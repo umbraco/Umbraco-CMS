@@ -83,7 +83,7 @@ internal sealed class RedirectUrlServiceTests : UmbracoIntegrationTestWithConten
     public void Can_Get_Most_Recent_RedirectUrl()
     {
         var redirect = RedirectUrlService.GetMostRecentRedirectUrl(Url);
-        Assert.AreEqual(redirect.ContentId, _secondSubPage.Id);
+        Assert.That(_secondSubPage.Id, Is.EqualTo(redirect.ContentId));
     }
 
     [Test]
@@ -91,7 +91,7 @@ internal sealed class RedirectUrlServiceTests : UmbracoIntegrationTestWithConten
     public void Can_Get_Most_Recent_RedirectUrl_With_Culture()
     {
         var redirect = RedirectUrlService.GetMostRecentRedirectUrl(Url, CultureEnglish);
-        Assert.AreEqual(redirect.ContentId, _firstSubPage.Id);
+        Assert.That(_firstSubPage.Id, Is.EqualTo(redirect.ContentId));
     }
 
     [Test]
@@ -99,7 +99,7 @@ internal sealed class RedirectUrlServiceTests : UmbracoIntegrationTestWithConten
     public void Can_Get_Most_Recent_RedirectUrl_With_Culture_When_No_CultureVariant_Exists()
     {
         var redirect = RedirectUrlService.GetMostRecentRedirectUrl(UrlAlt, UnusedCulture);
-        Assert.AreEqual(redirect.ContentId, _thirdSubPage.Id);
+        Assert.That(_thirdSubPage.Id, Is.EqualTo(redirect.ContentId));
     }
 
     [Test]
@@ -111,8 +111,8 @@ internal sealed class RedirectUrlServiceTests : UmbracoIntegrationTestWithConten
 
         var redirect = RedirectUrlService.GetMostRecentRedirectUrl(TestUrl, CultureEnglish);
 
-        Assert.AreEqual(redirect.ContentId, _firstSubPage.Id);
-        Assert.AreEqual(status.Status, RedirectUrlOperationStatus.Success);
+        Assert.That(_firstSubPage.Id, Is.EqualTo(redirect.ContentId));
+        Assert.That(status.Status, Is.EqualTo(RedirectUrlOperationStatus.Success));
     }
 
     [Test]
@@ -129,18 +129,18 @@ internal sealed class RedirectUrlServiceTests : UmbracoIntegrationTestWithConten
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(result.Success);
-            Assert.AreEqual(RedirectUrlOperationStatus.Success, result.Status);
+            Assert.That(result.Success, Is.True);
+            Assert.That(result.Status, Is.EqualTo(RedirectUrlOperationStatus.Success));
 
-            Assert.IsNotNull(savingCaptured);
+            Assert.That(savingCaptured, Is.Not.Null);
             IRedirectUrl savingEntity = savingCaptured!.SavedEntities.Single();
-            Assert.AreEqual(_firstSubPage.Key, savingEntity.ContentKey);
-            Assert.AreEqual(OldUrl, savingEntity.Url);
+            Assert.That(savingEntity.ContentKey, Is.EqualTo(_firstSubPage.Key));
+            Assert.That(savingEntity.Url, Is.EqualTo(OldUrl));
 
-            Assert.IsNotNull(savedCaptured);
+            Assert.That(savedCaptured, Is.Not.Null);
             IRedirectUrl savedEntity = savedCaptured!.SavedEntities.Single();
-            Assert.AreEqual(_firstSubPage.Key, savedEntity.ContentKey);
-            Assert.AreEqual(OldUrl, savedEntity.Url);
+            Assert.That(savedEntity.ContentKey, Is.EqualTo(_firstSubPage.Key));
+            Assert.That(savedEntity.Url, Is.EqualTo(OldUrl));
         });
     }
 
@@ -157,14 +157,14 @@ internal sealed class RedirectUrlServiceTests : UmbracoIntegrationTestWithConten
 
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(result.Success);
-            Assert.AreEqual(RedirectUrlOperationStatus.CancelledByNotification, result.Status);
-            Assert.IsFalse(savedWasCalled, "Saved notification must not fire when Saving was cancelled.");
+            Assert.That(result.Success, Is.False);
+            Assert.That(result.Status, Is.EqualTo(RedirectUrlOperationStatus.CancelledByNotification));
+            Assert.That(savedWasCalled, Is.False, "Saved notification must not fire when Saving was cancelled.");
         });
 
         // Verify nothing was persisted.
         var persisted = RedirectUrlService.GetMostRecentRedirectUrl(OldUrl, CultureEnglish);
-        Assert.IsNull(persisted);
+        Assert.That(persisted, Is.Null);
     }
 
     [Test]
@@ -180,12 +180,12 @@ internal sealed class RedirectUrlServiceTests : UmbracoIntegrationTestWithConten
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(RedirectUrlOperationStatus.CancelledByNotification, status);
-            Assert.IsFalse(deletedWasCalled);
+            Assert.That(status, Is.EqualTo(RedirectUrlOperationStatus.CancelledByNotification));
+            Assert.That(deletedWasCalled, Is.False);
         });
 
         // Verify the redirect still exists.
-        Assert.IsNotNull(RedirectUrlService.GetContentRedirectUrls(_firstSubPage.Key).FirstOrDefault(r => r.Key == existing.Key));
+        Assert.That(RedirectUrlService.GetContentRedirectUrls(_firstSubPage.Key).FirstOrDefault(r => r.Key == existing.Key), Is.Not.Null);
     }
 
     [Test]
@@ -193,7 +193,7 @@ internal sealed class RedirectUrlServiceTests : UmbracoIntegrationTestWithConten
     {
         var status = RedirectUrlService.DeleteWithStatus(Guid.NewGuid());
 
-        Assert.AreEqual(RedirectUrlOperationStatus.NotFound, status);
+        Assert.That(status, Is.EqualTo(RedirectUrlOperationStatus.NotFound));
     }
 
     [Test]
@@ -203,8 +203,8 @@ internal sealed class RedirectUrlServiceTests : UmbracoIntegrationTestWithConten
 
         var status = RedirectUrlService.DeleteContentRedirectUrlsWithStatus(_firstSubPage.Key);
 
-        Assert.AreEqual(RedirectUrlOperationStatus.CancelledByNotification, status);
-        Assert.IsNotEmpty(RedirectUrlService.GetContentRedirectUrls(_firstSubPage.Key));
+        Assert.That(status, Is.EqualTo(RedirectUrlOperationStatus.CancelledByNotification));
+        Assert.That(RedirectUrlService.GetContentRedirectUrls(_firstSubPage.Key), Is.Not.Empty);
     }
 
     internal sealed class RedirectUrlNotificationHandler :

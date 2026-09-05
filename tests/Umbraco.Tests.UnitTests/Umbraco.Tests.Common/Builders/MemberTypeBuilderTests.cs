@@ -85,31 +85,31 @@ public class MemberTypeBuilderTests
             .Build();
 
         // Assert
-        Assert.AreEqual(testId, memberType.Id);
-        Assert.AreEqual(testAlias, memberType.Alias);
-        Assert.AreEqual(testName, memberType.Name);
-        Assert.AreEqual(testKey, memberType.Key);
-        Assert.AreEqual(testCreateDate, memberType.CreateDate);
-        Assert.AreEqual(testUpdateDate, memberType.UpdateDate);
-        Assert.AreEqual(testCreatorId, memberType.CreatorId);
-        Assert.AreEqual(testParentId, memberType.ParentId);
-        Assert.AreEqual(testLevel, memberType.Level);
-        Assert.AreEqual(testPath, memberType.Path);
-        Assert.AreEqual(testSortOrder, memberType.SortOrder);
-        Assert.AreEqual(testDescription, memberType.Description);
-        Assert.AreEqual(testIcon, memberType.Icon);
-        Assert.AreEqual(testThumbnail, memberType.Thumbnail);
-        Assert.AreEqual(testTrashed, memberType.Trashed);
-        Assert.IsNull(memberType.ListView);
-        Assert.AreEqual(3, memberType.PropertyTypes.Count()); // 1 from membership properties group, 2 custom
+        Assert.That(memberType.Id, Is.EqualTo(testId));
+        Assert.That(memberType.Alias, Is.EqualTo(testAlias));
+        Assert.That(memberType.Name, Is.EqualTo(testName));
+        Assert.That(memberType.Key, Is.EqualTo(testKey));
+        Assert.That(memberType.CreateDate, Is.EqualTo(testCreateDate));
+        Assert.That(memberType.UpdateDate, Is.EqualTo(testUpdateDate));
+        Assert.That(memberType.CreatorId, Is.EqualTo(testCreatorId));
+        Assert.That(memberType.ParentId, Is.EqualTo(testParentId));
+        Assert.That(memberType.Level, Is.EqualTo(testLevel));
+        Assert.That(memberType.Path, Is.EqualTo(testPath));
+        Assert.That(memberType.SortOrder, Is.EqualTo(testSortOrder));
+        Assert.That(memberType.Description, Is.EqualTo(testDescription));
+        Assert.That(memberType.Icon, Is.EqualTo(testIcon));
+        Assert.That(memberType.Thumbnail, Is.EqualTo(testThumbnail));
+        Assert.That(memberType.Trashed, Is.EqualTo(testTrashed));
+        Assert.That(memberType.ListView, Is.Null);
+        Assert.That(memberType.PropertyTypes.Count(), Is.EqualTo(3)); // 1 from membership properties group, 2 custom
 
         var propertyTypeIds = memberType.PropertyTypes.Select(x => x.Id).OrderBy(x => x).ToArray();
-        Assert.AreEqual(testPropertyTypeIdsIncrementingFrom + 1, propertyTypeIds.Min());
-        Assert.AreEqual(testPropertyTypeIdsIncrementingFrom + 3, propertyTypeIds.Max());
+        Assert.That(propertyTypeIds.Min(), Is.EqualTo(testPropertyTypeIdsIncrementingFrom + 1));
+        Assert.That(propertyTypeIds.Max(), Is.EqualTo(testPropertyTypeIdsIncrementingFrom + 3));
 
-        Assert.IsTrue(memberType.MemberCanEditProperty(testPropertyType1.Alias));
-        Assert.IsFalse(memberType.MemberCanViewProperty(testPropertyType1.Alias));
-        Assert.IsTrue(memberType.MemberCanViewProperty(testPropertyType2.Alias));
-        Assert.IsFalse(memberType.MemberCanEditProperty(testPropertyType2.Alias));
+        Assert.That(memberType.MemberCanEditProperty(testPropertyType1.Alias), Is.True);
+        Assert.That(memberType.MemberCanViewProperty(testPropertyType1.Alias), Is.False);
+        Assert.That(memberType.MemberCanViewProperty(testPropertyType2.Alias), Is.True);
+        Assert.That(memberType.MemberCanEditProperty(testPropertyType2.Alias), Is.False);
     }
 }

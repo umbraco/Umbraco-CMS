@@ -88,8 +88,8 @@ internal sealed partial class UserServiceTests
             timings[i] = watch.ElapsedMilliseconds;
 
             // Basic correctness assertion on every iteration
-            Assert.IsTrue(result.Success);
-            Assert.AreEqual(childCount, result.Result.Count());
+            Assert.That(result.Success, Is.True);
+            Assert.That(result.Result.Count(), Is.EqualTo(childCount));
         }
 
         var median = timings.OrderBy(t => t).ElementAt(iterations / 2);
@@ -113,19 +113,19 @@ internal sealed partial class UserServiceTests
         for (var i = 0; i < 5; i++)
         {
             var perms = permissionsByKey[children[i].Key];
-            Assert.IsTrue(perms.Contains(ActionBrowse.ActionLetter), $"child-{i} should have Browse");
-            Assert.IsTrue(perms.Contains(ActionPublish.ActionLetter), $"child-{i} should have Publish");
-            Assert.IsFalse(perms.Contains(ActionMove.ActionLetter), $"child-{i} should NOT have Move (overridden)");
-            Assert.IsFalse(perms.Contains(ActionDelete.ActionLetter), $"child-{i} should NOT have Delete (overridden)");
+            Assert.That(perms.Contains(ActionBrowse.ActionLetter), Is.True, $"child-{i} should have Browse");
+            Assert.That(perms.Contains(ActionPublish.ActionLetter), Is.True, $"child-{i} should have Publish");
+            Assert.That(perms.Contains(ActionMove.ActionLetter), Is.False, $"child-{i} should NOT have Move (overridden)");
+            Assert.That(perms.Contains(ActionDelete.ActionLetter), Is.False, $"child-{i} should NOT have Delete (overridden)");
         }
 
         // child-5 through child-49: inherited from parent (Browse + Move)
         for (var i = 5; i < childCount; i++)
         {
             var perms = permissionsByKey[children[i].Key];
-            Assert.IsTrue(perms.Contains(ActionBrowse.ActionLetter), $"child-{i} should inherit Browse from parent");
-            Assert.IsTrue(perms.Contains(ActionMove.ActionLetter), $"child-{i} should inherit Move from parent");
-            Assert.IsFalse(perms.Contains(ActionDelete.ActionLetter), $"child-{i} should NOT have Delete (parent overrides root)");
+            Assert.That(perms.Contains(ActionBrowse.ActionLetter), Is.True, $"child-{i} should inherit Browse from parent");
+            Assert.That(perms.Contains(ActionMove.ActionLetter), Is.True, $"child-{i} should inherit Move from parent");
+            Assert.That(perms.Contains(ActionDelete.ActionLetter), Is.False, $"child-{i} should NOT have Delete (parent overrides root)");
         }
 
         // Log the result so it appears in test output

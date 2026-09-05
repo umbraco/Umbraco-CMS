@@ -44,8 +44,8 @@ public class MimeTypesTransformerTests
 
         // Assert
         var response = (OpenApiResponse)operation.Responses!["200"];
-        Assert.AreEqual(1, response.Content?.Count);
-        Assert.IsTrue(response.Content?.ContainsKey("application/json"));
+        Assert.That(response.Content?.Count, Is.EqualTo(1));
+        Assert.That(response.Content?.ContainsKey("application/json"), Is.True);
     }
 
     [Test]
@@ -75,9 +75,9 @@ public class MimeTypesTransformerTests
 
         // Assert - text/plain is removed (JSON-equivalent), application/xml is kept
         var response = (OpenApiResponse)operation.Responses!["200"];
-        Assert.AreEqual(2, response.Content?.Count);
-        Assert.IsTrue(response.Content?.ContainsKey("application/json"));
-        Assert.IsTrue(response.Content?.ContainsKey("application/xml"));
+        Assert.That(response.Content?.Count, Is.EqualTo(2));
+        Assert.That(response.Content?.ContainsKey("application/json"), Is.True);
+        Assert.That(response.Content?.ContainsKey("application/xml"), Is.True);
     }
 
     [Test]
@@ -104,8 +104,8 @@ public class MimeTypesTransformerTests
 
         // Assert
         var requestBody = (OpenApiRequestBody)operation.RequestBody!;
-        Assert.AreEqual(1, requestBody.Content?.Count);
-        Assert.IsTrue(requestBody.Content?.ContainsKey("application/json"));
+        Assert.That(requestBody.Content?.Count, Is.EqualTo(1));
+        Assert.That(requestBody.Content?.ContainsKey("application/json"), Is.True);
     }
 
     [Test]
@@ -134,9 +134,9 @@ public class MimeTypesTransformerTests
 
         // Assert - All MIME types preserved when JSON is not present
         var response = (OpenApiResponse)operation.Responses!["200"];
-        Assert.AreEqual(2, response.Content?.Count);
-        Assert.IsTrue(response.Content?.ContainsKey("application/xml"));
-        Assert.IsTrue(response.Content?.ContainsKey("text/plain"));
+        Assert.That(response.Content?.Count, Is.EqualTo(2));
+        Assert.That(response.Content?.ContainsKey("application/xml"), Is.True);
+        Assert.That(response.Content?.ContainsKey("text/plain"), Is.True);
     }
 
     [Test]
@@ -205,8 +205,8 @@ public class MimeTypesTransformerTests
 
         // Assert
         var requestBody = (OpenApiRequestBody)operation.RequestBody!;
-        Assert.AreEqual(1, requestBody.Content?.Count);
-        Assert.IsTrue(requestBody.Content?.ContainsKey("multipart/form-data"));
+        Assert.That(requestBody.Content?.Count, Is.EqualTo(1));
+        Assert.That(requestBody.Content?.ContainsKey("multipart/form-data"), Is.True);
     }
 
     [Test]
@@ -234,9 +234,9 @@ public class MimeTypesTransformerTests
 
         // Assert
         var requestBody = (OpenApiRequestBody)operation.RequestBody!;
-        Assert.AreEqual(2, requestBody.Content?.Count);
-        Assert.IsTrue(requestBody.Content?.ContainsKey("application/json"));
-        Assert.IsTrue(requestBody.Content?.ContainsKey("text/plain"));
+        Assert.That(requestBody.Content?.Count, Is.EqualTo(2));
+        Assert.That(requestBody.Content?.ContainsKey("application/json"), Is.True);
+        Assert.That(requestBody.Content?.ContainsKey("text/plain"), Is.True);
     }
 
     [Test]
@@ -263,9 +263,9 @@ public class MimeTypesTransformerTests
 
         // Assert
         var requestBody = (OpenApiRequestBody)operation.RequestBody!;
-        Assert.AreEqual(1, requestBody.Content?.Count);
-        Assert.IsTrue(requestBody.Content?.ContainsKey("multipart/form-data"));
-        Assert.AreSame(existingSchema, requestBody.Content!["multipart/form-data"].Schema);
+        Assert.That(requestBody.Content?.Count, Is.EqualTo(1));
+        Assert.That(requestBody.Content?.ContainsKey("multipart/form-data"), Is.True);
+        Assert.That(requestBody.Content!["multipart/form-data"].Schema, Is.SameAs(existingSchema));
     }
 
     private static OpenApiOperationTransformerContext CreateContext(params object[] endpointMetadata) =>

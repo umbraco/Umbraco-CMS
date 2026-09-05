@@ -32,11 +32,11 @@ public class UserGroupServiceTests
         var result = await userGroupService.FilterAsync(userKey, null, 0, 10);
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(result.Success);
-            Assert.AreEqual(userGroupAliases.Length, result.Result.Items.Count());
+            Assert.That(result.Success, Is.True);
+            Assert.That(result.Result.Items.Count(), Is.EqualTo(userGroupAliases.Length));
             foreach (var userGroupAlias in userGroupAliases)
             {
-                Assert.IsNotNull(result.Result.Items.SingleOrDefault(g => g.Alias == userGroupAlias));
+                Assert.That(result.Result.Items.SingleOrDefault(g => g.Alias == userGroupAlias), Is.Not.Null);
             }
         });
     }
@@ -52,8 +52,8 @@ public class UserGroupServiceTests
         var result = await userGroupService.FilterAsync(userKey, null, 0, 10);
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(result.Success);
-            Assert.IsEmpty(result.Result.Items);
+            Assert.That(result.Success, Is.True);
+            Assert.That(result.Result.Items, Is.Empty);
         });
     }
 
@@ -66,12 +66,12 @@ public class UserGroupServiceTests
         var result = await userGroupService.FilterAsync(userKey, null, 0, 10);
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(result.Success);
-            Assert.AreEqual(4, result.Result.Items.Count());
-            Assert.IsNotNull(result.Result.Items.SingleOrDefault(g => g.Alias == Constants.Security.AdminGroupAlias));
-            Assert.IsNotNull(result.Result.Items.SingleOrDefault(g => g.Alias == "one"));
-            Assert.IsNotNull(result.Result.Items.SingleOrDefault(g => g.Alias == "two"));
-            Assert.IsNotNull(result.Result.Items.SingleOrDefault(g => g.Alias == "three"));
+            Assert.That(result.Success, Is.True);
+            Assert.That(result.Result.Items.Count(), Is.EqualTo(4));
+            Assert.That(result.Result.Items.SingleOrDefault(g => g.Alias == Constants.Security.AdminGroupAlias), Is.Not.Null);
+            Assert.That(result.Result.Items.SingleOrDefault(g => g.Alias == "one"), Is.Not.Null);
+            Assert.That(result.Result.Items.SingleOrDefault(g => g.Alias == "two"), Is.Not.Null);
+            Assert.That(result.Result.Items.SingleOrDefault(g => g.Alias == "three"), Is.Not.Null);
         });
     }
 
@@ -84,10 +84,10 @@ public class UserGroupServiceTests
         var result = await userGroupService.FilterAsync(userKey, "e", 0, 10);
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(result.Success);
-            Assert.AreEqual(2, result.Result.Items.Count());
-            Assert.IsNotNull(result.Result.Items.SingleOrDefault(g => g.Alias == "one"));
-            Assert.IsNotNull(result.Result.Items.SingleOrDefault(g => g.Alias == "three"));
+            Assert.That(result.Success, Is.True);
+            Assert.That(result.Result.Items.Count(), Is.EqualTo(2));
+            Assert.That(result.Result.Items.SingleOrDefault(g => g.Alias == "one"), Is.Not.Null);
+            Assert.That(result.Result.Items.SingleOrDefault(g => g.Alias == "three"), Is.Not.Null);
         });
     }
 
@@ -170,7 +170,7 @@ public class UserGroupServiceTests
         var updateAttempt = await service.UpdateAsync(updatingUserGroup, actingUserKey);
 
         // assert
-        Assert.AreEqual(status, updateAttempt.Status);
+        Assert.That(updateAttempt.Status, Is.EqualTo(status));
     }
 
     [Test]
@@ -197,8 +197,8 @@ public class UserGroupServiceTests
             performingUserKey);
 
         // Assert
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(UserGroupOperationStatus.Success, result.Result);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result, Is.EqualTo(UserGroupOperationStatus.Success));
     }
 
     [Test]
@@ -224,8 +224,8 @@ public class UserGroupServiceTests
             performingUserKey);
 
         // Assert
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(UserGroupOperationStatus.Success, result.Result);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result, Is.EqualTo(UserGroupOperationStatus.Success));
     }
 
     [Test]
@@ -251,8 +251,8 @@ public class UserGroupServiceTests
             performingUserKey);
 
         // Assert
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(UserGroupOperationStatus.Unauthorized, result.Result);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Result, Is.EqualTo(UserGroupOperationStatus.Unauthorized));
     }
 
     [Test]
@@ -279,8 +279,8 @@ public class UserGroupServiceTests
             performingUserKey);
 
         // Assert
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(UserGroupOperationStatus.Success, result.Result);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result, Is.EqualTo(UserGroupOperationStatus.Success));
     }
 
     [Test]
@@ -305,8 +305,8 @@ public class UserGroupServiceTests
             performingUserKey);
 
         // Assert
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(UserGroupOperationStatus.Success, result.Result);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result, Is.EqualTo(UserGroupOperationStatus.Success));
     }
 
     [Test]
@@ -331,8 +331,8 @@ public class UserGroupServiceTests
             performingUserKey);
 
         // Assert
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(UserGroupOperationStatus.Unauthorized, result.Result);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Result, Is.EqualTo(UserGroupOperationStatus.Unauthorized));
     }
 
     [Test]
@@ -388,8 +388,8 @@ public class UserGroupServiceTests
             performingUserKey);
 
         // Assert
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(UserGroupOperationStatus.MissingUser, result.Result);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Result, Is.EqualTo(UserGroupOperationStatus.MissingUser));
     }
 
     private UserGroupService SetupUserGroupServiceForUpdateUserGroups(

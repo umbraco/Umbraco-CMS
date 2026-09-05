@@ -28,23 +28,23 @@ public class RelationTypeTests
 
         var clone = (RelationType)item.DeepClone();
 
-        Assert.AreNotSame(clone, item);
-        Assert.AreEqual(clone, item);
-        Assert.AreEqual(clone.Alias, item.Alias);
-        Assert.AreEqual(clone.ChildObjectType, item.ChildObjectType);
-        Assert.AreEqual(clone.ParentObjectType, item.ParentObjectType);
-        Assert.AreEqual(clone.IsBidirectional, item.IsBidirectional);
-        Assert.AreEqual(clone.Id, item.Id);
-        Assert.AreEqual(clone.Key, item.Key);
-        Assert.AreEqual(clone.Name, item.Name);
-        Assert.AreEqual(clone.CreateDate, item.CreateDate);
-        Assert.AreEqual(clone.UpdateDate, item.UpdateDate);
+        Assert.That(item, Is.Not.SameAs(clone));
+        Assert.That(item, Is.EqualTo(clone));
+        Assert.That(item.Alias, Is.EqualTo(clone.Alias));
+        Assert.That(item.ChildObjectType, Is.EqualTo(clone.ChildObjectType));
+        Assert.That(item.ParentObjectType, Is.EqualTo(clone.ParentObjectType));
+        Assert.That(item.IsBidirectional, Is.EqualTo(clone.IsBidirectional));
+        Assert.That(item.Id, Is.EqualTo(clone.Id));
+        Assert.That(item.Key, Is.EqualTo(clone.Key));
+        Assert.That(item.Name, Is.EqualTo(clone.Name));
+        Assert.That(item.CreateDate, Is.EqualTo(clone.CreateDate));
+        Assert.That(item.UpdateDate, Is.EqualTo(clone.UpdateDate));
 
         // This double verifies by reflection
         var allProps = clone.GetType().GetProperties();
         foreach (var propertyInfo in allProps)
         {
-            Assert.AreEqual(propertyInfo.GetValue(clone, null), propertyInfo.GetValue(item, null));
+            Assert.That(propertyInfo.GetValue(item, null), Is.EqualTo(propertyInfo.GetValue(clone, null)));
         }
     }
 

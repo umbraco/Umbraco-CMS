@@ -206,8 +206,8 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(1, result.Count());
-            CollectionAssert.Contains(result, startNodeSelector.Context.CurrentKey.Value);
+            Assert.That(result.Count(), Is.EqualTo(1));
+            Assert.That(result, Has.Member(startNodeSelector.Context.CurrentKey.Value));
         });
     }
 
@@ -240,7 +240,7 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(0, result.Count());
+            Assert.That(result.Count(), Is.EqualTo(0));
         });
     }
 
@@ -277,7 +277,7 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(0, result.Count());
+            Assert.That(result.Count(), Is.EqualTo(0));
         });
     }
 
@@ -327,8 +327,8 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(1, result.Count());
-            CollectionAssert.Contains(result, ContentActs2022.Key);
+            Assert.That(result.Count(), Is.EqualTo(1));
+            Assert.That(result, Has.Member(ContentActs2022.Key));
         });
     }
 
@@ -376,8 +376,8 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(1, result.Count());
-            CollectionAssert.Contains(result, contentNewActs.Key);
+            Assert.That(result.Count(), Is.EqualTo(1));
+            Assert.That(result, Has.Member(contentNewActs.Key));
         });
     }
 
@@ -415,8 +415,8 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(1, result.Count());
-            CollectionAssert.Contains(result, ContentStages2022.Key);
+            Assert.That(result.Count(), Is.EqualTo(1));
+            Assert.That(result, Has.Member(ContentStages2022.Key));
         });
     }
 
@@ -448,8 +448,8 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(1, result.Count());
-            CollectionAssert.Contains(result, startNodeSelector.Context.CurrentKey.Value);
+            Assert.That(result.Count(), Is.EqualTo(1));
+            Assert.That(result, Has.Member(startNodeSelector.Context.CurrentKey.Value));
         });
     }
 
@@ -474,8 +474,8 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(1, result.Count());
-            CollectionAssert.Contains(result, startNodeSelector.Context.ParentKey);
+            Assert.That(result.Count(), Is.EqualTo(1));
+            Assert.That(result, Has.Member(startNodeSelector.Context.ParentKey));
         });
     }
 
@@ -521,7 +521,7 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
         var result = (await DynamicRootService.GetDynamicRootsAsync(startNodeSelector)).ToList();
 
         // Assert
-        Assert.AreEqual(0, result.Count());
+        Assert.That(result.Count(), Is.EqualTo(0));
     }
 
     /// <summary>
@@ -562,7 +562,7 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
         // Assert - should resolve the same as if editing existing content at the same tree position
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(1, result.Count());
+            Assert.That(result.Count(), Is.EqualTo(1));
             Assert.That(result, Has.Member(ContentStages2022.Key));
         });
     }
@@ -585,7 +585,7 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
         var result = DynamicRootService.FindOriginKey(selector);
 
         // Assert
-        Assert.AreEqual(selector.Context.ParentKey, result);
+        Assert.That(result, Is.EqualTo(selector.Context.ParentKey));
     }
 
     /// <summary>
@@ -606,7 +606,7 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
         var result = DynamicRootService.FindOriginKey(selector);
 
         // Assert
-        Assert.AreEqual(selector.Context.CurrentKey, result);
+        Assert.That(result, Is.EqualTo(selector.Context.CurrentKey));
     }
 
     /// <summary>
@@ -628,7 +628,7 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
         var result = DynamicRootService.FindOriginKey(selector);
 
         // Assert
-        Assert.IsNull(result);
+        Assert.That(result, Is.Null);
     }
 
     /// <summary>
@@ -650,7 +650,7 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
         var result = DynamicRootService.FindOriginKey(selector);
 
         // Assert
-        Assert.AreEqual(ContentYears.Key, result);
+        Assert.That(result, Is.EqualTo(ContentYears.Key));
     }
 
     /// <summary>
@@ -674,7 +674,7 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
         var result = DynamicRootService.FindOriginKey(selector);
 
         // Assert
-        Assert.AreEqual(ContentYears.Key, result);
+        Assert.That(result, Is.EqualTo(ContentYears.Key));
     }
 
     /// <summary>
@@ -699,7 +699,7 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
         var result = DynamicRootService.FindOriginKey(selector);
 
         // Assert
-        Assert.AreEqual(Constants.System.RootSystemKey, result);
+        Assert.That(result, Is.EqualTo(Constants.System.RootSystemKey));
     }
 
     /// <summary>
@@ -733,7 +733,7 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
         var result = DynamicRootService.FindOriginKey(selector);
 
         // Assert
-        Assert.AreEqual(origin.Key, result);
+        Assert.That(result, Is.EqualTo(origin.Key));
     }
 
     /// <summary>
@@ -767,7 +767,7 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
         var result = DynamicRootService.FindOriginKey(selector);
 
         // Assert
-        Assert.AreEqual(ContentYears.Key, result);
+        Assert.That(result, Is.EqualTo(ContentYears.Key));
     }
 
     /// <summary>
@@ -792,7 +792,7 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
         var result = DynamicRootService.FindOriginKey(selector);
 
         // Assert
-        Assert.AreEqual(ContentYears.Key, result);
+        Assert.That(result, Is.EqualTo(ContentYears.Key));
     }
 
     /// <summary>
@@ -818,7 +818,7 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
         var result = DynamicRootService.FindOriginKey(selector);
 
         // Assert
-        Assert.IsNull(result);
+        Assert.That(result, Is.Null);
     }
 
     /// <summary>
@@ -844,7 +844,7 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
         var result = DynamicRootService.FindOriginKey(selector);
 
         // Assert
-        Assert.IsNotNull(result);
+        Assert.That(result, Is.Not.Null);
     }
 
     /// <summary>
@@ -870,7 +870,7 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
         var result = DynamicRootService.FindOriginKey(selector);
 
         // Assert
-        Assert.IsNull(result);
+        Assert.That(result, Is.Null);
     }
 
     private static ContentTypeSort CreateContentTypeSort(ContentType contentType, int sortOrder)

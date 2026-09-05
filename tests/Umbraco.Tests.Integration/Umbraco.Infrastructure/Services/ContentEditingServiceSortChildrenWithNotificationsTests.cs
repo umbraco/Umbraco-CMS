@@ -26,7 +26,7 @@ internal sealed class ContentEditingServiceSortChildrenWithNotificationsTests : 
 
         var result = await ContentEditingService.SortByFieldAsync(root.Key, ContentSortField.Name, Direction.Descending, culture: null, Constants.Security.SuperUserKey);
 
-        Assert.AreEqual(ContentEditingOperationStatus.Success, result);
-        Assert.Greater(SortedNotificationCount, 0, "Expected a ContentSortedNotification when the opt-in setting is enabled.");
+        Assert.That(result, Is.EqualTo(ContentEditingOperationStatus.Success));
+        Assert.That(SortedNotificationCount, Is.GreaterThan(0), "Expected a ContentSortedNotification when the opt-in setting is enabled.");
     }
 }

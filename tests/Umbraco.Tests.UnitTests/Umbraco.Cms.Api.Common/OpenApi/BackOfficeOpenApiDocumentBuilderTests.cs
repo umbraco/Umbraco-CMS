@@ -23,10 +23,10 @@ public class BackOfficeOpenApiDocumentBuilderTests
     {
         OpenApiOptions options = BuildAndResolveOptions();
 
-        Assert.AreEqual(
-            (Func<System.Text.Json.Serialization.Metadata.JsonTypeInfo, string?>)UmbracoSchemaIdGenerator
-                .CreateSchemaReferenceId,
-            options.CreateSchemaReferenceId);
+        Assert.That(
+            options.CreateSchemaReferenceId,
+            Is.EqualTo((Func<System.Text.Json.Serialization.Metadata.JsonTypeInfo, string?>)UmbracoSchemaIdGenerator
+                .CreateSchemaReferenceId));
     }
 
     [Test]
@@ -35,7 +35,7 @@ public class BackOfficeOpenApiDocumentBuilderTests
         OpenApiOptions options = BuildAndResolveOptions();
         ApiDescription description = CreateApiDescription(new MapToApiAttribute(DocumentName));
 
-        Assert.IsTrue(options.ShouldInclude!(description));
+        Assert.That(options.ShouldInclude!(description), Is.True);
     }
 
     [Test]
@@ -44,7 +44,7 @@ public class BackOfficeOpenApiDocumentBuilderTests
         OpenApiOptions options = BuildAndResolveOptions();
         ApiDescription description = CreateApiDescription(new MapToApiAttribute("other-doc"));
 
-        Assert.IsFalse(options.ShouldInclude!(description));
+        Assert.That(options.ShouldInclude!(description), Is.False);
     }
 
     [Test]
@@ -53,7 +53,7 @@ public class BackOfficeOpenApiDocumentBuilderTests
         OpenApiOptions options = BuildAndResolveOptions();
         ApiDescription description = CreateApiDescription();
 
-        Assert.IsFalse(options.ShouldInclude!(description));
+        Assert.That(options.ShouldInclude!(description), Is.False);
     }
 
     [Test]
@@ -77,7 +77,7 @@ public class BackOfficeOpenApiDocumentBuilderTests
         OpenApiOptions options = BuildAndResolveOptions(b => b
             .ConfigureOpenApiOptions(o => o.CreateSchemaReferenceId = customGenerator));
 
-        Assert.AreEqual(customGenerator, options.CreateSchemaReferenceId);
+        Assert.That(options.CreateSchemaReferenceId, Is.EqualTo(customGenerator));
     }
 
     [Test]
@@ -85,7 +85,7 @@ public class BackOfficeOpenApiDocumentBuilderTests
     {
         SwaggerUIOptions swaggerOptions = BuildAndResolveSwaggerOptions(b => b.WithTitle("My API"));
 
-        Assert.IsTrue(swaggerOptions.ConfigObject.Urls!.Any(url => url.Name == "My API"));
+        Assert.That(swaggerOptions.ConfigObject.Urls!.Any(url => url.Name == "My API"), Is.True);
     }
 
     [Test]
@@ -95,8 +95,8 @@ public class BackOfficeOpenApiDocumentBuilderTests
             .WithTitle("Info Title")
             .WithUiTitle("Short Label"));
 
-        Assert.IsTrue(swaggerOptions.ConfigObject.Urls!.Any(url => url.Name == "Short Label"));
-        Assert.IsFalse(swaggerOptions.ConfigObject.Urls!.Any(url => url.Name == "Info Title"));
+        Assert.That(swaggerOptions.ConfigObject.Urls!.Any(url => url.Name == "Short Label"), Is.True);
+        Assert.That(swaggerOptions.ConfigObject.Urls!.Any(url => url.Name == "Info Title"), Is.False);
     }
 
     [Test]
@@ -104,7 +104,7 @@ public class BackOfficeOpenApiDocumentBuilderTests
     {
         SwaggerUIOptions swaggerOptions = BuildAndResolveSwaggerOptions();
 
-        Assert.IsTrue(swaggerOptions.ConfigObject.Urls!.Any(url => url.Name == DocumentName));
+        Assert.That(swaggerOptions.ConfigObject.Urls!.Any(url => url.Name == DocumentName), Is.True);
     }
 
     [Test]
@@ -115,7 +115,7 @@ public class BackOfficeOpenApiDocumentBuilderTests
             .ExcludeFromUi());
 
         IEnumerable<UrlDescriptor>? urls = swaggerOptions.ConfigObject.Urls;
-        Assert.IsTrue(urls is null || urls.All(url => url.Name != "My API" && url.Name != DocumentName));
+        Assert.That(urls is null || urls.All(url => url.Name != "My API" && url.Name != DocumentName), Is.True);
     }
 
     [Test]
@@ -133,9 +133,9 @@ public class BackOfficeOpenApiDocumentBuilderTests
         ServiceProvider provider = services.BuildServiceProvider();
         OpenApiOptions options = provider.GetRequiredService<IOptionsMonitor<OpenApiOptions>>().Get("mixedcasedocument");
 
-        Assert.IsTrue(options.ShouldInclude!(CreateApiDescription(new MapToApiAttribute("MixedCaseDocument"))));
-        Assert.IsTrue(options.ShouldInclude!(CreateApiDescription(new MapToApiAttribute("MIXEDCASEDOCUMENT"))));
-        Assert.IsTrue(options.ShouldInclude!(CreateApiDescription(new MapToApiAttribute("mixedcasedocument"))));
+        Assert.That(options.ShouldInclude!(CreateApiDescription(new MapToApiAttribute("MixedCaseDocument"))), Is.True);
+        Assert.That(options.ShouldInclude!(CreateApiDescription(new MapToApiAttribute("MIXEDCASEDOCUMENT"))), Is.True);
+        Assert.That(options.ShouldInclude!(CreateApiDescription(new MapToApiAttribute("mixedcasedocument"))), Is.True);
     }
 
     private static OpenApiOptions BuildAndResolveOptions(Action<BackOfficeOpenApiDocumentBuilder>? configure = null)

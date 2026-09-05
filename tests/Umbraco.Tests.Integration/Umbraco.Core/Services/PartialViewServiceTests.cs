@@ -51,10 +51,10 @@ internal sealed class PartialViewServiceTests : UmbracoIntegrationTest
 
         var result = await PartialViewService.CreateAsync(createModel, Constants.Security.SuperUserKey);
 
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(PartialViewOperationStatus.Success, result.Status);
-        Assert.IsNotNull(result.Result);
-        Assert.AreEqual("TestPartialView.cshtml", result.Result.Name);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(PartialViewOperationStatus.Success));
+        Assert.That(result.Result, Is.Not.Null);
+        Assert.That(result.Result.Name, Is.EqualTo("TestPartialView.cshtml"));
     }
 
     [Test]
@@ -66,7 +66,7 @@ internal sealed class PartialViewServiceTests : UmbracoIntegrationTest
             Content = "@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage\n<p>Original</p>"
         };
         var createResult = await PartialViewService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(createResult.Success);
+        Assert.That(createResult.Success, Is.True);
 
         var updateModel = new PartialViewUpdateModel
         {
@@ -75,9 +75,9 @@ internal sealed class PartialViewServiceTests : UmbracoIntegrationTest
 
         var result = await PartialViewService.UpdateAsync(createResult.Result!.Path, updateModel, Constants.Security.SuperUserKey);
 
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(PartialViewOperationStatus.Success, result.Status);
-        Assert.IsNotNull(result.Result);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(PartialViewOperationStatus.Success));
+        Assert.That(result.Result, Is.Not.Null);
         Assert.That(result.Result.Content, Does.Contain("Updated"));
     }
 
@@ -90,14 +90,14 @@ internal sealed class PartialViewServiceTests : UmbracoIntegrationTest
             Content = "@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage\n<p>Test</p>"
         };
         var createResult = await PartialViewService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(createResult.Success);
+        Assert.That(createResult.Success, Is.True);
 
         var result = await PartialViewService.DeleteAsync(createResult.Result!.Path, Constants.Security.SuperUserKey);
 
-        Assert.AreEqual(PartialViewOperationStatus.Success, result);
+        Assert.That(result, Is.EqualTo(PartialViewOperationStatus.Success));
 
         var getResult = await PartialViewService.GetAsync(createResult.Result.Path);
-        Assert.IsNull(getResult);
+        Assert.That(getResult, Is.Null);
     }
 
     [Test]
@@ -109,7 +109,7 @@ internal sealed class PartialViewServiceTests : UmbracoIntegrationTest
             Content = "@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage\n<p>Test</p>"
         };
         var createResult = await PartialViewService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(createResult.Success);
+        Assert.That(createResult.Success, Is.True);
 
         var renameModel = new PartialViewRenameModel
         {
@@ -118,10 +118,10 @@ internal sealed class PartialViewServiceTests : UmbracoIntegrationTest
 
         var result = await PartialViewService.RenameAsync(createResult.Result!.Path, renameModel, Constants.Security.SuperUserKey);
 
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(PartialViewOperationStatus.Success, result.Status);
-        Assert.IsNotNull(result.Result);
-        Assert.AreEqual("RenamedPartialView.cshtml", result.Result.Name);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(PartialViewOperationStatus.Success));
+        Assert.That(result.Result, Is.Not.Null);
+        Assert.That(result.Result.Name, Is.EqualTo("RenamedPartialView.cshtml"));
     }
 
     [Test]
@@ -136,9 +136,9 @@ internal sealed class PartialViewServiceTests : UmbracoIntegrationTest
 
         var result = await PartialViewService.CreateAsync(createModel, Constants.Security.SuperUserKey);
 
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(PartialViewOperationStatus.NotAllowedInProductionMode, result.Status);
-        Assert.IsNull(result.Result);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(PartialViewOperationStatus.NotAllowedInProductionMode));
+        Assert.That(result.Result, Is.Null);
     }
 
     [Test]
@@ -163,8 +163,8 @@ internal sealed class PartialViewServiceTests : UmbracoIntegrationTest
 
         var result = await PartialViewService.UpdateAsync(fileName, updateModel, Constants.Security.SuperUserKey);
 
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(PartialViewOperationStatus.NotAllowedInProductionMode, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(PartialViewOperationStatus.NotAllowedInProductionMode));
 
         // Verify the file was not changed
         using var fileStream = partialViewFileSystem.OpenFile(fileName);
@@ -188,12 +188,12 @@ internal sealed class PartialViewServiceTests : UmbracoIntegrationTest
             partialViewFileSystem.AddFile(fileName, stream);
         }
 
-        Assert.IsTrue(partialViewFileSystem.FileExists(fileName), "File should exist before delete attempt");
+        Assert.That(partialViewFileSystem.FileExists(fileName), Is.True, "File should exist before delete attempt");
 
         var result = await PartialViewService.DeleteAsync(fileName, Constants.Security.SuperUserKey);
 
-        Assert.AreEqual(PartialViewOperationStatus.NotAllowedInProductionMode, result);
-        Assert.IsTrue(partialViewFileSystem.FileExists(fileName), "File should still exist after blocked delete");
+        Assert.That(result, Is.EqualTo(PartialViewOperationStatus.NotAllowedInProductionMode));
+        Assert.That(partialViewFileSystem.FileExists(fileName), Is.True, "File should still exist after blocked delete");
     }
 
     [Test]
@@ -210,7 +210,7 @@ internal sealed class PartialViewServiceTests : UmbracoIntegrationTest
             partialViewFileSystem.AddFile(originalFileName, stream);
         }
 
-        Assert.IsTrue(partialViewFileSystem.FileExists(originalFileName), "Original file should exist");
+        Assert.That(partialViewFileSystem.FileExists(originalFileName), Is.True, "Original file should exist");
 
         var renameModel = new PartialViewRenameModel
         {
@@ -219,10 +219,10 @@ internal sealed class PartialViewServiceTests : UmbracoIntegrationTest
 
         var result = await PartialViewService.RenameAsync(originalFileName, renameModel, Constants.Security.SuperUserKey);
 
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(PartialViewOperationStatus.NotAllowedInProductionMode, result.Status);
-        Assert.IsTrue(partialViewFileSystem.FileExists(originalFileName), "Original file should still exist");
-        Assert.IsFalse(partialViewFileSystem.FileExists("RenamedFile.cshtml"), "Renamed file should not exist");
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(PartialViewOperationStatus.NotAllowedInProductionMode));
+        Assert.That(partialViewFileSystem.FileExists(originalFileName), Is.True, "Original file should still exist");
+        Assert.That(partialViewFileSystem.FileExists("RenamedFile.cshtml"), Is.False, "Renamed file should not exist");
     }
 
     [Test]
@@ -239,7 +239,7 @@ internal sealed class PartialViewServiceTests : UmbracoIntegrationTest
         {
             // GetAsync against a path that does not exist takes the read-miss code path.
             var result = await PartialViewFolderService.GetAsync("does-not-exist");
-            Assert.IsNull(result);
+            Assert.That(result, Is.Null);
 
             // Persist a canary in the same outer scope - this should survive scope.Complete().
             KeyValueService.SetValue(canaryKey, "ok");
@@ -247,7 +247,7 @@ internal sealed class PartialViewServiceTests : UmbracoIntegrationTest
         }
 
         // If the outer scope was poisoned by the un-completed child, this returns null.
-        Assert.AreEqual("ok", KeyValueService.GetValue(canaryKey));
+        Assert.That(KeyValueService.GetValue(canaryKey), Is.EqualTo("ok"));
     }
 
     [Test]
@@ -265,13 +265,13 @@ internal sealed class PartialViewServiceTests : UmbracoIntegrationTest
                 "does-not-exist.cshtml",
                 new PartialViewUpdateModel { Content = string.Empty },
                 Constants.Security.SuperUserKey);
-            Assert.AreEqual(PartialViewOperationStatus.NotFound, result.Status);
+            Assert.That(result.Status, Is.EqualTo(PartialViewOperationStatus.NotFound));
 
             KeyValueService.SetValue(canaryKey, "ok");
             outer.Complete();
         }
 
-        Assert.AreEqual("ok", KeyValueService.GetValue(canaryKey));
+        Assert.That(KeyValueService.GetValue(canaryKey), Is.EqualTo("ok"));
     }
 
     private void DeleteAllPartialViewFiles()

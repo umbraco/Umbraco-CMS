@@ -85,17 +85,17 @@ public class ApiContentResponseBuilderTests : UmbracoIntegrationTest
         UmbracoContextAccessor.Clear();
         var umbracoContext = UmbracoContextFactory.EnsureUmbracoContext().UmbracoContext;
         var publishedContent = umbracoContext.Content.GetById(content.Key);
-        Assert.IsNotNull(publishedContent);
+        Assert.That(publishedContent, Is.Not.Null);
 
         VariationContextAccessor.VariationContext = new VariationContext(culture: "en-US");
         var enResult = ApiContentResponseBuilder.Build(publishedContent);
-        Assert.IsNotNull(enResult);
+        Assert.That(enResult, Is.Not.Null);
 
         VariationContextAccessor.VariationContext = new VariationContext(culture: "da-DK");
         var daResult = ApiContentResponseBuilder.Build(publishedContent);
-        Assert.IsNotNull(daResult);
+        Assert.That(daResult, Is.Not.Null);
 
-        Assert.GreaterOrEqual((daResult.UpdateDate - enResult.UpdateDate).TotalMilliseconds, 200);
+        Assert.That((daResult.UpdateDate - enResult.UpdateDate).TotalMilliseconds, Is.GreaterThanOrEqualTo(200));
     }
 
     private void RefreshContentCache()

@@ -318,10 +318,10 @@ internal sealed class UserGroupRepositoryTest : UmbracoIntegrationTest
 
             // Assert
             var result = repository.GetMany(groups[0].Id, groups[1].Id).ToArray();
-            Assert.AreEqual(1, result[0].AllowedSections.Count());
-            Assert.AreEqual("media", result[0].AllowedSections.First());
-            Assert.AreEqual(1, result[1].AllowedSections.Count());
-            Assert.AreEqual("content", result[1].AllowedSections.First());
+            Assert.That(result[0].AllowedSections.Count(), Is.EqualTo(1));
+            Assert.That(result[0].AllowedSections.First(), Is.EqualTo("media"));
+            Assert.That(result[1].AllowedSections.Count(), Is.EqualTo(1));
+            Assert.That(result[1].AllowedSections.First(), Is.EqualTo("content"));
         }
     }
 
@@ -361,20 +361,20 @@ internal sealed class UserGroupRepositoryTest : UmbracoIntegrationTest
 
             for (var i = 0; i < 3; i++)
             {
-                Assert.IsNotNull(repository.Get(groups[i].Id));
+                Assert.That(repository.Get(groups[i].Id), Is.Not.Null);
             }
 
             // Assert
             var result = repository.GetMany(groups[0].Id, groups[1].Id, groups[2].Id).ToArray();
-            Assert.AreEqual(3, result.Length);
+            Assert.That(result, Has.Length.EqualTo(3));
 
-            Assert.AreEqual(3, result[0].AllowedSections.Count());
-            Assert.IsTrue(result[0].AllowedSections.Contains("content"));
-            Assert.IsTrue(result[0].AllowedSections.Contains("media"));
-            Assert.IsTrue(result[0].AllowedSections.Contains("settings"));
-            Assert.AreEqual(1, result[1].AllowedSections.Count());
-            Assert.IsTrue(result[1].AllowedSections.Contains("developer"));
-            Assert.AreEqual(0, result[2].AllowedSections.Count());
+            Assert.That(result[0].AllowedSections.Count(), Is.EqualTo(3));
+            Assert.That(result[0].AllowedSections, Does.Contain("content"));
+            Assert.That(result[0].AllowedSections, Does.Contain("media"));
+            Assert.That(result[0].AllowedSections, Does.Contain("settings"));
+            Assert.That(result[1].AllowedSections.Count(), Is.EqualTo(1));
+            Assert.That(result[1].AllowedSections, Does.Contain("developer"));
+            Assert.That(result[2].AllowedSections.Count(), Is.EqualTo(0));
         }
     }
 
@@ -398,9 +398,9 @@ internal sealed class UserGroupRepositoryTest : UmbracoIntegrationTest
 
             // Assert
             var result = repository.Get(groups[0].Id);
-            Assert.AreEqual(2, result.AllowedSections.Count());
-            Assert.IsTrue(result.AllowedSections.Contains("settings"));
-            Assert.IsTrue(result.AllowedSections.Contains("media"));
+            Assert.That(result.AllowedSections.Count(), Is.EqualTo(2));
+            Assert.That(result.AllowedSections, Does.Contain("settings"));
+            Assert.That(result.AllowedSections, Does.Contain("media"));
         }
     }
 
@@ -425,11 +425,11 @@ internal sealed class UserGroupRepositoryTest : UmbracoIntegrationTest
             var groups = repository.GetGroupsAssignedToSection("test1").ToArray();
 
             // Assert
-            Assert.AreEqual(2, groups.Count());
+            Assert.That(groups.Count(), Is.EqualTo(2));
             var names = groups.Select(x => x.Name).ToArray();
-            Assert.IsTrue(names.Contains("Test Group1"));
-            Assert.IsFalse(names.Contains("Test Group2"));
-            Assert.IsTrue(names.Contains("Test Group3"));
+            Assert.That(names.Contains("Test Group1"), Is.True);
+            Assert.That(names.Contains("Test Group2"), Is.False);
+            Assert.That(names.Contains("Test Group3"), Is.True);
         }
     }
 

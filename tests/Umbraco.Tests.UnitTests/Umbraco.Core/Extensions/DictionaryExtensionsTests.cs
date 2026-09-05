@@ -14,7 +14,7 @@ public class DictionaryExtensionsTests
     {
         var dictionary = new Dictionary<string, object?>();
 
-        Assert.AreEqual(string.Empty, dictionary.ToQueryString());
+        Assert.That(dictionary.ToQueryString(), Is.Empty);
     }
 
     [Test]
@@ -22,7 +22,7 @@ public class DictionaryExtensionsTests
     {
         var dictionary = new Dictionary<string, object?> { ["firstname"] = "shannon" };
 
-        Assert.AreEqual("firstname=shannon", dictionary.ToQueryString());
+        Assert.That(dictionary.ToQueryString(), Is.EqualTo("firstname=shannon"));
     }
 
     [Test]
@@ -50,7 +50,7 @@ public class DictionaryExtensionsTests
     {
         var dictionary = new Dictionary<string, object?> { ["key"] = null };
 
-        Assert.AreEqual("key=", dictionary.ToQueryString());
+        Assert.That(dictionary.ToQueryString(), Is.EqualTo("key="));
     }
 
     [Test]
@@ -59,6 +59,6 @@ public class DictionaryExtensionsTests
         var dictionary = new Dictionary<string, object?> { ["key"] = "a&b" };
 
         // The '&' inside the value must be URL-encoded (never treated as a separator or trimmed).
-        Assert.AreEqual("key=a%26b", dictionary.ToQueryString());
+        Assert.That(dictionary.ToQueryString(), Is.EqualTo("key=a%26b"));
     }
 }

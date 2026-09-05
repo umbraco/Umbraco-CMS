@@ -16,12 +16,12 @@ internal sealed partial class MediaNavigationServiceTests
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(3, initialChildrenKeysList.Count);
+            Assert.That(initialChildrenKeysList, Has.Count.EqualTo(3));
 
             // Assert initial order
-            Assert.AreEqual(Image1.Key, initialChildrenKeysList[0]);
-            Assert.AreEqual(SubAlbum1.Key, initialChildrenKeysList[1]);
-            Assert.AreEqual(SubAlbum2.Key, initialChildrenKeysList[2]);
+            Assert.That(initialChildrenKeysList[0], Is.EqualTo(Image1.Key));
+            Assert.That(initialChildrenKeysList[1], Is.EqualTo(SubAlbum1.Key));
+            Assert.That(initialChildrenKeysList[2], Is.EqualTo(SubAlbum2.Key));
         });
 
         IEnumerable<SortingModel> sortingModels = initialChildrenKeys
@@ -37,15 +37,15 @@ internal sealed partial class MediaNavigationServiceTests
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(SubAlbum2.Key, sortedChildrenKeysList[0]);
-            Assert.AreEqual(SubAlbum1.Key, sortedChildrenKeysList[1]);
-            Assert.AreEqual(Image1.Key, sortedChildrenKeysList[2]);
+            Assert.That(sortedChildrenKeysList[0], Is.EqualTo(SubAlbum2.Key));
+            Assert.That(sortedChildrenKeysList[1], Is.EqualTo(SubAlbum1.Key));
+            Assert.That(sortedChildrenKeysList[2], Is.EqualTo(Image1.Key));
         });
 
         var expectedChildrenKeysList = initialChildrenKeys.Reverse().ToList();
 
         // Check that the order matches what is expected
-        Assert.IsTrue(expectedChildrenKeysList.SequenceEqual(sortedChildrenKeysList));
+        Assert.That(expectedChildrenKeysList.SequenceEqual(sortedChildrenKeysList), Is.True);
     }
 
     [Test]
@@ -69,9 +69,9 @@ internal sealed partial class MediaNavigationServiceTests
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(SubAlbum1.Key, sortedChildrenKeysList[0]);
-            Assert.AreEqual(SubAlbum2.Key, sortedChildrenKeysList[1]);
-            Assert.AreEqual(Image1.Key, sortedChildrenKeysList[2]);
+            Assert.That(sortedChildrenKeysList[0], Is.EqualTo(SubAlbum1.Key));
+            Assert.That(sortedChildrenKeysList[1], Is.EqualTo(SubAlbum2.Key));
+            Assert.That(sortedChildrenKeysList[2], Is.EqualTo(Image1.Key));
         });
 
         var expectedChildrenKeysList = customSortingModels
@@ -80,7 +80,7 @@ internal sealed partial class MediaNavigationServiceTests
             .ToList();
 
         // Check that the order matches what is expected
-        Assert.IsTrue(expectedChildrenKeysList.SequenceEqual(sortedChildrenKeysList));
+        Assert.That(expectedChildrenKeysList.SequenceEqual(sortedChildrenKeysList), Is.True);
     }
 
     [Test]
@@ -104,7 +104,7 @@ internal sealed partial class MediaNavigationServiceTests
         var expectedRootKeysList = initialRootKeys.Reverse().ToList();
 
         // Check that the order matches what is expected
-        Assert.IsTrue(expectedRootKeysList.SequenceEqual(sortedRootKeys));
+        Assert.That(expectedRootKeysList.SequenceEqual(sortedRootKeys), Is.True);
     }
 
     [Test]
@@ -137,8 +137,8 @@ internal sealed partial class MediaNavigationServiceTests
 
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(initialDescendantsKeys.SequenceEqual(updatedDescendantsKeysList));
-            Assert.IsTrue(expectedDescendantsOrder.SequenceEqual(updatedDescendantsKeysList));
+            Assert.That(initialDescendantsKeys.SequenceEqual(updatedDescendantsKeysList), Is.False);
+            Assert.That(expectedDescendantsOrder.SequenceEqual(updatedDescendantsKeysList), Is.True);
         });
     }
 
@@ -167,7 +167,7 @@ internal sealed partial class MediaNavigationServiceTests
         MediaNavigationQueryService.TryGetSiblingsKeys(node, out IEnumerable<Guid> sortedSiblingsKeys);
         var sortedSiblingsKeysList = sortedSiblingsKeys.ToList();
 
-        Assert.IsTrue(expectedSiblingsOrder.SequenceEqual(sortedSiblingsKeysList));
+        Assert.That(expectedSiblingsOrder.SequenceEqual(sortedSiblingsKeysList), Is.True);
     }
 
     [Test]
@@ -194,6 +194,6 @@ internal sealed partial class MediaNavigationServiceTests
         MediaNavigationQueryService.TryGetSiblingsKeys(node, out IEnumerable<Guid> sortedSiblingsKeys);
         var sortedSiblingsKeysList = sortedSiblingsKeys.ToList();
 
-        Assert.IsTrue(expectedSiblingsKeysList.SequenceEqual(sortedSiblingsKeysList));
+        Assert.That(expectedSiblingsKeysList.SequenceEqual(sortedSiblingsKeysList), Is.True);
     }
 }

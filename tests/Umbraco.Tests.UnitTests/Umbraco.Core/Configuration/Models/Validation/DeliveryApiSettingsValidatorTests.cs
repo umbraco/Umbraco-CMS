@@ -29,7 +29,7 @@ public class DeliveryApiSettingsValidatorTests
 
         ValidateOptionsResult result = validator.Validate("settings", options);
 
-        Assert.IsTrue(result.Succeeded);
+        Assert.That(result.Succeeded, Is.True);
         VerifyNoWarningLogged();
     }
 
@@ -44,7 +44,7 @@ public class DeliveryApiSettingsValidatorTests
 
         ValidateOptionsResult result = validator.Validate("settings", options);
 
-        Assert.IsTrue(result.Succeeded);
+        Assert.That(result.Succeeded, Is.True);
         VerifyNoWarningLogged();
     }
 
@@ -60,7 +60,7 @@ public class DeliveryApiSettingsValidatorTests
 
         ValidateOptionsResult result = validator.Validate("settings", options);
 
-        Assert.IsTrue(result.Succeeded);
+        Assert.That(result.Succeeded, Is.True);
         VerifyNoWarningLogged();
     }
 
@@ -76,7 +76,7 @@ public class DeliveryApiSettingsValidatorTests
 
         ValidateOptionsResult result = validator.Validate("settings", options);
 
-        Assert.IsTrue(result.Succeeded);
+        Assert.That(result.Succeeded, Is.True);
 
         VerifyWarningLogged();
     }
@@ -84,13 +84,13 @@ public class DeliveryApiSettingsValidatorTests
     private void VerifyWarningLogged()
     {
         var warningCount = GetWarningLogCount();
-        Assert.AreEqual(1, warningCount);
+        Assert.That(warningCount, Is.EqualTo(1));
     }
 
     private void VerifyNoWarningLogged()
     {
         var warningCount = GetWarningLogCount();
-        Assert.AreEqual(0, warningCount);
+        Assert.That(warningCount, Is.EqualTo(0));
     }
 
     private int GetWarningLogCount() =>

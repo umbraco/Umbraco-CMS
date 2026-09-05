@@ -35,8 +35,8 @@ public class SystemInformationServiceTests
         var defaultLanguage = userDataService.GetTroubleshootingInformation().FirstOrDefault(x => x.Key == "Default Language");
         Assert.Multiple(() =>
         {
-            Assert.IsNotNull(defaultLanguage);
-            Assert.AreEqual(culture, defaultLanguage.Value);
+            Assert.That(defaultLanguage, Is.Not.Null);
+            Assert.That(defaultLanguage.Value, Is.EqualTo(culture));
         });
     }
 
@@ -52,8 +52,8 @@ public class SystemInformationServiceTests
         var currentCulture = userDataService.GetTroubleshootingInformation().FirstOrDefault(x => x.Key == "Current Culture");
         Assert.Multiple(() =>
         {
-            Assert.IsNotNull(currentCulture);
-            Assert.AreEqual(culture, currentCulture.Value);
+            Assert.That(currentCulture, Is.Not.Null);
+            Assert.That(currentCulture.Value, Is.EqualTo(culture));
         });
     }
 
@@ -69,8 +69,8 @@ public class SystemInformationServiceTests
         var currentCulture = userDataService.GetTroubleshootingInformation().FirstOrDefault(x => x.Key == "Current UI Culture");
         Assert.Multiple(() =>
         {
-            Assert.IsNotNull(currentCulture);
-            Assert.AreEqual(culture, currentCulture.Value);
+            Assert.That(currentCulture, Is.Not.Null);
+            Assert.That(currentCulture.Value, Is.EqualTo(culture));
         });
     }
 
@@ -85,9 +85,9 @@ public class SystemInformationServiceTests
         var userData = userDataService.GetTroubleshootingInformation().ToList();
         Assert.Multiple(() =>
         {
-            Assert.IsNotNull(userData.Select(x => x.Key == "Server OS"));
-            Assert.IsNotNull(userData.Select(x => x.Key == "Server Framework"));
-            Assert.IsNotNull(userData.Select(x => x.Key == "Current Webserver"));
+            Assert.That(userData.Select(x => x.Key == "Server OS"), Is.Not.Null);
+            Assert.That(userData.Select(x => x.Key == "Server Framework"), Is.Not.Null);
+            Assert.That(userData.Select(x => x.Key == "Current Webserver"), Is.Not.Null);
         });
     }
 
@@ -102,8 +102,8 @@ public class SystemInformationServiceTests
         var userData = userDataService.GetTroubleshootingInformation().ToArray();
 
         var actual = userData.FirstOrDefault(x => x.Key == "Models Builder Mode");
-        Assert.IsNotNull(actual.Value);
-        Assert.AreEqual(modelsMode, actual.Value);
+        Assert.That(actual.Value, Is.Not.Null);
+        Assert.That(actual.Value, Is.EqualTo(modelsMode));
     }
 
     [Test]
@@ -116,8 +116,8 @@ public class SystemInformationServiceTests
         var userData = userDataService.GetTroubleshootingInformation().ToArray();
 
         var actual = userData.FirstOrDefault(x => x.Key == "Runtime Mode");
-        Assert.IsNotNull(actual.Value);
-        Assert.AreEqual(runtimeMode.ToString(), actual.Value);
+        Assert.That(actual.Value, Is.Not.Null);
+        Assert.That(actual.Value, Is.EqualTo(runtimeMode.ToString()));
     }
 
     [Test]
@@ -129,8 +129,8 @@ public class SystemInformationServiceTests
         var userData = userDataService.GetTroubleshootingInformation().ToArray();
 
         var actual = userData.FirstOrDefault(x => x.Key == "Debug Mode");
-        Assert.IsNotNull(actual.Value);
-        Assert.AreEqual(isDebug.ToString(), actual.Value);
+        Assert.That(actual.Value, Is.Not.Null);
+        Assert.That(actual.Value, Is.EqualTo(isDebug.ToString()));
     }
 
     private ISystemTroubleshootingInformationService CreateSystemInformationService(

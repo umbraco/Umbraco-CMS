@@ -1,5 +1,6 @@
 using Moq;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Factories;
 using Umbraco.Cms.Core.Sync;
@@ -53,7 +54,7 @@ public class ServerRoleAwareLastSyncedRepositoryTest
         var sut = CreateSut();
         var result = await sut.GetInternalIdAsync();
 
-        Assert.AreEqual(99, result);
+        Assert.That(result, Is.EqualTo(99));
     }
 
     [Test]
@@ -83,7 +84,7 @@ public class ServerRoleAwareLastSyncedRepositoryTest
         var sut = CreateSut();
         var result = await sut.GetInternalIdAsync();
 
-        Assert.AreEqual(99, result);
+        Assert.That(result, Is.EqualTo(99));
     }
 
     [Test]

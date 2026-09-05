@@ -55,7 +55,7 @@ public class UmbRegisterControllerTests
 
         IActionResult result = await controller.HandleRegisterMember(new RegisterModel());
 
-        Assert.IsInstanceOf<UmbracoPageResult>(result);
+        Assert.That(result, Is.InstanceOf<UmbracoPageResult>());
         _memberManagerMock.Verify(
             x => x.CreateAsync(It.IsAny<MemberIdentityUser>(), It.IsAny<string>()),
             Times.Never);
@@ -78,9 +78,9 @@ public class UmbRegisterControllerTests
         });
 
         var redirect = result as RedirectResult;
-        Assert.IsNotNull(redirect);
-        Assert.AreEqual("/welcome", redirect!.Url);
-        Assert.AreEqual(true, controller.TempData["FormSuccess"]);
+        Assert.That(redirect, Is.Not.Null);
+        Assert.That(redirect!.Url, Is.EqualTo("/welcome"));
+        Assert.That(controller.TempData["FormSuccess"], Is.EqualTo(true));
     }
 
     [Test]
@@ -98,7 +98,7 @@ public class UmbRegisterControllerTests
             AutomaticLogIn = false,
         });
 
-        Assert.IsInstanceOf<RedirectToUmbracoPageResult>(result);
+        Assert.That(result, Is.InstanceOf<RedirectToUmbracoPageResult>());
     }
 
     [Test]
@@ -117,7 +117,7 @@ public class UmbRegisterControllerTests
             RedirectUrl = "https://evil.com/phish",
         });
 
-        Assert.IsInstanceOf<RedirectToUmbracoPageResult>(result);
+        Assert.That(result, Is.InstanceOf<RedirectToUmbracoPageResult>());
     }
 
     [Test]
@@ -172,9 +172,9 @@ public class UmbRegisterControllerTests
             Name = "New Member",
         });
 
-        Assert.IsInstanceOf<UmbracoPageResult>(result);
-        Assert.IsTrue(controller.ModelState["registerModel"]!.Errors
-            .Any(e => e.ErrorMessage == "Password too short"));
+        Assert.That(result, Is.InstanceOf<UmbracoPageResult>());
+        Assert.That(controller.ModelState["registerModel"]!.Errors
+            .Any(e => e.ErrorMessage == "Password too short"), Is.True);
         _memberServiceMock.Verify(x => x.Save(It.IsAny<IMember>(), It.IsAny<int>()), Times.Never);
     }
 
@@ -198,8 +198,8 @@ public class UmbRegisterControllerTests
             Name = string.Empty,
         });
 
-        Assert.IsNotNull(createdUser);
-        Assert.AreEqual("fallback@example.com", createdUser!.Name);
+        Assert.That(createdUser, Is.Not.Null);
+        Assert.That(createdUser!.Name, Is.EqualTo("fallback@example.com"));
     }
 
     [Test]
@@ -223,7 +223,7 @@ public class UmbRegisterControllerTests
             MemberTypeAlias = "customMemberType",
         });
 
-        Assert.AreEqual("customMemberType", createdUser!.MemberTypeAlias);
+        Assert.That(createdUser!.MemberTypeAlias, Is.EqualTo("customMemberType"));
     }
 
     private void SetupSuccessfulMemberCreation()

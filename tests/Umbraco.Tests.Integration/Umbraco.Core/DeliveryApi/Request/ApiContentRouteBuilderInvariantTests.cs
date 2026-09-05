@@ -80,12 +80,12 @@ public class ApiContentRouteBuilderInvariantTests : ApiContentRouteBuilderTestBa
     {
         var publishedContent = GetPublishedContent(_contentByName["Root 1"].Key);
         var route = ApiContentRouteBuilder.Build(publishedContent);
-        Assert.IsNotNull(route);
+        Assert.That(route, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual("/", route.Path);
-            Assert.AreEqual("root-1", route.StartItem.Path);
-            Assert.AreEqual(_contentByName["Root 1"].Key, route.StartItem.Id);
+            Assert.That(route.Path, Is.EqualTo("/"));
+            Assert.That(route.StartItem.Path, Is.EqualTo("root-1"));
+            Assert.That(route.StartItem.Id, Is.EqualTo(_contentByName["Root 1"].Key));
         });
     }
 
@@ -94,12 +94,12 @@ public class ApiContentRouteBuilderInvariantTests : ApiContentRouteBuilderTestBa
     {
         var publishedContent = GetPublishedContent(_contentByName["Root 3"].Key);
         var route = ApiContentRouteBuilder.Build(publishedContent);
-        Assert.IsNotNull(route);
+        Assert.That(route, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual("/root-3/", route.Path);
-            Assert.AreEqual("root-3", route.StartItem.Path);
-            Assert.AreEqual(_contentByName["Root 3"].Key, route.StartItem.Id);
+            Assert.That(route.Path, Is.EqualTo("/root-3/"));
+            Assert.That(route.StartItem.Path, Is.EqualTo("root-3"));
+            Assert.That(route.StartItem.Id, Is.EqualTo(_contentByName["Root 3"].Key));
         });
     }
 
@@ -110,12 +110,12 @@ public class ApiContentRouteBuilderInvariantTests : ApiContentRouteBuilderTestBa
     {
         var publishedContent = GetPublishedContent(_contentByName[$"Root {root}/Child 1"].Key);
         var route = ApiContentRouteBuilder.Build(publishedContent);
-        Assert.IsNotNull(route);
+        Assert.That(route, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual("/child-1/", route.Path);
-            Assert.AreEqual($"root-{root}", route.StartItem.Path);
-            Assert.AreEqual(_contentByName[$"Root {root}"].Key, route.StartItem.Id);
+            Assert.That(route.Path, Is.EqualTo("/child-1/"));
+            Assert.That(route.StartItem.Path, Is.EqualTo($"root-{root}"));
+            Assert.That(route.StartItem.Id, Is.EqualTo(_contentByName[$"Root {root}"].Key));
         });
     }
 
@@ -126,12 +126,12 @@ public class ApiContentRouteBuilderInvariantTests : ApiContentRouteBuilderTestBa
     {
         var publishedContent = GetPublishedContent(_contentByName[$"Root {root}/Child 3"].Key);
         var route = ApiContentRouteBuilder.Build(publishedContent);
-        Assert.IsNotNull(route);
+        Assert.That(route, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual("/child-3/", route.Path);
-            Assert.AreEqual($"root-{root}", route.StartItem.Path);
-            Assert.AreEqual(_contentByName[$"Root {root}"].Key, route.StartItem.Id);
+            Assert.That(route.Path, Is.EqualTo("/child-3/"));
+            Assert.That(route.StartItem.Path, Is.EqualTo($"root-{root}"));
+            Assert.That(route.StartItem.Id, Is.EqualTo(_contentByName[$"Root {root}"].Key));
         });
     }
 
@@ -142,12 +142,12 @@ public class ApiContentRouteBuilderInvariantTests : ApiContentRouteBuilderTestBa
     {
         var publishedContent = GetPublishedContent(_contentByName[$"Root {root}/Child 1/Grandchild 1"].Key);
         var route = ApiContentRouteBuilder.Build(publishedContent);
-        Assert.IsNotNull(route);
+        Assert.That(route, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual("/child-1/grandchild-1/", route.Path);
-            Assert.AreEqual($"root-{root}", route.StartItem.Path);
-            Assert.AreEqual(_contentByName[$"Root {root}"].Key, route.StartItem.Id);
+            Assert.That(route.Path, Is.EqualTo("/child-1/grandchild-1/"));
+            Assert.That(route.StartItem.Path, Is.EqualTo($"root-{root}"));
+            Assert.That(route.StartItem.Id, Is.EqualTo(_contentByName[$"Root {root}"].Key));
         });
     }
 
@@ -158,12 +158,12 @@ public class ApiContentRouteBuilderInvariantTests : ApiContentRouteBuilderTestBa
     {
         var publishedContent = GetPublishedContent(_contentByName[$"Root {root}/Child 3/Grandchild 3"].Key);
         var route = ApiContentRouteBuilder.Build(publishedContent);
-        Assert.IsNotNull(route);
+        Assert.That(route, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual("/child-3/grandchild-3/", route.Path);
-            Assert.AreEqual($"root-{root}", route.StartItem.Path);
-            Assert.AreEqual(_contentByName[$"Root {root}"].Key, route.StartItem.Id);
+            Assert.That(route.Path, Is.EqualTo("/child-3/grandchild-3/"));
+            Assert.That(route.StartItem.Path, Is.EqualTo($"root-{root}"));
+            Assert.That(route.StartItem.Id, Is.EqualTo(_contentByName[$"Root {root}"].Key));
         });
     }
 
@@ -175,12 +175,12 @@ public class ApiContentRouteBuilderInvariantTests : ApiContentRouteBuilderTestBa
     {
         var publishedContent = GetPublishedContent(_contentByName[$"Root {root}"].Key);
         var route = ApiContentRouteBuilder.Build(publishedContent);
-        Assert.IsNotNull(route);
+        Assert.That(route, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual("/", route.Path);
-            Assert.AreEqual($"root-{root}", route.StartItem.Path);
-            Assert.AreEqual(_contentByName[$"Root {root}"].Key, route.StartItem.Id);
+            Assert.That(route.Path, Is.EqualTo("/"));
+            Assert.That(route.StartItem.Path, Is.EqualTo($"root-{root}"));
+            Assert.That(route.StartItem.Id, Is.EqualTo(_contentByName[$"Root {root}"].Key));
         });
     }
 
@@ -194,12 +194,12 @@ public class ApiContentRouteBuilderInvariantTests : ApiContentRouteBuilderTestBa
 
         var publishedContent = GetPublishedContent(_contentByName[$"Root {root}"].Key);
         var route = ApiContentRouteBuilder.Build(publishedContent);
-        Assert.IsNotNull(route);
+        Assert.That(route, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual("/", route.Path);
-            Assert.AreEqual($"root-{root}", route.StartItem.Path);
-            Assert.AreEqual(_contentByName[$"Root {root}"].Key, route.StartItem.Id);
+            Assert.That(route.Path, Is.EqualTo("/"));
+            Assert.That(route.StartItem.Path, Is.EqualTo($"root-{root}"));
+            Assert.That(route.StartItem.Id, Is.EqualTo(_contentByName[$"Root {root}"].Key));
         });
     }
 
@@ -211,12 +211,12 @@ public class ApiContentRouteBuilderInvariantTests : ApiContentRouteBuilderTestBa
     {
         var publishedContent = GetPublishedContent(_contentByName[$"Root {root}"].Key);
         var route = ApiContentRouteBuilder.Build(publishedContent);
-        Assert.IsNotNull(route);
+        Assert.That(route, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(expectedPath, route.Path);
-            Assert.AreEqual($"root-{root}", route.StartItem.Path);
-            Assert.AreEqual(_contentByName[$"Root {root}"].Key, route.StartItem.Id);
+            Assert.That(route.Path, Is.EqualTo(expectedPath));
+            Assert.That(route.StartItem.Path, Is.EqualTo($"root-{root}"));
+            Assert.That(route.StartItem.Id, Is.EqualTo(_contentByName[$"Root {root}"].Key));
         });
     }
 
@@ -231,12 +231,12 @@ public class ApiContentRouteBuilderInvariantTests : ApiContentRouteBuilderTestBa
     {
         var publishedContent = GetPublishedContent(_contentByName[$"Root {root}/Child {child}"].Key);
         var route = ApiContentRouteBuilder.Build(publishedContent);
-        Assert.IsNotNull(route);
+        Assert.That(route, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual($"/child-{child}", route.Path);
-            Assert.AreEqual($"root-{root}", route.StartItem.Path);
-            Assert.AreEqual(_contentByName[$"Root {root}"].Key, route.StartItem.Id);
+            Assert.That(route.Path, Is.EqualTo($"/child-{child}"));
+            Assert.That(route.StartItem.Path, Is.EqualTo($"root-{root}"));
+            Assert.That(route.StartItem.Id, Is.EqualTo(_contentByName[$"Root {root}"].Key));
         });
     }
 }

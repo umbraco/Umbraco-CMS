@@ -51,17 +51,17 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
 
         var valueConverter = MultiNodeTreePickerValueConverter();
 
-        Assert.AreEqual(typeof(IEnumerable<IApiContent>), valueConverter.GetDeliveryApiPropertyValueType(publishedPropertyType.Object));
+        Assert.That(valueConverter.GetDeliveryApiPropertyValueType(publishedPropertyType.Object), Is.EqualTo(typeof(IEnumerable<IApiContent>)));
 
         var inter = new Udi[] { new GuidUdi(Constants.UdiEntityType.Document, PublishedContent.Key) };
         var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<IApiContent>;
-        Assert.NotNull(result);
-        Assert.AreEqual(1, result.Count());
-        Assert.AreEqual(PublishedContent.Name, result.First().Name);
-        Assert.AreEqual(PublishedContent.Key, result.First().Id);
-        Assert.AreEqual("/the-page-url/", result.First().Route.Path);
-        Assert.AreEqual("TheContentType", result.First().ContentType);
-        Assert.IsEmpty(result.First().Properties);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Count(), Is.EqualTo(1));
+        Assert.That(result.First().Name, Is.EqualTo(PublishedContent.Name));
+        Assert.That(result.First().Id, Is.EqualTo(PublishedContent.Key));
+        Assert.That(result.First().Route.Path, Is.EqualTo("/the-page-url/"));
+        Assert.That(result.First().ContentType, Is.EqualTo("TheContentType"));
+        Assert.That(result.First().Properties, Is.Empty);
     }
 
     [Test]
@@ -77,21 +77,21 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
 
         var valueConverter = MultiNodeTreePickerValueConverter();
 
-        Assert.AreEqual(typeof(IEnumerable<IApiContent>), valueConverter.GetDeliveryApiPropertyValueType(publishedPropertyType.Object));
+        Assert.That(valueConverter.GetDeliveryApiPropertyValueType(publishedPropertyType.Object), Is.EqualTo(typeof(IEnumerable<IApiContent>)));
 
         var inter = new Udi[] { new GuidUdi(Constants.UdiEntityType.Document, PublishedContent.Key), new GuidUdi(Constants.UdiEntityType.Document, otherContentKey) };
         var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<IApiContent>;
-        Assert.NotNull(result);
-        Assert.AreEqual(2, result.Count());
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Count(), Is.EqualTo(2));
 
-        Assert.AreEqual(PublishedContent.Name, result.First().Name);
-        Assert.AreEqual(PublishedContent.Key, result.First().Id);
-        Assert.AreEqual("/the-page-url/", result.First().Route.Path);
-        Assert.AreEqual("TheContentType", result.First().ContentType);
+        Assert.That(result.First().Name, Is.EqualTo(PublishedContent.Name));
+        Assert.That(result.First().Id, Is.EqualTo(PublishedContent.Key));
+        Assert.That(result.First().Route.Path, Is.EqualTo("/the-page-url/"));
+        Assert.That(result.First().ContentType, Is.EqualTo("TheContentType"));
 
-        Assert.AreEqual("The other page", result.Last().Name);
-        Assert.AreEqual(otherContentKey, result.Last().Id);
-        Assert.AreEqual("TheContentType", result.Last().ContentType);
+        Assert.That(result.Last().Name, Is.EqualTo("The other page"));
+        Assert.That(result.Last().Id, Is.EqualTo(otherContentKey));
+        Assert.That(result.Last().ContentType, Is.EqualTo("TheContentType"));
     }
 
     [Test]
@@ -103,17 +103,17 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
 
         var valueConverter = MultiNodeTreePickerValueConverter();
 
-        Assert.AreEqual(typeof(IEnumerable<IApiContent>), valueConverter.GetDeliveryApiPropertyValueType(publishedPropertyType.Object));
+        Assert.That(valueConverter.GetDeliveryApiPropertyValueType(publishedPropertyType.Object), Is.EqualTo(typeof(IEnumerable<IApiContent>)));
 
         var inter = new Udi[] { new GuidUdi(Constants.UdiEntityType.Document, DraftContent.Key) };
         var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, true, false) as IEnumerable<IApiContent>;
-        Assert.NotNull(result);
-        Assert.AreEqual(1, result.Count());
-        Assert.AreEqual(DraftContent.Name, result.First().Name);
-        Assert.AreEqual(DraftContent.Key, result.First().Id);
-        Assert.AreEqual("/the-draft-page-url/", result.First().Route.Path);
-        Assert.AreEqual("TheContentType", result.First().ContentType);
-        Assert.IsEmpty(result.First().Properties);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Count(), Is.EqualTo(1));
+        Assert.That(result.First().Name, Is.EqualTo(DraftContent.Name));
+        Assert.That(result.First().Id, Is.EqualTo(DraftContent.Key));
+        Assert.That(result.First().Route.Path, Is.EqualTo("/the-draft-page-url/"));
+        Assert.That(result.First().ContentType, Is.EqualTo("TheContentType"));
+        Assert.That(result.First().Properties, Is.Empty);
     }
 
     [Test]
@@ -151,19 +151,19 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
 
         var valueConverter = MultiNodeTreePickerValueConverter();
 
-        Assert.AreEqual(typeof(IEnumerable<IApiContent>), valueConverter.GetDeliveryApiPropertyValueType(publishedPropertyType.Object));
+        Assert.That(valueConverter.GetDeliveryApiPropertyValueType(publishedPropertyType.Object), Is.EqualTo(typeof(IEnumerable<IApiContent>)));
 
         var inter = new Udi[] { new GuidUdi(Constants.UdiEntityType.Document, key) };
         var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<IApiContent>;
-        Assert.NotNull(result);
-        Assert.AreEqual(1, result.Count());
-        Assert.AreEqual("The page", result.First().Name);
-        Assert.AreEqual(key, result.First().Id);
-        Assert.AreEqual("/page-url-segment/", result.First().Route.Path);
-        Assert.AreEqual("TheContentType", result.First().ContentType);
-        Assert.AreEqual(2, result.First().Properties.Count);
-        Assert.AreEqual("Delivery API value", result.First().Properties[DeliveryApiPropertyType.Alias]);
-        Assert.AreEqual("Default value", result.First().Properties[DefaultPropertyType.Alias]);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Count(), Is.EqualTo(1));
+        Assert.That(result.First().Name, Is.EqualTo("The page"));
+        Assert.That(result.First().Id, Is.EqualTo(key));
+        Assert.That(result.First().Route.Path, Is.EqualTo("/page-url-segment/"));
+        Assert.That(result.First().ContentType, Is.EqualTo("TheContentType"));
+        Assert.That(result.First().Properties, Has.Count.EqualTo(2));
+        Assert.That(result.First().Properties[DeliveryApiPropertyType.Alias], Is.EqualTo("Delivery API value"));
+        Assert.That(result.First().Properties[DefaultPropertyType.Alias], Is.EqualTo("Default value"));
     }
 
     [Test]
@@ -175,16 +175,16 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
 
         var valueConverter = MultiNodeTreePickerValueConverter();
 
-        Assert.AreEqual(typeof(IEnumerable<IApiMedia>), valueConverter.GetDeliveryApiPropertyValueType(publishedPropertyType.Object));
+        Assert.That(valueConverter.GetDeliveryApiPropertyValueType(publishedPropertyType.Object), Is.EqualTo(typeof(IEnumerable<IApiMedia>)));
 
         var inter = new Udi[] { new GuidUdi(Constants.UdiEntityType.Media, PublishedMedia.Key) };
         var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<IApiMedia>;
-        Assert.NotNull(result);
-        Assert.AreEqual(1, result.Count());
-        Assert.AreEqual(PublishedMedia.Name, result.First().Name);
-        Assert.AreEqual(PublishedMedia.Key, result.First().Id);
-        Assert.AreEqual("the-media-url", result.First().Url);
-        Assert.AreEqual("TheMediaType", result.First().MediaType);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Count(), Is.EqualTo(1));
+        Assert.That(result.First().Name, Is.EqualTo(PublishedMedia.Name));
+        Assert.That(result.First().Id, Is.EqualTo(PublishedMedia.Key));
+        Assert.That(result.First().Url, Is.EqualTo("the-media-url"));
+        Assert.That(result.First().MediaType, Is.EqualTo("TheMediaType"));
     }
 
     [Test]
@@ -200,20 +200,20 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
 
         var valueConverter = MultiNodeTreePickerValueConverter();
 
-        Assert.AreEqual(typeof(IEnumerable<IApiMedia>), valueConverter.GetDeliveryApiPropertyValueType(publishedPropertyType.Object));
+        Assert.That(valueConverter.GetDeliveryApiPropertyValueType(publishedPropertyType.Object), Is.EqualTo(typeof(IEnumerable<IApiMedia>)));
 
         var inter = new Udi[] { new GuidUdi(Constants.UdiEntityType.Media, PublishedMedia.Key), new GuidUdi(Constants.UdiEntityType.Media, otherMediaKey) };
         var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<IApiMedia>;
-        Assert.NotNull(result);
-        Assert.AreEqual(2, result.Count());
-        Assert.AreEqual(PublishedMedia.Name, result.First().Name);
-        Assert.AreEqual(PublishedMedia.Key, result.First().Id);
-        Assert.AreEqual("the-media-url", result.First().Url);
-        Assert.AreEqual("TheMediaType", result.First().MediaType);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Count(), Is.EqualTo(2));
+        Assert.That(result.First().Name, Is.EqualTo(PublishedMedia.Name));
+        Assert.That(result.First().Id, Is.EqualTo(PublishedMedia.Key));
+        Assert.That(result.First().Url, Is.EqualTo("the-media-url"));
+        Assert.That(result.First().MediaType, Is.EqualTo("TheMediaType"));
 
-        Assert.AreEqual("The other media", result.Last().Name);
-        Assert.AreEqual(otherMediaKey, result.Last().Id);
-        Assert.AreEqual("TheMediaType", result.Last().MediaType);
+        Assert.That(result.Last().Name, Is.EqualTo("The other media"));
+        Assert.That(result.Last().Id, Is.EqualTo(otherMediaKey));
+        Assert.That(result.Last().MediaType, Is.EqualTo("TheMediaType"));
     }
 
     [Test]
@@ -225,16 +225,16 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
 
         var valueConverter = MultiNodeTreePickerValueConverter();
 
-        Assert.AreEqual(typeof(IEnumerable<IApiContent>), valueConverter.GetDeliveryApiPropertyValueType(publishedPropertyType.Object));
+        Assert.That(valueConverter.GetDeliveryApiPropertyValueType(publishedPropertyType.Object), Is.EqualTo(typeof(IEnumerable<IApiContent>)));
 
         var inter = new Udi[] { new GuidUdi(Constants.UdiEntityType.Media, PublishedMedia.Key), new GuidUdi(Constants.UdiEntityType.Document, PublishedContent.Key) };
         var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<IApiContent>;
-        Assert.NotNull(result);
-        Assert.AreEqual(1, result.Count());
-        Assert.AreEqual(PublishedContent.Name, result.First().Name);
-        Assert.AreEqual(PublishedContent.Key, result.First().Id);
-        Assert.AreEqual("/the-page-url/", result.First().Route.Path);
-        Assert.AreEqual("TheContentType", result.First().ContentType);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Count(), Is.EqualTo(1));
+        Assert.That(result.First().Name, Is.EqualTo(PublishedContent.Name));
+        Assert.That(result.First().Id, Is.EqualTo(PublishedContent.Key));
+        Assert.That(result.First().Route.Path, Is.EqualTo("/the-page-url/"));
+        Assert.That(result.First().ContentType, Is.EqualTo("TheContentType"));
     }
 
     [Test]
@@ -246,16 +246,16 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
 
         var valueConverter = MultiNodeTreePickerValueConverter();
 
-        Assert.AreEqual(typeof(IEnumerable<IApiMedia>), valueConverter.GetDeliveryApiPropertyValueType(publishedPropertyType.Object));
+        Assert.That(valueConverter.GetDeliveryApiPropertyValueType(publishedPropertyType.Object), Is.EqualTo(typeof(IEnumerable<IApiMedia>)));
 
         var inter = new Udi[] { new GuidUdi(Constants.UdiEntityType.Media, PublishedMedia.Key), new GuidUdi(Constants.UdiEntityType.Document, PublishedContent.Key) };
         var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<IApiMedia>;
-        Assert.NotNull(result);
-        Assert.AreEqual(1, result.Count());
-        Assert.AreEqual(PublishedMedia.Name, result.First().Name);
-        Assert.AreEqual(PublishedMedia.Key, result.First().Id);
-        Assert.AreEqual("the-media-url", result.First().Url);
-        Assert.AreEqual("TheMediaType", result.First().MediaType);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Count(), Is.EqualTo(1));
+        Assert.That(result.First().Name, Is.EqualTo(PublishedMedia.Name));
+        Assert.That(result.First().Id, Is.EqualTo(PublishedMedia.Key));
+        Assert.That(result.First().Url, Is.EqualTo("the-media-url"));
+        Assert.That(result.First().MediaType, Is.EqualTo("TheMediaType"));
     }
 
     [TestCase(true)]
@@ -268,12 +268,12 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
 
         var valueConverter = MultiNodeTreePickerValueConverter();
 
-        Assert.AreEqual(typeof(string), valueConverter.GetDeliveryApiPropertyValueType(publishedPropertyType.Object));
+        Assert.That(valueConverter.GetDeliveryApiPropertyValueType(publishedPropertyType.Object), Is.EqualTo(typeof(string)));
 
         var inter = new Udi[] { new GuidUdi(Constants.UdiEntityType.Media, PublishedMedia.Key), new GuidUdi(Constants.UdiEntityType.Document, PublishedContent.Key) };
         var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false, false) as string;
-        Assert.NotNull(result);
-        Assert.AreEqual("(unsupported)", result);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result, Is.EqualTo("(unsupported)"));
     }
 
     [TestCase(123)]
@@ -288,8 +288,8 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
         var valueConverter = MultiNodeTreePickerValueConverter();
 
         var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<IApiContent>;
-        Assert.NotNull(result);
-        Assert.IsEmpty(result);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result, Is.Empty);
     }
 
     [TestCase(123)]
@@ -304,8 +304,8 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
         var valueConverter = MultiNodeTreePickerValueConverter();
 
         var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<IApiContent>;
-        Assert.NotNull(result);
-        Assert.IsEmpty(result);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result, Is.Empty);
     }
 
     [Test]
@@ -321,7 +321,7 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
 
         var inter = new Udi[] { new GuidUdi(Constants.UdiEntityType.Document, PublishedContent.Key) };
         var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<IApiContent>;
-        Assert.NotNull(result);
-        Assert.IsEmpty(result);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result, Is.Empty);
     }
 }

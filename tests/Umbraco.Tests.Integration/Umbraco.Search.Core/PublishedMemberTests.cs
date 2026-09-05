@@ -243,7 +243,7 @@ public class PublishedMemberTests : TestBase
 
         var pathIdsValue = document.Fields.FirstOrDefault(f => f.FieldName == Cms.Search.Core.Constants.FieldNames.PathIds)?.Value.Keywords?.ToArray();
         Assert.That(pathIdsValue, Is.Not.Null);
-        Assert.That(pathIdsValue!.Length, Is.EqualTo(pathKeys.Length));
+        Assert.That(pathIdsValue!, Has.Length.EqualTo(pathKeys.Length));
         Assert.That(pathIdsValue, Is.EquivalentTo(pathKeys.Select(k => $"{k:D}")));
     }
 }

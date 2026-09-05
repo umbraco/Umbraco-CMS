@@ -39,8 +39,8 @@ public class MultiValuePropertyEditorTests
         var dataType = CreateAndConfigureDataType(serializer, checkBoxListPropertyEditor);
 
         var configuration = dataType.ConfigurationObject as ValueListConfiguration;
-        Assert.NotNull(configuration);
-        Assert.AreEqual(3, configuration.Items.Count);
+        Assert.That(configuration, Is.Not.Null);
+        Assert.That(configuration.Items, Has.Count.EqualTo(3));
 
         var multipleValueEditor = CreateValueEditor();
         dataValueEditorFactoryMock
@@ -54,7 +54,7 @@ public class MultiValuePropertyEditorTests
         ((DataValueEditor)valueEditor).ConfigurationObject = dataType.ConfigurationObject;
         var result = valueEditor.ConvertDbToString(prop.PropertyType, prop.GetValue());
 
-        Assert.AreEqual("Value 1,Value 2,Value 3", result);
+        Assert.That(result, Is.EqualTo("Value 1,Value 2,Value 3"));
     }
 
     [Test]
@@ -69,8 +69,8 @@ public class MultiValuePropertyEditorTests
         var dataType = CreateAndConfigureDataType(serializer, checkBoxListPropertyEditor);
 
         var configuration = dataType.ConfigurationObject as ValueListConfiguration;
-        Assert.NotNull(configuration);
-        Assert.AreEqual(3, configuration.Items.Count);
+        Assert.That(configuration, Is.Not.Null);
+        Assert.That(configuration.Items, Has.Count.EqualTo(3));
 
         var multipleValueEditor = CreateValueEditor();
         dataValueEditorFactoryMock
@@ -82,7 +82,7 @@ public class MultiValuePropertyEditorTests
 
         var result = dataType.Editor.GetValueEditor().ConvertDbToString(prop.PropertyType, prop.GetValue());
 
-        Assert.AreEqual("Value 2", result);
+        Assert.That(result, Is.EqualTo("Value 2"));
     }
 
     [Test]
@@ -111,11 +111,11 @@ public class MultiValuePropertyEditorTests
 
         var result = configurationEditor.ToConfigurationObject(valueEditorConfiguration, serializer) as ValueListConfiguration;
 
-        Assert.NotNull(result);
-        Assert.AreEqual(3, result.Items.Count);
-        Assert.AreEqual("Item 1", result.Items[0]);
-        Assert.AreEqual("Item 2", result.Items[1]);
-        Assert.AreEqual("Item 3", result.Items[2]);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Items, Has.Count.EqualTo(3));
+        Assert.That(result.Items[0], Is.EqualTo("Item 1"));
+        Assert.That(result.Items[1], Is.EqualTo("Item 2"));
+        Assert.That(result.Items[2], Is.EqualTo("Item 3"));
     }
 
     [TestCase("", true, "")]
@@ -133,14 +133,14 @@ public class MultiValuePropertyEditorTests
         var result = editor.Validate(values.Split(','), false, null, PropertyValidationContext.Empty());
         if (expectedSuccess)
         {
-            Assert.IsEmpty(result);
+            Assert.That(result, Is.Empty);
         }
         else
         {
-            Assert.AreEqual(1, result.Count());
+            Assert.That(result.Count(), Is.EqualTo(1));
 
             var validationResult = result.First();
-            Assert.AreEqual($"validation_{expectedValidationMessageKey}", validationResult.ErrorMessage);
+            Assert.That(validationResult.ErrorMessage, Is.EqualTo($"validation_{expectedValidationMessageKey}"));
         }
     }
 

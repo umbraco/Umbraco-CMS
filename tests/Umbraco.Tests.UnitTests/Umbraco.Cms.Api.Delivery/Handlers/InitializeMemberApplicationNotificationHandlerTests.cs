@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using Umbraco.Cms.Api.Delivery.Handlers;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -69,7 +70,7 @@ public class InitializeMemberApplicationNotificationHandlerTests
         var isInitialized = (bool)typeof(InitializeMemberApplicationNotificationHandler)
             .GetField("_isInitialized", BindingFlags.NonPublic | BindingFlags.Static)!
             .GetValue(null)!;
-        Assert.IsFalse(isInitialized, "A failed attempt must not block a later restart from retrying.");
+        Assert.That(isInitialized, Is.False, "A failed attempt must not block a later restart from retrying.");
     }
 
     /// <summary>
@@ -96,7 +97,7 @@ public class InitializeMemberApplicationNotificationHandlerTests
         var isInitialized = (bool)typeof(InitializeMemberApplicationNotificationHandler)
             .GetField("_isInitialized", BindingFlags.NonPublic | BindingFlags.Static)!
             .GetValue(null)!;
-        Assert.IsTrue(isInitialized);
+        Assert.That(isInitialized, Is.True);
     }
 
     private static InitializeMemberApplicationNotificationHandler CreateSut(

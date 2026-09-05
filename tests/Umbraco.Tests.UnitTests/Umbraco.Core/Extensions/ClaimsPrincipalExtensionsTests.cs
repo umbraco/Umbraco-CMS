@@ -47,7 +47,7 @@ public class ClaimsPrincipalExtensionsTests
 
         var ticketRemainingSeconds = principal.GetRemainingAuthSeconds(then);
 
-        Assert.AreEqual(remainingSeconds, ticketRemainingSeconds);
+        Assert.That(ticketRemainingSeconds, Is.EqualTo(remainingSeconds));
     }
 
     [Test]
@@ -83,6 +83,6 @@ public class ClaimsPrincipalExtensionsTests
         backOfficeIdentity.AddOrUpdateClaim(claim);
         backOfficeIdentity.AddOrUpdateClaim(claim);
 
-        Assert.AreEqual(1, backOfficeIdentity.Claims.Count(x => x.Type == Constants.Security.TicketExpiresClaimType));
+        Assert.That(backOfficeIdentity.Claims.Count(x => x.Type == Constants.Security.TicketExpiresClaimType), Is.EqualTo(1));
     }
 }

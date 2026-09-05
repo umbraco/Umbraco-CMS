@@ -57,24 +57,24 @@ internal sealed class ElementContainerDeletedDistributedCacheNotificationHandler
         // Create the container and resolve its children once, so its key->id mapping is cached in IdKeyMap.
         EntityContainer firstContainer = await CreateContainerAsync(containerKey, "Container v1");
         Attempt<int> warmResolve = IdKeyMap.GetIdForKey(containerKey, UmbracoObjectTypes.ElementContainer);
-        Assert.IsTrue(warmResolve.Success, "Expected IdKeyMap to resolve the newly created container key.");
-        Assert.AreEqual(firstContainer.Id, warmResolve.Result);
+        Assert.That(warmResolve.Success, Is.True, "Expected IdKeyMap to resolve the newly created container key.");
+        Assert.That(warmResolve.Result, Is.EqualTo(firstContainer.Id));
 
         // Delete and recreate under the same key - the recreated container gets a new id.
         Attempt<EntityContainer?, EntityContainerOperationStatus> deleteResult =
             await ElementContainerService.DeleteAsync(containerKey, Constants.Security.SuperUserKey);
-        Assert.IsTrue(deleteResult.Success, $"Failed to delete container: {deleteResult.Status}");
+        Assert.That(deleteResult.Success, Is.True, $"Failed to delete container: {deleteResult.Status}");
 
         EntityContainer secondContainer = await CreateContainerAsync(containerKey, "Container v2");
-        Assert.AreNotEqual(firstContainer.Id, secondContainer.Id, "Recreated container should have a new id.");
+        Assert.That(secondContainer.Id, Is.Not.EqualTo(firstContainer.Id), "Recreated container should have a new id.");
 
         IElement element = CreateElementUnder(secondContainer.Id, elementType);
 
         // Without the fix, the stale containerKey->firstContainer.Id mapping survives and the children query
         // resolves to the old (now non-existent) parent id, returning nothing.
         Attempt<int> resolvedAfter = IdKeyMap.GetIdForKey(containerKey, UmbracoObjectTypes.ElementContainer);
-        Assert.IsTrue(resolvedAfter.Success, "Expected IdKeyMap to resolve the recreated container key.");
-        Assert.AreEqual(secondContainer.Id, resolvedAfter.Result, "Container key should resolve to the recreated container id.");
+        Assert.That(resolvedAfter.Success, Is.True, "Expected IdKeyMap to resolve the recreated container key.");
+        Assert.That(resolvedAfter.Result, Is.EqualTo(secondContainer.Id), "Container key should resolve to the recreated container id.");
 
         AssertChildrenContains(containerKey, element.Key);
     }
@@ -85,8 +85,8 @@ internal sealed class ElementContainerDeletedDistributedCacheNotificationHandler
             .GetPagedChildren(containerKey, _treeObjectTypes, _treeObjectTypes, 0, 100, false, out var total)
             .ToArray();
 
-        Assert.AreEqual(1, total, "Expected the element tree children query to return the nested element.");
-        Assert.IsTrue(children.Any(child => child.Key == expectedElementKey), "Nested element was not returned by the children query.");
+        Assert.That(total, Is.EqualTo(1), "Expected the element tree children query to return the nested element.");
+        Assert.That(children.Any(child => child.Key == expectedElementKey), Is.True, "Nested element was not returned by the children query.");
     }
 
     private async Task<IContentType> CreateElementTypeAsync()
@@ -100,7 +100,7 @@ internal sealed class ElementContainerDeletedDistributedCacheNotificationHandler
     {
         Attempt<EntityContainer?, EntityContainerOperationStatus> result =
             await ElementContainerService.CreateAsync(key, name, null, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success, $"Failed to create container: {result.Status}");
+        Assert.That(result.Success, Is.True, $"Failed to create container: {result.Status}");
         return result.Result!;
     }
 
@@ -108,7 +108,7 @@ internal sealed class ElementContainerDeletedDistributedCacheNotificationHandler
     {
         var element = new Element($"Element {Guid.NewGuid():N}", parentId, elementType);
         OperationResult saveResult = ElementService.Save(element);
-        Assert.IsTrue(saveResult.Success, "Failed to save element.");
+        Assert.That(saveResult.Success, Is.True, "Failed to save element.");
         return element;
     }
 }

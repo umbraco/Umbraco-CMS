@@ -77,9 +77,9 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
 
         var enTags = content1.Properties["tags"].GetTagsValue(PropertyEditorCollection, DataTypeService, IdKeyMap, Serializer)
             .ToArray();
-        Assert.AreEqual(4, enTags.Length);
-        Assert.Contains("one", enTags);
-        Assert.AreEqual(-1, enTags.IndexOf("plus"));
+        Assert.That(enTags, Has.Length.EqualTo(4));
+        Assert.That(enTags, Does.Contain("one"));
+        Assert.That(enTags.IndexOf("plus"), Is.EqualTo(-1));
 
         var tagGroups = TagService.GetAllTags().GroupBy(x => x.LanguageId);
         foreach (var tag in TagService.GetAllTags())
@@ -87,12 +87,12 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
             Console.WriteLine($"{tag.Group}:{tag.Text} {tag.LanguageId}");
         }
 
-        Assert.AreEqual(1, tagGroups.Count());
+        Assert.That(tagGroups.Count(), Is.EqualTo(1));
         var enTagGroup = tagGroups.FirstOrDefault(x => x.Key == null);
-        Assert.IsNotNull(enTagGroup);
-        Assert.AreEqual(4, enTagGroup.Count());
-        Assert.IsTrue(enTagGroup.Any(x => x.Text == "one"));
-        Assert.IsFalse(enTagGroup.Any(x => x.Text == "plus"));
+        Assert.That(enTagGroup, Is.Not.Null);
+        Assert.That(enTagGroup.Count(), Is.EqualTo(4));
+        Assert.That(enTagGroup.Any(x => x.Text == "one"), Is.True);
+        Assert.That(enTagGroup.Any(x => x.Text == "plus"), Is.False);
     }
 
     [Test]
@@ -140,15 +140,15 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
 
         var frTags = content1.Properties["tags"]
             .GetTagsValue(PropertyEditorCollection, DataTypeService, IdKeyMap, Serializer, "fr-FR").ToArray();
-        Assert.AreEqual(5, frTags.Length);
-        Assert.Contains("plus", frTags);
-        Assert.AreEqual(-1, frTags.IndexOf("one"));
+        Assert.That(frTags, Has.Length.EqualTo(5));
+        Assert.That(frTags, Does.Contain("plus"));
+        Assert.That(frTags.IndexOf("one"), Is.EqualTo(-1));
 
         var enTags = content1.Properties["tags"]
             .GetTagsValue(PropertyEditorCollection, DataTypeService, IdKeyMap, Serializer, "en-US").ToArray();
-        Assert.AreEqual(4, enTags.Length);
-        Assert.Contains("one", enTags);
-        Assert.AreEqual(-1, enTags.IndexOf("plus"));
+        Assert.That(enTags, Has.Length.EqualTo(4));
+        Assert.That(enTags, Does.Contain("one"));
+        Assert.That(enTags.IndexOf("plus"), Is.EqualTo(-1));
 
         var tagGroups = TagService.GetAllTags(culture: "*").GroupBy(x => x.LanguageId);
         foreach (var tag in TagService.GetAllTags())
@@ -156,17 +156,17 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
             Console.WriteLine($"{tag.Group}:{tag.Text} {tag.LanguageId}");
         }
 
-        Assert.AreEqual(2, tagGroups.Count());
+        Assert.That(tagGroups.Count(), Is.EqualTo(2));
         var frTagGroup = tagGroups.FirstOrDefault(x => x.Key == 2);
-        Assert.IsNotNull(frTagGroup);
-        Assert.AreEqual(5, frTagGroup.Count());
-        Assert.IsTrue(frTagGroup.Any(x => x.Text == "plus"));
-        Assert.IsFalse(frTagGroup.Any(x => x.Text == "one"));
+        Assert.That(frTagGroup, Is.Not.Null);
+        Assert.That(frTagGroup.Count(), Is.EqualTo(5));
+        Assert.That(frTagGroup.Any(x => x.Text == "plus"), Is.True);
+        Assert.That(frTagGroup.Any(x => x.Text == "one"), Is.False);
         var enTagGroup = tagGroups.FirstOrDefault(x => x.Key == 1);
-        Assert.IsNotNull(enTagGroup);
-        Assert.AreEqual(4, enTagGroup.Count());
-        Assert.IsTrue(enTagGroup.Any(x => x.Text == "one"));
-        Assert.IsFalse(enTagGroup.Any(x => x.Text == "plus"));
+        Assert.That(enTagGroup, Is.Not.Null);
+        Assert.That(enTagGroup.Count(), Is.EqualTo(4));
+        Assert.That(enTagGroup.Any(x => x.Text == "one"), Is.True);
+        Assert.That(enTagGroup.Any(x => x.Text == "plus"), Is.False);
     }
 
     [Test]
@@ -204,9 +204,9 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
 
         var tags = content1.Properties["tags"].GetTagsValue(PropertyEditorCollection, DataTypeService, IdKeyMap, Serializer)
             .ToArray();
-        Assert.AreEqual(4, tags.Length);
-        Assert.Contains("one", tags);
-        Assert.AreEqual(-1, tags.IndexOf("plus"));
+        Assert.That(tags, Has.Length.EqualTo(4));
+        Assert.That(tags, Does.Contain("one"));
+        Assert.That(tags.IndexOf("plus"), Is.EqualTo(-1));
 
         var tagGroups = TagService.GetAllTags().GroupBy(x => x.LanguageId);
         foreach (var tag in TagService.GetAllTags())
@@ -214,12 +214,12 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
             Console.WriteLine($"{tag.Group}:{tag.Text} {tag.LanguageId}");
         }
 
-        Assert.AreEqual(1, tagGroups.Count());
+        Assert.That(tagGroups.Count(), Is.EqualTo(1));
         var enTagGroup = tagGroups.FirstOrDefault(x => x.Key == null);
-        Assert.IsNotNull(enTagGroup);
-        Assert.AreEqual(4, enTagGroup.Count());
-        Assert.IsTrue(enTagGroup.Any(x => x.Text == "one"));
-        Assert.IsFalse(enTagGroup.Any(x => x.Text == "plus"));
+        Assert.That(enTagGroup, Is.Not.Null);
+        Assert.That(enTagGroup.Count(), Is.EqualTo(4));
+        Assert.That(enTagGroup.Any(x => x.Text == "one"), Is.True);
+        Assert.That(enTagGroup.Any(x => x.Text == "plus"), Is.False);
 
         propertyType.Variations = ContentVariation.Culture;
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
@@ -230,13 +230,13 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
         // property value has been moved from invariant to en-US
         tags = content1.Properties["tags"].GetTagsValue(PropertyEditorCollection, DataTypeService, IdKeyMap, Serializer)
             .ToArray();
-        Assert.IsEmpty(tags);
+        Assert.That(tags, Is.Empty);
 
         tags = content1.Properties["tags"].GetTagsValue(PropertyEditorCollection, DataTypeService, IdKeyMap, Serializer, "en-US")
             .ToArray();
-        Assert.AreEqual(4, tags.Length);
-        Assert.Contains("one", tags);
-        Assert.AreEqual(-1, tags.IndexOf("plus"));
+        Assert.That(tags, Has.Length.EqualTo(4));
+        Assert.That(tags, Does.Contain("one"));
+        Assert.That(tags.IndexOf("plus"), Is.EqualTo(-1));
 
         // tags have been copied from invariant to en-US
         tagGroups = TagService.GetAllTags(culture: "*").GroupBy(x => x.LanguageId);
@@ -245,13 +245,13 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
             Console.WriteLine($"{tag.Group}:{tag.Text} {tag.LanguageId}");
         }
 
-        Assert.AreEqual(1, tagGroups.Count());
+        Assert.That(tagGroups.Count(), Is.EqualTo(1));
 
         enTagGroup = tagGroups.FirstOrDefault(x => x.Key == enId);
-        Assert.IsNotNull(enTagGroup);
-        Assert.AreEqual(4, enTagGroup.Count());
-        Assert.IsTrue(enTagGroup.Any(x => x.Text == "one"));
-        Assert.IsFalse(enTagGroup.Any(x => x.Text == "plus"));
+        Assert.That(enTagGroup, Is.Not.Null);
+        Assert.That(enTagGroup.Count(), Is.EqualTo(4));
+        Assert.That(enTagGroup.Any(x => x.Text == "one"), Is.True);
+        Assert.That(enTagGroup.Any(x => x.Text == "plus"), Is.False);
     }
 
     [Test]
@@ -302,16 +302,16 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
         content1 = ContentService.GetById(content1.Id);
 
         // property value has been moved from en-US to invariant, fr-FR tags are gone
-        Assert.IsEmpty(content1.Properties["tags"]
-            .GetTagsValue(PropertyEditorCollection, DataTypeService, IdKeyMap, Serializer, "fr-FR"));
-        Assert.IsEmpty(content1.Properties["tags"]
-            .GetTagsValue(PropertyEditorCollection, DataTypeService, IdKeyMap, Serializer, "en-US"));
+        Assert.That(content1.Properties["tags"]
+            .GetTagsValue(PropertyEditorCollection, DataTypeService, IdKeyMap, Serializer, "fr-FR"), Is.Empty);
+        Assert.That(content1.Properties["tags"]
+            .GetTagsValue(PropertyEditorCollection, DataTypeService, IdKeyMap, Serializer, "en-US"), Is.Empty);
 
         var tags = content1.Properties["tags"].GetTagsValue(PropertyEditorCollection, DataTypeService, IdKeyMap, Serializer)
             .ToArray();
-        Assert.AreEqual(4, tags.Length);
-        Assert.Contains("one", tags);
-        Assert.AreEqual(-1, tags.IndexOf("plus"));
+        Assert.That(tags, Has.Length.EqualTo(4));
+        Assert.That(tags, Does.Contain("one"));
+        Assert.That(tags.IndexOf("plus"), Is.EqualTo(-1));
 
         // tags have been copied from en-US to invariant, fr-FR tags are gone
         var tagGroups = TagService.GetAllTags(culture: "*").GroupBy(x => x.LanguageId);
@@ -320,13 +320,13 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
             Console.WriteLine($"{tag.Group}:{tag.Text} {tag.LanguageId}");
         }
 
-        Assert.AreEqual(1, tagGroups.Count());
+        Assert.That(tagGroups.Count(), Is.EqualTo(1));
 
         var enTagGroup = tagGroups.FirstOrDefault(x => x.Key == null);
-        Assert.IsNotNull(enTagGroup);
-        Assert.AreEqual(4, enTagGroup.Count());
-        Assert.IsTrue(enTagGroup.Any(x => x.Text == "one"));
-        Assert.IsFalse(enTagGroup.Any(x => x.Text == "plus"));
+        Assert.That(enTagGroup, Is.Not.Null);
+        Assert.That(enTagGroup.Count(), Is.EqualTo(4));
+        Assert.That(enTagGroup.Any(x => x.Text == "one"), Is.True);
+        Assert.That(enTagGroup.Any(x => x.Text == "plus"), Is.False);
     }
 
     [Test]
@@ -451,16 +451,16 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
         content1 = ContentService.GetById(content1.Id);
 
         // property value has been moved from en-US to invariant, fr-FR tags are gone
-        Assert.IsEmpty(content1.Properties["tags"]
-            .GetTagsValue(PropertyEditorCollection, DataTypeService, IdKeyMap, Serializer, "fr-FR"));
-        Assert.IsEmpty(content1.Properties["tags"]
-            .GetTagsValue(PropertyEditorCollection, DataTypeService, IdKeyMap, Serializer, "en-US"));
+        Assert.That(content1.Properties["tags"]
+            .GetTagsValue(PropertyEditorCollection, DataTypeService, IdKeyMap, Serializer, "fr-FR"), Is.Empty);
+        Assert.That(content1.Properties["tags"]
+            .GetTagsValue(PropertyEditorCollection, DataTypeService, IdKeyMap, Serializer, "en-US"), Is.Empty);
 
         var tags = content1.Properties["tags"].GetTagsValue(PropertyEditorCollection, DataTypeService, IdKeyMap, Serializer)
             .ToArray();
-        Assert.AreEqual(4, tags.Length);
-        Assert.Contains("one", tags);
-        Assert.AreEqual(-1, tags.IndexOf("plus"));
+        Assert.That(tags, Has.Length.EqualTo(4));
+        Assert.That(tags, Does.Contain("one"));
+        Assert.That(tags.IndexOf("plus"), Is.EqualTo(-1));
 
         // tags have been copied from en-US to invariant, fr-FR tags are gone
         var tagGroups = TagService.GetAllTags(culture: "*").GroupBy(x => x.LanguageId);
@@ -469,13 +469,13 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
             Console.WriteLine($"{tag.Group}:{tag.Text} {tag.LanguageId}");
         }
 
-        Assert.AreEqual(1, tagGroups.Count());
+        Assert.That(tagGroups.Count(), Is.EqualTo(1));
 
         var enTagGroup = tagGroups.FirstOrDefault(x => x.Key == null);
-        Assert.IsNotNull(enTagGroup);
-        Assert.AreEqual(4, enTagGroup.Count());
-        Assert.IsTrue(enTagGroup.Any(x => x.Text == "one"));
-        Assert.IsFalse(enTagGroup.Any(x => x.Text == "plus"));
+        Assert.That(enTagGroup, Is.Not.Null);
+        Assert.That(enTagGroup.Count(), Is.EqualTo(4));
+        Assert.That(enTagGroup.Any(x => x.Text == "one"), Is.True);
+        Assert.That(enTagGroup.Any(x => x.Text == "plus"), Is.False);
     }
 
     [Test]
@@ -529,8 +529,8 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
         propertyType.Variations = ContentVariation.Culture;
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
-        Assert.AreEqual(frValue, Serializer.Deserialize<string[]>(content1.GetValue<string>("tags", "fr-FR")));
-        Assert.AreEqual(enValue, Serializer.Deserialize<string[]>(content1.GetValue<string>("tags", "en-US")));
+        Assert.That(Serializer.Deserialize<string[]>(content1.GetValue<string>("tags", "fr-FR")), Is.EqualTo(frValue));
+        Assert.That(Serializer.Deserialize<string[]>(content1.GetValue<string>("tags", "en-US")), Is.EqualTo(enValue));
     }
 
     [Test]
@@ -571,9 +571,9 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
 
         // verify
         var tags = TagService.GetTagsForEntity(content1.Id);
-        Assert.AreEqual(5, tags.Count());
+        Assert.That(tags.Count(), Is.EqualTo(5));
         var allTags = TagService.GetAllContentTags();
-        Assert.AreEqual(5, allTags.Count());
+        Assert.That(allTags.Count(), Is.EqualTo(5));
 
         ContentService.MoveToRecycleBin(content1);
     }
@@ -616,9 +616,9 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
 
         // verify
         var tags = TagService.GetTagsForEntity(content1.Id);
-        Assert.AreEqual(5, tags.Count());
+        Assert.That(tags.Count(), Is.EqualTo(5));
         var allTags = TagService.GetAllContentTags();
-        Assert.AreEqual(5, allTags.Count());
+        Assert.That(allTags.Count(), Is.EqualTo(5));
 
         ContentService.Unpublish(content1);
         ContentService.Unpublish(content2);
@@ -663,44 +663,44 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
 
         // verify
         var tags = TagService.GetTagsForEntity(content1.Id);
-        Assert.AreEqual(5, tags.Count());
+        Assert.That(tags.Count(), Is.EqualTo(5));
         var allTags = TagService.GetAllContentTags();
-        Assert.AreEqual(5, allTags.Count());
+        Assert.That(allTags.Count(), Is.EqualTo(5));
 
         ContentService.MoveToRecycleBin(content1);
 
         // no more tags
         tags = TagService.GetTagsForEntity(content1.Id);
-        Assert.AreEqual(0, tags.Count());
+        Assert.That(tags.Count(), Is.EqualTo(0));
         tags = TagService.GetTagsForEntity(content2.Id);
-        Assert.AreEqual(0, tags.Count());
+        Assert.That(tags.Count(), Is.EqualTo(0));
 
         // no more tags
         allTags = TagService.GetAllContentTags();
-        Assert.AreEqual(0, allTags.Count());
+        Assert.That(allTags.Count(), Is.EqualTo(0));
 
         ContentService.Move(content1, -1);
 
-        Assert.IsFalse(content1.Published);
+        Assert.That(content1.Published, Is.False);
 
         // no more tags
         tags = TagService.GetTagsForEntity(content1.Id);
-        Assert.AreEqual(0, tags.Count());
+        Assert.That(tags.Count(), Is.EqualTo(0));
         tags = TagService.GetTagsForEntity(content2.Id);
-        Assert.AreEqual(0, tags.Count());
+        Assert.That(tags.Count(), Is.EqualTo(0));
 
         // no more tags
         allTags = TagService.GetAllContentTags();
-        Assert.AreEqual(0, allTags.Count());
+        Assert.That(allTags.Count(), Is.EqualTo(0));
 
         ContentService.Save(content1);
         ContentService.Publish(content1, Array.Empty<string>());
 
-        Assert.IsTrue(content1.Published);
+        Assert.That(content1.Published, Is.True);
 
         // tags are back
         tags = TagService.GetTagsForEntity(content1.Id);
-        Assert.AreEqual(5, tags.Count());
+        Assert.That(tags.Count(), Is.EqualTo(5));
 
         // TODO: tag & tree issue
         // when we publish, we 'just' publish the top one and not the ones below = fails
@@ -708,11 +708,11 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
         // and just update the tag service to NOT return anything related to trashed or
         // unpublished entities (since trashed is set on ALL entities in the trashed branch)
         tags = TagService.GetTagsForEntity(content2.Id); // including that one!
-        Assert.AreEqual(4, tags.Count());
+        Assert.That(tags.Count(), Is.EqualTo(4));
 
         // tags are back
         allTags = TagService.GetAllContentTags();
-        Assert.AreEqual(5, allTags.Count());
+        Assert.That(allTags.Count(), Is.EqualTo(5));
     }
 
     [Test]
@@ -795,22 +795,22 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
         ContentService.Unpublish(content1);
 
         var tags = TagService.GetTagsForEntity(content1.Id);
-        Assert.AreEqual(0, tags.Count());
+        Assert.That(tags.Count(), Is.EqualTo(0));
 
         // TODO: tag & tree issue
         // when we (un)publish, we 'just' publish the top one and not the ones below = fails
         // see similar note above
         tags = TagService.GetTagsForEntity(content2.Id);
-        Assert.AreEqual(0, tags.Count());
+        Assert.That(tags.Count(), Is.EqualTo(0));
         var allTags = TagService.GetAllContentTags();
-        Assert.AreEqual(0, allTags.Count());
+        Assert.That(allTags.Count(), Is.EqualTo(0));
 
         ContentService.Publish(content1, Array.Empty<string>());
 
         tags = TagService.GetTagsForEntity(content2.Id);
-        Assert.AreEqual(4, tags.Count());
+        Assert.That(tags.Count(), Is.EqualTo(4));
         allTags = TagService.GetAllContentTags();
-        Assert.AreEqual(5, allTags.Count());
+        Assert.That(allTags.Count(), Is.EqualTo(5));
     }
 
     [Test]
@@ -873,17 +873,17 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
 
         using (var scope = ScopeProvider.CreateScope())
         {
-            Assert.AreEqual(4, ScopeAccessor.AmbientScope.Database.ExecuteScalar<int>(
+            Assert.That(ScopeAccessor.AmbientScope.Database.ExecuteScalar<int>(
                 "SELECT COUNT(*) FROM cmsTagRelationship WHERE nodeId=@nodeId AND propertyTypeId=@propTypeId",
-                new { nodeId = content.Id, propTypeId = propertyTypeId }));
+                new { nodeId = content.Id, propTypeId = propertyTypeId }), Is.EqualTo(4));
 
-            Assert.AreEqual(3, ScopeAccessor.AmbientScope.Database.ExecuteScalar<int>(
+            Assert.That(ScopeAccessor.AmbientScope.Database.ExecuteScalar<int>(
                 "SELECT COUNT(*) FROM cmsTagRelationship WHERE nodeId=@nodeId AND propertyTypeId=@propTypeId",
-                new { nodeId = child1.Id, propTypeId = propertyTypeId }));
+                new { nodeId = child1.Id, propTypeId = propertyTypeId }), Is.EqualTo(3));
 
-            Assert.AreEqual(2, ScopeAccessor.AmbientScope.Database.ExecuteScalar<int>(
+            Assert.That(ScopeAccessor.AmbientScope.Database.ExecuteScalar<int>(
                 "SELECT COUNT(*) FROM cmsTagRelationship WHERE nodeId=@nodeId AND propertyTypeId=@propTypeId",
-                new { nodeId = child2.Id, propTypeId = propertyTypeId }));
+                new { nodeId = child2.Id, propTypeId = propertyTypeId }), Is.EqualTo(2));
 
             scope.Complete();
         }
@@ -928,15 +928,15 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
         ContentService.Save(content);
 
         // the (edit) property does contain all tags
-        Assert.AreEqual(5, content.Properties["tags"].GetValue().ToString().Split(',').Distinct().Count());
+        Assert.That(content.Properties["tags"].GetValue().ToString().Split(',').Distinct().Count(), Is.EqualTo(5));
 
         // but the database still contains the initial two tags
         var propertyTypeId = contentType.PropertyTypes.Single(x => x.Alias == "tags").Id;
         using (var scope = ScopeProvider.CreateScope())
         {
-            Assert.AreEqual(4, ScopeAccessor.AmbientScope.Database.ExecuteScalar<int>(
+            Assert.That(ScopeAccessor.AmbientScope.Database.ExecuteScalar<int>(
                 "SELECT COUNT(*) FROM cmsTagRelationship WHERE nodeId=@nodeId AND propertyTypeId=@propTypeId",
-                new { nodeId = content.Id, propTypeId = propertyTypeId }));
+                new { nodeId = content.Id, propTypeId = propertyTypeId }), Is.EqualTo(4));
             scope.Complete();
         }
     }
@@ -970,13 +970,13 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
         ContentService.Publish(content, Array.Empty<string>());
 
         // Assert
-        Assert.AreEqual(4, content.Properties["tags"].GetValue().ToString().Split(',').Distinct().Count());
+        Assert.That(content.Properties["tags"].GetValue().ToString().Split(',').Distinct().Count(), Is.EqualTo(4));
         var propertyTypeId = contentType.PropertyTypes.Single(x => x.Alias == "tags").Id;
         using (var scope = ScopeProvider.CreateScope())
         {
-            Assert.AreEqual(4, ScopeAccessor.AmbientScope.Database.ExecuteScalar<int>(
+            Assert.That(ScopeAccessor.AmbientScope.Database.ExecuteScalar<int>(
                 "SELECT COUNT(*) FROM cmsTagRelationship WHERE nodeId=@nodeId AND propertyTypeId=@propTypeId",
-                new { nodeId = content.Id, propTypeId = propertyTypeId }));
+                new { nodeId = content.Id, propTypeId = propertyTypeId }), Is.EqualTo(4));
 
             scope.Complete();
         }
@@ -1020,13 +1020,13 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
         ContentService.Publish(content, Array.Empty<string>());
 
         // Assert
-        Assert.AreEqual(5, content.Properties["tags"].GetValue().ToString().Split(',').Distinct().Count());
+        Assert.That(content.Properties["tags"].GetValue().ToString().Split(',').Distinct().Count(), Is.EqualTo(5));
         var propertyTypeId = contentType.PropertyTypes.Single(x => x.Alias == "tags").Id;
         using (var scope = ScopeProvider.CreateScope())
         {
-            Assert.AreEqual(5, ScopeAccessor.AmbientScope.Database.ExecuteScalar<int>(
+            Assert.That(ScopeAccessor.AmbientScope.Database.ExecuteScalar<int>(
                 "SELECT COUNT(*) FROM cmsTagRelationship WHERE nodeId=@nodeId AND propertyTypeId=@propTypeId",
-                new { nodeId = content.Id, propTypeId = propertyTypeId }));
+                new { nodeId = content.Id, propTypeId = propertyTypeId }), Is.EqualTo(5));
 
             scope.Complete();
         }
@@ -1063,13 +1063,13 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
         ContentService.Publish(content, Array.Empty<string>());
 
         // Assert
-        Assert.AreEqual(2, content.Properties["tags"].GetValue().ToString().Split(',').Distinct().Count());
+        Assert.That(content.Properties["tags"].GetValue().ToString().Split(',').Distinct().Count(), Is.EqualTo(2));
         var propertyTypeId = contentType.PropertyTypes.Single(x => x.Alias == "tags").Id;
         using (var scope = ScopeProvider.CreateScope())
         {
-            Assert.AreEqual(2, ScopeAccessor.AmbientScope.Database.ExecuteScalar<int>(
+            Assert.That(ScopeAccessor.AmbientScope.Database.ExecuteScalar<int>(
                 "SELECT COUNT(*) FROM cmsTagRelationship WHERE nodeId=@nodeId AND propertyTypeId=@propTypeId",
-                new { nodeId = content.Id, propTypeId = propertyTypeId }));
+                new { nodeId = content.Id, propTypeId = propertyTypeId }), Is.EqualTo(2));
 
             scope.Complete();
         }
@@ -1120,7 +1120,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
             .ToArray();
 
         // Assert
-        Assert.AreEqual(4, savedTags.Length);
+        Assert.That(savedTags, Has.Length.EqualTo(4));
     }
 
     [Test]
@@ -1136,9 +1136,9 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
                 ConfigurationEditorJsonSerializer);
 
         var configuration = dataType.ConfigurationObject as TagConfiguration;
-        Assert.NotNull(configuration);
-        Assert.AreEqual("test", configuration.Group);
-        Assert.AreEqual(TagsStorageType.Json, configuration.StorageType);
+        Assert.That(configuration, Is.Not.Null);
+        Assert.That(configuration.Group, Is.EqualTo("test"));
+        Assert.That(configuration.StorageType, Is.EqualTo(TagsStorageType.Json));
 
         // updating the data type with the new configuration
         await DataTypeService.UpdateAsync(dataType, Constants.Security.SuperUserKey);
@@ -1173,7 +1173,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
             .ToArray();
 
         // Assert
-        Assert.AreEqual(2, savedTags.Length);
+        Assert.That(savedTags, Has.Length.EqualTo(2));
     }
 
     private PropertyType CreateAndAddTagsPropertyType(

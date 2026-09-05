@@ -17,7 +17,7 @@ public class HealthChecksSettingsValidatorTests
         var validator = new HealthChecksSettingsValidator(new NCronTabParser());
         var options = BuildHealthChecksSettings();
         var result = validator.Validate("settings", options);
-        Assert.True(result.Succeeded);
+        Assert.That(result.Succeeded, Is.True);
     }
 
     [Test]
@@ -26,7 +26,7 @@ public class HealthChecksSettingsValidatorTests
         var validator = new HealthChecksSettingsValidator(new NCronTabParser());
         var options = BuildHealthChecksSettings("0 3 *");
         var result = validator.Validate("settings", options);
-        Assert.False(result.Succeeded);
+        Assert.That(result.Succeeded, Is.False);
     }
 
     private static HealthChecksSettings BuildHealthChecksSettings(string firstRunTime = "0 3 * * *") =>

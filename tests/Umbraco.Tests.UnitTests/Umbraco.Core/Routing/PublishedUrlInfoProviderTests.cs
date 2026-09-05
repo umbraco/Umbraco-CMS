@@ -58,9 +58,9 @@ public class PublishedUrlInfoProviderTests
     {
         ISet<UrlInfo> result = await CreateSut().GetAllAsync(CreateContent(variesByCulture: true));
 
-        Assert.AreEqual(2, result.Count);
-        CollectionAssert.AreEquivalent(_installedCultures, result.Select(x => x.Culture));
-        Assert.IsTrue(result.All(x => x.Url is not null));
+        Assert.That(result, Has.Count.EqualTo(2));
+        Assert.That(result.Select(x => x.Culture), Is.EquivalentTo(_installedCultures));
+        Assert.That(result.All(x => x.Url is not null), Is.True);
     }
 
     [Test]
@@ -68,8 +68,8 @@ public class PublishedUrlInfoProviderTests
     {
         ISet<UrlInfo> result = await CreateSut().GetAllAsync(CreateContent(variesByCulture: true), "da-DK");
 
-        Assert.AreEqual(1, result.Count);
-        Assert.AreEqual("da-DK", result.Single().Culture);
+        Assert.That(result, Has.Count.EqualTo(1));
+        Assert.That(result.Single().Culture, Is.EqualTo("da-DK"));
     }
 
     [Test]
@@ -77,8 +77,8 @@ public class PublishedUrlInfoProviderTests
     {
         ISet<UrlInfo> result = await CreateSut().GetAllAsync(CreateContent(variesByCulture: true), "DA-dk");
 
-        Assert.AreEqual(1, result.Count);
-        Assert.AreEqual("da-DK", result.Single().Culture, "The installed culture's casing should be used.");
+        Assert.That(result, Has.Count.EqualTo(1));
+        Assert.That(result.Single().Culture, Is.EqualTo("da-DK"), "The installed culture's casing should be used.");
     }
 
     [Test]
@@ -86,7 +86,7 @@ public class PublishedUrlInfoProviderTests
     {
         ISet<UrlInfo> result = await CreateSut().GetAllAsync(CreateContent(variesByCulture: true), "xx-XX");
 
-        Assert.IsEmpty(result);
+        Assert.That(result, Is.Empty);
         _urlProvider.Verify(
             x => x.GetUrl(It.IsAny<Guid>(), It.IsAny<UrlMode>(), It.IsAny<string?>(), It.IsAny<Uri?>()),
             Times.Never);
@@ -102,8 +102,8 @@ public class PublishedUrlInfoProviderTests
         ISet<UrlInfo> result = await CreateSut().GetAllAsync(CreateContent(variesByCulture: true), "da-DK");
 
         UrlInfo info = result.Single();
-        Assert.IsNull(info.Url);
-        Assert.AreEqual("getUrlException", info.Message);
+        Assert.That(info.Url, Is.Null);
+        Assert.That(info.Message, Is.EqualTo("getUrlException"));
     }
 
     [Test]
@@ -115,8 +115,8 @@ public class PublishedUrlInfoProviderTests
         ISet<UrlInfo> result = await CreateSut().GetAllAsync(CreateContent(variesByCulture: true), "da-DK");
 
         UrlInfo info = result.Single();
-        Assert.IsNull(info.Url);
-        Assert.AreEqual("routeError", info.Message);
+        Assert.That(info.Url, Is.Null);
+        Assert.That(info.Message, Is.EqualTo("routeError"));
     }
 
     [Test]
@@ -128,8 +128,8 @@ public class PublishedUrlInfoProviderTests
         ISet<UrlInfo> result = await CreateSut().GetAllAsync(CreateContent(variesByCulture: true), "da-DK");
 
         UrlInfo info = result.Single();
-        Assert.IsNull(info.Url);
-        Assert.AreEqual("routeErrorCannotRoute", info.Message);
+        Assert.That(info.Url, Is.Null);
+        Assert.That(info.Message, Is.EqualTo("routeErrorCannotRoute"));
     }
 
     [Test]
@@ -141,8 +141,8 @@ public class PublishedUrlInfoProviderTests
         ISet<UrlInfo> result = await CreateSut().GetAllAsync(CreateContent(variesByCulture: true), "da-DK");
 
         UrlInfo info = result.Single();
-        Assert.IsNotNull(info.Url);
-        Assert.AreEqual("da-DK", info.Culture);
+        Assert.That(info.Url, Is.Not.Null);
+        Assert.That(info.Culture, Is.EqualTo("da-DK"));
     }
 
     [Test]
@@ -155,7 +155,7 @@ public class PublishedUrlInfoProviderTests
         ISet<UrlInfo> result = await CreateSut().GetAllAsync(CreateContent(variesByCulture: true, trashed: true), "da-DK");
 
         _urlProvider.Verify(x => x.GetOtherUrls(It.IsAny<int>()), Times.Never);
-        Assert.IsFalse(result.Any(x => x.Url is not null && x.Url.ToString().Contains("/other/")));
+        Assert.That(result.Any(x => x.Url is not null && x.Url.ToString().Contains("/other/")), Is.False);
     }
 
     [Test]
@@ -171,8 +171,8 @@ public class PublishedUrlInfoProviderTests
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(result.Any(x => x.Url is not null && x.Url.ToString().Contains("/other-da/")));
-            Assert.IsFalse(result.Any(x => x.Url is not null && x.Url.ToString().Contains("/other-en/")));
+            Assert.That(result.Any(x => x.Url is not null && x.Url.ToString().Contains("/other-da/")), Is.True);
+            Assert.That(result.Any(x => x.Url is not null && x.Url.ToString().Contains("/other-en/")), Is.False);
         });
     }
 

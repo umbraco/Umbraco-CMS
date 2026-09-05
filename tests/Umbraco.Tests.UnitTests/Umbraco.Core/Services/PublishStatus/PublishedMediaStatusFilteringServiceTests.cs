@@ -20,10 +20,10 @@ public class PublishedMediaStatusFilteringServiceTests
 
         IPublishedContent? first = sut.FilterAvailable(items.Keys, null).FirstOrDefault();
 
-        Assert.IsNotNull(first);
+        Assert.That(first, Is.Not.Null);
 
         // An all-L0-hit chunk must be served synchronously — the batched read is never engaged.
-        Assert.IsEmpty(batchedKeys);
+        Assert.That(batchedKeys, Is.Empty);
         serviceMock.Verify(s => s.GetByKeysAsync(It.IsAny<IReadOnlyCollection<Guid>>()), Times.Never);
     }
 
@@ -34,10 +34,10 @@ public class PublishedMediaStatusFilteringServiceTests
 
         IPublishedContent? first = sut.FilterAvailable(items.Keys, null).FirstOrDefault();
 
-        Assert.IsNotNull(first);
+        Assert.That(first, Is.Not.Null);
 
         // Slow-start's first chunk is a single key, so exactly one item is materialised.
-        Assert.AreEqual(1, batchedKeys.Count);
+        Assert.That(batchedKeys, Has.Count.EqualTo(1));
     }
 
     [Test]
@@ -47,10 +47,10 @@ public class PublishedMediaStatusFilteringServiceTests
 
         IPublishedContent[] taken = sut.FilterAvailable(items.Keys, null).Take(3).ToArray();
 
-        Assert.AreEqual(3, taken.Length);
+        Assert.That(taken, Has.Length.EqualTo(3));
 
         // Chunks of 1 then 2 cover the three requested items; the remaining seven are never materialised.
-        Assert.AreEqual(3, batchedKeys.Count);
+        Assert.That(batchedKeys, Has.Count.EqualTo(3));
     }
 
     [Test]
@@ -60,11 +60,11 @@ public class PublishedMediaStatusFilteringServiceTests
 
         IPublishedContent[] all = sut.FilterAvailable(items.Keys, null).ToArray();
 
-        Assert.AreEqual(items.Count, all.Length);
+        Assert.That(all, Has.Length.EqualTo(items.Count));
 
         // Every item is materialised exactly once...
-        Assert.AreEqual(items.Count, batchedKeys.Count);
-        Assert.AreEqual(items.Count, batchedKeys.Distinct().Count());
+        Assert.That(batchedKeys, Has.Count.EqualTo(items.Count));
+        Assert.That(batchedKeys.Distinct().Count(), Is.EqualTo(items.Count));
 
         // ...but collapsed into a handful of batched reads rather than one per item.
         serviceMock.Verify(s => s.GetByKeysAsync(It.IsAny<IReadOnlyCollection<Guid>>()), Times.AtMost(5));

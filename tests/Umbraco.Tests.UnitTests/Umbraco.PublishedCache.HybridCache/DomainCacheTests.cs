@@ -22,11 +22,11 @@ internal sealed class DomainCacheTests
         DomainCache sut = CreateSut(() => level, out _);
 
         // Constructing before the database can be read must not retain the DefaultUILanguage fallback.
-        Assert.AreEqual(ConfiguredUiLanguage, sut.DefaultCulture);
+        Assert.That(sut.DefaultCulture, Is.EqualTo(ConfiguredUiLanguage));
 
         level = RuntimeLevel.Run;
 
-        Assert.AreEqual(SiteDefaultCulture, sut.DefaultCulture);
+        Assert.That(sut.DefaultCulture, Is.EqualTo(SiteDefaultCulture));
     }
 
     [Test]
@@ -34,7 +34,7 @@ internal sealed class DomainCacheTests
     {
         DomainCache sut = CreateSut(() => RuntimeLevel.Upgrading, out _);
 
-        Assert.AreEqual(SiteDefaultCulture, sut.DefaultCulture);
+        Assert.That(sut.DefaultCulture, Is.EqualTo(SiteDefaultCulture));
     }
 
     [Test]
@@ -42,7 +42,7 @@ internal sealed class DomainCacheTests
     {
         DomainCache sut = CreateSut(() => RuntimeLevel.Run, out _);
 
-        Assert.AreEqual(SiteDefaultCulture, sut.DefaultCulture);
+        Assert.That(sut.DefaultCulture, Is.EqualTo(SiteDefaultCulture));
     }
 
     [Test]
@@ -52,7 +52,7 @@ internal sealed class DomainCacheTests
 
         for (var i = 0; i < 5; i++)
         {
-            Assert.AreEqual(SiteDefaultCulture, sut.DefaultCulture);
+            Assert.That(sut.DefaultCulture, Is.EqualTo(SiteDefaultCulture));
         }
 
         // Read per URL generated, so the resolved value must not be looked up again once it can be trusted.
@@ -64,11 +64,11 @@ internal sealed class DomainCacheTests
     {
         DomainCache sut = CreateSut(() => RuntimeLevel.Run, out Mock<ILanguageService> languageService, siteDefaultCulture: null);
 
-        Assert.AreEqual(string.Empty, sut.DefaultCulture);
+        Assert.That(sut.DefaultCulture, Is.Empty);
 
         languageService.Setup(x => x.GetDefaultIsoCodeAsync()).ReturnsAsync(SiteDefaultCulture);
 
-        Assert.AreEqual(SiteDefaultCulture, sut.DefaultCulture);
+        Assert.That(sut.DefaultCulture, Is.EqualTo(SiteDefaultCulture));
     }
 
     private static DomainCache CreateSut(

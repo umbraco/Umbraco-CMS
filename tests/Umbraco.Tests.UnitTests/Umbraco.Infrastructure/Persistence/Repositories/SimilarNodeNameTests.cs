@@ -15,7 +15,7 @@ internal sealed class SimilarNodeNameTests
         SimilarNodeName[] names = [new() { Id = 1, Name = "Zulu" }];
 
         var res = SimilarNodeName.GetUniqueName(names, 0, "Zulu");
-        Assert.AreEqual("Zulu (1)", res);
+        Assert.That(res, Is.EqualTo("Zulu (1)"));
     }
 
     [Test]
@@ -29,7 +29,7 @@ internal sealed class SimilarNodeNameTests
         ];
 
         var res = SimilarNodeName.GetUniqueName(names, 0, "Kilo (1)");
-        Assert.AreEqual("Kilo (2)", res);
+        Assert.That(res, Is.EqualTo("Kilo (2)"));
     }
 
     [Test]
@@ -42,7 +42,7 @@ internal sealed class SimilarNodeNameTests
         ];
 
         var res = SimilarNodeName.GetUniqueName(names, 0, "Golf");
-        Assert.AreEqual("Golf (1)", res);
+        Assert.That(res, Is.EqualTo("Golf (1)"));
     }
 
     [Test]
@@ -58,7 +58,7 @@ internal sealed class SimilarNodeNameTests
         ];
         var res = SimilarNodeName.GetUniqueName(names, nodeId, nodeName);
 
-        Assert.AreEqual(expected, res);
+        Assert.That(res, Is.EqualTo(expected));
     }
 
     [Test]
@@ -68,7 +68,7 @@ internal sealed class SimilarNodeNameTests
 
         var res = SimilarNodeName.GetUniqueName(names, 0, "Charlie");
 
-        Assert.AreEqual("Charlie", res);
+        Assert.That(res, Is.EqualTo("Charlie"));
     }
 
     [Test]
@@ -80,7 +80,7 @@ internal sealed class SimilarNodeNameTests
 
         var res = SimilarNodeName.GetUniqueName(names, nodeId, nodeName);
 
-        Assert.AreEqual(expected, res);
+        Assert.That(res, Is.EqualTo(expected));
     }
 
     [Test]
@@ -95,7 +95,7 @@ internal sealed class SimilarNodeNameTests
 
         var res = SimilarNodeName.GetUniqueName(names, 1, "Kilo (1)");
 
-        Assert.AreEqual("Kilo (1)", res);
+        Assert.That(res, Is.EqualTo("Kilo (1)"));
     }
 
     [Test]
@@ -114,7 +114,7 @@ internal sealed class SimilarNodeNameTests
 
         var res = SimilarNodeName.GetUniqueName(names, 0, "Test");
 
-        Assert.AreEqual("Test (3)", res);
+        Assert.That(res, Is.EqualTo("Test (3)"));
     }
 
     [Test]
@@ -124,7 +124,7 @@ internal sealed class SimilarNodeNameTests
 
         var res = SimilarNodeName.GetUniqueName(names, 0, "Test");
 
-        Assert.AreEqual("Test (1)", res);
+        Assert.That(res, Is.EqualTo("Test (1)"));
     }
 
     [Test]
@@ -140,7 +140,7 @@ internal sealed class SimilarNodeNameTests
 
         var res = SimilarNodeName.GetUniqueName(names, 0, "Test (1) (1)");
 
-        Assert.AreEqual("Test (1) (2)", res);
+        Assert.That(res, Is.EqualTo("Test (1) (2)"));
     }
 
     [Test]
@@ -149,7 +149,7 @@ internal sealed class SimilarNodeNameTests
         SimilarNodeName[] names = [new() { Id = 6, Name = "Alpha (1)" }];
         var res = SimilarNodeName.GetUniqueName(names, 0, "Alpha (1)");
 
-        Assert.AreEqual("Alpha (1) (1)", res);
+        Assert.That(res, Is.EqualTo("Alpha (1) (1)"));
     }
 
     [TestCase("Test (0)", "Test (0) (1)")]
@@ -160,7 +160,7 @@ internal sealed class SimilarNodeNameTests
         SimilarNodeName[] names = [new() { Id = 6, Name = suffix }];
         var res = SimilarNodeName.GetUniqueName(names, 0, suffix);
 
-        Assert.AreEqual(expected, res);
+        Assert.That(res, Is.EqualTo(expected));
     }
 
     [Test]
@@ -176,7 +176,7 @@ internal sealed class SimilarNodeNameTests
         ];
 
         var uniqueName = SimilarNodeName.GetUniqueName(names, 0, "Test");
-        Assert.AreEqual("Test (3)", uniqueName);
+        Assert.That(uniqueName, Is.EqualTo("Test (3)"));
     }
 
     [Test]
@@ -192,7 +192,7 @@ internal sealed class SimilarNodeNameTests
 
         var res = SimilarNodeName.GetUniqueName(names, 0, "Delta");
 
-        Assert.AreEqual("Delta (2)", res);
+        Assert.That(res, Is.EqualTo("Delta (2)"));
     }
 
     [Test]
@@ -208,7 +208,7 @@ internal sealed class SimilarNodeNameTests
 
         var res = SimilarNodeName.GetUniqueName(names, 0, "Test");
 
-        Assert.AreEqual("Test", res);
+        Assert.That(res, Is.EqualTo("Test"));
     }
 
     [Test]
@@ -224,7 +224,7 @@ internal sealed class SimilarNodeNameTests
 
         var res = SimilarNodeName.GetUniqueName(names, 0, "Foxtrot");
 
-        Assert.AreEqual("Foxtrot", res);
+        Assert.That(res, Is.EqualTo("Foxtrot"));
     }
 
     [Test]
@@ -236,7 +236,7 @@ internal sealed class SimilarNodeNameTests
 
         var res = SimilarNodeName.GetUniqueName(names, 0, string.Empty);
 
-        Assert.AreEqual(" (2)", res);
+        Assert.That(res, Is.EqualTo(" (2)"));
     }
 
     [Test]
@@ -248,7 +248,7 @@ internal sealed class SimilarNodeNameTests
 
         var res = SimilarNodeName.GetUniqueName(names, 0, string.Empty);
 
-        Assert.AreEqual(string.Empty, res);
+        Assert.That(res, Is.Empty);
     }
 
     [TestCase("Echo", "Echo")]
@@ -257,7 +257,7 @@ internal sealed class SimilarNodeNameTests
     [TestCase("Echo (0)", "Echo (0)")]
     [TestCase("50%", "50%")]
     public void GetBaseText_Removes_Trailing_Suffix(string name, string expected)
-        => Assert.AreEqual(expected, SimilarNodeName.GetBaseText(name));
+        => Assert.That(SimilarNodeName.GetBaseText(name), Is.EqualTo(expected));
 
     [TestCase("")]
     [TestCase(null)]
@@ -266,5 +266,5 @@ internal sealed class SimilarNodeNameTests
 
         // An empty name has no base text; it is represented as a single space so that a unique
         // name can still be produced (e.g. " (1)").
-        Assert.AreEqual(" ", SimilarNodeName.GetBaseText(name));
+        Assert.That(SimilarNodeName.GetBaseText(name), Is.EqualTo(" "));
 }

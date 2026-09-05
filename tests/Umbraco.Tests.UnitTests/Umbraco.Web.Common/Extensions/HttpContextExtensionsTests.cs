@@ -19,7 +19,7 @@ public class HttpContextExtensionsTests
             "Unexpected end of Stream, the content may have already been read by another component."));
 
         Assert.DoesNotThrow(() => context.GetRequestValue("umbdebugshowtrace"));
-        Assert.IsNull(context.GetRequestValue("umbdebugshowtrace"));
+        Assert.That(context.GetRequestValue("umbdebugshowtrace"), Is.Null);
     }
 
     [Test]
@@ -28,7 +28,7 @@ public class HttpContextExtensionsTests
         HttpContext context = ContextWithUnreadableForm(new InvalidDataException("Form value count limit exceeded."));
 
         Assert.DoesNotThrow(() => context.GetRequestValue("umbdebugshowtrace"));
-        Assert.IsNull(context.GetRequestValue("umbdebugshowtrace"));
+        Assert.That(context.GetRequestValue("umbdebugshowtrace"), Is.Null);
     }
 
     [Test]
@@ -37,7 +37,7 @@ public class HttpContextExtensionsTests
         HttpContext context = ContextWithUnreadableForm(new IOException("Unexpected end of Stream."));
         context.Request.QueryString = new QueryString("?umbdebugshowtrace=true");
 
-        Assert.AreEqual("true", context.GetRequestValue("umbdebugshowtrace"));
+        Assert.That(context.GetRequestValue("umbdebugshowtrace"), Is.EqualTo("true"));
     }
 
     [Test]
@@ -47,7 +47,7 @@ public class HttpContextExtensionsTests
         context.Request.ContentType = "application/x-www-form-urlencoded";
         context.Request.Form = new FormCollection(new Dictionary<string, StringValues> { ["key"] = "from-form" });
 
-        Assert.AreEqual("from-form", context.GetRequestValue("key"));
+        Assert.That(context.GetRequestValue("key"), Is.EqualTo("from-form"));
     }
 
     private static HttpContext ContextWithUnreadableForm(Exception exception)

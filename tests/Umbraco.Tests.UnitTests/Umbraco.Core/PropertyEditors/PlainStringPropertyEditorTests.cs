@@ -17,7 +17,7 @@ public class PlainStringPropertyEditorTests
     {
         IDataValueEditor valueEditor = CreatePropertyEditor().GetValueEditor();
 
-        Assert.IsInstanceOf<TextOnlyValueEditor>(valueEditor);
+        Assert.That(valueEditor, Is.InstanceOf<TextOnlyValueEditor>());
     }
 
     [TestCase("{\"test\":\"test\"}")]

@@ -69,7 +69,7 @@ public class ContentPickerPropertyEditorValidationTests
         // AllowedContentTypeIds is null — no restriction
         _valueEditor.ConfigurationObject = new ContentPickerConfiguration { AllowedContentTypeIds = null };
 
-        Assert.IsEmpty(Validate(documentKey));
+        Assert.That(Validate(documentKey), Is.Empty);
     }
 
     [TestCase(false)]
@@ -91,7 +91,7 @@ public class ContentPickerPropertyEditorValidationTests
                 : allowedContentTypeKey.ToString(),
         };
 
-        Assert.IsEmpty(Validate(documentKey));
+        Assert.That(Validate(documentKey), Is.Empty);
     }
 
     [Test]
@@ -139,7 +139,7 @@ public class ContentPickerPropertyEditorValidationTests
             AllowedContentTypeIds = Guid.NewGuid().ToString(),
         };
 
-        Assert.IsEmpty(_valueEditor.Validate(string.Empty, false, null, PropertyValidationContext.Empty()));
+        Assert.That(_valueEditor.Validate(string.Empty, false, null, PropertyValidationContext.Empty()), Is.Empty);
     }
 
     private IEnumerable<ValidationResult> Validate(Guid documentKey)

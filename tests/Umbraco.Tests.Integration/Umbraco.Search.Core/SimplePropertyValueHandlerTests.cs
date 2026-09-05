@@ -119,19 +119,19 @@ public class SimplePropertyValueHandlerTests : PropertyValueHandlerTestsBase
             Assert.That(dateTimeUnspecifiedValue, Is.EqualTo(new DateTimeOffset(new DateOnly(2015, 11, 05), new TimeOnly(18, 30, 0), TimeSpan.Zero)));
 
             var tagsAsJsonValue = document.Fields.FirstOrDefault(f => f.FieldName == "tagsAsJsonValue")?.Value.Keywords?.ToArray();
-            CollectionAssert.AreEqual(tagsAsJsonValue, new[] { "One", "Two", "Three" });
+            Assert.That(new[] { "One", "Two", "Three" }, Is.EqualTo(tagsAsJsonValue).AsCollection);
 
             var tagsAsCsvValue = document.Fields.FirstOrDefault(f => f.FieldName == "tagsAsCsvValue")?.Value.Keywords?.ToArray();
-            CollectionAssert.AreEqual(tagsAsCsvValue, new[] { "Four", "Five", "Six" });
+            Assert.That(new[] { "Four", "Five", "Six" }, Is.EqualTo(tagsAsCsvValue).AsCollection);
 
             var allTagsValue = document.Fields.FirstOrDefault(f => f.FieldName == Cms.Search.Core.Constants.FieldNames.Tags)?.Value.Keywords?.ToArray();
-            CollectionAssert.AreEquivalent(allTagsValue, new[] { "One", "Two", "Three", "Four", "Five", "Six" });
+            Assert.That(new[] { "One", "Two", "Three", "Four", "Five", "Six" }, Is.EquivalentTo(allTagsValue));
 
             var multipleTextstringsValue = document.Fields.FirstOrDefault(f => f.FieldName == "multipleTextstringsValue")?.Value.Texts?.ToArray();
-            CollectionAssert.AreEqual(multipleTextstringsValue, new[] { "First", "Second", "Third" });
+            Assert.That(new[] { "First", "Second", "Third" }, Is.EqualTo(multipleTextstringsValue).AsCollection);
 
             var contentPickerValue = document.Fields.FirstOrDefault(f => f.FieldName == "contentPickerValue")?.Value.Keywords?.SingleOrDefault();
-            CollectionAssert.AreEqual(contentPickerValue, "55bf7f6d-acd2-4f1e-92bd-f0b5c41dbfed");
+            Assert.That("55bf7f6d-acd2-4f1e-92bd-f0b5c41dbfed", Is.EqualTo(contentPickerValue));
 
             var booleanAsBooleanValue = document.Fields.FirstOrDefault(f => f.FieldName == "booleanAsBooleanValue")?.Value.Integers?.SingleOrDefault();
             Assert.That(booleanAsBooleanValue, Is.EqualTo(1));
@@ -146,22 +146,22 @@ public class SimplePropertyValueHandlerTests : PropertyValueHandlerTestsBase
             Assert.That(sliderSingleValue, Is.EqualTo(123.45m));
 
             var sliderRangeValue = document.Fields.FirstOrDefault(f => f.FieldName == "sliderRangeValue")?.Value.Decimals?.ToArray();
-            CollectionAssert.AreEqual(sliderRangeValue, new[] { 123.45m, 567.89m });
+            Assert.That(new[] { 123.45m, 567.89m }, Is.EqualTo(sliderRangeValue).AsCollection);
 
             var multiUrlPickerValue = document.Fields.FirstOrDefault(f => f.FieldName == "multiUrlPickerValue")?.Value.Texts?.ToArray();
-            CollectionAssert.AreEqual(multiUrlPickerValue, new[] { "Link One", "Link Two" });
+            Assert.That(new[] { "Link One", "Link Two" }, Is.EqualTo(multiUrlPickerValue).AsCollection);
 
             var dropdownSingleValue = document.Fields.FirstOrDefault(f => f.FieldName == "dropdownSingleValue")?.Value.Keywords?.ToArray();
-            CollectionAssert.AreEqual(dropdownSingleValue, new[] { "One" });
+            Assert.That(new[] { "One" }, Is.EqualTo(dropdownSingleValue).AsCollection);
 
             var dropdownMultipleValue = document.Fields.FirstOrDefault(f => f.FieldName == "dropdownMultipleValue")?.Value.Keywords?.ToArray();
-            CollectionAssert.AreEqual(dropdownMultipleValue, new[] { "One", "Two", "Three" });
+            Assert.That(new[] { "One", "Two", "Three" }, Is.EqualTo(dropdownMultipleValue).AsCollection);
 
             var radioButtonListValue = document.Fields.FirstOrDefault(f => f.FieldName == "radioButtonListValue")?.Value.Keywords?.ToArray();
-            CollectionAssert.AreEqual(radioButtonListValue, new[] { "One" });
+            Assert.That(new[] { "One" }, Is.EqualTo(radioButtonListValue).AsCollection);
 
             var checkBoxListValue = document.Fields.FirstOrDefault(f => f.FieldName == "checkBoxListValue")?.Value.Keywords?.ToArray();
-            CollectionAssert.AreEqual(checkBoxListValue, new[] { "Two" });
+            Assert.That(new[] { "Two" }, Is.EqualTo(checkBoxListValue).AsCollection);
         });
     }
 
@@ -169,7 +169,7 @@ public class SimplePropertyValueHandlerTests : PropertyValueHandlerTestsBase
     public void AllCorePropertyValueHandlers_HaveTheCorePropertyValueHandlerMarkerInterface()
     {
         IPropertyValueHandler[] handlers = GetRequiredService<PropertyValueHandlerCollection>().ToArray();
-        CollectionAssert.IsNotEmpty(handlers);
+        Assert.That(handlers, Is.Not.Empty);
         Assert.That(handlers.All(handler => handler is ICorePropertyValueHandler), Is.True);
     }
 

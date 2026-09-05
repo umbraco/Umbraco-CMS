@@ -31,8 +31,8 @@ public class UmbracoContextTests
         var originalRequestUrl = umbracoContext.OriginalRequestUrl;
 
         // Assert - should use the configured ApplicationMainUrl with https scheme, not the hardcoded http://localhost
-        Assert.AreEqual("https", originalRequestUrl.Scheme);
-        Assert.AreEqual("example.com", originalRequestUrl.Host);
+        Assert.That(originalRequestUrl.Scheme, Is.EqualTo("https"));
+        Assert.That(originalRequestUrl.Host, Is.EqualTo("example.com"));
     }
 
     [Test]
@@ -47,8 +47,8 @@ public class UmbracoContextTests
         var originalRequestUrl = umbracoContext.OriginalRequestUrl;
 
         // Assert - should fall back to http://localhost when no ApplicationMainUrl is available
-        Assert.AreEqual("http", originalRequestUrl.Scheme);
-        Assert.AreEqual("localhost", originalRequestUrl.Host);
+        Assert.That(originalRequestUrl.Scheme, Is.EqualTo("http"));
+        Assert.That(originalRequestUrl.Host, Is.EqualTo("localhost"));
     }
 
     [Test]
@@ -68,8 +68,8 @@ public class UmbracoContextTests
         var originalRequestUrl = umbracoContext.OriginalRequestUrl;
 
         // Assert - should use the actual request URL, not ApplicationMainUrl
-        Assert.AreEqual("https", originalRequestUrl.Scheme);
-        Assert.AreEqual("my-site.com", originalRequestUrl.Host);
+        Assert.That(originalRequestUrl.Scheme, Is.EqualTo("https"));
+        Assert.That(originalRequestUrl.Host, Is.EqualTo("my-site.com"));
     }
 
     [Test]
@@ -89,16 +89,16 @@ public class UmbracoContextTests
 
         // Act - first access falls back to http://localhost
         var firstUrl = umbracoContext.OriginalRequestUrl;
-        Assert.AreEqual("http", firstUrl.Scheme);
-        Assert.AreEqual("localhost", firstUrl.Host);
+        Assert.That(firstUrl.Scheme, Is.EqualTo("http"));
+        Assert.That(firstUrl.Host, Is.EqualTo("localhost"));
 
         // Simulate ApplicationMainUrl becoming available (e.g. after first HTTP request)
         hostingEnvironmentMock.Setup(x => x.ApplicationMainUrl).Returns(new Uri("https://example.com"));
 
         // Act - second access should pick up the newly available ApplicationMainUrl
         var secondUrl = umbracoContext.OriginalRequestUrl;
-        Assert.AreEqual("https", secondUrl.Scheme);
-        Assert.AreEqual("example.com", secondUrl.Host);
+        Assert.That(secondUrl.Scheme, Is.EqualTo("https"));
+        Assert.That(secondUrl.Host, Is.EqualTo("example.com"));
     }
 
     private static global::Umbraco.Cms.Web.Common.UmbracoContext.UmbracoContext CreateUmbracoContext(

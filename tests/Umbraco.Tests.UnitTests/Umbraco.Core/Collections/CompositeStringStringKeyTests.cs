@@ -15,10 +15,10 @@ public class CompositeStringStringKeyTests
         var key1 = new CompositeStringStringKey("a", "b");
         var key2 = new CompositeStringStringKey("a", "b");
 
-        Assert.IsTrue(key1.Equals(key2));
-        Assert.IsTrue(key1 == key2);
-        Assert.IsFalse(key1 != key2);
-        Assert.AreEqual(key1.GetHashCode(), key2.GetHashCode());
+        Assert.That(key1, Is.EqualTo(key2));
+        Assert.That(key1 == key2, Is.True);
+        Assert.That(key1 != key2, Is.False);
+        Assert.That(key2.GetHashCode(), Is.EqualTo(key1.GetHashCode()));
     }
 
     [Test]
@@ -27,8 +27,8 @@ public class CompositeStringStringKeyTests
         var key1 = new CompositeStringStringKey("a", "b");
         var key2 = new CompositeStringStringKey("c", "b");
 
-        Assert.IsFalse(key1.Equals(key2));
-        Assert.IsTrue(key1 != key2);
+        Assert.That(key1, Is.Not.EqualTo(key2));
+        Assert.That(key1 != key2, Is.True);
     }
 
     [Test]
@@ -37,8 +37,8 @@ public class CompositeStringStringKeyTests
         var key1 = new CompositeStringStringKey("a", "b");
         var key2 = new CompositeStringStringKey("a", "c");
 
-        Assert.IsFalse(key1.Equals(key2));
-        Assert.IsTrue(key1 != key2);
+        Assert.That(key1, Is.Not.EqualTo(key2));
+        Assert.That(key1 != key2, Is.True);
     }
 
     [Test]
@@ -47,8 +47,8 @@ public class CompositeStringStringKeyTests
         var key1 = new CompositeStringStringKey("a", "b");
         var key2 = new CompositeStringStringKey("b", "a");
 
-        Assert.IsFalse(key1.Equals(key2));
-        Assert.IsTrue(key1 != key2);
+        Assert.That(key1, Is.Not.EqualTo(key2));
+        Assert.That(key1 != key2, Is.True);
     }
 
     [Test]
@@ -57,8 +57,8 @@ public class CompositeStringStringKeyTests
         var key1 = new CompositeStringStringKey("Hello", "World");
         var key2 = new CompositeStringStringKey("hello", "world");
 
-        Assert.IsTrue(key1.Equals(key2));
-        Assert.AreEqual(key1.GetHashCode(), key2.GetHashCode());
+        Assert.That(key1, Is.EqualTo(key2));
+        Assert.That(key2.GetHashCode(), Is.EqualTo(key1.GetHashCode()));
     }
 
     [Test]
@@ -70,7 +70,7 @@ public class CompositeStringStringKeyTests
         var key1 = new CompositeStringStringKey(CharAsString(0x212A), CharAsString(0x1E9E));
         var key2 = new CompositeStringStringKey("k", CharAsString(0x00DF));
 
-        Assert.IsFalse(key1.Equals(key2));
+        Assert.That(key1, Is.Not.EqualTo(key2));
     }
 
     [Test]
@@ -79,8 +79,8 @@ public class CompositeStringStringKeyTests
         var key1 = new CompositeStringStringKey(string.Empty, string.Empty);
         var key2 = new CompositeStringStringKey(string.Empty, string.Empty);
 
-        Assert.IsTrue(key1.Equals(key2));
-        Assert.AreEqual(key1.GetHashCode(), key2.GetHashCode());
+        Assert.That(key1, Is.EqualTo(key2));
+        Assert.That(key2.GetHashCode(), Is.EqualTo(key1.GetHashCode()));
     }
 
     [Test]
@@ -88,10 +88,10 @@ public class CompositeStringStringKeyTests
     {
         var key = new CompositeStringStringKey("a", "b");
 
-        Assert.IsTrue(key.Equals((object)new CompositeStringStringKey("A", "B")));
-        Assert.IsFalse(key.Equals((object)new CompositeStringStringKey("a", "c")));
-        Assert.IsFalse(key.Equals(null));
-        Assert.IsFalse(key.Equals("a"));
+        Assert.That(key.Equals((object)new CompositeStringStringKey("A", "B")), Is.True);
+        Assert.That(key.Equals((object)new CompositeStringStringKey("a", "c")), Is.False);
+        Assert.That(key.Equals(null), Is.False);
+        Assert.That(key.Equals("a"), Is.False);
     }
 
     [Test]
@@ -103,16 +103,16 @@ public class CompositeStringStringKeyTests
         dict[key] = "value";
 
         var lookup = new CompositeStringStringKey("EN-us", "DEFAULT");
-        Assert.IsTrue(dict.ContainsKey(lookup));
-        Assert.AreEqual("value", dict[lookup]);
+        Assert.That(dict.ContainsKey(lookup), Is.True);
+        Assert.That(dict[lookup], Is.EqualTo("value"));
     }
 
     [Test]
     public void Default_Value_Is_Equal_To_Itself()
     {
         // The constructor rejects null parts, but default(T) bypasses it, leaving both parts null.
-        Assert.IsTrue(default(CompositeStringStringKey).Equals(default(CompositeStringStringKey)));
-        Assert.IsTrue(default(CompositeStringStringKey) == default);
+        Assert.That(default(CompositeStringStringKey).Equals(default(CompositeStringStringKey)), Is.True);
+        Assert.That(default(CompositeStringStringKey) == default, Is.True);
     }
 
     [Test]
@@ -121,7 +121,7 @@ public class CompositeStringStringKeyTests
         ArgumentNullException? exception =
             Assert.Throws<ArgumentNullException>(() => new CompositeStringStringKey(null!, "b"));
 
-        Assert.AreEqual("key1", exception?.ParamName);
+        Assert.That(exception?.ParamName, Is.EqualTo("key1"));
     }
 
     [Test]
@@ -130,7 +130,7 @@ public class CompositeStringStringKeyTests
         ArgumentNullException? exception =
             Assert.Throws<ArgumentNullException>(() => new CompositeStringStringKey("a", null!));
 
-        Assert.AreEqual("key2", exception?.ParamName);
+        Assert.That(exception?.ParamName, Is.EqualTo("key2"));
     }
 
     private static string CharAsString(int codePoint) => ((char)codePoint).ToString();

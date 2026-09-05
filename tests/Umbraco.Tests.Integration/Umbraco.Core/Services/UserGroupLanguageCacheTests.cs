@@ -52,7 +52,7 @@ internal sealed class UserGroupLanguageCacheTests : UmbracoIntegrationTest
     {
         var language = new LanguageBuilder().WithCultureInfo("nb-NO").Build();
         var languageCreated = await LanguageService.CreateAsync(language, Constants.Security.SuperUserKey);
-        Assert.IsTrue(languageCreated.Success);
+        Assert.That(languageCreated.Success, Is.True);
 
         var userGroup = new UserGroup(ShortStringHelper)
         {
@@ -63,31 +63,33 @@ internal sealed class UserGroupLanguageCacheTests : UmbracoIntegrationTest
         userGroup.AddAllowedLanguage(language.Id);
 
         var created = await UserGroupService.CreateAsync(userGroup, Constants.Security.SuperUserKey);
-        Assert.IsTrue(created.Success);
+        Assert.That(created.Success, Is.True);
         var userGroupId = created.Result!.Id;
 
         // Populate both the per-id cache and the "get all" cache (the list/filter endpoint that
         // actually surfaced the bug uses the latter) while the language still exists.
         var cachedById = await UserGroupService.GetAsync(userGroupId);
-        Assert.IsNotNull(cachedById);
-        Assert.IsTrue(cachedById!.AllowedLanguages.Contains(language.Id));
+        Assert.That(cachedById, Is.Not.Null);
+        Assert.That(cachedById!.AllowedLanguages, Does.Contain(language.Id));
 
         var cachedFromAll = (await UserGroupService.GetAllAsync(0, int.MaxValue)).Items.First(x => x.Id == userGroupId);
-        Assert.IsTrue(cachedFromAll.AllowedLanguages.Contains(language.Id));
+        Assert.That(cachedFromAll.AllowedLanguages, Does.Contain(language.Id));
 
         var deleted = await LanguageService.DeleteAsync(language.IsoCode, Constants.Security.SuperUserKey);
-        Assert.IsTrue(deleted.Success);
+        Assert.That(deleted.Success, Is.True);
 
         // Both cached read paths must drop the now-deleted language.
         var reloadedById = await UserGroupService.GetAsync(userGroupId);
-        Assert.IsNotNull(reloadedById);
-        Assert.IsFalse(
-            reloadedById!.AllowedLanguages.Contains(language.Id),
+        Assert.That(reloadedById, Is.Not.Null);
+        Assert.That(
+            reloadedById!.AllowedLanguages,
+            Does.Not.Contain(language.Id),
             "A deleted language should not remain on the cached user group (get-by-id path).");
 
         var reloadedFromAll = (await UserGroupService.GetAllAsync(0, int.MaxValue)).Items.First(x => x.Id == userGroupId);
-        Assert.IsFalse(
-            reloadedFromAll.AllowedLanguages.Contains(language.Id),
+        Assert.That(
+            reloadedFromAll.AllowedLanguages,
+            Does.Not.Contain(language.Id),
             "A deleted language should not remain on the cached user group (get-all path).");
     }
 }

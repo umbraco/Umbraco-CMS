@@ -52,20 +52,20 @@ public class DocumentEntitySlimBuilderTests
             .Build();
 
         // Assert
-        Assert.AreEqual(testId, item.Id);
-        Assert.AreEqual(testKey, item.Key);
-        Assert.AreEqual(testName, item.Name);
-        Assert.AreEqual(testCreateDate, item.CreateDate);
-        Assert.AreEqual(testUpdateDate, item.UpdateDate);
-        Assert.AreEqual(testCreatorId, item.CreatorId);
-        Assert.AreEqual(testParentId, item.ParentId);
-        Assert.AreEqual(testSortOrder, item.SortOrder);
-        Assert.AreEqual(testPath, item.Path);
-        Assert.AreEqual(testLevel, item.Level);
-        Assert.AreEqual(testContentTypeAlias, item.ContentTypeAlias);
-        Assert.AreEqual(testContentTypeIcon, item.ContentTypeIcon);
-        Assert.AreEqual(testContentTypeThumbnail, item.ContentTypeThumbnail);
-        Assert.AreEqual(testHasChildren, item.HasChildren);
-        Assert.AreEqual(testPublished, item.Published);
+        Assert.That(item.Id, Is.EqualTo(testId));
+        Assert.That(item.Key, Is.EqualTo(testKey));
+        Assert.That(item.Name, Is.EqualTo(testName));
+        Assert.That(item.CreateDate, Is.EqualTo(testCreateDate));
+        Assert.That(item.UpdateDate, Is.EqualTo(testUpdateDate));
+        Assert.That(item.CreatorId, Is.EqualTo(testCreatorId));
+        Assert.That(item.ParentId, Is.EqualTo(testParentId));
+        Assert.That(item.SortOrder, Is.EqualTo(testSortOrder));
+        Assert.That(item.Path, Is.EqualTo(testPath));
+        Assert.That(item.Level, Is.EqualTo(testLevel));
+        Assert.That(item.ContentTypeAlias, Is.EqualTo(testContentTypeAlias));
+        Assert.That(item.ContentTypeIcon, Is.EqualTo(testContentTypeIcon));
+        Assert.That(item.ContentTypeThumbnail, Is.EqualTo(testContentTypeThumbnail));
+        Assert.That(item.HasChildren, Is.EqualTo(testHasChildren));
+        Assert.That(item.Published, Is.EqualTo(testPublished));
     }
 }

@@ -50,7 +50,7 @@ public class WebhookPresentationFactoryTests
 
         var result = _factory.CreateResponseModel(log);
 
-        Assert.AreEqual("NotFound (404)", result.StatusCode);
+        Assert.That(result.StatusCode, Is.EqualTo("NotFound (404)"));
     }
 
     [Test]
@@ -61,7 +61,7 @@ public class WebhookPresentationFactoryTests
 
         var result = _factory.CreateResponseModel(log);
 
-        Assert.AreEqual("InternalServerError (500)", result.StatusCode);
+        Assert.That(result.StatusCode, Is.EqualTo("InternalServerError (500)"));
     }
 
     [TestCase("OK (200)", 200)]
@@ -74,7 +74,7 @@ public class WebhookPresentationFactoryTests
 
         var result = _factory.CreateResponseModel(log);
 
-        Assert.AreEqual(expected, result.HttpStatusCode);
+        Assert.That(result.HttpStatusCode, Is.EqualTo(expected));
     }
 
     [TestCase("ConnectionError")]
@@ -86,7 +86,7 @@ public class WebhookPresentationFactoryTests
 
         var result = _factory.CreateResponseModel(log);
 
-        Assert.IsNull(result.HttpStatusCode);
+        Assert.That(result.HttpStatusCode, Is.Null);
     }
 
     [Test]
@@ -97,7 +97,7 @@ public class WebhookPresentationFactoryTests
 
         var result = _factory.CreateResponseModel(log);
 
-        Assert.IsTrue(result.ExceptionOccured);
+        Assert.That(result.ExceptionOccured, Is.True);
     }
 
     [Test]
@@ -108,7 +108,7 @@ public class WebhookPresentationFactoryTests
 
         var result = _factory.CreateResponseModel(log);
 
-        Assert.AreEqual(ToggleDebugLocalizedText, result.ResponseBody);
+        Assert.That(result.ResponseBody, Is.EqualTo(ToggleDebugLocalizedText));
     }
 
     [Test]
@@ -119,7 +119,7 @@ public class WebhookPresentationFactoryTests
 
         var result = _factory.CreateResponseModel(log);
 
-        Assert.AreEqual(string.Empty, result.ResponseHeaders);
+        Assert.That(result.ResponseHeaders, Is.Empty);
     }
 
     [Test]
@@ -132,8 +132,8 @@ public class WebhookPresentationFactoryTests
 
         var result = _factory.CreateResponseModel(log);
 
-        Assert.AreEqual("the actual response body", result.ResponseBody);
-        Assert.AreEqual("Content-Type: application/json", result.ResponseHeaders);
+        Assert.That(result.ResponseBody, Is.EqualTo("the actual response body"));
+        Assert.That(result.ResponseHeaders, Is.EqualTo("Content-Type: application/json"));
     }
 
     [Test]
@@ -156,15 +156,15 @@ public class WebhookPresentationFactoryTests
 
         var result = _factory.CreateResponseModel(log);
 
-        Assert.AreEqual(key, result.Key);
-        Assert.AreEqual(webhookKey, result.WebhookKey);
-        Assert.AreEqual("https://example.test/hook", result.Url);
-        Assert.AreEqual("Umbraco.ContentPublish", result.EventAlias);
-        Assert.AreEqual(date, result.Date);
-        Assert.AreEqual(2, result.RetryCount);
-        Assert.AreEqual("the request body", result.RequestBody);
-        Assert.AreEqual("X-Test: yes", result.RequestHeaders);
-        Assert.IsFalse(result.IsSuccessStatusCode);
+        Assert.That(result.Key, Is.EqualTo(key));
+        Assert.That(result.WebhookKey, Is.EqualTo(webhookKey));
+        Assert.That(result.Url, Is.EqualTo("https://example.test/hook"));
+        Assert.That(result.EventAlias, Is.EqualTo("Umbraco.ContentPublish"));
+        Assert.That(result.Date, Is.EqualTo(date));
+        Assert.That(result.RetryCount, Is.EqualTo(2));
+        Assert.That(result.RequestBody, Is.EqualTo("the request body"));
+        Assert.That(result.RequestHeaders, Is.EqualTo("X-Test: yes"));
+        Assert.That(result.IsSuccessStatusCode, Is.False);
     }
 
     [Test]
@@ -175,7 +175,7 @@ public class WebhookPresentationFactoryTests
 
         var result = _factory.CreateResponseModel(log);
 
-        Assert.AreEqual(string.Empty, result.RequestBody);
+        Assert.That(result.RequestBody, Is.Empty);
     }
 
     [Test]
@@ -196,11 +196,11 @@ public class WebhookPresentationFactoryTests
 
         var result = _factory.CreateResponseModel(webhook);
 
-        Assert.AreEqual(1, result.Events.Length);
+        Assert.That(result.Events, Has.Length.EqualTo(1));
         WebhookEventResponseModel mappedEvent = result.Events.Single();
-        Assert.AreEqual("Umbraco.ContentPublish", mappedEvent.Alias);
-        Assert.AreEqual("Content Published", mappedEvent.EventName);
-        Assert.AreEqual("Content", mappedEvent.EventType);
+        Assert.That(mappedEvent.Alias, Is.EqualTo("Umbraco.ContentPublish"));
+        Assert.That(mappedEvent.EventName, Is.EqualTo("Content Published"));
+        Assert.That(mappedEvent.EventType, Is.EqualTo("Content"));
     }
 
     [Test]
@@ -211,9 +211,9 @@ public class WebhookPresentationFactoryTests
         var result = _factory.CreateResponseModel(webhook);
 
         WebhookEventResponseModel mappedEvent = result.Events.Single();
-        Assert.AreEqual("Some.Unregistered.Event", mappedEvent.Alias);
-        Assert.AreEqual("Some.Unregistered.Event", mappedEvent.EventName);
-        Assert.AreEqual(Constants.WebhookEvents.Types.Other, mappedEvent.EventType);
+        Assert.That(mappedEvent.Alias, Is.EqualTo("Some.Unregistered.Event"));
+        Assert.That(mappedEvent.EventName, Is.EqualTo("Some.Unregistered.Event"));
+        Assert.That(mappedEvent.EventType, Is.EqualTo(Constants.WebhookEvents.Types.Other));
     }
 
     private static WebhookLog CreateWebhookLog(

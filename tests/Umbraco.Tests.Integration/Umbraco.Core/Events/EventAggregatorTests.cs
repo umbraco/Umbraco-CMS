@@ -24,7 +24,7 @@ internal sealed class EventAggregatorTests : UmbracoTestServerTestBase
     public async Task Publish_HandlerWithScopedDependency_DoesNotThrow()
     {
         var result = await Client.GetAsync("/test-handler-with-scoped-services");
-        Assert.AreEqual(HttpStatusCode.OK, result.StatusCode);
+        Assert.That(result.StatusCode, Is.EqualTo(HttpStatusCode.OK));
     }
 }
 

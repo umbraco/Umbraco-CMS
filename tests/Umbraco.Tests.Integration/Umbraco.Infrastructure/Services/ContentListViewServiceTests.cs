@@ -55,9 +55,9 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(result.Success);
-            Assert.AreEqual(ContentCollectionOperationStatus.ContentNotFound, result.Status);
-            Assert.IsNull(result.Result);
+            Assert.That(result.Success, Is.False);
+            Assert.That(result.Status, Is.EqualTo(ContentCollectionOperationStatus.ContentNotFound));
+            Assert.That(result.Result, Is.Null);
         });
     }
 
@@ -93,11 +93,11 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
         Assert.Multiple(() =>
         {
             // Assert the content type is not configured as list view
-            Assert.IsNull(createResult.Result.Content.ContentType.ListView);
+            Assert.That(createResult.Result.Content.ContentType.ListView, Is.Null);
 
-            Assert.IsFalse(result.Success);
-            Assert.AreEqual(ContentCollectionOperationStatus.ContentNotCollection, result.Status);
-            Assert.IsNull(result.Result);
+            Assert.That(result.Success, Is.False);
+            Assert.That(result.Status, Is.EqualTo(ContentCollectionOperationStatus.ContentNotCollection));
+            Assert.That(result.Result, Is.Null);
         });
     }
 
@@ -124,19 +124,19 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
         Assert.Multiple(() =>
         {
             // Assert the content type is configured as list view
-            Assert.IsNotNull(root.ContentType.ListView);
+            Assert.That(root.ContentType.ListView, Is.Not.Null);
 
-            Assert.IsTrue(result.Success);
-            Assert.AreEqual(ContentCollectionOperationStatus.Success, result.Status);
-            Assert.IsNotNull(result.Result);
+            Assert.That(result.Success, Is.True);
+            Assert.That(result.Status, Is.EqualTo(ContentCollectionOperationStatus.Success));
+            Assert.That(result.Result, Is.Not.Null);
         });
 
         PagedModel<IContent> collectionItemsResult = result.Result.Items;
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(5, collectionItemsResult.Total);
-            CollectionAssert.AreEquivalent(descendants, collectionItemsResult.Items);
+            Assert.That(collectionItemsResult.Total, Is.EqualTo(5));
+            Assert.That(collectionItemsResult.Items, Is.EquivalentTo(descendants));
         });
     }
 
@@ -177,9 +177,9 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
         // Assert
         Assert.Multiple(async () =>
         {
-            Assert.IsTrue(result.Success);
-            Assert.AreEqual(ContentCollectionOperationStatus.Success, result.Status);
-            Assert.IsNotNull(result.Result);
+            Assert.That(result.Success, Is.True);
+            Assert.That(result.Status, Is.EqualTo(ContentCollectionOperationStatus.Success));
+            Assert.That(result.Result, Is.Not.Null);
 
             await AssertListViewConfiguration(result.Result.ListViewConfiguration, customListView.Key);
         });
@@ -204,15 +204,15 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
         // Guard Assert
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(dataTypeCreateResult.Success);
-            Assert.IsTrue(dataTypeCreateResult.Result.ConfigurationObject is ListViewConfiguration);
+            Assert.That(dataTypeCreateResult.Success, Is.True);
+            Assert.That(dataTypeCreateResult.Result.ConfigurationObject is ListViewConfiguration, Is.True);
         });
 
         var listViewKey = dataTypeCreateResult.Result.Key;
         var root = await CreateRootContentWithFiveChildrenAsListViewItems(listViewKey);
 
         var dataTypeDeleteResult = await DataTypeService.DeleteAsync(listViewKey, Constants.Security.SuperUserKey);
-        Assert.IsTrue(dataTypeDeleteResult.Success); // Guard Assert
+        Assert.That(dataTypeDeleteResult.Success, Is.True); // Guard Assert
 
         // Act
         var result = await ContentListViewService.GetListViewItemsByKeyAsync(
@@ -229,9 +229,9 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(result.Success);
-            Assert.AreEqual(ContentCollectionOperationStatus.CollectionNotFound, result.Status);
-            Assert.IsNull(result.Result);
+            Assert.That(result.Success, Is.False);
+            Assert.That(result.Status, Is.EqualTo(ContentCollectionOperationStatus.CollectionNotFound));
+            Assert.That(result.Result, Is.Null);
         });
     }
 
@@ -262,8 +262,8 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
         // Guard Assert
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(dataTypeCreateResult.Success);
-            Assert.IsTrue(dataTypeCreateResult.Result.ConfigurationObject is ListViewConfiguration);
+            Assert.That(dataTypeCreateResult.Success, Is.True);
+            Assert.That(dataTypeCreateResult.Result.ConfigurationObject is ListViewConfiguration, Is.True);
         });
 
         var root = await CreateRootContentWithFiveChildrenAsListViewItems(dataTypeCreateResult.Result.Key);
@@ -283,9 +283,9 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(result.Success);
-            Assert.AreEqual(ContentCollectionOperationStatus.MissingPropertiesInCollectionConfiguration, result.Status);
-            Assert.IsNull(result.Result);
+            Assert.That(result.Success, Is.False);
+            Assert.That(result.Status, Is.EqualTo(ContentCollectionOperationStatus.MissingPropertiesInCollectionConfiguration));
+            Assert.That(result.Result, Is.Null);
         });
     }
 
@@ -312,19 +312,19 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
         Assert.Multiple(() =>
         {
             // Assert the content type is not configured as list view
-            Assert.IsNull(root.ContentType.ListView);
+            Assert.That(root.ContentType.ListView, Is.Null);
 
-            Assert.IsTrue(result.Success);
-            Assert.AreEqual(ContentCollectionOperationStatus.Success, result.Status);
-            Assert.IsNotNull(result.Result);
+            Assert.That(result.Success, Is.True);
+            Assert.That(result.Status, Is.EqualTo(ContentCollectionOperationStatus.Success));
+            Assert.That(result.Result, Is.Not.Null);
         });
 
         PagedModel<IContent> collectionItemsResult = result.Result.Items;
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(5, collectionItemsResult.Total);
-            CollectionAssert.AreEquivalent(descendants, collectionItemsResult.Items);
+            Assert.That(collectionItemsResult.Total, Is.EqualTo(5));
+            Assert.That(collectionItemsResult.Items, Is.EquivalentTo(descendants));
         });
     }
 
@@ -349,9 +349,9 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
         // Assert
         Assert.Multiple(async () =>
         {
-            Assert.IsTrue(result.Success);
-            Assert.AreEqual(ContentCollectionOperationStatus.Success, result.Status);
-            Assert.IsNotNull(result.Result);
+            Assert.That(result.Success, Is.True);
+            Assert.That(result.Status, Is.EqualTo(ContentCollectionOperationStatus.Success));
+            Assert.That(result.Result, Is.Not.Null);
 
             await AssertListViewConfiguration(result.Result.ListViewConfiguration, _customListViewKey);
         });
@@ -380,11 +380,11 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
         Assert.Multiple(() =>
         {
             // Assert the content type is not configured as list view
-            Assert.IsNull(root.ContentType.ListView);
+            Assert.That(root.ContentType.ListView, Is.Null);
 
-            Assert.IsFalse(result.Success);
-            Assert.AreEqual(ContentCollectionOperationStatus.DataTypeNotContentProperty, result.Status);
-            Assert.IsNull(result.Result);
+            Assert.That(result.Success, Is.False);
+            Assert.That(result.Status, Is.EqualTo(ContentCollectionOperationStatus.DataTypeNotContentProperty));
+            Assert.That(result.Result, Is.Null);
         });
     }
 
@@ -409,9 +409,9 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(result.Success);
-            Assert.AreEqual(ContentCollectionOperationStatus.DataTypeNotFound, result.Status);
-            Assert.IsNull(result.Result);
+            Assert.That(result.Success, Is.False);
+            Assert.That(result.Status, Is.EqualTo(ContentCollectionOperationStatus.DataTypeNotFound));
+            Assert.That(result.Result, Is.Null);
         });
     }
 
@@ -438,9 +438,9 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(result.Success);
-            Assert.AreEqual(ContentCollectionOperationStatus.DataTypeNotCollection, result.Status);
-            Assert.IsNull(result.Result);
+            Assert.That(result.Success, Is.False);
+            Assert.That(result.Status, Is.EqualTo(ContentCollectionOperationStatus.DataTypeNotCollection));
+            Assert.That(result.Result, Is.Null);
         });
     }
 
@@ -465,9 +465,9 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(result.Success);
-            Assert.AreEqual(ContentCollectionOperationStatus.OrderByNotPartOfCollectionConfiguration, result.Status);
-            Assert.IsNull(result.Result);
+            Assert.That(result.Success, Is.False);
+            Assert.That(result.Status, Is.EqualTo(ContentCollectionOperationStatus.OrderByNotPartOfCollectionConfiguration));
+            Assert.That(result.Result, Is.Null);
         });
     }
 
@@ -494,9 +494,9 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(result.Success);
-            Assert.AreEqual(ContentCollectionOperationStatus.Success, result.Status);
-            Assert.IsNotNull(result.Result);
+            Assert.That(result.Success, Is.True);
+            Assert.That(result.Status, Is.EqualTo(ContentCollectionOperationStatus.Success));
+            Assert.That(result.Result, Is.Not.Null);
         });
 
         PagedModel<IContent> collectionItemsResult = result.Result.Items;
@@ -507,9 +507,9 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(5, collectionItemsResult.Total);
-            CollectionAssert.AreEquivalent(descendants, collectionItemsResult.Items);
-            Assert.IsTrue(expectedNames.SequenceEqual(actualNames));
+            Assert.That(collectionItemsResult.Total, Is.EqualTo(5));
+            Assert.That(collectionItemsResult.Items, Is.EquivalentTo(descendants));
+            Assert.That(expectedNames.SequenceEqual(actualNames), Is.True);
         });
     }
 
@@ -538,19 +538,19 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(result.Success);
-            Assert.AreEqual(ContentCollectionOperationStatus.Success, result.Status);
-            Assert.IsNotNull(result.Result);
+            Assert.That(result.Success, Is.True);
+            Assert.That(result.Status, Is.EqualTo(ContentCollectionOperationStatus.Success));
+            Assert.That(result.Result, Is.Not.Null);
         });
 
         PagedModel<IContent> collectionItemsResult = result.Result.Items;
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(5, collectionItemsResult.Total);
-            CollectionAssert.AreEquivalent(descendants, collectionItemsResult.Items);
-            Assert.AreEqual(expectedFirstItemName, collectionItemsResult.Items.First().Name);
-            Assert.AreEqual(expectedLastItemName, collectionItemsResult.Items.Last().Name);
+            Assert.That(collectionItemsResult.Total, Is.EqualTo(5));
+            Assert.That(collectionItemsResult.Items, Is.EquivalentTo(descendants));
+            Assert.That(collectionItemsResult.Items.First().Name, Is.EqualTo(expectedFirstItemName));
+            Assert.That(collectionItemsResult.Items.Last().Name, Is.EqualTo(expectedLastItemName));
         });
     }
 
@@ -578,9 +578,9 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(result.Success);
-            Assert.AreEqual(ContentCollectionOperationStatus.Success, result.Status);
-            Assert.IsNotNull(result.Result);
+            Assert.That(result.Success, Is.True);
+            Assert.That(result.Status, Is.EqualTo(ContentCollectionOperationStatus.Success));
+            Assert.That(result.Result, Is.Not.Null);
         });
 
         PagedModel<IContent> collectionItemsResult = result.Result.Items;
@@ -594,10 +594,10 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(sortOrderProperty.IsSystem);
-            Assert.AreEqual(5, collectionItemsResult.Total);
-            CollectionAssert.AreEquivalent(descendants, collectionItemsResult.Items);
-            Assert.IsTrue(expectedNames.SequenceEqual(actualNames));
+            Assert.That(sortOrderProperty.IsSystem, Is.True);
+            Assert.That(collectionItemsResult.Total, Is.EqualTo(5));
+            Assert.That(collectionItemsResult.Items, Is.EquivalentTo(descendants));
+            Assert.That(expectedNames.SequenceEqual(actualNames), Is.True);
         });
     }
 
@@ -624,9 +624,9 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(result.Success);
-            Assert.AreEqual(ContentCollectionOperationStatus.Success, result.Status);
-            Assert.IsNotNull(result.Result);
+            Assert.That(result.Success, Is.True);
+            Assert.That(result.Status, Is.EqualTo(ContentCollectionOperationStatus.Success));
+            Assert.That(result.Result, Is.Not.Null);
         });
 
         PagedModel<IContent> collectionItemsResult = result.Result.Items;
@@ -638,10 +638,10 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
 
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(priceProperty.IsSystem);
-            Assert.AreEqual(5, collectionItemsResult.Total);
-            CollectionAssert.AreEquivalent(descendants, collectionItemsResult.Items);
-            Assert.IsTrue(expectedNames.SequenceEqual(actualNames));
+            Assert.That(priceProperty.IsSystem, Is.False);
+            Assert.That(collectionItemsResult.Total, Is.EqualTo(5));
+            Assert.That(collectionItemsResult.Items, Is.EquivalentTo(descendants));
+            Assert.That(expectedNames.SequenceEqual(actualNames), Is.True);
         });
     }
 
@@ -669,9 +669,9 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(result.Success);
-            Assert.AreEqual(ContentCollectionOperationStatus.Success, result.Status);
-            Assert.IsNotNull(result.Result);
+            Assert.That(result.Success, Is.True);
+            Assert.That(result.Status, Is.EqualTo(ContentCollectionOperationStatus.Success));
+            Assert.That(result.Result, Is.Not.Null);
         });
 
         PagedModel<IContent> filteredCollectionItems = result.Result.Items;
@@ -679,9 +679,9 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(5, allChildren.Length);
-            Assert.AreEqual(1, filteredCollectionItems.Total);
-            Assert.AreEqual(expectedName, actualFirst.Name);
+            Assert.That(allChildren, Has.Length.EqualTo(5));
+            Assert.That(filteredCollectionItems.Total, Is.EqualTo(1));
+            Assert.That(actualFirst.Name, Is.EqualTo(expectedName));
         });
     }
 
@@ -706,11 +706,11 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(result.Success);
-            Assert.AreEqual(ContentCollectionOperationStatus.Success, result.Status);
-            Assert.IsNotNull(result.Result);
+            Assert.That(result.Success, Is.True);
+            Assert.That(result.Status, Is.EqualTo(ContentCollectionOperationStatus.Success));
+            Assert.That(result.Result, Is.Not.Null);
         });
-        Assert.AreEqual(0, result.Result.Items.Total);
+        Assert.That(result.Result.Items.Total, Is.EqualTo(0));
     }
 
     [Test]
@@ -767,11 +767,11 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(result.Success);
-            Assert.AreEqual(ContentCollectionOperationStatus.Success, result.Status);
-            Assert.IsNotNull(result.Result);
+            Assert.That(result.Success, Is.True);
+            Assert.That(result.Status, Is.EqualTo(ContentCollectionOperationStatus.Success));
+            Assert.That(result.Result, Is.Not.Null);
         });
-        Assert.AreEqual(0, result.Result.Items.Items.Count());
+        Assert.That(result.Result.Items.Items.Count(), Is.EqualTo(0));
     }
 
     [TestCase(true)]
@@ -806,9 +806,9 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(result.Success);
-            Assert.AreEqual(ContentCollectionOperationStatus.Success, result.Status);
-            Assert.IsNotNull(result.Result);
+            Assert.That(result.Success, Is.True);
+            Assert.That(result.Status, Is.EqualTo(ContentCollectionOperationStatus.Success));
+            Assert.That(result.Result, Is.Not.Null);
         });
 
         PagedModel<IContent> collectionItemsResult = result.Result.Items;
@@ -822,9 +822,9 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(5, collectionItemsResult.Total);
-            Assert.AreEqual(expectedOrder.Length, actualOrder.Length);
-            CollectionAssert.AreEqual(expectedOrder, actualOrder, $"Expected order: [{string.Join(", ", expectedOrder)}], Actual order: [{string.Join(", ", actualOrder)}]");
+            Assert.That(collectionItemsResult.Total, Is.EqualTo(5));
+            Assert.That(actualOrder, Has.Length.EqualTo(expectedOrder.Length));
+            Assert.That(actualOrder, Is.EqualTo(expectedOrder).AsCollection, $"Expected order: [{string.Join(", ", expectedOrder)}], Actual order: [{string.Join(", ", actualOrder)}]");
         });
     }
 
@@ -861,7 +861,7 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
             .Build();
 
         var createdContentTypeResult = await ContentTypeService.CreateAsync(childContentType, Constants.Security.SuperUserKey);
-        Assert.IsTrue(createdContentTypeResult.Success, "Failed to create child content type.");
+        Assert.That(createdContentTypeResult.Success, Is.True, "Failed to create child content type.");
 
         // Create root content type with list view property
         var contentTypeWithListViewPropertyType = new ContentTypeBuilder()
@@ -882,7 +882,7 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
             new ContentTypeSort(childContentType.Key, 1, childContentType.Alias),
         };
         createdContentTypeResult = await ContentTypeService.CreateAsync(contentTypeWithListViewPropertyType, Constants.Security.SuperUserKey);
-        Assert.IsTrue(createdContentTypeResult.Success, "Failed to create root content type.");
+        Assert.That(createdContentTypeResult.Success, Is.True, "Failed to create root content type.");
 
         // Create root content
         var rootContentCreateModel = new ContentCreateModel
@@ -893,7 +893,7 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
         };
 
         var rootResult = await ContentEditingService.CreateAsync(rootContentCreateModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(rootResult.Success, "Failed to create root content.");
+        Assert.That(rootResult.Success, Is.True, "Failed to create root content.");
         var root = rootResult.Result.Content;
 
         // Create child content items with date values.
@@ -930,7 +930,7 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
         // Get the real DateTimeWithTimeZone property editor from the collection
         // This ensures we use the editor that implements IDataValueSortable
         var propertyEditor = PropertyEditorCollection[Constants.PropertyEditors.Aliases.DateTimeWithTimeZone];
-        Assert.IsNotNull(propertyEditor, "DateTimeWithTimeZone property editor not found in collection");
+        Assert.That(propertyEditor, Is.Not.Null, "DateTimeWithTimeZone property editor not found in collection");
 
         var serializer = GetRequiredService<IConfigurationEditorJsonSerializer>();
         var dataType = new DataType(propertyEditor, serializer)
@@ -940,7 +940,7 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
         };
 
         var result = await DataTypeService.CreateAsync(dataType, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success, $"Failed to create data type: {result.Status}");
+        Assert.That(result.Success, Is.True, $"Failed to create data type: {result.Status}");
         return result.Result;
     }
 
@@ -950,7 +950,7 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
         // Arrange
         var root = await CreateRootContentWithFiveChildrenAsListViewItems();
         var children = ContentService.GetPagedChildren(root.Id, 0, 10, out _, null, null, null, true).ToArray();
-        Assert.AreEqual(5, children.Length);
+        Assert.That(children, Has.Length.EqualTo(5));
 
         // Create user group with Browse as default permission, start node = collection root
         var userGroup = new UserGroupBuilder()
@@ -993,21 +993,21 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(result.Success);
-            Assert.AreEqual(ContentCollectionOperationStatus.Success, result.Status);
-            Assert.IsNotNull(result.Result);
+            Assert.That(result.Success, Is.True);
+            Assert.That(result.Status, Is.EqualTo(ContentCollectionOperationStatus.Success));
+            Assert.That(result.Result, Is.Not.Null);
         });
 
         var returnedKeys = result.Result.Items.Items.Select(x => x.Key).ToHashSet();
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(3, result.Result.Items.Items.Count());
-            Assert.IsTrue(returnedKeys.Contains(children[0].Key), "Child 1 (with default browse) should be returned");
-            Assert.IsTrue(returnedKeys.Contains(children[1].Key), "Child 2 (with default browse) should be returned");
-            Assert.IsTrue(returnedKeys.Contains(children[2].Key), "Child 3 (with default browse) should be returned");
-            Assert.IsFalse(returnedKeys.Contains(children[3].Key), "Child 4 (browse denied) should be filtered out");
-            Assert.IsFalse(returnedKeys.Contains(children[4].Key), "Child 5 (browse denied) should be filtered out");
+            Assert.That(result.Result.Items.Items.Count(), Is.EqualTo(3));
+            Assert.That(returnedKeys, Does.Contain(children[0].Key), "Child 1 (with default browse) should be returned");
+            Assert.That(returnedKeys, Does.Contain(children[1].Key), "Child 2 (with default browse) should be returned");
+            Assert.That(returnedKeys, Does.Contain(children[2].Key), "Child 3 (with default browse) should be returned");
+            Assert.That(returnedKeys, Does.Not.Contain(children[3].Key), "Child 4 (browse denied) should be filtered out");
+            Assert.That(returnedKeys, Does.Not.Contain(children[4].Key), "Child 5 (browse denied) should be filtered out");
         });
     }
 
@@ -1031,8 +1031,8 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(result.Success);
-            Assert.IsTrue(result.Result.ConfigurationObject is ListViewConfiguration);
+            Assert.That(result.Success, Is.True);
+            Assert.That(result.Result.ConfigurationObject is ListViewConfiguration, Is.True);
         });
 
         return result.Result;

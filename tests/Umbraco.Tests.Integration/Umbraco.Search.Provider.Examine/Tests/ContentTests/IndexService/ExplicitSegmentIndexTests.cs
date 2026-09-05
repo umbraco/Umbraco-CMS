@@ -94,7 +94,7 @@ public class ExplicitSegmentIndexTests : IndexTestBase
             .ToList();
 
         // Should be exactly 1 document per culture (not 3 for null + segment-1 + segment-2)
-        Assert.That(documents.Count, Is.EqualTo(1), $"Expected exactly 1 indexed document for culture {culture}, not one per segment");
+        Assert.That(documents, Has.Count.EqualTo(1), $"Expected exactly 1 indexed document for culture {culture}, not one per segment");
     }
 
     [TestCase(true, "en-US")]
@@ -215,7 +215,7 @@ public class ExplicitSegmentIndexTests : IndexTestBase
 
         // 4 documents * 2 cultures = 8 total indexed documents
         // NOT 4 documents * 2 cultures * N segments = many more documents
-        Assert.That(allDocs.Count, Is.EqualTo(8), "Total indexed documents should be (document count * culture count), not (document count * culture count * segment count)");
+        Assert.That(allDocs, Has.Count.EqualTo(8), "Total indexed documents should be (document count * culture count), not (document count * culture count * segment count)");
     }
 
     /// <summary>
@@ -358,7 +358,7 @@ public class ExplicitSegmentIndexTests : IndexTestBase
             .Where(d => d.Values.TryGetValue(Constants.SystemFields.Culture, out var c) && c == culture)
             .ToList();
 
-        Assert.That(documents.Count, Is.EqualTo(1), $"Expected exactly 1 indexed document for culture {culture} with special character segments");
+        Assert.That(documents, Has.Count.EqualTo(1), $"Expected exactly 1 indexed document for culture {culture} with special character segments");
     }
 
     [TestCase(true, "en-US")]

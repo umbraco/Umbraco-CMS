@@ -15,7 +15,7 @@ public class UriUtilityCoreTests
     public void TrimPathEndSlash(string uri, string expected)
     {
         var result = UriUtilityCore.TrimPathEndSlash(uri);
-        Assert.AreEqual(expected, result);
+        Assert.That(result, Is.EqualTo(expected));
     }
 
 
@@ -28,6 +28,6 @@ public class UriUtilityCoreTests
     public void EndPathWithSlash(string uri, string expected)
     {
         var result = UriUtilityCore.EndPathWithSlash(uri);
-        Assert.AreEqual(expected, result);
+        Assert.That(result, Is.EqualTo(expected));
     }
 }

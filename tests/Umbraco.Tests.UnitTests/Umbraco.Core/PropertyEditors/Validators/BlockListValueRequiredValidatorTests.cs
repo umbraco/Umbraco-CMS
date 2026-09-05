@@ -20,7 +20,7 @@ public class BlockListValueRequiredValidatorTests
 
         var value = JsonNode.Parse("{ \"contentData\": [], \"settingsData\": [] }");
         var result = validator.ValidateRequired(value, ValueTypes.Json);
-        Assert.AreEqual(1, result.Count());
+        Assert.That(result.Count(), Is.EqualTo(1));
     }
 
     [Test]
@@ -30,6 +30,6 @@ public class BlockListValueRequiredValidatorTests
 
         var value = JsonNode.Parse("{ \"contentData\": [ {} ], \"settingsData\": [] }");
         var result = validator.ValidateRequired(value, ValueTypes.Json);
-        Assert.IsEmpty(result);
+        Assert.That(result, Is.Empty);
     }
 }

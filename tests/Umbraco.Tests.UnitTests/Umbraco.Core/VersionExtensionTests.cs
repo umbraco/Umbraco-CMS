@@ -26,6 +26,6 @@ public class VersionExtensionTests
 
         var result = version.SubtractRevision();
 
-        Assert.AreEqual(new Version(outcome), result);
+        Assert.That(result, Is.EqualTo(new Version(outcome)));
     }
 }

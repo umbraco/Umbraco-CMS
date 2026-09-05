@@ -40,17 +40,17 @@ internal sealed class ExternalMemberServiceTests : UmbracoIntegrationTest
         var result = await ExternalMemberService.CreateAsync(identity);
 
         // Assert
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(ExternalMemberOperationStatus.Success, result.Status);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(ExternalMemberOperationStatus.Success));
 
         var retrieved = await ExternalMemberService.GetByKeyAsync(result.Result.Key);
-        Assert.IsNotNull(retrieved);
-        Assert.AreEqual(result.Result.Key, retrieved!.Key);
-        Assert.AreEqual("create-test@example.com", retrieved.Email);
-        Assert.AreEqual("create-test@example.com", retrieved.UserName);
-        Assert.AreEqual("Create Test", retrieved.Name);
-        Assert.IsTrue(retrieved.IsApproved);
-        Assert.IsFalse(retrieved.IsLockedOut);
+        Assert.That(retrieved, Is.Not.Null);
+        Assert.That(retrieved!.Key, Is.EqualTo(result.Result.Key));
+        Assert.That(retrieved.Email, Is.EqualTo("create-test@example.com"));
+        Assert.That(retrieved.UserName, Is.EqualTo("create-test@example.com"));
+        Assert.That(retrieved.Name, Is.EqualTo("Create Test"));
+        Assert.That(retrieved.IsApproved, Is.True);
+        Assert.That(retrieved.IsLockedOut, Is.False);
     }
 
     [Test]
@@ -64,9 +64,9 @@ internal sealed class ExternalMemberServiceTests : UmbracoIntegrationTest
         var retrieved = await ExternalMemberService.GetByEmailAsync("email-test@example.com");
 
         // Assert
-        Assert.IsNotNull(retrieved);
-        Assert.AreEqual("email-test@example.com", retrieved!.Email);
-        Assert.AreEqual("Email Test", retrieved.Name);
+        Assert.That(retrieved, Is.Not.Null);
+        Assert.That(retrieved!.Email, Is.EqualTo("email-test@example.com"));
+        Assert.That(retrieved.Name, Is.EqualTo("Email Test"));
     }
 
     [Test]
@@ -84,9 +84,9 @@ internal sealed class ExternalMemberServiceTests : UmbracoIntegrationTest
         var retrieved = await ExternalMemberService.GetByUsernameAsync("username-lookup");
 
         // Assert
-        Assert.IsNotNull(retrieved);
-        Assert.AreEqual("username-lookup", retrieved!.UserName);
-        Assert.AreEqual("username-test@example.com", retrieved.Email);
+        Assert.That(retrieved, Is.Not.Null);
+        Assert.That(retrieved!.UserName, Is.EqualTo("username-lookup"));
+        Assert.That(retrieved.Email, Is.EqualTo("username-test@example.com"));
     }
 
     [Test]
@@ -95,10 +95,10 @@ internal sealed class ExternalMemberServiceTests : UmbracoIntegrationTest
         // Arrange
         var identity = ExternalMemberIdentityBuilder.CreateSimple("update-test@example.com", "Before Update");
         var createResult = await ExternalMemberService.CreateAsync(identity);
-        Assert.IsTrue(createResult.Success);
+        Assert.That(createResult.Success, Is.True);
 
         var member = await ExternalMemberService.GetByKeyAsync(createResult.Result.Key);
-        Assert.IsNotNull(member);
+        Assert.That(member, Is.Not.Null);
 
         // Act
         member!.Name = "After Update";
@@ -107,14 +107,14 @@ internal sealed class ExternalMemberServiceTests : UmbracoIntegrationTest
         var updateResult = await ExternalMemberService.UpdateAsync(member);
 
         // Assert
-        Assert.IsTrue(updateResult.Success);
-        Assert.AreEqual(ExternalMemberOperationStatus.Success, updateResult.Status);
+        Assert.That(updateResult.Success, Is.True);
+        Assert.That(updateResult.Status, Is.EqualTo(ExternalMemberOperationStatus.Success));
 
         var retrieved = await ExternalMemberService.GetByKeyAsync(createResult.Result.Key);
-        Assert.IsNotNull(retrieved);
-        Assert.AreEqual("After Update", retrieved!.Name);
-        Assert.AreEqual("updated@example.com", retrieved.Email);
-        Assert.IsFalse(retrieved.IsApproved);
+        Assert.That(retrieved, Is.Not.Null);
+        Assert.That(retrieved!.Name, Is.EqualTo("After Update"));
+        Assert.That(retrieved.Email, Is.EqualTo("updated@example.com"));
+        Assert.That(retrieved.IsApproved, Is.False);
     }
 
     [Test]
@@ -123,21 +123,21 @@ internal sealed class ExternalMemberServiceTests : UmbracoIntegrationTest
         // Arrange
         var identity = ExternalMemberIdentityBuilder.CreateSimple("delete-test@example.com", "Delete Test");
         var createResult = await ExternalMemberService.CreateAsync(identity);
-        Assert.IsTrue(createResult.Success);
+        Assert.That(createResult.Success, Is.True);
 
         // Verify it exists first
         var existing = await ExternalMemberService.GetByKeyAsync(createResult.Result.Key);
-        Assert.IsNotNull(existing);
+        Assert.That(existing, Is.Not.Null);
 
         // Act
         var deleteResult = await ExternalMemberService.DeleteAsync(createResult.Result.Key);
 
         // Assert
-        Assert.IsTrue(deleteResult.Success);
-        Assert.AreEqual(ExternalMemberOperationStatus.Success, deleteResult.Status);
+        Assert.That(deleteResult.Success, Is.True);
+        Assert.That(deleteResult.Status, Is.EqualTo(ExternalMemberOperationStatus.Success));
 
         var retrieved = await ExternalMemberService.GetByKeyAsync(createResult.Result.Key);
-        Assert.IsNull(retrieved);
+        Assert.That(retrieved, Is.Null);
     }
 
     [Test]
@@ -147,8 +147,8 @@ internal sealed class ExternalMemberServiceTests : UmbracoIntegrationTest
         var result = await ExternalMemberService.DeleteAsync(Guid.NewGuid());
 
         // Assert
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ExternalMemberOperationStatus.NotFound, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(ExternalMemberOperationStatus.NotFound));
     }
 
     [Test]
@@ -157,7 +157,7 @@ internal sealed class ExternalMemberServiceTests : UmbracoIntegrationTest
         // Arrange
         var identity = ExternalMemberIdentityBuilder.CreateSimple("roles-test@example.com", "Roles Test");
         var createResult = await ExternalMemberService.CreateAsync(identity);
-        Assert.IsTrue(createResult.Success);
+        Assert.That(createResult.Success, Is.True);
 
         MemberService.AddRole("ExternalTestGroup");
 
@@ -166,8 +166,8 @@ internal sealed class ExternalMemberServiceTests : UmbracoIntegrationTest
         var roles = await ExternalMemberService.GetRolesAsync(createResult.Result.Key);
 
         // Assert
-        Assert.IsTrue(assignResult.Success);
-        Assert.IsNotNull(roles);
+        Assert.That(assignResult.Success, Is.True);
+        Assert.That(roles, Is.Not.Null);
         Assert.That(roles.ToList(), Does.Contain("ExternalTestGroup"));
     }
 
@@ -177,7 +177,7 @@ internal sealed class ExternalMemberServiceTests : UmbracoIntegrationTest
         // Arrange
         var identity = ExternalMemberIdentityBuilder.CreateSimple("remove-roles@example.com", "Remove Roles Test");
         var createResult = await ExternalMemberService.CreateAsync(identity);
-        Assert.IsTrue(createResult.Success);
+        Assert.That(createResult.Success, Is.True);
 
         MemberService.AddRole("RemovableGroup");
         await ExternalMemberService.AssignRolesAsync(createResult.Result.Key, ["RemovableGroup"]);
@@ -190,7 +190,7 @@ internal sealed class ExternalMemberServiceTests : UmbracoIntegrationTest
         var removeResult = await ExternalMemberService.RemoveRolesAsync(createResult.Result.Key, ["RemovableGroup"]);
 
         // Assert
-        Assert.IsTrue(removeResult.Success);
+        Assert.That(removeResult.Success, Is.True);
         var rolesAfter = await ExternalMemberService.GetRolesAsync(createResult.Result.Key);
         Assert.That(rolesAfter.ToList(), Does.Not.Contain("RemovableGroup"));
     }
@@ -208,14 +208,14 @@ internal sealed class ExternalMemberServiceTests : UmbracoIntegrationTest
             .Build();
 
         var createResult = await ExternalMemberService.CreateAsync(identity);
-        Assert.IsTrue(createResult.Success);
+        Assert.That(createResult.Success, Is.True);
 
         // Act
         var retrieved = await ExternalMemberService.GetByKeyAsync(createResult.Result.Key);
 
         // Assert
-        Assert.IsNotNull(retrieved);
-        Assert.AreEqual(profileJson, retrieved!.ProfileData);
+        Assert.That(retrieved, Is.Not.Null);
+        Assert.That(retrieved!.ProfileData, Is.EqualTo(profileJson));
     }
 
     [Test]
@@ -225,7 +225,7 @@ internal sealed class ExternalMemberServiceTests : UmbracoIntegrationTest
         var retrieved = await ExternalMemberService.GetByKeyAsync(Guid.NewGuid());
 
         // Assert
-        Assert.IsNull(retrieved);
+        Assert.That(retrieved, Is.Null);
     }
 
     [Test]
@@ -247,8 +247,8 @@ internal sealed class ExternalMemberServiceTests : UmbracoIntegrationTest
         var result = await ExternalMemberService.CreateAsync(externalIdentity);
 
         // Assert
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ExternalMemberOperationStatus.DuplicateUsername, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(ExternalMemberOperationStatus.DuplicateUsername));
     }
 
     [Test]
@@ -270,8 +270,8 @@ internal sealed class ExternalMemberServiceTests : UmbracoIntegrationTest
         var result = await ExternalMemberService.CreateAsync(externalIdentity);
 
         // Assert
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ExternalMemberOperationStatus.DuplicateEmail, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(ExternalMemberOperationStatus.DuplicateEmail));
     }
 
     [Test]
@@ -284,7 +284,7 @@ internal sealed class ExternalMemberServiceTests : UmbracoIntegrationTest
             .WithName("Convert Test")
             .Build();
         var createResult = await ExternalMemberService.CreateAsync(identity);
-        Assert.IsTrue(createResult.Success);
+        Assert.That(createResult.Success, Is.True);
         var originalKey = createResult.Result.Key;
 
         MemberService.AddRole("ConvertGroup");
@@ -297,15 +297,15 @@ internal sealed class ExternalMemberServiceTests : UmbracoIntegrationTest
         var result = await ExternalMemberService.ConvertToContentMemberAsync(originalKey, memberType.Alias);
 
         // Assert — content member created with same key and identity fields.
-        Assert.IsTrue(result.Success);
-        Assert.IsNotNull(result.Result);
-        Assert.AreEqual(originalKey, result.Result!.Key);
-        Assert.AreEqual("convert-to-content@test.com", result.Result.Email);
-        Assert.AreEqual("convert-to-content", result.Result.Username);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result, Is.Not.Null);
+        Assert.That(result.Result!.Key, Is.EqualTo(originalKey));
+        Assert.That(result.Result.Email, Is.EqualTo("convert-to-content@test.com"));
+        Assert.That(result.Result.Username, Is.EqualTo("convert-to-content"));
 
         // Assert — external member record removed.
         var externalMember = await ExternalMemberService.GetByKeyAsync(originalKey);
-        Assert.IsNull(externalMember);
+        Assert.That(externalMember, Is.Null);
 
         // Assert — group memberships migrated.
         IEnumerable<string> contentRoles = MemberService.GetAllRoles(result.Result.Username);
@@ -324,7 +324,7 @@ internal sealed class ExternalMemberServiceTests : UmbracoIntegrationTest
             .WithProfileData(profileJson)
             .Build();
         var createResult = await ExternalMemberService.CreateAsync(identity);
-        Assert.IsTrue(createResult.Success);
+        Assert.That(createResult.Success, Is.True);
 
         IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
         await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
@@ -341,12 +341,12 @@ internal sealed class ExternalMemberServiceTests : UmbracoIntegrationTest
             });
 
         // Assert — callback received the profileData and property was persisted.
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(profileJson, capturedProfileData);
+        Assert.That(result.Success, Is.True);
+        Assert.That(capturedProfileData, Is.EqualTo(profileJson));
 
         IMember? reloaded = MemberService.GetById(result.Result!.Key);
-        Assert.IsNotNull(reloaded);
-        Assert.AreEqual("From Profile: Engineering", reloaded!.GetValue<string>("title"));
+        Assert.That(reloaded, Is.Not.Null);
+        Assert.That(reloaded!.GetValue<string>("title"), Is.EqualTo("From Profile: Engineering"));
 
         // Assert — without a callback, properties would remain empty.
         // (Verified by the absence of any auto-mapped properties on the result.)
@@ -359,8 +359,8 @@ internal sealed class ExternalMemberServiceTests : UmbracoIntegrationTest
         var result = await ExternalMemberService.ConvertToContentMemberAsync(Guid.NewGuid(), "Member");
 
         // Assert
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ExternalMemberOperationStatus.NotFound, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(ExternalMemberOperationStatus.NotFound));
     }
 
 }

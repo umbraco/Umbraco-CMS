@@ -40,12 +40,12 @@ public class ChildrenElementTreeControllerTests : ManagementApiUserGroupTestBase
 
         // Create parent container
         var parentResult = await ElementContainerService.CreateAsync(null, $"ParentContainer {Guid.NewGuid()}", null, Constants.Security.SuperUserKey);
-        Assert.IsTrue(parentResult.Success, $"Failed to create parent: {parentResult.Status}");
+        Assert.That(parentResult.Success, Is.True, $"Failed to create parent: {parentResult.Status}");
         _parentKey = parentResult.Result!.Key;
 
         // Create child container
         var childContainerResult = await ElementContainerService.CreateAsync(null, $"ChildContainer {Guid.NewGuid()}", _parentKey, Constants.Security.SuperUserKey);
-        Assert.IsTrue(childContainerResult.Success, $"Failed to create child container: {childContainerResult.Status}");
+        Assert.That(childContainerResult.Success, Is.True, $"Failed to create child container: {childContainerResult.Status}");
 
         // Create child element
         var createModel = new ElementCreateModel
@@ -55,7 +55,7 @@ public class ChildrenElementTreeControllerTests : ManagementApiUserGroupTestBase
             Variants = [new VariantModel { Name = $"ChildElement {Guid.NewGuid()}" }],
         };
         var childElementResult = await ElementEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(childElementResult.Success, $"Failed to create child element: {childElementResult.Status}");
+        Assert.That(childElementResult.Success, Is.True, $"Failed to create child element: {childElementResult.Status}");
     }
 
     protected override Expression<Func<ChildrenElementTreeController, object>> MethodSelector =>
@@ -88,7 +88,7 @@ public class ChildrenElementTreeControllerTests : ManagementApiUserGroupTestBase
             $"Start Node Folder {Guid.NewGuid()}",
             _parentKey,
             Constants.Security.SuperUserKey);
-        Assert.IsTrue(startNodeResult.Success, $"Failed to create start node folder: {startNodeResult.Status}");
+        Assert.That(startNodeResult.Success, Is.True, $"Failed to create start node folder: {startNodeResult.Status}");
         var startNodeFolder = startNodeResult.Result!;
 
         // Create a user group with Library section access but with a non-root element start node
@@ -109,12 +109,12 @@ public class ChildrenElementTreeControllerTests : ManagementApiUserGroupTestBase
         var response = await ClientRequest();
 
         // Should succeed
-        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, await response.Content.ReadAsStringAsync());
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK), await response.Content.ReadAsStringAsync());
 
         // Parse response and verify only folder1 is returned
         var result = await response.Content.ReadFromJsonAsync<PagedViewModel<ElementTreeItemResponseModel>>(JsonSerializerOptions);
-        Assert.IsNotNull(result);
-        Assert.AreEqual(1, result.Total);
-        Assert.AreEqual(startNodeFolder.Key, result.Items.First().Id);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Total, Is.EqualTo(1));
+        Assert.That(result.Items.First().Id, Is.EqualTo(startNodeFolder.Key));
     }
 }

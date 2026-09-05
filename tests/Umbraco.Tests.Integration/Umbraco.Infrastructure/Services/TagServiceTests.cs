@@ -90,19 +90,19 @@ internal sealed class TagServiceTests : UmbracoIntegrationTest
         content1 = ContentService.GetById(content1.Id);
         var tagsValue = content1.GetValue("tags").ToString();
         var tagsValues = JsonSerializer.Deserialize<string[]>(tagsValue);
-        Assert.AreEqual(3, tagsValues.Length);
-        Assert.Contains("pig", tagsValues);
-        Assert.Contains("goat", tagsValues);
-        Assert.Contains("elephant", tagsValues);
+        Assert.That(tagsValues, Has.Length.EqualTo(3));
+        Assert.That(tagsValues, Does.Contain("pig"));
+        Assert.That(tagsValues, Does.Contain("goat"));
+        Assert.That(tagsValues, Does.Contain("elephant"));
 
         var tags = TagService.GetTagsForProperty(content1.Id, "tags").ToArray();
-        Assert.IsTrue(tags.All(x => x.Group == "default"));
+        Assert.That(tags.All(x => x.Group == "default"), Is.True);
         tagsValues = tags.Select(x => x.Text).ToArray();
 
-        Assert.AreEqual(3, tagsValues.Length);
-        Assert.Contains("pig", tagsValues);
-        Assert.Contains("goat", tagsValues);
-        Assert.Contains("elephant", tagsValues);
+        Assert.That(tagsValues, Has.Length.EqualTo(3));
+        Assert.That(tagsValues, Does.Contain("pig"));
+        Assert.That(tagsValues, Does.Contain("goat"));
+        Assert.That(tagsValues, Does.Contain("elephant"));
     }
 
     [Test]
@@ -121,13 +121,13 @@ internal sealed class TagServiceTests : UmbracoIntegrationTest
         ElementService.Publish(element2, Array.Empty<string>());
 
         var taggedWithCow = TagService.GetTaggedElementsByTag("cow").ToArray();
-        Assert.AreEqual(1, taggedWithCow.Length);
-        Assert.AreEqual(element1.Id, taggedWithCow[0].EntityId);
-        Assert.IsTrue(taggedWithCow[0].TaggedProperties.SelectMany(x => x.Tags).Any(x => x.Text == "cow"));
+        Assert.That(taggedWithCow, Has.Length.EqualTo(1));
+        Assert.That(taggedWithCow[0].EntityId, Is.EqualTo(element1.Id));
+        Assert.That(taggedWithCow[0].TaggedProperties.SelectMany(x => x.Tags).Any(x => x.Text == "cow"), Is.True);
 
         var taggedWithPig = TagService.GetTaggedElementsByTag("pig").Select(x => x.EntityId).ToArray();
-        Assert.AreEqual(2, taggedWithPig.Length);
-        CollectionAssert.AreEquivalent(new[] { element1.Id, element2.Id }, taggedWithPig);
+        Assert.That(taggedWithPig, Has.Length.EqualTo(2));
+        Assert.That(taggedWithPig, Is.EquivalentTo(new[] { element1.Id, element2.Id }));
     }
 
     [Test]
@@ -141,8 +141,8 @@ internal sealed class TagServiceTests : UmbracoIntegrationTest
         ElementService.Publish(element1, Array.Empty<string>());
 
         var tagged = TagService.GetTaggedElementsByTagGroup("default").ToArray();
-        Assert.AreEqual(1, tagged.Length);
-        Assert.AreEqual(element1.Id, tagged[0].EntityId);
+        Assert.That(tagged, Has.Length.EqualTo(1));
+        Assert.That(tagged[0].EntityId, Is.EqualTo(element1.Id));
     }
 
     [Test]
@@ -169,13 +169,13 @@ internal sealed class TagServiceTests : UmbracoIntegrationTest
             .OrderByDescending(x => x.NodeCount)
             .ToList();
 
-        Assert.AreEqual(3, tags.Count);
-        Assert.AreEqual("cow", tags[0].Text);
-        Assert.AreEqual(3, tags[0].NodeCount);
-        Assert.AreEqual("pig", tags[1].Text);
-        Assert.AreEqual(2, tags[1].NodeCount);
-        Assert.AreEqual("goat", tags[2].Text);
-        Assert.AreEqual(1, tags[2].NodeCount);
+        Assert.That(tags, Has.Count.EqualTo(3));
+        Assert.That(tags[0].Text, Is.EqualTo("cow"));
+        Assert.That(tags[0].NodeCount, Is.EqualTo(3));
+        Assert.That(tags[1].Text, Is.EqualTo("pig"));
+        Assert.That(tags[1].NodeCount, Is.EqualTo(2));
+        Assert.That(tags[2].Text, Is.EqualTo("goat"));
+        Assert.That(tags[2].NodeCount, Is.EqualTo(1));
     }
 
     [Test]
@@ -194,12 +194,12 @@ internal sealed class TagServiceTests : UmbracoIntegrationTest
         ElementService.Publish(element, Array.Empty<string>());
 
         var taggedContent = TagService.GetTaggedContentByTag("shared").ToArray();
-        Assert.AreEqual(1, taggedContent.Length);
-        Assert.AreEqual(content.Id, taggedContent[0].EntityId);
+        Assert.That(taggedContent, Has.Length.EqualTo(1));
+        Assert.That(taggedContent[0].EntityId, Is.EqualTo(content.Id));
 
         var taggedElements = TagService.GetTaggedElementsByTag("shared").ToArray();
-        Assert.AreEqual(1, taggedElements.Length);
-        Assert.AreEqual(element.Id, taggedElements[0].EntityId);
+        Assert.That(taggedElements, Has.Length.EqualTo(1));
+        Assert.That(taggedElements[0].EntityId, Is.EqualTo(element.Id));
     }
 
     [Test]
@@ -232,13 +232,13 @@ internal sealed class TagServiceTests : UmbracoIntegrationTest
             .ToList();
 
         // Assert
-        Assert.AreEqual(3, tags.Count);
-        Assert.AreEqual("cow", tags[0].Text);
-        Assert.AreEqual(3, tags[0].NodeCount);
-        Assert.AreEqual("pig", tags[1].Text);
-        Assert.AreEqual(2, tags[1].NodeCount);
-        Assert.AreEqual("goat", tags[2].Text);
-        Assert.AreEqual(1, tags[2].NodeCount);
+        Assert.That(tags, Has.Count.EqualTo(3));
+        Assert.That(tags[0].Text, Is.EqualTo("cow"));
+        Assert.That(tags[0].NodeCount, Is.EqualTo(3));
+        Assert.That(tags[1].Text, Is.EqualTo("pig"));
+        Assert.That(tags[1].NodeCount, Is.EqualTo(2));
+        Assert.That(tags[2].Text, Is.EqualTo("goat"));
+        Assert.That(tags[2].NodeCount, Is.EqualTo(1));
     }
 
     private async Task<IContentType> CreateElementTypeWithTags()

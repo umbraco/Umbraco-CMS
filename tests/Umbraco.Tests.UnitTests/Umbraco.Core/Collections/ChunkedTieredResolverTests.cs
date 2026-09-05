@@ -27,11 +27,11 @@ public class ChunkedTieredResolverTests
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(10, result.Length);
-            CollectionAssert.AreEqual(Enumerable.Range(0, 10), result.Select(x => x.Id));
+            Assert.That(result, Has.Length.EqualTo(10));
+            Assert.That(result.Select(x => x.Id), Is.EqualTo(Enumerable.Range(0, 10)).AsCollection);
 
             // All served from the sync L0 tier — the batched materialiser is never invoked.
-            Assert.IsEmpty(calls);
+            Assert.That(calls, Is.Empty);
         });
     }
 
@@ -47,16 +47,16 @@ public class ChunkedTieredResolverTests
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(10, result.Length);
-            CollectionAssert.AreEqual(Enumerable.Range(0, 10), result.Select(x => x.Id));
+            Assert.That(result, Has.Length.EqualTo(10));
+            Assert.That(result.Select(x => x.Id), Is.EqualTo(Enumerable.Range(0, 10)).AsCollection);
 
             // Every key materialised exactly once...
             Guid[] requested = calls.SelectMany(c => c).ToArray();
-            Assert.AreEqual(10, requested.Length);
-            Assert.AreEqual(10, requested.Distinct().Count());
+            Assert.That(requested, Has.Length.EqualTo(10));
+            Assert.That(requested.Distinct().Count(), Is.EqualTo(10));
 
             // ...but collapsed into a handful of batches (slow-start: 1, 2, 4, 3), not one per item.
-            Assert.That(calls.Count, Is.LessThanOrEqualTo(5));
+            Assert.That(calls, Has.Count.LessThanOrEqualTo(5));
         });
     }
 
@@ -72,9 +72,9 @@ public class ChunkedTieredResolverTests
 
         Assert.Multiple(() =>
         {
-            Assert.IsNotNull(first);
-            Assert.AreEqual(0, first!.Id);
-            Assert.AreEqual(1, calls.SelectMany(c => c).Count());
+            Assert.That(first, Is.Not.Null);
+            Assert.That(first!.Id, Is.EqualTo(0));
+            Assert.That(calls.SelectMany(c => c).Count(), Is.EqualTo(1));
         });
     }
 
@@ -91,10 +91,10 @@ public class ChunkedTieredResolverTests
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(3, taken.Length);
+            Assert.That(taken, Has.Length.EqualTo(3));
 
             // Chunks of 1 then 2 cover the three requested items; the rest are never materialised.
-            Assert.AreEqual(3, calls.SelectMany(c => c).Count());
+            Assert.That(calls.SelectMany(c => c).Count(), Is.EqualTo(3));
         });
     }
 
@@ -110,7 +110,7 @@ public class ChunkedTieredResolverTests
             .Where(item => item.Id % 2 == 0)
             .ToArray();
 
-        CollectionAssert.AreEqual(_evenIds, result.Select(x => x.Id));
+        Assert.That(result.Select(x => x.Id), Is.EqualTo(_evenIds).AsCollection);
     }
 
     [Test]
@@ -127,7 +127,7 @@ public class ChunkedTieredResolverTests
             .ToArray();
 
         // Regardless of which tier served each item, the output stays in input order.
-        CollectionAssert.AreEqual(Enumerable.Range(0, 10), result.Select(x => x.Id));
+        Assert.That(result.Select(x => x.Id), Is.EqualTo(Enumerable.Range(0, 10)).AsCollection);
     }
 
     [Test]
@@ -143,7 +143,7 @@ public class ChunkedTieredResolverTests
             .Resolve(keys, AllMiss(), materialiseTier)
             .ToArray();
 
-        CollectionAssert.AreEqual(_firstFiveIds, result.Select(x => x.Id));
+        Assert.That(result.Select(x => x.Id), Is.EqualTo(_firstFiveIds).AsCollection);
     }
 
     [Test]
@@ -165,11 +165,11 @@ public class ChunkedTieredResolverTests
         Assert.Multiple(() =>
         {
             // The repeated key resolves to the same item at both occurrences.
-            CollectionAssert.AreEqual(_duplicateKeyResultIds, result.Select(x => x.Id));
+            Assert.That(result.Select(x => x.Id), Is.EqualTo(_duplicateKeyResultIds).AsCollection);
 
             // ...but the second chunk's tier call only asks about keyA once, not twice.
-            Assert.AreEqual(2, calls.Count);
-            CollectionAssert.AreEqual(new[] { keyA }, calls[1]);
+            Assert.That(calls, Has.Count.EqualTo(2));
+            Assert.That(calls[1], Is.EqualTo(new[] { keyA }).AsCollection);
         });
     }
 
@@ -184,8 +184,8 @@ public class ChunkedTieredResolverTests
 
         Assert.Multiple(() =>
         {
-            Assert.IsEmpty(result);
-            Assert.IsEmpty(calls);
+            Assert.That(result, Is.Empty);
+            Assert.That(calls, Is.Empty);
         });
     }
 

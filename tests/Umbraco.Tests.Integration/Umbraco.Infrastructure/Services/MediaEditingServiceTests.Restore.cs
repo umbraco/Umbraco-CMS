@@ -15,8 +15,8 @@ internal sealed partial class MediaEditingServiceTests
         await MediaEditingService.MoveToRecycleBinAsync(parent.Key, Constants.Security.SuperUserKey);
 
         var result = await MediaEditingService.RestoreAsync(parent.Key, topRoot.Key, Constants.Security.SuperUserKey, includeDescendants: false);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.Success));
 
         var restoredParent = await MediaEditingService.GetAsync(parent.Key);
         var leftBehindChild = await MediaEditingService.GetAsync(child.Key);
@@ -25,20 +25,20 @@ internal sealed partial class MediaEditingServiceTests
         Assert.Multiple(() =>
         {
             // the restored item leaves the bin and is re-parented under the target
-            Assert.IsFalse(restoredParent!.Trashed);
-            Assert.AreEqual(topRoot.Id, restoredParent.ParentId);
+            Assert.That(restoredParent!.Trashed, Is.False);
+            Assert.That(restoredParent.ParentId, Is.EqualTo(topRoot.Id));
 
             // the direct child stays trashed as a top-level recycle bin item
-            Assert.IsTrue(leftBehindChild!.Trashed);
-            Assert.AreEqual(Constants.System.RecycleBinMedia, leftBehindChild.ParentId);
-            Assert.AreEqual($"{Constants.System.RecycleBinMediaPathPrefix}{child.Id}", leftBehindChild.Path);
-            Assert.AreEqual(1, leftBehindChild.Level);
+            Assert.That(leftBehindChild!.Trashed, Is.True);
+            Assert.That(leftBehindChild.ParentId, Is.EqualTo(Constants.System.RecycleBinMedia));
+            Assert.That(leftBehindChild.Path, Is.EqualTo($"{Constants.System.RecycleBinMediaPathPrefix}{child.Id}"));
+            Assert.That(leftBehindChild.Level, Is.EqualTo(1));
 
             // the grandchild stays trashed underneath its (now top-level) parent
-            Assert.IsTrue(leftBehindGrandchild!.Trashed);
-            Assert.AreEqual(child.Id, leftBehindGrandchild.ParentId);
-            Assert.AreEqual($"{Constants.System.RecycleBinMediaPathPrefix}{child.Id},{grandchild.Id}", leftBehindGrandchild.Path);
-            Assert.AreEqual(2, leftBehindGrandchild.Level);
+            Assert.That(leftBehindGrandchild!.Trashed, Is.True);
+            Assert.That(leftBehindGrandchild.ParentId, Is.EqualTo(child.Id));
+            Assert.That(leftBehindGrandchild.Path, Is.EqualTo($"{Constants.System.RecycleBinMediaPathPrefix}{child.Id},{grandchild.Id}"));
+            Assert.That(leftBehindGrandchild.Level, Is.EqualTo(2));
         });
     }
 
@@ -50,7 +50,7 @@ internal sealed partial class MediaEditingServiceTests
         await MediaEditingService.MoveToRecycleBinAsync(parent.Key, Constants.Security.SuperUserKey);
 
         var result = await MediaEditingService.RestoreAsync(parent.Key, topRoot.Key, Constants.Security.SuperUserKey, includeDescendants: true);
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
 
         var restoredParent = await MediaEditingService.GetAsync(parent.Key);
         var restoredChild = await MediaEditingService.GetAsync(child.Key);
@@ -58,14 +58,14 @@ internal sealed partial class MediaEditingServiceTests
 
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(restoredParent!.Trashed);
-            Assert.AreEqual(topRoot.Id, restoredParent.ParentId);
+            Assert.That(restoredParent!.Trashed, Is.False);
+            Assert.That(restoredParent.ParentId, Is.EqualTo(topRoot.Id));
 
-            Assert.IsFalse(restoredChild!.Trashed);
-            Assert.AreEqual(parent.Id, restoredChild.ParentId);
+            Assert.That(restoredChild!.Trashed, Is.False);
+            Assert.That(restoredChild.ParentId, Is.EqualTo(parent.Id));
 
-            Assert.IsFalse(restoredGrandchild!.Trashed);
-            Assert.AreEqual(child.Id, restoredGrandchild.ParentId);
+            Assert.That(restoredGrandchild!.Trashed, Is.False);
+            Assert.That(restoredGrandchild.ParentId, Is.EqualTo(child.Id));
         });
     }
 

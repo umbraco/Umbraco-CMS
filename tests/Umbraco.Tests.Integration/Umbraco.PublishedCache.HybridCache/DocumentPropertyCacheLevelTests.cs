@@ -27,12 +27,12 @@ public class DocumentPropertyCacheLevelTests : PropertyCacheLevelTestsBase
 
         var contentTypeCreateModel = ContentTypeEditingBuilder.CreateSimpleContentType();
         var contentTypeAttempt = await ContentTypeEditingService.CreateAsync(contentTypeCreateModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(contentTypeAttempt.Success);
+        Assert.That(contentTypeAttempt.Success, Is.True);
 
         var contentCreateModel = ContentEditingBuilder.CreateSimpleContent(contentTypeAttempt.Result.Key);
         contentCreateModel.Key = _documentKey;
         var contentAttempt = await ContentEditingService.CreateAsync(contentCreateModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(contentAttempt.Success);
+        Assert.That(contentAttempt.Success, Is.True);
 
         await PublishPage();
     }
@@ -48,27 +48,27 @@ public class DocumentPropertyCacheLevelTests : PropertyCacheLevelTestsBase
         PropertyValueLevelDetectionTestsConverter.SetCacheLevel(cacheLevel);
 
         var publishedContent1 = await DocumentCacheService.GetByKeyAsync(_documentKey, preview);
-        Assert.IsNotNull(publishedContent1);
+        Assert.That(publishedContent1, Is.Not.Null);
 
         var publishedContent2 = await DocumentCacheService.GetByKeyAsync(_documentKey, preview);
-        Assert.IsNotNull(publishedContent2);
+        Assert.That(publishedContent2, Is.Not.Null);
 
         if (preview)
         {
-            Assert.AreNotSame(publishedContent1,  publishedContent2);
+            Assert.That(publishedContent2, Is.Not.SameAs(publishedContent1));
         }
         else
         {
-            Assert.AreSame(publishedContent1,  publishedContent2);
+            Assert.That(publishedContent2, Is.SameAs(publishedContent1));
         }
 
         var titleValue1 = publishedContent1.Value<string>("title");
-        Assert.IsNotNull(titleValue1);
+        Assert.That(titleValue1, Is.Not.Null);
 
         var titleValue2 = publishedContent2.Value<string>("title");
-        Assert.IsNotNull(titleValue2);
+        Assert.That(titleValue2, Is.Not.Null);
 
-        Assert.AreEqual(titleValue1,  titleValue2);
+        Assert.That(titleValue2, Is.EqualTo(titleValue1));
 
         // fetch title values 10 times in total, 5 times from each published content instance
         titleValue1 = publishedContent1.Value<string>("title");
@@ -81,8 +81,8 @@ public class DocumentPropertyCacheLevelTests : PropertyCacheLevelTestsBase
         titleValue2 = publishedContent2.Value<string>("title");
         titleValue2 = publishedContent2.Value<string>("title");
 
-        Assert.AreEqual(expectedSourceConverts, PropertyValueLevelDetectionTestsConverter.SourceConverts);
-        Assert.AreEqual(expectedInterConverts, PropertyValueLevelDetectionTestsConverter.InterConverts);
+        Assert.That(PropertyValueLevelDetectionTestsConverter.SourceConverts, Is.EqualTo(expectedSourceConverts));
+        Assert.That(PropertyValueLevelDetectionTestsConverter.InterConverts, Is.EqualTo(expectedInterConverts));
     }
 
     [TestCase(PropertyCacheLevel.None, false)]
@@ -96,27 +96,27 @@ public class DocumentPropertyCacheLevelTests : PropertyCacheLevelTestsBase
         PropertyValueLevelDetectionTestsConverter.SetCacheLevel(cacheLevel);
 
         var publishedContent1 = await DocumentCacheService.GetByKeyAsync(_documentKey, preview);
-        Assert.IsNotNull(publishedContent1);
+        Assert.That(publishedContent1, Is.Not.Null);
 
         var titleValue1 = publishedContent1.Value<string>("title");
-        Assert.IsNotNull(titleValue1);
+        Assert.That(titleValue1, Is.Not.Null);
 
         // re-publish the page to trigger a cache refresh for the page
         await PublishPage();
 
         var publishedContent2 = await DocumentCacheService.GetByKeyAsync(_documentKey, preview);
-        Assert.IsNotNull(publishedContent2);
+        Assert.That(publishedContent2, Is.Not.Null);
 
-        Assert.AreNotSame(publishedContent1,  publishedContent2);
+        Assert.That(publishedContent2, Is.Not.SameAs(publishedContent1));
 
         var titleValue2 = publishedContent2.Value<string>("title");
-        Assert.IsNotNull(titleValue2);
+        Assert.That(titleValue2, Is.Not.Null);
 
-        Assert.AreEqual(titleValue1,  titleValue2);
+        Assert.That(titleValue2, Is.EqualTo(titleValue1));
 
         // expect conversions for each published content instance, due to the cache refresh
-        Assert.AreEqual(2, PropertyValueLevelDetectionTestsConverter.SourceConverts);
-        Assert.AreEqual(2, PropertyValueLevelDetectionTestsConverter.InterConverts);
+        Assert.That(PropertyValueLevelDetectionTestsConverter.SourceConverts, Is.EqualTo(2));
+        Assert.That(PropertyValueLevelDetectionTestsConverter.InterConverts, Is.EqualTo(2));
     }
 
     private async Task PublishPage()
@@ -125,6 +125,6 @@ public class DocumentPropertyCacheLevelTests : PropertyCacheLevelTestsBase
             _documentKey,
             [new() { Culture = "*", }],
             Constants.Security.SuperUserKey);
-        Assert.IsTrue(publishAttempt.Success);
+        Assert.That(publishAttempt.Success, Is.True);
     }
 }

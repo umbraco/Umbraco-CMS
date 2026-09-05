@@ -109,7 +109,7 @@ internal sealed partial class PublishStatusServiceTests
         await Task.WhenAll(tasks);
 
         // Assert
-        Assert.IsEmpty(exceptions, $"Expected no exceptions but got {exceptions.Count}: {string.Join(", ", exceptions.Select(e => e.Message))}");
+        Assert.That(exceptions, Is.Empty, $"Expected no exceptions but got {exceptions.Count}: {string.Join(", ", exceptions.Select(e => e.Message))}");
     }
 
     [Test]
@@ -173,7 +173,7 @@ internal sealed partial class PublishStatusServiceTests
         await Task.WhenAll(tasks);
 
         // Assert
-        Assert.IsEmpty(exceptions, $"Expected no exceptions but got {exceptions.Count}: {string.Join(", ", exceptions.Select(e => e.Message))}");
+        Assert.That(exceptions, Is.Empty, $"Expected no exceptions but got {exceptions.Count}: {string.Join(", ", exceptions.Select(e => e.Message))}");
     }
 
     [Test]
@@ -187,7 +187,7 @@ internal sealed partial class PublishStatusServiceTests
 
         // Initialize once and confirm the baseline.
         await sut.InitializeAsync(CancellationToken.None);
-        Assert.IsTrue(sut.IsPublishedInAnyCulture(Textpage.Key), "Textpage should be published after initial load");
+        Assert.That(sut.IsPublishedInAnyCulture(Textpage.Key), Is.True, "Textpage should be published after initial load");
 
         var falseCount = 0;
         var totalReads = 0;
@@ -229,7 +229,7 @@ internal sealed partial class PublishStatusServiceTests
 
         // Assert - every single read should have returned true; the published status
         // must never be transiently lost during re-initialization.
-        Assert.IsTrue(falseCount == 0, $"Expected all reads to return true, but {falseCount} out of {totalReads} returned false");
+        Assert.That(falseCount, Is.EqualTo(0), $"Expected all reads to return true, but {falseCount} out of {totalReads} returned false");
     }
 
     private static Task RunWithSuppressedExecutionContext(Func<Task> action)

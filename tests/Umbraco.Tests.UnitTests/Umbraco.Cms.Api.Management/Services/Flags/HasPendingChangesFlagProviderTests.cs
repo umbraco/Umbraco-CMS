@@ -13,28 +13,28 @@ internal class HasPendingChangesFlagProviderTests
     public void HasPendingChangesFlagProvider_Can_Provide_Document_Variant_Item_Flags()
     {
         var sut = new HasPendingChangesFlagProvider();
-        Assert.IsTrue(sut.CanProvideFlags<DocumentVariantItemResponseModel>());
+        Assert.That(sut.CanProvideFlags<DocumentVariantItemResponseModel>(), Is.True);
     }
 
     [Test]
     public void HasPendingChangesFlagProvider_Can_Provide_Document_Variant_Flags()
     {
         var sut = new HasPendingChangesFlagProvider();
-        Assert.IsTrue(sut.CanProvideFlags<DocumentVariantResponseModel>());
+        Assert.That(sut.CanProvideFlags<DocumentVariantResponseModel>(), Is.True);
     }
 
     [Test]
     public void HasPendingChangesFlagProvider_Can_Provide_Element_Variant_Item_Flags()
     {
         var sut = new HasPendingChangesFlagProvider();
-        Assert.IsTrue(sut.CanProvideFlags<ElementVariantItemResponseModel>());
+        Assert.That(sut.CanProvideFlags<ElementVariantItemResponseModel>(), Is.True);
     }
 
     [Test]
     public void HasPendingChangesFlagProvider_Can_Provide_Element_Variant_Flags()
     {
         var sut = new HasPendingChangesFlagProvider();
-        Assert.IsTrue(sut.CanProvideFlags<ElementVariantResponseModel>());
+        Assert.That(sut.CanProvideFlags<ElementVariantResponseModel>(), Is.True);
     }
 
     [Test]
@@ -60,11 +60,11 @@ internal class HasPendingChangesFlagProviderTests
 
         await sut.PopulateFlagsAsync(variants);
 
-        Assert.AreEqual(variants[0].Flags.Count(), 1);
-        Assert.AreEqual(variants[1].Flags.Count(), 0);
+        Assert.That(variants[0].Flags.Count(), Is.EqualTo(1));
+        Assert.That(variants[1].Flags.Count(), Is.EqualTo(0));
 
         var flagModel = variants[0].Flags.First();
-        Assert.AreEqual("Umb.PendingChanges", flagModel.Alias);
+        Assert.That(flagModel.Alias, Is.EqualTo("Umb.PendingChanges"));
     }
 
     [Test]
@@ -90,11 +90,11 @@ internal class HasPendingChangesFlagProviderTests
 
         await sut.PopulateFlagsAsync(variants);
 
-        Assert.AreEqual(variants[0].Flags.Count(), 1);
-        Assert.AreEqual(variants[1].Flags.Count(), 0);
+        Assert.That(variants[0].Flags.Count(), Is.EqualTo(1));
+        Assert.That(variants[1].Flags.Count(), Is.EqualTo(0));
 
         var flagModel = variants[0].Flags.First();
-        Assert.AreEqual("Umb.PendingChanges", flagModel.Alias);
+        Assert.That(flagModel.Alias, Is.EqualTo("Umb.PendingChanges"));
     }
 
     [Test]
@@ -120,11 +120,11 @@ internal class HasPendingChangesFlagProviderTests
 
         await sut.PopulateFlagsAsync(variants);
 
-        Assert.AreEqual(variants[0].Flags.Count(), 1);
-        Assert.AreEqual(variants[1].Flags.Count(), 0);
+        Assert.That(variants[0].Flags.Count(), Is.EqualTo(1));
+        Assert.That(variants[1].Flags.Count(), Is.EqualTo(0));
 
         var flagModel = variants[0].Flags.First();
-        Assert.AreEqual("Umb.PendingChanges", flagModel.Alias);
+        Assert.That(flagModel.Alias, Is.EqualTo("Umb.PendingChanges"));
     }
 
     [Test]
@@ -150,10 +150,10 @@ internal class HasPendingChangesFlagProviderTests
 
         await sut.PopulateFlagsAsync(variants);
 
-        Assert.AreEqual(variants[0].Flags.Count(), 1);
-        Assert.AreEqual(variants[1].Flags.Count(), 0);
+        Assert.That(variants[0].Flags.Count(), Is.EqualTo(1));
+        Assert.That(variants[1].Flags.Count(), Is.EqualTo(0));
 
         var flagModel = variants[0].Flags.First();
-        Assert.AreEqual("Umb.PendingChanges", flagModel.Alias);
+        Assert.That(flagModel.Alias, Is.EqualTo("Umb.PendingChanges"));
     }
 }

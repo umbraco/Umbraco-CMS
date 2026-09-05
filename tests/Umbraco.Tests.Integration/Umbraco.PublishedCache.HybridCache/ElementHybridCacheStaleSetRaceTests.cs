@@ -135,26 +135,26 @@ internal sealed class ElementHybridCacheStaleSetRaceTests : UmbracoIntegrationTe
 
         // Verify the stale read (returns the old content)
         var staleResult = staleRead.Result;
-        Assert.IsNotNull(staleResult);
+        Assert.That(staleResult, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(OldName, staleResult!.Name, "Name should be served from the stale snapshot.");
-            Assert.AreEqual(
-                OldTitle,
+            Assert.That(staleResult!.Name, Is.EqualTo(OldName), "Name should be served from the stale snapshot.");
+            Assert.That(
                 staleResult.GetProperty("title")?.GetSourceValue(),
+                Is.EqualTo(OldTitle),
                 "Property value should be served from the stale snapshot.");
         });
 
         // 4. A fresh lookup must observe the refreshed content, not the clobbered stale snapshot.
         IPublishedElement? result = await _elementCacheService.GetByKeyAsync(_element.Key, false);
 
-        Assert.IsNotNull(result);
+        Assert.That(result, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(NewName, result!.Name, "Name was served from the clobbered stale snapshot.");
-            Assert.AreEqual(
-                NewTitle,
+            Assert.That(result!.Name, Is.EqualTo(NewName), "Name was served from the clobbered stale snapshot.");
+            Assert.That(
                 result.GetProperty("title")?.GetSourceValue(),
+                Is.EqualTo(NewTitle),
                 "Property value was served from the clobbered stale snapshot.");
         });
 
@@ -163,11 +163,11 @@ internal sealed class ElementHybridCacheStaleSetRaceTests : UmbracoIntegrationTe
             $"{_element.Key}",
             _ => new ValueTask<ContentCacheNode?>((ContentCacheNode?)null));
 
-        Assert.IsNotNull(cachedNode);
+        Assert.That(cachedNode, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(newNode.Key, cachedNode!.Key, "Cached node should be the refreshed node.");
-            Assert.AreEqual(NewName, cachedNode!.Data?.Name, "Cached node should hold the refreshed name.");
+            Assert.That(cachedNode!.Key, Is.EqualTo(newNode.Key), "Cached node should be the refreshed node.");
+            Assert.That(cachedNode!.Data?.Name, Is.EqualTo(NewName), "Cached node should hold the refreshed name.");
         });
     }
 }

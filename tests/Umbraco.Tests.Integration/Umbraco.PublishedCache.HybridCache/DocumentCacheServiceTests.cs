@@ -85,7 +85,7 @@ internal sealed partial class DocumentCacheServiceTests : UmbracoIntegrationTest
 
             // Verify we have published records for published content
             // Textpage, Subpage, Subpage2, Subpage3 should have draft cache entries
-            Assert.AreEqual(1, publishedDtos.Count, "Expected 1 published cache record");
+            Assert.That(publishedDtos, Has.Count.EqualTo(1), "Expected 1 published cache record");
 
             // Verify specific content items have cache entries
             var nodeIds = draftDtos.Select(d => d.NodeId).ToList();
@@ -385,7 +385,7 @@ internal sealed partial class DocumentCacheServiceTests : UmbracoIntegrationTest
             Assert.That(draftDtos, Has.Count.GreaterThanOrEqualTo(4), "Expected at least 4 draft cache records");
 
             // Verify we have published records for published content
-            Assert.AreEqual(1, publishedDtos.Count, "Expected 1 published cache record");
+            Assert.That(publishedDtos, Has.Count.EqualTo(1), "Expected 1 published cache record");
 
             // Verify specific content items have cache entries
             var nodeIds = draftDtos.Select(d => d.NodeId).ToList();

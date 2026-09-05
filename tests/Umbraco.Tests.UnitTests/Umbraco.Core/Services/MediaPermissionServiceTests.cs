@@ -33,7 +33,7 @@ public class MediaPermissionServiceTests
         var result = await sut.AuthorizeAccessAsync(user, mediaKey);
 
         // Assert
-        Assert.AreEqual(MediaAuthorizationStatus.Success, result);
+        Assert.That(result, Is.EqualTo(MediaAuthorizationStatus.Success));
     }
 
     [Test]
@@ -52,7 +52,7 @@ public class MediaPermissionServiceTests
         var result = await sut.AuthorizeAccessAsync(user, mediaKey);
 
         // Assert
-        Assert.AreEqual(MediaAuthorizationStatus.NotFound, result);
+        Assert.That(result, Is.EqualTo(MediaAuthorizationStatus.NotFound));
     }
 
     [Test]
@@ -74,7 +74,7 @@ public class MediaPermissionServiceTests
         var result = await sut.AuthorizeAccessAsync(user, mediaKey);
 
         // Assert
-        Assert.AreEqual(MediaAuthorizationStatus.UnauthorizedMissingPathAccess, result);
+        Assert.That(result, Is.EqualTo(MediaAuthorizationStatus.UnauthorizedMissingPathAccess));
     }
 
     [Test]
@@ -89,7 +89,7 @@ public class MediaPermissionServiceTests
         var result = await sut.AuthorizeRootAccessAsync(user);
 
         // Assert
-        Assert.AreEqual(MediaAuthorizationStatus.Success, result);
+        Assert.That(result, Is.EqualTo(MediaAuthorizationStatus.Success));
     }
 
     [Test]
@@ -107,7 +107,7 @@ public class MediaPermissionServiceTests
         var result = await sut.AuthorizeRootAccessAsync(user);
 
         // Assert
-        Assert.AreEqual(MediaAuthorizationStatus.UnauthorizedMissingRootAccess, result);
+        Assert.That(result, Is.EqualTo(MediaAuthorizationStatus.UnauthorizedMissingRootAccess));
     }
 
     [Test]
@@ -122,7 +122,7 @@ public class MediaPermissionServiceTests
         var result = await sut.AuthorizeBinAccessAsync(user);
 
         // Assert
-        Assert.AreEqual(MediaAuthorizationStatus.Success, result);
+        Assert.That(result, Is.EqualTo(MediaAuthorizationStatus.Success));
     }
 
     [Test]
@@ -140,7 +140,7 @@ public class MediaPermissionServiceTests
         var result = await sut.AuthorizeBinAccessAsync(user);
 
         // Assert
-        Assert.AreEqual(MediaAuthorizationStatus.UnauthorizedMissingBinAccess, result);
+        Assert.That(result, Is.EqualTo(MediaAuthorizationStatus.UnauthorizedMissingBinAccess));
     }
 
     [Test]
@@ -155,7 +155,7 @@ public class MediaPermissionServiceTests
         var result = await sut.AuthorizeAccessAsync(user, []);
 
         // Assert
-        Assert.AreEqual(MediaAuthorizationStatus.Success, result);
+        Assert.That(result, Is.EqualTo(MediaAuthorizationStatus.Success));
     }
 
     [Test]
@@ -179,7 +179,7 @@ public class MediaPermissionServiceTests
         var result = await sut.AuthorizeAccessAsync(user, [keyA, keyB]);
 
         // Assert
-        Assert.AreEqual(MediaAuthorizationStatus.Success, result);
+        Assert.That(result, Is.EqualTo(MediaAuthorizationStatus.Success));
     }
 
     [Test]
@@ -206,7 +206,7 @@ public class MediaPermissionServiceTests
         var result = await sut.AuthorizeAccessAsync(user, [keyA, keyB]);
 
         // Assert
-        Assert.AreEqual(MediaAuthorizationStatus.UnauthorizedMissingPathAccess, result);
+        Assert.That(result, Is.EqualTo(MediaAuthorizationStatus.UnauthorizedMissingPathAccess));
     }
 
     [Test]
@@ -233,7 +233,7 @@ public class MediaPermissionServiceTests
         var result = await sut.FilterAuthorizedAccessAsync(user, [keyA, keyB]);
 
         // Assert
-        CollectionAssert.AreEquivalent(new[] { keyA }, result);
+        Assert.That(result, Is.EquivalentTo(new[] { keyA }));
     }
 
     [Test]
@@ -248,7 +248,7 @@ public class MediaPermissionServiceTests
         var result = await sut.FilterAuthorizedAccessAsync(user, []);
 
         // Assert
-        Assert.IsEmpty(result);
+        Assert.That(result, Is.Empty);
     }
 
     private static IUser CreateUser(int id = 0, int? startMediaId = null) =>

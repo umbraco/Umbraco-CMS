@@ -50,8 +50,8 @@ public class DocumentUrlFactoryTests
         var result = (await factory.CreateUrlsAsync(content, "da-DK")).ToList();
 
         provider.Verify(x => x.GetAllAsync(content, "da-DK"), Times.Once);
-        Assert.AreEqual(1, result.Count);
-        Assert.AreEqual("da-DK", result[0].Culture);
+        Assert.That(result, Has.Count.EqualTo(1));
+        Assert.That(result[0].Culture, Is.EqualTo("da-DK"));
     }
 
     [Test]
@@ -78,9 +78,9 @@ public class DocumentUrlFactoryTests
         provider.Verify(x => x.GetAllAsync(contentA, "da-DK"), Times.Once);
         provider.Verify(x => x.GetAllAsync(contentB, "da-DK"), Times.Once);
 
-        Assert.AreEqual(2, result.Count);
-        Assert.AreEqual(contentA.Key, result[0].Id);
-        Assert.AreEqual(contentB.Key, result[1].Id);
+        Assert.That(result, Has.Count.EqualTo(2));
+        Assert.That(result[0].Id, Is.EqualTo(contentA.Key));
+        Assert.That(result[1].Id, Is.EqualTo(contentB.Key));
     }
 
     [Test]
@@ -105,9 +105,9 @@ public class DocumentUrlFactoryTests
 
         DocumentUrlInfo? result = await factory.GetPreviewUrlAsync(content, providerAlias, culture: null, segment: null);
 
-        Assert.IsNotNull(result);
-        Assert.AreEqual(isExternal, result!.IsExternal);
-        Assert.AreEqual("https://headless.example/preview", result.Url);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result!.IsExternal, Is.EqualTo(isExternal));
+        Assert.That(result.Url, Is.EqualTo("https://headless.example/preview"));
     }
 
     private static DocumentUrlFactory CreatePreviewFactory(string providerAlias, UrlInfo previewUrlInfo)

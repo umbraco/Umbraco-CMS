@@ -83,8 +83,8 @@ public class MemberRoleStoreTests
         var identityResult = await sut.CreateAsync(fakeRole, fakeCancellationToken);
 
         // assert
-        Assert.IsTrue(identityResult.Succeeded);
-        Assert.IsTrue(!identityResult.Errors.Any());
+        Assert.That(identityResult.Succeeded, Is.True);
+        Assert.That(!identityResult.Errors.Any(), Is.True);
         _mockMemberGroupService.Verify(x => x.CreateAsync(It.IsAny<MemberGroup>()));
     }
 
@@ -109,8 +109,8 @@ public class MemberRoleStoreTests
         var identityResult = await sut.UpdateAsync(fakeRole, fakeCancellationToken);
 
         // assert
-        Assert.IsTrue(identityResult.Succeeded);
-        Assert.IsTrue(!identityResult.Errors.Any());
+        Assert.That(identityResult.Succeeded, Is.True);
+        Assert.That(!identityResult.Errors.Any(), Is.True);
         _mockMemberGroupService.Verify(x => x.GetAsync(fakeKey));
     }
 
@@ -135,8 +135,8 @@ public class MemberRoleStoreTests
         var identityResult = await sut.UpdateAsync(fakeRole, fakeCancellationToken);
 
         // assert
-        Assert.IsTrue(identityResult.Succeeded);
-        Assert.IsTrue(!identityResult.Errors.Any());
+        Assert.That(identityResult.Succeeded, Is.True);
+        Assert.That(!identityResult.Errors.Any(), Is.True);
         _mockMemberGroupService.Verify(x => x.UpdateAsync(It.IsAny<IMemberGroup>()));
         _mockMemberGroupService.Verify(x => x.GetAsync(fakeKey));
     }
@@ -155,9 +155,9 @@ public class MemberRoleStoreTests
         var identityResult = await sut.UpdateAsync(fakeRole, fakeCancellationToken);
 
         // assert
-        Assert.IsTrue(identityResult.Succeeded == false);
-        Assert.IsTrue(identityResult.Errors.Any(x =>
-            x.Code == "IdentityMemberGroupNotFound" && x.Description == "Member group not found"));
+        Assert.That(identityResult.Succeeded, Is.EqualTo(false));
+        Assert.That(identityResult.Errors.Any(x =>
+            x.Code == "IdentityMemberGroupNotFound" && x.Description == "Member group not found"), Is.True);
     }
 
     [Test]
@@ -172,9 +172,9 @@ public class MemberRoleStoreTests
         var identityResult = await sut.UpdateAsync(fakeRole, fakeCancellationToken);
 
         // assert
-        Assert.IsTrue(identityResult.Succeeded == false);
-        Assert.IsTrue(identityResult.Errors.Any(x =>
-            x.Code == "IdentityIdParseError" && x.Description == "Cannot parse ID to int"));
+        Assert.That(identityResult.Succeeded, Is.EqualTo(false));
+        Assert.That(identityResult.Errors.Any(x =>
+            x.Code == "IdentityIdParseError" && x.Description == "Cannot parse ID to int"), Is.True);
         _mockMemberGroupService.VerifyNoOtherCalls();
     }
 
@@ -213,8 +213,8 @@ public class MemberRoleStoreTests
         var identityResult = await sut.DeleteAsync(fakeRole, fakeCancellationToken);
 
         // assert
-        Assert.IsTrue(identityResult.Succeeded);
-        Assert.IsTrue(!identityResult.Errors.Any());
+        Assert.That(identityResult.Succeeded, Is.True);
+        Assert.That(!identityResult.Errors.Any(), Is.True);
         _mockMemberGroupService.Verify(x => x.GetAsync(fakeKey));
         _mockMemberGroupService.Verify(x => x.DeleteAsync(fakeKey));
         _mockMemberGroupService.VerifyNoOtherCalls();
@@ -252,9 +252,9 @@ public class MemberRoleStoreTests
         var identityResult = await sut.DeleteAsync(fakeRole, fakeCancellationToken);
 
         // assert
-        Assert.IsTrue(identityResult.Succeeded == false);
-        Assert.IsTrue(identityResult.Errors.Any(x =>
-            x.Code == "IdentityMemberGroupNotFound" && x.Description == "Member group not found"));
+        Assert.That(identityResult.Succeeded, Is.EqualTo(false));
+        Assert.That(identityResult.Errors.Any(x =>
+            x.Code == "IdentityMemberGroupNotFound" && x.Description == "Member group not found"), Is.True);
         _mockMemberGroupService.VerifyNoOtherCalls();
     }
 
@@ -277,8 +277,8 @@ public class MemberRoleStoreTests
         IdentityRole actual = await sut.FindByIdAsync(fakeRole.Id);
 
         // assert
-        Assert.AreEqual(fakeRole.Name, actual.Name);
-        Assert.AreEqual(fakeRole.Id, actual.Id);
+        Assert.That(actual.Name, Is.EqualTo(fakeRole.Name));
+        Assert.That(actual.Id, Is.EqualTo(fakeRole.Id));
         _mockMemberGroupService.Verify(x => x.GetAsync(fakeKey));
         _mockMemberGroupService.VerifyNoOtherCalls();
     }
@@ -319,8 +319,8 @@ public class MemberRoleStoreTests
         IdentityRole actual = await sut.FindByIdAsync(fakeRoleGuid.ToString());
 
         // assert
-        Assert.AreEqual(fakeRole.Name, actual.Name);
-        Assert.AreEqual(fakeRole.Id, actual.Id);
+        Assert.That(actual.Name, Is.EqualTo(fakeRole.Name));
+        Assert.That(actual.Id, Is.EqualTo(fakeRole.Id));
         _mockMemberGroupService.Verify(x => x.GetAsync(fakeRoleGuid));
         _mockMemberGroupService.VerifyNoOtherCalls();
     }
@@ -346,8 +346,8 @@ public class MemberRoleStoreTests
         IdentityRole actual = await sut.FindByIdAsync(fakeRoleId.ToString());
 
         // assert
-        Assert.AreEqual(fakeRole.Name, actual.Name);
-        Assert.AreEqual(fakeRole.Id, actual.Id);
+        Assert.That(actual.Name, Is.EqualTo(fakeRole.Name));
+        Assert.That(actual.Id, Is.EqualTo(fakeRole.Id));
         _mockMemberGroupService.Verify(x => x.GetAsync(fakeKey));
         _mockMemberGroupService.VerifyNoOtherCalls();
     }
@@ -370,8 +370,8 @@ public class MemberRoleStoreTests
         IdentityRole actual = await sut.FindByNameAsync(fakeRole.Name);
 
         // assert
-        Assert.AreEqual(fakeRole.Name, actual.Name);
-        Assert.AreEqual(fakeRole.Id, actual.Id);
+        Assert.That(actual.Name, Is.EqualTo(fakeRole.Name));
+        Assert.That(actual.Id, Is.EqualTo(fakeRole.Id));
         _mockMemberGroupService.Verify(x => x.GetByName(fakeRole.Name));
     }
 
@@ -419,6 +419,6 @@ public class MemberRoleStoreTests
         var actual = sut.GetRoleIdAsync(fakeRole, fakeCancellationToken);
 
         // assert
-        Assert.AreEqual(fakeRoleId, actual.Result);
+        Assert.That(actual.Result, Is.EqualTo(fakeRoleId));
     }
 }

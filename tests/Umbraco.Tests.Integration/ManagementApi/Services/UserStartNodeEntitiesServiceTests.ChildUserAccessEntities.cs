@@ -22,22 +22,22 @@ public partial class UserStartNodeEntitiesServiceTests
             .ToArray();
 
         // expected total is 2, because only two items under "1" are allowed (note the page size is 3 for good measure)
-        Assert.AreEqual(2, totalItems);
-        Assert.AreEqual(2, children.Length);
+        Assert.That(totalItems, Is.EqualTo(2));
+        Assert.That(children, Has.Length.EqualTo(2));
         Assert.Multiple(() =>
         {
             // first and last content items are the ones allowed
-            Assert.AreEqual(ItemsByName["1-1"].Key, children[0].Entity.Key);
-            Assert.AreEqual(ItemsByName["1-10"].Key, children[1].Entity.Key);
+            Assert.That(children[0].Entity.Key, Is.EqualTo(ItemsByName["1-1"].Key));
+            Assert.That(children[1].Entity.Key, Is.EqualTo(ItemsByName["1-10"].Key));
 
             // explicitly verify the entity sort order, both so we know sorting works,
             // and so we know it's actually the first and last item below "1"
-            Assert.AreEqual(0, children[0].Entity.SortOrder);
-            Assert.AreEqual(9, children[1].Entity.SortOrder);
+            Assert.That(children[0].Entity.SortOrder, Is.EqualTo(0));
+            Assert.That(children[1].Entity.SortOrder, Is.EqualTo(9));
 
             // both are allowed (they are the actual start nodes)
-            Assert.IsTrue(children[0].HasAccess);
-            Assert.IsTrue(children[1].HasAccess);
+            Assert.That(children[0].HasAccess, Is.True);
+            Assert.That(children[1].HasAccess, Is.True);
         });
     }
 
@@ -45,7 +45,7 @@ public partial class UserStartNodeEntitiesServiceTests
     public async Task ChildUserAccessEntities_InAndOutOfScope_YieldsOnlyChildrenInScope()
     {
         var contentStartNodePaths = await CreateUserAndGetStartNodePaths(ItemsByName["1-5"].Id, ItemsByName["2-10"].Id);
-        Assert.AreEqual(2, contentStartNodePaths.Length);
+        Assert.That(contentStartNodePaths, Has.Length.EqualTo(2));
 
         var children = UserStartNodeEntitiesService
             .ChildUserAccessEntities(
@@ -58,13 +58,13 @@ public partial class UserStartNodeEntitiesServiceTests
                 out var totalItems)
             .ToArray();
 
-        Assert.AreEqual(1, totalItems);
-        Assert.AreEqual(1, children.Length);
+        Assert.That(totalItems, Is.EqualTo(1));
+        Assert.That(children, Has.Length.EqualTo(1));
         Assert.Multiple(() =>
         {
             // only the "2-10" content item is returned, as "1-5" is out of scope
-            Assert.AreEqual(ItemsByName["2-10"].Key, children[0].Entity.Key);
-            Assert.IsTrue(children[0].HasAccess);
+            Assert.That(children[0].Entity.Key, Is.EqualTo(ItemsByName["2-10"].Key));
+            Assert.That(children[0].HasAccess, Is.True);
         });
     }
 
@@ -72,7 +72,7 @@ public partial class UserStartNodeEntitiesServiceTests
     public async Task ChildUserAccessEntities_OutOfScope_YieldsNothing()
     {
         var contentStartNodePaths = await CreateUserAndGetStartNodePaths(ItemsByName["1-5"].Id, ItemsByName["2-10"].Id);
-        Assert.AreEqual(2, contentStartNodePaths.Length);
+        Assert.That(contentStartNodePaths, Has.Length.EqualTo(2));
 
         var children = UserStartNodeEntitiesService
             .ChildUserAccessEntities(
@@ -85,8 +85,8 @@ public partial class UserStartNodeEntitiesServiceTests
                 out var totalItems)
             .ToArray();
 
-        Assert.AreEqual(0, totalItems);
-        Assert.AreEqual(0, children.Length);
+        Assert.That(totalItems, Is.EqualTo(0));
+        Assert.That(children, Is.Empty);
     }
 
     [Test]
@@ -110,15 +110,15 @@ public partial class UserStartNodeEntitiesServiceTests
                 out var totalItems)
             .ToArray();
 
-        Assert.AreEqual(5, totalItems);
+        Assert.That(totalItems, Is.EqualTo(5));
         // page size is 2
-        Assert.AreEqual(2, children.Length);
+        Assert.That(children, Has.Length.EqualTo(2));
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(ItemsByName["1-1"].Key, children[0].Entity.Key);
-            Assert.AreEqual(ItemsByName["1-3"].Key, children[1].Entity.Key);
-            Assert.IsTrue(children[0].HasAccess);
-            Assert.IsTrue(children[1].HasAccess);
+            Assert.That(children[0].Entity.Key, Is.EqualTo(ItemsByName["1-1"].Key));
+            Assert.That(children[1].Entity.Key, Is.EqualTo(ItemsByName["1-3"].Key));
+            Assert.That(children[0].HasAccess, Is.True);
+            Assert.That(children[1].HasAccess, Is.True);
         });
 
         // next result page
@@ -133,15 +133,15 @@ public partial class UserStartNodeEntitiesServiceTests
                 out totalItems)
             .ToArray();
 
-        Assert.AreEqual(5, totalItems);
+        Assert.That(totalItems, Is.EqualTo(5));
         // page size is still 2
-        Assert.AreEqual(2, children.Length);
+        Assert.That(children, Has.Length.EqualTo(2));
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(ItemsByName["1-5"].Key, children[0].Entity.Key);
-            Assert.AreEqual(ItemsByName["1-7"].Key, children[1].Entity.Key);
-            Assert.IsTrue(children[0].HasAccess);
-            Assert.IsTrue(children[1].HasAccess);
+            Assert.That(children[0].Entity.Key, Is.EqualTo(ItemsByName["1-5"].Key));
+            Assert.That(children[1].Entity.Key, Is.EqualTo(ItemsByName["1-7"].Key));
+            Assert.That(children[0].HasAccess, Is.True);
+            Assert.That(children[1].HasAccess, Is.True);
         });
 
         // next result page
@@ -156,13 +156,13 @@ public partial class UserStartNodeEntitiesServiceTests
                 out totalItems)
             .ToArray();
 
-        Assert.AreEqual(5, totalItems);
+        Assert.That(totalItems, Is.EqualTo(5));
         // page size is still 2, but this is the last result page
-        Assert.AreEqual(1, children.Length);
+        Assert.That(children, Has.Length.EqualTo(1));
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(ItemsByName["1-9"].Key, children[0].Entity.Key);
-            Assert.IsTrue(children[0].HasAccess);
+            Assert.That(children[0].Entity.Key, Is.EqualTo(ItemsByName["1-9"].Key));
+            Assert.That(children[0].HasAccess, Is.True);
         });
     }
 
@@ -182,16 +182,16 @@ public partial class UserStartNodeEntitiesServiceTests
                 out var totalItems)
             .ToArray();
 
-        Assert.AreEqual(5, totalItems);
-        Assert.AreEqual(5, children.Length);
+        Assert.That(totalItems, Is.EqualTo(5));
+        Assert.That(children, Has.Length.EqualTo(5));
         Assert.Multiple(() =>
         {
             // all children of "3-3" should be allowed because "3-3" is a start node
             foreach (var childNumber in Enumerable.Range(1, 5))
             {
                 var child = children[childNumber - 1];
-                Assert.AreEqual(ItemsByName[$"3-3-{childNumber}"].Key, child.Entity.Key);
-                Assert.IsTrue(child.HasAccess);
+                Assert.That(child.Entity.Key, Is.EqualTo(ItemsByName[$"3-3-{childNumber}"].Key));
+                Assert.That(child.HasAccess, Is.True);
             }
         });
     }
@@ -212,17 +212,17 @@ public partial class UserStartNodeEntitiesServiceTests
                 out var totalItems)
             .ToArray();
 
-        Assert.AreEqual(2, totalItems);
-        Assert.AreEqual(2, children.Length);
+        Assert.That(totalItems, Is.EqualTo(2));
+        Assert.That(children, Has.Length.EqualTo(2));
         Assert.Multiple(() =>
         {
             // the two items are the children of "3-3" - that is, the actual start nodes
-            Assert.AreEqual(ItemsByName["3-3-3"].Key, children[0].Entity.Key);
-            Assert.AreEqual(ItemsByName["3-3-4"].Key, children[1].Entity.Key);
+            Assert.That(children[0].Entity.Key, Is.EqualTo(ItemsByName["3-3-3"].Key));
+            Assert.That(children[1].Entity.Key, Is.EqualTo(ItemsByName["3-3-4"].Key));
 
             // both are allowed (they are the actual start nodes)
-            Assert.IsTrue(children[0].HasAccess);
-            Assert.IsTrue(children[1].HasAccess);
+            Assert.That(children[0].HasAccess, Is.True);
+            Assert.That(children[1].HasAccess, Is.True);
         });
     }
 
@@ -242,17 +242,17 @@ public partial class UserStartNodeEntitiesServiceTests
                 out var totalItems)
             .ToArray();
 
-        Assert.AreEqual(2, totalItems);
-        Assert.AreEqual(2, children.Length);
+        Assert.That(totalItems, Is.EqualTo(2));
+        Assert.That(children, Has.Length.EqualTo(2));
         Assert.Multiple(() =>
         {
             // the two items are the children of "3" - that is, the parents of the actual start nodes
-            Assert.AreEqual(ItemsByName["3-3"].Key, children[0].Entity.Key);
-            Assert.AreEqual(ItemsByName["3-5"].Key, children[1].Entity.Key);
+            Assert.That(children[0].Entity.Key, Is.EqualTo(ItemsByName["3-3"].Key));
+            Assert.That(children[1].Entity.Key, Is.EqualTo(ItemsByName["3-5"].Key));
 
             // both are disallowed - only the two children (the actual start nodes) are allowed
-            Assert.IsFalse(children[0].HasAccess);
-            Assert.IsFalse(children[1].HasAccess);
+            Assert.That(children[0].HasAccess, Is.False);
+            Assert.That(children[1].HasAccess, Is.False);
         });
     }
 
@@ -265,7 +265,7 @@ public partial class UserStartNodeEntitiesServiceTests
         //       permissions additive (which in this case would mean ignoring the descendant rather than the ancestor).
 
         var contentStartNodePaths = await CreateUserAndGetStartNodePaths(ItemsByName["3-3"].Id, ItemsByName["3-3-1"].Id, ItemsByName["3-3-5"].Id);
-        Assert.AreEqual(2, contentStartNodePaths.Length);
+        Assert.That(contentStartNodePaths, Has.Length.EqualTo(2));
 
         var children = UserStartNodeEntitiesService
             .ChildUserAccessEntities(
@@ -277,12 +277,12 @@ public partial class UserStartNodeEntitiesServiceTests
                 BySortOrder,
                 out var totalItems)
             .ToArray();
-        Assert.AreEqual(1, totalItems);
-        Assert.AreEqual(1, children.Length);
+        Assert.That(totalItems, Is.EqualTo(1));
+        Assert.That(children, Has.Length.EqualTo(1));
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(ItemsByName["3-3"].Key, children[0].Entity.Key);
-            Assert.IsFalse(children[0].HasAccess);
+            Assert.That(children[0].Entity.Key, Is.EqualTo(ItemsByName["3-3"].Key));
+            Assert.That(children[0].HasAccess, Is.False);
         });
 
         children = UserStartNodeEntitiesService
@@ -296,16 +296,16 @@ public partial class UserStartNodeEntitiesServiceTests
                 out totalItems)
             .ToArray();
 
-        Assert.AreEqual(2, totalItems);
-        Assert.AreEqual(2, children.Length);
+        Assert.That(totalItems, Is.EqualTo(2));
+        Assert.That(children, Has.Length.EqualTo(2));
         Assert.Multiple(() =>
         {
             // the two items are the children of "3-3" - that is, the actual start nodes
-            Assert.AreEqual(ItemsByName["3-3-1"].Key, children[0].Entity.Key);
-            Assert.AreEqual(ItemsByName["3-3-5"].Key, children[1].Entity.Key);
+            Assert.That(children[0].Entity.Key, Is.EqualTo(ItemsByName["3-3-1"].Key));
+            Assert.That(children[1].Entity.Key, Is.EqualTo(ItemsByName["3-3-5"].Key));
 
-            Assert.IsTrue(children[0].HasAccess);
-            Assert.IsTrue(children[1].HasAccess);
+            Assert.That(children[0].HasAccess, Is.True);
+            Assert.That(children[1].HasAccess, Is.True);
         });
     }
 
@@ -324,13 +324,13 @@ public partial class UserStartNodeEntitiesServiceTests
                 BySortOrder,
                 out var totalItems)
             .ToArray();
-        Assert.AreEqual(3, totalItems);
-        Assert.AreEqual(3, children.Length);
+        Assert.That(totalItems, Is.EqualTo(3));
+        Assert.That(children, Has.Length.EqualTo(3));
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(ItemsByName["3-1"].Key, children[0].Entity.Key);
-            Assert.AreEqual(ItemsByName["3-2"].Key, children[1].Entity.Key);
-            Assert.AreEqual(ItemsByName["3-3"].Key, children[2].Entity.Key);
+            Assert.That(children[0].Entity.Key, Is.EqualTo(ItemsByName["3-1"].Key));
+            Assert.That(children[1].Entity.Key, Is.EqualTo(ItemsByName["3-2"].Key));
+            Assert.That(children[2].Entity.Key, Is.EqualTo(ItemsByName["3-3"].Key));
         });
     }
 }

@@ -13,7 +13,7 @@ using Umbraco.Cms.Tests.Integration.Umbraco.Persistence.EFCore.DbContext;
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Persistence.EFCore.Scoping;
 
 [TestFixture]
-[Timeout(60000)]
+[CancelAfter(60000)]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, Logger = UmbracoTestOptions.Logger.Console)]
 internal sealed class EFCoreLockTests : UmbracoIntegrationTest
 {
@@ -184,12 +184,12 @@ internal sealed class EFCoreLockTests : UmbracoIntegrationTest
             thread.Join();
         }
 
-        Assert.AreEqual(threadCount, maxAcquired);
-        Assert.AreEqual(0, acquired);
+        Assert.That(maxAcquired, Is.EqualTo(threadCount));
+        Assert.That(acquired, Is.EqualTo(0));
 
         for (var i = 0; i < threadCount; i++)
         {
-            Assert.IsNull(exceptions[i]);
+            Assert.That(exceptions[i], Is.Null);
         }
     }
 
@@ -292,7 +292,7 @@ internal sealed class EFCoreLockTests : UmbracoIntegrationTest
 
         m2.Wait();
         // only 1 thread has locked
-        Assert.AreEqual(1, acquired);
+        Assert.That(acquired, Is.EqualTo(1));
         for (var i = 0; i < threadCount; i++)
         {
             ms[i].Set(); // let all go
@@ -303,11 +303,11 @@ internal sealed class EFCoreLockTests : UmbracoIntegrationTest
             thread.Join();
         }
 
-        Assert.AreEqual(0, acquired);
+        Assert.That(acquired, Is.EqualTo(0));
 
         for (var i = 0; i < threadCount; i++)
         {
-            Assert.IsNull(exceptions[i]);
+            Assert.That(exceptions[i], Is.Null);
         }
     }
 
@@ -343,7 +343,7 @@ internal sealed class EFCoreLockTests : UmbracoIntegrationTest
         thread1.Join();
         thread2.Join();
 
-        Assert.IsNotNull(e1);
+        Assert.That(e1, Is.Not.Null);
         if (e1 != null)
         {
             AssertIsDistributedLockingTimeoutException(e1);
@@ -364,7 +364,7 @@ internal sealed class EFCoreLockTests : UmbracoIntegrationTest
     private void AssertIsDistributedLockingTimeoutException(Exception e)
     {
         var sqlException = e as DistributedLockingTimeoutException;
-        Assert.IsNotNull(sqlException);
+        Assert.That(sqlException, Is.Not.Null);
     }
 
     private void DeadLockTestThread(int id1, int id2, EventWaitHandle myEv, WaitHandle otherEv, ref Exception exception)

@@ -16,8 +16,9 @@ public class FileUploadPropertyValueEditorTests
             FileExtensions = ["pdf", "doc", "docx"],
         };
 
-        Assert.IsTrue(
+        Assert.That(
             FileUploadPropertyValueEditor.IsAllowedInDataTypeConfiguration(extension, configuration),
+            Is.True,
             $"Extension '{extension}' should be allowed but was rejected");
     }
 
@@ -29,7 +30,7 @@ public class FileUploadPropertyValueEditorTests
             FileExtensions = Enumerable.Empty<string>(),
         };
 
-        Assert.IsTrue(FileUploadPropertyValueEditor.IsAllowedInDataTypeConfiguration("anything", configuration));
+        Assert.That(FileUploadPropertyValueEditor.IsAllowedInDataTypeConfiguration("anything", configuration), Is.True);
     }
 
     [Test]
@@ -40,6 +41,6 @@ public class FileUploadPropertyValueEditorTests
             FileExtensions = ["pdf", "doc"],
         };
 
-        Assert.IsFalse(FileUploadPropertyValueEditor.IsAllowedInDataTypeConfiguration("jpg", configuration));
+        Assert.That(FileUploadPropertyValueEditor.IsAllowedInDataTypeConfiguration("jpg", configuration), Is.False);
     }
 }

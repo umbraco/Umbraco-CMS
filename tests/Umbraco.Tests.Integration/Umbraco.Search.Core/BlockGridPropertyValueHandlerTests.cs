@@ -174,7 +174,7 @@ public class BlockGridPropertyValueHandlerTests : PropertyValueHandlerTestsBase
         TestIndexDocument document = IndexerAndSearcher.Dump(IndexAliases.PublishedContent).Single();
         IndexValue? tagsValue = document.Fields.FirstOrDefault(f => f.FieldName == Cms.Search.Core.Constants.FieldNames.Tags)?.Value;
         Assert.That(tagsValue, Is.Not.Null);
-        CollectionAssert.AreEquivalent(new[] { "One", "Two", "Three", "Four", "Five", "Six" }, tagsValue.Keywords);
+        Assert.That(tagsValue.Keywords, Is.EquivalentTo(new[] { "One", "Two", "Three", "Four", "Five", "Six" }));
 
         return;
 
@@ -190,21 +190,21 @@ public class BlockGridPropertyValueHandlerTests : PropertyValueHandlerTestsBase
 
             Assert.Multiple(() =>
             {
-                CollectionAssert.AreEqual(new[] { "The TextBox value", "The TextArea value", "First", "Second", "Third", "Link One" }, indexValue.Texts);
+                Assert.That(indexValue.Texts, Is.EqualTo(new[] { "The TextBox value", "The TextArea value", "First", "Second", "Third", "Link One" }).AsCollection);
 
-                CollectionAssert.AreEqual(new[] { 1234, 1, 1, 1 }, indexValue.Integers);
+                Assert.That(indexValue.Integers, Is.EqualTo(new[] { 1234, 1, 1, 1 }).AsCollection);
 
-                CollectionAssert.AreEqual(new[] { 56.78m, 1.23m, 2.34m, 5.67m }, indexValue.Decimals);
+                Assert.That(indexValue.Decimals, Is.EqualTo(new[] { 56.78m, 1.23m, 2.34m, 5.67m }).AsCollection);
 
-                CollectionAssert.AreEqual(
-                    new[]
+                Assert.That(
+                    indexValue.DateTimeOffsets,
+                    Is.EqualTo(new[]
                     {
                         new DateTimeOffset(new DateOnly(2001, 02, 03), new TimeOnly(), TimeSpan.Zero),
                         new DateTimeOffset(new DateOnly(2004, 05, 06), new TimeOnly(07, 08, 09), TimeSpan.Zero)
-                    },
-                    indexValue.DateTimeOffsets);
+                    }).AsCollection);
 
-                CollectionAssert.AreEqual(new[] { "One", "Two", "Three", "Four", "Five", "Six", "55bf7f6d-acd2-4f1e-92bd-f0b5c41dbfed" }, indexValue.Keywords);
+                Assert.That(indexValue.Keywords, Is.EqualTo(new[] { "One", "Two", "Three", "Four", "Five", "Six", "55bf7f6d-acd2-4f1e-92bd-f0b5c41dbfed" }).AsCollection);
             });
         }
     }
@@ -315,14 +315,14 @@ public class BlockGridPropertyValueHandlerTests : PropertyValueHandlerTestsBase
 
         Assert.Multiple(() =>
         {
-            CollectionAssert.AreEqual(new[] { "Nested TextBox value", "Root TextBox value" }, indexValue.Texts);
-            CollectionAssert.AreEqual(new[] { 22, 12 }, indexValue.Integers);
-            CollectionAssert.AreEqual(new[] { "One", "Two", "Three", "Four", "Five", "Six" }, indexValue.Keywords);
+            Assert.That(indexValue.Texts, Is.EqualTo(new[] { "Nested TextBox value", "Root TextBox value" }).AsCollection);
+            Assert.That(indexValue.Integers, Is.EqualTo(new[] { 22, 12 }).AsCollection);
+            Assert.That(indexValue.Keywords, Is.EqualTo(new[] { "One", "Two", "Three", "Four", "Five", "Six" }).AsCollection);
         });
 
         IndexValue? tagsValue = document.Fields.FirstOrDefault(f => f.FieldName == Cms.Search.Core.Constants.FieldNames.Tags)?.Value;
         Assert.That(tagsValue, Is.Not.Null);
-        CollectionAssert.AreEquivalent(new[] { "One", "Two", "Three", "Four", "Five", "Six" }, tagsValue.Keywords);
+        Assert.That(tagsValue.Keywords, Is.EquivalentTo(new[] { "One", "Two", "Three", "Four", "Five", "Six" }));
     }
 
     private async Task<IContentType> CreateAllSimpleEditorsElementType(bool forBlockLevelVariance = false)

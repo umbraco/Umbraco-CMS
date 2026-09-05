@@ -33,8 +33,8 @@ internal sealed partial class UserServiceCrudTests
 
         var result = await userService.CreateAsync(Constants.Security.SuperUserKey, creationModel, true);
 
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(UserOperationStatus.CancelledByNotification, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(UserOperationStatus.CancelledByNotification));
     }
 
     private sealed class CancelUserSavingNotificationHandler : INotificationHandler<UserSavingNotification>
@@ -78,18 +78,18 @@ internal sealed partial class UserServiceCrudTests
 
         if (shouldSucceed is false)
         {
-            Assert.IsFalse(result.Success);
-            Assert.AreEqual(UserOperationStatus.UserNameIsNotEmail, result.Status);
+            Assert.That(result.Success, Is.False);
+            Assert.That(result.Status, Is.EqualTo(UserOperationStatus.UserNameIsNotEmail));
             return;
         }
 
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(UserOperationStatus.Success, result.Status);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(UserOperationStatus.Success));
         var createdUser = result.Result.CreatedUser;
-        Assert.IsNotNull(createdUser);
-        Assert.AreEqual(username, createdUser.Username);
-        Assert.AreEqual(email, createdUser.Email);
-        Assert.AreEqual(UserKind.Default, createdUser.Kind);
+        Assert.That(createdUser, Is.Not.Null);
+        Assert.That(createdUser.Username, Is.EqualTo(username));
+        Assert.That(createdUser.Email, Is.EqualTo(email));
+        Assert.That(createdUser.Kind, Is.EqualTo(UserKind.Default));
     }
 
     [TestCase(UserKind.Default)]
@@ -111,15 +111,15 @@ internal sealed partial class UserServiceCrudTests
 
         var result = await userService.CreateAsync(Constants.Security.SuperUserKey, creationModel, true);
 
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(UserOperationStatus.Success, result.Status);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(UserOperationStatus.Success));
         var createdUser = result.Result.CreatedUser;
-        Assert.IsNotNull(createdUser);
-        Assert.AreEqual(kind, createdUser.Kind);
+        Assert.That(createdUser, Is.Not.Null);
+        Assert.That(createdUser.Kind, Is.EqualTo(kind));
 
         var user = await userService.GetAsync(createdUser.Key);
-        Assert.NotNull(user);
-        Assert.AreEqual(kind, user.Kind);
+        Assert.That(user, Is.Not.Null);
+        Assert.That(user.Kind, Is.EqualTo(kind));
     }
 
     [Test]
@@ -137,7 +137,7 @@ internal sealed partial class UserServiceCrudTests
 
         var userService = CreateUserService(new SecuritySettings { UsernameIsEmail = false });
         var result = await userService.CreateAsync(Constants.Security.SuperUserKey, initialUserCreateModel, true);
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
 
         var duplicateUserCreateModel = new UserCreateModel
         {
@@ -148,8 +148,8 @@ internal sealed partial class UserServiceCrudTests
         };
 
         var secondResult = await userService.CreateAsync(Constants.Security.SuperUserKey, duplicateUserCreateModel, true);
-        Assert.IsFalse(secondResult.Success);
-        Assert.AreEqual(UserOperationStatus.DuplicateEmail, secondResult.Status);
+        Assert.That(secondResult.Success, Is.False);
+        Assert.That(secondResult.Status, Is.EqualTo(UserOperationStatus.DuplicateEmail));
     }
 
     [Test]
@@ -167,7 +167,7 @@ internal sealed partial class UserServiceCrudTests
 
         var userService = CreateUserService(new SecuritySettings { UsernameIsEmail = false });
         var result = await userService.CreateAsync(Constants.Security.SuperUserKey, initialUserCreateModel, true);
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
 
         var duplicateUserCreateModel = new UserCreateModel
         {
@@ -178,8 +178,8 @@ internal sealed partial class UserServiceCrudTests
         };
 
         var secondResult = await userService.CreateAsync(Constants.Security.SuperUserKey, duplicateUserCreateModel, true);
-        Assert.IsFalse(secondResult.Success);
-        Assert.AreEqual(UserOperationStatus.DuplicateUserName, secondResult.Status);
+        Assert.That(secondResult.Success, Is.False);
+        Assert.That(secondResult.Status, Is.EqualTo(UserOperationStatus.DuplicateUserName));
     }
 
     [Test]
@@ -196,8 +196,8 @@ internal sealed partial class UserServiceCrudTests
 
         var result = await userService.CreateAsync(Constants.Security.SuperUserKey, userCreateModel, true);
 
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(UserOperationStatus.NoUserGroup, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(UserOperationStatus.NoUserGroup));
     }
 
     [Test]
@@ -207,7 +207,7 @@ internal sealed partial class UserServiceCrudTests
 
         var result = await userService.CreateAsync(Guid.Empty, new UserCreateModel(), true);
 
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(UserOperationStatus.MissingUser, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(UserOperationStatus.MissingUser));
     }
 }

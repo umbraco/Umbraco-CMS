@@ -41,7 +41,7 @@ public class InstructionProcessJobTests
             Task runTask = sut.RunJobAsync(CancellationToken.None);
             Task winner = await Task.WhenAny(runTask, Task.Delay(TimeSpan.FromSeconds(10)));
 
-            Assert.AreSame(runTask, winner, "RunJobAsync did not return after the sync timed out.");
+            Assert.That(winner, Is.SameAs(runTask), "RunJobAsync did not return after the sync timed out.");
             await runTask; // Must complete without throwing so the loop continues.
 
             VerifyErrorLogged();
@@ -93,7 +93,7 @@ public class InstructionProcessJobTests
 
         // First run hangs and times out, leaving the sync in-flight.
         await sut.RunJobAsync(CancellationToken.None);
-        Assert.AreEqual(1, Volatile.Read(ref syncCount));
+        Assert.That(Volatile.Read(ref syncCount), Is.EqualTo(1));
 
         // Release the stalled call; once its task completes the next run must start a fresh sync — i.e. the job
         // self-heals without a recycle. Retry briefly to avoid racing the in-flight task's completion.
@@ -113,7 +113,7 @@ public class InstructionProcessJobTests
             }
         }
 
-        Assert.IsTrue(resumed, "Polling did not resume after the stalled sync completed.");
+        Assert.That(resumed, Is.True, "Polling did not resume after the stalled sync completed.");
         VerifyMessengerSyncedTimes(Times.Exactly(2));
     }
 

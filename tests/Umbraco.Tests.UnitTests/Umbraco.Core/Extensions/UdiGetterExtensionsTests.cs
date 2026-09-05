@@ -29,10 +29,10 @@ public class UdiGetterExtensionsTests
         };
 
         Udi udi = entity.GetUdi();
-        Assert.AreEqual(expected, udi.ToString());
+        Assert.That(udi.ToString(), Is.EqualTo(expected));
 
         udi = ((IEntity)entity).GetUdi();
-        Assert.AreEqual(expected, udi.ToString());
+        Assert.That(udi.ToString(), Is.EqualTo(expected));
     }
 
     [TestCase("6ad82c70-685c-4e04-9b36-d81bd779d16f", false, "umb://document/6ad82c70685c4e049b36d81bd779d16f")]
@@ -46,13 +46,13 @@ public class UdiGetterExtensionsTests
             .Build();
 
         Udi udi = entity.GetUdi();
-        Assert.AreEqual(expected, udi.ToString());
+        Assert.That(udi.ToString(), Is.EqualTo(expected));
 
         udi = ((IContentBase)entity).GetUdi();
-        Assert.AreEqual(expected, udi.ToString());
+        Assert.That(udi.ToString(), Is.EqualTo(expected));
 
         udi = ((IEntity)entity).GetUdi();
-        Assert.AreEqual(expected, udi.ToString());
+        Assert.That(udi.ToString(), Is.EqualTo(expected));
     }
 
     [TestCase("6ad82c70-685c-4e04-9b36-d81bd779d16f", "umb://media/6ad82c70685c4e049b36d81bd779d16f")]
@@ -64,13 +64,13 @@ public class UdiGetterExtensionsTests
             .Build();
 
         Udi udi = entity.GetUdi();
-        Assert.AreEqual(expected, udi.ToString());
+        Assert.That(udi.ToString(), Is.EqualTo(expected));
 
         udi = ((IContentBase)entity).GetUdi();
-        Assert.AreEqual(expected, udi.ToString());
+        Assert.That(udi.ToString(), Is.EqualTo(expected));
 
         udi = ((IEntity)entity).GetUdi();
-        Assert.AreEqual(expected, udi.ToString());
+        Assert.That(udi.ToString(), Is.EqualTo(expected));
     }
 
     [TestCase("6ad82c70-685c-4e04-9b36-d81bd779d16f", "umb://member/6ad82c70685c4e049b36d81bd779d16f")]
@@ -82,13 +82,13 @@ public class UdiGetterExtensionsTests
             .Build();
 
         Udi udi = entity.GetUdi();
-        Assert.AreEqual(expected, udi.ToString());
+        Assert.That(udi.ToString(), Is.EqualTo(expected));
 
         udi = ((IContentBase)entity).GetUdi();
-        Assert.AreEqual(expected, udi.ToString());
+        Assert.That(udi.ToString(), Is.EqualTo(expected));
 
         udi = ((IEntity)entity).GetUdi();
-        Assert.AreEqual(expected, udi.ToString());
+        Assert.That(udi.ToString(), Is.EqualTo(expected));
     }
 
     [TestCase("6ad82c70-685c-4e04-9b36-d81bd779d16f", "umb://document-type/6ad82c70685c4e049b36d81bd779d16f")]
@@ -99,13 +99,13 @@ public class UdiGetterExtensionsTests
             .Build();
 
         Udi udi = entity.GetUdi();
-        Assert.AreEqual(expected, udi.ToString());
+        Assert.That(udi.ToString(), Is.EqualTo(expected));
 
         udi = ((IContentTypeComposition)entity).GetUdi();
-        Assert.AreEqual(expected, udi.ToString());
+        Assert.That(udi.ToString(), Is.EqualTo(expected));
 
         udi = ((IEntity)entity).GetUdi();
-        Assert.AreEqual(expected, udi.ToString());
+        Assert.That(udi.ToString(), Is.EqualTo(expected));
     }
 
     [TestCase("6ad82c70-685c-4e04-9b36-d81bd779d16f", "umb://media-type/6ad82c70685c4e049b36d81bd779d16f")]
@@ -116,13 +116,13 @@ public class UdiGetterExtensionsTests
             .Build();
 
         Udi udi = entity.GetUdi();
-        Assert.AreEqual(expected, udi.ToString());
+        Assert.That(udi.ToString(), Is.EqualTo(expected));
 
         udi = ((IContentTypeComposition)entity).GetUdi();
-        Assert.AreEqual(expected, udi.ToString());
+        Assert.That(udi.ToString(), Is.EqualTo(expected));
 
         udi = ((IEntity)entity).GetUdi();
-        Assert.AreEqual(expected, udi.ToString());
+        Assert.That(udi.ToString(), Is.EqualTo(expected));
     }
 
     [TestCase("6ad82c70-685c-4e04-9b36-d81bd779d16f", "umb://member-type/6ad82c70685c4e049b36d81bd779d16f")]
@@ -133,13 +133,13 @@ public class UdiGetterExtensionsTests
             .Build();
 
         Udi udi = entity.GetUdi();
-        Assert.AreEqual(expected, udi.ToString());
+        Assert.That(udi.ToString(), Is.EqualTo(expected));
 
         udi = ((IContentTypeComposition)entity).GetUdi();
-        Assert.AreEqual(expected, udi.ToString());
+        Assert.That(udi.ToString(), Is.EqualTo(expected));
 
         udi = ((IEntity)entity).GetUdi();
-        Assert.AreEqual(expected, udi.ToString());
+        Assert.That(udi.ToString(), Is.EqualTo(expected));
     }
 
     [TestCase("6ad82c70-685c-4e04-9b36-d81bd779d16f", "umb://data-type/6ad82c70685c4e049b36d81bd779d16f")]
@@ -150,10 +150,10 @@ public class UdiGetterExtensionsTests
             .Build();
 
         Udi udi = entity.GetUdi();
-        Assert.AreEqual(expected, udi.ToString());
+        Assert.That(udi.ToString(), Is.EqualTo(expected));
 
         udi = ((IEntity)entity).GetUdi();
-        Assert.AreEqual(expected, udi.ToString());
+        Assert.That(udi.ToString(), Is.EqualTo(expected));
     }
 
     [TestCase("6ad82c70-685c-4e04-9b36-d81bd779d16f", "umb://dictionary-item/6ad82c70685c4e049b36d81bd779d16f")]
@@ -164,10 +164,10 @@ public class UdiGetterExtensionsTests
             .Build();
 
         Udi udi = entity.GetUdi();
-        Assert.AreEqual(expected, udi.ToString());
+        Assert.That(udi.ToString(), Is.EqualTo(expected));
 
         udi = ((IEntity)entity).GetUdi();
-        Assert.AreEqual(expected, udi.ToString());
+        Assert.That(udi.ToString(), Is.EqualTo(expected));
     }
 
     [TestCase("6ad82c70-685c-4e04-9b36-d81bd779d16f", "umb://element/6ad82c70685c4e049b36d81bd779d16f")]
@@ -179,13 +179,13 @@ public class UdiGetterExtensionsTests
             .Build();
 
         Udi udi = entity.GetUdi();
-        Assert.AreEqual(expected, udi.ToString());
+        Assert.That(udi.ToString(), Is.EqualTo(expected));
 
         udi = ((IContentBase)entity).GetUdi();
-        Assert.AreEqual(expected, udi.ToString());
+        Assert.That(udi.ToString(), Is.EqualTo(expected));
 
         udi = ((IEntity)entity).GetUdi();
-        Assert.AreEqual(expected, udi.ToString());
+        Assert.That(udi.ToString(), Is.EqualTo(expected));
     }
 
     [TestCase("en-US", "umb://language/en-US")]
@@ -197,10 +197,10 @@ public class UdiGetterExtensionsTests
             .Build();
 
         Udi udi = entity.GetUdi();
-        Assert.AreEqual(expected, udi.ToString());
+        Assert.That(udi.ToString(), Is.EqualTo(expected));
 
         udi = ((IEntity)entity).GetUdi();
-        Assert.AreEqual(expected, udi.ToString());
+        Assert.That(udi.ToString(), Is.EqualTo(expected));
     }
 
     [TestCase("6ad82c70-685c-4e04-9b36-d81bd779d16f", "umb://member-group/6ad82c70685c4e049b36d81bd779d16f")]
@@ -211,10 +211,10 @@ public class UdiGetterExtensionsTests
             .Build();
 
         Udi udi = entity.GetUdi();
-        Assert.AreEqual(expected, udi.ToString());
+        Assert.That(udi.ToString(), Is.EqualTo(expected));
 
         udi = ((IEntity)entity).GetUdi();
-        Assert.AreEqual(expected, udi.ToString());
+        Assert.That(udi.ToString(), Is.EqualTo(expected));
     }
 
     [TestCase("test.cshtml", "umb://partial-view/test.cshtml")]
@@ -227,7 +227,7 @@ public class UdiGetterExtensionsTests
             .Build();
 
         Udi udi = entity.GetUdi();
-        Assert.AreEqual(expected, udi.ToString());
+        Assert.That(udi.ToString(), Is.EqualTo(expected));
     }
 
     [TestCase("6ad82c70-685c-4e04-9b36-d81bd779d16f", "umb://relation/6ad82c70685c4e049b36d81bd779d16f")]
@@ -239,10 +239,10 @@ public class UdiGetterExtensionsTests
             .Build();
 
         Udi udi = entity.GetUdi();
-        Assert.AreEqual(expected, udi.ToString());
+        Assert.That(udi.ToString(), Is.EqualTo(expected));
 
         udi = ((IEntity)entity).GetUdi();
-        Assert.AreEqual(expected, udi.ToString());
+        Assert.That(udi.ToString(), Is.EqualTo(expected));
     }
 
     [TestCase("6ad82c70-685c-4e04-9b36-d81bd779d16f", "umb://relation-type/6ad82c70685c4e049b36d81bd779d16f")]
@@ -253,10 +253,10 @@ public class UdiGetterExtensionsTests
             .Build();
 
         Udi udi = entity.GetUdi();
-        Assert.AreEqual(expected, udi.ToString());
+        Assert.That(udi.ToString(), Is.EqualTo(expected));
 
         udi = ((IEntity)entity).GetUdi();
-        Assert.AreEqual(expected, udi.ToString());
+        Assert.That(udi.ToString(), Is.EqualTo(expected));
     }
 
     [TestCase("script.js", "umb://script/script.js")]
@@ -269,10 +269,10 @@ public class UdiGetterExtensionsTests
             .Build();
 
         Udi udi = entity.GetUdi();
-        Assert.AreEqual(expected, udi.ToString());
+        Assert.That(udi.ToString(), Is.EqualTo(expected));
 
         udi = ((IEntity)entity).GetUdi();
-        Assert.AreEqual(expected, udi.ToString());
+        Assert.That(udi.ToString(), Is.EqualTo(expected));
     }
 
     [TestCase("style.css", "umb://stylesheet/style.css")]
@@ -285,10 +285,10 @@ public class UdiGetterExtensionsTests
             .Build();
 
         Udi udi = entity.GetUdi();
-        Assert.AreEqual(expected, udi.ToString());
+        Assert.That(udi.ToString(), Is.EqualTo(expected));
 
         udi = ((IEntity)entity).GetUdi();
-        Assert.AreEqual(expected, udi.ToString());
+        Assert.That(udi.ToString(), Is.EqualTo(expected));
     }
 
     [TestCase("6ad82c70-685c-4e04-9b36-d81bd779d16f", "umb://template/6ad82c70685c4e049b36d81bd779d16f")]
@@ -299,10 +299,10 @@ public class UdiGetterExtensionsTests
             .Build();
 
         Udi udi = entity.GetUdi();
-        Assert.AreEqual(expected, udi.ToString());
+        Assert.That(udi.ToString(), Is.EqualTo(expected));
 
         udi = ((IEntity)entity).GetUdi();
-        Assert.AreEqual(expected, udi.ToString());
+        Assert.That(udi.ToString(), Is.EqualTo(expected));
     }
 
     [TestCase("6ad82c70-685c-4e04-9b36-d81bd779d16f", "umb://user/6ad82c70685c4e049b36d81bd779d16f")]
@@ -313,10 +313,10 @@ public class UdiGetterExtensionsTests
             .Build();
 
         Udi udi = entity.GetUdi();
-        Assert.AreEqual(expected, udi.ToString());
+        Assert.That(udi.ToString(), Is.EqualTo(expected));
 
         udi = ((IEntity)entity).GetUdi();
-        Assert.AreEqual(expected, udi.ToString());
+        Assert.That(udi.ToString(), Is.EqualTo(expected));
     }
 
     [TestCase("6ad82c70-685c-4e04-9b36-d81bd779d16f", "umb://user-group/6ad82c70685c4e049b36d81bd779d16f")]
@@ -327,10 +327,10 @@ public class UdiGetterExtensionsTests
             .Build();
 
         Udi udi = entity.GetUdi();
-        Assert.AreEqual(expected, udi.ToString());
+        Assert.That(udi.ToString(), Is.EqualTo(expected));
 
         udi = ((IEntity)entity).GetUdi();
-        Assert.AreEqual(expected, udi.ToString());
+        Assert.That(udi.ToString(), Is.EqualTo(expected));
     }
 
     [TestCase("6ad82c70-685c-4e04-9b36-d81bd779d16f", "umb://webhook/6ad82c70685c4e049b36d81bd779d16f")]
@@ -341,9 +341,9 @@ public class UdiGetterExtensionsTests
             .Build();
 
         Udi udi = entity.GetUdi();
-        Assert.AreEqual(expected, udi.ToString());
+        Assert.That(udi.ToString(), Is.EqualTo(expected));
 
         udi = ((IEntity)entity).GetUdi();
-        Assert.AreEqual(expected, udi.ToString());
+        Assert.That(udi.ToString(), Is.EqualTo(expected));
     }
 }

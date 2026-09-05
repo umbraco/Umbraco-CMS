@@ -24,8 +24,8 @@ internal sealed class LanguageServiceTests : UmbracoIntegrationTest
     public async Task Can_Get_All_Languages()
     {
         var languages = await LanguageService.GetAllAsync();
-        Assert.NotNull(languages);
-        Assert.IsTrue(languages.Any());
+        Assert.That(languages, Is.Not.Null);
+        Assert.That(languages.Any(), Is.True);
         Assert.That(languages.Count(), Is.EqualTo(3));
     }
 
@@ -34,7 +34,7 @@ internal sealed class LanguageServiceTests : UmbracoIntegrationTest
     {
         var isoCodes = await LanguageService.GetAllIsoCodesAsync();
         Assert.That(isoCodes.Count(), Is.EqualTo(3));
-        Assert.AreEqual("da-DK,en-GB,en-US", string.Join(",", isoCodes.OrderBy(x => x)));
+        Assert.That(string.Join(",", isoCodes.OrderBy(x => x)), Is.EqualTo("da-DK,en-GB,en-US"));
     }
 
     [Test]
@@ -42,15 +42,15 @@ internal sealed class LanguageServiceTests : UmbracoIntegrationTest
     {
         var danish = await LanguageService.GetAsync("da-DK");
         var english = await LanguageService.GetAsync("en-GB");
-        Assert.NotNull(danish);
-        Assert.NotNull(english);
+        Assert.That(danish, Is.Not.Null);
+        Assert.That(english, Is.Not.Null);
     }
 
     [Test]
     public async Task Does_Not_Fail_When_Language_Doesnt_Exist()
     {
         var language = await LanguageService.GetAsync("sv-SE");
-        Assert.Null(language);
+        Assert.That(language, Is.Null);
     }
 
     [Test]
@@ -63,57 +63,57 @@ internal sealed class LanguageServiceTests : UmbracoIntegrationTest
         Assert.That(languageNbNo.HasIdentity, Is.True);
 
         var language = await LanguageService.GetAsync("nb-NO");
-        Assert.NotNull(language);
+        Assert.That(language, Is.Not.Null);
 
         var result = await LanguageService.DeleteAsync("nb-NO", Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
 
         language = await LanguageService.GetAsync("nb-NO");
-        Assert.Null(language);
+        Assert.That(language, Is.Null);
     }
 
     [Test]
     public async Task Can_Create_Language_With_Fallback()
     {
         var languageDaDk = await LanguageService.GetAsync("da-DK");
-        Assert.NotNull(languageDaDk);
+        Assert.That(languageDaDk, Is.Not.Null);
         var languageNbNo = new LanguageBuilder()
             .WithCultureInfo("nb-NO")
             .WithFallbackLanguageIsoCode(languageDaDk.IsoCode)
             .Build();
         var result = await LanguageService.CreateAsync(languageNbNo, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
 
         var language = await LanguageService.GetAsync("nb-NO");
-        Assert.NotNull(language);
-        Assert.AreEqual("da-DK", language.FallbackIsoCode);
+        Assert.That(language, Is.Not.Null);
+        Assert.That(language.FallbackIsoCode, Is.EqualTo("da-DK"));
     }
 
     [Test]
     public async Task Can_Delete_Language_Used_As_Fallback()
     {
         var languageDaDk = await LanguageService.GetAsync("da-DK");
-        Assert.NotNull(languageDaDk);
+        Assert.That(languageDaDk, Is.Not.Null);
         var languageNbNo = new LanguageBuilder()
             .WithCultureInfo("nb-NO")
             .WithFallbackLanguageIsoCode(languageDaDk.IsoCode)
             .Build();
         var result = await LanguageService.CreateAsync(languageNbNo, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
 
         var language = await LanguageService.GetAsync("nb-NO");
-        Assert.NotNull(language);
-        Assert.AreEqual("da-DK", language.FallbackIsoCode);
+        Assert.That(language, Is.Not.Null);
+        Assert.That(language.FallbackIsoCode, Is.EqualTo("da-DK"));
 
         result = await LanguageService.DeleteAsync("da-DK", Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
 
         language = await LanguageService.GetAsync("da-DK");
-        Assert.Null(language);
+        Assert.That(language, Is.Null);
 
         language = await LanguageService.GetAsync("nb-NO");
-        Assert.NotNull(language);
-        Assert.Null(language.FallbackIsoCode);
+        Assert.That(language, Is.Not.Null);
+        Assert.That(language.FallbackIsoCode, Is.Null);
     }
 
     [Test]
@@ -123,7 +123,7 @@ internal sealed class LanguageServiceTests : UmbracoIntegrationTest
         var languages = await LanguageService.GetAllAsync();
 
         // Assert
-        Assert.That(3, Is.EqualTo(languages.Count()));
+        Assert.That(languages.Count(), Is.EqualTo(3));
     }
 
     [Test]
@@ -140,7 +140,7 @@ internal sealed class LanguageServiceTests : UmbracoIntegrationTest
         var result = await LanguageService.GetAsync(isoCode);
 
         // Assert
-        Assert.NotNull(result);
+        Assert.That(result, Is.Not.Null);
     }
 
     [Test]
@@ -153,7 +153,7 @@ internal sealed class LanguageServiceTests : UmbracoIntegrationTest
         await LanguageService.CreateAsync(languageEnAu, Constants.Security.SuperUserKey);
         var result = await LanguageService.GetAsync(languageEnAu.IsoCode);
 
-        Assert.IsTrue(result.IsDefault);
+        Assert.That(result.IsDefault, Is.True);
 
         var languageEnNz = new LanguageBuilder()
             .WithCultureInfo("en-NZ")
@@ -165,8 +165,8 @@ internal sealed class LanguageServiceTests : UmbracoIntegrationTest
         // re-get
         result = await LanguageService.GetAsync(languageEnAu.IsoCode);
 
-        Assert.IsTrue(result2.IsDefault);
-        Assert.IsFalse(result.IsDefault);
+        Assert.That(result2.IsDefault, Is.True);
+        Assert.That(result.IsDefault, Is.False);
     }
 
     [Test]
@@ -180,61 +180,61 @@ internal sealed class LanguageServiceTests : UmbracoIntegrationTest
 
         // Act
         var result = await LanguageService.DeleteAsync(languageEnAu.IsoCode, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
 
         // Assert
-        Assert.IsNull(await LanguageService.GetAsync(isoCode));
+        Assert.That(await LanguageService.GetAsync(isoCode), Is.Null);
     }
 
     [Test]
     public async Task Can_Update_Existing_Language()
     {
         ILanguage languageDaDk = await LanguageService.GetAsync("da-DK");
-        Assert.NotNull(languageDaDk);
-        Assert.IsFalse(languageDaDk.IsMandatory);
+        Assert.That(languageDaDk, Is.Not.Null);
+        Assert.That(languageDaDk.IsMandatory, Is.False);
         languageDaDk.IsMandatory = true;
         languageDaDk.IsoCode = "da";
         languageDaDk.CultureName = "New Culture Name For da-DK";
 
         var result = await LanguageService.UpdateAsync(languageDaDk, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(LanguageOperationStatus.Success, result.Status);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(LanguageOperationStatus.Success));
 
         // Verify that the create and update dates can be used to distinguish between creates
         // and updates (as these fields are used in ServerEventSender to emit a "Created" or "Updated"
         // event.
-        Assert.Greater(result.Result.UpdateDate, result.Result.CreateDate);
+        Assert.That(result.Result.UpdateDate, Is.GreaterThan(result.Result.CreateDate));
 
         // re-get
         languageDaDk = await LanguageService.GetAsync(languageDaDk.IsoCode);
-        Assert.NotNull(languageDaDk);
-        Assert.IsTrue(languageDaDk.IsMandatory);
-        Assert.AreEqual("da", languageDaDk.IsoCode);
-        Assert.AreEqual("New Culture Name For da-DK", languageDaDk.CultureName);
+        Assert.That(languageDaDk, Is.Not.Null);
+        Assert.That(languageDaDk.IsMandatory, Is.True);
+        Assert.That(languageDaDk.IsoCode, Is.EqualTo("da"));
+        Assert.That(languageDaDk.CultureName, Is.EqualTo("New Culture Name For da-DK"));
     }
 
     [Test]
     public async Task Can_Change_Default_Language_By_Update()
     {
         var defaultLanguageIsoCode = await LanguageService.GetDefaultIsoCodeAsync();
-        Assert.AreEqual("en-US", defaultLanguageIsoCode);
+        Assert.That(defaultLanguageIsoCode, Is.EqualTo("en-US"));
 
         ILanguage languageDaDk = await LanguageService.GetAsync("da-DK");
-        Assert.NotNull(languageDaDk);
-        Assert.IsFalse(languageDaDk.IsDefault);
-        Assert.AreNotEqual(defaultLanguageIsoCode, languageDaDk.IsoCode);
+        Assert.That(languageDaDk, Is.Not.Null);
+        Assert.That(languageDaDk.IsDefault, Is.False);
+        Assert.That(languageDaDk.IsoCode, Is.Not.EqualTo(defaultLanguageIsoCode));
 
         languageDaDk.IsDefault = true;
         var result = await LanguageService.UpdateAsync(languageDaDk, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
 
         // re-get
         var previousDefaultLanguage = await LanguageService.GetAsync(defaultLanguageIsoCode);
-        Assert.NotNull(previousDefaultLanguage);
-        Assert.IsFalse(previousDefaultLanguage.IsDefault);
+        Assert.That(previousDefaultLanguage, Is.Not.Null);
+        Assert.That(previousDefaultLanguage.IsDefault, Is.False);
         languageDaDk = await LanguageService.GetAsync(languageDaDk.IsoCode);
-        Assert.NotNull(languageDaDk);
-        Assert.IsTrue(languageDaDk.IsDefault);
+        Assert.That(languageDaDk, Is.Not.Null);
+        Assert.That(languageDaDk.IsDefault, Is.True);
     }
 
     [Test]
@@ -242,8 +242,8 @@ internal sealed class LanguageServiceTests : UmbracoIntegrationTest
     {
         var invalidLanguage = new Language("no-such-iso-code", "Invalid ISO code");
         var result = await LanguageService.CreateAsync(invalidLanguage, Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(LanguageOperationStatus.InvalidIsoCode, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(LanguageOperationStatus.InvalidIsoCode));
     }
 
     [Test]
@@ -254,14 +254,14 @@ internal sealed class LanguageServiceTests : UmbracoIntegrationTest
             .WithCultureInfo(isoCode)
             .Build();
         var result = await LanguageService.CreateAsync(languageEnAu, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
 
         var duplicateLanguageEnAu = new LanguageBuilder()
             .WithCultureInfo(isoCode)
             .Build();
         result = await LanguageService.CreateAsync(duplicateLanguageEnAu, Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(LanguageOperationStatus.DuplicateIsoCode, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(LanguageOperationStatus.DuplicateIsoCode));
     }
 
     [Test]
@@ -273,8 +273,8 @@ internal sealed class LanguageServiceTests : UmbracoIntegrationTest
             .WithFallbackLanguageIsoCode("no-such-ISO-code")
             .Build();
         var result = await LanguageService.CreateAsync(languageEnAu, Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(LanguageOperationStatus.InvalidFallbackIsoCode, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(LanguageOperationStatus.InvalidFallbackIsoCode));
     }
 
     [Test]
@@ -286,8 +286,8 @@ internal sealed class LanguageServiceTests : UmbracoIntegrationTest
             .WithFallbackLanguageIsoCode("fr-FR")
             .Build();
         var result = await LanguageService.CreateAsync(languageEnAu, Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(LanguageOperationStatus.InvalidFallback, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(LanguageOperationStatus.InvalidFallback));
     }
 
     [Test]
@@ -295,56 +295,56 @@ internal sealed class LanguageServiceTests : UmbracoIntegrationTest
     {
         ILanguage language = new Language("da", "Danish");
         var result = await LanguageService.UpdateAsync(language, Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(LanguageOperationStatus.NotFound, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(LanguageOperationStatus.NotFound));
     }
 
     [Test]
     public async Task Cannot_Undefault_Default_Language_By_Update()
     {
         var defaultLanguageIsoCode = await LanguageService.GetDefaultIsoCodeAsync();
-        Assert.IsNotNull(defaultLanguageIsoCode);
+        Assert.That(defaultLanguageIsoCode, Is.Not.Null);
         var defaultLanguage = await LanguageService.GetAsync(defaultLanguageIsoCode);
-        Assert.IsNotNull(defaultLanguage);
-        Assert.IsTrue(defaultLanguage.IsDefault);
+        Assert.That(defaultLanguage, Is.Not.Null);
+        Assert.That(defaultLanguage.IsDefault, Is.True);
 
         defaultLanguage.IsDefault = false;
         var result = await LanguageService.UpdateAsync(defaultLanguage, Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(LanguageOperationStatus.MissingDefault, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(LanguageOperationStatus.MissingDefault));
 
         // re-get
         defaultLanguage = await LanguageService.GetAsync(defaultLanguageIsoCode);
-        Assert.IsNotNull(defaultLanguage);
-        Assert.IsTrue(defaultLanguage.IsDefault);
+        Assert.That(defaultLanguage, Is.Not.Null);
+        Assert.That(defaultLanguage.IsDefault, Is.True);
         defaultLanguageIsoCode = await LanguageService.GetDefaultIsoCodeAsync();
-        Assert.AreEqual(defaultLanguage.IsoCode, defaultLanguageIsoCode);
+        Assert.That(defaultLanguageIsoCode, Is.EqualTo(defaultLanguage.IsoCode));
     }
 
     [Test]
     public async Task Cannot_Update_Language_With_NonExisting_Fallback_Language()
     {
         ILanguage languageDaDk = await LanguageService.GetAsync("da-DK");
-        Assert.NotNull(languageDaDk);
-        Assert.IsNull(languageDaDk.FallbackIsoCode);
+        Assert.That(languageDaDk, Is.Not.Null);
+        Assert.That(languageDaDk.FallbackIsoCode, Is.Null);
 
         languageDaDk.FallbackIsoCode = "fr-FR";
         var result = await LanguageService.UpdateAsync(languageDaDk, Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(LanguageOperationStatus.InvalidFallback, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(LanguageOperationStatus.InvalidFallback));
     }
 
     [Test]
     public async Task Cannot_Update_Language_With_Invalid_Fallback_Language()
     {
         ILanguage languageDaDk = await LanguageService.GetAsync("da-DK");
-        Assert.NotNull(languageDaDk);
-        Assert.IsNull(languageDaDk.FallbackIsoCode);
+        Assert.That(languageDaDk, Is.Not.Null);
+        Assert.That(languageDaDk.FallbackIsoCode, Is.Null);
 
         languageDaDk.FallbackIsoCode = "no-such-iso-code";
         var result = await LanguageService.UpdateAsync(languageDaDk, Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(LanguageOperationStatus.InvalidFallbackIsoCode, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(LanguageOperationStatus.InvalidFallbackIsoCode));
     }
 
     [Test]
@@ -352,19 +352,19 @@ internal sealed class LanguageServiceTests : UmbracoIntegrationTest
     {
         ILanguage languageDaDk = await LanguageService.GetAsync("da-DK");
         ILanguage languageEnGb = await LanguageService.GetAsync("en-GB");
-        Assert.NotNull(languageDaDk);
-        Assert.NotNull(languageEnGb);
-        Assert.IsNull(languageDaDk.FallbackIsoCode);
-        Assert.IsNull(languageEnGb.FallbackIsoCode);
+        Assert.That(languageDaDk, Is.Not.Null);
+        Assert.That(languageEnGb, Is.Not.Null);
+        Assert.That(languageDaDk.FallbackIsoCode, Is.Null);
+        Assert.That(languageEnGb.FallbackIsoCode, Is.Null);
 
         languageDaDk.FallbackIsoCode = languageEnGb.IsoCode;
         var result = await LanguageService.UpdateAsync(languageDaDk, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
 
         languageEnGb.FallbackIsoCode = languageDaDk.IsoCode;
         result = await LanguageService.UpdateAsync(languageEnGb, Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(LanguageOperationStatus.InvalidFallback, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(LanguageOperationStatus.InvalidFallback));
     }
 
     [Test]
@@ -373,37 +373,37 @@ internal sealed class LanguageServiceTests : UmbracoIntegrationTest
         ILanguage languageEnUs = await LanguageService.GetAsync("en-US");
         ILanguage languageEnGb = await LanguageService.GetAsync("en-GB");
         ILanguage languageDaDk = await LanguageService.GetAsync("da-DK");
-        Assert.IsNotNull(languageEnUs);
-        Assert.IsNotNull(languageEnGb);
-        Assert.IsNotNull(languageDaDk);
-        Assert.IsNull(languageEnUs.FallbackIsoCode);
-        Assert.IsNull(languageEnGb.FallbackIsoCode);
-        Assert.IsNull(languageDaDk.FallbackIsoCode);
+        Assert.That(languageEnUs, Is.Not.Null);
+        Assert.That(languageEnGb, Is.Not.Null);
+        Assert.That(languageDaDk, Is.Not.Null);
+        Assert.That(languageEnUs.FallbackIsoCode, Is.Null);
+        Assert.That(languageEnGb.FallbackIsoCode, Is.Null);
+        Assert.That(languageDaDk.FallbackIsoCode, Is.Null);
 
         languageEnGb.FallbackIsoCode = languageEnUs.IsoCode;
         var result = await LanguageService.UpdateAsync(languageEnGb, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
 
         languageDaDk.FallbackIsoCode = languageEnGb.IsoCode;
         result = await LanguageService.UpdateAsync(languageDaDk, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
 
         languageEnUs.FallbackIsoCode = languageDaDk.IsoCode;
         result = await LanguageService.UpdateAsync(languageEnUs, Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(LanguageOperationStatus.InvalidFallback, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(LanguageOperationStatus.InvalidFallback));
 
         // re-get
         languageEnUs = await LanguageService.GetAsync("en-US");
         languageEnGb = await LanguageService.GetAsync("en-GB");
         languageDaDk = await LanguageService.GetAsync("da-DK");
-        Assert.IsNotNull(languageEnUs);
-        Assert.IsNotNull(languageEnGb);
-        Assert.IsNotNull(languageDaDk);
+        Assert.That(languageEnUs, Is.Not.Null);
+        Assert.That(languageEnGb, Is.Not.Null);
+        Assert.That(languageDaDk, Is.Not.Null);
 
-        Assert.AreEqual(languageEnUs.IsoCode, languageEnGb.FallbackIsoCode);
-        Assert.AreEqual(languageEnGb.IsoCode, languageDaDk.FallbackIsoCode);
-        Assert.IsNull(languageEnUs.FallbackIsoCode);
+        Assert.That(languageEnGb.FallbackIsoCode, Is.EqualTo(languageEnUs.IsoCode));
+        Assert.That(languageDaDk.FallbackIsoCode, Is.EqualTo(languageEnGb.IsoCode));
+        Assert.That(languageEnUs.FallbackIsoCode, Is.Null);
     }
 
     [Test]
@@ -414,16 +414,16 @@ internal sealed class LanguageServiceTests : UmbracoIntegrationTest
             .WithIsDefault(true)
             .Build();
         var result = await LanguageService.CreateAsync(languageNbNo, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
 
         result = await LanguageService.DeleteAsync(languageNbNo.IsoCode, Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(LanguageOperationStatus.MissingDefault, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(LanguageOperationStatus.MissingDefault));
 
         // re-get
         languageNbNo = await LanguageService.GetAsync("nb-NO");
-        Assert.NotNull(languageNbNo);
-        Assert.IsTrue(languageNbNo.IsDefault);
+        Assert.That(languageNbNo, Is.Not.Null);
+        Assert.That(languageNbNo.IsDefault, Is.True);
     }
 
     [Test]
@@ -434,20 +434,20 @@ internal sealed class LanguageServiceTests : UmbracoIntegrationTest
             .Build();
 
         var result = await LanguageService.DeleteAsync(languageNbNo.IsoCode, Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(LanguageOperationStatus.NotFound, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(LanguageOperationStatus.NotFound));
     }
 
     [Test]
     public async Task Cannot_Create_Language_With_Reused_Language_Model()
     {
         var languageDaDk = await LanguageService.GetAsync("da-DK");
-        Assert.NotNull(languageDaDk);
+        Assert.That(languageDaDk, Is.Not.Null);
         languageDaDk.IsoCode = "nb-NO";
 
         var result = await LanguageService.CreateAsync(languageDaDk, Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(LanguageOperationStatus.InvalidId, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(LanguageOperationStatus.InvalidId));
     }
 
     private async Task CreateTestData()
@@ -460,8 +460,8 @@ internal sealed class LanguageServiceTests : UmbracoIntegrationTest
             .Build();
 
         var languageResult = await LanguageService.CreateAsync(languageDaDk, Constants.Security.SuperUserKey);
-        Assert.IsTrue(languageResult.Success);
+        Assert.That(languageResult.Success, Is.True);
         languageResult = await LanguageService.CreateAsync(languageEnGb, Constants.Security.SuperUserKey);
-        Assert.IsTrue(languageResult.Success);
+        Assert.That(languageResult.Success, Is.True);
     }
 }

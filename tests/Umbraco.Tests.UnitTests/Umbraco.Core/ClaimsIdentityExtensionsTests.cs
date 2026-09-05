@@ -22,7 +22,7 @@ public class ClaimsIdentityExtensionsTests
     {
         var identity = new ClaimsIdentity(new List<Claim>());
         var value = identity.FindFirstValue("test");
-        Assert.IsNull(value);
+        Assert.That(value, Is.Null);
     }
 
     [Test]
@@ -33,7 +33,7 @@ public class ClaimsIdentityExtensionsTests
 
         var value = identity.FindFirstValue("test");
 
-        Assert.AreEqual(expectedClaim.Value, value);
+        Assert.That(value, Is.EqualTo(expectedClaim.Value));
     }
 
     [Test]
@@ -45,6 +45,6 @@ public class ClaimsIdentityExtensionsTests
 
         var value = identity.FindFirstValue("test");
 
-        Assert.AreEqual(expectedClaim.Value, value);
+        Assert.That(value, Is.EqualTo(expectedClaim.Value));
     }
 }

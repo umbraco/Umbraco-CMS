@@ -39,10 +39,10 @@ public class DeepCloneAppCacheTests : RuntimeAppCacheTests
 
         var val = _provider.GetCacheItem("test", () => original);
 
-        Assert.AreEqual(original.Count, val.Count);
+        Assert.That(val, Has.Count.EqualTo(original.Count));
         foreach (var item in val)
         {
-            Assert.IsTrue(item.IsClone);
+            Assert.That(item.IsClone, Is.True);
         }
     }
 
@@ -50,12 +50,12 @@ public class DeepCloneAppCacheTests : RuntimeAppCacheTests
     public void Ensures_Cloned_And_Reset()
     {
         var original = new TestClass { Name = "hello" };
-        Assert.IsTrue(original.IsDirty());
+        Assert.That(original.IsDirty(), Is.True);
 
         var val = _provider.GetCacheItem("test", () => original);
 
-        Assert.AreNotEqual(original.CloneId, val.CloneId);
-        Assert.IsFalse(val.IsDirty());
+        Assert.That(val.CloneId, Is.Not.EqualTo(original.CloneId));
+        Assert.That(val.IsDirty(), Is.False);
     }
 
     [Test]
@@ -67,11 +67,11 @@ public class DeepCloneAppCacheTests : RuntimeAppCacheTests
 
         // does not throw
         value = (string)_provider.Get("key", () => GetValue(3));
-        Assert.AreEqual("succ3", value);
+        Assert.That(value, Is.EqualTo("succ3"));
 
         // cache
         value = (string)_provider.Get("key", () => GetValue(4));
-        Assert.AreEqual("succ3", value);
+        Assert.That(value, Is.EqualTo("succ3"));
     }
 
     private static string GetValue(int i)

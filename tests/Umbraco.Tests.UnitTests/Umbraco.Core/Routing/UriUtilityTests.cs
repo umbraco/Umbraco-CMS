@@ -40,7 +40,7 @@ public class UriUtilityTests
 
         // Assert
         var expectedUri = new Uri(expectedUrl);
-        Assert.AreEqual(expectedUri.ToString(), resultUri.ToString());
+        Assert.That(resultUri.ToString(), Is.EqualTo(expectedUri.ToString()));
     }
 
     // test directoryUrl true, trailingSlash false
@@ -64,7 +64,7 @@ public class UriUtilityTests
 
         // Assert
         var expectedUri = new Uri(expectedUrl, UriKind.Relative);
-        Assert.AreEqual(expectedUri.ToString(), resultUri.ToString());
+        Assert.That(resultUri.ToString(), Is.EqualTo(expectedUri.ToString()));
     }
 
     [TestCase("/", "/", "/")]
@@ -83,7 +83,7 @@ public class UriUtilityTests
         var resultUrl = uriUtility.ToAbsolute(sourceUrl);
 
         // Assert
-        Assert.AreEqual(expectedUrl, resultUrl);
+        Assert.That(resultUrl, Is.EqualTo(expectedUrl));
     }
 
     [TestCase("/", "/", "/")]
@@ -102,7 +102,7 @@ public class UriUtilityTests
         var resultUrl = uriUtility.ToAppRelative(sourceUrl);
 
         // Assert
-        Assert.AreEqual(expectedUrl, resultUrl);
+        Assert.That(resultUrl, Is.EqualTo(expectedUrl));
     }
 
     private UriUtility BuildUriUtility(string virtualPath)

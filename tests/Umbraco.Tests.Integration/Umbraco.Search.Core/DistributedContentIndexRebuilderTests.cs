@@ -94,7 +94,7 @@ public class DistributedContentIndexRebuilderTests : TestBase
 
         DistributedContentIndexRebuilder.Rebuild(IndexAliases.DraftContent);
 
-        Assert.That(IndexerAndSearcher.Dump(IndexAliases.DraftContent).Count, Is.EqualTo(5));
+        Assert.That(IndexerAndSearcher.Dump(IndexAliases.DraftContent), Has.Count.EqualTo(5));
     }
 
     [Test]
@@ -104,7 +104,7 @@ public class DistributedContentIndexRebuilderTests : TestBase
 
         DistributedContentIndexRebuilder.Rebuild(IndexAliases.PublishedContent);
 
-        Assert.That(IndexerAndSearcher.Dump(IndexAliases.PublishedContent).Count, Is.EqualTo(5));
+        Assert.That(IndexerAndSearcher.Dump(IndexAliases.PublishedContent), Has.Count.EqualTo(5));
     }
 
     [Test]
@@ -114,7 +114,7 @@ public class DistributedContentIndexRebuilderTests : TestBase
 
         DistributedContentIndexRebuilder.Rebuild(IndexAliases.Media);
 
-        Assert.That(IndexerAndSearcher.Dump(IndexAliases.Media).Count, Is.EqualTo(5));
+        Assert.That(IndexerAndSearcher.Dump(IndexAliases.Media), Has.Count.EqualTo(5));
     }
 
     [Test]
@@ -124,6 +124,6 @@ public class DistributedContentIndexRebuilderTests : TestBase
 
         DistributedContentIndexRebuilder.Rebuild(IndexAliases.Member);
 
-        Assert.That(IndexerAndSearcher.Dump(IndexAliases.Member).Count, Is.EqualTo(5));
+        Assert.That(IndexerAndSearcher.Dump(IndexAliases.Member), Has.Count.EqualTo(5));
     }
 }

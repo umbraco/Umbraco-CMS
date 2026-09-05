@@ -20,7 +20,7 @@ public class UmbracoPlanTests
         // InitialState is documented as the final migration state of 9.4.
         SemVersion? result = plan.GetVersionForState(plan.InitialState);
 
-        Assert.AreEqual(new SemVersion(16, 4, 0), result);
+        Assert.That(result, Is.EqualTo(new SemVersion(16, 4, 0)));
     }
 
     [Test]
@@ -28,7 +28,7 @@ public class UmbracoPlanTests
     {
         UmbracoPlan plan = CreateUmbracoPlan();
 
-        Assert.IsNull(plan.GetVersionForState(null));
+        Assert.That(plan.GetVersionForState(null), Is.Null);
     }
 
     [Test]
@@ -36,7 +36,7 @@ public class UmbracoPlanTests
     {
         UmbracoPlan plan = CreateUmbracoPlan();
 
-        Assert.IsNull(plan.GetVersionForState(string.Empty));
+        Assert.That(plan.GetVersionForState(string.Empty), Is.Null);
     }
 
     [Test]
@@ -44,7 +44,7 @@ public class UmbracoPlanTests
     {
         UmbracoPlan plan = CreateUmbracoPlan();
 
-        Assert.IsNull(plan.GetVersionForState("{00000000-0000-0000-0000-000000000000}"));
+        Assert.That(plan.GetVersionForState("{00000000-0000-0000-0000-000000000000}"), Is.Null);
     }
 
     [Test]
@@ -55,7 +55,7 @@ public class UmbracoPlanTests
         // Last migration state of the v17.2.0 block (AddDocumentUrlAlias).
         SemVersion? result = plan.GetVersionForState("{A7B8C9D0-E1F2-4A5B-8C7D-9E0F1A2B3C4D}");
 
-        Assert.AreEqual(new SemVersion(17, 2, 0), result);
+        Assert.That(result, Is.EqualTo(new SemVersion(17, 2, 0)));
     }
 
     [Test]
@@ -66,7 +66,7 @@ public class UmbracoPlanTests
         // A v17.3.0 migration state (PopulateSortableValueForDatePropertyData).
         SemVersion? result = plan.GetVersionForState("{6748CB56-CC16-49F0-BA91-B8ECE31BF456}");
 
-        Assert.AreEqual(new SemVersion(17, 3, 0), result);
+        Assert.That(result, Is.EqualTo(new SemVersion(17, 3, 0)));
     }
 
     [Test]
@@ -79,7 +79,7 @@ public class UmbracoPlanTests
         // Since NoopMigration has no version namespace, the last real version (13.5.0) carries forward.
         SemVersion? result = plan.GetVersionForState("{419827A0-4FCE-464B-A8F3-247C6092AF55}");
 
-        Assert.AreEqual(new SemVersion(13, 5, 0), result);
+        Assert.That(result, Is.EqualTo(new SemVersion(13, 5, 0)));
     }
 
     [Test]
@@ -91,7 +91,7 @@ public class UmbracoPlanTests
         // First migration in v17.0.0 block (AddGuidsToAuditEntries)
         SemVersion? result = plan.GetVersionForState("{17D5F6CA-CEB8-462A-AF86-4B9C3BF91CF1}");
 
-        Assert.AreEqual(new SemVersion(17, 0, 0), result);
+        Assert.That(result, Is.EqualTo(new SemVersion(17, 0, 0)));
     }
 
     [Test]
@@ -101,7 +101,7 @@ public class UmbracoPlanTests
 
         SemVersion? result = plan.GetVersionForState(plan.FinalState);
 
-        Assert.IsNotNull(result);
+        Assert.That(result, Is.Not.Null);
     }
 
     [Test]
@@ -130,7 +130,7 @@ public class UmbracoPlanTests
             }
         }
 
-        Assert.IsEmpty(violations, $"Migration types with non-standard namespaces:\n{string.Join("\n", violations)}");
+        Assert.That(violations, Is.Empty, $"Migration types with non-standard namespaces:\n{string.Join("\n", violations)}");
     }
 
     private static UmbracoPlan CreateUmbracoPlan()

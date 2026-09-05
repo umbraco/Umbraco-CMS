@@ -2,6 +2,7 @@ using System.Data.Common;
 using Microsoft.Data.SqlClient;
 using Microsoft.Data.Sqlite;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using Umbraco.Cms.Infrastructure.Persistence;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Persistence;
@@ -32,12 +33,12 @@ public class CommandTimeoutResolverTests
 
     [Test]
     public void Cannot_Get_Configured_Command_Timeout_Without_Provider()
-        => Assert.IsNull(CommandTimeoutResolver.GetConfiguredCommandTimeout(null, "Server=.;Database=x"));
+        => Assert.That(CommandTimeoutResolver.GetConfiguredCommandTimeout(null, "Server=.;Database=x"), Is.Null);
 
     [Test]
     [TestCase(null)]
     [TestCase("")]
     [TestCase("   ")]
     public void Cannot_Get_Configured_Command_Timeout_Without_Connection_String(string connectionString)
-        => Assert.IsNull(CommandTimeoutResolver.GetConfiguredCommandTimeout(SqlServer, connectionString));
+        => Assert.That(CommandTimeoutResolver.GetConfiguredCommandTimeout(SqlServer, connectionString), Is.Null);
 }

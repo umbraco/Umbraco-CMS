@@ -46,7 +46,7 @@ public class CropWebProcessorTests
 
         new CropWebProcessor().Process(formattedImage, logger, commands, parser, culture);
 
-        Assert.AreEqual(width, image.Width);
-        Assert.AreEqual(height, image.Height);
+        Assert.That(image.Width, Is.EqualTo(width));
+        Assert.That(image.Height, Is.EqualTo(height));
     }
 }

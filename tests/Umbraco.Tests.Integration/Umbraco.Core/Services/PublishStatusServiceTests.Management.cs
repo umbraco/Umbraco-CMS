@@ -17,21 +17,21 @@ internal sealed partial class PublishStatusServiceTests
 
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(sut.IsPublished(Textpage.Key, DefaultCulture));
-            Assert.IsFalse(sut.IsPublished(Subpage2.Key, DefaultCulture));
-            Assert.IsFalse(sut.IsPublished(Subpage.Key, DefaultCulture));
-            Assert.IsFalse(sut.IsPublished(Subpage2.Key, DefaultCulture));
-            Assert.IsFalse(sut.IsPublished(Subpage3.Key, DefaultCulture));
+            Assert.That(sut.IsPublished(Textpage.Key, DefaultCulture), Is.False);
+            Assert.That(sut.IsPublished(Subpage2.Key, DefaultCulture), Is.False);
+            Assert.That(sut.IsPublished(Subpage.Key, DefaultCulture), Is.False);
+            Assert.That(sut.IsPublished(Subpage2.Key, DefaultCulture), Is.False);
+            Assert.That(sut.IsPublished(Subpage3.Key, DefaultCulture), Is.False);
 
-            Assert.IsFalse(sut.IsPublished(Trashed.Key, DefaultCulture));
+            Assert.That(sut.IsPublished(Trashed.Key, DefaultCulture), Is.False);
 
-            Assert.IsFalse(sut.IsPublished(Textpage.Key, UnusedCulture));
-            Assert.IsFalse(sut.IsPublished(Subpage2.Key, UnusedCulture));
-            Assert.IsFalse(sut.IsPublished(Subpage.Key, UnusedCulture));
-            Assert.IsFalse(sut.IsPublished(Subpage2.Key, UnusedCulture));
-            Assert.IsFalse(sut.IsPublished(Subpage3.Key, UnusedCulture));
+            Assert.That(sut.IsPublished(Textpage.Key, UnusedCulture), Is.False);
+            Assert.That(sut.IsPublished(Subpage2.Key, UnusedCulture), Is.False);
+            Assert.That(sut.IsPublished(Subpage.Key, UnusedCulture), Is.False);
+            Assert.That(sut.IsPublished(Subpage2.Key, UnusedCulture), Is.False);
+            Assert.That(sut.IsPublished(Subpage3.Key, UnusedCulture), Is.False);
 
-            Assert.IsFalse(sut.IsPublished(Trashed.Key, UnusedCulture));
+            Assert.That(sut.IsPublished(Trashed.Key, UnusedCulture), Is.False);
         });
 
         // Act
@@ -40,22 +40,22 @@ internal sealed partial class PublishStatusServiceTests
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(publishResults.All(x => x.Result == PublishResultType.SuccessPublish));
-            Assert.IsTrue(sut.IsPublished(Textpage.Key, DefaultCulture));
-            Assert.IsTrue(sut.IsPublished(Subpage2.Key, DefaultCulture));
-            Assert.IsTrue(sut.IsPublished(Subpage.Key, DefaultCulture));
-            Assert.IsTrue(sut.IsPublished(Subpage2.Key, DefaultCulture));
-            Assert.IsTrue(sut.IsPublished(Subpage3.Key, DefaultCulture));
+            Assert.That(publishResults.All(x => x.Result == PublishResultType.SuccessPublish), Is.True);
+            Assert.That(sut.IsPublished(Textpage.Key, DefaultCulture), Is.True);
+            Assert.That(sut.IsPublished(Subpage2.Key, DefaultCulture), Is.True);
+            Assert.That(sut.IsPublished(Subpage.Key, DefaultCulture), Is.True);
+            Assert.That(sut.IsPublished(Subpage2.Key, DefaultCulture), Is.True);
+            Assert.That(sut.IsPublished(Subpage3.Key, DefaultCulture), Is.True);
 
-            Assert.IsFalse(sut.IsPublished(Trashed.Key, DefaultCulture));
+            Assert.That(sut.IsPublished(Trashed.Key, DefaultCulture), Is.False);
 
-            Assert.IsFalse(sut.IsPublished(Textpage.Key, UnusedCulture));
-            Assert.IsFalse(sut.IsPublished(Subpage2.Key, UnusedCulture));
-            Assert.IsFalse(sut.IsPublished(Subpage.Key, UnusedCulture));
-            Assert.IsFalse(sut.IsPublished(Subpage2.Key, UnusedCulture));
-            Assert.IsFalse(sut.IsPublished(Subpage3.Key, UnusedCulture));
+            Assert.That(sut.IsPublished(Textpage.Key, UnusedCulture), Is.False);
+            Assert.That(sut.IsPublished(Subpage2.Key, UnusedCulture), Is.False);
+            Assert.That(sut.IsPublished(Subpage.Key, UnusedCulture), Is.False);
+            Assert.That(sut.IsPublished(Subpage2.Key, UnusedCulture), Is.False);
+            Assert.That(sut.IsPublished(Subpage3.Key, UnusedCulture), Is.False);
 
-            Assert.IsFalse(sut.IsPublished(Trashed.Key, UnusedCulture));
+            Assert.That(sut.IsPublished(Trashed.Key, UnusedCulture), Is.False);
         });
     }
 
@@ -69,16 +69,16 @@ internal sealed partial class PublishStatusServiceTests
             GetRequiredService<ILanguageService>(),
             GetRequiredService<IDocumentNavigationQueryService>());
 
-        Assert.IsFalse(sut.IsPublished(Textpage.Key, DefaultCulture));
+        Assert.That(sut.IsPublished(Textpage.Key, DefaultCulture), Is.False);
 
         // Act
         var publishResults = ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
         await sut.AddOrUpdateStatusWithDescendantsAsync(Textpage.Key, CancellationToken.None);
 
-        Assert.IsTrue(sut.IsPublished(Textpage.Key, DefaultCulture));
-        Assert.IsTrue(sut.IsPublished(Subpage.Key, DefaultCulture)); // Updated due to being an descendant
-        Assert.IsFalse(sut.IsPublished(Textpage.Key, UnusedCulture)); // Do not exist
-        Assert.IsFalse(sut.IsPublished(Subpage.Key, UnusedCulture)); // Do not exist
+        Assert.That(sut.IsPublished(Textpage.Key, DefaultCulture), Is.True);
+        Assert.That(sut.IsPublished(Subpage.Key, DefaultCulture), Is.True); // Updated due to being an descendant
+        Assert.That(sut.IsPublished(Textpage.Key, UnusedCulture), Is.False); // Do not exist
+        Assert.That(sut.IsPublished(Subpage.Key, UnusedCulture), Is.False); // Do not exist
     }
 
     [Test]
@@ -91,16 +91,16 @@ internal sealed partial class PublishStatusServiceTests
             GetRequiredService<ILanguageService>(),
             GetRequiredService<IDocumentNavigationQueryService>());
 
-        Assert.IsFalse(sut.IsPublished(Textpage.Key, DefaultCulture));
+        Assert.That(sut.IsPublished(Textpage.Key, DefaultCulture), Is.False);
 
         // Act
         var publishResults = ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
         await sut.AddOrUpdateStatusAsync(Textpage.Key, CancellationToken.None);
 
-        Assert.IsTrue(sut.IsPublished(Textpage.Key, DefaultCulture));
-        Assert.IsFalse(sut.IsPublished(Subpage.Key, DefaultCulture)); // Not updated
-        Assert.IsFalse(sut.IsPublished(Textpage.Key, UnusedCulture)); // Do not exist
-        Assert.IsFalse(sut.IsPublished(Subpage.Key, UnusedCulture)); // Do not exist
+        Assert.That(sut.IsPublished(Textpage.Key, DefaultCulture), Is.True);
+        Assert.That(sut.IsPublished(Subpage.Key, DefaultCulture), Is.False); // Not updated
+        Assert.That(sut.IsPublished(Textpage.Key, UnusedCulture), Is.False); // Do not exist
+        Assert.That(sut.IsPublished(Subpage.Key, UnusedCulture), Is.False); // Do not exist
     }
 
     [Test]

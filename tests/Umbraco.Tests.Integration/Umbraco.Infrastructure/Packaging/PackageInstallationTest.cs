@@ -32,9 +32,9 @@ internal sealed class PackageInstallationTest : UmbracoIntegrationTest
         var package = PackageInstallation.ReadPackage(XDocument.Load(fileStream));
         Assert.Multiple(() =>
         {
-            Assert.IsNotNull(package);
-            Assert.AreEqual("Document Type Picker", package.Name);
-            Assert.AreEqual(1, package.DataTypes.Count());
+            Assert.That(package, Is.Not.Null);
+            Assert.That(package.Name, Is.EqualTo("Document Type Picker"));
+            Assert.That(package.DataTypes.Count(), Is.EqualTo(1));
         });
     }
 
@@ -47,12 +47,12 @@ internal sealed class PackageInstallationTest : UmbracoIntegrationTest
         var package = PackageInstallation.ReadPackage(XDocument.Load(fileStream));
         Assert.Multiple(() =>
         {
-            Assert.IsNotNull(package);
-            Assert.AreEqual("Hello", package.Name);
-            Assert.AreEqual(1, package.Documents.Count());
-            Assert.AreEqual(1, package.DocumentTypes.Count());
-            Assert.AreEqual(1, package.Templates.Count());
-            Assert.AreEqual(1, package.DataTypes.Count());
+            Assert.That(package, Is.Not.Null);
+            Assert.That(package.Name, Is.EqualTo("Hello"));
+            Assert.That(package.Documents.Count(), Is.EqualTo(1));
+            Assert.That(package.DocumentTypes.Count(), Is.EqualTo(1));
+            Assert.That(package.Templates.Count(), Is.EqualTo(1));
+            Assert.That(package.DataTypes.Count(), Is.EqualTo(1));
         });
     }
 
@@ -74,12 +74,12 @@ internal sealed class PackageInstallationTest : UmbracoIntegrationTest
         var dataType = package.DataTypes.First();
         Assert.Multiple(() =>
         {
-            Assert.AreEqual("Document Type Picker", package.Name);
-            Assert.AreEqual("3593d8e7-8b35-47b9-beda-5e830ca8c93c", dataType.LastAttribute?.Value);
-            Assert.AreEqual("Document Type Picker", dataType.FirstAttribute?.Value);
-            Assert.IsNotNull(preInstallWarnings);
-            Assert.AreEqual(0, preInstallWarnings.ConflictingStylesheets.Count());
-            Assert.AreEqual(0, preInstallWarnings.ConflictingTemplates.Count());
+            Assert.That(package.Name, Is.EqualTo("Document Type Picker"));
+            Assert.That(dataType.LastAttribute?.Value, Is.EqualTo("3593d8e7-8b35-47b9-beda-5e830ca8c93c"));
+            Assert.That(dataType.FirstAttribute?.Value, Is.EqualTo("Document Type Picker"));
+            Assert.That(preInstallWarnings, Is.Not.Null);
+            Assert.That(preInstallWarnings.ConflictingStylesheets.Count(), Is.EqualTo(0));
+            Assert.That(preInstallWarnings.ConflictingTemplates.Count(), Is.EqualTo(0));
         });
     }
 
@@ -92,9 +92,9 @@ internal sealed class PackageInstallationTest : UmbracoIntegrationTest
 
         var summary = PackageInstallation.InstallPackageData(package, -1, out var def);
 
-        Assert.AreEqual(1, summary.DataTypesInstalled.Count());
+        Assert.That(summary.DataTypesInstalled.Count(), Is.EqualTo(1));
 
         // make sure the def is updated too
-        Assert.AreEqual(summary.DataTypesInstalled.Count(), def.DataTypes.Count);
+        Assert.That(def.DataTypes, Has.Count.EqualTo(summary.DataTypesInstalled.Count()));
     }
 }

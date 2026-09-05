@@ -23,7 +23,7 @@ public class UriExtensionsTests
     {
         var source = new Uri(input);
         var output = source.Rewrite(path);
-        Assert.AreEqual(expected, output.ToString());
+        Assert.That(output.ToString(), Is.EqualTo(expected));
     }
 
     [TestCase("http://www.domain.com/", "path/to/page/", typeof(ArgumentException))]
@@ -48,7 +48,7 @@ public class UriExtensionsTests
     {
         var source = new Uri(input);
         var output = source.Rewrite(path, query);
-        Assert.AreEqual(expected, output.ToString());
+        Assert.That(output.ToString(), Is.EqualTo(expected));
     }
 
     [TestCase("http://www.domain.com/", "path/to/page/", "", typeof(ArgumentException))]
@@ -79,7 +79,7 @@ public class UriExtensionsTests
     {
         var source = new Uri(input, UriKind.RelativeOrAbsolute);
         var output = source.GetSafeAbsolutePath();
-        Assert.AreEqual(expected, output);
+        Assert.That(output, Is.EqualTo(expected));
     }
 
     [TestCase("http://www.domain.com/foo/bar%20nix", "/foo/bar nix")]
@@ -87,7 +87,7 @@ public class UriExtensionsTests
     {
         var source = new Uri(input, UriKind.RelativeOrAbsolute);
         var output = source.GetAbsolutePathDecoded();
-        Assert.AreEqual(expected, output);
+        Assert.That(output, Is.EqualTo(expected));
     }
 
     [TestCase("http://www.domain.com/foo/bar%20nix", "/foo/bar nix")]
@@ -96,7 +96,7 @@ public class UriExtensionsTests
     {
         var source = new Uri(input, UriKind.RelativeOrAbsolute);
         var output = source.GetSafeAbsolutePathDecoded();
-        Assert.AreEqual(expected, output);
+        Assert.That(output, Is.EqualTo(expected));
     }
 
     [TestCase("http://www.domain.com/path/to/page", "http://www.domain.com/path/to/page/")]
@@ -108,7 +108,7 @@ public class UriExtensionsTests
     {
         var source = new Uri(input);
         var output = source.EndPathWithSlash();
-        Assert.AreEqual(expected, output.ToString());
+        Assert.That(output.ToString(), Is.EqualTo(expected));
     }
 
     [TestCase("http://www.domain.com/path/to/page", "http://www.domain.com/path/to/page")]
@@ -120,7 +120,7 @@ public class UriExtensionsTests
     {
         var source = new Uri(input);
         var output = source.TrimPathEndSlash();
-        Assert.AreEqual(expected, output.ToString());
+        Assert.That(output.ToString(), Is.EqualTo(expected));
     }
 
     [TestCase("/foo/bar", "http://www.domain.com", "http://www.domain.com/foo/bar")]
@@ -133,7 +133,7 @@ public class UriExtensionsTests
         var source = new Uri(input, UriKind.Relative);
         var absolute = new Uri(reference);
         var output = source.MakeAbsolute(absolute);
-        Assert.AreEqual(expected, output.ToString());
+        Assert.That(output.ToString(), Is.EqualTo(expected));
     }
 
     [TestCase("https://example.com/media/image.jpg", "jpg")]
@@ -145,7 +145,7 @@ public class UriExtensionsTests
     {
         var source = new Uri(input, UriKind.RelativeOrAbsolute);
         var output = source.GetFileExtension();
-        Assert.AreEqual(expected, output);
+        Assert.That(output, Is.EqualTo(expected));
     }
 
     [TestCase("http://www.domain.com/path/to/page", "http://www.domain.com/path/to/page")]
@@ -164,6 +164,6 @@ public class UriExtensionsTests
     {
         var source = new Uri(input);
         var output = source.WithoutPort();
-        Assert.AreEqual(expected, output.ToString());
+        Assert.That(output.ToString(), Is.EqualTo(expected));
     }
 }

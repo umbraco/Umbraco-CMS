@@ -62,8 +62,8 @@ public class ContentTypeServiceExtensionsTests
                 new[] { "blah" })
             .Results.Where(x => x.Allowed).Select(x => x.Composition).ToArray();
 
-        Assert.AreEqual(1, availableTypes.Count());
-        Assert.AreEqual(ct4.Id, availableTypes.ElementAt(0).Id);
+        Assert.That(availableTypes.Count(), Is.EqualTo(1));
+        Assert.That(availableTypes.ElementAt(0).Id, Is.EqualTo(ct4.Id));
     }
 
     [Test]
@@ -107,8 +107,8 @@ public class ContentTypeServiceExtensionsTests
                 new[] { "title" })
             .Results.Where(x => x.Allowed).Select(x => x.Composition).ToArray();
 
-        Assert.AreEqual(1, availableTypes.Count());
-        Assert.AreEqual(ct4.Id, availableTypes.ElementAt(0).Id);
+        Assert.That(availableTypes.Count(), Is.EqualTo(1));
+        Assert.That(availableTypes.ElementAt(0).Id, Is.EqualTo(ct4.Id));
     }
 
     [Test]
@@ -151,8 +151,8 @@ public class ContentTypeServiceExtensionsTests
                 new[] { ct2.Alias })
             .Results.Where(x => x.Allowed).Select(x => x.Composition).ToArray();
 
-        Assert.AreEqual(1, availableTypes.Count());
-        Assert.AreEqual(ct4.Id, availableTypes.ElementAt(0).Id);
+        Assert.That(availableTypes.Count(), Is.EqualTo(1));
+        Assert.That(availableTypes.ElementAt(0).Id, Is.EqualTo(ct4.Id));
     }
 
     [Test]
@@ -172,9 +172,9 @@ public class ContentTypeServiceExtensionsTests
                 new[] { ct1, ct2, ct3 })
             .Results.Where(x => x.Allowed).Select(x => x.Composition).ToArray();
 
-        Assert.AreEqual(2, availableTypes.Count());
-        Assert.AreEqual(ct2.Id, availableTypes.ElementAt(0).Id);
-        Assert.AreEqual(ct3.Id, availableTypes.ElementAt(1).Id);
+        Assert.That(availableTypes.Count(), Is.EqualTo(2));
+        Assert.That(availableTypes.ElementAt(0).Id, Is.EqualTo(ct2.Id));
+        Assert.That(availableTypes.ElementAt(1).Id, Is.EqualTo(ct3.Id));
     }
 
     // Being inherited from (a child holds its parent in its own ContentTypeComposition) must not be
@@ -197,8 +197,8 @@ public class ContentTypeServiceExtensionsTests
             .Results.Where(x => x.Allowed).Select(x => x.Composition).ToArray();
 
         // ct3 is available as a composition; ct2 (the inheriting child) is not offered
-        Assert.AreEqual(1, availableTypes.Length);
-        Assert.AreEqual(ct3.Id, availableTypes.Single().Id);
+        Assert.That(availableTypes, Has.Length.EqualTo(1));
+        Assert.That(availableTypes.Single().Id, Is.EqualTo(ct3.Id));
     }
 
     // This shows that a nested comp is not allowed
@@ -220,7 +220,7 @@ public class ContentTypeServiceExtensionsTests
             ct1,
             new[] { ct1, ct2, ct3 }).Results;
 
-        Assert.AreEqual(0, availableTypes.Count());
+        Assert.That(availableTypes.Count(), Is.EqualTo(0));
     }
 
     // Being inherited from does not free a type that is ALSO used as a true composition - the composition
@@ -242,7 +242,7 @@ public class ContentTypeServiceExtensionsTests
             ct1,
             new[] { ct1, ct2, ct3 }).Results;
 
-        Assert.AreEqual(0, availableTypes.Count());
+        Assert.That(availableTypes.Count(), Is.EqualTo(0));
     }
 
     [Test]
@@ -264,8 +264,8 @@ public class ContentTypeServiceExtensionsTests
                 new[] { ct1, ct2, ct3 })
             .Results.Where(x => x.Allowed).Select(x => x.Composition).ToArray();
 
-        Assert.AreEqual(1, availableTypes.Count());
-        Assert.AreEqual(ct3.Id, availableTypes.Single().Id);
+        Assert.That(availableTypes.Count(), Is.EqualTo(1));
+        Assert.That(availableTypes.Single().Id, Is.EqualTo(ct3.Id));
     }
 
     [Test]
@@ -287,9 +287,9 @@ public class ContentTypeServiceExtensionsTests
                 new[] { ct1, ct2, ct3 })
             .Results.Where(x => x.Allowed).Select(x => x.Composition).ToArray();
 
-        Assert.AreEqual(2, availableTypes.Count());
-        Assert.AreEqual(ct2.Id, availableTypes.ElementAt(0).Id);
-        Assert.AreEqual(ct3.Id, availableTypes.ElementAt(1).Id);
+        Assert.That(availableTypes.Count(), Is.EqualTo(2));
+        Assert.That(availableTypes.ElementAt(0).Id, Is.EqualTo(ct2.Id));
+        Assert.That(availableTypes.ElementAt(1).Id, Is.EqualTo(ct3.Id));
     }
 
     [Test]
@@ -314,10 +314,10 @@ public class ContentTypeServiceExtensionsTests
                 new[] { ct1, ct2, ct3 })
             .Results.Where(x => x.Allowed).Select(x => x.Composition).ToArray();
 
-        Assert.AreEqual(3, availableTypes.Count());
-        Assert.AreEqual(ct2.Id, availableTypes.ElementAt(0).Id);
-        Assert.AreEqual(ct3.Id, availableTypes.ElementAt(1).Id);
-        Assert.AreEqual(ct4.Id, availableTypes.ElementAt(2).Id);
+        Assert.That(availableTypes.Count(), Is.EqualTo(3));
+        Assert.That(availableTypes.ElementAt(0).Id, Is.EqualTo(ct2.Id));
+        Assert.That(availableTypes.ElementAt(1).Id, Is.EqualTo(ct3.Id));
+        Assert.That(availableTypes.ElementAt(2).Id, Is.EqualTo(ct4.Id));
     }
 
     // An already-selected composition carrying properties must not self-collide just because a descendant
@@ -352,6 +352,6 @@ public class ContentTypeServiceExtensionsTests
             new IContentTypeComposition[] { composition, parent, child }).Results;
 
         var compositionResult = results.Single(x => x.Composition.Id == composition.Id);
-        Assert.IsTrue(compositionResult.Allowed);
+        Assert.That(compositionResult.Allowed, Is.True);
     }
 }

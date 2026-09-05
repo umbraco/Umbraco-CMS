@@ -17,21 +17,21 @@ public partial class UserStartNodeEntitiesServiceTests
             .ToArray();
 
         // expected total is 2, because only two items at root ("1" amd "10") are allowed
-        Assert.AreEqual(2, roots.Length);
+        Assert.That(roots, Has.Length.EqualTo(2));
         Assert.Multiple(() =>
         {
             // first and last content items are the ones allowed
-            Assert.AreEqual(ItemsByName["1"].Key, roots[0].Entity.Key);
-            Assert.AreEqual(ItemsByName["5"].Key, roots[1].Entity.Key);
+            Assert.That(roots[0].Entity.Key, Is.EqualTo(ItemsByName["1"].Key));
+            Assert.That(roots[1].Entity.Key, Is.EqualTo(ItemsByName["5"].Key));
 
             // explicitly verify the entity sort order, both so we know sorting works,
             // and so we know it's actually the first and last item at root
-            Assert.AreEqual(0, roots[0].Entity.SortOrder);
-            Assert.AreEqual(4, roots[1].Entity.SortOrder);
+            Assert.That(roots[0].Entity.SortOrder, Is.EqualTo(0));
+            Assert.That(roots[1].Entity.SortOrder, Is.EqualTo(4));
 
             // both are allowed (they are the actual start nodes)
-            Assert.IsTrue(roots[0].HasAccess);
-            Assert.IsTrue(roots[1].HasAccess);
+            Assert.That(roots[0].HasAccess, Is.True);
+            Assert.That(roots[1].HasAccess, Is.True);
         });
     }
 
@@ -46,16 +46,16 @@ public partial class UserStartNodeEntitiesServiceTests
                 contentStartNodeIds)
             .ToArray();
 
-        Assert.AreEqual(3, roots.Length);
+        Assert.That(roots, Has.Length.EqualTo(3));
         Assert.Multiple(() =>
         {
             // the three start nodes are the children of the "1", "3" and "5" roots, respectively, so these are expected as roots
-            Assert.AreEqual(ItemsByName["1"].Key, roots[0].Entity.Key);
-            Assert.AreEqual(ItemsByName["3"].Key, roots[1].Entity.Key);
-            Assert.AreEqual(ItemsByName["5"].Key, roots[2].Entity.Key);
+            Assert.That(roots[0].Entity.Key, Is.EqualTo(ItemsByName["1"].Key));
+            Assert.That(roots[1].Entity.Key, Is.EqualTo(ItemsByName["3"].Key));
+            Assert.That(roots[2].Entity.Key, Is.EqualTo(ItemsByName["5"].Key));
 
             // all are disallowed - only the children (the actual start nodes) are allowed
-            Assert.IsTrue(roots.All(r => r.HasAccess is false));
+            Assert.That(roots.All(r => r.HasAccess is false), Is.True);
         });
     }
 
@@ -70,16 +70,16 @@ public partial class UserStartNodeEntitiesServiceTests
                 contentStartNodeIds)
             .ToArray();
 
-        Assert.AreEqual(3, roots.Length);
+        Assert.That(roots, Has.Length.EqualTo(3));
         Assert.Multiple(() =>
         {
             // the three start nodes are the grandchildren of the "1", "2" and "3" roots, respectively, so these are expected as roots
-            Assert.AreEqual(ItemsByName["1"].Key, roots[0].Entity.Key);
-            Assert.AreEqual(ItemsByName["2"].Key, roots[1].Entity.Key);
-            Assert.AreEqual(ItemsByName["3"].Key, roots[2].Entity.Key);
+            Assert.That(roots[0].Entity.Key, Is.EqualTo(ItemsByName["1"].Key));
+            Assert.That(roots[1].Entity.Key, Is.EqualTo(ItemsByName["2"].Key));
+            Assert.That(roots[2].Entity.Key, Is.EqualTo(ItemsByName["3"].Key));
 
             // all are disallowed - only the grandchildren (the actual start nodes) are allowed
-            Assert.IsTrue(roots.All(r => r.HasAccess is false));
+            Assert.That(roots.All(r => r.HasAccess is false), Is.True);
         });
     }
 }

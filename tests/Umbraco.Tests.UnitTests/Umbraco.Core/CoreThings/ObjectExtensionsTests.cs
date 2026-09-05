@@ -34,8 +34,8 @@ public class ObjectExtensionsTests
 #pragma warning disable CS0618 // Type or member is obsolete
         var result = input.AsEnumerableOfOne<string>();
 #pragma warning restore CS0618 // Type or member is obsolete
-        Assert.AreEqual(1, result.Count());
-        Assert.AreEqual("hello", result.First());
+        Assert.That(result.Count(), Is.EqualTo(1));
+        Assert.That(result.First(), Is.EqualTo("hello"));
     }
 
     [Test]
@@ -43,8 +43,8 @@ public class ObjectExtensionsTests
     {
         var list = new List<string> { "hello", "world", "awesome" };
         var result = list.TryConvertTo<IEnumerable<string>>();
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(3, result.Result.Count());
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result.Count(), Is.EqualTo(3));
     }
 
     [Test]
@@ -83,8 +83,8 @@ public class ObjectExtensionsTests
         {
             var result = testCase.Key.TryConvertTo<bool>();
 
-            Assert.IsTrue(result.Success, testCase.Key);
-            Assert.AreEqual(testCase.Value, result.Result, testCase.Key);
+            Assert.That(result.Success, Is.True, testCase.Key);
+            Assert.That(result.Result, Is.EqualTo(testCase.Value), testCase.Key);
         }
     }
 
@@ -104,32 +104,32 @@ public class ObjectExtensionsTests
 
         var result = date.TryConvertTo<DateTime>();
 
-        Assert.IsTrue(result.Success, date);
-        Assert.AreEqual(DateTime.Equals(dateTime.Date, result.Result.Date), outcome, date);
+        Assert.That(result.Success, Is.True, date);
+        Assert.That(outcome, Is.EqualTo(DateTime.Equals(dateTime.Date, result.Result.Date)), date);
     }
 
     [Test]
     public virtual void CanConvertBlankStringToNullDateTime()
     {
         var result = string.Empty.TryConvertTo<DateTime?>();
-        Assert.IsTrue(result.Success);
-        Assert.IsNull(result.Result);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result, Is.Null);
     }
 
     [Test]
     public virtual void CanConvertBlankStringToNullBool()
     {
         var result = string.Empty.TryConvertTo<bool?>();
-        Assert.IsTrue(result.Success);
-        Assert.IsNull(result.Result);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result, Is.Null);
     }
 
     [Test]
     public virtual void CanConvertBlankStringToDateTime()
     {
         var result = string.Empty.TryConvertTo<DateTime>();
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(DateTime.MinValue, result.Result);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result, Is.EqualTo(DateTime.MinValue));
     }
 
     [Test]
@@ -137,8 +137,8 @@ public class ObjectExtensionsTests
     {
         var result = new MyTestObject().TryConvertTo<string>();
 
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual("Hello world", result.Result);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result, Is.EqualTo("Hello world"));
     }
 
     [Test]
@@ -147,129 +147,129 @@ public class ObjectExtensionsTests
         var obj = new MyTestObject();
         var result = obj.TryConvertTo<object>();
 
-        Assert.AreEqual(obj, result.Result);
+        Assert.That(result.Result, Is.EqualTo(obj));
     }
 
     [Test]
     public void ConvertToIntegerTest()
     {
         var conv = "100".TryConvertTo<int>();
-        Assert.IsTrue(conv);
-        Assert.AreEqual(100, conv.Result);
+        Assert.That((bool)conv, Is.True);
+        Assert.That(conv.Result, Is.EqualTo(100));
 
         conv = "100.000".TryConvertTo<int>();
-        Assert.IsTrue(conv);
-        Assert.AreEqual(100, conv.Result);
+        Assert.That((bool)conv, Is.True);
+        Assert.That(conv.Result, Is.EqualTo(100));
 
         conv = "100,000".TryConvertTo<int>();
-        Assert.IsTrue(conv);
-        Assert.AreEqual(100, conv.Result);
+        Assert.That((bool)conv, Is.True);
+        Assert.That(conv.Result, Is.EqualTo(100));
 
         // oops
         conv = "100.001".TryConvertTo<int>();
-        Assert.IsTrue(conv);
-        Assert.AreEqual(100, conv.Result);
+        Assert.That((bool)conv, Is.True);
+        Assert.That(conv.Result, Is.EqualTo(100));
 
         conv = 100m.TryConvertTo<int>();
-        Assert.IsTrue(conv);
-        Assert.AreEqual(100, conv.Result);
+        Assert.That((bool)conv, Is.True);
+        Assert.That(conv.Result, Is.EqualTo(100));
 
         conv = 100.000m.TryConvertTo<int>();
-        Assert.IsTrue(conv);
-        Assert.AreEqual(100, conv.Result);
+        Assert.That((bool)conv, Is.True);
+        Assert.That(conv.Result, Is.EqualTo(100));
 
         // oops
         conv = 100.001m.TryConvertTo<int>();
-        Assert.IsTrue(conv);
-        Assert.AreEqual(100, conv.Result);
+        Assert.That((bool)conv, Is.True);
+        Assert.That(conv.Result, Is.EqualTo(100));
     }
 
     [Test]
     public void ConvertToDecimalTest()
     {
         var conv = "100".TryConvertTo<decimal>();
-        Assert.IsTrue(conv);
-        Assert.AreEqual(100m, conv.Result);
+        Assert.That((bool)conv, Is.True);
+        Assert.That(conv.Result, Is.EqualTo(100m));
 
         conv = "100.000".TryConvertTo<decimal>();
-        Assert.IsTrue(conv);
-        Assert.AreEqual(100m, conv.Result);
+        Assert.That((bool)conv, Is.True);
+        Assert.That(conv.Result, Is.EqualTo(100m));
 
         conv = "100,000".TryConvertTo<decimal>();
-        Assert.IsTrue(conv);
-        Assert.AreEqual(100m, conv.Result);
+        Assert.That((bool)conv, Is.True);
+        Assert.That(conv.Result, Is.EqualTo(100m));
 
         conv = "100.001".TryConvertTo<decimal>();
-        Assert.IsTrue(conv);
-        Assert.AreEqual(100.001m, conv.Result);
+        Assert.That((bool)conv, Is.True);
+        Assert.That(conv.Result, Is.EqualTo(100.001m));
 
         conv = 100m.TryConvertTo<decimal>();
-        Assert.IsTrue(conv);
-        Assert.AreEqual(100m, conv.Result);
+        Assert.That((bool)conv, Is.True);
+        Assert.That(conv.Result, Is.EqualTo(100m));
 
         conv = 100.000m.TryConvertTo<decimal>();
-        Assert.IsTrue(conv);
-        Assert.AreEqual(100m, conv.Result);
+        Assert.That((bool)conv, Is.True);
+        Assert.That(conv.Result, Is.EqualTo(100m));
 
         conv = 100.001m.TryConvertTo<decimal>();
-        Assert.IsTrue(conv);
-        Assert.AreEqual(100.001m, conv.Result);
+        Assert.That((bool)conv, Is.True);
+        Assert.That(conv.Result, Is.EqualTo(100.001m));
 
         conv = 100.TryConvertTo<decimal>();
-        Assert.IsTrue(conv);
-        Assert.AreEqual(100m, conv.Result);
+        Assert.That((bool)conv, Is.True);
+        Assert.That(conv.Result, Is.EqualTo(100m));
     }
 
     [Test]
     public void ConvertToNullableDecimalTest()
     {
         var conv = "100".TryConvertTo<decimal?>();
-        Assert.IsTrue(conv);
-        Assert.AreEqual(100m, conv.Result);
+        Assert.That((bool)conv, Is.True);
+        Assert.That(conv.Result, Is.EqualTo(100m));
 
         conv = "100.000".TryConvertTo<decimal?>();
-        Assert.IsTrue(conv);
-        Assert.AreEqual(100m, conv.Result);
+        Assert.That((bool)conv, Is.True);
+        Assert.That(conv.Result, Is.EqualTo(100m));
 
         conv = "100,000".TryConvertTo<decimal?>();
-        Assert.IsTrue(conv);
-        Assert.AreEqual(100m, conv.Result);
+        Assert.That((bool)conv, Is.True);
+        Assert.That(conv.Result, Is.EqualTo(100m));
 
         conv = "100.001".TryConvertTo<decimal?>();
-        Assert.IsTrue(conv);
-        Assert.AreEqual(100.001m, conv.Result);
+        Assert.That((bool)conv, Is.True);
+        Assert.That(conv.Result, Is.EqualTo(100.001m));
 
         conv = 100m.TryConvertTo<decimal?>();
-        Assert.IsTrue(conv);
-        Assert.AreEqual(100m, conv.Result);
+        Assert.That((bool)conv, Is.True);
+        Assert.That(conv.Result, Is.EqualTo(100m));
 
         conv = 100.000m.TryConvertTo<decimal?>();
-        Assert.IsTrue(conv);
-        Assert.AreEqual(100m, conv.Result);
+        Assert.That((bool)conv, Is.True);
+        Assert.That(conv.Result, Is.EqualTo(100m));
 
         conv = 100.001m.TryConvertTo<decimal?>();
-        Assert.IsTrue(conv);
-        Assert.AreEqual(100.001m, conv.Result);
+        Assert.That((bool)conv, Is.True);
+        Assert.That(conv.Result, Is.EqualTo(100.001m));
 
         conv = 100.TryConvertTo<decimal?>();
-        Assert.IsTrue(conv);
-        Assert.AreEqual(100m, conv.Result);
+        Assert.That((bool)conv, Is.True);
+        Assert.That(conv.Result, Is.EqualTo(100m));
     }
 
     [Test]
     public void ConvertToDateTimeTest()
     {
         var conv = "2016-06-07".TryConvertTo<DateTime>();
-        Assert.IsTrue(conv);
-        Assert.AreEqual(new DateTime(2016, 6, 7), conv.Result);
+        Assert.That((bool)conv, Is.True);
+        Assert.That(conv.Result, Is.EqualTo(new DateTime(2016, 6, 7)));
     }
 
     [Test]
     public void ConvertToNullableDateTimeTest()
     {
         var conv = "2016-06-07".TryConvertTo<DateTime?>();
-        Assert.IsTrue(conv);
-        Assert.AreEqual(new DateTime(2016, 6, 7), conv.Result);
+        Assert.That((bool)conv, Is.True);
+        Assert.That(conv.Result, Is.EqualTo(new DateTime(2016, 6, 7)));
     }
 
     [TestCase("d72f12a9-29db-42b4-9ffb-25a3ba4dcef5")]
@@ -277,8 +277,8 @@ public class ObjectExtensionsTests
     public void CanConvertToGuid(string guidValue)
     {
         var conv = guidValue.TryConvertTo<Guid>();
-        Assert.IsTrue(conv);
-        Assert.AreEqual(Guid.Parse(guidValue), conv.Result);
+        Assert.That((bool)conv, Is.True);
+        Assert.That(conv.Result, Is.EqualTo(Guid.Parse(guidValue)));
     }
 
     [TestCase("d72f12a9-29db-42b4-9ffb-25a3ba4dcef5")]
@@ -286,8 +286,8 @@ public class ObjectExtensionsTests
     public void CanConvertToNullableGuid(string guidValue)
     {
         var conv = guidValue.TryConvertTo<Guid?>();
-        Assert.IsTrue(conv);
-        Assert.AreEqual(Guid.Parse(guidValue), conv.Result);
+        Assert.That((bool)conv, Is.True);
+        Assert.That(conv.Result, Is.EqualTo(Guid.Parse(guidValue)));
     }
 
     [TestCase("d72f12a9-29db-42b4-9ffb-25a3ba4dcef5")]
@@ -296,8 +296,8 @@ public class ObjectExtensionsTests
     {
         StringValues stringValues = guidValue;
         var conv = stringValues.TryConvertTo<Guid?>();
-        Assert.IsTrue(conv);
-        Assert.AreEqual(Guid.Parse(guidValue), conv.Result);
+        Assert.That((bool)conv, Is.True);
+        Assert.That(conv.Result, Is.EqualTo(Guid.Parse(guidValue)));
     }
 
     [TestCase(10)]
@@ -309,8 +309,8 @@ public class ObjectExtensionsTests
     {
         StringValues stringValues = intValue.ToString();
         var conv = stringValues.TryConvertTo<int>();
-        Assert.IsTrue(conv);
-        Assert.AreEqual(intValue, conv.Result);
+        Assert.That((bool)conv, Is.True);
+        Assert.That(conv.Result, Is.EqualTo(intValue));
     }
 
     [Test]
@@ -318,8 +318,8 @@ public class ObjectExtensionsTests
     {
         StringValues stringValues = "This is a string";
         var conv = stringValues.TryConvertTo<string>();
-        Assert.IsTrue(conv);
-        Assert.AreEqual("This is a string", conv.Result);
+        Assert.That((bool)conv, Is.True);
+        Assert.That(conv.Result, Is.EqualTo("This is a string"));
     }
 
     [Test]
@@ -327,11 +327,11 @@ public class ObjectExtensionsTests
     {
         var dateTimeOffset = new DateTimeOffset(new DateOnly(2024, 07, 05), new TimeOnly(12, 30, 01, 02, 03), TimeSpan.Zero);
         var result = dateTimeOffset.TryConvertTo<DateTime>();
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(new DateTime(new DateOnly(2024, 07, 05), new TimeOnly(12, 30, 01, 02, 03)), result.Result);
-            Assert.AreEqual(DateTimeKind.Utc, result.Result.Kind);
+            Assert.That(result.Result, Is.EqualTo(new DateTime(new DateOnly(2024, 07, 05), new TimeOnly(12, 30, 01, 02, 03))));
+            Assert.That(result.Result.Kind, Is.EqualTo(DateTimeKind.Utc));
         });
     }
 
@@ -340,8 +340,8 @@ public class ObjectExtensionsTests
     {
         var dateTime = new DateTime(new DateOnly(2024, 07, 05), new TimeOnly(12, 30, 01, 02, 03), DateTimeKind.Utc);
         var result = dateTime.TryConvertTo<DateTimeOffset>();
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(new DateTimeOffset(new DateOnly(2024, 07, 05), new TimeOnly(12, 30, 01, 02, 03), TimeSpan.Zero), result.Result);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result, Is.EqualTo(new DateTimeOffset(new DateOnly(2024, 07, 05), new TimeOnly(12, 30, 01, 02, 03), TimeSpan.Zero)));
     }
 
     [Test]
@@ -349,11 +349,11 @@ public class ObjectExtensionsTests
     {
         var dateTimeOffset = new DateTimeOffset(new DateOnly(2024, 07, 05), new TimeOnly(12, 30, 01, 02, 03), TimeSpan.FromHours(2));
         var result = dateTimeOffset.TryConvertTo<DateTime>();
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(new DateTime(new DateOnly(2024, 07, 05), new TimeOnly(12, 30, 01, 02, 03)), result.Result);
-            Assert.AreEqual(DateTimeKind.Utc, result.Result.Kind);
+            Assert.That(result.Result, Is.EqualTo(new DateTime(new DateOnly(2024, 07, 05), new TimeOnly(12, 30, 01, 02, 03))));
+            Assert.That(result.Result.Kind, Is.EqualTo(DateTimeKind.Utc));
         });
     }
 
@@ -362,8 +362,8 @@ public class ObjectExtensionsTests
     {
         var dateTime = new DateTime(new DateOnly(2024, 07, 05), new TimeOnly(12, 30, 01, 02, 03), DateTimeKind.Local);
         var result = dateTime.TryConvertTo<DateTimeOffset>();
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(new DateTimeOffset(new DateOnly(2024, 07, 05), new TimeOnly(12, 30, 01, 02, 03), TimeSpan.Zero), result.Result);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result, Is.EqualTo(new DateTimeOffset(new DateOnly(2024, 07, 05), new TimeOnly(12, 30, 01, 02, 03), TimeSpan.Zero)));
     }
 
     [Test]
@@ -372,8 +372,8 @@ public class ObjectExtensionsTests
         var valueEditor = MockedValueEditors.CreateDataValueEditor(ValueTypes.Decimal);
 
         var result = valueEditor.TryConvertValueToCrlType(12.34d);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(12.34d, result.Result);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result, Is.EqualTo(12.34d));
     }
 
     [Test]
@@ -382,14 +382,14 @@ public class ObjectExtensionsTests
         var valueEditor = MockedValueEditors.CreateDataValueEditor(ValueTypes.Date);
 
         var result = valueEditor.TryConvertValueToCrlType(new DateTimeOffset(new DateOnly(2024, 07, 05), new TimeOnly(12, 30), TimeSpan.Zero));
-        Assert.IsTrue(result.Success);
-        Assert.IsTrue(result.Result is DateTime);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result is DateTime, Is.True);
 
         var dateTime = (DateTime)result.Result;
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(new DateTime(new DateOnly(2024, 07, 05), new TimeOnly(12, 30)), dateTime);
-            Assert.AreEqual(DateTimeKind.Utc, dateTime.Kind);
+            Assert.That(dateTime, Is.EqualTo(new DateTime(new DateOnly(2024, 07, 05), new TimeOnly(12, 30))));
+            Assert.That(dateTime.Kind, Is.EqualTo(DateTimeKind.Utc));
         });
     }
 

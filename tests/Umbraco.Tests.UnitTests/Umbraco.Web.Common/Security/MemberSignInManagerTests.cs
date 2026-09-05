@@ -153,7 +153,7 @@ public class MemberSignInManagerTests
         var actual = await sut.PasswordSignInAsync(fakeUser, password, isPersistent, lockoutOnFailure);
 
         // Assert
-        Assert.IsTrue(actual.Succeeded);
+        Assert.That(actual.Succeeded, Is.True);
     }
 
     [Test]
@@ -170,7 +170,7 @@ public class MemberSignInManagerTests
         var actual = await sut.PasswordSignInAsync(fakeUser, password, isPersistent, lockoutOnFailure);
 
         // Assert
-        Assert.IsFalse(actual.Succeeded);
+        Assert.That(actual.Succeeded, Is.False);
     }
 
     [Test]
@@ -297,7 +297,7 @@ public class MemberSignInManagerTests
         var actual = await sut.ExternalLoginSignInAsync(CreateExternalLoginInfo(provider), false);
 
         // Assert
-        Assert.AreSame(MemberSignInManager.AutoLinkSignInResult.FailedNoEmail, actual);
+        Assert.That(actual, Is.SameAs(MemberSignInManager.AutoLinkSignInResult.FailedNoEmail));
     }
 
     [Test]
@@ -315,7 +315,7 @@ public class MemberSignInManagerTests
         var actual = await sut.ExternalLoginSignInAsync(loginInfo, false);
 
         // Assert
-        Assert.AreSame(MemberSignInManager.AutoLinkSignInResult.FailedNoName, actual);
+        Assert.That(actual, Is.SameAs(MemberSignInManager.AutoLinkSignInResult.FailedNoName));
     }
 
     [Test]

@@ -23,8 +23,8 @@ public class JsonValueConverterTests : PropertyValueConverterTests
         var valueConverter = new JsonValueConverter(propertyEditors, Mock.Of<ILogger<JsonValueConverter>>());
         var inter = valueConverter.ConvertSourceToIntermediate(Mock.Of<IPublishedElement>(), propertyType, "{\"message\": \"Hello, JSON\"}", false);
         var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), propertyType, PropertyCacheLevel.Element, inter, false, false);
-        Assert.IsTrue(result is JsonNode);
+        Assert.That(result is JsonNode, Is.True);
         JsonNode jsonNode = (JsonNode)result;
-        Assert.AreEqual("Hello, JSON", jsonNode["message"]!.GetValue<string>());
+        Assert.That(jsonNode["message"]!.GetValue<string>(), Is.EqualTo("Hello, JSON"));
     }
 }

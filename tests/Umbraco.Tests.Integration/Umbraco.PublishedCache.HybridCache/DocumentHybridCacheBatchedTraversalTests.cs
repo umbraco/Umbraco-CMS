@@ -100,9 +100,9 @@ internal sealed class DocumentHybridCacheBatchedTraversalTests : UmbracoIntegrat
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(expectedChildCount, children.Count, "All published children should be returned.");
-            Assert.AreEqual(0, _countingRepository.SingleContentReads, "A cold traversal must not read one row per item.");
-            Assert.GreaterOrEqual(_countingRepository.BatchContentReads, 1, "A cold traversal must issue at least one batched read.");
+            Assert.That(children, Has.Count.EqualTo(expectedChildCount), "All published children should be returned.");
+            Assert.That(_countingRepository.SingleContentReads, Is.EqualTo(0), "A cold traversal must not read one row per item.");
+            Assert.That(_countingRepository.BatchContentReads, Is.GreaterThanOrEqualTo(1), "A cold traversal must issue at least one batched read.");
             AssertOrderedBySortOrder(children);
         });
     }
@@ -118,9 +118,9 @@ internal sealed class DocumentHybridCacheBatchedTraversalTests : UmbracoIntegrat
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(expectedDescendantCount, descendants.Count, "All published descendants should be returned.");
-            Assert.AreEqual(0, _countingRepository.SingleContentReads, "A cold traversal must not read one row per item.");
-            Assert.GreaterOrEqual(_countingRepository.BatchContentReads, 1, "A cold traversal must issue at least one batched read.");
+            Assert.That(descendants, Has.Count.EqualTo(expectedDescendantCount), "All published descendants should be returned.");
+            Assert.That(_countingRepository.SingleContentReads, Is.EqualTo(0), "A cold traversal must not read one row per item.");
+            Assert.That(_countingRepository.BatchContentReads, Is.GreaterThanOrEqualTo(1), "A cold traversal must issue at least one batched read.");
         });
     }
 
@@ -146,17 +146,19 @@ internal sealed class DocumentHybridCacheBatchedTraversalTests : UmbracoIntegrat
         GetRequiredService<IVariationContextAccessor>().VariationContext = new VariationContext(DefaultCulture);
 
         IPublishedContent? root = await PublishedContentCache.GetByIdAsync(Textpage.Key);
-        Assert.IsNotNull(root);
+        Assert.That(root, Is.Not.Null);
 
         // Sanity-check the precondition: the children are genuinely cold before the traversal runs, so
         // that a passing test cannot be a false green from a warm cache.
-        Assert.IsTrue(
+        Assert.That(
             NavigationQueryService.TryGetChildrenKeys(Textpage.Key, out IEnumerable<Guid> childKeys),
+            Is.True,
             "Navigation should know the children.");
         foreach (Guid childKey in childKeys)
         {
-            Assert.IsFalse(
+            Assert.That(
                 DocumentCacheService.TryGetCached(childKey, false, out _),
+                Is.False,
                 "Children must not be in the converted-content (L0) cache before the cold traversal.");
         }
 
@@ -168,9 +170,9 @@ internal sealed class DocumentHybridCacheBatchedTraversalTests : UmbracoIntegrat
     {
         for (var i = 1; i < items.Count; i++)
         {
-            Assert.GreaterOrEqual(
+            Assert.That(
                 items[i].SortOrder,
-                items[i - 1].SortOrder,
+                Is.GreaterThanOrEqualTo(items[i - 1].SortOrder),
                 "Children should be returned in sort order.");
         }
     }

@@ -42,17 +42,17 @@ internal sealed partial class MediaNavigationServiceTests
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(initialNodeExists);
+            Assert.That(initialNodeExists, Is.False);
 
             // Verify that the item is present in the navigation structure after a rebuild
-            Assert.IsTrue(nodeExists);
+            Assert.That(nodeExists, Is.True);
 
             // Verify that we have the same items as in the original built state of MediaNavigationService
-            Assert.AreEqual(originalParentKey, parentKeyFromRebuild);
-            CollectionAssert.AreEquivalent(originalChildrenKeys, childrenKeysFromRebuild);
-            CollectionAssert.AreEquivalent(originalDescendantsKeys, descendantsKeysFromRebuild);
-            CollectionAssert.AreEquivalent(originalAncestorsKeys, ancestorsKeysFromRebuild);
-            CollectionAssert.AreEquivalent(originalSiblingsKeys, siblingsKeysFromRebuild);
+            Assert.That(parentKeyFromRebuild, Is.EqualTo(originalParentKey));
+            Assert.That(childrenKeysFromRebuild, Is.EquivalentTo(originalChildrenKeys));
+            Assert.That(descendantsKeysFromRebuild, Is.EquivalentTo(originalDescendantsKeys));
+            Assert.That(ancestorsKeysFromRebuild, Is.EquivalentTo(originalAncestorsKeys));
+            Assert.That(siblingsKeysFromRebuild, Is.EquivalentTo(originalSiblingsKeys));
         });
     }
 
@@ -90,17 +90,17 @@ internal sealed partial class MediaNavigationServiceTests
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(initialNodeExists);
+            Assert.That(initialNodeExists, Is.False);
 
             // Verify that the item is present in the navigation structure after a rebuild
-            Assert.IsTrue(nodeExists);
+            Assert.That(nodeExists, Is.True);
 
             // Verify that we have the same items as in the original built state of MediaNavigationService
-            Assert.AreEqual(originalParentKey, parentKeyFromRebuild);
-            CollectionAssert.AreEquivalent(originalChildrenKeys, childrenKeysFromRebuild);
-            CollectionAssert.AreEquivalent(originalDescendantsKeys, descendantsKeysFromRebuild);
-            CollectionAssert.AreEquivalent(originalAncestorsKeys, ancestorsKeysFromRebuild);
-            CollectionAssert.AreEquivalent(originalSiblingsKeys, siblingsKeysFromRebuild);
+            Assert.That(parentKeyFromRebuild, Is.EqualTo(originalParentKey));
+            Assert.That(childrenKeysFromRebuild, Is.EquivalentTo(originalChildrenKeys));
+            Assert.That(descendantsKeysFromRebuild, Is.EquivalentTo(originalDescendantsKeys));
+            Assert.That(ancestorsKeysFromRebuild, Is.EquivalentTo(originalAncestorsKeys));
+            Assert.That(siblingsKeysFromRebuild, Is.EquivalentTo(originalSiblingsKeys));
         });
     }
 }

@@ -93,7 +93,7 @@ internal sealed class RelationRepositoryTest : UmbracoIntegrationTest
             // Assert
             Assert.That(relationUpdated, Is.Not.Null);
             Assert.That(relationUpdated.Comment, Is.EqualTo("This relation has been updated"));
-            Assert.AreNotEqual(relationUpdated.UpdateDate, relation.UpdateDate);
+            Assert.That(relation.UpdateDate, Is.Not.EqualTo(relationUpdated.UpdateDate));
         }
     }
 
@@ -186,37 +186,37 @@ internal sealed class RelationRepositoryTest : UmbracoIntegrationTest
             // Get parent entities for child id
             var parents = repository.GetPagedParentEntitiesByChildId(createdMedia[0].Id, 0, 11, out var totalRecords)
                 .ToList();
-            Assert.AreEqual(9, totalRecords);
-            Assert.AreEqual(9, parents.Count);
+            Assert.That(totalRecords, Is.EqualTo(9));
+            Assert.That(parents, Has.Count.EqualTo(9));
 
             // Add the next page
             parents.AddRange(repository.GetPagedParentEntitiesByChildId(createdMedia[0].Id, 1, 11, out totalRecords));
-            Assert.AreEqual(9, totalRecords);
-            Assert.AreEqual(9, parents.Count);
+            Assert.That(totalRecords, Is.EqualTo(9));
+            Assert.That(parents, Has.Count.EqualTo(9));
 
             var contentEntities = parents.OfType<IDocumentEntitySlim>().ToList();
             var mediaEntities = parents.OfType<IMediaEntitySlim>().ToList();
             var memberEntities = parents.OfType<IMemberEntitySlim>().ToList();
 
-            Assert.AreEqual(3, contentEntities.Count);
-            Assert.AreEqual(3, mediaEntities.Count);
-            Assert.AreEqual(3, memberEntities.Count);
+            Assert.That(contentEntities, Has.Count.EqualTo(3));
+            Assert.That(mediaEntities, Has.Count.EqualTo(3));
+            Assert.That(memberEntities, Has.Count.EqualTo(3));
 
             // Only of a certain type
             parents.AddRange(repository.GetPagedParentEntitiesByChildId(createdMedia[0].Id, 0, 100, out totalRecords, UmbracoObjectTypes.Document.GetGuid()));
-            Assert.AreEqual(3, totalRecords);
+            Assert.That(totalRecords, Is.EqualTo(3));
 
             parents.AddRange(repository.GetPagedParentEntitiesByChildId(createdMedia[0].Id, 0, 100, out totalRecords, UmbracoObjectTypes.Member.GetGuid()));
-            Assert.AreEqual(3, totalRecords);
+            Assert.That(totalRecords, Is.EqualTo(3));
 
             parents.AddRange(repository.GetPagedParentEntitiesByChildId(createdMedia[0].Id, 0, 100, out totalRecords, UmbracoObjectTypes.Media.GetGuid()));
-            Assert.AreEqual(3, totalRecords);
+            Assert.That(totalRecords, Is.EqualTo(3));
 
             // Test relations on content
             var contentParents = repository
                 .GetPagedParentEntitiesByChildId(createdContent[0].Id, 0, int.MaxValue, out totalRecords).ToList();
-            Assert.AreEqual(6, totalRecords);
-            Assert.AreEqual(6, contentParents.Count);
+            Assert.That(totalRecords, Is.EqualTo(6));
+            Assert.That(contentParents, Has.Count.EqualTo(6));
 
             // Test getting relations of specified relation types
             var relatedMediaRelType =
@@ -227,20 +227,20 @@ internal sealed class RelationRepositoryTest : UmbracoIntegrationTest
                 RelationService.GetRelationTypeByAlias(Constants.Conventions.RelationTypes.RelatedMemberAlias);
 
             parents = repository.GetPagedParentEntitiesByChildId(createdMedia[0].Id, 0, 11, out totalRecords, [relatedContentRelType.Id, relatedMediaRelType.Id, relatedMemberRelType.Id]).ToList();
-            Assert.AreEqual(6, totalRecords);
-            Assert.AreEqual(6, parents.Count);
+            Assert.That(totalRecords, Is.EqualTo(6));
+            Assert.That(parents, Has.Count.EqualTo(6));
 
             parents = repository.GetPagedParentEntitiesByChildId(createdMedia[0].Id, 1, 11, out totalRecords, [relatedContentRelType.Id, relatedMediaRelType.Id, relatedMemberRelType.Id]).ToList();
-            Assert.AreEqual(6, totalRecords);
-            Assert.AreEqual(0, parents.Count);
+            Assert.That(totalRecords, Is.EqualTo(6));
+            Assert.That(parents, Is.Empty);
 
             parents = repository.GetPagedParentEntitiesByChildId(createdContent[0].Id, 0, 6, out totalRecords, [relatedContentRelType.Id, relatedMediaRelType.Id, relatedMemberRelType.Id]).ToList();
-            Assert.AreEqual(3, totalRecords);
-            Assert.AreEqual(3, parents.Count);
+            Assert.That(totalRecords, Is.EqualTo(3));
+            Assert.That(parents, Has.Count.EqualTo(3));
 
             parents = repository.GetPagedParentEntitiesByChildId(createdContent[0].Id, 1, 6, out totalRecords, [relatedContentRelType.Id, relatedMediaRelType.Id, relatedMemberRelType.Id]).ToList();
-            Assert.AreEqual(3, totalRecords);
-            Assert.AreEqual(0, parents.Count);
+            Assert.That(totalRecords, Is.EqualTo(3));
+            Assert.That(parents, Is.Empty);
         }
     }
 
@@ -261,13 +261,13 @@ internal sealed class RelationRepositoryTest : UmbracoIntegrationTest
 
             // Get parent entities for child id
             var parents = repository.GetPagedParentEntitiesByChildId(media.Id, 0, 10, out var totalRecords).ToList();
-            Assert.AreEqual(1, totalRecords);
-            Assert.AreEqual(1, parents.Count);
+            Assert.That(totalRecords, Is.EqualTo(1));
+            Assert.That(parents, Has.Count.EqualTo(1));
 
             // Get child entities for parent id
             var children = repository.GetPagedChildEntitiesByParentId(media.Id, 0, 10, out totalRecords).ToList();
-            Assert.AreEqual(1, totalRecords);
-            Assert.AreEqual(1, children.Count);
+            Assert.That(totalRecords, Is.EqualTo(1));
+            Assert.That(children, Has.Count.EqualTo(1));
         }
     }
 
@@ -283,31 +283,31 @@ internal sealed class RelationRepositoryTest : UmbracoIntegrationTest
             // Get parent entities for child id
             var parents = repository.GetPagedChildEntitiesByParentId(createdContent[0].Id, 0, 9, out var totalRecords)
                 .ToList();
-            Assert.AreEqual(9, totalRecords);
-            Assert.AreEqual(9, parents.Count);
+            Assert.That(totalRecords, Is.EqualTo(9));
+            Assert.That(parents, Has.Count.EqualTo(9));
 
             // Add the next page
             parents.AddRange(repository.GetPagedChildEntitiesByParentId(createdContent[0].Id, 1, 9, out totalRecords));
-            Assert.AreEqual(9, totalRecords);
-            Assert.AreEqual(9, parents.Count);
+            Assert.That(totalRecords, Is.EqualTo(9));
+            Assert.That(parents, Has.Count.EqualTo(9));
 
             var contentEntities = parents.OfType<IDocumentEntitySlim>().ToList();
             var mediaEntities = parents.OfType<IMediaEntitySlim>().ToList();
             var memberEntities = parents.OfType<IMemberEntitySlim>().ToList();
 
-            Assert.AreEqual(3, contentEntities.Count);
-            Assert.AreEqual(3, mediaEntities.Count);
-            Assert.AreEqual(3, memberEntities.Count);
+            Assert.That(contentEntities, Has.Count.EqualTo(3));
+            Assert.That(mediaEntities, Has.Count.EqualTo(3));
+            Assert.That(memberEntities, Has.Count.EqualTo(3));
 
             // only of a certain type
             parents.AddRange(repository.GetPagedChildEntitiesByParentId(createdContent[0].Id, 0, 100, out totalRecords, UmbracoObjectTypes.Media.GetGuid()));
-            Assert.AreEqual(3, totalRecords);
+            Assert.That(totalRecords, Is.EqualTo(3));
 
             parents.AddRange(repository.GetPagedChildEntitiesByParentId(createdMembers[0].Id, 0, 100, out totalRecords, UmbracoObjectTypes.Media.GetGuid()));
-            Assert.AreEqual(3, totalRecords);
+            Assert.That(totalRecords, Is.EqualTo(3));
 
             parents.AddRange(repository.GetPagedChildEntitiesByParentId(createdContent[0].Id, 0, 100, out totalRecords, UmbracoObjectTypes.Member.GetGuid()));
-            Assert.AreEqual(3, totalRecords);
+            Assert.That(totalRecords, Is.EqualTo(3));
 
             // Test getting relations of specified relation types
             var relatedMediaRelType =
@@ -318,12 +318,12 @@ internal sealed class RelationRepositoryTest : UmbracoIntegrationTest
                 RelationService.GetRelationTypeByAlias(Constants.Conventions.RelationTypes.RelatedMemberAlias);
 
             parents = repository.GetPagedChildEntitiesByParentId(createdContent[0].Id, 0, 6, out totalRecords, [relatedContentRelType.Id, relatedMediaRelType.Id, relatedMemberRelType.Id]).ToList();
-            Assert.AreEqual(6, totalRecords);
-            Assert.AreEqual(6, parents.Count);
+            Assert.That(totalRecords, Is.EqualTo(6));
+            Assert.That(parents, Has.Count.EqualTo(6));
 
             parents = repository.GetPagedChildEntitiesByParentId(createdContent[0].Id, 1, 6, out totalRecords, [relatedContentRelType.Id, relatedMediaRelType.Id, relatedMemberRelType.Id]).ToList();
-            Assert.AreEqual(6, totalRecords);
-            Assert.AreEqual(0, parents.Count);
+            Assert.That(totalRecords, Is.EqualTo(6));
+            Assert.That(parents, Is.Empty);
         }
     }
 

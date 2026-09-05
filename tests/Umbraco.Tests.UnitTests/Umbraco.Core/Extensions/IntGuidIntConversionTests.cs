@@ -21,7 +21,7 @@ public class IntGuidIntConversionTests
         Guid guid = startValue.ToGuid();
         int endValue = guid.ToInt();
 
-        Assert.AreEqual(startValue, endValue);
+        Assert.That(endValue, Is.EqualTo(startValue));
     }
 
     [TestCase(0)]
@@ -33,7 +33,7 @@ public class IntGuidIntConversionTests
     {
         Guid guid = value.ToGuid();
 
-        Assert.IsTrue(guid.IsFakeGuid());
+        Assert.That(guid.IsFakeGuid(), Is.True);
     }
 
     // A "fake" guid must have all bytes zero except the first 4. Each of these has a stray
@@ -47,6 +47,6 @@ public class IntGuidIntConversionTests
     {
         Guid guid = Guid.Parse(guidValue);
 
-        Assert.IsFalse(guid.IsFakeGuid());
+        Assert.That(guid.IsFakeGuid(), Is.False);
     }
 }

@@ -27,26 +27,26 @@ public class DictionaryItemTests
 
         var clone = (DictionaryItem)item.DeepClone();
 
-        Assert.AreNotSame(clone, item);
-        Assert.AreEqual(clone, item);
-        Assert.AreEqual(clone.CreateDate, item.CreateDate);
-        Assert.AreEqual(clone.Id, item.Id);
-        Assert.AreEqual(clone.ItemKey, item.ItemKey);
-        Assert.AreEqual(clone.Key, item.Key);
-        Assert.AreEqual(clone.ParentId, item.ParentId);
-        Assert.AreEqual(clone.UpdateDate, item.UpdateDate);
-        Assert.AreEqual(clone.Translations.Count(), item.Translations.Count());
+        Assert.That(item, Is.Not.SameAs(clone));
+        Assert.That(item, Is.EqualTo(clone));
+        Assert.That(item.CreateDate, Is.EqualTo(clone.CreateDate));
+        Assert.That(item.Id, Is.EqualTo(clone.Id));
+        Assert.That(item.ItemKey, Is.EqualTo(clone.ItemKey));
+        Assert.That(item.Key, Is.EqualTo(clone.Key));
+        Assert.That(item.ParentId, Is.EqualTo(clone.ParentId));
+        Assert.That(item.UpdateDate, Is.EqualTo(clone.UpdateDate));
+        Assert.That(item.Translations.Count(), Is.EqualTo(clone.Translations.Count()));
         for (var i = 0; i < item.Translations.Count(); i++)
         {
-            Assert.AreNotSame(clone.Translations.ElementAt(i), item.Translations.ElementAt(i));
-            Assert.AreEqual(clone.Translations.ElementAt(i), item.Translations.ElementAt(i));
+            Assert.That(item.Translations.ElementAt(i), Is.Not.SameAs(clone.Translations.ElementAt(i)));
+            Assert.That(item.Translations.ElementAt(i), Is.EqualTo(clone.Translations.ElementAt(i)));
         }
 
         // This double verifies by reflection
         var allProps = clone.GetType().GetProperties();
         foreach (var propertyInfo in allProps)
         {
-            Assert.AreEqual(propertyInfo.GetValue(clone, null), propertyInfo.GetValue(item, null));
+            Assert.That(propertyInfo.GetValue(item, null), Is.EqualTo(propertyInfo.GetValue(clone, null)));
         }
     }
 
@@ -81,6 +81,6 @@ public class DictionaryItemTests
             .Build();
 
         var value = item.GetTranslatedValue(isoCode);
-        Assert.AreEqual(expectedValue, value);
+        Assert.That(value, Is.EqualTo(expectedValue));
     }
 }
