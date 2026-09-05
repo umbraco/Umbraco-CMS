@@ -41,13 +41,12 @@ export class UmbBlockActionDefaultElement<
 
 		(async () => {
 			// TODO: Ideally the this.observe would accept a Promise<Observable> and handle the async resolution internally, but for now we await it here. [NL]
-			this.observe(
-				await this.#api?.getHrefObservable?.(),
-				async (href) => {
-					this._href = href ?? (await api?.getHref?.());
-				},
-				'observeHref',
-			);
+			const hrefObservable = await this.#api?.getHrefObservable?.();
+			if (hrefObservable) {
+				this.observe(hrefObservable, (href) => (this._href = href), 'observeHref');
+			} else {
+				this._href = await this.#api?.getHref?.();
+			}
 
 			const pathObservable = await this.#api?.getValidationDataPathObservable?.();
 			this.observe(
