@@ -1,57 +1,91 @@
 import { UmbDocumentTreeItemContext } from './document-tree-item.context.js';
-import type { UmbDocumentTreeItemModel } from '../types.js';
-import { expect } from '@open-wc/testing';
+import type { UmbDocumentTreeItemModel, UmbDocumentTreeRootModel } from '../types.js';
+import { UMB_DOCUMENT_ENTITY_TYPE, UMB_DOCUMENT_ROOT_ENTITY_TYPE } from '../../entity.js';
+import { UmbDefaultTreeContext, UmbTreeItemOpenEvent } from '@umbraco-cms/backoffice/tree';
+import { aTimeout, expect, oneEvent } from '@open-wc/testing';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';
+import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 
 @customElement('umb-test-document-tree-item-host')
 class UmbTestDocumentTreeItemHostElement extends UmbElementMixin(HTMLElement) {}
 
-function treeItem(overrides: Partial<UmbDocumentTreeItemModel>): UmbDocumentTreeItemModel {
+/**
+ * Reads the current value of an observable synchronously.
+ * @param {Observable<T>} observable - The observable to read.
+ * @returns {T} Its current value.
+ */
+function observeOnce<T>(observable: Observable<T>): T {
+	let value!: T;
+	observable.subscribe((next) => (value = next)).unsubscribe();
+	return value;
+}
+
+function createTreeItem(
+	hasCollection: boolean,
+	overrides?: Partial<UmbDocumentTreeItemModel>,
+): UmbDocumentTreeItemModel {
 	return {
-		unique: 'test-unique-id',
-		entityType: 'document',
-		name: 'Test Item',
+		unique: 'document-unique-id',
+		entityType: UMB_DOCUMENT_ENTITY_TYPE,
+		name: 'Test Document',
 		hasChildren: true,
 		isFolder: false,
+		parent: {
+			unique: null,
+			entityType: UMB_DOCUMENT_ROOT_ENTITY_TYPE,
+		},
+		ancestors: [],
 		noAccess: false,
 		isTrashed: false,
 		isProtected: false,
-		ancestors: [],
-		createDate: '2024-01-01',
+		documentType: {
+			unique: 'document-type-unique-id',
+			icon: 'icon-document',
+			collection: hasCollection ? { unique: 'collection-unique-id' } : null,
+		},
+		createDate: '2024-01-01T00:00:00Z',
 		variants: [],
 		flags: [],
-		parent: {
-			unique: null,
-			entityType: 'document-root',
-		},
-		documentType: {
-			unique: 'document-type-unique',
-			icon: 'icon-document',
-			collection: null,
-		},
 		...overrides,
-	} as UmbDocumentTreeItemModel;
+	};
 }
 
-describe('UmbDocumentTreeItemContext - collection start node access', () => {
+describe('UmbDocumentTreeItemContext', () => {
 	let host: UmbTestDocumentTreeItemHostElement;
+	let treeContext: UmbDefaultTreeContext<UmbDocumentTreeItemModel, UmbDocumentTreeRootModel>;
 	let context: UmbDocumentTreeItemContext;
-	let originalPushState: typeof history.pushState;
-	let pushedUrls: Array<string>;
 
-	beforeEach(() => {
+	// Stubs/spies (no sinon in this project).
+	let pushStateCalls: Array<{ url: string }>;
+	const originalPushState = history.pushState;
+	let expandCalls: number;
+	let collapseCalls: number;
+
+	beforeEach(async () => {
 		host = new UmbTestDocumentTreeItemHostElement();
 		document.body.appendChild(host);
-		context = new UmbDocumentTreeItemContext(host);
-		// Avoid depending on the section context for path construction.
-		(context as unknown as { getPath: () => string }).getPath = () => '/test-path';
 
-		pushedUrls = [];
-		originalPushState = history.pushState;
-		history.pushState = ((data: unknown, unused: string, url?: string | URL | null) => {
-			if (url != null) pushedUrls.push(url.toString());
-		}) as typeof history.pushState;
+		treeContext = new UmbDefaultTreeContext(host);
+
+		expandCalls = 0;
+		collapseCalls = 0;
+		treeContext.expansion.expandItem = async () => {
+			expandCalls++;
+		};
+		treeContext.expansion.collapseItem = async () => {
+			collapseCalls++;
+		};
+
+		pushStateCalls = [];
+		history.pushState = (_data: unknown, _unused: string, url?: string | URL | null) => {
+			pushStateCalls.push({ url: String(url) });
+		};
+
+		context = new UmbDocumentTreeItemContext(host);
+
+		// Wait for the tree context to be consumed by the item context.
+		await aTimeout(0);
 	});
 
 	afterEach(() => {
@@ -59,25 +93,155 @@ describe('UmbDocumentTreeItemContext - collection start node access', () => {
 		document.body.removeChild(host);
 	});
 
-	const collection = { unique: 'collection-unique' };
+	describe('collection item in a menu', () => {
+		beforeEach(async () => {
+			context.setIsMenu(true);
+			context.setTreeItem(createTreeItem(true));
+			// Let the children manager settle its expansion observer while the tree context is alive.
+			await aTimeout(0);
+		});
 
-	it('opens the collection view instead of expanding for an accessible collection', () => {
-		context.setIsMenu(true);
-		context.setTreeItem(treeItem({ noAccess: false, documentType: { unique: 'dt', icon: 'icon', collection } }));
+		it('navigates to the Collection view on showChildren instead of expanding', () => {
+			context.showChildren();
 
-		context.showChildren();
+			expect(pushStateCalls.length).to.equal(1);
+			expect(pushStateCalls[0].url).to.contain('openCollection=true');
+			expect(expandCalls).to.equal(0);
+		});
 
-		expect(pushedUrls.some((url) => url.includes('openCollection=true'))).to.be.true;
+		it('navigates to the Collection view on hideChildren instead of collapsing', () => {
+			context.hideChildren();
+
+			expect(pushStateCalls.length).to.equal(1);
+			expect(pushStateCalls[0].url).to.contain('openCollection=true');
+			expect(collapseCalls).to.equal(0);
+		});
 	});
 
-	it('expands the tree (does not divert to the collection view) for a no-access collection ancestor', () => {
+	describe('collection item in a picker', () => {
+		beforeEach(async () => {
+			// A picker is not a menu, but it does drill into opened items — which is what makes drilling into a collection
+			// possible at all.
+			treeContext.setDrillable(true);
+			context.setTreeItem(createTreeItem(true));
+			await aTimeout(0);
+		});
+
+		it('emits the open event on showChildren instead of expanding', async () => {
+			const listener = oneEvent(host, UmbTreeItemOpenEvent.TYPE);
+
+			context.showChildren();
+
+			const event = (await listener) as unknown as UmbTreeItemOpenEvent;
+			expect(event.unique).to.equal('document-unique-id');
+			expect(event.entityType).to.equal(UMB_DOCUMENT_ENTITY_TYPE);
+			expect(expandCalls).to.equal(0);
+			expect(pushStateCalls.length).to.equal(0);
+		});
+
+		it('emits the open event on hideChildren instead of collapsing', async () => {
+			const listener = oneEvent(host, UmbTreeItemOpenEvent.TYPE);
+
+			context.hideChildren();
+
+			const event = (await listener) as unknown as UmbTreeItemOpenEvent;
+			expect(event.unique).to.equal('document-unique-id');
+			expect(event.entityType).to.equal(UMB_DOCUMENT_ENTITY_TYPE);
+			expect(collapseCalls).to.equal(0);
+			expect(pushStateCalls.length).to.equal(0);
+		});
+	});
+
+	// Opening asks the host to drill into the item, so where the host does not, it does nothing. Drilling into a
+	// collection there would replace the expand caret with an affordance that cannot act, leaving the whole subtree
+	// unreachable.
+	describe('collection item in a tree that cannot drill', () => {
+		beforeEach(async () => {
+			context.setTreeItem(createTreeItem(true));
+			await aTimeout(0);
+		});
+
+		it('does not offer to be drilled into', () => {
+			expect(context.getDrillable()).to.be.false;
+			expect(observeOnce(context.drillableCollection)).to.be.false;
+		});
+
+		it('expands its children on showChildren', () => {
+			context.showChildren();
+
+			expect(expandCalls).to.equal(1);
+			expect(pushStateCalls.length).to.equal(0);
+		});
+
+		it('collapses its children on hideChildren', () => {
+			context.hideChildren();
+
+			expect(collapseCalls).to.equal(1);
+			expect(pushStateCalls.length).to.equal(0);
+		});
+	});
+
+	describe('non-collection item', () => {
+		beforeEach(async () => {
+			context.setTreeItem(createTreeItem(false));
+			await aTimeout(0);
+		});
+
+		it('expands its children on showChildren', () => {
+			context.showChildren();
+
+			expect(expandCalls).to.equal(1);
+			expect(pushStateCalls.length).to.equal(0);
+		});
+
+		it('collapses its children on hideChildren', () => {
+			context.hideChildren();
+
+			expect(collapseCalls).to.equal(1);
+			expect(pushStateCalls.length).to.equal(0);
+		});
+	});
+
+	describe('no-access collection item', () => {
 		// A "no access" collection node is an ancestor of the user's start node and must remain
-		// expandable so the user can browse down to their start node.
-		context.setIsMenu(true);
-		context.setTreeItem(treeItem({ noAccess: true, documentType: { unique: 'dt', icon: 'icon', collection } }));
+		// expandable so the user can browse down to their start node. (#22353)
+		it('expands its children in a menu instead of navigating to the Collection view', async () => {
+			context.setIsMenu(true);
+			context.setTreeItem(createTreeItem(true, { noAccess: true }));
+			await aTimeout(0);
 
-		context.showChildren();
+			context.showChildren();
 
-		expect(pushedUrls.some((url) => url.includes('openCollection=true'))).to.be.false;
+			expect(expandCalls).to.equal(1);
+			expect(pushStateCalls.length).to.equal(0);
+		});
+
+		it('collapses its children in a menu instead of navigating to the Collection view', async () => {
+			context.setIsMenu(true);
+			context.setTreeItem(createTreeItem(true, { noAccess: true }));
+			await aTimeout(0);
+
+			context.hideChildren();
+
+			expect(collapseCalls).to.equal(1);
+			expect(pushStateCalls.length).to.equal(0);
+		});
+
+		it('expands its children in a picker instead of emitting the open event', async () => {
+			// Declared browsable, so it is the no-access rule being tested and not the absence of a browsing host.
+			treeContext.setDrillable(true);
+			context.setTreeItem(createTreeItem(true, { noAccess: true }));
+			await aTimeout(0);
+
+			let openEvents = 0;
+			host.addEventListener(UmbTreeItemOpenEvent.TYPE, () => openEvents++);
+
+			context.showChildren();
+			await aTimeout(0);
+
+			expect(expandCalls).to.equal(1);
+			expect(openEvents).to.equal(0);
+			expect(pushStateCalls.length).to.equal(0);
+		});
 	});
 });
