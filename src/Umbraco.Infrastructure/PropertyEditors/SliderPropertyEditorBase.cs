@@ -129,7 +129,7 @@ public abstract class SliderPropertyEditorBase : DataEditor, IValueSchemaProvide
                 .ToArray();
 
             return parts.Length == parsed.Length && parsed.Length is 1 or 2
-                ? new SliderRange { From = parsed.First(), To = parsed.Last() }
+                ? new SliderRange { From = parsed[0], To = parsed[^1] }
                 : null;
         }
 
@@ -201,7 +201,7 @@ public abstract class SliderPropertyEditorBase : DataEditor, IValueSchemaProvide
             /// </summary>
             protected static bool TryParsePropertyValue(object? value, [NotNullWhen(true)] out SliderRange? parsedValue)
             {
-                if (value is null || value is not JsonObject valueAsJsonObject)
+                if (value is not JsonObject valueAsJsonObject)
                 {
                     parsedValue = null;
                     return false;

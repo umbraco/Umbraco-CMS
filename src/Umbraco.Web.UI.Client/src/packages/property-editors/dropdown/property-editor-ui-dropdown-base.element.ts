@@ -16,10 +16,7 @@ import type { UmbInputDropdownListElement } from '@umbraco-cms/backoffice/compon
  * edited the same way, which is what this base holds.
  */
 export abstract class UmbPropertyEditorUIDropdownElementBase
-	extends UmbFormControlMixin<Array<string> | string | undefined, typeof UmbLitElement, undefined>(
-		UmbLitElement,
-		undefined,
-	)
+	extends UmbFormControlMixin<Array<string> | string | undefined, typeof UmbLitElement, undefined>(UmbLitElement)
 	implements UmbPropertyEditorUiElement
 {
 	/**
@@ -84,7 +81,7 @@ export abstract class UmbPropertyEditorUIDropdownElementBase
 
 			// If selection includes a value that is not in the list, add it to the list
 			this.#selection.forEach((value) => {
-				if (value !== '' && !this._options.find((item) => item.value === value)) {
+				if (value !== '' && !this._options.some((item) => item.value === value)) {
 					this._options.push({
 						name: `${value} (${this.localize.term('validation_legacyOption')})`,
 						value,

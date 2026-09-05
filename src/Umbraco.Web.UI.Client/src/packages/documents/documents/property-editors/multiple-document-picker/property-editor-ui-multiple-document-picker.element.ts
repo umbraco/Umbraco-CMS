@@ -22,7 +22,7 @@ import '../../components/input-document/input-document.element.js';
  */
 @customElement('umb-property-editor-ui-multiple-document-picker')
 export class UmbPropertyEditorUIMultipleDocumentPickerElement
-	extends UmbFormControlMixin<Array<string> | undefined, typeof UmbLitElement, undefined>(UmbLitElement, undefined)
+	extends UmbFormControlMixin<Array<string> | undefined, typeof UmbLitElement, undefined>(UmbLitElement)
 	implements UmbPropertyEditorUiElement
 {
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {

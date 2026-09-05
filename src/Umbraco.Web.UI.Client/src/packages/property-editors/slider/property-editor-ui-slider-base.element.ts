@@ -32,7 +32,7 @@ function makeNumberOrUndefined(value: string | undefined, fallback?: undefined |
 		return fallback;
 	}
 	const n = Number(value);
-	if (isNaN(n)) {
+	if (Number.isNaN(n)) {
 		return fallback;
 	}
 	return n;
@@ -45,7 +45,7 @@ function makeNumberOrUndefined(value: string | undefined, fallback?: undefined |
  * @returns {number} The value, or the fallback.
  */
 function undefinedFallback(value: number | undefined, fallback: number) {
-	return value === undefined ? fallback : value;
+	return value ?? fallback;
 }
 
 /**
@@ -109,10 +109,10 @@ export abstract class UmbPropertyEditorUISliderElementBase
 		this._step = step > 0 ? step : 1;
 
 		const initVal1 = Number(config.getValueByAlias('initVal1'));
-		this._initVal1 = isNaN(initVal1) ? 0 : initVal1;
+		this._initVal1 = Number.isNaN(initVal1) ? 0 : initVal1;
 
 		const initVal2 = Number(config.getValueByAlias('initVal2'));
-		this._initVal2 = isNaN(initVal2) ? this._initVal1 + this._step : initVal2;
+		this._initVal2 = Number.isNaN(initVal2) ? this._initVal1 + this._step : initVal2;
 
 		this._min = this.#parseNumber(config.getValueByAlias('minVal')) || 0;
 		this._max = this.#parseNumber(config.getValueByAlias('maxVal')) || 100;

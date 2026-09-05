@@ -14,7 +14,7 @@ import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umb
  */
 @customElement('umb-property-editor-ui-multiple-member-picker')
 export class UmbPropertyEditorUIMultipleMemberPickerElement
-	extends UmbFormControlMixin<Array<string> | undefined, typeof UmbLitElement, undefined>(UmbLitElement, undefined)
+	extends UmbFormControlMixin<Array<string> | undefined, typeof UmbLitElement, undefined>(UmbLitElement)
 	implements UmbPropertyEditorUiElement
 {
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {

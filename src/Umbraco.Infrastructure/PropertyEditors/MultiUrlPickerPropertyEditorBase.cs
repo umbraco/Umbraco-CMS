@@ -100,6 +100,7 @@ public abstract class MultiUrlPickerPropertyEditorBase : DataEditor, IValueSchem
         return schema;
     }
 
+    /// <inheritdoc />
     protected override IDataValueEditor CreateValueEditor() =>
         DataValueEditorFactory.Create<MultiUrlPickerValueEditor>(Attribute!);
 }

@@ -39,6 +39,7 @@ public abstract class DropDownPropertyEditorBase : DataEditor, IValueSchemaProvi
         ["description"] = "Array of selected values from dropdown",
     };
 
+    /// <inheritdoc />
     protected override IDataValueEditor CreateValueEditor() =>
         DataValueEditorFactory.Create<MultipleValueEditor>(Attribute!);
 }

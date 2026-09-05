@@ -207,7 +207,7 @@ public abstract class MultiUrlPickerValueConverterBase : PropertyValueConverterB
         }
 
         MultiUrlPickerValueEditor.LinkDto[]? dtos = ParseLinkDtos(value)?.ToArray();
-        if (dtos == null || dtos.Any() == false)
+        if (dtos == null || dtos.Length == 0)
         {
             return DefaultValue();
         }

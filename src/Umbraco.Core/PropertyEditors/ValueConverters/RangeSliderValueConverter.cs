@@ -20,6 +20,6 @@ public class RangeSliderValueConverter : SliderValueConverterBase
         => typeof(Range<decimal>);
 
     /// <inheritdoc />
-    public override object ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel cacheLevel, object? source, bool preview)
-        => ReadRange(source?.ToString());
+    public override object ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
+        => ReadRange(inter?.ToString());
 }
