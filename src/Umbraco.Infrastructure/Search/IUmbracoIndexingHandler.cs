@@ -1,4 +1,5 @@
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Security;
 
 namespace Umbraco.Cms.Infrastructure.Search;
 
@@ -28,6 +29,28 @@ public interface IUmbracoIndexingHandler
     /// </summary>
     /// <param name="member">The <see cref="IMember"/> instance to re-index.</param>
     void ReIndexForMember(IMember member);
+
+    /// <summary>
+    /// Re-indexes the specified <see cref="ExternalMemberIdentity"/> in the search index.
+    /// </summary>
+    /// <param name="member">The <see cref="ExternalMemberIdentity"/> instance to re-index.</param>
+    // TODO (V19): Remove the default implementation.
+    void ReIndexForExternalMember(ExternalMemberIdentity member)
+    {
+    }
+
+    /// <summary>
+    ///     Remove an external member from the member indexes.
+    /// </summary>
+    /// <param name="externalMemberId">The external member ID to remove from member indexes.</param>
+    /// <remarks>
+    ///     External members have their own ID space (separate from <c>umbracoNode</c>) so they must
+    ///     be removed from member-only indexes rather than through <see cref="DeleteIndexForEntity"/>.
+    /// </remarks>
+    // TODO (V19): Remove the default implementation.
+    void DeleteExternalMemberFromIndex(int externalMemberId)
+    {
+    }
 
     /// <summary>
     /// Re-indexes the specified media item in the search index.

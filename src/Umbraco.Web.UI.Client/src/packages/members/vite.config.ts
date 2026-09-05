@@ -16,7 +16,6 @@ export default defineConfig({
 			'member-public-access/index': 'member-public-access/index.ts',
 			'member-type/index': 'member-type/index.ts',
 			'umbraco-package': 'umbraco-package.ts',
-			manifests: 'manifests.ts',
 		},
 	}),
 });

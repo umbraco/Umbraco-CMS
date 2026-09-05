@@ -1,16 +1,18 @@
 import type { UmbTreeItemModel, UmbTreeRootModel } from '../types.js';
 import type {
+	UmbCreateTreeItemDataResolverArgs,
 	UmbTreeChildrenOfRequestArgs,
 	UmbTreeAncestorsOfRequestArgs,
+	UmbTreeItemDataResolver,
 	UmbTreeRootItemsRequestArgs,
 } from './types.js';
-import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import type {
 	UmbRepositoryResponse,
 	UmbRepositoryResponseWithAsObservable,
 	UmbTargetPagedModel,
 } from '@umbraco-cms/backoffice/repository';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
  * Interface for a tree repository.
@@ -31,6 +33,19 @@ export interface UmbTreeRepository<
 	 * @memberof UmbTreeRepository
 	 */
 	requestTreeRoot: () => Promise<UmbRepositoryResponse<TreeRootType>>;
+
+	/**
+	 * Creates an item data resolver for a tree item. Implement this to resolve names and icons that cannot be
+	 * read directly off the tree item, such as variant aware document names.
+	 * @param {UmbControllerHost} host - The controller host of the consumer.
+	 * @param {UmbCreateTreeItemDataResolverArgs} [args] - Optional arguments for selecting the resolver.
+	 * @returns {UmbTreeItemDataResolver | undefined} A resolver for the item, if one is available.
+	 * @memberof UmbTreeRepository
+	 */
+	createTreeItemDataResolver?: (
+		host: UmbControllerHost,
+		args?: UmbCreateTreeItemDataResolverArgs,
+	) => UmbTreeItemDataResolver<TreeItemType> | undefined;
 
 	/**
 	 * Requests the root items of the tree.
@@ -56,19 +71,4 @@ export interface UmbTreeRepository<
 	 * @memberof UmbTreeRepository
 	 */
 	requestTreeItemAncestors: (args: TreeAncestorsOfRequestArgsType) => Promise<UmbRepositoryResponse<TreeItemType[]>>;
-
-	/**
-	 * Returns an observable of the root items of the tree.
-	 * @memberof UmbTreeRepository
-	 * @deprecated Use `requestTreeRootItems` instead. It will be removed in Umbraco 18.
-	 */
-	rootTreeItems?: () => Promise<Observable<TreeItemType[]>>;
-
-	/**
-	 * Returns an observable of the children of the given parent item.
-	 * @param {(string | null)} parentUnique
-	 * @memberof UmbTreeRepository
-	 * @deprecated Use `requestTreeItemsOf` instead. It will be removed in Umbraco 18.
-	 */
-	treeItemsOf?: (parentUnique: string | null) => Promise<Observable<TreeItemType[]>>;
 }

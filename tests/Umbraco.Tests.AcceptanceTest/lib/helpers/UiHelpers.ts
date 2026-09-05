@@ -1,4 +1,5 @@
-import {Page} from "@playwright/test"
+import {expect, Locator, Page} from "@playwright/test";
+import {ConstantHelper} from "./ConstantHelper";
 import {StylesheetUiHelper} from "./StylesheetUiHelper";
 import {umbracoConfig} from "../umbraco.config";
 import {PartialViewUiHelper} from "./PartialViewUiHelper";
@@ -23,6 +24,7 @@ import {RedirectManagementUiHelper} from './RedirectManagementUiHelper';
 import {MemberGroupUiHelper} from "./MemberGroupUiHelper";
 import {MemberUiHelper} from "./MemberUiHelper";
 import {MemberTypeUiHelper} from "./MemberTypeUiHelper";
+import {MemberAuthenticationUiHelper} from "./MemberAuthenticationUiHelper";
 import {MediaTypeUiHelper} from "./MediaTypeUiHelper";
 import {UserUiHelper} from "./UserUiHelper";
 import {UserGroupUiHelper} from "./UserGroupUiHelper";
@@ -35,7 +37,9 @@ import {CurrentUserProfileUiHelper} from './CurrentUserProfileUiHelper';
 import {WebhookUiHelper} from "./WebhookUiHelper";
 import {InstallUiHelper} from "./differentAppSettingsHelpers/InstallUiHelper";
 import {ExternalLoginUiHelpers} from "./differentAppSettingsHelpers/ExternalLoginUiHelpers";
+import {LibraryUiHelper} from "./LibraryUiHelper";
 import {PreviewUiHelper} from "./PreviewUiHelper";
+import {BackofficeSearchUiHelper} from "./BackofficeSearchUiHelper";
 
 export class UiHelpers {
   page: Page;
@@ -63,6 +67,7 @@ export class UiHelpers {
   memberGroup: MemberGroupUiHelper;
   member: MemberUiHelper;
   memberType: MemberTypeUiHelper;
+  memberAuthentication: MemberAuthenticationUiHelper;
   mediaType: MediaTypeUiHelper;
   user: UserUiHelper;
   userGroup: UserGroupUiHelper;
@@ -74,10 +79,14 @@ export class UiHelpers {
   webhook: WebhookUiHelper;
   install: InstallUiHelper;
   externalLogin: ExternalLoginUiHelpers;
+  library: LibraryUiHelper;
   preview: PreviewUiHelper;
+  backofficeSearch: BackofficeSearchUiHelper;
+  private readonly sectionLinks: Locator;
 
   constructor(page: Page) {
     this.page = page;
+    this.sectionLinks = page.getByTestId('section-links');
     this.stylesheet = new StylesheetUiHelper(this.page);
     this.partialView = new PartialViewUiHelper(this.page);
     this.script = new ScriptUiHelper(this.page);
@@ -102,6 +111,7 @@ export class UiHelpers {
     this.memberGroup = new MemberGroupUiHelper(this.page);
     this.member = new MemberUiHelper(this.page);
     this.memberType = new MemberTypeUiHelper(this.page);
+    this.memberAuthentication = new MemberAuthenticationUiHelper(this.page);
     this.mediaType = new MediaTypeUiHelper(this.page);
     this.user = new UserUiHelper(this.page);
     this.userGroup = new UserGroupUiHelper(this.page);
@@ -113,7 +123,9 @@ export class UiHelpers {
     this.webhook = new WebhookUiHelper(this.page);
     this.install = new InstallUiHelper(this.page);
     this.externalLogin = new ExternalLoginUiHelpers(this.page);
+    this.library = new LibraryUiHelper(this.page);
     this.preview = new PreviewUiHelper(this.page);
+    this.backofficeSearch = new BackofficeSearchUiHelper(this.page);
   }
 
   async goToBackOffice() {
@@ -126,6 +138,7 @@ export class UiHelpers {
 
   async reloadPage() {
     await this.page.reload();
+    await expect(this.sectionLinks).toBeVisible({timeout: ConstantHelper.timeout.navigation});
   }
 
   async goBackPage() {

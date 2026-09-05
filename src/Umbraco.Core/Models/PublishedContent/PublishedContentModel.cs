@@ -16,7 +16,7 @@ public abstract class PublishedContentModel : PublishedContentWrapped
     /// <param name="content">The original content.</param>
     /// <param name="publishedValueFallback">the PublishedValueFallback</param>
     protected PublishedContentModel(IPublishedContent content, IPublishedValueFallback publishedValueFallback)
-        : base(content, publishedValueFallback)
+        : base(content)
     {
     }
 }

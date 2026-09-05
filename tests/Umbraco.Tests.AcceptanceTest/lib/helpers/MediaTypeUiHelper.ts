@@ -50,7 +50,7 @@ export class MediaTypeUiHelper extends UiBaseLocators {
 
   async goToMediaType(mediaTypeName: string) {
     await this.clickRootFolderCaretButton();
-    await this.clickLabelWithName(mediaTypeName);
+    await this.clickTreeItemWithName(mediaTypeName);
   }
 
   async enterMediaTypeName(name: string) {
@@ -74,7 +74,7 @@ export class MediaTypeUiHelper extends UiBaseLocators {
   }
 
   async clickSaveButtonAndWaitForMediaTypeToBeUpdated() {
-    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.mediaType, this.clickSaveButton(), ConstantHelper.statusCodes.ok);
+    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.mediaType, this.clickSaveButton(), ConstantHelper.statusCodes.ok, ConstantHelper.httpMethods.put);
   }
 
   async clickConfirmToDeleteButtonAndWaitForMediaTypeToBeDeleted() {

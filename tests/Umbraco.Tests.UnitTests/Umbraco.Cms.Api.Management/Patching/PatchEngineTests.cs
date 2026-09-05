@@ -40,7 +40,8 @@ public class PatchEngineTests
         """;
 
         var result = PatchEngine.ApplyOperation(
-            JsonNode.Parse(json)!, PatchOperationType.Replace,
+            JsonNode.Parse(json)!,
+            PatchOperationType.Replace,
             "/values[alias=title]/value",
             "Updated Value");
 

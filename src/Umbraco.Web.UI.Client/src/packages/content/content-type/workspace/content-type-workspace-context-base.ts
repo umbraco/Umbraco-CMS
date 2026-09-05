@@ -29,9 +29,9 @@ export interface UmbContentTypeWorkspaceContextArgs extends UmbEntityDetailWorks
 const LOADING_STATE_UNIQUE = 'umbLoadingContentTypeDetail';
 
 export abstract class UmbContentTypeWorkspaceContextBase<
-		DetailModelType extends UmbContentTypeDetailModel = UmbContentTypeDetailModel,
-		DetailRepositoryType extends UmbDetailRepository<DetailModelType> = UmbDetailRepository<DetailModelType>,
-	>
+	DetailModelType extends UmbContentTypeDetailModel = UmbContentTypeDetailModel,
+	DetailRepositoryType extends UmbDetailRepository<DetailModelType> = UmbDetailRepository<DetailModelType>,
+>
 	extends UmbEntityDetailWorkspaceContextBase<DetailModelType, DetailRepositoryType>
 	implements UmbContentTypeWorkspaceContext<DetailModelType>, UmbRoutableWorkspaceContext
 {
@@ -92,7 +92,7 @@ export abstract class UmbContentTypeWorkspaceContextBase<
 		let { data } = await request;
 
 		if (data) {
-			data = await this._scaffoldProcessData(data);
+			data = await this._processIncomingData(data);
 
 			if (this.modalContext) {
 				// Notice if the preset comes with values, they will overwrite the scaffolded values... [NL]

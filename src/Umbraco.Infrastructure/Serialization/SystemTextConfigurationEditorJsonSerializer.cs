@@ -1,8 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
-using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
 
@@ -12,16 +10,6 @@ namespace Umbraco.Cms.Infrastructure.Serialization;
 public sealed class SystemTextConfigurationEditorJsonSerializer : SystemTextJsonSerializerBase, IConfigurationEditorJsonSerializer
 {
     private readonly JsonSerializerOptions _jsonSerializerOptions;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="SystemTextConfigurationEditorJsonSerializer" /> class.
-    /// </summary>
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
-    public SystemTextConfigurationEditorJsonSerializer()
-        : this(
-              StaticServiceProvider.Instance.GetRequiredService<IJsonSerializerEncoderFactory>())
-    {
-    }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SystemTextConfigurationEditorJsonSerializer" /> class.
@@ -46,6 +34,7 @@ public sealed class SystemTextConfigurationEditorJsonSerializer : SystemTextJson
                 new JsonUdiConverter(),
                 new JsonUdiRangeConverter(),
                 new JsonBooleanConverter(),
+                new JsonTolerantNumberConverterFactory(),
             },
 
             // Properties of data type configuration objects are annotated with [ConfigurationField] attributes

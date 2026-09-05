@@ -1,3 +1,4 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
@@ -7,9 +8,11 @@ using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Notifications;
+using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.Sync;
 using Umbraco.Extensions;
 using ComponentCollection = Umbraco.Cms.Core.Composing.ComponentCollection;
 using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
@@ -191,6 +194,16 @@ public class CoreRuntime : IRuntime
         // Initialize the components
         await _components.InitializeAsync(isRestarting, cancellationToken);
 
+        if (State.Level == RuntimeLevel.Run)
+        {
+            // Give the elected server role a chance to resolve before any UmbracoApplicationStarting/Started
+            // handler reads it. Without this, IServerRoleAccessor.CurrentServerRole is guaranteed to still be
+            // ServerRole.Unknown here, since the only thing that otherwise advances it - TouchServerJob - doesn't
+            // start its countdown until hosted services run, which is after this notification has already been
+            // awaited to completion.
+            await TryElectServerRoleOnceAsync(cancellationToken);
+        }
+
         await _eventAggregator.PublishAsync(new UmbracoApplicationStartingNotification(State.Level, isRestarting), cancellationToken);
 
         if (isRestarting == false)
@@ -198,6 +211,34 @@ public class CoreRuntime : IRuntime
             // Add application started and stopped notifications last (to ensure they're always published after starting)
             _hostApplicationLifetime?.ApplicationStarted.Register(() => _eventAggregator.Publish(new UmbracoApplicationStartedNotification(false)));
             _hostApplicationLifetime?.ApplicationStopped.Register(() => _eventAggregator.Publish(new UmbracoApplicationStoppedNotification(false)));
+        }
+
+        // Per-server caches are now seeded (UmbracoApplicationStartingNotification has completed), so the
+        // front-end may route content. BootUmbracoAsync awaits this method before adding middleware, so on a
+        // normal boot the app never serves before this point. During an unattended upgrade the runtime returns
+        // early above (Upgrading) and UnattendedUpgradeBackgroundService marks readiness once it finishes seeding.
+        _serviceProvider?.GetService<IContentRoutingReadiness>()?.MarkReady();
+    }
+
+    /// <summary>
+    ///     Makes one bounded, best-effort attempt to elect this server's role before it can be observed as
+    ///     <see cref="Umbraco.Cms.Core.Sync.ServerRole.Unknown" /> by any
+    ///     <see cref="UmbracoApplicationStartingNotification" /> handler.
+    /// </summary>
+    /// <remarks>
+    ///     Delegates to the shared <see cref="IServerRoleElector" />
+    ///     (also used by <see cref="Install.UnattendedUpgradeBackgroundService" />, which publishes
+    ///     <see cref="UmbracoApplicationStartingNotification" /> itself for the unattended-upgrade path rather than
+    ///     going through this method), resolved from the runtime's optional <see cref="IServiceProvider" /> rather
+    ///     than taken as a constructor parameter, since <see cref="CoreRuntime" /> is public API and this is an
+    ///     internal implementation detail.
+    /// </remarks>
+    private async Task TryElectServerRoleOnceAsync(CancellationToken cancellationToken)
+    {
+        IServerRoleElector? serverRoleElector = _serviceProvider?.GetService<IServerRoleElector>();
+        if (serverRoleElector is not null)
+        {
+            await serverRoleElector.TryElectOnceAsync(cancellationToken);
         }
     }
 

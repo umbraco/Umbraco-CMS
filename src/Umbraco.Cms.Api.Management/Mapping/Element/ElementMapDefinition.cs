@@ -1,0 +1,81 @@
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Api.Management.Mapping.Content;
+using Umbraco.Cms.Api.Management.ViewModels.Content;
+using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
+using Umbraco.Cms.Api.Management.ViewModels.Element;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Mapping;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.PropertyEditors;
+
+namespace Umbraco.Cms.Api.Management.Mapping.Element;
+
+/// <summary>
+/// Provides mapping configuration for elements in the Umbraco CMS API management layer.
+/// </summary>
+public class ElementMapDefinition : ContentMapDefinition<IElement, ElementValueResponseModel, ElementVariantResponseModel>, IMapDefinition
+{
+    public ElementMapDefinition(
+        PropertyEditorCollection propertyEditorCollection,
+        IDataValueEditorFactory dataValueEditorFactory)
+        : base(propertyEditorCollection, dataValueEditorFactory)
+    {
+    }
+
+    /// <summary>
+    /// Configures the object mappings for element-related models in the Umbraco CMS API.
+    /// This method registers mappings between <see cref="IElement"/> and <see cref="ElementResponseModel"/>,
+    /// as well as between <see cref="ContentScheduleCollection"/> and <see cref="ElementResponseModel"/>,
+    /// using the provided <paramref name="mapper"/>.
+    /// </summary>
+    /// <param name="mapper">The <see cref="IUmbracoMapper"/> instance used to define the mappings.</param>
+    public void DefineMaps(IUmbracoMapper mapper)
+    {
+        mapper.Define<IElement, ElementResponseModel>((_, _) => new ElementResponseModel(), Map);
+        mapper.Define<IElement, PublishedElementResponseModel>((_, _) => new PublishedElementResponseModel(), Map);
+        mapper.Define<ContentScheduleCollection, ElementResponseModel>(Map);
+    }
+
+    // Umbraco.Code.MapAll -Flags
+    private void Map(IElement source, ElementResponseModel target, MapperContext context)
+    {
+        target.Id = source.Key;
+        target.DocumentType = context.Map<DocumentTypeReferenceResponseModel>(source.ContentType)!;
+        target.Values = MapValueViewModels(source.Properties);
+        target.Variants = MapVariantViewModels(
+            source,
+            (culture, _, documentVariantViewModel) =>
+            {
+                documentVariantViewModel.State = PublishableVariantStateHelper.GetState(source, culture);
+                documentVariantViewModel.PublishDate = culture == null
+                    ? source.PublishDate
+                    : source.GetPublishDate(culture);
+            });
+        target.IsTrashed = source.Trashed;
+    }
+
+    // Umbraco.Code.MapAll -Flags
+    private void Map(IElement source, PublishedElementResponseModel target, MapperContext context)
+    {
+        target.Id = source.Key;
+        target.DocumentType = context.Map<DocumentTypeReferenceResponseModel>(source.ContentType)!;
+        target.Values = MapValueViewModels(source.Properties, published: true);
+        target.Variants = MapVariantViewModels(
+            source,
+            (culture, _, elementVariantViewModel) =>
+            {
+                elementVariantViewModel.Name = source.GetPublishName(culture) ?? elementVariantViewModel.Name;
+                PublishableVariantState variantState = PublishableVariantStateHelper.GetState(source, culture);
+                elementVariantViewModel.State = variantState == PublishableVariantState.PublishedPendingChanges
+                    ? PublishableVariantState.Published
+                    : variantState;
+                elementVariantViewModel.PublishDate = culture == null
+                    ? source.PublishDate
+                    : source.GetPublishDate(culture);
+            });
+        target.IsTrashed = source.Trashed;
+    }
+
+    private void Map(ContentScheduleCollection source, ElementResponseModel target, MapperContext context)
+        => MapContentScheduleCollection<ElementResponseModel, ElementVariantResponseModel>(source, target, context);
+}

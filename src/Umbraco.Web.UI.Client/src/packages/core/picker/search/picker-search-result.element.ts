@@ -126,9 +126,7 @@ export class UmbPickerSearchResultElement extends UmbLitElement {
 	}
 
 	#renderEmptyResult() {
-		return html`<uui-box>
-			<small>No result for <strong>"${this._executedQuery?.query}"</strong>.</small>
-		</uui-box>`;
+		return html`<uui-box>${this.localize.term('general_noResults')}</uui-box>`;
 	}
 
 	#renderResultItem(item: UmbSearchResultItemModel) {
@@ -172,8 +170,7 @@ export class UmbPickerSearchResultElement extends UmbLitElement {
 			}
 
 			uui-pagination {
-				display: block;
-				margin-top: var(--uui-size-layout-1);
+				margin-top: var(--uui-size-space-3);
 			}
 		`,
 	];

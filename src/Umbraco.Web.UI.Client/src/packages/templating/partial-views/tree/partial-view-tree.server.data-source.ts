@@ -11,6 +11,7 @@ import type {
 	UmbTreeRootItemsRequestArgs,
 } from '@umbraco-cms/backoffice/tree';
 import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
+import type { UmbOffsetPaginationRequestModel } from '@umbraco-cms/backoffice/utils';
 import type { FileSystemTreeItemPresentationModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { PartialViewService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -18,7 +19,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 /**
  * A data source for the PartialView tree that fetches data from the server
  * @class UmbPartialViewTreeServerDataSource
- * @implements {UmbTreeDataSource}
+ * @implements {UmbTreeServerDataSourceBase}
  */
 export class UmbPartialViewTreeServerDataSource extends UmbTreeServerDataSourceBase<
 	FileSystemTreeItemPresentationModel,
@@ -39,20 +40,33 @@ export class UmbPartialViewTreeServerDataSource extends UmbTreeServerDataSourceB
 	}
 }
 
-const getRootItems = (args: UmbTreeRootItemsRequestArgs) =>
+const getRootItems = async (args: UmbTreeRootItemsRequestArgs) => {
+	const { skip = 0, take = 100 } = (args.paging ?? {}) as UmbOffsetPaginationRequestModel;
 	// eslint-disable-next-line local-rules/no-direct-api-import
-	PartialViewService.getTreePartialViewRoot({ query: { skip: args.skip, take: args.take } });
+	const { data, ...rest } = await PartialViewService.getTreePartialViewRoot({
+		query: { skip, take },
+	});
+	return {
+		data: { ...data, totalBefore: skip, totalAfter: Math.max(data.total - skip - data.items.length, 0) },
+		...rest,
+	};
+};
 
-const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
+const getChildrenOf = async (args: UmbTreeChildrenOfRequestArgs) => {
 	const parentPath = new UmbServerFilePathUniqueSerializer().toServerPath(args.parent.unique);
 
 	if (parentPath === null) {
 		return getRootItems(args);
 	} else {
+		const { skip = 0, take = 100 } = (args.paging ?? {}) as UmbOffsetPaginationRequestModel;
 		// eslint-disable-next-line local-rules/no-direct-api-import
-		return PartialViewService.getTreePartialViewChildren({
-			query: { parentPath, skip: args.skip, take: args.take },
+		const { data, ...rest } = await PartialViewService.getTreePartialViewChildren({
+			query: { parentPath, skip, take },
 		});
+		return {
+			data: { ...data, totalBefore: skip, totalAfter: Math.max(data.total - skip - data.items.length, 0) },
+			...rest,
+		};
 	}
 };
 

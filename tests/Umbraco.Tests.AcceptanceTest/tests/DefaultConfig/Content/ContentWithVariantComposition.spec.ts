@@ -44,6 +44,8 @@ test('can create content with an invariant document type that has a variant comp
   expect(contentData.variants[0].state).toBe(expectedState);
 });
 
+// This test fails due to an existing issue
+// Issue link: https://github.com/umbraco/Umbraco-CMS/issues/22800
 test('can save property value from variant composition in invariant content', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const text = 'This is a property value from variant composition';

@@ -59,6 +59,8 @@ public class QueryMediaApiController : MediaApiControllerBase
         PagedModel<Guid> pagedResult = queryAttempt.Result;
         IPublishedContent[] mediaItems = pagedResult.Items.Select(PublishedMediaCache.GetById).WhereNotNull().ToArray();
 
+        SetOutputCacheMedia(mediaItems);
+
         var model = new PagedViewModel<IApiMediaWithCropsResponse>
         {
             Total = pagedResult.Total,

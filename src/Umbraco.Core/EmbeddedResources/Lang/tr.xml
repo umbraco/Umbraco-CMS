@@ -405,8 +405,4 @@
     <key alias="scheduledHealthCheckEmailBody"><![CDATA[<html><body><p>%0% tarihinde %1% ile çalıştırılan planlanmış Umbraco Sağlık Kontrollerinin sonuçları aşağıdaki gibidir: </p>%2%</body></html>]]></key>
     <key alias="scheduledHealthCheckEmailSubject">Umbraco Sağlık Kontrolü Durumu: %0%</key>
   </area>
-  <area alias="recycleBin">
-    <key alias="contentTrashed">Çöp kutusuna gönderilmiş içerik: {0} Şu kimliğe sahip orijinal ana içerikle ilgili: {1}</key>
-    <key alias="mediaTrashed">Şu kimliğe sahip çöp kutusuna gönderilen medya: {0} Şu kimliğe sahip orijinal ana medya öğesiyle ilgili: {1}</key>
-  </area>
 </language>

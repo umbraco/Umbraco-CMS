@@ -5,7 +5,7 @@ import { UmbStoreObjectBase } from '@umbraco-cms/backoffice/store';
 
 export class UmbUserConfigStore extends UmbStoreObjectBase<UmbUserConfigurationModel> {
 	constructor(host: UmbControllerHost) {
-		super(host, UMB_USER_CONFIG_STORE_CONTEXT.toString());
+		super(host, UMB_USER_CONFIG_STORE_CONTEXT);
 	}
 }
 

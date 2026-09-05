@@ -33,8 +33,8 @@ export class UmbExtensionElementInitializer<
 
 	/**
 	 * The props that are passed to the component.
-	 * @type {Record<string, any>}
-	 * @memberof UmbElementExtensionController
+	 * @type {Record<string, unknown>}
+	 * @memberof UmbExtensionElementInitializer
 	 * @example
 	 * ```ts
 	 * const controller = new UmbElementExtensionController(host, extensionRegistry, alias, onPermissionChanged);
@@ -76,14 +76,24 @@ export class UmbExtensionElementInitializer<
 		});
 	};
 
-	protected async _conditionsAreGood() {
+	protected async _conditionsAreGood(signal: AbortSignal) {
 		const manifest = this.manifest!; // In this case we are sure its not undefined.
 
 		const newComponent = await createExtensionElement(manifest, this.#defaultElement);
-		if (!this._isConditionsPositive) {
-			// We are not positive anymore, so we will back out of this creation.
+
+		if (signal.aborted || !this._isConditionsPositive) {
+			if (newComponent && 'destroy' in newComponent) {
+				(newComponent as unknown as { destroy: () => void }).destroy();
+			}
 			return false;
 		}
+		if (this.#component && this.#component !== newComponent) {
+			if ('destroy' in this.#component) {
+				(this.#component as unknown as { destroy: () => void }).destroy();
+			}
+			this.#component = undefined;
+		}
+
 		this.#component = newComponent as ExtensionElementInterface;
 		if (this.#component) {
 			this.#assignProperties();

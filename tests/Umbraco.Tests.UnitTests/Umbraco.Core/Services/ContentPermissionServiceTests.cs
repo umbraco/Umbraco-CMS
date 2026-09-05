@@ -346,11 +346,90 @@ public class ContentPermissionServiceTests
         return userMock.Object;
     }
 
+    [Test]
+    public async Task Can_Get_Permissions_For_Content()
+    {
+        // Arrange
+        var contentKey = Guid.NewGuid();
+        var user = CreateUser();
+
+        _entityServiceMock
+            .Setup(x => x.GetAllPaths(UmbracoObjectTypes.Document, new[] { contentKey }))
+            .Returns([CreateTreeEntityPath(contentKey, ContentNodeId, ContentNodePath)]);
+
+        SetupBatchPermissions(user, [ContentNodeId, 1234, -1], ["A", "B"]);
+
+        // Act
+        var result = (await _sut.GetPermissionsAsync(user, [contentKey])).ToArray();
+
+        // Assert
+        Assert.That(result, Has.Length.EqualTo(1));
+        Assert.That(result[0].NodeKey, Is.EqualTo(contentKey));
+        Assert.That(result[0].Permissions.Contains("A"), Is.True);
+        Assert.That(result[0].Permissions.Contains("B"), Is.True);
+    }
+
+    [Test]
+    public async Task Get_Permissions_Returns_Empty_For_Empty_Keys()
+    {
+        // Arrange
+        var user = CreateUser();
+
+        // Act
+        var result = (await _sut.GetPermissionsAsync(user, [])).ToArray();
+
+        // Assert
+        Assert.That(result, Is.Empty);
+    }
+
+    [Test]
+    public async Task Get_Permissions_Returns_Empty_When_Content_Not_Found()
+    {
+        // Arrange
+        var contentKey = Guid.NewGuid();
+        var user = CreateUser();
+
+        _entityServiceMock
+            .Setup(x => x.GetAllPaths(UmbracoObjectTypes.Document, new[] { contentKey }))
+            .Returns([]);
+
+        // Act
+        var result = (await _sut.GetPermissionsAsync(user, [contentKey])).ToArray();
+
+        // Assert
+        Assert.That(result, Is.Empty);
+    }
+
+    [Test]
+    public async Task FilterFallbackPermissions_Returns_Permissions_Unchanged()
+    {
+        // Arrange
+        var user = CreateUser();
+        var fallback = new HashSet<string> { "A", "B", "C" };
+
+        // Act - the stock implementation should pass through unchanged.
+        ISet<string> result = await _sut.FilterFallbackPermissionsAsync(user, fallback);
+
+        // Assert
+        Assert.That(result, Is.EquivalentTo(new[] { "A", "B", "C" }));
+    }
+
     private void SetupPermissions(IUser user, string path, string[] assignedPermissions)
     {
         var permissions = new EntityPermissionCollection { new(9876, 1234, assignedPermissions.ToHashSet()) };
         var permissionSet = new EntityPermissionSet(1234, permissions);
         _userServiceMock.Setup(x => x.GetPermissionsForPath(user, path)).Returns(permissionSet);
+    }
+
+    private void SetupBatchPermissions(IUser user, int[] nodeIds, string[] assignedPermissions)
+    {
+        var permissions = new EntityPermissionCollection();
+        foreach (var nodeId in nodeIds)
+        {
+            permissions.Add(new EntityPermission(9876, nodeId, assignedPermissions.ToHashSet()));
+        }
+
+        _userServiceMock.Setup(x => x.GetPermissions(user, It.IsAny<int[]>())).Returns(permissions);
     }
 
     private static TreeEntityPath CreateTreeEntityPath(Guid key, int id, string path)

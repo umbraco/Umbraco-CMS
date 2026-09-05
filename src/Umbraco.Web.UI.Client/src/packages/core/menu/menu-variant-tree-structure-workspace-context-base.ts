@@ -4,7 +4,7 @@ import { UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT } from './section-sidebar-menu
 import type { UmbTreeItemModel, UmbTreeRepository, UmbTreeRootModel } from '@umbraco-cms/backoffice/tree';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
-import { UmbArrayState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbAncestorsEntityContext, UmbParentEntityContext, type UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import {
@@ -13,10 +13,12 @@ import {
 	UMB_WORKSPACE_EDIT_PATH_PATTERN,
 	UMB_WORKSPACE_EDIT_VARIANT_PATH_PATTERN,
 } from '@umbraco-cms/backoffice/workspace';
-import { linkEntityExpansionEntries } from '@umbraco-cms/backoffice/utils';
+import { debounce, linkEntityExpansionEntries } from '@umbraco-cms/backoffice/utils';
 import { UMB_MODAL_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UMB_SECTION_CONTEXT } from '@umbraco-cms/backoffice/section';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
+import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 
 interface UmbMenuVariantTreeStructureWorkspaceContextBaseArgs {
 	treeRepositoryAlias: string;
@@ -32,12 +34,6 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 	#structure = new UmbArrayState<UmbVariantStructureItemModel>([], (x) => x.unique);
 	public readonly structure = this.#structure.asObservable();
 
-	#parent = new UmbObjectState<UmbVariantStructureItemModel | undefined>(undefined);
-	/**
-	 * @deprecated Will be removed in v.18: Use UMB_PARENT_ENTITY_CONTEXT instead.
-	 */
-	public readonly parent = this.#parent.asObservable();
-
 	protected _sectionContext?: typeof UMB_SECTION_CONTEXT.TYPE;
 
 	#parentContext = new UmbParentEntityContext(this);
@@ -47,17 +43,26 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 	#isNew: boolean | undefined = undefined;
 	#variantWorkspaceContext?: typeof UMB_VARIANT_WORKSPACE_CONTEXT.TYPE;
 	#workspaceActiveVariantId?: UmbVariantId;
+	#actionEventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
+	#structureRequestId = 0;
+
+	// Coalesces the unique/isNew/reload-event triggers when they fire in quick succession.
+	#requestStructure = debounce(() => this.#requestStructureImpl(), 100);
 
 	public readonly IS_MENU_VARIANT_STRUCTURE_WORKSPACE_CONTEXT = true;
 
 	constructor(host: UmbControllerHost, args: UmbMenuVariantTreeStructureWorkspaceContextBaseArgs) {
 		super(host, UMB_MENU_VARIANT_STRUCTURE_WORKSPACE_CONTEXT);
-		// 'UmbMenuStructureWorkspaceContext' is Obsolete, will be removed in v.18
-		this.provideContext('UmbMenuStructureWorkspaceContext', this);
 		this.#args = args;
 
 		this.consumeContext(UMB_MODAL_CONTEXT, (modalContext) => {
 			this.#isModalContext = modalContext !== undefined;
+		});
+
+		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (instance) => {
+			this.#removeEventListeners();
+			this.#actionEventContext = instance;
+			this.#addEventListeners();
 		});
 
 		this.consumeContext(UMB_SECTION_CONTEXT, (instance) => {
@@ -80,6 +85,8 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 				this.#workspaceContext?.unique,
 				(value) => {
 					if (!value) return;
+					// Clear immediately so the previous entity's breadcrumb/structure isn't shown while the new one loads.
+					this.#clearStructure();
 					this.#requestStructure();
 				},
 				'observeUnique',
@@ -90,7 +97,6 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 				(value) => {
 					// Workspace has changed from new to existing
 					if (value === false && this.#isNew === true) {
-						// TODO: We do not need to request here as we already know the structure and unique
 						this.#requestStructure();
 					}
 					this.#isNew = value;
@@ -132,7 +138,37 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 		});
 	}
 
-	async #requestStructure() {
+	#addEventListeners() {
+		this.#actionEventContext?.addEventListener(
+			UmbRequestReloadStructureForEntityEvent.TYPE,
+			this.#onReloadStructureForEntityRequest as EventListener,
+		);
+	}
+
+	#removeEventListeners() {
+		this.#actionEventContext?.removeEventListener(
+			UmbRequestReloadStructureForEntityEvent.TYPE,
+			this.#onReloadStructureForEntityRequest as EventListener,
+		);
+	}
+
+	#onReloadStructureForEntityRequest = (event: UmbRequestReloadStructureForEntityEvent) => {
+		if (!this.#isCurrentEntityOrAncestor(event.getEntityType(), event.getUnique())) return;
+		this.#requestStructure();
+	};
+
+	#isCurrentEntityOrAncestor(entityType: string, unique: string | null): boolean {
+		if (entityType === this.#workspaceContext?.getEntityType() && unique === this.#workspaceContext?.getUnique()) {
+			return true;
+		}
+
+		return this.#ancestorContext
+			.getAncestors()
+			.some((ancestor) => ancestor.entityType === entityType && ancestor.unique === unique);
+	}
+
+	async #requestStructureImpl() {
+		const requestId = ++this.#structureRequestId;
 		const isNew = this.#workspaceContext?.getIsNew();
 		const uniqueObservable = isNew
 			? this.#workspaceContext?._internal_createUnderParentEntityUnique
@@ -144,10 +180,16 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 		let structureItems: Array<UmbVariantStructureItemModel> = [];
 
 		const unique = (await this.observe(uniqueObservable, () => {})?.asPromise()) as string;
-		if (unique === undefined) throw new Error('Unique is not available');
+		if (unique === undefined) {
+			if (this._host) console.warn('[UmbMenuVariantTreeStructureWorkspaceContextBase] unique not available');
+			return;
+		}
 
 		const entityType = (await this.observe(entityTypeObservable, () => {})?.asPromise()) as string;
-		if (!entityType) throw new Error('Entity type is not available');
+		if (!entityType) {
+			if (this._host) console.warn('[UmbMenuVariantTreeStructureWorkspaceContextBase] entityType not available');
+			return;
+		}
 
 		// TODO: introduce variant tree item model
 		const treeRepository = await createExtensionApiByAlias<UmbTreeRepository<any, UmbTreeRootModel>>(
@@ -186,6 +228,13 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 
 			structureItems.push(...treeItemAncestors);
 
+			// Guard: this context may have been destroyed while the async requests were in flight
+			// (e.g. a condition such as IS_NOT_TRASHED flips before the API response arrives).
+			if (!this._host) return;
+
+			// Guard: a newer request has superseded this one; its result would already be stale.
+			if (requestId !== this.#structureRequestId) return;
+
 			this.#structure.setValue(structureItems);
 			this.#setParentData(structureItems);
 			this.#setAncestorData(data);
@@ -197,13 +246,16 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 		}
 	}
 
+	#clearStructure() {
+		this.#structure.setValue([]);
+		this.#parentContext.setParent(undefined);
+		this.#ancestorContext.setAncestors([]);
+	}
+
 	#setParentData(structureItems: Array<UmbVariantStructureItemModel>) {
 		/* If the item is not new, the current item is the last item in the array.
 			We filter out the current item unique to handle any case where it could show up */
 		const parent = structureItems.filter((item) => item.unique !== this.#workspaceContext?.getUnique()).pop();
-
-		// TODO: remove this when the parent gets removed from the structure interface
-		this.#parent.setValue(parent);
 
 		const parentEntity = parent
 			? {
@@ -262,9 +314,10 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 	}
 
 	override destroy(): void {
+		this.#requestStructure.cancel();
+		this.#removeEventListeners();
 		super.destroy();
 		this.#structure.destroy();
-		this.#parent.destroy();
 		this.#parentContext.destroy();
 		this.#ancestorContext.destroy();
 	}

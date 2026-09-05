@@ -1,3 +1,5 @@
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -22,6 +24,7 @@ public sealed class ContentTypeCacheRefresher : PayloadCacheRefresherBase<Conten
     private readonly IDocumentCacheService _documentCacheService;
     private readonly IPublishedContentTypeCache _publishedContentTypeCache;
     private readonly IMediaCacheService _mediaCacheService;
+    private readonly IElementCacheService _elementCacheService;
     private readonly IIdKeyMap _idKeyMap;
 
     /// <summary>
@@ -38,6 +41,7 @@ public sealed class ContentTypeCacheRefresher : PayloadCacheRefresherBase<Conten
     /// <param name="documentCacheService">The document cache service.</param>
     /// <param name="publishedContentTypeCache">The published content type cache.</param>
     /// <param name="mediaCacheService">The media cache service.</param>
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 20.")]
     public ContentTypeCacheRefresher(
         AppCaches appCaches,
         IJsonSerializer serializer,
@@ -50,6 +54,50 @@ public sealed class ContentTypeCacheRefresher : PayloadCacheRefresherBase<Conten
         IDocumentCacheService documentCacheService,
         IPublishedContentTypeCache publishedContentTypeCache,
         IMediaCacheService mediaCacheService)
+        : this(
+            appCaches,
+            serializer,
+            idKeyMap,
+            contentTypeCommonRepository,
+            eventAggregator,
+            factory,
+            publishedModelFactory,
+            publishedContentTypeFactory,
+            documentCacheService,
+            publishedContentTypeCache,
+            mediaCacheService,
+            StaticServiceProvider.Instance.GetRequiredService<IElementCacheService>())
+    {
+    }
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="ContentTypeCacheRefresher" /> class.
+    /// </summary>
+    /// <param name="appCaches">The application caches.</param>
+    /// <param name="serializer">The JSON serializer.</param>
+    /// <param name="idKeyMap">The ID-key mapping service.</param>
+    /// <param name="contentTypeCommonRepository">The content type common repository.</param>
+    /// <param name="eventAggregator">The event aggregator.</param>
+    /// <param name="factory">The cache refresher notification factory.</param>
+    /// <param name="publishedModelFactory">The published model factory.</param>
+    /// <param name="publishedContentTypeFactory">The published content type factory.</param>
+    /// <param name="documentCacheService">The document cache service.</param>
+    /// <param name="publishedContentTypeCache">The published content type cache.</param>
+    /// <param name="mediaCacheService">The media cache service.</param>
+    /// <param name="elementCacheService">The element cache service.</param>
+    public ContentTypeCacheRefresher(
+        AppCaches appCaches,
+        IJsonSerializer serializer,
+        IIdKeyMap idKeyMap,
+        IContentTypeCommonRepository contentTypeCommonRepository,
+        IEventAggregator eventAggregator,
+        ICacheRefresherNotificationFactory factory,
+        IPublishedModelFactory publishedModelFactory,
+        IPublishedContentTypeFactory publishedContentTypeFactory,
+        IDocumentCacheService documentCacheService,
+        IPublishedContentTypeCache publishedContentTypeCache,
+        IMediaCacheService mediaCacheService,
+        IElementCacheService elementCacheService)
         : base(appCaches, serializer, eventAggregator, factory)
     {
         _idKeyMap = idKeyMap;
@@ -59,6 +107,7 @@ public sealed class ContentTypeCacheRefresher : PayloadCacheRefresherBase<Conten
         _documentCacheService = documentCacheService;
         _publishedContentTypeCache = publishedContentTypeCache;
         _mediaCacheService = mediaCacheService;
+        _elementCacheService = elementCacheService;
     }
 
     #region Json
@@ -75,10 +124,27 @@ public sealed class ContentTypeCacheRefresher : PayloadCacheRefresherBase<Conten
         /// <param name="id">The identifier of the content type.</param>
         /// <param name="changeTypes">The types of changes that occurred.</param>
         public JsonPayload(string itemType, int id, ContentTypeChangeTypes changeTypes)
+            : this(itemType, id, changeTypes, false)
+        {
+        }
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="JsonPayload" /> class.
+        /// </summary>
+        /// <param name="itemType">The type name of the content type.</param>
+        /// <param name="id">The identifier of the content type.</param>
+        /// <param name="changeTypes">The types of changes that occurred.</param>
+        /// <param name="isElement">
+        ///     Whether the content type is an Element type. Only meaningful when <paramref name="itemType" /> is
+        ///     <see cref="IContentType" />, as Document and Element types share that item type.
+        /// </param>
+        [System.Text.Json.Serialization.JsonConstructor]
+        public JsonPayload(string itemType, int id, ContentTypeChangeTypes changeTypes, bool isElement)
         {
             ItemType = itemType;
             Id = id;
             ChangeTypes = changeTypes;
+            IsElement = isElement;
         }
 
         /// <summary>
@@ -95,6 +161,12 @@ public sealed class ContentTypeCacheRefresher : PayloadCacheRefresherBase<Conten
         ///     Gets the types of changes that occurred.
         /// </summary>
         public ContentTypeChangeTypes ChangeTypes { get; }
+
+        /// <summary>
+        ///     Gets a value indicating whether the content type is an Element type.
+        ///     Only meaningful when <see cref="ItemType" /> is <see cref="IContentType" />.
+        /// </summary>
+        public bool IsElement { get; }
     }
 
     #endregion
@@ -127,6 +199,7 @@ public sealed class ContentTypeCacheRefresher : PayloadCacheRefresherBase<Conten
         if (payloads.Any(x => x.ItemType == typeof(IContentType).Name))
         {
             ClearAllIsolatedCacheByEntityType<IContent>();
+            ClearAllIsolatedCacheByEntityType<IElement>();
             ClearAllIsolatedCacheByEntityType<IContentType>();
         }
 
@@ -175,41 +248,43 @@ public sealed class ContentTypeCacheRefresher : PayloadCacheRefresherBase<Conten
         _publishedContentTypeFactory.NotifyDataTypeChanges();
         _publishedModelFactory.WithSafeLiveFactoryReset(() =>
         {
-            // Separate structural changes (RefreshMain) from non-structural changes (RefreshOther).
-            // Structural changes require a full memory cache rebuild, while non-structural changes
-            // only need the converted content cache cleared since ContentCacheNode only stores ContentTypeId.
-            var structuralDocumentTypeIds = payloads
-                .Where(x => x.ItemType == nameof(IContentType) && x.ChangeTypes.IsStructuralChange())
-                .Select(x => x.Id)
-                .ToArray();
+            // Split changes into those that need the in-memory cache rebuilding (evicting the HybridCache
+            // entries by content type tag) and those that only need the converted content cache cleared.
+            // A structural change flagged RawDataUnaffected (a property removal) keeps its stored blob valid,
+            // so it belongs with the non-structural changes here — clearing the converted cache is enough.
+            // Document and Element types are both IContentType, so they're further split by IsElement to
+            // avoid scanning the wrong service's (unbounded) converted-content cache for IDs that can't match.
+            IEnumerable<JsonPayload> contentTypePayloads = payloads.Where(x => x.ItemType == nameof(IContentType));
+            IEnumerable<JsonPayload> mediaTypePayloads = payloads.Where(x => x.ItemType == nameof(IMediaType));
 
-            var nonStructuralDocumentTypeIds = payloads
-                .Where(x => x.ItemType == nameof(IContentType) && x.ChangeTypes.IsNonStructuralChange())
-                .Select(x => x.Id)
-                .ToArray();
+            IEnumerable<JsonPayload> rebuildContentTypes = contentTypePayloads.Where(x => x.ChangeTypes.RequiresRawDataRebuild());
+            IEnumerable<JsonPayload> convertedOnlyContentTypes = contentTypePayloads.Where(x => x.ChangeTypes.RequiresConvertedCacheClearOnly());
 
-            var structuralMediaTypeIds = payloads
-                .Where(x => x.ItemType == nameof(IMediaType) && x.ChangeTypes.IsStructuralChange())
-                .Select(x => x.Id)
-                .ToArray();
+            var rebuildDocumentTypeIds = DocumentTypeIds(rebuildContentTypes);
+            var rebuildElementTypeIds = ElementTypeIds(rebuildContentTypes);
+            var convertedOnlyDocumentTypeIds = DocumentTypeIds(convertedOnlyContentTypes);
+            var convertedOnlyElementTypeIds = ElementTypeIds(convertedOnlyContentTypes);
 
-            var nonStructuralMediaTypeIds = payloads
-                .Where(x => x.ItemType == nameof(IMediaType) && x.ChangeTypes.IsNonStructuralChange())
-                .Select(x => x.Id)
-                .ToArray();
+            var rebuildMediaTypeIds = DistinctIds(mediaTypePayloads.Where(x => x.ChangeTypes.RequiresRawDataRebuild()));
+            var convertedOnlyMediaTypeIds = DistinctIds(mediaTypePayloads.Where(x => x.ChangeTypes.RequiresConvertedCacheClearOnly()));
 
-            // Full memory cache rebuild only for structural changes
-            if (structuralDocumentTypeIds.Length > 0)
+            // Full memory cache rebuild only for changes that affect the stored data.
+            if (rebuildDocumentTypeIds.Length > 0)
             {
-                _documentCacheService.RebuildMemoryCacheByContentTypeAsync(structuralDocumentTypeIds).GetAwaiter().GetResult();
+                _documentCacheService.RebuildMemoryCacheByContentTypeAsync(rebuildDocumentTypeIds).GetAwaiter().GetResult();
             }
 
-            if (structuralMediaTypeIds.Length > 0)
+            if (rebuildElementTypeIds.Length > 0)
             {
-                _mediaCacheService.RebuildMemoryCacheByContentTypeAsync(structuralMediaTypeIds).GetAwaiter().GetResult();
+                _elementCacheService.RebuildMemoryCacheByContentTypeAsync(rebuildElementTypeIds).GetAwaiter().GetResult();
             }
 
-            // Clear the converted content cache for non-structural changes (HybridCache entries remain valid).
+            if (rebuildMediaTypeIds.Length > 0)
+            {
+                _mediaCacheService.RebuildMemoryCacheByContentTypeAsync(rebuildMediaTypeIds).GetAwaiter().GetResult();
+            }
+
+            // Clear the converted content cache for the remaining changes (HybridCache entries remain valid).
             // In auto models builder mode (InMemoryAuto), the factory reset above invalidates ALL compiled
             // model types, so we must clear all entries to prevent stale instances of other types
             // (e.g. Model.Parent<T>()) from being returned. In non-auto modes, only affected types need clearing.
@@ -217,26 +292,36 @@ public sealed class ContentTypeCacheRefresher : PayloadCacheRefresherBase<Conten
 
             if (isAutoFactory)
             {
-                if (structuralDocumentTypeIds.Length > 0 || nonStructuralDocumentTypeIds.Length > 0)
+                if (rebuildDocumentTypeIds.Length > 0 || convertedOnlyDocumentTypeIds.Length > 0)
                 {
                     _documentCacheService.ClearConvertedContentCache();
                 }
 
-                if (structuralMediaTypeIds.Length > 0 || nonStructuralMediaTypeIds.Length > 0)
+                if (rebuildElementTypeIds.Length > 0 || convertedOnlyElementTypeIds.Length > 0)
+                {
+                    _elementCacheService.ClearConvertedContentCache();
+                }
+
+                if (rebuildMediaTypeIds.Length > 0 || convertedOnlyMediaTypeIds.Length > 0)
                 {
                     _mediaCacheService.ClearConvertedContentCache();
                 }
             }
             else
             {
-                if (nonStructuralDocumentTypeIds.Length > 0)
+                if (convertedOnlyDocumentTypeIds.Length > 0)
                 {
-                    _documentCacheService.ClearConvertedContentCache(nonStructuralDocumentTypeIds);
+                    _documentCacheService.ClearConvertedContentCache(convertedOnlyDocumentTypeIds);
                 }
 
-                if (nonStructuralMediaTypeIds.Length > 0)
+                if (convertedOnlyElementTypeIds.Length > 0)
                 {
-                    _mediaCacheService.ClearConvertedContentCache(nonStructuralMediaTypeIds);
+                    _elementCacheService.ClearConvertedContentCache(convertedOnlyElementTypeIds);
+                }
+
+                if (convertedOnlyMediaTypeIds.Length > 0)
+                {
+                    _mediaCacheService.ClearConvertedContentCache(convertedOnlyMediaTypeIds);
                 }
             }
         });
@@ -256,6 +341,15 @@ public sealed class ContentTypeCacheRefresher : PayloadCacheRefresherBase<Conten
 
     /// <inheritdoc />
     public override void Remove(int id) => throw new NotSupportedException();
+
+    private static int[] DocumentTypeIds(IEnumerable<JsonPayload> payloads)
+        => DistinctIds(payloads.Where(x => !x.IsElement));
+
+    private static int[] ElementTypeIds(IEnumerable<JsonPayload> payloads)
+        => DistinctIds(payloads.Where(x => x.IsElement));
+
+    private static int[] DistinctIds(IEnumerable<JsonPayload> payloads)
+        => payloads.Select(x => x.Id).Distinct().ToArray();
 
     #endregion
 }

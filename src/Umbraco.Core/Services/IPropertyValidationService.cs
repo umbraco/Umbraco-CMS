@@ -13,11 +13,12 @@ public interface IPropertyValidationService
     /// <summary>
     ///     Validates the content item's properties pass validation rules
     /// </summary>
-    bool IsPropertyDataValid(IContent content, out IProperty[] invalidProperties, CultureImpact? impact);
+    bool IsPropertyDataValid(IPublishableContentBase content, out IProperty[] invalidProperties, CultureImpact? impact);
 
     /// <summary>
     ///     Gets a value indicating whether the property has valid values.
     /// </summary>
+    [Obsolete("Property level validation is not going to be supported moving forward. Please use content level validation with IsPropertyDataValid instead. Scheduled for removal in Umbraco 20.")]
     bool IsPropertyValid(IProperty property, PropertyValidationContext validationContext);
 
     /// <summary>

@@ -196,7 +196,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase
   implements UmbPublishableWorkspaceContext {
 
   constructor(host: UmbControllerHost) {
-    super(host, UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT.toString());
+    super(host, UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT);
 
     this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, (workspaceContext) => {
       // Access workspace data and add publishing capabilities
@@ -274,6 +274,79 @@ Workspace contexts can use kinds for shared patterns:
 | `UmbSaveWorkspaceAction` | `src/packages/core/workspace/components/workspace-action/common/save/save.action.ts` | `UMB_SAVEABLE_WORKSPACE_CONTEXT` | `requestSave()` |
 
 Most simple entities use `UmbSubmitWorkspaceAction` directly (no custom action class needed). Complex entities like documents define custom action classes for variant dialogs, permission checks, etc.
+
+### Button state when the action opens a modal
+
+If your action opens a confirmation/picker modal before doing real work, the legacy "set `waiting` on click" path produces a spinner during the modal and a success tick the moment the user cancels — both wrong. Workspace actions can opt in to a deferred-feedback contract instead.
+
+The contract has three pieces:
+
+| Piece | Where | Role |
+|---|---|---|
+| `UmbWorkspaceActionExecutionOptions` | `@umbraco-cms/backoffice/workspace` | Public type with `onActionStarting?: () => void` |
+| `notifyWorkspaceActionStarting(options)` | `@umbraco-cms/backoffice/workspace` | Fires `options?.onActionStarting?.()` once, at the point real work begins |
+| `UmbWorkspaceActionBase.setExecuting(value)` | `workspace-action-base.controller.ts` | Materialises an `isExecuting` observable on first call; the button element observes it |
+
+**Action side.** Subclass `UmbWorkspaceActionBase` (or one of its specialisations like `UmbSaveWorkspaceAction`), opt in in the constructor, then forward the callback through the workspace-context method:
+
+```ts
+export class MyWorkspaceAction extends UmbWorkspaceActionBase {
+    constructor(host: UmbControllerHost, args: UmbWorkspaceActionArgs) {
+        super(host, args);
+        // Opt in — exposes `isExecuting` so the button waits for real work.
+        this.setExecuting(false);
+    }
+
+    override async execute() {
+        try {
+            await this._workspaceContext?.doTheirThing({
+                onActionStarting: () => this.setExecuting(true),
+            });
+        } finally {
+            this.setExecuting(false);
+        }
+    }
+}
+```
+
+**Context side.** A workspace-context method that gates work behind a modal accepts the options and calls `notifyWorkspaceActionStarting` after the gate:
+
+```ts
+public async doTheirThing(options?: UmbWorkspaceActionExecutionOptions): Promise<void> {
+    const result = await umbOpenModal(this, MY_CONFIRM_MODAL, { /* ... */ })
+        .catch(() => undefined);
+    if (!result) return; // user cancelled — silent return, no spinner, no tick
+
+    notifyWorkspaceActionStarting(options);
+    // real work below
+    await this.#repository.doTheirThing(result);
+}
+```
+
+What the button element does with this:
+
+- `isExecuting` is undefined (action didn't opt in) → legacy behaviour: `waiting` on click, `success` or `failed` on resolve/reject.
+- `isExecuting` exists but never flips to `true` → button stays idle. This is the cancel path.
+- `isExecuting` flips to `true` → `waiting` shown. Action resolves → `success`. Action rejects → `failed`.
+
+Pre-flight rejections (modal cancel, missing context, `throw new Error('...')` before `setExecuting(true)`) leave the button idle — the warning still reaches the console via `#runApiAction`'s catch, but the user isn't shown a red cross for something they can't act on.
+
+**Overriding `_handleSave` / context methods in subclasses.** If you extend a base workspace context and override a method that accepts `UmbWorkspaceActionExecutionOptions`, forward the argument:
+
+```ts
+protected override async _handleSave(executionOptions?: UmbWorkspaceActionExecutionOptions) {
+    // ... your override logic ...
+    await super._handleSave(executionOptions); // forward — not super._handleSave()
+}
+```
+
+TypeScript won't warn if you drop the parameter; the spinner just silently stops working.
+
+Reference implementations:
+
+- `UmbSaveWorkspaceAction` — `src/packages/core/workspace/components/workspace-action/common/save/save.action.ts`
+- `UmbDocumentSaveAndPublishWorkspaceAction` — `src/packages/documents/documents/publishing/publish/workspace-action/save-and-publish.action.ts`
+- `UmbContentDetailWorkspaceContextBase._handleSave` and `UmbDocumentPublishingWorkspaceContext.saveAndPublish` for the context-side handshake.
 
 ---
 

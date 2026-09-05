@@ -55,7 +55,7 @@ public class MemberGroupPickerValueConverter : PropertyValueConverterBase, IDeli
             return null;
         }
 
-        IEnumerable<IMemberGroup> memberGroups = _memberGroupService.GetByIds(memberGroupIds);
+        IEnumerable<IMemberGroup> memberGroups = _memberGroupService.GetByIdsAsync(memberGroupIds).GetAwaiter().GetResult();
         return memberGroups.Select(m => m.Name).ToArray();
     }
 }

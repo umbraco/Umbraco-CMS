@@ -286,6 +286,8 @@ export default {
 		isSensitiveValue:
 			"Cette valeur est masquée. Si vous avez besoin de pouvoir accéder à cette valeur, veuillez prendre contact avec l'administrateur du site web.",
 		isSensitiveValue_short: 'Cette valeur est masquée.',
+		isSensitiveValueNotice:
+			"Si vous avez besoin de pouvoir accéder aux valeurs masquées, veuillez prendre contact avec l'administrateur du site web.",
 		languagesToPublish: 'Quelles langues souhaitez-vous publier?',
 		languagesToSendForApproval: 'Quells langues souhaitez-vous envoyer pour approbation?',
 		languagesToSchedule: 'Quelles langues souhaitez-vous planifier?',
@@ -298,6 +300,8 @@ export default {
 		createEmpty: 'Créer nouveau',
 		createFromClipboard: 'Copier du clipboard',
 		saveModalTitle: 'Sauver',
+		saveAndPublishDescendantsModalTitle: 'Sauver et publier avec les descendants',
+		saveAndScheduleModalTitle: 'Sauver et planifier la publication',
 	},
 	blueprints: {
 		createBlueprintFrom: 'Créer un nouveau Modèle de Contenu à partir de <em>%0%</em>',
@@ -311,6 +315,8 @@ export default {
 	},
 	media: {
 		clickToUpload: 'Cliquez pour télécharger',
+		browseFilesAction: 'Parcourir les fichiers',
+		dropFilesOr: 'Glissez-déposez des médias ici<br />ou',
 		orClickHereToUpload: 'ou cliquez ici pour choisir un fichier',
 		disallowedFileType: "Ce fichier ne peut pas ête chargé, il n'est pas d'un type de fichier autorisé",
 		invalidFileName: "Ce fichier ne peut pas être chargé, le nom du fichier n'est pas valide",
@@ -344,7 +350,7 @@ export default {
 		enterFolderName: 'Introduisez un nom de dossier',
 		updateData: 'Choisissez un type et un titre',
 		noDocumentTypes:
-			"Il n'y a aucun type de document disponible pour créer du contenu ici. Vous devez d'abord les activer dans <strong>Types de documents</strong> sous la section <strong>Paramètres</strong>, en modifiant les <strong>Types de noeuds enfants autorisés</strong> sous les <strong>Permissions</strong>.",
+			"Il n'y a aucun type de document disponible pour créer du contenu ici. Vous devez d'abord les activer dans <strong>Types de documents</strong> sous la section <strong>Paramètres</strong>, en modifiant les <strong>Types de noeuds enfants autorisés</strong> sous la <strong>Structure</strong>.",
 		noDocumentTypesAtRoot:
 			"Il n'y a aucun type de document disponible pour créer du contenu ici. Vous devez d'abord les activer dans <strong>Types de documents</strong> sous la section <strong>Paramètres</strong>.",
 		noDocumentTypesWithNoSettingsAccess:
@@ -352,9 +358,9 @@ export default {
 		noDocumentTypesEditPermissions: 'Modifier les permissions pour ce type de document',
 		noDocumentTypesCreateNew: 'Créer un nouveau type de document',
 		noDocumentTypesAllowedAtRoot:
-			"Il n'y a aucun type de document disponible pour créer du contenu ici. Vous devez d'abord les activer dans <strong>Types de documents</strong> sous la section <strong>Paramètres</strong>, en modifiant l'option <strong>Autoriser comme racine</strong> sous les <strong>Permissions</strong>.",
+			"Il n'y a aucun type de document disponible pour créer du contenu ici. Vous devez d'abord les activer dans <strong>Types de documents</strong> sous la section <strong>Paramètres</strong>, en modifiant l'option <strong>Autoriser comme racine</strong> sous la <strong>Structure</strong>.",
 		noMediaTypes:
-			"Il n'y a aucun type de média disponible pour créer un media ici. Vous devez d'abord les activer dans <strong>Types de médias</strong> dans la section <strong>Paramètres</strong>, en modifiant les <strong>Types de noeuds enfants autorisés</strong> sous les <strong>Permissions</strong>.",
+			"Il n'y a aucun type de média disponible pour créer un media ici. Vous devez d'abord les activer dans <strong>Types de médias</strong> dans la section <strong>Paramètres</strong>, en modifiant les <strong>Types de noeuds enfants autorisés</strong> sous la <strong>Structure</strong>.",
 		noMediaTypesWithNoSettingsAccess:
 			"Le media sélectionné dans l'arborescence n'autorise pas la création d'un autre media sous lui.",
 		noMediaTypesEditPermissions: 'Modifier les permissions pour ce type de media',
@@ -663,6 +669,7 @@ export default {
 		content: 'Contenu',
 		continue: 'Continuer',
 		copy: 'Copier',
+		copied: 'Copié !',
 		create: 'Créer',
 		database: 'Base de données',
 		date: 'Date',
@@ -719,6 +726,8 @@ export default {
 		new: 'Nouveau',
 		next: 'Suivant',
 		no: 'Non',
+		noResults: 'Aucun résultat',
+		noResultsFor: (query: string) => `Aucun résultat pour "${query}".`,
 		of: 'de',
 		off: 'Inactif',
 		ok: 'OK',
@@ -923,10 +932,8 @@ export default {
 		greeting5: 'Bienvenue',
 		greeting6: 'Bienvenue',
 		instruction: 'Connectez-vous ci-dessous',
-		signInWith: 'Identifiez-vous avec',
+		signInWith: 'Identifiez-vous avec {0}',
 		timeout: 'La session a expiré',
-		bottomText:
-			'<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener">Umbraco.com</a></p> ',
 		forgottenPassword: 'Mot de passe oublié?',
 		forgottenPasswordInstruction:
 			"Un email contenant un lien pour ré-initialiser votre mot de passe sera envoyé à l'adresse spécifiée",
@@ -938,9 +945,6 @@ export default {
 		setPasswordInstruction: 'Veuillez fournir un nouveau mot de passe',
 		setPasswordConfirmation: 'Votre mot de passe a été mis à jour',
 		resetCodeExpired: 'Le lien sur lequel vous avez cliqué est non valide ou a expiré.',
-		resetPasswordEmailCopySubject: 'Umbraco: Ré-initialiser le mot de passe',
-		resetPasswordEmailCopyFormat:
-			"\n        <html>\n\t\t\t<head>\n\t\t\t\t<meta name='viewport' content='width=device-width'>\n\t\t\t\t<meta http-equiv='Content-Type' content='text/html; charset=UTF-8'>\n\t\t\t</head>\n\t\t\t<body class='' style='font-family: sans-serif; -webkit-font-smoothing: antialiased; font-size: 14px; color: #392F54; line-height: 22px; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; background: #1d1333; margin: 0; padding: 0;' bgcolor='#1d1333'>\n\t\t\t\t<style type='text/css'> @media only screen and (max-width: 620px) {table[class=body] h1 {font-size: 28px !important; margin-bottom: 10px !important; } table[class=body] .wrapper {padding: 32px !important; } table[class=body] .article {padding: 32px !important; } table[class=body] .content {padding: 24px !important; } table[class=body] .container {padding: 0 !important; width: 100% !important; } table[class=body] .main {border-left-width: 0 !important; border-radius: 0 !important; border-right-width: 0 !important; } table[class=body] .btn table {width: 100% !important; } table[class=body] .btn a {width: 100% !important; } table[class=body] .img-responsive {height: auto !important; max-width: 100% !important; width: auto !important; } } .btn-primary table td:hover {background-color: #34495e !important; } .btn-primary a:hover {background-color: #34495e !important; border-color: #34495e !important; } .btn  a:visited {color:#FFFFFF;} </style>\n\t\t\t\t<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" class=\"body\" style=\"border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background: #1d1333;\" bgcolor=\"#1d1333\">\n\t\t\t\t\t<tr>\n\t\t\t\t\t\t<td style=\"font-family: sans-serif; font-size: 14px; vertical-align: top; padding: 24px;\" valign=\"top\">\n\t\t\t\t\t\t\t<table style=\"border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;\">\n\t\t\t\t\t\t\t\t<tr>\n\t\t\t\t\t\t\t\t\t<td background=\"https://umbraco.com/umbraco/assets/img/application/logo.png\" bgcolor=\"#1d1333\" width=\"28\" height=\"28\" valign=\"top\" style=\"font-family: sans-serif; font-size: 14px; vertical-align: top;\">\n\t\t\t\t\t\t\t\t\t\t<!--[if gte mso 9]> <v:rect xmlns:v=\"urn:schemas-microsoft-com:vml\" fill=\"true\" stroke=\"false\" style=\"width:30px;height:30px;\"> <v:fill type=\"tile\" src=\"https://umbraco.com/umbraco/assets/img/application/logo.png\" color=\"#1d1333\" /> <v:textbox inset=\"0,0,0,0\"> <![endif]-->\n\t\t\t\t\t\t\t\t\t\t<div> </div>\n\t\t\t\t\t\t\t\t\t\t<!--[if gte mso 9]> </v:textbox> </v:rect> <![endif]-->\n\t\t\t\t\t\t\t\t\t</td>\n\t\t\t\t\t\t\t\t\t<td style=\"font-family: sans-serif; font-size: 14px; vertical-align: top;\" valign=\"top\"></td>\n\t\t\t\t\t\t\t\t</tr>\n\t\t\t\t\t\t\t</table>\n\t\t\t\t\t\t</td>\n\t\t\t\t\t</tr>\n\t\t\t\t</table>\n\t\t\t\t<table border='0' cellpadding='0' cellspacing='0' class='body' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background: #1d1333;' bgcolor='#1d1333'>\n\t\t\t\t\t<tr>\n\t\t\t\t\t\t<td style='font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'> </td>\n\t\t\t\t\t\t<td class='container' style='font-family: sans-serif; font-size: 14px; vertical-align: top; display: block; max-width: 560px; width: 560px; margin: 0 auto; padding: 10px;' valign='top'>\n\t\t\t\t\t\t\t<div class='content' style='box-sizing: border-box; display: block; max-width: 560px; margin: 0 auto; padding: 10px;'>\n\t\t\t\t\t\t\t\t<br>\n\t\t\t\t\t\t\t\t<table class='main' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; border-radius: 3px; background: #FFFFFF;' bgcolor='#FFFFFF'>\n\t\t\t\t\t\t\t\t\t<tr>\n\t\t\t\t\t\t\t\t\t\t<td class='wrapper' style='font-family: sans-serif; font-size: 14px; vertical-align: top; box-sizing: border-box; padding: 50px;' valign='top'>\n\t\t\t\t\t\t\t\t\t\t\t<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;'>\n\t\t\t\t\t\t\t\t\t\t\t\t<tr>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<td style='line-height: 24px; font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<h1 style='color: #392F54; font-family: sans-serif; font-weight: bold; line-height: 1.4; font-size: 24px; text-align: left; text-transform: capitalize; margin: 0 0 30px;' align='left'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tUne réinitialisation de votre mot de passe a été demandée\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t</h1>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tVotre nom d'utilisateur pour vous connecter au backoffice Umbraco est : <strong>%0%</strong>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t</p>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: auto;'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<tbody>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<tr>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<td style='font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center; background: #35C786;' align='center' bgcolor='#35C786' valign='top'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<a href='%1%' target='_blank' rel='noopener' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tCliquez sur ce lien pour réinitialiser votre mot de passe\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t</a>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t</td>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t</tr>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t</tbody>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t</table>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t</p>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<p style='max-width: 400px; display: block; color: #392F54; font-family: sans-serif; font-size: 14px; line-height: 20px; font-weight: normal; margin: 15px 0;'>Si vous ne pouvez pas cliquer sur le lien, recopiez cet URL dans votre navigateur :</p>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<table border='0' cellpadding='0' cellspacing='0'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<tr>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<td style='-ms-word-break: break-all; word-break: break-all; font-family: sans-serif; font-size: 11px; line-height:14px;'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<font style=\"-ms-word-break: break-all; word-break: break-all; font-size: 11px; line-height:14px;\">\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<a style='-ms-word-break: break-all; word-break: break-all; color: #392F54; text-decoration: underline; font-size: 11px; line-height:15px;' href='%1%'>%1%</a>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t</font>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t</td>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t</tr>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t</table>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t</p>\n\t\t\t\t\t\t\t\t\t\t\t\t\t</td>\n\t\t\t\t\t\t\t\t\t\t\t\t</tr>\n\t\t\t\t\t\t\t\t\t\t\t</table>\n\t\t\t\t\t\t\t\t\t\t</td>\n\t\t\t\t\t\t\t\t\t</tr>\n\t\t\t\t\t\t\t\t</table>\n\t\t\t\t\t\t\t\t<br><br><br>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</td>\n\t\t\t\t\t\t<td style='font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'> </td>\n\t\t\t\t\t</tr>\n\t\t\t\t</table>\n\t\t\t</body>\n\t\t</html>\n\t",
 	},
 	main: {
 		dashboard: 'Tableau de bord',
@@ -1122,7 +1126,7 @@ export default {
 	},
 	sections: {
 		content: 'Contenu',
-		forms: 'Formulaires',
+		library: 'Bibliothèque',
 		media: 'Medias',
 		member: 'Membres',
 		packages: 'Packages',
@@ -1402,10 +1406,20 @@ export default {
 		childNodesDescription: 'Autorisez la création de contenu des types spécifiés sous le contenu de ce type-ci',
 		chooseChildNode: 'Choisissez les noeuds enfants',
 		compositionsDescription:
-			"Hériter des onglets et propriétés d'un type de document existant. De nouveaux onglets seront ajoutés au type de document actuel, ou fusionnés s'il existe un onglet avec un nom sililaire.",
+			"Hériter des onglets et propriétés d'un type de document existant. De nouveaux onglets seront ajoutés au type de document actuel, ou fusionnés s'il existe un onglet avec un nom similaire.",
+		compositionsDescriptionMediaType:
+			"Hériter des onglets et propriétés d'un type de media existant. De nouveaux onglets seront ajoutés au type de media actuel, ou fusionnés s'il existe un onglet avec un nom similaire.",
+		compositionsDescriptionMemberType:
+			"Hériter des onglets et propriétés d'un type de membre existant. De nouveaux onglets seront ajoutés au type de membre actuel, ou fusionnés s'il existe un onglet avec un nom similaire.",
 		compositionInUse:
 			'Ce type de contenu est utilisé dans une composition, et ne peut donc pas être lui-même un composé.',
+		compositionInUseMediaType:
+			'Ce type de media est utilisé dans une composition, et ne peut donc pas être lui-même un composé.',
+		compositionInUseMemberType:
+			'Ce type de membre est utilisé dans une composition, et ne peut donc pas être lui-même un composé.',
 		noAvailableCompositions: "Il n'y a pas de type de contenu disponible à utiliser dans une composition.",
+		noAvailableCompositionsMediaType: "Il n'y a pas de type de media disponible à utiliser dans une composition.",
+		noAvailableCompositionsMemberType: "Il n'y a pas de type de membre disponible à utiliser dans une composition.",
 		compositionRemoveWarning:
 			"La suppression d'une composition supprimera les données de toutes les propriétés associées. Une fois que vous sauvegardez le type de document, il n'y a plus moyen de faire marche arrière.",
 		availableEditors: 'Editeurs disponibles',
@@ -1442,6 +1456,10 @@ export default {
 		compositionUsageHeading: 'Où cette composition est-elle utilisée?',
 		compositionUsageSpecification:
 			'Cette composition est actuellement utilisée dans la composition des types de contenu suivants :',
+		compositionUsageSpecificationMediaType:
+			'Cette composition est actuellement utilisée dans la composition des types de media suivants :',
+		compositionUsageSpecificationMemberType:
+			'Cette composition est actuellement utilisée dans la composition des types de membre suivants :',
 		variantsHeading: 'Permettre une variation par culture',
 		variantsDescription: 'Permettre aux éditeurs de créer du contenu de ce type dans différentes langues.',
 		allowVaryByCulture: 'Permettre une variation par culture',
@@ -1788,6 +1806,8 @@ export default {
 	redirectUrls: {
 		disableUrlTracker: 'Désactiver URL tracker',
 		enableUrlTracker: 'Activer URL tracker',
+		urlTrackerEnabled: 'Activé',
+		urlTrackerDisabled: 'Désactivé',
 		culture: 'Culture',
 		originalUrl: 'URL original',
 		redirectedTo: 'Redirigé Vers',
@@ -1944,5 +1964,10 @@ export default {
 	treeSearch: {
 		searchResult: 'élément retrouvé',
 		searchResults: 'éléments retrouvés',
+	},
+	picker: {
+		browseTab: 'Parcourir',
+		searchTab: 'Rechercher',
+		selectedCount: (count: number) => `${count} ${count > 1 ? 'éléments sélectionnés' : 'élément sélectionné'}`,
 	},
 } as UmbLocalizationDictionary;

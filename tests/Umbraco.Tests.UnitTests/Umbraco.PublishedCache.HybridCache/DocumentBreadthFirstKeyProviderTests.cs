@@ -15,7 +15,7 @@ public class DocumentBreadthFirstKeyProviderTests
         get
         {
             var mock = new Mock<IPublishStatusQueryService>();
-            mock.Setup(x => x.IsDocumentPublishedInAnyCulture(It.IsAny<Guid>())).Returns(true);
+            mock.Setup(x => x.IsPublishedInAnyCulture(It.IsAny<Guid>())).Returns(true);
             return mock.Object;
         }
     }

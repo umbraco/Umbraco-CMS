@@ -7,7 +7,8 @@ import type { ManifestElementAndApi, ManifestWithDynamicConditions } from '@umbr
  * For example for content you may wish to create a new document etc
  */
 export interface ManifestEntitySign<MetaType extends MetaEntitySign = MetaEntitySign>
-	extends ManifestElementAndApi<UmbEntitySignElement, UmbEntitySignApi>,
+	extends
+		ManifestElementAndApi<UmbEntitySignElement, UmbEntitySignApi>,
 		ManifestWithDynamicConditions<UmbExtensionConditionConfig> {
 	type: 'entitySign';
 	forEntityTypes?: Array<string>;

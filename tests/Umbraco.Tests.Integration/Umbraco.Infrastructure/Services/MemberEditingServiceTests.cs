@@ -1,11 +1,15 @@
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Cms.Infrastructure.Security;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
@@ -26,6 +30,22 @@ internal sealed class MemberEditingServiceTests : UmbracoIntegrationTest
     private IUserService UserService => GetRequiredService<IUserService>();
 
     private IMemberGroupService MemberGroupService => GetRequiredService<IMemberGroupService>();
+
+    private IExternalMemberService ExternalMemberService => GetRequiredService<IExternalMemberService>();
+
+    private ITwoFactorLoginService TwoFactorLoginService => GetRequiredService<ITwoFactorLoginService>();
+
+    // Only providers registered for members or for the back office count as enabled, so a member two factor
+    // provider has to be registered for the two factor tests to exercise anything.
+    protected override void CustomTestSetup(IUmbracoBuilder builder)
+    {
+        builder.Services.AddSingleton<ITwoFactorProvider, TestTwoFactorProvider>();
+        builder.Services.AddSingleton<TestTwoFactorProvider>();
+        builder.Services.AddTransient<TwoFactorMemberValidationProvider<TestTwoFactorProvider>>();
+        builder.Services.Configure<IdentityOptions>(options =>
+            options.Tokens.ProviderMap[TestTwoFactorProvider.Name] =
+                new TokenProviderDescriptor(typeof(TwoFactorMemberValidationProvider<TestTwoFactorProvider>)));
+    }
 
     [Test]
     public async Task Can_Create_Member()
@@ -181,7 +201,7 @@ internal sealed class MemberEditingServiceTests : UmbracoIntegrationTest
         IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
         memberType.PropertyTypes.First(pt => pt.Alias == "title").Mandatory = true;
         memberType.PropertyTypes.First(pt => pt.Alias == "author").ValidationRegExp = "^\\d*$";
-        MemberTypeService.Save(memberType);
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
 
         var titleValue = addValidProperties ? "The title value" : null;
         var authorValue = addValidProperties ? "12345" : "This is not a number";
@@ -230,7 +250,7 @@ internal sealed class MemberEditingServiceTests : UmbracoIntegrationTest
         var memberType = await MemberTypeService.GetAsync(member.ContentType.Key)!;
         memberType.PropertyTypes.First(pt => pt.Alias == "title").Mandatory = true;
         memberType.PropertyTypes.First(pt => pt.Alias == "author").ValidationRegExp = "^\\d*$";
-        await MemberTypeService.SaveAsync(memberType, Constants.Security.SuperUserKey);
+        await MemberTypeService.UpdateAsync(memberType, Constants.Security.SuperUserKey);
 
         var titleValue = addValidProperties ? "The title value" : null;
         var authorValue = addValidProperties ? "12345" : "This is not a number";
@@ -368,13 +388,208 @@ internal sealed class MemberEditingServiceTests : UmbracoIntegrationTest
         Assert.IsFalse(member.IsLockedOut);
     }
 
+    [Test]
+    public async Task Two_Factor_Providers_Are_Retained_When_Updating_Without_Access()
+    {
+        // this user does NOT have access to sensitive data
+        var user = UserBuilder.CreateUser();
+        UserService.Save(user);
+
+        var member = await CreateMemberAsync();
+
+        await TwoFactorLoginService.SaveAsync(new TwoFactorLogin
+        {
+            UserOrMemberKey = member.Key,
+            ProviderName = TestTwoFactorProvider.Name,
+            Secret = "secret",
+            Confirmed = true,
+        });
+        Assert.IsTrue(await TwoFactorLoginService.IsTwoFactorEnabledAsync(member.Key));
+
+        // The two factor state is withheld from this user, so the update model carries the default value. That
+        // must not be taken as a request to disable the member's providers.
+        var updateModel = new MemberUpdateModel
+        {
+            Email = "test@test.com",
+            Username = "test",
+            IsTwoFactorEnabled = false,
+            Variants = [new VariantModel { Name = "T. Est" }],
+            Properties =
+            [
+                new PropertyValueModel { Alias = "title", Value = "The title value" },
+                new PropertyValueModel { Alias = "author", Value = "The author value" }
+            ],
+        };
+
+        var result = await MemberEditingService.UpdateAsync(member.Key, updateModel, user);
+        Assert.IsTrue(result.Success);
+
+        Assert.IsTrue(await TwoFactorLoginService.IsTwoFactorEnabledAsync(member.Key));
+    }
+
+    [Test]
+    public async Task Can_Disable_Two_Factor_Providers_With_Access()
+    {
+        var member = await CreateMemberAsync();
+
+        await TwoFactorLoginService.SaveAsync(new TwoFactorLogin
+        {
+            UserOrMemberKey = member.Key,
+            ProviderName = TestTwoFactorProvider.Name,
+            Secret = "secret",
+            Confirmed = true,
+        });
+
+        var updateModel = new MemberUpdateModel
+        {
+            Email = "test@test.com",
+            Username = "test",
+            IsTwoFactorEnabled = false,
+            Variants = [new VariantModel { Name = "T. Est" }],
+            Properties =
+            [
+                new PropertyValueModel { Alias = "title", Value = "The title value" },
+                new PropertyValueModel { Alias = "author", Value = "The author value" }
+            ],
+        };
+
+        var result = await MemberEditingService.UpdateAsync(member.Key, updateModel, SuperUser());
+        Assert.IsTrue(result.Success);
+
+        Assert.IsFalse(await TwoFactorLoginService.IsTwoFactorEnabledAsync(member.Key));
+    }
+
+    [Test]
+    public async Task IsExternalMember_Returns_True_For_External_Member()
+    {
+        // Arrange
+        var externalMember = new ExternalMemberIdentityBuilder()
+            .WithEmail("external@test.com")
+            .WithUserName("external@test.com")
+            .Build();
+        await ExternalMemberService.CreateAsync(externalMember);
+
+        // Act
+        var result = await MemberEditingService.IsExternalMemberAsync(externalMember.Key);
+
+        // Assert
+        Assert.IsTrue(result);
+    }
+
+    [Test]
+    public async Task IsExternalMember_Returns_False_For_Content_Member()
+    {
+        // Arrange
+        var member = await CreateMemberAsync();
+
+        // Act
+        var result = await MemberEditingService.IsExternalMemberAsync(member.Key);
+
+        // Assert
+        Assert.IsFalse(result);
+    }
+
+    [Test]
+    public async Task IsExternalMember_Returns_False_For_NonExistent_Key()
+    {
+        // Act
+        var result = await MemberEditingService.IsExternalMemberAsync(Guid.NewGuid());
+
+        // Assert
+        Assert.IsFalse(result);
+    }
+
+    [Test]
+    public async Task GetExternalMember_Returns_Member_For_External_Member()
+    {
+        // Arrange
+        var externalMember = new ExternalMemberIdentityBuilder()
+            .WithEmail("get-external@test.com")
+            .WithUserName("get-external@test.com")
+            .WithName("Get External Test")
+            .Build();
+        await ExternalMemberService.CreateAsync(externalMember);
+
+        // Act
+        var result = await MemberEditingService.GetExternalMemberAsync(externalMember.Key);
+
+        // Assert
+        Assert.IsNotNull(result);
+        Assert.AreEqual(externalMember.Key, result!.Key);
+        Assert.AreEqual("get-external@test.com", result.Email);
+        Assert.AreEqual("Get External Test", result.Name);
+    }
+
+    [Test]
+    public async Task GetExternalMember_Returns_Null_For_Content_Member()
+    {
+        // Arrange
+        var member = await CreateMemberAsync();
+
+        // Act
+        var result = await MemberEditingService.GetExternalMemberAsync(member.Key);
+
+        // Assert
+        Assert.IsNull(result);
+    }
+
+    [Test]
+    public async Task GetExternalMember_Returns_Null_For_NonExistent_Key()
+    {
+        // Act
+        var result = await MemberEditingService.GetExternalMemberAsync(Guid.NewGuid());
+
+        // Assert
+        Assert.IsNull(result);
+    }
+
+    [Test]
+    public async Task Can_Delete_External_Member()
+    {
+        // Arrange
+        var externalMember = new ExternalMemberIdentityBuilder()
+            .WithEmail("delete-external@test.com")
+            .WithUserName("delete-external@test.com")
+            .Build();
+        await ExternalMemberService.CreateAsync(externalMember);
+
+        // Verify it exists.
+        Assert.IsTrue(await MemberEditingService.IsExternalMemberAsync(externalMember.Key));
+
+        // Act
+        var result = await MemberEditingService.DeleteAsync(externalMember.Key, Constants.Security.SuperUserKey);
+
+        // Assert
+        Assert.IsTrue(result.Success);
+        Assert.IsFalse(await MemberEditingService.IsExternalMemberAsync(externalMember.Key));
+    }
+
+    [Test]
+    public async Task Delete_External_Member_Does_Not_Affect_Content_Members()
+    {
+        // Arrange — create both a content member and an external member.
+        var contentMember = await CreateMemberAsync();
+        var externalMember = new ExternalMemberIdentityBuilder()
+            .WithEmail("ext-only@test.com")
+            .WithUserName("ext-only@test.com")
+            .Build();
+        await ExternalMemberService.CreateAsync(externalMember);
+
+        // Act — delete the external member.
+        await MemberEditingService.DeleteAsync(externalMember.Key, Constants.Security.SuperUserKey);
+
+        // Assert — content member still exists.
+        var retrievedContent = await MemberEditingService.GetAsync(contentMember.Key);
+        Assert.IsNotNull(retrievedContent);
+    }
+
     private IUser SuperUser() => GetRequiredService<IUserService>().GetAsync(Constants.Security.SuperUserKey).GetAwaiter().GetResult();
 
     private async Task<IMember> CreateMemberAsync(Guid? key = null, bool titleIsSensitive = false)
     {
         IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
         memberType.SetIsSensitiveProperty("title", titleIsSensitive);
-        MemberTypeService.Save(memberType);
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
         MemberService.AddRole("RoleOne");
         var group = MemberGroupService.GetByName("RoleOne");
 
@@ -406,5 +621,19 @@ internal sealed class MemberEditingServiceTests : UmbracoIntegrationTest
         Assert.Greater(member.Id, 0);
 
         return await MemberEditingService.GetAsync(member.Key) ?? throw new ApplicationException("Created member could not be retrieved");
+    }
+
+    private sealed class TestTwoFactorProvider : ITwoFactorProvider
+    {
+        public const string Name = "TestTwoFactorProvider";
+
+        public string ProviderName => Name;
+
+        public Task<ISetupTwoFactorModel> GetSetupDataAsync(Guid userOrMemberKey, string secret)
+            => Task.FromResult<ISetupTwoFactorModel>(new NoopSetupTwoFactorModel());
+
+        public bool ValidateTwoFactorPIN(string secret, string token) => true;
+
+        public bool ValidateTwoFactorSetup(string secret, string token) => true;
     }
 }

@@ -2,7 +2,7 @@ import type { UmbProblemDetails } from './types.js';
 
 /**
  * Checks if the given error is an instance of ApiError.
- * @param {*} error The error to check
+ * @param {unknown} error The error to check
  * @returns {boolean} True if the error is an instance of ApiError, false otherwise
  * @deprecated Use {UmbApiError.isUmbApiError} instead and map your object to {UmbApiError} if needed.
  */
@@ -12,7 +12,7 @@ export function isApiError(error: unknown): error is { body?: string; status?: n
 
 /**
  * Checks if the given error is an instance of CancelError.
- * @param {*} error The error to check
+ * @param {unknown} error The error to check
  * @returns {boolean} True if the error is an instance of CancelError, false otherwise
  * @deprecated Use {UmbApiCancelError.isUmbApiCancelError}` instead and map your object to {UmbApiCancelError} if needed.
  */
@@ -22,7 +22,7 @@ export function isCancelError(error: unknown): error is Error {
 
 /**
  * Checks if the given promise is cancelable, i.e. if it has a cancel method.
- * @param {*} promise The promise to check
+ * @param {unknown} promise The promise to check
  * @returns {boolean} True if the promise is cancelable, false otherwise
  */
 export function isCancelablePromise<T>(promise: unknown): promise is Promise<T> & { cancel: () => void } {
@@ -31,7 +31,7 @@ export function isCancelablePromise<T>(promise: unknown): promise is Promise<T> 
 
 /**
  * Checks if the given error is an instance of ProblemDetails.
- * @param {*} error The error to check
+ * @param {unknown} error The error to check
  * @returns {boolean} True if the error is an instance of ProblemDetails, false otherwise
  */
 export function isProblemDetailsLike(error: unknown): error is UmbProblemDetails {

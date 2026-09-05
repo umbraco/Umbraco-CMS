@@ -61,7 +61,7 @@ internal sealed class MemberTypeEditingService : ContentTypeEditingServiceBase<I
 
         UpdatePropertyTypeVisibility(memberType, model);
 
-        await _memberTypeService.SaveAsync(memberType, userKey);
+        await _memberTypeService.CreateAsync(memberType, userKey);
         return result;
     }
 
@@ -82,7 +82,7 @@ internal sealed class MemberTypeEditingService : ContentTypeEditingServiceBase<I
 
         UpdatePropertyTypeVisibility(memberType, model);
 
-        await _memberTypeService.SaveAsync(memberType, userKey);
+        await _memberTypeService.UpdateAsync(memberType, userKey);
         return result;
     }
 

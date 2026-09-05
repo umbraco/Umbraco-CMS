@@ -55,11 +55,17 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
 
     private IMediaService MediaService => GetRequiredService<IMediaService>();
 
-    private IFileService FileService => GetRequiredService<IFileService>();
+    private ITemplateService TemplateService => GetRequiredService<ITemplateService>();
 
     private IContentTypeContainerService ContentTypeContainerService => GetRequiredService<IContentTypeContainerService>();
 
     public IContentTypeEditingService ContentTypeEditingService => GetRequiredService<IContentTypeEditingService>();
+
+    private IElementService ElementService => GetRequiredService<IElementService>();
+
+    private IElementContainerService ElementContainerService => GetRequiredService<IElementContainerService>();
+
+    private IElementEditingService ElementEditingService => GetRequiredService<IElementEditingService>();
 
     [Test]
     public void EntityService_Can_Get_Paged_Descendants_Ordering_Path()
@@ -650,6 +656,147 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
         Assert.That(total, Is.EqualTo(50));
     }
 
+    // Elements can only ever be leaves - the branching structure above them is made of ElementContainers,
+    // not Elements themselves (unlike Document/Media, which can nest arbitrarily). So "children of root" here
+    // means direct Element children of a container, and "descendants" means a container tree with Elements
+    // as the leaves at the bottom.
+    [Test]
+    public async Task EntityService_Can_Get_Paged_Element_Children()
+    {
+        var data = await GetSharedElementTreeData();
+
+        var entities = EntityService.GetPagedChildren(data.RootKey, [UmbracoObjectTypes.ElementContainer], [UmbracoObjectTypes.Element], 0, 2, false, out var total).ToArray();
+        Assert.That(entities.Length, Is.EqualTo(2));
+        Assert.That(total, Is.EqualTo(3));
+        entities = EntityService.GetPagedChildren(data.RootKey, [UmbracoObjectTypes.ElementContainer], [UmbracoObjectTypes.Element], 2, 2, false, out total).ToArray();
+        Assert.That(entities.Length, Is.EqualTo(1));
+        Assert.That(total, Is.EqualTo(3));
+    }
+
+    [Test]
+    [LongRunning]
+    public async Task EntityService_Can_Get_Paged_Element_Descendants()
+    {
+        var data = await GetSharedElementTreeData();
+
+        // Half of each collection is trashed and moves out of this subtree, leaving 28 descendants:
+        // 3 root elements + 5 branches x (1 + 4 leaves). Page size (15) forces a genuine two-page split.
+        var entities = EntityService.GetPagedDescendants(data.RootKey, UmbracoObjectTypes.ElementContainer, [UmbracoObjectTypes.ElementContainer, UmbracoObjectTypes.Element], 0, 15, out var total).ToArray();
+        Assert.That(entities.Length, Is.EqualTo(15));
+        Assert.That(total, Is.EqualTo(28));
+        entities = EntityService.GetPagedDescendants(data.RootKey, UmbracoObjectTypes.ElementContainer, [UmbracoObjectTypes.ElementContainer, UmbracoObjectTypes.Element], 15, 15, out total).ToArray();
+        Assert.That(entities.Length, Is.EqualTo(13));
+        Assert.That(total, Is.EqualTo(28));
+    }
+
+    [Test]
+    [LongRunning]
+    public async Task EntityService_Can_Get_Paged_Element_Descendants_Including_Recycled()
+    {
+        var data = await GetSharedElementTreeData();
+
+        // search at root to see if it returns recycled
+        var entities = EntityService.GetPagedDescendants([UmbracoObjectTypes.ElementContainer, UmbracoObjectTypes.Element], 0, 1000, out _)
+            .Select(x => x.Id)
+            .ToArray();
+
+        foreach (var id in data.TrashedContainerIds.Concat(data.TrashedElementIds))
+        {
+            Assert.IsTrue(entities.Contains(id));
+        }
+    }
+
+    [Test]
+    [LongRunning]
+    public async Task EntityService_Can_Get_Paged_Element_Descendants_Without_Recycled()
+    {
+        var data = await GetSharedElementTreeData();
+
+        // search at root to see if it excludes recycled
+        var entities = EntityService
+            .GetPagedDescendants([UmbracoObjectTypes.ElementContainer, UmbracoObjectTypes.Element], 0, 1000, out _, includeTrashed: false)
+            .Select(x => x.Id)
+            .ToArray();
+
+        foreach (var id in data.TrashedContainerIds.Concat(data.TrashedElementIds))
+        {
+            Assert.IsFalse(entities.Contains(id));
+        }
+    }
+
+    [Test]
+    [LongRunning]
+    public async Task EntityService_Can_Get_Paged_Trashed_Element_Children()
+    {
+        var data = await GetSharedElementTreeData();
+
+        // get paged containers at recycle bin root
+        var entities = EntityService
+            .GetPagedTrashedChildren(Constants.System.RecycleBinElement, UmbracoObjectTypes.ElementContainer, 0, 1000, out var total)
+            .Select(x => x.Id)
+            .ToArray();
+
+        Assert.True(total > 0);
+        foreach (var id in data.TrashedContainerIds)
+        {
+            Assert.IsTrue(entities.Contains(id));
+        }
+
+        // get paged elements at recycle bin root - individually-trashed elements are a direct Element-typed
+        // child of the recycle bin, not an ElementContainer, so this needs its own query.
+        var trashedElements = EntityService
+            .GetPagedTrashedChildren(Constants.System.RecycleBinElement, UmbracoObjectTypes.Element, 0, 1000, out var elementTotal)
+            .Select(x => x.Id)
+            .ToArray();
+
+        Assert.True(elementTotal > 0);
+        foreach (var id in data.TrashedElementIds)
+        {
+            Assert.IsTrue(trashedElements.Contains(id));
+        }
+    }
+
+    [Test]
+    [LongRunning]
+    public async Task EntityService_Can_Get_Paged_Element_Descendants_With_Search()
+    {
+        var data = await GetSharedElementTreeData();
+
+        // Half of each collection is trashed and moves out of this subtree: 5 "ssss" branches remain, and
+        // 3 root elements + 5 branches x 4 leaves = 23 "tttt" elements. Page size (1000) proves the result
+        // is capped at what's available, not the requested page size.
+        var entities = EntityService.GetPagedDescendants(
+            data.RootKey,
+            UmbracoObjectTypes.ElementContainer,
+            [UmbracoObjectTypes.ElementContainer, UmbracoObjectTypes.Element],
+            0,
+            1000,
+            out var total,
+            SqlContext.Query<IUmbracoEntity>().Where(x => x.Name.Contains("ssss"))).ToArray();
+        Assert.That(entities.Length, Is.EqualTo(5));
+        Assert.That(total, Is.EqualTo(5));
+        entities = EntityService.GetPagedDescendants(
+            data.RootKey,
+            UmbracoObjectTypes.ElementContainer,
+            [UmbracoObjectTypes.ElementContainer, UmbracoObjectTypes.Element],
+            0,
+            1000,
+            out total,
+            SqlContext.Query<IUmbracoEntity>().Where(x => x.Name.Contains("tttt"))).ToArray();
+        Assert.That(entities.Length, Is.EqualTo(23));
+        Assert.That(total, Is.EqualTo(23));
+    }
+
+    [Test]
+    public async Task EntityService_Can_Find_All_Elements_By_UmbracoObjectTypes()
+    {
+        var data = await GetSharedElementTreeData();
+
+        var elements = EntityService.GetAll(UmbracoObjectTypes.Element).ToArray();
+        Assert.That(elements.Length, Is.EqualTo(47));
+        Assert.That(elements.Any(x => x.Id == data.RootId), Is.False);
+    }
+
     [Test]
     public void EntityService_Can_Find_All_Content_By_UmbracoObjectTypes()
     {
@@ -692,14 +839,14 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void EntityService_Can_Get_Content_By_UmbracoObjectType_With_Variant_Names()
+    public async Task EntityService_Can_Get_Content_By_UmbracoObjectType_With_Variant_Names()
     {
         var alias = "test" + Guid.NewGuid();
         var template = TemplateBuilder.CreateTextPageTemplate(alias);
-        FileService.SaveTemplate(template);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
         var contentType = ContentTypeBuilder.CreateSimpleContentType("test2", "Test2", defaultTemplateId: template.Id);
         contentType.Variations = ContentVariation.Culture;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var c1 = ContentBuilder.CreateSimpleContent(contentType, "Test");
         c1.SetCultureName("Test - FR", _langFr.IsoCode);
@@ -716,13 +863,13 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void EntityService_Can_Get_Child_Content_By_ParentId_And_UmbracoObjectType_With_Variant_Names()
+    public async Task EntityService_Can_Get_Child_Content_By_ParentId_And_UmbracoObjectType_With_Variant_Names()
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
-        FileService.SaveTemplate(template);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
         var contentType = ContentTypeBuilder.CreateSimpleContentType("test1", "Test1", defaultTemplateId: template.Id);
         contentType.Variations = ContentVariation.Culture;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var root = ContentBuilder.CreateSimpleContent(contentType);
         root.SetCultureName("Root", _langFr.IsoCode); // else cannot save
@@ -886,7 +1033,8 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
     [Test]
     public void EntityService_Can_Get_Id_For_Key()
     {
-        var result = EntityService.GetId(Guid.Parse("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522"),
+        var result = EntityService.GetId(
+            Guid.Parse("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522"),
             UmbracoObjectTypes.DocumentType);
 
         Assert.IsTrue(result.Success);
@@ -1201,13 +1349,13 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
             _isSetup = true;
 
             var template = TemplateBuilder.CreateTextPageTemplate("defaultTemplate");
-            FileService.SaveTemplate(template); // else, FK violation on contentType!
+            await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey); // else, FK violation on contentType!
 
             // Create and Save ContentType "umbTextpage" -> _contentType.Id
             _contentType =
                 ContentTypeBuilder.CreateSimpleContentType("umbTextpage", "Textpage", defaultTemplateId: template.Id);
             _contentType.Key = new Guid("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522");
-            ContentTypeService.Save(_contentType);
+            await ContentTypeService.CreateAsync(_contentType, Constants.Security.SuperUserKey);
 
             // Create and Save Content "Homepage" based on "umbTextpage" -> 1053
             _textpage = ContentBuilder.CreateSimpleContent(_contentType);
@@ -1284,5 +1432,82 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
         var docType2Model = ContentTypeEditingBuilder.CreateBasicContentType("umbDocType2", "Doc Type 2");
         docType2Model.ContainerKey = _documentTypeSubContainer2Key;
         await ContentTypeEditingService.CreateAsync(docType2Model, Constants.Security.SuperUserKey);
+    }
+
+    private sealed record NestedElementTestData(
+        Guid RootKey,
+        int RootId,
+        List<int> TrashedContainerIds,
+        List<int> TrashedElementIds);
+
+    private NestedElementTestData? _sharedElementTreeData;
+
+    // Shared by all Element tests below: a root with 7 direct Elements and 10 sub-container branches of
+    // 4 leaves each, built once and reused - half of each collection is trashed.
+    private async Task<NestedElementTestData> GetSharedElementTreeData() =>
+        _sharedElementTreeData ??= await CreateNestedElementTestData(rootElementCount: 7, branchCount: 10, leavesPerBranch: 4);
+
+    // Builds a root ElementContainer with rootElementCount Elements directly under it, plus branchCount
+    // sub-containers each with leavesPerBranch Elements as leaves. Always trashes every other root Element
+    // individually and every other sub-container as a whole - the two different trash mechanisms Elements
+    // support.
+    private async Task<NestedElementTestData> CreateNestedElementTestData(
+        int rootElementCount,
+        int branchCount,
+        int leavesPerBranch)
+    {
+        var containerResult = await ElementContainerService.CreateAsync(Guid.NewGuid(), $"Root Container {Guid.NewGuid()}", null, Constants.Security.SuperUserKey);
+        var root = containerResult.Result;
+        var elementType = ContentTypeBuilder.CreateSimpleElementType("elementType" + Guid.NewGuid().ToString("N"), "Element Type");
+        await ContentTypeService.CreateAsync(elementType, Constants.Security.SuperUserKey);
+
+        var trashedElementKeys = new List<Guid>();
+        var trashedElementIds = new List<int>();
+        for (var i = 0; i < rootElementCount; i++)
+        {
+            var element = ElementBuilder.CreateSimpleElement(elementType, "tttt" + Guid.NewGuid());
+            element.ParentId = root.Id;
+            ElementService.Save(element);
+
+            if (i % 2 == 0)
+            {
+                trashedElementKeys.Add(element.Key);
+                trashedElementIds.Add(element.Id);
+            }
+        }
+
+        var trashedContainerKeys = new List<Guid>();
+        var trashedContainerIds = new List<int>();
+        for (var i = 0; i < branchCount; i++)
+        {
+            var subContainerKey = Guid.NewGuid();
+            var subContainerResult = await ElementContainerService.CreateAsync(subContainerKey, "ssss" + Guid.NewGuid(), root.Key, Constants.Security.SuperUserKey);
+            var subContainer = subContainerResult.Result;
+
+            if (i % 2 == 0)
+            {
+                trashedContainerKeys.Add(subContainerKey);
+                trashedContainerIds.Add(subContainer.Id);
+            }
+
+            for (var j = 0; j < leavesPerBranch; j++)
+            {
+                var element = ElementBuilder.CreateSimpleElement(elementType, "tttt" + Guid.NewGuid());
+                element.ParentId = subContainer.Id;
+                ElementService.Save(element);
+            }
+        }
+
+        foreach (var key in trashedContainerKeys)
+        {
+            await ElementContainerService.MoveToRecycleBinAsync(key, Constants.Security.SuperUserKey);
+        }
+
+        foreach (var key in trashedElementKeys)
+        {
+            await ElementEditingService.MoveToRecycleBinAsync(key, Constants.Security.SuperUserKey);
+        }
+
+        return new NestedElementTestData(root.Key, root.Id, trashedContainerIds, trashedElementIds);
     }
 }

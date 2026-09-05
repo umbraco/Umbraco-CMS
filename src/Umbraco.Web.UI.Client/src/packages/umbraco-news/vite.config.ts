@@ -8,5 +8,5 @@ const dist = '../../../dist-cms/packages/umbraco-news';
 rmSync(dist, { recursive: true, force: true });
 
 export default defineConfig({
-	...getDefaultConfig({ dist, entry: ['umbraco-package.ts', 'manifests.ts'] }),
+	...getDefaultConfig({ dist, entry: ['umbraco-package.ts'] }),
 });

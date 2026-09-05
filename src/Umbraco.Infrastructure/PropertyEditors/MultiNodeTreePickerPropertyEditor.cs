@@ -58,8 +58,11 @@ public class MultiNodeTreePickerPropertyEditor : DataEditor, IValueSchemaProvide
                     ["type"] = new JsonObject
                     {
                         ["type"] = "string",
-                        ["enum"] = new JsonArray("content", "media", "member"),
-                        ["description"] = "Entity type (content, media, or member)",
+                        ["enum"] = new JsonArray(
+                            Constants.UdiEntityType.Document,
+                            Constants.UdiEntityType.Media,
+                            Constants.UdiEntityType.Member),
+                        ["description"] = "UDI entity type of the selected entity",
                     },
                     ["unique"] = new JsonObject
                     {
@@ -217,7 +220,7 @@ public class MultiNodeTreePickerPropertyEditor : DataEditor, IValueSchemaProvide
         /// <summary>
         /// Validates the min/max configuration for the multi-node tree picker property editor.
         /// </summary>
-        internal sealed class MinMaxValidator : ITypedJsonValidator<EditorEntityReference[], MultiNodePickerConfiguration>
+        internal sealed class MinMaxValidator : ITypedValidator<EditorEntityReference[], MultiNodePickerConfiguration>
         {
             private readonly ILocalizedTextService _localizedTextService;
 
@@ -275,7 +278,7 @@ public class MultiNodeTreePickerPropertyEditor : DataEditor, IValueSchemaProvide
         /// <summary>
         /// Validates the selected object type for the multi-node tree picker property editor.
         /// </summary>
-        internal sealed class ObjectTypeValidator : ITypedJsonValidator<EditorEntityReference[], MultiNodePickerConfiguration>
+        internal sealed class ObjectTypeValidator : ITypedValidator<EditorEntityReference[], MultiNodePickerConfiguration>
         {
             private readonly ILocalizedTextService _localizedTextService;
             private readonly ICoreScopeProvider _coreScopeProvider;
@@ -366,7 +369,7 @@ public class MultiNodeTreePickerPropertyEditor : DataEditor, IValueSchemaProvide
         /// <summary>
         /// Validates the selected content type for the multi-node tree picker property editor.
         /// </summary>
-        internal sealed class ContentTypeValidator : ITypedJsonValidator<EditorEntityReference[], MultiNodePickerConfiguration>
+        internal sealed class ContentTypeValidator : ITypedValidator<EditorEntityReference[], MultiNodePickerConfiguration>
         {
             private readonly ILocalizedTextService _localizedTextService;
             private readonly ICoreScopeProvider _coreScopeProvider;

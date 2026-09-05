@@ -116,6 +116,15 @@ public interface IEntityService
     IEnumerable<IEntitySlim> GetAll(UmbracoObjectTypes objectType, params int[] ids);
 
     /// <summary>
+    ///     Gets entities of multiple object types.
+    /// </summary>
+    /// <param name="objectTypes">The object types of the entities.</param>
+    /// <param name="ids">The identifiers of the entities.</param>
+    /// <remarks>If <paramref name="ids" /> is empty, returns all entities of the specified types.</remarks>
+    IEnumerable<IEntitySlim> GetAll(IEnumerable<UmbracoObjectTypes> objectTypes, params int[] ids)
+        => throw new NotImplementedException(); // TODO (V19): Remove default implementation.
+
+    /// <summary>
     ///     Gets entities of a given object type.
     /// </summary>
     /// <param name="objectType">The object type of the entities.</param>
@@ -153,6 +162,15 @@ public interface IEntityService
     /// <param name="keys">The unique identifiers of the entities.</param>
     /// <remarks>If <paramref name="keys" /> is empty, returns all entities.</remarks>
     IEnumerable<IEntitySlim> GetAll(Guid objectType, params Guid[] keys);
+
+    /// <summary>
+    ///     Gets entities of multiple object types.
+    /// </summary>
+    /// <param name="objectTypes">The object types of the entities.</param>
+    /// <param name="keys">The unique identifiers of the entities.</param>
+    /// <remarks>If <paramref name="keys" /> is empty, returns all entities of the specified types.</remarks>
+    IEnumerable<IEntitySlim> GetAll(IEnumerable<UmbracoObjectTypes> objectTypes, params Guid[] keys)
+        => throw new NotImplementedException(); // TODO (V19): Remove default implementation.
 
     /// <summary>
     ///     Gets entities at root.
@@ -430,6 +448,19 @@ public interface IEntityService
         bool includeTrashed = true);
 
     /// <summary>
+    ///     Gets descendants of an entity.
+    /// </summary>
+    IEnumerable<IEntitySlim> GetPagedDescendants(
+        Guid? parentKey,
+        UmbracoObjectTypes parentObjectType,
+        IEnumerable<UmbracoObjectTypes> childObjectTypes,
+        int skip,
+        int take,
+        out long totalRecords,
+        IQuery<IUmbracoEntity>? filter = null,
+        Ordering? ordering = null);
+
+    /// <summary>
     ///     Gets the object type of an entity.
     /// </summary>
     UmbracoObjectTypes GetObjectType(int id);
@@ -475,6 +506,11 @@ public interface IEntityService
     IEnumerable<TreeEntityPath> GetAllPaths(UmbracoObjectTypes objectType, params Guid[] keys);
 
     /// <summary>
+    ///     Gets paths for entities.
+    /// </summary>
+    IEnumerable<TreeEntityPath> GetAllPaths(IEnumerable<UmbracoObjectTypes> objectTypes, params Guid[] keys);
+
+    /// <summary>
     ///     Reserves an identifier for a key.
     /// </summary>
     /// <param name="key">They key.</param>
@@ -493,10 +529,6 @@ public interface IEntityService
     /// <summary>
     /// Gets descendants of root for multiple object types.
     /// </summary>
-    /// <remarks>
-    /// This method has a no-op default implementation which is scheduled for removal in V18.
-    /// </remarks>
-    // TODO (V18): Remove the default implementation.
     IEnumerable<IEntitySlim> GetPagedDescendants(
         IEnumerable<UmbracoObjectTypes> objectTypes,
         long pageIndex,
@@ -504,9 +536,5 @@ public interface IEntityService
         out long totalRecords,
         IQuery<IUmbracoEntity>? filter = null,
         Ordering? ordering = null,
-        bool includeTrashed = true)
-    {
-        totalRecords = 0;
-        return [];
-    }
+        bool includeTrashed = true);
 }

@@ -39,6 +39,7 @@ public class ByIdsMediaApiController : MediaApiControllerBase
             .Select(BuildApiMediaWithCrops)
             .ToArray();
 
+        SetOutputCacheMedia(mediaItems);
         return Ok(apiMediaItems);
     }
 }

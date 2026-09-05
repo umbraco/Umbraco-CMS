@@ -23,7 +23,13 @@ export class UmbInputDataTypeElement extends UmbFormControlMixin(UmbLitElement, 
 	private _ids?: Array<string>;
 
 	/**
-	 * @param {string} dataTypeId
+	 * Optional query string for suggesting property editors.
+	 */
+	@property({ type: String })
+	suggestionQuery?: string;
+
+	/**
+	 * @param {string} dataTypeId - The unique id of the selected data type.
 	 * @default
 	 */
 	@property({ type: String, attribute: false })
@@ -51,7 +57,7 @@ export class UmbInputDataTypeElement extends UmbFormControlMixin(UmbLitElement, 
 		new UmbModalRouteRegistrationController(this, UMB_DATA_TYPE_PICKER_FLOW_MODAL)
 			.onSetup(() => {
 				return {
-					data: {},
+					data: { suggestionQuery: this.suggestionQuery },
 					value: { selection: this._ids ?? [] },
 				};
 			})
@@ -97,7 +103,7 @@ export class UmbInputDataTypeElement extends UmbFormControlMixin(UmbLitElement, 
 			: html`
 					<uui-button
 						id="empty-state-button"
-						label="Select Property Editor"
+						label=${this.localize.term('propertyEditorPicker_selectAction')}
 						look="placeholder"
 						color="default"
 						@blur=${() => {

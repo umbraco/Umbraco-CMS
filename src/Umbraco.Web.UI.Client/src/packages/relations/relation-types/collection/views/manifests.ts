@@ -1,20 +1,16 @@
+import { UMB_RELATION_TYPE_COLLECTION_ALIAS } from '../constants.js';
 import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collection';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'collectionView',
+		kind: 'table',
 		alias: 'Umb.CollectionView.RelationType.Table',
 		name: 'Relation Type Table Collection View',
-		js: () => import('./table/relation-type-table-collection-view.element.js'),
-		meta: {
-			label: 'Table',
-			icon: 'icon-table',
-			pathName: 'table',
-		},
 		conditions: [
 			{
 				alias: UMB_COLLECTION_ALIAS_CONDITION,
-				match: 'Umb.Collection.RelationType',
+				match: UMB_RELATION_TYPE_COLLECTION_ALIAS,
 			},
 		],
 	},

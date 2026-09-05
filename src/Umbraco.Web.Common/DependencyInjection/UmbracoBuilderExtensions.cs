@@ -217,7 +217,9 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddUnique<IUmbracoApplicationLifetime, AspNetCoreUmbracoApplicationLifetime>();
         builder.Services.AddUnique<IApplicationShutdownRegistry, AspNetCoreApplicationShutdownRegistry>();
         builder.Services.AddTransient<IIpAddressUtilities, IpAddressUtilities>();
+#pragma warning disable CS0618 // Type or member is obsolete - all usage has been removed up in V19
         builder.Services.AddUnique<IPreviewTokenGenerator, UserBasedPreviewTokenGenerator>();
+#pragma warning restore CS0618 // Type or member is obsolete
 
         return builder;
     }
@@ -241,16 +243,24 @@ public static partial class UmbracoBuilderExtensions
     private static IUmbracoBuilder AddHttpClients(this IUmbracoBuilder builder)
     {
         builder.Services.AddHttpClient();
+        // TODO (V19): Remove this registration along with Constants.HttpClients.IgnoreCertificateErrors.
+        #pragma warning disable CS0618 // Type or member is obsolete
         builder.Services.AddHttpClient(Constants.HttpClients.IgnoreCertificateErrors)
             .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
             {
                 ServerCertificateCustomValidationCallback =
                     HttpClientHandler.DangerousAcceptAnyServerCertificateValidator,
             });
+        #pragma warning restore CS0618 // Type or member is obsolete
         builder.Services.AddHttpClient(Constants.HttpClients.WebhookFiring, (services, client) =>
         {
             var productVersion = services.GetRequiredService<IUmbracoVersion>().SemanticVersion.ToSemanticStringWithoutBuild();
             client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue(Constants.HttpClients.Headers.UserAgentProductName, productVersion));
+        });
+        builder.Services.AddHttpClient(Constants.HttpClients.News, client =>
+        {
+            client.DefaultRequestHeaders.UserAgent.TryParseAdd(Constants.HttpClients.Headers.UserAgentProductName);
+            client.Timeout = TimeSpan.FromSeconds(20);
         });
         return builder;
     }
@@ -325,10 +335,6 @@ public static partial class UmbracoBuilderExtensions
         // register the umbraco context factory
         builder.Services.AddUnique<IUmbracoContextFactory, UmbracoContextFactory>();
         builder.Services.AddUnique<IBackOfficeSecurityAccessor, BackOfficeSecurityAccessor>();
-
-        var umbracoApiControllerTypes = builder.TypeLoader.GetUmbracoApiControllers().ToList();
-        builder.WithCollectionBuilder<UmbracoApiControllerTypeCollectionBuilder>()
-            .Add(umbracoApiControllerTypes);
 
         builder.Services.AddSingleton<UmbracoRequestLoggingMiddleware>();
         builder.Services.AddSingleton<PreviewAuthenticationMiddleware>();

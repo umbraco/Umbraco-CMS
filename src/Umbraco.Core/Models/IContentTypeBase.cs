@@ -58,6 +58,14 @@ public interface IContentTypeBase : IUmbracoEntity, IRememberBeingDirty
     bool IsElement { get; set; }
 
     /// <summary>
+    ///     Gets or sets a value indicating whether this content type is allowed in the library.
+    /// </summary>
+    /// <remarks>
+    ///     This is only meaningful for element types (where <see cref="IsElement"/> is <c>true</c>).
+    /// </remarks>
+    bool AllowedInLibrary { get; set; }
+
+    /// <summary>
     ///     Gets or sets the content variation of the content type.
     /// </summary>
     ContentVariation Variations { get; set; }
@@ -172,8 +180,14 @@ public interface IContentTypeBase : IUmbracoEntity, IRememberBeingDirty
     /// </summary>
     /// <param name="propertyTypeAlias">Alias of the PropertyType to move</param>
     /// <param name="propertyGroupAlias">Alias of the PropertyGroup to move the PropertyType to</param>
-    /// <returns></returns>
-    bool MovePropertyType(string propertyTypeAlias, string propertyGroupAlias);
+    /// <returns>
+    ///     Returns <c>True</c> if the PropertyType was moved, otherwise <c>False</c>.
+    /// </returns>
+    /// <remarks>
+    ///     If <paramref name="propertyGroupAlias" /> is null then the property is moved back to
+    ///     "generic properties" ie does not have a tab anymore.
+    /// </remarks>
+    bool MovePropertyType(string propertyTypeAlias, string? propertyGroupAlias);
 
     /// <summary>
     ///     Gets an <see cref="ISimpleContentType" /> corresponding to this content type.

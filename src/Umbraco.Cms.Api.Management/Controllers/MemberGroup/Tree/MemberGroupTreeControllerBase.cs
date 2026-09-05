@@ -22,16 +22,6 @@ public class MemberGroupTreeControllerBase : NamedEntityTreeControllerBase<Named
     /// <summary>
     /// Initializes a new instance of the <see cref="MemberGroupTreeControllerBase"/> class.
     /// </summary>
-    /// <param name="entityService">The <see cref="IEntityService"/> instance used to perform member group operations.</param>
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
-    public MemberGroupTreeControllerBase(IEntityService entityService)
-        : base(entityService)
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="MemberGroupTreeControllerBase"/> class.
-    /// </summary>
     /// <param name="entityService">The service used to manage and retrieve entities within the system.</param>
     /// <param name="flagProviders">A collection of providers that supply additional flags or metadata for entities.</param>
     public MemberGroupTreeControllerBase(

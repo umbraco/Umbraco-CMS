@@ -1,8 +1,9 @@
 import { UMB_MEMBER_WORKSPACE_CONTEXT } from '../../member-workspace.context-token.js';
 import type { UmbMemberDetailModel } from '../../../../types.js';
+import { UmbMemberKind } from '../../../../utils/index.js';
 import { TimeFormatOptions } from './utils.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, html, customElement, state, when } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, when, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
 import type { UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui';
@@ -11,6 +12,7 @@ import './member-workspace-view-member-info.element.js';
 import type { UmbInputMemberGroupElement } from '@umbraco-cms/backoffice/member-group';
 import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
 import { umbBindToValidation } from '@umbraco-cms/backoffice/validation';
+import '@umbraco-cms/backoffice/property';
 
 @customElement('umb-member-workspace-view-member')
 export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implements UmbWorkspaceViewElement {
@@ -24,6 +26,10 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 
 			this.observe(this._workspaceContext?.isNew, (isNew) => {
 				this._isNew = !!isNew;
+			});
+
+			this.observe(this._workspaceContext?.kind, (kind) => {
+				this._isExternalOnly = kind === UmbMemberKind.EXTERNAL_ONLY;
 			});
 		});
 
@@ -45,6 +51,9 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 
 	@state()
 	private _hasAccessToSensitiveData = false;
+
+	@state()
+	private _isExternalOnly = false;
 
 	#onChange(propertyName: keyof UmbMemberDetailModel, value: UmbMemberDetailModel[keyof UmbMemberDetailModel]) {
 		if (!this._workspaceContext) return;
@@ -165,86 +174,113 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 
 		return html`
 			<div id="left-column">
+				${this._isExternalOnly ? this.#renderExternalMemberBanner() : nothing}
 				<uui-box>
-					<umb-property-layout label=${this.localize.term('general_username')} mandatory>
+					<umb-property-layout label=${this.localize.term('general_username')} ?mandatory=${!this._isExternalOnly}>
 						<uui-input
 							slot="editor"
 							name="login"
 							data-mark="input:username"
 							label=${this.localize.term('general_username')}
 							value=${this._workspaceContext.username}
-							${umbBindToValidation(
-								this,
-								"$.values[?(@.alias == 'username' && @.culture == null && @.segment == null)].value",
-								this._workspaceContext.username,
-							)}
-							required
+							?readonly=${this._isExternalOnly}
+							${this._isExternalOnly
+								? nothing
+								: umbBindToValidation(
+										this,
+										"$.values[?(@.alias == 'username' && @.culture == null && @.segment == null)].value",
+										this._workspaceContext.username,
+									)}
+							?required=${!this._isExternalOnly}
 							required-message=${this.localize.term('user_loginnameRequired')}
 							@input=${(e: Event) => this.#onChange('username', (e.target as HTMLInputElement).value)}></uui-input>
 					</umb-property-layout>
 
-					<umb-property-layout label=${this.localize.term('general_email')} mandatory>
+					<umb-property-layout label=${this.localize.term('general_email')} ?mandatory=${!this._isExternalOnly}>
 						<uui-input
 							slot="editor"
 							name="email"
 							data-mark="input:email"
 							label=${this.localize.term('general_email')}
 							value=${this._workspaceContext.email}
-							${umbBindToValidation(
-								this,
-								"$.values[?(@.alias == 'email' && @.culture == null && @.segment == null)].value",
-								this._workspaceContext.email,
-							)}
-							required
+							?readonly=${this._isExternalOnly}
+							${this._isExternalOnly
+								? nothing
+								: umbBindToValidation(
+										this,
+										"$.values[?(@.alias == 'email' && @.culture == null && @.segment == null)].value",
+										this._workspaceContext.email,
+									)}
+							?required=${!this._isExternalOnly}
 							required-message=${this.localize.term('user_emailRequired')}
 							@input=${(e: Event) => this.#onChange('email', (e.target as HTMLInputElement).value)}></uui-input>
 					</umb-property-layout>
 
-					${this.#renderPasswordInput()}
+					${this._isExternalOnly ? nothing : this.#renderPasswordInput()}
 
 					<umb-property-layout label=${this.localize.term('content_membergroup')}>
 						<umb-input-member-group
 							slot="editor"
 							data-mark="input-member-group:member-group"
 							@change=${this.#onGroupsUpdated}
+							?readonly=${this._isExternalOnly}
 							.selection=${this._workspaceContext.memberGroups}></umb-input-member-group>
 					</umb-property-layout>
 
 					${when(
-						this._hasAccessToSensitiveData,
+						!this._isExternalOnly,
 						() => html`
 							<umb-property-layout label=${this.localize.term('user_stateApproved')}>
-								<uui-toggle
-									slot="editor"
-									data-mark="toggle:approved"
-									label=${this.localize.term('user_stateApproved')}
-									.checked=${this._workspaceContext!.isApproved}
-									@change=${(e: UUIBooleanInputEvent) => this.#onChange('isApproved', e.target.checked)}>
-								</uui-toggle>
+								${when(
+									this.#valuesAreHidden(),
+									() => html`<umb-sensitive-value short slot="editor"></umb-sensitive-value>`,
+									() => html`
+										<uui-toggle
+											slot="editor"
+											data-mark="toggle:approved"
+											label=${this.localize.term('user_stateApproved')}
+											.checked=${this._workspaceContext!.isApproved}
+											@change=${(e: UUIBooleanInputEvent) => this.#onChange('isApproved', e.target.checked)}>
+										</uui-toggle>
+									`,
+								)}
 							</umb-property-layout>
 
 							<umb-property-layout label=${this.localize.term('user_stateLockedOut')}>
-								<uui-toggle
-									slot="editor"
-									data-mark="toggle:locked-out"
-									label=${this.localize.term('user_stateLockedOut')}
-									?disabled=${this._isNew || !this._workspaceContext!.isLockedOut}
-									.checked=${this._workspaceContext!.isLockedOut}
-									@change=${(e: UUIBooleanInputEvent) => this.#onChange('isLockedOut', e.target.checked)}>
-								</uui-toggle>
+								${when(
+									this.#valuesAreHidden(),
+									() => html`<umb-sensitive-value short slot="editor"></umb-sensitive-value>`,
+									() => html`
+										<uui-toggle
+											slot="editor"
+											data-mark="toggle:locked-out"
+											label=${this.localize.term('user_stateLockedOut')}
+											?disabled=${this._isNew || !this._workspaceContext!.isLockedOut}
+											.checked=${this._workspaceContext!.isLockedOut}
+											@change=${(e: UUIBooleanInputEvent) => this.#onChange('isLockedOut', e.target.checked)}>
+										</uui-toggle>
+									`,
+								)}
+							</umb-property-layout>
+
+							<umb-property-layout label=${this.localize.term('member_2fa')}>
+								${when(
+									this.#valuesAreHidden(),
+									() => html`<umb-sensitive-value short slot="editor"></umb-sensitive-value>`,
+									() => html`
+										<uui-toggle
+											slot="editor"
+											data-mark="toggle:two-factor"
+											label=${this.localize.term('member_2fa')}
+											?disabled=${this._isNew || !this._workspaceContext!.isTwoFactorEnabled}
+											.checked=${this._workspaceContext!.isTwoFactorEnabled}
+											@change=${(e: UUIBooleanInputEvent) => this.#onChange('isTwoFactorEnabled', e.target.checked)}>
+										</uui-toggle>
+									`,
+								)}
 							</umb-property-layout>
 						`,
 					)}
-					<umb-property-layout label=${this.localize.term('member_2fa')}>
-						<uui-toggle
-							slot="editor"
-							data-mark="toggle:two-factor"
-							label=${this.localize.term('member_2fa')}
-							?disabled=${this._isNew || !this._workspaceContext.isTwoFactorEnabled}
-							.checked=${this._workspaceContext.isTwoFactorEnabled}
-							@change=${(e: UUIBooleanInputEvent) => this.#onChange('isTwoFactorEnabled', e.target.checked)}>
-						</uui-toggle>
-					</umb-property-layout>
 				</uui-box>
 
 				<div class="container">
@@ -254,6 +290,37 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 		`;
 	}
 
+	#renderExternalMemberBanner() {
+		return html`
+			<uui-box>
+				<div id="external-member-banner">
+					<uui-icon name="icon-lock"></uui-icon>
+					<div>
+						<strong>${this.localize.term('member_externalMemberTitle')}</strong>
+						<p>${this.localize.term('member_externalMemberDescription')}</p>
+					</div>
+				</div>
+			</uui-box>
+		`;
+	}
+
+	// The server withholds the member's login and lockout state from users without access to sensitive data,
+	// substituting default values. Those defaults must never be presented as the member's actual state.
+	// A member being created has no state to withhold, so its empty values are shown as they are.
+	#valuesAreHidden() {
+		return !this._hasAccessToSensitiveData && !this._isNew;
+	}
+
+	#renderHiddenOr(value: () => unknown) {
+		return this.#valuesAreHidden()
+			? html`<umb-sensitive-value short></umb-sensitive-value>`
+			: html`<span>${value()}</span>`;
+	}
+
+	#renderDateOrNever(date?: string | null) {
+		return date ? this.localize.date(date, TimeFormatOptions) : this.localize.term('general_never');
+	}
+
 	#renderRightColumn() {
 		if (!this._workspaceContext) return;
 
@@ -261,34 +328,33 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 			<div id="right-column">
 				<uui-box>
 					<umb-stack look="compact">
-						<div>
-							<h4><umb-localize key="user_failedPasswordAttempts">Failed login attempts</umb-localize></h4>
-							<span>${this._workspaceContext.failedPasswordAttempts}</span>
-						</div>
+						${this._isExternalOnly
+							? nothing
+							: html`<div>
+									<h4><umb-localize key="user_failedPasswordAttempts">Failed login attempts</umb-localize></h4>
+									${this.#renderHiddenOr(() => this._workspaceContext!.failedPasswordAttempts)}
+								</div>`}
 						<div>
 							<h4><umb-localize key="user_lastLockoutDate">Last lockout date</umb-localize></h4>
-							<span>
-								${this._workspaceContext.lastLockOutDate
-									? this.localize.date(this._workspaceContext.lastLockOutDate, TimeFormatOptions)
-									: this.localize.term('general_never')}
-							</span>
+							${this.#renderHiddenOr(() => this.#renderDateOrNever(this._workspaceContext!.lastLockOutDate))}
 						</div>
 						<div>
 							<h4><umb-localize key="user_lastLogin">Last login</umb-localize></h4>
-							<span>
-								${this._workspaceContext.lastLoginDate
-									? this.localize.date(this._workspaceContext.lastLoginDate, TimeFormatOptions)
-									: this.localize.term('general_never')}
-							</span>
+							${this.#renderHiddenOr(() => this.#renderDateOrNever(this._workspaceContext!.lastLoginDate))}
 						</div>
-						<div>
-							<h4><umb-localize key="user_passwordChangedGeneric">Password changed</umb-localize></h4>
-							<span>
-								${this._workspaceContext.lastPasswordChangeDate
-									? this.localize.date(this._workspaceContext.lastPasswordChangeDate, TimeFormatOptions)
-									: this.localize.term('general_never')}
-							</span>
-						</div>
+						${this._isExternalOnly
+							? nothing
+							: html`<div>
+									<h4><umb-localize key="user_passwordChangedGeneric">Password changed</umb-localize></h4>
+									${this.#renderHiddenOr(() => this.#renderDateOrNever(this._workspaceContext!.lastPasswordChangeDate))}
+								</div>`}
+						${when(
+							this.#valuesAreHidden(),
+							() =>
+								html`<p id="sensitive-value-notice">
+									<umb-localize key="content_isSensitiveValueNotice"></umb-localize>
+								</p>`,
+						)}
 					</umb-stack>
 				</uui-box>
 
@@ -331,6 +397,13 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 				flex-direction: column;
 				gap: var(--uui-size-space-4);
 			}
+			/* Space sibling workspace info apps (e.g. "Profile data", "Referenced by")
+				in the same way the surrounding left-column boxes are spaced. */
+			div.container {
+				display: flex;
+				flex-direction: column;
+				gap: var(--uui-size-space-4);
+			}
 			uui-box {
 				height: fit-content;
 			}
@@ -346,6 +419,27 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 			.validation-error {
 				margin-top: 0;
 				color: var(--uui-color-danger);
+			}
+			#external-member-banner {
+				display: flex;
+				align-items: flex-start;
+				gap: var(--uui-size-space-4);
+			}
+			#external-member-banner uui-icon {
+				font-size: 1.5em;
+				color: var(--uui-color-warning);
+				flex-shrink: 0;
+				margin-top: var(--uui-size-space-1);
+			}
+			#external-member-banner p {
+				margin: var(--uui-size-space-2) 0 0 0;
+				color: var(--uui-color-text-alt);
+			}
+
+			#sensitive-value-notice {
+				margin: var(--uui-size-space-5) 0 0;
+				color: var(--uui-color-text-alt);
+				font-style: italic;
 			}
 
 			h4 {

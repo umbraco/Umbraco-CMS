@@ -5,6 +5,7 @@ import type { UmbCollectionDataSource } from '@umbraco-cms/backoffice/collection
 import { SegmentService } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import type { UmbDataSourceResponse, UmbPagedModel } from '@umbraco-cms/backoffice/repository';
 
 /**
  * A data source that fetches the language collection data from the server.
@@ -17,12 +18,17 @@ export class UmbSegmentCollectionServerDataSource
 {
 	/**
 	 * Gets the language collection filtered by the given filter.
-	 * @param {UmbSegmentCollectionFilterModel} filter
-	 * @returns {*}
+	 * @param {UmbSegmentCollectionFilterModel} filter - The filter to apply to the collection.
+	 * @returns {UmbDataSourceResponse<UmbPagedModel<UmbSegmentCollectionItemModel>>} The segment collection.
 	 * @memberof UmbLanguageCollectionServerDataSource
 	 */
-	async getCollection(filter: UmbSegmentCollectionFilterModel) {
-		const { data, error } = await tryExecute(this, SegmentService.getSegment({ query: filter }));
+	async getCollection(
+		filter: UmbSegmentCollectionFilterModel,
+	): Promise<UmbDataSourceResponse<UmbPagedModel<UmbSegmentCollectionItemModel>>> {
+		const { data, error } = await tryExecute(
+			this,
+			SegmentService.getSegment({ query: { skip: filter.skip, take: filter.take } }),
+		);
 
 		if (data) {
 			const items = data.items.map((item) => {

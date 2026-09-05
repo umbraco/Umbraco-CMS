@@ -2,8 +2,10 @@
 // See LICENSE for more details.
 
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Extensions;
 
@@ -81,6 +83,41 @@ public static class PublishedElementExtensions
     {
         IPublishedProperty? prop = content.GetProperty(alias);
         return prop != null && prop.HasValue(culture, segment);
+    }
+
+    /// <summary>
+    ///     Gets a value indicating whether the content has a value for a property identified by its alias.
+    /// </summary>
+    /// <param name="content">The content.</param>
+    /// <param name="publishedValueFallback">The published value fallback implementation.</param>
+    /// <param name="alias">The property alias.</param>
+    /// <param name="culture">The variation language.</param>
+    /// <param name="segment">The variation segment.</param>
+    /// <param name="fallback">Optional fallback strategy.</param>
+    /// <returns>A value indicating whether the content has a value for the property identified by the alias.</returns>
+    /// <remarks>
+    ///     Returns true if HasValue is true, or a fallback strategy can provide a value.
+    ///     <see cref="Fallback.ToAncestors"/> is not supported at the element level and will throw
+    ///     a <see cref="NotSupportedException"/>.
+    /// </remarks>
+    public static bool HasValue(
+        this IPublishedElement content,
+        IPublishedValueFallback publishedValueFallback,
+        string alias,
+        string? culture = null,
+        string? segment = null,
+        Fallback fallback = default)
+    {
+        IPublishedProperty? property = content.GetProperty(alias);
+
+        // if we have a property, and it has a value, return that value
+        if (property != null && property.HasValue(culture, segment))
+        {
+            return true;
+        }
+
+        // else let fallback try to get a value
+        return publishedValueFallback.TryGetValue(content, alias, culture, segment, fallback, null, out object? _);
     }
 
     #endregion
@@ -242,6 +279,142 @@ public static class PublishedElementExtensions
         // rely on the property converter - will return default bool value, ie false, if property
         // is not defined, or has no value, else will return its value.
         content.Value<bool>(publishedValueFallback, Constants.Conventions.Content.NaviHide) == false;
+
+    #endregion
+
+    #region Culture
+
+    /// <summary>
+    ///     Determines whether the content has a culture.
+    /// </summary>
+    /// <remarks>Culture is case-insensitive.</remarks>
+    public static bool HasCulture(this IPublishedElement content, string? culture)
+    {
+        if (content == null)
+        {
+            throw new ArgumentNullException(nameof(content));
+        }
+
+        return content.Cultures.ContainsKey(culture ?? string.Empty);
+    }
+
+    /// <summary>
+    ///     Determines whether the content is invariant, or has a culture.
+    /// </summary>
+    /// <remarks>Culture is case-insensitive.</remarks>
+    public static bool IsInvariantOrHasCulture(this IPublishedElement content, string culture)
+        => !content.ContentType.VariesByCulture() || content.Cultures.ContainsKey(culture ?? string.Empty);
+
+    /// <summary>
+    ///     Gets the culture date of the content item.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="variationContextAccessor">The variation context accessor.</param>
+    /// <param name="culture">
+    ///     The specific culture to get the name for. If null is used the current culture is used (Default is
+    ///     null).
+    /// </param>
+    public static DateTime CultureDate(this IPublishedElement content, IVariationContextAccessor variationContextAccessor, string? culture = null)
+    {
+        // invariant has invariant value (whatever the requested culture)
+        if (!content.ContentType.VariesByCulture())
+        {
+            return content.UpdateDate;
+        }
+
+        // handle context culture for variant
+        if (culture == null)
+        {
+            culture = variationContextAccessor?.VariationContext?.Culture ?? string.Empty;
+        }
+
+        // get
+        return culture != string.Empty && content.Cultures.TryGetValue(culture, out PublishedCultureInfo? infos)
+            ? infos.Date
+            : DateTime.MinValue;
+    }
+
+    #endregion
+
+    #region IsSomething: misc.
+
+    /// <summary>
+    ///     Determines whether the specified content is a specified content type.
+    /// </summary>
+    /// <param name="content">The content to determine content type of.</param>
+    /// <param name="docTypeAlias">The alias of the content type to test against.</param>
+    /// <returns>True if the content is of the specified content type; otherwise false.</returns>
+    public static bool IsDocumentType(this IPublishedElement content, string docTypeAlias) =>
+        content.ContentType.Alias.InvariantEquals(docTypeAlias);
+
+    /// <summary>
+    ///     Determines whether the specified content is a specified content type or it's derived types.
+    /// </summary>
+    /// <param name="content">The content to determine content type of.</param>
+    /// <param name="docTypeAlias">The alias of the content type to test against.</param>
+    /// <param name="recursive">
+    ///     When true, recurses up the content type tree to check inheritance; when false just calls
+    ///     IsDocumentType(this IPublishedElement content, string docTypeAlias).
+    /// </param>
+    /// <returns>True if the content is of the specified content type or a derived content type; otherwise false.</returns>
+    public static bool IsDocumentType(this IPublishedElement content, string docTypeAlias, bool recursive)
+    {
+        if (content.IsDocumentType(docTypeAlias))
+        {
+            return true;
+        }
+
+        return recursive && content.IsComposedOf(docTypeAlias);
+    }
+
+    #endregion
+
+    #region IsSomething: equality
+
+    /// <summary>
+    /// Determines whether this content item is equal to another content item by comparing their IDs.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="other">The other content item to compare.</param>
+    /// <returns><c>true</c> if both content items have the same ID; otherwise, <c>false</c>.</returns>
+    public static bool IsEqual(this IPublishedElement content, IPublishedElement other) => content.Id == other.Id;
+
+    /// <summary>
+    /// Determines whether this content item is not equal to another content item by comparing their IDs.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="other">The other content item to compare.</param>
+    /// <returns><c>true</c> if the content items have different IDs; otherwise, <c>false</c>.</returns>
+    public static bool IsNotEqual(this IPublishedElement content, IPublishedElement other) =>
+        content.IsEqual(other) == false;
+
+    #endregion
+
+    #region Writer and creator
+
+    /// <summary>
+    /// Gets the name of the user who created the content item.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="userService">The user service.</param>
+    /// <returns>The name of the creator, or an empty string if not found.</returns>
+    public static string GetCreatorName(this IPublishedElement content, IUserService userService)
+    {
+        IProfile? user = userService.GetProfileById(content.CreatorId);
+        return user?.Name ?? string.Empty;
+    }
+
+    /// <summary>
+    /// Gets the name of the user who last updated the content item.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="userService">The user service.</param>
+    /// <returns>The name of the writer, or an empty string if not found.</returns>
+    public static string GetWriterName(this IPublishedElement content, IUserService userService)
+    {
+        IProfile? user = userService.GetProfileById(content.WriterId);
+        return user?.Name ?? string.Empty;
+    }
 
     #endregion
 

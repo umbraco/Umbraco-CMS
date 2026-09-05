@@ -3,7 +3,8 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'tiptapExtension',
 		alias: 'Umb.Tiptap.RichTextEssentials',
 		name: 'Rich Text Essentials Tiptap Extension',
-		api: () => import('./rich-text-essentials.tiptap-api.js'),
+		api: () =>
+			import('../extension-apis.bundle.js').then((m) => ({ default: m.UmbTiptapRichTextEssentialsExtensionApi })),
 		weight: 1000,
 		meta: {
 			icon: 'icon-browser-window',

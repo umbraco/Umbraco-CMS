@@ -65,6 +65,13 @@ public class MemberExternalSignInAutoLinkOptions
     public IEnumerable<string> DefaultMemberGroups { get; }
 
     /// <summary>
+    ///     Gets or sets a value indicating whether auto-linked members should be created as external-only
+    ///     (lightweight identity record, not a full content entity). When <c>true</c>, the external provider
+    ///     is the source of truth for profile data and the member is stored in the umbracoExternalMember table.
+    /// </summary>
+    public bool ExternalOnly { get; set; }
+
+    /// <summary>
     ///     The default Culture to use for auto-linking users
     /// </summary>
     // TODO: Should we use IDefaultCultureAccessor here instead?

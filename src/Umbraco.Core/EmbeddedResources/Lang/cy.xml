@@ -454,14 +454,11 @@
     <key alias="httpsCheckConfigurationRectifyNotPossible">Mae gosodiad ap 'Umbraco:CMS:Global:UseHttps' wedi'i osod i 'false' yn eich ffeil appSettings.json. Unwaith y byddwch yn cyrchu'r wefan hon gan ddefnyddio'r cynllun HTTPS, dylid gosod hwnnw i 'true'.</key>
     <key alias="httpsCheckConfigurationCheckResult">Mae'r gosodiad ap 'Umbraco:CMS:Global:UseHttps' wedi'i osod i '%0%' yn eich ffeil appSettings.json, mae eich cwcis %1% wedi'u marcio'n ddiogel.</key>
     <key alias="umbracoApplicationUrlCheckResultTrue">Mae gosodiad yr ap 'Umbraco:CMS:WebRouting:UmbracoApplicationUrl' wedi'i osod i <strong>%0%</strong>.</key>
-    <key alias="umbracoApplicationUrlCheckResultFalse">Nid yw gosodiad ap 'Umbraco:CMS:WebRouting:UmbracoApplicationUrl' wedi'i osod.</key>
+    <key alias="umbracoApplicationUrlCheckResultFalse"><![CDATA[Nid yw gosodiad ap 'Umbraco:CMS:WebRouting:UmbracoApplicationUrl' wedi'i osod, felly bydd URL y rhaglen yn cael ei ganfod yn awtomatig o geisiadau sy'n dod i mewn. Argymhellir ei osod yn benodol.]]></key>
+    <key alias="umbracoApplicationUrlCheckResultError"><![CDATA[Nid yw gosodiad ap 'Umbraco:CMS:WebRouting:UmbracoApplicationUrl' wedi'i osod ac mae canfod URL y rhaglen yn awtomatig wedi'i analluogi (mae 'Umbraco:CMS:WebRouting:ApplicationUrlDetection' yn 'None'). Ni fydd nodweddion sydd angen URL absoliwt, fel e-byst ailosod cyfrinair a gwahoddiadau, yn gweithio. Gosodwch URL y rhaglen yn benodol, neu galluogwch ganfod yn awtomatig.]]></key>
     <key alias="smtpMailSettingsNotFound">Nid oedd modd dod o hyd i'r ffurfweddiad 'Umbraco:CMS:Global:Smtp'.</key>
     <key alias="smtpMailSettingsHostNotConfigured">Nid oedd modd dod o hyd i'r ffurfweddiad 'Umbraco:CMS:Global:Smtp:Host'.</key>
     <key alias="smtpMailSettingsConnectionFail">Methwyd cyrraedd y gweinydd SMTP a ffurfweddwyd gyda gwesteiwr '%0%' a phorth '%1%'. Gwiriwch i sicrhau bod y gosodiadau SMTP yn y ffurfweddiad 'Umbraco:CMS:Global:Smtp' yn gywir.</key>
-  </area>
-  <area alias="recycleBin">
-    <key alias="contentTrashed">Wedi chwalu cynnwys gyda Id: {0} yn berthnasol i gynnwys rhiant gwreiddiol gyda Id: {1}</key>
-    <key alias="mediaTrashed">Wedi chwalu cyfrwng gyda Id: {0} yn berthnasol i gyfrwng rhiant gwreiddiol gyda Id: {1}</key>
   </area>
   <area alias="permissions">
     <key alias="FolderCreation">Creu ffolder</key>

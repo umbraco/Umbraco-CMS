@@ -64,6 +64,7 @@ using Umbraco.Cms.Infrastructure.Search;
 using Umbraco.Cms.Infrastructure.Security;
 using Umbraco.Cms.Infrastructure.Serialization;
 using Umbraco.Cms.Infrastructure.Services.Implement;
+using Umbraco.Cms.Infrastructure.Sync;
 using Umbraco.Extensions;
 using IScopeProvider = Umbraco.Cms.Infrastructure.Scoping.IScopeProvider;
 
@@ -89,11 +90,18 @@ public static partial class UmbracoBuilderExtensions
         builder.PackageMigrationPlans().Add(builder.TypeLoader.GetPackageMigrationPlans());
 
         builder.Services.AddSingleton<IRuntimeState, RuntimeState>();
+        builder.Services.AddSingleton<IContentRoutingReadiness, ContentRoutingReadiness>();
         builder.Services.AddSingleton<IRuntime, CoreRuntime>();
         builder.Services.AddSingleton<PendingPackageMigrations>();
         builder.AddNotificationAsyncHandler<RuntimeUnattendedInstallNotification, UnattendedInstaller>();
         builder.AddNotificationAsyncHandler<RuntimeUnattendedUpgradeNotification, UnattendedUpgrader>();
         builder.AddNotificationAsyncHandler<RuntimePremigrationsUpgradeNotification, PremigrationUpgrader>();
+        builder.Services.AddSingleton<IMigrationCoordinator, MigrationCoordinator>();
+
+        // Registered here (rather than alongside TouchServerJob in AddBackgroundJobs()) because
+        // UnattendedUpgradeBackgroundService, registered immediately below, needs it and this method runs in
+        // every composition path that also registers that service - AddBackgroundJobs() does not.
+        builder.Services.AddSingleton<IServerRoleElector, ServerRoleElector>();
         builder.Services.AddHostedService<UnattendedUpgradeBackgroundService>();
 
         // Database availability check.
@@ -382,19 +390,29 @@ public static partial class UmbracoBuilderExtensions
             .AddNotificationHandler<ContentMovedNotification, RelateOnTrashNotificationHandler>()
             .AddNotificationAsyncHandler<ContentMovedToRecycleBinNotification, RelateOnTrashNotificationHandler>()
             .AddNotificationHandler<MediaMovedNotification, RelateOnTrashNotificationHandler>()
-            .AddNotificationAsyncHandler<MediaMovedToRecycleBinNotification, RelateOnTrashNotificationHandler>();
+            .AddNotificationAsyncHandler<MediaMovedToRecycleBinNotification, RelateOnTrashNotificationHandler>()
+            .AddNotificationHandler<ElementMovedNotification, RelateOnTrashNotificationHandler>()
+            .AddNotificationAsyncHandler<ElementMovedToRecycleBinNotification, RelateOnTrashNotificationHandler>()
+            .AddNotificationHandler<EntityContainerMovedNotification, RelateOnTrashNotificationHandler>()
+            .AddNotificationAsyncHandler<EntityContainerMovedToRecycleBinNotification, RelateOnTrashNotificationHandler>();
 
         // add notification handlers for property editors
         builder
             .AddNotificationHandler<ContentSavingNotification, BlockListPropertyNotificationHandler>()
             .AddNotificationHandler<ContentCopyingNotification, BlockListPropertyNotificationHandler>()
             .AddNotificationHandler<ContentScaffoldedNotification, BlockListPropertyNotificationHandler>()
+            .AddNotificationHandler<ElementSavingNotification, BlockListPropertyNotificationHandler>()
+            .AddNotificationHandler<ElementCopyingNotification, BlockListPropertyNotificationHandler>()
             .AddNotificationHandler<ContentSavingNotification, BlockGridPropertyNotificationHandler>()
             .AddNotificationHandler<ContentCopyingNotification, BlockGridPropertyNotificationHandler>()
             .AddNotificationHandler<ContentScaffoldedNotification, BlockGridPropertyNotificationHandler>()
+            .AddNotificationHandler<ElementSavingNotification, BlockGridPropertyNotificationHandler>()
+            .AddNotificationHandler<ElementCopyingNotification, BlockGridPropertyNotificationHandler>()
             .AddNotificationHandler<ContentSavingNotification, RichTextPropertyNotificationHandler>()
             .AddNotificationHandler<ContentCopyingNotification, RichTextPropertyNotificationHandler>()
             .AddNotificationHandler<ContentScaffoldedNotification, RichTextPropertyNotificationHandler>()
+            .AddNotificationHandler<ElementSavingNotification, RichTextPropertyNotificationHandler>()
+            .AddNotificationHandler<ElementCopyingNotification, RichTextPropertyNotificationHandler>()
             .AddNotificationHandler<ContentCopiedNotification, FileUploadContentCopiedOrScaffoldedNotificationHandler>()
             .AddNotificationHandler<ContentScaffoldedNotification, FileUploadContentCopiedOrScaffoldedNotificationHandler>()
             .AddNotificationHandler<ContentSavedBlueprintNotification, FileUploadContentCopiedOrScaffoldedNotificationHandler>()
@@ -431,6 +449,8 @@ public static partial class UmbracoBuilderExtensions
             .AddNotificationHandler<LanguageDeletedNotification, LanguageDeletedDistributedCacheNotificationHandler>()
             .AddNotificationHandler<MemberSavedNotification, MemberSavedDistributedCacheNotificationHandler>()
             .AddNotificationHandler<MemberDeletedNotification, MemberDeletedDistributedCacheNotificationHandler>()
+            .AddNotificationHandler<ExternalMemberSavedNotification, ExternalMemberSavedDistributedCacheNotificationHandler>()
+            .AddNotificationHandler<ExternalMemberDeletedNotification, ExternalMemberDeletedDistributedCacheNotificationHandler>()
             .AddNotificationHandler<PublicAccessEntrySavedNotification, PublicAccessEntrySavedDistributedCacheNotificationHandler>()
             .AddNotificationHandler<PublicAccessEntryDeletedNotification, PublicAccessEntryDeletedDistributedCacheNotificationHandler>()
             .AddNotificationHandler<UserSavedNotification, UserSavedDistributedCacheNotificationHandler>()
@@ -452,6 +472,8 @@ public static partial class UmbracoBuilderExtensions
             .AddNotificationHandler<MediaTypeChangedNotification, MediaTypeChangedDistributedCacheNotificationHandler>()
             .AddNotificationHandler<MemberTypeChangedNotification, MemberTypeChangedDistributedCacheNotificationHandler>()
             .AddNotificationHandler<ContentTreeChangeNotification, ContentTreeChangeDistributedCacheNotificationHandler>()
+            .AddNotificationHandler<ElementTreeChangeNotification, ElementTreeChangeDistributedCacheNotificationHandler>()
+            .AddNotificationHandler<EntityContainerDeletedNotification, ElementContainerDeletedDistributedCacheNotificationHandler>()
             ;
 
         // add notification handlers for auditing
@@ -464,10 +486,14 @@ public static partial class UmbracoBuilderExtensions
             .AddNotificationAsyncHandler<UserSavedNotification, AuditNotificationsHandler>()
             .AddNotificationAsyncHandler<UserDeletedNotification, AuditNotificationsHandler>()
             .AddNotificationAsyncHandler<UserGroupWithUsersSavedNotification, AuditNotificationsHandler>()
-            .AddNotificationAsyncHandler<AssignedUserGroupPermissionsNotification, AuditNotificationsHandler>();
+            .AddNotificationAsyncHandler<AssignedUserGroupPermissionsNotification, AuditNotificationsHandler>()
+            .AddNotificationAsyncHandler<ExternalMemberSavedNotification, AuditNotificationsHandler>()
+            .AddNotificationAsyncHandler<ExternalMemberDeletedNotification, AuditNotificationsHandler>()
+            .AddNotificationAsyncHandler<AssignedExternalMemberRolesNotification, AuditNotificationsHandler>()
+            .AddNotificationAsyncHandler<RemovedExternalMemberRolesNotification, AuditNotificationsHandler>();
 
         // Handlers for publish warnings
-        builder.AddNotificationHandler<ContentPublishedNotification, AddDomainWarningsWhenPublishingNotificationHandler>();
+        builder.AddNotificationAsyncHandler<ContentPublishedNotification, AddDomainWarningsWhenPublishingNotificationHandler>();
         builder.AddNotificationAsyncHandler<ContentPublishedNotification, AddUnroutableContentWarningsWhenPublishingNotificationHandler>();
 
         // Handlers for save warnings
@@ -479,8 +505,11 @@ public static partial class UmbracoBuilderExtensions
         builder
             .AddNotificationHandler<ContentSavedNotification, ContentRelationsUpdate>()
             .AddNotificationHandler<ContentPublishedNotification, ContentRelationsUpdate>()
+            .AddNotificationHandler<ContentUnpublishedNotification, ContentRelationsUpdate>()
             .AddNotificationHandler<MediaSavedNotification, ContentRelationsUpdate>()
-            .AddNotificationHandler<MemberSavedNotification, ContentRelationsUpdate>();
+            .AddNotificationHandler<MemberSavedNotification, ContentRelationsUpdate>()
+            .AddNotificationHandler<ElementSavedNotification, ContentRelationsUpdate>()
+            .AddNotificationHandler<ElementPublishedNotification, ContentRelationsUpdate>();
 
         return builder;
     }

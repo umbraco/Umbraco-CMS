@@ -1,3 +1,4 @@
+import UmbPropertyActionElement from './property-action.element.js';
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_PROPERTY_ACTION_DEFAULT_KIND_MANIFEST: UmbExtensionManifestKind = {
@@ -9,7 +10,7 @@ export const UMB_PROPERTY_ACTION_DEFAULT_KIND_MANIFEST: UmbExtensionManifestKind
 		type: 'propertyAction',
 		kind: 'default',
 		weight: 1000,
-		element: () => import('./property-action.element.js'),
+		element: UmbPropertyActionElement,
 		meta: {
 			icon: 'icon-bug',
 			label: '(Missing label in manifest)',

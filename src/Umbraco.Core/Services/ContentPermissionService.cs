@@ -238,6 +238,57 @@ internal sealed class ContentPermissionService : IContentPermissionService
         return Task.FromResult<ISet<Guid>>(authorizedKeys);
     }
 
+    /// <inheritdoc/>
+    public Task<IEnumerable<NodePermissions>> GetPermissionsAsync(IUser user, IEnumerable<Guid> contentKeys)
+    {
+        Guid[] keysArray = [.. contentKeys];
+
+        if (keysArray.Length == 0)
+        {
+            return Task.FromResult(Enumerable.Empty<NodePermissions>());
+        }
+
+        TreeEntityPath[] entityPaths = [.. _entityService.GetAllPaths(UmbracoObjectTypes.Document, keysArray)];
+
+        if (entityPaths.Length == 0)
+        {
+            return Task.FromResult(Enumerable.Empty<NodePermissions>());
+        }
+
+        // Collect all unique node IDs from all entity paths for a single batch query.
+        var pathDataByKey = new Dictionary<Guid, int[]>();
+        var allUniqueNodeIds = new HashSet<int>();
+        foreach (TreeEntityPath entityPath in entityPaths)
+        {
+            int[] pathIds = entityPath.Path.GetIdsFromPathReversed();
+            pathDataByKey[entityPath.Key] = pathIds;
+            allUniqueNodeIds.UnionWith(pathIds);
+        }
+
+        // Single batch permission query for all unique node IDs.
+        EntityPermissionCollection allPermissions = _userService.GetPermissions(user, [.. allUniqueNodeIds]);
+
+        // Per-entity in-memory resolution using the batch results.
+        var results = new NodePermissions[entityPaths.Length];
+        for (var i = 0; i < entityPaths.Length; i++)
+        {
+            int[] pathIds = pathDataByKey[entityPaths[i].Key];
+            var pathNodeIdSet = new HashSet<int>(pathIds);
+            EntityPermission[] relevantPermissions = allPermissions
+                .Where(p => pathNodeIdSet.Contains(p.EntityId))
+                .ToArray();
+
+            EntityPermissionSet permissionSet = UserService.CalculatePermissionsForPathForUser(relevantPermissions, pathIds);
+            results[i] = new NodePermissions { NodeKey = entityPaths[i].Key, Permissions = permissionSet.GetAllPermissions() };
+        }
+
+        return Task.FromResult(results.AsEnumerable());
+    }
+
+    /// <inheritdoc/>
+    public Task<ISet<string>> FilterFallbackPermissionsAsync(IUser user, ISet<string> fallbackPermissions)
+        => Task.FromResult(fallbackPermissions);
+
     /// <summary>
     ///     Check the implicit/inherited permissions of a user for given content items.
     /// </summary>

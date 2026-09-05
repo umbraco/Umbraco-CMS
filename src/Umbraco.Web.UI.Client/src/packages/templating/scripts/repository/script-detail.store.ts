@@ -5,17 +5,17 @@ import { UmbDetailStoreBase } from '@umbraco-cms/backoffice/store';
 
 /**
  * @class UmbScriptDetailStore
- * @augments {UmbStoreBase}
+ * @augments {UmbDetailStoreBase}
  * @description - Data Store for scripts
  */
 export class UmbScriptDetailStore extends UmbDetailStoreBase<UmbScriptDetailModel> {
 	/**
 	 * Creates an instance of UmbScriptDetailStore.
-	 * @param {UmbControllerHostInterface} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbScriptDetailStore
 	 */
 	constructor(host: UmbControllerHost) {
-		super(host, UMB_SCRIPT_DETAIL_STORE_CONTEXT.toString());
+		super(host, UMB_SCRIPT_DETAIL_STORE_CONTEXT);
 	}
 }
 

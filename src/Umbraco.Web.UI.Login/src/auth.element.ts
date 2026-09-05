@@ -2,6 +2,7 @@ import { html, customElement, property, ifDefined } from '@umbraco-cms/backoffic
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { InputType, UUIFormLayoutItemElement } from '@umbraco-cms/backoffice/external/uui';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { umbLocalizationRegistry } from '@umbraco-cms/backoffice/localization';
 
 import { UMB_AUTH_CONTEXT, UmbAuthContext } from './contexts/index.js';
 import { UmbSlimBackofficeController } from './controllers/index.js';
@@ -121,7 +122,7 @@ const createFormLayoutPasswordItem = (
 	label: HTMLLabelElement,
 	input: HTMLInputElement,
 	showPasswordToggle: HTMLSpanElement,
-	requiredMessageKey: string
+	requiredMessageKey: string,
 ) => {
 	const formLayoutItem = document.createElement('uui-form-layout-item') as UUIFormLayoutItemElement;
 	const errorId = input.getAttribute('aria-errormessage') || input.id + '-error';
@@ -228,6 +229,19 @@ export default class UmbAuthElement extends UmbLitElement {
 		});
 	}
 
+	override connectedCallback() {
+		super.connectedCallback();
+
+		// The host's `lang` attribute is set by Razor from GlobalSettings.DefaultUILanguage.
+		// Use it as the initial active language; current-user.context overrides it after login.
+		if (this.lang) {
+			umbLocalizationRegistry.loadLanguage(this.lang);
+		}
+		this.observe(umbLocalizationRegistry.currentLanguage, (lang) => {
+			if (lang) this.lang = lang;
+		});
+	}
+
 	async firstUpdated() {
 		// Bind the (slim) Backoffice controller to this element so that we can use utilities from the Backoffice app.
 		await new UmbSlimBackofficeController(this).register(this);
@@ -256,7 +270,7 @@ export default class UmbAuthElement extends UmbLitElement {
 					return;
 				}
 				// Check if localization is available
-				if (this.localize.term('auth_showPassword') !== 'auth_showPassword') {
+				if (this.localize.term('login_showPassword') !== 'login_showPassword') {
 					clearInterval(checkInterval);
 					resolve();
 					return;
@@ -294,30 +308,30 @@ export default class UmbAuthElement extends UmbLitElement {
 		const passwordShowPasswordToggleButton = createShowPasswordToggleButton({
 			id: 'password-show-toggle',
 			name: 'password-show-toggle',
-			ariaLabelShowPassword: this.localize.term('auth_showPassword'),
-			ariaLabelHidePassword: this.localize.term('auth_hidePassword'),
+			ariaLabelShowPassword: this.localize.term('login_showPassword'),
+			ariaLabelHidePassword: this.localize.term('login_hidePassword'),
 		});
 		const passwordShowPasswordToggleItem = createShowPasswordToggleItem(passwordShowPasswordToggleButton);
 		const usernameLabel = createLabel({
 			forId: 'username-input',
-			localizeAlias: this.usernameIsEmail ? 'auth_email' : 'auth_username',
+			localizeAlias: this.usernameIsEmail ? 'login_email' : 'login_username',
 			localizeFallback: this.usernameIsEmail ? 'Email' : 'Username',
 		});
 		const passwordLabel = createLabel({
 			forId: 'password-input',
-			localizeAlias: 'auth_password',
+			localizeAlias: 'login_password',
 			localizeFallback: 'Password',
 		});
 		const usernameLayoutItem = createFormLayoutItem(
 			usernameLabel,
 			usernameInput,
-			this.usernameIsEmail ? 'auth_requiredEmailValidationMessage' : 'auth_requiredUsernameValidationMessage'
+			this.usernameIsEmail ? 'login_requiredEmailValidationMessage' : 'login_requiredUsernameValidationMessage',
 		);
 		const passwordLayoutItem = createFormLayoutPasswordItem(
 			passwordLabel,
 			passwordInput,
 			passwordShowPasswordToggleItem,
-			'auth_requiredPasswordValidationMessage'
+			'login_requiredPasswordValidationMessage',
 		);
 		const style = document.createElement('style');
 		style.innerHTML = authStyles;
@@ -350,7 +364,7 @@ export default class UmbAuthElement extends UmbLitElement {
 		if (this.disableLocalLogin) {
 			return html`
 				<umb-error-layout no-back-link>
-					<umb-localize key="auth_localLoginDisabled"
+					<umb-localize key="login_localLoginDisabled"
 						>Unfortunately, it is not possible to log in directly. It has been disabled by a login
 						provider.</umb-localize
 					>
@@ -363,11 +377,11 @@ export default class UmbAuthElement extends UmbLitElement {
 		const status = searchParams.get('status');
 
 		if (status === 'resetCodeExpired') {
-			return html` <umb-error-layout message=${this.localize.term('auth_resetCodeExpired')}> </umb-error-layout>`;
+			return html` <umb-error-layout message=${this.localize.term('login_resetCodeExpired')}> </umb-error-layout>`;
 		}
 
 		if (flow === 'invite-user' && status === 'false') {
-			return html` <umb-error-layout message=${this.localize.term('auth_userInviteExpiredMessage')}>
+			return html` <umb-error-layout message=${this.localize.term('login_userInviteExpiredMessage')}>
 			</umb-error-layout>`;
 		}
 

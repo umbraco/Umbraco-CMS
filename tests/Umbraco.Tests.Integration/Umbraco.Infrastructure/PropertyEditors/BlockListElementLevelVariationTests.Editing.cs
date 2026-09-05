@@ -29,9 +29,9 @@ internal partial class BlockListElementLevelVariationTests
             ? (await CreateLimitedUser()).Key
             : Constants.Security.SuperUserKey;
 
-        var elementType = CreateElementType(ContentVariation.Culture);
+        var elementType = await CreateElementType(ContentVariation.Culture);
         var blockListDataType = await CreateBlockListDataType(elementType);
-        var contentType = CreateContentType(ContentVariation.Culture, blockListDataType);
+        var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType);
         var content = CreateContent(contentType, elementType, [], false);
         content.SetCultureName("Home (de)", "de-DE");
         ContentService.Save(content);
@@ -187,9 +187,9 @@ internal partial class BlockListElementLevelVariationTests
             ? (await CreateLimitedUser()).Key
             : Constants.Security.SuperUserKey;
 
-        var elementType = CreateElementType(ContentVariation.Culture);
+        var elementType = await CreateElementType(ContentVariation.Culture);
         var blockListDataType = await CreateBlockListDataType(elementType);
-        var contentType = CreateContentType(ContentVariation.Culture, blockListDataType);
+        var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType);
         var content = CreateContent(contentType, elementType, [], false);
         content.SetCultureName("Home (de)", "de-DE");
         ContentService.Save(content);
@@ -319,9 +319,9 @@ internal partial class BlockListElementLevelVariationTests
             ? (await CreateLimitedUser()).Key
             : Constants.Security.SuperUserKey;
 
-        var elementType = CreateElementType(ContentVariation.Culture);
+        var elementType = await CreateElementType(ContentVariation.Culture);
         var blockListDataType = await CreateBlockListDataType(elementType);
-        var contentType = CreateContentType(ContentVariation.Culture, blockListDataType);
+        var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType);
         var content = CreateContent(contentType, elementType, [], false);
         content.SetCultureName("Home (de)", "de-DE");
         ContentService.Save(content);
@@ -480,9 +480,9 @@ internal partial class BlockListElementLevelVariationTests
             ? (await CreateLimitedUser()).Key
             : Constants.Security.SuperUserKey;
 
-        var elementType = CreateElementType(ContentVariation.Culture);
+        var elementType = await CreateElementType(ContentVariation.Culture);
         var blockListDataType = await CreateBlockListDataType(elementType);
-        var contentType = CreateContentType(ContentVariation.Culture, blockListDataType);
+        var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType);
         var content = CreateContent(contentType, elementType, [], false);
         content.SetCultureName("Home (de)", "de-DE");
         ContentService.Save(content);
@@ -603,9 +603,9 @@ internal partial class BlockListElementLevelVariationTests
             ? (await CreateLimitedUser()).Key
             : Constants.Security.SuperUserKey;
 
-        var elementType = CreateElementType(ContentVariation.Culture);
+        var elementType = await CreateElementType(ContentVariation.Culture);
         var blockListDataType = await CreateBlockListDataType(elementType);
-        var contentType = CreateContentType(ContentVariation.Culture, blockListDataType);
+        var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType);
         var content = CreateContent(contentType, elementType, [], false);
         content.SetCultureName("Home (de)", "de-DE");
         ContentService.Save(content);
@@ -768,9 +768,9 @@ internal partial class BlockListElementLevelVariationTests
             ? (await CreateLimitedUser()).Key
             : Constants.Security.SuperUserKey;
 
-        var elementType = CreateElementType(ContentVariation.Culture);
+        var elementType = await CreateElementType(ContentVariation.Culture);
         var blockListDataType = await CreateBlockListDataType(elementType);
-        var contentType = CreateContentType(ContentVariation.Culture, blockListDataType);
+        var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType);
         var content = CreateContent(contentType, elementType, [], false);
         content.SetCultureName("Home (de)", "de-DE");
         ContentService.Save(content);
@@ -893,9 +893,9 @@ internal partial class BlockListElementLevelVariationTests
             ? (await CreateLimitedUser()).Key
             : Constants.Security.SuperUserKey;
 
-        var elementType = CreateElementType(ContentVariation.Culture);
+        var elementType = await CreateElementType(ContentVariation.Culture);
         var blockListDataType = await CreateBlockListDataType(elementType);
-        var contentType = CreateContentType(ContentVariation.Culture, blockListDataType);
+        var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType);
         var content = CreateContent(contentType, elementType, [], false);
         content.SetCultureName("Home (de)", "de-DE");
         ContentService.Save(content);
@@ -996,9 +996,9 @@ internal partial class BlockListElementLevelVariationTests
             ? (await CreateLimitedUser()).Key
             : Constants.Security.SuperUserKey;
 
-        var elementType = CreateElementType(ContentVariation.Culture);
+        var elementType = await CreateElementType(ContentVariation.Culture);
         var blockListDataType = await CreateBlockListDataType(elementType);
-        var contentType = CreateContentType(ContentVariation.Culture, blockListDataType);
+        var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType);
         var content = CreateContent(contentType, elementType, [], false);
         content.SetCultureName("Home (de)", "de-DE");
         ContentService.Save(content);
@@ -1141,7 +1141,7 @@ internal partial class BlockListElementLevelVariationTests
         var userKey = updateWithLimitedUserAccess
             ? (await CreateLimitedUser()).Key
             : Constants.Security.SuperUserKey;
-        var nestedElementType = CreateElementType(ContentVariation.Culture);
+        var nestedElementType = await CreateElementType(ContentVariation.Culture);
         var nestedBlockListDataType = await CreateBlockListDataType(nestedElementType);
 
         var rootElementType = new ContentTypeBuilder()
@@ -1158,9 +1158,9 @@ internal partial class BlockListElementLevelVariationTests
             .WithVariations(ContentVariation.Nothing)
             .Done()
             .Build();
-        ContentTypeService.Save(rootElementType);
+        await ContentTypeService.CreateAsync(rootElementType, Constants.Security.SuperUserKey);
         var rootBlockListDataType = await CreateBlockListDataType(rootElementType);
-        var contentType = CreateContentType(ContentVariation.Culture, rootBlockListDataType);
+        var contentType = await CreateContentType(ContentVariation.Culture, rootBlockListDataType);
 
         var nestedElementContentKey = Guid.NewGuid();
         var nestedElementSettingsKey = Guid.NewGuid();
@@ -1290,9 +1290,9 @@ internal partial class BlockListElementLevelVariationTests
     [Test]
     public async Task Can_Align_Culture_Variance_For_Variant_Element_Types()
     {
-        var elementType = CreateElementType(ContentVariation.Culture);
+        var elementType = await CreateElementType(ContentVariation.Culture);
         var blockListDataType = await CreateBlockListDataType(elementType);
-        var contentType = CreateContentType(ContentVariation.Nothing, blockListDataType);
+        var contentType = await CreateContentType(ContentVariation.Nothing, blockListDataType);
 
         var content = CreateContent(
             contentType,
@@ -1310,7 +1310,7 @@ internal partial class BlockListElementLevelVariationTests
             false);
 
         contentType.Variations = ContentVariation.Culture;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.UpdateAsync(contentType, Constants.Security.SuperUserKey);
 
         // re-fetch content
         content = ContentService.GetById(content.Key);
@@ -1348,9 +1348,9 @@ internal partial class BlockListElementLevelVariationTests
     [TestCase(ContentVariation.Nothing)]
     public async Task Can_Turn_Invariant_Element_Variant(ContentVariation contentTypeVariation)
     {
-        var elementType = CreateElementType(ContentVariation.Nothing);
+        var elementType = await CreateElementType(ContentVariation.Nothing);
         var blockListDataType = await CreateBlockListDataType(elementType);
-        var contentType = CreateContentType(contentTypeVariation, blockListDataType);
+        var contentType = await CreateContentType(contentTypeVariation, blockListDataType);
 
         var content = CreateContent(
             contentType,
@@ -1369,7 +1369,7 @@ internal partial class BlockListElementLevelVariationTests
 
         elementType.Variations = ContentVariation.Culture;
         elementType.PropertyTypes.First(p => p.Alias == "variantText").Variations = ContentVariation.Culture;
-        ContentTypeService.Save(elementType);
+        await ContentTypeService.UpdateAsync(elementType, Constants.Security.SuperUserKey);
 
         // re-fetch content
         content = ContentService.GetById(content.Key);
@@ -1407,9 +1407,9 @@ internal partial class BlockListElementLevelVariationTests
     [TestCase(ContentVariation.Culture)]
     public async Task Can_Turn_Variant_Element_Invariant(ContentVariation contentTypeVariation)
     {
-        var elementType = CreateElementType(ContentVariation.Culture);
+        var elementType = await CreateElementType(ContentVariation.Culture);
         var blockListDataType = await CreateBlockListDataType(elementType);
-        var contentType = CreateContentType(contentTypeVariation, blockListDataType);
+        var contentType = await CreateContentType(contentTypeVariation, blockListDataType);
 
         var content = CreateContent(
             contentType,
@@ -1430,7 +1430,7 @@ internal partial class BlockListElementLevelVariationTests
 
         elementType.Variations = ContentVariation.Nothing;
         elementType.PropertyTypes.First(p => p.Alias == "variantText").Variations = ContentVariation.Nothing;
-        ContentTypeService.Save(elementType);
+        await ContentTypeService.UpdateAsync(elementType, Constants.Security.SuperUserKey);
 
         // re-fetch content
         content = ContentService.GetById(content.Key);
@@ -1458,6 +1458,103 @@ internal partial class BlockListElementLevelVariationTests
             Assert.IsNull(invariantValue.Culture);
             Assert.IsNull(variantValue.Culture);
             Assert.AreEqual("Variant settings in English", variantValue.Value);
+        });
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(1, blockListValue.Expose.Count);
+            Assert.IsNull(blockListValue.Expose.First().Culture);
+        });
+    }
+
+    [TestCase("en-US", "Variant content in English", "Variant settings in English", false)]
+    [TestCase("en-US", "Variant content in English", "Variant settings in English", true)]
+    [TestCase("da-DK", "Variant content in Danish", "Variant settings in Danish", false)]
+    [TestCase("da-DK", "Variant content in Danish", "Variant settings in Danish", true)]
+    public async Task Can_Turn_Variant_Element_Invariant_For_Variant_Block_Property(string culture, string expectedContentValue, string expectedSettingsValue, bool addCarriedPropertyValues)
+    {
+        var elementType = await CreateElementType(ContentVariation.Culture);
+        var blockListDataType = await CreateBlockListDataType(elementType);
+        var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType, ContentVariation.Culture);
+
+        // Each culture of this block property is stored as its own document, and a document can carry entries
+        // for cultures other than its own. The value retained must be the one for the culture being mapped,
+        // not the default language's.
+        var content = CreateContent(
+            contentType,
+            elementType,
+            new[]
+            {
+                new BlockProperty(
+                    new List<BlockPropertyValue>(
+                        new[]
+                        {
+                            new BlockPropertyValue { Alias = "invariantText", Value = "The invariant content value" },
+                            new BlockPropertyValue { Alias = "variantText", Value = "Variant content in English", Culture = "en-US" },
+                            addCarriedPropertyValues
+                                ? new BlockPropertyValue { Alias = "variantText", Value = "Carried content in Danish", Culture = "da-DK" }
+                                : null,
+                        }.WhereNotNull()),
+                    new List<BlockPropertyValue>(
+                        new[]
+                        {
+                            new BlockPropertyValue { Alias = "invariantText", Value = "The invariant settings value" },
+                            new BlockPropertyValue { Alias = "variantText", Value = "Variant settings in English", Culture = "en-US" },
+                            addCarriedPropertyValues
+                                ? new BlockPropertyValue { Alias = "variantText", Value = "Carried settings in Danish", Culture = "da-DK" }
+                                : null,
+                        }.WhereNotNull()),
+                    "en-US",
+                    null),
+                new BlockProperty(
+                    new List<BlockPropertyValue>(
+                        new[]
+                        {
+                            new BlockPropertyValue { Alias = "invariantText", Value = "The invariant content value" },
+                            new BlockPropertyValue { Alias = "variantText", Value = "Variant content in Danish", Culture = "da-DK" },
+                            addCarriedPropertyValues
+                                ? new BlockPropertyValue { Alias = "variantText", Value = "Carried content in English", Culture = "en-US" }
+                                : null,
+                        }.WhereNotNull()),
+                    new List<BlockPropertyValue>(
+                        new[]
+                        {
+                            new BlockPropertyValue { Alias = "invariantText", Value = "The invariant settings value" },
+                            new BlockPropertyValue { Alias = "variantText", Value = "Variant settings in Danish", Culture = "da-DK" },
+                            addCarriedPropertyValues
+                                ? new BlockPropertyValue { Alias = "variantText", Value = "Carried settings in English", Culture = "en-US" }
+                                : null,
+                        }.WhereNotNull()),
+                    "da-DK",
+                    null),
+            },
+            false);
+
+        elementType.Variations = ContentVariation.Nothing;
+        elementType.PropertyTypes.First(p => p.Alias == "variantText").Variations = ContentVariation.Nothing;
+        await ContentTypeService.UpdateAsync(elementType, Constants.Security.SuperUserKey);
+
+        // re-fetch content
+        content = ContentService.GetById(content.Key);
+
+        var valueEditor = (BlockListPropertyEditorBase.BlockListEditorPropertyValueEditor)blockListDataType.Editor!.GetValueEditor();
+
+        var blockListValue = valueEditor.ToEditor(content!.Properties["blocks"]!, culture) as BlockListValue;
+        Assert.IsNotNull(blockListValue);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(1, blockListValue.ContentData.Count);
+            Assert.AreEqual(2, blockListValue.ContentData.First().Values.Count);
+            var variantValue = blockListValue.ContentData.First().Values.First(value => value.Alias == "variantText");
+            Assert.IsNull(variantValue.Culture);
+            Assert.AreEqual(expectedContentValue, variantValue.Value);
+        });
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(1, blockListValue.SettingsData.Count);
+            Assert.AreEqual(2, blockListValue.SettingsData.First().Values.Count);
+            var variantValue = blockListValue.SettingsData.First().Values.First(value => value.Alias == "variantText");
+            Assert.IsNull(variantValue.Culture);
+            Assert.AreEqual(expectedSettingsValue, variantValue.Value);
         });
         Assert.Multiple(() =>
         {

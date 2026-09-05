@@ -36,7 +36,7 @@ public class UdtFileContentFactory : IUdtFileContentFactory
     /// <summary>
     /// Creates a <see cref="FileContentResult"/> from the specified content type by serializing it to XML.
     /// </summary>
-    /// <param name="contentType">The content type to serialize and create the file content from.</param>
+    /// <param name="mediaType">The media type to serialize and create the file content from.</param>
     /// <returns>A <see cref="FileContentResult"/> representing the serialized content type as a file.</returns>
     public FileContentResult Create(IMediaType mediaType)
     {
@@ -47,7 +47,7 @@ public class UdtFileContentFactory : IUdtFileContentFactory
     /// <summary>
     /// Creates a <see cref="FileContentResult"/> from the specified content type.
     /// </summary>
-    /// <param name="contentType">The content type to create the file content from.</param>
+    /// <param name="memberType">The member type to create the file content from.</param>
     /// <returns>A <see cref="FileContentResult"/> representing the serialized XML content of the content type.</returns>
     public FileContentResult Create(IMemberType memberType)
     {

@@ -10,16 +10,16 @@ namespace Umbraco.Cms.Persistence.EFCore.Scoping;
 public class AmbientEFCoreScopeStack<TDbContext> : IAmbientEFCoreScopeStack<TDbContext> where TDbContext : DbContext
 {
     private static Lock _lock = new();
-    private static AsyncLocal<ConcurrentStack<IEfCoreScope<TDbContext>>> _stack = new();
+    private static AsyncLocal<ConcurrentStack<IEFCoreScope<TDbContext>>> _stack = new();
 
     /// <inheritdoc />
-    public IEfCoreScope<TDbContext>? AmbientScope
+    public IEFCoreScope<TDbContext>? AmbientScope
     {
         get
         {
             lock (_lock)
             {
-                if (_stack.Value?.TryPeek(out IEfCoreScope<TDbContext>? ambientScope) ?? false)
+                if (_stack.Value?.TryPeek(out IEFCoreScope<TDbContext>? ambientScope) ?? false)
                 {
                     return ambientScope;
                 }
@@ -30,11 +30,11 @@ public class AmbientEFCoreScopeStack<TDbContext> : IAmbientEFCoreScopeStack<TDbC
     }
 
     /// <inheritdoc />
-    public IEfCoreScope<TDbContext> Pop()
+    public IEFCoreScope<TDbContext> Pop()
     {
         lock (_lock)
         {
-            if (_stack.Value?.TryPop(out IEfCoreScope<TDbContext>? ambientScope) ?? false)
+            if (_stack.Value?.TryPop(out IEFCoreScope<TDbContext>? ambientScope) ?? false)
             {
                 return ambientScope;
             }
@@ -44,13 +44,23 @@ public class AmbientEFCoreScopeStack<TDbContext> : IAmbientEFCoreScopeStack<TDbC
     }
 
     /// <inheritdoc />
-    public void Push(IEfCoreScope<TDbContext> scope)
+    public void Push(IEFCoreScope<TDbContext> scope)
     {
         lock (_lock)
         {
-            _stack.Value ??= new ConcurrentStack<IEfCoreScope<TDbContext>>();
+            ConcurrentStack<IEFCoreScope<TDbContext>>? stack = _stack.Value;
 
-            _stack.Value.Push(scope);
+            // An empty stack was inherited from an ancestor execution context, because popping the last entry
+            // leaves the instance in place. AsyncLocal copy-on-write protects the reference and not the instance
+            // it points at, so pushing onto it would share this flow's scopes with every sibling flow that
+            // inherited it. A non-empty stack is genuine nesting within this flow and is kept.
+            if (stack is null || stack.IsEmpty)
+            {
+                stack = new ConcurrentStack<IEFCoreScope<TDbContext>>();
+                _stack.Value = stack;
+            }
+
+            stack.Push(scope);
         }
     }
 }

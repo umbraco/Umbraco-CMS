@@ -30,7 +30,7 @@ export class UmbUserGroupEntityTypePermissionGroupsElement extends UmbLitElement
 					})
 					.sort((a, b) => a.headline.localeCompare(b.headline));
 			},
-			'umbUserPermissionsObserver',
+			null,
 		);
 
 		this.#observeGranularPermissionsWithNoEntityType();
@@ -52,8 +52,8 @@ export class UmbUserGroupEntityTypePermissionGroupsElement extends UmbLitElement
 		return html`${repeat(
 			this._groups,
 			(group) => group.entityType,
-			(group) =>
-				html`<uui-box>
+			(group) => html`
+				<uui-box>
 					<div slot="headline">${group.headline}</div>
 
 					<umb-user-group-entity-type-permissions
@@ -61,7 +61,8 @@ export class UmbUserGroupEntityTypePermissionGroupsElement extends UmbLitElement
 
 					<umb-user-group-entity-type-granular-permissions
 						.entityType=${group.entityType}></umb-user-group-entity-type-granular-permissions>
-				</uui-box>`,
+				</uui-box>
+			`,
 		)}
 		${this.#renderUngroupedGranularPermissions()}`;
 	}

@@ -9,7 +9,7 @@
 - **Runtime**: Node.js >=22, npm >=10 (see `engines` in `package.json`)
 - **Language**: TypeScript 5.x (strict mode, ESM — all imports must use `.js` extensions)
 - **Framework**: **Lit 3** — Web Components with reactive templates, decorators, and `html`/`css` tagged template literals
-- **UI Library**: **@umbraco-ui/uui 1.x** — 80+ Web Components (`<uui-button>`, `<uui-input>`, `<uui-box>`, etc.). Always prefer UUI components over native HTML or custom implementations.
+- **UI Library**: **@umbraco-ui/uui 2.x** — 80+ Web Components (`<uui-button>`, `<uui-input>`, `<uui-box>`, etc.). Always prefer UUI components over native HTML or custom implementations.
 - **Rich Text**: **TipTap 3** — ProseMirror-based editor (see `src/packages/tiptap/`)
 - **Build**: Vite 7 (config in `vite.config.ts`)
 - **State**: RxJS 7 wrapped by UmbState classes — see [Core Primitives](./core-primitives.md)
@@ -48,6 +48,8 @@ src/
 **Extension-first architecture**: HQ builds extensions the same way third-party developers do. All UI (sections, dashboards, property editors, workspaces, trees, actions) is registered via manifests. Any default behavior can be replaced, overridden, or removed. Consumers can use any framework that outputs a Web Component.
 
 *Note: The extension-first mindset is the guiding principle, and the frontend fully embraces this by treating all features as manifest-registered, replaceable extensions.*
+
+Extension-first also constrains how shared code is written: it must serve any implementation of an extension point, not only the one that prompted the change. See [General-Purpose by Default](../../../CLAUDE.md#2-general-purpose-by-default).
 
 ---
 

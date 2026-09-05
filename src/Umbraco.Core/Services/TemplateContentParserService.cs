@@ -4,12 +4,12 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Core.Services;
 
 /// <summary>
-///     Provides functionality for parsing template content to extract metadata such as the master template alias.
+///     Provides functionality for parsing template content to extract metadata such as the layout template alias.
 /// </summary>
 public partial class TemplateContentParserService : ITemplateContentParserService
 {
     /// <inheritdoc />
-    public string? MasterTemplateAlias(string? viewContent)
+    public string? LayoutTemplateAlias(string? viewContent)
     {
         if (viewContent.IsNullOrWhiteSpace())
         {

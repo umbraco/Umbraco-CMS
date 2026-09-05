@@ -5,7 +5,7 @@ import { UmbStoreObjectBase } from '@umbraco-cms/backoffice/store';
 
 export class UmbTemporaryFileConfigStore extends UmbStoreObjectBase<UmbTemporaryFileConfigurationModel> {
 	constructor(host: UmbControllerHost) {
-		super(host, UMB_TEMPORARY_FILE_CONFIG_STORE_CONTEXT.toString());
+		super(host, UMB_TEMPORARY_FILE_CONFIG_STORE_CONTEXT);
 	}
 }
 

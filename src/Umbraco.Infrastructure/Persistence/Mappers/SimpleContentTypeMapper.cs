@@ -39,5 +39,6 @@ public sealed class SimpleContentTypeMapper : BaseMapper
         DefineMap<ContentType, ContentTypeDto>(nameof(ContentType.ListView), nameof(ContentTypeDto.ListView));
         DefineMap<ContentType, ContentTypeDto>(nameof(ContentType.AllowedAsRoot), nameof(ContentTypeDto.AllowAtRoot));
         DefineMap<ContentType, ContentTypeDto>(nameof(ContentType.IsElement), nameof(ContentTypeDto.IsElement));
+        DefineMap<ContentType, ContentTypeDto>(nameof(ContentType.AllowedInLibrary), nameof(ContentTypeDto.AllowedInLibrary));
     }
 }

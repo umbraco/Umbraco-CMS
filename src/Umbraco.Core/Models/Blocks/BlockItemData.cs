@@ -20,21 +20,6 @@ public class BlockItemData
     /// <summary>
     ///     Initializes a new instance of the <see cref="BlockItemData" /> class.
     /// </summary>
-    /// <param name="udi">The UDI.</param>
-    /// <param name="contentTypeKey">The content type key.</param>
-    /// <param name="contentTypeAlias">The content type alias.</param>
-    [Obsolete("Use constructor that accepts GUID key instead. Scheduled for removal in Umbraco 18.")]
-    public BlockItemData(Udi udi, Guid contentTypeKey, string contentTypeAlias)
-        : this(
-            (udi as GuidUdi)?.Guid ?? throw new ArgumentException(nameof(udi)),
-            contentTypeKey,
-            contentTypeAlias)
-    {
-    }
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="BlockItemData" /> class.
-    /// </summary>
     /// <param name="key">The key.</param>
     /// <param name="contentTypeKey">The content type key.</param>
     /// <param name="contentTypeAlias">The content type alias.</param>
@@ -42,7 +27,6 @@ public class BlockItemData
     {
         ContentTypeAlias = contentTypeAlias;
         Key = key;
-        Udi = new GuidUdi(Constants.UdiEntityType.Element, key);
         ContentTypeKey = contentTypeKey;
     }
 
@@ -62,16 +46,6 @@ public class BlockItemData
     /// </remarks>
     [JsonIgnore]
     public string ContentTypeAlias { get; set; } = string.Empty;
-
-    /// <summary>
-    ///     Gets or sets the UDI.
-    /// </summary>
-    /// <value>
-    ///     The UDI.
-    /// </value>
-    [Obsolete("Use Key instead. Scheduled for removal in Umbraco 18.")]
-    [JsonIgnore]
-    public Udi? Udi { get; set; }
 
     /// <summary>
     ///     Gets or sets the key.

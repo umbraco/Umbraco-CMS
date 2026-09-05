@@ -59,7 +59,7 @@ src/Umbraco.Infrastructure/
 │
 ├── Migrations/                    # Database migration system
 │   ├── Install/                   # Initial database schema
-│   ├── Upgrade/                   # Version upgrade migrations (21 versions)
+│   ├── Upgrade/                   # Version upgrade migrations (V17+)
 │   ├── PostMigrations/            # Post-upgrade data fixes
 │   ├── MigrationPlan.cs           # Migration orchestration
 │   └── MigrationPlanExecutor.cs   # Migration execution
@@ -187,7 +187,7 @@ dotnet build src/Umbraco.Infrastructure /p:TreatWarningsAsErrors=true
 This project contains the migration framework but **migrations are NOT run via EF Core**. Migrations run at application startup via `MigrationPlanExecutor`.
 
 To create a new migration:
-1. Create class inheriting `MigrationBase` in `Migrations/Upgrade/`
+1. Create class inheriting `AsyncMigrationBase` in `Migrations/Upgrade/`
 2. Add to `UmbracoPlan` migration plan
 3. Restart application - migration runs automatically
 
@@ -227,13 +227,12 @@ internal class ContentFactory : IEntityFactory<IContent, ContentDto>
 - Converts DTO → Domain entity
 - Always `internal` (implementation detail)
 
-**Service Naming** (from Services/Implement/):
+**Service Naming** (`Services/Implement/`):
 ```csharp
-internal sealed class ContentService : RepositoryService, IContentService
+internal sealed class ContentSearchService : ContentSearchServiceBase<IContent>, IContentSearchService
 ```
-- Pattern: `{Domain}Service : RepositoryService, I{Domain}Service`
-- Inherits `RepositoryService` for scope/repository access
-- Always `internal sealed`
+- Pattern: `{Domain}Service : I{Domain}Service` (base class varies by concern)
+- Only services with genuine Infrastructure dependencies live here (search, packaging, webhooks, log viewing); the `RepositoryService`-based domain services (`ContentService`, `MediaService`, …) live in `Umbraco.Core/Services/` — see root CLAUDE.md §5
 
 ### Key Code Patterns
 
@@ -375,7 +374,7 @@ using (ICoreScope scope = ScopeProvider.CreateCoreScope())
 - 16 service implementations
 - Services fire notifications before/after operations
 - Services manage scopes (not repositories)
-- Example: `ContentService`, `MediaService`, `UserService`
+- Example: `ContentSearchService`, `PackagingService`, `WebhookFiringService` — the Infrastructure-dependent services; the main domain services (`ContentService`, `MediaService`, …) live in `Umbraco.Core/Services/`
 
 ### Code Smells to Watch For
 
@@ -384,6 +383,57 @@ using (ICoreScope scope = ScopeProvider.CreateCoreScope())
 3. **Lazy loading outside scope** - NPoco relationships must load within scope
 4. **Large migrations** - Split into multiple steps if > 1000 lines
 5. **Repository logic in services** - Keep repos thin, logic in services
+6. **Unbatched `WHERE IN` on user-sized collections** - See "Avoiding the SQL Server 2100-parameter limit" below
+
+### Avoiding the SQL Server 2100-parameter limit
+
+SQL Server caps a single statement at 2100 parameters. When an `IN` clause is built from a collection sized by user data, that cap can be hit — and the symptom is a runtime `SqlException` (error 8003) on customer installs that nobody hit in dev.
+
+**The constant and helpers**:
+- `Constants.Sql.MaxParameterCount = 2000` (in `Umbraco.Core`, `Constants-Sql.cs`) — the ceiling we target (2100 minus headroom for joined predicates already in the SQL).
+- `IEnumerable<T>.InGroupsOf(groupSize)` (in `Umbraco.Core`, `Extensions/EnumerableExtensions.cs`) — extension method to batch a collection.
+- `Database.FetchByGroups<TResult, TSource>(source, groupSize, sqlFactory)` (in `Umbraco.Infrastructure`, `Persistence/NPocoDatabaseExtensions.cs`) — NPoco helper that batches a fetch.
+
+**The safe patterns** (use one of these any time the collection size is user-driven):
+
+```csharp
+// Pattern 1: batch a DeleteMany / Execute / Fetch by looping.
+foreach (IEnumerable<int> group in ids.InGroupsOf(Constants.Sql.MaxParameterCount))
+{
+    Database.DeleteMany<FooDto>().Where(x => group.Contains(x.Id)).Execute();
+}
+
+// Pattern 2: batched fetch with NPoco helper.
+List<FooDto> dtos = Database.FetchByGroups<FooDto, int>(
+    ids,
+    Constants.Sql.MaxParameterCount,
+    batch => Sql().Select<FooDto>().From<FooDto>().WhereIn<FooDto>(x => x.Id, batch));
+
+// Pattern 3: reserve headroom for other parameters in the same statement.
+foreach (IEnumerable<int> group in entityIds.InGroupsOf(Constants.Sql.MaxParameterCount - userGroupIds.Length))
+{
+    // statement uses entityIds + userGroupIds, so subtract the other predicate's parameter count from the budget
+}
+```
+
+**Decision rule when writing or reviewing a `WHERE IN`-style query**:
+
+Look at what drives the size of the collection feeding the `IN`. Ask: *could this realistically exceed 2000 on a large install?* Risky drivers — batch any query backed by these:
+- All content / media / member nodes (or descendants of a deep tree).
+- A product of two scaling dimensions, e.g. `documents × languages`, `properties × versions`, `relations × endpoints`.
+- Configuration-tunable batch sizes (`CacheSettings.DocumentSeedBatchSize`, `NuCacheSettings.SqlPageSize`, etc.). The default may be safe but the customer can raise it.
+- Anything that scans property data, version history, relations, or audit logs across many nodes.
+
+Safe drivers — don't bother batching:
+- Languages / content types / member groups / user groups — bounded by install configuration, typically <100.
+- "Per single content item" collections — properties on one document, versions of one document, tokens for one external login.
+- IDs supplied directly by a user action through the UI (picker selections, bulk actions on a page of results).
+
+If you're not sure, batch — the cost is one loop and an `IEnumerable<T>` allocation per batch; the cost of being wrong is a SqlException on a customer's biggest site.
+
+**For new public APIs** that take an `IEnumerable<int>`/`IEnumerable<Guid>` and feed it into a query, batch internally even if no current caller is large — package authors and future callers will not know about the 2000-limit ceiling.
+
+**Don't** rely on `if (ids.Length > MaxParameterCount) throw` as a substitute for batching. Throwing only moves the problem; the caller has no obvious way to recover and will most likely just fail in production.
 
 ---
 
@@ -485,7 +535,34 @@ using (var outer = ScopeProvider.CreateCoreScope())
 **Data Migrations** - Can be slow:
 - Migrations run at startup (blocking)
 - Large data migrations (> 100k rows) should be chunked
-- Use `AsyncMigrationBase` for long-running operations
+- All migrations use `AsyncMigrationBase`
+
+**Schema-seeding migrations MUST assign the same fixed keys as a clean install**:
+- A migration that adds built-in schema entities (media/content/member types, property types,
+  property groups, data types, etc.) must set each entity's `Key` explicitly to the **same Guid**
+  used for that entity in `Migrations/Install/DatabaseDataCreator.cs`.
+- If you don't set `Key`, `EntityBase.Key` lazily generates a **random `Guid.NewGuid()`** — so every
+  upgraded site (and every environment) ends up with a **different** key, none of which match a clean
+  install. Umbraco Deploy / uSync key their schema artifacts by `Key`, so this shows up as spurious
+  "the key changed" schema diffs across environments (see issue #23337).
+- Keep the Guids in **one place** (a shared `Constants` value referenced by both `DatabaseDataCreator`
+  and the migration) so they cannot drift.
+
+**Migrations merged UP into an already-released version line must be re-applied at the plan's end**:
+- The upgrader only ever walks the migration chain **forward** from the state stored in the database.
+  A migration merged up from a lower version (e.g. a 17.6 migration merged into v18) lands in the
+  `UmbracoPlan` in namespace order — i.e. **before** the higher line's own migrations.
+- Sites already released on the higher line have a stored state **past** that insertion point, so they
+  will **never** run it (e.g. sites on 18.0.x skip a 17.6-positioned migration when upgrading to 18.1).
+- **Fix**: re-apply the migration at the **end** of the plan under a new version section with a new GUID.
+  Migrations are already required to be idempotent (guard with `IndexExists`, existence checks, etc.),
+  so upgrade paths that hit it twice are unaffected.
+- Implement the re-run as an **empty subclass of the original migration** placed in the **new version's**
+  namespace (e.g. `V_18_1_0.AddContentTypeIdIndexForContent : V_17_6_0.AddContentTypeIdIndexForContent`).
+  Do **not** re-list the original type directly: `UmbracoPlan.GetVersionForState` (used by
+  `RuntimeState.CurrentMigrationVersion`) derives the database version from the **final** migration
+  type's `V_{major}_{minor}_{patch}` namespace, so the last step must live in the new version's namespace
+  to report the correct version. See PR #23328 (original) and #23466 (re-application).
 
 ### Repository Edge Cases
 
@@ -553,9 +630,9 @@ using (var outer = ScopeProvider.CreateCoreScope())
 3. Which version does this target?
 
 **Workflow**:
-1. **Create Migration Class** in `Migrations/Upgrade/V{Version}/`
-   - Inherit from `MigrationBase` (schema) or `AsyncMigrationBase` (data)
-   - Implement `Migrate()` method
+1. **Create Migration Class** in `Migrations/Upgrade/V_{Version}/`
+   - Inherit from `AsyncMigrationBase`
+   - Implement `MigrateAsync()` method
 2. **Add to UmbracoPlan** in `Migrations/Upgrade/UmbracoPlan.cs`
    - Specify dependencies (runs after which migrations?)
 3. **Test Migration**:
@@ -588,7 +665,7 @@ using (var outer = ScopeProvider.CreateCoreScope())
 - 47 repositories × ~3 files each (repo, mapper, factory) = ~141 files
 - 75 property editors × ~2 files each = ~150 files
 - 80 DTOs for database tables = 80 files
-- 21 versions × ~5 migrations each = ~105 files
+- 7 version dirs (V17+) × ~5 migrations each = ~36 files
 - Remaining: services, background jobs, search, email, logging, etc.
 
 **Why NPoco + Custom Migrations?**
@@ -732,7 +809,7 @@ dotnet pack src/Umbraco.Infrastructure -c Release
 - **Scope Provider**: `src/Umbraco.Infrastructure/Scoping/ScopeProvider.cs`
 - **Database Factory**: `src/Umbraco.Infrastructure/Persistence/UmbracoDatabaseFactory.cs`
 - **Migration Executor**: `src/Umbraco.Infrastructure/Migrations/MigrationPlanExecutor.cs`
-- **Content Service**: `src/Umbraco.Infrastructure/Services/Implement/ContentService.cs`
+- **Content Search Service**: `src/Umbraco.Infrastructure/Services/Implement/ContentSearchService.cs`
 - **User Repository**: `src/Umbraco.Infrastructure/Persistence/Repositories/Implement/UserRepository.cs`
 
 ### Critical Patterns

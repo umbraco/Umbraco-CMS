@@ -1,25 +1,17 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Xml.Linq;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
-using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Cache.PropertyEditors;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.IO;
-using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
-using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
-using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Tests.Common.Builders;
@@ -41,16 +33,15 @@ internal sealed class EntityXmlSerializerTests : UmbracoIntegrationTest
     private IMediaTypeService MediaTypeService => GetRequiredService<IMediaTypeService>();
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
     private IDataValueEditorFactory DataValueEditorFactory => GetRequiredService<IDataValueEditorFactory>();
-    private ILocalizedTextService TextService => GetRequiredService<ILocalizedTextService>();
-    private IFileService FileService => GetRequiredService<IFileService>();
+    private ITemplateService TemplateService => GetRequiredService<ITemplateService>();
 
     [Test]
     public async Task Can_Export_DictionaryItems()
     {
         // Arrange
         await CreateDictionaryData();
-        var localizationService = GetRequiredService<ILocalizationService>();
-        var dictionaryItem = localizationService.GetDictionaryItemByKey("Parent");
+        var dictionaryItemService = GetRequiredService<IDictionaryItemService>();
+        var dictionaryItem = await dictionaryItemService.GetAsync("Parent");
 
         var newPackageXml = XElement.Parse(ImportResources.Dictionary_Package);
         var dictionaryItemsElement = newPackageXml.Elements("DictionaryItems").First();
@@ -90,14 +81,14 @@ internal sealed class EntityXmlSerializerTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Generate_Xml_Representation_Of_Content()
+    public async Task Can_Generate_Xml_Representation_Of_Content()
     {
         // Arrange
         var template = TemplateBuilder.CreateTextPageTemplate();
-        FileService.SaveTemplate(template); // else, FK violation on contentType!
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey); // else, FK violation on contentType!
         var contentType = ContentTypeBuilder.CreateTextPageContentType(
             defaultTemplateId: template.Id);
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var content = ContentBuilder.CreateTextpageContent(contentType, "Root Home", -1);
         ContentService.Save(content, Constants.Security.SuperUserId);
@@ -128,6 +119,7 @@ internal sealed class EntityXmlSerializerTests : UmbracoIntegrationTest
         Assert.AreEqual(content.GetWriterProfile(UserService).Name, (string)element.Attribute("writerName"));
         Assert.AreEqual(content.WriterId.ToString(), (string)element.Attribute("writerID"));
         Assert.AreEqual(content.TemplateId.ToString(), (string)element.Attribute("template"));
+        Assert.AreEqual(template.Alias, (string)element.Attribute("templateAlias"));
 
         Assert.AreEqual(content.Properties["title"].GetValue().ToString(), element.Elements("title").Single().Value);
         Assert.AreEqual(
@@ -142,12 +134,12 @@ internal sealed class EntityXmlSerializerTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Generate_Xml_Representation_Of_Media()
+    public async Task Can_Generate_Xml_Representation_Of_Media()
     {
         // Arrange
         var mediaType = MediaTypeBuilder.CreateImageMediaType("image2");
 
-        MediaTypeService.Save(mediaType);
+        await MediaTypeService.CreateAsync(mediaType, Constants.Security.SuperUserKey);
 
         // reference, so static ctor runs, so event handlers register
         // and then, this will reset the width, height... because the file does not exist, of course ;-(
@@ -200,24 +192,29 @@ internal sealed class EntityXmlSerializerTests : UmbracoIntegrationTest
         Assert.AreEqual(media.CreatorId.ToString(), (string)element.Attribute("writerID"));
         Assert.IsNull(element.Attribute("template"));
 
-        Assert.AreEqual(media.Properties[Constants.Conventions.Media.File].GetValue().ToString(),
+        Assert.AreEqual(
+            media.Properties[Constants.Conventions.Media.File].GetValue().ToString(),
             element.Elements(Constants.Conventions.Media.File).Single().Value);
-        Assert.AreEqual(media.Properties[Constants.Conventions.Media.Width].GetValue().ToString(),
+        Assert.AreEqual(
+            media.Properties[Constants.Conventions.Media.Width].GetValue().ToString(),
             element.Elements(Constants.Conventions.Media.Width).Single().Value);
-        Assert.AreEqual(media.Properties[Constants.Conventions.Media.Height].GetValue().ToString(),
+        Assert.AreEqual(
+            media.Properties[Constants.Conventions.Media.Height].GetValue().ToString(),
             element.Elements(Constants.Conventions.Media.Height).Single().Value);
-        Assert.AreEqual(media.Properties[Constants.Conventions.Media.Bytes].GetValue().ToString(),
+        Assert.AreEqual(
+            media.Properties[Constants.Conventions.Media.Bytes].GetValue().ToString(),
             element.Elements(Constants.Conventions.Media.Bytes).Single().Value);
-        Assert.AreEqual(media.Properties[Constants.Conventions.Media.Extension].GetValue().ToString(),
+        Assert.AreEqual(
+            media.Properties[Constants.Conventions.Media.Extension].GetValue().ToString(),
             element.Elements(Constants.Conventions.Media.Extension).Single().Value);
     }
 
     [Test]
-    public void Serialize_ForContentTypeWithHistoryCleanupPolicy_OutputsSerializedHistoryCleanupPolicy()
+    public async Task Serialize_ForContentTypeWithHistoryCleanupPolicy_OutputsSerializedHistoryCleanupPolicy()
     {
         // Arrange
         var template = TemplateBuilder.CreateTextPageTemplate();
-        FileService.SaveTemplate(template); // else, FK violation on contentType!
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey); // else, FK violation on contentType!
 
         var contentType = ContentTypeBuilder.CreateTextPageContentType(defaultTemplateId: template.Id);
 
@@ -228,7 +225,7 @@ internal sealed class EntityXmlSerializerTests : UmbracoIntegrationTest
             KeepLatestVersionPerDayForDays = 2
         };
 
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         // Act
         var element = Serializer.Serialize(contentType);
@@ -236,27 +233,30 @@ internal sealed class EntityXmlSerializerTests : UmbracoIntegrationTest
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.That(element.Element("HistoryCleanupPolicy")!.Attribute("preventCleanup")!.Value,
+            Assert.That(
+                element.Element("HistoryCleanupPolicy")!.Attribute("preventCleanup")!.Value,
                 Is.EqualTo("true"));
-            Assert.That(element.Element("HistoryCleanupPolicy")!.Attribute("keepAllVersionsNewerThanDays")!.Value,
+            Assert.That(
+                element.Element("HistoryCleanupPolicy")!.Attribute("keepAllVersionsNewerThanDays")!.Value,
                 Is.EqualTo("1"));
-            Assert.That(element.Element("HistoryCleanupPolicy")!.Attribute("keepLatestVersionPerDayForDays")!.Value,
+            Assert.That(
+                element.Element("HistoryCleanupPolicy")!.Attribute("keepLatestVersionPerDayForDays")!.Value,
                 Is.EqualTo("2"));
         });
     }
 
     [Test]
-    public void Serialize_ForContentTypeWithNullHistoryCleanupPolicy_DoesNotOutputSerializedDefaultPolicy()
+    public async Task Serialize_ForContentTypeWithNullHistoryCleanupPolicy_DoesNotOutputSerializedDefaultPolicy()
     {
         // Arrange
         var template = TemplateBuilder.CreateTextPageTemplate();
-        FileService.SaveTemplate(template); // else, FK violation on contentType!
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey); // else, FK violation on contentType!
 
         var contentType = ContentTypeBuilder.CreateTextPageContentType(defaultTemplateId: template.Id);
 
         contentType.HistoryCleanup = null;
 
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var element = Serializer.Serialize(contentType);
 

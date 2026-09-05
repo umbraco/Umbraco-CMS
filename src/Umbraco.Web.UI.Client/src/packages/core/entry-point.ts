@@ -5,7 +5,6 @@ import {
 	UmbBackofficeModalContainerElement,
 } from '@umbraco-cms/backoffice/components';
 import { UmbInteractionMemoryContext } from '@umbraco-cms/backoffice/interaction-memory';
-import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 import { UmbExtensionsApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
@@ -20,14 +19,11 @@ import '@umbraco-cms/backoffice/property-action';
 import '@umbraco-cms/backoffice/property-editor-data-source';
 import '@umbraco-cms/backoffice/property-sort-mode';
 import '@umbraco-cms/backoffice/entity-item';
+import '@umbraco-cms/backoffice/value-summary';
 
 export const onInit: UmbEntryPointOnInit = (host, extensionRegistry) => {
 	new UmbExtensionsApiInitializer(host, extensionRegistry, 'globalContext', [host]);
 	new UmbExtensionsApiInitializer(host, extensionRegistry, 'store', [host]);
-	/**
-	 * TODO: Remove this in Umbraco 18, use the repository instead
-	 */
-	new UmbExtensionsApiInitializer(host, extensionRegistry, 'treeStore', [host]);
 	new UmbExtensionsApiInitializer(host, extensionRegistry, 'itemStore', [host]);
 
 	extensionRegistry.registerMany(coreManifests);
@@ -42,9 +38,4 @@ export const onInit: UmbEntryPointOnInit = (host, extensionRegistry) => {
 	new UmbModalManagerContext(host);
 	new UmbActionEventContext(host);
 	new UmbInteractionMemoryContext(host);
-
-	host.consumeContext(UMB_AUTH_CONTEXT, (authContext) => {
-		// Initialize the auth context to let the app context know that the core module is ready
-		authContext?.setInitialized();
-	});
 };

@@ -35,7 +35,8 @@ public class PackageManifestServiceTests
         _service = new PackageManifestService(
             new[] { _readerMock.Object },
             appCaches,
-            new TestOptionsMonitor<RuntimeSettings>(new RuntimeSettings { Mode = RuntimeMode.Production }));
+            new TestOptionsMonitor<RuntimeSettings>(new RuntimeSettings { Mode = RuntimeMode.Production }),
+            new TestOptionsMonitor<UmbracoPluginSettings>(new UmbracoPluginSettings()));
     }
 
     [Test]

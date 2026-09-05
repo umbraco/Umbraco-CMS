@@ -9,4 +9,6 @@ public class FolderResponseModel : FolderModelBase
     /// Gets or sets the unique identifier of the folder.
     /// </summary>
     public Guid Id { get; set; }
+
+    public bool IsTrashed { get; set; }
 }

@@ -24,6 +24,21 @@ public class GlobalSettingsValidator
             return ValidateOptionsResult.Fail(message2);
         }
 
+        if (!ValidateTimeOutSetting(options.TimeOut, out var message3))
+        {
+            return ValidateOptionsResult.Fail(message3);
+        }
+
+        if (!ValidateDatabaseTimeoutSetting(nameof(GlobalSettings.DatabaseCommandTimeout), options.DatabaseCommandTimeout, out var message4))
+        {
+            return ValidateOptionsResult.Fail(message4);
+        }
+
+        if (!ValidateDatabaseTimeoutSetting(nameof(GlobalSettings.DatabaseConnectTimeout), options.DatabaseConnectTimeout, out var message5))
+        {
+            return ValidateOptionsResult.Fail(message5);
+        }
+
         return ValidateOptionsResult.Success;
     }
 
@@ -40,6 +55,40 @@ public class GlobalSettingsValidator
         {
             message =
                 $"The `{Constants.Configuration.ConfigGlobal}:{nameof(GlobalSettings.DistributedLockingWriteLockDefaultTimeout)}` should not be configured as less than {minimumTimeOut} ms";
+            return false;
+        }
+
+        message = string.Empty;
+        return true;
+    }
+
+    private bool ValidateTimeOutSetting(TimeSpan configuredTimeOut, out string message)
+    {
+        // JavaScript's setTimeout maximum delay is 2^31 - 1 milliseconds (~24.85 days); values
+        // exceeding it cause timers to fire immediately, breaking session management.
+        // Cap at a clean 24 days, comfortably below the limit.
+        var maxTimeOut = TimeSpan.FromDays(24);
+
+        if (configuredTimeOut > maxTimeOut)
+        {
+            message =
+                $"The `{Constants.Configuration.ConfigGlobal}:{nameof(GlobalSettings.TimeOut)}` must not exceed {maxTimeOut.TotalDays:F0} days. " +
+                $"Values larger than this overflow the browser's maximum timer delay and break session management. " +
+                $"Consider using the `KeepUserLoggedIn` setting instead.";
+            return false;
+        }
+
+        message = string.Empty;
+        return true;
+    }
+
+    private static bool ValidateDatabaseTimeoutSetting(string settingName, TimeSpan? configuredTimeOut, out string message)
+    {
+        if (configuredTimeOut < TimeSpan.Zero)
+        {
+            message =
+                $"The `{Constants.Configuration.ConfigGlobal}:{settingName}` must not be negative. " +
+                $"Use `00:00:00` for no limit, or omit the setting to use the value from the connection string.";
             return false;
         }
 

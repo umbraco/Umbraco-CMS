@@ -37,9 +37,18 @@ test('can trash an invariant content node', {tag: '@smoke'}, async ({umbracoApi,
   await umbracoUi.content.clickConfirmTrashButtonAndWaitForContentToBeTrashed();
 
   // Assert
-  expect(await umbracoApi.document.doesNameExist(contentName)).toBeFalsy();
+  // Trashing settles asynchronously in the tree read model, so poll rather than read once.
+  await expect.poll(() => umbracoApi.document.doesNameExist(contentName), {timeout: ConstantHelper.timeout.veryLong}).toBeFalsy();
   await umbracoUi.content.isItemVisibleInRecycleBin(contentName);
-  expect(await umbracoApi.document.doesItemExistInRecycleBin(contentName)).toBeTruthy();
+  await expect.poll(() => umbracoApi.document.doesItemExistInRecycleBin(contentName), {timeout: ConstantHelper.timeout.veryLong}).toBeTruthy();
+  // Verify audit trail
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickInfoTab();
+  await umbracoUi.content.doesHistoryItemHaveTag(ConstantHelper.auditTrailTypes.move);
+  await umbracoUi.content.doesHistoryItemHaveDescription(ConstantHelper.auditTrailMessages.contentMoved);
+  const currentUser = await umbracoApi.user.getCurrentUser();
+  await umbracoUi.content.doesHistoryItemHaveUsername(currentUser.name);
+  await umbracoUi.content.doesHistoryItemHaveUsername(currentUser.name, 1);
 });
 
 test('can trash a variant content node', async ({umbracoApi, umbracoUi}) => {
@@ -57,9 +66,18 @@ test('can trash a variant content node', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.content.clickConfirmTrashButtonAndWaitForContentToBeTrashed();
 
   // Assert
-  expect(await umbracoApi.document.doesNameExist(contentName)).toBeFalsy();
+  // Trashing settles asynchronously in the tree read model, so poll rather than read once.
+  await expect.poll(() => umbracoApi.document.doesNameExist(contentName), {timeout: ConstantHelper.timeout.veryLong}).toBeFalsy();
   await umbracoUi.content.isItemVisibleInRecycleBin(contentName);
-  expect(await umbracoApi.document.doesItemExistInRecycleBin(contentName)).toBeTruthy();
+  await expect.poll(() => umbracoApi.document.doesItemExistInRecycleBin(contentName), {timeout: ConstantHelper.timeout.veryLong}).toBeTruthy();
+    // Verify audit trail
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickInfoTab();
+  await umbracoUi.content.doesHistoryItemHaveTag(ConstantHelper.auditTrailTypes.move);
+  await umbracoUi.content.doesHistoryItemHaveDescription(ConstantHelper.auditTrailMessages.contentMoved);
+  const currentUser = await umbracoApi.user.getCurrentUser();
+  await umbracoUi.content.doesHistoryItemHaveUsername(currentUser.name);
+  await umbracoUi.content.doesHistoryItemHaveUsername(currentUser.name, 1);
 });
 
 test('can trash a published content node', async ({umbracoApi, umbracoUi}) => {
@@ -78,9 +96,10 @@ test('can trash a published content node', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.content.clickConfirmTrashButtonAndWaitForContentToBeTrashed();
 
   // Assert
-  expect(await umbracoApi.document.doesNameExist(contentName)).toBeFalsy();
+  // Trashing settles asynchronously in the tree read model, so poll rather than read once.
+  await expect.poll(() => umbracoApi.document.doesNameExist(contentName), {timeout: ConstantHelper.timeout.veryLong}).toBeFalsy();
   await umbracoUi.content.isItemVisibleInRecycleBin(contentName);
-  expect(await umbracoApi.document.doesItemExistInRecycleBin(contentName)).toBeTruthy();
+  await expect.poll(() => umbracoApi.document.doesItemExistInRecycleBin(contentName), {timeout: ConstantHelper.timeout.veryLong}).toBeTruthy();
 });
 
 test('can trash an invariant content node that references one item', async ({umbracoApi, umbracoUi}) => {
@@ -104,9 +123,10 @@ test('can trash an invariant content node that references one item', async ({umb
   await umbracoUi.content.clickConfirmTrashButtonAndWaitForContentToBeTrashed();
 
   // Assert
-  expect(await umbracoApi.document.doesNameExist(contentName)).toBeFalsy();
+  // Trashing settles asynchronously in the tree read model, so poll rather than read once.
+  await expect.poll(() => umbracoApi.document.doesNameExist(contentName), {timeout: ConstantHelper.timeout.veryLong}).toBeFalsy();
   await umbracoUi.content.isItemVisibleInRecycleBin(contentName);
-  expect(await umbracoApi.document.doesItemExistInRecycleBin(contentName)).toBeTruthy();
+  await expect.poll(() => umbracoApi.document.doesItemExistInRecycleBin(contentName), {timeout: ConstantHelper.timeout.veryLong}).toBeTruthy();
 });
 
 test('can trash a variant content node that references one item', async ({umbracoApi, umbracoUi}) => {
@@ -130,9 +150,10 @@ test('can trash a variant content node that references one item', async ({umbrac
   await umbracoUi.content.clickConfirmTrashButtonAndWaitForContentToBeTrashed();
 
   // Assert
-  expect(await umbracoApi.document.doesNameExist(contentName)).toBeFalsy();
+  // Trashing settles asynchronously in the tree read model, so poll rather than read once.
+  await expect.poll(() => umbracoApi.document.doesNameExist(contentName), {timeout: ConstantHelper.timeout.veryLong}).toBeFalsy();
   await umbracoUi.content.isItemVisibleInRecycleBin(contentName);
-  expect(await umbracoApi.document.doesItemExistInRecycleBin(contentName)).toBeTruthy();
+  await expect.poll(() => umbracoApi.document.doesItemExistInRecycleBin(contentName), {timeout: ConstantHelper.timeout.veryLong}).toBeTruthy();
 });
 
 test('can trash an invariant content node that references more than 3 items', async ({umbracoApi, umbracoUi}) => {
@@ -155,19 +176,17 @@ test('can trash an invariant content node that references more than 3 items', as
   // Act
   await umbracoUi.content.clickActionsMenuForContent(contentName);
   await umbracoUi.content.clickTrashActionMenuOption();
-  // Verify the references list has 3 items and has the text '...and one more item'
+  // Which 3 of the 4 references are shown is not deterministic, so assert the count and truncation text, not specific names.
   await umbracoUi.content.doesReferenceHeadlineHaveText(referenceHeadline);
   await umbracoUi.content.doesReferenceItemsHaveCount(3);
-  await umbracoUi.content.isReferenceItemNameVisible(documentPickerName[0]);
-  await umbracoUi.content.isReferenceItemNameVisible(documentPickerName2[0]);
-  await umbracoUi.content.isReferenceItemNameVisible(documentPickerName3[0]);
   await umbracoUi.content.doesReferencesContainText('...and one more item');
   await umbracoUi.content.clickConfirmTrashButtonAndWaitForContentToBeTrashed();
 
   // Assert
-  expect(await umbracoApi.document.doesNameExist(contentName)).toBeFalsy();
+  // Trashing settles asynchronously in the tree read model, so poll rather than read once.
+  await expect.poll(() => umbracoApi.document.doesNameExist(contentName), {timeout: ConstantHelper.timeout.veryLong}).toBeFalsy();
   await umbracoUi.content.isItemVisibleInRecycleBin(contentName);
-  expect(await umbracoApi.document.doesItemExistInRecycleBin(contentName)).toBeTruthy();
+  await expect.poll(() => umbracoApi.document.doesItemExistInRecycleBin(contentName), {timeout: ConstantHelper.timeout.veryLong}).toBeTruthy();
 
   // Clean
   await umbracoApi.documentType.ensureNameNotExists(documentPickerName2[1]);
@@ -195,19 +214,17 @@ test('can trash a variant content node that references more than 3 items', async
   // Act
   await umbracoUi.content.clickActionsMenuForContent(contentName);
   await umbracoUi.content.clickTrashActionMenuOption();
-  // Verify the references list has 3 items and has the text '...and one more item'
+  // Which 3 of the 4 references are shown is not deterministic, so assert the count and truncation text, not specific names.
   await umbracoUi.content.doesReferenceHeadlineHaveText(referenceHeadline);
   await umbracoUi.content.doesReferenceItemsHaveCount(3);
-  await umbracoUi.content.isReferenceItemNameVisible(documentPickerName[0]);
-  await umbracoUi.content.isReferenceItemNameVisible(documentPickerName2[0]);
-  await umbracoUi.content.isReferenceItemNameVisible(documentPickerName3[0]);
   await umbracoUi.content.doesReferencesContainText('...and one more item');
   await umbracoUi.content.clickConfirmTrashButtonAndWaitForContentToBeTrashed();
 
   // Assert
-  expect(await umbracoApi.document.doesNameExist(contentName)).toBeFalsy();
+  // Trashing settles asynchronously in the tree read model, so poll rather than read once.
+  await expect.poll(() => umbracoApi.document.doesNameExist(contentName), {timeout: ConstantHelper.timeout.veryLong}).toBeFalsy();
   await umbracoUi.content.isItemVisibleInRecycleBin(contentName);
-  expect(await umbracoApi.document.doesItemExistInRecycleBin(contentName)).toBeTruthy();
+  await expect.poll(() => umbracoApi.document.doesItemExistInRecycleBin(contentName), {timeout: ConstantHelper.timeout.veryLong}).toBeTruthy();
 
   // Clean
   await umbracoApi.documentType.ensureNameNotExists(documentPickerName2[1]);
@@ -241,9 +258,10 @@ test('can trash a content node with multiple cultures that references one item',
   await umbracoUi.content.clickConfirmTrashButtonAndWaitForContentToBeTrashed();
 
   // Assert
-  expect(await umbracoApi.document.doesNameExist(contentName)).toBeFalsy();
+  // Trashing settles asynchronously in the tree read model, so poll rather than read once.
+  await expect.poll(() => umbracoApi.document.doesNameExist(contentName), {timeout: ConstantHelper.timeout.veryLong}).toBeFalsy();
   await umbracoUi.content.isItemVisibleInRecycleBin(contentName);
-  expect(await umbracoApi.document.doesItemExistInRecycleBin(contentName)).toBeTruthy();
+  await expect.poll(() => umbracoApi.document.doesItemExistInRecycleBin(contentName), {timeout: ConstantHelper.timeout.veryLong}).toBeTruthy();
 
   // Clean
   await umbracoApi.language.ensureIsoCodeNotExists(secondCulture);

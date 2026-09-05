@@ -1,8 +1,6 @@
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 
@@ -44,53 +42,9 @@ public class SyncBootStateAccessor : ISyncBootStateAccessor
     }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="SyncBootStateAccessor"/> class.
-    /// </summary>
-    /// <param name="logger">The logger used for diagnostic and operational logging.</param>
-    /// <param name="lastSyncedFileManager">Manages information about the last synced files.</param>
-    /// <param name="globalSettings">Provides access to global settings via options monitoring.</param>
-    /// <param name="cacheInstructionService">Service for handling cache instructions across the application.</param>
-    /// <param name="lastSyncedManager">Manages the state of the last synchronization operation.</param>
-    [Obsolete("Please use the constructor without LastSyncedFileManager. Scheduled for removal in Umbraco 18.")]
-    public SyncBootStateAccessor(
-        ILogger<SyncBootStateAccessor> logger,
-        LastSyncedFileManager lastSyncedFileManager,
-        IOptionsMonitor<GlobalSettings> globalSettings,
-        ICacheInstructionService cacheInstructionService,
-        ILastSyncedManager lastSyncedManager)
-        : this(
-            logger,
-            globalSettings,
-            cacheInstructionService,
-            lastSyncedManager)
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="Umbraco.Cms.Infrastructure.Sync.SyncBootStateAccessor"/> class.
-    /// </summary>
-    /// <param name="logger">The logger used for logging diagnostic and operational information.</param>
-    /// <param name="lastSyncedFileManager">Manages the state of the last successfully synced file during boot.</param>
-    /// <param name="globalSettings">Monitors and provides access to global configuration settings.</param>
-    /// <param name="cacheInstructionService">Service responsible for handling cache synchronization instructions across the environment.</param>
-    [Obsolete("Please use the constructor with ILastSyncedManager. Scheduled for removal in Umbraco 18.")]
-    public SyncBootStateAccessor(
-        ILogger<SyncBootStateAccessor> logger,
-        LastSyncedFileManager lastSyncedFileManager,
-        IOptionsMonitor<GlobalSettings> globalSettings,
-        ICacheInstructionService cacheInstructionService)
-        : this(
-            logger,
-            globalSettings,
-            cacheInstructionService,
-            StaticServiceProvider.Instance.GetRequiredService<ILastSyncedManager>())
-    {
-    }
-
-    /// <summary>
     /// Returns the current synchronization boot state, initializing it if it has not already been created.
     /// </summary>
-    /// <returns>The <see cref="Umbraco.Cms.Infrastructure.Sync.SyncBootState"/> representing the current synchronization boot state.</returns>
+    /// <returns>The <see cref="SyncBootState"/> representing the current synchronization boot state.</returns>
     public SyncBootState GetSyncBootState()
         => LazyInitializer.EnsureInitialized(
             ref _syncBootState,

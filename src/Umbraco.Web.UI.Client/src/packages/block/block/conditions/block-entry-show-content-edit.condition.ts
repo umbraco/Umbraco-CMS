@@ -19,7 +19,9 @@ export class UmbBlockEntryShowContentEditCondition
 			this.observe(
 				context?.showContentEdit,
 				(showContentEdit) => {
-					this.permitted = !!showContentEdit;
+					if (showContentEdit !== undefined) {
+						this.permitted = showContentEdit === (this.config.match !== undefined ? this.config.match : true);
+					}
 				},
 				ObserveSymbol,
 			);

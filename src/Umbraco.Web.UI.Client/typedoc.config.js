@@ -19,4 +19,6 @@ for (const [key, value] of Object.entries(packageJsonExports || {})) {
 export default {
 	entryPoints,
 	out: 'ui-api',
+	tsconfig: './tsconfig.typedoc.json',
+	plugin: ['./devops/typedoc-plugins/strip-inherited-class-comments.js'],
 };

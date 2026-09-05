@@ -12,7 +12,6 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
-import type { UmbLocalizationController } from './localization.controller.js';
 import type { UmbLocalizationEntry } from './types/localization.js';
 
 export type FunctionParams<T> = T extends (...args: infer U) => string ? U : [];
@@ -28,42 +27,59 @@ export interface UmbLocalizationSet extends UmbLocalizationSetBase {
 	[key: UmbLocalizationSetKey]: UmbLocalizationEntry;
 }
 
+/**
+ * The non-generic contract the manager calls on each registered controller. Decoupled from
+ * `UmbLocalizationController<T>`'s generic so the manager's `Set` and consumer-registration
+ * methods don't pick up variance from `term()`'s conditional types — and so the manager can't
+ * accidentally start depending on the generic in future without amending the contract here.
+ */
+export interface UmbLocalizationConsumer {
+	keysChanged(changedKeys: Set<UmbLocalizationSetKey>): void;
+	documentUpdate(): void;
+}
+
 export const UMB_DEFAULT_LOCALIZATION_CULTURE = 'en';
 
 export class UmbLocalizationManager {
-	connectedControllers = new Set<UmbLocalizationController<UmbLocalizationSetBase>>();
-	#documentElementObserver: MutationObserver;
+	/**
+	 * Internal registry of controllers the manager dispatches `keysChanged` / `documentUpdate` to.
+	 * Use `appendConsumer` / `removeConsumer` to mutate this set — external code should not iterate
+	 * it directly or assume the stored values are full `UmbLocalizationController` instances. The
+	 * element type was relaxed from `UmbLocalizationController<UmbLocalizationSetBase>` to the
+	 * smaller `UmbLocalizationConsumer` contract in v18.1 so that the manager doesn't pick up
+	 * variance from the controller's generic `term()` signature.
+	 */
+	connectedControllers = new Set<UmbLocalizationConsumer>();
 
 	#changedKeys: Set<UmbLocalizationSetKey> = new Set();
 	#requestUpdateChangedKeysId?: number = undefined;
 
 	localizations: Map<string, UmbLocalizationSetBase> = new Map();
-	documentDirection = document.documentElement.dir || 'ltr';
+
+	/**
+	 * The currently active language and direction. Read-only from a consumer perspective —
+	 * to change the active language, call `umbLocalizationRegistry.loadLanguage(locale)`.
+	 * The fields stay publicly writable for the registry's pipeline; consumers writing here
+	 * directly will only sync the field without loading the matching dictionaries.
+	 */
+	documentDirection: 'ltr' | 'rtl' = (document.documentElement.dir as 'ltr' | 'rtl') || 'ltr';
 	documentLanguage = document.documentElement.lang || navigator.language;
 
 	get fallback(): UmbLocalizationSet | undefined {
 		return this.localizations.get(UMB_DEFAULT_LOCALIZATION_CULTURE) as UmbLocalizationSet;
 	}
 
-	constructor() {
-		this.#documentElementObserver = new MutationObserver(this.updateAll);
-		this.#documentElementObserver.observe(document.documentElement, {
-			attributes: true,
-			attributeFilter: ['dir', 'lang'],
-		});
-	}
-
-	appendConsumer(consumer: UmbLocalizationController<UmbLocalizationSetBase>) {
+	appendConsumer(consumer: UmbLocalizationConsumer) {
 		if (this.connectedControllers.has(consumer)) return;
 		this.connectedControllers.add(consumer);
 	}
-	removeConsumer(consumer: UmbLocalizationController<UmbLocalizationSetBase>) {
+	removeConsumer(consumer: UmbLocalizationConsumer) {
 		this.connectedControllers.delete(consumer);
 	}
 
 	/**
 	 * Registers one or more translations
-	 * @param t
+	 * @param {UmbLocalizationSetBase} t - the localization set to register.
 	 */
 	registerLocalization(t: UmbLocalizationSetBase) {
 		const code = t.$code.toLowerCase();
@@ -87,29 +103,6 @@ export class UmbLocalizationManager {
 	registerManyLocalizations(translations: Array<UmbLocalizationSetBase>) {
 		translations.map(this.#registerLocalizationBind);
 	}
-
-	/** Updates all localized elements that are currently connected */
-	updateAll = () => {
-		const newDir = document.documentElement.dir || 'ltr';
-		const newLang = document.documentElement.lang || navigator.language;
-
-		if (this.documentDirection === newDir && this.documentLanguage === newLang) return;
-
-		// The document direction or language did changed, so lets move on:
-		this.documentDirection = newDir;
-		this.documentLanguage = newLang;
-
-		// Check if there was any changed.
-		this.connectedControllers.forEach((ctrl) => {
-			ctrl.documentUpdate();
-		});
-
-		if (this.#requestUpdateChangedKeysId) {
-			cancelAnimationFrame(this.#requestUpdateChangedKeysId);
-			this.#requestUpdateChangedKeysId = undefined;
-		}
-		this.#changedKeys.clear();
-	};
 
 	#updateChangedKeys = () => {
 		this.#requestUpdateChangedKeysId = undefined;

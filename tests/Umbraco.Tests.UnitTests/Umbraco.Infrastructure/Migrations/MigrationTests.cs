@@ -80,7 +80,7 @@ public class MigrationTests
     public async Task RunGoodMigration()
     {
         var migrationContext = GetMigrationContext();
-        MigrationBase migration = new GoodMigration(migrationContext);
+        AsyncMigrationBase migration = new GoodMigration(migrationContext);
         await migration.RunAsync();
     }
 
@@ -88,7 +88,7 @@ public class MigrationTests
     public void DetectBadMigration1()
     {
         var migrationContext = GetMigrationContext();
-        MigrationBase migration = new BadMigration1(migrationContext);
+        AsyncMigrationBase migration = new BadMigration1(migrationContext);
         Assert.ThrowsAsync<IncompleteMigrationExpressionException>(migration.RunAsync);
     }
 
@@ -96,43 +96,54 @@ public class MigrationTests
     public void DetectBadMigration2()
     {
         var migrationContext = GetMigrationContext();
-        MigrationBase migration = new BadMigration2(migrationContext);
+        AsyncMigrationBase migration = new BadMigration2(migrationContext);
         Assert.ThrowsAsync<IncompleteMigrationExpressionException>(migration.RunAsync);
     }
 
-    public class GoodMigration : MigrationBase
+    public class GoodMigration : AsyncMigrationBase
     {
         public GoodMigration(IMigrationContext context)
             : base(context)
         {
         }
 
-        protected override void Migrate() => Execute.Sql(string.Empty).Do();
+        protected override Task MigrateAsync()
+        {
+            Execute.Sql(string.Empty).Do();
+            return Task.CompletedTask;
+        }
     }
 
-    public class BadMigration1 : MigrationBase
+    public class BadMigration1 : AsyncMigrationBase
     {
         public BadMigration1(IMigrationContext context)
             : base(context)
         {
         }
 
-        protected override void Migrate() => Alter.Table("foo"); // stop here, don't Do it
+        protected override Task MigrateAsync()
+        {
+            Alter.Table("foo");
+            // stop here, don't Do it
+            return Task.CompletedTask;
+        }
     }
 
-    public class BadMigration2 : MigrationBase
+    public class BadMigration2 : AsyncMigrationBase
     {
         public BadMigration2(IMigrationContext context)
             : base(context)
         {
         }
 
-        protected override void Migrate()
+        protected override Task MigrateAsync()
         {
             Alter.Table("foo"); // stop here, don't Do it
 
             // and try to start another one
             Alter.Table("bar");
+
+            return Task.CompletedTask;
         }
     }
 }

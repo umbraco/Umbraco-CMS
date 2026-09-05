@@ -1,4 +1,4 @@
-import {Page, Locator} from "@playwright/test";
+import {Page, Locator, expect} from "@playwright/test";
 import {UiBaseLocators} from "./UiBaseLocators";
 import {ConstantHelper} from "./ConstantHelper";
 
@@ -16,7 +16,7 @@ export class MemberGroupUiHelper extends UiBaseLocators {
     super(page);
     this.memberGroupsTab = page.locator('uui-tab[label="Member Groups"]');
     this.memberGroupNameTxt = page.locator('input#input');
-    this.memberGroupView = page.locator('umb-member-group-table-collection-view');
+    this.memberGroupView = page.locator('[data-mark="collection-view:Umb.CollectionView.MemberGroup.Table"]');
     this.activeMemberGroupsTab = page.locator('uui-tab[label="Member Groups"][active]');
     this.createMemberGroupBtn = page.getByTestId('collection-action:Umb.CollectionAction.MemberGroup.Create').getByLabel('Create', {exact: true});
     this.memberGroupsMenu = page.locator('umb-menu').getByLabel('Member Groups', {exact: true});
@@ -26,7 +26,6 @@ export class MemberGroupUiHelper extends UiBaseLocators {
 
   async clickMemberGroupsTab() {
     await this.waitForVisible(this.memberGroupsTab);
-    await this.page.waitForTimeout(ConstantHelper.wait.short);
     await this.click(this.memberGroupsTab);
     await this.waitForVisible(this.activeMemberGroupsTab);
   }
@@ -44,7 +43,23 @@ export class MemberGroupUiHelper extends UiBaseLocators {
   }
 
   async clickMemberGroupLinkByName(memberGroupName: string) {
-    await this.click(this.page.getByRole('link', {name: memberGroupName}));
+    const memberGroupLink = this.page.getByRole('link', {name: memberGroupName});
+    // A group created via the API right before this runs can lag behind the sidebar's list; re-clicking
+    // an already-open sidebar button doesn't refetch it, so leave and re-enter the section to remount it.
+    await expect(async () => {
+      if (!(await memberGroupLink.isVisible())) {
+        await this.reopenMemberGroupsSidebar();
+      }
+      await expect(memberGroupLink).toBeVisible({timeout: ConstantHelper.timeout.short});
+    }).toPass({timeout: ConstantHelper.timeout.veryLong});
+    await this.click(memberGroupLink);
+  }
+
+  // Leave and re-enter the Members section so the sidebar remounts and refetches, without a full page reload.
+  private async reopenMemberGroupsSidebar() {
+    await this.goToSection(ConstantHelper.sections.content, true, true);
+    await this.goToSection(ConstantHelper.sections.members, true, true);
+    await this.clickMemberGroupsSidebarButton();
   }
 
   async isMemberGroupNameVisible(memberGroupName: string, isVisible: boolean = true) {

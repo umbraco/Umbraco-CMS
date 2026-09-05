@@ -5,9 +5,12 @@ using System.Net.Http.Json;
 using System.Net.Mime;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Web;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using OpenIddict.Abstractions;
 using Umbraco.Cms.Api.Management.Controllers;
@@ -21,6 +24,8 @@ using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Security;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.TestServerTest;
@@ -32,8 +37,21 @@ namespace Umbraco.Cms.Tests.Integration.ManagementApi;
 public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
     where T : ManagementApiControllerBase
 {
+    protected const string UserPassword = "1234567890";
+
     private static readonly Dictionary<string, string> _tokenCache = new();
     private static readonly SHA256 _sha256 = SHA256.Create();
+
+    protected JsonSerializerOptions JsonSerializerOptions
+    {
+        get
+        {
+            var options = GetRequiredService<IOptionsMonitor<JsonOptions>>();
+            return options
+                .Get(Constants.JsonOptionsNames.BackOffice)
+                .JsonSerializerOptions;
+        }
+    }
 
     protected abstract Expression<Func<T, object>> MethodSelector { get; set; }
 
@@ -42,8 +60,6 @@ public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
     [SetUp]
     public override void Setup()
     {
-        InMemoryConfiguration["Umbraco:CMS:ModelsBuilder:ModelsMode"] = "Nothing";
-
         base.Setup();
         Client.DefaultRequestHeaders.Accept.Clear();
         Client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(MediaTypeNames.Application.Json));
@@ -51,7 +67,7 @@ public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
 
     [SetUp]
     public override void SetUp_Logging() =>
-        TestContext.Out.Write($"Start test {TestCount++}: {TestContext.CurrentContext.Test.FullName}");
+        TestContext.Out.Write($"Start test {GetNextTestCount()}: {TestContext.CurrentContext.Test.FullName}");
 
     [OneTimeTearDown]
     public void ClearCache() => _tokenCache.Clear();
@@ -61,8 +77,60 @@ public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
         // We do not wanna fake anything, and thereby have protection
     }
 
+    /// <summary>
+    /// Creates a user group allowed access to the supplied sections only, and authenticates
+    /// <see cref="UmbracoTestServerTestBase.Client"/> as a new user in that group.
+    /// </summary>
+    /// <param name="groupAlias">
+    /// The alias (and name) of the user group to create. Must be unique within the fixture, as both the
+    /// group alias and the derived user email are unique per database, and the database is shared by all
+    /// tests in the fixture.
+    /// </param>
+    /// <param name="allowedSections">The sections the group is allowed to access.</param>
+    protected async Task AuthenticateWithSectionsAsync(string groupAlias, params string[] allowedSections)
+    {
+        var userGroup = new Cms.Core.Models.Membership.UserGroup(GetRequiredService<IShortStringHelper>())
+        {
+            Name = groupAlias,
+            Alias = groupAlias,
+            Icon = "icon-users",
+            HasAccessToAllLanguages = true,
+        };
+
+        foreach (var allowedSection in allowedSections)
+        {
+            userGroup.AddAllowedSection(allowedSection);
+        }
+
+        Attempt<IUserGroup, UserGroupOperationStatus> userGroupAttempt = await GetRequiredService<IUserGroupService>()
+            .CreateAsync(userGroup, Constants.Security.SuperUserKey);
+        Assert.IsTrue(userGroupAttempt.Success, $"Could not create the user group: {userGroupAttempt.Status}");
+
+        var email = $"{groupAlias}@umbraco.com";
+
+        await AuthenticateClientAsync(
+            Client,
+            async userService =>
+            {
+                IUser user = (await userService.CreateAsync(
+                    Constants.Security.SuperUserKey,
+                    new UserCreateModel
+                    {
+                        Email = email,
+                        Name = groupAlias,
+                        UserName = email,
+                        UserGroupKeys = new HashSet<Guid> { userGroupAttempt.Result.Key },
+                    },
+                    true)).Result.CreatedUser;
+
+                return (user, UserPassword);
+            },
+            $"{email}:{groupAlias}");
+    }
+
     protected async Task AuthenticateClientAsync(HttpClient client, string username, string password, bool isAdmin) =>
-        await AuthenticateClientAsync(client,
+        await AuthenticateClientAsync(
+            client,
             async userService =>
             {
                 IUser user;
@@ -148,7 +216,8 @@ public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
 
             var token = await userManager.GeneratePasswordResetTokenAsync(userCreationResult.User);
 
-            var changePasswordAttempt = await userService.ChangePasswordAsync(userKey,
+            var changePasswordAttempt = await userService.ChangePasswordAsync(
+                userKey,
                 new ChangeUserPasswordModel
                 {
                     NewPassword = password, ResetPasswordToken = token.Result.ToUrlBase64(), UserKey = userKey,
@@ -181,7 +250,8 @@ public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
 
         Assert.AreEqual(HttpStatusCode.Found, authorizeResponse.StatusCode, await authorizeResponse.Content.ReadAsStringAsync());
 
-        var tokenResponse = await client.PostAsync("/umbraco/management/api/v1/security/back-office/token",
+        var tokenResponse = await client.PostAsync(
+            "/umbraco/management/api/v1/security/back-office/token",
             new FormUrlEncodedContent(new Dictionary<string, string>
             {
                 ["grant_type"] = "authorization_code",

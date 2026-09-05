@@ -7,6 +7,7 @@ import {
 	map,
 	of,
 	switchMap,
+	tap,
 } from '@umbraco-cms/backoffice/external/rxjs';
 import { hasDefaultExport, loadManifestPlainJs } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
@@ -36,10 +37,39 @@ function addOrUpdateDictionary(
 	}
 }
 
+/**
+ * Returns the canonical form of the given locale, or the default culture if the input is empty or
+ * cannot be canonicalised. `Intl.getCanonicalLocales` throws RangeError for malformed input so we
+ * intentionally swallow it here — a misconfigured DefaultUILanguage should fall back, not crash.
+ * @param {string} locale - the locale to canonicalise.
+ * @returns {string} the canonical locale, or the default culture if invalid.
+ */
+function toCanonicalLocale(locale: string): string {
+	if (!locale) return UMB_DEFAULT_LOCALIZATION_CULTURE;
+	try {
+		return Intl.getCanonicalLocales(locale)[0] ?? UMB_DEFAULT_LOCALIZATION_CULTURE;
+	} catch {
+		return UMB_DEFAULT_LOCALIZATION_CULTURE;
+	}
+}
+
+/**
+ * Returns the lowercase BCP-47 base name (`language[-script][-region]`) of a locale tag, e.g.
+ * `'en-US'` → `'en-us'`, `'zh-Hant-TW'` → `'zh-hant-tw'`. The input is expected to already be
+ * a canonical locale (use {@link toCanonicalLocale} first if it might not be).
+ * @param {string} locale - the locale to extract the base name from.
+ * @returns {string} the lowercase base name of the locale.
+ */
+function baseLocaleOf(locale: string): string {
+	return new Intl.Locale(locale).baseName.toLowerCase();
+}
+
 export class UmbLocalizationRegistry {
-	#currentLanguage = new UmbStringState(
-		document.documentElement.lang !== '' ? document.documentElement.lang : UMB_DEFAULT_LOCALIZATION_CULTURE,
-	);
+	// The active language is driven by the consuming host element (<umb-app>, <umb-auth>) via
+	// `loadLanguage()` — Razor sets `lang="@DefaultUILanguage"` on those, the element passes
+	// it through on connect, and current-user.context takes over after login. The default here
+	// is just the bootstrap value before any host has connected.
+	#currentLanguage = new UmbStringState(UMB_DEFAULT_LOCALIZATION_CULTURE);
 	readonly currentLanguage = this.#currentLanguage.asObservable();
 
 	/**
@@ -62,18 +92,28 @@ export class UmbLocalizationRegistry {
 				filter((currentLanguage) => !!currentLanguage),
 				// Use distinctUntilChanged to avoid unnecessary re-renders when the language hasn't changed
 				distinctUntilChanged(),
+				// Mirror the active language onto the manager synchronously, so a fresh element
+				// rendering between now and the async translation load picks up the requested
+				// language on its first render. Direction and the actual consumer notification
+				// happen below, once the dictionaries are in place.
+				tap((currentLanguage) => {
+					umbLocalizationManager.documentLanguage = baseLocaleOf(currentLanguage);
+				}),
 				// Switch to the extensions registry to get the current language and the extensions for that language
 				// Note: This also cancels the previous subscription if the language changes
 				switchMap((currentLanguage) => {
 					return extensionRegistry.byType('localization').pipe(
-						// Filter the extensions to only those that match the current language
+						// Filter the extensions to those matching the current language; we also always
+						// include the default culture so the manager has it available as a key-level
+						// fallback when the active language is missing a translation.
 						map((extensions) => {
 							locale = new Intl.Locale(currentLanguage);
-							return extensions.filter(
-								(ext) =>
-									ext.meta.culture.toLowerCase() === locale!.baseName.toLowerCase() ||
-									ext.meta.culture.toLowerCase() === locale!.language.toLowerCase(),
-							);
+							const baseName = locale.baseName.toLowerCase();
+							const language = locale.language.toLowerCase();
+							return extensions.filter((ext) => {
+								const culture = ext.meta.culture.toLowerCase();
+								return culture === UMB_DEFAULT_LOCALIZATION_CULTURE || culture === baseName || culture === language;
+							});
 						}),
 					);
 				}),
@@ -118,9 +158,6 @@ export class UmbLocalizationRegistry {
 			)
 			// Subscribe to the observable to trigger the loading of translations
 			.subscribe();
-
-		// Always register the fallback language (en) to ensure there is always at least one language available
-		this.loadLanguage(UMB_DEFAULT_LOCALIZATION_CULTURE);
 	}
 
 	#loadExtension = async (extension: ManifestLocalization) => {
@@ -154,36 +191,25 @@ export class UmbLocalizationRegistry {
 	};
 
 	#setBrowserLanguage(locale: Intl.Locale, translations: UmbLocalizationSetBase[]) {
-		// Set the document language
 		const newLang = locale.baseName.toLowerCase();
-		if (document.documentElement.lang.toLowerCase() !== newLang) {
-			document.documentElement.lang = newLang;
-		}
 
-		// We need to find the direction of the new language, so we look for the best match
-		// If the new language is not found, we default to 'ltr'
+		// Regional match wins, then language-only match, then default to LTR.
 		const reverseTranslations = translations.slice().reverse();
+		const bestMatch =
+			reverseTranslations.find((t) => t.$code.toLowerCase() === newLang) ??
+			reverseTranslations.find((t) => t.$code.toLowerCase() === locale.language.toLowerCase());
+		const direction: 'ltr' | 'rtl' = bestMatch?.$dir ?? 'ltr';
 
-		// Look for a direct match first
-		const directMatch = reverseTranslations.find((t) => t.$code.toLowerCase() === newLang);
-		if (directMatch) {
-			document.documentElement.dir = directMatch.$dir;
-			return;
+		if (document.documentElement.dir !== direction) {
+			document.documentElement.dir = direction;
 		}
-
-		// If no direct match, look for a match with the language code only
-		const langOnlyDirectMatch = reverseTranslations.find(
-			(t) => t.$code.toLowerCase() === locale.language.toLowerCase(),
-		);
-		if (langOnlyDirectMatch) {
-			document.documentElement.dir = langOnlyDirectMatch.$dir;
-			return;
-		}
-
-		// If no match is found, default to 'ltr'
-		if (document.documentElement.dir !== 'ltr') {
-			document.documentElement.dir = 'ltr';
-		}
+		// Write the active language and direction onto the manager, then tell every connected
+		// controller to re-render against the freshly loaded dictionaries. Inlined here because
+		// it's the only place this happens — no need for another public method on the manager
+		// that we'd just have to retire when the manager and registry get merged.
+		umbLocalizationManager.documentLanguage = newLang;
+		umbLocalizationManager.documentDirection = direction;
+		umbLocalizationManager.connectedControllers.forEach((ctrl) => ctrl.documentUpdate());
 	}
 
 	#arraysEqual(a: string[], b: string[]) {
@@ -196,11 +222,10 @@ export class UmbLocalizationRegistry {
 
 	/**
 	 * Load a language from the extension registry.
-	 * @param {string} locale The locale to load.
+	 * @param {string} locale The locale to load. Invalid or empty input falls back to the default culture.
 	 */
 	loadLanguage(locale: string) {
-		const canonicalLocale = Intl.getCanonicalLocales(locale)[0];
-		this.#currentLanguage.setValue(canonicalLocale);
+		this.#currentLanguage.setValue(toCanonicalLocale(locale));
 	}
 
 	destroy() {

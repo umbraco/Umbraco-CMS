@@ -11,7 +11,20 @@ import {
 	state,
 } from '@umbraco-cms/backoffice/external/lit';
 
+import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
+
 import { UMB_AUTH_CONTEXT } from '../../contexts/index.js';
+
+const warnedLegacyKeys = new Set<string>();
+const umbWarnLegacyGreetingKey = (legacyKey: string, canonicalKey: string) => {
+	if (warnedLegacyKeys.has(legacyKey)) return;
+	warnedLegacyKeys.add(legacyKey);
+	new UmbDeprecation({
+		deprecated: `Translation key "${legacyKey}"`,
+		removeInVersion: '20.0.0',
+		solution: `Use "${canonicalKey}" instead. See https://github.com/umbraco/Umbraco-CMS/issues/20082`,
+	}).warn();
+};
 
 @customElement('umb-login-page')
 export default class UmbLoginPageElement extends UmbLitElement {
@@ -121,15 +134,19 @@ export default class UmbLoginPageElement extends UmbLitElement {
 	};
 
 	get #greetingLocalizationKey() {
-		return [
-			'auth_greeting0',
-			'auth_greeting1',
-			'auth_greeting2',
-			'auth_greeting3',
-			'auth_greeting4',
-			'auth_greeting5',
-			'auth_greeting6',
-		][new Date().getDay()];
+		const day = new Date().getDay();
+		const legacyKey = `auth_greeting${day}`;
+		const canonicalKey = `login_greeting${day}`;
+		// Honour translation packages still shipping the legacy `auth_greeting*` namespace,
+		// otherwise use the canonical `login_greeting*` key (the shipped default lives there
+		// in the shared backoffice dictionary). See #20082.
+		// TODO (V20): remove the auth_greeting* fallback and the warning helper above; only
+		// login_greeting* remains.
+		if (this.localize.termOrDefault(legacyKey, null) !== null) {
+			umbWarnLegacyGreetingKey(legacyKey, canonicalKey);
+			return legacyKey;
+		}
+		return canonicalKey;
 	}
 
 	#onSubmitClick = () => {
@@ -150,8 +167,8 @@ export default class UmbLoginPageElement extends UmbLitElement {
 					this.supportPersistLogin,
 					() =>
 						html` <uui-form-layout-item>
-							<uui-checkbox name="persist" .label=${this.localize.term('auth_rememberMe')}>
-								<umb-localize key="auth_rememberMe">Remember me</umb-localize>
+							<uui-checkbox name="persist" .label=${this.localize.term('login_rememberMe')}>
+								<umb-localize key="login_rememberMe">Remember me</umb-localize>
 							</uui-checkbox>
 						</uui-form-layout-item>`,
 				)}
@@ -159,7 +176,7 @@ export default class UmbLoginPageElement extends UmbLitElement {
 					this.allowPasswordReset,
 					() =>
 						html` <uui-button type="button" id="forgot-password" @click=${this.#handleForgottenPassword} compact>
-							<umb-localize key="auth_forgottenPassword">Forgotten password?</umb-localize>
+							<umb-localize key="login_forgottenPassword">Forgotten password?</umb-localize>
 						</uui-button>`,
 				)}
 			</div>
@@ -168,7 +185,7 @@ export default class UmbLoginPageElement extends UmbLitElement {
 				type="submit"
 				id="umb-login-button"
 				look="primary"
-				.label=${this.localize.term('auth_login')}
+				.label=${this.localize.term('login_login')}
 				color="default"
 				.state=${this._loginState}></uui-button>
 

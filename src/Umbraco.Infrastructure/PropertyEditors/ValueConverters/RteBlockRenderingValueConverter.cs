@@ -329,7 +329,7 @@ public class RteBlockRenderingValueConverter : SimpleRichTextValueConverter, IDe
         }
 
         var creator = new RichTextBlockPropertyValueCreator(_blockEditorConverter, _variationContextAccessor, _propertyRenderingContextAccessor, _blockEditorVarianceHandler, _jsonSerializer, _constructorCache, _languageService);
-        return creator.CreateBlockModelAsync(owner, referenceCacheLevel, blocks, preview, configuration.Blocks).GetAwaiter().GetResult();
+        return creator.CreateBlockModelAsync(owner, referenceCacheLevel, blocks, preview, BlockPropertyVariance.OwningPropertyCulture(_variationContextAccessor, owner, propertyType), configuration.Blocks).GetAwaiter().GetResult();
     }
 
     private string RenderRichTextBlockModel(string source, RichTextBlockModel? richTextBlockModel)
@@ -342,7 +342,7 @@ public class RteBlockRenderingValueConverter : SimpleRichTextValueConverter, IDe
         var blocksByKey = richTextBlockModel.ToDictionary(block => block.ContentKey);
 
         string RenderBlock(Match match) =>
-            Guid.TryParse(match.Groups["key"].Value, out Guid key) && blocksByKey.TryGetValue(key, out RichTextBlockItem? richTextBlockItem)
+            Guid.TryParse(match.Groups["key"].ValueSpan, out Guid key) && blocksByKey.TryGetValue(key, out RichTextBlockItem? richTextBlockItem)
                 ? _partialViewBlockEngine.ExecuteAsync(richTextBlockItem).GetAwaiter().GetResult()
                 : string.Empty;
 

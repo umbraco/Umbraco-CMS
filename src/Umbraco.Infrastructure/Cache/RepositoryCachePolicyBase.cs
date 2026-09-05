@@ -35,16 +35,6 @@ public abstract class RepositoryCachePolicyBase<TEntity, TId> : IRepositoryCache
         _cacheSyncService = cacheSyncService;
     }
 
-    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
-    protected RepositoryCachePolicyBase(IAppPolicyCache globalCache, IScopeAccessor scopeAccessor)
-    : this(
-        globalCache,
-        scopeAccessor,
-        StaticServiceProvider.Instance.GetRequiredService<IRepositoryCacheVersionService>(),
-        StaticServiceProvider.Instance.GetRequiredService<ICacheSyncService>())
-    {
-    }
-
     protected IAppPolicyCache Cache
     {
         get

@@ -109,10 +109,12 @@ export class UmbPropertyEditorUIImageCropsElement extends UmbLitElement implemen
 			<uui-form>
 				<form @submit=${this.#onSubmit}>
 					<div class="input">
-						<uui-label for="label">Label</uui-label>
+						<uui-label for="label">
+							<umb-localize key="general_label"></umb-localize>
+						</uui-label>
 						<uui-input
 							@input=${this.#onLabelInput}
-							label="Label"
+							label=${this.localize.term('general_label')}
 							id="label"
 							name="label"
 							type="text"
@@ -120,9 +122,11 @@ export class UmbPropertyEditorUIImageCropsElement extends UmbLitElement implemen
 							.value=${initial?.label ?? ''}></uui-input>
 					</div>
 					<div class="input">
-						<uui-label for="alias">Alias</uui-label>
+						<uui-label for="alias">
+							<umb-localize key="general_alias"></umb-localize>
+						</uui-label>
 						<uui-input
-							label="Alias"
+							label=${this.localize.term('general_alias')}
 							id="alias"
 							name="alias"
 							type="text"
@@ -131,9 +135,11 @@ export class UmbPropertyEditorUIImageCropsElement extends UmbLitElement implemen
 							.value=${initial?.alias ?? ''}></uui-input>
 					</div>
 					<div class="input">
-						<uui-label for="width">Width</uui-label>
+						<uui-label for="width">
+							<umb-localize key="general_width"></umb-localize>
+						</uui-label>
 						<uui-input
-							label="Width"
+							label=${this.localize.term('general_width')}
 							id="width"
 							name="width"
 							type="number"
@@ -145,9 +151,11 @@ export class UmbPropertyEditorUIImageCropsElement extends UmbLitElement implemen
 						</uui-input>
 					</div>
 					<div class="input">
-						<uui-label for="height">Height</uui-label>
+						<uui-label for="height">
+							<umb-localize key="general_height"></umb-localize>
+						</uui-label>
 						<uui-input
-							label="Height"
+							label=${this.localize.term('general_height')}
 							id="height"
 							name="height"
 							type="number"
@@ -160,8 +168,13 @@ export class UmbPropertyEditorUIImageCropsElement extends UmbLitElement implemen
 					</div>
 					<div class="action-wrapper">
 						${this.editCropAlias
-							? html`<uui-button @click=${this.#onEditCancel}>Cancel</uui-button>
-									<uui-button look="secondary" type="submit" label=${this.localize.term('general_edit')}></uui-button>`
+							? html`<uui-button
+										@click=${this.#onEditCancel}
+										label=${this.localize.term('general_cancel')}></uui-button>
+									<uui-button
+										look="secondary"
+										type="submit"
+										label=${this.localize.term('general_update')}></uui-button>`
 							: html`<uui-button
 									look="secondary"
 									type="submit"
@@ -259,9 +272,9 @@ export class UmbPropertyEditorUIImageCropsElement extends UmbLitElement implemen
 			}
 			.append {
 				padding-inline: var(--uui-size-space-4);
-				background: var(--uui-color-disabled);
+				background: var(--uui-color-surface-alt);
 				border-left: 1px solid var(--uui-color-border);
-				color: var(--uui-color-disabled-contrast);
+				color: var(--uui-color-text);
 				font-size: var(--uui-type-small-size);
 				display: flex;
 				align-items: center;

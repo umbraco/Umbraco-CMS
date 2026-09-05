@@ -1,7 +1,5 @@
 using System.Globalization;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
@@ -54,7 +52,6 @@ namespace Umbraco.Cms.Core.Services
             IEventMessagesFactory eventMessagesFactory,
             IMediaRepository mediaRepository,
             IAuditService auditService,
-            IAuditRepository auditRepository,   // TODO (V18): Remove this parameter (it's only there to avoid ambiguity with obsolete constructors).
             IMediaTypeRepository mediaTypeRepository,
             IEntityRepository entityRepository,
             IShortStringHelper shortStringHelper,
@@ -72,115 +69,6 @@ namespace Umbraco.Cms.Core.Services
             _userIdKeyResolver = userIdKeyResolver;
             _mediaPathScheme = mediaPathScheme;
             _logger = logger;
-        }
-
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="MediaService"/> class.
-        /// </summary>
-        /// <param name="provider">The <see cref="ICoreScopeProvider"/> for database scope management.</param>
-        /// <param name="mediaFileManager">The <see cref="MediaFileManager"/> for media file operations.</param>
-        /// <param name="loggerFactory">The <see cref="ILoggerFactory"/> for creating loggers.</param>
-        /// <param name="eventMessagesFactory">The <see cref="IEventMessagesFactory"/> for creating event messages.</param>
-        /// <param name="mediaRepository">The <see cref="IMediaRepository"/> for media persistence.</param>
-        /// <param name="auditRepository">The audit repository (obsolete, not used).</param>
-        /// <param name="mediaTypeRepository">The <see cref="IMediaTypeRepository"/> for media type persistence.</param>
-        /// <param name="entityRepository">The <see cref="IEntityRepository"/> for entity operations.</param>
-        /// <param name="shortStringHelper">The <see cref="IShortStringHelper"/> for string operations.</param>
-        /// <param name="userIdKeyResolver">The <see cref="IUserIdKeyResolver"/> for resolving user IDs.</param>
-        [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in Umbraco 18.")]
-        public MediaService(
-            ICoreScopeProvider provider,
-            MediaFileManager mediaFileManager,
-            ILoggerFactory loggerFactory,
-            IEventMessagesFactory eventMessagesFactory,
-            IMediaRepository mediaRepository,
-            IAuditService auditService,
-            IMediaTypeRepository mediaTypeRepository,
-            IEntityRepository entityRepository,
-            IShortStringHelper shortStringHelper,
-            IUserIdKeyResolver userIdKeyResolver)
-            : this(
-                provider,
-                mediaFileManager,
-                loggerFactory,
-                eventMessagesFactory,
-                mediaRepository,
-                auditService,
-                StaticServiceProvider.Instance.GetRequiredService<IAuditRepository>(),
-                mediaTypeRepository,
-                entityRepository,
-                shortStringHelper,
-                userIdKeyResolver,
-                StaticServiceProvider.Instance.GetRequiredService<IMediaPathScheme>(),
-                StaticServiceProvider.Instance.GetRequiredService<ILogger<MediaService>>())
-        {
-        }
-
-        [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in Umbraco 18.")]
-        public MediaService(
-            ICoreScopeProvider provider,
-            MediaFileManager mediaFileManager,
-            ILoggerFactory loggerFactory,
-            IEventMessagesFactory eventMessagesFactory,
-            IMediaRepository mediaRepository,
-            IAuditRepository auditRepository,
-            IMediaTypeRepository mediaTypeRepository,
-            IEntityRepository entityRepository,
-            IShortStringHelper shortStringHelper,
-            IUserIdKeyResolver userIdKeyResolver)
-            : this(
-                provider,
-                mediaFileManager,
-                loggerFactory,
-                eventMessagesFactory,
-                mediaRepository,
-                StaticServiceProvider.Instance.GetRequiredService<IAuditService>(),
-                mediaTypeRepository,
-                entityRepository,
-                shortStringHelper,
-                userIdKeyResolver)
-        {
-        }
-
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="MediaService"/> class.
-        /// </summary>
-        /// <param name="provider">The <see cref="ICoreScopeProvider"/> for database scope management.</param>
-        /// <param name="mediaFileManager">The <see cref="MediaFileManager"/> for media file operations.</param>
-        /// <param name="loggerFactory">The <see cref="ILoggerFactory"/> for creating loggers.</param>
-        /// <param name="eventMessagesFactory">The <see cref="IEventMessagesFactory"/> for creating event messages.</param>
-        /// <param name="mediaRepository">The <see cref="IMediaRepository"/> for media persistence.</param>
-        /// <param name="auditService">The <see cref="IAuditService"/> for audit logging.</param>
-        /// <param name="auditRepository">The audit repository (obsolete, not used).</param>
-        /// <param name="mediaTypeRepository">The <see cref="IMediaTypeRepository"/> for media type persistence.</param>
-        /// <param name="entityRepository">The <see cref="IEntityRepository"/> for entity operations.</param>
-        /// <param name="shortStringHelper">The <see cref="IShortStringHelper"/> for string operations.</param>
-        /// <param name="userIdKeyResolver">The <see cref="IUserIdKeyResolver"/> for resolving user IDs.</param>
-        [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in Umbraco 18.")]
-        public MediaService(
-            ICoreScopeProvider provider,
-            MediaFileManager mediaFileManager,
-            ILoggerFactory loggerFactory,
-            IEventMessagesFactory eventMessagesFactory,
-            IMediaRepository mediaRepository,
-            IAuditService auditService,
-            IAuditRepository auditRepository,
-            IMediaTypeRepository mediaTypeRepository,
-            IEntityRepository entityRepository,
-            IShortStringHelper shortStringHelper,
-            IUserIdKeyResolver userIdKeyResolver)
-            : this(
-                provider,
-                mediaFileManager,
-                loggerFactory,
-                eventMessagesFactory,
-                mediaRepository,
-                auditService,
-                mediaTypeRepository,
-                entityRepository,
-                shortStringHelper,
-                userIdKeyResolver)
-        {
         }
 
         #endregion
@@ -297,8 +185,10 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="mediaTypeAlias">The alias of the media type.</param>
         /// <param name="userId">The optional id of the user creating the media.</param>
         /// <returns>The media object.</returns>
-        public IMedia CreateMedia(string? name, int parentId, string mediaTypeAlias, int userId = Constants.Security.SuperUserId)
+        public IMedia CreateMedia(string name, int parentId, string mediaTypeAlias, int userId = Constants.Security.SuperUserId)
         {
+            ArgumentNullException.ThrowIfNull(name);
+
             IMediaType? mediaType = GetMediaType(mediaTypeAlias);
             if (mediaType == null)
             {
@@ -311,7 +201,7 @@ namespace Umbraco.Cms.Core.Services
                 throw new ArgumentException("No media with that id.", nameof(parentId));
             }
 
-            if (name != null && name.Length > 255)
+            if (name.Length > 255)
             {
                 throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
             }
@@ -337,6 +227,8 @@ namespace Umbraco.Cms.Core.Services
         /// <returns>The media object.</returns>
         public IMedia CreateMedia(string name, string mediaTypeAlias, int userId = Constants.Security.SuperUserId)
         {
+            ArgumentNullException.ThrowIfNull(name);
+
             // not locking since not saving anything
 
             IMediaType? mediaType = GetMediaType(mediaTypeAlias);
@@ -345,7 +237,7 @@ namespace Umbraco.Cms.Core.Services
                 throw new ArgumentException("No media type with that alias.", nameof(mediaTypeAlias));
             }
 
-            if (name != null && name.Length > 255)
+            if (name.Length > 255)
             {
                 throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
             }
@@ -372,6 +264,8 @@ namespace Umbraco.Cms.Core.Services
         /// <returns>The media object.</returns>
         public IMedia CreateMedia(string name, IMedia? parent, string mediaTypeAlias, int userId = Constants.Security.SuperUserId)
         {
+            ArgumentNullException.ThrowIfNull(name);
+
             if (parent == null)
             {
                 throw new ArgumentNullException(nameof(parent));
@@ -386,7 +280,7 @@ namespace Umbraco.Cms.Core.Services
                 throw new ArgumentException("No media type with that alias.", nameof(mediaTypeAlias)); // causes rollback
             }
 
-            if (name != null && name.Length > 255)
+            if (name.Length > 255)
             {
                 throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
             }
@@ -1179,7 +1073,8 @@ namespace Umbraco.Cms.Core.Services
                 scope.Notifications.Publish(new MediaTreeChangeNotification(media, TreeChangeTypes.RefreshBranch, messages));
                 MoveToRecycleBinEventInfo<IMedia>[] moveInfo = moves.Select(x => new MoveToRecycleBinEventInfo<IMedia>(x.Item1, x.Item2)).ToArray();
                 scope.Notifications.Publish(new MediaMovedToRecycleBinNotification(moveInfo, messages).WithStateFrom(movingToRecycleBinNotification));
-                Audit(AuditType.Move, userId, media.Id, "Move Media to recycle bin");
+
+                Audit(AuditType.Move, userId, media.Id, $"Moved to recycle bin from parent {originalPath.GetParentIdFromPath()}");
                 scope.Complete();
             }
 
@@ -1192,7 +1087,26 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="media">The <see cref="IMedia"/> to move</param>
         /// <param name="parentId">Id of the Media's new Parent</param>
         /// <param name="userId">Id of the User moving the Media</param>
+#pragma warning disable CS0618 // Type or member is obsolete - the int-userId overloads still default to SuperUserId; there is no non-obsolete int equivalent until it is removed in v18
         public Attempt<OperationResult?> Move(IMedia media, int parentId, int userId = Constants.Security.SuperUserId)
+#pragma warning restore CS0618 // Type or member is obsolete
+            => Move(media, parentId, true, userId);
+
+        /// <summary>
+        /// Moves an <see cref="IMedia"/> object to a new location.
+        /// </summary>
+        /// <param name="media">The <see cref="IMedia"/> to move.</param>
+        /// <param name="parentId">Id of the Media's new Parent.</param>
+        /// <param name="includeDescendants">
+        ///     Whether to move the descendants of the media along with it. When restoring an item out of the recycle bin
+        ///     this can be set to <c>false</c> to restore only the item itself, leaving its descendants in the recycle bin
+        ///     as top-level bin items.
+        /// </param>
+        /// <param name="userId">Id of the User moving the Media.</param>
+        /// <returns>The operation result.</returns>
+#pragma warning disable CS0618 // Type or member is obsolete - the int-userId overloads still default to SuperUserId; there is no non-obsolete int equivalent until it is removed in v18
+        public Attempt<OperationResult?> Move(IMedia media, int parentId, bool includeDescendants, int userId = Constants.Security.SuperUserId)
+#pragma warning restore CS0618 // Type or member is obsolete
         {
             EventMessages messages = EventMessagesFactory.Get();
 
@@ -1229,8 +1143,27 @@ namespace Umbraco.Cms.Core.Services
                 // leave it unchanged
                 var trashed = media.Trashed ? false : (bool?)null;
 
-                PerformMoveLocked(media, parentId, parent, userId, moves, trashed);
-                scope.Notifications.Publish(new MediaTreeChangeNotification(media, TreeChangeTypes.RefreshBranch, messages));
+                // when restoring a single item out of the recycle bin without its descendants, those descendants stay
+                // trashed and are re-homed under the recycle bin root - see PerformMoveLocked
+                var leaveDescendantsInRecycleBin = includeDescendants is false && media.Trashed && parentId != Constants.System.RecycleBinMedia;
+
+                PerformMoveLocked(media, parentId, parent, userId, moves, trashed, includeDescendants);
+
+                if (leaveDescendantsInRecycleBin)
+                {
+                    // The single RefreshBranch above cannot reconcile the descendants left in the bin (they are no longer
+                    // descendants of the restored item), so also refresh the re-homed direct children. The navigation
+                    // reconciler then moves them - and their sub-trees - back under the recycle bin root.
+                    IMedia[] rehomedChildren = moves
+                        .Select(x => x.Item1)
+                        .Where(x => x.ParentId == Constants.System.RecycleBinMedia)
+                        .ToArray();
+                    scope.Notifications.Publish(new MediaTreeChangeNotification(media.Yield().Concat(rehomedChildren), TreeChangeTypes.RefreshBranch, messages));
+                }
+                else
+                {
+                    scope.Notifications.Publish(new MediaTreeChangeNotification(media, TreeChangeTypes.RefreshBranch, messages));
+                }
 
                 MoveEventInfo<IMedia>[] moveInfo = moves //changes
                     // FIXME: Use MoveEventInfo that also takes a parent key when implementing move with parentKey.
@@ -1255,11 +1188,15 @@ namespace Umbraco.Cms.Core.Services
         ///     If <c>true</c>, marks items as trashed; if <c>false</c>, marks items as not trashed;
         ///     if <c>null</c>, leaves the trashed status unchanged.
         /// </param>
+        /// <param name="includeDescendants">
+        ///     Whether to move the descendants along with the media. When <c>false</c> during a restore out of the recycle
+        ///     bin, the descendants are left trashed - the item's direct children are re-homed to the recycle bin root.
+        /// </param>
         /// <remarks>
         ///     MUST be called from within WriteLock.
         ///     The trash parameter indicates whether we are trashing, un-trashing, or not changing anything.
         /// </remarks>
-        private void PerformMoveLocked(IMedia media, int parentId, IMedia? parent, int userId, ICollection<(IMedia, string)> moves, bool? trash)
+        private void PerformMoveLocked(IMedia media, int parentId, IMedia? parent, int userId, List<(IMedia Media, string OriginalPath)> moves, bool? trash, bool includeDescendants = true)
         {
             // Needed to update the in-memory navigation structure
             var cameFromRecycleBin = media.ParentId == Constants.System.RecycleBinMedia;
@@ -1268,6 +1205,7 @@ namespace Umbraco.Cms.Core.Services
             // get the level delta (old pos to new pos)
             // note that recycle bin (id:-20) level is 0!
             var levelDelta = 1 - media.Level + (parent?.Level ?? 0);
+            var originalLevel = media.Level;
 
             var paths = new Dictionary<int, string>();
 
@@ -1280,12 +1218,19 @@ namespace Umbraco.Cms.Core.Services
             //media.Path = (parent == null ? "-1" : parent.Path) + "," + media.Id;
             //media.SortOrder = ((MediaRepository) repository).NextChildSortOrder(parentId);
             //media.Level += levelDelta;
-            PerformMoveMediaLocked(media, trash);
+            PerformMoveMediaLocked(media, userId, trash);
 
             // if uow is not immediate, content.Path will be updated only when the UOW commits,
             // and because we want it now, we have to calculate it by ourselves
             //paths[media.Id] = media.Path;
             paths[media.Id] = (parent == null ? parentId == Constants.System.RecycleBinMedia ? "-1,-21" : Constants.System.RootString : parent.Path) + "," + media.Id;
+
+            // When restoring a single item out of the recycle bin without its descendants, the descendants must stay
+            // trashed: the item's direct children are re-homed to the recycle bin root (and the rest of the subtree keeps
+            // its relative structure), so nothing is orphaned and it can still be restored on its own later.
+            var leaveDescendantsInRecycleBin = includeDescendants is false
+                && parentId != Constants.System.RecycleBinMedia
+                && originalPath.Contains(Constants.System.RecycleBinMediaString);
 
             const int pageSize = 500;
             IQuery<IMedia>? query = GetPagedDescendantQuery(originalPath);
@@ -1299,30 +1244,65 @@ namespace Umbraco.Cms.Core.Services
                 {
                     moves.Add((descendant, descendant.Path)); // capture original path
 
-                    // update path and level since we do not update parentId
-                    descendant.Path = paths[descendant.Id] = paths[descendant.ParentId] + "," + descendant.Id;
-                    descendant.Level += levelDelta;
-                    PerformMoveMediaLocked(descendant, trash);
+                    if (leaveDescendantsInRecycleBin)
+                    {
+                        LeaveDescendantInRecycleBinLocked(descendant, media.Id, originalLevel, userId, paths);
+                    }
+                    else
+                    {
+                        PerformMoveDescendantLocked(descendant, levelDelta, userId, trash, paths);
+                    }
                 }
 
             }
             while (total > pageSize);
         }
 
+        // Re-homes a descendant of a restored item within the recycle bin: the restored item's direct children become
+        // top-level recycle bin items, while deeper descendants keep their relative structure below their (now re-homed)
+        // ancestor. The trashed state is left untouched so these items remain in the recycle bin.
+        private void LeaveDescendantInRecycleBinLocked(IMedia descendant, int restoredItemId, int originalLevel, int userId, Dictionary<int, string> paths)
+        {
+            var isDirectChild = descendant.ParentId == restoredItemId;
+            descendant.Path = paths[descendant.Id] = isDirectChild
+                ? Constants.System.RecycleBinMediaPathPrefix + descendant.Id
+                : paths[descendant.ParentId] + "," + descendant.Id;
+            descendant.Level -= originalLevel;
+            if (isDirectChild)
+            {
+                descendant.ParentId = Constants.System.RecycleBinMedia;
+            }
+
+            PerformMoveMediaLocked(descendant, userId, null);
+        }
+
+        // Moves a descendant along with the item being moved, updating its path and level (parentId is unchanged).
+        private void PerformMoveDescendantLocked(IMedia descendant, int levelDelta, int userId, bool? trash, Dictionary<int, string> paths)
+        {
+            descendant.Path = paths[descendant.Id] = paths[descendant.ParentId] + "," + descendant.Id;
+            descendant.Level += levelDelta;
+            PerformMoveMediaLocked(descendant, userId, trash);
+        }
+
         /// <summary>
         ///     Performs the actual save of a media item during a move operation while holding a write lock.
         /// </summary>
         /// <param name="media">The media item to save.</param>
+        /// <param name="userId">The identifier of the user performing the move.</param>
         /// <param name="trash">
         ///     If <c>true</c>, marks the item as trashed; if <c>false</c>, marks the item as not trashed;
         ///     if <c>null</c>, leaves the trashed status unchanged.
         /// </param>
-        private void PerformMoveMediaLocked(IMedia media, bool? trash)
+        private void PerformMoveMediaLocked(IMedia media, int userId, bool? trash)
         {
             if (trash.HasValue)
             {
                 ((ContentBase)media).Trashed = trash.Value;
             }
+
+            // Track who moved/trashed the item so the audit trail (and any consumer of WriterId)
+            // reflects the acting user, not the original creator. Mirrors PerformMoveContentLocked.
+            media.WriterId = userId;
 
             _mediaRepository.Save(media);
         }
@@ -1409,6 +1389,15 @@ namespace Umbraco.Cms.Core.Services
             {
                 scope.WriteLock(Constants.Locks.MediaTree);
 
+                // Reload within the lock so sorting operates on fully-loaded entities. Callers may pass
+                // partially-loaded media (e.g. without property data), and saving those directly would
+                // wipe the property data (#23120). Preserve the caller's ordering, which drives the sort.
+                var reloadedById = GetByIds(itemsA.Select(x => x.Id)).ToDictionary(x => x.Id);
+                itemsA = itemsA
+                    .Select(x => reloadedById.TryGetValue(x.Id, out IMedia? media) ? media : null)
+                    .WhereNotNull()
+                    .ToArray();
+
                 var savingNotification = new MediaSavingNotification(itemsA, messages);
                 if (scope.Notifications.PublishCancelable(savingNotification))
                 {
@@ -1445,6 +1434,43 @@ namespace Umbraco.Cms.Core.Services
 
             return true;
 
+        }
+
+        /// <inheritdoc />
+        public OperationResult SortChildren(int parentId, IReadOnlyList<int> orderedChildIds, int userId = Constants.Security.SuperUserId)
+        {
+            EventMessages evtMsgs = EventMessagesFactory.Get();
+            if (orderedChildIds.Count == 0)
+            {
+                return new OperationResult(OperationResultType.NoOperation, evtMsgs);
+            }
+
+            using ICoreScope scope = ScopeProvider.CreateCoreScope();
+            scope.WriteLock(Constants.Locks.MediaTree);
+
+            _mediaRepository.UpdateSortOrder(orderedChildIds);
+
+            // Sort order lives in umbracoNode; neither the published cache nor the media repository cache keeps
+            // a separate serialized copy of it, so refreshing the affected branch (which invalidates both and has
+            // them reload from umbracoNode) is enough to pick up the new order without re-saving each child.
+            if (parentId == Constants.System.Root)
+            {
+                IMedia[] roots = GetByIds(orderedChildIds).ToArray();
+                scope.Notifications.Publish(new MediaTreeChangeNotification(roots, TreeChangeTypes.RefreshNode, evtMsgs));
+            }
+            else
+            {
+                IMedia? parent = GetById(parentId);
+                if (parent is not null)
+                {
+                    scope.Notifications.Publish(new MediaTreeChangeNotification(parent, TreeChangeTypes.RefreshBranch, evtMsgs));
+                }
+            }
+
+            Audit(AuditType.Sort, userId, parentId);
+
+            scope.Complete();
+            return OperationResult.Succeed(evtMsgs);
         }
 
         /// <summary>

@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.OutputCaching;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,8 +15,6 @@ using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
-using Umbraco.Cms.Infrastructure.DependencyInjection;
-using Umbraco.Cms.Web.Common.ApplicationBuilder;
 using Umbraco.Cms.Web.Common.Middleware;
 using Umbraco.Cms.Web.Common.Routing;
 using Umbraco.Cms.Web.Website.Cache.PartialViewCacheInvalidators;
@@ -73,7 +70,8 @@ public static partial class UmbracoBuilderExtensions
             x.GetRequiredService<IPublicAccessRequestHandler>(),
             x.GetRequiredService<IUmbracoVirtualPageRoute>(),
             x.GetRequiredService<IOptionsMonitor<GlobalSettings>>(),
-            x.GetRequiredService<IDocumentUrlService>()));
+            x.GetRequiredService<IDocumentUrlService>(),
+            x.GetRequiredService<IContentRoutingReadiness>()));
         builder.Services.AddSingleton<IControllerActionSearcher, ControllerActionSearcher>();
         builder.Services.TryAddEnumerable(Singleton<MatcherPolicy, NotFoundSelectorPolicy>());
         builder.Services.AddSingleton<IUmbracoVirtualPageRoute, UmbracoVirtualPageRoute>();
@@ -124,17 +122,21 @@ public static partial class UmbracoBuilderExtensions
                 new WebsiteOutputCachePolicy(settings.ContentDuration));
         });
 
-        builder.Services.Configure<UmbracoPipelineOptions>(options =>
-            options.AddFilter(new WebsiteOutputCachePipelineFilter("UmbracoWebsiteOutputCache")));
+        // Signal that Umbraco has enabled output caching so the application builder registers
+        // the output cache middleware. Gated via a marker rather than IOutputCacheStore so that
+        // applications calling services.AddOutputCache(...) for their own purposes are not
+        // affected by Umbraco's automatic middleware registration.
+        builder.Services.TryAddSingleton<IUmbracoManagedOutputCacheMarker, UmbracoManagedOutputCacheMarker>();
 
         // Register eviction handlers and providers.
-        builder.AddNotificationAsyncHandler<ContentCacheRefresherNotification, DocumentOutputCacheEvictionHandler>();
-        builder.AddNotificationAsyncHandler<MediaCacheRefresherNotification, MediaOutputCacheEvictionHandler>();
-        builder.AddNotificationAsyncHandler<MemberCacheRefresherNotification, MemberOutputCacheEvictionHandler>();
-        builder.Services.AddSingleton<IWebsiteOutputCacheTagProvider, ContentTypeOutputCacheTagProvider>();
-        builder.Services.AddSingleton<IWebsiteOutputCacheDurationProvider, DefaultWebsiteOutputCacheDurationProvider>();
-        builder.Services.AddSingleton<IWebsiteOutputCacheRequestFilter, DefaultWebsiteOutputCacheRequestFilter>();
-        builder.Services.AddSingleton<IWebsiteOutputCacheManager, WebsiteOutputCacheManager>();
+        builder.AddNotificationAsyncHandler<ContentCacheRefresherNotification, WebsiteDocumentOutputCacheEvictionHandler>();
+        builder.AddNotificationAsyncHandler<MediaCacheRefresherNotification, WebsiteMediaOutputCacheEvictionHandler>();
+        builder.AddNotificationAsyncHandler<MemberCacheRefresherNotification, WebsiteMemberOutputCacheEvictionHandler>();
+        builder.AddNotificationAsyncHandler<ElementCacheRefresherNotification, WebsiteElementOutputCacheEvictionHandler>();
+        builder.Services.AddSingleton<IWebsiteOutputCacheTagProvider, WebsiteContentTypeOutputCacheTagProvider>();
+        builder.Services.AddUnique<IWebsiteOutputCacheDurationProvider, DefaultWebsiteOutputCacheDurationProvider>();
+        builder.Services.AddUnique<IWebsiteOutputCacheRequestFilter, DefaultWebsiteOutputCacheRequestFilter>();
+        builder.Services.AddUnique<IWebsiteOutputCacheManager, WebsiteOutputCacheManager>();
 
         return builder;
     }

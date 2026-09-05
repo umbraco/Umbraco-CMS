@@ -22,9 +22,7 @@ Read these before creating a repository — they define the conventions this ski
 2. **Repository type** — `detail`, `item`, `collection`, or `action-specific`
 3. **Package path** — which package directory (e.g., `src/packages/webhook/webhook/`)
 
-**Additional for action-specific:**
-4. **Action name** — what the operation does (e.g., `duplicate`, `move-to`, `publishing`, `culture-and-hostnames`)
-5. **Methods** — what operations the repository exposes
+**Additional for action-specific:** 4. **Action name** — what the operation does (e.g., `duplicate`, `move-to`, `publishing`, `culture-and-hostnames`) 5. **Methods** — what operations the repository exposes
 
 ## Choosing the right type
 
@@ -80,7 +78,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class Umb{EntityName}DetailStore extends UmbDetailStoreBase<Umb{EntityName}DetailModel> {
 	constructor(host: UmbControllerHost) {
-		super(host, UMB_{ENTITY}_DETAIL_STORE_CONTEXT.toString());
+		super(host, UMB_{ENTITY}_DETAIL_STORE_CONTEXT);
 	}
 }
 
@@ -324,7 +322,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class Umb{EntityName}ItemStore extends UmbItemStoreBase<Umb{EntityName}ItemModel> {
 	constructor(host: UmbControllerHost) {
-		super(host, UMB_{ENTITY}_ITEM_STORE_CONTEXT.toString());
+		super(host, UMB_{ENTITY}_ITEM_STORE_CONTEXT);
 	}
 }
 
@@ -500,6 +498,7 @@ For domain operations that don't fit CRUD — publish, duplicate, move, sort, re
 ```
 
 **Location rules:**
+
 - Entity actions: `entity-actions/{action-name}/repository/`
 - Bulk actions: `entity-bulk-actions/{action-name}/repository/`
 - Domain sub-features: `{feature-name}/repository/` (e.g., `publishing/repository/`)

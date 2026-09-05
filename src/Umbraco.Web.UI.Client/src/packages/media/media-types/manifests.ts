@@ -1,4 +1,5 @@
 import { manifests as entityActionsManifests } from './entity-actions/manifests.js';
+import { manifests as mediaTypeRootManifests } from './media-type-root/manifests.js';
 import { manifests as menuManifests } from './menu/manifests.js';
 import { manifests as propertyEditorUiManifests } from './property-editors/manifests.js';
 import { manifests as propertyTypeManifests } from './property-type/manifests.js';
@@ -12,6 +13,7 @@ import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension
 export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [
 	...entityActionsManifests,
 	...menuManifests,
+	...mediaTypeRootManifests,
 	...propertyEditorUiManifests,
 	...propertyTypeManifests,
 	...repositoryManifests,

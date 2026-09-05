@@ -23,24 +23,44 @@ export class UmbServerConnection extends UmbControllerBase {
 	#umbracoCssPath = new UmbStringState(undefined);
 	umbracoCssPath = this.#umbracoCssPath.asObservable();
 
+	#signalRSkipNegotiation = new UmbBooleanState(false);
+	signalRSkipNegotiation = this.#signalRSkipNegotiation.asObservable();
+
 	constructor(host: UmbControllerHost, serverUrl: string) {
 		super(host);
 		this.#url = serverUrl;
 	}
 
 	/**
+	 * Gets whether the server has configured SignalR to skip the negotiate round-trip.
+	 * @returns {boolean} True if SignalR should skip the negotiate round-trip
+	 * @memberof UmbServerConnection
+	 */
+	getSignalRSkipNegotiation() {
+		return this.#signalRSkipNegotiation.getValue();
+	}
+
+	/**
 	 * Connects to the server.
+	 * @returns {Promise<UmbServerConnection>} This server connection instance
 	 * @memberof UmbServerConnection
 	 */
 	async connect() {
-		await this.#setStatus();
-		await this.#setServerConfiguration();
+		// Independent reads, but both are required for the backoffice to function.
+		const results = await Promise.allSettled([this.#setStatus(), this.#setServerConfiguration()]);
+		const errors = results
+			.filter((result): result is PromiseRejectedResult => result.status === 'rejected')
+			.map((result) => result.reason);
+		if (errors.length) {
+			throw errors.length === 1 ? errors[0] : new AggregateError(errors, 'Failed to connect to the Umbraco server');
+		}
+		this.#isConnected.setValue(true);
 		return this;
 	}
 
 	/**
 	 * Gets the URL of the server.
-	 * @returns {*}
+	 * @returns {string} The server URL
 	 * @memberof UmbServerConnection
 	 */
 	getUrl() {
@@ -49,7 +69,7 @@ export class UmbServerConnection extends UmbControllerBase {
 
 	/**
 	 * Gets the status of the server.
-	 * @returns {string}
+	 * @returns {string} The server's runtime level status
 	 * @memberof UmbServerConnection
 	 */
 	getStatus() {
@@ -59,7 +79,7 @@ export class UmbServerConnection extends UmbControllerBase {
 
 	/**
 	 * Checks if the server is connected.
-	 * @returns {boolean}
+	 * @returns {boolean} True if the server is connected
 	 * @memberof UmbServerConnection
 	 */
 	getIsConnected() {
@@ -74,7 +94,6 @@ export class UmbServerConnection extends UmbControllerBase {
 			throw error;
 		}
 
-		this.#isConnected.setValue(true);
 		this.#status = data?.serverStatus ?? RuntimeLevelModel.UNKNOWN;
 	}
 
@@ -90,5 +109,6 @@ export class UmbServerConnection extends UmbControllerBase {
 		this.#allowLocalLogin.setValue(data?.allowLocalLogin ?? false);
 		this.#allowPasswordReset.setValue(data?.allowPasswordReset ?? false);
 		this.#umbracoCssPath.setValue(data?.umbracoCssPath);
+		this.#signalRSkipNegotiation.setValue(data?.signalR?.skipNegotiation ?? false);
 	}
 }

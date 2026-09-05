@@ -2,8 +2,10 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
@@ -42,6 +44,8 @@ public class NewDefaultUrlProviderTests
 
         public Mock<ILanguageService> LanguageService { get; } = new();
 
+        public Mock<ILogger<DefaultUrlProvider>> Logger { get; } = new();
+
         public RequestHandlerSettings RequestConfig { get; set; } = new() { AddTrailingSlash = true };
 
         public string DefaultCulture { get; set; } = "en-US";
@@ -62,7 +66,7 @@ public class NewDefaultUrlProviderTests
                 .ReturnsAsync(() => DefaultCulture);
         }
 
-        public NewDefaultUrlProvider CreateProvider()
+        public DefaultUrlProvider CreateProvider()
         {
             var hostingEnv = new Mock<IHostingEnvironment>();
             hostingEnv.Setup(x => x.ApplicationVirtualPath).Returns("/");
@@ -71,9 +75,9 @@ public class NewDefaultUrlProviderTests
             var optionsMonitor = new Mock<IOptionsMonitor<RequestHandlerSettings>>();
             optionsMonitor.Setup(x => x.CurrentValue).Returns(RequestConfig);
 
-            return new NewDefaultUrlProvider(
+            return new DefaultUrlProvider(
                 optionsMonitor.Object,
-                Mock.Of<ILogger<NewDefaultUrlProvider>>(),
+                Logger.Object,
                 SiteDomainMapper.Object,
                 UmbracoContextAccessor.Object,
                 uriUtility,
@@ -144,7 +148,7 @@ public class NewDefaultUrlProviderTests
     }
 
     /// <summary>
-    /// Verifies that the "#" route marker returns null (unpublished content).
+    /// Verifies that the <see cref="Constants.Routing.Unroutable"/> route marker returns null (unpublished content).
     /// </summary>
     [Test]
     public void Can_Return_Null_For_Hash_Route()
@@ -152,7 +156,7 @@ public class NewDefaultUrlProviderTests
         var ctx = new TestContext();
         var provider = ctx.CreateProvider();
 
-        var result = provider.GetUrlFromRoute("#", 123, _currentUri, UrlMode.Auto, null);
+        var result = provider.GetUrlFromRoute(Constants.Routing.Unroutable, 123, _currentUri, UrlMode.Auto, null);
 
         Assert.That(result, Is.Null);
     }
@@ -491,5 +495,56 @@ public class NewDefaultUrlProviderTests
 
         Assert.That(result, Is.Not.Null);
         Assert.That(result!.Culture, Is.EqualTo("en-US"));
+    }
+
+    /// <summary>
+    /// Verifies that the key lookup used to enrich the unroutable debug message is not performed when debug
+    /// logging is disabled, so it costs nothing on the URL resolution path.
+    /// </summary>
+    [Test]
+    public void Does_Not_Resolve_Key_For_Unroutable_Content_When_Debug_Logging_Disabled()
+    {
+        var ctx = new TestContext();
+        ctx.Logger.Setup(x => x.IsEnabled(LogLevel.Debug)).Returns(false);
+        var provider = ctx.CreateProvider();
+
+        provider.GetUrlFromRoute(Constants.Routing.Unroutable, 123, _currentUri, UrlMode.Auto, null);
+
+        ctx.IdKeyMap.Verify(
+            x => x.GetKeyForId(It.IsAny<int>(), It.IsAny<UmbracoObjectTypes>()),
+            Times.Never);
+    }
+
+    /// <summary>
+    /// Verifies that the key of unroutable content is resolved once, as a document, when no key was passed in
+    /// by the caller and debug logging is enabled.
+    /// </summary>
+    [Test]
+    public void Can_Resolve_Key_For_Unroutable_Content_When_Debug_Logging_Enabled()
+    {
+        var ctx = new TestContext();
+        ctx.Logger.Setup(x => x.IsEnabled(LogLevel.Debug)).Returns(true);
+        var provider = ctx.CreateProvider();
+
+        provider.GetUrlFromRoute(Constants.Routing.Unroutable, 123, _currentUri, UrlMode.Auto, null);
+
+        ctx.IdKeyMap.Verify(x => x.GetKeyForId(123, UmbracoObjectTypes.Document), Times.Once);
+    }
+
+    /// <summary>
+    /// Verifies that a caller supplying the key does not trigger a lookup, even with debug logging enabled.
+    /// </summary>
+    [Test]
+    public void Cannot_Resolve_Key_For_Unroutable_Content_When_Key_Is_Provided()
+    {
+        var ctx = new TestContext();
+        ctx.Logger.Setup(x => x.IsEnabled(LogLevel.Debug)).Returns(true);
+        var provider = ctx.CreateProvider();
+
+        provider.GetUrlFromRoute(Constants.Routing.Unroutable, 123, _currentUri, UrlMode.Auto, null, Guid.NewGuid());
+
+        ctx.IdKeyMap.Verify(
+            x => x.GetKeyForId(It.IsAny<int>(), It.IsAny<UmbracoObjectTypes>()),
+            Times.Never);
     }
 }

@@ -31,11 +31,14 @@ export class UmbBlockGridScaleHandlerElement extends UmbLitElement implements Um
 				inset: 0;
 				pointer-events: none;
 				box-sizing: border-box;
+				border: transparent solid 1px;
+				border-radius: var(--uui-border-radius);
+				border-bottom-right-radius: 0;
+				transition: border-color 120ms;
 			}
 			:host(:focus-within),
 			:host(:hover) {
-				border: var(--uui-color-interactive) solid 1px;
-				border-radius: var(--uui-border-radius);
+				border-color: var(--uui-color-interactive);
 			}
 
 			#handler {
@@ -48,15 +51,15 @@ export class UmbBlockGridScaleHandlerElement extends UmbLitElement implements Um
 				pointer-events: all;
 				cursor: nwse-resize;
 
-				bottom: -4px;
-				right: -4px;
+				bottom: -3px;
+				right: -3px;
 				width: 7px;
 				height: 7px;
 				padding: 0;
 				background-color: var(--uui-color-surface);
 				border: var(--uui-color-interactive) solid 1px;
 				box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.7);
-				opacity: 0;
+				opacity: var(--umb-block-scale-handler-opacity, 0);
 				transition: opacity 120ms;
 			}
 			#handler:hover,

@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Api.Management.Extensions;
 using Umbraco.Cms.Api.Management.ViewModels.Content;
 using Umbraco.Cms.Api.Management.ViewModels.Member;
 using Umbraco.Cms.Api.Management.ViewModels.Member.Item;
@@ -9,11 +10,13 @@ using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
+/// <inheritdoc/>
 internal sealed class MemberPresentationFactory : IMemberPresentationFactory
 {
     private readonly IUmbracoMapper _umbracoMapper;
@@ -22,6 +25,7 @@ internal sealed class MemberPresentationFactory : IMemberPresentationFactory
     private readonly ITwoFactorLoginService _twoFactorLoginService;
     private readonly IMemberGroupService _memberGroupService;
     private readonly DeliveryApiSettings _deliveryApiSettings;
+    private readonly IExternalMemberService _externalMemberService;
     private IEnumerable<Guid>? _clientCredentialsMemberKeys;
 
     /// <summary>
@@ -33,13 +37,15 @@ internal sealed class MemberPresentationFactory : IMemberPresentationFactory
     /// <param name="twoFactorLoginService">Service for handling two-factor authentication for members.</param>
     /// <param name="memberGroupService">Service for managing member groups.</param>
     /// <param name="deliveryApiSettings">The configuration options for the Delivery API.</param>
+    /// <param name="externalMemberService">Service for managing external-only members.</param>
     public MemberPresentationFactory(
         IUmbracoMapper umbracoMapper,
         IMemberService memberService,
         IMemberTypeService memberTypeService,
         ITwoFactorLoginService twoFactorLoginService,
         IMemberGroupService memberGroupService,
-        IOptions<DeliveryApiSettings> deliveryApiSettings)
+        IOptions<DeliveryApiSettings> deliveryApiSettings,
+        IExternalMemberService externalMemberService)
     {
         _umbracoMapper = umbracoMapper;
         _memberService = memberService;
@@ -47,14 +53,10 @@ internal sealed class MemberPresentationFactory : IMemberPresentationFactory
         _twoFactorLoginService = twoFactorLoginService;
         _memberGroupService = memberGroupService;
         _deliveryApiSettings = deliveryApiSettings.Value;
+        _externalMemberService = externalMemberService;
     }
 
-    /// <summary>
-    /// Asynchronously creates a <see cref="MemberResponseModel"/> for the specified <see cref="IMember"/>, including or excluding sensitive data based on the current user's permissions.
-    /// </summary>
-    /// <param name="member">The member entity to map to a response model.</param>
-    /// <param name="currentUser">The user requesting the data, used to determine access to sensitive information.</param>
-    /// <returns>A task representing the asynchronous operation, with a <see cref="MemberResponseModel"/> as the result.</returns>
+    /// <inheritdoc/>
     public async Task<MemberResponseModel> CreateResponseModelAsync(IMember member, IUser currentUser)
     {
         MemberResponseModel responseModel = _umbracoMapper.Map<MemberResponseModel>(member)!;
@@ -65,11 +67,18 @@ internal sealed class MemberPresentationFactory : IMemberPresentationFactory
 
         // Get the member groups per role, so we can return the group keys
         responseModel.Groups = roles.Select(x => _memberGroupService.GetByName(x)).WhereNotNull().Select(x => x.Key).ToArray();
-        return currentUser.HasAccessToSensitiveData()
-            ? responseModel
-            : await RemoveSensitiveDataAsync(member, responseModel);
+
+        responseModel.ClearSensitiveValuesFor(currentUser);
+
+        if (currentUser.HasAccessToSensitiveData() is false)
+        {
+            await RemoveSensitivePropertyValuesAsync(member, responseModel);
+        }
+
+        return responseModel;
     }
 
+    /// <inheritdoc/>
     public async Task<IEnumerable<MemberResponseModel>> CreateMultipleAsync(IEnumerable<IMember> members, IUser currentUser)
     {
         var memberResponseModels = new List<MemberResponseModel>();
@@ -81,54 +90,135 @@ internal sealed class MemberPresentationFactory : IMemberPresentationFactory
         return memberResponseModels;
     }
 
-    /// <summary>
-    /// Creates a response model for a member item from the given entity.
-    /// </summary>
-    /// <param name="entity">The member entity to create the response model from.</param>
-    /// <returns>A <see cref="MemberItemResponseModel"/> representing the member.</returns>
+    /// <inheritdoc/>
     public MemberItemResponseModel CreateItemResponseModel(IMemberEntitySlim entity)
         => CreateItemResponseModel<IMemberEntitySlim>(entity);
 
-    /// <summary>
-    /// Creates a response model for a member item based on the given member entity.
-    /// </summary>
-    /// <param name="entity">The member entity to create the response model from.</param>
-    /// <returns>A <see cref="MemberItemResponseModel"/> representing the member.</returns>
+    /// <inheritdoc/>
     public MemberItemResponseModel CreateItemResponseModel(IMember entity)
         => CreateItemResponseModel<IMember>(entity);
 
+    /// <inheritdoc/>
+    [Obsolete("Please use the overload taking the current user. Scheduled for removal in Umbraco 19.")]
+    public Task<MemberResponseModel> CreateExternalMemberResponseModelAsync(ExternalMemberIdentity member)
+        => BuildExternalMemberResponseModelAsync(member);
+
+    /// <inheritdoc/>
+    public async Task<MemberResponseModel> CreateExternalMemberResponseModelAsync(ExternalMemberIdentity member, IUser currentUser)
+    {
+        MemberResponseModel responseModel = await BuildExternalMemberResponseModelAsync(member);
+
+        responseModel.ClearSensitiveValuesFor(currentUser);
+
+        return responseModel;
+    }
+
+    private async Task<MemberResponseModel> BuildExternalMemberResponseModelAsync(ExternalMemberIdentity member)
+    {
+        IEnumerable<string> roles = await _externalMemberService.GetRolesAsync(member.Key);
+        IEnumerable<Guid> groupKeys = roles
+            .Select(x => _memberGroupService.GetByName(x))
+            .WhereNotNull()
+            .Select(x => x.Key)
+            .ToArray();
+
+        return new MemberResponseModel
+        {
+            Id = member.Key,
+            Email = member.Email,
+            Username = member.UserName,
+            IsApproved = member.IsApproved,
+            IsLockedOut = member.IsLockedOut,
+            IsTwoFactorEnabled = false,
+            FailedPasswordAttempts = 0,
+            LastLoginDate = member.LastLoginDate.HasValue ? new DateTimeOffset(member.LastLoginDate.Value, TimeSpan.Zero) : null,
+            LastLockoutDate = member.LastLockoutDate.HasValue ? new DateTimeOffset(member.LastLockoutDate.Value, TimeSpan.Zero) : null,
+            LastPasswordChangeDate = null,
+            Kind = MemberKind.ExternalOnly,
+            Variants = [
+                new MemberVariantResponseModel
+                {
+                    Name = member.Name ?? string.Empty,
+                    CreateDate = new DateTimeOffset(member.CreateDate, TimeSpan.Zero),
+                    UpdateDate = new DateTimeOffset(member.UpdateDate, TimeSpan.Zero),
+                }
+            ],
+            Values = Enumerable.Empty<MemberValueResponseModel>(),
+            MemberType = new MemberTypeReferenceResponseModel(),
+            Groups = groupKeys,
+            ProfileData = member.ProfileData,
+        };
+    }
+
+    /// <inheritdoc/>
+    public MemberItemResponseModel CreateExternalMemberItemResponseModel(ExternalMemberIdentity member) =>
+        new()
+        {
+            Id = member.Key,
+            MemberType = new MemberTypeReferenceResponseModel(),
+            Variants = [new VariantItemResponseModel { Name = member.Name ?? string.Empty, Culture = null }],
+            Kind = MemberKind.ExternalOnly,
+        };
+
+    /// <inheritdoc/>
+    [Obsolete("Please use the overload taking the current user. Scheduled for removal in Umbraco 19.")]
+    public MemberResponseModel CreateFilterItemResponseModel(MemberFilterItem item)
+        => BuildFilterItemResponseModel(item);
+
+    /// <inheritdoc/>
+    public MemberResponseModel CreateFilterItemResponseModel(MemberFilterItem item, IUser currentUser)
+    {
+        MemberResponseModel responseModel = BuildFilterItemResponseModel(item);
+
+        responseModel.ClearSensitiveValuesFor(currentUser);
+
+        return responseModel;
+    }
+
+    private static MemberResponseModel BuildFilterItemResponseModel(MemberFilterItem item) =>
+        new()
+        {
+            Id = item.Key,
+            Email = item.Email,
+            Username = item.UserName,
+            IsApproved = item.IsApproved,
+            IsLockedOut = item.IsLockedOut,
+            LastLoginDate = item.LastLoginDate.HasValue ? new DateTimeOffset(item.LastLoginDate.Value, TimeSpan.Zero) : null,
+            LastLockoutDate = item.LastLockoutDate.HasValue ? new DateTimeOffset(item.LastLockoutDate.Value, TimeSpan.Zero) : null,
+            LastPasswordChangeDate = item.LastPasswordChangeDate.HasValue ? new DateTimeOffset(item.LastPasswordChangeDate.Value, TimeSpan.Zero) : null,
+            Kind = item.Kind,
+            Variants = [new MemberVariantResponseModel { Name = item.Name ?? string.Empty }],
+            Values = [],
+            MemberType = new MemberTypeReferenceResponseModel
+            {
+                Id = item.MemberTypeKey ?? Guid.Empty,
+                Icon = item.MemberTypeIcon ?? string.Empty,
+            },
+            Groups = item.Groups,
+        };
+
     private MemberItemResponseModel CreateItemResponseModel<T>(T entity)
         where T : ITreeEntity
-        => new MemberItemResponseModel
+        => new()
         {
             Id = entity.Key,
             MemberType = _umbracoMapper.Map<MemberTypeReferenceResponseModel>(entity)!,
             Variants = CreateVariantsItemResponseModels(entity),
-            Kind = GetMemberKind(entity.Key)
+            Kind = GetMemberKind(entity.Key),
         };
 
     private static IEnumerable<VariantItemResponseModel> CreateVariantsItemResponseModels(ITreeEntity entity)
-        => new[]
-        {
+        =>
+        [
             new VariantItemResponseModel
             {
                 Name = entity.Name ?? string.Empty,
-                Culture = null
+                Culture = null,
             }
-        };
+        ];
 
-    private async Task<MemberResponseModel> RemoveSensitiveDataAsync(IMember member, MemberResponseModel responseModel)
+    private async Task RemoveSensitivePropertyValuesAsync(IMember member, MemberResponseModel responseModel)
     {
-        // these properties are considered sensitive; some of them are not nullable, so for
-        // those we can't do much more than force revert them to their default values.
-        responseModel.IsApproved = false;
-        responseModel.IsLockedOut = false;
-        responseModel.IsTwoFactorEnabled = false;
-        responseModel.FailedPasswordAttempts = 0;
-        responseModel.LastLoginDate = null;
-        responseModel.LastLockoutDate = null;
-        responseModel.LastPasswordChangeDate = null;
-
         IMemberType memberType = await _memberTypeService.GetAsync(member.ContentType.Key)
                                  ?? throw new InvalidOperationException($"The member type {member.ContentType.Alias} could not be found");
 
@@ -138,8 +228,6 @@ internal sealed class MemberPresentationFactory : IMemberPresentationFactory
         responseModel.Values = responseModel.Values
             .Where(valueModel => sensitivePropertyAliases.InvariantContains(valueModel.Alias) is false)
             .ToArray();
-
-        return responseModel;
     }
 
     private MemberKind GetMemberKind(Guid key)

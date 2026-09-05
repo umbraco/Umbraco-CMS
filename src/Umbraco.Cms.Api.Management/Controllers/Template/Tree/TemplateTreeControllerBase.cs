@@ -21,16 +21,6 @@ namespace Umbraco.Cms.Api.Management.Controllers.Template.Tree;
 public class TemplateTreeControllerBase : NamedEntityTreeControllerBase<NamedEntityTreeItemResponseModel>
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="TemplateTreeControllerBase"/> class, which provides base functionality for template tree controllers.
-    /// </summary>
-    /// <param name="entityService">An <see cref="IEntityService"/> instance used for managing entities within the controller.</param>
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
-    public TemplateTreeControllerBase(IEntityService entityService)
-        : base(entityService)
-    {
-    }
-
-    /// <summary>
     /// Initializes a new instance of the <see cref="TemplateTreeControllerBase"/> class with the specified entity service and flag providers.
     /// </summary>
     /// <param name="entityService">The <see cref="IEntityService"/> used for entity operations within the template tree controller.</param>

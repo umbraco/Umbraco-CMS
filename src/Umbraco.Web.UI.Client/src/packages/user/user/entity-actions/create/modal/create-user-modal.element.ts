@@ -1,5 +1,6 @@
 import { UmbUserDetailRepository } from '../../../repository/index.js';
 import { UmbUserKind } from '../../../utils/index.js';
+import type { UmbUserKindType } from '../../../utils/index.js';
 import { UMB_CREATE_USER_SUCCESS_MODAL } from './create-user-success-modal.token.js';
 import type { UmbCreateUserModalData } from './create-user-modal.token.js';
 import type { UmbUserGroupInputElement } from '@umbraco-cms/backoffice/user-group';
@@ -47,19 +48,16 @@ export class UmbCreateUserModalElement extends UmbModalBaseElement<UmbCreateUser
 		const { data } = await this.#userDetailRepository.create(userScaffold);
 
 		if (data) {
-			if (data.kind === UmbUserKind.DEFAULT) {
-				this.#openSuccessModal(data.unique);
-			} else {
-				this._submitModal();
-			}
+			this.#openSuccessModal(data.unique, data.kind);
 		}
 	}
 
-	async #openSuccessModal(userUnique: string) {
+	async #openSuccessModal(userUnique: string, userKind: UmbUserKindType) {
 		await umbOpenModal(this, UMB_CREATE_USER_SUCCESS_MODAL, {
 			data: {
 				user: {
 					unique: userUnique,
+					kind: userKind,
 				},
 			},
 		})
@@ -76,8 +74,9 @@ export class UmbCreateUserModalElement extends UmbModalBaseElement<UmbCreateUser
 	}
 
 	override render() {
-		return html`<uui-dialog-layout headline=${this.localize.term('user_createUserHeadline', this.data?.user.kind)}>
-			<p>${this.localize.term('user_createUserDescription', this.data?.user.kind)}</p>
+		return html`<uui-dialog-layout
+			headline=${this.localize.term('user_createUserHeadline', this.data?.user.kind ?? '')}>
+			<p>${this.localize.term('user_createUserDescription', this.data?.user.kind ?? '')}</p>
 
 			${this.#renderForm()}
 			<uui-button @click=${this._rejectModal} slot="actions" label="Cancel" look="secondary"></uui-button>

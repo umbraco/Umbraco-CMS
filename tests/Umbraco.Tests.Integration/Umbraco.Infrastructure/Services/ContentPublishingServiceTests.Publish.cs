@@ -619,7 +619,7 @@ public partial class ContentPublishingServiceTests
 
         ContentType.PropertyTypes.First(pt => pt.Alias == "title").Mandatory = true;
         ContentType.PropertyTypes.First(pt => pt.Alias == "author").ValidationRegExp = "^\\d*$";
-        await ContentTypeService.SaveAsync(ContentType, Constants.Security.SuperUserKey);
+        await ContentTypeService.UpdateAsync(ContentType, Constants.Security.SuperUserKey);
 
         result = await ContentPublishingService.PublishAsync(Textpage.Key, [new CulturePublishScheduleModel()], Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
@@ -646,7 +646,7 @@ public partial class ContentPublishingServiceTests
             {
                 Alias = "mandatoryProperty", Name = "Mandatory Property", Mandatory = true
             });
-        await ContentTypeService.SaveAsync(ContentType, Constants.Security.SuperUserKey);
+        await ContentTypeService.UpdateAsync(ContentType, Constants.Security.SuperUserKey);
 
         result = await ContentPublishingService.PublishAsync(Textpage.Key, [new CulturePublishScheduleModel()], Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
@@ -683,7 +683,7 @@ public partial class ContentPublishingServiceTests
             {
                 Alias = "mandatoryProperty", Name = "Mandatory Property", Mandatory = true
             });
-        await ContentTypeService.SaveAsync(ContentType, Constants.Security.SuperUserKey);
+        await ContentTypeService.UpdateAsync(ContentType, Constants.Security.SuperUserKey);
 
         // force an update on the root page so it is valid (and also subject to branch republishing).
         // if we didn't do this, the children would never be considered for branch publishing, as the publish logic

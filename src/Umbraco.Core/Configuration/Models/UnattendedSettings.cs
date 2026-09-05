@@ -16,6 +16,7 @@ public class UnattendedSettings
     private const bool StaticInstallUnattended = false;
     private const bool StaticUpgradeUnattended = false;
     private const TelemetryLevel StaticTelemetryLevel = TelemetryLevel.Detailed;
+    private const string StaticMigrationClaimTimeout = "02:00:00";
 
     /// <summary>
     ///     Gets or sets a value indicating whether unattended installs are enabled.
@@ -44,6 +45,17 @@ public class UnattendedSettings
     ///     This is true by default.
     /// </remarks>
     public bool PackageMigrationsUnattended { get; set; } = true;
+
+    /// <summary>
+    ///     Gets or sets the maximum time a migration leadership claim is considered valid before
+    ///     another server may take over. Protects against a leader crashing mid-migration.
+    /// </summary>
+    /// <remarks>
+    ///     Only relevant in load-balanced deployments with <see cref="UpgradeUnattended"/> enabled.
+    ///     Default is 2 hours, which should exceed the longest reasonable migration run time.
+    /// </remarks>
+    [DefaultValue(StaticMigrationClaimTimeout)]
+    public TimeSpan MigrationClaimTimeout { get; set; } = TimeSpan.Parse(StaticMigrationClaimTimeout);
 
     /// <summary>
     ///     Gets or sets a value to use for creating a user with a name for Unattended Installs

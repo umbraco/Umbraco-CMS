@@ -4,13 +4,13 @@ import { fromCamelCase } from '@umbraco-cms/backoffice/utils';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_COLLECTION_CONTEXT, UmbCollectionDefaultElement } from '@umbraco-cms/backoffice/collection';
 import type { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
-import type { UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
+import type { UUISelectEvent, UUISelectOption } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-extension-collection')
 export class UmbExtensionCollectionElement extends UmbCollectionDefaultElement {
 	#collectionContext?: UmbDefaultCollectionContext<UmbExtensionCollectionItemModel, UmbExtensionCollectionFilterModel>;
 
-	#options: Array<Option> = [];
+	#options: Array<UUISelectOption> = [];
 
 	constructor() {
 		super();
@@ -19,11 +19,15 @@ export class UmbExtensionCollectionElement extends UmbCollectionDefaultElement {
 			this.#collectionContext = collectionContext;
 		});
 
-		this.observe(umbExtensionsRegistry.extensions, (extensions) => {
-			const types = [...new Set(extensions.map((x) => x.type))];
-			const options = types.sort().map((x) => ({ name: fromCamelCase(x), value: x }));
-			this.#options = [{ name: 'All', value: '' }, ...options];
-		});
+		this.observe(
+			umbExtensionsRegistry.extensions,
+			(extensions) => {
+				const types = [...new Set(extensions.map((x) => x.type))];
+				const options = types.sort().map((x) => ({ name: fromCamelCase(x), value: x }));
+				this.#options = [{ name: 'All', value: '' }, ...options];
+			},
+			null,
+		);
 	}
 
 	#onChange(event: UUISelectEvent) {

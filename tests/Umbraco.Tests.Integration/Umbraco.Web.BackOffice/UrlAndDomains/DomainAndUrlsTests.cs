@@ -7,7 +7,6 @@ using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Packaging;
-using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Navigation;
@@ -26,7 +25,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.UrlAndDomains;
 internal sealed class DomainAndUrlsTests : UmbracoIntegrationTest
 {
     [SetUp]
-    public void Setup()
+    public new void Setup()
     {
         var xml = PackageMigrationResource.GetEmbeddedPackageDataManifest(GetType());
         var packagingService = GetRequiredService<IPackagingService>();
@@ -35,9 +34,12 @@ internal sealed class DomainAndUrlsTests : UmbracoIntegrationTest
         Root = InstallationSummary.ContentInstalled.First();
         ContentService.Publish(Root, Root.AvailableCultures.ToArray());
 
+        // Note: this SetUp must remain synchronous. EnsureUmbracoContext() below writes to an AsyncLocal
+        // (via HybridUmbracoContextAccessor) and AsyncLocal mutations made inside an awaited Task do not
+        // flow back to the test method's execution context.
         var cultures = new List<string>
         {
-            GetRequiredService<ILocalizationService>().GetDefaultLanguageIsoCode()
+            GetRequiredService<ILanguageService>().GetDefaultIsoCodeAsync().GetAwaiter().GetResult(),
         };
 
         foreach (var language in InstallationSummary.LanguagesInstalled)
@@ -240,6 +242,66 @@ internal sealed class DomainAndUrlsTests : UmbracoIntegrationTest
     }
 
     [Test]
+    public async Task Can_Resolve_Urls_Restricted_To_A_Single_Culture()
+    {
+        var domainService = GetRequiredService<IDomainService>();
+        var updateModel = new DomainsUpdateModel
+        {
+            Domains = Cultures.Select(culture => new DomainModel
+            {
+                DomainName = GetDomainUrlFromCultureCode(culture),
+                IsoCode = culture,
+            })
+        };
+
+        var result = await domainService.UpdateDomainsAsync(Root.Key, updateModel);
+        Assert.IsTrue(result.Success);
+
+        var culture = Cultures[1];
+        var publishedUrlInfoProvider = GetRequiredService<IPublishedUrlInfoProvider>();
+
+        var allUrls = await publishedUrlInfoProvider.GetAllAsync(Root);
+        var cultureUrls = await publishedUrlInfoProvider.GetAllAsync(Root, culture);
+
+        Assert.Multiple(() =>
+        {
+            // The culture-scoped result contains only the requested culture.
+            Assert.IsNotEmpty(cultureUrls);
+            CollectionAssert.AreEquivalent(new[] { culture }, cultureUrls.Select(x => x.Culture).Distinct());
+
+            // The culture-scoped result equals the all-cultures result filtered to that culture.
+            CollectionAssert.AreEquivalent(
+                allUrls.Where(x => x.Culture == culture).Select(x => x.Url?.ToString()),
+                cultureUrls.Select(x => x.Url?.ToString()));
+        });
+    }
+
+    [Test]
+    public async Task Cannot_Resolve_Urls_For_An_Unknown_Culture()
+    {
+        var domainService = GetRequiredService<IDomainService>();
+        var updateModel = new DomainsUpdateModel
+        {
+            Domains = Cultures.Select(culture => new DomainModel
+            {
+                DomainName = GetDomainUrlFromCultureCode(culture),
+                IsoCode = culture,
+            })
+        };
+
+        var result = await domainService.UpdateDomainsAsync(Root.Key, updateModel);
+        Assert.IsTrue(result.Success);
+
+        var publishedUrlInfoProvider = GetRequiredService<IPublishedUrlInfoProvider>();
+
+        var unknownCultureUrls = await publishedUrlInfoProvider.GetAllAsync(Root, "xx-XX");
+
+        // An unknown culture is not an installed culture, so there are no urls to report for it -
+        // rather than falling back to (expensively) resolving all cultures.
+        Assert.IsEmpty(unknownCultureUrls);
+    }
+
+    [Test]
     public async Task Can_Resolve_Urls_For_Non_Default_Domain_Culture_Only()
     {
         var culture = Cultures[1];
@@ -297,35 +359,31 @@ internal sealed class DomainAndUrlsTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Use_Obsolete_Save()
+    public async Task Cannot_Update_Domains_For_Non_Existent_Content()
     {
-        foreach (var culture in Cultures)
+        var domainService = GetRequiredService<IDomainService>();
+        var updateModel = new DomainsUpdateModel
         {
-            SetDomainOnContent(Root, culture, GetDomainUrlFromCultureCode(culture));
-        }
+            Domains = new DomainModel { DomainName = "/domain", IsoCode = Cultures.First() }.Yield()
+        };
 
-        var domains = GetRequiredService<IDomainService>().GetAssignedDomains(Root.Id, true);
-        Assert.AreEqual(3, domains.Count());
+        var result = await domainService.UpdateDomainsAsync(Guid.NewGuid(), updateModel);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(DomainOperationStatus.ContentNotFound, result.Status);
     }
 
     [Test]
-    public void Can_Use_Obsolete_Delete()
+    public async Task Cannot_Update_Domains_With_Unknown_Iso_Code()
     {
-        foreach (var culture in Cultures)
-        {
-            SetDomainOnContent(Root, culture, GetDomainUrlFromCultureCode(culture));
-        }
-
         var domainService = GetRequiredService<IDomainService>();
+        var updateModel = new DomainsUpdateModel
+        {
+            Domains = new DomainModel { DomainName = "/domain", IsoCode = "xx-XX" }.Yield()
+        };
 
-        var domains = domainService.GetAssignedDomains(Root.Id, true);
-        Assert.AreEqual(3, domains.Count());
-
-        var result = domainService.Delete(domains.First());
-        Assert.IsTrue(result.Success);
-
-        domains = domainService.GetAssignedDomains(Root.Id, true);
-        Assert.AreEqual(2, domains.Count());
+        var result = await domainService.UpdateDomainsAsync(Root.Key, updateModel);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(DomainOperationStatus.LanguageNotFound, result.Status);
     }
 
     [TestCase("/domain")]
@@ -393,14 +451,6 @@ internal sealed class DomainAndUrlsTests : UmbracoIntegrationTest
 
     private static string GetDomainUrlFromCultureCode(string culture) =>
         "/" + culture.Replace("-", string.Empty).ToLower() + "/";
-
-    private void SetDomainOnContent(IContent content, string cultureIsoCode, string domain)
-    {
-        var domainService = GetRequiredService<IDomainService>();
-        var langId = GetRequiredService<ILocalizationService>().GetLanguageIdByIsoCode(cultureIsoCode);
-        domainService.Save(
-            new UmbracoDomain(domain) { RootContentId = content.Id, LanguageId = langId });
-    }
 
     private IEnumerable<UrlInfo> GetContentUrlsAsync(IContent root) =>
         root.GetContentUrlsAsync(

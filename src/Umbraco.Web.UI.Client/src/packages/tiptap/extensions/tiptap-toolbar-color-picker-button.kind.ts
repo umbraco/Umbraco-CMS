@@ -6,6 +6,9 @@ export const manifest: UmbExtensionManifestKind = {
 	matchKind: 'colorPickerButton',
 	matchType: 'tiptapToolbarExtension',
 	manifest: {
-		element: () => import('../components/toolbar/tiptap-toolbar-color-picker-button.element.js'),
+		element: () =>
+			import('./extension-apis.bundle.js').then((m) => ({
+				default: m.UmbTiptapToolbarColorPickerButtonElement,
+			})),
 	},
 };

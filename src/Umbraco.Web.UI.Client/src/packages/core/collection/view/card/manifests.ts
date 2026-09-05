@@ -1,3 +1,4 @@
+import { UmbCardCollectionViewElement } from './card-collection-view.element.js';
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
 export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [
@@ -9,7 +10,7 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 		manifest: {
 			type: 'collectionView',
 			kind: 'card',
-			element: () => import('./card-collection-view.element.js'),
+			element: UmbCardCollectionViewElement,
 			weight: 800,
 			meta: {
 				label: 'Cards',

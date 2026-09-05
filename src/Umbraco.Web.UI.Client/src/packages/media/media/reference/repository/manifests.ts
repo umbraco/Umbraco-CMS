@@ -1,4 +1,5 @@
 import { UMB_MEDIA_REFERENCE_REPOSITORY_ALIAS } from './constants.js';
+import { UmbMediaReferenceResponseManagementApiDataMapping } from './media-reference-response.management-api.mapping.js';
 import { UMB_MANAGEMENT_API_DATA_SOURCE_ALIAS } from '@umbraco-cms/backoffice/repository';
 
 export const manifests: Array<UmbExtensionManifest> = [
@@ -12,7 +13,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'dataSourceDataMapping',
 		alias: 'Umb.DataSourceDataMapping.ManagementApi.MediaReferenceResponse',
 		name: 'Media Reference Response Management Api Data Mapping',
-		api: () => import('./media-reference-response.management-api.mapping.js'),
+		api: UmbMediaReferenceResponseManagementApiDataMapping,
 		forDataSource: UMB_MANAGEMENT_API_DATA_SOURCE_ALIAS,
 		forDataModel: 'MediaReferenceResponseModel',
 	},

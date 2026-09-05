@@ -5,7 +5,7 @@ namespace Umbraco.Cms.Tests.Common.Builders;
 
 public abstract class ContentTypeEditingBaseBuilder<TBuilder, TCreateModel, TPropertyType, TPropertyTypeContainer> :
     IWithAliasBuilder, IWithNameBuilder, IWithDescriptionBuilder, IWithIconBuilder, IWithAllowAsRootBuilder,
-    IWithIsElementBuilder, IWithVariesByCultureBuilder,
+    IWithAllowedInLibraryBuilder, IWithIsElementBuilder, IWithVariesByCultureBuilder,
     IWithVariesBySegmentBuilder
     where TBuilder : ContentTypeEditingBaseBuilder<TBuilder, TCreateModel, TPropertyType, TPropertyTypeContainer>
     where TCreateModel : ContentTypeEditingModelBase<TPropertyType, TPropertyTypeContainer>, new()
@@ -18,6 +18,7 @@ public abstract class ContentTypeEditingBaseBuilder<TBuilder, TCreateModel, TPro
     private string? _description;
     private string _icon;
     private bool? _allowedAsRoot;
+    private bool? _allowedInLibrary;
     private bool? _isElement;
     private bool? _variesByCulture;
     private bool? _variesBySegment;
@@ -53,6 +54,12 @@ public abstract class ContentTypeEditingBaseBuilder<TBuilder, TCreateModel, TPro
     {
         get => _allowedAsRoot ?? false;
         set => _allowedAsRoot = value;
+    }
+
+    bool? IWithAllowedInLibraryBuilder.AllowedInLibrary
+    {
+        get => _allowedInLibrary ?? false;
+        set => _allowedInLibrary = value;
     }
 
     bool? IWithIsElementBuilder.IsElement
@@ -105,6 +112,7 @@ public abstract class ContentTypeEditingBaseBuilder<TBuilder, TCreateModel, TPro
         _model.Description = _description;
         _model.Icon = _icon ?? _model.Icon;
         _model.AllowedAsRoot = _allowedAsRoot ?? false;
+        _model.AllowedInLibrary = _allowedInLibrary ?? false;
         _model.IsElement = _isElement ?? _model.IsElement;
         _model.VariesByCulture = _variesByCulture ?? _model.VariesByCulture;
         _model.VariesBySegment = _variesBySegment ?? _model.VariesBySegment;

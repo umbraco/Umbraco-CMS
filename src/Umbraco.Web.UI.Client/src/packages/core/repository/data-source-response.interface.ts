@@ -1,4 +1,4 @@
-import type { UmbApiError, UmbCancelError, UmbError } from '../resources/umb-error.js';
+import type { UmbApiError, UmbCancelError, UmbError } from '@umbraco-cms/backoffice/resources';
 
 export interface UmbDataSourceResponse<T = unknown> extends UmbDataSourceErrorResponse {
 	/**

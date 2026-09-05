@@ -1,13 +1,13 @@
-import { UmbFormControlMixin } from '../../validation/mixins/index.js';
+import { UmbFormControlMixin, UMB_VALIDATION_EMPTY_LOCALIZATION_KEY } from '@umbraco-cms/backoffice/validation';
 import { customElement, html, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UUISliderEvent } from '@umbraco-cms/backoffice/external/uui';
-import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY } from '@umbraco-cms/backoffice/validation';
 
 /**
- *
- * @param value
+ * Splits a comma-separated slider value string into its from/to numbers.
+ * @param {string | undefined} value The comma-separated value string, e.g. "1,10".
+ * @returns {Partial<[number | undefined, number | undefined]>} The parsed from/to numbers.
  */
 function splitString(value: string | undefined): Partial<[number | undefined, number | undefined]> {
 	const [from, to] = (value ?? ',').split(',');
@@ -16,9 +16,10 @@ function splitString(value: string | undefined): Partial<[number | undefined, nu
 }
 
 /**
- *
- * @param value
- * @param fallback
+ * Parses a string to a number, returning the fallback if it is not a valid number.
+ * @param {string | undefined} value The value to parse.
+ * @param {number | undefined} fallback The value to return if parsing fails.
+ * @returns {number | undefined} The parsed number, or the fallback.
  */
 function makeNumberOrUndefined(value: string | undefined, fallback?: undefined | number) {
 	if (value === undefined) {
@@ -32,12 +33,42 @@ function makeNumberOrUndefined(value: string | undefined, fallback?: undefined |
 }
 
 /**
- *
- * @param value
- * @param fallback
+ * Converts a number to a string, using the fallback if the value is undefined.
+ * @param {number | undefined} value The value to convert.
+ * @param {number} fallback The value to use if `value` is undefined.
+ * @returns {string} The resulting string.
  */
 function undefinedFallbackToString(value: number | undefined, fallback: number): string {
 	return (value === undefined ? fallback : value).toString();
+}
+
+/**
+ * Counts the number of decimal places in a number.
+ * @param {number} num The number to inspect.
+ * @returns {number} The number of decimal places.
+ */
+function countDecimalPlaces(num: number): number {
+	const str = num.toString();
+	const decimalIndex = str.indexOf('.');
+	return decimalIndex >= 0 ? str.length - decimalIndex - 1 : 0;
+}
+
+/**
+ * Rounds each numeric part of a slider value string to the given step precision.
+ * This corrects IEEE 754 floating-point artifacts (e.g. 0.30000000000000004 → 0.3).
+ * @param {string} raw - The raw value string from the UUI slider (e.g. "0.1,0.30000000000000004")
+ * @param {number} step - The step increment for determining decimal precision
+ * @returns {string} The value string with each part rounded to the step's decimal precision.
+ */
+function roundToStepPrecision(raw: string, step: number): string {
+	const decimals = countDecimalPlaces(step);
+	return raw
+		.split(',')
+		.map((part) => {
+			const n = Number(part);
+			return isNaN(n) ? part : n.toFixed(decimals);
+		})
+		.join(',');
 }
 
 @customElement('umb-input-slider')
@@ -100,6 +131,9 @@ export class UmbInputSliderElement extends UmbFormControlMixin<string, typeof Um
 			super.value = `${undefinedFallbackToString(this.valueLow, this.min)}`;
 		}
 	}
+
+	@property({ type: Number, attribute: 'min-gap' })
+	minGap = 0;
 
 	@property({ type: Boolean, attribute: 'enable-range' })
 	enableRange = false;
@@ -173,6 +207,24 @@ export class UmbInputSliderElement extends UmbFormControlMixin<string, typeof Um
 				return false;
 			},
 		);
+
+		this.addValidator(
+			'customError',
+			() => {
+				return this.localize.term('validation_minimumRange', [this.minGap?.toString()]);
+			},
+			() => {
+				if (this.enableRange && this.minGap > 0) {
+					const [from, to] = splitString(this.value);
+					if (from !== undefined && to !== undefined) {
+						const decimals = countDecimalPlaces(this.step);
+						const span = Number((to - from).toFixed(decimals));
+						return span < this.minGap;
+					}
+				}
+				return false;
+			},
+		);
 	}
 
 	protected override getFormElement() {
@@ -181,7 +233,7 @@ export class UmbInputSliderElement extends UmbFormControlMixin<string, typeof Um
 
 	#onChange(event: UUISliderEvent) {
 		event.stopPropagation();
-		this.value = event.target.value as string;
+		this.value = roundToStepPrecision(event.target.value as string, this.step);
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
@@ -211,6 +263,7 @@ export class UmbInputSliderElement extends UmbFormControlMixin<string, typeof Um
 				.min=${this.min}
 				.max=${this.max}
 				.step=${this.step}
+				.minGap=${this.minGap}
 				.value="${undefinedFallbackToString(this.valueLow, this.min).toString()},${undefinedFallbackToString(
 					this.valueHigh,
 					this.max,

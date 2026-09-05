@@ -1,7 +1,7 @@
 import type { UmbInstallerContext } from '../installer.context.js';
 import { UMB_INSTALLER_CONTEXT } from '../installer.context.js';
 
-import type { UUIButtonElement } from '@umbraco-cms/backoffice/external/uui';
+import type { UUIButtonElement, UUISelectOption } from '@umbraco-cms/backoffice/external/uui';
 import type { CSSResultGroup } from '@umbraco-cms/backoffice/external/lit';
 import { css, html, nothing, customElement, property, query, state } from '@umbraco-cms/backoffice/external/lit';
 import type {
@@ -21,7 +21,7 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 	public databaseFormData!: DatabaseInstallRequestModel;
 
 	@state()
-	private _options: Option[] = [];
+	private _options: UUISelectOption[] = [];
 
 	@state()
 	private _databases: DatabaseSettingsPresentationModel[] = [];
@@ -263,6 +263,7 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 				label="Database name"
 				@input=${this._handleChange}
 				placeholder="umbraco"
+				autocomplete="off"
 				required
 				required-message="Database name is required"></uui-input>
 		</uui-form-layout-item>`;
@@ -284,6 +285,7 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 									name="username"
 									label="Username"
 									@input=${this._handleChange}
+									autocomplete="off"
 									required
 									required-message="Username is required"></uui-input>
 							</uui-form-layout-item>
@@ -297,7 +299,7 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 									name="password"
 									label="Password"
 									@input=${this._handleChange}
-									autocomplete="new-password"
+									autocomplete="off"
 									required
 									required-message="Password is required"></uui-input>
 							</uui-form-layout-item>`

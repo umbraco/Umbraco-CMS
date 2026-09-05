@@ -2,9 +2,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 
@@ -21,7 +19,6 @@ public class BackOfficeDefaultController : Controller
     /// Initializes a new instance of the <see cref="BackOfficeDefaultController"/> class.
     /// </summary>
     /// <param name="umbracoRuntime">An instance of <see cref="IRuntime"/> representing the Umbraco runtime environment.</param>
-    [ActivatorUtilitiesConstructor]
     public BackOfficeDefaultController(IRuntime umbracoRuntime)
         => _umbracoRuntime = umbracoRuntime;
 
@@ -57,7 +54,7 @@ public class BackOfficeDefaultController : Controller
     /// <summary>
     ///     Returns the default view for the BackOffice
     /// </summary>
-    /// <returns>The default view currently /umbraco/UmbracoBackOffice/Default.cshtml</returns>
+    /// <returns>The default view currently /umbraco/UmbracoBackOffice/Index.cshtml</returns>
     public ViewResult DefaultView()
     {
         var viewPath = Path.Combine(Constants.SystemDirectories.Umbraco, Constants.Web.Mvc.BackOfficeArea, nameof(Index) + ".cshtml")

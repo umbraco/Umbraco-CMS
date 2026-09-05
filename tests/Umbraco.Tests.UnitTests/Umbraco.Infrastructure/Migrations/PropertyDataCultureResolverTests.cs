@@ -131,6 +131,20 @@ internal sealed class PropertyDataCultureResolverTests
     }
 
     [Test]
+    public void CreateMigrationProperty_CultureAndSegmentVaryingPropertyType_NullCulture_WithSegment_DoesNotThrow()
+    {
+        // #23357: invariant (null culture) data that still carries a segment on a
+        // culture+segment-varying property type must not throw.
+        var propertyType = CreateConcretePropertyType(ContentVariation.CultureAndSegment);
+
+        var property = PropertyDataCultureResolver.CreateMigrationProperty(
+            propertyType, "test value", culture: null, segment: "engage_personalization_1");
+
+        Assert.That(property, Is.Not.Null);
+        Assert.That(property.GetValue(null, "engage_personalization_1"), Is.EqualTo("test value"));
+    }
+
+    [Test]
     public void CreateMigrationProperty_DoesNotMutateOriginalPropertyType()
     {
         var propertyType = CreateConcretePropertyType(ContentVariation.Culture);

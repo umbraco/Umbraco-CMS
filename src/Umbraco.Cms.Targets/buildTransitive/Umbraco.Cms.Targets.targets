@@ -49,4 +49,39 @@
       <ContentWithTargetPath Include="@(_UmbracoFolderFiles)" Exclude="@(ContentWithTargetPath)" TargetPath="%(Identity)" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
     </ItemGroup>
   </Target>
+
+  <!--
+    The Razor source generator needs .cshtml files in @(AdditionalFiles). The Razor SDK adds them
+    via @(RazorGenerate), but only inside a target that runs during the build — so during cohost
+    design-time builds they may not be present yet, which is what PR #21861 worked around.
+
+    Doing the include at evaluation time (as PR #21861 did) causes duplicates with the SDK during
+    dotnet watch / hot reload design-time builds: the SDK adds the same .cshtml under a different
+    item Identity (slash form / relative vs absolute) and the generator then sees two inputs that
+    derive the same hintName, which crashes it with CS8785 (see issue #22773).
+
+    Run as a target before CoreCompile (hot-reload path) and CompileDesignTime (IDE design-time path)
+    so the SDK's contribution is visible in both cases. Then add only the .cshtml files that are not already
+    present. Both sides are normalized to %(FullPath) so items with different Identity forms still compare equal.
+
+    Set EnableCohostEditorCompatibility=false in a project to opt out entirely.
+  -->
+  <Target Name="_UmbracoEnsureRazorAdditionalFilesForCohostEditor"
+          BeforeTargets="CoreCompile;CompileDesignTime"
+          Condition="'$(DesignTimeBuild)' == 'true' and '$(EnableCohostEditorCompatibility)' != 'false'">
+    <ItemGroup>
+      <_UmbracoCshtmlCandidate Include="**\*.cshtml" />
+      <_UmbracoCshtmlCandidateFull Include="@(_UmbracoCshtmlCandidate->'%(FullPath)')" />
+
+      <_UmbracoExistingAdditionalCshtmlFull
+        Include="@(AdditionalFiles->'%(FullPath)')"
+        Condition="'%(Extension)' == '.cshtml'" />
+
+      <_UmbracoCshtmlMissingFromAdditional
+        Include="@(_UmbracoCshtmlCandidateFull)"
+        Exclude="@(_UmbracoExistingAdditionalCshtmlFull)" />
+
+      <AdditionalFiles Include="@(_UmbracoCshtmlMissingFromAdditional)" />
+    </ItemGroup>
+  </Target>
 </Project>

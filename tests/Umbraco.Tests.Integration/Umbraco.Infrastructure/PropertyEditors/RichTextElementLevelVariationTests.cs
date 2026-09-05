@@ -21,10 +21,10 @@ internal sealed class RichTextElementLevelVariationTests : BlockEditorElementVar
     [Test]
     public async Task Can_Publish_Cultures_Independently()
     {
-        var elementType = CreateElementType(ContentVariation.Culture);
+        var elementType = await CreateElementType(ContentVariation.Culture);
 
         var rteDataType = await CreateRichTextDataType(elementType);
-        var contentType = CreateContentType(rteDataType);
+        var contentType = await CreateContentType(rteDataType);
         var richTextValue = CreateRichTextValue(elementType);
         var content = CreateContent(contentType, richTextValue);
 
@@ -179,10 +179,10 @@ internal sealed class RichTextElementLevelVariationTests : BlockEditorElementVar
     [Test]
     public async Task Can_Publish_With_Blocks_Removed()
     {
-        var elementType = CreateElementType(ContentVariation.Culture);
+        var elementType = await CreateElementType(ContentVariation.Culture);
 
         var rteDataType = await CreateRichTextDataType(elementType);
-        var contentType = CreateContentType(rteDataType);
+        var contentType = await CreateContentType(rteDataType);
         var richTextValue = CreateRichTextValue(elementType);
         var content = CreateContent(contentType, richTextValue);
 
@@ -284,10 +284,10 @@ internal sealed class RichTextElementLevelVariationTests : BlockEditorElementVar
     [Test]
     public async Task Markup_Follows_Invariance()
     {
-        var elementType = CreateElementType(ContentVariation.Culture);
+        var elementType = await CreateElementType(ContentVariation.Culture);
 
         var rteDataType = await CreateRichTextDataType(elementType);
-        var contentType = CreateContentType(rteDataType);
+        var contentType = await CreateContentType(rteDataType);
         var richTextValue = CreateRichTextValue(elementType);
         var content = CreateContent(contentType, richTextValue);
 
@@ -368,10 +368,10 @@ internal sealed class RichTextElementLevelVariationTests : BlockEditorElementVar
     [Test]
     public async Task Can_Publish_Without_Blocks_Variant()
     {
-        var elementType = CreateElementType(ContentVariation.Culture);
+        var elementType = await CreateElementType(ContentVariation.Culture);
 
         var rteDataType = await CreateRichTextDataType(elementType);
-        var contentType = CreateContentType(rteDataType);
+        var contentType = await CreateContentType(rteDataType);
         var richTextValue = new RichTextEditorValue { Markup = "<p>Markup here</p>", Blocks = null };
         var content = CreateContent(contentType, richTextValue);
 
@@ -397,10 +397,10 @@ internal sealed class RichTextElementLevelVariationTests : BlockEditorElementVar
     [Test]
     public async Task Can_Publish_Without_Blocks_Invariant()
     {
-        var elementType = CreateElementType(ContentVariation.Culture);
+        var elementType = await CreateElementType(ContentVariation.Culture);
 
         var rteDataType = await CreateRichTextDataType(elementType);
-        var contentType = CreateContentType(ContentVariation.Nothing, rteDataType);
+        var contentType = await CreateContentType(ContentVariation.Nothing, rteDataType);
         var richTextValue = new RichTextEditorValue { Markup = "<p>Markup here</p>", Blocks = null };
         var content = CreateContent(contentType, richTextValue);
 
@@ -426,10 +426,10 @@ internal sealed class RichTextElementLevelVariationTests : BlockEditorElementVar
     [Test]
     public async Task Can_Index_Cultures_Independently_Invariant_Blocks()
     {
-        var elementType = CreateElementType(ContentVariation.Culture);
+        var elementType = await CreateElementType(ContentVariation.Culture);
 
         var rteDataType = await CreateRichTextDataType(elementType);
-        var contentType = CreateContentType(rteDataType);
+        var contentType = await CreateContentType(rteDataType);
         var richTextValue = CreateRichTextValue(elementType);
         var content = CreateContent(contentType, richTextValue);
         PublishContent(content, ["en-US", "da-DK"]);
@@ -492,10 +492,10 @@ internal sealed class RichTextElementLevelVariationTests : BlockEditorElementVar
     [TestCase(false)]
     public async Task Can_Index_With_Unexposed_Blocks(bool published)
     {
-        var elementType = CreateElementType(ContentVariation.Culture);
+        var elementType = await CreateElementType(ContentVariation.Culture);
 
         var rteDataType = await CreateRichTextDataType(elementType);
-        var contentType = CreateContentType(rteDataType);
+        var contentType = await CreateContentType(rteDataType);
         var richTextValue = CreateRichTextValue(elementType);
         richTextValue.Blocks!.Expose.RemoveAll(e => e.Culture == "da-DK");
 
@@ -572,10 +572,10 @@ internal sealed class RichTextElementLevelVariationTests : BlockEditorElementVar
     [TestCase(ContentVariation.Nothing)]
     public async Task Can_Index_Cultures_Independently_Variant_Blocks(ContentVariation elementTypeVariation)
     {
-        var elementType = CreateElementType(elementTypeVariation);
+        var elementType = await CreateElementType(elementTypeVariation);
 
         var rteDataType = await CreateRichTextDataType(elementType);
-        var contentType = CreateContentType(ContentVariation.Culture, rteDataType, ContentVariation.Culture);
+        var contentType = await CreateContentType(ContentVariation.Culture, rteDataType, ContentVariation.Culture);
 
         var englishRichTextValue = CreateInvariantRichTextValue("en-US");
         var danishRichTextValue = CreateInvariantRichTextValue("da-DK");
@@ -664,6 +664,81 @@ internal sealed class RichTextElementLevelVariationTests : BlockEditorElementVar
         }
     }
 
+    [TestCase("en-US", "variantText value for en-US")]
+    [TestCase("da-DK", "variantText value for da-DK")]
+    public async Task Can_Become_Invariant_After_Publish_For_Variant_Block_Property(string culture, string expectedVariantValue)
+    {
+        var elementType = await CreateElementType(ContentVariation.Culture);
+        var rteDataType = await CreateRichTextDataType(elementType);
+        var contentType = await CreateContentType(ContentVariation.Culture, rteDataType, ContentVariation.Culture);
+
+        var contentElementKey = Guid.NewGuid();
+
+        // Each culture of this block property is stored as its own document, and a document can carry entries
+        // for cultures other than its own. The value retained must be the one for the culture being mapped,
+        // not the default language's.
+        RichTextEditorValue RichTextValueFor(string valueCulture) => new()
+        {
+            Markup = $"""
+                      <p>Some text for {valueCulture}.</p>
+                      <umb-rte-block data-content-key="{contentElementKey:D}"><!--Umbraco-Block--></umb-rte-block>
+                      """,
+            Blocks = new RichTextBlockValue([new RichTextBlockLayoutItem(contentElementKey)])
+            {
+                ContentData =
+                [
+                    new(contentElementKey, elementType.Key, elementType.Alias)
+                    {
+                        Values =
+                        [
+                            new() { Alias = "invariantText", Value = "The invariant value" },
+                            new() { Alias = "variantText", Culture = "en-US", Value = valueCulture == "en-US" ? "variantText value for en-US" : null },
+                            new() { Alias = "variantText", Culture = "da-DK", Value = valueCulture == "da-DK" ? "variantText value for da-DK" : null },
+                        ],
+                    },
+                ],
+                SettingsData = [],
+                Expose =
+                [
+                    new(contentElementKey, "en-US", null),
+                    new(contentElementKey, "da-DK", null),
+                ],
+            },
+        };
+
+        var content = CreateContent(contentType);
+        content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(RichTextValueFor("en-US")), "en-US");
+        content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(RichTextValueFor("da-DK")), "da-DK");
+        ContentService.Save(content);
+
+        PublishContent(content, ["en-US", "da-DK"]);
+
+        // the element type is made invariant after publishing. the "blocks" property varies by culture, so each culture
+        // holds its own block value - which means every culture retains the value it was published with.
+        elementType.Variations = ContentVariation.Nothing;
+        elementType.PropertyTypes.First(pt => pt.Alias == "variantText").Variations = ContentVariation.Nothing;
+        await ContentTypeService.UpdateAsync(elementType, Constants.Security.SuperUserKey);
+
+        RefreshContentTypeCache(elementType);
+
+        SetVariationContext(culture, null);
+
+        var publishedContent = GetPublishedContent(content.Key);
+        var property = publishedContent.GetProperty("blocks");
+        Assert.IsNotNull(property);
+
+        var propertyValue = property.GetDeliveryApiValue(false, culture) as RichTextModel;
+        Assert.IsNotNull(propertyValue);
+
+        var blocks = propertyValue.Blocks.ToArray();
+        Assert.AreEqual(1, blocks.Length);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual("The invariant value", blocks[0].Content.Properties["invariantText"]);
+            Assert.AreEqual(expectedVariantValue, blocks[0].Content.Properties["variantText"]);
+        });
+    }
+
     private async Task<IDataType> CreateRichTextDataType(IContentType elementType)
         => await CreateBlockEditorDataType(
             Constants.PropertyEditors.Aliases.RichText,
@@ -676,8 +751,8 @@ internal sealed class RichTextElementLevelVariationTests : BlockEditorElementVar
                 }
             });
 
-    private IContentType CreateContentType(IDataType blockListDataType)
-        => CreateContentType(ContentVariation.Culture, blockListDataType);
+    private async Task<IContentType> CreateContentType(IDataType blockListDataType)
+        => await CreateContentType(ContentVariation.Culture, blockListDataType);
 
     private RichTextEditorValue CreateRichTextValue(IContentType elementType)
     {
@@ -812,9 +887,9 @@ internal sealed class RichTextElementLevelVariationTests : BlockEditorElementVar
     public async Task Publishing_After_Changing_Element_Property_From_Variant_To_Invariant_Does_Not_Keep_Old_Culture_Specific_Values(bool republishEnglish, bool republishDanish)
     {
         // 1. Create element type WITH culture variation
-        var elementType = CreateElementType(ContentVariation.Culture);
+        var elementType = await CreateElementType(ContentVariation.Culture);
         var rteDataType = await CreateRichTextDataType(elementType);
-        var contentType = CreateContentType(rteDataType);
+        var contentType = await CreateContentType(rteDataType);
 
         // 2. Create a simple rich text value with a single block for clarity
         var contentElementKey = Guid.NewGuid();
@@ -871,7 +946,7 @@ internal sealed class RichTextElementLevelVariationTests : BlockEditorElementVar
             propertyType.Variations = ContentVariation.Nothing;
         }
 
-        ContentTypeService.Save(elementType);
+        await ContentTypeService.CreateAsync(elementType, Constants.Security.SuperUserKey);
 
         // 4. Update the content values to be invariant
         richTextValue = JsonSerializer.Deserialize<RichTextEditorValue>((string)content.Properties["blocks"]!.GetValue()!)!;
@@ -950,11 +1025,11 @@ internal sealed class RichTextElementLevelVariationTests : BlockEditorElementVar
     public async Task Publishing_After_Changing_Element_Property_From_Invariant_To_Variant_Does_Not_Keep_Old_Invariant_Values(bool republishEnglish, bool republishDanish)
     {
         // 1. Create variant element type WITHOUT variant properties
-        var elementType = CreateElementType(ContentVariation.Culture);
+        var elementType = await CreateElementType(ContentVariation.Culture);
         elementType.PropertyTypes.First(p => p.Alias == "variantText").Variations = ContentVariation.Nothing;
         await ContentTypeService.UpdateAsync(elementType, Constants.Security.SuperUserKey);
         var rteDataType = await CreateRichTextDataType(elementType);
-        var contentType = CreateContentType(rteDataType);
+        var contentType = await CreateContentType(rteDataType);
 
         // 2. Create a simple rich text value with a single block
         var contentElementKey = Guid.NewGuid();
@@ -1025,7 +1100,7 @@ internal sealed class RichTextElementLevelVariationTests : BlockEditorElementVar
             propertyType.Variations = ContentVariation.Culture;
         }
 
-        ContentTypeService.Save(elementType);
+        await ContentTypeService.CreateAsync(elementType, Constants.Security.SuperUserKey);
 
         // 4. Update the content values to have culture-specific values
         richTextValue = JsonSerializer.Deserialize<RichTextEditorValue>((string)content.Properties["blocks"]!.GetValue()!)!;
