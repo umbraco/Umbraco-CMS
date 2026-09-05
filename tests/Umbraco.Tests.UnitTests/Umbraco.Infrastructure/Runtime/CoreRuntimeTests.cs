@@ -1,6 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
@@ -18,6 +19,7 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Install;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Runtime;
+using Umbraco.Cms.Infrastructure.Sync;
 using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Runtime;
@@ -339,9 +341,83 @@ public class CoreRuntimeTests
             Times.Once);
     }
 
+    /// <summary>
+    /// On a normal startup at Run level, CoreRuntime resolves the shared IServerRoleElector from its optional
+    /// service provider and makes it attempt to elect the server role before the starting notification is
+    /// published. The election guard/mechanics themselves belong to ServerRoleElector - see
+    /// ServerRoleElectorTests - this only verifies CoreRuntime's own responsibility: resolving and calling it.
+    /// </summary>
+    [Test]
+    public async Task StartAsync_WhenRunLevel_CallsServerRoleElector()
+    {
+        var runtimeState = CreateMockRuntimeState(RuntimeLevel.Run);
+        var eventAggregator = new Mock<IEventAggregator>();
+        SetupAllNotifications(eventAggregator);
+
+        var serverRoleElector = new Mock<IServerRoleElector>();
+        IServiceProvider serviceProvider = CreateServiceProvider(serverRoleElector.Object);
+
+        var sut = CreateSut(runtimeState.Object, eventAggregator.Object, serviceProvider);
+
+        await sut.StartAsync(CancellationToken.None);
+
+        serverRoleElector.Verify(x => x.TryElectOnceAsync(It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    /// <summary>
+    /// Below Run level (e.g. Install, where no connection string is configured yet) the election attempt
+    /// must not run at all.
+    /// </summary>
+    [Test]
+    public async Task StartAsync_WhenNotRunLevel_DoesNotCallServerRoleElector()
+    {
+        var runtimeState = CreateMockRuntimeState(RuntimeLevel.Install);
+        var eventAggregator = new Mock<IEventAggregator>();
+        SetupAllNotifications(eventAggregator);
+
+        var serverRoleElector = new Mock<IServerRoleElector>();
+        IServiceProvider serviceProvider = CreateServiceProvider(serverRoleElector.Object);
+
+        var sut = CreateSut(runtimeState.Object, eventAggregator.Object, serviceProvider);
+
+        await sut.StartAsync(CancellationToken.None);
+
+        serverRoleElector.Verify(x => x.TryElectOnceAsync(It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    /// <summary>
+    /// When no IServerRoleElector is registered (e.g. a minimal test harness with no service provider at all,
+    /// covered by every other test in this fixture via CreateSut's default null serviceProvider), StartAsync
+    /// must not throw and must still publish the starting notification.
+    /// </summary>
+    [Test]
+    public async Task StartAsync_WhenNoServerRoleElectorRegistered_DoesNotFailStartup()
+    {
+        var runtimeState = CreateMockRuntimeState(RuntimeLevel.Run);
+        var eventAggregator = new Mock<IEventAggregator>();
+        SetupAllNotifications(eventAggregator);
+
+        IServiceProvider serviceProvider = new ServiceCollection().BuildServiceProvider();
+        var sut = CreateSut(runtimeState.Object, eventAggregator.Object, serviceProvider);
+
+        Assert.DoesNotThrowAsync(() => sut.StartAsync(CancellationToken.None));
+
+        eventAggregator.Verify(
+            x => x.PublishAsync(It.IsAny<UmbracoApplicationStartingNotification>(), It.IsAny<CancellationToken>()),
+            Times.Once);
+    }
+
+    private static IServiceProvider CreateServiceProvider(IServerRoleElector serverRoleElector)
+    {
+        var services = new ServiceCollection();
+        services.AddSingleton(serverRoleElector);
+        return services.BuildServiceProvider();
+    }
+
     private static CoreRuntime CreateSut(
         IRuntimeState runtimeState,
-        IEventAggregator eventAggregator)
+        IEventAggregator eventAggregator,
+        IServiceProvider? serviceProvider = null)
     {
         var loggerFactory = NullLoggerFactory.Instance;
 
@@ -368,7 +444,7 @@ public class CoreRuntimeTests
             eventAggregator,
             Mock.Of<IHostingEnvironment>(),
             Mock.Of<IUmbracoVersion>(),
-            null,
+            serviceProvider,
             lifetime.Object);
     }
 

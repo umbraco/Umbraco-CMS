@@ -187,7 +187,7 @@ export abstract class UmbTreeItemElementBase<
 		this.#api?.deselect();
 	}
 
-	#handleDblClick(event: MouseEvent) {
+	protected _handleDblClick(event: MouseEvent) {
 		if (!this._item?.hasChildren) return;
 		event.stopPropagation();
 		this.#api?.open();
@@ -301,7 +301,7 @@ export abstract class UmbTreeItemElementBase<
 	}
 
 	renderLabel() {
-		return html`<span slot="label" @dblclick=${this.#handleDblClick}>${this._label}<slot name="label"></slot></span>`;
+		return html`<span slot="label" @dblclick=${this._handleDblClick}>${this._label}<slot name="label"></slot></span>`;
 	}
 
 	#renderActions() {

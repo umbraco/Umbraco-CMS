@@ -1,52 +1,53 @@
-import type { UmbLanguageDetailModel } from '../types.js';
-import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
-
-import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
-import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
+import { UMB_LANGUAGE_ROOT_ENTITY_TYPE } from '../entity.js';
+import { UMB_ENTITY_NAMED_DETAIL_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UMB_MENU_STRUCTURE_WORKSPACE_CONTEXT, type UmbStructureItemModel } from '@umbraco-cms/backoffice/menu';
+import { UmbMenuListStructureWorkspaceContextBase, type UmbStructureItemModel } from '@umbraco-cms/backoffice/menu';
+import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 
-export class UmbLanguageNavigationStructureWorkspaceContext extends UmbContextBase {
-	// TODO: figure out the correct type where we have "data" available
-	#workspaceContext?: any;
-
-	#structure = new UmbArrayState<UmbStructureItemModel>([], (x) => x.unique);
-	public readonly structure = this.#structure.asObservable();
-
+export class UmbLanguageNavigationStructureWorkspaceContext extends UmbMenuListStructureWorkspaceContextBase {
 	constructor(host: UmbControllerHost) {
-		super(host, UMB_MENU_STRUCTURE_WORKSPACE_CONTEXT);
-		// 'UmbMenuStructureWorkspaceContext' is Obsolete, will be removed in v.18
-		this.provideContext('UmbMenuStructureWorkspaceContext', this);
+		super(host);
 
-		this.consumeContext(UMB_WORKSPACE_CONTEXT, (instance) => {
-			this.#workspaceContext = instance;
-			this.#requestStructure();
+		this.consumeContext(UMB_ENTITY_NAMED_DETAIL_WORKSPACE_CONTEXT, (instance) => {
+			if (!instance) return;
+
+			this.observe(
+				observeMultiple([instance.unique, instance.entityType, instance.name, instance.isNew]),
+				([unique, entityType, name, isNew]) => this.#requestStructure(unique, entityType, name, isNew),
+				'umbLanguageMenuStructureObserver',
+			);
 		});
 	}
 
-	async #requestStructure() {
-		const data = (await this.observe(this.#workspaceContext?.data, () => {})?.asPromise()) as UmbLanguageDetailModel;
-		if (!data) throw new Error('Data is not available');
+	#requestStructure(
+		unique: string | null | undefined,
+		entityType: string | undefined,
+		name: string | undefined,
+		isNew: boolean | undefined,
+	) {
+		if (!entityType) return;
 
-		const items = [
-			// TODO: figure out if we can get the root from somewhere
-			// so we don't have to hardcode it
+		// While new, the item itself does not exist yet, so its ancestors are just the (fixed) root.
+		const items: Array<UmbStructureItemModel> = [
 			{
 				unique: null,
-				entityType: 'language-root',
-				name: 'Languages',
-				isFolder: false,
-			},
-			{
-				unique: data.unique,
-				entityType: data.entityType,
-				name: data.name,
+				entityType: UMB_LANGUAGE_ROOT_ENTITY_TYPE,
+				name: '#treeHeaders_languages',
 				isFolder: false,
 			},
 		];
 
-		this.#structure.setValue(items);
+		if (!isNew) {
+			items.push({
+				unique: unique ?? null,
+				entityType,
+				name: name ?? '',
+				isFolder: false,
+			});
+		}
+
+		this._setStructure(items);
 	}
 }
 
-export default UmbLanguageNavigationStructureWorkspaceContext;
+export { UmbLanguageNavigationStructureWorkspaceContext as api };
