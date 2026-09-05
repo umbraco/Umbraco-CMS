@@ -550,6 +550,7 @@ export default {
 			'Unpublishing will make the selected items and all their descendants publicly unavailable.',
 		confirmPublish: 'Publishing will make this content and all its published descendants publicly available.',
 		confirmUnpublish: 'Unpublishing will make this content publicly unavailable.',
+		cannotUnpublishWhenReferenced: 'This item cannot be unpublished because it is referenced by other items.',
 		doctypeChangeWarning: 'You have unsaved changes. Making changes to the Document Type will discard the changes.',
 	},
 	bulk: {
@@ -2662,12 +2663,17 @@ export default {
 		deleteDisabledWarning: 'This item or its descendants is being used. Therefore, deletion has been disabled.',
 		listViewDialogWarning: 'The following items you are trying to %0% are used by other content.',
 		labelUsedByItems: 'Referenced by',
+		labelDescendantsWithReferences: 'Descendants with references',
 		labelDependsOnThis: 'The following items depend on this',
 		labelDependentDescendants: 'The following descending items have dependencies',
 		labelMoreReferences: (count: number) => {
 			if (count === 1) return '...and one more item';
 			return `...and ${count} more items`;
 		},
+		labelElementsWithPendingChanges: 'The following referenced elements are not fully published',
+		viewDependentItemsAction: 'View items that depend on this…',
+		viewDescendantsWithReferencesAction: 'View referenced descendants…',
+		viewEntitiesNeedingAttentionAction: 'View referenced elements with pending changes…',
 	},
 	logViewer: {
 		deleteSavedSearch: 'Delete Saved Search',
