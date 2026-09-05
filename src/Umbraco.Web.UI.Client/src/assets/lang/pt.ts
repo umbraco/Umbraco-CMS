@@ -325,6 +325,8 @@ export default {
 		isSensitiveValue:
 			'Este valor está oculto. Se precisar de acesso para visualizar este valor, entre em contacto com o administrador do seu site.',
 		isSensitiveValue_short: 'Este valor está oculto.',
+		isSensitiveValueNotice:
+			'Se precisar de acesso para visualizar os valores ocultos, entre em contacto com o administrador do seu site.',
 		languagesToPublish: 'Que idiomas gostaria de publicar?',
 		languagesToSendForApproval: 'Que idiomas gostaria de enviar para aprovação?',
 		languagesToSchedule: 'Que idiomas gostaria de agendar?',

@@ -1,18 +1,17 @@
 import { UmbDocumentItemDataResolver } from '../../../../item/index.js';
 import type { UmbEditableDocumentCollectionItemModel } from '../../../types.js';
-import { UmbDocumentVariantState } from '../../../../variant-state.js';
-import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { fromCamelCase } from '@umbraco-cms/backoffice/utils';
+import type { UmbDocumentVariantState } from '../../../../variant-state.js';
+import { getDocumentVariantStateTagConfig } from '../../../../variant-state/utils.js';
+import { customElement, html, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbTableColumn, UmbTableColumnLayoutElement, UmbTableItem } from '@umbraco-cms/backoffice/components';
-import type { UUIInterfaceColor } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-document-table-column-state')
 export class UmbDocumentTableColumnStateElement extends UmbLitElement implements UmbTableColumnLayoutElement {
 	#resolver = new UmbDocumentItemDataResolver(this);
 
 	@state()
-	private _state = '';
+	private _state?: UmbDocumentVariantState | null;
 
 	column!: UmbTableColumn;
 	item!: UmbTableItem;
@@ -32,27 +31,13 @@ export class UmbDocumentTableColumnStateElement extends UmbLitElement implements
 
 	constructor() {
 		super();
-		this.#resolver.observe(this.#resolver.state, (state) => (this._state = state || ''));
-	}
-
-	#getStateTagConfig(): { color: UUIInterfaceColor; label: string } {
-		switch (this._state) {
-			case UmbDocumentVariantState.PUBLISHED:
-				return { color: 'positive', label: this.localize.term('content_published') };
-			case UmbDocumentVariantState.PUBLISHED_PENDING_CHANGES:
-				return { color: 'warning', label: this.localize.term('content_publishedPendingChanges') };
-			case UmbDocumentVariantState.DRAFT:
-				return { color: 'default', label: this.localize.term('content_unpublished') };
-			case UmbDocumentVariantState.NOT_CREATED:
-				return { color: 'danger', label: this.localize.term('content_notCreated') };
-			default:
-				return { color: 'danger', label: fromCamelCase(this._state) };
-		}
+		this.#resolver.observe(this.#resolver.state, (state) => (this._state = state));
 	}
 
 	override render() {
-		const tagConfig = this.#getStateTagConfig();
-		return html`<uui-tag color=${tagConfig.color} look="secondary">${tagConfig.label}</uui-tag>`;
+		if (this._state === undefined) return nothing;
+		const { color, label } = getDocumentVariantStateTagConfig(this._state, this.localize);
+		return html`<uui-tag color=${color} look="secondary">${label}</uui-tag>`;
 	}
 }
 
