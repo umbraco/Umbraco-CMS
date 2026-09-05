@@ -1,6 +1,7 @@
 import { UMB_ELEMENT_WORKSPACE_CONTEXT } from '../../workspace/element-workspace.context-token.js';
 import type { UmbElementDetailModel, UmbElementVariantOptionModel } from '../../types.js';
 import { UmbElementVariantState } from '../../variant-state.js';
+import { UMB_ELEMENT_ITEM_REPOSITORY_ALIAS, UMB_ELEMENT_REFERENCE_REPOSITORY_ALIAS } from '../../constants.js';
 import { UmbElementPublishingRepository } from '../repository/index.js';
 import { UmbElementPublishedPendingChangesManager } from '../pending-changes/index.js';
 import type { UmbElementVariantPublishModel } from '../types.js';
@@ -14,6 +15,7 @@ import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UMB_CONTENT_PUBLISH_MODAL, UmbContentUnpublishEntityAction } from '@umbraco-cms/backoffice/content';
+import { UmbEntityReferenceCountManager } from '@umbraco-cms/backoffice/relations';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
@@ -34,6 +36,16 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 	 * @memberof UmbElementPublishingWorkspaceContext
 	 */
 	public readonly publishedPendingChanges = new UmbElementPublishedPendingChangesManager(this);
+
+	/**
+	 * Tracks how many items reference this element, so the publish flow can decide whether the confirmation
+	 * dialog has anything to say for a single-variant element (it always has something to say once there are
+	 * multiple variants to choose between).
+	 * @memberof UmbElementPublishingWorkspaceContext
+	 */
+	public readonly referenceCount = new UmbEntityReferenceCountManager(this, {
+		referenceRepositoryAlias: UMB_ELEMENT_REFERENCE_REPOSITORY_ALIAS,
+	});
 
 	#init: Promise<unknown>;
 	#elementWorkspaceContext?: typeof UMB_ELEMENT_WORKSPACE_CONTEXT.TYPE;
@@ -133,6 +145,7 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 		// Reload workspace data to reflect the unpublished state
 		await this.#elementWorkspaceContext.reload();
 		await this.#loadAndProcessLastPublished();
+		this.referenceCount.reload().catch(() => undefined);
 	}
 
 	/**
@@ -164,6 +177,9 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 						unpublishTime: option.variant?.scheduledUnpublishDate,
 					},
 				})),
+				unique,
+				itemRepositoryAlias: UMB_ELEMENT_ITEM_REPOSITORY_ALIAS,
+				referenceRepositoryAlias: UMB_ELEMENT_REFERENCE_REPOSITORY_ALIAS,
 			},
 		}).catch(() => undefined);
 
@@ -210,6 +226,7 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 
 					// reload the element so all states are updated after the schedule operation
 					await this.#elementWorkspaceContext.reload();
+					this.referenceCount.reload().catch(() => undefined);
 
 					// request reload of this entity
 					const structureEvent = new UmbRequestReloadStructureForEntityEvent({ entityType, unique });
@@ -267,19 +284,26 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 
 		const { options, selected } = await this.#determineVariantOptions();
 
-		// If there is only one variant, we don't need to open the modal.
 		if (options.length === 0) {
 			throw new Error('No variants are available');
-		} else if (options.length === 1) {
-			// If only one option we will skip ahead and save the element with the only variant available:
+		}
+
+		// Skip the confirmation dialog only when it would have nothing to say: a single variant to publish and no
+		// items referencing this element. Otherwise open it — the modal itself hides the variant picker when there
+		// is only one option, showing just the reference-awareness section.
+		const needsModal = await this.#needsPublishConfirmationModal(options);
+
+		if (!needsModal) {
 			variantIds.push(UmbVariantId.Create(options[0]));
 		} else {
-			// If there are multiple variants, we will open the modal to let the user pick which variants to publish.
 			const result = await umbOpenModal(this, UMB_CONTENT_PUBLISH_MODAL, {
 				data: {
 					headline: this.#localize.term('content_saveAndPublishModalTitle'),
 					options,
 					pickableFilter: (option) => this.#publishableVariantsFilter(option as UmbElementVariantOptionModel),
+					unique,
+					itemRepositoryAlias: UMB_ELEMENT_ITEM_REPOSITORY_ALIAS,
+					referenceRepositoryAlias: UMB_ELEMENT_REFERENCE_REPOSITORY_ALIAS,
 				},
 				value: { selection: selected },
 			}).catch(() => undefined);
@@ -318,6 +342,23 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 				return await Promise.reject(reason);
 			},
 		);
+	}
+
+	/**
+	 * Whether the publish confirmation modal has anything to say: either there is more than one variant to choose
+	 * between, or something references this element.
+	 * @param {Array<UmbElementVariantOptionModel>} options - The variant options being published.
+	 * @returns {Promise<boolean>} Whether the confirmation modal should be shown.
+	 */
+	async #needsPublishConfirmationModal(options: Array<UmbElementVariantOptionModel>): Promise<boolean> {
+		if (options.length > 1) return true;
+		try {
+			return (await this.referenceCount.getTotalAsync()) > 0;
+		} catch {
+			// Couldn't determine the reference count — show the modal rather than risk publishing silently past
+			// references we failed to check for.
+			return true;
+		}
 	}
 
 	async #performSaveAndPublish(variantIds: Array<UmbVariantId>, saveData: UmbElementDetailModel): Promise<void> {
@@ -370,6 +411,7 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 		}
 
 		await this.#loadAndProcessLastPublished();
+		this.referenceCount.reload().catch(() => undefined);
 
 		const event = new UmbRequestReloadStructureForEntityEvent({ unique, entityType });
 		this.#eventContext?.dispatchEvent(event);
@@ -442,6 +484,7 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 				}
 
 				this.#currentUnique = unique;
+				this.referenceCount.setUnique(unique ?? undefined).catch(() => undefined);
 
 				if (isNew === false && unique) {
 					this.#loadAndProcessLastPublished();
