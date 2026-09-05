@@ -821,6 +821,8 @@ export default {
 		externalLoginError: 'External login',
 		unauthorized: 'You were not authorized before performing this action',
 		userNotFound: 'The local user was not found in the database',
+		lockedOut: 'The user is locked, and needs to be unlocked before more login attempts can be made',
+		notAllowed: 'The operation is not allowed on the user',
 		externalInfoNotFound: 'The server did not succeed in communicating with the external login provider',
 		externalLoginFailed:
 			'The server failed to authorize you against the external login provider. Please close the window and try again.',
