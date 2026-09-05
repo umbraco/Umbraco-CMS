@@ -25,6 +25,7 @@ export interface UmbBlockAction<ArgsMetaType> extends UmbAction<UmbBlockActionAr
 	 */
 	execute(): Promise<void>;
 
+	// TODO: Remove in v.20. [NL]
 	/**
 	 * @deprecated Use `getValidationDataPathObservable()` instead. Optional validation data path for displaying an invalid badge on the action button.
 	 * Optional validation data path for displaying an invalid badge on the action button.
