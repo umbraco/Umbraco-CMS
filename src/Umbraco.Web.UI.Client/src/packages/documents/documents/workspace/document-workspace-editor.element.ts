@@ -211,9 +211,9 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 	};
 
 	override render() {
-		return !this._loading && this._routes
-			? html`<umb-router-slot .routes=${this._routes} @init=${this._gotWorkspaceRoute}></umb-router-slot>`
-			: html`<umb-view-loader></umb-view-loader>`;
+		return html`<umb-router-slot .routes=${this._loading ? [] : this._routes} @init=${this._gotWorkspaceRoute}
+			><umb-view-loader></umb-view-loader
+		></umb-router-slot>`;
 	}
 
 	static override styles = [

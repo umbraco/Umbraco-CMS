@@ -469,6 +469,9 @@ export class UmbPropertyElement extends UmbLitElement {
 	}
 
 	#renderPropertyEditor() {
+		if (!this._element) {
+			return html`<umb-view-loader slot="editor"></umb-view-loader>`;
+		}
 		return html`
 			<div id="editor" slot="editor">
 				${this._isReadOnly && this._supportsReadOnly === false ? html`<div id="overlay"></div>` : nothing}
