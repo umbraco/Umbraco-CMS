@@ -1,3 +1,4 @@
+import { manifest as rangeSliderSchemaManifest } from './Umbraco.Slider.Range.js';
 import { manifest as sliderSchemaManifest } from './Umbraco.Slider.js';
 import { manifests as valueSummaryManifests } from './value-summary/manifests.js';
 
@@ -36,12 +37,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 			settings: {
 				properties: [
 					{
-						alias: 'enableRange',
-						label: 'Enable range',
-						description: '',
-						propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
-					},
-					{
 						alias: 'initVal1',
 						label: 'Initial value',
 						description: '',
@@ -49,9 +44,58 @@ export const manifests: Array<UmbExtensionManifest> = [
 						config: [{ alias: 'step', value: '0.00001' }],
 					},
 					{
+						alias: 'step',
+						label: 'Step increments',
+						description: '',
+						propertyEditorUiAlias: 'Umb.PropertyEditorUi.Decimal',
+						config: [{ alias: 'step', value: '0.00001' }],
+					},
+				],
+				defaultData: [
+					{
+						alias: 'initVal1',
+						value: 0.0,
+					},
+					{
+						alias: 'step',
+						value: 1.0,
+					},
+				],
+			},
+		},
+	},
+	{
+		type: 'propertyValuePreset',
+		forPropertyEditorSchemaAlias: 'Umbraco.Slider.Range',
+		alias: 'Umb.PropertyValuePreset.RangeSlider',
+		name: 'Property Editor Schema Range Slider Preset for Initial Values',
+		api: () => import('./range-slider-property-value-preset.js'),
+	},
+	{
+		type: 'propertyEditorUi',
+		alias: 'Umb.PropertyEditorUi.Slider.Range',
+		name: 'Range Slider Property Editor UI',
+		element: () => import('./property-editor-ui-range-slider.element.js'),
+		meta: {
+			label: 'Range Slider',
+			propertyEditorSchemaAlias: 'Umbraco.Slider.Range',
+			icon: 'icon-navigation-horizontal',
+			group: '#propertyEditorUIGroups_common',
+			keywords: ['number', 'range', 'percentage', 'between', 'span', 'scale', 'from', 'to'],
+			supportsReadOnly: true,
+			settings: {
+				properties: [
+					{
+						alias: 'initVal1',
+						label: 'Initial low value',
+						description: '',
+						propertyEditorUiAlias: 'Umb.PropertyEditorUi.Decimal',
+						config: [{ alias: 'step', value: '0.00001' }],
+					},
+					{
 						alias: 'initVal2',
-						label: 'Initial value 2',
-						description: 'Used when range is enabled',
+						label: 'Initial high value',
+						description: '',
 						propertyEditorUiAlias: 'Umb.PropertyEditorUi.Decimal',
 						config: [{ alias: 'step', value: '0.00001' }],
 					},
@@ -81,5 +125,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 		},
 	},
 	sliderSchemaManifest,
+	rangeSliderSchemaManifest,
 	...valueSummaryManifests,
 ];

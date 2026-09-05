@@ -1,4 +1,4 @@
-using Umbraco.Cms.Core.PropertyEditors;
+﻿using Umbraco.Cms.Core.PropertyEditors;
 
 namespace Umbraco.Cms.Core;
 
@@ -107,9 +107,14 @@ public static partial class Constants
             public const string ColorPickerEyeDropper = "Umbraco.ColorPicker.EyeDropper";
 
             /// <summary>
-            ///     Content Picker.
+            ///     Content Picker, holding a single document.
             /// </summary>
             public const string ContentPicker = "Umbraco.ContentPicker";
+
+            /// <summary>
+            ///     Document Picker, holding any number of documents.
+            /// </summary>
+            public const string MultipleDocumentPicker = "Umbraco.DocumentPicker.Multiple";
 
             /// <summary>
             ///     DateTime.
@@ -142,9 +147,25 @@ public static partial class Constants
             public const string TimeOnly = "Umbraco.TimeOnly";
 
             /// <summary>
+            ///     DropDown List, holding any number of values.
+            /// </summary>
+            /// <remarks>
+            ///     The alias reads "flexible" because the editor used to be flexible about how many values it held.
+            ///     It no longer is - a dropdown holding a single value is <see cref="SingleDropDown" /> - but the
+            ///     alias is stored against every dropdown data type, so it stays as it is.
+            /// </remarks>
+            public const string MultipleDropDown = "Umbraco.DropDown.Flexible";
+
+            /// <summary>
+            ///     DropDown List, holding a single value.
+            /// </summary>
+            public const string SingleDropDown = "Umbraco.DropDown.Single";
+
+            /// <summary>
             ///     DropDown List.
             /// </summary>
-            public const string DropDownListFlexible = "Umbraco.DropDown.Flexible";
+            [Obsolete("Use MultipleDropDown instead, which names the same editor for what it now does. Scheduled for removal in Umbraco 21.")]
+            public const string DropDownListFlexible = MultipleDropDown;
 
             /// <summary>
             ///     Grid.
@@ -177,14 +198,24 @@ public static partial class Constants
             public const string MediaPicker3 = "Umbraco.MediaPicker3";
 
             /// <summary>
+            ///     Media Picker, holding a single item.
+            /// </summary>
+            public const string SingleMediaPicker = "Umbraco.MediaPicker.Single";
+
+            /// <summary>
             ///     Multiple Media Picker.
             /// </summary>
             public const string MultipleMediaPicker = "Umbraco.MultipleMediaPicker";
 
             /// <summary>
-            ///     Member Picker.
+            ///     Member Picker, holding a single member.
             /// </summary>
             public const string MemberPicker = "Umbraco.MemberPicker";
+
+            /// <summary>
+            ///     Member Picker, holding any number of members.
+            /// </summary>
+            public const string MultipleMemberPicker = "Umbraco.MemberPicker.Multiple";
 
             /// <summary>
             ///     Member Group Picker.
@@ -202,9 +233,39 @@ public static partial class Constants
             public const string MultipleTextstring = "Umbraco.MultipleTextstring";
 
             /// <summary>
-            ///     Label.
+            ///     Label, holding a string.
             /// </summary>
             public const string Label = "Umbraco.Label";
+
+            /// <summary>
+            ///     Label, holding a long string.
+            /// </summary>
+            public const string LabelText = "Umbraco.Label.Text";
+
+            /// <summary>
+            ///     Label, holding an integer.
+            /// </summary>
+            public const string LabelInteger = "Umbraco.Label.Integer";
+
+            /// <summary>
+            ///     Label, holding a big integer.
+            /// </summary>
+            public const string LabelBigInt = "Umbraco.Label.BigInt";
+
+            /// <summary>
+            ///     Label, holding a decimal.
+            /// </summary>
+            public const string LabelDecimal = "Umbraco.Label.Decimal";
+
+            /// <summary>
+            ///     Label, holding a date and time.
+            /// </summary>
+            public const string LabelDateTime = "Umbraco.Label.DateTime";
+
+            /// <summary>
+            ///     Label, holding a time.
+            /// </summary>
+            public const string LabelTime = "Umbraco.Label.Time";
 
             /// <summary>
             ///     Picker Relations.
@@ -217,9 +278,14 @@ public static partial class Constants
             public const string RadioButtonList = "Umbraco.RadioButtonList";
 
             /// <summary>
-            ///     Slider.
+            ///     Slider, holding a single value.
             /// </summary>
             public const string Slider = "Umbraco.Slider";
+
+            /// <summary>
+            ///     Slider, holding a range of two values.
+            /// </summary>
+            public const string RangeSlider = "Umbraco.Slider.Range";
 
             /// <summary>
             ///     Tags.
@@ -275,6 +341,11 @@ public static partial class Constants
             ///     Alias for the multi URL picker editor.
             /// </summary>
             public const string MultiUrlPicker = "Umbraco.MultiUrlPicker";
+
+            /// <summary>
+            ///     Alias for the URL picker editor holding a single link.
+            /// </summary>
+            public const string SingleUrlPicker = "Umbraco.UrlPicker.Single";
 
             /// <summary>
             ///     Configuration-less string.

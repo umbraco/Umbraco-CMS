@@ -1,4 +1,6 @@
 ﻿import { UMB_ELEMENT_FOLDER_ENTITY_TYPE } from '../../entity.js';
+import { UmbDynamicRootResolver } from '@umbraco-cms/backoffice/dynamic-root';
+import type { UmbContentPickerDynamicRoot } from '@umbraco-cms/backoffice/dynamic-root';
 import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbFormControlMixin, UMB_VALIDATION_EMPTY_LOCALIZATION_KEY } from '@umbraco-cms/backoffice/validation';
@@ -41,6 +43,8 @@ export class UmbElementPickerPropertyEditorUIElement
 			? { unique: startNodeId[0], entityType: UMB_ELEMENT_FOLDER_ENTITY_TYPE }
 			: undefined;
 
+		this.#dynamicRoot = config.getValueByAlias<UmbContentPickerDynamicRoot>('dynamicRoot');
+
 		const allowedContentTypes = config.getValueByAlias<string>('allowedContentTypes');
 		this._allowedContentTypes = allowedContentTypes ? allowedContentTypes.split(',').filter(Boolean) : undefined;
 	}
@@ -63,6 +67,10 @@ export class UmbElementPickerPropertyEditorUIElement
 	@state()
 	private _startNode?: UmbTreeStartNode;
 
+	#dynamicRoot?: UmbContentPickerDynamicRoot;
+
+	#dynamicRootResolver = new UmbDynamicRootResolver(this);
+
 	@state()
 	private _allowedContentTypes?: string[];
 
@@ -70,10 +78,18 @@ export class UmbElementPickerPropertyEditorUIElement
 		return this.shadowRoot?.querySelector('umb-input-element')?.focus();
 	}
 
-	override firstUpdated(changedProperties: Map<string | number | symbol, unknown>) {
+	override async firstUpdated(changedProperties: Map<string | number | symbol, unknown>) {
 		super.firstUpdated(changedProperties);
 
 		this.addFormControlElement(this.shadowRoot!.querySelector('umb-input-element')!);
+
+		// A fixed start node wins; the dynamic root is only resolved when there is none.
+		if (!this._startNode) {
+			const unique = await this.#dynamicRootResolver.resolveStartNodeUnique(this.#dynamicRoot);
+			if (unique) {
+				this._startNode = { unique, entityType: UMB_ELEMENT_FOLDER_ENTITY_TYPE };
+			}
+		}
 
 		if (this._min && this._max && this._min > this._max) {
 			console.warn(

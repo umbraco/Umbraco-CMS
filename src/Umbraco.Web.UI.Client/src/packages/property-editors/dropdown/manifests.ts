@@ -1,4 +1,7 @@
 import { manifest as schemaManifest } from './Umbraco.Dropdown.Flexible.js';
+import { manifest as singleSchemaManifest } from './Umbraco.Dropdown.Single.js';
+
+const keywords = ['select', 'dropdown', 'choice', 'option', 'list'];
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -11,7 +14,21 @@ export const manifests: Array<UmbExtensionManifest> = [
 			propertyEditorSchemaAlias: 'Umbraco.DropDown.Flexible',
 			icon: 'icon-list',
 			group: '#propertyEditorUIGroups_lists',
-			keywords: ['select', 'dropdown', 'choice', 'option', 'list'],
+			keywords: [...keywords, 'multiple', 'several'],
+			supportsReadOnly: true,
+		},
+	},
+	{
+		type: 'propertyEditorUi',
+		alias: 'Umb.PropertyEditorUi.Dropdown.Single',
+		name: 'Single Dropdown Property Editor UI',
+		element: () => import('./property-editor-ui-single-dropdown.element.js'),
+		meta: {
+			label: 'Single Dropdown',
+			propertyEditorSchemaAlias: 'Umbraco.DropDown.Single',
+			icon: 'icon-list',
+			group: '#propertyEditorUIGroups_lists',
+			keywords: [...keywords, 'single', 'one'],
 			supportsReadOnly: true,
 			settings: {
 				properties: [
@@ -25,4 +42,5 @@ export const manifests: Array<UmbExtensionManifest> = [
 		},
 	},
 	schemaManifest,
+	singleSchemaManifest,
 ];

@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Runtime.Serialization;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Models;
@@ -41,7 +41,9 @@ public class DataEditor : IDataEditor
         }
 
         Alias = Attribute.Alias;
+#pragma warning disable CS0618 // Type or member is obsolete
         IsDeprecated = Attribute.IsDeprecated;
+#pragma warning restore CS0618 // Type or member is obsolete
 
         _canReuseValueEditor = Attribute.ValueEditorIsReusable;
     }
@@ -89,6 +91,7 @@ public class DataEditor : IDataEditor
 
     /// <inheritdoc />
     [IgnoreDataMember]
+    [Obsolete("Nothing reads this value. Declare \"deprecated\" on the property editor UI manifest instead, which is what the backoffice reads. Scheduled for removal in Umbraco 21.")]
     public bool IsDeprecated { get; }
 
     /// <inheritdoc />

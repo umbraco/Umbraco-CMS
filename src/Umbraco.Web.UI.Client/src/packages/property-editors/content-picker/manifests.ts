@@ -17,6 +17,8 @@ const manifest: ManifestPropertyEditorUi = {
 		keywords: ['select', 'page', 'node', 'reference', 'related', 'link', 'pages', 'content'],
 		propertyEditorSchemaAlias: 'Umbraco.MultiNodeTreePicker',
 		supportsReadOnly: true,
+		// Replaced by the dedicated document, media, element and member pickers. Existing data types keep working.
+		deprecated: true,
 		settings: {
 			properties: [
 				{

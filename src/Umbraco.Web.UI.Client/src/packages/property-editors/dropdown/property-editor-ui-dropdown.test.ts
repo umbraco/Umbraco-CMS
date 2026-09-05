@@ -1,19 +1,21 @@
+import type { UmbPropertyEditorUIDropdownElementBase } from './property-editor-ui-dropdown-base.element.js';
 import { UmbPropertyEditorUIDropdownElement } from './property-editor-ui-dropdown.element.js';
+import { UmbPropertyEditorUISingleDropdownElement } from './property-editor-ui-single-dropdown.element.js';
 import { expect, fixture, html } from '@open-wc/testing';
 import { type UmbTestRunnerWindow, defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
-import {
-	setupBasicStringConfig,
-	setupObjectConfig,
-	setupEmptyConfig,
-	MULTI_SELECT_TEST_DATA,
-} from '../utils/property-editor-test-utils.js';
+import { MULTI_SELECT_TEST_DATA } from '../utils/property-editor-test-utils.js';
 
 describe('UmbPropertyEditorUIDropdownElement', () => {
-	let element: UmbPropertyEditorUIDropdownElement;
+	let element: UmbPropertyEditorUIDropdownElementBase;
 
 	beforeEach(async () => {
 		element = await fixture(html` <umb-property-editor-ui-dropdown></umb-property-editor-ui-dropdown> `);
 	});
+
+	// The number of values an editor holds follows from the editor, so a test picks the one it is about.
+	async function createSingleDropdown() {
+		element = await fixture(html` <umb-property-editor-ui-single-dropdown></umb-property-editor-ui-single-dropdown> `);
+	}
 
 	// Local helper functions to avoid conflicts with shared utilities
 	function getLocalDropdownInput() {
@@ -48,14 +50,11 @@ describe('UmbPropertyEditorUIDropdownElement', () => {
 		expect(getLocalSelectedValues().sort()).to.deep.equal(expectedSelected.sort());
 	}
 
-	function setupBasicConfigWithMultiple(multiple = false) {
+	function setupBasicConfig() {
 		element.config = {
 			getValueByAlias: (alias: string) => {
 				if (alias === 'items') {
 					return ['Red', 'Green', 'Blue'];
-				}
-				if (alias === 'multiple') {
-					return multiple;
 				}
 				return undefined;
 			},
@@ -74,8 +73,13 @@ describe('UmbPropertyEditorUIDropdownElement', () => {
 
 	describe('programmatic value setting - single mode', () => {
 		beforeEach(async () => {
-			setupBasicConfigWithMultiple(false);
+			await createSingleDropdown();
+			setupBasicConfig();
 			await element.updateComplete;
+		});
+
+		it('is defined with its own instance', () => {
+			expect(element).to.be.instanceOf(UmbPropertyEditorUISingleDropdownElement);
 		});
 
 		it('should update UI immediately when value is set programmatically with array', async () => {
@@ -141,7 +145,7 @@ describe('UmbPropertyEditorUIDropdownElement', () => {
 
 	describe('programmatic value setting - multiple mode', () => {
 		beforeEach(async () => {
-			setupBasicConfigWithMultiple(true);
+			setupBasicConfig();
 			await element.updateComplete;
 		});
 
@@ -184,13 +188,11 @@ describe('UmbPropertyEditorUIDropdownElement', () => {
 
 	describe('configuration handling', () => {
 		it('should handle string array configuration', async () => {
+			await createSingleDropdown();
 			element.config = {
 				getValueByAlias: (alias: string) => {
 					if (alias === 'items') {
 						return ['Option1', 'Option2', 'Option3'];
-					}
-					if (alias === 'multiple') {
-						return false;
 					}
 					return undefined;
 				},
@@ -203,6 +205,7 @@ describe('UmbPropertyEditorUIDropdownElement', () => {
 		});
 
 		it('should handle object array configuration', async () => {
+			await createSingleDropdown();
 			element.config = {
 				getValueByAlias: (alias: string) => {
 					if (alias === 'items') {
@@ -211,9 +214,6 @@ describe('UmbPropertyEditorUIDropdownElement', () => {
 							{ name: 'Green Color', value: 'green' },
 							{ name: 'Blue Color', value: 'blue' },
 						];
-					}
-					if (alias === 'multiple') {
-						return false;
 					}
 					return undefined;
 				},
@@ -237,21 +237,21 @@ describe('UmbPropertyEditorUIDropdownElement', () => {
 			expect(element.value).to.deep.equal(['test']);
 		});
 
-		it('should switch between single and multiple modes correctly', async () => {
-			// Start with single mode
-			setupBasicConfigWithMultiple(false);
+		it('should render the control that suits the number of values the editor holds', async () => {
+			setupBasicConfig();
+			element.value = ['Red'];
+			await element.updateComplete;
+
+			expect(getLocalDropdownInput()).to.not.exist;
+			expect(getNativeSelectElement()).to.exist;
+
+			await createSingleDropdown();
+			setupBasicConfig();
 			element.value = ['Red'];
 			await element.updateComplete;
 
 			expect(getLocalDropdownInput()).to.exist;
 			expect(getNativeSelectElement()).to.not.exist;
-
-			// Switch to multiple mode
-			setupBasicConfigWithMultiple(true);
-			await element.updateComplete;
-
-			expect(getLocalDropdownInput()).to.not.exist;
-			expect(getNativeSelectElement()).to.exist;
 		});
 	});
 });

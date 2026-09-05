@@ -4,6 +4,7 @@ import type {
 	UmbPropertyEditorUIPickerModalValue,
 } from './property-editor-ui-picker-modal.token.js';
 import { UmbPropertyEditorUISearchController } from './property-editor-ui-search.controller.js';
+import { selectablePropertyEditorUis } from './selectable-property-editor-uis.function.js';
 import { css, customElement, html, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { debounce, fromCamelCaseIfCamelCase } from '@umbraco-cms/backoffice/utils';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
@@ -39,9 +40,15 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbModalBaseElement<
 	#usePropertyEditorUIs() {
 		this.observe(umbExtensionsRegistry.byType('propertyEditorUi'), (propertyEditorUIs) => {
 			// Only include Property Editor UIs which has Property Editor Schema Alias
-			this.#propertyEditorUIs = propertyEditorUIs
-				.filter((propertyEditorUi) => !!propertyEditorUi.meta.propertyEditorSchemaAlias)
-				.sort((a, b) => a.meta.label.localeCompare(b.meta.label));
+			const withSchemaAlias = propertyEditorUIs.filter(
+				(propertyEditorUi) => !!propertyEditorUi.meta.propertyEditorSchemaAlias,
+			);
+
+			this.#propertyEditorUIs = selectablePropertyEditorUis(
+				withSchemaAlias,
+				this.value.selection,
+				this.data?.showDeprecated,
+			).sort((a, b) => a.meta.label.localeCompare(b.meta.label));
 
 			this.#searchController.setPropertyEditorUIs(this.#propertyEditorUIs);
 			this.#performFiltering();
