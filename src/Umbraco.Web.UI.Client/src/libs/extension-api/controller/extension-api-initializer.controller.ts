@@ -36,7 +36,7 @@ export class UmbExtensionApiInitializer<
 
 	/**
 	 * The props that are passed to the class.
-	 * @type {Record<string, any>}
+	 * @type {Record<string, unknown>}
 	 * @memberof UmbExtensionApiController
 	 * @example
 	 * ```ts

@@ -4,7 +4,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
  * @class UmbDataTypeTreeStore
- * @augments {UmbStoreBase}
+ * @augments {UmbUniqueTreeStore}
  * @description - Tree Data Store for Data Types
  * @deprecated - Use `UmbDataTypeTreeRepository` instead. This will be removed in Umbraco 18.
  */

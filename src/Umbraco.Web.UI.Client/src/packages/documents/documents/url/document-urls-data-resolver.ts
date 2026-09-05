@@ -20,7 +20,7 @@ export class UmbDocumentUrlsDataResolver extends UmbControllerBase {
 	readonly #urls = new UmbArrayState<UmbDocumentUrlModel>([], (url) => url.url);
 	/**
 	 * The urls for the current culture
-	 * @returns {ObservableArray<UmbDocumentUrlModel>} The urls for the current culture
+	 * @returns {Observable<Array<UmbDocumentUrlModel>>} The urls for the current culture
 	 * @memberof UmbDocumentUrlsDataResolver
 	 */
 	public readonly urls = this.#urls.asObservable();

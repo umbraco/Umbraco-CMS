@@ -6,34 +6,34 @@
   </PropertyGroup>
   <!-- Global packages (private, build-time packages for all projects) -->
   <ItemGroup>
-    <GlobalPackageReference Include="Nerdbank.GitVersioning" Version="3.10.91" />
+    <GlobalPackageReference Include="Nerdbank.GitVersioning" Version="3.10.94" />
     <GlobalPackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.556" />
     <GlobalPackageReference Include="Umbraco.Code" Version="2.4.0" />
     <GlobalPackageReference Include="Umbraco.GitVersioning.Extensions" Version="0.2.0" />
   </ItemGroup>
   <!-- Microsoft packages -->
   <ItemGroup>
-    <PackageVersion Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="10.0.10" />
+    <PackageVersion Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="10.0.11" />
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="4.14.0" />
-    <PackageVersion Include="Microsoft.Data.Sqlite" Version="10.0.10" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.10" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.10" />
-    <PackageVersion Include="Microsoft.Extensions.Caching.Abstractions" Version="10.0.10" />
-    <PackageVersion Include="Microsoft.Extensions.Caching.Memory" Version="10.0.10" />
-    <PackageVersion Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.10" />
-    <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="10.0.10" />
-    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="10.0.10" />
-    <PackageVersion Include="Microsoft.Extensions.FileProviders.Embedded" Version="10.0.10" />
-    <PackageVersion Include="Microsoft.Extensions.FileProviders.Physical" Version="10.0.10" />
-    <PackageVersion Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.10" />
-    <PackageVersion Include="Microsoft.Extensions.Http" Version="10.0.10" />
-    <PackageVersion Include="Microsoft.Extensions.Identity.Core" Version="10.0.10" />
-    <PackageVersion Include="Microsoft.Extensions.Identity.Stores" Version="10.0.10" />
-    <PackageVersion Include="Microsoft.Extensions.Logging" Version="10.0.10" />
-    <PackageVersion Include="Microsoft.Extensions.Options" Version="10.0.10" />
-    <PackageVersion Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="10.0.10" />
-    <PackageVersion Include="Microsoft.Extensions.Options.DataAnnotations" Version="10.0.10" />
-    <PackageVersion Include="Microsoft.Extensions.Caching.Hybrid" Version="10.8.0" />
+    <PackageVersion Include="Microsoft.Data.Sqlite" Version="10.0.11" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.11" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.11" />
+    <PackageVersion Include="Microsoft.Extensions.Caching.Abstractions" Version="10.0.11" />
+    <PackageVersion Include="Microsoft.Extensions.Caching.Memory" Version="10.0.11" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.11" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="10.0.11" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="10.0.11" />
+    <PackageVersion Include="Microsoft.Extensions.FileProviders.Embedded" Version="10.0.11" />
+    <PackageVersion Include="Microsoft.Extensions.FileProviders.Physical" Version="10.0.11" />
+    <PackageVersion Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.11" />
+    <PackageVersion Include="Microsoft.Extensions.Http" Version="10.0.11" />
+    <PackageVersion Include="Microsoft.Extensions.Identity.Core" Version="10.0.11" />
+    <PackageVersion Include="Microsoft.Extensions.Identity.Stores" Version="10.0.11" />
+    <PackageVersion Include="Microsoft.Extensions.Logging" Version="10.0.11" />
+    <PackageVersion Include="Microsoft.Extensions.Options" Version="10.0.11" />
+    <PackageVersion Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="10.0.11" />
+    <PackageVersion Include="Microsoft.Extensions.Options.DataAnnotations" Version="10.0.11" />
+    <PackageVersion Include="Microsoft.Extensions.Caching.Hybrid" Version="10.9.0" />
     <PackageVersion Include="System.Linq.Async" Version="7.0.1" />
   </ItemGroup>
   <!-- Umbraco packages -->
@@ -44,10 +44,10 @@
   <ItemGroup>
     <PackageVersion Include="Asp.Versioning.Mvc" Version="8.1.1" />
     <PackageVersion Include="Asp.Versioning.Mvc.ApiExplorer" Version="8.1.1" />
-    <PackageVersion Include="BitFaster.Caching" Version="2.6.0" />
+    <PackageVersion Include="BitFaster.Caching" Version="2.6.1" />
     <PackageVersion Include="Dazinator.Extensions.FileProviders" Version="2.0.0" />
-    <PackageVersion Include="Examine" Version="3.9.0" />
-    <PackageVersion Include="Examine.Core" Version="3.9.0" />
+    <PackageVersion Include="Examine" Version="3.10.0" />
+    <PackageVersion Include="Examine.Core" Version="3.10.0" />
     <PackageVersion Include="HtmlAgilityPack" Version="1.12.4" />
     <PackageVersion Include="JsonPatch.Net" Version="3.3.0" />
     <PackageVersion Include="K4os.Compression.LZ4" Version="1.3.8" />
@@ -60,9 +60,9 @@
     <PackageVersion Include="ncrontab" Version="3.4.0" />
     <PackageVersion Include="NPoco" Version="6.2.0" />
     <PackageVersion Include="NPoco.SqlServer" Version="6.2.0" />
-    <PackageVersion Include="OpenIddict.Abstractions" Version="7.6.0" />
-    <PackageVersion Include="OpenIddict.AspNetCore" Version="7.6.0" />
-    <PackageVersion Include="OpenIddict.EntityFrameworkCore" Version="7.6.0" />
+    <PackageVersion Include="OpenIddict.Abstractions" Version="7.6.1" />
+    <PackageVersion Include="OpenIddict.AspNetCore" Version="7.6.1" />
+    <PackageVersion Include="OpenIddict.EntityFrameworkCore" Version="7.6.1" />
     <PackageVersion Include="Serilog" Version="4.4.0" />
     <PackageVersion Include="Serilog.AspNetCore" Version="9.0.0" />
     <PackageVersion Include="Serilog.Enrichers.Process" Version="3.0.0" />
@@ -112,9 +112,9 @@
     <!--
       Microsoft.Data.Sqlite and Microsoft.EntityFrameworkCore.Sqlite (via SQLitePCLRaw.bundle_e_sqlite3)
       otherwise resolve the native SQLitePCLRaw.lib.e_sqlite3 down to a vulnerable 2.1.11
-      (GHSA-2m69-gcr7-jv3q). Pin forward to the patched 2.1.12 until the referencing packages raise
+      (GHSA-2m69-gcr7-jv3q). Pin forward to the patched 2.1.13 until the referencing packages raise
       their floor.
     -->
-    <PackageVersion Include="SQLitePCLRaw.lib.e_sqlite3" Version="2.1.12" />
+    <PackageVersion Include="SQLitePCLRaw.lib.e_sqlite3" Version="2.1.13" />
   </ItemGroup>
 </Project>

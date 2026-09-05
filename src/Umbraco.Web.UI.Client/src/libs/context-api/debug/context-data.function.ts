@@ -1,7 +1,7 @@
 /* eslint-disable no-case-declarations */
 /**
  * Change the collection of Contexts into a simplified array of data
- * @param {Map<any, any>} contexts This is a map of the collected contexts from umb-debug
+ * @param {Map<string, unknown>} contexts This is a map of the collected contexts from umb-debug
  * @returns {Array<UmbDebugContextData>} An array of simplified context data
  */
 export function contextData(contexts: Map<any, any>): Array<UmbDebugContextData> {
@@ -15,7 +15,7 @@ export function contextData(contexts: Map<any, any>): Array<UmbDebugContextData>
 
 /**
  * Used to find the methods and properties of a context
- * @param {any} contextInstance The instance of the context
+ * @param {unknown} contextInstance The instance of the context
  * @returns {UmbDebugContextItemData} A simplied object contain the properties and methods of the context
  */
 function contextItemData(contextInstance: any): UmbDebugContextItemData {
@@ -80,7 +80,7 @@ function contextItemData(contextInstance: any): UmbDebugContextItemData {
 
 /**
  * Gets a list of methods from a class
- * @param {any} klass The class to get the methods from
+ * @param {object} klass The class to get the methods from
  * @returns {Array<string>} An array of method names as strings
  */
 function getClassMethodNames(klass: any) {

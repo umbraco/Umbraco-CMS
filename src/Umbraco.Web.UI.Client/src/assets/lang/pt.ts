@@ -325,6 +325,8 @@ export default {
 		isSensitiveValue:
 			'Este valor está oculto. Se precisar de acesso para visualizar este valor, entre em contacto com o administrador do seu site.',
 		isSensitiveValue_short: 'Este valor está oculto.',
+		isSensitiveValueNotice:
+			'Se precisar de acesso para visualizar os valores ocultos, entre em contacto com o administrador do seu site.',
 		languagesToPublish: 'Que idiomas gostaria de publicar?',
 		languagesToSendForApproval: 'Que idiomas gostaria de enviar para aprovação?',
 		languagesToSchedule: 'Que idiomas gostaria de agendar?',
@@ -379,6 +381,8 @@ export default {
 	},
 	media: {
 		clickToUpload: 'Clique para carregar',
+		browseFilesAction: 'Procurar ficheiros',
+		dropFilesOr: 'Arraste e solte ficheiros multimédia aqui<br />ou',
 		orClickHereToUpload: 'ou clique aqui para escolher ficheiros',
 		disallowedFileType: 'Não é possível carregar este ficheiro, não tem um tipo de ficheiro aprovado',
 		disallowedMediaType:
@@ -901,6 +905,8 @@ export default {
 		no: 'Não',
 		nodeName: 'Nome do Nó',
 		notFound: 'Não encontrado',
+		noResults: 'Sem resultados',
+		noResultsFor: (query: string) => `Nenhum resultado para "${query}".`,
 		of: 'de',
 		off: 'Desligado',
 		ok: 'OK',
@@ -2866,6 +2872,8 @@ export default {
 		invalidTimeZone: 'O fuso horário selecionado não é válido',
 	},
 	picker: {
+		browseTab: 'Procurar',
+		searchTab: 'Pesquisar',
 		selectedCount: (count: number) => `${count} ${count === 1 ? 'item selecionado' : 'itens selecionados'}`,
 	},
 } as UmbLocalizationDictionary;

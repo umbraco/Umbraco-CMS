@@ -6,7 +6,6 @@ import { tryExecute } from '@umbraco-cms/backoffice/resources';
 /**
  * A data source for the Document Public Access that fetches data from the server
  * @class UmbDocumentPublicAccessServerDataSource
- * @implements {RepositoryDetailDataSource}
  */
 export class UmbDocumentPublicAccessServerDataSource {
 	#host: UmbControllerHost;

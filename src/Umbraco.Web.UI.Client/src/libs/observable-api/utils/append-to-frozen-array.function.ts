@@ -1,5 +1,6 @@
 /**
  * @function appendToFrozenArray
+ * @template T
  * @param {Array<T>} data - An Array which is frozen and should be updated.
  * @param {T} entry - A new entry to append to the array.
  * @param {(entry: T) => unknown} getUniqueMethod - Method to retrieve a value of an entry that is unique to it. This enables the method to replace existing value if it matches the unique value.

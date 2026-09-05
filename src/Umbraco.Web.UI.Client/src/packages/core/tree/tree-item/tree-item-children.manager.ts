@@ -63,7 +63,7 @@ export class UmbTreeItemChildrenManager<
 	#isLoadingNextChildren = new UmbBooleanState(false);
 	public readonly isLoadingNextChildren = this.#isLoadingNextChildren.asObservable();
 
-	#takeSize: number = 50;
+	#takeSize: number = 100;
 	#takeBeforeTarget?: number;
 	#takeAfterTarget?: number;
 
@@ -507,7 +507,7 @@ export class UmbTreeItemChildrenManager<
 	 * Checks if a specific child is loaded
 	 * @param {(UmbEntityModel | undefined)} entity - The entity to check
 	 * @returns {boolean} - True if items has been loaded
-	 * @memberof UmbRepositoryTreeItemChildrenManager
+	 * @memberof UmbTreeItemChildrenManager
 	 */
 	public isChildLoaded(entity: UmbEntityModel | undefined): boolean {
 		return this.#children
@@ -518,7 +518,7 @@ export class UmbTreeItemChildrenManager<
 	/**
 	 * Checks if any children have been loaded
 	 * @returns {boolean} - True if any items has been loaded
-	 * @memberof UmbRepositoryTreeItemChildrenManager
+	 * @memberof UmbTreeItemChildrenManager
 	 */
 	public hasLoadedChildren(): boolean {
 		return this.#children.getValue().length > 0;
@@ -526,7 +526,7 @@ export class UmbTreeItemChildrenManager<
 
 	/**
 	 * Clears the internal state
-	 * @memberof UmbRepositoryTreeItemChildrenManager
+	 * @memberof UmbTreeItemChildrenManager
 	 */
 	public clear(): void {
 		this.#children.setValue([]);

@@ -1,5 +1,6 @@
 /**
  * @function pushToUniqueArray
+ * @template T
  * @param {T[]} data - An array of objects.
  * @param {T} entry - The object to insert or replace with.
  * @param {(entry: T) => unknown} [getUniqueMethod] - Method to get the unique value of an entry.

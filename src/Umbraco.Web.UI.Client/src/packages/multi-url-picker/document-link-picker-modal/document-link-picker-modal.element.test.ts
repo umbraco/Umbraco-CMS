@@ -1,5 +1,6 @@
 import { UmbDocumentLinkPickerModalElement } from './document-link-picker-modal.element.js';
-import { expect } from '@open-wc/testing';
+import { expect, waitUntil } from '@open-wc/testing';
+import { ignoreResizeObserverLoopErrors } from '@umbraco-cms/internal/test-utils';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_DOCUMENT_SEARCH_PROVIDER_ALIAS } from '@umbraco-cms/backoffice/document';
@@ -48,6 +49,7 @@ const searchProviderManifest = {
 
 describe('UmbDocumentLinkPickerModalElement', () => {
 	let host: UmbTestScopeHostElement;
+	let restoreErrorHandler: () => void;
 
 	before(() => {
 		umbExtensionsRegistry.register(searchProviderManifest as never);
@@ -67,17 +69,83 @@ describe('UmbDocumentLinkPickerModalElement', () => {
 	};
 
 	beforeEach(() => {
+		restoreErrorHandler = ignoreResizeObserverLoopErrors();
 		host = new UmbTestScopeHostElement();
 		document.body.appendChild(host);
 	});
 
 	afterEach(() => {
 		host.remove();
+		restoreErrorHandler();
 	});
 
 	it('is defined with its own instance', async () => {
 		const { element } = await mount();
 		expect(element).to.be.instanceOf(UmbDocumentLinkPickerModalElement);
+	});
+
+	describe('tabs', () => {
+		const getTabs = (element: UmbDocumentLinkPickerModalElement) => element.shadowRoot?.querySelector('uui-tab-group');
+
+		const getPane = (element: UmbDocumentLinkPickerModalElement, id: 'browse' | 'search') =>
+			element.shadowRoot?.querySelector<HTMLElement>(`#${id}`);
+
+		const clickTab = async (element: UmbDocumentLinkPickerModalElement, tab: 'browse' | 'search') => {
+			element.shadowRoot?.querySelector<HTMLElement>(`[data-mark="picker:tab:${tab}"]`)?.click();
+			await element.updateComplete;
+		};
+
+		const mountWithTabs = async () => {
+			const { element, tree } = await mount();
+			await waitUntil(() => !!getTabs(element), 'tab group was never rendered');
+			return { element, tree };
+		};
+
+		it('renders a browse and a search tab', async () => {
+			const { element } = await mountWithTabs();
+			expect(getTabs(element)?.querySelectorAll('uui-tab')).to.have.lengthOf(2);
+		});
+
+		it('starts on the browse tab', async () => {
+			const { element } = await mountWithTabs();
+			expect(getPane(element, 'browse')?.hidden).to.be.false;
+			expect(getPane(element, 'search')?.hidden).to.be.true;
+		});
+
+		it('shows the search pane when the search tab is clicked', async () => {
+			const { element } = await mountWithTabs();
+
+			await clickTab(element, 'search');
+
+			expect(getPane(element, 'browse')?.hidden).to.be.true;
+			expect(getPane(element, 'search')?.hidden).to.be.false;
+		});
+
+		it('keeps the tree mounted while the search tab is active', async () => {
+			const { element, tree } = await mountWithTabs();
+
+			await clickTab(element, 'search');
+
+			expect(getPane(element, 'browse')?.querySelector('umb-tree')).to.equal(tree);
+		});
+
+		it('renders one language selector, shared by both tabs', async () => {
+			const { element } = await mountWithTabs();
+			element.data = { allowCultureSpecificLinks: true };
+
+			// The selector only appears once more than one language has loaded.
+			await waitUntil(
+				() => !!element.shadowRoot?.querySelector('uui-combobox'),
+				'language selector was never rendered',
+			);
+
+			await clickTab(element, 'search');
+
+			// The culture applies to the picked document either way, so the selector sits above both panes.
+			expect(element.shadowRoot?.querySelectorAll('uui-combobox')).to.have.lengthOf(1);
+			expect(getPane(element, 'browse')?.querySelector('uui-combobox')).to.not.exist;
+			expect(getPane(element, 'search')?.querySelector('uui-combobox')).to.not.exist;
+		});
 	});
 
 	describe('interaction memory', () => {

@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.MediaType;
 
@@ -38,14 +39,14 @@ public class CompositionReferenceMediaTypeController : MediaTypeControllerBase
     [EndpointDescription("Gets a collection of media types that reference the specified media type as a composition.")]
     public async Task<IActionResult> CompositionReferences(CancellationToken cancellationToken, Guid id)
     {
-        var mediaType = await _mediaTypeService.GetAsync(id);
+        IMediaType? mediaType = await _mediaTypeService.GetAsync(id);
 
         if (mediaType is null)
         {
             return OperationStatusResult(ContentTypeOperationStatus.NotFound);
         }
 
-        IEnumerable<IMediaType> composedOf = _mediaTypeService.GetComposedOf(mediaType.Id);
+        IEnumerable<IMediaType> composedOf = _mediaTypeService.GetComposedOf(mediaType.Id, ComposedOfType.Composition);
         List<MediaTypeCompositionResponseModel> responseModels = _umbracoMapper.MapEnumerable<IMediaType, MediaTypeCompositionResponseModel>(composedOf);
 
         return Ok(responseModels);

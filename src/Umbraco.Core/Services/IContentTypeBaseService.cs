@@ -86,10 +86,15 @@ public interface IContentTypeBaseService<TItem> : IContentTypeBaseService, IServ
     IEnumerable<TItem> GetDescendants(int id, bool andSelf); // parent-child axis
 
     /// <summary>
-    ///     Gets all content types that are composed of a given content type.
+    ///     Gets all content types that are composed of a given content type (both composition users and inheritance children).
     /// </summary>
     /// <param name="id">The identifier of the composition content type.</param>
     /// <returns>A collection of content types that use the specified composition.</returns>
+    /// <remarks>
+    ///     To restrict the result to a single relationship kind use the
+    ///     <see cref="Umbraco.Extensions.ContentTypeServiceExtensions.GetComposedOf{TItem}(IContentTypeBaseService{TItem}, int, ComposedOfType)" />
+    ///     extension.
+    /// </remarks>
     IEnumerable<TItem> GetComposedOf(int id); // composition axis
 
     /// <summary>

@@ -53,7 +53,7 @@ export class UmbNotificationHandler {
 	}
 
 	/**
-	 * @param {...any} args - Arguments passed to the close resolver
+	 * @param {...unknown} args - Arguments passed to the close resolver
 	 * @memberof UmbNotificationHandler
 	 */
 	public close(...args: any) {
@@ -62,7 +62,7 @@ export class UmbNotificationHandler {
 	}
 
 	/**
-	 * @returns {*} A promise that resolves when the notification is closed
+	 * @returns {Promise<unknown>} A promise that resolves when the notification is closed
 	 * @memberof UmbNotificationHandler
 	 */
 	public onClose(): Promise<any> {

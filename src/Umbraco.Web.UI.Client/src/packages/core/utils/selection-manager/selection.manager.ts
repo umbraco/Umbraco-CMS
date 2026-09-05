@@ -27,7 +27,7 @@ export class UmbSelectionManager<ValueType extends string | null = string | null
 
 	/**
 	 * Returns whether items can be selected.
-	 * @returns {*} Whether items can be selected.
+	 * @returns {boolean} Whether items can be selected.
 	 * @memberof UmbSelectionManager
 	 */
 	public getSelectable() {
@@ -45,7 +45,7 @@ export class UmbSelectionManager<ValueType extends string | null = string | null
 
 	/**
 	 * Returns the current selection.
-	 * @returns {*} The current selection.
+	 * @returns {Array<ValueType>} The current selection.
 	 * @memberof UmbSelectionManager
 	 */
 	public getSelection() {
@@ -73,7 +73,7 @@ export class UmbSelectionManager<ValueType extends string | null = string | null
 
 	/**
 	 * Returns whether multiple items can be selected.
-	 * @returns {*} Whether multiple items can be selected.
+	 * @returns {boolean} Whether multiple items can be selected.
 	 * @memberof UmbSelectionManager
 	 */
 	public getMultiple() {
@@ -144,7 +144,7 @@ export class UmbSelectionManager<ValueType extends string | null = string | null
 	/**
 	 * Returns true if the given unique id is selected.
 	 * @param {(ValueType)} unique - The unique id to check.
-	 * @returns {*} True if the given unique id is selected.
+	 * @returns {boolean} True if the given unique id is selected.
 	 * @memberof UmbSelectionManager
 	 */
 	public isSelected(unique: ValueType) {
@@ -171,7 +171,7 @@ export class UmbSelectionManager<ValueType extends string | null = string | null
 
 	/**
 	 * Returns the function that determines if an item is selectable or not.
-	 * @returns {*} The function that determines if an item is selectable or not.
+	 * @returns {(unique: ValueType) => boolean} The function that determines if an item is selectable or not.
 	 * @memberof UmbSelectionManager
 	 */
 	public getAllowLimitation() {

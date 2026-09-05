@@ -1,12 +1,13 @@
 import type { UmbCultureDataSource } from './index.js';
-import { CultureService } from '@umbraco-cms/backoffice/external/backend-api';
+import { CultureService, type PagedCultureReponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
+import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
 
 /**
  * A data source for the Language that fetches data from the server
  * @class UmbLanguageServerDataSource
- * @implements {RepositoryDetailDataSource}
+ * @implements {UmbCultureDataSource}
  */
 export class UmbCultureServerDataSource implements UmbCultureDataSource {
 	#host: UmbControllerHost;
@@ -25,10 +26,16 @@ export class UmbCultureServerDataSource implements UmbCultureDataSource {
 	 * @param {object} root0 - Pagination options.
 	 * @param {number} root0.skip - Number of items to skip.
 	 * @param {number} root0.take - Number of items to take.
-	 * @returns {*} The paginated list of cultures.
+	 * @returns {Promise<UmbDataSourceResponse<PagedCultureReponseModel>>} The paginated list of cultures.
 	 * @memberof UmbLanguageServerDataSource
 	 */
-	async getCollection({ skip, take }: { skip: number; take: number }) {
+	async getCollection({
+		skip,
+		take,
+	}: {
+		skip: number;
+		take: number;
+	}): Promise<UmbDataSourceResponse<PagedCultureReponseModel>> {
 		return tryExecute(this.#host, CultureService.getCulture({ query: { skip, take } }));
 	}
 }

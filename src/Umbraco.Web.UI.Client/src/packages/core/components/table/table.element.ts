@@ -119,7 +119,7 @@ export class UmbTableSortedEvent extends Event {
  *  @fires {UmbTableSelectedEvent} selected - fires when a row is selected
  *  @fires {UmbTableDeselectedEvent} deselected - fires when a row is deselected
  *  @fires {UmbTableOrderedEvent} sort - fires when a column order is changed
- *  @augments LitElement
+ *  @augments UmbLitElement
  */
 @customElement('umb-table')
 export class UmbTableElement extends UmbLitElement {

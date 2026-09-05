@@ -4,12 +4,16 @@ import { DocumentBlueprintService } from '@umbraco-cms/backoffice/external/backe
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
+import type {
+	UmbDataSourceErrorResponse,
+	UmbDataSourceResponse,
+	UmbDetailDataSource,
+} from '@umbraco-cms/backoffice/repository';
 
 /**
  * A data source for a Document Blueprint folder that fetches data from the server
  * @class UmbDocumentBlueprintFolderServerDataSource
- * @implements {RepositoryDetailDataSource}
+ * @implements {UmbDetailDataSource<UmbFolderModel>}
  */
 export class UmbDocumentBlueprintFolderServerDataSource implements UmbDetailDataSource<UmbFolderModel> {
 	#host: UmbControllerHost;
@@ -26,10 +30,10 @@ export class UmbDocumentBlueprintFolderServerDataSource implements UmbDetailData
 	/**
 	 * Creates a scaffold for a Document Blueprint folder
 	 * @param {Partial<UmbFolderModel>} [preset] - The preset data to populate the scaffold with.
-	 * @returns {*} The document blueprint folder scaffold.
+	 * @returns {Promise<UmbDataSourceResponse<UmbFolderModel>>} The document blueprint folder scaffold.
 	 * @memberof UmbDocumentBlueprintFolderServerDataSource
 	 */
-	async createScaffold(preset?: Partial<UmbFolderModel>) {
+	async createScaffold(preset?: Partial<UmbFolderModel>): Promise<UmbDataSourceResponse<UmbFolderModel>> {
 		const scaffold: UmbFolderModel = {
 			entityType: UMB_DOCUMENT_BLUEPRINT_FOLDER_ENTITY_TYPE,
 			unique: UmbId.new(),
@@ -43,10 +47,10 @@ export class UmbDocumentBlueprintFolderServerDataSource implements UmbDetailData
 	/**
 	 * Fetches a Document Blueprint folder from the server
 	 * @param {string} unique - The unique identifier of the folder to fetch.
-	 * @returns {*} The document blueprint folder.
+	 * @returns {Promise<UmbDataSourceResponse<UmbFolderModel>>} The document blueprint folder.
 	 * @memberof UmbDocumentBlueprintFolderServerDataSource
 	 */
-	async read(unique: string) {
+	async read(unique: string): Promise<UmbDataSourceResponse<UmbFolderModel>> {
 		if (!unique) throw new Error('Unique is missing');
 
 		const { data, error } = await tryExecute(
@@ -72,10 +76,10 @@ export class UmbDocumentBlueprintFolderServerDataSource implements UmbDetailData
 	/**
 	 * Creates a Document Blueprint folder on the server
 	 * @param {UmbFolderModel} model - The document blueprint folder to create.
-	 * @returns {*} The created document blueprint folder.
+	 * @returns {Promise<UmbDataSourceResponse<UmbFolderModel>>} The created document blueprint folder.
 	 * @memberof UmbDocumentBlueprintFolderServerDataSource
 	 */
-	async create(model: UmbFolderModel, parentUnique: string | null) {
+	async create(model: UmbFolderModel, parentUnique: string | null): Promise<UmbDataSourceResponse<UmbFolderModel>> {
 		if (!model) throw new Error('Model is missing');
 		if (!model.unique) throw new Error('Unique is missing');
 		if (!model.name) throw new Error('Name is missing');
@@ -103,10 +107,10 @@ export class UmbDocumentBlueprintFolderServerDataSource implements UmbDetailData
 	/**
 	 * Updates a Document Blueprint folder on the server
 	 * @param {UmbFolderModel} model - The document blueprint folder to update.
-	 * @returns {*} The updated document blueprint folder.
+	 * @returns {Promise<UmbDataSourceResponse<UmbFolderModel>>} The updated document blueprint folder.
 	 * @memberof UmbDocumentBlueprintFolderServerDataSource
 	 */
-	async update(model: UmbFolderModel) {
+	async update(model: UmbFolderModel): Promise<UmbDataSourceResponse<UmbFolderModel>> {
 		if (!model) throw new Error('Model is missing');
 		if (!model.unique) throw new Error('Unique is missing');
 		if (!model.name) throw new Error('Folder name is missing');
@@ -129,10 +133,10 @@ export class UmbDocumentBlueprintFolderServerDataSource implements UmbDetailData
 	/**
 	 * Deletes a Document Blueprint folder on the server
 	 * @param {string} unique - The unique identifier of the folder to delete.
-	 * @returns {*} The result of the delete operation.
-	 * @memberof UmbDocumentBlueprintServerDataSource
+	 * @returns {Promise<UmbDataSourceErrorResponse>} The result of the delete operation.
+	 * @memberof UmbDocumentBlueprintFolderServerDataSource
 	 */
-	async delete(unique: string) {
+	async delete(unique: string): Promise<UmbDataSourceErrorResponse> {
 		if (!unique) throw new Error('Unique is missing');
 		return tryExecute(
 			this.#host,

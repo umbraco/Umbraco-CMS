@@ -104,6 +104,15 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 	@property({ type: Boolean, attribute: false })
 	isMenu?: boolean = false;
 
+	/**
+	 * Whether opening an item takes the user into it, by acting on `UmbTreeItemOpenEvent`.
+	 *
+	 * Set it when the host does. A tree that can do no more than expand and collapse must leave it off, so an item never
+	 * replaces the affordance that expands with one that cannot act.
+	 */
+	@property({ type: Boolean, attribute: false })
+	drillable?: boolean = false;
+
 	@property({ attribute: false })
 	selectableFilter: (item: UmbTreeItemModelBase) => boolean = () => true;
 
@@ -186,6 +195,10 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 
 		if (_changedProperties.has('hideTreeItemActions')) {
 			this._api!.setHideTreeItemActions?.(this.hideTreeItemActions);
+		}
+
+		if (_changedProperties.has('drillable')) {
+			this._api!.setDrillable?.(this.drillable ?? false);
 		}
 
 		if (_changedProperties.has('isMenu')) {

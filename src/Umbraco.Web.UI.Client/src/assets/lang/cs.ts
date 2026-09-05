@@ -316,6 +316,8 @@ export default {
 	},
 	media: {
 		clickToUpload: 'Klikněte pro nahrání',
+		browseFilesAction: 'Procházet soubory',
+		dropFilesOr: 'Přetáhněte média sem<br />nebo',
 		orClickHereToUpload: 'nebo kliknutím sem vyberte soubory',
 		disallowedFileType: 'Tento soubor nelze nahrát, nemá povolený typ souboru',
 		maxFileSize: 'Maximální velikost souboru je',
@@ -697,6 +699,8 @@ export default {
 		new: 'Nový',
 		next: 'Následující',
 		no: 'Ne',
+		noResults: 'Žádné výsledky',
+		noResultsFor: (query: string) => `Nebyl nalezen žádný výsledek pro "${query}".`,
 		of: 'z',
 		off: 'Vypnuto',
 		ok: 'OK',
@@ -1562,6 +1566,10 @@ export default {
 		thirdPartyGroup: 'Třetí strana',
 		userPermissions: 'Oprávnění uživatele',
 		userTypes: 'Typy uživatelů',
+	},
+	picker: {
+		browseTab: 'Procházet',
+		searchTab: 'Hledat',
 	},
 	update: {
 		updateAvailable: 'Nová aktualizace je připrvena',

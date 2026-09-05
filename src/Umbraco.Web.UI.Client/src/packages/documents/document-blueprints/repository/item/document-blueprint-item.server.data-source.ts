@@ -10,7 +10,7 @@ import { tryExecute } from '@umbraco-cms/backoffice/resources';
 /**
  * A data source for Document Blueprint items that fetches data from the server
  * @class UmbDocumentBlueprintItemServerDataSource
- * @implements {DocumentTreeDataSource}
+ * @augments {UmbItemServerDataSourceBase}
  */
 export class UmbDocumentBlueprintItemServerDataSource extends UmbItemServerDataSourceBase<
 	DocumentBlueprintItemResponseModel,

@@ -103,8 +103,9 @@ internal static class PathValidationExtensions
         if (entity.ValidatePath() == false)
         {
             logger.LogWarning(
-                "The content item {EntityId} has an invalid path: {EntityPath} with parentID: {EntityParentId}",
+                "The content item {EntityId} (key {EntityKey}) has an invalid path: {EntityPath} with parentID: {EntityParentId}",
                 entity.Id,
+                entity.Key,
                 entity.Path,
                 entity.ParentId);
             if (entity.ParentId == -1)

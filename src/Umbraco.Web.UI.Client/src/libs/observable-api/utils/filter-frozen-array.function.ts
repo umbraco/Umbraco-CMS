@@ -1,5 +1,6 @@
 /**
  * @function filterFrozenArray
+ * @template T
  * @param {Array<T>} data - RxJS Subject to use for this Observable.
  * @param {(entry: T) => boolean} filterMethod - Method to filter the array.
  * @returns {Array<T>} - A new, filtered array.

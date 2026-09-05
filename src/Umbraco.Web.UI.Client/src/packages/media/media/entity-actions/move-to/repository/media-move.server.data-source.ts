@@ -2,6 +2,7 @@ import { MediaService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import type { UmbMoveDataSource, UmbMoveToRequestArgs } from '@umbraco-cms/backoffice/tree';
+import type { UmbDataSourceErrorResponse } from '@umbraco-cms/backoffice/repository';
 
 /**
  * Move Media Server Data Source
@@ -21,13 +22,11 @@ export class UmbMoveMediaServerDataSource implements UmbMoveDataSource {
 
 	/**
 	 * Move an item for the given id to the target unique
-	 * @param {string} unique - The unique ID of the media to move
-	 * @param {(string | null)} targetUnique - The unique ID of the destination
 	 * @param {UmbMoveToRequestArgs} args - The move request arguments
-	 * @returns {*} A promise that resolves once the media has been moved
+	 * @returns {UmbDataSourceErrorResponse} A promise that resolves once the media has been moved
 	 * @memberof UmbMoveMediaServerDataSource
 	 */
-	async moveTo(args: UmbMoveToRequestArgs) {
+	async moveTo(args: UmbMoveToRequestArgs): Promise<UmbDataSourceErrorResponse> {
 		if (!args.unique) throw new Error('Unique is missing');
 		if (args.destination.unique === undefined) throw new Error('Destination unique is missing');
 

@@ -21,6 +21,8 @@ export abstract class UmbTreeItemElementBase<
 > extends UmbLitElement {
 	@property({ type: Object, attribute: false })
 	set item(newVal: TreeItemModelType) {
+		if (newVal === this._item) return;
+
 		this._item = newVal;
 		this._extractFlags(newVal);
 
@@ -185,7 +187,7 @@ export abstract class UmbTreeItemElementBase<
 		this.#api?.deselect();
 	}
 
-	#handleDblClick(event: MouseEvent) {
+	protected _handleDblClick(event: MouseEvent) {
 		if (!this._item?.hasChildren) return;
 		event.stopPropagation();
 		this.#api?.open();
@@ -299,7 +301,7 @@ export abstract class UmbTreeItemElementBase<
 	}
 
 	renderLabel() {
-		return html`<span slot="label" @dblclick=${this.#handleDblClick}>${this._label}<slot name="label"></slot></span>`;
+		return html`<span slot="label" @dblclick=${this._handleDblClick}>${this._label}<slot name="label"></slot></span>`;
 	}
 
 	#renderActions() {
@@ -313,7 +315,7 @@ export abstract class UmbTreeItemElementBase<
 			${this._childItems
 				? repeat(
 						this._childItems,
-						(item, index) => item.name + '___' + index,
+						(item) => `${item.entityType}:${item.unique}`,
 						(item) => html`
 							<umb-tree-item
 								.entityType=${item.entityType}

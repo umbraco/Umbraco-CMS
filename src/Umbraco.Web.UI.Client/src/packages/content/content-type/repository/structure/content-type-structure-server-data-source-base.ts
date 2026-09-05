@@ -35,7 +35,7 @@ export abstract class UmbContentTypeStructureServerDataSourceBase<
 	 * Creates an instance of UmbContentTypeStructureServerDataSourceBase.
 	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @param {UmbContentTypeStructureServerDataSourceBaseArgs} args - The arguments for this data source
-	 * @memberof UmbItemServerDataSourceBase
+	 * @memberof UmbContentTypeStructureServerDataSourceBase
 	 */
 	constructor(
 		host: UmbControllerHost,
@@ -50,7 +50,7 @@ export abstract class UmbContentTypeStructureServerDataSourceBase<
 	 * Returns a promise with the allowed content types for the given unique
 	 * @param {string} unique The unique identifier of the content type.
 	 * @param {string | null} parentContentUnique The unique identifier of the parent content.
-	 * @returns {*} The allowed children of the content type.
+	 * @returns {Promise<UmbDataSourceResponse<UmbPagedModel<ClientItemType>>>} The allowed children of the content type.
 	 * @memberof UmbContentTypeStructureServerDataSourceBase
 	 */
 	async getAllowedChildrenOf(unique: string | null, parentContentUnique: string | null) {

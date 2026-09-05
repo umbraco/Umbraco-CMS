@@ -1,5 +1,6 @@
 import type { ManifestElement } from '@umbraco-cms/backoffice/extension-api';
-import type { UUIInterfaceColor, UUIInterfaceLook } from '@umbraco-cms/backoffice/external/uui';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars -- UUIButtonElement is referenced only via {@link} in JSDoc below
+import type { UUIButtonElement, UUIInterfaceColor, UUIInterfaceLook } from '@umbraco-cms/backoffice/external/uui';
 
 /**
  * Represents an authentication provider that can be used to authenticate users.

@@ -22,6 +22,7 @@ type UmbArrayStateValue<T, D extends T[] | undefined> = undefined extends D ? T[
  * `undefined` — or a value typed to include `undefined` — makes the state nullable (`getValue()` returns `T[] | undefined`).
  * Note this detection only works when the generic parameters aren't pinned explicitly to just `T`; to opt into the nullable
  * behaviour while still naming `T`, provide all three generics: `new UmbArrayState<Item, unknown, undefined>(undefined, ...)`.
+ * @template T
  */
 export class UmbArrayState<T, U = unknown, D extends T[] | undefined = T[]> extends UmbDeepState<
 	UmbArrayStateValue<T, D>

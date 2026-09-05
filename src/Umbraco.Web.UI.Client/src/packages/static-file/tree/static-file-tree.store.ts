@@ -4,7 +4,7 @@ import { UmbUniqueTreeStore } from '@umbraco-cms/backoffice/tree';
 
 /**
  * @class UmbStaticFileTreeStore
- * @augments {UmbStoreBase}
+ * @augments {UmbUniqueTreeStore}
  * @description - Tree Data Store for Static File Items
  * @deprecated - Use `UmbStaticFileTreeRepository` instead. This will be removed in Umbraco 18.
  */

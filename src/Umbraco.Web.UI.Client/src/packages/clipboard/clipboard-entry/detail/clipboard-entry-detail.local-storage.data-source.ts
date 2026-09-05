@@ -24,7 +24,7 @@ export class UmbClipboardEntryDetailLocalStorageDataSource
 	/**
 	 * Scaffold a new clipboard entry
 	 * @param {Partial<UmbClipboardEntryDetailModel>} [preset] Preset values for the new entry.
-	 * @returns {*} The scaffolded clipboard entry.
+	 * @returns {Promise<UmbDataSourceResponse<UmbClipboardEntryDetailModel>>} The scaffolded clipboard entry.
 	 * @memberof UmbClipboardEntryDetailLocalStorageDataSource
 	 */
 	async createScaffold(preset: Partial<UmbClipboardEntryDetailModel> = {}) {
@@ -46,7 +46,7 @@ export class UmbClipboardEntryDetailLocalStorageDataSource
 	/**
 	 * Create a new clipboard entry in local storage
 	 * @param {UmbClipboardEntryDetailModel} model The clipboard entry to create.
-	 * @returns {*}  {Promise<UmbDataSourceResponse<UmbClipboardEntry>>}
+	 * @returns {Promise<UmbDataSourceResponse<UmbClipboardEntryDetailModel>>} The created clipboard entry, or an error.
 	 * @memberof UmbClipboardEntryDetailLocalStorageDataSource
 	 */
 	async create(model: UmbClipboardEntryDetailModel): Promise<UmbDataSourceResponse<UmbClipboardEntryDetailModel>> {
@@ -81,7 +81,7 @@ export class UmbClipboardEntryDetailLocalStorageDataSource
 	/**
 	 * Read a clipboard entry from local storage
 	 * @param {string} unique The unique id of the clipboard entry.
-	 * @returns {*}  {Promise<UmbDataSourceResponse<UmbClipboardEntry>>}
+	 * @returns {Promise<UmbDataSourceResponse<UmbClipboardEntryDetailModel>>} The clipboard entry, or an error.
 	 * @memberof UmbClipboardEntryDetailLocalStorageDataSource
 	 */
 	async read(unique: string): Promise<UmbDataSourceResponse<UmbClipboardEntryDetailModel>> {
@@ -106,7 +106,7 @@ export class UmbClipboardEntryDetailLocalStorageDataSource
 	/**
 	 * Update a clipboard entry in local storage
 	 * @param {UmbClipboardEntryDetailModel} model The clipboard entry to update.
-	 * @returns {*}  {Promise<UmbDataSourceResponse<UmbClipboardEntry>>}
+	 * @returns {Promise<UmbDataSourceResponse<UmbClipboardEntryDetailModel>>} The updated clipboard entry, or an error.
 	 * @memberof UmbClipboardEntryDetailLocalStorageDataSource
 	 */
 	async update(model: UmbClipboardEntryDetailModel): Promise<UmbDataSourceResponse<UmbClipboardEntryDetailModel>> {
@@ -146,7 +146,7 @@ export class UmbClipboardEntryDetailLocalStorageDataSource
 	/**
 	 * Delete a clipboard entry from local storage
 	 * @param {string} unique The unique id of the clipboard entry.
-	 * @returns {*}  {Promise<UmbDataSourceErrorResponse>}
+	 * @returns {Promise<UmbDataSourceErrorResponse>} An error, if the deletion failed.
 	 * @memberof UmbClipboardEntryDetailLocalStorageDataSource
 	 */
 	async delete(unique: string): Promise<UmbDataSourceErrorResponse> {

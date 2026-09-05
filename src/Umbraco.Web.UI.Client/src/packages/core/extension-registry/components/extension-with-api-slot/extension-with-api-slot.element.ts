@@ -160,7 +160,7 @@ export class UmbExtensionWithApiSlotElement extends UmbLitElement {
 	 *     .filter=${(manifest) => manifest.meta.look === 'primary'}>
 	 * </umb-extension-with-api-slot>
 	 * ```
-	 * @returns {(manifest: any) => boolean} The filter function.
+	 * @returns {(manifest: ManifestBase) => boolean} The filter function.
 	 */
 	@property({ type: Object, attribute: false })
 	public get filter(): (manifest: any) => boolean {
@@ -217,7 +217,7 @@ export class UmbExtensionWithApiSlotElement extends UmbLitElement {
 	 *     .apiArgs=${(manifest) => [entityContext, manifest.meta.actionType]}>
 	 * </umb-extension-with-api-slot>
 	 * ```
-	 * @returns {Array<unknown> | UmbApiConstructorArgumentsMethodType<any> | undefined} The API constructor arguments.
+	 * @returns {Array<unknown> | UmbApiConstructorArgumentsMethodType<ManifestBase> | undefined} The API constructor arguments.
 	 */
 	@property({ attribute: false })
 	get apiArgs(): Array<unknown> | UmbApiConstructorArgumentsMethodType<any> | undefined {

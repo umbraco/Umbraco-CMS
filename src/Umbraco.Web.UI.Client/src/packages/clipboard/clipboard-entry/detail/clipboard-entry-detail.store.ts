@@ -5,7 +5,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
  * @class UmbClipboardEntryDetailStore
- * @augments {UmbStoreBase}
+ * @augments {UmbDetailStoreBase}
  * @description - Data Store for Clipboard Details
  */
 export class UmbClipboardEntryDetailStore extends UmbDetailStoreBase<UmbClipboardEntryDetailModel> {

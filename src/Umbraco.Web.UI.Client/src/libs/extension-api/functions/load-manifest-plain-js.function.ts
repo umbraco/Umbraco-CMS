@@ -2,6 +2,7 @@ import type { JsLoaderPromise } from '../types/utils.js';
 
 /**
  * Loads a plain JS module from a manifest property.
+ * @template JsType
  * @param {string | JsLoaderPromise<JsType> | JsType} property The manifest property to load the module from.
  * @returns {Promise<JsType | undefined>} The resolved module, if found.
  */

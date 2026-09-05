@@ -196,6 +196,8 @@ export default {
 		isSensitiveValue:
 			'Это значение скрыто. Если Вам нужен доступ к просмотру этого значения, свяжитесь с администратором веб-сайта.',
 		isSensitiveValue_short: 'Это значение скрыто.',
+		isSensitiveValueNotice:
+			'Если Вам нужен доступ к просмотру скрытых значений, свяжитесь с администратором веб-сайта.',
 		itemChanged: 'Этот документ был изменен после публикации',
 		itemNotPublished: 'Этот документ не опубликован',
 		lastPublished: 'Документ опубликован',
@@ -573,6 +575,8 @@ export default {
 		next: 'След',
 		no: 'Нет',
 		noItemsInList: 'Здесь пока нет элементов',
+		noResults: 'Нет результатов',
+		noResultsFor: (query: string) => `Нет результатов по запросу "${query}".`,
 		of: 'из',
 		off: 'Выкл',
 		ok: 'Ok',
@@ -840,6 +844,8 @@ export default {
 	},
 	media: {
 		clickToUpload: 'Нажмите, чтобы загрузить',
+		browseFilesAction: 'Обзор файлов',
+		dropFilesOr: 'Перетащите медиафайлы сюда<br />или',
 		disallowedFileType: 'Невозможна загрузка этого файла, этот тип файлов не разрешен для загрузки',
 		orClickHereToUpload: 'или нажмите сюда, чтобы выбрать файлы',
 		maxFileSize: 'Максимально допустимый размер файла: ',
@@ -1340,6 +1346,10 @@ export default {
 		stylesheets: 'Стили CSS',
 		templates: 'Шаблоны',
 		users: 'Пользователи',
+	},
+	picker: {
+		browseTab: 'Обзор',
+		searchTab: 'Поиск',
 	},
 	update: {
 		updateAvailable: 'Доступны обновления',

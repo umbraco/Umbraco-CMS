@@ -229,7 +229,6 @@ export class UmbRelationTypeDetailWorkspaceViewElement extends UmbLitElement imp
 
 			uui-pagination {
 				margin-top: var(--uui-size-layout-1);
-				display: block;
 			}
 		`,
 	];

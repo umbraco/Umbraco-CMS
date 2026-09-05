@@ -4,7 +4,7 @@ import { UmbUniqueTreeStore } from '@umbraco-cms/backoffice/tree';
 
 /**
  * @class UmbMemberTypeTreeStore
- * @augments {UmbStoreBase}
+ * @augments {UmbUniqueTreeStore}
  * @description - Tree Data Store for MemberType Items
  * @deprecated - Use `UmbMemberTypeTreeRepository` instead. This will be removed in Umbraco 18.
  */

@@ -6,7 +6,6 @@ import { tryExecute } from '@umbraco-cms/backoffice/resources';
 /**
  * A data source for the Document Culture and Hostnames that fetches data from the server
  * @class UmbDocumentCultureAndHostnamesServerDataSource
- * @implements {RepositoryDetailDataSource}
  */
 export class UmbDocumentCultureAndHostnamesServerDataSource {
 	#host: UmbControllerHost;

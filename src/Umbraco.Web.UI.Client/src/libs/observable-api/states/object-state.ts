@@ -7,6 +7,7 @@ import { UmbDeepState } from './deep-state.js';
  * Additionally the Subject ensures the data is unique, not updating any Observes unless there is an actual change of the content.
  *
  * The UmbObjectState provides methods to append data when the data is an Object.
+ * @template T
  */
 export class UmbObjectState<T> extends UmbDeepState<T> {
 	/**

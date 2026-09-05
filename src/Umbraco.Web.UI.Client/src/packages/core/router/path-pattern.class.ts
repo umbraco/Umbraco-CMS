@@ -18,7 +18,7 @@ export class UmbPathPattern<
 	/**
 	 * Get the params type of the path pattern
 	 * @public
-	 * @type      {T}
+	 * @type      {LocalParamsType}
 	 * @memberof UmbPathPattern
 	 * @example   `typeof MyPathPattern.PARAMS`
 	 */
@@ -27,7 +27,7 @@ export class UmbPathPattern<
 	/**
 	 * Get absolute params type of the path pattern
 	 * @public
-	 * @type      {T}
+	 * @type      {LocalParamsType & BaseParamsType}
 	 * @memberof UmbPathPattern
 	 * @example   `typeof MyPathPattern.ABSOLUTE_PARAMS`
 	 */
@@ -47,7 +47,6 @@ export class UmbPathPattern<
 	/**
 	 * generate an absolute path from the path pattern
 	 * @param {LocalParamsType} params - The local pattern parameters.
-	 * @param {BaseParamsType} baseParams - The base pattern parameters.
 	 * @returns {string} The generated absolute path.
 	 */
 	generateAbsolute(params: LocalParamsType & BaseParamsType) {

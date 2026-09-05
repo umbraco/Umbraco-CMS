@@ -26,7 +26,7 @@
 
   <ItemGroup>
     <!-- Add design/build time support for EF Core migrations -->
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" PrivateAssets="all" Version="10.0.10" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" PrivateAssets="all" Version="10.0.11" />
   </ItemGroup>
 
   <ItemGroup>
@@ -49,7 +49,7 @@
     of the vulnerable 2.1.11 that Microsoft.Data.Sqlite / Microsoft.EntityFrameworkCore.Sqlite otherwise
     resolve (GHSA-2m69-gcr7-jv3q).
     -->
-    <PackageReference Include="SQLitePCLRaw.lib.e_sqlite3" Version="2.1.12" />
+    <PackageReference Include="SQLitePCLRaw.lib.e_sqlite3" Version="2.1.13" />
   </ItemGroup>
 
   <PropertyGroup>

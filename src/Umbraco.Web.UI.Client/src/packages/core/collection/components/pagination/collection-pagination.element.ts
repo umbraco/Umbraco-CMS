@@ -98,7 +98,6 @@ export class UmbCollectionPaginationElement extends UmbLitElement {
 			}
 
 			uui-pagination {
-				display: block;
 				margin-top: var(--uui-size-layout-1);
 			}
 		`,

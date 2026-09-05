@@ -36,7 +36,7 @@ export class UmbBlockToBlockSingleClipboardPastePropertyValueTranslator
 	/**
 	 * Checks if the clipboard entry value is compatible with the config.
 	 * @param {UmbBlockSingleValueModel} propertyValue - The property value
-	 * @param {*} config - The Property Editor config.
+	 * @param {Array<{ alias: string; value: [{ contentElementTypeKey: string }] }>} config - The Property Editor config.
 	 * @returns {Promise<boolean>} - Whether the clipboard entry value is compatible with the config.
 	 * @memberof UmbBlockToBlockSingleClipboardPastePropertyValueTranslator
 	 */

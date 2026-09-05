@@ -1,11 +1,15 @@
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Cms.Infrastructure.Security;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
@@ -28,6 +32,20 @@ internal sealed class MemberEditingServiceTests : UmbracoIntegrationTest
     private IMemberGroupService MemberGroupService => GetRequiredService<IMemberGroupService>();
 
     private IExternalMemberService ExternalMemberService => GetRequiredService<IExternalMemberService>();
+
+    private ITwoFactorLoginService TwoFactorLoginService => GetRequiredService<ITwoFactorLoginService>();
+
+    // Only providers registered for members or for the back office count as enabled, so a member two factor
+    // provider has to be registered for the two factor tests to exercise anything.
+    protected override void CustomTestSetup(IUmbracoBuilder builder)
+    {
+        builder.Services.AddSingleton<ITwoFactorProvider, TestTwoFactorProvider>();
+        builder.Services.AddSingleton<TestTwoFactorProvider>();
+        builder.Services.AddTransient<TwoFactorMemberValidationProvider<TestTwoFactorProvider>>();
+        builder.Services.Configure<IdentityOptions>(options =>
+            options.Tokens.ProviderMap[TestTwoFactorProvider.Name] =
+                new TokenProviderDescriptor(typeof(TwoFactorMemberValidationProvider<TestTwoFactorProvider>)));
+    }
 
     [Test]
     public async Task Can_Create_Member()
@@ -371,6 +389,77 @@ internal sealed class MemberEditingServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
+    public async Task Two_Factor_Providers_Are_Retained_When_Updating_Without_Access()
+    {
+        // this user does NOT have access to sensitive data
+        var user = UserBuilder.CreateUser();
+        UserService.Save(user);
+
+        var member = await CreateMemberAsync();
+
+        await TwoFactorLoginService.SaveAsync(new TwoFactorLogin
+        {
+            UserOrMemberKey = member.Key,
+            ProviderName = TestTwoFactorProvider.Name,
+            Secret = "secret",
+            Confirmed = true,
+        });
+        Assert.IsTrue(await TwoFactorLoginService.IsTwoFactorEnabledAsync(member.Key));
+
+        // The two factor state is withheld from this user, so the update model carries the default value. That
+        // must not be taken as a request to disable the member's providers.
+        var updateModel = new MemberUpdateModel
+        {
+            Email = "test@test.com",
+            Username = "test",
+            IsTwoFactorEnabled = false,
+            Variants = [new VariantModel { Name = "T. Est" }],
+            Properties =
+            [
+                new PropertyValueModel { Alias = "title", Value = "The title value" },
+                new PropertyValueModel { Alias = "author", Value = "The author value" }
+            ],
+        };
+
+        var result = await MemberEditingService.UpdateAsync(member.Key, updateModel, user);
+        Assert.IsTrue(result.Success);
+
+        Assert.IsTrue(await TwoFactorLoginService.IsTwoFactorEnabledAsync(member.Key));
+    }
+
+    [Test]
+    public async Task Can_Disable_Two_Factor_Providers_With_Access()
+    {
+        var member = await CreateMemberAsync();
+
+        await TwoFactorLoginService.SaveAsync(new TwoFactorLogin
+        {
+            UserOrMemberKey = member.Key,
+            ProviderName = TestTwoFactorProvider.Name,
+            Secret = "secret",
+            Confirmed = true,
+        });
+
+        var updateModel = new MemberUpdateModel
+        {
+            Email = "test@test.com",
+            Username = "test",
+            IsTwoFactorEnabled = false,
+            Variants = [new VariantModel { Name = "T. Est" }],
+            Properties =
+            [
+                new PropertyValueModel { Alias = "title", Value = "The title value" },
+                new PropertyValueModel { Alias = "author", Value = "The author value" }
+            ],
+        };
+
+        var result = await MemberEditingService.UpdateAsync(member.Key, updateModel, SuperUser());
+        Assert.IsTrue(result.Success);
+
+        Assert.IsFalse(await TwoFactorLoginService.IsTwoFactorEnabledAsync(member.Key));
+    }
+
+    [Test]
     public async Task IsExternalMember_Returns_True_For_External_Member()
     {
         // Arrange
@@ -532,5 +621,19 @@ internal sealed class MemberEditingServiceTests : UmbracoIntegrationTest
         Assert.Greater(member.Id, 0);
 
         return await MemberEditingService.GetAsync(member.Key) ?? throw new ApplicationException("Created member could not be retrieved");
+    }
+
+    private sealed class TestTwoFactorProvider : ITwoFactorProvider
+    {
+        public const string Name = "TestTwoFactorProvider";
+
+        public string ProviderName => Name;
+
+        public Task<ISetupTwoFactorModel> GetSetupDataAsync(Guid userOrMemberKey, string secret)
+            => Task.FromResult<ISetupTwoFactorModel>(new NoopSetupTwoFactorModel());
+
+        public bool ValidateTwoFactorPIN(string secret, string token) => true;
+
+        public bool ValidateTwoFactorSetup(string secret, string token) => true;
     }
 }

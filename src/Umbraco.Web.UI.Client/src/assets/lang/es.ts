@@ -222,6 +222,8 @@ export default {
 	},
 	media: {
 		clickToUpload: 'Haz clic para subir archivos',
+		browseFilesAction: 'Explorar archivos',
+		dropFilesOr: 'Arrastra y suelta archivos multimedia aquí<br />o',
 	},
 	member: {
 		createNewMember: 'Crear nuevo miembro',
@@ -527,6 +529,8 @@ export default {
 		new: 'Nuevo',
 		next: 'Próximo',
 		no: 'No',
+		noResults: 'Sin resultados',
+		noResultsFor: (query: string) => `Ningún resultado para "${query}".`,
 		of: 'de',
 		off: 'Desactivado',
 		ok: 'OK',
@@ -1471,6 +1475,8 @@ export default {
 		deselectAllLogLevelFilters: 'Deseleccionar todo',
 	},
 	picker: {
+		browseTab: 'Explorar',
+		searchTab: 'Buscar',
 		selectedCount: (count: number) => `${count} ${count === 1 ? 'elemento seleccionado' : 'elementos seleccionados'}`,
 	},
 } as UmbLocalizationDictionary;

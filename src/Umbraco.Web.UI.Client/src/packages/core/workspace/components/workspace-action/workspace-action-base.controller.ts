@@ -9,7 +9,7 @@ import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
  * @abstract
  * @class UmbWorkspaceActionBase
  * @augments {UmbActionBase}
- * @implements {UmbEntityAction}
+ * @implements {UmbWorkspaceAction}
  * @template RepositoryType
  */
 export abstract class UmbWorkspaceActionBase<ArgsMetaType = never>

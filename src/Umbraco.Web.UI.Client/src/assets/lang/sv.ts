@@ -599,6 +599,8 @@ export default {
 		new: 'Nytt',
 		next: 'Nästa',
 		no: 'Nej',
+		noResults: 'Inga resultat',
+		noResultsFor: (query: string) => `Inget resultat för "${query}".`,
 		of: 'av',
 		ok: 'OK',
 		open: 'Öppna',
@@ -772,6 +774,8 @@ export default {
 	},
 	media: {
 		clickToUpload: 'Klicka för att ladda upp',
+		browseFilesAction: 'Bläddra bland filer',
+		dropFilesOr: 'Dra och släpp media här<br />eller',
 		orClickHereToUpload: 'eller klicka här för att välja filer',
 		disallowedFileType: 'Det går inte att ladda upp filen eftersom filtypen inte är godkänd',
 		disallowedFileExtension: (extension: string) =>
@@ -1290,6 +1294,8 @@ export default {
 			'Aktivera möjligheten att ange en kultur vid länkning till dokument.',
 	},
 	picker: {
+		browseTab: 'Bläddra',
+		searchTab: 'Sök',
 		selectedCount: (count: number) => `${count} objekt ${count === 1 ? 'valt' : 'valda'}`,
 	},
 } as UmbLocalizationDictionary;

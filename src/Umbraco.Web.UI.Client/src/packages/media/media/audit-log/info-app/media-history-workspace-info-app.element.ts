@@ -183,9 +183,6 @@ export class UmbMediaHistoryWorkspaceInfoAppElement extends UmbLitElement {
 			}
 
 			uui-pagination {
-				flex: 1;
-				display: flex;
-				justify-content: center;
 				margin-top: var(--uui-size-layout-1);
 			}
 		`,
