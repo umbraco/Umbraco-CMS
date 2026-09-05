@@ -15,6 +15,7 @@ import {
 import { UmbActionExecutedEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbObserveValidationStateController } from '@umbraco-cms/backoffice/validation';
+import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 
 /**
  * Default element for the `blockAction` extension type.
@@ -38,23 +39,40 @@ export class UmbBlockActionDefaultElement<
 		this.#api = api;
 		this._href = undefined;
 
-		// TODO: getHref() and getValidationDataPath() resolve once. If the underlying observable values
-		// change, the button won't update. Consider making these reactive in a future iteration. [LK]
-		this.#api?.getHref?.().then((href) => {
-			this._href = href;
-		});
-
-		this.#api?.getValidationDataPath?.().then((path) => {
-			this.removeUmbControllerByAlias('observeValidation');
-			if (path) {
-				new UmbObserveValidationStateController(
-					this,
-					path,
-					(hasMessages) => (this._invalid = hasMessages),
-					'observeValidation',
-				);
+		(async () => {
+			// TODO: Ideally the this.observe would accept a Promise<Observable> and handle the async resolution internally, but for now we await it here. [NL]
+			const hrefObservable = await this.#api?.getHrefObservable?.();
+			if (hrefObservable) {
+				this.observe(hrefObservable, (href) => (this._href = href), 'observeHref');
+			} else {
+				this._href = await this.#api?.getHref?.();
 			}
-		});
+
+			const pathObservable = await this.#api?.getValidationDataPathObservable?.();
+			this.observe(
+				pathObservable,
+				async (path) => {
+					this.removeUmbControllerByAlias('observeValidation');
+					path ??= await this.#api?.getValidationDataPath?.();
+					if (path) {
+						new UmbObserveValidationStateController(
+							this,
+							path,
+							(hasMessages) => (this._invalid = hasMessages),
+							'observeValidation',
+						);
+					}
+				},
+				'observeValidationPath',
+			);
+			if (this.#api && !pathObservable && !!this.#api.getValidationDataPath) {
+				new UmbDeprecation({
+					deprecated: 'Block Action getValidationDataPath is deprecated.',
+					removeInVersion: '20.0.0',
+					solution: 'Use getValidationDataPathObservable instead.',
+				}).warn();
+			}
+		})();
 	}
 
 	@state()
