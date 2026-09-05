@@ -32,7 +32,7 @@ export class UmbRouterSlotElement extends UmbLitElement {
 		const oldValue = this.#router.routes;
 		if (
 			value.length !== (oldValue?.length ?? 0) ||
-			value.filter((route) => oldValue?.findIndex((r) => r.path === route.path) === -1).length > 0
+			value.some((route) => oldValue?.findIndex((r) => r.path === route.path && r.unique === route.unique) === -1)
 		) {
 			this.#router.routes = value;
 		}
