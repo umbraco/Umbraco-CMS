@@ -288,6 +288,8 @@ export default {
 		isSensitiveValue:
 			'Bu değer gizlidir. Bu değeri görüntülemek için erişime ihtiyacınız varsa, lütfen web sitesi yöneticinizle iletişime geçin.',
 		isSensitiveValue_short: 'Bu değer gizlidir.',
+		isSensitiveValueNotice:
+			'Gizli değerleri görüntülemek için erişime ihtiyacınız varsa, lütfen web sitesi yöneticinizle iletişime geçin.',
 		languagesToPublish: 'Hangi dilleri yayınlamak istersiniz?',
 		languagesToSendForApproval: 'Onay için hangi dilleri göndermek istersiniz?',
 		languagesToSchedule: 'Hangi dilleri planlamak istersiniz?',

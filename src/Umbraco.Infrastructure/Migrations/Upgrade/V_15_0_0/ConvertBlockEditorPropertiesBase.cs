@@ -135,11 +135,12 @@ public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
             try
             {
                 _logger.LogInformation(
-                    "- starting property type {propertyTypeIndex}/{propertyTypeCount} : {propertyTypeName} (id: {propertyTypeId}, alias: {propertyTypeAlias})...",
+                    "- starting property type {propertyTypeIndex}/{propertyTypeCount} : {propertyTypeName} (id: {propertyTypeId}, key: {propertyTypeKey}, alias: {propertyTypeAlias})...",
                     propertyTypeIndex + 1,
                     propertyTypeCount,
                     propertyType.Name,
                     propertyType.Id,
+                    propertyType.Key,
                     propertyType.Alias);
                 IDataType dataType = _dataTypeService.GetAsync(propertyType.DataTypeKey).GetAwaiter().GetResult()
                                      ?? throw new InvalidOperationException("The data type could not be fetched.");
@@ -194,6 +195,7 @@ public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
                                     cultureResult.OrphanedLanguageId,
                                     propertyType.Name,
                                     propertyType.Id,
+                                    propertyType.Key,
                                     propertyType.Alias);
                                 return;
                             }
@@ -207,10 +209,11 @@ public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
                             {
                                 case null:
                                     _logger.LogWarning(
-                                        "    - value editor yielded a null value for property data with id: {propertyDataId} (property type: {propertyTypeName}, id: {propertyTypeId}, alias: {propertyTypeAlias})",
+                                        "    - value editor yielded a null value for property data with id: {propertyDataId} (property type: {propertyTypeName}, id: {propertyTypeId}, key: {propertyTypeKey}, alias: {propertyTypeAlias})",
                                         propertyDataDto.Id,
                                         propertyType.Name,
                                         propertyType.Id,
+                                        propertyType.Key,
                                         propertyType.Alias);
                                     updatesToSkip.Add(update);
                                     return;
@@ -232,11 +235,12 @@ public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
                                             break;
                                         case EditorValueHandling.HandleAsError:
                                             _logger.LogError(
-                                                "    - value editor did not yield a valid ToEditor value for property data with id: {propertyDataId} - the value type was {valueType} (property type: {propertyTypeName}, id: {propertyTypeId}, alias: {propertyTypeAlias})",
+                                                "    - value editor did not yield a valid ToEditor value for property data with id: {propertyDataId} - the value type was {valueType} (property type: {propertyTypeName}, id: {propertyTypeId}, key: {propertyTypeKey}, alias: {propertyTypeAlias})",
                                                 propertyDataDto.Id,
                                                 toEditorValue.GetType(),
                                                 propertyType.Name,
                                                 propertyType.Id,
+                                                propertyType.Key,
                                                 propertyType.Alias);
                                             updatesToSkip.Add(update);
                                             return;
@@ -265,10 +269,11 @@ public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
                             if (dbValue is not string stringValue || stringValue.DetectIsJson() is false)
                             {
                                 _logger.LogError(
-                                    "    - value editor did not yield a valid JSON string as FromEditor value property data with id: {propertyDataId} (property type: {propertyTypeName}, id: {propertyTypeId}, alias: {propertyTypeAlias})",
+                                    "    - value editor did not yield a valid JSON string as FromEditor value property data with id: {propertyDataId} (property type: {propertyTypeName}, id: {propertyTypeId}, key: {propertyTypeKey}, alias: {propertyTypeAlias})",
                                     propertyDataDto.Id,
                                     propertyType.Name,
                                     propertyType.Id,
+                                    propertyType.Key,
                                     propertyType.Alias);
                                 updatesToSkip.Add(update);
                                 return;
@@ -326,9 +331,10 @@ public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
                 }
 
                 _logger.LogDebug(
-                    "Migration completed for property type: {propertyTypeName} (id: {propertyTypeId}, alias: {propertyTypeAlias}, editor alias: {propertyTypeEditorAlias}) - {updateCount} property DTO entries updated.",
+                    "Migration completed for property type: {propertyTypeName} (id: {propertyTypeId}, key: {propertyTypeKey}, alias: {propertyTypeAlias}, editor alias: {propertyTypeEditorAlias}) - {updateCount} property DTO entries updated.",
                     propertyType.Name,
                     propertyType.Id,
+                    propertyType.Key,
                     propertyType.Alias,
                     propertyType.PropertyEditorAlias,
                     result);
@@ -337,9 +343,10 @@ public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
             {
                 _logger.LogError(
                     ex,
-                    "Migration failed for property type: {propertyTypeName} (id: {propertyTypeId}, alias: {propertyTypeAlias}, editor alias: {propertyTypeEditorAlias})",
+                    "Migration failed for property type: {propertyTypeName} (id: {propertyTypeId}, key: {propertyTypeKey}, alias: {propertyTypeAlias}, editor alias: {propertyTypeEditorAlias})",
                     propertyType.Name,
                     propertyType.Id,
+                    propertyType.Key,
                     propertyType.Alias,
                     propertyType.PropertyEditorAlias);
 

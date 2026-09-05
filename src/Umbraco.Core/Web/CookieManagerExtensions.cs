@@ -9,6 +9,7 @@ namespace Umbraco.Extensions;
 /// <summary>
 /// Extension methods for <see cref="ICookieManager"/>.
 /// </summary>
+[Obsolete("This has been deprecated and will be removed in Umbraco 19.")]
 public static class CookieManagerExtensions
 {
     /// <summary>
