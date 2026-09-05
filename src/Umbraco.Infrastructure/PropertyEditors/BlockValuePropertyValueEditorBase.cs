@@ -641,6 +641,237 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
         return _jsonSerializer.Serialize(mergeResult);
     }
 
+    /// <summary>
+    /// Determines the specific cultures that contain an actual content, settings, or exposure change within an
+    /// otherwise culture-invariant block property value, by deserializing and comparing <paramref name="sourceValue"/>
+    /// (edited) against <paramref name="targetValue"/> (published).
+    /// </summary>
+    /// <param name="sourceValue">The source (edited) property value.</param>
+    /// <param name="targetValue">The target (published) property value.</param>
+    /// <param name="defaultCulture">
+    /// The default culture to attribute a change to when it cannot be tied to one specific culture (e.g. a
+    /// genuinely invariant nested value, or a purely structural change).
+    /// </param>
+    /// <returns>
+    /// The set of cultures containing an actual edit, or an empty collection if neither value can be
+    /// resolved as block editor data - callers should treat an empty collection as "unable to narrow down the
+    /// affected culture(s)" and fall back to flagging <paramref name="defaultCulture"/> as edited.
+    /// </returns>
+    internal virtual IEnumerable<string> GetChangedCulturesForPartialPropertyValues(object? sourceValue, object? targetValue, string defaultCulture)
+    {
+        BlockEditorData<TValue, TLayout>? sourceBlockEditorData = sourceValue is not null ? BlockEditorValues.DeserializeAndClean(sourceValue) : null;
+        BlockEditorData<TValue, TLayout>? targetBlockEditorData = targetValue is not null ? BlockEditorValues.DeserializeAndClean(targetValue) : null;
+
+        if (sourceBlockEditorData is null && targetBlockEditorData is null)
+        {
+            // nothing resolvable on either side - let the caller fall back to the default culture.
+            return [];
+        }
+
+        return GetChangedCulturesForBlockValue(sourceBlockEditorData?.BlockValue, targetBlockEditorData?.BlockValue, defaultCulture);
+    }
+
+    /// <summary>
+    /// Compares two block values and returns the set of cultures for which a nested, culture-variant block
+    /// property value or block exposure differs (added, removed, or changed) between
+    /// <paramref name="sourceBlockValue"/> (edited) and <paramref name="targetBlockValue"/> (published). Block
+    /// layout is not compared, as it is invariant and shared between all cultures.
+    /// </summary>
+    /// <param name="sourceBlockValue">The source (edited) block value, or <c>null</c> if none exists.</param>
+    /// <param name="targetBlockValue">The target (published) block value, or <c>null</c> if none has been published yet.</param>
+    /// <param name="defaultCulture">The culture to attribute a changed, genuinely invariant value or exposure entry to.</param>
+    /// <returns>
+    /// The set of cultures for which a content, settings, or exposure change was detected. A changed
+    /// value or exposure entry that is itself culture-invariant is attributed to <paramref name="defaultCulture"/>.
+    /// </returns>
+    protected HashSet<string> GetChangedCulturesForBlockValue(TValue? sourceBlockValue, TValue? targetBlockValue, string defaultCulture)
+    {
+        var changedCultures = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        CollectChangedCultures(sourceBlockValue?.ContentData ?? [], targetBlockValue?.ContentData ?? [], defaultCulture, changedCultures);
+        CollectChangedCultures(sourceBlockValue?.SettingsData ?? [], targetBlockValue?.SettingsData ?? [], defaultCulture, changedCultures);
+        CollectChangedExposureCultures(sourceBlockValue?.Expose ?? [], targetBlockValue?.Expose ?? [], defaultCulture, changedCultures);
+
+        return changedCultures;
+    }
+
+    /// <summary>
+    /// Compares the exposure of two block values and returns the set of cultures for which a block's exposure
+    /// was toggled (added or removed) between <paramref name="sourceExpose"/> (edited) and
+    /// <paramref name="targetExpose"/> (published). Unlike layout, which is invariant/shared between all
+    /// cultures, exposure is culture-specific - a block can be exposed for one culture and hidden for another.
+    /// </summary>
+    /// <param name="sourceExpose">The source (edited) exposure entries.</param>
+    /// <param name="targetExpose">The target (published) exposure entries.</param>
+    /// <param name="defaultCulture">The culture to attribute a toggled, genuinely invariant exposure entry to.</param>
+    /// <param name="changedCultures">The set that any changed cultures are added to.</param>
+    private static void CollectChangedExposureCultures(
+        IList<BlockItemVariation> sourceExpose,
+        IList<BlockItemVariation> targetExpose,
+        string defaultCulture,
+        HashSet<string> changedCultures)
+    {
+        var sourceKeys = sourceExpose.Select(ToKey).ToHashSet();
+        var targetKeys = targetExpose.Select(ToKey).ToHashSet();
+
+        foreach (BlockItemVariation sourceVariation in sourceExpose)
+        {
+            if (targetKeys.Contains(ToKey(sourceVariation)) is false)
+            {
+                changedCultures.Add(sourceVariation.Culture ?? defaultCulture);
+            }
+        }
+
+        foreach (BlockItemVariation targetVariation in targetExpose)
+        {
+            if (sourceKeys.Contains(ToKey(targetVariation)) is false)
+            {
+                changedCultures.Add(targetVariation.Culture ?? defaultCulture);
+            }
+        }
+
+        static (Guid ContentKey, string? Culture, string? Segment) ToKey(BlockItemVariation variation) =>
+            (variation.ContentKey, variation.Culture, variation.Segment);
+    }
+
+    private void CollectChangedCultures(
+        List<BlockItemData> sourceBlockItems,
+        List<BlockItemData> targetBlockItems,
+        string defaultCulture,
+        HashSet<string> changedCultures)
+    {
+        Dictionary<Guid, BlockItemData> sourceBlockItemsByKey = ToBlockItemsByKey(sourceBlockItems);
+        Dictionary<Guid, BlockItemData> targetBlockItemsByKey = ToBlockItemsByKey(targetBlockItems);
+
+        // blocks removed entirely (present in published, gone from edited): every value they held is an edit
+        // for its own culture (its removal is the change).
+        foreach (BlockItemData targetBlockItem in targetBlockItems)
+        {
+            if (sourceBlockItemsByKey.ContainsKey(targetBlockItem.Key))
+            {
+                continue;
+            }
+
+            foreach (BlockPropertyValue targetBlockPropertyValue in targetBlockItem.Values)
+            {
+                changedCultures.Add(targetBlockPropertyValue.Culture ?? defaultCulture);
+            }
+        }
+
+        foreach (BlockItemData sourceBlockItem in sourceBlockItems)
+        {
+            if (targetBlockItemsByKey.TryGetValue(sourceBlockItem.Key, out BlockItemData? targetBlockItem) is false)
+            {
+                // block newly added in the edited value: every value it holds is an edit for its own culture.
+                foreach (BlockPropertyValue sourceBlockPropertyValue in sourceBlockItem.Values)
+                {
+                    changedCultures.Add(sourceBlockPropertyValue.Culture ?? defaultCulture);
+                }
+
+                continue;
+            }
+
+            Dictionary<(string Alias, string? Culture, string? Segment), BlockPropertyValue> sourceValuesByKey = ToBlockPropertyValuesByKey(sourceBlockItem.Values);
+            Dictionary<(string Alias, string? Culture, string? Segment), BlockPropertyValue> targetValuesByKey = ToBlockPropertyValuesByKey(targetBlockItem.Values);
+
+            // values removed from an existing block also count as edits for their own culture.
+            foreach (BlockPropertyValue targetBlockPropertyValue in targetBlockItem.Values)
+            {
+                if (sourceValuesByKey.ContainsKey(ToKey(targetBlockPropertyValue)) is false)
+                {
+                    changedCultures.Add(targetBlockPropertyValue.Culture ?? defaultCulture);
+                }
+            }
+
+            foreach (BlockPropertyValue sourceBlockPropertyValue in sourceBlockItem.Values)
+            {
+                targetValuesByKey.TryGetValue(ToKey(sourceBlockPropertyValue), out BlockPropertyValue? targetBlockPropertyValue);
+
+                // is this another editor that supports partial merging? i.e. blocks within blocks - recurse,
+                // mirroring the recursion performed by MergePartialPropertyValueForCulture.
+                IDataEditor? nestedDataEditor = null;
+                var isNestedPartialMergeEditor = sourceBlockPropertyValue.PropertyType is not null
+                    && _propertyEditors.TryGet(sourceBlockPropertyValue.PropertyType.PropertyEditorAlias, out nestedDataEditor)
+                    && nestedDataEditor.CanMergePartialPropertyValues(sourceBlockPropertyValue.PropertyType);
+
+                if (isNestedPartialMergeEditor)
+                {
+                    var nestedChangedCultures = nestedDataEditor!.GetChangedCulturesForPartialPropertyValues(
+                        sourceBlockPropertyValue.Value,
+                        targetBlockPropertyValue?.Value,
+                        defaultCulture)
+                        .ToArray();
+
+                    if (nestedChangedCultures.Length is 0)
+                    {
+                        // nested editor couldn't determine specifics - be conservative.
+                        changedCultures.Add(sourceBlockPropertyValue.Culture ?? defaultCulture);
+                    }
+                    else
+                    {
+                        changedCultures.UnionWith(nestedChangedCultures);
+                    }
+
+                    continue;
+                }
+
+                if (targetBlockPropertyValue is null)
+                {
+                    changedCultures.Add(sourceBlockPropertyValue.Culture ?? defaultCulture);
+                    continue;
+                }
+
+                if (!BlockPropertyValuesAreEqual(sourceBlockPropertyValue.Value, targetBlockPropertyValue.Value))
+                {
+                    changedCultures.Add(sourceBlockPropertyValue.Culture ?? defaultCulture);
+                }
+            }
+        }
+
+        static Dictionary<Guid, BlockItemData> ToBlockItemsByKey(List<BlockItemData> blockItems)
+        {
+            var result = new Dictionary<Guid, BlockItemData>(blockItems.Count);
+            foreach (BlockItemData blockItem in blockItems)
+            {
+                result.TryAdd(blockItem.Key, blockItem);
+            }
+
+            return result;
+        }
+
+        static Dictionary<(string Alias, string? Culture, string? Segment), BlockPropertyValue> ToBlockPropertyValuesByKey(IList<BlockPropertyValue> values)
+        {
+            var result = new Dictionary<(string Alias, string? Culture, string? Segment), BlockPropertyValue>(values.Count);
+            foreach (BlockPropertyValue value in values)
+            {
+                result.TryAdd(ToKey(value), value);
+            }
+
+            return result;
+        }
+
+        static (string Alias, string? Culture, string? Segment) ToKey(BlockPropertyValue value) =>
+            (value.Alias, value.Culture, value.Segment);
+    }
+
+    private bool BlockPropertyValuesAreEqual(object? sourceValue, object? targetValue)
+    {
+        if (sourceValue is null && targetValue is null)
+        {
+            return true;
+        }
+
+        if (sourceValue is null || targetValue is null)
+        {
+            return false;
+        }
+
+        // Do NOT use object.Equals() here: block property values are populated by generic JSON
+        // deserialization, so for non-primitive values they are typically boxed JsonElements - a struct
+        // whose default equality is not a structural comparison. Round-trip through the serializer instead.
+        return _jsonSerializer.Serialize(sourceValue) == _jsonSerializer.Serialize(targetValue);
+    }
+
     protected TValue MergeBlockEditorDataForCulture(TValue sourceBlockValue, TValue targetBlockValue, string? culture)
     {
         // structure is global, layout and expose follows structure
