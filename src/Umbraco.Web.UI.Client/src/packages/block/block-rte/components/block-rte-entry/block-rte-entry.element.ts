@@ -109,6 +109,10 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 		config: { showContentEdit: false, showSettingsEdit: false },
 	}; // Set to undefined cause it will be set before we render.
 
+	// 'is-reference' attribute is used for styling purpose.
+	@property({ type: Boolean, attribute: 'is-reference', reflect: true })
+	private _isExternalContent = false;
+
 	// 'content-invalid' attribute is used for styling purpose.
 	@property({ type: Boolean, attribute: 'content-invalid', reflect: true })
 	// eslint-disable-next-line @typescript-eslint/naming-convention
@@ -233,10 +237,17 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 			null,
 		);
 		this.observe(
-			this.#context.hasExpose,
-			(exposed) => {
-				this.#updateBlockViewProps({ unpublished: !exposed });
-				this._exposed = exposed;
+			this.#context.isExposed,
+			(isExposed) => {
+				this.#updateBlockViewProps({ unpublished: !isExposed });
+				this._exposed = isExposed;
+			},
+			null,
+		);
+		this.observe(
+			this.#context.isExternalContent,
+			(isExternalContent) => {
+				this._isExternalContent = isExternalContent;
 			},
 			null,
 		);
@@ -324,7 +335,8 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 		return when(
 			this.contentKey && (this._contentTypeAlias || this.unsupported),
 			() => html`
-				<div>
+				<div class="umb-block-rte__block uui-text uui-font">
+					<umb-entity-frame .label=${this._label}></umb-entity-frame>
 					<umb-extension-slot
 						type="blockEditorCustomView"
 						default-element="umb-ref-rte-block"
@@ -382,6 +394,7 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 			:host {
 				position: relative;
 				display: block;
+				margin-top: var(--uui-size-3);
 				user-select: all;
 				user-drag: auto;
 				white-space: nowrap;
