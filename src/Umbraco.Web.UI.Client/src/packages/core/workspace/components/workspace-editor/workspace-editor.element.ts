@@ -192,7 +192,7 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 				)}
 				${this.#renderRoutes()}
 				<slot
-					@onslotchange=${(event: Event) => {
+					@slotchange=${(event: Event) => {
 						this._hasSlottedContent = (event.target as HTMLSlotElement).assignedElements().length > 0;
 						if (this._hasSlottedContent) {
 							new UmbDeprecation({
