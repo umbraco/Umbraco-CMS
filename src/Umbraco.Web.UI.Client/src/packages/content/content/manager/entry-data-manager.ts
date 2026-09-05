@@ -1,19 +1,19 @@
 import { UmbMergeContentVariantDataController } from '../controller/merge-content-variant-data.controller.js';
-import type { UmbElementDetailModel, UmbElementValueModel } from '../types.js';
+import type { UmbEntryDetailModel, UmbEntryValueModel } from '../types.js';
 import { UmbVariantId, umbVariantObjectCompare } from '@umbraco-cms/backoffice/variant';
 import { UmbEntityWorkspaceDataManager, type UmbWorkspaceDataManager } from '@umbraco-cms/backoffice/workspace';
 
 /**
  * Compares two element values by alias and variant.
- * @param {UmbElementValueModel} a The first value to compare.
- * @param {UmbElementValueModel} b The second value to compare.
+ * @param {UmbEntryValueModel} a The first value to compare.
+ * @param {UmbEntryValueModel} b The second value to compare.
  * @returns {boolean} True if the values have the same alias and variant.
  */
-function valueObjectCompare(a: UmbElementValueModel, b: UmbElementValueModel): boolean {
+function valueObjectCompare(a: UmbEntryValueModel, b: UmbEntryValueModel): boolean {
 	return a.alias === b.alias && umbVariantObjectCompare(a, b);
 }
 
-export class UmbElementWorkspaceDataManager<ModelType extends UmbElementDetailModel>
+export class UmbEntryWorkspaceDataManager<ModelType extends UmbEntryDetailModel>
 	extends UmbEntityWorkspaceDataManager<ModelType>
 	implements UmbWorkspaceDataManager<ModelType>
 {
@@ -112,3 +112,11 @@ export class UmbElementWorkspaceDataManager<ModelType extends UmbElementDetailMo
 		);
 	}
 }
+
+// TODO: Remove in v.21 [NL]
+/**
+ * @deprecated Use UmbEntryWorkspaceDataManager instead.
+ * @description This is a deprecated alias for UmbEntryWorkspaceDataManager. It will be removed in future versions.
+ * Use UmbEntryWorkspaceDataManager instead.
+ */
+export const UmbElementWorkspaceDataManager = UmbEntryWorkspaceDataManager;

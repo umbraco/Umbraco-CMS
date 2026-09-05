@@ -201,8 +201,7 @@ public class PropertyValidationService : IPropertyValidationService
                 {
                     Culture = null,
                     Segment = null,
-                    CulturesBeingValidated = [impact.Culture!],
-                    SegmentsBeingValidated = []
+                    CulturesBeingValidated = [impact.Culture!]
                 });
 #pragma warning restore CS0618 // Type or member is obsolete
             }
@@ -234,8 +233,7 @@ public class PropertyValidationService : IPropertyValidationService
         {
             Culture = validationContext.Culture?.NullOrWhiteSpaceAsNull(),
             Segment = validationContext.Segment?.NullOrWhiteSpaceAsNull(),
-            CulturesBeingValidated = validationContext.CulturesBeingValidated,
-            SegmentsBeingValidated = validationContext.SegmentsBeingValidated
+            CulturesBeingValidated = validationContext.CulturesBeingValidated
         };
 
         var culture = validationContext.Culture;
@@ -277,7 +275,6 @@ public class PropertyValidationService : IPropertyValidationService
                         Culture = culture,
                         Segment = null,
                         CulturesBeingValidated = validationContext.CulturesBeingValidated,
-                        SegmentsBeingValidated = validationContext.SegmentsBeingValidated,
                     }))
             {
                 return false;

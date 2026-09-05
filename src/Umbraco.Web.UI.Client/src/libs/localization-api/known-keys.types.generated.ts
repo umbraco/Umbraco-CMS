@@ -488,6 +488,7 @@ declare global {
 		content_isPublished: string;
 		content_isSensitiveValue: string;
 		content_isSensitiveValue_short: string;
+		content_isSensitiveValueNotice: string;
 		content_itemChanged: string;
 		content_itemNotPublished: string;
 		content_languagesToPublish: string;
@@ -669,6 +670,7 @@ declare global {
 		contentTypeEditor_elementDoesNotSupport: string;
 		contentTypeEditor_elementHeading: string;
 		contentTypeEditor_elementType: string;
+		contentTypeEditor_elementTypeOnlyAllowedInLibrarySupport: string;
 		contentTypeEditor_elementTypeOnlySupport: string;
 		contentTypeEditor_enableListViewDescription: string;
 		contentTypeEditor_enableListViewHeading: string;

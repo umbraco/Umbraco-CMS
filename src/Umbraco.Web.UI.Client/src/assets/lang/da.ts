@@ -1851,7 +1851,7 @@ export default {
 		allowVaryBySegment: 'Tillad segmentering',
 		elementType: 'Element-type',
 		elementHeading: 'Er en Element-type',
-		elementDescription: 'En Element-type er tiltænkt brug i andre Dokumenttyper, ikke i indholdstræet.\n    ',
+		elementDescription: 'Tiltænkt Block eller Genanvendeligt Element i Library sektionen.\n    ',
 		elementCannotToggle:
 			'En Dokumenttype kan ikke ændres til en Element-type efter den er blevet brugt til\n      at oprette en eller flere indholds elementer.\n    ',
 		elementDoesNotSupport: 'Dette benyttes ikke for en Element-type',
