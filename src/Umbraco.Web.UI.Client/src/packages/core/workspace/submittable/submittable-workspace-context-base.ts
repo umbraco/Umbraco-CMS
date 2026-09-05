@@ -92,8 +92,8 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 	}
 
 	/**
-	 * If there are no validation messages (including filtered/other-variant messages), reset validation state for all validation contexts in this workspace.
-	 * Call this when a workspace submission is complete without any validation errors.
+	 * Evaluate the Validation Mode, If there are no validation messages (including filtered/other-variant messages), then the validation state is reset for all validation contexts in this workspace.
+	 * Call this when a workspace submission is complete.
 	 */
 	protected evaluateValidationMode(): void {
 		if (this.hasValidationMessages()) return;
