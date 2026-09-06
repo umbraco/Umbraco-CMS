@@ -7,7 +7,7 @@ import {
 	createTestVariantAncestorItem,
 	createTestVariantTreeRepositoryManifest,
 } from './menu-variant-tree-structure-workspace-context.test-utils.js';
-import { UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT } from './section-sidebar-menu/section-context/section-sidebar-menu.section-context.token.js';
+import { UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT } from './section-sidebar-menu/index.js';
 import { UMB_ANCESTORS_ENTITY_CONTEXT, UMB_PARENT_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
 import { aTimeout, expect } from '@open-wc/testing';
 import { UmbActionEventContext } from '@umbraco-cms/backoffice/action';
