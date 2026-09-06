@@ -199,8 +199,9 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase extends UmbContex
 		this.#structure.setValue(structureItems);
 		this.#setParentData(structureItems);
 
+		// Don't expand the parent for an item that hasn't been created yet.
 		const menuItemAlias = this.manifest?.meta?.menuItemAlias;
-		if (menuItemAlias && !this.#isModalContext) {
+		if (menuItemAlias && !this.#isModalContext && !isNew) {
 			this.#expandSectionSidebarMenu(structureItems, menuItemAlias);
 		}
 	}
