@@ -65,6 +65,7 @@ describe('UmbMenuTreeStructureWorkspaceContextBase', () => {
 		};
 
 		workspaceContext.setEntityType('test-entity-type');
+		workspaceContext.setIsNew(false);
 		workspaceContext.setUnique('test-unique');
 		await aTimeout(150);
 	});
