@@ -299,6 +299,10 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 	}
 
 	#renderFileExtension(item: UmbMediaCardItemModel) {
+		// Rendered as a tag rather than through the card's own `file-ext` attribute: that attribute only feeds the
+		// card's fallback file symbol, which the card drops as soon as anything occupies its default slot — and the
+		// thumbnail always does.
+		//
 		// The item model carries no extension of its own, so it is derived from the name. An item that can hold
 		// children is a container rather than a file, and a dot in its name is part of the name — not an extension.
 		if (item.hasChildren) return nothing;
