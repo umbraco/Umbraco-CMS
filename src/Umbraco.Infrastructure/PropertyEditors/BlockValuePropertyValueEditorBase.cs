@@ -787,6 +787,13 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
             {
                 targetValuesByKey.TryGetValue(ToKey(sourceBlockPropertyValue), out BlockPropertyValue? targetBlockPropertyValue);
 
+                // short-circuit for identical block values.
+                if (targetBlockPropertyValue is not null
+                    && BlockPropertyValuesAreEqual(sourceBlockPropertyValue.Value, targetBlockPropertyValue.Value))
+                {
+                    continue;
+                }
+
                 // is this another editor that supports partial merging? i.e. blocks within blocks - recurse,
                 // mirroring the recursion performed by MergePartialPropertyValueForCulture.
                 IDataEditor? nestedDataEditor = null;
