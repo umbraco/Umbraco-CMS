@@ -100,7 +100,6 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 	@state()
 	private _isReadOnly = false;
 
-	// TODO: consumed by <umb-entity-frame> label, landing in a follow-up PR; add `@state()` when used in render [LK]
 	private _name?: string;
 
 	@state()
@@ -335,8 +334,10 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 		return when(
 			this.contentKey && (this._contentTypeAlias || this.unsupported),
 			() => html`
-				<div class="umb-block-rte__block uui-text uui-font">
-					<umb-entity-frame .label=${this._label}></umb-entity-frame>
+				<div class="umb-block-rte__block">
+					<umb-entity-frame>
+						${when(this._isExternalContent, () => html`<uui-icon name="link"></uui-icon>`)}${this._label}
+					</umb-entity-frame>
 					<umb-extension-slot
 						type="blockEditorCustomView"
 						default-element="umb-ref-rte-block"

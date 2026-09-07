@@ -384,7 +384,6 @@ export abstract class UmbPropertyEditorUiRteElementBase
 
 	/**
 	 * @param {(string | null)[]} usedLayoutKeys - Layout keys (not content keys) currently present in the editor markup.
-	 * @since 19.0.0 — parameter semantics changed from content keys to layout keys.
 	 */
 	protected _filterUnusedBlocks(usedLayoutKeys: (string | null)[]) {
 		const unusedLayouts = this.#managerContext.getLayouts().filter((x) => !usedLayoutKeys.includes(x.key));
@@ -399,9 +398,12 @@ export abstract class UmbPropertyEditorUiRteElementBase
 			.map((x) => x.settingsKey)
 			.filter((x) => typeof x === 'string') as Array<string>;
 
+		// Layouts first: removing content/settings emits synchronously, and #updateBlocks would
+		// re-insert any layout still present whose content is still resolvable (external content
+		// is never purged from the manager's externalContentValues state). [LK]
+		this.#managerContext.removeManyLayouts(unusedLayouts.map((x) => x.key));
 		this.#managerContext.removeManyContent(unusedContentKeys);
 		this.#managerContext.removeManySettings(unusedSettingsKeys);
-		this.#managerContext.removeManyLayouts(unusedLayouts.map((x) => x.key));
 	}
 
 	protected _fireChangeEvent() {

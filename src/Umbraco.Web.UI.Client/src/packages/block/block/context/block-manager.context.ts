@@ -89,6 +89,8 @@ export abstract class UmbBlockManagerContext<
 	/**
 	 * Combined observable of local block content and resolved external (library element) content.
 	 * Use this alongside `contents` when you also need to react to library elements becoming available.
+	 * The two arrays are concatenated without de-duplication — a key present in both (which should not
+	 * normally happen) appears twice, with the local entry taking precedence in lookups like `getContentOf`.
 	 */
 	public readonly allContents = mergeObservables(
 		[this.#contents.asObservable(), this.#externalContentValues.asObservable()],

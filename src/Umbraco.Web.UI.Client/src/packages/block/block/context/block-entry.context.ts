@@ -89,6 +89,10 @@ export abstract class UmbBlockEntryContext<
 	#hasExpose = new UmbBooleanState(undefined);
 	readonly hasExpose = this.#hasExpose.asObservable();
 
+	/**
+	 * Whether the block is currently published/exposed. For a block backed by external (library element)
+	 * content, this reflects that content's own variant state rather than the local expose entry.
+	 */
 	readonly isExposed = mergeObservables(
 		[this.hasExpose, this.isExternalContent, this.externalContentVariantState],
 		([hasExpose, isExternalContent, variantState]) =>
