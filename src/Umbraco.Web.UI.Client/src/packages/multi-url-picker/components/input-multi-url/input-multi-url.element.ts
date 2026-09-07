@@ -1,6 +1,8 @@
 import type { UmbLinkPickerLink } from '../../link-picker-modal/types.js';
 import { UMB_LINK_PICKER_MODAL } from '../../link-picker-modal/link-picker-modal.token.js';
 import type { UmbLinkPickerDocumentLinksConfig } from '../../link-picker-modal/link-picker-modal.token.js';
+import { UMB_LINK_PICKER_LINK_REF_SELECTOR } from '../link-picker-link-ref/constants.js';
+import type { UmbLinkPickerLinkRefElement } from '../link-picker-link-ref/link-picker-link-ref.element.js';
 import {
 	css,
 	customElement,
@@ -16,12 +18,6 @@ import { simpleHashCode } from '@umbraco-cms/backoffice/observable-api';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import {
-	UmbDocumentItemRepository,
-	UmbDocumentUrlRepository,
-	UmbDocumentUrlsDataResolver,
-} from '@umbraco-cms/backoffice/document';
-import { UmbMediaItemRepository, UmbMediaUrlRepository } from '@umbraco-cms/backoffice/media';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UmbEntityInputInteractionMemoryManager } from '@umbraco-cms/backoffice/entity';
@@ -30,6 +26,10 @@ import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interact
 import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
 import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+
+import '../link-picker-link-ref/link-picker-link-ref.element.js';
+import '../link-picker-link-ref/link-picker-document-ref.element.js';
+import '../link-picker-link-ref/link-picker-media-ref.element.js';
 
 /**
  * @element umb-input-multi-url
@@ -49,7 +49,7 @@ export class UmbInputMultiUrlElement extends UmbFormControlMixin<string, typeof 
 			return this.#getUnique(modelEntry);
 		},
 		identifier: 'Umb.SorterIdentifier.InputMultiUrl',
-		itemSelector: 'uui-ref-node',
+		itemSelector: UMB_LINK_PICKER_LINK_REF_SELECTOR,
 		containerSelector: 'uui-ref-list',
 		onChange: ({ model }) => {
 			this.urls = model;
@@ -124,20 +124,12 @@ export class UmbInputMultiUrlElement extends UmbFormControlMixin<string, typeof 
 		this.#urls = [...data]; // Unfreeze data coming from State, so we can manipulate it.
 		super.value = this.#urls.map((x) => x.url).join(',');
 		this.#sorter.setModel(this.#urls);
-		this.#populateLinksNameAndUrl();
 	}
 	get urls(): Array<UmbLinkPickerLink> {
 		return this.#urls;
 	}
 
 	#urls: Array<UmbLinkPickerLink> = [];
-
-	#documentItemRepository = new UmbDocumentItemRepository(this);
-	#documentUrlRepository = new UmbDocumentUrlRepository(this);
-	#documentUrlsDataResolver = new UmbDocumentUrlsDataResolver(this);
-
-	#mediaItemRepository = new UmbMediaItemRepository(this);
-	#mediaUrlRepository = new UmbMediaUrlRepository(this);
 
 	/**
 	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
@@ -180,20 +172,6 @@ export class UmbInputMultiUrlElement extends UmbFormControlMixin<string, typeof 
 
 	@state()
 	private _modalRoute?: UmbModalRouteBuilder;
-
-	@state()
-	private _resolvedLinkNames: Array<{ unique: string; name: string }> = [];
-
-	@state()
-	private _resolvedLinkUrls: Array<{ unique: string; url: string }> = [];
-
-	// A link's name and URL only depend on its unique, so they are requested once per unique. This
-	// spares every link that is merely moved or re-assigned unchanged — such as on a re-order — from
-	// being looked up again. A unique is marked before its lookup starts, so a second render does not
-	// fire the same request while the first is in flight, and un-marked again if nothing came back,
-	// so a lookup that failed can be retried.
-	#requestedNameUniques = new Set<string>();
-	#requestedUrlUniques = new Set<string>();
 
 	#linkPickerModal;
 
@@ -278,106 +256,26 @@ export class UmbInputMultiUrlElement extends UmbFormControlMixin<string, typeof 
 			});
 	}
 
-	#populateLinksNameAndUrl() {
-		this.#urls.forEach((link) => {
-			this.#resolveLinkName(link);
-			this.#resolveLinkUrl(link);
-		});
-	}
-
-	// Documents and media have URLs saved in the local link format.
-	// Display the actual URL to align with what the user sees when they selected it initially.
-	async #resolveLinkUrl(link: UmbLinkPickerLink) {
-		const unique = link.unique;
-		if (!unique || this.#requestedUrlUniques.has(unique)) return;
-
-		this.#requestedUrlUniques.add(unique);
-
-		let url: string;
-
-		switch (link.type) {
-			case 'document':
-				url = await this.#getUrlForDocument(unique);
-				break;
-			case 'media':
-				url = await this.#getUrlForMedia(unique);
-				break;
-			default:
-				return;
-		}
-
-		if (!url) {
-			this.#requestedUrlUniques.delete(unique);
-			return;
-		}
-
-		this._resolvedLinkUrls = [...this._resolvedLinkUrls, { unique, url }];
-	}
-
-	async #resolveLinkName(link: UmbLinkPickerLink) {
-		const unique = link.unique;
-		if (!unique || link.name || this.#requestedNameUniques.has(unique)) return;
-
-		this.#requestedNameUniques.add(unique);
-
-		let name: string;
-
-		switch (link.type) {
-			case 'document':
-				name = await this.#getNameForDocument(unique);
-				break;
-			case 'media':
-				name = await this.#getNameForMedia(unique);
-				break;
-			default:
-				return;
-		}
-
-		if (!name) {
-			this.#requestedNameUniques.delete(unique);
-			return;
-		}
-
-		this._resolvedLinkNames = [...this._resolvedLinkNames, { unique, name }];
-	}
-
-	async #getUrlForDocument(unique: string) {
-		const { data: data } = await this.#documentUrlRepository.requestItems([unique]);
-
-		this.#documentUrlsDataResolver.setData(data?.[0]?.urls);
-
-		const resolvedUrls = await this.#documentUrlsDataResolver.getUrls();
-		return resolvedUrls?.[0]?.url ?? '';
-	}
-
-	async #getUrlForMedia(unique: string) {
-		const { data } = await this.#mediaUrlRepository.requestItems([unique]);
-		return data?.[0].url ?? '';
-	}
-
-	async #getNameForDocument(unique: string) {
-		const { data } = await this.#documentItemRepository.requestItems([unique]);
-		// TODO: [v17] Review usage of `item.variants[0].name` as this needs to be implemented properly! [LK]
-		return data?.[0]?.variants[0].name ?? '';
-	}
-
-	async #getNameForMedia(unique: string) {
-		const { data } = await this.#mediaItemRepository.requestItems([unique]);
-		return data?.[0]?.name ?? '';
-	}
-
-	async #requestRemoveItem(index: number, name?: string) {
+	async #requestRemoveItem(index: number) {
 		const item = this.#urls[index];
 		if (!item) throw new Error('Could not find item at index: ' + index);
 
+		// The ref rendering the link is what knows the name it is displayed under, which is not
+		// necessarily the one the link carries.
+		const name = this.#getRefElement(item)?.displayName || item.name || 'item';
+
 		await umbConfirmModal(this, {
 			color: 'danger',
-			headline: `Remove ${name || item.name || 'item'}?`,
+			headline: `Remove ${name}?`,
 			content: 'Are you sure you want to remove this item?',
 			confirmLabel: '#general_remove',
 		});
 
 		this.#removeItem(index);
+	}
+
+	#getRefElement(link: UmbLinkPickerLink) {
+		return this.shadowRoot?.getElementById(this.#getUnique(link)) as UmbLinkPickerLinkRefElement | null;
 	}
 
 	#removeItem(index: number) {
@@ -409,17 +307,6 @@ export class UmbInputMultiUrlElement extends UmbFormControlMixin<string, typeof 
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
-	#getResolvedItemName(link: UmbLinkPickerLink): string {
-		return (link.name || this._resolvedLinkNames.find((name) => name.unique === link.unique)?.name) ?? '';
-	}
-
-	#getResolvedItemUrl(link: UmbLinkPickerLink): string {
-		const baseUrl = link.culture
-			? (link.url ?? '')
-			: (this._resolvedLinkUrls.find((url) => url.unique === link.unique)?.url ?? link.url ?? '');
-		return baseUrl + (link.queryString || '');
-	}
-
 	override render() {
 		return html`${this.#renderItems()} ${this.#renderAddButton()}`;
 	}
@@ -446,7 +333,7 @@ export class UmbInputMultiUrlElement extends UmbFormControlMixin<string, typeof 
 			<uui-ref-list>
 				${repeat(
 					this.urls,
-					(link) => link.unique,
+					(link) => this.#getUnique(link),
 					(link, index) => this.#renderItem(link, index),
 				)}
 			</uui-ref-list>
@@ -456,30 +343,53 @@ export class UmbInputMultiUrlElement extends UmbFormControlMixin<string, typeof 
 	#renderItem(link: UmbLinkPickerLink, index: number) {
 		const unique = this.#getUnique(link);
 		const href = this.readonly ? undefined : (this._modalRoute?.({ index }) ?? undefined);
-		const name = this.#getResolvedItemName(link);
-		const url = this.#getResolvedItemUrl(link);
+		const standalone = this.max === 1 && this.urls?.length === 1;
+		const actions = when(
+			!this.readonly,
+			() => html`
+				<uui-action-bar slot="actions">
+					<uui-button
+						label=${this.localize.term('general_remove')}
+						@click=${() => this.#requestRemoveItem(index)}></uui-button>
+				</uui-action-bar>
+			`,
+		);
 
-		return html`
-			<uui-ref-node
-				id=${unique}
-				href=${ifDefined(href)}
-				name=${name || url}
-				detail=${ifDefined(name ? url : undefined)}
-				?readonly=${this.readonly}
-				?standalone=${this.max === 1 && this.urls?.length === 1}>
-				<umb-icon slot="icon" name=${link.icon || 'icon-link'}></umb-icon>
-				${when(
-					!this.readonly,
-					() => html`
-						<uui-action-bar slot="actions">
-							<uui-button
-								label=${this.localize.term('general_remove')}
-								@click=${() => this.#requestRemoveItem(index, name)}></uui-button>
-						</uui-action-bar>
-					`,
-				)}
-			</uui-ref-node>
-		`;
+		switch (link.type) {
+			case 'document':
+				return html`
+					<umb-link-picker-document-ref
+						id=${unique}
+						.link=${link}
+						href=${ifDefined(href)}
+						?readonly=${this.readonly}
+						?standalone=${standalone}>
+						${actions}
+					</umb-link-picker-document-ref>
+				`;
+			case 'media':
+				return html`
+					<umb-link-picker-media-ref
+						id=${unique}
+						.link=${link}
+						href=${ifDefined(href)}
+						?readonly=${this.readonly}
+						?standalone=${standalone}>
+						${actions}
+					</umb-link-picker-media-ref>
+				`;
+			default:
+				return html`
+					<umb-link-picker-link-ref
+						id=${unique}
+						.link=${link}
+						href=${ifDefined(href)}
+						?readonly=${this.readonly}
+						?standalone=${standalone}>
+						${actions}
+					</umb-link-picker-link-ref>
+				`;
+		}
 	}
 
 	static override styles = [
