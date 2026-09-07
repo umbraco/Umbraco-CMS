@@ -13,6 +13,8 @@ export interface UmbBlockAction<ArgsMetaType> extends UmbAction<UmbBlockActionAr
 	/**
 	 * The href location, the action will act as a link.
 	 * The `execute` method will not be called.
+	 * Kept alongside `getHrefObservable` for actions whose href never changes after resolving once;
+	 * implement the observable variant instead when the href can change during the action's lifetime.
 	 * @returns {Promise<string | undefined>}
 	 */
 	getHref(): Promise<string | undefined>;
@@ -23,6 +25,7 @@ export interface UmbBlockAction<ArgsMetaType> extends UmbAction<UmbBlockActionAr
 	 */
 	execute(): Promise<void>;
 
+	// TODO: Remove in v.20. [NL]
 	/**
 	 * @deprecated Use `getValidationDataPathObservable()` instead. Optional validation data path for displaying an invalid badge on the action button.
 	 * Optional validation data path for displaying an invalid badge on the action button.

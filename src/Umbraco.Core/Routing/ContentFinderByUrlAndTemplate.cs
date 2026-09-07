@@ -116,7 +116,7 @@ public class ContentFinderByUrlAndTemplate : ContentFinderByUrl
         if (!node.IsAllowedTemplate(_contentTypeService, _webRoutingSettings, template.Id))
         {
             _logger.LogWarning(
-                "Alternative template '{TemplateAlias}' is not allowed on node {NodeId}.", template.Alias, node.Id);
+                "Alternative template '{TemplateAlias}' is not allowed on node {NodeId} (key {NodeKey}).", template.Alias, node.Id, node.Key);
             frequest.SetPublishedContent(null); // clear
             return Task.FromResult(false);
         }

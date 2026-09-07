@@ -93,7 +93,7 @@ public class ContentFinderByRedirectUrl : IContentFinder
         {
             if (_logger.IsEnabled(LogLevel.Debug))
             {
-                _logger.LogDebug("Route {Route} matches content {ContentId} which has no URL.", route, redirectUrl.ContentId);
+                _logger.LogDebug("Route {Route} matches content {ContentId} (key {ContentKey}) which has no URL.", route, redirectUrl.ContentId, redirectUrl.ContentKey);
             }
 
             return false;
@@ -103,7 +103,7 @@ public class ContentFinderByRedirectUrl : IContentFinder
         url = string.IsNullOrEmpty(frequest.Uri.Query) ? url : url + frequest.Uri.Query;
         if (_logger.IsEnabled(LogLevel.Debug))
         {
-            _logger.LogDebug("Route {Route} matches content {ContentId} with URL '{Url}', redirecting.", route, content?.Id, url);
+            _logger.LogDebug("Route {Route} matches content {ContentId} (key {ContentKey}) with URL '{Url}', redirecting.", route, content?.Id, content?.Key, url);
         }
 
         frequest

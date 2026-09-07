@@ -83,10 +83,83 @@ internal sealed class MemberFilterRepository : IMemberFilterRepository
         PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);
         Page<MemberFilterItemDto> page = await Database.PageAsync<MemberFilterItemDto>(pageNumber + 1, pageSize, combinedSql);
 
-        return new PagedModel<MemberFilterItem>(
-            page.TotalItems,
-            page.Items.Select(MapToItem));
+        var items = page.Items.Select(MapToItem).ToList();
+        Dictionary<Guid, List<Guid>> groupKeysByMemberKey = await GetGroupKeysByMemberKeyAsync(page.Items);
+        foreach (MemberFilterItem item in items)
+        {
+            if (groupKeysByMemberKey.TryGetValue(item.Key, out List<Guid>? groupKeys))
+            {
+                item.Groups = groupKeys;
+            }
+        }
+
+        return new PagedModel<MemberFilterItem>(page.TotalItems, items);
     }
+
+    private async Task<Dictionary<Guid, List<Guid>>> GetGroupKeysByMemberKeyAsync(IReadOnlyCollection<MemberFilterItemDto> items)
+    {
+        var groupKeysByMemberKey = new Dictionary<Guid, List<Guid>>();
+
+        Guid[] contentMemberKeys = items.Where(x => x.IsExternalOnly is false).Select(x => x.Key).ToArray();
+        Guid[] externalMemberKeys = items.Where(x => x.IsExternalOnly).Select(x => x.Key).ToArray();
+
+        if (contentMemberKeys.Length > 0)
+        {
+            await AppendGroupKeysAsync(groupKeysByMemberKey, contentMemberKeys, BuildContentMemberGroupKeysSql);
+        }
+
+        if (externalMemberKeys.Length > 0)
+        {
+            await AppendGroupKeysAsync(groupKeysByMemberKey, externalMemberKeys, BuildExternalMemberGroupKeysSql);
+        }
+
+        return groupKeysByMemberKey;
+    }
+
+    private async Task AppendGroupKeysAsync(
+        Dictionary<Guid, List<Guid>> target,
+        Guid[] memberKeys,
+        Func<IEnumerable<Guid>, Sql<ISqlContext>> sqlFactory)
+    {
+        foreach (IEnumerable<Guid> batch in memberKeys.InGroupsOf(Constants.Sql.MaxParameterCount))
+        {
+            List<MemberGroupKeyDto> rows = await Database.FetchAsync<MemberGroupKeyDto>(sqlFactory(batch));
+            foreach (MemberGroupKeyDto row in rows)
+            {
+                if (target.TryGetValue(row.MemberKey, out List<Guid>? groupKeys) is false)
+                {
+                    groupKeys = new List<Guid>();
+                    target[row.MemberKey] = groupKeys;
+                }
+
+                groupKeys.Add(row.GroupKey);
+            }
+        }
+    }
+
+    private Sql<ISqlContext> BuildContentMemberGroupKeysSql(IEnumerable<Guid> memberKeys) =>
+        SqlContext.Sql()
+            .Append(
+                $@"SELECT
+                    n.{QCol(NodeDto.KeyColumnName)} AS {QName("memberKey")},
+                    mgn.{QCol(NodeDto.KeyColumnName)} AS {QName("groupKey")}
+                FROM {QTab(Member2MemberGroupDto.TableName)} m2mg
+                INNER JOIN {QTab(NodeDto.TableName)} n ON n.{QCol(NodeDto.PrimaryKeyColumnName)} = m2mg.{QCol(Member2MemberGroupDto.MemberColumnName)}
+                INNER JOIN {QTab(NodeDto.TableName)} mgn ON mgn.{QCol(NodeDto.PrimaryKeyColumnName)} = m2mg.{QCol(Member2MemberGroupDto.MemberGroupColumnName)}
+                WHERE n.{QCol(NodeDto.KeyColumnName)} IN (@memberKeys)",
+                new { memberKeys });
+
+    private Sql<ISqlContext> BuildExternalMemberGroupKeysSql(IEnumerable<Guid> memberKeys) =>
+        SqlContext.Sql()
+            .Append(
+                $@"SELECT
+                    em.{QCol("key")} AS {QName("memberKey")},
+                    mgn.{QCol(NodeDto.KeyColumnName)} AS {QName("groupKey")}
+                FROM {QTab(ExternalMember2MemberGroupDto.TableName)} em2mg
+                INNER JOIN {QTab(ExternalMemberDto.TableName)} em ON em.{QCol(ExternalMemberDto.PrimaryKeyColumnName)} = em2mg.{QCol(ExternalMember2MemberGroupDto.ExternalMemberColumnName)}
+                INNER JOIN {QTab(NodeDto.TableName)} mgn ON mgn.{QCol(NodeDto.PrimaryKeyColumnName)} = em2mg.{QCol(ExternalMember2MemberGroupDto.MemberGroupColumnName)}
+                WHERE em.{QCol("key")} IN (@memberKeys)",
+                new { memberKeys });
 
     private Sql<ISqlContext> BuildContentMemberSql(MemberFilter filter)
     {
@@ -279,5 +352,18 @@ internal sealed class MemberFilterRepository : IMemberFilterRepository
 
         [Column("memberTypeIcon")]
         public string? MemberTypeIcon { get; set; }
+    }
+
+    /// <summary>
+    ///     Internal DTO for member-to-group key lookups.
+    /// </summary>
+    [ExplicitColumns]
+    private sealed class MemberGroupKeyDto
+    {
+        [Column("memberKey")]
+        public Guid MemberKey { get; set; }
+
+        [Column("groupKey")]
+        public Guid GroupKey { get; set; }
     }
 }

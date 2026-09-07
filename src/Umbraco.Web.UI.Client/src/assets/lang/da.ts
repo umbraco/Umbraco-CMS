@@ -328,6 +328,8 @@ export default {
 		isSensitiveValue:
 			'Denne værdi er skjult.Hvis du har brug for adgang til at se denne værdi, bedes du\n      kontakte din web-administrator.\n    ',
 		isSensitiveValue_short: 'Denne værdi er skjult.',
+		isSensitiveValueNotice:
+			'Hvis du har brug for adgang til at se de skjulte værdier, bedes du kontakte din web-administrator.',
 		languagesToPublish: 'Hvilke sprog vil du gerne udgive?',
 		languagesToSendForApproval: 'Hvilke sprog vil du gerne sende til godkendelse?',
 		languagesToSchedule: 'Hvilke sprog vil du gerne planlægge?',
