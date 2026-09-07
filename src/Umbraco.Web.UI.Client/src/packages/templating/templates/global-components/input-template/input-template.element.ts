@@ -119,7 +119,7 @@ export class UmbInputTemplateElement extends UUIFormControlMixin(UmbLitElement, 
 
 	#onCardChange(e: CustomEvent) {
 		e.stopPropagation();
-		const unique = (e.target as UmbTemplateCardElement).value as string;
+		const unique = (e.target as UmbTemplateCardElement).id as string;
 		this.defaultUnique = unique;
 		this.dispatchEvent(new UmbChangeEvent());
 	}
@@ -174,11 +174,6 @@ export class UmbInputTemplateElement extends UUIFormControlMixin(UmbLitElement, 
 						.id=${template.unique}
 						.name=${template.name}
 						@change=${this.#onCardChange}
-						@open=${() => {
-							if (this._templatePath) {
-								window.history.pushState({}, '', this._templatePath + 'edit/' + template.unique);
-							}
-						}}
 						.href=${this._templatePath ? this._templatePath + 'edit/' + template.unique : undefined}
 						?default=${template.unique === this.defaultUnique}>
 						<uui-button
