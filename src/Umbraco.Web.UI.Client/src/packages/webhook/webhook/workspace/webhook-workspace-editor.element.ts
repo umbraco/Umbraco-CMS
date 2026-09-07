@@ -40,6 +40,7 @@ export class UmbWebhookWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	override render() {
+		// TODO: move default slot content to a separate component, and registere as a workspace view. [NL]
 		return html`
 			<umb-entity-detail-workspace-editor back-path=${UMB_WEBHOOK_ROOT_WORKSPACE_PATH}>
 				<div id="header" slot="header">
