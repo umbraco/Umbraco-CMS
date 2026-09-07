@@ -2675,9 +2675,9 @@ internal partial class BlockListElementLevelVariationTests
     [Test]
     public async Task Editing_A_Non_Default_Culture_Block_Value_Flags_That_Culture_As_Edited()
     {
-        var elementType = CreateElementType(ContentVariation.Culture);
+        var elementType = await CreateElementType(ContentVariation.Culture);
         var blockListDataType = await CreateBlockListDataType(elementType);
-        var contentType = CreateContentType(ContentVariation.Culture, blockListDataType);
+        var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType);
 
         var content = CreateContent(
             contentType,
@@ -2744,9 +2744,9 @@ internal partial class BlockListElementLevelVariationTests
     [Test]
     public async Task Can_Publish_Branch_Republishes_Non_Default_Culture_Changed_Only_Inside_Invariant_Block()
     {
-        var elementType = CreateElementType(ContentVariation.Culture);
+        var elementType = await CreateElementType(ContentVariation.Culture);
         var blockListDataType = await CreateBlockListDataType(elementType);
-        var contentType = CreateContentType(ContentVariation.Culture, blockListDataType);
+        var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType);
 
         var content = CreateContent(
             contentType,
@@ -2784,7 +2784,7 @@ internal partial class BlockListElementLevelVariationTests
     [Test]
     public async Task Can_Publish_Branch_Republishes_Non_Default_Culture_Changed_Only_Inside_Nested_Invariant_Blocks()
     {
-        var nestedElementType = CreateElementType(ContentVariation.Culture, "myNestedElementType");
+        var nestedElementType = await CreateElementType(ContentVariation.Culture, "myNestedElementType");
         var nestedBlockListDataType = await CreateBlockListDataType(nestedElementType);
 
         var rootElementType = new ContentTypeBuilder()
@@ -2811,7 +2811,7 @@ internal partial class BlockListElementLevelVariationTests
             .Build();
         await ContentTypeService.CreateAsync(rootElementType, Constants.Security.SuperUserKey);
         var rootBlockListDataType = await CreateBlockListDataType(rootElementType);
-        var contentType = CreateContentType(ContentVariation.Culture, rootBlockListDataType);
+        var contentType = await CreateContentType(ContentVariation.Culture, rootBlockListDataType);
 
         var nestedElementContentKey = Guid.NewGuid();
         var nestedElementSettingsKey = Guid.NewGuid();
@@ -2883,9 +2883,9 @@ internal partial class BlockListElementLevelVariationTests
     [Test]
     public async Task Can_Publish_Branch_Republishes_Non_Default_Culture_Changed_Only_Via_Exposure()
     {
-        var elementType = CreateElementType(ContentVariation.Culture);
+        var elementType = await CreateElementType(ContentVariation.Culture);
         var blockListDataType = await CreateBlockListDataType(elementType);
-        var contentType = CreateContentType(ContentVariation.Culture, blockListDataType);
+        var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType);
 
         var content = CreateContent(contentType, elementType, [], false);
         var contentElementKey = Guid.NewGuid();
@@ -2973,7 +2973,7 @@ internal partial class BlockListElementLevelVariationTests
     [Test]
     public async Task Editing_A_Non_Default_Culture_Block_Value_Alongside_An_Unchanged_Nested_Block_Flags_Only_That_Culture()
     {
-        var nestedElementType = CreateElementType(ContentVariation.Culture, "myNestedElementType");
+        var nestedElementType = await CreateElementType(ContentVariation.Culture, "myNestedElementType");
         var nestedBlockListDataType = await CreateBlockListDataType(nestedElementType);
 
         var rootElementType = new ContentTypeBuilder()
@@ -3000,7 +3000,7 @@ internal partial class BlockListElementLevelVariationTests
             .Build();
         await ContentTypeService.CreateAsync(rootElementType, Constants.Security.SuperUserKey);
         var rootBlockListDataType = await CreateBlockListDataType(rootElementType);
-        var contentType = CreateContentType(ContentVariation.Culture, rootBlockListDataType);
+        var contentType = await CreateContentType(ContentVariation.Culture, rootBlockListDataType);
 
         var nestedElementContentKey = Guid.NewGuid();
         var nestedElementSettingsKey = Guid.NewGuid();
