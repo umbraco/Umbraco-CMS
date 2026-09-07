@@ -15,11 +15,29 @@ public class RichTextParsingRegexesTests
     [TestCase($"<umb-rte-block class=\"x\" data-content-key=\"{ContentKey}\"></umb-rte-block>")]
     [TestCase($"<umb-rte-block-inline data-key=\"{LayoutKey}\" data-content-key=\"{ContentKey}\"></umb-rte-block-inline>")]
     [TestCase($"<umb-rte-block data-key=\"{LayoutKey}\" data-content-key=\"{ContentKey}\"><!--Umbraco-Block--></umb-rte-block>")]
-    public void Matches_And_Captures_The_Content_Key(string markup)
+    public void Can_Match_Block_With_Optional_Attributes(string markup)
     {
         var match = RichTextParsingRegexes.BlockRegex().Match(markup);
 
         Assert.IsTrue(match.Success);
         Assert.AreEqual(ContentKey, match.Groups["key"].Value);
+    }
+
+    [TestCase($"<umb-rte-block data-key=\"{LayoutKey}\"></umb-rte-block>")]
+    [TestCase($"<umb-rte-block></umb-rte-block>")]
+    public void Cannot_Match_Block_Without_Content_Key(string markup)
+    {
+        var match = RichTextParsingRegexes.BlockRegex().Match(markup);
+
+        Assert.IsFalse(match.Success);
+    }
+
+    [TestCase($"<umb-rte-block data-content-key=\"{ContentKey}\">some text</umb-rte-block>")]
+    [TestCase($"<umb-rte-block data-content-key=\"{ContentKey}\"><p>nested</p></umb-rte-block>")]
+    public void Cannot_Match_Block_With_Inner_Content(string markup)
+    {
+        var match = RichTextParsingRegexes.BlockRegex().Match(markup);
+
+        Assert.IsFalse(match.Success);
     }
 }
