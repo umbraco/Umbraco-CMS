@@ -139,6 +139,10 @@ export class DocumentTypeApiHelper {
   // FOLDER
   async getFolder(id: string) {
     const response = await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/document-type/folder/' + id);
+    if (!response.ok()) {
+      return null;
+    }
+
     return await response.json();
   }
 

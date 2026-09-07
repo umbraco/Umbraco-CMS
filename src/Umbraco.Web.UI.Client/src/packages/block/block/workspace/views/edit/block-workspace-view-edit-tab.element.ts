@@ -35,17 +35,16 @@ export class UmbBlockWorkspaceViewEditTabElement extends UmbLitElement {
 	private _containerId?: string | null;
 
 	/**
-	 * If true, the group box will be hidden, if we are to only represents one group.
-	 * This is used by Inline Editing Mode of Block List Editor.
+	 * This is used by Inline Editing Mode of Block Editors, to simplify the visuals when possible.
 	 */
 	@property({ type: Boolean, reflect: false })
 	hideSingleGroup = false;
 
 	@state()
-	private _groups: Array<UmbPropertyTypeContainerMergedModel> = [];
+	private _groups?: Array<UmbPropertyTypeContainerMergedModel>;
 
 	@state()
-	private _hasProperties = false;
+	private _hasProperties?: boolean;
 
 	constructor() {
 		super();
@@ -76,24 +75,37 @@ export class UmbBlockWorkspaceViewEditTabElement extends UmbLitElement {
 	}
 
 	override render() {
-		return html`
-			${this._hasProperties
-				? html`<uui-box>
-						<umb-block-workspace-view-edit-properties
-							.managerName=${this.#managerName}
-							data-mark="property-group:root"
-							.containerId=${this._containerId}></umb-block-workspace-view-edit-properties>
-					</uui-box>`
-				: ''}
-			${this.hideSingleGroup && this._groups.length === 1
-				? this.renderGroup(this._groups[0])
-				: repeat(
-						this._groups,
-						(group) => group.key,
-						(group) =>
-							html`<uui-box .headline=${this.localize.string(group.name)}>${this.renderGroup(group)}</uui-box>`,
-					)}
-		`;
+		if (this._containerId === undefined) return;
+		return html`${this.#renderRootProperties()}${this.#renderGroups()}`;
+	}
+
+	#renderRootProperties() {
+		// Only render the root properties if we have loaded both root properties and groups.
+		if (!this._hasProperties || this._groups === undefined) return;
+		if (this.hideSingleGroup && (!this._groups || this._groups.length === 0)) {
+			return html`<umb-block-workspace-view-edit-properties
+				.managerName=${this.#managerName}
+				data-mark="property-group:root"
+				.containerId=${this._containerId}></umb-block-workspace-view-edit-properties>`;
+		}
+		return html`<uui-box>
+			<umb-block-workspace-view-edit-properties
+				.managerName=${this.#managerName}
+				data-mark="property-group:root"
+				.containerId=${this._containerId}></umb-block-workspace-view-edit-properties>
+		</uui-box>`;
+	}
+
+	#renderGroups() {
+		if (!this._groups || this._groups.length === 0) return;
+		if (this.hideSingleGroup && this._hasProperties === false && this._groups?.length === 1) {
+			return this.renderGroup(this._groups[0]);
+		}
+		return repeat(
+			this._groups,
+			(group) => group.key,
+			(group) => html`<uui-box .headline=${this.localize.string(group.name)}>${this.renderGroup(group)}</uui-box>`,
+		);
 	}
 
 	renderGroup(group: UmbPropertyTypeContainerMergedModel) {

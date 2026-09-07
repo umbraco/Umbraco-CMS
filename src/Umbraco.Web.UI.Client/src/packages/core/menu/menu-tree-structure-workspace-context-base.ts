@@ -2,11 +2,13 @@ import type { ManifestWorkspaceContextMenuStructureKind, UmbStructureItemModel }
 import { UMB_MENU_STRUCTURE_WORKSPACE_CONTEXT } from './menu-structure-workspace-context.context-token.js';
 import { UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT } from './section-sidebar-menu/index.js';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
-import { linkEntityExpansionEntries } from '@umbraco-cms/backoffice/utils';
+import { debounce, linkEntityExpansionEntries } from '@umbraco-cms/backoffice/utils';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbAncestorsEntityContext, UmbParentEntityContext, type UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UMB_MODAL_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
+import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 import { UMB_SECTION_CONTEXT } from '@umbraco-cms/backoffice/section';
 import {
 	UMB_SUBMITTABLE_TREE_ENTITY_WORKSPACE_CONTEXT,
@@ -36,6 +38,11 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase extends UmbContex
 	#sectionSidebarMenuContext?: typeof UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT.TYPE;
 	#isModalContext: boolean = false;
 	#isNew: boolean | undefined = undefined;
+	#actionEventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
+	#structureRequestId = 0;
+
+	// Coalesces the unique/isNew/reload-event triggers when they fire in quick succession.
+	#requestStructure = debounce(() => this.#requestStructureImpl(), 100);
 
 	constructor(host: UmbControllerHost, args: UmbMenuTreeStructureWorkspaceContextBaseArgs) {
 		super(host, UMB_MENU_STRUCTURE_WORKSPACE_CONTEXT);
@@ -49,6 +56,12 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase extends UmbContex
 			this._sectionContext = instance;
 		});
 
+		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (instance) => {
+			this.#removeEventListeners();
+			this.#actionEventContext = instance;
+			this.#addEventListeners();
+		});
+
 		this.consumeContext(UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT, (instance) => {
 			this.#sectionSidebarMenuContext = instance;
 		});
@@ -59,6 +72,8 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase extends UmbContex
 				this.#workspaceContext?.unique,
 				(value) => {
 					if (!value) return;
+					// Clear immediately so the previous entity's breadcrumb/structure isn't shown while the new one loads.
+					this.#clearStructure();
 					this.#requestStructure();
 				},
 				'observeUnique',
@@ -92,7 +107,37 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase extends UmbContex
 		});
 	}
 
-	async #requestStructure() {
+	#addEventListeners() {
+		this.#actionEventContext?.addEventListener(
+			UmbRequestReloadStructureForEntityEvent.TYPE,
+			this.#onReloadStructureForEntityRequest as EventListener,
+		);
+	}
+
+	#removeEventListeners() {
+		this.#actionEventContext?.removeEventListener(
+			UmbRequestReloadStructureForEntityEvent.TYPE,
+			this.#onReloadStructureForEntityRequest as EventListener,
+		);
+	}
+
+	#onReloadStructureForEntityRequest = (event: UmbRequestReloadStructureForEntityEvent) => {
+		if (!this.#isCurrentEntityOrAncestor(event.getEntityType(), event.getUnique())) return;
+		this.#requestStructure();
+	};
+
+	#isCurrentEntityOrAncestor(entityType: string, unique: string | null): boolean {
+		if (entityType === this.#workspaceContext?.getEntityType() && unique === this.#workspaceContext?.getUnique()) {
+			return true;
+		}
+
+		return this.#ancestorContext
+			.getAncestors()
+			.some((ancestor) => ancestor.entityType === entityType && ancestor.unique === unique);
+	}
+
+	async #requestStructureImpl() {
+		const requestId = ++this.#structureRequestId;
 		const isNew = this.#workspaceContext?.getIsNew();
 		const uniqueObservable = isNew
 			? this.#workspaceContext?._internal_createUnderParentEntityUnique
@@ -159,6 +204,9 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase extends UmbContex
 		// Guard: this context may have been destroyed while the async requests were in flight.
 		if (!this._host) return;
 
+		// Guard: a newer request has superseded this one; its result would already be stale.
+		if (requestId !== this.#structureRequestId) return;
+
 		if (ancestorData) {
 			this.#setAncestorData(ancestorData);
 		}
@@ -170,6 +218,12 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase extends UmbContex
 		if (menuItemAlias && !this.#isModalContext) {
 			this.#expandSectionSidebarMenu(structureItems, menuItemAlias);
 		}
+	}
+
+	#clearStructure() {
+		this.#structure.setValue([]);
+		this.#parentContext.setParent(undefined);
+		this.#ancestorContext.setAncestors([]);
 	}
 
 	#setParentData(structureItems: Array<UmbStructureItemModel>) {
@@ -221,6 +275,8 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase extends UmbContex
 	}
 
 	override destroy(): void {
+		this.#requestStructure.cancel();
+		this.#removeEventListeners();
 		super.destroy();
 		this.#structure.destroy();
 		this.#parentContext.destroy();
