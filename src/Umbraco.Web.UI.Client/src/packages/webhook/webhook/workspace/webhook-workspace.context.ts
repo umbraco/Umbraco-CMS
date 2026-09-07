@@ -1,10 +1,13 @@
 import type { UmbWebhookDetailRepository } from '../repository/index.js';
 import { UMB_WEBHOOK_DETAIL_REPOSITORY_ALIAS } from '../repository/index.js';
 import { UMB_WEBHOOK_ENTITY_TYPE, UMB_WEBHOOK_ROOT_ENTITY_TYPE, UMB_WEBHOOK_WORKSPACE_ALIAS } from '../../entity.js';
+import { UMB_EDIT_WEBHOOK_WORKSPACE_PATH_PATTERN } from '../paths.js';
+import { UMB_WEBHOOK_ROOT_WORKSPACE_PATH } from '../../webhook-root/paths.js';
 import type { UmbWebhookDetailModel } from '../types.js';
 import type { UmbWebhookEventModel } from '../../webhook-event/types.js';
 import { UmbWebhookWorkspaceEditorElement } from './webhook-workspace-editor.element.js';
 import {
+	UmbDeleteEntityWorkspaceRedirectController,
 	UmbEntityNamedDetailWorkspaceContextBase,
 	UmbWorkspaceIsNewRedirectController,
 	UmbWorkspaceIsNewRedirectControllerAlias,
@@ -51,6 +54,13 @@ export class UmbWebhookWorkspaceContext
 				setup: (_component, info) => {
 					this.removeUmbControllerByAlias(UmbWorkspaceIsNewRedirectControllerAlias);
 					this.load(info.match.params.unique);
+
+					new UmbDeleteEntityWorkspaceRedirectController(this, this, {
+						getRedirectPath: ({ entity }) => {
+							if (!entity?.unique) return UMB_WEBHOOK_ROOT_WORKSPACE_PATH;
+							return UMB_EDIT_WEBHOOK_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: entity.unique });
+						},
+					});
 				},
 			},
 		]);

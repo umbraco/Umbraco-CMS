@@ -2,10 +2,13 @@ import { UmbLanguageDetailRepository } from '../../repository/index.js';
 import { UMB_LANGUAGE_DETAIL_REPOSITORY_ALIAS } from '../../constants.js';
 import type { UmbLanguageDetailModel } from '../../types.js';
 import { UMB_LANGUAGE_ENTITY_TYPE, UMB_LANGUAGE_ROOT_ENTITY_TYPE } from '../../entity.js';
+import { UMB_EDIT_LANGUAGE_WORKSPACE_PATH_PATTERN } from '../../paths.js';
+import { UMB_LANGUAGE_ROOT_WORKSPACE_PATH } from '../language-root/paths.js';
 import { UmbLanguageWorkspaceEditorElement } from './language-workspace-editor.element.js';
 import { UMB_LANGUAGE_WORKSPACE_ALIAS } from './constants.js';
 import {
 	type UmbSubmittableWorkspaceContext,
+	UmbDeleteEntityWorkspaceRedirectController,
 	UmbWorkspaceIsNewRedirectController,
 	type UmbRoutableWorkspaceContext,
 	UmbWorkspaceIsNewRedirectControllerAlias,
@@ -46,6 +49,13 @@ export class UmbLanguageWorkspaceContext
 				setup: (_component, info) => {
 					this.removeUmbControllerByAlias(UmbWorkspaceIsNewRedirectControllerAlias);
 					this.load(info.match.params.unique);
+
+					new UmbDeleteEntityWorkspaceRedirectController(this, this, {
+						getRedirectPath: ({ entity }) => {
+							if (!entity?.unique) return UMB_LANGUAGE_ROOT_WORKSPACE_PATH;
+							return UMB_EDIT_LANGUAGE_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: entity.unique });
+						},
+					});
 				},
 			},
 		]);
