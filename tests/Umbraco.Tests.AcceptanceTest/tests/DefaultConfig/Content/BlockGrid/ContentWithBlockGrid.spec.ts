@@ -186,8 +186,8 @@ test('cannot publish content with fewer block elements than the minimum amount',
 
   // Assert
   const contentData = await umbracoApi.document.getByName(contentName);
-  const blockGridValue = contentData.values.find(item => item.value);
-  expect(blockGridValue).toBeTruthy();
+  expect(contentData.values[0].value.contentData.length).toBe(1);
+  expect(contentData.values[0].value.contentData[0].contentTypeKey).toEqual(elementTypeId);
 });
 
 test('can set the label of create button in root', async ({umbracoApi, umbracoUi}) => {
