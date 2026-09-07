@@ -209,6 +209,26 @@ public class GlobalSettings
     public string DatabaseFactoryServerVersion { get; set; } = string.Empty;
 
     /// <summary>
+    ///     Gets or sets the maximum time a single database command may run before it is cancelled.
+    /// </summary>
+    /// <remarks>
+    ///     Takes precedence over a command timeout in the connection string. When not set, the connection
+    ///     string's value applies, or the database provider's default. Not every database provider supports
+    ///     a command timeout.
+    /// </remarks>
+    public TimeSpan? DatabaseCommandTimeout { get; set; }
+
+    /// <summary>
+    ///     Gets or sets the maximum time to wait when opening a connection to the database.
+    /// </summary>
+    /// <remarks>
+    ///     Takes precedence over a connect timeout in the connection string. When not set, the connection
+    ///     string's value applies, or the database provider's default. Not every database provider supports
+    ///     a connect timeout.
+    /// </remarks>
+    public TimeSpan? DatabaseConnectTimeout { get; set; }
+
+    /// <summary>
     ///     Gets or sets a value for the main dom lock.
     /// </summary>
     public string MainDomLock { get; set; } = string.Empty;
