@@ -1,5 +1,9 @@
 import type { UmbPropertyEditorRteValueType } from '../types.js';
-import { UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS } from '../constants.js';
+import {
+	UMB_BLOCK_RTE_DATA_CONTENT_KEY,
+	UMB_BLOCK_RTE_DATA_LAYOUT_KEY,
+	UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS,
+} from '../constants.js';
 import { jsonStringComparison, observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbBlockRteEntriesContext, UmbBlockRteManagerContext } from '@umbraco-cms/backoffice/block-rte';
@@ -13,6 +17,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_VARIANT_CONTEXT, UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UMB_CONTENT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
+import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import type { StyleInfo } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbBlockDataModel } from '@umbraco-cms/backoffice/block';
 import type { UmbBlockRteLayoutModel, UmbBlockRteTypeModel } from '@umbraco-cms/backoffice/block-rte';
@@ -383,9 +388,56 @@ export abstract class UmbPropertyEditorUiRteElementBase
 	}
 
 	/**
+	 * @deprecated Use `_filterUnusedBlocksFromMarkup` instead, passing the raw RTE markup — it derives the
+	 * used layout keys itself, including the legacy-markup fallback to content keys. Scheduled for removal
+	 * in Umbraco 21.
 	 * @param {(string | null)[]} usedLayoutKeys - Layout keys (not content keys) currently present in the editor markup.
 	 */
 	protected _filterUnusedBlocks(usedLayoutKeys: (string | null)[]) {
+		new UmbDeprecation({
+			deprecated: 'UmbPropertyEditorUiRteElementBase._filterUnusedBlocks()',
+			removeInVersion: '21.0.0',
+			solution: 'Use _filterUnusedBlocksFromMarkup() instead, passing the raw RTE markup.',
+		}).warn();
+
+		this.#filterUnusedBlocksByLayoutKeys(usedLayoutKeys);
+	}
+
+	/**
+	 * Removes block layout entries — and their content/settings — no longer referenced in the given markup.
+	 * RTE implementations should call this from their change handler with the editor's current markup.
+	 * @param {string} markup - The RTE markup as currently held by the editor.
+	 */
+	protected _filterUnusedBlocksFromMarkup(markup: string) {
+		this.#filterUnusedBlocksByLayoutKeys(this.#getUsedRteBlockLayoutKeysInMarkup(markup));
+	}
+
+	/**
+	 * Extracts each block element's layout key from the given markup, mirroring the backend's
+	 * `RichTextParsingRegexes.BlockRegex`. Falls back to the content key for legacy markup that predates
+	 * `data-key`, matching `setLayouts()`'s `layout.key ??= layout.contentKey` coercion.
+	 * @param {string} markup - The RTE markup to scan.
+	 * @returns {Array<string>} The layout keys of every block element found in the markup.
+	 */
+	#getUsedRteBlockLayoutKeysInMarkup(markup: string): Array<string> {
+		const usedLayoutKeys: Array<string> = [];
+
+		const blockRegex = /<umb-rte-block(?:-inline)?(?:[^>]*)>/gi;
+		let blockElement: RegExpExecArray | null;
+		while ((blockElement = blockRegex.exec(markup)) !== null) {
+			const tag = blockElement[0];
+			const layoutKeyMatch = new RegExp(` ${UMB_BLOCK_RTE_DATA_LAYOUT_KEY}="([^"]+)"`).exec(tag)?.[1];
+			const contentKeyMatch = new RegExp(` ${UMB_BLOCK_RTE_DATA_CONTENT_KEY}="([^"]+)"`).exec(tag)?.[1];
+			const layoutKey = layoutKeyMatch ?? contentKeyMatch;
+			if (layoutKey) {
+				usedLayoutKeys.push(layoutKey);
+			}
+		}
+
+		return usedLayoutKeys;
+	}
+
+	#filterUnusedBlocksByLayoutKeys(usedLayoutKeys: (string | null)[]) {
 		const unusedLayouts = this.#managerContext.getLayouts().filter((x) => !usedLayoutKeys.includes(x.key));
 
 		// Temporarily set the unused layouts to the lookup, as they could be restored later, e.g. via an RTE undo action. [LK]

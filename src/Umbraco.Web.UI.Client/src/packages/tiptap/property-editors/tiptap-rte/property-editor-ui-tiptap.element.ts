@@ -59,22 +59,6 @@ export class UmbPropertyEditorUiTiptapElement extends UmbPropertyEditorUiRteElem
 		const tipTapElement = event.target;
 		const markup = tipTapElement.value;
 
-		// Remove unused Blocks of Blocks Layout. Leaving only the Blocks that are present in Markup.
-		// Extract the layout key (data-key) from each block element to uniquely identify layout entries.
-		// For legacy markup without data-key, fall back to data-content-key — safe because
-		// setLayouts() coerces layout.key ??= layout.contentKey for persisted data without a key.
-		const usedLayoutKeys: string[] = [];
-
-		const blockRegex = /<umb-rte-block(?:-inline)?(?:[^>]*)>/gi;
-		let blockElement: RegExpExecArray | null;
-		while ((blockElement = blockRegex.exec(markup)) !== null) {
-			const tag = blockElement[0];
-			const layoutKey = / data-key="([^"]+)"/.exec(tag)?.[1] ?? / data-content-key="([^"]+)"/.exec(tag)?.[1];
-			if (layoutKey) {
-				usedLayoutKeys.push(layoutKey);
-			}
-		}
-
 		if (this.value) {
 			this.value = {
 				...this.value,
@@ -93,7 +77,7 @@ export class UmbPropertyEditorUiTiptapElement extends UmbPropertyEditorUiRteElem
 		}
 
 		// lets run this one after we set the value, to make sure we don't reset the value.
-		this._filterUnusedBlocks(usedLayoutKeys);
+		this._filterUnusedBlocksFromMarkup(markup);
 
 		this._fireChangeEvent();
 	}
