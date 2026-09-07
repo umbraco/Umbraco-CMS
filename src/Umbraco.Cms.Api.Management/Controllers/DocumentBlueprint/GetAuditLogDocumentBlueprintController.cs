@@ -24,6 +24,7 @@ public class GetAuditLogDocumentBlueprintController : DocumentBlueprintControlle
     private readonly IAuditLogPresentationFactory _auditLogPresentationFactory;
     private readonly IAuthorizationService _authorizationService;
 
+    [ActivatorUtilitiesConstructor]
     public GetAuditLogDocumentBlueprintController(
         IAuditService auditService,
         IAuditLogPresentationFactory auditLogPresentationFactory,

@@ -31,6 +31,7 @@ public class MoveDocumentBlueprintController : DocumentBlueprintControllerBase
     /// </summary>
     /// <param name="contentBlueprintEditingService">The service used to edit content blueprints. This dependency is injected.</param>
     /// <param name="backOfficeSecurityAccessor">Provides access to back office security information. This dependency is injected.</param>
+    [ActivatorUtilitiesConstructor]
     public MoveDocumentBlueprintController(
         IContentBlueprintEditingService contentBlueprintEditingService,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,

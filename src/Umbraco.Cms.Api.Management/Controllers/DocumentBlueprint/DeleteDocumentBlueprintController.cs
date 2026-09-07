@@ -32,6 +32,7 @@ public class DeleteDocumentBlueprintController : DocumentBlueprintControllerBase
     /// <param name="contentBlueprintEditingService">Service used for editing content blueprints.</param>
     /// <param name="backOfficeSecurityAccessor">Accessor for back office security context.</param>
     /// <param name="authorizationService">The authorization service.</param>
+    [ActivatorUtilitiesConstructor]
     public DeleteDocumentBlueprintController(
         IContentBlueprintEditingService contentBlueprintEditingService,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,

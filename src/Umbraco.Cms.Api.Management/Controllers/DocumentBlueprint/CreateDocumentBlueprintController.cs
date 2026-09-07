@@ -36,6 +36,7 @@ public class CreateDocumentBlueprintController : DocumentBlueprintControllerBase
     /// <param name="contentBlueprintEditingService">Service used for editing document blueprints.</param>
     /// <param name="backOfficeSecurityAccessor">Accessor for the back office security context.</param>
     /// <param name="authorizationService">The authorization service.</param>
+    [ActivatorUtilitiesConstructor]
     public CreateDocumentBlueprintController(
         IDocumentBlueprintEditingPresentationFactory blueprintEditingPresentationFactory,
         IContentBlueprintEditingService contentBlueprintEditingService,
