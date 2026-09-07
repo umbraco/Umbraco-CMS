@@ -36,6 +36,7 @@ public class UpdateDocumentBlueprintController : DocumentBlueprintControllerBase
     /// <param name="contentBlueprintEditingService">Service responsible for content blueprint editing operations.</param>
     /// <param name="backOfficeSecurityAccessor">Accessor for the back office security context.</param>
     /// <param name="authorizationService">The authorization service.</param>
+    [ActivatorUtilitiesConstructor]
     public UpdateDocumentBlueprintController(
         IDocumentBlueprintEditingPresentationFactory blueprintEditingPresentationFactory,
         IContentBlueprintEditingService contentBlueprintEditingService,
