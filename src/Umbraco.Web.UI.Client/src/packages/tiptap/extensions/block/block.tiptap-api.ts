@@ -1,6 +1,6 @@
 import { UmbTiptapExtensionApiBase } from '../tiptap-extension-api-base.js';
 import { umbRteBlock, umbRteBlockInline } from './block.tiptap-extension.js';
-import { combineLatest } from '@umbraco-cms/backoffice/external/rxjs';
+import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { UMB_BLOCK_RTE_DATA_LAYOUT_KEY } from '@umbraco-cms/backoffice/rte';
 import { UMB_BLOCK_RTE_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/block-rte';
 import type { UmbBlockRteLayoutModel } from '@umbraco-cms/backoffice/block-rte';
@@ -18,7 +18,7 @@ export default class UmbTiptapBlockElementApi extends UmbTiptapExtensionApiBase 
 			this.#managerContext = context;
 
 			this.observe(
-				combineLatest([context.layouts, context.allContents]),
+				observeMultiple([context.layouts, context.allContents]),
 				([layouts]) => {
 					this.#updateBlocks(layouts);
 				},
