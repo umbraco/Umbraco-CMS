@@ -26,6 +26,7 @@ public class ByKeyDocumentBlueprintFolderController : DocumentBlueprintFolderCon
     /// </summary>
     /// <param name="backOfficeSecurityAccessor">Provides access to back office security features for authorization and authentication.</param>
     /// <param name="contentBlueprintContainerService">Service used to manage content blueprint containers (folders).</param>
+    [ActivatorUtilitiesConstructor]
     public ByKeyDocumentBlueprintFolderController(
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
         IContentBlueprintContainerService contentBlueprintContainerService,

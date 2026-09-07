@@ -26,6 +26,7 @@ public class CreateDocumentBlueprintFolderController : DocumentBlueprintFolderCo
     /// </summary>
     /// <param name="backOfficeSecurityAccessor">Accessor for back office security operations.</param>
     /// <param name="contentBlueprintContainerService">Service for managing content blueprint containers.</param>
+    [ActivatorUtilitiesConstructor]
     public CreateDocumentBlueprintFolderController(
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
         IContentBlueprintContainerService contentBlueprintContainerService,

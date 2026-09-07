@@ -61,6 +61,7 @@ public class DocumentBlueprintTreeControllerBase : UserStartNodeFolderTreeContro
     {
     }
 
+    [ActivatorUtilitiesConstructor]
     public DocumentBlueprintTreeControllerBase(
         IEntityService entityService,
         FlagProviderCollection flagProviders,

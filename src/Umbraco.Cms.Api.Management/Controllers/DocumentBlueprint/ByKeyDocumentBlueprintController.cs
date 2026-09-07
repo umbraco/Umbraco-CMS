@@ -31,6 +31,7 @@ public class ByKeyDocumentBlueprintController : DocumentBlueprintControllerBase
     /// <param name="contentBlueprintEditingService">An instance of <see cref="IContentBlueprintEditingService"/> used to manage content blueprint editing operations.</param>
     /// <param name="umbracoMapper">An instance of <see cref="IUmbracoMapper"/> used for mapping between Umbraco models.</param>
     /// <param name="authorizationService">The authorization service.</param>
+    [ActivatorUtilitiesConstructor]
     public ByKeyDocumentBlueprintController(
         IContentBlueprintEditingService contentBlueprintEditingService,
         IUmbracoMapper umbracoMapper,
