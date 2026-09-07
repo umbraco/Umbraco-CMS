@@ -423,6 +423,27 @@ public class MemberPresentationFactoryTests
     }
 
     [Test]
+    public void CreateFilterItemResponseModel_Maps_Group_Keys()
+    {
+        // Arrange
+        var groupKey = Guid.NewGuid();
+        var item = new MemberFilterItem
+        {
+            Key = Guid.NewGuid(),
+            Email = "filter-grouped@test.com",
+            UserName = "filter-grouped",
+            Kind = MemberKind.Default,
+            Groups = [groupKey],
+        };
+
+        // Act
+        MemberResponseModel result = _sut.CreateFilterItemResponseModel(item, CreateMockUser(true).Object);
+
+        // Assert
+        Assert.That(result.Groups.ToList(), Does.Contain(groupKey));
+    }
+
+    [Test]
     public void CreateFilterItemResponseModel_Maps_External_Member_With_Empty_Type()
     {
         // Arrange

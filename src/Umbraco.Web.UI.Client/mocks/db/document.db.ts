@@ -27,19 +27,13 @@ export class UmbDocumentMockDB extends UmbEntityMockDbBase<UmbMockDocumentModel>
 	tree = new UmbMockEntityTreeManager<UmbMockDocumentModel>(this, treeItemMapper);
 	item = new UmbMockEntityVariantItemManager<UmbMockDocumentModel>(this, itemMapper);
 	detail = new UmbMockEntityDetailManager<UmbMockDocumentModel>(this, createMockDocumentMapper, detailResponseMapper);
-	recycleBin = new UmbEntityRecycleBin<UmbMockDocumentModel>(this.data, treeItemMapper);
+	recycleBin = new UmbEntityRecycleBin<UmbMockDocumentModel>(this, treeItemMapper);
 	publishing = new UmbMockDocumentPublishingManager(this);
 	collection = new UmbMockDocumentCollectionManager(this, collectionMapper);
 	url = new UmbMockEntityVariantUrlManager<UmbMockDocumentModel>(this);
 
 	constructor(data: Array<UmbMockDocumentModel>) {
 		super('document', data);
-	}
-
-	override setData(data: Array<UmbMockDocumentModel>) {
-		super.setData(data);
-		// Update recycleBin's data to match - it has its own data array
-		this.recycleBin.setData(data);
 	}
 
 	// permissions
@@ -175,6 +169,7 @@ const collectionMapper = (model: UmbMockDocumentModel): DocumentCollectionRespon
 			alias: '',
 			icon: model.documentType.icon,
 		},
+		hasChildren: model.hasChildren,
 		id: model.id,
 		isProtected: model.isProtected,
 		isTrashed: model.isTrashed,
