@@ -208,7 +208,6 @@ test('can not publish a mandatory multi node tree picker with an empty value', a
   await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.nullValue);
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
 
-  // Set the value and publish succeeds
   await umbracoUi.content.clickChooseButton();
   await umbracoUi.content.selectLinkByName(pickerTargetName);
   await umbracoUi.content.clickChooseModalButton();

@@ -169,7 +169,6 @@ test('cannot publish content with fewer block elements than the minimum amount',
   // Assert
   await umbracoUi.content.isErrorNotificationVisible();
 
-  // Adding a block lets the publish succeed
   await umbracoUi.content.clickAddBlockElementButton();
   await umbracoUi.content.clickBlockElementWithName(elementTypeName);
   await umbracoUi.content.clickCreateModalButton();
@@ -419,7 +418,6 @@ test('cannot create a block when a property value exceeds the configured maximum
   await umbracoUi.content.clickCreateModalButton();
 
   // Assert
-  // The modal stays open and the block is never created - the invalid value is never saved
   await umbracoUi.content.isTextWithMessageVisible("Value must be less than or equal to '10'.");
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values).toEqual([]);

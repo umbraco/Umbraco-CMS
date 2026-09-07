@@ -101,7 +101,6 @@ test('can not publish a mandatory approved color with an empty value', async ({u
   await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.nullValue);
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
 
-  // Set the value and publish succeeds
   await umbracoUi.content.clickApprovedColorByValue(colorValue);
   await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBeUpdated();
 

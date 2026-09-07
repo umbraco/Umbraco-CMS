@@ -34,7 +34,6 @@ test('can not publish a mandatory multiple text string with an empty value', asy
   await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.nullValue);
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
 
-  // Fill the value and publish succeeds
   await umbracoUi.content.addMultipleTextStringItem(text);
   await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBeUpdated();
 

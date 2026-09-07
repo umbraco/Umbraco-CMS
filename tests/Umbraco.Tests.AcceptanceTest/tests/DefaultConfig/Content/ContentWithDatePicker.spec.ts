@@ -79,7 +79,6 @@ test('can not publish a mandatory date picker with an empty value', async ({umbr
   await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.nullValue);
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
 
-  // Set the value and publish succeeds
   await umbracoUi.content.enterDateInputValue(dateValue);
   await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBeUpdated();
 

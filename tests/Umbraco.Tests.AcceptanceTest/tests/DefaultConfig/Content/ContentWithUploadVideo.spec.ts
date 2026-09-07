@@ -149,7 +149,6 @@ test('can not publish a mandatory upload video with an empty value', async ({umb
   await umbracoUi.content.isErrorNotificationVisible();
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
 
-  // Upload a file and publish succeeds
   await umbracoUi.content.uploadFile(uploadVideoPath + uploadFileName);
   await umbracoUi.content.isInputDropzoneVisible(false);
   await umbracoUi.content.doesInputUploadFileHaveName(uploadFileName);

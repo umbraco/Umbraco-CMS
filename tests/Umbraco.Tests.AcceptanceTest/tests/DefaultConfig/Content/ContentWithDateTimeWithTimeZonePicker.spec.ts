@@ -83,7 +83,6 @@ test('can not publish a mandatory date time with time zone picker with an empty 
   await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.emptyDate);
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
 
-  // Set the value and publish succeeds
   await umbracoUi.content.enterDateInputValue(dateTimeValue);
   await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBeUpdated();
 

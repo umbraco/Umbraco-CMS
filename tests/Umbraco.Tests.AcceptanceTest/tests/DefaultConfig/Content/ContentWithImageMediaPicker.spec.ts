@@ -122,7 +122,6 @@ test('can not publish a mandatory image media picker with an empty value', async
   await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.nullValue);
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
 
-  // Pick an image and publish succeeds
   await umbracoUi.content.clickChooseButtonAndSelectMediaWithName(mediaName);
   await umbracoUi.content.clickChooseModalButton();
   await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBeUpdated();

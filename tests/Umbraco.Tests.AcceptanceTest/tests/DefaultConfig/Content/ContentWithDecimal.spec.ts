@@ -40,7 +40,6 @@ test('cannot publish a decimal value below the configured minimum', async ({umbr
   await umbracoUi.content.isErrorNotificationVisible();
   await umbracoUi.content.isTextWithMessageVisible(warningMessage);
 
-  // Fix the value and the error disappears
   await umbracoUi.content.enterDecimal(min);
   await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBeUpdated();
   await umbracoUi.content.isTextWithMessageVisible(warningMessage, false);
@@ -67,7 +66,6 @@ test('cannot publish a decimal value above the configured maximum', async ({umbr
   await umbracoUi.content.isErrorNotificationVisible();
   await umbracoUi.content.isTextWithMessageVisible(warningMessage);
 
-  // Fix the value and the error disappears
   await umbracoUi.content.enterDecimal(max);
   await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBeUpdated();
   await umbracoUi.content.isTextWithMessageVisible(warningMessage, false);

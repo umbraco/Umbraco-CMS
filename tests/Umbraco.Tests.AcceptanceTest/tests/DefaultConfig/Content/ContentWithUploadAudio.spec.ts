@@ -150,7 +150,6 @@ test('can not publish a mandatory upload audio with an empty value', async ({umb
   await umbracoUi.content.isErrorNotificationVisible();
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
 
-  // Upload a file and publish succeeds
   await umbracoUi.content.uploadFile(uploadFilePath + uploadFileName);
   await umbracoUi.content.isInputDropzoneVisible(false);
   await umbracoUi.content.doesInputUploadFileHaveName(uploadFileName);

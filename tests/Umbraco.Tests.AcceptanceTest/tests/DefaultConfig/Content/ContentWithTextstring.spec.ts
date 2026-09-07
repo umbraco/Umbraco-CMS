@@ -117,7 +117,6 @@ test('can not publish a mandatory textstring with an empty value', async ({umbra
   await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.nullValue);
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
 
-  // Fill the value and publish succeeds
   await umbracoUi.content.enterTextstring(text);
   await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBeUpdated();
 

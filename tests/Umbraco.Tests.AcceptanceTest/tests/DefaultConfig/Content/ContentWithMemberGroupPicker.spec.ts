@@ -83,7 +83,6 @@ test('can not publish a mandatory member group picker with an empty value', asyn
   await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.nullValue);
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
 
-  // Pick a member group and publish succeeds
   await umbracoUi.content.addMemberGroupPicker(memberGroupName);
   await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBeUpdated();
 

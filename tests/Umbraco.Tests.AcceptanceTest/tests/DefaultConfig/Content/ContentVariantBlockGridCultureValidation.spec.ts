@@ -37,7 +37,6 @@ test('can publish english variant when danish has no blocks and minimum is requi
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
   // Act
-  // Add a block and publish english
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickAddBlockElementButton();
   await umbracoUi.content.clickBlockElementWithName(blockElementName);
@@ -63,7 +62,6 @@ test('can publish english after visiting danish that has block validation errors
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
   // Act
-  // Add a block and publish english
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickAddBlockElementButton();
   await umbracoUi.content.clickBlockElementWithName(blockElementName);
@@ -72,10 +70,8 @@ test('can publish english after visiting danish that has block validation errors
   await umbracoUi.content.clickSaveAndPublishButton();
   await umbracoUi.content.clickContainerSaveAndPublishButtonAndWaitForContentToBePublished();
   await umbracoUi.content.isSuccessNotificationVisible();
-  // Switch to danish and back to english
   await umbracoUi.content.switchLanguage('Danish');
   await umbracoUi.content.switchLanguage('English');
-  // Publish english again
   await umbracoUi.content.clickSaveAndPublishButton();
   await umbracoUi.content.clickContainerSaveAndPublishButtonAndWaitForContentToBePublished();
 

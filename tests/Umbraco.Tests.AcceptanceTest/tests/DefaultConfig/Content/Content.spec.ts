@@ -325,11 +325,9 @@ test('cannot create content without entering a name', async ({umbracoApi, umbrac
   await umbracoUi.content.chooseDocumentType(documentTypeName);
 
   // Assert
-  // The Save button is disabled while the name is empty - there is no way to submit a nameless document
   await umbracoUi.content.isSaveButtonDisabled();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeFalsy();
 
-  // Entering a name enables saving
   await umbracoUi.content.enterContentName(contentName);
   await umbracoUi.content.clickSaveButtonAndWaitForContentToBeCreated();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();

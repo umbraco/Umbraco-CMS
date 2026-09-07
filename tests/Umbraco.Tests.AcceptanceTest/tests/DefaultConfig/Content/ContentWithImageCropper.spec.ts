@@ -121,7 +121,6 @@ test('can not publish a mandatory image cropper with an empty value', async ({um
   await umbracoUi.content.isErrorNotificationVisible();
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
 
-  // Upload an image and publish succeeds
   await umbracoUi.content.uploadFile(imageFilePath);
   await umbracoUi.content.isInputDropzoneVisible(false);
   await umbracoUi.content.isImageCropperFieldVisible();
