@@ -193,7 +193,7 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 				${this.#renderRoutes()}
 				<slot
 					@slotchange=${(event: Event) => {
-						this._hasSlottedContent = (event.target as HTMLSlotElement).assignedElements().length > 0;
+						this._hasSlottedContent = (event.target as HTMLSlotElement).assignedElements({ flatten: true }).length > 0;
 						if (this._hasSlottedContent) {
 							new UmbDeprecation({
 								deprecated: 'Using slotted content in umb-workspace-editor is deprecated, use routes instead.',
@@ -270,8 +270,8 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	#renderRoutes() {
-		// Only render the router-slot if there are no slotted content, or if there are workspace views defined.
-		if (this._hasSlottedContent && (!this._routes || this._routes.length === 0)) {
+		// Only render the router-slot if there is no slotted content, or if workspace views are registered.
+		if (this._hasSlottedContent && this._workspaceViews.length === 0) {
 			return nothing;
 		}
 		return html`
