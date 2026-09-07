@@ -223,14 +223,14 @@ public class UmbracoMapper : IUmbracoMapper
         // if there is a direct constructor, map
         if (ctor != null && map != null)
         {
-            var target = ctor(source, context);
             using (ICoreScope scope = _scopeProvider.CreateCoreScope())
             {
+                var target = ctor(source, context);
                 map(source, target, context);
                 scope.Complete();
-            }
 
-            return (TTarget)target;
+                return (TTarget)target;
+            }
         }
 
         // otherwise, see if we can deal with enumerable
