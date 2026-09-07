@@ -5,8 +5,8 @@ const contentName = 'TestContent';
 const documentTypeName = 'TestDocumentTypeForContent';
 const dataTypeName = 'Custom Date Time With Time Zone Picker';
 const dateTimeValue = '2026-09-01T14:30';
-// The picker defaults to the client's local time zone, which is the same machine running the test -
-// compute it rather than hardcoding a zone/offset that would only be correct on this one machine.
+// The picker defaults to the client's local time zone, which is the same machine running the test,
+// so compute it rather than hardcoding a zone/offset that would only be correct on this one machine.
 const expectedClientTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
 test.beforeEach(async ({umbracoApi, umbracoUi}) => {
