@@ -6,6 +6,7 @@ import { css, customElement, html, state, type PropertyValues } from '@umbraco-c
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbCollectionViewElementBase } from '@umbraco-cms/backoffice/collection';
 import type { UmbCollectionColumnConfiguration } from '@umbraco-cms/backoffice/collection';
+import { UmbTreeItemOpenEvent } from '@umbraco-cms/backoffice/tree';
 import type {
 	UmbTableColumn,
 	UmbTableConfig,
@@ -141,6 +142,14 @@ export class UmbDocumentTableCollectionViewElement extends UmbCollectionViewElem
 		this._tableItems = this._items.map((item) => {
 			if (!item.unique) throw new Error('Item id is missing.');
 
+			// While selectable (e.g. in a picker), the name must not navigate away from the picker. An item with
+			// children still needs a way to be opened, so it drills further into it via an open event instead.
+			const editPath = UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: item.unique });
+			const href = this._selectable ? undefined : editPath;
+			const onOpen = item.hasChildren
+				? () => this.dispatchEvent(new UmbTreeItemOpenEvent({ unique: item.unique, entityType: item.entityType }))
+				: undefined;
+
 			const data =
 				this._tableColumns?.map((column) => {
 					if (column.alias === 'entityActions') {
@@ -151,13 +160,9 @@ export class UmbDocumentTableCollectionViewElement extends UmbCollectionViewElem
 						};
 					}
 
-					const editPath = UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN.generateAbsolute({
-						unique: item.unique,
-					});
-
 					return {
 						columnAlias: column.alias,
-						value: { item, editPath },
+						value: { item, href, onOpen },
 					};
 				}) ?? [];
 
@@ -165,7 +170,11 @@ export class UmbDocumentTableCollectionViewElement extends UmbCollectionViewElem
 				id: item.unique,
 				icon: item.documentType.icon,
 				entityType: UMB_DOCUMENT_ENTITY_TYPE,
+				childrenIndicator: item.hasChildren ? { href, onOpen } : undefined,
 				selectable: this._isSelectableItem(item),
+				// select-only disables all row interaction, which would leave no way to open an item with
+				// children while a selection is in progress.
+				selectOnly: item.hasChildren ? false : undefined,
 				data: data,
 			};
 		});

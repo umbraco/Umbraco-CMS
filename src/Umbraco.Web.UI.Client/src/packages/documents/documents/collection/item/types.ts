@@ -35,5 +35,8 @@ export interface UmbDocumentCollectionItemModel extends UmbEntityWithFlags {
 
 export interface UmbEditableDocumentCollectionItemModel {
 	item: UmbDocumentCollectionItemModel;
-	editPath: string;
+	/** When set, the name becomes an anchor linking to this href. */
+	href?: string;
+	/** When set (and no `href` is provided), the name becomes a button invoking this callback. */
+	onOpen?: () => void;
 }

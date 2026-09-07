@@ -22,6 +22,7 @@ import type {
 	UmbDefaultCollectionContext,
 	UmbEntityCollectionItemElement,
 } from '@umbraco-cms/backoffice/collection';
+import { UmbTreeItemOpenEvent } from '@umbraco-cms/backoffice/tree';
 import { UmbEntityContentTypeEntityContext } from '@umbraco-cms/backoffice/content-type';
 import { UMB_DOCUMENT_TYPE_ENTITY_TYPE } from '@umbraco-cms/backoffice/document-type';
 import { fromCamelCase } from '@umbraco-cms/backoffice/utils';
@@ -116,6 +117,12 @@ export class UmbDocumentCollectionItemCardElement extends UmbLitElement implemen
 		this.dispatchEvent(new UmbDeselectedEvent(this.item.unique));
 	}
 
+	#onOpen(event: Event) {
+		if (!this.item?.hasChildren) return;
+		event.stopPropagation();
+		this.dispatchEvent(new UmbTreeItemOpenEvent({ unique: this.item.unique, entityType: this.item.entityType }));
+	}
+
 	#getPropertyValueByAlias(alias: string) {
 		if (!this.item) return { value: '' };
 
@@ -151,18 +158,26 @@ export class UmbDocumentCollectionItemCardElement extends UmbLitElement implemen
 		return !this.item?.hasChildren && this.selectOnly;
 	}
 
+	// While selectable (e.g. in a picker), the name must not navigate away from the picker; an item with
+	// children is instead opened via the `open` event, drilling further into it.
+	get #href(): string | undefined {
+		return this.selectable ? undefined : this.href;
+	}
+
 	override render() {
 		if (!this.item) return nothing;
 		return html`
 			<uui-card-content-node
 				.name=${this._name}
-				href=${ifDefined(this.href)}
+				href=${ifDefined(this.#href)}
+				?has-children=${this.item.hasChildren}
 				?selectable=${this.selectable}
 				?select-only=${this.#selectOnly}
 				?selected=${this.selected}
 				?disabled=${this.disabled}
 				@selected=${this.#onSelected}
-				@deselected=${this.#onDeselected}>
+				@deselected=${this.#onDeselected}
+				@open=${this.#onOpen}>
 				${this.#renderIcon()} ${this.#renderState()}
 				<div id="properties">${this.#renderProperties()}</div>
 				<slot name="actions" slot="actions"></slot>
