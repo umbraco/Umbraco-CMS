@@ -8,10 +8,10 @@ import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/property-
 const manifest: ManifestPropertyEditorUi = {
 	type: 'propertyEditorUi',
 	alias: 'Umb.PropertyEditorUi.ContentPicker',
-	name: 'Content Picker Property Editor UI',
+	name: 'Multi Node Tree Picker Property Editor UI',
 	element: () => import('./property-editor-ui-content-picker.element.js'),
 	meta: {
-		label: 'Content Picker',
+		label: 'Multi Node Tree Picker',
 		icon: 'icon-page-add',
 		group: '#propertyEditorUIGroups_pickers',
 		keywords: ['select', 'page', 'node', 'reference', 'related', 'link', 'pages', 'content'],
