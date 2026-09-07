@@ -1,19 +1,22 @@
-import {ConstantHelper, test, AliasHelper} from '@umbraco/acceptance-test-helpers';
+import {ConstantHelper, NotificationConstantHelper, test, AliasHelper} from '@umbraco/acceptance-test-helpers';
 import {expect} from "@playwright/test";
 
 const contentName = 'TestContent';
 const documentTypeName = 'TestDocumentTypeForContent';
 const dataTypeName = 'Upload Article';
+const customDataTypeName = 'Custom Upload Article';
 const uploadFilePath = './fixtures/mediaLibrary/';
 
 test.beforeEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   await umbracoApi.document.ensureNameNotExists(contentName);
+  await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
 });
 
 test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.document.ensureNameNotExists(contentName);
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
+  await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
 });
 
 test('can create content with the upload article data type', async ({umbracoApi, umbracoUi}) => {
@@ -107,4 +110,53 @@ test('can remove an article file in the content', async ({umbracoApi, umbracoUi}
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values).toEqual([]);
+});
+
+test('cannot upload a file with a disallowed extension', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const dataTypeId = await umbracoApi.dataType.createUploadDataType(customDataTypeName, ['pdf']);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, dataTypeId);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  // A disallowed extension is silently rejected - no error message, just an empty dropzone
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.uploadFile(uploadFilePath + 'File.txt');
+  await umbracoUi.content.isInputDropzoneVisible(true);
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
+
+  // Assert
+  const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.values).toEqual([]);
+});
+
+test('can not publish a mandatory upload article with an empty value', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const uploadFileName = 'Article.pdf';
+  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id, 'Test Group', false, false, true);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickSaveAndPublishButton();
+
+  // Assert
+  await umbracoUi.content.isErrorNotificationVisible();
+  await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
+
+  // Upload a file and publish succeeds
+  await umbracoUi.content.uploadFile(uploadFilePath + uploadFileName);
+  await umbracoUi.content.isInputDropzoneVisible(false);
+  await umbracoUi.content.doesInputUploadFileHaveName(uploadFileName);
+  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBeUpdated();
+
+  // Assert
+  const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
+  expect(contentData.values[0].value.src).toContain(AliasHelper.toAlias(uploadFileName));
 });

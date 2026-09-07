@@ -142,3 +142,7 @@ test('can show the label off for the true/false in the content ', async ({umbrac
   // Clean
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
 });
+
+// Not applicable: the toggle always renders a real boolean value (false by default, see
+// "can create content with the true/false data type" above), so a mandatory true/false is
+// never actually empty and publish succeeds regardless of the mandatory flag.

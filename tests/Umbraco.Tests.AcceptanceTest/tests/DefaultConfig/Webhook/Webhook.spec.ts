@@ -194,6 +194,7 @@ test('cannot create a webhook without a url', async ({umbracoApi, umbracoUi}) =>
   await umbracoUi.webhook.clickSaveButton();
 
   // Assert
+  await umbracoUi.webhook.isErrorNotificationVisible();
   expect(await umbracoApi.webhook.doesNameExist(webhookName)).toBeFalsy();
 });
 
