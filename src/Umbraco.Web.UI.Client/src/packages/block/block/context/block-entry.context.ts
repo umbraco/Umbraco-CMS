@@ -87,6 +87,9 @@ export abstract class UmbBlockEntryContext<
 	protected readonly _variantId = this.#variantId.asObservable();
 
 	#hasExpose = new UmbBooleanState(undefined);
+	/**
+	 * Whether the local expose entry exists. Prefer {@link isExposed} to determine rendered publish state.
+	 */
 	readonly hasExpose = this.#hasExpose.asObservable();
 
 	/**
