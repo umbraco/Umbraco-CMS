@@ -637,18 +637,23 @@ export class UmbAuthContext extends UmbContextBase {
 	 * @param {number} issuedAt The timestamp when the session was issued.
 	 */
 	#setSessionLocally(expiresIn: number | undefined, issuedAt: number) {
-		this.#applySessionExpiry(expiresIn === undefined ? undefined : issuedAt + expiresIn);
+		if (expiresIn === undefined) {
+			this.#applySessionExpiry(undefined);
+			return;
+		}
+
+		// Every request bearing the session re-issues it for another full window, so the lifetime that
+		// came with a just-learned expiry is that whole window.
+		this.#applySessionExpiry(issuedAt + expiresIn, expiresIn * 1000);
 	}
 
 	/**
 	 * Sets the in-memory session to a known expiry and remembers the window it describes.
 	 * @param {number | undefined} expiresAt When the session expires (unix seconds), or undefined when
 	 * the expiry is unknown.
-	 * @param {number} [sessionWindowInMs] The window the expiry describes, for callers that already know
-	 * it. Defaults to the time still to run, which is the whole window whenever an expiry is learned:
-	 * every request bearing the session re-issues it for another full window, so a just-learned expiry
-	 * belongs to a just-started one. That makes the remembered window exactly as accurate as the expiry
-	 * it came from, and never more optimistic.
+	 * @param {number} [sessionWindowInMs] The window the expiry describes. Falls back to the time still
+	 * to run, for an expiry that arrives without its window — the same value, less however long it took
+	 * to get here.
 	 */
 	#applySessionExpiry(expiresAt: number | undefined, sessionWindowInMs?: number) {
 		this.#sessionWindowInMs =
@@ -690,7 +695,7 @@ export class UmbAuthContext extends UmbContextBase {
 		this.#applySessionExpiry(expiresAt, sessionWindowInMs);
 
 		// Peer tabs share the cookie, so their expiry moved too — they just didn't make the request.
-		this.#channel.postMessage({ type: 'sessionUpdate', ...this.#session.getValue(), sessionWindowInMs });
+		this.#channel.postMessage({ type: 'sessionUpdate', expiresAt, sessionWindowInMs });
 	}
 
 	async #makeLinkTokenRequest(provider: string) {
