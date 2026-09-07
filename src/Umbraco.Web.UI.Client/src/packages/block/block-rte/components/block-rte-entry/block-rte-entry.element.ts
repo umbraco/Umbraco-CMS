@@ -409,6 +409,7 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 
 			:host(.ProseMirror-selectednode) {
 				--uui-color-default-contrast: initial;
+				border-radius: var(--uui-border-radius);
 				outline: 3px solid var(--uui-color-focus);
 			}
 
