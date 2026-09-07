@@ -27,21 +27,25 @@ export class UmbTiptapStatusbarConfigurationContext extends UmbContextBase {
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_TIPTAP_STATUSBAR_CONFIGURATION_CONTEXT);
 
-		this.observe(umbExtensionsRegistry.byType('tiptapStatusbarExtension'), (extensions) => {
-			const _extensions = extensions
-				.sort((a, b) => a.alias.localeCompare(b.alias))
-				.map((ext) => ({
-					kind: 'default',
-					alias: ext.alias,
-					label: ext.meta.label,
-					icon: ext.meta.icon,
-					dependencies: ext.forExtensions,
-				}));
+		this.observe(
+			umbExtensionsRegistry.byType('tiptapStatusbarExtension'),
+			(extensions) => {
+				const _extensions = extensions
+					.sort((a, b) => a.alias.localeCompare(b.alias))
+					.map((ext) => ({
+						kind: 'default',
+						alias: ext.alias,
+						label: ext.meta.label,
+						icon: ext.meta.icon,
+						dependencies: ext.forExtensions,
+					}));
 
-			this.#extensions.setValue(_extensions);
+				this.#extensions.setValue(_extensions);
 
-			this.#lookup = new Map(_extensions.map((ext) => [ext.alias, ext]));
-		});
+				this.#lookup = new Map(_extensions.map((ext) => [ext.alias, ext]));
+			},
+			null,
+		);
 
 		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, async (dataset) => {
 			this.observe(

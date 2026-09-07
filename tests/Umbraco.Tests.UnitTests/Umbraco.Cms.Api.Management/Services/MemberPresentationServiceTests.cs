@@ -65,7 +65,7 @@ public class MemberPresentationServiceTests
 
         _mockMemberEditingService.Setup(x => x.GetAsync(id)).ReturnsAsync((IMember?)null);
         _mockMemberEditingService.Setup(x => x.GetExternalMemberAsync(id)).ReturnsAsync(externalMember);
-        _mockFactory.Setup(x => x.CreateExternalMemberResponseModelAsync(externalMember)).ReturnsAsync(expected);
+        _mockFactory.Setup(x => x.CreateExternalMemberResponseModelAsync(externalMember, user.Object)).ReturnsAsync(expected);
 
         // Act
         MemberResponseModel? result = await _sut.CreateResponseModelByKeyAsync(id, user.Object);

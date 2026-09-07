@@ -1,7 +1,9 @@
 import { UmbUserServerDataSource } from '../../repository/detail/user-detail.server.data-source.js';
+import type { UmbUserDetailModel } from '../../types.js';
 import type { UmbInviteUserDataSource, UmbInviteUserRequestModel, UmbResendUserInviteRequestModel } from './types.js';
 import { UserService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbDataSourceResponse, UmbDataSourceErrorResponse } from '@umbraco-cms/backoffice/repository';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 /**
@@ -14,7 +16,7 @@ export class UmbInviteUserServerDataSource implements UmbInviteUserDataSource {
 
 	/**
 	 * Creates an instance of UmbInviteUserServerDataSource.
-	 * @param host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to.
 	 * @memberof UmbInviteUserServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
@@ -24,11 +26,11 @@ export class UmbInviteUserServerDataSource implements UmbInviteUserDataSource {
 
 	/**
 	 * Invites a user
-	 * @param {UmbInviteUserRequestModel} request
-	 * @returns
+	 * @param {UmbInviteUserRequestModel} request - The invite request data.
+	 * @returns {Promise<UmbDataSourceResponse<UmbUserDetailModel>>} The invited user.
 	 * @memberof UmbInviteUserServerDataSource
 	 */
-	async invite(request: UmbInviteUserRequestModel) {
+	async invite(request: UmbInviteUserRequestModel): Promise<UmbDataSourceResponse<UmbUserDetailModel>> {
 		if (!request) throw new Error('Request Data is missing');
 
 		const body = {
@@ -57,11 +59,11 @@ export class UmbInviteUserServerDataSource implements UmbInviteUserDataSource {
 
 	/**
 	 * Resend an invite to a user
-	 * @param {UmbResendUserInviteRequestModel} request
-	 * @returns
+	 * @param {UmbResendUserInviteRequestModel} request - The resend invite request data.
+	 * @returns {Promise<UmbDataSourceErrorResponse>} The result of the resend invite operation.
 	 * @memberof UmbInviteUserServerDataSource
 	 */
-	async resendInvite(request: UmbResendUserInviteRequestModel) {
+	async resendInvite(request: UmbResendUserInviteRequestModel): Promise<UmbDataSourceErrorResponse> {
 		if (!request.user.unique) throw new Error('User unique is missing');
 		if (!request) throw new Error('Request data is missing');
 

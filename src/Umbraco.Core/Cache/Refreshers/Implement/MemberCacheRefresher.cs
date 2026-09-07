@@ -78,8 +78,9 @@ public sealed class MemberCacheRefresher : PayloadCacheRefresherBase<MemberCache
         /// <param name="username">The username of the member.</param>
         /// <param name="removed">Whether the member was removed.</param>
         /// <param name="indexableFieldsChanged">
-        ///     Whether any field that is part of the Examine value set has changed as part of this operation.
-        ///     When <c>false</c>, Examine indexing handlers will skip the re-index for this payload.
+        ///     Whether any field that is part of the search index value set has changed as part of this
+        ///     operation. Mirrors <see cref="Constants.Conventions.Member.IndexableFieldsChangedStateKey"/>
+        ///     from the originating save.
         /// </param>
         [System.Text.Json.Serialization.JsonConstructor]
         public JsonPayload(int id, string? username, bool removed, bool indexableFieldsChanged)
@@ -115,8 +116,9 @@ public sealed class MemberCacheRefresher : PayloadCacheRefresherBase<MemberCache
         /// </summary>
         /// <remarks>
         ///     Defaults to <c>true</c> for backward compatibility. Explicitly set to <c>false</c>
-        ///     on login-only updates (which do not bump <c>UpdateDate</c>) so that the Examine
-        ///     indexing handlers skip re-indexing this payload.
+        ///     on login-only updates (which do not bump <c>UpdateDate</c>), mirroring
+        ///     <see cref="Constants.Conventions.Member.IndexableFieldsChangedStateKey"/> from the
+        ///     originating save.
         /// </remarks>
         public bool IndexableFieldsChanged { get; } = true;
     }

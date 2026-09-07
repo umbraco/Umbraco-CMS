@@ -145,8 +145,9 @@ export class UmbLocalizationController<LocalizationSetType extends UmbLocalizati
 	 * Looks up a localization entry for the given key.
 	 * Searches in order: primary (regional) → secondary (language) → fallback (en).
 	 * Also tracks the key usage for reactive updates.
+	 * @template K
 	 * @param {string} key - the localization key to look up.
-	 * @returns {any} - the localization entry (string or function), or null if not found.
+	 * @returns {LocalizationSetType[K] | null} - the localization entry (string or function), or null if not found.
 	 */
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	#lookupTerm<K extends keyof LocalizationSetType>(key: K): any {
@@ -170,7 +171,7 @@ export class UmbLocalizationController<LocalizationSetType extends UmbLocalizati
 
 	/**
 	 * Processes a localization entry (string or function) with the provided arguments.
-	 * @param {any} term - the localization entry to process.
+	 * @param {string | ((...args: unknown[]) => string)} term - the localization entry to process.
 	 * @param {unknown[]} args - the arguments to apply to the term.
 	 * @returns {string} - the processed term as a string.
 	 */
@@ -271,7 +272,7 @@ export class UmbLocalizationController<LocalizationSetType extends UmbLocalizati
 	 * Outputs a localized date in the specified format.
 	 * @param {Date} dateToFormat - the date to format.
 	 * @param {Intl.DateTimeFormatOptions} options - the options to use when formatting the date.
-	 * @returns {string}
+	 * @returns {string} - the formatted date.
 	 */
 	date(dateToFormat: Date | string, options?: Intl.DateTimeFormatOptions): string {
 		dateToFormat = new Date(dateToFormat);
@@ -281,7 +282,7 @@ export class UmbLocalizationController<LocalizationSetType extends UmbLocalizati
 	/**
 	 * Outputs a localized date with time using short date and medium time format.
 	 * @param {Date | string} dateToFormat - the date to format.
-	 * @returns {string}
+	 * @returns {string} - the formatted date and time.
 	 */
 	dateTime(dateToFormat: Date | string): string {
 		dateToFormat = new Date(dateToFormat);

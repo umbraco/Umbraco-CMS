@@ -1,7 +1,7 @@
+import type { UmbMediaSearchItemModel } from './types.js';
 import { classMap, css, customElement, html, nothing, property, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbSearchResultItemModel } from '@umbraco-cms/backoffice/search';
-import type { UmbMediaSearchItemModel } from './types.js';
 
 @customElement('umb-media-search-result-item')
 export class UmbMediaSearchResultItemElement extends UmbLitElement {

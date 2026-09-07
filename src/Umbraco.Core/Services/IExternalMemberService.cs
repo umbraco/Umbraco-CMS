@@ -66,9 +66,12 @@ public interface IExternalMemberService
     ///     Use this instead of <see cref="UpdateAsync"/> on the login path when only <c>LastLoginDate</c>
     ///     and/or <c>SecurityStamp</c> have changed. Skips the uniqueness checks and full-DTO mapping
     ///     performed by the full update, and deliberately does <em>not</em> bump <c>UpdateDate</c> —
-    ///     login is not treated as a member update, and the Examine index is not refreshed. Any
-    ///     change to real member data (name, email, profile data, etc.) must go through
-    ///     <see cref="UpdateAsync"/> which does bump <c>UpdateDate</c> and triggers a re-index.
+    ///     login is not treated as a member update. The
+    ///     <see cref="Constants.Conventions.Member.IndexableFieldsChangedStateKey"/> notification-state
+    ///     flag is set to <c>false</c> so that search indexing can skip re-indexing on login; note that
+    ///     external members are not currently indexed by search at all. Any change to real member data
+    ///     (name, email, profile data, etc.) must go through <see cref="UpdateAsync"/>, which does bump
+    ///     <c>UpdateDate</c>.
     /// </remarks>
     Task<Attempt<ExternalMemberIdentity, ExternalMemberOperationStatus>> UpdateLoginPropertiesAsync(ExternalMemberIdentity member);
 

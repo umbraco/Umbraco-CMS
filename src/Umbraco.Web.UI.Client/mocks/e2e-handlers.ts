@@ -7,7 +7,6 @@ import * as serverHandlers from './msw-handlers/server.handlers.js';
 import { handlers as upgradeHandlers } from './msw-handlers/upgrade.handlers.js';
 import { handlers as userHandlers } from './msw-handlers/user/index.js';
 import { handlers as telemetryHandlers } from './msw-handlers/telemetry.handlers.js';
-import { handlers as examineManagementHandlers } from './msw-handlers/examine-management.handlers.js';
 import { handlers as modelsBuilderHandlers } from './msw-handlers/modelsbuilder.handlers.js';
 import { handlers as profileHandlers } from './msw-handlers/performance-profiling.handlers.js';
 import { handlers as healthCheckHandlers } from './msw-handlers/health-check.handlers.js';
@@ -27,7 +26,6 @@ export const handlers = [
 	...documentTypeHandlers,
 	...telemetryHandlers,
 	...publishedStatusHandlers,
-	...examineManagementHandlers,
 	...modelsBuilderHandlers,
 	...profileHandlers,
 	...healthCheckHandlers,

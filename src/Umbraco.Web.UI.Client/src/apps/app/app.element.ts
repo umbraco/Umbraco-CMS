@@ -3,6 +3,7 @@ import { UmbAppErrorElement } from './app-error.element.js';
 import { UmbAppAuthController } from './app-auth.controller.js';
 import { UmbAppAuthElement } from './app-auth.element.js';
 import { UmbNetworkConnectionStatusManager } from './network-connection-status.manager.js';
+import { UmbOutlineStyleController } from './outline-style.controller.js';
 import type { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 import { UmbAuthContext } from '@umbraco-cms/backoffice/auth';
 import { UmbServerConnection, UmbServerContext } from '@umbraco-cms/backoffice/server';
@@ -25,11 +26,7 @@ import { UmbViewContext } from '@umbraco-cms/backoffice/view';
 import { umbLocalizationRegistry } from '@umbraco-cms/backoffice/localization';
 
 import './app-logo.element.js';
-import {
-	UMB_CURRENT_USER_CONTEXT,
-	UmbUserEntryPointExtensionInitializer,
-} from '@umbraco-cms/backoffice/current-user';
-import { UmbOutlineStyleController } from './outline-style.controller.js';
+import { UMB_CURRENT_USER_CONTEXT, UmbUserEntryPointExtensionInitializer } from '@umbraco-cms/backoffice/current-user';
 
 const CORE_PACKAGES: Array<Promise<{ name: string; extensions: Array<ManifestBase | UmbExtensionManifestKind> }>> = [
 	import('../../packages/block/umbraco-package.js'),

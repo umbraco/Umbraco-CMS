@@ -1,8 +1,9 @@
 /**
  * @function prependToUniqueArray
+ * @template T
  * @param {T[]} data - An array of objects.
  * @param {T} entry - The object to insert or replace with.
- * @param {getUniqueMethod: (entry: T) => unknown} [getUniqueMethod] - Method to get the unique value of an entry.
+ * @param {(entry: T) => unknown} [getUniqueMethod] - Method to get the unique value of an entry.
  * @description - Prepend or replaces an item of an Array.
  * @returns {T[]} - The new array with the entry prepended or replaced.
  * @example <caption>Example prepend new entry for a Array. Where the key is unique and the item will be updated if matched with existing.</caption>

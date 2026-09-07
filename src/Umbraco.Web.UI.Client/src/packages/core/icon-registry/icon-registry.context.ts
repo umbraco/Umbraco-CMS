@@ -19,20 +19,28 @@ export class UmbIconRegistryContext extends UmbContextBase {
 		this.#registry = new UmbIconRegistry();
 		this.#registry.attach(host.getHostElement());
 
-		this.observe(this.icons, (icons) => {
-			//if (icons.length > 0) {
-			this.#registry.setIcons(icons);
-			//}
-		});
+		this.observe(
+			this.icons,
+			(icons) => {
+				//if (icons.length > 0) {
+				this.#registry.setIcons(icons);
+				//}
+			},
+			null,
+		);
 
-		this.observe(umbExtensionsRegistry.byType('icons'), (manifests) => {
-			manifests.forEach((manifest) => {
-				if (this.#manifestMap.has(manifest.alias)) return;
-				this.#manifestMap.set(manifest.alias, manifest);
-				// TODO: Should we unInit a entry point if is removed?
-				this.instantiateIcons(manifest);
-			});
-		});
+		this.observe(
+			umbExtensionsRegistry.byType('icons'),
+			(manifests) => {
+				manifests.forEach((manifest) => {
+					if (this.#manifestMap.has(manifest.alias)) return;
+					this.#manifestMap.set(manifest.alias, manifest);
+					// TODO: Should we unInit a entry point if is removed?
+					this.instantiateIcons(manifest);
+				});
+			},
+			null,
+		);
 	}
 
 	async instantiateIcons(manifest: ManifestIcons) {

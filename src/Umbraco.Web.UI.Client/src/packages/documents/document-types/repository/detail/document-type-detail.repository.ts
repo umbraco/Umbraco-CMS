@@ -28,7 +28,7 @@ export class UmbDocumentTypeDetailRepository extends UmbDetailRepositoryBase<
 	/**
 	 * Requests multiple document type details by their unique IDs
 	 * @param {Array<string>} uniques - The unique IDs of the document types to fetch
-	 * @returns {Promise<UmbRepositoryResponseWithAsObservable<Array<UmbDocumentTypeDetailModel>>>}
+	 * @returns {Promise<UmbRepositoryResponseWithAsObservable<Array<UmbDocumentTypeDetailModel>>>} The document type details.
 	 * @memberof UmbDocumentTypeDetailRepository
 	 */
 	async requestByUniques(

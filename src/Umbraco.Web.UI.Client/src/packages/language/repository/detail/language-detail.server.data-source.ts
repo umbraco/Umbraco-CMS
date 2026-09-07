@@ -1,6 +1,10 @@
 import type { UmbLanguageDetailModel } from '../../types.js';
 import { UMB_LANGUAGE_ENTITY_TYPE } from '../../entity.js';
-import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
+import type {
+	UmbDataSourceErrorResponse,
+	UmbDataSourceResponse,
+	UmbDetailDataSource,
+} from '@umbraco-cms/backoffice/repository';
 import type {
 	CreateLanguageRequestModel,
 	UpdateLanguageRequestModel,
@@ -12,7 +16,7 @@ import { tryExecute } from '@umbraco-cms/backoffice/resources';
 /**
  * A data source for the Language that fetches data from the server
  * @class UmbLanguageServerDataSource
- * @implements {RepositoryDetailDataSource}
+ * @implements {UmbDetailDataSource}
  */
 export class UmbLanguageServerDataSource implements UmbDetailDataSource<UmbLanguageDetailModel> {
 	#host: UmbControllerHost;
@@ -28,8 +32,8 @@ export class UmbLanguageServerDataSource implements UmbDetailDataSource<UmbLangu
 
 	/**
 	 * Creates a new Language scaffold
-	 * @param {Partial<UmbLanguageDetailModel>} [preset]
-	 * @returns { CreateLanguageRequestModel }
+	 * @param {Partial<UmbLanguageDetailModel>} [preset] Initial values for the scaffold.
+	 * @returns { CreateLanguageRequestModel } The language scaffold.
 	 * @memberof UmbLanguageServerDataSource
 	 */
 	async createScaffold(preset: Partial<UmbLanguageDetailModel> = {}) {
@@ -48,11 +52,11 @@ export class UmbLanguageServerDataSource implements UmbDetailDataSource<UmbLangu
 
 	/**
 	 * Fetches a Language with the given id from the server
-	 * @param {string} unique
-	 * @returns {*}
+	 * @param {string} unique The iso code of the language to fetch.
+	 * @returns {Promise<UmbDataSourceResponse<UmbLanguageDetailModel>>} The language.
 	 * @memberof UmbLanguageServerDataSource
 	 */
-	async read(unique: string) {
+	async read(unique: string): Promise<UmbDataSourceResponse<UmbLanguageDetailModel>> {
 		if (!unique) throw new Error('Unique is missing');
 
 		const { data, error } = await tryExecute(
@@ -79,11 +83,11 @@ export class UmbLanguageServerDataSource implements UmbDetailDataSource<UmbLangu
 
 	/**
 	 * Inserts a new Language on the server
-	 * @param {UmbLanguageDetailModel} model
-	 * @returns {*}
+	 * @param {UmbLanguageDetailModel} model The language to create.
+	 * @returns {Promise<UmbDataSourceResponse<UmbLanguageDetailModel>>} The created language.
 	 * @memberof UmbLanguageServerDataSource
 	 */
-	async create(model: UmbLanguageDetailModel) {
+	async create(model: UmbLanguageDetailModel): Promise<UmbDataSourceResponse<UmbLanguageDetailModel>> {
 		if (!model) throw new Error('Language is missing');
 
 		// TODO: make data mapper to prevent errors
@@ -111,12 +115,11 @@ export class UmbLanguageServerDataSource implements UmbDetailDataSource<UmbLangu
 
 	/**
 	 * Updates a Language on the server
-	 * @param {UmbLanguageDetailModel} Language
-	 * @param model
-	 * @returns {*}
+	 * @param {UmbLanguageDetailModel} model The language to update.
+	 * @returns {Promise<UmbDataSourceResponse<UmbLanguageDetailModel>>} The updated language.
 	 * @memberof UmbLanguageServerDataSource
 	 */
-	async update(model: UmbLanguageDetailModel) {
+	async update(model: UmbLanguageDetailModel): Promise<UmbDataSourceResponse<UmbLanguageDetailModel>> {
 		if (!model.unique) throw new Error('Unique is missing');
 
 		// TODO: make data mapper to prevent errors
@@ -144,11 +147,11 @@ export class UmbLanguageServerDataSource implements UmbDetailDataSource<UmbLangu
 
 	/**
 	 * Deletes a Language on the server
-	 * @param {string} unique
-	 * @returns {*}
+	 * @param {string} unique The iso code of the language to delete.
+	 * @returns {Promise<UmbDataSourceErrorResponse>} The result of the delete operation.
 	 * @memberof UmbLanguageServerDataSource
 	 */
-	async delete(unique: string) {
+	async delete(unique: string): Promise<UmbDataSourceErrorResponse> {
 		if (!unique) throw new Error('Unique is missing');
 
 		return tryExecute(

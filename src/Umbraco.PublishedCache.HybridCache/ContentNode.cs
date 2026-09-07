@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache;
@@ -26,7 +26,8 @@ internal sealed class ContentNode
         int creatorId,
         IPublishedContentType contentType,
         ContentData? draftData,
-        ContentData? publishedData)
+        ContentData? publishedData,
+        int? owningContentId = null)
     {
         Id = id;
         Key = key;
@@ -34,6 +35,7 @@ internal sealed class ContentNode
         CreateDate = createDate;
         CreatorId = creatorId;
         ContentType = contentType;
+        OwningContentId = owningContentId;
 
         if (draftData == null && publishedData == null)
         {
@@ -55,6 +57,7 @@ internal sealed class ContentNode
     public readonly int SortOrder;
     public readonly DateTime CreateDate;
     public readonly int CreatorId;
+    public readonly int? OwningContentId;
 
     public bool HasPublishedCulture(string culture) => _publishedData != null && (_publishedData.CultureInfos?.ContainsKey(culture) ?? false);
 #pragma warning restore IDE1006 // Naming Styles

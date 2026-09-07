@@ -3,28 +3,31 @@ namespace Umbraco.Cms.Core;
 public static partial class Constants
 {
     /// <summary>
-    ///     Contains constants for Umbraco Examine search index names.
+    ///     Contains constants for Umbraco Search index aliases.
     /// </summary>
-    public static class UmbracoIndexes
+    public static class IndexAliases
     {
-        /// <summary>
-        ///     The name of the internal content index (includes unpublished content).
-        /// </summary>
-        public const string InternalIndexName = "InternalIndex";
+        private const string IndexPrefix = "Umb_";
 
         /// <summary>
-        ///     The name of the external content index (published content only).
+        ///     The alias of the published content index, used as the default index for template searches via
+        ///     <see cref="IPublishedContentQuery" />.
         /// </summary>
-        public const string ExternalIndexName = "ExternalIndex";
+        public const string PublishedContent = $"{IndexPrefix}PublishedContent";
 
         /// <summary>
-        ///     The name of the members index.
+        ///     The alias of the draft content index.
         /// </summary>
-        public const string MembersIndexName = "MembersIndex";
+        public const string DraftContent = $"{IndexPrefix}Content";
 
         /// <summary>
-        ///     The name of the Delivery API content index.
+        ///     The alias of the draft media index.
         /// </summary>
-        public const string DeliveryApiContentIndexName = "DeliveryApiContentIndex";
+        public const string DraftMedia = $"{IndexPrefix}Media";
+
+        /// <summary>
+        ///     The alias of the draft members index.
+        /// </summary>
+        public const string DraftMembers = $"{IndexPrefix}Members";
     }
 }

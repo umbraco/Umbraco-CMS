@@ -22,7 +22,6 @@ import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-
 
 /**
  * Clipboard context for managing clipboard entries for property values
- * @export
  * @class UmbClipboardPropertyContext
  * @augments {UmbContextBase}
  */
@@ -80,10 +79,10 @@ export class UmbClipboardPropertyContext extends UmbContextBase {
 
 	/**
 	 * Write a clipboard entry for a property. The property value will be translated to the clipboard entry values
-	 * @param args - Arguments for writing a clipboard entry
+	 * @param {object} args - Arguments for writing a clipboard entry
 	 * @param {string} args.name - The name of the clipboard entry
 	 * @param {string} args.icon - The icon of the clipboard entry
-	 * @param {any} args.propertyValue - The property value to write
+	 * @param {unknown} args.propertyValue - The property value to write
 	 * @param {string} args.propertyEditorUiAlias - The alias of the property editor to match
 	 * @returns { Promise<void> }
 	 */
@@ -130,11 +129,11 @@ export class UmbClipboardPropertyContext extends UmbContextBase {
 
 	/**
 	 * Pick a clipboard entry for a property. The entry will be translated to the property editor value
-	 * @param args - Arguments for picking a clipboard entry
+	 * @param {object} args - Arguments for picking a clipboard entry
 	 * @param {boolean} args.multiple - Allow multiple clipboard entries to be picked
 	 * @param {string} args.propertyEditorUiAlias - The alias of the property editor to match
 	 * @param {() => Promise<boolean>} args.filter - A filter function to filter clipboard entries
-	 * @returns { Promise<{ selection: Array<UmbEntityUnique>; propertyValues: Array<any> }> }
+	 * @returns { Promise<{ selection: Array<UmbEntityUnique>; propertyValues: Array<unknown> }> } The selected entries and their translated property values.
 	 */
 	async pick(args: {
 		multiple: boolean;

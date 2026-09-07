@@ -57,7 +57,7 @@ export class UmbUiCultureInputElement extends UmbFormControlMixin<string, typeof
 
 				this._options = distinct.sort((a, b) => a.name.localeCompare(b.name));
 			},
-			'umbObserveLocalizationManifests',
+			null,
 		);
 
 		this.addValidator(
@@ -69,11 +69,7 @@ export class UmbUiCultureInputElement extends UmbFormControlMixin<string, typeof
 		this.addValidator(
 			'customError',
 			() =>
-				this.localize.term(
-					'user_languageNotFoundFallback',
-					this.#invalidCulture ?? '',
-					this.#invalidBaseCulture ?? '',
-				),
+				this.localize.term('user_languageNotFoundFallback', this.#invalidCulture ?? '', this.#invalidBaseCulture ?? ''),
 			() => !!this.#invalidCulture && !!this.#invalidBaseCulture,
 		);
 	}

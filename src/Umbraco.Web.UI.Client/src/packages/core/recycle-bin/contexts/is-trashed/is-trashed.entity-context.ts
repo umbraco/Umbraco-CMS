@@ -19,8 +19,8 @@ export class UmbIsTrashedEntityContext extends UmbContextBase {
 
 	/**
 	 * Gets the isTrashed state
-	 * @returns {*}
-	 * @memberof UmbIsTrashedContext
+	 * @returns {boolean} Whether the entity is trashed
+	 * @memberof UmbIsTrashedEntityContext
 	 */
 	getIsTrashed() {
 		return this.#isTrashed.getValue();
@@ -28,8 +28,8 @@ export class UmbIsTrashedEntityContext extends UmbContextBase {
 
 	/**
 	 * Sets the isTrashed state
-	 * @param {boolean} isTrashed
-	 * @memberof UmbIsTrashedContext
+	 * @param {boolean} isTrashed - Whether the entity is trashed
+	 * @memberof UmbIsTrashedEntityContext
 	 */
 	setIsTrashed(isTrashed: boolean) {
 		this.#isTrashed.setValue(isTrashed);

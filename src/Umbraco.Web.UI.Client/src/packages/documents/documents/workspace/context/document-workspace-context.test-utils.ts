@@ -13,6 +13,10 @@ import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controlle
 import { UmbActionEventContext } from '@umbraco-cms/backoffice/action';
 import { UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
+import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
+import { UMB_APP_LANGUAGE_CONTEXT, UmbLanguageCollectionRepository } from '@umbraco-cms/backoffice/language';
+import type { UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
 
 export const TEST_MANIFESTS = [
 	...documentDetailRepositoryManifests,
@@ -37,9 +41,35 @@ class UmbMockModalManagerContext extends UmbModalManagerContext {
 	}
 }
 
+// The workspace observes UMB_APP_LANGUAGE_CONTEXT for languages. The real context is auth-gated and
+// self-loading, so tests provide this minimal stand-in and fill it from the mock server instead.
+class UmbTestAppLanguageContext {
+	#host: UmbControllerHost;
+	#languages = new UmbArrayState<UmbLanguageDetailModel>([], (x) => x.unique);
+	readonly languages = this.#languages.asObservable();
+
+	constructor(host: UmbControllerHost) {
+		this.#host = host;
+	}
+
+	getHostElement() {
+		return this.#host.getHostElement();
+	}
+
+	async load() {
+		const { data } = await new UmbLanguageCollectionRepository(this.#host).requestAllItems();
+		this.#languages.setValue(data?.items ?? []);
+	}
+
+	setLanguages(languages: Array<UmbLanguageDetailModel>) {
+		this.#languages.setValue(languages);
+	}
+}
+
 @customElement('umb-test-document-workspace-host')
 export class UmbTestDocumentWorkspaceHostElement extends UmbControllerHostElementMixin(HTMLElement) {
 	#currentUserContext = new UmbCurrentUserContext(this);
+	#appLanguageContext = new UmbTestAppLanguageContext(this);
 
 	constructor() {
 		super();
@@ -51,9 +81,15 @@ export class UmbTestDocumentWorkspaceHostElement extends UmbControllerHostElemen
 		new UmbMockModalManagerContext(this);
 		new UmbNotificationContext(this);
 		new UmbCurrentUserStore(this);
+		new UmbContextProviderController(this, UMB_APP_LANGUAGE_CONTEXT, this.#appLanguageContext as never);
 	}
 
 	public async init() {
 		await this.#currentUserContext.load();
+		await this.#appLanguageContext.load();
+	}
+
+	public setAppLanguages(languages: Array<UmbLanguageDetailModel>) {
+		this.#appLanguageContext.setLanguages(languages);
 	}
 }

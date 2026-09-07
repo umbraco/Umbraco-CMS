@@ -7,6 +7,12 @@ export { UmbTrashWithRelationEntityAction } from './entity-actions/trash/trash-w
 export * from './global-components/index.js';
 export * from './utils.js';
 
-export type { MetaEntityBulkActionTrashWithRelationKind, ManifestEntityBulkActionTrashWithRelationKind } from './entity-actions/bulk-trash/types.js';
-export type { MetaEntityActionTrashWithRelationKind, ManifestEntityActionTrashWithRelationKind } from './entity-actions/trash/types.js';
+export type {
+	MetaEntityBulkActionTrashWithRelationKind,
+	ManifestEntityBulkActionTrashWithRelationKind,
+} from './entity-actions/bulk-trash/types.js';
+export type {
+	MetaEntityActionTrashWithRelationKind,
+	ManifestEntityActionTrashWithRelationKind,
+} from './entity-actions/trash/types.js';
 export type * from './types.js';

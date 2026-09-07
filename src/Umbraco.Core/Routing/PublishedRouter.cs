@@ -500,9 +500,10 @@ public class PublishedRouter : IPublishedRouter
             if (_logger.IsEnabled(LogLevel.Debug))
             {
                 _logger.LogDebug(
-                    "Found? {Found}, Content: {PublishedContentId}, Template: {TemplateAlias}, Domain: {Domain}, Culture: {Culture}, StatusCode: {StatusCode}",
+                    "Found? {Found}, Content: {PublishedContentId} (key {PublishedContentKey}), Template: {TemplateAlias}, Domain: {Domain}, Culture: {Culture}, StatusCode: {StatusCode}",
                     found,
                     request.HasPublishedContent() ? request.PublishedContent?.Id : "NULL",
+                    request.HasPublishedContent() ? request.PublishedContent?.Key : "NULL",
                     request.HasTemplate() ? request.Template?.Alias : "NULL",
                     request.HasDomain() ? request.Domain?.ToString() : "NULL",
                     request.Culture ?? "NULL",
@@ -692,7 +693,10 @@ public class PublishedRouter : IPublishedRouter
             redirect = true;
             if (_logger.IsEnabled(LogLevel.Debug))
             {
-                _logger.LogDebug("FollowInternalRedirects: Redirecting to id={InternalRedirectId}", internalRedirectId);
+                _logger.LogDebug(
+                    "FollowInternalRedirects: Redirecting to id={InternalRedirectId}, key={InternalRedirectKey}",
+                    internalRedirectNode.Id,
+                    internalRedirectNode.Key);
             }
         }
 
@@ -756,8 +760,9 @@ public class PublishedRouter : IPublishedRouter
                     if (_logger.IsEnabled(LogLevel.Debug))
                     {
                         _logger.LogDebug(
-                            "FindTemplate: Running with template id={TemplateId} alias={TemplateAlias}",
+                            "FindTemplate: Running with template id={TemplateId} key={TemplateKey} alias={TemplateAlias}",
                             template.Id,
+                            template.Key,
                             template.Alias);
                     }
                 }
@@ -803,8 +808,9 @@ public class PublishedRouter : IPublishedRouter
                 if (_logger.IsEnabled(LogLevel.Debug))
                 {
                     _logger.LogDebug(
-                        "FindTemplate: Got alternative template id={TemplateId} alias={TemplateAlias}",
+                        "FindTemplate: Got alternative template id={TemplateId} key={TemplateKey} alias={TemplateAlias}",
                         altTemplateModel!.Id,
+                        altTemplateModel.Key,
                         altTemplateModel.Alias);
                 }
             }
@@ -820,9 +826,10 @@ public class PublishedRouter : IPublishedRouter
             else
             {
                 _logger.LogWarning(
-                    "FindTemplate: Alternative template {TemplateAlias} is not allowed on node {NodeId}, ignoring.",
+                    "FindTemplate: Alternative template {TemplateAlias} is not allowed on node {NodeId} (key {NodeKey}), ignoring.",
                     altTemplate,
-                    request.PublishedContent.Id);
+                    request.PublishedContent.Id,
+                    request.PublishedContent.Key);
 
                 // not allowed, back to default
                 var templateId = request.PublishedContent.TemplateId;
@@ -831,8 +838,9 @@ public class PublishedRouter : IPublishedRouter
                 if (_logger.IsEnabled(LogLevel.Debug))
                 {
                     _logger.LogDebug(
-                        "FindTemplate: Running with template id={TemplateId} alias={TemplateAlias}",
+                        "FindTemplate: Running with template id={TemplateId} key={TemplateKey} alias={TemplateAlias}",
                         template?.Id,
+                        template?.Key,
                         template?.Alias);
                 }
             }
@@ -882,7 +890,7 @@ public class PublishedRouter : IPublishedRouter
 
         if (_logger.IsEnabled(LogLevel.Debug))
         {
-            _logger.LogDebug("GetTemplateModel: Got template id={TemplateId} alias={TemplateAlias}", template.Id, template.Alias);
+            _logger.LogDebug("GetTemplateModel: Got template id={TemplateId} key={TemplateKey} alias={TemplateAlias}", template.Id, template.Key, template.Alias);
         }
 
         return template;

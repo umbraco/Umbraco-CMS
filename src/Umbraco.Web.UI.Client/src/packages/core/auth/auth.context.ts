@@ -2,6 +2,7 @@ import { UMB_AUTH_CONTEXT } from './auth.context.token.js';
 import { UmbAuthSessionTimeoutController } from './controllers/auth-session-timeout.controller.js';
 import type { UmbOpenApiConfiguration } from './models/openApiConfiguration.js';
 import type { ManifestAuthProvider } from './auth-provider.extension.js';
+import { isReturnableRoute } from './returnable-route.function.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbApiInterceptorController, UMB_AUTH_SIGNALER_CONTEXT } from '@umbraco-cms/backoffice/resources';
@@ -10,7 +11,6 @@ import { ReplaySubject, Subject, distinctUntilChanged, auditTime, map } from '@u
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbBackofficeExtensionRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbApiClient, umbHttpClient } from '@umbraco-cms/backoffice/http-client';
-import { isReturnableRoute } from './returnable-route.function.js';
 import { isTestEnvironment, UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 
 export interface UmbAuthSession {
@@ -61,11 +61,12 @@ export class UmbAuthContext extends UmbContextBase {
 
 	/**
 	 * Observable that emits once, without a value, when the auth context is initialized.
-	 * @internal This was only ever public so the core entry point could drive it. It gates nothing
-	 * for consumers: the boot sequence already awaits app entry points before the router evaluates
+	 * For consumers: the boot sequence already awaits app entry points before the router evaluates
 	 * its guards, so by the time any extension code runs this has long since completed.
+	 * @internal
 	 * @deprecated Internal boot signal, never intended for public use. Scheduled for removal in Umbraco 19.
-	 * @remark It will only emit once and then complete itself.
+	 * @remarks It will only emit once and then complete itself.
+	 * @returns {Observable<void>} An observable that emits once when the auth context is initialized.
 	 */
 	get isInitialized(): Observable<void> {
 		new UmbDeprecation({
@@ -77,12 +78,12 @@ export class UmbAuthContext extends UmbContextBase {
 		return this.#isInitializedObservable;
 	}
 
-	/** Internal, non-warning view of {@link isInitialized} for use inside this class. */
+	/** Internal, non-warning view of {@link UmbAuthContext#isInitialized} for use inside this class. */
 	readonly #isInitializedObservable = this.#isInitialized.asObservable();
 
 	/**
 	 * Observable that emits true if the user is authorized, otherwise false.
-	 * It will only emit when the authorization state changes.
+	 * @remarks It will only emit when the authorization state changes.
 	 */
 	readonly isAuthorized = this.#session.asObservable().pipe(
 		map((session) => this.#isBypassed || !!session),
@@ -92,7 +93,7 @@ export class UmbAuthContext extends UmbContextBase {
 	/**
 	 * Observable that acts as a signal and emits when the user has timed out, i.e. the token has expired.
 	 * This can be used to show a timeout message to the user.
-	 * It will emit once per second, so it can be used to trigger UI updates or other actions when the user has timed out.
+	 * @remarks It will emit once per second, so it can be used to trigger UI updates or other actions when the user has timed out.
 	 */
 	readonly timeoutSignal = this.#isTimeout.asObservable().pipe(
 		// Audit the timeout signal to ensure that it waits for 1s before allowing another emission, which prevents rapid firing of the signal.
@@ -178,10 +179,11 @@ export class UmbAuthContext extends UmbContextBase {
 	 *
 	 * The built-in "Umbraco" provider is local username/password login (the server login app); any
 	 * other provider is challenged via the cookie external-login endpoint.
-	 * @param {string} identityProvider The provider to log in with. Default 'Umbraco' (local login).
-	 * @param {boolean} redirect Navigate full-page instead of opening a popup.
-	 * @param {string} _usernameHint Ignored (cookie auth has no username hint).
-	 * @param {ManifestAuthProvider} manifest The registered provider's manifest, used for the popup target/features.
+	 * @param {string} identityProvider The provider to use for login. Default is 'Umbraco'.
+	 * @param {boolean} redirect If true, the user will be redirected to the login page.
+	 * @param {string} usernameHint The username hint to use for login.
+	 * @param _usernameHint
+	 * @param {ManifestAuthProvider} manifest The manifest for the registered provider.
 	 */
 	async makeAuthorizationRequest(
 		identityProvider = 'Umbraco',
@@ -332,7 +334,7 @@ export class UmbAuthContext extends UmbContextBase {
 	/**
 	 * Checks if the current session is still valid.
 	 * @deprecated Use {@link getIsAuthorized} or observe {@link session$} instead. Scheduled for removal in Umbraco 19.
-	 * @returns True if the session has not expired.
+	 * @returns {boolean} True if the session has not expired.
 	 */
 	isSessionValid(): boolean {
 		new UmbDeprecation({
@@ -344,7 +346,10 @@ export class UmbAuthContext extends UmbContextBase {
 		return this.#isSessionValid();
 	}
 
-	/** Internal, non-warning implementation of {@link isSessionValid}. */
+	/**
+	 * Internal, non-warning implementation of {@link isSessionValid}.
+	 * @returns {boolean} True if the session has not expired.
+	 */
 	#isSessionValid(): boolean {
 		const session = this.#session.getValue();
 		if (!session) return false;
@@ -379,7 +384,7 @@ export class UmbAuthContext extends UmbContextBase {
 
 	/**
 	 * Get the server url to the Management API.
-	 * @deprecated Consume {@link UMB_SERVER_CONTEXT} and use its `getServerUrl()` — the canonical source for the server URL. Scheduled for removal in Umbraco 21.
+	 * @deprecated Consume UMB_SERVER_CONTEXT and use its `getServerUrl()` — the canonical source for the server URL. Scheduled for removal in Umbraco 21.
 	 * @memberof UmbAuthContext
 	 * @example <caption>Using the server url</caption>
 	 * ```js
@@ -394,8 +399,8 @@ export class UmbAuthContext extends UmbContextBase {
 	 * 		headers: { Authorization: `Bearer ${await config.token()}` },
 	 * 	});
 	 * ```
-	 * @deprecated Consume {@link UMB_SERVER_CONTEXT} and use its `getServerUrl()` — the canonical source for the server URL. Scheduled for removal in Umbraco 19.
-	 * @returns The server url to the Management API
+	 * @deprecated Consume UMB_SERVER_CONTEXT and use its `getServerUrl()` — the canonical source for the server URL. Scheduled for removal in Umbraco 19.
+	 * @returns {string} The server url to the Management API
 	 */
 	getServerUrl() {
 		new UmbDeprecation({
@@ -408,9 +413,8 @@ export class UmbAuthContext extends UmbContextBase {
 	}
 
 	/**
-	 * Get the default OpenAPI configuration, which is set up to communicate with the Management API
-	 * or any other API that uses the same cookie-based authentication.
-	 * This is useful if you want to communicate with your own resources generated by the [@hey-api/openapi-ts](https://github.com/hey-api/openapi-ts) library.
+	 * Get the default OpenAPI configuration, which is set up to communicate with the Management API.
+	 * @remarks This is useful if you want to communicate with your own resources generated by the [@hey-api/openapi-ts](https://github.com/hey-api/openapi-ts) library.
 	 * @memberof UmbAuthContext
 	 * @example <caption>Using the default OpenAPI configuration</caption>
 	 * ```js
@@ -457,7 +461,7 @@ export class UmbAuthContext extends UmbContextBase {
 	 * // Now myClient automatically includes auth headers and interceptors
 	 * ```
 	 * @param {UmbApiClient} client A `@hey-api/openapi-ts` client instance — either {@link umbHttpClient}
-	 * or one regenerated by an extension package against its own OpenAPI document. You can see {@link UmbApiClient} for the expected interface.
+	 * or one regenerated by an extension package against its own OpenAPI document.
 	 */
 	configureClient(client: UmbApiClient): void {
 		if (this.#configuredClients.has(client)) return;
@@ -485,10 +489,10 @@ export class UmbAuthContext extends UmbContextBase {
 
 	/**
 	 * Sets the auth context as initialized, which means that the auth context is ready to be used.
-	 * @internal Only public because the core entry point calls it from outside this class. Nothing
-	 * outside Umbraco core should ever call this — doing so opens the provider-discovery gate early.
+	 * No code outside Umbraco core should ever call this — doing so opens the provider-discovery gate early.
+	 * @internal
 	 * @deprecated Internal boot hook, never intended for public use. Scheduled for removal in Umbraco 19.
-	 * @remark The constructor already does this, so calling it again is a no-op on an
+	 * @remarks The constructor already does this, so calling it again is a no-op on an
 	 * already-completed subject. It emits once, without a value.
 	 */
 	setInitialized() {
@@ -510,9 +514,10 @@ export class UmbAuthContext extends UmbContextBase {
 	/**
 	 * Gets all registered auth providers.
 	 * @deprecated Query the extension registry directly: `umbExtensionsRegistry.byType('authProvider')`. Scheduled for removal in Umbraco 19.
-	 * @remark The initialization gate this used to add is redundant — the app awaits app entry points
+	 * @remarks The initialization gate this used to add is redundant — the app awaits app entry points
 	 * before the router evaluates its guards, so the provider list has already settled by then.
-	 * @param extensionsRegistry
+	 * @param {UmbBackofficeExtensionRegistry} extensionsRegistry The extension registry to query.
+	 * @returns {Observable<Array<ManifestAuthProvider>>} An observable of the registered auth providers.
 	 */
 	getAuthProviders(extensionsRegistry: UmbBackofficeExtensionRegistry) {
 		new UmbDeprecation({
@@ -529,6 +534,8 @@ export class UmbAuthContext extends UmbContextBase {
 	 * No initialization gate: the constructor completes #isInitialized, so piping through it only
 	 * added a micro-task delay. Ordering is guaranteed by the boot sequence awaiting app entry
 	 * points before the router evaluates its guards.
+	 * @param {UmbBackofficeExtensionRegistry} extensionsRegistry The extension registry to query.
+	 * @returns {Observable<Array<ManifestAuthProvider>>} An observable of the registered auth providers.
 	 */
 	#getAuthProviders(extensionsRegistry: UmbBackofficeExtensionRegistry) {
 		return extensionsRegistry.byType<'authProvider', ManifestAuthProvider>('authProvider');
@@ -578,9 +585,9 @@ export class UmbAuthContext extends UmbContextBase {
 
 	/**
 	 * Unlinks the current user from the specified provider.
-	 * @param {string} loginProvider The provider to unlink from.
-	 * @param {string} providerKey The provider key to unlink from.
-	 * @returns {Promise<boolean>} True if the unlink was successful, otherwise false.
+	 * @param {string} loginProvider The login provider to unlink from.
+	 * @param {string} providerKey The provider's key for the current user.
+	 * @returns {Promise<boolean>} True if the unlink succeeded.
 	 */
 	async unlinkLogin(loginProvider: string, providerKey: string): Promise<boolean> {
 		const request = new Request(this.#unlinkEndpoint, {

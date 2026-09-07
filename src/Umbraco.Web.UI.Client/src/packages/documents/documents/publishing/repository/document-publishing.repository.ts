@@ -1,6 +1,10 @@
 import type { UmbDocumentDetailModel, UmbDocumentVariantPublishModel } from '../../types.js';
 import { UmbDocumentPublishingServerDataSource } from './document-publishing.server.data-source.js';
-import { UmbRepositoryBase, type UmbRepositoryResponse } from '@umbraco-cms/backoffice/repository';
+import {
+	UmbRepositoryBase,
+	type UmbRepositoryErrorResponse,
+	type UmbRepositoryResponse,
+} from '@umbraco-cms/backoffice/repository';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 export class UmbDocumentPublishingRepository extends UmbRepositoryBase {
@@ -11,7 +15,7 @@ export class UmbDocumentPublishingRepository extends UmbRepositoryBase {
 	 * @param {UmbDocumentDetailModel} model - The Document to create
 	 * @param {Array<UmbVariantId>} variantIds - The variants to publish after creating
 	 * @param {string | null} parentUnique - The unique of the parent to create under
-	 * @returns {*}
+	 * @returns {Promise<UmbRepositoryResponse<unknown>>} The result of the create and publish request
 	 * @memberof UmbDocumentPublishingRepository
 	 */
 	async createAndPublish(
@@ -29,7 +33,7 @@ export class UmbDocumentPublishingRepository extends UmbRepositoryBase {
 	 * Updates and publishes an existing Document in a single operation
 	 * @param {UmbDocumentDetailModel} model - The Document to update
 	 * @param {Array<UmbVariantId>} variantIds - The variants to publish after updating
-	 * @returns {*}
+	 * @returns {Promise<UmbRepositoryResponse<unknown>>} The result of the update and publish request
 	 * @memberof UmbDocumentPublishingRepository
 	 */
 	async updateAndPublish(model: UmbDocumentDetailModel, variantIds: Array<UmbVariantId>) {
@@ -40,11 +44,9 @@ export class UmbDocumentPublishingRepository extends UmbRepositoryBase {
 
 	/**
 	 * Publish one or more variants of a Document
-	 * @param {string} id
-	 * @param {Array<UmbVariantId>} variantIds
-	 * @param unique
-	 * @param variants
-	 * @returns {*}
+	 * @param {string} unique - The unique of the Document
+	 * @param {Array<UmbDocumentVariantPublishModel>} variants - The variants to publish
+	 * @returns {Promise<UmbRepositoryResponse<unknown>>} The result of the publish request
 	 * @memberof UmbDocumentPublishingRepository
 	 */
 	async publish(unique: string, variants: Array<UmbDocumentVariantPublishModel>) {
@@ -56,9 +58,9 @@ export class UmbDocumentPublishingRepository extends UmbRepositoryBase {
 
 	/**
 	 * Unpublish one or more variants of a Document
-	 * @param {string} id
-	 * @param {Array<UmbVariantId>} variantIds
-	 * @returns {*}
+	 * @param {string} id - The unique of the Document
+	 * @param {Array<UmbVariantId>} variantIds - The variants to unpublish
+	 * @returns {Promise<UmbRepositoryResponse<unknown>>} The result of the unpublish request
 	 * @memberof UmbDocumentPublishingRepository
 	 */
 	async unpublish(id: string, variantIds: Array<UmbVariantId>) {
@@ -70,12 +72,17 @@ export class UmbDocumentPublishingRepository extends UmbRepositoryBase {
 
 	/**
 	 * Publish variants of a document including its descendants
-	 * @param id
-	 * @param variantIds
-	 * @param includeUnpublishedDescendants
+	 * @param {string} id - The unique of the Document
+	 * @param {Array<UmbVariantId>} variantIds - The variants to publish
+	 * @param {boolean} includeUnpublishedDescendants - Whether to include unpublished descendants
+	 * @returns {Promise<UmbRepositoryErrorResponse>} The result of the publish request
 	 * @memberof UmbDocumentPublishingRepository
 	 */
-	async publishWithDescendants(id: string, variantIds: Array<UmbVariantId>, includeUnpublishedDescendants: boolean) {
+	async publishWithDescendants(
+		id: string,
+		variantIds: Array<UmbVariantId>,
+		includeUnpublishedDescendants: boolean,
+	): Promise<UmbRepositoryErrorResponse> {
 		if (!id) throw new Error('id is missing');
 		if (!variantIds) throw new Error('variant IDs are missing');
 

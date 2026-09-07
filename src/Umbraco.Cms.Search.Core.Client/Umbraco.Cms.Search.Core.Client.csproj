@@ -1,0 +1,94 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+  <PropertyGroup>
+    <Title>Umbraco CMS - Search - Core Client</Title>
+    <Description>Contains the backoffice UI for Umbraco Search.</Description>
+    <PackageTags>umbraco search</PackageTags>
+    <StaticWebAssetBasePath>/</StaticWebAssetBasePath>
+    <!-- Disable compression for static files, because MapStaticAssets() is not used anyway (yet) -->
+    <CompressionEnabled>false</CompressionEnabled>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Dont include the client folder as part of packaging nuget build -->
+    <Content Remove="Client\**" />
+
+    <!-- However make the Umbraco-package.json included for dotnet pack or nuget package and visible to the solution -->
+    <None Include="Client\public\umbraco-package.json" Pack="false" />
+    <None Include="Client\package.json" Pack="false" />
+    <None Include="Client\tsconfig.json" Pack="false" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\" />
+  </ItemGroup>
+
+  <!-- BEGIN: Restore and build the search client project (mirrors the Login block in Umbraco.Cms.StaticAssets) -->
+  <PropertyGroup>
+    <SearchClientProjectDirectory Condition="'$(SearchClientProjectDirectory)' == ''">$(ProjectDir)Client\</SearchClientProjectDirectory>
+    <BackofficeClientProjectDirectory Condition="'$(BackofficeClientProjectDirectory)' == ''">$(ProjectDir)..\Umbraco.Web.UI.Client\</BackofficeClientProjectDirectory>
+    <SearchClientAssetsPath>$(ProjectDir)wwwroot\App_Plugins\UmbracoSearch</SearchClientAssetsPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Remove="$(SearchClientAssetsPath)\**" />
+  </ItemGroup>
+
+  <Target Name="BuildSearchClientStaticAssetsPreconditions" BeforeTargets="AssignTargetPaths">
+    <Message Text="Skip BuildSearchClient target because UmbracoBuild is '$(UmbracoBuild)' (this is not Visual Studio)" Importance="high" Condition="'$(UmbracoBuild)' != ''" />
+    <Message Text="Skip BuildSearchClient target because '$(SearchClientAssetsPath)' already exists" Importance="high" Condition="Exists('$(SearchClientAssetsPath)')" />
+    <Message Text="Call BuildSearchClient target because UmbracoBuild is empty (this is Visual Studio) and '$(SearchClientAssetsPath)' doesn't exist" Importance="high" Condition="'$(UmbracoBuild)' == '' and !Exists('$(SearchClientAssetsPath)')" />
+    <CallTarget Targets="BuildSearchClient" Condition="'$(UmbracoBuild)' == '' and !Exists('$(SearchClientAssetsPath)')" />
+  </Target>
+
+  <Target Name="RestoreSearchClient" Inputs="$(SearchClientProjectDirectory)package-lock.json" Outputs="$(SearchClientProjectDirectory)node_modules/.package-lock.json">
+    <Message Importance="high" Text="Restoring Search Client NPM packages..." />
+    <Exec Command="npm i --no-fund --no-audit" WorkingDirectory="$(SearchClientProjectDirectory)" />
+  </Target>
+
+  <!-- The backoffice client only needs restoring (not building): the search client's tsc walks its sources through tsconfig path aliases -->
+  <Target Name="RestoreBackofficeClient" Inputs="$(BackofficeClientProjectDirectory)package-lock.json" Outputs="$(BackofficeClientProjectDirectory)node_modules/.package-lock.json">
+    <Message Importance="high" Text="Restoring Backoffice NPM packages..." />
+    <Exec Command="npm i --no-fund --no-audit" WorkingDirectory="$(BackofficeClientProjectDirectory)" />
+  </Target>
+
+  <Target Name="BuildSearchClient" DependsOnTargets="RestoreSearchClient;RestoreBackofficeClient">
+    <Message Importance="high" Text="Executing Search Client NPM build script..." />
+    <Exec Command="npm run build" WorkingDirectory="$(SearchClientProjectDirectory)" />
+    <ItemGroup>
+      <_SearchClientAssetsBuildOutput Include="$(SearchClientAssetsPath)\**" />
+    </ItemGroup>
+    <WriteLinesToFile File="$(IntermediateOutputPath)searchclient.complete.txt" Lines="@(_SearchClientAssetsBuildOutput)" Overwrite="true" />
+  </Target>
+
+  <Target Name="DefineSearchClientAssets" AfterTargets="BuildSearchClient" DependsOnTargets="ResolveStaticWebAssetsConfiguration">
+    <ItemGroup>
+      <FileWrites Include="@(_SearchClientAssetsBuildOutput)" />
+      <FileWrites Include="$(IntermediateOutputPath)searchclient.complete.txt" />
+    </ItemGroup>
+    <DefineStaticWebAssets CandidateAssets="@(_SearchClientAssetsBuildOutput)" SourceId="$(PackageId)" SourceType="Computed" ContentRoot="$(ProjectDir)wwwroot" BasePath="$(StaticWebAssetBasePath)">
+      <Output TaskParameter="Assets" ItemName="StaticWebAsset" />
+      <Output TaskParameter="Assets" ItemName="_SearchClientStaticWebAssets" />
+    </DefineStaticWebAssets>
+    <!-- Endpoints must be defined explicitly for computed assets, otherwise the pack targets fail (NU5019) because this project has no other wwwroot assets -->
+    <DefineStaticWebAssetEndpoints CandidateAssets="@(_SearchClientStaticWebAssets)" ExistingEndpoints="@(StaticWebAssetEndpoint)" ContentTypeMappings="@(StaticWebAssetContentTypeMapping)">
+      <Output TaskParameter="Endpoints" ItemName="StaticWebAssetEndpoint" />
+    </DefineStaticWebAssetEndpoints>
+  </Target>
+
+  <Target Name="CleanSearchClientStaticAssetsPreconditions" AfterTargets="Clean" Condition="'$(UmbracoBuild)' == ''">
+    <Message Text="Skip CleanSearchClient target because '$(SearchClientAssetsPath)' doesn't exist" Importance="high" Condition="!Exists('$(SearchClientAssetsPath)')" />
+    <Message Text="Skip CleanSearchClient target because preserve.search marker file exists" Importance="high" Condition="Exists('$(SearchClientAssetsPath)') and Exists('$(SolutionDir)preserve.search')" />
+    <Message Text="Call CleanSearchClient target because '$(SearchClientAssetsPath)' exists and preserve.search marker file doesn't exist" Importance="high" Condition="Exists('$(SearchClientAssetsPath)') and !Exists('$(SolutionDir)preserve.search')" />
+    <CallTarget Targets="CleanSearchClient" Condition="Exists('$(SearchClientAssetsPath)') and !Exists('$(SolutionDir)preserve.search')" />
+  </Target>
+
+  <Target Name="CleanSearchClient">
+    <ItemGroup>
+      <SearchClientDirectories Include="$(SearchClientAssetsPath)" />
+    </ItemGroup>
+    <RemoveDir Directories="@(SearchClientDirectories)" />
+  </Target>
+  <!-- END: Restore and build the search client project -->
+
+</Project>

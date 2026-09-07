@@ -1,9 +1,11 @@
 import { CompositionTypeModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { COLLECTION_DATA_TYPE_ID } from './data-type.data.js';
 import type { UmbMockDocumentTypeModel } from '../../mock-data-set.types.js';
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
+export const COLLECTION_FOLDER_ID = 'documents-collection-folder-id';
+export const COLLECTION_DOCUMENT_TYPE_ID = 'documents-collection-document-type-id';
+export const COLLECTION_ITEM_DOCUMENT_TYPE_ID = 'documents-collection-item-document-type-id';
 export const INVARIANT_DOCUMENT_TYPE_ID = 'variant-documents-invariant-document-type-id';
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const VARIANT_DOCUMENT_TYPE_ID = 'variant-documents-variant-document-type-id';
 export const SEGMENT_VARIANT_DOCUMENT_TYPE_ID = 'variant-documents-segment-variant-document-type-id';
 export const COMPOSED_FOLDER_ID = 'variant-documents-composed-folder-id';
@@ -18,6 +20,112 @@ export const INVARIANT_DOCUMENT_TYPE_WITH_SEGMENT_VARIANT_COMPOSITION_ID =
 	'variant-documents-invariant-document-type-with-segment-variant-composition-id';
 
 export const data: Array<UmbMockDocumentTypeModel> = [
+	{
+		id: COLLECTION_FOLDER_ID,
+		alias: 'collectionFolder',
+		name: 'Collection',
+		description: null,
+		icon: 'icon-folder',
+		allowedTemplates: [],
+		defaultTemplate: null,
+		allowedAsRoot: true,
+		allowedInLibrary: false,
+		variesByCulture: false,
+		variesBySegment: false,
+		isElement: false,
+		hasChildren: true,
+		parent: null,
+		isFolder: true,
+		properties: [],
+		containers: [],
+		allowedDocumentTypes: [],
+		compositions: [],
+		cleanup: {
+			preventCleanup: false,
+			keepAllVersionsNewerThanDays: null,
+			keepLatestVersionPerDayForDays: null,
+		},
+		flags: [],
+		noAccess: false,
+	},
+	{
+		id: COLLECTION_DOCUMENT_TYPE_ID,
+		alias: 'collection',
+		name: 'Collection',
+		description: null,
+		icon: 'icon-layers',
+		allowedTemplates: [],
+		defaultTemplate: null,
+		allowedAsRoot: true,
+		allowedInLibrary: false,
+		variesByCulture: false,
+		variesBySegment: false,
+		isElement: false,
+		hasChildren: false,
+		parent: { id: COLLECTION_FOLDER_ID },
+		isFolder: false,
+		properties: [],
+		containers: [],
+		allowedDocumentTypes: [{ documentType: { id: COLLECTION_ITEM_DOCUMENT_TYPE_ID }, sortOrder: 0 }],
+		compositions: [],
+		cleanup: {
+			preventCleanup: false,
+			keepAllVersionsNewerThanDays: null,
+			keepLatestVersionPerDayForDays: null,
+		},
+		collection: { id: COLLECTION_DATA_TYPE_ID },
+		flags: [],
+		noAccess: false,
+	},
+	{
+		id: COLLECTION_ITEM_DOCUMENT_TYPE_ID,
+		alias: 'collectionItem',
+		name: 'Collection Item',
+		description: null,
+		icon: 'icon-document',
+		allowedTemplates: [],
+		defaultTemplate: null,
+		allowedAsRoot: false,
+		allowedInLibrary: false,
+		variesByCulture: false,
+		variesBySegment: false,
+		isElement: false,
+		hasChildren: false,
+		parent: { id: COLLECTION_FOLDER_ID },
+		isFolder: false,
+		properties: [
+			{
+				id: 'documents-collection-item-prop-text-id',
+				container: null,
+				alias: 'text',
+				name: 'Text',
+				description: null,
+				dataType: { id: 'variant-documents-textstring-data-type-id' },
+				variesByCulture: false,
+				variesBySegment: false,
+				sortOrder: 0,
+				validation: {
+					mandatory: false,
+					mandatoryMessage: null,
+					regEx: null,
+					regExMessage: null,
+				},
+				appearance: {
+					labelOnTop: false,
+				},
+			},
+		],
+		containers: [],
+		allowedDocumentTypes: [],
+		compositions: [],
+		cleanup: {
+			preventCleanup: false,
+			keepAllVersionsNewerThanDays: null,
+			keepLatestVersionPerDayForDays: null,
+		},
+		flags: [],
+		noAccess: false,
+	},
 	{
 		id: INVARIANT_DOCUMENT_TYPE_ID,
 		alias: 'invariantDocumentType',

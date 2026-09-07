@@ -1,5 +1,4 @@
 using System.Net;
-using System.Security.Claims;
 using System.Text;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,7 +19,6 @@ public class BasicAuthenticationMiddlewareTests
     private Mock<IRuntimeState> _runtimeStateMock = null!;
     private Mock<IBasicAuthService> _basicAuthServiceMock = null!;
     private Mock<IBackOfficeSignInManager> _signInManagerMock = null!;
-    private Mock<IPreviewService> _previewServiceMock = null!;
     private BasicAuthenticationMiddleware _middleware = null!;
     private bool _nextCalled;
 
@@ -39,18 +37,12 @@ public class BasicAuthenticationMiddlewareTests
 
         _signInManagerMock = new Mock<IBackOfficeSignInManager>();
 
-        _previewServiceMock = new Mock<IPreviewService>();
-        _previewServiceMock
-            .Setup(x => x.TryGetPreviewClaimsIdentityAsync())
-            .ReturnsAsync(Attempt<ClaimsIdentity>.Fail());
-
         _nextCalled = false;
 
         _middleware = new BasicAuthenticationMiddleware(
             _runtimeStateMock.Object,
             _basicAuthServiceMock.Object,
-            hostingEnvironmentMock.Object,
-            _previewServiceMock.Object);
+            hostingEnvironmentMock.Object);
     }
 
     /// <summary>
@@ -318,84 +310,6 @@ public class BasicAuthenticationMiddlewareTests
 
         Assert.IsFalse(_nextCalled);
         Assert.That(httpContext.Response.StatusCode, Is.EqualTo(401));
-    }
-
-    /// <summary>
-    /// Verifies that a request carrying a valid preview token is let through without a Basic challenge,
-    /// even though the back-office cookie has expired.
-    /// </summary>
-    [Test]
-    public async Task InvokeAsync_ValidPreviewToken_NoBackOfficeCookie_PassesThrough()
-    {
-        _previewServiceMock
-            .Setup(x => x.TryGetPreviewClaimsIdentityAsync())
-            .ReturnsAsync(Attempt<ClaimsIdentity>.Succeed(
-                new ClaimsIdentity(Constants.Security.BackOfficeAuthenticationType)));
-
-        HttpContext context = CreateHttpContext("/previewed-page");
-
-        await _middleware.InvokeAsync(context, NextDelegate());
-
-        Assert.IsTrue(_nextCalled);
-        Assert.That(context.Response.StatusCode, Is.EqualTo(200));
-    }
-
-    /// <summary>
-    /// Verifies that an unverifiable preview token does not bypass the Basic challenge.
-    /// </summary>
-    [Test]
-    public async Task InvokeAsync_InvalidPreviewToken_HandleUnauthorized()
-    {
-        _basicAuthServiceMock.Setup(x => x.IsRedirectToLoginPageEnabled()).Returns(false);
-        _previewServiceMock
-            .Setup(x => x.TryGetPreviewClaimsIdentityAsync())
-            .ReturnsAsync(Attempt<ClaimsIdentity>.Fail());
-
-        HttpContext context = CreateHttpContext("/previewed-page");
-
-        await _middleware.InvokeAsync(context, NextDelegate());
-
-        Assert.IsFalse(_nextCalled);
-        Assert.That(context.Response.StatusCode, Is.EqualTo(401));
-    }
-
-    /// <summary>
-    /// Verifies that a successful preview attempt carrying no identity does not authenticate the request.
-    /// The preview token can verify without a back-office principal being built for the user.
-    /// </summary>
-    [Test]
-    public async Task InvokeAsync_PreviewAttemptWithNullIdentity_HandleUnauthorized()
-    {
-        _basicAuthServiceMock.Setup(x => x.IsRedirectToLoginPageEnabled()).Returns(false);
-        _previewServiceMock
-            .Setup(x => x.TryGetPreviewClaimsIdentityAsync())
-            .ReturnsAsync(Attempt<ClaimsIdentity>.Succeed(null!));
-
-        HttpContext context = CreateHttpContext("/previewed-page");
-
-        await _middleware.InvokeAsync(context, NextDelegate());
-
-        Assert.IsFalse(_nextCalled);
-        Assert.That(context.Response.StatusCode, Is.EqualTo(401));
-    }
-
-    /// <summary>
-    /// Verifies that a preview identity that is not a back-office identity does not authenticate the request.
-    /// </summary>
-    [Test]
-    public async Task InvokeAsync_PreviewIdentityNotBackOfficeAuthenticationType_HandleUnauthorized()
-    {
-        _basicAuthServiceMock.Setup(x => x.IsRedirectToLoginPageEnabled()).Returns(false);
-        _previewServiceMock
-            .Setup(x => x.TryGetPreviewClaimsIdentityAsync())
-            .ReturnsAsync(Attempt<ClaimsIdentity>.Succeed(new ClaimsIdentity("SomeOtherScheme")));
-
-        HttpContext context = CreateHttpContext("/previewed-page");
-
-        await _middleware.InvokeAsync(context, NextDelegate());
-
-        Assert.IsFalse(_nextCalled);
-        Assert.That(context.Response.StatusCode, Is.EqualTo(401));
     }
 
     /// <summary>

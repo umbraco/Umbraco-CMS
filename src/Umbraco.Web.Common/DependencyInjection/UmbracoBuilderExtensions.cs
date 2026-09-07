@@ -26,7 +26,6 @@ using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Net;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Repositories;
-using Umbraco.Cms.Core.Preview;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Templates;
@@ -42,7 +41,6 @@ using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Cms.Web.Common.Blocks;
 using Umbraco.Cms.Web.Common.Cache;
 using Umbraco.Cms.Web.Common.Configuration;
-using Umbraco.Cms.Web.Common.Controllers;
 using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Cms.Web.Common.FileProviders;
 using Umbraco.Cms.Web.Common.HealthChecks;
@@ -51,7 +49,6 @@ using Umbraco.Cms.Web.Common.Localization;
 using Umbraco.Cms.Web.Common.Middleware;
 using Umbraco.Cms.Web.Common.ModelBinders;
 using Umbraco.Cms.Web.Common.Mvc;
-using Umbraco.Cms.Web.Common.Preview;
 using Umbraco.Cms.Web.Common.Profiler;
 using Umbraco.Cms.Web.Common.Repositories;
 using Umbraco.Cms.Web.Common.Security;
@@ -217,7 +214,6 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddUnique<IUmbracoApplicationLifetime, AspNetCoreUmbracoApplicationLifetime>();
         builder.Services.AddUnique<IApplicationShutdownRegistry, AspNetCoreApplicationShutdownRegistry>();
         builder.Services.AddTransient<IIpAddressUtilities, IpAddressUtilities>();
-        builder.Services.AddUnique<IPreviewTokenGenerator, UserBasedPreviewTokenGenerator>();
 
         return builder;
     }
@@ -254,6 +250,11 @@ public static partial class UmbracoBuilderExtensions
         {
             var productVersion = services.GetRequiredService<IUmbracoVersion>().SemanticVersion.ToSemanticStringWithoutBuild();
             client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue(Constants.HttpClients.Headers.UserAgentProductName, productVersion));
+        });
+        builder.Services.AddHttpClient(Constants.HttpClients.News, client =>
+        {
+            client.DefaultRequestHeaders.UserAgent.TryParseAdd(Constants.HttpClients.Headers.UserAgentProductName);
+            client.Timeout = TimeSpan.FromSeconds(20);
         });
         return builder;
     }

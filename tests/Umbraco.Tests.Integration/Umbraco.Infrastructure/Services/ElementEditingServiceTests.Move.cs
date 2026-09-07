@@ -336,4 +336,23 @@ public partial class ElementEditingServiceTests
 
         Assert.AreEqual(0, GetFolderChildren(trashedContainerKey, true).Length);
     }
+
+    [Test]
+    public async Task Cannot_Move_Element_Under_Another_Element()
+    {
+        var targetElement = await CreateInvariantElement();
+        var elementToMove = await CreateInvariantElement();
+
+        var moveResult = await ElementEditingService.MoveAsync(elementToMove.Key, targetElement.Key, Constants.Security.SuperUserKey);
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsFalse(moveResult.Success);
+            Assert.AreEqual(ContentEditingOperationStatus.ParentNotFound, moveResult.Result);
+        });
+
+        elementToMove = await ElementEditingService.GetAsync(elementToMove.Key);
+        Assert.IsNotNull(elementToMove);
+        Assert.AreEqual(Constants.System.Root, elementToMove.ParentId);
+    }
 }

@@ -45,6 +45,10 @@ describe('UmbInteractionMemoryManager', () => {
 				expect(manager).to.have.property('deleteMemory').that.is.a('function');
 			});
 
+			it('has a setMemories method', () => {
+				expect(manager).to.have.property('setMemories').that.is.a('function');
+			});
+
 			it('has a getAllMemories method', () => {
 				expect(manager).to.have.property('getAllMemories').that.is.a('function');
 			});
@@ -83,6 +87,51 @@ describe('UmbInteractionMemoryManager', () => {
 			manager.deleteMemory('1');
 			const result = manager.getMemory('1');
 			expect(result).to.be.undefined;
+		});
+	});
+
+	describe('setMemories()', () => {
+		it('replaces all memory items with the given list', () => {
+			const newMemory = { unique: 'newMemory', value: 'New Memory' };
+			manager.setMemories([newMemory]);
+			expect(manager.getAllMemories()).to.deep.equal([newMemory]);
+		});
+
+		it('drops memory items no longer present in the given list', () => {
+			manager.setMemories([memory1]);
+			expect(manager.getMemory('2')).to.be.undefined;
+			expect(manager.getAllMemories()).to.deep.equal([memory1]);
+		});
+
+		it('emits at most once, even when several items differ', (done) => {
+			let emissionCount = 0;
+			manager.memories.subscribe(() => {
+				emissionCount++;
+			});
+
+			// The initial subscription emits the current value once; reset before the call under test.
+			emissionCount = 0;
+			manager.setMemories([{ unique: '1', value: 'Updated Memory 1' }, { unique: '3', value: 'Memory 3' }]);
+
+			setTimeout(() => {
+				expect(emissionCount).to.equal(1);
+				done();
+			}, 10);
+		});
+
+		it('does not emit when the given list is unchanged', (done) => {
+			let emissionCount = 0;
+			manager.memories.subscribe(() => {
+				emissionCount++;
+			});
+
+			emissionCount = 0;
+			manager.setMemories([memory1, memory2]);
+
+			setTimeout(() => {
+				expect(emissionCount).to.equal(0);
+				done();
+			}, 10);
 		});
 	});
 

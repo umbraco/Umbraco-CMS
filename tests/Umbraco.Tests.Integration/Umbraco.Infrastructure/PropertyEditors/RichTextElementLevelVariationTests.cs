@@ -5,7 +5,6 @@ using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
-using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 
@@ -423,245 +422,79 @@ internal sealed class RichTextElementLevelVariationTests : BlockEditorElementVar
         }
     }
 
-    [Test]
-    public async Task Can_Index_Cultures_Independently_Invariant_Blocks()
+    [TestCase("en-US", "variantText value for en-US")]
+    [TestCase("da-DK", "variantText value for da-DK")]
+    public async Task Can_Become_Invariant_After_Publish_For_Variant_Block_Property(string culture, string expectedVariantValue)
     {
         var elementType = await CreateElementType(ContentVariation.Culture);
-
-        var rteDataType = await CreateRichTextDataType(elementType);
-        var contentType = await CreateContentType(rteDataType);
-        var richTextValue = CreateRichTextValue(elementType);
-        var content = CreateContent(contentType, richTextValue);
-        PublishContent(content, ["en-US", "da-DK"]);
-
-        var editor = rteDataType.Editor!;
-        var indexValues = editor.PropertyIndexValueFactory.GetIndexValues(
-            content.Properties["blocks"]!,
-            culture: null,
-            segment: null,
-            published: true,
-            availableCultures: ["en-US", "da-DK"],
-            contentTypeDictionary: new Dictionary<Guid, IContentType>
-            {
-                { elementType.Key, elementType }, { contentType.Key, contentType }
-            });
-
-        Assert.AreEqual(3, indexValues.Count());
-        Assert.NotNull(indexValues.FirstOrDefault(value => value.FieldName.StartsWith(UmbracoExamineFieldNames.RawFieldPrefix)));
-
-        AssertIndexedValues(
-            "en-US",
-            "Some text.",
-            "More text.",
-            "Even more text.",
-            "The end.",
-            "#1: The first invariant content value",
-            "#1: The first content value in English",
-            "#2: The first invariant content value",
-            "#2: The first content value in English",
-            "#3: The first invariant content value",
-            "#3: The first content value in English");
-
-        AssertIndexedValues(
-            "da-DK",
-            "Some text.",
-            "More text.",
-            "Even more text.",
-            "The end.",
-            "#1: The first invariant content value",
-            "#1: The first content value in Danish",
-            "#2: The first invariant content value",
-            "#2: The first content value in Danish",
-            "#3: The first invariant content value",
-            "#3: The first content value in Danish");
-
-        void AssertIndexedValues(string culture, params string[] expectedIndexedValues)
-        {
-            var indexValue = indexValues.FirstOrDefault(v => v.Culture.InvariantEquals(culture));
-            Assert.IsNotNull(indexValue);
-            Assert.AreEqual(1, indexValue.Values.Count());
-            var indexedValue = indexValue.Values.First() as string;
-            Assert.IsNotNull(indexedValue);
-            var values = indexedValue.Split(Environment.NewLine).Select(s => s.Trim()).Where(s => s.IsNullOrWhiteSpace() is false).ToArray();
-            Assert.AreEqual(expectedIndexedValues.Length, values.Length);
-            Assert.IsTrue(values.ContainsAll(expectedIndexedValues));
-        }
-    }
-
-    [TestCase(true)]
-    [TestCase(false)]
-    public async Task Can_Index_With_Unexposed_Blocks(bool published)
-    {
-        var elementType = await CreateElementType(ContentVariation.Culture);
-
-        var rteDataType = await CreateRichTextDataType(elementType);
-        var contentType = await CreateContentType(rteDataType);
-        var richTextValue = CreateRichTextValue(elementType);
-        richTextValue.Blocks!.Expose.RemoveAll(e => e.Culture == "da-DK");
-
-        var content = CreateContent(contentType, richTextValue);
-        PublishContent(content, ["en-US", "da-DK"]);
-
-        var editor = rteDataType.Editor!;
-        var indexValues = editor.PropertyIndexValueFactory.GetIndexValues(
-            content.Properties["blocks"]!,
-            culture: null,
-            segment: null,
-            published: published,
-            availableCultures: ["en-US", "da-DK"],
-            contentTypeDictionary: new Dictionary<Guid, IContentType>
-            {
-                { elementType.Key, elementType }, { contentType.Key, contentType }
-            });
-
-        Assert.AreEqual(3, indexValues.Count());
-        Assert.NotNull(indexValues.FirstOrDefault(value => value.FieldName.StartsWith(UmbracoExamineFieldNames.RawFieldPrefix)));
-
-        if (published)
-        {
-            AssertIndexedValues(
-                "da-DK",
-                "Some text.",
-                "More text.",
-                "Even more text.",
-                "The end.");
-        }
-        else
-        {
-            AssertIndexedValues(
-                "da-DK",
-                "Some text.",
-                "More text.",
-                "Even more text.",
-                "The end.",
-                "#1: The first invariant content value",
-                "#1: The first content value in Danish",
-                "#2: The first invariant content value",
-                "#2: The first content value in Danish",
-                "#3: The first invariant content value",
-                "#3: The first content value in Danish");
-        }
-
-        AssertIndexedValues(
-            "en-US",
-            "Some text.",
-            "More text.",
-            "Even more text.",
-            "The end.",
-            "#1: The first invariant content value",
-            "#1: The first content value in English",
-            "#2: The first invariant content value",
-            "#2: The first content value in English",
-            "#3: The first invariant content value",
-            "#3: The first content value in English");
-
-        void AssertIndexedValues(string culture, params string[] expectedIndexedValues)
-        {
-            var indexValue = indexValues.FirstOrDefault(v => v.Culture.InvariantEquals(culture));
-            Assert.IsNotNull(indexValue);
-            Assert.AreEqual(1, indexValue.Values.Count());
-            var indexedValue = indexValue.Values.First() as string;
-            Assert.IsNotNull(indexedValue);
-            var values = indexedValue.Split(Environment.NewLine).Select(s => s.Trim()).Where(s => s.IsNullOrWhiteSpace() is false).ToArray();
-            Assert.AreEqual(expectedIndexedValues.Length, values.Length);
-            Assert.IsTrue(values.ContainsAll(expectedIndexedValues));
-        }
-    }
-
-    [TestCase(ContentVariation.Culture)]
-    [TestCase(ContentVariation.Nothing)]
-    public async Task Can_Index_Cultures_Independently_Variant_Blocks(ContentVariation elementTypeVariation)
-    {
-        var elementType = await CreateElementType(elementTypeVariation);
-
         var rteDataType = await CreateRichTextDataType(elementType);
         var contentType = await CreateContentType(ContentVariation.Culture, rteDataType, ContentVariation.Culture);
 
-        var englishRichTextValue = CreateInvariantRichTextValue("en-US");
-        var danishRichTextValue = CreateInvariantRichTextValue("da-DK");
+        var contentElementKey = Guid.NewGuid();
+
+        // Each culture of this block property is stored as its own document, and a document can carry entries
+        // for cultures other than its own. The value retained must be the one for the culture being mapped,
+        // not the default language's.
+        RichTextEditorValue RichTextValueFor(string valueCulture) => new()
+        {
+            Markup = $"""
+                      <p>Some text for {valueCulture}.</p>
+                      <umb-rte-block data-content-key="{contentElementKey:D}"><!--Umbraco-Block--></umb-rte-block>
+                      """,
+            Blocks = new RichTextBlockValue([new RichTextBlockLayoutItem(contentElementKey)])
+            {
+                ContentData =
+                [
+                    new(contentElementKey, elementType.Key, elementType.Alias)
+                    {
+                        Values =
+                        [
+                            new() { Alias = "invariantText", Value = "The invariant value" },
+                            new() { Alias = "variantText", Culture = "en-US", Value = valueCulture == "en-US" ? "variantText value for en-US" : null },
+                            new() { Alias = "variantText", Culture = "da-DK", Value = valueCulture == "da-DK" ? "variantText value for da-DK" : null },
+                        ],
+                    },
+                ],
+                SettingsData = [],
+                Expose =
+                [
+                    new(contentElementKey, "en-US", null),
+                    new(contentElementKey, "da-DK", null),
+                ],
+            },
+        };
 
         var content = CreateContent(contentType);
-        content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(englishRichTextValue), "en-US");
-        content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(danishRichTextValue), "da-DK");
+        content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(RichTextValueFor("en-US")), "en-US");
+        content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(RichTextValueFor("da-DK")), "da-DK");
         ContentService.Save(content);
 
         PublishContent(content, ["en-US", "da-DK"]);
 
-        var editor = rteDataType.Editor!;
+        // the element type is made invariant after publishing. the "blocks" property varies by culture, so each culture
+        // holds its own block value - which means every culture retains the value it was published with.
+        elementType.Variations = ContentVariation.Nothing;
+        elementType.PropertyTypes.First(pt => pt.Alias == "variantText").Variations = ContentVariation.Nothing;
+        await ContentTypeService.UpdateAsync(elementType, Constants.Security.SuperUserKey);
 
-        AssertIndexedValues(
-            "en-US",
-            "Some text for en-US.",
-            "More text for en-US.",
-            "invariantText value for en-US",
-            "variantText value for en-US");
+        RefreshContentTypeCache(elementType);
 
-        AssertIndexedValues(
-            "da-DK",
-            "Some text for da-DK.",
-            "More text for da-DK.",
-            "invariantText value for da-DK",
-            "variantText value for da-DK");
+        SetVariationContext(culture, null);
 
-        void AssertIndexedValues(string culture, params string[] expectedIndexedValues)
+        var publishedContent = GetPublishedContent(content.Key);
+        var property = publishedContent.GetProperty("blocks");
+        Assert.IsNotNull(property);
+
+        var propertyValue = property.GetDeliveryApiValue(false, culture) as RichTextModel;
+        Assert.IsNotNull(propertyValue);
+
+        var blocks = propertyValue.Blocks.ToArray();
+        Assert.AreEqual(1, blocks.Length);
+        Assert.Multiple(() =>
         {
-            var indexValues = editor.PropertyIndexValueFactory.GetIndexValues(
-                content.Properties["blocks"]!,
-                culture: culture,
-                segment: null,
-                published: true,
-                availableCultures: ["en-US", "da-DK"],
-                contentTypeDictionary: new Dictionary<Guid, IContentType>
-                {
-                    { elementType.Key, elementType }, { contentType.Key, contentType }
-                });
-
-            Assert.AreEqual(2, indexValues.Count());
-            Assert.NotNull(indexValues.FirstOrDefault(value => value.FieldName.StartsWith(UmbracoExamineFieldNames.RawFieldPrefix)));
-
-            var indexValue = indexValues.FirstOrDefault(v => v.Culture.InvariantEquals(culture) && v.FieldName == "blocks");
-            Assert.IsNotNull(indexValue);
-            Assert.AreEqual(1, indexValue.Values.Count());
-            var indexedValue = indexValue.Values.First() as string;
-            Assert.IsNotNull(indexedValue);
-            var values = indexedValue.Split(Environment.NewLine).Select(s => s.Trim()).Where(s => s.IsNullOrWhiteSpace() is false).ToArray();
-            Assert.AreEqual(expectedIndexedValues.Length, values.Length);
-            Assert.IsTrue(values.ContainsAll(expectedIndexedValues));
-        }
-
-        RichTextEditorValue CreateInvariantRichTextValue(string culture)
-        {
-            var contentElementKey = Guid.NewGuid();
-            return new RichTextEditorValue
-            {
-                Markup = $"""
-                          <p>Some text for {culture}.</p>
-                          <umb-rte-block data-content-key="{contentElementKey:D}"><!--Umbraco-Block--></umb-rte-block>
-                          <p>More text for {culture}.</p>
-                          """,
-                Blocks = new RichTextBlockValue([
-                    new RichTextBlockLayoutItem(contentElementKey)
-                ])
-                {
-                    ContentData =
-                    [
-                        new(contentElementKey, elementType.Key, elementType.Alias)
-                        {
-                            Values =
-                            [
-                                new() { Alias = "invariantText", Value = $"invariantText value for {culture}" },
-                                new() { Alias = "variantText", Value = $"variantText value for {culture}" }
-                            ]
-                        }
-                    ],
-                    SettingsData = [],
-                    Expose =
-                    [
-                        new(contentElementKey, culture, null),
-                    ]
-                }
-            };
-        }
+            Assert.AreEqual("The invariant value", blocks[0].Content.Properties["invariantText"]);
+            Assert.AreEqual(expectedVariantValue, blocks[0].Content.Properties["variantText"]);
+        });
     }
 
     private async Task<IDataType> CreateRichTextDataType(IContentType elementType)

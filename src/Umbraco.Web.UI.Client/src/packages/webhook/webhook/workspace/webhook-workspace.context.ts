@@ -67,7 +67,7 @@ export class UmbWebhookWorkspaceContext
 
 	/**
 	 * Gets the events
-	 * @returns {Array<UmbWebhookEventModel>}
+	 * @returns {Array<UmbWebhookEventModel>} The events
 	 * @memberof UmbWebhookWorkspaceContext
 	 */
 	getEvents(): Array<UmbWebhookEventModel> | undefined {

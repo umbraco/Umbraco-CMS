@@ -1,0 +1,18 @@
+# Build output
+dist/
+
+# Dependencies
+node_modules/
+
+# Generated code
+src/api/
+
+# Lock files
+package-lock.json
+
+# Logs
+*.log
+
+# IDE
+.idea/
+.vscode/

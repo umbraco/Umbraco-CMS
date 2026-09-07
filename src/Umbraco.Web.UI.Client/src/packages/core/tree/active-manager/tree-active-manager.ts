@@ -1,16 +1,74 @@
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import { UmbArrayState, type Observable } from '@umbraco-cms/backoffice/observable-api';
+import {
+	mergeObservables,
+	UmbArrayState,
+	UmbStringState,
+	type Observable,
+} from '@umbraco-cms/backoffice/observable-api';
+import { ensureSlash } from '@umbraco-cms/backoffice/router';
+import { debounce, UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 
 /**
- * Manages the expansion state of a tree
+ * Manages which tree entity is currently being viewed, and the trail of entities leading to it
  * @exports
  * @class UmbTreeItemActiveManager
  * @augments {UmbControllerBase}
  */
 export class UmbTreeItemActiveManager extends UmbControllerBase {
 	#active = new UmbArrayState<UmbEntityModel>([], (x) => x.entityType + x.unique);
-	readonly active = this.#active.asObservable();
+
+	/**
+	 * The trail of entities from the tree root down to the entity currently being viewed.
+	 */
+	readonly activeTrail = this.#active.asObservable();
+
+	/**
+	 * @returns {Observable<Array<UmbEntityModel>>} The active trail
+	 * @deprecated Deprecated since v17. Use `activeTrail` instead. Will be removed in v19.
+	 */
+	get active(): Observable<Array<UmbEntityModel>> {
+		new UmbDeprecation({
+			deprecated: 'UmbTreeItemActiveManager.active',
+			removeInVersion: '19.0.0',
+			solution: 'Use activeTrail instead.',
+		}).warn();
+
+		return this.activeTrail;
+	}
+
+	#currentLocation = new UmbStringState(window.location.pathname);
+
+	// One listener per tree rather than one per tree item: every item asks the same question of the
+	// same answer, and a tree scoped source is released together with the items observing it.
+	#onNavigationEnd = debounce(() => this.#currentLocation.setValue(window.location.pathname), 100);
+
+	override hostConnected(): void {
+		super.hostConnected();
+		window.addEventListener('navigationend', this.#onNavigationEnd);
+		this.#currentLocation.setValue(window.location.pathname);
+	}
+
+	override hostDisconnected(): void {
+		super.hostDisconnected();
+		window.removeEventListener('navigationend', this.#onNavigationEnd);
+		this.#onNavigationEnd.cancel();
+	}
+
+	/**
+	 * Checks if a path is the one currently open in the browser
+	 * @param {Observable<string>} path The path to check, as it may change while the item is alive
+	 * @returns {Observable<boolean>} True while the browser location points at the path
+	 * @memberof UmbTreeItemActiveManager
+	 */
+	isCurrentLocation(path: Observable<string>): Observable<boolean> {
+		return mergeObservables(
+			[this.#currentLocation.asObservable(), path],
+			// Compare with trailing slashes so /path-1 does not match /path-1-2, and allow anything
+			// beyond the item path itself, such as the workspace view segment.
+			([currentLocation, itemPath]) => !!itemPath && ensureSlash(currentLocation).includes(ensureSlash(itemPath)),
+		);
+	}
 
 	/**
 	 * Checks if an entity is active
@@ -48,31 +106,45 @@ export class UmbTreeItemActiveManager extends UmbControllerBase {
 	}
 
 	/**
-	 * Sets the active chain state
-	 * @param {Array<UmbEntityModel>} activeChain The active entries.
+	 * Sets the trail of entities from the tree root down to the entity currently being viewed
+	 * @param {Array<UmbEntityModel>} activeTrail The active entries, root first.
 	 * @memberof UmbTreeItemActiveManager
 	 * @returns {void}
 	 */
-	setActive(activeChain: Array<UmbEntityModel>): void {
-		this.#active.setValue(activeChain);
+	setActiveTrail(activeTrail: Array<UmbEntityModel>): void {
+		this.#active.setValue(activeTrail);
 	}
 
 	/**
-	 * Sets the active chain state
 	 * @param {Array<UmbEntityModel>} activeChain The active entries.
+	 * @deprecated Deprecated since v17. Use `setActiveTrail()` instead. Will be removed in v19.
+	 */
+	setActive(activeChain: Array<UmbEntityModel>): void {
+		new UmbDeprecation({
+			deprecated: 'UmbTreeItemActiveManager.setActive()',
+			removeInVersion: '19.0.0',
+			solution: 'Use setActiveTrail() instead.',
+		}).warn();
+
+		this.setActiveTrail(activeChain);
+	}
+
+	/**
+	 * Clears the active trail, but only when it matches the given trail
+	 * @param {Array<UmbEntityModel>} activeTrail The trail that must match for the state to be cleared.
 	 * @memberof UmbTreeItemActiveManager
 	 * @returns {void}
 	 */
-	removeActiveIfMatch(activeChain: Array<UmbEntityModel>): void {
-		const currentChain = this.#active.getValue();
-		// test if new chain and current chain matches:
+	removeActiveTrailIfMatch(activeTrail: Array<UmbEntityModel>): void {
+		const currentTrail = this.#active.getValue();
+		// test if new trail and current trail matches:
 		// Test length for a start:
-		if (activeChain.length !== currentChain.length) return;
+		if (activeTrail.length !== currentTrail.length) return;
 		// test content next:
-		for (let i = 0; i < activeChain.length; i++) {
+		for (let i = 0; i < activeTrail.length; i++) {
 			if (
-				activeChain[i].entityType !== currentChain[i].entityType ||
-				activeChain[i].unique !== currentChain[i].unique
+				activeTrail[i].entityType !== currentTrail[i].entityType ||
+				activeTrail[i].unique !== currentTrail[i].unique
 			) {
 				return;
 			}
@@ -83,11 +155,39 @@ export class UmbTreeItemActiveManager extends UmbControllerBase {
 	}
 
 	/**
-	 * Gets the expansion state
+	 * @param {Array<UmbEntityModel>} activeChain The active entries.
+	 * @deprecated Deprecated since v17. Use `removeActiveTrailIfMatch()` instead. Will be removed in v19.
+	 */
+	removeActiveIfMatch(activeChain: Array<UmbEntityModel>): void {
+		new UmbDeprecation({
+			deprecated: 'UmbTreeItemActiveManager.removeActiveIfMatch()',
+			removeInVersion: '19.0.0',
+			solution: 'Use removeActiveTrailIfMatch() instead.',
+		}).warn();
+
+		this.removeActiveTrailIfMatch(activeChain);
+	}
+
+	/**
+	 * Gets the trail of entities from the tree root down to the entity currently being viewed
 	 * @memberof UmbTreeItemActiveManager
-	 * @returns {Array<UmbEntityModel>} The expansion state
+	 * @returns {Array<UmbEntityModel>} The active trail, root first
+	 */
+	getActiveTrail(): Array<UmbEntityModel> {
+		return this.#active.getValue();
+	}
+
+	/**
+	 * @returns {Array<UmbEntityModel>} The active trail
+	 * @deprecated Deprecated since v17. Use `getActiveTrail()` instead. Will be removed in v19.
 	 */
 	getActive(): Array<UmbEntityModel> {
-		return this.#active.getValue();
+		new UmbDeprecation({
+			deprecated: 'UmbTreeItemActiveManager.getActive()',
+			removeInVersion: '19.0.0',
+			solution: 'Use getActiveTrail() instead.',
+		}).warn();
+
+		return this.getActiveTrail();
 	}
 }

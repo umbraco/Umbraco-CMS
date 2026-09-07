@@ -45,7 +45,7 @@ export class UmbExtensionElementAndApiInitializer<
 	/**
 	 * The api that is created for this extension.
 	 * @readonly
-	 * @type {(class | undefined)}
+	 * @type {(ExtensionApiInterface | undefined)}
 	 */
 	public get api() {
 		return this.#api;
@@ -53,8 +53,8 @@ export class UmbExtensionElementAndApiInitializer<
 
 	/**
 	 * The props that are passed to the component.
-	 * @type {Record<string, any>}
-	 * @memberof UmbElementExtensionController
+	 * @type {Record<string, unknown>}
+	 * @memberof UmbExtensionElementAndApiInitializer
 	 * @example
 	 * ```ts
 	 * const controller = new UmbElementExtensionController(host, extensionRegistry, alias, onPermissionChanged);
@@ -77,8 +77,8 @@ export class UmbExtensionElementAndApiInitializer<
 
 	/**
 	 * The props that are passed to the api.
-	 * @type {Record<string, any>}
-	 * @memberof UmbElementExtensionController
+	 * @type {Record<string, unknown>}
+	 * @memberof UmbExtensionElementAndApiInitializer
 	 * @example
 	 * ```ts
 	 * const controller = new UmbElementExtensionController(host, extensionRegistry, alias, onPermissionChanged);

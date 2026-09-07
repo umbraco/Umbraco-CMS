@@ -29,7 +29,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 ///     A value converter for TinyMCE that will ensure any blocks content are rendered properly even when
 ///     used dynamically.
 /// </summary>
-[DefaultPropertyValueConverter]
+[DefaultPropertyValueConverter(typeof(SimpleRichTextValueConverter))]
 public class RteBlockRenderingValueConverter : SimpleRichTextValueConverter, IDeliveryApiPropertyValueConverter, IDisposable
 {
     private readonly HtmlImageSourceParser _imageSourceParser;
@@ -373,7 +373,7 @@ public class RteBlockRenderingValueConverter : SimpleRichTextValueConverter, IDe
         }
 
         var creator = new RichTextBlockPropertyValueCreator(_blockEditorConverter, _variationContextAccessor, _propertyRenderingContextAccessor, _blockEditorVarianceHandler, _elementCacheService, _jsonSerializer, _constructorCache, _languageService);
-        return creator.CreateBlockModelAsync(owner, referenceCacheLevel, blocks, preview, configuration.Blocks).GetAwaiter().GetResult();
+        return creator.CreateBlockModelAsync(owner, referenceCacheLevel, blocks, preview, BlockPropertyVariance.OwningPropertyCulture(_variationContextAccessor, owner, propertyType), configuration.Blocks).GetAwaiter().GetResult();
     }
 
     private string RenderRichTextBlockModel(string source, RichTextBlockModel? richTextBlockModel)

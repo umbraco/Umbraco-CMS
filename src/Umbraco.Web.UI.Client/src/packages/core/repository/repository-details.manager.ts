@@ -16,7 +16,6 @@ interface UmbRepositoryRequestStatus {
 }
 
 /**
- * @export
  * @class UmbRepositoryDetailsManager
  * @augments {UmbControllerBase}
  * @template DetailType
@@ -128,7 +127,7 @@ export class UmbRepositoryDetailsManager<DetailType extends { unique: string }> 
 
 	/**
 	 * Set the uniques in the manager
-	 * @param {(string[] | undefined)} uniques
+	 * @param {(string[] | undefined)} uniques - The uniques to set.
 	 * @memberof UmbRepositoryDetailsManager
 	 */
 	setUniques(uniques: Array<string> | undefined): void {
@@ -137,7 +136,7 @@ export class UmbRepositoryDetailsManager<DetailType extends { unique: string }> 
 
 	/**
 	 * Add a unique to the manager
-	 * @param {string} unique
+	 * @param {string} unique - The unique to add.
 	 * @memberof UmbRepositoryDetailsManager
 	 */
 	addUnique(unique: string): void {
@@ -146,7 +145,7 @@ export class UmbRepositoryDetailsManager<DetailType extends { unique: string }> 
 
 	/**
 	 * Add an entry to the manager
-	 * @param {DetailType} data
+	 * @param {DetailType} data - The entry to add.
 	 * @memberof UmbRepositoryDetailsManager
 	 */
 	addEntry(data: DetailType): void {
@@ -175,7 +174,7 @@ export class UmbRepositoryDetailsManager<DetailType extends { unique: string }> 
 
 	/**
 	 * Get an entry observable by unique
-	 * @param {string} unique
+	 * @param {string} unique - The unique of the entry.
 	 * @returns {Observable<DetailType | undefined>} - The entry observable.
 	 * @memberof UmbRepositoryDetailsManager
 	 */

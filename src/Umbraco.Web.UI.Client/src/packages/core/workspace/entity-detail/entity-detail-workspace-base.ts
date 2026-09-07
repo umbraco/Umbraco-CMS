@@ -43,7 +43,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	/**
 	 * @description Data manager for the workspace.
 	 * @protected
-	 * @memberof UmbEntityWorkspaceContextBase
+	 * @memberof UmbEntityDetailWorkspaceContextBase
 	 */
 	protected readonly _data = new UmbEntityWorkspaceDataManager<DetailModelType>(this);
 
@@ -259,8 +259,8 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 
 	/**
 	 * Method to check if the workspace data is loaded.
-	 * @returns { Promise<any> | undefined } true if the workspace data is loaded.
-	 * @memberof UmbEntityWorkspaceContextBase
+	 * @returns { Promise<UmbRepositoryResponse<DetailModelType> | UmbRepositoryResponseWithAsObservable<DetailModelType>> | undefined } true if the workspace data is loaded.
+	 * @memberof UmbEntityDetailWorkspaceContextBase
 	 */
 	public isLoaded(): Promise<any> | undefined {
 		return this._getDataPromise;
@@ -273,7 +273,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	 * @param {UmbEntityUnique} args.parent.unique The unique identifier of the parent entity.
 	 * @param {string} args.parent.entityType The entity type of the parent entity.
 	 * @param {Partial<DetailModelType>} args.preset The preset data.
-	 * @returns { Promise<any> | undefined } The data of the scaffold.
+	 * @returns { Promise<DetailModelType | undefined> } The data of the scaffold.
 	 */
 	public async createScaffold(args: CreateArgsType) {
 		this.resetState();
@@ -332,7 +332,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 
 	/**
 	 * Deletes the entity.
-	 * @param unique The unique identifier of the entity to delete.
+	 * @param {string} unique The unique identifier of the entity to delete.
 	 */
 	async delete(unique: string) {
 		await this.#init;
@@ -344,7 +344,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	 * @protected
 	 * @param {string | URL} newUrl The new url that the workspace is navigating to.
 	 * @returns {boolean} true if the workspace is navigating away.
-	 * @memberof UmbEntityWorkspaceContextBase
+	 * @memberof UmbEntityDetailWorkspaceContextBase
 	 */
 	protected _checkWillNavigateAway(newUrl: string | URL): boolean {
 		return umbWorkspaceWillNavigateAway(this.routes, this.getUnique(), newUrl);

@@ -23,7 +23,7 @@ export class UmbContextProvider<
 	/**
 	 * Method to enable comparing the context providers by the instance they provide.
 	 * Note this method should have a unique name for the provider controller, for it not to be confused with a consumer.
-	 * @returns {*}
+	 * @returns {unknown} The provided instance.
 	 */
 	public providerInstance(): unknown {
 		return this.#instance;
@@ -33,7 +33,7 @@ export class UmbContextProvider<
 	 * Creates an instance of UmbContextProvider.
 	 * @param {EventTarget} eventTarget - the host element for this context provider
 	 * @param {string | UmbContextToken} contextIdentifier - a string or token to identify the context
-	 * @param {*} instance - the instance to provide
+	 * @param {ResultType} instance - the instance to provide
 	 * @memberof UmbContextProvider
 	 */
 	constructor(

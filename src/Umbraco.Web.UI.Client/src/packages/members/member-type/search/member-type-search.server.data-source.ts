@@ -4,11 +4,12 @@ import type { UmbSearchDataSource, UmbSearchRequestArgs } from '@umbraco-cms/bac
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { MemberTypeService } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
+import type { UmbDataSourceResponse, UmbPagedModel } from '@umbraco-cms/backoffice/repository';
 
 /**
  * A data source for the Rollback that fetches data from the server
  * @class UmbMemberTypeSearchServerDataSource
- * @implements {RepositoryDetailDataSource}
+ * @implements {UmbSearchDataSource}
  */
 export class UmbMemberTypeSearchServerDataSource implements UmbSearchDataSource<UmbMemberTypeSearchItemModel> {
 	#host: UmbControllerHost;
@@ -24,11 +25,13 @@ export class UmbMemberTypeSearchServerDataSource implements UmbSearchDataSource<
 
 	/**
 	 * Get a list of versions for a data
-	 * @param args
-	 * @returns {*}
+	 * @param {UmbSearchRequestArgs} args - The arguments for the search
+	 * @returns {Promise<UmbDataSourceResponse<UmbPagedModel<UmbMemberTypeSearchItemModel>>>} The search results
 	 * @memberof UmbMemberTypeSearchServerDataSource
 	 */
-	async search(args: UmbSearchRequestArgs) {
+	async search(
+		args: UmbSearchRequestArgs,
+	): Promise<UmbDataSourceResponse<UmbPagedModel<UmbMemberTypeSearchItemModel>>> {
 		const { data, error } = await tryExecute(
 			this.#host,
 			MemberTypeService.getItemMemberTypeSearch({

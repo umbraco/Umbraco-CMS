@@ -1,10 +1,13 @@
-import type { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
 import type {
 	UmbRecycleBinOriginalParentRequestArgs,
 	UmbRecycleBinRestoreRequestArgs,
 	UmbRecycleBinTrashRequestArgs,
 } from './types.js';
-import type { UmbRepositoryErrorResponse, UmbRepositoryResponse } from '@umbraco-cms/backoffice/repository';
+import type {
+	UmbRepositoryBase,
+	UmbRepositoryErrorResponse,
+	UmbRepositoryResponse,
+} from '@umbraco-cms/backoffice/repository';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
 export interface UmbRecycleBinRepository extends UmbRepositoryBase, UmbApi {

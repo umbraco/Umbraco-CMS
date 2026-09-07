@@ -10,7 +10,7 @@ export class UmbUserAllowExternalLoginActionCondition extends UmbConditionBase<n
 		this.observe(
 			umbExtensionsRegistry.byType('authProvider'),
 			(exts) => (this.permitted = exts.length > 0 && exts.some((ext) => ext.meta?.linking?.allowManualLinking)),
-			'_userAllowExternalLoginActionConditionProviders',
+			null,
 		);
 	}
 }

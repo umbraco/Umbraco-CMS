@@ -1,0 +1,14 @@
+{
+  "id": "Umbraco.Cms.Search.Provider.Examine",
+  "name": "@umbraco-cms/search/examine",
+  "version": "18.0.0",
+  "allowTelemetry": true,
+  "extensions": [
+    {
+      "type": "bundle",
+      "alias": "Umbraco.Cms.Search.Provider.Examine.Bundle",
+      "name": "Umbraco Search Examine Bundle",
+      "js": "/App_Plugins/UmbracoSearchExamine/examine-bundle.js?v=%CACHE_BUSTER%"
+    }
+  ]
+}

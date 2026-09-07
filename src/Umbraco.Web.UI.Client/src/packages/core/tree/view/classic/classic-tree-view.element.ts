@@ -65,11 +65,7 @@ export class UmbClassicTreeViewElement extends UmbTreeViewElementBase {
 			'_observeHideTreeItemActions',
 		);
 		this.observe(this._treeContext?.isMenu, (value) => (this._isMenu = value ?? false), '_observeIsMenu');
-		this.observe(
-			this._treeContext?.startNode,
-			(value) => (this._startNode = value),
-			'_observeStartNode',
-		);
+		this.observe(this._treeContext?.startNode, (value) => (this._startNode = value), '_observeStartNode');
 	}
 
 	#onLoadPrev(event: Event) {
@@ -91,11 +87,7 @@ export class UmbClassicTreeViewElement extends UmbTreeViewElementBase {
 		if ((this._hideTreeRoot || this._startNode) && this._rootItems.length === 0) {
 			return nothing;
 		}
-		return html`
-			<uui-box>
-				${this.#renderTreeRoot()} ${this.#renderRootItems()}
-			</uui-box>
-		`;
+		return html` <uui-box> ${this.#renderTreeRoot()} ${this.#renderRootItems()} </uui-box> `;
 	}
 
 	#renderTreeRoot() {
@@ -119,7 +111,7 @@ export class UmbClassicTreeViewElement extends UmbTreeViewElementBase {
 			${this.#renderLoadPrevButton()}
 			${repeat(
 				this._rootItems,
-				(item, index) => item.name + '___' + index,
+				(item) => `${item.entityType}:${item.unique}`,
 				(item) => html`
 					<umb-tree-item
 						.entityType=${item.entityType}

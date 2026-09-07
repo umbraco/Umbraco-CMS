@@ -15,11 +15,6 @@ public class CreateTemplateControllerTests : ManagementApiUserGroupTestBase<Crea
         ExpectedStatusCode = HttpStatusCode.Created
     };
 
-    protected override UserGroupAssertionModel EditorUserGroupAssertionModel => new()
-    {
-        ExpectedStatusCode = HttpStatusCode.Created
-    };
-
     protected override UserGroupAssertionModel SensitiveDataUserGroupAssertionModel => new()
     {
         ExpectedStatusCode = HttpStatusCode.Forbidden
@@ -28,11 +23,6 @@ public class CreateTemplateControllerTests : ManagementApiUserGroupTestBase<Crea
     protected override UserGroupAssertionModel TranslatorUserGroupAssertionModel => new()
     {
         ExpectedStatusCode = HttpStatusCode.Forbidden
-    };
-
-    protected override UserGroupAssertionModel WriterUserGroupAssertionModel => new()
-    {
-        ExpectedStatusCode = HttpStatusCode.Created
     };
 
     protected override UserGroupAssertionModel UnauthorizedUserGroupAssertionModel => new()

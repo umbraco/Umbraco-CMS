@@ -64,7 +64,7 @@ export class UmbSortChildrenOfModalElement<
 				this._currentPage = currentPage;
 				this._totalPages = totalPages;
 			},
-			'umbPaginationObserver',
+			null,
 		);
 	}
 
@@ -269,11 +269,7 @@ export class UmbSortChildrenOfModalElement<
 
 			${this._hasMorePages()
 				? html`
-						<uui-button
-							id="loadMoreButton"
-							look="placeholder"
-							?disabled=${this._loading}
-							@click=${this._onLoadMore}>
+						<uui-button id="loadMoreButton" look="placeholder" ?disabled=${this._loading} @click=${this._onLoadMore}>
 							<umb-localize key="actions_loadMore">Load more</umb-localize> (${this._currentPage}/${this._totalPages})
 						</uui-button>
 					`

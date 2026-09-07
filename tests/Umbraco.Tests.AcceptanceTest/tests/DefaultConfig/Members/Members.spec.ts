@@ -72,8 +72,7 @@ test('can edit username', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.member.clickSaveButtonAndWaitForMemberToBeUpdated();
 
   // Assert
-  const memberData = await umbracoApi.member.get(memberId);
-  expect(memberData.username).toBe(updatedUsername);
+  await expect.poll(async () => (await umbracoApi.member.get(memberId)).username).toBe(updatedUsername);
 });
 
 test('can edit email', async ({umbracoApi, umbracoUi}) => {

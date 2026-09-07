@@ -92,7 +92,7 @@ public class ConvertersTests
         var variationContextAccessor = new TestVariationContextAccessor { VariationContext = new() };
         var propertyRenderingContextAccessor = new TestPropertyRenderingContextAccessor { PropertyRenderingContext = new(default) };
 
-        var contentNode = CreateContentNode("Element 1", 1234, elementType1, new Dictionary<string, object> { { "prop1", "val1" } });
+        var contentNode = CreateContentNode("Element 1", 1234, elementType1, new Dictionary<string, object> { { "prop1", "val1" } }, owningContentId: 5678);
         var element1 = new PublishedElement(contentNode, false, elementsCache, variationContextAccessor, propertyRenderingContextAccessor);
 
         contentNode = CreateContentNode("Element 2", 2345, elementType2, new Dictionary<string, object> { { "prop2", "1003" } });
@@ -134,6 +134,9 @@ public class ConvertersTests
         Assert.IsInstanceOf<PublishedSnapshotTestObjects.TestElementModel1>(model1);
         Assert.AreEqual("val1", ((PublishedSnapshotTestObjects.TestElementModel1)model1).Prop1);
 
+        // the model forwards OwningContentId to the wrapped element instead of falling back to the interface default
+        Assert.AreEqual(5678, ((PublishedSnapshotTestObjects.TestElementModel1)model1).OwningContentId);
+
         // can create a model for a published content
         var model2 = factory.CreateModel(element2);
         Assert.IsInstanceOf<PublishedSnapshotTestObjects.TestElementModel2>(model2);
@@ -155,7 +158,7 @@ public class ConvertersTests
         Assert.AreSame(cacheContent[mmodel1.Id], mmodel1);
     }
 
-    private ContentNode CreateContentNode(string name, int id, IPublishedContentType contentType, Dictionary<string, object> properties)
+    private ContentNode CreateContentNode(string name, int id, IPublishedContentType contentType, Dictionary<string, object> properties, int? owningContentId = null)
     {
         var contentData = new ContentData(
             name: name,
@@ -170,7 +173,7 @@ public class ConvertersTests
                     p => p.Key,
                     p => new PropertyData[] { new() { Value = p.Value, Culture = string.Empty, Segment = string.Empty } }),
             cultureInfos: null);
-        return new ContentNode(id, Guid.NewGuid(), 1, DateTime.Today, -1, contentType, contentData, contentData);
+        return new ContentNode(id, Guid.NewGuid(), 1, DateTime.Today, -1, contentType, contentData, contentData, owningContentId);
     }
 
     public class SimpleConverter3A : PropertyValueConverterBase

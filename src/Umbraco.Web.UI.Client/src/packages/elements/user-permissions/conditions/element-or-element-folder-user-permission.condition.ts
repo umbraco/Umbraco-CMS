@@ -1,8 +1,8 @@
+import { UmbElementFolderUserPermissionCondition } from '../../folder/user-permissions/conditions/element-folder-user-permission.condition.js';
+import { UMB_ELEMENT_FOLDER_USER_PERMISSION_CONDITION_ALIAS } from '../../folder/user-permissions/conditions/constants.js';
 import type { UmbElementOrElementFolderUserPermissionConditionConfig } from './types.js';
 import { UMB_ELEMENT_USER_PERMISSION_CONDITION_ALIAS } from './constants.js';
 import { UmbElementUserPermissionCondition } from './element-user-permission.condition.js';
-import { UmbElementFolderUserPermissionCondition } from '../../folder/user-permissions/conditions/element-folder-user-permission.condition.js';
-import { UMB_ELEMENT_FOLDER_USER_PERMISSION_CONDITION_ALIAS } from '../../folder/user-permissions/conditions/constants.js';
 import { UmbConditionBase } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbConditionControllerArguments, UmbExtensionCondition } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';

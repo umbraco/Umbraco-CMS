@@ -188,7 +188,7 @@ Development-specific overrides:
 | Setting | Value | Description |
 |---------|-------|-------------|
 | `Hosting.Debug` | `true` | Debug mode enabled |
-| `LuceneDirectoryFactory` | `TempFileSystemDirectoryFactory` | Examine indexes in temp |
+| `Search.Examine.LuceneDirectoryFactory` | `TempFileSystemDirectoryFactory` | Examine indexes in temp |
 | Console logging | `Async` sink | Serilog console output |
 | Examine log levels | `Debug` | Detailed Examine logging |
 

@@ -27,7 +27,7 @@ export class UmbObserver<T> {
 	/**
 	 * provides a promise which is resolved ones the observer got a value that is not undefined.
 	 * Notice this promise will resolve immediately if the Observable holds an empty array or empty string.
-	 *
+	 * @returns {Promise} - a promise resolving with the first non-undefined value.
 	 */
 	public asPromise() {
 		// Notice, we do not want to store and reuse the Promise, cause this promise guarantees that the value is not undefined when resolved. and reusing the promise would not ensure that.

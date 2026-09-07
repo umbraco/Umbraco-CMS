@@ -3,7 +3,7 @@ import type { UmbDetailStore } from './detail-store.interface.js';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
-import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import type { UmbContextMinimal, UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 /**
  * @class UmbDetailStoreBase
@@ -18,18 +18,18 @@ export abstract class UmbDetailStoreBase<T extends UmbEntityModel>
 	/**
 	 * Creates an instance of UmbDetailStoreBase.
 	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
-	 * @param storeAlias - The alias of the store
+	 * @param {UmbContextToken<UmbContextMinimal> | string} storeAlias - The alias of the store
 	 * @memberof UmbDetailStoreBase
 	 */
 	constructor(host: UmbControllerHost, storeAlias: UmbContextToken<any> | string) {
-		super(host, storeAlias, new UmbArrayState<T>([], (x) => x.unique));
+		const alias: UmbContextToken<UmbContextMinimal> | string = storeAlias;
+		super(host, alias, new UmbArrayState<T>([], (x) => x.unique));
 	}
 
 	/**
 	 * Retrieve a detail model from the store
-	 * @param {unique} string unique identifier
-	 * @param unique
-	 * @returns {Observable<T>}
+	 * @param {string} unique - Unique identifier
+	 * @returns {Observable<T>} An observable of the detail model
 	 * @memberof UmbDetailStoreBase
 	 */
 	byUnique(unique: string) {
@@ -39,7 +39,7 @@ export abstract class UmbDetailStoreBase<T extends UmbEntityModel>
 	/**
 	 * Retrieve multiple detail models from the store
 	 * @param {Array<string>} uniques - Array of unique identifiers
-	 * @returns {Observable<Array<T>>}
+	 * @returns {Observable<Array<T>>} An observable of the detail models
 	 * @memberof UmbDetailStoreBase
 	 */
 	byUniques(uniques: Array<string>) {

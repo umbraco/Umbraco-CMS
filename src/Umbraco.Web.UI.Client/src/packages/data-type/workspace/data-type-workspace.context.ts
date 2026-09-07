@@ -357,8 +357,8 @@ export class UmbDataTypeWorkspaceContext
 
 	/**
 	 * @function propertyValueByAlias
-	 * @param {string} propertyAlias
-	 * @returns {Promise<Observable<ReturnType | undefined> | undefined>}
+	 * @param {string} propertyAlias - The alias of the property to get the value of.
+	 * @returns {Promise<Observable<ReturnType | undefined> | undefined>} An Observable of the property value.
 	 * @description Get an Observable for the value of this property.
 	 */
 	async propertyValueByAlias<ReturnType = unknown>(propertyAlias: string) {

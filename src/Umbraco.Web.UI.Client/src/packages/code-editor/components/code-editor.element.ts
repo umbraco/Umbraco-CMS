@@ -6,6 +6,7 @@ import {
 	type CodeEditorLanguage,
 	type CodeEditorSearchOptions,
 	type UmbCodeEditorHost,
+	type UmbCodeEditorRange,
 } from '../models/index.js';
 import { UMB_THEME_CONTEXT } from '@umbraco-cms/backoffice/themes';
 import type { PropertyValues, Ref } from '@umbraco-cms/backoffice/external/lit';
@@ -238,7 +239,7 @@ export class UmbCodeEditorElement extends UmbLitElement implements UmbCodeEditor
 
 	/**
 	 * Inserts text at the current cursor position.
-	 * @param {string} text
+	 * @param {string} text The text to insert.
 	 * @memberof UmbCodeEditorElement
 	 */
 	insert(text: string) {
@@ -247,12 +248,15 @@ export class UmbCodeEditorElement extends UmbLitElement implements UmbCodeEditor
 
 	/**
 	 * Finds all occurrence of the given string or matches the given regular expression.
-	 * @param {string} text
-	 * @param searchOptions
-	 * @returns {*}
+	 * @param {string} text The string or pattern to search for.
+	 * @param {CodeEditorSearchOptions} searchOptions The options to use when searching.
+	 * @returns {(UmbCodeEditorRange[] | undefined)} The ranges of the found matches.
 	 * @memberof UmbCodeEditorElement
 	 */
-	find(text: string, searchOptions: CodeEditorSearchOptions = <CodeEditorSearchOptions>{}) {
+	find(
+		text: string,
+		searchOptions: CodeEditorSearchOptions = <CodeEditorSearchOptions>{},
+	): UmbCodeEditorRange[] | undefined {
 		return this.#editor?.find(text, searchOptions);
 	}
 

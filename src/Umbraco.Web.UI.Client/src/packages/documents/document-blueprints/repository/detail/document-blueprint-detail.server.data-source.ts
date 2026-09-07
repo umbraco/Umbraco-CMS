@@ -1,7 +1,11 @@
 import type { UmbDocumentBlueprintDetailModel } from '../../types.js';
 import { UMB_DOCUMENT_BLUEPRINT_ENTITY_TYPE, UMB_DOCUMENT_BLUEPRINT_PROPERTY_VALUE_ENTITY_TYPE } from '../../entity.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import type { UmbDataSourceResponse, UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
+import type {
+	UmbDataSourceErrorResponse,
+	UmbDataSourceResponse,
+	UmbDetailDataSource,
+} from '@umbraco-cms/backoffice/repository';
 import type {
 	CreateDocumentBlueprintRequestModel,
 	DocumentBlueprintResponseModel,
@@ -30,8 +34,8 @@ export class UmbDocumentBlueprintServerDataSource implements UmbDetailDataSource
 
 	/**
 	 * Creates a new Document scaffold
-	 * @param preset
-	 * @returns { UmbDocumentBlueprintDetailModel }
+	 * @param {Partial<UmbDocumentBlueprintDetailModel>} preset - The preset data to populate the scaffold with.
+	 * @returns { UmbDocumentBlueprintDetailModel } The document blueprint scaffold.
 	 * @memberof UmbDocumentBlueprintServerDataSource
 	 */
 	async createScaffold(preset: Partial<UmbDocumentBlueprintDetailModel> = {}) {
@@ -72,8 +76,8 @@ export class UmbDocumentBlueprintServerDataSource implements UmbDetailDataSource
 
 	/**
 	 * Fetches a Document with the given id from the server
-	 * @param {string} unique
-	 * @returns {*}
+	 * @param {string} unique - The unique identifier of the document blueprint to fetch.
+	 * @returns {Promise<UmbDataSourceResponse<UmbDocumentBlueprintDetailModel>>} The document blueprint.
 	 * @memberof UmbDocumentBlueprintServerDataSource
 	 */
 	async read(unique: string): Promise<UmbDataSourceResponse<UmbDocumentBlueprintDetailModel>> {
@@ -112,9 +116,9 @@ export class UmbDocumentBlueprintServerDataSource implements UmbDetailDataSource
 
 	/**
 	 * Inserts a new Document on the server
-	 * @param {UmbDocumentBlueprintDetailModel} model
-	 * @param parentUnique
-	 * @returns {*}
+	 * @param {UmbDocumentBlueprintDetailModel} model - The document blueprint to create.
+	 * @param {string | null} parentUnique - The unique identifier of the parent, if any.
+	 * @returns {Promise<UmbDataSourceResponse<UmbDocumentBlueprintDetailModel>>} The created document blueprint.
 	 * @memberof UmbDocumentBlueprintServerDataSource
 	 */
 	async create(model: UmbDocumentBlueprintDetailModel, parentUnique: string | null = null) {
@@ -146,9 +150,8 @@ export class UmbDocumentBlueprintServerDataSource implements UmbDetailDataSource
 
 	/**
 	 * Updates a Document on the server
-	 * @param {UmbDocumentBlueprintDetailModel} Document
-	 * @param model
-	 * @returns {*}
+	 * @param {UmbDocumentBlueprintDetailModel} model - The document blueprint to update.
+	 * @returns {Promise<UmbDataSourceResponse<UmbDocumentBlueprintDetailModel>>} The updated document blueprint.
 	 * @memberof UmbDocumentBlueprintServerDataSource
 	 */
 	async update(model: UmbDocumentBlueprintDetailModel) {
@@ -177,11 +180,11 @@ export class UmbDocumentBlueprintServerDataSource implements UmbDetailDataSource
 
 	/**
 	 * Deletes a Document on the server
-	 * @param {string} unique
-	 * @returns {*}
+	 * @param {string} unique - The unique identifier of the document blueprint to delete.
+	 * @returns {Promise<UmbDataSourceErrorResponse>} The result of the delete operation.
 	 * @memberof UmbDocumentBlueprintServerDataSource
 	 */
-	async delete(unique: string) {
+	async delete(unique: string): Promise<UmbDataSourceErrorResponse> {
 		if (!unique) throw new Error('Unique is missing');
 
 		return tryExecute(this.#host, DocumentBlueprintService.deleteDocumentBlueprintById({ path: { id: unique } }));

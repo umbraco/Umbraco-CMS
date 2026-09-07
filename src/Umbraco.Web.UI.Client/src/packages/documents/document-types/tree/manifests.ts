@@ -1,6 +1,5 @@
 import { UMB_DOCUMENT_TYPE_ENTITY_TYPE, UMB_DOCUMENT_TYPE_ROOT_ENTITY_TYPE } from '../entity.js';
 import { UMB_DOCUMENT_TYPE_ROOT_WORKSPACE_ALIAS } from '../constants.js';
-import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 import {
 	UMB_DOCUMENT_TYPE_TREE_ALIAS,
 	UMB_DOCUMENT_TYPE_TREE_REPOSITORY_ALIAS,
@@ -10,6 +9,7 @@ import {
 import { manifests as folderManifests } from './folder/manifests.js';
 import { manifests as treeItemChildrenManifests } from './tree-item-children/manifests.js';
 import { manifests as viewManifests } from './views/manifests.js';
+import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
 import { UMB_TREE_ALIAS_CONDITION } from '@umbraco-cms/backoffice/tree';
 

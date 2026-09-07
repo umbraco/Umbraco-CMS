@@ -6,8 +6,9 @@ import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
 import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 
 /**
- *
- * @param value
+ * Parses a string to a number, returning undefined if it is not a valid number.
+ * @param {string} value The value to parse.
+ * @returns {number | undefined} The parsed number, or undefined if invalid.
  */
 function getNumberOrUndefined(value: string) {
 	const num = parseInt(value, 10);

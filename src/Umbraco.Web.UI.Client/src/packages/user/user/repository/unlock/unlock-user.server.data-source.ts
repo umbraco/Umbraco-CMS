@@ -21,7 +21,7 @@ export class UmbUnlockUserServerDataSource implements UmbUnlockUserDataSource {
 
 	/**
 	 * Unlock users
-	 * @param {string[]} userIds
+	 * @param {string[]} userIds - The ids of the users to unlock
 	 * @returns {Promise<void>}
 	 * @memberof UmbUnlockUserServerDataSource
 	 */

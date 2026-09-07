@@ -18,7 +18,7 @@ export class UmbDocumentConfigurationServerDataSource extends UmbControllerBase 
 				disableDeleteWhenReferenced: data.disableDeleteWhenReferenced,
 				disableUnpublishWhenReferenced: data.disableUnpublishWhenReferenced,
 				allowEditInvariantFromNonDefault: data.allowEditInvariantFromNonDefault,
-				// eslint-disable-next-line @typescript-eslint/no-deprecated
+
 				allowNonExistingSegmentsCreation: data.allowNonExistingSegmentsCreation,
 			};
 

@@ -1,9 +1,9 @@
 /**
  * Computes the Levenshtein distance between two strings using the
  * Wagner-Fischer algorithm with single-row space optimization.
- * @param a - First string
- * @param b - Second string
- * @returns The edit distance between the two strings
+ * @param {string} a - First string
+ * @param {string} b - Second string
+ * @returns {number} The edit distance between the two strings
  */
 export function levenshteinDistance(a: string, b: string): number {
 	if (a === b) return 0;
@@ -43,9 +43,9 @@ export function levenshteinDistance(a: string, b: string): number {
 /**
  * Computes a normalized similarity score between 0 and 1.
  * 1 means identical, 0 means completely different.
- * @param a - First string
- * @param b - Second string
- * @returns Similarity score between 0 and 1
+ * @param {string} a - First string
+ * @param {string} b - Second string
+ * @returns {number} Similarity score between 0 and 1
  */
 export function levenshteinSimilarity(a: string, b: string): number {
 	const maxLen = Math.max(a.length, b.length);

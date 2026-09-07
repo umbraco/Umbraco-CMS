@@ -226,8 +226,8 @@ export default {
 		sendtopublishvariant: 'Content sent for publishing for languages: %0%',
 		sort: 'Sort child items performed by user',
 		custom: '%0%',
-		contentversionpreventcleanup: 'Clean up disabled for version: %0%',
-		contentversionenablecleanup: 'Clean up enabled for version: %0%',
+		contentversionpreventcleanup: 'Cleanup disabled for version: %0%',
+		contentversionenablecleanup: 'Cleanup enabled for version: %0%',
 		smallAssignDomain: 'Assign Hostname',
 		smallCopy: 'Copy',
 		smallPublish: 'Publish',
@@ -357,6 +357,7 @@ export default {
 		isSensitiveValue:
 			'This value is hidden. If you need access to view this value please contact your website administrator.',
 		isSensitiveValue_short: 'This value is hidden.',
+		isSensitiveValueNotice: 'If you need access to view the hidden values, contact your website administrator.',
 		languagesToPublish: 'What languages would you like to publish?',
 		languagesToSendForApproval: 'What languages would you like to send for approval?',
 		languagesToSchedule: 'What languages would you like to schedule?',
@@ -423,6 +424,8 @@ export default {
 	},
 	media: {
 		clickToUpload: 'Click to upload',
+		browseFilesAction: 'Browse files',
+		dropFilesOr: 'Drag and drop media here<br />or',
 		orClickHereToUpload: 'or click here to choose files',
 		disallowedFileType: 'Cannot upload this file, it does not have an approved file type',
 		disallowedFileExtension: (extension: string) =>
@@ -720,38 +723,6 @@ export default {
 		changeKeyError: "The key '%0%' already exists.",
 		overviewTitle: 'Dictionary overview',
 	},
-	examineManagement: {
-		configuredSearchers: 'Configured Searchers',
-		configuredSearchersDescription:
-			'Shows properties and tools for any configured Searcher (e.g. such as a multi-index searcher)',
-		fieldValues: 'Field values',
-		healthStatus: 'Health status',
-		healthStatusDescription: 'The health status of the index and if it can be read',
-		indexers: 'Indexers',
-		indexInfo: 'Index info',
-		contentInIndex: 'Content in index',
-		indexInfoDescription: 'Lists the properties of the index',
-		manageIndexes: 'Manage Examine indexes',
-		manageIndexesDescription:
-			'Allows you to view the details of each index and provides some tools for managing the indexes',
-		rebuildIndex: 'Rebuild index',
-		rebuildIndexWarning:
-			'This will cause the index to be rebuilt.<br /> Depending on how much content there is in your site this could take a while.<br /> It is not recommended to rebuild an index during times of high website traffic or when editors are editing content.',
-		searchers: 'Searchers',
-		searchDescription: 'Search the index and view the results',
-		tools: 'Tools',
-		toolsDescription: 'Tools to manage the index',
-		fields: 'fields',
-		indexCannotRead: 'The index cannot be read and will need to be rebuilt',
-		processIsTakingLonger:
-			'The process is taking longer than expected, check the Umbraco log to see if there have been any errors during this operation',
-		indexCannotRebuild: 'This index cannot be rebuilt because it has no assigned',
-		iIndexPopulator: 'IIndexPopulator',
-		noResults: 'No results were found',
-		searchResultsFound: 'Showing %0% - %1% of %2% result(s) - Page %3% of %4%',
-		corruptStatus: 'Possible corrupt index detected',
-		corruptErrorDescription: 'Error received when evaluating the index:',
-	},
 	placeholders: {
 		username: 'Enter your username',
 		password: 'Enter your password',
@@ -965,6 +936,8 @@ export default {
 		nodeName: 'Node Name',
 		none: 'None',
 		notFound: 'Not found',
+		noResults: 'No results',
+		noResultsFor: (query: string) => `No result for "${query}".`,
 		of: 'of',
 		off: 'Off',
 		ok: 'OK',
@@ -1992,14 +1965,14 @@ export default {
 		removeChildNodeWarning:
 			'Removing a child node will limit the editors options to create different content types beneath a node.',
 		usingEditor: 'using this editor will get updated with the new settings.',
-		historyCleanupHeading: 'History clean up',
-		historyCleanupDescription: 'Allow overriding the global history clean up settings.',
+		historyCleanupHeading: 'History cleanup',
+		historyCleanupDescription: 'Allow overriding the global history cleanup settings.',
 		historyCleanupKeepAllVersionsNewerThanDays: 'Keep all versions newer than days',
 		historyCleanupKeepLatestVersionPerDayForDays: 'Keep latest version per day for days',
-		historyCleanupPreventCleanup: 'Prevent clean up',
-		historyCleanupEnableCleanup: 'Enable clean up',
+		historyCleanupPreventCleanup: 'Prevent cleanup',
+		historyCleanupEnableCleanup: 'Enable cleanup',
 		historyCleanupGloballyDisabled:
-			'<strong>NOTE!</strong> The clean up of historically content versions are disabled globally. These settings will not take effect before it is enabled.',
+			'<strong>NOTE!</strong> The clean up of historical content versions is disabled globally. These settings will not take effect before it is enabled.',
 		changeDataTypeHelpText:
 			'Changing a data type with stored values is disabled. To allow this you can change the Umbraco:CMS:DataTypes:CanBeChanged setting in appsettings.json.',
 		collection: 'Collection',
@@ -2177,6 +2150,11 @@ export default {
 		tableViewLabel: 'Table',
 		children: 'Children',
 		noItems: 'No items',
+	},
+	picker: {
+		browseTab: 'Browse',
+		searchTab: 'Search',
+		selectedCount: (count: number) => `${count} ${count === 1 ? 'item' : 'items'} selected`,
 	},
 	update: {
 		updateAvailable: 'New update ready',
@@ -2566,11 +2544,14 @@ export default {
 		autocompleteLabel: 'Autocomplete',
 	},
 	recycleBin: {
+		restoreItemTo: (from: string, to: string) => `Restore <strong>${from}</strong> to <strong>${to}</strong>`,
 		contentTrashed: 'Trashed content with Id: {0} related to original parent content with Id: {1}',
 		mediaTrashed: 'Trashed media with Id: {0} related to original parent media item with Id: {1}',
 		itemCannotBeRestored: 'Cannot automatically restore this item',
 		itemCannotBeRestoredHelpText:
-			'There is no location where this item can be automatically restored. You can move the item manually using the tree below.',
+			'There is no location where this item can be automatically restored. You can select a new location below.',
+		restoreToTitle: 'Restore to',
+		selectRestoreLocation: 'Select location',
 		wasRestored: 'was restored under',
 	},
 	relationType: {
@@ -2598,7 +2579,6 @@ export default {
 		libraryWelcome: 'Welcome',
 		mediaFolderBrowser: 'Content',
 		settingsWelcome: 'Welcome',
-		settingsExamine: 'Examine Management',
 		settingsPublishedStatus: 'Published Status',
 		settingsModelsBuilder: 'Models Builder',
 		settingsHealthCheck: 'Health Check',

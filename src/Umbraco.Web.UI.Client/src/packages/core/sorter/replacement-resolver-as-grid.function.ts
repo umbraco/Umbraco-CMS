@@ -2,8 +2,8 @@ import type { UmbSorterResolvePlacementArgs } from './sorter.controller.js';
 
 /**
  * This function is used to resolve the placement of an item in a simple grid layout.
- * @param args
- * @returns { null | true }
+ * @param {UmbSorterResolvePlacementArgs<unknown>} args - The placement arguments to resolve
+ * @returns { null | true } The resolved placement, or false if not applicable
  */
 export function UmbSorterResolvePlacementAsGrid(args: UmbSorterResolvePlacementArgs<unknown>) {
 	// If we are part of the same Sorter model

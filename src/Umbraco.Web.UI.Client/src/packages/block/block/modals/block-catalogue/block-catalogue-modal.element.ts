@@ -93,19 +93,31 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 			this._manager = manager;
 		});
 
-		this.observe(this.#itemManager.items, async (items) => {
-			this.#observeBlockTypes(items);
-		});
+		this.observe(
+			this.#itemManager.items,
+			async (items) => {
+				this.#observeBlockTypes(items);
+			},
+			null,
+		);
 
 		this.#pickerContext.search.updateConfig({ providerAlias: 'Umb.SearchProvider.Element' });
 		this.#pickerContext.selection.setMultiple(false);
-		this.observe(this.#pickerContext.search.query, (query) => {
-			this._searchQuery = query?.query ?? '';
-		});
-		this.observe(this.#pickerContext.selection.selection, (selection) => {
-			const elementKey = selection[0];
-			this.value = elementKey ? { library: { elementKey } } : undefined;
-		});
+		this.observe(
+			this.#pickerContext.search.query,
+			(query) => {
+				this._searchQuery = query?.query ?? '';
+			},
+			null,
+		);
+		this.observe(
+			this.#pickerContext.selection.selection,
+			(selection) => {
+				const elementKey = selection[0];
+				this.value = elementKey ? { library: { elementKey } } : undefined;
+			},
+			null,
+		);
 	}
 
 	override connectedCallback() {

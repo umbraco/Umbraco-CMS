@@ -1,3 +1,4 @@
+import type { UmbDocumentVariantOptionModel } from '../types.js';
 import { UmbDocumentWorkspaceSplitViewElement } from './document-workspace-split-view.element.js';
 import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from './context/document-workspace.context-token.js';
 import { customElement, state, css, html } from '@umbraco-cms/backoffice/external/lit';
@@ -6,7 +7,6 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbRoute, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
 import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
 import { createObservablePart } from '@umbraco-cms/backoffice/observable-api';
-import type { UmbDocumentVariantOptionModel } from '../types.js';
 import {
 	UmbWorkspaceStaleVariantRedirectController,
 	UMB_WORKSPACE_PATH_VARIANT_DELIMITER,

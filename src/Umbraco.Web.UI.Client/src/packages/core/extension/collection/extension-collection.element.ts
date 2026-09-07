@@ -19,11 +19,15 @@ export class UmbExtensionCollectionElement extends UmbCollectionDefaultElement {
 			this.#collectionContext = collectionContext;
 		});
 
-		this.observe(umbExtensionsRegistry.extensions, (extensions) => {
-			const types = [...new Set(extensions.map((x) => x.type))];
-			const options = types.sort().map((x) => ({ name: fromCamelCase(x), value: x }));
-			this.#options = [{ name: 'All', value: '' }, ...options];
-		});
+		this.observe(
+			umbExtensionsRegistry.extensions,
+			(extensions) => {
+				const types = [...new Set(extensions.map((x) => x.type))];
+				const options = types.sort().map((x) => ({ name: fromCamelCase(x), value: x }));
+				this.#options = [{ name: 'All', value: '' }, ...options];
+			},
+			null,
+		);
 	}
 
 	#onChange(event: UUISelectEvent) {

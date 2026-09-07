@@ -4,8 +4,9 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
  * Check if the current user is the user with the given unique id
- * @param host
- * @param userUnique
+ * @param {UmbControllerHost} host - The controller host.
+ * @param {string} userUnique - The unique id of the user to check.
+ * @returns {Promise<boolean>} Whether the given user is the current user.
  */
 export const isCurrentUser = async (host: UmbControllerHost, userUnique: string) => {
 	const ctrl = new UmbContextConsumerController(host, UMB_CURRENT_USER_CONTEXT);

@@ -1,10 +1,10 @@
 import { MemberTypeService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
+import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
 
 /**
  * Export Member Server Data Source
- * @export
  * @class UmbExportMemberTypeServerDataSource
  */
 export class UmbExportMemberTypeServerDataSource {
@@ -12,7 +12,7 @@ export class UmbExportMemberTypeServerDataSource {
 
 	/**
 	 * Creates an instance of UmbExportMemberTypeServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbExportMemberTypeServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
@@ -21,11 +21,11 @@ export class UmbExportMemberTypeServerDataSource {
 
 	/**
 	 * Export an item for the given id to the destination unique
-	 * @param {unique} unique
-	 * @returns {*}
+	 * @param {unique} unique - The unique identifier of the Member Type to export
+	 * @returns {UmbDataSourceResponse<Blob | File>} The exported Member Type file, or an error
 	 * @memberof UmbExportMemberTypeServerDataSource
 	 */
-	async export(unique: string) {
+	async export(unique: string): Promise<UmbDataSourceResponse<Blob | File>> {
 		if (!unique) throw new Error('Unique is missing');
 
 		return tryExecute(this.#host, MemberTypeService.getMemberTypeByIdExport({ path: { id: unique } }));

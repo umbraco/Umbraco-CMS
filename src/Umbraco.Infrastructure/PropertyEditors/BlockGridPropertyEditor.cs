@@ -22,12 +22,10 @@ public class BlockGridPropertyEditor : BlockGridPropertyEditorBase
     /// </summary>
     /// <param name="dataValueEditorFactory">Factory used to create data value editors for property editing.</param>
     /// <param name="ioHelper">Helper for IO operations, such as file and path handling.</param>
-    /// <param name="blockValuePropertyIndexValueFactory">Factory for creating index values for block value properties.</param>
     public BlockGridPropertyEditor(
         IDataValueEditorFactory dataValueEditorFactory,
-        IIOHelper ioHelper,
-        IBlockGridPropertyIndexValueFactory blockValuePropertyIndexValueFactory)
-        : base(dataValueEditorFactory, blockValuePropertyIndexValueFactory)
+        IIOHelper ioHelper)
+        : base(dataValueEditorFactory)
         => _ioHelper = ioHelper;
 
     /// <summary>

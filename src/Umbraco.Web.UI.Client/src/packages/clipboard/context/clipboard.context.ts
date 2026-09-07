@@ -5,7 +5,6 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
  * Clipboard context for managing clipboard entries
- * @export
  * @class UmbClipboardContext
  * @augments {UmbContextBase}
  */

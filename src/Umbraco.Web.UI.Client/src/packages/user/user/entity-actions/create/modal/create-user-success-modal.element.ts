@@ -96,9 +96,10 @@ export class UmbCreateUserSuccessModalElement extends UmbModalBaseElement<
 	};
 
 	override render() {
-		return html`<uui-dialog-layout
-			headline="${this._userItem?.name} ${this.localize.term('user_userCreated')}">
-			<p>${this.localize.term(this.#isDefaultUser ? 'user_userCreatedSuccessHelp' : 'user_userCreatedApiSuccessHelp')}</p>
+		return html`<uui-dialog-layout headline="${this._userItem?.name} ${this.localize.term('user_userCreated')}">
+			<p>
+				${this.localize.term(this.#isDefaultUser ? 'user_userCreatedSuccessHelp' : 'user_userCreatedApiSuccessHelp')}
+			</p>
 			${this.#isDefaultUser
 				? html`<uui-form-layout-item>
 						<uui-label slot="label" for="password">${this.localize.term('general_password')}</uui-label>

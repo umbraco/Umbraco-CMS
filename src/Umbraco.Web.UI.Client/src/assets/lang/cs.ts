@@ -316,6 +316,8 @@ export default {
 	},
 	media: {
 		clickToUpload: 'Klikněte pro nahrání',
+		browseFilesAction: 'Procházet soubory',
+		dropFilesOr: 'Přetáhněte média sem<br />nebo',
 		orClickHereToUpload: 'nebo kliknutím sem vyberte soubory',
 		disallowedFileType: 'Tento soubor nelze nahrát, nemá povolený typ souboru',
 		maxFileSize: 'Maximální velikost souboru je',
@@ -505,33 +507,6 @@ export default {
 		changeKeyError: "Klíč '%0%' již existuje.",
 		overviewTitle: 'Přehled slovníku',
 	},
-	examineManagement: {
-		configuredSearchers: 'Konfigurovaní vyhledávače',
-		configuredSearchersDescription:
-			'Zobrazuje vlastnosti a nástroje pro libovolný konfigurovaný vyhledávač (např. pro víceindexový vyhledávač)',
-		fieldValues: 'Hodnoty pole',
-		healthStatus: 'Stav',
-		healthStatusDescription: 'Stav indexu a jeho čitelnost',
-		indexers: 'Indexery',
-		indexInfo: 'Informace o indexu',
-		indexInfoDescription: 'Uvádí vlastnosti indexu',
-		manageIndexes: 'Spravovat indexy Examine',
-		manageIndexesDescription:
-			'Umožňuje zobrazit podrobnosti každého indexu a poskytuje některé nástroje pro správu indexů',
-		rebuildIndex: 'Znovu vytvořit index',
-		rebuildIndexWarning:
-			'\n      To způsobí opětovné sestavení indexu.<br />V závislosti na tom, kolik obsahu je na vašem webu, může to chvíli trvat.<br />Nedoporučuje se znovu vytvářet index v době vysokého provozu na webu nebo při úpravách obsahu editory.\n     ',
-		searchers: 'Vyhledávače',
-		searchDescription: 'Prohledat index a zobrazit výsledky',
-		tools: 'Nástroje',
-		toolsDescription: 'Nástroje pro správu indexu',
-		fields: 'pole',
-		indexCannotRead: 'Index nelze číst a bude nutné jej znovu sestavit',
-		processIsTakingLonger:
-			'Proces trvá déle, než se očekávalo, zkontrolujte Umbraco log a zkontrolujte, zda během této operace nedošlo k chybám',
-		indexCannotRebuild: 'Tento index nelze znovu sestavit, protože nemá přiřazen',
-		iIndexPopulator: 'IIndexPopulator',
-	},
 	placeholders: {
 		username: 'Zadejte Vaše uživatelské jméno',
 		password: 'Zadejte Vaše heslo',
@@ -697,6 +672,8 @@ export default {
 		new: 'Nový',
 		next: 'Následující',
 		no: 'Ne',
+		noResults: 'Žádné výsledky',
+		noResultsFor: (query: string) => `Nebyl nalezen žádný výsledek pro "${query}".`,
 		of: 'z',
 		off: 'Vypnuto',
 		ok: 'OK',
@@ -1413,8 +1390,10 @@ export default {
 		tabHasNoSortOrder: 'záložka nemá žádné řazení',
 		compositionUsageHeading: 'Kde se toto složení používá?',
 		compositionUsageSpecification: 'Toto složení se v současnosti používá ve složení následujících typů obsahu:',
-		compositionUsageSpecificationMediaType: 'Toto složení se v současnosti používá ve složení následujících typů média:',
-		compositionUsageSpecificationMemberType: 'Toto složení se v současnosti používá ve složení následujících typů člena:',
+		compositionUsageSpecificationMediaType:
+			'Toto složení se v současnosti používá ve složení následujících typů média:',
+		compositionUsageSpecificationMemberType:
+			'Toto složení se v současnosti používá ve složení následujících typů člena:',
 		variantsHeading: 'Povolit různé jazyky',
 		variantsDescription: 'Povolit editorům vytvářet obsah tohoto typu v různých jazycích.',
 		allowVaryByCulture: 'Povolit různé jazyky',
@@ -1548,6 +1527,10 @@ export default {
 		thirdPartyGroup: 'Třetí strana',
 		userPermissions: 'Oprávnění uživatele',
 		userTypes: 'Typy uživatelů',
+	},
+	picker: {
+		browseTab: 'Procházet',
+		searchTab: 'Hledat',
 	},
 	update: {
 		updateAvailable: 'Nová aktualizace je připrvena',
@@ -1790,7 +1773,6 @@ export default {
 		contentRedirectManager: 'Správa přesměrování',
 		mediaFolderBrowser: 'Obsah',
 		settingsWelcome: 'Vítejte',
-		settingsExamine: 'Správa Examine',
 		settingsPublishedStatus: 'Stav publikování',
 		settingsModelsBuilder: 'Tvůrce modelů',
 		settingsHealthCheck: 'Health Check',

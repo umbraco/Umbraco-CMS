@@ -33,7 +33,7 @@ export class UmbServerConnection extends UmbControllerBase {
 
 	/**
 	 * Gets whether the server has configured SignalR to skip the negotiate round-trip.
-	 * @returns {boolean}
+	 * @returns {boolean} True if SignalR should skip the negotiate round-trip
 	 * @memberof UmbServerConnection
 	 */
 	getSignalRSkipNegotiation() {
@@ -42,6 +42,7 @@ export class UmbServerConnection extends UmbControllerBase {
 
 	/**
 	 * Connects to the server.
+	 * @returns {Promise<UmbServerConnection>} This server connection instance
 	 * @memberof UmbServerConnection
 	 */
 	async connect() {
@@ -59,7 +60,7 @@ export class UmbServerConnection extends UmbControllerBase {
 
 	/**
 	 * Gets the URL of the server.
-	 * @returns {*}
+	 * @returns {string} The server URL
 	 * @memberof UmbServerConnection
 	 */
 	getUrl() {
@@ -68,7 +69,7 @@ export class UmbServerConnection extends UmbControllerBase {
 
 	/**
 	 * Gets the status of the server.
-	 * @returns {string}
+	 * @returns {string} The server's runtime level status
 	 * @memberof UmbServerConnection
 	 */
 	getStatus() {
@@ -78,7 +79,7 @@ export class UmbServerConnection extends UmbControllerBase {
 
 	/**
 	 * Checks if the server is connected.
-	 * @returns {boolean}
+	 * @returns {boolean} True if the server is connected
 	 * @memberof UmbServerConnection
 	 */
 	getIsConnected() {

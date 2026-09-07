@@ -1,7 +1,7 @@
 import { UMB_DOCUMENT_COLLECTION_CONTEXT } from '../../document-collection.context-token.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../../entity.js';
 import { UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN } from '../../../paths.js';
-import type { UmbDocumentCollectionItemModel } from '../../types.js';
+import type { UmbDocumentCollectionFilterModel, UmbDocumentCollectionItemModel } from '../../types.js';
 import { css, customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -58,6 +58,12 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 	@state()
 	private _selection: Array<string> = [];
 
+	@state()
+	private _orderingColumn = '';
+
+	@state()
+	private _orderingDesc = false;
+
 	#collectionContext?: typeof UMB_DOCUMENT_COLLECTION_CONTEXT.TYPE;
 
 	constructor() {
@@ -97,6 +103,16 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 				this._selection = selection as string[];
 			},
 			'_observeSelection',
+		);
+
+		this.observe(
+			this.#collectionContext.filter,
+			(filter) => {
+				const { orderBy, orderDirection } = filter as UmbDocumentCollectionFilterModel;
+				this._orderingColumn = orderBy ?? '';
+				this._orderingDesc = orderDirection === 'desc';
+			},
+			'_observeOrdering',
 		);
 	}
 
@@ -185,6 +201,8 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 				.columns=${this._tableColumns}
 				.items=${this._tableItems}
 				.selection=${this._selection}
+				.orderingColumn=${this._orderingColumn}
+				.orderingDesc=${this._orderingDesc}
 				@selected=${this.#handleSelect}
 				@deselected=${this.#handleDeselect}
 				@ordered=${this.#handleOrdering}></umb-table>

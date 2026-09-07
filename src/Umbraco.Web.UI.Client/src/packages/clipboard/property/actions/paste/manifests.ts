@@ -3,7 +3,7 @@ import { UMB_PROPERTY_ACTION_DEFAULT_KIND_MANIFEST } from '@umbraco-cms/backoffi
 
 export const UMB_PROPERTY_ACTION_PASTE_FROM_CLIPBOARD_KIND_MANIFEST: UmbExtensionManifestKind = {
 	type: 'kind',
-	alias: 'Umb.Kind.PropertyAction.pasteFromClipboard',
+	alias: 'Umb.Kind.PropertyAction.PasteFromClipboard',
 	matchKind: 'pasteFromClipboard',
 	matchType: 'propertyAction',
 	manifest: {

@@ -1,5 +1,6 @@
 import { UmbLogViewerRepository } from '../repository/log-viewer.repository.js';
 import type { UmbLogLevelCounts } from '../types.js';
+import { getEndOfDayInLocalTime, getStartOfDayInLocalTime } from '../utils.js';
 import { UMB_APP_LOG_VIEWER_CONTEXT } from './logviewer-workspace.context-token.js';
 import { UmbBasicState, UmbArrayState, UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import type {
@@ -156,8 +157,14 @@ export class UmbLogViewerWorkspaceContext extends UmbContextBase implements UmbW
 		if (!startDate) startDate = this.defaultDateRange.startDate;
 		if (!endDate) endDate = this.defaultDateRange.endDate;
 
-		const isAnyDateInTheFuture = new Date(startDate) > new Date() || new Date(endDate) > new Date();
-		const isStartDateBiggerThenEndDate = new Date(startDate) > new Date(endDate);
+		// Parse the calendar dates in local time (a bare `YYYY-MM-DD` would parse as UTC), so the
+		// comparison against "now" is consistent regardless of the browser's time zone (#14710).
+		const now = new Date();
+		const startDateLocal = new Date(`${startDate}T00:00:00`);
+		const endDateLocal = new Date(`${endDate}T00:00:00`);
+
+		const isAnyDateInTheFuture = startDateLocal > now || endDateLocal > now;
+		const isStartDateBiggerThenEndDate = startDateLocal > endDateLocal;
 		if (isAnyDateInTheFuture || isStartDateBiggerThenEndDate) {
 			return;
 		}
@@ -170,6 +177,17 @@ export class UmbLogViewerWorkspaceContext extends UmbContextBase implements UmbW
 
 	getDateRange() {
 		return this.#dateRange.getValue();
+	}
+
+	// Query the server with absolute instants spanning the full local day (see
+	// getStartOfDayInLocalTime / getEndOfDayInLocalTime) so it resolves the correct day files
+	// regardless of the browser/server offset (#14710). #dateRange keeps the bare dates for display.
+	#getRequestDateRange(): UmbLogViewerDateRange {
+		const { startDate, endDate } = this.#dateRange.getValue();
+		return {
+			startDate: getStartOfDayInLocalTime(startDate),
+			endDate: getEndOfDayInLocalTime(endDate),
+		};
 	}
 
 	async getSavedSearches({ skip = 0, take = 999 }: { skip?: number; take?: number } = {}) {
@@ -231,12 +249,12 @@ export class UmbLogViewerWorkspaceContext extends UmbContextBase implements UmbW
 	}
 
 	async getLogCount() {
-		const { data } = await this.#repository.getLogCount({ ...this.#dateRange.getValue() });
+		const { data } = await this.#repository.getLogCount({ ...this.#getRequestDateRange() });
 		this.#logCount.setValue(data ?? null);
 	}
 
 	async getMessageTemplates(skip: number, take: number) {
-		const { data } = await this.#repository.getMessageTemplates({ skip, take, ...this.#dateRange.getValue() });
+		const { data } = await this.#repository.getMessageTemplates({ skip, take, ...this.#getRequestDateRange() });
 
 		if (data) {
 			this.#messageTemplates.setValue(data);
@@ -252,7 +270,7 @@ export class UmbLogViewerWorkspaceContext extends UmbContextBase implements UmbW
 	}
 
 	async validateLogSize() {
-		const { error } = await this.#repository.getLogViewerValidateLogsSize({ ...this.#dateRange.getValue() });
+		const { error } = await this.#repository.getLogViewerValidateLogsSize({ ...this.#getRequestDateRange() });
 		if (error) {
 			this.#canShowLogs.setValue(false);
 			return;
@@ -282,7 +300,7 @@ export class UmbLogViewerWorkspaceContext extends UmbContextBase implements UmbW
 			orderDirection: this.#sortingDirection.getValue(),
 			filterExpression: this.#filterExpression.getValue(),
 			logLevel: this.#logLevelsFilter.getValue(),
-			...this.#dateRange.getValue(),
+			...this.#getRequestDateRange(),
 		};
 
 		const { data } = await this.#repository.getLogs(options);

@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Title>Umbraco CMS - Search - Delivery API</Title>
+    <Description>Enables Umbraco Search as the querying engine for the Umbraco CMS Delivery API.</Description>
+    <PackageTags>umbraco search</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Umbraco.Cms.Search.Core\Umbraco.Cms.Search.Core.csproj" />
+  </ItemGroup>
+
+</Project>

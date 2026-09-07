@@ -1,5 +1,3 @@
-import { manifests as examineManifests } from './examine-management-dashboard/manifests.js';
-import { UMB_SECTION_ALIAS_CONDITION_ALIAS } from '@umbraco-cms/backoffice/section';
 import UmbSearchHeaderAppElement from './umb-search-header-app.element.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
@@ -21,25 +19,4 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Search Modal',
 		element: () => import('./search-modal/search-modal.element.js'),
 	},
-	{
-		type: 'dashboard',
-		alias: 'Umb.Dashboard.ExamineManagement',
-		name: 'Examine Management Dashboard',
-		element: () => import('./examine-management-dashboard/dashboard-examine-management.element.js'),
-		weight: 400,
-		meta: {
-			label: '#dashboardTabs_settingsExamine',
-			pathname: 'examine-management',
-		},
-		conditions: [
-			{
-				alias: UMB_SECTION_ALIAS_CONDITION_ALIAS,
-				/* TODO: kept as a magic string to avoid illegal import outside of core
-					Move dashboard implementation out of core
-				*/
-				match: 'Umb.Section.Settings',
-			},
-		],
-	},
-	...examineManifests,
 ];

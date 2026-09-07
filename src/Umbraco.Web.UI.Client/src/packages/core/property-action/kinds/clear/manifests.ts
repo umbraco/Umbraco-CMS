@@ -1,7 +1,7 @@
 import { UMB_PROPERTY_ACTION_DEFAULT_KIND_MANIFEST } from '../default/index.js';
+import UmbClearPropertyAction from './property-action-clear.controller.js';
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_WRITABLE_PROPERTY_CONDITION_ALIAS } from '@umbraco-cms/backoffice/property';
-import UmbClearPropertyAction from './property-action-clear.controller.js';
 
 export const UMB_PROPERTY_ACTION_CLEAR_KIND_MANIFEST: UmbExtensionManifestKind = {
 	type: 'kind',

@@ -36,11 +36,6 @@ public interface IDataEditor : IDiscoverable
     IDictionary<string, object>? DefaultConfiguration { get; }
 
     /// <summary>
-    ///     Gets the index value factory for the editor.
-    /// </summary>
-    IPropertyIndexValueFactory PropertyIndexValueFactory { get; }
-
-    /// <summary>
     ///     Gets a value editor.
     /// </summary>
     IDataValueEditor GetValueEditor(); // TODO: should be configured?!

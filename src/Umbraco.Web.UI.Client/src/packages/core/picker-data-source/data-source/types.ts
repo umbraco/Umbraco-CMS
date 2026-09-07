@@ -5,8 +5,7 @@ import type { UmbConfigCollectionModel } from '@umbraco-cms/backoffice/utils';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export interface UmbPickerDataSource<PickedItemType extends UmbItemModel = UmbItemModel>
-	extends UmbItemRepository<PickedItemType>,
-		UmbApi {
+	extends UmbItemRepository<PickedItemType>, UmbApi {
 	setConfig?(config: UmbConfigCollectionModel | undefined): void;
 	getConfig?(): UmbConfigCollectionModel | undefined;
 

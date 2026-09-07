@@ -7,12 +7,12 @@ import type { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
 import type { UmbNamedEntityModel } from '@umbraco-cms/backoffice/entity';
 
 export abstract class UmbEntityNamedDetailWorkspaceContextBase<
-		NamedDetailModelType extends UmbNamedEntityModel = UmbNamedEntityModel,
-		NamedDetailRepositoryType extends
-			UmbDetailRepository<NamedDetailModelType> = UmbDetailRepository<NamedDetailModelType>,
-		CreateArgsType extends
-			UmbEntityDetailWorkspaceContextCreateArgs<NamedDetailModelType> = UmbEntityDetailWorkspaceContextCreateArgs<NamedDetailModelType>,
-	>
+	NamedDetailModelType extends UmbNamedEntityModel = UmbNamedEntityModel,
+	NamedDetailRepositoryType extends UmbDetailRepository<NamedDetailModelType> =
+		UmbDetailRepository<NamedDetailModelType>,
+	CreateArgsType extends UmbEntityDetailWorkspaceContextCreateArgs<NamedDetailModelType> =
+		UmbEntityDetailWorkspaceContextCreateArgs<NamedDetailModelType>,
+>
 	extends UmbEntityDetailWorkspaceContextBase<NamedDetailModelType, NamedDetailRepositoryType, CreateArgsType>
 	implements UmbNamableWorkspaceContext
 {

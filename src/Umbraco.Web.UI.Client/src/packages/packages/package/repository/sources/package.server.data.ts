@@ -2,9 +2,13 @@ import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { ManifestService, PackageService } from '@umbraco-cms/backoffice/external/backend-api';
 import type {
 	CreatePackageRequestModel,
+	ManifestResponseModel,
+	PackageConfigurationResponseModel,
+	PagedPackageMigrationStatusResponseModel,
 	UpdatePackageRequestModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
 
 /**
  * Data source for packages from the server
@@ -31,25 +35,28 @@ export class UmbPackageServerDataSource {
 
 	/**
 	 * Get the root items from the server
+	 * @returns {Promise<UmbDataSourceResponse<Array<ManifestResponseModel>>>} The root items.
 	 * @memberof UmbPackageServerDataSource
 	 */
-	getRootItems() {
+	getRootItems(): Promise<UmbDataSourceResponse<Array<ManifestResponseModel>>> {
 		return tryExecute(this._host, ManifestService.getManifestManifest());
 	}
 
 	/**
 	 * Get the package configuration from the server
+	 * @returns {Promise<UmbDataSourceResponse<PackageConfigurationResponseModel>>} The package configuration.
 	 * @memberof UmbPackageServerDataSource
 	 */
-	getPackageConfiguration() {
+	getPackageConfiguration(): Promise<UmbDataSourceResponse<PackageConfigurationResponseModel>> {
 		return tryExecute(this._host, PackageService.getPackageConfiguration());
 	}
 
 	/**
 	 * Get the package migrations from the server
+	 * @returns {Promise<UmbDataSourceResponse<PagedPackageMigrationStatusResponseModel>>} The package migrations.
 	 * @memberof UmbPackageServerDataSource
 	 */
-	getPackageMigrations() {
+	getPackageMigrations(): Promise<UmbDataSourceResponse<PagedPackageMigrationStatusResponseModel>> {
 		return tryExecute(this._host, PackageService.getPackageMigrationStatus({ query: { skip: 0, take: 9999 } }));
 	}
 

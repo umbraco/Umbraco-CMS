@@ -5,7 +5,7 @@ import type { UmbFolderModel } from '@umbraco-cms/backoffice/tree';
 
 /**
  * @class UmbPartialViewFolderStore
- * @augments {UmbStoreBase}
+ * @augments {UmbDetailStoreBase}
  * @description - Data Store for Partial View Folders
  */
 export class UmbPartialViewFolderStore extends UmbDetailStoreBase<UmbFolderModel> {

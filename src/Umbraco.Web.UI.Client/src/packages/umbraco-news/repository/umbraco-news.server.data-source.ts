@@ -16,7 +16,7 @@ export interface UmbNewsDataSource {
 export class UmbNewsServerDataSource extends UmbControllerBase implements UmbNewsDataSource {
 	/**
 	 * Get all news items from the server
-	 * @returns {*}
+	 * @returns {Promise<UmbDataSourceResponse<NewsDashboardResponseModel>>} The news items, or an error
 	 * @memberof UmbNewsServerDataSource
 	 */
 	async getNewsItems() {

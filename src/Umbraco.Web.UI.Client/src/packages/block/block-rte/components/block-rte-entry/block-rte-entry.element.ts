@@ -190,7 +190,7 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 				this._isReadOnly = isReadOnly;
 				this.#updateBlockViewProps({ readonly: isReadOnly });
 			},
-			'umbReadOnlyObserver',
+			null,
 		);
 	}
 
@@ -431,8 +431,8 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 			}
 
 			:host([is-reference]) .umb-block-rte__block {
-				--umb-entity-frame-color: var(--umb-color-reference, #7532c8);
-				--umb-entity-frame-contrast-color: var(--umb-color-reference-contrast, #ffffff);
+				--umb-entity-frame-color: var(--umb-color-reference);
+				--umb-entity-frame-contrast-color: var(--umb-color-reference-contrast);
 			}
 
 			.umb-block-rte__block {

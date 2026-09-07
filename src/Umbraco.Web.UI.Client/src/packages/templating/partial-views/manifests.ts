@@ -14,7 +14,7 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 	...workspaceManifests,
 	{
 		name: 'Partial View Backoffice Entry Point',
-		alias: 'Umb.EntryPoint.Partial View',
+		alias: 'Umb.EntryPoint.PartialView',
 		type: 'backofficeEntryPoint',
 		js: entryPointModule,
 	},

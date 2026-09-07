@@ -5,7 +5,8 @@ const $anchor = document.createElement('a');
 /**
  * The current path of the location.
  * As default slashes are included at the start and end.
- * @param options
+ * @param {Partial<ISlashOptions>} options - The slash options
+ * @returns {string} The current path
  */
 export function path(options: Partial<ISlashOptions> = {}): string {
 	return slashify(window.location.pathname, options);
@@ -13,7 +14,8 @@ export function path(options: Partial<ISlashOptions> = {}): string {
 
 /**
  * Returns the path without the base path.
- * @param options
+ * @param {Partial<ISlashOptions>} options - The slash options
+ * @returns {string} The path without the base path
  */
 export function pathWithoutBasePath(options: Partial<ISlashOptions> = {}): string {
 	return slashify(stripStart(path(), basePath()), options);
@@ -29,7 +31,8 @@ export function pathWithoutBasePath(options: Partial<ISlashOptions> = {}): strin
  *
  * To make this method more performant we could cache the anchor element.
  * As default it will return the base path with slashes in front and at the end.
- * @param options
+ * @param {Partial<ISlashOptions>} options - The slash options
+ * @returns {string} The base path
  */
 export function basePath(options: Partial<ISlashOptions> = {}): string {
 	return constructPathWithBasePath('.', options);
@@ -42,8 +45,9 @@ export function basePath(options: Partial<ISlashOptions> = {}): string {
  * doesn't use the built in HTMLHyperlinkElementUtils.
  *
  * As default it will return the base path with slashes in front and at the end.
- * @param path
- * @param options
+ * @param {string} path - The path to resolve relative to the base path
+ * @param {Partial<ISlashOptions>} options - The slash options
+ * @returns {string} The resolved path
  */
 export function constructPathWithBasePath(path: string, options: Partial<ISlashOptions> = {}) {
 	$anchor.href = path;
@@ -52,8 +56,9 @@ export function constructPathWithBasePath(path: string, options: Partial<ISlashO
 
 /**
  * Removes the start of the path that matches the part.
- * @param path
- * @param part
+ * @param {string} path - The path to strip
+ * @param {string} part - The part to remove from the start
+ * @returns {string} The path without the matching start
  */
 export function stripStart(path: string, part: string) {
 	return path.replace(new RegExp(`^${part}`), '');
@@ -61,6 +66,7 @@ export function stripStart(path: string, part: string) {
 
 /**
  * Returns the query string.
+ * @returns {string} The query string
  */
 export function queryString(): string {
 	return window.location.search;
@@ -68,7 +74,7 @@ export function queryString(): string {
 
 /**
  * Returns the params for the current path.
- * @returns Params
+ * @returns {Query} Params
  */
 export function query(): Query {
 	return toQuery(queryString().substring(1));
@@ -76,7 +82,8 @@ export function query(): Query {
 
 /**
  * Strips the slash from the start and end of a path.
- * @param path
+ * @param {string} path - The path to strip
+ * @returns {string} The path without leading/trailing slashes
  */
 export function stripSlash(path: string): string {
 	return slashify(path, { start: false, end: false });
@@ -84,7 +91,8 @@ export function stripSlash(path: string): string {
 
 /**
  * Ensures the path starts and ends with a slash
- * @param path
+ * @param {string} path - The path to ensure slashes on
+ * @returns {string} The path with leading and trailing slashes
  */
 export function ensureSlash(path: string): string {
 	return slashify(path, { start: true, end: true });
@@ -92,11 +100,11 @@ export function ensureSlash(path: string): string {
 
 /**
  * Makes sure that the start and end slashes are present or not depending on the options.
- * @param path
- * @param start.start
- * @param start
- * @param end
- * @param start.end
+ * @param {string} path - The path to slashify
+ * @param {Partial<ISlashOptions>} options - The slash options
+ * @param {boolean} [options.start] - Whether the path should start with a slash
+ * @param {boolean} [options.end] - Whether the path should end with a slash
+ * @returns {string} The slashified path
  */
 export function slashify(path: string, { start = true, end = true }: Partial<ISlashOptions> = {}): string {
 	path = start && !path.startsWith('/') ? `/${path}` : !start && path.startsWith('/') ? path.slice(1) : path;
@@ -106,7 +114,7 @@ export function slashify(path: string, { start = true, end = true }: Partial<ISl
 /**
  * Turns a query string into an object.
  * @param {string} queryString (example: ("test=123&hejsa=LOL&wuhuu"))
- * @returns {Query}
+ * @returns {Query} The parsed query object
  */
 export function toQuery(queryString: string): Query {
 	// If the query does not contain anything, return an empty object.
@@ -131,7 +139,8 @@ export function toQuery(queryString: string): Query {
 
 /**
  * Turns a query object into a string query.
- * @param query
+ * @param {Query} query - The query object to stringify
+ * @returns {string} The query string
  */
 export function toQueryString(query: Query): string {
 	return Object.entries(query)

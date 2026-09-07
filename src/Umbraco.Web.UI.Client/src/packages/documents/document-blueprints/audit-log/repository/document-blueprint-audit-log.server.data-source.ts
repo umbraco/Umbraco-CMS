@@ -5,9 +5,7 @@ import type { DirectionModel } from '@umbraco-cms/backoffice/external/backend-ap
 import { DocumentBlueprintService } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
-export class UmbDocumentBlueprintAuditLogServerDataSource
-	implements UmbAuditLogDataSource<UmbDocumentBlueprintAuditLogModel>
-{
+export class UmbDocumentBlueprintAuditLogServerDataSource implements UmbAuditLogDataSource<UmbDocumentBlueprintAuditLogModel> {
 	#host: UmbControllerHost;
 
 	constructor(host: UmbControllerHost) {

@@ -36,7 +36,7 @@ export class UmbInstallerContext extends UmbContextBase {
 	/**
 	 * Observable method to get the current step in the installation process
 	 * @public
-	 * @returns {*}  {Observable<number>}
+	 * @returns {Observable<number>} The current step.
 	 * @memberof UmbInstallerContext
 	 */
 	public currentStepChanges(): Observable<number> {
@@ -46,7 +46,7 @@ export class UmbInstallerContext extends UmbContextBase {
 	/**
 	 * Observable method to get the install status in the installation process
 	 * @public
-	 * @returns {*}  {(Observable<UmbProblemDetails | null>)}
+	 * @returns {(Observable<UmbProblemDetails | null>)} The current install status.
 	 * @memberof UmbInstallerContext
 	 */
 	public installStatusChanges(): Observable<UmbProblemDetails | null> {
@@ -94,7 +94,7 @@ export class UmbInstallerContext extends UmbContextBase {
 	/**
 	 * Get the data for the installation process
 	 * @public
-	 * @returns {*}  {PostInstallRequest}
+	 * @returns {InstallRequestModel} The installation data.
 	 * @memberof UmbInstallerContext
 	 */
 	public getData(): InstallRequestModel {

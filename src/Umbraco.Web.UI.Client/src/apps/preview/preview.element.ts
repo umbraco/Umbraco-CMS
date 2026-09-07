@@ -28,8 +28,8 @@ export class UmbPreviewElement extends UmbLitElement {
 
 		new UmbBackofficeEntryPointExtensionInitializer(this, umbExtensionsRegistry);
 
-		this.observe(this.#context.iframeReady, (iframeReady) => (this._iframeReady = iframeReady));
-		this.observe(this.#context.previewUrl, (previewUrl) => (this._previewUrl = previewUrl));
+		this.observe(this.#context.iframeReady, (iframeReady) => (this._iframeReady = iframeReady), null);
+		this.observe(this.#context.previewUrl, (previewUrl) => (this._previewUrl = previewUrl), null);
 	}
 
 	override async firstUpdated() {

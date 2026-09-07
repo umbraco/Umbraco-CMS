@@ -17,12 +17,10 @@ import type {
 } from '@umbraco-cms/backoffice/management-api';
 
 interface UmbManagementApiMediaTreeRootItemsRequestArgs
-	extends UmbManagementApiTreeRootItemsRequestArgs,
-		Pick<UmbMediaTreeRootItemsRequestArgs, 'dataType'> {}
+	extends UmbManagementApiTreeRootItemsRequestArgs, Pick<UmbMediaTreeRootItemsRequestArgs, 'dataType'> {}
 
 interface UmbManagementApiMediaTreeChildrenOfRequestArgs
-	extends UmbManagementApiTreeChildrenOfRequestArgs,
-		Pick<UmbMediaTreeChildrenOfRequestArgs, 'dataType'> {}
+	extends UmbManagementApiTreeChildrenOfRequestArgs, Pick<UmbMediaTreeChildrenOfRequestArgs, 'dataType'> {}
 
 interface UmbManagementApiMediaTreeSiblingsFromRequestArgs extends UmbManagementApiTreeSiblingsFromRequestArgs {
 	dataType?: {

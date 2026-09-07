@@ -4,15 +4,14 @@ import type { ManifestElementAndApi, ManifestWithDynamicConditions } from '@umbr
 
 export interface ManifestWorkspaceActionMenuItem<
 	MetaType extends MetaWorkspaceActionMenuItem = MetaWorkspaceActionMenuItem,
-> extends ManifestElementAndApi<UmbControllerHostElement, UmbWorkspaceActionMenuItem<MetaType>>,
+>
+	extends
+		ManifestElementAndApi<UmbControllerHostElement, UmbWorkspaceActionMenuItem<MetaType>>,
 		ManifestWithDynamicConditions<UmbExtensionConditionConfig> {
 	type: 'workspaceActionMenuItem';
 	/**
 	 * Define which workspace actions this menu item should be shown for.
-	 * @examples [
-	 * 	['Umb.WorkspaceAction.Document.Save', 'Umb.WorkspaceAction.Document.SaveAndPublish'],
-	 * 	"Umb.WorkspaceAction.Document.Save"
-	 * ]
+	 * @examples [['Umb.WorkspaceAction.Document.Save', 'Umb.WorkspaceAction.Document.SaveAndPublish'], "Umb.WorkspaceAction.Document.Save"]
 	 * @required
 	 */
 	forWorkspaceActions: string | string[];
@@ -32,19 +31,13 @@ export interface ManifestWorkspaceActionMenuItemDefaultKind<
 export interface MetaWorkspaceActionMenuItemDefaultKind extends MetaWorkspaceActionMenuItem {
 	/**
 	 * An icon to represent the action to be performed
-	 * @examples [
-	 *   "icon-box",
-	 *   "icon-grid"
-	 * ]
+	 * @examples ["icon-box", "icon-grid"]
 	 */
 	icon: string;
 
 	/**
 	 * The friendly name of the action to perform
-	 * @examples [
-	 *   "Create",
-	 *   "Create Content Template"
-	 * ]
+	 * @examples ["Create", "Create Content Template"]
 	 */
 	label: string;
 }

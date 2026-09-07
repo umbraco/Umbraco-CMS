@@ -1,0 +1,37 @@
+{
+  "name": "@umbraco-cms/search-examine",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "watch": "vite build --watch",
+    "build": "tsc && vite build",
+    "generate-client": "node ./scripts/generate-openapi.js https://localhost:44324/umbraco/swagger/search-examine-provider/swagger.json src/api",
+    "generate:tsconfig": "node ./scripts/generate-tsconfig.js",
+    "lint": "eslint . --max-warnings 0",
+    "lint:fix": "eslint . --fix",
+    "lint:errors-only": "eslint . --quiet",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "devDependencies": {
+    "vite-tsconfig-paths": "^6.1.1",
+    "@eslint/js": "^10.0.1",
+    "@typescript-eslint/eslint-plugin": "^8.62.1",
+    "@typescript-eslint/parser": "^8.62.1",
+    "chalk": "^5.6.2",
+    "cross-env": "^10.1.0",
+    "eslint": "^10.6.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-lit": "^2.3.1",
+    "eslint-plugin-wc": "^3.1.0",
+    "node-fetch": "^3.3.2",
+    "prettier": "^3.9.4",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.62.1",
+    "vite": "^8.1.1"
+  },
+  "engines": {
+    "node": ">=24"
+  }
+}

@@ -3,9 +3,9 @@ import { AsyncDirective, directive, nothing, type ElementPart } from '@umbraco-c
  *
  * test if a element has focus
  * this also returns true if the focused element is a child of the target.
- * @param current
- * @param target
- * @returns bool
+ * @param {Element | null} current - The element to check, starting point of the recursive search
+ * @param {HTMLElement} target - The element to test for focus
+ * @returns {boolean} bool
  */
 function hasFocus(current: any, target: HTMLElement): boolean {
 	if (current === target) {
@@ -79,7 +79,7 @@ class UmbFocusDirective extends AsyncDirective {
 /**
  * @description
  * A Lit directive, which sets focus on the element of scope once its connected to the DOM.
- * @example:
+ * @example
  * ```js
  * html`<input ${umbFocus()}>`;
  * ```
