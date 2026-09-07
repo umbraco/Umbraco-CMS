@@ -234,6 +234,27 @@ describe('UmbAuthContext', () => {
 			expect(sessionUpdates[0].expiresAt).to.be.greaterThan(expiresAt);
 		});
 
+		// Activity re-issues the session for the lifetime it was issued for, so the window has to be
+		// taken from that reported lifetime rather than from however much of it is left by the time the
+		// report is applied.
+		it('slides by the lifetime the session was issued for, not by what is left of it', async () => {
+			const elapsedInSeconds = 600;
+			channel.postMessage({
+				type: 'authorized',
+				expiresIn: SESSION_LENGTH_IN_SECONDS,
+				issuedAt: Math.floor(Date.now() / 1000) - elapsedInSeconds,
+			});
+			await aTimeout(50);
+
+			await receiveResponse(200);
+
+			const [sessionUpdate] = peerMessages.filter((message) => message.type === 'sessionUpdate');
+			expect(sessionUpdate?.sessionWindowInMs).to.equal(SESSION_LENGTH_IN_SECONDS * 1000);
+			expect(getLatestExpiresAt()).to.be.greaterThan(
+				Math.floor(Date.now() / 1000) + SESSION_LENGTH_IN_SECONDS - elapsedInSeconds,
+			);
+		});
+
 		// A session whose expiry the server never reported gets no countdown at all (see the timeout
 		// controller), and activity must not turn that into a guessed one.
 		it('does not invent an expiry for a session that has none', async () => {
