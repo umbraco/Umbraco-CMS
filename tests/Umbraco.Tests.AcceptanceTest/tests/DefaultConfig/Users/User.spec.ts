@@ -716,7 +716,7 @@ test('cannot create a user with an invalid email format', async ({umbracoApi, um
   await umbracoUi.user.clickCreateUserButton();
 
   // Assert
-  // The browser's native email-format validation blocks submission - the dialog never closes and no API call is made
+  // The browser's native email-format validation blocks submission, so the dialog never closes and no API call is made
   await umbracoUi.user.isTextWithMessageVisible("Please include an '@' in the email address.");
   expect(await umbracoApi.user.doesNameExist(nameOfTheUser)).toBeFalsy();
 });

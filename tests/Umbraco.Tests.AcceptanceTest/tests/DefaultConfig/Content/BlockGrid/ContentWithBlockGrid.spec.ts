@@ -178,7 +178,6 @@ test('cannot publish content with fewer block elements than the minimum amount',
 
   // Assert
   await umbracoUi.content.isErrorNotificationVisible();
-
   await umbracoUi.content.clickAddBlockElementButton();
   await umbracoUi.content.clickBlockElementWithName(elementTypeName);
   await umbracoUi.content.clickCreateModalButton();

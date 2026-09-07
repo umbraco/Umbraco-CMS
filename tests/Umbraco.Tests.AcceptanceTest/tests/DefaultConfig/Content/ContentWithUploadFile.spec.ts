@@ -120,7 +120,7 @@ test('cannot upload a file with a disallowed extension', async ({umbracoApi, umb
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
   // Act
-  // A disallowed extension is silently rejected - no error message, just an empty dropzone
+  // A disallowed extension is silently rejected, with no error message, just an empty dropzone
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.uploadFile(uploadFilePath + 'File.txt');
   await umbracoUi.content.isInputDropzoneVisible(true);
@@ -147,7 +147,6 @@ test('can not publish a mandatory upload file with an empty value', async ({umbr
   // Assert
   await umbracoUi.content.isErrorNotificationVisible();
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
-
   await umbracoUi.content.uploadFile(uploadFilePath + uploadFileName);
   await umbracoUi.content.isInputDropzoneVisible(false);
   await umbracoUi.content.doesInputUploadFileHaveName(uploadFileName);

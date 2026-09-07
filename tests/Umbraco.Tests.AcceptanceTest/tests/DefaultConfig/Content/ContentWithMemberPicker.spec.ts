@@ -126,7 +126,6 @@ test('can not publish a mandatory member picker with an empty value', async ({um
   // Assert
   await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.nullValue);
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
-
   await umbracoUi.content.clickChooseMemberPickerButton();
   await umbracoUi.content.selectMemberByName(memberName);
   await umbracoUi.content.clickChooseModalButton();

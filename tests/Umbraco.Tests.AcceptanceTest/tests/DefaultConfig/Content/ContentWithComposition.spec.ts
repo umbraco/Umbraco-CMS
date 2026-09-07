@@ -79,7 +79,6 @@ test('can not publish a mandatory property inherited via composition with an emp
 
   // Assert
   await umbracoUi.content.isErrorNotificationVisible();
-
   await umbracoUi.content.enterTextstring(text);
   await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
 

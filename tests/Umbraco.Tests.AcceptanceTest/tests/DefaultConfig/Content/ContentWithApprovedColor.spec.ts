@@ -4,20 +4,22 @@ import {expect} from "@playwright/test";
 const contentName = 'TestContent';
 const documentTypeName = 'TestDocumentTypeForContent';
 const dataTypeName = 'Approved Color';
+const customDataTypeName = 'CustomApprovedColor';
+const mandatoryDataTypeName = 'MandatoryApprovedColor';
 
 test.beforeEach(async ({umbracoApi, umbracoUi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   await umbracoApi.document.ensureNameNotExists(contentName);
-  await umbracoApi.dataType.ensureNameNotExists('CustomApprovedColor');
-  await umbracoApi.dataType.ensureNameNotExists('MandatoryApprovedColor');
+  await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
+  await umbracoApi.dataType.ensureNameNotExists(mandatoryDataTypeName);
   await umbracoUi.goToBackOffice();
 });
 
 test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.document.ensureNameNotExists(contentName);
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
-  await umbracoApi.dataType.ensureNameNotExists('CustomApprovedColor');
-  await umbracoApi.dataType.ensureNameNotExists('MandatoryApprovedColor');
+  await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
+  await umbracoApi.dataType.ensureNameNotExists(mandatoryDataTypeName);
 });
 
 test('can create content with the approved color data type', async ({umbracoApi, umbracoUi}) => {
@@ -62,7 +64,6 @@ test('can publish content with the approved color data type', async ({umbracoApi
 
 test('can create content with the custom approved color data type', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const customDataTypeName = 'CustomApprovedColor';
   const colorValue = 'd73737';
   const colorLabel = 'Test Label';
   const customDataTypeId = await umbracoApi.dataType.createApprovedColorDataTypeWithOneItem(customDataTypeName, colorLabel, colorValue);
@@ -85,11 +86,10 @@ test('can create content with the custom approved color data type', {tag: '@rele
 
 test('can not publish a mandatory approved color with an empty value', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const customDataTypeName = 'MandatoryApprovedColor';
   const colorValue = 'd73737';
   const colorLabel = 'Test Label';
-  const customDataTypeId = await umbracoApi.dataType.createApprovedColorDataTypeWithOneItem(customDataTypeName, colorLabel, colorValue);
-  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId, 'Test Group', false, false, true);
+  const customDataTypeId = await umbracoApi.dataType.createApprovedColorDataTypeWithOneItem(mandatoryDataTypeName, colorLabel, colorValue);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, mandatoryDataTypeName, customDataTypeId, 'Test Group', false, false, true);
   await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
@@ -100,7 +100,6 @@ test('can not publish a mandatory approved color with an empty value', async ({u
   // Assert
   await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.nullValue);
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
-
   await umbracoUi.content.clickApprovedColorByValue(colorValue);
   await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBeUpdated();
 

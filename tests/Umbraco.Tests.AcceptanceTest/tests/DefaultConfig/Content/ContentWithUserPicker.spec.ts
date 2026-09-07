@@ -84,7 +84,6 @@ test('can not publish a mandatory user picker with an empty value', async ({umbr
   // Assert
   await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.nullValue);
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
-
   await umbracoUi.content.addUserPicker(userName);
   await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.nullValue, false);
   await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBeUpdated();
