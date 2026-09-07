@@ -63,6 +63,3 @@ test('can publish content with the slider data type', async ({umbracoApi, umbrac
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
   expect(contentData.values[0].value).toEqual(expectedValue);
 });
-
-// Not applicable: the slider always renders a default numeric value (e.g. "0"), so a mandatory
-// slider is never actually empty and publish succeeds regardless of the mandatory flag.
