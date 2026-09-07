@@ -1,9 +1,16 @@
 import type { UmbMemberTypeDetailModel } from '../types.js';
-import { UMB_MEMBER_TYPE_DETAIL_REPOSITORY_ALIAS, UMB_MEMBER_TYPE_ENTITY_TYPE } from '../index.js';
+import {
+	UMB_MEMBER_TYPE_DETAIL_REPOSITORY_ALIAS,
+	UMB_MEMBER_TYPE_ENTITY_TYPE,
+	UMB_MEMBER_TYPE_FOLDER_ENTITY_TYPE,
+} from '../index.js';
+import { UMB_MEMBER_TYPE_ROOT_WORKSPACE_PATH, UMB_EDIT_MEMBER_TYPE_WORKSPACE_PATH_PATTERN } from '../paths.js';
+import { UMB_EDIT_MEMBER_TYPE_FOLDER_WORKSPACE_PATH_PATTERN } from '../tree/folder/workspace/paths.js';
 import { UmbMemberTypeWorkspaceEditorElement } from './member-type-workspace-editor.element.js';
 import { UMB_MEMBER_TYPE_WORKSPACE_ALIAS } from './constants.js';
 import {
 	type UmbRoutableWorkspaceContext,
+	UmbDeleteEntityWorkspaceRedirectController,
 	UmbWorkspaceIsNewRedirectController,
 } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -48,6 +55,16 @@ export class UmbMemberTypeWorkspaceContext
 				setup: (_component, info) => {
 					const unique = info.match.params.unique;
 					this.load(unique);
+
+					new UmbDeleteEntityWorkspaceRedirectController(this, this, {
+						getRedirectPath: ({ entity }) => {
+							if (!entity?.unique) return UMB_MEMBER_TYPE_ROOT_WORKSPACE_PATH;
+							if (entity.entityType === UMB_MEMBER_TYPE_FOLDER_ENTITY_TYPE) {
+								return UMB_EDIT_MEMBER_TYPE_FOLDER_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: entity.unique });
+							}
+							return UMB_EDIT_MEMBER_TYPE_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: entity.unique });
+						},
+					});
 				},
 			},
 		]);

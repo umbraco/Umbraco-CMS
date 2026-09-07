@@ -1,7 +1,9 @@
 import type { UmbPartialViewDetailModel } from '../types.js';
-import { UMB_PARTIAL_VIEW_ENTITY_TYPE } from '../entity.js';
+import { UMB_PARTIAL_VIEW_ENTITY_TYPE, UMB_PARTIAL_VIEW_FOLDER_ENTITY_TYPE } from '../entity.js';
 import type { UmbPartialViewDetailRepository } from '../repository/index.js';
 import { UMB_PARTIAL_VIEW_DETAIL_REPOSITORY_ALIAS } from '../constants.js';
+import { UMB_EDIT_PARTIAL_VIEW_WORKSPACE_PATH_PATTERN } from '../paths.js';
+import { UMB_EDIT_PARTIAL_VIEW_FOLDER_WORKSPACE_PATH_PATTERN } from '../tree/folder/workspace/paths.js';
 import { UmbPartialViewWorkspaceEditorElement } from './partial-view-workspace-editor.element.js';
 import { UMB_PARTIAL_VIEW_WORKSPACE_ALIAS } from './manifests.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -11,6 +13,7 @@ import type {
 	UmbSubmittableWorkspaceContext,
 } from '@umbraco-cms/backoffice/workspace';
 import {
+	UmbDeleteEntityWorkspaceRedirectController,
 	UmbEntityNamedDetailWorkspaceContextBase,
 	UmbWorkspaceIsNewRedirectController,
 } from '@umbraco-cms/backoffice/workspace';
@@ -18,6 +21,7 @@ import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { PartialViewService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { IRoutingInfo, PageComponent } from '@umbraco-cms/backoffice/router';
 import { UmbServerFileRenameWorkspaceRedirectController } from '@umbraco-cms/backoffice/server-file-system';
+import { UMB_SETTINGS_SECTION_PATH } from '@umbraco-cms/backoffice/settings';
 
 export interface UmbPartialViewWorkspaceContextCreateArgs extends UmbEntityDetailWorkspaceContextCreateArgs<UmbPartialViewDetailModel> {
 	snippet: { unique: string } | null;
@@ -78,6 +82,16 @@ export class UmbPartialViewWorkspaceContext
 						this,
 						this.getHostElement().shadowRoot!.querySelector('umb-router-slot')!,
 					);
+
+					new UmbDeleteEntityWorkspaceRedirectController(this, this, {
+						getRedirectPath: ({ entity }) => {
+							if (!entity?.unique) return UMB_SETTINGS_SECTION_PATH;
+							if (entity.entityType === UMB_PARTIAL_VIEW_FOLDER_ENTITY_TYPE) {
+								return UMB_EDIT_PARTIAL_VIEW_FOLDER_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: entity.unique });
+							}
+							return UMB_EDIT_PARTIAL_VIEW_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: entity.unique });
+						},
+					});
 				},
 			},
 		]);

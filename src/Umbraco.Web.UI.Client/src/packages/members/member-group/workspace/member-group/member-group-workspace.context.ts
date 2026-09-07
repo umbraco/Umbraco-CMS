@@ -1,10 +1,12 @@
 import type { UmbMemberGroupDetailModel } from '../../types.js';
 import { UMB_MEMBER_GROUP_ENTITY_TYPE } from '../../entity.js';
 import { UMB_MEMBER_GROUP_DETAIL_REPOSITORY_ALIAS } from '../../constants.js';
+import { UMB_MEMBER_GROUP_ROOT_WORKSPACE_PATH, UMB_EDIT_MEMBER_GROUP_WORKSPACE_PATH_PATTERN } from '../../paths.js';
 import { UMB_MEMBER_GROUP_WORKSPACE_ALIAS } from './constants.js';
 import { UmbMemberGroupWorkspaceEditorElement } from './member-group-workspace-editor.element.js';
 import {
 	type UmbSubmittableWorkspaceContext,
+	UmbDeleteEntityWorkspaceRedirectController,
 	UmbWorkspaceIsNewRedirectController,
 	type UmbRoutableWorkspaceContext,
 	UmbEntityNamedDetailWorkspaceContextBase,
@@ -43,6 +45,13 @@ export class UmbMemberGroupWorkspaceContext
 				setup: (_component, info) => {
 					const unique = info.match.params.unique;
 					this.load(unique);
+
+					new UmbDeleteEntityWorkspaceRedirectController(this, this, {
+						getRedirectPath: ({ entity }) => {
+							if (!entity?.unique) return UMB_MEMBER_GROUP_ROOT_WORKSPACE_PATH;
+							return UMB_EDIT_MEMBER_GROUP_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: entity.unique });
+						},
+					});
 				},
 			},
 		]);
