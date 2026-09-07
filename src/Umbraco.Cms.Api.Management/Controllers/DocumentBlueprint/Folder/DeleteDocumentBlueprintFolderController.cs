@@ -25,6 +25,7 @@ public class DeleteDocumentBlueprintFolderController : DocumentBlueprintFolderCo
     /// </summary>
     /// <param name="backOfficeSecurityAccessor">Provides access to back office security features for authorization and authentication.</param>
     /// <param name="contentBlueprintContainerService">Service used to manage content blueprint folders (containers).</param>
+    [ActivatorUtilitiesConstructor]
     public DeleteDocumentBlueprintFolderController(
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
         IContentBlueprintContainerService contentBlueprintContainerService,
