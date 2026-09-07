@@ -374,6 +374,8 @@ test('cannot create a template with a duplicate name', async ({umbracoApi, umbra
 
   // Assert
   await umbracoUi.template.isFailedStateButtonVisible();
+  // The attempted duplicate shares the existing item's name, so doesNameExist() would always be
+  // true regardless of outcome. Count matches instead to confirm no second item was created.
   const rootTemplates = await (await umbracoApi.template.getAllAtRoot()).json();
-  expect(rootTemplates.items.filter(item => item.name === templateName).length).toBe(1);
+  expect(rootTemplates.items.filter(item => item.name === templateName)).toHaveLength(1);
 });

@@ -185,7 +185,7 @@ test('cannot publish content with fewer block elements than the minimum amount',
 
   // Assert
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values[0].value.contentData.length).toBe(1);
+  expect(contentData.values[0].value.contentData).toHaveLength(1);
   expect(contentData.values[0].value.contentData[0].contentTypeKey).toEqual(elementTypeId);
 });
 
