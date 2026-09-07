@@ -52,9 +52,7 @@ export class UmbDocumentCollectionServerDataSource implements UmbCollectionDataS
 					unique: item.id,
 					entityType: UMB_DOCUMENT_ENTITY_TYPE,
 					creator: item.creator,
-					// TODO: DocumentCollectionResponseModel does not yet expose hasChildren.
-					// Remove the cast and the `?? false` when the Management API ships the field.
-					hasChildren: (item as { hasChildren?: boolean }).hasChildren ?? false,
+					hasChildren: item.hasChildren,
 					isProtected: item.isProtected,
 					isTrashed: item.isTrashed,
 					sortOrder: item.sortOrder,

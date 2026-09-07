@@ -23,7 +23,7 @@ export interface UmbDocumentCollectionItemModel extends UmbEntityWithFlags {
 		alias: string;
 	};
 	entityType: UmbDocumentEntityType;
-	hasChildren?: boolean;
+	hasChildren: boolean;
 	isProtected: boolean;
 	isTrashed: boolean;
 	sortOrder: number;
