@@ -100,6 +100,7 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 	@state()
 	private _isReadOnly = false;
 
+	@state()
 	private _name?: string;
 
 	@state()
@@ -219,6 +220,7 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 			null,
 		);
 		this.observe(this.#context.index, (index) => this.#updateBlockViewProps({ index }), null);
+		this.observe(this.#context.name, (name) => (this._name = name), null);
 		this.observe(
 			this.#context.label,
 			(label) => {
@@ -336,7 +338,7 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 			() => html`
 				<div class="umb-block-rte__block">
 					<umb-entity-frame>
-						${when(this._isExternalContent, () => html`<uui-icon name="link"></uui-icon>`)}${this._label}
+						${when(this._isExternalContent, () => html`<uui-icon name="link"></uui-icon>`)} ${this._name}
 					</umb-entity-frame>
 					<umb-extension-slot
 						type="blockEditorCustomView"
