@@ -2,6 +2,7 @@ using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
+using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
@@ -737,6 +738,41 @@ internal sealed class RichTextElementLevelVariationTests : BlockEditorElementVar
             Assert.AreEqual("The invariant value", blocks[0].Content.Properties["invariantText"]);
             Assert.AreEqual(expectedVariantValue, blocks[0].Content.Properties["variantText"]);
         });
+    }
+
+    /// <summary>
+    /// When an invariant Rich Text property holds culture-variant block values, a change to only the
+    /// non-default culture's nested block value must be attributed to that specific culture - not the default
+    /// culture - so that culture-aware publishing (e.g. branch publish) knows it needs republishing. This
+    /// mirrors BlockListElementLevelVariationTests.Publishing.Editing_A_Non_Default_Culture_Block_Value_Flags_That_Culture_As_Edited,
+    /// proving the same behaviour for Rich Text's shared block-value implementation.
+    /// </summary>
+    /// <remarks>
+    /// This exercises <see cref="IDataEditor.GetChangedCulturesForPartialPropertyValues"/> directly rather than
+    /// through a full ContentService save/publish round-trip: unlike Block List/Grid, Rich Text's
+    /// <c>FromEditor</c> does not canonically sort nested block values by culture, so a full round-trip is not
+    /// order-stable and would make this assertion flaky for reasons unrelated to the behaviour under test.
+    /// </remarks>
+    [Test]
+    public async Task GetChangedCulturesForPartialPropertyValues_Flags_Only_The_Culture_With_An_Actual_Change()
+    {
+        var elementType = CreateElementType(ContentVariation.Culture);
+        var rteDataType = await CreateRichTextDataType(elementType);
+        var richTextValue = CreateRichTextValue(elementType);
+        var publishedJson = JsonSerializer.Serialize(richTextValue);
+
+        var editedValue = JsonSerializer.Deserialize<RichTextEditorValue>(publishedJson)!;
+        editedValue.Blocks!.ContentData[0].Values.Single(v => v.Alias == "variantText" && v.Culture == "da-DK").Value = "#1: The second content value in Danish";
+        var editedJson = JsonSerializer.Serialize(editedValue);
+
+        var dataEditor = rteDataType.Editor!;
+        var changedCultures = dataEditor.GetChangedCulturesForPartialPropertyValues(editedJson, publishedJson, "en-US").ToArray();
+
+        CollectionAssert.AreEquivalent(new[] { "da-DK" }, changedCultures);
+
+        // an unchanged value must not report any changed cultures at all.
+        var unchangedCultures = dataEditor.GetChangedCulturesForPartialPropertyValues(publishedJson, publishedJson, "en-US").ToArray();
+        Assert.IsEmpty(unchangedCultures);
     }
 
     private async Task<IDataType> CreateRichTextDataType(IContentType elementType)
