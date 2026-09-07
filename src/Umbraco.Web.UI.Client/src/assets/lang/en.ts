@@ -1493,6 +1493,7 @@ export default {
 	},
 	scripts: {
 		editscript: 'Edit script file',
+		tabCode: 'Code',
 	},
 	sections: {
 		content: 'Content',
@@ -1683,6 +1684,7 @@ export default {
 		notAllowed: 'The selected template is no longer allowed on this document type.',
 		productionMode: 'Production Mode',
 		runtimeModeProduction: 'Content is not editable when using runtime mode <code>Production</code>.',
+		tabCode: 'Code',
 		deleteByIdFailed: 'Failed to delete template with ID %0%',
 		edittemplate: 'Edit template',
 		insertSections: 'Sections',
