@@ -514,7 +514,7 @@ internal sealed class RichTextElementLevelVariationTests : BlockEditorElementVar
     [Test]
     public async Task GetChangedCulturesForPartialPropertyValues_Flags_Only_The_Culture_With_An_Actual_Change()
     {
-        var elementType = CreateElementType(ContentVariation.Culture);
+        var elementType = await CreateElementType(ContentVariation.Culture);
         var rteDataType = await CreateRichTextDataType(elementType);
         var richTextValue = CreateRichTextValue(elementType);
         var publishedJson = JsonSerializer.Serialize(richTextValue);
