@@ -270,7 +270,8 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	#renderRoutes() {
-		if (this._hasSlottedContent) {
+		// Only render the router-slot if there are no slotted content, or if there are workspace views defined.
+		if (this._hasSlottedContent && (!this._routes || this._routes.length === 0)) {
 			return nothing;
 		}
 		return html`
@@ -284,8 +285,8 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 				@change=${(event: UmbRouterSlotChangeEvent) => {
 					this._activePath = event.target.localActiveViewPath;
 				}}
-				><umb-view-loader></umb-view-loader
-			></umb-router-slot>
+				>${!this._hasSlottedContent ? html`<umb-view-loader></umb-view-loader>` : nothing}</umb-router-slot
+			>
 		`;
 	}
 
