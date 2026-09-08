@@ -1276,7 +1276,7 @@ groups: ["accessibility","medical"],
 path: () => import("./icons/icon-help.js"),
 },{
 name: "icon-history",
-groups: ["arrows","time"],
+keywords: ["history","time","redo","undo","rewind","timeline","version","time machine","backup","ccw"],
 path: () => import("./icons/icon-history.js"),
 },{
 name: "icon-home",
