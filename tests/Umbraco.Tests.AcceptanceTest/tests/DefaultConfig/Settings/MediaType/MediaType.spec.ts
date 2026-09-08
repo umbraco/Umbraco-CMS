@@ -105,4 +105,8 @@ test('cannot create a media type with a duplicate name', async ({umbracoApi, umb
 
   // Assert
   await umbracoUi.mediaType.isErrorNotificationVisible();
+  // The attempted duplicate shares the existing item's name, so doesNameExist() would always be
+  // true regardless of outcome. Count matches instead to confirm no second item was created.
+  const rootMediaTypes = await (await umbracoApi.mediaType.getAllAtRoot()).json();
+  expect(rootMediaTypes.items.filter(item => item.name === mediaTypeName)).toHaveLength(1);
 });
