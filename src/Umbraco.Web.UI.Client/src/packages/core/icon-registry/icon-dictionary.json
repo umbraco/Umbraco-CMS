@@ -5881,10 +5881,6 @@
 			"file": "underline.svg"
 		},
 		{
-			"name": "icon-unlink",
-			"file": "unlink.svg"
-		},
-		{
 			"name": "icon-unlocked",
 			"file": "lock-open.svg",
 			"keywords": [
@@ -7123,5 +7119,10 @@
 			"file": "legacy/icon-umbraco.svg"
 		}
 	],
-	"custom": []
+	"custom": [
+		{
+			"name": "icon-unlink",
+			"file": "unlink.svg"
+		}
+	]
 }
