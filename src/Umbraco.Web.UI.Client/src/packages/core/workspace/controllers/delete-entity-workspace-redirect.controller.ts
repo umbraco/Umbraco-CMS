@@ -53,9 +53,6 @@ export class UmbDeleteEntityWorkspaceRedirectController extends UmbControllerBas
 		if (event.getEntityType() !== this.#workspaceContext.getEntityType()) return;
 
 		const path = this.#navigationParentItemPath;
-
-		this.destroy();
-
 		if (!path) return;
 
 		// The deleted entity's own URL is gone for good (unlike trash, which keeps a readonly URL reachable) —

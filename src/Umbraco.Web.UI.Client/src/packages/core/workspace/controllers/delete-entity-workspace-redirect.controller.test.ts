@@ -34,6 +34,12 @@ class UmbTestNavigationParentItemPathWorkspaceContext {
 	setNavigationParentItemPath(path: string | undefined) {
 		this.#navigationParentItemPath.setValue(path);
 	}
+
+	/** Simulates the same workspace context instance later loading a different entity. */
+	load(unique: string | null, entityType: string) {
+		this.#unique = unique;
+		this.#entityType = entityType;
+	}
 }
 
 /**
@@ -153,15 +159,28 @@ describe('UmbDeleteEntityWorkspaceRedirectController', () => {
 		expect(history.pushStateCalls).to.have.lengthOf(0);
 	});
 
-	it('destroys itself after redirecting, so a repeat event has no further effect', async () => {
-		workspaceContext.setNavigationParentItemPath('/test/edit/parent-unique');
+	it('keeps reacting to further deletes after handling one, since it is created once per workspace context and reused as that context goes on to load different entities', async () => {
+		workspaceContext.setNavigationParentItemPath('/test/edit/first-parent');
 		createController();
 		await aTimeout(0);
 
 		dispatchDeleted();
-		dispatchDeleted();
 
 		expect(history.replaceStateCalls).to.have.lengthOf(1);
+		expect(history.replaceStateCalls[0].url).to.equal('/test/edit/first-parent');
+
+		// The same workspace context instance now loads a different entity...
+		workspaceContext.load('second-unique', 'test-entity-type');
+		workspaceContext.setNavigationParentItemPath('/test/edit/second-parent');
+		await aTimeout(0);
+
+		// ...which later gets deleted too.
+		actionEventContext.dispatchEvent(
+			new UmbEntityDeletedEvent({ unique: 'second-unique', entityType: 'test-entity-type' }),
+		);
+
+		expect(history.replaceStateCalls).to.have.lengthOf(2);
+		expect(history.replaceStateCalls[1].url).to.equal('/test/edit/second-parent');
 	});
 
 	it('stops reacting once destroyed', async () => {
