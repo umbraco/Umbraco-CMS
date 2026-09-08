@@ -28,6 +28,10 @@ export abstract class UmbMenuListStructureWorkspaceContextBase
 		this.provideContext('UmbMenuStructureWorkspaceContext', this);
 	}
 
+	getItemHref(_structureItem: UmbStructureItemModel): string | undefined {
+		return undefined;
+	}
+
 	/**
 	 * Sets the structure, ordered root first and the current item last, and updates the parent
 	 * entity context to the item preceding the current one.
