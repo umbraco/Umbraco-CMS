@@ -1,47 +1,51 @@
-import type { ManifestWorkspaceContextMenuStructureKind, UmbStructureItemModel } from './types.js';
 import { UMB_MENU_STRUCTURE_WORKSPACE_CONTEXT } from './menu-structure-workspace-context.context-token.js';
 import { UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT } from './section-sidebar-menu/index.js';
-import type { UmbTreeRepository, UmbTreeItemModel, UmbTreeRootModel } from '@umbraco-cms/backoffice/tree';
+import type { ManifestWorkspaceContextMenuStructureKind, UmbStructureItemModel } from './types.js';
+import type { UmbMenuStructureWorkspaceContext } from './menu-structure-workspace-context.interface.js';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
-import { UMB_SUBMITTABLE_TREE_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
-import { UmbArrayState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbAncestorsEntityContext, UmbParentEntityContext, type UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import { debounce, linkEntityExpansionEntries } from '@umbraco-cms/backoffice/utils';
-import { UMB_MODAL_CONTEXT } from '@umbraco-cms/backoffice/modal';
-import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
+import { UmbAncestorsEntityContext, UmbParentEntityContext, type UmbEntityModel } from '@umbraco-cms/backoffice/entity';
+import { UmbArrayState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
+import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
+import { UMB_MODAL_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { UMB_SUBMITTABLE_TREE_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbTreeRepository, UmbTreeItemModel, UmbTreeRootModel } from '@umbraco-cms/backoffice/tree';
 
 interface UmbMenuTreeStructureWorkspaceContextBaseArgs {
 	treeRepositoryAlias: string;
 }
 
 // TODO: introduce base class for all menu structure workspaces to handle ancestors and parent
-export abstract class UmbMenuTreeStructureWorkspaceContextBase extends UmbContextBase {
+export abstract class UmbMenuTreeStructureWorkspaceContextBase
+	extends UmbContextBase
+	implements UmbMenuStructureWorkspaceContext
+{
 	manifest?: ManifestWorkspaceContextMenuStructureKind;
 
 	#workspaceContext?: typeof UMB_SUBMITTABLE_TREE_ENTITY_WORKSPACE_CONTEXT.TYPE;
-	#args: UmbMenuTreeStructureWorkspaceContextBaseArgs;
+	readonly #args: UmbMenuTreeStructureWorkspaceContextBaseArgs;
 
-	#structure = new UmbArrayState<UmbStructureItemModel>([], (x) => x.unique);
+	readonly #structure = new UmbArrayState<UmbStructureItemModel>([], (x) => x.unique);
 	public readonly structure = this.#structure.asObservable();
 
-	#parent = new UmbObjectState<UmbStructureItemModel | undefined>(undefined);
+	readonly #parent = new UmbObjectState<UmbStructureItemModel | undefined>(undefined);
 	/**
 	 * @deprecated Will be removed in v.18: Use UMB_PARENT_ENTITY_CONTEXT instead.
 	 */
 	public readonly parent = this.#parent.asObservable();
 
-	#parentContext = new UmbParentEntityContext(this);
-	#ancestorContext = new UmbAncestorsEntityContext(this);
+	readonly #parentContext = new UmbParentEntityContext(this);
+	readonly #ancestorContext = new UmbAncestorsEntityContext(this);
 	#sectionSidebarMenuContext?: typeof UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT.TYPE;
 	#isModalContext: boolean = false;
 	#actionEventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
 	#structureRequestId = 0;
 
 	// Coalesces the unique/isNew/reload-event triggers when they fire in quick succession.
-	#requestStructure = debounce(() => this.#requestStructureImpl(), 100);
+	readonly #requestStructure = debounce(() => this.#requestStructureImpl(), 100);
 
 	constructor(host: UmbControllerHost, args: UmbMenuTreeStructureWorkspaceContextBaseArgs) {
 		super(host, UMB_MENU_STRUCTURE_WORKSPACE_CONTEXT);
@@ -105,7 +109,7 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase extends UmbContex
 		);
 	}
 
-	#onReloadStructureForEntityRequest = (event: UmbRequestReloadStructureForEntityEvent) => {
+	readonly #onReloadStructureForEntityRequest = (event: UmbRequestReloadStructureForEntityEvent) => {
 		if (!this.#isCurrentEntityOrAncestor(event.getEntityType(), event.getUnique())) return;
 		this.#requestStructure();
 	};
