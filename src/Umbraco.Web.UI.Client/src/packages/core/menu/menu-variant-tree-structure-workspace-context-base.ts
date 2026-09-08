@@ -46,7 +46,6 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 	#ancestorContext = new UmbAncestorsEntityContext(this);
 	#sectionSidebarMenuContext?: typeof UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT.TYPE;
 	#isModalContext: boolean = false;
-	#isNew: boolean | undefined = undefined;
 	#variantWorkspaceContext?: typeof UMB_VARIANT_WORKSPACE_CONTEXT.TYPE;
 	#workspaceActiveVariantId?: UmbVariantId;
 	#actionEventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
@@ -100,14 +99,15 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 				'observeUnique',
 			);
 
+			// isNew is observed on its own, separate from the structure fetch, so the expand decision never
+			// depends on which of the two happens to settle first: whichever settles last (isNew resolving to
+			// false, or the structure fetch resolving) is the one that actually triggers the expand.
 			this.observe(
 				this.#workspaceContext?.isNew,
-				(value) => {
-					// Workspace has changed from new to existing
-					if (value === false && this.#isNew === true) {
-						this.#requestStructure();
+				(isNew) => {
+					if (isNew === false) {
+						this.#tryExpandSectionSidebarMenu();
 					}
-					this.#isNew = value;
 				},
 				'observeIsNew',
 			);
@@ -247,12 +247,26 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 			this.#setParentData(structureItems);
 			this.#setAncestorData(data);
 
-			// Don't expand the parent for an item that hasn't been created yet.
-			const menuItemAlias = this.manifest?.meta?.menuItemAlias;
-			if (menuItemAlias && !this.#isModalContext && isNew === false) {
-				this.#expandSectionSidebarMenu(structureItems, menuItemAlias);
-			}
+			this.#tryExpandSectionSidebarMenu();
 		}
+	}
+
+	/**
+	 * Expands the parent in the section sidebar menu, but only once we know for certain the item isn't still being
+	 * created, and only once the structure has actually been fetched. Reads both conditions fresh, so it's safe to
+	 * call from either the structure-fetch completion or the isNew observer, whichever settles last.
+	 */
+	#tryExpandSectionSidebarMenu() {
+		const menuItemAlias = this.manifest?.meta?.menuItemAlias;
+		if (!menuItemAlias || this.#isModalContext) return;
+
+		// Don't expand the parent for an item that hasn't been created yet.
+		if (this.#workspaceContext?.getIsNew() !== false) return;
+
+		const structureItems = this.#structure.getValue();
+		if (!structureItems.length) return;
+
+		this.#expandSectionSidebarMenu(structureItems, menuItemAlias);
 	}
 
 	#clearStructure() {

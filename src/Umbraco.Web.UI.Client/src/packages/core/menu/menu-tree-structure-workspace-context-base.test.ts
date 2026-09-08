@@ -281,3 +281,68 @@ describe('UmbMenuTreeStructureWorkspaceContextBase (creating a new item)', () =>
 		expect(UmbTestSectionSidebarMenuContext.expandItemsCalls).to.have.lengthOf(1);
 	});
 });
+
+describe('UmbMenuTreeStructureWorkspaceContextBase (isNew resolves after the structure has already loaded)', () => {
+	let host: UmbTestMenuStructureControllerHostElement;
+	let workspaceContext: UmbTestSubmittableTreeEntityWorkspaceContext;
+	let context: TestMenuTreeStructureWorkspaceContext;
+
+	before(() => {
+		umbExtensionsRegistry.register(createTestTreeRepositoryManifest(TEST_TREE_REPOSITORY_ALIAS));
+	});
+
+	after(() => {
+		umbExtensionsRegistry.unregister(TEST_TREE_REPOSITORY_ALIAS);
+	});
+
+	beforeEach(async () => {
+		UmbTestTreeRepository.reset();
+		UmbTestSectionSidebarMenuContext.reset();
+
+		host = new UmbTestMenuStructureControllerHostElement();
+		document.body.appendChild(host);
+
+		workspaceContext = new UmbTestSubmittableTreeEntityWorkspaceContext(host);
+		new UmbContextProviderController(host, UMB_SUBMITTABLE_TREE_ENTITY_WORKSPACE_CONTEXT, workspaceContext as never);
+		new UmbContextProviderController(
+			host,
+			UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT,
+			new UmbTestSectionSidebarMenuContext(host) as never,
+		);
+
+		context = new TestMenuTreeStructureWorkspaceContext(host);
+		context.manifest = {
+			type: 'workspaceContext',
+			kind: 'menuStructure',
+			alias: 'Umb.Test.MenuStructureWorkspaceContext.Race',
+			name: 'Test Menu Structure Workspace Context (isNew resolves late)',
+			meta: { menuItemAlias: 'test-menu-item' },
+		};
+
+		// A workspace context that publishes `unique` before `isNew` has resolved (e.g. a slow detail request) -
+		// the structure fetch runs and completes while `isNew` is still undefined.
+		workspaceContext.setEntityType('test-entity-type');
+		workspaceContext.setUnique('test-unique');
+		await aTimeout(150);
+	});
+
+	afterEach(() => {
+		context.destroy();
+		document.body.removeChild(host);
+	});
+
+	it('fetches the structure but does not expand while isNew is still unresolved', async () => {
+		expect(UmbTestTreeRepository.requestTreeItemAncestorsCalls).to.have.lengthOf(1);
+		expect(UmbTestSectionSidebarMenuContext.expandItemsCalls).to.have.lengthOf(0);
+	});
+
+	it('expands once isNew resolves to false, without re-fetching the structure', async () => {
+		const requestCountBeforeIsNewResolves = UmbTestTreeRepository.requestTreeItemAncestorsCalls.length;
+
+		workspaceContext.setIsNew(false);
+		await aTimeout(150);
+
+		expect(UmbTestSectionSidebarMenuContext.expandItemsCalls).to.have.lengthOf(1);
+		expect(UmbTestTreeRepository.requestTreeItemAncestorsCalls).to.have.lengthOf(requestCountBeforeIsNewResolves);
+	});
+});
