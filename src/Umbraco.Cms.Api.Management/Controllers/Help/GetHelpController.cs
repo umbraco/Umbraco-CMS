@@ -45,6 +45,11 @@ public class GetHelpController : HelpControllerBase
     /// </remarks>
     [HttpGet]
     [MapToApiVersion("1.0")]
+
+    // The 400 is never returned any more, but stays declared so the generated backoffice client keeps
+    // exporting the "GetHelpError" type: hey-api omits that alias for operations whose only error is a 401.
+    // TODO (V19): remove along with this controller.
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(PagedViewModel<HelpPageResponseModel>), StatusCodes.Status200OK)]
     [EndpointSummary("Gets help information.")]
     [EndpointDescription("Gets help information and documentation resources for the Umbraco back office.")]

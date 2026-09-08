@@ -10251,10 +10251,16 @@ export type GetHelpData = {
 
 export type GetHelpErrors = {
     /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+    /**
      * The resource is protected and requires an authentication token
      */
     401: unknown;
 };
+
+export type GetHelpError = GetHelpErrors[keyof GetHelpErrors];
 
 export type GetHelpResponses = {
     /**
