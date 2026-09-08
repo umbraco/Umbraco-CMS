@@ -158,8 +158,9 @@ thumbnails therefore decodes every source in parallel, so peak memory is
 
 `ImageProcessingThrottleMiddleware` (registered ahead of `UseImageSharp()` in the pre-pipeline)
 applies the concurrency cap. Requests over the limit wait rather than being rejected, and only
-requests whose path has a file extension *and* whose query contains a registered processor command
-are gated.
+requests carrying a registered processor command whose format resolves to a configured image format
+are gated, so an unrelated response like `/export.csv?format=xlsx` is not. What the placement can
+and cannot exclude — cache hits in particular — is documented on the class itself.
 
 ImageSharp's own pool default is an eighth of available memory, released only on a gen2 collection
 and then at most 50% per minute, which leaves a container sitting well above its working set at

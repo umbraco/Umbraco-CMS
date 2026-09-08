@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
+using SixLabors.ImageSharp.Web;
+using SixLabors.ImageSharp.Web.Middleware;
 using SixLabors.ImageSharp.Web.Processors;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Imaging.ImageSharp;
@@ -36,10 +38,10 @@ public class ImageProcessingThrottleMiddlewareTests
         Assert.That(probe.Peak, Is.EqualTo(Limit), "More images were processed concurrently than configured.");
     }
 
-    // A file with no processing command, and an API call that happens to carry one: neither is
-    // something the imaging middleware will process, so neither may queue behind it.
+    // None of these is something the imaging middleware will process, so none may queue behind it.
     [TestCase(ImagePath, "v", "1234")]
     [TestCase("/umbraco/management/api/v1/tree", "width", "400")]
+    [TestCase("/export.csv", "format", "xlsx")]
     public Task InvokeAsync_NonProcessingRequests_AreNotThrottled(string path, string key, string value)
         => AssertAllRequestsPassThrough(CreateMiddleware, () => CreateContext(path, (key, value)));
 
@@ -53,8 +55,8 @@ public class ImageProcessingThrottleMiddlewareTests
             return Task.CompletedTask;
         });
 
-        // PathString.Empty exposes a null Value, which the extension check has to treat as
-        // "not an image request" rather than faulting the pipeline.
+        // PathString.Empty exposes a null Value, which has to read as "not an image request"
+        // rather than faulting the pipeline.
         var context = new DefaultHttpContext();
         context.Request.Path = PathString.Empty;
         context.Request.QueryString = QueryString.Create("width", "400");
@@ -133,12 +135,15 @@ public class ImageProcessingThrottleMiddlewareTests
         var settings = new ImagingSettings { Memory = memory };
 
         var processor = new Mock<IImageWebProcessor>();
-        processor.SetupGet(x => x.Commands).Returns(new[] { "width", "height" });
+        processor.SetupGet(x => x.Commands).Returns(new[] { "width", "height", "format" });
         IImageWebProcessor[] processors = { processor.Object };
 
+        // The real utility, so the tests use the same supported-format set as runtime.
+        var formatUtilities = new FormatUtilities(Options.Create(new ImageSharpMiddlewareOptions()));
+
         return availableMemoryBytes is { } memoryBytes && processorCount is { } cores
-            ? new ImageProcessingThrottleMiddleware(next, Options.Create(settings), processors, memoryBytes, cores)
-            : new ImageProcessingThrottleMiddleware(next, Options.Create(settings), processors);
+            ? new ImageProcessingThrottleMiddleware(next, Options.Create(settings), processors, formatUtilities, memoryBytes, cores)
+            : new ImageProcessingThrottleMiddleware(next, Options.Create(settings), processors, formatUtilities);
     }
 
     private static async Task AssertAllRequestsPassThrough(
