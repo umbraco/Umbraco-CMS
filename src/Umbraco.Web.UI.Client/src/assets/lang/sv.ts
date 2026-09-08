@@ -382,7 +382,7 @@ export default {
 		confirmPasteOverwriteMessage: (name: string) =>
 			`Egenskapen innehåller redan ett värde. Klistra in från egenskapsåtgärden kommer att skriva över det nuvarande värdet. Vill du ersätta det nuvarande värdet med <strong>${name}</strong>?`,
 		copySuccessHeadline: 'Kopierad till urklipp',
-		noItems: 'Det finns inga objekt i urklipp.',
+		noItemsMessage: 'Det finns inga objekt i urklipp.',
 	},
 	prompt: {
 		stay: 'Stanna',

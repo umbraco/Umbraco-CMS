@@ -208,7 +208,7 @@ export default {
 		confirmPasteOverwriteMessage: (name: string) =>
 			`プロパティにはすでに値が含まれています。クリップボードから貼り付けると現在の値が上書きされます。現在の値を <strong>${name}</strong> に置き換えますか？`,
 		copySuccessHeadline: 'クリップボードにコピーされました',
-		noItems: 'クリップボードに項目はありません。',
+		noItemsMessage: 'クリップボードに項目はありません。',
 	},
 	prompt: {
 		stay: 'このページに留まる',

@@ -168,7 +168,7 @@ export class UmbClipboardEntryPickerElement extends UmbLitElement {
 							(item) => item.unique,
 							(item) => this.#renderItem(item),
 						),
-					() => html`<p><umb-localize key="clipboard_noItems">There are no items in the clipboard.</umb-localize></p>`,
+					() => html`<p><umb-localize key="clipboard_noItemsMessage">There are no items in the clipboard.</umb-localize></p>`,
 				)}
 			</uui-box>
 		`;

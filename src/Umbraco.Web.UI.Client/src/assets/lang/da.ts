@@ -2517,7 +2517,7 @@ export default {
 		confirmPasteOverwriteMessage: (name: string) =>
 			`Egenskaben indeholder allerede en værdi. Indsæt fra egenskabsaktionen vil overskrive den nuværende værdi. Vil du erstatte den nuværende værdi med <strong>${name}</strong>?`,
 		copySuccessHeadline: 'Kopieret til udklipsholder',
-		noItems: 'Der er ingen elementer i udklipsholderen.',
+		noItemsMessage: 'Der er ingen elementer i udklipsholderen.',
 	},
 	propertyActions: {
 		tooltipForPropertyActionsMenu: 'Åbn egenskabshandlinger',
