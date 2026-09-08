@@ -58,6 +58,21 @@ public sealed class ImageProcessingThrottleMiddleware
     {
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ImageProcessingThrottleMiddleware" /> class,
+    /// with the host's characteristics supplied rather than measured.
+    /// </summary>
+    /// <param name="next">The next middleware in the pipeline.</param>
+    /// <param name="imagingSettings">The Umbraco imaging settings.</param>
+    /// <param name="processors">The registered image processors, used to recognise processing requests.</param>
+    /// <param name="formatUtilities">The image format utilities, used to recognise image sources.</param>
+    /// <param name="availableMemoryBytes">The memory available to the process.</param>
+    /// <param name="processorCount">The number of processors available to the process.</param>
+    /// <remarks>
+    /// Whether the limit applies at all, and what it works out to, are derived from the memory and
+    /// processor count of the host. Tests supply both so they assert the derivation instead of
+    /// whatever the machine running them happens to report.
+    /// </remarks>
     internal ImageProcessingThrottleMiddleware(
         RequestDelegate next,
         IOptions<ImagingSettings> imagingSettings,

@@ -45,6 +45,16 @@ public class ImageProcessingThrottleMiddlewareTests
     public Task InvokeAsync_NonProcessingRequests_AreNotThrottled(string path, string key, string value)
         => AssertAllRequestsPassThrough(CreateMiddleware, () => CreateContext(path, (key, value)));
 
+    // A request the imaging middleware serves from cache never reaches the decode hook, so it never
+    // takes a slot however many arrive at once. This is what gating at the decode buys over gating
+    // in the middleware, where a cache hit waited behind decodes.
+    [Test]
+    public Task InvokeAsync_RequestsServedWithoutDecoding_AreNotThrottled()
+        => AssertAllRequestsPassThrough(
+            CreateMiddleware,
+            () => CreateContext(ImagePath, ("width", "400")),
+            decoding: false);
+
     [Test]
     public async Task InvokeAsync_RequestsWithNoPath_AreNotThrottled()
     {
@@ -84,15 +94,16 @@ public class ImageProcessingThrottleMiddlewareTests
         var completed = false;
 
         // One middleware throughout, so the assertion is about this instance's semaphore.
-        var middleware = CreateMiddleware(_ =>
+        var middleware = CreateMiddleware(async context =>
         {
+            await AcquireSlotAsync(context);
+
             if (shouldThrow)
             {
                 throw new InvalidOperationException("Decoding failed.");
             }
 
             completed = true;
-            return Task.CompletedTask;
         });
 
         // Exactly Limit failures, so every slot is consumed. Going further would block here rather
@@ -146,12 +157,23 @@ public class ImageProcessingThrottleMiddlewareTests
             : new ImageProcessingThrottleMiddleware(next, Options.Create(settings), processors, formatUtilities);
     }
 
+    // Takes the request's slot the way the imaging middleware's decode hook does.
+    private static async Task AcquireSlotAsync(HttpContext context)
+    {
+        if (context.Items.TryGetValue(ImageProcessingSlot.HttpContextItemKey, out var value)
+            && value is ImageProcessingSlot slot)
+        {
+            await slot.AcquireAsync(context.RequestAborted);
+        }
+    }
+
     private static async Task AssertAllRequestsPassThrough(
         Func<RequestDelegate, ImageProcessingThrottleMiddleware> create,
-        Func<DefaultHttpContext> context)
+        Func<DefaultHttpContext> context,
+        bool decoding = true)
     {
         var probe = new ConcurrencyProbe();
-        var middleware = create(probe.HandleAsync);
+        var middleware = create(decoding ? probe.HandleAsync : probe.HandleWithoutDecodingAsync);
 
         Task[] requests = Send(middleware, context);
 
@@ -203,7 +225,21 @@ public class ImageProcessingThrottleMiddlewareTests
 
         public void Release() => _released.SetResult();
 
+        /// <summary>
+        /// Stands in for a decode, taking the request's slot before it is counted.
+        /// </summary>
         public async Task HandleAsync(HttpContext context)
+        {
+            await AcquireSlotAsync(context);
+            await RecordAsync();
+        }
+
+        /// <summary>
+        /// Stands in for a cache hit, which never reaches the decode hook and so takes no slot.
+        /// </summary>
+        public Task HandleWithoutDecodingAsync(HttpContext context) => RecordAsync();
+
+        private async Task RecordAsync()
         {
             RecordPeak(Interlocked.Increment(ref _current));
 

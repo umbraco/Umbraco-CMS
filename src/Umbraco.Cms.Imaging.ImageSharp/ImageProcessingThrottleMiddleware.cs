@@ -22,11 +22,17 @@ namespace Umbraco.Cms.Imaging.ImageSharp;
 /// is created and every request passes straight through.
 /// </para>
 /// <para>
-/// Running ahead of <c>UseImageSharp()</c> means a cache hit cannot be told from a decode, so a
-/// gated request holds its slot for the whole of the downstream pipeline - a cache hit, or a
-/// missing source falling through to the 404 content, included. Narrowing that further needs the
-/// gate inside the imaging middleware, at <c>OnBeforeLoadAsync</c>, which only ImageSharp.Web 3.x
-/// offers - hence the placement here, which both packages share.
+/// Running ahead of <c>UseImageSharp()</c> means this cannot itself tell a cache hit from a
+/// decode, so it does not wait here. It publishes an <see cref="ImageProcessingSlot" /> for the
+/// request and waits only when the imaging middleware reaches its decode hook, which happens on a
+/// cache miss alone (see <see cref="ConfigureImageSharpMiddlewareOptions" />). A cache hit, and a
+/// request the imaging middleware declines, therefore pass through without waiting.
+/// </para>
+/// <para>
+/// Owning the slot here is what makes that safe: the place is given back when the request ends,
+/// whether the decode succeeded, threw, or never happened. It is held until then rather than
+/// released at the end of processing, because the decoded image stays in memory while the result
+/// is encoded and cached, and that is the memory being bounded.
 /// </para>
 /// </remarks>
 public sealed class ImageProcessingThrottleMiddleware
@@ -58,6 +64,21 @@ public sealed class ImageProcessingThrottleMiddleware
     {
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ImageProcessingThrottleMiddleware" /> class,
+    /// with the host's characteristics supplied rather than measured.
+    /// </summary>
+    /// <param name="next">The next middleware in the pipeline.</param>
+    /// <param name="imagingSettings">The Umbraco imaging settings.</param>
+    /// <param name="processors">The registered image processors, used to recognise processing requests.</param>
+    /// <param name="formatUtilities">The image format utilities, used to recognise image sources.</param>
+    /// <param name="availableMemoryBytes">The memory available to the process.</param>
+    /// <param name="processorCount">The number of processors available to the process.</param>
+    /// <remarks>
+    /// Whether the limit applies at all, and what it works out to, are derived from the memory and
+    /// processor count of the host. Tests supply both so they assert the derivation instead of
+    /// whatever the machine running them happens to report.
+    /// </remarks>
     internal ImageProcessingThrottleMiddleware(
         RequestDelegate next,
         IOptions<ImagingSettings> imagingSettings,
@@ -92,14 +113,16 @@ public sealed class ImageProcessingThrottleMiddleware
             return;
         }
 
-        await _semaphore.WaitAsync(context.RequestAborted);
+        var slot = new ImageProcessingSlot(_semaphore);
+        context.Items[ImageProcessingSlot.HttpContextItemKey] = slot;
+
         try
         {
             await _next(context);
         }
         finally
         {
-            _semaphore.Release();
+            slot.Release();
         }
     }
 

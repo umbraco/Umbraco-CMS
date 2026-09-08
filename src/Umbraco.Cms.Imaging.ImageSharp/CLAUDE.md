@@ -19,19 +19,22 @@ Image processing library using **ImageSharp 3.x** and **ImageSharp.Web** for on-
 
 - `Umbraco.Web.Common` - Web infrastructure
 
-### Project Structure (7 source files)
+### Project Structure (10 source files)
 
 ```
 Umbraco.Cms.Imaging.ImageSharp/
 ├── ImageSharpComposer.cs                    # Auto-registration via IComposer
 ├── UmbracoBuilderExtensions.cs              # DI setup and middleware configuration
-├── ConfigureImageSharpMiddlewareOptions.cs  # Middleware options (caching, HMAC, size limits)
+├── ConfigureImageSharpMiddlewareOptions.cs  # Middleware options (caching, HMAC, size limits, decode throttle)
 ├── ConfigurePhysicalFileSystemCacheOptions.cs # File cache location
+├── ImageProcessingThrottleMiddleware.cs     # Bounds concurrent processing; owns the slot lifetime
+├── ImageProcessingSlot.cs                   # One request's claim on the concurrency limit
 ├── ImageProcessors/
 │   └── CropWebProcessor.cs                  # Custom crop processor with EXIF awareness
 └── Media/
     ├── ImageSharpDimensionExtractor.cs      # Extract image dimensions (EXIF-aware)
-    └── ImageSharpImageUrlGenerator.cs       # Generate query string URLs for processing
+    ├── ImageSharpImageUrlGenerator.cs       # Generate query string URLs for processing
+    └── ImageSharpImageUrlTokenGenerator.cs  # Re-sign image URLs after an HMAC key rotation
 ```
 
 ### Relationship to ImageSharp2
@@ -156,11 +159,27 @@ thumbnails therefore decodes every source in parallel, so peak memory is
 `concurrent requests x decoded source size` — measured at ~60 MB for one 300x300 thumbnail of a
 4000x3000 JPEG. Unbounded, that exhausts a container limit and the process is killed (exit 137).
 
-`ImageProcessingThrottleMiddleware` (registered ahead of `UseImageSharp()` in the pre-pipeline)
-applies the concurrency cap. Requests over the limit wait rather than being rejected, and only
-requests carrying a registered processor command whose format resolves to a configured image format
-are gated, so an unrelated response like `/export.csv?format=xlsx` is not. What the placement can
-and cannot exclude — cache hits in particular — is documented on the class itself.
+The concurrency cap is applied in two stages, and requests over it wait rather than being rejected.
+
+1. `ImageProcessingThrottleMiddleware`, registered ahead of `UseImageSharp()` in the pre-pipeline,
+   decides whether a request *could* decode: it needs a registered processor command and a format
+   that resolves to a configured image format, so an unrelated response like
+   `/export.csv?format=xlsx` is left alone. For those that qualify it publishes an
+   `ImageProcessingSlot` on `HttpContext.Items` and releases it when the request ends.
+2. `ConfigureImageSharpMiddlewareOptions` wires `OnBeforeLoadAsync`, which ImageSharp invokes on a
+   cache **miss** only, after the source is resolved and immediately before the decode. That is
+   where the wait happens, so a cache hit never queues behind a decode.
+
+Splitting it this way keeps the wait precise while leaving the release somewhere it is guaranteed to
+run — the hook has no matching "after" callback, and the middleware's `finally` does. The slot is
+held until the request ends rather than freed when processing finishes, because the decoded image
+stays in memory while the result is encoded and cached.
+
+**ImageSharp 2.x differs here.** ImageSharp.Web 2.0.2 has no `OnBeforeLoadAsync` (its earliest hook,
+`OnParseCommandsAsync`, runs before the cache check), so `Umbraco.Cms.Imaging.ImageSharp2` waits in
+the middleware for anything its request filter matches — cache hits included. The two copies of
+`ImageProcessingThrottleMiddleware` are therefore *not* interchangeable; the v2 copy is the coarser
+fallback.
 
 ImageSharp's own pool default is an eighth of available memory, released only on a gen2 collection
 and then at most 50% per minute, which leaves a container sitting well above its working set at
