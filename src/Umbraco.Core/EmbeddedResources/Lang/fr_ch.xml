@@ -2317,12 +2317,12 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
 		<key alias="more">En savoir plus</key>
 		<key alias="bulletPointOne">
 			<![CDATA[
-            Lisez-en plus sur la façon de travailler avec les éléments dans la section Settings <a class="btn-link -underline" href="https://docs.umbraco.com/umbraco-cms/fundamentals/backoffice/sections/" target="_blank" rel="noopener">dans la section Documentation</a> de Our Umbraco
+            Lisez-en plus sur la façon de travailler avec les éléments dans la section Settings <a class="btn-link -underline" href="https://docs.umbraco.com/umbraco-cms/fundamentals/backoffice/sections/" target="_blank" rel="noopener">dans la section Documentation</a> d'Umbraco
         ]]>
 		</key>
 		<key alias="bulletPointTwo">
 			<![CDATA[
-            Posez une question dans le <a class="btn-link -underline" href="https://our.umbraco.com/forum" target="_blank" rel="noopener">Community Forum</a>
+            Posez une question dans le <a class="btn-link -underline" href="https://forum.umbraco.com" target="_blank" rel="noopener">Community Forum</a>
         ]]>
 		</key>
 		<key alias="bulletPointThree">

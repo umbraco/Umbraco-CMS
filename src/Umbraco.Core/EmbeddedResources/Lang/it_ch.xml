@@ -3010,12 +3010,12 @@ Per gestire il tuo sito web, è sufficiente aprire il backoffice di Umbraco e in
 		<key alias="more"><![CDATA[Scopri di più]]></key>
 		<key alias="bulletPointOne">
 			<![CDATA[
-            Maggiori informazioni su come lavorare con gli elementi in Impostazioni <a class="btn-link -underline" href="https://docs.umbraco.com/umbraco-cms/fundamentals/backoffice/sections/" target="_blank" rel="noopener">nella documentazione</a> di Our Umbraco
+            Maggiori informazioni su come lavorare con gli elementi in Impostazioni <a class="btn-link -underline" href="https://docs.umbraco.com/umbraco-cms/fundamentals/backoffice/sections/" target="_blank" rel="noopener">nella documentazione</a> di Umbraco
         ]]>
 		</key>
 		<key alias="bulletPointTwo">
 			<![CDATA[
-            Fai una domanda nel <a class="btn-link -underline" href="https://our.umbraco.com/forum" target="_blank" rel="noopener">Community Forum</a>
+            Fai una domanda nel <a class="btn-link -underline" href="https://forum.umbraco.com" target="_blank" rel="noopener">Community Forum</a>
         ]]>
 		</key>
 		<key alias="bulletPointThree">
