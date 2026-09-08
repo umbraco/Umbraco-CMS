@@ -294,6 +294,55 @@ public class AspNetCoreHostingEnvironmentTests
         Assert.AreEqual(upgraded, sut.ApplicationMainUrl, "EveryRequest keeps switching hosts; only downgrades are refused");
     }
 
+    [TestCase("http://site-a.com", "http://localhost")]
+    [TestCase("https://site-a.com", "https://127.0.0.1")]
+    [TestCase("http://site-a.com", "https://localhost:5001")]
+    public void EnsureApplicationMainUrl_EveryRequest_DoesNotReplaceWithLoopback(string real, string loopback)
+    {
+        var sut = CreateWithDefaultConfig(ApplicationUrlDetection.EveryRequest);
+
+        sut.EnsureApplicationMainUrl(new Uri(real));
+        sut.EnsureApplicationMainUrl(new Uri(loopback));
+
+        Assert.AreEqual(new Uri(real), sut.ApplicationMainUrl, "A loopback URL is never useful as the public URL");
+    }
+
+    [TestCase("http://localhost:5000", "https://site-a.com")]
+    [TestCase("https://localhost:5001", "http://site-a.com")]
+    public void EnsureApplicationMainUrl_EveryRequest_ReplacesLoopbackWithNonLoopback(string loopback, string real)
+    {
+        var sut = CreateWithDefaultConfig(ApplicationUrlDetection.EveryRequest);
+
+        sut.EnsureApplicationMainUrl(new Uri(loopback));
+        sut.EnsureApplicationMainUrl(new Uri(real));
+
+        Assert.AreEqual(new Uri(real), sut.ApplicationMainUrl, "Leaving loopback wins even when the scheme goes from HTTPS to HTTP");
+    }
+
+    [Test]
+    public void EnsureApplicationMainUrl_EveryRequest_LoopbackToLoopbackFollowsSchemeRule()
+    {
+        var sut = CreateWithDefaultConfig(ApplicationUrlDetection.EveryRequest);
+
+        var https = new Uri("https://localhost:5001");
+        sut.EnsureApplicationMainUrl(https);
+        sut.EnsureApplicationMainUrl(new Uri("http://localhost:5000"));
+
+        Assert.AreEqual(https, sut.ApplicationMainUrl);
+    }
+
+    [Test]
+    public void EnsureApplicationMainUrl_EveryRequest_LoopbackToLoopbackWithSameSchemeStillSwitches()
+    {
+        var sut = CreateWithDefaultConfig(ApplicationUrlDetection.EveryRequest);
+
+        var second = new Uri("http://127.0.0.1:5000");
+        sut.EnsureApplicationMainUrl(new Uri("http://localhost:5000"));
+        sut.EnsureApplicationMainUrl(second);
+
+        Assert.AreEqual(second, sut.ApplicationMainUrl, "Between two loopback URLs the legacy host switch still applies");
+    }
+
     [Test]
     public void EnsureApplicationMainUrl_EveryRequest_ExplicitConfigTakesPrecedence()
     {

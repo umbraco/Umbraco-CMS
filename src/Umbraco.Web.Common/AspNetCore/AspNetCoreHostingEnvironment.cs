@@ -255,10 +255,17 @@ public class AspNetCoreHostingEnvironment : IHostingEnvironment
 
     /// <summary>
     ///     A URL is never replaced by one that is less useful as the public application URL:
-    ///     HTTP replacing HTTPS.
+    ///     a loopback host replacing a non-loopback host, or HTTP replacing HTTPS.
     /// </summary>
     private static bool IsDowngrade(Uri current, Uri candidate)
-        => current.Scheme == Uri.UriSchemeHttps && candidate.Scheme == Uri.UriSchemeHttp;
+    {
+        if (current.IsLoopback != candidate.IsLoopback)
+        {
+            return candidate.IsLoopback;
+        }
+
+        return current.Scheme == Uri.UriSchemeHttps && candidate.Scheme == Uri.UriSchemeHttp;
+    }
 
     private void SetSiteNameAndDebugMode(HostingSettings hostingSettings)
     {
