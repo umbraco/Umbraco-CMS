@@ -84,6 +84,10 @@ export class UserUiHelper extends UiBaseLocators {
     await this.enterText(this.userEmailTxt, email);
   }
 
+  async isUserEmailInvalid() {
+    await this.isInputTypeMismatched(this.userEmailTxt);
+  }
+
   async clickAddUserGroupsButton() {
     await this.click(this.addUserGroupsBtn);
     // This wait is necessary to avoid the click on the user group button to be ignored

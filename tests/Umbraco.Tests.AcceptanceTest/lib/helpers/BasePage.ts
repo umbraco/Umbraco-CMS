@@ -490,6 +490,19 @@ export class BasePage {
   }
 
   /**
+   * Asserts that an input's value fails the browser's native type constraint — for example an
+   * `<input type="email">` holding a value that is not a valid address. Asserts the constraint-validation
+   * state rather than the browser's message text, which varies by engine version and locale.
+   * @param locator - The input to check
+   */
+  async isInputTypeMismatched(locator: Locator, timeout?: number): Promise<void> {
+    await expect
+      .poll(() => locator.evaluate((el: HTMLInputElement) => el.validity.typeMismatch),
+        {timeout: timeout ?? ConstantHelper.timeout.medium})
+      .toBeTruthy();
+  }
+
+  /**
    * Asserts that an element contains specific text.
    * @param locator - The element to check
    * @param text - The text to look for
