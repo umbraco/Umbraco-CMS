@@ -84,6 +84,9 @@ export class UserUiHelper extends UiBaseLocators {
     await this.enterText(this.userEmailTxt, email);
   }
 
+  /**
+   * Asserts that the entered user email is rejected by the browser as a malformed address.
+   */
   async isUserEmailInvalid() {
     await this.isInputTypeMismatched(this.userEmailTxt);
   }

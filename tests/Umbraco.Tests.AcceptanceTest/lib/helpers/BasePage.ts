@@ -497,7 +497,7 @@ export class BasePage {
    */
   async isInputTypeMismatched(locator: Locator, timeout?: number): Promise<void> {
     await expect
-      .poll(() => locator.evaluate((el: HTMLInputElement) => el.validity.typeMismatch),
+      .poll(() => locator.evaluate((el: HTMLInputElement) => el.validity?.typeMismatch ?? false),
         {timeout: timeout ?? ConstantHelper.timeout.medium})
       .toBeTruthy();
   }

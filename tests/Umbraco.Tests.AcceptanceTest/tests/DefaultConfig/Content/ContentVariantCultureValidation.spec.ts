@@ -136,5 +136,5 @@ test('can unpublish english variant while danish still has an empty mandatory fi
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.unpublished);
   await umbracoUi.content.isErrorNotificationVisible(false);
   const updatedContentData = await umbracoApi.document.getByName(contentName);
-  expect(updatedContentData.variants.find(variant => variant.culture === 'en-US').state).toBe('Draft');
+  expect(updatedContentData.variants.find(variant => variant.culture === 'en-US')?.state).toBe('Draft');
 });

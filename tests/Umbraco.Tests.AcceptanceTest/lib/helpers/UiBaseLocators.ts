@@ -741,6 +741,9 @@ export class UiBaseLocators extends BasePage {
     await this.page.waitForTimeout(ConstantHelper.wait.short);
   }
 
+  /**
+   * Asserts that the save button is disabled, as it is while required fields are incomplete.
+   */
   async isSaveButtonDisabled() {
     await this.isDisabled(this.saveBtn);
   }

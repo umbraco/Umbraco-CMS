@@ -1127,6 +1127,10 @@ export class ContentUiHelper extends UiBaseLocators {
     await this.sliderInput.fill(value);
   }
 
+  /**
+   * Enters a value into the date input of the property editor currently in view.
+   * @param value - The date value, in the format the editor expects (e.g. `2026-09-01`)
+   */
   async enterDateInputValue(value: string) {
     await this.enterText(this.dateInputTxt, value);
   }
