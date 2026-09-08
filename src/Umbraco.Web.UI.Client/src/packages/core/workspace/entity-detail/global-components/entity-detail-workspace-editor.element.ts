@@ -3,11 +3,42 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { css, customElement, html, ifDefined, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbEntityDeletedEvent } from '@umbraco-cms/backoffice/entity-action';
+import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
+
+const umbBackPathDeprecation = new UmbDeprecation({
+	deprecated: 'The `backPath` property on `<umb-entity-detail-workspace-editor>`.',
+	removeInVersion: '19',
+	solution: 'Implement `navigationParentItemPath` on the workspace context instead.',
+});
 
 @customElement('umb-entity-detail-workspace-editor')
 export class UmbEntityDetailWorkspaceEditorElement extends UmbLitElement {
+	#backPath?: string;
+
+	/**
+	 * A fallback "back to parent" path, used only when the workspace context has no `navigationParentItemPath` of
+	 * its own (e.g. a third-party context that hasn't implemented it yet).
+	 * @deprecated Implement `navigationParentItemPath` on the workspace context instead. Will be removed in Umbraco 19.
+	 * @returns {string | undefined} The fallback back-to-parent path.
+	 */
 	@property({ attribute: 'back-path' })
-	public backPath?: string;
+	public get backPath(): string | undefined {
+		return this.#backPath;
+	}
+	public set backPath(value: string | undefined) {
+		if (value === undefined || value === this.#backPath) return;
+		umbBackPathDeprecation.warn();
+		this.#backPath = value;
+	}
+
+	/**
+	 * Shows a "back to parent" button, linking to the closest known parent — the workspace context's own
+	 * `navigationParentItemPath` when available, or the deprecated `backPath` as a fallback. Left as an explicit
+	 * opt-in since not every entity should surface this button (e.g. tree-based entities rely on the tree itself
+	 * for navigation).
+	 */
+	@property({ type: Boolean, attribute: 'show-back-to-parent-button' })
+	public showBackToParentButton = false;
 
 	@state()
 	private _entityType?: string;
@@ -24,6 +55,9 @@ export class UmbEntityDetailWorkspaceEditorElement extends UmbLitElement {
 	@state()
 	private _isNew? = false;
 
+	@state()
+	private _navigationParentItemPath?: string;
+
 	#context?: typeof UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT.TYPE;
 	#eventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
 	#unique?: string | null;
@@ -39,6 +73,11 @@ export class UmbEntityDetailWorkspaceEditorElement extends UmbLitElement {
 			this.observe(this.#context?.data, (data) => (this._exists = !!data));
 			this.observe(this.#context?.isNew, (isNew) => (this._isNew = isNew));
 			this.observe(this.#context?.unique, (unique) => (this.#unique = unique));
+			this.observe(
+				this.#context?.navigationParentItemPath,
+				(path) => (this._navigationParentItemPath = path),
+				'umbObserveNavigationParentItemPath',
+			);
 		});
 
 		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (context) => {
@@ -61,9 +100,13 @@ export class UmbEntityDetailWorkspaceEditorElement extends UmbLitElement {
 		if (event.getEntityType() !== this._entityType) return;
 		if (event.getUnique() !== this.#unique) return;
 
-		// Navigate to the back path when the entity is deleted
-		if (this.backPath) {
-			history.pushState({}, '', this.backPath);
+		// A dedicated UmbDeleteEntityWorkspaceRedirectController (wired into every UmbEntityDetailWorkspaceContextBase)
+		// already redirects using this same path — only fall back to the deprecated backPath when the workspace
+		// context doesn't expose one.
+		if (this._navigationParentItemPath) return;
+
+		if (this.#backPath) {
+			history.pushState({}, '', this.#backPath);
 		}
 	};
 
@@ -92,7 +135,7 @@ export class UmbEntityDetailWorkspaceEditorElement extends UmbLitElement {
 		 -->
 			<umb-workspace-editor
 				?loading=${this._isLoading}
-				.backPath=${this.backPath}
+				.backPath=${this.showBackToParentButton ? (this._navigationParentItemPath ?? this.#backPath) : undefined}
 				class="${this._exists === false ? 'hide' : ''}">
 				<slot name="header" slot="header"></slot>
 				${this.#renderEntityActions()}
