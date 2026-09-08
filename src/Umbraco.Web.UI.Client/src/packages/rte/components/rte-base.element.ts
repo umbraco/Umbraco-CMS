@@ -423,11 +423,13 @@ export abstract class UmbPropertyEditorUiRteElementBase
 		const usedLayoutKeys: Array<string> = [];
 
 		const blockRegex = /<umb-rte-block(?:-inline)?(?:[^>]*)>/gi;
+		const layoutKeyRegex = new RegExp(` ${UMB_BLOCK_RTE_DATA_LAYOUT_KEY}="([^"]+)"`);
+		const contentKeyRegex = new RegExp(` ${UMB_BLOCK_RTE_DATA_CONTENT_KEY}="([^"]+)"`);
 		let blockElement: RegExpExecArray | null;
 		while ((blockElement = blockRegex.exec(markup)) !== null) {
 			const tag = blockElement[0];
-			const layoutKeyMatch = new RegExp(` ${UMB_BLOCK_RTE_DATA_LAYOUT_KEY}="([^"]+)"`).exec(tag)?.[1];
-			const contentKeyMatch = new RegExp(` ${UMB_BLOCK_RTE_DATA_CONTENT_KEY}="([^"]+)"`).exec(tag)?.[1];
+			const layoutKeyMatch = layoutKeyRegex.exec(tag)?.[1];
+			const contentKeyMatch = contentKeyRegex.exec(tag)?.[1];
 			const layoutKey = layoutKeyMatch ?? contentKeyMatch;
 			if (layoutKey) {
 				usedLayoutKeys.push(layoutKey);
