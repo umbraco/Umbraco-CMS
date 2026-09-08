@@ -6,11 +6,11 @@ import { UmbDataTypeFolderWorkspaceEditorElement } from './data-type-folder-edit
 import { UMB_DATA_TYPE_ROOT_WORKSPACE_PATH } from '../../../paths.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import {
-	UmbDeleteEntityWorkspaceRedirectController,
 	UmbEntityNamedDetailWorkspaceContextBase,
 	type UmbRoutableWorkspaceContext,
 	type UmbSubmittableWorkspaceContext,
 } from '@umbraco-cms/backoffice/workspace';
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import type { IRoutingInfo, PageComponent } from '@umbraco-cms/backoffice/router';
 import type { UmbFolderModel } from '@umbraco-cms/backoffice/tree';
 
@@ -32,16 +32,14 @@ export class UmbDataTypeFolderWorkspaceContext
 				setup: (component: PageComponent, info: IRoutingInfo) => {
 					const unique = info.match.params.unique;
 					this.load(unique);
-
-					new UmbDeleteEntityWorkspaceRedirectController(this, this, {
-						getRedirectPath: ({ entity }) => {
-							if (!entity?.unique) return UMB_DATA_TYPE_ROOT_WORKSPACE_PATH;
-							return UMB_EDIT_DATA_TYPE_FOLDER_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: entity.unique });
-						},
-					});
 				},
 			},
 		]);
+	}
+
+	protected override _getNavigationParentItemPath(entity: UmbEntityModel | undefined): string | undefined {
+		if (!entity?.unique) return UMB_DATA_TYPE_ROOT_WORKSPACE_PATH;
+		return UMB_EDIT_DATA_TYPE_FOLDER_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: entity.unique });
 	}
 }
 

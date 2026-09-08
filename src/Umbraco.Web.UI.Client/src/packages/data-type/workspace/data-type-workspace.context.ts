@@ -12,13 +12,13 @@ import type {
 	UmbRoutableWorkspaceContext,
 } from '@umbraco-cms/backoffice/workspace';
 import {
-	UmbDeleteEntityWorkspaceRedirectController,
 	UmbInvariantWorkspacePropertyDatasetContext,
 	UmbWorkspaceIsNewRedirectController,
 	UmbEntityNamedDetailWorkspaceContextBase,
 } from '@umbraco-cms/backoffice/workspace';
 import { appendToFrozenArray, UmbArrayState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import type {
 	PropertyEditorSettingsDefaultData,
 	PropertyEditorSettingsProperty,
@@ -116,19 +116,17 @@ export class UmbDataTypeWorkspaceContext
 				setup: (_component, info) => {
 					const unique = info.match.params.unique;
 					this.load(unique);
-
-					new UmbDeleteEntityWorkspaceRedirectController(this, this, {
-						getRedirectPath: ({ entity }) => {
-							if (!entity?.unique) return UMB_DATA_TYPE_ROOT_WORKSPACE_PATH;
-							if (entity.entityType === UMB_DATA_TYPE_FOLDER_ENTITY_TYPE) {
-								return UMB_EDIT_DATA_TYPE_FOLDER_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: entity.unique });
-							}
-							return UMB_EDIT_DATA_TYPE_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: entity.unique });
-						},
-					});
 				},
 			},
 		]);
+	}
+
+	protected override _getNavigationParentItemPath(entity: UmbEntityModel | undefined): string | undefined {
+		if (!entity?.unique) return UMB_DATA_TYPE_ROOT_WORKSPACE_PATH;
+		if (entity.entityType === UMB_DATA_TYPE_FOLDER_ENTITY_TYPE) {
+			return UMB_EDIT_DATA_TYPE_FOLDER_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: entity.unique });
+		}
+		return UMB_EDIT_DATA_TYPE_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: entity.unique });
 	}
 
 	override resetState() {

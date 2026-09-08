@@ -8,13 +8,13 @@ import { UmbUserConfigRepository } from '../../repository/config/index.js';
 import { UmbUserWorkspaceEditorElement } from './user-workspace-editor.element.js';
 import { UMB_USER_WORKSPACE_ALIAS } from './constants.js';
 import {
-	UmbDeleteEntityWorkspaceRedirectController,
 	UmbEntityNamedDetailWorkspaceContextBase,
 } from '@umbraco-cms/backoffice/workspace';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbRepositoryResponseWithAsObservable } from '@umbraco-cms/backoffice/repository';
 import type { UmbSubmittableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 
 type EntityType = UmbUserDetailModel;
 
@@ -56,16 +56,14 @@ export class UmbUserWorkspaceContext
 				setup: (_component, info) => {
 					const id = info.match.params.id;
 					this.load(id);
-
-					new UmbDeleteEntityWorkspaceRedirectController(this, this, {
-						getRedirectPath: ({ entity }) => {
-							if (!entity?.unique) return UMB_USER_ROOT_WORKSPACE_PATH;
-							return UMB_EDIT_USER_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: entity.unique });
-						},
-					});
 				},
 			},
 		]);
+	}
+
+	protected override _getNavigationParentItemPath(entity: UmbEntityModel | undefined): string | undefined {
+		if (!entity?.unique) return UMB_USER_ROOT_WORKSPACE_PATH;
+		return UMB_EDIT_USER_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: entity.unique });
 	}
 
 	override async load(unique: string) {

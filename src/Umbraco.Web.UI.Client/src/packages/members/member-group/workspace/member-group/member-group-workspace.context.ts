@@ -6,13 +6,13 @@ import { UMB_MEMBER_GROUP_WORKSPACE_ALIAS } from './constants.js';
 import { UmbMemberGroupWorkspaceEditorElement } from './member-group-workspace-editor.element.js';
 import {
 	type UmbSubmittableWorkspaceContext,
-	UmbDeleteEntityWorkspaceRedirectController,
 	UmbWorkspaceIsNewRedirectController,
 	type UmbRoutableWorkspaceContext,
 	UmbEntityNamedDetailWorkspaceContextBase,
 } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UMB_USER_GROUP_ROOT_ENTITY_TYPE } from '@umbraco-cms/backoffice/user-group';
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 
 export class UmbMemberGroupWorkspaceContext
 	extends UmbEntityNamedDetailWorkspaceContextBase<UmbMemberGroupDetailModel>
@@ -45,16 +45,14 @@ export class UmbMemberGroupWorkspaceContext
 				setup: (_component, info) => {
 					const unique = info.match.params.unique;
 					this.load(unique);
-
-					new UmbDeleteEntityWorkspaceRedirectController(this, this, {
-						getRedirectPath: ({ entity }) => {
-							if (!entity?.unique) return UMB_MEMBER_GROUP_ROOT_WORKSPACE_PATH;
-							return UMB_EDIT_MEMBER_GROUP_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: entity.unique });
-						},
-					});
 				},
 			},
 		]);
+	}
+
+	protected override _getNavigationParentItemPath(entity: UmbEntityModel | undefined): string | undefined {
+		if (!entity?.unique) return UMB_MEMBER_GROUP_ROOT_WORKSPACE_PATH;
+		return UMB_EDIT_MEMBER_GROUP_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: entity.unique });
 	}
 }
 

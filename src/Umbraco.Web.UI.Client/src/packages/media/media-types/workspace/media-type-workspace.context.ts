@@ -7,7 +7,6 @@ import { UmbMediaTypeWorkspaceEditorElement } from './media-type-workspace-edito
 import { UMB_MEDIA_TYPE_WORKSPACE_ALIAS } from './constants.js';
 import {
 	type UmbRoutableWorkspaceContext,
-	UmbDeleteEntityWorkspaceRedirectController,
 	UmbWorkspaceIsNewRedirectController,
 } from '@umbraco-cms/backoffice/workspace';
 import { UmbContentTypeWorkspaceContextBase } from '@umbraco-cms/backoffice/content-type';
@@ -53,19 +52,17 @@ export class UmbMediaTypeWorkspaceContext
 				setup: (_component, info) => {
 					const id = info.match.params.id;
 					this.load(id);
-
-					new UmbDeleteEntityWorkspaceRedirectController(this, this, {
-						getRedirectPath: ({ entity }) => {
-							if (!entity?.unique) return UMB_MEDIA_TYPE_ROOT_WORKSPACE_PATH;
-							if (entity.entityType === UMB_MEDIA_TYPE_FOLDER_ENTITY_TYPE) {
-								return UMB_EDIT_MEDIA_TYPE_FOLDER_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: entity.unique });
-							}
-							return UMB_EDIT_MEDIA_TYPE_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: entity.unique });
-						},
-					});
 				},
 			},
 		]);
+	}
+
+	protected override _getNavigationParentItemPath(entity: UmbEntityModel | undefined): string | undefined {
+		if (!entity?.unique) return UMB_MEDIA_TYPE_ROOT_WORKSPACE_PATH;
+		if (entity.entityType === UMB_MEDIA_TYPE_FOLDER_ENTITY_TYPE) {
+			return UMB_EDIT_MEDIA_TYPE_FOLDER_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: entity.unique });
+		}
+		return UMB_EDIT_MEDIA_TYPE_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: entity.unique });
 	}
 
 	setAllowedAtRoot(allowedAtRoot: boolean) {

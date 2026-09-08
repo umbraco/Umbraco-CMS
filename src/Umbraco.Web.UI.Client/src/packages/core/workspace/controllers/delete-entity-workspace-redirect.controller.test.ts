@@ -4,17 +4,19 @@ import { aTimeout, expect } from '@open-wc/testing';
 import { UmbActionEventContext } from '@umbraco-cms/backoffice/action';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
-import { UmbParentEntityContext, type UmbEntityModel } from '@umbraco-cms/backoffice/entity';
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbEntityWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
+import { UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 
 @customElement('umb-test-delete-redirect-controller-host')
 class UmbTestDeleteRedirectControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
 
-/** A minimal `UmbEntityWorkspaceContext` stand-in — just the identity the controller reads. */
-class UmbTestEntityWorkspaceContext implements Pick<UmbEntityWorkspaceContext, 'getUnique' | 'getEntityType'> {
+/** A minimal stand-in for the workspace context — just what the controller reads. */
+class UmbTestNavigationParentItemPathWorkspaceContext {
 	#unique: string | null;
 	#entityType: string;
+	#navigationParentItemPath = new UmbStringState<string | undefined>(undefined);
+	readonly navigationParentItemPath = this.#navigationParentItemPath.asObservable();
 
 	constructor(unique: string | null, entityType: string) {
 		this.#unique = unique;
@@ -27,6 +29,10 @@ class UmbTestEntityWorkspaceContext implements Pick<UmbEntityWorkspaceContext, '
 
 	getEntityType() {
 		return this.#entityType;
+	}
+
+	setNavigationParentItemPath(path: string | undefined) {
+		this.#navigationParentItemPath.setValue(path);
 	}
 }
 
@@ -60,18 +66,11 @@ function stubHistory() {
 describe('UmbDeleteEntityWorkspaceRedirectController', () => {
 	let host: UmbTestDeleteRedirectControllerHostElement;
 	let actionEventContext: UmbActionEventContext;
-	let parentEntityContext: UmbParentEntityContext;
-	let workspaceContext: UmbTestEntityWorkspaceContext;
+	let workspaceContext: UmbTestNavigationParentItemPathWorkspaceContext;
 	let history: ReturnType<typeof stubHistory>;
-	let redirectPathCalls: Array<UmbEntityModel | undefined>;
 
 	function createController() {
-		return new UmbDeleteEntityWorkspaceRedirectController(host, workspaceContext as unknown as UmbEntityWorkspaceContext, {
-			getRedirectPath: ({ entity }) => {
-				redirectPathCalls.push(entity);
-				return entity ? `/test/edit/${entity.unique}` : '/test/root';
-			},
-		});
+		return new UmbDeleteEntityWorkspaceRedirectController(host, workspaceContext);
 	}
 
 	function dispatchDeleted(overrides?: Partial<UmbEntityModel>) {
@@ -82,14 +81,12 @@ describe('UmbDeleteEntityWorkspaceRedirectController', () => {
 
 	beforeEach(async () => {
 		history = stubHistory();
-		redirectPathCalls = [];
 
 		host = new UmbTestDeleteRedirectControllerHostElement();
 		document.body.appendChild(host);
 
 		actionEventContext = new UmbActionEventContext(host);
-		parentEntityContext = new UmbParentEntityContext(host);
-		workspaceContext = new UmbTestEntityWorkspaceContext('test-unique', 'test-entity-type');
+		workspaceContext = new UmbTestNavigationParentItemPathWorkspaceContext('test-unique', 'test-entity-type');
 
 		await aTimeout(0);
 	});
@@ -99,33 +96,43 @@ describe('UmbDeleteEntityWorkspaceRedirectController', () => {
 		document.body.removeChild(host);
 	});
 
-	it('redirects to the parent from UMB_PARENT_ENTITY_CONTEXT', async () => {
-		parentEntityContext.setParent({ unique: 'parent-unique', entityType: 'parent-entity-type' });
+	it('redirects to the path from navigationParentItemPath', async () => {
+		workspaceContext.setNavigationParentItemPath('/test/edit/parent-unique');
 		createController();
 		await aTimeout(0);
 
 		dispatchDeleted();
 
-		expect(redirectPathCalls).to.have.lengthOf(1);
-		expect(redirectPathCalls[0]).to.deep.equal({ unique: 'parent-unique', entityType: 'parent-entity-type' });
 		expect(history.replaceStateCalls).to.have.lengthOf(1);
 		expect(history.replaceStateCalls[0].url).to.equal('/test/edit/parent-unique');
 		expect(history.pushStateCalls).to.have.lengthOf(0);
 	});
 
-	it('redirects to the fallback path when the deleted entity had no parent (root)', async () => {
+	it('does not redirect when navigationParentItemPath has no value', async () => {
 		createController();
 		await aTimeout(0);
 
 		dispatchDeleted();
 
-		expect(redirectPathCalls).to.have.lengthOf(1);
-		expect(redirectPathCalls[0]).to.equal(undefined);
+		expect(history.replaceStateCalls).to.have.lengthOf(0);
+		expect(history.pushStateCalls).to.have.lengthOf(0);
+	});
+
+	it('reacts to navigationParentItemPath updating after the controller is created', async () => {
+		createController();
+		await aTimeout(0);
+
+		workspaceContext.setNavigationParentItemPath('/test/edit/parent-unique');
+		await aTimeout(0);
+
+		dispatchDeleted();
+
 		expect(history.replaceStateCalls).to.have.lengthOf(1);
-		expect(history.replaceStateCalls[0].url).to.equal('/test/root');
+		expect(history.replaceStateCalls[0].url).to.equal('/test/edit/parent-unique');
 	});
 
 	it('does not redirect when the deleted unique does not match the open entity', async () => {
+		workspaceContext.setNavigationParentItemPath('/test/root');
 		createController();
 		await aTimeout(0);
 
@@ -136,6 +143,7 @@ describe('UmbDeleteEntityWorkspaceRedirectController', () => {
 	});
 
 	it('does not redirect when the deleted entity type does not match the open entity', async () => {
+		workspaceContext.setNavigationParentItemPath('/test/root');
 		createController();
 		await aTimeout(0);
 
@@ -146,18 +154,18 @@ describe('UmbDeleteEntityWorkspaceRedirectController', () => {
 	});
 
 	it('destroys itself after redirecting, so a repeat event has no further effect', async () => {
-		parentEntityContext.setParent({ unique: 'parent-unique', entityType: 'parent-entity-type' });
+		workspaceContext.setNavigationParentItemPath('/test/edit/parent-unique');
 		createController();
 		await aTimeout(0);
 
 		dispatchDeleted();
 		dispatchDeleted();
 
-		expect(redirectPathCalls).to.have.lengthOf(1);
 		expect(history.replaceStateCalls).to.have.lengthOf(1);
 	});
 
 	it('stops reacting once destroyed', async () => {
+		workspaceContext.setNavigationParentItemPath('/test/root');
 		const controller = createController();
 		await aTimeout(0);
 		controller.destroy();

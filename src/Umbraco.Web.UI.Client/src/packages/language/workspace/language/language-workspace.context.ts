@@ -8,13 +8,13 @@ import { UmbLanguageWorkspaceEditorElement } from './language-workspace-editor.e
 import { UMB_LANGUAGE_WORKSPACE_ALIAS } from './constants.js';
 import {
 	type UmbSubmittableWorkspaceContext,
-	UmbDeleteEntityWorkspaceRedirectController,
 	UmbWorkspaceIsNewRedirectController,
 	type UmbRoutableWorkspaceContext,
 	UmbWorkspaceIsNewRedirectControllerAlias,
 	UmbEntityNamedDetailWorkspaceContextBase,
 } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 
 export class UmbLanguageWorkspaceContext
 	extends UmbEntityNamedDetailWorkspaceContextBase<UmbLanguageDetailModel, UmbLanguageDetailRepository>
@@ -49,16 +49,14 @@ export class UmbLanguageWorkspaceContext
 				setup: (_component, info) => {
 					this.removeUmbControllerByAlias(UmbWorkspaceIsNewRedirectControllerAlias);
 					this.load(info.match.params.unique);
-
-					new UmbDeleteEntityWorkspaceRedirectController(this, this, {
-						getRedirectPath: ({ entity }) => {
-							if (!entity?.unique) return UMB_LANGUAGE_ROOT_WORKSPACE_PATH;
-							return UMB_EDIT_LANGUAGE_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: entity.unique });
-						},
-					});
 				},
 			},
 		]);
+	}
+
+	protected override _getNavigationParentItemPath(entity: UmbEntityModel | undefined): string | undefined {
+		if (!entity?.unique) return UMB_LANGUAGE_ROOT_WORKSPACE_PATH;
+		return UMB_EDIT_LANGUAGE_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: entity.unique });
 	}
 
 	setCulture(unique: string) {

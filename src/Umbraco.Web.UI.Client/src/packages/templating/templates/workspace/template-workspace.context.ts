@@ -7,7 +7,6 @@ import { UMB_TEMPLATE_WORKSPACE_ALIAS } from './manifests.js';
 import { UmbTemplateWorkspaceEditorElement } from './template-workspace-editor.element.js';
 import type { UmbRoutableWorkspaceContext, UmbSubmittableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import {
-	UmbDeleteEntityWorkspaceRedirectController,
 	UmbEntityNamedDetailWorkspaceContextBase,
 	UmbWorkspaceIsNewRedirectController,
 	UmbWorkspaceIsNewRedirectControllerAlias,
@@ -63,16 +62,14 @@ export class UmbTemplateWorkspaceContext
 					this.removeUmbControllerByAlias(UmbWorkspaceIsNewRedirectControllerAlias);
 					const unique = info.match.params.unique;
 					this.load(unique);
-
-					new UmbDeleteEntityWorkspaceRedirectController(this, this, {
-						getRedirectPath: ({ entity }) => {
-							if (!entity?.unique) return UMB_SETTINGS_SECTION_PATH;
-							return UMB_EDIT_TEMPLATE_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: entity.unique });
-						},
-					});
 				},
 			},
 		]);
+	}
+
+	protected override _getNavigationParentItemPath(entity: UmbEntityModel | undefined): string | undefined {
+		if (!entity?.unique) return UMB_SETTINGS_SECTION_PATH;
+		return UMB_EDIT_TEMPLATE_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: entity.unique });
 	}
 
 	override async load(unique: string) {

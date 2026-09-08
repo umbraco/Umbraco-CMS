@@ -13,7 +13,6 @@ import type {
 	UmbSubmittableWorkspaceContext,
 } from '@umbraco-cms/backoffice/workspace';
 import {
-	UmbDeleteEntityWorkspaceRedirectController,
 	UmbEntityNamedDetailWorkspaceContextBase,
 	UmbWorkspaceIsNewRedirectController,
 } from '@umbraco-cms/backoffice/workspace';
@@ -22,6 +21,7 @@ import { PartialViewService } from '@umbraco-cms/backoffice/external/backend-api
 import type { IRoutingInfo, PageComponent } from '@umbraco-cms/backoffice/router';
 import { UmbServerFileRenameWorkspaceRedirectController } from '@umbraco-cms/backoffice/server-file-system';
 import { UMB_SETTINGS_SECTION_PATH } from '@umbraco-cms/backoffice/settings';
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 
 export interface UmbPartialViewWorkspaceContextCreateArgs extends UmbEntityDetailWorkspaceContextCreateArgs<UmbPartialViewDetailModel> {
 	snippet: { unique: string } | null;
@@ -82,19 +82,17 @@ export class UmbPartialViewWorkspaceContext
 						this,
 						this.getHostElement().shadowRoot!.querySelector('umb-router-slot')!,
 					);
-
-					new UmbDeleteEntityWorkspaceRedirectController(this, this, {
-						getRedirectPath: ({ entity }) => {
-							if (!entity?.unique) return UMB_SETTINGS_SECTION_PATH;
-							if (entity.entityType === UMB_PARTIAL_VIEW_FOLDER_ENTITY_TYPE) {
-								return UMB_EDIT_PARTIAL_VIEW_FOLDER_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: entity.unique });
-							}
-							return UMB_EDIT_PARTIAL_VIEW_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: entity.unique });
-						},
-					});
 				},
 			},
 		]);
+	}
+
+	protected override _getNavigationParentItemPath(entity: UmbEntityModel | undefined): string | undefined {
+		if (!entity?.unique) return UMB_SETTINGS_SECTION_PATH;
+		if (entity.entityType === UMB_PARTIAL_VIEW_FOLDER_ENTITY_TYPE) {
+			return UMB_EDIT_PARTIAL_VIEW_FOLDER_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: entity.unique });
+		}
+		return UMB_EDIT_PARTIAL_VIEW_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: entity.unique });
 	}
 
 	#onCreate = async (args: UmbPartialViewWorkspaceContextCreateArgs) => {

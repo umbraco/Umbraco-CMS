@@ -8,7 +8,6 @@ import { UMB_SCRIPT_WORKSPACE_ALIAS } from './manifests.js';
 import { UmbScriptWorkspaceEditorElement } from './script-workspace-editor.element.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import {
-	UmbDeleteEntityWorkspaceRedirectController,
 	UmbEntityNamedDetailWorkspaceContextBase,
 	type UmbRoutableWorkspaceContext,
 	type UmbSubmittableWorkspaceContext,
@@ -17,6 +16,7 @@ import {
 import type { IRoutingInfo, PageComponent } from '@umbraco-cms/backoffice/router';
 import { UmbServerFileRenameWorkspaceRedirectController } from '@umbraco-cms/backoffice/server-file-system';
 import { UMB_SETTINGS_SECTION_PATH } from '@umbraco-cms/backoffice/settings';
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 
 export class UmbScriptWorkspaceContext
 	extends UmbEntityNamedDetailWorkspaceContextBase<UmbScriptDetailModel, UmbScriptDetailRepository>
@@ -59,19 +59,17 @@ export class UmbScriptWorkspaceContext
 						this,
 						this.getHostElement().shadowRoot!.querySelector('umb-router-slot')!,
 					);
-
-					new UmbDeleteEntityWorkspaceRedirectController(this, this, {
-						getRedirectPath: ({ entity }) => {
-							if (!entity?.unique) return UMB_SETTINGS_SECTION_PATH;
-							if (entity.entityType === UMB_SCRIPT_FOLDER_ENTITY_TYPE) {
-								return UMB_EDIT_SCRIPT_FOLDER_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: entity.unique });
-							}
-							return UMB_EDIT_SCRIPT_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: entity.unique });
-						},
-					});
 				},
 			},
 		]);
+	}
+
+	protected override _getNavigationParentItemPath(entity: UmbEntityModel | undefined): string | undefined {
+		if (!entity?.unique) return UMB_SETTINGS_SECTION_PATH;
+		if (entity.entityType === UMB_SCRIPT_FOLDER_ENTITY_TYPE) {
+			return UMB_EDIT_SCRIPT_FOLDER_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: entity.unique });
+		}
+		return UMB_EDIT_SCRIPT_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: entity.unique });
 	}
 
 	/**

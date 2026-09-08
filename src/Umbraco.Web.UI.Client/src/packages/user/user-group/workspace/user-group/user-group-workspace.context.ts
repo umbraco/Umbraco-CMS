@@ -5,13 +5,13 @@ import { UMB_USER_GROUP_ROOT_WORKSPACE_PATH, UMB_EDIT_USER_GROUP_WORKSPACE_PATH_
 import { UmbUserGroupWorkspaceEditorElement } from './user-group-workspace-editor.element.js';
 import { UMB_USER_GROUP_WORKSPACE_ALIAS } from './constants.js';
 import {
-	UmbDeleteEntityWorkspaceRedirectController,
 	UmbEntityNamedDetailWorkspaceContextBase,
 	UmbWorkspaceIsNewRedirectController,
 } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbRoutableWorkspaceContext, UmbSubmittableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import type { UmbUserPermissionModel } from '@umbraco-cms/backoffice/user-permission';
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 
 export class UmbUserGroupWorkspaceContext
 	extends UmbEntityNamedDetailWorkspaceContextBase<UmbUserGroupDetailModel, UmbUserGroupDetailRepository>
@@ -60,16 +60,14 @@ export class UmbUserGroupWorkspaceContext
 				setup: (component, info) => {
 					const unique = info.match.params.unique;
 					this.load(unique);
-
-					new UmbDeleteEntityWorkspaceRedirectController(this, this, {
-						getRedirectPath: ({ entity }) => {
-							if (!entity?.unique) return UMB_USER_GROUP_ROOT_WORKSPACE_PATH;
-							return UMB_EDIT_USER_GROUP_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: entity.unique });
-						},
-					});
 				},
 			},
 		]);
+	}
+
+	protected override _getNavigationParentItemPath(entity: UmbEntityModel | undefined): string | undefined {
+		if (!entity?.unique) return UMB_USER_GROUP_ROOT_WORKSPACE_PATH;
+		return UMB_EDIT_USER_GROUP_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: entity.unique });
 	}
 
 	updateProperty<Alias extends keyof UmbUserGroupDetailModel>(alias: Alias, value: UmbUserGroupDetailModel[Alias]) {
