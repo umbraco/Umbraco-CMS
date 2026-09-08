@@ -75,8 +75,9 @@ public abstract class LogViewerServiceBase : ILogViewerService
 
         logViewerQuery = new LogViewerQuery(name, query);
 
-        using ICoreScope scope = _provider.CreateCoreScope(autoComplete: true);
+        using ICoreScope scope = _provider.CreateCoreScope();
         _logViewerQueryRepository.Save(logViewerQuery);
+        scope.Complete();
 
         return Attempt.SucceedWithStatus<ILogViewerQuery?, LogViewerOperationStatus>(
             LogViewerOperationStatus.Success,
@@ -94,8 +95,9 @@ public abstract class LogViewerServiceBase : ILogViewerService
                 LogViewerOperationStatus.NotFoundLogSearch, null);
         }
 
-        using ICoreScope scope = _provider.CreateCoreScope(autoComplete: true);
+        using ICoreScope scope = _provider.CreateCoreScope();
         _logViewerQueryRepository.Delete(logViewerQuery);
+        scope.Complete();
 
         return Attempt.SucceedWithStatus<ILogViewerQuery?, LogViewerOperationStatus>(
             LogViewerOperationStatus.Success,
