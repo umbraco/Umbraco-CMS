@@ -383,7 +383,9 @@ namespace Umbraco.Cms.Core.DependencyInjection
 
             Services.AddSingleton<ConflictingPackageData>();
             Services.AddSingleton<CompiledPackageXmlParser>();
+#pragma warning disable CS0618 // Type or member is obsolete - all usage has been removed up in V19
             Services.AddUnique<IPreviewTokenGenerator, NoopPreviewTokenGenerator>();
+#pragma warning restore CS0618 // Type or member is obsolete
             Services.AddUnique<IPreviewService, PreviewService>();
             Services.AddUnique<DocumentNavigationService, DocumentNavigationService>();
             Services.AddUnique<IDocumentNavigationQueryService>(x => x.GetRequiredService<DocumentNavigationService>());

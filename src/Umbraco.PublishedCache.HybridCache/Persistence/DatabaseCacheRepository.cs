@@ -191,12 +191,10 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     public Task RemovePublishedElementAsync(int id)
         => RemovePublishedAsync(id);
 
-
     /// <inheritdoc/>
     public void Rebuild(
         IReadOnlyCollection<int>? contentTypeIds,
         IReadOnlyCollection<int>? mediaTypeIds,
-        IReadOnlyCollection<int>? memberTypeIds,
         IReadOnlyCollection<int>? elementTypeIds,
         Action<Action>? executeStep)
     {
@@ -206,37 +204,27 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
         IContentCacheDataSerializer serializer = _contentCacheDataSerializerFactory.Create(
             ContentCacheDataSerializerEntityType.Document
             | ContentCacheDataSerializerEntityType.Media
-            | ContentCacheDataSerializerEntityType.Member
             | ContentCacheDataSerializerEntityType.Element);
 
-        // If all type ID collections are non-null but empty,
-        // truncate the table as all records will be deleted.
+        // All collections non-null but empty means every row this method writes is about to be replaced,
+        // so clear the whole table in one statement rather than once per object type.
         if (contentTypeIds is not null && contentTypeIds.Count == 0 &&
             mediaTypeIds is not null && mediaTypeIds.Count == 0 &&
-            memberTypeIds is not null && memberTypeIds.Count == 0 &&
             elementTypeIds is not null && elementTypeIds.Count == 0)
         {
-            TruncateContent();
+            ClearContent();
         }
 
         RebuildDocumentDbCache(serializer, _nucacheSettings.Value.SqlPageSize, contentTypeIds, executeStep);
         RebuildMediaDbCache(serializer, _nucacheSettings.Value.SqlPageSize, mediaTypeIds, executeStep);
-        RebuildMemberDbCache(serializer, _nucacheSettings.Value.SqlPageSize, memberTypeIds, executeStep);
         RebuildElementDbCache(serializer, _nucacheSettings.Value.SqlPageSize, elementTypeIds, executeStep);
     }
 
-    private void TruncateContent()
-    {
-        if (Database.DatabaseType == DatabaseType.SqlServer2012)
-        {
-            Database.Execute($"TRUNCATE TABLE cmsContentNu");
-        }
-
-        if (Database.DatabaseType == DatabaseType.SQLite)
-        {
-            Database.Execute($"DELETE FROM cmsContentNu");
-        }
-    }
+    // Deletes rather than truncates. Truncating needs ALTER permission on the table where deleting needs
+    // only DELETE, and this runs from a backoffice action on sites whose runtime database user may have
+    // been reduced to read/write.
+    private void ClearContent()
+        => Database.Execute($"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.NodeData)}");
 
     /// <inheritdoc/>
     public async Task<ContentCacheNode?> GetDocumentSourceAsync(Guid key, bool preview = false)
@@ -1450,87 +1438,10 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
         return new ContentNuDto
         {
             NodeId = content.NodeId,
-            Published = false, // Media and members don't have published state
+            Published = false, // Media does not have a published state
             Data = serialized.StringData,
             RawData = serialized.ByteData,
         };
-    }
-
-    /// <summary>
-    /// Rebuilds the content database cache for members by clearing and repopulating the cache with the latest member data.
-    /// </summary>
-    /// <remarks>
-    /// Assumes content tree lock.
-    /// Uses an optimized query approach that bypasses IMember entity hydration for better performance.
-    /// </remarks>
-    private void RebuildMemberDbCache(IContentCacheDataSerializer serializer, int groupSize, IReadOnlyCollection<int>? contentTypeIds, Action<Action> executeStep)
-    {
-        if (contentTypeIds is null)
-        {
-            return;
-        }
-
-        Guid memberObjectType = Constants.ObjectTypes.Member;
-
-        Dictionary<int, List<string>>? propertyAliasesByContentType = null;
-
-        // Delete stale rows in batches (each its own step); the returned count of affected nodes is the
-        // number to repopulate, so no separate count query is needed.
-        long total = RemoveByObjectTypeInBatches(memberObjectType, contentTypeIds, executeStep);
-
-        if (total == 0)
-        {
-            return;
-        }
-
-        executeStep(() =>
-        {
-            propertyAliasesByContentType = GetPropertyAliasesByContentType(contentTypeIds);
-        });
-
-        long processed = 0;
-        long pageIndex = 0;
-
-        while (processed < total)
-        {
-            var pageComplete = false;
-
-            executeStep(() =>
-            {
-                List<int> nodeIds = GetPagedContentNodeIds(memberObjectType, contentTypeIds, pageIndex, groupSize);
-                if (nodeIds.Count == 0)
-                {
-                    return;
-                }
-
-                List<CacheRebuildContentDto> memberDtos = GetContentMetadataForNodes(nodeIds);
-                List<CacheRebuildPropertyDto> propertyDtos = GetPropertyDataForNodes(nodeIds);
-
-                var items = memberDtos
-                    .AsParallel()
-                    .WithDegreeOfParallelism(Environment.ProcessorCount)
-                    .Select(member => BuildCacheDtoForContent(member, propertyDtos, propertyAliasesByContentType!, serializer))
-                    .ToList();
-
-                BulkInsertSkipExisting(items);
-
-                processed += nodeIds.Count;
-                pageComplete = true;
-            });
-
-            // The break IS reachable: the executeStep delegate's early return (a page yielding no nodes — e.g.
-            // content removed concurrently, leaving the total row count stale) leaves pageComplete false, which
-            // guards against looping indefinitely. SonarLint cannot see through the delegate, so it incorrectly
-            // reports the condition as always false.
-#pragma warning disable S2583 // Conditionally executed code should be reachable
-            if (!pageComplete)
-            {
-                break;
-            }
-#pragma warning restore S2583
-
-            pageIndex++;
-        }
     }
 
     /// <summary>
@@ -2088,20 +1999,22 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
                 if (Debugger.IsAttached)
                 {
                     throw new InvalidOperationException("Missing cmsContentNu edited content for node " + dto.Id +
-                                                        ", consider rebuilding.");
+                                                        " (key " + dto.Key + "), consider rebuilding.");
                 }
 
                 _logger.LogWarning(
-                    "Missing cmsContentNu edited content for node {NodeId}, consider rebuilding.",
-                    dto.Id);
+                    "Missing cmsContentNu edited content for node {NodeId} (key {NodeKey}), consider rebuilding.",
+                    dto.Id,
+                    dto.Key);
                 return null;
             }
 
             if (dto.EditName is null)
             {
                 _logger.LogError(
-                    "Node {NodeId} has edited data but EditName is null, indicating an inconsistent database state. Skipping node.",
-                    dto.Id);
+                    "Node {NodeId} (key {NodeKey}) has edited data but EditName is null, indicating an inconsistent database state. Skipping node.",
+                    dto.Id,
+                    dto.Key);
                 return null;
             }
 
@@ -2137,20 +2050,22 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
             if (Debugger.IsAttached)
             {
                 throw new InvalidOperationException("Missing cmsContentNu published content for node " + dto.Id +
-                                                    ", consider rebuilding.");
+                                                    " (key " + dto.Key + "), consider rebuilding.");
             }
 
             _logger.LogWarning(
-                "Missing cmsContentNu published content for node {NodeId}, consider rebuilding.",
-                dto.Id);
+                "Missing cmsContentNu published content for node {NodeId} (key {NodeKey}), consider rebuilding.",
+                dto.Id,
+                dto.Key);
             return null;
         }
 
         if (dto.PubName is null)
         {
             _logger.LogError(
-                "Node {NodeId} has published data but PubName is null, indicating an inconsistent database state. Consider republishing or rebuilding the cache. Skipping node.",
-                dto.Id);
+                "Node {NodeId} (key {NodeKey}) has published data but PubName is null, indicating an inconsistent database state. Consider republishing or rebuilding the cache. Skipping node.",
+                dto.Id,
+                dto.Key);
             return null;
         }
 

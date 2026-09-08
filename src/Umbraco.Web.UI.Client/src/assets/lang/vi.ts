@@ -328,6 +328,8 @@ export default {
 		isSensitiveValue:
 			'Giá trị này bị ẩn. Nếu bạn cần quyền truy cập để xem giá trị này, vui lòng liên hệ với quản trị viên trang web của bạn.',
 		isSensitiveValue_short: 'Giá trị này bị ẩn.',
+		isSensitiveValueNotice:
+			'Nếu bạn cần quyền truy cập để xem các giá trị bị ẩn, vui lòng liên hệ với quản trị viên trang web của bạn.',
 		languagesToPublish: 'Bạn muốn xuất bản ngôn ngữ nào?',
 		languagesToSendForApproval: 'Bạn muốn gửi ngôn ngữ nào để phê duyệt?',
 		languagesToSchedule: 'Bạn muốn lên lịch ngôn ngữ nào?',

@@ -430,9 +430,10 @@ type ReadonlyContent = Readonly<UmbContentModel>;
 - Restating what the code does. If the comment is a paraphrase of the next two lines, delete it.
 - Narrating a sequence of calls. The order is already in the code.
 - Pointing at the current task, fix, callers, or PR (`// Used by X`, `// Added for the Y flow`, `// Fix for issue Z`). That metadata belongs in the commit message and PR description, not in source — it rots.
+- Explaining a recognized idiom (a guard clause, a null check, an early return). It reads as itself no matter which caller or framework has a reason to trigger it redundantly — that reason belongs in whichever layer it's actually true of, not here.
 
 **When a comment IS justified** — only when removing it would leave a future reader confused. State the rule at the altitude of the code it's in: generic and shared code describes its contract, never a specific extension's implementation of it.
-- A non-obvious **WHY**: a hidden constraint, ordering requirement, or business rule that is not visible from the code.
+- A non-obvious **WHY**: a hidden constraint, ordering requirement, or business rule that is not visible from the code, and not already accounted for by a recognized idiom.
 - A **workaround** for a specific bug or browser quirk. Anchor it to an issue (`(#21996)`) so it can be deleted when the upstream fix lands.
 - A subtle **invariant** the type system does not enforce.
 - An **edge case** the code intentionally handles that would surprise a reader.

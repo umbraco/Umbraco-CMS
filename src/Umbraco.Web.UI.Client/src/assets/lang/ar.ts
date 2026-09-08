@@ -293,6 +293,7 @@ export default {
 		includeUnpublished: 'تضمين عناصر المحتوى غير المنشورة.',
 		isSensitiveValue: 'هذه القيمة مخفية. إذا كنت بحاجة إلى الوصول لعرض هذه القيمة، يرجى الاتصال بمدير موقعك.',
 		isSensitiveValue_short: 'هذه القيمة مخفية.',
+		isSensitiveValueNotice: 'إذا كنت بحاجة إلى الوصول لعرض القيم المخفية، يرجى الاتصال بمدير موقعك.',
 		languagesToPublish: 'ما اللغات التي ترغب في نشرها؟',
 		languagesToSendForApproval: 'ما اللغات التي ترغب في إرسالها للموافقة؟',
 		languagesToSchedule: 'ما اللغات التي ترغب في جدولتها؟',

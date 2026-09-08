@@ -149,6 +149,10 @@ export class PartialViewApiHelper {
   // Folder
   async getFolder(path: string) {
     const response = await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/partial-view/folder/' + encodeURIComponent(path));
+    if (!response.ok()) {
+      return null;
+    }
+
     return await response.json();
   }
 

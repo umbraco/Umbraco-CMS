@@ -226,8 +226,8 @@ export default {
 		sendtopublishvariant: 'Content sent for publishing for languages: %0%',
 		sort: 'Sort child items performed by user',
 		custom: '%0%',
-		contentversionpreventcleanup: 'Clean up disabled for version: %0%',
-		contentversionenablecleanup: 'Clean up enabled for version: %0%',
+		contentversionpreventcleanup: 'Cleanup disabled for version: %0%',
+		contentversionenablecleanup: 'Cleanup enabled for version: %0%',
 		smallAssignDomain: 'Assign Hostname',
 		smallCopy: 'Copy',
 		smallPublish: 'Publish',
@@ -357,6 +357,7 @@ export default {
 		isSensitiveValue:
 			'This value is hidden. If you need access to view this value please contact your website administrator.',
 		isSensitiveValue_short: 'This value is hidden.',
+		isSensitiveValueNotice: 'If you need access to view the hidden values, contact your website administrator.',
 		languagesToPublish: 'What languages would you like to publish?',
 		languagesToSendForApproval: 'What languages would you like to send for approval?',
 		languagesToSchedule: 'What languages would you like to schedule?',
@@ -1996,14 +1997,14 @@ export default {
 		removeChildNodeWarning:
 			'Removing a child node will limit the editors options to create different content types beneath a node.',
 		usingEditor: 'using this editor will get updated with the new settings.',
-		historyCleanupHeading: 'History clean up',
-		historyCleanupDescription: 'Allow overriding the global history clean up settings.',
+		historyCleanupHeading: 'History cleanup',
+		historyCleanupDescription: 'Allow overriding the global history cleanup settings.',
 		historyCleanupKeepAllVersionsNewerThanDays: 'Keep all versions newer than days',
 		historyCleanupKeepLatestVersionPerDayForDays: 'Keep latest version per day for days',
-		historyCleanupPreventCleanup: 'Prevent clean up',
-		historyCleanupEnableCleanup: 'Enable clean up',
+		historyCleanupPreventCleanup: 'Prevent cleanup',
+		historyCleanupEnableCleanup: 'Enable cleanup',
 		historyCleanupGloballyDisabled:
-			'<strong>NOTE!</strong> The clean up of historically content versions are disabled globally. These settings will not take effect before it is enabled.',
+			'<strong>NOTE!</strong> The clean up of historical content versions is disabled globally. These settings will not take effect before it is enabled.',
 		changeDataTypeHelpText:
 			'Changing a data type with stored values is disabled. To allow this you can change the Umbraco:CMS:DataTypes:CanBeChanged setting in appsettings.json.',
 		collection: 'Collection',

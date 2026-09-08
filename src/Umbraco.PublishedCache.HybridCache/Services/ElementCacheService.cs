@@ -367,7 +367,6 @@ internal sealed class ElementCacheService : IElementCacheService, IMemoryCacheSi
         => _databaseCacheRepository.Rebuild(
             null,
             null,
-            null,
             elementTypeIds.ToList(),
             action =>
             {

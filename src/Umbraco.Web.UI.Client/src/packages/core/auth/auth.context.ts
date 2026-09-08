@@ -19,7 +19,7 @@ import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbBackofficeExtensionRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbApiClient, umbHttpClient } from '@umbraco-cms/backoffice/http-client';
 import { isTestEnvironment, UmbDeprecation } from '@umbraco-cms/backoffice/utils';
-
+// eslint-disable-next-line @typescript-eslint/no-unused-vars -- referenced only via {@link} in JSDoc below
 import type { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 
 /**

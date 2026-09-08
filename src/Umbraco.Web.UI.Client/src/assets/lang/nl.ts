@@ -302,6 +302,8 @@ export default {
 		isSensitiveValue:
 			'Deze waarde is verborgen. Indien u toegang nodig heeft om deze waarde te bekijken,\n      neem dan contact op met uw websitebeheerder.\n    ',
 		isSensitiveValue_short: 'Deze waarde is verborgen',
+		isSensitiveValueNotice:
+			'Indien u toegang nodig heeft om de verborgen waarden te bekijken, neem dan contact op met uw websitebeheerder.',
 		languagesToPublish: 'Welke talen wil je publiceren?',
 		languagesToSendForApproval: 'Welke talen wil je ter goedkeuring verzenden?',
 		languagesToSchedule: 'Welke talen wil je plannen?',

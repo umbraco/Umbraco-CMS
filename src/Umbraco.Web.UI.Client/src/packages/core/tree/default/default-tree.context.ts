@@ -55,6 +55,16 @@ export class UmbDefaultTreeContext<
 	#isMenu = new UmbBooleanState(undefined);
 	public readonly isMenu = this.#isMenu.asObservable();
 
+	#drillable = new UmbBooleanState(false);
+	/**
+	 * Whether opening an item takes the user into it. A property of the host, so it is the same for every item in the
+	 * tree.
+	 *
+	 * Off unless the host declares otherwise: a tree that can do no more than expand and collapse is the common case,
+	 * and the one where offering to drill into an item would strand everything below it.
+	 */
+	public readonly drillable = this.#drillable.asObservable();
+
 	#expandTreeRoot = new UmbBooleanState(undefined);
 	public readonly expandTreeRoot = this.#expandTreeRoot.asObservable();
 
@@ -272,11 +282,30 @@ export class UmbDefaultTreeContext<
 	}
 
 	/**
+	 * Sets whether opening an item takes the user into it.
+	 * @param {boolean} value - True when the host acts on `UmbTreeItemOpenEvent`.
+	 * @memberof UmbDefaultTreeContext
+	 */
+	setDrillable(value: boolean) {
+		this.#drillable.setValue(value);
+	}
+
+	/**
+	 * Returns whether opening an item takes the user into it.
+	 * @returns {boolean} True when the host acts on `UmbTreeItemOpenEvent`.
+	 * @memberof UmbDefaultTreeContext
+	 */
+	getDrillable(): boolean {
+		return this.#drillable.getValue();
+	}
+
+	/**
 	 * Sets the hideTreeRoot config
 	 * @param {boolean} hideTreeRoot - Whether to hide the tree root
 	 * @memberof UmbDefaultTreeContext
 	 */
 	setHideTreeRoot(hideTreeRoot: boolean) {
+		if (this.getHideTreeRoot() === hideTreeRoot) return;
 		this.#hideTreeRoot.setValue(hideTreeRoot);
 		// we need to reset the tree if this config changes
 		this.#clearTree();
@@ -298,6 +327,9 @@ export class UmbDefaultTreeContext<
 	 * @memberof UmbDefaultTreeContext
 	 */
 	setStartNode(startNode: UmbTreeStartNode | undefined) {
+		const current = this.getStartNode();
+		if (current?.unique === startNode?.unique && current?.entityType === startNode?.entityType) return;
+
 		this.#treeItemChildrenManager.setStartNode(startNode);
 		if (startNode) {
 			this.#entityContext.setEntityType(startNode.entityType);
@@ -323,6 +355,7 @@ export class UmbDefaultTreeContext<
 	 * @memberof UmbDefaultTreeContext
 	 */
 	setFoldersOnly(foldersOnly: boolean) {
+		if (this.getFoldersOnly() === foldersOnly) return;
 		this.#treeItemChildrenManager.setFoldersOnly(foldersOnly);
 		// we need to reset the tree if this config changes
 		this.#clearTree();

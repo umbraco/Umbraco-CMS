@@ -22,6 +22,7 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
 				this._forceShowExpand = has;
 				this.requestUpdate('_forceShowExpand', oldValue);
 			});
+			this.observe(this.#api.drillableCollection, (drillable) => (this._drillableCollection = drillable));
 			this.observe(this.#api.icon, (icon) => (this.#icon = icon || ''));
 			this.observe(this.#api.flags, (flags) => (this._flags = flags || []));
 		}
@@ -42,6 +43,9 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
 	@property({ type: Boolean, reflect: true, attribute: 'draft' })
 	protected _isDraft = false;
 
+	@state()
+	private _drillableCollection = false;
+
 	#icon: string | null | undefined;
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -55,19 +59,19 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
 
 	// eslint-disable-next-line @typescript-eslint/naming-convention
 	override _renderExpandSymbol = () => {
-		// If this in the menu and it is a collection, then we will enforce the user to the Collection view instead of expanding.
-		// `this._forceShowExpand` is equivalent to hasCollection for this element.
-		// Exception: a "no access" collection is an ancestor of the user's start node, so it must stay
-		// expandable in the tree (render the normal caret) to let the user browse down to it.
-		if (this._isMenu && this._forceShowExpand && !this._noAccess) {
-			return html`<umb-icon data-mark="open-collection" name="icon-list" style="font-size: 8px;"></umb-icon>`;
-		} else {
-			return undefined;
-		}
+		// The list icon replaces the expand arrow only where activating it drills into the Collection — see
+		// `drillableCollection`. Where it would do nothing, the normal caret is rendered and the children expand, so a
+		// subtree is never made unreachable by an affordance that cannot act.
+		if (!this._drillableCollection) return undefined;
+		return html`<umb-icon data-mark="open-collection" name="icon-list" style="font-size: 8px;"></umb-icon>`;
 	};
 
 	override renderLabel() {
-		return html`<span id="label" slot="label" class=${classMap({ draft: this._isDraft, noAccess: this._noAccess })}>
+		return html`<span
+			id="label"
+			slot="label"
+			class=${classMap({ draft: this._isDraft, noAccess: this._noAccess })}
+			@dblclick=${this._handleDblClick}>
 			${this._name}
 		</span> `;
 	}

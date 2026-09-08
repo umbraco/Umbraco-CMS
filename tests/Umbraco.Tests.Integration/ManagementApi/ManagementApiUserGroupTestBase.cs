@@ -11,8 +11,6 @@ public abstract class ManagementApiUserGroupTestBase<T> : ManagementApiTest<T>
 {
     protected virtual string UserEmail => "test@umbraco.com";
 
-    protected const string UserPassword = "1234567890";
-
     protected override Expression<Func<T, object>> MethodSelector { get; set; }
 
     protected virtual UserGroupAssertionModel AdminUserGroupAssertionModel => new()
