@@ -179,4 +179,60 @@ describe('UmbEntityWorkspaceDataManager', () => {
 			expect(manager.getPersisted()).to.be.undefined;
 		});
 	});
+
+	describe('_sortCurrentData invocation', () => {
+		class UmbTestDataManager extends UmbEntityWorkspaceDataManager<TestDataModel> {
+			invocations = 0;
+			protected override _sortCurrentData<GivenType extends Partial<TestDataModel> = Partial<TestDataModel>>(
+				persistedData: Partial<TestDataModel>,
+				currentData: GivenType,
+			): GivenType {
+				this.invocations++;
+				return currentData;
+			}
+		}
+
+		let testManager: UmbTestDataManager;
+
+		beforeEach(() => {
+			const hostElement = new UmbTestControllerHostElement();
+			testManager = new UmbTestDataManager(hostElement);
+		});
+
+		it('is invoked from setCurrent when persisted data exists', () => {
+			testManager.setPersisted({ name: 'test' });
+			testManager.invocations = 0;
+			testManager.setCurrent({ name: 'test' });
+			expect(testManager.invocations).to.equal(1);
+		});
+
+		it('is invoked from updateCurrent when persisted data exists', () => {
+			testManager.setPersisted({ name: 'test' });
+			testManager.setCurrent({ name: 'test' });
+			testManager.invocations = 0;
+			testManager.updateCurrent({ name: 'updated' });
+			expect(testManager.invocations).to.equal(1);
+		});
+
+		it('is invoked from setPersisted when current data already exists', () => {
+			testManager.setCurrent({ name: 'test' });
+			testManager.invocations = 0;
+			testManager.setPersisted({ name: 'test' });
+			expect(testManager.invocations).to.equal(1);
+		});
+
+		it('is invoked from updatePersisted when current data already exists', () => {
+			testManager.setPersisted({ name: 'test' });
+			testManager.setCurrent({ name: 'test' });
+			testManager.invocations = 0;
+			testManager.updatePersisted({ name: 'updated' });
+			expect(testManager.invocations).to.equal(1);
+		});
+
+		it('is not invoked from setPersisted when current data does not exist', () => {
+			testManager.invocations = 0;
+			testManager.setPersisted({ name: 'test' });
+			expect(testManager.invocations).to.equal(0);
+		});
+	});
 });

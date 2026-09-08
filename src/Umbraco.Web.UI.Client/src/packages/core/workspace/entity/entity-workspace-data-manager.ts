@@ -53,6 +53,9 @@ export class UmbEntityWorkspaceDataManager<ModelType>
 	 */
 	setPersisted(data: ModelType | undefined) {
 		this._persisted.setValue(data);
+		if (data) {
+			this.#alignCurrentToPersisted(data);
+		}
 	}
 
 	/**
@@ -62,6 +65,17 @@ export class UmbEntityWorkspaceDataManager<ModelType>
 	 */
 	updatePersisted(partialData: Partial<ModelType>) {
 		this._persisted.update(partialData);
+		const persistedData = this._persisted.getValue();
+		if (persistedData) {
+			this.#alignCurrentToPersisted(persistedData);
+		}
+	}
+
+	#alignCurrentToPersisted(persistedData: ModelType) {
+		const currentData = this._current.getValue();
+		if (currentData) {
+			this._current.setValue(this._sortCurrentData(persistedData, currentData));
+		}
 	}
 
 	/**

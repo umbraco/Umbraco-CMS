@@ -32,10 +32,12 @@ export class UmbElementWorkspaceDataManager<ModelType extends UmbElementDetailMo
 			return {
 				...currentData,
 				values: [...currentData.values].sort(function (a, b) {
-					return (
-						persistedValues.findIndex((x) => valueObjectCompare(x, a)) -
-						persistedValues.findIndex((x) => valueObjectCompare(x, b))
-					);
+					const aIndex = persistedValues.findIndex((x) => valueObjectCompare(x, a));
+					const bIndex = persistedValues.findIndex((x) => valueObjectCompare(x, b));
+					if (aIndex === -1 || bIndex === -1) {
+						return aIndex === bIndex ? 0 : aIndex === -1 ? 1 : -1;
+					}
+					return aIndex - bIndex;
 				}),
 			};
 		}
