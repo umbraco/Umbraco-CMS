@@ -20,7 +20,7 @@ export default {
 		browse: 'Gennemse elementer',
 		changeDocType: 'Skift dokumenttype',
 		changeDataType: 'Skift datatype',
-    clear: 'Ryd',
+		clear: 'Ryd',
 		copy: 'Kopier',
 		copyTo: 'Kopier til',
 		create: 'Opret',
