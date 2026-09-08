@@ -102,10 +102,7 @@ export class UmbContentPublishEntityAction extends UmbEntityActionBase<MetaEntit
 		languageData: { items: Array<UmbLanguageDetailModel> } | undefined,
 		appCulture: string | undefined,
 	): Array<UmbEntityVariantOptionModel> {
-		// only display culture variants as options
-		const cultureVariantOptions = detailData.variants;
-
-		return cultureVariantOptions.map<UmbEntityVariantOptionModel>((variant) => ({
+		return detailData.variants.map<UmbEntityVariantOptionModel>((variant) => ({
 			culture: variant.culture,
 			segment: null,
 			language: languageData?.items.find((language) => language.unique === variant.culture) ?? {
