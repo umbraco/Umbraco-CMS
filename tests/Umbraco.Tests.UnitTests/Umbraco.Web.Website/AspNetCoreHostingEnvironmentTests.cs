@@ -125,6 +125,44 @@ public class AspNetCoreHostingEnvironmentTests
         Assert.AreEqual(url, sut.ApplicationMainUrl);
     }
 
+    [TestCase("http://localhost:5000", "https://legit-site.com")]
+    [TestCase("https://127.0.0.1", "http://legit-site.com")]
+    [TestCase("http://[::1]:8080", "https://legit-site.com")]
+    public void EnsureApplicationMainUrl_FirstRequest_ReplacesLoopbackUrl(string loopback, string replacement)
+    {
+        var sut = CreateWithDefaultConfig(ApplicationUrlDetection.FirstRequest);
+
+        sut.EnsureApplicationMainUrl(new Uri(loopback));
+        sut.EnsureApplicationMainUrl(new Uri(replacement));
+
+        Assert.AreEqual(new Uri(replacement), sut.ApplicationMainUrl, "A loopback URL is never useful as the public URL and is replaced");
+    }
+
+    [Test]
+    public void EnsureApplicationMainUrl_FirstRequest_LoopbackDoesNotReplaceLoopback()
+    {
+        var sut = CreateWithDefaultConfig(ApplicationUrlDetection.FirstRequest);
+
+        var first = new Uri("http://localhost:5000");
+        sut.EnsureApplicationMainUrl(first);
+        sut.EnsureApplicationMainUrl(new Uri("http://127.0.0.1:5000"));
+
+        Assert.AreEqual(first, sut.ApplicationMainUrl);
+    }
+
+    [Test]
+    public void EnsureApplicationMainUrl_FirstRequest_LocksAfterLeavingLoopback()
+    {
+        var sut = CreateWithDefaultConfig(ApplicationUrlDetection.FirstRequest);
+
+        var legitimateUrl = new Uri("https://legit-site.com");
+        sut.EnsureApplicationMainUrl(new Uri("http://localhost:5000"));
+        sut.EnsureApplicationMainUrl(legitimateUrl);
+        sut.EnsureApplicationMainUrl(new Uri("https://non-configured-site.com"));
+
+        Assert.AreEqual(legitimateUrl, sut.ApplicationMainUrl, "Once a non-loopback URL is set, other hosts are ignored");
+    }
+
     [Test]
     public void EnsureApplicationMainUrl_NoneMode_NeverSetsUrl()
     {

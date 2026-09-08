@@ -202,9 +202,7 @@ public class AspNetCoreHostingEnvironment : IHostingEnvironment
                 return;
 
             case ApplicationUrlDetection.FirstRequest:
-                // Atomic: only the first thread to arrive sets the URL.
-                // Subsequent calls (even concurrent ones with different hosts) are no-ops.
-                Interlocked.CompareExchange(ref _applicationMainUrl, currentApplicationUrl, null);
+                LockOrUpgrade(currentApplicationUrl);
                 break;
 
             case ApplicationUrlDetection.EveryRequest:
@@ -220,6 +218,28 @@ public class AspNetCoreHostingEnvironment : IHostingEnvironment
                 break;
         }
     }
+
+    private void LockOrUpgrade(Uri candidate)
+    {
+        Uri? current = _applicationMainUrl;
+        while (current is null || IsUpgrade(current, candidate))
+        {
+            Uri? observed = Interlocked.CompareExchange(ref _applicationMainUrl, candidate, current);
+            if (ReferenceEquals(observed, current))
+            {
+                return;
+            }
+
+            current = observed;
+        }
+    }
+
+    /// <summary>
+    ///     A locked URL is only replaced by one that is strictly more useful as the public application URL:
+    ///     a non-loopback host replacing a loopback host.
+    /// </summary>
+    private static bool IsUpgrade(Uri current, Uri candidate)
+        => current.IsLoopback && candidate.IsLoopback is false;
 
     private void SetSiteNameAndDebugMode(HostingSettings hostingSettings)
     {
