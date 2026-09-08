@@ -1456,8 +1456,9 @@ groups: ["weather","cloud"],
 path: () => import("./icons/icon-lightning.js"),
 },{
 name: "icon-link",
-keywords: ["chains","links","hyperlinks","chain","url"],
+keywords: ["chains","links","hyperlinks","reference","relation","chain","url"],
 groups: ["item","technology","text","account"],
+related: ["icon-unlink"],
 path: () => import("./icons/icon-link.js"),
 },{
 name: "icon-list",
@@ -3616,6 +3617,9 @@ name: "icon-umbraco",
 path: () => import("./icons/icon-umbraco.js"),
 },{
 name: "icon-unlink",
+keywords: ["url","unchain","reference","relation","break"],
+groups: ["text"],
+related: ["icon-link"],
 path: () => import("./icons/icon-unlink.js"),
 },{
 name: "icon-azure",

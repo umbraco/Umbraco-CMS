@@ -2079,11 +2079,16 @@
 			"keywords": [
 				"chains",
 				"links",
-				"hyperlinks"
+				"hyperlinks",
+				"reference",
+				"relation"
 			],
 			"groups": [
 				"item",
 				"technology"
+			],
+			"related": [
+				"icon-unlink"
 			]
 		},
 		{
@@ -7122,7 +7127,10 @@
 	"custom": [
 		{
 			"name": "icon-unlink",
-			"file": "unlink.svg"
+			"file": "unlink.svg",
+			"keywords": ["url","unchain","reference","relation","break"],
+			"groups": ["text"],
+			"related": ["icon-link"]
 		}
 	]
 }
