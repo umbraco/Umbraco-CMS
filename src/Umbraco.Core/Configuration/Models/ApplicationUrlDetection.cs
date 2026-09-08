@@ -14,13 +14,17 @@ public enum ApplicationUrlDetection
     None,
 
     /// <summary>
-    ///     The URL is set from the first HTTP request and then locked.
-    ///     Subsequent requests with different host headers are ignored.
+    ///     The URL is set from the first HTTP request and then locked against requests for other hosts.
+    ///     The locked URL is only replaced when a later request is strictly more useful as a public address:
+    ///     a request for a non-loopback host replaces a loopback URL, and an HTTPS request for the same host
+    ///     and path replaces an HTTP URL.
     /// </summary>
     FirstRequest,
 
     /// <summary>
-    ///     The URL is updated from every new incoming HTTP request (legacy behavior).
+    ///     The URL is updated from every new incoming HTTP request (legacy behavior), except that it is never
+    ///     replaced by a loopback address once it holds a non-loopback one, or by an HTTP address when it is
+    ///     already HTTPS.
     ///     This is vulnerable to host header poisoning.
     /// </summary>
     EveryRequest,
