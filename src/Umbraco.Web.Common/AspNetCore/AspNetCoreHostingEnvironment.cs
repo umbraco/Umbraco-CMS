@@ -202,36 +202,39 @@ public class AspNetCoreHostingEnvironment : IHostingEnvironment
                 return;
 
             case ApplicationUrlDetection.FirstRequest:
-                LockOrUpgrade(currentApplicationUrl);
+                TryReplace(currentApplicationUrl, IsUpgrade);
                 break;
 
             case ApplicationUrlDetection.EveryRequest:
-                var change = _applicationUrls.Contains(currentApplicationUrl) is false;
-                if (change)
+                if (_applicationUrls.Contains(currentApplicationUrl))
                 {
-                    if (_applicationUrls.TryAdd(currentApplicationUrl))
-                    {
-                        ApplicationMainUrl = currentApplicationUrl;
-                    }
+                    return;
+                }
+
+                if (TryReplace(currentApplicationUrl, static (current, candidate) => IsDowngrade(current, candidate) is false))
+                {
+                    _applicationUrls.TryAdd(currentApplicationUrl);
                 }
 
                 break;
         }
     }
 
-    private void LockOrUpgrade(Uri candidate)
+    private bool TryReplace(Uri candidate, Func<Uri, Uri, bool> shouldReplace)
     {
         Uri? current = _applicationMainUrl;
-        while (current is null || IsUpgrade(current, candidate))
+        while (current is null || shouldReplace(current, candidate))
         {
             Uri? observed = Interlocked.CompareExchange(ref _applicationMainUrl, candidate, current);
             if (ReferenceEquals(observed, current))
             {
-                return;
+                return true;
             }
 
             current = observed;
         }
+
+        return false;
     }
 
     /// <summary>
@@ -249,6 +252,13 @@ public class AspNetCoreHostingEnvironment : IHostingEnvironment
             && candidate.Scheme == Uri.UriSchemeHttps
             && Uri.Compare(current, candidate, UriComponents.Host | UriComponents.Path, UriFormat.Unescaped, StringComparison.OrdinalIgnoreCase) == 0;
     }
+
+    /// <summary>
+    ///     A URL is never replaced by one that is less useful as the public application URL:
+    ///     HTTP replacing HTTPS.
+    /// </summary>
+    private static bool IsDowngrade(Uri current, Uri candidate)
+        => current.Scheme == Uri.UriSchemeHttps && candidate.Scheme == Uri.UriSchemeHttp;
 
     private void SetSiteNameAndDebugMode(HostingSettings hostingSettings)
     {

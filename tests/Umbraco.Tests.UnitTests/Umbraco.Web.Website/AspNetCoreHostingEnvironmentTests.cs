@@ -270,6 +270,30 @@ public class AspNetCoreHostingEnvironmentTests
         Assert.AreEqual(url, sut.ApplicationMainUrl, "Repeated same URL is a no-op");
     }
 
+    [TestCase("https://site-a.com", "http://site-a.com")]
+    [TestCase("https://site-a.com", "http://site-b.com")]
+    public void EnsureApplicationMainUrl_EveryRequest_DoesNotDowngradeToHttp(string https, string http)
+    {
+        var sut = CreateWithDefaultConfig(ApplicationUrlDetection.EveryRequest);
+
+        sut.EnsureApplicationMainUrl(new Uri(https));
+        sut.EnsureApplicationMainUrl(new Uri(http));
+
+        Assert.AreEqual(new Uri(https), sut.ApplicationMainUrl, "An HTTPS URL is never replaced by an HTTP one");
+    }
+
+    [Test]
+    public void EnsureApplicationMainUrl_EveryRequest_StillSwitchesHostWhenUpgradingToHttps()
+    {
+        var sut = CreateWithDefaultConfig(ApplicationUrlDetection.EveryRequest);
+
+        var upgraded = new Uri("https://site-b.com");
+        sut.EnsureApplicationMainUrl(new Uri("http://site-a.com"));
+        sut.EnsureApplicationMainUrl(upgraded);
+
+        Assert.AreEqual(upgraded, sut.ApplicationMainUrl, "EveryRequest keeps switching hosts; only downgrades are refused");
+    }
+
     [Test]
     public void EnsureApplicationMainUrl_EveryRequest_ExplicitConfigTakesPrecedence()
     {
