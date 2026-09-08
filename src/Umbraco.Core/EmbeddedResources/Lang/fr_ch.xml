@@ -2226,10 +2226,6 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
 		<key alias="searchThisMessageWithGoogle">Chercher ce message avec Google</key>
 		<key alias="searchWithBing">Chercher avec Bing</key>
 		<key alias="searchThisMessageWithBing">Chercher ce message avec Bing</key>
-		<key alias="searchOurUmbraco">Chercher dans Our Umbraco</key>
-		<key alias="searchThisMessageOnOurUmbracoForumsAndDocs">Chercher ce message dans les forums et docs de Our Umbraco</key>
-		<key alias="searchOurUmbracoWithGoogle">Chercher dans Our Umbraco avec Google</key>
-		<key alias="searchOurUmbracoForumsUsingGoogle">Chercher dans les forums de Our Umbraco en utilisant Google</key>
 		<key alias="searchUmbracoSource">Chercher dans les Sources Umbraco</key>
 		<key alias="searchWithinUmbracoSourceCodeOnGithub">Chercher dans le code source d'Umbraco sur Github</key>
 		<key alias="searchUmbracoIssues">Chercher dans les Umbraco Issues</key>
