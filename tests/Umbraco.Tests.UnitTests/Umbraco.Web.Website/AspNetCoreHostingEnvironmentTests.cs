@@ -163,6 +163,48 @@ public class AspNetCoreHostingEnvironmentTests
         Assert.AreEqual(legitimateUrl, sut.ApplicationMainUrl, "Once a non-loopback URL is set, other hosts are ignored");
     }
 
+    [TestCase("http://legit-site.com", "https://legit-site.com")]
+    [TestCase("http://legit-site.com:5000", "https://legit-site.com:5001")]
+    [TestCase("http://legit-site.com/site", "https://legit-site.com/site")]
+    [TestCase("http://LEGIT-SITE.com", "https://legit-site.com")]
+    [TestCase("http://localhost:5000", "https://localhost:5001")]
+    [TestCase("http://legit-site.com/Site", "https://legit-site.com/site")]
+    public void EnsureApplicationMainUrl_FirstRequest_UpgradesSameHostToHttps(string http, string https)
+    {
+        var sut = CreateWithDefaultConfig(ApplicationUrlDetection.FirstRequest);
+
+        sut.EnsureApplicationMainUrl(new Uri(http));
+        sut.EnsureApplicationMainUrl(new Uri(https));
+
+        Assert.AreEqual(new Uri(https), sut.ApplicationMainUrl, "HTTPS for the same host and path replaces HTTP");
+    }
+
+    [TestCase("http://legit-site.com", "https://non-configured-site.com")]
+    [TestCase("http://legit-site.com/site", "https://legit-site.com/other")]
+    [TestCase("http://legit-site.com", "http://non-configured-site.com")]
+    public void EnsureApplicationMainUrl_FirstRequest_HttpsForAnotherHostOrPathDoesNotUnlock(string http, string other)
+    {
+        var sut = CreateWithDefaultConfig(ApplicationUrlDetection.FirstRequest);
+
+        var locked = new Uri(http);
+        sut.EnsureApplicationMainUrl(locked);
+        sut.EnsureApplicationMainUrl(new Uri(other));
+
+        Assert.AreEqual(locked, sut.ApplicationMainUrl, "The upgrade path must not let a request change the host or path");
+    }
+
+    [Test]
+    public void EnsureApplicationMainUrl_FirstRequest_DoesNotDowngradeToHttp()
+    {
+        var sut = CreateWithDefaultConfig(ApplicationUrlDetection.FirstRequest);
+
+        var https = new Uri("https://legit-site.com");
+        sut.EnsureApplicationMainUrl(https);
+        sut.EnsureApplicationMainUrl(new Uri("http://legit-site.com"));
+
+        Assert.AreEqual(https, sut.ApplicationMainUrl);
+    }
+
     [Test]
     public void EnsureApplicationMainUrl_NoneMode_NeverSetsUrl()
     {

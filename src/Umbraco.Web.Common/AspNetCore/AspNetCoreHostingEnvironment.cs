@@ -236,10 +236,19 @@ public class AspNetCoreHostingEnvironment : IHostingEnvironment
 
     /// <summary>
     ///     A locked URL is only replaced by one that is strictly more useful as the public application URL:
-    ///     a non-loopback host replacing a loopback host.
+    ///     a non-loopback host replacing a loopback host, or HTTPS replacing HTTP for the same host and path.
     /// </summary>
     private static bool IsUpgrade(Uri current, Uri candidate)
-        => current.IsLoopback && candidate.IsLoopback is false;
+    {
+        if (current.IsLoopback != candidate.IsLoopback)
+        {
+            return candidate.IsLoopback is false;
+        }
+
+        return current.Scheme == Uri.UriSchemeHttp
+            && candidate.Scheme == Uri.UriSchemeHttps
+            && Uri.Compare(current, candidate, UriComponents.Host | UriComponents.Path, UriFormat.Unescaped, StringComparison.OrdinalIgnoreCase) == 0;
+    }
 
     private void SetSiteNameAndDebugMode(HostingSettings hostingSettings)
     {
