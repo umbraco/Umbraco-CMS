@@ -44,7 +44,7 @@ import {
 	UmbPropertyValuePresetVariantBuilderController,
 	UmbVariantPropertyGuardManager,
 } from '@umbraco-cms/backoffice/property';
-import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import { UmbVariantId, umbExpandVariantIdsWithSegmentOptions } from '@umbraco-cms/backoffice/variant';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import {
 	UMB_VALIDATION_CONTEXT,
@@ -1000,6 +1000,10 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		// User has committed to saving (modal closed with a selection, or no modal needed).
 		notifyWorkspaceActionStarting(executionOptions);
 
+		if (this.getVariesBySegment()) {
+			variantIds = umbExpandVariantIdsWithSegmentOptions(variantIds, await this.getVariantOptions());
+		}
+
 		const saveData = await this.constructSaveData(variantIds);
 
 		await this.runMandatoryValidationForSaveData(saveData, variantIds);
@@ -1028,27 +1032,6 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	}
 
 	protected async _validateVariantsAndLog(variantIds?: Array<UmbVariantId>): Promise<void> {
-		// Make sure that each variant-id for a given culture, has gotten all the valid segment variant-ids present too. See variant-options for which are available. [NL]
-		if (variantIds && this.getVariesBySegment()) {
-			const variantOptions = await this.getVariantOptions();
-			const expandedVariantIds: Array<UmbVariantId> = [];
-
-			for (const variantId of variantIds) {
-				// If a culture variant without segment, add all segment variants for that culture:
-				if (variantId.culture !== null && variantId.segment === null) {
-					for (const option of variantOptions) {
-						if (option.culture === variantId.culture) {
-							expandedVariantIds.push(UmbVariantId.Create(option));
-						}
-					}
-				} else {
-					expandedVariantIds.push(variantId);
-				}
-			}
-
-			variantIds = expandedVariantIds;
-		}
-
 		await this.#validateByVariantIds(variantIds).catch(async () => {
 			// TODO: Implement developer-mode logging here. [NL]
 			console.warn(

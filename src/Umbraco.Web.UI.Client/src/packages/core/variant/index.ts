@@ -1,5 +1,6 @@
 export * from './constants.js';
 export * from './context/index.js';
+export * from './expand-variant-ids-with-segment-options.function.js';
 export * from './sort-variants.function.js';
 export * from './variant-id.class.js';
 export * from './variant-object-compare.function.js';
