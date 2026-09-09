@@ -3,9 +3,12 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Search.Core.Extensions;
-using Umbraco.Cms.Search.Core.Models.Searching;
-using Umbraco.Cms.Search.Core.Models.Searching.Filtering;
-using Umbraco.Cms.Search.Core.Models.Searching.Sorting;
+using Umbraco.Cms.Core.Search;
+using Umbraco.Cms.Core.Extensions;
+using Umbraco.Cms.Core.Search.Indexing;
+using Umbraco.Cms.Core.Search.Querying;
+using Umbraco.Cms.Core.Search.Querying.Filtering;
+using Umbraco.Cms.Core.Search.Querying.Sorting;
 using Umbraco.Cms.Search.Core.Services;
 using Umbraco.Extensions;
 
@@ -89,7 +92,7 @@ internal abstract class ContentSearchServiceBase<TContent> : IndexedSearchServic
         // this method only searches for children, not descendants; if there is no parent ID, explicitly match root level content
         if (parentId.HasValue is false)
         {
-            filters.Add(new IntegerExactFilter(Core.Constants.FieldNames.Level, [1], false));
+            filters.Add(new IntegerExactFilter(Umbraco.Cms.Core.Constants.IndexFieldNames.Level, [1], false));
         }
 
         Sorter sorter = GetSorter(ordering);
@@ -189,9 +192,9 @@ internal abstract class ContentSearchServiceBase<TContent> : IndexedSearchServic
         switch (ordering.OrderBy)
         {
             case "name":
-                return new TextSorter(Core.Constants.FieldNames.Name, ordering.Direction);
+                return new TextSorter(Umbraco.Cms.Core.Constants.IndexFieldNames.Name, ordering.Direction);
             case "updateDate":
-                return new DateTimeOffsetSorter(Core.Constants.FieldNames.UpdateDate, ordering.Direction);
+                return new DateTimeOffsetSorter(Umbraco.Cms.Core.Constants.IndexFieldNames.UpdateDate, ordering.Direction);
             case "creator":
             case "owner":
                 // NOTE: "creator" / "owner" is configurable for list view but not supported here,

@@ -3,9 +3,11 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Search.Core.Configuration;
 using Umbraco.Cms.Search.Core.DependencyInjection;
 using Umbraco.Cms.Search.Core.Services;
+using Umbraco.Cms.Core.Search;
+
+using Umbraco.Cms.Core.Search.Configuration;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Core;
 

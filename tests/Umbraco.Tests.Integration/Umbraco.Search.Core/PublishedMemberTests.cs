@@ -3,13 +3,16 @@ using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Search.Core.Configuration;
 using Umbraco.Cms.Search.Core.Services;
+using Umbraco.Cms.Core.Search;
 using Umbraco.Cms.Search.Core.Services.ContentIndexing;
+using Umbraco.Cms.Core.Search.Indexing;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing.Search;
+
+using Umbraco.Cms.Core.Search.Configuration;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Core;
 
@@ -235,13 +238,13 @@ public class PublishedMemberTests : TestBase
 
     private void VerifyDocumentStructureValues(TestIndexDocument document, Guid key, Guid parentKey, Guid[] pathKeys)
     {
-        var idValue = document.Fields.FirstOrDefault(f => f.FieldName == Cms.Search.Core.Constants.FieldNames.Id)?.Value.Keywords?.SingleOrDefault();
+        var idValue = document.Fields.FirstOrDefault(f => f.FieldName == global::Umbraco.Cms.Core.Constants.IndexFieldNames.Id)?.Value.Keywords?.SingleOrDefault();
         Assert.That(idValue, Is.EqualTo($"{key:D}"));
 
-        var parentIdValue = document.Fields.FirstOrDefault(f => f.FieldName == Cms.Search.Core.Constants.FieldNames.ParentId)?.Value.Keywords?.SingleOrDefault();
+        var parentIdValue = document.Fields.FirstOrDefault(f => f.FieldName == global::Umbraco.Cms.Core.Constants.IndexFieldNames.ParentId)?.Value.Keywords?.SingleOrDefault();
         Assert.That(parentIdValue, Is.EqualTo($"{parentKey:D}"));
 
-        var pathIdsValue = document.Fields.FirstOrDefault(f => f.FieldName == Cms.Search.Core.Constants.FieldNames.PathIds)?.Value.Keywords?.ToArray();
+        var pathIdsValue = document.Fields.FirstOrDefault(f => f.FieldName == global::Umbraco.Cms.Core.Constants.IndexFieldNames.PathIds)?.Value.Keywords?.ToArray();
         Assert.That(pathIdsValue, Is.Not.Null);
         Assert.That(pathIdsValue!.Length, Is.EqualTo(pathKeys.Length));
         Assert.That(pathIdsValue, Is.EquivalentTo(pathKeys.Select(k => $"{k:D}")));

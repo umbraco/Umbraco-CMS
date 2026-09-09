@@ -1,9 +1,9 @@
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
-using Umbraco.Cms.Search.Core.Helpers;
-using Umbraco.Cms.Search.Core.Models.Indexing;
-using IndexValue = Umbraco.Cms.Search.Core.Models.Indexing.IndexValue;
+using Umbraco.Cms.Core.Search;
+using Umbraco.Cms.Core.Search.Indexing;
+using IndexValue = Umbraco.Cms.Core.Search.Indexing.IndexValue;
 
 namespace Umbraco.Cms.Search.Core.PropertyValueHandlers;
 

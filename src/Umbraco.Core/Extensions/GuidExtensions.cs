@@ -48,4 +48,11 @@ public static class GuidExtensions
         guid.TryWriteBytes(bytes);
         return BitConverter.ToInt32(bytes);
     }
+
+    /// <summary>
+    /// Converts the GUID to its search index keyword representation.
+    /// </summary>
+    /// <param name="guid">The GUID.</param>
+    /// <returns>The keyword representation.</returns>
+    public static string AsKeyword(this Guid guid) => guid.ToString("D");
 }

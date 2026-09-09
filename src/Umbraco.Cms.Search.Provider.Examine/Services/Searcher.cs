@@ -8,17 +8,20 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Search.Core.Extensions;
-using Umbraco.Cms.Search.Core.Models.Searching;
-using Umbraco.Cms.Search.Core.Models.Searching.Faceting;
-using Umbraco.Cms.Search.Core.Models.Searching.Filtering;
-using Umbraco.Cms.Search.Core.Models.Searching.Sorting;
+using Umbraco.Cms.Core.Search;
+using Umbraco.Cms.Core.Extensions;
+using Umbraco.Cms.Core.Search.Indexing;
+using Umbraco.Cms.Core.Search.Querying;
+using Umbraco.Cms.Core.Search.Querying.Faceting;
+using Umbraco.Cms.Core.Search.Querying.Filtering;
+using Umbraco.Cms.Core.Search.Querying.Sorting;
 using Umbraco.Cms.Search.Provider.Examine.Configuration;
 using Umbraco.Cms.Search.Provider.Examine.Extensions;
 using Umbraco.Cms.Search.Provider.Examine.Helpers;
 using Umbraco.Cms.Search.Provider.Examine.Models.Searching.Filtering;
 using Umbraco.Extensions;
-using FacetResult = Umbraco.Cms.Search.Core.Models.Searching.Faceting.FacetResult;
-using SearchResult = Umbraco.Cms.Search.Core.Models.Searching.SearchResult;
+using FacetResult = Umbraco.Cms.Core.Search.Querying.Faceting.FacetResult;
+using SearchResult = Umbraco.Cms.Core.Search.Querying.SearchResult;
 
 namespace Umbraco.Cms.Search.Provider.Examine.Services;
 

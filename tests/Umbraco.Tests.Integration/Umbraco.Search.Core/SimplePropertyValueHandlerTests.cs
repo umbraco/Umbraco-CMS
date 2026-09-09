@@ -4,7 +4,8 @@ using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Search.Core.PropertyValueHandlers;
-using Umbraco.Cms.Search.Core.PropertyValueHandlers.Collection;
+using Umbraco.Cms.Core.Search.Indexing;
+using Umbraco.Cms.Core.Search.Indexing.Collection;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Integration.Testing.Search;
@@ -124,7 +125,7 @@ public class SimplePropertyValueHandlerTests : PropertyValueHandlerTestsBase
             var tagsAsCsvValue = document.Fields.FirstOrDefault(f => f.FieldName == "tagsAsCsvValue")?.Value.Keywords?.ToArray();
             CollectionAssert.AreEqual(tagsAsCsvValue, new[] { "Four", "Five", "Six" });
 
-            var allTagsValue = document.Fields.FirstOrDefault(f => f.FieldName == Cms.Search.Core.Constants.FieldNames.Tags)?.Value.Keywords?.ToArray();
+            var allTagsValue = document.Fields.FirstOrDefault(f => f.FieldName == global::Umbraco.Cms.Core.Constants.IndexFieldNames.Tags)?.Value.Keywords?.ToArray();
             CollectionAssert.AreEquivalent(allTagsValue, new[] { "One", "Two", "Three", "Four", "Five", "Six" });
 
             var multipleTextstringsValue = document.Fields.FirstOrDefault(f => f.FieldName == "multipleTextstringsValue")?.Value.Texts?.ToArray();

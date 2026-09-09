@@ -3,10 +3,12 @@ using Examine.Search;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Search.Core.Extensions;
-using Umbraco.Cms.Search.Core.Models.Indexing;
+using Umbraco.Cms.Core.Search;
+using Umbraco.Cms.Core.Extensions;
+using Umbraco.Cms.Core.Search.Indexing;
 using Umbraco.Cms.Search.Provider.Examine.Configuration;
 using Umbraco.Cms.Search.Provider.Examine.Helpers;
-using CoreConstants = Umbraco.Cms.Search.Core.Constants;
+using CoreConstants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Search.Provider.Examine.Services;
 
@@ -224,7 +226,7 @@ public class Indexer : IExamineIndexer
 
     private void DeleteSingleDoc(IIndex index, Guid id)
     {
-        ISearchResults documents = index.Searcher.CreateQuery().Field(FieldNameHelper.FieldName(CoreConstants.FieldNames.Id, Constants.FieldValues.Keywords), id.AsKeyword()).Execute();
+        ISearchResults documents = index.Searcher.CreateQuery().Field(FieldNameHelper.FieldName(CoreConstants.IndexFieldNames.Id, Constants.FieldValues.Keywords), id.AsKeyword()).Execute();
 
         var idsToDelete = new HashSet<string>();
 
@@ -247,7 +249,7 @@ public class Indexer : IExamineIndexer
 
         foreach (Guid id in ids)
         {
-            ISearchResults documents = index.Searcher.CreateQuery().Field(FieldNameHelper.FieldName(CoreConstants.FieldNames.PathIds, Constants.FieldValues.Keywords), id.AsKeyword()).Execute();
+            ISearchResults documents = index.Searcher.CreateQuery().Field(FieldNameHelper.FieldName(CoreConstants.IndexFieldNames.PathIds, Constants.FieldValues.Keywords), id.AsKeyword()).Execute();
             foreach (ISearchResult document in documents)
             {
                 idsToDelete.Add(document.Id);

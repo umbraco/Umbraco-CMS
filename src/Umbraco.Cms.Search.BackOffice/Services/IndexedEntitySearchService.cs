@@ -6,11 +6,14 @@ using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Search.Core.Extensions;
-using Umbraco.Cms.Search.Core.Models.Searching;
-using Umbraco.Cms.Search.Core.Models.Searching.Filtering;
-using Umbraco.Cms.Search.Core.Models.Searching.Sorting;
+using Umbraco.Cms.Core.Search;
+using Umbraco.Cms.Core.Extensions;
+using Umbraco.Cms.Core.Search.Indexing;
+using Umbraco.Cms.Core.Search.Querying;
+using Umbraco.Cms.Core.Search.Querying.Filtering;
+using Umbraco.Cms.Core.Search.Querying.Sorting;
 using Umbraco.Cms.Search.Core.Services;
-using Constants = Umbraco.Cms.Search.Core.Constants;
+using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Search.BackOffice.Services;
 
@@ -89,7 +92,7 @@ internal sealed class IndexedEntitySearchService : IndexedSearchServiceBase, IIn
         {
             filters.Add(
                 new KeywordFilter(
-                    FieldName: Constants.FieldNames.ContentTypeId,
+                    FieldName: Constants.IndexFieldNames.ContentTypeId,
                     Values: contentTypeIdsAsArray.Select(contentTypeId => contentTypeId.AsKeyword()).ToArray(),
                     Negate: false));
         }
@@ -98,7 +101,7 @@ internal sealed class IndexedEntitySearchService : IndexedSearchServiceBase, IIn
         {
             filters.Add(
                 new KeywordFilter(
-                    FieldName: Constants.FieldNames.PathIds,
+                    FieldName: Constants.IndexFieldNames.PathIds,
                     Values: startNodeKeys.Select(key => key.AsKeyword()).ToArray(),
                     Negate: false));
         }
@@ -115,7 +118,7 @@ internal sealed class IndexedEntitySearchService : IndexedSearchServiceBase, IIn
             {
                 filters.Add(
                     new KeywordFilter(
-                        FieldName: Constants.FieldNames.PathIds,
+                        FieldName: Constants.IndexFieldNames.PathIds,
                         Values: [recycleBinId.Value.AsKeyword()],
                         Negate: trashed.Value is false));
             }

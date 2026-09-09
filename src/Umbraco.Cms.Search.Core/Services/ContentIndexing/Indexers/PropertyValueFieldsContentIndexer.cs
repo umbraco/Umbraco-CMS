@@ -2,9 +2,11 @@
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Search.Core.Extensions;
-using Umbraco.Cms.Search.Core.Models.Indexing;
+using Umbraco.Cms.Core.Search;
+using Umbraco.Cms.Core.Extensions;
+using Umbraco.Cms.Core.Search.Indexing;
 using Umbraco.Cms.Search.Core.PropertyValueHandlers;
-using Umbraco.Cms.Search.Core.PropertyValueHandlers.Collection;
+using Umbraco.Cms.Core.Search.Indexing.Collection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Search.Core.Services.ContentIndexing.Indexers;

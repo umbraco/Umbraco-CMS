@@ -1,10 +1,10 @@
 ﻿using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Search.Core.Helpers;
-using Umbraco.Cms.Search.Core.Models.Indexing;
+using Umbraco.Cms.Core.Search;
+using Umbraco.Cms.Core.Search.Indexing;
 using Umbraco.Cms.Search.Core.Services.ContentIndexing;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Models;
-using IndexField = Umbraco.Cms.Search.Core.Models.Indexing.IndexField;
+using IndexField = Umbraco.Cms.Core.Search.Indexing.IndexField;
 
 namespace Umbraco.Cms.Search.DeliveryApi.Services;
 

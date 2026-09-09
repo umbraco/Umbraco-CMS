@@ -6,7 +6,6 @@ using Umbraco.Cms.Api.Management.OpenApi;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.ServerEvents;
 using Umbraco.Cms.Search.Core.Cache;
-using Umbraco.Cms.Search.Core.Notifications;
 using Umbraco.Cms.Search.Core.Cache.Content;
 using Umbraco.Cms.Search.Core.Cache.ContentType;
 using Umbraco.Cms.Search.Core.Cache.Index;
@@ -16,11 +15,12 @@ using Umbraco.Cms.Search.Core.Cache.MediaType;
 using Umbraco.Cms.Search.Core.Cache.Member;
 using Umbraco.Cms.Search.Core.Cache.MemberType;
 using Umbraco.Cms.Search.Core.Cache.PublicAccess;
-using Umbraco.Cms.Search.Core.Helpers;
+using Umbraco.Cms.Core.Search;
 using Umbraco.Cms.Search.Core.NotificationHandlers;
 using Umbraco.Cms.Search.Core.Persistence;
+using Umbraco.Cms.Core.Search.Indexing;
 using Umbraco.Cms.Search.Core.PropertyValueHandlers;
-using Umbraco.Cms.Search.Core.PropertyValueHandlers.Collection;
+using Umbraco.Cms.Core.Search.Indexing.Collection;
 using Umbraco.Cms.Search.Core.Services;
 using Umbraco.Cms.Search.Core.Services.ContentIndexing;
 using Umbraco.Cms.Search.Core.Services.ContentIndexing.Indexers;
@@ -101,8 +101,8 @@ public static class UmbracoBuilderExtensions
         if (builder.Services.Any(s => s.ServiceType == typeof(IServerEventRouter)))
         {
             builder
-                .AddNotificationAsyncHandler<IndexRebuildStartingNotification, IndexRebuildServerEventNotificationHandler>()
-                .AddNotificationAsyncHandler<IndexRebuildCompletedNotification, IndexRebuildServerEventNotificationHandler>();
+                .AddNotificationAsyncHandler<Umbraco.Cms.Core.Notifications.IndexRebuildStartingNotification, IndexRebuildServerEventNotificationHandler>()
+                .AddNotificationAsyncHandler<Umbraco.Cms.Core.Notifications.IndexRebuildCompletedNotification, IndexRebuildServerEventNotificationHandler>();
         }
 
         builder

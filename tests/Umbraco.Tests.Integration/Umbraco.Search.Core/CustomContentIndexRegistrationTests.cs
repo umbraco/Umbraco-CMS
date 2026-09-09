@@ -2,13 +2,16 @@ using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Search.Core.Configuration;
 using Umbraco.Cms.Search.Core.Services;
+using Umbraco.Cms.Core.Search;
 using Umbraco.Cms.Search.Core.Services.ContentIndexing;
+using Umbraco.Cms.Core.Search.Indexing;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Integration.Testing.Search;
 using CoreConstants = Umbraco.Cms.Core.Constants;
+
+using Umbraco.Cms.Core.Search.Configuration;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Core;
 

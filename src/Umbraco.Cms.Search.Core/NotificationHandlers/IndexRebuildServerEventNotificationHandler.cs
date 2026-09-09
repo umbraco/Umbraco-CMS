@@ -1,7 +1,7 @@
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models.ServerEvents;
 using Umbraco.Cms.Core.ServerEvents;
-using Umbraco.Cms.Search.Core.Notifications;
+using Umbraco.Cms.Core.Notifications;
 
 namespace Umbraco.Cms.Search.Core.NotificationHandlers;
 

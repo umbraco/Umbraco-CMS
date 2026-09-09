@@ -3,11 +3,11 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
-using Umbraco.Cms.Search.Core.Configuration;
-using Umbraco.Cms.Search.Core.Models.Configuration;
-using Umbraco.Cms.Search.Core.Models.Indexing;
+using Umbraco.Cms.Core.Search.Configuration;
+using Umbraco.Cms.Core.Search.Indexing;
 using Umbraco.Cms.Search.Core.Models.ViewModels;
 using Umbraco.Cms.Search.Core.Services;
+using Umbraco.Cms.Core.Search;
 
 namespace Umbraco.Cms.Search.Core.Controllers;
 

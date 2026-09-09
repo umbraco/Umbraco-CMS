@@ -3,6 +3,9 @@ using Examine;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Search.Core.Extensions;
+using Umbraco.Cms.Core.Search;
+using Umbraco.Cms.Core.Extensions;
+using Umbraco.Cms.Core.Search.Indexing;
 using Umbraco.Cms.Search.Provider.Examine.Helpers;
 using Umbraco.Cms.Search.Provider.Examine.Models.ViewModels;
 using Umbraco.Cms.Search.Provider.Examine.Services;
@@ -50,7 +53,7 @@ public class ExamineApiController : ExamineApiControllerBase
         ISearchResults results = index.Searcher
             .CreateQuery()
             .Field(
-                FieldNameHelper.FieldName(Core.Constants.FieldNames.Id, Constants.FieldValues.Keywords),
+                FieldNameHelper.FieldName(Umbraco.Cms.Core.Constants.IndexFieldNames.Id, Constants.FieldValues.Keywords),
                 documentKey.AsKeyword())
             .Execute();
 

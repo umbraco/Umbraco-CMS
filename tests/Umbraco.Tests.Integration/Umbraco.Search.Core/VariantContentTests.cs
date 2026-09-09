@@ -2,8 +2,9 @@ using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Search.Core;
 using Umbraco.Cms.Search.Core.Extensions;
-using Umbraco.Cms.Search.Core.Helpers;
-using Umbraco.Cms.Search.Core.Models.Indexing;
+using Umbraco.Cms.Core.Search;
+using Umbraco.Cms.Core.Extensions;
+using Umbraco.Cms.Core.Search.Indexing;
 using Umbraco.Cms.Tests.Integration.Testing.Search;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Core;
@@ -153,24 +154,24 @@ public class VariantContentTests : VariantContentTestBase
 
         Assert.Multiple(() =>
         {
-            var contentTypeValue = document.Fields.FirstOrDefault(f => f.FieldName == Constants.FieldNames.ContentTypeId)?.Value.Keywords?.SingleOrDefault();
+            var contentTypeValue = document.Fields.FirstOrDefault(f => f.FieldName == global::Umbraco.Cms.Core.Constants.IndexFieldNames.ContentTypeId)?.Value.Keywords?.SingleOrDefault();
             Assert.That(contentTypeValue, Is.EqualTo(content.ContentType.Key.AsKeyword()));
 
-            IndexField[] nameFields = document.Fields.Where(f => f.FieldName == Constants.FieldNames.Name).ToArray();
+            IndexField[] nameFields = document.Fields.Where(f => f.FieldName == global::Umbraco.Cms.Core.Constants.IndexFieldNames.Name).ToArray();
             Assert.That(nameFields.Length, Is.EqualTo(2));
             Assert.That(nameFields.SingleOrDefault(f => f.Culture.InvariantEquals("en-US"))?.Value.TextsR1?.SingleOrDefault(), Is.EqualTo(content.GetCultureName("en-US")));
             Assert.That(nameFields.SingleOrDefault(f => f.Culture.InvariantEquals("da-DK"))?.Value.TextsR1?.SingleOrDefault(), Is.EqualTo(content.GetCultureName("da-DK")));
 
-            DateTimeOffset? createDateValue = document.Fields.FirstOrDefault(f => f.FieldName == Constants.FieldNames.CreateDate)?.Value.DateTimeOffsets?.SingleOrDefault();
+            DateTimeOffset? createDateValue = document.Fields.FirstOrDefault(f => f.FieldName == global::Umbraco.Cms.Core.Constants.IndexFieldNames.CreateDate)?.Value.DateTimeOffsets?.SingleOrDefault();
             Assert.That(createDateValue, Is.EqualTo(dateTimeOffsetConverter.ToDateTimeOffset(content.CreateDate)));
 
-            DateTimeOffset? updateDateValue = document.Fields.FirstOrDefault(f => f.FieldName == Constants.FieldNames.UpdateDate)?.Value.DateTimeOffsets?.SingleOrDefault();
+            DateTimeOffset? updateDateValue = document.Fields.FirstOrDefault(f => f.FieldName == global::Umbraco.Cms.Core.Constants.IndexFieldNames.UpdateDate)?.Value.DateTimeOffsets?.SingleOrDefault();
             Assert.That(updateDateValue, Is.EqualTo(dateTimeOffsetConverter.ToDateTimeOffset(content.UpdateDate)));
 
-            var levelValue = document.Fields.FirstOrDefault(f => f.FieldName == Constants.FieldNames.Level)?.Value.Integers?.SingleOrDefault();
+            var levelValue = document.Fields.FirstOrDefault(f => f.FieldName == global::Umbraco.Cms.Core.Constants.IndexFieldNames.Level)?.Value.Integers?.SingleOrDefault();
             Assert.That(levelValue, Is.EqualTo(content.Level));
 
-            var sortOrderValue = document.Fields.FirstOrDefault(f => f.FieldName == Constants.FieldNames.SortOrder)?.Value.Integers?.SingleOrDefault();
+            var sortOrderValue = document.Fields.FirstOrDefault(f => f.FieldName == global::Umbraco.Cms.Core.Constants.IndexFieldNames.SortOrder)?.Value.Integers?.SingleOrDefault();
             Assert.That(sortOrderValue, Is.EqualTo(content.SortOrder));
         });
     }

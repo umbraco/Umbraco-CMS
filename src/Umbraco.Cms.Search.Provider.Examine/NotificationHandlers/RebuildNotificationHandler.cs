@@ -3,10 +3,11 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Notifications;
-using Umbraco.Cms.Search.Core.Models.Configuration;
+using Umbraco.Cms.Core.Search.Configuration;
 using Umbraco.Cms.Search.Core.Services.ContentIndexing;
+using Umbraco.Cms.Core.Search.Indexing;
 using Umbraco.Cms.Search.Provider.Examine.Services;
-using IndexOptions = Umbraco.Cms.Search.Core.Configuration.IndexOptions;
+using IndexOptions = Umbraco.Cms.Core.Search.Configuration.IndexOptions;
 
 namespace Umbraco.Cms.Search.Provider.Examine.NotificationHandlers;
 

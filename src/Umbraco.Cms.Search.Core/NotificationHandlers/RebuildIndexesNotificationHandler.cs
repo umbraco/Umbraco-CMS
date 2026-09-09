@@ -8,9 +8,9 @@ using Umbraco.Cms.Search.Core.Cache.Index;
 using Umbraco.Cms.Search.Core.Cache.Language;
 using Umbraco.Cms.Search.Core.Cache.MediaType;
 using Umbraco.Cms.Search.Core.Cache.MemberType;
-using Umbraco.Cms.Search.Core.Configuration;
-using Umbraco.Cms.Search.Core.Models.Configuration;
+using Umbraco.Cms.Core.Search.Configuration;
 using Umbraco.Cms.Search.Core.Services.ContentIndexing;
+using Umbraco.Cms.Core.Search.Indexing;
 
 namespace Umbraco.Cms.Search.Core.NotificationHandlers;
 

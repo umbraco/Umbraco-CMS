@@ -1,9 +1,10 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Search.Core.Models.Indexing;
+using Umbraco.Cms.Core.Search.Indexing;
 using Umbraco.Cms.Search.Core.Models.ViewModels;
 using Umbraco.Cms.Search.Core.Services;
+using Umbraco.Cms.Core.Search;
 
 namespace Umbraco.Cms.Search.Core.Controllers;
 

@@ -1,5 +1,5 @@
 ﻿using Umbraco.Cms.Core;
-using Umbraco.Cms.Search.Core.Models.Searching.Sorting;
+using Umbraco.Cms.Core.Search.Querying.Sorting;
 
 namespace Umbraco.Cms.Search.BackOffice.Services;
 

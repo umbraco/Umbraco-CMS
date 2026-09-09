@@ -1,6 +1,6 @@
 ﻿using System.Globalization;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Search.Core.Models.Indexing;
+using Umbraco.Cms.Core.Search.Indexing;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Search.Core.PropertyValueHandlers;

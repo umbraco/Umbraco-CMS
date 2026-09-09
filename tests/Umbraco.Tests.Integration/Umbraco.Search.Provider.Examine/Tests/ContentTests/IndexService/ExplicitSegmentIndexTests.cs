@@ -2,12 +2,15 @@ using Examine;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Search.Core.Extensions;
+using Umbraco.Cms.Core.Search;
+using Umbraco.Cms.Core.Extensions;
+using Umbraco.Cms.Core.Search.Indexing;
 using Umbraco.Cms.Search.Provider.Examine.Helpers;
 using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Constants = Umbraco.Cms.Search.Provider.Examine.Constants;
-using CoreConstants = Umbraco.Cms.Search.Core.Constants;
+using CoreConstants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Provider.Examine.Tests.ContentTests.IndexService;
 
@@ -56,7 +59,7 @@ public class ExplicitSegmentIndexTests : IndexTestBase
     /// </summary>
     private ISearchResult? GetDocumentByKeyAndCulture(IIndex index, Guid key, string culture)
     {
-        var idFieldName = FieldNameHelper.FieldName(CoreConstants.FieldNames.Id, Constants.FieldValues.Keywords);
+        var idFieldName = FieldNameHelper.FieldName(CoreConstants.IndexFieldNames.Id, Constants.FieldValues.Keywords);
         ISearchResults results = index.Searcher.CreateQuery().All().Execute();
 
         return results.FirstOrDefault(doc =>
@@ -71,7 +74,7 @@ public class ExplicitSegmentIndexTests : IndexTestBase
     /// </summary>
     private IEnumerable<ISearchResult> GetDocumentsByKey(IIndex index, Guid key)
     {
-        var idFieldName = FieldNameHelper.FieldName(CoreConstants.FieldNames.Id, Constants.FieldValues.Keywords);
+        var idFieldName = FieldNameHelper.FieldName(CoreConstants.IndexFieldNames.Id, Constants.FieldValues.Keywords);
         ISearchResults results = index.Searcher.CreateQuery().All().Execute();
 
         return results.Where(doc =>

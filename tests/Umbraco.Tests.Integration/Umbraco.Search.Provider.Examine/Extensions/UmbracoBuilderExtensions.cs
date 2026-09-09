@@ -2,7 +2,6 @@ using Examine.Lucene.Directories;
 using Examine.Lucene.Providers;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Notifications;
-using Umbraco.Cms.Search.Core.Notifications;
 using Umbraco.Cms.Search.Provider.Examine.NotificationHandlers;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Provider.Examine.Extensions;

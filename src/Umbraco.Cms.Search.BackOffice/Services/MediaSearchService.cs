@@ -2,6 +2,7 @@
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Search.Core.Services;
+using Umbraco.Cms.Core.Search;
 using Constants = Umbraco.Cms.Search.Core.Constants;
 
 namespace Umbraco.Cms.Search.BackOffice.Services;

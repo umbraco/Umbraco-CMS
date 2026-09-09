@@ -1,9 +1,9 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Search.Core.Helpers;
-using Umbraco.Cms.Search.Core.Models.Searching.Filtering;
-using Umbraco.Cms.Search.Core.Models.Searching.Sorting;
+using Umbraco.Cms.Core.Search;
+using Umbraco.Cms.Core.Search.Querying.Filtering;
+using Umbraco.Cms.Core.Search.Querying.Sorting;
 using Umbraco.Cms.Search.Core.Services;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
@@ -13,9 +13,11 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Search.Core.Extensions;
-using Umbraco.Cms.Search.Core.Models.Searching;
+using Umbraco.Cms.Core.Extensions;
+using Umbraco.Cms.Core.Search.Indexing;
+using Umbraco.Cms.Core.Search.Querying;
 using Umbraco.Extensions;
-using Constants = Umbraco.Cms.Search.Core.Constants;
+using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Search.DeliveryApi.Services;
 
@@ -241,7 +243,7 @@ internal sealed class DeliveryApiContentQueryProvider : IApiContentQueryProvider
 
         fieldName = MapSystemFieldName(fieldName);
 
-        if (fieldName is Constants.FieldNames.Level or Constants.FieldNames.SortOrder)
+        if (fieldName is Constants.IndexFieldNames.Level or Constants.IndexFieldNames.SortOrder)
         {
             sorter = new IntegerSorter(fieldName, direction);
             return true;
@@ -264,24 +266,24 @@ internal sealed class DeliveryApiContentQueryProvider : IApiContentQueryProvider
         => fieldName switch
         {
             // AncestorsSelectorIndexer:
-            "itemId" => Constants.FieldNames.Id,
+            "itemId" => Constants.IndexFieldNames.Id,
             // ChildrenSelectorIndexer:
-            "parentId" => Constants.FieldNames.ParentId,
+            "parentId" => Constants.IndexFieldNames.ParentId,
             // DescendantsSelectorIndexer:
             // TODO: this is somewhat wrong... PathIds equals ancestors-or-self, but the Delivery API queries for ancestors only
-            "ancestorIds" => Constants.FieldNames.PathIds,
+            "ancestorIds" => Constants.IndexFieldNames.PathIds,
             // ContentTypeFilterIndexer:
-            "contentType" => Constants.FieldNames.ContentTypeId,
+            "contentType" => Constants.IndexFieldNames.ContentTypeId,
             // NameFilterIndexer or NameSortIndexer:
-            "name" or "sortName" => Constants.FieldNames.Name,
+            "name" or "sortName" => Constants.IndexFieldNames.Name,
             // CreateDateSortIndexer
-            "createDate" => Constants.FieldNames.CreateDate,
+            "createDate" => Constants.IndexFieldNames.CreateDate,
             // UpdateDateSortIndexer
-            "updateDate" => Constants.FieldNames.UpdateDate,
+            "updateDate" => Constants.IndexFieldNames.UpdateDate,
             // LevelSortIndexer
-            "level" => Constants.FieldNames.Level,
+            "level" => Constants.IndexFieldNames.Level,
             // SortOrderSortIndexer
-            "sortOrder" => Constants.FieldNames.SortOrder,
+            "sortOrder" => Constants.IndexFieldNames.SortOrder,
             _ => fieldName
         };
 
@@ -306,7 +308,7 @@ internal sealed class DeliveryApiContentQueryProvider : IApiContentQueryProvider
 
     private string[] MapSystemFieldValues(string fieldName, string[] values)
     {
-        if (fieldName is not Constants.FieldNames.ContentTypeId)
+        if (fieldName is not Constants.IndexFieldNames.ContentTypeId)
         {
             return values;
         }

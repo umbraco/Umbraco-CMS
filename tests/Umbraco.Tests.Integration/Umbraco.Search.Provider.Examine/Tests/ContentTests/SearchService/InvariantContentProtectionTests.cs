@@ -3,11 +3,11 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
-using Umbraco.Cms.Search.Core.Models.Searching;
+using Umbraco.Cms.Core.Search.Querying;
 using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
-using SearchResult = Umbraco.Cms.Search.Core.Models.Searching.SearchResult;
+using SearchResult = Umbraco.Cms.Core.Search.Querying.SearchResult;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Provider.Examine.Tests.ContentTests.SearchService;
 

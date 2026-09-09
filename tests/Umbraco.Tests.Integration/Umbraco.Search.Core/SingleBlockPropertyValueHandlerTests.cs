@@ -10,7 +10,7 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Integration.Testing.Search;
-using IndexValue = Umbraco.Cms.Search.Core.Models.Indexing.IndexValue;
+using IndexValue = Umbraco.Cms.Core.Search.Indexing.IndexValue;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Core;
 
@@ -170,7 +170,7 @@ public class SingleBlockPropertyValueHandlerTests : PropertyValueHandlerTestsBas
         AssertDocumentFields(IndexAliases.PublishedContent);
 
         TestIndexDocument document = IndexerAndSearcher.Dump(IndexAliases.PublishedContent).Single();
-        IndexValue? tagsValue = document.Fields.FirstOrDefault(f => f.FieldName == Cms.Search.Core.Constants.FieldNames.Tags)?.Value;
+        IndexValue? tagsValue = document.Fields.FirstOrDefault(f => f.FieldName == global::Umbraco.Cms.Core.Constants.IndexFieldNames.Tags)?.Value;
         Assert.That(tagsValue, Is.Not.Null);
         CollectionAssert.AreEquivalent(new[] { "One", "Two", "Three", "Four", "Five", "Six" }, tagsValue.Keywords);
 
@@ -290,7 +290,7 @@ public class SingleBlockPropertyValueHandlerTests : PropertyValueHandlerTestsBas
             CollectionAssert.AreEqual(new[] { "One", "Two", "Three" }, indexValue.Keywords);
         });
 
-        IndexValue? tagsValue = document.Fields.FirstOrDefault(f => f.FieldName == Cms.Search.Core.Constants.FieldNames.Tags)?.Value;
+        IndexValue? tagsValue = document.Fields.FirstOrDefault(f => f.FieldName == global::Umbraco.Cms.Core.Constants.IndexFieldNames.Tags)?.Value;
         Assert.That(tagsValue, Is.Not.Null);
         CollectionAssert.AreEquivalent(new[] { "One", "Two", "Three" }, tagsValue.Keywords);
     }

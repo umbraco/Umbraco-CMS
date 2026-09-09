@@ -2,8 +2,8 @@ using NUnit.Framework;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Search.Core;
-using Umbraco.Cms.Search.Core.Models.Indexing;
-using Umbraco.Cms.Search.Core.Notifications;
+using Umbraco.Cms.Core.Search.Indexing;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Tests.Integration.Testing.Search;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Core;
@@ -136,7 +136,7 @@ public class ContentIndexingNotificationTests : InvariantContentTestBase
         {
             CollectionAssert.AreEqual(titleField.Value.Keywords, new[] { "NotificationHandlerKeyword", document.Id.ToString("D") });
 
-            IndexField? nameField = document.Fields.SingleOrDefault(field => field.FieldName == Constants.FieldNames.Name);
+            IndexField? nameField = document.Fields.SingleOrDefault(field => field.FieldName == global::Umbraco.Cms.Core.Constants.IndexFieldNames.Name);
             Assert.That(nameField, Is.Not.Null);
             Assert.Multiple(() =>
             {
@@ -158,7 +158,7 @@ public class ContentIndexingNotificationTests : InvariantContentTestBase
             {
                 IndexField? titleField = notification.Fields.SingleOrDefault(field => field.FieldName == "title");
                 IndexField? countField = notification.Fields.SingleOrDefault(field => field.FieldName == "count");
-                IndexField? nameField = notification.Fields.SingleOrDefault(field => field.FieldName == Constants.FieldNames.Name);
+                IndexField? nameField = notification.Fields.SingleOrDefault(field => field.FieldName == global::Umbraco.Cms.Core.Constants.IndexFieldNames.Name);
                 Assert.Multiple(() =>
                 {
                     Assert.That(titleField, Is.Not.Null);

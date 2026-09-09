@@ -5,9 +5,10 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Search.Core.Models.Searching;
+using Umbraco.Cms.Core.Search.Querying;
 using Umbraco.Cms.Search.Core.Models.ViewModels;
 using Umbraco.Cms.Search.Core.Services;
+using Umbraco.Cms.Core.Search;
 
 namespace Umbraco.Cms.Search.Core.Controllers;
 

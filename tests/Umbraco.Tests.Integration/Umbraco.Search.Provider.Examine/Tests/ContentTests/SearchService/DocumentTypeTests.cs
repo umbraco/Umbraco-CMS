@@ -7,7 +7,7 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.ContentTypeEditing;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Search.Core.Cache.ContentType;
-using Umbraco.Cms.Search.Core.Models.Searching;
+using Umbraco.Cms.Core.Search.Querying;
 using Umbraco.Cms.Search.Core.NotificationHandlers;
 using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;

@@ -1,12 +1,13 @@
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Search.Core.Models.Indexing;
-using Umbraco.Cms.Search.Core.Models.Searching;
-using Umbraco.Cms.Search.Core.Models.Searching.Faceting;
-using Umbraco.Cms.Search.Core.Models.Searching.Filtering;
-using Umbraco.Cms.Search.Core.Models.Searching.Sorting;
+using Umbraco.Cms.Core.Search.Indexing;
+using Umbraco.Cms.Core.Search.Querying;
+using Umbraco.Cms.Core.Search.Querying.Faceting;
+using Umbraco.Cms.Core.Search.Querying.Filtering;
+using Umbraco.Cms.Core.Search.Querying.Sorting;
 using Umbraco.Cms.Search.Core.Models.ViewModels;
 using Umbraco.Cms.Search.Core.Services;
+using Umbraco.Cms.Core.Search;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Search.Core.Constants;
 
@@ -31,7 +32,7 @@ public class TestIndexerAndSearcher : IIndexer, ISearcher
         {
             GetIndex(indexAlias).Remove(key);
             IEnumerable<TestIndexDocument> descendantDocuments = GetIndex(indexAlias).Values.Where(document =>
-                document.Fields.Any(f => f.FieldName == Constants.FieldNames.PathIds && f.Value.Keywords?.Contains($"{key:D}") is true));
+                document.Fields.Any(f => f.FieldName == global::Umbraco.Cms.Core.Constants.IndexFieldNames.PathIds && f.Value.Keywords?.Contains($"{key:D}") is true));
             foreach (TestIndexDocument descendantDocument in descendantDocuments)
             {
                 GetIndex(indexAlias).Remove(descendantDocument.Id);

@@ -2,7 +2,8 @@
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Infrastructure;
-using Umbraco.Cms.Search.Core.Models.Searching;
+using Umbraco.Cms.Core.Search;
+using Umbraco.Cms.Core.Search.Querying;
 
 namespace Umbraco.Cms.Search.Core.Services;
 
