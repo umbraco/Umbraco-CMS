@@ -72,6 +72,16 @@ export class UmbMediaPickerInputContext extends UmbPickerInputContext<
 		await super.openPicker(combinedPickerData);
 	}
 
+	/**
+	 * The media types that represent a container — an item that holds other media rather than a file.
+	 * @returns {Promise<ReadonlySet<string>>} the unique of every folder media type.
+	 * @description Resolved once and reused; the picker's own filter reads the same set.
+	 */
+	async getFolderTypeUniques(): Promise<ReadonlySet<string>> {
+		await this.#loadFolderTypes();
+		return this.#folderTypeUniques;
+	}
+
 	async #loadFolderTypes() {
 		if (!this.#folderTypesPromise) {
 			this.#folderTypesPromise = this.#mediaTypeStructureRepository.requestMediaTypesOfFolders().then((folderTypes) => {

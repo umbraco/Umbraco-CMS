@@ -164,6 +164,9 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 	@state()
 	private _cards: Array<UmbMediaCardItemModel> = [];
 
+	@state()
+	private _folderTypeUniques?: ReadonlySet<string>;
+
 	#pickerInputContext = new UmbMediaPickerInputContext(this);
 	#interactionMemoryManager = new UmbEntityInputInteractionMemoryManager(
 		this,
@@ -191,6 +194,10 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 				if (selectedItems?.length && !missingCards.length) return;
 
 				this._cards = selectedItems ?? [];
+
+				if (this._cards.length && !this._folderTypeUniques) {
+					this._folderTypeUniques = await this.#pickerInputContext.getFolderTypeUniques();
+				}
 			},
 			null,
 		);
@@ -288,7 +295,7 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 					icon=${item.mediaType.icon}
 					file-ext=${ifDefined(this.#fileExtension(item))}></umb-media-thumbnail>
 				${this.#renderIsTrashed(item)}
-				<uui-action-bar slot="actions"> ${this.#renderRemoveAction(item)}</uui-action-bar>
+				<uui-action-bar slot="actions">${this.#renderRemoveAction(item)}</uui-action-bar>
 			</uui-card-media>
 		`;
 	}
@@ -303,9 +310,10 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 	}
 
 	#fileExtension(item: UmbMediaCardItemModel) {
-		// The item model carries no extension of its own, so it is derived from the name. An item that can hold
-		// children is a container rather than a file, and a dot in its name is part of the name — not an extension.
-		if (item.hasChildren) return undefined;
+		// The item model carries no extension of its own, so it is derived from the name. A container holds other
+		// media rather than a file, and a dot in its name is part of the name — not an extension. Until the folder
+		// media types are known, every item is treated as one: a missing label beats a wrong one.
+		if (!this._folderTypeUniques || this._folderTypeUniques.has(item.mediaType.unique)) return undefined;
 		return getFileExtension(item.name)?.toLowerCase();
 	}
 
