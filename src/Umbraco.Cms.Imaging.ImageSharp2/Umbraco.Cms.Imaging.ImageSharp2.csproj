@@ -13,6 +13,17 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!--
+      Shared with the ImageSharp 3.x package rather than copied. Neither file touches an API that
+      differs between the two majors, and the packages cannot share an assembly because they depend
+      on mutually exclusive versions of SixLabors.ImageSharp, so linking the source is the only way
+      to keep one copy. Everything else in this project is a deliberate variant of its counterpart.
+    -->
+    <Compile Include="..\Umbraco.Cms.Imaging.ImageSharp\ImageProcessingMemory.cs" Link="ImageProcessingMemory.cs" />
+    <Compile Include="..\Umbraco.Cms.Imaging.ImageSharp\ConfigurePhysicalFileSystemCacheOptions.cs" Link="ConfigurePhysicalFileSystemCacheOptions.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
       <_Parameter1>Umbraco.Tests.UnitTests</_Parameter1>
     </AssemblyAttribute>

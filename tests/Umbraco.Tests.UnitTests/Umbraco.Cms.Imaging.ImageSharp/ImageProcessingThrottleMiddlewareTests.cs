@@ -15,6 +15,9 @@ using Umbraco.Cms.Imaging.ImageSharp;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Imaging.ImageSharp;
 
+/// <summary>
+/// Tests for <see cref="ImageProcessingThrottleMiddleware" />.
+/// </summary>
 [TestFixture]
 public class ImageProcessingThrottleMiddlewareTests
 {
@@ -40,16 +43,20 @@ public class ImageProcessingThrottleMiddlewareTests
         Assert.That(probe.Peak, Is.EqualTo(Limit), "More images were processed concurrently than configured.");
     }
 
-    // None of these is something the imaging middleware will process, so none may queue behind it.
+    /// <summary>
+    /// None of these is something the imaging middleware will process, so none may queue behind it.
+    /// </summary>
     [TestCase(ImagePath, "v", "1234")]
     [TestCase("/umbraco/management/api/v1/tree", "width", "400")]
     [TestCase("/export.csv", "format", "xlsx")]
     public Task InvokeAsync_NonProcessingRequests_AreNotThrottled(string path, string key, string value)
         => AssertAllRequestsPassThrough(CreateMiddleware, () => CreateContext(path, (key, value)));
 
-    // A request the imaging middleware serves from cache never reaches the decode hook, so it never
-    // takes a slot however many arrive at once. This is what gating at the decode buys over gating
-    // in the middleware, where a cache hit waited behind decodes.
+    /// <summary>
+    /// A request the imaging middleware serves from cache never reaches the decode hook, so it
+    /// never takes a slot however many arrive at once. This is what gating at the decode buys over
+    /// gating in the middleware, where a cache hit waited behind decodes.
+    /// </summary>
     [Test]
     public Task InvokeAsync_RequestsServedWithoutDecoding_AreNotThrottled()
         => AssertAllRequestsPassThrough(
@@ -78,13 +85,17 @@ public class ImageProcessingThrottleMiddlewareTests
         Assert.That(handled, Is.True);
     }
 
-    // Ample memory for a single processor: the processor count already bounds concurrent decodes,
-    // so the gate steps aside rather than serialising requests the cache could serve.
+    /// <summary>
+    /// Ample memory for a single processor: the processor count already bounds concurrent decodes,
+    /// so the gate steps aside rather than serialising requests the cache could serve.
+    /// </summary>
     [Test]
     public Task InvokeAsync_WhenMemoryIsNotConstrained_DoesNotThrottle()
         => AssertAllRequestsPassThrough(CreateUnconstrainedMiddleware, () => CreateContext(ImagePath, ("width", "400")));
 
-    // An explicit limit is set, but the feature is switched off, so nothing is gated.
+    /// <summary>
+    /// An explicit limit is set, but the feature is switched off, so nothing is gated.
+    /// </summary>
     [Test]
     public Task InvokeAsync_WhenDisabled_DoesNotThrottle()
         => AssertAllRequestsPassThrough(CreateDisabledMiddleware, () => CreateContext(ImagePath, ("width", "400")));
@@ -134,8 +145,12 @@ public class ImageProcessingThrottleMiddlewareTests
     private static ImageProcessingThrottleMiddleware CreateDisabledMiddleware(RequestDelegate next)
         => Build(next, new ImagingMemorySettings { Enabled = false, MaximumConcurrentProcessing = Limit });
 
-    // Derived settings (zero) against 2 GB and a single processor, so memory is not the binding
-    // constraint and no limit is enforced.
+    /// <summary>
+    /// Derived settings (zero) against 2 GB and a single processor, so memory is not the binding
+    /// constraint and no limit is enforced.
+    /// </summary>
+    /// <param name="next">The next middleware in the pipeline.</param>
+    /// <returns>The middleware under test.</returns>
     private static ImageProcessingThrottleMiddleware CreateUnconstrainedMiddleware(RequestDelegate next)
         => Build(next, new ImagingMemorySettings(), availableMemoryBytes: 2048L * 1024 * 1024, processorCount: 1);
 
@@ -160,7 +175,11 @@ public class ImageProcessingThrottleMiddlewareTests
             : new ImageProcessingThrottleMiddleware(next, Options.Create(settings), processors, formatUtilities, logger);
     }
 
-    // Takes the request's slot the way the imaging middleware's decode hook does.
+    /// <summary>
+    /// Takes the request's slot the way the imaging middleware's decode hook does.
+    /// </summary>
+    /// <param name="context">The request context.</param>
+    /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
     private static async Task AcquireSlotAsync(HttpContext context)
     {
         if (context.Items.TryGetValue(ImageProcessingSlot.HttpContextItemKey, out var value)
