@@ -2,9 +2,19 @@ import { UMB_IMAGE_CROPPER_EDITOR_MODAL } from '../../modals/index.js';
 import type { UmbMediaItemModel, UmbCropModel, UmbMediaPickerPropertyValueEntry } from '../../types.js';
 import { UMB_MEDIA_ITEM_REPOSITORY_ALIAS } from '../../repository/constants.js';
 import { UmbMediaPickerInputContext } from '../input-media/input-media.context.js';
+import { getMediaFileExtension } from '../../utils/index.js';
 import { UmbFileDropzoneItemStatus } from '@umbraco-cms/backoffice/dropzone';
 import type { UmbDropzoneChangeEvent } from '@umbraco-cms/backoffice/dropzone';
-import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import {
+	css,
+	customElement,
+	html,
+	ifDefined,
+	nothing,
+	property,
+	repeat,
+	state,
+} from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -26,6 +36,7 @@ type UmbRichMediaCardModel = {
 	name: string;
 	src?: string;
 	icon?: string;
+	mediaTypeUnique?: string;
 	isTrashed?: boolean;
 	isLoading?: boolean;
 };
@@ -166,6 +177,9 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 	private _cards: Array<UmbRichMediaCardModel> = [];
 
 	@state()
+	private _folderTypeUniques?: ReadonlySet<string>;
+
+	@state()
 	private _routeBuilder?: UmbModalRouteBuilder;
 
 	readonly #itemManager = new UmbRepositoryItemsManager<UmbMediaItemModel>(this, UMB_MEDIA_ITEM_REPOSITORY_ALIAS);
@@ -283,10 +297,15 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 					media: item.mediaKey,
 					name: media?.name ?? '',
 					icon: media?.mediaType?.icon,
+					mediaTypeUnique: media?.mediaType?.unique,
 					isTrashed: media?.isTrashed ?? false,
 					isLoading: !media,
 				};
 			}) ?? [];
+
+		if (this._cards.length && !this._folderTypeUniques) {
+			this._folderTypeUniques = await this.#pickerInputContext.getFolderTypeUniques();
+		}
 	}
 
 	#pickableFilter: (item: UmbMediaItemModel) => boolean = (item) => {
@@ -409,6 +428,7 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 					.unique=${item.media}
 					.alt=${item.name}
 					.icon=${item.icon ?? 'icon-picture'}
+					file-ext=${ifDefined(getMediaFileExtension(item.name, item.mediaTypeUnique, this._folderTypeUniques))}
 					.externalLoading=${item.isLoading ?? false}></umb-media-thumbnail>
 
 				${this.#renderIsTrashed(item)} ${this.#renderActions(item)}

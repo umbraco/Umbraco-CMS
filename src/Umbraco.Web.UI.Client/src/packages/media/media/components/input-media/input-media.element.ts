@@ -10,7 +10,8 @@ import {
 	repeat,
 	state,
 } from '@umbraco-cms/backoffice/external/lit';
-import { getFileExtension, splitStringToArray } from '@umbraco-cms/backoffice/utils';
+import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
+import { getMediaFileExtension } from '../../utils/index.js';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UmbEntityInputInteractionMemoryManager } from '@umbraco-cms/backoffice/entity';
@@ -293,7 +294,9 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 					unique=${item.unique}
 					alt=${item.name}
 					icon=${item.mediaType.icon}
-					file-ext=${ifDefined(this.#fileExtension(item))}></umb-media-thumbnail>
+					file-ext=${ifDefined(
+						getMediaFileExtension(item.name, item.mediaType.unique, this._folderTypeUniques),
+					)}></umb-media-thumbnail>
 				${this.#renderIsTrashed(item)}
 				<uui-action-bar slot="actions">${this.#renderRemoveAction(item)}</uui-action-bar>
 			</uui-card-media>
@@ -307,14 +310,6 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 				<uui-icon name="icon-trash"></uui-icon>
 			</uui-button>
 		`;
-	}
-
-	#fileExtension(item: UmbMediaCardItemModel) {
-		// The item model carries no extension of its own, so it is derived from the name. A container holds other
-		// media rather than a file, and a dot in its name is part of the name — not an extension. Until the folder
-		// media types are known, every item is treated as one: a missing label beats a wrong one.
-		if (!this._folderTypeUniques || this._folderTypeUniques.has(item.mediaType.unique)) return undefined;
-		return getFileExtension(item.name)?.toLowerCase();
 	}
 
 	#renderIsTrashed(item: UmbMediaCardItemModel) {

@@ -19,7 +19,8 @@ import {
 	repeat,
 	state,
 } from '@umbraco-cms/backoffice/external/lit';
-import { debounce, getFileExtension, UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
+import { debounce, UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
+import { getMediaFileExtension } from '../../utils/index.js';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { UmbFileDropzoneItemStatus } from '@umbraco-cms/backoffice/dropzone';
 import { UmbMediaTypeStructureRepository } from '@umbraco-cms/backoffice/media-type';
@@ -671,16 +672,11 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 					unique=${item.unique}
 					alt=${item.name}
 					icon=${item.mediaType.icon}
-					file-ext=${ifDefined(this.#fileExtension(item))}></umb-media-thumbnail>
+					file-ext=${ifDefined(
+						getMediaFileExtension(item.name, item.mediaType.unique, this.#folderTypeUniques),
+					)}></umb-media-thumbnail>
 			</uui-card-media>
 		`;
-	}
-
-	#fileExtension(item: UmbMediaTreeItemModel | UmbMediaSearchItemModel) {
-		// The item model carries no extension of its own, so it is derived from the name. A container holds other
-		// media rather than a file, and a dot in its name is part of the name — not an extension.
-		if (this.#folderTypeUniques.has(item.mediaType.unique)) return undefined;
-		return getFileExtension(item.name)?.toLowerCase();
 	}
 
 	#buildTableItems(items: Array<UmbMediaTreeItemModel | UmbMediaSearchItemModel>): Array<UmbTableItem> {
