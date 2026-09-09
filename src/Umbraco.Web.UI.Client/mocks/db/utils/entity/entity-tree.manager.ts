@@ -103,11 +103,12 @@ export class UmbMockEntityTreeManager<T extends { id: string; parent?: { id: str
 		return { items: treeItemsHasChildren, totalBefore, totalAfter };
 	}
 
-	move(ids: Array<string>, destinationId: string) {
+	/** A `null`/`undefined` `destinationId` moves the items to the tree root. */
+	move(ids: Array<string>, destinationId: string | null | undefined) {
 		if (!this.#db.update) throw new Error('move() requires a DB with update() method');
 
-		const destinationItem = this.#db.read(destinationId);
-		if (!destinationItem) throw new Error(`Destination item with id ${destinationId} not found`);
+		const destinationItem = destinationId ? this.#db.read(destinationId) : undefined;
+		if (destinationId && !destinationItem) throw new Error(`Destination item with id ${destinationId} not found`);
 
 		const items: Array<any> = [];
 
@@ -125,16 +126,20 @@ export class UmbMockEntityTreeManager<T extends { id: string; parent?: { id: str
 		});
 
 		movedItems.forEach((movedItem: any) => this.#db.update!(movedItem.id, movedItem));
-		destinationItem.hasChildren = true;
-		this.#db.update(destinationItem.id, destinationItem);
+
+		if (destinationItem) {
+			destinationItem.hasChildren = true;
+			this.#db.update(destinationItem.id, destinationItem);
+		}
 	}
 
-	copy(ids: Array<string>, destinationId: string) {
+	/** A `null`/`undefined` `destinationId` copies the items to the tree root. */
+	copy(ids: Array<string>, destinationId: string | null | undefined) {
 		if (!this.#db.update || !this.#db.create)
 			throw new Error('copy() requires a DB with update() and create() methods');
 
-		const destinationItem = this.#db.read(destinationId);
-		if (!destinationItem) throw new Error(`Destination item with id ${destinationId} not found`);
+		const destinationItem = destinationId ? this.#db.read(destinationId) : undefined;
+		if (destinationId && !destinationItem) throw new Error(`Destination item with id ${destinationId} not found`);
 
 		// Notice we don't add numbers to the 'copy' name.
 		const items: Array<any> = [];
@@ -150,15 +155,17 @@ export class UmbMockEntityTreeManager<T extends { id: string; parent?: { id: str
 				...item,
 				name: item.name + ' Copy',
 				id: UmbId.new(),
-				parentId: destinationId,
+				parent: destinationId ? { id: destinationId } : null,
 			};
 		});
 
 		copyItems.forEach((copyItem) => this.#db.create!(copyItem));
 		const newIds = copyItems.map((item) => item.id);
 
-		destinationItem.hasChildren = true;
-		this.#db.update(destinationItem.id, destinationItem);
+		if (destinationItem) {
+			destinationItem.hasChildren = true;
+			this.#db.update(destinationItem.id, destinationItem);
+		}
 
 		return newIds;
 	}

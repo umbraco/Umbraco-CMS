@@ -1361,9 +1361,6 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
 		<key alias="translation">Traduction</key>
 		<key alias="users">Utilisateurs</key>
 	</area>
-	<area alias="help">
-		<key alias="theBestUmbracoVideoTutorials">Les meilleurs tutoriels vidéo Umbraco</key>
-	</area>
 	<area alias="settings">
 		<key alias="defaulttemplate">Modèle par défaut</key>
 		<key alias="importDocumentTypeHelp">Pour importer un type de document, trouvez le fichier ".udt" sur votre ordinateur en cliquant sur le bouton "Parcourir" et cliquez sur "Importer" (une confirmation vous sera demandée à l'écran suivant)</key>
@@ -2235,10 +2232,6 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
 		<key alias="searchThisMessageWithGoogle">Chercher ce message avec Google</key>
 		<key alias="searchWithBing">Chercher avec Bing</key>
 		<key alias="searchThisMessageWithBing">Chercher ce message avec Bing</key>
-		<key alias="searchOurUmbraco">Chercher dans Our Umbraco</key>
-		<key alias="searchThisMessageOnOurUmbracoForumsAndDocs">Chercher ce message dans les forums et docs de Our Umbraco</key>
-		<key alias="searchOurUmbracoWithGoogle">Chercher dans Our Umbraco avec Google</key>
-		<key alias="searchOurUmbracoForumsUsingGoogle">Chercher dans les forums de Our Umbraco en utilisant Google</key>
 		<key alias="searchUmbracoSource">Chercher dans les Sources Umbraco</key>
 		<key alias="searchWithinUmbracoSourceCodeOnGithub">Chercher dans le code source d'Umbraco sur Github</key>
 		<key alias="searchUmbracoIssues">Chercher dans les Umbraco Issues</key>
@@ -2326,12 +2319,12 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
 		<key alias="more">En savoir plus</key>
 		<key alias="bulletPointOne">
 			<![CDATA[
-            Lisez-en plus sur la façon de travailler avec les éléments dans la section Settings <a class="btn-link -underline" href="https://docs.umbraco.com/umbraco-cms/fundamentals/backoffice/sections/" target="_blank" rel="noopener">dans la section Documentation</a> de Our Umbraco
+            Lisez-en plus sur la façon de travailler avec les éléments dans la section Settings <a class="btn-link -underline" href="https://docs.umbraco.com/umbraco-cms/fundamentals/backoffice/sections/" target="_blank" rel="noopener">dans la section Documentation</a> d'Umbraco
         ]]>
 		</key>
 		<key alias="bulletPointTwo">
 			<![CDATA[
-            Posez une question dans le <a class="btn-link -underline" href="https://our.umbraco.com/forum" target="_blank" rel="noopener">Community Forum</a>
+            Posez une question dans le <a class="btn-link -underline" href="https://forum.umbraco.com" target="_blank" rel="noopener">Community Forum</a>
         ]]>
 		</key>
 		<key alias="bulletPointThree">

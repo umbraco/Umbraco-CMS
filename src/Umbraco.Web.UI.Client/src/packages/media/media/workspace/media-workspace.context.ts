@@ -10,19 +10,12 @@ import type { UmbMediaDetailRepository } from '../repository/index.js';
 import { UMB_MEDIA_WORKSPACE_ALIAS, UMB_MEMBER_DETAIL_MODEL_VARIANT_SCAFFOLD } from './constants.js';
 import { UmbContentDetailWorkspaceContextBase, type UmbContentWorkspaceContext } from '@umbraco-cms/backoffice/content';
 import {
-	UmbEntityRestoredFromRecycleBinEvent,
-	UmbEntityTrashedEvent,
-	UmbIsTrashedEntityContext,
-} from '@umbraco-cms/backoffice/recycle-bin';
-import {
 	UmbWorkspaceIsNewRedirectController,
 	UmbWorkspaceIsNewRedirectControllerAlias,
 } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UMB_MEDIA_TYPE_ENTITY_TYPE, type UmbMediaTypeDetailModel } from '@umbraco-cms/backoffice/media-type';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
-import type { UmbVariantGuardRule } from '@umbraco-cms/backoffice/utils';
-import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbEntityContentTypeEntityContext } from '@umbraco-cms/backoffice/content-type';
 
 type ContentModel = UmbMediaDetailModel;
@@ -46,9 +39,7 @@ export class UmbMediaWorkspaceContext
 	readonly contentTypeHasCollection = this._data.createObservablePartOfCurrent((data) => !!data?.mediaType.collection);
 	readonly contentTypeIcon = this._data.createObservablePartOfCurrent((data) => data?.mediaType.icon);
 
-	#isTrashedContext = new UmbIsTrashedEntityContext(this);
 	#entityContentTypeContext = new UmbEntityContentTypeEntityContext(this);
-	#actionEventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
 
 	constructor(host: UmbControllerHost) {
 		super(host, {
@@ -73,14 +64,6 @@ export class UmbMediaWorkspaceContext
 			},
 			null,
 		);
-
-		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (actionEventContext) => {
-			this.#removeEventListeners();
-			this.#actionEventContext = actionEventContext;
-			this.#addEventListeners();
-		});
-
-		this.observe(this.isTrashed, (isTrashed) => this.#onTrashStateChange(isTrashed), null);
 
 		// TODO: This is done by the content detail base class, so we can remove it from there and only do it here. [NL]
 		this.propertyViewGuard.fallbackToPermitted();
@@ -120,7 +103,6 @@ export class UmbMediaWorkspaceContext
 
 	public override resetState() {
 		super.resetState();
-		this.#isTrashedContext.setIsTrashed(false);
 		this.removeUmbControllerByAlias(UmbWorkspaceIsNewRedirectControllerAlias);
 	}
 
@@ -165,53 +147,6 @@ export class UmbMediaWorkspaceContext
 		variantId: UmbVariantId,
 	): UmbMediaPropertyDatasetContext {
 		return new UmbMediaPropertyDatasetContext(host, this, variantId);
-	}
-
-	#addEventListeners() {
-		this.#actionEventContext?.addEventListener(UmbEntityTrashedEvent.TYPE, this.#onRecycleBinEvent as EventListener);
-		this.#actionEventContext?.addEventListener(
-			UmbEntityRestoredFromRecycleBinEvent.TYPE,
-			this.#onRecycleBinEvent as EventListener,
-		);
-	}
-
-	#removeEventListeners() {
-		this.#actionEventContext?.removeEventListener(UmbEntityTrashedEvent.TYPE, this.#onRecycleBinEvent as EventListener);
-		this.#actionEventContext?.removeEventListener(
-			UmbEntityRestoredFromRecycleBinEvent.TYPE,
-			this.#onRecycleBinEvent as EventListener,
-		);
-	}
-
-	#onRecycleBinEvent = (event: UmbEntityTrashedEvent | UmbEntityRestoredFromRecycleBinEvent) => {
-		const unique = this.getUnique();
-		const entityType = this.getEntityType();
-		if (event.getUnique() !== unique || event.getEntityType() !== entityType) return;
-		this.reload();
-	};
-
-	#onTrashStateChange(isTrashed?: boolean) {
-		this.#isTrashedContext.setIsTrashed(isTrashed ?? false);
-
-		const guardUnique = `UMB_PREVENT_EDIT_TRASHED_ITEM`;
-
-		if (!isTrashed) {
-			this.readOnlyGuard.removeRule(guardUnique);
-			return;
-		}
-
-		const rule: UmbVariantGuardRule = {
-			unique: guardUnique,
-			permitted: true,
-		};
-
-		// TODO: Change to use property write guard when it supports making the name read-only.
-		this.readOnlyGuard.addRule(rule);
-	}
-
-	public override destroy(): void {
-		this.#removeEventListeners();
-		super.destroy();
 	}
 }
 
