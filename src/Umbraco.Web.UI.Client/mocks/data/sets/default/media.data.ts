@@ -307,4 +307,108 @@ export const data: Array<UmbMockMediaModel> = [
 		],
 		flags: [],
 	},
+	{
+		hasChildren: false,
+		id: '9b4b5e4a-1f2c-4d3e-8a71-6c0d5e2f1a01',
+		createDate: '2023-02-06T15:32:05.350038',
+		parent: null,
+		noAccess: false,
+		isTrashed: false,
+		mediaType: {
+			id: 'media-type-5-id',
+			icon: 'icon-document',
+		},
+		// No upload value on purpose: these stand in for media the imaging endpoint cannot preview, which is
+		// where the file extension is the only hint about what the item actually is.
+		values: [],
+		variants: [
+			{
+				publishDate: '2023-02-06T15:31:51.354764',
+				culture: null,
+				segment: null,
+				name: 'annual-report.pdf',
+				createDate: '2023-02-06T15:31:46.876902',
+				updateDate: '2023-02-06T15:31:51.354764',
+			},
+		],
+		flags: [],
+	},
+	{
+		hasChildren: false,
+		id: '9b4b5e4a-1f2c-4d3e-8a71-6c0d5e2f1a02',
+		createDate: '2023-02-06T15:32:05.350038',
+		parent: null,
+		noAccess: false,
+		isTrashed: false,
+		mediaType: {
+			id: 'media-type-2-id',
+			icon: 'icon-audio-lines',
+		},
+		// No upload value on purpose: these stand in for media the imaging endpoint cannot preview, which is
+		// where the file extension is the only hint about what the item actually is.
+		values: [],
+		variants: [
+			{
+				publishDate: '2023-02-06T15:31:51.354764',
+				culture: null,
+				segment: null,
+				name: 'soundtrack.mp3',
+				createDate: '2023-02-06T15:31:46.876902',
+				updateDate: '2023-02-06T15:31:51.354764',
+			},
+		],
+		flags: [],
+	},
+	{
+		hasChildren: false,
+		id: '9b4b5e4a-1f2c-4d3e-8a71-6c0d5e2f1a03',
+		createDate: '2023-02-06T15:32:05.350038',
+		parent: null,
+		noAccess: false,
+		isTrashed: false,
+		mediaType: {
+			id: 'media-type-5-id',
+			icon: 'icon-document',
+		},
+		// No upload value on purpose: these stand in for media the imaging endpoint cannot preview, which is
+		// where the file extension is the only hint about what the item actually is.
+		values: [],
+		variants: [
+			{
+				publishDate: '2023-02-06T15:31:51.354764',
+				culture: null,
+				segment: null,
+				name: 'assets-bundle.zip',
+				createDate: '2023-02-06T15:31:46.876902',
+				updateDate: '2023-02-06T15:31:51.354764',
+			},
+		],
+		flags: [],
+	},
+	{
+		hasChildren: false,
+		id: '9b4b5e4a-1f2c-4d3e-8a71-6c0d5e2f1a04',
+		createDate: '2023-02-06T15:32:05.350038',
+		parent: null,
+		noAccess: false,
+		isTrashed: false,
+		mediaType: {
+			id: 'media-type-4-id',
+			icon: 'icon-video',
+		},
+		// No upload value on purpose: these stand in for media the imaging endpoint cannot preview, which is
+		// where the file extension is the only hint about what the item actually is.
+		values: [],
+		variants: [
+			{
+				publishDate: '2023-02-06T15:31:51.354764',
+				culture: null,
+				segment: null,
+				name: 'promo-clip.mov',
+				createDate: '2023-02-06T15:31:46.876902',
+				updateDate: '2023-02-06T15:31:51.354764',
+			},
+		],
+		flags: [],
+	},
 ];
