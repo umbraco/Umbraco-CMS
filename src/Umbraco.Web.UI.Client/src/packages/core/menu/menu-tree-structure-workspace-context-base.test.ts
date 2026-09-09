@@ -16,6 +16,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 import { UMB_SUBMITTABLE_TREE_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
+import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 
 const TEST_TREE_REPOSITORY_ALIAS = 'Umb.Test.MenuTreeStructureWorkspaceContextBase.TreeRepository';
 
@@ -279,6 +280,73 @@ describe('UmbMenuTreeStructureWorkspaceContextBase (creating a new item)', () =>
 		await aTimeout(150);
 
 		expect(UmbTestSectionSidebarMenuContext.expandItemsCalls).to.have.lengthOf(1);
+	});
+});
+
+describe('UmbMenuTreeStructureWorkspaceContextBase (creating a new item directly under the root)', () => {
+	let host: UmbTestMenuStructureControllerHostElement;
+	let workspaceContext: UmbTestSubmittableTreeEntityWorkspaceContext;
+	let context: TestMenuTreeStructureWorkspaceContext;
+
+	before(() => {
+		umbExtensionsRegistry.register(createTestTreeRepositoryManifest(TEST_TREE_REPOSITORY_ALIAS));
+	});
+
+	after(() => {
+		umbExtensionsRegistry.unregister(TEST_TREE_REPOSITORY_ALIAS);
+	});
+
+	beforeEach(async () => {
+		UmbTestTreeRepository.reset();
+		UmbTestSectionSidebarMenuContext.reset();
+
+		host = new UmbTestMenuStructureControllerHostElement();
+		document.body.appendChild(host);
+
+		workspaceContext = new UmbTestSubmittableTreeEntityWorkspaceContext(host);
+		new UmbContextProviderController(host, UMB_SUBMITTABLE_TREE_ENTITY_WORKSPACE_CONTEXT, workspaceContext as never);
+		new UmbContextProviderController(
+			host,
+			UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT,
+			new UmbTestSectionSidebarMenuContext(host) as never,
+		);
+
+		context = new TestMenuTreeStructureWorkspaceContext(host);
+		context.manifest = {
+			type: 'workspaceContext',
+			kind: 'menuStructure',
+			alias: 'Umb.Test.MenuStructureWorkspaceContext.CreateUnderRoot',
+			name: 'Test Menu Structure Workspace Context (create under root)',
+			meta: { menuItemAlias: 'test-menu-item' },
+		};
+
+		// Creating directly under the tree root (e.g. a Dictionary item created at the root): the parent IS the
+		// root, so no ancestors call happens while still new (the root is already the full structure on its own).
+		workspaceContext.setEntityType('test-entity-type');
+		workspaceContext.setIsNew(true);
+		workspaceContext.setCreateUnderParent({ unique: null, entityType: 'test-root-entity-type' });
+		workspaceContext.setUnique('new-item-unique');
+		await aTimeout(150);
+	});
+
+	afterEach(() => {
+		context.destroy();
+		document.body.removeChild(host);
+	});
+
+	it('re-fetches the structure once the item has been saved, so the root stays in the breadcrumb', async () => {
+		// The real ancestors endpoint, once the item exists, returns the item itself as the trailing entry.
+		UmbTestTreeRepository.ancestors = [createTestAncestorItem({ unique: 'new-item-unique', entityType: 'test-entity-type' })];
+
+		workspaceContext.setIsNew(false);
+		await aTimeout(150);
+
+		expect(UmbTestTreeRepository.requestTreeItemAncestorsCalls).to.deep.equal([
+			{ unique: 'new-item-unique', entityType: 'test-entity-type' },
+		]);
+
+		const structure = await firstValueFrom(context.structure);
+		expect(structure.map((item) => item.unique)).to.deep.equal([null, 'new-item-unique']);
 	});
 });
 
