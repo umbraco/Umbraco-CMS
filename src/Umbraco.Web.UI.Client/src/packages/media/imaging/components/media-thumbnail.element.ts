@@ -1,6 +1,6 @@
 import { UmbImagingCropMode } from '../types.js';
 import { UmbImagingRepository } from '../imaging.repository.js';
-import { css, customElement, html, property, state, when } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing, property, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
@@ -10,11 +10,10 @@ import { UmbEntityUpdatedEvent } from '@umbraco-cms/backoffice/entity-action';
  * Displays a thumbnail for a media item, with optional server-side cropping and transparency support.
  * This is the recommended component for rendering media images in the backoffice.
  * @element umb-media-thumbnail
- * @attr {boolean} no-preview - Reflected once the lookup has settled without a preview image, i.e. while the
- * fallback icon is shown. Consumers can key sibling styling off it.
  * @cssprop [--umb-media-thumbnail-background] - Background shown behind the image. Defaults to a checkerboard
  * pattern that reveals transparency; set to `none` for a transparent background.
  * @csspart img - The underlying `<img>` element.
+ * @csspart file-ext - The file extension label shown over the fallback icon.
  */
 @customElement('umb-media-thumbnail')
 export class UmbMediaThumbnailElement extends UmbLitElement {
@@ -67,6 +66,14 @@ export class UmbMediaThumbnailElement extends UmbLitElement {
 	icon = 'icon-picture';
 
 	/**
+	 * The file extension to label the fallback icon with, without the leading dot.
+	 * @description Only shown where there is no image to preview — a rendered image already says what it is.
+	 * Leave unset for anything the label would misdescribe, such as a container.
+	 */
+	@property({ type: String, attribute: 'file-ext' })
+	fileExt?: string;
+
+	/**
 	 * The `loading` state of the thumbnail.
 	 * @enum {'lazy' | 'eager'}
 	 * @default 'lazy'
@@ -84,7 +91,7 @@ export class UmbMediaThumbnailElement extends UmbLitElement {
 	private _isLoading = false;
 
 	@state()
-	private _thumbnailUrl?: string;
+	private _thumbnailUrl = '';
 
 	#imagingRepository = new UmbImagingRepository(this);
 
@@ -163,14 +170,18 @@ export class UmbMediaThumbnailElement extends UmbLitElement {
 					loading=${this.loading}
 					decoding="async"
 					draggable="false" />`,
-			() => html`<umb-icon id="icon" name=${this.icon}></umb-icon>`,
+			() => html`<umb-icon id="icon" name=${this.icon}></umb-icon>${this.#renderFileExtension()}`,
 		);
+	}
+
+	#renderFileExtension() {
+		if (!this.fileExt) return nothing;
+		return html`<small id="file-ext" part="file-ext">${this.fileExt.toUpperCase()}</small>`;
 	}
 
 	async #generateThumbnailUrl() {
 		if (!this.unique) return;
 		this._isLoading = true;
-		this.removeAttribute('no-preview');
 
 		const { data } = await this.#imagingRepository.requestResizedItems([this.unique], {
 			height: this.height,
@@ -181,7 +192,6 @@ export class UmbMediaThumbnailElement extends UmbLitElement {
 
 		this._thumbnailUrl = data?.[0]?.url ?? '';
 		this._isLoading = false;
-		this.toggleAttribute('no-preview', !this._thumbnailUrl);
 	}
 
 	static override styles = [
@@ -222,6 +232,23 @@ export class UmbMediaThumbnailElement extends UmbLitElement {
 				width: 100%;
 				height: 100%;
 				font-size: var(--uui-size-8);
+			}
+
+			#file-ext {
+				position: absolute;
+				bottom: var(--uui-size-space-2);
+				left: 50%;
+				transform: translateX(-50%);
+				max-width: calc(100% - var(--uui-size-space-4));
+				padding: 0 var(--uui-size-space-2);
+				border-radius: var(--uui-border-radius);
+				background-color: var(--uui-color-surface-alt);
+				font-size: var(--uui-type-small-size);
+				font-weight: 700;
+				line-height: 1.5;
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
 			}
 		`,
 	];

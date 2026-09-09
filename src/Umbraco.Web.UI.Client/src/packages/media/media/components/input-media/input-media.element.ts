@@ -282,8 +282,12 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 				href="${ifDefined(href)}"
 				?readonly=${this.readonly}
 				?disabled=${!this._editMediaPath}>
-				<umb-media-thumbnail unique=${item.unique} alt=${item.name} icon=${item.mediaType.icon}></umb-media-thumbnail>
-				${this.#renderFileExtension(item)}${this.#renderIsTrashed(item)}
+				<umb-media-thumbnail
+					unique=${item.unique}
+					alt=${item.name}
+					icon=${item.mediaType.icon}
+					file-ext=${ifDefined(this.#fileExtension(item))}></umb-media-thumbnail>
+				${this.#renderIsTrashed(item)}
 				<uui-action-bar slot="actions"> ${this.#renderRemoveAction(item)}</uui-action-bar>
 			</uui-card-media>
 		`;
@@ -298,18 +302,11 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 		`;
 	}
 
-	#renderFileExtension(item: UmbMediaCardItemModel) {
-		// Rendered as a tag rather than through the card's own `file-ext` attribute: that attribute only feeds the
-		// card's fallback file symbol, which the card drops as soon as anything occupies its default slot — and the
-		// thumbnail always does. Whether the thumbnail resolved to a preview is only known once it has loaded, so the
-		// tag is rendered up front and revealed by CSS off the thumbnail's `no-preview` state.
-		//
+	#fileExtension(item: UmbMediaCardItemModel) {
 		// The item model carries no extension of its own, so it is derived from the name. An item that can hold
 		// children is a container rather than a file, and a dot in its name is part of the name — not an extension.
-		if (item.hasChildren) return nothing;
-		const extension = getFileExtension(item.name)?.toLowerCase();
-		if (!extension) return nothing;
-		return html`<uui-tag class="file-ext" size="s" slot="tag" look="secondary" color="default">${extension}</uui-tag>`;
+		if (item.hasChildren) return undefined;
+		return getFileExtension(item.name)?.toLowerCase();
 	}
 
 	#renderIsTrashed(item: UmbMediaCardItemModel) {
@@ -345,16 +342,6 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 
 			uui-card-media umb-icon {
 				font-size: var(--uui-size-8);
-			}
-
-			/* The card gathers every tag into one right-aligned slot, so they need separating themselves. */
-			uui-card-media uui-tag + uui-tag {
-				margin-left: var(--uui-size-space-1);
-			}
-
-			/* The extension only helps where the thumbnail has nothing to show; a preview speaks for itself. */
-			umb-media-thumbnail:not([no-preview]) ~ .file-ext {
-				display: none;
 			}
 
 			uui-card-media[drag-placeholder] {
