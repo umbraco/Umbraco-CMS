@@ -45,14 +45,20 @@ export class UmbMediaTypeStructureRepository extends UmbContentTypeStructureRepo
 	 * asks the server. Use this where the answer only decides how an item is presented.
 	 */
 	async getFolderTypeUniques(): Promise<ReadonlySet<string>> {
-		folderTypeUniquesPromise ??= this.requestMediaTypesOfFolders().then(
-			(folderTypes) =>
-				new Set(
-					folderTypes
-						.map((folderType) => folderType.unique)
-						.filter((unique): unique is string => typeof unique === 'string'),
-				),
-		);
+		folderTypeUniquesPromise ??= this.requestMediaTypesOfFolders()
+			.then(
+				(folderTypes) =>
+					new Set(
+						folderTypes
+							.map((folderType) => folderType.unique)
+							.filter((unique): unique is string => typeof unique === 'string'),
+					),
+			)
+			.catch((error) => {
+				// Memoising a failure would keep every later caller broken until the page is reloaded.
+				folderTypeUniquesPromise = undefined;
+				throw error;
+			});
 		return await folderTypeUniquesPromise;
 	}
 }

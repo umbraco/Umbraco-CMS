@@ -192,7 +192,7 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 	constructor() {
 		super();
 
-		this.#pickerInputContext.getFolderTypeUniques().then((uniques) => (this._folderTypeUniques = uniques));
+		this.#loadFolderTypeUniques();
 
 		this.observe(
 			this.#itemManager.items,
@@ -285,6 +285,14 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 
 	protected override getFormElement() {
 		return undefined;
+	}
+
+	async #loadFolderTypeUniques() {
+		try {
+			this._folderTypeUniques = await this.#pickerInputContext.getFolderTypeUniques();
+		} catch {
+			// Leave the cards unlabelled. Opening the picker surfaces the failure where it actually blocks the user.
+		}
 	}
 
 	#populateCards() {

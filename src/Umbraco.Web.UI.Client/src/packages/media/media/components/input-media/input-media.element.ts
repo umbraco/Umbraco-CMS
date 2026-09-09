@@ -199,7 +199,7 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 			null,
 		);
 
-		this.#pickerInputContext.getFolderTypeUniques().then((uniques) => (this._folderTypeUniques = uniques));
+		this.#loadFolderTypeUniques();
 
 		this.addValidator(
 			'rangeUnderflow',
@@ -303,6 +303,14 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 				<uui-action-bar slot="actions">${this.#renderRemoveAction(item)}</uui-action-bar>
 			</uui-card-media>
 		`;
+	}
+
+	async #loadFolderTypeUniques() {
+		try {
+			this._folderTypeUniques = await this.#pickerInputContext.getFolderTypeUniques();
+		} catch {
+			// Leave the cards unlabelled. Opening the picker surfaces the failure where it actually blocks the user.
+		}
 	}
 
 	#renderRemoveAction(item: UmbMediaCardItemModel) {

@@ -242,6 +242,9 @@ export class UmbMediaThumbnailElement extends UmbLitElement {
 
 			#file-ext {
 				flex: none;
+				max-width: 10ch;
+				overflow: hidden;
+				text-overflow: ellipsis;
 				margin-top: var(--uui-size-space-2);
 				padding: 0 var(--uui-size-space-2);
 				border-radius: var(--uui-border-radius);
