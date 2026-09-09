@@ -1,7 +1,6 @@
 import { customElement, html, ifDefined, property, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { ensureSlash } from '@umbraco-cms/backoffice/router';
-import { debounce } from '@umbraco-cms/backoffice/utils';
 import { UmbEntityContext } from '@umbraco-cms/backoffice/entity';
 
 /**
@@ -67,10 +66,12 @@ export class UmbMenuItemLayoutElement extends UmbLitElement {
 
 	override connectedCallback() {
 		super.connectedCallback();
-		window.addEventListener('navigationend', this.#debouncedCheckIsActive);
+		window.addEventListener('navigationend', this.#onNavigationEnd);
 	}
 
-	#debouncedCheckIsActive = debounce(() => this.#checkIsActive(), 100);
+	// history.pushState runs synchronously before any router-slot dispatches this event, so the location
+	// is already final on the first firing — no need to coalesce repeat firings from nested router-slots.
+	#onNavigationEnd = () => this.#checkIsActive();
 
 	#checkIsActive() {
 		if (!this.href) {
@@ -107,7 +108,7 @@ export class UmbMenuItemLayoutElement extends UmbLitElement {
 
 	override disconnectedCallback() {
 		super.disconnectedCallback();
-		window.removeEventListener('navigationend', this.#debouncedCheckIsActive);
+		window.removeEventListener('navigationend', this.#onNavigationEnd);
 	}
 }
 
