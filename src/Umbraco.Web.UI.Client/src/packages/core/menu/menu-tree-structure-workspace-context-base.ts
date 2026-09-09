@@ -37,6 +37,7 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase extends UmbContex
 	#ancestorContext = new UmbAncestorsEntityContext(this);
 	#sectionSidebarMenuContext?: typeof UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT.TYPE;
 	#isModalContext: boolean = false;
+	#isNew: boolean | undefined = undefined;
 	#actionEventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
 	#structureRequestId = 0;
 
@@ -82,9 +83,15 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase extends UmbContex
 			this.observe(
 				this.#workspaceContext?.isNew,
 				(isNew) => {
-					if (isNew === false) {
+					// The item has just been created: the structure fetched while new was based on the parent (the
+					// item didn't exist yet), so it must be re-fetched using the item's own identity - otherwise the
+					// structure never ends with the item itself, which the breadcrumb relies on when trimming it.
+					if (isNew === false && this.#isNew === true) {
+						this.#requestStructure();
+					} else if (isNew === false) {
 						this.#tryExpandSectionSidebarMenu();
 					}
+					this.#isNew = isNew;
 				},
 				'observeIsNew',
 			);
