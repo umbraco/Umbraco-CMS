@@ -10,6 +10,8 @@ import { UmbEntityUpdatedEvent } from '@umbraco-cms/backoffice/entity-action';
  * Displays a thumbnail for a media item, with optional server-side cropping and transparency support.
  * This is the recommended component for rendering media images in the backoffice.
  * @element umb-media-thumbnail
+ * @attr {boolean} no-preview - Reflected once the lookup has settled without a preview image, i.e. while the
+ * fallback icon is shown. Consumers can key sibling styling off it.
  * @cssprop [--umb-media-thumbnail-background] - Background shown behind the image. Defaults to a checkerboard
  * pattern that reveals transparency; set to `none` for a transparent background.
  * @csspart img - The underlying `<img>` element.
@@ -82,7 +84,7 @@ export class UmbMediaThumbnailElement extends UmbLitElement {
 	private _isLoading = false;
 
 	@state()
-	private _thumbnailUrl = '';
+	private _thumbnailUrl?: string;
 
 	#imagingRepository = new UmbImagingRepository(this);
 
@@ -168,6 +170,7 @@ export class UmbMediaThumbnailElement extends UmbLitElement {
 	async #generateThumbnailUrl() {
 		if (!this.unique) return;
 		this._isLoading = true;
+		this.removeAttribute('no-preview');
 
 		const { data } = await this.#imagingRepository.requestResizedItems([this.unique], {
 			height: this.height,
@@ -178,6 +181,7 @@ export class UmbMediaThumbnailElement extends UmbLitElement {
 
 		this._thumbnailUrl = data?.[0]?.url ?? '';
 		this._isLoading = false;
+		this.toggleAttribute('no-preview', !this._thumbnailUrl);
 	}
 
 	static override styles = [
