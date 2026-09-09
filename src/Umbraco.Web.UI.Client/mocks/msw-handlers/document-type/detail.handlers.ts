@@ -35,7 +35,7 @@ export const detailHandlers = [
 
 		const relevantBlueprints = umbDocumentBlueprintMockDb
 			.getAll()
-			.filter((blueprint) => blueprint.documentType.id === id);
+			.filter((blueprint) => blueprint.documentType?.id === id);
 		const response: PagedDocumentTypeBlueprintItemResponseModel = {
 			total: relevantBlueprints.length,
 			items: relevantBlueprints,
