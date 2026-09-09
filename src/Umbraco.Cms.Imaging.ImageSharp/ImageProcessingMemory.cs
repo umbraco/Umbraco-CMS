@@ -1,8 +1,10 @@
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Memory;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 
 namespace Umbraco.Cms.Imaging.ImageSharp;
@@ -174,6 +176,28 @@ internal static class ImageProcessingMemory
                 availableMemoryMegabytes);
         }
     }
+
+    /// <summary>
+    /// Reports a decode that could not be served within the configured ceiling.
+    /// </summary>
+    /// <param name="context">The request context.</param>
+    /// <param name="logger">The logger.</param>
+    /// <param name="exception">The allocation failure raised by the imaging library.</param>
+    /// <remarks>
+    /// The imaging library wraps this as "failed to allocate buffers for possibly degenerate
+    /// dimensions", naming the image, because it has no idea a ceiling was imposed on it. Left
+    /// alone, the operator reads that as a complaint about their media rather than about their
+    /// configuration, so it is worth saying which setting is responsible.
+    /// </remarks>
+    internal static void LogDecodeOverLimit(
+        HttpContext context,
+        ILogger logger,
+        InvalidMemoryOperationException exception)
+        => logger.LogWarning(
+            "Could not decode {Path} within the limit set by {SettingPath}. {AllocationDetail} The imaging library attributes the failure to the image's dimensions, but the ceiling is the cause.",
+            context.Request.Path.Value,
+            $"{Constants.Configuration.ConfigImaging}:Memory:{nameof(ImagingMemorySettings.MaximumDecodedImageMegabytes)}",
+            exception.Message);
 
     /// <summary>
     /// Gets a value indicating whether the number of images processed concurrently needs to be

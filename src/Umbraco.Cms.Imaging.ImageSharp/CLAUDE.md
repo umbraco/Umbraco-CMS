@@ -155,7 +155,7 @@ Each numeric value defaults to `0`, meaning "derive from the memory available to
 | `Enabled` | Master switch for imaging memory management. When `false`, none of the three bounds is applied and ImageSharp's own memory behaviour is left untouched. | `true` |
 | `MaximumPoolSizeMegabytes` | Caps the unmanaged buffer pool ImageSharp retains between requests | available / 32, clamped to 16-64 MB |
 | `MaximumConcurrentProcessing` | Caps how many images are processed at once | (available / 2) / 64 MB, capped at processor count |
-| `MaximumDecodedImageMegabytes` | Caps the buffers a single image may be decoded into | available / 4, clamped to 256-1024 MB |
+| `MaximumDecodedImageMegabytes` | Caps any single buffer allocated while decoding an image | available / 4, clamped to 256-1024 MB |
 
 `ImagingMemorySettings` in `Umbraco.Core` carries only these four values. What each is derived as,
 and whether it applies at all, lives in `ImageProcessingMemory` in this project — the policy only
@@ -186,8 +186,14 @@ The single-image ceiling exists because the concurrency bound assumes a cost per
 bounding only the count leaves the size trusted — a 100 megapixel source decodes to roughly 400 MB,
 so even a derived limit of 3 would exhaust a 512 MB container. This bounds the other factor, and it
 maps onto ImageSharp's `AllocationLimitMegabytes`, whose own default is a flat 1 GB on a 32-bit
-process and 4 GB on a 64-bit one. Exceeding it throws `InvalidMemoryOperationException`, so one
-outsized request fails rather than the process dying. Note this is unrelated to `Resize.MaxWidth`
+process and 4 GB on a 64-bit one.
+
+It applies **per allocation, not per image**: a decode makes several, so the total can still exceed
+the ceiling. What it caps is the dominant one — the pixel buffer, roughly `width x height x 3` for a
+JPEG — which is enough to catch a source far larger than the host can serve. Over the limit,
+ImageSharp throws `InvalidMemoryOperationException` wrapped in an `InvalidImageContentException`
+blaming "possibly degenerate dimensions", so `ImageProcessingThrottleMiddleware` logs a warning
+naming the setting before letting the failure through. Note this is unrelated to `Resize.MaxWidth`
 and `Resize.MaxHeight`, which bound the *output* dimensions, not the source decode.
 
 A request over the limit waits, then after `ImageProcessingThrottle.WaitTimeout` (30 seconds) is

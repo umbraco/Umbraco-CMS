@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Memory;
 using SixLabors.ImageSharp.Web;
 using SixLabors.ImageSharp.Web.Processors;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -126,7 +128,9 @@ public sealed class ImageProcessingThrottleMiddleware
     {
         if (_semaphore is null || IsProcessingRequest(context.Request) is false)
         {
-            await _next(context);
+            // The single-image ceiling is in force on hosts where the gate is not, so its failure
+            // still needs attributing.
+            await InvokeNextAsync(context);
             return;
         }
 
@@ -140,11 +144,26 @@ public sealed class ImageProcessingThrottleMiddleware
 
         try
         {
-            await _next(context);
+            await InvokeNextAsync(context);
         }
         finally
         {
             _semaphore.Release();
+        }
+    }
+
+    private async Task InvokeNextAsync(HttpContext context)
+    {
+        try
+        {
+            await _next(context);
+        }
+        catch (InvalidImageContentException ex) when (ex.InnerException is InvalidMemoryOperationException inner)
+        {
+            // Rethrown: the image genuinely cannot be decoded within the ceiling, so a failure is the
+            // honest answer. Only the reason for it is added.
+            ImageProcessingMemory.LogDecodeOverLimit(context, _logger, inner);
+            throw;
         }
     }
 

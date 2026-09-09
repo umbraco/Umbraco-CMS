@@ -90,16 +90,19 @@ public class ImagingMemorySettings
     public int MaximumConcurrentProcessing { get; set; } = StaticMaximumConcurrentProcessing;
 
     /// <summary>
-    /// Gets or sets the maximum size, in megabytes, of the buffers a single image may be decoded
-    /// into.
+    /// Gets or sets the maximum size, in megabytes, of any single buffer allocated while decoding
+    /// an image.
     /// </summary>
     /// <remarks>
     /// A request for an image needing more than this fails rather than being served, which on a
     /// memory-limited host is preferable to exhausting the limit and taking the process with it.
     /// <see cref="MaximumConcurrentProcessing" /> bounds how many images are decoded at once
-    /// against an assumed cost each; this bounds that cost, so an unusually large source cannot
-    /// exceed the budget the two are meant to keep. Set to zero to derive a value from the
-    /// available memory.
+    /// against an assumed cost each; this bounds the largest allocation within one of them.
+    /// <para>
+    /// A decode makes several allocations, so this is not a ceiling on what one image costs in
+    /// total. It caps the dominant one - the pixel buffer - which is enough to catch a source far
+    /// larger than the host can serve. Set to zero to derive a value from the available memory.
+    /// </para>
     /// </remarks>
     [DefaultValue(StaticMaximumDecodedImageMegabytes)]
     public int MaximumDecodedImageMegabytes { get; set; } = StaticMaximumDecodedImageMegabytes;

@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Memory;
 using SixLabors.ImageSharp.Web;
 using SixLabors.ImageSharp.Web.Processors;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -130,14 +132,14 @@ public sealed class ImageProcessingThrottleMiddleware
     /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
     public async Task InvokeAsync(HttpContext context)
     {
-        if (_semaphore is null || IsProcessingRequest(context.Request) is false)
+        // A slot only for a request that could decode; the handling below applies either way,
+        // because the single-image ceiling is in force on hosts where the gate is not.
+        ImageProcessingSlot? slot = null;
+        if (_semaphore is not null && IsProcessingRequest(context.Request))
         {
-            await _next(context);
-            return;
+            slot = new ImageProcessingSlot(_semaphore, ImageProcessingThrottle.WaitTimeout);
+            context.Items[ImageProcessingSlot.HttpContextItemKey] = slot;
         }
-
-        var slot = new ImageProcessingSlot(_semaphore, ImageProcessingThrottle.WaitTimeout);
-        context.Items[ImageProcessingSlot.HttpContextItemKey] = slot;
 
         try
         {
@@ -147,9 +149,16 @@ public sealed class ImageProcessingThrottleMiddleware
         {
             ImageProcessingThrottle.Reject(context, _logger);
         }
+        catch (InvalidImageContentException ex) when (ex.InnerException is InvalidMemoryOperationException inner)
+        {
+            // Rethrown: the image genuinely cannot be decoded within the ceiling, so a failure is the
+            // honest answer. Only the reason for it is added.
+            ImageProcessingMemory.LogDecodeOverLimit(context, _logger, inner);
+            throw;
+        }
         finally
         {
-            slot.Release();
+            slot?.Release();
         }
     }
 
