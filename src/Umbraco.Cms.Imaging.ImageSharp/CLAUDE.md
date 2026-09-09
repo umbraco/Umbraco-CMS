@@ -154,15 +154,19 @@ Each numeric value defaults to `0`, meaning "derive from the memory available to
 | `MaximumConcurrentProcessing` | Caps how many images are processed at once | (available / 2) / 64 MB, capped at processor count |
 | `MaximumDecodedImageMegabytes` | Caps the buffers a single image may be decoded into | available / 4, clamped to 256-1024 MB |
 
+`ImagingMemorySettings` in `Umbraco.Core` carries only these four values. What each is derived as,
+and whether it applies at all, lives in `ImageProcessingMemory` in this project — the policy only
+means anything against ImageSharp's own defaults, which Core knows nothing about.
+
 All three bounds are default-on but **conditional**, so an upgrade changes nothing on a host that
 was never at risk. Each has its own engagement test, and setting a value explicitly overrides that
 test — an operator who names a number gets it.
 
 | Bound | Engages when | Test |
 |-------|--------------|------|
-| Pool cap | Under 4 GB is available to the process | `RequiresPoolSizeLimit` |
-| Single image | Under 4 GB is available to the process | `RequiresAllocationLimit` |
-| Concurrency | The memory budget cannot feed as many concurrent decodes as there are processors | `RequiresConcurrencyLimit` |
+| Pool cap | Under 4 GB is available to the process | `ImageProcessingMemory.RequiresPoolSizeLimit` |
+| Single image | Under 4 GB is available to the process | `ImageProcessingMemory.RequiresAllocationLimit` |
+| Concurrency | The memory budget cannot feed as many concurrent decodes as there are processors | `ImageProcessingMemory.RequiresConcurrencyLimit` |
 
 The tests deliberately differ. Concurrency is about *peak* — it only needs bounding where memory is
 tighter than the core count, since decoding is CPU bound and the processor count caps it

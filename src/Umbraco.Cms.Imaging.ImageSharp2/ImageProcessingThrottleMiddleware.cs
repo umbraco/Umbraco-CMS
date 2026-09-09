@@ -19,7 +19,7 @@ namespace Umbraco.Cms.Imaging.ImageSharp;
 /// the number of concurrent requests multiplied by the size of a decoded source, which on a host
 /// with a hard memory limit is enough to have the process killed. Requests over the limit wait
 /// here instead. The gate engages only when memory is the binding constraint (see
-/// <see cref="ImagingMemorySettings.RequiresConcurrencyLimit" />); on any other host no semaphore
+/// <see cref="ImageProcessingMemory.RequiresConcurrencyLimit" />); on any other host no semaphore
 /// is created and every request passes straight through.
 /// </para>
 /// <para>
@@ -93,9 +93,9 @@ public sealed class ImageProcessingThrottleMiddleware
         var availableMemoryMegabytes = availableMemoryBytes / 1024 / 1024;
 
         ImagingMemorySettings memory = imagingSettings.Value.Memory;
-        if (memory.RequiresConcurrencyLimit(availableMemoryBytes, processorCount))
+        if (ImageProcessingMemory.RequiresConcurrencyLimit(memory, availableMemoryBytes, processorCount))
         {
-            var maximumConcurrentProcessing = memory.ResolveMaximumConcurrentProcessing(availableMemoryBytes, processorCount);
+            var maximumConcurrentProcessing = ImageProcessingMemory.ResolveMaximumConcurrentProcessing(memory, availableMemoryBytes, processorCount);
             _semaphore = new SemaphoreSlim(maximumConcurrentProcessing, maximumConcurrentProcessing);
 
             logger.LogInformation(
