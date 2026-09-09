@@ -99,19 +99,14 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 	#ownerIsElement = false;
 	#persistedAlias?: string;
 
-	/**
-	 * An Element Type stores its property values keyed by alias rather than by property type, so renaming
-	 * the alias of an already stored property orphans the values held under the previous alias.
-	 */
 	#observePersistedProperty() {
 		const structure = this._propertyStructureHelper?.getStructureManager();
 		const unique = this._property?.unique;
-		// The helper outlives its structure manager, which is set - and can be replaced - after construction.
+		// The helper is stable, but its structure manager is set - and can be replaced - after construction.
 		if (unique === this.#observedPropertyUnique && structure === this.#observedStructureManager) return;
 		this.#observedPropertyUnique = unique;
 		this.#observedStructureManager = structure;
 
-		// Passing no source removes the observer and calls back with undefined, which resets the state.
 		this.observe(
 			structure && unique
 				? structure.ownerContentTypeObservablePart((contentType) => contentType?.isElement === true)
@@ -133,6 +128,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 		);
 	}
 
+	// Only an Element Type keys its property values by alias, so only there does a rename orphan them.
 	#updateAliasRenamed() {
 		this._aliasRenamed =
 			this.#ownerIsElement && this.#persistedAlias !== undefined && this.#persistedAlias !== this._property?.alias;

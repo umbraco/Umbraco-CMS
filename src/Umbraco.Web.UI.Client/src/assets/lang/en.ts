@@ -1898,7 +1898,7 @@ export default {
 		elementDoesNotSupport: 'This is not applicable for an Element Type',
 		propertyHasChanges: 'You have made changes to this property. Are you sure you want to discard them?',
 		propertyAliasRenamedNotice:
-			'Content based on element types is stored by alias, and will be lost for <strong>%0%</strong> when you save.',
+			'Content based on element types is stored by alias and will be lost for <strong>%0%</strong> when you save.',
 		displaySettingsHeadline: 'Appearance',
 		displaySettingsLabelOnLeft: 'Label to the left',
 		displaySettingsLabelOnTop: 'Label above (full-width)',
