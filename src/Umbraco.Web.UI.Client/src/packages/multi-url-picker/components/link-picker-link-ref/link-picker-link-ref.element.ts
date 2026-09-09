@@ -101,7 +101,10 @@ export class UmbLinkPickerLinkRefElement extends UmbLitElement {
 	async #resolveName() {
 		const link = this.#link;
 		const unique = link?.unique;
-		if (!unique || link.name || unique === this.#requestedName) return;
+		if (!unique) return;
+		// A link that carries a name of its own is displayed under that, so there is nothing to look up.
+		if (link.name) return;
+		if (unique === this.#requestedName) return;
 
 		// Reaching here means this is a unique that has not been looked up, so anything resolved for the
 		// one before it no longer describes this link.
@@ -122,8 +125,10 @@ export class UmbLinkPickerLinkRefElement extends UmbLitElement {
 	async #resolveUrl() {
 		const link = this.#link;
 		const unique = link?.unique;
+		if (!unique) return;
 		// A link picked for a specific culture carries the URL of that culture already.
-		if (!unique || link.culture || unique === this.#requestedUrl) return;
+		if (link.culture) return;
+		if (unique === this.#requestedUrl) return;
 
 		this._resolvedUrl = undefined;
 		this.#requestedUrl = unique;
