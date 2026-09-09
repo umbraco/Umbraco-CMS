@@ -306,7 +306,13 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 			this._data.setPersisted(processedData);
 			this._data.setCurrent(processedData);
 
-			this.observe(asObservable?.(), (entity) => this.#onDetailStoreChange(entity), 'umbEntityDetailTypeStoreObserver');
+			this.observe(
+				asObservable?.(),
+				(entity) => {
+					if (!entity) this._data.clear();
+				},
+				'umbEntityDetailTypeStoreObserver',
+			);
 		}
 
 		this.loading.removeState(LOADING_STATE_UNIQUE);
@@ -585,12 +591,6 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 				this.#checkIfInitialized();
 			},
 		);
-	}
-
-	#onDetailStoreChange(entity: DetailModelType | undefined) {
-		if (!entity) {
-			this._data.clear();
-		}
 	}
 
 	// Discriminator to identify events from this workspace context

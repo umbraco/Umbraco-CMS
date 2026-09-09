@@ -8,6 +8,7 @@ import {
 	UMB_CREATE_FROM_BLUEPRINT_DOCUMENT_WORKSPACE_PATH_PATTERN,
 	UMB_DOCUMENT_COLLECTION_ALIAS,
 	UMB_DOCUMENT_ENTITY_TYPE,
+	UMB_DOCUMENT_RECYCLE_BIN_ROOT_WORKSPACE_PATH,
 	UMB_DOCUMENT_SAVE_MODAL,
 	UMB_DOCUMENT_USER_PERMISSION_CONDITION_ALIAS,
 	UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN,
@@ -16,6 +17,7 @@ import {
 } from '../../constants.js';
 import { UmbDocumentValidationRepository } from '../../repository/validation/index.js';
 import { UMB_DOCUMENT_CONFIGURATION_CONTEXT } from '../../index.js';
+import { UMB_DOCUMENTS_SECTION_PATH } from '../../../section/paths.js';
 import { UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD, UMB_DOCUMENT_WORKSPACE_ALIAS } from '../constants.js';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbContentDetailWorkspaceContextBase } from '@umbraco-cms/backoffice/content';
@@ -185,6 +187,15 @@ export class UmbDocumentWorkspaceContext
 				},
 			},
 		]);
+	}
+
+	protected override _getNavigationParentItemPath(entity: UmbEntityModel | undefined): string | undefined {
+		if (!entity?.unique) {
+			return this._data.getCurrent()?.isTrashed
+				? UMB_DOCUMENT_RECYCLE_BIN_ROOT_WORKSPACE_PATH
+				: UMB_DOCUMENTS_SECTION_PATH;
+		}
+		return UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: entity.unique });
 	}
 
 	#enforceUserPermission(verb: string, message: string) {

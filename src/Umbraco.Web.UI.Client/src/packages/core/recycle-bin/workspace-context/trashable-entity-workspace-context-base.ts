@@ -135,7 +135,15 @@ export abstract class UmbTrashableEntityWorkspaceContextBase extends UmbContextB
 	}
 
 	#onTrashStateChange(isTrashed?: boolean) {
-		this.#isTrashedContext.setIsTrashed(isTrashed ?? false);
+		// TODO v20
+		// `undefined` means "not settled yet" (loading, or data just cleared), not "not trashed". Ideally
+		// that distinction would be forwarded to `#isTrashedContext` and left for consumers (e.g. the
+		// trashed/not-trashed conditions) to ignore as they see fit — but `UmbIsTrashedEntityContext` is
+		// public API typed as `boolean`, and widening it to `boolean | undefined` would be a breaking
+		// change. So keep the last settled value here instead of forwarding an unsettled one.
+		if (isTrashed === undefined) return;
+
+		this.#isTrashedContext.setIsTrashed(isTrashed);
 
 		const guardUnique = `UMB_PREVENT_EDIT_TRASHED_ITEM`;
 
