@@ -65,7 +65,7 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 	#mediaSearchProvider = new UmbMediaSearchProvider(this);
 	#mediaTypeStructureRepository = new UmbMediaTypeStructureRepository(this);
 
-	#folderTypeUniques = new Set<string>();
+	#folderTypeUniques: ReadonlySet<string> = new Set<string>();
 
 	#hasMediaRootAccess = false;
 	#mediaStartNodeUniques: Array<string> = [];
@@ -256,8 +256,7 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 	}
 
 	async #loadFolderTypes() {
-		const folderTypes = await this.#mediaTypeStructureRepository.requestMediaTypesOfFolders();
-		this.#folderTypeUniques = new Set(folderTypes.map((ft) => ft.unique).filter((u): u is string => u != null));
+		this.#folderTypeUniques = await this.#mediaTypeStructureRepository.getFolderTypeUniques();
 	}
 
 	// TODO: move to location manager in context
