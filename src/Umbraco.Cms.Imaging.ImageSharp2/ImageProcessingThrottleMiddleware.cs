@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using SixLabors.ImageSharp.Web;
@@ -43,16 +44,19 @@ public sealed class ImageProcessingThrottleMiddleware
     /// <param name="imagingSettings">The Umbraco imaging settings.</param>
     /// <param name="processors">The registered image processors, used to recognise processing requests.</param>
     /// <param name="formatUtilities">The image format utilities, used to recognise image sources.</param>
+    /// <param name="logger">The logger.</param>
     public ImageProcessingThrottleMiddleware(
         RequestDelegate next,
         IOptions<ImagingSettings> imagingSettings,
         IEnumerable<IImageWebProcessor> processors,
-        FormatUtilities formatUtilities)
+        FormatUtilities formatUtilities,
+        ILogger<ImageProcessingThrottleMiddleware> logger)
         : this(
             next,
             imagingSettings,
             processors,
             formatUtilities,
+            logger,
             GC.GetGCMemoryInfo().TotalAvailableMemoryBytes,
             Environment.ProcessorCount)
     {
@@ -66,6 +70,7 @@ public sealed class ImageProcessingThrottleMiddleware
     /// <param name="imagingSettings">The Umbraco imaging settings.</param>
     /// <param name="processors">The registered image processors, used to recognise processing requests.</param>
     /// <param name="formatUtilities">The image format utilities, used to recognise image sources.</param>
+    /// <param name="logger">The logger.</param>
     /// <param name="availableMemoryBytes">The memory available to the process.</param>
     /// <param name="processorCount">The number of processors available to the process.</param>
     /// <remarks>
@@ -78,17 +83,33 @@ public sealed class ImageProcessingThrottleMiddleware
         IOptions<ImagingSettings> imagingSettings,
         IEnumerable<IImageWebProcessor> processors,
         FormatUtilities formatUtilities,
+        ILogger<ImageProcessingThrottleMiddleware> logger,
         long availableMemoryBytes,
         int processorCount)
     {
         _next = next;
         _formatUtilities = formatUtilities;
 
+        var availableMemoryMegabytes = availableMemoryBytes / 1024 / 1024;
+
         ImagingMemorySettings memory = imagingSettings.Value.Memory;
         if (memory.RequiresConcurrencyLimit(availableMemoryBytes, processorCount))
         {
             var maximumConcurrentProcessing = memory.ResolveMaximumConcurrentProcessing(availableMemoryBytes, processorCount);
             _semaphore = new SemaphoreSlim(maximumConcurrentProcessing, maximumConcurrentProcessing);
+
+            logger.LogInformation(
+                "Bounded concurrent image processing to {MaximumConcurrentProcessing}, with {AvailableMemoryMegabytes} MB and {ProcessorCount} processors available to the process.",
+                maximumConcurrentProcessing,
+                availableMemoryMegabytes,
+                processorCount);
+        }
+        else
+        {
+            logger.LogDebug(
+                "Left concurrent image processing unbounded, with {AvailableMemoryMegabytes} MB and {ProcessorCount} processors available to the process.",
+                availableMemoryMegabytes,
+                processorCount);
         }
 
         _commands = new HashSet<string>(processors.SelectMany(x => x.Commands), StringComparer.OrdinalIgnoreCase);

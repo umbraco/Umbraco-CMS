@@ -2,6 +2,8 @@
 // See LICENSE for more details.
 
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
@@ -151,10 +153,11 @@ public class ImageProcessingThrottleMiddlewareTests
 
         // The real utility, so the tests use the same supported-format set as runtime.
         var formatUtilities = new FormatUtilities(Options.Create(new ImageSharpMiddlewareOptions()));
+        ILogger<ImageProcessingThrottleMiddleware> logger = NullLogger<ImageProcessingThrottleMiddleware>.Instance;
 
         return availableMemoryBytes is { } memoryBytes && processorCount is { } cores
-            ? new ImageProcessingThrottleMiddleware(next, Options.Create(settings), processors, formatUtilities, memoryBytes, cores)
-            : new ImageProcessingThrottleMiddleware(next, Options.Create(settings), processors, formatUtilities);
+            ? new ImageProcessingThrottleMiddleware(next, Options.Create(settings), processors, formatUtilities, logger, memoryBytes, cores)
+            : new ImageProcessingThrottleMiddleware(next, Options.Create(settings), processors, formatUtilities, logger);
     }
 
     // Takes the request's slot the way the imaging middleware's decode hook does.

@@ -147,11 +147,30 @@ Both numeric values default to `0`, meaning "derive from the memory available to
 | `MaximumPoolSizeMegabytes` | Caps the unmanaged buffer pool ImageSharp retains between requests | available / 32, clamped to 16-64 MB |
 | `MaximumConcurrentProcessing` | Caps how many images are processed at once | (available / 2) / 64 MB, capped at processor count |
 
-The concurrency bound is a no-op except where memory is the binding constraint — a host with more
-cores than its memory can feed concurrent decodes (see `RequiresConcurrencyLimit`). On any other host
-no semaphore is created and every request passes straight through, so the default-on behaviour costs
-nothing off the OOM path. `Enabled: false` is the one-setting escape hatch for operators who would
-rather opt out of both bounds entirely.
+Both bounds are default-on but **conditional**, so an upgrade changes nothing on a host that was
+never at risk. Each has its own engagement test, and setting either value explicitly overrides that
+test — an operator who names a number gets it.
+
+| Bound | Engages when | Test |
+|-------|--------------|------|
+| Pool cap | Under 4 GB is available to the process | `RequiresPoolSizeLimit` |
+| Concurrency | The memory budget cannot feed as many concurrent decodes as there are processors | `RequiresConcurrencyLimit` |
+
+The two tests deliberately differ. Concurrency is about *peak* — it only needs bounding where memory
+is tighter than the core count, since decoding is CPU bound and the processor count caps it
+otherwise. The pool cap is about *retention*, and ImageSharp's default there is an eighth of
+available memory on **any 64-bit host** — [`GetDefaultMaxPoolSizeBytes`](https://github.com/SixLabors/ImageSharp/blob/v3.1.12/src/ImageSharp/Memory/Allocators/UniformUnmanagedMemoryPoolMemoryAllocator.cs#L156)
+returns `total / 8` when `Environment.Is64BitProcess`, and a flat 128 MB otherwise. It is never
+disproportionate; it is a problem only in absolute terms, where that eighth competes with the memory
+the rest of the site needs. Hence a flat memory threshold rather than a ratio — and note that
+reusing `RequiresConcurrencyLimit` for the pool would switch it off on the low-core 2 GB host where
+the retention was actually measured.
+
+`Enabled: false` remains the one-setting escape hatch that restores stock ImageSharp behaviour.
+
+Both decisions are logged at startup — at Information when a bound engages, naming the resolved
+value, and at Debug when it does not. That log line is the first thing to ask for when diagnosing
+either an exit 137 or an unexplained change in image throughput.
 
 **Why these exist**: a source image is decoded at full resolution before any processor runs, and
 `ImageSharpMiddleware` only de-duplicates concurrent requests for the *same* URL. A page of distinct
@@ -181,9 +200,9 @@ the middleware for anything its request filter matches — cache hits included. 
 `ImageProcessingThrottleMiddleware` are therefore *not* interchangeable; the v2 copy is the coarser
 fallback.
 
-ImageSharp's own pool default is an eighth of available memory, released only on a gen2 collection
-and then at most 50% per minute, which leaves a container sitting well above its working set at
-rest. This memory is unmanaged, so no `DOTNET_GC*` setting governs it.
+ImageSharp's own pool default is an eighth of available memory on a 64-bit process, released only on
+a gen2 collection and then at most 50% per minute, which leaves a container sitting well above its
+working set at rest. This memory is unmanaged, so no `DOTNET_GC*` setting governs it.
 
 ### Security: Max Dimension Limits
 

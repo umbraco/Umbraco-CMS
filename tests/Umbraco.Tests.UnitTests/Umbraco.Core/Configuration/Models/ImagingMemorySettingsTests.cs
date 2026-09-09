@@ -34,8 +34,8 @@ public class ImagingMemorySettingsTests
     [Test]
     public void ResolveMaximumPoolSizeMegabytes_StaysWellBelowTheImageSharpDefault()
     {
-        // ImageSharp defaults to an eighth of available memory, which is what leaves a container
-        // sitting far above its working set at rest.
+        // ImageSharp defaults to an eighth of available memory on a 64-bit process, which is what
+        // leaves a container sitting far above its working set at rest.
         const long available = 2048 * OneMegabyte;
         var imageSharpDefaultMegabytes = (int)(available / 8 / OneMegabyte);
 
@@ -81,6 +81,44 @@ public class ImagingMemorySettingsTests
         var settings = new ImagingMemorySettings();
 
         Assert.That(settings.ResolveMaximumConcurrentProcessing(16 * OneMegabyte, 1), Is.EqualTo(1));
+    }
+
+    // A container, or a small VM, where what the library retains at rest competes with the memory
+    // the rest of the site needs.
+    [TestCase(384)]
+    [TestCase(2048)]
+    public void RequiresPoolSizeLimit_WhenMemoryIsLow_IsTrue(int availableMegabytes)
+    {
+        var settings = new ImagingMemorySettings();
+
+        Assert.That(settings.RequiresPoolSizeLimit(availableMegabytes * OneMegabyte), Is.True);
+    }
+
+    // Enough memory that an eighth of it, which is what the library keeps by default on a 64-bit
+    // process, is not worth reclaiming - so an upgrade must not change how it allocates.
+    [TestCase(4096)]
+    [TestCase(65536)]
+    public void RequiresPoolSizeLimit_WhenMemoryIsAmple_IsFalse(int availableMegabytes)
+    {
+        var settings = new ImagingMemorySettings();
+
+        Assert.That(settings.RequiresPoolSizeLimit(availableMegabytes * OneMegabyte), Is.False);
+    }
+
+    [Test]
+    public void RequiresPoolSizeLimit_WhenConfigured_IsTrueEvenWithAmpleMemory()
+    {
+        var settings = new ImagingMemorySettings { MaximumPoolSizeMegabytes = 128 };
+
+        Assert.That(settings.RequiresPoolSizeLimit(65536 * OneMegabyte), Is.True);
+    }
+
+    [Test]
+    public void RequiresPoolSizeLimit_WhenDisabled_IsFalse()
+    {
+        var settings = new ImagingMemorySettings { Enabled = false, MaximumPoolSizeMegabytes = 128 };
+
+        Assert.That(settings.RequiresPoolSizeLimit(384 * OneMegabyte), Is.False);
     }
 
     [Test]

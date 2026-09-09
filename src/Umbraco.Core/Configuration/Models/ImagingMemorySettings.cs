@@ -52,15 +52,34 @@ public class ImagingMemorySettings
     /// The share of available memory used when deriving <see cref="MaximumPoolSizeMegabytes" />.
     /// </summary>
     /// <remarks>
-    /// ImageSharp itself defaults to an eighth of available memory, which it releases only on a
-    /// gen2 collection and then only in halves, at most once a minute. A tighter pool trades a
-    /// little throughput for markedly lower memory at rest.
+    /// ImageSharp itself defaults to an eighth of available memory on a 64-bit process, which it
+    /// releases only on a gen2 collection and then only in halves, at most once a minute. A tighter
+    /// pool trades a little throughput for markedly lower memory at rest.
     /// </remarks>
     private const int PoolMemoryShareDivisor = 32;
 
     private const int MinimumPoolSizeMegabytes = 16;
 
     private const int MaximumDerivedPoolSizeMegabytes = 64;
+
+    /// <summary>
+    /// The memory available to the process, in megabytes, below which
+    /// <see cref="MaximumPoolSizeMegabytes" /> is applied.
+    /// </summary>
+    /// <remarks>
+    /// On a 64-bit process the imaging library's own pool default is an eighth of available memory
+    /// whatever the host size, so it is never disproportionate - it is a problem only in absolute
+    /// terms, where that eighth competes with the memory the rest of the site needs. On a host with
+    /// room to spare it costs nothing worth reclaiming, so the pool is left alone above this point.
+    /// A 32-bit process gets a flat 128 MB instead, which is already conservative, so whether this
+    /// threshold is reached there matters little either way.
+    /// <para>
+    /// That default is not documented, only implemented, so it is worth re-checking whenever the
+    /// imaging library is upgraded:
+    /// https://github.com/SixLabors/ImageSharp/blob/v3.1.12/src/ImageSharp/Memory/Allocators/UniformUnmanagedMemoryPoolMemoryAllocator.cs#L156
+    /// </para>
+    /// </remarks>
+    private const int PoolManagementMemoryThresholdMegabytes = 4096;
 
     private const int OneMegabyte = 1024 * 1024;
 
@@ -116,6 +135,28 @@ public class ImagingMemorySettings
 
         return (int)Math.Clamp(derived, MinimumPoolSizeMegabytes, MaximumDerivedPoolSizeMegabytes);
     }
+
+    /// <summary>
+    /// Gets a value indicating whether the pool the imaging library retains between requests needs
+    /// to be capped on this host.
+    /// </summary>
+    /// <param name="availableMemoryBytes">
+    /// The memory available to the process, honouring any container limit. Typically
+    /// <see cref="GCMemoryInfo.TotalAvailableMemoryBytes" />.
+    /// </param>
+    /// <returns>
+    /// <c>true</c> when a size is configured explicitly, or when the memory available to the
+    /// process is low enough that what the library retains at rest competes with the rest of the
+    /// site; otherwise <c>false</c>.
+    /// </returns>
+    /// <remarks>
+    /// Left alone on a host with memory to spare, so upgrading a site that was never at risk does
+    /// not change how the imaging library allocates.
+    /// </remarks>
+    public bool RequiresPoolSizeLimit(long availableMemoryBytes)
+        => Enabled
+           && (MaximumPoolSizeMegabytes > 0
+               || availableMemoryBytes < PoolManagementMemoryThresholdMegabytes * (long)OneMegabyte);
 
     /// <summary>
     /// Resolves <see cref="MaximumConcurrentProcessing" />, deriving a value when it is not configured.

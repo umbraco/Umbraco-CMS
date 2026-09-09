@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Memory;
@@ -35,17 +36,33 @@ public static class UmbracoBuilderExtensions
             .GetSection(Constants.Configuration.ConfigImaging)
             .Get<ImagingSettings>() ?? new ImagingSettings();
 
+        ILogger logger = builder.BuilderLoggerFactory.CreateLogger("Umbraco.Cms.Imaging.ImageSharp");
+        var availableMemoryBytes = GC.GetGCMemoryInfo().TotalAvailableMemoryBytes;
+        var availableMemoryMegabytes = availableMemoryBytes / 1024 / 1024;
+
         // ImageSharp pools unmanaged memory sized against the available memory and releases it only
         // on a gen2 collection, so on a memory constrained host it sits at rest well above what the
         // site needs. Applied before the configuration is shared so nothing allocates from the
         // default pool first.
-        if (imagingSettings.Memory.Enabled)
+        if (imagingSettings.Memory.RequiresPoolSizeLimit(availableMemoryBytes))
         {
+            var maximumPoolSizeMegabytes = imagingSettings.Memory.ResolveMaximumPoolSizeMegabytes(availableMemoryBytes);
+
             Configuration.Default.MemoryAllocator = MemoryAllocator.Create(new MemoryAllocatorOptions
             {
-                MaximumPoolSizeMegabytes = imagingSettings.Memory.ResolveMaximumPoolSizeMegabytes(
-                    GC.GetGCMemoryInfo().TotalAvailableMemoryBytes),
+                MaximumPoolSizeMegabytes = maximumPoolSizeMegabytes,
             });
+
+            logger.LogInformation(
+                "Capped the image processing memory pool at {MaximumPoolSizeMegabytes} MB, with {AvailableMemoryMegabytes} MB available to the process.",
+                maximumPoolSizeMegabytes,
+                availableMemoryMegabytes);
+        }
+        else
+        {
+            logger.LogDebug(
+                "Left the image processing memory pool at the imaging library's default, with {AvailableMemoryMegabytes} MB available to the process.",
+                availableMemoryMegabytes);
         }
 
         // Add default ImageSharp configuration and service implementations
