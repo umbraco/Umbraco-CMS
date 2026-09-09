@@ -106,9 +106,10 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 			this.observe(
 				this.#workspaceContext?.isNew,
 				(isNew) => {
-					// The item has just been created: the structure fetched while new was based on the parent (the
-					// item didn't exist yet), so it must be re-fetched using the item's own identity - otherwise the
-					// structure never ends with the item itself, which the breadcrumb relies on when trimming it.
+					// The item has just been created: the structure fetched while new was based on the create-under
+					// parent's identity (the item didn't exist yet), so it must be re-fetched using the item's own
+					// identity - otherwise parent/ancestor data downstream keeps describing the parent it was
+					// created under rather than the entity that now actually exists.
 					if (isNew === false && this.#isNew === true) {
 						this.#requestStructure();
 					} else if (isNew === false) {
