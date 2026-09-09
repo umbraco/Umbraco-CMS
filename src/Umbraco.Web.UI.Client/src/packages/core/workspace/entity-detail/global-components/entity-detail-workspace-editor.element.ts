@@ -7,7 +7,7 @@ import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 
 const umbBackPathDeprecation = new UmbDeprecation({
 	deprecated: 'The `backPath` property on `<umb-entity-detail-workspace-editor>`.',
-	removeInVersion: '19',
+	removeInVersion: '20',
 	solution: 'Implement `navigationParentItemPath` on the workspace context instead.',
 });
 
@@ -18,7 +18,7 @@ export class UmbEntityDetailWorkspaceEditorElement extends UmbLitElement {
 	/**
 	 * A fallback "back to parent" path, used only when the workspace context has no `navigationParentItemPath` of
 	 * its own (e.g. a third-party context that hasn't implemented it yet).
-	 * @deprecated Implement `navigationParentItemPath` on the workspace context instead. Will be removed in Umbraco 19.
+	 * @deprecated Implement `navigationParentItemPath` on the workspace context instead. Will be removed in Umbraco 20.
 	 * @returns {string | undefined} The fallback back-to-parent path.
 	 */
 	@property({ attribute: 'back-path' })
