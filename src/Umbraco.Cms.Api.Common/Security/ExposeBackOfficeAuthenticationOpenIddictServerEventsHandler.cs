@@ -48,8 +48,9 @@ public class ExposeBackOfficeAuthenticationOpenIddictServerEventsHandler : IOpen
     /// </remarks>
     public async ValueTask HandleAsync(OpenIddictServerEvents.GenerateTokenContext context)
     {
-        // A single token response generates several tokens (access, refresh and potentially identity tokens), each
-        // raising this event. We only sign in once per response, otherwise the cookie is written multiple times.
+        // This event is raised once per generated token, not once per token response, so signing in on every
+        // occurrence would write the cookie more than once. The access token is the one token generated both by
+        // the initial code exchange and by every refresh grant, making it the point to refresh the cookie from.
         if (context.TokenType != OpenIddictConstants.TokenTypeIdentifiers.AccessToken)
         {
             return;
