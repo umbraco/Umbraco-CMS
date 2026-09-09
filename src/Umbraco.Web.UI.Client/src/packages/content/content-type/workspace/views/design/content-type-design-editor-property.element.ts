@@ -1,4 +1,7 @@
-import type { UmbContentTypePropertyStructureHelper } from '../../../structure/index.js';
+import type {
+	UmbContentTypePropertyStructureHelper,
+	UmbContentTypeStructureManager,
+} from '../../../structure/index.js';
 import type { UmbContentTypeModel, UmbPropertyTypeModel, UmbPropertyTypeScaffoldModel } from '../../../types.js';
 import { UmbPropertyTypeContext } from './content-type-design-editor-property.context.js';
 import { css, html, customElement, property, state, nothing } from '@umbraco-cms/backoffice/external/lit';
@@ -92,6 +95,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 	private _aliasRenamed = false;
 
 	#observedPropertyUnique?: string;
+	#observedStructureManager?: UmbContentTypeStructureManager<UmbContentTypeModel>;
 	#ownerIsElement = false;
 	#persistedAlias?: string;
 
@@ -102,8 +106,11 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 	#observePersistedProperty() {
 		const structure = this._propertyStructureHelper?.getStructureManager();
 		const unique = this._property?.unique;
-		if (!structure || !unique || unique === this.#observedPropertyUnique) return;
+		if (!structure || !unique) return;
+		// The helper outlives its structure manager, which is set - and can be replaced - after construction.
+		if (unique === this.#observedPropertyUnique && structure === this.#observedStructureManager) return;
 		this.#observedPropertyUnique = unique;
+		this.#observedStructureManager = structure;
 
 		this.observe(
 			structure.ownerContentTypeObservablePart((contentType) => contentType?.isElement === true),

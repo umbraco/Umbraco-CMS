@@ -1100,6 +1100,7 @@ export class UmbContentTypeStructureManager<
 		this.#contentTypeObservers = [];
 		this.#repoManager?.clear();
 		this.#contentTypes.setValue([]);
+		this.#persistedContentTypes.setValue([]);
 		this.#dataTypeDetails.setValue([]);
 		this.#ownerContentTypeUnique = undefined;
 	}
