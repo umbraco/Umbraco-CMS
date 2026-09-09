@@ -2,6 +2,7 @@
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Search.Core.Extensions;
 using Umbraco.Cms.Search.Core.Models.Searching;
 using Umbraco.Cms.Search.Core.Models.Searching.Filtering;
 using Umbraco.Cms.Search.Core.Models.Searching.Sorting;
@@ -18,19 +19,19 @@ internal abstract class ContentSearchServiceBase<TContent> : IndexedSearchServic
     where TContent : class, IContentBase
 {
     private readonly IIdKeyMap _idKeyMap;
-    private readonly ISearcher _searcher;
+    private readonly ISearcherResolver _searcherResolver;
     private readonly ILogger<ContentSearchServiceBase<TContent>> _logger;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ContentSearchServiceBase{TContent}"/> class.
     /// </summary>
     /// <param name="idKeyMap">The map used to resolve between numeric IDs and keys.</param>
-    /// <param name="searcher">The searcher used to query the search index.</param>
+    /// <param name="searcherResolver">The resolver used to obtain the searcher for the index alias.</param>
     /// <param name="logger">The logger used to record warnings when a parent key cannot be resolved.</param>
-    protected ContentSearchServiceBase(IIdKeyMap idKeyMap, ISearcher searcher, ILogger<ContentSearchServiceBase<TContent>> logger)
+    protected ContentSearchServiceBase(IIdKeyMap idKeyMap, ISearcherResolver searcherResolver, ILogger<ContentSearchServiceBase<TContent>> logger)
     {
         _idKeyMap = idKeyMap;
-        _searcher = searcher;
+        _searcherResolver = searcherResolver;
         _logger = logger;
     }
 
@@ -93,7 +94,8 @@ internal abstract class ContentSearchServiceBase<TContent> : IndexedSearchServic
 
         Sorter sorter = GetSorter(ordering);
 
-        SearchResult result = await _searcher.SearchAsync(
+        ISearcher searcher = _searcherResolver.GetRequiredSearcher(IndexAlias);
+        SearchResult result = await searcher.SearchAsync(
             IndexAlias,
             query: effectiveQuery,
             filters: filters,
