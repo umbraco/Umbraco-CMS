@@ -177,6 +177,9 @@ export class UmbContentVariantLanguagePickerElement extends UmbLitElement {
 	static override readonly styles = [
 		UmbTextStyles,
 		css`
+			:host {
+				display: block;
+			}
 			.required {
 				color: var(--uui-color-danger);
 				--uui-menu-item-color-hover: var(--uui-color-danger-emphasis);
