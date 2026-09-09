@@ -27,6 +27,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 		if (value === this._propertyStructureHelper) return;
 		this._propertyStructureHelper = value;
 		this.#checkInherited();
+		this.#observePersistedProperty();
 	}
 	public get propertyStructureHelper(): UmbContentTypePropertyStructureHelper<UmbContentTypeModel> | undefined {
 		return this._propertyStructureHelper;
@@ -50,6 +51,8 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 		this.#context.setAlias(value?.alias);
 		this.#context.setLabel(value?.name);
 		this.#checkInherited();
+		this.#observePersistedProperty();
+		this.#updateAliasRenamed();
 		this.#setDataType(this._property?.dataType?.unique);
 		this.requestUpdate('property', oldValue);
 	}
@@ -84,6 +87,47 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 
 	@state()
 	private _dataTypeName?: string;
+
+	@state()
+	private _aliasRenamed = false;
+
+	#observedPropertyUnique?: string;
+	#ownerIsElement = false;
+	#persistedAlias?: string;
+
+	/**
+	 * An Element Type stores its property values keyed by alias rather than by property type, so renaming
+	 * the alias of an already stored property orphans the values held under the previous alias.
+	 */
+	#observePersistedProperty() {
+		const structure = this._propertyStructureHelper?.getStructureManager();
+		const unique = this._property?.unique;
+		if (!structure || !unique || unique === this.#observedPropertyUnique) return;
+		this.#observedPropertyUnique = unique;
+
+		this.observe(
+			structure.ownerContentTypeObservablePart((contentType) => contentType?.isElement === true),
+			(isElement) => {
+				this.#ownerIsElement = isElement;
+				this.#updateAliasRenamed();
+			},
+			'observeOwnerIsElement',
+		);
+
+		this.observe(
+			structure.persistedPropertyById(unique),
+			(property) => {
+				this.#persistedAlias = property?.alias;
+				this.#updateAliasRenamed();
+			},
+			'observePersistedProperty',
+		);
+	}
+
+	#updateAliasRenamed() {
+		this._aliasRenamed =
+			this.#ownerIsElement && this.#persistedAlias !== undefined && this.#persistedAlias !== this._property?.alias;
+	}
 
 	async #checkInherited() {
 		if (this._propertyStructureHelper && this._property) {
@@ -206,6 +250,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 						@change=${this.#onNameAliasChange}
 						${umbBindToValidation(this)}></umb-input-with-alias>
 					<umb-form-validation-message for="name-alias-input"></umb-form-validation-message>
+					${this.#renderAliasRenamedNotice()}
 
 					<slot name="action-menu"></slot>
 					<p>
@@ -261,6 +306,16 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 				@change=${this.#onPropertyOrderChanged}
 				.value=${(this.property.sortOrder ?? 0).toString()}></uui-input>
 		`;
+	}
+
+	#renderAliasRenamedNotice() {
+		if (!this._aliasRenamed) return nothing;
+		return html`<small id="alias-renamed-notice">
+			<uui-icon name="icon-alert"></uui-icon>
+			<span>
+				<umb-localize key="contentTypeEditor_propertyAliasRenamedNotice" .args=${[this.#persistedAlias]}></umb-localize>
+			</span>
+		</small>`;
 	}
 
 	#renderPropertyName() {
@@ -439,6 +494,21 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 			#header umb-input-with-alias,
 			#header uui-textarea {
 				width: 100%;
+			}
+
+			#alias-renamed-notice {
+				display: flex;
+				align-items: flex-start;
+				gap: var(--uui-size-space-1);
+				margin-top: var(--uui-size-space-2);
+				/* Indent to the text inset of the inputs above, which includes their border. */
+				padding-left: calc(var(--uui-size-space-3) + 1px);
+			}
+
+			#alias-renamed-notice uui-icon {
+				flex-shrink: 0;
+				/* Centre the icon on the first line rather than the whole, possibly wrapped, block. */
+				margin-top: calc((1lh - 1em) / 2);
 			}
 
 			#description-input:not(:hover):not(:focus) {
