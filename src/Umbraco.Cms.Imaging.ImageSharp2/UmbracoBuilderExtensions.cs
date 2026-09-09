@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -9,7 +8,6 @@ using SixLabors.ImageSharp.Web.Caching;
 using SixLabors.ImageSharp.Web.DependencyInjection;
 using SixLabors.ImageSharp.Web.Middleware;
 using SixLabors.ImageSharp.Web.Providers;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Media;
@@ -32,57 +30,6 @@ public static class UmbracoBuilderExtensions
     /// <returns>The <see cref="IServiceCollection" />.</returns>
     public static IServiceCollection AddUmbracoImageSharp(this IUmbracoBuilder builder)
     {
-        ImagingSettings imagingSettings = builder.Config
-            .GetSection(Constants.Configuration.ConfigImaging)
-            .Get<ImagingSettings>() ?? new ImagingSettings();
-
-        ILogger logger = builder.BuilderLoggerFactory.CreateLogger("Umbraco.Cms.Imaging.ImageSharp");
-        var availableMemoryBytes = GC.GetGCMemoryInfo().TotalAvailableMemoryBytes;
-        var availableMemoryMegabytes = availableMemoryBytes / 1024 / 1024;
-
-        // ImageSharp pools unmanaged memory sized against the available memory and releases it only
-        // on a gen2 collection, so on a memory constrained host it sits at rest well above what the
-        // site needs, and it will decode a source of any size into that memory. Both are left to
-        // the library on a host with room to spare. Applied before the configuration is shared so
-        // nothing allocates from the default pool first.
-        MemoryAllocatorOptions options = default;
-
-        if (imagingSettings.Memory.RequiresPoolSizeLimit(availableMemoryBytes))
-        {
-            options.MaximumPoolSizeMegabytes = imagingSettings.Memory.ResolveMaximumPoolSizeMegabytes(availableMemoryBytes);
-        }
-
-        if (imagingSettings.Memory.RequiresAllocationLimit(availableMemoryBytes))
-        {
-            options.AllocationLimitMegabytes = imagingSettings.Memory.ResolveMaximumDecodedImageMegabytes(availableMemoryBytes);
-        }
-
-        if (options.MaximumPoolSizeMegabytes.HasValue || options.AllocationLimitMegabytes.HasValue)
-        {
-            // One allocator, shared process-wide, as the imaging library advises. Its documented
-            // sample clones the configuration instead, but a clone would leave Configuration.Default
-            // on its own allocator, so anything using that directly would pool separately. Assigned
-            // once per host build, so a process building several - the test harness - replaces it
-            // rather than accumulating them.
-            // https://docs.sixlabors.com/articles/imagesharp/memorymanagement.html#customize-the-allocator
-            Configuration.Default.MemoryAllocator = MemoryAllocator.Create(options);
-
-            logger.LogInformation(
-                "Bounded image processing memory with a {MaximumPoolSizeMegabytes} MB pool and a {MaximumDecodedImageMegabytes} MB ceiling per image, with {AvailableMemoryMegabytes} MB available to the process. A null bound is left to the imaging library.",
-                options.MaximumPoolSizeMegabytes,
-                options.AllocationLimitMegabytes,
-                availableMemoryMegabytes);
-        }
-        else
-        {
-            if (logger.IsEnabled(LogLevel.Debug))
-            {
-                logger.LogDebug(
-                    "No memory bounds applied to image processing, with {AvailableMemoryMegabytes} MB available to the process. A null bound is left to the imaging library.",
-                    availableMemoryMegabytes);
-            }
-        }
-
         // Add default ImageSharp configuration and service implementations
         builder.Services.AddSingleton(Configuration.Default);
         builder.Services.AddUnique<IImageDimensionExtractor, ImageSharpDimensionExtractor>();
@@ -109,6 +56,7 @@ public static class UmbracoBuilderExtensions
             {
                 PrePipeline = prePipeline =>
                 {
+                    ConfigureMemoryAllocator(prePipeline.ApplicationServices);
                     prePipeline.UseMiddleware<ImageProcessingThrottleMiddleware>();
                     prePipeline.UseImageSharp();
                 }
@@ -116,5 +64,67 @@ public static class UmbracoBuilderExtensions
         });
 
         return builder.Services;
+    }
+
+    /// <summary>
+    /// Bounds the memory the imaging library uses against the memory available to the process.
+    /// </summary>
+    /// <param name="services">The application services.</param>
+    /// <remarks>
+    /// Applied while the pipeline is built rather than while services are registered, so the
+    /// settings come from <c>IOptions</c> - the same source the rest of the imaging code reads, and
+    /// the only one a composer can contribute to. That is late enough: nothing is allocated until an
+    /// image is decoded, which cannot happen before the site takes a request. It also puts both
+    /// bounds in one place, so the pool and the concurrency gate are engaged as a unit.
+    /// </remarks>
+    private static void ConfigureMemoryAllocator(IServiceProvider services)
+    {
+        ImagingMemorySettings memory = services.GetRequiredService<IOptions<ImagingSettings>>().Value.Memory;
+        ILogger logger = services.GetRequiredService<ILoggerFactory>().CreateLogger(typeof(UmbracoBuilderExtensions));
+
+        var availableMemoryBytes = GC.GetGCMemoryInfo().TotalAvailableMemoryBytes;
+        var availableMemoryMegabytes = availableMemoryBytes / 1024 / 1024;
+
+        // ImageSharp pools unmanaged memory sized against the available memory and releases it only
+        // on a gen2 collection, so on a memory constrained host it sits at rest well above what the
+        // site needs, and it will decode a source of any size into that memory. Both are left to
+        // the library on a host with room to spare.
+        MemoryAllocatorOptions options = default;
+
+        if (memory.RequiresPoolSizeLimit(availableMemoryBytes))
+        {
+            options.MaximumPoolSizeMegabytes = memory.ResolveMaximumPoolSizeMegabytes(availableMemoryBytes);
+        }
+
+        if (memory.RequiresAllocationLimit(availableMemoryBytes))
+        {
+            options.AllocationLimitMegabytes = memory.ResolveMaximumDecodedImageMegabytes(availableMemoryBytes);
+        }
+
+        if (options.MaximumPoolSizeMegabytes.HasValue is false && options.AllocationLimitMegabytes.HasValue is false)
+        {
+            if (logger.IsEnabled(LogLevel.Debug))
+            {
+                logger.LogDebug(
+                    "Left image processing memory to the imaging library, with {AvailableMemoryMegabytes} MB available to the process.",
+                    availableMemoryMegabytes);
+            }
+
+            return;
+        }
+
+        // One allocator, shared process-wide, as the imaging library advises. Its documented sample
+        // clones the configuration instead, but a clone would leave Configuration.Default on its own
+        // allocator, so anything using that directly would pool separately. Assigned once per host
+        // build, so a process building several - the test harness - replaces it rather than
+        // accumulating them.
+        // https://docs.sixlabors.com/articles/imagesharp/memorymanagement.html#customize-the-allocator
+        Configuration.Default.MemoryAllocator = MemoryAllocator.Create(options);
+
+        logger.LogInformation(
+            "Bounded image processing memory with a {MaximumPoolSizeMegabytes} MB pool and a {MaximumDecodedImageMegabytes} MB ceiling per image, with {AvailableMemoryMegabytes} MB available to the process. A null bound is left to the imaging library.",
+            options.MaximumPoolSizeMegabytes,
+            options.AllocationLimitMegabytes,
+            availableMemoryMegabytes);
     }
 }
