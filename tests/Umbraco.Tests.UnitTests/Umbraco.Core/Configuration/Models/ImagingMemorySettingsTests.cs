@@ -122,6 +122,89 @@ public class ImagingMemorySettingsTests
     }
 
     [Test]
+    public void ResolveMaximumDecodedImageMegabytes_WhenConfigured_UsesConfiguredValue()
+    {
+        var settings = new ImagingMemorySettings { MaximumDecodedImageMegabytes = 96 };
+
+        Assert.That(settings.ResolveMaximumDecodedImageMegabytes(512 * OneMegabyte), Is.EqualTo(96));
+    }
+
+    [TestCase(512, 256)] // Clamped to the minimum.
+    [TestCase(2048, 512)]
+    [TestCase(8192, 1024)] // Clamped to the maximum.
+    public void ResolveMaximumDecodedImageMegabytes_WhenNotConfigured_DerivesFromAvailableMemory(
+        int availableMegabytes,
+        int expected)
+    {
+        var settings = new ImagingMemorySettings();
+
+        Assert.That(
+            settings.ResolveMaximumDecodedImageMegabytes(availableMegabytes * OneMegabyte),
+            Is.EqualTo(expected));
+    }
+
+    // The bound has to clear any legitimate source comfortably, or a large upload starts failing
+    // on a host that could have served it. A 12 megapixel decode is ~48 MB.
+    [TestCase(384)]
+    [TestCase(2048)]
+    public void ResolveMaximumDecodedImageMegabytes_LeavesRoomForALargeSource(int availableMegabytes)
+    {
+        const int twelveMegapixelDecodeMegabytes = 48;
+
+        var resolved = new ImagingMemorySettings().ResolveMaximumDecodedImageMegabytes(availableMegabytes * OneMegabyte);
+
+        Assert.That(resolved, Is.GreaterThan(twelveMegapixelDecodeMegabytes * 4));
+    }
+
+    // Never looser than the library's own ceiling, which is a flat 1 GB even on a 32-bit process.
+    [TestCase(384)]
+    [TestCase(2048)]
+    [TestCase(8192)]
+    public void ResolveMaximumDecodedImageMegabytes_NeverExceedsTheImageSharpDefault(int availableMegabytes)
+    {
+        const int imageSharpDefaultMegabytes = 1024;
+
+        var resolved = new ImagingMemorySettings().ResolveMaximumDecodedImageMegabytes(availableMegabytes * OneMegabyte);
+
+        Assert.That(resolved, Is.LessThanOrEqualTo(imageSharpDefaultMegabytes));
+    }
+
+    [TestCase(384)]
+    [TestCase(2048)]
+    public void RequiresAllocationLimit_WhenMemoryIsLow_IsTrue(int availableMegabytes)
+    {
+        var settings = new ImagingMemorySettings();
+
+        Assert.That(settings.RequiresAllocationLimit(availableMegabytes * OneMegabyte), Is.True);
+    }
+
+    // Above the threshold the library's own ceiling stands, so a derived value would only loosen it.
+    [TestCase(4096)]
+    [TestCase(65536)]
+    public void RequiresAllocationLimit_WhenMemoryIsAmple_IsFalse(int availableMegabytes)
+    {
+        var settings = new ImagingMemorySettings();
+
+        Assert.That(settings.RequiresAllocationLimit(availableMegabytes * OneMegabyte), Is.False);
+    }
+
+    [Test]
+    public void RequiresAllocationLimit_WhenConfigured_IsTrueEvenWithAmpleMemory()
+    {
+        var settings = new ImagingMemorySettings { MaximumDecodedImageMegabytes = 512 };
+
+        Assert.That(settings.RequiresAllocationLimit(65536 * OneMegabyte), Is.True);
+    }
+
+    [Test]
+    public void RequiresAllocationLimit_WhenDisabled_IsFalse()
+    {
+        var settings = new ImagingMemorySettings { Enabled = false, MaximumDecodedImageMegabytes = 512 };
+
+        Assert.That(settings.RequiresAllocationLimit(384 * OneMegabyte), Is.False);
+    }
+
+    [Test]
     public void RequiresConcurrencyLimit_WhenConfigured_IsAlwaysTrue()
     {
         var settings = new ImagingMemorySettings { MaximumConcurrentProcessing = 4 };

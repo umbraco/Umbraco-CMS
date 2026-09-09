@@ -33,6 +33,12 @@ public class ImagingMemorySettings
     internal const int StaticMaximumConcurrentProcessing = 0;
 
     /// <summary>
+    /// The default maximum size of a single decoded image, in megabytes. Zero means it is derived
+    /// from the available memory.
+    /// </summary>
+    internal const int StaticMaximumDecodedImageMegabytes = 0;
+
+    /// <summary>
     /// The share of available memory image processing is allowed to occupy when deriving
     /// <see cref="MaximumConcurrentProcessing" />.
     /// </summary>
@@ -63,8 +69,24 @@ public class ImagingMemorySettings
     private const int MaximumDerivedPoolSizeMegabytes = 64;
 
     /// <summary>
+    /// The share of available memory a single decoded image may occupy when deriving
+    /// <see cref="MaximumDecodedImageMegabytes" />.
+    /// </summary>
+    /// <remarks>
+    /// Deliberately generous. This is a ceiling on the absurd, not a target: a source needing a
+    /// quarter of the memory available to the whole site cannot be processed usefully whatever the
+    /// concurrency, so failing that one request beats exhausting the host.
+    /// </remarks>
+    private const int DecodedImageMemoryShareDivisor = 4;
+
+    private const int MinimumDecodedImageMegabytes = 256;
+
+    private const int MaximumDerivedDecodedImageMegabytes = 1024;
+
+    /// <summary>
     /// The memory available to the process, in megabytes, below which
-    /// <see cref="MaximumPoolSizeMegabytes" /> is applied.
+    /// <see cref="MaximumPoolSizeMegabytes" /> and <see cref="MaximumDecodedImageMegabytes" /> are
+    /// applied.
     /// </summary>
     /// <remarks>
     /// On a 64-bit process the imaging library's own pool default is an eighth of available memory
@@ -79,7 +101,7 @@ public class ImagingMemorySettings
     /// https://github.com/SixLabors/ImageSharp/blob/v3.1.12/src/ImageSharp/Memory/Allocators/UniformUnmanagedMemoryPoolMemoryAllocator.cs#L156
     /// </para>
     /// </remarks>
-    private const int PoolManagementMemoryThresholdMegabytes = 4096;
+    private const int MemoryManagementThresholdMegabytes = 4096;
 
     private const int OneMegabyte = 1024 * 1024;
 
@@ -90,7 +112,7 @@ public class ImagingMemorySettings
     /// When enabled (the default), the pool the imaging library retains between requests is capped and
     /// the number of images decoded at the same time is bounded on hosts where memory is the binding
     /// constraint. Set to <c>false</c> to leave the imaging library's own memory behaviour untouched -
-    /// neither the pool cap nor the concurrency bound is applied.
+    /// none of the pool cap, the concurrency bound or the single-image ceiling is applied.
     /// </remarks>
     [DefaultValue(StaticEnabled)]
     public bool Enabled { get; set; } = StaticEnabled;
@@ -115,6 +137,21 @@ public class ImagingMemorySettings
     /// </remarks>
     [DefaultValue(StaticMaximumConcurrentProcessing)]
     public int MaximumConcurrentProcessing { get; set; } = StaticMaximumConcurrentProcessing;
+
+    /// <summary>
+    /// Gets or sets the maximum size, in megabytes, of the buffers a single image may be decoded
+    /// into.
+    /// </summary>
+    /// <remarks>
+    /// A request for an image needing more than this fails rather than being served, which on a
+    /// memory-limited host is preferable to exhausting the limit and taking the process with it.
+    /// <see cref="MaximumConcurrentProcessing" /> bounds how many images are decoded at once
+    /// against an assumed cost each; this bounds that cost, so an unusually large source cannot
+    /// exceed the budget the two are meant to keep. Set to zero to derive a value from the
+    /// available memory.
+    /// </remarks>
+    [DefaultValue(StaticMaximumDecodedImageMegabytes)]
+    public int MaximumDecodedImageMegabytes { get; set; } = StaticMaximumDecodedImageMegabytes;
 
     /// <summary>
     /// Resolves <see cref="MaximumPoolSizeMegabytes" />, deriving a value when it is not configured.
@@ -156,7 +193,51 @@ public class ImagingMemorySettings
     public bool RequiresPoolSizeLimit(long availableMemoryBytes)
         => Enabled
            && (MaximumPoolSizeMegabytes > 0
-               || availableMemoryBytes < PoolManagementMemoryThresholdMegabytes * (long)OneMegabyte);
+               || availableMemoryBytes < MemoryManagementThresholdMegabytes * (long)OneMegabyte);
+
+    /// <summary>
+    /// Resolves <see cref="MaximumDecodedImageMegabytes" />, deriving a value when it is not
+    /// configured.
+    /// </summary>
+    /// <param name="availableMemoryBytes">
+    /// The memory available to the process, honouring any container limit. Typically
+    /// <see cref="GCMemoryInfo.TotalAvailableMemoryBytes" />.
+    /// </param>
+    /// <returns>The maximum size of a single decoded image, in megabytes.</returns>
+    public int ResolveMaximumDecodedImageMegabytes(long availableMemoryBytes)
+    {
+        if (MaximumDecodedImageMegabytes > 0)
+        {
+            return MaximumDecodedImageMegabytes;
+        }
+
+        long derived = availableMemoryBytes / DecodedImageMemoryShareDivisor / OneMegabyte;
+
+        return (int)Math.Clamp(derived, MinimumDecodedImageMegabytes, MaximumDerivedDecodedImageMegabytes);
+    }
+
+    /// <summary>
+    /// Gets a value indicating whether the size of a single decoded image needs to be capped on
+    /// this host.
+    /// </summary>
+    /// <param name="availableMemoryBytes">
+    /// The memory available to the process, honouring any container limit. Typically
+    /// <see cref="GCMemoryInfo.TotalAvailableMemoryBytes" />.
+    /// </param>
+    /// <returns>
+    /// <c>true</c> when a size is configured explicitly, or when the memory available to the
+    /// process is low enough that one outsized source could exhaust it; otherwise <c>false</c>.
+    /// </returns>
+    /// <remarks>
+    /// The imaging library's own ceiling here is a flat 1 GB on a 32-bit process and 4 GB on a
+    /// 64-bit one, so on a host with memory to spare a derived value would only ever loosen it.
+    /// Left alone above the same threshold as the pool cap, so one figure governs whether imaging
+    /// memory is managed at all.
+    /// </remarks>
+    public bool RequiresAllocationLimit(long availableMemoryBytes)
+        => Enabled
+           && (MaximumDecodedImageMegabytes > 0
+               || availableMemoryBytes < MemoryManagementThresholdMegabytes * (long)OneMegabyte);
 
     /// <summary>
     /// Resolves <see cref="MaximumConcurrentProcessing" />, deriving a value when it is not configured.

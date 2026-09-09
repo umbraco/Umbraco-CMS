@@ -65,11 +65,16 @@ Images are processed via URL query parameters handled by ImageSharp.Web middlewa
 
 ### Pipeline Integration
 
-ImageSharp middleware runs **before** static files in `UmbracoBuilderExtensions.cs:44-50`:
+ImageSharp middleware runs **before** static files, with the processing throttle registered ahead of
+it, in `UmbracoBuilderExtensions.cs`:
 ```csharp
 options.AddFilter(new UmbracoPipelineFilter(nameof(ImageSharpComposer))
 {
-    PrePipeline = prePipeline => prePipeline.UseImageSharp()
+    PrePipeline = prePipeline =>
+    {
+        prePipeline.UseMiddleware<ImageProcessingThrottleMiddleware>();
+        prePipeline.UseImageSharp();
+    }
 });
 ```
 
@@ -128,7 +133,8 @@ if (_options.HMACSecretKey.Length != 0 && _requestAuthorizationUtilities is not 
         "Memory": {
           "Enabled": true,
           "MaximumPoolSizeMegabytes": 0,
-          "MaximumConcurrentProcessing": 0
+          "MaximumConcurrentProcessing": 0,
+          "MaximumDecodedImageMegabytes": 0
         }
       }
     }
@@ -138,26 +144,28 @@ if (_options.HMACSecretKey.Length != 0 && _requestAuthorizationUtilities is not 
 
 ### Memory Settings (`ImagingMemorySettings`)
 
-Both numeric values default to `0`, meaning "derive from the memory available to the process"
+Each numeric value defaults to `0`, meaning "derive from the memory available to the process"
 (`GC.GetGCMemoryInfo().TotalAvailableMemoryBytes`, which honours a container limit).
 
 | Setting | Purpose | Default |
 |---------|---------|---------|
-| `Enabled` | Master switch for imaging memory management. When `false`, neither the pool cap nor the concurrency bound is applied and ImageSharp's own memory behaviour is left untouched. | `true` |
+| `Enabled` | Master switch for imaging memory management. When `false`, none of the three bounds is applied and ImageSharp's own memory behaviour is left untouched. | `true` |
 | `MaximumPoolSizeMegabytes` | Caps the unmanaged buffer pool ImageSharp retains between requests | available / 32, clamped to 16-64 MB |
 | `MaximumConcurrentProcessing` | Caps how many images are processed at once | (available / 2) / 64 MB, capped at processor count |
+| `MaximumDecodedImageMegabytes` | Caps the buffers a single image may be decoded into | available / 4, clamped to 256-1024 MB |
 
-Both bounds are default-on but **conditional**, so an upgrade changes nothing on a host that was
-never at risk. Each has its own engagement test, and setting either value explicitly overrides that
+All three bounds are default-on but **conditional**, so an upgrade changes nothing on a host that
+was never at risk. Each has its own engagement test, and setting a value explicitly overrides that
 test — an operator who names a number gets it.
 
 | Bound | Engages when | Test |
 |-------|--------------|------|
 | Pool cap | Under 4 GB is available to the process | `RequiresPoolSizeLimit` |
+| Single image | Under 4 GB is available to the process | `RequiresAllocationLimit` |
 | Concurrency | The memory budget cannot feed as many concurrent decodes as there are processors | `RequiresConcurrencyLimit` |
 
-The two tests deliberately differ. Concurrency is about *peak* — it only needs bounding where memory
-is tighter than the core count, since decoding is CPU bound and the processor count caps it
+The tests deliberately differ. Concurrency is about *peak* — it only needs bounding where memory is
+tighter than the core count, since decoding is CPU bound and the processor count caps it
 otherwise. The pool cap is about *retention*, and ImageSharp's default there is an eighth of
 available memory on **any 64-bit host** — [`GetDefaultMaxPoolSizeBytes`](https://github.com/SixLabors/ImageSharp/blob/v3.1.12/src/ImageSharp/Memory/Allocators/UniformUnmanagedMemoryPoolMemoryAllocator.cs#L156)
 returns `total / 8` when `Environment.Is64BitProcess`, and a flat 128 MB otherwise. It is never
@@ -165,6 +173,15 @@ disproportionate; it is a problem only in absolute terms, where that eighth comp
 the rest of the site needs. Hence a flat memory threshold rather than a ratio — and note that
 reusing `RequiresConcurrencyLimit` for the pool would switch it off on the low-core 2 GB host where
 the retention was actually measured.
+
+The single-image ceiling exists because the concurrency bound assumes a cost per image
+(`EstimatedMegabytesPerImage`, measured against a 12 megapixel JPEG). Peak is `count x size`, and
+bounding only the count leaves the size trusted — a 100 megapixel source decodes to roughly 400 MB,
+so even a derived limit of 3 would exhaust a 512 MB container. This bounds the other factor, and it
+maps onto ImageSharp's `AllocationLimitMegabytes`, whose own default is a flat 1 GB on a 32-bit
+process and 4 GB on a 64-bit one. Exceeding it throws `InvalidMemoryOperationException`, so one
+outsized request fails rather than the process dying. Note this is unrelated to `Resize.MaxWidth`
+and `Resize.MaxHeight`, which bound the *output* dimensions, not the source decode.
 
 `Enabled: false` remains the one-setting escape hatch that restores stock ImageSharp behaviour.
 

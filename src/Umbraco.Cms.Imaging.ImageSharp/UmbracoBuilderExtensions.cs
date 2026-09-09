@@ -42,27 +42,39 @@ public static class UmbracoBuilderExtensions
 
         // ImageSharp pools unmanaged memory sized against the available memory and releases it only
         // on a gen2 collection, so on a memory constrained host it sits at rest well above what the
-        // site needs. Applied before the configuration is shared so nothing allocates from the
-        // default pool first.
+        // site needs, and it will decode a source of any size into that memory. Both are left to
+        // the library on a host with room to spare. Applied before the configuration is shared so
+        // nothing allocates from the default pool first.
+        MemoryAllocatorOptions options = default;
+
         if (imagingSettings.Memory.RequiresPoolSizeLimit(availableMemoryBytes))
         {
-            var maximumPoolSizeMegabytes = imagingSettings.Memory.ResolveMaximumPoolSizeMegabytes(availableMemoryBytes);
+            options.MaximumPoolSizeMegabytes = imagingSettings.Memory.ResolveMaximumPoolSizeMegabytes(availableMemoryBytes);
+        }
 
-            Configuration.Default.MemoryAllocator = MemoryAllocator.Create(new MemoryAllocatorOptions
-            {
-                MaximumPoolSizeMegabytes = maximumPoolSizeMegabytes,
-            });
+        if (imagingSettings.Memory.RequiresAllocationLimit(availableMemoryBytes))
+        {
+            options.AllocationLimitMegabytes = imagingSettings.Memory.ResolveMaximumDecodedImageMegabytes(availableMemoryBytes);
+        }
+
+        if (options.MaximumPoolSizeMegabytes.HasValue || options.AllocationLimitMegabytes.HasValue)
+        {
+            Configuration.Default.MemoryAllocator = MemoryAllocator.Create(options);
 
             logger.LogInformation(
-                "Capped the image processing memory pool at {MaximumPoolSizeMegabytes} MB, with {AvailableMemoryMegabytes} MB available to the process.",
-                maximumPoolSizeMegabytes,
+                "Bounded image processing memory with a {MaximumPoolSizeMegabytes} MB pool and a {MaximumDecodedImageMegabytes} MB ceiling per image, with {AvailableMemoryMegabytes} MB available to the process. A null bound is left to the imaging library.",
+                options.MaximumPoolSizeMegabytes,
+                options.AllocationLimitMegabytes,
                 availableMemoryMegabytes);
         }
         else
         {
-            logger.LogDebug(
-                "Left the image processing memory pool at the imaging library's default, with {AvailableMemoryMegabytes} MB available to the process.",
-                availableMemoryMegabytes);
+            if (logger.IsEnabled(LogLevel.Debug))
+            {
+                logger.LogDebug(
+                    "Left image processing memory to the imaging library, with {AvailableMemoryMegabytes} MB available to the process.",
+                    availableMemoryMegabytes);
+            }
         }
 
         // Add default ImageSharp configuration and service implementations
