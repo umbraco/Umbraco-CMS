@@ -2,14 +2,13 @@
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
-using Umbraco.Cms.Search.Core.Extensions;
 using Umbraco.Cms.Core.Search;
 using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Search.Indexing;
 using Umbraco.Extensions;
 using IndexValue = Umbraco.Cms.Core.Search.Indexing.IndexValue;
 
-namespace Umbraco.Cms.Search.Core.PropertyValueHandlers;
+namespace Umbraco.Cms.Infrastructure.Search.PropertyValueHandlers;
 
 /// <summary>
 /// Indexes multi-node tree picker property values as the picked documents' keys (Keywords). Picker configurations

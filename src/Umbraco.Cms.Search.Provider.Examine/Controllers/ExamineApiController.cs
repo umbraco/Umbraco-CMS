@@ -2,7 +2,6 @@ using Asp.Versioning;
 using Examine;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Search.Core.Extensions;
 using Umbraco.Cms.Core.Search;
 using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Search.Indexing;

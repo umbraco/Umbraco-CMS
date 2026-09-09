@@ -1,4 +1,4 @@
-namespace Umbraco.Cms.Search.Core.Extensions;
+namespace Umbraco.Cms.Infrastructure.Search.PropertyValueHandlers;
 
 /// <summary>
 /// Provides extension methods for arrays.

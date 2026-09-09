@@ -1,7 +1,7 @@
 ﻿using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Search.Indexing;
 
-namespace Umbraco.Cms.Search.Core.PropertyValueHandlers;
+namespace Umbraco.Cms.Infrastructure.Search.PropertyValueHandlers;
 
 /// <summary>
 /// Indexes boolean property values as integers (0 or 1).

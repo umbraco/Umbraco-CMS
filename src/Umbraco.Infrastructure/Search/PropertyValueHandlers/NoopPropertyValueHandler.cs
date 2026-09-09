@@ -1,7 +1,7 @@
 ﻿using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Search.Indexing;
 
-namespace Umbraco.Cms.Search.Core.PropertyValueHandlers;
+namespace Umbraco.Cms.Infrastructure.Search.PropertyValueHandlers;
 
 /// <summary>
 /// Fallback handler for property editors that are not (yet) indexed. Always yields no index fields.

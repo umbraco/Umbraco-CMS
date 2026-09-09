@@ -5,7 +5,6 @@ using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Search.Core.Extensions;
 using Umbraco.Cms.Core.Search;
 using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Search.Indexing;

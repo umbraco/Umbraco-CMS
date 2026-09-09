@@ -5,7 +5,7 @@ using Umbraco.Cms.Core.Search.Indexing;
 using Umbraco.Extensions;
 using IndexValue = Umbraco.Cms.Core.Search.Indexing.IndexValue;
 
-namespace Umbraco.Cms.Search.Core.PropertyValueHandlers;
+namespace Umbraco.Cms.Infrastructure.Search.PropertyValueHandlers;
 
 /// <summary>
 /// Indexes multi URL picker property values as the picked links' display names (text).

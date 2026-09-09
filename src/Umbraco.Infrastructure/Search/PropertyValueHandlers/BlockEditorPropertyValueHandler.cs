@@ -4,7 +4,6 @@ using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Search.Core.Extensions;
 using Umbraco.Cms.Core.Search;
 using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Search.Indexing;
@@ -12,7 +11,7 @@ using Umbraco.Cms.Core.Search.Indexing.Collection;
 using Umbraco.Extensions;
 using IndexValue = Umbraco.Cms.Core.Search.Indexing.IndexValue;
 
-namespace Umbraco.Cms.Search.Core.PropertyValueHandlers;
+namespace Umbraco.Cms.Infrastructure.Search.PropertyValueHandlers;
 
 /// <summary>
 /// Base class for property value handlers of block-based editors (block list, block grid, single block, rich text).

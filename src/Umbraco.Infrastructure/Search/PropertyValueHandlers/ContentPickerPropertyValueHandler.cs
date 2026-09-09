@@ -1,12 +1,11 @@
 ﻿using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Search.Core.Extensions;
 using Umbraco.Cms.Core.Search;
 using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Search.Indexing;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Search.Core.PropertyValueHandlers;
+namespace Umbraco.Cms.Infrastructure.Search.PropertyValueHandlers;
 
 /// <summary>
 /// Indexes content picker property values as the picked content's key (Keyword).

@@ -3,7 +3,7 @@ using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Search.Indexing;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Search.Core.PropertyValueHandlers;
+namespace Umbraco.Cms.Infrastructure.Search.PropertyValueHandlers;
 
 /// <summary>
 /// Indexes exact-match string property values (dropdowns, radio buttons, checkbox lists) as keywords.

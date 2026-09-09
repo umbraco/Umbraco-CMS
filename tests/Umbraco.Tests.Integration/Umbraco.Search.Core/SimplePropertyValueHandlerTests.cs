@@ -3,7 +3,6 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.Serialization;
-using Umbraco.Cms.Search.Core.PropertyValueHandlers;
 using Umbraco.Cms.Core.Search.Indexing;
 using Umbraco.Cms.Core.Search.Indexing.Collection;
 using Umbraco.Cms.Tests.Common.Builders;

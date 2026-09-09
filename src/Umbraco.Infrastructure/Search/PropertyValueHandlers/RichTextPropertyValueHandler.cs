@@ -8,7 +8,7 @@ using Umbraco.Cms.Core.Search.Indexing;
 using Umbraco.Cms.Core.Search.Indexing.Collection;
 using IndexValue = Umbraco.Cms.Core.Search.Indexing.IndexValue;
 
-namespace Umbraco.Cms.Search.Core.PropertyValueHandlers;
+namespace Umbraco.Cms.Infrastructure.Search.PropertyValueHandlers;
 
 /// <summary>
 /// Indexes rich text property values, extracting HTML text (weighted by heading level) and recursively indexing

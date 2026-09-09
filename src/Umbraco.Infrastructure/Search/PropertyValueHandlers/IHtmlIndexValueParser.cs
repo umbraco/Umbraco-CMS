@@ -1,6 +1,6 @@
 using Umbraco.Cms.Core.Search.Indexing;
 
-namespace Umbraco.Cms.Search.Core.PropertyValueHandlers;
+namespace Umbraco.Cms.Infrastructure.Search.PropertyValueHandlers;
 
 /// <summary>
 /// Parses HTML markup into indexable text, separating headings (H1-H3) from body text for relevance weighting.

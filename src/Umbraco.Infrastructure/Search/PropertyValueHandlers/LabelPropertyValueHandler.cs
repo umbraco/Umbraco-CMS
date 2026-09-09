@@ -5,7 +5,7 @@ using Umbraco.Cms.Core.Search;
 using Umbraco.Cms.Core.Search.Indexing;
 using IndexValue = Umbraco.Cms.Core.Search.Indexing.IndexValue;
 
-namespace Umbraco.Cms.Search.Core.PropertyValueHandlers;
+namespace Umbraco.Cms.Infrastructure.Search.PropertyValueHandlers;
 
 /// <summary>
 /// Indexes label property values as the underlying value type configured for the label (integer, decimal, date or string).

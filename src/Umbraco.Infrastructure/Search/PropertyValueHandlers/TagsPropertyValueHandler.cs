@@ -6,7 +6,7 @@ using Umbraco.Cms.Core.Search.Indexing;
 using Umbraco.Extensions;
 using IndexValue = Umbraco.Cms.Core.Search.Indexing.IndexValue;
 
-namespace Umbraco.Cms.Search.Core.PropertyValueHandlers;
+namespace Umbraco.Cms.Infrastructure.Search.PropertyValueHandlers;
 
 /// <summary>
 /// Indexes tags property values as keywords, parsing either JSON or delimiter-separated storage.

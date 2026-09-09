@@ -19,7 +19,7 @@ using Umbraco.Cms.Core.Search;
 using Umbraco.Cms.Search.Core.NotificationHandlers;
 using Umbraco.Cms.Search.Core.Persistence;
 using Umbraco.Cms.Core.Search.Indexing;
-using Umbraco.Cms.Search.Core.PropertyValueHandlers;
+using Umbraco.Cms.Infrastructure.Search.PropertyValueHandlers;
 using Umbraco.Cms.Core.Search.Indexing.Collection;
 using Umbraco.Cms.Search.Core.Services;
 using Umbraco.Cms.Search.Core.Services.ContentIndexing;

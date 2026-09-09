@@ -2,7 +2,7 @@ using HeyRed.MarkdownSharp;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Search.Indexing;
 
-namespace Umbraco.Cms.Search.Core.PropertyValueHandlers;
+namespace Umbraco.Cms.Infrastructure.Search.PropertyValueHandlers;
 
 /// <summary>
 /// Indexes markdown property values by converting the markdown to HTML and parsing it into indexable text.

@@ -4,7 +4,7 @@ using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Search;
 using Umbraco.Cms.Core.Search.Indexing;
 
-namespace Umbraco.Cms.Search.Core.PropertyValueHandlers;
+namespace Umbraco.Cms.Infrastructure.Search.PropertyValueHandlers;
 
 /// <summary>
 /// Indexes date/time property values (date, time, date-only, time-only and variants) as dates.

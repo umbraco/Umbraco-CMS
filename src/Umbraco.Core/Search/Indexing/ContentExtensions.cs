@@ -1,14 +1,13 @@
-﻿using System.Globalization;
+using System.Globalization;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Extensions;
-using CoreConstants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Cms.Search.Core.Extensions;
+namespace Umbraco.Cms.Core.Search.Indexing;
 
 /// <summary>
 /// Provides extension methods for <see cref="IContentBase"/>, used by the content indexing pipeline.
 /// </summary>
-internal static class ContentExtensions
+public static class ContentExtensions
 {
     /// <summary>
     /// Gets the numeric IDs of the content's ancestors, excluding the content itself and the root.
@@ -16,7 +15,7 @@ internal static class ContentExtensions
     /// <param name="content">The content.</param>
     /// <returns>The ancestor IDs.</returns>
     public static IEnumerable<int> AncestorIds(this IContentBase content)
-        => content.Path.Split(CoreConstants.CharArrays.Comma)
+        => content.Path.Split(Constants.CharArrays.Comma)
             .Select(s => int.Parse(s, CultureInfo.InvariantCulture))
             .Where(i => i > 0 && i != content.Id);
 
