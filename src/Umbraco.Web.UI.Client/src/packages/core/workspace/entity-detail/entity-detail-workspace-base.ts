@@ -164,6 +164,10 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		new UmbDeleteEntityWorkspaceRedirectController(this, this);
 	}
 
+	// TODO: Ideally this would be resolved by a more global, outer navigation context instead of by each
+	// workspace individually. Right now, only the workspace itself knows how to match an entity to a path, so
+	// that responsibility sits here. Once there's a way to do that matching more generally, this method could
+	// source the information from that context instead.
 	/**
 	 * Resolves where a "back to parent" navigation should go, given the entity's current parent item (or
 	 * `undefined` when there's no parent or it's not yet known). Override to provide entity-specific redirect
