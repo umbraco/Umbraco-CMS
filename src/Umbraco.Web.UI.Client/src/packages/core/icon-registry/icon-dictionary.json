@@ -1707,7 +1707,7 @@
 		},
 		{
 			"name": "icon-history",
-			"file": "history.svg"
+			"file": "rotate-ccw-clock.svg"
 		},
 		{
 			"name": "icon-home",
@@ -2079,11 +2079,16 @@
 			"keywords": [
 				"chains",
 				"links",
-				"hyperlinks"
+				"hyperlinks",
+				"reference",
+				"relation"
 			],
 			"groups": [
 				"item",
 				"technology"
+			],
+			"related": [
+				"icon-unlink"
 			]
 		},
 		{
@@ -5881,10 +5886,6 @@
 			"file": "underline.svg"
 		},
 		{
-			"name": "icon-unlink",
-			"file": "unlink.svg"
-		},
-		{
 			"name": "icon-unlocked",
 			"file": "lock-open.svg",
 			"keywords": [
@@ -7123,5 +7124,13 @@
 			"file": "legacy/icon-umbraco.svg"
 		}
 	],
-	"custom": []
+	"custom": [
+		{
+			"name": "icon-unlink",
+			"file": "unlink.svg",
+			"keywords": ["url","unchain","reference","relation","break"],
+			"groups": ["text"],
+			"related": ["icon-link"]
+		}
+	]
 }
