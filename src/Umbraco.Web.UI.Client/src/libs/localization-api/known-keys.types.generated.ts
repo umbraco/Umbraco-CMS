@@ -1516,9 +1516,11 @@ declare global {
 		logViewer_searchOurUmbraco: string;
 		logViewer_searchOurUmbracoForumsUsingGoogle: string;
 		logViewer_searchOurUmbracoWithGoogle: string;
+		logViewer_searchThisMessageInUmbracoDocs: string;
 		logViewer_searchThisMessageOnOurUmbracoForumsAndDocs: string;
 		logViewer_searchThisMessageWithBing: string;
 		logViewer_searchThisMessageWithGoogle: string;
+		logViewer_searchUmbracoDocs: string;
 		logViewer_searchUmbracoIssues: string;
 		logViewer_searchUmbracoIssuesOnGithub: string;
 		logViewer_searchUmbracoSource: string;

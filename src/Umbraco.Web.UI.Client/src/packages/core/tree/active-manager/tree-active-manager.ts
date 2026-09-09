@@ -6,7 +6,7 @@ import {
 	type Observable,
 } from '@umbraco-cms/backoffice/observable-api';
 import { ensureSlash } from '@umbraco-cms/backoffice/router';
-import { debounce, UmbDeprecation } from '@umbraco-cms/backoffice/utils';
+import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 
 /**
@@ -41,7 +41,9 @@ export class UmbTreeItemActiveManager extends UmbControllerBase {
 
 	// One listener per tree rather than one per tree item: every item asks the same question of the
 	// same answer, and a tree scoped source is released together with the items observing it.
-	#onNavigationEnd = debounce(() => this.#currentLocation.setValue(window.location.pathname), 100);
+	// history.pushState runs synchronously before any router-slot dispatches this event, so the location
+	// is already final on the first firing — no need to coalesce repeat firings from nested router-slots.
+	#onNavigationEnd = () => this.#currentLocation.setValue(window.location.pathname);
 
 	override hostConnected(): void {
 		super.hostConnected();
@@ -52,7 +54,6 @@ export class UmbTreeItemActiveManager extends UmbControllerBase {
 	override hostDisconnected(): void {
 		super.hostDisconnected();
 		window.removeEventListener('navigationend', this.#onNavigationEnd);
-		this.#onNavigationEnd.cancel();
 	}
 
 	/**

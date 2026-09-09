@@ -24,6 +24,8 @@ public class UmbracoDatabase : Database, IUmbracoDatabase
     private readonly IBulkSqlInsertProvider? _bulkSqlInsertProvider;
     private readonly DatabaseSchemaCreatorFactory? _databaseSchemaCreatorFactory;
     private readonly IEnumerable<IMapper>? _mapperCollection;
+    private readonly DbProviderFactory? _provider;
+    private readonly Lazy<int?> _configuredCommandTimeout;
     private readonly Guid _instanceGuid = Guid.NewGuid();
     private List<CommandInfo>? _commands;
 
@@ -58,6 +60,8 @@ public class UmbracoDatabase : Database, IUmbracoDatabase
         _bulkSqlInsertProvider = bulkSqlInsertProvider;
         _databaseSchemaCreatorFactory = databaseSchemaCreatorFactory;
         _mapperCollection = mapperCollection;
+        _provider = provider;
+        _configuredCommandTimeout = CreateConfiguredCommandTimeout();
 
         Init();
     }
@@ -76,6 +80,7 @@ public class UmbracoDatabase : Database, IUmbracoDatabase
         SqlContext = sqlContext;
         _logger = logger;
         _bulkSqlInsertProvider = bulkSqlInsertProvider;
+        _configuredCommandTimeout = CreateConfiguredCommandTimeout();
 
         Init();
     }
@@ -95,9 +100,21 @@ public class UmbracoDatabase : Database, IUmbracoDatabase
         InitCommandTimeout();
     }
 
-    // https://github.com/umbraco/Umbraco-CMS/issues/13354
-    // This sets the Database Command to connectionString Connection Timeout /  Connect Timeout
-    // This could be better, ideally the UmbracoDatabaseFactory.CreateDatabase() function would set this based on a setting (global or connectionstring setting)
+    /// <summary>
+    ///     Applies Umbraco's own command timeout override, if it has one.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         NPoco forces a non-zero <see cref="Database.CommandTimeout" /> onto every command, so leaving it
+    ///         at zero is what allows the timeout the provider derived from the connection string to stand.
+    ///     </para>
+    ///     <para>
+    ///         The single remaining override is the deprecated convention, introduced for
+    ///         <see href="https://github.com/umbraco/Umbraco-CMS/issues/13354">#13354</see> before providers
+    ///         exposed a command timeout keyword, by which a connect timeout in the connection string also
+    ///         lengthened the command timeout. It applies only where no command timeout is configured.
+    ///     </para>
+    /// </remarks>
     private void InitCommandTimeout()
     {
         if (CommandTimeout != 0)
@@ -106,42 +123,39 @@ public class UmbracoDatabase : Database, IUmbracoDatabase
             return;
         }
 
-        if (Connection is not null && Connection.ConnectionTimeout > 0)
+        // TODO (V19): remove; deriving the command timeout from the connect timeout is deprecated.
+#pragma warning disable CS0618 // Type or member is obsolete
+        if (CommandTimeoutResolver.TryGetDeprecatedConnectTimeout(_provider, ConnectionString, out var timeout, out var keyword))
+#pragma warning restore CS0618 // Type or member is obsolete
         {
-            CommandTimeout = Connection.ConnectionTimeout;
-            return;
-        }
-
-        // get from ConnectionString
-        var connectionParser = new DbConnectionStringBuilder
-        {
-            ConnectionString = ConnectionString
-        };
-
-        if (connectionParser.TryGetValue("connection timeout", out var connectionTimeoutString))
-        {
-            if (int.TryParse(connectionTimeoutString.ToString(), out var connectionTimeout))
+            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Trace))
             {
-                _logger.LogTrace("Setting Command Timeout to value configured in connectionstring Connection Timeout : {TimeOut} seconds", connectionTimeout);
-                CommandTimeout = connectionTimeout;
-                return;
+                _logger.LogTrace(
+                    "Applying the connection string \"{Keyword}\" value of {Timeout} seconds as the command timeout.",
+                    keyword,
+                    timeout);
             }
-        }
 
-        if (connectionParser.TryGetValue("connect timeout", out var connectTimeoutString))
-        {
-            if (int.TryParse(connectTimeoutString.ToString(), out var connectionTimeout))
-            {
-                _logger.LogTrace("Setting Command Timeout to value configured in connectionstring Connect Timeout : {TimeOut} seconds", connectionTimeout);
-                CommandTimeout = connectionTimeout;
-            }
+            CommandTimeout = timeout;
         }
     }
+
+    private Lazy<int?> CreateConfiguredCommandTimeout()
+        => new(() => CommandTimeoutResolver.GetConfiguredCommandTimeout(_provider, ConnectionString));
 
     #endregion
 
     /// <inheritdoc />
     public ISqlContext SqlContext { get; }
+
+    /// <summary>
+    ///     Gets the command timeout, in seconds, that applies to commands created by this database:
+    ///     <see cref="Database.CommandTimeout" /> when set, otherwise the timeout the underlying provider
+    ///     derives from the connection string.
+    /// </summary>
+    /// <remarks>Zero means no limit. <c>null</c> means the timeout could not be determined.</remarks>
+    internal int? EffectiveCommandTimeout
+        => CommandTimeout > 0 ? CommandTimeout : _configuredCommandTimeout.Value;
 
     #region Testing, Debugging and Troubleshooting
 
@@ -324,12 +338,6 @@ public class UmbracoDatabase : Database, IUmbracoDatabase
 
     protected override void OnExecutingCommand(DbCommand cmd)
     {
-        // if no timeout is specified, and the connection has a longer timeout, use it
-        if (OneTimeCommandTimeout == 0 && CommandTimeout == 0 && cmd.Connection?.ConnectionTimeout > 30)
-        {
-            cmd.CommandTimeout = cmd.Connection.ConnectionTimeout;
-        }
-
         if (EnableSqlTrace)
         {
             if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))

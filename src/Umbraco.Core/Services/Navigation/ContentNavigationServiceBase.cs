@@ -196,6 +196,17 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
         => TryGetChildrenKeysFromStructure(_navigation.Structure, parentKey, out childrenKeys);
 
     /// <summary>
+    ///    Attempts to determine if a parent node has any children in the main navigation structure.
+    /// </summary>
+    /// <param name="parentKey">The unique identifier of the parent node.</param>
+    /// <param name="hasChildren">
+    ///     When this method returns, contains a value indicating whether the parent node has any children.
+    /// </param>
+    /// <returns><c>true</c> if the parent node exists in the structure; otherwise, <c>false</c>.</returns>
+    public bool TryGetHasChildren(Guid parentKey, out bool hasChildren)
+        => TryGetHasChildrenFromStructure(_navigation.Structure, parentKey, out hasChildren);
+
+    /// <summary>
     ///     Attempts to get all child node keys of a specific content type under a parent node.
     /// </summary>
     /// <param name="parentKey">The unique identifier of the parent node.</param>
@@ -360,6 +371,17 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
     /// <returns><c>true</c> if the parent node exists in the recycle bin; otherwise, <c>false</c>.</returns>
     public bool TryGetChildrenKeysInBin(Guid parentKey, out IEnumerable<Guid> childrenKeys)
         => TryGetChildrenKeysFromStructure(_recycleBinNavigation.Structure, parentKey, out childrenKeys);
+
+    /// <summary>
+    ///    Attempts to determine if a parent node has any children in the recycle bin navigation structure.
+    /// </summary>
+    /// <param name="parentKey">The unique identifier of the parent node in the recycle bin.</param>
+    /// <param name="hasChildren">
+    ///     When this method returns, contains a value indicating whether the parent node has any children.
+    /// </param>
+    /// <returns><c>true</c> if the parent node exists in the recycle bin; otherwise, <c>false</c>.</returns>
+    public bool TryGetHasChildrenInBin(Guid parentKey, out bool hasChildren)
+        => TryGetHasChildrenFromStructure(_recycleBinNavigation.Structure, parentKey, out hasChildren);
 
     /// <summary>
     ///     Attempts to get all descendant node keys of a parent node in the recycle bin navigation structure.
@@ -768,6 +790,24 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
         keysWithSortOrder.Sort((a, b) => a.SortOrder.CompareTo(b.SortOrder));
         rootKeys = keysWithSortOrder.ConvertAll(keyWithSortOrder => keyWithSortOrder.Key);
 
+        return true;
+    }
+
+    private static bool TryGetHasChildrenFromStructure(
+        ConcurrentDictionary<Guid, NavigationNode> structure,
+        Guid parentKey,
+        out bool hasChildren)
+    {
+        if (structure.TryGetValue(parentKey, out NavigationNode? parentNode) is false)
+        {
+            // Parent doesn't exist
+            hasChildren = false;
+            return false;
+        }
+
+        // Deliberately not via GetOrderedChildren, which builds and caches a sorted array of the
+        // child keys - needless work when only their existence matters.
+        hasChildren = parentNode.Children.Count > 0;
         return true;
     }
 
