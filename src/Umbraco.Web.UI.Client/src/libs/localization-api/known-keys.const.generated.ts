@@ -456,7 +456,6 @@ export const KNOWN_LOCALIZATION_KEYS: readonly UmbKnownLocalizationKey[] = [
 	'content_isPublished',
 	'content_isSensitiveValue',
 	'content_isSensitiveValue_short',
-	'content_isSensitiveValueNotice',
 	'content_itemChanged',
 	'content_itemNotPublished',
 	'content_languagesToPublish',

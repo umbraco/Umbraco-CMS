@@ -16,13 +16,17 @@ export class UmbLinkPickerMediaRefElement extends UmbLinkPickerLinkRefElement {
 	#urlRepository = new UmbMediaUrlRepository(this);
 
 	protected override async _requestName(unique: string) {
-		const { data } = await this.#itemRepository.requestItems([unique]);
-		return data?.[0]?.name;
+		const { data, error } = await this.#itemRepository.requestItems([unique]);
+		if (error) return { error };
+
+		return { value: data?.[0]?.name };
 	}
 
 	protected override async _requestUrl(unique: string) {
-		const { data } = await this.#urlRepository.requestItems([unique]);
-		return data?.[0]?.url;
+		const { data, error } = await this.#urlRepository.requestItems([unique]);
+		if (error) return { error };
+
+		return { value: data?.[0]?.url };
 	}
 }
 

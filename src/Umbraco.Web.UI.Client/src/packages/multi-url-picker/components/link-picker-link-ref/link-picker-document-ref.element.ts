@@ -21,18 +21,21 @@ export class UmbLinkPickerDocumentRefElement extends UmbLinkPickerLinkRefElement
 	#urlsDataResolver = new UmbDocumentUrlsDataResolver(this);
 
 	protected override async _requestName(unique: string) {
-		const { data } = await this.#itemRepository.requestItems([unique]);
+		const { data, error } = await this.#itemRepository.requestItems([unique]);
+		if (error) return { error };
+
 		// TODO: [v17] Review usage of `item.variants[0].name` as this needs to be implemented properly! [LK]
-		return data?.[0]?.variants[0].name;
+		return { value: data?.[0]?.variants[0].name };
 	}
 
 	protected override async _requestUrl(unique: string) {
-		const { data } = await this.#urlRepository.requestItems([unique]);
+		const { data, error } = await this.#urlRepository.requestItems([unique]);
+		if (error) return { error };
 
 		this.#urlsDataResolver.setData(data?.[0]?.urls);
 
 		const urls = await this.#urlsDataResolver.getUrls();
-		return urls?.[0]?.url;
+		return { value: urls?.[0]?.url };
 	}
 }
 

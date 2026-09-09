@@ -1,4 +1,6 @@
 import type { UmbLinkPickerLink } from '../../link-picker-modal/types.js';
+import { UMB_LINK_PICKER_LINK_REF_ATTRIBUTE } from './constants.js';
+import type { UmbLinkPickerLinkRefLookup } from './types.js';
 import { css, customElement, html, ifDefined, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
@@ -10,6 +12,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
  * implements the lookups; each element holds on to what it resolved, so the list it sits in can render
  * and re-order again without the same information being requested twice.
  * @element umb-link-picker-link-ref
+ * @attr name - The name this link is displayed under. Set by the element, not by its consumer.
  * @slot actions - The actions available for this link.
  */
 @customElement('umb-link-picker-link-ref')
@@ -22,9 +25,7 @@ export class UmbLinkPickerLinkRefElement extends UmbLitElement {
 	 */
 	@property({ type: Object, attribute: false })
 	public set link(value: UmbLinkPickerLink | undefined) {
-		const previous = this.#link;
 		this.#link = value;
-		this.requestUpdate('link', previous);
 		this.#resolveName();
 		this.#resolveUrl();
 	}
@@ -67,16 +68,33 @@ export class UmbLinkPickerLinkRefElement extends UmbLitElement {
 		return this.#link?.name || this._resolvedName || '';
 	}
 
+	/**
+	 * The URL this link is displayed with, which is the URL of the item it points at where that had to
+	 * be resolved and the one it carries itself otherwise, plus any query string.
+	 * @returns {string} The URL shown for this link, or an empty string while it is still unknown.
+	 */
+	public get displayUrl(): string {
+		const link = this.#link;
+		if (!link) return '';
+		return (this._resolvedUrl ?? link.url ?? '') + (link.queryString || '');
+	}
+
+	// A link falls back to showing its URL until it has a name to show.
+	get #label(): string {
+		return this.displayName || this.displayUrl;
+	}
+
 	@state()
 	protected _resolvedName?: string;
 
 	@state()
 	protected _resolvedUrl?: string;
 
-	// What is looked up for a link is derived from its unique, so it is only looked up once. A unique is
-	// marked before its lookup starts, so re-assigning the same link — which happens on every render of
-	// the list this element sits in, a re-order included — neither fires a second request nor waits for
-	// one, and un-marked again when nothing came back, so a lookup that failed can be retried.
+	// What is looked up for a link is derived from its unique, so it is only looked up once per unique.
+	// A unique is marked before its lookup starts, so re-assigning the same link — which happens on
+	// every render of the list this element sits in, a re-order included — neither fires a second
+	// request nor waits for one. It is un-marked again only when the lookup could not be performed, so
+	// that one can be retried; a lookup that came back with nothing has answered and is not repeated.
 	#requestedName?: string;
 	#requestedUrl?: string;
 
@@ -85,17 +103,20 @@ export class UmbLinkPickerLinkRefElement extends UmbLitElement {
 		const unique = link?.unique;
 		if (!unique || link.name || unique === this.#requestedName) return;
 
+		// Reaching here means this is a unique that has not been looked up, so anything resolved for the
+		// one before it no longer describes this link.
+		this._resolvedName = undefined;
 		this.#requestedName = unique;
 
-		const name = await this._requestName(unique);
+		const { value, error } = await this._requestName(unique);
 		if (this.#requestedName !== unique) return;
 
-		if (!name) {
+		if (error) {
 			this.#requestedName = undefined;
 			return;
 		}
 
-		this._resolvedName = name;
+		this._resolvedName = value;
 	}
 
 	async #resolveUrl() {
@@ -104,37 +125,57 @@ export class UmbLinkPickerLinkRefElement extends UmbLitElement {
 		// A link picked for a specific culture carries the URL of that culture already.
 		if (!unique || link.culture || unique === this.#requestedUrl) return;
 
+		this._resolvedUrl = undefined;
 		this.#requestedUrl = unique;
 
-		const url = await this._requestUrl(unique);
+		const { value, error } = await this._requestUrl(unique);
 		if (this.#requestedUrl !== unique) return;
 
-		if (!url) {
+		if (error) {
 			this.#requestedUrl = undefined;
 			return;
 		}
 
-		this._resolvedUrl = url;
+		this._resolvedUrl = value;
 	}
 
 	/**
 	 * Requests the name of the item this link points at. Resolves to nothing unless a link type that
 	 * has a name to look up implements it.
 	 * @param {string} _unique The unique of the item this link points at.
-	 * @returns {Promise<string | undefined>} The name of the item, or undefined when it has none.
+	 * @returns {Promise<UmbLinkPickerLinkRefLookup>} The name of the item, or the error that stopped
+	 * it from being looked up.
 	 */
-	protected async _requestName(_unique: string): Promise<string | undefined> {
-		return undefined;
+	protected async _requestName(_unique: string): Promise<UmbLinkPickerLinkRefLookup> {
+		return {};
 	}
 
 	/**
 	 * Requests the URL of the item this link points at. Resolves to nothing unless a link type that
 	 * has a URL to look up implements it.
 	 * @param {string} _unique The unique of the item this link points at.
-	 * @returns {Promise<string | undefined>} The URL of the item, or undefined when it has none.
+	 * @returns {Promise<UmbLinkPickerLinkRefLookup>} The URL of the item, or the error that stopped it
+	 * from being looked up.
 	 */
-	protected async _requestUrl(_unique: string): Promise<string | undefined> {
-		return undefined;
+	protected async _requestUrl(_unique: string): Promise<UmbLinkPickerLinkRefLookup> {
+		return {};
+	}
+
+	// Marks this element as one of the link refs, so a consumer that addresses the rendered links as a
+	// group — the sorter of the list they sit in, for instance — reaches every link type, including the
+	// ones added after it. Set on connect rather than on first render, so it is already there when an
+	// observer of the list is notified of this element being inserted.
+	override connectedCallback() {
+		super.connectedCallback();
+		this.toggleAttribute(UMB_LINK_PICKER_LINK_REF_ATTRIBUTE, true);
+	}
+
+	// The name is reflected onto this element rather than left on the ref node it renders, so that the
+	// element identified by the name is also the one the actions are slotted into — which is what a
+	// consumer addressing a link by its name and reaching for one of its actions relies on.
+	protected override updated(changedProperties: Map<PropertyKey, unknown>) {
+		super.updated(changedProperties);
+		this.setAttribute('name', this.#label);
 	}
 
 	override render() {
@@ -142,12 +183,11 @@ export class UmbLinkPickerLinkRefElement extends UmbLitElement {
 		if (!link) return nothing;
 
 		const name = this.displayName;
-		const url = (this._resolvedUrl ?? link.url ?? '') + (link.queryString || '');
 
 		return html`
 			<uui-ref-node
-				name=${name || url}
-				detail=${ifDefined(name ? url : undefined)}
+				.name=${this.#label}
+				detail=${ifDefined(name ? this.displayUrl : undefined)}
 				href=${ifDefined(this.href)}
 				?readonly=${this.readonly}
 				?standalone=${this.standalone}>
