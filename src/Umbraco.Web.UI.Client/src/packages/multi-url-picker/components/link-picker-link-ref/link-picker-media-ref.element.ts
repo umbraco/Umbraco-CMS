@@ -12,8 +12,8 @@ import { UmbMediaItemRepository, UmbMediaUrlRepository } from '@umbraco-cms/back
  */
 @customElement('umb-link-picker-media-ref')
 export class UmbLinkPickerMediaRefElement extends UmbLinkPickerLinkRefElement {
-	#itemRepository = new UmbMediaItemRepository(this);
-	#urlRepository = new UmbMediaUrlRepository(this);
+	readonly #itemRepository = new UmbMediaItemRepository(this);
+	readonly #urlRepository = new UmbMediaUrlRepository(this);
 
 	protected override async _requestName(unique: string) {
 		const { data, error } = await this.#itemRepository.requestItems([unique]);

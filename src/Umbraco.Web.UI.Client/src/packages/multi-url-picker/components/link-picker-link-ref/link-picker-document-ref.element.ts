@@ -16,9 +16,9 @@ import {
  */
 @customElement('umb-link-picker-document-ref')
 export class UmbLinkPickerDocumentRefElement extends UmbLinkPickerLinkRefElement {
-	#itemRepository = new UmbDocumentItemRepository(this);
-	#urlRepository = new UmbDocumentUrlRepository(this);
-	#urlsDataResolver = new UmbDocumentUrlsDataResolver(this);
+	readonly #itemRepository = new UmbDocumentItemRepository(this);
+	readonly #urlRepository = new UmbDocumentUrlRepository(this);
+	readonly #urlsDataResolver = new UmbDocumentUrlsDataResolver(this);
 
 	protected override async _requestName(unique: string) {
 		const { data, error } = await this.#itemRepository.requestItems([unique]);

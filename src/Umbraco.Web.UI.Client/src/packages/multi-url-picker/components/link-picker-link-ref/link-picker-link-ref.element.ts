@@ -202,7 +202,7 @@ export class UmbLinkPickerLinkRefElement extends UmbLitElement {
 		`;
 	}
 
-	static override styles = [
+	static override readonly styles = [
 		css`
 			/* A ref list draws its separators as absolutely positioned pseudo elements on the items it
 			   slots, so an item has to be a containing block of its own. */
