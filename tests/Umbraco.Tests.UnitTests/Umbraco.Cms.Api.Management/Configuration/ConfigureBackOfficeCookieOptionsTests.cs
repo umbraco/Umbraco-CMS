@@ -314,6 +314,8 @@ public class ConfigureBackOfficeCookieOptionsTests
     }
 
     // Missing required back-office claims (GivenName, Locality, SecurityStamp), so GetUmbracoIdentity() rejects it as not a valid back-office identity.
+    private static ClaimsPrincipal CreateInvalidBackOfficePrincipal()
+    {
         var identity = new ClaimsIdentity(
             Constants.Security.BackOfficeAuthenticationType,
             ClaimTypes.Name,
