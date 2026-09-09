@@ -46,6 +46,7 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 	#ancestorContext = new UmbAncestorsEntityContext(this);
 	#sectionSidebarMenuContext?: typeof UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT.TYPE;
 	#isModalContext: boolean = false;
+	#isNew: boolean | undefined = undefined;
 	#variantWorkspaceContext?: typeof UMB_VARIANT_WORKSPACE_CONTEXT.TYPE;
 	#workspaceActiveVariantId?: UmbVariantId;
 	#actionEventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
@@ -105,9 +106,16 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 			this.observe(
 				this.#workspaceContext?.isNew,
 				(isNew) => {
-					if (isNew === false) {
+					// The item has just been created: the structure fetched while new was based on the create-under
+					// parent's identity (the item didn't exist yet), so it must be re-fetched using the item's own
+					// identity - otherwise parent/ancestor data downstream keeps describing the parent it was
+					// created under rather than the entity that now actually exists.
+					if (isNew === false && this.#isNew === true) {
+						this.#requestStructure();
+					} else if (isNew === false) {
 						this.#tryExpandSectionSidebarMenu();
 					}
+					this.#isNew = isNew;
 				},
 				'observeIsNew',
 			);
