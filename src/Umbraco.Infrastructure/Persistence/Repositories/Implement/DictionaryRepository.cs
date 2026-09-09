@@ -212,13 +212,13 @@ internal sealed class DictionaryRepository : EntityRepositoryBase<int, IDictiona
             // Then fetch ALL translations for those items
             sql.Where(
                 $"({QuotedColumn("key")} LIKE @0 OR {QuotedColumn("id")} IN (SELECT DISTINCT {QuoteColumnName("UniqueId")} FROM {QuoteTableName(LanguageTextDto.TableName)} WHERE {QuoteColumnName("value")} LIKE @1))",
-                $"{filter}%",
+                $"%{filter}%",
                 $"%{filter}%");
         }
         else
         {
             // Search only in keys
-            sql.Where<DictionaryDto>(x => x.Key.StartsWith(filter));
+            sql.Where<DictionaryDto>(x => x.Key.Contains(filter));
         }
     }
 

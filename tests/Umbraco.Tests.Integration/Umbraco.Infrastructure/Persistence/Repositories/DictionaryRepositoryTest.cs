@@ -649,6 +649,39 @@ internal sealed class DictionaryRepositoryTest : UmbracoIntegrationTest
         }
     }
 
+    /// <summary>
+    /// Verifies that <see cref="IDictionaryRepository.GetDictionaryItemDescendants"/> matches the filter
+    /// anywhere in the dictionary item key, not only at the start of it.
+    /// </summary>
+    [TestCase(true)]
+    [TestCase(false)]
+    public async Task GetDictionaryItemDescendants_Matches_Filter_Anywhere_In_Key(bool enableValueSearch)
+    {
+        // Arrange - a key whose middle segment does not occur in any of its translation values,
+        // so only a key match can satisfy the filter regardless of the value search setting.
+        var languageService = GetRequiredService<ILanguageService>();
+        var dictionaryItemService = GetRequiredService<IDictionaryItemService>();
+        var language = await languageService.GetAsync("en-US");
+
+        await dictionaryItemService.CreateAsync(
+            new DictionaryItem("AlphaBravoCharlie")
+            {
+                Translations = new List<IDictionaryTranslation> { new DictionaryTranslation(language, "Delta") }
+            },
+            Constants.Security.SuperUserKey);
+
+        var repository = CreateRepositoryWithCache(AppCaches.Create(Mock.Of<IRequestCache>()), enableValueSearch);
+
+        using (ScopeProvider.CreateScope())
+        {
+            // Act
+            var results = repository.GetDictionaryItemDescendants(null, "Bravo").ToArray();
+
+            // Assert
+            Assert.That(results.Select(x => x.ItemKey), Is.EqualTo(new[] { "AlphaBravoCharlie" }));
+        }
+    }
+
     public async Task CreateTestData()
     {
         var languageService = GetRequiredService<ILanguageService>();
