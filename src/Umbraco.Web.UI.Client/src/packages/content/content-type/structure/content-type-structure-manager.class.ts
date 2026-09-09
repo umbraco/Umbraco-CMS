@@ -97,13 +97,6 @@ export class UmbContentTypeStructureManager<
 	readonly ownerContentTypeName = createObservablePart(this.ownerContentType, (x) => x?.name);
 	readonly ownerContentTypeCompositions = createObservablePart(this.ownerContentType, (x) => x?.compositions);
 
-	/**
-	 * The Content Types of this structure as they are currently stored on the server.
-	 * Local, unsaved edits are not reflected here, which makes this the reference point for
-	 * determining what a save will change.
-	 */
-	readonly persistedContentTypes = this.#persistedContentTypes.asObservable();
-
 	// TODO: for v.18 make it pausable for this to be undefined when no content-type are present. [NL]
 	readonly contentTypeCompositions = this.#contentTypes.asObservablePart((contentTypes) => {
 		return contentTypes.flatMap((x) => x.compositions ?? []);
@@ -847,33 +840,21 @@ export class UmbContentTypeStructureManager<
 
 	/**
 	 * The property as it is currently stored on the server, looked up across the whole structure.
-	 * Emits undefined for a property that is not (yet) stored on the server.
+	 * Local, unsaved edits are not reflected here, which makes it the reference point for determining
+	 * what a save will change. Emits undefined for a property that is not (yet) stored on the server.
 	 * @param {string} propertyUnique - The unique of the property.
 	 * @returns {Observable<UmbPropertyTypeModel | undefined>} - An observable of the persisted property.
 	 */
 	persistedPropertyById(propertyUnique: string): Observable<UmbPropertyTypeModel | undefined> {
-		return this.#persistedContentTypes.asObservablePart((contentTypes) =>
-			this.#findPropertyById(contentTypes, propertyUnique),
-		);
-	}
-
-	/**
-	 * The property as it is currently stored on the server, looked up across the whole structure.
-	 * @param {string} propertyUnique - The unique of the property.
-	 * @returns {UmbPropertyTypeModel | undefined} - The persisted property, or undefined if it is not stored on the server.
-	 */
-	getPersistedPropertyById(propertyUnique: string): UmbPropertyTypeModel | undefined {
-		return this.#findPropertyById(this.#persistedContentTypes.getValue(), propertyUnique);
-	}
-
-	#findPropertyById(contentTypes: Array<T>, propertyUnique: string): UmbPropertyTypeModel | undefined {
-		for (const contentType of contentTypes) {
-			const property = contentType.properties?.find((x) => x.unique === propertyUnique);
-			if (property) {
-				return property;
+		return this.#persistedContentTypes.asObservablePart((contentTypes) => {
+			for (const contentType of contentTypes) {
+				const foundProp = contentType.properties?.find((property) => property.unique === propertyUnique);
+				if (foundProp) {
+					return foundProp;
+				}
 			}
-		}
-		return undefined;
+			return undefined;
+		});
 	}
 
 	async getPropertyStructureById(propertyUnique: string) {

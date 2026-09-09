@@ -93,6 +93,18 @@ describe('UmbContentTypeDesignEditorPropertyElement', () => {
 		expect(notice()).to.not.exist;
 	});
 
+	it('stops warning when the structure helper is taken away', async () => {
+		await setup('headline', 'title');
+		expect(notice()).to.exist;
+
+		element.propertyStructureHelper = undefined;
+
+		await aTimeout(0);
+		await element.updateComplete;
+
+		expect(notice()).to.not.exist;
+	});
+
 	it('does not warn when the owner is not an Element Type', async () => {
 		await setup('headline', 'title');
 		helper.manager.setIsElement(false);

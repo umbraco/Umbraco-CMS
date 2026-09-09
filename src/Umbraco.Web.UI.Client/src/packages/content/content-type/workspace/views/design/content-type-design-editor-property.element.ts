@@ -106,23 +106,25 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 	#observePersistedProperty() {
 		const structure = this._propertyStructureHelper?.getStructureManager();
 		const unique = this._property?.unique;
-		if (!structure || !unique) return;
 		// The helper outlives its structure manager, which is set - and can be replaced - after construction.
 		if (unique === this.#observedPropertyUnique && structure === this.#observedStructureManager) return;
 		this.#observedPropertyUnique = unique;
 		this.#observedStructureManager = structure;
 
+		// Passing no source removes the observer and calls back with undefined, which resets the state.
 		this.observe(
-			structure.ownerContentTypeObservablePart((contentType) => contentType?.isElement === true),
+			structure && unique
+				? structure.ownerContentTypeObservablePart((contentType) => contentType?.isElement === true)
+				: undefined,
 			(isElement) => {
-				this.#ownerIsElement = isElement;
+				this.#ownerIsElement = isElement === true;
 				this.#updateAliasRenamed();
 			},
 			'observeOwnerIsElement',
 		);
 
 		this.observe(
-			structure.persistedPropertyById(unique),
+			structure && unique ? structure.persistedPropertyById(unique) : undefined,
 			(property) => {
 				this.#persistedAlias = property?.alias;
 				this.#updateAliasRenamed();
