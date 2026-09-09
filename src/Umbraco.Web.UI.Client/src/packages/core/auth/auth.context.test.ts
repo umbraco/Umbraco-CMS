@@ -205,6 +205,24 @@ describe('UmbAuthContext', () => {
 			await aTimeout(50);
 		}
 
+		// A session can be established before anything provides a modal manager — a peer tab
+		// broadcasting one while this tab is still booting. Dismissing the timeout modal is a no-op
+		// then, and must stay one rather than surfacing as a rejection nobody handles.
+		it('does not float a rejection when a session arrives with no modal manager to dismiss', async () => {
+			const rejections: Array<unknown> = [];
+			const collectRejection = (event: PromiseRejectionEvent) => rejections.push(event.reason);
+			window.addEventListener('unhandledrejection', collectRejection);
+
+			try {
+				await establishSession();
+				await aTimeout(50);
+			} finally {
+				window.removeEventListener('unhandledrejection', collectRejection);
+			}
+
+			expect(rejections).to.be.empty;
+		});
+
 		it('slides the expiry forward when a request succeeds', async () => {
 			const expiresAt = await establishSession();
 
