@@ -4,6 +4,7 @@ export * from './property-dataset-property-validator/index.js';
 export * from './property-dataset/index.js';
 export * from './property-guard-manager/index.js';
 export * from './property-value-cloner/property-value-clone.controller.js';
+export * from './property-value-entity-reference/property-value-entity-references.controller.js';
 export * from './property-value-flat-mapper/index.js';
 export * from './property-value-preset/index.js';
 

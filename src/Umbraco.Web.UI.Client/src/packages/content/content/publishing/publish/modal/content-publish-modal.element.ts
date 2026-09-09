@@ -6,9 +6,11 @@ import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbPublishableVariantState } from '@umbraco-cms/backoffice/variant';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import type { UmbEntityReferencesConfig } from '@umbraco-cms/backoffice/relations';
 import type { UmbEntityVariantOptionModel } from '@umbraco-cms/backoffice/variant';
 
 import '../../../variant-picker/content-variant-language-picker.element.js';
+import '@umbraco-cms/backoffice/relations';
 
 @customElement('umb-content-publish-modal')
 export class UmbContentPublishModalElement extends UmbModalBaseElement<
@@ -26,6 +28,9 @@ export class UmbContentPublishModalElement extends UmbModalBaseElement<
 	@state()
 	private _isInvariant = false;
 
+	@state()
+	private _referencesConfig?: UmbEntityReferencesConfig;
+
 	readonly #pickableFilter = (option: UmbEntityVariantOptionModel) => {
 		if (!option.variant || option.variant.state === UmbPublishableVariantState.NOT_CREATED) {
 			return false;
@@ -34,6 +39,8 @@ export class UmbContentPublishModalElement extends UmbModalBaseElement<
 	};
 
 	override firstUpdated() {
+		this.#configureReferences();
+
 		// If invariant, don't display the variant selection component.
 		if (this.data?.options.length === 1 && this.data.options[0].culture === null) {
 			this._isInvariant = true;
@@ -41,6 +48,16 @@ export class UmbContentPublishModalElement extends UmbModalBaseElement<
 		}
 
 		this.#configureSelectionManager();
+	}
+
+	#configureReferences() {
+		if (!this.data) return;
+		const { unique, itemRepositoryAlias, referenceRepositoryAlias } = this.data;
+		if (!unique) return;
+		if (!itemRepositoryAlias) return;
+		if (!referenceRepositoryAlias) return;
+
+		this._referencesConfig = { unique, itemRepositoryAlias, referenceRepositoryAlias };
 	}
 
 	async #configureSelectionManager() {
@@ -90,24 +107,29 @@ export class UmbContentPublishModalElement extends UmbModalBaseElement<
 		return html`
 			<uui-dialog-layout headline=${headline}>
 				<p><umb-localize key="prompt_confirmPublish"></umb-localize></p>
-
 				${when(
 					!this._isInvariant,
-					() =>
-						html`<umb-content-variant-language-picker
+					() => html`
+						<umb-content-variant-language-picker
 							.selectionManager=${this.#selectionManager}
 							.variantLanguageOptions=${this._options}
 							.requiredFilter=${isNotPublishedMandatory}
-							.pickableFilter=${this.#pickableFilter}></umb-content-variant-language-picker>`,
+							.pickableFilter=${this.#pickableFilter}></umb-content-variant-language-picker>
+					`,
 				)}
-
+				${when(
+					this._referencesConfig,
+					() =>
+						html`<umb-entity-references-summary
+							.config=${this._referencesConfig}
+							.entitiesNeedingAttention=${this.data
+								?.entitiesNeedingAttention}></umb-entity-references-summary>`,
+				)}
 				<div slot="actions">
 					<uui-button label=${this.localize.term('general_close')} @click=${this.#close}></uui-button>
 					<uui-button
 						${umbFocus()}
-						label="${this.data?.confirmLabel
-							? this.localize.string(this.data.confirmLabel)
-							: this.localize.term('buttons_saveAndPublish')}"
+						label=${this.localize.string(this.data?.confirmLabel || '#buttons_saveAndPublish')}
 						look="primary"
 						color="positive"
 						?disabled=${this._hasNotSelectedMandatory}
@@ -124,6 +146,10 @@ export class UmbContentPublishModalElement extends UmbModalBaseElement<
 				display: block;
 				min-width: 460px;
 				max-width: 90vw;
+			}
+
+			umb-content-variant-language-picker {
+				margin-bottom: var(--uui-size-3);
 			}
 		`,
 	];

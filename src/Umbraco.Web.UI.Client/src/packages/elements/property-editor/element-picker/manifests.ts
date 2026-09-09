@@ -1,6 +1,8 @@
 ﻿import { manifest as schemaManifest } from './Umbraco.ElementPicker.js';
 import { manifests as valueSummaryManifests } from './value-summary/manifests.js';
+import { UmbElementPickerPropertyValueEntityReferenceResolver } from './property-value-entity-reference/element-picker-property-value-entity-reference.resolver.js';
 import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/property-editor';
+import type { ManifestPropertyValueEntityReference } from '@umbraco-cms/backoffice/property';
 
 const propertyEditorUi: ManifestPropertyEditorUi = {
 	type: 'propertyEditorUi',
@@ -47,4 +49,17 @@ const propertyEditorUi: ManifestPropertyEditorUi = {
 	},
 };
 
-export const manifests: Array<UmbExtensionManifest> = [propertyEditorUi, schemaManifest, ...valueSummaryManifests];
+const propertyValueEntityReference: ManifestPropertyValueEntityReference = {
+	type: 'propertyValueEntityReference',
+	alias: 'Umb.PropertyValueEntityReference.ElementPicker',
+	name: 'Element Picker Entity Reference Resolver',
+	api: UmbElementPickerPropertyValueEntityReferenceResolver,
+	forEditorAlias: schemaManifest.alias,
+};
+
+export const manifests: Array<UmbExtensionManifest> = [
+	propertyEditorUi,
+	schemaManifest,
+	propertyValueEntityReference,
+	...valueSummaryManifests,
+];
