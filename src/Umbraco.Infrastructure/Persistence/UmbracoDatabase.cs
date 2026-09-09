@@ -96,48 +96,6 @@ public class UmbracoDatabase : Database, IUmbracoDatabase
                 Mappers.Add(mapper);
             }
         }
-
-        InitCommandTimeout();
-    }
-
-    /// <summary>
-    ///     Applies Umbraco's own command timeout override, if it has one.
-    /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         NPoco forces a non-zero <see cref="Database.CommandTimeout" /> onto every command, so leaving it
-    ///         at zero is what allows the timeout the provider derived from the connection string to stand.
-    ///     </para>
-    ///     <para>
-    ///         The single remaining override is the deprecated convention, introduced for
-    ///         <see href="https://github.com/umbraco/Umbraco-CMS/issues/13354">#13354</see> before providers
-    ///         exposed a command timeout keyword, by which a connect timeout in the connection string also
-    ///         lengthened the command timeout. It applies only where no command timeout is configured.
-    ///     </para>
-    /// </remarks>
-    private void InitCommandTimeout()
-    {
-        if (CommandTimeout != 0)
-        {
-            // CommandTimeout configured elsewhere, so we'll skip
-            return;
-        }
-
-        // TODO (V19): remove; deriving the command timeout from the connect timeout is deprecated.
-#pragma warning disable CS0618 // Type or member is obsolete
-        if (CommandTimeoutResolver.TryGetDeprecatedConnectTimeout(_provider, ConnectionString, out var timeout, out var keyword))
-#pragma warning restore CS0618 // Type or member is obsolete
-        {
-            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Trace))
-            {
-                _logger.LogTrace(
-                    "Applying the connection string \"{Keyword}\" value of {Timeout} seconds as the command timeout.",
-                    keyword,
-                    timeout);
-            }
-
-            CommandTimeout = timeout;
-        }
     }
 
     private Lazy<int?> CreateConfiguredCommandTimeout()

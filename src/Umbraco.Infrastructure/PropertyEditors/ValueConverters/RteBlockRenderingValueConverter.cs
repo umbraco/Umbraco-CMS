@@ -29,7 +29,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 ///     A value converter for TinyMCE that will ensure any blocks content are rendered properly even when
 ///     used dynamically.
 /// </summary>
-[DefaultPropertyValueConverter]
+[DefaultPropertyValueConverter(typeof(SimpleRichTextValueConverter))]
 public class RteBlockRenderingValueConverter : SimpleRichTextValueConverter, IDeliveryApiPropertyValueConverter, IDisposable
 {
     private readonly HtmlImageSourceParser _imageSourceParser;
