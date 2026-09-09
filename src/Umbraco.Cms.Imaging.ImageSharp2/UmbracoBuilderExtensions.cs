@@ -59,6 +59,12 @@ public static class UmbracoBuilderExtensions
 
         if (options.MaximumPoolSizeMegabytes.HasValue || options.AllocationLimitMegabytes.HasValue)
         {
+            // One allocator, shared process-wide, as the imaging library advises. Its documented
+            // sample clones the configuration instead, but a clone would leave Configuration.Default
+            // on its own allocator, so anything using that directly would pool separately. Assigned
+            // once per host build, so a process building several - the test harness - replaces it
+            // rather than accumulating them.
+            // https://docs.sixlabors.com/articles/imagesharp/memorymanagement.html#customize-the-allocator
             Configuration.Default.MemoryAllocator = MemoryAllocator.Create(options);
 
             logger.LogInformation(
