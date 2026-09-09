@@ -27,10 +27,13 @@ internal sealed class DictionaryRepositoryTest : UmbracoIntegrationTest
 
     private IDictionaryRepository CreateRepository() => GetRequiredService<IDictionaryRepository>();
 
-    private IDictionaryRepository CreateRepositoryWithCache(AppCaches cache, bool enableValueSearch = false)
+    private IDictionaryRepository CreateRepositoryWithCache(
+        AppCaches cache,
+        bool enableValueSearch = false,
+        DictionaryKeySearchMode keySearchMode = DictionaryKeySearchMode.StartsWith)
     {
         var dictionarySettingsMonitor = new Mock<IOptionsMonitor<DictionarySettings>>();
-        dictionarySettingsMonitor.Setup(x => x.CurrentValue).Returns(new DictionarySettings { EnableValueSearch = enableValueSearch });
+        dictionarySettingsMonitor.Setup(x => x.CurrentValue).Returns(new DictionarySettings { EnableValueSearch = enableValueSearch, KeySearchMode = keySearchMode });
 
         // Create a repository with a real runtime cache.
         return new DictionaryRepository(
@@ -649,28 +652,13 @@ internal sealed class DictionaryRepositoryTest : UmbracoIntegrationTest
         }
     }
 
-    /// <summary>
-    /// Verifies that <see cref="IDictionaryRepository.GetDictionaryItemDescendants"/> matches the filter
-    /// anywhere in the dictionary item key, not only at the start of it.
-    /// </summary>
     [TestCase(true)]
     [TestCase(false)]
-    public async Task GetDictionaryItemDescendants_Matches_Filter_Anywhere_In_Key(bool enableValueSearch)
+    public async Task GetDictionaryItemDescendants_With_KeySearchMode_Contains_Matches_Filter_Anywhere_In_Key(bool enableValueSearch)
     {
-        // Arrange - a key whose middle segment does not occur in any of its translation values,
-        // so only a key match can satisfy the filter regardless of the value search setting.
-        var languageService = GetRequiredService<ILanguageService>();
-        var dictionaryItemService = GetRequiredService<IDictionaryItemService>();
-        var language = await languageService.GetAsync("en-US");
-
-        await dictionaryItemService.CreateAsync(
-            new DictionaryItem("AlphaBravoCharlie")
-            {
-                Translations = new List<IDictionaryTranslation> { new DictionaryTranslation(language, "Delta") }
-            },
-            Constants.Security.SuperUserKey);
-
-        var repository = CreateRepositoryWithCache(AppCaches.Create(Mock.Of<IRequestCache>()), enableValueSearch);
+        // Arrange
+        await CreateItemWithFilterTermInsideKey();
+        var repository = CreateRepositoryWithCache(AppCaches.Create(Mock.Of<IRequestCache>()), enableValueSearch, DictionaryKeySearchMode.Contains);
 
         using (ScopeProvider.CreateScope())
         {
@@ -680,6 +668,49 @@ internal sealed class DictionaryRepositoryTest : UmbracoIntegrationTest
             // Assert
             Assert.That(results.Select(x => x.ItemKey), Is.EqualTo(new[] { "AlphaBravoCharlie" }));
         }
+    }
+
+    [TestCase(true)]
+    [TestCase(false)]
+    public async Task GetDictionaryItemDescendants_With_Default_KeySearchMode_Matches_Filter_Only_At_Start_Of_Key(bool enableValueSearch)
+    {
+        // Arrange
+        await CreateItemWithFilterTermInsideKey();
+        var repository = CreateRepositoryWithCache(AppCaches.Create(Mock.Of<IRequestCache>()), enableValueSearch);
+
+        using (ScopeProvider.CreateScope())
+        {
+            // Act
+            var matchedInsideKey = repository.GetDictionaryItemDescendants(null, "Bravo").ToArray();
+            var matchedAtStartOfKey = repository.GetDictionaryItemDescendants(null, "Alpha").ToArray();
+
+            // Assert
+            Assert.Multiple(() =>
+            {
+                Assert.That(matchedInsideKey, Is.Empty);
+                Assert.That(matchedAtStartOfKey.Select(x => x.ItemKey), Is.EqualTo(new[] { "AlphaBravoCharlie" }));
+            });
+        }
+    }
+
+    /// <summary>
+    /// Creates a dictionary item whose key contains "Bravo" at a position other than the start, and whose
+    /// translation value contains neither "Bravo" nor "Alpha" so that only a key match can satisfy those filters.
+    /// </summary>
+    private async Task CreateItemWithFilterTermInsideKey()
+    {
+        var languageService = GetRequiredService<ILanguageService>();
+        var dictionaryItemService = GetRequiredService<IDictionaryItemService>();
+
+        await dictionaryItemService.CreateAsync(
+            new DictionaryItem("AlphaBravoCharlie")
+            {
+                Translations = new List<IDictionaryTranslation>
+                {
+                    new DictionaryTranslation(await languageService.GetAsync("en-US"), "Delta")
+                }
+            },
+            Constants.Security.SuperUserKey);
     }
 
     public async Task CreateTestData()

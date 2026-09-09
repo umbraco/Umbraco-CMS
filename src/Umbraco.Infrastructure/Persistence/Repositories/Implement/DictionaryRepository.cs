@@ -205,20 +205,25 @@ internal sealed class DictionaryRepository : EntityRepositoryBase<int, IDictiona
             return;
         }
 
-        if (_dictionarySettings.CurrentValue.EnableValueSearch)
+        DictionarySettings settings = _dictionarySettings.CurrentValue;
+        var matchKeyAnywhere = settings.KeySearchMode == DictionaryKeySearchMode.Contains;
+
+        if (settings.EnableValueSearch)
         {
             // Search in both keys and values
             // Use a subquery to find dictionary items that have matching translations
             // Then fetch ALL translations for those items
             sql.Where(
                 $"({QuotedColumn("key")} LIKE @0 OR {QuotedColumn("id")} IN (SELECT DISTINCT {QuoteColumnName("UniqueId")} FROM {QuoteTableName(LanguageTextDto.TableName)} WHERE {QuoteColumnName("value")} LIKE @1))",
-                $"%{filter}%",
+                matchKeyAnywhere ? $"%{filter}%" : $"{filter}%",
                 $"%{filter}%");
         }
         else
         {
             // Search only in keys
-            sql.Where<DictionaryDto>(x => x.Key.Contains(filter));
+            sql.Where<DictionaryDto>(matchKeyAnywhere
+                ? x => x.Key.Contains(filter)
+                : x => x.Key.StartsWith(filter));
         }
     }
 

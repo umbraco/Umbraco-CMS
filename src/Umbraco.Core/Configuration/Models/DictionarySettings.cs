@@ -12,6 +12,7 @@ namespace Umbraco.Cms.Core.Configuration.Models;
 public class DictionarySettings
 {
     private const bool StaticEnableValueSearch = false;
+    private const DictionaryKeySearchMode StaticKeySearchMode = DictionaryKeySearchMode.StartsWith;
 
     /// <summary>
     ///     Gets or sets a value indicating whether to enable searching in dictionary values in addition to keys.
@@ -22,4 +23,13 @@ public class DictionarySettings
     /// </remarks>
     [DefaultValue(StaticEnableValueSearch)]
     public bool EnableValueSearch { get; set; } = StaticEnableValueSearch;
+
+    /// <summary>
+    ///     Gets or sets a value indicating how a dictionary item filter is matched against the dictionary item key.
+    /// </summary>
+    /// <remarks>
+    ///     Applies whether or not <see cref="EnableValueSearch" /> is enabled.
+    /// </remarks>
+    [DefaultValue(StaticKeySearchMode)]
+    public DictionaryKeySearchMode KeySearchMode { get; set; } = StaticKeySearchMode;
 }
