@@ -106,7 +106,8 @@ export class UmbEntityDetailWorkspaceEditorElement extends UmbLitElement {
 		if (this._navigationParentItemPath) return;
 
 		if (this.#backPath) {
-			history.pushState({}, '', this.#backPath);
+			// The deleted entity's own URL is gone for good — replace it rather than push, so "back" doesn't land on a 404.
+			window.history.replaceState(null, '', this.#backPath);
 		}
 	};
 
