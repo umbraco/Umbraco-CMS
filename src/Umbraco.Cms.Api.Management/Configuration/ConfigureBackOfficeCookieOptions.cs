@@ -140,17 +140,6 @@ public class ConfigureBackOfficeCookieOptions : IConfigureNamedOptions<CookieAut
                 // ensure the thread culture is set
                 backOfficeIdentity?.EnsureCulture();
 
-                // Any request bearing a valid back-office identity renews the ticket. This is safe for
-                // AllowConcurrentLogins enforcement: ConfigureSecurityStampOptions forces ValidationInterval
-                // to zero when concurrent logins are disallowed, so the stamp check below still runs on
-                // effectively every request (any positive time gap exceeds a zero interval) regardless of
-                // how often we reset IssuedUtc here. What matters is that the reset below stays *after* the
-                // ValidateAsync call, so this request's own interval check reads the pre-renewal IssuedUtc.
-                if (backOfficeIdentity != null)
-                {
-                    ctx.ShouldRenew = true;
-                }
-
                 // add or update a claim to track when the cookie expires, we use this to track time remaining
                 // NOTE: this runs before the ExpiresUtc reset below, so on a renewing request the claim
                 // still carries the pre-renewal expiry and only catches up on the next request. That is
@@ -166,16 +155,29 @@ public class ConfigureBackOfficeCookieOptions : IConfigureNamedOptions<CookieAut
 
                 await securityStampValidator.ValidateAsync(ctx);
 
-                // Only reset timestamps when a renewal was actually triggered (i.e. there was a valid
-                // identity, or the SecurityStampValidator decided to refresh the principal on its own).
-                // When the SecurityStampValidator refreshes the principal, it sets ShouldRenew but updates
-                // IssuedUtc without updating ExpiresUtc, causing the effective cookie lifetime to shrink
-                // with each validation. The manual reset here fixes that drift.
+                // ctx.ShouldRenew is true here only when the SecurityStampValidator itself decided to
+                // refresh the principal, i.e. its ValidationInterval had elapsed and the stamp was still
+                // valid. That's a genuine re-validation, so it's safe to reset both timestamps: IssuedUtc
+                // starts a fresh validation interval, and ExpiresUtc is reset alongside it because the
+                // SecurityStampValidator's own renewal updates IssuedUtc without touching ExpiresUtc,
+                // which would otherwise shrink the effective cookie lifetime with each validation.
                 if (ctx.ShouldRenew)
                 {
                     DateTimeOffset now = _timeProvider.GetUtcNow();
                     ctx.Properties.IssuedUtc = now;
                     ctx.Properties.ExpiresUtc = now.Add(_globalSettings.TimeOut);
+                }
+                else if (ctx.Principal != null)
+                {
+                    // No stamp re-validation happened this request (the ValidationInterval hasn't
+                    // elapsed yet), but any request bearing a valid principal should still refresh the
+                    // session on activity. Extend ExpiresUtc only - IssuedUtc must be left untouched, or
+                    // the SecurityStampValidator's interval clock would be reset on every request and the
+                    // stamp would never be re-checked again for the lifetime of an active session (this
+                    // matters most when AllowConcurrentLogins is true, where ValidationInterval stays at
+                    // its non-zero default instead of being forced to zero).
+                    ctx.ShouldRenew = true;
+                    ctx.Properties.ExpiresUtc = _timeProvider.GetUtcNow().Add(_globalSettings.TimeOut);
                 }
             },
             OnSigningIn = ctx =>

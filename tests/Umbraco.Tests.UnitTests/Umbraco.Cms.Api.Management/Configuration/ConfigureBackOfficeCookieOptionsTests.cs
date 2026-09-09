@@ -49,9 +49,11 @@ public class ConfigureBackOfficeCookieOptionsTests
     }
 
     [Test]
-    public async Task Can_Renew_Ticket_For_Any_Request_With_Valid_Identity()
+    public async Task Can_Extend_Expiry_On_Activity_Without_Resetting_IssuedUtc_When_Stamp_Not_Revalidated()
     {
-        // Arrange: nothing else would trigger a renewal - validator does nothing, arbitrary path.
+        // Arrange: the stamp validator does nothing, i.e. its ValidationInterval has not elapsed yet
+        // (this is the common case for most requests: AllowConcurrentLogins = true keeps a non-zero
+        // interval, so most requests fall in the gap between stamp re-validations).
         _mockStampValidator
             .Setup(v => v.ValidateAsync(It.IsAny<CookieValidatePrincipalContext>()))
             .Returns(Task.CompletedTask);
@@ -68,11 +70,14 @@ public class ConfigureBackOfficeCookieOptionsTests
         // Act
         await onValidatePrincipal(context);
 
-        // Assert: any request with a valid back-office identity renews the ticket
+        // Assert: the session still gets refreshed on activity (ExpiresUtc slides forward), but
+        // IssuedUtc must be left untouched - resetting it here would reset the SecurityStampValidator's
+        // interval clock on every request and stop it from ever re-checking the stamp again during an
+        // active session (e.g. a password change or a disabled account would go unnoticed).
         Assert.Multiple(() =>
         {
             Assert.That(context.ShouldRenew, Is.True);
-            Assert.That(context.Properties.IssuedUtc, Is.EqualTo(_now));
+            Assert.That(context.Properties.IssuedUtc, Is.EqualTo(originalIssuedUtc));
             Assert.That(context.Properties.ExpiresUtc, Is.EqualTo(_now.Add(_globalSettings.TimeOut)));
         });
     }
