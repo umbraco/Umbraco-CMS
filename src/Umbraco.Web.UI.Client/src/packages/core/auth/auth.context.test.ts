@@ -194,6 +194,22 @@ describe('UmbAuthContext', () => {
 				headers: { 'Content-Type': 'application/json' },
 			});
 
+		// Resolves as soon as the session reference actually changes. The race tests below hold
+		// the origin-wide `umb:token-refresh` Web Lock while they wait, and web-test-runner runs
+		// test files concurrently against a single origin — so waiting on a fixed timeout there
+		// would block unrelated test files for the whole duration.
+		const nextSessionChange = () => {
+			let unsubscribe = () => {};
+			const changed = new Promise<void>((resolve) => {
+				let emissions = 0;
+				const subscription = context.session$.subscribe(() => {
+					if (++emissions > 1) resolve();
+				});
+				unsubscribe = () => subscription.unsubscribe();
+			});
+			return changed.finally(() => unsubscribe());
+		};
+
 		beforeEach(() => {
 			fetchCalls = [];
 			window.fetch = ((input: RequestInfo | URL) => {
@@ -299,8 +315,9 @@ describe('UmbAuthContext', () => {
 			await fetchInFlight;
 
 			// A fresh sign-in completes and supersedes the session being refreshed
+			const superseded = nextSessionChange();
 			channel.postMessage({ type: 'sessionUpdate', accessTokenExpiresAt: now + 600, expiresAt: now + 900 });
-			await aTimeout(50);
+			await superseded;
 
 			let timeOutCalls = 0;
 			context.timeOut = () => {
@@ -308,9 +325,42 @@ describe('UmbAuthContext', () => {
 			};
 
 			resolveFetch(invalidGrantResponse());
-			await refreshPromise;
 
+			// The caller must be told the token is usable: the session-timeout controller
+			// times the user out itself when validateToken() reports failure, which would
+			// reintroduce the very teardown this guard exists to prevent.
+			expect(await refreshPromise).to.be.true;
 			expect(timeOutCalls).to.equal(0);
+			expect(context.getIsAuthorized()).to.be.true;
+		});
+
+		it('reports success when a transient failure raced a newly established session', async () => {
+			const now = Math.floor(Date.now() / 1000);
+			channel.postMessage({ type: 'sessionUpdate', accessTokenExpiresAt: now + 60, expiresAt: now + 240 });
+			await aTimeout(50);
+
+			let rejectFetch!: (error: Error) => void;
+			let fetchStarted!: () => void;
+			const fetchInFlight = new Promise<void>((resolve) => {
+				fetchStarted = resolve;
+			});
+			window.fetch = (() => {
+				fetchStarted();
+				return new Promise<Response>((_, reject) => {
+					rejectFetch = reject;
+				});
+			}) as typeof window.fetch;
+
+			const refreshPromise = context.validateToken();
+			await fetchInFlight;
+
+			const superseded = nextSessionChange();
+			channel.postMessage({ type: 'sessionUpdate', accessTokenExpiresAt: now + 600, expiresAt: now + 900 });
+			await superseded;
+
+			rejectFetch(new TypeError('Failed to fetch'));
+
+			expect(await refreshPromise).to.be.true;
 			expect(context.getIsAuthorized()).to.be.true;
 		});
 	});
