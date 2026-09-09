@@ -197,9 +197,10 @@ the OOM under sustained load.
 
 `Enabled: false` remains the one-setting escape hatch that restores stock ImageSharp behaviour.
 
-Both decisions are logged at startup — at Information when a bound engages, naming the resolved
-value, and at Debug when it does not. That log line is the first thing to ask for when diagnosing
-either an exit 137 or an unexplained change in image throughput.
+Each bound reports itself at startup — Information when it engages, naming the resolved value, and
+Debug when it does not, so an unaffected site running at Information says nothing. Those lines are
+the first thing to ask for when diagnosing either an exit 137 or an unexplained change in image
+throughput.
 
 **Why these exist**: a source image is decoded at full resolution before any processor runs, and
 `ImageSharpMiddleware` only de-duplicates concurrent requests for the *same* URL. A page of distinct

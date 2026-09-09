@@ -126,38 +126,53 @@ internal static class ImageProcessingMemory
             options.AllocationLimitMegabytes = ResolveMaximumDecodedImageMegabytes(memory, availableMemoryBytes);
         }
 
-        if (options.MaximumPoolSizeMegabytes.HasValue is false && options.AllocationLimitMegabytes.HasValue is false)
+        if (options.MaximumPoolSizeMegabytes.HasValue || options.AllocationLimitMegabytes.HasValue)
         {
-            if (logger.IsEnabled(LogLevel.Debug))
-            {
-                logger.LogDebug(
-                    "Left image processing memory to the imaging library, with {AvailableMemoryMegabytes} MB available to the process.",
-                    availableMemoryMegabytes);
-            }
+            // One allocator, shared process-wide. The library's own remarks on
+            // Configuration.MemoryAllocator say to ensure that "by altering the allocator of
+            // Configuration.Default", which is why this does not follow the documented sample's
+            // Configuration.Default.Clone(): a clone would leave the default on its own allocator,
+            // so anything using that directly - a package, or a plain Image.Load - would pool
+            // separately.
+            // https://docs.sixlabors.com/articles/imagesharp/memorymanagement.html#customize-the-allocator
+            MemoryAllocator dropped = Configuration.Default.MemoryAllocator;
+            Configuration.Default.MemoryAllocator = MemoryAllocator.Create(options);
 
-            return;
+            // Required of an allocator that is dropped, by the same remarks. Nothing is retained on
+            // a first boot, but a process that builds several hosts - the test harness - would
+            // otherwise leave every replaced pool holding its returned buffers. Only idle buffers
+            // are freed, so this cannot disturb an image still in use.
+            dropped.ReleaseRetainedResources();
         }
 
-        // One allocator, shared process-wide. The library's own remarks on
-        // Configuration.MemoryAllocator say to ensure that "by altering the allocator of
-        // Configuration.Default", which is why this does not follow the documented sample's
-        // Configuration.Default.Clone(): a clone would leave the default on its own allocator, so
-        // anything using that directly - a package, or a plain Image.Load - would pool separately.
-        // https://docs.sixlabors.com/articles/imagesharp/memorymanagement.html#customize-the-allocator
-        MemoryAllocator dropped = Configuration.Default.MemoryAllocator;
-        Configuration.Default.MemoryAllocator = MemoryAllocator.Create(options);
+        // Reported settings and actions per bound.
+        if (options.MaximumPoolSizeMegabytes.HasValue)
+        {
+            logger.LogInformation(
+                "Capped the image processing memory pool at {MaximumPoolSizeMegabytes} MB, with {AvailableMemoryMegabytes} MB available to the process.",
+                options.MaximumPoolSizeMegabytes,
+                availableMemoryMegabytes);
+        }
+        else if (logger.IsEnabled(LogLevel.Debug))
+        {
+            logger.LogDebug(
+                "Left the image processing memory pool to the imaging library, with {AvailableMemoryMegabytes} MB available to the process.",
+                availableMemoryMegabytes);
+        }
 
-        // Required of an allocator that is dropped, by the same remarks. Nothing is retained on a
-        // first boot, but a process that builds several hosts - the test harness - would otherwise
-        // leave every replaced pool holding its returned buffers. Only idle buffers are freed, so
-        // this cannot disturb an image still in use.
-        dropped.ReleaseRetainedResources();
-
-        logger.LogInformation(
-            "Bounded image processing memory with a {MaximumPoolSizeMegabytes} MB pool and a {MaximumDecodedImageMegabytes} MB ceiling per image, with {AvailableMemoryMegabytes} MB available to the process. A null bound is left to the imaging library.",
-            options.MaximumPoolSizeMegabytes,
-            options.AllocationLimitMegabytes,
-            availableMemoryMegabytes);
+        if (options.AllocationLimitMegabytes.HasValue)
+        {
+            logger.LogInformation(
+                "Capped a single decoded image at {MaximumDecodedImageMegabytes} MB, with {AvailableMemoryMegabytes} MB available to the process.",
+                options.AllocationLimitMegabytes,
+                availableMemoryMegabytes);
+        }
+        else if (logger.IsEnabled(LogLevel.Debug))
+        {
+            logger.LogDebug(
+                "Left the size of a single decoded image to the imaging library, with {AvailableMemoryMegabytes} MB available to the process.",
+                availableMemoryMegabytes);
+        }
     }
 
     /// <summary>

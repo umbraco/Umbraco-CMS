@@ -56,7 +56,7 @@ public class ImageProcessingMemoryTests
         Assert.Multiple(() =>
         {
             Assert.That(Configuration.Default.MemoryAllocator, Is.Not.SameAs(_originalAllocator));
-            Assert.That(logs.Single().Level, Is.EqualTo(LogLevel.Information));
+            Assert.That(logs.Levels, Is.EqualTo(new[] { LogLevel.Information, LogLevel.Information }));
         });
     }
 
@@ -72,12 +72,14 @@ public class ImageProcessingMemoryTests
         Assert.Multiple(() =>
         {
             Assert.That(
-                logs.Single().Properties["MaximumPoolSizeMegabytes"],
+                logs.WithProperty("MaximumPoolSizeMegabytes").Properties["MaximumPoolSizeMegabytes"],
                 Is.EqualTo(ImageProcessingMemory.ResolveMaximumPoolSizeMegabytes(settings, ConstrainedMemoryBytes)));
             Assert.That(
-                logs.Single().Properties["MaximumDecodedImageMegabytes"],
+                logs.WithProperty("MaximumDecodedImageMegabytes").Properties["MaximumDecodedImageMegabytes"],
                 Is.EqualTo(ImageProcessingMemory.ResolveMaximumDecodedImageMegabytes(settings, ConstrainedMemoryBytes)));
-            Assert.That(logs.Single().Properties["AvailableMemoryMegabytes"], Is.EqualTo(512L));
+            Assert.That(
+                logs.WithProperty("MaximumPoolSizeMegabytes").Properties["AvailableMemoryMegabytes"],
+                Is.EqualTo(512L));
         });
     }
 
@@ -89,7 +91,7 @@ public class ImageProcessingMemoryTests
         Assert.Multiple(() =>
         {
             Assert.That(Configuration.Default.MemoryAllocator, Is.SameAs(_originalAllocator));
-            Assert.That(logs.Single().Level, Is.EqualTo(LogLevel.Debug));
+            Assert.That(logs.Levels, Is.EqualTo(new[] { LogLevel.Debug, LogLevel.Debug }));
         });
     }
 
@@ -111,16 +113,16 @@ public class ImageProcessingMemoryTests
         Assert.Multiple(() =>
         {
             Assert.That(Configuration.Default.MemoryAllocator, Is.SameAs(_originalAllocator));
-            Assert.That(logs.Single().Level, Is.EqualTo(LogLevel.Debug));
+            Assert.That(logs.Levels, Is.EqualTo(new[] { LogLevel.Debug, LogLevel.Debug }));
         });
     }
 
     /// <summary>
-    /// With ample memory only the explicitly configured bound engages, and the other is reported as
-    /// unset so the imaging library keeps its own default for it.
+    /// With ample memory only the explicitly configured bound engages. Each reports itself, so the
+    /// one left to the imaging library reads as such instead of as an absent value.
     /// </summary>
     [Test]
-    public void Configure_WhenOnlyOneBoundApplies_ReportsTheOtherAsUnset()
+    public void Configure_WhenOnlyOneBoundApplies_ReportsEachSeparately()
     {
         var settings = new ImagingMemorySettings { MaximumPoolSizeMegabytes = 128 };
 
@@ -129,8 +131,10 @@ public class ImageProcessingMemoryTests
         Assert.Multiple(() =>
         {
             Assert.That(Configuration.Default.MemoryAllocator, Is.Not.SameAs(_originalAllocator));
-            Assert.That(logs.Single().Properties["MaximumPoolSizeMegabytes"], Is.EqualTo(128));
-            Assert.That(logs.Single().Properties["MaximumDecodedImageMegabytes"], Is.Null);
+            Assert.That(
+                logs.WithProperty("MaximumPoolSizeMegabytes").Properties["MaximumPoolSizeMegabytes"],
+                Is.EqualTo(128));
+            Assert.That(logs.Levels, Is.EqualTo(new[] { LogLevel.Information, LogLevel.Debug }));
         });
     }
 
@@ -153,7 +157,7 @@ public class ImageProcessingMemoryTests
         Assert.Multiple(() =>
         {
             Assert.That(Configuration.Default.MemoryAllocator, Is.SameAs(_originalAllocator));
-            Assert.That(logs.Single().Level, Is.EqualTo(LogLevel.Debug));
+            Assert.That(logs.Levels, Is.EqualTo(new[] { LogLevel.Debug, LogLevel.Debug }));
         });
     }
 
@@ -425,10 +429,16 @@ public class ImageProcessingMemoryTests
     {
         private readonly List<Entry> _entries = [];
 
-        public Entry Single()
+        public IEnumerable<LogLevel> Levels => _entries.Select(x => x.Level);
+
+        public Entry WithProperty(string name)
         {
-            Assert.That(_entries, Has.Count.EqualTo(1), "Expected exactly one log entry.");
-            return _entries[0];
+            Assert.That(
+                _entries.Where(x => x.Properties.ContainsKey(name)),
+                Has.Exactly(1).Items,
+                $"Expected exactly one log entry carrying {name}.");
+
+            return _entries.Single(x => x.Properties.ContainsKey(name));
         }
 
         public ILogger CreateLogger(string categoryName) => this;
