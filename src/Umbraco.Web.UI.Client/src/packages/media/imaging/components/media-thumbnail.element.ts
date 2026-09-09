@@ -13,7 +13,7 @@ import { UmbEntityUpdatedEvent } from '@umbraco-cms/backoffice/entity-action';
  * @cssprop [--umb-media-thumbnail-background] - Background shown behind the image. Defaults to a checkerboard
  * pattern that reveals transparency; set to `none` for a transparent background.
  * @csspart img - The underlying `<img>` element.
- * @csspart file-ext - The file extension label shown over the fallback icon.
+ * @csspart file-ext - The file extension label shown alongside the fallback icon.
  */
 @customElement('umb-media-thumbnail')
 export class UmbMediaThumbnailElement extends UmbLitElement {
@@ -67,8 +67,7 @@ export class UmbMediaThumbnailElement extends UmbLitElement {
 
 	/**
 	 * The file extension to label the fallback icon with, without the leading dot.
-	 * @description Only shown where there is no image to preview — a rendered image already says what it is.
-	 * Leave unset for anything the label would misdescribe, such as a container.
+	 * @description Only rendered where there is no image to preview: a rendered image already says what it is.
 	 */
 	@property({ type: String, attribute: 'file-ext' })
 	fileExt?: string;
@@ -232,18 +231,15 @@ export class UmbMediaThumbnailElement extends UmbLitElement {
 			#icon {
 				width: 100%;
 				height: 100%;
-				min-height: 0;
 				font-size: var(--uui-size-8);
 			}
 
-			/* Give up the full height when labelled, so the icon and its label centre as one group. Left alone, the
-			   icon claims every pixel and pushes the label under whatever the host sits behind. */
+			/* Filling the box is only right while the icon is alone in it. With a label to sit alongside, it takes
+			   its own height instead so the two centre as one group. */
 			#icon:has(+ #file-ext) {
 				height: auto;
 			}
 
-			/* In flow rather than overlaid: the card sizes its preview area to the content, so a label that took
-			   itself out of flow would be squeezed into whatever width the icon alone happens to claim. */
 			#file-ext {
 				flex: none;
 				margin-top: var(--uui-size-space-2);

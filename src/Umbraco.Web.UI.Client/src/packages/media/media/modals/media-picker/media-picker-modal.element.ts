@@ -673,7 +673,11 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 					alt=${item.name}
 					icon=${item.mediaType.icon}
 					file-ext=${ifDefined(
-						getMediaFileExtension(item.name, item.mediaType.unique, this.#folderTypeUniques),
+						getMediaFileExtension({
+							name: item.name,
+							mediaTypeUnique: item.mediaType.unique,
+							folderTypeUniques: this.#folderTypeUniques,
+						}),
 					)}></umb-media-thumbnail>
 			</uui-card-media>
 		`;

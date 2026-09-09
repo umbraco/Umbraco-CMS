@@ -190,18 +190,16 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 
 		this.observe(
 			this.#pickerInputContext.selectedItems,
-			async (selectedItems) => {
+			(selectedItems) => {
 				const missingCards = selectedItems.filter((item) => !this._cards.find((card) => card.unique === item.unique));
 				if (selectedItems?.length && !missingCards.length) return;
 
 				this._cards = selectedItems ?? [];
-
-				if (this._cards.length && !this._folderTypeUniques) {
-					this._folderTypeUniques = await this.#pickerInputContext.getFolderTypeUniques();
-				}
 			},
 			null,
 		);
+
+		this.#pickerInputContext.getFolderTypeUniques().then((uniques) => (this._folderTypeUniques = uniques));
 
 		this.addValidator(
 			'rangeUnderflow',
@@ -295,7 +293,11 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 					alt=${item.name}
 					icon=${item.mediaType.icon}
 					file-ext=${ifDefined(
-						getMediaFileExtension(item.name, item.mediaType.unique, this._folderTypeUniques),
+						getMediaFileExtension({
+							name: item.name,
+							mediaTypeUnique: item.mediaType.unique,
+							folderTypeUniques: this._folderTypeUniques,
+						}),
 					)}></umb-media-thumbnail>
 				${this.#renderIsTrashed(item)}
 				<uui-action-bar slot="actions">${this.#renderRemoveAction(item)}</uui-action-bar>

@@ -35,8 +35,7 @@ type UmbRichMediaCardModel = {
 	media: string;
 	name: string;
 	src?: string;
-	icon?: string;
-	mediaTypeUnique?: string;
+	mediaType?: UmbMediaItemModel['mediaType'];
 	isTrashed?: boolean;
 	isLoading?: boolean;
 };
@@ -193,6 +192,8 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 	constructor() {
 		super();
 
+		this.#pickerInputContext.getFolderTypeUniques().then((uniques) => (this._folderTypeUniques = uniques));
+
 		this.observe(
 			this.#itemManager.items,
 			() => {
@@ -286,7 +287,7 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 		return undefined;
 	}
 
-	async #populateCards() {
+	#populateCards() {
 		const mediaItems = this.#itemManager.getItems();
 
 		this._cards =
@@ -296,16 +297,11 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 					unique: item.key,
 					media: item.mediaKey,
 					name: media?.name ?? '',
-					icon: media?.mediaType?.icon,
-					mediaTypeUnique: media?.mediaType?.unique,
+					mediaType: media?.mediaType,
 					isTrashed: media?.isTrashed ?? false,
 					isLoading: !media,
 				};
 			}) ?? [];
-
-		if (this._cards.length && !this._folderTypeUniques) {
-			this._folderTypeUniques = await this.#pickerInputContext.getFolderTypeUniques();
-		}
 	}
 
 	#pickableFilter: (item: UmbMediaItemModel) => boolean = (item) => {
@@ -427,8 +423,14 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 				<umb-media-thumbnail
 					.unique=${item.media}
 					.alt=${item.name}
-					.icon=${item.icon ?? 'icon-picture'}
-					file-ext=${ifDefined(getMediaFileExtension(item.name, item.mediaTypeUnique, this._folderTypeUniques))}
+					.icon=${item.mediaType?.icon ?? 'icon-picture'}
+					file-ext=${ifDefined(
+						getMediaFileExtension({
+							name: item.name,
+							mediaTypeUnique: item.mediaType?.unique,
+							folderTypeUniques: this._folderTypeUniques,
+						}),
+					)}
 					.externalLoading=${item.isLoading ?? false}></umb-media-thumbnail>
 
 				${this.#renderIsTrashed(item)} ${this.#renderActions(item)}
