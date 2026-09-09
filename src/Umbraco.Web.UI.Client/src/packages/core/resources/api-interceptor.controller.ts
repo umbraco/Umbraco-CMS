@@ -79,6 +79,10 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 	 */
 	addSessionActivityInterceptor(client: typeof umbHttpClient) {
 		client.interceptors.response.use((response): Response => {
+			// A successful response stands in for the renewal, which the client cannot observe directly:
+			// the session lives in a cookie it cannot read. The proxy is optimistic in one direction —
+			// a request to an endpoint that does not require a session succeeds without renewing one —
+			// so it can report activity the server did not act on, never miss activity it did.
 			if (response.ok) {
 				this.#signaler.signalActivity();
 			}
