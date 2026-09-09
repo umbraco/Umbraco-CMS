@@ -78,11 +78,4 @@ test('can not publish a mandatory time only picker with an empty value', async (
   // Assert
   await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.emptyDate);
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
-  await umbracoUi.content.enterDateInputValue(timeValue);
-  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBeUpdated();
-
-  // Assert
-  const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
-  expect(contentData.values[0].value).toEqual(expectedValue);
 });

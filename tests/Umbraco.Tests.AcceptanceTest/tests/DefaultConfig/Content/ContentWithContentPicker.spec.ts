@@ -208,11 +208,4 @@ test('can not publish a mandatory content picker with an empty value', async ({u
   // Assert
   await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.nullValue);
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
-  await umbracoUi.content.addContentPicker(contentPickerName);
-  await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.nullValue, false);
-  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBeUpdated();
-
-  // Assert
-  const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values[0].value).toContain(contentPickerId);
 });

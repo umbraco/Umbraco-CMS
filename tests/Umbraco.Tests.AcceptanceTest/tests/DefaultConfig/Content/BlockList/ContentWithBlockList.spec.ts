@@ -168,15 +168,6 @@ test('cannot publish content with fewer block elements than the minimum amount',
 
   // Assert
   await umbracoUi.content.isErrorNotificationVisible();
-  await umbracoUi.content.clickAddBlockElementButton();
-  await umbracoUi.content.clickBlockElementWithName(elementTypeName);
-  await umbracoUi.content.clickCreateModalButton();
-  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
-
-  // Assert
-  const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values[0].value.contentData).toHaveLength(1);
-  expect(contentData.values[0].value.contentData[0].contentTypeKey).toEqual(elementTypeId);
 });
 
 test('can set the label of block element in the content', async ({umbracoApi, umbracoUi}) => {

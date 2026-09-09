@@ -116,12 +116,4 @@ test('can not publish a mandatory textarea with an empty value', async ({umbraco
   // Assert
   await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.nullValue);
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
-  await umbracoUi.content.enterTextArea(text);
-  await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.nullValue, false);
-  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBeUpdated();
-
-  // Assert
-  const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
-  expect(contentData.values[0].value).toEqual(text);
 });

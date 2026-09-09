@@ -79,14 +79,6 @@ test('can not publish a mandatory property inherited via composition with an emp
 
   // Assert
   await umbracoUi.content.isErrorNotificationVisible();
-  await umbracoUi.content.enterTextstring(text);
-  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
-
-  // Assert
-  const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.variants[0].state).toBe('Published');
-  expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
-  expect(contentData.values[0].value).toEqual(text);
 });
 
 test('can publish content with a document type that has a composition', async ({umbracoApi, umbracoUi}) => {

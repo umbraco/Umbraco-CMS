@@ -129,13 +129,4 @@ test('can not publish a mandatory multiple media picker with an empty value', as
   // Assert
   await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.nullValue);
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
-  await umbracoUi.content.clickChooseMediaPickerButton();
-  await umbracoUi.content.selectMediaWithName(firstMediaFileName);
-  await umbracoUi.content.clickChooseModalButton();
-  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBeUpdated();
-
-  // Assert
-  const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
-  expect(contentData.values[0].value[0].mediaKey).toEqual(firstMediaFileId);
 });

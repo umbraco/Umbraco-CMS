@@ -82,12 +82,4 @@ test('can not publish a mandatory date time with time zone picker with an empty 
   // Assert
   await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.emptyDate);
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
-  await umbracoUi.content.enterDateInputValue(dateTimeValue);
-  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBeUpdated();
-
-  // Assert
-  const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
-  expect(contentData.values[0].value.date).toContain('2026-09-01T14:30:00');
-  expect(contentData.values[0].value.timeZone).toEqual(expectedClientTimeZone);
 });

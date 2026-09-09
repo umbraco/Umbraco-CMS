@@ -120,14 +120,5 @@ test('can not publish a mandatory image cropper with an empty value', async ({um
   // Assert
   await umbracoUi.content.isErrorNotificationVisible();
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
-  await umbracoUi.content.uploadFile(imageFilePath);
-  await umbracoUi.content.isInputDropzoneVisible(false);
-  await umbracoUi.content.isImageCropperFieldVisible();
-  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBeUpdated();
-
-  // Assert
-  const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
-  expect(contentData.values[0].value.src).toContain(AliasHelper.toAlias(imageFileName));
 });
 

@@ -36,8 +36,6 @@ test('cannot publish content with an invalid email address format', async ({umbr
   await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.invalidEmail);
   await umbracoUi.content.enterTextstring(validEmail);
   await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBeUpdated();
-
-  // Assert
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
   expect(contentData.values[0].value).toEqual(validEmail);

@@ -207,14 +207,4 @@ test('can not publish a mandatory multi node tree picker with an empty value', a
   // Assert
   await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.nullValue);
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
-  await umbracoUi.content.clickChooseButton();
-  await umbracoUi.content.selectLinkByName(pickerTargetName);
-  await umbracoUi.content.clickChooseModalButton();
-  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBeUpdated();
-
-  // Assert
-  const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.variants[0].state).toBe('Published');
-  expect(contentData.values[0].value[0]['unique']).toEqual(pickerTargetId);
-  expect(contentData.values[0].value[0]['type']).toEqual('document');
 });

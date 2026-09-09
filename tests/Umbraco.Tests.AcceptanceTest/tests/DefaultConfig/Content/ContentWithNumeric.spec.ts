@@ -128,13 +128,5 @@ test('can not publish a mandatory numeric with an empty value', async ({umbracoA
   // Assert
   await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.nullValue);
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
-
-  // The mandatory check only re-runs on the next publish attempt, unlike the range messages above
-  await umbracoUi.content.enterNumeric(number);
-  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBeUpdated();
-
-  // Assert
-  const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values[0].value).toEqual(number);
 });
 

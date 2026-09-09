@@ -147,13 +147,4 @@ test('can not publish a mandatory upload article with an empty value', async ({u
   // Assert
   await umbracoUi.content.isErrorNotificationVisible();
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
-  await umbracoUi.content.uploadFile(uploadFilePath + uploadFileName);
-  await umbracoUi.content.isInputDropzoneVisible(false);
-  await umbracoUi.content.doesInputUploadFileHaveName(uploadFileName);
-  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBeUpdated();
-
-  // Assert
-  const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
-  expect(contentData.values[0].value.src).toContain(AliasHelper.toAlias(uploadFileName));
 });

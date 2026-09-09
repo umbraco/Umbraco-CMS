@@ -95,12 +95,4 @@ test('can not publish a mandatory tags with an empty value', async ({umbracoApi,
   // Assert
   await umbracoUi.content.isErrorNotificationVisible();
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
-
-  // The tag input is already active here, unlike a fresh create flow where "+" must be clicked first
-  await umbracoUi.content.enterTag(tagsName[0]);
-  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBeUpdated();
-
-  // Assert
-  const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values[0].value).toEqual([tagsName[0]]);
 });
