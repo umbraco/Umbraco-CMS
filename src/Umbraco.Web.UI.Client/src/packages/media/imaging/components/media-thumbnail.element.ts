@@ -202,6 +202,7 @@ export class UmbMediaThumbnailElement extends UmbLitElement {
 				position: relative;
 				overflow: hidden;
 				display: flex;
+				flex-direction: column;
 				justify-content: center;
 				align-items: center;
 				width: 100%;
@@ -231,15 +232,21 @@ export class UmbMediaThumbnailElement extends UmbLitElement {
 			#icon {
 				width: 100%;
 				height: 100%;
+				min-height: 0;
 				font-size: var(--uui-size-8);
 			}
 
+			/* Give up the full height when labelled, so the icon and its label centre as one group. Left alone, the
+			   icon claims every pixel and pushes the label under whatever the host sits behind. */
+			#icon:has(+ #file-ext) {
+				height: auto;
+			}
+
+			/* In flow rather than overlaid: the card sizes its preview area to the content, so a label that took
+			   itself out of flow would be squeezed into whatever width the icon alone happens to claim. */
 			#file-ext {
-				position: absolute;
-				bottom: var(--uui-size-space-2);
-				left: 50%;
-				transform: translateX(-50%);
-				max-width: calc(100% - var(--uui-size-space-4));
+				flex: none;
+				margin-top: var(--uui-size-space-2);
 				padding: 0 var(--uui-size-space-2);
 				border-radius: var(--uui-border-radius);
 				background-color: var(--uui-color-surface-alt);
@@ -247,8 +254,6 @@ export class UmbMediaThumbnailElement extends UmbLitElement {
 				font-weight: 700;
 				line-height: 1.5;
 				white-space: nowrap;
-				overflow: hidden;
-				text-overflow: ellipsis;
 			}
 		`,
 	];
