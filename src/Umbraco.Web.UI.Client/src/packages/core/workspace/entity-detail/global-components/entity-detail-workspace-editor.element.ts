@@ -17,7 +17,8 @@ export class UmbEntityDetailWorkspaceEditorElement extends UmbLitElement {
 
 	/**
 	 * A fallback "back to parent" path, used only when the workspace context has no `navigationParentItemPath` of
-	 * its own (e.g. a third-party context that hasn't implemented it yet).
+	 * its own. Always shows its own back button when set, independent of `showBackToParentButton`, which only
+	 * governs the button for `navigationParentItemPath`.
 	 * @deprecated Implement `navigationParentItemPath` on the workspace context instead. Will be removed in Umbraco 20.
 	 * @returns {string | undefined} The fallback back-to-parent path.
 	 */
@@ -26,16 +27,15 @@ export class UmbEntityDetailWorkspaceEditorElement extends UmbLitElement {
 		return this.#backPath;
 	}
 	public set backPath(value: string | undefined) {
-		if (value === undefined || value === this.#backPath) return;
-		umbBackPathDeprecation.warn();
+		if (value === this.#backPath) return;
+		if (value !== undefined) umbBackPathDeprecation.warn();
 		this.#backPath = value;
 	}
 
 	/**
-	 * Shows a "back to parent" button, linking to the closest known parent — the workspace context's own
-	 * `navigationParentItemPath` when available, or the deprecated `backPath` as a fallback. Left as an explicit
-	 * opt-in since not every entity should surface this button (e.g. tree-based entities rely on the tree itself
-	 * for navigation).
+	 * Shows a "back to parent" button linking to the workspace context's own `navigationParentItemPath`. Left as an
+	 * explicit opt-in since not every entity should surface this button (e.g. tree-based entities rely on the tree
+	 * itself for navigation). Does not affect the deprecated `backPath`, which always shows its own button when set.
 	 */
 	@property({ type: Boolean, attribute: 'show-back-to-parent-button' })
 	public showBackToParentButton = false;
@@ -136,7 +136,7 @@ export class UmbEntityDetailWorkspaceEditorElement extends UmbLitElement {
 		 -->
 			<umb-workspace-editor
 				?loading=${this._isLoading}
-				.backPath=${this.showBackToParentButton ? (this._navigationParentItemPath ?? this.#backPath) : undefined}
+				.backPath=${(this.showBackToParentButton ? this._navigationParentItemPath : undefined) ?? this.#backPath}
 				class="${this._exists === false ? 'hide' : ''}">
 				<slot name="header" slot="header"></slot>
 				${this.#renderEntityActions()}
