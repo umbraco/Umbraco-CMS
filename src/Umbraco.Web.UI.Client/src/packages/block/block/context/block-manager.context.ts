@@ -367,8 +367,8 @@ export abstract class UmbBlockManagerContext<
 				const { data } = await this.#elementRepository.requestByUnique(key);
 				if (data) {
 					const blockData: UmbBlockDataModel = {
-						key: data.unique,
 						contentTypeKey: data.documentType.unique,
+						key: data.unique,
 						values: data.values.map(
 							(v): UmbBlockDataValueModel => ({
 								alias: v.alias,
@@ -646,8 +646,8 @@ export abstract class UmbBlockManagerContext<
 		// TODO: Handle presets here [NL]
 
 		return {
-			key: UmbId.new(),
 			contentTypeKey: blockType.settingsElementTypeKey,
+			key: UmbId.new(),
 			values: [],
 		};
 	}
