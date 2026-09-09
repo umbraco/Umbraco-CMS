@@ -11,15 +11,14 @@ using Umbraco.Cms.Core.Search.Indexing;
 using Umbraco.Cms.Core.Search.Querying;
 using Umbraco.Cms.Core.Search.Querying.Filtering;
 using Umbraco.Cms.Core.Search.Querying.Sorting;
-using Umbraco.Cms.Search.Core.Services;
 using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Cms.Search.BackOffice.Services;
+namespace Umbraco.Cms.Core.Services;
 
 /// <summary>
 /// Provides backoffice entity search against search indexes, honoring user start node and recycle bin restrictions.
 /// </summary>
-internal sealed class IndexedEntitySearchService : IndexedSearchServiceBase, IIndexedEntitySearchService
+public sealed class IndexedEntitySearchService : IndexedSearchServiceBase, IIndexedEntitySearchService
 {
     private readonly ISearcherResolver _searcherResolver;
     private readonly IEntityService _entityService;
@@ -129,7 +128,7 @@ internal sealed class IndexedEntitySearchService : IndexedSearchServiceBase, IIn
             query: effectiveQuery,
             filters: filters,
             facets: null,
-            sorters: [Sorting.Default()],
+            sorters: [DefaultSorter()],
             culture: culture,
             segment: null,
             accessContext: null,

@@ -1,12 +1,13 @@
 ﻿using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Search.Querying.Filtering;
+using Umbraco.Cms.Core.Search.Querying.Sorting;
 
-namespace Umbraco.Cms.Search.BackOffice.Services;
+namespace Umbraco.Cms.Core.Services;
 
 /// <summary>
-/// Provides shared filter parsing for indexed backoffice search services.
+/// Provides shared filter parsing and default sorting for indexed backoffice search services.
 /// </summary>
-internal abstract class IndexedSearchServiceBase
+public abstract class IndexedSearchServiceBase
 {
     /// <summary>
     /// Builds the filters for a search query, extracting an ID or parent ID filter where applicable.
@@ -35,4 +36,9 @@ internal abstract class IndexedSearchServiceBase
 
         return filters;
     }
+
+    /// <summary>
+    /// Gets the default sorter: descending relevance score.
+    /// </summary>
+    protected static Sorter DefaultSorter() => new ScoreSorter(Direction.Descending);
 }

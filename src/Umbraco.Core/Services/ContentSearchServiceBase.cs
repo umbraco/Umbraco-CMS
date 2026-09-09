@@ -8,16 +8,15 @@ using Umbraco.Cms.Core.Search.Indexing;
 using Umbraco.Cms.Core.Search.Querying;
 using Umbraco.Cms.Core.Search.Querying.Filtering;
 using Umbraco.Cms.Core.Search.Querying.Sorting;
-using Umbraco.Cms.Search.Core.Services;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Search.BackOffice.Services;
+namespace Umbraco.Cms.Core.Services;
 
 /// <summary>
 /// Provides backoffice child search for a content type, falling back to the database when no query is given.
 /// </summary>
 /// <typeparam name="TContent">The type of content item to search for.</typeparam>
-internal abstract class ContentSearchServiceBase<TContent> : IndexedSearchServiceBase, IContentSearchService<TContent>
+public abstract class ContentSearchServiceBase<TContent> : IndexedSearchServiceBase, IContentSearchService<TContent>
     where TContent : class, IContentBase
 {
     private readonly IIdKeyMap _idKeyMap;
@@ -179,13 +178,13 @@ internal abstract class ContentSearchServiceBase<TContent> : IndexedSearchServic
     {
         if (ordering?.OrderBy is null)
         {
-            return Sorting.Default();
+            return DefaultSorter();
         }
 
         if (ordering.IsCustomField)
         {
             // TODO: support custom field ordering
-            return Sorting.Default();
+            return DefaultSorter();
         }
 
         switch (ordering.OrderBy)
@@ -199,10 +198,10 @@ internal abstract class ContentSearchServiceBase<TContent> : IndexedSearchServic
                 // NOTE: "creator" / "owner" is configurable for list view but not supported here,
                 //       because this will require a full re-index when any username is changed
                 _logger.LogInformation("The system field \"{field}\" does not support sorting by indexed content search.", ordering.OrderBy);
-                return Sorting.Default();
+                return DefaultSorter();
             default:
                 _logger.LogInformation("The system field \"{field}\" could not be converted into a sorting by indexed content search.", ordering.OrderBy);
-                return Sorting.Default();
+                return DefaultSorter();
         }
     }
 }

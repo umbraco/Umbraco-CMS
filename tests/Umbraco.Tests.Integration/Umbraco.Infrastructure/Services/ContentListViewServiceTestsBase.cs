@@ -11,7 +11,6 @@ using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.ServerEvents;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
-using Umbraco.Cms.Search.BackOffice.DependencyInjection;
 using Umbraco.Cms.Search.Core.DependencyInjection;
 using Umbraco.Cms.Search.Core.Persistence;
 using Umbraco.Cms.Core.Search.Indexing;
@@ -30,8 +29,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
 public abstract class ContentListViewServiceTestsBase : UmbracoIntegrationTest
 {
-    // ContentListViewService now resolves list-view items through IContentSearchService (Umbraco.Cms.Search.BackOffice),
-    // which searches the Umb_Content index. Compose the back-office search stack over an in-memory indexer/searcher so
+    // ContentListViewService now resolves list-view items through IContentSearchService (Umbraco.Cms.Core.Services),
+    // which searches the Umb_Content index. Compose the search stack over an in-memory indexer/searcher so
     // the service resolves and index-backed filtering returns correct results, mirroring Umbraco.Tests.Search.Integration.
     private readonly TestIndexerAndSearcher _indexerAndSearcher = new();
 
@@ -40,7 +39,6 @@ public abstract class ContentListViewServiceTestsBase : UmbracoIntegrationTest
         base.CustomTestSetup(builder);
 
         builder.AddSearchCore();
-        builder.AddBackOfficeSearch();
 
         builder.Services.AddUnique<IBackgroundTaskQueue, ImmediateBackgroundTaskQueue>();
         builder.Services.AddUnique<IServerMessenger, LocalServerMessenger>();

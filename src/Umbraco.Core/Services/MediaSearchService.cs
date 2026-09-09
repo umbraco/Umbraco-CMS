@@ -1,16 +1,14 @@
 ﻿using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Search.Core.Services;
 using Umbraco.Cms.Core.Search;
-using Constants = Umbraco.Cms.Search.Core.Constants;
 
-namespace Umbraco.Cms.Search.BackOffice.Services;
+namespace Umbraco.Cms.Core.Services;
 
 /// <summary>
 /// Provides backoffice child search for media.
 /// </summary>
-internal sealed class MediaSearchService : ContentSearchServiceBase<IMedia>, IMediaSearchService
+public sealed class MediaSearchService : ContentSearchServiceBase<IMedia>, IMediaSearchService
 {
     private readonly IMediaService _mediaService;
 

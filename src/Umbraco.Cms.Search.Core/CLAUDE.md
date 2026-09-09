@@ -141,7 +141,7 @@ cd src/Umbraco.Web.UI
 dotnet run
 ```
 
-The full search stack is registered in the default install via composers: `SearchCoreComposer` + `ExamineSearchProviderComposer` (core + Examine provider), `BackOfficeSearchComposer` (backoffice search services run on the new indexes) and `DeliveryApiSearchComposer` (Delivery API content querying runs on the new indexes; only active when the Delivery API is composed). The legacy Examine-based search stack has been fully removed from the codebase — there is no side-by-side legacy indexing and no legacy fallback setting.
+The full search stack is registered in the default install via composers: `SearchCoreComposer` (core engine, including the backoffice search services — `IContentSearchService`, `IMediaSearchService`, `IIndexedEntitySearchService` — which now live in `Umbraco.Core/Services`) + `ExamineSearchProviderComposer` (Examine provider) and `DeliveryApiSearchComposer` (Delivery API content querying runs on the new indexes; only active when the Delivery API is composed). The legacy Examine-based search stack has been fully removed from the codebase — there is no side-by-side legacy indexing and no legacy fallback setting.
 
 ## Architecture
 
@@ -216,9 +216,9 @@ Content changes are tracked via notification handlers that trigger indexing:
 
 Index documents are persisted via `IndexDocumentRepository` using **MessagePack serialization** (with Lz4 compression) for efficient change detection — only actual field changes trigger re-indexing, not every save.
 
-### Backoffice Integration (Umbraco.Cms.Search.BackOffice)
+### Backoffice Integration (Umbraco.Core/Services)
 
-Provides backoffice search using the Search API. Registers a backoffice search provider that queries the `Umb_Content` index.
+`ContentSearchService`, `MediaSearchService` and `IndexedEntitySearchService` live in `Umbraco.Core/Services` and provide backoffice search using the Search API, querying the `Umb_Content` index (registered by `SearchCoreComposer`/`AddSearchCore()`).
 
 ### Delivery API Integration (Umbraco.Cms.Search.DeliveryApi)
 

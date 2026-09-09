@@ -5,6 +5,7 @@ using Umbraco.Cms.Api.Common.OpenApi;
 using Umbraco.Cms.Api.Management.OpenApi;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.ServerEvents;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Search.Core.Cache;
 using Umbraco.Cms.Search.Core.Cache.Content;
 using Umbraco.Cms.Search.Core.Cache.ContentType;
@@ -78,6 +79,10 @@ public static class UmbracoBuilderExtensions
 
         // replace the core IPublishedContentQuery with the search enabled implementation (same scoped lifetime as the core registration)
         builder.Services.AddUnique<Umbraco.Cms.Core.IPublishedContentQuery, SearchEnabledPublishedContentQuery>(ServiceLifetime.Scoped);
+
+        builder.Services.AddUnique<IIndexedEntitySearchService, IndexedEntitySearchService>();
+        builder.Services.AddUnique<IContentSearchService, ContentSearchService>();
+        builder.Services.AddUnique<IMediaSearchService, MediaSearchService>();
 
         // we need these notification handlers explicitly registered for the distributed content index refresher
         builder.Services.AddTransient<DraftContentNotificationHandler>();
