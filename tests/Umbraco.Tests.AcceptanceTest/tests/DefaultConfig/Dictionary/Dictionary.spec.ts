@@ -26,7 +26,7 @@ test('can create a dictionary item', async ({umbracoApi, umbracoUi}) => {
   // Assert
   await umbracoUi.dictionary.isErrorNotificationVisible(false);
   expect(await umbracoApi.dictionary.doesNameExist(dictionaryName)).toBeTruthy();
-  await umbracoUi.dictionary.clickLeftArrowButton();
+  await umbracoUi.dictionary.goToSection(ConstantHelper.sections.dictionary);
   // Verify the dictionary item displays in the tree and in the list
   await umbracoUi.dictionary.isDictionaryTreeItemVisible(dictionaryName);
   expect(await umbracoUi.dictionary.doesDictionaryListHaveText(dictionaryName)).toBeTruthy();
@@ -68,7 +68,7 @@ test('can create a dictionary item in a dictionary', {tag: '@smoke'}, async ({um
   await umbracoUi.dictionary.isErrorNotificationVisible(false);
   const dictionaryChildren = await umbracoApi.dictionary.getChildren(parentDictionaryId);
   expect(dictionaryChildren[0].name).toEqual(dictionaryName);
-  await umbracoUi.dictionary.clickLeftArrowButton();
+  await umbracoUi.dictionary.goToSection(ConstantHelper.sections.dictionary);
   // Verify the new dictionary item displays in the list
   expect(await umbracoUi.dictionary.doesDictionaryListHaveText(dictionaryName)).toBeTruthy();
   // Verify the new dictionary item displays in the tree
