@@ -2307,6 +2307,7 @@ export default {
 		invariantForVariantHelp: 'Allows editing of content shared across languages. *Does not apply to culture-invariant content.*',
 		allowAccessToAllDocuments: 'Allow access to all documents',
 		allowAccessToAllElements: 'Allow access to all elements',
+		allowAccessToAllDocumentBlueprints: 'Allow access to all document blueprints',
 		allowAccessToAllMedia: 'Allow access to all media',
 		sectionsHelp: 'Add sections to give users access',
 		selectUserGroup: (multiple: boolean) => {
@@ -2400,6 +2401,9 @@ export default {
 		enableUserConfirmation: 'Are you sure you want to enable this user?',
 		unlockUserHeadline: (name: string) => `Unlock ${name}`,
 		unlockUserConfirmation: 'Are you sure you want to unlock this user?',
+		selectDocumentBlueprintStartNode: 'Select document blueprint start node',
+		selectDocumentBlueprintStartNodeDescription:
+			'Limit the document blueprints users can manage to a specific start node',
 	},
 	userPermissions: {
 		create: 'Create',
