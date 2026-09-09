@@ -5,7 +5,9 @@ import { UmbEntityDeletedEvent } from '@umbraco-cms/backoffice/entity-action';
 import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 
-export const UmbDeleteEntityWorkspaceRedirectControllerAlias = Symbol('UmbDeleteEntityWorkspaceRedirectControllerAlias');
+export const UmbDeleteEntityWorkspaceRedirectControllerAlias = Symbol(
+	'UmbDeleteEntityWorkspaceRedirectControllerAlias',
+);
 
 /**
  * The minimal shape this controller needs from a workspace context — intentionally not a public interface, since
@@ -35,11 +37,7 @@ export class UmbDeleteEntityWorkspaceRedirectController extends UmbControllerBas
 		super(host, UmbDeleteEntityWorkspaceRedirectControllerAlias);
 		this.#workspaceContext = workspaceContext;
 
-		this.observe(
-			workspaceContext.navigationParentItemPath,
-			(path) => (this.#navigationParentItemPath = path),
-			'umbObserveNavigationParentItemPath',
-		);
+		this.observe(workspaceContext.navigationParentItemPath, (path) => (this.#navigationParentItemPath = path), null);
 
 		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (context) => {
 			this.#actionEventContext = context;
