@@ -121,7 +121,6 @@ test('cannot upload a file with a disallowed extension', async ({umbracoApi, umb
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
   // Act
-  // A disallowed extension is silently rejected, with no error message, just an empty dropzone
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.uploadFile(uploadFilePath + 'File.txt');
   await umbracoUi.content.isInputDropzoneVisible(true);
