@@ -73,6 +73,8 @@ public class DocumentBlueprintTreeControllerBase : UserStartNodeFolderTreeContro
     {
         DocumentBlueprintTreeItemResponseModel responseModel = await base.MapTreeItemViewModelAsync(parentKey, entity);
 
+        // Containers are read alongside the blueprints, and a query covering blueprints yields every
+        // row as a document, so the entity type alone does not tell the two apart.
         if (responseModel.IsFolder is false && entity is IDocumentEntitySlim documentEntitySlim)
         {
             responseModel.HasChildren = false;
@@ -80,6 +82,13 @@ public class DocumentBlueprintTreeControllerBase : UserStartNodeFolderTreeContro
             responseModel.Variants = await _documentPresentationFactory.CreateVariantsItemResponseModelsAsync(documentEntitySlim);
         }
 
+        return responseModel;
+    }
+
+    protected override async Task<DocumentBlueprintTreeItemResponseModel> MapTreeItemViewModelAsNoAccessAsync(Guid? parentKey, IEntitySlim entity)
+    {
+        DocumentBlueprintTreeItemResponseModel responseModel = await MapTreeItemViewModelAsync(parentKey, entity);
+        responseModel.NoAccess = true;
         return responseModel;
     }
 }
