@@ -42,15 +42,16 @@ internal sealed class SingleBlockPropertyValueCreator : BlockPropertyValueCreato
     /// <param name="referenceCacheLevel">The cache level to use for property references.</param>
     /// <param name="intermediateBlockModelValue">The intermediate block model value as a string, typically JSON.</param>
     /// <param name="preview">True if the model is being created for preview purposes; otherwise, false.</param>
+    /// <param name="owningPropertyCulture">The culture of the stored property value the block value was loaded from, or <c>null</c> when the property does not vary by culture.</param>
     /// <param name="blockConfigurations">An array of <see cref="BlockListConfiguration.BlockConfiguration"/> objects to use when creating the model.</param>
     /// <returns>A single <see cref="BlockListItem"/> representing the block model, or <c>null</c> if none could be created.</returns>
-    public async Task<BlockListItem?> CreateBlockModelAsync(IPublishedElement owner, PropertyCacheLevel referenceCacheLevel, string intermediateBlockModelValue, bool preview, BlockListConfiguration.BlockConfiguration[] blockConfigurations)
+    public async Task<BlockListItem?> CreateBlockModelAsync(IPublishedElement owner, PropertyCacheLevel referenceCacheLevel, string intermediateBlockModelValue, bool preview, string? owningPropertyCulture, BlockListConfiguration.BlockConfiguration[] blockConfigurations)
     {
         BlockListModel CreateEmptyModel() => BlockListModel.Empty;
 
         BlockListModel CreateModel(IList<BlockListItem> items) => new BlockListModel(items);
 
-        BlockListItem? blockModel = (await CreateBlockModelAsync(owner, referenceCacheLevel, intermediateBlockModelValue, preview, blockConfigurations, CreateEmptyModel, CreateModel)).SingleOrDefault();
+        BlockListItem? blockModel = (await CreateBlockModelAsync(owner, referenceCacheLevel, intermediateBlockModelValue, preview, owningPropertyCulture, blockConfigurations, CreateEmptyModel, CreateModel)).SingleOrDefault();
 
         return blockModel;
     }
