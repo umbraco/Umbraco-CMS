@@ -39,6 +39,19 @@ public class ImagingMemorySettings
     internal const int StaticMaximumDecodedImageMegabytes = 0;
 
     /// <summary>
+    /// The largest pool size, in megabytes, that may be configured for
+    /// <see cref="MaximumPoolSizeMegabytes" />.
+    /// </summary>
+    /// <remarks>
+    /// Not a limit on anything the imaging library can do - it is well past any pool a site could
+    /// use, and past what its own default reaches on all but an extraordinary host. It exists to
+    /// catch a value given in bytes rather than megabytes, which would otherwise have the library
+    /// size an internal array against it and fail the boot with an unattributable out of memory
+    /// error.
+    /// </remarks>
+    internal const int MaximumConfigurablePoolSizeMegabytes = 65536;
+
+    /// <summary>
     /// The share of available memory image processing is allowed to occupy when deriving
     /// <see cref="MaximumConcurrentProcessing" />.
     /// </summary>
