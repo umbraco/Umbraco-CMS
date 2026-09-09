@@ -65,6 +65,39 @@ describe('UmbEntryWorkspaceDataManager', () => {
 		});
 	});
 
+	describe('values ordering (_sortCurrentData)', () => {
+		const valueA = { alias: 'a', culture: null, segment: null, editorAlias: 'test', value: 'A' };
+		const valueB = { alias: 'b', culture: null, segment: null, editorAlias: 'test', value: 'B' };
+		const valueC = { alias: 'c', culture: null, segment: null, editorAlias: 'test', value: 'C' };
+
+		it('sorts current values to match persisted order when current is set', () => {
+			manager.setPersisted({ values: [valueA, valueB] });
+			manager.setCurrent({ values: [valueB, valueA] });
+			expect(manager.getCurrent()?.values.map((x) => x.alias)).to.deep.equal(['a', 'b']);
+		});
+
+		it('re-sorts existing current values when persisted is set again with a different order', () => {
+			manager.setCurrent({ values: [valueB, valueA] });
+			manager.setPersisted({ values: [valueA, valueB] });
+			expect(manager.getCurrent()?.values.map((x) => x.alias)).to.deep.equal(['a', 'b']);
+			expect(manager.getHasUnpersistedChanges()).to.be.false;
+		});
+
+		it('re-sorts existing current values when persisted is updated with a different order', () => {
+			manager.setPersisted({ values: [valueB, valueA] });
+			manager.setCurrent({ values: [valueB, valueA] });
+			manager.updatePersisted({ values: [valueA, valueB] });
+			expect(manager.getCurrent()?.values.map((x) => x.alias)).to.deep.equal(['a', 'b']);
+			expect(manager.getHasUnpersistedChanges()).to.be.false;
+		});
+
+		it('appends a current-only value after every value known to persisted', () => {
+			manager.setPersisted({ values: [valueA, valueB] });
+			manager.setCurrent({ values: [valueC, valueB, valueA] });
+			expect(manager.getCurrent()?.values.map((x) => x.alias)).to.deep.equal(['a', 'b', 'c']);
+		});
+	});
+
 	describe('destroy', () => {
 		it('does not throw when finishPropertyValueChange is called after destroy', () => {
 			manager.initiatePropertyValueChange();
