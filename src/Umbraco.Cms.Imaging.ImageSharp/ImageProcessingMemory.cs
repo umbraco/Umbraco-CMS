@@ -68,13 +68,20 @@ internal static class ImageProcessingMemory
             return;
         }
 
-        // One allocator, shared process-wide, as the imaging library advises. Its documented sample
-        // clones the configuration instead, but a clone would leave Configuration.Default on its own
-        // allocator, so anything using that directly would pool separately. Assigned once per host
-        // build, so a process building several - the test harness - replaces it rather than
-        // accumulating them.
+        // One allocator, shared process-wide. The library's own remarks on
+        // Configuration.MemoryAllocator say to ensure that "by altering the allocator of
+        // Configuration.Default", which is why this does not follow the documented sample's
+        // Configuration.Default.Clone(): a clone would leave the default on its own allocator, so
+        // anything using that directly - a package, or a plain Image.Load - would pool separately.
         // https://docs.sixlabors.com/articles/imagesharp/memorymanagement.html#customize-the-allocator
+        MemoryAllocator dropped = Configuration.Default.MemoryAllocator;
         Configuration.Default.MemoryAllocator = MemoryAllocator.Create(options);
+
+        // Required of an allocator that is dropped, by the same remarks. Nothing is retained on a
+        // first boot, but a process that builds several hosts - the test harness - would otherwise
+        // leave every replaced pool holding its returned buffers. Only idle buffers are freed, so
+        // this cannot disturb an image still in use.
+        dropped.ReleaseRetainedResources();
 
         logger.LogInformation(
             "Bounded image processing memory with a {MaximumPoolSizeMegabytes} MB pool and a {MaximumDecodedImageMegabytes} MB ceiling per image, with {AvailableMemoryMegabytes} MB available to the process. A null bound is left to the imaging library.",
