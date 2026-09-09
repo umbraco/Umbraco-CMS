@@ -26,7 +26,7 @@ public class ConfigureImageSharpMiddlewareOptionsTests
         ImageSharpMiddlewareOptions options = Configure();
 
         using var semaphore = new SemaphoreSlim(2, 2);
-        var slot = new ImageProcessingSlot(semaphore);
+        var slot = new ImageProcessingSlot(semaphore, TimeSpan.FromSeconds(5));
         ImageCommandContext context = CreateContext(slot);
 
         await options.OnBeforeLoadAsync(context, Configuration.Default);
@@ -61,7 +61,7 @@ public class ConfigureImageSharpMiddlewareOptionsTests
         Configure(options);
 
         using var semaphore = new SemaphoreSlim(1, 1);
-        ImageCommandContext context = CreateContext(new ImageProcessingSlot(semaphore));
+        ImageCommandContext context = CreateContext(new ImageProcessingSlot(semaphore, TimeSpan.FromSeconds(5)));
 
         DecoderOptions? decoderOptions = await options.OnBeforeLoadAsync(context, Configuration.Default);
 

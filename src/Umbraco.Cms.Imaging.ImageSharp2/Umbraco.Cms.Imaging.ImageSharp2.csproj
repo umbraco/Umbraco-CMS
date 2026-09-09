@@ -20,6 +20,7 @@
       to keep one copy. Everything else in this project is a deliberate variant of its counterpart.
     -->
     <Compile Include="..\Umbraco.Cms.Imaging.ImageSharp\ImageProcessingMemory.cs" Link="ImageProcessingMemory.cs" />
+    <Compile Include="..\Umbraco.Cms.Imaging.ImageSharp\ImageProcessingThrottle.cs" Link="ImageProcessingThrottle.cs" />
     <Compile Include="..\Umbraco.Cms.Imaging.ImageSharp\ConfigurePhysicalFileSystemCacheOptions.cs" Link="ConfigurePhysicalFileSystemCacheOptions.cs" />
   </ItemGroup>
 

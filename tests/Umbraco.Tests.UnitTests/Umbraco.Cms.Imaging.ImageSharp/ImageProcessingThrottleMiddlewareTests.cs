@@ -139,6 +139,26 @@ public class ImageProcessingThrottleMiddlewareTests
         Assert.That(completed, Is.True);
     }
 
+    /// <summary>
+    /// A request that waits without getting a place is turned away rather than left hanging, and
+    /// with a status a proxy in front of the site can act on.
+    /// </summary>
+    [Test]
+    public async Task InvokeAsync_WhenTheWaitIsGivenUpOn_RespondsServiceUnavailable()
+    {
+        // Thrown from the decode hook in production; raised here from the pipeline it reaches.
+        var middleware = CreateMiddleware(_ => throw new ImageProcessingUnavailableException("No place came free."));
+        DefaultHttpContext context = CreateContext(ImagePath, ("width", "400"));
+
+        await middleware.InvokeAsync(context);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(context.Response.StatusCode, Is.EqualTo(StatusCodes.Status503ServiceUnavailable));
+            Assert.That(context.Response.Headers.RetryAfter.ToString(), Is.Not.Empty);
+        });
+    }
+
     private static ImageProcessingThrottleMiddleware CreateMiddleware(RequestDelegate next)
         => Build(next, new ImagingMemorySettings { MaximumConcurrentProcessing = Limit });
 

@@ -34,6 +34,7 @@ public sealed class ImageProcessingThrottleMiddleware
 {
     private readonly RequestDelegate _next;
     private readonly FormatUtilities _formatUtilities;
+    private readonly ILogger _logger;
     private readonly SemaphoreSlim? _semaphore;
     private readonly HashSet<string> _commands;
 
@@ -89,6 +90,7 @@ public sealed class ImageProcessingThrottleMiddleware
     {
         _next = next;
         _formatUtilities = formatUtilities;
+        _logger = logger;
 
         var availableMemoryMegabytes = availableMemoryBytes / 1024 / 1024;
 
@@ -128,7 +130,14 @@ public sealed class ImageProcessingThrottleMiddleware
             return;
         }
 
-        await _semaphore.WaitAsync(context.RequestAborted);
+        // Waiting without a bound is hanging, not degrading, so demand beyond what the host can
+        // serve is turned away instead of queued indefinitely.
+        if (await _semaphore.WaitAsync(ImageProcessingThrottle.WaitTimeout, context.RequestAborted) is false)
+        {
+            ImageProcessingThrottle.Reject(context, _logger);
+            return;
+        }
+
         try
         {
             await _next(context);

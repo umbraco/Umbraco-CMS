@@ -18,13 +18,19 @@ internal sealed class ImageProcessingSlot
     internal const string HttpContextItemKey = "Umbraco.Cms.Imaging.ImageSharp.ImageProcessingSlot";
 
     private readonly SemaphoreSlim _semaphore;
+    private readonly TimeSpan _waitTimeout;
     private bool _held;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ImageProcessingSlot" /> class.
     /// </summary>
     /// <param name="semaphore">The semaphore bounding concurrent processing.</param>
-    public ImageProcessingSlot(SemaphoreSlim semaphore) => _semaphore = semaphore;
+    /// <param name="waitTimeout">How long to wait for a place before giving up on one.</param>
+    public ImageProcessingSlot(SemaphoreSlim semaphore, TimeSpan waitTimeout)
+    {
+        _semaphore = semaphore;
+        _waitTimeout = waitTimeout;
+    }
 
     /// <summary>
     /// Waits for a place within the concurrency limit, unless this request already holds one.
@@ -41,7 +47,12 @@ internal sealed class ImageProcessingSlot
             return;
         }
 
-        await _semaphore.WaitAsync(cancellationToken);
+        if (await _semaphore.WaitAsync(_waitTimeout, cancellationToken) is false)
+        {
+            throw new ImageProcessingUnavailableException(
+                $"Waited {_waitTimeout.TotalSeconds} seconds without a place within the image processing concurrency limit.");
+        }
+
         _held = true;
     }
 

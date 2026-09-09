@@ -9,11 +9,15 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Imaging.ImageSharp;
 [TestFixture]
 public class ImageProcessingSlotTests
 {
+    // Long enough that a place already free is taken without fuss, short enough that the test
+    // asserting the timeout does not sit here.
+    private static readonly TimeSpan WaitTimeout = TimeSpan.FromMilliseconds(250);
+
     [Test]
     public async Task AcquireAsync_TakesOnePlace()
     {
         using var semaphore = new SemaphoreSlim(2, 2);
-        var slot = new ImageProcessingSlot(semaphore);
+        var slot = new ImageProcessingSlot(semaphore, WaitTimeout);
 
         await slot.AcquireAsync(CancellationToken.None);
 
@@ -26,7 +30,7 @@ public class ImageProcessingSlotTests
     public async Task AcquireAsync_WhenAlreadyHeld_TakesNoFurtherPlace()
     {
         using var semaphore = new SemaphoreSlim(2, 2);
-        var slot = new ImageProcessingSlot(semaphore);
+        var slot = new ImageProcessingSlot(semaphore, WaitTimeout);
 
         await slot.AcquireAsync(CancellationToken.None);
         await slot.AcquireAsync(CancellationToken.None);
@@ -38,7 +42,7 @@ public class ImageProcessingSlotTests
     public async Task Release_GivesThePlaceBack()
     {
         using var semaphore = new SemaphoreSlim(1, 1);
-        var slot = new ImageProcessingSlot(semaphore);
+        var slot = new ImageProcessingSlot(semaphore, WaitTimeout);
 
         await slot.AcquireAsync(CancellationToken.None);
         slot.Release();
@@ -52,7 +56,7 @@ public class ImageProcessingSlotTests
     public void Release_WhenNeverAcquired_DoesNothing()
     {
         using var semaphore = new SemaphoreSlim(1, 1);
-        var slot = new ImageProcessingSlot(semaphore);
+        var slot = new ImageProcessingSlot(semaphore, WaitTimeout);
 
         Assert.DoesNotThrow(slot.Release);
         Assert.That(semaphore.CurrentCount, Is.EqualTo(1));
@@ -62,7 +66,7 @@ public class ImageProcessingSlotTests
     public async Task Release_WhenCalledTwice_GivesBackOnlyOnePlace()
     {
         using var semaphore = new SemaphoreSlim(1, 1);
-        var slot = new ImageProcessingSlot(semaphore);
+        var slot = new ImageProcessingSlot(semaphore, WaitTimeout);
 
         await slot.AcquireAsync(CancellationToken.None);
 
@@ -77,7 +81,7 @@ public class ImageProcessingSlotTests
     public void AcquireAsync_WhenCancelled_TakesNoPlace()
     {
         using var semaphore = new SemaphoreSlim(0, 1);
-        var slot = new ImageProcessingSlot(semaphore);
+        var slot = new ImageProcessingSlot(semaphore, WaitTimeout);
 
         using var cancellation = new CancellationTokenSource();
         cancellation.Cancel();
@@ -85,6 +89,19 @@ public class ImageProcessingSlotTests
         Assert.CatchAsync<OperationCanceledException>(() => slot.AcquireAsync(cancellation.Token));
 
         // Nothing was taken, so the later release must not hand back a place that was never held.
+        slot.Release();
+        Assert.That(semaphore.CurrentCount, Is.Zero);
+    }
+
+    [Test]
+    public void AcquireAsync_WhenNoPlaceComesFree_GivesUp()
+    {
+        using var semaphore = new SemaphoreSlim(0, 1);
+        var slot = new ImageProcessingSlot(semaphore, WaitTimeout);
+
+        Assert.ThrowsAsync<ImageProcessingUnavailableException>(() => slot.AcquireAsync(CancellationToken.None));
+
+        // Nothing was taken, so the release at the end of the request must hand nothing back.
         slot.Release();
         Assert.That(semaphore.CurrentCount, Is.Zero);
     }

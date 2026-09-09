@@ -40,6 +40,7 @@ public sealed class ImageProcessingThrottleMiddleware
 {
     private readonly RequestDelegate _next;
     private readonly FormatUtilities _formatUtilities;
+    private readonly ILogger _logger;
     private readonly SemaphoreSlim? _semaphore;
     private readonly HashSet<string> _commands;
 
@@ -95,6 +96,7 @@ public sealed class ImageProcessingThrottleMiddleware
     {
         _next = next;
         _formatUtilities = formatUtilities;
+        _logger = logger;
 
         var availableMemoryMegabytes = availableMemoryBytes / 1024 / 1024;
 
@@ -134,12 +136,16 @@ public sealed class ImageProcessingThrottleMiddleware
             return;
         }
 
-        var slot = new ImageProcessingSlot(_semaphore);
+        var slot = new ImageProcessingSlot(_semaphore, ImageProcessingThrottle.WaitTimeout);
         context.Items[ImageProcessingSlot.HttpContextItemKey] = slot;
 
         try
         {
             await _next(context);
+        }
+        catch (ImageProcessingUnavailableException)
+        {
+            ImageProcessingThrottle.Reject(context, _logger);
         }
         finally
         {

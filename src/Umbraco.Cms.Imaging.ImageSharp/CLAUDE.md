@@ -19,7 +19,7 @@ Image processing library using **ImageSharp 3.x** and **ImageSharp.Web** for on-
 
 - `Umbraco.Web.Common` - Web infrastructure
 
-### Project Structure (10 source files)
+### Project Structure (13 source files)
 
 ```
 Umbraco.Cms.Imaging.ImageSharp/
@@ -29,6 +29,9 @@ Umbraco.Cms.Imaging.ImageSharp/
 ├── ConfigurePhysicalFileSystemCacheOptions.cs # File cache location
 ├── ImageProcessingThrottleMiddleware.cs     # Bounds concurrent processing; owns the slot lifetime
 ├── ImageProcessingSlot.cs                   # One request's claim on the concurrency limit
+├── ImageProcessingMemory.cs                 # Derives and applies the memory bounds (shared with ImageSharp2)
+├── ImageProcessingThrottle.cs               # How long a request waits, and how it is turned away
+├── ImageProcessingUnavailableException.cs   # Raised from the decode hook when the wait is given up on
 ├── ImageProcessors/
 │   └── CropWebProcessor.cs                  # Custom crop processor with EXIF awareness
 └── Media/
@@ -186,6 +189,11 @@ maps onto ImageSharp's `AllocationLimitMegabytes`, whose own default is a flat 1
 process and 4 GB on a 64-bit one. Exceeding it throws `InvalidMemoryOperationException`, so one
 outsized request fails rather than the process dying. Note this is unrelated to `Resize.MaxWidth`
 and `Resize.MaxHeight`, which bound the *output* dimensions, not the source decode.
+
+A request over the limit waits, then after `ImageProcessingThrottle.WaitTimeout` (30 seconds) is
+turned away with `503` and a `Retry-After`, logged as a warning. It must not be let through
+unthrottled on expiry instead — concurrent decodes are the thing being bounded, so that reinstates
+the OOM under sustained load.
 
 `Enabled: false` remains the one-setting escape hatch that restores stock ImageSharp behaviour.
 
