@@ -2,7 +2,6 @@ import { UmbDocumentVariantState } from '../../../variant-state.js';
 import type { UmbDocumentPublishWithDescendantsModalElement } from './document-publish-with-descendants-modal.element.js';
 import type { UmbDocumentVariantOptionModel } from '../../../types.js';
 import { expect, fixture, html } from '@open-wc/testing';
-import type { UmbDocumentVariantLanguagePickerElement } from '../../../modals/shared/document-variant-language-picker.element.js';
 
 import './document-publish-with-descendants-modal.element.js';
 
@@ -49,11 +48,10 @@ async function listedOptions(options: Array<UmbDocumentVariantOptionModel>): Pro
 	);
 	await element.updateComplete;
 
-	const picker = element.shadowRoot!.querySelector(
-		'umb-document-variant-language-picker',
-	) as UmbDocumentVariantLanguagePickerElement;
+	const picker = element.shadowRoot!.querySelector('umb-document-variant-language-picker');
+	expect(picker, 'the variant picker is rendered').to.exist;
 
-	return picker.variantLanguageOptions.map((o) => o.unique);
+	return picker!.variantLanguageOptions.map((o) => o.unique);
 }
 
 describe('UmbDocumentPublishWithDescendantsModalElement', () => {

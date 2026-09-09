@@ -98,8 +98,6 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 
 		let selected = this.data?.activeVariants ?? [];
 
-		// Only display variants that are relevant to pick from, i.e. variants that are draft, not-published-mandatory or published with pending changes.
-		// If we don't know the state (e.g. from a bulk publishing selection) we need to consider it available for selection.
 		const validOptions = this._options.filter((option) => this.#pickableFilter(option));
 
 		// Filter selection based on options:
