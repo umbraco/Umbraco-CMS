@@ -169,10 +169,10 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	 * `undefined` when there's no parent or it's not yet known). Override to provide entity-specific redirect
 	 * logic — e.g. a root workspace or section fallback when there's no parent, or branching on the parent's
 	 * entity type (e.g. a folder vs. a regular item). Defaults to `undefined` (no known target).
-	 * @param {UmbEntityModel | undefined} entity - The current parent entity, or undefined when there is none.
+	 * @param {UmbEntityModel | undefined} _entity - The current parent entity, or undefined when there is none.
 	 * @returns {string | undefined} An absolute path to navigate to, or undefined if there is none.
 	 */
-	protected _getNavigationParentItemPath(entity: UmbEntityModel | undefined): string | undefined {
+	protected _getNavigationParentItemPath(_entity: UmbEntityModel | undefined): string | undefined {
 		return undefined;
 	}
 
