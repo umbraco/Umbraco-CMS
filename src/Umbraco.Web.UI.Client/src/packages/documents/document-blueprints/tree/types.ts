@@ -11,4 +11,5 @@ export interface UmbDocumentBlueprintTreeRootModel extends UmbTreeRootModel {
 
 export interface UmbDocumentBlueprintTreeItemModel extends UmbTreeItemModel {
 	entityType: UmbDocumentBlueprintEntityType | UmbDocumentBlueprintFolderEntityType;
+	noAccess: boolean;
 }

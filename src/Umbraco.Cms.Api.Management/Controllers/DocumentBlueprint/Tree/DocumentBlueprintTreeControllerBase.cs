@@ -87,19 +87,25 @@ public class DocumentBlueprintTreeControllerBase : UserStartNodeFolderTreeContro
         }
     }
 
-    protected override async Task<DocumentBlueprintTreeItemResponseModel[]> MapTreeItemViewModelsAsync(Guid? parentId, IEntitySlim[] entities)
+    protected override async Task<DocumentBlueprintTreeItemResponseModel> MapTreeItemViewModelAsync(Guid? parentKey, IEntitySlim entity)
     {
-        IEnumerable<Task<DocumentBlueprintTreeItemResponseModel>> tasks = entities.Select(async entity =>
-        {
-            DocumentBlueprintTreeItemResponseModel responseModel = await MapTreeItemViewModelAsync(parentId, entity);
-            if (entity is IDocumentEntitySlim documentEntitySlim)
-            {
-                responseModel.HasChildren = false;
-                responseModel.DocumentType = _documentPresentationFactory.CreateDocumentTypeReferenceResponseModel(documentEntitySlim);
-            }
-            return responseModel;
-        });
+        DocumentBlueprintTreeItemResponseModel responseModel = await base.MapTreeItemViewModelAsync(parentKey, entity);
 
-        return await Task.WhenAll(tasks);
+        // Containers are read alongside the blueprints, and a query covering blueprints yields every
+        // row as a document, so the entity type alone does not tell the two apart.
+        if (responseModel.IsFolder is false && entity is IDocumentEntitySlim documentEntitySlim)
+        {
+            responseModel.HasChildren = false;
+            responseModel.DocumentType = _documentPresentationFactory.CreateDocumentTypeReferenceResponseModel(documentEntitySlim);
+        }
+
+        return responseModel;
+    }
+
+    protected override async Task<DocumentBlueprintTreeItemResponseModel> MapTreeItemViewModelAsNoAccessAsync(Guid? parentKey, IEntitySlim entity)
+    {
+        DocumentBlueprintTreeItemResponseModel responseModel = await MapTreeItemViewModelAsync(parentKey, entity);
+        responseModel.NoAccess = true;
+        return responseModel;
     }
 }

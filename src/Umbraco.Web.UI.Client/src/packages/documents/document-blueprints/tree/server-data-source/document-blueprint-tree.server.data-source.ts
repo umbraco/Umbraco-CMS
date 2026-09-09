@@ -69,6 +69,7 @@ export class UmbDocumentBlueprintTreeServerDataSource
 			entityType: item.isFolder ? UMB_DOCUMENT_BLUEPRINT_FOLDER_ENTITY_TYPE : UMB_DOCUMENT_BLUEPRINT_ENTITY_TYPE,
 			isFolder: item.isFolder,
 			hasChildren: item.hasChildren,
+			noAccess: item.noAccess,
 			icon: item.isFolder ? 'icon-folder' : 'icon-blueprint',
 		};
 	}
