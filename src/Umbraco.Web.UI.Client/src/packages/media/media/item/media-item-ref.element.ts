@@ -5,7 +5,7 @@ import { UMB_EDIT_MEDIA_WORKSPACE_PATH_PATTERN } from '../paths.js';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { customElement, html, ifDefined, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
+import { umbGenerateWorkspaceLink, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS } from '@umbraco-cms/backoffice/section';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 
@@ -57,29 +57,25 @@ export class UmbMediaItemRefElement extends UmbLitElement {
 			});
 	}
 
-	#getHref(item: UmbMediaItemModel) {
-		// No `_editPath` means the modal route registration couldn't reach a parent route context
-		// (e.g. this ref is rendered inside a non-routable modal). The workspace is still reachable, just
-		// not as a route relative to this host, so link to it by its absolute path instead.
-		if (!this._editPath) return UMB_EDIT_MEDIA_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: item.unique });
-		const path = UMB_EDIT_MEDIA_WORKSPACE_PATH_PATTERN.generateLocal({ unique: item.unique });
-		return `${this._editPath}/${path}`;
-	}
-
-	// An absolute href leaves whatever the host is showing (a modal, a workspace with unsaved changes), so
-	// open it in a new tab. A route-relative href stays within the current view and navigates in place.
-	#getTarget() {
-		return this._editPath ? undefined : '_blank';
+	#getLink(item: UmbMediaItemModel) {
+		if (!item.unique) return;
+		return umbGenerateWorkspaceLink({
+			pattern: UMB_EDIT_MEDIA_WORKSPACE_PATH_PATTERN,
+			params: { unique: item.unique },
+			routePath: this._editPath,
+		});
 	}
 
 	override render() {
 		if (!this.item) return nothing;
 
+		const link = this.#getLink(this.item);
+
 		return html`
 			<uui-ref-node
 				name=${this.item.name}
-				href=${ifDefined(this.#getHref(this.item))}
-				target=${ifDefined(this.#getTarget())}
+				href=${ifDefined(link?.href)}
+				target=${ifDefined(link?.target)}
 				?readonly=${this.readonly || !this._userHasSectionAccess}
 				?standalone=${this.standalone}>
 				<slot name="actions" slot="actions"></slot>

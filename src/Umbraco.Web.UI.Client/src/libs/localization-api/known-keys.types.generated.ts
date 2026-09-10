@@ -1879,6 +1879,7 @@ declare global {
 		references_labelUsedByMediaTypes: string;
 		references_labelUsedByMembers: string;
 		references_labelUsedByMemberTypes: string;
+		references_labelUsedByOtherContent: string;
 		references_labelUsedDescendants: string;
 		references_labelUsedItems: string;
 		references_listViewDialogWarning: string;

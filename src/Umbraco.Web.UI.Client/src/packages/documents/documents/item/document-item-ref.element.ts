@@ -4,8 +4,11 @@ import type { UmbDocumentSearchItemModel } from '../search/types.js';
 import type { UmbDocumentItemModel } from './types.js';
 import { UmbDocumentItemDataResolver } from './document-item-data-resolver.js';
 import { css, customElement, html, ifDefined, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
+import { umbGenerateWorkspaceLink, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
+import { UMB_CONTENT_SECTION_ALIAS } from '@umbraco-cms/backoffice/content';
+import { UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS } from '@umbraco-cms/backoffice/section';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import type { UUISelectableEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbDeselectedEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
@@ -68,8 +71,22 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 	@state()
 	private _ancestorPath = '';
 
+	@state()
+	private _userHasSectionAccess = false;
+
 	constructor() {
 		super();
+
+		createExtensionApiByAlias(this, UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS, [
+			{
+				config: {
+					match: UMB_CONTENT_SECTION_ALIAS,
+				},
+				onChange: (permitted: boolean) => {
+					this._userHasSectionAccess = permitted;
+				},
+			},
+		]);
 
 		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
 			.addUniquePaths(['unique'])
@@ -87,20 +104,13 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 		this.#item.observe(this.#item.isDraft, (isDraft) => (this._isDraft = isDraft ?? false));
 	}
 
-	#getHref() {
+	#getLink() {
 		if (!this._unique) return;
-		// No `_editPath` means the modal route registration couldn't reach a parent route context
-		// (e.g. this ref is rendered inside a non-routable modal). The workspace is still reachable, just
-		// not as a route relative to this host, so link to it by its absolute path instead.
-		if (!this._editPath) return UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: this._unique });
-		const path = UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN.generateLocal({ unique: this._unique });
-		return `${this._editPath}/${path}`;
-	}
-
-	// An absolute href leaves whatever the host is showing (a modal, a workspace with unsaved changes), so
-	// open it in a new tab. A route-relative href stays within the current view and navigates in place.
-	#getTarget() {
-		return this._editPath ? undefined : '_blank';
+		return umbGenerateWorkspaceLink({
+			pattern: UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN,
+			params: { unique: this._unique },
+			routePath: this._editPath,
+		});
 	}
 
 	#onSelected(event: UUISelectableEvent) {
@@ -116,12 +126,14 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 	override render() {
 		if (!this.item) return nothing;
 
+		const link = this.#getLink();
+
 		return html`
 			<uui-ref-node
 				name=${this._name}
-				href=${ifDefined(this.#getHref())}
-				target=${ifDefined(this.#getTarget())}
-				?readonly=${this.readonly}
+				href=${ifDefined(link?.href)}
+				target=${ifDefined(link?.target)}
+				?readonly=${this.readonly || !this._userHasSectionAccess}
 				?standalone=${this.standalone}
 				?select-only=${this.selectOnly}
 				?selectable=${this.selectable}
