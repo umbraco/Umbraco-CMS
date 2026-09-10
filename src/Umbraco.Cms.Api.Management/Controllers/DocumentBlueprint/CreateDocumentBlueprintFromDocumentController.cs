@@ -65,7 +65,7 @@ public class CreateDocumentBlueprintFromDocumentController : DocumentBlueprintCo
 
         AuthorizationResult documentBlueprintAuthorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,
-            DocumentBlueprintPermissionResource.Root(),
+            DocumentBlueprintPermissionResource.WithKeys(fromDocumentRequestModel.Parent?.Id),
             AuthorizationPolicies.DocumentBlueprintPermissionByResource);
 
         if (documentBlueprintAuthorizationResult.Succeeded is false)
