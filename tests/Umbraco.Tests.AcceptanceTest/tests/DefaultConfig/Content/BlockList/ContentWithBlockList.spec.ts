@@ -200,8 +200,7 @@ test('can add settings model for the block in the content', async ({umbracoApi, 
   await umbracoApi.documentType.ensureNameNotExists(settingModelName);
 });
 
-// Unwritten: addBlockElementBtn resolves with .first(), so once a block exists it reopens that block instead
-// of adding a second one. Not the block card drag bug - a content entry has no anchor in its shadow root.
+// Unwritten: addBlockElementBtn resolves with .first(), so it reopens the existing block instead of adding a second.
 test.skip('can move blocks in the content', async ({umbracoApi, umbracoUi}) => {
   // TODO: Implement it later
 });
@@ -236,8 +235,6 @@ test('can add a block element with inline editing mode enabled', async ({umbraco
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickAddBlockElementButton();
-  //await umbracoUi.content.clickTextButtonWithName(elementTypeName);
-  //await umbracoUi.content.clickInlineBlockCaretButtonForName(elementTypeName);
   await umbracoUi.content.enterTextstring(inputText);
   await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
 

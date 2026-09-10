@@ -180,8 +180,7 @@ for (const listView of listViewTypes) {
     expect(await umbracoApi.dataType.doesListViewHaveLayout(listView.type, 'List', 'icon-list', listView.collectionViewList)).toBeTruthy();
     expect(await umbracoApi.dataType.doesListViewHaveProperty(listView.type, 'Last edited', 'updateDate')).toBeTruthy();
     expect(await umbracoApi.dataType.doesListViewHaveProperty(listView.type, 'Updated by', 'creator')).toBeTruthy();
-    // TODO: Uncomment this when the front-end is ready. Currently there is no default icon for workspace view icon
-    // expect(await umbracoApi.dataType.doesDataTypeHaveValue(listView.type, 'icon', 'icon-list')).toBeTruthy();
+    expect(await umbracoApi.dataType.doesDataTypeHaveValue(listView.type, 'icon')).toBeFalsy();
     expect(await umbracoApi.dataType.doesDataTypeHaveValue(listView.type, 'tabName')).toBeFalsy();
     expect(await umbracoApi.dataType.doesDataTypeHaveValue(listView.type, 'showContentFirst')).toBeFalsy();
   });

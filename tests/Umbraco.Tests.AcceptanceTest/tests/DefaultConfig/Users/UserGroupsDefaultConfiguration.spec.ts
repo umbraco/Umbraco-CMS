@@ -68,10 +68,9 @@ test('the default configuration of Administrators is correct', {tag: '@release'}
   await umbracoUi.userGroup.doesUserGroupHaveElementPermissionEnabled(uiElementPermissions);
   await umbracoUi.userGroup.doesUserGroupHaveSections(uiSections);
   await umbracoUi.userGroup.doesUserGroupSectionsHaveCount(uiSections.length);
-  // Fixme - Uncomment this when the front-end is ready. Currently the sections includes "Umb.Section.Forms" which should be removed.
-  //expect(await umbracoApi.userGroup.doesUserGroupHaveSections(userGroupName, sections)).toBeTruthy();
-  // Fixme - Uncomment this when the front-end is ready. Currently the fallbackPermissions includes some unnecessary values such as ":", "5", "T"
-  //expect(await umbracoApi.userGroup.doesUserGroupHaveFallbackPermissions(userGroupName, fallbackPermissions)).toBeTruthy();
+  // The install seed grants this group the Forms section, which has no UI tab without the package installed.
+  expect(await umbracoApi.userGroup.doesUserGroupHaveSections(userGroupName, [...sections, "Umb.Section.Forms"])).toBeTruthy();
+  expect(await umbracoApi.userGroup.doesUserGroupHaveFallbackPermissions(userGroupName, [...fallbackDocumentPermissions, ...fallbackElementPermissions], false)).toBeTruthy();
   const userGroupData = await umbracoApi.userGroup.getByName(userGroupName);
   expect(userGroupData.hasAccessToAllLanguages).toEqual(hasAccessToAllLanguages);
   expect(userGroupData.documentRootAccess).toEqual(documentRootAccess);
@@ -134,10 +133,9 @@ test('the default configuration of Editors is correct', {tag: '@release'}, async
   await umbracoUi.userGroup.doesUserGroupHaveElementPermissionEnabled(uiElementPermissions);
   await umbracoUi.userGroup.doesUserGroupHaveSections(uiSections);
   await umbracoUi.userGroup.doesUserGroupSectionsHaveCount(uiSections.length);
-  // Fixme - Uncomment this when the front-end is ready. Currently the sections includes "Umb.Section.Forms" which should be removed.
-  //expect(await umbracoApi.userGroup.doesUserGroupHaveSections(userGroupName, sections)).toBeTruthy();
-  // Fixme - Uncomment this when the front-end is ready. Currently the fallbackPermissions includes some unnecessary values such as ":", "5", "T"
-  //expect(await umbracoApi.userGroup.doesUserGroupHaveFallbackPermissions(userGroupName, fallbackPermissions)).toBeTruthy();
+  // The install seed grants this group the Forms section, which has no UI tab without the package installed.
+  expect(await umbracoApi.userGroup.doesUserGroupHaveSections(userGroupName, [...sections, "Umb.Section.Forms"])).toBeTruthy();
+  expect(await umbracoApi.userGroup.doesUserGroupHaveFallbackPermissions(userGroupName, [...fallbackDocumentPermissions, ...fallbackElementPermissions], false)).toBeTruthy();
   const userGroupData = await umbracoApi.userGroup.getByName(userGroupName);
   expect(userGroupData.hasAccessToAllLanguages).toEqual(hasAccessToAllLanguages);
   expect(userGroupData.documentRootAccess).toEqual(documentRootAccess);
@@ -172,10 +170,8 @@ test('the default configuration of Sensitive data is correct', {tag: '@release'}
   await umbracoUi.userGroup.doesUserGroupHaveElementPermissionEnabled(uiElementPermissions);
   await umbracoUi.userGroup.doesUserGroupHaveSections(uiSections);
   await umbracoUi.userGroup.doesUserGroupSectionsHaveCount(uiSections.length);
-  // Fixme - Uncomment this when the front-end is ready. Currently the sections includes "Umb.Section.Forms" which should be removed.
-  //expect(await umbracoApi.userGroup.doesUserGroupHaveSections(userGroupName, sections)).toBeTruthy();
-  // Fixme - Uncomment this when the front-end is ready. Currently the fallbackPermissions includes some unnecessary values such as ":", "5", "T"
-  //expect(await umbracoApi.userGroup.doesUserGroupHaveFallbackPermissions(userGroupName, fallbackPermissions)).toBeTruthy();
+  expect(await umbracoApi.userGroup.doesUserGroupHaveSections(userGroupName, sections)).toBeTruthy();
+  expect(await umbracoApi.userGroup.doesUserGroupHaveFallbackPermissions(userGroupName, [...fallbackDocumentPermissions, ...fallbackElementPermissions], false)).toBeTruthy();
   const userGroupData = await umbracoApi.userGroup.getByName(userGroupName);
   expect(userGroupData.hasAccessToAllLanguages).toEqual(hasAccessToAllLanguages);
   expect(userGroupData.documentRootAccess).toEqual(documentRootAccess);
@@ -217,8 +213,7 @@ test('the default configuration of Translators data is correct', {tag: '@release
   await umbracoUi.userGroup.doesUserGroupHaveSections(uiSections);
   await umbracoUi.userGroup.doesUserGroupSectionsHaveCount(uiSections.length);
   expect(await umbracoApi.userGroup.doesUserGroupHaveSections(userGroupName, sections)).toBeTruthy();
-  // Fixme - Uncomment this when the front-end is ready. Currently the fallbackPermissions includes some unnecessary values such as ":", "5", "T"
-  // expect(await umbracoApi.userGroup.doesUserGroupHaveFallbackPermissions(userGroupName, fallbackPermissions)).toBeTruthy();
+  expect(await umbracoApi.userGroup.doesUserGroupHaveFallbackPermissions(userGroupName, [...fallbackDocumentPermissions, ...fallbackElementPermissions], false)).toBeTruthy();
   const userGroupData = await umbracoApi.userGroup.getByName(userGroupName);
   expect(userGroupData.hasAccessToAllLanguages).toEqual(hasAccessToAllLanguages);
   expect(userGroupData.documentRootAccess).toEqual(documentRootAccess);
@@ -263,8 +258,7 @@ test('the default configuration of Writers data is correct', {tag: '@release'}, 
   await umbracoUi.userGroup.doesUserGroupHaveSections(uiSections);
   await umbracoUi.userGroup.doesUserGroupSectionsHaveCount(uiSections.length);
   expect(await umbracoApi.userGroup.doesUserGroupHaveSections(userGroupName, sections)).toBeTruthy();
-  // Fixme - Uncomment this when the front-end is ready. Currently the fallbackPermissions includes some unnecessary values such as ":", "5", "T"
-  // expect(await umbracoApi.userGroup.doesUserGroupHaveFallbackPermissions(userGroupName, fallbackPermissions)).toBeTruthy();
+  expect(await umbracoApi.userGroup.doesUserGroupHaveFallbackPermissions(userGroupName, [...fallbackDocumentPermissions, ...fallbackElementPermissions], false)).toBeTruthy();
   const userGroupData = await umbracoApi.userGroup.getByName(userGroupName);
   expect(userGroupData.hasAccessToAllLanguages).toEqual(hasAccessToAllLanguages);
   expect(userGroupData.documentRootAccess).toEqual(documentRootAccess);
