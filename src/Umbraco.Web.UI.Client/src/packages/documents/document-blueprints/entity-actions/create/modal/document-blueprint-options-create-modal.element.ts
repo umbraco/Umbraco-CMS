@@ -2,19 +2,16 @@ import {
 	UMB_DOCUMENT_BLUEPRINT_FOLDER_REPOSITORY_ALIAS,
 	UmbDocumentBlueprintFolderRepository,
 } from '../../../tree/index.js';
+import { UmbDocumentBlueprintTypeStructureRepository } from '../../../repository/structure/index.js';
 import type {
 	UmbDocumentBlueprintOptionsCreateModalData,
 	UmbDocumentBlueprintOptionsCreateModalValue,
 } from './constants.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { html, customElement, css, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbModalBaseElement, umbOpenModal } from '@umbraco-cms/backoffice/modal';
+import { UmbModalBaseElement, umbOpenModal, UMB_ITEM_PICKER_MODAL } from '@umbraco-cms/backoffice/modal';
 import { UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbCreateFolderEntityAction } from '@umbraco-cms/backoffice/tree';
-import {
-	UMB_DOCUMENT_TYPE_PICKER_MODAL,
-	type UmbDocumentTypeTreeItemModel,
-} from '@umbraco-cms/backoffice/document-type';
 import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 
 /** @deprecated Use the `Umb.EntityAction.DocumentBlueprint.Create` entity action with `entityCreateOptionAction` extensions instead. Scheduled for removal in Umbraco 19. */
@@ -29,6 +26,8 @@ export class UmbDocumentBlueprintOptionsCreateModalElement extends UmbModalBaseE
 	#createFolderAction?: UmbCreateFolderEntityAction;
 
 	#folderRepository = new UmbDocumentBlueprintFolderRepository(this);
+
+	#structureRepository = new UmbDocumentBlueprintTypeStructureRepository(this);
 
 	override async connectedCallback(): Promise<void> {
 		super.connectedCallback();
@@ -74,15 +73,28 @@ export class UmbDocumentBlueprintOptionsCreateModalElement extends UmbModalBaseE
 
 	async #onCreateBlueprintClick(event: PointerEvent) {
 		event.stopPropagation();
-		const value = await umbOpenModal(this, UMB_DOCUMENT_TYPE_PICKER_MODAL, {
+		const parentUnique = this.data?.parent?.unique ?? null;
+		const { data } = await this.#structureRepository.requestAllowedChildrenOf(null, parentUnique);
+
+		const value = await umbOpenModal(this, UMB_ITEM_PICKER_MODAL, {
 			data: {
-				hideTreeRoot: true,
-				pickableFilter: (item: UmbDocumentTypeTreeItemModel) => item.isElement == false,
+				headline: `${this.localize.term('general_choose')}...`,
+				items: (data?.items ?? []).flatMap((documentType) =>
+					documentType.unique
+						? [
+								{
+									label: documentType.name,
+									value: documentType.unique,
+									description: documentType.description ?? undefined,
+									icon: documentType.icon ?? undefined,
+								},
+							]
+						: [],
+				),
 			},
 		});
 
-		const selection = value.selection.filter((x) => x !== null);
-		this.value = { documentTypeUnique: selection[0] };
+		this.value = { documentTypeUnique: value?.value };
 		this.modalContext?.dispatchEvent(new UmbSelectionChangeEvent());
 		this._submitModal();
 	}
