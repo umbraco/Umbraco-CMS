@@ -344,7 +344,7 @@ describe('UmbLocalizationRegistry formatting locale', () => {
 		expect(umbLocalizationManager.documentLanguage).to.equal('da');
 	});
 
-	it('re-applies the correction when the requested locale changes within the same dictionary', async () => {
+	it('corrects a bare en when switching from an explicitly requested region', async () => {
 		registry.loadLanguage('en-GB');
 		await aTimeout(0);
 		expect(umbLocalizationManager.documentLanguage).to.equal('en-gb');

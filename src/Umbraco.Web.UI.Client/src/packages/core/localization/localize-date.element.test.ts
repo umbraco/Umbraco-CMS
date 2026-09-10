@@ -61,9 +61,9 @@ describe('umb-localize-date', () => {
 	});
 });
 
-// `en` is corrected to en-GB for formatting, so cover the case where a region was asked for
-// explicitly and must be left alone.
 describe('umb-localize-date with an explicitly requested region', () => {
+	// `en` is corrected to en-GB for formatting, so this suite switches the active language to a
+	// specific region, which must be left alone. Hence its own hooks rather than the shared ones.
 	const englishUs = {
 		type: 'localization',
 		alias: 'test.en-us',
