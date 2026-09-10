@@ -112,7 +112,11 @@ public partial class ContentBlueprintEditingServiceTests : ContentEditingService
     }
 
     [SetUp]
-    public void ResetContentTypeFilter() => ExcludingContentTypeFilter.ExcludedContentTypeKey = null;
+    public void ResetContentTypeFilter()
+    {
+        ExcludingContentTypeFilter.ExcludedContentTypeKey = null;
+        ExcludingContentTypeFilter.ExcludedForParentKey = null;
+    }
 
     /// <summary>
     /// Stands in for an implementor's filter, so the tests can prove the blueprint create path honours
@@ -122,9 +126,17 @@ public partial class ContentBlueprintEditingServiceTests : ContentEditingService
     {
         public static Guid? ExcludedContentTypeKey { get; set; }
 
+        /// <summary>
+        /// Gets or sets the parent to exclude the content type for. When left unset, the content type is
+        /// excluded everywhere, so the tests can also cover a filter that ignores the parent.
+        /// </summary>
+        public static Guid? ExcludedForParentKey { get; set; }
+
         public Task<IEnumerable<TItem>> FilterAllowedForBlueprintsAsync<TItem>(IEnumerable<TItem> contentTypes, Guid? parentKey)
             where TItem : IContentTypeComposition
-            => Task.FromResult(contentTypes.Where(contentType => contentType.Key != ExcludedContentTypeKey));
+            => Task.FromResult(contentTypes.Where(contentType
+                => contentType.Key != ExcludedContentTypeKey
+                   || (ExcludedForParentKey.HasValue && ExcludedForParentKey != parentKey)));
     }
 }
 
