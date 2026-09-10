@@ -1,12 +1,15 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-namespace Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Configuration.Models;
+using CoreConstants = Umbraco.Cms.Core.Constants;
+
+namespace Umbraco.Cms.Search.Provider.Examine.Configuration;
 
 /// <summary>
 ///     Typed configuration options for the Examine provider for Umbraco Search.
 /// </summary>
-[UmbracoOptions(Constants.Configuration.ConfigSearchExamine)]
+[UmbracoOptions(CoreConstants.Configuration.ConfigSearchExamine)]
 public class ExamineSearchProviderSettings
 {
     /// <summary>

@@ -6,7 +6,7 @@ using Examine.Lucene.Directories;
 using Examine.Lucene.Providers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Search.Provider.Examine.Configuration;
 using Directory = Lucene.Net.Store.Directory;
 
 namespace Umbraco.Cms.Search.Provider.Examine.Lucene;

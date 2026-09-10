@@ -19,6 +19,11 @@
 
   <Import Project="..\Umbraco.Cms.Targets\buildTransitive\Umbraco.Cms.Targets.props" />
   <Import Project="..\Umbraco.Cms.Targets\buildTransitive\Umbraco.Cms.Targets.targets" />
+
+  <!-- Umbraco.Cms.Search.Provider.Examine is referenced via ProjectReference (not as a NuGet package), so its
+       buildTransitive props - which contribute its own JSON schema fragment - aren't picked up automatically. -->
+  <Import Project="..\Umbraco.Cms.Search.Provider.Examine\buildTransitive\Umbraco.Cms.Search.Provider.Examine.props" />
+
   <ItemGroup>
     <ProjectReference Include="..\Umbraco.Cms.DevelopmentMode.Backoffice\Umbraco.Cms.DevelopmentMode.Backoffice.csproj" />
     <ProjectReference Include="..\Umbraco.Cms\Umbraco.Cms.csproj" />

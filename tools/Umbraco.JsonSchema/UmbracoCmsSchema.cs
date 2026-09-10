@@ -81,16 +81,6 @@ internal sealed class UmbracoCmsSchema
         public required WebsiteSettings Website { get; set; }
 
         public required SignalRSettings SignalR { get; set; }
-
-        public required SearchDefinition Search { get; set; }
-    }
-
-    /// <summary>
-    /// Configuration of Umbraco Search.
-    /// </summary>
-    public class SearchDefinition
-    {
-        public required ExamineSearchProviderSettings Examine { get; set; }
     }
 
     public class InstallDefaultDataNamedOptions

@@ -2,7 +2,6 @@
 using Examine.Lucene;
 using Lucene.Net.Index;
 using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Search.Provider.Examine.Helpers;
 using Umbraco.Extensions;
 using CoreConstants = Umbraco.Cms.Core.Constants;

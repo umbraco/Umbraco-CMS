@@ -1,7 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-namespace Umbraco.Cms.Core.Configuration.Models;
+namespace Umbraco.Cms.Search.Provider.Examine.Configuration;
 
 /// <summary>
 ///     Specifies the Lucene directory factory type for Examine indexes.

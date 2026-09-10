@@ -11,6 +11,7 @@
 
   <ItemGroup>
     <PackageReference Include="Examine" />
+    <PackageReference Include="Umbraco.JsonSchema.Extensions" PrivateAssets="all" GeneratePathProperty="true" />
   </ItemGroup>
 
   <ItemGroup>
@@ -19,6 +20,31 @@
     <ProjectReference Include="..\Umbraco.Cms.Search.Core\Umbraco.Cms.Search.Core.csproj" />
     <ProjectReference Include="..\Umbraco.Web.Common\Umbraco.Web.Common.csproj" />
   </ItemGroup>
+
+  <!-- Generate this provider's own JSON schema fragment (Umbraco:CMS:Search:Examine), following the pattern
+       Umbraco Forms uses - see Umbraco.Cms.Targets.csproj for the CMS's own (differently-produced) schema,
+       and buildTransitive\Umbraco.Cms.Search.Provider.Examine.props for how consuming sites pick this up. -->
+  <PropertyGroup>
+    <_UmbracoSearchExamineJsonSchemaReference>appsettings-schema.Umbraco.Cms.Search.Examine.json</_UmbracoSearchExamineJsonSchemaReference>
+    <NoWarn>$(NoWarn),NU5100,NU5128</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- Sdk.Razor's default item globbing already picks up these files as Content once they exist on disk;
+         Remove then Include so the explicit metadata below always wins instead of colliding (NETSDK1022). -->
+    <Content Remove="$(_UmbracoSearchExamineJsonSchemaReference)" />
+    <Content Include="$(_UmbracoSearchExamineJsonSchemaReference)" PackagePath="" Visible="false" />
+    <Content Remove="buildTransitive\**" />
+    <Content Include="buildTransitive\**" PackagePath="buildTransitive" />
+  </ItemGroup>
+
+  <Target Name="GenerateAppsettingsSchema" BeforeTargets="Build;CopyUmbracoJsonSchemaFiles" Inputs="$(TargetPath)" Outputs="$(_UmbracoSearchExamineJsonSchemaReference)">
+    <JsonSchemaGenerate AssemblyPath="$(TargetPath)" TypeName="UmbracoSearchExamineSchema" OutputPath="$(_UmbracoSearchExamineJsonSchemaReference)" IncludeObsoleteProperties="false" />
+  </Target>
+
+  <!-- Remove generated JSON schema on clean -->
+  <Target Name="RemoveAppsettingsSchema" AfterTargets="Clean" Condition="Exists('$(_UmbracoSearchExamineJsonSchemaReference)')">
+    <Delete Files="$(_UmbracoSearchExamineJsonSchemaReference)" />
+  </Target>
 
   <ItemGroup>
     <!-- Dont include the client folder as part of packaging nuget build -->
