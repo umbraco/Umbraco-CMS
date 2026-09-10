@@ -18,6 +18,8 @@ export interface UmbMediaTreeItemModel extends UmbTreeItemModel {
 	};
 	variants: Array<UmbMediaTreeItemVariantModel>;
 	createDate: string;
+	/** The file extension, without the leading dot and in lowercase. Undefined when the item holds no file. */
+	extension?: string;
 }
 
 export interface UmbMediaTreeRootModel extends UmbTreeRootModel {

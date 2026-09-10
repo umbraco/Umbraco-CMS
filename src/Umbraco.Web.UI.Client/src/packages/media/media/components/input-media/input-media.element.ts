@@ -11,7 +11,6 @@ import {
 	state,
 } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
-import { getMediaFileExtension } from '../../utils/index.js';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UmbEntityInputInteractionMemoryManager } from '@umbraco-cms/backoffice/entity';
@@ -165,9 +164,6 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 	@state()
 	private _cards: Array<UmbMediaCardItemModel> = [];
 
-	@state()
-	private _folderTypeUniques?: ReadonlySet<string>;
-
 	#pickerInputContext = new UmbMediaPickerInputContext(this);
 	#interactionMemoryManager = new UmbEntityInputInteractionMemoryManager(
 		this,
@@ -198,8 +194,6 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 			},
 			null,
 		);
-
-		this.#loadFolderTypeUniques();
 
 		this.addValidator(
 			'rangeUnderflow',
@@ -292,25 +286,11 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 					unique=${item.unique}
 					alt=${item.name}
 					icon=${item.mediaType.icon}
-					file-ext=${ifDefined(
-						getMediaFileExtension({
-							name: item.name,
-							mediaTypeUnique: item.mediaType.unique,
-							folderTypeUniques: this._folderTypeUniques,
-						}),
-					)}></umb-media-thumbnail>
+					file-ext=${ifDefined(item.extension)}></umb-media-thumbnail>
 				${this.#renderIsTrashed(item)}
 				<uui-action-bar slot="actions">${this.#renderRemoveAction(item)}</uui-action-bar>
 			</uui-card-media>
 		`;
-	}
-
-	async #loadFolderTypeUniques() {
-		try {
-			this._folderTypeUniques = await this.#pickerInputContext.getFolderTypeUniques();
-		} catch {
-			// Leave the cards unlabelled. Opening the picker surfaces the failure where it actually blocks the user.
-		}
 	}
 
 	#renderRemoveAction(item: UmbMediaCardItemModel) {

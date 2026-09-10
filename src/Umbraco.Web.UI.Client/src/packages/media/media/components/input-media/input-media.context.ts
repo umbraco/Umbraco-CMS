@@ -29,7 +29,8 @@ export class UmbMediaPickerInputContext extends UmbPickerInputContext<
 	UmbMediaPickerModalValue
 > {
 	#mediaTypeStructureRepository;
-	#folderTypeUniques: ReadonlySet<string> = new Set<string>();
+	#folderTypeUniques = new Set<string>();
+	#folderTypesPromise: Promise<void> | null = null;
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_MEDIA_ITEM_REPOSITORY_ALIAS, UMB_MEDIA_PICKER_MODAL);
@@ -71,16 +72,13 @@ export class UmbMediaPickerInputContext extends UmbPickerInputContext<
 		await super.openPicker(combinedPickerData);
 	}
 
-	/**
-	 * The media types that represent a folder, i.e. one that holds other media rather than a file.
-	 * @returns {Promise<ReadonlySet<string>>} The unique of every folder media type.
-	 */
-	async getFolderTypeUniques(): Promise<ReadonlySet<string>> {
-		return this.#mediaTypeStructureRepository.getFolderTypeUniques();
-	}
-
 	async #loadFolderTypes() {
-		this.#folderTypeUniques = await this.getFolderTypeUniques();
+		if (!this.#folderTypesPromise) {
+			this.#folderTypesPromise = this.#mediaTypeStructureRepository.requestMediaTypesOfFolders().then((folderTypes) => {
+				this.#folderTypeUniques = new Set(folderTypes.map((ft) => ft.unique).filter((u): u is string => u != null));
+			});
+		}
+		return this.#folderTypesPromise;
 	}
 
 	#pickableFilter = (

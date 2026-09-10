@@ -20,7 +20,6 @@ import {
 	state,
 } from '@umbraco-cms/backoffice/external/lit';
 import { debounce, UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
-import { getMediaFileExtension } from '../../utils/index.js';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { UmbFileDropzoneItemStatus } from '@umbraco-cms/backoffice/dropzone';
 import { UmbMediaTypeStructureRepository } from '@umbraco-cms/backoffice/media-type';
@@ -65,7 +64,7 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 	#mediaSearchProvider = new UmbMediaSearchProvider(this);
 	#mediaTypeStructureRepository = new UmbMediaTypeStructureRepository(this);
 
-	#folderTypeUniques: ReadonlySet<string> = new Set<string>();
+	#folderTypeUniques = new Set<string>();
 
 	#hasMediaRootAccess = false;
 	#mediaStartNodeUniques: Array<string> = [];
@@ -256,7 +255,8 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 	}
 
 	async #loadFolderTypes() {
-		this.#folderTypeUniques = await this.#mediaTypeStructureRepository.getFolderTypeUniques();
+		const folderTypes = await this.#mediaTypeStructureRepository.requestMediaTypesOfFolders();
+		this.#folderTypeUniques = new Set(folderTypes.map((ft) => ft.unique).filter((u): u is string => u != null));
 	}
 
 	// TODO: move to location manager in context
@@ -671,13 +671,7 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 					unique=${item.unique}
 					alt=${item.name}
 					icon=${item.mediaType.icon}
-					file-ext=${ifDefined(
-						getMediaFileExtension({
-							name: item.name,
-							mediaTypeUnique: item.mediaType.unique,
-							folderTypeUniques: this.#folderTypeUniques,
-						}),
-					)}></umb-media-thumbnail>
+					file-ext=${ifDefined(item.extension)}></umb-media-thumbnail>
 			</uui-card-media>
 		`;
 	}

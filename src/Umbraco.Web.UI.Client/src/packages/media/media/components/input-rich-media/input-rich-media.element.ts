@@ -2,7 +2,6 @@ import { UMB_IMAGE_CROPPER_EDITOR_MODAL } from '../../modals/index.js';
 import type { UmbMediaItemModel, UmbCropModel, UmbMediaPickerPropertyValueEntry } from '../../types.js';
 import { UMB_MEDIA_ITEM_REPOSITORY_ALIAS } from '../../repository/constants.js';
 import { UmbMediaPickerInputContext } from '../input-media/input-media.context.js';
-import { getMediaFileExtension } from '../../utils/index.js';
 import { UmbFileDropzoneItemStatus } from '@umbraco-cms/backoffice/dropzone';
 import type { UmbDropzoneChangeEvent } from '@umbraco-cms/backoffice/dropzone';
 import {
@@ -36,6 +35,7 @@ type UmbRichMediaCardModel = {
 	name: string;
 	src?: string;
 	mediaType?: UmbMediaItemModel['mediaType'];
+	extension?: string;
 	isTrashed?: boolean;
 	isLoading?: boolean;
 };
@@ -176,9 +176,6 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 	private _cards: Array<UmbRichMediaCardModel> = [];
 
 	@state()
-	private _folderTypeUniques?: ReadonlySet<string>;
-
-	@state()
 	private _routeBuilder?: UmbModalRouteBuilder;
 
 	readonly #itemManager = new UmbRepositoryItemsManager<UmbMediaItemModel>(this, UMB_MEDIA_ITEM_REPOSITORY_ALIAS);
@@ -191,8 +188,6 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 
 	constructor() {
 		super();
-
-		this.#loadFolderTypeUniques();
 
 		this.observe(
 			this.#itemManager.items,
@@ -287,14 +282,6 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 		return undefined;
 	}
 
-	async #loadFolderTypeUniques() {
-		try {
-			this._folderTypeUniques = await this.#pickerInputContext.getFolderTypeUniques();
-		} catch {
-			// Leave the cards unlabelled. Opening the picker surfaces the failure where it actually blocks the user.
-		}
-	}
-
 	#populateCards() {
 		const mediaItems = this.#itemManager.getItems();
 
@@ -306,6 +293,7 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 					media: item.mediaKey,
 					name: media?.name ?? '',
 					mediaType: media?.mediaType,
+					extension: media?.extension,
 					isTrashed: media?.isTrashed ?? false,
 					isLoading: !media,
 				};
@@ -432,13 +420,7 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 					.unique=${item.media}
 					.alt=${item.name}
 					.icon=${item.mediaType?.icon ?? 'icon-picture'}
-					file-ext=${ifDefined(
-						getMediaFileExtension({
-							name: item.name,
-							mediaTypeUnique: item.mediaType?.unique,
-							folderTypeUniques: this._folderTypeUniques,
-						}),
-					)}
+					file-ext=${ifDefined(item.extension)}
 					.externalLoading=${item.isLoading ?? false}></umb-media-thumbnail>
 
 				${this.#renderIsTrashed(item)} ${this.#renderActions(item)}
