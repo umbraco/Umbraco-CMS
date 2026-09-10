@@ -79,7 +79,10 @@ export class LogViewerUiHelper extends UiBaseLocators {
     return this.page.locator('.saved-search-item').filter({has: this.page.getByText(searchName, {exact: true})});
   }
 
-  async clickSortLogByTimestampButton(orderDirection: 'Ascending' | 'Descending' = 'Ascending') {
+  async clickSortLogByTimestampButton(orderDirection?: 'Ascending' | 'Descending') {
+    if (!orderDirection) {
+      return await this.click(this.sortLogByTimestampBtn);
+    }
     // The log viewer polls this endpoint on its own timer, so a generic endpoint match can resolve on an unrelated
     // poll response - match the orderDirection param/value pair alone to target the response this toggle triggered.
     return await this.waitForResponseAfterExecutingPromise(`orderDirection=${orderDirection}`, this.click(this.sortLogByTimestampBtn), ConstantHelper.statusCodes.ok, ConstantHelper.httpMethods.get);

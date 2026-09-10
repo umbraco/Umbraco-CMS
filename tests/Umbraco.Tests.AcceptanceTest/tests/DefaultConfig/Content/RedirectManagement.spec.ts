@@ -32,8 +32,8 @@ test.afterEach(async ({umbracoApi}) => {
 });
 
 // Toggling the URL tracker from the backoffice was removed; it is now driven by the
-// Umbraco:CMS:WebRouting:DisableRedirectUrlTracking configuration key, so it belongs in a
-// ContentSettingConfig spec rather than here. Coverage for that is still to be written.
+// Umbraco:CMS:WebRouting:DisableRedirectUrlTracking configuration key.
+// TODO: add DisableRedirectUrlTracking coverage under ContentSettingConfig
 
 test('can search for original URL', async ({umbracoApi, umbracoUi}) => {
   // Arrange

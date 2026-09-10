@@ -141,7 +141,7 @@ test('can sort logs by timestamp', async ({umbracoUi}) => {
   //Act
   await umbracoUi.logViewer.clickSearchButton();
   // Sorts logs by timestamp
-  await umbracoUi.logViewer.clickSortLogByTimestampButton();
+  await umbracoUi.logViewer.clickSortLogByTimestampButton('Ascending');
 
   // Assert
   await expect.poll(async () => {

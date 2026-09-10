@@ -619,6 +619,7 @@ export class DataTypeUiHelper extends UiBaseLocators {
     await this.enterText(this.sliderMaximumTxt, value);
   }
 
+  /** @deprecated The "allow decimals" setting was removed from the front-end; nothing renders this toggle. */
   async clickAllowDecimalsToggle() {
     await this.click(this.allowDecimalsToggle);
   }
