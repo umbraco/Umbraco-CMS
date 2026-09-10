@@ -56,7 +56,6 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 		this.#context.setAlias(value?.alias);
 		this.#context.setLabel(value?.name);
 		this.#checkInherited();
-		this.#updateAliasRenamed();
 		this.#setDataType(this._property?.dataType?.unique);
 		this.requestUpdate('property', oldValue);
 	}
@@ -92,10 +91,8 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 	@state()
 	private _dataTypeName?: string;
 
-	@state()
-	private _aliasRenamed = false;
-
 	#persistedContentType?: UmbContentTypeDetailModel;
+	#aliasChangeConfirmed = false;
 
 	constructor() {
 		super();
@@ -105,24 +102,44 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 				context?.persistedData,
 				(data) => {
 					this.#persistedContentType = data as UmbContentTypeDetailModel | undefined;
-					this.#updateAliasRenamed();
 				},
 				'observePersistedContentType',
 			);
 		});
 	}
 
-	// Only an Element Type keys its property values by alias, so only there does a rename orphan them.
-	#updateAliasRenamed() {
-		const persistedAlias = this.#persistedAlias();
-		this._aliasRenamed =
-			this.#persistedContentType?.isElement === true &&
-			persistedAlias !== undefined &&
-			persistedAlias !== this._property?.alias;
-	}
-
 	#persistedAlias() {
 		return this.#persistedContentType?.properties?.find((x) => x.unique === this._property?.unique)?.alias;
+	}
+
+	/**
+	 * Only an Element Type keys its property values by alias, so only there does a rename orphan them.
+	 * Confirmed once the alias is left alone, rather than on every keystroke.
+	 */
+	async #confirmAliasChange() {
+		const persistedAlias = this.#persistedAlias();
+		if (this.#persistedContentType?.isElement !== true || persistedAlias === undefined) return;
+
+		if (persistedAlias === this._property?.alias) {
+			this.#aliasChangeConfirmed = false;
+			return;
+		}
+
+		if (this.#aliasChangeConfirmed) return;
+
+		try {
+			await umbConfirmModal(this, {
+				headline: this.localize.term('contentTypeEditor_confirmPropertyAliasChangeHeadline'),
+				content: html`<umb-localize
+					key="contentTypeEditor_confirmPropertyAliasChangeMessage"
+					.args=${[this._property?.name, persistedAlias]}></umb-localize>`,
+				confirmLabel: '#general_change',
+				color: 'danger',
+			});
+			this.#aliasChangeConfirmed = true;
+		} catch {
+			this.#singleValueUpdate('alias', persistedAlias);
+		}
 	}
 
 	async #checkInherited() {
@@ -244,9 +261,9 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 						.value=${this.property.name}
 						.alias=${this.property.alias}
 						@change=${this.#onNameAliasChange}
+						@focusout=${this.#confirmAliasChange}
 						${umbBindToValidation(this)}></umb-input-with-alias>
 					<umb-form-validation-message for="name-alias-input"></umb-form-validation-message>
-					${this.#renderAliasRenamedNotice()}
 
 					<slot name="action-menu"></slot>
 					<p>
@@ -302,18 +319,6 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 				@change=${this.#onPropertyOrderChanged}
 				.value=${(this.property.sortOrder ?? 0).toString()}></uui-input>
 		`;
-	}
-
-	#renderAliasRenamedNotice() {
-		if (!this._aliasRenamed) return nothing;
-		return html`<small id="alias-renamed-notice">
-			<uui-icon name="icon-alert"></uui-icon>
-			<span>
-				<umb-localize
-					key="contentTypeEditor_propertyAliasRenamedNotice"
-					.args=${[this.#persistedAlias()]}></umb-localize>
-			</span>
-		</small>`;
 	}
 
 	#renderPropertyName() {
@@ -492,21 +497,6 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 			#header umb-input-with-alias,
 			#header uui-textarea {
 				width: 100%;
-			}
-
-			#alias-renamed-notice {
-				display: flex;
-				align-items: flex-start;
-				gap: var(--uui-size-space-1);
-				margin-top: var(--uui-size-space-2);
-				/* Indent to the text inset of the inputs above, which includes their border. */
-				padding-left: calc(var(--uui-size-space-3) + 1px);
-			}
-
-			#alias-renamed-notice uui-icon {
-				flex-shrink: 0;
-				/* Centre the icon on the first line rather than the whole, possibly wrapped, block. */
-				margin-top: calc((1lh - 1em) / 2);
 			}
 
 			#description-input:not(:hover):not(:focus) {
