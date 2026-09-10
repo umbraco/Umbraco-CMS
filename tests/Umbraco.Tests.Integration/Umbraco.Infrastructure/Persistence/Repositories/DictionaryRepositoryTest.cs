@@ -672,11 +672,11 @@ internal sealed class DictionaryRepositoryTest : UmbracoIntegrationTest
 
     [TestCase(true)]
     [TestCase(false)]
-    public async Task GetDictionaryItemDescendants_With_Default_KeySearchMode_Matches_Filter_Only_At_Start_Of_Key(bool enableValueSearch)
+    public async Task GetDictionaryItemDescendants_With_KeySearchMode_StartsWith_Matches_Filter_Only_At_Start_Of_Key(bool enableValueSearch)
     {
         // Arrange
         await CreateItemWithFilterTermInsideKey();
-        var repository = CreateRepositoryWithCache(AppCaches.Create(Mock.Of<IRequestCache>()), enableValueSearch);
+        var repository = CreateRepositoryWithCache(AppCaches.Create(Mock.Of<IRequestCache>()), enableValueSearch, DictionaryKeySearchMode.StartsWith);
 
         using (ScopeProvider.CreateScope())
         {
