@@ -156,6 +156,7 @@ const collectionMapper = (model: UmbMockMediaModel): MediaCollectionResponseMode
 			icon: model.mediaType.icon,
 		},
 		sortOrder: 0,
+		extension: model.extension,
 		values: model.values,
 		variants: model.variants,
 		flags: model.flags,

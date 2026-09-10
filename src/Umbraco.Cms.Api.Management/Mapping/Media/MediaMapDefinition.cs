@@ -98,6 +98,7 @@ public class MediaMapDefinition : ContentMapDefinition<IMedia, MediaValueRespons
     {
         target.Id = source.Key;
         target.MediaType = context.Map<MediaTypeCollectionReferenceResponseModel>(source.ContentType)!;
+        target.Extension = source.GetFileExtension();
         target.SortOrder = source.SortOrder;
         target.Creator = _commonMapper.GetOwnerName(source, context);
 

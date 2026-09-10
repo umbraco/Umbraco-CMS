@@ -1571,6 +1571,7 @@ export type ManifestResponseModel = {
 
 export type MediaCollectionResponseModel = {
     mediaType: MediaTypeCollectionReferenceResponseModel;
+    extension?: null | string;
     creator?: null | string;
     sortOrder: number;
     id: string;
