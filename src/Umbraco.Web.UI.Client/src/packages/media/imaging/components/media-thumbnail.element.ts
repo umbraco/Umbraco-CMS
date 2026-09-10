@@ -1,6 +1,6 @@
 import { UmbImagingCropMode } from '../types.js';
 import { UmbImagingRepository } from '../imaging.repository.js';
-import { css, customElement, html, nothing, property, state, when } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, property, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
@@ -13,7 +13,6 @@ import { UmbEntityUpdatedEvent } from '@umbraco-cms/backoffice/entity-action';
  * @cssprop [--umb-media-thumbnail-background] - Background shown behind the image. Defaults to a checkerboard
  * pattern that reveals transparency; set to `none` for a transparent background.
  * @csspart img - The underlying `<img>` element.
- * @csspart file-ext - The file extension label shown alongside the fallback icon.
  */
 @customElement('umb-media-thumbnail')
 export class UmbMediaThumbnailElement extends UmbLitElement {
@@ -67,7 +66,7 @@ export class UmbMediaThumbnailElement extends UmbLitElement {
 
 	/**
 	 * The file extension to label the fallback icon with, without the leading dot.
-	 * @description Only rendered where there is no image to preview: a rendered image already says what it is.
+	 * @description Rendered only when there is no preview image.
 	 */
 	@property({ type: String, attribute: 'file-ext' })
 	fileExt?: string;
@@ -169,13 +168,12 @@ export class UmbMediaThumbnailElement extends UmbLitElement {
 					loading=${this.loading}
 					decoding="async"
 					draggable="false" />`,
-			() => html`<umb-icon id="icon" name=${this.icon}></umb-icon>${this.#renderFileExtension()}`,
+			() =>
+				html`<umb-icon id="icon" name=${this.icon}></umb-icon> ${when(
+						this.fileExt,
+						(fileExt) => html`<small id="file-ext">${fileExt}</small>`,
+					)}`,
 		);
-	}
-
-	#renderFileExtension() {
-		if (!this.fileExt) return nothing;
-		return html`<small id="file-ext" part="file-ext">${this.fileExt.toUpperCase()}</small>`;
 	}
 
 	async #generateThumbnailUrl() {
@@ -234,8 +232,7 @@ export class UmbMediaThumbnailElement extends UmbLitElement {
 				font-size: var(--uui-size-8);
 			}
 
-			/* Filling the box is only right while the icon is alone in it. With a label to sit alongside, it takes
-			   its own height instead so the two centre as one group. */
+			/* Filling the box is only right while the icon is alone in it. */
 			#icon:has(+ #file-ext) {
 				height: auto;
 			}
@@ -252,6 +249,7 @@ export class UmbMediaThumbnailElement extends UmbLitElement {
 				font-size: var(--uui-type-small-size);
 				font-weight: 700;
 				line-height: 1.5;
+				text-transform: uppercase;
 				white-space: nowrap;
 			}
 		`,

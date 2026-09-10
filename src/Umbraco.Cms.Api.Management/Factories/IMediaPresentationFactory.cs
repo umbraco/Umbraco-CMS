@@ -27,23 +27,6 @@ public interface IMediaPresentationFactory
     MediaItemResponseModel CreateItemResponseModel(IMediaEntitySlim entity);
 
     /// <summary>
-    /// Gets the file extension of a media entity, without the leading dot and in lowercase.
-    /// </summary>
-    /// <param name="entity">The media entity to read the extension from.</param>
-    /// <returns>The file extension (e.g. "jpg"), or <c>null</c> when the entity holds no file, such as a folder.</returns>
-    string? CreateFileExtension(IMediaEntitySlim entity)
-    {
-        if (string.IsNullOrWhiteSpace(entity.MediaPath))
-        {
-            return null;
-        }
-
-        var extension = Path.GetExtension(entity.MediaPath).TrimStart('.').ToLowerInvariant();
-
-        return extension.Length > 0 ? extension : null;
-    }
-
-    /// <summary>
     /// Creates variant item response models for the specified media entity.
     /// </summary>
     /// <param name="entity">The media entity for which to create variant item response models.</param>

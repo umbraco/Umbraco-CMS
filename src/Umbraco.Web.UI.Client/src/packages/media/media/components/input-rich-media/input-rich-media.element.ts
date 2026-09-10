@@ -4,16 +4,7 @@ import { UMB_MEDIA_ITEM_REPOSITORY_ALIAS } from '../../repository/constants.js';
 import { UmbMediaPickerInputContext } from '../input-media/input-media.context.js';
 import { UmbFileDropzoneItemStatus } from '@umbraco-cms/backoffice/dropzone';
 import type { UmbDropzoneChangeEvent } from '@umbraco-cms/backoffice/dropzone';
-import {
-	css,
-	customElement,
-	html,
-	ifDefined,
-	nothing,
-	property,
-	repeat,
-	state,
-} from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -34,7 +25,7 @@ type UmbRichMediaCardModel = {
 	media: string;
 	name: string;
 	src?: string;
-	mediaType?: UmbMediaItemModel['mediaType'];
+	icon?: string;
 	extension?: string;
 	isTrashed?: boolean;
 	isLoading?: boolean;
@@ -282,7 +273,7 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 		return undefined;
 	}
 
-	#populateCards() {
+	async #populateCards() {
 		const mediaItems = this.#itemManager.getItems();
 
 		this._cards =
@@ -292,7 +283,7 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 					unique: item.key,
 					media: item.mediaKey,
 					name: media?.name ?? '',
-					mediaType: media?.mediaType,
+					icon: media?.mediaType?.icon,
 					extension: media?.extension,
 					isTrashed: media?.isTrashed ?? false,
 					isLoading: !media,
@@ -419,8 +410,8 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 				<umb-media-thumbnail
 					.unique=${item.media}
 					.alt=${item.name}
-					.icon=${item.mediaType?.icon ?? 'icon-picture'}
-					file-ext=${ifDefined(item.extension)}
+					.icon=${item.icon ?? 'icon-picture'}
+					.fileExt=${item.extension}
 					.externalLoading=${item.isLoading ?? false}></umb-media-thumbnail>
 
 				${this.#renderIsTrashed(item)} ${this.#renderActions(item)}

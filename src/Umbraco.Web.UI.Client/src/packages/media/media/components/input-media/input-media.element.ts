@@ -186,7 +186,7 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 
 		this.observe(
 			this.#pickerInputContext.selectedItems,
-			(selectedItems) => {
+			async (selectedItems) => {
 				const missingCards = selectedItems.filter((item) => !this._cards.find((card) => card.unique === item.unique));
 				if (selectedItems?.length && !missingCards.length) return;
 

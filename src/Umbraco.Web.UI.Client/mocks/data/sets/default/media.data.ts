@@ -307,6 +307,9 @@ export const data: Array<UmbMockMediaModel> = [
 		],
 		flags: [],
 	},
+	// Media the imaging endpoint cannot preview, so the cards fall back to their media type icon — the case the
+	// file extension label exists for. Their names carry no extension, as `toFriendlyName` leaves them on upload,
+	// so they also cover the label coming from the file rather than from the name.
 	{
 		hasChildren: false,
 		id: '9b4b5e4a-1f2c-4d3e-8a71-6c0d5e2f1a01',
@@ -319,13 +322,10 @@ export const data: Array<UmbMockMediaModel> = [
 			id: 'media-type-5-id',
 			icon: 'icon-document',
 		},
-		// No upload value on purpose: these stand in for media the imaging endpoint cannot preview, which is
-		// where the file extension is the only hint about what the item actually is. Their names carry no
-		// extension either, matching what `toFriendlyName` leaves behind on a real upload.
 		values: [],
 		variants: [
 			{
-				publishDate: '2023-02-06T15:31:51.354764',
+				publishDate: null,
 				culture: null,
 				segment: null,
 				name: 'Annual Report',
@@ -338,62 +338,6 @@ export const data: Array<UmbMockMediaModel> = [
 	{
 		hasChildren: false,
 		id: '9b4b5e4a-1f2c-4d3e-8a71-6c0d5e2f1a02',
-		extension: 'mp3',
-		createDate: '2023-02-06T15:32:05.350038',
-		parent: null,
-		noAccess: false,
-		isTrashed: false,
-		mediaType: {
-			id: 'media-type-2-id',
-			icon: 'icon-audio-lines',
-		},
-		// No upload value on purpose: these stand in for media the imaging endpoint cannot preview, which is
-		// where the file extension is the only hint about what the item actually is. Their names carry no
-		// extension either, matching what `toFriendlyName` leaves behind on a real upload.
-		values: [],
-		variants: [
-			{
-				publishDate: '2023-02-06T15:31:51.354764',
-				culture: null,
-				segment: null,
-				name: 'Soundtrack',
-				createDate: '2023-02-06T15:31:46.876902',
-				updateDate: '2023-02-06T15:31:51.354764',
-			},
-		],
-		flags: [],
-	},
-	{
-		hasChildren: false,
-		id: '9b4b5e4a-1f2c-4d3e-8a71-6c0d5e2f1a03',
-		extension: 'zip',
-		createDate: '2023-02-06T15:32:05.350038',
-		parent: null,
-		noAccess: false,
-		isTrashed: false,
-		mediaType: {
-			id: 'media-type-5-id',
-			icon: 'icon-document',
-		},
-		// No upload value on purpose: these stand in for media the imaging endpoint cannot preview, which is
-		// where the file extension is the only hint about what the item actually is. Their names carry no
-		// extension either, matching what `toFriendlyName` leaves behind on a real upload.
-		values: [],
-		variants: [
-			{
-				publishDate: '2023-02-06T15:31:51.354764',
-				culture: null,
-				segment: null,
-				name: 'Assets Bundle',
-				createDate: '2023-02-06T15:31:46.876902',
-				updateDate: '2023-02-06T15:31:51.354764',
-			},
-		],
-		flags: [],
-	},
-	{
-		hasChildren: false,
-		id: '9b4b5e4a-1f2c-4d3e-8a71-6c0d5e2f1a04',
 		extension: 'mov',
 		createDate: '2023-02-06T15:32:05.350038',
 		parent: null,
@@ -403,13 +347,10 @@ export const data: Array<UmbMockMediaModel> = [
 			id: 'media-type-4-id',
 			icon: 'icon-video',
 		},
-		// No upload value on purpose: these stand in for media the imaging endpoint cannot preview, which is
-		// where the file extension is the only hint about what the item actually is. Their names carry no
-		// extension either, matching what `toFriendlyName` leaves behind on a real upload.
 		values: [],
 		variants: [
 			{
-				publishDate: '2023-02-06T15:31:51.354764',
+				publishDate: null,
 				culture: null,
 				segment: null,
 				name: 'Promo Clip',
