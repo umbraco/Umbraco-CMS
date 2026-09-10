@@ -213,7 +213,7 @@ describe('UmbLocalizeController', () => {
 		registry.loadLanguage('en');
 		await aTimeout(0);
 
-		expect(umbLocalizationManager.documentLanguage).to.equal('en');
+		expect(umbLocalizationManager.documentLanguage).to.equal('en-gb');
 		expect(document.documentElement.dir).to.equal('ltr');
 
 		const current = registry.localizations.get(englishUk.meta.culture);
@@ -294,5 +294,64 @@ describe('UmbLocalizationRegistry initialization', () => {
 		await aTimeout(0);
 
 		expect(registry.localizations.has('en'), 'expected default "en" to be loaded').to.be.true;
+	});
+});
+
+describe('UmbLocalizationRegistry formatting locale', () => {
+	let registry: UmbLocalizationRegistry;
+
+	beforeEach(() => {
+		registry = new UmbLocalizationRegistry(umbExtensionsRegistry);
+	});
+
+	afterEach(() => {
+		registry.destroy();
+		umbLocalizationManager.localizations.clear();
+	});
+
+	it('corrects a language whose default region does not match the dictionary we ship', async () => {
+		registry.loadLanguage('en');
+		await aTimeout(0);
+
+		expect(umbLocalizationManager.documentLanguage).to.equal('en-gb');
+	});
+
+	it('still resolves terms from the dictionary registered under the requested culture', async () => {
+		registry.loadLanguage('en');
+		await aTimeout(0);
+
+		expect(registry.localizations.get('en')).to.have.property('general_color', 'Colour');
+	});
+
+	it('keeps a region requested by the consumer', async () => {
+		registry.loadLanguage('en-US');
+		await aTimeout(0);
+
+		expect(umbLocalizationManager.documentLanguage).to.equal('en-us');
+	});
+
+	it('keeps a requested region that has no dictionary of its own', async () => {
+		registry.loadLanguage('en-AU');
+		await aTimeout(0);
+
+		expect(umbLocalizationManager.documentLanguage).to.equal('en-au');
+	});
+
+	it('leaves a language with no correction on the requested locale', async () => {
+		registry.loadLanguage('da');
+		await aTimeout(0);
+
+		expect(umbLocalizationManager.documentLanguage).to.equal('da');
+	});
+
+	it('re-applies the correction when the requested locale changes within the same dictionary', async () => {
+		registry.loadLanguage('en-GB');
+		await aTimeout(0);
+		expect(umbLocalizationManager.documentLanguage).to.equal('en-gb');
+
+		registry.loadLanguage('en');
+		await aTimeout(0);
+
+		expect(umbLocalizationManager.documentLanguage).to.equal('en-gb');
 	});
 });
