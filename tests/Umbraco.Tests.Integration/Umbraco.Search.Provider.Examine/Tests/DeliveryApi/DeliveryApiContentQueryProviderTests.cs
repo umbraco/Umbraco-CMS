@@ -4,7 +4,6 @@ using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.DeliveryApi;
-using Umbraco.Cms.Search.DeliveryApi.DependencyInjection;
 using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
@@ -32,7 +31,7 @@ public class DeliveryApiContentQueryProviderTests : TestBase
     protected override void CustomTestSetup(IUmbracoBuilder builder)
     {
         base.CustomTestSetup(builder);
-        builder.AddDeliveryApiSearch();
+        builder.AddDeliveryApi();
     }
 
     [Test]

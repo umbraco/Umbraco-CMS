@@ -1,12 +1,11 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Search;
 using Umbraco.Cms.Core.Search.Indexing;
-using Umbraco.Cms.Search.Core.Services.ContentIndexing;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Models;
 using IndexField = Umbraco.Cms.Core.Search.Indexing.IndexField;
 
-namespace Umbraco.Cms.Search.DeliveryApi.Services;
+namespace Umbraco.Cms.Api.Delivery.Indexing;
 
 /// <summary>
 /// Indexes Delivery API selector, filter and sorter field values for content, using the registered Delivery API content index handlers.
@@ -52,8 +51,8 @@ internal sealed class DeliveryApiContentIndexer : IContentIndexer
 
         foreach (IContentIndexHandler handler in _contentIndexHandlerCollection)
         {
-            // ignore the core handlers, as they've covered by the system fields
-            if (handler.GetType().Namespace?.StartsWith("Umbraco.Cms.Api.Delivery") is true)
+            // system handlers are already covered by the system fields
+            if (handler is ISystemContentIndexHandler)
             {
                 continue;
             }

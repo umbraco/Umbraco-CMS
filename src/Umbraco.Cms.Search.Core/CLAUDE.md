@@ -141,7 +141,7 @@ cd src/Umbraco.Web.UI
 dotnet run
 ```
 
-The full search stack is registered in the default install via composers: `SearchCoreComposer` (core engine, including the backoffice search services — `IContentSearchService`, `IMediaSearchService`, `IIndexedEntitySearchService` — which now live in `Umbraco.Core/Services`) + `ExamineSearchProviderComposer` (Examine provider) and `DeliveryApiSearchComposer` (Delivery API content querying runs on the new indexes; only active when the Delivery API is composed). The legacy Examine-based search stack has been fully removed from the codebase — there is no side-by-side legacy indexing and no legacy fallback setting.
+The full search stack is registered in the default install via composers: `SearchCoreComposer` (core engine, including the backoffice search services — `IContentSearchService`, `IMediaSearchService`, `IIndexedEntitySearchService` — which now live in `Umbraco.Core/Services`) + `ExamineSearchProviderComposer` (Examine provider). Delivery API content querying (running on the new indexes) is wired up directly by `AddDeliveryApi()` in `Umbraco.Cms.Api.Delivery`. The legacy Examine-based search stack has been fully removed from the codebase — there is no side-by-side legacy indexing and no legacy fallback setting.
 
 ## Architecture
 
@@ -220,9 +220,9 @@ Index documents are persisted via `IndexDocumentRepository` using **MessagePack 
 
 `ContentSearchService`, `MediaSearchService` and `IndexedEntitySearchService` live in `Umbraco.Core/Services` and provide backoffice search using the Search API, querying the `Umb_Content` index (registered by `SearchCoreComposer`/`AddSearchCore()`).
 
-### Delivery API Integration (Umbraco.Cms.Search.DeliveryApi)
+### Delivery API Integration (Umbraco.Cms.Api.Delivery)
 
-Replaces the default Delivery API querying with Search-based querying. Queries the `Umb_PublishedContent` index.
+`DeliveryApiContentQueryProvider` and `DeliveryApiContentIndexer` live in `Umbraco.Cms.Api.Delivery/Services` and `/Indexing`, registered by that project's own `AddDeliveryApi()`. They query/index the `Umb_PublishedContent` index.
 
 ### Client Architecture (npm Workspaces Monorepo)
 

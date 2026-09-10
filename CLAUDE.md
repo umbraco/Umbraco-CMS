@@ -79,7 +79,6 @@ Umbraco-CMS/
 │   │   └── CLAUDE.md                      # ⭐ API patterns guide
 │   ├── Umbraco.PublishedCache.HybridCache/ # Content caching
 │   ├── Umbraco.Cms.Search.Core/           # Search abstractions
-│   ├── Umbraco.Cms.Search.DeliveryApi/    # Delivery API search integration
 │   ├── Umbraco.Cms.Search.Provider.Examine/ # Examine (Lucene) search provider
 │   ├── Umbraco.Cms.Persistence.EFCore/    # EF Core data access
 │   ├── Umbraco.Cms.Persistence.EFCore.Sqlite/

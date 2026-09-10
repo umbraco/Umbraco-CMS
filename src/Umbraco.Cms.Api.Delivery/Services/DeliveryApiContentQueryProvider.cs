@@ -1,10 +1,9 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Search;
 using Umbraco.Cms.Core.Search.Querying.Filtering;
 using Umbraco.Cms.Core.Search.Querying.Sorting;
-using Umbraco.Cms.Search.Core.Services;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Models;
@@ -18,7 +17,7 @@ using Umbraco.Cms.Core.Search.Querying;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Cms.Search.DeliveryApi.Services;
+namespace Umbraco.Cms.Api.Delivery.Services;
 
 // TODO: implement IApiMediaQueryProvider when that's a thing
 /// <summary>
@@ -66,28 +65,6 @@ internal sealed class DeliveryApiContentQueryProvider : IApiContentQueryProvider
             .DistinctBy(field => field.FieldName)
             .ToDictionary(field => field.FieldName, field => field.FieldType, StringComparer.InvariantCultureIgnoreCase);
     }
-
-    /// <summary>
-    /// Returns a page of item ids that passed the search criteria, without any protected content access restrictions.
-    /// </summary>
-    /// <param name="selectorOption">The selector option of the search criteria.</param>
-    /// <param name="filterOptions">The filter options of the search criteria.</param>
-    /// <param name="sortOptions">The sorting options of the search criteria.</param>
-    /// <param name="culture">The requested culture.</param>
-    /// <param name="preview">Whether or not to search for preview content.</param>
-    /// <param name="skip">Number of search results to skip (for pagination).</param>
-    /// <param name="take">Number of search results to retrieve (for pagination).</param>
-    /// <returns>A paged model containing the resulting IDs and the total number of results matching the search criteria.</returns>
-    [Obsolete($"Use the {nameof(ExecuteQuery)} method that accepts {nameof(ProtectedAccess)}. Will be removed in V14.")]
-    public PagedModel<Guid> ExecuteQuery(
-        SelectorOption selectorOption,
-        IList<FilterOption> filterOptions,
-        IList<SortOption> sortOptions,
-        string culture,
-        bool preview,
-        int skip,
-        int take)
-        => ExecuteQuery(selectorOption, filterOptions, sortOptions, culture, ProtectedAccess.None, preview, skip, take);
 
     /// <inheritdoc />
     public PagedModel<Guid> ExecuteQuery(

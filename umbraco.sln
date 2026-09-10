@@ -202,8 +202,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Cms.Search.Core", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Cms.Search.Core.Client", "src\Umbraco.Cms.Search.Core.Client\Umbraco.Cms.Search.Core.Client.csproj", "{3646B795-FC10-4BF3-B30E-8CD63D842478}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Cms.Search.DeliveryApi", "src\Umbraco.Cms.Search.DeliveryApi\Umbraco.Cms.Search.DeliveryApi.csproj", "{F8B62409-D51A-4850-8005-35C359E34867}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Cms.Search.Provider.Examine", "src\Umbraco.Cms.Search.Provider.Examine\Umbraco.Cms.Search.Provider.Examine.csproj", "{A6A5C933-DEBC-41FF-83C3-6B8915291CBC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.PublishedCache.HybridCache.Bounded", "src\Umbraco.PublishedCache.HybridCache.Bounded\Umbraco.PublishedCache.HybridCache.Bounded.csproj", "{0A00AC20-8CB8-4E93-AB84-B1851095AEC2}"
@@ -772,12 +770,6 @@ Global
 		{3646B795-FC10-4BF3-B30E-8CD63D842478}.Release|Any CPU.Build.0 = Release|Any CPU
 		{3646B795-FC10-4BF3-B30E-8CD63D842478}.SkipTests|Any CPU.ActiveCfg = Debug|Any CPU
 		{3646B795-FC10-4BF3-B30E-8CD63D842478}.SkipTests|Any CPU.Build.0 = Debug|Any CPU
-		{F8B62409-D51A-4850-8005-35C359E34867}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F8B62409-D51A-4850-8005-35C359E34867}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F8B62409-D51A-4850-8005-35C359E34867}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F8B62409-D51A-4850-8005-35C359E34867}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F8B62409-D51A-4850-8005-35C359E34867}.SkipTests|Any CPU.ActiveCfg = Debug|Any CPU
-		{F8B62409-D51A-4850-8005-35C359E34867}.SkipTests|Any CPU.Build.0 = Debug|Any CPU
 		{A6A5C933-DEBC-41FF-83C3-6B8915291CBC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A6A5C933-DEBC-41FF-83C3-6B8915291CBC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A6A5C933-DEBC-41FF-83C3-6B8915291CBC}.Release|Any CPU.ActiveCfg = Release|Any CPU
