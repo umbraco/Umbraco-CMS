@@ -1,5 +1,6 @@
 import {Page, Locator} from "@playwright/test";
 import {UiBaseLocators} from "./UiBaseLocators";
+import {ConstantHelper} from "./ConstantHelper";
 
 export class TelemetryDataUiHelper extends UiBaseLocators {
   private readonly telemetryDataTab: Locator;
@@ -21,5 +22,13 @@ export class TelemetryDataUiHelper extends UiBaseLocators {
 
   async doesTelemetryDataLevelHaveValue(value: string) {
     await this.hasValue(this.telemetryDataLevelToggle, value);
+  }
+
+  async clickSaveButtonAndWaitForTelemetryLevelToBeSaved() {
+    return await this.waitForResponseAfterExecutingPromise(
+      ConstantHelper.apiEndpoints.telemetryLevel,
+      this.clickSaveButton(),
+      ConstantHelper.statusCodes.ok,
+    );
   }
 }

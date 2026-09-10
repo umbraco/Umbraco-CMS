@@ -15,6 +15,41 @@ export class ElementApiHelper {
     return await response.json();
   }
 
+  /** Asserts the publication state of a variant on an already-fetched element. */
+  async doesVariantHaveState(elementData: any, expectedState: string, culture: string | null = null): Promise<void> {
+    await this.api.doesVariantHaveState(elementData, expectedState, culture);
+  }
+
+  /** Asserts a property value on an already-fetched element, matched by alias rather than position. */
+  async doesPropertyHaveValue(elementData: any, alias: string, expectedValue: any, culture: string | null = null): Promise<void> {
+    await this.api.doesPropertyHaveValue(elementData, alias, expectedValue, culture);
+  }
+
+  /** Asserts how many property values an already-fetched element carries; 0 means nothing is set. */
+  async doesHaveValueCount(elementData: any, expectedCount: number): Promise<void> {
+    await this.api.doesHaveValueCount(elementData, expectedCount);
+  }
+
+  /** Returns the element's only property value, asserting there is exactly one. The caller asserts on it. */
+  getOnlyPropertyValue(elementData: any): any {
+    return this.api.getOnlyPropertyValue(elementData);
+  }
+
+  /** Asserts how many variants an already-fetched element carries. */
+  async doesHaveVariantCount(elementData: any, expectedCount: number): Promise<void> {
+    await this.api.doesHaveVariantCount(elementData, expectedCount);
+  }
+
+  /** Returns a property value from an already-fetched element, looked up by alias. The caller asserts. */
+  getPropertyValue(elementData: any, alias: string, culture: string | null = null): any {
+    return this.api.getPropertyValue(elementData, alias, culture);
+  }
+
+  /** Asserts the name of a variant on an already-fetched element. */
+  async doesVariantHaveName(elementData: any, expectedName: string, culture: string | null = null): Promise<void> {
+    await this.api.doesVariantHaveName(elementData, expectedName, culture);
+  }
+
   async waitUntilIndexed(query: string, id: string) {
     await this.api.waitUntilItemIsIndexed(ConstantHelper.apiEndpoints.elementSearch, query, id);
   }

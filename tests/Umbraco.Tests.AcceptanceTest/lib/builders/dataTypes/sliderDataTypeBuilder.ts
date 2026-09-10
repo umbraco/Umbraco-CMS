@@ -1,4 +1,5 @@
 import {DataTypeBuilder} from './dataTypeBuilder';
+import {DataTypeValues} from '../types';
 
 export class SliderDataTypeBuilder extends DataTypeBuilder {
   minVal: number;
@@ -53,7 +54,7 @@ export class SliderDataTypeBuilder extends DataTypeBuilder {
   }
 
   getValues() {
-    let values: any = [];
+    const values: DataTypeValues = [];
     values.push({
       alias: 'minVal',
       value: this.minVal || 0

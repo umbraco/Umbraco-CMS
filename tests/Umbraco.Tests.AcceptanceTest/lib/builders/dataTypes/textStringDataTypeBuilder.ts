@@ -1,4 +1,5 @@
 import {DataTypeBuilder} from './dataTypeBuilder';
+import {DataTypeValues} from '../types';
 
 export class TextStringDataTypeBuilder extends DataTypeBuilder {
   maxChars: number;
@@ -15,7 +16,7 @@ export class TextStringDataTypeBuilder extends DataTypeBuilder {
   }
 
   getValues() {
-    let values: any = [];
+    const values: DataTypeValues = [];
     values.push({
       alias: 'maxChars',
       value: this.maxChars || 0

@@ -89,7 +89,7 @@ export class UserGroupUiHelper extends UiBaseLocators {
   }
 
   async clickRemoveLanguageFromUserGroup(languageName: string) {
-    await this.click(this.entityItem.filter({hasText: languageName}).getByLabel('Remove'));
+    await this.click(this.entityItem.filter({has: this.page.locator(`[name="${languageName}"]`)}).getByLabel('Remove'));
   }
 
   // Matches the row whose name cell is exactly `name`. A substring match ({hasText}) would also match
@@ -287,11 +287,11 @@ export class UserGroupUiHelper extends UiBaseLocators {
   }
 
   async clickRemoveButtonForUserWithName(userName: string) {
-    await this.click(this.workspaceUserItemRefs.filter({hasText: userName}).getByLabel('Remove'));
+    await this.click(this.workspaceUserItemRefs.filter({has: this.page.locator(`[name="${userName}"]`)}).getByLabel('Remove'));
   }
 
   async isUserVisibleInUserGroup(userName: string, isVisible = true) {
-    await this.isVisible(this.workspaceUserItemRefs.filter({hasText: userName}), isVisible);
+    await this.isVisible(this.workspaceUserItemRefs.filter({has: this.page.locator(`[name="${userName}"]`)}), isVisible);
   }
 
   async getUsersInGroupCount() {

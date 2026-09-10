@@ -56,7 +56,7 @@ export class TemplateApiHelper {
       idArray += '&id=' + ids[i];
     }
 
-    const response = await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/tree/template/item?' + idArray);
+    const response = await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/item/template?' + idArray);
     const json = await response.json();
 
     if (json !== null) {
@@ -107,6 +107,11 @@ export class TemplateApiHelper {
       }
     }
     return false;
+  }
+
+  /** Asserts the file content of an already-fetched template. */
+  async doesHaveContent(templateData: any, expectedContent: string): Promise<void> {
+    await this.api.doesHaveContent(templateData, expectedContent);
   }
 
   async getByName(name: string) {

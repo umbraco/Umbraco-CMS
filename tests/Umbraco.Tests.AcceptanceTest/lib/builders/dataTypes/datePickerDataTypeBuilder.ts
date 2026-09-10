@@ -1,4 +1,5 @@
 import {DataTypeBuilder} from './dataTypeBuilder';
+import {DataTypeValues} from '../types';
 
 export class DatePickerDataTypeBuilder extends DataTypeBuilder {
   format: string;
@@ -15,7 +16,7 @@ export class DatePickerDataTypeBuilder extends DataTypeBuilder {
   }
 
   getValues() {
-    let values: any = [];
+    const values: DataTypeValues = [];
     values.push({
       alias: 'format',
       value: this.format || 'YYYY-MM-DD'

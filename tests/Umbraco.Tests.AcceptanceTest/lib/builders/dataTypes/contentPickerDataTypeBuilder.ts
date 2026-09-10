@@ -1,4 +1,5 @@
 import {DataTypeBuilder} from './dataTypeBuilder';
+import {DataTypeValues} from '../types';
 
 export class ContentPickerDataTypeBuilder extends DataTypeBuilder {
   showOpenButton: boolean;
@@ -27,7 +28,7 @@ export class ContentPickerDataTypeBuilder extends DataTypeBuilder {
   }
 
   getValues() {
-    let values: any[] = [];
+    const values: DataTypeValues = [];
 
     if (this.showOpenButton !== undefined) {
       values.push({

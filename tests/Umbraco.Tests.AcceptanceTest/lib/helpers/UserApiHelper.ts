@@ -178,7 +178,7 @@ export class UserApiHelper {
       "newPassword": newPassword,
       "oldPassword": oldPassword
     };
-    return await this.api.post(this.api.baseUrl + '/umbraco/management/api/v1/user/change-password/', updatePassword);
+    return await this.api.post(this.api.baseUrl + '/umbraco/management/api/v1/user/current/change-password', updatePassword);
   }
 
   // Invite

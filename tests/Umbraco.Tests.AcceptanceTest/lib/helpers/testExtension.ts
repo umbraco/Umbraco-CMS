@@ -30,13 +30,18 @@ const test = base.extend<{ umbracoApi: ApiHelpers } & { umbracoUi: UiHelpers }>(
     const consoleErrorHelper = new ConsoleErrorHelper();
     const consoleErrors: string[] = [];
 
+    // Resolved once, up front, rather than inside the handler: the listener stays attached until
+    // the page closes, so it can fire during teardown - and test.info() throws when called outside
+    // a running test, which inside an event listener surfaces as an unhandled error rather than a
+    // test failure.
+    const testTitle = test.info().title;
+    const testLocation = test.info().titlePath[0];
+
     // Listen for all console events and handle errors
     page.on('console', message => {
       if (message.type() === 'error') {
         const errorMessage = message.text();
         consoleErrors.push(errorMessage);
-        const testTitle = test.info().title;
-        const testLocation = test.info().titlePath[0];
         let errorMessageJson = consoleErrorHelper.updateConsoleErrorTextToJson(errorMessage, testTitle, testLocation);
         consoleErrorHelper.writeConsoleErrorToFile(errorMessageJson);
       }

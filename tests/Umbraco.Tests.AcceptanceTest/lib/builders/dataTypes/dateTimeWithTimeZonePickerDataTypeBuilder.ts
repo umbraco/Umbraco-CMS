@@ -1,4 +1,5 @@
 import {DataTypeBuilder} from './dataTypeBuilder';
+import {DataTypeValues} from '../types';
 
 export class DateTimeWithTimeZonePickerDataTypeBuilder extends DataTypeBuilder {
   timeFormat: string;
@@ -28,7 +29,7 @@ export class DateTimeWithTimeZonePickerDataTypeBuilder extends DataTypeBuilder {
   }
 
   getValues() {
-    let values: any = [];
+    const values: DataTypeValues = [];
     values.push({
       alias: 'timeFormat',
       value: this.timeFormat || 'HH:mm'

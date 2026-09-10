@@ -1,4 +1,5 @@
 import {DataTypeBuilder} from './dataTypeBuilder';
+import {DataTypeValues} from '../types';
 
 export class TagsDataTypeBuilder extends DataTypeBuilder {
   group: string;
@@ -21,7 +22,7 @@ export class TagsDataTypeBuilder extends DataTypeBuilder {
   }
 
   getValues() {
-    let values: any = [];
+    const values: DataTypeValues = [];
     values.push({
       alias: 'group',
       value: this.group || 'default'

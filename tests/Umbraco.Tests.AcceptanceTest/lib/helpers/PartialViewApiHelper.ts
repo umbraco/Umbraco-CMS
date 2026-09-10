@@ -65,6 +65,11 @@ export class PartialViewApiHelper {
     return await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/tree/partial-view/root?skip=0&take=10000');
   }
 
+  /** Asserts the file content of an already-fetched partialView. */
+  async doesHaveContent(partialViewData: any, expectedContent: string): Promise<void> {
+    await this.api.doesHaveContent(partialViewData, expectedContent);
+  }
+
   async getByName(name: string) {
     const rootPartialView = await this.getAllAtRoot();
     const jsonPartialView = await rootPartialView.json();

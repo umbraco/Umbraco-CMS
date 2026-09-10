@@ -752,6 +752,7 @@ export class ContentUiHelper extends UiBaseLocators {
   /**
    * @deprecated Save-and-publish waits on the publish response, not a plain update.
    * Prefer {@link clickSaveAndPublishButtonAndWaitForContentToBePublished}.
+   * Scheduled for removal in 20.0.
    * TODO: remove once all callers have migrated.
    */
   async clickSaveAndPublishButtonAndWaitForContentToBeUpdated() {
@@ -1211,8 +1212,11 @@ export class ContentUiHelper extends UiBaseLocators {
     await this.hasCount(this.listViewTableRow, count);
   }
 
+  // The collection's name cell is `<uui-button label=${name}>`, so the name is an attribute and
+  // its only text lives in the button's shadow DOM. Match the attribute: exact, and independent
+  // of how uui-button chooses to render its label.
   async selectContentWithNameInListView(name: string) {
-    await this.click(this.listViewTableRow.filter({hasText: name}));
+    await this.click(this.listViewTableRow.filter({has: this.page.locator(`[label="${name}"]`)}));
   }
 
   async clickPublishSelectedListItems() {
@@ -1408,7 +1412,7 @@ export class ContentUiHelper extends UiBaseLocators {
     await expect(previousVersion).toHaveClass(/active/);
   }
 
-  /** @deprecated Prefer {@link clickPreviousRollBackItem}; kept for backwards compatibility. */
+  /** @deprecated Prefer {@link clickPreviousRollBackItem}; kept for backwards compatibility. Scheduled for removal in 20.0. */
   async clickLatestRollBackItem() {
     await this.click(this.rollbackItem.last());
   }

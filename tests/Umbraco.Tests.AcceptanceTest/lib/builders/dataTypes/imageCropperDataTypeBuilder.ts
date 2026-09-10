@@ -1,5 +1,6 @@
 import {DataTypeBuilder} from './dataTypeBuilder';
 import {ImageCropperCropBuilder} from './imageCropperBuilder';
+import {DataTypeValues} from '../types';
 
 export class ImageCropperDataTypeBuilder extends DataTypeBuilder {
   imageCropperCropBuilder: ImageCropperCropBuilder[];
@@ -18,7 +19,7 @@ export class ImageCropperDataTypeBuilder extends DataTypeBuilder {
   }
 
   getValues() {
-    let values: any[] = [];
+    const values: DataTypeValues = [];
     if (this.imageCropperCropBuilder && this.imageCropperCropBuilder.length > 0) {
       values.push({
         alias: 'crops',

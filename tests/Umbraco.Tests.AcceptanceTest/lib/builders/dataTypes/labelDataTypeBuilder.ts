@@ -1,4 +1,5 @@
 import {DataTypeBuilder} from './dataTypeBuilder';
+import {DataTypeValues} from '../types';
 
 export class LabelDataTypeBuilder extends DataTypeBuilder {
   umbracoDataValueType: string;
@@ -15,7 +16,7 @@ export class LabelDataTypeBuilder extends DataTypeBuilder {
   }
 
   getValues() {
-    let values: any = [];
+    const values: DataTypeValues = [];
     if (this.umbracoDataValueType !== undefined) {
       values.push({
         alias: 'umbracoDataValueType',

@@ -1,4 +1,5 @@
 import {DataTypeBuilder} from './dataTypeBuilder';
+import {DataTypeValues} from '../types';
 
 export class TimeOnlyPickerDataTypeBuilder extends DataTypeBuilder {
   timeFormat: string;
@@ -15,7 +16,7 @@ export class TimeOnlyPickerDataTypeBuilder extends DataTypeBuilder {
   }
 
   getValues() {
-    let values: any = [];
+    const values: DataTypeValues = [];
     values.push({
       alias: 'timeFormat',
       value: this.timeFormat || 'HH:mm'

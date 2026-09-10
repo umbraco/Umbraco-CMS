@@ -41,7 +41,9 @@ export class RelationTypeApiHelper {
   }
 
   async getAllAtRoot() {
-    return await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/tree/relation-type/root?skip=0&take=10000');
+    // Relation types expose no tree endpoint; the paged list is the equivalent and returns the
+    // same {total, items} shape itemsOf expects.
+    return await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/relation-type?skip=0&take=10000');
   }
 
   async getItems(ids) {
@@ -52,7 +54,7 @@ export class RelationTypeApiHelper {
       idArray += '&id=' + ids[i];
     }
 
-    const response = await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/relation-type/item?' + idArray);
+    const response = await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/item/relation-type?' + idArray);
     const json = await response.json();
 
     if (json !== null) {

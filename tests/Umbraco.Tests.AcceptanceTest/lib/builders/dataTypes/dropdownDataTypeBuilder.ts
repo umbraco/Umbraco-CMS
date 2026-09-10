@@ -1,4 +1,5 @@
 import {DataTypeBuilder} from './dataTypeBuilder';
+import {DataTypeValues} from '../types';
 
 export class DropdownDataTypeBuilder extends DataTypeBuilder {
   multiple: boolean;
@@ -21,7 +22,7 @@ export class DropdownDataTypeBuilder extends DataTypeBuilder {
   }
 
   getValues() {
-    let values: any[] = [];
+    const values: DataTypeValues = [];
     values.push({
       alias: 'multiple',
       value: this.multiple || false

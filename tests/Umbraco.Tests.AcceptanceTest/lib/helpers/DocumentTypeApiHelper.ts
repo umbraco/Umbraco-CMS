@@ -104,6 +104,31 @@ export class DocumentTypeApiHelper {
     return null;
   }
 
+  /** Asserts how many property definitions an already-fetched documentType carries. */
+  async doesHavePropertyCount(documentTypeData: any, expectedCount: number): Promise<void> {
+    await this.api.doesHavePropertyCount(documentTypeData, expectedCount);
+  }
+
+  /** Asserts how many compositions an already-fetched documentType carries. */
+  async doesHaveCompositionCount(documentTypeData: any, expectedCount: number): Promise<void> {
+    await this.api.doesHaveCompositionCount(documentTypeData, expectedCount);
+  }
+
+  /** Asserts that the property with `propertyAlias` is backed by `dataTypeId`. */
+  async doesPropertyUseDataType(documentTypeData: any, propertyAlias: string, dataTypeId: string): Promise<void> {
+    await this.api.doesPropertyUseDataType(documentTypeData, propertyAlias, dataTypeId);
+  }
+
+  /** Asserts the documentType has exactly one property and that it uses `dataTypeId`. */
+  async doesOnlyPropertyUseDataType(documentTypeData: any, dataTypeId: string): Promise<void> {
+    await this.api.doesOnlyPropertyUseDataType(documentTypeData, dataTypeId);
+  }
+
+  /** Asserts whether an already-fetched document type is an element type. */
+  async isElementType(documentTypeData: any, expected: boolean = true): Promise<void> {
+    await this.api.isElementType(documentTypeData, expected);
+  }
+
   async getByName(name: string) {
     const rootDocumentTypes = await this.getAllAtRoot();
     const jsonDocumentTypes = await rootDocumentTypes.json();

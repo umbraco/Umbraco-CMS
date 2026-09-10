@@ -1,5 +1,6 @@
 import {DataTypeBuilder} from './dataTypeBuilder';
 import {ListViewBulkActionPermissionsBuilder, ListViewLayoutBuilder, ListViewPropertyBuilder} from './listViewBuilder';
+import {DataTypeValues} from '../types';
 
 export class ListViewDataTypeBuilder extends DataTypeBuilder {
   pageSize: number;
@@ -70,7 +71,7 @@ export class ListViewDataTypeBuilder extends DataTypeBuilder {
   }
 
   getValues() {
-    let values: any = [];
+    const values: DataTypeValues = [];
 
     values.push({
       alias: 'pageSize',

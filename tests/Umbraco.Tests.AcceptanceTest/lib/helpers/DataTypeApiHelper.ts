@@ -1,4 +1,5 @@
 ﻿import {ApiHelpers} from "./ApiHelpers";
+import {expect} from "@playwright/test";
 import {AliasHelper} from "./AliasHelper";
 import {
   CheckboxListDataTypeBuilder,
@@ -95,8 +96,35 @@ export class DataTypeApiHelper {
       idArray += '&id=' + ids[i];
     }
 
-    const response = await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/tree/data-type/item?' + idArray);
+    const response = await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/item/data-type?' + idArray);
     return await response.json();
+  }
+
+  /**
+   * Asserts both editor aliases on an already-fetched data type.
+   *
+   * The two are always checked together - a data type with the right `editorAlias` but the
+   * wrong `editorUiAlias` renders the wrong editor in the backoffice, so asserting one
+   * without the other passes on a genuinely broken data type.
+   */
+  async doesDataTypeHaveEditors(dataTypeData: any, expectedEditorAlias: string, expectedEditorUiAlias: string): Promise<void> {
+    expect(dataTypeData?.editorAlias, `Expected data type '${dataTypeData?.name}' to use editor '${expectedEditorAlias}'`).toBe(expectedEditorAlias);
+    expect(dataTypeData?.editorUiAlias, `Expected data type '${dataTypeData?.name}' to use editor UI '${expectedEditorUiAlias}'`).toBe(expectedEditorUiAlias);
+  }
+
+  /** Returns a configuration value from an already-fetched data type, looked up by alias. The caller asserts. */
+  getPropertyValue(dataTypeData: any, alias: string): any {
+    return this.api.getPropertyValue(dataTypeData, alias);
+  }
+
+  /** Returns the data type's only configuration value, asserting there is exactly one. */
+  getOnlyPropertyValue(dataTypeData: any): any {
+    return this.api.getOnlyPropertyValue(dataTypeData);
+  }
+
+  /** Asserts how many configuration values an already-fetched data type carries; 0 means all defaults. */
+  async doesHaveValueCount(dataTypeData: any, expectedCount: number): Promise<void> {
+    await this.api.doesHaveValueCount(dataTypeData, expectedCount);
   }
 
   async getByName(name: string) {

@@ -1,5 +1,6 @@
 import {DataTypeBuilder} from './dataTypeBuilder';
 import {MultiNodeTreePickerStartNodeBuilder} from './multiNodeTreePickerBuilder/multiNodeTreePickerStartNodeBuilder';
+import {DataTypeValues} from '../types';
 
 export class MultiNodeTreePickerDataTypeBuilder extends DataTypeBuilder {
   minNumber: number;
@@ -41,7 +42,7 @@ export class MultiNodeTreePickerDataTypeBuilder extends DataTypeBuilder {
   }
 
   getValues() {
-    let values: any[] = [];
+    const values: DataTypeValues = [];
 
     values.push({
       alias: 'minNumber',

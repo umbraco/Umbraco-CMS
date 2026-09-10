@@ -68,6 +68,11 @@ export class StylesheetApiHelper {
     return await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/tree/stylesheet/root?skip=0&take=10000');
   }
 
+  /** Asserts the file content of an already-fetched stylesheet. */
+  async doesHaveContent(stylesheetData: any, expectedContent: string): Promise<void> {
+    await this.api.doesHaveContent(stylesheetData, expectedContent);
+  }
+
   async getByName(name: string) {
     const rootStylesheet = await this.getAllAtRoot();
     const jsonStylesheet = await rootStylesheet.json();

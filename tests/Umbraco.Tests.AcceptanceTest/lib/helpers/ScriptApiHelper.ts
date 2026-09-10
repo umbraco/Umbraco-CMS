@@ -68,7 +68,7 @@ export class ScriptApiHelper {
       pathArray += '&path=' + paths[i];
     }
 
-    const response = await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/tree/script/item?' + pathArray);
+    const response = await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/item/script?' + pathArray);
     const json = await response.json();
     if (json !== null) {
       return json;
@@ -82,6 +82,11 @@ export class ScriptApiHelper {
 
   async doesNameExist(name: string) {
     return await this.getByName(name);
+  }
+
+  /** Asserts the file content of an already-fetched script. */
+  async doesHaveContent(scriptData: any, expectedContent: string): Promise<void> {
+    await this.api.doesHaveContent(scriptData, expectedContent);
   }
 
   async getByName(name: string) {

@@ -8,7 +8,7 @@ export class PublishedCacheApiHelper {
   }
 
   async getStatus() {
-    const response = await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/published-cache/status');
+    const response = await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/published-cache/rebuild/status');
     return await response.json(); 
   }
 }

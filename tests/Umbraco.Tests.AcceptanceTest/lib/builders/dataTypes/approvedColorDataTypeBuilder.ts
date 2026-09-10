@@ -1,5 +1,6 @@
 import {ApprovedColorItemBuilder} from './approvedColorBuilder';
 import {DataTypeBuilder} from './dataTypeBuilder';
+import {DataTypeValues} from '../types';
 
 export class ApprovedColorDataTypeBuilder extends DataTypeBuilder {
   useLabel: boolean;
@@ -24,7 +25,7 @@ export class ApprovedColorDataTypeBuilder extends DataTypeBuilder {
   }
 
   getValues() {
-    let values: any = [];
+    const values: DataTypeValues = [];
     values.push({
       alias: 'useLabel',
       value: this.useLabel || false

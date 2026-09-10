@@ -83,7 +83,9 @@ export class DocumentBlueprintsValueBuilder {
       alias: this.alias || null,
       value: value || null,
       editorAlias: this.editorAlias || null,
-      entityType: this.editorAlias !== undefined ? 'document-blueprint-property-value' : null
+      // Honour an explicit withEntityType(); the fallback stays keyed on editorAlias so every
+      // call site that does not set it produces the same payload as before.
+      entityType: this.entityType ?? (this.editorAlias !== undefined ? 'document-blueprint-property-value' : null)
     };
   }
 }

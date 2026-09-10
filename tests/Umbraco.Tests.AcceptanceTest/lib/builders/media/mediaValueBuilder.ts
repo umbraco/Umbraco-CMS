@@ -70,7 +70,9 @@ export class MediaValueBuilder {
       alias: this.alias || null,
       editorAlias: this.editorAlias || null,
       value: value || null,
-      entityType: this.editorAlias !== undefined ? 'media-property-value' : null
+      // Honour an explicit withEntityType(); the fallback stays keyed on editorAlias so every
+      // call site that does not set it produces the same payload as before.
+      entityType: this.entityType ?? (this.editorAlias !== undefined ? 'media-property-value' : null)
     };
   }
 }

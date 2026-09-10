@@ -1,5 +1,6 @@
 import {DataTypeBuilder} from '../dataTypeBuilder';
 import {TinyMCEToolbarBuilder} from './tinyMCEToolbarBuilder';
+import {DataTypeValues} from '../../types';
 
 export class TinyMCEDataTypeBuilder extends DataTypeBuilder {
   tinyMCEToolbarBuilder: TinyMCEToolbarBuilder;
@@ -73,7 +74,7 @@ export class TinyMCEDataTypeBuilder extends DataTypeBuilder {
   }
 
   getValues() {
-    let values: any[] = [];
+    const values: DataTypeValues = [];
 
     if (this.tinyMCEToolbarBuilder) {
       values.push({

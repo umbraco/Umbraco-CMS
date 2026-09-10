@@ -1,4 +1,5 @@
 import {DataTypeBuilder} from './dataTypeBuilder';
+import {DataTypeValues} from '../types';
 
 export class MarkdownEditorDataTypeBuilder extends DataTypeBuilder {
   preview: boolean;
@@ -27,7 +28,7 @@ export class MarkdownEditorDataTypeBuilder extends DataTypeBuilder {
   }
 
   getValues() {
-    let values: any = [];
+    const values: DataTypeValues = [];
     if (this.preview !== undefined) {
       values.push({
         alias: 'preview',

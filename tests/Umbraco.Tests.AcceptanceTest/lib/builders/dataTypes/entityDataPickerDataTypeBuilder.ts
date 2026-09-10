@@ -1,4 +1,5 @@
 import {DataTypeBuilder} from './dataTypeBuilder';
+import {DataTypeValues} from '../types';
 
 export class EntityDataPickerDataTypeBuilder extends DataTypeBuilder {
   minValue: number;
@@ -27,7 +28,7 @@ export class EntityDataPickerDataTypeBuilder extends DataTypeBuilder {
   }
 
   getValues() {
-    let values: any = [];
+    const values: DataTypeValues = [];
 
     // Add validationLimit alias and value if present
     if (this.minValue !== undefined || this.maxValue !== undefined) {

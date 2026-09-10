@@ -1,6 +1,7 @@
 import {DataTypeBuilder} from './dataTypeBuilder';
 import {BlockGridBlockBuilder} from './blockGridBuilder';
 import {BlockGridBlockGroupBuilder} from './blockGridBuilder';
+import {DataTypeValues} from '../types';
 
 export class BlockGridDataTypeBuilder extends DataTypeBuilder {
   blockGridBlockBuilder: BlockGridBlockBuilder[];
@@ -85,7 +86,7 @@ export class BlockGridDataTypeBuilder extends DataTypeBuilder {
   }
 
   getValues() {
-    let values: any[] = [];
+    const values: DataTypeValues = [];
 
     // Since the method getBlockGroupGUID is only called when a group is used by an element, we need to make sure to check if a group actually exists before building, and if it exists, it is added to the blockGroupValue
     if (this.blockGridGroupValue == null) {

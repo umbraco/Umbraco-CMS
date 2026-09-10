@@ -1,4 +1,5 @@
 import {DataTypeBuilder} from './dataTypeBuilder';
+import {DataTypeValues} from '../types';
 
 export class NumericDataTypeBuilder extends DataTypeBuilder {
   min: number;
@@ -27,7 +28,7 @@ export class NumericDataTypeBuilder extends DataTypeBuilder {
   }
 
   getValues() {
-    let values: any = [];
+    const values: DataTypeValues = [];
     values.push({
       alias: 'min',
       value: this.min || 0

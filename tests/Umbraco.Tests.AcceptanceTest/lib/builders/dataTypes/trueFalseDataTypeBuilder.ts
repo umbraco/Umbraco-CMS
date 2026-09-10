@@ -1,4 +1,5 @@
 import {DataTypeBuilder} from './dataTypeBuilder';
+import {DataTypeValues} from '../types';
 
 export class TrueFalseDataTypeBuilder extends DataTypeBuilder {
   isDefault: boolean;
@@ -33,7 +34,7 @@ export class TrueFalseDataTypeBuilder extends DataTypeBuilder {
   }
 
   getValues() {
-    let values: any = [];
+    const values: DataTypeValues = [];
     if (this.isDefault !== undefined) {
       values.push({
         alias: 'default',

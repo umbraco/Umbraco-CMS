@@ -1,4 +1,5 @@
 import {DataTypeBuilder} from './dataTypeBuilder';
+import {DataTypeValues} from '../types';
 
 export class MultipleTextStringDataTypeBuilder extends DataTypeBuilder {
   min: number;
@@ -21,7 +22,7 @@ export class MultipleTextStringDataTypeBuilder extends DataTypeBuilder {
   }
 
   getValues() {
-    let values: any = [];
+    const values: DataTypeValues = [];
     values.push({
       alias: 'min',
       value: this.min || 0

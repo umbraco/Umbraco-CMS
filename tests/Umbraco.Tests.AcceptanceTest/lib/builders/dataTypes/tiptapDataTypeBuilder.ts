@@ -1,5 +1,6 @@
 import {DataTypeBuilder} from './dataTypeBuilder';
 import {TiptapExtensionBuilder, TiptapToolbarRowBuilder, TiptapBlockBuilder, TiptapStatusbarBuilder} from './tiptapBuilder';
+import {DataTypeValues} from '../types';
 
 export class TiptapDataTypeBuilder extends DataTypeBuilder {
   maxImageSize: number;
@@ -74,7 +75,7 @@ export class TiptapDataTypeBuilder extends DataTypeBuilder {
   }
 
   getValues() {
-    let values: any[] = [];
+    const values: DataTypeValues = [];
 
     values.push({
       alias: 'maxImageSize',

@@ -1145,7 +1145,7 @@ export class DataTypeUiHelper extends UiBaseLocators {
   }
 
   async clickRemoveStylesheetButton(stylesheetName: string) {
-    const removeButton = this.entityItem.filter({hasText: stylesheetName}).getByLabel('Remove');
+    const removeButton = this.entityItem.filter({has: this.page.locator(`[name="${stylesheetName}"]`)}).getByLabel('Remove');
     await this.click(removeButton);
   }
 

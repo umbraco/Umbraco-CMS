@@ -1,5 +1,6 @@
 import {DataTypeBuilder} from './dataTypeBuilder';
 import {MediaPickerCropBuilder} from './mediaPickerBuilder';
+import {DataTypeValues} from '../types';
 
 export class MediaPickerDataTypeBuilder extends DataTypeBuilder {
   filter: string;
@@ -60,7 +61,7 @@ export class MediaPickerDataTypeBuilder extends DataTypeBuilder {
   }
 
   getValues() {
-    let values: any[] = [];
+    const values: DataTypeValues = [];
     if (this.filter !== undefined) {
       values.push({
         alias: 'filter',

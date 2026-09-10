@@ -1,4 +1,5 @@
 import {DataTypeBuilder} from './dataTypeBuilder';
+import {DataTypeValues} from '../types';
 
 export class UploadFieldDataTypeBuilder extends DataTypeBuilder {
   fileExtensions: string[];
@@ -15,7 +16,7 @@ export class UploadFieldDataTypeBuilder extends DataTypeBuilder {
   }
 
   getValues() {
-    let values: any[] = [];
+    const values: DataTypeValues = [];
 
     if (this.fileExtensions && this.fileExtensions.length > 0) {
       values.push({

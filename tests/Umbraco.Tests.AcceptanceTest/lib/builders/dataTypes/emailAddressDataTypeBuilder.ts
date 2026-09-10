@@ -1,4 +1,5 @@
 import {DataTypeBuilder} from './dataTypeBuilder';
+import {DataTypeValues} from '../types';
 
 export class EmailAddressDataTypeBuilder extends DataTypeBuilder {
   constructor() {
@@ -8,7 +9,7 @@ export class EmailAddressDataTypeBuilder extends DataTypeBuilder {
   }
 
   getValues() {
-    let values: any = [];
+    const values: DataTypeValues = [];
     values.push({
       alias: 'inputType',
       value: 'email'

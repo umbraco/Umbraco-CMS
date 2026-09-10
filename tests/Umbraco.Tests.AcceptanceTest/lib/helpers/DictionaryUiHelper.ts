@@ -73,14 +73,32 @@ export class DictionaryUiHelper extends UiBaseLocators {
 
   // This function will export dictionary and return the file name
   async exportDictionary(includesDescendants: boolean) {
+    return (await this.exportDictionaryAndReadFile(includesDescendants)).filename;
+  }
+
+  /**
+   * Exports a dictionary item and returns both the suggested filename and the file's contents.
+   *
+   * The filename is `{id}.udt` whether or not descendants are included, so it cannot distinguish
+   * the two - only the contents can. A `.udt` is XML carrying one `<DictionaryItem Name="…">`
+   * element per exported item, so asserting on a name tells you whether that item was included.
+   */
+  async exportDictionaryAndReadFile(includesDescendants: boolean): Promise<{filename: string; content: string}> {
     if (includesDescendants) {
       await this.click(this.includeDescendantsCheckbox);
     }
-    const [downloadPromise] = await Promise.all([
+    const [download] = await Promise.all([
       this.page.waitForEvent('download'),
       await this.click(this.exportModalBtn)
     ]);
-    return downloadPromise.suggestedFilename();
+
+    const stream = await download.createReadStream();
+    const chunks: Buffer[] = [];
+    for await (const chunk of stream) {
+      chunks.push(Buffer.from(chunk));
+    }
+
+    return {filename: download.suggestedFilename(), content: Buffer.concat(chunks).toString('utf-8')};
   }
 
   async importDictionary(filePath: string) {

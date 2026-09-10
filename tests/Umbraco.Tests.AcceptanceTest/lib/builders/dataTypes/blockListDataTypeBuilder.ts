@@ -1,5 +1,6 @@
 import {DataTypeBuilder} from './dataTypeBuilder';
 import {BlockListBlockBuilder} from './blockListBuilder';
+import {DataTypeValues} from '../types';
 
 export class BlockListDataTypeBuilder extends DataTypeBuilder {
   minValue: number;
@@ -54,7 +55,7 @@ export class BlockListDataTypeBuilder extends DataTypeBuilder {
   }
 
   getValues() {
-    let values: any[] = [];
+    const values: DataTypeValues = [];
 
     // Add validationLimit alias and value if present
     if (this.minValue !== undefined || this.maxValue !== undefined) {

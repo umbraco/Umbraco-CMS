@@ -20,6 +20,41 @@ export class DocumentApiHelper {
     await this.api.waitUntilItemIsIndexed(ConstantHelper.apiEndpoints.documentSearch, query, id);
   }
 
+  /** Asserts the publication state of a variant on an already-fetched document. */
+  async doesVariantHaveState(documentData: any, expectedState: string, culture: string | null = null): Promise<void> {
+    await this.api.doesVariantHaveState(documentData, expectedState, culture);
+  }
+
+  /** Asserts a property value on an already-fetched document, matched by alias rather than position. */
+  async doesPropertyHaveValue(documentData: any, alias: string, expectedValue: any, culture: string | null = null): Promise<void> {
+    await this.api.doesPropertyHaveValue(documentData, alias, expectedValue, culture);
+  }
+
+  /** Asserts how many property values an already-fetched document carries; 0 means nothing is set. */
+  async doesHaveValueCount(documentData: any, expectedCount: number): Promise<void> {
+    await this.api.doesHaveValueCount(documentData, expectedCount);
+  }
+
+  /** Returns the document's only property value, asserting there is exactly one. The caller asserts on it. */
+  getOnlyPropertyValue(documentData: any): any {
+    return this.api.getOnlyPropertyValue(documentData);
+  }
+
+  /** Asserts how many variants an already-fetched document carries. */
+  async doesHaveVariantCount(documentData: any, expectedCount: number): Promise<void> {
+    await this.api.doesHaveVariantCount(documentData, expectedCount);
+  }
+
+  /** Returns a property value from an already-fetched document, looked up by alias. The caller asserts. */
+  getPropertyValue(documentData: any, alias: string, culture: string | null = null): any {
+    return this.api.getPropertyValue(documentData, alias, culture);
+  }
+
+  /** Asserts the name of a variant on an already-fetched document. */
+  async doesVariantHaveName(documentData: any, expectedName: string, culture: string | null = null): Promise<void> {
+    await this.api.doesVariantHaveName(documentData, expectedName, culture);
+  }
+
   async doesExist(id: string) {
     const response = await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/document/' + id);
     return response.status() === 200;

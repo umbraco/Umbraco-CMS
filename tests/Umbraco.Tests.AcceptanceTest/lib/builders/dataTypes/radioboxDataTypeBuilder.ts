@@ -1,4 +1,5 @@
 import {DataTypeBuilder} from './dataTypeBuilder';
+import {DataTypeValues} from '../types';
 
 export class RadioboxDataTypeBuilder extends DataTypeBuilder {
   items: string[];
@@ -15,7 +16,7 @@ export class RadioboxDataTypeBuilder extends DataTypeBuilder {
   }
 
   getValues() {
-    let values: any[] = [];
+    const values: DataTypeValues = [];
 
     if (this.items && this.items.length > 0) {
       values.push({

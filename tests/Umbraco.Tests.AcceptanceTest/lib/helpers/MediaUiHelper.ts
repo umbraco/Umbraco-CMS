@@ -238,7 +238,7 @@ export class MediaUiHelper extends UiBaseLocators {
     ]);
   }
 
-  /** @deprecated Prefer {@link clickChooseModalButtonAndWaitForMediaWithIdsToBeMoved}, which waits per media id (deterministic); kept for backwards compatibility. */
+  /** @deprecated Prefer {@link clickChooseModalButtonAndWaitForMediaWithIdsToBeMoved}, which waits per media id (deterministic); kept for backwards compatibility. Scheduled for removal in 20.0. */
   async clickChooseModalButtonAndWaitForMediaItemsToBeMoved(movedMediaItems: number) {
     return await this.waitForMultipleResponsesAfterExecutingPromise('/move', this.clickChooseModalButton(), ConstantHelper.statusCodes.ok, movedMediaItems);
   }

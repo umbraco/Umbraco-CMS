@@ -27,7 +27,7 @@ export class ExamineManagementUiHelper extends UiBaseLocators {
     await this.hasCount(this.indexerItems, count);
   }
 
-  /** @deprecated Prefer {@link doesIndexersHaveCount} (deterministic assertion); kept for backwards compatibility. */
+  /** @deprecated Prefer {@link doesIndexersHaveCount} (deterministic assertion); kept for backwards compatibility. Scheduled for removal in 20.0. */
   checkIndexersCount() {
     return this.indexerItems.count();
   }

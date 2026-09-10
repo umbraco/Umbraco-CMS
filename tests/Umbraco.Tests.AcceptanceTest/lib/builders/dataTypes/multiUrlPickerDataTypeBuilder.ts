@@ -1,4 +1,5 @@
 import {DataTypeBuilder} from './dataTypeBuilder';
+import {DataTypeValues} from '../types';
 
 export class MultiUrlPickerDataTypeBuilder extends DataTypeBuilder {
   minNumber: number;
@@ -39,7 +40,7 @@ export class MultiUrlPickerDataTypeBuilder extends DataTypeBuilder {
   }
 
   getValues() {
-    let values: any = [];
+    const values: DataTypeValues = [];
     if (this.minNumber !== undefined) {
       values.push({
         alias: 'minNumber',

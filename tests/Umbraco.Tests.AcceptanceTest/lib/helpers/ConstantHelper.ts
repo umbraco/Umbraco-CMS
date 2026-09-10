@@ -344,6 +344,7 @@
     treeElementRoot: '/umbraco/management/api/v1/tree/element/root',
     treeElementChildren: '/umbraco/management/api/v1/tree/element/children',
     currentUserProfile: '/umbraco/management/api/v1/user/current/profile',
+    telemetryLevel: '/umbraco/management/api/v1/telemetry/level',
     currentUserAvatar: '/umbraco/management/api/v1/user/current/avatar'
   }
 

@@ -96,6 +96,26 @@ export class MediaTypeApiHelper {
     return response.status();
   }
 
+  /** Asserts how many property definitions an already-fetched mediaType carries. */
+  async doesHavePropertyCount(mediaTypeData: any, expectedCount: number): Promise<void> {
+    await this.api.doesHavePropertyCount(mediaTypeData, expectedCount);
+  }
+
+  /** Asserts how many compositions an already-fetched mediaType carries. */
+  async doesHaveCompositionCount(mediaTypeData: any, expectedCount: number): Promise<void> {
+    await this.api.doesHaveCompositionCount(mediaTypeData, expectedCount);
+  }
+
+  /** Asserts that the property with `propertyAlias` is backed by `dataTypeId`. */
+  async doesPropertyUseDataType(mediaTypeData: any, propertyAlias: string, dataTypeId: string): Promise<void> {
+    await this.api.doesPropertyUseDataType(mediaTypeData, propertyAlias, dataTypeId);
+  }
+
+  /** Asserts the mediaType has exactly one property and that it uses `dataTypeId`. */
+  async doesOnlyPropertyUseDataType(mediaTypeData: any, dataTypeId: string): Promise<void> {
+    await this.api.doesOnlyPropertyUseDataType(mediaTypeData, dataTypeId);
+  }
+
   async getByName(name: string) {
     const rootMediaTypes = await this.getAllAtRoot();
     const jsonMediaTypes = await rootMediaTypes.json();

@@ -1,6 +1,6 @@
 ﻿import {expect, Locator, Page} from "@playwright/test"
 import {UiBaseLocators} from "./UiBaseLocators";
-import {umbracoConfig} from "../umbraco.config";
+
 import {ConstantHelper} from "./ConstantHelper";
 
 export class UserUiHelper extends UiBaseLocators {
@@ -120,8 +120,14 @@ export class UserUiHelper extends UiBaseLocators {
     return await this.isVisible(this.page.getByText(name, {exact: true}), isVisible);
   }
 
+  // Matches the ref whose name is exactly `userGroupName`. A substring match ({hasText}) would also
+  // match a longer leftover name (e.g. 'TestUserGroupNameDescription') and trip strict-mode multi-match.
+  private userGroupRefWithExactName(userGroupName: string) {
+    return this.page.locator('umb-user-group-ref').filter({has: this.page.getByText(userGroupName, {exact: true})});
+  }
+
   async clickRemoveButtonForUserGroupWithName(userGroupName: string) {
-    await this.click(this.page.locator('umb-user-group-ref', {hasText: userGroupName}).locator('[label="Remove"]'));
+    await this.click(this.userGroupRefWithExactName(userGroupName).locator('[label="Remove"]'));
   }
 
   async searchInUserSection(name: string) {
@@ -180,10 +186,11 @@ export class UserUiHelper extends UiBaseLocators {
   }
 
   async isPasswordUpdatedForUserWithId(userId: string) {
-    await Promise.all([
-      this.page.waitForResponse(resp => resp.url().includes(umbracoConfig.environment.baseUrl + '/umbraco/management/api/v1/user/' + userId + '/change-password') && resp.status() === 200),
-      await this.clickConfirmButton()
-    ]);
+    await this.waitForResponseAfterExecutingPromise(
+      `${ConstantHelper.apiEndpoints.user}/${userId}/change-password`,
+      this.clickConfirmButton(),
+      ConstantHelper.statusCodes.ok,
+    );
   }
 
   async clickChooseContainerButton() {
@@ -279,10 +286,7 @@ export class UserUiHelper extends UiBaseLocators {
   }
 
   async doesUserGroupPickerHaveDetails(userGroupName: string, details: string) {
-    // Filter by an exact-text match so a longer leftover name (e.g. 'TestUserGroupNameDescription')
-    // does not also match 'TestUserGroupName' and trip strict-mode multi-match.
-    const userGroupRefLocator = this.page.locator('umb-user-group-ref').filter({has: this.page.getByText(userGroupName, {exact: true})});
-    const detailsLocator = userGroupRefLocator.locator('#details');
+    const detailsLocator = this.userGroupRefWithExactName(userGroupName).locator('#details');
     return await this.containsText(detailsLocator, details);
   }
 

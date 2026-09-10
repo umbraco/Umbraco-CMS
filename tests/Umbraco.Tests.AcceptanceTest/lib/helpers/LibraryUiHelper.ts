@@ -1004,8 +1004,10 @@ export class LibraryUiHelper extends UiBaseLocators {
     await this.hasCount(this.elementCollectionViewTableRow, count);
   }
 
+  // As with the document collection, the name cell is `<uui-button label=${name}>` - match the
+  // attribute rather than shadow-DOM text.
   async selectElementWithNameInElementCollectionView(name: string) {
-    await this.click(this.elementCollectionViewTableRow.filter({hasText: name}));
+    await this.click(this.elementCollectionViewTableRow.filter({has: this.page.locator(`[label="${name}"]`)}));
   }
 
   async clickPublishSelectedListItems() {
@@ -1187,7 +1189,7 @@ export class LibraryUiHelper extends UiBaseLocators {
     await expect(previousVersion).toHaveClass(/active/);
   }
 
-  /** @deprecated Prefer {@link clickPreviousRollBackItem}; kept for backwards compatibility. */
+  /** @deprecated Prefer {@link clickPreviousRollBackItem}; kept for backwards compatibility. Scheduled for removal in 20.0. */
   async clickLatestRollBackItem() {
     await this.click(this.rollbackItem.last());
   }

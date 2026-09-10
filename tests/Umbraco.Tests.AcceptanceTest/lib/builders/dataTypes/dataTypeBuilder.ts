@@ -1,4 +1,5 @@
 import {ensureIdExists} from '../../helpers/BuilderUtils';
+import {DataTypePayload, DataTypeValues} from '../types';
 
 export abstract class DataTypeBuilder {
   id: string;
@@ -22,7 +23,7 @@ export abstract class DataTypeBuilder {
     return this;
   }
 
-  build() {
+  build(): DataTypePayload {
     this.id = ensureIdExists(this.id);
     return {
       editorAlias: this.editorAlias,
@@ -34,5 +35,5 @@ export abstract class DataTypeBuilder {
     };
   }
 
-  abstract getValues();
+  abstract getValues(): DataTypeValues;
 }

@@ -120,6 +120,26 @@ export class MemberTypeApiHelper {
     return this.api.itemsOf(items);
   }
 
+  /** Asserts how many property definitions an already-fetched memberType carries. */
+  async doesHavePropertyCount(memberTypeData: any, expectedCount: number): Promise<void> {
+    await this.api.doesHavePropertyCount(memberTypeData, expectedCount);
+  }
+
+  /** Asserts how many compositions an already-fetched memberType carries. */
+  async doesHaveCompositionCount(memberTypeData: any, expectedCount: number): Promise<void> {
+    await this.api.doesHaveCompositionCount(memberTypeData, expectedCount);
+  }
+
+  /** Asserts that the property with `propertyAlias` is backed by `dataTypeId`. */
+  async doesPropertyUseDataType(memberTypeData: any, propertyAlias: string, dataTypeId: string): Promise<void> {
+    await this.api.doesPropertyUseDataType(memberTypeData, propertyAlias, dataTypeId);
+  }
+
+  /** Asserts the memberType has exactly one property and that it uses `dataTypeId`. */
+  async doesOnlyPropertyUseDataType(memberTypeData: any, dataTypeId: string): Promise<void> {
+    await this.api.doesOnlyPropertyUseDataType(memberTypeData, dataTypeId);
+  }
+
   async getByName(name: string) {
     const rootMemberTypes = await this.getAllAtRoot();
     const jsonMemberTypes = await rootMemberTypes.json();

@@ -1,4 +1,5 @@
 import {DataTypeBuilder} from './dataTypeBuilder';
+import {DataTypeValues} from '../types';
 
 export class ElementPickerDataTypeBuilder extends DataTypeBuilder {
   minValidation: number;
@@ -21,7 +22,7 @@ export class ElementPickerDataTypeBuilder extends DataTypeBuilder {
   }
   
   getValues() {
-    let values: any[] = [];
+    const values: DataTypeValues = [];
 
     if (this.minValidation !== undefined || this.maxValidation !== undefined) {
       values.push({

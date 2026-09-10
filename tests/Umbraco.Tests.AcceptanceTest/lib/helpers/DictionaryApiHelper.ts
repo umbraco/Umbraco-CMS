@@ -47,7 +47,7 @@ export class DictionaryApiHelper {
     for (i = 1; i < ids.length; ++i) {
       idArray += '&id=' + ids[i];
     }
-    const response = await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/tree/dictionary/item?' + idArray);
+    const response = await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/item/dictionary?' + idArray);
     const json = await response.json();
 
     if (json !== null) {

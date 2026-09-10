@@ -1,4 +1,5 @@
 import {DataTypeBuilder} from './dataTypeBuilder';
+import {DataTypeValues} from '../types';
 
 export class CodeEditorDataTypeBuilder extends DataTypeBuilder {
   language: string;
@@ -39,7 +40,7 @@ export class CodeEditorDataTypeBuilder extends DataTypeBuilder {
   }
 
   getValues() {
-    let values: any = [];
+    const values: DataTypeValues = [];
     values.push({
       alias: 'language',
       value: this.language || 'javascript'
