@@ -5,11 +5,7 @@ import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbEntityDeletedEvent } from '@umbraco-cms/backoffice/entity-action';
 import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 
-const umbBackPathDeprecation = new UmbDeprecation({
-	deprecated: 'The `backPath` property on `<umb-entity-detail-workspace-editor>`.',
-	removeInVersion: '20',
-	solution: 'Implement `navigationParentItemPath` on the workspace context instead.',
-});
+let umbBackPathDeprecation: UmbDeprecation | undefined;
 
 @customElement('umb-entity-detail-workspace-editor')
 export class UmbEntityDetailWorkspaceEditorElement extends UmbLitElement {
@@ -28,7 +24,14 @@ export class UmbEntityDetailWorkspaceEditorElement extends UmbLitElement {
 	}
 	public set backPath(value: string | undefined) {
 		if (value === this.#backPath) return;
-		if (value !== undefined) umbBackPathDeprecation.warn();
+		if (value !== undefined) {
+			umbBackPathDeprecation ??= new UmbDeprecation({
+				deprecated: 'The `backPath` property on `<umb-entity-detail-workspace-editor>`.',
+				removeInVersion: '20',
+				solution: 'Implement `navigationParentItemPath` on the workspace context instead.',
+			});
+			umbBackPathDeprecation.warn();
+		}
 		this.#backPath = value;
 	}
 
