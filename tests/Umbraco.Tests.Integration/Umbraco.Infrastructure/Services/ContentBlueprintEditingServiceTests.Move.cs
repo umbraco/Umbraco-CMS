@@ -1,6 +1,7 @@
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
@@ -99,5 +100,69 @@ public partial class ContentBlueprintEditingServiceTests
 
         var auditLog = (await AuditService.GetItemsByEntityAsync(blueprint!.Id, 0, 1)).Items.First();
         Assert.AreEqual(AuditType.Move, auditLog.AuditType);
+    }
+
+    [Test]
+    public async Task Cannot_Move_Blueprint_To_A_Folder_The_Content_Type_Is_Not_Allowed_In_By_Content_Type_Filters()
+    {
+        var allowedContainerKey = Guid.NewGuid();
+        var allowedContainer = (await ContentBlueprintContainerService.CreateAsync(allowedContainerKey, "Allowed Container", null, Constants.Security.SuperUserKey)).Result;
+        var disallowedContainerKey = Guid.NewGuid();
+        await ContentBlueprintContainerService.CreateAsync(disallowedContainerKey, "Disallowed Container", null, Constants.Security.SuperUserKey);
+
+        var blueprintKey = Guid.NewGuid();
+        await ContentBlueprintEditingService.CreateAsync(SimpleContentBlueprintCreateModel(blueprintKey, null), Constants.Security.SuperUserKey);
+
+        ExcludingContentTypeFilter.ExcludedContentTypeKey = ContentType.Key;
+        ExcludingContentTypeFilter.ExcludedForParentKey = disallowedContainerKey;
+
+        var allowedResult = await ContentBlueprintEditingService.MoveAsync(blueprintKey, allowedContainerKey, Constants.Security.SuperUserKey);
+        Assert.IsTrue(allowedResult.Success);
+
+        var result = await ContentBlueprintEditingService.MoveAsync(blueprintKey, disallowedContainerKey, Constants.Security.SuperUserKey);
+        Assert.Multiple(() =>
+        {
+            Assert.IsFalse(result.Success);
+            Assert.AreEqual(ContentEditingOperationStatus.NotAllowed, result.Result);
+        });
+
+        var blueprint = await ContentBlueprintEditingService.GetAsync(blueprintKey);
+        Assert.NotNull(blueprint);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(allowedContainer!.Id, blueprint.ParentId);
+            Assert.AreEqual($"{allowedContainer.Path},{blueprint.Id}", blueprint.Path);
+            Assert.AreEqual(1, GetBlueprintChildren(allowedContainerKey).Length);
+            Assert.AreEqual(0, GetBlueprintChildren(disallowedContainerKey).Length);
+        });
+    }
+
+    [Test]
+    public async Task Cannot_Move_Blueprint_To_Root_When_The_Content_Type_Is_Not_Allowed_There_By_Content_Type_Filters()
+    {
+        var containerKey = Guid.NewGuid();
+        var container = (await ContentBlueprintContainerService.CreateAsync(containerKey, "Root Container", null, Constants.Security.SuperUserKey)).Result;
+
+        var blueprintKey = Guid.NewGuid();
+        await ContentBlueprintEditingService.CreateAsync(SimpleContentBlueprintCreateModel(blueprintKey, containerKey), Constants.Security.SuperUserKey);
+
+        ExcludingContentTypeFilter.ExcludedContentTypeKey = ContentType.Key;
+
+        var result = await ContentBlueprintEditingService.MoveAsync(blueprintKey, null, Constants.Security.SuperUserKey);
+        Assert.Multiple(() =>
+        {
+            Assert.IsFalse(result.Success);
+            Assert.AreEqual(ContentEditingOperationStatus.NotAllowed, result.Result);
+        });
+
+        var blueprint = await ContentBlueprintEditingService.GetAsync(blueprintKey);
+        Assert.NotNull(blueprint);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(container!.Id, blueprint.ParentId);
+            Assert.AreEqual($"{container.Path},{blueprint.Id}", blueprint.Path);
+            Assert.AreEqual(1, GetBlueprintChildren(containerKey).Length);
+            Assert.AreEqual(0, GetBlueprintChildren(null).Length);
+        });
     }
 }
