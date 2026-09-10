@@ -46,7 +46,7 @@ test('can add a composition to a document type', {tag: '@smoke'}, async ({umbrac
   // Assert
   await umbracoUi.documentType.isInheritedGroupVisible(groupName, compositionDocumentTypeName);
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
-  expect(documentTypeData.compositions.length).toBe(1);
+  await umbracoApi.documentType.doesHaveCompositionCount(documentTypeData, 1);
   expect(documentTypeData.compositions[0].documentType.id).toBe(compositionDocumentTypeId);
   expect(documentTypeData.compositions[0].compositionType).toBe('Composition');
 });
@@ -69,7 +69,7 @@ test('can add multiple compositions to a document type', async ({umbracoApi, umb
 
   // Assert
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
-  expect(documentTypeData.compositions.length).toBe(2);
+  await umbracoApi.documentType.doesHaveCompositionCount(documentTypeData, 2);
   const compositionIds = documentTypeData.compositions.map(c => c.documentType.id);
   expect(compositionIds).toContain(compositionDocumentTypeId);
   expect(compositionIds).toContain(secondCompositionDocumentTypeId);
@@ -111,7 +111,7 @@ test('can add a composition with properties in a tab to a document type', async 
 
   // Assert
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
-  expect(documentTypeData.compositions.length).toBe(1);
+  await umbracoApi.documentType.doesHaveCompositionCount(documentTypeData, 1);
   expect(documentTypeData.compositions[0].documentType.id).toBe(compositionDocumentTypeId);
 });
 
@@ -131,11 +131,11 @@ test('can add a composition to a document type that already has properties', asy
 
   // Assert
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
-  expect(documentTypeData.compositions.length).toBe(1);
+  await umbracoApi.documentType.doesHaveCompositionCount(documentTypeData, 1);
   expect(documentTypeData.compositions[0].documentType.id).toBe(compositionDocumentTypeId);
   // Verify existing property is still there
-  expect(documentTypeData.properties.length).toBe(1);
-  expect(documentTypeData.properties[0].dataType.id).toBe(secondDataTypeData.id);
+  await umbracoApi.documentType.doesHavePropertyCount(documentTypeData, 1);
+  await umbracoApi.documentType.doesOnlyPropertyUseDataType(documentTypeData, secondDataTypeData.id);
 });
 
 test('cannot add a composition with conflicting property aliases to a document type', async ({umbracoApi, umbracoUi}) => {
@@ -172,7 +172,7 @@ test('can remove one composition when multiple exist in a document type', async 
 
   // Assert
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
-  expect(documentTypeData.compositions.length).toBe(1);
+  await umbracoApi.documentType.doesHaveCompositionCount(documentTypeData, 1);
   expect(documentTypeData.compositions[0].documentType.id).toBe(secondCompositionDocumentTypeId);
 });
 
@@ -192,7 +192,7 @@ test('can create a document type with inheritance', async ({umbracoApi, umbracoU
 
   // Assert
   const childDocumentTypeData = await umbracoApi.documentType.getByName(childDocumentTypeName);
-  expect(childDocumentTypeData.compositions.length).toBe(1);
+  await umbracoApi.documentType.doesHaveCompositionCount(childDocumentTypeData, 1);
   expect(childDocumentTypeData.compositions[0].compositionType).toBe('Inheritance');
 });
 
@@ -243,7 +243,7 @@ test('child document type inherits properties from both parent and composition',
 
   // Assert
   const childData = await umbracoApi.documentType.getByName(childDocumentTypeName);
-  expect(childData.compositions.length).toBe(1);
+  await umbracoApi.documentType.doesHaveCompositionCount(childData, 1);
   expect(childData.compositions[0].compositionType).toBe('Inheritance');
   await umbracoUi.documentType.isInheritedGroupVisible(secondGroupName, parentDocumentTypeName);
   await umbracoUi.documentType.isInheritedGroupVisible(groupName, compositionDocumentTypeName);

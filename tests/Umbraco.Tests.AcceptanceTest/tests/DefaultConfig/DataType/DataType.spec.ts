@@ -79,8 +79,7 @@ test('can change property editor in a data type', {tag: '@smoke'}, async ({umbra
   // Assert
   expect(await umbracoApi.dataType.doesNameExist(dataTypeName)).toBeTruthy();
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-  expect(dataTypeData.editorAlias).toBe(updatedEditorAlias);
-  expect(dataTypeData.editorUiAlias).toBe(updatedEditorUiAlias);
+  await umbracoApi.dataType.doesDataTypeHaveEditors(dataTypeData, updatedEditorAlias, updatedEditorUiAlias);
 
   const maxCharsSetting = dataTypeData.values.find((x: {alias: string, value: unknown}) => x.alias === 'maxChars');
   expect(maxCharsSetting.value, 'Stored configuration should be transferred').toBe(maxChars);

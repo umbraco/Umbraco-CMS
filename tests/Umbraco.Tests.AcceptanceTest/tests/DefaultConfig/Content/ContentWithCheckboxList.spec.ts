@@ -36,8 +36,8 @@ test('can create content with the checkbox list data type', async ({umbracoApi, 
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.variants[0].state).toBe(expectedState);
-  expect(contentData.values).toEqual([]);
+  await umbracoApi.document.doesVariantHaveState(contentData, expectedState);
+  await umbracoApi.document.doesHaveValueCount(contentData, 0);
 });
 
 test('can publish content with the checkbox list data type', async ({umbracoApi, umbracoUi}) => {
@@ -54,8 +54,8 @@ test('can publish content with the checkbox list data type', async ({umbracoApi,
 
   // Assert
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.variants[0].state).toBe(expectedState);
-  expect(contentData.values).toEqual([]);
+  await umbracoApi.document.doesVariantHaveState(contentData, expectedState);
+  await umbracoApi.document.doesHaveValueCount(contentData, 0);
 });
 
 test('can create content with the custom checkbox list data type', async ({umbracoApi, umbracoUi}) => {
@@ -73,8 +73,7 @@ test('can create content with the custom checkbox list data type', async ({umbra
 
   // Assert
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(customDataTypeName));
-  expect(contentData.values[0].value).toEqual([optionValues[0]]);
+  await umbracoApi.document.doesPropertyHaveValue(contentData, AliasHelper.toAlias(customDataTypeName), [optionValues[0]]);
 });
 
 test('can not publish a mandatory checkbox list with an empty value', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
@@ -99,6 +98,5 @@ test('can not publish a mandatory checkbox list with an empty value', {tag: '@re
 
   // Assert
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(customDataTypeName));
-  expect(contentData.values[0].value).toEqual([optionValues[0]]);
+  await umbracoApi.document.doesPropertyHaveValue(contentData, AliasHelper.toAlias(customDataTypeName), [optionValues[0]]);
 });

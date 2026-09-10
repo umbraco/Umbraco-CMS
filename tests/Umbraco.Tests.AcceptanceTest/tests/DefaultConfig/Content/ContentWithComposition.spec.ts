@@ -39,7 +39,7 @@ test('can create content with a document type that has a composition', async ({u
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.variants[0].state).toBe(expectedState);
+  await umbracoApi.document.doesVariantHaveState(contentData, expectedState);
 });
 
 test('can edit property value from composition in content', async ({umbracoApi, umbracoUi}) => {
@@ -57,8 +57,7 @@ test('can edit property value from composition in content', async ({umbracoApi, 
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
-  expect(contentData.values[0].value).toEqual(text);
+  await umbracoApi.document.doesPropertyHaveValue(contentData, AliasHelper.toAlias(dataTypeName), text);
 });
 
 test('can publish content with a document type that has a composition', async ({umbracoApi, umbracoUi}) => {
@@ -75,7 +74,6 @@ test('can publish content with a document type that has a composition', async ({
 
   // Assert
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.variants[0].state).toBe('Published');
-  expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
-  expect(contentData.values[0].value).toEqual(text);
+  await umbracoApi.document.doesVariantHaveState(contentData, 'Published');
+  await umbracoApi.document.doesPropertyHaveValue(contentData, AliasHelper.toAlias(dataTypeName), text);
 });

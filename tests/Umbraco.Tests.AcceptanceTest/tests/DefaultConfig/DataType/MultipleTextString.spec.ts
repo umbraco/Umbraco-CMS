@@ -30,8 +30,7 @@ test('can create a multiple text string data type', async ({umbracoApi, umbracoU
   await umbracoUi.dataType.isDataTypeTreeItemVisible(customDataTypeName);
   expect(await umbracoApi.dataType.doesNameExist(customDataTypeName)).toBeTruthy();
   const dataTypeData = await umbracoApi.dataType.getByName(customDataTypeName);
-  expect(dataTypeData.editorAlias).toBe(editorAlias);
-  expect(dataTypeData.editorUiAlias).toBe(editorUiAlias);
+  await umbracoApi.dataType.doesDataTypeHaveEditors(dataTypeData, editorAlias, editorUiAlias);
 });
 
 test('can update minimum value', async ({umbracoApi, umbracoUi}) => {
@@ -74,8 +73,7 @@ test('the default configuration is correct', async ({umbracoApi, umbracoUi}) => 
 
   // Assert
   const dataTypeData = await umbracoApi.dataType.getByName(customDataTypeName);
-  expect(dataTypeData.editorAlias).toBe(editorAlias);
-  expect(dataTypeData.editorUiAlias).toBe(editorUiAlias);
+  await umbracoApi.dataType.doesDataTypeHaveEditors(dataTypeData, editorAlias, editorUiAlias);
   expect(dataTypeData.values).toEqual([
     {alias: 'min', value: 0},
     {alias: 'max', value: 0},

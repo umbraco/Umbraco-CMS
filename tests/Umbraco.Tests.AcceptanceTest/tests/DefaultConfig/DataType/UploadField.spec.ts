@@ -48,7 +48,7 @@ test('can remove accepted file extension', async ({ umbracoApi, umbracoUi }) => 
 
   // Assert
   const customDataTypeData = await umbracoApi.dataType.getByName(customDataTypeName);
-  expect(customDataTypeData.values).toEqual([]);
+  await umbracoApi.dataType.doesHaveValueCount(customDataTypeData, 0);
 });
 
 for (const uploadType of uploadTypes) {
@@ -65,7 +65,7 @@ for (const uploadType of uploadTypes) {
       expect(await umbracoApi.dataType.doesDataTypeHaveValue(uploadType.type, 'fileExtensions', uploadType.fileExtensions)).toBeTruthy();
     } else {
       const dataTypeDefaultData = await umbracoApi.dataType.getByName(uploadType.type);
-      expect(dataTypeDefaultData.values).toEqual([]);
+      await umbracoApi.dataType.doesHaveValueCount(dataTypeDefaultData, 0);
     }
   });
 }

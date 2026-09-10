@@ -34,7 +34,7 @@ test('can create content with the custom data type with email address property e
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values).toEqual([]);
+  await umbracoApi.document.doesHaveValueCount(contentData, 0);
 });
 
 test('can add text to the email address in the content section', async ({umbracoApi, umbracoUi}) => {
@@ -55,8 +55,7 @@ test('can add text to the email address in the content section', async ({umbraco
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(customDataTypeName));
-  expect(contentData.values[0].value).toEqual(emailAddress);
+  await umbracoApi.document.doesPropertyHaveValue(contentData, AliasHelper.toAlias(customDataTypeName), emailAddress);
 });
 
 test('can create content with the custom data type with decimal property editor', async ({umbracoApi, umbracoUi}) => {
@@ -77,7 +76,7 @@ test('can create content with the custom data type with decimal property editor'
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values).toEqual([]);
+  await umbracoApi.document.doesHaveValueCount(contentData, 0);
 });
 
 test('can add decimal number to the decimal in the content section', async ({umbracoApi, umbracoUi}) => {
@@ -98,8 +97,7 @@ test('can add decimal number to the decimal in the content section', async ({umb
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(customDataTypeName));
-  expect(contentData.values[0].value).toEqual(decimal);
+  await umbracoApi.document.doesPropertyHaveValue(contentData, AliasHelper.toAlias(customDataTypeName), decimal);
 });
 
 test('can create content with the custom data type with code editor property editor', async ({umbracoApi, umbracoUi}) => {
@@ -120,7 +118,7 @@ test('can create content with the custom data type with code editor property edi
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values).toEqual([]);
+  await umbracoApi.document.doesHaveValueCount(contentData, 0);
 });
 
 test('can add javascript code to the code editor in the content section', async ({umbracoApi, umbracoUi}) => {
@@ -141,8 +139,7 @@ test('can add javascript code to the code editor in the content section', async 
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(customDataTypeName));
-  expect(contentData.values[0].value).toEqual(javascriptCode);
+  await umbracoApi.document.doesPropertyHaveValue(contentData, AliasHelper.toAlias(customDataTypeName), javascriptCode);
 });
 
 test('can create content with the custom data type with markdown editor property editor', async ({umbracoApi, umbracoUi}) => {
@@ -163,7 +160,7 @@ test('can create content with the custom data type with markdown editor property
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values).toEqual([]);
+  await umbracoApi.document.doesHaveValueCount(contentData, 0);
 });
 
 test('can add code to the markdown editor in the content section', async ({umbracoApi, umbracoUi}) => {
@@ -184,8 +181,7 @@ test('can add code to the markdown editor in the content section', async ({umbra
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(customDataTypeName));
-  expect(contentData.values[0].value).toEqual(inputText);
+  await umbracoApi.document.doesPropertyHaveValue(contentData, AliasHelper.toAlias(customDataTypeName), inputText);
 });
 
 test('can create content with the custom data type with multiple text string property editor', async ({umbracoApi, umbracoUi}) => {
@@ -206,7 +202,7 @@ test('can create content with the custom data type with multiple text string pro
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values).toEqual([]);
+  await umbracoApi.document.doesHaveValueCount(contentData, 0);
 });
 
 test('can add string to the multiple text string in the content section', async ({umbracoApi, umbracoUi}) => {
@@ -227,8 +223,7 @@ test('can add string to the multiple text string in the content section', async 
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(customDataTypeName));
-  expect(contentData.values[0].value).toEqual([multipleTextStringValue]);
+  await umbracoApi.document.doesPropertyHaveValue(contentData, AliasHelper.toAlias(customDataTypeName), [multipleTextStringValue]);
 });
 
 test('can create content with the custom data type with slider property editor', async ({umbracoApi, umbracoUi}) => {
@@ -250,7 +245,7 @@ test('can create content with the custom data type with slider property editor',
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values).toEqual([]);
+  await umbracoApi.document.doesHaveValueCount(contentData, 0);
 });
 
 test('can change slider value in the content section', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
@@ -275,8 +270,7 @@ test('can change slider value in the content section', {tag: '@release'}, async 
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(customDataTypeName));
-  expect(contentData.values[0].value).toEqual(expectedValue);
+  await umbracoApi.document.doesPropertyHaveValue(contentData, AliasHelper.toAlias(customDataTypeName), expectedValue);
 });
 
 test('can save content after changing the property editor of the custom data type', async ({umbracoApi, umbracoUi}) => {
@@ -301,5 +295,5 @@ test('can save content after changing the property editor of the custom data typ
 
   // Assert
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values[0].value).toContain(inputText);
+  expect(umbracoApi.document.getOnlyPropertyValue(contentData)).toContain(inputText);
 });

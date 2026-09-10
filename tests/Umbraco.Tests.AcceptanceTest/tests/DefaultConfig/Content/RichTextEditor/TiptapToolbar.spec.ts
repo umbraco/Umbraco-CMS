@@ -42,8 +42,8 @@ test('can add a media in RTE Tiptap property editor', async ({umbracoApi, umbrac
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values[0].value.markup).toContain('<img');
-  expect(contentData.values[0].value.markup).toContain(imageName);
+  expect(umbracoApi.document.getOnlyPropertyValue(contentData).markup).toContain('<img');
+  expect(umbracoApi.document.getOnlyPropertyValue(contentData).markup).toContain(imageName);
 
   // Clean
   await umbracoApi.media.ensureNameNotExists(imageName);
@@ -71,8 +71,8 @@ test('can embed a video into RTE Tiptap property editor', async ({umbracoApi, um
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values[0].value.markup).toContain('data-embed-url');
-  expect(contentData.values[0].value.markup).toContain(videoURL);
+  expect(umbracoApi.document.getOnlyPropertyValue(contentData).markup).toContain('data-embed-url');
+  expect(umbracoApi.document.getOnlyPropertyValue(contentData).markup).toContain(videoURL);
 });
 
 test('cannot submit an empty link in RTE Tiptap property editor', async ({umbracoApi, umbracoUi}) => {
@@ -146,9 +146,9 @@ test('can insert a link to an unpublished document in RTE Tiptap property editor
 
   // Assert
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values[0].value.markup).toContain('href=');
-  expect(contentData.values[0].value.markup).toContain(linkedDocumentId);
-  expect(contentData.values[0].value.markup).toContain(linkedDocumentName);
+  expect(umbracoApi.document.getOnlyPropertyValue(contentData).markup).toContain('href=');
+  expect(umbracoApi.document.getOnlyPropertyValue(contentData).markup).toContain(linkedDocumentId);
+  expect(umbracoApi.document.getOnlyPropertyValue(contentData).markup).toContain(linkedDocumentName);
 
   // Clean
   await umbracoApi.documentType.ensureNameNotExists(documentTypeForLinkedDocumentName);

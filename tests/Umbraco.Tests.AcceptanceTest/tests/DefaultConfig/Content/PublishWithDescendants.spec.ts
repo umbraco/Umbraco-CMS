@@ -53,10 +53,10 @@ test('can publish invariant content with descendants without unpublished content
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.publishWithDescendants);
   await umbracoUi.content.isErrorNotificationVisible(false);
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.variants[0].state).toBe('Published');
-  expect(contentData.values[0].value).toBe(contentText);
+  await umbracoApi.document.doesVariantHaveState(contentData, 'Published');
+  expect(umbracoApi.document.getOnlyPropertyValue(contentData)).toBe(contentText);
   const childContentData = await umbracoApi.document.getByName(childContentName);
-  expect(childContentData.variants[0].state).toBe('Draft');
+  await umbracoApi.document.doesVariantHaveState(childContentData, 'Draft');
 });
 
 test('can publish invariant content with descendants and include unpublished content items', async ({umbracoApi, umbracoUi}) => {
@@ -82,10 +82,10 @@ test('can publish invariant content with descendants and include unpublished con
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.publishWithDescendants);
   await umbracoUi.content.isErrorNotificationVisible(false);
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.variants[0].state).toBe('Published');
-  expect(contentData.values[0].value).toBe(contentText);
+  await umbracoApi.document.doesVariantHaveState(contentData, 'Published');
+  expect(umbracoApi.document.getOnlyPropertyValue(contentData)).toBe(contentText);
   const childContentData = await umbracoApi.document.getByName(childContentName);
-  expect(childContentData.variants[0].state).toBe('Published');
+  await umbracoApi.document.doesVariantHaveState(childContentData, 'Published');
 });
 
 test('can cancel to publish invariant content with descendants', async ({umbracoApi, umbracoUi}) => {
@@ -109,10 +109,10 @@ test('can cancel to publish invariant content with descendants', async ({umbraco
   // Assert
   await umbracoUi.content.isErrorNotificationVisible(false);
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.variants[0].state).toBe('Draft');
-  expect(contentData.values[0].value).toBe(contentText);
+  await umbracoApi.document.doesVariantHaveState(contentData, 'Draft');
+  expect(umbracoApi.document.getOnlyPropertyValue(contentData)).toBe(contentText);
   const childContentData = await umbracoApi.document.getByName(childContentName);
-  expect(childContentData.variants[0].state).toBe('Draft');
+  await umbracoApi.document.doesVariantHaveState(childContentData, 'Draft');
 });
 
 test('can publish variant content with descendants without unpublished content items', async ({umbracoApi, umbracoUi}) => {
@@ -138,10 +138,10 @@ test('can publish variant content with descendants without unpublished content i
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.publishWithDescendants, true, false, 10000);
   await umbracoUi.content.isErrorNotificationVisible(false);
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.variants[0].state).toBe('Published');
-  expect(contentData.values[0].value).toBe(contentText);
+  await umbracoApi.document.doesVariantHaveState(contentData, 'Published');
+  expect(umbracoApi.document.getOnlyPropertyValue(contentData)).toBe(contentText);
   const childContentData = await umbracoApi.document.getByName(childContentName);
-  expect(childContentData.variants[0].state).toBe('Draft');
+  await umbracoApi.document.doesVariantHaveState(childContentData, 'Draft');
 });
 
 test('can publish variant content with descendants and include unpublished content items', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
@@ -168,10 +168,10 @@ test('can publish variant content with descendants and include unpublished conte
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.publishWithDescendants);
   await umbracoUi.content.isErrorNotificationVisible(false);
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.variants[0].state).toBe('Published');
-  expect(contentData.values[0].value).toBe(contentText);
+  await umbracoApi.document.doesVariantHaveState(contentData, 'Published');
+  expect(umbracoApi.document.getOnlyPropertyValue(contentData)).toBe(contentText);
   const childContentData = await umbracoApi.document.getByName(childContentName);
-  expect(childContentData.variants[0].state).toBe('Published');
+  await umbracoApi.document.doesVariantHaveState(childContentData, 'Published');
 });
 
 test('can cancel to publish variant content with descendants', async ({umbracoApi, umbracoUi}) => {
@@ -196,8 +196,8 @@ test('can cancel to publish variant content with descendants', async ({umbracoAp
   // Assert
   await umbracoUi.content.isErrorNotificationVisible(false);
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.variants[0].state).toBe('Draft');
-  expect(contentData.values[0].value).toBe(contentText);
+  await umbracoApi.document.doesVariantHaveState(contentData, 'Draft');
+  expect(umbracoApi.document.getOnlyPropertyValue(contentData)).toBe(contentText);
   const childContentData = await umbracoApi.document.getByName(childContentName);
-  expect(childContentData.variants[0].state).toBe('Draft');
+  await umbracoApi.document.doesVariantHaveState(childContentData, 'Draft');
 });

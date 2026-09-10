@@ -41,8 +41,8 @@ test('can create content with an empty block list', async ({umbracoApi, umbracoU
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.variants[0].state).toBe(expectedState);
-  expect(contentData.values).toEqual([]);
+  await umbracoApi.document.doesVariantHaveState(contentData, expectedState);
+  await umbracoApi.document.doesHaveValueCount(contentData, 0);
 });
 
 test('can publish content with an empty block list', async ({umbracoApi, umbracoUi}) => {
@@ -63,8 +63,8 @@ test('can publish content with an empty block list', async ({umbracoApi, umbraco
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.variants[0].state).toBe(expectedState);
-  expect(contentData.values).toEqual([]);
+  await umbracoApi.document.doesVariantHaveState(contentData, expectedState);
+  await umbracoApi.document.doesHaveValueCount(contentData, 0);
 });
 
 test('can add a block element in the content', async ({umbracoApi, umbracoUi}) => {
@@ -87,7 +87,7 @@ test('can add a block element in the content', async ({umbracoApi, umbracoUi}) =
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values[0].value.contentData[0].values[0].value).toEqual(inputText);
+  expect(umbracoApi.document.getOnlyPropertyValue(contentData).contentData[0].values[0].value).toEqual(inputText);
   const blockListValue = contentData.values.find(item => item.editorAlias === "Umbraco.BlockList")?.value;
   expect(blockListValue).toBeTruthy();
 });
@@ -107,7 +107,7 @@ test('can edit block element in the content', async ({umbracoApi, umbracoUi}) =>
 
   // Assert
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values[0].value.contentData[0].values[0].value).toEqual(updatedText);
+  expect(umbracoApi.document.getOnlyPropertyValue(contentData).contentData[0].values[0].value).toEqual(updatedText);
 });
 
 test('can delete block element in the content', async ({umbracoApi, umbracoUi}) => {
@@ -193,14 +193,14 @@ test('can add settings model for the block in the content', async ({umbracoApi, 
 
   // Assert
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values[0].value.contentData[0].values[0].value).toEqual(contentBlockInputText);
-  expect(contentData.values[0].value.settingsData[0].values[0].value).toEqual(settingBlockInputText);
+  expect(umbracoApi.document.getOnlyPropertyValue(contentData).contentData[0].values[0].value).toEqual(contentBlockInputText);
+  expect(umbracoApi.document.getOnlyPropertyValue(contentData).settingsData[0].values[0].value).toEqual(settingBlockInputText);
 
   // Clean
   await umbracoApi.documentType.ensureNameNotExists(settingModelName);
 });
 
-test.skip('can move blocks in the content', async ({umbracoApi, umbracoUi}) => {
+test.skip('can move blocks in the content', {annotation: {type: 'todo', description: "Never implemented - the body is an empty stub. Either write it or delete it."}}, async ({umbracoApi, umbracoUi}) => {
   // TODO: Implement it later
 });
 
@@ -242,7 +242,7 @@ test('can add a block element with inline editing mode enabled', async ({umbraco
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values[0].value.contentData[0].values[0].value).toEqual(inputText);
+  expect(umbracoApi.document.getOnlyPropertyValue(contentData).contentData[0].values[0].value).toEqual(inputText);
   const blockListValue = contentData.values.find(item => item.editorAlias === "Umbraco.BlockList")?.value;
   expect(blockListValue).toBeTruthy();
 });
@@ -270,7 +270,7 @@ test('can add an invariant block element with invariant RTE Tiptap in the conten
 
   // Assert
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values[0].value.contentData[0].values[0].value.markup).toContain(inputText);
+  expect(umbracoApi.document.getOnlyPropertyValue(contentData).contentData[0].values[0].value.markup).toContain(inputText);
   const blockListValue = contentData.values.find(item => item.editorAlias === "Umbraco.BlockList")?.value;
   expect(blockListValue).toBeTruthy();
 
@@ -304,7 +304,7 @@ test('can add a variant block element with variant RTE Tiptap in the content', a
 
   // Assert
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values[0].value.contentData[0].values[0].value.markup).toContain(inputText);
+  expect(umbracoApi.document.getOnlyPropertyValue(contentData).contentData[0].values[0].value.markup).toContain(inputText);
   const blockListValue = contentData.values.find(item => item.editorAlias === "Umbraco.BlockList")?.value;
   expect(blockListValue).toBeTruthy();
 
@@ -339,7 +339,7 @@ test('can add a variant block element with invariant RTE Tiptap in the content',
 
   // Assert
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values[0].value.contentData[0].values[0].value.markup).toContain(inputText);
+  expect(umbracoApi.document.getOnlyPropertyValue(contentData).contentData[0].values[0].value.markup).toContain(inputText);
   const blockListValue = contentData.values.find(item => item.editorAlias === "Umbraco.BlockList")?.value;
   expect(blockListValue).toBeTruthy();
 

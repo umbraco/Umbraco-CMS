@@ -52,9 +52,9 @@ test('can bulk publish multiple child content items from list view', async ({umb
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
   expect(await umbracoApi.document.getChildrenAmount(documentId)).toEqual(2);
   const firstChildData = await umbracoApi.document.getByName(firstChildContentName);
-  expect(firstChildData.variants[0].state).toBe(expectedState);
+  await umbracoApi.document.doesVariantHaveState(firstChildData, expectedState);
   const secondChildData = await umbracoApi.document.getByName(secondChildContentName);
-  expect(secondChildData.variants[0].state).toBe(expectedState);
+  await umbracoApi.document.doesVariantHaveState(secondChildData, expectedState);
   // Verify audit trail
   const currentUser = await umbracoApi.user.getCurrentUser();
   await umbracoUi.content.clickContentCardWithName(firstChildContentName);
@@ -75,9 +75,9 @@ test('can bulk unpublish multiple child content items from list view', async ({u
   await umbracoApi.document.publish(firstChildId);
   await umbracoApi.document.publish(secondChildId);
   const firstChildBeforeUnpublish = await umbracoApi.document.getByName(firstChildContentName);
-  expect(firstChildBeforeUnpublish.variants[0].state).toBe('Published');
+  await umbracoApi.document.doesVariantHaveState(firstChildBeforeUnpublish, 'Published');
   const secondChildBeforeUnpublish = await umbracoApi.document.getByName(secondChildContentName);
-  expect(secondChildBeforeUnpublish.variants[0].state).toBe('Published');
+  await umbracoApi.document.doesVariantHaveState(secondChildBeforeUnpublish, 'Published');
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
   await umbracoUi.content.goToContentWithName(contentName);
 
@@ -91,9 +91,9 @@ test('can bulk unpublish multiple child content items from list view', async ({u
   await umbracoUi.content.isSuccessNotificationVisible();
   await umbracoUi.content.isErrorNotificationVisible(false);
   const firstChildData = await umbracoApi.document.getByName(firstChildContentName);
-  expect(firstChildData.variants[0].state).toBe(expectedState);
+  await umbracoApi.document.doesVariantHaveState(firstChildData, expectedState);
   const secondChildData = await umbracoApi.document.getByName(secondChildContentName);
-  expect(secondChildData.variants[0].state).toBe(expectedState);
+  await umbracoApi.document.doesVariantHaveState(secondChildData, expectedState);
 });
 
 test('can bulk duplicate multiple child content items in list view', async ({umbracoApi, umbracoUi}) => {
@@ -164,9 +164,9 @@ test('can bulk publish multiple child content items when some are already publis
   await umbracoApi.document.publish(documentId);
   await umbracoApi.document.publish(firstChildId);
   const firstChildBeforePublish = await umbracoApi.document.getByName(firstChildContentName);
-  expect(firstChildBeforePublish.variants[0].state).toBe('Published');
+  await umbracoApi.document.doesVariantHaveState(firstChildBeforePublish, 'Published');
   const secondChildBeforePublish = await umbracoApi.document.getByName(secondChildContentName);
-  expect(secondChildBeforePublish.variants[0].state).toBe('Draft');
+  await umbracoApi.document.doesVariantHaveState(secondChildBeforePublish, 'Draft');
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
   await umbracoUi.content.goToContentWithName(contentName);
 
@@ -179,9 +179,9 @@ test('can bulk publish multiple child content items when some are already publis
   // Assert
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
   const firstChildData = await umbracoApi.document.getByName(firstChildContentName);
-  expect(firstChildData.variants[0].state).toBe(expectedState);
+  await umbracoApi.document.doesVariantHaveState(firstChildData, expectedState);
   const secondChildData = await umbracoApi.document.getByName(secondChildContentName);
-  expect(secondChildData.variants[0].state).toBe(expectedState);
+  await umbracoApi.document.doesVariantHaveState(secondChildData, expectedState);
 });
 
 test('can clear selection after selecting multiple child content items in list view', async ({umbracoApi, umbracoUi}) => {

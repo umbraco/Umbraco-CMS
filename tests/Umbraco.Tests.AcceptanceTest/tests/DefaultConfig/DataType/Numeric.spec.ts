@@ -58,8 +58,7 @@ test('can update step size value', async ({umbracoApi, umbracoUi}) => {
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'step', stepSizeValue)).toBeTruthy();
 });
 
-// Skip this test as currently this setting is removed.
-test.skip('can allow decimals', async ({umbracoApi, umbracoUi}) => {
+test.skip('can allow decimals', {annotation: {type: 'blocked', description: "Skip this test as currently this setting is removed."}}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.dataType.createDefaultNumericDataType(customDataTypeName);
   await umbracoUi.dataType.goToDataType(customDataTypeName);
@@ -72,9 +71,7 @@ test.skip('can allow decimals', async ({umbracoApi, umbracoUi}) => {
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'allowDecimals', true)).toBeTruthy();
 });
 
-// TODO: Remove skip when the front-end is ready. Currently you still can update the minimum greater than the maximum.
-// Issue link: https://github.com/umbraco/Umbraco-CMS/issues/17509
-test.skip('cannot update the minimum greater than the maximum', async ({umbracoApi, umbracoUi}) => {
+test.skip('cannot update the minimum greater than the maximum', {annotation: {type: 'issue', description: "TODO: Remove skip when the front-end is ready. Currently you still can update the minimum greater than the maximum. Issue link: https://github.com/umbraco/Umbraco-CMS/issues/17509"}}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const minimumValue = 5;
   const maximumValue = 2;
@@ -101,9 +98,8 @@ test('the default configuration is correct', async ({umbracoApi, umbracoUi}) => 
   await umbracoUi.dataType.doesPropertyEditorHaveAlias(editorAlias);
   await umbracoUi.dataType.doesPropertyEditorHaveUiAlias(editorUiAlias);
   const dataTypeDefaultData = await umbracoApi.dataType.getByName(dataTypeName);
-  expect(dataTypeDefaultData.editorAlias).toBe(editorAlias);
-  expect(dataTypeDefaultData.editorUiAlias).toBe(editorUiAlias);
-  expect(dataTypeDefaultData.values).toEqual([]);
+  await umbracoApi.dataType.doesDataTypeHaveEditors(dataTypeDefaultData, editorAlias, editorUiAlias);
+  await umbracoApi.dataType.doesHaveValueCount(dataTypeDefaultData, 0);
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(dataTypeName, 'min')).toBeFalsy();
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(dataTypeName, 'max')).toBeFalsy();
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(dataTypeName, 'step')).toBeFalsy();

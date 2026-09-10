@@ -84,7 +84,7 @@ test('can update overlay size for a block', async ({umbracoApi, umbracoUi}) => {
 
   // Assert
   const blockData = await umbracoApi.dataType.getByName(blockListEditorName);
-  expect(blockData.values[0].value[0].editorSize).toEqual(overlaySize);
+  expect(umbracoApi.dataType.getOnlyPropertyValue(blockData)[0].editorSize).toEqual(overlaySize);
 });
 
 test('can open content model in a block', async ({umbracoApi, umbracoUi}) => {
@@ -100,8 +100,7 @@ test('can open content model in a block', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.isElementWorkspaceOpenInBlock(elementTypeName);
 });
 
-// Skip this test as it is impossible to remove a content model in front-end
-test.skip('can remove a content model from a block', async ({umbracoApi, umbracoUi}) => {
+test.skip('can remove a content model from a block', {annotation: {type: 'blocked', description: "Skip this test as it is impossible to remove a content model in front-end"}}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.dataType.createBlockListDataTypeWithABlock(blockListEditorName, elementTypeId);
 
@@ -173,7 +172,7 @@ test('can add a background color to a block', async ({umbracoApi, umbracoUi}) =>
 
   // Assert
   const blockData = await umbracoApi.dataType.getByName(blockListEditorName);
-  expect(blockData.values[0].value[0].backgroundColor).toEqual(backgroundColor);
+  expect(umbracoApi.dataType.getOnlyPropertyValue(blockData)[0].backgroundColor).toEqual(backgroundColor);
 });
 
 test('can update a background color for a block', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
@@ -182,7 +181,7 @@ test('can update a background color for a block', {tag: '@smoke'}, async ({umbra
   const newBackgroundColor = '#ff4242';
   await umbracoApi.dataType.createBlockListWithBlockWithCatalogueAppearance(blockListEditorName, elementTypeId, backgroundColor);
   let blockData = await umbracoApi.dataType.getByName(blockListEditorName);
-  expect(blockData.values[0].value[0].backgroundColor).toEqual(backgroundColor);
+  expect(umbracoApi.dataType.getOnlyPropertyValue(blockData)[0].backgroundColor).toEqual(backgroundColor);
 
   // Act
   await umbracoUi.dataType.goToDataType(blockListEditorName);
@@ -193,7 +192,7 @@ test('can update a background color for a block', {tag: '@smoke'}, async ({umbra
 
   // Assert
   blockData = await umbracoApi.dataType.getByName(blockListEditorName);
-  expect(blockData.values[0].value[0].backgroundColor).toEqual(newBackgroundColor);
+  expect(umbracoApi.dataType.getOnlyPropertyValue(blockData)[0].backgroundColor).toEqual(newBackgroundColor);
 });
 
 test('can delete a background color from a block', async ({umbracoApi, umbracoUi}) => {
@@ -201,7 +200,7 @@ test('can delete a background color from a block', async ({umbracoApi, umbracoUi
   const backgroundColor = '#ff0000';
   await umbracoApi.dataType.createBlockListWithBlockWithCatalogueAppearance(blockListEditorName, elementTypeId, backgroundColor);
   let blockData = await umbracoApi.dataType.getByName(blockListEditorName);
-  expect(blockData.values[0].value[0].backgroundColor).toEqual(backgroundColor);
+  expect(umbracoApi.dataType.getOnlyPropertyValue(blockData)[0].backgroundColor).toEqual(backgroundColor);
 
   // Act
   await umbracoUi.dataType.goToDataType(blockListEditorName);
@@ -212,7 +211,7 @@ test('can delete a background color from a block', async ({umbracoApi, umbracoUi
 
   // Assert
   blockData = await umbracoApi.dataType.getByName(blockListEditorName);
-  expect(blockData.values[0].value[0].backgroundColor).toEqual('');
+  expect(umbracoApi.dataType.getOnlyPropertyValue(blockData)[0].backgroundColor).toEqual('');
 });
 
 test('can add a icon color to a block', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
@@ -229,7 +228,7 @@ test('can add a icon color to a block', {tag: '@smoke'}, async ({umbracoApi, umb
 
   // Assert
   const blockData = await umbracoApi.dataType.getByName(blockListEditorName);
-  expect(blockData.values[0].value[0].iconColor).toEqual(iconColor);
+  expect(umbracoApi.dataType.getOnlyPropertyValue(blockData)[0].iconColor).toEqual(iconColor);
 });
 
 test('can update a icon color for a block', async ({umbracoApi, umbracoUi}) => {
@@ -238,7 +237,7 @@ test('can update a icon color for a block', async ({umbracoApi, umbracoUi}) => {
   const newIconColor = '#ff4242';
   await umbracoApi.dataType.createBlockListWithBlockWithCatalogueAppearance(blockListEditorName, elementTypeId, '', iconColor);
   let blockData = await umbracoApi.dataType.getByName(blockListEditorName);
-  expect(blockData.values[0].value[0].iconColor).toEqual(iconColor);
+  expect(umbracoApi.dataType.getOnlyPropertyValue(blockData)[0].iconColor).toEqual(iconColor);
 
   // Act
   await umbracoUi.dataType.goToDataType(blockListEditorName);
@@ -249,7 +248,7 @@ test('can update a icon color for a block', async ({umbracoApi, umbracoUi}) => {
 
   // Assert
   blockData = await umbracoApi.dataType.getByName(blockListEditorName);
-  expect(blockData.values[0].value[0].iconColor).toEqual(newIconColor);
+  expect(umbracoApi.dataType.getOnlyPropertyValue(blockData)[0].iconColor).toEqual(newIconColor);
 });
 
 test('can delete a icon color from a block', async ({umbracoApi, umbracoUi}) => {
@@ -257,7 +256,7 @@ test('can delete a icon color from a block', async ({umbracoApi, umbracoUi}) => 
   const iconColor = '#ff0000';
   await umbracoApi.dataType.createBlockListWithBlockWithCatalogueAppearance(blockListEditorName, elementTypeId, '', iconColor);
   let blockData = await umbracoApi.dataType.getByName(blockListEditorName);
-  expect(blockData.values[0].value[0].iconColor).toEqual(iconColor);
+  expect(umbracoApi.dataType.getOnlyPropertyValue(blockData)[0].iconColor).toEqual(iconColor);
 
   // Act
   await umbracoUi.dataType.goToDataType(blockListEditorName);
@@ -268,11 +267,10 @@ test('can delete a icon color from a block', async ({umbracoApi, umbracoUi}) => 
 
   // Assert
   blockData = await umbracoApi.dataType.getByName(blockListEditorName);
-  expect(blockData.values[0].value[0].iconColor).toEqual('');
+  expect(umbracoApi.dataType.getOnlyPropertyValue(blockData)[0].iconColor).toEqual('');
 });
 
-// TODO: Remove skip when the front-end is ready. Currently it is not possible to update a stylesheet to a block
-test.skip('can update a custom stylesheet for a block', async ({umbracoApi, umbracoUi}) => {
+test.skip('can update a custom stylesheet for a block', {annotation: {type: 'blocked', description: "TODO: Remove skip when the front-end is ready. Currently it is not possible to update a stylesheet to a block"}}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const stylesheetName = 'TestStylesheet.css';
   const stylesheetPath = '/wwwroot/css/' + stylesheetName;
@@ -298,15 +296,14 @@ test.skip('can update a custom stylesheet for a block', async ({umbracoApi, umbr
 
   // Assert
   blockData = await umbracoApi.dataType.getByName(blockListEditorName);
-  expect(blockData.values[0].value[0].stylesheet[0]).toEqual(encodedSecondStylesheetPath);
+  expect(umbracoApi.dataType.getOnlyPropertyValue(blockData)[0].stylesheet[0]).toEqual(encodedSecondStylesheetPath);
 
   // Clean
   await umbracoApi.stylesheet.ensureNameNotExists(stylesheetName);
   await umbracoApi.stylesheet.ensureNameNotExists(secondStylesheetName);
 });
 
-// TODO: Remove skip when the front-end is ready. Currently it is not possible to delete a stylesheet to a block
-test.skip('can delete a custom stylesheet from a block', async ({umbracoApi, umbracoUi}) => {
+test.skip('can delete a custom stylesheet from a block', {annotation: {type: 'blocked', description: "TODO: Remove skip when the front-end is ready. Currently it is not possible to delete a stylesheet to a block"}}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const stylesheetName = 'TestStylesheet.css';
   const stylesheetPath = '/wwwroot/css/' + stylesheetName;
@@ -316,7 +313,7 @@ test.skip('can delete a custom stylesheet from a block', async ({umbracoApi, umb
 
   await umbracoApi.dataType.createBlockListWithBlockWithCatalogueAppearance(blockListEditorName, elementTypeId, '', '', encodedStylesheetPath);
   let blockData = await umbracoApi.dataType.getByName(blockListEditorName);
-  expect(blockData.values[0].value[0].stylesheet[0]).toEqual(encodedStylesheetPath);
+  expect(umbracoApi.dataType.getOnlyPropertyValue(blockData)[0].stylesheet[0]).toEqual(encodedStylesheetPath);
 
   // Act
   await umbracoUi.dataType.goToDataType(blockListEditorName);
@@ -346,14 +343,14 @@ test('can enable hide content editor in a block', async ({umbracoApi, umbracoUi}
 
   // Assert
   const blockData = await umbracoApi.dataType.getByName(blockListEditorName);
-  expect(blockData.values[0].value[0].forceHideContentEditorInOverlay).toEqual(true);
+  expect(umbracoApi.dataType.getOnlyPropertyValue(blockData)[0].forceHideContentEditorInOverlay).toEqual(true);
 });
 
 test('can disable hide content editor in a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.dataType.createBlockListWithBlockWithHideContentEditor(blockListEditorName, elementTypeId, true);
   let blockData = await umbracoApi.dataType.getByName(blockListEditorName);
-  expect(blockData.values[0].value[0].forceHideContentEditorInOverlay).toEqual(true);
+  expect(umbracoApi.dataType.getOnlyPropertyValue(blockData)[0].forceHideContentEditorInOverlay).toEqual(true);
 
   // Act
   await umbracoUi.dataType.goToDataType(blockListEditorName);
@@ -364,7 +361,7 @@ test('can disable hide content editor in a block', async ({umbracoApi, umbracoUi
 
   // Assert
   blockData = await umbracoApi.dataType.getByName(blockListEditorName);
-  expect(blockData.values[0].value[0].forceHideContentEditorInOverlay).toEqual(false);
+  expect(umbracoApi.dataType.getOnlyPropertyValue(blockData)[0].forceHideContentEditorInOverlay).toEqual(false);
 });
 
 test('can add a thumbnail to a block', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {

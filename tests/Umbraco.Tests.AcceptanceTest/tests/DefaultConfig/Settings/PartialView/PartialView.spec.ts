@@ -50,10 +50,10 @@ test('can create a partial view from snippet', async ({umbracoApi, umbracoUi}) =
 
   switch (process.platform) {
     case 'win32':
-      expect(partialViewData.content).toBe(expectedPartialViewContentWindows);
+      await umbracoApi.partialView.doesHaveContent(partialViewData, expectedPartialViewContentWindows);
       break;
     case 'linux':
-      expect(partialViewData.content).toBe(expectedPartialViewContentLinux);
+      await umbracoApi.partialView.doesHaveContent(partialViewData, expectedPartialViewContentLinux);
       break;
     default:
       throw new Error(`Untested platform: ${process.platform}`);
@@ -104,7 +104,7 @@ test('can update a partial view content', {tag: '@smoke'}, async ({umbracoApi, u
 
   // Assert
   const updatedPartialView = await umbracoApi.partialView.getByName(partialViewFileName);
-  expect(updatedPartialView.content).toBe(updatedPartialViewContent);
+  await umbracoApi.partialView.doesHaveContent(updatedPartialView, updatedPartialViewContent);
 });
 
 test('can use query builder with Order By statement for a partial view', async ({umbracoApi, umbracoUi}) => {
@@ -142,11 +142,10 @@ test('can use query builder with Order By statement for a partial view', async (
 
   // Assert
   const updatedPartialView = await umbracoApi.partialView.getByName(partialViewFileName);
-  expect(updatedPartialView.content).toBe(expectedTemplateContent);
+  await umbracoApi.partialView.doesHaveContent(updatedPartialView, expectedTemplateContent);
 });
 
-// Skip this test due to this issue: https://github.com/umbraco/Umbraco-CMS/issues/22000
-test.skip('can use query builder with Where statement for a partial view', async ({umbracoApi, umbracoUi}) => {
+test.skip('can use query builder with Where statement for a partial view', {annotation: {type: 'issue', description: "Skip this test due to this issue: https://github.com/umbraco/Umbraco-CMS/issues/22000"}}, async ({umbracoApi, umbracoUi}) => {
   //Arrange
   const propertyAliasValue = 'Name';
   const operatorValue = 'is';
@@ -182,7 +181,7 @@ test.skip('can use query builder with Where statement for a partial view', async
 
   // Assert
   const updatedPartialView = await umbracoApi.partialView.getByName(partialViewFileName);
-  expect(updatedPartialView.content).toBe(expectedTemplateContent);
+  await umbracoApi.partialView.doesHaveContent(updatedPartialView, expectedTemplateContent);
 });
 
 test('can insert dictionary item into a partial view', async ({umbracoApi, umbracoUi}) => {
@@ -200,7 +199,7 @@ test('can insert dictionary item into a partial view', async ({umbracoApi, umbra
 
   // Assert
   const partialViewData = await umbracoApi.partialView.getByName(partialViewFileName);
-  expect(partialViewData.content).toBe(partialViewContent);
+  await umbracoApi.partialView.doesHaveContent(partialViewData, partialViewContent);
 });
 
 test('can insert value into a partial view', async ({umbracoApi, umbracoUi}) => {
@@ -217,7 +216,7 @@ test('can insert value into a partial view', async ({umbracoApi, umbracoUi}) => 
 
   // Assert
   const partialViewData = await umbracoApi.partialView.getByName(partialViewFileName);
-  expect(partialViewData.content).toBe(partialViewContent);
+  await umbracoApi.partialView.doesHaveContent(partialViewData, partialViewContent);
 });
 
 test('can delete a partial view', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {

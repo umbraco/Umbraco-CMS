@@ -30,8 +30,7 @@ test('can create a decimal data type', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.isDataTypeTreeItemVisible(customDataTypeName);
   expect(await umbracoApi.dataType.doesNameExist(customDataTypeName)).toBeTruthy();
   const dataTypeData = await umbracoApi.dataType.getByName(customDataTypeName);
-  expect(dataTypeData.editorAlias).toBe(editorAlias);
-  expect(dataTypeData.editorUiAlias).toBe(editorUiAlias);
+  await umbracoApi.dataType.doesDataTypeHaveEditors(dataTypeData, editorAlias, editorUiAlias);
 });
 
 test('can update minimum value', async ({umbracoApi, umbracoUi}) => {
@@ -88,8 +87,7 @@ test('the default configuration is correct', async ({umbracoApi, umbracoUi}) => 
 
   // Assert
   const dataTypeData = await umbracoApi.dataType.getByName(customDataTypeName);
-  expect(dataTypeData.editorAlias).toBe(editorAlias);
-  expect(dataTypeData.editorUiAlias).toBe(editorUiAlias);
+  await umbracoApi.dataType.doesDataTypeHaveEditors(dataTypeData, editorAlias, editorUiAlias);
   expect(dataTypeData.values).toEqual([{alias: 'step', value: '0.01'}]);
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'min')).toBeFalsy();
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'max')).toBeFalsy();

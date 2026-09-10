@@ -35,8 +35,7 @@ test('can create a block list editor', {tag: '@smoke'}, async ({umbracoApi, umbr
   await umbracoUi.dataType.isDataTypeTreeItemVisible(blockListEditorName);
   expect(await umbracoApi.dataType.doesNameExist(blockListEditorName)).toBeTruthy();
   const dataTypeData = await umbracoApi.dataType.getByName(blockListEditorName);
-  expect(dataTypeData.editorAlias).toBe(blockListEditorAlias);
-  expect(dataTypeData.editorUiAlias).toBe(blockListEditorUiAlias);
+  await umbracoApi.dataType.doesDataTypeHaveEditors(dataTypeData, blockListEditorAlias, blockListEditorUiAlias);
 });
 
 test('can rename a block list editor', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
@@ -147,8 +146,8 @@ test('can add a min and max amount to a block list editor', {tag: '@smoke'}, asy
 
   // Assert
   const dataTypeData = await umbracoApi.dataType.getByName(blockListEditorName);
-  expect(dataTypeData.values[0].value.min).toBe(minAmount);
-  expect(dataTypeData.values[0].value.max).toBe(maxAmount);
+  expect(umbracoApi.dataType.getOnlyPropertyValue(dataTypeData).min).toBe(minAmount);
+  expect(umbracoApi.dataType.getOnlyPropertyValue(dataTypeData).max).toBe(maxAmount);
 });
 
 test('max can not be less than min', async ({umbracoApi, umbracoUi}) => {
@@ -167,9 +166,9 @@ test('max can not be less than min', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.isFailedStateButtonVisible();
   const dataTypeData = await umbracoApi.dataType.getByName(blockListEditorName);
   await umbracoUi.dataType.doesAmountContainErrorMessageWithText('The low value must not exceed the high value.');
-  expect(dataTypeData.values[0].value.min).toBe(minAmount);
+  expect(umbracoApi.dataType.getOnlyPropertyValue(dataTypeData).min).toBe(minAmount);
   // The max value should not be updated
-  expect(dataTypeData.values[0].value.max).toBe(oldMaxAmount);
+  expect(umbracoApi.dataType.getOnlyPropertyValue(dataTypeData).max).toBe(oldMaxAmount);
 });
 
 test('can enable single block mode', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {

@@ -44,7 +44,7 @@ test('can update content of a template', {tag: '@smoke'}, async ({umbracoApi, um
   // Assert
   // Checks if the template was updated
   const updatedTemplate = await umbracoApi.template.getByName(templateName);
-  expect(updatedTemplate.content).toBe(updatedTemplateContent);
+  await umbracoApi.template.doesHaveContent(updatedTemplate, updatedTemplateContent);
 });
 
 test('can rename a template', async ({umbracoApi, umbracoUi}) => {
@@ -164,11 +164,10 @@ test('can use query builder with Order By statement for a template', async ({umb
 
   // Assert
   const templateData = await umbracoApi.template.getByName(templateName);
-  expect(templateData.content).toBe(expectedTemplateContent);
+  await umbracoApi.template.doesHaveContent(templateData, expectedTemplateContent);
 });
 
-// Skip this test due to this issue: https://github.com/umbraco/Umbraco-CMS/issues/22000
-test.skip('can use query builder with Where statement for a template', async ({umbracoApi, umbracoUi}) => {
+test.skip('can use query builder with Where statement for a template', {annotation: {type: 'issue', description: "Skip this test due to this issue: https://github.com/umbraco/Umbraco-CMS/issues/22000"}}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const propertyAliasValue = 'Name';
   const operatorValue = 'is';
@@ -203,7 +202,7 @@ test.skip('can use query builder with Where statement for a template', async ({u
 
   // Assert
   const templateData = await umbracoApi.template.getByName(templateName);
-  expect(templateData.content).toBe(expectedTemplateContent);
+  await umbracoApi.template.doesHaveContent(templateData, expectedTemplateContent);
 });
 
 test('can insert sections - render child template into a template', async ({umbracoApi, umbracoUi}) => {
@@ -220,7 +219,7 @@ test('can insert sections - render child template into a template', async ({umbr
 
   // Assert
   const templateData = await umbracoApi.template.getByName(templateName);
-  expect(templateData.content).toBe(templateContent);
+  await umbracoApi.template.doesHaveContent(templateData, templateContent);
 });
 
 test('can insert sections - render a named section into a template', async ({umbracoApi, umbracoUi}) => {
@@ -238,7 +237,7 @@ test('can insert sections - render a named section into a template', async ({umb
 
   // Assert
   const templateData = await umbracoApi.template.getByName(templateName);
-  expect(templateData.content).toBe(templateContent);
+  await umbracoApi.template.doesHaveContent(templateData, templateContent);
 });
 
 test('can insert sections - define a named section into a template', async ({umbracoApi, umbracoUi}) => {
@@ -256,7 +255,7 @@ test('can insert sections - define a named section into a template', async ({umb
 
   // Assert
   const templateData = await umbracoApi.template.getByName(templateName);
-  expect(templateData.content).toBe(templateContent);
+  await umbracoApi.template.doesHaveContent(templateData, templateContent);
 });
 
 test('can insert dictionary item into a template', async ({umbracoApi, umbracoUi}) => {
@@ -274,7 +273,7 @@ test('can insert dictionary item into a template', async ({umbracoApi, umbracoUi
 
   // Assert
   const templateData = await umbracoApi.template.getByName(templateName);
-  expect(templateData.content).toBe(templateContent);
+  await umbracoApi.template.doesHaveContent(templateData, templateContent);
 
   // Clean
   await umbracoApi.dictionary.ensureNameNotExists(dictionaryName);
@@ -296,7 +295,7 @@ test('can insert partial view into a template', async ({umbracoApi, umbracoUi}) 
 
   // Assert
   const templateData = await umbracoApi.template.getByName(templateName);
-  expect(templateData.content).toBe(templateContent);
+  await umbracoApi.template.doesHaveContent(templateData, templateContent);
 });
 
 test('can insert value into a template', async ({umbracoApi, umbracoUi}) => {
@@ -312,7 +311,7 @@ test('can insert value into a template', async ({umbracoApi, umbracoUi}) => {
 
   // Assert
   const templateData = await umbracoApi.template.getByName(templateName);
-  expect(templateData.content).toBe(templateContent);
+  await umbracoApi.template.doesHaveContent(templateData, templateContent);
 });
 
 test('can show returned items in query builder ', async ({umbracoApi, umbracoUi}) => {

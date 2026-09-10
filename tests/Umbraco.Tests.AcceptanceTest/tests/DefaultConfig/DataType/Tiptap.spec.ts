@@ -31,8 +31,7 @@ test('can create a rich text editor with tiptap', {tag: '@smoke'}, async ({umbra
   // Assert
   expect(await umbracoApi.dataType.doesNameExist(tipTapName)).toBeTruthy();
   const dataTypeData = await umbracoApi.dataType.getByName(tipTapName);
-  expect(dataTypeData.editorAlias).toBe(tipTapAlias);
-  expect(dataTypeData.editorUiAlias).toBe(tipTapUiAlias);
+  await umbracoApi.dataType.doesDataTypeHaveEditors(dataTypeData, tipTapAlias, tipTapUiAlias);
 });
 
 test('can rename a rich text editor with tiptap', async ({umbracoApi, umbracoUi}) => {

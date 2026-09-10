@@ -48,8 +48,7 @@ test('can see root element start node and children', async ({umbracoApi, umbraco
   await umbracoUi.library.isChildElementInTreeVisible(rootFolderName, childElementTwoName);
 });
 
-// Skip this test since currently the front-end does not support adding a specific element as start nodes
-test.skip('can see parent of start node but not access it', async ({umbracoApi, umbracoUi}) => {
+test.skip('can see parent of start node but not access it', {annotation: {type: 'blocked', description: "Skip this test since currently the front-end does not support adding a specific element as start nodes"}}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithElementStartNode(userGroupName, childElementOneId);
   await umbracoApi.user.setUserPermissionsForElement(testUser.name, testUser.email, testUser.password, userGroupId);
@@ -68,8 +67,7 @@ test.skip('can see parent of start node but not access it', async ({umbracoApi, 
   await umbracoUi.library.isChildElementInTreeVisible(rootFolderName, childElementTwoName, false);
 });
 
-// Currently the front-end does not support adding a specific element as start nodes
-test.skip('cannot see any element when no element start nodes specified', async ({umbracoApi, umbracoUi}) => {
+test.skip('cannot see any element when no element start nodes specified', {annotation: {type: 'blocked', description: "Currently the front-end does not support adding a specific element as start nodes"}}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createSimpleUserGroupWithLibrarySection(userGroupName);
   await umbracoApi.user.setUserPermissionsForElement(testUser.name, testUser.email, testUser.password, userGroupId);

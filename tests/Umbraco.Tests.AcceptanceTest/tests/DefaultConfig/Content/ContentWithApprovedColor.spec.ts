@@ -33,8 +33,8 @@ test('can create content with the approved color data type', async ({umbracoApi,
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.variants[0].state).toBe(expectedState);
-  expect(contentData.values).toEqual([]);
+  await umbracoApi.document.doesVariantHaveState(contentData, expectedState);
+  await umbracoApi.document.doesHaveValueCount(contentData, 0);
 });
 
 test('can publish content with the approved color data type', async ({umbracoApi, umbracoUi}) => {
@@ -52,8 +52,8 @@ test('can publish content with the approved color data type', async ({umbracoApi
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.variants[0].state).toBe(expectedState);
-  expect(contentData.values).toEqual([]);
+  await umbracoApi.document.doesVariantHaveState(contentData, expectedState);
+  await umbracoApi.document.doesHaveValueCount(contentData, 0);
 });
 
 test('can create content with the custom approved color data type', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
@@ -74,9 +74,8 @@ test('can create content with the custom approved color data type', {tag: '@rele
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(customDataTypeName));
-  expect(contentData.values[0].value.label).toEqual(colorLabel);
-  expect(contentData.values[0].value.value).toEqual('#' + colorValue);
+  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(customDataTypeName)).label).toEqual(colorLabel);
+  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(customDataTypeName)).value).toEqual('#' + colorValue);
 
   // Clean
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);

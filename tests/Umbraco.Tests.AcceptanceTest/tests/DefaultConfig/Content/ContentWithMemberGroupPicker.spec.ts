@@ -42,9 +42,8 @@ test('can create content with the member group picker data type', async ({umbrac
   // Assert
   await expect.poll(() => umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.variants[0].state).toBe(expectedState);
-  expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
-  expect(contentData.values[0].value).toEqual(memberGroupId);
+  await umbracoApi.document.doesVariantHaveState(contentData, expectedState);
+  await umbracoApi.document.doesPropertyHaveValue(contentData, AliasHelper.toAlias(dataTypeName), memberGroupId);
 });
 
 test('can publish content with the member group picker data type', async ({umbracoApi, umbracoUi}) => {
@@ -63,7 +62,6 @@ test('can publish content with the member group picker data type', async ({umbra
   // Assert
   await expect.poll(() => umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.variants[0].state).toBe(expectedState);
-  expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
-  expect(contentData.values[0].value).toEqual(memberGroupId);
+  await umbracoApi.document.doesVariantHaveState(contentData, expectedState);
+  await umbracoApi.document.doesPropertyHaveValue(contentData, AliasHelper.toAlias(dataTypeName), memberGroupId);
 });

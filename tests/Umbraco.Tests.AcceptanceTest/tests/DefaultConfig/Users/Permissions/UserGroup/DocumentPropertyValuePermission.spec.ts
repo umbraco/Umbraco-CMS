@@ -57,8 +57,7 @@ test('can see property values with UI read but not UI write permission', {tag: '
   await umbracoUi.content.isPropertyEditorUiWithNameReadOnly('text-box');
 });
 
-// Skip this test due to this issue: https://github.com/umbraco/Umbraco-CMS/issues/20505
-test.skip('cannot open content without document read permission even with UI read permission', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+test.skip('cannot open content without document read permission even with UI read permission', {annotation: {type: 'issue', description: "Skip this test due to this issue: https://github.com/umbraco/Umbraco-CMS/issues/20505"}, tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithReadDocumentPermissionAndReadPropertyValueDocumentPermission(userGroupName, false, true);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
@@ -105,8 +104,7 @@ test('can edit property values with UI write permission', async ({umbracoApi, um
 
   // Assert
   const documentData = await umbracoApi.document.getByName(documentName);
-  expect(documentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
-  expect(documentData.values[0].value).toEqual(updatedText);
+  await umbracoApi.document.doesPropertyHaveValue(documentData, AliasHelper.toAlias(dataTypeName), updatedText);
 });
 
 test('cannot see property values with only UI write but no UI read permission', async ({umbracoApi, umbracoUi}) => {

@@ -17,6 +17,9 @@ test.beforeEach(async ({umbracoUi, umbracoApi}) => {
 
 test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
+  // 'can add column displayed' creates this document type and nothing removed it. The name is
+  // generic enough that other specs use it, so the leftover is not harmless.
+  await umbracoApi.documentType.ensureNameNotExists('TestDocumentType');
 });
 
 test('can update page size', async ({umbracoApi, umbracoUi}) => {

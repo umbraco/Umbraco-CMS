@@ -104,7 +104,7 @@ test('cannot publish child if the parent is not published', async ({umbracoApi, 
   // Assert
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.parentNotPublished);
   const contentData = await umbracoApi.document.getByName(childContentName);
-  expect(contentData.variants[0].state).toBe('Draft');
+  await umbracoApi.document.doesVariantHaveState(contentData, 'Draft');
 });
 
 test('can publish content with child node', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
@@ -124,7 +124,7 @@ test('can publish content with child node', {tag: '@smoke'}, async ({umbracoApi,
   // Assert
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.variants[0].state).toBe('Published');
+  await umbracoApi.document.doesVariantHaveState(contentData, 'Published');
   const childContentData = await umbracoApi.document.getByName(childContentName);
-  expect(childContentData.variants[0].state).toBe('Draft');
+  await umbracoApi.document.doesVariantHaveState(childContentData, 'Draft');
 });

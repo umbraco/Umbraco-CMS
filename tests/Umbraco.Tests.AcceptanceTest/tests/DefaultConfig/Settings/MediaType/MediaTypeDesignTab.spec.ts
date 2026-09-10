@@ -32,7 +32,7 @@ test('can create a media type with a property', {tag: '@smoke'}, async ({umbraco
   const mediaTypeData = await umbracoApi.mediaType.getByName(mediaTypeName);
   const dataType = await umbracoApi.dataType.getByName(dataTypeName);
   // Checks if the correct property was added to the media type
-  expect(mediaTypeData.properties[0].dataType.id).toBe(dataType.id);
+  await umbracoApi.mediaType.doesOnlyPropertyUseDataType(mediaTypeData, dataType.id);
 });
 
 test('can update a property in a media type', async ({umbracoApi, umbracoUi}) => {
@@ -50,7 +50,7 @@ test('can update a property in a media type', async ({umbracoApi, umbracoUi}) =>
   const mediaTypeData = await umbracoApi.mediaType.getByName(mediaTypeName);
   const dataType = await umbracoApi.dataType.getByName(newDataTypeName);
   // Checks if the correct property was added to the media type
-  expect(mediaTypeData.properties[0].dataType.id).toBe(dataType.id);
+  await umbracoApi.mediaType.doesOnlyPropertyUseDataType(mediaTypeData, dataType.id);
 });
 
 test('can update group name in a media type', async ({umbracoApi, umbracoUi}) => {
@@ -81,7 +81,7 @@ test('can delete a property in a media type', async ({umbracoApi, umbracoUi}) =>
 
   // Assert
   const mediaTypeData = await umbracoApi.mediaType.getByName(mediaTypeName);
-  expect(mediaTypeData.properties.length).toBe(0);
+  await umbracoApi.mediaType.doesHavePropertyCount(mediaTypeData, 0);
 });
 
 test('can add a description to property in a media type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
@@ -174,7 +174,7 @@ test('can delete a group in a media type', {tag: '@smoke'}, async ({umbracoApi, 
   // Assert
   const mediaTypeData = await umbracoApi.mediaType.getByName(mediaTypeName);
   expect(mediaTypeData.containers.length).toBe(0);
-  expect(mediaTypeData.properties.length).toBe(0);
+  await umbracoApi.mediaType.doesHavePropertyCount(mediaTypeData, 0);
 });
 
 test('can create a media type with a property in a tab', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {

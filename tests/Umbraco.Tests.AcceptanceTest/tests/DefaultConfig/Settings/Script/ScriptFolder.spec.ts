@@ -61,7 +61,7 @@ test('can create a script in a folder', async ({umbracoApi, umbracoUi}) => {
   const scriptChildren = await umbracoApi.script.getChildren('/' + scriptFolderName);
   expect(scriptChildren[0].path).toBe('/' + scriptFolderName + '/' + scriptName);
   const scriptData = await umbracoApi.script.get(scriptChildren[0].path);
-  expect(scriptData.content).toBe(scriptContent);
+  await umbracoApi.script.doesHaveContent(scriptData, scriptContent);
   await umbracoUi.stylesheet.openCaretButtonForName(scriptFolderName);
   await umbracoUi.script.isScriptRootTreeItemVisible(scriptName, true, false);
 });
@@ -165,4 +165,7 @@ test('cannot delete non-empty folder', {tag: '@release'}, async ({umbracoApi, um
 
   // Assert
   await umbracoUi.script.doesErrorNotificationHaveText(NotificationConstantHelper.error.notEmpty);
+  // The notification alone would also be satisfied by a bug that deleted the folder and then
+  // errored - the point of the test is that the folder survives.
+  expect(await umbracoApi.script.doesFolderExist(scriptFolderName)).toBeTruthy();
 });

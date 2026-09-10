@@ -43,8 +43,8 @@ test('can create element with the element picker data type', async ({umbracoApi,
   // Assert
   expect(await umbracoApi.element.doesNameExist(elementName)).toBeTruthy();
   const elementData = await umbracoApi.element.getByName(elementName);
-  expect(elementData.variants[0].state).toBe(expectedState);
-  expect(elementData.values).toEqual([]);
+  await umbracoApi.element.doesVariantHaveState(elementData, expectedState);
+  await umbracoApi.element.doesHaveValueCount(elementData, 0);
 });
 
 test('can publish element with the element picker data type', async ({umbracoApi, umbracoUi}) => {
@@ -61,8 +61,8 @@ test('can publish element with the element picker data type', async ({umbracoApi
 
   // Assert
   const elementData = await umbracoApi.element.getByName(elementName);
-  expect(elementData.variants[0].state).toBe(expectedState);
-  expect(elementData.values).toEqual([]);
+  await umbracoApi.element.doesVariantHaveState(elementData, expectedState);
+  await umbracoApi.element.doesHaveValueCount(elementData, 0);
 });
 
 test('can publish element with an element picker selected', async ({umbracoApi, umbracoUi}) => {
@@ -83,8 +83,7 @@ test('can publish element with an element picker selected', async ({umbracoApi, 
   // Assert
   expect(await umbracoApi.element.doesNameExist(elementName)).toBeTruthy();
   const elementData = await umbracoApi.element.getByName(elementName);
-  expect(elementData.values[0].alias).toEqual(AliasHelper.toAlias(elementPickerDataTypeName));
-  expect(elementData.values[0].value).toContain(elementPickerId);
+  expect(umbracoApi.element.getPropertyValue(elementData, AliasHelper.toAlias(elementPickerDataTypeName))).toContain(elementPickerId);
 });
 
 test('can select multiple elements in the element picker', async ({umbracoApi, umbracoUi}) => {
@@ -107,9 +106,8 @@ test('can select multiple elements in the element picker', async ({umbracoApi, u
 
   // Assert
   const elementData = await umbracoApi.element.getByName(elementName);
-  expect(elementData.values[0].alias).toEqual(AliasHelper.toAlias(elementPickerDataTypeName));
-  expect(elementData.values[0].value).toContain(firstElementPickerId);
-  expect(elementData.values[0].value).toContain(secondElementPickerId);
+  expect(umbracoApi.element.getPropertyValue(elementData, AliasHelper.toAlias(elementPickerDataTypeName))).toContain(firstElementPickerId);
+  expect(umbracoApi.element.getPropertyValue(elementData, AliasHelper.toAlias(elementPickerDataTypeName))).toContain(secondElementPickerId);
 
   // Clean
   await umbracoApi.element.ensureNameNotExists(secondElementPickerName);
@@ -138,8 +136,7 @@ test('can not publish a mandatory element picker with an empty value', async ({u
 
   // Assert
   const elementData = await umbracoApi.element.getByName(elementName);
-  expect(elementData.values[0].alias).toEqual(AliasHelper.toAlias(elementPickerDataTypeName));
-  expect(elementData.values[0].value).toContain(elementPickerId);
+  expect(umbracoApi.element.getPropertyValue(elementData, AliasHelper.toAlias(elementPickerDataTypeName))).toContain(elementPickerId);
 });
 
 test('can validate minimum amount in element picker', async ({umbracoApi, umbracoUi}) => {
@@ -207,7 +204,7 @@ test('can remove an element from the element picker in the element', async ({umb
   // Assert
   expect(await umbracoApi.element.doesNameExist(elementName)).toBeTruthy();
   const elementData = await umbracoApi.element.getByName(elementName);
-  expect(elementData.values).toEqual([]);
+  await umbracoApi.element.doesHaveValueCount(elementData, 0);
 });
 
 test('can remove a not-found element from the element picker in the element', async ({umbracoApi, umbracoUi}) => {
@@ -230,5 +227,5 @@ test('can remove a not-found element from the element picker in the element', as
   // Assert
   expect(await umbracoApi.element.doesNameExist(elementName)).toBeTruthy();
   const elementData = await umbracoApi.element.getByName(elementName);
-  expect(elementData.values).toEqual([]);
+  await umbracoApi.element.doesHaveValueCount(elementData, 0);
 });

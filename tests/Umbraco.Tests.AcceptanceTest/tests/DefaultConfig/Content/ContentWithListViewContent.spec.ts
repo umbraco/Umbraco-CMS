@@ -41,7 +41,7 @@ test('can create content with the list view data type', async ({umbracoApi, umbr
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.variants[0].state).toBe(expectedState);
+  await umbracoApi.document.doesVariantHaveState(contentData, expectedState);
   expect(await umbracoApi.document.getChildrenAmount(contentData.id)).toEqual(0);
 });
 
@@ -62,7 +62,7 @@ test('can publish content with the list view data type', async ({umbracoApi, umb
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.variants[0].state).toBe(expectedState);
+  await umbracoApi.document.doesVariantHaveState(contentData, expectedState);
   expect(await umbracoApi.document.getChildrenAmount(documentId)).toEqual(0);
 });
 
@@ -108,11 +108,11 @@ test('can publish content with a child in the list', async ({umbracoApi, umbraco
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.variants[0].state).toBe(expectedState);
+  await umbracoApi.document.doesVariantHaveState(contentData, expectedState);
   expect(await umbracoApi.document.getChildrenAmount(documentId)).toEqual(1);
   // Checks if child is published
   const childContentData = await umbracoApi.document.getByName(childContentName);
-  expect(childContentData.variants[0].state).toBe(expectedState);
+  await umbracoApi.document.doesVariantHaveState(childContentData, expectedState);
 });
 
 test('can not publish child in a list when parent is not published', async ({umbracoApi, umbracoUi}) => {
@@ -135,11 +135,11 @@ test('can not publish child in a list when parent is not published', async ({umb
   // Content created, but not published
   await umbracoUi.content.isErrorNotificationVisible();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.variants[0].state).toBe(expectedState);
+  await umbracoApi.document.doesVariantHaveState(contentData, expectedState);
   expect(await umbracoApi.document.getChildrenAmount(documentId)).toEqual(1);
   // Checks if child is still in draft
   const childContentData = await umbracoApi.document.getByName(childContentName);
-  expect(childContentData.variants[0].state).toBe(expectedState);
+  await umbracoApi.document.doesVariantHaveState(childContentData, expectedState);
 });
 
 test('child is removed from list after child content is deleted', async ({umbracoApi, umbracoUi}) => {
@@ -211,11 +211,10 @@ test('can publish child content from list', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
   expect(await umbracoApi.document.getChildrenAmount(documentId)).toEqual(1);
   const childContentData = await umbracoApi.document.getByName(childContentName);
-  expect(childContentData.variants[0].state).toBe(expectedState);
+  await umbracoApi.document.doesVariantHaveState(childContentData, expectedState);
 });
 
-// Remove .skip when the issue is fixed: https://github.com/umbraco/Umbraco-CMS/issues/18615
-test.skip('can not publish child content from list when parent is not published', async ({umbracoApi, umbracoUi}) => {
+test.skip('can not publish child content from list when parent is not published', {annotation: {type: 'issue', description: "Remove .skip when the issue is fixed: https://github.com/umbraco/Umbraco-CMS/issues/18615"}}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const expectedState = 'Draft';
   const childDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentType(childDocumentTypeName);
@@ -235,7 +234,7 @@ test.skip('can not publish child content from list when parent is not published'
   // Assert
   await umbracoUi.content.isErrorNotificationVisible();
   const childContentData = await umbracoApi.document.getByName(childContentName);
-  expect(childContentData.variants[0].state).toBe(expectedState);
+  await umbracoApi.document.doesVariantHaveState(childContentData, expectedState);
 });
 
 test('can unpublish child content from list', async ({umbracoApi, umbracoUi}) => {
@@ -250,7 +249,7 @@ test('can unpublish child content from list', async ({umbracoApi, umbracoUi}) =>
   await umbracoApi.document.publish(documentId);
   await umbracoApi.document.publish(childDocumentId);
   const childContentDataBeforeUnpublished = await umbracoApi.document.getByName(childContentName);
-  expect(childContentDataBeforeUnpublished.variants[0].state).toBe('Published');
+  await umbracoApi.document.doesVariantHaveState(childContentDataBeforeUnpublished, 'Published');
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
   await umbracoUi.content.goToContentWithName(contentName);
 
@@ -262,7 +261,7 @@ test('can unpublish child content from list', async ({umbracoApi, umbracoUi}) =>
   // Assert
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.unpublished);
   const childContentData = await umbracoApi.document.getByName(childContentName);
-  expect(childContentData.variants[0].state).toBe(expectedState);
+  await umbracoApi.document.doesVariantHaveState(childContentData, expectedState);
 });
 
 test('can duplicate child content in list', async ({umbracoApi, umbracoUi}) => {

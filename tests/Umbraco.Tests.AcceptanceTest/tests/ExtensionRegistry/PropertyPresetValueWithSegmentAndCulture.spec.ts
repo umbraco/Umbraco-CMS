@@ -48,7 +48,7 @@ test('can insert preset value into textstring property that vary by culture and 
 
   // Assert
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values[0].value).toBe(presetValue);
+  expect(umbracoApi.document.getOnlyPropertyValue(contentData)).toBe(presetValue);
 });
 
 test('can insert preset value into textstring property that vary by culture and segment in segment of default language', async ({umbracoApi, umbracoUi}) => {

@@ -34,8 +34,7 @@ test('can create a block grid editor', {tag: '@smoke'}, async ({umbracoApi, umbr
   // Assert
   expect(await umbracoApi.dataType.doesNameExist(blockGridEditorName)).toBeTruthy();
   const dataTypeData = await umbracoApi.dataType.getByName(blockGridEditorName);
-  expect(dataTypeData.editorAlias).toBe(blockGridEditorAlias);
-  expect(dataTypeData.editorUiAlias).toBe(blockGridEditorUiAlias);
+  await umbracoApi.dataType.doesDataTypeHaveEditors(dataTypeData, blockGridEditorAlias, blockGridEditorUiAlias);
 });
 
 test('can rename a block grid editor', async ({umbracoApi, umbracoUi}) => {
@@ -196,7 +195,7 @@ test('can remove a block in a group from a block grid editor', {tag: '@smoke'}, 
   expect(await umbracoApi.dataType.doesBlockEditorContainBlocksWithContentTypeIds(blockGridEditorName, [elementTypeId])).toBeFalsy();
 });
 
-test.fixme('can move a block from a group to another group in a block grid editor', async ({umbracoApi, umbracoUi}) => {
+test.fixme('can move a block from a group to another group in a block grid editor', {annotation: {type: 'fixme', description: "Fully implemented but disabled; the failure reason was never recorded. Needs a run against a current build to establish whether it is a product bug or a stale test."}}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const secondGroupName = 'MoveToHereGroup';
@@ -220,7 +219,7 @@ test.fixme('can move a block from a group to another group in a block grid edito
   expect(await umbracoApi.dataType.doesBlockGridGroupContainCorrectBlocks(blockGridEditorName, groupName, [elementTypeId])).toBeFalsy();
 });
 
-test.fixme('can delete a group in a block grid editor', async ({umbracoApi, umbracoUi}) => {
+test.fixme('can delete a group in a block grid editor', {annotation: {type: 'fixme', description: "Fully implemented but disabled; the failure reason was never recorded. Needs a run against a current build to establish whether it is a product bug or a stale test."}}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const elementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
@@ -246,8 +245,8 @@ test('can add a min and max amount to a block grid editor', {tag: '@release'}, a
 
   // Assert
   const dataTypeData = await umbracoApi.dataType.getByName(blockGridEditorName);
-  expect(dataTypeData.values[0].value.min).toBe(minAmount);
-  expect(dataTypeData.values[0].value.max).toBe(maxAmount);
+  expect(umbracoApi.dataType.getOnlyPropertyValue(dataTypeData).min).toBe(minAmount);
+  expect(umbracoApi.dataType.getOnlyPropertyValue(dataTypeData).max).toBe(maxAmount);
 });
 
 test('max can not be less than min in a block grid editor', async ({umbracoApi, umbracoUi}) => {
@@ -266,9 +265,9 @@ test('max can not be less than min in a block grid editor', async ({umbracoApi, 
   await umbracoUi.dataType.isFailedStateButtonVisible();
   await umbracoUi.dataType.doesAmountContainErrorMessageWithText('The low value must not exceed the high value.');
   const dataTypeData = await umbracoApi.dataType.getByName(blockGridEditorName);
-  expect(dataTypeData.values[0].value.min).toBe(minAmount);
+  expect(umbracoApi.dataType.getOnlyPropertyValue(dataTypeData).min).toBe(minAmount);
   // The max value should not be updated
-  expect(dataTypeData.values[0].value.max).toBe(oldMaxAmount);
+  expect(umbracoApi.dataType.getOnlyPropertyValue(dataTypeData).max).toBe(oldMaxAmount);
 });
 
 test('can enable live editing mode in a block grid editor', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
@@ -370,8 +369,7 @@ test('can update grid columns in a block grid editor', async ({umbracoApi, umbra
   expect(await umbracoApi.dataType.doesBlockGridContainGridColumns(blockGridEditorName, gridColumns)).toBeTruthy();
 });
 
-// TODO: wait until fixed by frontend, currently you are able to insert multiple stylesheets
-test.skip('can add a stylesheet a block grid editor', async ({umbracoApi, umbracoUi}) => {
+test.skip('can add a stylesheet a block grid editor', {annotation: {type: 'blocked', description: "TODO: wait until fixed by frontend, currently you are able to insert multiple stylesheets"}}, async ({umbracoApi, umbracoUi}) => {
   // TODO: Implement it later
 });
 

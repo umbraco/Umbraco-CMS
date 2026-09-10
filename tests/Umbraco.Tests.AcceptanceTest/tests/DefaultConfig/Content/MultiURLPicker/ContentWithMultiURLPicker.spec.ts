@@ -46,14 +46,13 @@ test('can create content with the document link', {tag: '@release'}, async ({umb
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.variants[0].state).toBe(expectedState);
-  expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
-  expect(contentData.values[0].value.length).toBe(1);
-  expect(contentData.values[0].value[0].type).toEqual('document');
-  expect(contentData.values[0].value[0].icon).toEqual('icon-document');
-  expect(contentData.values[0].value[0].target).toBeNull();
-  expect(contentData.values[0].value[0].unique).toEqual(linkedDocumentId);
-  expect(contentData.values[0].value[0].name).toEqual(linkedDocumentName);
+  await umbracoApi.document.doesVariantHaveState(contentData, expectedState);
+  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(dataTypeName)).length).toBe(1);
+  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(dataTypeName))[0].type).toEqual('document');
+  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(dataTypeName))[0].icon).toEqual('icon-document');
+  expect(umbracoApi.document.getOnlyPropertyValue(contentData)[0].target).toBeNull();
+  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(dataTypeName))[0].unique).toEqual(linkedDocumentId);
+  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(dataTypeName))[0].name).toEqual(linkedDocumentName);
 
   // Clean
   await umbracoApi.documentType.ensureNameNotExists(documentTypeForLinkedDocumentName);
@@ -85,14 +84,13 @@ test('can publish content with the document link', async ({umbracoApi, umbracoUi
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.variants[0].state).toBe(expectedState);
-  expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
-  expect(contentData.values[0].value.length).toBe(1);
-  expect(contentData.values[0].value[0].type).toEqual('document');
-  expect(contentData.values[0].value[0].icon).toEqual('icon-document');
-  expect(contentData.values[0].value[0].target).toBeNull();
-  expect(contentData.values[0].value[0].unique).toEqual(linkedDocumentId);
-  expect(contentData.values[0].value[0].name).toEqual(linkedDocumentName);
+  await umbracoApi.document.doesVariantHaveState(contentData, expectedState);
+  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(dataTypeName)).length).toBe(1);
+  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(dataTypeName))[0].type).toEqual('document');
+  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(dataTypeName))[0].icon).toEqual('icon-document');
+  expect(umbracoApi.document.getOnlyPropertyValue(contentData)[0].target).toBeNull();
+  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(dataTypeName))[0].unique).toEqual(linkedDocumentId);
+  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(dataTypeName))[0].name).toEqual(linkedDocumentName);
 
   // Clean
   await umbracoApi.documentType.ensureNameNotExists(documentTypeForLinkedDocumentName);
@@ -117,12 +115,11 @@ test('can create content with the manual link with title', async ({umbracoApi, u
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
-  expect(contentData.values[0].value.length).toBe(1);
-  expect(contentData.values[0].value[0].type).toEqual('external');
-  expect(contentData.values[0].value[0].icon).toEqual('icon-link');
-  expect(contentData.values[0].value[0].name).toEqual(linkTitle);
-  expect(contentData.values[0].value[0].url).toEqual(link);
+  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(dataTypeName)).length).toBe(1);
+  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(dataTypeName))[0].type).toEqual('external');
+  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(dataTypeName))[0].icon).toEqual('icon-link');
+  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(dataTypeName))[0].name).toEqual(linkTitle);
+  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(dataTypeName))[0].url).toEqual(link);
 });
 
 test('can create content with the media link', async ({umbracoApi, umbracoUi}) => {
@@ -147,12 +144,11 @@ test('can create content with the media link', async ({umbracoApi, umbracoUi}) =
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
-  expect(contentData.values[0].value.length).toBe(1);
-  expect(contentData.values[0].value[0].type).toEqual('media');
-  expect(contentData.values[0].value[0].icon).toEqual('icon-picture');
-  expect(contentData.values[0].value[0].unique).toEqual(mediaFileId);
-  expect(contentData.values[0].value[0].name).toEqual(mediaFileName);
+  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(dataTypeName)).length).toBe(1);
+  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(dataTypeName))[0].type).toEqual('media');
+  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(dataTypeName))[0].icon).toEqual('icon-picture');
+  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(dataTypeName))[0].unique).toEqual(mediaFileId);
+  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(dataTypeName))[0].name).toEqual(mediaFileName);
 
   // Clean
   await umbracoApi.media.ensureNameNotExists(mediaFileName);
@@ -187,18 +183,17 @@ test('can add multiple links in the content', {tag: '@release'}, async ({umbraco
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
-  expect(contentData.values[0].value.length).toBe(2);
+  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(dataTypeName)).length).toBe(2);
   // Verify the information of the first URL picker
-  expect(contentData.values[0].value[0].type).toEqual('media');
-  expect(contentData.values[0].value[0].icon).toEqual('icon-picture');
-  expect(contentData.values[0].value[0].unique).toEqual(mediaFileId);
-  expect(contentData.values[0].value[0].name).toEqual(mediaFileName);
+  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(dataTypeName))[0].type).toEqual('media');
+  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(dataTypeName))[0].icon).toEqual('icon-picture');
+  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(dataTypeName))[0].unique).toEqual(mediaFileId);
+  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(dataTypeName))[0].name).toEqual(mediaFileName);
   // Verify the information of the second URL picker
-  expect(contentData.values[0].value[1].type).toEqual('external');
-  expect(contentData.values[0].value[1].icon).toEqual('icon-link');
-  expect(contentData.values[0].value[1].name).toEqual(linkTitle);
-  expect(contentData.values[0].value[1].url).toEqual(link);
+  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(dataTypeName))[1].type).toEqual('external');
+  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(dataTypeName))[1].icon).toEqual('icon-link');
+  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(dataTypeName))[1].name).toEqual(linkTitle);
+  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(dataTypeName))[1].url).toEqual(link);
 
   // Clean
   await umbracoApi.media.ensureNameNotExists(mediaFileName);
@@ -218,7 +213,7 @@ test('can remove the URL picker in the content', async ({umbracoApi, umbracoUi})
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values).toEqual([]);
+  await umbracoApi.document.doesHaveValueCount(contentData, 0);
 });
 
 test('can edit the URL picker in the content', async ({umbracoApi, umbracoUi}) => {
@@ -238,12 +233,11 @@ test('can edit the URL picker in the content', async ({umbracoApi, umbracoUi}) =
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
-  expect(contentData.values[0].value.length).toBe(1);
-  expect(contentData.values[0].value[0].type).toEqual('external');
-  expect(contentData.values[0].value[0].icon).toEqual('icon-link');
-  expect(contentData.values[0].value[0].name).toEqual(updatedLinkTitle);
-  expect(contentData.values[0].value[0].url).toEqual(link);
+  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(dataTypeName)).length).toBe(1);
+  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(dataTypeName))[0].type).toEqual('external');
+  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(dataTypeName))[0].icon).toEqual('icon-link');
+  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(dataTypeName))[0].name).toEqual(updatedLinkTitle);
+  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(dataTypeName))[0].url).toEqual(link);
 });
 
 test('can create content with the link to an unpublished document', async ({umbracoApi, umbracoUi}) => {
@@ -272,14 +266,13 @@ test('can create content with the link to an unpublished document', async ({umbr
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.variants[0].state).toBe(expectedState);
-  expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
-  expect(contentData.values[0].value.length).toBe(1);
-  expect(contentData.values[0].value[0].type).toEqual('document');
-  expect(contentData.values[0].value[0].icon).toEqual('icon-document');
-  expect(contentData.values[0].value[0].target).toBeNull();
-  expect(contentData.values[0].value[0].unique).toEqual(linkedDocumentId);
-  expect(contentData.values[0].value[0].name).toEqual(linkedDocumentName);
+  await umbracoApi.document.doesVariantHaveState(contentData, expectedState);
+  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(dataTypeName)).length).toBe(1);
+  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(dataTypeName))[0].type).toEqual('document');
+  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(dataTypeName))[0].icon).toEqual('icon-document');
+  expect(umbracoApi.document.getOnlyPropertyValue(contentData)[0].target).toBeNull();
+  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(dataTypeName))[0].unique).toEqual(linkedDocumentId);
+  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(dataTypeName))[0].name).toEqual(linkedDocumentName);
 
   // Clean
   await umbracoApi.documentType.ensureNameNotExists(documentTypeForLinkedDocumentName);
@@ -318,7 +311,7 @@ test('can close dialog without saving link', {tag: '@release'}, async ({umbracoA
   // Assert
   const contentData = await umbracoApi.document.getByName(contentName);
   // Verify no link was added since dialog was closed without clicking Add
-  expect(contentData.values).toEqual([]);
+  await umbracoApi.document.doesHaveValueCount(contentData, 0);
 });
 
 test('can reset manual URL using remove button', async ({umbracoApi, umbracoUi}) => {
@@ -358,7 +351,7 @@ test('can create content with special characters in title field', async ({umbrac
 
   // Assert
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values[0].value[0].name).toEqual(customTitle);
+  expect(umbracoApi.document.getOnlyPropertyValue(contentData)[0].name).toEqual(customTitle);
 });
 
 test('can create content with target toggle enabled to open link in new window', async ({umbracoApi, umbracoUi}) => {
@@ -379,7 +372,7 @@ test('can create content with target toggle enabled to open link in new window',
 
   // Assert
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values[0].value[0].target).toEqual('_blank');
+  expect(umbracoApi.document.getOnlyPropertyValue(contentData)[0].target).toEqual('_blank');
 });
 
 test('cannot select a media folder as a media link', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
@@ -427,11 +420,10 @@ test('can select a media file inside a folder as a media link', async ({umbracoA
 
   // Assert
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
-  expect(contentData.values[0].value.length).toBe(1);
-  expect(contentData.values[0].value[0].type).toEqual('media');
-  expect(contentData.values[0].value[0].unique).toEqual(mediaFileId);
-  expect(contentData.values[0].value[0].name).toEqual(mediaFileName);
+  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(dataTypeName)).length).toBe(1);
+  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(dataTypeName))[0].type).toEqual('media');
+  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(dataTypeName))[0].unique).toEqual(mediaFileId);
+  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(dataTypeName))[0].name).toEqual(mediaFileName);
 
   // Clean
   await umbracoApi.media.ensureNameNotExists(mediaFolderName);

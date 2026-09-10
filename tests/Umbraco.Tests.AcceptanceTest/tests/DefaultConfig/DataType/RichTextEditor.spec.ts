@@ -86,8 +86,7 @@ test('tiptap is the default property editor in rich text editor', async ({umbrac
   await umbracoUi.dataType.doesPropertyEditorHaveAlias(tipTapAlias);
   await umbracoUi.dataType.doesPropertyEditorHaveUiAlias(tipTapUiAlias);
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-  expect(dataTypeData.editorAlias).toBe(tipTapAlias);
-  expect(dataTypeData.editorUiAlias).toBe(tipTapUiAlias);
+  await umbracoApi.dataType.doesDataTypeHaveEditors(dataTypeData, tipTapAlias, tipTapUiAlias);
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(dataTypeName, 'maxImageSize', 500)).toBeTruthy();
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(dataTypeName, 'overlaySize', 'medium')).toBeTruthy();
   expect(await umbracoApi.dataType.doesTiptapExtensionsItemsMatchCount(dataTypeName, extensionsDefaultValue.length)).toBeTruthy();

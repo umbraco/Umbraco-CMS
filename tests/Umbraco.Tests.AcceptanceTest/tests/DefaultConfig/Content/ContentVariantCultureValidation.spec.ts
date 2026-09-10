@@ -47,7 +47,7 @@ test('can save and publish english variant when danish has empty mandatory field
   await umbracoUi.content.isSuccessNotificationVisible();
   await umbracoUi.content.isErrorNotificationVisible(false);
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.variants[0].state).toBe('Published');
+  await umbracoApi.document.doesVariantHaveState(contentData, 'Published');
 });
 
 test('can publish english variant after visiting danish that has empty mandatory field', async ({umbracoUi}) => {
@@ -117,5 +117,5 @@ test('can publish english variant from actions menu when danish has empty mandat
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
   await umbracoUi.content.isErrorNotificationVisible(false);
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.variants[0].state).toBe('Published');
+  await umbracoApi.document.doesVariantHaveState(contentData, 'Published');
 });

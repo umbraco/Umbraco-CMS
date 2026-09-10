@@ -112,10 +112,12 @@ test('can export a dictionary item', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.dictionary.clickActionsMenuForDictionary(dictionaryName);
   await umbracoUi.dictionary.clickExportActionMenuOption();
-  const exportData = await umbracoUi.dictionary.exportDictionary(false);
+  const exportData = await umbracoUi.dictionary.exportDictionaryAndReadFile(false);
 
   // Assert
-  expect(exportData).toEqual(dictionaryId + '.udt');
+  expect(exportData.filename).toEqual(dictionaryId + '.udt');
+  // The filename alone only proves a download happened - assert the item is actually in it.
+  expect(exportData.content).toContain(`Name="${dictionaryName}"`);
 });
 
 test('can export a dictionary item with descendants', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
@@ -128,10 +130,14 @@ test('can export a dictionary item with descendants', {tag: '@smoke'}, async ({u
   // Act
   await umbracoUi.dictionary.clickActionsMenuForDictionary(parentDictionaryName);
   await umbracoUi.dictionary.clickExportActionMenuOption();
-  const exportData = await umbracoUi.dictionary.exportDictionary(true);
+  const exportData = await umbracoUi.dictionary.exportDictionaryAndReadFile(true);
 
   // Assert
-  expect(exportData).toEqual(parentDictionaryId + '.udt');
+  expect(exportData.filename).toEqual(parentDictionaryId + '.udt');
+  // The filename is `{id}.udt` with or without descendants, so only the contents can show
+  // the descendant was included - without this the test passes even if the option does nothing.
+  expect(exportData.content).toContain(`Name="${parentDictionaryName}"`);
+  expect(exportData.content).toContain(`Name="${dictionaryName}"`);
 
   // Clean
   await umbracoApi.dictionary.ensureNameNotExists(parentDictionaryName);

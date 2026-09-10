@@ -55,8 +55,7 @@ test('can add an area for a block', {tag: '@smoke'}, async ({umbracoApi, umbraco
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainAreaWithAlias(blockGridEditorName, contentElementTypeId)).toBeTruthy();
 });
 
-// TODO: There are currently issues when trying to select the locator.
-test.skip('can resize an area for a block', async ({umbracoApi, umbracoUi}) => {
+test.skip('can resize an area for a block', {annotation: {type: 'blocked', description: "TODO: There are currently issues when trying to select the locator."}}, async ({umbracoApi, umbracoUi}) => {
 // Arrange
   const areaAlias = 'TestArea';
   await umbracoApi.dataType.createBlockGridWithAnAreaInABlock(blockGridEditorName, contentElementTypeId, areaAlias);
@@ -251,8 +250,7 @@ test('can remove max allowed for an area in a block', async ({umbracoApi, umbrac
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainAreaWithMaxAllowed(blockGridEditorName, contentElementTypeId, areaAlias, maxAllowed)).toBeFalsy();
 });
 
-// TODO: Remove skip when the front-end is ready. Currently there is no frontend validation for min and max values
-test.skip('min can not be more than max an area in a block', async ({umbracoApi, umbracoUi}) => {
+test.skip('min can not be more than max an area in a block', {annotation: {type: 'blocked', description: "TODO: Remove skip when the front-end is ready. Currently there is no frontend validation for min and max values"}}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const areaAlias = 'TestArea';
   const minAllowed = 6;

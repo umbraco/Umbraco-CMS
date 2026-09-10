@@ -34,9 +34,8 @@ test('can create content with the true/false data type', async ({umbracoApi, umb
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.variants[0].state).toBe(expectedState);
-  expect(contentData.values[0].alias).toEqual('truefalse');
-  expect(contentData.values[0].value).toEqual(false);
+  await umbracoApi.document.doesVariantHaveState(contentData, expectedState);
+  await umbracoApi.document.doesPropertyHaveValue(contentData, 'truefalse', false);
 });
 
 test('can publish content with the true/false data type', async ({umbracoApi, umbracoUi}) => {
@@ -55,8 +54,8 @@ test('can publish content with the true/false data type', async ({umbracoApi, um
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.variants[0].state).toBe(expectedState);
-  expect(contentData.values[0].value).toEqual(false);
+  await umbracoApi.document.doesVariantHaveState(contentData, expectedState);
+  expect(umbracoApi.document.getOnlyPropertyValue(contentData)).toEqual(false);
 });
 
 test('can toggle the true/false value in the content', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
@@ -75,8 +74,7 @@ test('can toggle the true/false value in the content', {tag: '@release'}, async 
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values[0].alias).toEqual('truefalse');
-  expect(contentData.values[0].value).toEqual(true);
+  await umbracoApi.document.doesPropertyHaveValue(contentData, 'truefalse', true);
 });
 
 test('can toggle the true/false value with the initial state enabled', async ({umbracoApi, umbracoUi}) => {
@@ -97,8 +95,7 @@ test('can toggle the true/false value with the initial state enabled', async ({u
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(customDataTypeName));
-  expect(contentData.values[0].value).toEqual(false);
+  await umbracoApi.document.doesPropertyHaveValue(contentData, AliasHelper.toAlias(customDataTypeName), false);
 
   // Clean
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);

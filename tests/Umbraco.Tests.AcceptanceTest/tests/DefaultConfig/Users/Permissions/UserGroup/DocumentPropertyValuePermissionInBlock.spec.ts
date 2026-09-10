@@ -28,6 +28,10 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   await umbracoApi.documentType.ensureNameNotExists(elementTypeName);
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
+  // The user group and test user outlive the last test otherwise. A leftover user group is the
+  // residue that makes a name locator match two rows in a later spec (see CLAUDE.md §3).
+  await umbracoApi.user.ensureNameNotExists(testUser.name);
+  await umbracoApi.userGroup.ensureNameNotExists(userGroupName);
 });
 
 test('can see property values in block list with UI read but not UI write permission', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
@@ -48,9 +52,7 @@ test('can see property values in block list with UI read but not UI write permis
   await umbracoUi.content.isPropertyEditorUiWithNameReadOnly('text-box');
 });
 
-// Remove .skip when the front-end is ready.
-// Issue link: https://github.com/umbraco/Umbraco-CMS/issues/19395
-test.skip('can edit property values in block list with UI write permission', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+test.skip('can edit property values in block list with UI write permission', {annotation: {type: 'issue', description: "Remove .skip when the front-end is ready. Issue link: https://github.com/umbraco/Umbraco-CMS/issues/19395"}, tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const updatedText = 'Updated test text';
   await umbracoApi.document.createDefaultDocumentWithABlockListEditor(documentName, elementTypeId, documentTypeName, customDataTypeName);
@@ -70,7 +72,7 @@ test.skip('can edit property values in block list with UI write permission', {ta
 
   // Assert
   const documentData = await umbracoApi.document.getByName(documentName);
-  expect(documentData.values[0].value.contentData[0].values[0].value).toEqual(updatedText);
+  expect(umbracoApi.document.getOnlyPropertyValue(documentData).contentData[0].values[0].value).toEqual(updatedText);
 });
 
 test('cannot see property values in block list with only UI write but no UI read permission', async ({umbracoApi, umbracoUi}) => {
@@ -107,9 +109,7 @@ test('can see property values in block grid with UI read but not UI write permis
   await umbracoUi.content.isPropertyEditorUiWithNameReadOnly('text-box');
 });
 
-// Remove .skip when the front-end is ready.
-// Issue link: https://github.com/umbraco/Umbraco-CMS/issues/19395
-test.skip('can edit property values in block grid with UI write permission', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+test.skip('can edit property values in block grid with UI write permission', {annotation: {type: 'issue', description: "Remove .skip when the front-end is ready. Issue link: https://github.com/umbraco/Umbraco-CMS/issues/19395"}, tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const updatedText = 'Updated test text';
   await umbracoApi.document.createDefaultDocumentWithABlockGridEditor(documentName, elementTypeId, documentTypeName, customDataTypeName);
@@ -129,7 +129,7 @@ test.skip('can edit property values in block grid with UI write permission', {ta
 
   // Assert
   const documentData = await umbracoApi.document.getByName(documentName);
-  expect(documentData.values[0].value.contentData[0].values[0].value).toEqual(updatedText);
+  expect(umbracoApi.document.getOnlyPropertyValue(documentData).contentData[0].values[0].value).toEqual(updatedText);
 });
 
 test('cannot see property values in block grid with only UI write but no UI read permission', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {

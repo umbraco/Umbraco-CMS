@@ -72,8 +72,7 @@ for (const dropdown of dropdowns) {
     await umbracoUi.dataType.doesPropertyEditorHaveAlias(editorAlias);
     await umbracoUi.dataType.doesPropertyEditorHaveUiAlias(editorUiAlias);
     const dataTypeDefaultData = await umbracoApi.dataType.getByName(dropdown.type);
-    expect(dataTypeDefaultData.editorAlias).toBe(editorAlias);
-    expect(dataTypeDefaultData.editorUiAlias).toBe(editorUiAlias);
+    await umbracoApi.dataType.doesDataTypeHaveEditors(dataTypeDefaultData, editorAlias, editorUiAlias);
     expect(await umbracoApi.dataType.doesDataTypeHaveValue(dropdown.type, 'multiple', dropdown.multipleChoice)).toBeTruthy();
     expect(await umbracoApi.dataType.doesDataTypeHaveValue(dropdown.type, 'items')).toBeFalsy();
   });

@@ -41,8 +41,8 @@ test('can create content with the content picker datatype', {tag: '@smoke'}, asy
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.variants[0].state).toBe(expectedState);
-  expect(contentData.values[0].value).toEqual(contentPickerId);
+  await umbracoApi.document.doesVariantHaveState(contentData, expectedState);
+  expect(umbracoApi.document.getOnlyPropertyValue(contentData)).toEqual(contentPickerId);
 });
 
 test('can publish content with the content picker data type', async ({umbracoApi, umbracoUi}) => {
@@ -63,8 +63,8 @@ test('can publish content with the content picker data type', async ({umbracoApi
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.variants[0].state).toBe(expectedState);
-  expect(contentData.values[0].value).toEqual(contentPickerId);
+  await umbracoApi.document.doesVariantHaveState(contentData, expectedState);
+  expect(umbracoApi.document.getOnlyPropertyValue(contentData)).toEqual(contentPickerId);
 });
 
 test('can open content picker in the content', async ({umbracoApi, umbracoUi}) => {
@@ -99,7 +99,7 @@ test('can create content with content picker without ignore start node', async (
   const childContentPickerDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentType(childContentPickerDocumentTypeName);
   contentPickerDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedChildNode(contentPickerName, childContentPickerDocumentTypeId);
   const contentPickerId = await umbracoApi.document.createDefaultDocument(contentPickerName, contentPickerDocumentTypeId);
-  await umbracoApi.document.createDefaultDocumentWithParent(childContentPickerName, childContentPickerDocumentTypeId, contentPickerId);
+  const childContentPickerId = await umbracoApi.document.createDefaultDocumentWithParent(childContentPickerName, childContentPickerDocumentTypeId, contentPickerId);
   // Create a custom content picker with start node
   const customDataTypeId = await umbracoApi.dataType.createContentPickerDataTypeWithStartNode(customDataTypeName, contentPickerId);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
@@ -114,6 +114,9 @@ test('can create content with content picker without ignore start node', async (
 
   // Assert
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
+  // The notification alone only proves the publish succeeded - assert the pick was stored.
+  const contentData = await umbracoApi.document.getByName(contentName);
+  expect(umbracoApi.document.getOnlyPropertyValue(contentData)).toEqual(childContentPickerId);
 
   // Clean
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
@@ -130,8 +133,15 @@ test('can create content with content picker with ignore start node', async ({um
   const childContentPickerDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentType(childContentPickerDocumentTypeName);
   contentPickerDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedChildNode(contentPickerName, childContentPickerDocumentTypeId);
   const contentPickerId = await umbracoApi.document.createDefaultDocument(contentPickerName, contentPickerDocumentTypeId);
-  await umbracoApi.document.createDefaultDocumentWithParent(childContentPickerName, childContentPickerDocumentTypeId, contentPickerId);
+  const childContentPickerId = await umbracoApi.document.createDefaultDocumentWithParent(childContentPickerName, childContentPickerDocumentTypeId, contentPickerId);
   // Create a custom content picker with the setting "ignore user start node" is enable
+  //
+  // Scope note: "ignore user start nodes" only changes which nodes a user whose account IS
+  // start-node-restricted may pick. This test runs as the shared admin, who has no such
+  // restriction, so the setting has no observable effect here and this test cannot distinguish
+  // it from the sibling test above. What it does cover is that the data type configuration is
+  // accepted and the pick still persists. Verifying the setting itself needs a restricted user -
+  // see tests/DefaultConfig/Users/Permissions/User/ContentStartNodes.spec.ts for that pattern.
   const customDataTypeId = await umbracoApi.dataType.createContentPickerDataTypeWithIgnoreUserStartNodes(customDataTypeName, contentPickerId);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
   await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
@@ -145,6 +155,9 @@ test('can create content with content picker with ignore start node', async ({um
 
   // Assert
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
+  // The notification alone only proves the publish succeeded - assert the pick was stored.
+  const contentData = await umbracoApi.document.getByName(contentName);
+  expect(umbracoApi.document.getOnlyPropertyValue(contentData)).toEqual(childContentPickerId);
 
   // Clean
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
@@ -168,7 +181,7 @@ test('can remove content picker in the content', async ({umbracoApi, umbracoUi})
 
   // Assert
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values).toEqual([]);
+  await umbracoApi.document.doesHaveValueCount(contentData, 0);
 });
 
 // This test for regression issue: https://github.com/umbraco/Umbraco-CMS/issues/21130
@@ -189,5 +202,5 @@ test('can remove a not-found content picker', {tag: '@release'}, async ({umbraco
 
   // Assert
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values).toEqual([]);
+  await umbracoApi.document.doesHaveValueCount(contentData, 0);
 });

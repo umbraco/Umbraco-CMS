@@ -35,8 +35,8 @@ test('can create content with empty RTE Tiptap property editor', async ({umbraco
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.variants[0].state).toBe(expectedState);
-  expect(contentData.values).toEqual([]);
+  await umbracoApi.document.doesVariantHaveState(contentData, expectedState);
+  await umbracoApi.document.doesHaveValueCount(contentData, 0);
 });
 
 test('can create content with non-empty RTE Tiptap property editor', async ({umbracoApi, umbracoUi}) => {
@@ -58,8 +58,8 @@ test('can create content with non-empty RTE Tiptap property editor', async ({umb
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.variants[0].state).toBe(expectedState);
-  expect(contentData.values[0].value.markup).toEqual('<p>' + inputText + '</p>');
+  await umbracoApi.document.doesVariantHaveState(contentData, expectedState);
+  expect(umbracoApi.document.getOnlyPropertyValue(contentData).markup).toEqual('<p>' + inputText + '</p>');
 });
 
 test('can publish content with RTE Tiptap property editor', async ({umbracoApi, umbracoUi}) => {
@@ -79,8 +79,8 @@ test('can publish content with RTE Tiptap property editor', async ({umbracoApi, 
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.variants[0].state).toBe(expectedState);
-  expect(contentData.values[0].value.markup).toEqual('<p>' + inputText + '</p>');
+  await umbracoApi.document.doesVariantHaveState(contentData, expectedState);
+  expect(umbracoApi.document.getOnlyPropertyValue(contentData).markup).toEqual('<p>' + inputText + '</p>');
 });
 
 // This is a test for the regression issue #19763
@@ -117,7 +117,7 @@ test('can save a variant content node after removing embedded block in RTE', asy
   await umbracoUi.content.clickSaveButtonForContent();
   await umbracoUi.content.clickSaveModalButtonAndWaitForContentToBeUpdated();
   const contentData = await umbracoApi.document.getByName(englishContentName);
-  expect(contentData.values[0].value.blocks.contentData[0].values[0].value).toBe(textStringValue);
+  expect(umbracoApi.document.getOnlyPropertyValue(contentData).blocks.contentData[0].values[0].value).toBe(textStringValue);
   await umbracoUi.content.clearTipTapEditor();
   await umbracoUi.content.clickSaveButtonForContent();
   await umbracoUi.content.clickSaveModalButtonAndWaitForContentToBeUpdated();

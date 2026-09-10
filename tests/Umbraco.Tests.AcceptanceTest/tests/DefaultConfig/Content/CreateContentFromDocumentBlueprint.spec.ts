@@ -57,7 +57,7 @@ test('can create content using an invariant document blueprint', async ({umbraco
   // Assert
   expect(await umbracoApi.document.doesNameExist(documentBlueprintName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(documentBlueprintName);
-  expect(contentData.values[0].value).toBe(textContent);
+  expect(umbracoApi.document.getOnlyPropertyValue(contentData)).toBe(textContent);
 });
 
 test('can create content using a variant document blueprint', async ({umbracoApi, umbracoUi}) => {
@@ -81,8 +81,8 @@ test('can create content using a variant document blueprint', async ({umbracoApi
   // Assert
   expect(await umbracoApi.document.doesNameExist(documentBlueprintName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(documentBlueprintName);
-  expect(contentData.values[0].value).toBe(textContent);
-  expect(contentData.variants[0].name).toBe(documentBlueprintName);
+  expect(umbracoApi.document.getOnlyPropertyValue(contentData)).toBe(textContent);
+  await umbracoApi.document.doesVariantHaveName(contentData, documentBlueprintName);
   expect(contentData.variants[1].name).toBe(documentBlueprintDanishName);
 
   // Clean
@@ -110,7 +110,7 @@ test('can create content with different name using an invariant document bluepri
   expect(await umbracoApi.document.doesNameExist(documentBlueprintName)).toBeFalsy();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values[0].value).toBe(textContent);
+  expect(umbracoApi.document.getOnlyPropertyValue(contentData)).toBe(textContent);
 });
 
 test('can create content with different name using a variant document blueprint', async ({umbracoApi, umbracoUi}) => {
@@ -135,8 +135,8 @@ test('can create content with different name using a variant document blueprint'
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values[0].value).toBe(textContent);
-  expect(contentData.variants[0].name).toBe(contentName);
+  expect(umbracoApi.document.getOnlyPropertyValue(contentData)).toBe(textContent);
+  await umbracoApi.document.doesVariantHaveName(contentData, contentName);
   expect(contentData.variants[1].name).toBe(documentBlueprintDanishName);
 
   // Clean
@@ -163,7 +163,7 @@ test('can create content using a document blueprint with block list', async ({um
   // Assert
   expect(await umbracoApi.document.doesNameExist(documentBlueprintName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(documentBlueprintName);
-  expect(contentData.values[0].value.contentData[0].values[0].value.markup).toEqual(textContent);
+  expect(umbracoApi.document.getOnlyPropertyValue(contentData).contentData[0].values[0].value.markup).toEqual(textContent);
   const blockListValue = contentData.values.find(item => item.editorAlias === "Umbraco.BlockList")?.value;
   expect(blockListValue).toBeTruthy();
 });
@@ -188,7 +188,7 @@ test('can create content using a document blueprint with block grid', async ({um
   // Assert
   expect(await umbracoApi.document.doesNameExist(documentBlueprintName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(documentBlueprintName);
-  expect(contentData.values[0].value.contentData[0].values[0].value.markup).toEqual(textContent);
+  expect(umbracoApi.document.getOnlyPropertyValue(contentData).contentData[0].values[0].value.markup).toEqual(textContent);
   const blockListValue = contentData.values.find(item => item.editorAlias === "Umbraco.BlockGrid")?.value;
   expect(blockListValue).toBeTruthy();
 });

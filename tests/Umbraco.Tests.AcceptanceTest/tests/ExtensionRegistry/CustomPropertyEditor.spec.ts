@@ -57,7 +57,7 @@ test('can select custom property editor in property editor picker on data type',
   expect(await umbracoApi.documentType.doesNameExist(documentTypeName)).toBeTruthy();
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
   // Checks if the correct property was added to the document type
-  expect(documentTypeData.properties[0].dataType.id).toBe(dataTypeId);
+  await umbracoApi.documentType.doesOnlyPropertyUseDataType(documentTypeData, dataTypeId);
 });
 
 test('can write and read value from custom property editor', async ({umbracoApi, umbracoUi}) => {
@@ -81,5 +81,5 @@ test('can write and read value from custom property editor', async ({umbracoApi,
 
   // Assert
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values[0].value).toEqual(testValue);
+  expect(umbracoApi.document.getOnlyPropertyValue(contentData)).toEqual(testValue);
 });

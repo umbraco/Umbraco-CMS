@@ -28,8 +28,7 @@ test('can add allow vary by culture for a document type', {tag: '@smoke'}, async
   expect(documentTypeData.variesByCulture).toBeTruthy();
 });
 
-// On V16 Segments will not be allowed through the UI, but the server.
-test.skip('can add allow segmentation for a document type', async ({umbracoApi, umbracoUi}) => {
+test.skip('can add allow segmentation for a document type', {annotation: {type: 'blocked', description: "On V16 Segments will not be allowed through the UI, but the server."}}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.documentType.createDefaultDocumentType(documentTypeName);
   await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
@@ -58,7 +57,7 @@ test('can set is an element type for a document type', {tag: '@smoke'}, async ({
 
   // Assert
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
-  expect(documentTypeData.isElement).toBeTruthy();
+  await umbracoApi.documentType.isElementType(documentTypeData);
 });
 
 test('can disable history cleanup for a document type', async ({umbracoApi, umbracoUi}) => {
@@ -108,7 +107,7 @@ test('can see History Cleanup section in Settings tab after toggling off Element
   await umbracoUi.documentType.isPreventCleanupButtonVisible(true);
   await umbracoUi.documentType.doesElementTypeNotApplicableMessageExist(false);
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
-  expect(documentTypeData.isElement).toBeFalsy();
+  await umbracoApi.documentType.isElementType(documentTypeData, false);
 });
 
 test('can see History Cleanup section in Settings tab after enabling Allow in Library', async ({umbracoApi, umbracoUi}) => {
@@ -127,7 +126,7 @@ test('can see History Cleanup section in Settings tab after enabling Allow in Li
   await umbracoUi.documentType.isPreventCleanupButtonVisible(true);
   await umbracoUi.documentType.doesElementTypeNotApplicableMessageExist(false);
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
-  expect(documentTypeData.isElement).toBeTruthy();
+  await umbracoApi.documentType.isElementType(documentTypeData);
 });
 
 test('cannot see element type not applicable message in Settings tab for a Document Type', async ({umbracoApi, umbracoUi}) => {
@@ -160,7 +159,7 @@ test('cannot disable Element Type when element of that type exists', async ({umb
   // Assert
   await umbracoUi.documentType.doesErrorNotificationHaveText(ConstantHelper.elementTypeChangeMessages.elementHasContent);
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
-  expect(documentTypeData.isElement).toBeTruthy();
+  await umbracoApi.documentType.isElementType(documentTypeData);
 
   // Clean
   await umbracoApi.element.ensureNameNotExists(elementName);
@@ -183,7 +182,7 @@ test('can disable Element Type after deleting the element of that type', async (
   // Assert
   await umbracoUi.documentType.isErrorNotificationVisible(false);
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
-  expect(documentTypeData.isElement).toBeFalsy();
+  await umbracoApi.documentType.isElementType(documentTypeData, false);
 });
 
 test('cannot enable Element Type when document of that type exists', async ({umbracoApi, umbracoUi}) => {
@@ -202,7 +201,7 @@ test('cannot enable Element Type when document of that type exists', async ({umb
   // Assert
   await umbracoUi.documentType.doesErrorNotificationHaveText(ConstantHelper.elementTypeChangeMessages.documentHasContent);
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
-  expect(documentTypeData.isElement).toBeFalsy();
+  await umbracoApi.documentType.isElementType(documentTypeData, false);
 
   // Clean
   await umbracoApi.document.ensureNameNotExists(documentName);
@@ -224,7 +223,7 @@ test('cannot disable Element Type when used in a block editor configuration', as
   // Assert
   await umbracoUi.documentType.doesErrorNotificationHaveText(ConstantHelper.elementTypeChangeMessages.elementUsedInBlockEditor);
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
-  expect(documentTypeData.isElement).toBeTruthy();
+  await umbracoApi.documentType.isElementType(documentTypeData);
 
   // Clean
   await umbracoApi.dataType.ensureNameNotExists(blockListDataTypeName);

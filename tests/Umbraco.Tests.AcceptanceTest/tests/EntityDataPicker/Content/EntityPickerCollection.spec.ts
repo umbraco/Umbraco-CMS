@@ -33,8 +33,8 @@ test('can create empty content with an entity picker using the collection data s
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.variants[0].state).toBe(expectedState);
-  expect(contentData.values).toEqual([]);
+  await umbracoApi.document.doesVariantHaveState(contentData, expectedState);
+  await umbracoApi.document.doesHaveValueCount(contentData, 0);
 });
 
 test('can create content with an entity picker using the collection data source that has an item', async ({umbracoApi, umbracoUi}) => {
@@ -52,7 +52,7 @@ test('can create content with an entity picker using the collection data source 
 
   // Assert
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values[0].value.ids[0]).toEqual('1');
+  expect(umbracoApi.document.getOnlyPropertyValue(contentData).ids[0]).toEqual('1');
 });
 
 test('can create content with an entity picker using the collection data source that has multiple items', async ({umbracoApi, umbracoUi}) => {
@@ -72,9 +72,9 @@ test('can create content with an entity picker using the collection data source 
 
   // Assert
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values[0].value.ids[0]).toEqual('1');
-  expect(contentData.values[0].value.ids[1]).toEqual('3');
-  expect(contentData.values[0].value.ids[2]).toEqual('5');
+  expect(umbracoApi.document.getOnlyPropertyValue(contentData).ids[0]).toEqual('1');
+  expect(umbracoApi.document.getOnlyPropertyValue(contentData).ids[1]).toEqual('3');
+  expect(umbracoApi.document.getOnlyPropertyValue(contentData).ids[2]).toEqual('5');
 });
 
 test('can not create content with an entity picker using the collection data source that has more items than max amount', async ({umbracoApi, umbracoUi}) => {
@@ -95,8 +95,7 @@ test('can not create content with an entity picker using the collection data sou
   await umbracoUi.content.isChooseButtonVisible(false);
 });
 
-// Skip this test due to this issue: https://github.com/umbraco/Umbraco-CMS/issues/22121
-test.skip('can not create content with an entity picker using the collection data source that has less items than min amount', async ({umbracoApi, umbracoUi}) => {
+test.skip('can not create content with an entity picker using the collection data source that has less items than min amount', {annotation: {type: 'issue', description: "Skip this test due to this issue: https://github.com/umbraco/Umbraco-CMS/issues/22121"}}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const expectedState = 'Published';
   const dataTypeId = await umbracoApi.dataType.createEntityDataPickerDataTypeWithMinAndMaxValues(dataTypeName, collectionDataSourceAlias, 2, 5);
@@ -115,5 +114,5 @@ test.skip('can not create content with an entity picker using the collection dat
   // Assert
   await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.variants[0].state).toBe(expectedState);
+  await umbracoApi.document.doesVariantHaveState(contentData, expectedState);
 });

@@ -53,6 +53,9 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(childDocumentTypeTwoName);
   await umbracoApi.userGroup.ensureNameNotExists(userGroupName);
   await umbracoApi.documentBlueprint.ensureNameNotExists(documentBlueprintName);
+  // 'can set public access...' creates this member group; nothing cascades to a member group,
+  // so without this it outlives the run under a name other specs also use.
+  await umbracoApi.memberGroup.ensureNameNotExists('TestMemberGroup');
 });
 
 test('can read content node with permission enabled', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
@@ -70,8 +73,7 @@ test('can read content node with permission enabled', {tag: '@release'}, async (
   await umbracoUi.content.doesDocumentHaveName(rootDocumentName);
 });
 
-// Skip this test due to this issue: https://github.com/umbraco/Umbraco-CMS/issues/20505
-test.skip('can not read content node with permission disabled', async ({umbracoApi, umbracoUi}) => {
+test.skip('can not read content node with permission disabled', {annotation: {type: 'issue', description: "Skip this test due to this issue: https://github.com/umbraco/Umbraco-CMS/issues/20505"}}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithReadDocumentPermission(userGroupName, false);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
@@ -284,8 +286,7 @@ test('can not publish content with publish permission disabled', async ({umbraco
   await umbracoUi.content.isActionsMenuForNameVisible(rootDocumentName, false);
 });
 
-// Skip this as this function is removed from the front-end.
-test.skip('can set permissions with set permissions permission enabled', async ({umbracoApi, umbracoUi}) => {
+test.skip('can set permissions with set permissions permission enabled', {annotation: {type: 'blocked', description: "Skip this as this function is removed from the front-end."}}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithSetPermissionsDocumentPermission(userGroupName);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
@@ -301,8 +302,7 @@ test.skip('can set permissions with set permissions permission enabled', async (
   // await umbracoUi.content.doesDocumentPermissionsDialogExist();
 });
 
-// Skip this as this function is removed from the front-end.
-test.skip('can not set permissions with set permissions permission disabled', async ({umbracoApi, umbracoUi}) => {
+test.skip('can not set permissions with set permissions permission disabled', {annotation: {type: 'blocked', description: "Skip this as this function is removed from the front-end."}}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithSetPermissionsDocumentPermission(userGroupName, false);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
@@ -411,7 +411,7 @@ test('can duplicate content with duplicate permission enabled', {tag: '@release'
   await umbracoUi.content.isContentInTreeVisible(duplicatedContentName);
   const rootContent = await umbracoApi.document.getByName(rootDocumentName);
   const rootDuplicatedContent = await umbracoApi.document.getByName(duplicatedContentName);
-  expect(rootContent.values[0].value).toEqual(rootDuplicatedContent.values[0].value);
+  expect(umbracoApi.document.getOnlyPropertyValue(rootContent)).toEqual(rootDuplicatedContent.values[0].value);
 });
 
 test('can not duplicate content with duplicate permission disabled', async ({umbracoApi, umbracoUi}) => {

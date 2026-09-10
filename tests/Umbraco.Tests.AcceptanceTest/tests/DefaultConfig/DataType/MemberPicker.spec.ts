@@ -16,7 +16,6 @@ test('the default configuration is correct', async ({umbracoApi, umbracoUi}) => 
   await umbracoUi.dataType.doesPropertyEditorHaveAlias(editorAlias);
   await umbracoUi.dataType.doesPropertyEditorHaveUiAlias(editorUiAlias);
   const dataTypeDefaultData = await umbracoApi.dataType.getByName(dataTypeName);
-  expect(dataTypeDefaultData.editorAlias).toBe(editorAlias);
-  expect(dataTypeDefaultData.editorUiAlias).toBe(editorUiAlias);
-  expect(dataTypeDefaultData.values).toEqual([]);
+  await umbracoApi.dataType.doesDataTypeHaveEditors(dataTypeDefaultData, editorAlias, editorUiAlias);
+  await umbracoApi.dataType.doesHaveValueCount(dataTypeDefaultData, 0);
 });

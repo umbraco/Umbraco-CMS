@@ -30,9 +30,7 @@ test('can update maximum allowed characters value', async ({umbracoApi, umbracoU
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'maxChars', maxCharsValue)).toBeTruthy();
 });
 
-// Remove .skip when the front-end is ready. The "Input type" should be removed.
-// Issue link: https://github.com/umbraco/Umbraco-CMS/issues/19340
-test.skip('the default configuration is correct', async ({umbracoApi, umbracoUi}) => {
+test.skip('the default configuration is correct', {annotation: {type: 'issue', description: "Remove .skip when the front-end is ready. The \"Input type\" should be removed. Issue link: https://github.com/umbraco/Umbraco-CMS/issues/19340"}}, async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.dataType.goToDataType(dataTypeName);
 
@@ -42,8 +40,7 @@ test.skip('the default configuration is correct', async ({umbracoApi, umbracoUi}
   await umbracoUi.dataType.doesPropertyEditorHaveAlias(editorAlias);
   await umbracoUi.dataType.doesPropertyEditorHaveUiAlias(editorUiAlias);
   const dataTypeDefaultData = await umbracoApi.dataType.getByName(dataTypeName);
-  expect(dataTypeDefaultData.editorAlias).toBe(editorAlias);
-  expect(dataTypeDefaultData.editorUiAlias).toBe(editorUiAlias);
-  expect(dataTypeDefaultData.values).toEqual([]);
+  await umbracoApi.dataType.doesDataTypeHaveEditors(dataTypeDefaultData, editorAlias, editorUiAlias);
+  await umbracoApi.dataType.doesHaveValueCount(dataTypeDefaultData, 0);
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(dataTypeName, 'maxChars')).toBeFalsy();
 });

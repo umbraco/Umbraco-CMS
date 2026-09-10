@@ -52,7 +52,7 @@ test.describe('content with culture and segment variations', () => {
     const contentData = await umbracoApi.document.getByName(contentName);
     expect(contentData.values[0].culture).toBe('en-US');
     expect(contentData.values[0].segment).toBeNull();
-    expect(contentData.values[0].value).toBe(defaultSegmentValue);
+    expect(umbracoApi.document.getOnlyPropertyValue(contentData)).toBe(defaultSegmentValue);
   });
 
   test('can save VIP segment-specific property value', async ({umbracoApi, umbracoUi}) => {
@@ -174,7 +174,7 @@ test.describe('content with segment-only variations', () => {
     const contentData = await umbracoApi.document.getByName(contentName);
     expect(contentData.values[0].culture).toBeNull();
     expect(contentData.values[0].segment).toBeNull();
-    expect(contentData.values[0].value).toBe(defaultSegmentValue);
+    expect(umbracoApi.document.getOnlyPropertyValue(contentData)).toBe(defaultSegmentValue);
   });
 
   test('can add VIP segment value to segment-only content', async ({umbracoApi, umbracoUi}) => {

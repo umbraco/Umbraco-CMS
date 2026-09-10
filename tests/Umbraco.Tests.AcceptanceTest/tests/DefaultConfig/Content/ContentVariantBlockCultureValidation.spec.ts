@@ -50,7 +50,7 @@ test('can publish english variant when danish has no blocks and minimum is requi
   await umbracoUi.content.isSuccessNotificationVisible();
   await umbracoUi.content.isErrorNotificationVisible(false);
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.variants[0].state).toBe('Published');
+  await umbracoApi.document.doesVariantHaveState(contentData, 'Published');
 });
 
 test('can publish english variant when block mandatory field is only filled in english and not danish', async ({umbracoApi, umbracoUi}) => {
@@ -76,7 +76,7 @@ test('can publish english variant when block mandatory field is only filled in e
   await umbracoUi.content.isSuccessNotificationVisible();
   await umbracoUi.content.isErrorNotificationVisible(false);
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.variants[0].state).toBe('Published');
+  await umbracoApi.document.doesVariantHaveState(contentData, 'Published');
 });
 
 test('can publish english after visiting danish that has block validation errors', async ({umbracoApi, umbracoUi}) => {
@@ -109,5 +109,5 @@ test('can publish english after visiting danish that has block validation errors
   await umbracoUi.content.isSuccessNotificationVisible();
   await umbracoUi.content.isErrorNotificationVisible(false);
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.variants[0].state).toBe('Published');
+  await umbracoApi.document.doesVariantHaveState(contentData, 'Published');
 });

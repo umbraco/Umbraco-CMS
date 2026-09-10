@@ -30,7 +30,7 @@ test('can create a member type with a property', {tag: '@smoke'}, async ({umbrac
   expect(await umbracoApi.memberType.doesNameExist(memberTypeName)).toBeTruthy();
   const memberTypeData = await umbracoApi.memberType.getByName(memberTypeName);
   const dataType = await umbracoApi.dataType.getByName(dataTypeName);
-  expect(memberTypeData.properties[0].dataType.id).toBe(dataType.id);
+  await umbracoApi.memberType.doesOnlyPropertyUseDataType(memberTypeData, dataType.id);
 });
 
 test('can update a property in a member type', async ({umbracoApi, umbracoUi}) => {
@@ -47,7 +47,7 @@ test('can update a property in a member type', async ({umbracoApi, umbracoUi}) =
   // Assert
   const memberTypeData = await umbracoApi.memberType.getByName(memberTypeName);
   const dataType = await umbracoApi.dataType.getByName(newDataTypeName);
-  expect(memberTypeData.properties[0].dataType.id).toBe(dataType.id);
+  await umbracoApi.memberType.doesOnlyPropertyUseDataType(memberTypeData, dataType.id);
 });
 
 test('can update group name in a member type', async ({umbracoApi, umbracoUi}) => {
@@ -78,7 +78,7 @@ test('can delete a property in a member type', async ({umbracoApi, umbracoUi}) =
 
   // Assert
   const memberTypeData = await umbracoApi.memberType.getByName(memberTypeName);
-  expect(memberTypeData.properties.length).toBe(0);
+  await umbracoApi.memberType.doesHavePropertyCount(memberTypeData, 0);
 });
 
 test('can add a description to property in a member type', async ({umbracoApi, umbracoUi}) => {
@@ -171,7 +171,7 @@ test('can delete a group in a member type', async ({umbracoApi, umbracoUi}) => {
   // Assert
   const memberTypeData = await umbracoApi.memberType.getByName(memberTypeName);
   expect(memberTypeData.containers.length).toBe(0);
-  expect(memberTypeData.properties.length).toBe(0);
+  await umbracoApi.memberType.doesHavePropertyCount(memberTypeData, 0);
 });
 
 test('can create a member type with multiple groups', async ({umbracoApi, umbracoUi}) => {
@@ -191,7 +191,7 @@ test('can create a member type with multiple groups', async ({umbracoApi, umbrac
   // Assert
   expect(await umbracoApi.memberType.doesNameExist(memberTypeName)).toBeTruthy();
   const memberTypeData = await umbracoApi.memberType.getByName(memberTypeName);
-  expect(memberTypeData.properties.length).toBe(2);
+  await umbracoApi.memberType.doesHavePropertyCount(memberTypeData, 2);
   expect(memberTypeData.containers.length).toBe(2);
 });
 

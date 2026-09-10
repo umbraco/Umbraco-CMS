@@ -54,8 +54,7 @@ test('the default configuration is correct', async ({umbracoApi, umbracoUi}) => 
   await umbracoUi.dataType.doesPropertyEditorHaveAlias(editorAlias);
   await umbracoUi.dataType.doesPropertyEditorHaveUiAlias(editorUiAlias);
   const dataTypeDefaultData = await umbracoApi.dataType.getByName(dataTypeName);
-  expect(dataTypeDefaultData.editorAlias).toBe(editorAlias);
-  expect(dataTypeDefaultData.editorUiAlias).toBe(editorUiAlias);
+  await umbracoApi.dataType.doesDataTypeHaveEditors(dataTypeDefaultData, editorAlias, editorUiAlias);
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(dataTypeName, 'group', 'default', dataTypeDefaultData)).toBeTruthy();
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(dataTypeName, 'storageType', 'Json', dataTypeDefaultData)).toBeTruthy();
 });

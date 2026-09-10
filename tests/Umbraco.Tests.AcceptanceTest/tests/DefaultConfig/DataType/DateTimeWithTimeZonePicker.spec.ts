@@ -30,6 +30,5 @@ test('can create a date time with time zone data type', async ({umbracoApi, umbr
   await umbracoUi.dataType.isDataTypeTreeItemVisible(customDataTypeName);
   expect(await umbracoApi.dataType.doesNameExist(customDataTypeName)).toBeTruthy();
   const dataTypeData = await umbracoApi.dataType.getByName(customDataTypeName);
-  expect(dataTypeData.editorAlias).toBe(editorAlias);
-  expect(dataTypeData.editorUiAlias).toBe(editorUiAlias);
+  await umbracoApi.dataType.doesDataTypeHaveEditors(dataTypeData, editorAlias, editorUiAlias);
 });

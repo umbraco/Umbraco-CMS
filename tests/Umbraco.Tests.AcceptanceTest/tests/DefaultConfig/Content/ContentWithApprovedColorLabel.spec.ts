@@ -30,7 +30,7 @@ test('can update the contents color label when the data type label changes', asy
   // Arrange
   await umbracoApi.dataType.updateApprovedColorItemLabel(customDataTypeName, colorValue, newLabel);
   const oldContentData = await umbracoApi.document.getByName(contentName);
-  expect(oldContentData.values[0].value.label).toBe(oldLabel);
+  expect(umbracoApi.document.getOnlyPropertyValue(oldContentData).label).toBe(oldLabel);
 
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
@@ -38,8 +38,8 @@ test('can update the contents color label when the data type label changes', asy
 
   // Assert
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values[0].value.label).toBe(newLabel);
-  expect(contentData.values[0].value.value).toBe('#' + colorValue);
+  expect(umbracoApi.document.getOnlyPropertyValue(contentData).label).toBe(newLabel);
+  expect(umbracoApi.document.getOnlyPropertyValue(contentData).value).toBe('#' + colorValue);
 });
 
 test('can render the updated color label after republishing', async ({umbracoApi, umbracoUi}) => {

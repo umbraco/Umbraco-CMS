@@ -43,7 +43,7 @@ test('can add a composition to an element type', {tag: '@smoke'}, async ({umbrac
 
   // Assert
   const elementTypeData = await umbracoApi.documentType.getByName(elementTypeName);
-  expect(elementTypeData.compositions.length).toBe(1);
+  await umbracoApi.documentType.doesHaveCompositionCount(elementTypeData, 1);
   expect(elementTypeData.compositions[0].documentType.id).toBe(compositionElementTypeId);
 });
 

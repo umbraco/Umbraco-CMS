@@ -64,7 +64,7 @@ test('can create a element type using create options', {tag: '@release'}, async 
   expect(await umbracoApi.documentType.doesNameExist(documentTypeName)).toBeTruthy();
   // Checks if the isElement is true
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
-  expect(documentTypeData.isElement).toBeTruthy();
+  await umbracoApi.documentType.isElementType(documentTypeData);
   // Check the created element type is displayed in the tree
   await umbracoUi.documentType.reloadDocumentTypeTree();
   await umbracoUi.documentType.isDocumentTreeItemVisible(documentTypeName);
@@ -148,7 +148,7 @@ test('can create a element type in a folder using create options', async ({umbra
   expect(await umbracoApi.documentType.doesNameExist(documentTypeName)).toBeTruthy();
   // Checks if the isElement is true
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
-  expect(documentTypeData.isElement).toBeTruthy();
+  await umbracoApi.documentType.isElementType(documentTypeData);
   // Verify the element type is inside the parent folder
   const parentFolderChildren = await umbracoApi.documentType.getChildren(parentFolderId);
   expect(parentFolderChildren).toHaveLength(1);

@@ -41,8 +41,8 @@ test('can create content with an empty block grid', async ({umbracoApi, umbracoU
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.variants[0].state).toBe(expectedState);
-  expect(contentData.values).toEqual([]);
+  await umbracoApi.document.doesVariantHaveState(contentData, expectedState);
+  await umbracoApi.document.doesHaveValueCount(contentData, 0);
 });
 
 test('can publish content with an empty block grid', async ({umbracoApi, umbracoUi}) => {
@@ -63,8 +63,8 @@ test('can publish content with an empty block grid', async ({umbracoApi, umbraco
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.variants[0].state).toBe(expectedState);
-  expect(contentData.values).toEqual([]);
+  await umbracoApi.document.doesVariantHaveState(contentData, expectedState);
+  await umbracoApi.document.doesHaveValueCount(contentData, 0);
 });
 
 test('can add a block element in the content', async ({umbracoApi, umbracoUi}) => {
@@ -87,7 +87,7 @@ test('can add a block element in the content', async ({umbracoApi, umbracoUi}) =
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values[0].value.contentData[0].values[0].value).toEqual(inputText);
+  expect(umbracoApi.document.getOnlyPropertyValue(contentData).contentData[0].values[0].value).toEqual(inputText);
   const blockGridValue = contentData.values.find(item => item.editorAlias === "Umbraco.BlockGrid")?.value;
   expect(blockGridValue).toBeTruthy();
 });
@@ -108,7 +108,7 @@ test('can edit block element in the content', async ({umbracoApi, umbracoUi}) =>
 
   // Assert
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values[0].value.contentData[0].values[0].value).toEqual(updatedText);
+  expect(umbracoApi.document.getOnlyPropertyValue(contentData).contentData[0].values[0].value).toEqual(updatedText);
 });
 
 test('can delete block element in the content', async ({umbracoApi, umbracoUi}) => {
@@ -144,8 +144,7 @@ test('cannot add block element if allow in root is disabled', async ({umbracoApi
   await umbracoUi.content.isAddBlockElementButtonVisible(false);
 });
 
-// Skip this test due to this issue: https://github.com/umbraco/Umbraco-CMS/issues/22121
-test.skip('cannot add number of block element greater than the maximum amount', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+test.skip('cannot add number of block element greater than the maximum amount', {annotation: {type: 'issue', description: "Skip this test due to this issue: https://github.com/umbraco/Umbraco-CMS/issues/22121"}, tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const customDataTypeId = await umbracoApi.dataType.createBlockGridWithABlockAndMinAndMaxAmount(customDataTypeName, elementTypeId, 0, 0);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
@@ -248,14 +247,14 @@ test('can add settings model for the block in the content', async ({umbracoApi, 
   // Assert
   await umbracoUi.content.isErrorNotificationVisible(false);
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values[0].value.contentData[0].values[0].value).toEqual(contentBlockInputText);
-  expect(contentData.values[0].value.settingsData[0].values[0].value).toEqual(settingBlockInputText);
+  expect(umbracoApi.document.getOnlyPropertyValue(contentData).contentData[0].values[0].value).toEqual(contentBlockInputText);
+  expect(umbracoApi.document.getOnlyPropertyValue(contentData).settingsData[0].values[0].value).toEqual(settingBlockInputText);
 
   // Clean
   await umbracoApi.documentType.ensureNameNotExists(settingModelName);
 });
 
-test.skip('can move blocks in the content', async ({umbracoApi, umbracoUi}) => {
+test.skip('can move blocks in the content', {annotation: {type: 'todo', description: "Never implemented - the body is an empty stub. Either write it or delete it."}}, async ({umbracoApi, umbracoUi}) => {
   // TODO: Implement it later
 });
 
@@ -298,7 +297,7 @@ test('can add a block element with inline editing mode enabled', async ({umbraco
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values[0].value.contentData[0].values[0].value).toEqual(inputText);
+  expect(umbracoApi.document.getOnlyPropertyValue(contentData).contentData[0].values[0].value).toEqual(inputText);
   const blockGridValue = contentData.values.find(item => item.editorAlias === "Umbraco.BlockGrid")?.value;
   expect(blockGridValue).toBeTruthy();
   await umbracoUi.content.doesPropertyContainValue(propertyInBlock, inputText);
@@ -328,7 +327,7 @@ test('can add an invariant block element with an invariant RTE Tiptap in the con
 
   // Assert
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values[0].value.contentData[0].values[0].value.markup).toContain(inputText);
+  expect(umbracoApi.document.getOnlyPropertyValue(contentData).contentData[0].values[0].value.markup).toContain(inputText);
   const blockGridValue = contentData.values.find(item => item.editorAlias === "Umbraco.BlockGrid")?.value;
   expect(blockGridValue).toBeTruthy();
 
@@ -362,7 +361,7 @@ test('can add a variant block element with variant RTE Tiptap in the content', a
 
   // Assert
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values[0].value.contentData[0].values[0].value.markup).toContain(inputText);
+  expect(umbracoApi.document.getOnlyPropertyValue(contentData).contentData[0].values[0].value.markup).toContain(inputText);
   const blockGridValue = contentData.values.find(item => item.editorAlias === "Umbraco.BlockGrid")?.value;
   expect(blockGridValue).toBeTruthy();
 
@@ -397,7 +396,7 @@ test('can add a variant block element with invariant RTE Tiptap in the content',
 
   // Assert
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values[0].value.contentData[0].values[0].value.markup).toContain(inputText);
+  expect(umbracoApi.document.getOnlyPropertyValue(contentData).contentData[0].values[0].value.markup).toContain(inputText);
   const blockGridValue = contentData.values.find(item => item.editorAlias === "Umbraco.BlockGrid")?.value;
   expect(blockGridValue).toBeTruthy();
 

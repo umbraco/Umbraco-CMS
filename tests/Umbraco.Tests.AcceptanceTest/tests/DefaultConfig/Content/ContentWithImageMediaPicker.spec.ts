@@ -36,7 +36,7 @@ test('can create content with a image media picker', async ({umbracoApi, umbraco
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.variants[0].state).toBe(expectedState);
+  await umbracoApi.document.doesVariantHaveState(contentData, expectedState);
 });
 
 test('can publish content with a image media picker', async ({umbracoApi, umbracoUi}) => {
@@ -55,7 +55,7 @@ test('can publish content with a image media picker', async ({umbracoApi, umbrac
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.variants[0].state).toBe(expectedState);
+  await umbracoApi.document.doesVariantHaveState(contentData, expectedState);
 });
 
 test('can add an image to the image media picker', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
@@ -104,8 +104,7 @@ test('can remove an image from the image media picker', async ({umbracoApi, umbr
   await umbracoApi.media.ensureNameNotExists(mediaName);
 });
 
-// TODO: Remove skip when the front-end is ready as there are currently no displayed error notification.
-test.skip('image count can not be less than min amount set in image media picker', async ({umbracoApi, umbracoUi}) => {
+test.skip('image count can not be less than min amount set in image media picker', {annotation: {type: 'blocked', description: "TODO: Remove skip when the front-end is ready as there are currently no displayed error notification."}}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
   const dataTypeId = await umbracoApi.dataType.createImageMediaPickerDataType(customDataTypeName, 1);
@@ -125,8 +124,7 @@ test.skip('image count can not be less than min amount set in image media picker
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
 });
 
-// TODO: Remove skip when the front-end is ready as there are currently no displayed error notification.
-test.skip('image count can not be more than max amount set in image media picker', async ({umbracoApi, umbracoUi}) => {
+test.skip('image count can not be more than max amount set in image media picker', {annotation: {type: 'blocked', description: "TODO: Remove skip when the front-end is ready as there are currently no displayed error notification."}}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
   const dataTypeId = await umbracoApi.dataType.createImageMediaPickerDataType(customDataTypeName, 0, 0);
@@ -231,8 +229,7 @@ test('can reset focal point in a image from the image media picker', async ({umb
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
 });
 
-// TODO: Remove skip when the front-end is ready as currently the crop is not being selected.
-test.skip('can add an image from the image media picker with a image crop', async ({umbracoApi, umbracoUi}) => {
+test.skip('can add an image from the image media picker with a image crop', {annotation: {type: 'blocked', description: "TODO: Remove skip when the front-end is ready as currently the crop is not being selected."}}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const cropLabel = 'TestCrop';
   const cropWidth = 100;

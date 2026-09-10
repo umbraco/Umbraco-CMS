@@ -34,8 +34,8 @@ test('can create content with the upload video data type', async ({umbracoApi, u
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.variants[0].state).toBe(expectedState);
-  expect(contentData.values).toEqual([]);
+  await umbracoApi.document.doesVariantHaveState(contentData, expectedState);
+  await umbracoApi.document.doesHaveValueCount(contentData, 0);
 });
 
 test('can publish content with the upload video data type', async ({umbracoApi, umbracoUi}) => {
@@ -54,8 +54,8 @@ test('can publish content with the upload video data type', async ({umbracoApi, 
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.variants[0].state).toBe(expectedState);
-  expect(contentData.values).toEqual([]);
+  await umbracoApi.document.doesVariantHaveState(contentData, expectedState);
+  await umbracoApi.document.doesHaveValueCount(contentData, 0);
 });
 
 const uploadVideos = [
@@ -83,8 +83,7 @@ for (const uploadVideo of uploadVideos) {
     // Assert
     expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
     const contentData = await umbracoApi.document.getByName(contentName);
-    expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
-    expect(contentData.values[0].value.src).toContain(AliasHelper.toAlias(uploadVideo.fileName));
+    expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(dataTypeName)).src).toContain(AliasHelper.toAlias(uploadVideo.fileName));
   });
 }
 
@@ -106,5 +105,5 @@ test('can remove a mp4 file in the content', async ({umbracoApi, umbracoUi}) => 
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values).toEqual([]);
+  await umbracoApi.document.doesHaveValueCount(contentData, 0);
 });

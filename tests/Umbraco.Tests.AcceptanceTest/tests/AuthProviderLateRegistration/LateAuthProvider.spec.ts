@@ -1,4 +1,4 @@
-import {test} from '@umbraco/acceptance-test-helpers';
+import {ConstantHelper, test} from '@umbraco/acceptance-test-helpers';
 import {expect} from '@playwright/test';
 
 // Regression guard for the v17.4+ external-login race (introduced in #22522).
@@ -26,5 +26,5 @@ test('a late-registered external auth provider is offered on the login screen', 
   const lateProviderButton = umbracoUi.page
     .locator('umb-auth-provider-default')
     .getByText('Sign in with Late External Login');
-  await expect(lateProviderButton).toBeVisible({timeout: 15000});
+  await expect(lateProviderButton).toBeVisible({timeout: ConstantHelper.timeout.veryLong});
 });

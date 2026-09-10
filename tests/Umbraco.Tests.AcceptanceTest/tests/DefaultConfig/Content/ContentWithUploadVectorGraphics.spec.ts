@@ -34,8 +34,8 @@ test('can create content with the upload vector graphics data type', async ({umb
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.variants[0].state).toBe(expectedState);
-  expect(contentData.values).toEqual([]);
+  await umbracoApi.document.doesVariantHaveState(contentData, expectedState);
+  await umbracoApi.document.doesHaveValueCount(contentData, 0);
 });
 
 test('can publish content with the upload vector graphics data type', async ({umbracoApi, umbracoUi}) => {
@@ -54,8 +54,8 @@ test('can publish content with the upload vector graphics data type', async ({um
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.variants[0].state).toBe(expectedState);
-  expect(contentData.values).toEqual([]);
+  await umbracoApi.document.doesVariantHaveState(contentData, expectedState);
+  await umbracoApi.document.doesHaveValueCount(contentData, 0);
 });
 
 test(`can upload a file with the svg extension in the content`, {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
@@ -78,8 +78,7 @@ test(`can upload a file with the svg extension in the content`, {tag: '@release'
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
-  expect(contentData.values[0].value.src).toContain(AliasHelper.toAlias(vectorGraphicsName));
+  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(dataTypeName)).src).toContain(AliasHelper.toAlias(vectorGraphicsName));
   await umbracoUi.content.doesUploadedSvgThumbnailHaveSrc(umbracoApi.baseUrl + contentData.values[0].value.src);
 });
 
@@ -101,5 +100,5 @@ test('can remove an svg file in the content', async ({umbracoApi, umbracoUi}) =>
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values).toEqual([]);
+  await umbracoApi.document.doesHaveValueCount(contentData, 0);
 });

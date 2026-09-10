@@ -34,8 +34,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.userGroup.ensureNameNotExists(userGroupName);
 });
 
-// Skip this test due to this issue: https://github.com/umbraco/Umbraco-CMS/issues/20505
-test.skip('can only see property values for specific document with read UI enabled', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+test.skip('can only see property values for specific document with read UI enabled', {annotation: {type: 'issue', description: "Skip this test due to this issue: https://github.com/umbraco/Umbraco-CMS/issues/20505"}, tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithPermissionsForSpecificDocumentAndTwoPropertyValues(userGroupName, firstDocumentId, documentTypeId, firstPropertyName[0], true, false, secondPropertyName[0], true, false);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
@@ -118,10 +117,8 @@ test('can edit specific property values with UI read and write permission enable
 
   // Assert
   const firstDocumentData = await umbracoApi.document.getByName(firstDocumentName);
-  expect(firstDocumentData.values[0].alias).toEqual(AliasHelper.toAlias(firstPropertyName[0]));
-  expect(firstDocumentData.values[0].value).toEqual(inputText);
-  expect(firstDocumentData.values[1].alias).toEqual(AliasHelper.toAlias(secondPropertyName[0]).replace('/', ''));
-  expect(firstDocumentData.values[1].value).toEqual(true);
+  await umbracoApi.document.doesPropertyHaveValue(firstDocumentData, AliasHelper.toAlias(firstPropertyName[0]), inputText);
+  await umbracoApi.document.doesPropertyHaveValue(firstDocumentData, AliasHelper.toAlias(secondPropertyName[0]).replace('/', ''), true);
 });
 
 test('cannot see specific property values with UI write permission enabled and UI read permission disabled', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {

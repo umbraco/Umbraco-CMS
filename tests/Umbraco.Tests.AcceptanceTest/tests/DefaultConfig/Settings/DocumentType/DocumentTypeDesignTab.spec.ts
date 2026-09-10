@@ -88,7 +88,7 @@ test('can delete a group in a document type', {tag: '@smoke'}, async ({umbracoAp
   // Assert
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
   expect(documentTypeData.containers.length).toBe(0);
-  expect(documentTypeData.properties.length).toBe(0);
+  await umbracoApi.documentType.doesHavePropertyCount(documentTypeData, 0);
 });
 
 test('can delete a tab in a document type', async ({umbracoApi, umbracoUi}) => {
@@ -123,7 +123,7 @@ test('can delete a property editor in a document type', {tag: '@smoke'}, async (
   // Assert
   expect(await umbracoApi.documentType.doesNameExist(documentTypeName)).toBeTruthy();
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
-  expect(documentTypeData.properties.length).toBe(0);
+  await umbracoApi.documentType.doesHavePropertyCount(documentTypeData, 0);
 });
 
 test('can create a document type with a property in a tab', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
@@ -277,7 +277,7 @@ test('can add a description to a property in a document type', async ({umbracoAp
 
   // Assert
   await expect(umbracoUi.documentType.enterDescriptionTxt).toBeVisible();
-  expect(umbracoUi.documentType.doesDescriptionHaveValue(descriptionText)).toBeTruthy();
+  await umbracoUi.documentType.doesDescriptionHaveValue(descriptionText);
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
   expect(documentTypeData.properties[0].description).toBe(descriptionText);
 });

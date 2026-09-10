@@ -143,7 +143,7 @@ test('can create and publish an element in a folder', async ({umbracoApi, umbrac
   const folderChildren = await umbracoApi.element.getChildren(folderId);
   expect(folderChildren[0].name).toBe(elementName);
   const elementData = await umbracoApi.element.getByName(elementName);
-  expect(elementData.variants[0].state).toBe('Published');
+  await umbracoApi.element.doesVariantHaveState(elementData, 'Published');
 });
 
 test('can create an element in a nested folder', async ({umbracoApi, umbracoUi}) => {

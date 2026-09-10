@@ -30,6 +30,8 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(blockName);
   await umbracoApi.dataType.ensureNameNotExists(blockListName);
   await umbracoApi.dataType.ensureNameNotExists(propertyEditorName);
+  // A language is global state; leaving Danish behind changes what later specs see.
+  await umbracoApi.language.ensureNameNotExists('Danish');
 });
 
 test('cannot publish a block list with a mandatory radiobox without a value', async ({umbracoApi, umbracoUi}) => {
@@ -150,7 +152,7 @@ test('cannot update a variant block list with invalid text', {tag: '@release'}, 
 
   // Assert
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values[0].value.contentData[0].values[0].value).toContain(correctPropertyValue);
+  expect(umbracoApi.document.getOnlyPropertyValue(contentData).contentData[0].values[0].value).toContain(correctPropertyValue);
   const blockListValue = contentData.values.find(item => item.editorAlias === "Umbraco.BlockList")?.value;
   expect(blockListValue).toBeTruthy();
   await umbracoUi.content.clickEditBlockListEntryWithName(blockName);

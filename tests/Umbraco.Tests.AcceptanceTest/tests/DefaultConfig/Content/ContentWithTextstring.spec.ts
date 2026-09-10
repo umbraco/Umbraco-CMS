@@ -35,8 +35,8 @@ test('can create content with the textstring data type', async ({umbracoApi, umb
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.variants[0].state).toBe(expectedState);
-  expect(contentData.values).toEqual([]);
+  await umbracoApi.document.doesVariantHaveState(contentData, expectedState);
+  await umbracoApi.document.doesHaveValueCount(contentData, 0);
 });
 
 test('can publish content with the textstring data type', async ({umbracoApi, umbracoUi}) => {
@@ -54,8 +54,8 @@ test('can publish content with the textstring data type', async ({umbracoApi, um
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.variants[0].state).toBe(expectedState);
-  expect(contentData.values).toEqual([]);
+  await umbracoApi.document.doesVariantHaveState(contentData, expectedState);
+  await umbracoApi.document.doesHaveValueCount(contentData, 0);
 });
 
 test('can input text into the textstring', async ({umbracoApi, umbracoUi}) => {
@@ -73,8 +73,7 @@ test('can input text into the textstring', async ({umbracoApi, umbracoUi}) => {
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
-  expect(contentData.values[0].value).toEqual(text);
+  await umbracoApi.document.doesPropertyHaveValue(contentData, AliasHelper.toAlias(dataTypeName), text);
 });
 
 test('cannot input the text that exceeds the allowed amount of characters', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {

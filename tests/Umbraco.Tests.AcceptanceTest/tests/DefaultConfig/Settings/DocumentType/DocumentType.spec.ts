@@ -67,7 +67,7 @@ test('can create a element type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi
   // Assert
   // Checks if the isElement is true
   const documentTypeData = await umbracoApi.documentType.get(documentTypeId);
-  expect(documentTypeData.isElement).toBeTruthy();
+  await umbracoApi.documentType.isElementType(documentTypeData);
 });
 
 test('can rename a document type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {

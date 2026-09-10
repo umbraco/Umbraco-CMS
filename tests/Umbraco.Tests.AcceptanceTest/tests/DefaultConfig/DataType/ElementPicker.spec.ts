@@ -30,9 +30,8 @@ test('can create an element picker data type', async ({umbracoApi, umbracoUi}) =
   await umbracoUi.dataType.isDataTypeTreeItemVisible(customDataTypeName);
   expect(await umbracoApi.dataType.doesNameExist(customDataTypeName)).toBeTruthy();
   const dataTypeData = await umbracoApi.dataType.getByName(customDataTypeName);
-  expect(dataTypeData.editorAlias).toBe(editorAlias);
-  expect(dataTypeData.editorUiAlias).toBe(editorUiAlias);
-  expect(dataTypeData.values).toEqual([]);
+  await umbracoApi.dataType.doesDataTypeHaveEditors(dataTypeData, editorAlias, editorUiAlias);
+  await umbracoApi.dataType.doesHaveValueCount(dataTypeData, 0);
 });
 
 test('can set minimum amount', async ({umbracoApi, umbracoUi}) => {

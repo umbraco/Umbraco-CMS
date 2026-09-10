@@ -30,8 +30,7 @@ test('can create a slider data type', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.isDataTypeTreeItemVisible(customDataTypeName);
   expect(await umbracoApi.dataType.doesNameExist(customDataTypeName)).toBeTruthy();
   const dataTypeData = await umbracoApi.dataType.getByName(customDataTypeName);
-  expect(dataTypeData.editorAlias).toBe(editorAlias);
-  expect(dataTypeData.editorUiAlias).toBe(editorUiAlias);
+  await umbracoApi.dataType.doesDataTypeHaveEditors(dataTypeData, editorAlias, editorUiAlias);
 });
 
 test('can update minimum value', async ({umbracoApi, umbracoUi}) => {

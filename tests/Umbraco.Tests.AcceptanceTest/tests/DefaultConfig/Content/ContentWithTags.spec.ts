@@ -36,8 +36,8 @@ test('can create content with one tag', async ({umbracoApi, umbracoUi}) => {
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.variants[0].state).toBe(expectedState);
-  expect(contentData.values[0].value).toEqual([tagsName[0]]);
+  await umbracoApi.document.doesVariantHaveState(contentData, expectedState);
+  expect(umbracoApi.document.getOnlyPropertyValue(contentData)).toEqual([tagsName[0]]);
 });
 
 test('can publish content with multiple tags', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
@@ -58,8 +58,8 @@ test('can publish content with multiple tags', {tag: '@release'}, async ({umbrac
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.variants[0].state).toBe(expectedState);
-  expect(contentData.values[0].value).toEqual(tagsName);
+  await umbracoApi.document.doesVariantHaveState(contentData, expectedState);
+  expect(umbracoApi.document.getOnlyPropertyValue(contentData)).toEqual(tagsName);
 });
 
 test('can remove a tag in the content', async ({umbracoApi, umbracoUi}) => {
@@ -78,5 +78,5 @@ test('can remove a tag in the content', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.content.isErrorNotificationVisible(false);
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values).toEqual([]);
+  await umbracoApi.document.doesHaveValueCount(contentData, 0);
 });

@@ -41,7 +41,7 @@ test('can create content with an invariant document type that has a variant comp
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.variants[0].state).toBe(expectedState);
+  await umbracoApi.document.doesVariantHaveState(contentData, expectedState);
 });
 
 // This test fails due to an existing issue
@@ -61,8 +61,7 @@ test('can save property value from variant composition in invariant content', as
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
-  expect(contentData.values[0].value).toEqual(text);
+  await umbracoApi.document.doesPropertyHaveValue(contentData, AliasHelper.toAlias(dataTypeName), text);
 });
 
 test('can save property values from variant composition in variant content with multiple cultures', async ({umbracoApi, umbracoUi}) => {

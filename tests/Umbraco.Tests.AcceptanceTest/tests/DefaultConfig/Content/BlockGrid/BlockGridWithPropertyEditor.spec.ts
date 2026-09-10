@@ -28,6 +28,8 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   await umbracoApi.documentType.ensureNameNotExists(blockName);
   await umbracoApi.dataType.ensureNameNotExists(blockGridName);
+  // A language is global state; leaving Danish behind changes what later specs see.
+  await umbracoApi.language.ensureNameNotExists('Danish');
 });
 
 test('cannot publish a block grid with a mandatory radiobox without a value', async ({umbracoApi, umbracoUi}) => {
@@ -56,7 +58,7 @@ test('cannot publish a block grid with a mandatory radiobox without a value', as
 
   // Assert
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.variants[0].state).toBe('Published');
+  await umbracoApi.document.doesVariantHaveState(contentData, 'Published');
 });
 
 test('cannot publish a block grid with a mandatory checkbox list without a value', async ({umbracoApi, umbracoUi}) => {
@@ -85,7 +87,7 @@ test('cannot publish a block grid with a mandatory checkbox list without a value
 
   // Assert
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.variants[0].state).toBe('Published');
+  await umbracoApi.document.doesVariantHaveState(contentData, 'Published');
 });
 
 test('cannot publish a block grid with a mandatory dropdown without a value', async ({umbracoApi, umbracoUi}) => {
@@ -114,7 +116,7 @@ test('cannot publish a block grid with a mandatory dropdown without a value', as
 
   // Assert
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.variants[0].state).toBe('Published');
+  await umbracoApi.document.doesVariantHaveState(contentData, 'Published');
 });
 
 test('cannot update a variant block grid with invalid text', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
@@ -158,7 +160,7 @@ test('cannot update a variant block grid with invalid text', {tag: '@release'}, 
 
   // Assert
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values[0].value.contentData[0].values[0].value).toContain(correctPropertyValue);
+  expect(umbracoApi.document.getOnlyPropertyValue(contentData).contentData[0].values[0].value).toContain(correctPropertyValue);
   const blockListValue = contentData.values.find(item => item.editorAlias === "Umbraco.BlockGrid")?.value;
   expect(blockListValue).toBeTruthy();
   await umbracoUi.content.clickBlockElementWithName(blockName);

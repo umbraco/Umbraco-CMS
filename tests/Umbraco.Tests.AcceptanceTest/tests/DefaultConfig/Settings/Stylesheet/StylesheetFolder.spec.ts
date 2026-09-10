@@ -122,7 +122,7 @@ test('can create a stylesheet in a folder', async ({umbracoApi, umbracoUi}) => {
   const stylesheetChildren = await umbracoApi.stylesheet.getChildren('/' + stylesheetFolderName);
   expect(stylesheetChildren[0].path).toBe('/' + stylesheetFolderName + '/' + stylesheetName);
   const stylesheetData = await umbracoApi.stylesheet.get(stylesheetChildren[0].path);
-  expect(stylesheetData.content).toBe(stylesheetContent);
+  await umbracoApi.stylesheet.doesHaveContent(stylesheetData, stylesheetContent);
   await umbracoUi.stylesheet.openCaretButtonForName(stylesheetFolderName);
   await umbracoUi.stylesheet.isStylesheetRootTreeItemVisible(stylesheetName, true, false);
 });
@@ -150,7 +150,7 @@ test('can create a stylesheet in a folder in a folder', async ({umbracoApi, umbr
   const stylesheetChildren = await umbracoApi.stylesheet.getChildren('/' + stylesheetFolderName + '/' + childFolderName);
   expect(stylesheetChildren[0].path).toBe('/' + stylesheetFolderName + '/' + childFolderName + '/' + stylesheetName);
   const stylesheetData = await umbracoApi.stylesheet.get(stylesheetChildren[0].path);
-  expect(stylesheetData.content).toBe(stylesheetContent);
+  await umbracoApi.stylesheet.doesHaveContent(stylesheetData, stylesheetContent);
   await umbracoUi.stylesheet.openCaretButtonForName(childFolderName);
   await umbracoUi.stylesheet.isStylesheetRootTreeItemVisible(stylesheetName, true, false);
 });
@@ -169,4 +169,7 @@ test('cannot delete non-empty folder', {tag: '@release'}, async ({umbracoApi, um
 
   //Assert
   await umbracoUi.stylesheet.doesErrorNotificationHaveText(NotificationConstantHelper.error.notEmpty);
+  // The notification alone would also be satisfied by a bug that deleted the folder and then
+  // errored - the point of the test is that the folder survives.
+  expect(await umbracoApi.stylesheet.doesFolderExist(stylesheetFolderName)).toBeTruthy();
 });

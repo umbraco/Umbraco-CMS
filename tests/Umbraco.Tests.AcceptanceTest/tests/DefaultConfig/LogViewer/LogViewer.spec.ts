@@ -68,8 +68,7 @@ test('can create a saved search', {tag: '@smoke'}, async ({umbracoApi, umbracoUi
   await umbracoApi.logViewer.deleteSavedSearch(searchName);
 });
 
-// TODO: unskip, currently flaky
-test.skip('can create a complex saved search', async ({umbracoApi, umbracoUi}) => {
+test.skip('can create a complex saved search', {annotation: {type: 'blocked', description: "TODO: unskip, currently flaky"}}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const searchName = 'ComplexTest';
   const search = "@Level='Fatal' or @Level='Error' or @Level='Warning'";
@@ -136,8 +135,7 @@ test('can expand a log entry', async ({umbracoUi}) => {
   await umbracoUi.logViewer.doesDetailedLogHaveText('The token');
 });
 
-// Currently only works if the user is using the locale 'en-US' otherwise it will fail
-test.skip('can sort logs by timestamp', async ({umbracoApi, umbracoUi}) => {
+test.skip('can sort logs by timestamp', {annotation: {type: 'blocked', description: "Currently only works if the user is using the locale 'en-US' otherwise it will fail"}}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const locale = 'en-US';
   const options: Intl.DateTimeFormatOptions = {
@@ -163,8 +161,7 @@ test.skip('can sort logs by timestamp', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.logViewer.doesFirstLogHaveTimestamp(lastLogTimestamp);
 });
 
-// Will fail if there is not enough logs.
-test.skip('can use pagination', async ({umbracoApi, umbracoUi}) => {
+test.skip('can use pagination', {annotation: {type: 'blocked', description: "Will fail if there is not enough logs."}}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const secondPageLogs = await umbracoApi.logViewer.getLog(100, 100, 'Ascending');
   const firstLogOnSecondPage = secondPageLogs.items[0].renderedMessage;

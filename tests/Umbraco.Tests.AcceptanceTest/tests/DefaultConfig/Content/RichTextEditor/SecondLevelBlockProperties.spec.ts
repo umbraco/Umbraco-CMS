@@ -109,7 +109,7 @@ test('can publish a rich text editor with a block grid editor', async ({umbracoA
   // Assert
   // Asserts that the value in the BlockGrid is as expected
   const documentData = await umbracoApi.document.getByName(contentName);
-  expect(documentData.values[0].value.blocks.contentData[0].values[0].value.contentData[0].values[0].value).toContain(textStringValue);
+  expect(umbracoApi.document.getOnlyPropertyValue(documentData).blocks.contentData[0].values[0].value.contentData[0].values[0].value).toContain(textStringValue);
 
   // Clean
   await umbracoApi.dataType.ensureNameNotExists(blockGridDataTypeName);
@@ -151,7 +151,7 @@ test('can publish a rich text editor with a block list editor', async ({umbracoA
   // Assert
   // Asserts that the value in the BlockGrid is as expected
   const documentData = await umbracoApi.document.getByName(contentName);
-  expect(documentData.values[0].value.blocks.contentData[0].values[0].value.contentData[0].values[0].value).toContain(textStringValue);
+  expect(umbracoApi.document.getOnlyPropertyValue(documentData).blocks.contentData[0].values[0].value.contentData[0].values[0].value).toContain(textStringValue);
 
   // Clean
   await umbracoApi.dataType.ensureNameNotExists(blockListDataTypeName);

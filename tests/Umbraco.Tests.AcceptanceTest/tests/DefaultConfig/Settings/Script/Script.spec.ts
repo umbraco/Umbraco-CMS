@@ -45,7 +45,7 @@ test('can create a script with content', async ({umbracoApi, umbracoUi}) => {
   // Assert
   expect(await umbracoApi.script.doesNameExist(scriptName)).toBeTruthy();
   const scriptData = await umbracoApi.script.getByName(scriptName);
-  expect(scriptData.content).toBe(scriptContent);
+  await umbracoApi.script.doesHaveContent(scriptData, scriptContent);
   await umbracoUi.script.isScriptRootTreeItemVisible(scriptName);
 });
 
@@ -62,7 +62,7 @@ test('can update a script', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => 
 
   // Assert
   const updatedScript = await umbracoApi.script.get(scriptPath);
-  expect(updatedScript.content).toBe(updatedScriptContent);
+  await umbracoApi.script.doesHaveContent(updatedScript, updatedScriptContent);
 });
 
 test('can delete a script', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {

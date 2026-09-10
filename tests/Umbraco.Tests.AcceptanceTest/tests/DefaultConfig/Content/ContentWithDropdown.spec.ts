@@ -37,8 +37,8 @@ for (const dataTypeName of dataTypeNames) {
     // Assert
     expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
     const contentData = await umbracoApi.document.getByName(contentName);
-    expect(contentData.variants[0].state).toBe(expectedState);
-    expect(contentData.values).toEqual([]);
+    await umbracoApi.document.doesVariantHaveState(contentData, expectedState);
+    await umbracoApi.document.doesHaveValueCount(contentData, 0);
   });
 
   test(`can publish content with the ${dataTypeName} data type`, async ({umbracoApi, umbracoUi}) => {
@@ -55,8 +55,8 @@ for (const dataTypeName of dataTypeNames) {
 
     // Assert
     const contentData = await umbracoApi.document.getByName(contentName);
-    expect(contentData.variants[0].state).toBe(expectedState);
-    expect(contentData.values).toEqual([]);
+    await umbracoApi.document.doesVariantHaveState(contentData, expectedState);
+    await umbracoApi.document.doesHaveValueCount(contentData, 0);
   });
 
   test(`can create content with the custom ${dataTypeName} data type`, async ({umbracoApi, umbracoUi}) => {
@@ -76,8 +76,7 @@ for (const dataTypeName of dataTypeNames) {
 
     // Assert
     const contentData = await umbracoApi.document.getByName(contentName);
-    expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(customDataTypeName));
-    expect(contentData.values[0].value).toEqual(selectedOptions);
+    await umbracoApi.document.doesPropertyHaveValue(contentData, AliasHelper.toAlias(customDataTypeName), selectedOptions);
   });
 }
 
@@ -103,6 +102,5 @@ test('can not publish a mandatory dropdown with an empty value', {tag: '@release
 
   // Assert
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(customDataTypeName));
-  expect(contentData.values[0].value).toEqual([optionValues[0]]);
+  await umbracoApi.document.doesPropertyHaveValue(contentData, AliasHelper.toAlias(customDataTypeName), [optionValues[0]]);
 });

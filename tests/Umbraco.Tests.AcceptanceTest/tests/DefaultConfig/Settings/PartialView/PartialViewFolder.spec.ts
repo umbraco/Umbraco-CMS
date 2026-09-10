@@ -173,4 +173,7 @@ test('cannot delete non-empty folder', {tag: '@release'}, async ({umbracoApi, um
 
   // Assert
   await umbracoUi.partialView.doesErrorNotificationHaveText(NotificationConstantHelper.error.notEmpty);
+  // The notification alone would also be satisfied by a bug that deleted the folder and then
+  // errored - the point of the test is that the folder survives.
+  expect(await umbracoApi.partialView.doesFolderExist(folderName)).toBeTruthy();
 });

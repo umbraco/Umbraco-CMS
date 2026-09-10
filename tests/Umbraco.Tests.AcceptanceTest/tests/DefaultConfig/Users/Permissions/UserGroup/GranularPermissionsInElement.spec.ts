@@ -143,8 +143,7 @@ test('can update a specific element with update permission enabled', async ({umb
   await umbracoApi.element.ensureNameNotExists(newElementName);
 });
 
-// Currently only have success notification but no actual duplication happening
-test.skip('can duplicate a specific element with duplicate permission enabled', async ({umbracoApi, umbracoUi}) => {
+test.skip('can duplicate a specific element with duplicate permission enabled', {annotation: {type: 'blocked', description: "Currently only have success notification but no actual duplication happening"}}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const duplicatedElementName = firstElementName + ' (1)';
   userGroupId = await umbracoApi.userGroup.createUserGroupWithDuplicatePermissionForSpecificElement(userGroupName, firstElementId);

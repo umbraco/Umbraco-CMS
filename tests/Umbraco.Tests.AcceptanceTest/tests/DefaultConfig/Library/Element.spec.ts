@@ -35,7 +35,7 @@ test('can create empty element', async ({umbracoApi, umbracoUi}) => {
   // Assert
   expect(await umbracoApi.element.doesNameExist(elementName)).toBeTruthy();
   const elementData = await umbracoApi.element.getByName(elementName);
-  expect(elementData.variants[0].state).toBe(expectedState);
+  await umbracoApi.element.doesVariantHaveState(elementData, expectedState);
   await umbracoUi.library.isElementInTreeVisible(elementName);
   // Verify audit trail
   await umbracoUi.library.goToElementWithName(elementName);
@@ -63,7 +63,7 @@ test('can save and publish empty element', async ({umbracoApi, umbracoUi}) => {
   // Assert
   expect(await umbracoApi.element.doesNameExist(elementName)).toBeTruthy();
   const elementData = await umbracoApi.element.getByName(elementName);
-  expect(elementData.variants[0].state).toBe(expectedState);
+  await umbracoApi.element.doesVariantHaveState(elementData, expectedState);
   // Verify audit trail
   await umbracoUi.library.goToElementWithName(elementName);
   await umbracoUi.library.clickInfoTab();
@@ -89,7 +89,7 @@ test('can create element', async ({umbracoApi, umbracoUi}) => {
   // Assert
   expect(await umbracoApi.element.doesNameExist(elementName)).toBeTruthy();
   const elementData = await umbracoApi.element.getByName(elementName);
-  expect(elementData.values[0].value).toBe(elementText);
+  expect(umbracoApi.element.getOnlyPropertyValue(elementData)).toBe(elementText);
   // Verify audit trail
   await umbracoUi.library.goToElementWithName(elementName);
   await umbracoUi.library.clickInfoTab();
@@ -115,7 +115,7 @@ test('can rename element', async ({umbracoApi, umbracoUi}) => {
 
   // Assert
   const updatedElementData = await umbracoApi.element.get(elementId);
-  expect(updatedElementData.variants[0].name).toEqual(elementName);
+  await umbracoApi.element.doesVariantHaveName(updatedElementData, elementName);
   // Verify audit trail
   await umbracoUi.library.clickInfoTab();
   await umbracoUi.library.doesHistoryHaveCount(2);
@@ -139,7 +139,7 @@ test('can update element', async ({umbracoApi, umbracoUi}) => {
 
   // Assert
   const updatedElementData = await umbracoApi.element.getByName(elementName);
-  expect(updatedElementData.values[0].value).toBe(elementText);
+  expect(umbracoApi.element.getOnlyPropertyValue(updatedElementData)).toBe(elementText);
   // Verify audit trail
   await umbracoUi.library.clickInfoTab();
   await umbracoUi.library.doesHistoryHaveCount(2);
@@ -198,7 +198,7 @@ test('can duplicate a element node to root', async ({umbracoApi, umbracoUi}) => 
   await umbracoUi.library.isElementInTreeVisible(duplicatedElementName);
   const elementData = await umbracoApi.element.getByName(elementName);
   const duplicatedElementData = await umbracoApi.element.getByName(duplicatedElementName);
-  expect(elementData.values[0].value).toEqual(duplicatedElementData.values[0].value);
+  expect(umbracoApi.element.getOnlyPropertyValue(elementData)).toEqual(duplicatedElementData.values[0].value);
   // Verify audit trail on the source element
   await umbracoUi.library.goToElementWithName(elementName);
   await umbracoUi.library.clickInfoTab();

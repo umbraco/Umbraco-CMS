@@ -182,9 +182,7 @@ test('can fetch a media item by its path', async ({umbracoApi}) => {
   await umbracoApi.media.ensureNameNotExists(rootArticleName);  
 });
 
-// Skip this because it will return 404 error if the path includes # or ?
-// Issue link: https://github.com/umbraco/Umbraco-CMS/issues/20024
-test.skip('can fetch a media item by its path with special characters', async ({umbracoApi}) => {
+test.skip('can fetch a media item by its path with special characters', {annotation: {type: 'issue', description: "Skip this because it will return 404 error if the path includes # or ? Issue link: https://github.com/umbraco/Umbraco-CMS/issues/20024"}}, async ({umbracoApi}) => {
   // Arrange
   const mediaTypeName = 'Image';
   // Create an image item at root level and its name has special characters

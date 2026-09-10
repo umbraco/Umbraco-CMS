@@ -84,9 +84,7 @@ test('can update hide anchor/query string input', async ({umbracoApi, umbracoUi}
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'hideAnchor', true)).toBeTruthy();
 });
 
-// TODO: Remove skip when the front-end is ready. Currently you still can update the minimum greater than the maximum.
-// Issue link: https://github.com/umbraco/Umbraco-CMS/issues/17509
-test.skip('cannot update the minimum number of items greater than the maximum', async ({umbracoApi, umbracoUi}) => {
+test.skip('cannot update the minimum number of items greater than the maximum', {annotation: {type: 'issue', description: "TODO: Remove skip when the front-end is ready. Currently you still can update the minimum greater than the maximum. Issue link: https://github.com/umbraco/Umbraco-CMS/issues/17509"}}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const minimumValue = 5;
   const maximumValue = 2;
@@ -113,9 +111,8 @@ test('the default configuration is correct', async ({umbracoApi, umbracoUi}) => 
   await umbracoUi.dataType.doesPropertyEditorHaveAlias(editorAlias);
   await umbracoUi.dataType.doesPropertyEditorHaveUiAlias(editorUiAlias);
   const dataTypeDefaultData = await umbracoApi.dataType.getByName(dataTypeName);
-  expect(dataTypeDefaultData.editorAlias).toBe(editorAlias);
-  expect(dataTypeDefaultData.editorUiAlias).toBe(editorUiAlias);
-  expect(dataTypeDefaultData.values).toEqual([]);
+  await umbracoApi.dataType.doesDataTypeHaveEditors(dataTypeDefaultData, editorAlias, editorUiAlias);
+  await umbracoApi.dataType.doesHaveValueCount(dataTypeDefaultData, 0);
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(dataTypeName, 'minNumber')).toBeFalsy();
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(dataTypeName, 'maxNumber')).toBeFalsy();
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(dataTypeName, 'ignoreUserStartNodes')).toBeFalsy();

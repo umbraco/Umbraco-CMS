@@ -154,7 +154,7 @@ test('can see Allow at Root toggle in Structure tab after toggling off Element T
   await umbracoUi.documentType.isAddCollectionButtonVisible(true);
   await umbracoUi.documentType.doesElementTypeNotApplicableMessageExist(false);
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
-  expect(documentTypeData.isElement).toBeFalsy();
+  await umbracoApi.documentType.isElementType(documentTypeData, false);
 });
 
 test('cannot see element type not applicable message in Structure tab for a Document Type', async ({umbracoApi, umbracoUi}) => {

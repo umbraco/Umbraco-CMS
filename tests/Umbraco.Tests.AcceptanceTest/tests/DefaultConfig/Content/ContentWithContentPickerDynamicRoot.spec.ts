@@ -60,6 +60,6 @@ test('can save content from another root node using content root dynamic root', 
 
   // Assert
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values[0].value[0]['unique']).toEqual(firstRootContentId);
-  expect(contentData.values[0].value[0]['type']).toEqual('document');
+  expect(umbracoApi.document.getOnlyPropertyValue(contentData)[0]['unique']).toEqual(firstRootContentId);
+  expect(umbracoApi.document.getOnlyPropertyValue(contentData)[0]['type']).toEqual('document');
 });

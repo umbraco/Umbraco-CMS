@@ -41,12 +41,11 @@ test('can create content with the media picker data type', {tag: '@smoke'}, asyn
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.variants[0].state).toBe(expectedState);
-  expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
-  expect(contentData.values[0].value[0].mediaKey).toEqual(mediaFileId);
-  expect(contentData.values[0].value[0].mediaTypeAlias).toEqual(mediaTypeName);
-  expect(contentData.values[0].value[0].focalPoint).toBeNull();
-  expect(contentData.values[0].value[0].crops).toEqual([]);
+  await umbracoApi.document.doesVariantHaveState(contentData, expectedState);
+  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(dataTypeName))[0].mediaKey).toEqual(mediaFileId);
+  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(dataTypeName))[0].mediaTypeAlias).toEqual(mediaTypeName);
+  expect(umbracoApi.document.getOnlyPropertyValue(contentData)[0].focalPoint).toBeNull();
+  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(dataTypeName))[0].crops).toEqual([]);
 });
 
 test('can publish content with the media picker data type', async ({umbracoApi, umbracoUi}) => {
@@ -69,12 +68,11 @@ test('can publish content with the media picker data type', async ({umbracoApi, 
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.variants[0].state).toBe(expectedState);
-  expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
-  expect(contentData.values[0].value[0].mediaKey).toEqual(mediaFileId);
-  expect(contentData.values[0].value[0].mediaTypeAlias).toEqual(mediaTypeName);
-  expect(contentData.values[0].value[0].focalPoint).toBeNull();
-  expect(contentData.values[0].value[0].crops).toEqual([]);
+  await umbracoApi.document.doesVariantHaveState(contentData, expectedState);
+  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(dataTypeName))[0].mediaKey).toEqual(mediaFileId);
+  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(dataTypeName))[0].mediaTypeAlias).toEqual(mediaTypeName);
+  expect(umbracoApi.document.getOnlyPropertyValue(contentData)[0].focalPoint).toBeNull();
+  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(dataTypeName))[0].crops).toEqual([]);
 });
 
 test('can remove a media picker in the content', async ({umbracoApi, umbracoUi}) => {
@@ -93,7 +91,7 @@ test('can remove a media picker in the content', async ({umbracoApi, umbracoUi})
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values).toEqual([]);
+  await umbracoApi.document.doesHaveValueCount(contentData, 0);
 });
 
 test('can limit the media picker in the content by setting the start node', async ({umbracoApi, umbracoUi}) => {
@@ -147,11 +145,10 @@ test('can not publish a mandatory media picker with an empty value', async ({umb
 
   // Assert
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
-  expect(contentData.values[0].value[0].mediaKey).toEqual(mediaFileId);
-  expect(contentData.values[0].value[0].mediaTypeAlias).toEqual(mediaTypeName);
-  expect(contentData.values[0].value[0].focalPoint).toBeNull();
-  expect(contentData.values[0].value[0].crops).toEqual([]);
+  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(dataTypeName))[0].mediaKey).toEqual(mediaFileId);
+  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(dataTypeName))[0].mediaTypeAlias).toEqual(mediaTypeName);
+  expect(umbracoApi.document.getOnlyPropertyValue(contentData)[0].focalPoint).toBeNull();
+  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(dataTypeName))[0].crops).toEqual([]);
 });
 
 // This is a test for the regression issue #10431

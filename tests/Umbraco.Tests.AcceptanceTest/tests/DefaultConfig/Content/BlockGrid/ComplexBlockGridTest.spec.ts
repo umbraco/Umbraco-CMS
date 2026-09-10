@@ -118,7 +118,7 @@ test('can update property value nested in a block grid area with an RTE with a b
   // Assert
   // Checks if published
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.variants[0].state).toBe('Published');
+  await umbracoApi.document.doesVariantHaveState(contentData, 'Published');
   // Checks if the textstring block has the correct value after reloading the page
   await umbracoUi.reloadPage();
   await umbracoUi.content.clickBlockElementInRTEWithName(blockListElementTypeName);

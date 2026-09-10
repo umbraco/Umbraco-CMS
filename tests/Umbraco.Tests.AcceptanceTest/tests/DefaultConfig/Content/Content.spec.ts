@@ -34,7 +34,7 @@ test('can create empty content', async ({umbracoApi, umbracoUi}) => {
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.variants[0].state).toBe(expectedState);
+  await umbracoApi.document.doesVariantHaveState(contentData, expectedState);
 });
 
 test('can save and publish empty content', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
@@ -54,7 +54,7 @@ test('can save and publish empty content', {tag: '@smoke'}, async ({umbracoApi, 
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.variants[0].state).toBe(expectedState);
+  await umbracoApi.document.doesVariantHaveState(contentData, expectedState);
 });
 
 test('can create content', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
@@ -75,7 +75,7 @@ test('can create content', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values[0].value).toBe(contentText);
+  expect(umbracoApi.document.getOnlyPropertyValue(contentData)).toBe(contentText);
   // Verify audit trail
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickInfoTab();
@@ -102,7 +102,7 @@ test('can rename content', async ({umbracoApi, umbracoUi}) => {
 
   // Assert
   const updatedContentData = await umbracoApi.document.get(contentId);
-  expect(updatedContentData.variants[0].name).toEqual(contentName);
+  await umbracoApi.document.doesVariantHaveName(updatedContentData, contentName);
   // Verify audit trail
   await umbracoUi.content.doesHistoryHaveCount(2);
   await umbracoUi.content.doesHistoryItemHaveTag(ConstantHelper.auditTrailTypes.save);
@@ -127,8 +127,8 @@ test('can update content', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
 
   // Assert
   const updatedContentData = await umbracoApi.document.get(contentId);
-  expect(updatedContentData.variants[0].name).toEqual(contentName);
-  expect(updatedContentData.values[0].value).toBe(contentText);
+  await umbracoApi.document.doesVariantHaveName(updatedContentData, contentName);
+  expect(umbracoApi.document.getOnlyPropertyValue(updatedContentData)).toBe(contentText);
   // Verify audit trail
   await umbracoUi.content.clickInfoTab();
   await umbracoUi.content.doesHistoryHaveCount(2);
@@ -154,7 +154,7 @@ test('can publish invariant content node', async ({umbracoApi, umbracoUi}) => {
   // Assert
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.variants[0].state).toBe('Published');
+  await umbracoApi.document.doesVariantHaveState(contentData, 'Published');
   // Verify audit trail
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickInfoTab();
@@ -181,7 +181,7 @@ test('can unpublish content', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) =
   // Assert
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.unpublished);
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.variants[0].state).toBe('Draft');
+  await umbracoApi.document.doesVariantHaveState(contentData, 'Draft');
   // Verify audit trail
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickInfoTab();
@@ -207,7 +207,7 @@ test('can publish variant content node', async ({umbracoApi, umbracoUi}) => {
   // Assert
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.variants[0].state).toBe('Published');
+  await umbracoApi.document.doesVariantHaveState(contentData, 'Published');
 });
 
 test('can duplicate a content node to root', async ({umbracoApi, umbracoUi}) => {
@@ -234,7 +234,7 @@ test('can duplicate a content node to root', async ({umbracoApi, umbracoUi}) => 
   await umbracoUi.content.isContentInTreeVisible(duplicatedContentName);
   const contentData = await umbracoApi.document.getByName(contentName);
   const duplicatedContentData = await umbracoApi.document.getByName(duplicatedContentName);
-  expect(contentData.values[0].value).toEqual(duplicatedContentData.values[0].value);
+  expect(umbracoApi.document.getOnlyPropertyValue(contentData)).toEqual(duplicatedContentData.values[0].value);
   // Verify audit trail
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickInfoTab();

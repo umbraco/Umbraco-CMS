@@ -49,8 +49,8 @@ test('can create content with content picker with allowed types', async ({umbrac
 
   // Assert
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values[0].value[0]['unique']).toEqual(allowedContentPickerId);
-  expect(contentData.values[0].value[0]['type']).toEqual('document');
+  expect(umbracoApi.document.getOnlyPropertyValue(contentData)[0]['unique']).toEqual(allowedContentPickerId);
+  expect(umbracoApi.document.getOnlyPropertyValue(contentData)[0]['type']).toEqual('document');
 
   // Clean
   await umbracoApi.document.ensureNameNotExists(allowedContentPickerName);
@@ -89,8 +89,8 @@ test('can search and see only allowed content types', async ({umbracoApi, umbrac
 
   // Assert
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values[0].value[0]['unique']).toEqual(allowedContentPickerId);
-  expect(contentData.values[0].value[0]['type']).toEqual('document');
+  expect(umbracoApi.document.getOnlyPropertyValue(contentData)[0]['unique']).toEqual(allowedContentPickerId);
+  expect(umbracoApi.document.getOnlyPropertyValue(contentData)[0]['type']).toEqual('document');
 
   // Clean
   await umbracoApi.document.ensureNameNotExists(allowedContentPickerName);
@@ -128,8 +128,8 @@ test('can search and see only allowed media types', async ({umbracoApi, umbracoU
 
   // Assert
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values[0].value[0]['unique']).toEqual(allowedMediaPickerId);
-  expect(contentData.values[0].value[0]['type']).toEqual('media');
+  expect(umbracoApi.document.getOnlyPropertyValue(contentData)[0]['unique']).toEqual(allowedMediaPickerId);
+  expect(umbracoApi.document.getOnlyPropertyValue(contentData)[0]['type']).toEqual('media');
 
   // Clean
   await umbracoApi.media.ensureNameNotExists(allowedMediaPickerName);
@@ -180,6 +180,6 @@ test('can search and see only allowed member types', async ({umbracoApi, umbraco
   await umbracoUi.content.clickChooseModalButton();
   await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values[0].value[0]['unique']).toEqual(allowedTestMemberId);
-  expect(contentData.values[0].value[0]['type']).toEqual('member');
+  expect(umbracoApi.document.getOnlyPropertyValue(contentData)[0]['unique']).toEqual(allowedTestMemberId);
+  expect(umbracoApi.document.getOnlyPropertyValue(contentData)[0]['type']).toEqual('member');
 });

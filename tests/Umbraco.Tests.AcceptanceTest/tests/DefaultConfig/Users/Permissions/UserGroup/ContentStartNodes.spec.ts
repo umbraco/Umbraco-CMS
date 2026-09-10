@@ -57,8 +57,7 @@ test('can see root start node and children', async ({umbracoApi, umbracoUi}) => 
   await umbracoUi.content.isChildContentInTreeVisible(rootDocumentName, childDocumentTwoName);
 });
 
-// Skip this test due to this issue: https://github.com/umbraco/Umbraco-CMS/issues/20505
-test.skip('can see parent of start node but not access it', async ({umbracoApi, umbracoUi}) => {
+test.skip('can see parent of start node but not access it', {annotation: {type: 'issue', description: "Skip this test due to this issue: https://github.com/umbraco/Umbraco-CMS/issues/20505"}}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithDocumentStartNode(userGroupName, childDocumentOneId);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);

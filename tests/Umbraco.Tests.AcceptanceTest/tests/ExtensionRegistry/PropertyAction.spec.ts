@@ -54,5 +54,5 @@ test('can write value to textstring editor using write property action', async (
 
   // Assert
   const updatedContentData = await umbracoApi.document.get(contentId);
-  expect(updatedContentData.values[0].value).toBe(writeTextValue);
+  expect(umbracoApi.document.getOnlyPropertyValue(updatedContentData)).toBe(writeTextValue);
 });

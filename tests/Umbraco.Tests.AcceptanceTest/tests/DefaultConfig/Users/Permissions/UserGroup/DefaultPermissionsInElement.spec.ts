@@ -73,8 +73,7 @@ test('can not see element in tree with read permission disabled', async ({umbrac
   await umbracoUi.library.doesElementWorkspaceHaveText('Access denied');
 });
 
-// Currently there is no 'Save' button in the UI when creating an element
-test.skip('can create element with create permission enabled', async ({umbracoApi, umbracoUi}) => {
+test.skip('can create element with create permission enabled', {annotation: {type: 'blocked', description: "Currently there is no 'Save' button in the UI when creating an element"}}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithCreateElementPermission(userGroupName);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
@@ -293,7 +292,7 @@ test('can duplicate element with duplicate permission enabled', async ({umbracoA
   await umbracoUi.library.isElementInTreeVisible(duplicatedElementName);
   const originalElement = await umbracoApi.element.getByName(elementName);
   const duplicatedElement = await umbracoApi.element.getByName(duplicatedElementName);
-  expect(originalElement.values[0].value).toEqual(duplicatedElement.values[0].value);
+  expect(umbracoApi.element.getOnlyPropertyValue(originalElement)).toEqual(duplicatedElement.values[0].value);
 
   // Clean
   await umbracoApi.element.ensureNameNotExists(duplicatedElementName);

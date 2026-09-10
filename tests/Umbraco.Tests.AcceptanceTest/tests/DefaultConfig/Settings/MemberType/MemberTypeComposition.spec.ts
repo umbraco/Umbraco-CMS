@@ -34,7 +34,7 @@ test('can add a composition to a member type', {tag: '@smoke'}, async ({umbracoA
 
   // Assert
   const memberTypeData = await umbracoApi.memberType.getByName(memberTypeName);
-  expect(memberTypeData.compositions.length).toBe(1);
+  await umbracoApi.memberType.doesHaveCompositionCount(memberTypeData, 1);
   expect(memberTypeData.compositions[0].memberType.id).toBe(compositionMemberTypeId);
 });
 
