@@ -48,6 +48,7 @@ public class CreateDocumentBlueprintFromDocumentController : DocumentBlueprintCo
     [HttpPost("from-document")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [EndpointSummary("Creates a document blueprint from an existing document.")]
     [EndpointDescription("Creates a new document blueprint based on an existing document identified by the provided Id.")]
