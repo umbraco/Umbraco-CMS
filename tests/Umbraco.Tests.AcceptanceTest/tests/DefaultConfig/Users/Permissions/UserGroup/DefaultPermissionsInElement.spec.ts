@@ -69,7 +69,7 @@ test('can not see element in tree with read permission disabled', async ({umbrac
 
   // Assert
   await umbracoUi.library.isElementInTreeVisible(elementName, false);
-  await umbracoUi.page.goto(`${umbracoUi.page.url()}/workspace/element/edit/${elementId}`);
+  await umbracoUi.goToEntityWorkspace('element', elementId);
   await umbracoUi.library.doesElementWorkspaceHaveText('Access denied');
 });
 

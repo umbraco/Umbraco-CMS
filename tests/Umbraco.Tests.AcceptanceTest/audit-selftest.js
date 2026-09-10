@@ -137,6 +137,27 @@ const CASES = [
     files: {'tests/DefaultConfig/g.spec.ts': [`await umbracoUi.page.goto('/x');`]},
   },
   {
+    // Any reach for `page` counts, not a chosen list of its methods - `url()` and `reload()`
+    // were both invisible while `goto` next to them was flagged.
+    rule: 'helperPageInSpec', expect: 3, label: 'any page member, not just a listed few',
+    files: {
+      'tests/DefaultConfig/g2.spec.ts': [
+        `const u = umbracoUi.page.url();`,
+        `await umbracoUi.page.reload();`,
+        `await umbracoApi.page.waitForTimeout(500);`,
+      ],
+    },
+  },
+  {
+    rule: 'helperPageInSpec', expect: 0, label: 'a helper method that wraps page is the fix, not a finding',
+    files: {
+      'tests/DefaultConfig/g3.spec.ts': [
+        `const u = umbracoUi.getCurrentUrl();`,
+        `await umbracoUi.goToEntityWorkspace('document', id);`,
+      ],
+    },
+  },
+  {
     rule: 'hardcodedEndpoint', expect: 1,
     files: {'tests/DefaultConfig/h.spec.ts': [`resp.url().includes('/umbraco/management/api/v1/telemetry/level')`]},
   },
@@ -413,6 +434,40 @@ const CASES = [
   {
     rule: 'rawClickInLib', expect: 0, label: 'this.click() is the wrapper, not a raw click',
     files: {'lib/helpers/U2.ts': [`    await this.click(this.saveBtn);`]},
+  },
+  {
+    // The wrapper's whole value is the visibility wait, so a click that already has one is fine.
+    rule: 'rawClickInLib', expect: 0, label: 'a preceding visibility wait on the same receiver',
+    files: {
+      'lib/helpers/U3.ts': [
+        `    await expect(this.saveBtn).toBeVisible();`,
+        `    await this.saveBtn.click();`,
+      ],
+    },
+  },
+  {
+    // this.click() takes only {force, timeout}, so a middle-click has no wrapper to use.
+    rule: 'rawClickInLib', expect: 0, label: 'a click option the wrapper cannot express',
+    files: {
+      'lib/helpers/U4.ts': [
+        `    await this.waitForVisible(this.editor);`,
+        `    await this.editor.click({button: 'middle'});`,
+      ],
+    },
+  },
+  {
+    rule: 'rawClickInLib', expect: 0, label: 'a DOM click inside evaluate is not a Playwright click',
+    files: {'lib/helpers/U5.ts': [`    await locator.evaluate((el: HTMLElement) => el.click());`]},
+  },
+  {
+    // The wait must name the same receiver - a wait on something else is not cover.
+    rule: 'rawClickInLib', expect: 1, label: 'a visibility wait on a different element is not cover',
+    files: {
+      'lib/helpers/U6.ts': [
+        `    await expect(this.modal).toBeVisible();`,
+        `    await this.saveBtn.click();`,
+      ],
+    },
   },
   {
     // asserts internally + no await: the assertions still run, but a failure becomes an

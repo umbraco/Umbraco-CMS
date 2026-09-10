@@ -454,7 +454,7 @@ test.describe('fetch content items from a query', () => {
       const childId = await umbracoApi.document.createDefaultDocumentWithParent(childPublishInvariantContentPrefix + i, invariantDocTypeId, publishInvariantParentId);
       await umbracoApi.document.publish(childId);
     }
-    await umbracoApi.page.waitForTimeout(ConstantHelper.wait.medium); // Wait is needed to ensure content is indexed
+    await umbracoApi.waitForTimeout(ConstantHelper.wait.medium); // Wait is needed to ensure content is indexed
     const parentContentData = await umbracoApi.document.getByName(parentContentName);
     const parentContentId = parentContentData.id;
     const fetch = 'children:' + parentContentId;
@@ -480,7 +480,7 @@ test.describe('fetch content items from a query', () => {
     const childContentName = childPublishInvariantContentPrefix + '1';
     const childId = await umbracoApi.document.createDefaultDocumentWithParent(childContentName, invariantDocTypeId, publishInvariantParentId);
     await umbracoApi.document.publish(childId);
-    await umbracoApi.page.waitForTimeout(ConstantHelper.wait.long); // Wait is needed to ensure content is indexed
+    await umbracoApi.waitForTimeout(ConstantHelper.wait.long); // Wait is needed to ensure content is indexed
     const fetch = 'ancestors:' + childId;
 
     // Act
@@ -503,7 +503,7 @@ test.describe('fetch content items from a query', () => {
     const contentType = collectionDocumentType;
     const contentTypeData = await umbracoApi.documentType.getByName(contentType);
     const filter = 'contentType:' + contentTypeData.alias;
-    await umbracoApi.page.waitForTimeout(ConstantHelper.wait.medium); // Wait is needed to ensure content is indexed
+    await umbracoApi.waitForTimeout(ConstantHelper.wait.medium); // Wait is needed to ensure content is indexed
 
     // Act
     const contentItems = await umbracoApi.contentDeliveryApi.getContentItemsFromAQuery(undefined, undefined, filter);
@@ -523,7 +523,7 @@ test.describe('fetch content items from a query', () => {
       const childId = await umbracoApi.document.createDefaultDocumentWithParent(childPublishInvariantContentPrefix + i, invariantDocTypeId, publishInvariantParentId);
       await umbracoApi.document.publish(childId);
     }
-    await umbracoApi.page.waitForTimeout(ConstantHelper.wait.medium); // Wait is needed to ensure content is indexed
+    await umbracoApi.waitForTimeout(ConstantHelper.wait.medium); // Wait is needed to ensure content is indexed
     const sort = 'name:desc';
     const filter = 'name:' + 'Child';
 
@@ -553,7 +553,7 @@ test.describe('fetch content items from a query', () => {
       const childId = await umbracoApi.document.createDefaultDocumentWithParent(childPublishInvariantContentPrefix + i, invariantDocTypeId, publishInvariantParentId);
       await umbracoApi.document.publish(childId);
     }
-    await umbracoApi.page.waitForTimeout(ConstantHelper.wait.medium); // Wait is needed to ensure content is indexed
+    await umbracoApi.waitForTimeout(ConstantHelper.wait.medium); // Wait is needed to ensure content is indexed
     const sort = 'name:asc';
     const filter = 'name:' + 'Child';
     const skip = 0;

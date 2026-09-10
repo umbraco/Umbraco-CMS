@@ -60,13 +60,13 @@ test.skip('can see parent of start node but not access it', {annotation: {type: 
 
   // Assert
   // Get initial URL (should be on library section)
-  const initialUrl = umbracoUi.page.url();
+  const initialUrl = umbracoUi.getCurrentUrl();
 
   await umbracoUi.library.isElementInTreeVisible(rootFolderName);
   await umbracoUi.library.goToElementWithName(rootFolderName);
 
   // Assert - URL should not have changed (no navigation occurred)
-  const currentUrl = umbracoUi.page.url();
+  const currentUrl = umbracoUi.getCurrentUrl();
   expect(currentUrl).toBe(initialUrl);
 
   await umbracoUi.library.openElementCaretButtonForName(rootFolderName);
@@ -85,7 +85,7 @@ test.skip('see no-access view when deep-linking to restricted element', {annotat
 
   // Assert
   await umbracoUi.library.isElementInTreeVisible(rootFolderName);
-  await umbracoUi.page.goto(`${umbracoUi.page.url().replace('/collection', '')}/workspace/element/edit/${childElementOneId!}`);
+  await umbracoUi.goToEntityWorkspace('element', childElementOneId!);
   await umbracoUi.library.doesElementWorkspaceHaveText('Access denied');
 });
 

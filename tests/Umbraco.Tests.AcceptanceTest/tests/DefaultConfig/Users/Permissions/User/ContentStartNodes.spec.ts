@@ -68,13 +68,13 @@ test('can see parent of start node but not access it', async ({umbracoApi, umbra
 
   // Assert
   // Get initial URL (should be on content section)
-  const initialUrl = umbracoUi.page.url();
+  const initialUrl = umbracoUi.getCurrentUrl();
 
   await umbracoUi.content.isContentInTreeVisible(rootDocumentName);
   await umbracoUi.content.goToContentWithName(rootDocumentName, false);
 
   // Assert - URL should not have changed (no navigation occurred)
-  const currentUrl = umbracoUi.page.url();
+  const currentUrl = umbracoUi.getCurrentUrl();
   expect(currentUrl).toBe(initialUrl);
 
   await umbracoUi.content.openContentCaretButtonForName(rootDocumentName);
@@ -93,7 +93,7 @@ test('see no-access view when deep-linking to restricted document', async ({umbr
 
   // Assert
   await umbracoUi.content.isContentInTreeVisible(rootDocumentName);
-  await umbracoUi.page.goto(`${umbracoUi.page.url()}/workspace/document/edit/${rootDocumentId!}`);
+  await umbracoUi.goToEntityWorkspace('document', rootDocumentId!);
   await umbracoUi.content.doesDocumentWorkspaceHaveText('Access denied');
 });
 

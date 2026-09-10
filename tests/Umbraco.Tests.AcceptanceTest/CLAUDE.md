@@ -126,7 +126,14 @@ Fixed sleeps (`page.waitForTimeout(...)`, `ConstantHelper.wait.*`) are the singl
 - **"Save and publish" hits different endpoints for new vs existing content**: a new document publishes via `POST /document/create-and-publish` (201), an existing one via `PUT /document/{id}/update-and-publish` (200), and the workspace then re-fetches `GET /document/{id}/published`. Waiting on the generic `apiEndpoints.document` (status 200) resolves on whichever 200 `/document` response follows the click, so the same helper works for both cases — don't narrow it to a single publish sub-endpoint.
 
 ### `this.click()` vs raw `.click()`
-`BasePage.click()` waits for the element to be visible before clicking. Use it. Reach for a raw locator `.click()` only when you deliberately need to skip that wait.
+`BasePage.click()` awaits `toBeVisible` before clicking. Use it — that wait is the whole point, and a click on an element that has not rendered yet is a flake with a misleading message.
+
+Two cases legitimately click raw, and the audit does not count either:
+
+- **The receiver was already awaited visible.** `hoverAndClick` asserts `toBeVisible` on both locators before clicking, so wrapping it again would add nothing.
+- **The click needs an option `this.click()` cannot express.** It takes only `{force, timeout}`, so a middle-click (`clearTipTapEditor` uses one to avoid opening a block in the RTE) or a modifier click has no wrapper available. Wait for visibility yourself on the line before.
+
+Anything else is counted, at a budget of **0**. What the rule looks for is a click with no visibility wait, not the spelling of the call — it reads back a few lines for a `toBeVisible` or `waitForVisible` naming the same receiver. Its previous version excluded any line matching `locator.click`, which exempted a call purely because its variable was named `locator`, and four of its five findings were false positives while the one real case — a chained `.filter(...).locator(...).click()` with no wait at all — sat in the same list.
 
 ### `force: true` needs the same justification as a sleep
 `force: true` switches off Playwright's actionability checks — visibility, stability, hit-target. That is exactly how "the element is covered", "the element is still animating" and "another element is intercepting the click" stop being failures and become passes. It is a legitimate escape hatch (a known-harmless overlay, a control the browser reports as unstable but is fine to hit), but it is never free.
@@ -565,12 +572,12 @@ already drifted from the real budgets before this column was removed.
 | Commented-out test | gate | invisible to `--list` and every reporter |
 | Deprecation with no removal version | gate | consumer has no runway; we never know when to delete |
 | Builder exit returning an unchecked shape | gate | malformed payload compiles, fails as a 400 |
+| Raw `.click()` in `lib/` with no visibility wait | gate | clicks an element that may not be there yet |
+| Spec reaching through a helper to `page` | gate | navigation and waits belong in a page object |
 | Fixed sleep **without a justification** | debt | see §3 |
 | `force: true` **without a justification** | debt | masks actionability failures |
 | Entity name matched on a substring | debt | strict-mode multi-match on leftover data |
-| Raw `.click()` in `lib/` | debt | skips the visibility wait |
 | Hardcoded `.nth(N)` | debt | bakes in unpromised list order |
-| Spec reaching through a helper to `page` | debt | navigation belongs in a helper |
 | `: any` inside a builder | debt | defeats the payload types downstream |
 | Commented-out assertion in a live test | debt | test asserts less than it appears to |
 | TODO with no version trigger or author | debt | cannot rot out loud, so never gets removed |

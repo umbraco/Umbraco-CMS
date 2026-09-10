@@ -539,4 +539,14 @@ export class ApiHelpers {
       hour12: true,
     });
   }
+
+  /**
+   * Fixed sleep. Prefer waiting on observable state (CLAUDE.md §3); this exists for the cases
+   * where there is none - notably Examine indexing, which the Management API exposes no
+   * completion signal for. Leave a comment at the call site saying what it stands in for.
+   * @param timeout - milliseconds; use ConstantHelper.wait.*
+   */
+  async waitForTimeout(timeout: number) {
+    await this.page.waitForTimeout(timeout);
+  }
 }

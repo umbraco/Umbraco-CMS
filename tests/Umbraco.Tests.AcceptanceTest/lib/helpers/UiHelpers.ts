@@ -144,4 +144,36 @@ export class UiHelpers {
   async goBackPage() {
     await this.page.goBack();
   }
+
+  /**
+   * The browser's current URL. Named `get*` rather than `does*` because it hands a value back
+   * for the caller to assert on (see CLAUDE.md §3).
+   */
+  getCurrentUrl(): string {
+    return this.page.url();
+  }
+
+  /**
+   * Waits until the URL matches - for a redirect the backoffice performs itself, rather than one
+   * a helper triggered.
+   * @param url - glob or regex to match
+   * @param timeout - defaults to Playwright's navigation timeout
+   */
+  async waitForUrl(url: string | RegExp, timeout?: number) {
+    await this.page.waitForURL(url, {timeout});
+  }
+
+  /**
+   * Deep-links to an entity's workspace edit route, relative to the section currently open.
+   *
+   * Used to check that a user without permission gets the no-access view instead of the editor,
+   * which only a direct navigation can exercise. The `/collection` segment is stripped here
+   * because a section whose landing page is a collection (media) carries it in the URL while
+   * content and library do not, and `/collection/workspace/...` is not a route - previously two
+   * of the four call sites stripped it and two did not.
+   */
+  async goToEntityWorkspace(entityType: 'document' | 'element' | 'media', id: string) {
+    const sectionUrl = this.getCurrentUrl().replace(/\/collection$/, '');
+    await this.page.goto(`${sectionUrl}/workspace/${entityType}/edit/${id}`);
+  }
 }

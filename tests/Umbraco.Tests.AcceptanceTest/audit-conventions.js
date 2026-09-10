@@ -22,10 +22,16 @@ const BUDGET = {
   fixedSleep: 81,
   forceClick: 79,
   substringEntityName: 14,
-  rawClickInLib: 5,
+  // Paid off: 5 -> 0. Four were false positives of a rule that keyed on the spelling of the
+  // call rather than on whether visibility was awaited; the fifth was real and is fixed.
+  rawClickInLib: 0,
   literalIndexLocator: 15,
   hardcodedTimeout: 0,
-  helperPageInSpec: 11,
+  // Paid off: 11 -> 0. Broadening the pattern from a list of page methods to any page member
+  // first raised it to 17 (six were invisible, two of them on the lines either side of one it
+  // did flag), then all 17 moved behind helpers: getCurrentUrl, waitForUrl,
+  // goToEntityWorkspace on UiHelpers, and waitForTimeout on ApiHelpers.
+  helperPageInSpec: 0,
   // Rebased 96 -> 73 when the rule was keyed on effect rather than on the presence of an
   // annotation. 36 of the old 96 were DataTypeBuilder subclasses whose `const values:
   // DataTypeValues = []` already catches a misspelled field, where a return type provably
@@ -130,16 +136,62 @@ for (const f of allTs) {
 
 // entity-name locators matched on a substring -> strict-mode multi-match on leftover data
 const ENTITY_EL = /(uui-card-media|uui-card-block-type|uui-card-user|uui-table-row|umb-[a-z-]*-ref|umb-entity-item-ref|umb-tree-item|mediaCardItems|blockTypeCard|entityItem|listViewTableRow|elementCollectionViewTableRow|workspaceUserItemRefs|this\.results)/;
-for (const f of libFiles) read(f).forEach((l, i) => {
-  if (isComment(l)) return;
-  const m = l.match(/hasText:\s*([a-zA-Z_$][A-Za-z0-9_$]*)/);
-  if (m && /Name$|^name$|Item$/.test(m[1]) && ENTITY_EL.test(l)) add('substringEntityName', f, i + 1, `{hasText: ${m[1]}} on an entity element`);
-  // Literal only: `.nth(i)` with a variable index is the legitimate "the i-th block" form (§3).
-  if (/\.nth\(\d+\)/.test(l)) add('literalIndexLocator', f, i + 1, 'hardcoded index');
-  if (/\.click\s*\(/.test(l) && !/this\.(click|doubleClick|rightClick|javascriptClick|hoverAndClick)/.test(l)
-      && !/async (click|doubleClick|rightClick|javascriptClick)/.test(l) && !/locator\.click|page\.mouse/.test(l))
-    add('rawClickInLib', f, i + 1, 'prefer this.click() so visibility is awaited');
-});
+// The point of preferring this.click() is that it awaits visibility first, so what the rule has
+// to detect is a click with no visibility wait - not the spelling of the call. Three shapes are
+// therefore not counted, each of them already satisfying or unable to use the wrapper:
+//
+//   - the receiver was awaited visible in the preceding lines (`await expect(x).toBeVisible()`
+//     or `await this.waitForVisible(x)` naming the same receiver), which is exactly what
+//     this.click() would have done;
+//   - the click passes an option this.click() cannot express - it takes only {force, timeout},
+//     so a middle-click or a modifier click has no wrapper to use;
+//   - it is a DOM click inside `evaluate(...)`, which is not a Playwright click at all.
+//
+// The previous version instead excluded any line matching `locator.click`, which exempted a call
+// purely because its variable happened to be named `locator` - so BasePage.click's own click was
+// exempt by coincidence while hoverAndClick's, three lines after its own toBeVisible, was not.
+// Four of that rule's five findings were false positives.
+const CLICK_OPTS_WRAPPER_LACKS = /\.click\s*\(\s*\{[^}]*\b(button|modifiers|position|clickCount|delay)\s*:/;
+const receiverOf = line => {
+  const at = line.indexOf('.click');
+  if (at < 0) return null;
+  // Walk back over the receiver expression, balancing brackets so a chained call survives.
+  let depth = 0, start = at;
+  for (let k = at - 1; k >= 0; k--) {
+    const c = line[k];
+    if (')]}'.includes(c)) depth++;
+    else if ('([{'.includes(c)) { if (depth === 0) { start = k + 1; break; } depth--; }
+    else if (depth === 0 && /[\s,;=]/.test(c)) { start = k + 1; break; }
+    start = k;
+  }
+  return line.slice(start, at).trim();
+};
+
+for (const f of libFiles) {
+  const ls = read(f);
+  ls.forEach((l, i) => {
+    if (isComment(l)) return;
+    const m = l.match(/hasText:\s*([a-zA-Z_$][A-Za-z0-9_$]*)/);
+    if (m && /Name$|^name$|Item$/.test(m[1]) && ENTITY_EL.test(l)) add('substringEntityName', f, i + 1, `{hasText: ${m[1]}} on an entity element`);
+    // Literal only: `.nth(i)` with a variable index is the legitimate "the i-th block" form (§3).
+    if (/\.nth\(\d+\)/.test(l)) add('literalIndexLocator', f, i + 1, 'hardcoded index');
+
+    if (!/\.click\s*\(/.test(l)) return;
+    if (/this\.(click|doubleClick|rightClick|javascriptClick|hoverAndClick)/.test(l)) return;
+    if (/async (click|doubleClick|rightClick|javascriptClick)/.test(l)) return;
+    if (/page\.mouse/.test(l)) return;
+    if (/evaluate\s*\(/.test(l)) return;
+    if (CLICK_OPTS_WRAPPER_LACKS.test(l)) return;
+
+    const receiver = receiverOf(l);
+    if (receiver) {
+      const before = ls.slice(Math.max(0, i - 4), i).join('\n');
+      const waited = new RegExp('(toBeVisible|waitForVisible)').test(before) && before.includes(receiver);
+      if (waited) return;
+    }
+    add('rawClickInLib', f, i + 1, 'no visibility wait before this click - use this.click()');
+  });
+}
 
 // builders are the typed boundary between specs and the Management API - an untyped build()
 // or an `any` on the way to it lets a malformed payload compile and fail as an opaque 400.
@@ -459,11 +511,14 @@ for (const f of specFiles) {
   if (!PROJECT_DIRS.includes(seg)) add('orphanSpec', f, 1, 'no playwright project testMatch claims this file');
 }
 
-// specs should go through page objects
+// Specs go through page objects. Any reach for `page` counts, not just a chosen list of its
+// methods: the earlier version listed locator|getBy|click|goto|fill|waitFor, which left
+// `umbracoUi.page.url()`, `.reload()`, `.keyboard` and `.evaluate()` uncounted - six sites, two of
+// them on the lines either side of one it did flag.
 for (const f of specFiles) read(f).forEach((l, i) => {
   if (isComment(l)) return;
-  if (/(^|[^.\w])page\.(locator|getBy|click|goto|fill|waitFor)/.test(l)) add('rawFixtureInSpec', f, i + 1, 'use a page object, not the raw page fixture');
-  else if (/umbraco(Ui|Api)\.page\.(locator|getBy|click|goto|fill|waitFor)/.test(l)) add('helperPageInSpec', f, i + 1, 'wrap this in a helper method');
+  if (/(^|[^.\w])page\.[a-zA-Z]/.test(l)) add('rawFixtureInSpec', f, i + 1, 'use a page object, not the raw page fixture');
+  else if (/umbraco(Ui|Api)\.page\.[a-zA-Z]/.test(l)) add('helperPageInSpec', f, i + 1, 'wrap this in a helper method');
 });
 
 // ---- report ----------------------------------------------------------------

@@ -61,13 +61,13 @@ test('can see parent of start node but not access it', async ({umbracoApi, umbra
 
   // Assert
   await umbracoUi.media.isMediaTreeItemVisible(rootFolderName);
-  await umbracoUi.page.waitForURL('**/section/media/collection');
-  const initialUrl = umbracoUi.page.url();
+  await umbracoUi.waitForUrl('**/section/media/collection');
+  const initialUrl = umbracoUi.getCurrentUrl();
 
   await umbracoUi.media.goToMediaWithName(rootFolderName);
 
   // URL should not have changed (folder is visible but not accessible, so no navigation occurred)
-  const currentUrl = umbracoUi.page.url();
+  const currentUrl = umbracoUi.getCurrentUrl();
   expect(currentUrl).toBe(initialUrl);
 
   await umbracoUi.media.openMediaCaretButtonForName(rootFolderName);
@@ -86,7 +86,7 @@ test('see no-access view when deep-linking to restricted media', async ({umbraco
 
   // Assert
   await umbracoUi.media.isMediaTreeItemVisible(rootFolderName);
-  await umbracoUi.page.goto(`${umbracoUi.page.url().replace('/collection', '')}/workspace/media/edit/${rootFolderId!}`);
+  await umbracoUi.goToEntityWorkspace('media', rootFolderId!);
   await umbracoUi.media.doesMediaWorkspaceHaveText('Access denied');
 });
 
