@@ -67,6 +67,7 @@ public class MoveDocumentBlueprintController : DocumentBlueprintControllerBase
     [HttpPut("{id:guid}/move")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [EndpointSummary("Moves a document blueprint.")]
     [EndpointDescription("Moves a document blueprint identified by the provided Id to a different location.")]
