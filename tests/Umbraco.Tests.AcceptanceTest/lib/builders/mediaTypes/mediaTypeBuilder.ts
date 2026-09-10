@@ -3,6 +3,7 @@ import {MediaTypeContainerBuilder} from './mediaTypeContainerBuilder';
 import {MediaTypeAllowedMediaTypeBuilder} from './mediaTypeAllowedMediaTypeBuilder';
 import {MediaTypeCompositionBuilder} from './mediaTypeCompositionBuilder';
 import {ensureIdExists} from '../../helpers/BuilderUtils';
+import {MediaTypePayload} from '../types';
 
 export class MediaTypeBuilder {
   alias: string;
@@ -102,7 +103,7 @@ export class MediaTypeBuilder {
     return this;
   }
 
-  build() {
+  build(): MediaTypePayload {
     this.id = ensureIdExists(this.id);
 
     return {

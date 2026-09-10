@@ -1,4 +1,5 @@
 import {ElementBuilder} from './elementBuilder';
+import {EntityPropertyValue} from '../types';
 
 export class ElementValueBuilder {
   parentBuilder: ElementBuilder;
@@ -47,7 +48,7 @@ export class ElementValueBuilder {
     return this.parentBuilder;
   }
 
-  build() {
+  build(): EntityPropertyValue {
     let value: any = null;
 
     if (this.value != null) {

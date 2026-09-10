@@ -1,4 +1,5 @@
 import {MediaBuilder} from './mediaBuilder';
+import {EntityVariant} from '../types';
 
 export class MediaVariantBuilder {
   parentBuilder: MediaBuilder
@@ -29,7 +30,7 @@ export class MediaVariantBuilder {
     return this.parentBuilder;
   }
 
-  build() {
+  build(): EntityVariant {
     return {
       culture: this.culture || null,
       segment: this.segment || null,

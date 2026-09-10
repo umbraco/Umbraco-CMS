@@ -2,6 +2,7 @@ import {MemberTypeCompositionBuilder} from './memberTypeCompositionBuilder';
 import {MemberTypeContainerBuilder} from './memberTypeContainerBuilder';
 import {MemberTypePropertyBuilder} from './memberTypePropertyBuilder';
 import {ensureIdExists} from '../../helpers/BuilderUtils';
+import {MemberTypePayload} from '../types';
 
 export class MemberTypeBuilder {
   alias: string;
@@ -99,7 +100,7 @@ export class MemberTypeBuilder {
     return this;
   }
 
-  build() {
+  build(): MemberTypePayload {
     this.id = ensureIdExists(this.id);
 
     return {

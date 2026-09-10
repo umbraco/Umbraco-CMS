@@ -1,6 +1,7 @@
 import {DocumentValueBuilder} from './documentValueBuilder';
 import {DocumentVariantBuilder} from './documentVariantBuilder';
 import {ensureIdExists} from '../../helpers/BuilderUtils';
+import {DocumentPayload} from '../types';
 
 export class DocumentBuilder {
   documentValueBuilder: DocumentValueBuilder[];
@@ -47,7 +48,7 @@ export class DocumentBuilder {
     return this;
   }
 
-  build() {
+  build(): DocumentPayload {
     this.id = ensureIdExists(this.id);
 
     return {

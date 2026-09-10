@@ -1,6 +1,7 @@
 import {MemberValueBuilder} from './memberValueBuilder';
 import {MemberVariantBuilder} from './memberVariantBuilder';
 import {ensureIdExists} from '../../helpers/BuilderUtils';
+import {MemberPayload} from '../types';
 
 export class MemberBuilder {
   memberValueBuilder: MemberValueBuilder[];
@@ -66,7 +67,7 @@ export class MemberBuilder {
     return this;
   }
 
-  build() {
+  build(): MemberPayload {
     this.id = ensureIdExists(this.id);
 
     return {

@@ -464,7 +464,25 @@ abstract getValues(): DataTypeValues
 
 The remaining debt is not in those 33 subclasses — it is in the **sub-builders**, which return an inline object literal or push into a `let values: any = {}`. There a declared return type does do the work: TypeScript's excess-property check fires on a literal in a return position and names the mistake. That is what the audit's `untypedBuilderExit` now counts, so paying it off means giving each sub-builder's item shape an interface — not sprinkling annotations on the exits that are already checked.
 
-Still to do: 96 `build()`/`getValues()` outside the `DataTypeBuilder` hierarchy have no declared return type, and 25 `: any` remain (mostly the `*ValueBuilder` classes for documents, media and elements). Both are budgeted. Worth typing per-entity as each builder is touched — define the payload interface in `types.ts`, annotate the exit, then remove the `any` that would otherwise defeat it.
+**What is typed now.** `types.ts` carries the payload envelopes: `EntityVariant` and
+`EntityPropertyValue` for the five variant and five value builders; `DocumentPayload`,
+`MediaPayload` and `MemberPayload` for the entity builders; `DocumentTypePayload`,
+`MediaTypePayload` and `MemberTypePayload` for the three content-type builders, sharing
+`ContentTypePayloadBase`. The container, property and composition shapes inside those are
+`ReturnType<typeof buildContainer>` and friends, derived from `BuilderUtils` rather than
+restated, so there is one definition to change.
+
+Two shapes are deliberately not normalised, because the payload is what the suite has always
+sent and changing it wants a running instance rather than a tidy-up: `MemberVariantBuilder`
+sends `name: ''` where the other four send `null`, and `MemberValueBuilder` omits `editorAlias`
+and `entityType` entirely (hence both optional on `EntityPropertyValue`).
+
+Still to do: the **sub-builders** — block grid, block list, tiptap, TinyMCE, list view,
+image cropper, media picker, user-group permissions — 44 exits, each needing an interface for
+its own item shape, plus the 25 `: any` that would defeat one. Both budgeted. The pattern is
+the one above: define the shape in `types.ts`, annotate the exit, then plant a misspelled
+field and confirm `tsc` reports it — an annotation over an `any` local catches nothing, so the
+planted defect is the only proof the work landed.
 
 ### The bug class to look for in a builder
 

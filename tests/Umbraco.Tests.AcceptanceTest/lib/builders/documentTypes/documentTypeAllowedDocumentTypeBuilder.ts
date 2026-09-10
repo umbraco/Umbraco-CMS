@@ -1,4 +1,5 @@
 import {DocumentTypeBuilder} from './documentTypeBuilder';
+import {AllowedDocumentType} from '../types';
 
 export class DocumentTypeAllowedDocumentTypeBuilder {
   parentBuilder: DocumentTypeBuilder;
@@ -23,7 +24,7 @@ export class DocumentTypeAllowedDocumentTypeBuilder {
     return this.parentBuilder;
   }
 
-  build() {
+  build(): AllowedDocumentType {
     return {
       documentType: {
         id: this.id || null

@@ -1,4 +1,5 @@
 import {DocumentBuilder} from './documentBuilder';
+import {EntityVariant} from '../types';
 
 export class DocumentVariantBuilder {
   parentBuilder: DocumentBuilder;
@@ -29,7 +30,7 @@ export class DocumentVariantBuilder {
     return this.parentBuilder;
   }
 
-  build() {
+  build(): EntityVariant {
     return {
       culture: this.culture || null,
       segment: this.segment || null,

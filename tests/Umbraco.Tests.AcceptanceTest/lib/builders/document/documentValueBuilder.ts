@@ -4,6 +4,7 @@ import {URLPickerValueBuilder} from './urlPickerValueBuilder';
 import {ImageCropperValueBuilder} from './imageCropperValueBuilder';
 import {BlockGridValueBuilder} from './blockGridValueBuilder';
 import {BlockListValueBuilder} from './blockListValueBuilder';
+import {EntityPropertyValue} from '../types';
 
 export class DocumentValueBuilder {
   parentBuilder: DocumentBuilder;
@@ -95,7 +96,7 @@ export class DocumentValueBuilder {
     return this.parentBuilder;
   }
 
-  build() {
+  build(): EntityPropertyValue {
     let value: any = null;
 
     if (this.value != null) {

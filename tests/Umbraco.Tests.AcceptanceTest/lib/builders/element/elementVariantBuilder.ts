@@ -1,4 +1,5 @@
 import {ElementBuilder} from './elementBuilder';
+import {EntityVariant} from '../types';
 
 export class ElementVariantBuilder {
   parentBuilder: ElementBuilder;
@@ -29,7 +30,7 @@ export class ElementVariantBuilder {
     return this.parentBuilder;
   }
 
-  build() {
+  build(): EntityVariant {
     return {
       culture: this.culture || null,
       segment: this.segment || null,

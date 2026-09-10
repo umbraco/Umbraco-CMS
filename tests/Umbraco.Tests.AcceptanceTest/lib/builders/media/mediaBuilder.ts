@@ -1,5 +1,6 @@
 import {MediaValueBuilder} from './mediaValueBuilder';
 import {MediaVariantBuilder} from './mediaVariantBuilder';
+import {MediaPayload} from '../types';
 
 export class MediaBuilder {
   mediaValueBuilder: MediaValueBuilder[];
@@ -40,7 +41,7 @@ export class MediaBuilder {
     return this;
   }
 
-  build() {
+  build(): MediaPayload {
     return {
       values: this.mediaValueBuilder.map(builder => builder.build()),
       variants: this.mediaVariantBuilders.map(builder => builder.build()),

@@ -31,7 +31,12 @@ const BUDGET = {
   // DataTypeValues = []` already catches a misspelled field, where a return type provably
   // changes nothing; 13 `getValue()` exits that do return an unchecked shape were outside the
   // old rule and are now counted. No code changed - the number was wrong, not the suite.
-  untypedBuilderExit: 73,
+  //   Then 73 -> 64: nine more were `return buildProperty(...)` / `buildContainer` /
+  //   `buildComposition` pass-throughs, which BuilderUtils already types at the call site.
+  //   Then 64 -> 44: the variant, value, entity and content-type builders now declare their
+  //   payload types (lib/builders/types.ts). What is left is the sub-builders - block, tiptap,
+  //   list-view, user-group permissions - each of which needs an interface for its item shape.
+  untypedBuilderExit: 44,
   anyInBuilder: 25,
   commentedOutTest: 0,
   commentedOutAssertion: 15,
@@ -171,6 +176,12 @@ for (const f of walk(at('lib/builders'), n => n.endsWith('.ts'))) {
     const declared = [...text.matchAll(/(?:const|let)\s+(\w+)\s*:\s*([A-Za-z][\w<>\[\]]*)\s*=/g)]
       .filter(m => m[2] !== 'any' && m[2] !== 'any[]');
     if (declared.some(m => new RegExp('return\\s+' + m[1] + '\\s*;').test(text))) return;
+
+    // A pass-through to a shared builder utility - `return buildProperty({...})` - is checked at
+    // the call site: excess-property checking applies to an argument literal just as it does to a
+    // return literal, and BuilderUtils declares a return type on every one of these. Annotating
+    // the exit as well would restate what the utility's signature already fixes.
+    if (/return\s+[A-Za-z_$][\w$]*\s*\(/.test(text) && !/return\s*\{/.test(text)) return;
 
     add('untypedBuilderExit', f, i + 1, 'returns an unchecked shape - a return type would catch a misspelled field');
   });

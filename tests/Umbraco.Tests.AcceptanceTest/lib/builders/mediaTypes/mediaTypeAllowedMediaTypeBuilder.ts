@@ -1,4 +1,5 @@
 import {MediaTypeBuilder} from './mediaTypeBuilder';
+import {AllowedMediaType} from '../types';
 
 export class MediaTypeAllowedMediaTypeBuilder {
   parentBuilder: MediaTypeBuilder;
@@ -23,7 +24,7 @@ export class MediaTypeAllowedMediaTypeBuilder {
     return this.parentBuilder;
   }
 
-  build() {
+  build(): AllowedMediaType {
     return {
       mediaType: {
         id: this.id || null

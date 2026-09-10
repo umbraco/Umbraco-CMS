@@ -1,4 +1,5 @@
 import {DocumentBlueprintsBuilder} from './documentBlueprintsBuilder';
+import {EntityVariant} from '../types';
 
 export class DocumentBlueprintsVariantBuilder {
   parentBuilder: DocumentBlueprintsBuilder;
@@ -29,7 +30,7 @@ export class DocumentBlueprintsVariantBuilder {
     return this.parentBuilder;
   }
 
-  build() {
+  build(): EntityVariant {
     return {
       culture: this.culture || null,
       segment: this.segment || null,

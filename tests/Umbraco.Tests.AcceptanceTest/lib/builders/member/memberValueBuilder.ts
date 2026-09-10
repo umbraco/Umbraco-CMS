@@ -1,4 +1,5 @@
 import {MemberBuilder} from './memberBuilder';
+import {EntityPropertyValue} from '../types';
 
 export class MemberValueBuilder {
   parentBuilder: MemberBuilder;
@@ -35,7 +36,7 @@ export class MemberValueBuilder {
     return this.parentBuilder;
   }
 
-  build() {
+  build(): EntityPropertyValue {
     return {
       culture: this.culture || null,
       segment: this.segment || null,

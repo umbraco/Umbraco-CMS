@@ -1,6 +1,7 @@
 import {BlockGridValueBuilder} from '../document/blockGridValueBuilder';
 import {BlockListValueBuilder} from '../document/blockListValueBuilder';
 import {DocumentBlueprintsBuilder} from './documentBlueprintsBuilder';
+import {EntityPropertyValue} from '../types';
 
 export class DocumentBlueprintsValueBuilder {
   parentBuilder: DocumentBlueprintsBuilder;
@@ -63,7 +64,7 @@ export class DocumentBlueprintsValueBuilder {
     return this.parentBuilder;
   }
 
-  build() {
+  build(): EntityPropertyValue {
     let value: any = null;
 
     if (this.value != null) {

@@ -5,6 +5,7 @@ import {DocumentTypeCompositionBuilder} from './documentTypeCompositionBuilder';
 import {DocumentTypeAllowedTemplateBuilder} from './documentTypeAllowedTemplateBuilder';
 import {AliasHelper} from '../../helpers/AliasHelper';
 import {ensureIdExists} from '../../helpers/BuilderUtils';
+import {DocumentTypePayload} from '../types';
 
 export class DocumentTypeBuilder {
   alias: string;
@@ -147,7 +148,7 @@ export class DocumentTypeBuilder {
     return this;
   }
 
-  build() {
+  build(): DocumentTypePayload {
     this.id = ensureIdExists(this.id);
 
     return {

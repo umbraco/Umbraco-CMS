@@ -287,6 +287,39 @@ const CASES = [
     },
   },
   {
+    // `return buildProperty({...})` is checked at the call site - excess-property checking
+    // applies to an argument literal, and BuilderUtils declares a return type on each of these.
+    rule: 'untypedBuilderExit', expect: 0, label: 'a pass-through to a typed utility is already checked',
+    files: {
+      'lib/builders/r6/r6Builder.ts': [
+        `export class R6Builder {`,
+        `  build() {`,
+        `    return buildProperty({`,
+        `      id: this.id,`,
+        `      alias: this.alias`,
+        `    });`,
+        `  }`,
+        `}`,
+      ],
+    },
+  },
+  {
+    // The exemption must not swallow an exit that builds a literal and calls something in it.
+    rule: 'untypedBuilderExit', expect: 1, label: 'a literal containing a call is still counted',
+    files: {
+      'lib/builders/r7/r7Builder.ts': [
+        `export class R7Builder {`,
+        `  build() {`,
+        `    return {`,
+        `      alias: this.alias,`,
+        `      value: this.inner.getValue()`,
+        `    };`,
+        `  }`,
+        `}`,
+      ],
+    },
+  },
+  {
     // An `any`-typed local is not "already checked" - it must still be counted.
     rule: 'untypedBuilderExit', expect: 1, label: 'an any-typed local is not a check',
     files: {

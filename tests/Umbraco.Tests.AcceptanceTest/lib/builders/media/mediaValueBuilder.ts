@@ -1,5 +1,6 @@
 import {MediaBuilder} from './mediaBuilder';
 import {MediaValueDataBuilder} from './mediaValueDataBuilder';
+import {EntityPropertyValue} from '../types';
 
 export class MediaValueBuilder {
   parentBuilder: MediaBuilder;
@@ -55,7 +56,7 @@ export class MediaValueBuilder {
     return this.parentBuilder;
   }
 
-  build() {
+  build(): EntityPropertyValue {
     let value: any = null;
 
     if (this.value != null) {
