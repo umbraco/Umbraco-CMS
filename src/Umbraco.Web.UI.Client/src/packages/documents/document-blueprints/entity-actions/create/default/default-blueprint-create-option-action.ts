@@ -20,7 +20,7 @@ export class UmbDefaultBlueprintCreateOptionAction extends UmbEntityCreateOption
 
 		const value = await umbOpenModal(this, UMB_ITEM_PICKER_MODAL, {
 			data: {
-				headline: `${this.#localize.term('general_choose')}...`,
+				headline: this.#localize.term('blueprints_chooseDocumentType'),
 				items: (data?.items ?? []).flatMap((documentType) =>
 					documentType.unique
 						? [
