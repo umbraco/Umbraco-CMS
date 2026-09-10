@@ -1,6 +1,7 @@
 import { UmbDocumentDetailRepository } from '../../../repository/index.js';
 import type { UmbCreateBlueprintModalData, UmbCreateBlueprintModalValue } from './create-blueprint-modal.token.js';
-import { html, customElement, css, state } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, css, state, when } from '@umbraco-cms/backoffice/external/lit';
+import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
@@ -26,6 +27,23 @@ export class UmbCreateBlueprintModalElement extends UmbModalBaseElement<
 
 	@state()
 	private _hasSelectedLocation = false;
+
+	@state()
+	private _hasRootAccess?: boolean;
+
+	constructor() {
+		super();
+
+		this.consumeContext(UMB_CURRENT_USER_CONTEXT, (context) => {
+			this.observe(
+				context?.hasDocumentBlueprintRootAccess,
+				(hasRootAccess) => (this._hasRootAccess = hasRootAccess ?? false),
+				'_observeDocumentBlueprintRootAccess',
+			);
+		});
+	}
+
+	#selectableFilter = (item: { unique: string | null }) => item.unique !== null || this._hasRootAccess === true;
 
 	override firstUpdated() {
 		this.#documentUnique = this.data?.unique ?? '';
@@ -75,13 +93,22 @@ export class UmbCreateBlueprintModalElement extends UmbModalBaseElement<
 						</div>
 					</umb-property-layout>
 					<umb-property-layout label=${this.localize.term('general_choose')} orientation="vertical" mandatory>
-						<umb-tree
-							slot="editor"
-							alias="Umb.Tree.DocumentBlueprint"
-							.props=${{ hideTreeItemActions: true, foldersOnly: true }}
-							@selected=${this.#onLocationSelected}
-							@deselected=${this.#onLocationDeselected}>
-						</umb-tree>
+						${when(
+							this._hasRootAccess !== undefined,
+							() => html`
+								<umb-tree
+									slot="editor"
+									alias="Umb.Tree.DocumentBlueprint"
+									.props=${{
+										hideTreeItemActions: true,
+										foldersOnly: true,
+										selectableFilter: this.#selectableFilter,
+									}}
+									@selected=${this.#onLocationSelected}
+									@deselected=${this.#onLocationDeselected}>
+								</umb-tree>
+							`,
+						)}
 					</umb-property-layout>
 				</uui-box>
 				<uui-button
