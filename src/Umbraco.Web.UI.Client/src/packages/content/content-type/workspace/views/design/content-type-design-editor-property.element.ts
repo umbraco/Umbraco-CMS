@@ -1,8 +1,10 @@
+import type { UmbContentTypePropertyStructureHelper } from '../../../structure/index.js';
 import type {
-	UmbContentTypePropertyStructureHelper,
-	UmbContentTypeStructureManager,
-} from '../../../structure/index.js';
-import type { UmbContentTypeModel, UmbPropertyTypeModel, UmbPropertyTypeScaffoldModel } from '../../../types.js';
+	UmbContentTypeDetailModel,
+	UmbContentTypeModel,
+	UmbPropertyTypeModel,
+	UmbPropertyTypeScaffoldModel,
+} from '../../../types.js';
 import { UmbPropertyTypeContext } from './content-type-design-editor-property.context.js';
 import { css, html, customElement, property, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
@@ -13,6 +15,7 @@ import { UMB_EDIT_PROPERTY_TYPE_WORKSPACE_PATH_PATTERN } from '@umbraco-cms/back
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbInputWithAliasElement } from '@umbraco-cms/backoffice/components';
 import { umbBindToValidation } from '@umbraco-cms/backoffice/validation';
+import { UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 
 /**
  *  @element umb-content-type-design-editor-property
@@ -30,7 +33,6 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 		if (value === this._propertyStructureHelper) return;
 		this._propertyStructureHelper = value;
 		this.#checkInherited();
-		this.#observePersistedProperty();
 	}
 	public get propertyStructureHelper(): UmbContentTypePropertyStructureHelper<UmbContentTypeModel> | undefined {
 		return this._propertyStructureHelper;
@@ -54,7 +56,6 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 		this.#context.setAlias(value?.alias);
 		this.#context.setLabel(value?.name);
 		this.#checkInherited();
-		this.#observePersistedProperty();
 		this.#updateAliasRenamed();
 		this.#setDataType(this._property?.dataType?.unique);
 		this.requestUpdate('property', oldValue);
@@ -94,44 +95,34 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 	@state()
 	private _aliasRenamed = false;
 
-	#observedPropertyUnique?: string;
-	#observedStructureManager?: UmbContentTypeStructureManager<UmbContentTypeModel>;
-	#ownerIsElement = false;
-	#persistedAlias?: string;
+	#persistedContentType?: UmbContentTypeDetailModel;
 
-	#observePersistedProperty() {
-		const structure = this._propertyStructureHelper?.getStructureManager();
-		const unique = this._property?.unique;
-		// The helper is stable, but its structure manager is set - and can be replaced - after construction.
-		if (unique === this.#observedPropertyUnique && structure === this.#observedStructureManager) return;
-		this.#observedPropertyUnique = unique;
-		this.#observedStructureManager = structure;
+	constructor() {
+		super();
 
-		this.observe(
-			structure && unique
-				? structure.ownerContentTypeObservablePart((contentType) => contentType?.isElement === true)
-				: undefined,
-			(isElement) => {
-				this.#ownerIsElement = isElement === true;
-				this.#updateAliasRenamed();
-			},
-			'observeOwnerIsElement',
-		);
-
-		this.observe(
-			structure && unique ? structure.persistedPropertyById(unique) : undefined,
-			(property) => {
-				this.#persistedAlias = property?.alias;
-				this.#updateAliasRenamed();
-			},
-			'observePersistedProperty',
-		);
+		this.consumeContext(UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT, (context) => {
+			this.observe(
+				context?.persistedData,
+				(data) => {
+					this.#persistedContentType = data as UmbContentTypeDetailModel | undefined;
+					this.#updateAliasRenamed();
+				},
+				'observePersistedContentType',
+			);
+		});
 	}
 
 	// Only an Element Type keys its property values by alias, so only there does a rename orphan them.
 	#updateAliasRenamed() {
+		const persistedAlias = this.#persistedAlias();
 		this._aliasRenamed =
-			this.#ownerIsElement && this.#persistedAlias !== undefined && this.#persistedAlias !== this._property?.alias;
+			this.#persistedContentType?.isElement === true &&
+			persistedAlias !== undefined &&
+			persistedAlias !== this._property?.alias;
+	}
+
+	#persistedAlias() {
+		return this.#persistedContentType?.properties?.find((x) => x.unique === this._property?.unique)?.alias;
 	}
 
 	async #checkInherited() {
@@ -318,7 +309,9 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 		return html`<small id="alias-renamed-notice">
 			<uui-icon name="icon-alert"></uui-icon>
 			<span>
-				<umb-localize key="contentTypeEditor_propertyAliasRenamedNotice" .args=${[this.#persistedAlias]}></umb-localize>
+				<umb-localize
+					key="contentTypeEditor_propertyAliasRenamedNotice"
+					.args=${[this.#persistedAlias()]}></umb-localize>
 			</span>
 		</small>`;
 	}

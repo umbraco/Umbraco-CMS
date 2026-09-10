@@ -83,8 +83,6 @@ export class UmbContentTypeStructureManager<
 
 	#contentTypes = new UmbArrayState<T>([], (x) => x.unique);
 
-	#persistedContentTypes = new UmbArrayState<T>([], (x) => x.unique);
-
 	// Data type detail loading for bulk optimization
 	#dataTypeDetailRepository = new UmbDataTypeDetailRepository(this);
 	#dataTypeDetails = new UmbArrayState<UmbDataTypeDetailModel>([], (x) => x.unique);
@@ -187,8 +185,6 @@ export class UmbContentTypeStructureManager<
 			this.observe(
 				this.#repoManager.entries,
 				(entries) => {
-					this.#persistedContentTypes.setValue(entries);
-
 					// Prevent updating once that are have edited here.
 					const entriesToBeUpdated = entries.filter(
 						(x) => !(this.#editedTypes.getHasOne(x.unique) && this.#contentTypes.getHasOne(x.unique)),
@@ -838,25 +834,6 @@ export class UmbContentTypeStructureManager<
 		});
 	}
 
-	/**
-	 * The property as it is currently stored on the server, looked up across the whole structure.
-	 * Local, unsaved edits are not reflected here, which makes it the reference point for determining
-	 * what a save will change. Emits undefined for a property that is not (yet) stored on the server.
-	 * @param {string} propertyUnique - The unique of the property.
-	 * @returns {Observable<UmbPropertyTypeModel | undefined>} - An observable of the persisted property.
-	 */
-	persistedPropertyById(propertyUnique: string): Observable<UmbPropertyTypeModel | undefined> {
-		return this.#persistedContentTypes.asObservablePart((contentTypes) => {
-			for (const contentType of contentTypes) {
-				const foundProp = contentType.properties?.find((property) => property.unique === propertyUnique);
-				if (foundProp) {
-					return foundProp;
-				}
-			}
-			return undefined;
-		});
-	}
-
 	async getPropertyStructureById(propertyUnique: string) {
 		await this.#init;
 		for (const docType of this.#contentTypes.getValue()) {
@@ -1081,14 +1058,12 @@ export class UmbContentTypeStructureManager<
 		this.#contentTypeObservers = [];
 		this.#repoManager?.clear();
 		this.#contentTypes.setValue([]);
-		this.#persistedContentTypes.setValue([]);
 		this.#dataTypeDetails.setValue([]);
 		this.#ownerContentTypeUnique = undefined;
 	}
 
 	public override destroy() {
 		this.#contentTypes.destroy();
-		this.#persistedContentTypes.destroy();
 		this.#dataTypeDetails.destroy();
 		super.destroy();
 	}

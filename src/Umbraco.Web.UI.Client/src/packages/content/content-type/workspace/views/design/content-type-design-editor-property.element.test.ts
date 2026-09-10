@@ -1,52 +1,56 @@
 import { UmbContentTypeDesignEditorPropertyElement } from './content-type-design-editor-property.element.js';
-import { aTimeout, expect, fixture, html } from '@open-wc/testing';
+import { aTimeout, expect, fixture } from '@open-wc/testing';
+import { customElement, html } from '@umbraco-cms/backoffice/external/lit';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
-import type { UmbPropertyTypeModel } from '../../../types.js';
+import { UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
+import type { UmbContentTypeDetailModel, UmbPropertyTypeModel } from '../../../types.js';
 
 const OWNER_UNIQUE = 'owner-content-type';
+const PROPERTY_UNIQUE = 'property-unique';
 
-class UmbTestStructureManager {
-	#ownerContentType = new UmbObjectState<any>({ unique: OWNER_UNIQUE, name: 'Hero', isElement: true });
-	#persistedProperty = new UmbObjectState<UmbPropertyTypeModel | undefined>(undefined);
+@customElement('umb-test-content-type-design-editor-property-host')
+class UmbTestPropertyHostElement extends UmbLitElement {
+	override render() {
+		return html`<slot></slot>`;
+	}
+}
 
-	readonly ownerContentType = this.#ownerContentType.asObservable();
+class UmbTestWorkspaceContext {
+	readonly IS_ENTITY_DETAIL_WORKSPACE_CONTEXT = true;
 
-	ownerContentTypeObservablePart<R>(mappingFunction: (value: any) => R) {
-		return this.#ownerContentType.asObservablePart(mappingFunction);
+	#host: UmbLitElement;
+	#persisted = new UmbObjectState<UmbContentTypeDetailModel | undefined>(undefined);
+	readonly persistedData = this.#persisted.asObservable();
+
+	constructor(host: UmbLitElement) {
+		this.#host = host;
 	}
 
-	persistedPropertyById() {
-		return this.#persistedProperty.asObservable();
+	getHostElement() {
+		return this.#host;
 	}
 
-	getOwnerContentTypeUnique() {
-		return OWNER_UNIQUE;
-	}
-
-	setIsElement(isElement: boolean) {
-		this.#ownerContentType.update({ isElement });
-	}
-
-	setPersistedProperty(property: UmbPropertyTypeModel | undefined) {
-		this.#persistedProperty.setValue(property);
+	setPersisted(data: UmbContentTypeDetailModel | undefined) {
+		this.#persisted.setValue(data);
 	}
 }
 
 class UmbTestPropertyStructureHelper {
-	readonly manager = new UmbTestStructureManager();
-
 	getStructureManager() {
-		return this.manager;
+		return {
+			getOwnerContentTypeUnique: () => OWNER_UNIQUE,
+		};
 	}
 
 	async contentTypeOfProperty() {
-		return this.manager.ownerContentType;
+		return new UmbObjectState({ unique: OWNER_UNIQUE, name: 'Hero' }).asObservable();
 	}
 }
 
 const propertyModel = (alias: string) =>
 	({
-		unique: 'property-unique',
+		unique: PROPERTY_UNIQUE,
 		container: null,
 		alias,
 		name: 'Headline',
@@ -59,17 +63,33 @@ const propertyModel = (alias: string) =>
 		appearance: { labelOnTop: false },
 	}) as unknown as UmbPropertyTypeModel;
 
+const contentTypeModel = (isElement: boolean, properties: Array<UmbPropertyTypeModel>) =>
+	({
+		unique: OWNER_UNIQUE,
+		name: 'Hero',
+		alias: 'hero',
+		isElement,
+		properties,
+	}) as unknown as UmbContentTypeDetailModel;
+
 describe('UmbContentTypeDesignEditorPropertyElement', () => {
 	let element: UmbContentTypeDesignEditorPropertyElement;
-	let helper: UmbTestPropertyStructureHelper;
+	let workspaceContext: UmbTestWorkspaceContext;
 
-	const setup = async (persistedAlias: string | undefined, currentAlias: string) => {
-		helper = new UmbTestPropertyStructureHelper();
-		helper.manager.setPersistedProperty(persistedAlias ? propertyModel(persistedAlias) : undefined);
+	const setup = async (persisted: UmbContentTypeDetailModel | undefined, currentAlias: string) => {
+		const host: UmbTestPropertyHostElement = await fixture(
+			html`<umb-test-content-type-design-editor-property-host>
+				<umb-content-type-design-editor-property></umb-content-type-design-editor-property>
+			</umb-test-content-type-design-editor-property-host>`,
+		);
 
-		element = await fixture(html`<umb-content-type-design-editor-property></umb-content-type-design-editor-property>`);
+		workspaceContext = new UmbTestWorkspaceContext(host);
+		workspaceContext.setPersisted(persisted);
+		host.provideContext(UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT, workspaceContext as never);
+
+		element = host.querySelector('umb-content-type-design-editor-property')!;
 		element.setAttribute('editpropertytypepath', '/edit/');
-		element.propertyStructureHelper = helper as any;
+		element.propertyStructureHelper = new UmbTestPropertyStructureHelper() as never;
 		element.property = propertyModel(currentAlias);
 
 		await aTimeout(0);
@@ -79,35 +99,30 @@ describe('UmbContentTypeDesignEditorPropertyElement', () => {
 	const notice = () => element.shadowRoot!.querySelector('#alias-renamed-notice');
 
 	it('warns when the alias of a stored property is changed on an Element Type', async () => {
-		await setup('headline', 'title');
+		await setup(contentTypeModel(true, [propertyModel('headline')]), 'title');
 		expect(notice()).to.exist;
 	});
 
 	it('does not warn when the alias matches the stored one', async () => {
-		await setup('headline', 'headline');
+		await setup(contentTypeModel(true, [propertyModel('headline')]), 'headline');
 		expect(notice()).to.not.exist;
 	});
 
 	it('does not warn for a property that is not stored yet', async () => {
-		await setup(undefined, 'title');
-		expect(notice()).to.not.exist;
-	});
-
-	it('stops warning when the structure helper is taken away', async () => {
-		await setup('headline', 'title');
-		expect(notice()).to.exist;
-
-		element.propertyStructureHelper = undefined;
-
-		await aTimeout(0);
-		await element.updateComplete;
-
+		await setup(contentTypeModel(true, []), 'title');
 		expect(notice()).to.not.exist;
 	});
 
 	it('does not warn when the owner is not an Element Type', async () => {
-		await setup('headline', 'title');
-		helper.manager.setIsElement(false);
+		await setup(contentTypeModel(false, [propertyModel('headline')]), 'title');
+		expect(notice()).to.not.exist;
+	});
+
+	it('stops warning once the rename is stored', async () => {
+		await setup(contentTypeModel(true, [propertyModel('headline')]), 'title');
+		expect(notice()).to.exist;
+
+		workspaceContext.setPersisted(contentTypeModel(true, [propertyModel('title')]));
 
 		await aTimeout(0);
 		await element.updateComplete;
