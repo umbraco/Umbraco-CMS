@@ -54,6 +54,7 @@ export class UmbBlockWorkspaceEditorElement extends UmbLitElement {
 				display: flex;
 				align-items: center;
 				gap: var(--uui-size-3);
+				min-width: 0;
 			}
 			#headline {
 				display: block;
