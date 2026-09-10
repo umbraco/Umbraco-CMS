@@ -1178,6 +1178,19 @@ export enum EventMessageTypeModel {
     WARNING = 'Warning'
 }
 
+export type FacetModel = {
+    fieldName: string;
+};
+
+export type FacetResultResponseModel = {
+    fieldName: string;
+    values: Array<FacetValueModel>;
+};
+
+export type FacetValueModel = {
+    count: number;
+};
+
 export type FetchResponseModelDataTypeSchemaItemResponseModel = {
     total: number;
     items: Array<DataTypeSchemaItemResponseModel>;
@@ -1193,6 +1206,11 @@ export type FileSystemTreeItemPresentationModel = {
     parent?: null | FileSystemFolderModel;
     isFolder: boolean;
     hasChildren: boolean;
+};
+
+export type FilterModel = {
+    fieldName: string;
+    negate: boolean;
 };
 
 export type FlagModel = {
@@ -1256,6 +1274,14 @@ export type HealthCheckWithResultPresentationModel = {
     id: string;
 };
 
+export enum HealthStatusModel {
+    HEALTHY = 'Healthy',
+    REBUILDING = 'Rebuilding',
+    CORRUPTED = 'Corrupted',
+    EMPTY = 'Empty',
+    UNKNOWN = 'Unknown'
+}
+
 export type HelpPageResponseModel = {
     name?: null | string;
     description?: null | string;
@@ -1289,6 +1315,13 @@ export type ImportMemberTypeRequestModel = {
     file: ReferenceByIdModel;
 };
 
+export type IndexResponseModel = {
+    indexAlias: string;
+    providerName: string;
+    documentCount: number;
+    healthStatus: HealthStatusModel;
+};
+
 export type InstallRequestModel = {
     user: UserInstallRequestModel;
     database: DatabaseInstallRequestModel;
@@ -1310,13 +1343,13 @@ export type InviteUserRequestModel = {
 };
 
 export type IPermissionPresentationModel = ({
-    $type?: 'DocumentPermissionPresentationModel';
+    $type: 'DocumentPermissionPresentationModel';
 } & IPermissionPresentationModelDocumentPermissionPresentationModel) | ({
-    $type?: 'DocumentPropertyValuePermissionPresentationModel';
+    $type: 'DocumentPropertyValuePermissionPresentationModel';
 } & IPermissionPresentationModelDocumentPropertyValuePermissionPresentationModel) | ({
-    $type?: 'ElementPermissionPresentationModel';
+    $type: 'ElementPermissionPresentationModel';
 } & IPermissionPresentationModelElementPermissionPresentationModel) | ({
-    $type?: 'UnknownTypePermissionPresentationModel';
+    $type: 'UnknownTypePermissionPresentationModel';
 } & IPermissionPresentationModelUnknownTypePermissionPresentationModel);
 
 export type IPermissionPresentationModelDocumentPermissionPresentationModel = {
@@ -1345,23 +1378,23 @@ export type IPermissionPresentationModelUnknownTypePermissionPresentationModel =
 };
 
 export type IReferenceResponseModel = ({
-    $type?: 'DefaultReferenceResponseModel';
+    $type: 'DefaultReferenceResponseModel';
 } & IReferenceResponseModelDefaultReferenceResponseModel) | ({
-    $type?: 'DocumentReferenceResponseModel';
+    $type: 'DocumentReferenceResponseModel';
 } & IReferenceResponseModelDocumentReferenceResponseModel) | ({
-    $type?: 'DocumentTypePropertyTypeReferenceResponseModel';
+    $type: 'DocumentTypePropertyTypeReferenceResponseModel';
 } & IReferenceResponseModelDocumentTypePropertyTypeReferenceResponseModel) | ({
-    $type?: 'ElementContainerReferenceResponseModel';
+    $type: 'ElementContainerReferenceResponseModel';
 } & IReferenceResponseModelElementContainerReferenceResponseModel) | ({
-    $type?: 'ElementReferenceResponseModel';
+    $type: 'ElementReferenceResponseModel';
 } & IReferenceResponseModelElementReferenceResponseModel) | ({
-    $type?: 'MediaReferenceResponseModel';
+    $type: 'MediaReferenceResponseModel';
 } & IReferenceResponseModelMediaReferenceResponseModel) | ({
-    $type?: 'MediaTypePropertyTypeReferenceResponseModel';
+    $type: 'MediaTypePropertyTypeReferenceResponseModel';
 } & IReferenceResponseModelMediaTypePropertyTypeReferenceResponseModel) | ({
-    $type?: 'MemberReferenceResponseModel';
+    $type: 'MemberReferenceResponseModel';
 } & IReferenceResponseModelMemberReferenceResponseModel) | ({
-    $type?: 'MemberTypePropertyTypeReferenceResponseModel';
+    $type: 'MemberTypePropertyTypeReferenceResponseModel';
 } & IReferenceResponseModelMemberTypePropertyTypeReferenceResponseModel);
 
 export type IReferenceResponseModelDefaultReferenceResponseModel = {
@@ -1434,9 +1467,7 @@ export type IReferenceResponseModelMemberTypePropertyTypeReferenceResponseModel 
     name?: null | string;
 };
 
-export type ISetupTwoFactorModel = {
-    $type?: 'NoopSetupTwoFactorModel';
-} & ISetupTwoFactorModelNoopSetupTwoFactorModel;
+export type ISetupTwoFactorModel = ISetupTwoFactorModelNoopSetupTwoFactorModel;
 
 export type ISetupTwoFactorModelNoopSetupTwoFactorModel = {
     $type: 'NoopSetupTwoFactorModel';
@@ -2153,6 +2184,11 @@ export type PagedHelpPageResponseModel = {
     items: Array<HelpPageResponseModel>;
 };
 
+export type PagedIndexResponseModel = {
+    total: number;
+    items: Array<IndexResponseModel>;
+};
+
 export type PagedIReferenceResponseModel = {
     total: number;
     items: Array<IReferenceResponseModel>;
@@ -2643,6 +2679,29 @@ export type ScriptResponseModel = {
     path: string;
 };
 
+export type SearchDocumentResponseModel = {
+    id: string;
+    objectType: UmbracoObjectTypesModel;
+    name?: null | string;
+    icon?: null | string;
+};
+
+export type SearchRequestModel = {
+    indexAlias: string;
+    query?: null | string;
+    filters?: null | Array<FilterModel>;
+    facets?: null | Array<FacetModel>;
+    sorters?: null | Array<SorterModel>;
+    culture?: null | string;
+    segment?: null | string;
+};
+
+export type SearchResultResponseModel = {
+    total: number;
+    documents: Array<SearchDocumentResponseModel>;
+    facets: Array<FacetResultResponseModel>;
+};
+
 export type SecurityConfigurationResponseModel = {
     passwordConfiguration: PasswordConfigurationResponseModel;
 };
@@ -2692,6 +2751,11 @@ export type SignalRClientSettingsResponseModel = {
 export type SortDocumentChildrenByFieldRequestModel = {
     culture?: null | string;
     field: ContentSortFieldModel;
+    direction: DirectionModel;
+};
+
+export type SorterModel = {
+    fieldName: string;
     direction: DirectionModel;
 };
 
@@ -2946,6 +3010,36 @@ export type TrackedReferenceMemberTypeModel = {
 };
 
 export type TreeItemKindModel = string;
+
+export enum UmbracoObjectTypesModel {
+    UNKNOWN = 'Unknown',
+    ROOT = 'ROOT',
+    DOCUMENT = 'Document',
+    MEDIA = 'Media',
+    TEMPLATE = 'Template',
+    DOCUMENT_TYPE = 'DocumentType',
+    MEDIA_TYPE = 'MediaType',
+    MEMBER_TYPE = 'MemberType',
+    MEMBER_GROUP = 'MemberGroup',
+    RECYCLE_BIN = 'RecycleBin',
+    MEMBER = 'Member',
+    DATA_TYPE = 'DataType',
+    DOCUMENT_TYPE_CONTAINER = 'DocumentTypeContainer',
+    MEDIA_TYPE_CONTAINER = 'MediaTypeContainer',
+    MEMBER_TYPE_CONTAINER = 'MemberTypeContainer',
+    DATA_TYPE_CONTAINER = 'DataTypeContainer',
+    DOCUMENT_BLUEPRINT_CONTAINER = 'DocumentBlueprintContainer',
+    RELATION_TYPE = 'RelationType',
+    FORMS_FORM = 'FormsForm',
+    FORMS_PRE_VALUE = 'FormsPreValue',
+    FORMS_DATA_SOURCE = 'FormsDataSource',
+    LANGUAGE = 'Language',
+    DOCUMENT_BLUEPRINT = 'DocumentBlueprint',
+    ID_RESERVATION = 'IdReservation',
+    ELEMENT = 'Element',
+    ELEMENT_CONTAINER = 'ElementContainer',
+    ELEMENT_RECYCLE_BIN = 'ElementRecycleBin'
+}
 
 export type UnlockUsersRequestModel = {
     userIds: Array<ReferenceByIdModel>;
@@ -16406,6 +16500,143 @@ export type GetTreeScriptSiblingsResponses = {
 };
 
 export type GetTreeScriptSiblingsResponse = GetTreeScriptSiblingsResponses[keyof GetTreeScriptSiblingsResponses];
+
+export type GetSearchIndexesData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/umbraco/management/api/v1/search/indexes';
+};
+
+export type GetSearchIndexesErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+};
+
+export type GetSearchIndexesResponses = {
+    /**
+     * OK
+     */
+    200: PagedIndexResponseModel;
+};
+
+export type GetSearchIndexesResponse = GetSearchIndexesResponses[keyof GetSearchIndexesResponses];
+
+export type GetSearchIndexesByIndexAliasData = {
+    body?: never;
+    path: {
+        indexAlias: string;
+    };
+    query?: never;
+    url: '/umbraco/management/api/v1/search/indexes/{indexAlias}';
+};
+
+export type GetSearchIndexesByIndexAliasErrors = {
+    /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+    /**
+     * Not Found
+     */
+    404: unknown;
+};
+
+export type GetSearchIndexesByIndexAliasResponses = {
+    /**
+     * OK
+     */
+    200: IndexResponseModel;
+};
+
+export type GetSearchIndexesByIndexAliasResponse = GetSearchIndexesByIndexAliasResponses[keyof GetSearchIndexesByIndexAliasResponses];
+
+export type PutSearchRebuildData = {
+    body?: never;
+    path?: never;
+    query?: {
+        indexAlias?: string;
+    };
+    url: '/umbraco/management/api/v1/search/rebuild';
+};
+
+export type PutSearchRebuildErrors = {
+    /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+    /**
+     * Not Found
+     */
+    404: unknown;
+};
+
+export type PutSearchRebuildResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
+export type PostSearchSearchData = {
+    body: SearchRequestModel;
+    path?: never;
+    query?: {
+        skip?: number;
+        take?: number;
+    };
+    url: '/umbraco/management/api/v1/search/search';
+};
+
+export type PostSearchSearchErrors = {
+    /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+    /**
+     * Not Found
+     */
+    404: unknown;
+};
+
+export type PostSearchSearchResponses = {
+    /**
+     * OK
+     */
+    200: SearchResultResponseModel;
+};
+
+export type PostSearchSearchResponse = PostSearchSearchResponses[keyof PostSearchSearchResponses];
 
 export type GetSecurityConfigurationData = {
     body?: never;

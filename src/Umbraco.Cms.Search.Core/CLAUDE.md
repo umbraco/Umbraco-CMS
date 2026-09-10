@@ -107,30 +107,16 @@ dotnet test tests/Umbraco.Tests.Integration/Umbraco.Tests.Integration.csproj --f
 
 ### Client Development (Backoffice UI)
 
-Each client is a **standalone npm project** (no workspace root). Two clients:
-- **Core Client**: `src/Umbraco.Cms.Search.Core.Client/Client/` - Main backoffice UI (TypeScript + Vite, 3-bundle code-splitting)
-- **Examine Client**: `src/Umbraco.Cms.Search.Provider.Examine/Client/` - Examine provider UI (TypeScript + Vite, single bundle)
-
-Each `Client/` folder carries its own config: `package.json`, `tsconfig.json` (extending the local `tsconfig.base.json`), `.prettierrc.json`, `.nvmrc` (Node.js 24), and `scripts/generate-openapi.js`.
+The search index management UI is part of the main backoffice client — `src/Umbraco.Web.UI.Client/src/packages/search-management/` — built and versioned together with the rest of the backoffice. It consumes the Management API's generated `SearchService` client (`@umbraco-cms/backoffice/external/backend-api`) like any other package; there is no separate OpenAPI document or generated client for it.
 
 ```bash
-# From either Client/ directory
+# From src/Umbraco.Web.UI.Client
 npm install
-
-# Build
 npm run build
-
-# Watch
-npm run watch
-
-# Lint (errors only)
-npm run lint:errors-only
-
-# Generate OpenAPI client (requires a running site at https://localhost:44324)
-npm run generate-client
+npm run dev
 ```
 
-Requires **Node.js 24** (see `.nvmrc` in each Client folder).
+The Examine provider keeps its own **standalone npm project** at `src/Umbraco.Cms.Search.Provider.Examine/Client/` (its own `package.json`, `tsconfig.json`, `.nvmrc`, and OpenAPI document) — see [Examine Client CLAUDE.md](../Umbraco.Cms.Search.Provider.Examine/CLAUDE.md). That client resolves imports into the backoffice (including `@umbraco-cms/backoffice/search-management`) via generated tsconfig path aliases, same as any other in-repo consumer of the backoffice client's sources.
 
 ### Test Site
 
@@ -224,51 +210,27 @@ Index documents are persisted via `IndexDocumentRepository` using **MessagePack 
 
 `DeliveryApiContentQueryProvider` and `DeliveryApiContentIndexer` live in `Umbraco.Cms.Api.Delivery/Services` and `/Indexing`, registered by that project's own `AddDeliveryApi()`. They query/index the `Umb_PublishedContent` index.
 
-### Client Architecture (npm Workspaces Monorepo)
+### Client Architecture
 
-The backoffice clients are an **npm workspaces monorepo** rooted at `src/`, with shared TypeScript, Vite, ESLint, and Prettier configuration.
+#### Search Index Management UI (`Umbraco.Web.UI.Client/src/packages/search-management`)
 
-#### Core Client (Umbraco.Cms.Search.Core.Client)
-
-Uses **code-splitting with importmap pattern** for optimal loading:
-
-**Three-Bundle Strategy:**
-- `search-bundle.js` (~3kb) - Manifest metadata, loaded upfront
-- `search-global.js` (~1.5kb) - Global contexts for SignalR event subscriptions, loaded upfront
-- `search-settings.js` (~22kb) - Core implementation, lazy-loaded on demand
-
-**Logical Import Pattern:**
-- Code imports `@umbraco-cms/search/settings` and `@umbraco-cms/search/global`
-- TypeScript resolves via `tsconfig.json` paths for type-checking
-- Vite marks as external (not bundled)
-- Browser resolves via importmap in `umbraco-package.json` at runtime
+Lives inside the backoffice client as an ordinary package — no separate bundle strategy, importmap, or npm project. Extensions are lazy-loaded the same way as everywhere else in the backoffice (`api: () => import(...)`, `element: () => import(...)`).
 
 **Two-Workspace Architecture:**
 - **Root Workspace** (`Umbraco.Search.Workspace.Root`) - Collection view of all search indexes
 - **Detail Workspace** (`Umbraco.Search.Workspace`) - Detail view for a single index with extensible boxes
 
 **Custom Extension Type:**
-- `searchIndexDetailBox` - Allows adding custom UI boxes to the index detail view via extension slot
+- `searchIndexDetailBox` - Allows adding custom UI boxes to the index detail view via extension slot (defined in `search-index/index-detail-box/types.ts`; the Examine provider's own client contributes a box to it)
 
 #### Examine Client (Umbraco.Cms.Search.Provider.Examine)
 
-A simpler **single-bundle** workspace (`examine-bundle.js` ~11kb) that provides:
+A simpler **single-bundle**, standalone npm workspace (`examine-bundle.js` ~11kb) that provides:
 - `UmbSearchExamineProviderRepository` - Fetches search document fields from the Examine API
 - `UmbSearchExamineShowFieldsEntityAction` - Entity action to view document fields
 - `UmbSearchExamineShowFieldsModal` - Modal displaying indexed fields with filtering, expand/collapse, and copy
 
-Output goes to `wwwroot/App_Plugins/UmbracoSearchExamine/` (gitignored, built by Vite).
-
-#### Monorepo Dependency Management
-
-All shared dependencies are hoisted to the root `src/package.json`:
-- **`@umbraco-cms/backoffice`** (runtime dependency) - Umbraco backoffice SDK
-- **Dev dependencies**: `typescript`, `vite`, `eslint`, `prettier`, and related plugins
-- **Script utilities**: `chalk`, `node-fetch`, `cross-env` (used by shared `generate-openapi.js`)
-
-Workspace `package.json` files (`Core.Client/Client/package.json`, `Provider.Examine/Client/package.json`) contain **scripts only** - no dependency declarations. npm workspaces resolves all imports from the hoisted root `node_modules/`.
-
-A shared OpenAPI generation script lives at `src/scripts/generate-openapi.js`. Both workspaces call it with different swagger URLs and output directories via their `generate-client` npm scripts.
+Output goes to `wwwroot/App_Plugins/UmbracoSearchExamine/` (gitignored, built by Vite). It resolves `UMB_SEARCH_WORKSPACE_CONTEXT` from `@umbraco-cms/backoffice/search-management` via its generated tsconfig aliases — see [Examine Client CLAUDE.md](../Umbraco.Cms.Search.Provider.Examine/CLAUDE.md).
 
 ## Key Concepts
 
@@ -345,31 +307,31 @@ Pass `AccessContext` to `SearchAsync` to include protected content in results.
 
 ### Adding a New Repository (Client)
 
-Repositories abstract API calls and provide clean interfaces for UI components. Follow this pattern:
+Repositories abstract API calls and provide clean interfaces for UI components. Follow this pattern (see `src/Umbraco.Web.UI.Client/docs/data-flow.md` and `docs/repositories.md` for the general convention):
 
-1. **Define Domain Types** in `src/settings/types.ts`:
+1. **Define Domain Types** in `search-index/types.ts`:
    - Create request/response types that abstract away API-generated types
    - Example: `UmbSearchRequest`, `UmbSearchResult`
 
-2. **Create Server Data Source** (e.g., `search-query.server.data-source.ts`):
-   - Implements data fetching and type mapping
+2. **Create Server Data Source** (e.g., `search-index/query/search-query.server.data-source.ts`):
+   - Implements data fetching and type mapping against `SearchService` (`@umbraco-cms/backoffice/external/backend-api`)
    - Maps domain types → API types (for requests)
    - Maps API types → domain types (for responses)
    - Uses `tryExecute()` for error handling
 
-3. **Create Repository** (e.g., `search-query.repository.ts`):
+3. **Create Repository** (e.g., `search-index/query/search-query.repository.ts`):
    - Extends `UmbRepositoryBase`
    - Orchestrates data source calls
    - Provides clean API for consumers
    - Example: `async search(request: UmbSearchRequest) { return this.#dataSource.search(request); }`
 
 4. **Register Repository**:
-   - Add constant in `src/global/constants.ts`: `export const UMB_SEARCH_QUERY_REPOSITORY_ALIAS = '...'`
-   - Export from `src/settings/repositories/index.ts`
-   - Add manifest in `src/bundle/repositories.manifests.ts`
+   - Add constant in `search-index/constants.ts`: `export const UMB_SEARCH_QUERY_REPOSITORY_ALIAS = '...'`
+   - Export from the sub-feature's `index.ts`
+   - Add manifest in the sub-feature's `manifests.ts` (`api: () => import('./search-query.repository.js')`)
 
 5. **Use in Components**:
-   - Import repository class directly: `import { UmbSearchQueryRepository } from '../repositories/search-query.repository.js'`
+   - Import the repository class directly, e.g. `import { UmbSearchQueryRepository } from '../query/search-query.repository.js'`
    - Instantiate: `#repository = new UmbSearchQueryRepository(this)`
    - Call methods: `const { data, error } = await this.#repository.search(request)`
 
@@ -403,25 +365,23 @@ Repositories abstract API calls and provide clean interfaces for UI components. 
 
 3. **Variation Field Naming**: When querying variant content, ensure field names include culture/segment suffixes where appropriate.
 
-4. **Global Contexts Must Load Upfront**: Client global contexts (e.g., notification listeners) must be in `search-global.js`, not lazy-loaded in `search-settings.js`.
+4. **Client Import Paths**: Inside `search-management`, import relatively (`../workspace/search-workspace.context-token.js`), the same as any other backoffice package. Only the Examine provider's separate client needs the `@umbraco-cms/backoffice/search-management` alias.
 
-5. **Client Import Paths**: Always use logical imports (`@umbraco-cms/search/settings` not `./path/to/file`) to leverage the importmap pattern.
+5. **Segment Variant Search**: Known limitation - segment variant content not created in the targeted segment may be excluded from results. This is a bug being addressed.
 
-6. **Segment Variant Search**: Known limitation - segment variant content not created in the targeted segment may be excluded from results. This is a bug being addressed.
+6. **Entity Actions vs Workspace Actions**: Entity actions automatically appear in workspace header dropdowns. Don't create duplicate workspace actions for the same functionality. Ensure the workspace's `entityType` matches the entity action's registered entity type.
 
-7. **Entity Actions vs Workspace Actions**: Entity actions automatically appear in workspace header dropdowns. Don't create duplicate workspace actions for the same functionality. Ensure the workspace's `entityType` matches the entity action's registered entity type.
+7. **Enum JSON Serialization**: C# enums used in ViewModels should use `[JsonConverter(typeof(JsonStringEnumConverter))]` to serialize as strings instead of numbers. This prevents confusion in the UI where enum values would appear as numbers.
 
-8. **Enum JSON Serialization**: C# enums used in ViewModels should use `[JsonConverter(typeof(JsonStringEnumConverter))]` to serialize as strings instead of numbers. This prevents confusion in the UI where enum values would appear as numbers.
+8. **State Management Race Conditions**: When setting loading states for async operations, set the state BEFORE making the API call, not after. This ensures immediate UI feedback and prevents race conditions where the operation completes before the loading state is set.
 
-9. **State Management Race Conditions**: When setting loading states for async operations, set the state BEFORE making the API call, not after. This ensures immediate UI feedback and prevents race conditions where the operation completes before the loading state is set.
+9. **Server-Driven State**: UI state should be derived from server health status (e.g., `healthStatus: 'Rebuilding'` → `state: 'loading'`). This keeps the UI synchronized with actual server state after reloads.
 
-10. **Server-Driven State**: UI state should be derived from server health status (e.g., `healthStatus: 'Rebuilding'` → `state: 'loading'`). This keeps the UI synchronized with actual server state after reloads.
+10. **Invariant Culture in Examine Index**: The Examine provider uses `"none"` as the `Sys_Culture` field value for invariant documents. Sending `culture: "en-US"` to `SearchAsync` searches `Sys_Culture: "en-US" OR "none"`, so invariant content is always included. Sending `culture: null` returns invariant-only. Always send a real culture code from the client; use `"none"` as the fallback for invariant-only contexts.
 
-11. **Invariant Culture in Examine Index**: The Examine provider uses `"none"` as the `Sys_Culture` field value for invariant documents. Sending `culture: "en-US"` to `SearchAsync` searches `Sys_Culture: "en-US" OR "none"`, so invariant content is always included. Sending `culture: null` returns invariant-only. Always send a real culture code from the client; use `"none"` as the fallback for invariant-only contexts.
+11. **Culture State on Workspace Context**: The `UmbSearchWorkspaceContext` owns `selectedCulture` state (observable + getter/setter). The search box writes it, entity actions read it via `getContext()`. Don't read culture from `window.location.href` — use the workspace context as the source of truth. URL params (`?culture=`) are for persistence/bookmarking only.
 
-12. **Culture State on Workspace Context**: The `UmbSearchWorkspaceContext` owns `selectedCulture` state (observable + getter/setter). The search box writes it, entity actions read it via `getContext()`. Don't read culture from `window.location.href` — use the workspace context as the source of truth. URL params (`?culture=`) are for persistence/bookmarking only.
-
-13. **Examine Client Cross-Package Imports**: The Examine Client can import from `@umbraco-cms/search/settings` (e.g., `UMB_SEARCH_WORKSPACE_CONTEXT`) via tsconfig path mappings. Both `settings` and `global` paths are needed since settings depends on global transitively. Vite externalizes these; the importmap resolves at runtime.
+12. **Examine Client Cross-Package Imports**: The Examine Client imports `UMB_SEARCH_WORKSPACE_CONTEXT` from `@umbraco-cms/backoffice/search-management` via its generated tsconfig path mapping — the same generated-alias mechanism it already uses for every other `@umbraco-cms/backoffice/<sub>` import. Vite externalizes these; the browser importmap resolves them at runtime.
 
 ## Coding Conventions
 
@@ -446,7 +406,7 @@ Repositories abstract API calls and provide clean interfaces for UI components. 
 
 Related CLAUDE.md files:
 - [Repository CLAUDE.md](../../CLAUDE.md) - Umbraco-CMS repository overview, architecture, and workflow
-- [Core Client CLAUDE.md](../Umbraco.Cms.Search.Core.Client/CLAUDE.md) - Detailed client architecture, manifest patterns, and development workflow
+- [Backoffice Client CLAUDE.md](../Umbraco.Web.UI.Client/CLAUDE.md) - Backoffice package conventions; the search index management UI lives at `src/packages/search-management/`
 - [Examine Client CLAUDE.md](../Umbraco.Cms.Search.Provider.Examine/CLAUDE.md) - Examine client architecture and development workflow
 
 External references:

@@ -14,7 +14,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Umbraco.Cms.Api.Common\Umbraco.Cms.Api.Common.csproj" />
+    <ProjectReference Include="..\Umbraco.Cms.Api.Management\Umbraco.Cms.Api.Management.csproj" />
     <ProjectReference Include="..\Umbraco.Cms.Search.Core\Umbraco.Cms.Search.Core.csproj" />
+    <ProjectReference Include="..\Umbraco.Web.Common\Umbraco.Web.Common.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -40,7 +43,6 @@
   <!-- BEGIN: Restore and build the search Examine client project (mirrors the Login block in Umbraco.Cms.StaticAssets) -->
   <PropertyGroup>
     <SearchExamineClientProjectDirectory Condition="'$(SearchExamineClientProjectDirectory)' == ''">$(ProjectDir)Client\</SearchExamineClientProjectDirectory>
-    <SearchCoreClientProjectDirectory Condition="'$(SearchCoreClientProjectDirectory)' == ''">$(ProjectDir)..\Umbraco.Cms.Search.Core.Client\Client\</SearchCoreClientProjectDirectory>
     <BackofficeClientProjectDirectory Condition="'$(BackofficeClientProjectDirectory)' == ''">$(ProjectDir)..\Umbraco.Web.UI.Client\</BackofficeClientProjectDirectory>
     <SearchExamineClientAssetsPath>$(ProjectDir)wwwroot\App_Plugins\UmbracoSearchExamine</SearchExamineClientAssetsPath>
   </PropertyGroup>
@@ -61,18 +63,13 @@
     <Exec Command="npm i --no-fund --no-audit" WorkingDirectory="$(SearchExamineClientProjectDirectory)" />
   </Target>
 
-  <!-- The Core Client and backoffice only need restoring (not building): this client's tsc walks their sources through tsconfig path aliases -->
-  <Target Name="RestoreSearchCoreClient" Inputs="$(SearchCoreClientProjectDirectory)package-lock.json" Outputs="$(SearchCoreClientProjectDirectory)node_modules/.package-lock.json">
-    <Message Importance="high" Text="Restoring Search Core Client NPM packages..." />
-    <Exec Command="npm i --no-fund --no-audit" WorkingDirectory="$(SearchCoreClientProjectDirectory)" />
-  </Target>
-
+  <!-- The backoffice only needs restoring (not building): this client's tsc walks its sources through tsconfig path aliases -->
   <Target Name="RestoreBackofficeClient" Inputs="$(BackofficeClientProjectDirectory)package-lock.json" Outputs="$(BackofficeClientProjectDirectory)node_modules/.package-lock.json">
     <Message Importance="high" Text="Restoring Backoffice NPM packages..." />
     <Exec Command="npm i --no-fund --no-audit" WorkingDirectory="$(BackofficeClientProjectDirectory)" />
   </Target>
 
-  <Target Name="BuildSearchExamineClient" DependsOnTargets="RestoreSearchExamineClient;RestoreSearchCoreClient;RestoreBackofficeClient">
+  <Target Name="BuildSearchExamineClient" DependsOnTargets="RestoreSearchExamineClient;RestoreBackofficeClient">
     <Message Importance="high" Text="Executing Search Examine Client NPM build script..." />
     <Exec Command="npm run build" WorkingDirectory="$(SearchExamineClientProjectDirectory)" />
     <ItemGroup>

@@ -6,17 +6,6 @@
 public static class Constants
 {
     /// <summary>
-    /// API-related constants.
-    /// </summary>
-    public static class Api
-    {
-        /// <summary>
-        /// The API name used to map the Search Management API endpoints.
-        /// </summary>
-        public const string Name = "search";
-    }
-
-    /// <summary>
     /// Persistence-related constants.
     /// </summary>
     public static class Persistence

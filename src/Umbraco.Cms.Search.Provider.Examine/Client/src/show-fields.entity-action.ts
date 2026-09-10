@@ -1,6 +1,6 @@
 import { fieldsRouteBuilder } from './fields-route-provider.element.js';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
-import { UMB_SEARCH_WORKSPACE_CONTEXT } from '@umbraco-cms/search/settings';
+import { UMB_SEARCH_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/search-management';
 
 export class UmbSearchExamineShowFieldsEntityAction extends UmbEntityActionBase<never> {
   override async getHref() {

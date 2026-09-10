@@ -83,6 +83,9 @@ internal static class ServerEventExtensions
         builder.AddNotificationAsyncHandler<MediaTypeChangedNotification, ServerEventSender>();
         builder.AddNotificationAsyncHandler<MemberTypeChangedNotification, ServerEventSender>();
 
+        builder.AddNotificationAsyncHandler<IndexRebuildStartingNotification, IndexRebuildServerEventNotificationHandler>();
+        builder.AddNotificationAsyncHandler<IndexRebuildCompletedNotification, IndexRebuildServerEventNotificationHandler>();
+
         return builder;
     }
 
