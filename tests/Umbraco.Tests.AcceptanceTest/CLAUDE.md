@@ -460,7 +460,9 @@ build(): DataTypePayload
 abstract getValues(): DataTypeValues
 ```
 
-**The part that is easy to get wrong:** annotating the base class alone achieves nothing. Every subclass declared `let values: any[] = []` and pushed into it, so the `any` swallowed the mistake long before it reached the return type — the annotation type-checked and caught precisely zero real errors. The 33 subclasses now declare `const values: DataTypeValues = []`, and with that in place a misspelled `allias:` fails compilation with *"Did you mean to write 'alias'?"*. **An `any` anywhere on the path to `build()` defeats the whole exercise**, which is why `npm run audit` budgets `: any` inside builders alongside the untyped exits.
+**The part that is easy to get wrong:** annotating the base class alone achieves nothing. Every subclass declared `let values: any[] = []` and pushed into it, so the `any` swallowed the mistake long before it reached the return type — the annotation type-checked and caught precisely zero real errors. The 33 subclasses now declare `const values: DataTypeValues = []`, and with that in place a misspelled `allias:` fails compilation with *"Did you mean to write 'alias'?"*. **An `any` anywhere on the path to `build()` defeats the whole exercise**, which is why `npm run audit` budgets `: any` inside builders alongside the unchecked exits.
+
+The remaining debt is not in those 33 subclasses — it is in the **sub-builders**, which return an inline object literal or push into a `let values: any = {}`. There a declared return type does do the work: TypeScript's excess-property check fires on a literal in a return position and names the mistake. That is what the audit's `untypedBuilderExit` now counts, so paying it off means giving each sub-builder's item shape an interface — not sprinkling annotations on the exits that are already checked.
 
 Still to do: 96 `build()`/`getValues()` outside the `DataTypeBuilder` hierarchy have no declared return type, and 25 `: any` remain (mostly the `*ValueBuilder` classes for documents, media and elements). Both are budgeted. Worth typing per-entity as each builder is touched — define the payload interface in `types.ts`, annotate the exit, then remove the `any` that would otherwise defeat it.
 
@@ -500,32 +502,40 @@ It needs no Umbraco instance and exits non-zero when a rule goes over budget.
 
 **A rule must never contradict the convention it enforces.** The sleep and force-click rules originally counted *every* occurrence, justified or not, with the budget set to the exact current total. §3 permits either escape when there is genuinely no observable state *provided a comment says what it stands in for* — so a properly justified addition pushed the count over budget, and the only way out was raising the budget, which this section forbids. The convention was unfollowable. Both rules now count only the **unjustified** ones; the comment is the contract, and the budget tracks the sites that lack one. `literalIndexLocator` works the same way: a parameterised `.nth(i)` is the legitimate form and is not counted, only a hardcoded literal is. If you add a rule with a documented exception, exclude that exception in the rule itself and add a `good` self-test case proving it.
 
-| Rule | Budget | Why it matters |
-|------|-------:|----------------|
-| Dropped promises | 0 | assertion never runs; test greens regardless |
-| Value-returning check nothing asserts on | 0 | same silent green, different disguise |
-| Assert-internally helper called without `await` | 0 | failure becomes a rejected promise; the test reports as passed |
-| Endpoint constant absent from `OpenApi.json` | 0 | a renamed route becomes a mystifying timeout |
-| Spec creates an entity it never tears down | 0 | global residue changes what later specs see |
-| Spec outside a project directory | 0 | file is never run at all |
-| Raw `page` fixture in a spec | 0 | bypasses the page objects |
-| Hardcoded API endpoint | 0 | belongs in `ConstantHelper.apiEndpoints` |
-| Disabled test without an annotation | 0 | invisible in reports |
-| Fixed sleep **without a justification** | 81 | debt — see §3 |
-| `force: true` **without a justification** | 79 | debt — masks actionability failures |
-| Entity name matched on a substring | 14 | strict-mode multi-match on leftover data |
-| Raw `.click()` in `lib/` | 5 | skips the visibility wait |
-| Hardcoded `.nth(N)` | 15 | bakes in unpromised list order |
-| Hardcoded timeout in ms | 1 | belongs in `ConstantHelper.timeout` |
-| Spec reaching through a helper to `page` | 11 | navigation belongs in a helper |
-| Untyped builder `build()`/`getValues()` | 96 | malformed payload compiles, fails as a 400 |
-| `: any` inside a builder | 25 | defeats the payload types downstream |
-| Commented-out test | 17 | invisible to `--list` and every reporter |
-| Commented-out assertion in a live test | 15 | test asserts less than it appears to |
-| TODO with no version trigger or author | 15 | cannot rot out loud, so never gets removed |
-| Spec asserting on a raw API response shape | 211 | couples 269 files to the response shape |
-| Deprecation with no removal version | 0 | consumer has no runway; we never know when to delete |
-| Helper parameter the body never reads | 1 | signature promises what the body does not do |
+**A rule must measure the effect, not the shape.** The builder-exit rule counted exits with no return type annotation. But for the 36 `DataTypeBuilder` subclasses, adding one provably changes nothing: their bodies already declare `const values: DataTypeValues = []`, which is what catches a misspelled field, and an unannotated `const values = []` infers `any[]` — which satisfies a `DataTypeValues` return annotation, so the annotation catches nothing on its own. The rule was asking for 36 edits with no effect while ignoring the 13 `getValue()` exits that genuinely return an unchecked shape. Both halves were checked by planting a misspelled field and re-running `tsc`, and the rule now counts the exits where an annotation would actually fire. **When you write a rule, plant the defect it exists to catch and confirm the type-checker or the run actually reports it** — otherwise you are enforcing a shape you have assumed is protective.
+
+The counts live in `audit-conventions.js` and are printed by `npm run audit`; this table gives
+the reason each rule exists, and whether it is a **gate** (must never be violated) or **debt**
+(ratcheted — the count may shrink, never grow). Deliberately no numbers here: four of them had
+already drifted from the real budgets before this column was removed.
+
+| Rule | | Why it matters |
+|------|--|----------------|
+| Dropped promises | gate | assertion never runs; test greens regardless |
+| Value-returning check nothing asserts on | gate | same silent green, different disguise |
+| Assert-internally helper called without `await` | gate | failure becomes a rejected promise; the test reports as passed |
+| `expect()` on an un-awaited async helper | gate | the assertion is on a Promise, so it is always true |
+| Endpoint constant absent from `OpenApi.json` | gate | a renamed route becomes a mystifying timeout |
+| Spec creates an entity it never tears down | gate | global residue changes what later specs see |
+| Spec outside a project directory | gate | file is never run at all |
+| Raw `page` fixture in a spec | gate | bypasses the page objects |
+| Hardcoded API endpoint | gate | belongs in `ConstantHelper.apiEndpoints` |
+| Hardcoded timeout in ms | gate | belongs in `ConstantHelper.timeout` |
+| Disabled test without an annotation | gate | invisible in reports |
+| Commented-out test | gate | invisible to `--list` and every reporter |
+| Deprecation with no removal version | gate | consumer has no runway; we never know when to delete |
+| Fixed sleep **without a justification** | debt | see §3 |
+| `force: true` **without a justification** | debt | masks actionability failures |
+| Entity name matched on a substring | debt | strict-mode multi-match on leftover data |
+| Raw `.click()` in `lib/` | debt | skips the visibility wait |
+| Hardcoded `.nth(N)` | debt | bakes in unpromised list order |
+| Spec reaching through a helper to `page` | debt | navigation belongs in a helper |
+| Builder exit returning an unchecked shape | debt | malformed payload compiles, fails as a 400 |
+| `: any` inside a builder | debt | defeats the payload types downstream |
+| Commented-out assertion in a live test | debt | test asserts less than it appears to |
+| TODO with no version trigger or author | debt | cannot rot out loud, so never gets removed |
+| Spec asserting on a raw API response shape | debt | couples 269 files to the response shape |
+| Helper parameter the body never reads | debt | signature promises what the body does not do |
 
 **When you reduce a count, lower the budget in the same commit** — the audit prints the new number for you. Never raise a budget to make a run pass; that is the one move that turns a ratchet back into a wish.
 

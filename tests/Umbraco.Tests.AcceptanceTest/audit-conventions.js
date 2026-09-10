@@ -26,7 +26,12 @@ const BUDGET = {
   literalIndexLocator: 15,
   hardcodedTimeout: 0,
   helperPageInSpec: 11,
-  untypedBuilderExit: 96,
+  // Rebased 96 -> 73 when the rule was keyed on effect rather than on the presence of an
+  // annotation. 36 of the old 96 were DataTypeBuilder subclasses whose `const values:
+  // DataTypeValues = []` already catches a misspelled field, where a return type provably
+  // changes nothing; 13 `getValue()` exits that do return an unchecked shape were outside the
+  // old rule and are now counted. No code changed - the number was wrong, not the suite.
+  untypedBuilderExit: 73,
   anyInBuilder: 25,
   commentedOutTest: 0,
   commentedOutAssertion: 15,
@@ -125,14 +130,49 @@ for (const f of libFiles) read(f).forEach((l, i) => {
 });
 
 // builders are the typed boundary between specs and the Management API - an untyped build()
-// or an `any` on the way to it lets a malformed payload compile and fail as an opaque 400
+// or an `any` on the way to it lets a malformed payload compile and fail as an opaque 400.
+//
+// A return type only buys something where the returned shape is not already checked, so two
+// shapes are deliberately NOT counted:
+//   - a body that declares the value with an explicit payload type (`const values:
+//     DataTypeValues = []`). That local annotation is what actually catches a misspelled
+//     envelope field; a return type adds nothing, because an unannotated `const values = []`
+//     infers `any[]` and `any[]` satisfies a `DataTypeValues` return annotation.
+//   - a body that returns an empty literal, where there is no shape to get wrong.
+// What is counted is an exit returning an inline object literal with no annotation. There the
+// annotation does the work: TypeScript's excess-property check fires on a literal in a return
+// position and names the mistake ("did you mean to write 'alias'?").
+//
+// Both halves were verified by planting a misspelled field and re-running tsc, because the
+// earlier version of this rule counted the annotation rather than the effect and so reported
+// 36 cases where adding one provably changes nothing.
+const EXIT_SIG = /^  (abstract )?(build|getValues|getValue)\s*\([^)]*\)\s*\{?\s*$/;
 for (const f of walk(at('lib/builders'), n => n.endsWith('.ts'))) {
   if (/types\.ts$/.test(f)) continue;
-  read(f).forEach((l, i) => {
+  const ls = read(f);
+  ls.forEach((l, i) => {
     if (isComment(l)) return;
-    if (/^  (abstract )?(build|getValues)\s*\([^)]*\)\s*\{?\s*$/.test(l))
-      add('untypedBuilderExit', f, i + 1, 'declare a return type so callers and subclasses are checked');
     if (/:\s*any\b/.test(l)) add('anyInBuilder', f, i + 1, 'an `any` here defeats the payload types downstream');
+    if (!EXIT_SIG.test(l)) return;
+
+    // Body by brace matching from the signature line.
+    let depth = 0, body = [], started = false;
+    for (let j = i; j < ls.length; j++) {
+      for (const c of ls[j]) { if (c === '{') { depth++; started = true; } else if (c === '}') depth--; }
+      if (j > i) body.push(ls[j]);
+      if (started && depth <= 0) break;
+    }
+    const text = body.join('\n');
+
+    // Nothing to get wrong.
+    if (/^\s*return\s*(\[\s*\]|\{\s*\}|null|undefined)\s*;?\s*$/m.test(text) && !/return\s*\{\s*$/m.test(text)) return;
+
+    // Already checked by an explicit, non-any annotation on the value that is returned.
+    const declared = [...text.matchAll(/(?:const|let)\s+(\w+)\s*:\s*([A-Za-z][\w<>\[\]]*)\s*=/g)]
+      .filter(m => m[2] !== 'any' && m[2] !== 'any[]');
+    if (declared.some(m => new RegExp('return\\s+' + m[1] + '\\s*;').test(text))) return;
+
+    add('untypedBuilderExit', f, i + 1, 'returns an unchecked shape - a return type would catch a misspelled field');
   });
 }
 
@@ -429,7 +469,7 @@ const RULES = [
   ['helperPageInSpec', 'Spec reaching through a helper to page'],
   ['commentedOutTest', 'Commented-out test (invisible to every report)'],
   ['commentedOutAssertion', 'Commented-out assertion in a live test'],
-  ['untypedBuilderExit', 'Builder build()/getValues() with no return type'],
+  ['untypedBuilderExit', 'Builder exit returning an unchecked shape'],
   ['anyInBuilder', '`: any` inside a builder'],
   ['unanchoredTodo', 'TODO with no version trigger or author'],
   ['rawResponseAssertion', 'Spec asserting on a raw API response shape'],

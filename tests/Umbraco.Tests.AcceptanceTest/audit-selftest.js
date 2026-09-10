@@ -1,7 +1,7 @@
 /**
  * Self-test for audit-conventions.js.
  *
- * The audit gates CI, and six of its rules have a budget of 0. For those, a rule whose
+ * The audit gates CI, and over half its rules have a budget of 0. For those, a rule whose
  * regex silently stops matching looks exactly like a rule that is passing — it reports
  * "clean" forever while the convention goes unenforced. Two of these detectors had real
  * bugs when first written (a dropped-promise rule that flagged 19 false positives, and a
@@ -230,12 +230,76 @@ const CASES = [
     files: {'lib/helpers/V.ts': [`    await expect(x).toBeVisible({timeout: 15000});`]},
   },
   {
+    // The shape worth flagging: an inline object literal with no annotation. TypeScript's
+    // excess-property check would name a misspelled field here if the return type were declared.
     rule: 'untypedBuilderExit', expect: 1,
-    files: {'lib/builders/q/qBuilder.ts': [`export class QBuilder {`, `  getValues() {`, `    return [];`, `  }`, `}`]},
+    files: {
+      'lib/builders/q/qBuilder.ts': [
+        `export class QBuilder {`,
+        `  build() {`,
+        `    return {`,
+        `      alias: this.alias || null,`,
+        `      value: this.value || null`,
+        `    };`,
+        `  }`,
+        `}`,
+      ],
+    },
   },
   {
     rule: 'untypedBuilderExit', expect: 0, label: 'a typed exit is allowed',
     files: {'lib/builders/r/rBuilder.ts': [`export class RBuilder {`, `  getValues(): DataTypeValues {`, `    return [];`, `  }`, `}`]},
+  },
+  {
+    // An annotated local is what actually catches a misspelled field - an unannotated
+    // `const values = []` infers `any[]`, and `any[]` satisfies a `DataTypeValues` return
+    // annotation, so requiring the return type here would buy nothing.
+    rule: 'untypedBuilderExit', expect: 0, label: 'an annotated local that is returned is already checked',
+    files: {
+      'lib/builders/r2/r2Builder.ts': [
+        `export class R2Builder {`,
+        `  getValues() {`,
+        `    const values: DataTypeValues = [];`,
+        `    values.push({alias: 'items', value: this.items});`,
+        `    return values;`,
+        `  }`,
+        `}`,
+      ],
+    },
+  },
+  {
+    rule: 'untypedBuilderExit', expect: 0, label: 'an empty literal has no shape to get wrong',
+    files: {'lib/builders/r3/r3Builder.ts': [`export class R3Builder {`, `  getValues() {`, `    return [];`, `  }`, `}`]},
+  },
+  {
+    // getValue() is an exit too - it was outside the rule until the rule was keyed on effect.
+    rule: 'untypedBuilderExit', expect: 1, label: 'getValue() counts as an exit',
+    files: {
+      'lib/builders/r4/r4Builder.ts': [
+        `export class R4Builder {`,
+        `  getValue() {`,
+        `    return {`,
+        `      contentKey: this.contentKey`,
+        `    };`,
+        `  }`,
+        `}`,
+      ],
+    },
+  },
+  {
+    // An `any`-typed local is not "already checked" - it must still be counted.
+    rule: 'untypedBuilderExit', expect: 1, label: 'an any-typed local is not a check',
+    files: {
+      'lib/builders/r5/r5Builder.ts': [
+        `export class R5Builder {`,
+        `  getValues() {`,
+        `    let values: any = {};`,
+        `    values.label = this.label;`,
+        `    return values;`,
+        `  }`,
+        `}`,
+      ],
+    },
   },
   {
     rule: 'anyInBuilder', expect: 1,
@@ -448,6 +512,34 @@ const uncovered = Object.keys(LABELS).filter(k => !covered.has(k) && !NO_FIXTURE
 if (uncovered.length) {
   console.error(`\n  FAIL  no self-test case for: ${uncovered.join(', ')}`);
   failed += uncovered.length;
+}
+
+// The rule table in CLAUDE.md §7 documents why each rule exists. It used to restate each
+// budget too, and four of those numbers had drifted from the real ones - so the numbers were
+// removed and what remains is whether a rule is a gate (budget 0) or ratcheted debt. That still
+// drifts if a rule is added, or flips between the two, without the table following. Checked
+// here by count rather than by matching prose to rule names, which would just move the drift
+// into a third place.
+{
+  const budgetBlock = fs.readFileSync(path.join(__dirname, 'audit-conventions.js'), 'utf8')
+    .match(/const BUDGET = \{[\s\S]*?\n\};/)[0];
+  const budgets = [...budgetBlock.matchAll(/^\s*([a-zA-Z]+):\s*(\d+),/gm)].map(m => [m[1], Number(m[2])]);
+  const gates = budgets.filter(([, n]) => n === 0).length;
+  const debt = budgets.length - gates;
+
+  const md = fs.readFileSync(path.join(__dirname, 'CLAUDE.md'), 'utf8');
+  const rows = [...md.matchAll(/^\| [^|]+ \| (gate|debt) \|/gm)].map(m => m[1]);
+  const docGates = rows.filter(r => r === 'gate').length;
+  const docDebt = rows.filter(r => r === 'debt').length;
+
+  if (rows.length !== budgets.length || docGates !== gates || docDebt !== debt) {
+    console.error(`\n  FAIL  CLAUDE.md §7 table is out of step with BUDGET: ` +
+      `table has ${rows.length} rows (${docGates} gate, ${docDebt} debt), ` +
+      `BUDGET has ${budgets.length} rules (${gates} gate, ${debt} debt)`);
+    failed++;
+  } else {
+    console.log(`  ok    CLAUDE.md §7 table covers all ${budgets.length} rules (${gates} gate, ${debt} debt)`);
+  }
 }
 
 fs.rmSync(tmp, {recursive: true, force: true});
