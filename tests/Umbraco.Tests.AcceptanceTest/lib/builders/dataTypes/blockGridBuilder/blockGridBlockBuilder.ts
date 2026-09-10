@@ -1,5 +1,6 @@
 import {BlockGridDataTypeBuilder} from '../blockGridDataTypeBuilder';
 import {BlockGridAreaBuilder} from './blockGridAreaBuilder';
+import {BlockGridBlockConfiguration} from '../../types';
 
 export class BlockGridBlockBuilder {
   parentBuilder: BlockGridDataTypeBuilder;
@@ -129,8 +130,8 @@ export class BlockGridBlockBuilder {
     return this.parentBuilder;
   }
 
-  getValues() {
-    let values: any = {};
+  getValues(): BlockGridBlockConfiguration {
+    const values: BlockGridBlockConfiguration = {};
 
     if (this.contentElementTypeKey) {
       values.contentElementTypeKey = this.contentElementTypeKey;

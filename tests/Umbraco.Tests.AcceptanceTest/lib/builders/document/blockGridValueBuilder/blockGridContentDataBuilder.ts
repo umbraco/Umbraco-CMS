@@ -1,5 +1,6 @@
 import {BlockGridValueBuilder} from './blockGridValueBuilder';
 import {BlockGridContentDataValueBuilder} from './blockGridContentDataValueBuilder';
+import {BlockGridContentData} from '../../types';
 
 export class BlockGridContentDataBuilder {
   parentBuilder: BlockGridValueBuilder;
@@ -38,7 +39,7 @@ export class BlockGridContentDataBuilder {
     return this.parentBuilder;
   }
 
-  getValue() {
+  getValue(): BlockGridContentData {
     return {
       contentTypeKey: this.contentTypeKey,
       key: this.key,

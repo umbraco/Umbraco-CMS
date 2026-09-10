@@ -1,5 +1,6 @@
 import {UserGroupPermissionBuilder} from './userGroupPermissionBuilder';
 import {UserGroupsPermissionsBaseBuilder} from './userGroupsPermissionsBaseBuilder';
+import {UserGroupPropertyValuePermission} from '../types';
 
 export class UserGroupPropertyValuePermissionBuilder {
   parentBuilder: UserGroupPermissionBuilder;
@@ -31,7 +32,7 @@ export class UserGroupPropertyValuePermissionBuilder {
     return this.parentBuilder;
   }
 
-  build() {
+  build(): UserGroupPropertyValuePermission {
     return {
       '$type': 'DocumentPropertyValuePermissionPresentationModel',
       documentType: this.documentTypeId ? {id: this.documentTypeId} : null,

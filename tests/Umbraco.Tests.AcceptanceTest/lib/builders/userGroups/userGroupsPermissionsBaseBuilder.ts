@@ -1,3 +1,4 @@
+import {UserGroupVerbs} from '../types';
 export class UserGroupsPermissionsBaseBuilder {
   parentBuilder;
 
@@ -205,8 +206,8 @@ export class UserGroupsPermissionsBaseBuilder {
     return this.parentBuilder;
   }
 
-  build() {
-    let values: any[] = [];
+  build(): UserGroupVerbs {
+    const values: UserGroupVerbs = [];
 
     // Document permissions
     if (this.readDocument) {

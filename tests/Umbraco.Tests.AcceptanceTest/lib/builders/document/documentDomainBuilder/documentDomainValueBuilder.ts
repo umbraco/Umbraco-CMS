@@ -1,5 +1,6 @@
 
 import {DocumentDomainBuilder} from './documentDomainBuilder';
+import {DocumentDomainValue} from '../../types';
 
 export class DocumentDomainValueBuilder {
   parentBuilder: DocumentDomainBuilder;
@@ -24,7 +25,7 @@ export class DocumentDomainValueBuilder {
     return this.parentBuilder;
   }
 
-  build() {
+  build(): DocumentDomainValue {
     return {
       domainName: this.domainName,
       isoCode: this.isoCode,

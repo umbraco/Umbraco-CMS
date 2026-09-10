@@ -36,8 +36,15 @@ const BUDGET = {
   //   Then 64 -> 44: the variant, value, entity and content-type builders now declare their
   //   payload types (lib/builders/types.ts). What is left is the sub-builders - block, tiptap,
   //   list-view, user-group permissions - each of which needs an interface for its item shape.
-  untypedBuilderExit: 44,
-  anyInBuilder: 25,
+  // Paid off: every builder exit now declares its payload type, so this is a gate rather than
+  // debt. A new exit returning an unchecked shape fails the build.
+  untypedBuilderExit: 0,
+  // 25 -> 12. The 13 removed were `let values: any = {}` accumulators, now declared with the
+  // shape they build - which is what makes a misspelled field an error rather than silence.
+  // Of the 12 left, nine are correct: a property `value` is genuinely heterogeneous, and the
+  // four `let value: any = null` accumulators hold one. The other three are exported
+  // signatures that should narrow but cannot in a minor - each carries a TODO (V19).
+  anyInBuilder: 12,
   commentedOutTest: 0,
   commentedOutAssertion: 15,
   unanchoredTodo: 15,

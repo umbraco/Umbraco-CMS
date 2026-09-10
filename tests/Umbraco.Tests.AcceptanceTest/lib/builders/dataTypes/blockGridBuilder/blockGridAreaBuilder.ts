@@ -1,6 +1,7 @@
 import {BlockGridSpecifiedAllowanceBuilder} from './blockGridSpecifiedAllowanceBuilder';
 import {BlockGridBlockBuilder} from './blockGridBlockBuilder';
 import {ensureIdExists} from '../../../helpers/BuilderUtils';
+import {BlockGridAreaConfiguration} from '../../types';
 
 export class BlockGridAreaBuilder {
   parentBuilder: BlockGridBlockBuilder;
@@ -63,8 +64,8 @@ export class BlockGridAreaBuilder {
     return this.parentBuilder;
   }
 
-  getValues() {
-    let values: any = {};
+  getValues(): BlockGridAreaConfiguration {
+    const values: BlockGridAreaConfiguration = {};
 
     this.key = ensureIdExists(this.key);
     values.key = this.key;

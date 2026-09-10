@@ -1,4 +1,5 @@
 import {TiptapDataTypeBuilder} from '../tiptapDataTypeBuilder';
+import {TiptapBlockConfiguration} from '../../types';
 
 export class TiptapBlockBuilder {
   parentBuilder: TiptapDataTypeBuilder;
@@ -59,39 +60,39 @@ export class TiptapBlockBuilder {
     return this.parentBuilder;
   }
 
-  build() {
-    let values = {};
+  build(): TiptapBlockConfiguration {
+    const values: TiptapBlockConfiguration = {};
 
     if (this.contentElementTypeKey !== '') {
-      values['contentElementTypeKey'] = this.contentElementTypeKey;
+      values.contentElementTypeKey = this.contentElementTypeKey;
     }
 
     if (this.displayInline) {
-      values['displayInline'] = this.displayInline;
+      values.displayInline = this.displayInline;
     }
 
     if (this.backgroundColor !== '') {
-      values['backgroundColor'] = this.backgroundColor;
+      values.backgroundColor = this.backgroundColor;
     }
 
     if (this.iconColor !== '') {
-      values['iconColor'] = this.iconColor;
+      values.iconColor = this.iconColor;
     }
 
     if (this.thumbnail !== '') {
-      values['thumbnail'] = this.thumbnail;
+      values.thumbnail = this.thumbnail;
     }
 
     if (this.editorSize !== '') {
-      values['editorSize'] = this.editorSize;
+      values.editorSize = this.editorSize;
     }
 
     if (this.label !== '') {
-      values['label'] = this.label;
+      values.label = this.label;
     }
 
     if (this.settingsElementTypeKey !== '') {
-      values['settingsElementTypeKey'] = this.settingsElementTypeKey;
+      values.settingsElementTypeKey = this.settingsElementTypeKey;
     }
 
     return values;

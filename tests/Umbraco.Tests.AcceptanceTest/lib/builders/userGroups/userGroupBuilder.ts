@@ -1,6 +1,7 @@
 import {UserGroupPermissionBuilder} from './userGroupPermissionBuilder';
 import {AliasHelper} from '../../helpers/AliasHelper';
 import {UserGroupsPermissionsBaseBuilder} from './userGroupsPermissionsBaseBuilder';
+import {UserGroupPayload} from '../types';
 
 export class UserGroupBuilder {
   name: string;
@@ -95,7 +96,7 @@ export class UserGroupBuilder {
     return this;
   }
 
-  build() {
+  build(): UserGroupPayload {
     return {
       name: this.name || '',
       alias: AliasHelper.toAlias(this.name) || '',

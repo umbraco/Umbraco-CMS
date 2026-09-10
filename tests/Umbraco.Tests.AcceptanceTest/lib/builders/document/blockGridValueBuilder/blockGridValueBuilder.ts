@@ -3,6 +3,7 @@ import {DocumentValueBuilder} from '../documentValueBuilder';
 import {BlockGridContentDataBuilder} from './blockGridContentDataBuilder';
 import {BlockGridExposeBuilder} from './blockGridExposeBuilder';
 import {BlockGridLayoutBuilder} from './blockGridLayoutBuilder';
+import {BlockGridValue} from '../../types';
 
 export class BlockGridValueBuilder {
   parentBuilder: DocumentValueBuilder | DocumentBlueprintsValueBuilder;
@@ -41,7 +42,7 @@ export class BlockGridValueBuilder {
     return this.parentBuilder;
   }
 
-  getValue() {
+  getValue(): BlockGridValue {
     return {
       contentData: this.blockGridContentDataBuilder.map((builder) => {
         return builder.getValue();

@@ -32,6 +32,7 @@ export class TinyMCEDataTypeBuilder extends DataTypeBuilder {
     return this;
   }
 
+  // TODO (V19): narrow to `string`; the only caller passes the literal 'Classic'.
   withEditorMode(editorMode: any) {
     this.editorMode = editorMode;
     return this;

@@ -1,3 +1,4 @@
+import {BlockContentDataValue} from '../../types';
 export class BaseContentDataValueBuilder {
   alias: string;
   culture: string;
@@ -30,7 +31,7 @@ export class BaseContentDataValueBuilder {
     return this;
   }
 
-  getValue() {
+  getValue(): BlockContentDataValue {
     return {
       alias: this.alias,
       culture: this.culture || null,

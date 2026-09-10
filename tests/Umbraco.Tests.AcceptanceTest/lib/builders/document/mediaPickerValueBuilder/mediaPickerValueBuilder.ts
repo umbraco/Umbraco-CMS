@@ -1,4 +1,5 @@
 import {DocumentValueBuilder} from '../documentValueBuilder';
+import {MediaPickerValue} from '../../types';
 
 export class MediaPickerValueBuilder {
   parentBuilder: DocumentValueBuilder;
@@ -36,8 +37,8 @@ export class MediaPickerValueBuilder {
     return this.parentBuilder;
   }
 
-  getValue() {
-    let value: any = {};
+  getValue(): MediaPickerValue {
+    const value: MediaPickerValue = {};
     if (this.key == null) {
       const crypto = require('crypto');
       this.key = crypto.randomUUID();

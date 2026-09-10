@@ -1,4 +1,5 @@
 import {ListViewDataTypeBuilder} from '../listViewDataTypeBuilder';
+import {ListViewLayout} from '../../types';
 
 export class ListViewLayoutBuilder {
   parentBuilder: ListViewDataTypeBuilder;
@@ -29,7 +30,7 @@ export class ListViewLayoutBuilder {
     return this.parentBuilder;
   }
 
-  getValues() {
+  getValues(): ListViewLayout {
     return {
       collectionView: this.collectionView || 'Umb.CollectionView.Document.Table',
       icon: this.icon || 'icon-list',

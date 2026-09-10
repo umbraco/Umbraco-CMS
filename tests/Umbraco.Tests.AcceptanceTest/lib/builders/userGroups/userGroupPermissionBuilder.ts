@@ -2,6 +2,7 @@ import {UserGroupBuilder} from './userGroupBuilder';
 import {UserGroupDocumentPermissionBuilder} from './userGroupDocumentPermissionBuilder';
 import {UserGroupElementPermissionBuilder} from './userGroupElementPermissionBuilder';
 import {UserGroupPropertyValuePermissionBuilder} from './userGroupPropertyValuePermissionBuilder';
+import {UserGroupPermission} from '../types';
 
 export class UserGroupPermissionBuilder {
   parentBuilder: UserGroupBuilder;
@@ -34,7 +35,7 @@ export class UserGroupPermissionBuilder {
     return this.parentBuilder;
   }
 
-  build() {
+  build(): UserGroupPermission[] {
     return this.permissionBuilders.map(builder => builder.build());
   }
 }

@@ -1,4 +1,5 @@
 import {ImageCropperDataTypeBuilder} from '../imageCropperDataTypeBuilder';
+import {CropConfiguration} from '../../types';
 
 export class ImageCropperCropBuilder {
   parentBuilder: ImageCropperDataTypeBuilder;
@@ -35,8 +36,8 @@ export class ImageCropperCropBuilder {
     return this.parentBuilder;
   }
 
-  getValues() {
-    let values: any = {};
+  getValues(): CropConfiguration {
+    const values: CropConfiguration = {};
     if (this.label) {
       values.label = this.label;
     }

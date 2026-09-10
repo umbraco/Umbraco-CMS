@@ -27,6 +27,7 @@ export class DocumentValueBuilder {
     this.urlPickerValueBuilder = [];
   }
 
+  // TODO (V19): narrow to `string | null`, as DocumentBlueprintsValueBuilder already does.
   withCulture(culture: any) {
     this.culture = culture;
     return this;

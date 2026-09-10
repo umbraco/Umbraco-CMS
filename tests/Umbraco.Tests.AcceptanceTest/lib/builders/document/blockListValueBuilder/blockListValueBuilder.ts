@@ -3,6 +3,7 @@ import {DocumentValueBuilder} from '../documentValueBuilder';
 import {BlockListContentDataBuilder} from './blockListContentDataBuilder';
 import {BlockListExposeBuilder} from './blockListExposeBuilder';
 import {BlockListLayoutBuilder} from './blockListLayoutBuilder';
+import {BlockListValue} from '../../types';
 
 export class BlockListValueBuilder {
   parentBuilder: DocumentValueBuilder | DocumentBlueprintsValueBuilder;
@@ -41,7 +42,7 @@ export class BlockListValueBuilder {
     return this.parentBuilder;
   }
 
-  getValue() {
+  getValue(): BlockListValue {
     return {
       contentData: this.blockListContentDataBuilder.map((builder) => {
         return builder.getValue();

@@ -20,7 +20,7 @@ export class TiptapToolbarRowBuilder {
     return this.parentBuilder;
   }
 
-  build() {
+  build(): string[][] {
     return this.tiptapToolbarGroupBuilder.map(builder => builder.build());
   }
 }

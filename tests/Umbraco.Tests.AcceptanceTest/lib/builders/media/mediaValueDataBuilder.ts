@@ -1,4 +1,5 @@
 import {MediaValueBuilder} from './mediaValueBuilder';
+import {ImageValue} from '../types';
 
 export class MediaValueDataBuilder {
   parentBuilder: MediaValueBuilder;
@@ -36,8 +37,8 @@ export class MediaValueDataBuilder {
     return this.parentBuilder;
   }
 
-  getValue() {
-    let value: any = {};
+  getValue(): ImageValue {
+    const value: ImageValue = {};
     value.crops = this.crops || [];
     if (this.focalPoint !== undefined) {
       value.focalPoint = this.focalPoint; 

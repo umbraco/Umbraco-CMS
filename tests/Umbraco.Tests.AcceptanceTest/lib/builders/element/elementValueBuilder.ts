@@ -14,6 +14,7 @@ export class ElementValueBuilder {
     this.parentBuilder = parentBuilder;
   }
 
+  // TODO (V19): narrow to `string | null`, as DocumentBlueprintsValueBuilder already does.
   withCulture(culture: any) {
     this.culture = culture;
     return this;

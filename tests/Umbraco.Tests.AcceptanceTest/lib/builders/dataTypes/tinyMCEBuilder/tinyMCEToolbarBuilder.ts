@@ -207,7 +207,7 @@ export class TinyMCEToolbarBuilder {
     return this.parentBuilder;
   }
 
-  build() {
+  build(): string[] {
     return Object.keys(this.toolbarValues).filter(key => this.toolbarValues[key]);
   }
 }

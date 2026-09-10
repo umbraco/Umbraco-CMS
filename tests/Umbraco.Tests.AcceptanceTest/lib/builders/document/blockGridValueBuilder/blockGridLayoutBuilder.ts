@@ -1,4 +1,5 @@
 import {BlockGridAreaBuilder} from './blockGridAreaBuilder';
+import {BlockGridLayoutItem} from '../../types';
 
 export class BlockGridLayoutBuilder {
   parentBuilder;
@@ -55,7 +56,7 @@ export class BlockGridLayoutBuilder {
     return this.parentBuilder;
   }
 
-  getValue() {
+  getValue(): BlockGridLayoutItem {
     return {
       $type: 'BlockGridLayoutItem',
       columnSpan: this.columnSpan || 12,

@@ -1,4 +1,5 @@
 import {BlockGridLayoutBuilder} from './blockGridLayoutBuilder';
+import {BlockGridArea} from '../../types';
 
 export class BlockGridAreaBuilder {
   parentBuilder: BlockGridLayoutBuilder;
@@ -25,7 +26,7 @@ export class BlockGridAreaBuilder {
     return this.parentBuilder;
   }
 
-  getValue() {
+  getValue(): BlockGridArea {
     return {
       key: this.key,
       items: this.itemsLayoutBuilder.map((builder) => {

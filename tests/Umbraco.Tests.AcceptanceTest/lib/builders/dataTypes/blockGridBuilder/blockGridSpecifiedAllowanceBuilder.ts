@@ -1,4 +1,5 @@
 import {BlockGridAreaBuilder} from './blockGridAreaBuilder';
+import {BlockGridSpecifiedAllowance} from '../../types';
 
 export class BlockGridSpecifiedAllowanceBuilder {
   parentBuilder: BlockGridAreaBuilder;
@@ -35,8 +36,8 @@ export class BlockGridSpecifiedAllowanceBuilder {
     return this.parentBuilder;
   }
 
-  getValues() {
-    let values: any = {};
+  getValues(): BlockGridSpecifiedAllowance {
+    const values: BlockGridSpecifiedAllowance = {};
 
     if (this.elementTypeKey !== undefined) {
       values.elementTypeKey = this.elementTypeKey;

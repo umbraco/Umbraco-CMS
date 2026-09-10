@@ -1,10 +1,11 @@
-﻿export class WebhookBuilder {
+﻿import {WebhookPayload} from '../types';
+export class WebhookBuilder {
   enabled: boolean;
   name: string;
   description: string;
   url: string;
   contentTypeKeys: string[];
-  headers;
+  headers: Record<string, string>;
   events: string[];
 
   constructor() {
@@ -48,7 +49,7 @@
     return this;
   }
 
-  build() {
+  build(): WebhookPayload {
     return {
       enabled: this.enabled !== undefined ? this.enabled : true,
       name: this.name,

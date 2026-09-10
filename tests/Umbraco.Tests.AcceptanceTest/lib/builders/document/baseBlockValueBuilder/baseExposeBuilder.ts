@@ -1,4 +1,5 @@
-﻿export class BaseExposeBuilder {
+﻿import {BlockExpose} from '../../types';
+export class BaseExposeBuilder {
   contentKey: string;
   culture: string;
   segment: string;
@@ -18,7 +19,7 @@
     return this;
   }
 
-  getValue() {
+  getValue(): BlockExpose {
     return {
       contentKey: this.contentKey,
       culture: this.culture || null,

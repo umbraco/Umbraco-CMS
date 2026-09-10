@@ -87,7 +87,7 @@ export class TiptapExtensionBuilder {
     return this.parentBuilder;
   }
 
-  build() {
+  build(): string[] {
     return Object.keys(this.extensionValues).filter(key => this.extensionValues[key]);
   }
 }

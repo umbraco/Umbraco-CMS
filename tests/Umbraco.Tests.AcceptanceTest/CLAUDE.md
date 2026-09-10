@@ -477,12 +477,34 @@ sent and changing it wants a running instance rather than a tidy-up: `MemberVari
 sends `name: ''` where the other four send `null`, and `MemberValueBuilder` omits `editorAlias`
 and `entityType` entirely (hence both optional on `EntityPropertyValue`).
 
-Still to do: the **sub-builders** — block grid, block list, tiptap, TinyMCE, list view,
-image cropper, media picker, user-group permissions — 44 exits, each needing an interface for
-its own item shape, plus the 25 `: any` that would defeat one. Both budgeted. The pattern is
-the one above: define the shape in `types.ts`, annotate the exit, then plant a misspelled
-field and confirm `tsc` reports it — an annotation over an `any` local catches nothing, so the
-planted defect is the only proof the work landed.
+The sub-builders are done too — block grid, block list, tiptap, TinyMCE, list view, image
+cropper, media picker, user-group permissions — so **`untypedBuilderExit` is a gate now, not
+debt**: a new exit returning an unchecked shape fails the build.
+
+Most of those built their payload conditionally into a `let values: any = {}` and returned it,
+and that is the shape to know, because the fix is not the return type. **The local declaration
+is what does the work.** With `const values: BlockGridBlockConfiguration = {}`, a
+`values.allowAtRot = …` is an error that names the typo; on an `any` local the identical line
+is silent, and a return annotation over it changes nothing. So these interfaces have every
+property optional — the builders emit a field only when it is set — and the local carries the
+type.
+
+One case needed more than an annotation: `TiptapBlockBuilder` assigned with brackets
+(`values['label'] = …`). Bracket assignment is **not** checked, because `noImplicitAny` is off
+under `strict: false`, so it was converted to dot access. Same payload, and the typo in
+`displayInline` it now catches is the kind with a lowercase L in it.
+
+`: any` is down from 25 to 12, and the remaining 12 split two ways. Nine are correct: a
+property `value` is genuinely heterogeneous, and the four `let value: any = null` accumulators
+hold one. Three are exported signatures that ought to narrow — two `withCulture(culture: any)`
+against a sibling that already declares `string | null`, and `withEditorMode(editorMode: any)`
+whose only caller passes `'Classic'` — but §2 forbids changing an exported signature in a
+minor, so each carries a `TODO (V19)` rather than a change.
+
+When you add a sub-builder, follow the same order: declare the shape in `types.ts` with
+optional properties, declare the **local** with it, annotate the exit, then plant a misspelled
+field and confirm `tsc` names it. That last step is not optional — it is the only thing that
+distinguishes typing that works from typing that looks like it does.
 
 ### The bug class to look for in a builder
 
@@ -542,13 +564,13 @@ already drifted from the real budgets before this column was removed.
 | Disabled test without an annotation | gate | invisible in reports |
 | Commented-out test | gate | invisible to `--list` and every reporter |
 | Deprecation with no removal version | gate | consumer has no runway; we never know when to delete |
+| Builder exit returning an unchecked shape | gate | malformed payload compiles, fails as a 400 |
 | Fixed sleep **without a justification** | debt | see §3 |
 | `force: true` **without a justification** | debt | masks actionability failures |
 | Entity name matched on a substring | debt | strict-mode multi-match on leftover data |
 | Raw `.click()` in `lib/` | debt | skips the visibility wait |
 | Hardcoded `.nth(N)` | debt | bakes in unpromised list order |
 | Spec reaching through a helper to `page` | debt | navigation belongs in a helper |
-| Builder exit returning an unchecked shape | debt | malformed payload compiles, fails as a 400 |
 | `: any` inside a builder | debt | defeats the payload types downstream |
 | Commented-out assertion in a live test | debt | test asserts less than it appears to |
 | TODO with no version trigger or author | debt | cannot rot out loud, so never gets removed |

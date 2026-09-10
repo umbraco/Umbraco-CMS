@@ -1,4 +1,5 @@
 import {BlockListValueBuilder} from './blockListValueBuilder';
+import {BlockListLayoutItem} from '../../types';
 
 export class BlockListLayoutBuilder {
   parentBuilder: BlockListValueBuilder;
@@ -17,7 +18,7 @@ export class BlockListLayoutBuilder {
     return this.parentBuilder;
   }
 
-  getValue() {
+  getValue(): BlockListLayoutItem {
     return {
       contentKey: this.contentKey
     };

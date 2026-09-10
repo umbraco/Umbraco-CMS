@@ -1,5 +1,6 @@
 import {UserGroupPermissionBuilder} from './userGroupPermissionBuilder';
 import {UserGroupsPermissionsBaseBuilder} from './userGroupsPermissionsBaseBuilder';
+import {UserGroupDocumentPermission} from '../types';
 
 export class UserGroupDocumentPermissionBuilder {
   parentBuilder: UserGroupPermissionBuilder;
@@ -25,7 +26,7 @@ export class UserGroupDocumentPermissionBuilder {
     return this.parentBuilder;
   }
 
-  build() {
+  build(): UserGroupDocumentPermission {
     return {
       '$type': 'DocumentPermissionPresentationModel',
       document: this.documentId ? {id: this.documentId} : null,

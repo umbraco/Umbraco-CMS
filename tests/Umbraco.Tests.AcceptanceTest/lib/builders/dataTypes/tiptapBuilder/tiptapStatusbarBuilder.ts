@@ -23,7 +23,7 @@ export class TiptapStatusbarBuilder {
     return this.parentBuilder;
   }
 
-  build() {
+  build(): string[] {
     return Object.keys(this.statusbarValues).filter(key => this.statusbarValues[key]);
   }
 }

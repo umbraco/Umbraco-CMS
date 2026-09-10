@@ -1,4 +1,5 @@
 import {ApprovedColorDataTypeBuilder} from '../approvedColorDataTypeBuilder';
+import {ApprovedColorItem} from '../../types';
 
 export class ApprovedColorItemBuilder {
   parentBuilder: ApprovedColorDataTypeBuilder;
@@ -23,8 +24,8 @@ export class ApprovedColorItemBuilder {
     return this.parentBuilder;
   }
 
-  getValues() {
-    let values: any = {};
+  getValues(): ApprovedColorItem {
+    const values: ApprovedColorItem = {};
     if (this.label) {
       values.label = this.label;
     }

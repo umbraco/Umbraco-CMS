@@ -99,7 +99,7 @@ export interface ContentTypePayloadBase {
 export interface DocumentTypePayload extends ContentTypePayloadBase {
   allowedInLibrary: boolean;
   allowedDocumentTypes: AllowedDocumentType[];
-  allowedTemplates: { id: string | null }[];
+  allowedTemplates: OptionalEntityReference[];
   defaultTemplate: EntityReference | null;
   cleanup: {
     preventCleanup: boolean;
@@ -150,6 +150,369 @@ export interface MemberPayload extends EntityPayloadBase {
   groups: string[];
   isApproved: boolean;
 }
+
+/**
+ * A block editor's property value.
+ *
+ * The three arrays are parallel rather than nested: `contentData` holds each block's own
+ * property values keyed by `key`, `layout` holds the arrangement referring back to those keys,
+ * and `expose` marks which blocks are exposed for which culture/segment. A layout entry whose
+ * `contentKey` matches no `contentData` key is accepted by the type system and rejected by the
+ * API, so the keys are the part to check by eye.
+ */
+
+/** One `{alias, value}` entry inside a block's `contentData`. */
+export interface BlockContentDataValue {
+  alias: string;
+  culture: string | null;
+  editorAlias: string;
+  segment: string | null;
+  value: any;
+}
+
+/** An `expose` entry, marking a block's content as exposed for a culture/segment. */
+export interface BlockExpose {
+  contentKey: string;
+  culture: string | null;
+  segment: string | null;
+}
+
+/** A block-list `contentData` entry. */
+export interface BlockListContentData {
+  contentTypeKey: string;
+  key: string;
+  values: BlockContentDataValue[];
+}
+
+/** A block-grid `contentData` entry: the list's shape plus the legacy `udi`. */
+export interface BlockGridContentData extends BlockListContentData {
+  udi: string | null;
+}
+
+/** A block-list `layout` entry. */
+export interface BlockListLayoutItem {
+  contentKey: string;
+}
+
+/** A block-grid area, holding nested layout items. */
+export interface BlockGridArea {
+  key: string;
+  items: BlockGridLayoutItem[];
+}
+
+/** A block-grid `layout` entry. Areas nest layout items, so this is mutually recursive. */
+export interface BlockGridLayoutItem {
+  $type: string;
+  columnSpan: number;
+  contentKey: string;
+  areas: BlockGridArea[];
+  contentUdi: string | null;
+  rowSpan: number;
+  settingsKey: string | null;
+  settingsUdi: string | null;
+}
+
+/** The value a block-list property carries. The layout key is the editor alias. */
+export interface BlockListValue {
+  contentData: BlockListContentData[];
+  expose: BlockExpose[];
+  layout: { 'Umbraco.BlockList': BlockListLayoutItem[] };
+  settingsData: any[];
+}
+
+/** The value a block-grid property carries. */
+export interface BlockGridValue {
+  contentData: BlockGridContentData[];
+  expose: BlockExpose[];
+  layout: { 'Umbraco.BlockGrid': BlockGridLayoutItem[] };
+  settingsData: any[];
+}
+
+/**
+ * User-group permissions. The API discriminates the three kinds on `$type`, so these are a
+ * discriminated union rather than one type with every key optional - that way a document
+ * permission cannot be handed to a property-value slot.
+ */
+
+/** The verbs a permission grants, e.g. `'Umb.Document.Read'`. */
+export type UserGroupVerbs = string[];
+
+/** A permission scoped to one document. */
+export interface UserGroupDocumentPermission {
+  $type: 'DocumentPermissionPresentationModel';
+  document: EntityReference | null;
+  verbs: UserGroupVerbs;
+}
+
+/** A permission scoped to one element. */
+export interface UserGroupElementPermission {
+  $type: 'ElementPermissionPresentationModel';
+  element: EntityReference | null;
+  verbs: UserGroupVerbs;
+}
+
+/** A permission scoped to one property on one document type. */
+export interface UserGroupPropertyValuePermission {
+  $type: 'DocumentPropertyValuePermissionPresentationModel';
+  documentType: EntityReference | null;
+  propertyType: EntityReference | null;
+  verbs: UserGroupVerbs;
+}
+
+export type UserGroupPermission =
+  | UserGroupDocumentPermission
+  | UserGroupElementPermission
+  | UserGroupPropertyValuePermission;
+
+/** A user-group payload. */
+export interface UserGroupPayload {
+  name: string;
+  alias: string;
+  icon: string;
+  sections: string[];
+  languages: string[];
+  hasAccessToAllLanguages: boolean;
+  documentStartNode: EntityReference | null;
+  documentRootAccess: boolean;
+  mediaStartNode: EntityReference | null;
+  mediaRootAccess: boolean;
+  fallbackPermissions: UserGroupVerbs;
+  permissions: UserGroupPermission[];
+  description: string;
+  elementStartNode: EntityReference | null;
+  elementRootAccess: boolean;
+}
+
+
+/** A reference that may legitimately be unset, as an `allowedTemplates` entry is. */
+export interface OptionalEntityReference {
+  id: string | null;
+}
+
+/** A block-grid block group. */
+export interface BlockGridBlockGroup {
+  key: string;
+  name: string | null;
+}
+
+/** The list-view bulk-action permission flags. */
+export interface ListViewBulkActionPermissions {
+  allowBulkCopy: boolean;
+  allowBulkDelete: boolean;
+  allowBulkMove: boolean;
+  allowBulkPublish: boolean;
+  allowBulkUnPublish: boolean;
+}
+
+/** One collection view offered by a list view. */
+export interface ListViewLayout {
+  collectionView: string;
+  icon: string;
+  name: string | null;
+}
+
+/** One column a list view shows. */
+export interface ListViewProperty {
+  alias: string;
+  header: string;
+  nameTemplate: string | null;
+  isSystem: boolean;
+}
+
+/** One step in a multi-node-tree-picker start-node query. */
+export interface StartNodeQueryStep {
+  unique: string;
+  alias: string;
+  anyOfDocTypeKeys: string[];
+}
+
+/** One culture assignment on a document's domains. */
+export interface DocumentDomainValue {
+  domainName: string;
+  isoCode: string;
+}
+
+/** The domains payload for a document. */
+export interface DocumentDomainsPayload {
+  domains: DocumentDomainValue[];
+  defaultIsoCode: string | null;
+}
+
+/** A package definition payload. Each array holds the ids of the entities to include. */
+export interface PackagePayload {
+  name: string;
+  contentNodeId: string;
+  contentLoadChildNodes: boolean;
+  mediaIds: string[];
+  mediaLoadChildNodes: boolean;
+  documentTypes: string[];
+  mediaTypes: string[];
+  dataTypes: string[];
+  templates: string[];
+  partialViews: string[];
+  stylesheets: string[];
+  scripts: string[];
+  languages: string[];
+  dictionaryItems: string[];
+}
+
+/** A user payload. */
+export interface UserPayload {
+  email: string;
+  name: string;
+  kind: string;
+  userGroupIds: EntityReference[];
+  userName: string;
+}
+
+/** A webhook payload. */
+export interface WebhookPayload {
+  enabled: boolean;
+  name: string;
+  description: string;
+  url: string;
+  contentTypeKeys: string[];
+  headers: Record<string, string>;
+  events: string[];
+}
+
+
+/**
+ * Configuration and value shapes built up conditionally - a field is emitted only when set - so
+ * every property is optional.
+ *
+ * Declaring the local as one of these is the part that matters, not the return type: assigning
+ * `values.labell` to a typed object is an error naming the typo, while the same assignment on an
+ * `any` local is silent. Bracket assignment (`values['labell']`) stays unchecked either way
+ * because `noImplicitAny` is off, which is why these builders use dot access.
+ */
+
+/** A focal point on a cropped image. */
+export interface FocalPoint {
+  left: number;
+  top: number;
+}
+
+/** An image value: the shape both the image cropper and a media property emit. */
+export interface ImageValue {
+  crops?: any[];
+  focalPoint?: FocalPoint | null;
+  src?: string;
+  temporaryFileId?: string;
+}
+
+/** A media-picker property value entry. */
+export interface MediaPickerValue {
+  key?: string;
+  mediaKey?: string;
+  mediaTypeAlias?: string;
+  focalPoint?: FocalPoint | null;
+  crops?: any[];
+}
+
+/** A URL-picker property value entry. */
+export interface UrlPickerValue {
+  icon?: string;
+  name?: string | null;
+  published?: boolean;
+  queryString?: string | null;
+  target?: string | null;
+  trashed?: boolean;
+  type?: string;
+  unique?: string | null;
+  url?: string;
+}
+
+/** A crop definition on an image-cropper or media-picker data type. */
+export interface CropConfiguration {
+  label?: string;
+  alias?: string;
+  width?: number;
+  height?: number;
+}
+
+/** An approved-colour item. */
+export interface ApprovedColorItem {
+  label?: string;
+  value?: string;
+}
+
+/** One entry in a block-grid area's `specifiedAllowance`. */
+export interface BlockGridSpecifiedAllowance {
+  elementTypeKey?: string;
+  groupKey?: string;
+  minAllowed?: number;
+  maxAllowed?: number;
+}
+
+/** A block-grid area's configuration. */
+export interface BlockGridAreaConfiguration {
+  key?: string;
+  alias?: string;
+  columnSpan?: number;
+  rowSpan?: number;
+  minAllowed?: number;
+  maxAllowed?: number;
+  createLabel?: string;
+  specifiedAllowance?: BlockGridSpecifiedAllowance[];
+}
+
+/**
+ * Configuration common to a block-list and a block-grid block. `stylesheet` is deliberately not
+ * here: the block-list builder holds a `string[]` and the block-grid builder a `string`, so it is
+ * declared per editor rather than unified, which would change one of the two payloads.
+ */
+export interface BlockConfigurationBase {
+  contentElementTypeKey?: string;
+  label?: string;
+  settingsElementTypeKey?: string;
+  editorSize?: string;
+  backgroundColor?: string;
+  iconColor?: string;
+  thumbnail?: string;
+}
+
+/** A block-list block's configuration. */
+export interface BlockListBlockConfiguration extends BlockConfigurationBase {
+  stylesheet?: string[];
+  forceHideContentEditorInOverlay?: boolean;
+}
+
+/** A block-grid block's configuration. */
+export interface BlockGridBlockConfiguration extends BlockConfigurationBase {
+  stylesheet?: string;
+  allowAtRoot?: boolean;
+  allowInAreas?: boolean;
+  columnSpanOptions?: { columnSpan: number }[];
+  rowMinSpan?: number;
+  rowMaxSpan?: number;
+  inlineEditing?: boolean;
+  hideContentEditor?: boolean;
+  view?: string;
+  groupKey?: string;
+  areas?: BlockGridAreaConfiguration[];
+  areaGridColumns?: number;
+}
+
+/** A tiptap block's configuration. */
+export interface TiptapBlockConfiguration {
+  contentElementTypeKey?: string;
+  displayInline?: boolean;
+  backgroundColor?: string;
+  iconColor?: string;
+  thumbnail?: string;
+  editorSize?: string;
+  label?: string;
+  settingsElementTypeKey?: string;
+}
+
+/** A multi-node-tree-picker start node. */
+export interface MultiNodeTreePickerStartNode {
+  type?: string;
+  originAlias?: string;
+  startNodeQuerySteps?: StartNodeQueryStep[];
+}
+
 
 /** What every `DataTypeBuilder.getValues()` returns. */
 export type DataTypeValues = EntityValue[];

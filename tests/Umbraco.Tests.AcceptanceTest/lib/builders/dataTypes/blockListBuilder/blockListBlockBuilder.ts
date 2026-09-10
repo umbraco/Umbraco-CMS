@@ -1,4 +1,5 @@
 import {BlockListDataTypeBuilder} from '../blockListDataTypeBuilder';
+import {BlockListBlockConfiguration} from '../../types';
 
 export class BlockListBlockBuilder {
   parentBuilder: BlockListDataTypeBuilder;
@@ -66,8 +67,8 @@ export class BlockListBlockBuilder {
     return this.parentBuilder;
   }
 
-  getValues() {
-    let values: any = {};
+  getValues(): BlockListBlockConfiguration {
+    const values: BlockListBlockConfiguration = {};
 
     if (this.contentElementTypeKey) {
       values.contentElementTypeKey = this.contentElementTypeKey;

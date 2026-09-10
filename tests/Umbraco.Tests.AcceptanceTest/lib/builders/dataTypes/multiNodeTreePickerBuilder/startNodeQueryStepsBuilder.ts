@@ -1,4 +1,5 @@
 import {MultiNodeTreePickerStartNodeBuilder} from './multiNodeTreePickerStartNodeBuilder';
+import {StartNodeQueryStep} from '../../types';
 
 export class StartNodeQueryStepsBuilder {
   parentBuilder: MultiNodeTreePickerStartNodeBuilder;
@@ -29,7 +30,7 @@ export class StartNodeQueryStepsBuilder {
     return this.parentBuilder;
   }
 
-  getValues() {
+  getValues(): StartNodeQueryStep {
     return {
       unique: this.unique,
       alias: this.alias,

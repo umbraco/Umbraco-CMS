@@ -1,4 +1,5 @@
 import {DocumentTypeBuilder} from './documentTypeBuilder';
+import {OptionalEntityReference} from '../types';
 
 export class DocumentTypeAllowedTemplateBuilder {
   parentBuilder: DocumentTypeBuilder;
@@ -17,7 +18,7 @@ export class DocumentTypeAllowedTemplateBuilder {
     return this.parentBuilder;
   }
 
-  build() {
+  build(): OptionalEntityReference {
     return {
       id: this.id || null
     };

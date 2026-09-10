@@ -1,3 +1,4 @@
+import {UserPayload} from '../types';
 export class UserBuilder {
   email: string;
   kind: string;
@@ -34,7 +35,7 @@ export class UserBuilder {
     return this;
   }
 
-  build() {
+  build(): UserPayload {
     return {
       email: this.email || '',
       name: this.name || this.email,

@@ -1,5 +1,6 @@
 import {BlockListValueBuilder} from './blockListValueBuilder';
 import {BlockListContentDataValueBuilder} from './blockListContentDataValueBuilder';
+import {BlockListContentData} from '../../types';
 
 export class BlockListContentDataBuilder {
   parentBuilder: BlockListValueBuilder;
@@ -32,7 +33,7 @@ export class BlockListContentDataBuilder {
     return this.parentBuilder;
   }
 
-  getValue() {
+  getValue(): BlockListContentData {
     return {
       contentTypeKey: this.contentTypeKey,
       key: this.key,

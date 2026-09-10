@@ -1,3 +1,4 @@
+import {PackagePayload} from '../types';
 export class PackageBuilder {
   name: string;
   contentNodeId: string;
@@ -84,7 +85,7 @@ export class PackageBuilder {
     return this;
   }
 
-  build() {
+  build(): PackagePayload {
     return {
       name: this.name,
       contentNodeId: this.contentNodeId || '',

@@ -1,4 +1,5 @@
 import {ListViewDataTypeBuilder} from '../listViewDataTypeBuilder';
+import {ListViewBulkActionPermissions} from '../../types';
 
 export class ListViewBulkActionPermissionsBuilder {
   parentBuilder: ListViewDataTypeBuilder;
@@ -41,7 +42,7 @@ export class ListViewBulkActionPermissionsBuilder {
     return this.parentBuilder;
   }
 
-  getValues() {
+  getValues(): ListViewBulkActionPermissions {
     return {
       allowBulkCopy: this.allowBulkCopy || false,
       allowBulkDelete: this.allowBulkDelete || false,

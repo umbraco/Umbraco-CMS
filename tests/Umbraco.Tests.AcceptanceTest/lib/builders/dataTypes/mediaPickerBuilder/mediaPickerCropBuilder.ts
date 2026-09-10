@@ -1,4 +1,5 @@
 import {MediaPickerDataTypeBuilder} from '../mediaPickerDataTypeBuilder';
+import {CropConfiguration} from '../../types';
 
 export class MediaPickerCropBuilder {
   parentBuilder: MediaPickerDataTypeBuilder;
@@ -35,8 +36,8 @@ export class MediaPickerCropBuilder {
     return this.parentBuilder;
   }
 
-  getValues() {
-    let values: any = {};
+  getValues(): CropConfiguration {
+    const values: CropConfiguration = {};
     if (this.label) {
       values.label = this.label;
     }

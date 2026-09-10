@@ -1,4 +1,5 @@
 import {DocumentDomainValueBuilder} from './documentDomainValueBuilder';
+import {DocumentDomainsPayload} from '../../types';
 
 export class DocumentDomainBuilder {
   defaultIsoCode: string;
@@ -19,7 +20,7 @@ export class DocumentDomainBuilder {
     return builder;
   }
 
-  build() {
+  build(): DocumentDomainsPayload {
     return {
       domains: this.documentDomainValueBuilder.map(builder => builder.build()),
       defaultIsoCode: this.defaultIsoCode || null,

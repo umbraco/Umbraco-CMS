@@ -1,4 +1,5 @@
 import {ListViewDataTypeBuilder} from '../listViewDataTypeBuilder';
+import {ListViewProperty} from '../../types';
 
 export class ListViewPropertyBuilder {
   parentBuilder: ListViewDataTypeBuilder;
@@ -35,7 +36,7 @@ export class ListViewPropertyBuilder {
     return this.parentBuilder;
   }
 
-  getValues() {
+  getValues(): ListViewProperty {
     return {
       alias: this.alias || 'sortOrder',
       header: this.header || 'Sort',

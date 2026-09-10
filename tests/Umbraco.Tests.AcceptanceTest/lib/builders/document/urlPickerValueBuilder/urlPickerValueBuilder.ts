@@ -1,4 +1,5 @@
 import {DocumentValueBuilder} from '../documentValueBuilder';
+import {UrlPickerValue} from '../../types';
 
 export class URLPickerValueBuilder{
   parentBuilder: DocumentValueBuilder;
@@ -65,8 +66,8 @@ export class URLPickerValueBuilder{
     return this.parentBuilder;
   }
 
-  getValue() {
-    let value: any = {};
+  getValue(): UrlPickerValue {
+    const value: UrlPickerValue = {};
 
     value.icon = this.icon;
     value.name = this.name || null;
