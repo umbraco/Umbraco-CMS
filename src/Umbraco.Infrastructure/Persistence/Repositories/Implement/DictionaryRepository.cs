@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NPoco;
@@ -206,7 +207,15 @@ internal sealed class DictionaryRepository : EntityRepositoryBase<int, IDictiona
         }
 
         DictionarySettings settings = _dictionarySettings.CurrentValue;
-        var matchKeyAnywhere = settings.KeySearchMode == DictionaryKeySearchMode.Contains;
+
+        // Resolve search mode forms. The key is matched as a LIKE pattern when combined with the translation
+        // values in raw SQL, and as a predicate when matched on its own.
+        (string Pattern, Expression<Func<DictionaryDto, bool>> Predicate) keyMatch = settings.KeySearchMode switch
+        {
+            DictionaryKeySearchMode.Contains => ($"%{filter}%", x => x.Key.Contains(filter)),
+            DictionaryKeySearchMode.StartsWith => ($"{filter}%", x => x.Key.StartsWith(filter)),
+            _ => throw new ArgumentOutOfRangeException(nameof(settings.KeySearchMode), settings.KeySearchMode, null),
+        };
 
         if (settings.EnableValueSearch)
         {
@@ -215,15 +224,13 @@ internal sealed class DictionaryRepository : EntityRepositoryBase<int, IDictiona
             // Then fetch ALL translations for those items
             sql.Where(
                 $"({QuotedColumn("key")} LIKE @0 OR {QuotedColumn("id")} IN (SELECT DISTINCT {QuoteColumnName("UniqueId")} FROM {QuoteTableName(LanguageTextDto.TableName)} WHERE {QuoteColumnName("value")} LIKE @1))",
-                matchKeyAnywhere ? $"%{filter}%" : $"{filter}%",
+                keyMatch.Pattern,
                 $"%{filter}%");
         }
         else
         {
             // Search only in keys
-            sql.Where<DictionaryDto>(matchKeyAnywhere
-                ? x => x.Key.Contains(filter)
-                : x => x.Key.StartsWith(filter));
+            sql.Where(keyMatch.Predicate);
         }
     }
 
