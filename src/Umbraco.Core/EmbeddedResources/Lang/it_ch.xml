@@ -1651,12 +1651,6 @@ Per gestire il tuo sito web, è sufficiente aprire il backoffice di Umbraco e in
 		<key alias="translation">Traduzione</key>
 		<key alias="users">Utenti</key>
 	</area>
-	<area alias="help">
-		<key alias="tours">Tours</key>
-		<key alias="theBestUmbracoVideoTutorials">I migliori video tutorial su Umbraco</key>
-		<key alias="umbracoForum">Visita our.umbraco.com</key>
-		<key alias="umbracoTv">Visita umbraco.tv</key>
-	</area>
 	<area alias="settings">
 		<key alias="defaulttemplate"><![CDATA[Template di base]]></key>
 		<key alias="importDocumentTypeHelp">
@@ -2888,13 +2882,6 @@ Per gestire il tuo sito web, è sufficiente aprire il backoffice di Umbraco e in
 		<key alias="searchThisMessageWithGoogle">Ricerca questo messaggio con Google</key>
 		<key alias="searchWithBing">Ricerca con Bing</key>
 		<key alias="searchThisMessageWithBing">Ricerca questo messaggio con Bing</key>
-		<key alias="searchOurUmbraco">Ricerca su Our Umbraco</key>
-		<key alias="searchThisMessageOnOurUmbracoForumsAndDocs">
-			Ricerca questo messaggio sui forum e le documentazioni di
-			Our Umbraco
-		</key>
-		<key alias="searchOurUmbracoWithGoogle">Ricerca su Our Umbraco con Google</key>
-		<key alias="searchOurUmbracoForumsUsingGoogle">Ricerca sui forum di Our Umbraco con Google</key>
 		<key alias="searchUmbracoSource">Ricerca nel codice sorgente di Umbraco</key>
 		<key alias="searchWithinUmbracoSourceCodeOnGithub">Ricerca nel codice sorgente di Umbraco su GitHub</key>
 		<key alias="searchUmbracoIssues">Ricerca tra i problemi di Umbraco</key>
@@ -3016,12 +3003,12 @@ Per gestire il tuo sito web, è sufficiente aprire il backoffice di Umbraco e in
 		<key alias="more"><![CDATA[Scopri di più]]></key>
 		<key alias="bulletPointOne">
 			<![CDATA[
-            Maggiori informazioni su come lavorare con gli elementi in Impostazioni <a class="btn-link -underline" href="https://docs.umbraco.com/umbraco-cms/fundamentals/backoffice/sections/" target="_blank" rel="noopener">nella documentazione</a> di Our Umbraco
+            Maggiori informazioni su come lavorare con gli elementi in Impostazioni <a class="btn-link -underline" href="https://docs.umbraco.com/umbraco-cms/fundamentals/backoffice/sections/" target="_blank" rel="noopener">nella documentazione</a> di Umbraco
         ]]>
 		</key>
 		<key alias="bulletPointTwo">
 			<![CDATA[
-            Fai una domanda nel <a class="btn-link -underline" href="https://our.umbraco.com/forum" target="_blank" rel="noopener">Community Forum</a>
+            Fai una domanda nel <a class="btn-link -underline" href="https://forum.umbraco.com" target="_blank" rel="noopener">Community Forum</a>
         ]]>
 		</key>
 		<key alias="bulletPointThree">
