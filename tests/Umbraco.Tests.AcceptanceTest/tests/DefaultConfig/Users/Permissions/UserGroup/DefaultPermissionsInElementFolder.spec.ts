@@ -300,7 +300,7 @@ test('cannot restore an element folder from the recycle bin without move folder 
 });
 
 // Product gap: umb-element-folder-workspace-editor has no forbidden handling, so it renders empty for a folder
-// the user cannot read. The workspace locator was also wrong and is fixed.
+// the user cannot read.
 test.skip('cannot see an element inside a folder when read folder permission is disabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const innerElementId = await umbracoApi.element.createDefaultElementWithParent(elementName, elementTypeId, folderId);

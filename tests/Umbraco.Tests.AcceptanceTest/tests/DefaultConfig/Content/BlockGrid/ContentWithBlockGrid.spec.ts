@@ -254,6 +254,7 @@ test('can add settings model for the block in the content', async ({umbracoApi, 
   await umbracoApi.documentType.ensureNameNotExists(settingModelName);
 });
 
+// Unwritten: addBlockElementBtn resolves with .first(), so it reopens the existing block instead of adding a second.
 test.skip('can move blocks in the content', async ({umbracoApi, umbracoUi}) => {
   // TODO: Implement it later
 });

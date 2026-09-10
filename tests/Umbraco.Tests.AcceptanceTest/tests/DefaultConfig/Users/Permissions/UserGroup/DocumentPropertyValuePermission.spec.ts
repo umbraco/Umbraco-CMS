@@ -59,7 +59,7 @@ test('can see property values with UI read but not UI write permission', {tag: '
 });
 
 // Product gap (https://github.com/umbraco/Umbraco-CMS/issues/20505): deep-linking to a document the user may not
-// read renders an empty workspace. Expected text should be 'Access denied'. Navigation fixed to deep-link.
+// read renders an empty workspace instead of Access denied.
 test.skip('cannot open content without document read permission even with UI read permission', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithReadDocumentPermissionAndReadPropertyValueDocumentPermission(userGroupName, false, true);

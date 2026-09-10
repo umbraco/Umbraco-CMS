@@ -119,7 +119,6 @@ test('image count can not be less than min amount set in image media picker', as
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
   // Act
-  // Pick a single image when the minimum is two
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickChooseButtonAndSelectMediaWithName(mediaName);
   await umbracoUi.content.clickChooseModalButton();
@@ -153,7 +152,6 @@ test('image count can not be more than max amount set in image media picker', as
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
   // Act
-  // Pick one image more than the maximum allows
   await umbracoUi.content.goToContentWithName(contentName);
   for (const name of [firstMediaName, secondMediaName, thirdMediaName]) {
     await umbracoUi.content.clickChooseButtonAndSelectMediaWithName(name);

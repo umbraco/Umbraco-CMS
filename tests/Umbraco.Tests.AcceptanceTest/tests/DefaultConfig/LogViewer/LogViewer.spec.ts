@@ -144,7 +144,6 @@ test('can sort logs by timestamp', async ({umbracoUi}) => {
   await umbracoUi.logViewer.clickSortLogByTimestampButton();
 
   // Assert
-  // Checks the loaded page is itself in ascending order, rather than against an external snapshot.
   await expect.poll(async () => {
     const timestamps = (await umbracoUi.logViewer.getLogTimestamps()).map((timestamp) => new Date(timestamp).getTime());
     return timestamps.every((timestamp, index) => index === 0 || timestamps[index - 1] <= timestamp);

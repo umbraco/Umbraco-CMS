@@ -71,7 +71,7 @@ test('can read content node with permission enabled', {tag: '@release'}, async (
 });
 
 // Product gap (https://github.com/umbraco/Umbraco-CMS/issues/20505): deep-linking to a document the user may not
-// read renders an empty umb-document-workspace-editor instead of Access denied. Navigation fixed to deep-link.
+// read renders an empty umb-document-workspace-editor instead of Access denied.
 test.skip('can not read content node with permission disabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithReadDocumentPermission(userGroupName, false);

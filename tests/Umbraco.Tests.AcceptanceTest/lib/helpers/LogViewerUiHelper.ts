@@ -37,9 +37,8 @@ export class LogViewerUiHelper extends UiBaseLocators {
   }
 
   async clickSearchButton() {
-    // Also wait for the view's own initial log fetch: the frontend doesn't cancel/sequence requests, so an
-    // action performed immediately after opening Search (e.g. sorting) can fire a second request that
-    // resolves before this one, and the initial (default, descending) response then overwrites it.
+    // Wait for the view's own initial log fetch too: requests are not sequenced, so a sort fired right after
+    // opening Search can resolve first and then be overwritten by this default, descending response.
     await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.logViewerLog, this.click(this.searchBtn), ConstantHelper.statusCodes.ok);
     await this.waitForVisible(this.searchLogsTxt);
   }

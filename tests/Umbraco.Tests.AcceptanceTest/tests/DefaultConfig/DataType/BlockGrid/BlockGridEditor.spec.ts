@@ -197,7 +197,7 @@ test('can remove a block in a group from a block grid editor', {tag: '@smoke'}, 
 });
 
 // Product bug: the card's anchor sits in uui-card-block-type's shadow root, which setupIgnorerElements cannot
-// reach, so a native link drag starts and the sorter ignores the drop. Affects block reordering generally.
+// reach, so a native link drag starts and the sorter ignores the drop. Affects block type cards in data type config.
 test.skip('can move a block from a group to another group in a block grid editor', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);

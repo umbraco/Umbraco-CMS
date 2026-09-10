@@ -80,7 +80,7 @@ test('cannot see any element when no element start nodes specified', async ({umb
   await umbracoUi.user.goToSection(ConstantHelper.sections.library, false);
 
   // Assert
-  // Positive precondition: the section must actually render, otherwise the absence check below is vacuous.
+  // Guards the absence check below from passing vacuously.
   await umbracoUi.library.isSectionWithNameVisible('Library');
   await umbracoUi.library.isElementInTreeVisible(rootFolderName, false);
 });

@@ -36,7 +36,7 @@ test.afterEach(async ({umbracoApi}) => {
 });
 
 // Product gap (https://github.com/umbraco/Umbraco-CMS/issues/20505): only the final assertion fails, so the
-// granular read-UI permission itself works. Navigation fixed to deep-link.
+// granular read-UI permission itself works.
 test.skip('can only see property values for specific document with read UI enabled', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithPermissionsForSpecificDocumentAndTwoPropertyValues(userGroupName, firstDocumentId, documentTypeId, firstPropertyName[0], true, false, secondPropertyName[0], true, false);

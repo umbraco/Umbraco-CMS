@@ -1902,8 +1902,8 @@ export class LibraryUiHelper extends UiBaseLocators {
     await this.hasValue(propertyLocator, value);
   }
 
-  // Matched against move-to-recycle-bin alone, not the generic element endpoint: the latter also matches
-  // tree/collection GET refreshes that can resolve the wait before the trash request has actually landed.
+  // The generic element endpoint also matches the tree/collection refreshes, which can resolve the wait
+  // before the trash request has landed, so match the trash request alone.
   async clickConfirmTrashButtonAndWaitForElementToBeTrashed() {
     return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.moveToRecycleBin, this.clickConfirmTrashButton(), ConstantHelper.statusCodes.ok);
   }
@@ -1968,7 +1968,6 @@ export class LibraryUiHelper extends UiBaseLocators {
     return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.elementFolder, this.clickConfirmRenameButton(), ConstantHelper.statusCodes.ok);
   }
 
-  // See clickConfirmTrashButtonAndWaitForElementToBeTrashed above for why this matches move-to-recycle-bin alone.
   async clickConfirmTrashButtonAndWaitForElementFolderToBeTrashed() {
     return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.moveToRecycleBin, this.clickConfirmTrashButton(), ConstantHelper.statusCodes.ok);
   }
