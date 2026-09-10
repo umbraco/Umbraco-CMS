@@ -4,7 +4,9 @@ End-to-end acceptance tests for Umbraco CMS using [Playwright](https://playwrigh
 
 You can watch a video following these instructions [here](https://www.youtube.com/watch?v=N4hBKB0U-d8) and a longer UmbraCollab recording [here](https://www.youtube.com/watch?v=hvoI28s_fDI). Make sure to use the latest recommended `main` branch rather than v10 that's mentioned in the video.
 
-> **npm package**: This project is also published to npm as [`@umbraco/acceptance-test-helpers`](https://www.npmjs.com/package/@umbraco/acceptance-test-helpers). See [README.npm.md](./README.npm.md) for the package documentation.
+> **npm package**: `lib/` is also published to npm as [`@umbraco-cms/acceptance-test-helpers`](https://www.npmjs.com/package/@umbraco-cms/acceptance-test-helpers). See [README.npm.md](./README.npm.md) for the consumer-facing package documentation.
+>
+> Note the two different specifiers: **consumers** import from the published name `@umbraco-cms/acceptance-test-helpers`, while **tests inside this repository** import from `@umbraco/acceptance-test-helpers` — a path alias declared in [`tsconfig.json`](./tsconfig.json) that resolves straight to `lib/index.ts`. Keep using the alias in-repo; it is what all existing specs use.
 
 ---
 
@@ -13,6 +15,14 @@ You can watch a video following these instructions [here](https://www.youtube.co
 - **Node.js 24** (see [`.nvmrc`](./.nvmrc))
 - **A running installed Umbraco instance** on URL: [https://localhost:44339](https://localhost:44339) (default development port)
   - Install using `SqlServer`/`LocalDb` as the tests execute too fast for `SQLite` to handle
+
+> **Your local instance is not configured the way CI's is.** The nightly pipeline builds a purpose-made instance and copies the composers from `tests/Umbraco.Tests.AcceptanceTest.UmbracoProject/` into it, which:
+> - **suspends scheduled publishing** (`SuspendScheduledPublishingComposer`) — otherwise the background publishing job can fire in the middle of a test;
+> - enables **SQL Server delayed durability** (`SqlServerDelayedDurabilityComposer`) — no fsync per commit, which matters a lot for a write-heavy suite.
+>
+> Running against `src/Umbraco.Web.UI` instead gets neither, and that project also sets `ModelsBuilder:ModelsMode` to `InMemoryAuto` — so models are regenerated on **every** content-type change, and this suite changes content types hundreds of times per run.
+>
+> Practical consequence: a flake you see only locally may be an artefact of your instance, not a bug in the test. Before chasing one, consider setting `ModelsMode` to `Nothing` locally and adding the composers above, so you are debugging the same conditions CI runs.
 
 ---
 
@@ -42,12 +52,40 @@ You can watch a video following these instructions [here](https://www.youtube.co
 | `npm run test` | Execute DefaultConfig tests headlessly |
 | `npm run ui` | Open Playwright UI mode with browser |
 | `npm run smokeTest` | Run quick smoke tests (`@smoke` tagged) |
+| `npm run smokeTestSqlite` | Smoke tests excluding User tests (SQLite limitation) |
 | `npm run releaseTest` | Run comprehensive release tests (`@release` tagged) |
 | `npm run all` | Run all test suites |
 | `npm run testSqlite` | Run tests excluding User tests (SQLite limitation) |
 | `npm run testWindows` | Run tests excluding RelationType tests |
-| `npm run createTest <name>` | Generate a new test file template |
+| `npm run createTest <name> [projectDir]` | Generate a new test file template |
 | `npm run config` | Reconfigure environment settings |
+| `npm run build` | Compile `lib/` to `dist/` (does **not** type-check `tests/`) |
+| `npm run typecheck` | Type-check `lib/` **and** `tests/` |
+| `npm run audit` | Self-test the rules, then check the suite against CLAUDE.md §3 |
+| `npm run audit:selftest` | Run just the audit's own rule tests |
+| `npm run helpers:selftest` | Test the API assertion helpers (no Umbraco needed) |
+| `npm run check` | typecheck + audit + helper tests |
+
+> Every `test`/`ui`/`smokeTest`/… script runs `npm run build` first, so `lib/` changes are picked up automatically.
+
+### Checks to run before committing
+
+Neither needs a running Umbraco instance:
+
+```bash
+npm run check              # typecheck + audit + helper tests
+
+npm run typecheck          # a type error in a spec won't surface from `npm run build`
+npm run audit              # one line per convention; non-zero exit if a rule regresses
+npm run audit -- --verbose # every finding, with file:line
+npm run helpers:selftest   # the API assertion helpers, against fabricated responses
+```
+
+`npm run audit` self-tests its own 21 rules before reporting — six of them gate at budget 0, where a broken regex would otherwise be indistinguishable from a passing rule. Adding a rule without a test case fails the self-test.
+
+There is no lint step. `npm run audit` is the closest thing — it enforces the mechanical parts of [CLAUDE.md](./CLAUDE.md) §3 (dropped promises, silently-discarded assertions, specs that no project runs, un-annotated skipped tests) at a budget of zero, and ratchets the known debt (fixed sleeps, force clicks, substring name locators, untyped builders) so it can shrink but not grow. See CLAUDE.md §7 for the budget table.
+
+**Both run in CI** — `build/azure-pipelines.yml`, `Build` stage, job C — so a regression fails the build rather than waiting to be noticed.
 
 ### Running Single Tests
 
@@ -113,7 +151,7 @@ test.afterEach(async ({ umbracoApi }) => {
 
 test('can create content', { tag: '@smoke' }, async ({ umbracoApi, umbracoUi }) => {
   // Arrange - Setup test data via API
-  const documentTypeId = await umbracoApi.documentType.createDefaultDocumentType(documentTypeName);
+  await umbracoApi.documentType.createDefaultDocumentType(documentTypeName);
 
   // Act - Perform UI actions
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
@@ -147,19 +185,23 @@ test('comprehensive test', { tag: '@release' }, async ({ umbracoApi, umbracoUi }
 
 Use the generator script:
 ```bash
-npm run createTest MyFeatureName
+npm run createTest MyFeatureName            # -> tests/DefaultConfig/MyFeatureName.spec.ts
+npm run createTest MyFeatureName DeliveryApi # -> tests/DeliveryApi/MyFeatureName.spec.ts
 ```
 
-This creates `tests/MyFeatureName.spec.ts` with a template.
+It scaffolds a spec that already follows the conventions below — idempotent cleanup in `beforeEach`/`afterEach`, API setup, AAA body — and refuses to overwrite an existing file. The second argument picks the project directory; it defaults to `DefaultConfig` because a spec outside a project directory never runs.
 
 ### Test Conventions
 
-1. **Idempotent cleanup**: Use `ensureNameNotExists()` instead of `delete()` - won't fail if item doesn't exist
+1. **Idempotent cleanup**: Use `ensureNameNotExists()` instead of `delete()` — won't fail if the item doesn't exist
 2. **API for setup**: Create test data via API (faster than UI)
 3. **UI for validation**: Test actual user workflows through the UI
 4. **Test independence**: Each test should run standalone without depending on other tests
-5. **Descriptive names**: Use clear, descriptive test and variable names
-6. **Clean up**: Always clean up test data in `afterEach`
+5. **Clear the name before creating**: entity names are shared widely across specs (`TestContent` appears in 79 files), and what keeps that safe is `workers: 1` plus `create*` helpers that call `ensureNameNotExists` first — not per-file uniqueness. If you add a `create*` helper, ensure the name first. See [CLAUDE.md](./CLAUDE.md) §4.
+6. **Descriptive names**: Use clear, descriptive test and variable names
+7. **Clean up**: Always clean up test data in `afterEach`
+
+> **Determinism rules live in [CLAUDE.md](./CLAUDE.md) §3**, which opens with a 12-row checklist — read that before adding a spec or a helper, and follow a link into the detail when you hit that case. Most flaky failures trace back to one of those twelve.
 
 ---
 
@@ -213,16 +255,23 @@ PWDEBUG=1 npx playwright test tests/DefaultConfig/Content/Content.spec.ts
 
 The test suite is organized into multiple Playwright projects (see `playwright.config.ts`):
 
-| Project | Description |
-|---------|-------------|
-| `setup` | Authentication setup (runs first) |
-| `defaultConfig` | Main test suite (depends on setup) |
-| `extensionRegistry` | Extension registry tests |
-| `entityDataPicker` | Entity data picker tests |
-| `deliveryApi` | Delivery API tests |
-| `externalLoginAzureADB2C` | Azure AD B2C authentication tests |
-| `unattendedInstallConfig` | Installation tests (no auth required) |
-| `smtp` | Email/SMTP tests |
+| Project | Matches | Authenticated |
+|---------|---------|---------------|
+| `setup` | `**/*.setup.ts` | — (produces the auth state) |
+| `defaultConfig` | `DefaultConfig/**` | yes |
+| `extensionRegistry` | `ExtensionRegistry/**/*.spec.ts` | yes |
+| `entityDataPicker` | `EntityDataPicker/**/*.spec.ts` | yes |
+| `deliveryApi` | `DeliveryApi/**` | yes |
+| `contentSettingConfig` | `ContentSettingConfig/**` | yes |
+| `smtp` | `SMTP/*.spec.ts` | yes |
+| `imagingSettingConfig` | `ImagingSettingConfig/*.spec.ts` | yes |
+| `externalLoginAzureADB2C` | `ExternalLogin/AzureADB2C/**` | no |
+| `authProviderLateRegistration` | `AuthProviderLateRegistration/**/*.spec.ts` | no (exercises the login screen) |
+| `unattendedInstallConfig` | `UnattendedInstallConfig/**` | no (exercises install) |
+
+Every authenticated project declares `dependencies: ['setup']` and reuses the stored `storageState`.
+
+> **A spec must live under a directory one of these projects matches.** A file written straight into `tests/` matches no `testMatch` pattern and is silently never run — which is why `npm run createTest` writes into `tests/DefaultConfig/` by default (pass a second argument to target another project directory).
 
 ---
 
@@ -230,12 +279,14 @@ The test suite is organized into multiple Playwright projects (see `playwright.c
 
 Key settings in `playwright.config.ts`:
 
-- **Test timeout**: 30 seconds per test
+- **Test timeout**: 60 seconds per test
 - **Expect timeout**: 5 seconds for assertions
-- **Retries**: 2 retries on CI (0 locally)
-- **Workers**: 1 (sequential execution for state consistency)
-- **Browser**: Desktop Chrome with HTTPS
-- **Test identifier**: `data-mark` attribute
+- **Retries**: 2 — everywhere, not just on CI
+- **Workers**: 1 (sequential execution; specs share fixed entity names and would collide in parallel)
+- **Trace**: `retain-on-failure` (switch to `on-first-retry` locally to roughly halve run time)
+- **Browser**: Desktop Chrome with `ignoreHTTPSErrors`
+- **Test identifier**: `data-mark` attribute (so `getByTestId()` reads `data-mark`)
+- **`forbidOnly`**: enabled on CI — a stray `test.only` fails the build
 
 ---
 
@@ -243,4 +294,5 @@ Key settings in `playwright.config.ts`:
 
 - [Playwright Documentation](https://playwright.dev/docs/intro)
 - [Umbraco Documentation](https://docs.umbraco.com/)
-- [@umbraco/acceptance-test-helpers](https://www.npmjs.com/package/@umbraco/acceptance-test-helpers) (published from this project)
+- [`@umbraco-cms/acceptance-test-helpers`](https://www.npmjs.com/package/@umbraco-cms/acceptance-test-helpers) (published from this project)
+- [CLAUDE.md](./CLAUDE.md) — architecture and the determinism conventions that keep the suite stable

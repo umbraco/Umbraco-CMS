@@ -1,6 +1,6 @@
 # Umbraco CMS - Multi-Project Repository
 
-Enterprise-grade CMS built on .NET 10.0. This repository contains 21 production projects organized in a layered architecture with clear separation of concerns.
+Enterprise-grade CMS built on .NET 10.0. The projects under `src/` and `tests/` are organized in a layered architecture with clear separation of concerns. **`umbraco.sln` is the authoritative inventory** — the overview below orients you, but count projects there, not here.
 
 **Repository**: https://github.com/umbraco/Umbraco-CMS
 **License**: MIT
@@ -32,13 +32,16 @@ Enterprise-grade CMS built on .NET 10.0. This repository contains 21 production 
    - Imaging: `Imaging.ImageSharp` v1 & v2 (image processing)
    - Other: Static assets, targets, development tools
 
-**6 Test Projects**:
+**Test Projects**:
 - `Umbraco.Tests.Common` - Shared test utilities
 - `Umbraco.Tests.UnitTests` - Unit tests
 - `Umbraco.Tests.Integration` - Integration tests
 - `Umbraco.Tests.Benchmarks` - Performance benchmarks
-- `Umbraco.Tests.AcceptanceTest` - E2E tests
+- `Umbraco.Tests.AcceptanceTest` - Playwright E2E tests
 - `Umbraco.Tests.AcceptanceTest.UmbracoProject` - Test instance
+- `Umbraco.TestData` - Test data generation for manual/perf scenarios
+
+A **second, separate Playwright suite** lives at `src/Umbraco.Web.UI.Client/e2e/` and covers the installer and upgrader flows only (run via `npm run test:e2e` in that project). Install-flow coverage is therefore split: that suite plus the `UnattendedInstallConfig` project in `Umbraco.Tests.AcceptanceTest`. Check both before concluding a flow is untested.
 
 ### Key Technologies
 
@@ -67,7 +70,7 @@ This repository is a product platform, not an application. Every layer is consum
 
 ```
 Umbraco-CMS/
-├── src/                                    # 21 production projects
+├── src/                                    # production projects (see umbraco.sln)
 │   ├── Umbraco.Core/                      # Domain contracts (interfaces only)
 │   │   └── CLAUDE.md                      # ⭐ Core architecture guide
 │   ├── Umbraco.Infrastructure/            # Service implementations
@@ -89,15 +92,20 @@ Umbraco-CMS/
 │   ├── Umbraco.Cms.StaticAssets/          # Embedded assets
 │   ├── Umbraco.Cms.DevelopmentMode.Backoffice/
 │   ├── Umbraco.Cms.Targets/               # NuGet targets
+│   ├── Umbraco.PublishedCache.HybridCache.Bounded/ # Bounded-size cache variant
+│   ├── Umbraco.Web.UI.Client/             # Backoffice frontend (Lit)
+│   ├── Umbraco.Web.UI.Login/              # Login screen frontend
+│   ├── Umbraco.Web.Website/               # Front-end website rendering
 │   └── Umbraco.Cms/                       # Meta-package
 │
-├── tests/                                  # 6 test projects
+├── tests/                                  # test projects (see umbraco.sln)
 │   ├── Umbraco.Tests.Common/
 │   ├── Umbraco.Tests.UnitTests/
 │   ├── Umbraco.Tests.Integration/
 │   ├── Umbraco.Tests.Benchmarks/
 │   ├── Umbraco.Tests.AcceptanceTest/
-│   └── Umbraco.Tests.AcceptanceTest.UmbracoProject/
+│   ├── Umbraco.Tests.AcceptanceTest.UmbracoProject/
+│   └── Umbraco.TestData/
 │
 ├── templates/                              # Project templates
 │   └── Umbraco.Templates/
@@ -569,6 +577,16 @@ Verify any test you add for a bug fix actually catches the bug: either write the
 
 For integration tests that exercise caching or cache refreshers, see `tests/Umbraco.Tests.Integration/CLAUDE.md` — the harness disables caching by default, which can produce false greens.
 
+### Acceptance (end-to-end) tests
+
+Playwright E2E tests live in `tests/Umbraco.Tests.AcceptanceTest/`. They run serially against a **running, installed Umbraco instance**, so they are the one suite you cannot verify from a clean checkout alone.
+
+Read `tests/Umbraco.Tests.AcceptanceTest/CLAUDE.md` before touching a spec or a helper — it carries the determinism conventions (never drop a promise, wait on state rather than on time, exact-name locators to survive leftover data) that most flaky failures trace back to. `README.md` alongside it covers setup and running. The `/umb-e2e-test` skill turns those conventions into a procedure.
+
+Two traps worth knowing before you start:
+- A spec must sit inside a directory one of the `playwright.config.ts` projects matches. A file written straight into `tests/` is silently never run.
+- `npm run build` in that project compiles `lib/` only; it does not type-check the specs. Run `npx tsc -p tsconfig.json --noEmit` for that.
+
 ---
 
 ## 11. Verification Discipline
@@ -631,10 +649,18 @@ SQL Server-specific tests use `BaseTestDatabase.IsSqlite()` to skip when running
 
 ### Project-Specific Documentation
 
-For detailed information about individual projects, see their CLAUDE.md files:
+**Nearly every project carries its own CLAUDE.md** — 21 of the 24 under `src/`, plus the two main test projects (25 in total). So before working in a project, read the CLAUDE.md next to its `.csproj`; assume one exists rather than assuming it doesn't. `find . -name CLAUDE.md -not -path '*/node_modules/*'` lists them all.
+
+The ones most often needed, with what is only in them:
 - **Core Architecture**: `/src/Umbraco.Core/CLAUDE.md` - Service contracts, notification patterns
+- **Infrastructure**: `/src/Umbraco.Infrastructure/CLAUDE.md` - Repositories, the SQL Server 2100-parameter limit
 - **API Infrastructure**: `/src/Umbraco.Cms.Api.Common/CLAUDE.md` - OpenAPI, authentication, serialization
+- **Management API**: `/src/Umbraco.Cms.Api.Management/CLAUDE.md` - Controllers, view models, OpenApi.json
 - **Backoffice Frontend**: `/src/Umbraco.Web.UI.Client/CLAUDE.md` - Lit web components, extension system, auth client
+- **Acceptance Tests**: `/tests/Umbraco.Tests.AcceptanceTest/CLAUDE.md` - Playwright helper architecture, flakiness-avoidance conventions, the convention audit
+- **Integration Tests**: `/tests/Umbraco.Tests.Integration/CLAUDE.md` - Test harness, caching false-green trap
+
+This list is a shortcut, not the set — absence from it does not mean a project has no guide, so check next to the `.csproj` first.
 
 **Important**: When working on backoffice client code (anything under `src/Umbraco.Web.UI.Client/`), read `/src/Umbraco.Web.UI.Client/CLAUDE.md` first. It contains action-specific checklists (deprecation, testing, security, etc.) that are not duplicated here.
 
