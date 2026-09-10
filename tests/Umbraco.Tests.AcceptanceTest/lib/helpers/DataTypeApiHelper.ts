@@ -1836,6 +1836,11 @@ export class DataTypeApiHelper {
     return startNodeValue?.value?.dynamicRoot;
   }
 
+  async doesDataTypeContainAlias(dataTypeName: string, alias: string, dataTypeData?) {
+    const dataType = dataTypeData || await this.getByName(dataTypeName);
+    return dataType.values.some(item => item.alias === alias);
+  }
+
   async doesDataTypeHaveValue(dataTypeName: string, alias: string, value?: any, dataTypeData?) {
     const dataType = dataTypeData || await this.getByName(dataTypeName);
     const valueData = dataType.values.find(item => item.alias === alias);
