@@ -2697,6 +2697,7 @@ export default {
 		labelUsedByItems: 'Referenced by',
 		labelDependsOnThis: 'The following items depend on this',
 		labelDependentDescendants: 'The following descending items have dependencies',
+		labelUsedByOtherContent: 'The following items are used by other content',
 		labelMoreReferences: (count: number) => {
 			if (count === 1) return '...and one more item';
 			return `...and ${count} more items`;
