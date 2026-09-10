@@ -106,8 +106,9 @@ test('can select multiple elements in the element picker', async ({umbracoApi, u
 
   // Assert
   const elementData = await umbracoApi.element.getByName(elementName);
-  expect(umbracoApi.element.getPropertyValue(elementData, AliasHelper.toAlias(elementPickerDataTypeName))).toContain(firstElementPickerId);
-  expect(umbracoApi.element.getPropertyValue(elementData, AliasHelper.toAlias(elementPickerDataTypeName))).toContain(secondElementPickerId);
+  const propertyValue = umbracoApi.element.getPropertyValue(elementData, AliasHelper.toAlias(elementPickerDataTypeName));
+  expect(propertyValue).toContain(firstElementPickerId);
+  expect(propertyValue).toContain(secondElementPickerId);
 
   // Clean
   await umbracoApi.element.ensureNameNotExists(secondElementPickerName);

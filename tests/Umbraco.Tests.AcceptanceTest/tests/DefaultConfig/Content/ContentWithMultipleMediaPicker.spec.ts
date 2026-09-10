@@ -86,11 +86,12 @@ test('can add multiple media files to the multiple media picker', async ({umbrac
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(dataTypeName)).length).toBe(2);
-  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(dataTypeName))[0].mediaKey).toEqual(firstMediaFileId);
-  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(dataTypeName))[0].mediaTypeAlias).toEqual(firstMediaTypeName);
-  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(dataTypeName))[1].mediaKey).toEqual(secondMediaFileId);
-  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(dataTypeName))[1].mediaTypeAlias).toEqual(secondMediaTypeName);
+  const propertyValue = umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(dataTypeName));
+  expect(propertyValue.length).toBe(2);
+  expect(propertyValue[0].mediaKey).toEqual(firstMediaFileId);
+  expect(propertyValue[0].mediaTypeAlias).toEqual(firstMediaTypeName);
+  expect(propertyValue[1].mediaKey).toEqual(secondMediaFileId);
+  expect(propertyValue[1].mediaTypeAlias).toEqual(secondMediaTypeName);
 });
 
 test('can remove a media picker in the content', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
@@ -108,7 +109,8 @@ test('can remove a media picker in the content', {tag: '@release'}, async ({umbr
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(dataTypeName)).length).toBe(1);
-  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(dataTypeName))[0].mediaKey).toEqual(secondMediaFileId);
-  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(dataTypeName))[0].mediaTypeAlias).toEqual(secondMediaTypeName);
+  const propertyValue = umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(dataTypeName));
+  expect(propertyValue.length).toBe(1);
+  expect(propertyValue[0].mediaKey).toEqual(secondMediaFileId);
+  expect(propertyValue[0].mediaTypeAlias).toEqual(secondMediaTypeName);
 });

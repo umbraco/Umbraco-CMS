@@ -443,7 +443,7 @@ Note the last two: the leaked names (`TestDocumentType`, `TestMemberGroup`) are 
 
 ### A disabled test carries an annotation, not a comment
 
-64 of the suite's 1636 tests are off (`test.skip` / `test.fixme`). That is a standing claim about what the product is *not* covered for, so it has to be answerable without grepping. Every one carries a machine-readable annotation:
+79 of the suite's 1651 tests are off (`test.skip` / `test.fixme`). That is a standing claim about what the product is *not* covered for, so it has to be answerable without grepping. Every one carries a machine-readable annotation:
 
 ```ts
 test.skip('can create content with block grid area with min allowed',
@@ -458,14 +458,14 @@ Annotations show up in every reporter (and in the HTML report's test detail), so
 | `issue` | Blocked on a tracked GitHub issue or PR — description carries the link | 25 |
 | `blocked` | Blocked on product behaviour with no issue filed yet ("the front-end does not support…") | 34 |
 | `todo` | Never implemented — the body is an empty stub | 3 |
-| `fixme` | Fully implemented, disabled, reason never recorded | 2 |
+| `fixme` | Fully implemented but disabled | 17 |
 
 Rules: a new disabled test needs an annotation (`npm run audit` fails without one), and prefer `type: 'issue'` with a link — a `blocked` entry carrying only prose is how a test stays off for two years.
 
 The two categories that are not really "skipped tests" at all:
 
 - **`todo` (3)** — `ContentWithBlockGrid`/`ContentWithBlockList` "can move blocks in the content" and `User` "can change from grid to table view". The body is `// TODO: Implement it later`. A skipped empty stub asserts nothing and documents nothing; write it or delete it.
-- **`fixme` (2)** — both in `BlockGridEditor` (moving a block between groups, deleting a group). These have complete arrange/act/assert bodies, so something once worked and then didn't. They need one run against a current build to decide product bug vs stale test.
+- **`fixme` (17)** — two in `BlockGridEditor` (moving a block between groups, deleting a group) with complete arrange/act/assert bodies, so something once worked and then didn't; both need one run against a current build to decide product bug vs stale test. The other fifteen are `CreatedPackages`, which had been commented out wholesale since the v15 era: uncommenting them changed nothing about what runs, but it moved 15 tests from invisible to countable, which is why the suite total went from 1651 to 1651. Enable them one at a time against a running instance.
 
 If a test is off because the *feature* was removed, delete it — a permanent skip is not documentation.
 
@@ -645,7 +645,7 @@ The root `CLAUDE.md` §9 comment policy applies here in full — default to no c
 
 **Three comment shapes are never right**, and `npm run audit` counts all three:
 
-- **A commented-out test.** The most thoroughly hidden form of disabled test — invisible to `--list`, to every reporter, and to the annotation rule in §4. `tests/DefaultConfig/Packages/CreatedPackages.spec.ts` is 347 lines and 17 tests commented out wholesale behind `// UNCOMMENT WHEN FIXED`, with no issue link; it has been dead since the **v15** era and contributes 0 of the suite's 1636 tests. Use `test.skip` with an annotation instead, so a disabled test is at least countable.
+- **A commented-out test.** The most thoroughly hidden form of disabled test — invisible to `--list`, to every reporter, and to the annotation rule in §4. `tests/DefaultConfig/Packages/CreatedPackages.spec.ts` is 347 lines and 17 tests commented out wholesale behind `// UNCOMMENT WHEN FIXED`, with no issue link; it has been dead since the **v15** era and contributes 0 of the suite's 1651 tests. Use `test.skip` with an annotation instead, so a disabled test is at least countable.
 - **A commented-out assertion in a live test.** Strictly worse than deleting it: the test still passes while quietly checking less than it appears to. There are 15, eight of them in `UserGroupsDefaultConfiguration.spec.ts`. Restore it or delete it.
 - **An unanchored TODO.** §9 allows TODOs precisely because they are deleted when done — which needs an anchor to hang off: `// TODO (V19): remove once the obsolete overload is gone` or `// TODO: pagination [NL]`. A bare `// TODO: Implement it later` (15 of these) can't rot out loud, so it never gets removed.
 

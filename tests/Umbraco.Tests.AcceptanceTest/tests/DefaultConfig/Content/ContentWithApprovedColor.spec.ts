@@ -74,8 +74,9 @@ test('can create content with the custom approved color data type', {tag: '@rele
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(customDataTypeName)).label).toEqual(colorLabel);
-  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(customDataTypeName)).value).toEqual('#' + colorValue);
+  const propertyValue = umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(customDataTypeName));
+  expect(propertyValue.label).toEqual(colorLabel);
+  expect(propertyValue.value).toEqual('#' + colorValue);
 
   // Clean
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);

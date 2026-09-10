@@ -319,8 +319,9 @@ test('can enable validation for a property in a document type', {tag: '@release'
 
   // Assert
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
-  expect(umbracoApi.documentType.getOnlyPropertyDefinition(documentTypeData).validation.regEx).toBe(regex);
-  expect(umbracoApi.documentType.getOnlyPropertyDefinition(documentTypeData).validation.regExMessage).toBe(regexMessage);
+  const propertyDefinition = umbracoApi.documentType.getOnlyPropertyDefinition(documentTypeData);
+  expect(propertyDefinition.validation.regEx).toBe(regex);
+  expect(propertyDefinition.validation.regExMessage).toBe(regexMessage);
 });
 
 test('can allow vary by culture for a property in a document type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {

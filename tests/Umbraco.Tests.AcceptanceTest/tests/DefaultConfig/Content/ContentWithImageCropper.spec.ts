@@ -41,9 +41,10 @@ test('can create content with the image cropper data type', async ({umbracoApi, 
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   await umbracoApi.document.doesVariantHaveState(contentData, expectedState);
-  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(dataTypeName)).src).toContain(AliasHelper.toAlias(imageFileName));
-  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(dataTypeName)).crops).toEqual([]);
-  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(dataTypeName)).focalPoint).toEqual(defaultFocalPoint);
+  const propertyValue = umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(dataTypeName));
+  expect(propertyValue.src).toContain(AliasHelper.toAlias(imageFileName));
+  expect(propertyValue.crops).toEqual([]);
+  expect(propertyValue.focalPoint).toEqual(defaultFocalPoint);
 });
 
 test('can publish content with the image cropper data type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
@@ -66,9 +67,10 @@ test('can publish content with the image cropper data type', {tag: '@smoke'}, as
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   await umbracoApi.document.doesVariantHaveState(contentData, expectedState);
-  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(dataTypeName)).src).toContain(AliasHelper.toAlias(imageFileName));
-  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(dataTypeName)).crops).toEqual([]);
-  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(dataTypeName)).focalPoint).toEqual(defaultFocalPoint);
+  const propertyValue = umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(dataTypeName));
+  expect(propertyValue.src).toContain(AliasHelper.toAlias(imageFileName));
+  expect(propertyValue.crops).toEqual([]);
+  expect(propertyValue.focalPoint).toEqual(defaultFocalPoint);
 });
 
 test('can create content with the custom image cropper data type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
@@ -93,11 +95,12 @@ test('can create content with the custom image cropper data type', {tag: '@smoke
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(customDataTypeName)).src).toContain(AliasHelper.toAlias(imageFileName));
-  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(customDataTypeName)).focalPoint).toEqual(defaultFocalPoint);
-  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(customDataTypeName)).crops[0].alias).toEqual(AliasHelper.toAlias(cropAlias));
-  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(customDataTypeName)).crops[0].width).toEqual(cropWidth);
-  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(customDataTypeName)).crops[0].height).toEqual(cropHeight);
+  const propertyValue = umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(customDataTypeName));
+  expect(propertyValue.src).toContain(AliasHelper.toAlias(imageFileName));
+  expect(propertyValue.focalPoint).toEqual(defaultFocalPoint);
+  expect(propertyValue.crops[0].alias).toEqual(AliasHelper.toAlias(cropAlias));
+  expect(propertyValue.crops[0].width).toEqual(cropWidth);
+  expect(propertyValue.crops[0].height).toEqual(cropHeight);
 
   // Clean
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);

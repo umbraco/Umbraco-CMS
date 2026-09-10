@@ -1,6 +1,5 @@
 ﻿import {expect, Locator, Page} from "@playwright/test"
 import {UiBaseLocators} from "./UiBaseLocators";
-
 import {ConstantHelper} from "./ConstantHelper";
 
 export class UserUiHelper extends UiBaseLocators {

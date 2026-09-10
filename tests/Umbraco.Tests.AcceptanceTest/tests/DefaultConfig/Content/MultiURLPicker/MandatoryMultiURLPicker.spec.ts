@@ -44,11 +44,12 @@ test('can save content with mandatory multi url picker after adding a link', asy
   await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.nullValue, false);
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(mandatoryDataTypeName)).length).toBe(1);
-  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(mandatoryDataTypeName))[0].type).toEqual('external');
-  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(mandatoryDataTypeName))[0].icon).toEqual('icon-link');
-  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(mandatoryDataTypeName))[0].name).toEqual(linkTitle);
-  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(mandatoryDataTypeName))[0].url).toEqual(link);
+  const propertyValue = umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(mandatoryDataTypeName));
+  expect(propertyValue.length).toBe(1);
+  expect(propertyValue[0].type).toEqual('external');
+  expect(propertyValue[0].icon).toEqual('icon-link');
+  expect(propertyValue[0].name).toEqual(linkTitle);
+  expect(propertyValue[0].url).toEqual(link);
 });
 
 test('can see validation error after removing all links from mandatory multi url picker', async ({umbracoApi, umbracoUi}) => {
@@ -98,15 +99,16 @@ test('can see validation error clear when minimum number of links is met', async
 
   // Assert
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(minNumberDataTypeName)).length).toBe(2);
-  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(minNumberDataTypeName))[0].type).toEqual('external');
-  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(minNumberDataTypeName))[0].icon).toEqual('icon-link');
-  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(minNumberDataTypeName))[0].name).toEqual(linkTitle);
-  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(minNumberDataTypeName))[0].url).toEqual(link);
-  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(minNumberDataTypeName))[1].type).toEqual('external');
-  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(minNumberDataTypeName))[1].icon).toEqual('icon-link');
-  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(minNumberDataTypeName))[1].name).toEqual(secondLinkTitle);
-  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(minNumberDataTypeName))[1].url).toEqual(secondLink);
+  const propertyValue = umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(minNumberDataTypeName));
+  expect(propertyValue.length).toBe(2);
+  expect(propertyValue[0].type).toEqual('external');
+  expect(propertyValue[0].icon).toEqual('icon-link');
+  expect(propertyValue[0].name).toEqual(linkTitle);
+  expect(propertyValue[0].url).toEqual(link);
+  expect(propertyValue[1].type).toEqual('external');
+  expect(propertyValue[1].icon).toEqual('icon-link');
+  expect(propertyValue[1].name).toEqual(secondLinkTitle);
+  expect(propertyValue[1].url).toEqual(secondLink);
 
   // Clean
   await umbracoApi.documentType.ensureNameNotExists(minNumberDocumentTypeName);

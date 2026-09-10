@@ -100,7 +100,7 @@ If you reduced a budgeted count (removed a sleep, tightened a locator), **lower 
 You can also confirm Playwright still collects what you expect without a running site:
 
 ```bash
-npx playwright test --list | tail -1   # e.g. "Total: 1636 tests in 269 files"
+npx playwright test --list | tail -1   # e.g. "Total: 1651 tests in 270 files" (270 counts auth.setup.ts)
 ```
 
 Then, if an instance is available, run the narrowest thing that covers the change, more than once — a single green does not distinguish a deterministic test from a lucky one:

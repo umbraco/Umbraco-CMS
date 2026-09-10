@@ -139,8 +139,9 @@ test('can set up validation for a property in a media type', {tag: '@release'}, 
 
   // Assert
   const mediaTypeData = await umbracoApi.mediaType.getByName(mediaTypeName);
-  expect(umbracoApi.mediaType.getOnlyPropertyDefinition(mediaTypeData).validation.regEx).toBe(regex);
-  expect(umbracoApi.mediaType.getOnlyPropertyDefinition(mediaTypeData).validation.regExMessage).toBe(regexMessage);
+  const propertyDefinition = umbracoApi.mediaType.getOnlyPropertyDefinition(mediaTypeData);
+  expect(propertyDefinition.validation.regEx).toBe(regex);
+  expect(propertyDefinition.validation.regExMessage).toBe(regexMessage);
 });
 
 test('can set appearance as label on top for property in a media type', async ({umbracoApi, umbracoUi}) => {

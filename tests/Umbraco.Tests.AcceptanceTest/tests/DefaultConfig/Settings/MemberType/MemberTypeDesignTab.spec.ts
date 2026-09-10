@@ -136,8 +136,9 @@ test('can set up validation for a property in a member type', async ({umbracoApi
 
   // Assert
   const memberTypeData = await umbracoApi.memberType.getByName(memberTypeName);
-  expect(umbracoApi.memberType.getOnlyPropertyDefinition(memberTypeData).validation.regEx).toBe(regex);
-  expect(umbracoApi.memberType.getOnlyPropertyDefinition(memberTypeData).validation.regExMessage).toBe(regexMessage);
+  const propertyDefinition = umbracoApi.memberType.getOnlyPropertyDefinition(memberTypeData);
+  expect(propertyDefinition.validation.regEx).toBe(regex);
+  expect(propertyDefinition.validation.regExMessage).toBe(regexMessage);
 });
 
 test('can set appearance as label on top for property in a member type', async ({umbracoApi, umbracoUi}) => {

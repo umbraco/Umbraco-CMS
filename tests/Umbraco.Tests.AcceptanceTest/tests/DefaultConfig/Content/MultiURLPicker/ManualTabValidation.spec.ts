@@ -109,9 +109,10 @@ test('can create content with manual url only', {tag: '@release'}, async ({umbra
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(dataTypeName)).length).toBe(1);
-  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(dataTypeName))[0].type).toEqual('external');
-  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(dataTypeName))[0].url).toEqual(link);
+  const propertyValue = umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(dataTypeName));
+  expect(propertyValue.length).toBe(1);
+  expect(propertyValue[0].type).toEqual('external');
+  expect(propertyValue[0].url).toEqual(link);
 });
 
 test('can create content with manual anchor only', async ({umbracoApi, umbracoUi}) => {
@@ -131,8 +132,9 @@ test('can create content with manual anchor only', async ({umbracoApi, umbracoUi
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(dataTypeName)).length).toBe(1);
-  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(dataTypeName))[0].queryString).toEqual(anchorValue);
+  const propertyValue = umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(dataTypeName));
+  expect(propertyValue.length).toBe(1);
+  expect(propertyValue[0].queryString).toEqual(anchorValue);
 });
 
 test('can create content with manual url and anchor', async ({umbracoApi, umbracoUi}) => {
@@ -153,10 +155,11 @@ test('can create content with manual url and anchor', async ({umbracoApi, umbrac
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(dataTypeName)).length).toBe(1);
-  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(dataTypeName))[0].type).toEqual('external');
-  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(dataTypeName))[0].url).toEqual(link);
-  expect(umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(dataTypeName))[0].queryString).toEqual(querystringValue);
+  const propertyValue = umbracoApi.document.getPropertyValue(contentData, AliasHelper.toAlias(dataTypeName));
+  expect(propertyValue.length).toBe(1);
+  expect(propertyValue[0].type).toEqual('external');
+  expect(propertyValue[0].url).toEqual(link);
+  expect(propertyValue[0].queryString).toEqual(querystringValue);
 });
 
 test('cannot update content with empty manual url and anchor', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
