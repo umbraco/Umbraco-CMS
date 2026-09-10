@@ -7,11 +7,13 @@ export class DocumentBlueprintUiHelper extends UiBaseLocators{
   private readonly documentBlueprintNameTxt: Locator;
   private readonly deleteMenu: Locator;
   private readonly documentBlueprintSidebarHeader: Locator;
+  private readonly itemPickerModal: Locator;
 
   constructor(page: Page) {
     super(page);
     this.documentBlueprintTree = page.locator('umb-tree[alias="Umb.Tree.DocumentBlueprint"]');
     this.documentBlueprintSidebarHeader = page.locator('[data-mark="section-sidebar-app:Umb.SidebarMenu.DocumentBlueprint"]');
+    this.itemPickerModal = page.locator('umb-item-picker-modal');
     this.documentBlueprintNameTxt = page.locator('#name-input #input');
     this.deleteMenu = page.locator('umb-section-sidebar #menu-item').getByLabel('Delete');
   }
@@ -22,6 +24,10 @@ export class DocumentBlueprintUiHelper extends UiBaseLocators{
 
   async clickActionsMenuAtRoot() {
     await this.click(this.documentBlueprintSidebarHeader.getByTestId('open-dropdown'), {force: true});
+  }
+
+  async chooseDocumentTypeForDocumentBlueprint(documentTypeName: string) {
+    await this.click(this.itemPickerModal.locator(`umb-ref-item[name="${documentTypeName}"]`));
   }
 
   async clickSaveButtonAndWaitForDocumentBlueprintToBeCreated() {
