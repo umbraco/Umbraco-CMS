@@ -24,6 +24,7 @@
     "audit:selftest": "node audit-selftest.js",
     "helpers:selftest": "npm run build && node helpers-selftest.js",
     "typecheck": "tsc -p tsconfig.json --noEmit",
+    "flaky": "node flaky-report.js",
     "check": "npm run typecheck && npm run audit && npm run helpers:selftest",
     "testSqlite": "npm run build && npx playwright test DefaultConfig --grep-invert \"Users\"",
     "all": "npm run build && npx playwright test",

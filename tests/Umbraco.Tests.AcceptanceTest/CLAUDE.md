@@ -347,6 +347,23 @@ So before converting a locator: find the element under `src/Umbraco.Web.UI.Clien
 
 `{hasText: ...}` remains correct for **structural** filtering — narrowing to a group, tab, property or box by its label (`filter({hasText: 'Document permissions'})`). The rule is about entity names, which are the values leftover data collides on.
 
+### Which tests are actually flaky
+
+Everything above is how to avoid introducing flakiness. This is how to find what is already there — and until now nothing did.
+
+`retries: 2` means a test that fails twice and passes on the third attempt is reported **green**. CI publishes a JUnit report, and JUnit carries only the final result, so those retries were discarded every night: the flaky set existed as folklore and never as a list. Every run now also writes `results/results.json`, whose `results[]` holds one entry per attempt with its own `retry`, `status` and `duration`.
+
+```bash
+npm run flaky                       # your last run
+npm run flaky -- <path/to/report>   # a results.json from a nightly artifact
+```
+
+It names three groups. **Passed only after a retry** is the flaky set proper. **Failed every attempt** is a real failure. **Slowest attempt past half the 60s timeout** is the group worth attention before it becomes the first group — a test at 55s passes on an idle agent and fails on a loaded one, and the resulting failure looks like a product bug rather than a budget problem.
+
+It reports rather than gates, deliberately: a flaky test is information, and a run that already reported its own result should not be failed twice for the same reason.
+
+Two things to know when reading it. A test's duration is taken from its **slowest** attempt, not its last, so a test whose failing attempt hit the ceiling shows the ceiling — which is the number you want. And skipped tests are excluded throughout; Playwright records a duration for them and it means nothing.
+
 ---
 
 ## 4. Test data & isolation
@@ -518,7 +535,7 @@ The audit is a text scanner, not a type checker — it catches shapes, not seman
 
 ### The audit tests itself
 
-**`npm run audit` runs `audit-selftest.js` first and refuses to report anything if it fails.** This is not ceremony. Six rules gate at budget 0, and for those a rule whose regex silently stops matching looks *exactly* like a rule that is passing — it reports `clean` forever while the convention goes unenforced. Two of these detectors shipped with real bugs on their first draft (a dropped-promise rule with 19 false positives; a commented-assertion rule that double-counted a wholly-dead file), so this is a demonstrated failure mode.
+**`npm run audit` runs `audit-selftest.js` first and refuses to report anything if it fails.** This is not ceremony. Over half its rules gate at budget 0, and for those a rule whose regex silently stops matching looks *exactly* like a rule that is passing — it reports `clean` forever while the convention goes unenforced. Two of these detectors shipped with real bugs on their first draft (a dropped-promise rule with 19 false positives; a commented-assertion rule that double-counted a wholly-dead file), so this is a demonstrated failure mode.
 
 The self-test builds a throwaway fixture tree per case and points the audit at it with `--root`. Every rule needs two kinds of case:
 

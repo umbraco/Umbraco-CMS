@@ -112,6 +112,8 @@ npx playwright test --headed tests/DefaultConfig/MyFeatureName.spec.ts
 npx playwright test --repeat-each 3 tests/DefaultConfig/MyFeatureName.spec.ts  # flakiness check
 ```
 
+A run writes `results/results.json`, and `npm run flaky` reads it — a test that failed twice and passed on the third attempt is reported green, so a green run is not by itself evidence the spec is deterministic. Check it before calling the change verified. It also names any test whose slowest attempt ran past half the 60s timeout, which is the state a spec is in shortly before it becomes flaky. See `CLAUDE.md` §3.
+
 If you cannot run it, say so plainly and name the specs that need running. Do not describe an unrun change as verified.
 
 ### 6. Repairing a flaky or failing spec

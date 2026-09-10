@@ -65,12 +65,13 @@ You can watch a video following these instructions [here](https://www.youtube.co
 | `npm run audit:selftest` | Run just the audit's own rule tests |
 | `npm run helpers:selftest` | Test the API assertion helpers (no Umbraco needed) |
 | `npm run check` | typecheck + audit + helper tests |
+| `npm run flaky` | Name the flaky and near-timeout tests from a run's JSON report |
 
 > Every `test`/`ui`/`smokeTest`/… script runs `npm run build` first, so `lib/` changes are picked up automatically.
 
 ### Checks to run before committing
 
-Neither needs a running Umbraco instance:
+None of these needs a running Umbraco instance:
 
 ```bash
 npm run check              # typecheck + audit + helper tests
@@ -81,11 +82,24 @@ npm run audit -- --verbose # every finding, with file:line
 npm run helpers:selftest   # the API assertion helpers, against fabricated responses
 ```
 
-`npm run audit` self-tests its own 21 rules before reporting — six of them gate at budget 0, where a broken regex would otherwise be indistinguishable from a passing rule. Adding a rule without a test case fails the self-test.
+`npm run audit` self-tests every one of its rules before reporting — over half gate at budget 0, where a broken regex would otherwise be indistinguishable from a passing rule. Adding a rule without a test case fails the self-test.
 
 There is no lint step. `npm run audit` is the closest thing — it enforces the mechanical parts of [CLAUDE.md](./CLAUDE.md) §3 (dropped promises, silently-discarded assertions, specs that no project runs, un-annotated skipped tests) at a budget of zero, and ratchets the known debt (fixed sleeps, force clicks, substring name locators, untyped builders) so it can shrink but not grow. See CLAUDE.md §7 for the budget table.
 
-**Both run in CI** — `build/azure-pipelines.yml`, `Build` stage, job C — so a regression fails the build rather than waiting to be noticed.
+**All three run in CI** — `build/azure-pipelines.yml`, `Build` stage, job C — so a regression fails the build rather than waiting to be noticed.
+
+### After a run: which tests were flaky
+
+`retries: 2` means a test that fails twice and passes on the third attempt is reported **green**, and the JUnit report CI publishes keeps only the final result. So the flaky set has never been visible — known as folklore, never as a list. Every run now also writes a JSON report, which records each attempt separately:
+
+```bash
+npm run flaky                       # reads results/results.json from your last run
+npm run flaky -- <path/to/report>   # or a results.json from a nightly artifact
+```
+
+It reports three groups: tests that only passed after a retry, tests that failed every attempt, and tests whose slowest attempt ran past half the 60s timeout — that last group being the ones that pass on an idle agent and fail on a loaded one. It only reports; it never fails a build.
+
+CI publishes `results/` as the *"Acceptance Test Results"* pipeline artifact, so pointing this at a few downloaded nightlies is what turns a single run into a trend.
 
 ### Running Single Tests
 

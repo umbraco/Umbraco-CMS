@@ -24,7 +24,15 @@ export default defineConfig({
   workers: 1,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   //reporter: process.env.CI ? 'line' : 'html',
-  reporter: process.env.CI ? [['line'], ['junit', {outputFile: 'results/results.xml'}]] : 'html',
+  // The JSON report is what makes flakiness visible: retries: 2 means a test that fails twice
+  // and passes on the third attempt is reported as green, and JUnit exposes only the final
+  // result. JSON records every attempt and its duration, so `npm run flaky` can name the
+  // flaky set and the tests running close to the timeout. It is emitted locally too, so that
+  // command needs no special invocation; in CI results/ is already published as the
+  // "Acceptance Test Results" pipeline artifact, so no extra step is needed there either.
+  reporter: process.env.CI
+    ? [['line'], ['junit', {outputFile: 'results/results.xml'}], ['json', {outputFile: 'results/results.json'}]]
+    : [['html'], ['json', {outputFile: 'results/results.json'}]],
   outputDir: "./results",
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
