@@ -394,6 +394,7 @@ export default {
 		shared: 'Shared',
 	},
 	blueprints: {
+		chooseDocumentType: 'Choose Document Type',
 		createBlueprintFrom: "Create a new Document Blueprint from '%0%'",
 		createBlueprintItemUnder: "Create a new item under '%0%'",
 		createBlueprintFolderUnder: "Create a new folder under '%0%'",

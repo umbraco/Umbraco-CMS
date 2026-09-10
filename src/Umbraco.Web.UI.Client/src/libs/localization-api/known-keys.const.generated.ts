@@ -315,6 +315,7 @@ export const KNOWN_LOCALIZATION_KEYS: readonly UmbKnownLocalizationKey[] = [
 	'blockEditor_unsupportedBlockName',
 	'blueprints_blankBlueprint',
 	'blueprints_blueprintDescription',
+	'blueprints_chooseDocumentType',
 	'blueprints_createBlueprintFolderUnder',
 	'blueprints_createBlueprintFrom',
 	'blueprints_createBlueprintItemUnder',

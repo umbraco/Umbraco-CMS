@@ -342,6 +342,7 @@ declare global {
 		blockEditor_unsupportedBlockName: string;
 		blueprints_blankBlueprint: string;
 		blueprints_blueprintDescription: string;
+		blueprints_chooseDocumentType: string;
 		blueprints_createBlueprintFolderUnder: string;
 		blueprints_createBlueprintFrom: string;
 		blueprints_createBlueprintItemUnder: string;
