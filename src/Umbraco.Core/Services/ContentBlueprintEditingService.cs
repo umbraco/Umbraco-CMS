@@ -235,10 +235,12 @@ internal sealed class ContentBlueprintEditingService
             return Attempt.Fail(ContentEditingOperationStatus.NotFound);
         }
 
+        Guid? targetContainerKey = containerKey == Guid.Empty ? null : containerKey;
+
         var parentId = Constants.System.Root;
-        if (containerKey.HasValue && containerKey.Value != Guid.Empty)
+        if (targetContainerKey.HasValue)
         {
-            EntityContainer? container = await _containerService.GetAsync(containerKey.Value);
+            EntityContainer? container = await _containerService.GetAsync(targetContainerKey.Value);
             if (container is null)
             {
                 return Attempt.Fail(ContentEditingOperationStatus.ParentNotFound);
@@ -250,6 +252,17 @@ internal sealed class ContentBlueprintEditingService
         if (toMove.ParentId == parentId)
         {
             return Attempt.Succeed(ContentEditingOperationStatus.Success);
+        }
+
+        IContentType? contentType = ContentTypeService.Get(toMove.ContentTypeId);
+        if (contentType is null)
+        {
+            return Attempt.Fail(ContentEditingOperationStatus.ContentTypeNotFound);
+        }
+
+        if (await IsAllowedForBlueprintsByContentTypeFilters(contentType, targetContainerKey) is false)
+        {
+            return Attempt.Fail(ContentEditingOperationStatus.NotAllowed);
         }
 
         // NOTE: as long as the parent ID is correct the document repo takes care of updating the rest of the
