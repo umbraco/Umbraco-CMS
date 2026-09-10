@@ -52,6 +52,7 @@ internal sealed class MediaPresentationFactory : IMediaPresentationFactory
             Parent = parentKeyAttempt.Success ? new ReferenceByIdModel { Id = parentKeyAttempt.Result } : null,
             HasChildren = entity.HasChildren,
             MediaType = _umbracoMapper.Map<MediaTypeReferenceResponseModel>(entity)!,
+            Extension = ((IMediaPresentationFactory)this).CreateFileExtension(entity),
             Variants = CreateVariantsItemResponseModels(entity)
         };
     }

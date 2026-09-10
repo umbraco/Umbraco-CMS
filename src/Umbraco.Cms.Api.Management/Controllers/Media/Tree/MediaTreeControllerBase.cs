@@ -128,6 +128,7 @@ public class MediaTreeControllerBase : UserStartNodeTreeControllerBase<MediaTree
 
             responseModel.Variants = _mediaPresentationFactory.CreateVariantsItemResponseModels(mediaEntitySlim);
             responseModel.MediaType = _mediaPresentationFactory.CreateMediaTypeReferenceResponseModel(mediaEntitySlim);
+            responseModel.Extension = _mediaPresentationFactory.CreateFileExtension(mediaEntitySlim);
         }
 
         return responseModel;
