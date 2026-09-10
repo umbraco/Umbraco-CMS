@@ -7,15 +7,15 @@ description: Write, extend, or repair Playwright acceptance (end-to-end) tests f
 
 Procedure for writing and repairing the Playwright E2E suite in `tests/Umbraco.Tests.AcceptanceTest`.
 
-`CLAUDE.md` in that project is the reference for *why* each rule exists; this skill is the order to do things in. Read the **12-row checklist at the top of its §3** once per session before editing a spec or helper, and drop into a subsection when you hit that specific case — the section itself is long because the reasons are, not because the rules are. `npm run audit` catches the mechanical half.
+`CLAUDE.md` in that project is the reference for *why* each rule exists; this skill is the order to do things in. Read the **12-row checklist at the top of its §3** once per session before editing a spec or helper, and drop into a subsection when you hit that specific case — the section itself is long because the reasons are, not because the rules are.
 
 **All paths below are relative to `tests/Umbraco.Tests.AcceptanceTest`.** Prefer paths over `cd`.
 
 ## Key facts
 
 - **A spec only runs if it sits in a directory a `playwright.config.ts` project matches** — `DefaultConfig/**`, `ExtensionRegistry/**/*.spec.ts`, `EntityDataPicker/**/*.spec.ts`, `DeliveryApi/**`, `ContentSettingConfig/**`, `SMTP/*.spec.ts`, `ImagingSettingConfig/*.spec.ts`, `ExternalLogin/AzureADB2C/**`, `AuthProviderLateRegistration/**/*.spec.ts`, `UnattendedInstallConfig/**`. A file written straight into `tests/` type-checks, looks correct, and is **silently never run**. Default to `tests/DefaultConfig/`.
-- **Two gates run without an Umbraco instance**: `npm run typecheck` (covers `lib/` *and* `tests/`; `npm run build` compiles `lib/` only and misses spec type errors) and `npm run audit` (the conventions in `CLAUDE.md` §3). Run both before committing.
-- **There is no lint step**, but `npm run audit` covers the mechanical part: it fails at budget 0 on dropped promises, silently-discarded assertions, specs no project runs, raw `page` use in a spec, hardcoded endpoints, and un-annotated skipped tests. What debt is left (sleeps, force clicks, hardcoded indexes, raw response assertions) is budgeted so it can shrink but not grow — see `CLAUDE.md` §7 for which rules are gates and which are ratchets. **All of these run in CI** (`build/azure-pipelines.yml`, `Build` stage, job C), so a regression fails the build.
+- **One check runs without an Umbraco instance**: `npm run typecheck`, which covers `lib/` *and* `tests/` (`npm run build` compiles `lib/` only and misses spec type errors). Run it before committing.
+- **There is no lint step, and nothing mechanically enforces the conventions.** Dropped promises, silently-discarded assertions, specs no project runs, raw `page` use in a spec, hardcoded endpoints, un-annotated skipped tests, fixed sleeps, force clicks, hardcoded indexes and raw response assertions are all caught by reading, not by a tool. Type-checking runs in CI (`build/azure-pipelines.yml`, `Build` stage, job C); everything in step 4 below is on you.
 - **Running the suite needs a running, installed Umbraco** on `https://localhost:44339` using SQL Server/LocalDB (SQLite is too slow for the suite), plus a `.env` with superadmin credentials. Without one you can write and type-check, but you cannot verify.
 - **`workers: 1`, `retries: 2`, 60s test timeout, 5s expect timeout.** Specs share fixed entity names, so they must not run in parallel.
 - In-repo specs import from `@umbraco/acceptance-test-helpers` — a `tsconfig.json` path alias onto `lib/index.ts`, **not** the published package name (`@umbraco-cms/acceptance-test-helpers`). Use the alias in-repo.
@@ -86,16 +86,12 @@ Walk this before committing. Each item is a real failure mode in this suite:
 ### 5. Verify
 
 ```bash
-npm run check   # typecheck + audit (self-tests its rules first) + API helper tests
+npm run typecheck
 ```
 
-If you add an audit rule, add its `bad` **and** `good` fixture cases to `audit-selftest.js` in the same commit — the self-test fails on any rule with no case.
-
-If you change what an API assertion helper *means*, add a case to `helpers-selftest.js` first. They back ~700 spec assertions, so a semantic change silently changes what all of those assert — and the shape of mistake to watch for is a check that counts `values` entries instead of distinct aliases, which passes on invariant content and fails on every variant and segment spec. See `CLAUDE.md` §3.
+If you change what an API assertion helper *means*, stop and reconsider. They back ~700 spec assertions, so a semantic change silently changes what all of those assert with nothing to point at the cause — and the shape of mistake to watch for is a check that counts `values` entries instead of distinct aliases, which passes on invariant content and fails on every variant and segment spec. See `CLAUDE.md` §3.
 
 The same file also pins **builder payloads**. When you add a `withX()`, check the field is actually read in `build()`/`getValues()`/`getValue()` and add a case asserting the built payload carries it — a setter that stores a field nothing reads is a silent no-op that no test run, type-check or audit will catch. See `CLAUDE.md` §5.
-
-If you reduced a budgeted count (removed a sleep, tightened a locator), **lower that budget in `audit-conventions.js` in the same commit** — the audit prints the new number. Never raise a budget to make a run pass.
 
 You can also confirm Playwright still collects what you expect without a running site:
 
@@ -112,7 +108,7 @@ npx playwright test --headed tests/DefaultConfig/MyFeatureName.spec.ts
 npx playwright test --repeat-each 3 tests/DefaultConfig/MyFeatureName.spec.ts  # flakiness check
 ```
 
-A run writes `results/results.json`, and `npm run flaky` reads it — a test that failed twice and passed on the third attempt is reported green, so a green run is not by itself evidence the spec is deterministic. Check it before calling the change verified. It also names any test whose slowest attempt ran past half the 60s timeout, which is the state a spec is in shortly before it becomes flaky. See `CLAUDE.md` §3.
+`retries: 2` means a test that fails twice and passes on the third attempt is still reported green, so a single green run is not evidence the spec is deterministic — which is why the `--repeat-each` run above matters.
 
 If you cannot run it, say so plainly and name the specs that need running. Do not describe an unrun change as verified.
 

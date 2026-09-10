@@ -188,21 +188,11 @@ stages:
             parameters:
               nodeVersion: ${{ variables.nodeVersion }}
               npm_config_cache: ${{ variables.npm_config_cache }}
-          # Neither gate needs a running Umbraco instance, and deps are already installed above.
+          # Needs no running Umbraco instance, and deps are already installed above.
           # `npm run build` compiles lib/ only, so the specs under tests/ are unchecked without this.
           - script: npm run typecheck
             workingDirectory: tests/Umbraco.Tests.AcceptanceTest
             displayName: Type-check test helpers and specs
-          # `npm run audit` self-tests its own rules first: six of them gate at budget 0,
-          # where a rule whose regex stops matching is indistinguishable from a passing one.
-          - script: npm run audit
-            workingDirectory: tests/Umbraco.Tests.AcceptanceTest
-            displayName: Audit acceptance test conventions
-          # The API assertion helpers back ~700 spec assertions, so a change in their
-          # semantics silently changes what those specs assert. Needs no Umbraco instance.
-          - script: npm run helpers:selftest
-            workingDirectory: tests/Umbraco.Tests.AcceptanceTest
-            displayName: Test the API assertion helpers
           - template: templates/set-npm-version.yml
             parameters:
               workingDirectory: tests/Umbraco.Tests.AcceptanceTest

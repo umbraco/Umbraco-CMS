@@ -61,45 +61,18 @@ You can watch a video following these instructions [here](https://www.youtube.co
 | `npm run config` | Reconfigure environment settings |
 | `npm run build` | Compile `lib/` to `dist/` (does **not** type-check `tests/`) |
 | `npm run typecheck` | Type-check `lib/` **and** `tests/` |
-| `npm run audit` | Self-test the rules, then check the suite against CLAUDE.md §3 |
-| `npm run audit:selftest` | Run just the audit's own rule tests |
-| `npm run helpers:selftest` | Test the API assertion helpers (no Umbraco needed) |
-| `npm run check` | typecheck + audit + helper tests |
-| `npm run flaky` | Name the flaky and near-timeout tests from a run's JSON report |
 
 > Every `test`/`ui`/`smokeTest`/… script runs `npm run build` first, so `lib/` changes are picked up automatically.
 
-### Checks to run before committing
-
-None of these needs a running Umbraco instance:
+### Before committing
 
 ```bash
-npm run check              # typecheck + audit + helper tests
-
-npm run typecheck          # a type error in a spec won't surface from `npm run build`
-npm run audit              # one line per convention; non-zero exit if a rule regresses
-npm run audit -- --verbose # every finding, with file:line
-npm run helpers:selftest   # the API assertion helpers, against fabricated responses
+npm run typecheck   # a type error in a spec will not surface from `npm run build`
 ```
 
-`npm run audit` self-tests every one of its rules before reporting — over half gate at budget 0, where a broken regex would otherwise be indistinguishable from a passing rule. Adding a rule without a test case fails the self-test.
+It needs no running Umbraco instance, and it runs in CI (`build/azure-pipelines.yml`, `Build` stage, job C), so a type regression fails the build.
 
-There is no lint step. `npm run audit` is the closest thing — it enforces the mechanical parts of [CLAUDE.md](./CLAUDE.md) §3 (dropped promises, silently-discarded assertions, specs that no project runs, un-annotated skipped tests) at a budget of zero, and ratchets what debt is left (fixed sleeps, force clicks, hardcoded indexes, raw response assertions) so it can shrink but not grow. Seventeen of its twenty-five rules are now gates at zero. See CLAUDE.md §7 for which is which.
-
-**All three run in CI** — `build/azure-pipelines.yml`, `Build` stage, job C — so a regression fails the build rather than waiting to be noticed.
-
-### After a run: which tests were flaky
-
-`retries: 2` means a test that fails twice and passes on the third attempt is reported **green**, and the JUnit report CI publishes keeps only the final result. So the flaky set has never been visible — known as folklore, never as a list. Every run now also writes a JSON report, which records each attempt separately:
-
-```bash
-npm run flaky                       # reads results/results.json from your last run
-npm run flaky -- <path/to/report>   # or a results.json from a nightly artifact
-```
-
-It reports three groups: tests that only passed after a retry, tests that failed every attempt, and tests whose slowest attempt ran past half the 60s timeout — that last group being the ones that pass on an idle agent and fail on a loaded one. It only reports; it never fails a build.
-
-CI publishes `results/` as the *"Acceptance Test Results"* pipeline artifact, so pointing this at a few downloaded nightlies is what turns a single run into a trend.
+**There is no lint step.** The determinism conventions in [CLAUDE.md](./CLAUDE.md) §3 — awaiting every assertion, waiting on state rather than time, exact-name locators, tearing down global entities — are applied by reading and by review, not by a tool. A green `typecheck` proves the types line up and nothing more.
 
 ### Running Single Tests
 

@@ -4,21 +4,17 @@ Playwright end-to-end tests for Umbraco CMS. This file covers **how the suite is
 
 ---
 
-## 1. Gates you can run without an Umbraco instance
+## 1. The one check you can run without an Umbraco instance
 
 ```bash
-npm run check       # all three of the below, in order
-
-npm run typecheck        # tsc -p tsconfig.json --noEmit  — lib/ AND tests/
-npm run audit            # conventions from §3 (self-tests its own rules first), see §7
-npm run helpers:selftest # the API assertion helpers, against fabricated responses
+npm run typecheck   # tsc -p tsconfig.json --noEmit — lib/ AND tests/
 ```
 
-Run `npm run check` before committing. None of it needs a running site, so there is no excuse to skip it.
+Run it before committing; it needs no running site, so there is no excuse to skip it.
 
 `npm run build` compiles `lib/` only (`tsconfig.build.json`) and does **not** type-check the specs under `tests/` — that is what `npm run typecheck` is for.
 
-There is no lint step. §7 covers what `npm run audit` can check mechanically; everything else in §3 you apply by hand.
+**There is no lint step, and nothing mechanically enforces §3.** Every convention in it is applied by reading and by review. That is worth knowing before you rely on a green `typecheck` meaning more than it does: it proves the types line up, not that a promise is awaited, an entity is torn down, or a locator matches exactly one element.
 
 A spec also has to sit **inside a directory that one of the `playwright.config.ts` projects matches** (`DefaultConfig/**`, `DeliveryApi/**`, `SMTP/*.spec.ts`, …). A file written straight into `tests/` type-checks, looks fine, and is silently never run — no project's `testMatch` claims it. `npm run createTest` writes into `tests/DefaultConfig/` for exactly this reason.
 
@@ -80,7 +76,7 @@ These are the rules that keep the suite stable. Most flaky failures trace back t
 | 11 | Match entity names exactly, so leftover data can't multi-match | [Match names exactly](#match-names-exactly-to-survive-leftover-data) |
 | 12 | Read the component before choosing a locator form | [Verify a locator against the component](#verify-a-locator-against-the-component-not-against-a-hunch) |
 
-`npm run audit` enforces the mechanical half of every one of these — see §7 for which, and at what budget.
+Nothing enforces these mechanically. They hold because they are read and applied.
 
 ### Never drop a promise
 Every Playwright assertion (`expect(locator).toBeVisible()`, `.toHaveText()`, …) and every helper call is async. Always `await` it, and **never** wrap awaited work in `Array.forEach(async …)` — the callback's promise is discarded and the assertion never runs.
@@ -111,7 +107,7 @@ Fixed sleeps (`page.waitForTimeout(...)`, `ConstantHelper.wait.*`) are the singl
 
 **Before blaming the test, check the instance.** Scheduled publishing firing mid-test is a flake the suite guards against *in CI only* — the nightly pipeline copies `SuspendScheduledPublishingComposer` (and SQL Server delayed durability) from `tests/Umbraco.Tests.AcceptanceTest.UmbracoProject/` into the instance it builds. A local instance has neither, and `src/Umbraco.Web.UI` additionally runs ModelsBuilder in `InMemoryAuto`, regenerating models on every content-type change in a suite that changes them constantly. A flake that reproduces only locally is often that difference. See README.md → Prerequisites.
 
-**Known debt — the suite has not finished paying this off.** 91 `waitForTimeout` calls remain, concentrated in `ContentUiHelper`, `LibraryUiHelper` and `UiBaseLocators`. Only **10 of them carry a justification**; the other 81 are what `npm run audit` budgets. Treat them as debt, not as precedent: the fact that a neighbouring method sleeps is not a reason for a new one to.
+**Known debt — the suite has not finished paying this off.** 91 `waitForTimeout` calls remain, concentrated in `ContentUiHelper`, `LibraryUiHelper` and `UiBaseLocators`. Only **10 of them carry a justification**; the other 81 do not. Treat them as debt, not as precedent: the fact that a neighbouring method sleeps is not a reason for a new one to.
 
 `BasePage.waitForTimeout()` and `UiHelpers.waitForTimeout()` exist and are exported, so they stay — but reach for them only when there is genuinely no observable state to wait on, and **leave a comment saying what the sleep stands in for** (as `FormsUiHelper` does). That comment is the contract: the audit counts unjustified sleeps only, so a justified one is allowed and does not fail the build. When you remove one, replace it with a wait on the state it was covering for, and verify the spec still passes against a running instance.
 
@@ -168,7 +164,7 @@ So: **a new `does*`/`is*`/`has*` method asserts internally.** If it has to hand 
 
 A real assertion failure reads as a **green test**, with the error demoted to a line a CI summary will skip. Verified by probe, not inferred.
 
-`npm run audit` fails at budget 0 on both halves of this: a value-returning check that nothing asserts on (`discardedCheck`), and an assert-internally helper called without `await` (`unawaitedAssertion`). Both are currently 0 — every one of the ~730 migrated call sites is awaited, and the 12 value-returning checks are all wrapped in `expect()`.
+Both halves of this were swept once and were clean at the time: every one of the ~730 migrated call sites is awaited, and the 12 value-returning checks are all wrapped in `expect()`. Neither property is checked automatically, so both are worth a glance in review.
 
 ### Assert through a helper, not on the raw API response
 
@@ -227,7 +223,7 @@ The resulting contract:
 - `getPropertyValue(data, alias)` / `doesPropertyHaveValue(data, alias, value)` — with no culture, several matches is legitimate and the first is used; pass a culture when a specific variant is the subject, and then exactly one match is required.
 - `doesVariantHaveState` / `doesVariantHaveName` — with no culture, target `variants[0]`, the default variant.
 
-Every one of those cases is pinned by `npm run helpers:selftest`, which runs the helpers against fabricated response objects and needs no Umbraco instance. **Add a case there before changing any of these semantics** — these helpers back ~700 spec assertions, so a change to what they mean silently changes what all those specs assert.
+**Think hard before changing any of these semantics** — these helpers back ~700 spec assertions, so a change to what they mean silently changes what all of those specs assert, with no failure to point at the cause.
 
 `getPropertyValue` is deliberately named `get*`, not `does*`: it hands a value back, so the caller must assert on it (§3's check-method rule). It exists for the nested shapes a generic assertion cannot cover, and it keeps the nested assertion — which is the actual subject of such a test — while dropping the positional lookup:
 
@@ -334,7 +330,7 @@ This is why `UserGroupUiHelper`/`UserUiHelper` match exactly rather than with `h
 
 #### Endpoint constants are checked against the API's own contract
 
-`ConstantHelper.apiEndpoints` hardcodes 46 Management API paths. Nothing used to tie them to the API, so a renamed route surfaced as a helper waiting for a response that never arrives — a 60-second timeout with no hint of the cause. `npm run audit` now cross-checks every constant against the committed `src/Umbraco.Cms.Api.Management/OpenApi.json` (428 paths), which needs no running instance.
+`ConstantHelper.apiEndpoints` hardcodes 46 Management API paths, and 232 more are written inline in the `*ApiHelper` files. Nothing ties them to the API, so a renamed route surfaces as a helper waiting for a response that never arrives — a 60-second timeout with no hint of the cause. When a wait times out for no visible reason, check the path against the committed `src/Umbraco.Cms.Api.Management/OpenApi.json`, which is the contract and needs no running instance. Seven paths had already drifted when this was last checked by hand.
 
 The check covers **inline paths too, not just the constants** — and it has to: only 31 call sites use `ConstantHelper.apiEndpoints`, while **232 write the path inline** in an `*ApiHelper`. Checking constants alone would have verified about a eighth of the suite's API surface. (Migrating those 232 to constants is separate, optional tidying; what matters for correctness is that the route exists.)
 
@@ -386,23 +382,6 @@ Two things made this checkable without a running site: `@umbraco-ui/uui` ships `
 
 `{hasText: ...}` remains correct for **structural** filtering — narrowing to a group, tab, property or box by its label (`filter({hasText: 'Document permissions'})`). The rule is about entity names, which are the values leftover data collides on.
 
-### Which tests are actually flaky
-
-Everything above is how to avoid introducing flakiness. This is how to find what is already there — and until now nothing did.
-
-`retries: 2` means a test that fails twice and passes on the third attempt is reported **green**. CI publishes a JUnit report, and JUnit carries only the final result, so those retries were discarded every night: the flaky set existed as folklore and never as a list. Every run now also writes `results/results.json`, whose `results[]` holds one entry per attempt with its own `retry`, `status` and `duration`.
-
-```bash
-npm run flaky                       # your last run
-npm run flaky -- <path/to/report>   # a results.json from a nightly artifact
-```
-
-It names three groups. **Passed only after a retry** is the flaky set proper. **Failed every attempt** is a real failure. **Slowest attempt past half the 60s timeout** is the group worth attention before it becomes the first group — a test at 55s passes on an idle agent and fails on a loaded one, and the resulting failure looks like a product bug rather than a budget problem.
-
-It reports rather than gates, deliberately: a flaky test is information, and a run that already reported its own result should not be failed twice for the same reason.
-
-Two things to know when reading it. A test's duration is taken from its **slowest** attempt, not its last, so a test whose failing attempt hit the ceiling shows the ceiling — which is the number you want. And skipped tests are excluded throughout; Playwright records a duration for them and it means nothing.
-
 ---
 
 ## 4. Test data & isolation
@@ -420,14 +399,14 @@ Name sharing is not the exception, it is the norm: **167 name constants appear i
 
 The residual risk sits with the **127 `create*` helpers that do not ensure first**: for those, a shared name plus a leftover means a duplicate or a 400 rather than a clean overwrite. If you add a `create*` helper, ensure the name first — that is the habit the suite actually depends on.
 
-So the rule that matters is not "unique names" but "clean up anything global" — see the teardown table below, which `npm run audit` enforces.
+So the rule that matters is not "unique names" but "clean up anything global" — see the teardown table below.
 - Cleanup caveats to be aware of when debugging leftover state: some `ensureNameNotExists` / `recurseChildren` helpers delete only the **first** match, and list fetches use a single large `take` (no pagination) — duplicates or very large trees can leave residue.
 
 ### What actually has to be torn down
 
 **Deleting a type removes its instances**, so a spec that cleans up the document type does not also need to remove its documents — and most specs rely on exactly that. The cascades: `document`, `documentBlueprint` and `element` from `documentType`; `media` from `mediaType`; `member` from `memberType`.
 
-**Everything else has to be removed explicitly**, and these are the ones that bite because they are *global*: a `language`, `userGroup`, `user`, `memberGroup`, `dataType`, `template`, `dictionary`, `webhook` or `relationType` left behind changes what every later spec sees. `npm run audit` checks this (`entityNotTornDown`, budget 0), with the cascade map built in so it does not fire on the common case.
+**Everything else has to be removed explicitly**, and these are the ones that bite because they are *global*: a `language`, `userGroup`, `user`, `memberGroup`, `dataType`, `template`, `dictionary`, `webhook` or `relationType` left behind changes what every later spec sees. Check this by eye when you add a `create*` to a spec: does something in the same file remove it, or remove a type it cascades from?
 
 Five real leaks existed when the rule was written, and the shape is instructive — each had a sibling spec doing it correctly:
 
@@ -460,7 +439,7 @@ Annotations show up in every reporter (and in the HTML report's test detail), so
 | `todo` | Never implemented — the body is an empty stub | 3 |
 | `fixme` | Fully implemented but disabled | 17 |
 
-Rules: a new disabled test needs an annotation (`npm run audit` fails without one), and prefer `type: 'issue'` with a link — a `blocked` entry carrying only prose is how a test stays off for two years.
+Rules: a new disabled test needs an annotation, and prefer `type: 'issue'` with a link — a `blocked` entry carrying only prose is how a test stays off for two years.
 
 The two categories that are not really "skipped tests" at all:
 
@@ -482,7 +461,7 @@ If a test is off because the *feature* was removed, delete it — a permanent sk
 
 13 builders call `ensureIdExists` in `build()` and so emit a client-generated GUID — `document`, `element`, `member`, `dataType`, the three content types, and the property/area/group sub-builders. **`media`, `userGroup` and `user` do not**: they emit `id: null` and let the server assign, even though they are the same category of top-level entity builder.
 
-Both work, because `ApiHelpers.create()` reads the new id from the `Location` header either way. But the point of `ensureIdExists` is that a spec can know an entity's id *before* creating it, and for those three you cannot. Aligning them is a payload change across many specs, so it wants verifying against a running instance rather than doing blind — `npm run helpers:selftest` pins the current split so a change to either side is deliberate.
+Both work, because `ApiHelpers.create()` reads the new id from the `Location` header either way. But the point of `ensureIdExists` is that a spec can know an entity's id *before* creating it, and for those three you cannot. Aligning them is a payload change across many specs, so it wants verifying against a running instance rather than doing blind.
 
 Sub-builders that reference an existing entity (`*AllowedDocumentTypeBuilder`, `*ContainerBuilder`, the permission builders) correctly do **not** generate ids.
 
@@ -499,7 +478,7 @@ build(): DataTypePayload
 abstract getValues(): DataTypeValues
 ```
 
-**The part that is easy to get wrong:** annotating the base class alone achieves nothing. Every subclass declared `let values: any[] = []` and pushed into it, so the `any` swallowed the mistake long before it reached the return type — the annotation type-checked and caught precisely zero real errors. The 33 subclasses now declare `const values: DataTypeValues = []`, and with that in place a misspelled `allias:` fails compilation with *"Did you mean to write 'alias'?"*. **An `any` anywhere on the path to `build()` defeats the whole exercise**, which is why `npm run audit` budgets `: any` inside builders alongside the unchecked exits.
+**The part that is easy to get wrong:** annotating the base class alone achieves nothing. Every subclass declared `let values: any[] = []` and pushed into it, so the `any` swallowed the mistake long before it reached the return type — the annotation type-checked and caught precisely zero real errors. The 33 subclasses now declare `const values: DataTypeValues = []`, and with that in place a misspelled `allias:` fails compilation with *"Did you mean to write 'alias'?"*. **An `any` anywhere on the path to `build()` defeats the whole exercise** — so when you touch a builder, check the local the exit returns is declared, not just the exit.
 
 The remaining debt is not in those 33 subclasses — it is in the **sub-builders**, which return an inline object literal or push into a `let values: any = {}`. There a declared return type does do the work: TypeScript's excess-property check fires on a literal in a return position and names the mistake. That is what the audit's `untypedBuilderExit` now counts, so paying it off means giving each sub-builder's item shape an interface — not sprinkling annotations on the exits that are already checked.
 
@@ -551,7 +530,7 @@ distinguishes typing that works from typing that looks like it does.
 
 It survives because the key name and the field name differ *legitimately* almost everywhere else — `parent: this.parentId ? {id: …}`, `min: this.minValue`, `value: this.lineNumbers` — so a mismatch does not look wrong on its own. What made this one a bug is that a field of the same name existed and was ignored.
 
-When adding or reviewing a setter, check the field is read in the exit method, and add a case to `npm run helpers:selftest` asserting the built payload carries it. Nothing else catches this: not `tsc`, not the audit, and not a green test run.
+When adding or reviewing a setter, check by hand that the field is read in the exit method. Nothing catches this otherwise: not `tsc`, and not a green test run.
 
 **The same class exists one layer up, in the helpers: a parameter the body never reads.** The audit checks for it (`unusedHelperParam`), and the shape to fear is a negation flag — an ignored `isVisible: boolean = true` means a caller passing `false` still gets the *positive* assertion, so the test asserts the opposite of what it reads. The suite currently has **zero** of those; the one finding is a vestigial `pageDocumentTypeAlias` on `TemplateApiHelper.createTemplateWithDisplayingElementPickerVarianceAndIdentityMethods`, copy-pasted from a sibling that does use it to emit a `PageIsDocumentType` line. Nothing asserts that line, so nothing fails — but a spec that passed the argument expecting it would be silently disappointed.
 
@@ -566,99 +545,28 @@ When adding or reviewing a setter, check the field is read in the exit method, a
 
 ---
 
-## 7. The audit — these conventions are checkable
-
-There is no lint step, so §3 used to be enforced by memory alone. `audit-conventions.js` is the checker:
-
-```bash
-npm run audit              # one line per rule
-npm run audit -- --verbose # every finding, with file:line
-```
-
-It needs no Umbraco instance and exits non-zero when a rule goes over budget.
-
-**How the budgets work.** Rules that should never be violated have a budget of **0** and fail the moment one appears. Rules that are pre-existing debt carry the current count as their budget, so the count can only shrink — the ratchet stops the debt growing without demanding it be paid off today.
-
-**A rule must never contradict the convention it enforces.** The sleep and force-click rules originally counted *every* occurrence, justified or not, with the budget set to the exact current total. §3 permits either escape when there is genuinely no observable state *provided a comment says what it stands in for* — so a properly justified addition pushed the count over budget, and the only way out was raising the budget, which this section forbids. The convention was unfollowable. Both rules now count only the **unjustified** ones; the comment is the contract, and the budget tracks the sites that lack one. `literalIndexLocator` works the same way: a parameterised `.nth(i)` is the legitimate form and is not counted, only a hardcoded literal is. If you add a rule with a documented exception, exclude that exception in the rule itself and add a `good` self-test case proving it.
-
-**A rule must measure the effect, not the shape.** The builder-exit rule counted exits with no return type annotation. But for the 36 `DataTypeBuilder` subclasses, adding one provably changes nothing: their bodies already declare `const values: DataTypeValues = []`, which is what catches a misspelled field, and an unannotated `const values = []` infers `any[]` — which satisfies a `DataTypeValues` return annotation, so the annotation catches nothing on its own. The rule was asking for 36 edits with no effect while ignoring the 13 `getValue()` exits that genuinely return an unchecked shape. Both halves were checked by planting a misspelled field and re-running `tsc`, and the rule now counts the exits where an annotation would actually fire. **When you write a rule, plant the defect it exists to catch and confirm the type-checker or the run actually reports it** — otherwise you are enforcing a shape you have assumed is protective.
-
-The counts live in `audit-conventions.js` and are printed by `npm run audit`; this table gives
-the reason each rule exists, and whether it is a **gate** (must never be violated) or **debt**
-(ratcheted — the count may shrink, never grow). Deliberately no numbers here: four of them had
-already drifted from the real budgets before this column was removed.
-
-| Rule | | Why it matters |
-|------|--|----------------|
-| Dropped promises | gate | assertion never runs; test greens regardless |
-| Value-returning check nothing asserts on | gate | same silent green, different disguise |
-| Assert-internally helper called without `await` | gate | failure becomes a rejected promise; the test reports as passed |
-| `expect()` on an un-awaited async helper | gate | the assertion is on a Promise, so it is always true |
-| Endpoint constant absent from `OpenApi.json` | gate | a renamed route becomes a mystifying timeout |
-| Spec creates an entity it never tears down | gate | global residue changes what later specs see |
-| Spec outside a project directory | gate | file is never run at all |
-| Raw `page` fixture in a spec | gate | bypasses the page objects |
-| Hardcoded API endpoint | gate | belongs in `ConstantHelper.apiEndpoints` |
-| Hardcoded timeout in ms | gate | belongs in `ConstantHelper.timeout` |
-| Disabled test without an annotation | gate | invisible in reports |
-| Commented-out test | gate | invisible to `--list` and every reporter |
-| Deprecation with no removal version | gate | consumer has no runway; we never know when to delete |
-| Builder exit returning an unchecked shape | gate | malformed payload compiles, fails as a 400 |
-| Raw `.click()` in `lib/` with no visibility wait | gate | clicks an element that may not be there yet |
-| Spec reaching through a helper to `page` | gate | navigation and waits belong in a page object |
-| Entity name matched on a substring | gate | strict-mode multi-match on leftover data |
-| Fixed sleep **without a justification** | debt | see §3 |
-| `force: true` **without a justification** | debt | masks actionability failures |
-| Hardcoded `.nth(N)` | debt | bakes in unpromised list order |
-| `: any` inside a builder | debt | defeats the payload types downstream |
-| Commented-out assertion in a live test | debt | test asserts less than it appears to |
-| TODO with no version trigger or author | debt | cannot rot out loud, so never gets removed |
-| Spec asserting on a raw API response shape | debt | couples 269 files to the response shape |
-| Helper parameter the body never reads | debt | signature promises what the body does not do |
-
-**When you reduce a count, lower the budget in the same commit** — the audit prints the new number for you. Never raise a budget to make a run pass; that is the one move that turns a ratchet back into a wish.
-
-**CI runs both gates.** `build/azure-pipelines.yml`, `Build` stage, job C ("Build Test Helpers Package") runs `npm run typecheck` then `npm run audit` before packing — that job already installs dependencies and neither gate needs an Umbraco instance. Before this, nothing in CI type-checked or linted this project at all, which is how a wrong package name and 95 sleeps accumulated unnoticed.
-
-The audit is a text scanner, not a type checker — it catches shapes, not semantics. It is a floor under §3, not a substitute for reading it.
-
-### The audit tests itself
-
-**`npm run audit` runs `audit-selftest.js` first and refuses to report anything if it fails.** This is not ceremony. Over half its rules gate at budget 0, and for those a rule whose regex silently stops matching looks *exactly* like a rule that is passing — it reports `clean` forever while the convention goes unenforced. Two of these detectors shipped with real bugs on their first draft (a dropped-promise rule with 19 false positives; a commented-assertion rule that double-counted a wholly-dead file), so this is a demonstrated failure mode.
-
-The self-test builds a throwaway fixture tree per case and points the audit at it with `--root`. Every rule needs two kinds of case:
-
-- a **`bad`** fixture it must flag — proves the rule still detects;
-- a **`good`** fixture it must ignore — proves it doesn't fire on the idiom it is meant to permit (an anchored TODO, `this.click()`, a multi-line `await expect(...).toPass()`).
-
-It also **fails if any rule has no case at all**, so adding a rule without a test is caught at once. Add both cases in the same commit as a new rule; a rule with no `good` case is how a checker starts flagging correct code and gets switched off.
-
-Run it alone with `npm run audit:selftest`.
-
----
-
-## 8. Comments and documentation
+## 7. Comments and documentation
 
 The root `CLAUDE.md` §9 comment policy applies here in full — default to no comment; write one for a non-obvious *why*, an invariant the types don't enforce, or an edge case deliberately handled.
 
-**JSDoc coverage is 3% (71 of 2671 public helper methods) and that is correct, not a gap.** `clickSaveAndPublishButton()` and `enterElementName(name)` say what they do; a `/** Clicks the save and publish button. */` above them is the noise §9 tells you not to write. JSDoc in `lib/` sits exactly where the contract is *not* obvious — `BasePage`'s primitives (what does `isVisible(locator, isVisible)` actually assert?), the response-waiting helpers, `BuilderUtils`, and the two assertion helpers in §3. Keep it that way: document the surprising, not the self-evident. Don't run a coverage sweep.
+**JSDoc coverage is 3% (71 of 2671 public helper methods) and that is correct, not a gap.** `clickSaveAndPublishButton()` and `enterElementName(name)` say what they do; a `/** Clicks the save and publish button. */` above them is the noise the root §9 tells you not to write. JSDoc in `lib/` sits exactly where the contract is *not* obvious — `BasePage`'s primitives (what does `isVisible(locator, isVisible)` actually assert?), the response-waiting helpers, `BuilderUtils`, and the two assertion helpers in §3. Keep it that way: document the surprising, not the self-evident. Don't run a coverage sweep.
 
-**Three comment shapes are never right**, and `npm run audit` counts all three:
+**Three comment shapes are never right:**
 
 - **A commented-out test.** The most thoroughly hidden form of disabled test — invisible to `--list`, to every reporter, and to the annotation rule in §4. `tests/DefaultConfig/Packages/CreatedPackages.spec.ts` is 347 lines and 17 tests commented out wholesale behind `// UNCOMMENT WHEN FIXED`, with no issue link; it has been dead since the **v15** era and contributes 0 of the suite's 1651 tests. Use `test.skip` with an annotation instead, so a disabled test is at least countable.
 - **A commented-out assertion in a live test.** Strictly worse than deleting it: the test still passes while quietly checking less than it appears to. There are 15, eight of them in `UserGroupsDefaultConfiguration.spec.ts`. Restore it or delete it.
-- **An unanchored TODO.** §9 allows TODOs precisely because they are deleted when done — which needs an anchor to hang off: `// TODO (V19): remove once the obsolete overload is gone` or `// TODO: pagination [NL]`. A bare `// TODO: Implement it later` (15 of these) can't rot out loud, so it never gets removed.
+- **An unanchored TODO.** The root §9 allows TODOs precisely because they are deleted when done — which needs an anchor to hang off: `// TODO (V19): remove once the obsolete overload is gone` or `// TODO: pagination [NL]`. A bare `// TODO: Implement it later` (15 of these) can't rot out loud, so it never gets removed.
 
 ### Keeping the docs true
 
 Three rules, each learned from a way this file and `README.md` went stale:
 
 - **Don't restate what a config file owns.** Point at it, or document only what it can't say — *why* `workers: 1`, not *that* it is 1. The README carried a 30s test timeout against a config saying 60s, and "2 retries on CI, 0 locally" against `retries: 2` unconditionally. A number living in two places disagrees eventually.
-- **Give debt a count and a location, not an adjective.** "Prefer deterministic waits" coexisted with 95 sleeps for as long as it named no number. "91, worst in `ContentUiHelper`, `LibraryUiHelper`, `UiBaseLocators`" can be checked — and §7 now checks it.
+- **Give debt a count and a location, not an adjective.** "Prefer deterministic waits" coexisted with 95 sleeps for as long as it named no number. "91, worst in `ContentUiHelper`, `LibraryUiHelper`, `UiBaseLocators`" can be checked by anyone reading it.
 - **A rename is a doc change.** The npm package moved to the `@umbraco-cms` scope and reached none of the three READMEs, so the consumer-facing `npm install` line was wrong for months. Any change to a published name, script, or path sweeps the docs in the same PR.
 
 ---
 
-## 9. Skill
+## 8. Skill
 
 `/umb-e2e-test` (`.claude/skills/umb-e2e-test/`) wraps this document into a working procedure — where a spec belongs, which layer a new locator goes in, the determinism checklist to apply before committing, and the verification gates. Reach for it when writing or repairing a spec or a helper; it is the executable form of §3.
