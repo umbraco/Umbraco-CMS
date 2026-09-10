@@ -46777,6 +46777,12 @@
           "mediaType": {
             "$ref": "#/components/schemas/MediaTypeReferenceResponseModel"
           },
+          "extension": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
           "variants": {
             "type": "array",
             "items": {
@@ -46893,6 +46899,12 @@
         "properties": {
           "mediaType": {
             "$ref": "#/components/schemas/MediaTypeReferenceResponseModel"
+          },
+          "extension": {
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "variants": {
             "type": "array",

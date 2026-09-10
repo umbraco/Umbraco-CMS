@@ -1589,6 +1589,7 @@ export type MediaItemResponseModel = {
     parent?: null | ReferenceByIdModel;
     hasChildren: boolean;
     mediaType: MediaTypeReferenceResponseModel;
+    extension?: null | string;
     variants: Array<VariantItemResponseModel>;
     id: string;
     flags: Array<FlagModel>;
@@ -1614,6 +1615,7 @@ export type MediaResponseModel = {
 
 export type MediaTreeItemResponseModel = {
     mediaType: MediaTypeReferenceResponseModel;
+    extension?: null | string;
     variants: Array<VariantItemResponseModel>;
     noAccess: boolean;
     isTrashed: boolean;
