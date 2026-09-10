@@ -32,6 +32,9 @@ export class UmbCreateBlueprintModalElement extends UmbModalBaseElement<
 	@state()
 	private _hasBlueprintAccess?: boolean;
 
+	@state()
+	private _hasRootAccess?: boolean;
+
 	constructor() {
 		super();
 
@@ -41,12 +44,15 @@ export class UmbCreateBlueprintModalElement extends UmbModalBaseElement<
 			this.observe(
 				observeMultiple([context.hasDocumentBlueprintRootAccess, context.documentBlueprintStartNodeUniques]),
 				([hasRootAccess, startNodeUniques]) => {
-					this._hasBlueprintAccess = hasRootAccess === true || (startNodeUniques?.length ?? 0) > 0;
+					this._hasRootAccess = hasRootAccess === true;
+					this._hasBlueprintAccess = this._hasRootAccess || (startNodeUniques?.length ?? 0) > 0;
 				},
 				'_observeDocumentBlueprintAccess',
 			);
 		});
 	}
+
+	#selectableFilter = (item: { unique: string | null }) => item.unique !== null || this._hasRootAccess === true;
 
 	override firstUpdated() {
 		this.#documentUnique = this.data?.unique ?? '';
@@ -100,13 +106,22 @@ export class UmbCreateBlueprintModalElement extends UmbModalBaseElement<
 								</div>
 							</umb-property-layout>
 							<umb-property-layout label=${this.localize.term('general_choose')} orientation="vertical" mandatory>
-								<umb-tree
-									slot="editor"
-									alias="Umb.Tree.DocumentBlueprint"
-									.props=${{ hideTreeItemActions: true, foldersOnly: true }}
-									@selected=${this.#onLocationSelected}
-									@deselected=${this.#onLocationDeselected}>
-								</umb-tree>
+								${when(
+									this._hasRootAccess !== undefined,
+									() => html`
+										<umb-tree
+											slot="editor"
+											alias="Umb.Tree.DocumentBlueprint"
+											.props=${{
+												hideTreeItemActions: true,
+												foldersOnly: true,
+												selectableFilter: this.#selectableFilter,
+											}}
+											@selected=${this.#onLocationSelected}
+											@deselected=${this.#onLocationDeselected}>
+										</umb-tree>
+									`,
+								)}
 							</umb-property-layout>
 						`,
 					)}
