@@ -22,7 +22,7 @@ public sealed class IndexOptions
         where TIndexer : class, IIndexer
         where TSearcher : class, ISearcher
     {
-        ArgumentException.ThrowIfNullOrEmpty("Index alias cannot be empty", nameof(indexAlias));
+        ArgumentException.ThrowIfNullOrEmpty(indexAlias);
 
         _register[indexAlias] = new IndexRegistration(indexAlias, typeof(TIndexer), typeof(TSearcher));
     }
@@ -55,7 +55,7 @@ public sealed class IndexOptions
         where TSearcher : class, ISearcher
         where TContentChangeStrategy : class, IContentChangeStrategy
     {
-        ArgumentException.ThrowIfNullOrEmpty("Index alias cannot be empty", nameof(indexAlias));
+        ArgumentException.ThrowIfNullOrEmpty(indexAlias, nameof(indexAlias));
         if (containedObjectTypes.Length is 0)
         {
             throw new ArgumentException($"Index \"{indexAlias}\" must define at least one contained object type",  nameof(containedObjectTypes));
