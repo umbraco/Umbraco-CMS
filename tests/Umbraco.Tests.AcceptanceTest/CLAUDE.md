@@ -250,11 +250,29 @@ Three things they buy:
 
 They take the **already-fetched entity** rather than a name on purpose: `getByName` walks the tree recursively, so a name-based overload would re-request on every assertion.
 
-**211 raw-response assertions remain**, down from 890 (-76%), and the count is budgeted.
+**184 raw-response assertions remain**, down from 890 (-79%), and the count is budgeted.
 
 The two `get*` helpers are what made the deep cases tractable. `getOnlyPropertyValue` in particular replaces `values[0].value` where no alias is in play: it asserts there *is* exactly one property and returns it, so the single-property expectation is stated instead of buried in an index — and a spec that later grows a second property fails loudly rather than silently asserting against whichever sorts first. Both stop at the entity boundary: `getOnlyPropertyValue(data).contentData[0].values[0].value` still indexes into the *block's own* structure, which is that test's actual subject.
 
-What is left is a genuine long tail: no shape appears more than nine times, spread across roughly twenty-five distinct ones (user-group permission flags, domain routes, block colours, pagination totals). Writing twenty-five helpers for five call sites each would inflate a published package's public surface for very little, so these stay. Add a helper when you touch one and it earns its place; do not add new raw assertions, since the audit will fail.
+**184 remain, and the previous read of them was wrong** — worth knowing, because the mistake is easy to repeat. The conclusion had been "no shape appears more than nine times, spread across roughly twenty-five distinct ones, so writing a helper for each would inflate the package for little". That is true of **exact paths** — there are 86, and the largest is `.id` at ten. It is false of **subjects**: cluster by what is actually being asserted and 86 paths collapse to 13, several of them large and concentrated in two or three files:
+
+| Subject | Lines | Files |
+|---------|------:|------:|
+| property definitions (name, description, dataType, validation, appearance) | 23 | 3 |
+| identity (id / key / path / alias / name) | 22 | 16 |
+| user-group access flags and permissions | 22 | 2 |
+| compositions | 14 | 4 |
+| allowed templates and child types | 13 | 6 |
+| domains | 13 | 2 |
+| property values | 12 | 7 |
+| file content | 9 | 2 |
+| variants, member fields, containers, child variants, pagination | 34 | — |
+
+**Concentration is what decides whether a helper earns its place, not the raw count.** Twenty-two `.id` assertions across sixteen files are a genuine long tail — a helper would add an indirection per file and buy nothing. Twenty-three property-definition assertions across *three* files are not: they were all `properties[0].<field>`, one positional lookup repeated, which is exactly what `getPropertyValue` was introduced to remove on the values side. That cluster is now `getPropertyDefinition(data, alias)` and `getOnlyPropertyDefinition(data)`.
+
+The next two worth doing on the same grounds are **user-group access flags** (22 lines, 2 files) and **domains** (13 lines, 2 files). The rest are long tail: add a helper when you touch one and it earns its place, and do not add new raw assertions, since the audit will fail.
+
+**One index stays on purpose.** The three "can reorder properties" tests assert `properties[0].name` and `properties[1].name` — there the position *is* the subject, the same exemption a parameterised `.nth(i)` gets. Two of the three asserted only `properties[0]`, which cannot tell a reorder from a property being dropped or duplicated; both now assert the second position too, matching the document-type test that had it right.
 
 ### An assertion that cannot distinguish pass from fail
 

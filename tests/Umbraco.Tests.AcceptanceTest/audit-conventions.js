@@ -63,7 +63,11 @@ const BUDGET = {
   // a scanner that skips comments. This is the one legitimate reason to raise a budget - debt
   // becoming countable, not a new violation - and it is recorded here so it cannot be mistaken
   // for the forbidden move of raising a budget to get a run green.
-  rawResponseAssertion: 201,
+  // 201 -> 184. The stated reason for stopping at 201 was that "no shape appears more than nine
+  // times" - true of exact paths (86 of them), false of subjects (13). Clustering by what is
+  // being asserted found several groups worth a helper; the property-definition one, 23 lines
+  // across 3 files, is now getPropertyDefinition / getOnlyPropertyDefinition.
+  rawResponseAssertion: 184,
   deprecationWithoutRemoval: 0,
   unusedHelperParam: 1,
   unawaitedAssertion: 0,

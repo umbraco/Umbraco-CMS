@@ -92,6 +92,24 @@ const contentType = {
   compositions: [{documentType: {id: 'c-1'}}],
 };
 
+// Two definitions, deliberately not in alias order, so a lookup that works cannot be relying
+// on position. `body` also carries the nested shapes the specs assert on.
+const twoDefinitions = {
+  name: 'DT2',
+  properties: [
+    {alias: 'title', name: 'Title', dataType: {id: 'dt-1'}},
+    {
+      alias: 'body',
+      name: 'Body',
+      description: 'the body',
+      dataType: {id: 'dt-2'},
+      variesByCulture: true,
+      validation: {mandatory: true, regEx: '^a', regExMessage: 'nope'},
+      appearance: {labelOnTop: true},
+    },
+  ],
+};
+
 (async () => {
   console.log('\ngetOnlyPropertyValue');
   await ok('single invariant property', () => expect(api.getOnlyPropertyValue(invariant)).toBe('hello'));
@@ -129,6 +147,18 @@ const contentType = {
   await ok('counts entries', () => api.doesHaveValueCount(twoProps, 2));
   await ok('zero means nothing set', () => api.doesHaveValueCount({values: []}, 0));
   await rejects('wrong count', () => api.doesHaveValueCount(twoProps, 1));
+
+  console.log('\ngetOnlyPropertyDefinition / getPropertyDefinition');
+  await ok('the sole definition', () => expect(api.getOnlyPropertyDefinition(contentType).alias).toBe('title'));
+  await rejects('two definitions is not "only"', () => api.getOnlyPropertyDefinition(twoDefinitions));
+  await rejects('missing properties array', () => api.getOnlyPropertyDefinition({}));
+  await ok('finds by alias regardless of position', () => expect(api.getPropertyDefinition(twoDefinitions, 'body').name).toBe('Body'));
+  await ok('reaches the nested validation shape', () => expect(api.getPropertyDefinition(twoDefinitions, 'body').validation.regEx).toBe('^a'));
+  await ok('reaches the nested appearance shape', () => expect(api.getPropertyDefinition(twoDefinitions, 'body').appearance.labelOnTop).toBe(true));
+  await rejects('absent alias', () => api.getPropertyDefinition(twoDefinitions, 'nope'));
+  // The counting rule is the opposite of getOnlyPropertyValue's on purpose: a definition is one
+  // entry per property, so length is the count - whereas a *value* is one entry per culture.
+  await ok('a culture-varying definition is still one entry', () => expect(api.getPropertyDefinition(twoDefinitions, 'body').variesByCulture).toBe(true));
 
   console.log('\ncontent type helpers');
   await ok('property definition count', () => api.doesHavePropertyCount(contentType, 1));

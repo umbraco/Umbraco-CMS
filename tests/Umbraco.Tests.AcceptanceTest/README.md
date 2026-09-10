@@ -84,7 +84,7 @@ npm run helpers:selftest   # the API assertion helpers, against fabricated respo
 
 `npm run audit` self-tests every one of its rules before reporting — over half gate at budget 0, where a broken regex would otherwise be indistinguishable from a passing rule. Adding a rule without a test case fails the self-test.
 
-There is no lint step. `npm run audit` is the closest thing — it enforces the mechanical parts of [CLAUDE.md](./CLAUDE.md) §3 (dropped promises, silently-discarded assertions, specs that no project runs, un-annotated skipped tests) at a budget of zero, and ratchets the known debt (fixed sleeps, force clicks, substring name locators, untyped builders) so it can shrink but not grow. See CLAUDE.md §7 for the budget table.
+There is no lint step. `npm run audit` is the closest thing — it enforces the mechanical parts of [CLAUDE.md](./CLAUDE.md) §3 (dropped promises, silently-discarded assertions, specs that no project runs, un-annotated skipped tests) at a budget of zero, and ratchets what debt is left (fixed sleeps, force clicks, hardcoded indexes, raw response assertions) so it can shrink but not grow. Seventeen of its twenty-five rules are now gates at zero. See CLAUDE.md §7 for which is which.
 
 **All three run in CI** — `build/azure-pipelines.yml`, `Build` stage, job C — so a regression fails the build rather than waiting to be noticed.
 

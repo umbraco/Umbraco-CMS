@@ -32,7 +32,7 @@ test('can add a property to a document type', {tag: '@smoke'}, async ({umbracoAp
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
   const dataType = await umbracoApi.dataType.getByName(dataTypeName);
   // Checks if the correct property was added to the document type
-  expect(documentTypeData.properties[0].dataType.id).toBe(dataType.id);
+  await umbracoApi.documentType.doesOnlyPropertyUseDataType(documentTypeData, dataType.id);
 });
 
 test('can update a property in a document type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
@@ -52,7 +52,7 @@ test('can update a property in a document type', {tag: '@smoke'}, async ({umbrac
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
   const dataType = await umbracoApi.dataType.getByName(newDataTypeName);
   // Checks if the correct property was added to the document type
-  expect(documentTypeData.properties[0].dataType.id).toBe(dataType.id);
+  await umbracoApi.documentType.doesOnlyPropertyUseDataType(documentTypeData, dataType.id);
 });
 
 test('can update group name in a document type', async ({umbracoApi, umbracoUi}) => {
@@ -143,7 +143,7 @@ test('can create a document type with a property in a tab', {tag: '@smoke'}, asy
   // Assert
   expect(await umbracoApi.documentType.doesNameExist(documentTypeName)).toBeTruthy();
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
-  expect(await umbracoApi.documentType.doesTabContainCorrectPropertyEditorInGroup(documentTypeName, dataTypeName, documentTypeData.properties[0].dataType.id, tabName, groupName)).toBeTruthy();
+  expect(await umbracoApi.documentType.doesTabContainCorrectPropertyEditorInGroup(documentTypeName, dataTypeName, umbracoApi.documentType.getOnlyPropertyDefinition(documentTypeData).dataType.id, tabName, groupName)).toBeTruthy();
 });
 
 test('can create a document type with multiple groups', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
@@ -279,7 +279,7 @@ test('can add a description to a property in a document type', async ({umbracoAp
   await expect(umbracoUi.documentType.enterDescriptionTxt).toBeVisible();
   await umbracoUi.documentType.doesDescriptionHaveValue(descriptionText);
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
-  expect(documentTypeData.properties[0].description).toBe(descriptionText);
+  expect(umbracoApi.documentType.getOnlyPropertyDefinition(documentTypeData).description).toBe(descriptionText);
 });
 
 test('can set is mandatory for a property in a document type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
@@ -297,7 +297,7 @@ test('can set is mandatory for a property in a document type', {tag: '@smoke'}, 
 
   // Assert
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
-  expect(documentTypeData.properties[0].validation.mandatory).toBeTruthy();
+  expect(umbracoApi.documentType.getOnlyPropertyDefinition(documentTypeData).validation.mandatory).toBeTruthy();
 });
 
 test('can enable validation for a property in a document type', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
@@ -319,8 +319,8 @@ test('can enable validation for a property in a document type', {tag: '@release'
 
   // Assert
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
-  expect(documentTypeData.properties[0].validation.regEx).toBe(regex);
-  expect(documentTypeData.properties[0].validation.regExMessage).toBe(regexMessage);
+  expect(umbracoApi.documentType.getOnlyPropertyDefinition(documentTypeData).validation.regEx).toBe(regex);
+  expect(umbracoApi.documentType.getOnlyPropertyDefinition(documentTypeData).validation.regExMessage).toBe(regexMessage);
 });
 
 test('can allow vary by culture for a property in a document type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
@@ -338,7 +338,7 @@ test('can allow vary by culture for a property in a document type', {tag: '@smok
 
   // Assert
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
-  expect(documentTypeData.properties[0].variesByCulture).toBeTruthy();
+  expect(umbracoApi.documentType.getOnlyPropertyDefinition(documentTypeData).variesByCulture).toBeTruthy();
 });
 
 test('can set appearance to label on top for a property in a document type', async ({umbracoApi, umbracoUi}) => {
@@ -356,7 +356,7 @@ test('can set appearance to label on top for a property in a document type', asy
 
   // Assert
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
-  expect(documentTypeData.properties[0].appearance.labelOnTop).toBeTruthy();
+  expect(umbracoApi.documentType.getOnlyPropertyDefinition(documentTypeData).appearance.labelOnTop).toBeTruthy();
 });
 
 test('can add a block list property with inline editing mode to a document type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
@@ -378,7 +378,7 @@ test('can add a block list property with inline editing mode to a document type'
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
   const blockListDataTypeData = await umbracoApi.dataType.getByName(blockListDataTypeName);
   // Checks if the correct property was added to the document type
-  expect(documentTypeData.properties[0].dataType.id).toBe(blockListDataTypeData.id);
+  await umbracoApi.documentType.doesOnlyPropertyUseDataType(documentTypeData, blockListDataTypeData.id);
 
   // Clean
   await umbracoApi.dataType.ensureNameNotExists(blockListDataTypeName);

@@ -305,6 +305,39 @@ export class ApiHelpers {
     return values[0].value;
   }
 
+  /**
+   * One property **definition** on a content type, matched by alias rather than by position.
+   *
+   * The definitions-side counterpart of {@link getPropertyValue}. Hands the property back so the
+   * caller asserts on a named field (`.description`, `.validation.regEx`, `.appearance.labelOnTop`)
+   * instead of indexing `properties[0]` and asserting an order the API never promised.
+   */
+  getPropertyDefinition(contentTypeData: any, alias: string): any {
+    const properties = contentTypeData?.properties;
+    expect(Array.isArray(properties), `Expected the content type to carry a properties array, got: ${JSON.stringify(contentTypeData)?.slice(0, 200)}`).toBeTruthy();
+    const match = properties.find(p => p.alias === alias);
+    expect(match, `Expected a property aliased '${alias}', found: ${properties.map(p => p.alias).join(', ') || '(none)'}`).toBeTruthy();
+    return match;
+  }
+
+  /**
+   * The sole property definition on a content type, asserting there is exactly one.
+   *
+   * **The counting rule differs from {@link getOnlyPropertyValue} on purpose.** A content *type*
+   * carries one `properties` entry per definition, so `properties.length` really is the property
+   * count. A content *item*'s `values` carries one entry per culture and segment, which is why
+   * the values-side helper counts distinct aliases instead. Same word, different arrays - see
+   * CLAUDE.md §3.
+   *
+   * Prefer {@link getPropertyDefinition} whenever the alias is known.
+   */
+  getOnlyPropertyDefinition(contentTypeData: any): any {
+    const properties = contentTypeData?.properties;
+    expect(Array.isArray(properties), `Expected the content type to carry a properties array, got: ${JSON.stringify(contentTypeData)?.slice(0, 200)}`).toBeTruthy();
+    expect(properties.length, `Expected the content type to have exactly one property, found ${properties.length}: ${properties.map(p => p.alias).join(', ') || '(none)'}`).toBe(1);
+    return properties[0];
+  }
+
   /** Asserts how many variants an already-fetched document or element carries. */
   async doesHaveVariantCount(entityData: any, expectedCount: number): Promise<void> {
     const variants = entityData?.variants;

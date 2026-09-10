@@ -98,7 +98,7 @@ test('can add a description to property in a member type', async ({umbracoApi, u
   await expect(umbracoUi.memberType.enterDescriptionTxt).toBeVisible();
   await umbracoUi.memberType.doesDescriptionHaveValue(descriptionText);
   const memberTypeData = await umbracoApi.memberType.getByName(memberTypeName);
-  expect(memberTypeData.properties[0].description).toBe(descriptionText);
+  expect(umbracoApi.memberType.getOnlyPropertyDefinition(memberTypeData).description).toBe(descriptionText);
 });
 
 test('can set a property as mandatory in a member type', async ({umbracoApi, umbracoUi}) => {
@@ -115,7 +115,7 @@ test('can set a property as mandatory in a member type', async ({umbracoApi, umb
 
   // Assert
   const memberTypeData = await umbracoApi.memberType.getByName(memberTypeName);
-  expect(memberTypeData.properties[0].validation.mandatory).toBeTruthy();
+  expect(umbracoApi.memberType.getOnlyPropertyDefinition(memberTypeData).validation.mandatory).toBeTruthy();
 });
 
 test('can set up validation for a property in a member type', async ({umbracoApi, umbracoUi}) => {
@@ -136,8 +136,8 @@ test('can set up validation for a property in a member type', async ({umbracoApi
 
   // Assert
   const memberTypeData = await umbracoApi.memberType.getByName(memberTypeName);
-  expect(memberTypeData.properties[0].validation.regEx).toBe(regex);
-  expect(memberTypeData.properties[0].validation.regExMessage).toBe(regexMessage);
+  expect(umbracoApi.memberType.getOnlyPropertyDefinition(memberTypeData).validation.regEx).toBe(regex);
+  expect(umbracoApi.memberType.getOnlyPropertyDefinition(memberTypeData).validation.regExMessage).toBe(regexMessage);
 });
 
 test('can set appearance as label on top for property in a member type', async ({umbracoApi, umbracoUi}) => {
@@ -154,7 +154,7 @@ test('can set appearance as label on top for property in a member type', async (
 
   // Assert
   const memberTypeData = await umbracoApi.memberType.getByName(memberTypeName);
-  expect(memberTypeData.properties[0].appearance.labelOnTop).toBeTruthy();
+  expect(umbracoApi.memberType.getOnlyPropertyDefinition(memberTypeData).appearance.labelOnTop).toBeTruthy();
 });
 
 test('can delete a group in a member type', async ({umbracoApi, umbracoUi}) => {
@@ -213,4 +213,5 @@ test('can reorder properties in a member type', async ({umbracoApi, umbracoUi}) 
   // Assert
   const memberTypeData = await umbracoApi.memberType.getByName(memberTypeName);
   expect(memberTypeData.properties[0].name).toBe(dataTypeNameTwo);
+  expect(memberTypeData.properties[1].name).toBe(dataTypeName);
 });

@@ -136,6 +136,16 @@ export class MemberTypeApiHelper {
   }
 
   /** Asserts the memberType has exactly one property and that it uses `dataTypeId`. */
+  /** One property definition, by alias. See {@link ApiHelpers.getPropertyDefinition}. */
+  getPropertyDefinition(memberTypeData: any, alias: string): any {
+    return this.api.getPropertyDefinition(memberTypeData, alias);
+  }
+
+  /** The sole property definition. See {@link ApiHelpers.getOnlyPropertyDefinition}. */
+  getOnlyPropertyDefinition(memberTypeData: any): any {
+    return this.api.getOnlyPropertyDefinition(memberTypeData);
+  }
+
   async doesOnlyPropertyUseDataType(memberTypeData: any, dataTypeId: string): Promise<void> {
     await this.api.doesOnlyPropertyUseDataType(memberTypeData, dataTypeId);
   }

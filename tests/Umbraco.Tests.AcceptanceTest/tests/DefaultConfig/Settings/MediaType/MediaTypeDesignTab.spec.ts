@@ -101,7 +101,7 @@ test('can add a description to property in a media type', {tag: '@smoke'}, async
   await expect(umbracoUi.mediaType.enterDescriptionTxt).toBeVisible();
   await umbracoUi.mediaType.doesDescriptionHaveValue(descriptionText);
   const mediaTypeData = await umbracoApi.mediaType.getByName(mediaTypeName);
-  expect(mediaTypeData.properties[0].description).toBe(descriptionText);
+  expect(umbracoApi.mediaType.getOnlyPropertyDefinition(mediaTypeData).description).toBe(descriptionText);
 });
 
 test('can set a property as mandatory in a media type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
@@ -118,7 +118,7 @@ test('can set a property as mandatory in a media type', {tag: '@smoke'}, async (
 
   // Assert
   const mediaTypeData = await umbracoApi.mediaType.getByName(mediaTypeName);
-  expect(mediaTypeData.properties[0].validation.mandatory).toBeTruthy();
+  expect(umbracoApi.mediaType.getOnlyPropertyDefinition(mediaTypeData).validation.mandatory).toBeTruthy();
 });
 
 test('can set up validation for a property in a media type', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
@@ -139,8 +139,8 @@ test('can set up validation for a property in a media type', {tag: '@release'}, 
 
   // Assert
   const mediaTypeData = await umbracoApi.mediaType.getByName(mediaTypeName);
-  expect(mediaTypeData.properties[0].validation.regEx).toBe(regex);
-  expect(mediaTypeData.properties[0].validation.regExMessage).toBe(regexMessage);
+  expect(umbracoApi.mediaType.getOnlyPropertyDefinition(mediaTypeData).validation.regEx).toBe(regex);
+  expect(umbracoApi.mediaType.getOnlyPropertyDefinition(mediaTypeData).validation.regExMessage).toBe(regexMessage);
 });
 
 test('can set appearance as label on top for property in a media type', async ({umbracoApi, umbracoUi}) => {
@@ -157,7 +157,7 @@ test('can set appearance as label on top for property in a media type', async ({
 
   // Assert
   const mediaTypeData = await umbracoApi.mediaType.getByName(mediaTypeName);
-  expect(mediaTypeData.properties[0].appearance.labelOnTop).toBeTruthy();
+  expect(umbracoApi.mediaType.getOnlyPropertyDefinition(mediaTypeData).appearance.labelOnTop).toBeTruthy();
 });
 
 test('can delete a group in a media type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
@@ -191,7 +191,7 @@ test('can create a media type with a property in a tab', {tag: '@smoke'}, async 
   // Assert
   // Checks if the media type has the correct tab and property
   const mediaTypeData = await umbracoApi.mediaType.getByName(mediaTypeName);
-  expect(await umbracoApi.mediaType.doesTabContainerCorrectPropertyEditor(mediaTypeName, tabName, mediaTypeData.properties[0].dataType.id)).toBeTruthy();
+  expect(await umbracoApi.mediaType.doesTabContainerCorrectPropertyEditor(mediaTypeName, tabName, umbracoApi.mediaType.getOnlyPropertyDefinition(mediaTypeData).dataType.id)).toBeTruthy();
 });
 
 test('can create a media type with multiple groups', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
@@ -294,6 +294,7 @@ test('can reorder properties in a media type', async ({umbracoApi, umbracoUi}) =
   // Assert
   const mediaTypeData = await umbracoApi.mediaType.getByName(mediaTypeName);
   expect(mediaTypeData.properties[0].name).toBe(dataTypeNameTwo);
+  expect(mediaTypeData.properties[1].name).toBe(dataTypeName);
 });
 
 test('can reorder tabs in a media type', async ({umbracoApi, umbracoUi}) => {
