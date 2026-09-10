@@ -32,7 +32,7 @@ internal sealed class MetricsConsentServiceTest : UmbracoIntegrationTest
     {
         await MetricsConsentService.SetConsentLevelAsync(TelemetryLevel.Detailed);
 
-        var stringValue = KeyValueService.GetValue(Cms.Core.Services.MetricsConsentService.Key);
+        var stringValue = KeyValueService.GetValue(global::Umbraco.Cms.Core.Services.MetricsConsentService.Key);
 
         Assert.AreEqual("Detailed", stringValue);
     }

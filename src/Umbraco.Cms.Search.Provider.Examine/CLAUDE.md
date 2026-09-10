@@ -29,7 +29,7 @@ npm run build
 # Watch
 npm run watch
 
-# Generate OpenAPI client (requires a running site at https://localhost:44324)
+# Generate OpenAPI client (requires a running site at https://localhost:44339)
 npm run generate-client
 ```
 
@@ -242,7 +242,7 @@ Simple bundle declaration:
 
 Test through the test site:
 
-1. Run: `dotnet run --project src/Umbraco.Web.TestSite.V17`
+1. Run: `dotnet run --project src/Umbraco.Web.UI`
 2. Navigate to Settings > Search
 3. Click on an index, then search for documents
 4. Click "Show Fields" on a search result row — modal opens, **URL changes** to include document unique and culture

@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Umbraco Search is a new search abstraction for Umbraco CMS v16+ that will eventually replace the current search implementation. It provides three main capabilities:
+Umbraco Search is the CMS's search implementation (replacing the legacy Examine-based stack, which has been fully removed). It provides three main capabilities:
 1. Frontend search via the `ISearcher` interface
 2. Backoffice search
 3. Delivery API querying
@@ -90,16 +90,19 @@ dotnet build src/Umbraco.Cms.Search.Core/Umbraco.Cms.Search.Core.csproj
 ### Running Tests
 
 The search tests live in the main Umbraco test projects: unit tests under
-`tests/Umbraco.Tests.UnitTests` (namespace `...Umbraco.Cms.Search.Core`) and integration tests
-under `tests/Umbraco.Tests.Integration` (namespaces `...Umbraco.Search.Core`,
-`...Umbraco.Search.BackOffice`, `...Umbraco.Search.Provider.Examine`).
+`tests/Umbraco.Tests.UnitTests/Umbraco.Cms.Search.Core` and integration tests under
+`tests/Umbraco.Tests.Integration/Umbraco.Cms.Search.Core` and
+`tests/Umbraco.Tests.Integration/Umbraco.Cms.Search.Provider.Examine`. Backoffice search service
+tests (`ContentSearchService`, `MediaSearchService`, `IndexedEntitySearchService`) live alongside
+the rest of the Core service tests, in `tests/Umbraco.Tests.Integration/Umbraco.Core/Services` —
+they moved with their subject when those services relocated to `Umbraco.Core/Services`.
 
 ```bash
 # Run the search unit tests (filtered out of the full unit-test project)
 dotnet test tests/Umbraco.Tests.UnitTests/Umbraco.Tests.UnitTests.csproj --filter "FullyQualifiedName~Umbraco.Cms.Search"
 
 # Run the search integration tests (SQLite by default, see appsettings.Tests.json)
-dotnet test tests/Umbraco.Tests.Integration/Umbraco.Tests.Integration.csproj --filter "FullyQualifiedName~Umbraco.Search"
+dotnet test tests/Umbraco.Tests.Integration/Umbraco.Tests.Integration.csproj --filter "FullyQualifiedName~Umbraco.Cms.Search"
 
 # Run a specific test by filter
 dotnet test tests/Umbraco.Tests.Integration/Umbraco.Tests.Integration.csproj --filter "FullyQualifiedName~ContentExtensionsTests"
@@ -175,9 +178,9 @@ The Examine provider implements the core abstractions using Examine/Lucene:
 
 **Important:** Fields used for faceting/sorting must be configured in `FieldOptions` **before** indexing. Changes require a full index rebuild.
 
-### Property Value Handlers (Umbraco.Cms.Search.Core/PropertyValueHandlers)
+### Property Value Handlers (Umbraco.Infrastructure/Search/PropertyValueHandlers)
 
-Property values are indexed based on property editor type. Each handler implements `IPropertyValueHandler` with a `CanHandle(string propertyEditorAlias)` method that determines which property editors it supports. Handlers are auto-discovered via `TypeLoader.GetTypes<IPropertyValueHandler>()`.
+Property values are indexed based on property editor type. Each handler implements `IPropertyValueHandler` (declared in `Umbraco.Core`, alongside the built-in handler collection) with a `CanHandle(string propertyEditorAlias)` method that determines which property editors it supports. The built-in handlers live in `Umbraco.Infrastructure` — they know intimately about core property editors, so they move with them rather than with the provider-agnostic engine. Handlers are auto-discovered via `TypeLoader.GetTypes<IPropertyValueHandler>()`.
 
 **Key handlers:**
 - `ContentPickerPropertyValueHandler` - Extracts content IDs (Keywords)
@@ -279,20 +282,20 @@ Pass `AccessContext` to `SearchAsync` to include protected content in results.
 
 ### Adding a New Property Value Handler
 
-1. Create handler in `src/Umbraco.Cms.Search.Core/PropertyValueHandlers/`
+1. Create handler in `src/Umbraco.Infrastructure/Search/PropertyValueHandlers/`
 2. Implement `IPropertyValueHandler` interface (specifically the `CanHandle(string propertyEditorAlias)` method)
 3. The handler is auto-discovered via `TypeLoader.GetTypes<IPropertyValueHandler>()` — no manual registration needed
 
 ### Adding a New Filter Type
 
-1. Create filter model in `src/Umbraco.Cms.Search.Core/Models/Searching/Filtering/`
+1. Create filter model in `src/Umbraco.Core/Search/Querying/Filtering/`
 2. Inherit from `Filter` base class
 3. Create provider-specific implementation in `src/Umbraco.Cms.Search.Provider.Examine/Models/Searching/Filtering/`
 4. Update `Searcher` to handle the new filter type
 
 ### Adding a New Facet Type
 
-1. Create facet model in `src/Umbraco.Cms.Search.Core/Models/Searching/Faceting/`
+1. Create facet model in `src/Umbraco.Core/Search/Querying/Faceting/`
 2. Inherit from `Facet` base class
 3. Create provider-specific implementation in provider project
 4. Update `Searcher` to handle the new facet type
@@ -345,13 +348,14 @@ Repositories abstract API calls and provide clean interfaces for UI components. 
 - Use Moq for dependencies
 - Focus on business logic without infrastructure dependencies
 
-### Integration Tests (`Umbraco.Tests.Integration`, namespaces `...Umbraco.Search.Core` and `...Umbraco.Search.BackOffice`)
+### Integration Tests (`Umbraco.Tests.Integration`, namespace `...Umbraco.Cms.Search.Core`)
 
 - Test core services with real Umbraco infrastructure
 - Use `Umbraco.Cms.Tests.Integration` base classes
 - Test content indexing workflows end-to-end
+- Backoffice search service tests (`ContentSearchService`/`MediaSearchService`/`IndexedEntitySearchService`) live under `...Umbraco.Core.Services` instead, alongside the rest of the Core service tests
 
-### Provider Integration Tests (`Umbraco.Tests.Integration`, namespace `...Umbraco.Search.Provider.Examine`)
+### Provider Integration Tests (`Umbraco.Tests.Integration`, namespace `...Umbraco.Cms.Search.Provider.Examine`)
 
 - Test Examine-specific implementations
 - Verify Lucene index behavior
@@ -399,8 +403,11 @@ Repositories abstract API calls and provide clean interfaces for UI components. 
 - **Target Framework**: .NET 10.0
 - **Umbraco CMS**: built as part of this repository (project references)
 - **Examine**: Search provider implementation
-- **Node.js**: 24 (for client build)
 - **Versioning**: Uses Nerdbank.GitVersioning (see `version.json` at the repository root)
+
+This project itself has no client/npm build — the search index management UI lives in
+`Umbraco.Web.UI.Client` as an ordinary backoffice package (see "Client Architecture" above). Only
+the Examine provider keeps its own standalone npm project (Node.js 24).
 
 ## Further Reading
 

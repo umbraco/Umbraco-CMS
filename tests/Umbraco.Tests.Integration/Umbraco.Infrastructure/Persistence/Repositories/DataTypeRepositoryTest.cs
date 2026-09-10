@@ -374,7 +374,7 @@ internal sealed class DataTypeRepositoryTest : UmbracoIntegrationTest
             .WithId(0)
             .WithName("Test Data Type")
             .AddEditor()
-                .WithAlias(Cms.Core.Constants.PropertyEditors.Aliases.TextBox)
+                .WithAlias(global::Umbraco.Cms.Core.Constants.PropertyEditors.Aliases.TextBox)
                 .Done()
             .Build();
 

@@ -134,15 +134,15 @@ public abstract class UserStartNodeEntitiesServiceTestsBase : UmbracoIntegration
     /// <summary>
     /// Builds a user with the specified start node IDs (type-specific implementation).
     /// </summary>
-    protected abstract Cms.Core.Models.Membership.User BuildUserWithStartNodes(int[] startNodeIds);
+    protected abstract global::Umbraco.Cms.Core.Models.Membership.User BuildUserWithStartNodes(int[] startNodeIds);
 
     /// <summary>
     /// Gets the start node paths for the user (type-specific implementation).
     /// </summary>
-    protected abstract string[]? GetStartNodePaths(Cms.Core.Models.Membership.User user);
+    protected abstract string[]? GetStartNodePaths(global::Umbraco.Cms.Core.Models.Membership.User user);
 
     /// <summary>
     /// Calculates the start node IDs for the user (type-specific implementation).
     /// </summary>
-    protected abstract int[]? CalculateStartNodeIds(Cms.Core.Models.Membership.User user);
+    protected abstract int[]? CalculateStartNodeIds(global::Umbraco.Cms.Core.Models.Membership.User user);
 }
