@@ -941,7 +941,7 @@ export class ContentUiHelper extends UiBaseLocators {
   }
 
   async isMediaNameVisible(mediaName: string, isVisible: boolean = true) {
-    return await this.isVisible(this.mediaCardItems.filter({hasText: mediaName}), isVisible);
+    return await this.isVisible(this.getMediaCardWithName(mediaName), isVisible);
   }
 
   async clickResetFocalPointButton() {
@@ -992,7 +992,7 @@ export class ContentUiHelper extends UiBaseLocators {
   async addUserPicker(userName: string) {
     await this.clickChooseButton();
     await this.click(
-      this.sidebarModal.locator("uui-card-user").filter({ hasText: userName }),
+      this.sidebarModal.locator("uui-card-user").filter({has: this.getTextLocatorWithName(userName)}),
     );
     await this.clickChooseModalButton();
   }

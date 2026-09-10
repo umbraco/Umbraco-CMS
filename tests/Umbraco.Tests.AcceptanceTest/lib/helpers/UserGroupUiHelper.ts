@@ -300,7 +300,7 @@ export class UserGroupUiHelper extends UiBaseLocators {
   }
 
   async clickUserCardWithName(userName: string) {
-    await this.click(this.page.locator('uui-card-user', {hasText: userName}));
+    await this.click(this.getUserCardWithName(userName));
   }
 
   async clickChooseModalButtonAndWaitForGroupUsersUpdate() {

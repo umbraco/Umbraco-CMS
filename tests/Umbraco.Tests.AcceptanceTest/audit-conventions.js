@@ -21,7 +21,11 @@ const BUDGET = {
   disabledWithoutAnnotation: 0,
   fixedSleep: 81,
   forceClick: 79,
-  substringEntityName: 14,
+  // Paid off: 14 -> 0. Media cards match the `name` attribute (bound as an attribute, and a
+  // pre-existing usage in this repo verified the form); block-type, user and search-result
+  // items match exact text instead, because those bind `.name=` as a property and nothing
+  // reflects it - so no attribute exists there and `[name="..."]` would match nothing.
+  substringEntityName: 0,
   // Paid off: 5 -> 0. Four were false positives of a rule that keyed on the spelling of the
   // call rather than on whether visibility was awaited; the fifth was real and is fixed.
   rawClickInLib: 0,

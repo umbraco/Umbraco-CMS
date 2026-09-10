@@ -169,7 +169,7 @@ export class MediaUiHelper extends UiBaseLocators {
   }
 
   async isMediaCardWithNameSelected(mediaName: string, isSelected: boolean = true) {
-    const mediaLocator = this.mediaCardItems.filter({hasText: mediaName});
+    const mediaLocator = this.getMediaCardWithName(mediaName);
     if (isSelected) {
       await expect(mediaLocator).toHaveAttribute('selected');
     } else {

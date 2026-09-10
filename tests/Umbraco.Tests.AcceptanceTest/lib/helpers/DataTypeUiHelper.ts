@@ -722,7 +722,7 @@ export class DataTypeUiHelper extends UiBaseLocators {
   }
 
   async removeMediaStartNode(mediaName: string) {
-    await this.click(this.page.locator(`uui-card-media[name="${mediaName}"]`).locator('[label="Remove"]'));
+    await this.click(this.getMediaCardWithName(mediaName).locator('[label="Remove"]'));
     await this.click(this.confirmToRemoveBtn);
   }
 
@@ -771,7 +771,7 @@ export class DataTypeUiHelper extends UiBaseLocators {
   }
 
   async removeImageUploadFolder(mediaFolderName: string) {
-    await this.click(this.page.locator(`uui-card-media[name="${mediaFolderName}"]`).locator('[label="Remove"]'));
+    await this.click(this.getMediaCardWithName(mediaFolderName).locator('[label="Remove"]'));
     await this.click(this.confirmToRemoveBtn);
   }
 
@@ -1230,7 +1230,7 @@ export class DataTypeUiHelper extends UiBaseLocators {
   }
 
   async doesBlockHaveThumbnailImage(blockName: string, thumbnailImageUrl: string) {
-    const blockCardLocator = this.blockTypeCard.filter({hasText: blockName});
+    const blockCardLocator = this.getBlockTypeCardWithName(blockName);
     await this.hasAttribute(blockCardLocator.locator('img'), 'src', thumbnailImageUrl);
   }
 
@@ -1280,7 +1280,7 @@ export class DataTypeUiHelper extends UiBaseLocators {
   }
 
   async doesBlockHaveNoThumbnailImage(blockName: string) {
-    const blockCardLocator = this.blockTypeCard.filter({hasText: blockName});
+    const blockCardLocator = this.getBlockTypeCardWithName(blockName);
     await expect(blockCardLocator.locator('img')).toHaveCount(0);
   }
 

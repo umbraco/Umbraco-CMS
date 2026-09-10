@@ -753,7 +753,7 @@ export class LibraryUiHelper extends UiBaseLocators {
   }
 
   async isMediaNameVisible(mediaName: string, isVisible: boolean = true) {
-    return await this.isVisible(this.mediaCardItems.filter({hasText: mediaName}), isVisible);
+    return await this.isVisible(this.getMediaCardWithName(mediaName), isVisible);
   }
 
   async clickResetFocalPointButton() {
@@ -1701,7 +1701,7 @@ export class LibraryUiHelper extends UiBaseLocators {
   }
 
   async clickBlockCardWithName(name: string, toForce: boolean = false) {
-    const blockWithNameLocator = this.page.locator('uui-card-block-type', {hasText: name});
+    const blockWithNameLocator = this.getBlockTypeCardWithName(name);
     // The card can sit below the fold in the nested-block picker; scrollIntoView brings it in and, unlike
     // the raw scrollIntoViewIfNeeded, waits for visibility first so a missing card fails fast.
     await this.scrollIntoView(blockWithNameLocator);

@@ -136,7 +136,7 @@ export class BackofficeSearchUiHelper extends UiBaseLocators {
   }
 
   private resultByName(name: string) {
-    return this.results.filter({hasText: name});
+    return this.results.filter({has: this.getTextLocatorWithName(name)});
   }
 
   private providerByName(providerName: string) {

@@ -1656,12 +1656,48 @@ export class UiBaseLocators extends BasePage {
   }
 
   // Media Methods
+  /**
+   * A media card matched on its **exact** name.
+   *
+   * `uui-card-media` receives the name as an attribute - the collection item binds
+   * `name=${item.name}` - so this is exact and cannot multi-match the way `{hasText: name}` can
+   * when a leftover `TestMedia` and `TestMediaTwo` are both present (CLAUDE.md §3). Note the
+   * attribute is on the card itself, not a descendant, so this is not a `filter({has})`.
+   *
+   * The same form does **not** transfer to `uui-card-block-type` or `uui-card-user`: both are
+   * bound with `.name=` as a property and neither reflects it, so no attribute exists there.
+   */
+  getMediaCardWithName(name: string): Locator {
+    return this.page.locator(`uui-card-media[name="${name}"]`);
+  }
+
+  /**
+   * A block-type card matched on its **exact** name.
+   *
+   * Unlike a media card this matches on text, not an attribute: `umb-block-type-card` binds
+   * `.name=` as a *property* and `uui-card-block-type` does not reflect it, so no `name`
+   * attribute exists in the DOM. The component renders
+   * `<span title=${name} id="name">${name}</span>` in its shadow root, and the substring form
+   * this replaced already matched that text - so only substring vs exact changes here.
+   */
+  getBlockTypeCardWithName(name: string): Locator {
+    return this.blockTypeCard.filter({has: this.getTextLocatorWithName(name)});
+  }
+
+  /**
+   * A user card matched on its **exact** name. Same story as the block-type card: bound with
+   * `.name=`, not reflected, and rendered as `<span title=${name}>${name}</span>`.
+   */
+  getUserCardWithName(name: string): Locator {
+    return this.page.locator('uui-card-user').filter({has: this.getTextLocatorWithName(name)});
+  }
+
   async clickMediaWithName(name: string) {
-    await this.click(this.mediaCardItems.filter({ hasText: name }));
+    await this.click(this.getMediaCardWithName(name));
   }
 
   async selectMediaWithName(mediaName: string) {
-    const mediaLocator = this.mediaCardItems.filter({hasText: mediaName});
+    const mediaLocator = this.getMediaCardWithName(mediaName);
     await this.waitForVisible(mediaLocator);
     await this.hover(mediaLocator);
     await this.click(mediaLocator.locator("#select-checkbox"), {force: true});
@@ -1688,7 +1724,7 @@ export class UiBaseLocators extends BasePage {
 
   async isMediaCardItemWithNameDisabled(itemName: string) {
     await this.hasAttribute(
-      this.mediaCardItems.filter({ hasText: itemName }),
+      this.getMediaCardWithName(itemName),
       "class",
       "not-allowed",
     );
@@ -1699,7 +1735,7 @@ export class UiBaseLocators extends BasePage {
     isVisible: boolean = true,
   ) {
     await this.isVisible(
-      this.mediaCardItems.filter({ hasText: itemName }),
+      this.getMediaCardWithName(itemName),
       isVisible,
     );
   }
@@ -2192,7 +2228,7 @@ export class UiBaseLocators extends BasePage {
   }
 
   async isSelectCheckboxVisibleForMediaName(mediaName: string, isVisible: boolean = true) {
-    const selectCheckboxLocator = this.mediaCardItems.filter({hasText: mediaName}).locator('#select-checkbox');
+    const selectCheckboxLocator = this.getMediaCardWithName(mediaName).locator('#select-checkbox');
     await this.isVisible(selectCheckboxLocator, isVisible);
   }
 

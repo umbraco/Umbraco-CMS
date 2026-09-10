@@ -350,7 +350,17 @@ That last row is the trap: a collection row's name is a `label` attribute whose 
 
 So before converting a locator: find the element under `src/Umbraco.Web.UI.Client/src/packages/`, read its `render()`, and pick the form that matches what it emits. A pre-existing passing usage of the same form on the same element counts as verification too. Where neither is available, leave the substring form alone.
 
-**Still on substring matching:** the `uui-card-media` and `uui-card-block-type` locators (`ContentUiHelper`, `LibraryUiHelper`, `MediaUiHelper`, `DataTypeUiHelper`, `UiBaseLocators`) still filter with `{hasText: name}` — 14 sites, budgeted. Read those two card components first; if they expose an attribute or a light-DOM text node for the name, convert on that basis rather than guessing.
+**The cards are converted, and they needed two different forms** — which is the clearest illustration of why this section says to read the component. Three shared locators on `UiBaseLocators` now hold the difference:
+
+| Card | Binds the name as | Locator |
+|------|-------------------|---------|
+| `uui-card-media` | an **attribute** (`name=${item.name}`) | `getMediaCardWithName` → `uui-card-media[name="..."]` |
+| `uui-card-block-type` | a **property** (`.name=`), not reflected | `getBlockTypeCardWithName` → exact text |
+| `uui-card-user` | a **property** (`.name=`), not reflected | `getUserCardWithName` → exact text |
+
+Only the media card can be matched on the attribute. The other two are bound with Lit's `.name=` property syntax and neither component declares `reflect: true`, so **no `name` attribute exists in the DOM at all** — `[name="..."]` there matches nothing and the failure looks like a missing element rather than a wrong locator. Both render `<span title=${name}>${name}</span>` in their shadow root, so exact text is the form that fits.
+
+Two things made this checkable without a running site: `@umbraco-ui/uui` ships `vscode.html-custom-data.json` and its compiled elements under `node_modules`, which is where the reflection question is answered; and the substring form being replaced already matched that shadow text, which proves the text is reachable, leaving only substring-vs-exact to change.
 
 `{hasText: ...}` remains correct for **structural** filtering — narrowing to a group, tab, property or box by its label (`filter({hasText: 'Document permissions'})`). The rule is about entity names, which are the values leftover data collides on.
 
@@ -574,9 +584,9 @@ already drifted from the real budgets before this column was removed.
 | Builder exit returning an unchecked shape | gate | malformed payload compiles, fails as a 400 |
 | Raw `.click()` in `lib/` with no visibility wait | gate | clicks an element that may not be there yet |
 | Spec reaching through a helper to `page` | gate | navigation and waits belong in a page object |
+| Entity name matched on a substring | gate | strict-mode multi-match on leftover data |
 | Fixed sleep **without a justification** | debt | see §3 |
 | `force: true` **without a justification** | debt | masks actionability failures |
-| Entity name matched on a substring | debt | strict-mode multi-match on leftover data |
 | Hardcoded `.nth(N)` | debt | bakes in unpromised list order |
 | `: any` inside a builder | debt | defeats the payload types downstream |
 | Commented-out assertion in a live test | debt | test asserts less than it appears to |
