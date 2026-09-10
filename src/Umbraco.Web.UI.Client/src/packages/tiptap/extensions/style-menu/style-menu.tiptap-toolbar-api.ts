@@ -43,21 +43,24 @@ export default class UmbTiptapToolbarStyleMenuApi extends UmbTiptapToolbarElemen
 		if (!editor || !item?.data) return false;
 
 		const { tag, id, class: className } = item.data;
+		if (tag) return this.#isTagActive(editor, tag, id, className);
+		return this.#hasAncestorWithAttributes(editor, id, className);
+	}
 
-		if (tag) {
-			const ext = this.#commands[tag];
-			if (!ext) return false;
-			const tagMatch = ext.isActive?.(editor) ?? editor.isActive(ext.type) ?? false;
-			return tagMatch && this.#hasAttributes(editor.getAttributes(ext.type), id, className);
-		}
+	#isTagActive(editor: Editor, tag: string, id?: string, className?: string): boolean {
+		const ext = this.#commands[tag];
+		if (!ext) return false;
+		const tagMatch = ext.isActive?.(editor) ?? editor.isActive(ext.type) ?? false;
+		return tagMatch && this.#hasAttributes(editor.getAttributes(ext.type), id, className);
+	}
 
+	#hasAncestorWithAttributes(editor: Editor, id?: string, className?: string): boolean {
 		// Without a tag, `execute` toggles the id/class on every node type around the selection, not only on paragraphs,
 		// so the item is active when any ancestor node of the selection carries them.
 		const { $from } = editor.state.selection;
 		for (let depth = $from.depth; depth > 0; depth--) {
 			if (this.#hasAttributes($from.node(depth).attrs, id, className)) return true;
 		}
-
 		return false;
 	}
 
