@@ -18,7 +18,7 @@ export default class UmbTiptapToolbarStyleMenuApi extends UmbTiptapToolbarElemen
 		};
 	}
 
-	#commands: Record<string, UmbTiptapToolbarStyleMenuCommandType> = {
+	readonly #commands: Record<string, UmbTiptapToolbarStyleMenuCommandType> = {
 		h1: this.#headingCommand(1),
 		h2: this.#headingCommand(2),
 		h3: this.#headingCommand(3),
