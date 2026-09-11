@@ -226,10 +226,6 @@ Simple bundle declaration:
 
 6. **Entity Action Culture via Workspace Context**: The entity action reads culture from `UMB_SEARCH_WORKSPACE_CONTEXT.getSelectedCulture()`, not from URL params. The Core Client includes culture in the table item `id` (e.g., `id: \`${doc.unique}_${culture}\``) to force fresh entity action instances when culture changes.
 
-11. **Cross-Package Context Import**: Importing `UMB_SEARCH_WORKSPACE_CONTEXT` from `@umbraco-cms/backoffice/search-management` requires no special aliasing beyond the standard generated `@umbraco-cms/backoffice/<sub>` path mapping (the search index management UI is part of the backoffice client itself). ESLint may flag `@typescript-eslint/no-unsafe-argument` and `@typescript-eslint/no-unsafe-call` on the context usage — use eslint-disable comments.
-
-12. **Invariant Culture Value**: The Examine index uses `"none"` as the `Sys_Culture` field for invariant documents. When the entity action has no culture from the workspace context, it falls back to `'none'` to match this convention.
-
 7. **Auth Token**: Use `UMB_AUTH_CONTEXT.getLatestToken()` for authentication, not raw `config.auth()`.
 
 8. **Lit Decorators**: Import `@state()` from `@umbraco-cms/backoffice/external/lit`, not from a separate decorators module.
@@ -237,6 +233,10 @@ Simple bundle declaration:
 9. **Bundle Output**: Built files go to `../wwwroot/App_Plugins/UmbracoSearchExamine/` which is gitignored. The `.csproj` serves these as static web assets.
 
 10. **Entity Type**: The entity action registers for `search-document` entity type (set by Core Client when rendering search results).
+
+11. **Cross-Package Context Import**: Importing `UMB_SEARCH_WORKSPACE_CONTEXT` from `@umbraco-cms/backoffice/search-management` requires no special aliasing beyond the standard generated `@umbraco-cms/backoffice/<sub>` path mapping (the search index management UI is part of the backoffice client itself). ESLint may flag `@typescript-eslint/no-unsafe-argument` and `@typescript-eslint/no-unsafe-call` on the context usage — use eslint-disable comments.
+
+12. **Invariant Culture Value**: The Examine index uses `"none"` as the `Sys_Culture` field for invariant documents. When the entity action has no culture from the workspace context, it falls back to `'none'` to match this convention.
 
 ## Testing
 

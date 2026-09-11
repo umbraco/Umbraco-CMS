@@ -1,6 +1,4 @@
-﻿using Umbraco.Cms.Core.Search.Indexing;
-
-namespace Umbraco.Cms.Core.Search.Indexing;
+﻿namespace Umbraco.Cms.Core.Search.Indexing;
 
 /// <summary>
 /// Tracks content changes and translates them into index updates for the indexes that use this strategy.

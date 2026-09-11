@@ -1,6 +1,4 @@
-﻿using Umbraco.Cms.Core.Search;
-
-namespace Umbraco.Cms.Core.Search;
+﻿namespace Umbraco.Cms.Core.Search;
 
 /// <summary>
 /// Provides extension methods for <see cref="IIndexerResolver"/>.

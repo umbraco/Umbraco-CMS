@@ -1,5 +1,3 @@
-using Umbraco.Cms.Core.Search;
-
 namespace Umbraco.Cms.Core.Search;
 
 /// <summary>

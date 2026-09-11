@@ -1,6 +1,4 @@
-﻿using Umbraco.Cms.Core.Search.Indexing;
-
-namespace Umbraco.Cms.Core.Search.Indexing;
+﻿namespace Umbraco.Cms.Core.Search.Indexing;
 
 /// <summary>
 /// Persists and queries <see cref="IndexDocument"/> snapshots, used for change detection so only actual field
