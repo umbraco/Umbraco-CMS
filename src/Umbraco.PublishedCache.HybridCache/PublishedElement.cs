@@ -128,6 +128,9 @@ internal class PublishedElement : PublishableContentBase, IPublishedElement
     /// <inheritdoc/>
     public override PublishedItemType ItemType => ContentNode.ContentType.ItemType;
 
+    /// <inheritdoc/>
+    public int? OwningContentId => ContentNode.OwningContentId;
+
     public override IPublishedProperty? GetProperty(string alias)
     {
         var index = ContentNode.ContentType.GetPropertyIndex(alias);

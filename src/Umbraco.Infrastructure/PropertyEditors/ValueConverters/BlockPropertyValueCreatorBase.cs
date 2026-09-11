@@ -83,6 +83,7 @@ internal abstract class BlockPropertyValueCreatorBase<TBlockModel, TBlockItemMod
         PropertyCacheLevel referenceCacheLevel,
         string intermediateBlockModelValue,
         bool preview,
+        string? owningPropertyCulture,
         IEnumerable<TBlockConfiguration> blockConfigurations,
         CreateEmptyBlockModel createEmptyModel,
         CreateBlockModelFromItems createModelFromItems,
@@ -96,7 +97,7 @@ internal abstract class BlockPropertyValueCreatorBase<TBlockModel, TBlockItemMod
 
         BlockEditorDataConverter<TBlockValue, TBlockLayoutItem> blockEditorDataConverter = CreateBlockEditorDataConverter();
         BlockEditorData<TBlockValue, TBlockLayoutItem> converted = blockEditorDataConverter.Deserialize(intermediateBlockModelValue);
-        return await CreateBlockModelAsync(owner, referenceCacheLevel, converted, preview, blockConfigurations, createEmptyModel, createModelFromItems, enrichBlockItem);
+        return await CreateBlockModelAsync(owner, referenceCacheLevel, converted, preview, owningPropertyCulture, blockConfigurations, createEmptyModel, createModelFromItems, enrichBlockItem);
     }
 
     protected async Task<TBlockModel> CreateBlockModelAsync(
@@ -104,6 +105,7 @@ internal abstract class BlockPropertyValueCreatorBase<TBlockModel, TBlockItemMod
         PropertyCacheLevel referenceCacheLevel,
         TBlockValue blockValue,
         bool preview,
+        string? owningPropertyCulture,
         IEnumerable<TBlockConfiguration> blockConfigurations,
         CreateEmptyBlockModel createEmptyModel,
         CreateBlockModelFromItems createModelFromItems,
@@ -111,7 +113,7 @@ internal abstract class BlockPropertyValueCreatorBase<TBlockModel, TBlockItemMod
     {
         BlockEditorDataConverter<TBlockValue, TBlockLayoutItem> blockEditorDataConverter = CreateBlockEditorDataConverter();
         BlockEditorData<TBlockValue, TBlockLayoutItem> converted = blockEditorDataConverter.Convert(blockValue);
-        return await CreateBlockModelAsync(owner, referenceCacheLevel, converted, preview, blockConfigurations, createEmptyModel, createModelFromItems, enrichBlockItem);
+        return await CreateBlockModelAsync(owner, referenceCacheLevel, converted, preview, owningPropertyCulture, blockConfigurations, createEmptyModel, createModelFromItems, enrichBlockItem);
     }
 
     private async Task<TBlockModel> CreateBlockModelAsync(
@@ -119,6 +121,7 @@ internal abstract class BlockPropertyValueCreatorBase<TBlockModel, TBlockItemMod
         PropertyCacheLevel referenceCacheLevel,
         BlockEditorData<TBlockValue, TBlockLayoutItem> converted,
         bool preview,
+        string? owningPropertyCulture,
         IEnumerable<TBlockConfiguration> blockConfigurations,
         CreateEmptyBlockModel createEmptyModel,
         CreateBlockModelFromItems createModelFromItems,
@@ -162,7 +165,7 @@ internal abstract class BlockPropertyValueCreatorBase<TBlockModel, TBlockItemMod
             }
             else if (blockContentDataMap.TryGetValue(layout.ContentKey, out data))
             {
-                element = BlockEditorConverter.ConvertToElement(owner, data, referenceCacheLevel, preview);
+                element = BlockEditorConverter.ConvertToElement(owner, data, referenceCacheLevel, preview, owningPropertyCulture);
             }
 
             if (element is null)
@@ -172,7 +175,11 @@ internal abstract class BlockPropertyValueCreatorBase<TBlockModel, TBlockItemMod
 
             // if case changes have been made to the content or element type variation since the content was published,
             // we need to align those changes for the exposed blocks.
-            IEnumerable<BlockItemVariation> expose = await _blockEditorVarianceHandler.AlignedExposeVarianceAsync(converted.BlockValue, owner, element);
+            IEnumerable<BlockItemVariation> expose = await _blockEditorVarianceHandler.AlignedExposeVarianceAsync(
+                converted.BlockValue,
+                owner,
+                element,
+                owningPropertyCulture);
             var expectedBlockVariationCulture = owner.ContentType.VariesByCulture() && element.ContentType.VariesByCulture()
                 ? variationContext.Culture.NullOrWhiteSpaceAsNull()
                 : null;
@@ -198,7 +205,7 @@ internal abstract class BlockPropertyValueCreatorBase<TBlockModel, TBlockItemMod
                 try
                 {
                     _variationContextAccessor.VariationContext = new VariationContext(resolvedCulture, originalContext?.Segment);
-                    element = BlockEditorConverter.ConvertToElement(owner, data, referenceCacheLevel, preview);
+                    element = BlockEditorConverter.ConvertToElement(owner, data, referenceCacheLevel, preview, owningPropertyCulture);
                     if (element is null)
                     {
                         continue;
@@ -230,7 +237,7 @@ internal abstract class BlockPropertyValueCreatorBase<TBlockModel, TBlockItemMod
                 continue;
             }
 
-            IPublishedElement? element = BlockEditorConverter.ConvertToElement(owner, data, referenceCacheLevel, preview);
+            IPublishedElement? element = BlockEditorConverter.ConvertToElement(owner, data, referenceCacheLevel, preview, owningPropertyCulture);
             if (element is null)
             {
                 continue;

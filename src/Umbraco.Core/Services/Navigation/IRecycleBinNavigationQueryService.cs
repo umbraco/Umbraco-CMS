@@ -35,6 +35,32 @@ public interface IRecycleBinNavigationQueryService
     bool TryGetChildrenKeysInBin(Guid parentKey, out IEnumerable<Guid> childrenKeys);
 
     /// <summary>
+    ///     Attempts to determine whether a node in the recycle bin has any children.
+    /// </summary>
+    /// <param name="parentKey">The unique identifier of the parent node.</param>
+    /// <param name="hasChildren">
+    ///     When this method returns, indicates whether the node has at least one child;
+    ///     otherwise, <c>false</c>.
+    /// </param>
+    /// <returns><c>true</c> if the node exists in the recycle bin structure; otherwise, <c>false</c>.</returns>
+    /// <remarks>
+    ///     Prefer this over <see cref="TryGetChildrenKeysInBin" /> when only the existence of children
+    ///     is needed, as it avoids building and caching the ordered set of child keys.
+    /// </remarks>
+    // TODO (V19): Remove the default implementation.
+    bool TryGetHasChildrenInBin(Guid parentKey, out bool hasChildren)
+    {
+        if (TryGetChildrenKeysInBin(parentKey, out IEnumerable<Guid> childrenKeys))
+        {
+            hasChildren = childrenKeys.Any();
+            return true;
+        }
+
+        hasChildren = false;
+        return false;
+    }
+
+    /// <summary>
     ///     Attempts to get all descendant node keys of a parent node in the recycle bin.
     /// </summary>
     /// <param name="parentKey">The unique identifier of the parent node.</param>

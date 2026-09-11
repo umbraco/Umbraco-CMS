@@ -89,7 +89,7 @@ test('cannot see History Cleanup section in Settings tab for an Element Type wit
 
   // Assert
   // Anchor on the not-applicable message so the tab has loaded before asserting the section is absent.
-  await umbracoUi.documentType.isElementTypeNotApplicableMessageForPropertyWithNameVisible('History clean up');
+  await umbracoUi.documentType.isElementTypeNotApplicableMessageForPropertyWithNameVisible('History cleanup');
   await umbracoUi.documentType.isPreventCleanupButtonVisible(false);
 });
 

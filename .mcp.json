@@ -2,7 +2,7 @@
   "mcpServers": {
     "umbraco-cms": {
       "command": "npx",
-      "args": ["@umbraco-cms/mcp-dev@18", "--env", ".env.local"]
+      "args": ["@umbraco-cms/mcp-dev@latest", "--env", ".env.local"]
     },
     "playwright": {
       "command": "npx",

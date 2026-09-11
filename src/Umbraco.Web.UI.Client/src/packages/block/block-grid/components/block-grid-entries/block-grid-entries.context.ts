@@ -510,7 +510,7 @@ export class UmbBlockGridEntriesContext
 			throw new Error(`Cannot delete block, missing layout for ${key}`);
 		}
 		// The following loop will only delete the referenced data of sub Layout Entries, as the Layout entry is part of the main Layout Entry they will go away when that is removed. [NL]
-		forEachBlockLayoutEntryOf(layout, async (entry) => {
+		await forEachBlockLayoutEntryOf(layout, async (entry) => {
 			if (entry.settingsKey) {
 				this._manager!.removeOneSettings(entry.settingsKey);
 			}
