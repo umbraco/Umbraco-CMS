@@ -2,15 +2,19 @@ import type { UmbUserDetailModel, UmbUserStartNodesModel, UmbUserStateEnum } fro
 import type { UmbUserDetailRepository } from '../../repository/index.js';
 import { UMB_USER_DETAIL_REPOSITORY_ALIAS } from '../../repository/index.js';
 import { UMB_USER_ENTITY_TYPE } from '../../entity.js';
+import { UMB_USER_ROOT_WORKSPACE_PATH, UMB_EDIT_USER_WORKSPACE_PATH_PATTERN } from '../../paths.js';
 import { UmbUserAvatarRepository } from '../../repository/avatar/index.js';
 import { UmbUserConfigRepository } from '../../repository/config/index.js';
 import { UmbUserWorkspaceEditorElement } from './user-workspace-editor.element.js';
 import { UMB_USER_WORKSPACE_ALIAS } from './constants.js';
-import { UmbEntityNamedDetailWorkspaceContextBase } from '@umbraco-cms/backoffice/workspace';
+import {
+	UmbEntityNamedDetailWorkspaceContextBase,
+} from '@umbraco-cms/backoffice/workspace';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbRepositoryResponseWithAsObservable } from '@umbraco-cms/backoffice/repository';
 import type { UmbSubmittableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 
 type EntityType = UmbUserDetailModel;
 
@@ -55,6 +59,11 @@ export class UmbUserWorkspaceContext
 				},
 			},
 		]);
+	}
+
+	protected override _getNavigationParentItemPath(entity: UmbEntityModel | undefined): string | undefined {
+		if (!entity?.unique) return UMB_USER_ROOT_WORKSPACE_PATH;
+		return UMB_EDIT_USER_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: entity.unique });
 	}
 
 	override async load(unique: string) {

@@ -23,11 +23,13 @@ export class UmbTestTrashableEntityWorkspaceContext implements UmbTrashableEntit
 	#entityType = 'test-entity-type';
 	#isTrashed = new UmbBooleanState(undefined);
 	#isNew = new UmbBooleanState(undefined);
+	#navigationParentItemPath = new UmbObjectState<string | undefined>(undefined);
 
 	readonly workspaceAlias = 'Umb.Test.Workspace';
 	readonly unique = this.#unique.asObservable();
 	readonly isTrashed = this.#isTrashed.asObservable();
 	readonly isNew = this.#isNew.asObservable();
+	readonly navigationParentItemPath = this.#navigationParentItemPath.asObservable();
 	modalContext: unknown;
 
 	readonly readOnlyGuardRuleCalls: Array<UmbTestReadOnlyGuardRuleCall> = [];
@@ -69,6 +71,10 @@ export class UmbTestTrashableEntityWorkspaceContext implements UmbTrashableEntit
 
 	setIsNew(value: boolean | undefined) {
 		this.#isNew.setValue(value);
+	}
+
+	setNavigationParentItemPath(path: string | undefined) {
+		this.#navigationParentItemPath.setValue(path);
 	}
 
 	resetData(): void {

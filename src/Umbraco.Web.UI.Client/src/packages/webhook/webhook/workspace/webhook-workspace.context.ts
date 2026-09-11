@@ -1,6 +1,8 @@
 import type { UmbWebhookDetailRepository } from '../repository/index.js';
 import { UMB_WEBHOOK_DETAIL_REPOSITORY_ALIAS } from '../repository/index.js';
 import { UMB_WEBHOOK_ENTITY_TYPE, UMB_WEBHOOK_ROOT_ENTITY_TYPE, UMB_WEBHOOK_WORKSPACE_ALIAS } from '../../entity.js';
+import { UMB_EDIT_WEBHOOK_WORKSPACE_PATH_PATTERN } from '../paths.js';
+import { UMB_WEBHOOK_ROOT_WORKSPACE_PATH } from '../../webhook-root/paths.js';
 import type { UmbWebhookDetailModel } from '../types.js';
 import type { UmbWebhookEventModel } from '../../webhook-event/types.js';
 import { UmbWebhookWorkspaceEditorElement } from './webhook-workspace-editor.element.js';
@@ -11,6 +13,7 @@ import {
 } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbSubmittableWorkspaceContext, UmbRoutableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 
 export class UmbWebhookWorkspaceContext
 	extends UmbEntityNamedDetailWorkspaceContextBase<UmbWebhookDetailModel, UmbWebhookDetailRepository>
@@ -54,6 +57,11 @@ export class UmbWebhookWorkspaceContext
 				},
 			},
 		]);
+	}
+
+	protected override _getNavigationParentItemPath(entity: UmbEntityModel | undefined): string | undefined {
+		if (!entity?.unique) return UMB_WEBHOOK_ROOT_WORKSPACE_PATH;
+		return UMB_EDIT_WEBHOOK_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: entity.unique });
 	}
 
 	/**

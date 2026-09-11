@@ -1,13 +1,14 @@
 import { UmbMediaTypeDetailRepository } from '../../media-types/repository/detail/media-type-detail.repository.js';
 import { UmbMediaPropertyDatasetContext } from '../property-dataset-context/media-property-dataset-context.js';
 import { UMB_MEDIA_ENTITY_TYPE } from '../entity.js';
-import { UMB_MEDIA_DETAIL_REPOSITORY_ALIAS } from '../constants.js';
+import { UMB_MEDIA_DETAIL_REPOSITORY_ALIAS, UMB_MEDIA_RECYCLE_BIN_ROOT_WORKSPACE_PATH } from '../constants.js';
 import type { UmbMediaDetailModel, UmbMediaVariantModel } from '../types.js';
 import { UMB_CREATE_MEDIA_WORKSPACE_PATH_PATTERN, UMB_EDIT_MEDIA_WORKSPACE_PATH_PATTERN } from '../paths.js';
 import { UmbMediaValidationRepository } from '../repository/validation/media-validation.repository.js';
 import { UMB_MEDIA_COLLECTION_ALIAS } from '../collection/constants.js';
 import type { UmbMediaDetailRepository } from '../repository/index.js';
 import { UMB_MEDIA_WORKSPACE_ALIAS, UMB_MEMBER_DETAIL_MODEL_VARIANT_SCAFFOLD } from './constants.js';
+import { UMB_MEDIA_SECTION_PATH } from '../../media-section/paths.js';
 import { UmbContentDetailWorkspaceContextBase, type UmbContentWorkspaceContext } from '@umbraco-cms/backoffice/content';
 import {
 	UmbWorkspaceIsNewRedirectController,
@@ -17,6 +18,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UMB_MEDIA_TYPE_ENTITY_TYPE, type UmbMediaTypeDetailModel } from '@umbraco-cms/backoffice/media-type';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbEntityContentTypeEntityContext } from '@umbraco-cms/backoffice/content-type';
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 
 type ContentModel = UmbMediaDetailModel;
 type ContentTypeModel = UmbMediaTypeDetailModel;
@@ -104,6 +106,13 @@ export class UmbMediaWorkspaceContext
 	public override resetState() {
 		super.resetState();
 		this.removeUmbControllerByAlias(UmbWorkspaceIsNewRedirectControllerAlias);
+	}
+
+	protected override _getNavigationParentItemPath(entity: UmbEntityModel | undefined): string | undefined {
+		if (!entity?.unique) {
+			return this._data.getCurrent()?.isTrashed ? UMB_MEDIA_RECYCLE_BIN_ROOT_WORKSPACE_PATH : UMB_MEDIA_SECTION_PATH;
+		}
+		return UMB_EDIT_MEDIA_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: entity.unique });
 	}
 
 	/*

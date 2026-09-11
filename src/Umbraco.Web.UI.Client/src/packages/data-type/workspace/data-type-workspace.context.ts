@@ -1,5 +1,8 @@
 import type { UmbDataTypeDetailModel, UmbDataTypePropertyValueModel } from '../types.js';
 import { UMB_DATA_TYPE_DETAIL_REPOSITORY_ALIAS, UMB_DATA_TYPE_ENTITY_TYPE } from '../constants.js';
+import { UMB_DATA_TYPE_FOLDER_ENTITY_TYPE } from '../entity.js';
+import { UMB_DATA_TYPE_ROOT_WORKSPACE_PATH, UMB_EDIT_DATA_TYPE_WORKSPACE_PATH_PATTERN } from '../paths.js';
+import { UMB_EDIT_DATA_TYPE_FOLDER_WORKSPACE_PATH_PATTERN } from '../tree/folder/workspace/paths.js';
 import type { UmbDataTypeDetailRepository } from '../repository/index.js';
 import { UmbDataTypeWorkspaceEditorElement } from './data-type-workspace-editor.element.js';
 import { UMB_DATA_TYPE_WORKSPACE_ALIAS } from './constants.js';
@@ -15,6 +18,7 @@ import {
 } from '@umbraco-cms/backoffice/workspace';
 import { appendToFrozenArray, UmbArrayState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import type {
 	PropertyEditorSettingsDefaultData,
 	PropertyEditorSettingsProperty,
@@ -115,6 +119,14 @@ export class UmbDataTypeWorkspaceContext
 				},
 			},
 		]);
+	}
+
+	protected override _getNavigationParentItemPath(entity: UmbEntityModel | undefined): string | undefined {
+		if (!entity?.unique) return UMB_DATA_TYPE_ROOT_WORKSPACE_PATH;
+		if (entity.entityType === UMB_DATA_TYPE_FOLDER_ENTITY_TYPE) {
+			return UMB_EDIT_DATA_TYPE_FOLDER_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: entity.unique });
+		}
+		return UMB_EDIT_DATA_TYPE_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: entity.unique });
 	}
 
 	override resetState() {

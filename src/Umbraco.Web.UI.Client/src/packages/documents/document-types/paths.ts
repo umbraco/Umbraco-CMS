@@ -1,4 +1,8 @@
-import { UMB_DOCUMENT_TYPE_ENTITY_TYPE, type UmbDocumentTypeEntityTypeUnion } from './entity.js';
+import {
+	UMB_DOCUMENT_TYPE_ENTITY_TYPE,
+	UMB_DOCUMENT_TYPE_ROOT_ENTITY_TYPE,
+	type UmbDocumentTypeEntityTypeUnion,
+} from './entity.js';
 import { UMB_SETTINGS_SECTION_PATHNAME } from '@umbraco-cms/backoffice/settings';
 import { UmbPathPattern } from '@umbraco-cms/backoffice/router';
 import { UMB_WORKSPACE_PATH_PATTERN } from '@umbraco-cms/backoffice/workspace';
@@ -18,6 +22,11 @@ export type UmbCreateDocumentTypeWorkspacePresetType =
 export const UMB_DOCUMENT_TYPE_WORKSPACE_PATH = UMB_WORKSPACE_PATH_PATTERN.generateAbsolute({
 	sectionName: UMB_SETTINGS_SECTION_PATHNAME,
 	entityType: UMB_DOCUMENT_TYPE_ENTITY_TYPE,
+});
+
+export const UMB_DOCUMENT_TYPE_ROOT_WORKSPACE_PATH = UMB_WORKSPACE_PATH_PATTERN.generateAbsolute({
+	sectionName: UMB_SETTINGS_SECTION_PATHNAME,
+	entityType: UMB_DOCUMENT_TYPE_ROOT_ENTITY_TYPE,
 });
 
 export const UMB_CREATE_DOCUMENT_TYPE_WORKSPACE_PATH_PATTERN = new UmbPathPattern<{
