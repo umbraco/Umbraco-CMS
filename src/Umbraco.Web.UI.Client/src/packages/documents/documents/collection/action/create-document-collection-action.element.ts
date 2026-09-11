@@ -51,7 +51,10 @@ export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
 	}
 
 	async #retrieveAllowedDocumentTypesOf(unique: string | null, parentContentUnique: string | null) {
-		const { data } = await this.#documentTypeStructureRepository.requestAllowedChildrenOf(unique, parentContentUnique);
+		const { data } = await this.#documentTypeStructureRepository.requestAllAllowedChildrenOf(
+			unique,
+			parentContentUnique,
+		);
 
 		if (data && data.items) {
 			this._allowedDocumentTypes = data.items;
