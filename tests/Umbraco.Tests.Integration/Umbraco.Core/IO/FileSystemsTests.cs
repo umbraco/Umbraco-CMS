@@ -8,6 +8,7 @@ using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
+using CoreConstants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.IO;
 
@@ -96,10 +97,10 @@ internal sealed class FileSystemsTests : UmbracoIntegrationTest
         CreateMediaFile(MediaFileManager, HostingEnvironment, out string virtualPath, out string physicalPath);
         Assert.IsTrue(File.Exists(physicalPath));
 
-        MediaFileManager.SuffixMediaFiles([virtualPath], Cms.Core.Constants.Conventions.Media.TrashedMediaSuffix);
+        MediaFileManager.SuffixMediaFiles([virtualPath], CoreConstants.Conventions.Media.TrashedMediaSuffix);
         Assert.IsFalse(File.Exists(physicalPath));
 
-        var virtualPathWithSuffix = virtualPath.Replace("file.txt", $"file{Cms.Core.Constants.Conventions.Media.TrashedMediaSuffix}.txt");
+        var virtualPathWithSuffix = virtualPath.Replace("file.txt", $"file{CoreConstants.Conventions.Media.TrashedMediaSuffix}.txt");
         physicalPath = HostingEnvironment.MapPathWebRoot(Path.Combine("media", virtualPathWithSuffix));
         Assert.IsTrue(File.Exists(physicalPath));
     }
@@ -108,13 +109,13 @@ internal sealed class FileSystemsTests : UmbracoIntegrationTest
     public void Can_Remove_Suffix_From_Media_Files()
     {
         CreateMediaFile(MediaFileManager, HostingEnvironment, out string virtualPath, out string physicalPath);
-        MediaFileManager.SuffixMediaFiles([virtualPath], Cms.Core.Constants.Conventions.Media.TrashedMediaSuffix);
+        MediaFileManager.SuffixMediaFiles([virtualPath], CoreConstants.Conventions.Media.TrashedMediaSuffix);
         Assert.IsFalse(File.Exists(physicalPath));
 
-        MediaFileManager.RemoveSuffixFromMediaFiles([virtualPath], Cms.Core.Constants.Conventions.Media.TrashedMediaSuffix);
+        MediaFileManager.RemoveSuffixFromMediaFiles([virtualPath], CoreConstants.Conventions.Media.TrashedMediaSuffix);
         Assert.IsFalse(File.Exists(physicalPath));
 
-        var virtualPathWithSuffix = virtualPath.Replace("file.txt", $"file{Cms.Core.Constants.Conventions.Media.TrashedMediaSuffix}.txt");
+        var virtualPathWithSuffix = virtualPath.Replace("file.txt", $"file{CoreConstants.Conventions.Media.TrashedMediaSuffix}.txt");
         physicalPath = HostingEnvironment.MapPathWebRoot(Path.Combine("media", virtualPathWithSuffix));
         Assert.IsTrue(File.Exists(physicalPath));
     }

@@ -1,7 +1,7 @@
 using Examine;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
-using Umbraco.Cms.Search.Core.Notifications;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Search.Provider.Examine.Services;
 
 namespace Umbraco.Cms.Search.Provider.Examine.NotificationHandlers;

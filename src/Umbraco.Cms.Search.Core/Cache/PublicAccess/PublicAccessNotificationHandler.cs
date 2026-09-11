@@ -2,8 +2,8 @@
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
+using Umbraco.Cms.Core.Search.Indexing;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Search.Core.Services.ContentIndexing;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Search.Core.Cache.PublicAccess;

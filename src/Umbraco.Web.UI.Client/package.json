@@ -81,6 +81,7 @@
 		"./modal": "./dist-cms/packages/core/modal/index.js",
 		"./models": "./dist-cms/packages/core/models/index.js",
 		"./search": "./dist-cms/packages/core/search/index.js",
+		"./search-management": "./dist-cms/packages/search-management/index.js",
 		"./multi-url-picker": "./dist-cms/packages/multi-url-picker/index.js",
 		"./notification": "./dist-cms/packages/core/notification/index.js",
 		"./object-type": "./dist-cms/packages/core/object-type/index.js",

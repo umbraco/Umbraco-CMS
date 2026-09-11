@@ -79,8 +79,6 @@ Umbraco-CMS/
 │   │   └── CLAUDE.md                      # ⭐ API patterns guide
 │   ├── Umbraco.PublishedCache.HybridCache/ # Content caching
 │   ├── Umbraco.Cms.Search.Core/           # Search abstractions
-│   ├── Umbraco.Cms.Search.BackOffice/     # Backoffice search integration
-│   ├── Umbraco.Cms.Search.DeliveryApi/    # Delivery API search integration
 │   ├── Umbraco.Cms.Search.Provider.Examine/ # Examine (Lucene) search provider
 │   ├── Umbraco.Cms.Persistence.EFCore/    # EF Core data access
 │   ├── Umbraco.Cms.Persistence.EFCore.Sqlite/
@@ -245,7 +243,7 @@ Project ownership is distributed across teams. Check individual project director
    - Infrastructure implements contracts that need Infrastructure-owned machinery
    - Web/APIs consume implementations via DI
 
-   **Where service implementations live**: Services whose dependencies are satisfiable from Core interfaces alone (repositories, scope, config, other Core services) live in `Umbraco.Core/Services/` — this covers the majority of domain services (`MemberService`, `ContentService`, `MediaService`, `ContentTypeService`, `EntityService`, `AuditService`, `ExternalMemberService`, etc.). Service implementations only live in `Umbraco.Infrastructure/Services/Implement/` when they genuinely need Infrastructure concerns — Examine indexes (`ContentSearchService`, `MediaSearchService`, `IndexedEntitySearchService`), log files (`LogViewerRepository`), packaging internals (`PackagingService`), webhook firing (`WebhookFiringService`), distributed-job coordination (`DistributedJobService`). When adding a new service, default to Core and only move to Infrastructure if a concrete dependency forces it.
+   **Where service implementations live**: Services whose dependencies are satisfiable from Core interfaces alone (repositories, scope, config, other Core services) live in `Umbraco.Core/Services/` — this covers the majority of domain services (`MemberService`, `ContentService`, `MediaService`, `ContentTypeService`, `EntityService`, `AuditService`, `ExternalMemberService`, etc.). Service implementations only live in `Umbraco.Infrastructure/Services/Implement/` when they genuinely need Infrastructure concerns — log files (`LogViewerRepository`), packaging internals (`PackagingService`), webhook firing (`WebhookFiringService`), distributed-job coordination (`DistributedJobService`). When adding a new service, default to Core and only move to Infrastructure if a concrete dependency forces it.
 
 2. **Interface-First Design**
    - All services defined as interfaces in Core

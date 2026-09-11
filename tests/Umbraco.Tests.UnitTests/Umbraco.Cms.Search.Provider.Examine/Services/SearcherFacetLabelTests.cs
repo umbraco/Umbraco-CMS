@@ -2,7 +2,7 @@ using System.Globalization;
 using NUnit.Framework;
 using Umbraco.Cms.Search.Provider.Examine.Services;
 
-namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Search.Provider.Examine.Services;
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Search.Provider.Examine.Services;
 
 [TestFixture]
 public class SearcherFacetLabelTests

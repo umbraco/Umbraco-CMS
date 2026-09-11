@@ -7,22 +7,20 @@ using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Search;
+using Umbraco.Cms.Core.Search.Indexing;
+using Umbraco.Cms.Core.Search.Querying;
+using Umbraco.Cms.Core.Search.Querying.Faceting;
+using Umbraco.Cms.Core.Search.Querying.Filtering;
+using Umbraco.Cms.Core.Search.Querying.Sorting;
 using Umbraco.Cms.Core.Sync;
-using Umbraco.Cms.Infrastructure.BackgroundJobs;
-using Umbraco.Cms.Search.Core.Models.Indexing;
-using Umbraco.Cms.Search.Core.Models.Searching;
-using Umbraco.Cms.Search.Core.Models.Searching.Faceting;
-using Umbraco.Cms.Search.Core.Models.Searching.Filtering;
-using Umbraco.Cms.Search.Core.Models.Searching.Sorting;
-using Umbraco.Cms.Search.Core.Services;
-using Umbraco.Cms.Search.Core.Services.ContentIndexing;
 using Umbraco.Cms.Search.Provider.Examine.BackgroundJobs;
 using Umbraco.Cms.Search.Provider.Examine.Services;
-using IndexOptions = Umbraco.Cms.Search.Core.Configuration.IndexOptions;
-using ISearcher = Umbraco.Cms.Search.Core.Services.ISearcher;
-using SearchResult = Umbraco.Cms.Search.Core.Models.Searching.SearchResult;
+using IndexOptions = Umbraco.Cms.Core.Search.Configuration.IndexOptions;
+using ISearcher = Umbraco.Cms.Core.Search.ISearcher;
+using SearchResult = Umbraco.Cms.Core.Search.Querying.SearchResult;
 
-namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Search.Provider.Examine.BackgroundJobs;
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Search.Provider.Examine.BackgroundJobs;
 
 [TestFixture]
 public class IndexRebuildJobTests

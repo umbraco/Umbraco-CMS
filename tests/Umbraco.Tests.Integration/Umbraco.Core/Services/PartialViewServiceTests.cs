@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
@@ -146,7 +147,7 @@ internal sealed class PartialViewServiceTests : UmbracoIntegrationTest
     public async Task Cannot_Update_PartialView_In_Production_Mode()
     {
         // Create file directly via filesystem since service blocks creation in production mode
-        var fileSystems = GetRequiredService<Cms.Core.IO.FileSystems>();
+        var fileSystems = GetRequiredService<FileSystems>();
         var partialViewFileSystem = fileSystems.PartialViewsFileSystem!;
         const string fileName = "ExistingPartialView.cshtml";
         const string originalContent = "@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage\n<p>Original</p>";
@@ -178,7 +179,7 @@ internal sealed class PartialViewServiceTests : UmbracoIntegrationTest
     [ConfigureBuilder(ActionName = nameof(ConfigureProductionMode))]
     public async Task Cannot_Delete_PartialView_In_Production_Mode()
     {
-        var fileSystems = GetRequiredService<Cms.Core.IO.FileSystems>();
+        var fileSystems = GetRequiredService<FileSystems>();
         var partialViewFileSystem = fileSystems.PartialViewsFileSystem!;
         const string fileName = "PartialViewToDelete.cshtml";
         const string content = "@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage\n<p>Test</p>";
@@ -200,7 +201,7 @@ internal sealed class PartialViewServiceTests : UmbracoIntegrationTest
     [ConfigureBuilder(ActionName = nameof(ConfigureProductionMode))]
     public async Task Cannot_Rename_PartialView_In_Production_Mode()
     {
-        var fileSystems = GetRequiredService<Cms.Core.IO.FileSystems>();
+        var fileSystems = GetRequiredService<FileSystems>();
         var partialViewFileSystem = fileSystems.PartialViewsFileSystem!;
         const string originalFileName = "OriginalName.cshtml";
         const string content = "@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage\n<p>Test</p>";
@@ -276,7 +277,7 @@ internal sealed class PartialViewServiceTests : UmbracoIntegrationTest
 
     private void DeleteAllPartialViewFiles()
     {
-        var fileSystems = GetRequiredService<Cms.Core.IO.FileSystems>();
+        var fileSystems = GetRequiredService<FileSystems>();
         var partialViewFileSystem = fileSystems.PartialViewsFileSystem!;
         foreach (var file in partialViewFileSystem.GetFiles(string.Empty).ToArray())
         {

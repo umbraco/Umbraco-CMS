@@ -411,8 +411,8 @@ stages:
               testFilter: "(FullyQualifiedName~Umbraco.Infrastructure.Service)"
             LinuxPart3Of3:
               vmImage: "ubuntu-latest"
-              # Run all tests that are not part of the Umbraco.Infrastructure, ManagementApi, or Umbraco.Search namespaces (Umbraco.Search runs in its own Search Integration Tests job)
-              testFilter: "(FullyQualifiedName!~Umbraco.Infrastructure) & (FullyQualifiedName!~ManagementApi) & (FullyQualifiedName!~Umbraco.Search)"
+              # Run all tests that are not part of the Umbraco.Infrastructure, ManagementApi, or Umbraco.Cms.Search namespaces (Umbraco.Cms.Search runs in its own Search Integration Tests job)
+              testFilter: "(FullyQualifiedName!~Umbraco.Infrastructure) & (FullyQualifiedName!~ManagementApi) & (FullyQualifiedName!~Umbraco.Cms.Search)"
             macOSPart1Of3:
               vmImage: "macOS-latest"
               # Filter tests that are part of the Umbraco.Infrastructure namespace but not part of the Umbraco.Infrastructure.Service namespace
@@ -423,8 +423,8 @@ stages:
               testFilter: "(FullyQualifiedName~Umbraco.Infrastructure.Service)"
             macOSPart3Of3:
               vmImage: "macOS-latest"
-              # Run all tests that are not part of the Umbraco.Infrastructure, ManagementApi, or Umbraco.Search namespaces (Umbraco.Search runs in its own Search Integration Tests job)
-              testFilter: "(FullyQualifiedName!~Umbraco.Infrastructure) & (FullyQualifiedName!~ManagementApi) & (FullyQualifiedName!~Umbraco.Search)"
+              # Run all tests that are not part of the Umbraco.Infrastructure, ManagementApi, or Umbraco.Cms.Search namespaces (Umbraco.Cms.Search runs in its own Search Integration Tests job)
+              testFilter: "(FullyQualifiedName!~Umbraco.Infrastructure) & (FullyQualifiedName!~ManagementApi) & (FullyQualifiedName!~Umbraco.Cms.Search)"
         pool:
           vmImage: $(vmImage)
         variables:
@@ -496,7 +496,7 @@ stages:
             inputs:
               command: test
               projects: "tests/Umbraco.Tests.Integration/Umbraco.Tests.Integration.csproj"
-              arguments: '--filter "FullyQualifiedName~Umbraco.Search" --configuration $(buildConfiguration) --no-build'
+              arguments: '--filter "FullyQualifiedName~Umbraco.Cms.Search" --configuration $(buildConfiguration) --no-build'
               testRunTitle: Search Integration Tests SQLite - $(Agent.OS)
       # Integration Tests (SQL Server)
       - job:
@@ -523,8 +523,8 @@ stages:
               vmImage: "windows-latest"
               Tests__Database__DatabaseType: LocalDb
               Tests__Database__SQLServerMasterConnectionString: N/A
-              # Run all tests that are not part of the Umbraco.Infrastructure, ManagementApi, or Umbraco.Search namespaces (Umbraco.Search runs in its own Search Integration Tests job)
-              testFilter: "(FullyQualifiedName!~Umbraco.Infrastructure) & (FullyQualifiedName!~ManagementApi) & (FullyQualifiedName!~Umbraco.Search)"
+              # Run all tests that are not part of the Umbraco.Infrastructure, ManagementApi, or Umbraco.Cms.Search namespaces (Umbraco.Cms.Search runs in its own Search Integration Tests job)
+              testFilter: "(FullyQualifiedName!~Umbraco.Infrastructure) & (FullyQualifiedName!~ManagementApi) & (FullyQualifiedName!~Umbraco.Cms.Search)"
             LinuxPart1Of3:
               vmImage: "ubuntu-latest"
               SA_PASSWORD: UmbracoIntegration123!
@@ -544,8 +544,8 @@ stages:
               SA_PASSWORD: UmbracoIntegration123!
               Tests__Database__DatabaseType: SqlServer
               Tests__Database__SQLServerMasterConnectionString: "Server=(local);User Id=sa;Password=$(SA_PASSWORD);TrustServerCertificate=True"
-              # Run all tests that are not part of the Umbraco.Infrastructure, ManagementApi, or Umbraco.Search namespaces (Umbraco.Search runs in its own Search Integration Tests job)
-              testFilter: "(FullyQualifiedName!~Umbraco.Infrastructure) & (FullyQualifiedName!~ManagementApi) & (FullyQualifiedName!~Umbraco.Search)"
+              # Run all tests that are not part of the Umbraco.Infrastructure, ManagementApi, or Umbraco.Cms.Search namespaces (Umbraco.Cms.Search runs in its own Search Integration Tests job)
+              testFilter: "(FullyQualifiedName!~Umbraco.Infrastructure) & (FullyQualifiedName!~ManagementApi) & (FullyQualifiedName!~Umbraco.Cms.Search)"
         pool:
           vmImage: $(vmImage)
         steps:
@@ -691,7 +691,7 @@ stages:
             inputs:
               command: test
               projects: "tests/Umbraco.Tests.Integration/Umbraco.Tests.Integration.csproj"
-              arguments: '--filter "FullyQualifiedName~Umbraco.Search" --configuration $(buildConfiguration) --no-build'
+              arguments: '--filter "FullyQualifiedName~Umbraco.Cms.Search" --configuration $(buildConfiguration) --no-build'
               testRunTitle: Search Integration Tests SQL Server - $(Agent.OS)
 
           - pwsh: docker stop mssql
