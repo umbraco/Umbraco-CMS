@@ -17,12 +17,14 @@ export class UmbItemDataApiGetRequestController<
 > extends UmbControllerBase {
 	#apiCallback: (args: { uniques: Array<string> }) => Promise<ResponseModelType>;
 	#uniques: Array<string>;
+	#disableNotifications: boolean;
 	#batchSize: number = 40;
 
 	constructor(host: UmbControllerHost, args: UmbItemDataApiGetRequestControllerArgs<ResponseModelType>) {
 		super(host);
 		this.#apiCallback = args.api;
 		this.#uniques = args.uniques;
+		this.#disableNotifications = args.disableNotifications ?? false;
 	}
 
 	async request() {
@@ -33,19 +35,30 @@ export class UmbItemDataApiGetRequestController<
 
 		if (this.#uniques.length > this.#batchSize) {
 			const chunks = batchArray<string>(this.#uniques, this.#batchSize);
+
 			const results = await batchTryExecute(this, chunks, (chunk) => this.#apiCallback({ uniques: chunk }));
 
-			const errors = results.filter((promiseResult) => promiseResult.status === 'rejected');
+			// A failing chunk resolves rather than rejects, because batchTryExecute wraps each one in tryExecute.
+			// Both shapes therefore have to be read to find out what actually failed.
+			const errors = results
+				.map((promiseResult) =>
+					promiseResult.status === 'rejected' ? promiseResult.reason : promiseResult.value.error,
+				)
+				.filter((chunkError) => chunkError !== undefined);
+
+			// A chunk that failed contributes no data, so the successful chunks are still returned alongside the error.
+			data = results
+				.filter((promiseResult) => promiseResult.status === 'fulfilled')
+				.flatMap((promiseResult) => promiseResult.value.data)
+				.filter((item: unknown) => item !== undefined);
 
 			if (errors.length > 0) {
 				error = await this.#getAndHandleErrorResult(errors);
 			}
-
-			data = results
-				.filter((promiseResult) => promiseResult.status === 'fulfilled')
-				.flatMap((promiseResult) => promiseResult.value.data);
 		} else {
-			const result = await tryExecute(this, this.#apiCallback({ uniques: this.#uniques }));
+			const result = await tryExecute(this, this.#apiCallback({ uniques: this.#uniques }), {
+				disableNotifications: this.#disableNotifications,
+			});
 			data = result.data;
 			error = result.error;
 		}
@@ -53,14 +66,28 @@ export class UmbItemDataApiGetRequestController<
 		return { data, error };
 	}
 
-	async #getAndHandleErrorResult(errors: Array<PromiseRejectedResult>) {
+	async #getAndHandleErrorResult(errors: Array<unknown>) {
 		// TODO: We currently expect all the errors to be the same, but we should handle this better in the future.
 		const error = errors[0];
-		await umbPeekError(this, {
-			headline: 'Error fetching items',
-			message: 'An error occurred while fetching items.',
-		});
 
-		return new UmbError(error.reason);
+		if (this.#disableNotifications === false) {
+			try {
+				await umbPeekError(this, {
+					headline: 'Error fetching items',
+					message: 'An error occurred while fetching items.',
+				});
+			} catch {
+				// Telling the user is best effort - it needs a notification context, which a host is not obliged to
+				// provide. Failing to report the error must not replace it with a different one.
+			}
+		}
+
+		// A chunk that failed carries an UmbApiError or UmbCancelError with the status and problem details on it, so
+		// it is returned as it is - flattening it into a message would drop what the caller needs to act on it.
+		if (error instanceof Error) {
+			return error;
+		}
+
+		return new UmbError((error as { message?: string })?.message ?? String(error));
 	}
 }

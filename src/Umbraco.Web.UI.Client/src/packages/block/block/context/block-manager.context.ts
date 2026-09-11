@@ -229,11 +229,21 @@ export abstract class UmbBlockManagerContext<
 
 		if (this.#contentTypeRepository.requestByUniques) {
 			const { error, data } = await this.#contentTypeRepository.requestByUniques(uniques);
-			if (error || !data) {
-				throw error?.message ?? 'Repository could not request Content Types by Uniques.';
-			}
-			if (data) {
-				data.forEach((item) => contentTypesMap.set(item.unique, item));
+
+			data?.forEach((item) => {
+				if (item) {
+					contentTypesMap.set(item.unique, item);
+				}
+			});
+
+			// Anything the bulk request did not return is loaded individually below, so a failure here is recoverable
+			// and must not abort the initialization. It is worth a warning though, because the fallback costs one
+			// request per content type.
+			if (error) {
+				console.warn(
+					`[UmbBlockManagerContext] Bulk request for ${uniques.length} content types failed; falling back to individual requests. This is slower - see the failing request for the cause.`,
+					error,
+				);
 			}
 		}
 
