@@ -18,6 +18,7 @@ public class ElementService : PublishableContentServiceBase<IElement>, IElementS
     private readonly IElementRepository _elementRepository;
     private readonly ILogger<ElementService> _logger;
     private readonly IShortStringHelper _shortStringHelper;
+    private readonly IUserIdKeyResolver _userIdKeyResolver;
 
     public ElementService(
         ICoreScopeProvider provider,
@@ -50,6 +51,7 @@ public class ElementService : PublishableContentServiceBase<IElement>, IElementS
         _elementRepository = elementRepository;
         _shortStringHelper = shortStringHelper;
         _logger = loggerFactory.CreateLogger<ElementService>();
+        _userIdKeyResolver = userIdKeyResolver;
     }
 
     #region Others
@@ -73,6 +75,28 @@ public class ElementService : PublishableContentServiceBase<IElement>, IElementS
     {
         PersistContentSchedule(content, contentSchedule);
         return Task.CompletedTask;
+    }
+
+    /// <inheritdoc />
+    // No async repository exists for elements yet - bridges to the existing synchronous Rollback engine.
+    public Task<Attempt<ContentRollbackOperationStatus>> RollbackAsync(Guid key, int versionId, string culture, Guid userKey, CancellationToken cancellationToken)
+    {
+        Attempt<int> idAttempt = IdKeyMap.GetIdForKeyAsync(key, ContentObjectType).GetAwaiter().GetResult();
+        if (idAttempt.Success == false)
+        {
+            return Task.FromResult(Attempt.Fail(ContentRollbackOperationStatus.ContentNotFound));
+        }
+
+        int userId = _userIdKeyResolver.GetAsync(userKey).GetAwaiter().GetResult();
+        OperationResult result = Rollback(idAttempt.Result, versionId, culture, userId);
+
+        return Task.FromResult(result.Result switch
+        {
+            OperationResultType.Success => Attempt.Succeed(ContentRollbackOperationStatus.Success),
+            OperationResultType.FailedCancelledByEvent => Attempt.Fail(ContentRollbackOperationStatus.CancelledByNotification),
+            OperationResultType.FailedCannot => Attempt.Fail(ContentRollbackOperationStatus.ContentNotFound),
+            _ => Attempt.Fail(ContentRollbackOperationStatus.SaveFailed),
+        });
     }
 
     /// <inheritdoc />

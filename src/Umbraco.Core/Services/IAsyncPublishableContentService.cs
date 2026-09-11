@@ -84,6 +84,17 @@ public interface IAsyncPublishableContentService<TContent> : IAsyncContentServic
     Task<Attempt<ContentDeleteOperationStatus>> DeleteAsync(TContent content, int? userId, CancellationToken cancellationToken);
 
     /// <summary>
+    ///     Rolls content back to a prior version.
+    /// </summary>
+    /// <param name="key">The Guid key of the content to roll back.</param>
+    /// <param name="versionId">The version id to roll back to.</param>
+    /// <param name="culture">The culture to roll back, or "*" for all cultures.</param>
+    /// <param name="userKey">The Guid key of the user performing the action.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>An attempt carrying the operation status.</returns>
+    Task<Attempt<ContentRollbackOperationStatus>> RollbackAsync(Guid key, int versionId, string culture, Guid userKey, CancellationToken cancellationToken);
+
+    /// <summary>
     ///     Gets a version of content.
     /// </summary>
     /// <remarks>

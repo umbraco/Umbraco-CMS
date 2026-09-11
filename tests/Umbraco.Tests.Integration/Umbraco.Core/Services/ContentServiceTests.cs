@@ -3604,6 +3604,40 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     }
 
     [Test]
+    public async Task RollbackAsync_Reverts_Content_To_Prior_Version()
+    {
+        // A document can only be published once its ancestor path is published too.
+        var parent = await ContentService.GetByIdAsync(Textpage.Key, CancellationToken.None);
+        await ContentService.SaveAsync(parent, null, null, CancellationToken.None);
+        ContentService.Publish(parent, parent.AvailableCultures.ToArray());
+
+        var content = await ContentService.GetByIdAsync(Subpage.Key, CancellationToken.None);
+        content.SetValue("author", "Francis Doe");
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        PublishResult publishResult = ContentService.Publish(content, content.AvailableCultures.ToArray());
+        Assert.IsTrue(publishResult.Success, publishResult.Result.ToString());
+
+        // The currently-published version - a stable rollback target as long as it isn't superseded by a
+        // further publish (only Save is called below, so the draft diverges but the publish stays put).
+        var publishedVersionId = (await ContentService.GetByIdAsync(Subpage.Key, CancellationToken.None)).PublishedVersionId;
+
+        content.SetValue("author", "Jane Doe");
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        Assert.AreEqual("Jane Doe", (await ContentService.GetByIdAsync(Subpage.Key, CancellationToken.None)).GetValue<string>("author"));
+
+        Attempt<ContentRollbackOperationStatus> rollbackResult = await ContentService.RollbackAsync(Subpage.Key, publishedVersionId, "*", Constants.Security.SuperUserKey, CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(rollbackResult.Success);
+            Assert.AreEqual(ContentRollbackOperationStatus.Success, rollbackResult.Result);
+        });
+
+        var reloaded = await ContentService.GetByIdAsync(Subpage.Key, CancellationToken.None);
+        Assert.AreEqual("Francis Doe", reloaded.GetValue<string>("author"));
+    }
+
+    [Test]
     [LongRunning]
     public async Task Can_Rollback_Version_On_Multilingual()
     {

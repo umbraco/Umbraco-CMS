@@ -230,70 +230,49 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
 
     #region Rollback
 
-    /// <inheritdoc/>
-    public OperationResult Rollback(int id, int versionId, string culture = "*", int userId = Constants.Security.SuperUserId)
+    /// <inheritdoc />
+    public async Task<Attempt<ContentRollbackOperationStatus>> RollbackAsync(Guid key, int versionId, string culture, Guid userKey, CancellationToken cancellationToken)
     {
-        EventMessages evtMsgs = EventMessagesFactory.Get();
+        EventMessages eventMessages = EventMessagesFactory.Get();
 
-        // Get the current copy of the node
-        Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForIdAsync(id, ContentObjectType).GetAwaiter().GetResult();
-        TContent? content = keyAttempt.Success
-            ? GetByIdAsync(keyAttempt.Result, CancellationToken.None).GetAwaiter().GetResult()
-            : null;
+        TContent? content = await GetByIdAsync(key, cancellationToken);
+        TContent? version = await GetVersionAsync(versionId, cancellationToken);
 
-        // Get the version
-        TContent? version = GetVersionAsync(versionId, CancellationToken.None).GetAwaiter().GetResult();
-
-        // Good old null checks
-        if (content == null || version == null || content.Trashed)
+        if (content is null || version is null || content.Trashed)
         {
-            return new OperationResult(OperationResultType.FailedCannot, evtMsgs);
+            return Attempt.Fail(ContentRollbackOperationStatus.ContentNotFound);
         }
 
-        // Store the result of doing the save of content for the rollback
-        Attempt<ContentSaveOperationStatus> rollbackSaveResult;
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        var rollingBackNotification = RollingBackNotification(content, eventMessages);
+        if (await scope.Notifications.PublishCancelableAsync(rollingBackNotification))
         {
-            var rollingBackNotification = RollingBackNotification(content, evtMsgs);
-            if (scope.Notifications.PublishCancelable(rollingBackNotification))
-            {
-                scope.Complete();
-                return OperationResult.Cancel(evtMsgs);
-            }
-
-            // Copy the changes from the version
-            content.CopyFrom(version, culture);
-
-            // Save the content for the rollback
-            rollbackSaveResult = SaveAsync(content, userId, null, CancellationToken.None).GetAwaiter().GetResult();
-
-            // Depending on the save result - is what we log & audit along with what we return
-            if (rollbackSaveResult.Success == false)
-            {
-                // Log the error/warning
-                Logger.LogError(
-                    "User '{UserId}' was unable to rollback content '{ContentId}' to version '{VersionId}'", userId, id, versionId);
-            }
-            else
-            {
-                scope.Notifications.Publish(RolledBackNotification(content, evtMsgs).WithStateFrom(rollingBackNotification));
-
-                // Logging & Audit message
-                Logger.LogInformation("User '{UserId}' rolled back content '{ContentId}' to version '{VersionId}'", userId, id, versionId);
-                Audit(AuditType.RollBack, userId, id, $"Content '{content.Name}' was rolled back to version '{versionId}'");
-            }
-
             scope.Complete();
+            return Attempt.Fail(ContentRollbackOperationStatus.CancelledByNotification);
         }
 
-        OperationResultType rollbackResultType = rollbackSaveResult.Result switch
+        content.CopyFrom(version, culture);
+
+        int userId = await _userIdKeyResolver.GetAsync(userKey);
+        Attempt<ContentSaveOperationStatus> saveResult = await SaveAsync(content, userId, null, cancellationToken);
+
+        if (saveResult.Success)
         {
-            ContentSaveOperationStatus.Success => OperationResultType.Success,
-            ContentSaveOperationStatus.CancelledByNotification => OperationResultType.FailedCancelledByEvent,
-            _ => OperationResultType.FailedCannot,
-        };
-        return new OperationResult(rollbackResultType, evtMsgs);
+            scope.Notifications.Publish(RolledBackNotification(content, eventMessages).WithStateFrom(rollingBackNotification));
+            await AuditAsync(AuditType.RollBack, userId, content.Id, $"Content '{content.Name}' was rolled back to version '{versionId}'");
+        }
+        else
+        {
+            Logger.LogError(
+                "User '{UserId}' was unable to rollback content '{ContentId}' to version '{VersionId}'", userId, content.Id, versionId);
+        }
+
+        scope.Complete();
+
+        return saveResult.Success
+            ? Attempt.Succeed(ContentRollbackOperationStatus.Success)
+            : Attempt.Fail(ContentRollbackOperationStatus.SaveFailed);
     }
 
     #endregion

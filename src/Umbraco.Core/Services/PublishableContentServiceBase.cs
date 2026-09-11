@@ -215,7 +215,9 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
 
     #region Rollback
 
-    /// <inheritdoc/>
+    // No longer an interface member (retired from IPublishableContentService<TContent> in favour of
+    // RollbackAsync) — kept as a plain method because ElementService.RollbackAsync bridges to it
+    // until Element has its own async repository.
     public OperationResult Rollback(int id, int versionId, string culture = "*", int userId = Constants.Security.SuperUserId)
     {
         EventMessages evtMsgs = EventMessagesFactory.Get();

@@ -93,17 +93,8 @@ public interface IPublishableContentService<TContent> : IContentServiceBase
     /// </remarks>
     PublishResult Unpublish(TContent content, string? culture = "*", int userId = Constants.Security.SuperUserId);
 
-    /// <summary>
-    ///     Rolls back the content to a specific version.
-    /// </summary>
-    /// <param name="id">The id of the content node.</param>
-    /// <param name="versionId">The version id to roll back to.</param>
-    /// <param name="culture">An optional culture to roll back.</param>
-    /// <param name="userId">The identifier of the user who is performing the roll back.</param>
-    /// <remarks>
-    ///     <para>When no culture is specified, all cultures are rolled back.</para>
-    /// </remarks>
-    OperationResult Rollback(int id, int versionId, string culture = "*", int userId = Constants.Security.SuperUserId);
+    // Rollback(int, int, string, int) has been retired from this interface in favour of the async
+    // RollbackAsync (declared on IAsyncPublishableContentService<TContent>).
 
     /// <summary>
     ///     Publishes and unpublishes scheduled content.

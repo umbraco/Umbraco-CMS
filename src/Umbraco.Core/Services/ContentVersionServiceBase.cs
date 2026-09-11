@@ -137,28 +137,20 @@ internal abstract class ContentVersionServiceBase<TContent>
             return Attempt<ContentVersionOperationStatus>.Fail(ContentVersionOperationStatus.NotFound);
         }
 
-        OperationResult rollBackResult = _contentService.Rollback(
-            version.ContentId,
+        Guid key = _entityService.GetKey(version.ContentId, ItemObjectType).Result;
+
+        Attempt<ContentRollbackOperationStatus> rollBackResult = await _asyncContentService.RollbackAsync(
+            key,
             version.VersionId,
             culture ?? "*",
-            await _userIdKeyResolver.GetAsync(userKey));
+            userKey,
+            CancellationToken.None);
 
-        if (rollBackResult.Success)
-        {
-            return Attempt<ContentVersionOperationStatus>.Succeed(ContentVersionOperationStatus.Success);
-        }
-
-        switch (rollBackResult.Result)
-        {
-            case OperationResultType.Failed:
-            case OperationResultType.FailedCannot:
-            case OperationResultType.FailedExceptionThrown:
-            case OperationResultType.NoOperation:
-            default:
-                return Attempt<ContentVersionOperationStatus>.Fail(ContentVersionOperationStatus.RollBackFailed);
-            case OperationResultType.FailedCancelledByEvent:
-                return Attempt<ContentVersionOperationStatus>.Fail(ContentVersionOperationStatus.RollBackCanceled);
-        }
+        return rollBackResult.Success
+            ? Attempt<ContentVersionOperationStatus>.Succeed(ContentVersionOperationStatus.Success)
+            : Attempt<ContentVersionOperationStatus>.Fail(rollBackResult.Result == ContentRollbackOperationStatus.CancelledByNotification
+                ? ContentVersionOperationStatus.RollBackCanceled
+                : ContentVersionOperationStatus.RollBackFailed);
     }
 
     private IEnumerable<ContentVersionMeta> HandleGetPagedContentVersions(
