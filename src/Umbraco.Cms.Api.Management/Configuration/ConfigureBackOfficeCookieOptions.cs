@@ -167,7 +167,7 @@ public class ConfigureBackOfficeCookieOptions : IConfigureNamedOptions<CookieAut
                     ctx.Properties.IssuedUtc = now;
                     ctx.Properties.ExpiresUtc = now.Add(_globalSettings.TimeOut);
                 }
-                else if (ctx.Principal != null)
+                else if (ctx.Principal is not null)
                 {
                     // No stamp re-validation happened this request (the ValidationInterval hasn't
                     // elapsed yet), but any request bearing a valid principal should still refresh the
