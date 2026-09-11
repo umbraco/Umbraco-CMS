@@ -1,10 +1,10 @@
-import type { UmbStructureItemModel } from './types.js';
 import { UMB_MENU_STRUCTURE_WORKSPACE_CONTEXT } from './menu-structure-workspace-context.context-token.js';
 import type { UmbMenuStructureWorkspaceContext } from './menu-structure-workspace-context.interface.js';
-import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
+import type { UmbStructureItemModel } from './types.js';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbParentEntityContext } from '@umbraco-cms/backoffice/entity';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
  * Base class for a menu structure workspace context for an entity that is organized as a flat
@@ -17,19 +17,15 @@ export abstract class UmbMenuListStructureWorkspaceContextBase
 	extends UmbContextBase
 	implements UmbMenuStructureWorkspaceContext
 {
-	#structure = new UmbArrayState<UmbStructureItemModel>([], (x) => x.unique);
+	readonly #structure = new UmbArrayState<UmbStructureItemModel>([], (x) => x.unique);
 	public readonly structure = this.#structure.asObservable();
 
-	#parentContext = new UmbParentEntityContext(this);
+	readonly #parentContext = new UmbParentEntityContext(this);
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_MENU_STRUCTURE_WORKSPACE_CONTEXT);
 		// 'UmbMenuStructureWorkspaceContext' is Obsolete, will be removed in v.18
 		this.provideContext('UmbMenuStructureWorkspaceContext', this);
-	}
-
-	getItemHref(_structureItem: UmbStructureItemModel): string | undefined {
-		return undefined;
 	}
 
 	/**
