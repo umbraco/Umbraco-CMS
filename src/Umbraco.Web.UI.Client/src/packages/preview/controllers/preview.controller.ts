@@ -39,36 +39,63 @@ export class UmbPreviewController extends UmbControllerBase {
 	 * @param {string} args.unique - The unique identifier of the document to preview.
 	 * @param {string | null | undefined} args.culture - The culture to preview, or null/undefined for the default culture.
 	 * @param {string | null | undefined} args.segment - The segment to preview, or null/undefined for no segment.
+	 * @param {WindowProxy | null} [previewWindow] - A window opened synchronously during the user gesture. Safari only
+	 * allows `window.open` from within the gesture's synchronous call stack, and resolving the preview URL takes
+	 * several awaits, so callers reached from a click must open the tab up front and hand it over here (#22626).
 	 * @returns {Promise<void>} Resolves once the preview window has been opened or focused.
 	 * @memberof UmbPreviewController
 	 */
-	async preview(args: UmbPreviewControllerArgs) {
+	async preview(args: UmbPreviewControllerArgs, previewWindow?: WindowProxy | null) {
 		// If a preview window is still open for the same document + provider, just focus it and let
 		// SignalR handle the refresh. This only holds for internal preview URLs; external URLs (custom
 		// URL providers, e.g. headless setups) have no SignalR connection back to the backoffice, so we
 		// must always re-request the URL — to obtain a fresh preview token — and reload the tab. See #21820.
 		if (!this.#previewIsExternal && this.#tryFocusExistingWindow(args)) {
+			// Opening by the document's target name reuses the existing tab, in which case the handed-over
+			// window *is* the one we just focused — closing it would shut the preview the user asked for.
+			if (previewWindow && previewWindow !== this.#previewWindow) {
+				previewWindow.close();
+			}
 			return;
 		}
 
-		const previewUrlData = await this.#previewRepository.getPreviewUrl(
-			args.unique,
-			args.urlProviderAlias,
-			args.culture ?? undefined,
-			args.segment ?? undefined,
-		);
+		let previewUrlData;
+		try {
+			previewUrlData = await this.#previewRepository.getPreviewUrl(
+				args.unique,
+				args.urlProviderAlias,
+				args.culture ?? undefined,
+				args.segment ?? undefined,
+			);
+		} catch (error) {
+			previewWindow?.close();
+			throw error;
+		}
 
 		if (previewUrlData.url) {
 			// Add cache-busting parameter to ensure the preview tab reloads with the new preview session
 			const previewUrl = new URL(previewUrlData.url, window.document.baseURI);
 			previewUrl.searchParams.set('rnd', Date.now().toString());
-			// Reusing the same window target reloads the already-open tab in place for external URLs.
-			this.#previewWindow = window.open(previewUrl.toString(), `umbpreview-${args.unique}`);
+			const target = `umbpreview-${args.unique}`;
+
+			if (previewWindow) {
+				// Adopt the tab opened during the user gesture, naming it so later previews of the same
+				// document reuse it exactly as window.open(url, target) would have.
+				previewWindow.name = target;
+				previewWindow.location.replace(previewUrl.toString());
+				this.#previewWindow = previewWindow;
+			} else {
+				// Reusing the same window target reloads the already-open tab in place for external URLs.
+				this.#previewWindow = window.open(previewUrl.toString(), target);
+			}
+
 			this.#previewWindowKey = this.#windowKey(args);
 			this.#previewIsExternal = previewUrlData.isExternal;
 			this.#previewWindow?.focus();
 			return;
 		}
+
+		previewWindow?.close();
 
 		if (!previewUrlData.message) {
 			return;

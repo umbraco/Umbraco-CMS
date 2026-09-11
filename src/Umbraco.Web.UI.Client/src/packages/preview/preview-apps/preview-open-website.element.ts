@@ -5,8 +5,18 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 @customElement('umb-preview-open-website')
 export class UmbPreviewOpenWebsiteElement extends UmbLitElement {
 	async #onClick() {
+		// Opened before the first await so it stays inside the click's synchronous call stack, which is
+		// the only place Safari permits window.open(). The context adopts or closes it (#22626).
+		const websiteWindow = window.open('', '_blank');
+
 		const previewContext = await this.getContext(UMB_PREVIEW_CONTEXT);
-		await previewContext?.openWebsite();
+
+		if (!previewContext) {
+			websiteWindow?.close();
+			return;
+		}
+
+		await previewContext.openWebsite(websiteWindow);
 	}
 
 	override render() {
