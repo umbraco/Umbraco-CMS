@@ -51,7 +51,7 @@ public class CreateDocumentBlueprintFromDocumentControllerTests
         => new() { ExpectedStatusCode = HttpStatusCode.Created };
 
     protected override UserGroupAssertionModel EditorUserGroupAssertionModel
-        => new() { ExpectedStatusCode = HttpStatusCode.Created };
+        => new() { ExpectedStatusCode = HttpStatusCode.Forbidden };
 
     protected override UserGroupAssertionModel SensitiveDataUserGroupAssertionModel
         => new() { ExpectedStatusCode = HttpStatusCode.Forbidden };
@@ -59,8 +59,6 @@ public class CreateDocumentBlueprintFromDocumentControllerTests
     protected override UserGroupAssertionModel TranslatorUserGroupAssertionModel
         => new() { ExpectedStatusCode = HttpStatusCode.Forbidden };
 
-    // Unlike the other blueprint endpoints, this one also authorizes the source document against
-    // ActionCreateBlueprintFromContent, which writers are not granted.
     protected override UserGroupAssertionModel WriterUserGroupAssertionModel
         => new() { ExpectedStatusCode = HttpStatusCode.Forbidden };
 
