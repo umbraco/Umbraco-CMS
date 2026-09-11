@@ -1097,11 +1097,6 @@ export class UiBaseLocators extends BasePage {
     await this.clickTreeItemWithName(settingsTreeItemName);
   }
 
-  async goToLibraryTreeItem(libraryTreeItemName: string) {
-    await this.goToSection(ConstantHelper.sections.library);
-    await this.clickTreeItemWithName(libraryTreeItemName);
-  }
-
   async goToWorkspacePath(path: string) {
     await this.page.goto(`${this.page.url()}${path}`);
   }
