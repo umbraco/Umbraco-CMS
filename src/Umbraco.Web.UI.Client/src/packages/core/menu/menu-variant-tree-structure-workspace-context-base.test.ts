@@ -1,11 +1,13 @@
 import { UmbMenuVariantTreeStructureWorkspaceContextBase } from './menu-variant-tree-structure-workspace-context-base.js';
 import {
 	UmbTestMenuVariantStructureControllerHostElement,
+	UmbTestSectionSidebarMenuContext,
 	UmbTestSubmittableTreeEntityWorkspaceContext,
 	UmbTestVariantTreeRepository,
 	createTestVariantAncestorItem,
 	createTestVariantTreeRepositoryManifest,
 } from './menu-variant-tree-structure-workspace-context.test-utils.js';
+import { UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT } from './section-sidebar-menu/index.js';
 import { UMB_ANCESTORS_ENTITY_CONTEXT, UMB_PARENT_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
 import { aTimeout, expect } from '@open-wc/testing';
 import { UmbActionEventContext } from '@umbraco-cms/backoffice/action';
@@ -39,6 +41,7 @@ describe('UmbMenuVariantTreeStructureWorkspaceContextBase', () => {
 
 	beforeEach(async () => {
 		UmbTestVariantTreeRepository.reset();
+		UmbTestSectionSidebarMenuContext.reset();
 
 		host = new UmbTestMenuVariantStructureControllerHostElement();
 		document.body.appendChild(host);
@@ -46,10 +49,23 @@ describe('UmbMenuVariantTreeStructureWorkspaceContextBase', () => {
 		actionEventContext = new UmbActionEventContext(host);
 		workspaceContext = new UmbTestSubmittableTreeEntityWorkspaceContext(host);
 		new UmbContextProviderController(host, UMB_SUBMITTABLE_TREE_ENTITY_WORKSPACE_CONTEXT, workspaceContext as never);
+		new UmbContextProviderController(
+			host,
+			UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT,
+			new UmbTestSectionSidebarMenuContext(host) as never,
+		);
 
 		context = new TestMenuVariantTreeStructureWorkspaceContext(host);
+		context.manifest = {
+			type: 'workspaceContext',
+			kind: 'menuStructure',
+			alias: 'Umb.Test.MenuVariantStructureWorkspaceContext',
+			name: 'Test Menu Variant Structure Workspace Context',
+			meta: { menuItemAlias: 'test-menu-item' },
+		};
 
 		workspaceContext.setEntityType('test-entity-type');
+		workspaceContext.setIsNew(false);
 		workspaceContext.setUnique('test-unique');
 		await aTimeout(150);
 	});
@@ -182,6 +198,12 @@ describe('UmbMenuVariantTreeStructureWorkspaceContextBase', () => {
 		});
 	});
 
+	describe('expanding the sidebar menu', () => {
+		it('expands the resolved parent when opening an existing item', async () => {
+			expect(UmbTestSectionSidebarMenuContext.expandItemsCalls).to.have.lengthOf(1);
+		});
+	});
+
 	describe('destroy', () => {
 		it('stops reacting to reload-structure events once destroyed', async () => {
 			context.destroy();
@@ -194,5 +216,133 @@ describe('UmbMenuVariantTreeStructureWorkspaceContextBase', () => {
 
 			expect(UmbTestVariantTreeRepository.requestTreeItemAncestorsCalls).to.have.lengthOf(1);
 		});
+	});
+});
+
+describe('UmbMenuVariantTreeStructureWorkspaceContextBase (creating a new item)', () => {
+	let host: UmbTestMenuVariantStructureControllerHostElement;
+	let workspaceContext: UmbTestSubmittableTreeEntityWorkspaceContext;
+	let context: TestMenuVariantTreeStructureWorkspaceContext;
+
+	before(() => {
+		umbExtensionsRegistry.register(createTestVariantTreeRepositoryManifest(TEST_TREE_REPOSITORY_ALIAS));
+	});
+
+	after(() => {
+		umbExtensionsRegistry.unregister(TEST_TREE_REPOSITORY_ALIAS);
+	});
+
+	beforeEach(async () => {
+		UmbTestVariantTreeRepository.reset();
+		UmbTestSectionSidebarMenuContext.reset();
+
+		host = new UmbTestMenuVariantStructureControllerHostElement();
+		document.body.appendChild(host);
+
+		workspaceContext = new UmbTestSubmittableTreeEntityWorkspaceContext(host);
+		new UmbContextProviderController(host, UMB_SUBMITTABLE_TREE_ENTITY_WORKSPACE_CONTEXT, workspaceContext as never);
+		new UmbContextProviderController(
+			host,
+			UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT,
+			new UmbTestSectionSidebarMenuContext(host) as never,
+		);
+
+		context = new TestMenuVariantTreeStructureWorkspaceContext(host);
+		context.manifest = {
+			type: 'workspaceContext',
+			kind: 'menuStructure',
+			alias: 'Umb.Test.MenuVariantStructureWorkspaceContext.Create',
+			name: 'Test Menu Variant Structure Workspace Context (create)',
+			meta: { menuItemAlias: 'test-menu-item' },
+		};
+
+		// Simulate opening a "Create X under Y" workspace before any save: isNew is already true,
+		// and the item already has a client-generated unique.
+		workspaceContext.setEntityType('test-entity-type');
+		workspaceContext.setIsNew(true);
+		workspaceContext.setCreateUnderParent({ unique: 'parent-unique', entityType: 'test-entity-type' });
+		workspaceContext.setUnique('new-item-unique');
+		await aTimeout(150);
+	});
+
+	afterEach(() => {
+		context.destroy();
+		document.body.removeChild(host);
+	});
+
+	it('does not expand the parent while the workspace is still in create mode', async () => {
+		expect(UmbTestSectionSidebarMenuContext.expandItemsCalls).to.have.lengthOf(0);
+	});
+
+	it('expands the parent once the item has been saved', async () => {
+		workspaceContext.setIsNew(false);
+		await aTimeout(150);
+
+		expect(UmbTestSectionSidebarMenuContext.expandItemsCalls).to.have.lengthOf(1);
+	});
+});
+
+describe('UmbMenuVariantTreeStructureWorkspaceContextBase (isNew resolves after the structure has already loaded)', () => {
+	let host: UmbTestMenuVariantStructureControllerHostElement;
+	let workspaceContext: UmbTestSubmittableTreeEntityWorkspaceContext;
+	let context: TestMenuVariantTreeStructureWorkspaceContext;
+
+	before(() => {
+		umbExtensionsRegistry.register(createTestVariantTreeRepositoryManifest(TEST_TREE_REPOSITORY_ALIAS));
+	});
+
+	after(() => {
+		umbExtensionsRegistry.unregister(TEST_TREE_REPOSITORY_ALIAS);
+	});
+
+	beforeEach(async () => {
+		UmbTestVariantTreeRepository.reset();
+		UmbTestSectionSidebarMenuContext.reset();
+
+		host = new UmbTestMenuVariantStructureControllerHostElement();
+		document.body.appendChild(host);
+
+		workspaceContext = new UmbTestSubmittableTreeEntityWorkspaceContext(host);
+		new UmbContextProviderController(host, UMB_SUBMITTABLE_TREE_ENTITY_WORKSPACE_CONTEXT, workspaceContext as never);
+		new UmbContextProviderController(
+			host,
+			UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT,
+			new UmbTestSectionSidebarMenuContext(host) as never,
+		);
+
+		context = new TestMenuVariantTreeStructureWorkspaceContext(host);
+		context.manifest = {
+			type: 'workspaceContext',
+			kind: 'menuStructure',
+			alias: 'Umb.Test.MenuVariantStructureWorkspaceContext.Race',
+			name: 'Test Menu Variant Structure Workspace Context (isNew resolves late)',
+			meta: { menuItemAlias: 'test-menu-item' },
+		};
+
+		// A workspace context that publishes `unique` before `isNew` has resolved (e.g. a slow detail request) -
+		// the structure fetch runs and completes while `isNew` is still undefined.
+		workspaceContext.setEntityType('test-entity-type');
+		workspaceContext.setUnique('test-unique');
+		await aTimeout(150);
+	});
+
+	afterEach(() => {
+		context.destroy();
+		document.body.removeChild(host);
+	});
+
+	it('fetches the structure but does not expand while isNew is still unresolved', async () => {
+		expect(UmbTestVariantTreeRepository.requestTreeItemAncestorsCalls).to.have.lengthOf(1);
+		expect(UmbTestSectionSidebarMenuContext.expandItemsCalls).to.have.lengthOf(0);
+	});
+
+	it('expands once isNew resolves to false, without re-fetching the structure', async () => {
+		const requestCountBeforeIsNewResolves = UmbTestVariantTreeRepository.requestTreeItemAncestorsCalls.length;
+
+		workspaceContext.setIsNew(false);
+		await aTimeout(150);
+
+		expect(UmbTestSectionSidebarMenuContext.expandItemsCalls).to.have.lengthOf(1);
+		expect(UmbTestVariantTreeRepository.requestTreeItemAncestorsCalls).to.have.lengthOf(requestCountBeforeIsNewResolves);
 	});
 });
