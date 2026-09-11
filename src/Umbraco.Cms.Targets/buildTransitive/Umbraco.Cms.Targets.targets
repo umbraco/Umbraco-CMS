@@ -7,26 +7,40 @@
     <Content Update="appsettings-schema.*.json">
       <DependentUpon>appsettings-schema.json</DependentUpon>
     </Content>
+    <Content Update="umbraco-package-schema.*.json">
+      <DependentUpon>umbraco-package-schema.json</DependentUpon>
+    </Content>
   </ItemGroup>
 
-  <!-- Copy JSON schema files into the project directory -->
+  <!-- Copy appsettings.json and umbraco-package.json schema files into the project directory -->
   <Target Name="CopyUmbracoJsonSchemaFiles" BeforeTargets="Build">
-    <Message Text="Copying JSON schema files into project directory: @(UmbracoJsonSchemaFiles->'%(Filename)%(Extension)')" Importance="high" />
+    <Message Text="Copying appsettings.json schema files into project directory: @(UmbracoJsonSchemaFiles->'%(Filename)%(Extension)')" Importance="high" />
     <Copy SourceFiles="@(UmbracoJsonSchemaFiles)" DestinationFolder="$(MSBuildProjectDirectory)" SkipUnchangedFiles="true" />
 
-    <Message Text="Copying JSON schema files into project directory: @(UmbracoPackageSchemaFiles->'%(Filename)%(Extension)')" Importance="high" />
+    <Message Text="Copying umbraco-package.json schema files into project directory: @(UmbracoPackageSchemaFiles->'%(Filename)%(Extension)')" Importance="high" />
     <Copy SourceFiles="@(UmbracoPackageSchemaFiles)" DestinationFolder="$(MSBuildProjectDirectory)" SkipUnchangedFiles="true" />
   </Target>
 
-  <!-- Add references to the JSON schema in the project directory -->
   <UsingTask TaskName="JsonSchemaAddReferences" AssemblyFile="$(MSBuildThisFileDirectory)..\tasks\netstandard2.0\Umbraco.JsonSchema.Extensions.dll" />
+
+  <!-- Add references to the appsettings-schema.json file in the project directory -->
   <Target Name="AddUmbracoJsonSchemaReferences" BeforeTargets="Build" DependsOnTargets="CopyUmbracoJsonSchemaFiles">
     <ItemGroup>
-      <!-- Include references to JSON schema files that are copied into the project directory (if they aren't already referenced and didn't opt-out) -->
+      <!-- Include references to schema files that are copied into the project directory (if they aren't already referenced and didn't opt-out) -->
       <UmbracoJsonSchemaReferences Include="@(UmbracoJsonSchemaFiles->'%(Filename)%(Extension)#')" Exclude="@(UmbracoJsonSchemaReferences)" Condition="'%(UmbracoJsonSchemaFiles.Reference)' != 'false'" />
     </ItemGroup>
-    <Message Text="Adding JSON schema references to appsettings-schema.json: @(UmbracoJsonSchemaReferences)" Importance="high" />
+    <Message Text="Adding schema references to appsettings-schema.json: @(UmbracoJsonSchemaReferences)" Importance="high" />
     <JsonSchemaAddReferences JsonSchemaFile="$(MSBuildProjectDirectory)\appsettings-schema.json" References="@(UmbracoJsonSchemaReferences)" />
+  </Target>
+
+  <!-- Add references to the umbraco-package-schema.json file in the project directory -->
+  <Target Name="AddUmbracoPackageSchemaReferences" BeforeTargets="Build" DependsOnTargets="CopyUmbracoJsonSchemaFiles">
+    <ItemGroup>
+      <!-- Include references to package schema fragments copied into the project directory (if they aren't already referenced and didn't opt-out) -->
+      <UmbracoPackageSchemaReferences Include="@(UmbracoPackageSchemaFiles->'%(Filename)%(Extension)#')" Exclude="@(UmbracoPackageSchemaReferences)" Condition="'%(UmbracoPackageSchemaFiles.Reference)' != 'false'" />
+    </ItemGroup>
+    <Message Text="Adding schema references to umbraco-package-schema.json: @(UmbracoPackageSchemaReferences)" Importance="high" />
+    <JsonSchemaAddReferences JsonSchemaFile="$(MSBuildProjectDirectory)\umbraco-package-schema.json" References="@(UmbracoPackageSchemaReferences)" TargetPath="$.properties.extensions.items" Combinator="anyOf" />
   </Target>
 
   <!-- Include App_Plugins content in output/publish directories -->

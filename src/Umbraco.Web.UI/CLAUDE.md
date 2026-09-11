@@ -59,8 +59,9 @@ Umbraco.Web.UI/
 ├── appsettings.template.json                # Template for new installs
 ├── appsettings.Development.template.json    # Dev template
 ├── appsettings-schema.json                  # JSON schema reference
-├── appsettings-schema.Umbraco.Cms.json      # Full Umbraco schema (71KB)
-├── umbraco-package-schema.json              # Package manifest schema (495KB)
+├── appsettings-schema.Umbraco.Cms.json      # Full Umbraco CMS appsettings schema
+├── umbraco-package-schema.json              # JSON schema reference
+├── umbraco-package-schema.Umbraco.Cms.json  # Full Umbraco CMS package manifest schema
 ├── Program.cs                               # Application entry point (33 lines)
 └── Umbraco.Web.UI.csproj                    # Project file (75 lines)
 ```
