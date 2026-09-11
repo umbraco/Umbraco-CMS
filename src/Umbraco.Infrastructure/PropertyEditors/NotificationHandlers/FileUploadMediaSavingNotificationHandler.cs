@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
+using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Extensions;
 
@@ -27,13 +28,15 @@ internal sealed class FileUploadMediaSavingNotificationHandler : FileUploadNotif
     /// <param name="elementTypeCache">Caches block editor element types for efficient access during media processing.</param>
     /// <param name="contentSettings">Provides access to content-related configuration settings.</param>
     /// <param name="uploadAutoFillProperties">Handles automatic population of media properties during file upload.</param>
+    /// <param name="propertyEditors">The collection of registered property editors.</param>
     public FileUploadMediaSavingNotificationHandler(
         IJsonSerializer jsonSerializer,
         MediaFileManager mediaFileManager,
         IBlockEditorElementTypeCache elementTypeCache,
         IOptionsMonitor<ContentSettings> contentSettings,
-        UploadAutoFillProperties uploadAutoFillProperties)
-        : base(jsonSerializer, mediaFileManager, elementTypeCache)
+        UploadAutoFillProperties uploadAutoFillProperties,
+        PropertyEditorCollection propertyEditors)
+        : base(jsonSerializer, mediaFileManager, elementTypeCache, propertyEditors)
     {
         _contentSettings = contentSettings;
         _uploadAutoFillProperties = uploadAutoFillProperties;
