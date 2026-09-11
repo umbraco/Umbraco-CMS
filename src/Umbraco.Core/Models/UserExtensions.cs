@@ -121,6 +121,10 @@ public static class UserExtensions
     /// <summary>
     ///     Determines whether the user has access to the document blueprint root.
     /// </summary>
+    /// <param name="user">The user.</param>
+    /// <param name="entityService">The entity service.</param>
+    /// <param name="appCaches">The application caches.</param>
+    /// <returns>True if the user has access to the document blueprint root; otherwise false.</returns>
     internal static bool HasDocumentBlueprintRootAccess(this IUser user, IEntityService entityService, AppCaches appCaches) =>
         ContentPermissions.HasPathAccessWithoutRecycleBin(
             Constants.System.RootString,

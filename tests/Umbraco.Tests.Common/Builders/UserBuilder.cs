@@ -286,7 +286,7 @@ public class UserBuilder<TParent>
             StartContentIds = startContentIds,
             StartMediaIds = startMediaIds,
             StartElementIds = startElementIds,
-            StartDocumentBlueprintIds = startDocumentBlueprintIds
+            StartDocumentBlueprintIds = startDocumentBlueprintIds,
         };
         foreach (var readOnlyUserGroup in groups)
         {
