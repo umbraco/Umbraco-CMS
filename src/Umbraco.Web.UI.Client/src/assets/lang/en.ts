@@ -1897,6 +1897,9 @@ export default {
 			'A Document Type cannot be changed to an Element Type once it has been used to create one or more content items.',
 		elementDoesNotSupport: 'This is not applicable for an Element Type',
 		propertyHasChanges: 'You have made changes to this property. Are you sure you want to discard them?',
+		confirmPropertyAliasChangeHeadline: 'Change property alias',
+		confirmPropertyAliasChangeMessage:
+			'Content based on element types is stored by alias, so any content stored for <strong>%0%</strong> under <strong>%1%</strong> will be lost when you save.',
 		displaySettingsHeadline: 'Appearance',
 		displaySettingsLabelOnLeft: 'Label to the left',
 		displaySettingsLabelOnTop: 'Label above (full-width)',
