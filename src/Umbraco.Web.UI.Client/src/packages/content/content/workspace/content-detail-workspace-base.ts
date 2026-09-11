@@ -63,7 +63,7 @@ import type { UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
 import type { UmbPropertyTypePresetModel, UmbPropertyTypePresetModelTypeModel } from '@umbraco-cms/backoffice/property';
 import type { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 import type { UmbSegmentModel } from '@umbraco-cms/backoffice/segment';
-import { UmbEntryAppendValue } from '../utils/index.js';
+import { umbEntryAppendValue } from '../utils/index.js';
 
 export interface UmbContentDetailWorkspaceContextArgs<
 	DetailModelType extends UmbContentDetailModel<VariantModelType>,
@@ -749,7 +749,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 
 			const currentData = this.getData();
 			if (currentData) {
-				const values: DetailModelType['values'] = UmbEntryAppendValue(
+				const values: DetailModelType['values'] = umbEntryAppendValue(
 					currentData.values ?? [],
 					entry,
 					(x) => x.alias === alias && variantId!.compare(x),

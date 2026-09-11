@@ -12,7 +12,7 @@ import { sortEntryValuesByCulture } from './sort-entry-values-by-culture.functio
  * @param {(entry: T) => unknown} getUniqueMethod - Method to retrieve the value that uniquely identifies an entry, used to find an existing match to replace.
  * @returns {Array<T>} A new array with the entry inserted or replacing its match.
  */
-export function UmbEntryAppendValue<T extends UmbEntryValueModel>(
+export function umbEntryAppendValue<T extends UmbEntryValueModel>(
 	data: Array<T>,
 	entry: T,
 	getUniqueMethod: (entry: T) => unknown,

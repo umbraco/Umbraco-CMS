@@ -10,7 +10,7 @@ import { UmbDocumentTypeDetailRepository } from '@umbraco-cms/backoffice/documen
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbValidationController } from '@umbraco-cms/backoffice/validation';
 import {
-	UmbEntryAppendValue,
+	umbEntryAppendValue,
 	UmbContentValidationToHintsManager,
 	UmbEntryWorkspaceDataManager,
 	umbExtractVariantValues,
@@ -272,7 +272,7 @@ export class UmbBlockElementManager<LayoutDataType extends UmbBlockLayoutBaseMod
 
 		const currentData = this.getData();
 		if (currentData) {
-			const values = UmbEntryAppendValue(
+			const values = umbEntryAppendValue(
 				currentData.values ?? [],
 				entry,
 				(x) => x.alias === alias && variantId!.compare(x),
