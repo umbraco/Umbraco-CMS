@@ -9,6 +9,7 @@ import { UmbEntityContext, type UmbEntityModel, type UmbEntityUnique } from '@um
 import { UMB_DISCARD_CHANGES_MODAL, umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import {
+	UmbEntityCreatedEvent,
 	UmbEntityUpdatedEvent,
 	UmbRequestReloadChildrenOfEntityEvent,
 	UmbRequestReloadStructureForEntityEvent,
@@ -379,6 +380,14 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		});
 
 		eventContext.dispatchEvent(reloadChildren);
+
+		const createdEvent = new UmbEntityCreatedEvent({
+			unique: data.unique,
+			entityType: this.getEntityType(),
+			eventUnique: this._workspaceEventUnique,
+		});
+
+		eventContext.dispatchEvent(createdEvent);
 	}
 
 	protected async _update(currentData: DetailModelType) {

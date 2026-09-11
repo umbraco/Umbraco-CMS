@@ -4,6 +4,8 @@ import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { useMockSet } from '@umbraco-cms/internal/mock-manager';
 import { UmbDocumentWorkspaceContext } from './document-workspace.context.js';
 import { TEST_MANIFESTS, UmbTestDocumentWorkspaceHostElement } from './document-workspace-context.test-utils.js';
+import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
+import { UmbEntityCreatedEvent, UmbEntityUpdatedEvent } from '@umbraco-cms/backoffice/entity-action';
 import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 
 const INVARIANT_DOCUMENT_ID = 'variant-documents-invariant-document-id';
@@ -103,6 +105,43 @@ describe('UmbDocumentWorkspaceContext (CRUD)', () => {
 		});
 	});
 
+	describe('create dispatches entity-created event', () => {
+		it('dispatches an entity-created event for the new document on save', async () => {
+			await context.create(PARENT_ENTITY, INVARIANT_DOCUMENT_TYPE_ID);
+			context.setName('New Test Document');
+			const unique = context.getUnique();
+
+			const eventContext = await context.getContext(UMB_ACTION_EVENT_CONTEXT);
+			let createdEvent: UmbEntityCreatedEvent | undefined;
+			eventContext!.addEventListener(UmbEntityCreatedEvent.TYPE, ((event: UmbEntityCreatedEvent) => {
+				createdEvent = event;
+			}) as EventListener);
+
+			await context.requestSave();
+
+			expect(createdEvent, 'entity-created event was not dispatched').to.exist;
+			expect(createdEvent!.getUnique()).to.equal(unique);
+			expect(createdEvent!.getEntityType()).to.equal('document');
+			// Invariant document: the single invariant variant is reported.
+			expect(createdEvent!.getVariantIds().map((v) => v.culture)).to.deep.equal([null]);
+		});
+
+		it('does not dispatch an entity-updated event on create', async () => {
+			await context.create(PARENT_ENTITY, INVARIANT_DOCUMENT_TYPE_ID);
+			context.setName('New Test Document');
+
+			const eventContext = await context.getContext(UMB_ACTION_EVENT_CONTEXT);
+			let updatedDispatched = false;
+			eventContext!.addEventListener(UmbEntityUpdatedEvent.TYPE, (() => {
+				updatedDispatched = true;
+			}) as EventListener);
+
+			await context.requestSave();
+
+			expect(updatedDispatched).to.be.false;
+		});
+	});
+
 	describe('update (save existing document)', () => {
 		beforeEach(async () => {
 			await context.load(INVARIANT_DOCUMENT_ID);
@@ -172,6 +211,23 @@ describe('UmbDocumentWorkspaceContext (CRUD)', () => {
 			const newContext = new UmbDocumentWorkspaceContext(hostElement);
 			await newContext.load(VARIANT_DOCUMENT_ID);
 			expect(newContext.getPropertyValue('variantText', da)).to.equal('Dette er den danske varianttekst.');
+		});
+
+		it('reports the saved culture on the entity-updated event', async () => {
+			const enUs = UmbVariantId.Create({ culture: 'en-US', segment: null });
+			await context.setPropertyValue('variantText', 'Updated en-US by test', enUs);
+
+			const eventContext = await context.getContext(UMB_ACTION_EVENT_CONTEXT);
+			let updatedEvent: UmbEntityUpdatedEvent | undefined;
+			eventContext!.addEventListener(UmbEntityUpdatedEvent.TYPE, ((event: UmbEntityUpdatedEvent) => {
+				updatedEvent = event;
+			}) as EventListener);
+
+			await context.requestSave();
+
+			expect(updatedEvent, 'entity-updated event was not dispatched').to.exist;
+			expect(updatedEvent!.getVariantIds().some((v) => v.culture === 'en-US')).to.be.true;
+			expect(updatedEvent!.getVariantIds().some((v) => v.culture === 'da')).to.be.false;
 		});
 	});
 
