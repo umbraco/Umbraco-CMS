@@ -75,16 +75,22 @@ describe('html-tag-div-container.tiptap-extension', () => {
 	});
 
 	it('preserves an umb-rte-block nested inside a div', () => {
-		editor.commands.setContent('<div><umb-rte-block data-content-key="key-1"></umb-rte-block></div>');
+		editor.commands.setContent(
+			'<div><umb-rte-block data-key="layout-1" data-content-key="content-1"></umb-rte-block></div>',
+		);
 
-		expect(editor.getHTML()).to.equal('<div><umb-rte-block data-content-key="key-1"></umb-rte-block></div>');
+		expect(editor.getHTML()).to.equal(
+			'<div><umb-rte-block data-key="layout-1" data-content-key="content-1"></umb-rte-block></div>',
+		);
 	});
 
 	it('falls through to the inline div for a div wrapping only an umb-rte-block-inline', () => {
-		editor.commands.setContent('<div><umb-rte-block-inline data-content-key="key-1"></umb-rte-block-inline></div>');
+		editor.commands.setContent(
+			'<div><umb-rte-block-inline data-key="layout-1" data-content-key="content-1"></umb-rte-block-inline></div>',
+		);
 
 		expect(editor.getHTML()).to.equal(
-			'<div><umb-rte-block-inline data-content-key="key-1"></umb-rte-block-inline></div>',
+			'<div><umb-rte-block-inline data-key="layout-1" data-content-key="content-1"></umb-rte-block-inline></div>',
 		);
 		// Both `div` and `divContainer` render as <div>, so assert on the parsed node type directly
 		// to confirm the inline div (not divContainer) claimed the element.
