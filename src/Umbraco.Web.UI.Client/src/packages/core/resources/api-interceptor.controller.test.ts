@@ -1,5 +1,5 @@
 import { UmbApiInterceptorController } from './api-interceptor.controller.js';
-import { expect } from '@open-wc/testing';
+import { expect, waitUntil } from '@open-wc/testing';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 import type { umbHttpClient } from '@umbraco-cms/backoffice/http-client';
@@ -112,5 +112,77 @@ describe('UmbApiInterceptorController', () => {
 		const result = await responseInterceptors[0](originalResponse, new Request('https://example.com'), {});
 
 		expect(result).to.equal(originalResponse);
+	});
+
+	describe('created (201) responses', () => {
+		const notificationsHeader = JSON.stringify([
+			{ category: 'BackOfficeNotifications', message: 'Saving Handler Message', type: 'Success' },
+		]);
+
+		function createdResponse() {
+			return new Response(null, {
+				status: 201,
+				headers: {
+					'Umb-Generated-Resource': 'a-key',
+					'Umb-Notifications': notificationsHeader,
+				},
+			});
+		}
+
+		it('preserves the Umb-Notifications header when moving the generated resource into the body', async () => {
+			controller.addUmbGeneratedResourceInterceptor(fakeClient);
+			const generatedResourceInterceptor = responseInterceptors[responseInterceptors.length - 1];
+
+			const result = await generatedResourceInterceptor(createdResponse(), new Request('https://example.com'), {});
+
+			expect(await result.text()).to.equal('a-key');
+			expect(result.headers.get('Umb-Notifications')).to.equal(notificationsHeader);
+		});
+
+		it('preserves "X-" headers when rewriting', async () => {
+			controller.addUmbGeneratedResourceInterceptor(fakeClient);
+			const generatedResourceInterceptor = responseInterceptors[responseInterceptors.length - 1];
+			const originalResponse = new Response(null, {
+				status: 201,
+				headers: { 'Umb-Generated-Resource': 'a-key', 'X-Correlation-Id': 'a-correlation-id' },
+			});
+
+			const result = await generatedResourceInterceptor(originalResponse, new Request('https://example.com'), {});
+
+			expect(result.headers.get('X-Correlation-Id')).to.equal('a-correlation-id');
+		});
+
+		it('notifies about event messages returned alongside a generated resource', async () => {
+			// Imported dynamically, as the interceptor itself does, to avoid a circular reference.
+			const { UmbNotificationContext } = await import('@umbraco-cms/backoffice/notification');
+			const notificationContext = new UmbNotificationContext(hostElement);
+
+			let notifications: Array<{ color: string; element: Element }> = [];
+			const subscription = notificationContext.notifications.subscribe((value) => (notifications = value));
+
+			// Registered in the same order as bindDefaultInterceptors, so the notifications interceptor sees
+			// the response rebuilt by the generated resource interceptor.
+			controller.addUmbGeneratedResourceInterceptor(fakeClient);
+			controller.addUmbNotificationsInterceptor(fakeClient);
+			const chain = responseInterceptors.slice(-2);
+
+			let response = createdResponse();
+			for (const interceptor of chain) {
+				response = await interceptor(response, new Request('https://example.com'), {});
+			}
+
+			await waitUntil(() => notifications.length === 1, 'Expected a notification to be shown');
+
+			const layout = notifications[0].element.firstElementChild as
+				| (Element & { data?: { message?: string } })
+				| null;
+			expect(layout?.data?.message).to.equal('Saving Handler Message');
+			expect(notifications[0].color).to.equal('positive');
+
+			// The notifications interceptor reports the messages but leaves the header in place.
+			expect(response.headers.get('Umb-Notifications')).to.equal(notificationsHeader);
+
+			subscription.unsubscribe();
+		});
 	});
 });
