@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Search;
 
 namespace Umbraco.Cms.Core.Services;

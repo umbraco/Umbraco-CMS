@@ -1,9 +1,8 @@
 using NUnit.Framework;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Search.Core;
-using Umbraco.Cms.Core.Search.Indexing;
 using Umbraco.Cms.Core.Notifications;
+using Umbraco.Cms.Core.Search.Indexing;
 using Umbraco.Cms.Tests.Integration.Testing.Search;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Cms.Search.Core;

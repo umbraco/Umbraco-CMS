@@ -1,4 +1,3 @@
-using System.Text.Json.Serialization;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.ServerEvents;
 using Umbraco.Cms.Api.Management.ServerEvents.AccessFilters;

@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using Umbraco.Cms.Api.Common.DependencyInjection;
 using Umbraco.Cms.Api.Delivery.Accessors;
@@ -28,7 +27,6 @@ using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Search.Indexing;
 using Umbraco.Cms.Infrastructure.Security;
 using Umbraco.Cms.Search.Core.DependencyInjection;
-using Umbraco.Cms.Web.Common.ApplicationBuilder;
 
 namespace Umbraco.Extensions;
 

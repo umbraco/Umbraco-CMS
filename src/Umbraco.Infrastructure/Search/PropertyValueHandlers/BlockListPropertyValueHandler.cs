@@ -1,10 +1,10 @@
 ﻿using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
-using Umbraco.Cms.Core.Serialization;
-using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Search.Indexing;
 using Umbraco.Cms.Core.Search.Indexing.Collection;
+using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Infrastructure.Search.PropertyValueHandlers;
 

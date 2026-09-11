@@ -10,10 +10,10 @@ using Umbraco.Cms.Search.Provider.Examine.Configuration;
 /// Describes this provider's own slice of the configuration tree, for generating its
 /// <c>appsettings-schema.Umbraco.Cms.Search.Examine.json</c> fragment at build time.
 /// </summary>
-internal sealed class UmbracoSearchExamineSchema
+internal sealed class UmbracoSearchExamineSchema // NOSONAR: deliberately global-namespaced, see comment above
 {
     /// <summary>
-    /// Gets the configuration for this provider.
+    /// Gets or sets the configuration for this provider.
     /// </summary>
     public required UmbracoDefinition Umbraco { get; set; }
 
@@ -23,7 +23,7 @@ internal sealed class UmbracoSearchExamineSchema
     public class UmbracoDefinition
     {
         /// <summary>
-        /// Gets the configuration of Umbraco CMS.
+        /// Gets or sets the configuration of Umbraco CMS.
         /// </summary>
         public required UmbracoCmsDefinition CMS { get; set; }
     }
@@ -34,7 +34,7 @@ internal sealed class UmbracoSearchExamineSchema
     public class UmbracoCmsDefinition
     {
         /// <summary>
-        /// Gets the configuration of Umbraco Search providers.
+        /// Gets or sets the configuration of Umbraco Search providers.
         /// </summary>
         public required SearchDefinition Search { get; set; }
     }
@@ -45,7 +45,7 @@ internal sealed class UmbracoSearchExamineSchema
     public class SearchDefinition
     {
         /// <summary>
-        /// Gets the configuration of the Examine search provider.
+        /// Gets or sets the configuration of the Examine search provider.
         /// </summary>
         public required ExamineSearchProviderSettings Examine { get; set; }
     }

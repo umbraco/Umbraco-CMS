@@ -10,6 +10,12 @@ namespace Umbraco.Cms.Core.Services;
 public abstract class IndexedSearchServiceBase
 {
     /// <summary>
+    /// Gets the default sorter: descending relevance score.
+    /// </summary>
+    /// <returns>A sorter that orders results by descending relevance score.</returns>
+    protected static Sorter DefaultSorter() => new ScoreSorter(Direction.Descending);
+
+    /// <summary>
     /// Builds the filters for a search query, extracting an ID or parent ID filter where applicable.
     /// </summary>
     /// <param name="query">The search query. If it parses as a GUID, an ID filter is used instead of a text query.</param>
@@ -36,9 +42,4 @@ public abstract class IndexedSearchServiceBase
 
         return filters;
     }
-
-    /// <summary>
-    /// Gets the default sorter: descending relevance score.
-    /// </summary>
-    protected static Sorter DefaultSorter() => new ScoreSorter(Direction.Descending);
 }

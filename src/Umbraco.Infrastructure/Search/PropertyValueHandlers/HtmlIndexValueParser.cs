@@ -1,13 +1,12 @@
 using System.Text.RegularExpressions;
 using HtmlAgilityPack;
 using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core.Search;
-using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Search.Indexing;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Search.PropertyValueHandlers;
 
+/// <inheritdoc />
 public sealed partial class HtmlIndexValueParser : IHtmlIndexValueParser
 {
     private readonly ILogger<HtmlIndexValueParser> _logger;

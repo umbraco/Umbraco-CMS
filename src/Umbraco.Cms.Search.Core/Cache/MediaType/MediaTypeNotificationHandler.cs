@@ -1,6 +1,5 @@
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Notifications;
-using Umbraco.Cms.Search.Core.Services.ContentIndexing;
 using Umbraco.Cms.Core.Search.Indexing;
 
 namespace Umbraco.Cms.Search.Core.Cache.MediaType;

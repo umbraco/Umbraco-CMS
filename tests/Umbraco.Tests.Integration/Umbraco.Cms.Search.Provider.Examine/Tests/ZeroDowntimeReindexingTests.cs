@@ -5,19 +5,15 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.ContentTypeEditing;
+using Umbraco.Cms.Core.Search;
+using Umbraco.Cms.Core.Search.Indexing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.ContentTypeEditing;
 using Umbraco.Cms.Core.Services.OperationStatus;
-using Umbraco.Cms.Core.Search.Indexing;
-using Umbraco.Cms.Search.Core.Services;
-using Umbraco.Cms.Core.Search;
-using Umbraco.Cms.Search.Core.Services.ContentIndexing;
 using Umbraco.Cms.Search.Provider.Examine.Services;
 using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
-using Umbraco.Cms.Tests.Integration.Testing.Search;
-using Constants = Umbraco.Cms.Search.Core.Constants;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Cms.Search.Provider.Examine.Tests;
 

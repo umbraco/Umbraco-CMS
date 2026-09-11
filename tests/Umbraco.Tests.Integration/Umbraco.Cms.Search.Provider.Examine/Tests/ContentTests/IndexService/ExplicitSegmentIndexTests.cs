@@ -1,9 +1,7 @@
 using Examine;
 using NUnit.Framework;
-using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Search;
 using Umbraco.Cms.Core.Extensions;
-using Umbraco.Cms.Core.Search.Indexing;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Search.Provider.Examine.Helpers;
 using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;

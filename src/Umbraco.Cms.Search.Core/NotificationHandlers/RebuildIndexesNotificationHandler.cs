@@ -2,15 +2,14 @@
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Search.Configuration;
+using Umbraco.Cms.Core.Search.Indexing;
 using Umbraco.Cms.Core.Services.Changes;
 using Umbraco.Cms.Search.Core.Cache.ContentType;
 using Umbraco.Cms.Search.Core.Cache.Index;
 using Umbraco.Cms.Search.Core.Cache.Language;
 using Umbraco.Cms.Search.Core.Cache.MediaType;
 using Umbraco.Cms.Search.Core.Cache.MemberType;
-using Umbraco.Cms.Core.Search.Configuration;
-using Umbraco.Cms.Search.Core.Services.ContentIndexing;
-using Umbraco.Cms.Core.Search.Indexing;
 
 namespace Umbraco.Cms.Search.Core.NotificationHandlers;
 

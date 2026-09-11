@@ -2,26 +2,21 @@ using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.HostedServices;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Search;
+using Umbraco.Cms.Core.Search.Configuration;
+using Umbraco.Cms.Core.Search.Indexing;
 using Umbraco.Cms.Core.ServerEvents;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Search.Core.DependencyInjection;
-using Umbraco.Cms.Search.Core.Persistence;
-using Umbraco.Cms.Core.Search.Indexing;
-using Umbraco.Cms.Search.Core.Services;
-using Umbraco.Cms.Core.Search;
-using Umbraco.Cms.Search.Core.Services.ContentIndexing;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 using Umbraco.Cms.Tests.Integration.Testing.Search;
-
-using Umbraco.Cms.Core.Search.Configuration;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 

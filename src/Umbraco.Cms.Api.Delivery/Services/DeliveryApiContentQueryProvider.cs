@@ -1,19 +1,18 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core.Search;
-using Umbraco.Cms.Core.Search.Querying.Filtering;
-using Umbraco.Cms.Core.Search.Querying.Sorting;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
-using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Extensions;
-using Umbraco.Cms.Core.Search.Indexing;
+using Umbraco.Cms.Core.Search;
 using Umbraco.Cms.Core.Search.Querying;
+using Umbraco.Cms.Core.Search.Querying.Filtering;
+using Umbraco.Cms.Core.Search.Querying.Sorting;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 

@@ -1,9 +1,8 @@
 ﻿using Examine;
 using Examine.Search;
 using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Search;
 using Umbraco.Cms.Core.Extensions;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Search.Indexing;
 using Umbraco.Cms.Search.Provider.Examine.Configuration;
 using Umbraco.Cms.Search.Provider.Examine.Helpers;
@@ -12,7 +11,7 @@ using CoreConstants = Umbraco.Cms.Core.Constants;
 namespace Umbraco.Cms.Search.Provider.Examine.Services;
 
 /// <summary>
-/// Implements <see cref="Umbraco.Cms.Search.Core.Services.IIndexer"/> against Examine/Lucene, mapping core <see cref="IndexField"/> values to
+/// Implements <see cref="Umbraco.Cms.Core.Search.IIndexer"/> against Examine/Lucene, mapping core <see cref="IndexField"/> values to
 /// Examine field definitions and writing to whichever physical index slot (active or shadow) is currently the write target.
 /// </summary>
 public class Indexer : IExamineIndexer

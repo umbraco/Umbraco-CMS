@@ -1,5 +1,3 @@
-using NUnit.Framework;
-using Umbraco.Cms.Core;
 using ISearcher = Umbraco.Cms.Core.Search.ISearcher;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Cms.Search.Provider.Examine.Tests.ContentTests.SearchService;

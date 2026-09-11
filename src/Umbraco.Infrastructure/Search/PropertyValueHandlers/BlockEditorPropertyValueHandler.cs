@@ -2,12 +2,10 @@ using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.PropertyEditors;
-using Umbraco.Cms.Core.Serialization;
-using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Search;
-using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Search.Indexing;
 using Umbraco.Cms.Core.Search.Indexing.Collection;
+using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 using IndexValue = Umbraco.Cms.Core.Search.Indexing.IndexValue;
 

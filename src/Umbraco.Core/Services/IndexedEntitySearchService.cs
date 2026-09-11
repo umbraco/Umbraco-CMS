@@ -1,17 +1,12 @@
-﻿using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Cache;
+﻿using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
-using Umbraco.Cms.Core.Security;
-using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Search;
-using Umbraco.Cms.Core.Extensions;
-using Umbraco.Cms.Core.Search.Indexing;
 using Umbraco.Cms.Core.Search.Querying;
 using Umbraco.Cms.Core.Search.Querying.Filtering;
-using Umbraco.Cms.Core.Search.Querying.Sorting;
-using Constants = Umbraco.Cms.Core.Constants;
+using Umbraco.Cms.Core.Security;
 
 namespace Umbraco.Cms.Core.Services;
 

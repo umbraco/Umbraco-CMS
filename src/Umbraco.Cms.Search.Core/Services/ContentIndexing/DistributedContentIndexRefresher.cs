@@ -1,8 +1,8 @@
 ﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Search.Indexing;
 using Umbraco.Cms.Search.Core.Cache.Content;
 using Umbraco.Cms.Search.Core.Cache.Media;
 using Umbraco.Cms.Search.Core.Cache.Member;
-using Umbraco.Cms.Core.Search.Indexing;
 
 namespace Umbraco.Cms.Search.Core.Services.ContentIndexing;
 

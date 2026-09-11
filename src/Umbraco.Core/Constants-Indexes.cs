@@ -7,8 +7,6 @@ public static partial class Constants
     /// </summary>
     public static class IndexAliases
     {
-        private const string IndexPrefix = "Umb_";
-
         /// <summary>
         ///     The alias of the published content index, used as the default index for template searches via
         ///     <see cref="IPublishedContentQuery" />.
@@ -29,6 +27,8 @@ public static partial class Constants
         ///     The alias of the draft members index.
         /// </summary>
         public const string DraftMembers = $"{IndexPrefix}Members";
+
+        private const string IndexPrefix = "Umb_";
     }
 
     /// <summary>
@@ -36,8 +36,6 @@ public static partial class Constants
     /// </summary>
     public static class IndexFieldNames
     {
-        private const string FieldPrefix = "Umb_";
-
         /// <summary>
         /// The field name for the entity ID.
         /// </summary>
@@ -92,5 +90,7 @@ public static partial class Constants
         /// The field name for accumulated tags.
         /// </summary>
         public const string Tags = $"{FieldPrefix}Tags";
+
+        private const string FieldPrefix = "Umb_";
     }
 }

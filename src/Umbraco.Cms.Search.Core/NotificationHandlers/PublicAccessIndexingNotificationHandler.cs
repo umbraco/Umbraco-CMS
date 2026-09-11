@@ -1,8 +1,7 @@
 ﻿using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Scoping;
-using Umbraco.Cms.Search.Core.Cache.PublicAccess;
 using Umbraco.Cms.Core.Search.Indexing;
-using Umbraco.Cms.Search.Core.Services.ContentIndexing;
+using Umbraco.Cms.Search.Core.Cache.PublicAccess;
 
 namespace Umbraco.Cms.Search.Core.NotificationHandlers;
 

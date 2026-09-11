@@ -5,7 +5,6 @@ using Umbraco.Cms.Core.Search.Configuration;
 using Umbraco.Cms.Core.Search.Indexing;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Infrastructure.BackgroundJobs;
-using Umbraco.Cms.Search.Core.Services.ContentIndexing;
 using Umbraco.Cms.Search.Provider.Examine.Services;
 using IndexOptions = Umbraco.Cms.Core.Search.Configuration.IndexOptions;
 

@@ -1,13 +1,11 @@
 using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Notifications;
+using Umbraco.Cms.Core.Search.Indexing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence;
-using Umbraco.Cms.Core.Search;
-using Umbraco.Cms.Core.Extensions;
-using Umbraco.Cms.Core.Search.Indexing;
-using Umbraco.Cms.Core.Notifications;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Search.Core.Services.ContentIndexing;

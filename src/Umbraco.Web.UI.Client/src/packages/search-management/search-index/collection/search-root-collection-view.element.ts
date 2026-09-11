@@ -11,11 +11,11 @@ export default class UmbSearchRootCollectionViewElement extends UmbLitElement {
 	@state()
 	private _tableItems: Array<UmbTableItem> = [];
 
-	private _tableConfig: UmbTableConfig = {
+	private readonly _tableConfig: UmbTableConfig = {
 		allowSelection: false,
 	};
 
-	private _tableColumns: Array<UmbTableColumn> = [
+	private readonly _tableColumns: Array<UmbTableColumn> = [
 		{
 			name: this.localize.term('searchManagement_tableColumnAlias'),
 			alias: 'indexAlias',
@@ -68,15 +68,14 @@ export default class UmbSearchRootCollectionViewElement extends UmbLitElement {
 
 	#createTable(items: UmbSearchIndex[]) {
 		this._tableItems = items?.map((item) => {
+			const editHref = `section/settings/workspace/${UMB_SEARCH_INDEX_ENTITY_TYPE}/edit/${item.unique}`;
 			return {
 				id: item.unique,
 				icon: this.#healthStatusIcon(item),
 				data: [
 					{
 						columnAlias: 'indexAlias',
-						value: html`<a href=${`section/settings/workspace/${UMB_SEARCH_INDEX_ENTITY_TYPE}/edit/${item.unique}`}
-							>${item.unique}</a
-						>`,
+						value: html`<a href=${editHref}>${item.unique}</a>`,
 					},
 					{
 						columnAlias: 'healthStatus',

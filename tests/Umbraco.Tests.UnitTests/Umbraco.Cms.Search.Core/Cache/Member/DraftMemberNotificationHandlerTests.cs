@@ -5,10 +5,9 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
+using Umbraco.Cms.Core.Search.Indexing;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Search.Core.Cache.Member;
-using Umbraco.Cms.Search.Core.Services.ContentIndexing;
-using Umbraco.Cms.Core.Search.Indexing;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Search.Core.Cache.Member;
 

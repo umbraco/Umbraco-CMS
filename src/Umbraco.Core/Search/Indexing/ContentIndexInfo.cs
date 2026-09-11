@@ -1,5 +1,4 @@
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Search;
 
 namespace Umbraco.Cms.Core.Search.Indexing;
 

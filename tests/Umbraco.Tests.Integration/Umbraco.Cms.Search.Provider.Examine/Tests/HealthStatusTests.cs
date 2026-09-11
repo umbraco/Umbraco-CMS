@@ -1,8 +1,6 @@
 using NUnit.Framework;
-using Umbraco.Cms.Search.Core;
-using Umbraco.Cms.Core.Search.Indexing;
-using Umbraco.Cms.Search.Core.Services;
 using Umbraco.Cms.Core.Search;
+using Umbraco.Cms.Core.Search.Indexing;
 using Umbraco.Cms.Tests.Common.Attributes;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Cms.Search.Provider.Examine.Tests;

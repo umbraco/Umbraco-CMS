@@ -1,8 +1,8 @@
 ﻿using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
-using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Search;
 using Umbraco.Cms.Core.Search.Indexing;
+using Umbraco.Cms.Core.Serialization;
 
 namespace Umbraco.Cms.Infrastructure.Search.PropertyValueHandlers;
 

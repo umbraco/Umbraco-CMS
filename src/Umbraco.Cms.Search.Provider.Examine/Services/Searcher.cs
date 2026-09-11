@@ -7,10 +7,8 @@ using Examine.Search;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Exceptions;
-using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Search;
 using Umbraco.Cms.Core.Extensions;
-using Umbraco.Cms.Core.Search.Indexing;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Search.Querying;
 using Umbraco.Cms.Core.Search.Querying.Faceting;
 using Umbraco.Cms.Core.Search.Querying.Filtering;
@@ -26,7 +24,7 @@ using SearchResult = Umbraco.Cms.Core.Search.Querying.SearchResult;
 namespace Umbraco.Cms.Search.Provider.Examine.Services;
 
 /// <summary>
-/// Implements <see cref="Umbraco.Cms.Search.Core.Services.ISearcher"/> against Examine/Lucene, translating core
+/// Implements <see cref="Umbraco.Cms.Core.Search.ISearcher"/> against Examine/Lucene, translating core
 /// <see cref="Filter"/>, <see cref="Facet"/>, and <see cref="Sorter"/> types into Examine query operations.
 /// </summary>
 public class Searcher : IExamineSearcher

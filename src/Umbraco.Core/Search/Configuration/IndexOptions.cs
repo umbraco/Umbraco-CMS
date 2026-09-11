@@ -1,5 +1,4 @@
 ﻿using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Search;
 using Umbraco.Cms.Core.Search.Indexing;
 
 namespace Umbraco.Cms.Core.Search.Configuration;
@@ -54,7 +53,7 @@ public sealed class IndexOptions
         where TSearcher : class, ISearcher
         where TContentChangeStrategy : class, IContentChangeStrategy
     {
-        ArgumentException.ThrowIfNullOrEmpty(indexAlias, nameof(indexAlias));
+        ArgumentException.ThrowIfNullOrEmpty(indexAlias);
         if (containedObjectTypes.Length is 0)
         {
             throw new ArgumentException($"Index \"{indexAlias}\" must define at least one contained object type",  nameof(containedObjectTypes));

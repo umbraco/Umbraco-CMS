@@ -2,9 +2,9 @@ using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Querying;
+using Umbraco.Cms.Core.Search.Indexing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence;
-using Umbraco.Cms.Core.Search.Indexing;
 
 namespace Umbraco.Cms.Search.Core.Services.ContentIndexing;
 

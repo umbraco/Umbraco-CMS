@@ -8,6 +8,7 @@ using Umbraco.Cms.Core.HostedServices;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.ContentTypeEditing;
+using Umbraco.Cms.Core.Search.Indexing;
 using Umbraco.Cms.Core.ServerEvents;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.ContentTypeEditing;
@@ -15,10 +16,7 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Search.Core.Cache.Language;
 using Umbraco.Cms.Search.Core.DependencyInjection;
-using Umbraco.Cms.Core.Search.Indexing;
 using Umbraco.Cms.Search.Core.NotificationHandlers;
-using Umbraco.Cms.Search.Core.Persistence;
-using Umbraco.Cms.Search.Core.Services.ContentIndexing;
 using Umbraco.Cms.Search.Provider.Examine.Services;
 using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
@@ -28,7 +26,6 @@ using Umbraco.Cms.Tests.Integration.Testing.Search;
 using Umbraco.Cms.Tests.Integration.Umbraco.Cms.Search.Provider.Examine.Attributes;
 using Umbraco.Cms.Tests.Integration.Umbraco.Cms.Search.Provider.Examine.Extensions;
 using Umbraco.Cms.Tests.Integration.Umbraco.Cms.Search.Provider.Examine.Tests.ContentTests.IndexService;
-using Constants = Umbraco.Cms.Search.Core.Constants;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Cms.Search.Provider.Examine.Tests.ContentTests.PersistenceTests;
 

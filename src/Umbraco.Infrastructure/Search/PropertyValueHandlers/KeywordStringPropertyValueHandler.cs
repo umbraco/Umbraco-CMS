@@ -1,6 +1,6 @@
 ﻿using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Search.Indexing;
+using Umbraco.Cms.Core.Serialization;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Search.PropertyValueHandlers;

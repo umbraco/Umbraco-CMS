@@ -1,4 +1,3 @@
-using Umbraco.Cms.Core.Search.Querying;
 using Umbraco.Cms.Core.Search.Querying.Faceting;
 using Umbraco.Cms.Core.Search.Querying.Filtering;
 using Umbraco.Cms.Core.Search.Querying.Sorting;

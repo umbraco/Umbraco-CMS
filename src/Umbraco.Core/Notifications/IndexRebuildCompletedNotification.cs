@@ -1,5 +1,3 @@
-using Umbraco.Cms.Core.Notifications;
-
 namespace Umbraco.Cms.Core.Notifications;
 
 /// <summary>

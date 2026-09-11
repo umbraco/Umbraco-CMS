@@ -1,5 +1,3 @@
-using Umbraco.Cms.Core;
-
 namespace Umbraco.Cms.Core.Search.Querying.Sorting;
 
 /// <summary>

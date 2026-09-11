@@ -1,5 +1,4 @@
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Search.Indexing;
 
 namespace Umbraco.Cms.Core.Notifications;

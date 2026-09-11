@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Core.Search.Indexing;
 public interface IContentIndexingDataCollectionService
 {
     /// <summary>
-    /// Collects the index fields for a content item, reusing a persisted <see cref="Models.Persistence.IndexDocument"/> snapshot when available.
+    /// Collects the index fields for a content item, reusing a persisted <see cref="IndexDocument"/> snapshot when available.
     /// </summary>
     /// <param name="content">The content item to collect fields for.</param>
     /// <param name="published">Whether to collect fields for the published or draft version of the content.</param>
