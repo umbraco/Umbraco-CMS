@@ -1,93 +1,130 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the README at:
-// https://github.com/microsoft/vscode-dev-containers/tree/main/containers/dotnet
+// README at: https://github.com/devcontainers/templates/tree/main/src/dotnet
 {
 	"name": "C# (.NET) Umbraco & SMTP4Dev",
-	"dockerComposeFile": "docker-compose.yml",
-	"service": "app",
-	"workspaceFolder": "/workspace",
-	
-	
-	// Set *default* container specific settings.json values on container create.
-	"settings": {		
-		"omnisharp.defaultLaunchSolution": "umbraco.sln",
-		"omnisharp.enableDecompilationSupport": true,
-		"omnisharp.enableRoslynAnalyzers": true
-	},
 
+	// List of images here:
+	// https://github.com/devcontainers/images/tree/main/src/dotnet
+	"image": "mcr.microsoft.com/devcontainers/dotnet:2-10.0-noble",
+	// Features to add to the dev container. More info: https://containers.dev/features.
 	"features": {
-		// Workaround until the image is updated to include the latest version of .NET Core - .NET7
-		// https://github.com/devcontainers/templates/issues/38#issuecomment-1310803259		
-		"ghcr.io/devcontainers/features/dotnet:1": {
-			"version": "7"
-		},
-
 		// Adds SSH support to the container
 		// Allowing the Github CLI `gh codespace ssh` to work
 		"ghcr.io/devcontainers/features/sshd:1": {
 			"version": "latest"
 		},
 
+		// Adds the GitHub CLI for interacting with GitHub from the terminal
+		"ghcr.io/devcontainers/features/github-cli:1": {},
+
+		// Node JS - pinned to 22 to match the >= 22.17.1 requirement in package.json
+		"ghcr.io/devcontainers/features/node:1": {
+			"version": "22"
+		},
+
+		// TEMPORARILY DISABLED: smtp4dev fails to install because its postinstall script calls
+		// setcap on /usr/local/dotnet-tools/smtp4dev, which is a symlink. setcap requires a
+		// real ELF binary and refuses to operate on symlinks. Fix needed in the upstream feature:
+		// use `readlink -f` to resolve the symlink before calling setcap. Since smtpport is 2525
+		// (above 1024) the setcap call is not required at all for this configuration.
+		// Re-enable once https://github.com/warrenbuckley/codespace-features is updated.
+		// "ghcr.io/warrenbuckley/codespace-features/smtp4dev:1": {
+		// 	"autorun": true,
+		// 	"webport": "5050",
+		// 	"smtpport": "2525",
+		// 	"imapport": "143"
+		// },
+
 		// Adds SQLite feature from apt install
 		// Also adds the SQLite VSCode extension
-		"ghcr.io/warrenbuckley/codespace-features/sqlite:1": {}
+		"ghcr.io/warrenbuckley/codespace-features/sqlite:1": {},
+
+		// Installs the Claude Code CLI for AI-assisted development in the terminal
+		"ghcr.io/anthropics/devcontainer-features/claude-code:1.0": {}
 	},
 
-	// Add the IDs of extensions you want installed when the container is created.
-	"extensions": [
-		"ms-dotnettools.csharp"
-	],
-	
-	// This is used in the prebuilds - so dotnet build (nuget restore and node stuff) is done
-	"updateContentCommand": "dotnet build umbraco.sln && dotnet dev-certs https --trust",
-
-	// Use 'forwardPorts' to make a list of ports inside the container available locallAdd	"forwardPorts": [9000, 5000, 25],
-	// Port needed to help discover SMTP4Dev
-	"forwardPorts": [
-		5000
-	],
-
+	// Port 11000 is the HTTP Kestrel endpoint used by the Codespaces proxy (which talks
+	// plain HTTP to container ports — TLS is terminated at the *.app.github.dev edge).
+	// Port 44339 is the HTTPS endpoint for local development only; it is silenced here
+	// because the Codespaces forwarding agent cannot reach an HTTPS-only Kestrel socket.
+	// 5050 (SMTP4Dev) removed from forwardPorts until the feature is re-enabled.
+	"forwardPorts": [5173, 11000],
 	"portsAttributes": {
-		"5000": {
-			"label": "SMTP4Dev",
+		"5050": {
+			"label": "SMTP4Dev (disabled)",
+			"protocol": "http",
+			"onAutoForward": "silent"
+		},
+		"5173": {
+			"label": "Backoffice (Vite)",
+			"protocol": "http",
+			"onAutoForward": "openBrowser"
+		},
+		"11000": {
+			"label": "Umbraco .NET backend",
 			"protocol": "http",
 			"onAutoForward": "notify"
 		},
-		"9000": {
-			"label": "Umbraco HTTP",
-			"protocol": "http",
-			"onAutoForward": "notify"
-		},
-		"44331": {
-			"label": "Umbraco HTTPS",
-			"protocol": "https",
-			"onAutoForward": "notify"
+		"44339": {
+			"label": "Umbraco HTTPS (local dev only)",
+			"onAutoForward": "silent"
 		}
 	},
+
+	"containerEnv": {
+		// Tells ASP.NET Core to honour X-Forwarded-Proto / X-Forwarded-Host headers from the
+		// Codespaces proxy. Without this, the app sees plain HTTP internally and won't set the
+		// Secure flag on cookies — which breaks SameSite=None auth cookies in the browser.
+		"ASPNETCORE_FORWARDEDHEADERS_ENABLED": "true",
+
+		// Increases the Node.js V8 heap size limit from the default (~1.5GB on 64-bit) to 4GB.
+		// This is required to prevent "JavaScript heap out of memory" errors during the
+		// Umbraco frontend build (npm run build:for:cms).
+		// See: https://nodejs.org/api/cli.html#--max-old-space-sizesize-in-mebibytes
+		// See: https://nodejs.org/en/learn/diagnostics/memory/understanding-and-tuning-memory
+		"NODE_OPTIONS": "--max-old-space-size=4096",
+
+		"ConnectionStrings__umbracoDbDSN": "Data Source=|DataDirectory|/Umbraco.sqlite.db;Cache=Shared;Foreign Keys=True;Pooling=True",
+		"ConnectionStrings__umbracoDbDSN_ProviderName": "Microsoft.Data.Sqlite",
+		"Umbraco__CMS__Unattended__InstallUnattended": "true",
+		"Umbraco__CMS__Unattended__UnattendedUserName": "Admin",
+		"Umbraco__CMS__Unattended__UnattendedUserEmail": "test@umbraco.com",
+		"Umbraco__CMS__Unattended__UnattendedUserPassword": "password1234",
+		"Umbraco__CMS__Global__Smtp__Host": "smtp4dev",
+		"Umbraco__CMS__Global__Smtp__Port": "2525",
+		"Umbraco__CMS__Global__Smtp__From": "noreply@umbraco.test"
+	},
+
+	// Codespaces uses a shallow clone by default, which prevents Nerdbank.GitVersioning
+	// from calculating the version height by walking the commit history.
+	// This command unshallows the clone to ensure the full history is available.
+	// stderr is suppressed because git prints "fatal: --unshallow on a complete repository
+	// does not make sense" when the clone is already full — the || true handles the exit code.
+	"initializeCommand": "git fetch --unshallow 2>/dev/null || true",
+
+	// This is used in the prebuilds - so dotnet build (nuget restore and node stuff) is done
+	"updateContentCommand": "dotnet build umbraco.sln",
+
+	// Runs once after the container is created (not part of the prebuild snapshot).
+	// Generates HTTPS dev cert and configures Codespaces-specific settings when needed.
+	"postCreateCommand": "bash .devcontainer/postCreate.sh",
+
 	"customizations": {
+		"vscode": {
+			"extensions": [
+				// C# debugging and IntelliSense
+				"ms-dotnettools.csdevkit",
+				// Frontend tooling
+				"dbaeumer.vscode-eslint",
+				"esbenp.prettier-vscode",
+				"runem.lit-plugin",
+				"editorconfig.editorconfig"
+			]
+		},
 		"codespaces": {
 		  "openFiles": [
 			".github/codespaces-readme.md"
 		  ]
 		}
 	}
-
-	// [Optional] To reuse of your local HTTPS dev cert:
-	//
-	// 1. Export it locally using this command:
-	//    * Windows PowerShell:
-	//        dotnet dev-certs https --trust; dotnet dev-certs https -ep "$env:USERPROFILE/.aspnet/https/aspnetapp.pfx" -p "SecurePwdGoesHere"
-	//    * macOS/Linux terminal:
-	//        dotnet dev-certs https --trust; dotnet dev-certs https -ep "${HOME}/.aspnet/https/aspnetapp.pfx" -p "SecurePwdGoesHere"
-	// 
-	// 2. Uncomment these 'remoteEnv' lines:
-	//    "remoteEnv": {
-	// 	      "ASPNETCORE_Kestrel__Certificates__Default__Password": "SecurePwdGoesHere",
-	//        "ASPNETCORE_Kestrel__Certificates__Default__Path": "/home/vscode/.aspnet/https/aspnetapp.pfx",
-	//    },
-	//
-	// 3. Next, copy your certificate into the container:
-	//      1. Start the container
-	//      2. Drag ~/.aspnet/https/aspnetapp.pfx into the root of the file explorer
-	//      3. Open a terminal in VS Code and run "mkdir -p /home/vscode/.aspnet/https && mv aspnetapp.pfx /home/vscode/.aspnet/https"
-
 }
