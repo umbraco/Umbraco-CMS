@@ -20,7 +20,7 @@ public class CreateDocumentBlueprintControllerTests : ManagementApiUserGroupTest
     private Guid _contentTypeKey;
 
     [SetUp]
-    public async Task Setup()
+    public new async Task Setup()
     {
         var contentType = new ContentTypeBuilder()
             .WithAlias(Guid.NewGuid().ToString("N"))

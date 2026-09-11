@@ -22,7 +22,7 @@ public class UpdateDocumentBlueprintControllerTests : ManagementApiUserGroupTest
     private Guid _documentBlueprintKey;
 
     [SetUp]
-    public async Task Setup()
+    public new async Task Setup()
     {
         var contentType = new ContentTypeBuilder()
             .WithAlias(Guid.NewGuid().ToString("N"))
