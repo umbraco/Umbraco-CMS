@@ -13,7 +13,7 @@ export class UmbDocumentBlueprintFolderItemServerDataSource extends UmbItemServe
 	FolderItemResponseModel,
 	UmbDocumentBlueprintFolderItemModel
 > {
-	#itemRequestManager = new UmbManagementApiDocumentBlueprintFolderItemDataRequestManager(this);
+	readonly #itemRequestManager = new UmbManagementApiDocumentBlueprintFolderItemDataRequestManager(this);
 
 	/**
 	 * Creates an instance of UmbDocumentBlueprintFolderItemServerDataSource.
