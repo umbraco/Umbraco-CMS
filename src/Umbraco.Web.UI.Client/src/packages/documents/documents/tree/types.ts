@@ -16,6 +16,15 @@ export interface UmbDocumentTreeItemModel extends Omit<UmbTreeItemModel, 'flags'
 	noAccess: boolean;
 	isTrashed: boolean;
 	isProtected: boolean;
+	// TODO (V20): make `contentType` required when the deprecated `documentType` field is removed.
+	contentType?: {
+		unique: string;
+		icon: string;
+		collection: UmbReferenceByUnique | null;
+	};
+	/**
+	 * @deprecated Use `contentType` instead. This field will be removed in v20.
+	 */
 	documentType: {
 		unique: string;
 		icon: string;

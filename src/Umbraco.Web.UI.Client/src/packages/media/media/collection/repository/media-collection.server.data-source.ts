@@ -31,18 +31,23 @@ export class UmbMediaCollectionServerDataSource implements UmbCollectionDataSour
 				// TODO: [LK] Temp solution, review how to get the name from the corresponding variant.
 				const variant = item.variants[0];
 
+				const contentType = {
+					unique: item.mediaType.id,
+					icon: item.mediaType.icon,
+					alias: item.mediaType.alias,
+					collection: item.mediaType.collection ? { unique: item.mediaType.collection.id } : null,
+				};
+
 				const model: UmbMediaCollectionItemModel = {
 					unique: item.id,
 					entityType: UMB_MEDIA_ENTITY_TYPE,
 					contentTypeAlias: item.mediaType.alias,
+					contentType,
 					createDate: new Date(variant.createDate),
 					creator: item.creator,
 					icon: item.mediaType.icon,
-					mediaType: {
-						unique: item.mediaType.id,
-						icon: item.mediaType.icon,
-						alias: item.mediaType.alias,
-					},
+					// TODO (V20): remove when the deprecated `mediaType` field is removed.
+					mediaType: { unique: contentType.unique, icon: contentType.icon, alias: contentType.alias },
 					name: variant.name,
 					sortOrder: item.sortOrder,
 					updateDate: new Date(variant.updateDate),

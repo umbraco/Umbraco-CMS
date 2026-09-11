@@ -55,7 +55,9 @@ function makeItem(unique: string, overrides: Partial<TestCollectionItemModel> = 
 	};
 }
 
-function makeManifest(columns: ManifestCollectionViewTableKind['meta']['columns'] = []): ManifestCollectionViewTableKind {
+function makeManifest(
+	columns: ManifestCollectionViewTableKind['meta']['columns'] = [],
+): ManifestCollectionViewTableKind {
 	return {
 		type: 'collectionView',
 		kind: 'table',
@@ -108,10 +110,19 @@ describe('UmbTableCollectionViewElement', () => {
 			expect(aliases).to.include('entityActions');
 		});
 
+		it('omits the entity actions column when the collection hides item actions', async () => {
+			hostElement.collectionContext.setConfig({ hideItemActions: true });
+			element.manifest = makeManifest();
+			setCollectionItems([makeItem('1')]);
+			await aTimeout(0);
+
+			const aliases = getTable().columns.map((c) => c.alias);
+			expect(aliases).to.include('name');
+			expect(aliases).to.not.include('entityActions');
+		});
+
 		it('includes manifest-defined columns', async () => {
-			element.manifest = makeManifest([
-				{ label: 'Status', field: 'status' },
-			]);
+			element.manifest = makeManifest([{ label: 'Status', field: 'status' }]);
 			setCollectionItems([makeItem('1', { status: 'Published' })]);
 			await aTimeout(0);
 
@@ -120,9 +131,7 @@ describe('UmbTableCollectionViewElement', () => {
 		});
 
 		it('maps manifest column values to table row data', async () => {
-			element.manifest = makeManifest([
-				{ label: 'Status', field: 'status' },
-			]);
+			element.manifest = makeManifest([{ label: 'Status', field: 'status' }]);
 			setCollectionItems([makeItem('1', { status: 'Draft' })]);
 			await aTimeout(0);
 
@@ -165,10 +174,7 @@ describe('UmbTableCollectionViewElement', () => {
 
 		it('includes description column when at least one item has a description', async () => {
 			element.manifest = makeManifest();
-			const items = [
-				makeItem('1'),
-				{ ...makeItem('2'), description: 'Has a description' },
-			];
+			const items = [makeItem('1'), { ...makeItem('2'), description: 'Has a description' }];
 			setCollectionItems(items as any);
 			await aTimeout(0);
 

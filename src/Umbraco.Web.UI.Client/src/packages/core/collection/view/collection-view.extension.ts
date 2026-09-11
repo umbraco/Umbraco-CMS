@@ -20,6 +20,8 @@ export interface MetaCollectionView {
 
 	/**
 	 * The URL pathname for this collection view that can be deep linked to by sharing the url
+	 * @deprecated Deprecated since v18. Collection views are no longer routed, so this pathname is unused. Scheduled
+	 * for removal in Umbraco 20.
 	 */
 	pathName: string;
 }

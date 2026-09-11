@@ -57,7 +57,17 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 			this.observe(
 				value.view.currentView,
 				async (manifest) => {
-					const element = manifest ? await createExtensionElement(manifest) : null;
+					if (!manifest) {
+						this._viewElement = null;
+						return;
+					}
+
+					const element = await createExtensionElement(manifest);
+
+					// Views are imported on demand, so a slow import must not replace the view that became the current
+					// one while it was in flight.
+					if (manifest.alias !== this._api?.view?.getCurrentView()?.alias) return;
+
 					if (element && 'manifest' in element) {
 						(element as HTMLElement & { manifest: unknown }).manifest = manifest;
 					}
