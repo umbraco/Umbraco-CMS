@@ -1,7 +1,7 @@
-import { UmbUserStateFilter } from './utils/index.js';
+import { UmbUserKindFilter, UmbUserStateFilter } from './utils/index.js';
 import { UMB_USER_COLLECTION_CONTEXT } from './user-collection.context-token.js';
 import type { UmbUserOrderByOption } from './types.js';
-import type { UmbUserStateFilterType } from './utils/index.js';
+import type { UmbUserKindFilterType, UmbUserStateFilterType } from './utils/index.js';
 import { css, customElement, html, ifDefined, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -16,6 +16,12 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 
 	@state()
 	private _stateFilterSelection: Array<UmbUserStateFilterType> = [];
+
+	@state()
+	private _kindFilterOptions: Array<UmbUserKindFilterType> = Object.values(UmbUserKindFilter);
+
+	@state()
+	private _kindFilterSelection: Array<UmbUserKindFilterType> = [];
 
 	@state()
 	private _userGroups: Array<UmbUserGroupDetailModel> = [];
@@ -85,6 +91,19 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 		this.#collectionContext?.setStateFilter(this._stateFilterSelection);
 	}
 
+	#onKindFilterChange(event: UUIBooleanInputEvent) {
+		event.stopPropagation();
+		const target = event.currentTarget as UUICheckboxElement;
+		const value = target.value as UmbUserKindFilterType;
+		const isChecked = target.checked;
+
+		this._kindFilterSelection = isChecked
+			? [...this._kindFilterSelection, value]
+			: this._kindFilterSelection.filter((v) => v !== value);
+
+		this.#collectionContext?.setKindFilter(this._kindFilterSelection);
+	}
+
 	#onUserGroupFilterChange(event: UUIBooleanInputEvent) {
 		const target = event.currentTarget as UUICheckboxElement;
 		const item = this._userGroups.find((group) => group.unique === target.value);
@@ -129,12 +148,24 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 					.join(', ') + (length > max ? ' + ' + (length - max) : '');
 	}
 
+	#getTypeFilterLabel() {
+		const length = this._kindFilterSelection.length;
+		const max = 2;
+		return length === 0
+			? this.localize.term('general_all')
+			: this._kindFilterSelection
+					.slice(0, max)
+					.map((kind) => this.localize.term('user_userKind' + kind))
+					.join(', ') + (length > max ? ' + ' + (length - max) : '');
+	}
+
 	override render() {
 		return html`
 			<umb-collection-toolbar slot="header">
 				<div id="toolbar">
 					<umb-collection-filter-field></umb-collection-filter-field>
-					${this.#renderStatusFilter()} ${this.#renderUserGroupFilter()} ${this.#renderOrderBy()}
+					${this.#renderStatusFilter()} ${this.#renderTypeFilter()} ${this.#renderUserGroupFilter()}
+					${this.#renderOrderBy()}
 				</div>
 			</umb-collection-toolbar>
 		`;
@@ -154,6 +185,28 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 									label=${this.localize.term('user_state' + option)}
 									@change=${this.#onStateFilterChange}
 									name="state"
+									value=${option}></uui-checkbox>`,
+						)}
+					</div>
+				</umb-popover-layout>
+			</uui-popover-container>
+		`;
+	}
+
+	#renderTypeFilter() {
+		return html`
+			<uui-button popovertarget="popover-user-type-filter" label=${this.localize.term('user_type')} compact>
+				<umb-localize key="user_type"></umb-localize>: <b>${this.#getTypeFilterLabel()}</b>
+			</uui-button>
+			<uui-popover-container id="popover-user-type-filter" placement="bottom">
+				<umb-popover-layout>
+					<div class="filter-dropdown">
+						${this._kindFilterOptions.map(
+							(option) =>
+								html`<uui-checkbox
+									label=${this.localize.term('user_userKind' + option)}
+									@change=${this.#onKindFilterChange}
+									name="kind"
 									value=${option}></uui-checkbox>`,
 						)}
 					</div>

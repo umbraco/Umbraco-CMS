@@ -2366,6 +2366,7 @@ export default {
 		stateApproved: 'Approved',
 		stateInvited: 'Invited',
 		stateInactive: 'Inactive',
+		type: 'Type',
 		sortNameAscending: 'Name (A-Z)',
 		sortNameDescending: 'Name (Z-A)',
 		sortCreateDateDescending: 'Newest',
