@@ -1,23 +1,7 @@
 import { UmbResourceController } from '../resource.controller.js';
 import type { UmbApiResponse, UmbTryExecuteOptions } from '../types.js';
-import { UmbCancelError } from '../umb-error.js';
-import type { UmbApiError } from '../umb-error.js';
-
-/**
- * Codes that are ignored for notifications.
- * These are typically non-fatal errors that the UI can handle gracefully,
- * such as 401 (Unauthorized), 403 (Forbidden), and 404 (Not Found).
- * The UI should handle these cases without showing a notification.
- */
-const IGNORED_ERROR_CODES = [401, 403, 404];
-
-/**
- * Operation statuses that are ignored for notifications.
- * These are operation statuses where the server already sends a notification
- * via the Umb-Notifications response header, so we avoid showing a duplicate
- * notification from the ProblemDetails body.
- */
-const IGNORED_OPERATION_STATUSES = ['CancelledByNotification'];
+import type { UmbApiError, UmbCancelError } from '../umb-error.js';
+import { apiErrorWasNotified } from './api-error-was-notified.function.js';
 
 export class UmbTryExecuteController<T> extends UmbResourceController<T> {
 	#abortSignal?: AbortSignal;
@@ -52,8 +36,9 @@ export class UmbTryExecuteController<T> extends UmbResourceController<T> {
 	}
 
 	#notifyOnError(error: UmbApiError | UmbCancelError): void {
-		if (UmbCancelError.isUmbCancelError(error)) {
-			// Cancel error, do not show notification
+		if (!apiErrorWasNotified(error)) {
+			// Cancellations, non-fatal status codes, and statuses already covered by the Umb-Notifications
+			// header interceptor.
 			return;
 		}
 
@@ -67,21 +52,6 @@ export class UmbTryExecuteController<T> extends UmbResourceController<T> {
 
 		// Check if we can extract problem details from the error
 		if (apiError.problemDetails) {
-			if (IGNORED_ERROR_CODES.includes(apiError.problemDetails.status)) {
-				// Non-fatal errors that the UI can handle gracefully
-				// so we avoid showing a notification
-				return;
-			}
-
-			if (
-				apiError.problemDetails.operationStatus &&
-				IGNORED_OPERATION_STATUSES.includes(apiError.problemDetails.operationStatus)
-			) {
-				// These operation statuses are already handled by the Umb-Notifications header interceptor
-				// so we avoid showing a duplicate notification
-				return;
-			}
-
 			// UmbProblemDetails, show notification
 			message = apiError.problemDetails.title;
 			detail = apiError.problemDetails.detail;
