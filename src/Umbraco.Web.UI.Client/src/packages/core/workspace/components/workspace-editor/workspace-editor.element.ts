@@ -16,11 +16,12 @@ import {
 import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { UmbDeepPartialObject } from '@umbraco-cms/backoffice/utils';
+import { UmbDeprecation, type UmbDeepPartialObject } from '@umbraco-cms/backoffice/utils';
 import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbRoute, UmbRouterSlotInitEvent, UmbRouterSlotChangeEvent } from '@umbraco-cms/backoffice/router';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbVariantHint } from '@umbraco-cms/backoffice/hint';
+import type { UmbWorkspaceViewContext } from './workspace-view.context.js';
 
 /**
  * @element umb-workspace-editor
@@ -80,7 +81,10 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	@state()
-	private _workspaceViews: Array<UmbWorkspaceViewController> = [];
+	private _hasSlottedContent?: boolean;
+
+	@state()
+	private _workspaceViews: Array<UmbWorkspaceViewContext> = [];
 
 	@state()
 	private _hintMap: Map<string, UmbVariantHint> = new Map();
@@ -175,7 +179,7 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 
 	override render() {
 		// Notice if no routes then fallback to use a slot.
-		// TODO: Deprecate the slot feature, to rely purely on routes, cause currently bringing an additional route would mean the slotted content would never be shown. [NL]
+		// TODO: Remove the default slot in v.21, to rely purely on workspaceViews extensions, cause currently bringing an additional route would mean the slotted content would never be shown. [NL]
 		return html`
 			<umb-body-layout main-no-padding .headline=${this.headline} ?loading=${this.loading}>
 				${when(
@@ -188,7 +192,17 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 					`,
 				)}
 				${this.#renderRoutes()}
-				<slot></slot>
+				<slot
+					@slotchange=${(event: Event) => {
+						this._hasSlottedContent = (event.target as HTMLSlotElement).assignedElements({ flatten: true }).length > 0;
+						if (this._hasSlottedContent) {
+							new UmbDeprecation({
+								deprecated: 'Using slotted content in umb-workspace-editor is deprecated, use routes instead.',
+								solution: 'Add a workspace view for your content.',
+								removeInVersion: '21.0.0',
+							}).warn();
+						}
+					}}></slot>
 				${when(
 					!this.enforceNoFooter,
 					() => html`
@@ -257,7 +271,8 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	#renderRoutes() {
-		if (!this._routes || this._routes.length === 0 || !this._workspaceViews || this._workspaceViews.length === 0) {
+		// Only render the router-slot if there is no slotted content, or if workspace views are registered.
+		if (this._hasSlottedContent && this._workspaceViews.length === 0) {
 			return nothing;
 		}
 		return html`
@@ -270,7 +285,9 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 				}}
 				@change=${(event: UmbRouterSlotChangeEvent) => {
 					this._activePath = event.target.localActiveViewPath;
-				}}></umb-router-slot>
+				}}
+				>${!this._hasSlottedContent ? html`<umb-view-loader></umb-view-loader>` : nothing}</umb-router-slot
+			>
 		`;
 	}
 

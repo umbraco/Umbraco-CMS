@@ -59,6 +59,7 @@ export default {
 		remove: 'Remove',
 		rename: 'Rename',
 		republish: 'Republish entire site',
+		replace: 'Replace',
 		resendInvite: 'Resend Invitation',
 		restore: 'Restore',
 		rights: 'Permissions',
@@ -2578,6 +2579,7 @@ export default {
 		labelUsedByItems: 'Referenced by',
 		labelDependsOnThis: 'The following items depend on this',
 		labelDependentDescendants: 'The following descending items have dependencies',
+		labelUsedByOtherContent: 'The following items are used by other content',
 		labelMoreReferences: (count: number) => {
 			if (count === 1) return '...and one more item';
 			return `...and ${count} more items`;
@@ -2601,10 +2603,12 @@ export default {
 		searchThisMessageWithGoogle: 'Search this message with Google',
 		searchWithBing: 'Search With Bing',
 		searchThisMessageWithBing: 'Search this message with Bing',
-		searchOurUmbraco: 'Search Our Umbraco',
-		searchThisMessageOnOurUmbracoForumsAndDocs: 'Search this message on Our Umbraco forums and docs',
-		searchOurUmbracoWithGoogle: 'Search Our Umbraco with Google',
-		searchOurUmbracoForumsUsingGoogle: 'Search Our Umbraco forums using Google',
+		searchOurUmbraco: 'Search Umbraco forum',
+		searchThisMessageOnOurUmbracoForumsAndDocs: 'Search this message in the Umbraco forum',
+		searchOurUmbracoWithGoogle: 'Search Umbraco forum with Google',
+		searchOurUmbracoForumsUsingGoogle: 'Search Umbraco forum using Google',
+		searchUmbracoDocs: 'Search Umbraco documentation',
+		searchThisMessageInUmbracoDocs: 'Search this message in the Umbraco documentation',
 		searchUmbracoSource: 'Search Umbraco Source',
 		searchWithinUmbracoSourceCodeOnGithub: 'Search within Umbraco source code on GitHub',
 		searchUmbracoIssues: 'Search Umbraco Issues',
@@ -2656,6 +2660,7 @@ export default {
 		confirmPasteOverwriteMessage: (name: string) =>
 			`The property already contains a value. Paste from the property action will overwrite the current value. Do you want to replace the current value with <strong>${name}</strong>?`,
 		copySuccessHeadline: 'Copied to clipboard',
+		noItemsMessage: 'There are no items in the clipboard.',
 	},
 	propertyActions: {
 		tooltipForPropertyActionsMenu: 'Open Property Actions',

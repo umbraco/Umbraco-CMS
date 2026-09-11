@@ -1,15 +1,14 @@
-import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';
-import { css, html, customElement, property, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import { UUICardElement } from '@umbraco-cms/backoffice/external/uui';
+import { css, customElement, html, ifDefined, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
+import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';
+import { UUICardElement } from '@umbraco-cms/backoffice/external/uui';
 
 /**
  * @element umb-template-card
  * @slot actions
- * @fires open
+ * @fires open — when no href is set
  * @fires selected
  */
-// TODO: This should extends the UUICardElement, and the visual look of this should be like the UserCard or similarly.
 // TOOD: Consider if this should be select in the 'persisted'-select style when it is selected as a default. (But its should not use the runtime-selection style)
 @customElement('umb-template-card')
 export class UmbTemplateCardElement extends UmbElementMixin(UUICardElement) {
@@ -18,9 +17,6 @@ export class UmbTemplateCardElement extends UmbElementMixin(UUICardElement) {
 
 	@property({ type: Boolean, reflect: true })
 	default = false;
-
-	@property({ type: String })
-	href?: string;
 
 	#id = '';
 
@@ -32,7 +28,7 @@ export class UmbTemplateCardElement extends UmbElementMixin(UUICardElement) {
 		return this.#id;
 	}
 
-	// TODO: Remove in v.20
+	/** @deprecated Use `id` instead. This property will be removed in Umbraco 20. */
 	public set value(newId: string) {
 		new UmbDeprecation({
 			deprecated: 'UmbTemplateCardElement.value',
@@ -65,23 +61,25 @@ export class UmbTemplateCardElement extends UmbElementMixin(UUICardElement) {
 	}
 
 	override render() {
-		return html`<div id="card">
-			${this.href ? this.#renderLink() : this.#renderButton()}
-			<uui-button
-				id="bottom"
-				label="${this.localize.term('settings_defaulttemplate')}"
-				look=${this.default ? 'default' : 'secondary'}
-				?disabled="${this.default}"
-				@click="${this.#setSelection}">
-				${this.localize.term(this.default ? 'settings_defaulttemplate' : 'grid_setAsDefault')}
-			</uui-button>
-			<slot name="actions"></slot>
-		</div>`;
+		return html`
+			<div id="card">
+				${this.href ? this.#renderLink() : this.#renderButton()}
+				<uui-button
+					id="bottom"
+					label=${this.localize.term('settings_defaulttemplate')}
+					look=${this.default ? 'default' : 'secondary'}
+					?disabled=${this.default}
+					@click=${this.#setSelection}>
+					${this.localize.term(this.default ? 'settings_defaulttemplate' : 'grid_setAsDefault')}
+				</uui-button>
+				<slot name="actions"></slot>
+			</div>
+		`;
 	}
 
 	#renderButton() {
 		return html`
-			<button id="open-part" aria-label="Open ${this.name}" @click="${this.#openTemplate}">
+			<button id="open-part" aria-label="Open ${this.name}" @click=${this.#openTemplate}>
 				${this.#renderContent()}
 			</button>
 		`;
@@ -106,17 +104,11 @@ export class UmbTemplateCardElement extends UmbElementMixin(UUICardElement) {
 		`;
 	}
 
-	static override styles = [
+	static override readonly styles = [
 		...UUICardElement.styles,
 		css`
 			:host {
-				box-sizing: border-box;
 				display: contents;
-				position: relative;
-
-				height: 100%;
-				border: 1px solid red;
-				margin: auto;
 			}
 
 			#card {

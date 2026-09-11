@@ -64,6 +64,26 @@ function baseLocaleOf(locale: string): string {
 	return new Intl.Locale(locale).baseName.toLowerCase();
 }
 
+/**
+ * Locale-sensitive formatting is delegated to `Intl`, which resolves a language-only tag to the
+ * conventions of that language's default region. Where the dictionary we ship under that tag is
+ * written for a different region, the default is wrong for our users and is corrected here.
+ * Keyed on the full base name, so an explicitly requested region is never overridden.
+ */
+const FORMATTING_LOCALE_OVERRIDES: Record<string, string> = {
+	// The `en` dictionary is UK English, but `Intl` resolves a bare `en` to US conventions.
+	en: 'en-gb',
+};
+
+/**
+ * Returns the locale to use for locale-sensitive formatting of the given base name.
+ * @param {string} baseName - the lowercase base name of the requested locale.
+ * @returns {string} the formatting locale, which is the base name itself unless overridden.
+ */
+function toFormattingLocale(baseName: string): string {
+	return FORMATTING_LOCALE_OVERRIDES[baseName] ?? baseName;
+}
+
 export class UmbLocalizationRegistry {
 	// The active language is driven by the consuming host element (<umb-app>, <umb-auth>) via
 	// `loadLanguage()` — Razor sets `lang="@DefaultUILanguage"` on those, the element passes
@@ -97,7 +117,7 @@ export class UmbLocalizationRegistry {
 				// language on its first render. Direction and the actual consumer notification
 				// happen below, once the dictionaries are in place.
 				tap((currentLanguage) => {
-					umbLocalizationManager.documentLanguage = baseLocaleOf(currentLanguage);
+					umbLocalizationManager.documentLanguage = toFormattingLocale(baseLocaleOf(currentLanguage));
 				}),
 				// Switch to the extensions registry to get the current language and the extensions for that language
 				// Note: This also cancels the previous subscription if the language changes
@@ -207,7 +227,7 @@ export class UmbLocalizationRegistry {
 		// controller to re-render against the freshly loaded dictionaries. Inlined here because
 		// it's the only place this happens — no need for another public method on the manager
 		// that we'd just have to retire when the manager and registry get merged.
-		umbLocalizationManager.documentLanguage = newLang;
+		umbLocalizationManager.documentLanguage = toFormattingLocale(newLang);
 		umbLocalizationManager.documentDirection = direction;
 		umbLocalizationManager.connectedControllers.forEach((ctrl) => ctrl.documentUpdate());
 	}
