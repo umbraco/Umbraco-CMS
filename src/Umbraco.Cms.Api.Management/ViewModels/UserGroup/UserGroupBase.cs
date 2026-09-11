@@ -96,7 +96,7 @@ public class UserGroupBase
     public bool ElementRootAccess { get; init; }
 
     /// <summary>
-    /// Gets or sets the key of the container that should act as root node for the user group in the document blueprint tree.
+    /// Gets the key of the container that should act as root node for the user group in the document blueprint tree.
     /// <remarks>
     /// This can be overwritten by a different user group if a user is a member of multiple groups
     /// </remarks>
@@ -104,7 +104,7 @@ public class UserGroupBase
     public ReferenceByIdModel? DocumentBlueprintStartNode { get; init; }
 
     /// <summary>
-    /// Gets or sets a value indicating whether the group should have access to the document blueprint root.
+    /// Gets a value indicating whether the group should have access to the document blueprint root.
     /// <remarks>
     /// This will be ignored if an explicit start node has been specified in <see cref="DocumentBlueprintStartNode"/>.
     /// </remarks>

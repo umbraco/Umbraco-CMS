@@ -154,7 +154,7 @@ public class DocumentBlueprintPermissionServiceTests
         Assert.AreEqual(DocumentBlueprintAuthorizationStatus.UnauthorizedMissingPathAccess, result);
     }
 
-    private static IUser CreateUser(int? startDocumentBlueprintId = null)
+    private static User CreateUser(int? startDocumentBlueprintId = null)
     {
         UserBuilder builder = new UserBuilder().WithId(0);
 
@@ -178,9 +178,9 @@ public class DocumentBlueprintPermissionServiceTests
     /// access outright. The builders default every start node to the root, and a user level assignment
     /// only ever overrides a group one, so this cannot be expressed through them.
     /// </summary>
-    private static IUser CreateUserWithoutAccess()
+    private static User CreateUserWithoutAccess()
     {
-        IUser user = new UserBuilder().WithId(0).WithStartDocumentBlueprintIds([]).Build();
+        User user = new UserBuilder().WithId(0).WithStartDocumentBlueprintIds([]).Build();
         user.ClearGroups();
         user.AddGroup(Mock.Of<IReadOnlyUserGroup>(x =>
             x.Id == 1 &&
