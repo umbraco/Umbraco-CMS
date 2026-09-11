@@ -7,6 +7,7 @@ using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Web.Common.Security;
@@ -116,6 +117,30 @@ public class BackOfficeSignInManager : UmbracoSignInManager<BackOfficeIdentityUs
     }
 
     /// <summary>
+    ///     Overridden to ensure that only users of <see cref="UserKind.Default" /> can obtain a back office session.
+    /// </summary>
+    /// <param name="user">The user attempting to sign in.</param>
+    /// <returns><c>true</c> if the user can sign in; otherwise, <c>false</c>.</returns>
+    /// <remarks>
+    ///     Users of other kinds are not interactive: they authenticate against the token endpoint using their own
+    ///     credentials and never hold a back office session.
+    /// </remarks>
+    public override async Task<bool> CanSignInAsync(BackOfficeIdentityUser user)
+    {
+        if (user.Kind != UserKind.Default)
+        {
+            Logger.LogWarning(
+                "Sign in refused for a user of kind '{UserKind}', which cannot sign in to the back office. Affected user id: '{UserId}', key: '{UserKey}'",
+                user.Kind,
+                user.Id,
+                user.Key);
+            return false;
+        }
+
+        return await base.CanSignInAsync(user);
+    }
+
+    /// <summary>
     ///     Configures the redirect URL and user identifier for the specified external login <paramref name="provider" />.
     /// </summary>
     /// <param name="provider">The provider to configure.</param>
@@ -218,6 +243,20 @@ public class BackOfficeSignInManager : UmbracoSignInManager<BackOfficeIdentityUs
         BackOfficeIdentityUser? autoLinkUser = await UserManager.FindByEmailAsync(email!);
         if (autoLinkUser != null)
         {
+            // Email addresses are unique across all users regardless of their kind, so the match found here could be a
+            // user that is not permitted to sign in interactively. Auto-linking to such a user would grant an external
+            // identity a back office session under an account that was never intended to have one.
+            if (autoLinkUser.Kind != UserKind.Default)
+            {
+                Logger.LogWarning(
+                    "External login auto-link failed for provider '{LoginProvider}': the user matched on email address is of kind '{UserKind}', which cannot sign in to the back office. Affected user id: '{UserId}', key: '{UserKey}'",
+                    loginInfo.LoginProvider,
+                    autoLinkUser.Kind,
+                    autoLinkUser.Id,
+                    autoLinkUser.Key);
+                return AutoLinkSignInResult.FailedUnsupportedUserKind;
+            }
+
             try
             {
                 // Call the callback if one is assigned
