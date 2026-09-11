@@ -1660,18 +1660,27 @@ export class UiBaseLocators extends BasePage {
 
   // Media Methods
   /**
-   * A media card matched on its **exact** name.
+   * A media card matched on its **exact** name, so a leftover `TestMedia` cannot also match
+   * `TestMediaTwo` and trip strict mode (CLAUDE.md §3).
    *
-   * `uui-card-media` receives the name as an attribute - the collection item binds
-   * `name=${item.name}` - so this is exact and cannot multi-match the way `{hasText: name}` can
-   * when a leftover `TestMedia` and `TestMediaTwo` are both present (CLAUDE.md §3). Note the
-   * attribute is on the card itself, not a descendant, so this is not a `filter({has})`.
+   * Matches **either** attribute, because `uui-card-media` is bound differently depending on
+   * where it is rendered, and the card in one place is not the card in another:
    *
-   * The same form does **not** transfer to `uui-card-block-type` or `uui-card-user`: both are
-   * bound with `.name=` as a property and neither reflects it, so no attribute exists there.
+   * | Rendered by | `name` | `title` |
+   * |-------------|--------|---------|
+   * | `media-collection-item-card` (collection view) | attribute | — |
+   * | `input-media` (already-picked card on the form) | attribute | attribute |
+   * | `media-picker-modal` (the picker itself) | **`.name` property only** | attribute |
+   *
+   * The picker binds `.name=${item.name}`, which sets no attribute, so `[name="…"]` alone finds
+   * nothing there — it fails as "element not found", which reads like the media is missing
+   * rather than like a wrong locator. Both attributes are exact, so matching either is safe.
+   *
+   * Neither form transfers to `uui-card-block-type` or `uui-card-user`: both are bound with
+   * `.name=` and set no attribute at all, so those match on exact text instead.
    */
   getMediaCardWithName(name: string): Locator {
-    return this.page.locator(`uui-card-media[name="${name}"]`);
+    return this.page.locator(`uui-card-media[name="${name}"], uui-card-media[title="${name}"]`);
   }
 
   /**
