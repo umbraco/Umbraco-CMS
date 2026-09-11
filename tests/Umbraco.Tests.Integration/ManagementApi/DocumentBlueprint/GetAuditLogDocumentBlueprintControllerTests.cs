@@ -48,7 +48,7 @@ public class GetAuditLogDocumentBlueprintControllerTests
         => new() { ExpectedStatusCode = HttpStatusCode.OK };
 
     protected override UserGroupAssertionModel EditorUserGroupAssertionModel
-        => new() { ExpectedStatusCode = HttpStatusCode.OK };
+        => new() { ExpectedStatusCode = HttpStatusCode.Forbidden };
 
     protected override UserGroupAssertionModel SensitiveDataUserGroupAssertionModel
         => new() { ExpectedStatusCode = HttpStatusCode.Forbidden };
@@ -57,7 +57,7 @@ public class GetAuditLogDocumentBlueprintControllerTests
         => new() { ExpectedStatusCode = HttpStatusCode.Forbidden };
 
     protected override UserGroupAssertionModel WriterUserGroupAssertionModel
-        => new() { ExpectedStatusCode = HttpStatusCode.OK };
+        => new() { ExpectedStatusCode = HttpStatusCode.Forbidden };
 
     protected override UserGroupAssertionModel UnauthorizedUserGroupAssertionModel
         => new() { ExpectedStatusCode = HttpStatusCode.Unauthorized };
