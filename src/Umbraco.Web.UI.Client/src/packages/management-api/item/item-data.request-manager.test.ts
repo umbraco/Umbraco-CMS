@@ -399,6 +399,39 @@ describe('UmbManagementApiItemDataRequestManager', () => {
 			// Cache should not be affected by undefined state
 			expect(dataCache.has('item-1')).to.be.true;
 		});
+
+		// A consumer rebuilt mid-session — e.g. a picker after a workspace tab is remounted —
+		// constructs a fresh request manager and requests immediately. The connection is
+		// already established and the cache is already warm, so the rebuild should cost
+		// nothing. (#23572)
+		it('reads from the cache when constructed while the connection is already established', async () => {
+			mockServerEventContext.setIsConnected(true);
+			await new Promise((resolve) => setTimeout(resolve, 10));
+
+			dataCache.set('item-1', { id: 'item-1', name: 'Cached Item 1' });
+			dataCache.set('item-2', { id: 'item-2', name: 'Cached Item 2' });
+
+			let getItemsCalled = false;
+			mockGetItems = async (ids: Array<string>) => {
+				getItemsCalled = true;
+				return { data: ids.map((id) => ({ id, name: `Fresh Item ${id}` })) };
+			};
+
+			const rebuiltManager = new UmbManagementApiItemDataRequestManager<TestItemModel>(hostElement, {
+				getItems: mockGetItems,
+				dataCache,
+				inflightRequestCache,
+				getUniqueMethod: (item) => item.id,
+			});
+
+			// Deliberately no wait: the production call path requests straight after construction.
+			const result = await rebuiltManager.getItems(['item-1', 'item-2']);
+
+			expect(getItemsCalled, 'expected the warm cache to serve the request without a server call').to.be.false;
+			expect(result.data).to.have.lengthOf(2);
+
+			rebuiltManager.destroy();
+		});
 	});
 
 	describe('without inflight cache', () => {
