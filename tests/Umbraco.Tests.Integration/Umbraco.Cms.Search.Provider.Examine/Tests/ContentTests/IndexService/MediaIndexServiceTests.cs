@@ -7,7 +7,7 @@ using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 
-namespace Umbraco.Cms.Tests.Integration.Umbraco.Cms.Search.Provider.Examine.Tests.ContentTests.IndexService;
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Provider.Examine.Tests.ContentTests.IndexService;
 
 [LongRunning]
 public class MediaIndexServiceTests : IndexTestBase
@@ -17,7 +17,7 @@ public class MediaIndexServiceTests : IndexTestBase
     {
         await CreateMediaAsync();
 
-        IIndex index = GetIndex(global::Umbraco.Cms.Core.Constants.IndexAliases.DraftMedia);
+        IIndex index = GetIndex(Constants.IndexAliases.DraftMedia);
 
         ISearchResults results = index.Searcher.CreateQuery().All().Execute();
         Assert.That(results.TotalItemCount, Is.EqualTo(1));
@@ -37,7 +37,7 @@ public class MediaIndexServiceTests : IndexTestBase
             .Build();
         await GetRequiredService<IMediaTypeService>().CreateAsync(mediaType, Constants.Security.SuperUserKey);
 
-        await WaitForIndexing(global::Umbraco.Cms.Core.Constants.IndexAliases.DraftMedia, () =>
+        await WaitForIndexing(Constants.IndexAliases.DraftMedia, () =>
         {
             GetRequiredService<IMediaService>().Save(
                 new MediaBuilder()

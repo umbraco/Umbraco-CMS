@@ -8,7 +8,7 @@ using Umbraco.Cms.Core.Search.Configuration;
 using Umbraco.Cms.Search.Core.DependencyInjection;
 using Umbraco.Cms.Search.Core.Services;
 
-namespace Umbraco.Cms.Tests.Integration.Umbraco.Cms.Search.Core;
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Core;
 
 [TestFixture]
 internal class IndexerResolverTests : ResolverTestsBase<IndexerResolver>

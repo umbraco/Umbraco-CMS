@@ -9,8 +9,9 @@ using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Constants = Umbraco.Cms.Search.Provider.Examine.Constants;
+using CoreConstants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Cms.Tests.Integration.Umbraco.Cms.Search.Provider.Examine.Tests.ContentTests.IndexService;
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Provider.Examine.Tests.ContentTests.IndexService;
 
 [LongRunning]
 public class InvariantFacetsIndexTests : IndexTestBase
@@ -24,8 +25,8 @@ public class InvariantFacetsIndexTests : IndexTestBase
         await CreateCountDocuments([1, 2]);
 
         IIndex index = GetIndex(publish
-            ? global::Umbraco.Cms.Core.Constants.IndexAliases.PublishedContent
-            : global::Umbraco.Cms.Core.Constants.IndexAliases.DraftContent);
+            ? CoreConstants.IndexAliases.PublishedContent
+            : CoreConstants.IndexAliases.DraftContent);
 
         var fieldName = FieldNameHelper.FieldName("otherName", Constants.FieldValues.Integers);
         ISearchResults results = index.Searcher.CreateQuery()
@@ -49,8 +50,8 @@ public class InvariantFacetsIndexTests : IndexTestBase
         await CreateDecimalDocuments([3.6, 600.4]);
 
         IIndex index = GetIndex(publish
-            ? global::Umbraco.Cms.Core.Constants.IndexAliases.PublishedContent
-            : global::Umbraco.Cms.Core.Constants.IndexAliases.DraftContent);
+            ? CoreConstants.IndexAliases.PublishedContent
+            : CoreConstants.IndexAliases.DraftContent);
 
         var fieldName = FieldNameHelper.FieldName("decimalproperty", Constants.FieldValues.Decimals);
         ISearchResults results = index.Searcher.CreateQuery()
@@ -74,8 +75,8 @@ public class InvariantFacetsIndexTests : IndexTestBase
         await CreateTitleDocuments(["Title", "Title", "Another"]);
 
         IIndex index = GetIndex(publish
-            ? global::Umbraco.Cms.Core.Constants.IndexAliases.PublishedContent
-            : global::Umbraco.Cms.Core.Constants.IndexAliases.DraftContent);
+            ? CoreConstants.IndexAliases.PublishedContent
+            : CoreConstants.IndexAliases.DraftContent);
 
         var fieldName = FieldNameHelper.FieldName("title", Constants.FieldValues.Texts);
         ISearchResults results = index.Searcher.CreateQuery()
@@ -100,8 +101,8 @@ public class InvariantFacetsIndexTests : IndexTestBase
         await CreateCountDocuments([1, 2, 99, 101, 170]);
 
         IIndex index = GetIndex(publish
-            ? global::Umbraco.Cms.Core.Constants.IndexAliases.PublishedContent
-            : global::Umbraco.Cms.Core.Constants.IndexAliases.DraftContent);
+            ? CoreConstants.IndexAliases.PublishedContent
+            : CoreConstants.IndexAliases.DraftContent);
 
         var fieldName = FieldNameHelper.FieldName("otherName", Constants.FieldValues.Integers);
         ISearchResults results = index.Searcher.CreateQuery()
@@ -126,10 +127,10 @@ public class InvariantFacetsIndexTests : IndexTestBase
             .AddPropertyType()
             .WithAlias("otherName")
             .WithDataTypeId(-51)
-            .WithPropertyEditorAlias(global::Umbraco.Cms.Core.Constants.PropertyEditors.Aliases.Integer)
+            .WithPropertyEditorAlias(CoreConstants.PropertyEditors.Aliases.Integer)
             .Done()
             .Build();
-        await ContentTypeService.CreateAsync(ContentType, global::Umbraco.Cms.Core.Constants.Security.SuperUserKey);
+        await ContentTypeService.CreateAsync(ContentType, CoreConstants.Security.SuperUserKey);
     }
 
     private async Task CreateTitleDocType()
@@ -138,18 +139,18 @@ public class InvariantFacetsIndexTests : IndexTestBase
             .WithAlias("invariant")
             .AddPropertyType()
             .WithAlias("title")
-            .WithDataTypeId(global::Umbraco.Cms.Core.Constants.DataTypes.Textbox)
-            .WithPropertyEditorAlias(global::Umbraco.Cms.Core.Constants.PropertyEditors.Aliases.TextBox)
+            .WithDataTypeId(CoreConstants.DataTypes.Textbox)
+            .WithPropertyEditorAlias(CoreConstants.PropertyEditors.Aliases.TextBox)
             .Done()
             .Build();
-        await ContentTypeService.CreateAsync(ContentType, global::Umbraco.Cms.Core.Constants.Security.SuperUserKey);
+        await ContentTypeService.CreateAsync(ContentType, CoreConstants.Security.SuperUserKey);
     }
 
     private async Task CreateTitleDocuments(string[] values)
     {
         await CreateTitleDocType();
 
-        await WaitForIndexing(global::Umbraco.Cms.Core.Constants.IndexAliases.PublishedContent, () =>
+        await WaitForIndexing(CoreConstants.IndexAliases.PublishedContent, () =>
         {
             foreach (var stringValue in values)
             {
@@ -177,27 +178,27 @@ public class InvariantFacetsIndexTests : IndexTestBase
             .WithoutIdentity()
             .WithDatabaseType(ValueStorageType.Decimal)
             .AddEditor()
-            .WithAlias(global::Umbraco.Cms.Core.Constants.PropertyEditors.Aliases.Decimal)
+            .WithAlias(CoreConstants.PropertyEditors.Aliases.Decimal)
             .Done()
             .Build();
 
-        await DataTypeService.CreateAsync(dataType, global::Umbraco.Cms.Core.Constants.Security.SuperUserKey);
+        await DataTypeService.CreateAsync(dataType, CoreConstants.Security.SuperUserKey);
         ContentType = new ContentTypeBuilder()
             .WithAlias("invariant")
             .AddPropertyType()
             .WithAlias("decimalproperty")
             .WithDataTypeId(dataType.Id)
-            .WithPropertyEditorAlias(global::Umbraco.Cms.Core.Constants.PropertyEditors.Aliases.Decimal)
+            .WithPropertyEditorAlias(CoreConstants.PropertyEditors.Aliases.Decimal)
             .Done()
             .Build();
-        await ContentTypeService.CreateAsync(ContentType, global::Umbraco.Cms.Core.Constants.Security.SuperUserKey);
+        await ContentTypeService.CreateAsync(ContentType, CoreConstants.Security.SuperUserKey);
     }
 
     private async Task CreateDecimalDocuments(double[] values)
     {
         await CreateDecimalDocType();
 
-        await WaitForIndexing(global::Umbraco.Cms.Core.Constants.IndexAliases.PublishedContent, () =>
+        await WaitForIndexing(CoreConstants.IndexAliases.PublishedContent, () =>
         {
             foreach (var doubleValue in values)
             {
@@ -222,7 +223,7 @@ public class InvariantFacetsIndexTests : IndexTestBase
     {
         await CreateCountDocType();
 
-        await WaitForIndexing(global::Umbraco.Cms.Core.Constants.IndexAliases.PublishedContent, () =>
+        await WaitForIndexing(CoreConstants.IndexAliases.PublishedContent, () =>
         {
             foreach (var countValue in values)
             {

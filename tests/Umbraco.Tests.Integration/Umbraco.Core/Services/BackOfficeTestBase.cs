@@ -5,7 +5,7 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Common.Testing;
-using Umbraco.Cms.Tests.Integration.Umbraco.Cms.Search.Core;
+using Umbraco.Cms.Tests.Integration.Umbraco.Search.Core;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 

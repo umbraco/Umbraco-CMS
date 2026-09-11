@@ -15,11 +15,12 @@ using Umbraco.Cms.Search.Provider.Examine.Services;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 using Umbraco.Cms.Tests.Integration.Testing.Search;
-using Umbraco.Cms.Tests.Integration.Umbraco.Cms.Search.Provider.Examine.Attributes;
-using Umbraco.Cms.Tests.Integration.Umbraco.Cms.Search.Provider.Examine.Extensions;
-using Umbraco.Cms.Tests.Integration.Umbraco.Cms.Search.Provider.Examine.Tests.ContentTests.IndexService;
+using Umbraco.Cms.Tests.Integration.Umbraco.Search.Provider.Examine.Attributes;
+using Umbraco.Cms.Tests.Integration.Umbraco.Search.Provider.Examine.Extensions;
+using Umbraco.Cms.Tests.Integration.Umbraco.Search.Provider.Examine.Tests.ContentTests.IndexService;
+using Umbraco.Cms.Core;
 
-namespace Umbraco.Cms.Tests.Integration.Umbraco.Cms.Search.Provider.Examine.Tests;
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Provider.Examine.Tests;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
@@ -130,5 +131,5 @@ public abstract class TestBase : UmbracoIntegrationTest
     private void IndexCommited(object? sender, EventArgs e)
         => Interlocked.Exchange(ref _lastCommitTimestamp, Stopwatch.GetTimestamp());
 
-    protected string GetIndexAlias(bool publish) => publish ? global::Umbraco.Cms.Core.Constants.IndexAliases.PublishedContent : global::Umbraco.Cms.Core.Constants.IndexAliases.DraftContent;
+    protected string GetIndexAlias(bool publish) => publish ? Constants.IndexAliases.PublishedContent : Constants.IndexAliases.DraftContent;
 }

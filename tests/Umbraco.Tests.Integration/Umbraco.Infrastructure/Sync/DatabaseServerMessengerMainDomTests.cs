@@ -12,6 +12,7 @@ using Umbraco.Cms.Infrastructure.Sync;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
+using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Sync;
 
@@ -46,10 +47,10 @@ internal sealed class DatabaseServerMessengerMainDomTests : UmbracoIntegrationTe
         var maxInstructionIdBeforePublish = CacheInstructionService.GetMaxInstructionId();
 
         var template = TemplateBuilder.CreateTextPageTemplate("testPageTemplate");
-        await TemplateService.CreateAsync(template, global::Umbraco.Cms.Core.Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
 
         var contentType = ContentTypeBuilder.CreateSimpleContentType("testPage", "Test Page", defaultTemplateId: template.Id);
-        await ContentTypeService.CreateAsync(contentType, global::Umbraco.Cms.Core.Constants.Security.SuperUserKey);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
         var content = ContentBuilder.CreateSimpleContent(contentType, "Test Content");
         ContentService.Save(content);
 

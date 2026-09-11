@@ -3,7 +3,7 @@ using Umbraco.Cms.Core.Search.Querying;
 using Umbraco.Cms.Core.Search.Querying.Filtering;
 using Umbraco.Cms.Tests.Common.Attributes;
 
-namespace Umbraco.Cms.Tests.Integration.Umbraco.Cms.Search.Provider.Examine.Tests;
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Provider.Examine.Tests;
 
 // tests specifically related to the IndexValue.TextsR2 collection
 // - note that these tests are not exhaustive - see more test cases for IndexValue.Texts

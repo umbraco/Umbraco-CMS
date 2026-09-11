@@ -3,7 +3,7 @@ using Examine.Lucene.Providers;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace Umbraco.Cms.Tests.Integration.Umbraco.Cms.Search.Provider.Examine;
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Provider.Examine;
 
 internal class TestIndex : LuceneIndex
 {

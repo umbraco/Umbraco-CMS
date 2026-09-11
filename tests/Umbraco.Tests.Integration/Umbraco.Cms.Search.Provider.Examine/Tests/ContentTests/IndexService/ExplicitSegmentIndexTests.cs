@@ -9,7 +9,7 @@ using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Constants = Umbraco.Cms.Search.Provider.Examine.Constants;
 using CoreConstants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Cms.Tests.Integration.Umbraco.Cms.Search.Provider.Examine.Tests.ContentTests.IndexService;
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Provider.Examine.Tests.ContentTests.IndexService;
 
 /// <summary>
 /// Tests that verify the indexing structure for segment-based content.
@@ -387,7 +387,7 @@ public class ExplicitSegmentIndexTests : IndexTestBase
         ILanguage langDk = new LanguageBuilder()
             .WithCultureInfo("da-DK")
             .Build();
-        await LanguageService.CreateAsync(langDk, global::Umbraco.Cms.Core.Constants.Security.SuperUserKey);
+        await LanguageService.CreateAsync(langDk, CoreConstants.Security.SuperUserKey);
 
         IContentType contentType = new ContentTypeBuilder()
             .WithAlias("segmentTestType")
@@ -395,11 +395,11 @@ public class ExplicitSegmentIndexTests : IndexTestBase
             .AddPropertyType()
             .WithAlias("segmentedProperty")
             .WithVariations(ContentVariation.CultureAndSegment)
-            .WithDataTypeId(global::Umbraco.Cms.Core.Constants.DataTypes.Textbox)
-            .WithPropertyEditorAlias(global::Umbraco.Cms.Core.Constants.PropertyEditors.Aliases.TextBox)
+            .WithDataTypeId(CoreConstants.DataTypes.Textbox)
+            .WithPropertyEditorAlias(CoreConstants.PropertyEditors.Aliases.TextBox)
             .Done()
             .Build();
-        await ContentTypeService.CreateAsync(contentType, global::Umbraco.Cms.Core.Constants.Security.SuperUserKey);
+        await ContentTypeService.CreateAsync(contentType, CoreConstants.Security.SuperUserKey);
 
         // Document 1: Has distinct values in null-segment, segment-1, and segment-2
         Content docWithAllSegments = new ContentBuilder()

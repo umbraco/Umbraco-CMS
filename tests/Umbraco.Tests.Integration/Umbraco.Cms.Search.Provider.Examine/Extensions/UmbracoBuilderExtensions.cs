@@ -4,7 +4,7 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Search.Provider.Examine.NotificationHandlers;
 
-namespace Umbraco.Cms.Tests.Integration.Umbraco.Cms.Search.Provider.Examine.Extensions;
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Provider.Examine.Extensions;
 
 internal static class UmbracoBuilderExtensions
 {

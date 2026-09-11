@@ -1,7 +1,7 @@
 ﻿using NUnit.Framework;
 using Umbraco.Cms.Core.Search.Querying;
 
-namespace Umbraco.Cms.Tests.Integration.Umbraco.Cms.Search.Provider.Examine.Tests;
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Provider.Examine.Tests;
 
 // tests related to searching with an empty (rather than null) culture, as happens for the
 // invariant Media section list view in the backoffice

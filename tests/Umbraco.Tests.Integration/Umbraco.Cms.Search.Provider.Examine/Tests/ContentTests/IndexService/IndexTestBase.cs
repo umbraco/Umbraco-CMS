@@ -2,7 +2,7 @@ using Examine;
 using Umbraco.Cms.Core.Search;
 using Umbraco.Cms.Search.Provider.Examine.Services;
 
-namespace Umbraco.Cms.Tests.Integration.Umbraco.Cms.Search.Provider.Examine.Tests.ContentTests.IndexService;
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Provider.Examine.Tests.ContentTests.IndexService;
 
 public abstract class IndexTestBase : TestBase
 {

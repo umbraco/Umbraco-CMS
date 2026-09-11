@@ -12,7 +12,7 @@ using Umbraco.Cms.Search.Core.DependencyInjection;
 using Umbraco.Cms.Tests.Integration.Testing;
 using Umbraco.Cms.Tests.Integration.Testing.Search;
 
-namespace Umbraco.Cms.Tests.Integration.Umbraco.Cms.Search.Core;
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Core;
 
 public abstract class TestBase : UmbracoIntegrationTest
 {

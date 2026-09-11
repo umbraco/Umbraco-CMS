@@ -9,8 +9,9 @@ using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Constants = Umbraco.Cms.Search.Provider.Examine.Constants;
+using CoreConstants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Cms.Tests.Integration.Umbraco.Cms.Search.Provider.Examine.Tests.ContentTests.IndexService;
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Provider.Examine.Tests.ContentTests.IndexService;
 
 [LongRunning]
 public class InvariantDocumentProtectionIndexTests : IndexTestBase
@@ -24,7 +25,7 @@ public class InvariantDocumentProtectionIndexTests : IndexTestBase
     {
         Attempt<IMemberGroup?, MemberGroupOperationStatus> result = await MemberGroupService.CreateAsync(new MemberGroup { Name = "testGroup" });
 
-        await WaitForIndexing(global::Umbraco.Cms.Core.Constants.IndexAliases.PublishedContent, async () =>
+        await WaitForIndexing(CoreConstants.IndexAliases.PublishedContent, async () =>
         {
             await PublicAccessService.CreateAsync(
                 new PublicAccessEntrySlim
@@ -36,7 +37,7 @@ public class InvariantDocumentProtectionIndexTests : IndexTestBase
                 });
         });
 
-        IIndex index = GetIndex(global::Umbraco.Cms.Core.Constants.IndexAliases.PublishedContent);
+        IIndex index = GetIndex(CoreConstants.IndexAliases.PublishedContent);
         ISearchResults results = index.Searcher.CreateQuery().All().Execute();
         IReadOnlyList<string> indexedAccessKeys = results.First().AllValues.First(x => x.Key == Constants.SystemFields.Protection).Value;
         Assert.That(indexedAccessKeys, Has.Count.EqualTo(1));
@@ -52,7 +53,7 @@ public class InvariantDocumentProtectionIndexTests : IndexTestBase
         Attempt<IMemberGroup?, MemberGroupOperationStatus> group4 = await MemberGroupService.CreateAsync(new MemberGroup { Name = "testGroup 4" });
         Attempt<IMemberGroup?, MemberGroupOperationStatus> group5 = await MemberGroupService.CreateAsync(new MemberGroup { Name = "testGroup 5" });
 
-        await WaitForIndexing(global::Umbraco.Cms.Core.Constants.IndexAliases.PublishedContent, async () =>
+        await WaitForIndexing(CoreConstants.IndexAliases.PublishedContent, async () =>
         {
             await PublicAccessService.CreateAsync(
                 new PublicAccessEntrySlim
@@ -64,7 +65,7 @@ public class InvariantDocumentProtectionIndexTests : IndexTestBase
                 });
         });
 
-        IIndex index = GetIndex(global::Umbraco.Cms.Core.Constants.IndexAliases.PublishedContent);
+        IIndex index = GetIndex(CoreConstants.IndexAliases.PublishedContent);
         ISearchResults results = index.Searcher.CreateQuery().All().Execute();
         IReadOnlyList<string> indexedAccessKeys = results.First().AllValues.First(x => x.Key == Constants.SystemFields.Protection).Value;
         Assert.That(indexedAccessKeys, Has.Count.EqualTo(5));
@@ -78,7 +79,7 @@ public class InvariantDocumentProtectionIndexTests : IndexTestBase
     [Test]
     public void DoesNotIndexContentProtectionIfNoneExists()
     {
-        IIndex index = GetIndex(global::Umbraco.Cms.Core.Constants.IndexAliases.PublishedContent);
+        IIndex index = GetIndex(CoreConstants.IndexAliases.PublishedContent);
         ISearchResults results = index.Searcher.CreateQuery().All().Execute();
         Assert.That(results.First().AllValues.SelectMany(x => x.Value), Does.Not.Contain(Constants.SystemFields.Protection));
     }
@@ -90,11 +91,11 @@ public class InvariantDocumentProtectionIndexTests : IndexTestBase
             .WithAlias("invariant")
             .AddPropertyType()
             .WithAlias("title")
-            .WithDataTypeId(global::Umbraco.Cms.Core.Constants.DataTypes.Textbox)
-            .WithPropertyEditorAlias(global::Umbraco.Cms.Core.Constants.PropertyEditors.Aliases.TextBox)
+            .WithDataTypeId(CoreConstants.DataTypes.Textbox)
+            .WithPropertyEditorAlias(CoreConstants.PropertyEditors.Aliases.TextBox)
             .Done()
             .Build();
-        await ContentTypeService.CreateAsync(contentType, global::Umbraco.Cms.Core.Constants.Security.SuperUserKey);
+        await ContentTypeService.CreateAsync(contentType, CoreConstants.Security.SuperUserKey);
 
         Content root = new ContentBuilder()
             .WithKey(RootKey)
@@ -107,7 +108,7 @@ public class InvariantDocumentProtectionIndexTests : IndexTestBase
                 })
             .Build();
 
-        await WaitForIndexing(global::Umbraco.Cms.Core.Constants.IndexAliases.PublishedContent, () =>
+        await WaitForIndexing(CoreConstants.IndexAliases.PublishedContent, () =>
         {
             SaveAndPublish(root);
             return Task.CompletedTask;

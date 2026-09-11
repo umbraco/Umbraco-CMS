@@ -111,9 +111,9 @@ public partial class UserStartNodeEntitiesServiceElementTests : UserStartNodeEnt
             .WithStartElementIds(startNodeIds)
             .Build();
 
-    protected override string[]? GetStartNodePaths(global::Umbraco.Cms.Core.Models.Membership.User user)
+    protected override string[]? GetStartNodePaths(Core.Models.Membership.User user)
         => user.GetElementStartNodePaths(EntityService, AppCaches.NoCache);
 
-    protected override int[]? CalculateStartNodeIds(global::Umbraco.Cms.Core.Models.Membership.User user)
+    protected override int[]? CalculateStartNodeIds(Core.Models.Membership.User user)
         => user.CalculateElementStartNodeIds(EntityService, AppCaches.NoCache);
 }

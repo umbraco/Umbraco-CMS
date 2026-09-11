@@ -6,7 +6,7 @@ using Umbraco.Cms.Search.Core.Cache.Content;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 
-namespace Umbraco.Cms.Tests.Integration.Umbraco.Cms.Search.Core;
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Core;
 
 public partial class PublishedContentCacheRefresherTests
 {

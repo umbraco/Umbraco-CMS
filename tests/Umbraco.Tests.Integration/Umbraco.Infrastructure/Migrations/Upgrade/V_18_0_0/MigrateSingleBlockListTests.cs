@@ -574,7 +574,7 @@ internal sealed class MigrateSingleBlockListTests : UmbracoIntegrationTest
 
     private async Task AssertDataTypeIsSingleBlockAsync(int dataTypeId)
     {
-        using global::Umbraco.Cms.Infrastructure.Scoping.IScope scope = ScopeProvider.CreateScope();
+        using Cms.Infrastructure.Scoping.IScope scope = ScopeProvider.CreateScope();
 
         Sql<ISqlContext> sql = scope.Database.SqlContext.Sql()
             .Select<DataTypeDto>()
@@ -616,7 +616,7 @@ internal sealed class MigrateSingleBlockListTests : UmbracoIntegrationTest
 
     private async Task<string?> GetStoredValueAsync(int contentId, string propertyAlias)
     {
-        using global::Umbraco.Cms.Infrastructure.Scoping.IScope scope = ScopeProvider.CreateScope();
+        using Cms.Infrastructure.Scoping.IScope scope = ScopeProvider.CreateScope();
 
         Sql<ISqlContext> sql = scope.Database.SqlContext.Sql()
             .Select<PropertyDataDto>()

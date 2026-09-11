@@ -5,7 +5,7 @@ using Umbraco.Cms.Core.Search.Indexing;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing.Search;
 
-namespace Umbraco.Cms.Tests.Integration.Umbraco.Cms.Search.Core;
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Core;
 
 // This test fixture is here to ensure that we don't accidentally make it too cumbersome to index custom data.
 [TestFixture]

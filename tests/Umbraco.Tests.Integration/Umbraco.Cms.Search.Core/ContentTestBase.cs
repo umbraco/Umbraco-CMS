@@ -2,7 +2,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Search.Indexing;
 using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Cms.Tests.Integration.Umbraco.Cms.Search.Core;
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Core;
 
 public abstract class ContentTestBase : ContentBaseTestBase
 {

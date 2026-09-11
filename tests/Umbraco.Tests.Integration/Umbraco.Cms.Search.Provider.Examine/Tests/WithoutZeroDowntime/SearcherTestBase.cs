@@ -8,17 +8,18 @@ using Umbraco.Cms.Core.Search.Querying;
 using Umbraco.Cms.Core.Search.Querying.Faceting;
 using Umbraco.Cms.Core.Search.Querying.Filtering;
 using Umbraco.Cms.Core.Search.Querying.Sorting;
-using Umbraco.Cms.Tests.Integration.Umbraco.Cms.Search.Provider.Examine.Extensions;
-using Umbraco.Cms.Tests.Integration.Umbraco.Cms.Search.Provider.Examine.Tests.ContentTests.IndexService;
+using Umbraco.Cms.Tests.Integration.Umbraco.Search.Provider.Examine.Extensions;
+using Umbraco.Cms.Tests.Integration.Umbraco.Search.Provider.Examine.Tests.ContentTests.IndexService;
+using Umbraco.Cms.Core;
 
-namespace Umbraco.Cms.Tests.Integration.Umbraco.Cms.Search.Provider.Examine.Tests.WithoutZeroDowntime;
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Provider.Examine.Tests.WithoutZeroDowntime;
 
 [TestFixture]
 public abstract class SearcherTestBase
 {
     private ServiceProvider _serviceProvider;
 
-    private const string IndexAlias = global::Umbraco.Cms.Core.Constants.IndexAliases.PublishedContent;
+    private const string IndexAlias = Constants.IndexAliases.PublishedContent;
     protected const string FieldMultipleValues = "fieldMultipleValues";
     protected const string FieldSingleValue = "fieldSingleValues";
 
@@ -50,7 +51,7 @@ public abstract class SearcherTestBase
                 [new Variation(Culture: null, Segment: null)],
                 [
                     new IndexField(
-                        global::Umbraco.Cms.Core.Constants.IndexFieldNames.PathIds,
+                        Constants.IndexFieldNames.PathIds,
                         new IndexValue { Keywords = [id.AsKeyword()] },
                         Culture: null,
                         Segment: null),

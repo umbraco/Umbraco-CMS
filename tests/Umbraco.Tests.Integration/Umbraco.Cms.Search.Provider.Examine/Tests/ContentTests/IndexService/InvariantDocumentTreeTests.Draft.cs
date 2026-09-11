@@ -6,7 +6,7 @@ using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 
-namespace Umbraco.Cms.Tests.Integration.Umbraco.Cms.Search.Provider.Examine.Tests.ContentTests.IndexService;
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Provider.Examine.Tests.ContentTests.IndexService;
 
 [LongRunning]
 public partial class InvariantDocumentTreeTests
@@ -15,7 +15,7 @@ public partial class InvariantDocumentTreeTests
     public async Task DraftStructure_YieldsAllDocuments()
     {
         await CreateInvariantDocumentTree(false);
-        IIndex index = GetIndex(global::Umbraco.Cms.Core.Constants.IndexAliases.DraftContent);
+        IIndex index = GetIndex(Constants.IndexAliases.DraftContent);
 
         ISearchResult[] results = index.Searcher.CreateQuery().All().Execute().ToArray();
 
@@ -37,7 +37,7 @@ public partial class InvariantDocumentTreeTests
     public async Task DraftStructure_YieldsNoPublishedDocuments()
     {
         await CreateInvariantDocumentTree(false);
-        IIndex index = GetIndex(global::Umbraco.Cms.Core.Constants.IndexAliases.PublishedContent);
+        IIndex index = GetIndex(Constants.IndexAliases.PublishedContent);
 
         ISearchResults results = index.Searcher.CreateQuery().All().Execute();
         Assert.That(results.Count(), Is.EqualTo(0));
@@ -48,14 +48,14 @@ public partial class InvariantDocumentTreeTests
     {
         await CreateInvariantDocumentTree(false);
 
-        await WaitForIndexing(global::Umbraco.Cms.Core.Constants.IndexAliases.DraftContent, () =>
+        await WaitForIndexing(Constants.IndexAliases.DraftContent, () =>
         {
             IContent root = ContentService.GetById(RootKey)!;
             ContentService.MoveToRecycleBin(root);
             return Task.CompletedTask;
         });
 
-        IIndex index = GetIndex(global::Umbraco.Cms.Core.Constants.IndexAliases.DraftContent);
+        IIndex index = GetIndex(Constants.IndexAliases.DraftContent);
         ISearchResult[] results = index.Searcher.CreateQuery().All().Execute().ToArray();
 
         Assert.Multiple(() =>
@@ -76,14 +76,14 @@ public partial class InvariantDocumentTreeTests
     public async Task DraftStructure_WithChildDeleted_YieldsNothingBelowRoot()
     {
         await CreateInvariantDocumentTree(false);
-        await WaitForIndexing(global::Umbraco.Cms.Core.Constants.IndexAliases.DraftContent, () =>
+        await WaitForIndexing(Constants.IndexAliases.DraftContent, () =>
         {
             IContent child = ContentService.GetById(ChildKey)!;
             ContentService.Delete(child);
             return Task.CompletedTask;
         });
 
-        IIndex index = GetIndex(global::Umbraco.Cms.Core.Constants.IndexAliases.DraftContent);
+        IIndex index = GetIndex(Constants.IndexAliases.DraftContent);
         ISearchResult[] results = index.Searcher.CreateQuery().All().Execute().ToArray();
 
         Assert.Multiple(() =>
@@ -97,7 +97,7 @@ public partial class InvariantDocumentTreeTests
     public async Task DraftStructure_WithGrandchildDeleted_YieldsNothingBelowChild()
     {
         await CreateInvariantDocumentTree(false);
-        await WaitForIndexing(global::Umbraco.Cms.Core.Constants.IndexAliases.DraftContent, () =>
+        await WaitForIndexing(Constants.IndexAliases.DraftContent, () =>
         {
             IContent grandchild = ContentService.GetById(GrandchildKey)!;
             ContentService.Delete(grandchild);
@@ -105,7 +105,7 @@ public partial class InvariantDocumentTreeTests
         });
 
 
-        IIndex index = GetIndex(global::Umbraco.Cms.Core.Constants.IndexAliases.DraftContent);
+        IIndex index = GetIndex(Constants.IndexAliases.DraftContent);
         ISearchResult[] results = index.Searcher.CreateQuery().All().Execute().ToArray();
 
         Assert.Multiple(() =>
@@ -132,7 +132,7 @@ public partial class InvariantDocumentTreeTests
             .Done()
             .Build();
 
-        await DataTypeService.CreateAsync(dataType, global::Umbraco.Cms.Core.Constants.Security.SuperUserKey);
+        await DataTypeService.CreateAsync(dataType, Constants.Security.SuperUserKey);
         IContentType contentType = new ContentTypeBuilder()
             .WithAlias("invariant")
             .AddPropertyType()
@@ -156,9 +156,9 @@ public partial class InvariantDocumentTreeTests
             .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.Decimal)
             .Done()
             .Build();
-        await ContentTypeService.CreateAsync(contentType, global::Umbraco.Cms.Core.Constants.Security.SuperUserKey);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
         contentType.AllowedContentTypes = [new ContentTypeSort(contentType.Key, 0, contentType.Alias)];
-        await ContentTypeService.CreateAsync(contentType, global::Umbraco.Cms.Core.Constants.Security.SuperUserKey);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         Content root = new ContentBuilder()
             .WithKey(RootKey)
@@ -174,7 +174,7 @@ public partial class InvariantDocumentTreeTests
                 })
             .Build();
 
-        await WaitForIndexing(publish ? global::Umbraco.Cms.Core.Constants.IndexAliases.PublishedContent : global::Umbraco.Cms.Core.Constants.IndexAliases.DraftContent, () =>
+        await WaitForIndexing(publish ? Constants.IndexAliases.PublishedContent : Constants.IndexAliases.DraftContent, () =>
         {
             if (publish)
             {

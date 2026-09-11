@@ -66,15 +66,15 @@ public partial class UserStartNodeEntitiesServiceTests : UserStartNodeEntitiesSe
     protected override void ClearUserGroupStartNode(IUserGroup userGroup)
         => userGroup.StartContentId = null;
 
-    protected override global::Umbraco.Cms.Core.Models.Membership.User BuildUserWithStartNodes(int[] startNodeIds)
+    protected override Core.Models.Membership.User BuildUserWithStartNodes(int[] startNodeIds)
         => new UserBuilder()
             .WithName(Guid.NewGuid().ToString("N"))
             .WithStartContentIds(startNodeIds)
             .Build();
 
-    protected override string[]? GetStartNodePaths(global::Umbraco.Cms.Core.Models.Membership.User user)
+    protected override string[]? GetStartNodePaths(Core.Models.Membership.User user)
         => user.GetContentStartNodePaths(EntityService, AppCaches.NoCache);
 
-    protected override int[]? CalculateStartNodeIds(global::Umbraco.Cms.Core.Models.Membership.User user)
+    protected override int[]? CalculateStartNodeIds(Core.Models.Membership.User user)
         => user.CalculateContentStartNodeIds(EntityService, AppCaches.NoCache);
 }

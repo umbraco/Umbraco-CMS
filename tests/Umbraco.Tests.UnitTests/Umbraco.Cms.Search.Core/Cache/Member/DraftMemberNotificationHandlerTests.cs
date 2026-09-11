@@ -9,7 +9,7 @@ using Umbraco.Cms.Core.Search.Indexing;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Search.Core.Cache.Member;
 
-namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Search.Core.Cache.Member;
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Search.Core.Cache.Member;
 
 [TestFixture]
 internal sealed class DraftMemberNotificationHandlerTests

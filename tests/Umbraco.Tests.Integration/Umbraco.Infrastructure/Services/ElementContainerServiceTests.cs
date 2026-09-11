@@ -101,7 +101,7 @@ public partial class ElementContainerServiceTests : UmbracoIntegrationTest
         var elementType = await CreateElementType();
 
         // ensure that we have at least three pages of descendants to iterate across
-        var iterations = global::Umbraco.Cms.Core.Services.ElementContainerService.DescendantsIteratorPageSize + 5;
+        var iterations = Cms.Core.Services.ElementContainerService.DescendantsIteratorPageSize + 5;
         for (var i = 0; i < iterations; i++)
         {
             var element = await CreateElement(elementType.Key, childContainerKey);

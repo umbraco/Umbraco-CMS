@@ -8,7 +8,7 @@ using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Integration.Testing.Search;
 
-namespace Umbraco.Cms.Tests.Integration.Umbraco.Cms.Search.Core;
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Core;
 
 // NOTE:
 // Covers the four newer date/time editors (Umbraco.DateOnly, Umbraco.TimeOnly, Umbraco.DateTimeUnspecified,

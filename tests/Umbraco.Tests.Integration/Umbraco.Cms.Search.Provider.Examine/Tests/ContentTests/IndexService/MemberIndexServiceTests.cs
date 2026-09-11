@@ -7,7 +7,7 @@ using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 
-namespace Umbraco.Cms.Tests.Integration.Umbraco.Cms.Search.Provider.Examine.Tests.ContentTests.IndexService;
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Provider.Examine.Tests.ContentTests.IndexService;
 
 [LongRunning]
 public class MemberIndexServiceTests : IndexTestBase
@@ -16,7 +16,7 @@ public class MemberIndexServiceTests : IndexTestBase
     public async Task CanIndexAnyMember()
     {
         await CreateMemberAsync();
-        IIndex index = GetIndex(global::Umbraco.Cms.Core.Constants.IndexAliases.DraftMembers);
+        IIndex index = GetIndex(Constants.IndexAliases.DraftMembers);
 
         ISearchResults results = index.Searcher.CreateQuery().All().Execute();
         Assert.That(results.TotalItemCount, Is.EqualTo(1));
@@ -36,7 +36,7 @@ public class MemberIndexServiceTests : IndexTestBase
             .Build();
         await GetRequiredService<IMemberTypeService>().CreateAsync(memberType, Constants.Security.SuperUserKey);
 
-        await WaitForIndexing(global::Umbraco.Cms.Core.Constants.IndexAliases.DraftMembers, () =>
+        await WaitForIndexing(Constants.IndexAliases.DraftMembers, () =>
         {
             GetRequiredService<IMemberService>().Save(
                 new MemberBuilder()

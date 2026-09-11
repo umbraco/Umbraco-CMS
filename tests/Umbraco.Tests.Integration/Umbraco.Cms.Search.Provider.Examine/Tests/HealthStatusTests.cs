@@ -3,7 +3,7 @@ using Umbraco.Cms.Core.Search;
 using Umbraco.Cms.Core.Search.Indexing;
 using Umbraco.Cms.Tests.Common.Attributes;
 
-namespace Umbraco.Cms.Tests.Integration.Umbraco.Cms.Search.Provider.Examine.Tests;
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Provider.Examine.Tests;
 
 [TestFixture]
 [LongRunning]

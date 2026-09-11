@@ -3,7 +3,7 @@ using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Search.Indexing;
 
-namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Search.Core.Extensions;
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Search.Core.Extensions;
 
 public partial class ContentExtensionsTests
 {

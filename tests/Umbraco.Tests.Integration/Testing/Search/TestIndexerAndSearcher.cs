@@ -28,7 +28,7 @@ public class TestIndexerAndSearcher : IIndexer, ISearcher
         {
             GetIndex(indexAlias).Remove(key);
             IEnumerable<TestIndexDocument> descendantDocuments = GetIndex(indexAlias).Values.Where(document =>
-                document.Fields.Any(f => f.FieldName == global::Umbraco.Cms.Core.Constants.IndexFieldNames.PathIds && f.Value.Keywords?.Contains($"{key:D}") is true));
+                document.Fields.Any(f => f.FieldName == Constants.IndexFieldNames.PathIds && f.Value.Keywords?.Contains($"{key:D}") is true));
             foreach (TestIndexDocument descendantDocument in descendantDocuments)
             {
                 GetIndex(indexAlias).Remove(descendantDocument.Id);

@@ -82,7 +82,7 @@ public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
     /// <param name="allowedSections">The sections the group is allowed to access.</param>
     protected async Task AuthenticateWithSectionsAsync(string groupAlias, params string[] allowedSections)
     {
-        var userGroup = new global::Umbraco.Cms.Core.Models.Membership.UserGroup(GetRequiredService<IShortStringHelper>())
+        var userGroup = new Cms.Core.Models.Membership.UserGroup(GetRequiredService<IShortStringHelper>())
         {
             Name = groupAlias,
             Alias = groupAlias,

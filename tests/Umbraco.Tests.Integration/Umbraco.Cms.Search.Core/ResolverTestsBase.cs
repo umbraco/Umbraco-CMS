@@ -10,7 +10,7 @@ using Umbraco.Cms.Core.Search.Querying.Sorting;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 
-namespace Umbraco.Cms.Tests.Integration.Umbraco.Cms.Search.Core;
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Core;
 
 [UmbracoTest(Database = UmbracoTestOptions.Database.None)]
 internal abstract class ResolverTestsBase<TResolver> : UmbracoIntegrationTest

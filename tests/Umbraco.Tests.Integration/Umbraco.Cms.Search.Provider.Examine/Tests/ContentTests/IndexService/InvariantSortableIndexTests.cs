@@ -7,8 +7,9 @@ using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Constants = Umbraco.Cms.Search.Provider.Examine.Constants;
+using CoreConstants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Cms.Tests.Integration.Umbraco.Cms.Search.Provider.Examine.Tests.ContentTests.IndexService;
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Provider.Examine.Tests.ContentTests.IndexService;
 
 [LongRunning]
 public class InvariantSortableIndexTests : IndexTestBase
@@ -22,8 +23,8 @@ public class InvariantSortableIndexTests : IndexTestBase
         await CreateTitleDocuments(["C Title", "A Title", "B Title"]);
 
         IIndex index = GetIndex(publish
-            ? global::Umbraco.Cms.Core.Constants.IndexAliases.PublishedContent
-            : global::Umbraco.Cms.Core.Constants.IndexAliases.DraftContent);
+            ? CoreConstants.IndexAliases.PublishedContent
+            : CoreConstants.IndexAliases.DraftContent);
 
         var fieldName = FieldNameHelper.FieldName("sortableTitle", Constants.FieldValues.Texts);
         ISearchResults results = index.Searcher.CreateQuery().All().OrderBy(new SortableField(fieldName, SortType.String)).Execute();
@@ -44,23 +45,23 @@ public class InvariantSortableIndexTests : IndexTestBase
             .WithAlias("invariant")
             .AddPropertyType()
             .WithAlias("sortableTitle")
-            .WithDataTypeId(global::Umbraco.Cms.Core.Constants.DataTypes.Textbox)
-            .WithPropertyEditorAlias(global::Umbraco.Cms.Core.Constants.PropertyEditors.Aliases.TextBox)
+            .WithDataTypeId(CoreConstants.DataTypes.Textbox)
+            .WithPropertyEditorAlias(CoreConstants.PropertyEditors.Aliases.TextBox)
             .Done()
             .AddPropertyType()
             .WithAlias("title")
-            .WithDataTypeId(global::Umbraco.Cms.Core.Constants.DataTypes.Textbox)
-            .WithPropertyEditorAlias(global::Umbraco.Cms.Core.Constants.PropertyEditors.Aliases.TextBox)
+            .WithDataTypeId(CoreConstants.DataTypes.Textbox)
+            .WithPropertyEditorAlias(CoreConstants.PropertyEditors.Aliases.TextBox)
             .Done()
             .Build();
-        await ContentTypeService.CreateAsync(ContentType, global::Umbraco.Cms.Core.Constants.Security.SuperUserKey);
+        await ContentTypeService.CreateAsync(ContentType, CoreConstants.Security.SuperUserKey);
     }
 
     private async Task CreateTitleDocuments(string[] values)
     {
         await CreateTitleDocType();
 
-        await WaitForIndexing(global::Umbraco.Cms.Core.Constants.IndexAliases.PublishedContent, () =>
+        await WaitForIndexing(CoreConstants.IndexAliases.PublishedContent, () =>
         {
             foreach (var stringValue in values)
             {

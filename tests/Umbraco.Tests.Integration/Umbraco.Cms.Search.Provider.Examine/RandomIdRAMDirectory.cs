@@ -1,6 +1,6 @@
 using Lucene.Net.Store;
 
-namespace Umbraco.Cms.Tests.Integration.Umbraco.Cms.Search.Provider.Examine;
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Provider.Examine;
 
 public class RandomIdRAMDirectory : RAMDirectory
 {

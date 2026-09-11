@@ -8,7 +8,7 @@ using Umbraco.Cms.Core.Search.Querying.Filtering;
 using Umbraco.Cms.Core.Search.Querying.Sorting;
 using Umbraco.Cms.Tests.Common.Attributes;
 
-namespace Umbraco.Cms.Tests.Integration.Umbraco.Cms.Search.Provider.Examine.Tests.WithoutZeroDowntime;
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Provider.Examine.Tests.WithoutZeroDowntime;
 
 [LongRunning]
 public class SearchTests : SearcherTestBase

@@ -7,7 +7,7 @@ using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 
-namespace Umbraco.Cms.Tests.Integration.Umbraco.Cms.Search.Provider.Examine.Tests.DeliveryApi;
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Provider.Examine.Tests.DeliveryApi;
 
 /// <summary>
 /// Tests the Umbraco Search based implementation of <see cref="IApiContentQueryProvider"/>

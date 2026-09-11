@@ -6,7 +6,7 @@ using Umbraco.Cms.Core.Search.Configuration;
 using Umbraco.Cms.Core.Search.Indexing;
 using Umbraco.Cms.Tests.Integration.Testing.Search;
 
-namespace Umbraco.Cms.Tests.Integration.Umbraco.Cms.Search.Core;
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Core;
 
 public class ContentIndexingServiceSameOriginOnlyTests : ContentIndexingServiceTestsBase
 {

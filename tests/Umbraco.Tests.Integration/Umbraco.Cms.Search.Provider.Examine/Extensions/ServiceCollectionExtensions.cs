@@ -5,17 +5,18 @@ using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Search.Provider.Examine.Configuration;
 using Umbraco.Cms.Search.Provider.Examine.DependencyInjection;
 using Umbraco.Cms.Search.Provider.Examine.Services;
+using Umbraco.Cms.Core;
 
-namespace Umbraco.Cms.Tests.Integration.Umbraco.Cms.Search.Provider.Examine.Extensions;
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Provider.Examine.Extensions;
 
 internal static class ServiceCollectionExtensions
 {
     private static readonly string[] IndexAliases =
     [
-        global::Umbraco.Cms.Core.Constants.IndexAliases.DraftContent,
-        global::Umbraco.Cms.Core.Constants.IndexAliases.PublishedContent,
-        global::Umbraco.Cms.Core.Constants.IndexAliases.DraftMedia,
-        global::Umbraco.Cms.Core.Constants.IndexAliases.DraftMembers,
+        Constants.IndexAliases.DraftContent,
+        Constants.IndexAliases.PublishedContent,
+        Constants.IndexAliases.DraftMedia,
+        Constants.IndexAliases.DraftMembers,
     ];
 
     public static IServiceCollection AddExamineSearchProviderServicesForTest<TIndex, TDirectoryFactory>(this IServiceCollection services)

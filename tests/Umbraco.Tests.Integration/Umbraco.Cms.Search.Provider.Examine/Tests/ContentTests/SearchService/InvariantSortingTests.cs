@@ -10,7 +10,7 @@ using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 
-namespace Umbraco.Cms.Tests.Integration.Umbraco.Cms.Search.Provider.Examine.Tests.ContentTests.SearchService;
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Provider.Examine.Tests.ContentTests.SearchService;
 
 [LongRunning]
 public class InvariantSortingTests : SearcherTestBase
@@ -181,7 +181,7 @@ public class InvariantSortingTests : SearcherTestBase
             null,
             null,
             null,
-            [new TextSorter(global::Umbraco.Cms.Core.Constants.IndexFieldNames.Name, direction)],
+            [new TextSorter(Constants.IndexFieldNames.Name, direction)],
             null,
             null,
             null,

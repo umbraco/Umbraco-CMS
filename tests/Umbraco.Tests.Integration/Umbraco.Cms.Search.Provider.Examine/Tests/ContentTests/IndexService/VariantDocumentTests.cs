@@ -8,8 +8,9 @@ using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Constants = Umbraco.Cms.Search.Provider.Examine.Constants;
+using CoreConstants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Cms.Tests.Integration.Umbraco.Cms.Search.Provider.Examine.Tests.ContentTests.IndexService;
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Provider.Examine.Tests.ContentTests.IndexService;
 
 [LongRunning]
 public class VariantDocumentTests : IndexTestBase
@@ -98,7 +99,7 @@ public class VariantDocumentTests : IndexTestBase
     {
         await CreateVariantDocument();
         var field = FieldNameHelper.FieldName(property, fieldValues);
-        IIndex index = GetIndex(global::Umbraco.Cms.Core.Constants.IndexAliases.PublishedContent);
+        IIndex index = GetIndex(CoreConstants.IndexAliases.PublishedContent);
 
         IOrdering queryBuilder = index.Searcher.CreateQuery().All();
         queryBuilder.SelectField(field);
@@ -121,7 +122,7 @@ public class VariantDocumentTests : IndexTestBase
         await CreateVariantDocument();
         await UpdateProperty(propertyName, updatedValue, culture);
 
-        IIndex index = GetIndex(global::Umbraco.Cms.Core.Constants.IndexAliases.PublishedContent);
+        IIndex index = GetIndex(CoreConstants.IndexAliases.PublishedContent);
 
         ISearchResults results = index.Searcher.Search(updatedValue);
         Assert.That(results, Is.Not.Empty);
@@ -173,11 +174,11 @@ public class VariantDocumentTests : IndexTestBase
             .WithoutIdentity()
             .WithDatabaseType(ValueStorageType.Decimal)
             .AddEditor()
-            .WithAlias(global::Umbraco.Cms.Core.Constants.PropertyEditors.Aliases.Decimal)
+            .WithAlias(CoreConstants.PropertyEditors.Aliases.Decimal)
             .Done()
             .Build();
 
-        await DataTypeService.CreateAsync(dataType, global::Umbraco.Cms.Core.Constants.Security.SuperUserKey);
+        await DataTypeService.CreateAsync(dataType, CoreConstants.Security.SuperUserKey);
 
         ILanguage langDk = new LanguageBuilder()
             .WithCultureInfo("da-DK")
@@ -187,8 +188,8 @@ public class VariantDocumentTests : IndexTestBase
             .WithCultureInfo("ja-JP")
             .Build();
 
-        await LanguageService.CreateAsync(langDk, global::Umbraco.Cms.Core.Constants.Security.SuperUserKey);
-        await LanguageService.CreateAsync(langJp, global::Umbraco.Cms.Core.Constants.Security.SuperUserKey);
+        await LanguageService.CreateAsync(langDk, CoreConstants.Security.SuperUserKey);
+        await LanguageService.CreateAsync(langJp, CoreConstants.Security.SuperUserKey);
 
         IContentType contentType = new ContentTypeBuilder()
             .WithAlias("variant")
@@ -196,35 +197,35 @@ public class VariantDocumentTests : IndexTestBase
             .AddPropertyType()
             .WithAlias("title")
             .WithVariations(ContentVariation.Culture)
-            .WithDataTypeId(global::Umbraco.Cms.Core.Constants.DataTypes.Textbox)
-            .WithPropertyEditorAlias(global::Umbraco.Cms.Core.Constants.PropertyEditors.Aliases.TextBox)
+            .WithDataTypeId(CoreConstants.DataTypes.Textbox)
+            .WithPropertyEditorAlias(CoreConstants.PropertyEditors.Aliases.TextBox)
             .Done()
             .AddPropertyType()
             .WithAlias("invarianttitle")
             .WithVariations(ContentVariation.Nothing)
-            .WithDataTypeId(global::Umbraco.Cms.Core.Constants.DataTypes.Textbox)
-            .WithPropertyEditorAlias(global::Umbraco.Cms.Core.Constants.PropertyEditors.Aliases.TextBox)
+            .WithDataTypeId(CoreConstants.DataTypes.Textbox)
+            .WithPropertyEditorAlias(CoreConstants.PropertyEditors.Aliases.TextBox)
             .Done()
             .AddPropertyType()
             .WithAlias("invariantcount")
             .WithVariations(ContentVariation.Nothing)
             .WithDataTypeId(-51)
-            .WithPropertyEditorAlias(global::Umbraco.Cms.Core.Constants.PropertyEditors.Aliases.Integer)
+            .WithPropertyEditorAlias(CoreConstants.PropertyEditors.Aliases.Integer)
             .Done()
             .AddPropertyType()
             .WithAlias("invariantdecimalproperty")
             .WithVariations(ContentVariation.Nothing)
             .WithDataTypeId(dataType.Id)
-            .WithPropertyEditorAlias(global::Umbraco.Cms.Core.Constants.PropertyEditors.Aliases.Decimal)
+            .WithPropertyEditorAlias(CoreConstants.PropertyEditors.Aliases.Decimal)
             .Done()
             .AddPropertyType()
             .WithAlias("body")
             .WithVariations(ContentVariation.CultureAndSegment)
-            .WithDataTypeId(global::Umbraco.Cms.Core.Constants.DataTypes.Textbox)
-            .WithPropertyEditorAlias(global::Umbraco.Cms.Core.Constants.PropertyEditors.Aliases.TextBox)
+            .WithDataTypeId(CoreConstants.DataTypes.Textbox)
+            .WithPropertyEditorAlias(CoreConstants.PropertyEditors.Aliases.TextBox)
             .Done()
             .Build();
-        await ContentTypeService.CreateAsync(contentType, global::Umbraco.Cms.Core.Constants.Security.SuperUserKey);
+        await ContentTypeService.CreateAsync(contentType, CoreConstants.Security.SuperUserKey);
 
         Content root = new ContentBuilder()
             .WithKey(RootKey)
@@ -248,7 +249,7 @@ public class VariantDocumentTests : IndexTestBase
         root.SetValue("body", "ボディ-segment-1", "ja-JP", "segment-1");
         root.SetValue("body", "ボディ-segment-2", "ja-JP", "segment-2");
 
-        await WaitForIndexing(global::Umbraco.Cms.Core.Constants.IndexAliases.PublishedContent, () =>
+        await WaitForIndexing(CoreConstants.IndexAliases.PublishedContent, () =>
         {
             ContentService.Save(root);
             ContentService.Publish(root, ["*"]);

@@ -10,9 +10,9 @@ using Umbraco.Cms.Search.Provider.Examine.Configuration;
 using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
-using Umbraco.Cms.Tests.Integration.Umbraco.Cms.Search.Provider.Examine.Attributes;
+using Umbraco.Cms.Tests.Integration.Umbraco.Search.Provider.Examine.Attributes;
 
-namespace Umbraco.Cms.Tests.Integration.Umbraco.Cms.Search.Provider.Examine.Tests.ContentTests.SearchService;
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Provider.Examine.Tests.ContentTests.SearchService;
 
 [LongRunning]
 public class InvariantFacetsTests : SearcherTestBase

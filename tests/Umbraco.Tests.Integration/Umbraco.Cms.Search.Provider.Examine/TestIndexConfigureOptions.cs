@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Search.Provider.Examine.Configuration;
 
-namespace Umbraco.Cms.Tests.Integration.Umbraco.Cms.Search.Provider.Examine;
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Provider.Examine;
 
 public class TestIndexConfigureOptions : IConfigureOptions<FieldOptions>
 {

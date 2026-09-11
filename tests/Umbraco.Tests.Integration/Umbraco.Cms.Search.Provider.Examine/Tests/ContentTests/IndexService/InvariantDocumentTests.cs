@@ -7,8 +7,9 @@ using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Constants = Umbraco.Cms.Search.Provider.Examine.Constants;
+using CoreConstants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Cms.Tests.Integration.Umbraco.Cms.Search.Provider.Examine.Tests.ContentTests.IndexService;
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Provider.Examine.Tests.ContentTests.IndexService;
 
 [LongRunning]
 public class InvariantDocumentTests : IndexTestBase
@@ -44,7 +45,7 @@ public class InvariantDocumentTests : IndexTestBase
     [Test]
     public async Task CanRemoveUnpublishedDocument()
     {
-        await WaitForIndexing(global::Umbraco.Cms.Core.Constants.IndexAliases.PublishedContent, () =>
+        await WaitForIndexing(CoreConstants.IndexAliases.PublishedContent, () =>
         {
             IContent content = ContentService.GetById(RootKey)!;
             ContentService.Unpublish(content);
@@ -52,7 +53,7 @@ public class InvariantDocumentTests : IndexTestBase
         });
 
 
-        IIndex index = GetIndex(global::Umbraco.Cms.Core.Constants.IndexAliases.PublishedContent);
+        IIndex index = GetIndex(CoreConstants.IndexAliases.PublishedContent);
         ISearchResults results = index.Searcher.CreateQuery().All().Execute();
         Assert.That(results, Is.Empty);
     }
@@ -180,35 +181,35 @@ public class InvariantDocumentTests : IndexTestBase
             .WithoutIdentity()
             .WithDatabaseType(ValueStorageType.Decimal)
             .AddEditor()
-            .WithAlias(global::Umbraco.Cms.Core.Constants.PropertyEditors.Aliases.Decimal)
+            .WithAlias(CoreConstants.PropertyEditors.Aliases.Decimal)
             .Done()
             .Build();
 
-        await DataTypeService.CreateAsync(dataType, global::Umbraco.Cms.Core.Constants.Security.SuperUserKey);
+        await DataTypeService.CreateAsync(dataType, CoreConstants.Security.SuperUserKey);
         IContentType contentType = new ContentTypeBuilder()
             .WithAlias("invariant")
             .AddPropertyType()
             .WithAlias("title")
-            .WithDataTypeId(global::Umbraco.Cms.Core.Constants.DataTypes.Textbox)
-            .WithPropertyEditorAlias(global::Umbraco.Cms.Core.Constants.PropertyEditors.Aliases.TextBox)
+            .WithDataTypeId(CoreConstants.DataTypes.Textbox)
+            .WithPropertyEditorAlias(CoreConstants.PropertyEditors.Aliases.TextBox)
             .Done()
             .AddPropertyType()
             .WithAlias("count")
             .WithDataTypeId(-51)
-            .WithPropertyEditorAlias(global::Umbraco.Cms.Core.Constants.PropertyEditors.Aliases.Integer)
+            .WithPropertyEditorAlias(CoreConstants.PropertyEditors.Aliases.Integer)
             .Done()
             .AddPropertyType()
             .WithAlias("datetime")
-            .WithDataTypeId(global::Umbraco.Cms.Core.Constants.DataTypes.DateTime)
-            .WithPropertyEditorAlias(global::Umbraco.Cms.Core.Constants.PropertyEditors.Aliases.DateTime)
+            .WithDataTypeId(CoreConstants.DataTypes.DateTime)
+            .WithPropertyEditorAlias(CoreConstants.PropertyEditors.Aliases.DateTime)
             .Done()
             .AddPropertyType()
             .WithAlias("decimalproperty")
             .WithDataTypeId(dataType.Id)
-            .WithPropertyEditorAlias(global::Umbraco.Cms.Core.Constants.PropertyEditors.Aliases.Decimal)
+            .WithPropertyEditorAlias(CoreConstants.PropertyEditors.Aliases.Decimal)
             .Done()
             .Build();
-        await ContentTypeService.CreateAsync(contentType, global::Umbraco.Cms.Core.Constants.Security.SuperUserKey);
+        await ContentTypeService.CreateAsync(contentType, CoreConstants.Security.SuperUserKey);
 
         CurrentDateTime = CurrentDateTimeOffset.DateTime.TruncateTo(DateTimeExtensions.DateTruncate.Second);
 
@@ -226,7 +227,7 @@ public class InvariantDocumentTests : IndexTestBase
                 })
             .Build();
 
-        await WaitForIndexing(global::Umbraco.Cms.Core.Constants.IndexAliases.PublishedContent, () =>
+        await WaitForIndexing(CoreConstants.IndexAliases.PublishedContent, () =>
         {
             ContentService.Save(root);
             ContentService.Publish(root, ["*"]);

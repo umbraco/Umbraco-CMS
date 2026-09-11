@@ -15,6 +15,7 @@ using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
+using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositories;
 
@@ -374,7 +375,7 @@ internal sealed class DataTypeRepositoryTest : UmbracoIntegrationTest
             .WithId(0)
             .WithName("Test Data Type")
             .AddEditor()
-                .WithAlias(global::Umbraco.Cms.Core.Constants.PropertyEditors.Aliases.TextBox)
+                .WithAlias(Constants.PropertyEditors.Aliases.TextBox)
                 .Done()
             .Build();
 

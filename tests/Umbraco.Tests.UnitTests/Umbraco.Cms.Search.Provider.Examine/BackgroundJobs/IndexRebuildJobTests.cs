@@ -20,7 +20,7 @@ using IndexOptions = Umbraco.Cms.Core.Search.Configuration.IndexOptions;
 using ISearcher = Umbraco.Cms.Core.Search.ISearcher;
 using SearchResult = Umbraco.Cms.Core.Search.Querying.SearchResult;
 
-namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Search.Provider.Examine.BackgroundJobs;
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Search.Provider.Examine.BackgroundJobs;
 
 [TestFixture]
 public class IndexRebuildJobTests

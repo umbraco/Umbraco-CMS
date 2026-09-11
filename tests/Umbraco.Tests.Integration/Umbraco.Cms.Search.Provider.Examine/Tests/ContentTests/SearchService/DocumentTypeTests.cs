@@ -14,7 +14,7 @@ using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.TestHelpers;
 using Umbraco.Cms.Tests.Common.Testing;
 
-namespace Umbraco.Cms.Tests.Integration.Umbraco.Cms.Search.Provider.Examine.Tests.ContentTests.SearchService;
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Provider.Examine.Tests.ContentTests.SearchService;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
@@ -40,7 +40,7 @@ public class DocumentTypeTests : SearcherTestBase
         await CreateDocumentsAndWaitForIndexing();
 
         SearchResult results = await Searcher.SearchAsync(
-            global::Umbraco.Cms.Core.Constants.IndexAliases.DraftContent,
+            Constants.IndexAliases.DraftContent,
             query: "Home Page");
 
         Assert.That(results.Total, Is.EqualTo(2));
@@ -51,7 +51,7 @@ public class DocumentTypeTests : SearcherTestBase
         await WaitForIndexesToRebuild();
 
         results = await Searcher.SearchAsync(
-            global::Umbraco.Cms.Core.Constants.IndexAliases.DraftContent,
+            Constants.IndexAliases.DraftContent,
             query: "Home Page");
 
         Assert.That(results.Total, Is.EqualTo(1));
@@ -63,7 +63,7 @@ public class DocumentTypeTests : SearcherTestBase
         await CreateDocumentsAndWaitForIndexing();
 
         SearchResult results = await Searcher.SearchAsync(
-            global::Umbraco.Cms.Core.Constants.IndexAliases.DraftContent,
+            Constants.IndexAliases.DraftContent,
             query: "Home Page");
 
         Assert.That(results.Total, Is.EqualTo(2));
@@ -73,7 +73,7 @@ public class DocumentTypeTests : SearcherTestBase
         await WaitForIndexesToRebuild();
 
         results = await Searcher.SearchAsync(
-            global::Umbraco.Cms.Core.Constants.IndexAliases.DraftContent,
+            Constants.IndexAliases.DraftContent,
             query: "Home Page");
 
         Assert.That(results.Total, Is.EqualTo(1));
@@ -84,7 +84,7 @@ public class DocumentTypeTests : SearcherTestBase
 
     private async Task CreateDocumentsAndWaitForIndexing()
         => await WaitForIndexing(
-            global::Umbraco.Cms.Core.Constants.IndexAliases.DraftContent,
+            Constants.IndexAliases.DraftContent,
             async () => await CreateDocuments());
 
     private async Task CreateDocuments()

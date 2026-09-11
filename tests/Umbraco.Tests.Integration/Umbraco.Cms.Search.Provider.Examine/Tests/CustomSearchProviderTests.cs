@@ -15,11 +15,12 @@ using Umbraco.Cms.Search.Provider.Examine.DependencyInjection;
 using Umbraco.Cms.Search.Provider.Examine.Helpers;
 using Umbraco.Cms.Search.Provider.Examine.Services;
 using Umbraco.Cms.Tests.Common.Attributes;
-using Umbraco.Cms.Tests.Integration.Umbraco.Cms.Search.Provider.Examine.Tests.ContentTests.IndexService;
+using Umbraco.Cms.Tests.Integration.Umbraco.Search.Provider.Examine.Tests.ContentTests.IndexService;
 using ISearcher = Umbraco.Cms.Core.Search.ISearcher;
 using SearchResult = Umbraco.Cms.Core.Search.Querying.SearchResult;
+using Umbraco.Cms.Core;
 
-namespace Umbraco.Cms.Tests.Integration.Umbraco.Cms.Search.Provider.Examine.Tests;
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Provider.Examine.Tests;
 
 /// <summary>
 /// Tests to verify that custom <see cref="IndexValue"/> subclasses can be indexed
@@ -30,7 +31,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Cms.Search.Provider.Examine.Test
 public class CustomSearchProviderTests
 {
     private ServiceProvider _serviceProvider = null!;
-    private const string IndexAlias = global::Umbraco.Cms.Core.Constants.IndexAliases.PublishedContent;
+    private const string IndexAlias = Constants.IndexAliases.PublishedContent;
     private const string CustomGuidFieldName = "customGuids";
 
     private Dictionary<int, Guid> DocumentIds { get; } = [];
@@ -68,7 +69,7 @@ public class CustomSearchProviderTests
                 [new Variation(Culture: null, Segment: null)],
                 [
                     new IndexField(
-                        global::Umbraco.Cms.Core.Constants.IndexFieldNames.PathIds,
+                        Constants.IndexFieldNames.PathIds,
                         new IndexValue { Keywords = [id.AsKeyword()] },
                         Culture: null,
                         Segment: null),
@@ -453,10 +454,10 @@ internal static class CustomIndexerServiceCollectionExtensions
         // Register dual indexes (_a and _b) per logical alias for zero-downtime reindexing
         string[] aliases =
         [
-            global::Umbraco.Cms.Core.Constants.IndexAliases.DraftContent,
-            global::Umbraco.Cms.Core.Constants.IndexAliases.PublishedContent,
-            global::Umbraco.Cms.Core.Constants.IndexAliases.DraftMedia,
-            global::Umbraco.Cms.Core.Constants.IndexAliases.DraftMembers,
+            Constants.IndexAliases.DraftContent,
+            Constants.IndexAliases.PublishedContent,
+            Constants.IndexAliases.DraftMedia,
+            Constants.IndexAliases.DraftMembers,
         ];
         foreach (var alias in aliases)
         {

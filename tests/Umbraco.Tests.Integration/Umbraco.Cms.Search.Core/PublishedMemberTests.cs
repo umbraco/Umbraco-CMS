@@ -11,7 +11,7 @@ using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing.Search;
 
-namespace Umbraco.Cms.Tests.Integration.Umbraco.Cms.Search.Core;
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Core;
 
 /// <summary>
 /// Tests that member changes are handled by IPublishedContentChangeStrategy.
@@ -235,13 +235,13 @@ public class PublishedMemberTests : TestBase
 
     private void VerifyDocumentStructureValues(TestIndexDocument document, Guid key, Guid parentKey, Guid[] pathKeys)
     {
-        var idValue = document.Fields.FirstOrDefault(f => f.FieldName == global::Umbraco.Cms.Core.Constants.IndexFieldNames.Id)?.Value.Keywords?.SingleOrDefault();
+        var idValue = document.Fields.FirstOrDefault(f => f.FieldName == Constants.IndexFieldNames.Id)?.Value.Keywords?.SingleOrDefault();
         Assert.That(idValue, Is.EqualTo($"{key:D}"));
 
-        var parentIdValue = document.Fields.FirstOrDefault(f => f.FieldName == global::Umbraco.Cms.Core.Constants.IndexFieldNames.ParentId)?.Value.Keywords?.SingleOrDefault();
+        var parentIdValue = document.Fields.FirstOrDefault(f => f.FieldName == Constants.IndexFieldNames.ParentId)?.Value.Keywords?.SingleOrDefault();
         Assert.That(parentIdValue, Is.EqualTo($"{parentKey:D}"));
 
-        var pathIdsValue = document.Fields.FirstOrDefault(f => f.FieldName == global::Umbraco.Cms.Core.Constants.IndexFieldNames.PathIds)?.Value.Keywords?.ToArray();
+        var pathIdsValue = document.Fields.FirstOrDefault(f => f.FieldName == Constants.IndexFieldNames.PathIds)?.Value.Keywords?.ToArray();
         Assert.That(pathIdsValue, Is.Not.Null);
         Assert.That(pathIdsValue!.Length, Is.EqualTo(pathKeys.Length));
         Assert.That(pathIdsValue, Is.EquivalentTo(pathKeys.Select(k => $"{k:D}")));
