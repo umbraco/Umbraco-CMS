@@ -1494,9 +1494,11 @@ declare global {
 		logViewer_searchOurUmbraco: string;
 		logViewer_searchOurUmbracoForumsUsingGoogle: string;
 		logViewer_searchOurUmbracoWithGoogle: string;
+		logViewer_searchThisMessageInUmbracoDocs: string;
 		logViewer_searchThisMessageOnOurUmbracoForumsAndDocs: string;
 		logViewer_searchThisMessageWithBing: string;
 		logViewer_searchThisMessageWithGoogle: string;
+		logViewer_searchUmbracoDocs: string;
 		logViewer_searchUmbracoIssues: string;
 		logViewer_searchUmbracoIssuesOnGithub: string;
 		logViewer_searchUmbracoSource: string;
@@ -1855,6 +1857,7 @@ declare global {
 		references_labelUsedByMediaTypes: string;
 		references_labelUsedByMembers: string;
 		references_labelUsedByMemberTypes: string;
+		references_labelUsedByOtherContent: string;
 		references_labelUsedDescendants: string;
 		references_labelUsedItems: string;
 		references_listViewDialogWarning: string;

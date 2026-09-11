@@ -1068,7 +1068,7 @@ stages:
               archiveFilePatterns: $(Build.SourcesDirectory)/csharp-docs.zip
               destinationFolder: $(Build.ArtifactStagingDirectory)/csharp-docs
               overwriteExistingFiles: true
-          - task: AzureFileCopy@4
+          - task: AzureFileCopy@6
             displayName: "Copy C# Docs to blob storage"
             inputs:
               SourcePath: "$(Build.ArtifactStagingDirectory)/csharp-docs/*"
@@ -1092,7 +1092,7 @@ stages:
               archiveFilePatterns: $(Build.SourcesDirectory)/ui-docs.zip
               destinationFolder: $(Build.ArtifactStagingDirectory)/ui-docs
               overwriteExistingFiles: true
-          - task: AzureFileCopy@4
+          - task: AzureFileCopy@6
             displayName: "Copy Storybook to blob storage"
             inputs:
               SourcePath: "$(Build.ArtifactStagingDirectory)/ui-docs/*"
@@ -1116,7 +1116,7 @@ stages:
               archiveFilePatterns: $(Build.SourcesDirectory)/ui-api-docs.zip
               destinationFolder: $(Build.ArtifactStagingDirectory)/ui-api-docs
               overwriteExistingFiles: true
-          - task: AzureFileCopy@4
+          - task: AzureFileCopy@6
             displayName: "Copy UI API Docs to blob storage"
             inputs:
               SourcePath: "$(Build.ArtifactStagingDirectory)/ui-api-docs/*"

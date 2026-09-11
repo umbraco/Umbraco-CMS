@@ -169,7 +169,6 @@ const collectionMapper = (model: UmbMockDocumentModel): DocumentCollectionRespon
 			alias: '',
 			icon: model.documentType.icon,
 		},
-		hasChildren: model.hasChildren,
 		id: model.id,
 		isProtected: model.isProtected,
 		isTrashed: model.isTrashed,
@@ -178,6 +177,7 @@ const collectionMapper = (model: UmbMockDocumentModel): DocumentCollectionRespon
 		values: model.values,
 		variants: model.variants,
 		flags: model.flags,
+		hasChildren: model.hasChildren,
 	};
 };
 
