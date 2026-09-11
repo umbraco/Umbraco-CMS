@@ -49,6 +49,12 @@ public class CreateDocumentBlueprintController : DocumentBlueprintControllerBase
         _authorizationService = authorizationService;
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="CreateDocumentBlueprintController"/> class.
+    /// </summary>
+    /// <param name="blueprintEditingPresentationFactory">Factory used to create document blueprint editing presentations.</param>
+    /// <param name="contentBlueprintEditingService">Service used for editing document blueprints.</param>
+    /// <param name="backOfficeSecurityAccessor">Accessor for the back office security context.</param>
     [Obsolete("Use the constructor with all parameters. Scheduled for removal in Umbraco 21.")]
     public CreateDocumentBlueprintController(
         IDocumentBlueprintEditingPresentationFactory blueprintEditingPresentationFactory,

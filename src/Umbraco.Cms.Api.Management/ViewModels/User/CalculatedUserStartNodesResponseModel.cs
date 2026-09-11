@@ -34,7 +34,13 @@ public class CalculatedUserStartNodesResponseModel
 
     public bool HasElementRootAccess { get; set; }
 
+    /// <summary>
+    /// Gets or sets the document blueprint start nodes calculated for the user.
+    /// </summary>
     public ISet<ReferenceByIdModel> DocumentBlueprintStartNodeIds { get; set; } = new HashSet<ReferenceByIdModel>();
 
+    /// <summary>
+    /// Gets or sets a value indicating whether the user has access to the document blueprint root.
+    /// </summary>
     public bool HasDocumentBlueprintRootAccess { get; set; }
 }

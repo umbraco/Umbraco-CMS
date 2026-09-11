@@ -43,6 +43,15 @@ public class DocumentBlueprintTreeControllerBase : UserStartNodeFolderTreeContro
     {
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DocumentBlueprintTreeControllerBase"/> class.
+    /// </summary>
+    /// <param name="entityService">The service used to interact with entities in the system.</param>
+    /// <param name="flagProviders">A collection of providers that supply flags for entities.</param>
+    /// <param name="entitySearchService">The service used to search for entities.</param>
+    /// <param name="idKeyMap">The map between entity ids and keys.</param>
+    /// <param name="documentPresentationFactory">The factory responsible for creating document presentation models.</param>
+    /// <param name="treeFilterService">The service used to filter the tree by the user's start nodes.</param>
     [ActivatorUtilitiesConstructor]
     public DocumentBlueprintTreeControllerBase(
         IEntityService entityService,
@@ -69,6 +78,7 @@ public class DocumentBlueprintTreeControllerBase : UserStartNodeFolderTreeContro
         }
     }
 
+    /// <inheritdoc />
     protected override async Task<DocumentBlueprintTreeItemResponseModel> MapTreeItemViewModelAsync(Guid? parentKey, IEntitySlim entity)
     {
         DocumentBlueprintTreeItemResponseModel responseModel = await base.MapTreeItemViewModelAsync(parentKey, entity);
@@ -85,6 +95,7 @@ public class DocumentBlueprintTreeControllerBase : UserStartNodeFolderTreeContro
         return responseModel;
     }
 
+    /// <inheritdoc />
     protected override async Task<DocumentBlueprintTreeItemResponseModel> MapTreeItemViewModelAsNoAccessAsync(Guid? parentKey, IEntitySlim entity)
     {
         DocumentBlueprintTreeItemResponseModel responseModel = await MapTreeItemViewModelAsync(parentKey, entity);
