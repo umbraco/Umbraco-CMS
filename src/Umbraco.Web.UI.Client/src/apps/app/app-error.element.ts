@@ -49,32 +49,37 @@ export class UmbAppErrorElement extends UmbLitElement {
 		const searchParams = new URLSearchParams(window.location.search);
 
 		const flow = searchParams.get('flow');
+		const status = searchParams.get('status');
 
-		if (flow === 'external-login-callback') {
+		// Both the anonymous sign-in callback ("external-login") and the link-login callback
+		// ("external-login-callback") report their own outcomes via a Umbraco-controlled "status"
+		// string. Only a bare "external-login" flow with no status is a raw OpenID error straight
+		// from the challenge itself (see the branch below), so status takes priority when present.
+		if ((flow === 'external-login-callback' || flow === 'external-login') && status) {
 			this.errorHeadline = this.localize.term('errors_externalLoginError');
-			console.log('External login error', searchParams.get('error'));
 
-			const status = searchParams.get('status');
-
-			// "Status" is controlled by Umbraco and is a string
-			if (status) {
-				switch (status) {
-					case 'unauthorized':
-						this.errorMessage = this.localize.term('errors_unauthorized');
-						break;
-					case 'user-not-found':
-						this.errorMessage = this.localize.term('errors_userNotFound');
-						break;
-					case 'external-info-not-found':
-						this.errorMessage = this.localize.term('errors_externalInfoNotFound');
-						break;
-					case 'failed':
-						this.errorMessage = this.localize.term('errors_externalLoginFailed');
-						break;
-					default:
-						this.errorMessage = this.localize.term('errors_defaultError');
-						break;
-				}
+			switch (status) {
+				case 'unauthorized':
+					this.errorMessage = this.localize.term('errors_unauthorized');
+					break;
+				case 'user-not-found':
+					this.errorMessage = this.localize.term('errors_userNotFound');
+					break;
+				case 'locked-out':
+					this.errorMessage = this.localize.term('errors_lockedOut');
+					break;
+				case 'not-allowed':
+					this.errorMessage = this.localize.term('errors_notAllowed');
+					break;
+				case 'external-info-not-found':
+					this.errorMessage = this.localize.term('errors_externalInfoNotFound');
+					break;
+				case 'failed':
+					this.errorMessage = this.localize.term('errors_externalLoginFailed');
+					break;
+				default:
+					this.errorMessage = this.localize.term('errors_defaultError');
+					break;
 			}
 			return;
 		}

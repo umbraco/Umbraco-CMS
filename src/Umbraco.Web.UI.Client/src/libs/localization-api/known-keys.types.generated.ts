@@ -1000,9 +1000,11 @@ declare global {
 		errors_externalLoginRedirectSuccess: string;
 		errors_externalLoginSuccess: string;
 		errors_filePermissionsError: string;
+		errors_lockedOut: string;
 		errors_macroErrorLoadingPartialView: string;
 		errors_missingTitle: string;
 		errors_missingType: string;
+		errors_notAllowed: string;
 		errors_pictureResizeBiggerThanOrg: string;
 		errors_propertyHasErrors: string;
 		errors_receivedErrorFromServer: string;

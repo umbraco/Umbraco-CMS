@@ -143,14 +143,7 @@ public class BackOfficeController : SecurityControllerBase
 
                 if (result.RequiresTwoFactor)
                 {
-                    string? twofactorView = _backOfficeTwoFactorOptions.GetTwoFactorView(model.Username);
-                    IEnumerable<string> enabledProviders = (await _userTwoFactorLoginService.GetProviderNamesAsync(user.Key)).Result.Where(x => x.IsEnabledOnUser).Select(x => x.ProviderName);
-
-                    return StatusCode(StatusCodes.Status402PaymentRequired, new RequiresTwoFactorResponseModel()
-                    {
-                        TwoFactorLoginView = twofactorView,
-                        EnabledTwoFactorProviderNames = enabledProviders
-                    });
+                    return StatusCode(StatusCodes.Status402PaymentRequired, await BuildRequiresTwoFactorResponseAsync(user));
                 }
             }
 
@@ -229,6 +222,34 @@ public class BackOfficeController : SecurityControllerBase
         return StatusCode(StatusCodes.Status400BadRequest, new ProblemDetailsBuilder()
             .WithTitle("Invalid code")
             .Build());
+    }
+
+    /// <summary>
+    /// Retrieves the two-factor provider options for the user currently mid-sign-in, i.e. one for whom
+    /// a prior sign-in attempt (local or external) returned a pending two-factor cookie.
+    /// </summary>
+    /// <returns>
+    /// <c>200 OK</c> with the same payload <see cref="Login" /> returns on <c>402</c>, or
+    /// <c>404 Not Found</c> if there is no pending two-factor sign-in for the current caller.
+    /// </returns>
+    [AllowAnonymous]
+    [HttpGet("pending-2fa")]
+    [EndpointSummary("Gets the pending two-factor sign-in options.")]
+    [EndpointDescription("Retrieves the two-factor provider options for a sign-in that is currently pending a second factor.")]
+    [MapToApiVersion("1.0")]
+    [ProducesResponseType(typeof(RequiresTwoFactorResponseModel), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> PendingTwoFactorInfo()
+    {
+        BackOfficeIdentityUser? user = await _backOfficeSignInManager.GetTwoFactorAuthenticationUserAsync();
+        if (user is null)
+        {
+            return StatusCode(StatusCodes.Status404NotFound, new ProblemDetailsBuilder()
+                .WithTitle("No pending two-factor sign-in")
+                .Build());
+        }
+
+        return Ok(await BuildRequiresTwoFactorResponseAsync(user));
     }
 
     /// <summary>
@@ -585,12 +606,12 @@ public class BackOfficeController : SecurityControllerBase
             isPersistent: false,
             bypassTwoFactor: _securitySettings.Value.UserBypassTwoFactorForExternalLogins);
 
+        string? returnUrl = null;
+        loginInfo.AuthenticationProperties?.Items.TryGetValue(ExternalLoginReturnUrlKey, out returnUrl);
+
         if (result.Succeeded)
         {
             await _backOfficeSignInManager.UpdateExternalAuthenticationTokensAsync(loginInfo);
-
-            string? returnUrl = null;
-            loginInfo.AuthenticationProperties?.Items.TryGetValue(ExternalLoginReturnUrlKey, out returnUrl);
             return Redirect(ExternalLoginSuccessRedirectUrl(returnUrl));
         }
 
@@ -600,10 +621,10 @@ public class BackOfficeController : SecurityControllerBase
             { IsNotAllowed: true } => ExternalLoginErrorRedirect("not-allowed"),
 
             // The provider authenticated the user but Umbraco still wants a second factor, which is a
-            // pending sign-in rather than a failure. The two-factor cookie survives this redirect, so the
-            // client can complete the flow against verify-2fa - but it can only do that if it is told
-            // apart from a genuine failure.
-            { RequiresTwoFactor: true } => ExternalLoginErrorRedirect("two-factor-required"),
+            // pending sign-in rather than a failure. The two-factor cookie survives this redirect, so
+            // send the browser to the login app's MFA screen to complete it, landing back on the same
+            // post-login URL a successful sign-in would have used.
+            { RequiresTwoFactor: true } => ExternalLoginTwoFactorRedirect(returnUrl),
             _ => ExternalLoginErrorRedirect("failed"),
         };
     }
@@ -711,6 +732,13 @@ public class BackOfficeController : SecurityControllerBase
                 ClaimsPrincipal backOfficePrincipal = HttpContext.User;
                 return await SignInBackOfficeUser(backOfficePrincipal, request);
             }
+            else if (result.RequiresTwoFactor)
+            {
+                // Same pending-sign-in case as ExternalLoginCallback: send the browser to the login
+                // app's MFA screen instead of silently re-challenging, which would otherwise discard
+                // the two-factor cookie's meaning and leave the user looking at a plain login screen.
+                return ExternalLoginTwoFactorRedirect(returnUrl: null);
+            }
             else
             {
                 // avoid infinite auth loops when something fails by performing the default challenge (default login screen)
@@ -783,5 +811,29 @@ public class BackOfficeController : SecurityControllerBase
         }
 
         return Redirect(redirectUrl);
+    }
+
+    // Redirects to the login app's MFA screen to complete a pending two-factor sign-in that was
+    // started by an external login. The two-factor cookie set by SignInOrTwoFactorAsync is what
+    // ties this back to the right user - the login app resolves it anonymously via the "2fa" action
+    // above, the same way Verify2FACode does.
+    private RedirectResult ExternalLoginTwoFactorRedirect(string? returnUrl)
+    {
+        var postMfaReturnUrl = ExternalLoginSuccessRedirectUrl(returnUrl);
+        var url = ClientRedirectUrl(BackOfficeLoginController.LoginPath)
+            .AppendQueryStringToUrl("flow=mfa", $"ReturnUrl={Uri.EscapeDataString(postMfaReturnUrl)}");
+        return Redirect(url);
+    }
+
+    private async Task<RequiresTwoFactorResponseModel> BuildRequiresTwoFactorResponseAsync(BackOfficeIdentityUser user)
+    {
+        string? twofactorView = _backOfficeTwoFactorOptions.GetTwoFactorView(user.UserName!);
+        IEnumerable<string> enabledProviders = (await _userTwoFactorLoginService.GetProviderNamesAsync(user.Key)).Result.Where(x => x.IsEnabledOnUser).Select(x => x.ProviderName);
+
+        return new RequiresTwoFactorResponseModel
+        {
+            TwoFactorLoginView = twofactorView,
+            EnabledTwoFactorProviderNames = enabledProviders,
+        };
     }
 }
