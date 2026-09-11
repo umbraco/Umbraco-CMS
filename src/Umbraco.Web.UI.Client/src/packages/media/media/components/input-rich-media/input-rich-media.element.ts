@@ -12,7 +12,11 @@ import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/rou
 import { UmbSorterController, UmbSorterResolvePlacementAsGrid } from '@umbraco-cms/backoffice/sorter';
 import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
 import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
-import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import {
+	isBelowMinItemCount,
+	UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
+	UmbFormControlMixin,
+} from '@umbraco-cms/backoffice/validation';
 import { UmbRepositoryItemsManager } from '@umbraco-cms/backoffice/repository';
 import { UMB_MEDIA_TYPE_ENTITY_TYPE } from '@umbraco-cms/backoffice/media-type';
 
@@ -252,14 +256,7 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 		this.addValidator(
 			'rangeUnderflow',
 			() => this.minMessage,
-			() =>
-				!this.readonly &&
-				// Only if min is set:
-				!!this.min &&
-				// if the value is empty and not required, we should not validate the min:
-				!(this.value?.length === 0 && this.required == false) &&
-				// Validate the min:
-				(this.value?.length ?? 0) < this.min,
+			() => !this.readonly && isBelowMinItemCount(this.value?.length ?? 0, this.min),
 		);
 		this.addValidator(
 			'rangeOverflow',

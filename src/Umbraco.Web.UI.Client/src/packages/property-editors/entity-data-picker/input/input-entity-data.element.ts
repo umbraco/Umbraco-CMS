@@ -18,7 +18,7 @@ import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
 import type { UmbRepositoryItemsStatus } from '@umbraco-cms/backoffice/repository';
 import type { UmbItemModel } from '@umbraco-cms/backoffice/entity-item';
-import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import { isBelowMinItemCount, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import type { UmbPickerDataSource } from '@umbraco-cms/backoffice/picker-data-source';
 
 @customElement('umb-input-entity-data')
@@ -176,7 +176,7 @@ export class UmbInputEntityDataElement extends UmbFormControlMixin<string | unde
 		this.addValidator(
 			'rangeUnderflow',
 			() => this.minMessage,
-			() => !!this.min && this.#pickerInputContext.getSelection().length < this.min,
+			() => isBelowMinItemCount(this.#pickerInputContext.getSelection().length, this.min),
 		);
 
 		this.addValidator(

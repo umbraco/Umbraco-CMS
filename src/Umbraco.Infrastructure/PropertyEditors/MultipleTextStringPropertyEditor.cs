@@ -230,7 +230,6 @@ public class MultipleTextStringPropertyEditor : DataEditor, IValueSchemaProvider
             }
 
             // Handle both a newline delimited string and an IEnumerable<string> as the value (see: https://github.com/umbraco/Umbraco-CMS/pull/18936).
-            // If we have a null value, treat as a string count of zero for minimum number validation.
             var stringCount = value is string stringValue
                 ? MultipleTextStringPropertyValueEditor.SplitPropertyValue(stringValue)
                     .Count(s => string.IsNullOrWhiteSpace(s) is false)
@@ -238,12 +237,12 @@ public class MultipleTextStringPropertyEditor : DataEditor, IValueSchemaProvider
                     ? strings.Count(s => string.IsNullOrWhiteSpace(s) is false)
                     : 0;
 
-            if (stringCount < multipleTextStringConfiguration.Min)
+            if (ItemCountValidationHelper.IsBelowMinimum(stringCount, multipleTextStringConfiguration.Min))
             {
                 if (stringCount == 1)
                 {
                     yield return new ValidationResult(
-                        _localizedTextService.Localize("validation", "outOfRangeSingleItemMinimum", [multipleTextStringConfiguration.Min.ToString()]),
+                        _localizedTextService.Localize("validation", "outOfRangeSingleItemMinimum", [stringCount.ToString(), multipleTextStringConfiguration.Min.ToString()]),
                         ["value"]);
                 }
                 else

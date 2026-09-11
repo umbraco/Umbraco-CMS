@@ -3,7 +3,7 @@ import { UmbSectionPickerInputContext } from './input-section.context.js';
 import { css, html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
-import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import { isBelowMinItemCount, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
 @customElement('umb-input-section')
 export class UmbInputSectionElement extends UmbFormControlMixin<string | undefined, typeof UmbLitElement>(
@@ -81,7 +81,7 @@ export class UmbInputSectionElement extends UmbFormControlMixin<string | undefin
 		this.addValidator(
 			'rangeUnderflow',
 			() => this.minMessage,
-			() => !!this.min && this.#pickerContext.getSelection().length < this.min,
+			() => isBelowMinItemCount(this.#pickerContext.getSelection().length, this.min),
 		);
 
 		this.addValidator(
