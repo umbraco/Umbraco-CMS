@@ -6,6 +6,7 @@ export const manifest: ManifestPropertyEditorUi = {
 	name: 'Block Grid Group Configuration Property Editor UI',
 	element: () => import('./property-editor-ui-block-grid-group-configuration.element.js'),
 	meta: {
+		supportsVariantChange: true,
 		label: '',
 		icon: 'icon-box-alt',
 		group: '#propertyEditorUIGroups_common',

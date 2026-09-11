@@ -8,6 +8,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Date Time with Time Zone Picker Property Editor UI',
 		element: () => import('./property-editor-ui-date-time-with-time-zone-picker.element.js'),
 		meta: {
+			supportsVariantChange: true,
 			label: 'Date Time (with time zone)',
 			propertyEditorSchemaAlias: 'Umbraco.DateTimeWithTimeZone',
 			icon: 'icon-calendar-alt',

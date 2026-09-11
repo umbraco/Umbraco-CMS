@@ -436,8 +436,10 @@ describe('UmbValidationController', () => {
 			expect(syncedMsg?.path).to.equal(`${parentPath}.other.field`);
 		});
 
-		it('cleans up messages from old parent when switching to a new parent', async () => {
-			// Simulates DOM update where child element moves from one parent to another
+		it('does not remove messages from the old parent when switching to a new parent', async () => {
+			// Simulates a property editor's validation context reparenting onto a different ambient
+			// validation context (e.g. the active document variant changing) while the underlying
+			// content is unchanged — the old parent's data is not this context's to delete. [NL]
 			const oldParent = ctrl;
 			const newParent = new UmbValidationController(host);
 
@@ -451,35 +453,33 @@ describe('UmbValidationController', () => {
 			expect(oldParent.messages.getHasAnyMessages()).to.be.true;
 			expect(oldParent.messages.getMessages()?.some((m) => m.body === 'child-error')).to.be.true;
 
-			// Child switches to new parent (simulating DOM move)
+			// Child switches to a new parent, at a different (unrelated) path
 			child.inheritFrom(newParent, "$.values[?(@.alias == 'other-property')].value");
 
-			// Wait for cleanup and new sync
+			// Old parent must still have the message — nothing about it has changed or been fixed: [NL]
+			expect(oldParent.messages.getHasAnyMessages(), 'old parent keeps its message after the child reparents').to.be
+				.true;
 
-			// Old parent should no longer have the child's message
-			expect(oldParent.messages.getHasAnyMessages()).to.be.false;
-
-			// Child's messages were cleared during the switch
+			// Child's own local view is reset to reflect the new parent/path, which has nothing under it yet:
 			expect(child.messages.getHasAnyMessages()).to.be.false;
-
-			// New parent should not have any messages yet (child was cleared)
 			expect(newParent.messages.getHasAnyMessages()).to.be.false;
 
-			// Add a new message to child - should sync to new parent
+			// A new local message added after the switch should still sync — to the new parent, autoReport
+			// having survived the reparent without being re-enabled explicitly: [NL]
 			child.messages.addMessage('client', '$.newField', 'new-error', 'new-key');
 
-			// New parent should have the new message
 			expect(newParent.messages.getHasAnyMessages()).to.be.true;
 			expect(newParent.messages.getMessages()?.some((m) => m.body === 'new-error')).to.be.true;
 
-			// Old parent should still be clean
-			expect(oldParent.messages.getHasAnyMessages()).to.be.false;
+			// Old parent remains completely unaffected by anything that happened after the switch:
+			expect(oldParent.messages.getHasAnyMessages()).to.be.true;
+			expect(oldParent.messages.getMessages()?.some((m) => m.body === 'new-error')).to.be.false;
 
 			// Cleanup
 			newParent.destroy();
 		});
 
-		it('cleans up messages from old parent when switching to same parent with different path', async () => {
+		it('does not remove messages from the parent when switching to the same parent with a different path', async () => {
 			// Child connects to parent at one path
 			child.inheritFrom(ctrl, "$.values[?(@.alias == 'property-1')].value");
 			child.autoReport();
@@ -491,19 +491,138 @@ describe('UmbValidationController', () => {
 			const firstMsg = ctrl.messages.getMessages()?.[0];
 			expect(firstMsg?.path).to.equal("$.values[?(@.alias == 'property-1')].value.field");
 
-			// Child switches to same parent but different path
+			// Child switches to the same parent but a different path
 			child.inheritFrom(ctrl, "$.values[?(@.alias == 'property-2')].value");
 
-			// Old message should be cleaned up
-			expect(ctrl.messages.getHasAnyMessages()).to.be.false;
+			// The message at the old path must still be there:
+			expect(ctrl.messages.getHasMessageOfPathAndBody("$.values[?(@.alias == 'property-1')].value.field", 'error-at-path-1'))
+				.to.be.true;
 
 			// Add new message at new path
 			child.messages.addMessage('client', '$.field', 'error-at-path-2', 'key-2');
 
-			// Parent should have message at new path
-			expect(ctrl.messages.getHasAnyMessages()).to.be.true;
-			const secondMsg = ctrl.messages.getMessages()?.[0];
-			expect(secondMsg?.path).to.equal("$.values[?(@.alias == 'property-2')].value.field");
+			// Parent should now have both the untouched old message and the new one at the new path:
+			expect(ctrl.messages.getMessages()?.length).to.equal(2);
+			expect(
+				ctrl.messages.getHasMessageOfPathAndBody("$.values[?(@.alias == 'property-2')].value.field", 'error-at-path-2'),
+			).to.be.true;
+		});
+	});
+
+	describe('Reparenting', () => {
+		let child: UmbValidationController;
+
+		beforeEach(() => {
+			child = new UmbValidationController(host);
+		});
+		afterEach(() => {
+			child.destroy();
+		});
+
+		it("picks up the new parent's current messages under the new data path", async () => {
+			const parent1 = ctrl;
+			const parent2 = new UmbValidationController(host);
+
+			parent1.messages.addMessage(
+				'server',
+				"$.values[?(@.alias == 'property-1')].value.test",
+				'error-on-property-1',
+				'p1-key',
+			);
+			parent2.messages.addMessage(
+				'server',
+				"$.values[?(@.alias == 'property-2')].value.test",
+				'error-on-property-2',
+				'p2-key',
+			);
+
+			child.inheritFrom(parent1, "$.values[?(@.alias == 'property-1')].value");
+			expect(child.messages.getMessages()?.[0]?.body).to.equal('error-on-property-1');
+
+			child.inheritFrom(parent2, "$.values[?(@.alias == 'property-2')].value");
+
+			// Child's local view reflects the new parent's current messages, not the old ones:
+			expect(child.messages.getMessages()?.length).to.equal(1);
+			expect(child.messages.getMessages()?.[0]?.body).to.equal('error-on-property-2');
+
+			// Old parent's message is untouched and irrelevant to what child now shows:
+			expect(parent1.messages.getHasAnyMessages()).to.be.true;
+
+			parent2.destroy();
+		});
+
+		it('keeps auto-reporting new local messages to whichever parent it currently has, without re-calling autoReport', async () => {
+			// Mirrors how a real property editor calls setDataPath()+autoReport() once at setup, then
+			// only calls setDataPath() again on later reparenting (e.g. a document variant switch),
+			// relying on sync staying alive on its own. [NL]
+			const parent1 = ctrl;
+			const parent2 = new UmbValidationController(host);
+
+			child.inheritFrom(parent1, '$.path1');
+			child.autoReport();
+
+			child.inheritFrom(parent2, '$.path2'); // no autoReport() call here
+
+			child.messages.addMessage('client', '$.field', 'new-error', 'new-key');
+
+			expect(parent2.messages.getHasAnyMessages(), 'sync must still work after reparenting').to.be.true;
+
+			parent2.destroy();
+		});
+
+		it('does not auto-report to a new parent if autoReport was never enabled', async () => {
+			const parent1 = ctrl;
+			const parent2 = new UmbValidationController(host);
+
+			child.inheritFrom(parent1, '$.path1'); // no autoReport at all
+			child.inheritFrom(parent2, '$.path2');
+
+			child.messages.addMessage('client', '$.field', 'new-error', 'new-key');
+
+			expect(parent2.messages.getHasAnyMessages()).to.be.false;
+
+			parent2.destroy();
+		});
+
+		it('preserves a root message when a leaf switches between two sibling contexts that both inherit from the same root', async () => {
+			// This mirrors the real-world case that motivated this whole file: a document's per-variant
+			// validation contexts (variantA/variantB) both inherit everything from the workspace root, and
+			// a property editor's own validation context reparents between them whenever the active
+			// variant changes. A message the root itself authored (e.g. a server validation error) must
+			// survive that switch, in both directions. [NL]
+			const variantA = new UmbValidationController(host);
+			const variantB = new UmbValidationController(host);
+
+			ctrl.messages.addMessage(
+				'server',
+				"$.values[?(@.alias == 'my-property')].value.test",
+				'server-error',
+				'server-key',
+			);
+
+			variantA.inheritFrom(ctrl, '$');
+			variantA.autoReport();
+			variantB.inheritFrom(ctrl, '$');
+			variantB.autoReport();
+
+			child.inheritFrom(variantA, "$.values[?(@.alias == 'my-property')].value");
+			child.autoReport();
+
+			expect(child.messages.getHasAnyMessages()).to.be.true;
+
+			// Simulate switching the active variant: the leaf now inherits from variantB instead. [NL]
+			child.inheritFrom(variantB, "$.values[?(@.alias == 'my-property')].value");
+
+			expect(ctrl.messages.getHasAnyMessages(), 'root message must survive the switch').to.be.true;
+			expect(variantA.messages.getHasAnyMessages(), 'variantA still independently has it').to.be.true;
+			expect(child.messages.getHasAnyMessages(), 'child re-inherits it from variantB').to.be.true;
+
+			// Switching back must still show it too:
+			child.inheritFrom(variantA, "$.values[?(@.alias == 'my-property')].value");
+			expect(child.messages.getHasAnyMessages()).to.be.true;
+
+			variantA.destroy();
+			variantB.destroy();
 		});
 	});
 
@@ -675,7 +794,9 @@ describe('UmbValidationController', () => {
 			// Destroy the child - this should remove it as a validator from parent
 			child.destroy();
 
-			// Clear the synced message from parent (destroy doesn't do this automatically)
+			// Destroying the child does not remove its previously-synced message from the parent (see the
+			// dedicated 'destroy' tests below) — clear it manually here so this test can isolate checking
+			// just the validator-removal effect on `isValid`. [NL]
 			ctrl.messages.clear();
 
 			// Parent should now be valid since child validator is removed
@@ -683,7 +804,7 @@ describe('UmbValidationController', () => {
 			expect(ctrl.isValid).to.be.true;
 		});
 
-		it('stopInheritance cleans up synced messages from parent', async () => {
+		it('does not remove synced messages from the parent when reparenting', async () => {
 			child.inheritFrom(ctrl, "$.values[?(@.alias == 'my-property')].value");
 			child.autoReport();
 
@@ -693,14 +814,44 @@ describe('UmbValidationController', () => {
 			// Verify parent has the message
 			expect(ctrl.messages.getHasAnyMessages()).to.be.true;
 
-			// Switch to a different parent (triggers stopInheritance which cleans up)
+			// Switch to a different parent
 			const otherParent = new UmbValidationController(host);
 			child.inheritFrom(otherParent, '$');
 
-			// Original parent should no longer have the child's message
-			expect(ctrl.messages.getHasAnyMessages()).to.be.false;
+			// Original parent must still have the message — it was never fixed or deleted, the child just
+			// stopped looking at that parent: [NL]
+			expect(ctrl.messages.getHasAnyMessages()).to.be.true;
 
 			otherParent.destroy();
+		});
+
+		it('does not remove synced messages from the parent when the child is destroyed', async () => {
+			// The underlying content this message is about is unchanged — closing or navigating away from
+			// its editing UI must not make a real, unresolved issue disappear from the parent. [NL]
+			child.inheritFrom(ctrl, "$.values[?(@.alias == 'my-property')].value");
+			child.autoReport();
+
+			child.messages.addMessage('client', '$.field', 'child-error', 'child-key');
+			expect(ctrl.messages.getHasAnyMessages()).to.be.true;
+
+			child.destroy();
+
+			expect(ctrl.messages.getHasAnyMessages(), 'the parent must still show the issue after the child is destroyed')
+				.to.be.true;
+		});
+
+		it('does not remove synced messages from the parent when detaching to no parent at all', async () => {
+			child.inheritFrom(ctrl, "$.values[?(@.alias == 'my-property')].value");
+			child.autoReport();
+
+			child.messages.addMessage('client', '$.field', 'child-error', 'child-key');
+			expect(ctrl.messages.getHasAnyMessages()).to.be.true;
+
+			// A full detach (no new parent lined up) must not push a deletion upward either: [NL]
+			child.inheritFrom(undefined, '$');
+
+			expect(ctrl.messages.getHasAnyMessages()).to.be.true;
+			expect(child.messages.getHasAnyMessages(), 'the detached child no longer holds it locally').to.be.false;
 		});
 
 		it('handles validation rejection gracefully when context is destroyed mid-validation', async () => {
@@ -771,7 +922,7 @@ describe('UmbValidationController', () => {
 			child.destroy();
 		});
 
-		it('handles inheritFrom with undefined parent gracefully', async () => {
+		it('handles inheritFrom with undefined parent gracefully, without removing anything from the old parent', async () => {
 			// First inherit from a real parent
 			child.inheritFrom(ctrl, "$.values[?(@.alias == 'my-property')].value");
 			child.autoReport();
@@ -780,18 +931,23 @@ describe('UmbValidationController', () => {
 
 			expect(ctrl.messages.getHasAnyMessages()).to.be.true;
 
-			// Now inherit from undefined (disconnects from parent)
+			// Now inherit from undefined (disconnects from parent, with nothing to reconnect to)
 			child.inheritFrom(undefined, '$');
 
-			// Old parent should be cleaned up
-			expect(ctrl.messages.getHasAnyMessages()).to.be.false;
+			// The old parent's message is untouched — the child stopping to look at it is not the same as
+			// the message becoming invalid or the content it describes being deleted: [NL]
+			expect(ctrl.messages.getHasAnyMessages()).to.be.true;
+			expect(child.messages.getHasAnyMessages()).to.be.false;
 		});
 
-		it('handles rapid parent switching without message leaks', async () => {
+		it('each parent keeps the messages it was told while it was the active parent, across rapid switching', async () => {
 			const parent1 = ctrl;
 			const parent2 = new UmbValidationController(host);
 			const parent3 = new UmbValidationController(host);
 
+			// autoReport is only ever enabled once, up front — matching how a real property editor
+			// calls it once at setup and then only calls `setDataPath`/`inheritFrom` again on later
+			// reparenting (e.g. a document variant switch). Sync must survive that on its own. [NL]
 			child.autoReport();
 
 			// Rapidly switch parents while adding messages
@@ -804,11 +960,13 @@ describe('UmbValidationController', () => {
 			child.inheritFrom(parent3, '$.path3');
 			child.messages.addMessage('client', '$.field', 'error-3', 'key-3');
 
-			// Only parent3 should have messages
-			expect(parent1.messages.getHasAnyMessages()).to.be.false;
-			expect(parent2.messages.getHasAnyMessages()).to.be.false;
-			expect(parent3.messages.getHasAnyMessages()).to.be.true;
-			expect(parent3.messages.getMessages()?.[0].body).to.equal('error-3');
+			// Every parent that was ever attached still has what it was told, none of them lost anything: [NL]
+			expect(parent1.messages.getHasAnyMessages(), 'parent1 keeps error-1').to.be.true;
+			expect(parent1.messages.getMessages()?.[0]?.body).to.equal('error-1');
+			expect(parent2.messages.getHasAnyMessages(), 'parent2 keeps error-2').to.be.true;
+			expect(parent2.messages.getMessages()?.[0]?.body).to.equal('error-2');
+			expect(parent3.messages.getHasAnyMessages(), 'parent3 keeps error-3').to.be.true;
+			expect(parent3.messages.getMessages()?.[0]?.body).to.equal('error-3');
 
 			// Cleanup
 			parent2.destroy();
@@ -1122,7 +1280,7 @@ describe('UmbValidationController', () => {
 			expect(ctrl.messages.getHasAnyMessages()).to.be.false;
 		});
 
-		it('middle child destruction cleans up messages from root', async () => {
+		it('middle child destruction does not remove its previously-synced messages from root', async () => {
 			// Setup hierarchy
 			child.inheritFrom(ctrl, "$.blocks[?(@.key == 'block-1')]");
 			child.autoReport();
@@ -1135,17 +1293,15 @@ describe('UmbValidationController', () => {
 
 			expect(ctrl.messages.getHasAnyMessages()).to.be.true;
 
-			// Destroy child (middle level) - this should clean up from root
+			// Destroy child (middle level) - the block it represents still exists and is still invalid,
+			// so root must keep showing the issue even though nothing is observing it anymore: [NL]
 			child.destroy();
 
-			// Root should be clean (child's messages removed)
-			// Note: The actual behavior depends on destroy() implementation
-			// Currently destroy() doesn't sync cleanup, so we clear manually for this test
-			ctrl.messages.clear();
-			expect(ctrl.messages.getHasAnyMessages()).to.be.false;
+			expect(ctrl.messages.getHasAnyMessages(), 'root keeps the message after the middle child is destroyed').to.be
+				.true;
 		});
 
-		it('grandchild switching parent cleans up old hierarchy', async () => {
+		it('grandchild switching parent does not remove messages from the old hierarchy', async () => {
 			// Setup hierarchy
 			child.inheritFrom(ctrl, "$.blocks[?(@.key == 'block-1')]");
 			child.autoReport();
@@ -1166,12 +1322,19 @@ describe('UmbValidationController', () => {
 
 			grandchild.inheritFrom(newChild, "$.values[?(@.alias == 'prop-2')].value");
 
-			// Old child should be clean
-			expect(child.messages.getHasAnyMessages()).to.be.false;
+			// Old child must still have the message — block-1 hasn't been touched, only the grandchild
+			// (e.g. a property editor) stopped looking at it: [NL]
+			expect(child.messages.getHasAnyMessages(), 'old child keeps its message').to.be.true;
 
-			// Root should be clean (old path messages removed)
+			// Root must still have the old-path message too:
 			const oldPathMessages = ctrl.messages.getMessages()?.filter((m) => m.path.includes('block-1'));
-			expect(oldPathMessages?.length ?? 0).to.equal(0);
+			expect(oldPathMessages?.length ?? 0).to.equal(1);
+
+			// The new hierarchy correctly picks up fresh messages added under it, without re-calling
+			// autoReport on the grandchild: [NL]
+			grandchild.messages.addMessage('client', '$.otherField', 'new-gc-error', 'new-gc-key');
+			expect(newChild.messages.getHasAnyMessages()).to.be.true;
+			expect(ctrl.messages.getMessages()?.some((m) => m.path.includes('block-2'))).to.be.true;
 
 			newChild.destroy();
 		});

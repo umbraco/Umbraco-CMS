@@ -6,7 +6,11 @@ import type {
 } from '@umbraco-cms/backoffice/content-type';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbHintController, UmbVariantHint } from '@umbraco-cms/backoffice/hint';
-import { extractJsonQueryProps, type UmbValidationController } from '@umbraco-cms/backoffice/validation';
+import {
+	extractJsonQueryProps,
+	umbGetFirstJsonPathBracket,
+	type UmbValidationController,
+} from '@umbraco-cms/backoffice/validation';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 /*
@@ -60,7 +64,7 @@ export class UmbContentValidationToHintsManager<
 					if (this.#hintedMsgs.has(message.key)) return;
 
 					// Get the value between [ and ] of message.path:
-					const query = getValueBetweenBrackets(message.path);
+					const query = umbGetFirstJsonPathBracket(message.path);
 					if (!query) return;
 					const queryProps = extractJsonQueryProps(query);
 
@@ -104,19 +108,4 @@ export class UmbContentValidationToHintsManager<
 			null,
 		);
 	}
-}
-
-/**
- * Extracts the value between the first pair of square brackets in a path string.
- * @param {string} path - The path string to extract the value from.
- * @returns {string | null} The extracted value, or null if no brackets are found.
- */
-function getValueBetweenBrackets(path: string): string | null {
-	const start = path.indexOf('[');
-	if (start === -1) return null;
-
-	const end = path.indexOf(']', start + 1);
-	if (end === -1) return null;
-
-	return path.substring(start + 1, end);
 }

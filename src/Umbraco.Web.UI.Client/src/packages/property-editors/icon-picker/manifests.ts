@@ -5,6 +5,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Icon Picker Property Editor UI',
 		element: () => import('./property-editor-ui-icon-picker.element.js'),
 		meta: {
+			supportsVariantChange: true,
 			label: 'Icon Picker',
 			icon: 'icon-autofill',
 			group: '#propertyEditorUIGroups_common',

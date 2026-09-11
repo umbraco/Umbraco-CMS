@@ -9,6 +9,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Color Picker Property Editor UI',
 		element: () => import('./property-editor-ui-color-picker.element.js'),
 		meta: {
+			supportsVariantChange: true,
 			label: 'Color Picker',
 			propertyEditorSchemaAlias: 'Umbraco.ColorPicker',
 			icon: 'icon-colorpicker',

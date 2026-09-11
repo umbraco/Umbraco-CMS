@@ -8,6 +8,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Time Only Picker Property Editor UI',
 		element: () => import('./property-editor-ui-time-only-picker.element.js'),
 		meta: {
+			supportsVariantChange: true,
 			label: 'Time Only',
 			propertyEditorSchemaAlias: 'Umbraco.TimeOnly',
 			icon: 'icon-time',

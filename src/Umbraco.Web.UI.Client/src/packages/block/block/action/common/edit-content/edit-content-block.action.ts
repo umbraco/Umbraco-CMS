@@ -1,8 +1,8 @@
 import type { MetaBlockActionDefaultKind } from '../../default/types.js';
 import type { UmbBlockActionArgs } from '../../types.js';
 import { UmbBlockActionBase } from '../../block-action-base.js';
-import { UmbDataPathBlockElementDataQuery } from '../../../validation/data-path-element-data-query.function.js';
 import { UMB_BLOCK_ENTRY_CONTEXT } from '../../../context/block-entry.context-token.js';
+import { UmbDataPathGeneratorForBlockElementData } from '../../../validation/index.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { mergeObservables, type Observable } from '@umbraco-cms/backoffice/observable-api';
 
@@ -38,7 +38,7 @@ export class UmbEditContentBlockAction extends UmbBlockActionBase<MetaBlockActio
 		if (!this.#context) return undefined;
 		return mergeObservables([this.#context.contentKey], ([contentKey]) => {
 			if (!contentKey) return undefined;
-			return `$.contentData[${UmbDataPathBlockElementDataQuery({ key: contentKey })}]`;
+			return UmbDataPathGeneratorForBlockElementData('contentData', { key: contentKey });
 		});
 	}
 }

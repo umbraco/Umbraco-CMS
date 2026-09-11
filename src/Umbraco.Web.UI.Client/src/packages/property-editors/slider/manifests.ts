@@ -15,6 +15,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Slider Property Editor UI',
 		element: () => import('./property-editor-ui-slider.element.js'),
 		meta: {
+			supportsVariantChange: true,
 			label: 'Slider',
 			propertyEditorSchemaAlias: 'Umbraco.Slider',
 			icon: 'icon-navigation-horizontal',

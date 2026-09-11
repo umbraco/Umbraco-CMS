@@ -1,7 +1,7 @@
 import { UMB_WORKSPACE_VIEW_PATH_PATTERN } from '../../paths.js';
 import type { ManifestWorkspaceView } from '../../types.js';
+import type { UmbWorkspaceViewController } from '../index.js';
 import { UmbWorkspaceEditorContext } from './workspace-editor.context.js';
-import type { UmbWorkspaceViewContext } from './workspace-view.context.js';
 import {
 	css,
 	customElement,
@@ -21,6 +21,7 @@ import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-a
 import type { UmbRoute, UmbRouterSlotInitEvent, UmbRouterSlotChangeEvent } from '@umbraco-cms/backoffice/router';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbVariantHint } from '@umbraco-cms/backoffice/hint';
+import type { UmbWorkspaceViewContext } from './workspace-view.context.js';
 
 /**
  * @element umb-workspace-editor
@@ -137,7 +138,7 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 		);
 	}
 
-	#currentProvidedView?: UmbWorkspaceViewContext;
+	#currentProvidedView?: UmbWorkspaceViewController;
 	#createRoutes() {
 		const newRoutes: UmbRoute[] = [];
 

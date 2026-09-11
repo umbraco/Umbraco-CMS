@@ -28,9 +28,19 @@ export class UmbFormControlValidator extends UmbControllerBase implements UmbVal
 				this.#context.removeValidator(this);
 			}
 			this.#context = context;
+			// If we have a dataPath, we will let that determine the validity of the control, otherwise we will use the form control's validity state. [NL]
+			if (dataPath) {
+				this.#isValid = !context?.messages?.getHasMessagesOfPathAndDescendant(dataPath);
+			} else {
+				this.#isValid = formControl.validity.valid;
+			}
 			context?.addValidator(this);
-			// If we have a message already, then un-pristine the control:
-			if (dataPath && context?.messages?.getHasMessagesOfPathAndDescendant(dataPath)) {
+			// Only safe to reveal the *valid* case synchronously here: #dispatchValidationState() is pristine-gated,
+			// so a stale re-validation of a still-present previous dataPath's value is harmlessly ignored while
+			// pristine. Revealing the *invalid* case this early is not safe — see syncControlPristine(). [NL]
+			if (this.#isValid) {
+				formControl.pristine = true;
+			} else {
 				formControl.pristine = false;
 			}
 		});
