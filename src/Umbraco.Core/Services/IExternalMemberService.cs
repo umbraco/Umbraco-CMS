@@ -114,5 +114,88 @@ public interface IExternalMemberService
     ///     (e.g. <c>member.SetValue("department", ...)</c>).
     /// </param>
     /// <returns>An <see cref="Attempt{TResult,TStatus}"/> with the newly created <see cref="IMember"/> on success.</returns>
+    /// <remarks>
+    ///     On success this publishes <see cref="Notifications.ExternalMemberDeletedNotification"/> for the
+    ///     removed external member, so it is evicted from caches and the search index. Handlers of that
+    ///     notification therefore also run during a conversion. Note that the member's Guid key is
+    ///     <em>preserved</em> on the new content member, so a handler that performs key-based cleanup
+    ///     (e.g. deleting related data by member key) would act on a key that now belongs to the live
+    ///     content member — such handlers should account for conversions. The external login links are
+    ///     intentionally left intact (they belong to the content member under the same key) and are not
+    ///     deleted as part of this notification.
+    /// </remarks>
     Task<Attempt<IMember?, ExternalMemberOperationStatus>> ConvertToContentMemberAsync(Guid memberKey, string memberTypeAlias, Action<IMember, string?>? mapProfileData = null);
+
+    /// <summary>
+    ///     Validates whether <see cref="ConvertToContentMemberAsync"/> would succeed for the given member,
+    ///     without mutating any data.
+    /// </summary>
+    /// <param name="memberKey">The unique key of the external member to validate for conversion.</param>
+    /// <param name="memberTypeAlias">The alias of the member type the content member would use.</param>
+    /// <returns>
+    ///     <see cref="ExternalMemberOperationStatus.Success"/> if the conversion would succeed; otherwise
+    ///     the status that would cause it to fail (<see cref="ExternalMemberOperationStatus.NotFound"/>,
+    ///     <see cref="ExternalMemberOperationStatus.InvalidMemberType"/>,
+    ///     <see cref="ExternalMemberOperationStatus.DuplicateUsername"/> or
+    ///     <see cref="ExternalMemberOperationStatus.DuplicateEmail"/>).
+    /// </returns>
+    // TODO (V19): remove the default implementation.
+    Task<ExternalMemberOperationStatus> ValidateConvertToContentMemberAsync(Guid memberKey, string memberTypeAlias)
+        => Task.FromResult(ExternalMemberOperationStatus.NotImplemented);
+
+    /// <summary>
+    ///     Converts a full content-based member into an external-only (lightweight) member,
+    ///     preserving its key, identity fields, group memberships and external login links.
+    /// </summary>
+    /// <param name="memberKey">The unique key of the content member to convert.</param>
+    /// <param name="mapProfileData">
+    ///     An optional callback invoked after the <see cref="ExternalMemberIdentity"/> is built from the
+    ///     content member but before it is persisted. Receives the new identity and the source
+    ///     <see cref="IMember"/>, allowing the developer to map content properties into the identity
+    ///     (e.g. serialize values into <see cref="ExternalMemberIdentity.ProfileData"/>).
+    /// </param>
+    /// <param name="requireExternalLogin">
+    ///     When <c>true</c> (the default) the conversion is rejected with
+    ///     <see cref="ExternalMemberOperationStatus.NoExternalLogin"/> unless the member already has an
+    ///     external login link — an external-only member has no password and can otherwise never
+    ///     authenticate. Set to <c>false</c> to force the conversion of a password-only member, relying
+    ///     on auto-linking to recreate a login link on the member's next external sign-in.
+    /// </param>
+    /// <returns>An <see cref="Attempt{TResult,TStatus}"/> with the created <see cref="ExternalMemberIdentity"/> on success.</returns>
+    /// <remarks>
+    ///     The conversion is <em>not</em> performed in a single transaction. The content member is
+    ///     deleted and the external identity created in one scope; the captured login links and tokens
+    ///     are re-saved in a second scope, because deleting a member queues a deferred notification that
+    ///     removes its login links at the end of the first scope. On a partial failure between the two
+    ///     scopes the member exists without a login link, which auto-linking recreates on the next
+    ///     external sign-in. Do not call this method within an ambient scope, as that would defer the
+    ///     login-link deletion past the re-save and leave the member with no link.
+    /// </remarks>
+    // TODO (V19): remove the default implementation.
+    Task<Attempt<ExternalMemberIdentity?, ExternalMemberOperationStatus>> ConvertToExternalMemberAsync(
+        Guid memberKey,
+        Action<ExternalMemberIdentity, IMember>? mapProfileData = null,
+        bool requireExternalLogin = true)
+        => Task.FromResult(Attempt.FailWithStatus<ExternalMemberIdentity?, ExternalMemberOperationStatus>(
+            ExternalMemberOperationStatus.NotImplemented, null));
+
+    /// <summary>
+    ///     Validates whether <see cref="ConvertToExternalMemberAsync"/> would succeed for the given member,
+    ///     without mutating any data.
+    /// </summary>
+    /// <param name="memberKey">The unique key of the content member to validate for conversion.</param>
+    /// <param name="requireExternalLogin">
+    ///     When <c>true</c> (the default) a member with no external login link yields
+    ///     <see cref="ExternalMemberOperationStatus.NoExternalLogin"/>.
+    /// </param>
+    /// <returns>
+    ///     <see cref="ExternalMemberOperationStatus.Success"/> if the conversion would succeed; otherwise
+    ///     the status that would cause it to fail (<see cref="ExternalMemberOperationStatus.NotFound"/>,
+    ///     <see cref="ExternalMemberOperationStatus.NoExternalLogin"/>,
+    ///     <see cref="ExternalMemberOperationStatus.DuplicateUsername"/> or
+    ///     <see cref="ExternalMemberOperationStatus.DuplicateEmail"/>).
+    /// </returns>
+    // TODO (V19): remove the default implementation.
+    Task<ExternalMemberOperationStatus> ValidateConvertToExternalMemberAsync(Guid memberKey, bool requireExternalLogin = true)
+        => Task.FromResult(ExternalMemberOperationStatus.NotImplemented);
 }

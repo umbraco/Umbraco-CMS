@@ -37,4 +37,15 @@ public enum ExternalMemberOperationStatus
     ///     The operation is not yet implemented.
     /// </summary>
     NotImplemented,
+
+    /// <summary>
+    ///     The operation failed because the member has no external login link, so it could not
+    ///     authenticate as an external-only member after conversion.
+    /// </summary>
+    NoExternalLogin,
+
+    /// <summary>
+    ///     The operation failed because the specified member type alias does not exist.
+    /// </summary>
+    InvalidMemberType,
 }
