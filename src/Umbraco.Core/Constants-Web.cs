@@ -125,6 +125,13 @@ public static partial class Constants
             ///     The dynamic route pattern used for Umbraco content routing.
             /// </summary>
             public const string DynamicRoutePattern = "/{**umbracoSlug}";
+
+            /// <summary>
+            ///     The key set on <see cref="Microsoft.AspNetCore.Builder.IApplicationBuilder.Properties"/> by
+            ///     <c>UseWebsiteEndpoints()</c> so that <c>UseBackOfficeEndpoints()</c> can detect when it has been
+            ///     called in the wrong order (back office endpoints must be registered first).
+            /// </summary>
+            public const string WebsiteEndpointsRegisteredKey = "Umbraco.Cms.Web.Website.WebsiteEndpointsRegistered";
         }
 
         /// <summary>
