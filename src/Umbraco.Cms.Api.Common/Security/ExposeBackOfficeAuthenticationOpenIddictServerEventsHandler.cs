@@ -2,6 +2,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
+using OpenIddict.Abstractions;
 using OpenIddict.Server;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Security;
@@ -47,6 +48,14 @@ public class ExposeBackOfficeAuthenticationOpenIddictServerEventsHandler : IOpen
     /// </remarks>
     public async ValueTask HandleAsync(OpenIddictServerEvents.GenerateTokenContext context)
     {
+        // This event is raised once per generated token, not once per token response, so signing in on every
+        // occurrence would write the cookie more than once. The access token is the one token generated both by
+        // the initial code exchange and by every refresh grant, making it the point to refresh the cookie from.
+        if (context.TokenType != OpenIddictConstants.TokenTypeIdentifiers.AccessToken)
+        {
+            return;
+        }
+
         // Only proceed if this is a back-office sign-in.
         if (context.Principal.Identity?.AuthenticationType != Core.Constants.Security.BackOfficeAuthenticationType)
         {
