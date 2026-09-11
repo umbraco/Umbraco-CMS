@@ -1,4 +1,15 @@
-import { Bold, BulletList, Document, Editor, Heading, ListItem, Paragraph, Text } from '../../externals.js';
+import {
+	Blockquote,
+	Bold,
+	BulletList,
+	Document,
+	Editor,
+	Heading,
+	Image,
+	ListItem,
+	Paragraph,
+	Text,
+} from '../../externals.js';
 import { HtmlClassAttribute } from '../html-attr-class/html-attr-class.tiptap-extension.js';
 import { HtmlIdAttribute } from '../html-attr-id/html-attr-id.tiptap-extension.js';
 import type { MetaTiptapToolbarStyleMenuItem } from '../types.js';
@@ -16,7 +27,7 @@ describe('UmbTiptapToolbarStyleMenuApi', () => {
 	let editor: Editor;
 	let api: UmbTiptapToolbarStyleMenuApi;
 
-	const attributeTypes = ['bold', 'bulletList', 'heading', 'listItem', 'paragraph'];
+	const attributeTypes = ['blockquote', 'bold', 'bulletList', 'heading', 'image', 'listItem', 'paragraph'];
 
 	const item = (data: MetaTiptapToolbarStyleMenuItem['data']): MetaTiptapToolbarStyleMenuItem => ({
 		label: 'Test style',
@@ -46,6 +57,8 @@ describe('UmbTiptapToolbarStyleMenuApi', () => {
 				BulletList,
 				ListItem,
 				Bold,
+				Image,
+				Blockquote,
 				HtmlClassAttribute.configure({ types: attributeTypes }),
 				HtmlIdAttribute.configure({ types: attributeTypes }),
 			],
@@ -137,6 +150,32 @@ describe('UmbTiptapToolbarStyleMenuApi', () => {
 			setContent('<p class="loud">text</p>');
 
 			expect(api.isActive(editor, item({ tag: 'aside', class: 'loud' }))).to.equal(false);
+		});
+
+		it('detects a class-only style on a mark at the selection', () => {
+			setContent('<p><strong class="loud">text</strong></p>', 2);
+
+			expect(api.isActive(editor, item({ class: 'loud' }))).to.equal(true);
+			expect(api.isActive(editor, item({ class: 'quiet' }))).to.equal(false);
+		});
+
+		it('detects a class-only style on a node-selected image', () => {
+			editor.commands.setContent('<p>text</p><img class="framed" src="test.png">');
+			editor.commands.setNodeSelection(6);
+
+			expect(api.isActive(editor, item({ class: 'framed' }))).to.equal(true);
+			expect(api.isActive(editor, item({ class: 'unframed' }))).to.equal(false);
+		});
+	});
+
+	describe('execute', () => {
+		it('turns a class-only style fully off after one toggle, even split across an ancestor and its content', () => {
+			setContent('<blockquote class="callout"><p>text</p></blockquote>', 2);
+			expect(api.isActive(editor, item({ class: 'callout' }))).to.equal(true);
+
+			api.execute(editor, item({ class: 'callout' }));
+
+			expect(api.isActive(editor, item({ class: 'callout' }))).to.equal(false);
 		});
 	});
 });
