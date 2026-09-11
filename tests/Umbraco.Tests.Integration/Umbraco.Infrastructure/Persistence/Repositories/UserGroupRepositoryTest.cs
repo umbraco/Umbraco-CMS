@@ -4,6 +4,7 @@
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Persistence.Repositories;
@@ -430,6 +431,55 @@ internal sealed class UserGroupRepositoryTest : UmbracoIntegrationTest
             Assert.IsTrue(names.Contains("Test Group1"));
             Assert.IsFalse(names.Contains("Test Group2"));
             Assert.IsTrue(names.Contains("Test Group3"));
+        }
+    }
+
+    [Test]
+    public void Can_Clear_Document_Blueprint_Start_Node_On_UserGroupRepository()
+    {
+        var provider = ScopeProvider;
+        using (var scope = provider.CreateScope())
+        {
+            var repository = CreateRepository(provider);
+
+            var userGroup = UserGroupBuilder.CreateUserGroup();
+            repository.Save(userGroup);
+
+            var resolved = repository.Get(userGroup.Id);
+            Assert.That(resolved.StartDocumentBlueprintId, Is.EqualTo(Constants.System.Root));
+
+            resolved.StartDocumentBlueprintId = null;
+            repository.Save(resolved);
+            scope.Complete();
+
+            var updated = repository.Get(userGroup.Id);
+
+            Assert.That(updated.StartDocumentBlueprintId, Is.Null, "Taking access away has to persist too.");
+        }
+    }
+
+    [Test]
+    public void Can_Persist_Document_Blueprint_Start_Node_Of_A_Folder_On_UserGroupRepository()
+    {
+        var provider = ScopeProvider;
+        using (var scope = provider.CreateScope())
+        {
+            var repository = CreateRepository(provider);
+
+            var userGroup = UserGroupBuilder.CreateUserGroup();
+            userGroup.StartDocumentBlueprintId = null;
+            repository.Save(userGroup);
+
+            var resolved = repository.Get(userGroup.Id);
+            Assert.That(resolved.StartDocumentBlueprintId, Is.Null);
+
+            resolved.StartDocumentBlueprintId = Constants.System.Root;
+            repository.Save(resolved);
+            scope.Complete();
+
+            var updated = repository.Get(userGroup.Id);
+
+            Assert.That(updated.StartDocumentBlueprintId, Is.EqualTo(Constants.System.Root));
         }
     }
 

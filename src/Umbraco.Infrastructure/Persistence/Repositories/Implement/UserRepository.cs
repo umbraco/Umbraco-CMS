@@ -800,6 +800,15 @@ SELECT 4 AS {keyAlias}, COUNT(id) AS {valueAlias} FROM {userTableName}
                 entity.StartElementIds);
         }
 
+        if (entity.IsPropertyDirty("StartDocumentBlueprintIds"))
+        {
+            AddingOrUpdateStartNodes(
+                entity,
+                Enumerable.Empty<UserStartNodeDto>(),
+                UserStartNodeDto.StartNodeTypeValue.DocumentBlueprint,
+                entity.StartDocumentBlueprintIds);
+        }
+
         if (entity.IsPropertyDirty("Groups"))
         {
             // Lookup all assigned groups.
@@ -918,7 +927,10 @@ SELECT 4 AS {keyAlias}, COUNT(id) AS {valueAlias} FROM {userTableName}
             Database.Update(userDto, changedCols);
         }
 
-        if (entity.IsPropertyDirty("StartContentIds") || entity.IsPropertyDirty("StartMediaIds") || entity.IsPropertyDirty("StartElementIds"))
+        if (entity.IsPropertyDirty("StartContentIds")
+            || entity.IsPropertyDirty("StartMediaIds")
+            || entity.IsPropertyDirty("StartElementIds")
+            || entity.IsPropertyDirty("StartDocumentBlueprintIds"))
         {
             Sql<ISqlContext> sql = SqlContext.Sql()
                 .SelectAll()
@@ -940,6 +952,11 @@ SELECT 4 AS {keyAlias}, COUNT(id) AS {valueAlias} FROM {userTableName}
             if (entity.IsPropertyDirty("StartElementIds"))
             {
                 AddingOrUpdateStartNodes(entity, assignedStartNodes, UserStartNodeDto.StartNodeTypeValue.Element, entity.StartElementIds);
+            }
+
+            if (entity.IsPropertyDirty("StartDocumentBlueprintIds"))
+            {
+                AddingOrUpdateStartNodes(entity, assignedStartNodes, UserStartNodeDto.StartNodeTypeValue.DocumentBlueprint, entity.StartDocumentBlueprintIds);
             }
         }
 

@@ -263,6 +263,8 @@ public class UserPresentationFactory : IUserPresentationFactory
             HasMediaRootAccess = HasRootAccess(user.StartMediaIds),
             ElementStartNodeIds = GetKeysFromIds(user.StartElementIds, UmbracoObjectTypes.ElementContainer),
             HasElementRootAccess = HasRootAccess(user.StartElementIds),
+            DocumentBlueprintStartNodeIds = GetKeysFromIds(user.StartDocumentBlueprintIds, UmbracoObjectTypes.DocumentBlueprintContainer),
+            HasDocumentBlueprintRootAccess = HasRootAccess(user.StartDocumentBlueprintIds),
             FailedLoginAttempts = user.FailedPasswordAttempts,
             LastLoginDate = user.LastLoginDate,
             LastLockoutDate = user.LastLockoutDate,
@@ -378,6 +380,8 @@ public class UserPresentationFactory : IUserPresentationFactory
             HasMediaRootAccess = updateModel.HasMediaRootAccess,
             ElementStartNodeKeys = updateModel.ElementStartNodeIds.Select(x => x.Id).ToHashSet(),
             HasElementRootAccess = updateModel.HasElementRootAccess,
+            DocumentBlueprintStartNodeKeys = updateModel.DocumentBlueprintStartNodeIds.Select(x => x.Id).ToHashSet(),
+            HasDocumentBlueprintRootAccess = updateModel.HasDocumentBlueprintRootAccess,
             UserGroupKeys = updateModel.UserGroupIds.Select(x => x.Id).ToHashSet()
         };
 
@@ -396,6 +400,8 @@ public class UserPresentationFactory : IUserPresentationFactory
         ISet<ReferenceByIdModel> documentStartNodeKeys = GetKeysFromIds(contentStartNodeIds, UmbracoObjectTypes.Document);
         var elementStartNodeIds = user.CalculateElementStartNodeIds(_entityService, _appCaches);
         ISet<ReferenceByIdModel> elementStartNodeKeys = GetKeysFromIds(elementStartNodeIds, UmbracoObjectTypes.ElementContainer);
+        var documentBlueprintStartNodeIds = user.CalculateDocumentBlueprintStartNodeIds(_entityService, _appCaches);
+        ISet<ReferenceByIdModel> documentBlueprintStartNodeKeys = GetKeysFromIds(documentBlueprintStartNodeIds, UmbracoObjectTypes.DocumentBlueprintContainer);
 
         HashSet<IPermissionPresentationModel> permissions = GetAggregatedGranularPermissions(user, presentationGroups);
 
@@ -424,6 +430,8 @@ public class UserPresentationFactory : IUserPresentationFactory
             HasDocumentRootAccess = HasRootAccess(contentStartNodeIds),
             ElementStartNodeIds = elementStartNodeKeys,
             HasElementRootAccess = HasRootAccess(elementStartNodeIds),
+            DocumentBlueprintStartNodeIds = documentBlueprintStartNodeKeys,
+            HasDocumentBlueprintRootAccess = HasRootAccess(documentBlueprintStartNodeIds),
             Permissions = permissions,
             FallbackPermissions = fallbackPermissions,
             HasAccessToAllLanguages = hasAccessToAllLanguages,
@@ -510,6 +518,8 @@ public class UserPresentationFactory : IUserPresentationFactory
         ISet<ReferenceByIdModel> documentStartNodeKeys = GetKeysFromIds(contentStartNodeIds, UmbracoObjectTypes.Document);
         var elementStartNodeIds = user.CalculateElementStartNodeIds(_entityService, _appCaches);
         ISet<ReferenceByIdModel> elementStartNodeKeys = GetKeysFromIds(elementStartNodeIds, UmbracoObjectTypes.ElementContainer);
+        var documentBlueprintStartNodeIds = user.CalculateDocumentBlueprintStartNodeIds(_entityService, _appCaches);
+        ISet<ReferenceByIdModel> documentBlueprintStartNodeKeys = GetKeysFromIds(documentBlueprintStartNodeIds, UmbracoObjectTypes.DocumentBlueprintContainer);
 
         return Task.FromResult<CalculatedUserStartNodesResponseModel>(new CalculatedUserStartNodesResponseModel()
         {
@@ -520,6 +530,8 @@ public class UserPresentationFactory : IUserPresentationFactory
             HasDocumentRootAccess = HasRootAccess(contentStartNodeIds),
             ElementStartNodeIds = elementStartNodeKeys,
             HasElementRootAccess = HasRootAccess(elementStartNodeIds),
+            DocumentBlueprintStartNodeIds = documentBlueprintStartNodeKeys,
+            HasDocumentBlueprintRootAccess = HasRootAccess(documentBlueprintStartNodeIds),
         });
     }
 

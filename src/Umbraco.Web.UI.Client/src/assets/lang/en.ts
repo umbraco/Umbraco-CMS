@@ -2277,6 +2277,7 @@ export default {
 		allowAccessToAllLanguages: 'Allow access to all languages',
 		allowAccessToAllDocuments: 'Allow access to all documents',
 		allowAccessToAllElements: 'Allow access to all elements',
+		allowAccessToAllDocumentBlueprints: 'Allow access to all document blueprints',
 		allowAccessToAllMedia: 'Allow access to all media',
 		sectionsHelp: 'Add sections to give users access',
 		selectUserGroup: (multiple: boolean) => {
@@ -2365,6 +2366,9 @@ export default {
 		usersNotManagedFromGroup: 'not manageable from this screen.',
 		selectElementStartNode: 'Select element start node',
 		selectElementStartNodeDescription: 'Limit the element library to a specific start node',
+		selectDocumentBlueprintStartNode: 'Select document blueprint start node',
+		selectDocumentBlueprintStartNodeDescription:
+			'Limit the document blueprints users can manage to a specific start node',
 	},
 	userPermissions: {
 		create: 'Create',

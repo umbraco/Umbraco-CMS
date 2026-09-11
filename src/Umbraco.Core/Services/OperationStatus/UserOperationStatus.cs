@@ -199,6 +199,7 @@ public enum UserOperationStatus
     ///     The operation failed because the element start node could not be found.
     /// </summary>
     ElementStartNodeNotFound,
+
     ///     The operation failed because the application URL is not configured.
     ///     Set <c>Umbraco:CMS:WebRouting:UmbracoApplicationUrl</c> or change
     ///     <c>ApplicationUrlDetection</c> to <c>FirstRequest</c> or <c>EveryRequest</c>.
@@ -209,4 +210,9 @@ public enum UserOperationStatus
     ///     The operation failed because the user has login history, and therefore might be referenced in audit logs etc.
     /// </summary>
     CannotDeleteUserWithLoginHistory,
+
+    /// <summary>
+    ///     The operation failed because the document blueprint start node could not be found.
+    /// </summary>
+    DocumentBlueprintStartNodeNotFound,
 }

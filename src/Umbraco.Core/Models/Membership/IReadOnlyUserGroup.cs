@@ -53,6 +53,12 @@ public interface IReadOnlyUserGroup
     int? StartElementId { get; }
 
     /// <summary>
+    ///     Gets the container that members of this user group start at in the document blueprint tree.
+    ///     A null value gives the group no access to document blueprints.
+    /// </summary>
+    int? StartDocumentBlueprintId { get; }
+
+    /// <summary>
     ///     Gets a value indicating whether this user group has access to all languages.
     /// </summary>
     /// <remarks>

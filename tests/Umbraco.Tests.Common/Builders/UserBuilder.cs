@@ -49,6 +49,7 @@ public class UserBuilder<TParent>
     private int[] _startContentIds;
     private int[] _startMediaIds;
     private int[] _startElementIds;
+    private int[] _startDocumentBlueprintIds;
     private string _suffix = string.Empty;
     private DateTime? _updateDate;
     private string _username;
@@ -210,6 +211,18 @@ public class UserBuilder<TParent>
         return this;
     }
 
+    public UserBuilder<TParent> WithStartDocumentBlueprintId(int startDocumentBlueprintId)
+    {
+        _startDocumentBlueprintIds = new[] { startDocumentBlueprintId };
+        return this;
+    }
+
+    public UserBuilder<TParent> WithStartDocumentBlueprintIds(int[] startDocumentBlueprintIds)
+    {
+        _startDocumentBlueprintIds = startDocumentBlueprintIds;
+        return this;
+    }
+
     public UserBuilder<TParent> WithSuffix(string suffix)
     {
         _suffix = suffix;
@@ -247,6 +260,7 @@ public class UserBuilder<TParent>
         var startContentIds = _startContentIds ?? new[] { -1 };
         var startMediaIds = _startMediaIds ?? new[] { -1 };
         var startElementIds = _startElementIds ?? new[] { -1 };
+        var startDocumentBlueprintIds = _startDocumentBlueprintIds ?? new[] { -1 };
         var groups = _userGroupBuilders.Select(x => x.Build());
 
         var result = new User(
@@ -271,7 +285,8 @@ public class UserBuilder<TParent>
             SessionTimeout = sessionTimeout,
             StartContentIds = startContentIds,
             StartMediaIds = startMediaIds,
-            StartElementIds = startElementIds
+            StartElementIds = startElementIds,
+            StartDocumentBlueprintIds = startDocumentBlueprintIds,
         };
         foreach (var readOnlyUserGroup in groups)
         {

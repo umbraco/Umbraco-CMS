@@ -45,6 +45,7 @@ export class UmbCurrentUserServerDataSource extends UmbControllerBase {
 				allowedSections: data.allowedSections,
 				avatarUrls: data.avatarUrls,
 				documentStartNodeUniques: data.documentStartNodeIds.map((node) => ({ unique: node.id })),
+				documentBlueprintStartNodeUniques: data.documentBlueprintStartNodeIds.map((node) => ({ unique: node.id })),
 				elementStartNodeUniques: data.elementStartNodeIds.map((node) => ({ unique: node.id })),
 				email: data.email,
 				fallbackPermissions: data.fallbackPermissions,
@@ -52,6 +53,7 @@ export class UmbCurrentUserServerDataSource extends UmbControllerBase {
 				hasAccessToSensitiveData: data.hasAccessToSensitiveData,
 				hasDocumentRootAccess: data.hasDocumentRootAccess,
 				hasMediaRootAccess: data.hasMediaRootAccess,
+				hasDocumentBlueprintRootAccess: data.hasDocumentBlueprintRootAccess,
 				hasElementRootAccess: data.hasElementRootAccess,
 				isAdmin: data.isAdmin,
 				languageIsoCode: data.languageIsoCode || 'en-us', // TODO: make global variable

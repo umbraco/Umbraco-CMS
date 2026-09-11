@@ -49,6 +49,7 @@ export const data: Array<UmbMockUserGroupModel> = [
 		languages: [],
 		hasAccessToAllLanguages: true,
 		documentRootAccess: false,
+		documentBlueprintRootAccess: false,
 		elementRootAccess: false,
 		mediaRootAccess: false,
 		documentStartNode: {
@@ -81,6 +82,7 @@ export const data: Array<UmbMockUserGroupModel> = [
 		languages: [],
 		hasAccessToAllLanguages: true,
 		documentRootAccess: false,
+		documentBlueprintRootAccess: false,
 		elementRootAccess: false,
 		mediaRootAccess: false,
 		documentStartNode: {
@@ -121,6 +123,7 @@ export const data: Array<UmbMockUserGroupModel> = [
 		languages: [],
 		hasAccessToAllLanguages: true,
 		documentRootAccess: false,
+		documentBlueprintRootAccess: false,
 		elementRootAccess: false,
 		mediaRootAccess: false,
 		documentStartNode: {
@@ -150,6 +153,7 @@ export const data: Array<UmbMockUserGroupModel> = [
 		languages: [],
 		hasAccessToAllLanguages: true,
 		documentRootAccess: false,
+		documentBlueprintRootAccess: false,
 		elementRootAccess: false,
 		mediaRootAccess: false,
 		documentStartNode: {
@@ -174,6 +178,7 @@ export const data: Array<UmbMockUserGroupModel> = [
 		languages: [],
 		hasAccessToAllLanguages: false,
 		documentRootAccess: true,
+		documentBlueprintRootAccess: true,
 		elementRootAccess: true,
 		mediaRootAccess: true,
 		aliasCanBeChanged: false,

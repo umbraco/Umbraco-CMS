@@ -119,6 +119,18 @@ public static class UserExtensions
             Constants.System.RecycleBinMedia);
 
     /// <summary>
+    ///     Determines whether the user has access to the document blueprint root.
+    /// </summary>
+    /// <param name="user">The user.</param>
+    /// <param name="entityService">The entity service.</param>
+    /// <param name="appCaches">The application caches.</param>
+    /// <returns>True if the user has access to the document blueprint root; otherwise false.</returns>
+    internal static bool HasDocumentBlueprintRootAccess(this IUser user, IEntityService entityService, AppCaches appCaches) =>
+        ContentPermissions.HasPathAccessWithoutRecycleBin(
+            Constants.System.RootString,
+            user.CalculateDocumentBlueprintStartNodeIds(entityService, appCaches));
+
+    /// <summary>
     ///     Determines whether the user has access to the elements root.
     /// </summary>
     internal static bool HasElementRootAccess(this IUser user, IEntityService entityService, AppCaches appCaches) =>
@@ -334,6 +346,37 @@ public static class UserExtensions
     }
 
     /// <summary>
+    ///     Gets the document blueprint start node identifiers for the user.
+    /// </summary>
+    /// <param name="user">The user to calculate start nodes for.</param>
+    /// <param name="entityService">The entity service.</param>
+    /// <param name="appCaches">The application caches.</param>
+    /// <returns>
+    ///     The combined start node identifiers, or <c>null</c> when none are granted, which denies access.
+    /// </returns>
+    public static int[]? CalculateDocumentBlueprintStartNodeIds(this IUser user, IEntityService entityService, AppCaches appCaches)
+    {
+        var cacheKey = user.UserCacheKey(CacheKeys.UserAllDocumentBlueprintStartNodesPrefix);
+        IAppPolicyCache runtimeCache = GetUserCache(appCaches);
+        return runtimeCache.GetCacheItem(
+            cacheKey,
+            () =>
+            {
+                var gsn = user.Groups.Where(x => x.StartDocumentBlueprintId.HasValue)
+                    .Select(x => x.StartDocumentBlueprintId!.Value).Distinct().ToArray();
+                var usn = user.StartDocumentBlueprintIds;
+                if (usn is not null)
+                {
+                    return CombineStartNodes(UmbracoObjectTypes.DocumentBlueprintContainer, gsn, usn, entityService);
+                }
+
+                return null;
+            },
+            TimeSpan.FromMinutes(2),
+            true);
+    }
+
+    /// <summary>
     ///     Gets the media start node paths for the user.
     /// </summary>
     /// <param name="user">The user to get paths for.</param>
@@ -382,6 +425,31 @@ public static class UserExtensions
             true);
 
         return result;
+    }
+
+    /// <summary>
+    ///     Gets the document blueprint start node paths for the user.
+    /// </summary>
+    /// <param name="user">The user to get paths for.</param>
+    /// <param name="entityService">The entity service.</param>
+    /// <param name="appCaches">The application caches.</param>
+    /// <returns>An array of document blueprint start node paths, or <c>null</c> if no start nodes are defined.</returns>
+    public static string[]? GetDocumentBlueprintStartNodePaths(this IUser user, IEntityService entityService, AppCaches appCaches)
+    {
+        var cacheKey = user.UserCacheKey(CacheKeys.UserDocumentBlueprintStartNodePathsPrefix);
+        IAppPolicyCache runtimeCache = GetUserCache(appCaches);
+        return runtimeCache.GetCacheItem(
+            cacheKey,
+            () =>
+            {
+                var startNodeIds = user.CalculateDocumentBlueprintStartNodeIds(entityService, appCaches);
+                return entityService
+                    .GetAllPaths(UmbracoObjectTypes.DocumentBlueprintContainer, startNodeIds)
+                    .Select(x => x.Path)
+                    .ToArray();
+            },
+            TimeSpan.FromMinutes(2),
+            true);
     }
 
     /// <summary>
@@ -437,7 +505,7 @@ public static class UserExtensions
                 continue; // ignore rogue node (no path)
             }
 
-            if (StartsWithPath(snp, binPath))
+            if (binPath is not null && StartsWithPath(snp, binPath))
             {
                 continue; // ignore bin
             }
@@ -459,7 +527,7 @@ public static class UserExtensions
                 continue; // ignore rogue node (no path)
             }
 
-            if (StartsWithPath(snp, binPath))
+            if (binPath is not null && StartsWithPath(snp, binPath))
             {
                 continue; // ignore bin
             }
@@ -504,10 +572,17 @@ public static class UserExtensions
         test.StartsWith(path) && test.Length > path.Length && test[path.Length] == ',';
 
     /// <summary>
-    ///     Gets the recycle bin path for the specified object type.
+    ///     Gets the recycle bin path for the specified object type, or <c>null</c> for a tree that has no
+    ///     recycle bin.
     /// </summary>
-    private static string GetBinPath(UmbracoObjectTypes objectType)
+    private static string? GetBinPath(UmbracoObjectTypes objectType)
     {
+        // Document blueprints have no recycle bin, so there is no bin branch to exclude.
+        if (objectType is UmbracoObjectTypes.DocumentBlueprint or UmbracoObjectTypes.DocumentBlueprintContainer)
+        {
+            return null;
+        }
+
         var binPath = Constants.System.RootString + ",";
         switch (objectType)
         {
