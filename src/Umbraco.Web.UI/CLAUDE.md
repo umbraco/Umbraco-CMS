@@ -173,7 +173,6 @@ Default configuration for new installations:
 
 | Setting | Value | Description |
 |---------|-------|-------------|
-| `ModelsMode` | `InMemoryAuto` | Auto-generate models in memory |
 | `DefaultUILanguage` | `en-us` | Backoffice language |
 | `HideTopLevelNodeFromPath` | `true` | Clean URLs |
 | `TimeOut` | `00:20:00` | Session timeout |
@@ -202,7 +201,9 @@ MSBuild targets automatically copy template files if missing (appsettings.json a
 
 ### InMemoryAuto Mode
 
-The project uses `InMemoryAuto` mode:
+The project runs in `InMemoryAuto` mode without configuring it: `Umbraco.Cms.DevelopmentMode.Backoffice` is referenced and the runtime mode defaults to `BackofficeDevelopment`, so that package raises the models mode from the default. Core defaults to generating nothing, being the only mode it can satisfy without an optional package.
+
+In this mode:
 - Models auto-generated at runtime
 - Source stored in `umbraco/Data/TEMP/InMemoryAuto/`
 - Compiled assembly in `Compiled/` subdirectory

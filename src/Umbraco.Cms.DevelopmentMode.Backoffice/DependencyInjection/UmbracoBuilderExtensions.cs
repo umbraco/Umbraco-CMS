@@ -1,10 +1,13 @@
 using Microsoft.AspNetCore.Mvc.Razor.Compilation;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.DevelopmentMode.Backoffice.InMemoryAuto;
+using Umbraco.Cms.Infrastructure.Runtime.RuntimeModeValidators;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.DevelopmentMode.Backoffice.DependencyInjection;
@@ -92,8 +95,6 @@ public static class UmbracoBuilderExtensions
             mvcBuilder.AddRazorRuntimeCompilation();
         });
         builder.AddInMemoryModelsRazorEngine();
-        builder.RuntimeModeValidators()
-            .Add<InMemoryModelsBuilderModeValidator>();
         builder.AddNotificationHandler<ModelBindingErrorNotification, ModelsBuilderBindingErrorHandler>();
 
         return builder;
@@ -105,8 +106,46 @@ public static class UmbracoBuilderExtensions
     {
         // We should only add/replace these services when models builder is InMemory, otherwise we'll cause issues.
         // Since these services expect the ModelsMode to be InMemoryAuto
-        if (builder.Config.GetModelsMode() == ModelsModeConstants.InMemoryAuto)
+        var modelsModeConfigured = builder.Config.IsModelsModeConfigured();
+        if (modelsModeConfigured is false || builder.Config.GetModelsMode() == ModelsModeConstants.InMemoryAuto)
         {
+            if (modelsModeConfigured is false)
+            {
+                // Reported once rather than on each options instance, as several are built per application and
+                // again whenever configuration reloads.
+                var reported = 0;
+
+                // Generating models at runtime is only possible because this package supplies the factory for it,
+                // so this package owns the mode when the site has expressed no preference. Core cannot default to
+                // a mode it has no way to satisfy on its own.
+                builder.Services.AddOptions<ModelsBuilderSettings>().PostConfigure<ILoggerFactory>((settings, loggerFactory) =>
+                {
+                    // A mode set in code is not visible in configuration, but has been applied by the time this
+                    // runs, so raise only a mode still left at its default rather than overriding that choice.
+                    if (settings.ModelsMode != Constants.ModelsBuilder.ModelsModes.Nothing)
+                    {
+                        return;
+                    }
+
+                    settings.ModelsMode = ModelsModeConstants.InMemoryAuto;
+
+                    if (Interlocked.Exchange(ref reported, 1) == 0)
+                    {
+                        loggerFactory
+                            .CreateLogger(typeof(InMemoryModelFactory).Namespace!)
+                            .LogInformation(
+                                "No ModelsBuilder mode is configured, so the {PackageName} package has raised it from the {DefaultModelsMode} default to {ModelsMode}.",
+                                "Umbraco.Cms.DevelopmentMode.Backoffice",
+                                Constants.ModelsBuilder.ModelsModes.Nothing,
+                                ModelsModeConstants.InMemoryAuto);
+                    }
+                });
+            }
+
+            // Nothing else needs to object to the mode now that it can be satisfied.
+            builder.RuntimeModeValidators()
+                .Remove<InMemoryModelsBuilderModeValidator>();
+
             // Ensure ModelsBuilder services (including UmbracoServices) are registered.
             // This is normally done by AddWebsite(), but in a delivery-API-only setup
             // it may not have been called. AddModelsBuilder() is idempotent.
