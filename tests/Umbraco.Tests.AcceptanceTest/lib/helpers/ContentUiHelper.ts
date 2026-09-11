@@ -2245,11 +2245,12 @@ export class ContentUiHelper extends UiBaseLocators {
 
   // Bulk trash sends one sequential request per selected item, so waiting on a single
   // response races the remaining items still in flight — pass the selection count for a bulk trash.
+  // The generic document endpoint also matches the tree/collection refreshes between trashes, so match the trash request alone.
   async clickConfirmTrashButtonAndWaitForContentToBeTrashed(expectedCount: number = 1) {
     if (expectedCount === 1) {
-      return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.document, this.clickConfirmTrashButton(), ConstantHelper.statusCodes.ok);
+      return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.moveToRecycleBin, this.clickConfirmTrashButton(), ConstantHelper.statusCodes.ok);
     }
-    return await this.waitForMultipleResponsesAfterExecutingPromise(ConstantHelper.apiEndpoints.document, this.clickConfirmTrashButton(), ConstantHelper.statusCodes.ok, expectedCount);
+    return await this.waitForMultipleResponsesAfterExecutingPromise(ConstantHelper.apiEndpoints.moveToRecycleBin, this.clickConfirmTrashButton(), ConstantHelper.statusCodes.ok, expectedCount);
   }
 
   async clickConfirmEmptyRecycleBinButtonAndWaitForRecycleBinToBeEmptied() {

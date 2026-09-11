@@ -214,7 +214,7 @@ test('can publish child content from list', async ({umbracoApi, umbracoUi}) => {
   expect(childContentData.variants[0].state).toBe(expectedState);
 });
 
-// Remove .skip when the issue is fixed: https://github.com/umbraco/Umbraco-CMS/issues/18615
+// Product bug: the publish is rejected and the child stays Unpublished, but the list view shows no notification at all.
 test.skip('can not publish child content from list when parent is not published', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const expectedState = 'Draft';

@@ -14,8 +14,8 @@ test.afterEach(async ({umbracoApi}) => {
 const dateTimes = [
   {type: 'with AM time', value: '2024-10-29 09:09:09', expectedValue: '10/29/2024 9:09:09 AM', dataTypeName: 'Date Picker with time'},
   {type: 'with PM time', value: '2024-10-29 21:09:09', expectedValue: '10/29/2024 9:09:09 PM', dataTypeName: 'Date Picker with time'},
-  // TODO: Uncomment this when the front-end is ready. Currently the time still be rendered.
-  //{type: 'without time', value: '2024-10-29 00:00:00', expectedValue: '10/29/2024', dataTypeName: 'Date Picker'}
+  // Date-only picker still stores a DateTime, which the template renders unformatted.
+  {type: 'without time', value: '2024-10-29 00:00:00', expectedValue: '10/29/2024 12:00:00 AM', dataTypeName: 'Date Picker'}
 ];
 
 for (const dateTime of dateTimes) {

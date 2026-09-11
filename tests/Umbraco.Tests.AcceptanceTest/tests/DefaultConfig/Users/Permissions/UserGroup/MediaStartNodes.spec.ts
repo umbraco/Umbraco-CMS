@@ -1,4 +1,5 @@
 import {ConstantHelper, test} from '@umbraco/acceptance-test-helpers';
+import {expect} from '@playwright/test';
 
 const testUser = ConstantHelper.testUserCredentials;
 
@@ -49,8 +50,7 @@ test('can see root media start node and children', {tag: '@release'}, async ({um
   await umbracoUi.media.isChildMediaVisible(rootFolderName, childFolderTwoName);
 });
 
-// Skip this test due to this issue: https://github.com/umbraco/Umbraco-CMS/issues/20505
-test.skip('can see parent of start node but not access it', async ({umbracoApi, umbracoUi}) => {
+test('can see parent of start node but not access it', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithMediaStartNode(userGroupName, childFolderOneId);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
@@ -62,8 +62,11 @@ test.skip('can see parent of start node but not access it', async ({umbracoApi, 
 
   // Assert
   await umbracoUi.media.isMediaTreeItemVisible(rootFolderName);
+  // A folder the user cannot access is rendered disabled and without an href, so clicking it must not navigate.
+  await umbracoUi.page.waitForURL('**/section/media/collection');
+  const initialUrl = umbracoUi.page.url();
   await umbracoUi.media.goToMediaWithName(rootFolderName);
-  await umbracoUi.media.doesMediaWorkspaceHaveText('Access denied');
+  expect(umbracoUi.page.url()).toBe(initialUrl);
   await umbracoUi.media.openMediaCaretButtonForName(rootFolderName);
   await umbracoUi.media.isChildMediaVisible(rootFolderName, childFolderOneName);
   await umbracoUi.media.isChildMediaVisible(rootFolderName, childFolderTwoName, false);

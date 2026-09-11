@@ -55,7 +55,7 @@ test('can add an area for a block', {tag: '@smoke'}, async ({umbracoApi, umbraco
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainAreaWithAlias(blockGridEditorName, contentElementTypeId)).toBeTruthy();
 });
 
-// TODO: There are currently issues when trying to select the locator.
+// Unwritten: reachable only as a pixel drag against umb-block-scale-handler, which the suite has none of.
 test.skip('can resize an area for a block', async ({umbracoApi, umbracoUi}) => {
 // Arrange
   const areaAlias = 'TestArea';
@@ -251,7 +251,8 @@ test('can remove max allowed for an area in a block', async ({umbracoApi, umbrac
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainAreaWithMaxAllowed(blockGridEditorName, contentElementTypeId, areaAlias, maxAllowed)).toBeFalsy();
 });
 
-// TODO: Remove skip when the front-end is ready. Currently there is no frontend validation for min and max values
+// Product gap (https://github.com/umbraco/Umbraco-CMS/issues/17509): the area config has no min/max validation,
+// so the save succeeds.
 test.skip('min can not be more than max an area in a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const areaAlias = 'TestArea';

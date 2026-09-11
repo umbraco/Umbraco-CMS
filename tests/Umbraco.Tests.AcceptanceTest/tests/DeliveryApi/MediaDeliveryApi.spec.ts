@@ -182,17 +182,20 @@ test('can fetch a media item by its path', async ({umbracoApi}) => {
   await umbracoApi.media.ensureNameNotExists(rootArticleName);  
 });
 
-// Skip this because it will return 404 error if the path includes # or ?
-// Issue link: https://github.com/umbraco/Umbraco-CMS/issues/20024
-test.skip('can fetch a media item by its path with special characters', async ({umbracoApi}) => {
+test('can fetch a media item by its path with special characters', async ({umbracoApi}) => {
   // Arrange
   const mediaTypeName = 'Image';
   // Create an image item at root level and its name has special characters
-  await umbracoApi.media.createDefaultMediaWithImage(specialCharacterImageName);
-  const mediaPath = '/' + specialCharacterImageName.toLowerCase() + '/';
+  const mediaId = await umbracoApi.media.createDefaultMediaWithImage(specialCharacterImageName);
+  // Umbraco slugifies the name into the URL segment, so the path has to be read off the item rather than
+  // derived from the name.
+  const mediaItemById = await umbracoApi.mediaDeliveryApi.getMediaItemWithId(mediaId);
+  const mediaPath = (await mediaItemById.json()).path;
+  // Each segment is encoded so '#' and '?' cannot be read as a fragment or a query string.
+  const encodedMediaPath = mediaPath.split('/').map(encodeURIComponent).join('/');
 
   // Act
-  const mediaItem = await umbracoApi.mediaDeliveryApi.getMediaItemWithPath(mediaPath);
+  const mediaItem = await umbracoApi.mediaDeliveryApi.getMediaItemWithPath(encodedMediaPath);
 
   // Assert
   expect(mediaItem.status()).toBe(200);

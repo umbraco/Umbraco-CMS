@@ -73,7 +73,8 @@ test('can not see element in tree with read permission disabled', async ({umbrac
   await umbracoUi.library.doesElementWorkspaceHaveText('Access denied');
 });
 
-// Currently there is no 'Save' button in the UI when creating an element
+// Design question: Umb.WorkspaceAction.Element.Save is gated on UMB_USER_PERMISSION_ELEMENT_UPDATE while this
+// grants create only, so the Save button is correctly absent.
 test.skip('can create element with create permission enabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithCreateElementPermission(userGroupName);

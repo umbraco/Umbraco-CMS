@@ -19,7 +19,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.dataType.ensureNameNotExists(blockGridEditorName);
 });
 
-// TODO: Remove skip and update test when the front-end is ready. Currently it is not possible to add a custom view to a block
+// Product gap: a custom view comes from a blockEditorCustomView manifest, not the Advanced tab, which only lists the registered ones.
 test.skip('can add a custom view to a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.dataType.createBlockGridWithABlock(blockGridEditorName, contentElementTypeId);
@@ -31,7 +31,7 @@ test.skip('can add a custom view to a block', async ({umbracoApi, umbracoUi}) =>
   // TODO: Implement it later
 });
 
-// TODO: Remove skip and update test when the front-end is ready. Currently it is not possible to add a custom view to a block
+// Product gap: a custom view comes from a blockEditorCustomView manifest, not the Advanced tab, which only lists the registered ones.
 test.skip('can remove a custom view from a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.dataType.createBlockGridWithABlock(blockGridEditorName, contentElementTypeId);
@@ -43,7 +43,7 @@ test.skip('can remove a custom view from a block', async ({umbracoApi, umbracoUi
   // TODO: Implement it later
 });
 
-// TODO: Remove skip and update test when the front-end is ready. Currently it is not possible to add a custom stylesheet to a block
+// Product gap: there is no custom stylesheet editor on a block; the block-type package never references one.
 test.skip('can remove a custom stylesheet from a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const stylesheetName = 'TestStylesheet.css'

@@ -100,23 +100,6 @@ test('can open content model in a block', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.isElementWorkspaceOpenInBlock(elementTypeName);
 });
 
-// Skip this test as it is impossible to remove a content model in front-end
-test.skip('can remove a content model from a block', async ({umbracoApi, umbracoUi}) => {
-  // Arrange
-  await umbracoApi.dataType.createBlockListDataTypeWithABlock(blockListEditorName, elementTypeId);
-
-  // Act
-  await umbracoUi.dataType.goToDataType(blockListEditorName);
-  await umbracoUi.dataType.goToBlockWithName(elementTypeName);
-  await umbracoUi.dataType.removeBlockContentModel();
-  await umbracoUi.dataType.clickConfirmRemoveButton();
-  await umbracoUi.dataType.clickSubmitButton();
-  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
-
-  // Assert
-  // TODO: missing check that the content model is removed
-});
-
 test('can add a settings model to a block', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const secondElementName = 'SecondElementTest';
@@ -271,7 +254,7 @@ test('can delete a icon color from a block', async ({umbracoApi, umbracoUi}) => 
   expect(blockData.values[0].value[0].iconColor).toEqual('');
 });
 
-// TODO: Remove skip when the front-end is ready. Currently it is not possible to update a stylesheet to a block
+// Product gap: there is no custom stylesheet editor on a block; the block-type package never references one.
 test.skip('can update a custom stylesheet for a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const stylesheetName = 'TestStylesheet.css';
@@ -305,7 +288,7 @@ test.skip('can update a custom stylesheet for a block', async ({umbracoApi, umbr
   await umbracoApi.stylesheet.ensureNameNotExists(secondStylesheetName);
 });
 
-// TODO: Remove skip when the front-end is ready. Currently it is not possible to delete a stylesheet to a block
+// Product gap: there is no custom stylesheet editor on a block; the block-type package never references one.
 test.skip('can delete a custom stylesheet from a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const stylesheetName = 'TestStylesheet.css';

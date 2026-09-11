@@ -30,8 +30,8 @@ test('can update maximum allowed characters value', async ({umbracoApi, umbracoU
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'maxChars', maxCharsValue)).toBeTruthy();
 });
 
-// Remove .skip when the front-end is ready. The "Input type" should be removed.
-// Issue link: https://github.com/umbraco/Umbraco-CMS/issues/19340
+// Product gap (https://github.com/umbraco/Umbraco-CMS/issues/19340): text-box/manifests.ts still injects the
+// Input type setting. ConstantHelper.textstringSettings needs updating too when this is fixed.
 test.skip('the default configuration is correct', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.dataType.goToDataType(dataTypeName);

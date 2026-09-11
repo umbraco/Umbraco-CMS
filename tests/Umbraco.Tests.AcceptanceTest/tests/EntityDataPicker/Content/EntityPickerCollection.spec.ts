@@ -95,8 +95,7 @@ test('can not create content with an entity picker using the collection data sou
   await umbracoUi.content.isChooseButtonVisible(false);
 });
 
-// Skip this test due to this issue: https://github.com/umbraco/Umbraco-CMS/issues/22121
-test.skip('can not create content with an entity picker using the collection data source that has less items than min amount', async ({umbracoApi, umbracoUi}) => {
+test('can not create content with an entity picker using the collection data source that has less items than min amount', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const expectedState = 'Published';
   const dataTypeId = await umbracoApi.dataType.createEntityDataPickerDataTypeWithMinAndMaxValues(dataTypeName, collectionDataSourceAlias, 2, 5);
@@ -107,7 +106,7 @@ test.skip('can not create content with an entity picker using the collection dat
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.chooseCollectionMenuItemWithName('Example 1');
-  await umbracoUi.content.isTextWithExactNameVisible('This field need more items');
+  await umbracoUi.content.isTextWithExactNameVisible('This field needs more items');
   await umbracoUi.content.clickSaveAndPublishButton();
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
   await umbracoUi.content.chooseCollectionMenuItemWithName('Example 3');
