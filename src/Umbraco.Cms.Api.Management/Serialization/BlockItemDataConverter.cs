@@ -13,12 +13,21 @@ internal sealed class BlockItemDataConverter : DelegatingJsonConverterBase<Block
 
     public override void Write(Utf8JsonWriter writer, BlockItemData value, JsonSerializerOptions options)
     {
-        value.Values = value.Values
-            .OrderBy(propertyValue => propertyValue.Culture, StringComparer.Ordinal)
-            .ThenBy(propertyValue => propertyValue.Segment, StringComparer.Ordinal)
-            .ThenBy(propertyValue => propertyValue.Alias, StringComparer.Ordinal)
-            .ToList();
+        IList<BlockPropertyValue> originalValues = value.Values;
 
-        JsonSerializer.Serialize(writer, value, GetOptionsWithoutSelf(options));
+        try
+        {
+            value.Values = originalValues
+                .OrderBy(propertyValue => propertyValue.Culture, StringComparer.Ordinal)
+                .ThenBy(propertyValue => propertyValue.Segment, StringComparer.Ordinal)
+                .ThenBy(propertyValue => propertyValue.Alias, StringComparer.Ordinal)
+                .ToList();
+
+            JsonSerializer.Serialize(writer, value, GetOptionsWithoutSelf(options));
+        }
+        finally
+        {
+            value.Values = originalValues;
+        }
     }
 }

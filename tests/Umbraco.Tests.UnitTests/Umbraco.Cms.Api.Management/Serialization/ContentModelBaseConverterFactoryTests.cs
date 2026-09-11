@@ -131,6 +131,38 @@ public class ContentModelBaseConverterFactoryTests
     }
 
     [Test]
+    public void Write_Does_Not_Leave_Variants_Or_Values_Reordered_On_The_Original_Instance()
+    {
+        // Culture order here is deliberately not the sorted order, so a leaked mutation from Write would
+        // be observable as a changed Variants/Values order on the original instance.
+        var model = new DocumentResponseModel
+        {
+            Id = Guid.NewGuid(),
+            DocumentType = new DocumentTypeReferenceResponseModel { Id = Guid.NewGuid() },
+            Variants =
+            [
+                new DocumentVariantResponseModel { Culture = "en-us", Name = "English" },
+                new DocumentVariantResponseModel { Culture = "da-dk", Name = "Danish" },
+            ],
+            Values =
+            [
+                new DocumentValueResponseModel { Culture = "en-us", Alias = "title", Value = "value" },
+                new DocumentValueResponseModel { Culture = "da-dk", Alias = "title", Value = "value" },
+            ],
+        };
+        var originalVariantOrder = model.Variants.Select(v => v.Culture).ToArray();
+        var originalValueOrder = model.Values.Select(v => v.Culture).ToArray();
+
+        JsonSerializer.Serialize(model, _jsonSerializerOptions);
+
+        Assert.Multiple(() =>
+        {
+            CollectionAssert.AreEqual(originalVariantOrder, model.Variants.Select(v => v.Culture).ToArray());
+            CollectionAssert.AreEqual(originalValueOrder, model.Values.Select(v => v.Culture).ToArray());
+        });
+    }
+
+    [Test]
     public void Read_Delegates_To_Default_Deserialization()
     {
         var model = new DocumentResponseModel

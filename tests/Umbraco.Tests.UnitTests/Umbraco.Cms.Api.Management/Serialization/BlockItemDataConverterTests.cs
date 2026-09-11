@@ -71,6 +71,19 @@ public class BlockItemDataConverterTests
     }
 
     [Test]
+    public void Write_Does_Not_Leave_Values_Reordered_On_The_Original_Instance()
+    {
+        // Culture order here ("en-us" before "da-dk") is deliberately not the sorted order, so a leaked
+        // mutation from Write would be observable as a changed Values order on the original instance.
+        BlockItemData model = CreateModel([("en-us", "title", null), ("da-dk", "title", null)]);
+        var originalOrder = model.Values.Select(v => v.Culture).ToArray();
+
+        JsonSerializer.Serialize(model, _jsonSerializerOptions);
+
+        CollectionAssert.AreEqual(originalOrder, model.Values.Select(v => v.Culture).ToArray());
+    }
+
+    [Test]
     public void Read_Delegates_To_Default_Deserialization()
     {
         BlockItemData model = CreateModel([("en-us", "title", null), ("da-dk", "title", null)]);

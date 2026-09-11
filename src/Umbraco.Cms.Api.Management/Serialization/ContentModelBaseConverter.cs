@@ -25,16 +25,27 @@ internal sealed class ContentModelBaseConverter<TConcrete, TValueModel, TVariant
 
     public override void Write(Utf8JsonWriter writer, TConcrete value, JsonSerializerOptions options)
     {
-        value.Variants = value.Variants
-            .OrderBy(variant => variant.Culture, StringComparer.Ordinal)
-            .ThenBy(variant => variant.Segment, StringComparer.Ordinal)
-            .ToArray();
-        value.Values = value.Values
-            .OrderBy(propertyValue => propertyValue.Culture, StringComparer.Ordinal)
-            .ThenBy(propertyValue => propertyValue.Segment, StringComparer.Ordinal)
-            .ThenBy(propertyValue => propertyValue.Alias, StringComparer.Ordinal)
-            .ToArray();
+        IEnumerable<TVariantModel> originalVariants = value.Variants as TVariantModel[] ?? value.Variants.ToArray();
+        IEnumerable<TValueModel> originalValues = value.Values as TValueModel[] ?? value.Values.ToArray();
 
-        JsonSerializer.Serialize(writer, value, GetOptionsWithoutSelf(options));
+        try
+        {
+            value.Variants = originalVariants
+                .OrderBy(variant => variant.Culture, StringComparer.Ordinal)
+                .ThenBy(variant => variant.Segment, StringComparer.Ordinal)
+                .ToArray();
+            value.Values = originalValues
+                .OrderBy(propertyValue => propertyValue.Culture, StringComparer.Ordinal)
+                .ThenBy(propertyValue => propertyValue.Segment, StringComparer.Ordinal)
+                .ThenBy(propertyValue => propertyValue.Alias, StringComparer.Ordinal)
+                .ToArray();
+
+            JsonSerializer.Serialize(writer, value, GetOptionsWithoutSelf(options));
+        }
+        finally
+        {
+            value.Variants = originalVariants;
+            value.Values = originalValues;
+        }
     }
 }
