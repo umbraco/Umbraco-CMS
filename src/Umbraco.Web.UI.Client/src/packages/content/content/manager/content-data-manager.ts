@@ -19,27 +19,6 @@ export class UmbContentWorkspaceDataManager<
 		this.#variantScaffold = variantScaffold;
 	}
 
-	protected override _sortCurrentData<GivenType extends Partial<ModelType> = Partial<ModelType>>(
-		persistedData: Partial<ModelType>,
-		currentData: GivenType,
-	): GivenType {
-		currentData = super._sortCurrentData(persistedData, currentData);
-		// Sort the variants in the same order as the persisted data:
-		const persistedVariants = persistedData.variants;
-		if (persistedVariants && currentData.variants) {
-			return {
-				...currentData,
-				variants: [...currentData.variants].sort(function (a, b) {
-					return (
-						persistedVariants.findIndex((x) => x.culture === a.culture) -
-						persistedVariants.findIndex((x) => x.culture === b.culture)
-					);
-				}),
-			};
-		}
-		return currentData;
-	}
-
 	/**
 	 * Sets the variant scaffold data
 	 * @param {ModelVariantType} variantScaffold The variant scaffold data

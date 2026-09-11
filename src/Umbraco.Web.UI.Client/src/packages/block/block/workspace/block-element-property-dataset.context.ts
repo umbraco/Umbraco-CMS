@@ -1,4 +1,4 @@
-import type { UmbBlockElementManager } from './block-element-manager.js';
+import type { UmbBlockElementManager } from './context/block-element-manager.js';
 import type { UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';

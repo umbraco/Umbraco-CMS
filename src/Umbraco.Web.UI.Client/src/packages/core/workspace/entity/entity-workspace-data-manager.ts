@@ -29,14 +29,6 @@ export class UmbEntityWorkspaceDataManager<ModelType>
 	 */
 	public readonly current = this._current.asObservable();
 
-	protected _sortCurrentData<GivenType extends Partial<ModelType> = Partial<ModelType>>(
-		persistedData: Partial<ModelType>,
-		currentData: GivenType,
-	): GivenType {
-		// do nothing.
-		return currentData;
-	}
-
 	/**
 	 * Gets persisted data
 	 * @returns {(ModelType | undefined)} The persisted data.
@@ -53,9 +45,6 @@ export class UmbEntityWorkspaceDataManager<ModelType>
 	 */
 	setPersisted(data: ModelType | undefined) {
 		this._persisted.setValue(data);
-		if (data) {
-			this.#alignCurrentToPersisted(data);
-		}
 	}
 
 	/**
@@ -65,17 +54,6 @@ export class UmbEntityWorkspaceDataManager<ModelType>
 	 */
 	updatePersisted(partialData: Partial<ModelType>) {
 		this._persisted.update(partialData);
-		const persistedData = this._persisted.getValue();
-		if (persistedData) {
-			this.#alignCurrentToPersisted(persistedData);
-		}
-	}
-
-	#alignCurrentToPersisted(persistedData: ModelType) {
-		const currentData = this._current.getValue();
-		if (currentData) {
-			this._current.setValue(this._sortCurrentData(persistedData, currentData));
-		}
 	}
 
 	/**
@@ -106,12 +84,6 @@ export class UmbEntityWorkspaceDataManager<ModelType>
 	 * @memberof UmbEntityWorkspaceDataManager
 	 */
 	setCurrent(data: ModelType | undefined) {
-		if (data) {
-			const persistedData = this._persisted.getValue();
-			if (persistedData) {
-				data = this._sortCurrentData(persistedData, data);
-			}
-		}
 		this._current.setValue(data);
 	}
 
@@ -121,12 +93,6 @@ export class UmbEntityWorkspaceDataManager<ModelType>
 	 * @memberof UmbEntityWorkspaceDataManager
 	 */
 	updateCurrent(partialData: Partial<ModelType>) {
-		if (partialData) {
-			const persistedData = this._persisted.getValue();
-			if (persistedData) {
-				partialData = this._sortCurrentData(persistedData, partialData);
-			}
-		}
 		this._current.update(partialData);
 	}
 

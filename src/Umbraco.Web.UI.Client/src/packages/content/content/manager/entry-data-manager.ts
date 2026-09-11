@@ -1,17 +1,7 @@
 import { UmbMergeContentVariantDataController } from '../controller/merge-content-variant-data.controller.js';
-import type { UmbEntryDetailModel, UmbEntryValueModel } from '../types.js';
-import { UmbVariantId, umbVariantObjectCompare } from '@umbraco-cms/backoffice/variant';
+import type { UmbEntryDetailModel } from '../types.js';
+import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbEntityWorkspaceDataManager, type UmbWorkspaceDataManager } from '@umbraco-cms/backoffice/workspace';
-
-/**
- * Compares two element values by alias and variant.
- * @param {UmbEntryValueModel} a The first value to compare.
- * @param {UmbEntryValueModel} b The second value to compare.
- * @returns {boolean} True if the values have the same alias and variant.
- */
-function valueObjectCompare(a: UmbEntryValueModel, b: UmbEntryValueModel): boolean {
-	return a.alias === b.alias && umbVariantObjectCompare(a, b);
-}
 
 export class UmbEntryWorkspaceDataManager<ModelType extends UmbEntryDetailModel>
 	extends UmbEntityWorkspaceDataManager<ModelType>
@@ -20,29 +10,6 @@ export class UmbEntryWorkspaceDataManager<ModelType extends UmbEntryDetailModel>
 	protected _varies?: boolean;
 	protected _variesByCulture?: boolean;
 	protected _variesBySegment?: boolean;
-
-	protected override _sortCurrentData<GivenType extends Partial<ModelType> = Partial<ModelType>>(
-		persistedData: Partial<ModelType>,
-		currentData: GivenType,
-	): GivenType {
-		currentData = super._sortCurrentData(persistedData, currentData);
-		// Sort the values in the same order as the persisted data:
-		const persistedValues = persistedData.values;
-		if (persistedValues && currentData.values) {
-			return {
-				...currentData,
-				values: [...currentData.values].sort(function (a, b) {
-					const aIndex = persistedValues.findIndex((x) => valueObjectCompare(x, a));
-					const bIndex = persistedValues.findIndex((x) => valueObjectCompare(x, b));
-					if (aIndex === -1 || bIndex === -1) {
-						return aIndex === bIndex ? 0 : aIndex === -1 ? 1 : -1;
-					}
-					return aIndex - bIndex;
-				}),
-			};
-		}
-		return currentData;
-	}
 
 	#updateLock = 0;
 	initiatePropertyValueChange() {
