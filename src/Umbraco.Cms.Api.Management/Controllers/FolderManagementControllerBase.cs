@@ -82,6 +82,24 @@ public abstract class FolderManagementControllerBase<TTreeEntity> : ManagementAp
             : OperationStatusResult(result.Status);
     }
 
+    /// <summary>
+    /// Moves a folder to the target supplied in the request model, or to the tree root when no target is supplied.
+    /// </summary>
+    /// <param name="key">The key of the folder to move.</param>
+    /// <param name="moveFolderRequestModel">The request model carrying the target to move to.</param>
+    /// <returns>An <see cref="IActionResult"/> representing the outcome of the move operation.</returns>
+    protected async Task<IActionResult> MoveFolderAsync(Guid key, MoveFolderRequestModel moveFolderRequestModel)
+    {
+        Attempt<EntityContainerOperationStatus> result = await _treeEntityTypeContainerService.MoveAsync(
+            key,
+            moveFolderRequestModel.Target?.Id,
+            CurrentUserKey(_backOfficeSecurityAccessor));
+
+        return result.Success
+            ? Ok()
+            : OperationStatusResult(result.Result);
+    }
+
     internal static IActionResult OperationStatusResult(EntityContainerOperationStatus status)
         => OperationStatusResult(status, problemDetailsBuilder => status switch
         {
@@ -110,6 +128,22 @@ public abstract class FolderManagementControllerBase<TTreeEntity> : ManagementAp
             EntityContainerOperationStatus.HasReferencedDescendants => new BadRequestObjectResult(problemDetailsBuilder
                 .WithTitle("The folder has referenced descendants")
                 .WithDetail("The folder cannot be moved to the recycle bin because it contains items that are referenced by other content.")
+                .Build()),
+            EntityContainerOperationStatus.InvalidParent => new BadRequestObjectResult(problemDetailsBuilder
+                .WithTitle("Invalid parent folder")
+                .WithDetail("The folder cannot be moved to itself or to one of its own descendants.")
+                .Build()),
+            EntityContainerOperationStatus.InTrash => new BadRequestObjectResult(problemDetailsBuilder
+                .WithTitle("The folder is in the recycle bin")
+                .WithDetail("The operation is not allowed on a folder that is in the recycle bin.")
+                .Build()),
+            EntityContainerOperationStatus.NotInTrash => new BadRequestObjectResult(problemDetailsBuilder
+                .WithTitle("The folder is not in the recycle bin")
+                .WithDetail("The operation is only allowed on a folder that is in the recycle bin.")
+                .Build()),
+            EntityContainerOperationStatus.ParentChangeNotAllowed => new BadRequestObjectResult(problemDetailsBuilder
+                .WithTitle("The folder parent cannot be changed")
+                .WithDetail("The parent of a folder cannot be changed by this operation. Move the folder instead.")
                 .Build()),
             _ => new ObjectResult(problemDetailsBuilder
                 .WithTitle("Unknown folder operation status.")

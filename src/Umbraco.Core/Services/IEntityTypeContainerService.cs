@@ -73,4 +73,15 @@ public interface IEntityTypeContainerService<TTreeEntity>
     /// <param name="userKey">Key of the user issuing the deletion.</param>
     /// <returns>An <see cref="Attempt{TResult,TStatus}"/> containing the deleted container if successful, or an error status if not.</returns>
     Task<Attempt<EntityContainer?, EntityContainerOperationStatus>> DeleteAsync(Guid id, Guid userKey);
+
+    /// <summary>
+    /// Moves a container, and everything below it, to a new parent container.
+    /// </summary>
+    /// <param name="key">The key of the container to move.</param>
+    /// <param name="parentKey">The key of the parent container to move to, or null to move to the tree root.</param>
+    /// <param name="userKey">Key of the user issuing the move.</param>
+    /// <returns>An <see cref="Attempt{TStatus}"/> describing the outcome of the operation.</returns>
+    // TODO (V19): Remove the default implementation and make this a required interface member.
+    Task<Attempt<EntityContainerOperationStatus>> MoveAsync(Guid key, Guid? parentKey, Guid userKey)
+        => throw new NotImplementedException();
 }

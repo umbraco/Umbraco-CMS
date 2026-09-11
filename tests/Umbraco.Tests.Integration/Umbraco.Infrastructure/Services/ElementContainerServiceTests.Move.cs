@@ -654,4 +654,73 @@ public partial class ElementContainerServiceTests
             Assert.AreEqual(EntityContainerOperationStatus.InvalidParent, moveResult.Result);
         });
     }
+
+    [Test]
+    public async Task Cannot_Move_Container_To_Parent_With_Same_Named_Child()
+    {
+        var containerToMoveKey = Guid.NewGuid();
+        await ElementContainerService.CreateAsync(containerToMoveKey, "Shared Name", null, Constants.Security.SuperUserKey);
+
+        var targetContainerKey = Guid.NewGuid();
+        await ElementContainerService.CreateAsync(targetContainerKey, "Target Container", null, Constants.Security.SuperUserKey);
+
+        // The target already has a child with the same name as the container we are about to move into it.
+        await ElementContainerService.CreateAsync(Guid.NewGuid(), "Shared Name", targetContainerKey, Constants.Security.SuperUserKey);
+
+        var moveResult = await ElementContainerService.MoveAsync(containerToMoveKey, targetContainerKey, Constants.Security.SuperUserKey);
+        Assert.Multiple(() =>
+        {
+            Assert.IsFalse(moveResult.Success);
+            Assert.AreEqual(EntityContainerOperationStatus.DuplicateName, moveResult.Result);
+        });
+
+        // The move must not have been persisted.
+        var containerToMove = await ElementContainerService.GetAsync(containerToMoveKey);
+        Assert.NotNull(containerToMove);
+        Assert.AreEqual(Constants.System.Root, containerToMove.ParentId);
+    }
+
+    [Test]
+    public async Task Moving_Container_To_Its_Current_Parent_Is_A_No_Op()
+    {
+        var rootContainerKey = Guid.NewGuid();
+        var rootContainer = (await ElementContainerService.CreateAsync(rootContainerKey, "Root Container", null, Constants.Security.SuperUserKey)).Result;
+        Assert.NotNull(rootContainer);
+
+        var childContainerKey = Guid.NewGuid();
+        await ElementContainerService.CreateAsync(childContainerKey, "Child Container", rootContainerKey, Constants.Security.SuperUserKey);
+
+        // Moving to the parent the container already has must succeed, and must not be tripped up by the
+        // duplicate name check - the container is itself a same named child of that parent.
+        var moveResult = await ElementContainerService.MoveAsync(childContainerKey, rootContainerKey, Constants.Security.SuperUserKey);
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(moveResult.Success);
+            Assert.AreEqual(EntityContainerOperationStatus.Success, moveResult.Result);
+        });
+
+        var childContainer = await ElementContainerService.GetAsync(childContainerKey);
+        Assert.NotNull(childContainer);
+        Assert.AreEqual(rootContainer.Id, childContainer.ParentId);
+        Assert.AreEqual(1, GetFolderChildren(rootContainerKey).Length);
+    }
+
+    [Test]
+    public async Task Can_Move_Container_To_Root_When_Another_Root_Container_Has_A_Different_Name()
+    {
+        var rootContainerKey = Guid.NewGuid();
+        await ElementContainerService.CreateAsync(rootContainerKey, "Root Container", null, Constants.Security.SuperUserKey);
+
+        var childContainerKey = Guid.NewGuid();
+        await ElementContainerService.CreateAsync(childContainerKey, "Child Container", rootContainerKey, Constants.Security.SuperUserKey);
+
+        var moveResult = await ElementContainerService.MoveAsync(childContainerKey, null, Constants.Security.SuperUserKey);
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(moveResult.Success);
+            Assert.AreEqual(EntityContainerOperationStatus.Success, moveResult.Result);
+        });
+
+        Assert.AreEqual(2, GetAtRoot().Length);
+    }
 }
