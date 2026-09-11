@@ -19,8 +19,9 @@ export class UserApiHelper {
     for (const sb of this.api.itemsOf(json)) {
       if (sb.name === name) {
         if (sb.id !== null) {
-          // It takes a while to create the user, so if we delete it too fast. We get a DB lock
-          await this.page.waitForTimeout(500);
+          // A user that was only just created cannot be deleted immediately - the server still
+          // holds a DB lock and returns an error. There is no endpoint that reports when it clears.
+          await this.page.waitForTimeout(ConstantHelper.wait.short);
           return await this.api.delete(this.api.baseUrl + '/umbraco/management/api/v1/user/' + sb.id);
         }
       }
@@ -86,7 +87,9 @@ export class UserApiHelper {
   }
 
   async delete(id: string) {
-    await this.page.waitForTimeout(500);
+    // A user that was only just created cannot be deleted immediately - the server still
+    // holds a DB lock and returns an error. There is no endpoint that reports when it clears.
+    await this.page.waitForTimeout(ConstantHelper.wait.short);
     return await this.api.delete(this.api.baseUrl + '/umbraco/management/api/v1/user/' + id);
   }
 
@@ -97,7 +100,8 @@ export class UserApiHelper {
     for (const sb of this.api.itemsOf(json)) {
       if (sb.name === name) {
         if (sb.id !== null) {
-          await this.page.waitForTimeout(500);
+          // Same DB lock as ensureNameNotExists: a just-created user cannot be deleted at once.
+          await this.page.waitForTimeout(ConstantHelper.wait.short);
           return await this.api.delete(this.api.baseUrl + '/umbraco/management/api/v1/user/' + sb.id);
         }
       }
@@ -121,7 +125,8 @@ export class UserApiHelper {
   }
 
   async removeAvatar(id: string) {
-    await this.page.waitForTimeout(500);
+    // Same DB lock as the user deletes above.
+    await this.page.waitForTimeout(ConstantHelper.wait.short);
     return await this.api.delete(this.api.baseUrl + '/umbraco/management/api/v1/user/avatar/' + id);
   }
 

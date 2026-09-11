@@ -961,6 +961,9 @@ export class ContentUiHelper extends UiBaseLocators {
     const x = element.x + (element.width * widthPercentage) / 100;
     const y = element.y + (element.height * heightPercentage) / 100;
 
+    // Synthetic mouse events, so these pauses are not a hedge: the drag handlers need an
+    // event-loop turn to register each step, and between two mouse events there is no
+    // observable state to wait on instead.
     await this.page.waitForTimeout(ConstantHelper.wait.minimal);
     await this.page.mouse.move(centerX, centerY, {steps: 5});
     await this.page.waitForTimeout(ConstantHelper.wait.minimal);
@@ -2152,7 +2155,7 @@ export class ContentUiHelper extends UiBaseLocators {
       }),
     );
     await this.clickChooseContainerButton();
-    await this.page.waitForTimeout(500);
+    await this.page.waitForTimeout(ConstantHelper.wait.short);
   }
 
   async chooseTreeMenuItemWithName(name: string, parentNames: string[] = []) {
@@ -2162,7 +2165,7 @@ export class ContentUiHelper extends UiBaseLocators {
     }
     await this.click(this.container.getByLabel(name));
     await this.clickChooseContainerButton();
-    await this.page.waitForTimeout(500);
+    await this.page.waitForTimeout(ConstantHelper.wait.short);
   }
 
   async isChooseButtonVisible(isVisible: boolean = true) {

@@ -1594,6 +1594,9 @@ export class UiBaseLocators extends BasePage {
     await this.page.mouse.move(10, 10);
     await this.hover(dragFromSelector);
     await this.page.mouse.down();
+    // Synthetic mouse events, so these pauses are not a hedge: the drag handlers need an
+    // event-loop turn to register each step, and between two mouse events there is no
+    // observable state to wait on instead.
     await this.page.waitForTimeout(ConstantHelper.wait.debounce);
     await this.page.mouse.move(
       elementCenterX + horizontalOffset,
