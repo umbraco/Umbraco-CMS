@@ -17,7 +17,7 @@ import { UMB_CONTENT_PUBLISH_MODAL, UmbContentUnpublishEntityAction } from '@umb
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
-import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import { UmbVariantId, umbExpandVariantIdsWithSegmentOptions } from '@umbraco-cms/backoffice/variant';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import { notifyWorkspaceActionStarting } from '@umbraco-cms/backoffice/workspace';
@@ -181,7 +181,15 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 
 		if (!variants.length) return;
 
-		const variantIds = variants.map((x) => x.variantId);
+		let variantIds = variants.map((x) => x.variantId);
+
+		if (this.#elementWorkspaceContext.getVariesBySegment()) {
+			variantIds = umbExpandVariantIdsWithSegmentOptions(
+				variantIds,
+				await this.#elementWorkspaceContext.getVariantOptions(),
+			);
+		}
+
 		const saveData = await this.#elementWorkspaceContext.constructSaveData(variantIds);
 		await this.#elementWorkspaceContext.runMandatoryValidationForSaveData(saveData, variantIds);
 		await this.#elementWorkspaceContext.askServerToValidate(saveData, variantIds);
@@ -291,6 +299,13 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 
 		// User has committed to publishing (modal closed with a selection, or no modal needed).
 		notifyWorkspaceActionStarting(executionOptions);
+
+		if (this.#elementWorkspaceContext.getVariesBySegment()) {
+			variantIds = umbExpandVariantIdsWithSegmentOptions(
+				variantIds,
+				await this.#elementWorkspaceContext.getVariantOptions(),
+			);
+		}
 
 		const saveData = await this.#elementWorkspaceContext.constructSaveData(variantIds);
 		await this.#elementWorkspaceContext.runMandatoryValidationForSaveData(saveData, variantIds);

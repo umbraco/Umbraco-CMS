@@ -6,7 +6,7 @@ import type {
 	UmbEntityVariantPublishModel,
 } from '@umbraco-cms/backoffice/variant';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
-import type { UmbContentDetailModel, UmbElementValueModel } from '@umbraco-cms/backoffice/content';
+import type { UmbContentDetailModel, UmbEntryValueModel } from '@umbraco-cms/backoffice/content';
 
 export type * from './audit-log/types.js';
 export type * from './collection/types.js';
@@ -49,7 +49,7 @@ export interface UmbDocumentUrlInfoModel {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface UmbDocumentValueModel<ValueType = unknown> extends UmbElementValueModel<ValueType> {}
+export interface UmbDocumentValueModel<ValueType = unknown> extends UmbEntryValueModel<ValueType> {}
 
 export interface UmbDocumentVariantOptionModel extends UmbEntityVariantOptionModel<UmbDocumentVariantModel> {
 	documentCount?: number;

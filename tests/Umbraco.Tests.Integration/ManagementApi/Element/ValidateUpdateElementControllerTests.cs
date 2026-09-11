@@ -68,7 +68,7 @@ public class ValidateUpdateElementControllerTests : ManagementApiUserGroupTestBa
         var validateModel = new ValidateUpdateElementRequestModel
         {
             Values = [],
-            Variants = [new ElementVariantRequestModel { Culture = null, Segment = null, Name = "Updated Element" }],
+            Variants = [new ElementVariantRequestModel { Culture = null, Name = "Updated Element" }],
             Cultures = null,
         };
 

@@ -66,20 +66,12 @@ internal abstract class ContentValidationServiceBase<TContentType>
             cultures = await GetCultureCodes();
         }
 
-        // We don't have managed segments, so we have to make do with the ones passed in the model.
-        var segments =
-        new string?[] { null }
-            .Union(contentEditingModelBase.Variants
-                .Where(variant => variant.Culture is null || cultures.Contains(variant.Culture))
-                .DistinctBy(variant => variant.Segment).Select(variant => variant.Segment)
-                .WhereNotNull())
-            .ToArray();
 
         foreach (IPropertyType propertyType in invariantPropertyTypes)
         {
             var validationContext = new PropertyValidationContext
             {
-                Culture = null, Segment = null, CulturesBeingValidated = cultures, SegmentsBeingValidated = segments
+                Culture = null, Segment = null, CulturesBeingValidated = cultures
             };
 
             PropertyValueModel? propertyValueModel = contentEditingModelBase
@@ -94,7 +86,7 @@ internal abstract class ContentValidationServiceBase<TContentType>
             {
                 var validationContext = new PropertyValidationContext
                 {
-                    Culture = culture, Segment = null, CulturesBeingValidated = cultures, SegmentsBeingValidated = segments
+                    Culture = culture, Segment = null, CulturesBeingValidated = cultures
                 };
 
                 PropertyValueModel? propertyValueModel = contentEditingModelBase
@@ -106,51 +98,46 @@ internal abstract class ContentValidationServiceBase<TContentType>
 
         foreach (IPropertyType propertyType in segmentVariantPropertyTypes)
         {
-            foreach (var segment in segments)
+            PropertyValueModel[] propertyValuesToValidate = contentEditingModelBase
+                .Properties
+                .Where(propertyValue => propertyValue.Alias == propertyType.Alias && propertyValue.Culture is null)
+                .ToArray();
+            var segmentsToValidate = propertyValuesToValidate.Select(pv => pv.Segment).Union([null]).Distinct().ToArray();
+
+            foreach (var segment in segmentsToValidate)
             {
                 var validationContext = new PropertyValidationContext
                 {
-                    Culture = null, Segment = segment, CulturesBeingValidated = cultures, SegmentsBeingValidated = segments
+                    Culture = null, Segment = segment, CulturesBeingValidated = cultures
                 };
 
-                PropertyValueModel? propertyValueModel = contentEditingModelBase
-                    .Properties
-                    .FirstOrDefault(propertyValue => propertyValue.Alias == propertyType.Alias && propertyValue.Culture is null && propertyValue.Segment.InvariantEquals(segment));
+                PropertyValueModel? propertyValueModel = propertyValuesToValidate.FirstOrDefault(pv => pv.Segment.InvariantEquals(segment));
                 validationErrors.AddRange(ValidateProperty(propertyType, propertyValueModel, validationContext));
             }
         }
 
         if (cultureAndSegmentVariantPropertyTypes.Length > 0)
         {
-            // Get a mapping of segments to their associated cultures based on the variants and properties provided in the model.
-            // Without managed segments again we need to rely on the model data.
-            Dictionary<string, HashSet<string>> segmentCultures = GetPopulatedSegmentCultures(contentEditingModelBase, cultures);
-
             foreach (IPropertyType propertyType in cultureAndSegmentVariantPropertyTypes)
             {
                 foreach (var culture in cultures)
                 {
-                    foreach (var segment in segments.DefaultIfEmpty(null))
-                    {
-                        // Skip validation if the segment has cultures defined and the current culture is not included.
-                        if (segment is not null &&
-                            segmentCultures.TryGetValue(segment, out HashSet<string>? associatedCultures) &&
-                            associatedCultures.Contains(culture) is false)
-                        {
-                            continue;
-                        }
+                    PropertyValueModel[] propertyValuesToValidate = contentEditingModelBase
+                        .Properties
+                        .Where(propertyValue => propertyValue.Alias == propertyType.Alias && propertyValue.Culture.InvariantEquals(culture))
+                        .ToArray();
+                    var segmentsToValidate = propertyValuesToValidate.Select(pv => pv.Segment).Union([null]).Distinct().ToArray();
 
+                    foreach (var segment in segmentsToValidate)
+                    {
                         var validationContext = new PropertyValidationContext
                         {
                             Culture = culture,
                             Segment = segment,
                             CulturesBeingValidated = cultures,
-                            SegmentsBeingValidated = segments,
                         };
 
-                        PropertyValueModel? propertyValueModel = contentEditingModelBase
-                            .Properties
-                            .FirstOrDefault(propertyValue => propertyValue.Alias == propertyType.Alias && propertyValue.Culture.InvariantEquals(culture) && propertyValue.Segment.InvariantEquals(segment));
+                        PropertyValueModel? propertyValueModel = propertyValuesToValidate.FirstOrDefault(pv => pv.Segment.InvariantEquals(segment));
                         validationErrors.AddRange(ValidateProperty(propertyType, propertyValueModel, validationContext));
                     }
                 }
@@ -177,31 +164,6 @@ internal abstract class ContentValidationServiceBase<TContentType>
     }
 
     private async Task<string[]> GetCultureCodes() => (await _languageService.GetAllIsoCodesAsync()).ToArray();
-
-    /// <summary>
-    /// Gets a dictionary of segments along with the cultures they are associated with.
-    /// </summary>
-    /// <param name="contentEditingModel">The content editing model.</param>
-    /// <param name="cultures">The cultures to consider when finding associated cultures for each segment.</param>
-    /// <returns>
-    /// A dictionary where the key is a unique segment from <see cref="ContentEditingModelBase.Variants"/> and the value is
-    /// the set of cultures that have at least one property defined for that segment in <see cref="ContentEditingModelBase.Properties"/>.
-    /// </returns>
-    /// <remarks>
-    /// Internal to support unit testing.
-    /// </remarks>
-    internal static Dictionary<string, HashSet<string>> GetPopulatedSegmentCultures(ContentEditingModelBase contentEditingModel, string[] cultures)
-    {
-        IEnumerable<string> uniqueSegments = contentEditingModel.Variants.Select(variant => variant.Segment).WhereNotNull().Distinct();
-
-        return uniqueSegments.ToDictionary(
-            segment => segment,
-            segment => contentEditingModel.Properties
-                .Where(property => property.Segment.InvariantEquals(segment))
-                .Where(property => property.Culture is not null && cultures.Contains(property.Culture))
-                .Select(property => property.Culture!)
-                .ToHashSet());
-    }
 
     private IEnumerable<PropertyValidationError> ValidateProperty(IPropertyType propertyType, PropertyValueModel? propertyValueModel, PropertyValidationContext validationContext)
     {

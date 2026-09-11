@@ -100,9 +100,7 @@ public partial class ContentEditingServiceTests
             ],
             Variants =
             [
-                new VariantModel { Name = "The Updated Name" },
-                new VariantModel { Segment = "seg-1", Name = "The Updated Name" },
-                new VariantModel { Segment = "seg-2", Name = "The Updated Name" }
+                new VariantModel { Name = "The Updated Name" }
             ]
         };
 
@@ -149,11 +147,7 @@ public partial class ContentEditingServiceTests
             Variants =
             [
                 new VariantModel { Name = "The Updated English Default Name", Culture = "en-US" },
-                new VariantModel { Name = "The Updated English Seg-1 Name", Culture = "en-US", Segment = "seg-1" },
-                new VariantModel { Name = "The Updated English Seg-2 Name", Culture = "en-US", Segment = "seg-2" },
                 new VariantModel { Name = "The Updated Danish Default Name", Culture = "da-DK" },
-                new VariantModel { Name = "The Updated Danish Seg-1 Name", Culture = "da-DK", Segment = "seg-1" },
-                new VariantModel { Name = "The Updated Danish Seg-2 Name", Culture = "da-DK", Segment = "seg-2" },
             ]
         };
 
@@ -207,11 +201,7 @@ public partial class ContentEditingServiceTests
             Variants =
             [
                 new VariantModel { Name = "The Updated English Default Name", Culture = "en-US" },
-                new VariantModel { Name = "The Updated English Seg-1 Name", Culture = "en-US", Segment = "seg-1" },
-                new VariantModel { Name = "The Updated English Seg-2 Name", Culture = "en-US", Segment = "seg-2" },
                 new VariantModel { Name = "The Updated Danish Default Name", Culture = "da-DK" },
-                new VariantModel { Name = "The Updated Danish Seg-1 Name", Culture = "da-DK", Segment = "seg-1" },
-                new VariantModel { Name = "The Updated Danish Seg-2 Name", Culture = "da-DK", Segment = "seg-2" },
             ]
         };
 

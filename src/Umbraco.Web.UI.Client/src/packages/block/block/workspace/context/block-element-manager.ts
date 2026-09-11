@@ -1,22 +1,18 @@
-import type { UmbBlockDataModel, UmbBlockDataValueModel, UmbBlockLayoutBaseModel } from '../types.js';
-import { UmbBlockElementPropertyDatasetContext } from './block-element-property-dataset.context.js';
+import type { UmbBlockDataModel, UmbBlockDataValueModel, UmbBlockLayoutBaseModel } from '../../types.js';
+import { UmbBlockElementPropertyDatasetContext } from '../block-element-property-dataset.context.js';
 import type { UmbBlockWorkspaceContext } from './block-workspace.context.js';
 import type { UmbContentTypeModel, UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
 import { UmbContentTypeStructureManager } from '@umbraco-cms/backoffice/content-type';
-import {
-	type Observable,
-	UmbClassState,
-	appendToFrozenArray,
-	mergeObservables,
-} from '@umbraco-cms/backoffice/observable-api';
+import { type Observable, UmbClassState, mergeObservables } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { type UmbClassInterface, UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbDocumentTypeDetailRepository } from '@umbraco-cms/backoffice/document-type';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbValidationController } from '@umbraco-cms/backoffice/validation';
 import {
+	umbEntryAppendValue,
 	UmbContentValidationToHintsManager,
-	UmbElementWorkspaceDataManager,
+	UmbEntryWorkspaceDataManager,
 	umbExtractVariantValues,
 	type UmbElementPropertyDataOwner,
 } from '@umbraco-cms/backoffice/content';
@@ -31,7 +27,7 @@ export class UmbBlockElementManager<LayoutDataType extends UmbBlockLayoutBaseMod
 {
 	//
 
-	readonly #data = new UmbElementWorkspaceDataManager<UmbBlockDataModel>(this);
+	readonly #data = new UmbEntryWorkspaceDataManager<UmbBlockDataModel>(this);
 	//#data = new UmbObjectState<UmbBlockDataModel | undefined>(undefined);
 	readonly data = this.#data.current;
 	#getDataPromise = new Promise<void>((resolve) => {
@@ -276,7 +272,7 @@ export class UmbBlockElementManager<LayoutDataType extends UmbBlockLayoutBaseMod
 
 		const currentData = this.getData();
 		if (currentData) {
-			const values = appendToFrozenArray(
+			const values = umbEntryAppendValue(
 				currentData.values ?? [],
 				entry,
 				(x) => x.alias === alias && variantId!.compare(x),

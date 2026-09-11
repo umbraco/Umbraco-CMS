@@ -183,9 +183,7 @@ public partial class ElementEditingServiceTests : UmbracoIntegrationTest
             ],
             Variants =
             [
-                new VariantModel { Segment = null, Name = "The Name" },
-                new VariantModel { Segment = "seg-1", Name = "The Name" },
-                new VariantModel { Segment = "seg-2", Name = "The Name" }
+                new VariantModel { Name = "The Name" }
             ],
         };
 
@@ -214,12 +212,8 @@ public partial class ElementEditingServiceTests : UmbracoIntegrationTest
             ],
             Variants =
             [
-                new VariantModel { Name = "The Name", Culture = "en-US", Segment = null },
-                new VariantModel { Name = "The Name", Culture = "en-US", Segment = "seg-1" },
-                new VariantModel { Name = "The Name", Culture = "en-US", Segment = "seg-2" },
-                new VariantModel { Name = "The Name", Culture = "da-DK", Segment = null },
-                new VariantModel { Name = "The Name", Culture = "da-DK", Segment = "seg-1" },
-                new VariantModel { Name = "The Name", Culture = "da-DK", Segment = "seg-2" },
+                new VariantModel { Name = "The Name", Culture = "en-US" },
+                new VariantModel { Name = "The Name", Culture = "da-DK" },
             ],
         };
 

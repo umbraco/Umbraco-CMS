@@ -44046,12 +44046,6 @@
               "string"
             ]
           },
-          "segment": {
-            "type": [
-              "null",
-              "string"
-            ]
-          },
           "name": {
             "type": "string"
           }
@@ -44111,12 +44105,6 @@
             "format": "date-time"
           },
           "culture": {
-            "type": [
-              "null",
-              "string"
-            ]
-          },
-          "segment": {
             "type": [
               "null",
               "string"
@@ -44697,12 +44685,6 @@
               "string"
             ]
           },
-          "segment": {
-            "type": [
-              "null",
-              "string"
-            ]
-          },
           "name": {
             "type": "string"
           }
@@ -44762,12 +44744,6 @@
             "format": "date-time"
           },
           "culture": {
-            "type": [
-              "null",
-              "string"
-            ]
-          },
-          "segment": {
             "type": [
               "null",
               "string"
@@ -47032,12 +47008,6 @@
               "string"
             ]
           },
-          "segment": {
-            "type": [
-              "null",
-              "string"
-            ]
-          },
           "name": {
             "type": "string"
           }
@@ -47060,12 +47030,6 @@
             "format": "date-time"
           },
           "culture": {
-            "type": [
-              "null",
-              "string"
-            ]
-          },
-          "segment": {
             "type": [
               "null",
               "string"
@@ -47705,12 +47669,6 @@
               "string"
             ]
           },
-          "segment": {
-            "type": [
-              "null",
-              "string"
-            ]
-          },
           "name": {
             "type": "string"
           }
@@ -47733,12 +47691,6 @@
             "format": "date-time"
           },
           "culture": {
-            "type": [
-              "null",
-              "string"
-            ]
-          },
-          "segment": {
             "type": [
               "null",
               "string"

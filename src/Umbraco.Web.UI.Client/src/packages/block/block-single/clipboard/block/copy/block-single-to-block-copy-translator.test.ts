@@ -43,7 +43,6 @@ describe('UmbBlockSingleToBlockClipboardCopyPropertyValueTranslator', () => {
 			{
 				contentKey: 'contentKey',
 				culture: null,
-				segment: null,
 			},
 		],
 	};

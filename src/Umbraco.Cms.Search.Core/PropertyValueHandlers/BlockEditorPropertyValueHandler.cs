@@ -136,8 +136,7 @@ internal abstract class BlockEditorPropertyValueHandler : IPropertyValueHandler
                         && propertyCulture is not null
                         && expose.Any(e =>
                             e.ContentKey == contentData.Key &&
-                            e.Culture.InvariantEquals(blockPropertyValue.Culture) &&
-                            e.Segment.InvariantEquals(blockPropertyValue.Segment)) is false)
+                            e.Culture.InvariantEquals(blockPropertyValue.Culture)) is false)
                     {
                         // un-exposed blocks should not be included in published indexing
                         continue;

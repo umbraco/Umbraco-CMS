@@ -69,7 +69,7 @@ public class UpdateAndPublishElementControllerTests : ManagementApiUserGroupTest
         var updateAndPublishElementRequestModel = new UpdateAndPublishElementRequestModel
         {
             Values = [],
-            Variants = [new ElementVariantRequestModel { Culture = null, Segment = null, Name = "Updated Element" }],
+            Variants = [new ElementVariantRequestModel { Culture = null, Name = "Updated Element" }],
             CulturesToPublish = [],
         };
 

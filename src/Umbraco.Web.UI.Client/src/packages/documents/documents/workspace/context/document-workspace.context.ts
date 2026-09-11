@@ -23,7 +23,7 @@ import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import { UmbDocumentBlueprintDetailRepository } from '@umbraco-cms/backoffice/document-blueprint';
 import { UmbEntityContentTypeEntityContext } from '@umbraco-cms/backoffice/content-type';
 import { UmbPreviewController } from '@umbraco-cms/backoffice/preview';
-import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import { UmbVariantId, umbExpandVariantIdsWithSegmentOptions } from '@umbraco-cms/backoffice/variant';
 import {
 	UmbWorkspaceIsNewRedirectController,
 	UmbWorkspaceIsNewRedirectControllerAlias,
@@ -285,7 +285,11 @@ export class UmbDocumentWorkspaceContext
 		const { selected } = await this._determineVariantOptions();
 		if (selected.length > 0) {
 			firstVariantId = UmbVariantId.FromString(selected[0]);
-			const variantIds = [firstVariantId];
+			let variantIds = [firstVariantId];
+
+			if (this.getVariesBySegment()) {
+				variantIds = umbExpandVariantIdsWithSegmentOptions(variantIds, await this.getVariantOptions());
+			}
 			const saveData = await this._data.constructData(variantIds);
 
 			// Run mandatory validation (checks for name, etc.)

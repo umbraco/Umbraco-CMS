@@ -155,7 +155,7 @@ public class BlockGridPropertyValueHandlerTests : PropertyValueHandlerTestsBase
             ],
             Expose =
             [
-                new BlockItemVariation(contentElementKey, null, null)
+                new BlockItemVariation(contentElementKey, null)
             ]
         };
         var blocksPropertyValue = JsonSerializer.Serialize(blockListValue);
@@ -261,7 +261,7 @@ public class BlockGridPropertyValueHandlerTests : PropertyValueHandlerTestsBase
                                     ],
                                     Expose =
                                     [
-                                        new BlockItemVariation(nestedElement1Key, null, null)
+                                        new BlockItemVariation(nestedElement1Key, null)
                                     ]
                                 })
                         }
@@ -291,8 +291,8 @@ public class BlockGridPropertyValueHandlerTests : PropertyValueHandlerTestsBase
             ],
             Expose =
             [
-                new BlockItemVariation(rootElement1Key, null, null),
-                new BlockItemVariation(rootElement2Key, null, null),
+                new BlockItemVariation(rootElement1Key, null),
+                new BlockItemVariation(rootElement2Key, null),
             ]
         };
         var blocksPropertyValue = JsonSerializer.Serialize(blockGridValue);

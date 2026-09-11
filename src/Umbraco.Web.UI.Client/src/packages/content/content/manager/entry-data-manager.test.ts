@@ -1,26 +1,26 @@
-import { UmbElementWorkspaceDataManager } from './element-data-manager.js';
+import { UmbEntryWorkspaceDataManager } from './entry-data-manager.js';
 import { expect } from '@open-wc/testing';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbElementDetailModel } from '../types.js';
+import type { UmbEntryDetailModel } from '../types.js';
 
 @customElement('test-element-data-manager-host')
 class UmbTestElementDataManagerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
 
-describe('UmbElementWorkspaceDataManager', () => {
-	let manager: UmbElementWorkspaceDataManager<UmbElementDetailModel>;
+describe('UmbEntryWorkspaceDataManager', () => {
+	let manager: UmbEntryWorkspaceDataManager<UmbEntryDetailModel>;
 
 	const newPropertyValue = { alias: 'test', culture: null, segment: null, editorAlias: 'test' };
 
 	beforeEach(() => {
 		const hostElement = new UmbTestElementDataManagerHostElement();
-		manager = new UmbElementWorkspaceDataManager(hostElement);
+		manager = new UmbEntryWorkspaceDataManager(hostElement);
 		manager.setCurrent({ values: [] });
 	});
 
 	describe('initiatePropertyValueChange and finishPropertyValueChange', () => {
 		it('suppresses observer emissions while initiated', () => {
-			const emissions: Array<UmbElementDetailModel | undefined> = [];
+			const emissions: Array<UmbEntryDetailModel | undefined> = [];
 			const subscription = manager.current.subscribe((value) => emissions.push(value));
 
 			manager.initiatePropertyValueChange();
@@ -33,7 +33,7 @@ describe('UmbElementWorkspaceDataManager', () => {
 		});
 
 		it('flushes buffered changes to observers when finish is called', () => {
-			const emissions: Array<UmbElementDetailModel | undefined> = [];
+			const emissions: Array<UmbEntryDetailModel | undefined> = [];
 			const subscription = manager.current.subscribe((value) => emissions.push(value));
 
 			manager.initiatePropertyValueChange();
@@ -47,7 +47,7 @@ describe('UmbElementWorkspaceDataManager', () => {
 		});
 
 		it('does not emit until all nested initiates are finished', () => {
-			const emissions: Array<UmbElementDetailModel | undefined> = [];
+			const emissions: Array<UmbEntryDetailModel | undefined> = [];
 			const subscription = manager.current.subscribe((value) => emissions.push(value));
 
 			manager.initiatePropertyValueChange();

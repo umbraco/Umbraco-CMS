@@ -22,7 +22,6 @@ const modalData: UmbDocumentPublishWithDescendantsModalData = {
 				createDate: '2021-08-25T14:00:00Z',
 				publishDate: null,
 				updateDate: null,
-				segment: null,
 				scheduledPublishDate: null,
 				scheduledUnpublishDate: null,
 				flags: [],
@@ -43,7 +42,6 @@ const modalData: UmbDocumentPublishWithDescendantsModalData = {
 			variant: {
 				name: 'English (GB)',
 				culture: 'en-us',
-				segment: null,
 				state: UmbDocumentVariantState.DRAFT,
 				createDate: '2021-08-25T14:00:00Z',
 				publishDate: null,
@@ -72,7 +70,6 @@ const modalData: UmbDocumentPublishWithDescendantsModalData = {
 				createDate: null,
 				publishDate: null,
 				updateDate: null,
-				segment: null,
 				scheduledPublishDate: null,
 				scheduledUnpublishDate: null,
 				flags: [],
@@ -126,7 +123,6 @@ this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (modalManager) => {
 						createDate: '2021-08-25T14:00:00Z',
 						publishDate: null,
 						updateDate: null,
-						segment: null,
 					},
 					language: {
 						entityType: 'language',
@@ -148,7 +144,6 @@ this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (modalManager) => {
 						createDate: null,
 						publishDate: null,
 						updateDate: null,
-						segment: null,
 					},
 					language: {
 						entityType: 'language',

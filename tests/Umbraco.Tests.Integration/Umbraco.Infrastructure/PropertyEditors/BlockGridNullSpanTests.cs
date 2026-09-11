@@ -65,7 +65,7 @@ internal sealed class BlockGridNullSpanTests : BlockEditorElementVariationTestBa
                 new(rootKey, elementType.Key, elementType.Alias) { Values = [new() { Alias = "invariantText", Value = "Root" }] },
                 new(nestedKey, elementType.Key, elementType.Alias) { Values = [new() { Alias = "invariantText", Value = "Nested" }] },
             ],
-            Expose = [new(rootKey, null, null), new(nestedKey, null, null)],
+            Expose = [new(rootKey, null), new(nestedKey, null)],
         };
 
         var content = new ContentBuilder().WithContentType(contentType).WithName("Home").Build();

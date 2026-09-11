@@ -115,11 +115,12 @@ export class UmbContentUnpublishEntityAction extends UmbEntityActionBase<MetaEnt
 		languageData: { items: Array<UmbLanguageDetailModel> } | undefined,
 		appCulture: string | undefined,
 	): Array<UmbEntityVariantOptionModel> {
-		const cultureVariantOptions = detailData.variants.filter((variant) => variant.segment === null);
+		// Only display culture variants as options
+		const cultureVariantOptions = detailData.variants;
 
 		return cultureVariantOptions.map<UmbEntityVariantOptionModel>((variant) => ({
 			culture: variant.culture,
-			segment: variant.segment,
+			segment: null,
 			language: languageData?.items.find((language) => language.unique === variant.culture) ?? {
 				name: appCulture!,
 				entityType: 'language',
@@ -129,7 +130,7 @@ export class UmbContentUnpublishEntityAction extends UmbEntityActionBase<MetaEnt
 				unique: appCulture!,
 			},
 			variant,
-			unique: new UmbVariantId(variant.culture, variant.segment).toString(),
+			unique: new UmbVariantId(variant.culture, null).toString(),
 		}));
 	}
 

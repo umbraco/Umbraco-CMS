@@ -19,7 +19,6 @@ export const data: Array<UmbMockElementModel> = [
 			{
 				state: UmbElementVariantState.PUBLISHED,
 				culture: null,
-				segment: null,
 				name: 'Element One (Library)',
 				createDate: '2024-01-15T10:00:00.000Z',
 				updateDate: '2024-01-15T10:00:00.000Z',
@@ -57,7 +56,6 @@ export const data: Array<UmbMockElementModel> = [
 			{
 				state: UmbElementVariantState.PUBLISHED,
 				culture: null,
-				segment: null,
 				name: 'Element Two (Library)',
 				createDate: '2024-01-15T10:00:00.000Z',
 				updateDate: '2024-01-15T10:00:00.000Z',
