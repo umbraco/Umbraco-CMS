@@ -27,10 +27,13 @@ internal sealed class DictionaryRepositoryTest : UmbracoIntegrationTest
 
     private IDictionaryRepository CreateRepository() => GetRequiredService<IDictionaryRepository>();
 
-    private IDictionaryRepository CreateRepositoryWithCache(AppCaches cache, bool enableValueSearch = false)
+    private IDictionaryRepository CreateRepositoryWithCache(
+        AppCaches cache,
+        bool enableValueSearch = false,
+        DictionaryKeySearchMode keySearchMode = DictionaryKeySearchMode.StartsWith)
     {
         var dictionarySettingsMonitor = new Mock<IOptionsMonitor<DictionarySettings>>();
-        dictionarySettingsMonitor.Setup(x => x.CurrentValue).Returns(new DictionarySettings { EnableValueSearch = enableValueSearch });
+        dictionarySettingsMonitor.Setup(x => x.CurrentValue).Returns(new DictionarySettings { EnableValueSearch = enableValueSearch, KeySearchMode = keySearchMode });
 
         // Create a repository with a real runtime cache.
         return new DictionaryRepository(
@@ -647,6 +650,142 @@ internal sealed class DictionaryRepositoryTest : UmbracoIntegrationTest
             Assert.That(translatedIsoCodes, Does.Contain("en-US"));
             Assert.That(translatedIsoCodes, Does.Contain("da-DK"));
         }
+    }
+
+    [TestCase(true)]
+    [TestCase(false)]
+    public async Task GetDictionaryItemDescendants_With_KeySearchMode_Contains_Matches_Filter_Anywhere_In_Key(bool enableValueSearch)
+    {
+        // Arrange
+        await CreateItemWithFilterTermInsideKey();
+        var repository = CreateRepositoryWithCache(AppCaches.Create(Mock.Of<IRequestCache>()), enableValueSearch, DictionaryKeySearchMode.Contains);
+
+        using (ScopeProvider.CreateScope())
+        {
+            // Act
+            var results = repository.GetDictionaryItemDescendants(null, "Bravo").ToArray();
+
+            // Assert
+            Assert.That(results.Select(x => x.ItemKey), Is.EqualTo(new[] { "AlphaBravoCharlie" }));
+        }
+    }
+
+    [TestCase(true)]
+    [TestCase(false)]
+    public async Task GetDictionaryItemDescendants_With_KeySearchMode_StartsWith_Matches_Filter_Only_At_Start_Of_Key(bool enableValueSearch)
+    {
+        // Arrange
+        await CreateItemWithFilterTermInsideKey();
+        var repository = CreateRepositoryWithCache(AppCaches.Create(Mock.Of<IRequestCache>()), enableValueSearch, DictionaryKeySearchMode.StartsWith);
+
+        using (ScopeProvider.CreateScope())
+        {
+            // Act
+            var matchedInsideKey = repository.GetDictionaryItemDescendants(null, "Bravo").ToArray();
+            var matchedAtStartOfKey = repository.GetDictionaryItemDescendants(null, "Alpha").ToArray();
+
+            // Assert
+            Assert.Multiple(() =>
+            {
+                Assert.That(matchedInsideKey, Is.Empty);
+                Assert.That(matchedAtStartOfKey.Select(x => x.ItemKey), Is.EqualTo(new[] { "AlphaBravoCharlie" }));
+            });
+        }
+    }
+
+    [TestCase(true)]
+    [TestCase(false)]
+    public async Task GetDictionaryItemDescendants_Of_Parent_With_KeySearchMode_Contains_Matches_Filter_Anywhere_In_Key(bool enableValueSearch)
+    {
+        // Arrange
+        var parentKey = await CreateChildItemWithFilterTermInsideKey();
+        var repository = CreateRepositoryWithCache(AppCaches.Create(Mock.Of<IRequestCache>()), enableValueSearch, DictionaryKeySearchMode.Contains);
+
+        using (ScopeProvider.CreateScope())
+        {
+            // Act
+            var results = repository.GetDictionaryItemDescendants(parentKey, "Bravo").ToArray();
+
+            // Assert
+            Assert.That(results.Select(x => x.ItemKey), Is.EqualTo(new[] { "AlphaBravoCharlie" }));
+        }
+    }
+
+    [TestCase(true)]
+    [TestCase(false)]
+    public async Task GetDictionaryItemDescendants_Of_Parent_With_KeySearchMode_StartsWith_Matches_Filter_Only_At_Start_Of_Key(bool enableValueSearch)
+    {
+        // Arrange
+        var parentKey = await CreateChildItemWithFilterTermInsideKey();
+        var repository = CreateRepositoryWithCache(AppCaches.Create(Mock.Of<IRequestCache>()), enableValueSearch, DictionaryKeySearchMode.StartsWith);
+
+        using (ScopeProvider.CreateScope())
+        {
+            // Act
+            var matchedInsideKey = repository.GetDictionaryItemDescendants(parentKey, "Bravo").ToArray();
+            var matchedAtStartOfKey = repository.GetDictionaryItemDescendants(parentKey, "Alpha").ToArray();
+
+            // Assert
+            Assert.Multiple(() =>
+            {
+                Assert.That(matchedInsideKey, Is.Empty);
+                Assert.That(matchedAtStartOfKey.Select(x => x.ItemKey), Is.EqualTo(new[] { "AlphaBravoCharlie" }));
+            });
+        }
+    }
+
+    /// <summary>
+    /// Creates a dictionary item whose key contains "Bravo" at a position other than the start, and whose
+    /// translation value contains neither "Bravo" nor "Alpha" so that only a key match can satisfy those filters.
+    /// </summary>
+    private async Task CreateItemWithFilterTermInsideKey()
+    {
+        var languageService = GetRequiredService<ILanguageService>();
+        var dictionaryItemService = GetRequiredService<IDictionaryItemService>();
+
+        await dictionaryItemService.CreateAsync(
+            new DictionaryItem("AlphaBravoCharlie")
+            {
+                Translations = new List<IDictionaryTranslation>
+                {
+                    new DictionaryTranslation(await languageService.GetAsync("en-US"), "Delta")
+                }
+            },
+            Constants.Security.SuperUserKey);
+    }
+
+    /// <summary>
+    /// Creates the same item as <see cref="CreateItemWithFilterTermInsideKey" />, but as the child of another
+    /// item, so that the filter is applied by the recursive descendant query rather than the flat one.
+    /// </summary>
+    /// <returns>The key of the parent dictionary item.</returns>
+    private async Task<Guid> CreateChildItemWithFilterTermInsideKey()
+    {
+        var languageService = GetRequiredService<ILanguageService>();
+        var dictionaryItemService = GetRequiredService<IDictionaryItemService>();
+
+        var parentKey = (await dictionaryItemService.CreateAsync(
+            new DictionaryItem("Omega")
+            {
+                Translations = new List<IDictionaryTranslation>
+                {
+                    new DictionaryTranslation(await languageService.GetAsync("en-US"), "Omega")
+                }
+            },
+            Constants.Security.SuperUserKey)).Result.Key;
+
+        await dictionaryItemService.CreateAsync(
+            new DictionaryItem("AlphaBravoCharlie")
+            {
+                ParentId = parentKey,
+                Translations = new List<IDictionaryTranslation>
+                {
+                    new DictionaryTranslation(await languageService.GetAsync("en-US"), "Delta")
+                }
+            },
+            Constants.Security.SuperUserKey);
+
+        return parentKey;
     }
 
     public async Task CreateTestData()
