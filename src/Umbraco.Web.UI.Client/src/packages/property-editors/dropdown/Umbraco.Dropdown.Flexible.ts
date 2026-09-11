@@ -9,11 +9,6 @@ export const manifest: ManifestPropertyEditorSchema = {
 		settings: {
 			properties: [
 				{
-					alias: 'multiple',
-					label: 'Enable multiple choice',
-					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
-				},
-				{
 					alias: 'items',
 					label: 'Add options',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.MultipleTextString',

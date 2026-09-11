@@ -613,6 +613,7 @@ export type DatatypeConfigurationResponseModel = {
     canBeChanged: DataTypeChangeModeModel;
     documentListViewId: string;
     mediaListViewId: string;
+    showDeprecatedPropertyEditors: boolean;
 };
 
 export type DataTypeItemResponseModel = {
@@ -1311,13 +1312,13 @@ export type InviteUserRequestModel = {
 };
 
 export type IPermissionPresentationModel = ({
-    $type?: 'DocumentPermissionPresentationModel';
+    $type: 'DocumentPermissionPresentationModel';
 } & IPermissionPresentationModelDocumentPermissionPresentationModel) | ({
-    $type?: 'DocumentPropertyValuePermissionPresentationModel';
+    $type: 'DocumentPropertyValuePermissionPresentationModel';
 } & IPermissionPresentationModelDocumentPropertyValuePermissionPresentationModel) | ({
-    $type?: 'ElementPermissionPresentationModel';
+    $type: 'ElementPermissionPresentationModel';
 } & IPermissionPresentationModelElementPermissionPresentationModel) | ({
-    $type?: 'UnknownTypePermissionPresentationModel';
+    $type: 'UnknownTypePermissionPresentationModel';
 } & IPermissionPresentationModelUnknownTypePermissionPresentationModel);
 
 export type IPermissionPresentationModelDocumentPermissionPresentationModel = {
@@ -1346,23 +1347,23 @@ export type IPermissionPresentationModelUnknownTypePermissionPresentationModel =
 };
 
 export type IReferenceResponseModel = ({
-    $type?: 'DefaultReferenceResponseModel';
+    $type: 'DefaultReferenceResponseModel';
 } & IReferenceResponseModelDefaultReferenceResponseModel) | ({
-    $type?: 'DocumentReferenceResponseModel';
+    $type: 'DocumentReferenceResponseModel';
 } & IReferenceResponseModelDocumentReferenceResponseModel) | ({
-    $type?: 'DocumentTypePropertyTypeReferenceResponseModel';
+    $type: 'DocumentTypePropertyTypeReferenceResponseModel';
 } & IReferenceResponseModelDocumentTypePropertyTypeReferenceResponseModel) | ({
-    $type?: 'ElementContainerReferenceResponseModel';
+    $type: 'ElementContainerReferenceResponseModel';
 } & IReferenceResponseModelElementContainerReferenceResponseModel) | ({
-    $type?: 'ElementReferenceResponseModel';
+    $type: 'ElementReferenceResponseModel';
 } & IReferenceResponseModelElementReferenceResponseModel) | ({
-    $type?: 'MediaReferenceResponseModel';
+    $type: 'MediaReferenceResponseModel';
 } & IReferenceResponseModelMediaReferenceResponseModel) | ({
-    $type?: 'MediaTypePropertyTypeReferenceResponseModel';
+    $type: 'MediaTypePropertyTypeReferenceResponseModel';
 } & IReferenceResponseModelMediaTypePropertyTypeReferenceResponseModel) | ({
-    $type?: 'MemberReferenceResponseModel';
+    $type: 'MemberReferenceResponseModel';
 } & IReferenceResponseModelMemberReferenceResponseModel) | ({
-    $type?: 'MemberTypePropertyTypeReferenceResponseModel';
+    $type: 'MemberTypePropertyTypeReferenceResponseModel';
 } & IReferenceResponseModelMemberTypePropertyTypeReferenceResponseModel);
 
 export type IReferenceResponseModelDefaultReferenceResponseModel = {
@@ -1435,9 +1436,7 @@ export type IReferenceResponseModelMemberTypePropertyTypeReferenceResponseModel 
     name?: null | string;
 };
 
-export type ISetupTwoFactorModel = {
-    $type?: 'NoopSetupTwoFactorModel';
-} & ISetupTwoFactorModelNoopSetupTwoFactorModel;
+export type ISetupTwoFactorModel = ISetupTwoFactorModelNoopSetupTwoFactorModel;
 
 export type ISetupTwoFactorModelNoopSetupTwoFactorModel = {
     $type: 'NoopSetupTwoFactorModel';

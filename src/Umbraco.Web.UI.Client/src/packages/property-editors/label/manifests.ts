@@ -1,4 +1,5 @@
 import { manifest as labelSchemaManifest } from './Umbraco.Label.js';
+import { manifests as typedLabelManifests } from './typed-labels.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -26,4 +27,5 @@ export const manifests: Array<UmbExtensionManifest> = [
 		},
 	},
 	labelSchemaManifest,
+	...typedLabelManifests,
 ];

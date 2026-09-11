@@ -1,4 +1,4 @@
-using System.Text.Json.Nodes;
+﻿using System.Text.Json.Nodes;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
@@ -7,6 +7,9 @@ using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
+
+// The multi node tree picker is obsolete, but must keep working for the whole deprecation period.
+#pragma warning disable CS0618 // Type or member is obsolete
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
 
@@ -181,3 +184,5 @@ public class ValueSchemaProviderTests
             Mock.Of<IIOHelper>());
     }
 }
+
+#pragma warning restore CS0618 // Type or member is obsolete

@@ -1762,6 +1762,7 @@ declare global {
 		prompt_unsavedChangesWarning: string;
 		propertyActions_tooltipForPropertyActionsMenu: string;
 		propertyActions_tooltipForPropertyActionsMenuClose: string;
+		propertyEditorPicker_deprecatedLabel: string;
 		propertyEditorPicker_openPropertyEditorPicker: string;
 		propertyEditorPicker_selectAction: string;
 		propertyEditorPicker_title: string;

@@ -44,6 +44,7 @@
 		"./dictionary": "./dist-cms/packages/dictionary/index.js",
 		"./document-blueprint": "./dist-cms/packages/documents/document-blueprints/index.js",
 		"./document-type": "./dist-cms/packages/documents/document-types/index.js",
+		"./dynamic-root": "./dist-cms/packages/dynamic-root/index.js",
 		"./document": "./dist-cms/packages/documents/documents/index.js",
 		"./dropzone": "./dist-cms/packages/media/dropzone/index.js",
 		"./entity-action": "./dist-cms/packages/core/entity-action/index.js",

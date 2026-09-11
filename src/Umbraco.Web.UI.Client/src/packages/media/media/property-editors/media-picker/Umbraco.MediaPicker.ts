@@ -15,12 +15,6 @@ export const manifest: ManifestPropertyEditorSchema = {
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.MediaTypePicker',
 				},
 				{
-					alias: 'multiple',
-					label: 'Pick multiple items',
-					description: 'Outputs a IEnumerable',
-					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
-				},
-				{
 					alias: 'validationLimit',
 					label: 'Amount',
 					description: 'Set a required range of medias',
@@ -32,6 +26,12 @@ export const manifest: ManifestPropertyEditorSchema = {
 					label: 'Start node',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.MediaEntityPicker',
 					config: [{ alias: 'validationLimit', value: { min: 0, max: 1 } }],
+				},
+				{
+					alias: 'dynamicRoot',
+					label: 'Dynamic root',
+					description: 'Resolve the start node from the content being edited, when no start node is set',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.DynamicRoot',
 				},
 				{
 					alias: 'enableLocalFocalPoint',

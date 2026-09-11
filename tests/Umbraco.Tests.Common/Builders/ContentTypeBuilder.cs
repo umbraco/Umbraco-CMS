@@ -1,4 +1,4 @@
-// Copyright (c) Umbraco.
+﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using Umbraco.Cms.Core;
@@ -481,7 +481,7 @@ public class ContentTypeBuilder
             .WithAlias("ddlMultiple")
             .WithName("Dropdown List Multiple")
             .WithDataTypeId(Constants.DataTypes.DropDownMultiple)
-            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.DropDownListFlexible)
+            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.MultipleDropDown)
             .WithValueStorageType(ValueStorageType.Nvarchar)
             .WithSortOrder(11)
             .Done()
@@ -505,7 +505,7 @@ public class ContentTypeBuilder
             .WithAlias("ddl")
             .WithName("Dropdown List")
             .WithDataTypeId(Constants.DataTypes.DropDownSingle)
-            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.DropDownListFlexible)
+            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.MultipleDropDown)
             .WithValueStorageType(ValueStorageType.Integer)
             .WithSortOrder(14)
             .Done()

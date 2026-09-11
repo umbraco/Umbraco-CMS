@@ -1,4 +1,4 @@
-import type { UmbContentPickerDynamicRoot } from '../../types.js';
+import type { UmbContentPickerDynamicRoot } from '../types.js';
 import { UmbContentPickerDynamicRootServerDataSource } from './dynamic-root.server.data.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';

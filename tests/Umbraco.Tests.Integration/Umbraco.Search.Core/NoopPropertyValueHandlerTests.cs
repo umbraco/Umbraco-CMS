@@ -1,4 +1,4 @@
-using Moq;
+﻿using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
@@ -38,6 +38,7 @@ public class NoopPropertyValueHandlerTests : ContentTestBase
                     colorPickerWithoutLabelsValue = jsonSerializer.Serialize(new ColorPickerValueConverter.PickedColor("123456", "test")),
                     colorPickerEyeDropperValue = "123456",
                     mediaPicker3Value = media.GetUdi().ToString(),
+                    singleMediaPickerValue = media.GetUdi().ToString(),
                     imageCropperValue = jsonSerializer.Serialize(new ImageCropperValue { Src = "/some/file.jpg" }),
                     uploadValue = "/some/file.jpg",
                 })
@@ -58,6 +59,7 @@ public class NoopPropertyValueHandlerTests : ContentTestBase
             Assert.That(document.Fields.Any(f => f.FieldName == "colorPickerWithoutLabelsValue"), Is.False);
             Assert.That(document.Fields.Any(f => f.FieldName == "colorPickerEyeDropperValue"), Is.False);
             Assert.That(document.Fields.Any(f => f.FieldName == "mediaPicker3Value"), Is.False);
+            Assert.That(document.Fields.Any(f => f.FieldName == "singleMediaPickerValue"), Is.False);
             Assert.That(document.Fields.Any(f => f.FieldName == "imageCropperValue"), Is.False);
             Assert.That(document.Fields.Any(f => f.FieldName == "uploadValue"), Is.False);
         });
@@ -71,7 +73,8 @@ public class NoopPropertyValueHandlerTests : ContentTestBase
             Assert.That(publishedContent.Value<ColorPickerValueConverter.PickedColor>("colorPickerWithLabelsValue")?.Color, Is.EqualTo("123456"));
             Assert.That(publishedContent.Value<string>("colorPickerWithoutLabelsValue"), Is.EqualTo("123456"));
             Assert.That(publishedContent.Value<string>("colorPickerEyeDropperValue"), Is.EqualTo("123456"));
-            Assert.That(publishedContent.Value<IPublishedContent>("mediaPicker3Value")?.Name, Is.EqualTo("The media"));
+            Assert.That(publishedContent.Value<IEnumerable<MediaWithCrops>>("mediaPicker3Value")?.Single().Name, Is.EqualTo("The media"));
+            Assert.That(publishedContent.Value<IPublishedContent>("singleMediaPickerValue")?.Name, Is.EqualTo("The media"));
             Assert.That(publishedContent.Value<ImageCropperValue>("imageCropperValue")?.Src, Is.EqualTo("/some/file.jpg"));
             Assert.That(publishedContent.Value<string>("uploadValue"), Is.EqualTo("/some/file.jpg"));
         });
@@ -142,6 +145,16 @@ public class NoopPropertyValueHandlerTests : ContentTestBase
             .Build();
         await dataTypeService.CreateAsync(mediaPicker3DataType, Constants.Security.SuperUserKey);
 
+        DataType singleMediaPickerDataType = new DataTypeBuilder()
+            .WithId(0)
+            .WithDatabaseType(ValueStorageType.Nvarchar)
+            .WithName("Single Media Picker")
+            .AddEditor()
+            .WithAlias(Constants.PropertyEditors.Aliases.SingleMediaPicker)
+            .Done()
+            .Build();
+        await dataTypeService.CreateAsync(singleMediaPickerDataType, Constants.Security.SuperUserKey);
+
         IContentType contentType = new ContentTypeBuilder()
             .WithAlias("allEditors")
             .AddPropertyType()
@@ -168,6 +181,11 @@ public class NoopPropertyValueHandlerTests : ContentTestBase
             .WithAlias("mediaPicker3Value")
             .WithDataTypeId(mediaPicker3DataType.Id)
             .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.MediaPicker3)
+            .Done()
+            .AddPropertyType()
+            .WithAlias("singleMediaPickerValue")
+            .WithDataTypeId(singleMediaPickerDataType.Id)
+            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.SingleMediaPicker)
             .Done()
             .AddPropertyType()
             .WithAlias("imageCropperValue")

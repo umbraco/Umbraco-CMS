@@ -1,16 +1,16 @@
 ﻿import {ConstantHelper, test} from "@umbraco/acceptance-test-helpers";
 import {expect} from "@playwright/test";
 
+// There is one label editor per type of value it holds, so the type follows from the editor rather than
+// from a configured value type.
 const labelTypes = [
-  {type: 'Label (bigint)', dataValueType: 'BIGINT'},
-  {type: 'Label (datetime)', dataValueType: 'DATETIME'},
-  {type: 'Label (decimal)', dataValueType: 'DECIMAL'},
-  {type: 'Label (integer)', dataValueType: 'INT'},
-  {type: 'Label (string)', dataValueType: 'STRING'},
-  {type: 'Label (time)', dataValueType: 'TIME'}
+  {type: 'Label (bigint)', editorAlias: 'Umbraco.Label.BigInt', editorUiAlias: 'Umb.PropertyEditorUi.Label.BigInt'},
+  {type: 'Label (datetime)', editorAlias: 'Umbraco.Label.DateTime', editorUiAlias: 'Umb.PropertyEditorUi.Label.DateTime'},
+  {type: 'Label (decimal)', editorAlias: 'Umbraco.Label.Decimal', editorUiAlias: 'Umb.PropertyEditorUi.Label.Decimal'},
+  {type: 'Label (integer)', editorAlias: 'Umbraco.Label.Integer', editorUiAlias: 'Umb.PropertyEditorUi.Label.Integer'},
+  {type: 'Label (string)', editorAlias: 'Umbraco.Label', editorUiAlias: 'Umb.PropertyEditorUi.Label'},
+  {type: 'Label (time)', editorAlias: 'Umbraco.Label.Time', editorUiAlias: 'Umb.PropertyEditorUi.Label.Time'}
 ];
-const editorAlias = 'Umbraco.Label';
-const editorUiAlias = 'Umb.PropertyEditorUi.Label';
 const customDataTypeName = 'Custom Label';
 
 test.beforeEach(async ({umbracoUi, umbracoApi}) => {
@@ -23,19 +23,6 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
 });
 
-test('can change value type', async ({umbracoApi, umbracoUi}) => {
-  // Arrange
-  await umbracoApi.dataType.createDefaultLabelDataType(customDataTypeName);
-  await umbracoUi.dataType.goToDataType(customDataTypeName);
-
-  // Act
-  await umbracoUi.dataType.changeValueType("Long String");
-  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
-
-  // Assert
-  expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'umbracoDataValueType', 'TEXT')).toBeTruthy();
-});
-
 for (const label of labelTypes) {
   test(`the default configuration of ${label.type} is correct`, async ({umbracoApi, umbracoUi}) => {
     // Act
@@ -44,8 +31,11 @@ for (const label of labelTypes) {
     // Assert
     await umbracoUi.dataType.doesSettingHaveValue(ConstantHelper.labelSettings);
     await umbracoUi.dataType.doesSettingItemsHaveCount(ConstantHelper.labelSettings);
-    await umbracoUi.dataType.doesPropertyEditorHaveAlias(editorAlias);
-    await umbracoUi.dataType.doesPropertyEditorHaveUiAlias(editorUiAlias);
-    expect(await umbracoApi.dataType.doesDataTypeHaveValue(label.type, 'umbracoDataValueType', label.dataValueType)).toBeTruthy();
+    await umbracoUi.dataType.doesPropertyEditorHaveAlias(label.editorAlias);
+    await umbracoUi.dataType.doesPropertyEditorHaveUiAlias(label.editorUiAlias);
+    const dataTypeDefaultData = await umbracoApi.dataType.getByName(label.type);
+    expect(dataTypeDefaultData.editorAlias).toBe(label.editorAlias);
+    expect(dataTypeDefaultData.editorUiAlias).toBe(label.editorUiAlias);
+    expect(await umbracoApi.dataType.doesDataTypeHaveValue(label.type, 'umbracoDataValueType')).toBeFalsy();
   });
 }

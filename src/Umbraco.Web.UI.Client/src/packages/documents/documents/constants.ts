@@ -20,3 +20,4 @@ export * from './url/constants.js';
 export * from './user-permissions/constants.js';
 export * from './workspace/constants.js';
 export * from './property-editors/document-picker/value-type/constants.js';
+export * from './property-editors/multiple-document-picker/value-type/constants.js';

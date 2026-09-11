@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
@@ -15,6 +15,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 /// <summary>
 ///     The multi node tree picker property editor value converter.
 /// </summary>
+[Obsolete("The multi node tree picker is replaced by the dedicated document, media, element and member pickers. Scheduled for removal in Umbraco 22.")]
 [DefaultPropertyValueConverter(typeof(MustBeStringValueConverter))]
 public class MultiNodeTreePickerValueConverter : PropertyValueConverterBase, IDeliveryApiPropertyValueConverter
 {

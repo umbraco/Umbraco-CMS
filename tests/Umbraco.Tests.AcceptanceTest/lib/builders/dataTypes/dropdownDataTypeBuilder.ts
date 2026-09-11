@@ -1,18 +1,14 @@
 import {DataTypeBuilder} from './dataTypeBuilder';
 
+// There is one dropdown editor per number of values it holds, so the two builders differ only in which
+// editor they target - the options are configured the same way.
 export class DropdownDataTypeBuilder extends DataTypeBuilder {
-  multiple: boolean;
   items: string[];
 
   constructor() {
     super();
     this.editorAlias = 'Umbraco.DropDown.Flexible';
     this.editorUiAlias = 'Umb.PropertyEditorUi.Dropdown';
-  }
-
-  withMultiple(multiple: boolean) {
-    this.multiple = multiple;
-    return this;
   }
 
   withItems(items: string[]) {
@@ -22,10 +18,6 @@ export class DropdownDataTypeBuilder extends DataTypeBuilder {
 
   getValues() {
     let values: any[] = [];
-    values.push({
-      alias: 'multiple',
-      value: this.multiple || false
-    });
     if (this.items && this.items.length > 0) {
       values.push({
         alias: 'items',
@@ -33,5 +25,13 @@ export class DropdownDataTypeBuilder extends DataTypeBuilder {
       });
     }
     return values;
+  }
+}
+
+export class SingleDropdownDataTypeBuilder extends DropdownDataTypeBuilder {
+  constructor() {
+    super();
+    this.editorAlias = 'Umbraco.DropDown.Single';
+    this.editorUiAlias = 'Umb.PropertyEditorUi.Dropdown.Single';
   }
 }

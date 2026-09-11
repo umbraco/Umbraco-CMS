@@ -1,4 +1,4 @@
-// Copyright (c) Umbraco.
+﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System.ComponentModel.DataAnnotations;
@@ -105,7 +105,7 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference, I
         _mediaService = mediaService;
         _appCaches = appCaches;
 
-        Validators.Add(new TypedJsonValidatorRunner<LinkDisplay[], MultiUrlPickerConfiguration>(
+        Validators.Add(new TypedJsonValidatorRunner<LinkDisplay[], MultiUrlPickerConfigurationBase>(
             _jsonSerializer,
             new MinMaxValidator(localizedTextService)));
     }
@@ -398,7 +398,7 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference, I
         public string? Culture { get; set; }
     }
 
-    internal sealed class MinMaxValidator : ITypedValidator<LinkDisplay[], MultiUrlPickerConfiguration>
+    internal sealed class MinMaxValidator : ITypedValidator<LinkDisplay[], MultiUrlPickerConfigurationBase>
     {
         private readonly ILocalizedTextService _localizedTextService;
 
@@ -412,7 +412,7 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference, I
         /// Validates that the number of links provided meets the minimum and maximum constraints specified in the configuration.
         /// </summary>
         /// <param name="linksDtos">An array of <see cref="LinkDisplay"/> objects representing the links to validate. May be <c>null</c>.</param>
-        /// <param name="multiUrlPickerConfiguration">The configuration object specifying minimum and maximum allowed links. May be <c>null</c>.</param>
+        /// <param name="urlPickerConfiguration">The configuration object the allowed number of links is read from. May be <c>null</c>.</param>
         /// <param name="valueType">The type of value being validated (not used in this implementation).</param>
         /// <param name="validationContext">The context for property validation.</param>
         /// <returns>
@@ -420,42 +420,47 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference, I
         /// </returns>
         public IEnumerable<ValidationResult> Validate(
             LinkDisplay[]? linksDtos,
-            MultiUrlPickerConfiguration? multiUrlPickerConfiguration,
+            MultiUrlPickerConfigurationBase? urlPickerConfiguration,
             string? valueType,
             PropertyValidationContext validationContext)
         {
-           if (multiUrlPickerConfiguration is null || (linksDtos is null && multiUrlPickerConfiguration.MinNumber == 0))
-           {
-               return [];
-           }
+            if (urlPickerConfiguration is SingleUrlPickerConfiguration)
+            {
+                return linksDtos?.Length > 1
+                    ? [Exceeds(1, linksDtos.Length)]
+                    : [];
+            }
 
-           if (linksDtos is null || linksDtos.Length < multiUrlPickerConfiguration.MinNumber)
-           {
-               return [new ValidationResult(
-                   _localizedTextService.Localize(
-                       "validation",
-                       "entriesShort",
-                       [multiUrlPickerConfiguration.MinNumber.ToString(), (multiUrlPickerConfiguration.MinNumber - (linksDtos?.Length ?? 0)).ToString()]),
-                   ["value"])];
-           }
+            if (urlPickerConfiguration is not MultiUrlPickerConfiguration configuration
+                || (linksDtos is null && configuration.MinNumber == 0))
+            {
+                return [];
+            }
 
-           if (linksDtos.Length > multiUrlPickerConfiguration.MaxNumber && multiUrlPickerConfiguration.MaxNumber > 0)
-           {
-               return
-               [
-                   new ValidationResult(
-                       _localizedTextService.Localize(
-                           "validation",
-                           "entriesExceed",
-                           [
-                               multiUrlPickerConfiguration.MaxNumber.ToString(),
-                               (linksDtos.Length - multiUrlPickerConfiguration.MaxNumber).ToString()
-                           ]),
-                       ["value"])
-               ];
-           }
+            if (linksDtos is null || linksDtos.Length < configuration.MinNumber)
+            {
+                return [new ValidationResult(
+                    _localizedTextService.Localize(
+                        "validation",
+                        "entriesShort",
+                        [configuration.MinNumber.ToString(), (configuration.MinNumber - (linksDtos?.Length ?? 0)).ToString()]),
+                    ["value"])];
+            }
 
-           return [];
+            if (linksDtos.Length > configuration.MaxNumber && configuration.MaxNumber > 0)
+            {
+                return [Exceeds(configuration.MaxNumber, linksDtos.Length)];
+            }
+
+            return [];
         }
+
+        private ValidationResult Exceeds(int maximum, int count)
+            => new(
+                _localizedTextService.Localize(
+                    "validation",
+                    "entriesExceed",
+                    [maximum.ToString(), (count - maximum).ToString()]),
+                ["value"]);
     }
 }
