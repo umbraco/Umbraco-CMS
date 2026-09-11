@@ -38,6 +38,7 @@ export class UmbMediaCollectionServerDataSource implements UmbCollectionDataSour
 					createDate: new Date(variant.createDate),
 					creator: item.creator,
 					icon: item.mediaType.icon,
+					extension: item.extension ?? undefined,
 					mediaType: {
 						unique: item.mediaType.id,
 						icon: item.mediaType.icon,
