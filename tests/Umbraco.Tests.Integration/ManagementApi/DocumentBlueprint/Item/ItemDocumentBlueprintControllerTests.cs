@@ -47,7 +47,7 @@ public class ItemDocumentBlueprintControllerTests : ManagementApiUserGroupTestBa
 
         // Blueprint
         _blueprintKey = Guid.NewGuid();
-        await ContentBlueprintEditingService.CreateFromContentAsync(_contentKey, createModel.Variants.First().Name, _blueprintKey, Constants.Security.SuperUserKey);
+        await ContentBlueprintEditingService.CreateFromContentAsync(_contentKey, createModel.Variants.First().Name, _blueprintKey, null, Constants.Security.SuperUserKey);
     }
 
     protected override Expression<Func<ItemDocumentBlueprintController, object>> MethodSelector =>
