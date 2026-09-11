@@ -14,10 +14,10 @@ import type { UmbConfigCollectionModel } from '@umbraco-cms/backoffice/utils';
 import type { UmbPickerTreeDataSource } from '@umbraco-cms/backoffice/picker-data-source';
 
 export class UmbDocumentBlueprintTreePickerDataSource extends UmbControllerBase implements UmbPickerTreeDataSource {
-	#documentBlueprintItem = new UmbDocumentBlueprintItemRepository(this);
-	#folderItem = new UmbDocumentBlueprintFolderItemRepository(this);
+	readonly #documentBlueprintItem = new UmbDocumentBlueprintItemRepository(this);
+	readonly #folderItem = new UmbDocumentBlueprintFolderItemRepository(this);
 	#folderOnly = false;
-	#tree = new UmbDocumentBlueprintTreeRepository(this);
+	readonly #tree = new UmbDocumentBlueprintTreeRepository(this);
 	#startNode?: UmbTreeStartNode;
 
 	setConfig(config: UmbConfigCollectionModel | undefined) {
