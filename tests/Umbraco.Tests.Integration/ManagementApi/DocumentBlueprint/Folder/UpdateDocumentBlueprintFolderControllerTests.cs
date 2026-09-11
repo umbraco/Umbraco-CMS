@@ -18,7 +18,7 @@ public class UpdateDocumentBlueprintFolderControllerTests
     private Guid _folderKey;
 
     [SetUp]
-    public async Task Setup()
+    public new async Task Setup()
     {
         var result = await ContentBlueprintContainerService.CreateAsync(
             null,
