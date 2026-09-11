@@ -159,6 +159,7 @@ export class UmbSectionMainViewElement extends UmbLitElement {
 			this._defaultView = routes[0].path;
 			routes.push({
 				...routes[0],
+				unique: routes[0].path,
 				path: '',
 			});
 
