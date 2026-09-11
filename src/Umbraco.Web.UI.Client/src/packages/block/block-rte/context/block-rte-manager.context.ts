@@ -6,7 +6,6 @@ import { UmbBlockManagerContext } from '@umbraco-cms/backoffice/block';
 import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 
 import '../components/block-rte-entry/index.js';
-import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 
 /**
  * A implementation of the Block Manager specifically for the Rich Text Editor.
