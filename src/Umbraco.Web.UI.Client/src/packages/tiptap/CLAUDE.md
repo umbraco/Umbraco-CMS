@@ -104,6 +104,11 @@ Four built-in kinds for toolbar extensions:
 - `menu` - Dropdown menu
 - `styleMenu` - Style selector dropdown
 
+For `menu` and `styleMenu`, each item's active/highlighted state comes from the extension's own API, not
+from the item itself — `isActive(editor, item)` and `execute(editor, item)` are called once per
+`MetaTiptapToolbarMenuItem`, so an override switches on `item.data` (see `font-family.tiptap-toolbar-api.ts`
+and `style-menu.tiptap-toolbar-api.ts`).
+
 ---
 
 ## File Naming Conventions

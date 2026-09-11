@@ -34,7 +34,7 @@ internal sealed class ExternalLoginProviderStartupHandler : INotificationHandler
     public void Handle(UmbracoApplicationStartingNotification notification)
     {
         if (_runtimeState.Level != RuntimeLevel.Run ||
-            _serverRoleAccessor.CurrentServerRole == ServerRole.Subscriber)
+            _serverRoleAccessor.CurrentServerRole is ServerRole.Subscriber or ServerRole.Unknown)
         {
             return;
         }
