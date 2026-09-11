@@ -34,6 +34,19 @@ public class ImageProcessingMemoryTests
     /// </summary>
     private const long AmpleMemoryBytes = 16384 * OneMegabyte;
 
+    // ImageSharp sizes its own allocator defaults by process bitness. The pool default is an eighth
+    // of available memory on a 64-bit process and a flat 128 MB on a 32-bit one
+    // (UniformUnmanagedMemoryPoolMemoryAllocator.GetDefaultMaxPoolSizeBytes); the single-allocation
+    // ceiling default is a flat 1 GB on 32-bit and 4 GB on 64-bit (MemoryAllocator.Create). This
+    // policy is deliberately bitness-agnostic - one flat threshold, flat clamps - so its derived
+    // bounds have to stay no looser than the library's own on EITHER, or on some host it would relax
+    // what the library would otherwise have held.
+    private const int ImageSharpDefaultPoolMegabytes32Bit = 128;
+    private const int ImageSharpDefaultAllocationMegabytes32Bit = 1024;
+    private const int ImageSharpDefaultAllocationMegabytes64Bit = 4096;
+
+    private static int ImageSharpDefaultPoolMegabytes64Bit(long availableBytes) => (int)(availableBytes / 8 / OneMegabyte);
+
     private MemoryAllocator _originalAllocator = null!;
 
     /// <summary>
@@ -181,17 +194,24 @@ public class ImageProcessingMemoryTests
         Assert.That(ImageProcessingMemory.ResolveMaximumPoolSizeMegabytes(settings, availableMegabytes * OneMegabyte), Is.EqualTo(expected));
     }
 
-    [Test]
-    public void ResolveMaximumPoolSizeMegabytes_StaysWellBelowTheImageSharpDefault()
+    // The pool cap must stay no looser than the library's own default whether the process is 32-bit
+    // (a flat 128 MB) or 64-bit (an eighth of available). That eighth is what leaves a container
+    // sitting far above its working set at rest, so on 64-bit the derived value has to be well under
+    // it; on 32-bit it has to be under the flat 128 MB.
+    [TestCase(384)]
+    [TestCase(2048)]
+    [TestCase(65536)]
+    public void ResolveMaximumPoolSizeMegabytes_IsNoLooserThanImageSharpsDefault_OnEitherBitness(int availableMegabytes)
     {
-        // ImageSharp defaults to an eighth of available memory on a 64-bit process, which is what
-        // leaves a container sitting far above its working set at rest.
-        const long available = 2048 * OneMegabyte;
-        var imageSharpDefaultMegabytes = (int)(available / 8 / OneMegabyte);
+        long available = availableMegabytes * OneMegabyte;
 
         var resolved = ImageProcessingMemory.ResolveMaximumPoolSizeMegabytes(new ImagingMemorySettings(), available);
 
-        Assert.That(resolved, Is.LessThan(imageSharpDefaultMegabytes));
+        Assert.Multiple(() =>
+        {
+            Assert.That(resolved, Is.LessThan(ImageSharpDefaultPoolMegabytes64Bit(available)), "looser than the 64-bit default");
+            Assert.That(resolved, Is.LessThanOrEqualTo(ImageSharpDefaultPoolMegabytes32Bit), "looser than the 32-bit default");
+        });
     }
 
     [Test]
@@ -306,17 +326,21 @@ public class ImageProcessingMemoryTests
         Assert.That(resolved, Is.GreaterThan(twelveMegapixelDecodeMegabytes * 4));
     }
 
-    // Never looser than the library's own ceiling, which is a flat 1 GB even on a 32-bit process.
+    // The single-image ceiling must never exceed the library's own, which is a flat 1 GB on a 32-bit
+    // process and a flat 4 GB on a 64-bit one - so the 1 GB figure is the binding one, and staying
+    // within it keeps the bound no looser than the library's on either bitness.
     [TestCase(384)]
     [TestCase(2048)]
     [TestCase(8192)]
-    public void ResolveMaximumDecodedImageMegabytes_NeverExceedsTheImageSharpDefault(int availableMegabytes)
+    public void ResolveMaximumDecodedImageMegabytes_IsNoLooserThanImageSharpsDefault_OnEitherBitness(int availableMegabytes)
     {
-        const int imageSharpDefaultMegabytes = 1024;
-
         var resolved = ImageProcessingMemory.ResolveMaximumDecodedImageMegabytes(new ImagingMemorySettings(), availableMegabytes * OneMegabyte);
 
-        Assert.That(resolved, Is.LessThanOrEqualTo(imageSharpDefaultMegabytes));
+        Assert.Multiple(() =>
+        {
+            Assert.That(resolved, Is.LessThanOrEqualTo(ImageSharpDefaultAllocationMegabytes32Bit), "looser than the 32-bit default");
+            Assert.That(resolved, Is.LessThanOrEqualTo(ImageSharpDefaultAllocationMegabytes64Bit), "looser than the 64-bit default");
+        });
     }
 
     [TestCase(384)]

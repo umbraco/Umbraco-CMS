@@ -7,6 +7,8 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Memory;
 using SixLabors.ImageSharp.Web;
 using SixLabors.ImageSharp.Web.Middleware;
 using SixLabors.ImageSharp.Web.Processors;
@@ -159,6 +161,81 @@ public class ImageProcessingThrottleMiddlewareTests
         });
     }
 
+    /// <summary>
+    /// The place is taken at the decode, not for the whole request, so a request the imaging
+    /// middleware serves from cache passes without waiting even while a decode holds the only place.
+    /// Gating the whole request instead - all a gate ahead of the decode could otherwise do - would
+    /// have made the cache hit queue behind the decode, which was the objection to doing this here.
+    /// </summary>
+    [Test]
+    public async Task InvokeAsync_CacheHit_PassesWhileADecodeHoldsTheOnlyPlace()
+    {
+        var decodeStarted = new TaskCompletionSource();
+        var releaseDecode = new TaskCompletionSource();
+
+        // A limit of one, so a single decode holds the whole concurrency budget while it runs.
+        var middleware = Build(
+            async context =>
+            {
+                // A cache hit never reaches the decode hook, so it takes no place; a decode does.
+                if (context.Request.Query.ContainsKey("cached"))
+                {
+                    return;
+                }
+
+                await AcquireSlotAsync(context);
+                decodeStarted.SetResult();
+                await releaseDecode.Task;
+            },
+            new ImagingMemorySettings { MaximumConcurrentProcessing = 1 });
+
+        Task decode = middleware.InvokeAsync(CreateContext(ImagePath, ("width", "400")));
+        await decodeStarted.Task;
+
+        // The cache hit is a processing URL too - it just happens to be cached - so it is exactly
+        // the request the old whole-request gate would have made wait. It must complete regardless.
+        Task cacheHit = middleware.InvokeAsync(CreateContext(ImagePath, ("width", "400"), ("cached", "1")));
+        Task winner = await Task.WhenAny(cacheHit, Task.Delay(TimeSpan.FromSeconds(10)));
+
+        Assert.That(winner, Is.SameAs(cacheHit), "A cache hit waited behind a decode holding the concurrency limit.");
+        await cacheHit;
+
+        releaseDecode.SetResult();
+        await decode;
+    }
+
+    /// <summary>
+    /// A source too large to decode within the ceiling fails - that is what the ceiling is for - but
+    /// the imaging library blames the image's dimensions, so the middleware names the setting
+    /// responsible and lets the failure through rather than swallowing it.
+    /// </summary>
+    [Test]
+    public void InvokeAsync_WhenADecodeExceedsItsCeiling_NamesTheSettingAndRethrows()
+    {
+        var logger = new CapturingLogger();
+        var middleware = Build(
+            async context =>
+            {
+                await AcquireSlotAsync(context);
+
+                // How the imaging library surfaces an allocation stopped by the ceiling: the memory
+                // failure wrapped as a complaint about the image's dimensions.
+                throw new InvalidImageContentException(
+                    "Failed to allocate buffers for possibly degenerate dimensions.",
+                    new InvalidMemoryOperationException("Unable to allocate."));
+            },
+            new ImagingMemorySettings { MaximumConcurrentProcessing = Limit },
+            logger: logger);
+
+        Assert.ThrowsAsync<InvalidImageContentException>(
+            () => middleware.InvokeAsync(CreateContext(ImagePath, ("width", "400"))));
+
+        Assert.That(
+            logger.Warnings,
+            Has.One.Contains(nameof(ImagingMemorySettings.MaximumDecodedImageMegabytes)),
+            "The warning must name the setting, since the imaging library attributes the failure to the image.");
+    }
+
     private static ImageProcessingThrottleMiddleware CreateMiddleware(RequestDelegate next)
         => Build(next, new ImagingMemorySettings { MaximumConcurrentProcessing = Limit });
 
@@ -178,7 +255,8 @@ public class ImageProcessingThrottleMiddlewareTests
         RequestDelegate next,
         ImagingMemorySettings memory,
         long? availableMemoryBytes = null,
-        int? processorCount = null)
+        int? processorCount = null,
+        ILogger<ImageProcessingThrottleMiddleware>? logger = null)
     {
         var settings = new ImagingSettings { Memory = memory };
 
@@ -188,7 +266,7 @@ public class ImageProcessingThrottleMiddlewareTests
 
         // The real utility, so the tests use the same supported-format set as runtime.
         var formatUtilities = new FormatUtilities(Options.Create(new ImageSharpMiddlewareOptions()));
-        ILogger<ImageProcessingThrottleMiddleware> logger = NullLogger<ImageProcessingThrottleMiddleware>.Instance;
+        logger ??= NullLogger<ImageProcessingThrottleMiddleware>.Instance;
 
         return availableMemoryBytes is { } memoryBytes && processorCount is { } cores
             ? new ImageProcessingThrottleMiddleware(next, Options.Create(settings), processors, formatUtilities, logger, memoryBytes, cores)
@@ -248,6 +326,36 @@ public class ImageProcessingThrottleMiddlewareTests
         {
             timeout.Token.ThrowIfCancellationRequested();
             await Task.Delay(10, timeout.Token);
+        }
+    }
+
+    /// <summary>
+    /// Keeps the rendered message of everything logged at warning, so a test can assert what a
+    /// rejection or an over-ceiling decode reported without depending on the template's wording.
+    /// </summary>
+    private sealed class CapturingLogger : ILogger<ImageProcessingThrottleMiddleware>
+    {
+        private readonly List<string> _warnings = [];
+
+        public IReadOnlyList<string> Warnings => _warnings;
+
+        public IDisposable? BeginScope<TState>(TState state)
+            where TState : notnull
+            => null;
+
+        public bool IsEnabled(LogLevel logLevel) => true;
+
+        public void Log<TState>(
+            LogLevel logLevel,
+            EventId eventId,
+            TState state,
+            Exception? exception,
+            Func<TState, Exception?, string> formatter)
+        {
+            if (logLevel == LogLevel.Warning)
+            {
+                _warnings.Add(formatter(state, exception));
+            }
         }
     }
 
