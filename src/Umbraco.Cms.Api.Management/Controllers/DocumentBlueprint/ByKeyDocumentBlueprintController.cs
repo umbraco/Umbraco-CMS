@@ -42,6 +42,11 @@ public class ByKeyDocumentBlueprintController : DocumentBlueprintControllerBase
         _authorizationService = authorizationService;
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ByKeyDocumentBlueprintController"/> class.
+    /// </summary>
+    /// <param name="contentBlueprintEditingService">An instance of <see cref="IContentBlueprintEditingService"/> used to manage content blueprint editing operations.</param>
+    /// <param name="umbracoMapper">An instance of <see cref="IUmbracoMapper"/> used for mapping between Umbraco models.</param>
     [Obsolete("Use the constructor with all parameters. Scheduled for removal in Umbraco 21.")]
     public ByKeyDocumentBlueprintController(IContentBlueprintEditingService contentBlueprintEditingService, IUmbracoMapper umbracoMapper)
         : this(

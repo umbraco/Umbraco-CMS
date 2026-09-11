@@ -43,6 +43,11 @@ public class DeleteDocumentBlueprintController : DocumentBlueprintControllerBase
         _authorizationService = authorizationService;
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DeleteDocumentBlueprintController"/> class.
+    /// </summary>
+    /// <param name="contentBlueprintEditingService">Service used for editing content blueprints.</param>
+    /// <param name="backOfficeSecurityAccessor">Accessor for back office security context.</param>
     [Obsolete("Use the constructor with all parameters. Scheduled for removal in Umbraco 21.")]
     public DeleteDocumentBlueprintController(IContentBlueprintEditingService contentBlueprintEditingService, IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
         : this(
