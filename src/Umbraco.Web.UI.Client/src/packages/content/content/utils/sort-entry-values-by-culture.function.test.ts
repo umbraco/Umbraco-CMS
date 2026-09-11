@@ -1,6 +1,6 @@
 import { expect } from '@open-wc/testing';
 import { sortEntryValuesByCulture } from './sort-entry-values-by-culture.function.js';
-import type { UmbEntryValueModel } from '../../types.js';
+import type { UmbEntryValueModel } from '../types.js';
 
 function makeValue(alias: string, culture: string | null): UmbEntryValueModel {
 	return { editorAlias: 'Umbraco.TextBox', alias, culture, segment: null, value: alias };

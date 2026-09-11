@@ -1,4 +1,4 @@
-import type { UmbEntryValueModel } from '../../types.js';
+import type { UmbEntryValueModel } from '../types.js';
 
 /**
  * Sorts entry values by culture, matching the order the backend settles a set of variant values into

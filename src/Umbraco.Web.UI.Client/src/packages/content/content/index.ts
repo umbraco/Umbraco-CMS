@@ -9,6 +9,7 @@ export * from './property-dataset-context/index.js';
 export * from './publishing/index.js';
 export * from './rollback/index.js';
 export * from './workspace/index.js';
+export * from './utils/index.js';
 
 export type * from './configuration/index.js';
 export type * from './repository/index.js';
