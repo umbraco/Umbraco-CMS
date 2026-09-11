@@ -233,10 +233,10 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 			null,
 		);
 		this.observe(
-			this.#context.hasExpose,
-			(exposed) => {
-				this.#updateBlockViewProps({ unpublished: !exposed });
-				this._exposed = exposed;
+			this.#context.isExposed,
+			(isExposed) => {
+				this.#updateBlockViewProps({ unpublished: !isExposed });
+				this._exposed = isExposed;
 			},
 			null,
 		);
