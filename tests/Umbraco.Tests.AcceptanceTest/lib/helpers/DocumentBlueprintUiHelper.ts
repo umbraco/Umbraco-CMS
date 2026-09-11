@@ -24,10 +24,6 @@ export class DocumentBlueprintUiHelper extends UiBaseLocators{
     await this.click(this.documentBlueprintSidebarHeader.getByTestId('open-dropdown'), {force: true});
   }
 
-  async clickRootFolderCaretButton() {
-    await this.openCaretButtonForName('Document Blueprints');
-  }
-
   async clickSaveButtonAndWaitForDocumentBlueprintToBeCreated() {
     return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.documentBlueprint, this.clickSaveButton(), ConstantHelper.statusCodes.created);
   }

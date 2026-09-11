@@ -89,7 +89,7 @@ test('can create a document blueprint from the content menu', {tag: '@release'},
 
   // Assert
   expect(await umbracoApi.documentBlueprint.doesNameExist(documentBlueprintName)).toBeTruthy();
-  await umbracoUi.documentBlueprint.goToLibraryTreeItem('Document Blueprints');
+  await umbracoUi.documentBlueprint.goToSection(ConstantHelper.sections.library);
   await umbracoUi.documentBlueprint.isDocumentBlueprintRootTreeItemVisible(documentBlueprintName, true);
 
   // Clean
