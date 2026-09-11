@@ -463,7 +463,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
                 var contentSchedule =
                     ContentScheduleCollection.CreateWithEntry(null, now.AddSeconds(5)); // expire in 5 seconds
-                ContentService.PersistContentSchedule(c, contentSchedule);
+                await ContentService.PersistContentScheduleAsync(c, contentSchedule, CancellationToken.None);
 
                 Assert.IsTrue(r.Success, r.Result.ToString());
             }
@@ -502,7 +502,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
                         alternatingCulture,
                         null,
                         now.AddSeconds(5)); // expire in 5 seconds
-                ContentService.PersistContentSchedule(c, contentSchedule);
+                await ContentService.PersistContentScheduleAsync(c, contentSchedule, CancellationToken.None);
 
                 Assert.IsTrue(r.Success, r.Result.ToString());
             }
@@ -1110,7 +1110,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         ContentService.Publish(root!, root!.AvailableCultures.ToArray());
         var content = await ContentService.GetByIdAsync(Subpage.Key, CancellationToken.None);
         var contentSchedule = ContentScheduleCollection.CreateWithEntry(null, DateTime.UtcNow.AddSeconds(1));
-        ContentService.PersistContentSchedule(content!, contentSchedule);
+        await ContentService.PersistContentScheduleAsync(content!, contentSchedule, CancellationToken.None);
         ContentService.Publish(content, content.AvailableCultures.ToArray());
 
         // Act
@@ -1131,7 +1131,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         ContentService.Publish(root!, root!.AvailableCultures.ToArray());
         var content = await ContentService.GetByIdAsync(Subpage.Key, CancellationToken.None);
         var contentSchedule = ContentScheduleCollection.CreateWithEntry(DateTime.UtcNow.AddDays(1), null);
-        ContentService.PersistContentSchedule(content!, contentSchedule);
+        await ContentService.PersistContentScheduleAsync(content!, contentSchedule, CancellationToken.None);
         ContentService.Publish(content, content.AvailableCultures.ToArray());
 
         // Act
@@ -1940,9 +1940,10 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
         content.Properties[0].SetValue("Foo", string.Empty);
         await contentService.SaveAsync(content, null, null, CancellationToken.None);
-        contentService.PersistContentSchedule(
+        await contentService.PersistContentScheduleAsync(
             content,
-            ContentScheduleCollection.CreateWithEntry(DateTime.UtcNow.AddHours(2), null));
+            ContentScheduleCollection.CreateWithEntry(DateTime.UtcNow.AddHours(2), null),
+            CancellationToken.None);
 
         // Act
         var result = contentService.Publish(content, Array.Empty<string>(), userId: Constants.Security.SuperUserId);
@@ -1993,9 +1994,10 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         await contentService.SaveAsync(content, null, null, CancellationToken.None);
         contentService.Publish(content, Array.Empty<string>());
 
-        contentService.PersistContentSchedule(
+        await contentService.PersistContentScheduleAsync(
             content,
-            ContentScheduleCollection.CreateWithEntry(DateTime.UtcNow.AddHours(2), null));
+            ContentScheduleCollection.CreateWithEntry(DateTime.UtcNow.AddHours(2), null),
+            CancellationToken.None);
         await contentService.SaveAsync(content, null, null, CancellationToken.None);
 
         // Act
@@ -2505,9 +2507,10 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
         content.Properties[0]!.SetValue("forcedPropertyValue", string.Empty);
         await contentService.SaveAsync(content, null, null, CancellationToken.None);
-        contentService.PersistContentSchedule(
+        await contentService.PersistContentScheduleAsync(
             content,
-            ContentScheduleCollection.CreateWithEntry(DateTime.UtcNow.AddHours(2), null));
+            ContentScheduleCollection.CreateWithEntry(DateTime.UtcNow.AddHours(2), null),
+            CancellationToken.None);
 
         var result = contentService.SaveAndPublish(content, Array.Empty<string>());
 

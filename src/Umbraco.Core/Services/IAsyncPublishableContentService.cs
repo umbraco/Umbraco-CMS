@@ -53,6 +53,14 @@ public interface IAsyncPublishableContentService<TContent> : IAsyncContentServic
     Task<ContentScheduleCollection> GetContentScheduleByContentIdAsync(Guid contentId, CancellationToken cancellationToken);
 
     /// <summary>
+    ///     Persists publish/unpublish schedule for a content node.
+    /// </summary>
+    /// <param name="content">The content to persist the schedule for.</param>
+    /// <param name="contentSchedule">The content schedule collection.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    Task PersistContentScheduleAsync(IPublishableContentBase content, ContentScheduleCollection contentSchedule, CancellationToken cancellationToken);
+
+    /// <summary>
     ///     Saves a content item.
     /// </summary>
     /// <param name="content">The content item to save.</param>

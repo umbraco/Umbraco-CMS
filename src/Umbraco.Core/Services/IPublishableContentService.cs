@@ -34,12 +34,9 @@ public interface IPublishableContentService<TContent> : IContentServiceBase
     /// </remarks>
     void DeleteOfTypes(IEnumerable<int> contentTypeIds, int userId = Constants.Security.SuperUserId);
 
-    /// <summary>
-    ///     Persists publish/unpublish schedule for a content node.
-    /// </summary>
-    /// <param name="content">The content to persist the schedule for.</param>
-    /// <param name="contentSchedule">The content schedule collection.</param>
-    void PersistContentSchedule(IPublishableContentBase content, ContentScheduleCollection contentSchedule);
+    // PersistContentSchedule(IPublishableContentBase, ContentScheduleCollection) has been retired from
+    // this interface in favour of the async PersistContentScheduleAsync (declared on
+    // IAsyncPublishableContentService<TContent>).
 
     /// <summary>
     ///     Publishes content

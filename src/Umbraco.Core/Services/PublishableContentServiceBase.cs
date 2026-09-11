@@ -442,7 +442,9 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         return guidKeyedResults;
     }
 
-    /// <inheritdoc />
+    // No longer an interface member (retired from IPublishableContentService<TContent> in favour of
+    // PersistContentScheduleAsync) — kept as a plain method because ElementService.PersistContentScheduleAsync
+    // bridges to it until Element has its own async repository.
     public void PersistContentSchedule(IPublishableContentBase content, ContentScheduleCollection contentSchedule)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())

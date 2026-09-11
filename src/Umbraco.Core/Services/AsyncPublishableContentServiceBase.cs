@@ -429,14 +429,12 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
     }
 
     /// <inheritdoc />
-    public void PersistContentSchedule(IPublishableContentBase content, ContentScheduleCollection contentSchedule)
+    public async Task PersistContentScheduleAsync(IPublishableContentBase content, ContentScheduleCollection contentSchedule, CancellationToken cancellationToken)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            scope.WriteLock(WriteLockIds);
-            _contentRepository.PersistContentSchedule(content, contentSchedule);
-            scope.Complete();
-        }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.WriteLock(WriteLockIds);
+        await _asyncContentRepository.PersistContentScheduleAsync(content, contentSchedule, cancellationToken);
+        scope.Complete();
     }
 
     /// <inheritdoc />

@@ -117,7 +117,7 @@ internal abstract class ContentPublishingServiceBase<TContent, TContentService>
         if (cultureAndSchedule.CulturesToPublishImmediately.Count == 0 &&
             cultureAndSchedule.Schedules.FullSchedule.Count == 0)
         {
-            _contentService.PersistContentSchedule(content, cultureAndSchedule.Schedules);
+            await _contentService.PersistContentScheduleAsync(content, cultureAndSchedule.Schedules, CancellationToken.None);
             scope.Complete();
             return Attempt.SucceedWithStatus(
                 ContentPublishingOperationStatus.Success,
@@ -204,7 +204,7 @@ internal abstract class ContentPublishingServiceBase<TContent, TContentService>
 
         if (result?.Success != false && cultureAndSchedule.Schedules.FullSchedule.Any())
         {
-            _contentService.PersistContentSchedule(result?.Content ?? content, cultureAndSchedule.Schedules);
+            await _contentService.PersistContentScheduleAsync(result?.Content ?? content, cultureAndSchedule.Schedules, CancellationToken.None);
             result = new PublishResult(
                 PublishResultType.SuccessPublish,
                 result?.EventMessages ?? new EventMessages(),
