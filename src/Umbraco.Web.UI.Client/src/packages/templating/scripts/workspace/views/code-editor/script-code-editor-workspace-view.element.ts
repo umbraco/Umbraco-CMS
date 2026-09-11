@@ -1,42 +1,41 @@
-import type { UmbStylesheetWorkspaceContext } from '../../stylesheet-workspace.context.js';
-import { UMB_STYLESHEET_WORKSPACE_CONTEXT } from '../../stylesheet-workspace.context-token.js';
+import { UMB_SCRIPT_WORKSPACE_CONTEXT } from '../../script-workspace.context-token.js';
 import { css, html, customElement, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbCodeEditorElement } from '@umbraco-cms/backoffice/code-editor';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
 
 import '@umbraco-cms/backoffice/code-editor';
 
-@customElement('umb-stylesheet-code-editor-workspace-view')
-export class UmbStylesheetCodeEditorWorkspaceViewElement extends UmbLitElement {
+@customElement('umb-script-code-editor-workspace-view')
+export class UmbScriptCodeEditorWorkspaceViewElement extends UmbLitElement implements UmbWorkspaceViewElement {
 	@state()
 	private _content?: string | null = '';
 
-	#stylesheetWorkspaceContext?: UmbStylesheetWorkspaceContext;
+	#context?: typeof UMB_SCRIPT_WORKSPACE_CONTEXT.TYPE;
 
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_STYLESHEET_WORKSPACE_CONTEXT, (workspaceContext) => {
-			this.#stylesheetWorkspaceContext = workspaceContext;
-
-			this.observe(this.#stylesheetWorkspaceContext?.content, (content) => {
-				this._content = content;
-			});
+		this.consumeContext(UMB_SCRIPT_WORKSPACE_CONTEXT, (context) => {
+			this.#context = context;
+			this.observe(this.#context?.content, (content) => (this._content = content));
 		});
 	}
 
 	#onCodeEditorInput(event: Event) {
 		const target = event.target as UmbCodeEditorElement;
 		const value = target.code as string;
-		this.#stylesheetWorkspaceContext?.setContent(value);
+		this.#context?.setContent(value);
 	}
 
 	override render() {
-		return html` <uui-box>
-			<div slot="header" id="code-editor-menu-container"></div>
-			${this.#renderCodeEditor()}
-		</uui-box>`;
+		return html`
+			<uui-box>
+				<!-- the div below in the header is to make the box display nicely with code editor -->
+				<div slot="header"></div>
+				${this.#renderCodeEditor()}
+			</uui-box>
+		`;
 	}
 
 	#renderCodeEditor() {
@@ -47,14 +46,13 @@ export class UmbStylesheetCodeEditorWorkspaceViewElement extends UmbLitElement {
 		return html`
 			<umb-code-editor
 				id="content"
-				language="css"
+				language="javascript"
 				.code=${this._content ?? ''}
 				@input=${this.#onCodeEditorInput}></umb-code-editor>
 		`;
 	}
 
 	static override styles = [
-		UmbTextStyles,
 		css`
 			:host {
 				display: block;
@@ -76,10 +74,10 @@ export class UmbStylesheetCodeEditorWorkspaceViewElement extends UmbLitElement {
 	];
 }
 
-export default UmbStylesheetCodeEditorWorkspaceViewElement;
+export default UmbScriptCodeEditorWorkspaceViewElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-stylesheet-code-editor-workspace-view': UmbStylesheetCodeEditorWorkspaceViewElement;
+		'umb-script-code-editor-workspace-view': UmbScriptCodeEditorWorkspaceViewElement;
 	}
 }
