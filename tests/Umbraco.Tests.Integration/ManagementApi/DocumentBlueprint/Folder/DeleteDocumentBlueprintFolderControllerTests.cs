@@ -16,7 +16,7 @@ public class DeleteDocumentBlueprintFolderControllerTests
     private Guid _folderKey;
 
     [SetUp]
-    public async Task Setup()
+    public new async Task Setup()
     {
         // A new folder for each test, since deleting removes it.
         var result = await ContentBlueprintContainerService.CreateAsync(

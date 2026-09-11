@@ -23,7 +23,7 @@ public class CreateDocumentBlueprintFromDocumentControllerTests
     private Guid _documentKey;
 
     [SetUp]
-    public async Task Setup()
+    public new async Task Setup()
     {
         var contentType = new ContentTypeBuilder()
             .WithAlias(Guid.NewGuid().ToString("N"))

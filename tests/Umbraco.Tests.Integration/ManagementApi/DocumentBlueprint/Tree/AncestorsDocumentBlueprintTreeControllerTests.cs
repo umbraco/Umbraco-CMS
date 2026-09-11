@@ -25,7 +25,7 @@ public class AncestorsDocumentBlueprintTreeControllerTests : ManagementApiUserGr
     private Guid _blueprintKey;
 
     [SetUp]
-    public async Task Setup()
+    public new async Task Setup()
     {
         var contentType = new ContentTypeBuilder()
             .WithAlias(Guid.NewGuid().ToString("N"))
