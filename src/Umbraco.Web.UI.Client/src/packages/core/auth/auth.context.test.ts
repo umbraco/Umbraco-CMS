@@ -194,6 +194,22 @@ describe('UmbAuthContext', () => {
 				headers: { 'Content-Type': 'application/json' },
 			});
 
+		// Resolves as soon as the session reference actually changes. The race tests below hold
+		// the origin-wide `umb:token-refresh` Web Lock while they wait, and web-test-runner runs
+		// test files concurrently against a single origin — so waiting on a fixed timeout there
+		// would block unrelated test files for the whole duration.
+		const nextSessionChange = () => {
+			let unsubscribe = () => {};
+			const changed = new Promise<void>((resolve) => {
+				let emissions = 0;
+				const subscription = context.session$.subscribe(() => {
+					if (++emissions > 1) resolve();
+				});
+				unsubscribe = () => subscription.unsubscribe();
+			});
+			return changed.finally(() => unsubscribe());
+		};
+
 		beforeEach(() => {
 			fetchCalls = [];
 			window.fetch = ((input: RequestInfo | URL) => {
@@ -271,6 +287,130 @@ describe('UmbAuthContext', () => {
 
 			await context.validateToken();
 			expect(fetchCalls).to.have.lengthOf(2);
+		});
+
+		it('does not time out a session established while an older refresh was still in flight', async () => {
+			const now = Math.floor(Date.now() / 1000);
+
+			// The session that is about to be rejected server-side
+			channel.postMessage({ type: 'sessionUpdate', accessTokenExpiresAt: now + 60, expiresAt: now + 240 });
+			await aTimeout(50);
+
+			let resolveFetch!: (response: Response) => void;
+			let fetchStarted!: () => void;
+			const fetchInFlight = new Promise<void>((resolve) => {
+				fetchStarted = resolve;
+			});
+			window.fetch = (() => {
+				fetchStarted();
+				return new Promise<Response>((resolve) => {
+					resolveFetch = resolve;
+				});
+			}) as typeof window.fetch;
+
+			const refreshPromise = context.validateToken();
+
+			// Wait for /token to actually be in flight — the refresh queues behind a Web Lock,
+			// so superseding the session before then would just make the queued caller skip it.
+			await fetchInFlight;
+
+			// A fresh sign-in completes and supersedes the session being refreshed
+			const superseded = nextSessionChange();
+			channel.postMessage({ type: 'sessionUpdate', accessTokenExpiresAt: now + 600, expiresAt: now + 900 });
+			await superseded;
+
+			let timeOutCalls = 0;
+			context.timeOut = () => {
+				timeOutCalls++;
+			};
+
+			resolveFetch(invalidGrantResponse());
+
+			// The caller must be told the token is usable: the session-timeout controller
+			// times the user out itself when validateToken() reports failure, which would
+			// reintroduce the very teardown this guard exists to prevent.
+			expect(await refreshPromise).to.be.true;
+			expect(timeOutCalls).to.equal(0);
+			expect(context.getIsAuthorized()).to.be.true;
+		});
+
+		it('reports success when a transient failure raced a newly established session', async () => {
+			const now = Math.floor(Date.now() / 1000);
+			channel.postMessage({ type: 'sessionUpdate', accessTokenExpiresAt: now + 60, expiresAt: now + 240 });
+			await aTimeout(50);
+
+			let rejectFetch!: (error: Error) => void;
+			let fetchStarted!: () => void;
+			const fetchInFlight = new Promise<void>((resolve) => {
+				fetchStarted = resolve;
+			});
+			window.fetch = (() => {
+				fetchStarted();
+				return new Promise<Response>((_, reject) => {
+					rejectFetch = reject;
+				});
+			}) as typeof window.fetch;
+
+			const refreshPromise = context.validateToken();
+			await fetchInFlight;
+
+			const superseded = nextSessionChange();
+			channel.postMessage({ type: 'sessionUpdate', accessTokenExpiresAt: now + 600, expiresAt: now + 900 });
+			await superseded;
+
+			rejectFetch(new TypeError('Failed to fetch'));
+
+			expect(await refreshPromise).to.be.true;
+			expect(context.getIsAuthorized()).to.be.true;
+		});
+
+		// The cold-boot shape of the same race: no session in hand when the refresh starts, so the
+		// `hadSession` guard already suppresses the timeout. What survives that guard is the
+		// `#sessionDead` latch, which would be applied to the session the login just established.
+		it('does not latch a newly established session as dead when a boot refresh is rejected', async () => {
+			const now = Math.floor(Date.now() / 1000);
+
+			let resolveFetch!: (response: Response) => void;
+			let fetchStarted!: () => void;
+			const fetchInFlight = new Promise<void>((resolve) => {
+				fetchStarted = resolve;
+			});
+			window.fetch = ((input: RequestInfo | URL) => {
+				fetchCalls.push(input.toString());
+				fetchStarted();
+				return new Promise<Response>((resolve) => {
+					resolveFetch = resolve;
+				});
+			}) as typeof window.fetch;
+
+			// Cold boot with a stale refresh cookie and no session yet
+			const bootRefresh = context.validateToken();
+			await fetchInFlight;
+
+			// The interactive login completes and establishes a session
+			const superseded = nextSessionChange();
+			channel.postMessage({ type: 'sessionUpdate', accessTokenExpiresAt: now + 600, expiresAt: now + 900 });
+			await superseded;
+
+			resolveFetch(invalidGrantResponse());
+			await bootRefresh;
+
+			// The session must still be usable: a later refresh has to reach the server rather
+			// than being short-circuited by a latch that belongs to the superseded session.
+			expect(context.getIsAuthorized()).to.be.true;
+			const callsBefore = fetchCalls.length;
+			window.fetch = ((input: RequestInfo | URL) => {
+				fetchCalls.push(input.toString());
+				return Promise.resolve(
+					new Response(JSON.stringify({ access_token: '[redacted]', expires_in: 300, token_type: 'Bearer' }), {
+						status: 200,
+						headers: { 'Content-Type': 'application/json' },
+					}),
+				);
+			}) as typeof window.fetch;
+
+			expect(await context.validateToken()).to.be.true;
+			expect(fetchCalls.length, 'a later refresh must still reach /token').to.be.greaterThan(callsBefore);
 		});
 	});
 });
