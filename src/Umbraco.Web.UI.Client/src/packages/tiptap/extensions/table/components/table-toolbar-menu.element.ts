@@ -1,4 +1,4 @@
-import { UmbTiptapToolbarMenuElement } from '../../../components/toolbar/tiptap-toolbar-menu.element.js';
+import { UmbTiptapToolbarMenuElement } from '../../../components/toolbar/menu/tiptap-toolbar-menu.element.js';
 import { customElement, html, ifDefined, when } from '@umbraco-cms/backoffice/external/lit';
 import type { PropertyValues } from '@umbraco-cms/backoffice/external/lit';
 

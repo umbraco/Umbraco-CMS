@@ -1174,10 +1174,6 @@ export default {
 		deselectAllLogLevelFilters: 'Opphev alle',
 	},
 	welcomeDashboard: {
-		ourUmbracoHeadline: 'Our Umbraco - Fellesskap for Umbraco',
-		ourUmbracoDescription:
-			"På 'Our Umbraco', den offisielle fellesskapssiden, finner du all informasjon relatert til Umbraco. Enten du trenger svar på et spørsmål, kule plugins eller en guide til hvordan du gjør noe i Umbraco, er verdens beste og vennligste fellesskap bare et klikk unna.",
-		ourUmbracoButton: 'Besøk Our Umbraco',
 		documentationHeadline: 'Dokumentasjon',
 		documentationDescription: 'Finn svarene på alle dine Umbraco-spørsmål',
 		communityHeadline: 'Fellesskap',
