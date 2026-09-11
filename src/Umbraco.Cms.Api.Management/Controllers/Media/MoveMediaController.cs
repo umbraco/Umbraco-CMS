@@ -65,7 +65,8 @@ public class MoveMediaController : MediaControllerBase
         Attempt<IMedia?, ContentEditingOperationStatus> result = await _mediaEditingService.MoveAsync(
             id,
             moveDocumentRequestModel.Target?.Id,
-            CurrentUserKey(_backOfficeSecurityAccessor));
+            CurrentUserKey(_backOfficeSecurityAccessor),
+            cancellationToken);
 
         return result.Success
             ? Ok()

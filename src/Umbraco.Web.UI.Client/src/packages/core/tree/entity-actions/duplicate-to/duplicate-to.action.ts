@@ -6,6 +6,7 @@ import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { linkEntityExpansionEntries } from '@umbraco-cms/backoffice/utils';
+import { UmbEntityBulkActionProgressController } from '@umbraco-cms/backoffice/entity-bulk-action';
 
 export class UmbDuplicateToEntityAction extends UmbEntityActionBase<MetaEntityActionDuplicateToKind> {
 	override async execute() {
@@ -37,9 +38,13 @@ export class UmbDuplicateToEntityAction extends UmbEntityActionBase<MetaEntityAc
 		);
 		if (!duplicateRepository) throw new Error('Duplicate repository is not available');
 
-		const { error } = await duplicateRepository.requestDuplicateTo({
-			unique: this.args.unique,
-			destination: { unique: destinationUnique },
+		const { error } = await new UmbEntityBulkActionProgressController(this).runIndeterminate({
+			headline: '#actions_copyInProgress',
+			operation: (abortSignal) =>
+				duplicateRepository.requestDuplicateTo(
+					{ unique: this.args.unique!, destination: { unique: destinationUnique } },
+					abortSignal,
+				),
 		});
 
 		if (error) {

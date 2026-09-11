@@ -1,3 +1,4 @@
+using System.Threading;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -150,8 +151,13 @@ internal sealed class MediaEditingService
     }
 
     /// <inheritdoc />
+    [Obsolete("Use the overload that takes a CancellationToken instead. Scheduled for removal in Umbraco 19.")]
     public async Task<Attempt<IMedia?, ContentEditingOperationStatus>> MoveToRecycleBinAsync(Guid key, Guid userKey)
-        => await HandleMoveToRecycleBinAsync(key, userKey);
+        => await MoveToRecycleBinAsync(key, userKey, CancellationToken.None);
+
+    /// <inheritdoc />
+    public async Task<Attempt<IMedia?, ContentEditingOperationStatus>> MoveToRecycleBinAsync(Guid key, Guid userKey, CancellationToken cancellationToken)
+        => await HandleMoveToRecycleBinAsync(key, userKey, cancellationToken);
 
     /// <inheritdoc />
     public async Task<Attempt<IMedia?, ContentEditingOperationStatus>> DeleteAsync(Guid key, Guid userKey)
@@ -162,8 +168,13 @@ internal sealed class MediaEditingService
         => await HandleDeleteAsync(key, userKey, true);
 
     /// <inheritdoc />
+    [Obsolete("Use the overload that takes a CancellationToken instead. Scheduled for removal in Umbraco 19.")]
     public async Task<Attempt<IMedia?, ContentEditingOperationStatus>> MoveAsync(Guid key, Guid? parentKey, Guid userKey)
-        => await HandleMoveAsync(key, parentKey, userKey);
+        => await MoveAsync(key, parentKey, userKey, CancellationToken.None);
+
+    /// <inheritdoc />
+    public async Task<Attempt<IMedia?, ContentEditingOperationStatus>> MoveAsync(Guid key, Guid? parentKey, Guid userKey, CancellationToken cancellationToken)
+        => await HandleMoveAsync(key, parentKey, userKey, cancellationToken: cancellationToken);
 
     /// <inheritdoc />
     [Obsolete("Use the overload that takes an includeDescendants parameter instead. Scheduled for removal in Umbraco 19.")]
@@ -172,7 +183,11 @@ internal sealed class MediaEditingService
 
     /// <inheritdoc />
     public async Task<Attempt<IMedia?, ContentEditingOperationStatus>> RestoreAsync(Guid key, Guid? parentKey, Guid userKey, bool includeDescendants)
-        => await HandleMoveAsync(key, parentKey, userKey, true, includeDescendants);
+        => await RestoreAsync(key, parentKey, userKey, includeDescendants, CancellationToken.None);
+
+    /// <inheritdoc />
+    public async Task<Attempt<IMedia?, ContentEditingOperationStatus>> RestoreAsync(Guid key, Guid? parentKey, Guid userKey, bool includeDescendants, CancellationToken cancellationToken)
+        => await HandleMoveAsync(key, parentKey, userKey, true, includeDescendants, cancellationToken);
 
     /// <inheritdoc />
     public async Task<ContentEditingOperationStatus> SortAsync(Guid? parentKey, IEnumerable<SortingModel> sortingModels, Guid userKey)
@@ -189,20 +204,20 @@ internal sealed class MediaEditingService
         => new Models.Media(name, parentId, mediaType);
 
     /// <inheritdoc />
-    protected override OperationResult? Move(IMedia media, int newParentId, bool includeDescendants, int userId)
-        => ContentService.Move(media, newParentId, includeDescendants, userId).Result;
+    protected override OperationResult? Move(IMedia media, int newParentId, bool includeDescendants, int userId, CancellationToken cancellationToken)
+        => ContentService.Move(media, newParentId, includeDescendants, cancellationToken, userId).Result;
 
     /// <inheritdoc />
     /// <exception cref="NotSupportedException">Copy is not supported for media items.</exception>
-    protected override IMedia? Copy(IMedia media, int newParentId, bool relateToOriginal, bool includeDescendants, int userId)
+    protected override IMedia? Copy(IMedia media, int newParentId, bool relateToOriginal, bool includeDescendants, int userId, CancellationToken cancellationToken)
         => throw new NotSupportedException("Copy is not supported for media");
 
     /// <inheritdoc />
-    protected override OperationResult? MoveToRecycleBin(IMedia media, int userId)
-        => ContentService.MoveToRecycleBin(media, userId).Result;
+    protected override OperationResult? MoveToRecycleBin(IMedia media, int userId, CancellationToken cancellationToken)
+        => ContentService.MoveToRecycleBin(media, cancellationToken, userId).Result;
 
     /// <inheritdoc />
-    protected override OperationResult? Delete(IMedia media, int userId)
+    protected override OperationResult? Delete(IMedia media, int userId, CancellationToken cancellationToken)
         => ContentService.Delete(media, userId).Result;
 
     /// <inheritdoc />

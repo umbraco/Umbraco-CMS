@@ -1,3 +1,4 @@
+using System.Threading;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -328,8 +329,13 @@ internal sealed class ContentEditingService
     }
 
     /// <inheritdoc />
+    [Obsolete("Use the overload that takes a CancellationToken instead. Scheduled for removal in Umbraco 19.")]
     public async Task<Attempt<IContent?, ContentEditingOperationStatus>> MoveToRecycleBinAsync(Guid key, Guid userKey)
-        => await HandleMoveToRecycleBinAsync(key, userKey);
+        => await MoveToRecycleBinAsync(key, userKey, CancellationToken.None);
+
+    /// <inheritdoc />
+    public async Task<Attempt<IContent?, ContentEditingOperationStatus>> MoveToRecycleBinAsync(Guid key, Guid userKey, CancellationToken cancellationToken)
+        => await HandleMoveToRecycleBinAsync(key, userKey, cancellationToken);
 
     /// <inheritdoc />
     public async Task<Attempt<IContent?, ContentEditingOperationStatus>> DeleteFromRecycleBinAsync(Guid key, Guid userKey)
@@ -340,8 +346,13 @@ internal sealed class ContentEditingService
         => await HandleDeleteAsync(key, userKey,false);
 
     /// <inheritdoc />
+    [Obsolete("Use the overload that takes a CancellationToken instead. Scheduled for removal in Umbraco 19.")]
     public async Task<Attempt<IContent?, ContentEditingOperationStatus>> MoveAsync(Guid key, Guid? parentKey, Guid userKey)
-        => await HandleMoveAsync(key, parentKey, userKey);
+        => await MoveAsync(key, parentKey, userKey, CancellationToken.None);
+
+    /// <inheritdoc />
+    public async Task<Attempt<IContent?, ContentEditingOperationStatus>> MoveAsync(Guid key, Guid? parentKey, Guid userKey, CancellationToken cancellationToken)
+        => await HandleMoveAsync(key, parentKey, userKey, cancellationToken: cancellationToken);
 
     /// <inheritdoc />
     [Obsolete("Use the overload that takes an includeDescendants parameter instead. Scheduled for removal in Umbraco 19.")]
@@ -350,11 +361,20 @@ internal sealed class ContentEditingService
 
     /// <inheritdoc />
     public async Task<Attempt<IContent?, ContentEditingOperationStatus>> RestoreAsync(Guid key, Guid? parentKey, Guid userKey, bool includeDescendants)
-        => await HandleMoveAsync(key, parentKey, userKey, true, includeDescendants);
+        => await RestoreAsync(key, parentKey, userKey, includeDescendants, CancellationToken.None);
 
     /// <inheritdoc />
+    public async Task<Attempt<IContent?, ContentEditingOperationStatus>> RestoreAsync(Guid key, Guid? parentKey, Guid userKey, bool includeDescendants, CancellationToken cancellationToken)
+        => await HandleMoveAsync(key, parentKey, userKey, true, includeDescendants, cancellationToken);
+
+    /// <inheritdoc />
+    [Obsolete("Use the overload that takes a CancellationToken instead. Scheduled for removal in Umbraco 19.")]
     public async Task<Attempt<IContent?, ContentEditingOperationStatus>> CopyAsync(Guid key, Guid? parentKey, bool relateToOriginal, bool includeDescendants, Guid userKey)
-        => await HandleCopyAsync(key, parentKey, relateToOriginal, includeDescendants, userKey);
+        => await CopyAsync(key, parentKey, relateToOriginal, includeDescendants, userKey, CancellationToken.None);
+
+    /// <inheritdoc />
+    public async Task<Attempt<IContent?, ContentEditingOperationStatus>> CopyAsync(Guid key, Guid? parentKey, bool relateToOriginal, bool includeDescendants, Guid userKey, CancellationToken cancellationToken)
+        => await HandleCopyAsync(key, parentKey, relateToOriginal, includeDescendants, userKey, cancellationToken);
 
     /// <inheritdoc />
     public async Task<ContentEditingOperationStatus> SortAsync(
@@ -410,18 +430,19 @@ internal sealed class ContentEditingService
         => new Content(name, parentId, contentType);
 
     /// <inheritdoc />
-    protected override OperationResult? Move(IContent content, int newParentId, bool includeDescendants, int userId)
-        => ContentService.Move(content, newParentId, includeDescendants, userId);
+    protected override OperationResult? Move(IContent content, int newParentId, bool includeDescendants, int userId, CancellationToken cancellationToken)
+        => ContentService.Move(content, newParentId, includeDescendants, cancellationToken, userId);
 
     /// <inheritdoc />
-    protected override IContent? Copy(IContent content, int newParentId, bool relateToOriginal, bool includeDescendants, int userId)
-        => ContentService.Copy(content, newParentId, relateToOriginal, includeDescendants, userId);
+    protected override IContent? Copy(IContent content, int newParentId, bool relateToOriginal, bool includeDescendants, int userId, CancellationToken cancellationToken)
+        => ContentService.Copy(content, newParentId, relateToOriginal, includeDescendants, cancellationToken, userId);
 
     /// <inheritdoc />
-    protected override OperationResult? MoveToRecycleBin(IContent content, int userId) => ContentService.MoveToRecycleBin(content, userId);
+    protected override OperationResult? MoveToRecycleBin(IContent content, int userId, CancellationToken cancellationToken)
+        => ContentService.MoveToRecycleBin(content, cancellationToken, userId);
 
     /// <inheritdoc />
-    protected override OperationResult? Delete(IContent content, int userId) => ContentService.Delete(content, userId);
+    protected override OperationResult? Delete(IContent content, int userId, CancellationToken cancellationToken) => ContentService.Delete(content, userId);
 
     /// <inheritdoc />
     protected override IEnumerable<IContent> GetPagedChildren(int parentId, int pageIndex, int pageSize, Ordering? ordering, out long total)
