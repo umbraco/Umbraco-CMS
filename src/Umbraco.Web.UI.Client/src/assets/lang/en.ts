@@ -2982,10 +2982,10 @@ export default {
 			'Document Blueprints are pre-defined content that can be selected when creating a new content node.',
 		createHeadline: 'How do I create a Document Blueprint?',
 		createDescription:
-			'<p>There are two ways to create a Document Blueprint:</p><ul><li>Right-click a content node and select "Create Document Blueprint" to create a new Document Blueprint.</li><li>Right-click the Document Blueprints tree in the Settings section and select the Document Type you want to create a Document Blueprint for.</li></ul><p>Once given a name, editors can start using the Document Blueprint as a foundation for their new page.</p>',
+			'<p>There are two ways to create a Document Blueprint:</p><ul><li>Right-click a content node and select "Create Document Blueprint" to create a new Document Blueprint.</li><li>Right-click the Document Blueprints tree in the Library section and select the Document Type you want to create a Document Blueprint for.</li></ul><p>Once given a name, editors can start using the Document Blueprint as a foundation for their new page.</p>',
 		manageHeadline: 'How do I manage Document Blueprints?',
 		manageDescription:
-			'You can edit and delete Document Blueprints from the "Document Blueprints" tree in the Settings section. Expand the Document Type which the Document Blueprint is based on and click it to edit or delete it.',
+			'You can edit and delete Document Blueprints from the "Document Blueprints" tree in the Library section. Expand the Document Type which the Document Blueprint is based on and click it to edit or delete it.',
 	},
 	preview: {
 		endLabel: 'Exit',

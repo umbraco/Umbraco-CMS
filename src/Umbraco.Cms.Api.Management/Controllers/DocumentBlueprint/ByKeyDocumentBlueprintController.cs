@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.DocumentBlueprint;
 /// Controller for managing document blueprints identified by their unique key.
 /// </summary>
 [ApiVersion("1.0")]
-[Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentsOrDocumentTypes)]
+[Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentsOrDocumentBlueprints)]
 public class ByKeyDocumentBlueprintController : DocumentBlueprintControllerBase
 {
     private readonly IContentBlueprintEditingService _contentBlueprintEditingService;

@@ -6,10 +6,12 @@ export class DocumentBlueprintUiHelper extends UiBaseLocators{
   private readonly documentBlueprintTree: Locator;
   private readonly documentBlueprintNameTxt: Locator;
   private readonly deleteMenu: Locator;
+  private readonly documentBlueprintSidebarHeader: Locator;
 
   constructor(page: Page) {
     super(page);
     this.documentBlueprintTree = page.locator('umb-tree[alias="Umb.Tree.DocumentBlueprint"]');
+    this.documentBlueprintSidebarHeader = page.locator('[data-mark="section-sidebar-app:Umb.SidebarMenu.DocumentBlueprint"]');
     this.documentBlueprintNameTxt = page.locator('#name-input #input');
     this.deleteMenu = page.locator('umb-section-sidebar #menu-item').getByLabel('Delete');
   }
@@ -19,11 +21,7 @@ export class DocumentBlueprintUiHelper extends UiBaseLocators{
   }
 
   async clickActionsMenuAtRoot() {
-    await this.clickActionsMenuForDocumentBlueprints('Document Blueprints');
-  }
-
-  async clickRootFolderCaretButton() {
-    await this.openCaretButtonForName('Document Blueprints');
+    await this.click(this.documentBlueprintSidebarHeader.getByTestId('open-dropdown'), {force: true});
   }
 
   async clickSaveButtonAndWaitForDocumentBlueprintToBeCreated() {
@@ -35,11 +33,12 @@ export class DocumentBlueprintUiHelper extends UiBaseLocators{
   }
 
   async reloadDocumentBlueprintsTree() {
-    await this.reloadTree('Document Blueprints');
+    await this.clickActionsMenuAtRoot();
+    await this.clickReloadChildrenActionMenuOption();
   }
 
   async goToDocumentBlueprint(blueprintName: string) {
-    await this.goToSection(ConstantHelper.sections.settings);
+    await this.goToSection(ConstantHelper.sections.library);
     await this.reloadDocumentBlueprintsTree();
     await this.clickTreeItemWithName(blueprintName);
   }
