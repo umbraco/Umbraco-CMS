@@ -440,17 +440,6 @@ export class UmbPropertyElement extends UmbLitElement {
 		this.#validationMessageBinder = undefined;
 	}
 
-	/**
-	 * (Re)binds the form control validator and server-validation message binder to the current element and `dataPath`.
-	 *
-	 * Called eagerly from the `dataPath` setter on every change, and again from `_gotEditorUI()` once a (possibly
-	 * brand new) element is in place. For a Property Editor UI that hasn't declared `meta.supportVariantChange`, a
-	 * variant switch drives `#reinitializeEditorElement()`, which replaces the element outright — so it's the call
-	 * from `_gotEditorUI()` that ends up binding against the value for the new `dataPath`. For one that has declared
-	 * it keeps itself up to date on its own, the existing element is left in place, and the eager call from the
-	 * `dataPath` setter is what re-binds validation ahead of the corresponding value, which arrives asynchronously.
-	 * [NL]
-	 */
 	#setupControlValidation(): void {
 		this.#dismantleControlValidation();
 		if (!this._element || !('checkValidity' in this._element)) return;
