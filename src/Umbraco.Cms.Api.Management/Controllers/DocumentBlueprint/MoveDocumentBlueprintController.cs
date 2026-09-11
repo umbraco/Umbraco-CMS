@@ -31,6 +31,7 @@ public class MoveDocumentBlueprintController : DocumentBlueprintControllerBase
     /// </summary>
     /// <param name="contentBlueprintEditingService">The service used to edit content blueprints. This dependency is injected.</param>
     /// <param name="backOfficeSecurityAccessor">Provides access to back office security information. This dependency is injected.</param>
+    /// <param name="authorizationService">The authorization service.</param>
     [ActivatorUtilitiesConstructor]
     public MoveDocumentBlueprintController(
         IContentBlueprintEditingService contentBlueprintEditingService,
@@ -42,6 +43,11 @@ public class MoveDocumentBlueprintController : DocumentBlueprintControllerBase
         _authorizationService = authorizationService;
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MoveDocumentBlueprintController"/> class.
+    /// </summary>
+    /// <param name="contentBlueprintEditingService">The service used to edit content blueprints. This dependency is injected.</param>
+    /// <param name="backOfficeSecurityAccessor">Provides access to back office security information. This dependency is injected.</param>
     [Obsolete("Use the constructor with all parameters. Scheduled for removal in Umbraco 21.")]
     public MoveDocumentBlueprintController(IContentBlueprintEditingService contentBlueprintEditingService, IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
         : this(

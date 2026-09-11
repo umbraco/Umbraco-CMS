@@ -18,6 +18,14 @@ internal sealed class DocumentBlueprintStartNodeTreeFilterService : UserStartNod
     private readonly IEntityService _entityService;
     private readonly AppCaches _appCaches;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DocumentBlueprintStartNodeTreeFilterService"/> class.
+    /// </summary>
+    /// <param name="userStartNodeEntitiesService">The service used to resolve start node entities.</param>
+    /// <param name="dataTypeService">The data type service.</param>
+    /// <param name="backOfficeSecurityAccessor">Accessor for the back office security context.</param>
+    /// <param name="entityService">The entity service.</param>
+    /// <param name="appCaches">The application caches.</param>
     public DocumentBlueprintStartNodeTreeFilterService(
         IUserStartNodeEntitiesService userStartNodeEntitiesService,
         IDataTypeService dataTypeService,
