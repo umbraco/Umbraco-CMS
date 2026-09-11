@@ -10,8 +10,8 @@ import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
 export class UmbInputDocumentBlueprintElement extends UmbFormControlMixin<
 	string | undefined,
 	typeof UmbLitElement
->(UmbLitElement, undefined) {
-	#dataSourceApi = new UmbDocumentBlueprintTreePickerDataSource(this);
+>(UmbLitElement) {
+	readonly #dataSourceApi = new UmbDocumentBlueprintTreePickerDataSource(this);
 
 	@property({ type: Boolean })
 	folderOnly = false;
