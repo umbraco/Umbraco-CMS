@@ -31,6 +31,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'propertyAction',
 		kind: 'pasteFromClipboard',
+		api: () => import('../../block/property-actions/block-paste-from-clipboard.js'),
 		alias: 'Umb.PropertyAction.BlockSingle.Clipboard.Paste',
 		name: 'Block Single Paste From Clipboard Property Action',
 		forPropertyEditorUis,
