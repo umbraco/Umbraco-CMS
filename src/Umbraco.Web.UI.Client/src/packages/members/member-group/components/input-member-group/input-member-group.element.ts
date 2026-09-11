@@ -212,7 +212,7 @@ export class UmbInputMemberGroupElement extends UmbFormControlMixin<string, type
 									?error=${true}
 									.errorMessage=${status.state.error}
 									.errorDetail=${unique}
-									?readonly=${this.readonly}
+									readonly
 									?standalone=${this.max === 1}>
 									${when(
 										!this.readonly,
