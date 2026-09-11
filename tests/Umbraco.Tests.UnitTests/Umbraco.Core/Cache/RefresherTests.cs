@@ -22,9 +22,9 @@ public class RefresherTests
         var json = JsonSerializer.Serialize(source);
         var payload = JsonSerializer.Deserialize<MediaCacheRefresher.JsonPayload[]>(json);
 
-        Assert.AreEqual(source[0].Id, payload[0].Id);
-        Assert.AreEqual(source[0].Key, payload[0].Key);
-        Assert.AreEqual(source[0].ChangeTypes, payload[0].ChangeTypes);
+        Assert.That(payload[0].Id, Is.EqualTo(source[0].Id));
+        Assert.That(payload[0].Key, Is.EqualTo(source[0].Key));
+        Assert.That(payload[0].ChangeTypes, Is.EqualTo(source[0].ChangeTypes));
     }
 
     [TestCase(TreeChangeTypes.None, false)]
@@ -49,12 +49,12 @@ public class RefresherTests
         var json = JsonSerializer.Serialize(source);
         var payload = JsonSerializer.Deserialize<ContentCacheRefresher.JsonPayload[]>(json);
 
-        Assert.AreEqual(1234, payload[0].Id);
-        Assert.AreEqual(key, payload[0].Key);
-        Assert.AreEqual(changeTypes, payload[0].ChangeTypes);
-        Assert.AreEqual(blueprint, payload[0].Blueprint);
-        Assert.IsNull(payload[0].PublishedCultures);
-        Assert.IsNull(payload[0].UnpublishedCultures);
+        Assert.That(payload[0].Id, Is.EqualTo(1234));
+        Assert.That(payload[0].Key, Is.EqualTo(key));
+        Assert.That(payload[0].ChangeTypes, Is.EqualTo(changeTypes));
+        Assert.That(payload[0].Blueprint, Is.EqualTo(blueprint));
+        Assert.That(payload[0].PublishedCultures, Is.Null);
+        Assert.That(payload[0].UnpublishedCultures, Is.Null);
     }
 
     [Test]
@@ -75,19 +75,19 @@ public class RefresherTests
         var json = JsonSerializer.Serialize(source);
         var payload = JsonSerializer.Deserialize<ContentCacheRefresher.JsonPayload[]>(json);
 
-        Assert.IsNotNull(payload[0].PublishedCultures);
+        Assert.That(payload[0].PublishedCultures, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(2, payload[0].PublishedCultures.Length);
-            Assert.AreEqual("en-US", payload[0].PublishedCultures.First());
-            Assert.AreEqual("da-DK", payload[0].PublishedCultures.Last());
+            Assert.That(payload[0].PublishedCultures, Has.Length.EqualTo(2));
+            Assert.That(payload[0].PublishedCultures.First(), Is.EqualTo("en-US"));
+            Assert.That(payload[0].PublishedCultures.Last(), Is.EqualTo("da-DK"));
         });
 
-        Assert.IsNotNull(payload[0].UnpublishedCultures);
+        Assert.That(payload[0].UnpublishedCultures, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(1, payload[0].UnpublishedCultures.Length);
-            Assert.AreEqual("de-DE", payload[0].UnpublishedCultures.First());
+            Assert.That(payload[0].UnpublishedCultures, Has.Length.EqualTo(1));
+            Assert.That(payload[0].UnpublishedCultures.First(), Is.EqualTo("de-DE"));
         });
     }
 
@@ -107,11 +107,11 @@ public class RefresherTests
         var json = JsonSerializer.Serialize(source);
         var payload = JsonSerializer.Deserialize<ElementCacheRefresher.JsonPayload[]>(json);
 
-        Assert.AreEqual(1234, payload[0].Id);
-        Assert.AreEqual(key, payload[0].Key);
-        Assert.AreEqual(changeTypes, payload[0].ChangeTypes);
-        Assert.IsNull(payload[0].PublishedCultures);
-        Assert.IsNull(payload[0].UnpublishedCultures);
+        Assert.That(payload[0].Id, Is.EqualTo(1234));
+        Assert.That(payload[0].Key, Is.EqualTo(key));
+        Assert.That(payload[0].ChangeTypes, Is.EqualTo(changeTypes));
+        Assert.That(payload[0].PublishedCultures, Is.Null);
+        Assert.That(payload[0].UnpublishedCultures, Is.Null);
     }
 
     [Test]
@@ -130,19 +130,19 @@ public class RefresherTests
         var json = JsonSerializer.Serialize(source);
         var payload = JsonSerializer.Deserialize<ElementCacheRefresher.JsonPayload[]>(json);
 
-        Assert.IsNotNull(payload[0].PublishedCultures);
+        Assert.That(payload[0].PublishedCultures, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(2, payload[0].PublishedCultures.Length);
-            Assert.AreEqual("en-US", payload[0].PublishedCultures.First());
-            Assert.AreEqual("da-DK", payload[0].PublishedCultures.Last());
+            Assert.That(payload[0].PublishedCultures, Has.Length.EqualTo(2));
+            Assert.That(payload[0].PublishedCultures.First(), Is.EqualTo("en-US"));
+            Assert.That(payload[0].PublishedCultures.Last(), Is.EqualTo("da-DK"));
         });
 
-        Assert.IsNotNull(payload[0].UnpublishedCultures);
+        Assert.That(payload[0].UnpublishedCultures, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(1, payload[0].UnpublishedCultures.Length);
-            Assert.AreEqual("de-DE", payload[0].UnpublishedCultures.First());
+            Assert.That(payload[0].UnpublishedCultures, Has.Length.EqualTo(1));
+            Assert.That(payload[0].UnpublishedCultures.First(), Is.EqualTo("de-DE"));
         });
     }
 
@@ -158,15 +158,15 @@ public class RefresherTests
         var json = JsonSerializer.Serialize(source);
         var payload = JsonSerializer.Deserialize<ContentTypeCacheRefresher.JsonPayload[]>(json);
 
-        Assert.AreEqual(source[0].ItemType, payload[0].ItemType);
-        Assert.AreEqual(source[0].Id, payload[0].Id);
-        Assert.AreEqual(source[0].ChangeTypes, payload[0].ChangeTypes);
+        Assert.That(payload[0].ItemType, Is.EqualTo(source[0].ItemType));
+        Assert.That(payload[0].Id, Is.EqualTo(source[0].Id));
+        Assert.That(payload[0].ChangeTypes, Is.EqualTo(source[0].ChangeTypes));
 
         // IsElement drives which cache service a content type change is routed to, and on subscriber servers
         // the payload only ever arrives via this JSON round trip.
-        Assert.IsFalse(payload[0].IsElement);
-        Assert.AreEqual(source[1].Id, payload[1].Id);
-        Assert.IsTrue(payload[1].IsElement);
+        Assert.That(payload[0].IsElement, Is.False);
+        Assert.That(payload[1].Id, Is.EqualTo(source[1].Id));
+        Assert.That(payload[1].IsElement, Is.True);
     }
 
     [Test]
@@ -180,9 +180,9 @@ public class RefresherTests
         var json = JsonSerializer.Serialize(source);
         var payload = JsonSerializer.Deserialize<DataTypeCacheRefresher.JsonPayload[]>(json);
 
-        Assert.AreEqual(source[0].Id, payload[0].Id);
-        Assert.AreEqual(source[0].Key, payload[0].Key);
-        Assert.AreEqual(source[0].Removed, payload[0].Removed);
+        Assert.That(payload[0].Id, Is.EqualTo(source[0].Id));
+        Assert.That(payload[0].Key, Is.EqualTo(source[0].Key));
+        Assert.That(payload[0].Removed, Is.EqualTo(source[0].Removed));
     }
 
     [Test]
@@ -196,7 +196,7 @@ public class RefresherTests
         var json = JsonSerializer.Serialize(source);
         var payload = JsonSerializer.Deserialize<DomainCacheRefresher.JsonPayload[]>(json);
 
-        Assert.AreEqual(source[0].Id, payload[0].Id);
-        Assert.AreEqual(source[0].ChangeType, payload[0].ChangeType);
+        Assert.That(payload[0].Id, Is.EqualTo(source[0].Id));
+        Assert.That(payload[0].ChangeType, Is.EqualTo(source[0].ChangeType));
     }
 }

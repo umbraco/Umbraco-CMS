@@ -382,7 +382,7 @@ public class ExplicitSegmentSearchTests : SearcherTestBase
             take: 100);
 
         Assert.That(results.Total, Is.EqualTo(2), "Should fall back to null segment when explicit segment has no match in range");
-        CollectionAssert.AreEquivalent(new[] { DocumentWithAllSegmentsKey, DocumentWithOverlappingValuesKey }, results.Documents.Select(d => d.Id));
+        Assert.That(results.Documents.Select(d => d.Id), Is.EquivalentTo(new[] { DocumentWithAllSegmentsKey, DocumentWithOverlappingValuesKey }));
     }
 
     [TestCase(true, "en-US", "segment-1")]
@@ -406,7 +406,7 @@ public class ExplicitSegmentSearchTests : SearcherTestBase
             take: 100);
 
         Assert.That(results.Total, Is.EqualTo(2), "Same document should only appear once even if both segment and null-segment values match");
-        CollectionAssert.AreEquivalent(new[] { DocumentWithAllSegmentsKey, DocumentWithOverlappingValuesKey }, results.Documents.Select(d => d.Id));
+        Assert.That(results.Documents.Select(d => d.Id), Is.EquivalentTo(new[] { DocumentWithAllSegmentsKey, DocumentWithOverlappingValuesKey }));
     }
 
     [TestCase(true, "en-US")]

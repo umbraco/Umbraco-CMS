@@ -26,31 +26,31 @@ public class TemplateTests
 
         var clone = (Template)template.DeepClone();
 
-        Assert.AreNotSame(clone, template);
-        Assert.AreEqual(clone, template);
-        Assert.AreEqual(clone.Path, template.Path);
-        Assert.AreEqual(clone.IsLayoutTemplate, template.IsLayoutTemplate);
-        Assert.AreEqual(clone.CreateDate, template.CreateDate);
-        Assert.AreEqual(clone.Alias, template.Alias);
-        Assert.AreEqual(clone.Id, template.Id);
-        Assert.AreEqual(clone.Key, template.Key);
-        Assert.AreEqual(clone.LayoutTemplateAlias, template.LayoutTemplateAlias);
-        Assert.AreEqual(clone.LayoutTemplateId.Value, ((Template)template).LayoutTemplateId.Value);
-        Assert.AreEqual(clone.Name, template.Name);
-        Assert.AreEqual(clone.UpdateDate, template.UpdateDate);
+        Assert.That(template, Is.Not.SameAs(clone));
+        Assert.That(template, Is.EqualTo(clone));
+        Assert.That(template.Path, Is.EqualTo(clone.Path));
+        Assert.That(template.IsLayoutTemplate, Is.EqualTo(clone.IsLayoutTemplate));
+        Assert.That(template.CreateDate, Is.EqualTo(clone.CreateDate));
+        Assert.That(template.Alias, Is.EqualTo(clone.Alias));
+        Assert.That(template.Id, Is.EqualTo(clone.Id));
+        Assert.That(template.Key, Is.EqualTo(clone.Key));
+        Assert.That(template.LayoutTemplateAlias, Is.EqualTo(clone.LayoutTemplateAlias));
+        Assert.That(((Template)template).LayoutTemplateId.Value, Is.EqualTo(clone.LayoutTemplateId.Value));
+        Assert.That(template.Name, Is.EqualTo(clone.Name));
+        Assert.That(template.UpdateDate, Is.EqualTo(clone.UpdateDate));
 
         // clone.Content should be null but getting it would lazy-load
         var type = clone.GetType();
         var contentField = type.BaseType.GetField("_content", BindingFlags.Instance | BindingFlags.NonPublic);
         var value = contentField.GetValue(clone);
-        Assert.IsNull(value);
+        Assert.That(value, Is.Null);
 
         // this double verifies by reflection
         // need to exclude content else it would lazy-load
         var allProps = clone.GetType().GetProperties();
         foreach (var propertyInfo in allProps.Where(x => x.Name != "Content"))
         {
-            Assert.AreEqual(propertyInfo.GetValue(clone, null), propertyInfo.GetValue(template, null));
+            Assert.That(propertyInfo.GetValue(template, null), Is.EqualTo(propertyInfo.GetValue(clone, null)));
         }
     }
 

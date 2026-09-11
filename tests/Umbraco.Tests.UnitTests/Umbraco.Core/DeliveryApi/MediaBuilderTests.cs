@@ -26,15 +26,15 @@ public class MediaBuilderTests : DeliveryApiTests
 
         var builder = new ApiMediaBuilder(new ApiContentNameProvider(), SetupMediaUrlProvider(), Mock.Of<IPublishedValueFallback>(), CreateOutputExpansionStrategyAccessor());
         var result = builder.Build(media);
-        Assert.NotNull(result);
-        Assert.AreEqual("The media", result.Name);
-        Assert.AreEqual("theMediaType", result.MediaType);
-        Assert.AreEqual("media-url:media-url-segment", result.Url);
-        Assert.AreEqual(key, result.Id);
-        Assert.AreEqual(111, result.Width);
-        Assert.AreEqual(222, result.Height);
-        Assert.AreEqual(".my-ext", result.Extension);
-        Assert.AreEqual(333, result.Bytes);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Name, Is.EqualTo("The media"));
+        Assert.That(result.MediaType, Is.EqualTo("theMediaType"));
+        Assert.That(result.Url, Is.EqualTo("media-url:media-url-segment"));
+        Assert.That(result.Id, Is.EqualTo(key));
+        Assert.That(result.Width, Is.EqualTo(111));
+        Assert.That(result.Height, Is.EqualTo(222));
+        Assert.That(result.Extension, Is.EqualTo(".my-ext"));
+        Assert.That(result.Bytes, Is.EqualTo(333));
     }
 
     [Test]
@@ -47,8 +47,8 @@ public class MediaBuilderTests : DeliveryApiTests
 
         var builder = new ApiMediaBuilder(new ApiContentNameProvider(), SetupMediaUrlProvider(), Mock.Of<IPublishedValueFallback>(), CreateOutputExpansionStrategyAccessor());
         var result = builder.Build(media);
-        Assert.NotNull(result);
-        Assert.IsEmpty(result.Properties);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Properties, Is.Empty);
     }
 
     [Test]
@@ -61,10 +61,10 @@ public class MediaBuilderTests : DeliveryApiTests
 
         var builder = new ApiMediaBuilder(new ApiContentNameProvider(), SetupMediaUrlProvider(), Mock.Of<IPublishedValueFallback>(), CreateOutputExpansionStrategyAccessor());
         var result = builder.Build(media);
-        Assert.NotNull(result);
-        Assert.AreEqual(2, result.Properties.Count);
-        Assert.AreEqual(123, result.Properties["myProperty"]);
-        Assert.AreEqual("A value goes here", result.Properties["anotherProperty"]);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Properties, Has.Count.EqualTo(2));
+        Assert.That(result.Properties["myProperty"], Is.EqualTo(123));
+        Assert.That(result.Properties["anotherProperty"], Is.EqualTo("A value goes here"));
     }
 
     private IPublishedContent SetupMedia(Guid key, string name, Dictionary<string, object> properties)

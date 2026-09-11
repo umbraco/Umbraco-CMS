@@ -110,16 +110,16 @@ internal sealed class MediaRepositoryTest : UmbracoIntegrationTest
 
         // Initial and subsequent requests should use the cache, since the cache by Id and Key was populated on save.
         repository.Get(media.Id);
-        Assert.AreEqual(0, database.SqlCount);
+        Assert.That(database.SqlCount, Is.EqualTo(0));
 
         repository.Get(media.Id);
-        Assert.AreEqual(0, database.SqlCount);
+        Assert.That(database.SqlCount, Is.EqualTo(0));
 
         repository.Get(media.Key);
-        Assert.AreEqual(0, database.SqlCount);
+        Assert.That(database.SqlCount, Is.EqualTo(0));
 
         repository.Get(media.Key);
-        Assert.AreEqual(0, database.SqlCount);
+        Assert.That(database.SqlCount, Is.EqualTo(0));
     }
 
     [Test]
@@ -149,7 +149,7 @@ internal sealed class MediaRepositoryTest : UmbracoIntegrationTest
 
         // Initial request by ID should hit the database.
         repository.Get(media.Id);
-        Assert.Greater(database.SqlCount, 0);
+        Assert.That(database.SqlCount, Is.GreaterThan(0));
 
         // Reset counter.
         database.EnableSqlCount = false;
@@ -157,10 +157,10 @@ internal sealed class MediaRepositoryTest : UmbracoIntegrationTest
 
         // Subsequent requests should use the cache, since the cache by Id and Key was populated on retrieval.
         repository.Get(media.Id);
-        Assert.AreEqual(0, database.SqlCount);
+        Assert.That(database.SqlCount, Is.EqualTo(0));
 
         repository.Get(media.Key);
-        Assert.AreEqual(0, database.SqlCount);
+        Assert.That(database.SqlCount, Is.EqualTo(0));
     }
 
     [Test]
@@ -190,7 +190,7 @@ internal sealed class MediaRepositoryTest : UmbracoIntegrationTest
 
         // Initial request by key should hit the database.
         repository.Get(media.Key);
-        Assert.Greater(database.SqlCount, 0);
+        Assert.That(database.SqlCount, Is.GreaterThan(0));
 
         // Reset counter.
         database.EnableSqlCount = false;
@@ -198,10 +198,10 @@ internal sealed class MediaRepositoryTest : UmbracoIntegrationTest
 
         // Subsequent requests should use the cache, since the cache by Id and Key was populated on retrieval.
         repository.Get(media.Key);
-        Assert.AreEqual(0, database.SqlCount);
+        Assert.That(database.SqlCount, Is.EqualTo(0));
 
         repository.Get(media.Id);
-        Assert.AreEqual(0, database.SqlCount);
+        Assert.That(database.SqlCount, Is.EqualTo(0));
     }
 
     private Media CreateMedia(MediaRepository repository, MediaTypeRepository mediaTypeRepository)
@@ -354,10 +354,10 @@ internal sealed class MediaRepositoryTest : UmbracoIntegrationTest
             int updatedDeleteCount = repository.GetAllVersions(media.Id).Count();
 
             // Assert
-            Assert.That(initialCount == 1);
-            Assert.That(initialDeleteCount == initialCount);
-            Assert.That(updatedCount == 1); // media has no unpublished state and therefore only one Version
-            Assert.That(updatedDeleteCount == initialCount);
+            Assert.That(initialCount, Is.EqualTo(1));
+            Assert.That(initialDeleteCount, Is.EqualTo(initialCount));
+            Assert.That(updatedCount, Is.EqualTo(1)); // media has no unpublished state and therefore only one Version
+            Assert.That(updatedDeleteCount, Is.EqualTo(initialCount));
         }
     }
 
@@ -689,7 +689,7 @@ internal sealed class MediaRepositoryTest : UmbracoIntegrationTest
         var guidRepo = (IReadRepository<Guid, IMedia>)repository;
 
         var result = guidRepo.GetMany().ToArray();
-        Assert.IsNotEmpty(result);
+        Assert.That(result, Is.Not.Empty);
         Assert.That(result.Any(m => m.Key == media.Key));
     }
 

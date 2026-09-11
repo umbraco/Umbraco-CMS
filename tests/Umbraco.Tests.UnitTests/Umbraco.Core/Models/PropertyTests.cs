@@ -27,19 +27,19 @@ public class PropertyTests
 
         var clone = (Property)property.DeepClone();
 
-        Assert.AreNotSame(clone, property);
-        Assert.AreNotSame(clone.Values, property.Values);
-        Assert.AreNotSame(property.PropertyType, clone.PropertyType);
+        Assert.That(property, Is.Not.SameAs(clone));
+        Assert.That(property.Values, Is.Not.SameAs(clone.Values));
+        Assert.That(clone.PropertyType, Is.Not.SameAs(property.PropertyType));
         for (var i = 0; i < property.Values.Count; i++)
         {
-            Assert.AreNotSame(property.Values.ElementAt(i), clone.Values.ElementAt(i));
+            Assert.That(clone.Values.ElementAt(i), Is.Not.SameAs(property.Values.ElementAt(i)));
         }
 
         // This double verifies by reflection
         var allProps = clone.GetType().GetProperties();
         foreach (var propertyInfo in allProps)
         {
-            Assert.AreEqual(propertyInfo.GetValue(clone, null), propertyInfo.GetValue(property, null));
+            Assert.That(propertyInfo.GetValue(property, null), Is.EqualTo(propertyInfo.GetValue(clone, null)));
         }
     }
 

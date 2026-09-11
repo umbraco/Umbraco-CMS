@@ -20,7 +20,7 @@ public class DefaultDatabaseAvailabilityCheckTests
 
         var sut = CreateDefaultDatabaseAvailabilityCheck();
         var result = sut.IsDatabaseAvailable(mockDatabaseFactory.Object);
-        Assert.IsFalse(result);
+        Assert.That(result, Is.False);
     }
 
     [Test]
@@ -33,7 +33,7 @@ public class DefaultDatabaseAvailabilityCheckTests
 
         var sut = CreateDefaultDatabaseAvailabilityCheck();
         var result = sut.IsDatabaseAvailable(mockDatabaseFactory.Object);
-        Assert.IsTrue(result);
+        Assert.That(result, Is.True);
     }
 
     [TestCase(5, true)]
@@ -60,7 +60,7 @@ public class DefaultDatabaseAvailabilityCheckTests
 
         var sut = CreateDefaultDatabaseAvailabilityCheck();
         var result = sut.IsDatabaseAvailable(mockDatabaseFactory.Object);
-        Assert.AreEqual(expectedResult, result);
+        Assert.That(result, Is.EqualTo(expectedResult));
     }
 
     private static DefaultDatabaseAvailabilityCheck CreateDefaultDatabaseAvailabilityCheck()

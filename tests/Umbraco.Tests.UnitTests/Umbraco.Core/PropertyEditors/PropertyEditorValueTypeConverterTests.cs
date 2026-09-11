@@ -30,11 +30,11 @@ public class PropertyEditorValueTypeConverterTests
             var converter = new DateTimeValueTypeConverter(ValueTypePropertyEditorCollection(valueType));
             var propertyType = PropertyType();
 
-            Assert.IsTrue(converter.IsConverter(propertyType));
+            Assert.That(converter.IsConverter(propertyType), Is.True);
 
             var result = converter.ConvertSourceToIntermediate(null, propertyType, date, false);
 
-            Assert.AreEqual(expectedResult, result);
+            Assert.That(result, Is.EqualTo(expectedResult));
         }
     }
 
@@ -54,11 +54,11 @@ public class PropertyEditorValueTypeConverterTests
         var converter = new DecimalValueTypeConverter(propertyEditors);
         var inter = converter.ConvertSourceToIntermediate(Mock.Of<IPublishedElement>(), propertyType, value, false);
 
-        Assert.IsTrue(converter.IsConverter(propertyType));
+        Assert.That(converter.IsConverter(propertyType), Is.True);
 
         var result = converter.ConvertIntermediateToObject(Mock.Of<IPublishedElement>(), propertyType, PropertyCacheLevel.Element, inter, false);
-        Assert.IsTrue(result is decimal);
-        Assert.AreEqual(expected, result);
+        Assert.That(result is decimal, Is.True);
+        Assert.That(result, Is.EqualTo(expected));
     }
 
     [TestCase("100", 100)]
@@ -77,11 +77,11 @@ public class PropertyEditorValueTypeConverterTests
         var converter = new IntegerValueTypeConverter(propertyEditors);
         var inter = converter.ConvertSourceToIntermediate(Mock.Of<IPublishedElement>(), propertyType, value, false);
 
-        Assert.IsTrue(converter.IsConverter(propertyType));
+        Assert.That(converter.IsConverter(propertyType), Is.True);
 
         var result = converter.ConvertIntermediateToObject(Mock.Of<IPublishedElement>(), propertyType, PropertyCacheLevel.Element, inter, false);
-        Assert.IsTrue(result is int);
-        Assert.AreEqual(expected, result);
+        Assert.That(result is int, Is.True);
+        Assert.That(result, Is.EqualTo(expected));
     }
 
     [TestCase("100", 100)]
@@ -100,11 +100,11 @@ public class PropertyEditorValueTypeConverterTests
         var converter = new BigintValueTypeConverter(propertyEditors);
         var inter = converter.ConvertSourceToIntermediate(Mock.Of<IPublishedElement>(), propertyType, value, false);
 
-        Assert.IsTrue(converter.IsConverter(propertyType));
+        Assert.That(converter.IsConverter(propertyType), Is.True);
 
         var result = converter.ConvertIntermediateToObject(Mock.Of<IPublishedElement>(), propertyType, PropertyCacheLevel.Element, inter, false);
-        Assert.IsTrue(result is long);
-        Assert.AreEqual(expected, result);
+        Assert.That(result is long, Is.True);
+        Assert.That(result, Is.EqualTo(expected));
     }
 
     [TestCase("100", "100")]
@@ -125,10 +125,10 @@ public class PropertyEditorValueTypeConverterTests
             var converter = new TextStringValueTypeConverter(propertyEditors);
             var inter = converter.ConvertSourceToIntermediate(Mock.Of<IPublishedElement>(), propertyType, value, false);
 
-            Assert.IsTrue(converter.IsConverter(propertyType));
+            Assert.That(converter.IsConverter(propertyType), Is.True);
 
             var result = converter.ConvertIntermediateToObject(Mock.Of<IPublishedElement>(), propertyType, PropertyCacheLevel.Element, inter, false);
-            Assert.AreEqual(expected, result);
+            Assert.That(result, Is.EqualTo(expected));
         }
     }
 
@@ -148,10 +148,10 @@ public class PropertyEditorValueTypeConverterTests
         var converter = new TimeValueTypeConverter(propertyEditors);
         var propertyType = PropertyType();
 
-        Assert.IsTrue(converter.IsConverter(propertyType));
+        Assert.That(converter.IsConverter(propertyType), Is.True);
 
         var result = converter.ConvertSourceToIntermediate(null, propertyType, sourceValue, false);
-        Assert.AreEqual(expectedResult, result);
+        Assert.That(result, Is.EqualTo(expectedResult));
     }
 
     [TestCase("<root>test</root>", true)]
@@ -167,17 +167,17 @@ public class PropertyEditorValueTypeConverterTests
         var converter = new XmlValueTypeConverter(propertyEditors);
         var propertyType = PropertyType();
 
-        Assert.IsTrue(converter.IsConverter(propertyType));
+        Assert.That(converter.IsConverter(propertyType), Is.True);
 
         var result = converter.ConvertSourceToIntermediate(null, propertyType, value, false) as XDocument;
         if (expectsSuccess)
         {
-            Assert.IsNotNull(result);
-            Assert.AreEqual(value, result.ToString(SaveOptions.DisableFormatting));
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.ToString(SaveOptions.DisableFormatting), Is.EqualTo(value));
         }
         else
         {
-            Assert.IsNull(result);
+            Assert.That(result, Is.Null);
         }
     }
 
@@ -194,17 +194,17 @@ public class PropertyEditorValueTypeConverterTests
         var converter = new JsonValueConverter(propertyEditors, Mock.Of<ILogger<JsonValueConverter>>());
         var propertyType = PropertyType();
 
-        Assert.IsTrue(converter.IsConverter(propertyType));
+        Assert.That(converter.IsConverter(propertyType), Is.True);
 
         var result = converter.ConvertSourceToIntermediate(null, propertyType, source, false) as JsonDocument;
         if (expectsSuccess)
         {
-            Assert.IsNotNull(result);
-            Assert.AreEqual(source, result.RootElement.ToString());
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.RootElement.ToString(), Is.EqualTo(source));
         }
         else
         {
-            Assert.IsNull(result);
+            Assert.That(result, Is.Null);
         }
     }
 

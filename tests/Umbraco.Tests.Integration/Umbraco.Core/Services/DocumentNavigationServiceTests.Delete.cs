@@ -25,17 +25,17 @@ internal sealed partial class DocumentNavigationServiceTests
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(nodeToDelete, deletedItemKey);
-            Assert.IsFalse(nodeExists);
-            Assert.IsFalse(nodeExistsInRecycleBin);
+            Assert.That(deletedItemKey, Is.EqualTo(nodeToDelete));
+            Assert.That(nodeExists, Is.False);
+            Assert.That(nodeExistsInRecycleBin, Is.False);
 
             foreach (Guid descendant in initialDescendantsKeys)
             {
                 var descendantExists = DocumentNavigationQueryService.TryGetParentKey(descendant, out _);
-                Assert.IsFalse(descendantExists);
+                Assert.That(descendantExists, Is.False);
 
                 var descendantExistsInRecycleBin = DocumentNavigationQueryService.TryGetParentKeyInBin(descendant, out _);
-                Assert.IsFalse(descendantExistsInRecycleBin);
+                Assert.That(descendantExistsInRecycleBin, Is.False);
             }
         });
     }
@@ -57,8 +57,8 @@ internal sealed partial class DocumentNavigationServiceTests
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(1, siblingsKeysAfterDeletionList.Count);
-            Assert.AreEqual(Child2.Key, siblingsKeysAfterDeletionList[0]);
+            Assert.That(siblingsKeysAfterDeletionList, Has.Count.EqualTo(1));
+            Assert.That(siblingsKeysAfterDeletionList[0], Is.EqualTo(Child2.Key));
         });
 
         // Create a new sibling under the same parent
@@ -72,9 +72,9 @@ internal sealed partial class DocumentNavigationServiceTests
         // Verify sibling order after creating the new content
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(2, siblingsKeysAfterCreationList.Count);
-            Assert.AreEqual(Child2.Key, siblingsKeysAfterCreationList[0]);
-            Assert.AreEqual(key, siblingsKeysAfterCreationList[1]);
+            Assert.That(siblingsKeysAfterCreationList, Has.Count.EqualTo(2));
+            Assert.That(siblingsKeysAfterCreationList[0], Is.EqualTo(Child2.Key));
+            Assert.That(siblingsKeysAfterCreationList[1], Is.EqualTo(key));
         });
     }
 }

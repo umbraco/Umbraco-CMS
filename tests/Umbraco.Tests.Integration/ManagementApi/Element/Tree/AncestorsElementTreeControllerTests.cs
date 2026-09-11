@@ -27,12 +27,12 @@ public class AncestorsElementTreeControllerTests : ManagementApiUserGroupTestBas
     {
         // Create grandparent container
         var grandparentResult = await ElementContainerService.CreateAsync(null, $"GrandparentContainer {Guid.NewGuid()}", null, Constants.Security.SuperUserKey);
-        Assert.IsTrue(grandparentResult.Success, $"Failed to create grandparent: {grandparentResult.Status}");
+        Assert.That(grandparentResult.Success, Is.True, $"Failed to create grandparent: {grandparentResult.Status}");
         _grandparentKey = grandparentResult.Result!.Key;
 
         // Create parent container
         var parentResult = await ElementContainerService.CreateAsync(null, $"ParentContainer {Guid.NewGuid()}", _grandparentKey, Constants.Security.SuperUserKey);
-        Assert.IsTrue(parentResult.Success, $"Failed to create parent: {parentResult.Status}");
+        Assert.That(parentResult.Success, Is.True, $"Failed to create parent: {parentResult.Status}");
         _parentKey = parentResult.Result!.Key;
         _parentId = parentResult.Result!.Id;
     }
@@ -78,15 +78,15 @@ public class AncestorsElementTreeControllerTests : ManagementApiUserGroupTestBas
         // Get ancestors of the parent folder (user's start node)
         var response = await ClientRequest();
 
-        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, await response.Content.ReadAsStringAsync());
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK), await response.Content.ReadAsStringAsync());
 
         var result = await response.Content.ReadFromJsonAsync<IEnumerable<ElementTreeItemResponseModel>>(JsonSerializerOptions);
-        Assert.IsNotNull(result);
+        Assert.That(result, Is.Not.Null);
         var ancestors = result.ToList();
 
         // Ancestors should include grandparent and parent (the target itself)
-        Assert.AreEqual(2, ancestors.Count, "Should return grandparent and parent");
-        Assert.AreEqual(_grandparentKey, ancestors[0].Id, "First ancestor should be grandparent");
-        Assert.AreEqual(_parentKey, ancestors[1].Id, "Second ancestor should be parent (target)");
+        Assert.That(ancestors, Has.Count.EqualTo(2), "Should return grandparent and parent");
+        Assert.That(ancestors[0].Id, Is.EqualTo(_grandparentKey), "First ancestor should be grandparent");
+        Assert.That(ancestors[1].Id, Is.EqualTo(_parentKey), "Second ancestor should be parent (target)");
     }
 }

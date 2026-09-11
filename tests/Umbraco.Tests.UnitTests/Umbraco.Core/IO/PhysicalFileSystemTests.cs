@@ -53,7 +53,7 @@ public class PhysicalFileSystemTests : AbstractFileSystemTests
             _fileSystem.AddFile("sub/f3.txt", ms);
         }
 
-        Assert.IsTrue(File.Exists(Path.Combine(basePath, "sub", "f3.txt")));
+        Assert.That(File.Exists(Path.Combine(basePath, "sub", "f3.txt")), Is.True);
     }
 
     [Test]
@@ -66,12 +66,12 @@ public class PhysicalFileSystemTests : AbstractFileSystemTests
             _fileSystem.AddFile("sub/f3.txt", ms);
         }
 
-        Assert.IsTrue(File.Exists(Path.Combine(basePath, "sub/f3.txt")));
+        Assert.That(File.Exists(Path.Combine(basePath, "sub/f3.txt")), Is.True);
 
         _fileSystem.MoveFile("sub/f3.txt", "sub2/f4.txt");
 
-        Assert.IsFalse(File.Exists(Path.Combine(basePath, "sub/f3.txt")));
-        Assert.IsTrue(File.Exists(Path.Combine(basePath, "sub2/f4.txt")));
+        Assert.That(File.Exists(Path.Combine(basePath, "sub/f3.txt")), Is.False);
+        Assert.That(File.Exists(Path.Combine(basePath, "sub2/f4.txt")), Is.True);
     }
 
     [Test]
@@ -90,16 +90,16 @@ public class PhysicalFileSystemTests : AbstractFileSystemTests
         // - does throw on invalid paths
         // works
         var path = _fileSystem.GetFullPath("foo.tmp");
-        Assert.AreEqual(Path.Combine(basePath, "foo.tmp"), path);
+        Assert.That(path, Is.EqualTo(Path.Combine(basePath, "foo.tmp")));
 
         // normalize path with parent directory references
         path = "foo/../bar/../bah/../";
         path = _fileSystem.GetFullPath(path + "foo.tmp");
-        Assert.AreEqual(Path.Combine(basePath, "foo.tmp"), path);
+        Assert.That(path, Is.EqualTo(Path.Combine(basePath, "foo.tmp")));
 
         // works too
         path = _fileSystem.GetFullPath("foo/bar.tmp");
-        Assert.AreEqual(Path.Combine(basePath, "foo", "bar.tmp"), path);
+        Assert.That(path, Is.EqualTo(Path.Combine(basePath, "foo", "bar.tmp")));
 
         // that path is invalid as it would be outside the root directory
         Assert.Throws<UnauthorizedAccessException>(() => _fileSystem.GetFullPath("../../foo.tmp"));
@@ -124,8 +124,8 @@ public class PhysicalFileSystemTests : AbstractFileSystemTests
         IFileProvider fileProvider = ((IFileProviderFactory)fs).Create();
         try
         {
-            Assert.IsNotNull(fileProvider);
-            Assert.IsTrue(Directory.Exists(nonExistentPath));
+            Assert.That(fileProvider, Is.Not.Null);
+            Assert.That(Directory.Exists(nonExistentPath), Is.True);
         }
         finally
         {

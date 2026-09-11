@@ -22,14 +22,14 @@ public class PublishedContentStatusFilteringServiceTests
         var (sut, items) = SetupInvariant(false);
 
         var children = sut.FilterAvailable(items.Keys, null).ToArray();
-        Assert.AreEqual(5, children.Length);
+        Assert.That(children, Has.Length.EqualTo(5));
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(0, children[0].Id);
-            Assert.AreEqual(2, children[1].Id);
-            Assert.AreEqual(4, children[2].Id);
-            Assert.AreEqual(6, children[3].Id);
-            Assert.AreEqual(8, children[4].Id);
+            Assert.That(children[0].Id, Is.EqualTo(0));
+            Assert.That(children[1].Id, Is.EqualTo(2));
+            Assert.That(children[2].Id, Is.EqualTo(4));
+            Assert.That(children[3].Id, Is.EqualTo(6));
+            Assert.That(children[4].Id, Is.EqualTo(8));
         });
     }
 
@@ -39,10 +39,10 @@ public class PublishedContentStatusFilteringServiceTests
         var (sut, items) = SetupInvariant(true);
 
         var children = sut.FilterAvailable(items.Keys, null).ToArray();
-        Assert.AreEqual(10, children.Length);
+        Assert.That(children, Has.Length.EqualTo(10));
         for (var i = 0; i < 10; i++)
         {
-            Assert.AreEqual(i, children[i].Id);
+            Assert.That(children[i].Id, Is.EqualTo(i));
         }
     }
 
@@ -54,33 +54,33 @@ public class PublishedContentStatusFilteringServiceTests
         var (sut, items) = SetupVariant(false, culture == Constants.System.InvariantCulture ? "en-US" : culture);
 
         var children = sut.FilterAvailable(items.Keys, culture).ToArray();
-        Assert.AreEqual(expectedNumberOfChildren, children.Length);
+        Assert.That(children, Has.Length.EqualTo(expectedNumberOfChildren));
 
         // IDs 0 through 3 exist in both en-US and da-DK - only even IDs are published
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(0, children[0].Id);
-            Assert.AreEqual(2, children[1].Id);
+            Assert.That(children[0].Id, Is.EqualTo(0));
+            Assert.That(children[1].Id, Is.EqualTo(2));
         });
 
         // IDs 4 through 6 exist only in en-US - only even IDs are published
         if (culture == "en-US")
         {
-            Assert.AreEqual(4, children[2].Id);
-            Assert.AreEqual(6, children[3].Id);
+            Assert.That(children[2].Id, Is.EqualTo(4));
+            Assert.That(children[3].Id, Is.EqualTo(6));
         }
 
         // IDs 7 through 9 exist only in da-DK - only even IDs are published
         if (culture == "da-DK")
         {
-            Assert.AreEqual(8, children[2].Id);
+            Assert.That(children[2].Id, Is.EqualTo(8));
         }
 
         if (culture == Constants.System.InvariantCulture)
         {
-            Assert.AreEqual(4, children[2].Id);
-            Assert.AreEqual(6, children[3].Id);
-            Assert.AreEqual(8, children[4].Id);
+            Assert.That(children[2].Id, Is.EqualTo(4));
+            Assert.That(children[3].Id, Is.EqualTo(6));
+            Assert.That(children[4].Id, Is.EqualTo(8));
         }
     }
 
@@ -92,41 +92,41 @@ public class PublishedContentStatusFilteringServiceTests
         var (sut, items) = SetupVariant(true, culture == Constants.System.InvariantCulture ? "en-US" : culture);
 
         var children = sut.FilterAvailable(items.Keys, culture).ToArray();
-        Assert.AreEqual(expectedNumberOfChildren, children.Length);
+        Assert.That(children, Has.Length.EqualTo(expectedNumberOfChildren));
 
         // IDs 0 through 3 exist in both en-US and da-DK
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(0, children[0].Id);
-            Assert.AreEqual(1, children[1].Id);
-            Assert.AreEqual(2, children[2].Id);
-            Assert.AreEqual(3, children[3].Id);
+            Assert.That(children[0].Id, Is.EqualTo(0));
+            Assert.That(children[1].Id, Is.EqualTo(1));
+            Assert.That(children[2].Id, Is.EqualTo(2));
+            Assert.That(children[3].Id, Is.EqualTo(3));
         });
 
         // IDs 4 through 6 exist only in en-US
         if (culture == "en-US")
         {
-            Assert.AreEqual(4, children[4].Id);
-            Assert.AreEqual(5, children[5].Id);
-            Assert.AreEqual(6, children[6].Id);
+            Assert.That(children[4].Id, Is.EqualTo(4));
+            Assert.That(children[5].Id, Is.EqualTo(5));
+            Assert.That(children[6].Id, Is.EqualTo(6));
         }
 
         // IDs 7 through 9 exist only in da-DK
         if (culture == "da-DK")
         {
-            Assert.AreEqual(7, children[4].Id);
-            Assert.AreEqual(8, children[5].Id);
-            Assert.AreEqual(9, children[6].Id);
+            Assert.That(children[4].Id, Is.EqualTo(7));
+            Assert.That(children[5].Id, Is.EqualTo(8));
+            Assert.That(children[6].Id, Is.EqualTo(9));
         }
 
         if (culture == Constants.System.InvariantCulture)
         {
-            Assert.AreEqual(4, children[4].Id);
-            Assert.AreEqual(5, children[5].Id);
-            Assert.AreEqual(6, children[6].Id);
-            Assert.AreEqual(7, children[7].Id);
-            Assert.AreEqual(8, children[8].Id);
-            Assert.AreEqual(9, children[9].Id);
+            Assert.That(children[4].Id, Is.EqualTo(4));
+            Assert.That(children[5].Id, Is.EqualTo(5));
+            Assert.That(children[6].Id, Is.EqualTo(6));
+            Assert.That(children[7].Id, Is.EqualTo(7));
+            Assert.That(children[8].Id, Is.EqualTo(8));
+            Assert.That(children[9].Id, Is.EqualTo(9));
         }
     }
 
@@ -141,28 +141,28 @@ public class PublishedContentStatusFilteringServiceTests
             (key, _, allItems) => allItems.Keys.IndexOf(key) > 2);
 
         var children = sut.FilterAvailable(items.Keys, culture).ToArray();
-        Assert.AreEqual(expectedNumberOfChildren, children.Length);
+        Assert.That(children, Has.Length.EqualTo(expectedNumberOfChildren));
 
         // IDs 0 through 3 exist in both en-US and da-DK, but none pass both the published and ancestor-path checks
 
         // IDs 4 through 6 exist only in en-US - only even IDs are published
         if (culture == "en-US")
         {
-            Assert.AreEqual(4, children[0].Id);
-            Assert.AreEqual(6, children[1].Id);
+            Assert.That(children[0].Id, Is.EqualTo(4));
+            Assert.That(children[1].Id, Is.EqualTo(6));
         }
 
         // IDs 7 through 9 exist only in da-DK - only even IDs are published
         if (culture == "da-DK")
         {
-            Assert.AreEqual(8, children[0].Id);
+            Assert.That(children[0].Id, Is.EqualTo(8));
         }
 
         if (culture == Constants.System.InvariantCulture)
         {
-            Assert.AreEqual(4, children[0].Id);
-            Assert.AreEqual(6, children[1].Id);
-            Assert.AreEqual(8, children[2].Id);
+            Assert.That(children[0].Id, Is.EqualTo(4));
+            Assert.That(children[1].Id, Is.EqualTo(6));
+            Assert.That(children[2].Id, Is.EqualTo(8));
         }
     }
 
@@ -177,41 +177,41 @@ public class PublishedContentStatusFilteringServiceTests
             (_, _, _) => false);
 
         var children = sut.FilterAvailable(items.Keys, culture).ToArray();
-        Assert.AreEqual(expectedNumberOfChildren, children.Length);
+        Assert.That(children, Has.Length.EqualTo(expectedNumberOfChildren));
 
         // IDs 0 through 3 exist in both en-US and da-DK
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(0, children[0].Id);
-            Assert.AreEqual(1, children[1].Id);
-            Assert.AreEqual(2, children[2].Id);
-            Assert.AreEqual(3, children[3].Id);
+            Assert.That(children[0].Id, Is.EqualTo(0));
+            Assert.That(children[1].Id, Is.EqualTo(1));
+            Assert.That(children[2].Id, Is.EqualTo(2));
+            Assert.That(children[3].Id, Is.EqualTo(3));
         });
 
         // IDs 4 through 6 exist only in en-US
         if (culture == "en-US")
         {
-            Assert.AreEqual(4, children[4].Id);
-            Assert.AreEqual(5, children[5].Id);
-            Assert.AreEqual(6, children[6].Id);
+            Assert.That(children[4].Id, Is.EqualTo(4));
+            Assert.That(children[5].Id, Is.EqualTo(5));
+            Assert.That(children[6].Id, Is.EqualTo(6));
         }
 
         // IDs 7 through 9 exist only in da-DK
         if (culture == "da-DK")
         {
-            Assert.AreEqual(7, children[4].Id);
-            Assert.AreEqual(8, children[5].Id);
-            Assert.AreEqual(9, children[6].Id);
+            Assert.That(children[4].Id, Is.EqualTo(7));
+            Assert.That(children[5].Id, Is.EqualTo(8));
+            Assert.That(children[6].Id, Is.EqualTo(9));
         }
 
         if (culture == Constants.System.InvariantCulture)
         {
-            Assert.AreEqual(4, children[4].Id);
-            Assert.AreEqual(5, children[5].Id);
-            Assert.AreEqual(6, children[6].Id);
-            Assert.AreEqual(7, children[7].Id);
-            Assert.AreEqual(8, children[8].Id);
-            Assert.AreEqual(9, children[9].Id);
+            Assert.That(children[4].Id, Is.EqualTo(4));
+            Assert.That(children[5].Id, Is.EqualTo(5));
+            Assert.That(children[6].Id, Is.EqualTo(6));
+            Assert.That(children[7].Id, Is.EqualTo(7));
+            Assert.That(children[8].Id, Is.EqualTo(8));
+            Assert.That(children[9].Id, Is.EqualTo(9));
         }
     }
 
@@ -223,37 +223,37 @@ public class PublishedContentStatusFilteringServiceTests
         var (sut, items) = SetupMixedVariance(false, culture == Constants.System.InvariantCulture ? "en-US" : culture);
 
         var children = sut.FilterAvailable(items.Keys, culture).ToArray();
-        Assert.AreEqual(expectedNumberOfChildren, children.Length);
+        Assert.That(children, Has.Length.EqualTo(expectedNumberOfChildren));
 
         // IDs 0 through 2 are invariant - only even IDs are published
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(0, children[0].Id);
-            Assert.AreEqual(2, children[1].Id);
+            Assert.That(children[0].Id, Is.EqualTo(0));
+            Assert.That(children[1].Id, Is.EqualTo(2));
         });
 
         // IDs 3 through 5 exist in both en-US and da-DK - only even IDs are published
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(4, children[2].Id);
+            Assert.That(children[2].Id, Is.EqualTo(4));
         });
 
         // IDs 6 and 7 exist only in en-US - only even IDs are published
         if (culture == "en-US")
         {
-            Assert.AreEqual(6, children[3].Id);
+            Assert.That(children[3].Id, Is.EqualTo(6));
         }
 
         // IDs 8 and 9 exist only in da-DK - only even IDs are published
         if (culture == "da-DK")
         {
-            Assert.AreEqual(8, children[3].Id);
+            Assert.That(children[3].Id, Is.EqualTo(8));
         }
 
         if (culture == Constants.System.InvariantCulture)
         {
-            Assert.AreEqual(6, children[3].Id);
-            Assert.AreEqual(8, children[4].Id);
+            Assert.That(children[3].Id, Is.EqualTo(6));
+            Assert.That(children[4].Id, Is.EqualTo(8));
         }
     }
 
@@ -265,44 +265,44 @@ public class PublishedContentStatusFilteringServiceTests
         var (sut, items) = SetupMixedVariance(true, culture == Constants.System.InvariantCulture ? "en-US" : culture);
 
         var children = sut.FilterAvailable(items.Keys, culture).ToArray();
-        Assert.AreEqual(expectedNumberOfChildren, children.Length);
+        Assert.That(children, Has.Length.EqualTo(expectedNumberOfChildren));
 
         // IDs 0 through 2 are invariant
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(0, children[0].Id);
-            Assert.AreEqual(1, children[1].Id);
-            Assert.AreEqual(2, children[2].Id);
+            Assert.That(children[0].Id, Is.EqualTo(0));
+            Assert.That(children[1].Id, Is.EqualTo(1));
+            Assert.That(children[2].Id, Is.EqualTo(2));
         });
 
         // IDs 3 through 5 exist in both en-US and da-DK
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(3, children[3].Id);
-            Assert.AreEqual(4, children[4].Id);
-            Assert.AreEqual(5, children[5].Id);
+            Assert.That(children[3].Id, Is.EqualTo(3));
+            Assert.That(children[4].Id, Is.EqualTo(4));
+            Assert.That(children[5].Id, Is.EqualTo(5));
         });
 
         // IDs 6 and 7 exist only in en-US
         if (culture == "en-US")
         {
-            Assert.AreEqual(6, children[6].Id);
-            Assert.AreEqual(7, children[7].Id);
+            Assert.That(children[6].Id, Is.EqualTo(6));
+            Assert.That(children[7].Id, Is.EqualTo(7));
         }
 
         // IDs 8 and 9 exist only in da-DK
         if (culture == "da-DK")
         {
-            Assert.AreEqual(8, children[6].Id);
-            Assert.AreEqual(9, children[7].Id);
+            Assert.That(children[6].Id, Is.EqualTo(8));
+            Assert.That(children[7].Id, Is.EqualTo(9));
         }
 
         if (culture == Constants.System.InvariantCulture)
         {
-            Assert.AreEqual(6, children[6].Id);
-            Assert.AreEqual(7, children[7].Id);
-            Assert.AreEqual(8, children[8].Id);
-            Assert.AreEqual(9, children[9].Id);
+            Assert.That(children[6].Id, Is.EqualTo(6));
+            Assert.That(children[7].Id, Is.EqualTo(7));
+            Assert.That(children[8].Id, Is.EqualTo(8));
+            Assert.That(children[9].Id, Is.EqualTo(9));
         }
     }
 
@@ -313,10 +313,10 @@ public class PublishedContentStatusFilteringServiceTests
 
         IPublishedContent? first = sut.FilterAvailable(items.Keys, null).FirstOrDefault();
 
-        Assert.IsNotNull(first);
+        Assert.That(first, Is.Not.Null);
 
         // An all-L0-hit chunk must be served synchronously — the batched read is never engaged.
-        Assert.IsEmpty(batchedKeys);
+        Assert.That(batchedKeys, Is.Empty);
         serviceMock.Verify(
             s => s.GetByKeysAsync(It.IsAny<IReadOnlyCollection<Guid>>(), It.IsAny<bool?>()),
             Times.Never);
@@ -329,10 +329,10 @@ public class PublishedContentStatusFilteringServiceTests
 
         IPublishedContent? first = sut.FilterAvailable(items.Keys, null).FirstOrDefault();
 
-        Assert.IsNotNull(first);
+        Assert.That(first, Is.Not.Null);
 
         // Slow-start's first chunk is a single key, so exactly one item is materialised.
-        Assert.AreEqual(1, batchedKeys.Count);
+        Assert.That(batchedKeys, Has.Count.EqualTo(1));
     }
 
     [Test]
@@ -342,10 +342,10 @@ public class PublishedContentStatusFilteringServiceTests
 
         IPublishedContent[] taken = sut.FilterAvailable(items.Keys, null).Take(3).ToArray();
 
-        Assert.AreEqual(3, taken.Length);
+        Assert.That(taken, Has.Length.EqualTo(3));
 
         // Chunks of 1 then 2 cover the three requested items; the remaining seven are never materialised.
-        Assert.AreEqual(3, batchedKeys.Count);
+        Assert.That(batchedKeys, Has.Count.EqualTo(3));
     }
 
     [Test]
@@ -355,10 +355,10 @@ public class PublishedContentStatusFilteringServiceTests
 
         IPublishedContent[] taken = sut.FilterAvailable(items.Keys, null).Take(3).ToArray();
 
-        Assert.AreEqual(3, taken.Length);
+        Assert.That(taken, Has.Length.EqualTo(3));
 
         // Only the keys passing the publish-status filter are materialised, so exactly three.
-        Assert.AreEqual(3, batchedKeys.Count);
+        Assert.That(batchedKeys, Has.Count.EqualTo(3));
 
         // Publish status must short-circuit before the full candidate set is enumerated.
         statusMock.Verify(
@@ -373,11 +373,11 @@ public class PublishedContentStatusFilteringServiceTests
 
         IPublishedContent[] all = sut.FilterAvailable(items.Keys, null).ToArray();
 
-        Assert.AreEqual(items.Count, all.Length);
+        Assert.That(all, Has.Length.EqualTo(items.Count));
 
         // Every item is materialised exactly once...
-        Assert.AreEqual(items.Count, batchedKeys.Count);
-        Assert.AreEqual(items.Count, batchedKeys.Distinct().Count());
+        Assert.That(batchedKeys, Has.Count.EqualTo(items.Count));
+        Assert.That(batchedKeys.Distinct().Count(), Is.EqualTo(items.Count));
 
         // ...but collapsed into a handful of batched reads rather than one per item.
         serviceMock.Verify(

@@ -39,16 +39,16 @@ internal sealed partial class DocumentNavigationServiceTests
         Assert.Multiple(() =>
         {
             // Verify that the item is still present in the navigation structure
-            Assert.IsTrue(nodeExists);
+            Assert.That(nodeExists, Is.True);
 
-            Assert.AreEqual(nodeToUpdate, updatedItemKey);
+            Assert.That(updatedItemKey, Is.EqualTo(nodeToUpdate));
 
             // Verify that nothing's changed
-            Assert.AreEqual(initialParentKey, updatedParentKey);
-            CollectionAssert.AreEquivalent(initialChildrenKeys, childrenKeysAfterUpdate);
-            CollectionAssert.AreEquivalent(initialDescendantsKeys, descendantsKeysAfterUpdate);
-            CollectionAssert.AreEquivalent(initialAncestorsKeys, ancestorsKeysAfterUpdate);
-            CollectionAssert.AreEquivalent(initialSiblingsKeys, siblingsKeysAfterUpdate);
+            Assert.That(updatedParentKey, Is.EqualTo(initialParentKey));
+            Assert.That(childrenKeysAfterUpdate, Is.EquivalentTo(initialChildrenKeys));
+            Assert.That(descendantsKeysAfterUpdate, Is.EquivalentTo(initialDescendantsKeys));
+            Assert.That(ancestorsKeysAfterUpdate, Is.EquivalentTo(initialAncestorsKeys));
+            Assert.That(siblingsKeysAfterUpdate, Is.EquivalentTo(initialSiblingsKeys));
         });
     }
 }

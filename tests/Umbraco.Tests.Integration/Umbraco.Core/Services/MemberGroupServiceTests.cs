@@ -29,8 +29,8 @@ internal sealed class MemberGroupServiceTests : UmbracoIntegrationTest
 
         Assert.Multiple(() =>
         {
-            Assert.IsNotNull(fetchedGroup);
-            Assert.AreEqual(fetchedGroup, memberGroup);
+            Assert.That(fetchedGroup, Is.Not.Null);
+            Assert.That(memberGroup, Is.EqualTo(fetchedGroup));
         });
     }
 
@@ -49,9 +49,9 @@ internal sealed class MemberGroupServiceTests : UmbracoIntegrationTest
 
         Assert.Multiple(() =>
         {
-            Assert.IsNotNull(fetchedGroup);
-            Assert.AreEqual(key, fetchedGroup.Key);
-            Assert.AreEqual(fetchedGroup, memberGroup);
+            Assert.That(fetchedGroup, Is.Not.Null);
+            Assert.That(fetchedGroup.Key, Is.EqualTo(key));
+            Assert.That(memberGroup, Is.EqualTo(fetchedGroup));
         });
     }
 
@@ -72,9 +72,9 @@ internal sealed class MemberGroupServiceTests : UmbracoIntegrationTest
 
         Assert.Multiple(() =>
         {
-            Assert.IsNotNull(fetchedGroup);
-            Assert.AreEqual(fetchedGroup.Name, updatedName);
-            Assert.AreEqual(fetchedGroup, memberGroup);
+            Assert.That(fetchedGroup, Is.Not.Null);
+            Assert.That(fetchedGroup.Name, Is.EqualTo(updatedName));
+            Assert.That(memberGroup, Is.EqualTo(fetchedGroup));
         });
     }
 
@@ -89,14 +89,14 @@ internal sealed class MemberGroupServiceTests : UmbracoIntegrationTest
 
         var fetchedGroup = await MemberGroupService.GetAsync(memberGroup.Key);
 
-        Assert.IsNotNull(fetchedGroup);
+        Assert.That(fetchedGroup, Is.Not.Null);
 
         await MemberGroupService.DeleteAsync(memberGroup.Key);
 
         // re-get
         fetchedGroup = await MemberGroupService.GetAsync(memberGroup.Key);
 
-        Assert.IsNull(fetchedGroup);
+        Assert.That(fetchedGroup, Is.Null);
     }
 
     [Test]
@@ -115,16 +115,16 @@ internal sealed class MemberGroupServiceTests : UmbracoIntegrationTest
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(attemptOne.Success);
-            Assert.AreEqual(MemberGroupOperationStatus.Success, attemptOne.Status);
+            Assert.That(attemptOne.Success, Is.True);
+            Assert.That(attemptOne.Status, Is.EqualTo(MemberGroupOperationStatus.Success));
         });
 
         var attemptTwo = await MemberGroupService.CreateAsync(memberGroupTwo);
 
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(attemptTwo.Success);
-            Assert.AreEqual(MemberGroupOperationStatus.DuplicateName, attemptTwo.Status);
+            Assert.That(attemptTwo.Success, Is.False);
+            Assert.That(attemptTwo.Status, Is.EqualTo(MemberGroupOperationStatus.DuplicateName));
         });
     }
 
@@ -142,10 +142,10 @@ internal sealed class MemberGroupServiceTests : UmbracoIntegrationTest
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(2, result.Length);
-            Assert.IsTrue(result.Any(x => x.Key == groupOne.Key));
-            Assert.IsTrue(result.Any(x => x.Key == groupThree.Key));
-            Assert.IsFalse(result.Any(x => x.Key == groupTwo.Key));
+            Assert.That(result, Has.Length.EqualTo(2));
+            Assert.That(result.Any(x => x.Key == groupOne.Key), Is.True);
+            Assert.That(result.Any(x => x.Key == groupThree.Key), Is.True);
+            Assert.That(result.Any(x => x.Key == groupTwo.Key), Is.False);
         });
     }
 
@@ -166,10 +166,10 @@ internal sealed class MemberGroupServiceTests : UmbracoIntegrationTest
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(attemptOne.Success);
-            Assert.AreEqual(MemberGroupOperationStatus.Success, attemptOne.Status);
-            Assert.IsTrue(attemptTwo.Success);
-            Assert.AreEqual(MemberGroupOperationStatus.Success, attemptTwo.Status);
+            Assert.That(attemptOne.Success, Is.True);
+            Assert.That(attemptOne.Status, Is.EqualTo(MemberGroupOperationStatus.Success));
+            Assert.That(attemptTwo.Success, Is.True);
+            Assert.That(attemptTwo.Status, Is.EqualTo(MemberGroupOperationStatus.Success));
         });
 
         // Update to already existing name.
@@ -178,8 +178,8 @@ internal sealed class MemberGroupServiceTests : UmbracoIntegrationTest
 
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(updateAttempt.Success);
-            Assert.AreEqual(MemberGroupOperationStatus.DuplicateName, updateAttempt.Status);
+            Assert.That(updateAttempt.Success, Is.False);
+            Assert.That(updateAttempt.Status, Is.EqualTo(MemberGroupOperationStatus.DuplicateName));
         });
     }
 }

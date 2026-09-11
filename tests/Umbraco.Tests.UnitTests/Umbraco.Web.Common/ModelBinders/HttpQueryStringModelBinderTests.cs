@@ -26,12 +26,12 @@ public class HttpQueryStringModelBinderTests
         binder.BindModelAsync(bindingContext);
 
         // Assert
-        Assert.True(bindingContext.Result.IsModelSet);
+        Assert.That(bindingContext.Result.IsModelSet, Is.True);
 
         var typedModel = bindingContext.Result.Model as FormCollection;
-        Assert.IsNotNull(typedModel);
-        Assert.AreEqual(typedModel["foo"], "bar");
-        Assert.AreEqual(typedModel["baz"], "buzz");
+        Assert.That(typedModel, Is.Not.Null);
+        Assert.That(typedModel["foo"], Is.EqualTo("bar"));
+        Assert.That(typedModel["baz"], Is.EqualTo("buzz"));
     }
 
     [Test]
@@ -45,11 +45,11 @@ public class HttpQueryStringModelBinderTests
         binder.BindModelAsync(bindingContext);
 
         // Assert
-        Assert.True(bindingContext.Result.IsModelSet);
+        Assert.That(bindingContext.Result.IsModelSet, Is.True);
 
         var typedModel = bindingContext.Result.Model as FormCollection;
-        Assert.IsNotNull(typedModel);
-        Assert.AreEqual(typedModel["culture"], "en-gb");
+        Assert.That(typedModel, Is.Not.Null);
+        Assert.That(typedModel["culture"], Is.EqualTo("en-gb"));
     }
 
     [Test]
@@ -63,11 +63,11 @@ public class HttpQueryStringModelBinderTests
         binder.BindModelAsync(bindingContext);
 
         // Assert
-        Assert.True(bindingContext.Result.IsModelSet);
+        Assert.That(bindingContext.Result.IsModelSet, Is.True);
 
         var typedModel = bindingContext.Result.Model as FormCollection;
-        Assert.IsNotNull(typedModel);
-        Assert.AreEqual(typedModel["culture"], "en-gb");
+        Assert.That(typedModel, Is.Not.Null);
+        Assert.That(typedModel["culture"], Is.EqualTo("en-gb"));
     }
 
     private ModelBindingContext CreateBindingContext(string querystring)

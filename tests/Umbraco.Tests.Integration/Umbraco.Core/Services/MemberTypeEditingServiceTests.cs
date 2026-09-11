@@ -34,9 +34,9 @@ internal sealed class MemberTypeEditingServiceTests : ContentTypeEditingServiceT
         var memberType = await MemberTypeService.GetAsync(result.Result.Key)!;
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(result.Success);
-            Assert.IsNotEmpty(memberType.PropertyTypes);
-            Assert.IsTrue(memberType.PropertyTypes.All(propertyType => memberType.IsSensitiveProperty(propertyType.Alias)));
+            Assert.That(result.Success, Is.True);
+            Assert.That(memberType.PropertyTypes, Is.Not.Empty);
+            Assert.That(memberType.PropertyTypes.All(propertyType => memberType.IsSensitiveProperty(propertyType.Alias)), Is.True);
         });
     }
 
@@ -58,9 +58,9 @@ internal sealed class MemberTypeEditingServiceTests : ContentTypeEditingServiceT
         memberType = await MemberTypeService.GetAsync(memberType.Key)!;
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(result.Success);
-            Assert.AreEqual(ContentTypeOperationStatus.Success, result.Status);
-            Assert.IsTrue(memberType.PropertyTypes.All(propertyType => memberType.IsSensitiveProperty(propertyType.Alias) == newIsSensitiveValue));
+            Assert.That(result.Success, Is.True);
+            Assert.That(result.Status, Is.EqualTo(ContentTypeOperationStatus.Success));
+            Assert.That(memberType.PropertyTypes.All(propertyType => memberType.IsSensitiveProperty(propertyType.Alias) == newIsSensitiveValue), Is.True);
         });
     }
 
@@ -80,8 +80,8 @@ internal sealed class MemberTypeEditingServiceTests : ContentTypeEditingServiceT
         var memberType = await MemberTypeService.GetAsync(result.Result.Key)!;
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(result.Success);
-            Assert.IsNull(memberType);
+            Assert.That(result.Success, Is.False);
+            Assert.That(memberType, Is.Null);
         });
     }
 
@@ -107,9 +107,9 @@ internal sealed class MemberTypeEditingServiceTests : ContentTypeEditingServiceT
         memberType = await MemberTypeService.GetAsync(memberType.Key)!;
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(result.Success);
-            Assert.AreEqual(ContentTypeOperationStatus.NotAllowed, result.Status);
-            Assert.IsTrue(memberType.PropertyTypes.All(propertyType => memberType.IsSensitiveProperty(propertyType.Alias) == initialIsSensitiveValue));
+            Assert.That(result.Success, Is.False);
+            Assert.That(result.Status, Is.EqualTo(ContentTypeOperationStatus.NotAllowed));
+            Assert.That(memberType.PropertyTypes.All(propertyType => memberType.IsSensitiveProperty(propertyType.Alias) == initialIsSensitiveValue), Is.True);
         });
 
     }
@@ -130,10 +130,10 @@ internal sealed class MemberTypeEditingServiceTests : ContentTypeEditingServiceT
         var memberType = await MemberTypeService.GetAsync(result.Result.Key)!;
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(result.Success);
-            Assert.IsNotEmpty(memberType.PropertyTypes);
-            Assert.IsTrue(memberType.PropertyTypes.All(propertyType => memberType.MemberCanViewProperty(propertyType.Alias) == memberCanView));
-            Assert.IsTrue(memberType.PropertyTypes.All(propertyType => memberType.MemberCanEditProperty(propertyType.Alias) == memberCanEdit));
+            Assert.That(result.Success, Is.True);
+            Assert.That(memberType.PropertyTypes, Is.Not.Empty);
+            Assert.That(memberType.PropertyTypes.All(propertyType => memberType.MemberCanViewProperty(propertyType.Alias) == memberCanView), Is.True);
+            Assert.That(memberType.PropertyTypes.All(propertyType => memberType.MemberCanEditProperty(propertyType.Alias) == memberCanEdit), Is.True);
         });
     }
 
@@ -155,9 +155,9 @@ internal sealed class MemberTypeEditingServiceTests : ContentTypeEditingServiceT
         memberType = await MemberTypeService.GetAsync(result.Result.Key)!;
         Assert.Multiple(() =>
         {
-            Assert.IsNotEmpty(memberType.PropertyTypes);
-            Assert.IsTrue(memberType.PropertyTypes.All(propertyType => memberType.MemberCanViewProperty(propertyType.Alias) == memberCanView));
-            Assert.IsTrue(memberType.PropertyTypes.All(propertyType => memberType.MemberCanEditProperty(propertyType.Alias) == memberCanEdit));
+            Assert.That(memberType.PropertyTypes, Is.Not.Empty);
+            Assert.That(memberType.PropertyTypes.All(propertyType => memberType.MemberCanViewProperty(propertyType.Alias) == memberCanView), Is.True);
+            Assert.That(memberType.PropertyTypes.All(propertyType => memberType.MemberCanEditProperty(propertyType.Alias) == memberCanEdit), Is.True);
         });
     }
 

@@ -19,10 +19,10 @@ public class ByKeyMemberControllerTests : MemberSensitiveDataTestBase<ByKeyMembe
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(ExpectedFailedPasswordAttempts, model.FailedPasswordAttempts);
-            Assert.IsTrue(model.IsLockedOut);
-            Assert.AreEqual(ExpectedLastLockoutDate, model.LastLockoutDate?.UtcDateTime);
-            Assert.AreEqual(ExpectedLastLoginDate, model.LastLoginDate?.UtcDateTime);
+            Assert.That(model.FailedPasswordAttempts, Is.EqualTo(ExpectedFailedPasswordAttempts));
+            Assert.That(model.IsLockedOut, Is.True);
+            Assert.That(model.LastLockoutDate?.UtcDateTime, Is.EqualTo(ExpectedLastLockoutDate));
+            Assert.That(model.LastLoginDate?.UtcDateTime, Is.EqualTo(ExpectedLastLoginDate));
         });
     }
 

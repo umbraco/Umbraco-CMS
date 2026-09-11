@@ -85,14 +85,14 @@ internal sealed class ScopedNuCacheTests : UmbracoIntegrationTest
             var e = umbracoContext.Content.GetById(item.Id);
 
             // during events, due to LiveSnapshot, we see the changes
-            Assert.IsNotNull(e);
-            Assert.AreEqual("changed", e.Name(VariationContextAccessor));
+            Assert.That(e, Is.Not.Null);
+            Assert.That(e.Name(VariationContextAccessor), Is.EqualTo("changed"));
         };
 
         // been created
         var x = umbracoContext.Content.GetById(item.Id);
-        Assert.IsNotNull(x);
-        Assert.AreEqual("name", x.Name(VariationContextAccessor));
+        Assert.That(x, Is.Not.Null);
+        Assert.That(x.Name(VariationContextAccessor), Is.EqualTo("name"));
 
         using (var scope = ScopeProvider.CreateScope())
         {
@@ -108,13 +108,13 @@ internal sealed class ScopedNuCacheTests : UmbracoIntegrationTest
 
         // only 1 event occuring because we are publishing twice for the same event for
         // the same object and the scope deduplicates the events (uses the latest)
-        Assert.AreEqual(complete ? 1 : 0, evented);
+        Assert.That(evented, Is.EqualTo(complete ? 1 : 0));
 
         // after the scope,
         // if completed, we see the changes
         // else changes have been rolled back
         x = umbracoContext.Content.GetById(item.Id);
-        Assert.IsNotNull(x);
-        Assert.AreEqual(complete ? "changed" : "name", x.Name(VariationContextAccessor));
+        Assert.That(x, Is.Not.Null);
+        Assert.That(x.Name(VariationContextAccessor), Is.EqualTo(complete ? "changed" : "name"));
     }
 }

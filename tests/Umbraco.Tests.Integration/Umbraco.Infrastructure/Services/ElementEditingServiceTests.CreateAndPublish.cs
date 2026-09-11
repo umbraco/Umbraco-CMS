@@ -29,7 +29,7 @@ public partial class ElementEditingServiceTests
         };
 
         var result = await ElementEditingService.CreateAndPublishAsync(createModel, [], Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
         VerifyCreateAndPublish(result.Result.Content);
 
         // re-get and re-test
@@ -37,12 +37,12 @@ public partial class ElementEditingServiceTests
 
         void VerifyCreateAndPublish(IElement? element)
         {
-            Assert.IsNotNull(element);
-            Assert.IsTrue(element.HasIdentity);
-            Assert.IsTrue(element.Published);
-            Assert.AreEqual("Test Create And Publish", element.Name);
-            Assert.AreEqual("The title", element.GetValue<string>("title", published: true));
-            Assert.AreEqual("The text", element.GetValue<string>("text", published: true));
+            Assert.That(element, Is.Not.Null);
+            Assert.That(element.HasIdentity, Is.True);
+            Assert.That(element.Published, Is.True);
+            Assert.That(element.Name, Is.EqualTo("Test Create And Publish"));
+            Assert.That(element.GetValue<string>("title", published: true), Is.EqualTo("The title"));
+            Assert.That(element.GetValue<string>("text", published: true), Is.EqualTo("The text"));
         }
     }
 
@@ -69,7 +69,7 @@ public partial class ElementEditingServiceTests
         };
 
         var result = await ElementEditingService.CreateAndPublishAsync(createModel, ["en-US", "da-DK"], Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
         VerifyCreateAndPublish(result.Result.Content);
 
         // re-get and re-test
@@ -77,15 +77,15 @@ public partial class ElementEditingServiceTests
 
         void VerifyCreateAndPublish(IElement? element)
         {
-            Assert.IsNotNull(element);
-            Assert.IsTrue(element.Published);
-            Assert.IsTrue(element.IsCulturePublished("en-US"));
-            Assert.IsTrue(element.IsCulturePublished("da-DK"));
-            Assert.AreEqual("English Name", element.GetCultureName("en-US"));
-            Assert.AreEqual("Danish Name", element.GetCultureName("da-DK"));
-            Assert.AreEqual("The Invariant Title", element.GetValue<string>("invariantTitle"));
-            Assert.AreEqual("The English Title", element.GetValue<string>("variantTitle", "en-US", published: true));
-            Assert.AreEqual("The Danish Title", element.GetValue<string>("variantTitle", "da-DK", published: true));
+            Assert.That(element, Is.Not.Null);
+            Assert.That(element.Published, Is.True);
+            Assert.That(element.IsCulturePublished("en-US"), Is.True);
+            Assert.That(element.IsCulturePublished("da-DK"), Is.True);
+            Assert.That(element.GetCultureName("en-US"), Is.EqualTo("English Name"));
+            Assert.That(element.GetCultureName("da-DK"), Is.EqualTo("Danish Name"));
+            Assert.That(element.GetValue<string>("invariantTitle"), Is.EqualTo("The Invariant Title"));
+            Assert.That(element.GetValue<string>("variantTitle", "en-US", published: true), Is.EqualTo("The English Title"));
+            Assert.That(element.GetValue<string>("variantTitle", "da-DK", published: true), Is.EqualTo("The Danish Title"));
         }
     }
 
@@ -112,7 +112,7 @@ public partial class ElementEditingServiceTests
         };
 
         var result = await ElementEditingService.CreateAndPublishAsync(createModel, ["en-US"], Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
         VerifyCreateAndPublish(result.Result.Content);
 
         // re-get and re-test
@@ -120,13 +120,13 @@ public partial class ElementEditingServiceTests
 
         void VerifyCreateAndPublish(IElement? element)
         {
-            Assert.IsNotNull(element);
-            Assert.IsTrue(element.IsCulturePublished("en-US"));
-            Assert.IsFalse(element.IsCulturePublished("da-DK"));
+            Assert.That(element, Is.Not.Null);
+            Assert.That(element.IsCulturePublished("en-US"), Is.True);
+            Assert.That(element.IsCulturePublished("da-DK"), Is.False);
 
             // both values should still be saved
-            Assert.AreEqual("The English Title", element.GetValue<string>("variantTitle", "en-US", published: true));
-            Assert.AreEqual("The Danish Title", element.GetValue<string>("variantTitle", "da-DK"));
+            Assert.That(element.GetValue<string>("variantTitle", "en-US", published: true), Is.EqualTo("The English Title"));
+            Assert.That(element.GetValue<string>("variantTitle", "da-DK"), Is.EqualTo("The Danish Title"));
         }
     }
 
@@ -149,10 +149,10 @@ public partial class ElementEditingServiceTests
         };
 
         var result = await ElementEditingService.CreateAndPublishAsync(createModel, [], Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(
-            ContentEditingOperationStatus.ContentTypeCultureVarianceMismatch,
+        Assert.That(result.Success, Is.False);
+        Assert.That(
             result.Status,
+            Is.EqualTo(ContentEditingOperationStatus.ContentTypeCultureVarianceMismatch),
             "Creating an invariant element without any variants should fail with a variance mismatch.");
     }
 
@@ -170,7 +170,7 @@ public partial class ElementEditingServiceTests
         };
 
         var result = await ElementEditingService.CreateAndPublishAsync(createModel, [], Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.ContentTypeNotFound, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.ContentTypeNotFound));
     }
 }

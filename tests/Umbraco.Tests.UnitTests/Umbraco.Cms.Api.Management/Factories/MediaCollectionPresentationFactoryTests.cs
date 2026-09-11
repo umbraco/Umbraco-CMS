@@ -1,5 +1,6 @@
 using Moq;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels.Media.Collection;
@@ -55,9 +56,9 @@ public class MediaCollectionPresentationFactoryTests
         List<MediaCollectionResponseModel> result = await _factory.CreateCollectionModelAsync(mediaCollection);
 
         // Assert
-        Assert.IsFalse(result[0].HasChildren);
-        Assert.IsTrue(result[1].HasChildren);
-        Assert.IsFalse(result[2].HasChildren);
+        Assert.That(result[0].HasChildren, Is.False);
+        Assert.That(result[1].HasChildren, Is.True);
+        Assert.That(result[2].HasChildren, Is.False);
     }
 
     [Test]
@@ -78,7 +79,7 @@ public class MediaCollectionPresentationFactoryTests
 
         List<MediaCollectionResponseModel> result = await _factory.CreateCollectionModelAsync(mediaCollection);
 
-        Assert.IsTrue(result[0].HasChildren);
+        Assert.That(result[0].HasChildren, Is.True);
     }
 
     private void SetupHasChildren(Guid key, bool hasChildren, bool inStructure = true)

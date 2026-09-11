@@ -16,13 +16,13 @@ public class EnumerableExtensionsTests
         var list2 = new[] { 6, 5, 3, 2, 1, 4 };
         var list3 = new[] { 6, 5, 4, 3, 2, 2 };
 
-        Assert.IsTrue(list1.UnsortedSequenceEqual(list2));
-        Assert.IsTrue(list2.UnsortedSequenceEqual(list1));
-        Assert.IsFalse(list1.UnsortedSequenceEqual(list3));
+        Assert.That(list1.UnsortedSequenceEqual(list2), Is.True);
+        Assert.That(list2.UnsortedSequenceEqual(list1), Is.True);
+        Assert.That(list1.UnsortedSequenceEqual(list3), Is.False);
 
-        Assert.IsTrue(((IEnumerable<object>)null).UnsortedSequenceEqual(null));
-        Assert.IsFalse(((IEnumerable<int>)null).UnsortedSequenceEqual(list1));
-        Assert.IsFalse(list1.UnsortedSequenceEqual(null));
+        Assert.That(((IEnumerable<object>)null).UnsortedSequenceEqual(null), Is.True);
+        Assert.That(((IEnumerable<int>)null).UnsortedSequenceEqual(list1), Is.False);
+        Assert.That(list1.UnsortedSequenceEqual(null), Is.False);
     }
 
     [Test]
@@ -32,10 +32,10 @@ public class EnumerableExtensionsTests
         var list2 = new[] { 6, 5, 3, 2, 1, 4 };
         var list3 = new[] { 6, 5, 4, 3 };
 
-        Assert.IsTrue(list1.ContainsAll(list2));
-        Assert.IsTrue(list2.ContainsAll(list1));
-        Assert.IsTrue(list1.ContainsAll(list3));
-        Assert.IsFalse(list3.ContainsAll(list1));
+        Assert.That(list1.ContainsAll(list2), Is.True);
+        Assert.That(list2.ContainsAll(list1), Is.True);
+        Assert.That(list1.ContainsAll(list3), Is.True);
+        Assert.That(list3.ContainsAll(list1), Is.False);
     }
 
     [Test]
@@ -45,7 +45,7 @@ public class EnumerableExtensionsTests
 
         var selectRecursive = hierarchy.Children.SelectRecursive(x => x.Children);
 
-        Assert.AreEqual(3, selectRecursive.Count());
+        Assert.That(selectRecursive.Count(), Is.EqualTo(3));
     }
 
     [Test]
@@ -98,7 +98,7 @@ public class EnumerableExtensionsTests
         };
 
         var selectRecursive = hierarchy.Children.SelectRecursive(x => x.Children);
-        Assert.AreEqual(10, selectRecursive.Count());
+        Assert.That(selectRecursive.Count(), Is.EqualTo(10));
     }
 
     private class TestItem
@@ -123,15 +123,15 @@ public class EnumerableExtensionsTests
 
         var flattened = groupsOfTwo.SelectMany(x => x).ToArray();
 
-        Assert.That(groupsOfTwo.Length, Is.EqualTo(5));
-        Assert.That(flattened.Length, Is.EqualTo(integers.Length));
-        CollectionAssert.AreEquivalent(integers, flattened);
+        Assert.That(groupsOfTwo, Has.Length.EqualTo(5));
+        Assert.That(flattened, Has.Length.EqualTo(integers.Length));
+        Assert.That(flattened, Is.EquivalentTo(integers));
 
         var groupsOfMassive = integers.InGroupsOf(100).ToArray();
-        Assert.That(groupsOfMassive.Length, Is.EqualTo(1));
+        Assert.That(groupsOfMassive, Has.Length.EqualTo(1));
         flattened = groupsOfMassive.SelectMany(x => x).ToArray();
-        Assert.That(flattened.Length, Is.EqualTo(integers.Length));
-        CollectionAssert.AreEquivalent(integers, flattened);
+        Assert.That(flattened, Has.Length.EqualTo(integers.Length));
+        Assert.That(flattened, Is.EquivalentTo(integers));
     }
 
     [Test]
@@ -139,8 +139,8 @@ public class EnumerableExtensionsTests
     {
         var integers = new[] { 0, 1, 2, 3, 4, 5, 6, 7, 8 };
         var inGroupsOf = integers.InGroupsOf(2);
-        Assert.AreEqual(5, inGroupsOf.Count());
-        Assert.AreEqual(5, inGroupsOf.Count()); // again
+        Assert.That(inGroupsOf.Count(), Is.EqualTo(5));
+        Assert.That(inGroupsOf.Count(), Is.EqualTo(5)); // again
     }
 
     [TestCase]
@@ -158,10 +158,10 @@ public class EnumerableExtensionsTests
 
         // Assert
         // First check distinction
-        Assert.AreEqual(3, iteratorSource.Count());
+        Assert.That(iteratorSource.Count(), Is.EqualTo(3));
 
         // Check for iterator block mistakes - reset to original query first
         iteratorSource = list.DistinctBy(x => x.Item2).ToArray();
-        Assert.AreEqual(iteratorSource.Length, iteratorSource.ToList().Count);
+        Assert.That(iteratorSource.ToList(), Has.Count.EqualTo(iteratorSource.Length));
     }
 }

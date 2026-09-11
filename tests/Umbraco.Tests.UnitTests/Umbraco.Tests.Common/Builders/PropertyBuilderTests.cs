@@ -34,10 +34,10 @@ public class PropertyBuilderTests
             .Build();
 
         // Assert
-        Assert.AreEqual(testId, property.Id);
-        Assert.AreEqual(testCreateDate, property.CreateDate);
-        Assert.AreEqual(testUpdateDate, property.UpdateDate);
-        Assert.AreEqual(testKey, property.Key);
-        Assert.AreEqual(testPropertyTypeId, property.PropertyType.Id);
+        Assert.That(property.Id, Is.EqualTo(testId));
+        Assert.That(property.CreateDate, Is.EqualTo(testCreateDate));
+        Assert.That(property.UpdateDate, Is.EqualTo(testUpdateDate));
+        Assert.That(property.Key, Is.EqualTo(testKey));
+        Assert.That(property.PropertyType.Id, Is.EqualTo(testPropertyTypeId));
     }
 }

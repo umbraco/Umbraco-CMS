@@ -79,19 +79,19 @@ internal sealed class BlockGridNullSpanTests : BlockEditorElementVariationTestBa
         // Before the fix this threw InvalidOperationException: "Nullable object must have a value".
         var blocks = published.Value<BlockGridModel>("blocks");
 
-        Assert.IsNotNull(blocks);
-        Assert.AreEqual(1, blocks!.Count);
+        Assert.That(blocks, Is.Not.Null);
+        Assert.That(blocks!, Has.Count.EqualTo(1));
 
         // Null RowSpan defaults to 1, null ColumnSpan defaults to gridColumns (12).
-        Assert.AreEqual(1, blocks[0].RowSpan);
-        Assert.AreEqual(12, blocks[0].ColumnSpan);
+        Assert.That(blocks[0].RowSpan, Is.EqualTo(1));
+        Assert.That(blocks[0].ColumnSpan, Is.EqualTo(12));
 
         var area = blocks[0].Areas.FirstOrDefault();
-        Assert.IsNotNull(area);
-        Assert.AreEqual(1, area!.Count);
+        Assert.That(area, Is.Not.Null);
+        Assert.That(area!, Has.Count.EqualTo(1));
 
         // Nested item gets the same defaults.
-        Assert.AreEqual(1, area[0].RowSpan);
-        Assert.AreEqual(12, area[0].ColumnSpan);
+        Assert.That(area[0].RowSpan, Is.EqualTo(1));
+        Assert.That(area[0].ColumnSpan, Is.EqualTo(12));
     }
 }

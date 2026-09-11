@@ -18,7 +18,7 @@ internal sealed partial class MediaNavigationServiceTests
         await MediaEditingService.MoveToRecycleBinAsync(nodeToDelete, Constants.Security.SuperUserKey);
         MediaNavigationQueryService.TryGetSiblingsKeysInBin(nodeInRecycleBin, out IEnumerable<Guid> initialSiblingsKeys);
         var initialSiblingsCount = initialSiblingsKeys.Count();
-        Assert.AreEqual(initialSiblingsCount, 1);
+        Assert.That(initialSiblingsCount, Is.EqualTo(1));
 
         // Act
         await MediaEditingService.DeleteFromRecycleBinAsync(nodeToDelete, Constants.Security.SuperUserKey);
@@ -29,13 +29,13 @@ internal sealed partial class MediaNavigationServiceTests
         Assert.Multiple(() =>
         {
             // Verify siblings count has decreased by one
-            Assert.AreEqual(initialSiblingsCount - 1, updatedSiblingsKeys.Count());
+            Assert.That(updatedSiblingsKeys.Count(), Is.EqualTo(initialSiblingsCount - 1));
             foreach (Guid descendant in initialDescendantsKeys)
             {
                 var descendantExists = MediaNavigationQueryService.TryGetParentKey(descendant, out _);
-                Assert.IsFalse(descendantExists);
+                Assert.That(descendantExists, Is.False);
                 var descendantExistsInRecycleBin = MediaNavigationQueryService.TryGetParentKeyInBin(descendant, out _);
-                Assert.IsFalse(descendantExistsInRecycleBin);
+                Assert.That(descendantExistsInRecycleBin, Is.False);
             }
         });
     }

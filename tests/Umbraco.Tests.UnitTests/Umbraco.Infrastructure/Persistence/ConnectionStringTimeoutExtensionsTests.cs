@@ -1,4 +1,5 @@
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using Umbraco.Cms.Infrastructure.Persistence;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Persistence;
@@ -28,12 +29,12 @@ public class ConnectionStringTimeoutExtensionsTests
     {
         // Zero seconds means no limit to supported providers, so the smallest configurable timeout must not
         // truncate into it.
-        Assert.AreNotEqual(0, TimeSpan.FromTicks(1).ToConnectionStringTimeoutSeconds());
+        Assert.That(TimeSpan.FromTicks(1).ToConnectionStringTimeoutSeconds(), Is.Not.EqualTo(0));
     }
 
     [Test]
     public void Can_Preserve_Explicitly_Configured_No_Limit()
     {
-        Assert.AreEqual(0, TimeSpan.Zero.ToConnectionStringTimeoutSeconds());
+        Assert.That(TimeSpan.Zero.ToConnectionStringTimeoutSeconds(), Is.EqualTo(0));
     }
 }

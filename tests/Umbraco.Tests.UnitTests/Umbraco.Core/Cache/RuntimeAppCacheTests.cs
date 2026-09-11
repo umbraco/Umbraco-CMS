@@ -18,22 +18,22 @@ public abstract class RuntimeAppCacheTests : AppCacheTests
         AppPolicyCache.Insert("DateTimeTest", () => now, new TimeSpan(0, 0, 0, 0, 20));
         var cachedDateTime = AppCache.GetCacheItem<DateTime>("DateTimeTest");
         var cachedDateTimeNullable = AppCache.GetCacheItem<DateTime?>("DateTimeTest");
-        Assert.AreEqual(now, cachedDateTime);
-        Assert.AreEqual(now, cachedDateTimeNullable);
+        Assert.That(cachedDateTime, Is.EqualTo(now));
+        Assert.That(cachedDateTimeNullable, Is.EqualTo(now));
 
         Thread.Sleep(30); // sleep longer than the cache expiration
 
         cachedDateTime = AppCache.GetCacheItem<DateTime>("DateTimeTest");
         cachedDateTimeNullable = AppCache.GetCacheItem<DateTime?>("DateTimeTest");
-        Assert.AreEqual(default(DateTime), cachedDateTime);
-        Assert.AreEqual(null, cachedDateTimeNullable);
+        Assert.That(cachedDateTime, Is.EqualTo(default(DateTime)));
+        Assert.That(cachedDateTimeNullable, Is.EqualTo(null));
     }
 
     [Test]
     public async Task Can_Get_With_Async_Factory()
     {
         var value = await AppPolicyCache.GetCacheItemAsync("AsyncFactoryGetTest", async () => await GetValueAsync(5), TimeSpan.FromMilliseconds(100));
-        Assert.AreEqual(50, value);
+        Assert.That(value, Is.EqualTo(50));
     }
 
     [Test]
@@ -41,7 +41,7 @@ public abstract class RuntimeAppCacheTests : AppCacheTests
     {
         await AppPolicyCache.InsertCacheItemAsync("AsyncFactoryInsertTest", async () => await GetValueAsync(10), TimeSpan.FromMilliseconds(100));
         var value = AppPolicyCache.GetCacheItem<int>("AsyncFactoryInsertTest");
-        Assert.AreEqual(100, value);
+        Assert.That(value, Is.EqualTo(100));
     }
 
     private static async Task<int> GetValueAsync(int value)

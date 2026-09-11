@@ -27,8 +27,8 @@ public partial class ContentBlueprintEditingServiceTests
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(result.Success);
-            Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
+            Assert.That(result.Success, Is.True);
+            Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.Success));
         });
         VerifyUpdate(result.Result.Content);
 
@@ -37,12 +37,12 @@ public partial class ContentBlueprintEditingServiceTests
 
         void VerifyUpdate(IContent? updatedContent)
         {
-            Assert.IsNotNull(updatedContent);
+            Assert.That(updatedContent, Is.Not.Null);
             Assert.Multiple(() =>
             {
-                Assert.AreEqual("Updated Blueprint Name", updatedContent.Name);
-                Assert.AreEqual("The updated title", updatedContent.GetValue<string>("title"));
-                Assert.AreEqual("The updated text", updatedContent.GetValue<string>("text"));
+                Assert.That(updatedContent.Name, Is.EqualTo("Updated Blueprint Name"));
+                Assert.That(updatedContent.GetValue<string>("title"), Is.EqualTo("The updated title"));
+                Assert.That(updatedContent.GetValue<string>("text"), Is.EqualTo("The updated text"));
             });
         }
     }
@@ -71,8 +71,8 @@ public partial class ContentBlueprintEditingServiceTests
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(result.Success);
-            Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
+            Assert.That(result.Success, Is.True);
+            Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.Success));
         });
         VerifyUpdate(result.Result.Content);
 
@@ -81,14 +81,14 @@ public partial class ContentBlueprintEditingServiceTests
 
         void VerifyUpdate(IContent? updatedContent)
         {
-            Assert.IsNotNull(updatedContent);
+            Assert.That(updatedContent, Is.Not.Null);
             Assert.Multiple(() =>
             {
-                Assert.AreEqual("Updated Blueprint English Name", updatedContent.GetCultureName("en-US"));
-                Assert.AreEqual("Updated Blueprint Danish Name", updatedContent.GetCultureName("da-DK"));
-                Assert.AreEqual("The updated blueprint invariant title", updatedContent.GetValue<string>("invariantTitle"));
-                Assert.AreEqual("The updated English title", updatedContent.GetValue<string>("variantTitle", "en-US"));
-                Assert.AreEqual("The updated Danish title", updatedContent.GetValue<string>("variantTitle", "da-DK"));
+                Assert.That(updatedContent.GetCultureName("en-US"), Is.EqualTo("Updated Blueprint English Name"));
+                Assert.That(updatedContent.GetCultureName("da-DK"), Is.EqualTo("Updated Blueprint Danish Name"));
+                Assert.That(updatedContent.GetValue<string>("invariantTitle"), Is.EqualTo("The updated blueprint invariant title"));
+                Assert.That(updatedContent.GetValue<string>("variantTitle", "en-US"), Is.EqualTo("The updated English title"));
+                Assert.That(updatedContent.GetValue<string>("variantTitle", "da-DK"), Is.EqualTo("The updated Danish title"));
             });
         }
     }
@@ -114,9 +114,9 @@ public partial class ContentBlueprintEditingServiceTests
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(createResult.Success);
-            Assert.AreEqual(ContentEditingOperationStatus.Success, createResult.Status);
-            Assert.IsNotNull(createResult.Result);
+            Assert.That(createResult.Success, Is.True);
+            Assert.That(createResult.Status, Is.EqualTo(ContentEditingOperationStatus.Success));
+            Assert.That(createResult.Result, Is.Not.Null);
         });
 
         // update a blueprint with the same name
@@ -129,11 +129,11 @@ public partial class ContentBlueprintEditingServiceTests
 
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(updateResult.Success);
-            Assert.AreEqual(ContentEditingOperationStatus.DuplicateName, updateResult.Status);
-            Assert.IsNotNull(updateResult.Result);
+            Assert.That(updateResult.Success, Is.False);
+            Assert.That(updateResult.Status, Is.EqualTo(ContentEditingOperationStatus.DuplicateName));
+            Assert.That(updateResult.Result, Is.Not.Null);
         });
-        Assert.IsNull(updateResult.Result.Content);
+        Assert.That(updateResult.Result.Content, Is.Null);
     }
 
     [Test]
@@ -148,27 +148,27 @@ public partial class ContentBlueprintEditingServiceTests
         await ContentBlueprintEditingService.UpdateAsync(blueprintKey, SimpleContentBlueprintUpdateModel(), Constants.Security.SuperUserKey);
 
         var blueprint = await ContentBlueprintEditingService.GetAsync(blueprintKey);
-        Assert.NotNull(blueprint);
+        Assert.That(blueprint, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(container.Id, blueprint.ParentId);
-            Assert.AreEqual($"{container.Path},{blueprint.Id}", blueprint.Path);
+            Assert.That(blueprint.ParentId, Is.EqualTo(container.Id));
+            Assert.That(blueprint.Path, Is.EqualTo($"{container.Path},{blueprint.Id}"));
         });
 
         var result = GetBlueprintChildren(containerKey);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(1, result.Length);
-            Assert.AreEqual(blueprintKey, result.First().Key);
+            Assert.That(result, Has.Length.EqualTo(1));
+            Assert.That(result.First().Key, Is.EqualTo(blueprintKey));
         });
 
         blueprint = await ContentBlueprintEditingService.GetAsync(blueprintKey);
-        Assert.IsNotNull(blueprint);
+        Assert.That(blueprint, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual("Blueprint #1 updated", blueprint.Name);
-            Assert.AreEqual("The title value updated", blueprint.GetValue<string>("title"));
-            Assert.AreEqual("The author value updated", blueprint.GetValue<string>("author"));
+            Assert.That(blueprint.Name, Is.EqualTo("Blueprint #1 updated"));
+            Assert.That(blueprint.GetValue<string>("title"), Is.EqualTo("The title value updated"));
+            Assert.That(blueprint.GetValue<string>("author"), Is.EqualTo("The author value updated"));
         });
     }
 }

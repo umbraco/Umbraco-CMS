@@ -25,7 +25,7 @@ public class EnsureUniqueValuesValidatorTest
             null,
             null,
             PropertyValidationContext.Empty());
-        Assert.AreEqual(1, result.Count());
+        Assert.That(result.Count(), Is.EqualTo(1));
     }
 
     [Test]
@@ -38,7 +38,7 @@ public class EnsureUniqueValuesValidatorTest
                 null,
                 null,
                 PropertyValidationContext.Empty());
-        Assert.AreEqual(0, result.Count());
+        Assert.That(result.Count(), Is.EqualTo(0));
     }
 
     [Test]
@@ -51,7 +51,7 @@ public class EnsureUniqueValuesValidatorTest
                 null,
                 null,
                 PropertyValidationContext.Empty());
-        Assert.AreEqual(0, result.Count());
+        Assert.That(result.Count(), Is.EqualTo(0));
     }
 
     [Test]
@@ -64,7 +64,7 @@ public class EnsureUniqueValuesValidatorTest
                 null,
                 null,
                 PropertyValidationContext.Empty());
-        Assert.AreEqual(1, result.Count());
+        Assert.That(result.Count(), Is.EqualTo(1));
     }
 
     [Test]
@@ -77,7 +77,7 @@ public class EnsureUniqueValuesValidatorTest
                 null,
                 null,
                 PropertyValidationContext.Empty());
-        Assert.AreEqual(2, result.Count());
+        Assert.That(result.Count(), Is.EqualTo(2));
     }
 
     [Test]
@@ -90,7 +90,7 @@ public class EnsureUniqueValuesValidatorTest
                 null,
                 null,
                 PropertyValidationContext.Empty());
-        Assert.AreEqual(0, result.Count());
+        Assert.That(result.Count(), Is.EqualTo(0));
     }
 
     [Test]
@@ -104,7 +104,7 @@ public class EnsureUniqueValuesValidatorTest
                 null,
                 null,
                 PropertyValidationContext.Empty());
-        Assert.AreEqual(0, result.Count());
+        Assert.That(result.Count(), Is.EqualTo(0));
     }
 
     [Test]
@@ -118,7 +118,7 @@ public class EnsureUniqueValuesValidatorTest
                 null,
                 null,
                 PropertyValidationContext.Empty());
-        Assert.AreEqual(0, result.Count());
+        Assert.That(result.Count(), Is.EqualTo(0));
     }
 
     [Test]
@@ -132,6 +132,6 @@ public class EnsureUniqueValuesValidatorTest
                 null,
                 null,
                 PropertyValidationContext.Empty());
-        Assert.AreEqual(0, result.Count());
+        Assert.That(result.Count(), Is.EqualTo(0));
     }
 }

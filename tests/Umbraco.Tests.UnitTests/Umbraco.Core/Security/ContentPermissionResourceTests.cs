@@ -22,12 +22,12 @@ public class ContentPermissionResourceTests
 
         Assert.Multiple(() =>
         {
-            CollectionAssert.AreEquivalent(new[] { _contentKey }, resource.ContentKeys);
-            CollectionAssert.AreEquivalent(new[] { PublishPermission }, resource.PermissionsToCheck);
-            Assert.IsFalse(resource.CheckRoot);
-            Assert.IsFalse(resource.CheckRecycleBin);
-            Assert.IsNull(resource.ParentKeyForBranch);
-            Assert.IsNull(resource.CulturesToCheck);
+            Assert.That(resource.ContentKeys, Is.EquivalentTo(new[] { _contentKey }));
+            Assert.That(resource.PermissionsToCheck, Is.EquivalentTo(new[] { PublishPermission }));
+            Assert.That(resource.CheckRoot, Is.False);
+            Assert.That(resource.CheckRecycleBin, Is.False);
+            Assert.That(resource.ParentKeyForBranch, Is.Null);
+            Assert.That(resource.CulturesToCheck, Is.Null);
         });
     }
 
@@ -40,8 +40,8 @@ public class ContentPermissionResourceTests
 
         Assert.Multiple(() =>
         {
-            CollectionAssert.AreEquivalent(new[] { _contentKey }, resource.ContentKeys);
-            CollectionAssert.AreEquivalent(cultures, resource.CulturesToCheck!);
+            Assert.That(resource.ContentKeys, Is.EquivalentTo(new[] { _contentKey }));
+            Assert.That(resource.CulturesToCheck!, Is.EquivalentTo(cultures));
         });
     }
 
@@ -55,9 +55,9 @@ public class ContentPermissionResourceTests
 
         Assert.Multiple(() =>
         {
-            CollectionAssert.AreEquivalent(keys, resource.ContentKeys);
-            Assert.IsFalse(resource.CheckRoot);
-            Assert.IsFalse(resource.CheckRecycleBin);
+            Assert.That(resource.ContentKeys, Is.EquivalentTo(keys));
+            Assert.That(resource.CheckRoot, Is.False);
+            Assert.That(resource.CheckRecycleBin, Is.False);
         });
     }
 
@@ -68,7 +68,7 @@ public class ContentPermissionResourceTests
 
         var resource = ContentPermissionResource.WithKeys(permissions, new[] { _contentKey });
 
-        CollectionAssert.AreEquivalent(permissions, resource.PermissionsToCheck);
+        Assert.That(resource.PermissionsToCheck, Is.EquivalentTo(permissions));
     }
 
     [Test]
@@ -78,9 +78,9 @@ public class ContentPermissionResourceTests
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(resource.CheckRoot);
-            Assert.IsFalse(resource.CheckRecycleBin);
-            CollectionAssert.IsEmpty(resource.ContentKeys.ToList());
+            Assert.That(resource.CheckRoot, Is.True);
+            Assert.That(resource.CheckRecycleBin, Is.False);
+            Assert.That(resource.ContentKeys.ToList(), Is.Empty);
         });
     }
 
@@ -91,8 +91,8 @@ public class ContentPermissionResourceTests
 
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(resource.CheckRoot);
-            CollectionAssert.AreEquivalent(new[] { _contentKey }, resource.ContentKeys);
+            Assert.That(resource.CheckRoot, Is.False);
+            Assert.That(resource.ContentKeys, Is.EquivalentTo(new[] { _contentKey }));
         });
     }
 
@@ -105,8 +105,8 @@ public class ContentPermissionResourceTests
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(resource.CheckRoot);
-            CollectionAssert.AreEquivalent(new[] { _contentKey }, resource.ContentKeys);
+            Assert.That(resource.CheckRoot, Is.True);
+            Assert.That(resource.ContentKeys, Is.EquivalentTo(new[] { _contentKey }));
         });
     }
 
@@ -117,11 +117,11 @@ public class ContentPermissionResourceTests
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(resource.CheckRoot);
-            Assert.IsFalse(resource.CheckRecycleBin);
-            Assert.IsNull(resource.ParentKeyForBranch);
-            CollectionAssert.IsEmpty(resource.ContentKeys.ToList());
-            CollectionAssert.AreEquivalent(new[] { PublishPermission }, resource.PermissionsToCheck);
+            Assert.That(resource.CheckRoot, Is.True);
+            Assert.That(resource.CheckRecycleBin, Is.False);
+            Assert.That(resource.ParentKeyForBranch, Is.Null);
+            Assert.That(resource.ContentKeys.ToList(), Is.Empty);
+            Assert.That(resource.PermissionsToCheck, Is.EquivalentTo(new[] { PublishPermission }));
         });
     }
 
@@ -134,8 +134,8 @@ public class ContentPermissionResourceTests
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(resource.CheckRoot);
-            CollectionAssert.AreEquivalent(cultures, resource.CulturesToCheck!);
+            Assert.That(resource.CheckRoot, Is.True);
+            Assert.That(resource.CulturesToCheck!, Is.EquivalentTo(cultures));
         });
     }
 
@@ -148,8 +148,8 @@ public class ContentPermissionResourceTests
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(resource.CheckRoot);
-            CollectionAssert.AreEquivalent(permissions, resource.PermissionsToCheck);
+            Assert.That(resource.CheckRoot, Is.True);
+            Assert.That(resource.PermissionsToCheck, Is.EquivalentTo(permissions));
         });
     }
 
@@ -160,10 +160,10 @@ public class ContentPermissionResourceTests
 
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(resource.CheckRoot);
-            Assert.IsTrue(resource.CheckRecycleBin);
-            Assert.IsNull(resource.ParentKeyForBranch);
-            CollectionAssert.IsEmpty(resource.ContentKeys.ToList());
+            Assert.That(resource.CheckRoot, Is.False);
+            Assert.That(resource.CheckRecycleBin, Is.True);
+            Assert.That(resource.ParentKeyForBranch, Is.Null);
+            Assert.That(resource.ContentKeys.ToList(), Is.Empty);
         });
     }
 
@@ -176,8 +176,8 @@ public class ContentPermissionResourceTests
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(resource.CheckRecycleBin);
-            CollectionAssert.AreEquivalent(permissions, resource.PermissionsToCheck);
+            Assert.That(resource.CheckRecycleBin, Is.True);
+            Assert.That(resource.PermissionsToCheck, Is.EquivalentTo(permissions));
         });
     }
 
@@ -188,12 +188,12 @@ public class ContentPermissionResourceTests
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(_contentKey, resource.ParentKeyForBranch);
-            Assert.IsFalse(resource.CheckRoot);
-            Assert.IsFalse(resource.CheckRecycleBin);
-            CollectionAssert.IsEmpty(resource.ContentKeys.ToList());
-            CollectionAssert.AreEquivalent(new[] { PublishPermission }, resource.PermissionsToCheck);
-            Assert.IsNull(resource.CulturesToCheck);
+            Assert.That(resource.ParentKeyForBranch, Is.EqualTo(_contentKey));
+            Assert.That(resource.CheckRoot, Is.False);
+            Assert.That(resource.CheckRecycleBin, Is.False);
+            Assert.That(resource.ContentKeys.ToList(), Is.Empty);
+            Assert.That(resource.PermissionsToCheck, Is.EquivalentTo(new[] { PublishPermission }));
+            Assert.That(resource.CulturesToCheck, Is.Null);
         });
     }
 
@@ -206,9 +206,9 @@ public class ContentPermissionResourceTests
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(_contentKey, resource.ParentKeyForBranch);
-            Assert.IsFalse(resource.CheckRecycleBin);
-            CollectionAssert.AreEquivalent(permissions, resource.PermissionsToCheck);
+            Assert.That(resource.ParentKeyForBranch, Is.EqualTo(_contentKey));
+            Assert.That(resource.CheckRecycleBin, Is.False);
+            Assert.That(resource.PermissionsToCheck, Is.EquivalentTo(permissions));
         });
     }
 
@@ -221,9 +221,9 @@ public class ContentPermissionResourceTests
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(_contentKey, resource.ParentKeyForBranch);
-            Assert.IsFalse(resource.CheckRecycleBin);
-            CollectionAssert.AreEquivalent(cultures, resource.CulturesToCheck!);
+            Assert.That(resource.ParentKeyForBranch, Is.EqualTo(_contentKey));
+            Assert.That(resource.CheckRecycleBin, Is.False);
+            Assert.That(resource.CulturesToCheck!, Is.EquivalentTo(cultures));
         });
     }
 
@@ -234,7 +234,7 @@ public class ContentPermissionResourceTests
 
         var resource = ContentPermissionResource.Branch(PublishPermission, _contentKey, cultures);
 
-        Assert.AreEqual(2, resource.CulturesToCheck!.Count);
-        CollectionAssert.AreEquivalent(new[] { "en-US", "da-DK" }, resource.CulturesToCheck);
+        Assert.That(resource.CulturesToCheck!, Has.Count.EqualTo(2));
+        Assert.That(resource.CulturesToCheck, Is.EquivalentTo(new[] { "en-US", "da-DK" }));
     }
 }

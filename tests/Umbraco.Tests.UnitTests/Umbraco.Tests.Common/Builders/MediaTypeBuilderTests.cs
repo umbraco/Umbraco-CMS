@@ -84,26 +84,26 @@ public class MediaTypeBuilderTests
             .Build();
 
         // Assert
-        Assert.AreEqual(testId, mediaType.Id);
-        Assert.AreEqual(testAlias, mediaType.Alias);
-        Assert.AreEqual(testName, mediaType.Name);
-        Assert.AreEqual(testKey, mediaType.Key);
-        Assert.AreEqual(testCreateDate, mediaType.CreateDate);
-        Assert.AreEqual(testUpdateDate, mediaType.UpdateDate);
-        Assert.AreEqual(testCreatorId, mediaType.CreatorId);
-        Assert.AreEqual(testParentId, mediaType.ParentId);
-        Assert.AreEqual(testLevel, mediaType.Level);
-        Assert.AreEqual(testPath, mediaType.Path);
-        Assert.AreEqual(testSortOrder, mediaType.SortOrder);
-        Assert.AreEqual(testDescription, mediaType.Description);
-        Assert.AreEqual(testIcon, mediaType.Icon);
-        Assert.AreEqual(testThumbnail, mediaType.Thumbnail);
-        Assert.AreEqual(testTrashed, mediaType.Trashed);
-        Assert.IsNull(mediaType.ListView);
-        Assert.AreEqual(7, mediaType.PropertyTypes.Count()); // 5 from media properties group, 2 custom
+        Assert.That(mediaType.Id, Is.EqualTo(testId));
+        Assert.That(mediaType.Alias, Is.EqualTo(testAlias));
+        Assert.That(mediaType.Name, Is.EqualTo(testName));
+        Assert.That(mediaType.Key, Is.EqualTo(testKey));
+        Assert.That(mediaType.CreateDate, Is.EqualTo(testCreateDate));
+        Assert.That(mediaType.UpdateDate, Is.EqualTo(testUpdateDate));
+        Assert.That(mediaType.CreatorId, Is.EqualTo(testCreatorId));
+        Assert.That(mediaType.ParentId, Is.EqualTo(testParentId));
+        Assert.That(mediaType.Level, Is.EqualTo(testLevel));
+        Assert.That(mediaType.Path, Is.EqualTo(testPath));
+        Assert.That(mediaType.SortOrder, Is.EqualTo(testSortOrder));
+        Assert.That(mediaType.Description, Is.EqualTo(testDescription));
+        Assert.That(mediaType.Icon, Is.EqualTo(testIcon));
+        Assert.That(mediaType.Thumbnail, Is.EqualTo(testThumbnail));
+        Assert.That(mediaType.Trashed, Is.EqualTo(testTrashed));
+        Assert.That(mediaType.ListView, Is.Null);
+        Assert.That(mediaType.PropertyTypes.Count(), Is.EqualTo(7)); // 5 from media properties group, 2 custom
 
         var propertyTypeIds = mediaType.PropertyTypes.Select(x => x.Id).OrderBy(x => x).ToArray();
-        Assert.AreEqual(testPropertyTypeIdsIncrementingFrom + 1, propertyTypeIds.Min());
-        Assert.AreEqual(testPropertyTypeIdsIncrementingFrom + 7, propertyTypeIds.Max());
+        Assert.That(propertyTypeIds.Min(), Is.EqualTo(testPropertyTypeIdsIncrementingFrom + 1));
+        Assert.That(propertyTypeIds.Max(), Is.EqualTo(testPropertyTypeIdsIncrementingFrom + 7));
     }
 }

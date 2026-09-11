@@ -51,7 +51,7 @@ public partial class ContentExtensionsTests
         var result = contentMock.Object.AvailableCultures();
         Assert.Multiple(() =>
         {
-            Assert.That(result.Length, Is.EqualTo(1));
+            Assert.That(result, Has.Length.EqualTo(1));
             Assert.That(result[0], Is.Null);
         });
     }

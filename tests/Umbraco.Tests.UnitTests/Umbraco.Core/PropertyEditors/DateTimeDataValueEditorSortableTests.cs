@@ -33,7 +33,7 @@ public class DateTimeDataValueEditorSortableTests
 
         var result = editor.GetSortableValue(null, null);
 
-        Assert.IsNull(result);
+        Assert.That(result, Is.Null);
     }
 
     [Test]
@@ -43,7 +43,7 @@ public class DateTimeDataValueEditorSortableTests
 
         var result = editor.GetSortableValue(string.Empty, null);
 
-        Assert.IsNull(result);
+        Assert.That(result, Is.Null);
     }
 
     [Test]
@@ -53,7 +53,7 @@ public class DateTimeDataValueEditorSortableTests
 
         var result = editor.GetSortableValue("   ", null);
 
-        Assert.IsNull(result);
+        Assert.That(result, Is.Null);
     }
 
     [Test]
@@ -63,7 +63,7 @@ public class DateTimeDataValueEditorSortableTests
 
         var result = editor.GetSortableValue(12345, null);
 
-        Assert.IsNull(result);
+        Assert.That(result, Is.Null);
     }
 
     [Test]
@@ -73,7 +73,7 @@ public class DateTimeDataValueEditorSortableTests
 
         var result = editor.GetSortableValue("not valid json", null);
 
-        Assert.IsNull(result);
+        Assert.That(result, Is.Null);
     }
 
     [Test]
@@ -87,7 +87,7 @@ public class DateTimeDataValueEditorSortableTests
 
         var result = editor.GetSortableValue(json, null);
 
-        Assert.IsNotNull(result);
+        Assert.That(result, Is.Not.Null);
         Assert.That(result, Does.StartWith("0001-01-01T00:00:00"));
     }
 
@@ -100,7 +100,7 @@ public class DateTimeDataValueEditorSortableTests
 
         var result = editor.GetSortableValue("{}", null);
 
-        Assert.IsNotNull(result);
+        Assert.That(result, Is.Not.Null);
         Assert.That(result, Does.StartWith("0001-01-01T00:00:00"));
     }
 
@@ -112,7 +112,7 @@ public class DateTimeDataValueEditorSortableTests
 
         var result = editor.GetSortableValue(storedValue, null);
 
-        Assert.IsNotNull(result);
+        Assert.That(result, Is.Not.Null);
         Assert.That(result, Does.EndWith("+00:00").Or.EndWith("Z"));
         Assert.That(result, Does.StartWith("2024-06-15T10:30:00"));
     }
@@ -127,7 +127,7 @@ public class DateTimeDataValueEditorSortableTests
 
         var result = editor.GetSortableValue(storedValue, null);
 
-        Assert.IsNotNull(result);
+        Assert.That(result, Is.Not.Null);
         Assert.That(result, Does.Contain("2024-06-15T12:30:00"));
         Assert.That(result, Does.EndWith("+00:00").Or.EndWith("Z"));
     }
@@ -142,7 +142,7 @@ public class DateTimeDataValueEditorSortableTests
 
         var result = editor.GetSortableValue(storedValue, null);
 
-        Assert.IsNotNull(result);
+        Assert.That(result, Is.Not.Null);
         Assert.That(result, Does.Contain("2024-06-15T13:00:00"));
         Assert.That(result, Does.EndWith("+00:00").Or.EndWith("Z"));
     }
@@ -157,7 +157,7 @@ public class DateTimeDataValueEditorSortableTests
 
         var result = editor.GetSortableValue(storedValue, null);
 
-        Assert.IsNotNull(result);
+        Assert.That(result, Is.Not.Null);
         Assert.That(result, Does.Contain("2024-06-15T18:00:00"));
     }
 
@@ -171,7 +171,7 @@ public class DateTimeDataValueEditorSortableTests
 
         var result = editor.GetSortableValue(storedValue, null);
 
-        Assert.IsNotNull(result);
+        Assert.That(result, Is.Not.Null);
         Assert.That(result, Does.Contain("2024-06-14T20:00:00"));
     }
 
@@ -197,9 +197,9 @@ public class DateTimeDataValueEditorSortableTests
 
         // Lexicographic sort should match chronological order
         var sorted = sortableValues.OrderBy(x => x).ToList();
-        Assert.AreEqual(sortableValues[0], sorted[0], "January date should be first");
-        Assert.AreEqual(sortableValues[1], sorted[1], "June date should be second");
-        Assert.AreEqual(sortableValues[2], sorted[2], "December date should be third");
+        Assert.That(sorted[0], Is.EqualTo(sortableValues[0]), "January date should be first");
+        Assert.That(sorted[1], Is.EqualTo(sortableValues[1]), "June date should be second");
+        Assert.That(sorted[2], Is.EqualTo(sortableValues[2]), "December date should be third");
     }
 
     [Test]
@@ -210,7 +210,7 @@ public class DateTimeDataValueEditorSortableTests
 
         var result = editor.GetSortableValue(storedValue, null);
 
-        Assert.IsNotNull(result);
+        Assert.That(result, Is.Not.Null);
 
         // Should be parseable as DateTimeOffset
         Assert.That(DateTimeOffset.TryParse(result, CultureInfo.InvariantCulture, DateTimeStyles.None, out _), Is.True);
@@ -226,7 +226,7 @@ public class DateTimeDataValueEditorSortableTests
 
         var result = editor.GetSortableValue(storedValue, null);
 
-        Assert.IsNotNull(result);
+        Assert.That(result, Is.Not.Null);
         Assert.That(result, Does.StartWith("0001-01-01T14:30:00"));
     }
 
@@ -247,7 +247,7 @@ public class DateTimeDataValueEditorSortableTests
             .ToList();
 
         var sorted = sortableValues.OrderBy(x => x).ToList();
-        CollectionAssert.AreEqual(sortableValues, sorted, "Times should already be in chronological order");
+        Assert.That(sorted, Is.EqualTo(sortableValues).AsCollection, "Times should already be in chronological order");
     }
 
     [Test]
@@ -267,7 +267,7 @@ public class DateTimeDataValueEditorSortableTests
             .ToList();
 
         var sorted = sortableValues.OrderBy(x => x).ToList();
-        CollectionAssert.AreEqual(sortableValues, sorted, "Dates should already be in chronological order");
+        Assert.That(sorted, Is.EqualTo(sortableValues).AsCollection, "Dates should already be in chronological order");
     }
 
     private static string CreateStoredValue(DateTimeOffset date, string? timeZone)

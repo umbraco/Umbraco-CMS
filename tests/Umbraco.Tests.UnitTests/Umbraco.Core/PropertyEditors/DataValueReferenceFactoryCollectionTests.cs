@@ -87,9 +87,9 @@ public class DataValueReferenceFactoryCollectionTests
         var properties = new PropertyCollection { property };
         var result = collection.GetAllReferences(properties, propertyEditors).ToArray();
 
-        Assert.AreEqual(2, result.Count());
-        Assert.AreEqual(trackedUdi2, result.ElementAt(0).Udi.ToString());
-        Assert.AreEqual(trackedUdi3, result.ElementAt(1).Udi.ToString());
+        Assert.That(result.Count(), Is.EqualTo(2));
+        Assert.That(result.ElementAt(0).Udi.ToString(), Is.EqualTo(trackedUdi2));
+        Assert.That(result.ElementAt(1).Udi.ToString(), Is.EqualTo(trackedUdi3));
     }
 
     [Test]
@@ -131,9 +131,9 @@ public class DataValueReferenceFactoryCollectionTests
         var properties = new PropertyCollection { property };
         var result = collection.GetAllReferences(properties, propertyEditors).ToArray();
 
-        Assert.AreEqual(2, result.Count());
-        Assert.AreEqual(trackedUdi2, result.ElementAt(0).Udi.ToString());
-        Assert.AreEqual(trackedUdi3, result.ElementAt(1).Udi.ToString());
+        Assert.That(result.Count(), Is.EqualTo(2));
+        Assert.That(result.ElementAt(0).Udi.ToString(), Is.EqualTo(trackedUdi2));
+        Assert.That(result.ElementAt(1).Udi.ToString(), Is.EqualTo(trackedUdi3));
     }
 
     [Test]
@@ -295,9 +295,9 @@ public class DataValueReferenceFactoryCollectionTests
         var properties = new PropertyCollection { property };
         var result = collection.GetAllReferences(properties, propertyEditors).ToArray();
 
-        Assert.AreEqual(2, result.Count());
-        Assert.AreEqual(trackedUdi1, result.ElementAt(0).Udi.ToString());
-        Assert.AreEqual(trackedUdi4, result.ElementAt(1).Udi.ToString());
+        Assert.That(result.Count(), Is.EqualTo(2));
+        Assert.That(result.ElementAt(0).Udi.ToString(), Is.EqualTo(trackedUdi1));
+        Assert.That(result.ElementAt(1).Udi.ToString(), Is.EqualTo(trackedUdi4));
     }
 
     [Test]
@@ -309,7 +309,7 @@ public class DataValueReferenceFactoryCollectionTests
         var result = collection.GetAllAutomaticRelationTypesAliases(propertyEditors).ToArray();
 
         var expected = Constants.Conventions.RelationTypes.AutomaticRelationTypes;
-        CollectionAssert.AreEquivalent(expected, result, "Result does not contain the expected relation type aliases.");
+        Assert.That(result, Is.EquivalentTo(expected), "Result does not contain the expected relation type aliases.");
     }
 
     [Test]
@@ -324,7 +324,7 @@ public class DataValueReferenceFactoryCollectionTests
         var result = collection.GetAllAutomaticRelationTypesAliases(propertyEditors).ToArray();
 
         var expected = Constants.Conventions.RelationTypes.AutomaticRelationTypes.Append("umbTest");
-        CollectionAssert.AreEquivalent(expected, result, "Result does not contain the expected relation type aliases.");
+        Assert.That(result, Is.EquivalentTo(expected), "Result does not contain the expected relation type aliases.");
     }
 
     [Test]
@@ -335,7 +335,7 @@ public class DataValueReferenceFactoryCollectionTests
         var throwingEditor = new ThrowingDataEditor();
         var result = collection.GetReferences(throwingEditor, "some incompatible value");
 
-        Assert.IsEmpty(result);
+        Assert.That(result, Is.Empty);
     }
 
     [Test]
@@ -348,7 +348,7 @@ public class DataValueReferenceFactoryCollectionTests
 
         var result = collection.GetReferences(labelEditor, "some incompatible value");
 
-        Assert.IsEmpty(result);
+        Assert.That(result, Is.Empty);
     }
 
     [Test]
@@ -363,8 +363,8 @@ public class DataValueReferenceFactoryCollectionTests
         var validUdi = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();
         var result = collection.GetReferences(throwingEditor, "incompatible value", validUdi).ToArray();
 
-        Assert.AreEqual(1, result.Length);
-        Assert.AreEqual(validUdi, result[0].Udi.ToString());
+        Assert.That(result, Has.Length.EqualTo(1));
+        Assert.That(result[0].Udi.ToString(), Is.EqualTo(validUdi));
     }
 
     [Test]
@@ -392,8 +392,8 @@ public class DataValueReferenceFactoryCollectionTests
         var properties = new PropertyCollection { property };
         var result = collection.GetAllReferences(properties, propertyEditors).ToArray();
 
-        Assert.AreEqual(1, result.Length);
-        Assert.AreEqual(validUdi, result[0].Udi.ToString());
+        Assert.That(result, Has.Length.EqualTo(1));
+        Assert.That(result[0].Udi.ToString(), Is.EqualTo(validUdi));
     }
 
     private class TestDataValueReferenceFactory : IDataValueReferenceFactory

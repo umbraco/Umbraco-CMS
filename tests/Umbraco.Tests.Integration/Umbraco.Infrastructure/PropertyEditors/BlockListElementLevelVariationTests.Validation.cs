@@ -56,11 +56,11 @@ internal partial class BlockListElementLevelVariationTests
         var errors = result.ValidationErrors.ToArray();
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(3, errors.Length);
-            Assert.IsTrue(errors.All(error => error.Alias == "blocks" && error.Culture == null && error.Segment == null));
-            Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".contentData[0].values[0].value"));
-            Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".contentData[0].values[2].value"));
-            Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".settingsData[0].values[1].value"));
+            Assert.That(errors, Has.Length.EqualTo(3));
+            Assert.That(errors.All(error => error.Alias == "blocks" && error.Culture == null && error.Segment == null), Is.True);
+            Assert.That(errors.FirstOrDefault(error => error.JsonPath == ".contentData[0].values[0].value"), Is.Not.Null);
+            Assert.That(errors.FirstOrDefault(error => error.JsonPath == ".contentData[0].values[2].value"), Is.Not.Null);
+            Assert.That(errors.FirstOrDefault(error => error.JsonPath == ".settingsData[0].values[1].value"), Is.Not.Null);
         });
     }
 
@@ -156,19 +156,19 @@ internal partial class BlockListElementLevelVariationTests
         var errors = result.ValidationErrors.ToArray();
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(9, errors.Length);
-            Assert.IsTrue(errors.All(error => error.Alias == "blocks" && error.Culture == null && error.Segment == null));
+            Assert.That(errors, Has.Length.EqualTo(9));
+            Assert.That(errors.All(error => error.Alias == "blocks" && error.Culture == null && error.Segment == null), Is.True);
 
-            Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".contentData[0].values[0].value.contentData[0].values[0].value"));
-            Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".contentData[0].values[0].value.contentData[0].values[2].value"));
-            Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".contentData[0].values[0].value.settingsData[0].values[1].value"));
-            Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".contentData[0].values[1].value"));
-            Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".contentData[0].values[3].value"));
+            Assert.That(errors.FirstOrDefault(error => error.JsonPath == ".contentData[0].values[0].value.contentData[0].values[0].value"), Is.Not.Null);
+            Assert.That(errors.FirstOrDefault(error => error.JsonPath == ".contentData[0].values[0].value.contentData[0].values[2].value"), Is.Not.Null);
+            Assert.That(errors.FirstOrDefault(error => error.JsonPath == ".contentData[0].values[0].value.settingsData[0].values[1].value"), Is.Not.Null);
+            Assert.That(errors.FirstOrDefault(error => error.JsonPath == ".contentData[0].values[1].value"), Is.Not.Null);
+            Assert.That(errors.FirstOrDefault(error => error.JsonPath == ".contentData[0].values[3].value"), Is.Not.Null);
 
-            Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".settingsData[0].values[0].value.contentData[0].values[1].value"));
-            Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".settingsData[0].values[0].value.settingsData[0].values[0].value"));
-            Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".settingsData[0].values[0].value.settingsData[0].values[2].value"));
-            Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".settingsData[0].values[2].value"));
+            Assert.That(errors.FirstOrDefault(error => error.JsonPath == ".settingsData[0].values[0].value.contentData[0].values[1].value"), Is.Not.Null);
+            Assert.That(errors.FirstOrDefault(error => error.JsonPath == ".settingsData[0].values[0].value.settingsData[0].values[0].value"), Is.Not.Null);
+            Assert.That(errors.FirstOrDefault(error => error.JsonPath == ".settingsData[0].values[0].value.settingsData[0].values[2].value"), Is.Not.Null);
+            Assert.That(errors.FirstOrDefault(error => error.JsonPath == ".settingsData[0].values[2].value"), Is.Not.Null);
         });
     }
 
@@ -228,10 +228,10 @@ internal partial class BlockListElementLevelVariationTests
         var errors = result.ValidationErrors.ToArray();
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(2, errors.Length);
-            Assert.IsTrue(errors.All(error => error.Alias == "blocks" && error.Culture == null && error.Segment == null));
-            Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".contentData[0].values[0].value"));
-            Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".settingsData[0].values[1].value"));
+            Assert.That(errors, Has.Length.EqualTo(2));
+            Assert.That(errors.All(error => error.Alias == "blocks" && error.Culture == null && error.Segment == null), Is.True);
+            Assert.That(errors.FirstOrDefault(error => error.JsonPath == ".contentData[0].values[0].value"), Is.Not.Null);
+            Assert.That(errors.FirstOrDefault(error => error.JsonPath == ".settingsData[0].values[1].value"), Is.Not.Null);
         });
     }
 
@@ -281,11 +281,11 @@ internal partial class BlockListElementLevelVariationTests
         var errors = result.ValidationErrors.ToArray();
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(3, errors.Length);
-            Assert.IsTrue(errors.All(error => error.Alias == "blocks" && error.Culture == null && error.Segment == null));
-            Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".contentData[0].values[0].value"));
-            Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".contentData[0].values[2].value"));
-            Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".settingsData[0].values[1].value"));
+            Assert.That(errors, Has.Length.EqualTo(3));
+            Assert.That(errors.All(error => error.Alias == "blocks" && error.Culture == null && error.Segment == null), Is.True);
+            Assert.That(errors.FirstOrDefault(error => error.JsonPath == ".contentData[0].values[0].value"), Is.Not.Null);
+            Assert.That(errors.FirstOrDefault(error => error.JsonPath == ".contentData[0].values[2].value"), Is.Not.Null);
+            Assert.That(errors.FirstOrDefault(error => error.JsonPath == ".settingsData[0].values[1].value"), Is.Not.Null);
         });
     }
 
@@ -340,11 +340,11 @@ internal partial class BlockListElementLevelVariationTests
         var errors = result.ValidationErrors.ToArray();
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(3, errors.Length);
-            Assert.IsTrue(errors.All(error => error.Alias == "blocks" && error.Culture == null && error.Segment == null));
-            Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".contentData[0].values[?(@.alias == 'invariantText' && @.culture == null && @.segment == null)].value"));
-            Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".contentData[0].values[?(@.alias == 'variantText' && @.culture == 'da-DK' && @.segment == null)].value"));
-            Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".settingsData[0].values[?(@.alias == 'variantText' && @.culture == 'en-US' && @.segment == null)].value"));
+            Assert.That(errors, Has.Length.EqualTo(3));
+            Assert.That(errors.All(error => error.Alias == "blocks" && error.Culture == null && error.Segment == null), Is.True);
+            Assert.That(errors.FirstOrDefault(error => error.JsonPath == ".contentData[0].values[?(@.alias == 'invariantText' && @.culture == null && @.segment == null)].value"), Is.Not.Null);
+            Assert.That(errors.FirstOrDefault(error => error.JsonPath == ".contentData[0].values[?(@.alias == 'variantText' && @.culture == 'da-DK' && @.segment == null)].value"), Is.Not.Null);
+            Assert.That(errors.FirstOrDefault(error => error.JsonPath == ".settingsData[0].values[?(@.alias == 'variantText' && @.culture == 'en-US' && @.segment == null)].value"), Is.Not.Null);
         });
     }
 
@@ -475,29 +475,29 @@ internal partial class BlockListElementLevelVariationTests
         {
             Assert.Multiple(() =>
             {
-                Assert.AreEqual(6, errors.Length);
-                Assert.IsTrue(errors.All(error => error.Alias == "blocks" && error.Culture == null && error.Segment == null));
+                Assert.That(errors, Has.Length.EqualTo(6));
+                Assert.That(errors.All(error => error.Alias == "blocks" && error.Culture == null && error.Segment == null), Is.True);
 
-                Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".contentData[0].values[0].value.contentData[0].values[?(@.alias == 'invariantText' && @.culture == null && @.segment == null)].value"));
-                Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".contentData[0].values[0].value.contentData[0].values[?(@.alias == 'variantText' && @.culture == 'da-DK' && @.segment == null)].value"));
-                Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".contentData[0].values[?(@.alias == 'variantText' && @.culture == 'da-DK' && @.segment == null)].value"));
+                Assert.That(errors.FirstOrDefault(error => error.JsonPath == ".contentData[0].values[0].value.contentData[0].values[?(@.alias == 'invariantText' && @.culture == null && @.segment == null)].value"), Is.Not.Null);
+                Assert.That(errors.FirstOrDefault(error => error.JsonPath == ".contentData[0].values[0].value.contentData[0].values[?(@.alias == 'variantText' && @.culture == 'da-DK' && @.segment == null)].value"), Is.Not.Null);
+                Assert.That(errors.FirstOrDefault(error => error.JsonPath == ".contentData[0].values[?(@.alias == 'variantText' && @.culture == 'da-DK' && @.segment == null)].value"), Is.Not.Null);
 
-                Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".settingsData[0].values[0].value.settingsData[0].values[?(@.alias == 'invariantText' && @.culture == null && @.segment == null)].value"));
-                Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".settingsData[0].values[0].value.settingsData[0].values[?(@.alias == 'variantText' && @.culture == 'da-DK' && @.segment == null)].value"));
-                Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".settingsData[0].values[?(@.alias == 'invariantText' && @.culture == null && @.segment == null)].value"));
+                Assert.That(errors.FirstOrDefault(error => error.JsonPath == ".settingsData[0].values[0].value.settingsData[0].values[?(@.alias == 'invariantText' && @.culture == null && @.segment == null)].value"), Is.Not.Null);
+                Assert.That(errors.FirstOrDefault(error => error.JsonPath == ".settingsData[0].values[0].value.settingsData[0].values[?(@.alias == 'variantText' && @.culture == 'da-DK' && @.segment == null)].value"), Is.Not.Null);
+                Assert.That(errors.FirstOrDefault(error => error.JsonPath == ".settingsData[0].values[?(@.alias == 'invariantText' && @.culture == null && @.segment == null)].value"), Is.Not.Null);
             });
         }
         else
         {
             Assert.Multiple(() =>
             {
-                Assert.AreEqual(3, errors.Length);
-                Assert.IsTrue(errors.All(error => error.Alias == "blocks" && error.Culture == null && error.Segment == null));
+                Assert.That(errors, Has.Length.EqualTo(3));
+                Assert.That(errors.All(error => error.Alias == "blocks" && error.Culture == null && error.Segment == null), Is.True);
 
-                Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".contentData[0].values[0].value.contentData[0].values[?(@.alias == 'variantText' && @.culture == 'da-DK' && @.segment == null)].value"));
-                Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".contentData[0].values[?(@.alias == 'variantText' && @.culture == 'da-DK' && @.segment == null)].value"));
+                Assert.That(errors.FirstOrDefault(error => error.JsonPath == ".contentData[0].values[0].value.contentData[0].values[?(@.alias == 'variantText' && @.culture == 'da-DK' && @.segment == null)].value"), Is.Not.Null);
+                Assert.That(errors.FirstOrDefault(error => error.JsonPath == ".contentData[0].values[?(@.alias == 'variantText' && @.culture == 'da-DK' && @.segment == null)].value"), Is.Not.Null);
 
-                Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".settingsData[0].values[0].value.settingsData[0].values[?(@.alias == 'variantText' && @.culture == 'da-DK' && @.segment == null)].value"));
+                Assert.That(errors.FirstOrDefault(error => error.JsonPath == ".settingsData[0].values[0].value.settingsData[0].values[?(@.alias == 'variantText' && @.culture == 'da-DK' && @.segment == null)].value"), Is.Not.Null);
             });
         }
     }
@@ -549,7 +549,7 @@ internal partial class BlockListElementLevelVariationTests
             contentType,
             ["da-DK"]);
 
-        Assert.IsEmpty(result.ValidationErrors);
+        Assert.That(result.ValidationErrors, Is.Empty);
     }
 
     [Test]
@@ -602,10 +602,10 @@ internal partial class BlockListElementLevelVariationTests
         var errors = result.ValidationErrors.ToArray();
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(2, errors.Length);
-            Assert.IsTrue(errors.All(error => error.Alias == "blocks" && error.Culture == "en-US" && error.Segment == null));
-            Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".contentData[0].values[1].value"));
-            Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".settingsData[0].values[0].value"));
+            Assert.That(errors, Has.Length.EqualTo(2));
+            Assert.That(errors.All(error => error.Alias == "blocks" && error.Culture == "en-US" && error.Segment == null), Is.True);
+            Assert.That(errors.FirstOrDefault(error => error.JsonPath == ".contentData[0].values[1].value"), Is.Not.Null);
+            Assert.That(errors.FirstOrDefault(error => error.JsonPath == ".settingsData[0].values[0].value"), Is.Not.Null);
         });
     }
 
@@ -657,10 +657,10 @@ internal partial class BlockListElementLevelVariationTests
         var errors = result.ValidationErrors.ToArray();
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(2, errors.Length);
-            Assert.IsTrue(errors.All(error => error.Alias == "blocks" && error.Culture == "en-US" && error.Segment == null));
-            Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".contentData[0].values[?(@.alias == 'invariantText' && @.culture == null && @.segment == null)].value"));
-            Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".settingsData[0].values[?(@.alias == 'variantText' && @.culture == null && @.segment == null)].value"));
+            Assert.That(errors, Has.Length.EqualTo(2));
+            Assert.That(errors.All(error => error.Alias == "blocks" && error.Culture == "en-US" && error.Segment == null), Is.True);
+            Assert.That(errors.FirstOrDefault(error => error.JsonPath == ".contentData[0].values[?(@.alias == 'invariantText' && @.culture == null && @.segment == null)].value"), Is.Not.Null);
+            Assert.That(errors.FirstOrDefault(error => error.JsonPath == ".settingsData[0].values[?(@.alias == 'variantText' && @.culture == null && @.segment == null)].value"), Is.Not.Null);
         });
     }
 }

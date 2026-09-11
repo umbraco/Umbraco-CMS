@@ -18,7 +18,7 @@ public partial class MachineIdentityProviderTests
         {
             var provider = new ConfiguredMachineIdentityProvider(
                 Options.Create(new HostingSettings { MachineIdentifier = "my-stable-id" }));
-            Assert.AreEqual("my-stable-id", provider.GetMachineIdentifier());
+            Assert.That(provider.GetMachineIdentifier(), Is.EqualTo("my-stable-id"));
         }
 
         [Test]
@@ -26,7 +26,7 @@ public partial class MachineIdentityProviderTests
         {
             var provider = new ConfiguredMachineIdentityProvider(
                 Options.Create(new HostingSettings { MachineIdentifier = null }));
-            Assert.IsNull(provider.GetMachineIdentifier());
+            Assert.That(provider.GetMachineIdentifier(), Is.Null);
         }
 
         [Test]
@@ -34,7 +34,7 @@ public partial class MachineIdentityProviderTests
         {
             var provider = new ConfiguredMachineIdentityProvider(
                 Options.Create(new HostingSettings { MachineIdentifier = "   " }));
-            Assert.IsNull(provider.GetMachineIdentifier());
+            Assert.That(provider.GetMachineIdentifier(), Is.Null);
         }
     }
 }

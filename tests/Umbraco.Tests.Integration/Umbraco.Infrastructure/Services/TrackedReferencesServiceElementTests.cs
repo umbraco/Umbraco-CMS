@@ -69,11 +69,11 @@ internal class TrackedReferencesServiceElementTests : UmbracoIntegrationTest
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(actual.Success);
-            Assert.AreEqual(1, actual.Result.Total);
+            Assert.That(actual.Success, Is.True);
+            Assert.That(actual.Result.Total, Is.EqualTo(1));
             var item = actual.Result.Items.First();
-            Assert.AreEqual(ElementType.Alias, item.ContentTypeAlias);
-            Assert.AreEqual(Element3.Key, item.NodeKey);
+            Assert.That(item.ContentTypeAlias, Is.EqualTo(ElementType.Alias));
+            Assert.That(item.NodeKey, Is.EqualTo(Element3.Key));
         });
     }
 
@@ -91,8 +91,8 @@ internal class TrackedReferencesServiceElementTests : UmbracoIntegrationTest
 
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(actual.Success);
-            Assert.AreEqual(GetReferencesOperationStatus.ContentNotFound, actual.Status);
+            Assert.That(actual.Success, Is.False);
+            Assert.That(actual.Status, Is.EqualTo(GetReferencesOperationStatus.ContentNotFound));
         });
     }
 
@@ -108,8 +108,8 @@ internal class TrackedReferencesServiceElementTests : UmbracoIntegrationTest
             10,
             true);
 
-        Assert.IsTrue(actual.Success);
-        Assert.AreEqual(0, actual.Result.Total);
+        Assert.That(actual.Success, Is.True);
+        Assert.That(actual.Result.Total, Is.EqualTo(0));
     }
 
     [Test]
@@ -127,10 +127,10 @@ internal class TrackedReferencesServiceElementTests : UmbracoIntegrationTest
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(1, actual.Total);
+            Assert.That(actual.Total, Is.EqualTo(1));
             var item = actual.Items.First();
-            Assert.AreEqual(ElementType.Alias, item.ContentTypeAlias);
-            Assert.AreEqual(Element3.Key, item.NodeKey);
+            Assert.That(item.ContentTypeAlias, Is.EqualTo(ElementType.Alias));
+            Assert.That(item.NodeKey, Is.EqualTo(Element3.Key));
         });
     }
 
@@ -152,12 +152,12 @@ internal class TrackedReferencesServiceElementTests : UmbracoIntegrationTest
         Assert.Multiple(() =>
         {
             // Element1 and Element2 should be returned as they are referenced
-            Assert.AreEqual(2, actual.Total);
-            Assert.IsTrue(actual.Items.Contains(Element1.Key));
-            Assert.IsTrue(actual.Items.Contains(Element2.Key));
+            Assert.That(actual.Total, Is.EqualTo(2));
+            Assert.That(actual.Items, Does.Contain(Element1.Key));
+            Assert.That(actual.Items, Does.Contain(Element2.Key));
 
             // Element3 should NOT be in the result as it is not referenced
-            Assert.IsFalse(actual.Items.Contains(Element3.Key));
+            Assert.That(actual.Items, Does.Not.Contain(Element3.Key));
         });
     }
 
@@ -176,10 +176,10 @@ internal class TrackedReferencesServiceElementTests : UmbracoIntegrationTest
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(actual.Success);
-            Assert.AreEqual(1, actual.Result.Total);
+            Assert.That(actual.Success, Is.True);
+            Assert.That(actual.Result.Total, Is.EqualTo(1));
             var item = actual.Result.Items.First();
-            Assert.AreEqual(Element3.Key, item.NodeKey);
+            Assert.That(item.NodeKey, Is.EqualTo(Element3.Key));
         });
     }
 
@@ -197,14 +197,14 @@ internal class TrackedReferencesServiceElementTests : UmbracoIntegrationTest
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(actual.Success);
-            Assert.AreEqual(GetReferencesOperationStatus.Success, actual.Status);
+            Assert.That(actual.Success, Is.True);
+            Assert.That(actual.Status, Is.EqualTo(GetReferencesOperationStatus.Success));
 
             var itemKeys = actual.Result.Items.Select(x => x.NodeKey).ToList();
 
             // Should *only* return the element inside the folder that is referenced
-            Assert.AreEqual(1, itemKeys.Count);
-            Assert.AreEqual(ElementInFolder.Key, itemKeys[0]);
+            Assert.That(itemKeys, Has.Count.EqualTo(1));
+            Assert.That(itemKeys[0], Is.EqualTo(ElementInFolder.Key));
         });
     }
 
@@ -222,8 +222,8 @@ internal class TrackedReferencesServiceElementTests : UmbracoIntegrationTest
 
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(actual.Success);
-            Assert.AreEqual(GetReferencesOperationStatus.ContentNotFound, actual.Status);
+            Assert.That(actual.Success, Is.False);
+            Assert.That(actual.Status, Is.EqualTo(GetReferencesOperationStatus.ContentNotFound));
         });
     }
 
@@ -286,7 +286,7 @@ internal class TrackedReferencesServiceElementTests : UmbracoIntegrationTest
             Variants = [new VariantModel { Name = "Element In Folder" }],
         };
         var createResult = await ElementEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(createResult.Success, $"Create failed with status: {createResult.Status}");
+        Assert.That(createResult.Success, Is.True, $"Create failed with status: {createResult.Status}");
         ElementInFolder = createResult.Result.Content!;
         ElementService.Publish(ElementInFolder, ["*"]);
 

@@ -21,7 +21,7 @@ public class TopoGraphTests
         }
         catch (Exception e)
         {
-            Assert.IsTrue(e.Message.StartsWith(TopoGraph.CycleDependencyError));
+            Assert.That(e.Message, Does.StartWith(TopoGraph.CycleDependencyError));
         }
     }
 
@@ -36,9 +36,9 @@ public class TopoGraphTests
         var ordered = graph.GetSortedItems(throwOnCycle: false).ToArray();
 
         // default order is dependencies before item
-        Assert.AreEqual(2, ordered[0].Id); // ignored cycle
-        Assert.AreEqual(3, ordered[1].Id);
-        Assert.AreEqual(1, ordered[2].Id);
+        Assert.That(ordered[0].Id, Is.EqualTo(2)); // ignored cycle
+        Assert.That(ordered[1].Id, Is.EqualTo(3));
+        Assert.That(ordered[2].Id, Is.EqualTo(1));
     }
 
     [Test]
@@ -56,7 +56,7 @@ public class TopoGraphTests
         }
         catch (Exception e)
         {
-            Assert.IsTrue(e.Message.StartsWith(TopoGraph.MissingDependencyError));
+            Assert.That(e.Message, Does.StartWith(TopoGraph.MissingDependencyError));
         }
     }
 
@@ -71,9 +71,9 @@ public class TopoGraphTests
         var ordered = graph.GetSortedItems(throwOnMissing: false).ToArray();
 
         // default order is dependencies before item
-        Assert.AreEqual(1, ordered[0].Id); // ignored dependency
-        Assert.AreEqual(2, ordered[1].Id);
-        Assert.AreEqual(3, ordered[2].Id);
+        Assert.That(ordered[0].Id, Is.EqualTo(1)); // ignored dependency
+        Assert.That(ordered[1].Id, Is.EqualTo(2));
+        Assert.That(ordered[2].Id, Is.EqualTo(3));
     }
 
     [Test]
@@ -87,9 +87,9 @@ public class TopoGraphTests
         var ordered = graph.GetSortedItems().ToArray();
 
         // default order is dependencies before item
-        Assert.AreEqual(1, ordered[0].Id);
-        Assert.AreEqual(2, ordered[1].Id);
-        Assert.AreEqual(3, ordered[2].Id);
+        Assert.That(ordered[0].Id, Is.EqualTo(1));
+        Assert.That(ordered[1].Id, Is.EqualTo(2));
+        Assert.That(ordered[2].Id, Is.EqualTo(3));
     }
 
     [Test]
@@ -103,9 +103,9 @@ public class TopoGraphTests
         var ordered = graph.GetSortedItems(reverse: true).ToArray();
 
         // reverse order is item before dependencies
-        Assert.AreEqual(3, ordered[0].Id);
-        Assert.AreEqual(2, ordered[1].Id);
-        Assert.AreEqual(1, ordered[2].Id);
+        Assert.That(ordered[0].Id, Is.EqualTo(3));
+        Assert.That(ordered[1].Id, Is.EqualTo(2));
+        Assert.That(ordered[2].Id, Is.EqualTo(1));
     }
 
     public class Thing

@@ -39,6 +39,6 @@ internal sealed class SchemaValidationTest : UmbracoIntegrationTest
         }
 
         // Assert
-        Assert.That(result.Errors.Count, Is.EqualTo(0));
+        Assert.That(result.Errors, Is.Empty);
     }
 }

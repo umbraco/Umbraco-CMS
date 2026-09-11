@@ -47,9 +47,9 @@ internal sealed class AmbientEFCoreScopeStackTests
 
         Assert.Multiple(() =>
         {
-            Assert.AreSame(scopeA, ambient[0], "Flow A observed another flow's ambient scope.");
-            Assert.AreSame(scopeB, ambient[1], "Flow B observed another flow's ambient scope.");
-            Assert.IsNull(sut.AmbientScope, "A scope pushed in a branching flow leaked into the calling context.");
+            Assert.That(ambient[0], Is.SameAs(scopeA), "Flow A observed another flow's ambient scope.");
+            Assert.That(ambient[1], Is.SameAs(scopeB), "Flow B observed another flow's ambient scope.");
+            Assert.That(sut.AmbientScope, Is.Null, "A scope pushed in a branching flow leaked into the calling context.");
         });
     }
 
@@ -68,11 +68,11 @@ internal sealed class AmbientEFCoreScopeStackTests
 
         Assert.Multiple(() =>
         {
-            Assert.AreSame(inner, sut.AmbientScope);
-            Assert.AreSame(inner, sut.Pop());
-            Assert.AreSame(outer, sut.AmbientScope);
-            Assert.AreSame(outer, sut.Pop());
-            Assert.IsNull(sut.AmbientScope);
+            Assert.That(sut.AmbientScope, Is.SameAs(inner));
+            Assert.That(sut.Pop(), Is.SameAs(inner));
+            Assert.That(sut.AmbientScope, Is.SameAs(outer));
+            Assert.That(sut.Pop(), Is.SameAs(outer));
+            Assert.That(sut.AmbientScope, Is.Null);
         });
     }
 

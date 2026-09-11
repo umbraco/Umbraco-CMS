@@ -14,7 +14,7 @@ public class DateTimeExtensionsTests
     {
         var date = new DateTime(2025, 6, 9, 14, 30, 45, DateTimeKind.Utc);
         var result = date.ToIsoString();
-        Assert.AreEqual("2025-06-09 14:30:45", result);
+        Assert.That(result, Is.EqualTo("2025-06-09 14:30:45"));
     }
 
     [TestCase(2023, 5, 15, 14, 30, 45, 123, DateTimeExtensions.DateTruncate.Year, 2023, 1, 1, 0, 0, 0, 0)]
@@ -46,6 +46,6 @@ public class DateTimeExtensionsTests
 
         var result = date.TruncateTo(truncateTo);
 
-        Assert.AreEqual(expected, result);
+        Assert.That(result, Is.EqualTo(expected));
     }
 }

@@ -20,7 +20,7 @@ public class HttpRequestExtensionsTests
             "Unexpected end of Stream, the content may have already been read by another component."));
 
         Assert.DoesNotThrow(() => request.GetUfprt());
-        Assert.IsNull(request.GetUfprt());
+        Assert.That(request.GetUfprt(), Is.Null);
     }
 
     [Test]
@@ -29,7 +29,7 @@ public class HttpRequestExtensionsTests
         HttpRequest request = RequestWithUnreadableForm(new InvalidDataException("Form value count limit exceeded."));
 
         Assert.DoesNotThrow(() => request.GetUfprt());
-        Assert.IsNull(request.GetUfprt());
+        Assert.That(request.GetUfprt(), Is.Null);
     }
 
     [Test]
@@ -38,7 +38,7 @@ public class HttpRequestExtensionsTests
         HttpRequest request = RequestWithUnreadableForm(new IOException("Unexpected end of Stream."));
         request.QueryString = new QueryString("?ufprt=from-query");
 
-        Assert.AreEqual("from-query", request.GetUfprt());
+        Assert.That(request.GetUfprt(), Is.EqualTo("from-query"));
     }
 
     [Test]
@@ -48,7 +48,7 @@ public class HttpRequestExtensionsTests
         context.Request.ContentType = "application/x-www-form-urlencoded";
         context.Request.Form = new FormCollection(new Dictionary<string, StringValues> { ["ufprt"] = "from-form" });
 
-        Assert.AreEqual("from-form", context.Request.GetUfprt());
+        Assert.That(context.Request.GetUfprt(), Is.EqualTo("from-form"));
     }
 
     // The other DoesNotThrow tests inject a fake form feature that throws a chosen exception; this one drives
@@ -62,7 +62,7 @@ public class HttpRequestExtensionsTests
         HttpRequest request = RequestWithRawMultipartBody(body, boundary);
 
         Assert.DoesNotThrow(() => request.GetUfprt());
-        Assert.IsNull(request.GetUfprt());
+        Assert.That(request.GetUfprt(), Is.Null);
     }
 
     // BadHttpRequestException (raised for body/size faults) derives from IOException, so it must be swallowed too.
@@ -72,7 +72,7 @@ public class HttpRequestExtensionsTests
         HttpRequest request = RequestWithUnreadableForm(new BadHttpRequestException("Request body too large."));
 
         Assert.DoesNotThrow(() => request.GetUfprt());
-        Assert.IsNull(request.GetUfprt());
+        Assert.That(request.GetUfprt(), Is.Null);
     }
 
     // Guards against the filter being loosened to a bare catch: only form-parse failures are swallowed,

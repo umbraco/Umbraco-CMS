@@ -23,7 +23,7 @@ public class ApiDocumentUrlServiceTests
 
         var apiDocumentUrlService = new ApiDocumentUrlService(documentUrlServiceMock.Object);
         var result = apiDocumentUrlService.GetDocumentKeyByRoute("1234/some/where", null, false);
-        Assert.AreEqual(documentKey, result);
+        Assert.That(result, Is.EqualTo(documentKey));
     }
 
     [Test]
@@ -41,6 +41,6 @@ public class ApiDocumentUrlServiceTests
 
         var apiDocumentUrlService = new ApiDocumentUrlService(documentUrlServiceMock.Object);
         var result = apiDocumentUrlService.GetDocumentKeyByRoute("/some/where", null, false);
-        Assert.AreEqual(documentKey, result);
+        Assert.That(result, Is.EqualTo(documentKey));
     }
 }

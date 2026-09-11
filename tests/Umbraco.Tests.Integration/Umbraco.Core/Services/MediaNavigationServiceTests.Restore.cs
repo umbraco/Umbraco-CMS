@@ -13,24 +13,24 @@ internal sealed partial class MediaNavigationServiceTests
 
         // Restore only Sub-album 2, leaving its descendants in the recycle bin.
         var restoreAttempt = await MediaEditingService.RestoreAsync(SubAlbum2.Key, Album.Key, Constants.Security.SuperUserKey, includeDescendants: false);
-        Assert.IsTrue(restoreAttempt.Success);
+        Assert.That(restoreAttempt.Success, Is.True);
 
         Assert.Multiple(() =>
         {
             // Sub-album 2 is back in the tree under Album, with no children (they stayed behind).
-            Assert.IsTrue(MediaNavigationQueryService.TryGetParentKey(SubAlbum2.Key, out Guid? restoredParentKey));
-            Assert.AreEqual(Album.Key, restoredParentKey);
+            Assert.That(MediaNavigationQueryService.TryGetParentKey(SubAlbum2.Key, out Guid? restoredParentKey), Is.True);
+            Assert.That(restoredParentKey, Is.EqualTo(Album.Key));
             MediaNavigationQueryService.TryGetChildrenKeys(SubAlbum2.Key, out IEnumerable<Guid> restoredChildren);
-            Assert.IsEmpty(restoredChildren);
+            Assert.That(restoredChildren, Is.Empty);
 
             // Sub-sub-album 1 is now a top-level recycle bin item (its former parent left the bin).
-            Assert.IsFalse(MediaNavigationQueryService.TryGetParentKey(SubSubAlbum1.Key, out _), "Sub-sub-album 1 should not be in the main tree.");
-            Assert.IsTrue(MediaNavigationQueryService.TryGetParentKeyInBin(SubSubAlbum1.Key, out Guid? binParentKey));
-            Assert.IsNull(binParentKey, "Sub-sub-album 1 should be a top-level recycle bin item.");
+            Assert.That(MediaNavigationQueryService.TryGetParentKey(SubSubAlbum1.Key, out _), Is.False, "Sub-sub-album 1 should not be in the main tree.");
+            Assert.That(MediaNavigationQueryService.TryGetParentKeyInBin(SubSubAlbum1.Key, out Guid? binParentKey), Is.True);
+            Assert.That(binParentKey, Is.Null, "Sub-sub-album 1 should be a top-level recycle bin item.");
 
             // Image 4 remains trashed underneath Sub-sub-album 1.
-            Assert.IsTrue(MediaNavigationQueryService.TryGetParentKeyInBin(Image4.Key, out Guid? imageBinParentKey));
-            Assert.AreEqual(SubSubAlbum1.Key, imageBinParentKey);
+            Assert.That(MediaNavigationQueryService.TryGetParentKeyInBin(Image4.Key, out Guid? imageBinParentKey), Is.True);
+            Assert.That(imageBinParentKey, Is.EqualTo(SubSubAlbum1.Key));
         });
     }
 
@@ -64,19 +64,19 @@ internal sealed partial class MediaNavigationServiceTests
         Assert.Multiple(() =>
         {
             // Verify siblings count has decreased by one
-            Assert.AreEqual(initialSiblingsKeys.Count() - 1, updatedSiblingsKeys.Count());
+            Assert.That(updatedSiblingsKeys.Count(), Is.EqualTo(initialSiblingsKeys.Count() - 1));
             if (targetParentKey is null)
             {
-                Assert.IsNull(restoredItemParentKey);
+                Assert.That(restoredItemParentKey, Is.Null);
             }
             else
             {
-                Assert.IsNotNull(restoredItemParentKey);
-                Assert.AreNotEqual(initialParentKey, restoredItemParentKey);
+                Assert.That(restoredItemParentKey, Is.Not.Null);
+                Assert.That(restoredItemParentKey, Is.Not.EqualTo(initialParentKey));
             }
 
-            Assert.AreEqual(beforeRestoreDescendants, afterRestoreDescendants);
-            Assert.AreEqual(targetParentKey, restoredItemParentKey);
+            Assert.That(afterRestoreDescendants, Is.EqualTo(beforeRestoreDescendants));
+            Assert.That(restoredItemParentKey, Is.EqualTo(targetParentKey));
         });
     }
 
@@ -100,12 +100,12 @@ internal sealed partial class MediaNavigationServiceTests
         if (targetParentKey is null)
         {
             MediaNavigationQueryService.TryGetRootKeys(out IEnumerable<Guid> rootKeys);
-            Assert.AreEqual(nodeToRestore, rootKeys.Last());
+            Assert.That(rootKeys.Last(), Is.EqualTo(nodeToRestore));
         }
         else
         {
             MediaNavigationQueryService.TryGetChildrenKeys(targetParentKey.Value, out IEnumerable<Guid> childrenKeys);
-            Assert.AreEqual(nodeToRestore, childrenKeys.Last());
+            Assert.That(childrenKeys.Last(), Is.EqualTo(nodeToRestore));
         }
     }
 }

@@ -19,7 +19,7 @@ public class StackQueueTests
         while (sq.Count > 0)
         {
             var next = sq.Dequeue();
-            Assert.AreEqual(expected, next);
+            Assert.That(next, Is.EqualTo(expected));
             expected++;
         }
     }
@@ -37,7 +37,7 @@ public class StackQueueTests
         while (sq.Count > 0)
         {
             var next = sq.Pop();
-            Assert.AreEqual(expected, next);
+            Assert.That(next, Is.EqualTo(expected));
             expected--;
         }
     }
@@ -63,10 +63,10 @@ public class StackQueueTests
         // 2 (push)
         // 1 (enqueue)
         // 0 (push)
-        Assert.AreEqual(4, sq.Pop());
-        Assert.AreEqual(0, sq.Dequeue());
-        Assert.AreEqual(3, sq.Pop());
-        Assert.AreEqual(1, sq.Dequeue());
-        Assert.AreEqual(2, sq.Pop());
+        Assert.That(sq.Pop(), Is.EqualTo(4));
+        Assert.That(sq.Dequeue(), Is.EqualTo(0));
+        Assert.That(sq.Pop(), Is.EqualTo(3));
+        Assert.That(sq.Dequeue(), Is.EqualTo(1));
+        Assert.That(sq.Pop(), Is.EqualTo(2));
     }
 }

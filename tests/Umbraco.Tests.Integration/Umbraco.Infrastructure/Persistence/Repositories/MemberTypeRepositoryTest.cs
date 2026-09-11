@@ -49,7 +49,7 @@ internal sealed class MemberTypeRepositoryTest : UmbracoIntegrationTest
             var expectedGroupCount = standardProps.Count > 0 ? 2 : 1;
 
             Assert.That(sut, Is.Not.Null);
-            Assert.That(sut.PropertyGroups.Count, Is.EqualTo(expectedGroupCount));
+            Assert.That(sut.PropertyGroups, Has.Count.EqualTo(expectedGroupCount));
             Assert.That(sut.PropertyTypes.Count(), Is.EqualTo(3 + standardProps.Count));
 
             Assert.That(sut.PropertyGroups.Any(x => x.HasIdentity == false || x.Id == 0), Is.False);
@@ -79,8 +79,8 @@ internal sealed class MemberTypeRepositoryTest : UmbracoIntegrationTest
             var propertyKeys2 = memberType.PropertyTypes.Select(x => x.Key).OrderBy(x => x).ToArray();
             var groupKeys2 = memberType.PropertyGroups.Select(x => x.Key).OrderBy(x => x).ToArray();
 
-            Assert.IsTrue(propertyKeys.SequenceEqual(propertyKeys2));
-            Assert.IsTrue(groupKeys.SequenceEqual(groupKeys2));
+            Assert.That(propertyKeys.SequenceEqual(propertyKeys2), Is.True);
+            Assert.That(groupKeys.SequenceEqual(groupKeys2), Is.True);
         }
     }
 
@@ -118,7 +118,7 @@ internal sealed class MemberTypeRepositoryTest : UmbracoIntegrationTest
             var result = repository.GetMany();
 
             // there are 3 because of the Member type created for init data
-            Assert.AreEqual(3, result.Count());
+            Assert.That(result.Count(), Is.EqualTo(3));
         }
     }
 
@@ -141,7 +141,7 @@ internal sealed class MemberTypeRepositoryTest : UmbracoIntegrationTest
             var result = ((IReadRepository<Guid, IMemberType>)repository).GetMany(memberType1.Key, memberType2.Key);
 
             // there are 3 because of the Member type created for init data
-            Assert.AreEqual(2, result.Count());
+            Assert.That(result.Count(), Is.EqualTo(2));
         }
     }
 
@@ -164,8 +164,8 @@ internal sealed class MemberTypeRepositoryTest : UmbracoIntegrationTest
             var result = repository.Get(memberType1.Key);
 
             // there are 3 because of the Member type created for init data
-            Assert.IsNotNull(result);
-            Assert.AreEqual(memberType1.Key, result.Key);
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Key, Is.EqualTo(memberType1.Key));
         }
     }
 
@@ -191,7 +191,7 @@ internal sealed class MemberTypeRepositoryTest : UmbracoIntegrationTest
             var result = repository.GetMany();
 
             // there are 3 because of the Member type created for init data
-            Assert.AreEqual(3, result.Count());
+            Assert.That(result.Count(), Is.EqualTo(3));
         }
     }
 
@@ -270,7 +270,7 @@ internal sealed class MemberTypeRepositoryTest : UmbracoIntegrationTest
             var m1Ids = memberType1.PropertyTypes.Select(x => x.Id).ToArray();
             var m2Ids = memberType2.PropertyTypes.Select(x => x.Id).ToArray();
 
-            Assert.IsFalse(m1Ids.Any(m2Ids.Contains));
+            Assert.That(m1Ids.Any(m2Ids.Contains), Is.False);
         }
     }
 

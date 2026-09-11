@@ -51,15 +51,15 @@ public class PropertyCacheLevelTests
 
         var set1 = new PublishedElement(contentNode, false, elementsCache, variationContextAccessor, propertyRenderingContextAccessor);
 
-        Assert.AreEqual(1234, set1.Value(Mock.Of<IPublishedValueFallback>(), "prop1"));
-        Assert.AreEqual(1, converter.SourceConverts);
-        Assert.AreEqual(1, converter.InterConverts);
+        Assert.That(set1.Value(Mock.Of<IPublishedValueFallback>(), "prop1"), Is.EqualTo(1234));
+        Assert.That(converter.SourceConverts, Is.EqualTo(1));
+        Assert.That(converter.InterConverts, Is.EqualTo(1));
 
         // source is always converted once and cached per content
         // inter conversion depends on the specified cache level
-        Assert.AreEqual(1234, set1.Value(Mock.Of<IPublishedValueFallback>(), "prop1"));
-        Assert.AreEqual(1, converter.SourceConverts);
-        Assert.AreEqual(interConverts, converter.InterConverts);
+        Assert.That(set1.Value(Mock.Of<IPublishedValueFallback>(), "prop1"), Is.EqualTo(1234));
+        Assert.That(converter.SourceConverts, Is.EqualTo(1));
+        Assert.That(converter.InterConverts, Is.EqualTo(interConverts));
     }
 
     [TestCase(PropertyCacheLevel.None, 2, 0, 0)]
@@ -101,30 +101,30 @@ public class PropertyCacheLevelTests
 
         var set1 = new PublishedElement(contentNode, false, elementsCache, variationContextAccessor, propertyRenderingContextAccessor);
 
-        Assert.AreEqual(1234, set1.Value(Mock.Of<IPublishedValueFallback>(), "prop1"));
-        Assert.AreEqual(1, converter.SourceConverts);
-        Assert.AreEqual(1, converter.InterConverts);
+        Assert.That(set1.Value(Mock.Of<IPublishedValueFallback>(), "prop1"), Is.EqualTo(1234));
+        Assert.That(converter.SourceConverts, Is.EqualTo(1));
+        Assert.That(converter.InterConverts, Is.EqualTo(1));
 
-        Assert.AreEqual(elementsCount1, elementsCache.Count);
-        Assert.AreEqual(1234, set1.Value(Mock.Of<IPublishedValueFallback>(), "prop1"));
-        Assert.AreEqual(1, converter.SourceConverts);
-        Assert.AreEqual(interConverts, converter.InterConverts);
+        Assert.That(elementsCache.Count, Is.EqualTo(elementsCount1));
+        Assert.That(set1.Value(Mock.Of<IPublishedValueFallback>(), "prop1"), Is.EqualTo(1234));
+        Assert.That(converter.SourceConverts, Is.EqualTo(1));
+        Assert.That(converter.InterConverts, Is.EqualTo(interConverts));
 
-        Assert.AreEqual(elementsCount2, elementsCache.Count);
+        Assert.That(elementsCache.Count, Is.EqualTo(elementsCount2));
 
-        Assert.AreEqual(1234, set1.Value(Mock.Of<IPublishedValueFallback>(), "prop1"));
-        Assert.AreEqual(1, converter.SourceConverts);
+        Assert.That(set1.Value(Mock.Of<IPublishedValueFallback>(), "prop1"), Is.EqualTo(1234));
+        Assert.That(converter.SourceConverts, Is.EqualTo(1));
 
-        Assert.AreEqual(elementsCount2, elementsCache.Count);
+        Assert.That(elementsCache.Count, Is.EqualTo(elementsCount2));
 
         var oldElementsCache = elementsCache;
         elementsCache.Clear();
 
-        Assert.AreEqual(1234, set1.Value(Mock.Of<IPublishedValueFallback>(), "prop1"));
-        Assert.AreEqual(1, converter.SourceConverts);
+        Assert.That(set1.Value(Mock.Of<IPublishedValueFallback>(), "prop1"), Is.EqualTo(1234));
+        Assert.That(converter.SourceConverts, Is.EqualTo(1));
 
-        Assert.AreEqual(elementsCount2, elementsCache.Count);
-        Assert.AreEqual(elementsCount2, oldElementsCache.Count);
+        Assert.That(elementsCache.Count, Is.EqualTo(elementsCount2));
+        Assert.That(oldElementsCache.Count, Is.EqualTo(elementsCount2));
     }
 
     [Test]

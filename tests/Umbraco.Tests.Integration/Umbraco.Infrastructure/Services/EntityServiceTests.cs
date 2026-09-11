@@ -92,9 +92,9 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
             6,
             out var total,
             ordering: ascendingOrder).ToArray();
-        Assert.That(entities.Length, Is.EqualTo(6));
+        Assert.That(entities, Has.Length.EqualTo(6));
         Assert.That(total, Is.EqualTo(10));
-        Assert.AreEqual(ids[0], entities[0].Id);
+        Assert.That(entities[0].Id, Is.EqualTo(ids[0]));
 
         entities = EntityService.GetPagedDescendants(
             rootId,
@@ -103,9 +103,9 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
             6,
             out total,
             ordering: ascendingOrder).ToArray();
-        Assert.That(entities.Length, Is.EqualTo(4));
+        Assert.That(entities, Has.Length.EqualTo(4));
         Assert.That(total, Is.EqualTo(10));
-        Assert.AreEqual(ids[6], entities[0].Id);
+        Assert.That(entities[0].Id, Is.EqualTo(ids[6]));
 
         // Test ordering direction
         var descendingOrder = Ordering.By("Path", Direction.Descending);
@@ -116,9 +116,9 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
             6,
             out total,
             ordering: descendingOrder).ToArray();
-        Assert.That(entities.Length, Is.EqualTo(6));
+        Assert.That(entities, Has.Length.EqualTo(6));
         Assert.That(total, Is.EqualTo(10));
-        Assert.AreEqual(ids[^1], entities[0].Id);
+        Assert.That(entities[0].Id, Is.EqualTo(ids[^1]));
 
         entities = EntityService.GetPagedDescendants(
             rootId,
@@ -127,9 +127,9 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
             6,
             out total,
             ordering: descendingOrder).ToArray();
-        Assert.That(entities.Length, Is.EqualTo(4));
+        Assert.That(entities, Has.Length.EqualTo(4));
         Assert.That(total, Is.EqualTo(10));
-        Assert.AreEqual(ids[ids.Count - 1 - 6], entities[0].Id);
+        Assert.That(entities[0].Id, Is.EqualTo(ids[ids.Count - 1 - 6]));
     }
 
     [Test]
@@ -149,14 +149,14 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
 
         var entities = EntityService.GetPagedChildren(root.Id, UmbracoObjectTypes.Document, 0, 6, out var total)
             .ToArray();
-        Assert.That(entities.Length, Is.EqualTo(6));
+        Assert.That(entities, Has.Length.EqualTo(6));
         Assert.That(total, Is.EqualTo(10));
-        Assert.AreEqual(ids[0], entities[0].Id);
+        Assert.That(entities[0].Id, Is.EqualTo(ids[0]));
 
         entities = EntityService.GetPagedChildren(root.Id, UmbracoObjectTypes.Document, 1, 6, out total).ToArray();
-        Assert.That(entities.Length, Is.EqualTo(4));
+        Assert.That(entities, Has.Length.EqualTo(4));
         Assert.That(total, Is.EqualTo(10));
-        Assert.AreEqual(ids[6], entities[0].Id);
+        Assert.That(entities[0].Id, Is.EqualTo(ids[6]));
 
         // Test ordering direction
         entities = EntityService.GetPagedChildren(
@@ -166,9 +166,9 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
             6,
             out total,
             ordering: Ordering.By("SortOrder", Direction.Descending)).ToArray();
-        Assert.That(entities.Length, Is.EqualTo(6));
+        Assert.That(entities, Has.Length.EqualTo(6));
         Assert.That(total, Is.EqualTo(10));
-        Assert.AreEqual(ids[^1], entities[0].Id);
+        Assert.That(entities[0].Id, Is.EqualTo(ids[^1]));
 
         entities = EntityService.GetPagedChildren(
             root.Id,
@@ -177,9 +177,9 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
             6,
             out total,
             ordering: Ordering.By("SortOrder", Direction.Descending)).ToArray();
-        Assert.That(entities.Length, Is.EqualTo(4));
+        Assert.That(entities, Has.Length.EqualTo(4));
         Assert.That(total, Is.EqualTo(10));
-        Assert.AreEqual(ids[ids.Count - 1 - 6], entities[0].Id);
+        Assert.That(entities[0].Id, Is.EqualTo(ids[ids.Count - 1 - 6]));
     }
 
     [Test]
@@ -206,10 +206,10 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
 
         var entities = EntityService.GetPagedDescendants(root.Id, UmbracoObjectTypes.Document, 0, 31, out var total)
             .ToArray();
-        Assert.That(entities.Length, Is.EqualTo(31));
+        Assert.That(entities, Has.Length.EqualTo(31));
         Assert.That(total, Is.EqualTo(60));
         entities = EntityService.GetPagedDescendants(root.Id, UmbracoObjectTypes.Document, 1, 31, out total).ToArray();
-        Assert.That(entities.Length, Is.EqualTo(29));
+        Assert.That(entities, Has.Length.EqualTo(29));
         Assert.That(total, Is.EqualTo(60));
     }
 
@@ -251,7 +251,7 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
 
         foreach (var c in toDelete)
         {
-            Assert.True(entities.Contains(c.Id));
+            Assert.That(entities.Contains(c.Id), Is.True);
         }
     }
 
@@ -294,7 +294,7 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
 
         foreach (var c in toDelete)
         {
-            Assert.IsFalse(entities.Contains(c.Id));
+            Assert.That(entities.Contains(c.Id), Is.False);
         }
     }
 
@@ -335,10 +335,10 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
             .Select(x => x.Id)
             .ToArray();
 
-        Assert.True(total > 0);
+        Assert.That(total, Is.GreaterThan(0));
         foreach (var c in toDelete)
         {
-            Assert.IsTrue(entities.Contains(c.Id));
+            Assert.That(entities.Contains(c.Id), Is.True);
         }
     }
 
@@ -369,7 +369,7 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
             10,
             out var total,
             SqlContext.Query<IUmbracoEntity>().Where(x => x.Name.Contains("ssss"))).ToArray();
-        Assert.That(entities.Length, Is.EqualTo(10));
+        Assert.That(entities, Has.Length.EqualTo(10));
         Assert.That(total, Is.EqualTo(10));
         entities = EntityService.GetPagedDescendants(
             root.Id,
@@ -378,7 +378,7 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
             50,
             out total,
             SqlContext.Query<IUmbracoEntity>().Where(x => x.Name.Contains("tttt"))).ToArray();
-        Assert.That(entities.Length, Is.EqualTo(50));
+        Assert.That(entities, Has.Length.EqualTo(50));
         Assert.That(total, Is.EqualTo(50));
     }
 
@@ -397,10 +397,10 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
         }
 
         var entities = EntityService.GetPagedChildren(root.Id, UmbracoObjectTypes.Media, 0, 6, out var total).ToArray();
-        Assert.That(entities.Length, Is.EqualTo(6));
+        Assert.That(entities, Has.Length.EqualTo(6));
         Assert.That(total, Is.EqualTo(10));
         entities = EntityService.GetPagedChildren(root.Id, UmbracoObjectTypes.Media, 1, 6, out total).ToArray();
-        Assert.That(entities.Length, Is.EqualTo(4));
+        Assert.That(entities, Has.Length.EqualTo(4));
         Assert.That(total, Is.EqualTo(10));
     }
 
@@ -422,11 +422,11 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
             out long totalRecords,
             ordering: ordering);
 
-        Assert.AreEqual(3, totalRecords);
-        Assert.AreEqual(3, children.Count());
-        Assert.IsTrue(children.Single(x => x.Key == _documentTypeSubContainer1Key).HasChildren);     // Has a single folder as a child.
-        Assert.IsTrue(children.Single(x => x.Key == _documentTypeSubContainer2Key).HasChildren);     // Has a single document type as a child.
-        Assert.IsFalse(children.Single(x => x.Key == _documentType1Key).HasChildren);                // Is a document type (has no children).
+        Assert.That(totalRecords, Is.EqualTo(3));
+        Assert.That(children.Count(), Is.EqualTo(3));
+        Assert.That(children.Single(x => x.Key == _documentTypeSubContainer1Key).HasChildren, Is.True);     // Has a single folder as a child.
+        Assert.That(children.Single(x => x.Key == _documentTypeSubContainer2Key).HasChildren, Is.True);     // Has a single document type as a child.
+        Assert.That(children.Single(x => x.Key == _documentType1Key).HasChildren, Is.False);                // Is a document type (has no children).
     }
 
     [Test]
@@ -441,10 +441,10 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
             false,
             out long totalRecords);
 
-        Assert.AreEqual(2, totalRecords);
-        Assert.AreEqual(2, children.Count());
-        Assert.IsTrue(children.Single(x => x.Key == _documentTypeSubContainer1Key).HasChildren);     // Has a single folder as a child.
-        Assert.IsFalse(children.Single(x => x.Key == _documentTypeSubContainer2Key).HasChildren);    // Has a single document type as a child.
+        Assert.That(totalRecords, Is.EqualTo(2));
+        Assert.That(children.Count(), Is.EqualTo(2));
+        Assert.That(children.Single(x => x.Key == _documentTypeSubContainer1Key).HasChildren, Is.True);     // Has a single folder as a child.
+        Assert.That(children.Single(x => x.Key == _documentTypeSubContainer2Key).HasChildren, Is.False);    // Has a single document type as a child.
     }
 
     [Test]
@@ -473,10 +473,10 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
 
         var entities = EntityService.GetPagedDescendants(root.Id, UmbracoObjectTypes.Media, 0, 31, out var total)
             .ToArray();
-        Assert.That(entities.Length, Is.EqualTo(31));
+        Assert.That(entities, Has.Length.EqualTo(31));
         Assert.That(total, Is.EqualTo(60));
         entities = EntityService.GetPagedDescendants(root.Id, UmbracoObjectTypes.Media, 1, 31, out total).ToArray();
-        Assert.That(entities.Length, Is.EqualTo(29));
+        Assert.That(entities, Has.Length.EqualTo(29));
         Assert.That(total, Is.EqualTo(60));
     }
 
@@ -519,7 +519,7 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
 
         foreach (var media in toDelete)
         {
-            Assert.IsTrue(entities.Contains(media.Id));
+            Assert.That(entities.Contains(media.Id), Is.True);
         }
     }
 
@@ -563,7 +563,7 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
 
         foreach (var media in toDelete)
         {
-            Assert.IsFalse(entities.Contains(media.Id));
+            Assert.That(entities.Contains(media.Id), Is.False);
         }
     }
 
@@ -605,10 +605,10 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
             .Select(x => x.Id)
             .ToArray();
 
-        Assert.True(total > 0);
+        Assert.That(total, Is.GreaterThan(0));
         foreach (var media in toDelete)
         {
-            Assert.IsTrue(entities.Contains(media.Id));
+            Assert.That(entities.Contains(media.Id), Is.True);
         }
     }
 
@@ -643,7 +643,7 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
             10,
             out var total,
             SqlContext.Query<IUmbracoEntity>().Where(x => x.Name.Contains("ssss"))).ToArray();
-        Assert.That(entities.Length, Is.EqualTo(10));
+        Assert.That(entities, Has.Length.EqualTo(10));
         Assert.That(total, Is.EqualTo(10));
         entities = EntityService.GetPagedDescendants(
             root.Id,
@@ -652,7 +652,7 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
             50,
             out total,
             SqlContext.Query<IUmbracoEntity>().Where(x => x.Name.Contains("tttt"))).ToArray();
-        Assert.That(entities.Length, Is.EqualTo(50));
+        Assert.That(entities, Has.Length.EqualTo(50));
         Assert.That(total, Is.EqualTo(50));
     }
 
@@ -666,10 +666,10 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
         var data = await GetSharedElementTreeData();
 
         var entities = EntityService.GetPagedChildren(data.RootKey, [UmbracoObjectTypes.ElementContainer], [UmbracoObjectTypes.Element], 0, 2, false, out var total).ToArray();
-        Assert.That(entities.Length, Is.EqualTo(2));
+        Assert.That(entities, Has.Length.EqualTo(2));
         Assert.That(total, Is.EqualTo(3));
         entities = EntityService.GetPagedChildren(data.RootKey, [UmbracoObjectTypes.ElementContainer], [UmbracoObjectTypes.Element], 2, 2, false, out total).ToArray();
-        Assert.That(entities.Length, Is.EqualTo(1));
+        Assert.That(entities, Has.Length.EqualTo(1));
         Assert.That(total, Is.EqualTo(3));
     }
 
@@ -682,10 +682,10 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
         // Half of each collection is trashed and moves out of this subtree, leaving 28 descendants:
         // 3 root elements + 5 branches x (1 + 4 leaves). Page size (15) forces a genuine two-page split.
         var entities = EntityService.GetPagedDescendants(data.RootKey, UmbracoObjectTypes.ElementContainer, [UmbracoObjectTypes.ElementContainer, UmbracoObjectTypes.Element], 0, 15, out var total).ToArray();
-        Assert.That(entities.Length, Is.EqualTo(15));
+        Assert.That(entities, Has.Length.EqualTo(15));
         Assert.That(total, Is.EqualTo(28));
         entities = EntityService.GetPagedDescendants(data.RootKey, UmbracoObjectTypes.ElementContainer, [UmbracoObjectTypes.ElementContainer, UmbracoObjectTypes.Element], 15, 15, out total).ToArray();
-        Assert.That(entities.Length, Is.EqualTo(13));
+        Assert.That(entities, Has.Length.EqualTo(13));
         Assert.That(total, Is.EqualTo(28));
     }
 
@@ -702,7 +702,7 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
 
         foreach (var id in data.TrashedContainerIds.Concat(data.TrashedElementIds))
         {
-            Assert.IsTrue(entities.Contains(id));
+            Assert.That(entities.Contains(id), Is.True);
         }
     }
 
@@ -720,7 +720,7 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
 
         foreach (var id in data.TrashedContainerIds.Concat(data.TrashedElementIds))
         {
-            Assert.IsFalse(entities.Contains(id));
+            Assert.That(entities.Contains(id), Is.False);
         }
     }
 
@@ -736,10 +736,10 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
             .Select(x => x.Id)
             .ToArray();
 
-        Assert.True(total > 0);
+        Assert.That(total, Is.GreaterThan(0));
         foreach (var id in data.TrashedContainerIds)
         {
-            Assert.IsTrue(entities.Contains(id));
+            Assert.That(entities.Contains(id), Is.True);
         }
 
         // get paged elements at recycle bin root - individually-trashed elements are a direct Element-typed
@@ -749,10 +749,10 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
             .Select(x => x.Id)
             .ToArray();
 
-        Assert.True(elementTotal > 0);
+        Assert.That(elementTotal, Is.GreaterThan(0));
         foreach (var id in data.TrashedElementIds)
         {
-            Assert.IsTrue(trashedElements.Contains(id));
+            Assert.That(trashedElements.Contains(id), Is.True);
         }
     }
 
@@ -773,7 +773,7 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
             1000,
             out var total,
             SqlContext.Query<IUmbracoEntity>().Where(x => x.Name.Contains("ssss"))).ToArray();
-        Assert.That(entities.Length, Is.EqualTo(5));
+        Assert.That(entities, Has.Length.EqualTo(5));
         Assert.That(total, Is.EqualTo(5));
         entities = EntityService.GetPagedDescendants(
             data.RootKey,
@@ -783,7 +783,7 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
             1000,
             out total,
             SqlContext.Query<IUmbracoEntity>().Where(x => x.Name.Contains("tttt"))).ToArray();
-        Assert.That(entities.Length, Is.EqualTo(23));
+        Assert.That(entities, Has.Length.EqualTo(23));
         Assert.That(total, Is.EqualTo(23));
     }
 
@@ -793,7 +793,7 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
         var data = await GetSharedElementTreeData();
 
         var elements = EntityService.GetAll(UmbracoObjectTypes.Element).ToArray();
-        Assert.That(elements.Length, Is.EqualTo(47));
+        Assert.That(elements, Has.Length.EqualTo(47));
         Assert.That(elements.Any(x => x.Id == data.RootId), Is.False);
     }
 
@@ -803,7 +803,7 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
         var entities = EntityService.GetAll(UmbracoObjectTypes.Document).ToArray();
 
         Assert.That(entities.Any(), Is.True);
-        Assert.That(entities.Length, Is.EqualTo(4));
+        Assert.That(entities, Has.Length.EqualTo(4));
         Assert.That(entities.Any(x => x.Trashed), Is.True);
     }
 
@@ -814,7 +814,7 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
         var entities = EntityService.GetAll(objectTypeId).ToArray();
 
         Assert.That(entities.Any(), Is.True);
-        Assert.That(entities.Length, Is.EqualTo(4));
+        Assert.That(entities, Has.Length.EqualTo(4));
         Assert.That(entities.Any(x => x.Trashed), Is.True);
     }
 
@@ -824,7 +824,7 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
         var entities = EntityService.GetAll<IContent>().ToArray();
 
         Assert.That(entities.Any(), Is.True);
-        Assert.That(entities.Length, Is.EqualTo(4));
+        Assert.That(entities, Has.Length.EqualTo(4));
         Assert.That(entities.Any(x => x.Trashed), Is.True);
     }
 
@@ -834,7 +834,7 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
         var entities = EntityService.GetChildren(-1, UmbracoObjectTypes.Document).ToArray();
 
         Assert.That(entities.Any(), Is.True);
-        Assert.That(entities.Length, Is.EqualTo(1));
+        Assert.That(entities, Has.Length.EqualTo(1));
         Assert.That(entities.Any(x => x.Trashed), Is.False);
     }
 
@@ -854,12 +854,12 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
         ContentService.Save(c1);
 
         var result = EntityService.Get(c1.Id, UmbracoObjectTypes.Document);
-        Assert.AreEqual("Test - FR", result.Name); // got name from default culture
-        Assert.IsNotNull(result as IDocumentEntitySlim);
+        Assert.That(result.Name, Is.EqualTo("Test - FR")); // got name from default culture
+        Assert.That(result as IDocumentEntitySlim, Is.Not.Null);
         var doc = (IDocumentEntitySlim)result;
         var cultureNames = doc.CultureNames;
-        Assert.AreEqual("Test - FR", cultureNames[_langFr.IsoCode]);
-        Assert.AreEqual("Test - ES", cultureNames[_langEs.IsoCode]);
+        Assert.That(cultureNames[_langFr.IsoCode], Is.EqualTo("Test - FR"));
+        Assert.That(cultureNames[_langEs.IsoCode], Is.EqualTo("Test - ES"));
     }
 
     [Test]
@@ -893,7 +893,7 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
 
         var entities = EntityService.GetChildren(root.Id, UmbracoObjectTypes.Document).ToArray();
 
-        Assert.AreEqual(10, entities.Length);
+        Assert.That(entities, Has.Length.EqualTo(10));
 
         for (var i = 0; i < entities.Length; i++)
         {
@@ -902,10 +902,10 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
                 var doc = (IDocumentEntitySlim)entities[i];
                 var keys = doc.CultureNames.Keys.ToList();
                 var vals = doc.CultureNames.Values.ToList();
-                Assert.AreEqual(_langFr.IsoCode.ToLowerInvariant(), keys[0].ToLowerInvariant());
-                Assert.AreEqual("Test " + i + " - FR", vals[0]);
-                Assert.AreEqual(_langEs.IsoCode.ToLowerInvariant(), keys[1].ToLowerInvariant());
-                Assert.AreEqual("Test " + i + " - ES", vals[1]);
+                Assert.That(keys[0].ToLowerInvariant(), Is.EqualTo(_langFr.IsoCode.ToLowerInvariant()));
+                Assert.That(vals[0], Is.EqualTo("Test " + i + " - FR"));
+                Assert.That(keys[1].ToLowerInvariant(), Is.EqualTo(_langEs.IsoCode.ToLowerInvariant()));
+                Assert.That(vals[1], Is.EqualTo("Test " + i + " - ES"));
             }
         }
     }
@@ -973,13 +973,13 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
         var entities = EntityService.GetAll(UmbracoObjectTypes.Media).ToArray();
 
         Assert.That(entities.Any(), Is.True);
-        Assert.That(entities.Length, Is.EqualTo(5));
+        Assert.That(entities, Has.Length.EqualTo(5));
 
         foreach (var entity in entities)
         {
-            Assert.IsTrue(entity.GetType().Implements<IMediaEntitySlim>());
+            Assert.That(entity.GetType().Implements<IMediaEntitySlim>(), Is.True);
             Console.WriteLine(((IMediaEntitySlim)entity).MediaPath);
-            Assert.IsNotEmpty(((IMediaEntitySlim)entity).MediaPath);
+            Assert.That(((IMediaEntitySlim)entity).MediaPath, Is.Not.Empty);
         }
     }
 
@@ -988,8 +988,8 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
     {
         var mediaObjectType = EntityService.GetObjectType(1031);
 
-        Assert.NotNull(mediaObjectType);
-        Assert.AreEqual(mediaObjectType, UmbracoObjectTypes.MediaType);
+        Assert.That(mediaObjectType, Is.Not.Null);
+        Assert.That(mediaObjectType, Is.EqualTo(UmbracoObjectTypes.MediaType));
     }
 
     [Test]
@@ -997,8 +997,8 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
     {
         var result = EntityService.GetKey(_contentType.Id, UmbracoObjectTypes.Unknown);
 
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(Guid.Parse("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522"), result.Result);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result, Is.EqualTo(Guid.Parse("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522")));
     }
 
     [Test]
@@ -1006,8 +1006,8 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
     {
         var result = EntityService.GetKey(_contentType.Id, UmbracoObjectTypes.DocumentType);
 
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(Guid.Parse("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522"), result.Result);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result, Is.EqualTo(Guid.Parse("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522")));
     }
 
     [Test]
@@ -1016,8 +1016,8 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
         var result1 = EntityService.GetKey(_contentType.Id, UmbracoObjectTypes.DocumentType);
         var result2 = EntityService.GetKey(_contentType.Id, UmbracoObjectTypes.MediaType);
 
-        Assert.IsTrue(result1.Success);
-        Assert.IsFalse(result2.Success);
+        Assert.That(result1.Success, Is.True);
+        Assert.That(result2.Success, Is.False);
     }
 
     [Test]
@@ -1026,8 +1026,8 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
         var result =
             EntityService.GetId(Guid.Parse("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522"), UmbracoObjectTypes.Unknown);
 
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(_contentType.Id, result.Result);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result, Is.EqualTo(_contentType.Id));
     }
 
     [Test]
@@ -1037,8 +1037,8 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
             Guid.Parse("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522"),
             UmbracoObjectTypes.DocumentType);
 
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(_contentType.Id, result.Result);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result, Is.EqualTo(_contentType.Id));
     }
 
     [Test]
@@ -1051,8 +1051,8 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
             Guid.Parse("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522"),
             UmbracoObjectTypes.MediaType);
 
-        Assert.IsTrue(result1.Success);
-        Assert.IsFalse(result2.Success);
+        Assert.That(result1.Success, Is.True);
+        Assert.That(result2.Success, Is.False);
     }
 
     [Test]
@@ -1062,20 +1062,20 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
 
         // can reserve
         var reservedId = EntityService.ReserveId(guid);
-        Assert.IsTrue(reservedId > 0);
+        Assert.That(reservedId, Is.GreaterThan(0));
 
         // can get it back
         var id = EntityService.GetId(guid, UmbracoObjectTypes.DocumentType);
-        Assert.IsTrue(id.Success);
-        Assert.AreEqual(reservedId, id.Result);
+        Assert.That(id.Success, Is.True);
+        Assert.That(id.Result, Is.EqualTo(reservedId));
 
         // anything goes
         id = EntityService.GetId(guid, UmbracoObjectTypes.Media);
-        Assert.IsTrue(id.Success);
-        Assert.AreEqual(reservedId, id.Result);
+        Assert.That(id.Success, Is.True);
+        Assert.That(id.Result, Is.EqualTo(reservedId));
 
         // a random guid won't work
-        Assert.IsFalse(EntityService.GetId(Guid.NewGuid(), UmbracoObjectTypes.DocumentType).Success);
+        Assert.That(EntityService.GetId(Guid.NewGuid(), UmbracoObjectTypes.DocumentType).Success, Is.False);
     }
 
     [Test]
@@ -1092,10 +1092,10 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
         ContentService.Save(grandChild);
 
         var result = EntityService.GetPathKeys(grandChild);
-        Assert.AreEqual($"{root.Key},{child.Key},{grandChild.Key}", string.Join(",", result));
+        Assert.That(string.Join(",", result), Is.EqualTo($"{root.Key},{child.Key},{grandChild.Key}"));
 
         var result2 = EntityService.GetPathKeys(grandChild, omitSelf: true);
-        Assert.AreEqual($"{root.Key},{child.Key}", string.Join(",", result2));
+        Assert.That(string.Join(",", result2), Is.EqualTo($"{root.Key},{child.Key}"));
     }
 
     [Test]
@@ -1106,12 +1106,12 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
         var target = children[1];
 
         var result = EntityService.GetSiblings(target.Key, [UmbracoObjectTypes.Document], 1, 1, out long totalBefore, out long totalAfter).ToArray();
-        Assert.AreEqual(0, totalBefore);
-        Assert.AreEqual(7, totalAfter);
-        Assert.AreEqual(3, result.Length);
-        Assert.IsTrue(result[0].Key == children[0].Key);
-        Assert.IsTrue(result[1].Key == children[1].Key);
-        Assert.IsTrue(result[2].Key == children[2].Key);
+        Assert.That(totalBefore, Is.EqualTo(0));
+        Assert.That(totalAfter, Is.EqualTo(7));
+        Assert.That(result, Has.Length.EqualTo(3));
+        Assert.That(result[0].Key, Is.EqualTo(children[0].Key));
+        Assert.That(result[1].Key, Is.EqualTo(children[1].Key));
+        Assert.That(result[2].Key, Is.EqualTo(children[2].Key));
     }
 
     [Test]
@@ -1124,13 +1124,13 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
 
         var target = children[2];
         var result = EntityService.GetSiblings(target.Key, [UmbracoObjectTypes.Document], 1, 1, out long totalBefore, out long totalAfter).ToArray();
-        Assert.AreEqual(0, totalBefore);
-        Assert.AreEqual(6, totalAfter);
-        Assert.AreEqual(3, result.Length);
-        Assert.IsFalse(result.Any(x => x.Key == trash.Key));
-        Assert.IsTrue(result[0].Key == children[0].Key);
-        Assert.IsTrue(result[1].Key == children[2].Key);
-        Assert.IsTrue(result[2].Key == children[3].Key);
+        Assert.That(totalBefore, Is.EqualTo(0));
+        Assert.That(totalAfter, Is.EqualTo(6));
+        Assert.That(result, Has.Length.EqualTo(3));
+        Assert.That(result.Any(x => x.Key == trash.Key), Is.False);
+        Assert.That(result[0].Key, Is.EqualTo(children[0].Key));
+        Assert.That(result[1].Key, Is.EqualTo(children[2].Key));
+        Assert.That(result[2].Key, Is.EqualTo(children[3].Key));
     }
 
     [Test]
@@ -1145,13 +1145,13 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
         }
 
         var result = EntityService.GetTrashedSiblings(children[1].Key, [UmbracoObjectTypes.Document], 1, 1, out long totalBefore, out long totalAfter).ToArray();
-        Assert.AreEqual(0, totalBefore);
-        Assert.AreEqual(1, totalAfter);
-        Assert.AreEqual(3, result.Length);
-        Assert.IsTrue(result[0].Key == children[0].Key);
-        Assert.IsTrue(result[1].Key == children[1].Key);
-        Assert.IsTrue(result[2].Key == children[2].Key);
-        Assert.IsFalse(result.Any(x => x.Key == children[3].Key));
+        Assert.That(totalBefore, Is.EqualTo(0));
+        Assert.That(totalAfter, Is.EqualTo(1));
+        Assert.That(result, Has.Length.EqualTo(3));
+        Assert.That(result[0].Key, Is.EqualTo(children[0].Key));
+        Assert.That(result[1].Key, Is.EqualTo(children[1].Key));
+        Assert.That(result[2].Key, Is.EqualTo(children[2].Key));
+        Assert.That(result.Any(x => x.Key == children[3].Key), Is.False);
     }
 
     [Test]
@@ -1166,13 +1166,13 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
 
         var target = children[2];
         var result = EntityService.GetSiblings(target.Key, [UmbracoObjectTypes.Document], 1, 1, out long totalBefore, out long totalAfter, filter).ToArray();
-        Assert.AreEqual(0, totalBefore);
-        Assert.AreEqual(6, totalAfter);
-        Assert.AreEqual(3, result.Length);
-        Assert.IsFalse(result.Any(x => x.Key == keysToExclude[0]));
-        Assert.IsTrue(result[0].Key == children[0].Key);
-        Assert.IsTrue(result[1].Key == children[2].Key);
-        Assert.IsTrue(result[2].Key == children[3].Key);
+        Assert.That(totalBefore, Is.EqualTo(0));
+        Assert.That(totalAfter, Is.EqualTo(6));
+        Assert.That(result, Has.Length.EqualTo(3));
+        Assert.That(result.Any(x => x.Key == keysToExclude[0]), Is.False);
+        Assert.That(result[0].Key, Is.EqualTo(children[0].Key));
+        Assert.That(result[1].Key, Is.EqualTo(children[2].Key));
+        Assert.That(result[2].Key, Is.EqualTo(children[3].Key));
     }
 
     [Test]
@@ -1187,13 +1187,13 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
 
         var target = children[2];
         var result = EntityService.GetSiblings(target.Key, [UmbracoObjectTypes.Document], 1, 1, out long totalBefore, out long totalAfter, filter).ToArray();
-        Assert.AreEqual(0, totalBefore);
-        Assert.AreEqual(6, totalAfter);
-        Assert.AreEqual(3, result.Length);
-        Assert.IsFalse(result.Any(x => x.Key == keyToExclude));
-        Assert.IsTrue(result[0].Key == children[0].Key);
-        Assert.IsTrue(result[1].Key == children[2].Key);
-        Assert.IsTrue(result[2].Key == children[3].Key);
+        Assert.That(totalBefore, Is.EqualTo(0));
+        Assert.That(totalAfter, Is.EqualTo(6));
+        Assert.That(result, Has.Length.EqualTo(3));
+        Assert.That(result.Any(x => x.Key == keyToExclude), Is.False);
+        Assert.That(result[0].Key, Is.EqualTo(children[0].Key));
+        Assert.That(result[1].Key, Is.EqualTo(children[2].Key));
+        Assert.That(result[2].Key, Is.EqualTo(children[3].Key));
     }
 
     [Test]
@@ -1206,12 +1206,12 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
 
         var target = children[1];
         var result = EntityService.GetSiblings(target.Key, [UmbracoObjectTypes.Document], 1, 1, out long totalBefore, out long totalAfter, ordering: Ordering.By(nameof(NodeDto.Text))).ToArray();
-        Assert.AreEqual(0, totalBefore);
-        Assert.AreEqual(7, totalAfter);
-        Assert.AreEqual(3, result.Length);
-        Assert.IsTrue(result[0].Key == children[0].Key);
-        Assert.IsTrue(result[1].Key == children[1].Key);
-        Assert.IsTrue(result[2].Key == children[2].Key);
+        Assert.That(totalBefore, Is.EqualTo(0));
+        Assert.That(totalAfter, Is.EqualTo(7));
+        Assert.That(result, Has.Length.EqualTo(3));
+        Assert.That(result[0].Key, Is.EqualTo(children[0].Key));
+        Assert.That(result[1].Key, Is.EqualTo(children[1].Key));
+        Assert.That(result[2].Key, Is.EqualTo(children[2].Key));
     }
 
     [Test]
@@ -1221,12 +1221,12 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
 
         var target = children[1];
         var result = EntityService.GetSiblings(target.Key, [UmbracoObjectTypes.Document], 100, 1, out long totalBefore, out long totalAfter).ToArray();
-        Assert.AreEqual(0, totalBefore);
-        Assert.AreEqual(7, totalAfter);
-        Assert.AreEqual(3, result.Length);
-        Assert.IsTrue(result[0].Key == children[0].Key);
-        Assert.IsTrue(result[1].Key == children[1].Key);
-        Assert.IsTrue(result[2].Key == children[2].Key);
+        Assert.That(totalBefore, Is.EqualTo(0));
+        Assert.That(totalAfter, Is.EqualTo(7));
+        Assert.That(result, Has.Length.EqualTo(3));
+        Assert.That(result[0].Key, Is.EqualTo(children[0].Key));
+        Assert.That(result[1].Key, Is.EqualTo(children[1].Key));
+        Assert.That(result[2].Key, Is.EqualTo(children[2].Key));
     }
 
     [Test]
@@ -1236,12 +1236,12 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
 
         var target = children[^2];
         var result = EntityService.GetSiblings(target.Key, [UmbracoObjectTypes.Document], 1, 100, out long totalBefore, out long totalAfter).ToArray();
-        Assert.AreEqual(7, totalBefore);
-        Assert.AreEqual(0, totalAfter);
-        Assert.AreEqual(3, result.Length);
-        Assert.IsTrue(result[^1].Key == children[^1].Key);
-        Assert.IsTrue(result[^2].Key == children[^2].Key);
-        Assert.IsTrue(result[^3].Key == children[^3].Key);
+        Assert.That(totalBefore, Is.EqualTo(7));
+        Assert.That(totalAfter, Is.EqualTo(0));
+        Assert.That(result, Has.Length.EqualTo(3));
+        Assert.That(result[^1].Key, Is.EqualTo(children[^1].Key));
+        Assert.That(result[^2].Key, Is.EqualTo(children[^2].Key));
+        Assert.That(result[^3].Key, Is.EqualTo(children[^3].Key));
     }
 
     [TestCase(true)]
@@ -1255,16 +1255,16 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
         }
 
         var result = EntityService.GetSiblings(_documentTypeSubContainer2Key, objectTypes, 1, 1, out long totalBefore, out long totalAfter).ToArray();
-        Assert.AreEqual(0, totalBefore);
-        Assert.AreEqual(0, totalAfter);
+        Assert.That(totalBefore, Is.EqualTo(0));
+        Assert.That(totalAfter, Is.EqualTo(0));
 
         var expectedCount = foldersOnly ? 2 : 3;
-        Assert.AreEqual(expectedCount, result.Length);
-        Assert.IsTrue(result[0].Key == _documentTypeSubContainer1Key);
-        Assert.IsTrue(result[1].Key == _documentTypeSubContainer2Key);
+        Assert.That(result, Has.Length.EqualTo(expectedCount));
+        Assert.That(result[0].Key, Is.EqualTo(_documentTypeSubContainer1Key));
+        Assert.That(result[1].Key, Is.EqualTo(_documentTypeSubContainer2Key));
         if (foldersOnly is false)
         {
-            Assert.IsTrue(result[2].Key == _documentType1Key);
+            Assert.That(result[2].Key, Is.EqualTo(_documentType1Key));
         }
     }
 
@@ -1274,9 +1274,9 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
         CreateDocumentSiblingsTestData();
 
         var result = EntityService.GetSiblings(Guid.NewGuid(), [UmbracoObjectTypes.Document], 1, 1, out long totalBefore, out long totalAfter).ToArray();
-        Assert.AreEqual(0, totalBefore);
-        Assert.AreEqual(0, totalAfter);
-        Assert.IsEmpty(result);
+        Assert.That(totalBefore, Is.EqualTo(0));
+        Assert.That(totalAfter, Is.EqualTo(0));
+        Assert.That(result, Is.Empty);
     }
 
     [Test]
@@ -1285,10 +1285,10 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
         var children = CreateDocumentSiblingsTestData(count: 1);
 
         var result = EntityService.GetSiblings(children[0].Key, [UmbracoObjectTypes.Document], 1, 1, out long totalBefore, out long totalAfter).ToArray();
-        Assert.AreEqual(0, totalBefore);
-        Assert.AreEqual(0, totalAfter);
-        Assert.AreEqual(1, result.Length);
-        Assert.IsTrue(result[0].Key == children[0].Key);
+        Assert.That(totalBefore, Is.EqualTo(0));
+        Assert.That(totalAfter, Is.EqualTo(0));
+        Assert.That(result, Has.Length.EqualTo(1));
+        Assert.That(result[0].Key, Is.EqualTo(children[0].Key));
     }
 
     [Test]
@@ -1300,12 +1300,12 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
         // the result should include indices 2-6, leaving 2 siblings before and 3 after the window.
         var target = children[4];
         var result = EntityService.GetSiblings(target.Key, [UmbracoObjectTypes.Document], 2, 2, out long totalBefore, out long totalAfter).ToArray();
-        Assert.AreEqual(2, totalBefore);
-        Assert.AreEqual(3, totalAfter);
-        Assert.AreEqual(5, result.Length);
-        Assert.IsTrue(result[0].Key == children[2].Key);
-        Assert.IsTrue(result[2].Key == children[4].Key);
-        Assert.IsTrue(result[4].Key == children[6].Key);
+        Assert.That(totalBefore, Is.EqualTo(2));
+        Assert.That(totalAfter, Is.EqualTo(3));
+        Assert.That(result, Has.Length.EqualTo(5));
+        Assert.That(result[0].Key, Is.EqualTo(children[2].Key));
+        Assert.That(result[2].Key, Is.EqualTo(children[4].Key));
+        Assert.That(result[4].Key, Is.EqualTo(children[6].Key));
     }
 
     private List<Content> CreateDocumentSiblingsTestData(int count = 10)

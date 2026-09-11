@@ -37,25 +37,25 @@ public class DistributedCacheExtensionsTests
         };
 
         var payloads = DistributedCacheExtensions.GetPayloads(members, state, removed);
-        Assert.AreEqual(3, payloads.Count());
+        Assert.That(payloads.Count(), Is.EqualTo(3));
 
         var payloadForFred = payloads.First();
-        Assert.AreEqual("fred", payloadForFred.Username);
-        Assert.AreEqual(1, payloadForFred.Id);
-        Assert.IsNull(payloadForFred.PreviousUsername);
-        Assert.AreEqual(removed, payloadForFred.Removed);
+        Assert.That(payloadForFred.Username, Is.EqualTo("fred"));
+        Assert.That(payloadForFred.Id, Is.EqualTo(1));
+        Assert.That(payloadForFred.PreviousUsername, Is.Null);
+        Assert.That(payloadForFred.Removed, Is.EqualTo(removed));
 
         var payloadForSally = payloads.Skip(1).First();
-        Assert.AreEqual("sally", payloadForSally.Username);
-        Assert.AreEqual(2, payloadForSally.Id);
-        Assert.IsNull(payloadForSally.PreviousUsername);
-        Assert.AreEqual(removed, payloadForSally.Removed);
+        Assert.That(payloadForSally.Username, Is.EqualTo("sally"));
+        Assert.That(payloadForSally.Id, Is.EqualTo(2));
+        Assert.That(payloadForSally.PreviousUsername, Is.Null);
+        Assert.That(payloadForSally.Removed, Is.EqualTo(removed));
 
         var payloadForJane = payloads.Skip(2).First();
-        Assert.AreEqual("jane", payloadForJane.Username);
-        Assert.AreEqual(3, payloadForJane.Id);
-        Assert.AreEqual("janeold", payloadForJane.PreviousUsername);
-        Assert.AreEqual(removed, payloadForJane.Removed);
+        Assert.That(payloadForJane.Username, Is.EqualTo("jane"));
+        Assert.That(payloadForJane.Id, Is.EqualTo(3));
+        Assert.That(payloadForJane.PreviousUsername, Is.EqualTo("janeold"));
+        Assert.That(payloadForJane.Removed, Is.EqualTo(removed));
     }
 
     private static IMember CreateMember(int id, Guid key, string name, string username, string email)

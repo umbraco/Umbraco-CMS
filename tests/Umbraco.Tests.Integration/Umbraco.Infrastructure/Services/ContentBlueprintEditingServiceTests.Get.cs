@@ -11,14 +11,14 @@ public partial class ContentBlueprintEditingServiceTests
         var blueprint = await (variant ? CreateVariantContentBlueprint() : CreateInvariantContentBlueprint());
 
         var result = await ContentBlueprintEditingService.GetAsync(blueprint.Key);
-        Assert.IsNotNull(result);
-        Assert.AreEqual(blueprint.Key, result.Key);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Key, Is.EqualTo(blueprint.Key));
     }
 
     [Test]
     public async Task Cannot_Get_Non_Existing()
     {
         var result = await ContentBlueprintEditingService.GetAsync(Guid.NewGuid());
-        Assert.IsNull(result);
+        Assert.That(result, Is.Null);
     }
 }

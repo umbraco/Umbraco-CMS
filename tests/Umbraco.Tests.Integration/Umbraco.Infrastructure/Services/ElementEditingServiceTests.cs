@@ -136,7 +136,7 @@ public partial class ElementEditingServiceTests : UmbracoIntegrationTest
         };
 
         var result = await ElementEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
         return result.Result.Content!;
     }
 
@@ -162,7 +162,7 @@ public partial class ElementEditingServiceTests : UmbracoIntegrationTest
         };
 
         var result = await ElementEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
         return result.Result.Content!;
     }
 
@@ -190,7 +190,7 @@ public partial class ElementEditingServiceTests : UmbracoIntegrationTest
         };
 
         var result = await ElementEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
         return result.Result.Content!;
     }
 
@@ -224,7 +224,7 @@ public partial class ElementEditingServiceTests : UmbracoIntegrationTest
         };
 
         var result = await ElementEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
         return result.Result.Content!;
     }
 

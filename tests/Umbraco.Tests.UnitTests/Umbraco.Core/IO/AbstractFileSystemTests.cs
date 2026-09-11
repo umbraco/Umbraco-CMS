@@ -21,11 +21,11 @@ public abstract class AbstractFileSystemTests
     {
         _fileSystem.AddFile("test.txt", CreateStream());
 
-        Assert.IsTrue(_fileSystem.FileExists("test.txt"));
+        Assert.That(_fileSystem.FileExists("test.txt"), Is.True);
 
         _fileSystem.DeleteFile("test.txt");
 
-        Assert.IsFalse(_fileSystem.FileExists("test.txt"));
+        Assert.That(_fileSystem.FileExists("test.txt"), Is.False);
     }
 
     [Test]
@@ -36,7 +36,7 @@ public abstract class AbstractFileSystemTests
 
         var files = _fileSystem.GetFiles("test").ToArray();
 
-        Assert.AreEqual(1, files.Count());
+        Assert.That(files.Count(), Is.EqualTo(1));
 
         foreach (var file in files)
         {
@@ -66,11 +66,11 @@ public abstract class AbstractFileSystemTests
 
         var files = _fileSystem.GetFiles("test");
 
-        Assert.AreEqual(4, files.Count());
+        Assert.That(files.Count(), Is.EqualTo(4));
 
         files = _fileSystem.GetFiles("test", "*.txt");
 
-        Assert.AreEqual(3, files.Count());
+        Assert.That(files.Count(), Is.EqualTo(3));
 
         _fileSystem.DeleteDirectory("test", true);
     }
@@ -85,7 +85,7 @@ public abstract class AbstractFileSystemTests
         var contents = reader.ReadToEnd();
         reader.Close();
 
-        Assert.AreEqual("hello world", contents);
+        Assert.That(contents, Is.EqualTo("hello world"));
 
         _fileSystem.DeleteFile("test.txt");
     }
@@ -99,10 +99,10 @@ public abstract class AbstractFileSystemTests
 
         var dirs = _fileSystem.GetDirectories("test");
 
-        Assert.AreEqual(3, dirs.Count());
-        Assert.IsTrue(_fileSystem.DirectoryExists("test/sub1"));
-        Assert.IsTrue(_fileSystem.DirectoryExists("test/sub2"));
-        Assert.IsTrue(_fileSystem.DirectoryExists("test/sub3"));
+        Assert.That(dirs.Count(), Is.EqualTo(3));
+        Assert.That(_fileSystem.DirectoryExists("test/sub1"), Is.True);
+        Assert.That(_fileSystem.DirectoryExists("test/sub2"), Is.True);
+        Assert.That(_fileSystem.DirectoryExists("test/sub3"), Is.True);
 
         _fileSystem.DeleteDirectory("test", true);
     }
@@ -117,13 +117,13 @@ public abstract class AbstractFileSystemTests
         var created = _fileSystem.GetCreated("test.txt");
         var modified = _fileSystem.GetLastModified("test.txt");
 
-        Assert.AreEqual(DateTime.UtcNow.Year, created.Year);
-        Assert.AreEqual(DateTime.UtcNow.Month, created.Month);
-        Assert.AreEqual(DateTime.UtcNow.Date, created.Date);
+        Assert.That(created.Year, Is.EqualTo(DateTime.UtcNow.Year));
+        Assert.That(created.Month, Is.EqualTo(DateTime.UtcNow.Month));
+        Assert.That(created.Date, Is.EqualTo(DateTime.UtcNow.Date));
 
-        Assert.AreEqual(DateTime.UtcNow.Year, modified.Year);
-        Assert.AreEqual(DateTime.UtcNow.Month, modified.Month);
-        Assert.AreEqual(DateTime.UtcNow.Date, modified.Date);
+        Assert.That(modified.Year, Is.EqualTo(DateTime.UtcNow.Year));
+        Assert.That(modified.Month, Is.EqualTo(DateTime.UtcNow.Month));
+        Assert.That(modified.Date, Is.EqualTo(DateTime.UtcNow.Date));
 
         _fileSystem.DeleteFile("test.txt");
     }
@@ -135,7 +135,7 @@ public abstract class AbstractFileSystemTests
 
         var url = _fileSystem.GetUrl("test.txt");
 
-        Assert.AreEqual(ConstructUrl("test.txt"), url);
+        Assert.That(url, Is.EqualTo(ConstructUrl("test.txt")));
 
         _fileSystem.DeleteFile("test.txt");
     }
@@ -148,11 +148,11 @@ public abstract class AbstractFileSystemTests
         var url = _fileSystem.GetUrl("test.txt");
         var fullPath = _fileSystem.GetFullPath("test.txt");
 
-        Assert.AreNotEqual("test.txt", url);
-        Assert.AreNotEqual("test.txt", fullPath);
+        Assert.That(url, Is.Not.EqualTo("test.txt"));
+        Assert.That(fullPath, Is.Not.EqualTo("test.txt"));
 
-        Assert.AreEqual("test.txt", _fileSystem.GetRelativePath(url));
-        Assert.AreEqual("test.txt", _fileSystem.GetRelativePath(fullPath));
+        Assert.That(_fileSystem.GetRelativePath(url), Is.EqualTo("test.txt"));
+        Assert.That(_fileSystem.GetRelativePath(fullPath), Is.EqualTo("test.txt"));
 
         _fileSystem.DeleteFile("test.txt");
     }
@@ -164,7 +164,7 @@ public abstract class AbstractFileSystemTests
         var streamLength = stream.Length;
         _fileSystem.AddFile("test.txt", stream);
 
-        Assert.AreEqual(streamLength, _fileSystem.GetSize("test.txt"));
+        Assert.That(_fileSystem.GetSize("test.txt"), Is.EqualTo(streamLength));
 
         _fileSystem.DeleteFile("test.txt");
     }

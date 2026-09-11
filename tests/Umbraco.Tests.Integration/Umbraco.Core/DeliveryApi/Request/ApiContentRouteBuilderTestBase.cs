@@ -24,7 +24,7 @@ public abstract class ApiContentRouteBuilderTestBase : ApiContentRequestTestBase
     protected IPublishedContent GetPublishedContent(Guid key)
     {
         var publishedContent = ClearAndEnsureUmbracoContext().Content.GetById(key);
-        Assert.IsNotNull(publishedContent);
+        Assert.That(publishedContent, Is.Not.Null);
 
         return publishedContent;
     }

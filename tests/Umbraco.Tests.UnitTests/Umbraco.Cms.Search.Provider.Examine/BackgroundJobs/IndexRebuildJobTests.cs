@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Infrastructure.BackgroundJobs;
@@ -49,7 +50,7 @@ public class IndexRebuildJobTests
     {
         IndexRebuildJob sut = CreateSut();
 
-        Assert.AreEqual(TimeSpan.FromMinutes(2), sut.Delay);
+        Assert.That(sut.Delay, Is.EqualTo(TimeSpan.FromMinutes(2)));
     }
 
     [Test]
@@ -59,8 +60,8 @@ public class IndexRebuildJobTests
 
         // The job is skipped entirely while the runtime is still installing or upgrading, so it has to stay
         // schedulable until a pass actually happens - otherwise the single attempt is lost.
-        Assert.AreNotEqual(Timeout.InfiniteTimeSpan, sut.Period);
-        Assert.Greater(sut.Period, TimeSpan.Zero);
+        Assert.That(sut.Period, Is.Not.EqualTo(Timeout.InfiniteTimeSpan));
+        Assert.That(sut.Period, Is.GreaterThan(TimeSpan.Zero));
     }
 
     [Test]
@@ -70,11 +71,11 @@ public class IndexRebuildJobTests
         _examineManager.Setup(x => x.TryGetIndex(PhysicalIndexName, out index)).Returns(true);
 
         IndexRebuildJob sut = CreateSut();
-        Assert.AreNotEqual(Timeout.InfiniteTimeSpan, sut.Period);
+        Assert.That(sut.Period, Is.Not.EqualTo(Timeout.InfiniteTimeSpan));
 
         await sut.RunJobAsync(CancellationToken.None);
 
-        Assert.AreEqual(Timeout.InfiniteTimeSpan, sut.Period);
+        Assert.That(sut.Period, Is.EqualTo(Timeout.InfiniteTimeSpan));
     }
 
     [Test]
@@ -100,11 +101,11 @@ public class IndexRebuildJobTests
         _examineManager.Setup(x => x.TryGetIndex(PhysicalIndexName, out index)).Returns(true);
 
         IndexRebuildJob sut = CreateSut();
-        Assert.AreNotEqual(Timeout.InfiniteTimeSpan, sut.Period);
+        Assert.That(sut.Period, Is.Not.EqualTo(Timeout.InfiniteTimeSpan));
 
         await sut.RunJobAsync(CancellationToken.None);
 
-        Assert.AreEqual(Timeout.InfiniteTimeSpan, sut.Period);
+        Assert.That(sut.Period, Is.EqualTo(Timeout.InfiniteTimeSpan));
     }
 
     [Test]
@@ -112,7 +113,7 @@ public class IndexRebuildJobTests
     {
         IndexRebuildJob sut = CreateSut();
 
-        CollectionAssert.AreEquivalent(Enum.GetValues<ServerRole>(), sut.ServerRoles);
+        Assert.That(sut.ServerRoles, Is.EquivalentTo(Enum.GetValues<ServerRole>()));
     }
 
     [Test]

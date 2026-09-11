@@ -56,7 +56,7 @@ internal sealed class EntityServiceTestsIsolated : UmbracoIntegrationTest
             : EntityService
                 .GetPagedChildren(Constants.System.RecycleBinContentKey, [UmbracoObjectTypes.Document], [UmbracoObjectTypes.Document], 0, 0, true, out total);
 
-        Assert.AreEqual(5, total);
-        Assert.IsEmpty(entities);
+        Assert.That(total, Is.EqualTo(5));
+        Assert.That(entities, Is.Empty);
     }
 }

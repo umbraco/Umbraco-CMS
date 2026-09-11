@@ -22,7 +22,7 @@ internal sealed class ContentEditingServiceSortChildrenWithoutNotificationsTests
 
         var result = await ContentEditingService.SortByFieldAsync(root.Key, ContentSortField.Name, Direction.Descending, culture: null, Constants.Security.SuperUserKey);
 
-        Assert.AreEqual(ContentEditingOperationStatus.Success, result);
-        Assert.AreEqual(0, SortedNotificationCount, "Expected no ContentSortedNotification on the default bulk path.");
+        Assert.That(result, Is.EqualTo(ContentEditingOperationStatus.Success));
+        Assert.That(SortedNotificationCount, Is.EqualTo(0), "Expected no ContentSortedNotification on the default bulk path.");
     }
 }

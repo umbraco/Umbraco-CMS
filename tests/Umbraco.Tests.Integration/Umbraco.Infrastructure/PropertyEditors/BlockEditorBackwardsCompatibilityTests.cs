@@ -67,27 +67,27 @@ internal sealed class BlockEditorBackwardsCompatibilityTests : UmbracoIntegratio
         ContentService.Save(content);
 
         var toEditor = richTextDataType.Editor!.GetValueEditor().ToEditor(content.Properties["blocks"]!) as RichTextEditorValue;
-        Assert.IsNotNull(toEditor);
-        Assert.IsNotNull(toEditor.Blocks);
+        Assert.That(toEditor, Is.Not.Null);
+        Assert.That(toEditor.Blocks, Is.Not.Null);
 
-        Assert.AreEqual(1, toEditor.Blocks.ContentData.Count);
-        Assert.AreEqual("1304e1ddac87439684fe8a399231cb3d", toEditor.Blocks.ContentData[0].Key.ToString("N"));
-        Assert.IsEmpty(toEditor.Blocks.ContentData[0].Values);
+        Assert.That(toEditor.Blocks.ContentData, Has.Count.EqualTo(1));
+        Assert.That(toEditor.Blocks.ContentData[0].Key.ToString("N"), Is.EqualTo("1304e1ddac87439684fe8a399231cb3d"));
+        Assert.That(toEditor.Blocks.ContentData[0].Values, Is.Empty);
 
         // The block has no properties, so historically it was never exposed on upgrade and rendered
         // as unpublished (#23379). It must now be exposed to preserve its published state.
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(1, toEditor.Blocks.Expose.Count);
-            Assert.AreEqual("1304e1ddac87439684fe8a399231cb3d", toEditor.Blocks.Expose[0].ContentKey.ToString("N"));
+            Assert.That(toEditor.Blocks.Expose, Has.Count.EqualTo(1));
+            Assert.That(toEditor.Blocks.Expose[0].ContentKey.ToString("N"), Is.EqualTo("1304e1ddac87439684fe8a399231cb3d"));
         });
     }
 
     private static void AssertValueEquals(BlockItemData blockItemData, string propertyAlias, string expectedValue)
     {
         var blockPropertyValue = blockItemData.Values.FirstOrDefault(v => v.Alias == propertyAlias);
-        Assert.IsNotNull(blockPropertyValue);
-        Assert.AreEqual(expectedValue, blockPropertyValue.Value);
+        Assert.That(blockPropertyValue, Is.Not.Null);
+        Assert.That(blockPropertyValue.Value, Is.EqualTo(expectedValue));
     }
 
     private async Task<IContentType> CreatePropertyLessElementType()

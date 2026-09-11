@@ -26,10 +26,10 @@ public class DataTypeTests
 
         var dirtyProperties = dataType.GetDirtyProperties().OrderBy(x => x).ToList();
 
-        Assert.IsTrue(dataType.IsPropertyDirty(nameof(dataType.DatabaseType)));
-        Assert.IsTrue(dataType.IsPropertyDirty(nameof(dataType.EditorUiAlias)));
+        Assert.That(dataType.IsPropertyDirty(nameof(dataType.DatabaseType)), Is.True);
+        Assert.That(dataType.IsPropertyDirty(nameof(dataType.EditorUiAlias)), Is.True);
 
-        Assert.AreEqual(2, dirtyProperties.Count);
-        Assert.AreEqual($"{nameof(dataType.DatabaseType)},{nameof(dataType.EditorUiAlias)}", string.Join(",", dirtyProperties));
+        Assert.That(dirtyProperties, Has.Count.EqualTo(2));
+        Assert.That(string.Join(",", dirtyProperties), Is.EqualTo($"{nameof(dataType.DatabaseType)},{nameof(dataType.EditorUiAlias)}"));
     }
 }

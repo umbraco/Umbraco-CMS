@@ -31,7 +31,7 @@ public partial class StringExtensionsTests
         string expected)
     {
         var result = input.ReplaceNonAlphanumericChars(replacement);
-        Assert.AreEqual(expected, result);
+        Assert.That(result, Is.EqualTo(expected));
     }
 
     [TestCase("hello", '-', "hello")] // no change needed
@@ -55,7 +55,7 @@ public partial class StringExtensionsTests
         string expected)
     {
         var result = input.ReplaceNonAlphanumericChars(replacement);
-        Assert.AreEqual(expected, result);
+        Assert.That(result, Is.EqualTo(expected));
     }
 
     [TestCase("hello", "hello")] // no whitespace
@@ -79,7 +79,7 @@ public partial class StringExtensionsTests
     public void StripWhitespace_ReturnsStringWithoutWhitespace(string input, string expected)
     {
         var result = input.StripWhitespace();
-        Assert.AreEqual(expected, result);
+        Assert.That(result, Is.EqualTo(expected));
     }
 
     [TestCase("hello", "hello")] // no HTML
@@ -105,7 +105,7 @@ public partial class StringExtensionsTests
     public void StripHtml_ReturnsStringWithoutHtmlTags(string input, string expected)
     {
         var result = input.StripHtml();
-        Assert.AreEqual(expected, result);
+        Assert.That(result, Is.EqualTo(expected));
     }
 
     [TestCase("hello", " ", "hello")] // no HTML
@@ -125,7 +125,7 @@ public partial class StringExtensionsTests
     public void StripHtml_WithReplacement_ReturnsStringWithTagsReplaced(string input, string replacement, string expected)
     {
         var result = input.StripHtml(replacement);
-        Assert.AreEqual(expected, result);
+        Assert.That(result, Is.EqualTo(expected));
     }
 
     [TestCase("hello", '/', "/hello")] // prepends char
@@ -139,7 +139,7 @@ public partial class StringExtensionsTests
     public void EnsureStartsWith_WithChar_ReturnsExpectedResult(string input, char value, string expected)
     {
         var result = input.EnsureStartsWith(value);
-        Assert.AreEqual(expected, result);
+        Assert.That(result, Is.EqualTo(expected));
     }
 
     [TestCase("hello", "/", "/hello")] // prepends string
@@ -153,7 +153,7 @@ public partial class StringExtensionsTests
     public void EnsureStartsWith_WithString_ReturnsExpectedResult(string input, string toStartWith, string expected)
     {
         var result = input.EnsureStartsWith(toStartWith);
-        Assert.AreEqual(expected, result);
+        Assert.That(result, Is.EqualTo(expected));
     }
 
     [TestCase("hello", '/', "hello/")] // appends char
@@ -167,7 +167,7 @@ public partial class StringExtensionsTests
     public void EnsureEndsWith_WithChar_ReturnsExpectedResult(string input, char value, string expected)
     {
         var result = input.EnsureEndsWith(value);
-        Assert.AreEqual(expected, result);
+        Assert.That(result, Is.EqualTo(expected));
     }
 
     [TestCase("hello", "/", "hello/")] // appends string
@@ -181,7 +181,7 @@ public partial class StringExtensionsTests
     public void EnsureEndsWith_WithString_ReturnsExpectedResult(string input, string toEndWith, string expected)
     {
         var result = input.EnsureEndsWith(toEndWith);
-        Assert.AreEqual(expected, result);
+        Assert.That(result, Is.EqualTo(expected));
     }
 
     [TestCase("hello", "hello")] // no newlines
@@ -198,7 +198,7 @@ public partial class StringExtensionsTests
     public void StripNewLines_ReturnsStringWithoutNewLines(string input, string expected)
     {
         var result = input.StripNewLines();
-        Assert.AreEqual(expected, result);
+        Assert.That(result, Is.EqualTo(expected));
     }
 
     [TestCase(null, null)] // null input
@@ -216,7 +216,7 @@ public partial class StringExtensionsTests
     public void ToSingleLine_ReplacesNewLinesWithSpaces(string? input, string expected)
     {
         var result = input.ToSingleLine();
-        Assert.AreEqual(expected, result);
+        Assert.That(result, Is.EqualTo(expected));
     }
 
     [TestCase("hello", 10, "...", "hello")] // shorter than limit
@@ -235,7 +235,7 @@ public partial class StringExtensionsTests
     public void Truncate_ReturnsExpectedResult(string input, int maxLength, string suffix, string expected)
     {
         var result = input.Truncate(maxLength, suffix);
-        Assert.AreEqual(expected, result);
+        Assert.That(result, Is.EqualTo(expected));
     }
 
     [Test]
@@ -243,7 +243,7 @@ public partial class StringExtensionsTests
     {
         var result = "hello world".TruncateWithUniqueHash(50);
 
-        Assert.AreEqual("hello world", result);
+        Assert.That(result, Is.EqualTo("hello world"));
     }
 
     [Test]
@@ -253,7 +253,7 @@ public partial class StringExtensionsTests
 
         var result = text.TruncateWithUniqueHash(50);
 
-        Assert.AreEqual(text, result);
+        Assert.That(result, Is.EqualTo(text));
     }
 
     [Test]
@@ -263,7 +263,7 @@ public partial class StringExtensionsTests
 
         var result = text.TruncateWithUniqueHash(50);
 
-        Assert.That(result.Length, Is.EqualTo(50));
+        Assert.That(result, Has.Length.EqualTo(50));
     }
 
     [Test]
@@ -297,7 +297,7 @@ public partial class StringExtensionsTests
         var resultA = textA.TruncateWithUniqueHash(50);
         var resultB = textB.TruncateWithUniqueHash(50);
 
-        Assert.AreNotEqual(resultA, resultB);
+        Assert.That(resultB, Is.Not.EqualTo(resultA));
     }
 
     [Test]
@@ -310,9 +310,9 @@ public partial class StringExtensionsTests
         var resultA = textA.TruncateWithUniqueHash(50);
         var resultB = textB.TruncateWithUniqueHash(50);
 
-        Assert.That(resultA.Length, Is.EqualTo(50));
-        Assert.That(resultB.Length, Is.EqualTo(50));
-        Assert.AreNotEqual(resultA, resultB);
+        Assert.That(resultA, Has.Length.EqualTo(50));
+        Assert.That(resultB, Has.Length.EqualTo(50));
+        Assert.That(resultB, Is.Not.EqualTo(resultA));
     }
 
     [Test]
@@ -323,6 +323,6 @@ public partial class StringExtensionsTests
         var result1 = text.TruncateWithUniqueHash(50);
         var result2 = text.TruncateWithUniqueHash(50);
 
-        Assert.AreEqual(result1, result2);
+        Assert.That(result2, Is.EqualTo(result1));
     }
 }

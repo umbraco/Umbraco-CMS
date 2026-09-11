@@ -39,7 +39,7 @@ public class CommonMapperTests
         var result = _commonMapper.GetOwnerName(content.Object, context);
 
         // Assert
-        Assert.AreEqual("Alice", result);
+        Assert.That(result, Is.EqualTo("Alice"));
         _userService.Verify(x => x.GetProfileById(It.IsAny<int>()), Times.Never);
     }
 
@@ -60,7 +60,7 @@ public class CommonMapperTests
         var result = _commonMapper.GetOwnerName(content.Object, context);
 
         // Assert
-        Assert.AreEqual("Bob", result);
+        Assert.That(result, Is.EqualTo("Bob"));
         _userService.Verify(x => x.GetProfileById(99), Times.Once);
     }
 
@@ -83,7 +83,7 @@ public class CommonMapperTests
         var result = _commonMapper.GetOwnerName(content.Object, context);
 
         // Assert
-        Assert.AreEqual("Charlie", result);
+        Assert.That(result, Is.EqualTo("Charlie"));
         _userService.Verify(x => x.GetProfileById(99), Times.Once);
     }
 
@@ -102,7 +102,7 @@ public class CommonMapperTests
         var result = _commonMapper.GetCreatorName(content.Object, context);
 
         // Assert
-        Assert.AreEqual("Writer Person", result);
+        Assert.That(result, Is.EqualTo("Writer Person"));
         _userService.Verify(x => x.GetProfileById(It.IsAny<int>()), Times.Never);
     }
 
@@ -123,7 +123,7 @@ public class CommonMapperTests
         var result = _commonMapper.GetCreatorName(content.Object, context);
 
         // Assert
-        Assert.AreEqual("Dave", result);
+        Assert.That(result, Is.EqualTo("Dave"));
         _userService.Verify(x => x.GetProfileById(77), Times.Once);
     }
 
@@ -146,7 +146,7 @@ public class CommonMapperTests
         var result = _commonMapper.GetCreatorName(content.Object, context);
 
         // Assert
-        Assert.AreEqual("Eve", result);
+        Assert.That(result, Is.EqualTo("Eve"));
         _userService.Verify(x => x.GetProfileById(88), Times.Once);
     }
 
@@ -165,7 +165,7 @@ public class CommonMapperTests
         var result = _commonMapper.GetOwnerName(content.Object, context);
 
         // Assert
-        Assert.IsNull(result);
+        Assert.That(result, Is.Null);
         _userService.Verify(x => x.GetProfileById(It.IsAny<int>()), Times.Never);
     }
 }

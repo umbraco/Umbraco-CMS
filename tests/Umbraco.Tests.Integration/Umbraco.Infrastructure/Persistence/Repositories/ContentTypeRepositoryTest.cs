@@ -100,7 +100,7 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
 
         // Initial request by Id should hit the database.
         repository.Get(contentType.Id);
-        Assert.Greater(database.SqlCount, 0);
+        Assert.That(database.SqlCount, Is.GreaterThan(0));
 
         // Reset counter.
         database.EnableSqlCount = false;
@@ -108,7 +108,7 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
 
         // Subsequent requests should use the cache.
         repository.Get(contentType.Id);
-        Assert.AreEqual(0, database.SqlCount);
+        Assert.That(database.SqlCount, Is.EqualTo(0));
     }
 
     [Test]
@@ -135,7 +135,7 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
 
         // Initial request by key should hit the database.
         repository.Get(contentType.Key);
-        Assert.Greater(database.SqlCount, 0);
+        Assert.That(database.SqlCount, Is.GreaterThan(0));
 
         // Reset counter.
         database.EnableSqlCount = false;
@@ -143,7 +143,7 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
 
         // Subsequent requests should use the cache.
         repository.Get(contentType.Key);
-        Assert.AreEqual(0, database.SqlCount);
+        Assert.That(database.SqlCount, Is.EqualTo(0));
     }
 
     [Test]
@@ -170,7 +170,7 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
 
         // Initial request by ID should hit the database.
         repository.Get(contentType.Id);
-        Assert.Greater(database.SqlCount, 0);
+        Assert.That(database.SqlCount, Is.GreaterThan(0));
 
         // Reset counter.
         database.EnableSqlCount = false;
@@ -178,10 +178,10 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
 
         // Subsequent requests should use the cache, since the cache by Id and Key was populated on retrieval.
         repository.Get(contentType.Id);
-        Assert.AreEqual(0, database.SqlCount);
+        Assert.That(database.SqlCount, Is.EqualTo(0));
 
         repository.Get(contentType.Key);
-        Assert.AreEqual(0, database.SqlCount);
+        Assert.That(database.SqlCount, Is.EqualTo(0));
     }
 
     [Test]
@@ -208,7 +208,7 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
 
         // Initial request by key should hit the database.
         repository.Get(contentType.Key);
-        Assert.Greater(database.SqlCount, 0);
+        Assert.That(database.SqlCount, Is.GreaterThan(0));
 
         // Reset counter.
         database.EnableSqlCount = false;
@@ -216,10 +216,10 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
 
         // Subsequent requests should use the cache, since the cache by Id and Key was populated on retrieval.
         repository.Get(contentType.Key);
-        Assert.AreEqual(0, database.SqlCount);
+        Assert.That(database.SqlCount, Is.EqualTo(0));
 
         repository.Get(contentType.Id);
-        Assert.AreEqual(0, database.SqlCount);
+        Assert.That(database.SqlCount, Is.EqualTo(0));
     }
 
     private ContentTypeRepository CreateRepository(IScopeAccessor scopeAccessor, AppCaches? appCaches = null)
@@ -281,8 +281,8 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
             // re-get
             var result = repository.Get(contentType.Id);
 
-            Assert.AreEqual(2, result.AllowedTemplates.Count());
-            Assert.AreEqual(templates[0].Id, result.DefaultTemplate.Id);
+            Assert.That(result.AllowedTemplates.Count(), Is.EqualTo(2));
+            Assert.That(result.DefaultTemplate.Id, Is.EqualTo(templates[0].Id));
         }
     }
 
@@ -312,15 +312,15 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
 
             var result = repository.Move(contentType, container1).ToArray();
 
-            Assert.AreEqual(2, result.Count());
+            Assert.That(result.Count(), Is.EqualTo(2));
 
             // re-get
             contentType = repository.Get(contentType.Id);
             contentType2 = repository.Get(contentType2.Id);
 
-            Assert.AreEqual(container1.Id, contentType.ParentId);
-            Assert.AreNotEqual(result.Single(x => x.Entity.Id == contentType.Id).OriginalPath, contentType.Path);
-            Assert.AreNotEqual(result.Single(x => x.Entity.Id == contentType2.Id).OriginalPath, contentType2.Path);
+            Assert.That(contentType.ParentId, Is.EqualTo(container1.Id));
+            Assert.That(contentType.Path, Is.Not.EqualTo(result.Single(x => x.Entity.Id == contentType.Id).OriginalPath));
+            Assert.That(contentType2.Path, Is.Not.EqualTo(result.Single(x => x.Entity.Id == contentType2.Id).OriginalPath));
         }
     }
 
@@ -336,7 +336,7 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
             Assert.That(container.Id, Is.GreaterThan(0));
 
             var found = DocumentTypeContainerRepository.Get(container.Id);
-            Assert.IsNotNull(found);
+            Assert.That(found, Is.Not.Null);
         }
     }
 
@@ -360,13 +360,13 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
             Assert.That(container3.Id, Is.GreaterThan(0));
 
             var found1 = DocumentTypeContainerRepository.Get(container1.Id);
-            Assert.IsNotNull(found1);
+            Assert.That(found1, Is.Not.Null);
             var found2 = DocumentTypeContainerRepository.Get(container2.Id);
-            Assert.IsNotNull(found2);
+            Assert.That(found2, Is.Not.Null);
             var found3 = DocumentTypeContainerRepository.Get(container3.Id);
-            Assert.IsNotNull(found3);
+            Assert.That(found3, Is.Not.Null);
             var allContainers = DocumentTypeContainerRepository.GetMany();
-            Assert.AreEqual(3, allContainers.Count());
+            Assert.That(allContainers.Count(), Is.EqualTo(3));
         }
     }
 
@@ -383,7 +383,7 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
             DocumentTypeContainerRepository.Delete(container);
 
             var found = DocumentTypeContainerRepository.Get(container.Id);
-            Assert.IsNull(found);
+            Assert.That(found, Is.Null);
         }
     }
 
@@ -401,7 +401,7 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
             contentType.ParentId = container.Id;
             repository.Save(contentType);
 
-            Assert.AreEqual(container.Id, contentType.ParentId);
+            Assert.That(contentType.ParentId, Is.EqualTo(container.Id));
         }
     }
 
@@ -422,11 +422,11 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
             MediaTypeContainerRepository.Delete(container);
 
             var found = MediaTypeContainerRepository.Get(container.Id);
-            Assert.IsNull(found);
+            Assert.That(found, Is.Null);
 
             contentType = MediaTypeRepository.Get(contentType.Id);
-            Assert.IsNotNull(contentType);
-            Assert.AreEqual(-1, contentType.ParentId);
+            Assert.That(contentType, Is.Not.Null);
+            Assert.That(contentType.ParentId, Is.EqualTo(-1));
         }
     }
 
@@ -447,16 +447,16 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
             Assert.That(contentType.HasIdentity, Is.True);
             Assert.That(contentType.PropertyGroups.All(x => x.HasIdentity), Is.True);
             Assert.That(contentType.PropertyTypes.All(x => x.HasIdentity), Is.True);
-            Assert.That(contentType.Path.Contains(","), Is.True);
+            Assert.That(contentType.Path, Does.Contain(","));
             Assert.That(contentType.SortOrder, Is.GreaterThan(0));
 
-            Assert.That(contentType.PropertyGroups.ElementAt(0).Name == "testGroup", Is.True);
+            Assert.That(contentType.PropertyGroups.ElementAt(0).Name, Is.EqualTo("testGroup"));
             var groupId = contentType.PropertyGroups.ElementAt(0).Id;
             Assert.That(contentType.PropertyTypes.All(x => x.PropertyGroupId.Value == groupId), Is.True);
 
             foreach (var propertyType in contentType.PropertyTypes)
             {
-                Assert.AreNotEqual(propertyType.Key, Guid.Empty);
+                Assert.That(Guid.Empty, Is.Not.EqualTo(propertyType.Key));
             }
 
             TestHelper.AssertPropertyValuesAreEqual(fetched, contentType, ignoreProperties: new[] { "DefaultTemplate", "AllowedTemplates", "UpdateDate", "HistoryCleanup" });
@@ -579,9 +579,9 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
 
             // Assert
             Assert.That(contentTypes.Count(), Is.EqualTo(3));
-            Assert.AreEqual("a123", contentTypes.ElementAt(0).Name);
-            Assert.AreEqual("abc", contentTypes.ElementAt(1).Name);
-            Assert.AreEqual("zyx", contentTypes.ElementAt(2).Name);
+            Assert.That(contentTypes.ElementAt(0).Name, Is.EqualTo("a123"));
+            Assert.That(contentTypes.ElementAt(1).Name, Is.EqualTo("abc"));
+            Assert.That(contentTypes.ElementAt(2).Name, Is.EqualTo("zyx"));
         }
     }
 
@@ -721,7 +721,7 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
 
             // Assert
             Assert.That(result.PropertyTypes.Any(x => x.Alias == "description"), Is.False);
-            Assert.That(contentType.PropertyGroups.Count, Is.EqualTo(result.PropertyGroups.Count));
+            Assert.That(contentType.PropertyGroups, Has.Count.EqualTo(result.PropertyGroups.Count));
             Assert.That(contentType.PropertyTypes.Count(), Is.EqualTo(result.PropertyTypes.Count()));
         }
     }
@@ -772,7 +772,7 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
             var repository = ContentTypeRepository;
             var contentType = repository.Get(_textpageContentType.Id);
 
-            Assert.That(contentType.PropertyGroups.Count, Is.EqualTo(2));
+            Assert.That(contentType.PropertyGroups, Has.Count.EqualTo(2));
             Assert.That(contentType.PropertyTypes.Count(), Is.EqualTo(4));
 
             // Act
@@ -787,7 +787,7 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
 
             var addedPropertyType = contentType.AddPropertyType(urlAlias);
 
-            Assert.That(contentType.PropertyGroups.Count, Is.EqualTo(2));
+            Assert.That(contentType.PropertyGroups, Has.Count.EqualTo(2));
             Assert.That(contentType.PropertyTypes.Count(), Is.EqualTo(5));
 
             repository.Save(contentType);
@@ -795,7 +795,7 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
             // Assert
             var updated = repository.Get(_textpageContentType.Id);
             Assert.That(addedPropertyType, Is.True);
-            Assert.That(updated.PropertyGroups.Count, Is.EqualTo(2));
+            Assert.That(updated.PropertyGroups, Has.Count.EqualTo(2));
             Assert.That(updated.PropertyTypes.Count(), Is.EqualTo(5));
             Assert.That(updated.PropertyTypes.Any(x => x.Alias == "urlAlias"), Is.True);
             Assert.That(updated.PropertyTypes.First(x => x.Alias == "urlAlias").PropertyGroupId, Is.Null);
@@ -1108,17 +1108,17 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
             contentType.RemovePropertyType("author");
             ContentTypeRepository.Save(contentType);
             userGroup = UserGroupRepository.Get(userGroup.Id);
-            Assert.AreEqual(3, userGroup.GranularPermissions.Count);
+            Assert.That(userGroup.GranularPermissions, Has.Count.EqualTo(3));
 
             contentType.RemovePropertyType("bodyText");
             ContentTypeRepository.Save(contentType);
             userGroup = UserGroupRepository.Get(userGroup.Id);
-            Assert.AreEqual(2, userGroup.GranularPermissions.Count);
+            Assert.That(userGroup.GranularPermissions, Has.Count.EqualTo(2));
 
             contentType.RemovePropertyType("title");
             ContentTypeRepository.Save(contentType);
             userGroup = UserGroupRepository.Get(userGroup.Id);
-            Assert.AreEqual(0, userGroup.GranularPermissions.Count);
+            Assert.That(userGroup.GranularPermissions, Is.Empty);
         }
     }
 
@@ -1138,7 +1138,7 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
             // Remove the content type and verify all permissions are removed from the user group.
             ContentTypeRepository.Delete(contentType);
             userGroup = UserGroupRepository.Get(userGroup.Id);
-            Assert.AreEqual(0, userGroup.GranularPermissions.Count);
+            Assert.That(userGroup.GranularPermissions, Is.Empty);
         }
     }
 
@@ -1166,7 +1166,7 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
         UserGroupRepository.Save(userGroup);
         userGroup = UserGroupRepository.Get(userGroup.Id);
 
-        Assert.AreEqual(4, userGroup.GranularPermissions.Count);
+        Assert.That(userGroup.GranularPermissions, Has.Count.EqualTo(4));
         return userGroup;
     }
 
@@ -1181,12 +1181,12 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
             var first = repository.Get(_simpleContentType.Key);
             var second = repository.Get(_simpleContentType.Key);
 
-            Assert.IsNotNull(first);
-            Assert.IsNotNull(second);
-            Assert.AreEqual(first.Id, second.Id);
+            Assert.That(first, Is.Not.Null);
+            Assert.That(second, Is.Not.Null);
+            Assert.That(second.Id, Is.EqualTo(first.Id));
 
             // Must be different object references (deep clones, not the cached original).
-            Assert.AreNotSame(first, second);
+            Assert.That(second, Is.Not.SameAs(first));
         }
     }
 
@@ -1201,9 +1201,9 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
             // Case-insensitive alias lookup.
             var result = repository.Get("UMBTEXTPAGE");
 
-            Assert.IsNotNull(result);
-            Assert.AreEqual(_simpleContentType.Id, result!.Id);
-            Assert.AreEqual("umbTextpage", result.Alias);
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result!.Id, Is.EqualTo(_simpleContentType.Id));
+            Assert.That(result.Alias, Is.EqualTo("umbTextpage"));
         }
     }
 
@@ -1218,10 +1218,10 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
             var first = repository.Get("umbTextpage");
             var second = repository.Get("umbTextpage");
 
-            Assert.IsNotNull(first);
-            Assert.IsNotNull(second);
-            Assert.AreEqual(first!.Id, second!.Id);
-            Assert.AreNotSame(first, second);
+            Assert.That(first, Is.Not.Null);
+            Assert.That(second, Is.Not.Null);
+            Assert.That(second!.Id, Is.EqualTo(first!.Id));
+            Assert.That(second, Is.Not.SameAs(first));
         }
     }
 
@@ -1235,7 +1235,7 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
 
             var exists = repository.Exists(_simpleContentType.Key);
 
-            Assert.IsTrue(exists);
+            Assert.That(exists, Is.True);
         }
     }
 
@@ -1249,7 +1249,7 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
 
             var exists = repository.Exists(Guid.NewGuid());
 
-            Assert.IsFalse(exists);
+            Assert.That(exists, Is.False);
         }
     }
 
@@ -1263,14 +1263,14 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
 
             // Get a content type and mutate its name.
             var first = repository.Get(_simpleContentType.Key);
-            Assert.IsNotNull(first);
+            Assert.That(first, Is.Not.Null);
             var originalName = first!.Name;
             first.Name = "MUTATED_NAME_" + Guid.NewGuid();
 
             // A subsequent Get should return an unmodified clone.
             var second = repository.Get(_simpleContentType.Key);
-            Assert.IsNotNull(second);
-            Assert.AreEqual(originalName, second!.Name, "Mutation of a returned entity should not affect the cached copy");
+            Assert.That(second, Is.Not.Null);
+            Assert.That(second!.Name, Is.EqualTo(originalName), "Mutation of a returned entity should not affect the cached copy");
         }
     }
 }

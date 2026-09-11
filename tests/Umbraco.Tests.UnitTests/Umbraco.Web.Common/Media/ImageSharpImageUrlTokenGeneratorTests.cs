@@ -34,7 +34,7 @@ public class ImageSharpImageUrlTokenGeneratorTests
         var generator = new ImageSharpImageUrlTokenGenerator(requestAuthorization, Options.Create(options));
 
         const string url = MediaPath + "?width=400&height=400";
-        Assert.AreEqual(url, generator.RefreshSignature(url));
+        Assert.That(generator.RefreshSignature(url), Is.EqualTo(url));
     }
 
     [Test]
@@ -45,7 +45,7 @@ public class ImageSharpImageUrlTokenGeneratorTests
         var generator = new ImageSharpImageUrlTokenGenerator(null, Options.Create(options));
 
         const string url = MediaPath + "?width=400&height=400";
-        Assert.AreEqual(url, generator.RefreshSignature(url));
+        Assert.That(generator.RefreshSignature(url), Is.EqualTo(url));
     }
 
     [Test]
@@ -56,7 +56,7 @@ public class ImageSharpImageUrlTokenGeneratorTests
 
         var generator = new ImageSharpImageUrlTokenGenerator(requestAuthorization, Options.Create(options));
 
-        Assert.AreEqual(string.Empty, generator.RefreshSignature(string.Empty));
+        Assert.That(generator.RefreshSignature(string.Empty), Is.Empty);
     }
 
     [Test]
@@ -69,7 +69,7 @@ public class ImageSharpImageUrlTokenGeneratorTests
 
         var result = generator.RefreshSignature(MediaPath + "?width=400&height=400");
 
-        StringAssert.StartsWith(MediaPath + "?width=400&height=400&hmac=", result);
+        Assert.That(result, Does.StartWith(MediaPath + "?width=400&height=400&hmac="));
     }
 
     [Test]
@@ -83,8 +83,8 @@ public class ImageSharpImageUrlTokenGeneratorTests
         var freshFromScratch = generator.RefreshSignature(MediaPath + "?width=400&height=400");
         var refreshedFromStale = generator.RefreshSignature(MediaPath + "?width=400&height=400&hmac=deadbeefdeadbeef");
 
-        Assert.AreEqual(freshFromScratch, refreshedFromStale);
-        Assert.AreEqual(1, CountOccurrences(refreshedFromStale, "hmac="));
+        Assert.That(refreshedFromStale, Is.EqualTo(freshFromScratch));
+        Assert.That(CountOccurrences(refreshedFromStale, "hmac="), Is.EqualTo(1));
     }
 
     [Test]
@@ -108,8 +108,8 @@ public class ImageSharpImageUrlTokenGeneratorTests
             Height = 400,
         });
 
-        Assert.IsNotNull(signedByEditor);
-        Assert.AreEqual(signedByEditor, tokenGenerator.RefreshSignature(signedByEditor!));
+        Assert.That(signedByEditor, Is.Not.Null);
+        Assert.That(tokenGenerator.RefreshSignature(signedByEditor!), Is.EqualTo(signedByEditor));
     }
 
     [Test]
@@ -122,7 +122,7 @@ public class ImageSharpImageUrlTokenGeneratorTests
 
         var generator = new ImageSharpImageUrlTokenGenerator(requestAuthorization, Options.Create(options));
 
-        Assert.AreEqual(MediaPath, generator.RefreshSignature(MediaPath));
+        Assert.That(generator.RefreshSignature(MediaPath), Is.EqualTo(MediaPath));
     }
 
     [Test]
@@ -135,10 +135,10 @@ public class ImageSharpImageUrlTokenGeneratorTests
 
         var result = generator.RefreshSignature(MediaPath + "?width=400&amp;height=400&amp;hmac=stale");
 
-        StringAssert.StartsWith(MediaPath + "?width=400&amp;height=400&amp;hmac=", result);
-        StringAssert.DoesNotContain("hmac=stale", result);
-        Assert.AreEqual(0, CountOccurrences(result, "&hmac="), "ampersands must remain entity-encoded");
-        Assert.AreEqual(1, CountOccurrences(result, "&amp;hmac="), "exactly one fresh token, &amp;-encoded");
+        Assert.That(result, Does.StartWith(MediaPath + "?width=400&amp;height=400&amp;hmac="));
+        Assert.That(result, Does.Not.Contain("hmac=stale"));
+        Assert.That(CountOccurrences(result, "&hmac="), Is.EqualTo(0), "ampersands must remain entity-encoded");
+        Assert.That(CountOccurrences(result, "&amp;hmac="), Is.EqualTo(1), "exactly one fresh token, &amp;-encoded");
     }
 
     [Test]
@@ -154,7 +154,7 @@ public class ImageSharpImageUrlTokenGeneratorTests
         const string pathWithAmpersand = "/media/foo&bar/img.jpg";
         var result = generator.RefreshSignature(pathWithAmpersand + "?width=400&amp;height=400");
 
-        StringAssert.StartsWith(pathWithAmpersand + "?width=400&amp;height=400&amp;hmac=", result);
+        Assert.That(result, Does.StartWith(pathWithAmpersand + "?width=400&amp;height=400&amp;hmac="));
     }
 
     [Test]
@@ -174,12 +174,12 @@ public class ImageSharpImageUrlTokenGeneratorTests
         var firstToken = TokenFrom(firstResult);
         var secondToken = TokenFrom(secondResult);
 
-        Assert.IsNotEmpty(firstToken);
-        Assert.AreEqual(firstToken, secondToken);
+        Assert.That(firstToken, Is.Not.Empty);
+        Assert.That(secondToken, Is.EqualTo(firstToken));
 
         // Each output URL retains its own cache buster.
-        StringAssert.Contains("v=20240101", firstResult);
-        StringAssert.Contains("v=20251231", secondResult);
+        Assert.That(firstResult, Does.Contain("v=20240101"));
+        Assert.That(secondResult, Does.Contain("v=20251231"));
     }
 
     [Test]
@@ -193,7 +193,7 @@ public class ImageSharpImageUrlTokenGeneratorTests
         var first = generator.RefreshSignature(MediaPath + "?width=400");
         var second = generator.RefreshSignature(MediaPath + "?width=400");
 
-        Assert.AreEqual(first, second);
+        Assert.That(second, Is.EqualTo(first));
     }
 
     private static RequestAuthorizationUtilities BuildRequestAuthorization(ImageSharpMiddlewareOptions options)

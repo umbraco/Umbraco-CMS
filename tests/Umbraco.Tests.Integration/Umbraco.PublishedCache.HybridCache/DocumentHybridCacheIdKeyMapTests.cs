@@ -76,7 +76,7 @@ internal sealed class DocumentHybridCacheIdKeyMapTests : UmbracoIntegrationTestW
 
         // Act - fetch by key, so resolving the document itself never consults the map.
         IPublishedContent? content = await PublishedContentHybridCache.GetByIdAsync(key);
-        Assert.IsNotNull(content);
+        Assert.That(content, Is.Not.Null);
 
         // Assert
         AssertResolvesWithoutQuerying(PublishedTextPageId, key);
@@ -90,13 +90,13 @@ internal sealed class DocumentHybridCacheIdKeyMapTests : UmbracoIntegrationTestW
         // Arrange - warm the hybrid cache, then drop only the converted content cache. The read below is
         // therefore served from the backing store rather than the database, which is the common case and
         // the reason the map is populated outside the branch that reads through to the repository.
-        Assert.IsNotNull(await PublishedContentHybridCache.GetByIdAsync(key));
+        Assert.That(await PublishedContentHybridCache.GetByIdAsync(key), Is.Not.Null);
         DocumentCacheService.ClearConvertedContentCache();
         IdKeyMap.ClearCache();
         IdKeyMapRepository.Reset();
 
         // Act
-        Assert.IsNotNull(await PublishedContentHybridCache.GetByIdAsync(key));
+        Assert.That(await PublishedContentHybridCache.GetByIdAsync(key), Is.Not.Null);
 
         // Assert
         AssertResolvesWithoutQuerying(PublishedTextPageId, key);
@@ -109,11 +109,11 @@ internal sealed class DocumentHybridCacheIdKeyMapTests : UmbracoIntegrationTestW
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(idAttempt.Success);
-            Assert.AreEqual(expectedId, idAttempt.Result);
-            Assert.IsTrue(keyAttempt.Success);
-            Assert.AreEqual(expectedKey, keyAttempt.Result);
-            Assert.AreEqual(0, IdKeyMapRepository.Count, "Expected no ID/key lookups against the database.");
+            Assert.That(idAttempt.Success, Is.True);
+            Assert.That(idAttempt.Result, Is.EqualTo(expectedId));
+            Assert.That(keyAttempt.Success, Is.True);
+            Assert.That(keyAttempt.Result, Is.EqualTo(expectedKey));
+            Assert.That(IdKeyMapRepository.Count, Is.EqualTo(0), "Expected no ID/key lookups against the database.");
         });
     }
 

@@ -72,8 +72,8 @@ public class RepositoryCacheVersionAccessorTests
 
         var result = await _sut.GetAsync(CacheKey);
 
-        Assert.AreEqual(version.ToString(), result?.Version);
-        Assert.IsNotNull(_requestCache.GetCacheItem<RepositoryCacheVersion>(CacheKey));
+        Assert.That(result?.Version, Is.EqualTo(version.ToString()));
+        Assert.That(_requestCache.GetCacheItem<RepositoryCacheVersion>(CacheKey), Is.Not.Null);
 
         // Second call within the same scope context must not hit the DB (scope cache hit).
         await _sut.GetAsync(CacheKey);
@@ -102,7 +102,7 @@ public class RepositoryCacheVersionAccessorTests
 
         var result = await _sut.GetAsync(CacheKey);
 
-        Assert.AreEqual(newGuid.ToString(), result?.Version);
+        Assert.That(result?.Version, Is.EqualTo(newGuid.ToString()));
         _repository.Verify(x => x.GetAsync(It.IsAny<string>()), Times.Never);
     }
 
@@ -116,17 +116,17 @@ public class RepositoryCacheVersionAccessorTests
 
         // Populate both caches.
         await _sut.GetAsync(CacheKey);
-        Assert.IsNotNull(_requestCache.GetCacheItem<RepositoryCacheVersion>(CacheKey));
+        Assert.That(_requestCache.GetCacheItem<RepositoryCacheVersion>(CacheKey), Is.Not.Null);
 
         // Update scope cache in-place; request cache must be cleared.
         var newerGuid = Guid.NewGuid();
         _sut.VersionChanged(CacheKey, newerGuid);
 
-        Assert.IsNull(_requestCache.GetCacheItem<RepositoryCacheVersion>(CacheKey));
+        Assert.That(_requestCache.GetCacheItem<RepositoryCacheVersion>(CacheKey), Is.Null);
 
         // Next read returns the newer GUID from scope cache — no DB round-trip.
         var result = await _sut.GetAsync(CacheKey);
-        Assert.AreEqual(newerGuid.ToString(), result?.Version);
+        Assert.That(result?.Version, Is.EqualTo(newerGuid.ToString()));
         _repository.Verify(x => x.GetAsync(CacheKey), Times.Once);
     }
 
@@ -138,7 +138,7 @@ public class RepositoryCacheVersionAccessorTests
 
         // Scope cache is populated: GetAsync returns from it without hitting the DB.
         var resultBeforeExit = await _sut.GetAsync(CacheKey);
-        Assert.AreEqual(guid1.ToString(), resultBeforeExit?.Version);
+        Assert.That(resultBeforeExit?.Version, Is.EqualTo(guid1.ToString()));
         _repository.Verify(x => x.GetAsync(It.IsAny<string>()), Times.Never);
 
         // Trigger scope exit — the Enlist cleanup callback fires and removes the entry.
@@ -174,7 +174,7 @@ public class RepositoryCacheVersionAccessorTests
         var result = await _sut.GetAsync(CacheKey);
 
         // Must not have served context1's scope cache entry.
-        Assert.AreNotEqual(guid1.ToString(), result?.Version);
+        Assert.That(result?.Version, Is.Not.EqualTo(guid1.ToString()));
         _repository.Verify(x => x.GetAsync(CacheKey), Times.Once);
     }
 
@@ -189,7 +189,7 @@ public class RepositoryCacheVersionAccessorTests
 
         var result = await _sut.GetAsync(CacheKey);
 
-        Assert.AreEqual(cachedVersion.Version, result?.Version);
+        Assert.That(result?.Version, Is.EqualTo(cachedVersion.Version));
         _repository.Verify(x => x.GetAsync(It.IsAny<string>()), Times.Never);
     }
 
@@ -197,11 +197,11 @@ public class RepositoryCacheVersionAccessorTests
     public void VersionChanged_WithoutGuid_ClearsRequestCache()
     {
         _requestCache.Set(CacheKey, new RepositoryCacheVersion { Identifier = CacheKey, Version = Guid.NewGuid().ToString() });
-        Assert.IsNotNull(_requestCache.GetCacheItem<RepositoryCacheVersion>(CacheKey));
+        Assert.That(_requestCache.GetCacheItem<RepositoryCacheVersion>(CacheKey), Is.Not.Null);
 
         _sut.VersionChanged(CacheKey);
 
-        Assert.IsNull(_requestCache.GetCacheItem<RepositoryCacheVersion>(CacheKey));
+        Assert.That(_requestCache.GetCacheItem<RepositoryCacheVersion>(CacheKey), Is.Null);
     }
 
     // --- Database tier ---
@@ -215,7 +215,7 @@ public class RepositoryCacheVersionAccessorTests
 
         var result = await _sut.GetAsync(CacheKey);
 
-        Assert.AreEqual(dbVersion.Version, result?.Version);
+        Assert.That(result?.Version, Is.EqualTo(dbVersion.Version));
         _repository.Verify(x => x.GetAsync(CacheKey), Times.Once);
     }
 
@@ -226,8 +226,8 @@ public class RepositoryCacheVersionAccessorTests
 
         var result = await _sut.GetAsync(CacheKey);
 
-        Assert.IsNull(result);
-        Assert.IsNull(_requestCache.GetCacheItem<RepositoryCacheVersion>(CacheKey));
+        Assert.That(result, Is.Null);
+        Assert.That(_requestCache.GetCacheItem<RepositoryCacheVersion>(CacheKey), Is.Null);
 
         // A second call must also hit the DB (nothing was cached).
         await _sut.GetAsync(CacheKey);
@@ -244,8 +244,8 @@ public class RepositoryCacheVersionAccessorTests
         var result = await _sut.GetAsync(CacheKey);
 
         // Object is returned and request-cached even though Version is null.
-        Assert.IsNotNull(result);
-        Assert.IsNotNull(_requestCache.GetCacheItem<RepositoryCacheVersion>(CacheKey));
+        Assert.That(result, Is.Not.Null);
+        Assert.That(_requestCache.GetCacheItem<RepositoryCacheVersion>(CacheKey), Is.Not.Null);
 
         // Scope cache was NOT populated (Version was null).
         // Removing the request cache entry forces the next call to fall through to the DB.
@@ -265,7 +265,7 @@ public class RepositoryCacheVersionAccessorTests
 
         var result = await _sut.GetAsync(CacheKey);
 
-        Assert.IsNull(result);
+        Assert.That(result, Is.Null);
         _repository.Verify(x => x.GetAsync(It.IsAny<string>()), Times.Never);
     }
 

@@ -25,24 +25,24 @@ public class RelationTests
 
         var clone = (Relation)relation.DeepClone();
 
-        Assert.AreNotSame(clone, relation);
-        Assert.AreEqual(clone, relation);
-        Assert.AreEqual(clone.ChildId, relation.ChildId);
-        Assert.AreEqual(clone.Comment, relation.Comment);
-        Assert.AreEqual(clone.CreateDate, relation.CreateDate);
-        Assert.AreEqual(clone.Id, relation.Id);
-        Assert.AreEqual(clone.Key, relation.Key);
-        Assert.AreEqual(clone.ParentId, relation.ParentId);
-        Assert.AreNotSame(clone.RelationType, relation.RelationType);
-        Assert.AreEqual(clone.RelationType, relation.RelationType);
-        Assert.AreEqual(clone.RelationTypeId, relation.RelationTypeId);
-        Assert.AreEqual(clone.UpdateDate, relation.UpdateDate);
+        Assert.That(relation, Is.Not.SameAs(clone));
+        Assert.That(relation, Is.EqualTo(clone));
+        Assert.That(relation.ChildId, Is.EqualTo(clone.ChildId));
+        Assert.That(relation.Comment, Is.EqualTo(clone.Comment));
+        Assert.That(relation.CreateDate, Is.EqualTo(clone.CreateDate));
+        Assert.That(relation.Id, Is.EqualTo(clone.Id));
+        Assert.That(relation.Key, Is.EqualTo(clone.Key));
+        Assert.That(relation.ParentId, Is.EqualTo(clone.ParentId));
+        Assert.That(relation.RelationType, Is.Not.SameAs(clone.RelationType));
+        Assert.That(relation.RelationType, Is.EqualTo(clone.RelationType));
+        Assert.That(relation.RelationTypeId, Is.EqualTo(clone.RelationTypeId));
+        Assert.That(relation.UpdateDate, Is.EqualTo(clone.UpdateDate));
 
         // This double verifies by reflection
         var allProps = clone.GetType().GetProperties();
         foreach (var propertyInfo in allProps)
         {
-            Assert.AreEqual(propertyInfo.GetValue(clone, null), propertyInfo.GetValue(relation, null));
+            Assert.That(propertyInfo.GetValue(relation, null), Is.EqualTo(propertyInfo.GetValue(clone, null)));
         }
     }
 

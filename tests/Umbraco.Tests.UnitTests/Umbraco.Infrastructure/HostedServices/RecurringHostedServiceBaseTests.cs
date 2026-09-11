@@ -3,6 +3,7 @@
 
 using Microsoft.Extensions.Time.Testing;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using Umbraco.Cms.Infrastructure.HostedServices;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.HostedServices;
@@ -24,7 +25,7 @@ public class RecurringHostedServiceBaseTests
 
         TimeSpan result = RecurringHostedServiceBase.ComputeNextDelay(period, elapsed);
 
-        Assert.AreEqual(TimeSpan.FromMilliseconds(expectedMs), result);
+        Assert.That(result, Is.EqualTo(TimeSpan.FromMilliseconds(expectedMs)));
     }
 
     [TestCase(0)]
@@ -86,17 +87,17 @@ public class RecurringHostedServiceBaseTests
 
         // Advancing time does not fire the first execution — initial delay is infinite.
         await timeProvider.AdvanceWhenWaitingAsync(TimeSpan.FromHours(24));
-        Assert.IsFalse(await executed.WaitAsync(TimeSpan.FromMilliseconds(50)), "Should not execute on its own when initial delay is infinite");
+        Assert.That(await executed.WaitAsync(TimeSpan.FromMilliseconds(50)), Is.False, "Should not execute on its own when initial delay is infinite");
 
         // Manual trigger fires the first execution.
         sut.PublicTriggerExecution();
-        Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)), "Triggered first execution should complete");
-        Assert.AreEqual(1, executionCount);
+        Assert.That(await executed.WaitAsync(TimeSpan.FromSeconds(5)), Is.True, "Triggered first execution should complete");
+        Assert.That(executionCount, Is.EqualTo(1));
 
         // After the first execution, the normal period applies — advance 10 min to fire the second.
         await timeProvider.AdvanceWhenWaitingAsync(TimeSpan.FromMinutes(10));
-        Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)), "Second execution should fire on Period after the triggered first run");
-        Assert.AreEqual(2, executionCount);
+        Assert.That(await executed.WaitAsync(TimeSpan.FromSeconds(5)), Is.True, "Second execution should fire on Period after the triggered first run");
+        Assert.That(executionCount, Is.EqualTo(2));
 
         cts.Cancel();
         await sut.StopAsync(CancellationToken.None);
@@ -118,19 +119,19 @@ public class RecurringHostedServiceBaseTests
         await sut.StartAsync(cts.Token);
 
         await timeProvider.AdvanceWhenWaitingAsync(TimeSpan.FromHours(24));
-        Assert.IsFalse(await executed.WaitAsync(TimeSpan.FromMilliseconds(50)), "Should not execute without a trigger");
+        Assert.That(await executed.WaitAsync(TimeSpan.FromMilliseconds(50)), Is.False, "Should not execute without a trigger");
 
         sut.PublicTriggerExecution();
-        Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)));
-        Assert.AreEqual(1, executionCount);
+        Assert.That(await executed.WaitAsync(TimeSpan.FromSeconds(5)), Is.True);
+        Assert.That(executionCount, Is.EqualTo(1));
 
         // Period is infinite, so no further executions without another trigger.
         await timeProvider.AdvanceWhenWaitingAsync(TimeSpan.FromHours(24));
-        Assert.IsFalse(await executed.WaitAsync(TimeSpan.FromMilliseconds(50)), "Should not execute again without a trigger");
+        Assert.That(await executed.WaitAsync(TimeSpan.FromMilliseconds(50)), Is.False, "Should not execute again without a trigger");
 
         sut.PublicTriggerExecution();
-        Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)));
-        Assert.AreEqual(2, executionCount);
+        Assert.That(await executed.WaitAsync(TimeSpan.FromSeconds(5)), Is.True);
+        Assert.That(executionCount, Is.EqualTo(2));
 
         cts.Cancel();
         await sut.StopAsync(CancellationToken.None);
@@ -152,21 +153,21 @@ public class RecurringHostedServiceBaseTests
         await sut.StartAsync(cts.Token);
 
         // First execution fires (delay = Zero — no initial wait)
-        Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)), "Initial execution should complete");
-        Assert.AreEqual(1, executionCount);
+        Assert.That(await executed.WaitAsync(TimeSpan.FromSeconds(5)), Is.True, "Initial execution should complete");
+        Assert.That(executionCount, Is.EqualTo(1));
 
         // Time advancing should not trigger another execution
         await timeProvider.AdvanceWhenWaitingAsync(TimeSpan.FromHours(24));
-        Assert.IsFalse(await executed.WaitAsync(TimeSpan.FromMilliseconds(50)), "Should not execute on its own when period is infinite");
+        Assert.That(await executed.WaitAsync(TimeSpan.FromMilliseconds(50)), Is.False, "Should not execute on its own when period is infinite");
 
         // Manual trigger fires the next execution
         sut.PublicTriggerExecution();
-        Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)), "Triggered execution should complete");
-        Assert.AreEqual(2, executionCount);
+        Assert.That(await executed.WaitAsync(TimeSpan.FromSeconds(5)), Is.True, "Triggered execution should complete");
+        Assert.That(executionCount, Is.EqualTo(2));
 
         // After the trigger, the next cycle should still wait for another trigger
         await timeProvider.AdvanceWhenWaitingAsync(TimeSpan.FromHours(24));
-        Assert.IsFalse(await executed.WaitAsync(TimeSpan.FromMilliseconds(50)), "Should resume infinite wait after trigger");
+        Assert.That(await executed.WaitAsync(TimeSpan.FromMilliseconds(50)), Is.False, "Should resume infinite wait after trigger");
 
         cts.Cancel();
         await sut.StopAsync(CancellationToken.None);
@@ -187,22 +188,22 @@ public class RecurringHostedServiceBaseTests
         using var cts = new CancellationTokenSource();
         await sut.StartAsync(cts.Token);
 
-        Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)));
-        Assert.AreEqual(1, executionCount);
+        Assert.That(await executed.WaitAsync(TimeSpan.FromSeconds(5)), Is.True);
+        Assert.That(executionCount, Is.EqualTo(1));
 
         // Once the infinite wait is in flight, switch to a 10-minute period — that wait should be interrupted.
         var waitsBeforeFinitePeriod = await timeProvider.WaitUntilWaitingAsync();
         sut.PublicChangePeriod(TimeSpan.FromMinutes(10));
 
         await timeProvider.AdvanceWhenWaitingAsync(TimeSpan.FromMinutes(10), afterWaitCount: waitsBeforeFinitePeriod);
-        Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)), "Should execute on schedule after switching to finite period");
-        Assert.AreEqual(2, executionCount);
+        Assert.That(await executed.WaitAsync(TimeSpan.FromSeconds(5)), Is.True, "Should execute on schedule after switching to finite period");
+        Assert.That(executionCount, Is.EqualTo(2));
 
         // Once the 10-minute wait is in flight, switch back to infinite — schedule disabled again.
         var waitsBeforeInfinitePeriod = await timeProvider.WaitUntilWaitingAsync();
         sut.PublicChangePeriod(Timeout.InfiniteTimeSpan);
         await timeProvider.AdvanceWhenWaitingAsync(TimeSpan.FromHours(24), afterWaitCount: waitsBeforeInfinitePeriod);
-        Assert.IsFalse(await executed.WaitAsync(TimeSpan.FromMilliseconds(50)), "Should not execute after switching back to infinite");
+        Assert.That(await executed.WaitAsync(TimeSpan.FromMilliseconds(50)), Is.False, "Should not execute after switching back to infinite");
 
         cts.Cancel();
         await sut.StopAsync(CancellationToken.None);
@@ -223,16 +224,16 @@ public class RecurringHostedServiceBaseTests
         using var cts = new CancellationTokenSource();
         await sut.StartAsync(cts.Token);
 
-        Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)), "First execution should complete");
-        Assert.AreEqual(1, executionCount);
+        Assert.That(await executed.WaitAsync(TimeSpan.FromSeconds(5)), Is.True, "First execution should complete");
+        Assert.That(executionCount, Is.EqualTo(1));
 
         await timeProvider.AdvanceWhenWaitingAsync(TimeSpan.FromMinutes(5));
-        Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)), "Second execution should complete");
-        Assert.AreEqual(2, executionCount);
+        Assert.That(await executed.WaitAsync(TimeSpan.FromSeconds(5)), Is.True, "Second execution should complete");
+        Assert.That(executionCount, Is.EqualTo(2));
 
         await timeProvider.AdvanceWhenWaitingAsync(TimeSpan.FromMinutes(5));
-        Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)), "Third execution should complete");
-        Assert.AreEqual(3, executionCount);
+        Assert.That(await executed.WaitAsync(TimeSpan.FromSeconds(5)), Is.True, "Third execution should complete");
+        Assert.That(executionCount, Is.EqualTo(3));
 
         cts.Cancel();
         await sut.StopAsync(CancellationToken.None);
@@ -253,12 +254,12 @@ public class RecurringHostedServiceBaseTests
         using var cts = new CancellationTokenSource();
         await sut.StartAsync(cts.Token);
 
-        Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)), "First execution should complete");
-        Assert.AreEqual(1, executionCount, "Should have executed once initially");
+        Assert.That(await executed.WaitAsync(TimeSpan.FromSeconds(5)), Is.True, "First execution should complete");
+        Assert.That(executionCount, Is.EqualTo(1), "Should have executed once initially");
 
         sut.PublicTriggerExecution();
-        Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)), "Triggered execution should complete");
-        Assert.AreEqual(2, executionCount, "Should have executed again after trigger");
+        Assert.That(await executed.WaitAsync(TimeSpan.FromSeconds(5)), Is.True, "Triggered execution should complete");
+        Assert.That(executionCount, Is.EqualTo(2), "Should have executed again after trigger");
 
         cts.Cancel();
         await sut.StopAsync(CancellationToken.None);
@@ -279,23 +280,23 @@ public class RecurringHostedServiceBaseTests
         using var cts = new CancellationTokenSource();
         await sut.StartAsync(cts.Token);
 
-        Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)));
-        Assert.AreEqual(1, executionCount);
+        Assert.That(await executed.WaitAsync(TimeSpan.FromSeconds(5)), Is.True);
+        Assert.That(executionCount, Is.EqualTo(1));
 
         // Advance 30min into the 1h period, then trigger with Reset
         await timeProvider.AdvanceWhenWaitingAsync(TimeSpan.FromMinutes(30));
         sut.PublicTriggerExecutionReset();
-        Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)), "Triggered execution should complete");
-        Assert.AreEqual(2, executionCount);
+        Assert.That(await executed.WaitAsync(TimeSpan.FromSeconds(5)), Is.True, "Triggered execution should complete");
+        Assert.That(executionCount, Is.EqualTo(2));
 
         // Reset means full period from now. Advancing 59min should not trigger.
         await timeProvider.AdvanceWhenWaitingAsync(TimeSpan.FromMinutes(59));
-        Assert.IsFalse(await executed.WaitAsync(TimeSpan.FromMilliseconds(50)), "Should not execute before full period");
+        Assert.That(await executed.WaitAsync(TimeSpan.FromMilliseconds(50)), Is.False, "Should not execute before full period");
 
         // Advancing 1 more minute completes the period
         await timeProvider.AdvanceWhenWaitingAsync(TimeSpan.FromMinutes(1));
-        Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)));
-        Assert.AreEqual(3, executionCount, "Should execute after full period");
+        Assert.That(await executed.WaitAsync(TimeSpan.FromSeconds(5)), Is.True);
+        Assert.That(executionCount, Is.EqualTo(3), "Should execute after full period");
 
         cts.Cancel();
         await sut.StopAsync(CancellationToken.None);
@@ -316,23 +317,23 @@ public class RecurringHostedServiceBaseTests
         using var cts = new CancellationTokenSource();
         await sut.StartAsync(cts.Token);
 
-        Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)));
-        Assert.AreEqual(1, executionCount);
+        Assert.That(await executed.WaitAsync(TimeSpan.FromSeconds(5)), Is.True);
+        Assert.That(executionCount, Is.EqualTo(1));
 
         // Advance 20min into 1h period, then trigger with None
         await timeProvider.AdvanceWhenWaitingAsync(TimeSpan.FromMinutes(20));
         sut.PublicTriggerExecutionNone();
-        Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)), "Triggered execution should complete");
-        Assert.AreEqual(2, executionCount);
+        Assert.That(await executed.WaitAsync(TimeSpan.FromSeconds(5)), Is.True, "Triggered execution should complete");
+        Assert.That(executionCount, Is.EqualTo(2));
 
         // None means resume original schedule. Remaining is ~40min. Advancing 39min should not trigger.
         await timeProvider.AdvanceWhenWaitingAsync(TimeSpan.FromMinutes(39));
-        Assert.IsFalse(await executed.WaitAsync(TimeSpan.FromMilliseconds(50)), "Should not execute before original schedule");
+        Assert.That(await executed.WaitAsync(TimeSpan.FromMilliseconds(50)), Is.False, "Should not execute before original schedule");
 
         // Advancing 1 more minute reaches the original tick
         await timeProvider.AdvanceWhenWaitingAsync(TimeSpan.FromMinutes(1));
-        Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)));
-        Assert.AreEqual(3, executionCount, "Should execute at original scheduled time");
+        Assert.That(await executed.WaitAsync(TimeSpan.FromSeconds(5)), Is.True);
+        Assert.That(executionCount, Is.EqualTo(3), "Should execute at original scheduled time");
 
         cts.Cancel();
         await sut.StopAsync(CancellationToken.None);
@@ -364,25 +365,25 @@ public class RecurringHostedServiceBaseTests
         using var cts = new CancellationTokenSource();
         await sut.StartAsync(cts.Token);
 
-        Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)));
-        Assert.AreEqual(1, executionCount);
+        Assert.That(await executed.WaitAsync(TimeSpan.FromSeconds(5)), Is.True);
+        Assert.That(executionCount, Is.EqualTo(1));
 
         // Advance 20min, then trigger with None. Remaining is 40min.
         // The triggered execution will advance time by 50min (overshooting by 10min).
         await timeProvider.AdvanceWhenWaitingAsync(TimeSpan.FromMinutes(20));
         sut.PublicTriggerExecutionNone();
-        Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)));
-        Assert.AreEqual(2, executionCount);
+        Assert.That(await executed.WaitAsync(TimeSpan.FromSeconds(5)), Is.True);
+        Assert.That(executionCount, Is.EqualTo(2));
 
         // The overshoot should skip the immediate tick. Next tick is at original + period = 2h from start.
         // We're now at ~70min. Advancing 49min (to ~119min) should not trigger.
         await timeProvider.AdvanceWhenWaitingAsync(TimeSpan.FromMinutes(49));
-        Assert.IsFalse(await executed.WaitAsync(TimeSpan.FromMilliseconds(50)), "Should not execute — overshot tick was skipped");
+        Assert.That(await executed.WaitAsync(TimeSpan.FromMilliseconds(50)), Is.False, "Should not execute — overshot tick was skipped");
 
         // Advancing 1 more minute reaches the next period tick
         await timeProvider.AdvanceWhenWaitingAsync(TimeSpan.FromMinutes(1));
-        Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)));
-        Assert.AreEqual(3, executionCount, "Should execute at next period tick");
+        Assert.That(await executed.WaitAsync(TimeSpan.FromSeconds(5)), Is.True);
+        Assert.That(executionCount, Is.EqualTo(3), "Should execute at next period tick");
 
         cts.Cancel();
         await sut.StopAsync(CancellationToken.None);
@@ -403,24 +404,24 @@ public class RecurringHostedServiceBaseTests
         using var cts = new CancellationTokenSource();
         await sut.StartAsync(cts.Token);
 
-        Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)));
-        Assert.AreEqual(1, executionCount);
+        Assert.That(await executed.WaitAsync(TimeSpan.FromSeconds(5)), Is.True);
+        Assert.That(executionCount, Is.EqualTo(1));
 
         // Advance 20min into 1h period, then trigger with Replace.
         // Remaining is ~40min. Next execution at remaining + period = ~40min + 1h = ~100min from now.
         await timeProvider.AdvanceWhenWaitingAsync(TimeSpan.FromMinutes(20));
         sut.PublicTriggerExecutionReplace();
-        Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)), "Triggered execution should complete");
-        Assert.AreEqual(2, executionCount);
+        Assert.That(await executed.WaitAsync(TimeSpan.FromSeconds(5)), Is.True, "Triggered execution should complete");
+        Assert.That(executionCount, Is.EqualTo(2));
 
         // The original next tick at 40min should be skipped. Advance to 60min — past the skipped tick.
         await timeProvider.AdvanceWhenWaitingAsync(TimeSpan.FromMinutes(60));
-        Assert.IsFalse(await executed.WaitAsync(TimeSpan.FromMilliseconds(50)), "Should not execute — skipped scheduled tick");
+        Assert.That(await executed.WaitAsync(TimeSpan.FromMilliseconds(50)), Is.False, "Should not execute — skipped scheduled tick");
 
         // Advance to the tick after the skipped one (~100min from trigger, ~40min more)
         await timeProvider.AdvanceWhenWaitingAsync(TimeSpan.FromMinutes(40));
-        Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)));
-        Assert.AreEqual(3, executionCount, "Should execute at tick after the skipped one");
+        Assert.That(await executed.WaitAsync(TimeSpan.FromSeconds(5)), Is.True);
+        Assert.That(executionCount, Is.EqualTo(3), "Should execute at tick after the skipped one");
 
         cts.Cancel();
         await sut.StopAsync(CancellationToken.None);
@@ -441,21 +442,21 @@ public class RecurringHostedServiceBaseTests
         using var cts = new CancellationTokenSource();
         await sut.StartAsync(cts.Token);
 
-        Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)));
-        Assert.AreEqual(1, executionCount);
+        Assert.That(await executed.WaitAsync(TimeSpan.FromSeconds(5)), Is.True);
+        Assert.That(executionCount, Is.EqualTo(1));
 
         // Trigger with a custom 10-minute delay
         sut.PublicTriggerExecutionWithDelay(TimeSpan.FromMinutes(10));
-        Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)), "Triggered execution should complete");
-        Assert.AreEqual(2, executionCount);
+        Assert.That(await executed.WaitAsync(TimeSpan.FromSeconds(5)), Is.True, "Triggered execution should complete");
+        Assert.That(executionCount, Is.EqualTo(2));
 
         // After the triggered execution, next should come after the custom 10min delay
         await timeProvider.AdvanceWhenWaitingAsync(TimeSpan.FromMinutes(9));
-        Assert.IsFalse(await executed.WaitAsync(TimeSpan.FromMilliseconds(50)), "Should not execute before custom delay");
+        Assert.That(await executed.WaitAsync(TimeSpan.FromMilliseconds(50)), Is.False, "Should not execute before custom delay");
 
         await timeProvider.AdvanceWhenWaitingAsync(TimeSpan.FromMinutes(1));
-        Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)));
-        Assert.AreEqual(3, executionCount, "Should execute after custom delay");
+        Assert.That(await executed.WaitAsync(TimeSpan.FromSeconds(5)), Is.True);
+        Assert.That(executionCount, Is.EqualTo(3), "Should execute after custom delay");
 
         cts.Cancel();
         await sut.StopAsync(CancellationToken.None);
@@ -477,28 +478,28 @@ public class RecurringHostedServiceBaseTests
         await sut.StartAsync(cts.Token);
 
         // Still in initial delay — no execution yet
-        Assert.IsFalse(await executed.WaitAsync(TimeSpan.FromMilliseconds(50)), "Should not have executed during initial delay");
+        Assert.That(await executed.WaitAsync(TimeSpan.FromMilliseconds(50)), Is.False, "Should not have executed during initial delay");
 
         // Trigger with a custom 5-minute next-delay during the initial delay
         sut.PublicTriggerExecutionWithDelay(TimeSpan.FromMinutes(5));
-        Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)));
-        Assert.AreEqual(1, executionCount, "Should have executed once after trigger interrupted delay");
+        Assert.That(await executed.WaitAsync(TimeSpan.FromSeconds(5)), Is.True);
+        Assert.That(executionCount, Is.EqualTo(1), "Should have executed once after trigger interrupted delay");
 
         // The custom 5-minute delay applies to the next wait — consistent with TriggerExecution(TimeSpan) docs.
         await timeProvider.AdvanceWhenWaitingAsync(TimeSpan.FromMinutes(4));
-        Assert.IsFalse(await executed.WaitAsync(TimeSpan.FromMilliseconds(50)), "Should not execute before the custom next-delay elapses");
+        Assert.That(await executed.WaitAsync(TimeSpan.FromMilliseconds(50)), Is.False, "Should not execute before the custom next-delay elapses");
 
         await timeProvider.AdvanceWhenWaitingAsync(TimeSpan.FromMinutes(1));
-        Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)));
-        Assert.AreEqual(2, executionCount, "Second execution fires after the custom 5-minute delay");
+        Assert.That(await executed.WaitAsync(TimeSpan.FromSeconds(5)), Is.True);
+        Assert.That(executionCount, Is.EqualTo(2), "Second execution fires after the custom 5-minute delay");
 
         // After the trigger's custom delay is consumed, the loop resumes the normal 1-hour period.
         await timeProvider.AdvanceWhenWaitingAsync(TimeSpan.FromMinutes(59));
-        Assert.IsFalse(await executed.WaitAsync(TimeSpan.FromMilliseconds(50)), "Should not execute before the normal period elapses");
+        Assert.That(await executed.WaitAsync(TimeSpan.FromMilliseconds(50)), Is.False, "Should not execute before the normal period elapses");
 
         await timeProvider.AdvanceWhenWaitingAsync(TimeSpan.FromMinutes(1));
-        Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)));
-        Assert.AreEqual(3, executionCount, "Third execution fires after the normal 1-hour period");
+        Assert.That(await executed.WaitAsync(TimeSpan.FromSeconds(5)), Is.True);
+        Assert.That(executionCount, Is.EqualTo(3), "Third execution fires after the normal 1-hour period");
 
         cts.Cancel();
         await sut.StopAsync(CancellationToken.None);
@@ -534,8 +535,8 @@ public class RecurringHostedServiceBaseTests
 
         // The first execution throws (after advancing time), so the loop immediately retries.
         // The second execution succeeds and signals the semaphore.
-        Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)), "Second execution should complete despite first throwing");
-        Assert.AreEqual(2, executionCount, "Loop should continue after exception");
+        Assert.That(await executed.WaitAsync(TimeSpan.FromSeconds(5)), Is.True, "Second execution should complete despite first throwing");
+        Assert.That(executionCount, Is.EqualTo(2), "Loop should continue after exception");
 
         cts.Cancel();
         await sut.StopAsync(CancellationToken.None);
@@ -556,8 +557,8 @@ public class RecurringHostedServiceBaseTests
         using var cts = new CancellationTokenSource();
         await sut.StartAsync(cts.Token);
 
-        Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)));
-        Assert.AreEqual(1, executionCount);
+        Assert.That(await executed.WaitAsync(TimeSpan.FromSeconds(5)), Is.True);
+        Assert.That(executionCount, Is.EqualTo(1));
 
         // Once the 10-minute wait is in flight, change to a 1-hour period — it should interrupt that wait immediately.
         var waitsBeforeNewPeriod = await timeProvider.WaitUntilWaitingAsync();
@@ -565,12 +566,12 @@ public class RecurringHostedServiceBaseTests
 
         // Advancing the old 10min period should NOT trigger execution.
         await timeProvider.AdvanceWhenWaitingAsync(TimeSpan.FromMinutes(10), afterWaitCount: waitsBeforeNewPeriod);
-        Assert.IsFalse(await executed.WaitAsync(TimeSpan.FromMilliseconds(50)), "Should not execute at old period interval");
+        Assert.That(await executed.WaitAsync(TimeSpan.FromMilliseconds(50)), Is.False, "Should not execute at old period interval");
 
         // Advancing to 1h total from first execution should trigger.
         await timeProvider.AdvanceWhenWaitingAsync(TimeSpan.FromMinutes(50));
-        Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)));
-        Assert.AreEqual(2, executionCount, "Should execute after new period");
+        Assert.That(await executed.WaitAsync(TimeSpan.FromSeconds(5)), Is.True);
+        Assert.That(executionCount, Is.EqualTo(2), "Should execute after new period");
 
         cts.Cancel();
         await sut.StopAsync(CancellationToken.None);

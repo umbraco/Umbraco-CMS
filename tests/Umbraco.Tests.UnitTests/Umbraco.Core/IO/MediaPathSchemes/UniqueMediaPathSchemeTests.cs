@@ -27,7 +27,7 @@ public class UniqueMediaPathSchemeTests
         var propertyGuid = new Guid("00000000-0000-4000-0000-000000000002");
         var filename = "test.txt";
         string actualPath = scheme.GetFilePath(MediaFileManager, itemGuid, propertyGuid, filename);
-        Assert.AreEqual("aaaaaaaa/test.txt", actualPath);
+        Assert.That(actualPath, Is.EqualTo("aaaaaaaa/test.txt"));
     }
 
     [TestCase(true, false)]

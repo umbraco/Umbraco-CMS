@@ -49,8 +49,8 @@ public class MemberPresentationServiceTests
         MemberResponseModel? result = await _sut.CreateResponseModelByKeyAsync(id, user.Object);
 
         // Assert
-        Assert.IsNotNull(result);
-        Assert.AreEqual(id, result!.Id);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result!.Id, Is.EqualTo(id));
         _mockMemberEditingService.Verify(x => x.GetExternalMemberAsync(It.IsAny<Guid>()), Times.Never);
     }
 
@@ -71,8 +71,8 @@ public class MemberPresentationServiceTests
         MemberResponseModel? result = await _sut.CreateResponseModelByKeyAsync(id, user.Object);
 
         // Assert
-        Assert.IsNotNull(result);
-        Assert.AreEqual(MemberKind.ExternalOnly, result!.Kind);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result!.Kind, Is.EqualTo(MemberKind.ExternalOnly));
     }
 
     [Test]
@@ -89,7 +89,7 @@ public class MemberPresentationServiceTests
         MemberResponseModel? result = await _sut.CreateResponseModelByKeyAsync(id, user.Object);
 
         // Assert
-        Assert.IsNull(result);
+        Assert.That(result, Is.Null);
     }
 
     [Test]
@@ -109,8 +109,8 @@ public class MemberPresentationServiceTests
         IEnumerable<MemberItemResponseModel> results = await _sut.CreateItemResponseModelsAsync([id]);
 
         // Assert
-        Assert.AreEqual(1, results.Count());
-        Assert.AreEqual(id, results.First().Id);
+        Assert.That(results.Count(), Is.EqualTo(1));
+        Assert.That(results.First().Id, Is.EqualTo(id));
     }
 
     [Test]
@@ -136,9 +136,9 @@ public class MemberPresentationServiceTests
             await _sut.CreateItemResponseModelsAsync(new HashSet<Guid> { contentId, externalId });
 
         // Assert
-        Assert.AreEqual(2, results.Count());
-        Assert.IsTrue(results.Any(r => r.Id == contentId));
-        Assert.IsTrue(results.Any(r => r.Id == externalId && r.Kind == MemberKind.ExternalOnly));
+        Assert.That(results.Count(), Is.EqualTo(2));
+        Assert.That(results.Any(r => r.Id == contentId), Is.True);
+        Assert.That(results.Any(r => r.Id == externalId && r.Kind == MemberKind.ExternalOnly), Is.True);
     }
 
     [Test]
@@ -157,7 +157,7 @@ public class MemberPresentationServiceTests
             await _sut.CreateItemResponseModelsAsync(new HashSet<Guid> { unknownId });
 
         // Assert
-        Assert.IsEmpty(results);
+        Assert.That(results, Is.Empty);
     }
 
     [Test]
@@ -168,7 +168,7 @@ public class MemberPresentationServiceTests
             await _sut.CreateItemResponseModelsAsync(new HashSet<Guid>());
 
         // Assert
-        Assert.IsEmpty(results);
+        Assert.That(results, Is.Empty);
         _mockEntityService.Verify(
             x => x.GetAll(UmbracoObjectTypes.Member, It.IsAny<Guid[]>()), Times.Once);
     }

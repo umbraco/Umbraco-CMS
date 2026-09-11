@@ -49,14 +49,14 @@ internal sealed class MemberManagerTests : UmbracoIntegrationTest
         var publishedMember = MemberManager.AsPublishedMember(memberIdentityUser);
 
         // Assert
-        Assert.IsNotNull(publishedMember);
-        Assert.AreEqual(createdMember.Id, publishedMember.Id);
-        Assert.AreEqual(createdMember.Key, publishedMember.Key);
-        Assert.AreEqual(createdMember.Name, publishedMember.Name);
-        Assert.AreEqual(PublishedItemType.Member, publishedMember.ItemType);
-        Assert.AreEqual("The title value", publishedMember.Value("title"));
-        Assert.IsNotNull(publishedMember.ContentType);
-        Assert.AreEqual(createdMember.ContentType.Alias, publishedMember.ContentType.Alias);
+        Assert.That(publishedMember, Is.Not.Null);
+        Assert.That(publishedMember.Id, Is.EqualTo(createdMember.Id));
+        Assert.That(publishedMember.Key, Is.EqualTo(createdMember.Key));
+        Assert.That(publishedMember.Name, Is.EqualTo(createdMember.Name));
+        Assert.That(publishedMember.ItemType, Is.EqualTo(PublishedItemType.Member));
+        Assert.That(publishedMember.Value("title"), Is.EqualTo("The title value"));
+        Assert.That(publishedMember.ContentType, Is.Not.Null);
+        Assert.That(publishedMember.ContentType.Alias, Is.EqualTo(createdMember.ContentType.Alias));
     }
 
     [Test]
@@ -66,7 +66,7 @@ internal sealed class MemberManagerTests : UmbracoIntegrationTest
         var publishedMember = MemberManager.AsPublishedMember(null!);
 
         // Assert
-        Assert.IsNull(publishedMember);
+        Assert.That(publishedMember, Is.Null);
     }
 
     [Test]
@@ -86,7 +86,7 @@ internal sealed class MemberManagerTests : UmbracoIntegrationTest
         var publishedMember = MemberManager.AsPublishedMember(memberIdentityUser);
 
         // Assert
-        Assert.IsNull(publishedMember);
+        Assert.That(publishedMember, Is.Null);
     }
 
     private async Task<IMember> CreateMemberAsync(Guid? key = null)
@@ -115,7 +115,7 @@ internal sealed class MemberManagerTests : UmbracoIntegrationTest
         };
 
         var result = await MemberEditingService.CreateAsync(createModel, SuperUser());
-        Assert.IsTrue(result.Success, "Member should be created successfully");
+        Assert.That(result.Success, Is.True, "Member should be created successfully");
         return result.Result.Content!;
     }
 

@@ -19,7 +19,7 @@ public class DictionaryServiceTests
 
         var result = await sut.CalculatePathAsync(null, 42);
 
-        Assert.AreEqual("-1,42", result);
+        Assert.That(result, Is.EqualTo("-1,42"));
         dictionaryItemService.Verify(x => x.GetAsync(It.IsAny<Guid>()), Times.Never);
     }
 
@@ -36,7 +36,7 @@ public class DictionaryServiceTests
 
         var result = await sut.CalculatePathAsync(parentKey, 42);
 
-        Assert.AreEqual("-1,100,42", result);
+        Assert.That(result, Is.EqualTo("-1,100,42"));
     }
 
     [Test]
@@ -57,7 +57,7 @@ public class DictionaryServiceTests
 
         var result = await sut.CalculatePathAsync(parentKey, 42);
 
-        Assert.AreEqual("-1,50,100,42", result);
+        Assert.That(result, Is.EqualTo("-1,50,100,42"));
     }
 
     [Test]
@@ -73,6 +73,6 @@ public class DictionaryServiceTests
 
         var result = await sut.CalculatePathAsync(parentKey, 42);
 
-        Assert.AreEqual("-1,42", result);
+        Assert.That(result, Is.EqualTo("-1,42"));
     }
 }

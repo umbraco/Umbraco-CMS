@@ -16,7 +16,7 @@ public class ContentScheduleTests
     {
         var now = DateTime.UtcNow;
         var schedule = new ContentScheduleCollection();
-        Assert.IsFalse(schedule.Add(now, now));
+        Assert.That(schedule.Add(now, now), Is.False);
     }
 
     [Test]
@@ -47,7 +47,7 @@ public class ContentScheduleTests
         schedule.Add(now, null);
         var invariantSched = schedule.GetSchedule(Constants.System.InvariantCulture);
         schedule.Remove(invariantSched.First());
-        Assert.AreEqual(0, schedule.FullSchedule.Count());
+        Assert.That(schedule.FullSchedule.Count(), Is.EqualTo(0));
     }
 
     [Test]
@@ -59,12 +59,12 @@ public class ContentScheduleTests
         schedule.Add("en-US", now, null);
         var invariantSched = schedule.GetSchedule(Constants.System.InvariantCulture);
         schedule.Remove(invariantSched.First());
-        Assert.AreEqual(0, schedule.GetSchedule(string.Empty).Count());
-        Assert.AreEqual(1, schedule.FullSchedule.Count());
+        Assert.That(schedule.GetSchedule(string.Empty).Count(), Is.EqualTo(0));
+        Assert.That(schedule.FullSchedule.Count(), Is.EqualTo(1));
         var variantSched = schedule.GetSchedule("en-US");
         schedule.Remove(variantSched.First());
-        Assert.AreEqual(0, schedule.GetSchedule("en-US").Count());
-        Assert.AreEqual(0, schedule.FullSchedule.Count());
+        Assert.That(schedule.GetSchedule("en-US").Count(), Is.EqualTo(0));
+        Assert.That(schedule.FullSchedule.Count(), Is.EqualTo(0));
     }
 
     [Test]
@@ -76,9 +76,9 @@ public class ContentScheduleTests
 
         schedule.Clear(ContentScheduleAction.Release);
 
-        Assert.AreEqual(0, schedule.GetSchedule(ContentScheduleAction.Release).Count());
-        Assert.AreEqual(1, schedule.GetSchedule(ContentScheduleAction.Expire).Count());
-        Assert.AreEqual(1, schedule.FullSchedule.Count());
+        Assert.That(schedule.GetSchedule(ContentScheduleAction.Release).Count(), Is.EqualTo(0));
+        Assert.That(schedule.GetSchedule(ContentScheduleAction.Expire).Count(), Is.EqualTo(1));
+        Assert.That(schedule.FullSchedule.Count(), Is.EqualTo(1));
     }
 
     [Test]
@@ -91,18 +91,18 @@ public class ContentScheduleTests
 
         schedule.Clear(ContentScheduleAction.Expire);
 
-        Assert.AreEqual(0, schedule.GetSchedule(ContentScheduleAction.Expire).Count());
-        Assert.AreEqual(1, schedule.GetSchedule(ContentScheduleAction.Release).Count());
-        Assert.AreEqual(1, schedule.GetSchedule("en-US", ContentScheduleAction.Expire).Count());
-        Assert.AreEqual(1, schedule.GetSchedule("en-US", ContentScheduleAction.Release).Count());
-        Assert.AreEqual(3, schedule.FullSchedule.Count());
+        Assert.That(schedule.GetSchedule(ContentScheduleAction.Expire).Count(), Is.EqualTo(0));
+        Assert.That(schedule.GetSchedule(ContentScheduleAction.Release).Count(), Is.EqualTo(1));
+        Assert.That(schedule.GetSchedule("en-US", ContentScheduleAction.Expire).Count(), Is.EqualTo(1));
+        Assert.That(schedule.GetSchedule("en-US", ContentScheduleAction.Release).Count(), Is.EqualTo(1));
+        Assert.That(schedule.FullSchedule.Count(), Is.EqualTo(3));
 
         schedule.Clear("en-US", ContentScheduleAction.Expire);
 
-        Assert.AreEqual(0, schedule.GetSchedule(ContentScheduleAction.Expire).Count());
-        Assert.AreEqual(1, schedule.GetSchedule(ContentScheduleAction.Release).Count());
-        Assert.AreEqual(0, schedule.GetSchedule("en-US", ContentScheduleAction.Expire).Count());
-        Assert.AreEqual(1, schedule.GetSchedule("en-US", ContentScheduleAction.Release).Count());
-        Assert.AreEqual(2, schedule.FullSchedule.Count());
+        Assert.That(schedule.GetSchedule(ContentScheduleAction.Expire).Count(), Is.EqualTo(0));
+        Assert.That(schedule.GetSchedule(ContentScheduleAction.Release).Count(), Is.EqualTo(1));
+        Assert.That(schedule.GetSchedule("en-US", ContentScheduleAction.Expire).Count(), Is.EqualTo(0));
+        Assert.That(schedule.GetSchedule("en-US", ContentScheduleAction.Release).Count(), Is.EqualTo(1));
+        Assert.That(schedule.FullSchedule.Count(), Is.EqualTo(2));
     }
 }

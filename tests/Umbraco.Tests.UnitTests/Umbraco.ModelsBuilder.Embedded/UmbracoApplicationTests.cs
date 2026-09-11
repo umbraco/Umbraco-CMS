@@ -42,7 +42,7 @@ public class UmbracoApplicationTests
             new() { ItemType = TypeModel.ItemTypes.Member, Alias = "member2" },
         };
 
-        Assert.AreEqual(6, UmbracoServices.EnsureDistinctAliases(typeModels).Count);
+        Assert.That(UmbracoServices.EnsureDistinctAliases(typeModels), Has.Count.EqualTo(6));
 
         typeModels.Add(new TypeModel { ItemType = TypeModel.ItemTypes.Media, Alias = "content1" });
 

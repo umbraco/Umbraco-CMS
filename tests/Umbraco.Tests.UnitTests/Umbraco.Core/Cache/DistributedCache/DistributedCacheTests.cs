@@ -41,7 +41,7 @@ public class DistributedCacheTests
             _distributedCache.Refresh(Guid.Parse("E0F452CB-DCB2-4E84-B5A5-4F01744C5C73"), i);
         }
 
-        Assert.AreEqual(10, ServerMessenger.IntIdsRefreshed.Count);
+        Assert.That(ServerMessenger.IntIdsRefreshed, Has.Count.EqualTo(10));
     }
 
     [Test]
@@ -55,7 +55,7 @@ public class DistributedCacheTests
                 new TestObjectWithId { Id = i });
         }
 
-        Assert.AreEqual(10, ServerMessenger.IntIdsRefreshed.Count);
+        Assert.That(ServerMessenger.IntIdsRefreshed, Has.Count.EqualTo(10));
     }
 
     [Test]
@@ -66,7 +66,7 @@ public class DistributedCacheTests
             _distributedCache.Refresh(Guid.Parse("E0F452CB-DCB2-4E84-B5A5-4F01744C5C73"), Guid.NewGuid());
         }
 
-        Assert.AreEqual(11, ServerMessenger.GuidIdsRefreshed.Count);
+        Assert.That(ServerMessenger.GuidIdsRefreshed, Has.Count.EqualTo(11));
     }
 
     [Test]
@@ -77,7 +77,7 @@ public class DistributedCacheTests
             _distributedCache.Remove(Guid.Parse("E0F452CB-DCB2-4E84-B5A5-4F01744C5C73"), i);
         }
 
-        Assert.AreEqual(12, ServerMessenger.IntIdsRemoved.Count);
+        Assert.That(ServerMessenger.IntIdsRemoved, Has.Count.EqualTo(12));
     }
 
     [Test]
@@ -88,7 +88,7 @@ public class DistributedCacheTests
             _distributedCache.RefreshAll(Guid.Parse("E0F452CB-DCB2-4E84-B5A5-4F01744C5C73"));
         }
 
-        Assert.AreEqual(13, ServerMessenger.CountOfFullRefreshes);
+        Assert.That(ServerMessenger.CountOfFullRefreshes, Is.EqualTo(13));
     }
 
     internal class TestObjectWithId

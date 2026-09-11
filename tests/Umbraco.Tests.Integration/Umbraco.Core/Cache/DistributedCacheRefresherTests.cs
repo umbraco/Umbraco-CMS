@@ -30,7 +30,7 @@ internal sealed class DistributedCacheRefresherTests : UmbracoIntegrationTest
         ContentCacheRefresher.RefreshInternal([new ContentCacheRefresher.JsonPayload()]);
         ContentCacheRefresher.Refresh([new ContentCacheRefresher.JsonPayload()]);
 
-        Assert.IsNull(ElementsCache.Get(cacheKey));
+        Assert.That(ElementsCache.Get(cacheKey), Is.Null);
     }
 
     [Test]
@@ -42,7 +42,7 @@ internal sealed class DistributedCacheRefresherTests : UmbracoIntegrationTest
         MediaCacheRefresher.RefreshInternal([new MediaCacheRefresher.JsonPayload(1, Guid.NewGuid(), TreeChangeTypes.RefreshAll)]);
         MediaCacheRefresher.Refresh([new MediaCacheRefresher.JsonPayload(1, Guid.NewGuid(), TreeChangeTypes.RefreshAll)]);
 
-        Assert.IsNull(ElementsCache.Get(cacheKey));
+        Assert.That(ElementsCache.Get(cacheKey), Is.Null);
     }
 
     [Test]
@@ -53,7 +53,7 @@ internal sealed class DistributedCacheRefresherTests : UmbracoIntegrationTest
 
         ElementCacheRefresher.Refresh([new ElementCacheRefresher.JsonPayload(1, Guid.NewGuid(), TreeChangeTypes.RefreshAll)]);
 
-        Assert.IsNull(ElementsCache.Get(cacheKey));
+        Assert.That(ElementsCache.Get(cacheKey), Is.Null);
     }
 
     private void PopulateCache(string key)
@@ -61,6 +61,6 @@ internal sealed class DistributedCacheRefresherTests : UmbracoIntegrationTest
         ElementsCache.Get(key, () => new object());
 
         // Just making sure something is in the cache now.
-        Assert.IsNotNull(ElementsCache.Get(key));
+        Assert.That(ElementsCache.Get(key), Is.Not.Null);
     }
 }

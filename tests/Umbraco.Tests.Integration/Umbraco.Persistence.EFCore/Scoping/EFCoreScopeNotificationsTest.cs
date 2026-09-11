@@ -37,7 +37,7 @@ internal sealed class EFCoreScopeNotificationsTest : UmbracoIntegrationTest
             scope.Complete();
         }
 
-        Assert.AreEqual(initialAssertCount + 1, TestContext.CurrentContext.AssertCount);
+        Assert.That(TestContext.CurrentContext.AssertCount, Is.EqualTo(initialAssertCount + 1));
     }
 
     [Test]
@@ -56,7 +56,7 @@ internal sealed class EFCoreScopeNotificationsTest : UmbracoIntegrationTest
             scope.Complete();
         }
 
-        Assert.AreEqual(initialAssertCount + 1, TestContext.CurrentContext.AssertCount);
+        Assert.That(TestContext.CurrentContext.AssertCount, Is.EqualTo(initialAssertCount + 1));
     }
 
     [Test]
@@ -113,7 +113,7 @@ internal sealed class EFCoreScopeNotificationsTest : UmbracoIntegrationTest
             scope.Complete();
         }
 
-        Assert.AreEqual(initialAssertCount + 1, TestContext.CurrentContext.AssertCount);
+        Assert.That(TestContext.CurrentContext.AssertCount, Is.EqualTo(initialAssertCount + 1));
     }
 
     [Test]
@@ -140,7 +140,7 @@ internal sealed class EFCoreScopeNotificationsTest : UmbracoIntegrationTest
             scope.Complete();
         }
 
-        Assert.AreEqual(initialAssertCount + 1, TestContext.CurrentContext.AssertCount);
+        Assert.That(TestContext.CurrentContext.AssertCount, Is.EqualTo(initialAssertCount + 1));
     }
 
     [Test]
@@ -162,7 +162,7 @@ internal sealed class EFCoreScopeNotificationsTest : UmbracoIntegrationTest
             scope.Complete();
         }
 
-        Assert.AreEqual(initialAssertCount + 1, TestContext.CurrentContext.AssertCount);
+        Assert.That(TestContext.CurrentContext.AssertCount, Is.EqualTo(initialAssertCount + 1));
     }
 
     [Test]
@@ -201,7 +201,7 @@ internal sealed class EFCoreScopeNotificationsTest : UmbracoIntegrationTest
     private class TestSendNotificationHandler : INotificationHandler<TestSendNotification>
     {
         public void Handle(TestSendNotification notification)
-            => Assert.IsNotNull(notification);
+            => Assert.That(notification, Is.Not.Null);
     }
 
     private class TestDoNotSendNotificationHandler : INotificationHandler<TestDoNotSendNotification>

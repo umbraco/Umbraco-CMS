@@ -51,14 +51,14 @@ internal sealed class MediaListViewServiceTests : ContentListViewServiceTestsBas
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(result.Success);
-            Assert.AreEqual(ContentCollectionOperationStatus.Success, result.Status);
-            Assert.IsNotNull(result.Result);
+            Assert.That(result.Success, Is.True);
+            Assert.That(result.Status, Is.EqualTo(ContentCollectionOperationStatus.Success));
+            Assert.That(result.Result, Is.Not.Null);
 
             PagedModel<IMedia> collectionItemsResult = result.Result.Items;
 
-            Assert.AreEqual(10, collectionItemsResult.Total);
-            CollectionAssert.AreEquivalent(descendants, collectionItemsResult.Items);
+            Assert.That(collectionItemsResult.Total, Is.EqualTo(10));
+            Assert.That(collectionItemsResult.Items, Is.EquivalentTo(descendants));
         });
     }
 
@@ -82,9 +82,9 @@ internal sealed class MediaListViewServiceTests : ContentListViewServiceTestsBas
         // Assert
         Assert.Multiple(async () =>
         {
-            Assert.IsTrue(result.Success);
-            Assert.AreEqual(ContentCollectionOperationStatus.Success, result.Status);
-            Assert.IsNotNull(result.Result);
+            Assert.That(result.Success, Is.True);
+            Assert.That(result.Status, Is.EqualTo(ContentCollectionOperationStatus.Success));
+            Assert.That(result.Result, Is.Not.Null);
 
             await AssertListViewConfiguration(result.Result.ListViewConfiguration, Constants.DataTypes.Guids.ListViewMediaGuid);
         });
@@ -112,16 +112,16 @@ internal sealed class MediaListViewServiceTests : ContentListViewServiceTestsBas
         Assert.Multiple(() =>
         {
             // Assert the content type is configured as list view
-            Assert.IsNotNull(root.ContentType.ListView);
+            Assert.That(root.ContentType.ListView, Is.Not.Null);
 
-            Assert.IsTrue(result.Success);
-            Assert.AreEqual(ContentCollectionOperationStatus.Success, result.Status);
-            Assert.IsNotNull(result.Result);
+            Assert.That(result.Success, Is.True);
+            Assert.That(result.Status, Is.EqualTo(ContentCollectionOperationStatus.Success));
+            Assert.That(result.Result, Is.Not.Null);
 
             PagedModel<IMedia> collectionItemsResult = result.Result.Items;
 
-            Assert.AreEqual(5, collectionItemsResult.Total);
-            CollectionAssert.AreEquivalent(descendants, collectionItemsResult.Items);
+            Assert.That(collectionItemsResult.Total, Is.EqualTo(5));
+            Assert.That(collectionItemsResult.Items, Is.EquivalentTo(descendants));
         });
     }
 
@@ -173,12 +173,12 @@ internal sealed class MediaListViewServiceTests : ContentListViewServiceTestsBas
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(result.Success);
-            Assert.AreEqual(ContentCollectionOperationStatus.Success, result.Status);
-            Assert.IsNotNull(result.Result);
-            Assert.AreEqual(2, totalChildren);
+            Assert.That(result.Success, Is.True);
+            Assert.That(result.Status, Is.EqualTo(ContentCollectionOperationStatus.Success));
+            Assert.That(result.Result, Is.Not.Null);
+            Assert.That(totalChildren, Is.EqualTo(2));
 
-            Assert.AreEqual(1, result.Result.Items.Items.Count());
+            Assert.That(result.Result.Items.Items.Count(), Is.EqualTo(1));
         });
 
     }

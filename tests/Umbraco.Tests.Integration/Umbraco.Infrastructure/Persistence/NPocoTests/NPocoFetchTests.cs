@@ -114,8 +114,8 @@ internal sealed class NPocoFetchTests : UmbracoIntegrationTest
                 .From<Thing1Dto>();
 
             var dtos = ScopeAccessor.AmbientScope.Database.Fetch<Thing1Dto>(sql);
-            Assert.AreEqual(2, dtos.Count);
-            Assert.AreEqual("one", dtos.First(x => x.Id == 1).Name);
+            Assert.That(dtos, Has.Count.EqualTo(2));
+            Assert.That(dtos.First(x => x.Id == 1).Name, Is.EqualTo("one"));
         }
     }
 
@@ -138,10 +138,10 @@ internal sealed class NPocoFetchTests : UmbracoIntegrationTest
                 .InnerJoin<Thing1Dto>().On<Thing2Dto, Thing1Dto>((t2, t1) => t2.ThingId == t1.Id);
 
             var dtos = ScopeAccessor.AmbientScope.Database.Fetch<Thing2Dto>(sql);
-            Assert.AreEqual(3, dtos.Count);
-            Assert.AreEqual("uno", dtos.First(x => x.Id == 1).Name);
-            Assert.IsNotNull(dtos.First(x => x.Id == 1).Thing);
-            Assert.AreEqual("one", dtos.First(x => x.Id == 1).Thing.Name);
+            Assert.That(dtos, Has.Count.EqualTo(3));
+            Assert.That(dtos.First(x => x.Id == 1).Name, Is.EqualTo("uno"));
+            Assert.That(dtos.First(x => x.Id == 1).Thing, Is.Not.Null);
+            Assert.That(dtos.First(x => x.Id == 1).Thing.Name, Is.EqualTo("one"));
         }
     }
 
@@ -170,15 +170,15 @@ internal sealed class NPocoFetchTests : UmbracoIntegrationTest
             // var dtos = scope.Database.FetchOneToMany<Thing3Dto>(x => x.Things, x => x.Id, sql);
             var dtos = ScopeAccessor.AmbientScope.Database.FetchOneToMany<Thing3Dto>(x => x.Things, sql);
 
-            Assert.AreEqual(1, dtos.Count);
+            Assert.That(dtos, Has.Count.EqualTo(1));
             var dto1 = dtos.FirstOrDefault(x => x.Id == 1);
-            Assert.IsNotNull(dto1);
-            Assert.AreEqual("one", dto1.Name);
-            Assert.IsNotNull(dto1.Things);
-            Assert.AreEqual(2, dto1.Things.Count);
+            Assert.That(dto1, Is.Not.Null);
+            Assert.That(dto1.Name, Is.EqualTo("one"));
+            Assert.That(dto1.Things, Is.Not.Null);
+            Assert.That(dto1.Things, Has.Count.EqualTo(2));
             var dto2 = dto1.Things.FirstOrDefault(x => x.Id == 1);
-            Assert.IsNotNull(dto2);
-            Assert.AreEqual("uno", dto2.Name);
+            Assert.That(dto2, Is.Not.Null);
+            Assert.That(dto2.Name, Is.EqualTo("uno"));
         }
     }
 
@@ -209,15 +209,15 @@ internal sealed class NPocoFetchTests : UmbracoIntegrationTest
 
             var dtos = ScopeAccessor.AmbientScope.Database.FetchOneToMany<Thing3Dto>(x => x.Things, /*x => x.Id,*/ sql);
 
-            Assert.AreEqual(2, dtos.Count);
+            Assert.That(dtos, Has.Count.EqualTo(2));
             var dto1 = dtos.FirstOrDefault(x => x.Id == 1);
-            Assert.IsNotNull(dto1);
-            Assert.AreEqual("one", dto1.Name);
-            Assert.IsNotNull(dto1.Things);
-            Assert.AreEqual(2, dto1.Things.Count);
+            Assert.That(dto1, Is.Not.Null);
+            Assert.That(dto1.Name, Is.EqualTo("one"));
+            Assert.That(dto1.Things, Is.Not.Null);
+            Assert.That(dto1.Things, Has.Count.EqualTo(2));
             var dto2 = dto1.Things.FirstOrDefault(x => x.Id == 1);
-            Assert.IsNotNull(dto2);
-            Assert.AreEqual("uno", dto2.Name);
+            Assert.That(dto2, Is.Not.Null);
+            Assert.That(dto2.Name, Is.EqualTo("uno"));
         }
     }
 
@@ -240,15 +240,15 @@ internal sealed class NPocoFetchTests : UmbracoIntegrationTest
 
             var dtos = ScopeAccessor.AmbientScope.Database.FetchOneToMany<Thing3Dto>(x => x.Things, /*x => x.Id,*/ sql);
 
-            Assert.AreEqual(2, dtos.Count);
+            Assert.That(dtos, Has.Count.EqualTo(2));
             var dto1 = dtos.FirstOrDefault(x => x.Id == 1);
-            Assert.IsNotNull(dto1);
-            Assert.AreEqual("one", dto1.Name);
-            Assert.IsNotNull(dto1.Things);
-            Assert.AreEqual(2, dto1.Things.Count);
+            Assert.That(dto1, Is.Not.Null);
+            Assert.That(dto1.Name, Is.EqualTo("one"));
+            Assert.That(dto1.Things, Is.Not.Null);
+            Assert.That(dto1.Things, Has.Count.EqualTo(2));
             var dto2 = dto1.Things.FirstOrDefault(x => x.Id == 1);
-            Assert.IsNotNull(dto2);
-            Assert.AreEqual("uno", dto2.Name);
+            Assert.That(dto2, Is.Not.Null);
+            Assert.That(dto2.Name, Is.EqualTo("uno"));
         }
     }
 
@@ -279,15 +279,15 @@ internal sealed class NPocoFetchTests : UmbracoIntegrationTest
 
             var dtos = ScopeAccessor.AmbientScope.Database.FetchOneToMany<Thing4Dto>(x => x.Groups, /*x => x.Id,*/ sql);
 
-            Assert.AreEqual(2, dtos.Count);
+            Assert.That(dtos, Has.Count.EqualTo(2));
             var dto1 = dtos.FirstOrDefault(x => x.Id == 1);
-            Assert.IsNotNull(dto1);
-            Assert.AreEqual("one", dto1.Name);
-            Assert.IsNotNull(dto1.Groups);
-            Assert.AreEqual(2, dto1.Groups.Count);
+            Assert.That(dto1, Is.Not.Null);
+            Assert.That(dto1.Name, Is.EqualTo("one"));
+            Assert.That(dto1.Groups, Is.Not.Null);
+            Assert.That(dto1.Groups, Has.Count.EqualTo(2));
             var dto2 = dto1.Groups.FirstOrDefault(x => x.Id == 1);
-            Assert.IsNotNull(dto2);
-            Assert.AreEqual("g-one", dto2.Name);
+            Assert.That(dto2, Is.Not.Null);
+            Assert.That(dto2.Name, Is.EqualTo("g-one"));
         }
     }
 
@@ -313,15 +313,15 @@ internal sealed class NPocoFetchTests : UmbracoIntegrationTest
 
             var dtos = ScopeAccessor.AmbientScope.Database.Fetch<Thing5Dto>(sql);
 
-            Assert.AreEqual(2, dtos.Count);
+            Assert.That(dtos, Has.Count.EqualTo(2));
             var dto1 = dtos.FirstOrDefault(x => x.Id == 1);
-            Assert.IsNotNull(dto1);
-            Assert.AreEqual("one", dto1.Name);
-            Assert.AreEqual(2, dto1.GroupCount);
+            Assert.That(dto1, Is.Not.Null);
+            Assert.That(dto1.Name, Is.EqualTo("one"));
+            Assert.That(dto1.GroupCount, Is.EqualTo(2));
             var dto2 = dtos.FirstOrDefault(x => x.Id == 2);
-            Assert.IsNotNull(dto2);
-            Assert.AreEqual("two", dto2.Name);
-            Assert.AreEqual(1, dto2.GroupCount);
+            Assert.That(dto2, Is.Not.Null);
+            Assert.That(dto2.Name, Is.EqualTo("two"));
+            Assert.That(dto2.GroupCount, Is.EqualTo(1));
         }
     }
 
@@ -340,8 +340,8 @@ internal sealed class NPocoFetchTests : UmbracoIntegrationTest
                 .Where<Thing1Dto>(x => x.Id == 1);
 
             var dto = ScopeAccessor.AmbientScope.Database.Fetch<Thing1Dto>(sql).FirstOrDefault();
-            Assert.IsNotNull(dto);
-            Assert.AreEqual("one", dto.Name);
+            Assert.That(dto, Is.Not.Null);
+            Assert.That(dto.Name, Is.EqualTo("one"));
 
             //// var sql2 = new Sql(sql.SQL, new { id = 1 });
             //// WriteSql(sql2);
@@ -351,8 +351,8 @@ internal sealed class NPocoFetchTests : UmbracoIntegrationTest
 
             var sql3 = new Sql(sql.SQL, 1);
             dto = ScopeAccessor.AmbientScope.Database.Fetch<Thing1Dto>(sql3).FirstOrDefault();
-            Assert.IsNotNull(dto);
-            Assert.AreEqual("one", dto.Name);
+            Assert.That(dto, Is.Not.Null);
+            Assert.That(dto.Name, Is.EqualTo("one"));
         }
     }
 
@@ -398,15 +398,15 @@ JOIN zbThingA3 a3x ON a2x.id=a3x.id
 ";
 
             var ts = ScopeAccessor.AmbientScope.Database.Fetch<ThingA1Dto>(sql);
-            Assert.AreEqual(1, ts.Count);
+            Assert.That(ts, Has.Count.EqualTo(1));
 
             var t = ts.First();
-            Assert.AreEqual("a1_a", t.Name);
-            Assert.AreEqual("a2_a", t.T2A.Name);
-            Assert.AreEqual("a2_b", t.T2B.Name);
+            Assert.That(t.Name, Is.EqualTo("a1_a"));
+            Assert.That(t.T2A.Name, Is.EqualTo("a2_a"));
+            Assert.That(t.T2B.Name, Is.EqualTo("a2_b"));
 
-            Assert.AreEqual("a3_a", t.T2A.T3.Name);
-            Assert.AreEqual("a3_b", t.T2B.T3.Name);
+            Assert.That(t.T2A.T3.Name, Is.EqualTo("a3_a"));
+            Assert.That(t.T2B.T3.Name, Is.EqualTo("a3_b"));
 
             scope.Complete();
         }

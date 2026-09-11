@@ -142,8 +142,8 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
     {
         var isoCode = (await LanguageService.GetDefaultLanguageAsync()).IsoCode;
 
-        Assert.IsNull(DocumentUrlService.GetUrlSegment(Trashed.Key, isoCode, true));
-        Assert.IsNull(DocumentUrlService.GetUrlSegment(Trashed.Key, isoCode, false));
+        Assert.That(DocumentUrlService.GetUrlSegment(Trashed.Key, isoCode, true), Is.Null);
+        Assert.That(DocumentUrlService.GetUrlSegment(Trashed.Key, isoCode, false), Is.Null);
 
     }
 
@@ -159,12 +159,12 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
         content.SetValue(Constants.Conventions.Content.UrlName, "park");
         ContentService.Save(content);
         var publishResult = ContentService.Publish(content, ["*"]);
-        Assert.IsTrue(publishResult.Success, $"Publish failed: {publishResult.Result}");
+        Assert.That(publishResult.Success, Is.True, $"Publish failed: {publishResult.Result}");
 
         var isoCode = (await LanguageService.GetDefaultLanguageAsync()).IsoCode;
         var actual = DocumentUrlService.GetUrlSegment(content.Key, isoCode, isDraft: false);
 
-        Assert.AreEqual("park", actual);
+        Assert.That(actual, Is.EqualTo("park"));
     }
 
     [Test]
@@ -179,19 +179,19 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
         content.SetValue(Constants.Conventions.Content.UrlName, "park");
         ContentService.Save(content);
         var publishResult = ContentService.Publish(content, ["*"]);
-        Assert.IsTrue(publishResult.Success, $"Publish failed: {publishResult.Result}");
+        Assert.That(publishResult.Success, Is.True, $"Publish failed: {publishResult.Result}");
 
         var isoCode = (await LanguageService.GetDefaultLanguageAsync()).IsoCode;
         var serviceSegment = DocumentUrlService.GetUrlSegment(content.Key, isoCode, isDraft: false);
 
         var published = await PublishedContentCache.GetByIdAsync(content.Key, preview: false);
-        Assert.IsNotNull(published);
+        Assert.That(published, Is.Not.Null);
 #pragma warning disable CS0618 // Type or member is obsolete
         var publishedSegment = published!.UrlSegment;
 #pragma warning restore CS0618 // Type or member is obsolete
 
-        Assert.AreEqual("park", serviceSegment);
-        Assert.AreEqual(serviceSegment, publishedSegment);
+        Assert.That(serviceSegment, Is.EqualTo("park"));
+        Assert.That(publishedSegment, Is.EqualTo(serviceSegment));
     }
 
     private async Task<IContentType> CreateInvariantContentTypeWithUrlNameAsync(string alias)
@@ -232,7 +232,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
 
         var actual = DocumentUrlService.GetUrlSegment(Subpage2.Key, isoCode, false);
 
-        Assert.IsNull(actual);
+        Assert.That(actual, Is.Null);
     }
 
     [Test]
@@ -246,7 +246,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
 
         var actual = DocumentUrlService.GetUrlSegment(Subpage2.Key, isoCode, false);
 
-        Assert.IsNull(actual);
+        Assert.That(actual, Is.Null);
     }
 
     [TestCase("/", ExpectedResult = TextpageKey)]
@@ -301,7 +301,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
             {
                 Domains = [new DomainModel { DomainName = domain, IsoCode = "en-US" }],
             });
-        Assert.IsTrue(updateDomainResult.Success);
+        Assert.That(updateDomainResult.Success, Is.True);
 
         var uri = new Uri(rootUrl + path);
         return DocumentUrlService.GetDocumentKeyByUri(uri, false)?.ToString()?.ToUpper();
@@ -332,8 +332,8 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
     [Test]
     public void GetDocumentKeyByRoute_UnPublished_Documents_Have_No_Published_Route()
     {
-        Assert.IsNotNull(DocumentUrlService.GetDocumentKeyByRoute("/text-page-1", "en-US", null, true));
-        Assert.IsNull(DocumentUrlService.GetDocumentKeyByRoute("/text-page-1", "en-US", null, false));
+        Assert.That(DocumentUrlService.GetDocumentKeyByRoute("/text-page-1", "en-US", null, true), Is.Not.Null);
+        Assert.That(DocumentUrlService.GetDocumentKeyByRoute("/text-page-1", "en-US", null, false), Is.Null);
     }
 
     [Test]
@@ -344,10 +344,10 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
 
         Assert.Multiple(() =>
         {
-            Assert.IsNotNull(DocumentUrlService.GetDocumentKeyByRoute("/", "en-US", null, true));
-            Assert.IsNotNull(DocumentUrlService.GetDocumentKeyByRoute("/", "en-US", null, false));
-            Assert.IsNotNull(DocumentUrlService.GetDocumentKeyByRoute("/text-page-1", "en-US", null, true));
-            Assert.IsNotNull(DocumentUrlService.GetDocumentKeyByRoute("/text-page-1", "en-US", null, false));
+            Assert.That(DocumentUrlService.GetDocumentKeyByRoute("/", "en-US", null, true), Is.Not.Null);
+            Assert.That(DocumentUrlService.GetDocumentKeyByRoute("/", "en-US", null, false), Is.Not.Null);
+            Assert.That(DocumentUrlService.GetDocumentKeyByRoute("/text-page-1", "en-US", null, true), Is.Not.Null);
+            Assert.That(DocumentUrlService.GetDocumentKeyByRoute("/text-page-1", "en-US", null, false), Is.Not.Null);
         });
 
         // Act
@@ -356,12 +356,12 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
         Assert.Multiple(() =>
         {
             //The unpublished page self
-            Assert.IsNotNull(DocumentUrlService.GetDocumentKeyByRoute("/", "en-US", null, true));
-            Assert.IsNull(DocumentUrlService.GetDocumentKeyByRoute("/", "en-US", null, false));
+            Assert.That(DocumentUrlService.GetDocumentKeyByRoute("/", "en-US", null, true), Is.Not.Null);
+            Assert.That(DocumentUrlService.GetDocumentKeyByRoute("/", "en-US", null, false), Is.Null);
 
             //A descendant of the unpublished page
-            Assert.IsNotNull(DocumentUrlService.GetDocumentKeyByRoute("/text-page-1", "en-US", null, true));
-            Assert.IsNull(DocumentUrlService.GetDocumentKeyByRoute("/text-page-1", "en-US", null, false));
+            Assert.That(DocumentUrlService.GetDocumentKeyByRoute("/text-page-1", "en-US", null, true), Is.Not.Null);
+            Assert.That(DocumentUrlService.GetDocumentKeyByRoute("/text-page-1", "en-US", null, false), Is.Null);
         });
     }
 
@@ -471,7 +471,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
 
         ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
         var route = DocumentUrlService.GetLegacyRouteFormat(Guid.Parse(documentKey), culture, false);
-        Assert.AreEqual($"{Textpage.Id}{expectedPath}", route);
+        Assert.That(route, Is.EqualTo($"{Textpage.Id}{expectedPath}"));
     }
 
     [Test]
@@ -856,7 +856,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
         {
             var language = new LanguageBuilder().WithCultureInfo(cultureCode).Build();
             var result = await LanguageService.CreateAsync(language, Constants.Security.SuperUserKey);
-            Assert.IsTrue(result.Success, $"Failed to create language {cultureCode}");
+            Assert.That(result.Success, Is.True, $"Failed to create language {cultureCode}");
             languageIds.Add(result.Result!.Id);
         }
 

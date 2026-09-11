@@ -114,7 +114,7 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 }
 ";
         Console.WriteLine(gen);
-        Assert.AreEqual(expected.ClearLf(), gen);
+        Assert.That(gen, Is.EqualTo(expected.ClearLf()));
     }
 
     [Test]
@@ -210,7 +210,7 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 }
 ";
         Console.WriteLine(gen);
-        Assert.AreEqual(expected.ClearLf(), gen);
+        Assert.That(gen, Is.EqualTo(expected.ClearLf()));
     }
 
     [Test]
@@ -326,7 +326,7 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 }
 ";
         Console.WriteLine(gen);
-        Assert.AreEqual(expected.ClearLf(), gen);
+        Assert.That(gen, Is.EqualTo(expected.ClearLf()));
     }
 
     [Test]
@@ -378,9 +378,9 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 
         Console.WriteLine(gen);
 
-        Assert.IsTrue(gen.Contains(" global::Umbraco.Cms.Core.Models.PublishedContent.IPublishedContent Prop1"));
-        Assert.IsTrue(gen.Contains(" global::System.Text.StringBuilder Prop2"));
-        Assert.IsTrue(gen.Contains(" global::Umbraco.Cms.Core.Exceptions.BootFailedException Prop3"));
+        Assert.That(gen, Does.Contain(" global::Umbraco.Cms.Core.Models.PublishedContent.IPublishedContent Prop1"));
+        Assert.That(gen, Does.Contain(" global::System.Text.StringBuilder Prop2"));
+        Assert.That(gen, Does.Contain(" global::Umbraco.Cms.Core.Exceptions.BootFailedException Prop3"));
     }
 
     [Test]
@@ -494,7 +494,7 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 }
 ";
         Console.WriteLine(genParent);
-        Assert.AreEqual(expectedParent.ClearLf(), genParent);
+        Assert.That(genParent, Is.EqualTo(expectedParent.ClearLf()));
 
         var sb2 = new StringBuilder();
         builder.Generate(sb2, builder.GetModelsToGenerate().Skip(1).First());
@@ -559,7 +559,7 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 ";
 
         Console.WriteLine(genChild);
-        Assert.AreEqual(expectedChild.ClearLf(), genChild);
+        Assert.That(genChild, Is.EqualTo(expectedChild.ClearLf()));
     }
 
     [Test]
@@ -627,14 +627,14 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
         var childGen = Generate("PageDefault");
 
         // The base type implements the composition interface and exposes the composition's property
-        Assert.IsTrue(parentGen.Contains("public partial class Parent : PublishedContentModel, IMetaData"), parentGen);
-        Assert.IsTrue(parentGen.Contains("MetaProperty"), parentGen);
+        Assert.That(parentGen, Does.Contain("public partial class Parent : PublishedContentModel, IMetaData"), parentGen);
+        Assert.That(parentGen, Does.Contain("MetaProperty"), parentGen);
 
         // The child inherits the base type only; it must not re-declare the composition interface
         // nor re-emit the composition property (both are inherited via the base class).
-        Assert.IsTrue(childGen.Contains("public partial class PageDefault : Parent"), childGen);
-        Assert.IsFalse(childGen.Contains("IMetaData"), childGen);
-        Assert.IsFalse(childGen.Contains("MetaProperty"), childGen);
+        Assert.That(childGen, Does.Contain("public partial class PageDefault : Parent"), childGen);
+        Assert.That(childGen, Does.Not.Contain("IMetaData"), childGen);
+        Assert.That(childGen, Does.Not.Contain("MetaProperty"), childGen);
     }
 
     [Test]
@@ -767,7 +767,7 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 }
 ";
         Console.WriteLine(genComposed);
-        Assert.AreEqual(expectedComposed.ClearLf(), genComposed);
+        Assert.That(genComposed, Is.EqualTo(expectedComposed.ClearLf()));
 
         var sb2 = new StringBuilder();
         builder.Generate(sb2, builder.GetModelsToGenerate().Skip(1).First());
@@ -858,7 +858,7 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 ";
 
         Console.WriteLine(genComposition);
-        Assert.AreEqual(expectedComposition.ClearLf(), genComposition);
+        Assert.That(genComposition, Is.EqualTo(expectedComposition.ClearLf()));
     }
 
     [TestCase("int", typeof(int))]
@@ -876,7 +876,7 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 #pragma warning disable CS0618 // Type or member is obsolete
         builder.WriteClrType(sb, input);
 #pragma warning restore CS0618 // Type or member is obsolete
-        Assert.AreEqual(expected, sb.ToString());
+        Assert.That(sb.ToString(), Is.EqualTo(expected));
     }
 
     [TestCase("int", typeof(int))]
@@ -896,7 +896,7 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 #pragma warning disable CS0618 // Type or member is obsolete
         builder.WriteClrType(sb, input);
 #pragma warning restore CS0618 // Type or member is obsolete
-        Assert.AreEqual(expected, sb.ToString());
+        Assert.That(sb.ToString(), Is.EqualTo(expected));
     }
 
     [Test]
@@ -914,7 +914,7 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 
         // note - these assertions differ from the original tests in MB because in the embedded version, the result of Builder.IsAmbiguousSymbol is always true
         // which means global:: syntax will be applied to most things
-        Assert.AreEqual("global::System.Text.StringBuilder", sb.ToString());
+        Assert.That(sb.ToString(), Is.EqualTo("global::System.Text.StringBuilder"));
     }
 
     [Test]
@@ -930,7 +930,7 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 #pragma warning disable CS0618 // Type or member is obsolete
         builder.WriteClrType(sb, typeof(StringBuilder));
 #pragma warning restore CS0618 // Type or member is obsolete
-        Assert.AreEqual("global::System.Text.StringBuilder", sb.ToString());
+        Assert.That(sb.ToString(), Is.EqualTo("global::System.Text.StringBuilder"));
     }
 
     [Test]
@@ -949,7 +949,7 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 
         // note - these assertions differ from the original tests in MB because in the embedded version, the result of Builder.IsAmbiguousSymbol is always true
         // which means global:: syntax will be applied to most things
-        Assert.AreEqual("global::System.Text.ASCIIEncoding", sb.ToString());
+        Assert.That(sb.ToString(), Is.EqualTo("global::System.Text.ASCIIEncoding"));
     }
 
     [Test]
@@ -968,7 +968,7 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 
         // note - these assertions differ from the original tests in MB because in the embedded version, the result of Builder.IsAmbiguousSymbol is always true
         // which means global:: syntax will be applied to most things
-        Assert.AreEqual("global::System.Text.ASCIIEncoding", sb.ToString());
+        Assert.That(sb.ToString(), Is.EqualTo("global::System.Text.ASCIIEncoding"));
     }
 
     [Test]
@@ -987,7 +987,7 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 
         // note - these assertions differ from the original tests in MB because in the embedded version, the result of Builder.IsAmbiguousSymbol is always true
         // which means global:: syntax will be applied to most things
-        Assert.AreEqual("global::Umbraco.Cms.Tests.UnitTests.Umbraco.ModelsBuilder.Embedded.ASCIIEncoding", sb.ToString());
+        Assert.That(sb.ToString(), Is.EqualTo("global::Umbraco.Cms.Tests.UnitTests.Umbraco.ModelsBuilder.Embedded.ASCIIEncoding"));
     }
 
     [Test]
@@ -1006,7 +1006,7 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 
         // note - these assertions differ from the original tests in MB because in the embedded version, the result of Builder.IsAmbiguousSymbol is always true
         // which means global:: syntax will be applied to most things
-        Assert.AreEqual("global::Umbraco.Cms.Tests.UnitTests.Umbraco.ModelsBuilder.Embedded.ASCIIEncoding", sb.ToString());
+        Assert.That(sb.ToString(), Is.EqualTo("global::Umbraco.Cms.Tests.UnitTests.Umbraco.ModelsBuilder.Embedded.ASCIIEncoding"));
     }
 
     [Test]
@@ -1025,7 +1025,7 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 
         // note - these assertions differ from the original tests in MB because in the embedded version, the result of Builder.IsAmbiguousSymbol is always true
         // which means global:: syntax will be applied to most things
-        Assert.AreEqual("global::Umbraco.Cms.Tests.UnitTests.Umbraco.ModelsBuilder.Embedded.ASCIIEncoding.Nested", sb.ToString());
+        Assert.That(sb.ToString(), Is.EqualTo("global::Umbraco.Cms.Tests.UnitTests.Umbraco.ModelsBuilder.Embedded.ASCIIEncoding.Nested"));
     }
 
     [Test]
@@ -1036,7 +1036,7 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 #pragma warning restore CS0618 // Type or member is obsolete
         var sb = new StringBuilder();
         builder.WriteClrType(sb, "System.Int32");
-        Assert.AreEqual("int", sb.ToString());
+        Assert.That(sb.ToString(), Is.EqualTo("int"));
     }
 
     [Test]
@@ -1047,7 +1047,7 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 #pragma warning restore CS0618 // Type or member is obsolete
         var sb = new StringBuilder();
         builder.WriteClrType(sb, "System.Collections.Generic.IEnumerable<System.Int32>");
-        Assert.AreEqual("global::System.Collections.Generic.IEnumerable<int>", sb.ToString());
+        Assert.That(sb.ToString(), Is.EqualTo("global::System.Collections.Generic.IEnumerable<int>"));
     }
 
     [Test]
@@ -1058,7 +1058,7 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 #pragma warning restore CS0618 // Type or member is obsolete
         var sb = new StringBuilder();
         builder.WriteClrType(sb, "System.Collections.Generic.Dictionary<System.String, System.Int32>");
-        Assert.AreEqual("global::System.Collections.Generic.Dictionary<string, int>", sb.ToString());
+        Assert.That(sb.ToString(), Is.EqualTo("global::System.Collections.Generic.Dictionary<string, int>"));
     }
 
     [Test]
@@ -1072,7 +1072,7 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
         // This is the format produced by ModelType.MapToName() - tests the string-based WriteClrType overload
         builder.WriteClrType(sb, "System.Collections.Generic.List<System.Tuple<System.String, System.String>>");
 
-        Assert.AreEqual("global::System.Collections.Generic.List<global::System.Tuple<string, string>>", sb.ToString());
+        Assert.That(sb.ToString(), Is.EqualTo("global::System.Collections.Generic.List<global::System.Tuple<string, string>>"));
     }
 
     [Test]
@@ -1083,7 +1083,7 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 #pragma warning restore CS0618 // Type or member is obsolete
         var sb = new StringBuilder();
         builder.WriteClrType(sb, "System.Collections.Generic.Dictionary<System.String, System.Collections.Generic.List<System.Tuple<System.Int32, System.String>>>");
-        Assert.AreEqual("global::System.Collections.Generic.Dictionary<string, global::System.Collections.Generic.List<global::System.Tuple<int, string>>>", sb.ToString());
+        Assert.That(sb.ToString(), Is.EqualTo("global::System.Collections.Generic.Dictionary<string, global::System.Collections.Generic.List<global::System.Tuple<int, string>>>"));
     }
 
     [Test]
@@ -1094,7 +1094,7 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 #pragma warning restore CS0618 // Type or member is obsolete
         var sb = new StringBuilder();
         builder.WriteClrType(sb, "System.Collections.Generic.Dictionary<System.Tuple<System.Int32, System.Int32>, System.Tuple<System.String, System.String>>");
-        Assert.AreEqual("global::System.Collections.Generic.Dictionary<global::System.Tuple<int, int>, global::System.Tuple<string, string>>", sb.ToString());
+        Assert.That(sb.ToString(), Is.EqualTo("global::System.Collections.Generic.Dictionary<global::System.Tuple<int, int>, global::System.Tuple<string, string>>"));
     }
 
     public class Class1

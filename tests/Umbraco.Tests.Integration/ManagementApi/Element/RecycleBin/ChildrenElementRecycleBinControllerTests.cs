@@ -25,7 +25,7 @@ public class ChildrenElementRecycleBinControllerTests : ElementRecycleBinControl
     {
         // Folder
         var folderResult = await ElementContainerService.CreateAsync(null, Guid.NewGuid().ToString(), null, Constants.Security.SuperUserKey);
-        Assert.IsTrue(folderResult.Success, $"Failed to create folder: {folderResult.Status}");
+        Assert.That(folderResult.Success, Is.True, $"Failed to create folder: {folderResult.Status}");
         _folderKey = folderResult.Result!.Key;
 
         // Element Type
@@ -45,11 +45,11 @@ public class ChildrenElementRecycleBinControllerTests : ElementRecycleBinControl
             Variants = [new VariantModel { Name = Guid.NewGuid().ToString() }],
         };
         var elementResult = await ElementEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(elementResult.Success, $"Failed to create element: {elementResult.Status}");
+        Assert.That(elementResult.Success, Is.True, $"Failed to create element: {elementResult.Status}");
 
         // Move folder to recycle bin (this will move the element inside it too)
         var moveResult = await ElementContainerService.MoveToRecycleBinAsync(_folderKey, Constants.Security.SuperUserKey);
-        Assert.IsTrue(moveResult.Success, $"Failed to move folder to recycle bin: {moveResult.Result}");
+        Assert.That(moveResult.Success, Is.True, $"Failed to move folder to recycle bin: {moveResult.Result}");
     }
 
     protected override Expression<Func<ChildrenElementRecycleBinController, object>> MethodSelector =>

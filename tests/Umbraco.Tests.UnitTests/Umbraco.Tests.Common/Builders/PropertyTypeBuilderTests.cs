@@ -55,22 +55,22 @@ public class PropertyTypeBuilderTests
             .Build();
 
         // Assert
-        Assert.AreEqual(testId, propertyType.Id);
-        Assert.AreEqual(testPropertyEditorAlias, propertyType.PropertyEditorAlias);
-        Assert.AreEqual(testValueStorageType, propertyType.ValueStorageType);
-        Assert.AreEqual(testAlias, propertyType.Alias);
-        Assert.AreEqual(testName, propertyType.Name);
-        Assert.AreEqual(testSortOrder, propertyType.SortOrder);
-        Assert.AreEqual(testDataTypeId, propertyType.DataTypeId);
-        Assert.AreEqual(testDataTypeKey, propertyType.DataTypeKey);
-        Assert.AreEqual(testCreateDate, propertyType.CreateDate);
-        Assert.AreEqual(testUpdateDate, propertyType.UpdateDate);
-        Assert.AreEqual(testDescription, propertyType.Description);
-        Assert.AreEqual(testKey, propertyType.Key);
-        Assert.AreEqual(testPropertyGroupId, propertyType.PropertyGroupId.Value);
-        Assert.AreEqual(testMandatory, propertyType.Mandatory);
-        Assert.AreEqual(testMandatoryMessage, propertyType.MandatoryMessage);
-        Assert.AreEqual(testValidationRegExp, propertyType.ValidationRegExp);
-        Assert.AreEqual(testValidationRegExpMessage, propertyType.ValidationRegExpMessage);
+        Assert.That(propertyType.Id, Is.EqualTo(testId));
+        Assert.That(propertyType.PropertyEditorAlias, Is.EqualTo(testPropertyEditorAlias));
+        Assert.That(propertyType.ValueStorageType, Is.EqualTo(testValueStorageType));
+        Assert.That(propertyType.Alias, Is.EqualTo(testAlias));
+        Assert.That(propertyType.Name, Is.EqualTo(testName));
+        Assert.That(propertyType.SortOrder, Is.EqualTo(testSortOrder));
+        Assert.That(propertyType.DataTypeId, Is.EqualTo(testDataTypeId));
+        Assert.That(propertyType.DataTypeKey, Is.EqualTo(testDataTypeKey));
+        Assert.That(propertyType.CreateDate, Is.EqualTo(testCreateDate));
+        Assert.That(propertyType.UpdateDate, Is.EqualTo(testUpdateDate));
+        Assert.That(propertyType.Description, Is.EqualTo(testDescription));
+        Assert.That(propertyType.Key, Is.EqualTo(testKey));
+        Assert.That(propertyType.PropertyGroupId.Value, Is.EqualTo(testPropertyGroupId));
+        Assert.That(propertyType.Mandatory, Is.EqualTo(testMandatory));
+        Assert.That(propertyType.MandatoryMessage, Is.EqualTo(testMandatoryMessage));
+        Assert.That(propertyType.ValidationRegExp, Is.EqualTo(testValidationRegExp));
+        Assert.That(propertyType.ValidationRegExpMessage, Is.EqualTo(testValidationRegExpMessage));
     }
 }

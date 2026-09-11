@@ -36,20 +36,20 @@ public class MemberPropertyCacheLevelTests : PropertyCacheLevelTestsBase
         var member = await CreateMember();
 
         var publishedMember1 = await MemberCacheService.Get(member);
-        Assert.IsNotNull(publishedMember1);
+        Assert.That(publishedMember1, Is.Not.Null);
 
         var publishedMember2 = await MemberCacheService.Get(member);
-        Assert.IsNotNull(publishedMember2);
+        Assert.That(publishedMember2, Is.Not.Null);
 
-        Assert.AreNotSame(publishedMember1,  publishedMember2);
+        Assert.That(publishedMember2, Is.Not.SameAs(publishedMember1));
 
         var titleValue1 = publishedMember1.Value<string>("title");
-        Assert.AreEqual("The title", titleValue1);
+        Assert.That(titleValue1, Is.EqualTo("The title"));
 
         var titleValue2 = publishedMember2.Value<string>("title");
-        Assert.IsNotNull(titleValue2);
+        Assert.That(titleValue2, Is.Not.Null);
 
-        Assert.AreEqual("The title",  titleValue2);
+        Assert.That(titleValue2, Is.EqualTo("The title"));
 
         // fetch title values 10 times in total, 5 times from each published member instance
         titleValue1 = publishedMember1.Value<string>("title");
@@ -62,8 +62,8 @@ public class MemberPropertyCacheLevelTests : PropertyCacheLevelTestsBase
         titleValue2 = publishedMember2.Value<string>("title");
         titleValue2 = publishedMember2.Value<string>("title");
 
-        Assert.AreEqual(expectedSourceConverts, PropertyValueLevelDetectionTestsConverter.SourceConverts);
-        Assert.AreEqual(expectedInterConverts, PropertyValueLevelDetectionTestsConverter.InterConverts);
+        Assert.That(PropertyValueLevelDetectionTestsConverter.SourceConverts, Is.EqualTo(expectedSourceConverts));
+        Assert.That(PropertyValueLevelDetectionTestsConverter.InterConverts, Is.EqualTo(expectedInterConverts));
     }
 
     private IUser SuperUser() => GetRequiredService<IUserService>().GetAsync(Constants.Security.SuperUserKey).GetAwaiter().GetResult();
@@ -72,7 +72,7 @@ public class MemberPropertyCacheLevelTests : PropertyCacheLevelTestsBase
     {
         IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
         var memberTypeCreateResult = await MemberTypeService.UpdateAsync(memberType, Constants.Security.SuperUserKey);
-        Assert.IsTrue(memberTypeCreateResult.Success);
+        Assert.That(memberTypeCreateResult.Success, Is.True);
 
         var createModel = new MemberCreateModel
         {
@@ -88,8 +88,8 @@ public class MemberPropertyCacheLevelTests : PropertyCacheLevelTestsBase
         };
 
         var memberCreateResult = await MemberEditingService.CreateAsync(createModel, SuperUser());
-        Assert.IsTrue(memberCreateResult.Success);
-        Assert.IsNotNull(memberCreateResult.Result.Content);
+        Assert.That(memberCreateResult.Success, Is.True);
+        Assert.That(memberCreateResult.Result.Content, Is.Not.Null);
 
         return memberCreateResult.Result.Content;
     }

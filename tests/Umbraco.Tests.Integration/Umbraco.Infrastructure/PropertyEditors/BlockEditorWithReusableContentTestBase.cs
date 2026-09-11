@@ -33,7 +33,7 @@ internal abstract class BlockEditorWithReusableContentTestBase : BlockEditorElem
                 ],
             },
             Constants.Security.SuperUserKey);
-        Assert.IsTrue(createResult.Success);
+        Assert.That(createResult.Success, Is.True);
 
         var elementKey = createResult.Result.Content!.Key;
 
@@ -41,7 +41,7 @@ internal abstract class BlockEditorWithReusableContentTestBase : BlockEditorElem
             elementKey,
             [new CulturePublishScheduleModel { Culture = null }],
             Constants.Security.SuperUserKey);
-        Assert.IsTrue(publishResult.Success);
+        Assert.That(publishResult.Success, Is.True);
 
         return elementKey;
     }
@@ -66,7 +66,7 @@ internal abstract class BlockEditorWithReusableContentTestBase : BlockEditorElem
                 ],
             },
             Constants.Security.SuperUserKey);
-        Assert.IsTrue(createResult.Success);
+        Assert.That(createResult.Success, Is.True);
 
         var elementKey = createResult.Result.Content!.Key;
 
@@ -76,7 +76,7 @@ internal abstract class BlockEditorWithReusableContentTestBase : BlockEditorElem
                 elementKey,
                 culturesToPublish.Select(culture => new CulturePublishScheduleModel { Culture = culture }).ToArray(),
                 Constants.Security.SuperUserKey);
-            Assert.IsTrue(publishResult.Success);
+            Assert.That(publishResult.Success, Is.True);
         }
 
         return elementKey;

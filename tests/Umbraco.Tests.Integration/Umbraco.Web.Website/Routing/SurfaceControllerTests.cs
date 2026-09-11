@@ -31,7 +31,7 @@ internal sealed class SurfaceControllerTests : UmbracoTestServerTestBase
         var body = await response.Content.ReadAsStringAsync();
 
         // Assert
-        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
     }
 
     [Test]
@@ -45,7 +45,7 @@ internal sealed class SurfaceControllerTests : UmbracoTestServerTestBase
         var body = await response.Content.ReadAsStringAsync();
 
         // Assert
-        Assert.AreEqual(HttpStatusCode.NoContent, response.StatusCode);
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NoContent));
     }
 
     [Test]
@@ -64,7 +64,7 @@ internal sealed class SurfaceControllerTests : UmbracoTestServerTestBase
 
         var body = await response.Content.ReadAsStringAsync();
 
-        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
     }
 }
 

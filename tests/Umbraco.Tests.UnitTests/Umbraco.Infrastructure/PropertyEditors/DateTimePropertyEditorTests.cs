@@ -36,6 +36,6 @@ public class DateTimePropertyEditorTests
         ContentPropertyData propertyData = new ContentPropertyData(actualDateTime, dictionary);
         var value = (DateTime)dateTimePropertyEditor.FromEditor(propertyData, null);
 
-        Assert.AreEqual(expectedDateTime, value);
+        Assert.That(value, Is.EqualTo(expectedDateTime));
     }
 }

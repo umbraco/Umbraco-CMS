@@ -22,8 +22,8 @@ public partial class ContentEditingServiceTests
 
         if (allowedAtRoot)
         {
-            Assert.IsTrue(result.Success);
-            Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
+            Assert.That(result.Success, Is.True);
+            Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.Success));
             VerifyCopy(result.Result);
 
             // re-get and re-test
@@ -31,17 +31,17 @@ public partial class ContentEditingServiceTests
 
             void VerifyCopy(IContent? copiedContent)
             {
-                Assert.IsNotNull(copiedContent);
-                Assert.AreEqual(Constants.System.Root, copiedContent.ParentId);
-                Assert.IsTrue(copiedContent.HasIdentity);
-                Assert.AreNotEqual(child.Id, copiedContent.Id);
-                Assert.AreNotEqual(child.Key, copiedContent.Key);
+                Assert.That(copiedContent, Is.Not.Null);
+                Assert.That(copiedContent.ParentId, Is.EqualTo(Constants.System.Root));
+                Assert.That(copiedContent.HasIdentity, Is.True);
+                Assert.That(copiedContent.Id, Is.Not.EqualTo(child.Id));
+                Assert.That(copiedContent.Key, Is.Not.EqualTo(child.Key));
             }
         }
         else
         {
-            Assert.IsFalse(result.Success);
-            Assert.AreEqual(ContentEditingOperationStatus.NotAllowed, result.Status);
+            Assert.That(result.Success, Is.False);
+            Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.NotAllowed));
         }
     }
 
@@ -64,8 +64,8 @@ public partial class ContentEditingServiceTests
 
         if (allowedAtParent)
         {
-            Assert.IsTrue(result.Success);
-            Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
+            Assert.That(result.Success, Is.True);
+            Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.Success));
             VerifyCopy(result.Result);
 
             // re-get and re-test
@@ -73,17 +73,17 @@ public partial class ContentEditingServiceTests
 
             void VerifyCopy(IContent? copiedContent)
             {
-                Assert.IsNotNull(copiedContent);
-                Assert.AreEqual(root2.Id, copiedContent.ParentId);
-                Assert.IsTrue(copiedContent.HasIdentity);
-                Assert.AreNotEqual(child1.Id, copiedContent.Id);
-                Assert.AreNotEqual(child1.Key, copiedContent.Key);
+                Assert.That(copiedContent, Is.Not.Null);
+                Assert.That(copiedContent.ParentId, Is.EqualTo(root2.Id));
+                Assert.That(copiedContent.HasIdentity, Is.True);
+                Assert.That(copiedContent.Id, Is.Not.EqualTo(child1.Id));
+                Assert.That(copiedContent.Key, Is.Not.EqualTo(child1.Key));
             }
         }
         else
         {
-            Assert.IsFalse(result.Success);
-            Assert.AreEqual(ContentEditingOperationStatus.NotAllowed, result.Status);
+            Assert.That(result.Success, Is.False);
+            Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.NotAllowed));
         }
     }
 
@@ -96,8 +96,8 @@ public partial class ContentEditingServiceTests
         (IContent root2, IContent child2) = await CreateRootAndChildAsync(contentType, "Root 2", "Child 2");
 
         var result = await ContentEditingService.CopyAsync(root1.Key, root2.Key, false, includeDescendants, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.Success));
 
         VerifyCopy(result.Result);
 
@@ -106,27 +106,27 @@ public partial class ContentEditingServiceTests
 
         void VerifyCopy(IContent? copiedRoot)
         {
-            Assert.IsNotNull(copiedRoot);
-            Assert.AreEqual(root2.Id, copiedRoot.ParentId);
-            Assert.AreNotEqual(root1.Id, copiedRoot.Id);
-            Assert.AreNotEqual(root1.Key, copiedRoot.Key);
-            Assert.AreEqual(root1.Name, copiedRoot.Name);
+            Assert.That(copiedRoot, Is.Not.Null);
+            Assert.That(copiedRoot.ParentId, Is.EqualTo(root2.Id));
+            Assert.That(copiedRoot.Id, Is.Not.EqualTo(root1.Id));
+            Assert.That(copiedRoot.Key, Is.Not.EqualTo(root1.Key));
+            Assert.That(copiedRoot.Name, Is.EqualTo(root1.Name));
 
             var copiedChildren = ContentService.GetPagedChildren(copiedRoot.Id, 0, 100, out var total, propertyAliases: null, filter: null, ordering: null).ToArray();
 
             if (includeDescendants)
             {
-                Assert.AreEqual(1, copiedChildren.Length);
-                Assert.AreEqual(1, total);
+                Assert.That(copiedChildren, Has.Length.EqualTo(1));
+                Assert.That(total, Is.EqualTo(1));
                 var copiedChild = copiedChildren.First();
-                Assert.AreNotEqual(child1.Id, copiedChild.Id);
-                Assert.AreNotEqual(child1.Key, copiedChild.Key);
-                Assert.AreEqual(child1.Name, copiedChild.Name);
+                Assert.That(copiedChild.Id, Is.Not.EqualTo(child1.Id));
+                Assert.That(copiedChild.Key, Is.Not.EqualTo(child1.Key));
+                Assert.That(copiedChild.Name, Is.EqualTo(child1.Name));
             }
             else
             {
-                Assert.AreEqual(0, copiedChildren.Length);
-                Assert.AreEqual(0, total);
+                Assert.That(copiedChildren, Is.Empty);
+                Assert.That(total, Is.EqualTo(0));
             }
         }
     }
@@ -138,8 +138,8 @@ public partial class ContentEditingServiceTests
         (IContent root, IContent child) = await CreateRootAndChildAsync(contentType);
 
         var result = await ContentEditingService.CopyAsync(child.Key, root.Key, false, false, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.Success));
 
         VerifyCopy(result.Result);
 
@@ -148,11 +148,11 @@ public partial class ContentEditingServiceTests
 
         void VerifyCopy(IContent? copiedContent)
         {
-            Assert.IsNotNull(copiedContent);
-            Assert.AreEqual(root.Id, copiedContent.ParentId);
-            Assert.IsTrue(copiedContent.HasIdentity);
-            Assert.AreNotEqual(child.Key, copiedContent.Key);
-            Assert.AreNotEqual(child.Name, copiedContent.Name);
+            Assert.That(copiedContent, Is.Not.Null);
+            Assert.That(copiedContent.ParentId, Is.EqualTo(root.Id));
+            Assert.That(copiedContent.HasIdentity, Is.True);
+            Assert.That(copiedContent.Key, Is.Not.EqualTo(child.Key));
+            Assert.That(copiedContent.Name, Is.Not.EqualTo(child.Name));
         }
     }
 
@@ -164,8 +164,8 @@ public partial class ContentEditingServiceTests
         (IContent root, IContent child) = await CreateRootAndChildAsync(contentType);
 
         var result = await ContentEditingService.CopyAsync(root.Key, child.Key, false, includeDescendants, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.Success));
 
         VerifyCopy(result.Result);
 
@@ -174,26 +174,26 @@ public partial class ContentEditingServiceTests
 
         void VerifyCopy(IContent? copiedRoot)
         {
-            Assert.IsNotNull(copiedRoot);
-            Assert.AreEqual(child.Id, copiedRoot.ParentId);
-            Assert.IsTrue(copiedRoot.HasIdentity);
-            Assert.AreNotEqual(root.Key, copiedRoot.Key);
-            Assert.AreEqual(root.Name, copiedRoot.Name);
+            Assert.That(copiedRoot, Is.Not.Null);
+            Assert.That(copiedRoot.ParentId, Is.EqualTo(child.Id));
+            Assert.That(copiedRoot.HasIdentity, Is.True);
+            Assert.That(copiedRoot.Key, Is.Not.EqualTo(root.Key));
+            Assert.That(copiedRoot.Name, Is.EqualTo(root.Name));
             var copiedChildren = ContentService.GetPagedChildren(copiedRoot.Id, 0, 100, out var total, propertyAliases: null, filter: null, ordering: null).ToArray();
 
             if (includeDescendants)
             {
-                Assert.AreEqual(1, copiedChildren.Length);
-                Assert.AreEqual(1, total);
+                Assert.That(copiedChildren, Has.Length.EqualTo(1));
+                Assert.That(total, Is.EqualTo(1));
                 var copiedChild = copiedChildren.First();
-                Assert.AreNotEqual(child.Id, copiedChild.Id);
-                Assert.AreNotEqual(child.Key, copiedChild.Key);
-                Assert.AreEqual(child.Name, copiedChild.Name);
+                Assert.That(copiedChild.Id, Is.Not.EqualTo(child.Id));
+                Assert.That(copiedChild.Key, Is.Not.EqualTo(child.Key));
+                Assert.That(copiedChild.Name, Is.EqualTo(child.Name));
             }
             else
             {
-                Assert.AreEqual(0, copiedChildren.Length);
-                Assert.AreEqual(0, total);
+                Assert.That(copiedChildren, Is.Empty);
+                Assert.That(total, Is.EqualTo(0));
             }
         }
     }
@@ -206,8 +206,8 @@ public partial class ContentEditingServiceTests
         (IContent root, IContent child) = await CreateRootAndChildAsync(contentType);
 
         var result = await ContentEditingService.CopyAsync(root.Key, root.Key, false, includeDescendants, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.Success));
 
         VerifyCopy(result.Result);
 
@@ -216,26 +216,26 @@ public partial class ContentEditingServiceTests
 
         void VerifyCopy(IContent? copiedRoot)
         {
-            Assert.IsNotNull(copiedRoot);
-            Assert.AreEqual(root.Id, copiedRoot.ParentId);
-            Assert.IsTrue(copiedRoot.HasIdentity);
-            Assert.AreNotEqual(root.Key, copiedRoot.Key);
-            Assert.AreEqual(root.Name, copiedRoot.Name);
+            Assert.That(copiedRoot, Is.Not.Null);
+            Assert.That(copiedRoot.ParentId, Is.EqualTo(root.Id));
+            Assert.That(copiedRoot.HasIdentity, Is.True);
+            Assert.That(copiedRoot.Key, Is.Not.EqualTo(root.Key));
+            Assert.That(copiedRoot.Name, Is.EqualTo(root.Name));
             var copiedChildren = ContentService.GetPagedChildren(copiedRoot.Id, 0, 100, out var total, propertyAliases: null, filter: null, ordering: null).ToArray();
 
             if (includeDescendants)
             {
-                Assert.AreEqual(1, copiedChildren.Length);
-                Assert.AreEqual(1, total);
+                Assert.That(copiedChildren, Has.Length.EqualTo(1));
+                Assert.That(total, Is.EqualTo(1));
                 var copiedChild = copiedChildren.First();
-                Assert.AreNotEqual(child.Id, copiedChild.Id);
-                Assert.AreNotEqual(child.Key, copiedChild.Key);
-                Assert.AreEqual(child.Name, copiedChild.Name);
+                Assert.That(copiedChild.Id, Is.Not.EqualTo(child.Id));
+                Assert.That(copiedChild.Key, Is.Not.EqualTo(child.Key));
+                Assert.That(copiedChild.Name, Is.EqualTo(child.Name));
             }
             else
             {
-                Assert.AreEqual(0, copiedChildren.Length);
-                Assert.AreEqual(0, total);
+                Assert.That(copiedChildren, Is.Empty);
+                Assert.That(total, Is.EqualTo(0));
             }
         }
     }
@@ -247,21 +247,21 @@ public partial class ContentEditingServiceTests
         (IContent root, IContent child) = await CreateRootAndChildAsync(contentType);
 
         var result = await ContentEditingService.CopyAsync(child.Key, root.Key, true, false, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.Success));
 
         var relationService = GetRequiredService<IRelationService>();
         var relations = relationService.GetByParentId(child.Id)!.ToArray();
-        Assert.AreEqual(1, relations.Length);
-        Assert.AreEqual(result.Result!.Id, relations.First().ChildId);
+        Assert.That(relations, Has.Length.EqualTo(1));
+        Assert.That(relations.First().ChildId, Is.EqualTo(result.Result!.Id));
     }
 
     [Test]
     public async Task Cannot_Copy_Non_Existing_Content()
     {
         var result = await ContentEditingService.CopyAsync(Guid.NewGuid(), Constants.System.RootKey, false, false, Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.NotFound, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.NotFound));
     }
 
     [Test]
@@ -271,8 +271,8 @@ public partial class ContentEditingServiceTests
         (IContent root, IContent child) = await CreateRootAndChildAsync(contentType);
 
         var result = await ContentEditingService.CopyAsync(child.Key, Guid.NewGuid(), false, false, Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.ParentNotFound, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.ParentNotFound));
     }
 
     [Test]
@@ -284,7 +284,7 @@ public partial class ContentEditingServiceTests
         await ContentEditingService.MoveToRecycleBinAsync(root1.Key, Constants.Security.SuperUserKey);
 
         var result = await ContentEditingService.CopyAsync(root2.Key, root1.Key, false, false, Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.InTrash, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.InTrash));
     }
 }

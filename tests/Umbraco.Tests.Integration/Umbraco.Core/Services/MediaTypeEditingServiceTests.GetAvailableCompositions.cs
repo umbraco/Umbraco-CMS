@@ -52,10 +52,10 @@ internal sealed partial class MediaTypeEditingServiceTests
                 Enumerable.Empty<string>());
 
         // Verify that mediaType2 and mediaType3 are present in available compositions
-        Assert.IsTrue(availableCompositions.Any(compositionsResult =>
-            compositionsResult.Composition.Key == result2.Result!.Key && compositionsResult.Allowed));
-        Assert.IsTrue(availableCompositions.Any(compositionsResult =>
-            compositionsResult.Composition.Key == result3.Result!.Key && compositionsResult.Allowed));
+        Assert.That(availableCompositions.Any(compositionsResult =>
+            compositionsResult.Composition.Key == result2.Result!.Key && compositionsResult.Allowed), Is.True);
+        Assert.That(availableCompositions.Any(compositionsResult =>
+            compositionsResult.Composition.Key == result3.Result!.Key && compositionsResult.Allowed), Is.True);
     }
 
     [Test]
@@ -87,7 +87,7 @@ internal sealed partial class MediaTypeEditingServiceTests
                 Enumerable.Empty<Guid>(),
                 Enumerable.Empty<string>());
 
-        Assert.IsFalse(availableCompositions.Any(compositionsResult => compositionsResult.Composition.Key == result2.Result!.Key));
+        Assert.That(availableCompositions.Any(compositionsResult => compositionsResult.Composition.Key == result2.Result!.Key), Is.False);
     }
 
     [Test]
@@ -112,6 +112,6 @@ internal sealed partial class MediaTypeEditingServiceTests
                 Enumerable.Empty<string>());
 
         // Being inherited from by "Child" must not lock "Parent" out of having its own compositions
-        Assert.IsTrue(availableCompositions.Any(x => x.Composition.Key == otherResult.Result!.Key && x.Allowed));
+        Assert.That(availableCompositions.Any(x => x.Composition.Key == otherResult.Result!.Key && x.Allowed), Is.True);
     }
 }

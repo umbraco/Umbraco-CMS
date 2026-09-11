@@ -9,6 +9,7 @@ using Moq;
 using NPoco;
 using NPoco.DatabaseTypes;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
@@ -29,8 +30,8 @@ public class UmbracoDatabaseTests
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(0, database.CommandTimeout);
-            Assert.AreEqual(300, database.EffectiveCommandTimeout);
+            Assert.That(database.CommandTimeout, Is.EqualTo(0));
+            Assert.That(database.EffectiveCommandTimeout, Is.EqualTo(300));
         });
     }
 
@@ -41,8 +42,8 @@ public class UmbracoDatabaseTests
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(0, database.CommandTimeout);
-            Assert.AreEqual(0, database.EffectiveCommandTimeout);
+            Assert.That(database.CommandTimeout, Is.EqualTo(0));
+            Assert.That(database.EffectiveCommandTimeout, Is.EqualTo(0));
         });
     }
 
@@ -53,8 +54,8 @@ public class UmbracoDatabaseTests
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(0, database.CommandTimeout);
-            Assert.AreEqual(30, database.EffectiveCommandTimeout);
+            Assert.That(database.CommandTimeout, Is.EqualTo(0));
+            Assert.That(database.EffectiveCommandTimeout, Is.EqualTo(30));
         });
     }
 
@@ -65,8 +66,8 @@ public class UmbracoDatabaseTests
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(0, database.CommandTimeout);
-            Assert.AreEqual(30, database.EffectiveCommandTimeout);
+            Assert.That(database.CommandTimeout, Is.EqualTo(0));
+            Assert.That(database.EffectiveCommandTimeout, Is.EqualTo(30));
         });
     }
 
@@ -77,8 +78,8 @@ public class UmbracoDatabaseTests
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(0, database.CommandTimeout);
-            Assert.AreEqual(600, database.EffectiveCommandTimeout);
+            Assert.That(database.CommandTimeout, Is.EqualTo(0));
+            Assert.That(database.EffectiveCommandTimeout, Is.EqualTo(600));
         });
     }
 
@@ -88,7 +89,7 @@ public class UmbracoDatabaseTests
         using UmbracoDatabase database = CreateSqliteDatabase("Data Source=x.db;Default Timeout=600");
         database.CommandTimeout = 45;
 
-        Assert.AreEqual(45, database.EffectiveCommandTimeout);
+        Assert.That(database.EffectiveCommandTimeout, Is.EqualTo(45));
     }
 
     [Test]
@@ -106,7 +107,7 @@ public class UmbracoDatabaseTests
 
         database.ExecuteScalar<long>("SELECT 1");
 
-        Assert.AreEqual(600, database.AppliedCommandTimeout);
+        Assert.That(database.AppliedCommandTimeout, Is.EqualTo(600));
     }
 
     [Test]
@@ -123,7 +124,7 @@ public class UmbracoDatabaseTests
 
         database.ExecuteScalar<long>("SELECT 1");
 
-        Assert.AreEqual(45, database.AppliedCommandTimeout);
+        Assert.That(database.AppliedCommandTimeout, Is.EqualTo(45));
     }
 
     private static UmbracoDatabase CreateSqlServerDatabase(string connectionString)

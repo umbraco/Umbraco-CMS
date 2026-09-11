@@ -32,7 +32,7 @@ public class PropertyTypeExtensionsTests
 
         IDataType? result = propertyType.GetDataType(dataTypeService.Object, idKeyMap.Object);
 
-        Assert.AreSame(expected, result);
+        Assert.That(result, Is.SameAs(expected));
         idKeyMap.VerifyNoOtherCalls();
     }
 
@@ -53,7 +53,7 @@ public class PropertyTypeExtensionsTests
 
         IDataType? result = propertyType.GetDataType(dataTypeService.Object, idKeyMap.Object);
 
-        Assert.AreSame(expected, result);
+        Assert.That(result, Is.SameAs(expected));
         idKeyMap.Verify(x => x.GetKeyForId(DataTypeId, UmbracoObjectTypes.DataType), Times.Once);
     }
 
@@ -72,7 +72,7 @@ public class PropertyTypeExtensionsTests
 
         IDataType? result = propertyType.GetDataType(dataTypeService.Object, idKeyMap.Object);
 
-        Assert.IsNull(result);
+        Assert.That(result, Is.Null);
         dataTypeService.Verify(x => x.GetAsync(It.IsAny<Guid>()), Times.Never);
     }
 
@@ -89,6 +89,6 @@ public class PropertyTypeExtensionsTests
 
         IDataType? result = propertyType.GetDataType(dataTypeService.Object, idKeyMap);
 
-        Assert.IsNull(result);
+        Assert.That(result, Is.Null);
     }
 }

@@ -58,12 +58,12 @@ internal sealed class DocumentHybridCacheAncestryVariantTests : UmbracoIntegrati
     {
         // Publish branch in all cultures
         var publishAttempt = await ContentPublishingService.PublishBranchAsync(rootContent.Key, [_englishIsoCode, _danishIsoCode], PublishBranchFilter.IncludeUnpublished, Constants.Security.SuperUserKey, false);
-        Assert.IsTrue(publishAttempt.Success);
+        Assert.That(publishAttempt.Success, Is.True);
         Assert.That(publishAttempt.Result.SucceededItems.Count(), Is.EqualTo(3));
 
         // Unpublish all cultures in child
         var unpublishAttempt = await ContentPublishingService.UnpublishAsync(childNode.Key, new HashSet<string>([_englishIsoCode, _danishIsoCode]), Constants.Security.SuperUserKey);
-        Assert.IsTrue(unpublishAttempt.Success);
+        Assert.That(unpublishAttempt.Success, Is.True);
 
         var publishedGrandChild = await PublishedContentCache.GetByIdAsync(grandChildNode.Key, preview);
 
@@ -73,7 +73,7 @@ internal sealed class DocumentHybridCacheAncestryVariantTests : UmbracoIntegrati
         }
         else
         {
-            Assert.IsNull(publishedGrandChild);
+            Assert.That(publishedGrandChild, Is.Null);
         }
     }
 
@@ -81,16 +81,16 @@ internal sealed class DocumentHybridCacheAncestryVariantTests : UmbracoIntegrati
     public async Task SingleCultureUnpublished()
     {
         var publishAttempt = await ContentPublishingService.PublishBranchAsync(rootContent.Key, [_englishIsoCode, _danishIsoCode], PublishBranchFilter.All, Constants.Security.SuperUserKey, false);
-        Assert.IsTrue(publishAttempt.Success);
+        Assert.That(publishAttempt.Success, Is.True);
         Assert.That(publishAttempt.Result.SucceededItems.Count(), Is.EqualTo(3));
 
         // Unpublish only english culture
         var unpublishAttempt = await ContentPublishingService.UnpublishAsync(childNode.Key, new HashSet<string> { _englishIsoCode }, Constants.Security.SuperUserKey);
-        Assert.IsTrue(unpublishAttempt.Success);
+        Assert.That(unpublishAttempt.Success, Is.True);
 
         var publishedGrandChild = await PublishedContentCache.GetByIdAsync(grandChildNode.Key, false);
         CacheTestsHelper.AssertPage(grandChildNode, publishedGrandChild, false);
-        Assert.IsTrue(publishedGrandChild!.IsPublished(_danishIsoCode));
+        Assert.That(publishedGrandChild!.IsPublished(_danishIsoCode), Is.True);
     }
 
     [Test]
@@ -104,7 +104,7 @@ internal sealed class DocumentHybridCacheAncestryVariantTests : UmbracoIntegrati
                 new() { Culture = _englishIsoCode },
             },
             Constants.Security.SuperUserKey);
-        Assert.IsTrue(publishAttempt.Success);
+        Assert.That(publishAttempt.Success, Is.True);
 
         // Publish only single culture.
         var publishChildAttempt = await ContentPublishingService.PublishAsync(
@@ -114,7 +114,7 @@ internal sealed class DocumentHybridCacheAncestryVariantTests : UmbracoIntegrati
                 new() { Culture = _danishIsoCode },
             },
             Constants.Security.SuperUserKey);
-        Assert.IsTrue(publishChildAttempt.Success);
+        Assert.That(publishChildAttempt.Success, Is.True);
 
         var publishGrandChildAttempt = await ContentPublishingService.PublishAsync(
             grandChildNode.Key,
@@ -123,13 +123,13 @@ internal sealed class DocumentHybridCacheAncestryVariantTests : UmbracoIntegrati
                 new() { Culture = _danishIsoCode },
             },
             Constants.Security.SuperUserKey);
-        Assert.IsTrue(publishGrandChildAttempt.Success);
+        Assert.That(publishGrandChildAttempt.Success, Is.True);
 
         var publishedGrandChild = await PublishedContentCache.GetByIdAsync(grandChildNode.Key, false);
 
         CacheTestsHelper.AssertPage(grandChildNode, publishedGrandChild, false);
-        Assert.IsTrue(publishedGrandChild!.IsPublished(_danishIsoCode));
-        Assert.IsFalse(publishedGrandChild.IsPublished(_englishIsoCode));
+        Assert.That(publishedGrandChild!.IsPublished(_danishIsoCode), Is.True);
+        Assert.That(publishedGrandChild.IsPublished(_englishIsoCode), Is.False);
     }
 
     private async Task CreateTestData()
@@ -170,19 +170,19 @@ internal sealed class DocumentHybridCacheAncestryVariantTests : UmbracoIntegrati
             _variantTitleName);
 
         var rootResult = await ContentEditingService.CreateAsync(contentCreateModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(rootResult.Success);
+        Assert.That(rootResult.Success, Is.True);
         rootContent = rootResult.Result.Content!;
 
         contentCreateModel.ParentKey = rootContent.Key;
         contentCreateModel.Key = Guid.NewGuid();
         var childResult = await ContentEditingService.CreateAsync(contentCreateModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(childResult.Success);
+        Assert.That(childResult.Success, Is.True);
         childNode = childResult.Result.Content!;
 
         contentCreateModel.ParentKey = childNode.Key;
         contentCreateModel.Key = Guid.NewGuid();
         var grandChildResult = await ContentEditingService.CreateAsync(contentCreateModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(grandChildResult.Success);
+        Assert.That(grandChildResult.Success, Is.True);
         grandChildNode = grandChildResult.Result.Content!;
     }
 }

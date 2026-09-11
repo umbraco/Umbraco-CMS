@@ -32,7 +32,7 @@ public class UmbLoginStatusControllerTests
 
         IActionResult result = await controller.HandleLogout(new PostRedirectModel());
 
-        Assert.IsInstanceOf<UmbracoPageResult>(result);
+        Assert.That(result, Is.InstanceOf<UmbracoPageResult>());
         _signInManagerMock.Verify(x => x.SignOutAsync(), Times.Never);
     }
 
@@ -44,8 +44,8 @@ public class UmbLoginStatusControllerTests
         IActionResult result = await controller.HandleLogout(new PostRedirectModel());
 
         _signInManagerMock.Verify(x => x.SignOutAsync(), Times.Once);
-        Assert.IsInstanceOf<RedirectToUmbracoPageResult>(result);
-        Assert.AreEqual(true, controller.TempData["LogoutSuccess"]);
+        Assert.That(result, Is.InstanceOf<RedirectToUmbracoPageResult>());
+        Assert.That(controller.TempData["LogoutSuccess"], Is.EqualTo(true));
     }
 
     [Test]
@@ -56,8 +56,8 @@ public class UmbLoginStatusControllerTests
         IActionResult result = await controller.HandleLogout(new PostRedirectModel());
 
         _signInManagerMock.Verify(x => x.SignOutAsync(), Times.Never);
-        Assert.IsInstanceOf<RedirectToUmbracoPageResult>(result);
-        Assert.AreEqual(true, controller.TempData["LogoutSuccess"]);
+        Assert.That(result, Is.InstanceOf<RedirectToUmbracoPageResult>());
+        Assert.That(controller.TempData["LogoutSuccess"], Is.EqualTo(true));
     }
 
     [Test]
@@ -68,8 +68,8 @@ public class UmbLoginStatusControllerTests
         IActionResult result = await controller.HandleLogout(new PostRedirectModel { RedirectUrl = "/goodbye" });
 
         var redirect = result as RedirectResult;
-        Assert.IsNotNull(redirect);
-        Assert.AreEqual("/goodbye", redirect!.Url);
+        Assert.That(redirect, Is.Not.Null);
+        Assert.That(redirect!.Url, Is.EqualTo("/goodbye"));
     }
 
     [Test]
@@ -79,7 +79,7 @@ public class UmbLoginStatusControllerTests
 
         IActionResult result = await controller.HandleLogout(new PostRedirectModel { RedirectUrl = "https://evil.com" });
 
-        Assert.IsInstanceOf<RedirectToUmbracoPageResult>(result);
+        Assert.That(result, Is.InstanceOf<RedirectToUmbracoPageResult>());
     }
 
     [Test]
@@ -91,8 +91,8 @@ public class UmbLoginStatusControllerTests
         IActionResult result = await controller.HandleLogout(new PostRedirectModel { RedirectUrl = "/from-model" });
 
         var redirect = result as RedirectResult;
-        Assert.IsNotNull(redirect);
-        Assert.AreEqual("/from-route", redirect!.Url);
+        Assert.That(redirect, Is.Not.Null);
+        Assert.That(redirect!.Url, Is.EqualTo("/from-route"));
     }
 
     private UmbLoginStatusController CreateController(bool isAuthenticated = false)

@@ -24,7 +24,7 @@ public class AspNetCoreCookieManagerTests
 
         cookieManager.SetCookieValue(CookieName, CookieValue, true, true, "Strict");
 
-        Assert.AreEqual(GetExpectedCookie(), httpContext.Response.Headers.SetCookie);
+        Assert.That(httpContext.Response.Headers.SetCookie, Is.EqualTo(GetExpectedCookie()));
     }
 
     [Test]
@@ -45,7 +45,7 @@ public class AspNetCoreCookieManagerTests
 
         var result = cookieManager.GetCookieValue(CookieName);
 
-        Assert.AreEqual(CookieValue, result);
+        Assert.That(result, Is.EqualTo(CookieValue));
     }
 
     [Test]
@@ -57,7 +57,7 @@ public class AspNetCoreCookieManagerTests
 
         var result = cookieManager.HasCookie(CookieName);
 
-        Assert.IsTrue(result);
+        Assert.That(result, Is.True);
     }
 
     [Test]
@@ -71,8 +71,8 @@ public class AspNetCoreCookieManagerTests
         cookieManager.ExpireCookie(CookieName);
 
         var setCookieHeader = httpContext.Response.Headers.SetCookie.ToString();
-        Assert.IsTrue(setCookieHeader.StartsWith("testCookie="));
-        Assert.IsTrue(setCookieHeader.Contains($"expires="));
+        Assert.That(setCookieHeader, Does.StartWith("testCookie="));
+        Assert.That(setCookieHeader, Does.Contain($"expires="));
     }
 
     private static AspNetCoreCookieManager CreateCookieManager(DefaultHttpContext httpContext)

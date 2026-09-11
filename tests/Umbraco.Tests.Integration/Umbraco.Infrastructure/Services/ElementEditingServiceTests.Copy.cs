@@ -12,23 +12,23 @@ public partial class ElementEditingServiceTests
         var container = (await ElementContainerService.CreateAsync(null, "Root Container", null, Constants.Security.SuperUserKey)).Result;
         var original = await CreateInvariantElement(container.Key);
 
-        Assert.AreEqual(1, GetFolderChildren(container.Key).Length);
+        Assert.That(GetFolderChildren(container.Key), Has.Length.EqualTo(1));
 
         var copyResult = await ElementEditingService.CopyAsync(original.Key, null, Constants.Security.SuperUserKey);
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(copyResult.Success);
-            Assert.AreEqual(ContentEditingOperationStatus.Success, copyResult.Status);
+            Assert.That(copyResult.Success, Is.True);
+            Assert.That(copyResult.Status, Is.EqualTo(ContentEditingOperationStatus.Success));
         });
 
         var copy = copyResult.Result;
-        Assert.IsNotNull(copy);
+        Assert.That(copy, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(copy.HasIdentity);
-            Assert.AreEqual(Constants.System.Root, copy.ParentId);
-            Assert.AreNotEqual(original.Key, copy.Key);
-            Assert.AreEqual(original.Name, copy.Name);
+            Assert.That(copy.HasIdentity, Is.True);
+            Assert.That(copy.ParentId, Is.EqualTo(Constants.System.Root));
+            Assert.That(copy.Key, Is.Not.EqualTo(original.Key));
+            Assert.That(copy.Name, Is.EqualTo(original.Name));
         });
     }
 
@@ -39,26 +39,26 @@ public partial class ElementEditingServiceTests
         var container2 = (await ElementContainerService.CreateAsync(null, "Root Container 2", null, Constants.Security.SuperUserKey)).Result;
         var original = await CreateInvariantElement(container1.Key);
 
-        Assert.AreEqual(1, GetFolderChildren(container1.Key).Length);
-        Assert.AreEqual(0, GetFolderChildren(container2.Key).Length);
+        Assert.That(GetFolderChildren(container1.Key), Has.Length.EqualTo(1));
+        Assert.That(GetFolderChildren(container2.Key), Is.Empty);
 
         var copyResult = await ElementEditingService.CopyAsync(original.Key, container2.Key, Constants.Security.SuperUserKey);
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(copyResult.Success);
-            Assert.AreEqual(ContentEditingOperationStatus.Success, copyResult.Status);
+            Assert.That(copyResult.Success, Is.True);
+            Assert.That(copyResult.Status, Is.EqualTo(ContentEditingOperationStatus.Success));
         });
 
-        Assert.AreEqual(1, GetFolderChildren(container2.Key).Length);
+        Assert.That(GetFolderChildren(container2.Key), Has.Length.EqualTo(1));
 
         var copy = copyResult.Result;
-        Assert.IsNotNull(copy);
+        Assert.That(copy, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(copy.HasIdentity);
-            Assert.AreEqual(container2.Id, copy.ParentId);
-            Assert.AreNotEqual(original.Key, copy.Key);
-            Assert.AreEqual(original.Name, copy.Name);
+            Assert.That(copy.HasIdentity, Is.True);
+            Assert.That(copy.ParentId, Is.EqualTo(container2.Id));
+            Assert.That(copy.Key, Is.Not.EqualTo(original.Key));
+            Assert.That(copy.Name, Is.EqualTo(original.Name));
         });
     }
 
@@ -68,25 +68,25 @@ public partial class ElementEditingServiceTests
         var container = (await ElementContainerService.CreateAsync(null, "Root Container", null, Constants.Security.SuperUserKey)).Result;
         var original = await CreateInvariantElement(container.Key);
 
-        Assert.AreEqual(1, GetFolderChildren(container.Key).Length);
+        Assert.That(GetFolderChildren(container.Key), Has.Length.EqualTo(1));
 
         var copyResult = await ElementEditingService.CopyAsync(original.Key, container.Key, Constants.Security.SuperUserKey);
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(copyResult.Success);
-            Assert.AreEqual(ContentEditingOperationStatus.Success, copyResult.Status);
+            Assert.That(copyResult.Success, Is.True);
+            Assert.That(copyResult.Status, Is.EqualTo(ContentEditingOperationStatus.Success));
         });
 
-        Assert.AreEqual(2, GetFolderChildren(container.Key).Length);
+        Assert.That(GetFolderChildren(container.Key), Has.Length.EqualTo(2));
 
         var copy = copyResult.Result;
-        Assert.IsNotNull(copy);
+        Assert.That(copy, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(copy.HasIdentity);
-            Assert.AreEqual(container.Id, copy.ParentId);
-            Assert.AreNotEqual(original.Key, copy.Key);
-            Assert.AreEqual($"{original.Name} (1)", copy.Name);
+            Assert.That(copy.HasIdentity, Is.True);
+            Assert.That(copy.ParentId, Is.EqualTo(container.Id));
+            Assert.That(copy.Key, Is.Not.EqualTo(original.Key));
+            Assert.That(copy.Name, Is.EqualTo($"{original.Name} (1)"));
         });
     }
 
@@ -98,8 +98,8 @@ public partial class ElementEditingServiceTests
         var copyResult = await ElementEditingService.CopyAsync(original.Key, Guid.NewGuid(), Constants.Security.SuperUserKey);
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(copyResult.Success);
-            Assert.AreEqual(ContentEditingOperationStatus.ParentNotFound, copyResult.Status);
+            Assert.That(copyResult.Success, Is.False);
+            Assert.That(copyResult.Status, Is.EqualTo(ContentEditingOperationStatus.ParentNotFound));
         });
     }
 }

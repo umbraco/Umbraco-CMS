@@ -18,15 +18,15 @@ internal sealed partial class DocumentNavigationServiceTests
         Guid copiedItemKey = copyAttempt.Result.Key;
 
         // Assert
-        Assert.AreNotEqual(nodeToCopy, copiedItemKey);
+        Assert.That(copiedItemKey, Is.Not.EqualTo(nodeToCopy));
 
         DocumentNavigationQueryService.TryGetParentKey(copiedItemKey, out Guid? copiedItemParentKey);
 
         Assert.Multiple(() =>
         {
-            Assert.IsNotNull(copiedItemParentKey);
-            Assert.AreEqual(targetParentKey, copiedItemParentKey);
-            Assert.AreNotEqual(sourceParentKey, copiedItemParentKey);
+            Assert.That(copiedItemParentKey, Is.Not.Null);
+            Assert.That(copiedItemParentKey, Is.EqualTo(targetParentKey));
+            Assert.That(copiedItemParentKey, Is.Not.EqualTo(sourceParentKey));
         });
     }
 
@@ -43,7 +43,7 @@ internal sealed partial class DocumentNavigationServiceTests
         Guid copiedItemKey = copyAttempt.Result.Key;
 
         // Assert
-        Assert.AreNotEqual(Grandchild2.Key, copiedItemKey);
+        Assert.That(copiedItemKey, Is.Not.EqualTo(Grandchild2.Key));
 
         DocumentNavigationQueryService.TryGetParentKey(copiedItemKey, out Guid? copiedItemParentKey);
         DocumentNavigationQueryService.TryGetSiblingsKeys(Root.Key, out IEnumerable<Guid> afterCopyRootSiblingsKeys);
@@ -53,15 +53,15 @@ internal sealed partial class DocumentNavigationServiceTests
         Assert.Multiple(() =>
         {
             // Verifies that the node actually has been copied
-            Assert.AreNotEqual(sourceParentKey, copiedItemParentKey);
-            Assert.IsNull(copiedItemParentKey);
+            Assert.That(copiedItemParentKey, Is.Not.EqualTo(sourceParentKey));
+            Assert.That(copiedItemParentKey, Is.Null);
 
             // Verifies that the siblings amount has been updated after copying
-            Assert.AreEqual(initialRootSiblingsCount + 1, rootSiblingsList.Count);
-            Assert.IsTrue(rootSiblingsList.Contains(copiedItemKey));
+            Assert.That(rootSiblingsList, Has.Count.EqualTo(initialRootSiblingsCount + 1));
+            Assert.That(rootSiblingsList, Does.Contain(copiedItemKey));
 
             // Verifies that the node was copied and not moved
-            Assert.IsTrue(sourceParentChildrenKeys.Contains(Grandchild2.Key));
+            Assert.That(sourceParentChildrenKeys, Does.Contain(Grandchild2.Key));
         });
     }
 
@@ -80,7 +80,7 @@ internal sealed partial class DocumentNavigationServiceTests
         Guid copiedItemKey = copyAttempt.Result.Key;
 
         // Assert
-        Assert.AreNotEqual(Grandchild3.Key, copiedItemKey);
+        Assert.That(copiedItemKey, Is.Not.EqualTo(Grandchild3.Key));
 
         DocumentNavigationQueryService.TryGetParentKey(copiedItemKey, out Guid? copiedItemParentKey);
         DocumentNavigationQueryService.TryGetChildrenKeys(Child3.Key, out IEnumerable<Guid> afterCopyChild3ChildrenKeys);
@@ -94,16 +94,16 @@ internal sealed partial class DocumentNavigationServiceTests
         Assert.Multiple(() =>
         {
             // Verifies that the node actually has been copied
-            Assert.AreNotEqual(sourceParentKey, copiedItemParentKey);
-            Assert.AreEqual(Child3.Key, copiedItemParentKey);
-            Assert.AreEqual(initialChild3ChildrenCount + 1, child3ChildrenList.Count);
+            Assert.That(copiedItemParentKey, Is.Not.EqualTo(sourceParentKey));
+            Assert.That(copiedItemParentKey, Is.EqualTo(Child3.Key));
+            Assert.That(child3ChildrenList, Has.Count.EqualTo(initialChild3ChildrenCount + 1));
 
             // Verifies that the descendant amount is the same for the original and the moved GrandChild1 node
-            Assert.AreEqual(initialGrandChild1DescendentsCount, grandChild1DescendantsList.Count);
+            Assert.That(grandChild1DescendantsList, Has.Count.EqualTo(initialGrandChild1DescendentsCount));
 
             // Verifies that the keys are not the same
-            Assert.AreEqual(GreatGrandchild1.Name, copiedGreatGrandChild1.Name);
-            Assert.AreNotEqual(GreatGrandchild1.Key, copiedGreatGrandChild1.Key);
+            Assert.That(copiedGreatGrandChild1.Name, Is.EqualTo(GreatGrandchild1.Name));
+            Assert.That(copiedGreatGrandChild1.Key, Is.Not.EqualTo(GreatGrandchild1.Key));
         });
     }
 
@@ -128,12 +128,12 @@ internal sealed partial class DocumentNavigationServiceTests
         if (parentKey is null)
         {
             DocumentNavigationQueryService.TryGetRootKeys(out IEnumerable<Guid> rootKeys);
-            Assert.AreEqual(copiedItemKey, rootKeys.Last());
+            Assert.That(rootKeys.Last(), Is.EqualTo(copiedItemKey));
         }
         else
         {
             DocumentNavigationQueryService.TryGetChildrenKeys(parentKey.Value, out IEnumerable<Guid> childrenKeys);
-            Assert.AreEqual(copiedItemKey, childrenKeys.Last());
+            Assert.That(childrenKeys.Last(), Is.EqualTo(copiedItemKey));
         }
     }
 }

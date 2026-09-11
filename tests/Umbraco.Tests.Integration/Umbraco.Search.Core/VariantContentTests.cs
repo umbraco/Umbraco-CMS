@@ -130,12 +130,12 @@ public class VariantContentTests : VariantContentTestBase
         => Assert.Multiple(() =>
         {
             IndexField[] titleFields = document.Fields.Where(f => f.FieldName == "title").ToArray();
-            Assert.That(titleFields.Length, Is.EqualTo(2));
+            Assert.That(titleFields, Has.Length.EqualTo(2));
             Assert.That(titleFields.SingleOrDefault(f => f.Culture.InvariantEquals("en-US"))?.Value.Texts?.SingleOrDefault(), Is.EqualTo(englishTitle));
             Assert.That(titleFields.SingleOrDefault(f => f.Culture.InvariantEquals("da-DK"))?.Value.Texts?.SingleOrDefault(), Is.EqualTo(danishTitle));
 
             IndexField[] messageFields = document.Fields.Where(f => f.FieldName == "message").ToArray();
-            Assert.That(messageFields.Length, Is.EqualTo(6));
+            Assert.That(messageFields, Has.Length.EqualTo(6));
             Assert.That(messageFields.SingleOrDefault(f => f.Culture.InvariantEquals("en-US") && f.Segment is null)?.Value.Texts?.SingleOrDefault(), Is.EqualTo($"{englishMessage} (default)"));
             Assert.That(messageFields.SingleOrDefault(f => f.Culture.InvariantEquals("en-US") && f.Segment == "segment-1")?.Value.Texts?.SingleOrDefault(), Is.EqualTo($"{englishMessage} (segment-1)"));
             Assert.That(messageFields.SingleOrDefault(f => f.Culture.InvariantEquals("en-US") && f.Segment == "segment-2")?.Value.Texts?.SingleOrDefault(), Is.EqualTo($"{englishMessage} (segment-2)"));
@@ -157,7 +157,7 @@ public class VariantContentTests : VariantContentTestBase
             Assert.That(contentTypeValue, Is.EqualTo(content.ContentType.Key.AsKeyword()));
 
             IndexField[] nameFields = document.Fields.Where(f => f.FieldName == Constants.FieldNames.Name).ToArray();
-            Assert.That(nameFields.Length, Is.EqualTo(2));
+            Assert.That(nameFields, Has.Length.EqualTo(2));
             Assert.That(nameFields.SingleOrDefault(f => f.Culture.InvariantEquals("en-US"))?.Value.TextsR1?.SingleOrDefault(), Is.EqualTo(content.GetCultureName("en-US")));
             Assert.That(nameFields.SingleOrDefault(f => f.Culture.InvariantEquals("da-DK"))?.Value.TextsR1?.SingleOrDefault(), Is.EqualTo(content.GetCultureName("da-DK")));
 

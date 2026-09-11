@@ -54,7 +54,7 @@ public class UmbProfileControllerTests
 
         IActionResult result = await controller.HandleUpdateProfile(CreateModel());
 
-        Assert.IsInstanceOf<UmbracoPageResult>(result);
+        Assert.That(result, Is.InstanceOf<UmbracoPageResult>());
         _memberManagerMock.Verify(x => x.UpdateAsync(It.IsAny<MemberIdentityUser>()), Times.Never);
     }
 
@@ -69,7 +69,7 @@ public class UmbProfileControllerTests
 
         IActionResult result = await controller.HandleUpdateProfile(CreateModel());
 
-        Assert.IsInstanceOf<RedirectToUmbracoPageResult>(result);
+        Assert.That(result, Is.InstanceOf<RedirectToUmbracoPageResult>());
         _memberManagerMock.Verify(x => x.UpdateAsync(It.IsAny<MemberIdentityUser>()), Times.Never);
     }
 
@@ -88,8 +88,8 @@ public class UmbProfileControllerTests
 
         IActionResult result = await controller.HandleUpdateProfile(CreateModel());
 
-        Assert.IsInstanceOf<UmbracoPageResult>(result);
-        Assert.IsTrue(controller.ModelState["profileModel"]!.Errors.Any(e => e.ErrorMessage == "Invalid email"));
+        Assert.That(result, Is.InstanceOf<UmbracoPageResult>());
+        Assert.That(controller.ModelState["profileModel"]!.Errors.Any(e => e.ErrorMessage == "Invalid email"), Is.True);
     }
 
     [Test]
@@ -101,8 +101,8 @@ public class UmbProfileControllerTests
 
         IActionResult result = await controller.HandleUpdateProfile(CreateModel());
 
-        Assert.IsInstanceOf<RedirectToUmbracoPageResult>(result);
-        Assert.AreEqual(true, controller.TempData["FormSuccess"]);
+        Assert.That(result, Is.InstanceOf<RedirectToUmbracoPageResult>());
+        Assert.That(controller.TempData["FormSuccess"], Is.EqualTo(true));
     }
 
     [Test]
@@ -115,8 +115,8 @@ public class UmbProfileControllerTests
         IActionResult result = await controller.HandleUpdateProfile(CreateModel(redirectUrl: "/profile-saved"));
 
         var redirect = result as RedirectResult;
-        Assert.IsNotNull(redirect);
-        Assert.AreEqual("/profile-saved", redirect!.Url);
+        Assert.That(redirect, Is.Not.Null);
+        Assert.That(redirect!.Url, Is.EqualTo("/profile-saved"));
     }
 
     [Test]
@@ -128,7 +128,7 @@ public class UmbProfileControllerTests
 
         IActionResult result = await controller.HandleUpdateProfile(CreateModel(redirectUrl: "https://evil.com"));
 
-        Assert.IsInstanceOf<RedirectToUmbracoPageResult>(result);
+        Assert.That(result, Is.InstanceOf<RedirectToUmbracoPageResult>());
     }
 
     [Test]
@@ -146,10 +146,10 @@ public class UmbProfileControllerTests
             Comments = "Updated comments",
         });
 
-        Assert.AreEqual("Updated Name", user.Name);
-        Assert.AreEqual("updated@example.com", user.Email);
-        Assert.AreEqual("updated-username", user.UserName);
-        Assert.AreEqual("Updated comments", user.Comments);
+        Assert.That(user.Name, Is.EqualTo("Updated Name"));
+        Assert.That(user.Email, Is.EqualTo("updated@example.com"));
+        Assert.That(user.UserName, Is.EqualTo("updated-username"));
+        Assert.That(user.Comments, Is.EqualTo("Updated comments"));
     }
 
     private static ProfileModel CreateModel(string? redirectUrl = null) =>

@@ -70,11 +70,11 @@ public class HealthCheckResultsTests
         };
         var results = await HealthCheckResults.Create(checks);
 
-        Assert.IsTrue(results.AllChecksSuccessful);
+        Assert.That(results.AllChecksSuccessful, Is.True);
 
         var resultAsMarkdown = results.ResultsAsMarkDown(HealthCheckNotificationVerbosity.Summary);
-        Assert.IsTrue(resultAsMarkdown.IndexOf("Checks for 'Stub check 1' all completed successfully.") > -1);
-        Assert.IsTrue(resultAsMarkdown.IndexOf("Checks for 'Stub check 2' all completed successfully.") > -1);
+        Assert.That(resultAsMarkdown.IndexOf("Checks for 'Stub check 1' all completed successfully."), Is.GreaterThan(-1));
+        Assert.That(resultAsMarkdown.IndexOf("Checks for 'Stub check 2' all completed successfully."), Is.GreaterThan(-1));
     }
 
     [Test]
@@ -87,11 +87,11 @@ public class HealthCheckResultsTests
         };
         var results = await HealthCheckResults.Create(checks);
 
-        Assert.IsFalse(results.AllChecksSuccessful);
+        Assert.That(results.AllChecksSuccessful, Is.False);
 
         var resultAsMarkdown = results.ResultsAsMarkDown(HealthCheckNotificationVerbosity.Summary);
-        Assert.IsTrue(resultAsMarkdown.IndexOf("Checks for 'Stub check 1' all completed successfully.") > -1);
-        Assert.IsTrue(resultAsMarkdown.IndexOf("Checks for 'Stub check 2' completed with errors.") > -1);
+        Assert.That(resultAsMarkdown.IndexOf("Checks for 'Stub check 1' all completed successfully."), Is.GreaterThan(-1));
+        Assert.That(resultAsMarkdown.IndexOf("Checks for 'Stub check 2' completed with errors."), Is.GreaterThan(-1));
     }
 
     [Test]
@@ -105,12 +105,12 @@ public class HealthCheckResultsTests
         };
         var results = await HealthCheckResults.Create(checks);
 
-        Assert.IsFalse(results.AllChecksSuccessful);
+        Assert.That(results.AllChecksSuccessful, Is.False);
 
         var resultAsMarkdown = results.ResultsAsMarkDown(HealthCheckNotificationVerbosity.Summary);
-        Assert.IsTrue(resultAsMarkdown.IndexOf("Checks for 'Stub check 1' all completed successfully.") > -1);
-        Assert.IsTrue(resultAsMarkdown.IndexOf("Checks for 'Stub check 2' completed with errors.") > -1);
-        Assert.IsTrue(resultAsMarkdown.IndexOf("Checks for 'Stub check 3' completed with errors.") > -1);
+        Assert.That(resultAsMarkdown.IndexOf("Checks for 'Stub check 1' all completed successfully."), Is.GreaterThan(-1));
+        Assert.That(resultAsMarkdown.IndexOf("Checks for 'Stub check 2' completed with errors."), Is.GreaterThan(-1));
+        Assert.That(resultAsMarkdown.IndexOf("Checks for 'Stub check 3' completed with errors."), Is.GreaterThan(-1));
     }
 
     [Test]
@@ -124,7 +124,7 @@ public class HealthCheckResultsTests
         var results = await HealthCheckResults.Create(checks);
 
         var resultAsMarkdown = results.ResultsAsMarkDown(HealthCheckNotificationVerbosity.Summary);
-        Assert.IsTrue(resultAsMarkdown.IndexOf("Result: 'Success'" + Environment.NewLine) > -1);
+        Assert.That(resultAsMarkdown.IndexOf("Result: 'Success'" + Environment.NewLine), Is.GreaterThan(-1));
     }
 
     [Test]
@@ -138,8 +138,8 @@ public class HealthCheckResultsTests
         var results = await HealthCheckResults.Create(checks);
 
         var resultAsMarkdown = results.ResultsAsMarkDown(HealthCheckNotificationVerbosity.Detailed);
-        Assert.IsFalse(resultAsMarkdown.IndexOf("Result: 'Success'" + Environment.NewLine) > -1);
-        Assert.IsTrue(resultAsMarkdown.IndexOf("Result: 'Success', Message: 'First check was successful'" +
-                                               Environment.NewLine) > -1);
+        Assert.That(resultAsMarkdown.IndexOf("Result: 'Success'" + Environment.NewLine), Is.LessThanOrEqualTo(-1));
+        Assert.That(resultAsMarkdown.IndexOf("Result: 'Success', Message: 'First check was successful'" +
+                                               Environment.NewLine), Is.GreaterThan(-1));
     }
 }

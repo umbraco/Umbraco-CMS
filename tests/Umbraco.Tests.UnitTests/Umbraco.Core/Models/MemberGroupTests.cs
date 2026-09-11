@@ -28,20 +28,20 @@ public class MemberGroupTests
         var clone = (MemberGroup)group.DeepClone();
 
         // Assert
-        Assert.AreNotSame(clone, group);
-        Assert.AreEqual(clone, group);
-        Assert.AreEqual(clone.Id, group.Id);
-        Assert.AreEqual(clone.CreateDate, group.CreateDate);
-        Assert.AreEqual(clone.CreatorId, group.CreatorId);
-        Assert.AreEqual(clone.Key, group.Key);
-        Assert.AreEqual(clone.UpdateDate, group.UpdateDate);
-        Assert.AreEqual(clone.Name, group.Name);
+        Assert.That(group, Is.Not.SameAs(clone));
+        Assert.That(group, Is.EqualTo(clone));
+        Assert.That(group.Id, Is.EqualTo(clone.Id));
+        Assert.That(group.CreateDate, Is.EqualTo(clone.CreateDate));
+        Assert.That(group.CreatorId, Is.EqualTo(clone.CreatorId));
+        Assert.That(group.Key, Is.EqualTo(clone.Key));
+        Assert.That(group.UpdateDate, Is.EqualTo(clone.UpdateDate));
+        Assert.That(group.Name, Is.EqualTo(clone.Name));
 
         // This double verifies by reflection
         var allProps = clone.GetType().GetProperties();
         foreach (var propertyInfo in allProps)
         {
-            Assert.AreEqual(propertyInfo.GetValue(clone, null), propertyInfo.GetValue(group, null));
+            Assert.That(propertyInfo.GetValue(group, null), Is.EqualTo(propertyInfo.GetValue(clone, null)));
         }
     }
 

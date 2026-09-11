@@ -69,7 +69,7 @@ public class ElementPickerPropertyEditorValidationTests
         // AllowedContentTypeIds is null — no restriction
         _valueEditor.ConfigurationObject = new ElementPickerConfiguration { AllowedContentTypeIds = null };
 
-        Assert.IsEmpty(Validate([elementKey]));
+        Assert.That(Validate([elementKey]), Is.Empty);
     }
 
     [TestCase(false)]
@@ -91,7 +91,7 @@ public class ElementPickerPropertyEditorValidationTests
                 : allowedContentTypeKey.ToString(),
         };
 
-        Assert.IsEmpty(Validate([elementKey]));
+        Assert.That(Validate([elementKey]), Is.Empty);
     }
 
     [Test]
@@ -140,7 +140,7 @@ public class ElementPickerPropertyEditorValidationTests
             AllowedContentTypeIds = Guid.NewGuid().ToString(),
         };
 
-        Assert.IsEmpty(Validate([]));
+        Assert.That(Validate([]), Is.Empty);
     }
 
     [Test]
@@ -160,7 +160,7 @@ public class ElementPickerPropertyEditorValidationTests
         };
 
         // The same key selected twice must not be reported as missing.
-        Assert.IsEmpty(Validate([elementKey, elementKey]));
+        Assert.That(Validate([elementKey, elementKey]), Is.Empty);
     }
 
     [Test]
@@ -180,7 +180,7 @@ public class ElementPickerPropertyEditorValidationTests
 
         // A non-GUID entry is not a resolvable key and must not be reported as missing.
         List<string> value = ["not-a-guid", elementKey.ToString()];
-        Assert.IsEmpty(_valueEditor.Validate(value, false, null, PropertyValidationContext.Empty()));
+        Assert.That(_valueEditor.Validate(value, false, null, PropertyValidationContext.Empty()), Is.Empty);
     }
 
     private IEnumerable<ValidationResult> Validate(IEnumerable<Guid> elementKeys)

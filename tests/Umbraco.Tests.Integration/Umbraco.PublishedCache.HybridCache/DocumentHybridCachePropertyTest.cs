@@ -52,10 +52,10 @@ internal sealed class DocumentHybridCachePropertyTest : UmbracoIntegrationTest
 
         // Assert
         IPublishedContent contentPickerValue = (IPublishedContent)contentPickerPage.Value("contentPicker");
-        Assert.AreEqual(textPage.Key, contentPickerValue.Key);
-        Assert.AreEqual(textPage.Id, contentPickerValue.Id);
-        Assert.AreEqual(textPage.Name, contentPickerValue.Name);
-        Assert.AreEqual("The title value", contentPickerValue.Properties.First(x => x.Alias == "title").GetValue());
+        Assert.That(contentPickerValue.Key, Is.EqualTo(textPage.Key));
+        Assert.That(contentPickerValue.Id, Is.EqualTo(textPage.Id));
+        Assert.That(contentPickerValue.Name, Is.EqualTo(textPage.Name));
+        Assert.That(contentPickerValue.Properties.First(x => x.Alias == "title").GetValue(), Is.EqualTo("The title value"));
     }
 
     [Test]
@@ -71,7 +71,7 @@ internal sealed class DocumentHybridCachePropertyTest : UmbracoIntegrationTest
         var notUpdatedContent = await CacheManager.Content.GetByIdAsync(contentPickerDocument.Id);
 
         IPublishedContent contentPickerValue = (IPublishedContent)notUpdatedContent.Value("contentPicker");
-        Assert.AreEqual("The title value", contentPickerValue.Properties.First(x => x.Alias == "title").GetValue());
+        Assert.That(contentPickerValue.Properties.First(x => x.Alias == "title").GetValue(), Is.EqualTo("The title value"));
 
         // Update content
         var updateModel = new ContentUpdateModel
@@ -85,24 +85,24 @@ internal sealed class DocumentHybridCachePropertyTest : UmbracoIntegrationTest
         };
 
         var updateResult = await ContentEditingService.UpdateAsync(textPage.Key, updateModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(updateResult.Success);
+        Assert.That(updateResult.Success, Is.True);
 
         var publishResult = await ContentPublishingService.PublishAsync(
             updateResult.Result.Content!.Key,
             [new CulturePublishScheduleModel { Culture = "*" }],
             Constants.Security.SuperUserKey);
 
-        Assert.IsTrue(publishResult);
+        Assert.That((bool)publishResult, Is.True);
 
         // Act
         var contentPickerPage = await CacheManager.Content.GetByIdAsync(contentPickerDocument.Id);
 
         // Assert
         IPublishedContent updatedPickerValue = (IPublishedContent)contentPickerPage.Value("contentPicker");
-        Assert.AreEqual(textPage.Key, updatedPickerValue.Key);
-        Assert.AreEqual(textPage.Id, updatedPickerValue.Id);
-        Assert.AreEqual(textPage.Name, updatedPickerValue.Name);
-        Assert.AreEqual("Updated title", updatedPickerValue.Properties.First(x => x.Alias == "title").GetValue());
+        Assert.That(updatedPickerValue.Key, Is.EqualTo(textPage.Key));
+        Assert.That(updatedPickerValue.Id, Is.EqualTo(textPage.Id));
+        Assert.That(updatedPickerValue.Name, Is.EqualTo(textPage.Name));
+        Assert.That(updatedPickerValue.Properties.First(x => x.Alias == "title").GetValue(), Is.EqualTo("Updated title"));
     }
 
     private async Task<IContent> CreateContentPickerDocument(Guid templateKey, Guid textPageKey)
@@ -117,15 +117,15 @@ internal sealed class DocumentHybridCachePropertyTest : UmbracoIntegrationTest
             textPageKey);
         var result = await ContentEditingService.CreateAsync(createOtherModel, Constants.Security.SuperUserKey);
 
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.Success));
 
         var publishResult = await ContentPublishingService.PublishAsync(
             result.Result.Content!.Key,
             [new CulturePublishScheduleModel { Culture = "*" }],
             Constants.Security.SuperUserKey);
 
-        Assert.IsTrue(publishResult.Success);
+        Assert.That(publishResult.Success, Is.True);
         return result.Result.Content;
     }
 
@@ -144,14 +144,14 @@ internal sealed class DocumentHybridCachePropertyTest : UmbracoIntegrationTest
             Constants.System.RootKey);
 
         var createResult = await ContentEditingService.CreateAsync(contentCreateModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(createResult.Success);
+        Assert.That(createResult.Success, Is.True);
 
         var publishResult = await ContentPublishingService.PublishAsync(
             createResult.Result.Content!.Key,
             [new CulturePublishScheduleModel { Culture = "*" }],
             Constants.Security.SuperUserKey);
 
-        Assert.IsTrue(publishResult.Success);
+        Assert.That(publishResult.Success, Is.True);
         return createResult.Result.Content;
     }
 }

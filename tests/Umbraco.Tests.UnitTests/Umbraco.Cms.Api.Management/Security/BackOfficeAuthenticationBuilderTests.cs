@@ -20,7 +20,7 @@ public class BackOfficeAuthenticationBuilderTests
         var sut = new BackOfficeAuthenticationBuilder.EnsureBackOfficeScheme<RemoteAuthenticationOptions>();
         sut.PostConfigure(scheme, options);
 
-        Assert.AreEqual(options.SignInScheme, Constants.Security.BackOfficeExternalAuthenticationType);
+        Assert.That(options.SignInScheme, Is.EqualTo(Constants.Security.BackOfficeExternalAuthenticationType));
     }
 
     [Test]
@@ -32,6 +32,6 @@ public class BackOfficeAuthenticationBuilderTests
         var sut = new BackOfficeAuthenticationBuilder.EnsureBackOfficeScheme<RemoteAuthenticationOptions>();
         sut.PostConfigure(scheme, options);
 
-        Assert.AreNotEqual(options.SignInScheme, Constants.Security.BackOfficeExternalAuthenticationType);
+        Assert.That(options.SignInScheme, Is.Not.EqualTo(Constants.Security.BackOfficeExternalAuthenticationType));
     }
 }

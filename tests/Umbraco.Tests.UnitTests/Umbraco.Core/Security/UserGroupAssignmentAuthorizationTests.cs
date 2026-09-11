@@ -14,7 +14,7 @@ public class UserGroupAssignmentAuthorizationTests
             requestedGroupAliases: ["editor"],
             existingGroupAliases: ["editor"]);
 
-        Assert.IsEmpty(result);
+        Assert.That(result, Is.Empty);
     }
 
     [Test]
@@ -25,7 +25,7 @@ public class UserGroupAssignmentAuthorizationTests
             requestedGroupAliases: ["editor", "writer"],
             existingGroupAliases: ["editor"]);
 
-        Assert.IsEmpty(result);
+        Assert.That(result, Is.Empty);
     }
 
     [Test]
@@ -36,8 +36,8 @@ public class UserGroupAssignmentAuthorizationTests
             requestedGroupAliases: ["editor", "admin"],
             existingGroupAliases: ["editor"]);
 
-        Assert.AreEqual(1, result.Count);
-        Assert.AreEqual("admin", result[0]);
+        Assert.That(result, Has.Count.EqualTo(1));
+        Assert.That(result[0], Is.EqualTo("admin"));
     }
 
     [Test]
@@ -48,7 +48,7 @@ public class UserGroupAssignmentAuthorizationTests
             requestedGroupAliases: ["writer", "editor"],
             existingGroupAliases: ["writer"]);
 
-        Assert.IsEmpty(result);
+        Assert.That(result, Is.Empty);
     }
 
     [Test]
@@ -59,8 +59,8 @@ public class UserGroupAssignmentAuthorizationTests
             requestedGroupAliases: ["editor", "admin", "sensitiveData"],
             existingGroupAliases: []);
 
-        Assert.AreEqual(2, result.Count);
-        CollectionAssert.AreEquivalent(new[] { "admin", "sensitiveData" }, result);
+        Assert.That(result, Has.Count.EqualTo(2));
+        Assert.That(result, Is.EquivalentTo(new[] { "admin", "sensitiveData" }));
     }
 
     [Test]
@@ -72,7 +72,7 @@ public class UserGroupAssignmentAuthorizationTests
             requestedGroupAliases: ["editor"],
             existingGroupAliases: ["editor", "writer", "admin"]);
 
-        Assert.IsEmpty(result);
+        Assert.That(result, Is.Empty);
     }
 
     [Test]
@@ -83,7 +83,7 @@ public class UserGroupAssignmentAuthorizationTests
             requestedGroupAliases: ["editor", "Writer"],
             existingGroupAliases: ["WRITER"]);
 
-        Assert.IsEmpty(result);
+        Assert.That(result, Is.Empty);
     }
 
     [Test]
@@ -94,7 +94,7 @@ public class UserGroupAssignmentAuthorizationTests
             requestedGroupAliases: [],
             existingGroupAliases: ["editor", "writer"]);
 
-        Assert.IsEmpty(result);
+        Assert.That(result, Is.Empty);
     }
 
     [Test]
@@ -105,7 +105,7 @@ public class UserGroupAssignmentAuthorizationTests
             requestedGroupAliases: ["editor"],
             existingGroupAliases: ["editor"]);
 
-        Assert.IsEmpty(result);
+        Assert.That(result, Is.Empty);
     }
 
     [Test]
@@ -116,7 +116,7 @@ public class UserGroupAssignmentAuthorizationTests
             requestedGroupAliases: ["editor"],
             existingGroupAliases: []);
 
-        Assert.AreEqual(1, result.Count);
-        Assert.AreEqual("editor", result[0]);
+        Assert.That(result, Has.Count.EqualTo(1));
+        Assert.That(result[0], Is.EqualTo("editor"));
     }
 }

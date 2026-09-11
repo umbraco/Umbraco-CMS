@@ -13,21 +13,21 @@ internal class IsProtectedFlagProviderTests
     public void IsProtectedFlagProvider_Can_Provide_Tree_Flags()
     {
         var sut = new IsProtectedFlagProvider();
-        Assert.IsTrue(sut.CanProvideFlags<DocumentTreeItemResponseModel>());
+        Assert.That(sut.CanProvideFlags<DocumentTreeItemResponseModel>(), Is.True);
     }
 
     [Test]
     public void IsProtectedFlagProvider_Can_Provide_Collection_Flags()
     {
         var sut = new IsProtectedFlagProvider();
-        Assert.IsTrue(sut.CanProvideFlags<DocumentCollectionResponseModel>());
+        Assert.That(sut.CanProvideFlags<DocumentCollectionResponseModel>(), Is.True);
     }
 
     [Test]
     public void IsProtectedFlagProvider_Can_Provide_Plain_Flags()
     {
         var sut = new IsProtectedFlagProvider();
-        Assert.IsTrue(sut.CanProvideFlags<DocumentItemResponseModel>());
+        Assert.That(sut.CanProvideFlags<DocumentItemResponseModel>(), Is.True);
     }
 
     [Test]
@@ -43,11 +43,11 @@ internal class IsProtectedFlagProviderTests
 
         await sut.PopulateFlagsAsync(viewModels);
 
-        Assert.AreEqual(viewModels[0].Flags.Count(), 0);
-        Assert.AreEqual(viewModels[1].Flags.Count(), 1);
+        Assert.That(viewModels[0].Flags.Count(), Is.EqualTo(0));
+        Assert.That(viewModels[1].Flags.Count(), Is.EqualTo(1));
 
         var flagModel = viewModels[1].Flags.First();
-        Assert.AreEqual("Umb.IsProtected", flagModel.Alias);
+        Assert.That(flagModel.Alias, Is.EqualTo("Umb.IsProtected"));
     }
 
     [Test]
@@ -63,11 +63,11 @@ internal class IsProtectedFlagProviderTests
 
         await sut.PopulateFlagsAsync(viewModels);
 
-        Assert.AreEqual(viewModels[0].Flags.Count(), 0);
-        Assert.AreEqual(viewModels[1].Flags.Count(), 1);
+        Assert.That(viewModels[0].Flags.Count(), Is.EqualTo(0));
+        Assert.That(viewModels[1].Flags.Count(), Is.EqualTo(1));
 
         var flagModel = viewModels[1].Flags.First();
-        Assert.AreEqual("Umb.IsProtected", flagModel.Alias);
+        Assert.That(flagModel.Alias, Is.EqualTo("Umb.IsProtected"));
     }
 
     [Test]
@@ -83,10 +83,10 @@ internal class IsProtectedFlagProviderTests
 
         await sut.PopulateFlagsAsync(viewModels);
 
-        Assert.AreEqual(viewModels[0].Flags.Count(), 0);
-        Assert.AreEqual(viewModels[1].Flags.Count(), 1);
+        Assert.That(viewModels[0].Flags.Count(), Is.EqualTo(0));
+        Assert.That(viewModels[1].Flags.Count(), Is.EqualTo(1));
 
         var flagModel = viewModels[1].Flags.First();
-        Assert.AreEqual("Umb.IsProtected", flagModel.Alias);
+        Assert.That(flagModel.Alias, Is.EqualTo("Umb.IsProtected"));
     }
 }

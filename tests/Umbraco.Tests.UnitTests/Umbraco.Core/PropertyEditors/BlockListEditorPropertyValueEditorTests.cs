@@ -36,10 +36,10 @@ public class BlockListEditorPropertyValueEditorTests
     {
         var editor = CreateValueEditor();
         var result = editor.Validate(null, false, null, PropertyValidationContext.Empty());
-        Assert.AreEqual(1, result.Count());
+        Assert.That(result.Count(), Is.EqualTo(1));
 
         var validationResult = result.First();
-        Assert.AreEqual($"validation_entriesShort", validationResult.ErrorMessage);
+        Assert.That(validationResult.ErrorMessage, Is.EqualTo($"validation_entriesShort"));
     }
 
     [TestCase(0, false)]
@@ -53,14 +53,14 @@ public class BlockListEditorPropertyValueEditorTests
         var result = editor.Validate(value, false, null, PropertyValidationContext.Empty());
         if (expectedSuccess)
         {
-            Assert.IsEmpty(result);
+            Assert.That(result, Is.Empty);
         }
         else
         {
-            Assert.AreEqual(1, result.Count());
+            Assert.That(result.Count(), Is.EqualTo(1));
 
             var validationResult = result.First();
-            Assert.AreEqual("validation_entriesShort", validationResult.ErrorMessage);
+            Assert.That(validationResult.ErrorMessage, Is.EqualTo("validation_entriesShort"));
         }
     }
 
@@ -74,14 +74,14 @@ public class BlockListEditorPropertyValueEditorTests
         var result = editor.Validate(value, false, null, PropertyValidationContext.Empty());
         if (expectedSuccess)
         {
-            Assert.IsEmpty(result);
+            Assert.That(result, Is.Empty);
         }
         else
         {
-            Assert.AreEqual(1, result.Count());
+            Assert.That(result.Count(), Is.EqualTo(1));
 
             var validationResult = result.First();
-            Assert.AreEqual("validation_entriesExceed", validationResult.ErrorMessage);
+            Assert.That(validationResult.ErrorMessage, Is.EqualTo("validation_entriesExceed"));
         }
     }
 
@@ -90,7 +90,7 @@ public class BlockListEditorPropertyValueEditorTests
     {
         var editor = CreateValueEditor();
         var result = editor.MergeVariantInvariantPropertyValue(null, null, true, ["en-US"]);
-        Assert.IsNull(result);
+        Assert.That(result, Is.Null);
     }
 
     [Test]
@@ -365,8 +365,8 @@ public class BlockListEditorPropertyValueEditorTests
 
     private static void AssertResultValue(object? result, int valueIndex, string expectedValue)
     {
-        Assert.IsNotNull(result);
+        Assert.That(result, Is.Not.Null);
         var resultAsJson = (JsonObject)JsonNode.Parse(result.ToString());
-        Assert.AreEqual(expectedValue, resultAsJson["contentData"][0]["values"][valueIndex]["value"].ToString());
+        Assert.That(resultAsJson["contentData"][0]["values"][valueIndex]["value"].ToString(), Is.EqualTo(expectedValue));
     }
 }

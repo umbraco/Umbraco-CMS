@@ -59,7 +59,7 @@ public class FriendlyPublishedElementExtensionsTests
                 { string.Empty, new PublishedCultureInfo(string.Empty, "Home Page", "home-page", DateTime.Now) },
             });
 
-        Assert.AreEqual("Home Page", element.Object.Name());
+        Assert.That(element.Object.Name(), Is.EqualTo("Home Page"));
     }
 
     [Test]
@@ -79,7 +79,7 @@ public class FriendlyPublishedElementExtensionsTests
                 { "da-DK", new PublishedCultureInfo("da-DK", "Hjem", "hjem", DateTime.Now) },
             });
 
-        Assert.AreEqual("Hjem", element.Object.Name());
+        Assert.That(element.Object.Name(), Is.EqualTo("Hjem"));
     }
 
     [Test]
@@ -97,7 +97,7 @@ public class FriendlyPublishedElementExtensionsTests
                 { "da-DK", new PublishedCultureInfo("da-DK", "Hjem", "hjem", DateTime.Now) },
             });
 
-        Assert.AreEqual("Home", element.Object.Name("en-US"));
+        Assert.That(element.Object.Name("en-US"), Is.EqualTo("Home"));
     }
 
     [Test]
@@ -112,7 +112,7 @@ public class FriendlyPublishedElementExtensionsTests
         element.Setup(x => x.ContentType).Returns(contentType.Object);
         element.Setup(x => x.UpdateDate).Returns(updateDate);
 
-        Assert.AreEqual(updateDate, element.Object.CultureDate());
+        Assert.That(element.Object.CultureDate(), Is.EqualTo(updateDate));
     }
 
     [Test]
@@ -131,7 +131,7 @@ public class FriendlyPublishedElementExtensionsTests
                 { "en-US", new PublishedCultureInfo("en-US", "Home", "home", cultureDate) },
             });
 
-        Assert.AreEqual(cultureDate, element.Object.CultureDate("en-US"));
+        Assert.That(element.Object.CultureDate("en-US"), Is.EqualTo(cultureDate));
     }
 
     [Test]
@@ -144,7 +144,7 @@ public class FriendlyPublishedElementExtensionsTests
         var element = new Mock<IPublishedElement>(MockBehavior.Strict);
         element.Setup(x => x.CreatorId).Returns(10);
 
-        Assert.AreEqual("Admin", element.Object.CreatorName());
+        Assert.That(element.Object.CreatorName(), Is.EqualTo("Admin"));
     }
 
     [Test]
@@ -155,7 +155,7 @@ public class FriendlyPublishedElementExtensionsTests
         var element = new Mock<IPublishedElement>(MockBehavior.Strict);
         element.Setup(x => x.CreatorId).Returns(99);
 
-        Assert.IsNull(element.Object.CreatorName());
+        Assert.That(element.Object.CreatorName(), Is.Null);
     }
 
     [Test]
@@ -168,7 +168,7 @@ public class FriendlyPublishedElementExtensionsTests
         var element = new Mock<IPublishedElement>(MockBehavior.Strict);
         element.Setup(x => x.WriterId).Returns(20);
 
-        Assert.AreEqual("Editor", element.Object.WriterName());
+        Assert.That(element.Object.WriterName(), Is.EqualTo("Editor"));
     }
 
     [Test]
@@ -179,6 +179,6 @@ public class FriendlyPublishedElementExtensionsTests
         var element = new Mock<IPublishedElement>(MockBehavior.Strict);
         element.Setup(x => x.WriterId).Returns(99);
 
-        Assert.IsNull(element.Object.WriterName());
+        Assert.That(element.Object.WriterName(), Is.Null);
     }
 }

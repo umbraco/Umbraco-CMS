@@ -37,7 +37,7 @@ internal sealed class ContentServicePerformanceTest : UmbracoIntegrationTest
     private IContentType ContentType { get; set; }
 
     [Test]
-    public void Profiler() => Assert.IsInstanceOf<TestProfiler>(GetRequiredService<IProfiler>());
+    public void Profiler() => Assert.That(GetRequiredService<IProfiler>(), Is.InstanceOf<TestProfiler>());
 
     private static IProfilingLogger GetTestProfilingLogger()
     {

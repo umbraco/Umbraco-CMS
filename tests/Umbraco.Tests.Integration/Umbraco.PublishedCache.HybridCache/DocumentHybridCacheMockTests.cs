@@ -177,7 +177,7 @@ internal sealed class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithC
         };
 
         var publishResult = await ContentPublishingService.PublishAsync(Textpage.Key, [schedule], Constants.Security.SuperUserKey);
-        Assert.IsTrue(publishResult.Success);
+        Assert.That(publishResult.Success, Is.True);
         Textpage.Published = true;
         await _documentCacheService.DeleteItemAsync(Textpage);
 
@@ -200,7 +200,7 @@ internal sealed class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithC
         };
 
         var publishResult = await ContentPublishingService.PublishAsync(Textpage.Key, [schedule], Constants.Security.SuperUserKey);
-        Assert.IsTrue(publishResult.Success);
+        Assert.That(publishResult.Success, Is.True);
         Textpage.Published = true;
         await _documentCacheService.DeleteItemAsync(Textpage);
 
@@ -251,8 +251,8 @@ internal sealed class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithC
 
         IReadOnlyList<IPublishedContent> result = await _documentCacheService.GetByKeysAsync(keys, false);
 
-        Assert.AreEqual(1, result.Count);
-        Assert.AreEqual(Textpage.Key, result[0].Key);
+        Assert.That(result, Has.Count.EqualTo(1));
+        Assert.That(result[0].Key, Is.EqualTo(Textpage.Key));
 
         // The single batched query is used; the per-item single query is never called.
         _mockDatabaseCacheRepository.Verify(x => x.GetDocumentSourcesAsync(It.IsAny<IEnumerable<Guid>>(), false), Times.Once);
@@ -269,12 +269,12 @@ internal sealed class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithC
         _mockDatabaseCacheRepository.Verify(x => x.GetDocumentSourcesAsync(It.IsAny<IEnumerable<Guid>>(), false), Times.Once);
 
         // Now served from the in-memory (L0) cache — the sync fast path hits.
-        Assert.IsTrue(_documentCacheService.TryGetCached(Textpage.Key, false, out IPublishedContent? cached));
-        Assert.IsNotNull(cached);
+        Assert.That(_documentCacheService.TryGetCached(Textpage.Key, false, out IPublishedContent? cached), Is.True);
+        Assert.That(cached, Is.Not.Null);
 
         // And a further retrieval makes no additional database call.
         var again = await _mockedCache.GetByIdAsync(Textpage.Key, false);
-        Assert.IsNotNull(again);
+        Assert.That(again, Is.Not.Null);
         _mockDatabaseCacheRepository.Verify(x => x.GetDocumentSourcesAsync(It.IsAny<IEnumerable<Guid>>(), false), Times.Once);
         _mockDatabaseCacheRepository.Verify(x => x.GetDocumentSourceAsync(It.IsAny<Guid>(), It.IsAny<bool>()), Times.Never);
     }
@@ -290,7 +290,7 @@ internal sealed class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithC
             .Setup(x => x.GetDocumentSourcesAsync(It.Is<IEnumerable<Guid>>(keys => keys.Contains(missingKey)), false))
             .ReturnsAsync(Array.Empty<ContentCacheNode>());
 
-        Assert.IsNull(await _documentCacheService.GetByKeyAsync(missingKey, false));
+        Assert.That(await _documentCacheService.GetByKeyAsync(missingKey, false), Is.Null);
         _mockDatabaseCacheRepository.Verify(x => x.GetDocumentSourceAsync(missingKey, false), Times.Once);
 
         IReadOnlyList<IPublishedContent> result = await _documentCacheService.GetByKeysAsync([missingKey], false);
@@ -298,7 +298,7 @@ internal sealed class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithC
         // A cached null means "already known to resolve to nothing", so the batched path has to serve it
         // from the cache as the per-key path does. Re-reading such a key on every request is the
         // regression reported in #18869.
-        Assert.IsEmpty(result);
+        Assert.That(result, Is.Empty);
         _mockDatabaseCacheRepository.Verify(x => x.GetDocumentSourcesAsync(It.IsAny<IEnumerable<Guid>>(), It.IsAny<bool>()), Times.Never);
     }
 
@@ -307,7 +307,7 @@ internal sealed class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithC
     {
         IReadOnlyList<IPublishedContent> result = await _documentCacheService.GetByKeysAsync(Array.Empty<Guid>(), false);
 
-        Assert.IsEmpty(result);
+        Assert.That(result, Is.Empty);
         _mockDatabaseCacheRepository.Verify(x => x.GetDocumentSourcesAsync(It.IsAny<IEnumerable<Guid>>(), It.IsAny<bool>()), Times.Never);
         _mockDatabaseCacheRepository.Verify(x => x.GetDocumentSourceAsync(It.IsAny<Guid>(), It.IsAny<bool>()), Times.Never);
     }
@@ -324,9 +324,9 @@ internal sealed class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithC
 
         IReadOnlyList<IPublishedContent> result = await _documentCacheService.GetByKeysAsync(keys, false);
 
-        Assert.AreEqual(2, result.Count);
-        Assert.AreEqual(Textpage.Key, result[0].Key);
-        Assert.AreEqual(Textpage.Key, result[1].Key);
+        Assert.That(result, Has.Count.EqualTo(2));
+        Assert.That(result[0].Key, Is.EqualTo(Textpage.Key));
+        Assert.That(result[1].Key, Is.EqualTo(Textpage.Key));
 
         _mockDatabaseCacheRepository.Verify(
             x => x.GetDocumentSourcesAsync(It.Is<IEnumerable<Guid>>(k => k.Count() == 1 && k.Contains(Textpage.Key)), false),
@@ -362,7 +362,7 @@ internal sealed class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithC
         Guid[] requestOrder = [Subpage2.Key, Subpage.Key, Textpage.Key];
         IReadOnlyList<IPublishedContent> result = await _documentCacheService.GetByKeysAsync(requestOrder, false);
 
-        CollectionAssert.AreEqual(requestOrder, result.Select(x => x.Key));
+        Assert.That(result.Select(x => x.Key), Is.EqualTo(requestOrder).AsCollection);
     }
 
     [Test]
@@ -392,10 +392,10 @@ internal sealed class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithC
         var draftPage = await _mockedCache.GetByIdAsync(Textpage.Key, true);
         var publishedPage = await _mockedCache.GetByIdAsync(Textpage.Key, false);
 
-        Assert.IsNotNull(draftPage);
-        Assert.IsNotNull(publishedPage);
-        Assert.AreEqual(Textpage.Name, draftPage.Name);
-        Assert.AreEqual(Textpage.Name, publishedPage.Name);
+        Assert.That(draftPage, Is.Not.Null);
+        Assert.That(publishedPage, Is.Not.Null);
+        Assert.That(draftPage.Name, Is.EqualTo(Textpage.Name));
+        Assert.That(publishedPage.Name, Is.EqualTo(Textpage.Name));
 
         // Verify no additional repository calls were made (content served from cache).
         _mockDatabaseCacheRepository.Verify(
@@ -445,7 +445,7 @@ internal sealed class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithC
 
         // Act 1 - ancestor check returns false, so GetByKeyAsync should return null.
         var firstResult = await controlledCache.GetByIdAsync(Textpage.Key, false);
-        Assert.IsNull(firstResult, "First call should return null when ancestor check fails");
+        Assert.That(firstResult, Is.Null, "First call should return null when ancestor check fails");
 
         // Act 2 - now the ancestor check returns true.
         ancestorCheckReturnsTrue = true;
@@ -453,7 +453,7 @@ internal sealed class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithC
 
         // Assert - the null from step 1 should NOT have been cached, so step 2 should
         // hit the database again and return the content.
-        Assert.IsNotNull(secondResult, "Second call should return content because null should not have been cached when ancestor check failed");
+        Assert.That(secondResult, Is.Not.Null, "Second call should return content because null should not have been cached when ancestor check failed");
     }
 
     private static ContentCacheNode BuildCacheNode(Content content) =>
@@ -482,9 +482,9 @@ internal sealed class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithC
     {
         Assert.Multiple(() =>
         {
-            Assert.IsNotNull(textPage);
-            Assert.AreEqual(Textpage.Name, textPage.Name);
-            Assert.AreEqual(Textpage.Published, textPage.IsPublished());
+            Assert.That(textPage, Is.Not.Null);
+            Assert.That(textPage.Name, Is.EqualTo(Textpage.Name));
+            Assert.That(textPage.IsPublished(), Is.EqualTo(Textpage.Published));
         });
         AssertProperties(Textpage.Properties, textPage.Properties);
     }
@@ -501,8 +501,8 @@ internal sealed class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithC
     {
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(property.Alias, publishedProperty.Alias);
-            Assert.AreEqual(property.PropertyType.Alias, publishedProperty.PropertyType.Alias);
+            Assert.That(publishedProperty.Alias, Is.EqualTo(property.Alias));
+            Assert.That(publishedProperty.PropertyType.Alias, Is.EqualTo(property.PropertyType.Alias));
         });
     }
 }

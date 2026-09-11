@@ -49,17 +49,17 @@ public class ConvertersTests
         var contentNode = CreateContentNode("Element 1", 1234, elementType1, new Dictionary<string, object> { { "prop1", "1234" } });
         var element1 = new PublishedElement(contentNode, false, elementsCache, variationContextAccessor, propertyRenderingContextAccessor);
 
-        Assert.AreEqual(1234, element1.Value(Mock.Of<IPublishedValueFallback>(), "prop1"));
+        Assert.That(element1.Value(Mock.Of<IPublishedValueFallback>(), "prop1"), Is.EqualTo(1234));
 
         // 'null' would be considered a 'missing' value by the default, magic logic
         contentNode = CreateContentNode("Element 1", 1234, elementType1, new Dictionary<string, object> { { "prop1", null } });
         var e = new PublishedElement(contentNode, false, elementsCache, variationContextAccessor, propertyRenderingContextAccessor);
-        Assert.IsFalse(e.HasValue("prop1"));
+        Assert.That(e.HasValue("prop1"), Is.False);
 
         // '0' would not - it's a valid integer - but the converter knows better
         contentNode = CreateContentNode("Element 1", 1234, elementType1, new Dictionary<string, object> { { "prop1", "0" } });
         e = new PublishedElement(contentNode, false, elementsCache, variationContextAccessor, propertyRenderingContextAccessor);
-        Assert.IsFalse(e.HasValue("prop1"));
+        Assert.That(e.HasValue("prop1"), Is.False);
     }
 
     private class SimpleConverter1 : IPropertyValueConverter
@@ -139,7 +139,7 @@ public class ConvertersTests
         var cnt1 = new InternalPublishedContent(cntType1) { Id = 1234 };
         cacheContent[cnt1.Id] = cnt1;
 
-        Assert.AreSame(cnt1, element1.Value(Mock.Of<IPublishedValueFallback>(), "prop1"));
+        Assert.That(element1.Value(Mock.Of<IPublishedValueFallback>(), "prop1"), Is.SameAs(cnt1));
     }
 
     private class SimpleConverter2 : IPropertyValueConverter

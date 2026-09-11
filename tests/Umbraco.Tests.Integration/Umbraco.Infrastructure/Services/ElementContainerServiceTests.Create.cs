@@ -13,16 +13,16 @@ public partial class ElementContainerServiceTests
         var result = await ElementContainerService.CreateAsync(null, "Root Container", null, Constants.Security.SuperUserKey);
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(result.Success);
-            Assert.AreEqual(EntityContainerOperationStatus.Success, result.Status);
+            Assert.That(result.Success, Is.True);
+            Assert.That(result.Status, Is.EqualTo(EntityContainerOperationStatus.Success));
         });
 
         var created = await ElementContainerService.GetAsync(result.Result.Key);
-        Assert.NotNull(created);
+        Assert.That(created, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual("Root Container", created.Name);
-            Assert.AreEqual(Constants.System.Root, created.ParentId);
+            Assert.That(created.Name, Is.EqualTo("Root Container"));
+            Assert.That(created.ParentId, Is.EqualTo(Constants.System.Root));
         });
     }
 
@@ -34,16 +34,16 @@ public partial class ElementContainerServiceTests
         var result = await ElementContainerService.CreateAsync(null, "Child Container", root.Key, Constants.Security.SuperUserKey);
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(result.Success);
-            Assert.AreEqual(EntityContainerOperationStatus.Success, result.Status);
+            Assert.That(result.Success, Is.True);
+            Assert.That(result.Status, Is.EqualTo(EntityContainerOperationStatus.Success));
         });
 
         var created = await ElementContainerService.GetAsync(result.Result.Key);
-        Assert.NotNull(created);
+        Assert.That(created, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual("Child Container", created.Name);
-            Assert.AreEqual(root.Id, created.ParentId);
+            Assert.That(created.Name, Is.EqualTo("Child Container"));
+            Assert.That(created.ParentId, Is.EqualTo(root.Id));
         });
     }
 
@@ -54,17 +54,17 @@ public partial class ElementContainerServiceTests
         var result = await ElementContainerService.CreateAsync(key, "Root Container", null, Constants.Security.SuperUserKey);
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(result.Success);
-            Assert.AreEqual(EntityContainerOperationStatus.Success, result.Status);
-            Assert.AreEqual(key, result.Result.Key);
+            Assert.That(result.Success, Is.True);
+            Assert.That(result.Status, Is.EqualTo(EntityContainerOperationStatus.Success));
+            Assert.That(result.Result.Key, Is.EqualTo(key));
         });
 
         var created = await ElementContainerService.GetAsync(key);
-        Assert.NotNull(created);
+        Assert.That(created, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual("Root Container", created.Name);
-            Assert.AreEqual(Constants.System.Root, created.ParentId);
+            Assert.That(created.Name, Is.EqualTo("Root Container"));
+            Assert.That(created.ParentId, Is.EqualTo(Constants.System.Root));
         });
     }
 
@@ -75,11 +75,11 @@ public partial class ElementContainerServiceTests
         var result = await ElementContainerService.CreateAsync(key, "Child Container", Guid.NewGuid(), Constants.Security.SuperUserKey);
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(result.Success);
-            Assert.AreEqual(EntityContainerOperationStatus.ParentNotFound, result.Status);
+            Assert.That(result.Success, Is.False);
+            Assert.That(result.Status, Is.EqualTo(EntityContainerOperationStatus.ParentNotFound));
         });
 
         var created = await ElementContainerService.GetAsync(key);
-        Assert.IsNull(created);
+        Assert.That(created, Is.Null);
     }
 }

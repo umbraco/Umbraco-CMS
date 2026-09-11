@@ -58,7 +58,7 @@ public abstract class MemberSensitiveDataTestBase<T> : ManagementApiTest<T>
         var memberTypeModel = new MemberTypeCreateModel { Alias = $"memberType{suffix}", Name = "Test Member Type" };
         Attempt<IMemberType?, ContentTypeOperationStatus> memberType =
             await MemberTypeEditingService.CreateAsync(memberTypeModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(memberType.Success, memberType.Status.ToString());
+        Assert.That(memberType.Success, Is.True, memberType.Status.ToString());
 
         IMember member = MemberService.CreateMember(
             $"member{suffix}",
@@ -88,23 +88,23 @@ public abstract class MemberSensitiveDataTestBase<T> : ManagementApiTest<T>
     protected async Task<TResponse> GetAsync<TResponse>(string url)
     {
         HttpResponseMessage response = await Client.GetAsync(url);
-        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, await response.Content.ReadAsStringAsync());
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK), await response.Content.ReadAsStringAsync());
 
         TResponse? model = await response.Content.ReadFromJsonAsync<TResponse>(BackOfficeJsonSerializerOptions);
-        Assert.IsNotNull(model);
+        Assert.That(model, Is.Not.Null);
         return model!;
     }
 
     protected static void AssertSensitiveValuesAreWithheld(MemberResponseModel model) =>
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(model.IsApproved);
-            Assert.IsFalse(model.IsLockedOut);
-            Assert.IsFalse(model.IsTwoFactorEnabled);
-            Assert.AreEqual(0, model.FailedPasswordAttempts);
-            Assert.IsNull(model.LastLoginDate);
-            Assert.IsNull(model.LastLockoutDate);
-            Assert.IsNull(model.LastPasswordChangeDate);
+            Assert.That(model.IsApproved, Is.False);
+            Assert.That(model.IsLockedOut, Is.False);
+            Assert.That(model.IsTwoFactorEnabled, Is.False);
+            Assert.That(model.FailedPasswordAttempts, Is.EqualTo(0));
+            Assert.That(model.LastLoginDate, Is.Null);
+            Assert.That(model.LastLockoutDate, Is.Null);
+            Assert.That(model.LastPasswordChangeDate, Is.Null);
         });
 
     // The shared harness authenticates the built-in super user for the administrators group, and that user is

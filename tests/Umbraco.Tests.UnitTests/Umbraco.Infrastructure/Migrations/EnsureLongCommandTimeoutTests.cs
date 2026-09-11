@@ -7,6 +7,7 @@ using Moq;
 using NPoco;
 using NPoco.DatabaseTypes;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
@@ -29,7 +30,7 @@ public class EnsureLongCommandTimeoutTests
 
         TestMigration.Invoke(database);
 
-        Assert.AreEqual(0, database.CommandTimeout);
+        Assert.That(database.CommandTimeout, Is.EqualTo(0));
     }
 
     [Test]
@@ -39,7 +40,7 @@ public class EnsureLongCommandTimeoutTests
 
         TestMigration.Invoke(database);
 
-        Assert.AreEqual(0, database.CommandTimeout);
+        Assert.That(database.CommandTimeout, Is.EqualTo(0));
     }
 
     [Test]
@@ -49,7 +50,7 @@ public class EnsureLongCommandTimeoutTests
 
         TestMigration.Invoke(database);
 
-        Assert.AreEqual(MinimumCommandTimeoutInSeconds, database.CommandTimeout);
+        Assert.That(database.CommandTimeout, Is.EqualTo(MinimumCommandTimeoutInSeconds));
     }
 
     [Test]
@@ -59,7 +60,7 @@ public class EnsureLongCommandTimeoutTests
 
         TestMigration.Invoke(database);
 
-        Assert.AreEqual(MinimumCommandTimeoutInSeconds, database.CommandTimeout);
+        Assert.That(database.CommandTimeout, Is.EqualTo(MinimumCommandTimeoutInSeconds));
     }
 
     [Test]

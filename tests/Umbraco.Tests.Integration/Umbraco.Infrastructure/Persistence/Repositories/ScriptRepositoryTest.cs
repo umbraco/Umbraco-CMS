@@ -133,7 +133,7 @@ internal sealed class ScriptRepositoryTest : UmbracoIntegrationTest
             repository.Delete(script);
 
             // Assert
-            Assert.IsFalse(repository.Exists("test-script.js"));
+            Assert.That(repository.Exists("test-script.js"), Is.False);
         }
     }
 
@@ -247,10 +247,10 @@ internal sealed class ScriptRepositoryTest : UmbracoIntegrationTest
             script = repository.Get("moved/test-move-script.js");
 
             // Assert
-            Assert.IsNotNull(script);
-            Assert.IsFalse(existsOld);
-            Assert.IsTrue(existsNew);
-            Assert.AreEqual(content, script.Content);
+            Assert.That(script, Is.Not.Null);
+            Assert.That(existsOld, Is.False);
+            Assert.That(existsNew, Is.True);
+            Assert.That(script.Content, Is.EqualTo(content));
         }
     }
 
@@ -265,46 +265,46 @@ internal sealed class ScriptRepositoryTest : UmbracoIntegrationTest
             IScript script = new Script("test-path-1.js") { Content = "// script" };
             repository.Save(script);
 
-            Assert.IsTrue(_fileSystem.FileExists("test-path-1.js"));
-            Assert.AreEqual("test-path-1.js", script.Path);
-            Assert.AreEqual("/scripts/test-path-1.js", script.VirtualPath);
+            Assert.That(_fileSystem.FileExists("test-path-1.js"), Is.True);
+            Assert.That(script.Path, Is.EqualTo("test-path-1.js"));
+            Assert.That(script.VirtualPath, Is.EqualTo("/scripts/test-path-1.js"));
 
             // ensure you can prefix the same path as the root path name
             script = new Script("scripts/path-2/test-path-2.js") { Content = "// script" };
             repository.Save(script);
 
-            Assert.IsTrue(_fileSystem.FileExists("scripts/path-2/test-path-2.js"));
-            Assert.AreEqual("scripts\\path-2\\test-path-2.js".Replace("\\", $"{Path.DirectorySeparatorChar}"), script.Path);
-            Assert.AreEqual("/scripts/scripts/path-2/test-path-2.js", script.VirtualPath);
+            Assert.That(_fileSystem.FileExists("scripts/path-2/test-path-2.js"), Is.True);
+            Assert.That(script.Path, Is.EqualTo("scripts\\path-2\\test-path-2.js".Replace("\\", $"{Path.DirectorySeparatorChar}")));
+            Assert.That(script.VirtualPath, Is.EqualTo("/scripts/scripts/path-2/test-path-2.js"));
 
             script = new Script("path-2/test-path-2.js") { Content = "// script" };
             repository.Save(script);
 
-            Assert.IsTrue(_fileSystem.FileExists("path-2/test-path-2.js"));
-            Assert.AreEqual("path-2\\test-path-2.js".Replace("\\", $"{Path.DirectorySeparatorChar}"), script.Path); // fixed in 7.3 - 7.2.8 does not update the path
-            Assert.AreEqual("/scripts/path-2/test-path-2.js", script.VirtualPath);
+            Assert.That(_fileSystem.FileExists("path-2/test-path-2.js"), Is.True);
+            Assert.That(script.Path, Is.EqualTo("path-2\\test-path-2.js".Replace("\\", $"{Path.DirectorySeparatorChar}"))); // fixed in 7.3 - 7.2.8 does not update the path
+            Assert.That(script.VirtualPath, Is.EqualTo("/scripts/path-2/test-path-2.js"));
 
             script = repository.Get("path-2/test-path-2.js");
-            Assert.IsNotNull(script);
-            Assert.AreEqual("path-2\\test-path-2.js".Replace("\\", $"{Path.DirectorySeparatorChar}"), script.Path);
-            Assert.AreEqual("/scripts/path-2/test-path-2.js", script.VirtualPath);
+            Assert.That(script, Is.Not.Null);
+            Assert.That(script.Path, Is.EqualTo("path-2\\test-path-2.js".Replace("\\", $"{Path.DirectorySeparatorChar}")));
+            Assert.That(script.VirtualPath, Is.EqualTo("/scripts/path-2/test-path-2.js"));
 
             script = new Script("path-2\\test-path-3.js") { Content = "// script" };
             repository.Save(script);
 
-            Assert.IsTrue(_fileSystem.FileExists("path-2/test-path-3.js"));
-            Assert.AreEqual("path-2\\test-path-3.js".Replace("\\", $"{Path.DirectorySeparatorChar}"), script.Path);
-            Assert.AreEqual("/scripts/path-2/test-path-3.js", script.VirtualPath);
+            Assert.That(_fileSystem.FileExists("path-2/test-path-3.js"), Is.True);
+            Assert.That(script.Path, Is.EqualTo("path-2\\test-path-3.js".Replace("\\", $"{Path.DirectorySeparatorChar}")));
+            Assert.That(script.VirtualPath, Is.EqualTo("/scripts/path-2/test-path-3.js"));
 
             script = repository.Get("path-2/test-path-3.js");
-            Assert.IsNotNull(script);
-            Assert.AreEqual("path-2\\test-path-3.js".Replace("\\", $"{Path.DirectorySeparatorChar}"), script.Path);
-            Assert.AreEqual("/scripts/path-2/test-path-3.js", script.VirtualPath);
+            Assert.That(script, Is.Not.Null);
+            Assert.That(script.Path, Is.EqualTo("path-2\\test-path-3.js".Replace("\\", $"{Path.DirectorySeparatorChar}")));
+            Assert.That(script.VirtualPath, Is.EqualTo("/scripts/path-2/test-path-3.js"));
 
             script = repository.Get("path-2\\test-path-3.js");
-            Assert.IsNotNull(script);
-            Assert.AreEqual("path-2\\test-path-3.js".Replace("\\", $"{Path.DirectorySeparatorChar}"), script.Path);
-            Assert.AreEqual("/scripts/path-2/test-path-3.js", script.VirtualPath);
+            Assert.That(script, Is.Not.Null);
+            Assert.That(script.Path, Is.EqualTo("path-2\\test-path-3.js".Replace("\\", $"{Path.DirectorySeparatorChar}")));
+            Assert.That(script.VirtualPath, Is.EqualTo("/scripts/path-2/test-path-3.js"));
 
             script = new Script("..\\test-path-4.js") { Content = "// script" };
             Assert.Throws<UnauthorizedAccessException>(() =>
@@ -314,12 +314,12 @@ internal sealed class ScriptRepositoryTest : UmbracoIntegrationTest
             repository.Save(script);
 
             script = repository.Get("\\test-path-5.js");
-            Assert.IsNotNull(script);
-            Assert.AreEqual("test-path-5.js", script.Path);
-            Assert.AreEqual("/scripts/test-path-5.js", script.VirtualPath);
+            Assert.That(script, Is.Not.Null);
+            Assert.That(script.Path, Is.EqualTo("test-path-5.js"));
+            Assert.That(script.VirtualPath, Is.EqualTo("/scripts/test-path-5.js"));
 
             script = repository.Get("missing.js");
-            Assert.IsNull(script);
+            Assert.That(script, Is.Null);
 
             Assert.Throws<UnauthorizedAccessException>(() => script = repository.Get("..\\test-path-4.js"));
             Assert.Throws<UnauthorizedAccessException>(() => script = repository.Get("../packages.config"));

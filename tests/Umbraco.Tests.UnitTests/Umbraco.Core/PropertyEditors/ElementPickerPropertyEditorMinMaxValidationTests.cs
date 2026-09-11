@@ -28,11 +28,11 @@ public class ElementPickerPropertyEditorMinMaxValidationTests
     [TestCase(null, 2, 2)]
     [TestCase(2, 4, 3)]
     public void Can_Pass_Validation_When_Element_Count_Is_Within_Min_Max_Limit(int? min, int? max, int count)
-        => Assert.IsEmpty(Validate(min, max, count));
+        => Assert.That(Validate(min, max, count), Is.Empty);
 
     [Test]
     public void Can_Pass_Validation_When_Limit_Configuration_Is_Null()
-        => Assert.IsEmpty(Validate(null, null, 0));
+        => Assert.That(Validate(null, null, 0), Is.Empty);
 
     [Test]
     public void Cannot_Pass_Validation_When_Value_Is_Null_And_Minimum_Is_Required()

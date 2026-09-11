@@ -19,7 +19,7 @@ public class HtmlStringUtilitiesTests
     {
         var output = _htmlStringUtilities.Truncate("hello world", 5, true, false).ToString();
         var expected = "hello&hellip;";
-        Assert.AreEqual(expected, output);
+        Assert.That(output, Is.EqualTo(expected));
     }
 
     [Test]
@@ -27,7 +27,7 @@ public class HtmlStringUtilitiesTests
     {
         var output = _htmlStringUtilities.Truncate("hello world", 5, false, false).ToString();
         var expected = "hello";
-        Assert.AreEqual(expected, output);
+        Assert.That(output, Is.EqualTo(expected));
     }
 
     [Test]
@@ -36,7 +36,7 @@ public class HtmlStringUtilitiesTests
         // http://issues.umbraco.org/issue/U4-10478
         var output = _htmlStringUtilities.Truncate("hi", 5, true, false).ToString();
         var expected = "hi";
-        Assert.AreEqual(expected, output);
+        Assert.That(output, Is.EqualTo(expected));
     }
 
     [Test]
@@ -44,6 +44,6 @@ public class HtmlStringUtilitiesTests
     {
         var output = _htmlStringUtilities.Truncate("hello world", 6 /* hello plus space */, true, false).ToString();
         var expected = "hello&hellip;";
-        Assert.AreEqual(expected, output);
+        Assert.That(output, Is.EqualTo(expected));
     }
 }

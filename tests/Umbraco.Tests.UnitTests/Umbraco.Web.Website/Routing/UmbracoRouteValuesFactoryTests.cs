@@ -87,9 +87,9 @@ public class UmbracoRouteValuesFactoryTests
 
         var result = await factory.CreateAsync(new DefaultHttpContext(), request);
 
-        Assert.IsNotNull(result);
-        Assert.AreEqual(renderingDefaults.Value.DefaultControllerType, result.ControllerType);
-        Assert.AreEqual(UmbracoRouteValues.DefaultActionName, result.ActionName);
-        Assert.IsNull(result.TemplateName);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.ControllerType, Is.EqualTo(renderingDefaults.Value.DefaultControllerType));
+        Assert.That(result.ActionName, Is.EqualTo(UmbracoRouteValues.DefaultActionName));
+        Assert.That(result.TemplateName, Is.Null);
     }
 }

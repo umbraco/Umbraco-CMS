@@ -69,16 +69,16 @@ public class VariationContextSegmentAccessorTests : UmbracoIntegrationTest
             [],
             Constants.Security.SuperUserKey);
 
-        Assert.IsTrue(createResult.Success);
+        Assert.That(createResult.Success, Is.True);
 
         var content = await DocumentCacheService.GetByKeyAsync(createResult.Result.Content!.Key);
-        Assert.IsNotNull(content);
+        Assert.That(content, Is.Not.Null);
 
         var titleValue = content.Value<string>("documentTitle");
-        Assert.AreEqual("Document Title", titleValue);
+        Assert.That(titleValue, Is.EqualTo("Document Title"));
 
         // the title property tracks at content level
-        Assert.AreEqual(content.Id, _contextTrackingVariationContextAccessor.LastTrackedContentId);
+        Assert.That(_contextTrackingVariationContextAccessor.LastTrackedContentId, Is.EqualTo(content.Id));
     }
 
     [Test]
@@ -152,36 +152,36 @@ public class VariationContextSegmentAccessorTests : UmbracoIntegrationTest
             [],
             Constants.Security.SuperUserKey);
 
-        Assert.IsTrue(createResult.Success);
+        Assert.That(createResult.Success, Is.True);
 
         var content = await DocumentCacheService.GetByKeyAsync(createResult.Result.Content!.Key);
-        Assert.IsNotNull(content);
+        Assert.That(content, Is.Not.Null);
 
         var blockListValue = content.Value<BlockListModel>("blockList");
-        Assert.IsNotNull(blockListValue);
-        Assert.AreEqual(1, blockListValue.Count);
+        Assert.That(blockListValue, Is.Not.Null);
+        Assert.That(blockListValue, Has.Count.EqualTo(1));
 
         // the block list property itself tracks at content level
-        Assert.AreEqual(content.Id, _contextTrackingVariationContextAccessor.LastTrackedContentId);
+        Assert.That(_contextTrackingVariationContextAccessor.LastTrackedContentId, Is.EqualTo(content.Id));
 
         var block = blockListValue.First();
 
         var contentTitleValue = block.Content.Value<string>("elementTitle");
-        Assert.AreEqual("Local Element Content Title", contentTitleValue);
+        Assert.That(contentTitleValue, Is.EqualTo("Local Element Content Title"));
 
         // the block content property tracks at content level because it's a locally sourced element
-        Assert.AreEqual(content.Id, _contextTrackingVariationContextAccessor.LastTrackedContentId);
+        Assert.That(_contextTrackingVariationContextAccessor.LastTrackedContentId, Is.EqualTo(content.Id));
 
-        Assert.IsNotNull(block.Settings);
+        Assert.That(block.Settings, Is.Not.Null);
         var settingsTitleValue = block.Settings.Value<string>("elementTitle");
-        Assert.AreEqual("Local Element Settings Title", settingsTitleValue);
+        Assert.That(settingsTitleValue, Is.EqualTo("Local Element Settings Title"));
 
         // the block settings property tracks at content level because it's a locally sourced element
-        Assert.AreEqual(content.Id, _contextTrackingVariationContextAccessor.LastTrackedContentId);
+        Assert.That(_contextTrackingVariationContextAccessor.LastTrackedContentId, Is.EqualTo(content.Id));
 
         // both of the block elements should have the content as their identity root
-        Assert.AreEqual(content.Id, block.Content.OwningContentId);
-        Assert.AreEqual(content.Id, block.Settings.OwningContentId);
+        Assert.That(block.Content.OwningContentId, Is.EqualTo(content.Id));
+        Assert.That(block.Settings.OwningContentId, Is.EqualTo(content.Id));
     }
 
     [Test]
@@ -262,38 +262,38 @@ public class VariationContextSegmentAccessorTests : UmbracoIntegrationTest
             [],
             Constants.Security.SuperUserKey);
 
-        Assert.IsTrue(createResult.Success);
+        Assert.That(createResult.Success, Is.True);
 
         var content = await DocumentCacheService.GetByKeyAsync(createResult.Result.Content!.Key);
-        Assert.IsNotNull(content);
+        Assert.That(content, Is.Not.Null);
 
         var blockListValue = content.Value<BlockListModel>("blockList");
-        Assert.IsNotNull(blockListValue);
-        Assert.AreEqual(1, blockListValue.Count);
+        Assert.That(blockListValue, Is.Not.Null);
+        Assert.That(blockListValue, Has.Count.EqualTo(1));
 
         // the block list property itself tracks at content level
-        Assert.AreEqual(content.Id, _contextTrackingVariationContextAccessor.LastTrackedContentId);
+        Assert.That(_contextTrackingVariationContextAccessor.LastTrackedContentId, Is.EqualTo(content.Id));
 
         var block = blockListValue.First();
 
         var nestedBlockListValue = block.Content.Value<BlockListModel>("elementBlockList");
-        Assert.IsNotNull(nestedBlockListValue);
-        Assert.AreEqual(1, nestedBlockListValue.Count);
+        Assert.That(nestedBlockListValue, Is.Not.Null);
+        Assert.That(nestedBlockListValue, Has.Count.EqualTo(1));
 
         // the block content property tracks at content level because it's a locally sourced element
-        Assert.AreEqual(content.Id, _contextTrackingVariationContextAccessor.LastTrackedContentId);
+        Assert.That(_contextTrackingVariationContextAccessor.LastTrackedContentId, Is.EqualTo(content.Id));
 
         var nestedBlock = nestedBlockListValue.First();
 
         var contentTitleValue = nestedBlock.Content.Value<string>("elementTitle");
-        Assert.AreEqual("Nested Local Element Content Title", contentTitleValue);
+        Assert.That(contentTitleValue, Is.EqualTo("Nested Local Element Content Title"));
 
         // the nested block content property also tracks at content level because it's a locally sourced element
-        Assert.AreEqual(content.Id, _contextTrackingVariationContextAccessor.LastTrackedContentId);
+        Assert.That(_contextTrackingVariationContextAccessor.LastTrackedContentId, Is.EqualTo(content.Id));
 
         // the elements of both the block and the nested block should have the content as their identity root
-        Assert.AreEqual(content.Id, block.Content.OwningContentId);
-        Assert.AreEqual(content.Id, nestedBlock.Content.OwningContentId);
+        Assert.That(block.Content.OwningContentId, Is.EqualTo(content.Id));
+        Assert.That(nestedBlock.Content.OwningContentId, Is.EqualTo(content.Id));
     }
 
     [Test]
@@ -354,37 +354,37 @@ public class VariationContextSegmentAccessorTests : UmbracoIntegrationTest
             [],
             Constants.Security.SuperUserKey);
 
-        Assert.IsTrue(contentCreateResult.Success);
+        Assert.That(contentCreateResult.Success, Is.True);
 
         var content = await DocumentCacheService.GetByKeyAsync(contentCreateResult.Result.Content!.Key);
-        Assert.IsNotNull(content);
+        Assert.That(content, Is.Not.Null);
 
         var blockListValue = content.Value<BlockListModel>("blockList");
-        Assert.IsNotNull(blockListValue);
-        Assert.AreEqual(1, blockListValue.Count);
+        Assert.That(blockListValue, Is.Not.Null);
+        Assert.That(blockListValue, Has.Count.EqualTo(1));
 
         // the block list property itself tracks at content level
-        Assert.AreEqual(content.Id, _contextTrackingVariationContextAccessor.LastTrackedContentId);
+        Assert.That(_contextTrackingVariationContextAccessor.LastTrackedContentId, Is.EqualTo(content.Id));
 
         var block = blockListValue.First();
 
         var contentTitleValue = block.Content.Value<string>("elementTitle");
-        Assert.AreEqual("Reusable Element Title", contentTitleValue);
+        Assert.That(contentTitleValue, Is.EqualTo("Reusable Element Title"));
 
         // the block content property tracks at element level because it's a reusable element
-        Assert.AreEqual(reusableElement.Id, _contextTrackingVariationContextAccessor.LastTrackedContentId);
+        Assert.That(_contextTrackingVariationContextAccessor.LastTrackedContentId, Is.EqualTo(reusableElement.Id));
 
-        Assert.IsNotNull(block.Settings);
+        Assert.That(block.Settings, Is.Not.Null);
         var settingsTitleValue = block.Settings.Value<string>("elementTitle");
-        Assert.AreEqual("Local Element Settings Title", settingsTitleValue);
+        Assert.That(settingsTitleValue, Is.EqualTo("Local Element Settings Title"));
 
         // the block settings property tracks at content level because it's a locally sourced element
-        Assert.AreEqual(content.Id, _contextTrackingVariationContextAccessor.LastTrackedContentId);
+        Assert.That(_contextTrackingVariationContextAccessor.LastTrackedContentId, Is.EqualTo(content.Id));
 
         // the content element (reusable element) should not track an identity root,
         // but the settings element (locally sourced) should still have the content as its identity root
-        Assert.IsNull(block.Content.OwningContentId);
-        Assert.AreEqual(content.Id, block.Settings.OwningContentId);
+        Assert.That(block.Content.OwningContentId, Is.Null);
+        Assert.That(block.Settings.OwningContentId, Is.EqualTo(content.Id));
     }
 
     [Test]
@@ -430,42 +430,42 @@ public class VariationContextSegmentAccessorTests : UmbracoIntegrationTest
             [],
             Constants.Security.SuperUserKey);
 
-        Assert.IsTrue(contentCreateResult.Success);
+        Assert.That(contentCreateResult.Success, Is.True);
 
         var content = await DocumentCacheService.GetByKeyAsync(contentCreateResult.Result.Content!.Key);
-        Assert.IsNotNull(content);
+        Assert.That(content, Is.Not.Null);
 
         // the assertions below distinguish the reusable element from the document, so the two must differ
-        Assert.AreNotEqual(content.Id, reusableElement.Id);
+        Assert.That(reusableElement.Id, Is.Not.EqualTo(content.Id));
 
         var blockListValue = content.Value<BlockListModel>("blockList");
-        Assert.IsNotNull(blockListValue);
-        Assert.AreEqual(1, blockListValue.Count);
+        Assert.That(blockListValue, Is.Not.Null);
+        Assert.That(blockListValue, Has.Count.EqualTo(1));
 
         var block = blockListValue.First();
 
         // the reusable element bears its own identity, so it has no owning content
-        Assert.IsNull(block.Content.OwningContentId);
+        Assert.That(block.Content.OwningContentId, Is.Null);
 
         var innerBlockListValue = block.Content.Value<BlockListModel>("elementBlockList");
-        Assert.IsNotNull(innerBlockListValue);
-        Assert.AreEqual(1, innerBlockListValue.Count);
+        Assert.That(innerBlockListValue, Is.Not.Null);
+        Assert.That(innerBlockListValue, Has.Count.EqualTo(1));
 
         var innerBlock = innerBlockListValue.First();
 
         // read a document level property first, so the tracking assertion below cannot pass on a value
         // left over from reading the reusable element
         content.Value<string>("documentTitle");
-        Assert.AreEqual(content.Id, _contextTrackingVariationContextAccessor.LastTrackedContentId);
+        Assert.That(_contextTrackingVariationContextAccessor.LastTrackedContentId, Is.EqualTo(content.Id));
 
         var innerTitleValue = innerBlock.Content.Value<string>("elementTitle");
-        Assert.AreEqual("Local Element Content Title In Reusable Element", innerTitleValue);
+        Assert.That(innerTitleValue, Is.EqualTo("Local Element Content Title In Reusable Element"));
 
         // the locally sourced block inside the reusable element is owned by the reusable element,
         // not by the document that renders it
-        Assert.AreEqual(reusableElement.Id, _contextTrackingVariationContextAccessor.LastTrackedContentId);
-        Assert.AreEqual(reusableElement.Id, innerBlock.Content.OwningContentId);
-        Assert.AreNotEqual(content.Id, innerBlock.Content.OwningContentId);
+        Assert.That(_contextTrackingVariationContextAccessor.LastTrackedContentId, Is.EqualTo(reusableElement.Id));
+        Assert.That(innerBlock.Content.OwningContentId, Is.EqualTo(reusableElement.Id));
+        Assert.That(innerBlock.Content.OwningContentId, Is.Not.EqualTo(content.Id));
     }
 
     [Test]
@@ -490,32 +490,32 @@ public class VariationContextSegmentAccessorTests : UmbracoIntegrationTest
             [],
             Constants.Security.SuperUserKey);
 
-        Assert.IsTrue(contentCreateResult.Success);
+        Assert.That(contentCreateResult.Success, Is.True);
 
         var content = await DocumentCacheService.GetByKeyAsync(contentCreateResult.Result.Content!.Key);
-        Assert.IsNotNull(content);
+        Assert.That(content, Is.Not.Null);
 
         var elementPickerValue = content.Value<IEnumerable<IPublishedElement>>("elementPicker");
-        Assert.IsNotNull(elementPickerValue);
+        Assert.That(elementPickerValue, Is.Not.Null);
 
         var publishedElements = elementPickerValue as IPublishedElement[] ?? elementPickerValue.ToArray();
-        Assert.AreEqual(1, publishedElements.Count());
+        Assert.That(publishedElements.Count(), Is.EqualTo(1));
 
         var publishedElement = publishedElements.First();
-        Assert.AreEqual(reusableElement.Key, publishedElement.Key);
+        Assert.That(publishedElement.Key, Is.EqualTo(reusableElement.Key));
 
         // the picker property itself tracks at content level
-        Assert.AreEqual(content.Id, _contextTrackingVariationContextAccessor.LastTrackedContentId);
+        Assert.That(_contextTrackingVariationContextAccessor.LastTrackedContentId, Is.EqualTo(content.Id));
 
         var elementTitleValue = publishedElement.Value<string>("elementTitle");
-        Assert.AreEqual("Reusable Element Title", elementTitleValue);
+        Assert.That(elementTitleValue, Is.EqualTo("Reusable Element Title"));
 
         // the element title property tracks at element level
-        Assert.AreEqual(reusableElement.Id, _contextTrackingVariationContextAccessor.LastTrackedContentId);
+        Assert.That(_contextTrackingVariationContextAccessor.LastTrackedContentId, Is.EqualTo(reusableElement.Id));
 
         // the element (reusable element) should not track an identity root,
         // and the settings element should have the content as its identity root
-        Assert.IsNull(publishedElement.OwningContentId);
+        Assert.That(publishedElement.OwningContentId, Is.Null);
     }
 
     [Test]
@@ -570,42 +570,42 @@ public class VariationContextSegmentAccessorTests : UmbracoIntegrationTest
             [],
             Constants.Security.SuperUserKey);
 
-        Assert.IsTrue(createResult.Success);
+        Assert.That(createResult.Success, Is.True);
 
         var content = await DocumentCacheService.GetByKeyAsync(createResult.Result.Content!.Key);
-        Assert.IsNotNull(content);
+        Assert.That(content, Is.Not.Null);
 
         var blockListValue = content.Value<BlockListModel>("blockList");
-        Assert.IsNotNull(blockListValue);
-        Assert.AreEqual(1, blockListValue.Count);
+        Assert.That(blockListValue, Is.Not.Null);
+        Assert.That(blockListValue, Has.Count.EqualTo(1));
 
         // the block list property itself tracks at content level
-        Assert.AreEqual(content.Id, _contextTrackingVariationContextAccessor.LastTrackedContentId);
+        Assert.That(_contextTrackingVariationContextAccessor.LastTrackedContentId, Is.EqualTo(content.Id));
 
         var block = blockListValue.First();
 
         var nestedElementPickerValue = block.Content.Value<IEnumerable<IPublishedElement>>("elementElementPicker");
-        Assert.IsNotNull(nestedElementPickerValue);
+        Assert.That(nestedElementPickerValue, Is.Not.Null);
 
         var publishedElements = nestedElementPickerValue as IPublishedElement[] ?? nestedElementPickerValue.ToArray();
-        Assert.AreEqual(1, publishedElements.Count());
+        Assert.That(publishedElements.Count(), Is.EqualTo(1));
 
         var publishedElement = publishedElements.First();
-        Assert.AreEqual(reusableElement.Key, publishedElement.Key);
+        Assert.That(publishedElement.Key, Is.EqualTo(reusableElement.Key));
 
         // the nested picker property itself tracks at content level, because it's inside a local block
-        Assert.AreEqual(content.Id, _contextTrackingVariationContextAccessor.LastTrackedContentId);
+        Assert.That(_contextTrackingVariationContextAccessor.LastTrackedContentId, Is.EqualTo(content.Id));
 
         var nestedElementTitleValue = publishedElement.Value<string>("elementTitle");
-        Assert.AreEqual("Reusable Element Title", nestedElementTitleValue);
+        Assert.That(nestedElementTitleValue, Is.EqualTo("Reusable Element Title"));
 
         // the element title property tracks at element level
-        Assert.AreEqual(reusableElement.Id, _contextTrackingVariationContextAccessor.LastTrackedContentId);
+        Assert.That(_contextTrackingVariationContextAccessor.LastTrackedContentId, Is.EqualTo(reusableElement.Id));
 
         // the block content element (locally sourced) should have the content as its identity root,
         // and the nested picked element (reusable) should not track any identity root
-        Assert.AreEqual(content.Id, block.Content.OwningContentId);
-        Assert.IsNull(publishedElement.OwningContentId);
+        Assert.That(block.Content.OwningContentId, Is.EqualTo(content.Id));
+        Assert.That(publishedElement.OwningContentId, Is.Null);
     }
 
     private async Task<(IContentType ContentType, IContentType ElementType)> SetupContentTypes()
@@ -760,16 +760,16 @@ public class VariationContextSegmentAccessorTests : UmbracoIntegrationTest
                 Variants = [new VariantModel { Name = "Reusable element" }],
             },
             Constants.Security.SuperUserKey);
-        Assert.IsTrue(elementCreateResult.Success);
+        Assert.That(elementCreateResult.Success, Is.True);
 
         var reusableElement = elementCreateResult.Result.Content!;
-        Assert.AreNotEqual(0, reusableElement.Id);
+        Assert.That(reusableElement.Id, Is.Not.EqualTo(0));
 
         var elementPublishResult = await ElementPublishingService.PublishAsync(
             reusableElement.Key,
             [new CulturePublishScheduleModel { Culture = null }],
             Constants.Security.SuperUserKey);
-        Assert.IsTrue(elementPublishResult.Success);
+        Assert.That(elementPublishResult.Success, Is.True);
 
         return reusableElement;
     }

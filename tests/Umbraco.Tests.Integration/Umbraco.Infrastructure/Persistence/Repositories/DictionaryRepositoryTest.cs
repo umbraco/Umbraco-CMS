@@ -410,8 +410,8 @@ internal sealed class DictionaryRepositoryTest : UmbracoIntegrationTest
             keyMap = repository.GetDictionaryItemKeyMap();
         }
 
-        Assert.IsNotNull(keyMap);
-        Assert.IsNotEmpty(keyMap);
+        Assert.That(keyMap, Is.Not.Null);
+        Assert.That(keyMap, Is.Not.Empty);
         foreach (var kvp in keyMap)
         {
             Console.WriteLine("{0}: {1}", kvp.Key, kvp.Value);
@@ -428,7 +428,7 @@ internal sealed class DictionaryRepositoryTest : UmbracoIntegrationTest
         {
             var dictionaryItem = repository.Get("Read More");
 
-            Assert.AreEqual("Read More", dictionaryItem.Translations.Single(x => x.LanguageIsoCode == "en-US").Value);
+            Assert.That(dictionaryItem.Translations.Single(x => x.LanguageIsoCode == "en-US").Value, Is.EqualTo("Read More"));
         }
 
         // Modify the value directly in the database. This won't be reflected in the repository cache and hence if the cache
@@ -443,7 +443,7 @@ internal sealed class DictionaryRepositoryTest : UmbracoIntegrationTest
         {
             var dictionaryItem = repository.Get("Read More");
 
-            Assert.AreEqual("Read More", dictionaryItem.Translations.Single(x => x.LanguageIsoCode == "en-US").Value);
+            Assert.That(dictionaryItem.Translations.Single(x => x.LanguageIsoCode == "en-US").Value, Is.EqualTo("Read More"));
         }
 
         cache.IsolatedCaches.ClearCache<IDictionaryItem>();
@@ -451,7 +451,7 @@ internal sealed class DictionaryRepositoryTest : UmbracoIntegrationTest
         {
             var dictionaryItem = repository.Get("Read More");
 
-            Assert.AreEqual("Read More (updated)", dictionaryItem.Translations.Single(x => x.LanguageIsoCode == "en-US").Value);
+            Assert.That(dictionaryItem.Translations.Single(x => x.LanguageIsoCode == "en-US").Value, Is.EqualTo("Read More (updated)"));
         }
     }
 
@@ -465,7 +465,7 @@ internal sealed class DictionaryRepositoryTest : UmbracoIntegrationTest
         {
             var dictionaryItem = repository.Get("Read More Updated");
 
-            Assert.IsNull(dictionaryItem);
+            Assert.That(dictionaryItem, Is.Null);
         }
 
         // Modify the value directly in the database such that it now exists. This won't be reflected in the repository cache and hence if the cache
@@ -480,7 +480,7 @@ internal sealed class DictionaryRepositoryTest : UmbracoIntegrationTest
         {
             var dictionaryItem = repository.Get("Read More Updated");
 
-            Assert.IsNull(dictionaryItem);
+            Assert.That(dictionaryItem, Is.Null);
         }
 
         cache.IsolatedCaches.ClearCache<IDictionaryItem>();
@@ -488,7 +488,7 @@ internal sealed class DictionaryRepositoryTest : UmbracoIntegrationTest
         {
             var dictionaryItem = repository.Get("Read More Updated");
 
-            Assert.IsNotNull(dictionaryItem);
+            Assert.That(dictionaryItem, Is.Not.Null);
         }
     }
 
@@ -501,7 +501,7 @@ internal sealed class DictionaryRepositoryTest : UmbracoIntegrationTest
         {
             var dictionaryItem = repository.Get("Read More");
 
-            Assert.AreEqual("Read More", dictionaryItem.Translations.Single(x => x.LanguageIsoCode == "en-US").Value);
+            Assert.That(dictionaryItem.Translations.Single(x => x.LanguageIsoCode == "en-US").Value, Is.EqualTo("Read More"));
         }
 
         // Modify the value directly in the database. As we don't have caching enabled on the repository we should get the new value.
@@ -515,7 +515,7 @@ internal sealed class DictionaryRepositoryTest : UmbracoIntegrationTest
         {
             var dictionaryItem = repository.Get("Read More");
 
-            Assert.AreEqual("Read More (updated)", dictionaryItem.Translations.Single(x => x.LanguageIsoCode == "en-US").Value);
+            Assert.That(dictionaryItem.Translations.Single(x => x.LanguageIsoCode == "en-US").Value, Is.EqualTo("Read More (updated)"));
         }
     }
 
@@ -528,7 +528,7 @@ internal sealed class DictionaryRepositoryTest : UmbracoIntegrationTest
         {
             var dictionaryItem = repository.Get("Read More Updated");
 
-            Assert.IsNull(dictionaryItem);
+            Assert.That(dictionaryItem, Is.Null);
         }
 
         // Modify the value directly in the database such that it now exists. As we don't have caching enabled on the repository we should get the new value.
@@ -542,7 +542,7 @@ internal sealed class DictionaryRepositoryTest : UmbracoIntegrationTest
         {
             var dictionaryItem = repository.Get("Read More Updated");
 
-            Assert.IsNotNull(dictionaryItem);
+            Assert.That(dictionaryItem, Is.Not.Null);
         }
     }
 

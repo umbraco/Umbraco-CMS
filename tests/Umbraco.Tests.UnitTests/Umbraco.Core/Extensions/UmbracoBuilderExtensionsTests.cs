@@ -2,7 +2,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoFixture;
-using AutoFixture.NUnit3;
+using AutoFixture.NUnit4;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -29,7 +29,7 @@ public class UmbracoBuilderExtensionsTests
 
         var expectedHandlerType = typeof(INotificationHandler<ContentPublishedNotification>);
         var handler = sut.Services.SingleOrDefault(x => x.ServiceType == expectedHandlerType);
-        Assert.NotNull(handler);
+        Assert.That(handler, Is.Not.Null);
         Assert.That(handler.ImplementationType, Is.EqualTo(typeof(StubNotificationHandler)));
     }
 
@@ -42,7 +42,7 @@ public class UmbracoBuilderExtensionsTests
 
         var expectedHandlerType = typeof(INotificationAsyncHandler<ContentPublishedNotification>);
         var handler = sut.Services.SingleOrDefault(x => x.ServiceType == expectedHandlerType);
-        Assert.NotNull(handler);
+        Assert.That(handler, Is.Not.Null);
         Assert.That(handler.ImplementationType, Is.EqualTo(typeof(StubNotificationHandler)));
     }
 

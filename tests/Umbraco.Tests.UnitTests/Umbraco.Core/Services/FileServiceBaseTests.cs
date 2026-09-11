@@ -29,13 +29,13 @@ public class FileServiceBaseTests
     [TestCase("valid-name.js")]
     [TestCase("valid name.js")]
     public void Can_Accept_Valid_File_Name(string fileName)
-        => Assert.IsTrue(_sut.HasValidFileNameForTest(fileName));
+        => Assert.That(_sut.HasValidFileNameForTest(fileName), Is.True);
 
     // '/' is invalid in a file name on every platform, unlike ':' which is only invalid on Windows.
     [TestCase("in/valid.js")]
     [TestCase("/.js")]
     public void Cannot_Accept_File_Name_With_Invalid_Characters(string fileName)
-        => Assert.IsFalse(_sut.HasValidFileNameForTest(fileName));
+        => Assert.That(_sut.HasValidFileNameForTest(fileName), Is.False);
 
     private sealed class TestFileService : FileServiceBase<IScriptRepository, IScript>
     {

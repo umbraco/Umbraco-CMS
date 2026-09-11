@@ -102,16 +102,16 @@ internal sealed class DomainAndUrlsTests : UmbracoIntegrationTest
         };
 
         var result = await domainService.UpdateDomainsAsync(Root.Key, updateModel);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(DomainOperationStatus.Success, result.Status);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(DomainOperationStatus.Success));
 
         void VerifyDomains(IDomain[] domains)
         {
-            Assert.AreEqual(3, domains.Length);
+            Assert.That(domains, Has.Length.EqualTo(3));
             for (var i = 0; i < domains.Length; i++)
             {
-                Assert.AreEqual(Cultures[i], domains[i].LanguageIsoCode);
-                Assert.AreEqual(GetDomainUrlFromCultureCode(Cultures[i]), domains[i].DomainName);
+                Assert.That(domains[i].LanguageIsoCode, Is.EqualTo(Cultures[i]));
+                Assert.That(domains[i].DomainName, Is.EqualTo(GetDomainUrlFromCultureCode(Cultures[i])));
             }
         }
 
@@ -136,16 +136,16 @@ internal sealed class DomainAndUrlsTests : UmbracoIntegrationTest
         };
 
         var result = await domainService.UpdateDomainsAsync(Root.Key, updateModel);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(DomainOperationStatus.Success, result.Status);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(DomainOperationStatus.Success));
 
         void VerifyDomains(IDomain[] domains)
         {
-            Assert.AreEqual(3, domains.Length);
+            Assert.That(domains, Has.Length.EqualTo(3));
             for (var i = 0; i < domains.Length; i++)
             {
-                Assert.AreEqual(reversedCultures[i], domains[i].LanguageIsoCode);
-                Assert.AreEqual(GetDomainUrlFromCultureCode(reversedCultures[i]), domains[i].DomainName);
+                Assert.That(domains[i].LanguageIsoCode, Is.EqualTo(reversedCultures[i]));
+                Assert.That(domains[i].DomainName, Is.EqualTo(GetDomainUrlFromCultureCode(reversedCultures[i])));
             }
         }
 
@@ -169,20 +169,20 @@ internal sealed class DomainAndUrlsTests : UmbracoIntegrationTest
         };
 
         var result = await domainService.UpdateDomainsAsync(Root.Key, updateModel);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(DomainOperationStatus.Success, result.Status);
-        Assert.AreEqual(3, result.Result.Domains.Count());
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(DomainOperationStatus.Success));
+        Assert.That(result.Result.Domains.Count(), Is.EqualTo(3));
 
         updateModel.Domains = Enumerable.Empty<DomainModel>();
 
         result = await domainService.UpdateDomainsAsync(Root.Key, updateModel);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(DomainOperationStatus.Success, result.Status);
-        Assert.AreEqual(0, result.Result.Domains.Count());
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(DomainOperationStatus.Success));
+        Assert.That(result.Result.Domains.Count(), Is.EqualTo(0));
 
         // re-get and verify again
         var domains = await domainService.GetAssignedDomainsAsync(Root.Key, true);
-        Assert.AreEqual(0, domains.Count());
+        Assert.That(domains.Count(), Is.EqualTo(0));
     }
 
     [Test]
@@ -198,18 +198,18 @@ internal sealed class DomainAndUrlsTests : UmbracoIntegrationTest
         };
 
         var result = await domainService.UpdateDomainsAsync(Root.Key, updateModel);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(DomainOperationStatus.Success, result.Status);
-        Assert.AreEqual(3, result.Result.Domains.Count());
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(DomainOperationStatus.Success));
+        Assert.That(result.Result.Domains.Count(), Is.EqualTo(3));
 
         updateModel.Domains = new[] { updateModel.Domains.First(), updateModel.Domains.Last() };
 
         result = await domainService.UpdateDomainsAsync(Root.Key, updateModel);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(DomainOperationStatus.Success, result.Status);
-        Assert.AreEqual(2, result.Result.Domains.Count());
-        Assert.AreEqual(Cultures.First(), result.Result.Domains.First().LanguageIsoCode);
-        Assert.AreEqual(Cultures.Last(), result.Result.Domains.Last().LanguageIsoCode);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(DomainOperationStatus.Success));
+        Assert.That(result.Result.Domains.Count(), Is.EqualTo(2));
+        Assert.That(result.Result.Domains.First().LanguageIsoCode, Is.EqualTo(Cultures.First()));
+        Assert.That(result.Result.Domains.Last().LanguageIsoCode, Is.EqualTo(Cultures.Last()));
     }
 
     [Test]
@@ -225,18 +225,18 @@ internal sealed class DomainAndUrlsTests : UmbracoIntegrationTest
         };
 
         var result = await domainService.UpdateDomainsAsync(Root.Key, updateModel);
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
 
         var rootUrls = GetContentUrlsAsync(Root).ToArray();
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(6, rootUrls.Count());
+            Assert.That(rootUrls.Count(), Is.EqualTo(6));
             foreach (var culture in Cultures)
             {
                 var domain = GetDomainUrlFromCultureCode(culture);
-                Assert.IsTrue(rootUrls.Any(x => x.Url?.ToString() == domain && x.Message == null));
-                Assert.IsTrue(rootUrls.Any(x => x.Url?.ToString() == "https://localhost" + domain && x.Message == null));
+                Assert.That(rootUrls.Any(x => x.Url?.ToString() == domain && x.Message == null), Is.True);
+                Assert.That(rootUrls.Any(x => x.Url?.ToString() == "https://localhost" + domain && x.Message == null), Is.True);
             }
         });
     }
@@ -255,7 +255,7 @@ internal sealed class DomainAndUrlsTests : UmbracoIntegrationTest
         };
 
         var result = await domainService.UpdateDomainsAsync(Root.Key, updateModel);
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
 
         var culture = Cultures[1];
         var publishedUrlInfoProvider = GetRequiredService<IPublishedUrlInfoProvider>();
@@ -266,13 +266,13 @@ internal sealed class DomainAndUrlsTests : UmbracoIntegrationTest
         Assert.Multiple(() =>
         {
             // The culture-scoped result contains only the requested culture.
-            Assert.IsNotEmpty(cultureUrls);
-            CollectionAssert.AreEquivalent(new[] { culture }, cultureUrls.Select(x => x.Culture).Distinct());
+            Assert.That(cultureUrls, Is.Not.Empty);
+            Assert.That(cultureUrls.Select(x => x.Culture).Distinct(), Is.EquivalentTo(new[] { culture }));
 
             // The culture-scoped result equals the all-cultures result filtered to that culture.
-            CollectionAssert.AreEquivalent(
-                allUrls.Where(x => x.Culture == culture).Select(x => x.Url?.ToString()),
-                cultureUrls.Select(x => x.Url?.ToString()));
+            Assert.That(
+                cultureUrls.Select(x => x.Url?.ToString()),
+                Is.EquivalentTo(allUrls.Where(x => x.Culture == culture).Select(x => x.Url?.ToString())));
         });
     }
 
@@ -290,7 +290,7 @@ internal sealed class DomainAndUrlsTests : UmbracoIntegrationTest
         };
 
         var result = await domainService.UpdateDomainsAsync(Root.Key, updateModel);
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
 
         var publishedUrlInfoProvider = GetRequiredService<IPublishedUrlInfoProvider>();
 
@@ -298,7 +298,7 @@ internal sealed class DomainAndUrlsTests : UmbracoIntegrationTest
 
         // An unknown culture is not an installed culture, so there are no urls to report for it -
         // rather than falling back to (expensively) resolving all cultures.
-        Assert.IsEmpty(unknownCultureUrls);
+        Assert.That(unknownCultureUrls, Is.Empty);
     }
 
     [Test]
@@ -316,23 +316,23 @@ internal sealed class DomainAndUrlsTests : UmbracoIntegrationTest
         };
 
         var result = await domainService.UpdateDomainsAsync(Root.Key, updateModel);
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
 
         var rootUrls = GetContentUrlsAsync(Root).ToArray();
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(4, rootUrls.Count());
+            Assert.That(rootUrls.Count(), Is.EqualTo(4));
 
             //We expect two for the domain that is setup
-            Assert.IsTrue(rootUrls.Any(x => x.Url?.ToString() == domain && x.Culture == culture && x.Message == null));
-            Assert.IsTrue(rootUrls.Any(x => x.Url?.ToString() == "https://localhost" + domain && x.Culture == culture && x.Message == null));
+            Assert.That(rootUrls.Any(x => x.Url?.ToString() == domain && x.Culture == culture && x.Message == null), Is.True);
+            Assert.That(rootUrls.Any(x => x.Url?.ToString() == "https://localhost" + domain && x.Culture == culture && x.Message == null), Is.True);
 
             //We expect the default language to be routable on the default path "/"
-            Assert.IsTrue(rootUrls.Any(x => x.Url?.ToString() == "/" && x.Culture == Cultures[0] && x.Message == null));
+            Assert.That(rootUrls.Any(x => x.Url?.ToString() == "/" && x.Culture == Cultures[0] && x.Message == null), Is.True);
 
             //We dont expect non-default languages without a domain to be routable
-            Assert.IsTrue(rootUrls.Any(x => x.Url == null && x.Culture == Cultures[2]));
+            Assert.That(rootUrls.Any(x => x.Url == null && x.Culture == Cultures[2]), Is.True);
         });
     }
 
@@ -348,14 +348,14 @@ internal sealed class DomainAndUrlsTests : UmbracoIntegrationTest
         };
 
         var result = await domainService.UpdateDomainsAsync(Root.Key, updateModel);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(1, result.Result.Domains.Count());
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result.Domains.Count(), Is.EqualTo(1));
 
         // default culture is represented as a wildcard domain
         var domain = result.Result.Domains.First();
-        Assert.IsTrue(domain.IsWildcard);
-        Assert.AreEqual(culture, domain.LanguageIsoCode);
-        Assert.AreEqual("*" + Root.Id, domain.DomainName);
+        Assert.That(domain.IsWildcard, Is.True);
+        Assert.That(domain.LanguageIsoCode, Is.EqualTo(culture));
+        Assert.That(domain.DomainName, Is.EqualTo("*" + Root.Id));
     }
 
     [Test]
@@ -368,8 +368,8 @@ internal sealed class DomainAndUrlsTests : UmbracoIntegrationTest
         };
 
         var result = await domainService.UpdateDomainsAsync(Guid.NewGuid(), updateModel);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(DomainOperationStatus.ContentNotFound, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(DomainOperationStatus.ContentNotFound));
     }
 
     [Test]
@@ -382,8 +382,8 @@ internal sealed class DomainAndUrlsTests : UmbracoIntegrationTest
         };
 
         var result = await domainService.UpdateDomainsAsync(Root.Key, updateModel);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(DomainOperationStatus.LanguageNotFound, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(DomainOperationStatus.LanguageNotFound));
     }
 
     [TestCase("/domain")]
@@ -398,8 +398,8 @@ internal sealed class DomainAndUrlsTests : UmbracoIntegrationTest
         };
 
         var result = await domainService.UpdateDomainsAsync(Root.Key, updateModel);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(DomainOperationStatus.DuplicateDomainName, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(DomainOperationStatus.DuplicateDomainName));
     }
 
     [TestCase("https://*.umbraco.com")]
@@ -414,8 +414,8 @@ internal sealed class DomainAndUrlsTests : UmbracoIntegrationTest
         };
 
         var result = await domainService.UpdateDomainsAsync(Root.Key, updateModel);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(DomainOperationStatus.InvalidDomainName, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(DomainOperationStatus.InvalidDomainName));
     }
 
     [Test]
@@ -434,18 +434,18 @@ internal sealed class DomainAndUrlsTests : UmbracoIntegrationTest
         };
 
         var result = await domainService.UpdateDomainsAsync(Root.Key, updateModel);
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
 
         result = await domainService.UpdateDomainsAsync(copy.Key, updateModel);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(DomainOperationStatus.ConflictingDomainName, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(DomainOperationStatus.ConflictingDomainName));
 
-        Assert.IsNotNull(result.Result.ConflictingDomains);
-        Assert.IsNotEmpty(result.Result.ConflictingDomains);
-        Assert.AreEqual(updateModel.Domains.Count(), result.Result.ConflictingDomains.Count());
+        Assert.That(result.Result.ConflictingDomains, Is.Not.Null);
+        Assert.That(result.Result.ConflictingDomains, Is.Not.Empty);
+        Assert.That(result.Result.ConflictingDomains.Count(), Is.EqualTo(updateModel.Domains.Count()));
         foreach (var culture in Cultures)
         {
-            Assert.IsNotNull(result.Result.ConflictingDomains.SingleOrDefault(c => c.RootContentId == Root.Id && c.DomainName == GetDomainUrlFromCultureCode(culture)));
+            Assert.That(result.Result.ConflictingDomains.SingleOrDefault(c => c.RootContentId == Root.Id && c.DomainName == GetDomainUrlFromCultureCode(culture)), Is.Not.Null);
         }
     }
 

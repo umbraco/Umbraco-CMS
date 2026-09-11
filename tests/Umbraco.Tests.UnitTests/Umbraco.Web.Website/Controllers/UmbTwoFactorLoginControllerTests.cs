@@ -45,7 +45,7 @@ public class UmbTwoFactorLoginControllerTests
 
         ActionResult<IEnumerable<string>> result = await controller.Get2FAProviders();
 
-        Assert.IsInstanceOf<NotFoundResult>(result.Result);
+        Assert.That(result.Result, Is.InstanceOf<NotFoundResult>());
     }
 
     [Test]
@@ -64,7 +64,7 @@ public class UmbTwoFactorLoginControllerTests
         ActionResult<IEnumerable<string>> result = await controller.Get2FAProviders();
 
         var objectResult = result.Result as ObjectResult;
-        Assert.IsNotNull(objectResult);
+        Assert.That(objectResult, Is.Not.Null);
         Assert.That((IList<string>)objectResult!.Value!, Is.EquivalentTo(new[] { "ProviderA", "ProviderB" }));
     }
 
@@ -79,7 +79,7 @@ public class UmbTwoFactorLoginControllerTests
 
         IActionResult result = await controller.Verify2FACode(CreateVerifyModel(), "/return");
 
-        Assert.IsInstanceOf<NotFoundResult>(result);
+        Assert.That(result, Is.InstanceOf<NotFoundResult>());
     }
 
     [Test]
@@ -98,8 +98,8 @@ public class UmbTwoFactorLoginControllerTests
         IActionResult result = await controller.Verify2FACode(CreateVerifyModel(), "/after-2fa");
 
         var redirect = result as RedirectResult;
-        Assert.IsNotNull(redirect);
-        Assert.AreEqual("/after-2fa", redirect!.Url);
+        Assert.That(redirect, Is.Not.Null);
+        Assert.That(redirect!.Url, Is.EqualTo("/after-2fa"));
     }
 
     [Test]
@@ -117,7 +117,7 @@ public class UmbTwoFactorLoginControllerTests
 
         IActionResult result = await controller.Verify2FACode(CreateVerifyModel(), "https://evil.com");
 
-        Assert.IsInstanceOf<RedirectToUmbracoPageResult>(result);
+        Assert.That(result, Is.InstanceOf<RedirectToUmbracoPageResult>());
     }
 
     [Test]
@@ -133,7 +133,7 @@ public class UmbTwoFactorLoginControllerTests
 
         IActionResult result = await controller.ValidateAndSaveSetup("Provider", "secret", "123456", "https://evil.com");
 
-        Assert.IsInstanceOf<RedirectToUmbracoPageResult>(result);
+        Assert.That(result, Is.InstanceOf<RedirectToUmbracoPageResult>());
     }
 
     [Test]
@@ -149,7 +149,7 @@ public class UmbTwoFactorLoginControllerTests
 
         IActionResult result = await controller.Disable("Provider", "https://evil.com");
 
-        Assert.IsInstanceOf<RedirectToUmbracoPageResult>(result);
+        Assert.That(result, Is.InstanceOf<RedirectToUmbracoPageResult>());
     }
 
     [Test]
@@ -161,8 +161,8 @@ public class UmbTwoFactorLoginControllerTests
 
         IActionResult result = await controller.Verify2FACode(CreateVerifyModel());
 
-        Assert.IsInstanceOf<UmbracoPageResult>(result);
-        Assert.IsTrue(controller.ModelState["Code"]!.Errors.Any(e => e.ErrorMessage == "Member is locked out"));
+        Assert.That(result, Is.InstanceOf<UmbracoPageResult>());
+        Assert.That(controller.ModelState["Code"]!.Errors.Any(e => e.ErrorMessage == "Member is locked out"), Is.True);
     }
 
     [Test]
@@ -174,8 +174,8 @@ public class UmbTwoFactorLoginControllerTests
 
         IActionResult result = await controller.Verify2FACode(CreateVerifyModel());
 
-        Assert.IsInstanceOf<UmbracoPageResult>(result);
-        Assert.IsTrue(controller.ModelState["Code"]!.Errors.Any(e => e.ErrorMessage == "Member is not allowed"));
+        Assert.That(result, Is.InstanceOf<UmbracoPageResult>());
+        Assert.That(controller.ModelState["Code"]!.Errors.Any(e => e.ErrorMessage == "Member is not allowed"), Is.True);
     }
 
     [Test]
@@ -187,8 +187,8 @@ public class UmbTwoFactorLoginControllerTests
 
         IActionResult result = await controller.Verify2FACode(CreateVerifyModel());
 
-        Assert.IsInstanceOf<UmbracoPageResult>(result);
-        Assert.IsTrue(controller.ModelState["Code"]!.Errors.Any(e => e.ErrorMessage == "Invalid code"));
+        Assert.That(result, Is.InstanceOf<UmbracoPageResult>());
+        Assert.That(controller.ModelState["Code"]!.Errors.Any(e => e.ErrorMessage == "Invalid code"), Is.True);
     }
 
     [Test]
@@ -205,8 +205,8 @@ public class UmbTwoFactorLoginControllerTests
 
         IActionResult result = await controller.ValidateAndSaveSetup("Provider", "secret", "000000");
 
-        Assert.IsInstanceOf<UmbracoPageResult>(result);
-        Assert.IsTrue(controller.ModelState["code"]!.Errors.Any(e => e.ErrorMessage == "Invalid Code"));
+        Assert.That(result, Is.InstanceOf<UmbracoPageResult>());
+        Assert.That(controller.ModelState["code"]!.Errors.Any(e => e.ErrorMessage == "Invalid Code"), Is.True);
         _twoFactorLoginServiceMock.Verify(x => x.SaveAsync(It.IsAny<TwoFactorLogin>()), Times.Never);
     }
 
@@ -224,8 +224,8 @@ public class UmbTwoFactorLoginControllerTests
 
         IActionResult result = await controller.ValidateAndSaveSetup("Provider", "secret", "123456");
 
-        Assert.IsInstanceOf<UmbracoPageResult>(result);
-        Assert.IsTrue(controller.ModelState["code"]!.Errors.Any(e => e.ErrorMessage == "Invalid Code"));
+        Assert.That(result, Is.InstanceOf<UmbracoPageResult>());
+        Assert.That(controller.ModelState["code"]!.Errors.Any(e => e.ErrorMessage == "Invalid Code"), Is.True);
         _twoFactorLoginServiceMock.Verify(x => x.SaveAsync(It.IsAny<TwoFactorLogin>()), Times.Never);
     }
 
@@ -243,8 +243,8 @@ public class UmbTwoFactorLoginControllerTests
         IActionResult result = await controller.ValidateAndSaveSetup("Provider", "secret", "123456", "/done");
 
         var redirect = result as RedirectResult;
-        Assert.IsNotNull(redirect);
-        Assert.AreEqual("/done", redirect!.Url);
+        Assert.That(redirect, Is.Not.Null);
+        Assert.That(redirect!.Url, Is.EqualTo("/done"));
         _twoFactorLoginServiceMock.Verify(
             x => x.SaveAsync(It.Is<TwoFactorLogin>(t =>
                 t.Confirmed &&
@@ -268,8 +268,8 @@ public class UmbTwoFactorLoginControllerTests
         IActionResult result = await controller.Disable("Provider", "/settings");
 
         var redirect = result as RedirectResult;
-        Assert.IsNotNull(redirect);
-        Assert.AreEqual("/settings", redirect!.Url);
+        Assert.That(redirect, Is.Not.Null);
+        Assert.That(redirect!.Url, Is.EqualTo("/settings"));
     }
 
     [Test]
@@ -285,7 +285,7 @@ public class UmbTwoFactorLoginControllerTests
 
         IActionResult result = await controller.Disable("Provider");
 
-        Assert.IsInstanceOf<UmbracoPageResult>(result);
+        Assert.That(result, Is.InstanceOf<UmbracoPageResult>());
     }
 
     [Test]
@@ -297,7 +297,7 @@ public class UmbTwoFactorLoginControllerTests
 
         IActionResult result = await controller.Disable("Provider");
 
-        Assert.IsInstanceOf<UmbracoPageResult>(result);
+        Assert.That(result, Is.InstanceOf<UmbracoPageResult>());
         _twoFactorLoginServiceMock.Verify(x => x.DisableAsync(It.IsAny<Guid>(), It.IsAny<string>()), Times.Never);
     }
 

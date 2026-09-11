@@ -21,9 +21,9 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
             [new() { Culture = langEn.IsoCode }],
             Constants.Security.SuperUserKey);
 
-        Assert.IsTrue(publishAttempt.Success);
+        Assert.That(publishAttempt.Success, Is.True);
         content = ContentService.GetById(content.Key);
-        Assert.AreEqual(1, content!.PublishedCultures.Count());
+        Assert.That(content!.PublishedCultures.Count(), Is.EqualTo(1));
     }
 
     [Test]
@@ -40,9 +40,9 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
             ],
             Constants.Security.SuperUserKey);
 
-        Assert.IsTrue(publishAttempt.Success);
+        Assert.That(publishAttempt.Success, Is.True);
         content = ContentService.GetById(content.Key);
-        Assert.AreEqual(2, content!.PublishedCultures.Count());
+        Assert.That(content!.PublishedCultures.Count(), Is.EqualTo(2));
     }
 
     [Test]
@@ -60,9 +60,9 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
             ],
             Constants.Security.SuperUserKey);
 
-        Assert.IsTrue(publishAttempt.Success);
+        Assert.That(publishAttempt.Success, Is.True);
         content = ContentService.GetById(content.Key);
-        Assert.AreEqual(3, content!.PublishedCultures.Count());
+        Assert.That(content!.PublishedCultures.Count(), Is.EqualTo(3));
     }
 
     [Test]
@@ -80,11 +80,11 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
             [new() { Culture = Constants.System.InvariantCulture }],
             Constants.Security.SuperUserKey);
 
-        Assert.IsFalse(publishAttempt.Success);
-        Assert.AreEqual(ContentPublishingOperationStatus.CannotPublishInvariantWhenVariant, publishAttempt.Status);
+        Assert.That(publishAttempt.Success, Is.False);
+        Assert.That(publishAttempt.Status, Is.EqualTo(ContentPublishingOperationStatus.CannotPublishInvariantWhenVariant));
 
         content = ContentService.GetById(content.Key);
-        Assert.AreEqual(0, content!.PublishedCultures.Count());
+        Assert.That(content!.PublishedCultures.Count(), Is.EqualTo(0));
     }
 
     [Test]
@@ -98,10 +98,10 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
             [new() { Culture = Constants.System.InvariantCulture }],
             Constants.Security.SuperUserKey);
 
-        Assert.IsTrue(publishAttempt.Success);
+        Assert.That(publishAttempt.Success, Is.True);
 
         content = ContentService.GetById(content.Key);
-        Assert.NotNull(content!.PublishDate);
+        Assert.That(content!.PublishDate, Is.Not.Null);
     }
 
     [Test]
@@ -115,11 +115,11 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
             [new() { Culture = Constants.System.InvariantCulture }],
             Constants.Security.SuperUserKey);
 
-        Assert.IsFalse(publishAttempt.Success);
-        Assert.AreEqual(ContentPublishingOperationStatus.ContentInvalid, publishAttempt.Status);
+        Assert.That(publishAttempt.Success, Is.False);
+        Assert.That(publishAttempt.Status, Is.EqualTo(ContentPublishingOperationStatus.ContentInvalid));
 
         content = ContentService.GetById(content.Key);
-        Assert.Null(content!.PublishDate);
+        Assert.That(content!.PublishDate, Is.Null);
     }
 
     [Test]
@@ -141,12 +141,12 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
             ],
             Constants.Security.SuperUserKey);
 
-        Assert.IsFalse(publishAttempt.Success);
-        Assert.AreEqual(ContentPublishingOperationStatus.ContentInvalid, publishAttempt.Status);
-        Assert.AreEqual("title", string.Join(",", publishAttempt.Result.InvalidPropertyAliases));
+        Assert.That(publishAttempt.Success, Is.False);
+        Assert.That(publishAttempt.Status, Is.EqualTo(ContentPublishingOperationStatus.ContentInvalid));
+        Assert.That(string.Join(",", publishAttempt.Result.InvalidPropertyAliases), Is.EqualTo("title"));
 
         content = ContentService.GetById(content.Key);
-        Assert.AreEqual(0, content!.PublishedCultures.Count()); // Even though the Danish culture was valid, we still don't publish if if any are invalid.
+        Assert.That(content!.PublishedCultures.Count(), Is.EqualTo(0)); // Even though the Danish culture was valid, we still don't publish if if any are invalid.
     }
 
     [Test]
@@ -167,10 +167,10 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
             ],
             Constants.Security.SuperUserKey);
 
-        Assert.IsTrue(publishAttempt.Success);
+        Assert.That(publishAttempt.Success, Is.True);
         content = ContentService.GetById(content.Key);
-        Assert.AreEqual(1, content!.PublishedCultures.Count());
-        Assert.AreEqual(langDa.IsoCode, content!.PublishedCultures.First());
+        Assert.That(content!.PublishedCultures.Count(), Is.EqualTo(1));
+        Assert.That(content!.PublishedCultures.First(), Is.EqualTo(langDa.IsoCode));
     }
 
     [Test]
@@ -192,11 +192,11 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
             ],
             Constants.Security.SuperUserKey);
 
-        Assert.IsFalse(publishAttempt.Success);
-        Assert.AreEqual(ContentPublishingOperationStatus.InvalidCulture, publishAttempt.Status);
+        Assert.That(publishAttempt.Success, Is.False);
+        Assert.That(publishAttempt.Status, Is.EqualTo(ContentPublishingOperationStatus.InvalidCulture));
 
         content = ContentService.GetById(content.Key);
-        Assert.AreEqual(0, content!.PublishedCultures.Count());
+        Assert.That(content!.PublishedCultures.Count(), Is.EqualTo(0));
     }
 
     [Test]
@@ -230,11 +230,11 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
             [new() { Culture = langEn.IsoCode }],
             Constants.Security.SuperUserKey);
 
-        Assert.IsFalse(publishAttempt.Success);
-        Assert.AreEqual(ContentPublishingOperationStatus.CultureAwaitingRelease, publishAttempt.Status);
+        Assert.That(publishAttempt.Success, Is.False);
+        Assert.That(publishAttempt.Status, Is.EqualTo(ContentPublishingOperationStatus.CultureAwaitingRelease));
 
         content = ContentService.GetById(content.Key);
-        Assert.AreEqual(0, content!.PublishedCultures.Count());
+        Assert.That(content!.PublishedCultures.Count(), Is.EqualTo(0));
     }
 
     // TODO: The following three tests verify existing functionality that could be reconsidered.
@@ -256,21 +256,21 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
             [new() { Culture = Constants.System.InvariantCulture }],
             Constants.Security.SuperUserKey);
 
-        Assert.IsFalse(publishAttempt.Success);
-        Assert.AreEqual(ContentPublishingOperationStatus.PathNotPublished, publishAttempt.Status);
+        Assert.That(publishAttempt.Success, Is.False);
+        Assert.That(publishAttempt.Status, Is.EqualTo(ContentPublishingOperationStatus.PathNotPublished));
 
         // Now publish the parent and re-try publishing the child.
         publishAttempt = await ContentPublishingService.PublishAsync(
             parentContent.Key,
             [new() { Culture = Constants.System.InvariantCulture }],
             Constants.Security.SuperUserKey);
-        Assert.IsTrue(publishAttempt.Success);
+        Assert.That(publishAttempt.Success, Is.True);
 
         publishAttempt = await ContentPublishingService.PublishAsync(
             childContent.Key,
             [new() { Culture = Constants.System.InvariantCulture }],
             Constants.Security.SuperUserKey);
-        Assert.IsTrue(publishAttempt.Success);
+        Assert.That(publishAttempt.Success, Is.True);
     }
 
     [Test]
@@ -294,21 +294,21 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
             childContent.Key,
             [new() { Culture = langEn.IsoCode }],
             Constants.Security.SuperUserKey);
-        Assert.IsFalse(publishAttempt.Success);
-        Assert.AreEqual(ContentPublishingOperationStatus.PathNotPublished, publishAttempt.Status);
+        Assert.That(publishAttempt.Success, Is.False);
+        Assert.That(publishAttempt.Status, Is.EqualTo(ContentPublishingOperationStatus.PathNotPublished));
 
         // Now publish the parent and re-try publishing the child.
         publishAttempt = await ContentPublishingService.PublishAsync(
             parentContent.Key,
             [new() { Culture = langEn.IsoCode }],
             Constants.Security.SuperUserKey);
-        Assert.IsTrue(publishAttempt.Success);
+        Assert.That(publishAttempt.Success, Is.True);
 
         publishAttempt = await ContentPublishingService.PublishAsync(
             childContent.Key,
             [new() { Culture = langEn.IsoCode }],
             Constants.Security.SuperUserKey);
-        Assert.IsTrue(publishAttempt.Success);
+        Assert.That(publishAttempt.Success, Is.True);
     }
 
     [Test]
@@ -332,21 +332,21 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
             parentContent.Key,
             [new() { Culture = langEn.IsoCode }],
             Constants.Security.SuperUserKey);
-        Assert.IsTrue(publishAttempt.Success);
+        Assert.That(publishAttempt.Success, Is.True);
 
         // Publish child in English, should succeed.
         publishAttempt = await ContentPublishingService.PublishAsync(
             childContent.Key,
             [new() { Culture = langEn.IsoCode }],
             Constants.Security.SuperUserKey);
-        Assert.IsTrue(publishAttempt.Success);
+        Assert.That(publishAttempt.Success, Is.True);
 
         // Publish child in Danish, should also succeed.
         publishAttempt = await ContentPublishingService.PublishAsync(
             childContent.Key,
             [new() { Culture = langDa.IsoCode }],
             Constants.Security.SuperUserKey);
-        Assert.IsTrue(publishAttempt.Success);
+        Assert.That(publishAttempt.Success, Is.True);
     }
 
     [Test]
@@ -363,7 +363,7 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
                 new() { Culture = langBe.IsoCode },
             ],
             Constants.Security.SuperUserKey);
-        Assert.IsTrue(publishAttempt.Success);
+        Assert.That(publishAttempt.Success, Is.True);
 
         var content = ContentService.GetById(setupData.Key)!;
         var firstPublishDateEn = content.GetPublishDate(langEn.IsoCode)
@@ -379,15 +379,15 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
             content.Key,
             [new() { Culture = langEn.IsoCode }],
             Constants.Security.SuperUserKey);
-        Assert.IsTrue(publishAttempt.Success);
+        Assert.That(publishAttempt.Success, Is.True);
 
         content = ContentService.GetById(content.Key)!;
-        Assert.AreEqual(firstPublishDateDa, content.GetPublishDate(langDa.IsoCode));
-        Assert.AreEqual(firstPublishDateBe, content.GetPublishDate(langBe.IsoCode));
+        Assert.That(content.GetPublishDate(langDa.IsoCode), Is.EqualTo(firstPublishDateDa));
+        Assert.That(content.GetPublishDate(langBe.IsoCode), Is.EqualTo(firstPublishDateBe));
 
         var lastPublishDateEn = content.GetPublishDate(langEn.IsoCode)
                                 ?? throw new InvalidOperationException("Expected a publish date for EN");
-        Assert.Greater(lastPublishDateEn, firstPublishDateEn);
+        Assert.That(lastPublishDateEn, Is.GreaterThan(firstPublishDateEn));
     }
 
     [Test]
@@ -399,7 +399,7 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
         using (var scope = ScopeProvider.CreateScope())
         {
             var dtos = scope.Database.Fetch<PropertyDataDto>();
-            Assert.AreEqual(18, dtos.Count);  // 3 properties * 3 cultures * 2 (published + edited).
+            Assert.That(dtos, Has.Count.EqualTo(18));  // 3 properties * 3 cultures * 2 (published + edited).
             scope.Complete();
         }
 
@@ -407,12 +407,12 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
             content.Key,
             [new() { Culture = langEn.IsoCode }],
             Constants.Security.SuperUserKey);
-        Assert.IsTrue(publishAttempt.Success);
+        Assert.That(publishAttempt.Success, Is.True);
 
         using (var scope = ScopeProvider.CreateScope())
         {
             var dtos = scope.Database.Fetch<PropertyDataDto>();
-            Assert.AreEqual(19, dtos.Count); // + 3 for published populated title property, - 2 for existing published properties of other cultures.
+            Assert.That(dtos, Has.Count.EqualTo(19)); // + 3 for published populated title property, - 2 for existing published properties of other cultures.
             scope.Complete();
         }
     }

@@ -34,11 +34,11 @@ public class OriginalParentFolderElementRecycleBinControllerTests : ElementRecyc
             $"Test Folder {Guid.NewGuid()}",
             null,
             Constants.Security.SuperUserKey);
-        Assert.IsTrue(folderResult.Success, $"Folder create failed with status: {folderResult.Status}");
+        Assert.That(folderResult.Success, Is.True, $"Folder create failed with status: {folderResult.Status}");
         _folderKey = folderResult.Result!.Key;
 
         var moveResult = await ElementContainerService.MoveToRecycleBinAsync(_folderKey, Constants.Security.SuperUserKey);
-        Assert.IsTrue(moveResult.Success, $"Failed to move folder to recycle bin: {moveResult.Result}");
+        Assert.That(moveResult.Success, Is.True, $"Failed to move folder to recycle bin: {moveResult.Result}");
     }
 
     protected override Expression<Func<OriginalParentElementFolderRecycleBinController, object>> MethodSelector =>

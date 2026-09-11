@@ -199,7 +199,7 @@ internal sealed class FixLabelDataTypeDbTypeFromConfigurationTests : UmbracoInte
         };
 
         var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success, $"Failed to create content: {result.Status}");
+        Assert.That(result.Success, Is.True, $"Failed to create content: {result.Status}");
         return result.Result.Content!;
     }
 
@@ -263,7 +263,7 @@ internal sealed class FixLabelDataTypeDbTypeFromConfigurationTests : UmbracoInte
             "SELECT dbType FROM umbracoDataType WHERE nodeId = @0",
             dataTypeId);
         scope.Complete();
-        Assert.AreEqual(expected.ToString(), actual);
+        Assert.That(actual, Is.EqualTo(expected.ToString()));
     }
 
     private async Task AssertPropertyDataMoved(int propertyTypeId, string expectedTextValue)
@@ -276,11 +276,11 @@ internal sealed class FixLabelDataTypeDbTypeFromConfigurationTests : UmbracoInte
         var rows = await scope.Database.FetchAsync<PropertyDataDto>(sql);
         scope.Complete();
 
-        Assert.IsNotEmpty(rows);
+        Assert.That(rows, Is.Not.Empty);
         foreach (var row in rows)
         {
-            Assert.AreEqual(expectedTextValue, row.TextValue);
-            Assert.IsNull(row.VarcharValue);
+            Assert.That(row.TextValue, Is.EqualTo(expectedTextValue));
+            Assert.That(row.VarcharValue, Is.Null);
         }
     }
 

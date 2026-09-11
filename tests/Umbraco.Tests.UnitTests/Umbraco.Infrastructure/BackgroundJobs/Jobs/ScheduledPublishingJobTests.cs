@@ -76,8 +76,8 @@ public class ScheduledPublishingJobTests
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(TimeSpan.FromSeconds(10), sut.Period);
-            Assert.IsTrue(sut.AlignToClock);
+            Assert.That(sut.Period, Is.EqualTo(TimeSpan.FromSeconds(10)));
+            Assert.That(sut.AlignToClock, Is.True);
         });
     }
 

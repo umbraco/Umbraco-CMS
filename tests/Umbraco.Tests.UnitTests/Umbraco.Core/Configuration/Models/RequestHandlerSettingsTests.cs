@@ -23,7 +23,7 @@ public class RequestHandlerSettingsTests
         var expectedCollection = RequestHandlerSettings.DefaultCharCollection.ToList();
         expectedCollection.AddRange(settings.UserDefinedCharCollection);
 
-        Assert.AreEqual(expectedCollection.Count, actual.Count);
+        Assert.That(actual, Has.Count.EqualTo(expectedCollection.Count));
         Assert.That(actual, Is.EquivalentTo(expectedCollection));
     }
 
@@ -41,7 +41,7 @@ public class RequestHandlerSettingsTests
         };
         var actual = settings.GetCharReplacements().ToList();
 
-        Assert.AreEqual(settings.UserDefinedCharCollection.Count(), actual.Count);
+        Assert.That(actual, Has.Count.EqualTo(settings.UserDefinedCharCollection.Count()));
         Assert.That(actual, Is.EquivalentTo(settings.UserDefinedCharCollection));
     }
 
@@ -58,7 +58,7 @@ public class RequestHandlerSettingsTests
         };
         var actual = settings.GetCharReplacements().ToList();
 
-        Assert.AreEqual(RequestHandlerSettings.DefaultCharCollection.Length, actual.Count);
+        Assert.That(actual, Has.Count.EqualTo(RequestHandlerSettings.DefaultCharCollection.Length));
 
         Assert.That(actual, Has.Exactly(1).Matches<CharItem>(x => x.Char == "%" && x.Replacement == "percent"));
         Assert.That(actual, Has.Exactly(1).Matches<CharItem>(x => x.Char == "." && x.Replacement == "dot"));
@@ -81,7 +81,7 @@ public class RequestHandlerSettingsTests
         var actual = settings.GetCharReplacements().ToList();
 
         // Add 1 to the length, because we're expecting to only add one new one
-        Assert.AreEqual(RequestHandlerSettings.DefaultCharCollection.Length + 1, actual.Count);
+        Assert.That(actual, Has.Count.EqualTo(RequestHandlerSettings.DefaultCharCollection.Length + 1));
 
         Assert.That(actual, Has.Exactly(1).Matches<CharItem>(x => x.Char == "%" && x.Replacement == "percent"));
         Assert.That(actual, Has.Exactly(1).Matches<CharItem>(x => x.Char == "." && x.Replacement == "dot"));

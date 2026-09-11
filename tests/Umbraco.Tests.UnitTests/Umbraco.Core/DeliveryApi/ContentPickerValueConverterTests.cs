@@ -29,7 +29,7 @@ public class ContentPickerValueConverterTests : PropertyValueConverterTests
         publishedPropertyType.SetupGet(p => p.Alias).Returns("test");
 
         var valueConverter = CreateValueConverter();
-        Assert.AreEqual(typeof(IApiContent), valueConverter.GetDeliveryApiPropertyValueType(publishedPropertyType.Object));
+        Assert.That(valueConverter.GetDeliveryApiPropertyValueType(publishedPropertyType.Object), Is.EqualTo(typeof(IApiContent)));
         var result = valueConverter.ConvertIntermediateToDeliveryApiObject(
             Mock.Of<IPublishedContent>(),
             publishedPropertyType.Object,
@@ -38,12 +38,12 @@ public class ContentPickerValueConverterTests : PropertyValueConverterTests
             false,
             false) as IApiContent;
 
-        Assert.NotNull(result);
-        Assert.AreEqual("The page", result.Name);
-        Assert.AreEqual(PublishedContent.Key, result.Id);
-        Assert.AreEqual("/the-page-url/", result.Route.Path);
-        Assert.AreEqual("TheContentType", result.ContentType);
-        Assert.IsEmpty(result.Properties);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Name, Is.EqualTo("The page"));
+        Assert.That(result.Id, Is.EqualTo(PublishedContent.Key));
+        Assert.That(result.Route.Path, Is.EqualTo("/the-page-url/"));
+        Assert.That(result.ContentType, Is.EqualTo("TheContentType"));
+        Assert.That(result.Properties, Is.Empty);
     }
 
     [Test]
@@ -64,8 +64,8 @@ public class ContentPickerValueConverterTests : PropertyValueConverterTests
             false,
             false) as IApiContent;
 
-        Assert.NotNull(result);
-        Assert.AreEqual("Custom name for: The page", result.Name);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Name, Is.EqualTo("Custom name for: The page"));
     }
 
     [Test]
@@ -99,7 +99,7 @@ public class ContentPickerValueConverterTests : PropertyValueConverterTests
             .Returns(content.Object);
 
         var valueConverter = CreateValueConverter();
-        Assert.AreEqual(typeof(IApiContent), valueConverter.GetDeliveryApiPropertyValueType(publishedPropertyType.Object));
+        Assert.That(valueConverter.GetDeliveryApiPropertyValueType(publishedPropertyType.Object), Is.EqualTo(typeof(IApiContent)));
         var result = valueConverter.ConvertIntermediateToDeliveryApiObject(
             Mock.Of<IPublishedContent>(),
             publishedPropertyType.Object,
@@ -108,14 +108,14 @@ public class ContentPickerValueConverterTests : PropertyValueConverterTests
             false,
             false) as IApiContent;
 
-        Assert.NotNull(result);
-        Assert.AreEqual("The page", result.Name);
-        Assert.AreEqual(content.Object.Key, result.Id);
-        Assert.AreEqual("/page-url-segment/", result.Route.Path);
-        Assert.AreEqual("TheContentType", result.ContentType);
-        Assert.AreEqual(2, result.Properties.Count);
-        Assert.AreEqual("Delivery API value", result.Properties[DeliveryApiPropertyType.Alias]);
-        Assert.AreEqual("Default value", result.Properties[DefaultPropertyType.Alias]);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Name, Is.EqualTo("The page"));
+        Assert.That(result.Id, Is.EqualTo(content.Object.Key));
+        Assert.That(result.Route.Path, Is.EqualTo("/page-url-segment/"));
+        Assert.That(result.ContentType, Is.EqualTo("TheContentType"));
+        Assert.That(result.Properties, Has.Count.EqualTo(2));
+        Assert.That(result.Properties[DeliveryApiPropertyType.Alias], Is.EqualTo("Delivery API value"));
+        Assert.That(result.Properties[DefaultPropertyType.Alias], Is.EqualTo("Default value"));
     }
 
     [Test]
@@ -133,9 +133,9 @@ public class ContentPickerValueConverterTests : PropertyValueConverterTests
             true,
             false) as IApiContent;
 
-        Assert.NotNull(result);
-        Assert.AreEqual("The page (draft)", result.Name);
-        Assert.AreEqual(DraftContent.Key, result.Id);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Name, Is.EqualTo("The page (draft)"));
+        Assert.That(result.Id, Is.EqualTo(DraftContent.Key));
     }
 
     [Test]
@@ -153,7 +153,7 @@ public class ContentPickerValueConverterTests : PropertyValueConverterTests
             false,
             false);
 
-        Assert.Null(result);
+        Assert.That(result, Is.Null);
     }
 
     [Test]
@@ -170,9 +170,9 @@ public class ContentPickerValueConverterTests : PropertyValueConverterTests
             new GuidUdi(Constants.UdiEntityType.Document, DraftContent.Key),
             true);
 
-        Assert.NotNull(result);
-        Assert.IsInstanceOf<IPublishedContent>(result);
-        Assert.AreEqual(DraftContent.Key, ((IPublishedContent)result).Key);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result, Is.InstanceOf<IPublishedContent>());
+        Assert.That(((IPublishedContent)result).Key, Is.EqualTo(DraftContent.Key));
     }
 
     [Test]
@@ -189,7 +189,7 @@ public class ContentPickerValueConverterTests : PropertyValueConverterTests
             new GuidUdi(Constants.UdiEntityType.Document, DraftContent.Key),
             false);
 
-        Assert.Null(result);
+        Assert.That(result, Is.Null);
     }
 
     [TestCase(Constants.Conventions.Content.InternalRedirectId)]
@@ -209,6 +209,6 @@ public class ContentPickerValueConverterTests : PropertyValueConverterTests
             inter,
             false);
 
-        Assert.AreEqual(inter, result);
+        Assert.That(result, Is.EqualTo(inter));
     }
 }

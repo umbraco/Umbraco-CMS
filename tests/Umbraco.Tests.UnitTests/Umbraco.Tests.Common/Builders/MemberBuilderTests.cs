@@ -121,29 +121,29 @@ public class MemberBuilderTests
             .Build();
 
         // Assert
-        Assert.AreEqual(testMemberTypeId, member.ContentTypeId);
-        Assert.AreEqual(testMemberTypeAlias, member.ContentType.Alias);
-        Assert.AreEqual(testMemberTypeName, member.ContentType.Name);
-        Assert.AreEqual(testId, member.Id);
-        Assert.AreEqual(testKey, member.Key);
-        Assert.AreEqual(testName, member.Name);
-        Assert.AreEqual(testCreateDate, member.CreateDate);
-        Assert.AreEqual(testUpdateDate, member.UpdateDate);
-        Assert.AreEqual(testCreatorId, member.CreatorId);
-        Assert.AreEqual(testFailedPasswordAttempts, member.FailedPasswordAttempts);
-        Assert.AreEqual(testIsApproved, member.IsApproved);
-        Assert.AreEqual(testIsLockedOut, member.IsLockedOut);
-        Assert.AreEqual(testLastLockoutDate, member.LastLockoutDate);
-        Assert.AreEqual(testLastLoginDate, member.LastLoginDate);
-        Assert.AreEqual(testLastPasswordChangeDate, member.LastPasswordChangeDate);
-        Assert.AreEqual(testGroups, member.Groups.ToArray());
-        Assert.AreEqual(4, member.Properties.Count); // 1 from membership properties group, 3 custom
-        Assert.AreEqual(testPropertyData1.Value, member.GetValue<string>(testPropertyData1.Key));
-        Assert.AreEqual(testPropertyData2.Value, member.GetValue<string>(testPropertyData2.Key));
-        Assert.AreEqual(testPropertyData3.Value, member.GetValue<string>(testPropertyData3.Key));
+        Assert.That(member.ContentTypeId, Is.EqualTo(testMemberTypeId));
+        Assert.That(member.ContentType.Alias, Is.EqualTo(testMemberTypeAlias));
+        Assert.That(member.ContentType.Name, Is.EqualTo(testMemberTypeName));
+        Assert.That(member.Id, Is.EqualTo(testId));
+        Assert.That(member.Key, Is.EqualTo(testKey));
+        Assert.That(member.Name, Is.EqualTo(testName));
+        Assert.That(member.CreateDate, Is.EqualTo(testCreateDate));
+        Assert.That(member.UpdateDate, Is.EqualTo(testUpdateDate));
+        Assert.That(member.CreatorId, Is.EqualTo(testCreatorId));
+        Assert.That(member.FailedPasswordAttempts, Is.EqualTo(testFailedPasswordAttempts));
+        Assert.That(member.IsApproved, Is.EqualTo(testIsApproved));
+        Assert.That(member.IsLockedOut, Is.EqualTo(testIsLockedOut));
+        Assert.That(member.LastLockoutDate, Is.EqualTo(testLastLockoutDate));
+        Assert.That(member.LastLoginDate, Is.EqualTo(testLastLoginDate));
+        Assert.That(member.LastPasswordChangeDate, Is.EqualTo(testLastPasswordChangeDate));
+        Assert.That(member.Groups.ToArray(), Is.EqualTo(testGroups));
+        Assert.That(member.Properties, Has.Count.EqualTo(4)); // 1 from membership properties group, 3 custom
+        Assert.That(member.GetValue<string>(testPropertyData1.Key), Is.EqualTo(testPropertyData1.Value));
+        Assert.That(member.GetValue<string>(testPropertyData2.Key), Is.EqualTo(testPropertyData2.Value));
+        Assert.That(member.GetValue<string>(testPropertyData3.Key), Is.EqualTo(testPropertyData3.Value));
 
         var propertyIds = member.Properties.Select(x => x.Id).OrderBy(x => x).ToArray();
-        Assert.AreEqual(testPropertyIdsIncrementingFrom + 1, propertyIds.Min());
-        Assert.AreEqual(testPropertyIdsIncrementingFrom + 4, propertyIds.Max());
+        Assert.That(propertyIds.Min(), Is.EqualTo(testPropertyIdsIncrementingFrom + 1));
+        Assert.That(propertyIds.Max(), Is.EqualTo(testPropertyIdsIncrementingFrom + 4));
     }
 }

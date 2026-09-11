@@ -3,7 +3,7 @@
 
 using System.Threading;
 using System.Threading.Tasks;
-using AutoFixture.NUnit3;
+using AutoFixture.NUnit4;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
@@ -35,7 +35,7 @@ public class TaskHelperTests
 
         Task.WaitAll(t);
 
-        Assert.IsNull(taskResult);
+        Assert.That(taskResult, Is.Null);
     }
 
     [Test]
@@ -53,7 +53,7 @@ public class TaskHelperTests
 
         Task.WaitAll(t);
 
-        Assert.AreEqual(1, i);
+        Assert.That(i, Is.EqualTo(1));
     }
 
     [Test]

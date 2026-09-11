@@ -151,7 +151,7 @@ public partial class IndexedEntitySearchServiceTests
         {
             Assert.That(result.Total, Is.EqualTo(expectedTotal));
             IDocumentEntitySlim[] items = result.Items.OfType<IDocumentEntitySlim>().ToArray();
-            Assert.That(items.Length, Is.EqualTo(expectedTotal));
+            Assert.That(items, Has.Length.EqualTo(expectedTotal));
             Assert.That(items.All(item => item.ContentTypeAlias == contentTypeAlias), Is.True);
         });
     }
@@ -174,7 +174,7 @@ public partial class IndexedEntitySearchServiceTests
         {
             Assert.That(result.Total, Is.EqualTo(10));
             IDocumentEntitySlim[] items = result.Items.OfType<IDocumentEntitySlim>().ToArray();
-            Assert.That(items.Length, Is.EqualTo(10));
+            Assert.That(items, Has.Length.EqualTo(10));
             Assert.That(items.All(item => item.ContentTypeAlias is "childContentType"), Is.True);
             Assert.That(items.All(item => item.ParentId == root.Id), Is.True);
         });

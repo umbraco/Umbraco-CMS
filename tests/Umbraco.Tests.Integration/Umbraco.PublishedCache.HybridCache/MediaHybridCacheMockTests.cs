@@ -98,8 +98,8 @@ internal sealed class MediaHybridCacheMockTests : UmbracoIntegrationTest
 
         IReadOnlyList<IPublishedContent> result = await _mediaCacheService.GetByKeysAsync(keys);
 
-        Assert.AreEqual(1, result.Count);
-        Assert.AreEqual(_mediaItem.Key, result[0].Key);
+        Assert.That(result, Has.Count.EqualTo(1));
+        Assert.That(result[0].Key, Is.EqualTo(_mediaItem.Key));
 
         // The single batched query is used; the per-item single query is never called.
         _mockDatabaseCacheRepository.Verify(x => x.GetMediaSourcesAsync(It.IsAny<IEnumerable<Guid>>()), Times.Once);
@@ -116,12 +116,12 @@ internal sealed class MediaHybridCacheMockTests : UmbracoIntegrationTest
         _mockDatabaseCacheRepository.Verify(x => x.GetMediaSourcesAsync(It.IsAny<IEnumerable<Guid>>()), Times.Once);
 
         // Now served from the in-memory (L0) cache — the sync fast path hits.
-        Assert.IsTrue(_mediaCacheService.TryGetCached(_mediaItem.Key, out IPublishedContent? cached));
-        Assert.IsNotNull(cached);
+        Assert.That(_mediaCacheService.TryGetCached(_mediaItem.Key, out IPublishedContent? cached), Is.True);
+        Assert.That(cached, Is.Not.Null);
 
         // And a further retrieval makes no additional database call.
         var again = await _mediaCacheService.GetByKeyAsync(_mediaItem.Key);
-        Assert.IsNotNull(again);
+        Assert.That(again, Is.Not.Null);
         _mockDatabaseCacheRepository.Verify(x => x.GetMediaSourcesAsync(It.IsAny<IEnumerable<Guid>>()), Times.Once);
         _mockDatabaseCacheRepository.Verify(x => x.GetMediaSourceAsync(It.IsAny<Guid>()), Times.Never);
     }
@@ -139,7 +139,7 @@ internal sealed class MediaHybridCacheMockTests : UmbracoIntegrationTest
 
         IReadOnlyList<IPublishedContent> result = await _mediaCacheService.GetByKeysAsync([missingKey]);
 
-        Assert.IsEmpty(result);
+        Assert.That(result, Is.Empty);
         _mockDatabaseCacheRepository.Verify(x => x.GetMediaSourcesAsync(It.IsAny<IEnumerable<Guid>>()), Times.Never);
     }
 
@@ -148,7 +148,7 @@ internal sealed class MediaHybridCacheMockTests : UmbracoIntegrationTest
     {
         IReadOnlyList<IPublishedContent> result = await _mediaCacheService.GetByKeysAsync(Array.Empty<Guid>());
 
-        Assert.IsEmpty(result);
+        Assert.That(result, Is.Empty);
         _mockDatabaseCacheRepository.Verify(x => x.GetMediaSourcesAsync(It.IsAny<IEnumerable<Guid>>()), Times.Never);
         _mockDatabaseCacheRepository.Verify(x => x.GetMediaSourceAsync(It.IsAny<Guid>()), Times.Never);
     }
@@ -165,9 +165,9 @@ internal sealed class MediaHybridCacheMockTests : UmbracoIntegrationTest
 
         IReadOnlyList<IPublishedContent> result = await _mediaCacheService.GetByKeysAsync(keys);
 
-        Assert.AreEqual(2, result.Count);
-        Assert.AreEqual(_mediaItem.Key, result[0].Key);
-        Assert.AreEqual(_mediaItem.Key, result[1].Key);
+        Assert.That(result, Has.Count.EqualTo(2));
+        Assert.That(result[0].Key, Is.EqualTo(_mediaItem.Key));
+        Assert.That(result[1].Key, Is.EqualTo(_mediaItem.Key));
 
         _mockDatabaseCacheRepository.Verify(
             x => x.GetMediaSourcesAsync(It.Is<IEnumerable<Guid>>(k => k.Count() == 1 && k.Contains(_mediaItem.Key))),
@@ -209,7 +209,7 @@ internal sealed class MediaHybridCacheMockTests : UmbracoIntegrationTest
         Guid[] requestOrder = [mediaC.Key, mediaB.Key, _mediaItem.Key];
         IReadOnlyList<IPublishedContent> result = await _mediaCacheService.GetByKeysAsync(requestOrder);
 
-        CollectionAssert.AreEqual(requestOrder, result.Select(x => x.Key));
+        Assert.That(result.Select(x => x.Key), Is.EqualTo(requestOrder).AsCollection);
     }
 
     private static ContentCacheNode BuildMediaCacheNode(Media media, int mediaTypeId) =>

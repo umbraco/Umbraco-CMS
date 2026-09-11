@@ -39,7 +39,7 @@ public partial class ContentBlueprintEditingServiceTests : ContentEditingService
         };
 
         var result = await ContentBlueprintEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
         return result.Result.Content!;
     }
 
@@ -65,7 +65,7 @@ public partial class ContentBlueprintEditingServiceTests : ContentEditingService
         };
 
         var result = await ContentBlueprintEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
         return result.Result.Content!;
     }
 

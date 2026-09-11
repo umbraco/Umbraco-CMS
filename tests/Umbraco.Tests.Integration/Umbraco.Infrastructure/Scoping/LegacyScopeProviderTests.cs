@@ -16,7 +16,7 @@ internal sealed class LegacyScopeProviderTests : UmbracoIntegrationTest
 
         using (var scope = scopeProvider.CreateScope())
         {
-            Assert.IsInstanceOf<IScope>(scope);
+            Assert.That(scope, Is.InstanceOf<IScope>());
         }
     }
 
@@ -25,6 +25,6 @@ internal sealed class LegacyScopeProviderTests : UmbracoIntegrationTest
     {
         var scopeProvider = GetRequiredService<IScopeProvider>();
 
-        Assert.IsInstanceOf<ICoreScopeProvider>(scopeProvider);
+        Assert.That(scopeProvider, Is.InstanceOf<ICoreScopeProvider>());
     }
 }

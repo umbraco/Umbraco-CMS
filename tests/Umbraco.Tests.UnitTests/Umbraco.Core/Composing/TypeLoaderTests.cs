@@ -106,11 +106,11 @@ public class TypeLoaderTests
         var hash3 = GetFileHash(list3, new ProfilingLogger(Mock.Of<ILogger<ProfilingLogger>>(), Mock.Of<IProfiler>()));
 
         // Assert
-        Assert.AreNotEqual(hash1, hash2);
-        Assert.AreNotEqual(hash1, hash3);
-        Assert.AreNotEqual(hash2, hash3);
+        Assert.That(hash2, Is.Not.EqualTo(hash1));
+        Assert.That(hash3, Is.Not.EqualTo(hash1));
+        Assert.That(hash3, Is.Not.EqualTo(hash2));
 
-        Assert.AreEqual(hash1, GetFileHash(list1, new ProfilingLogger(Mock.Of<ILogger<ProfilingLogger>>(), Mock.Of<IProfiler>())));
+        Assert.That(GetFileHash(list1, new ProfilingLogger(Mock.Of<ILogger<ProfilingLogger>>(), Mock.Of<IProfiler>())), Is.EqualTo(hash1));
     }
 
     [Test]
@@ -118,21 +118,21 @@ public class TypeLoaderTests
     {
         _ = _typeLoader.ResolveFindMeTypes();
         _ = _typeLoader.ResolveFindMeTypes();
-        Assert.AreEqual(1, _typeLoader.TypeLists.Count(x => x.BaseType == typeof(IFindMe) && x.AttributeType == null));
+        Assert.That(_typeLoader.TypeLists.Count(x => x.BaseType == typeof(IFindMe) && x.AttributeType == null), Is.EqualTo(1));
     }
 
     [Test]
     public void Resolves_Types()
     {
         var foundTypes1 = _typeLoader.ResolveFindMeTypes();
-        Assert.AreEqual(2, foundTypes1.Count());
+        Assert.That(foundTypes1.Count(), Is.EqualTo(2));
     }
 
     [Test]
     public void GetDataEditors()
     {
         var types = _typeLoader.GetDataEditors();
-        Assert.AreEqual(43, types.Count());
+        Assert.That(types.Count(), Is.EqualTo(43));
     }
 
     /// <summary>
@@ -151,12 +151,12 @@ public class TypeLoaderTests
 
         var found = types.SingleOrDefault(x => x.BaseType == typeof(DataEditor) && x.AttributeType == null);
 
-        Assert.IsNotNull(found);
+        Assert.That(found, Is.Not.Null);
 
         // This should not find a type list of this type
         var shouldNotFind = types.SingleOrDefault(x => x.BaseType == typeof(IDataEditor) && x.AttributeType == null);
 
-        Assert.IsNull(shouldNotFind);
+        Assert.That(shouldNotFind, Is.Null);
     }
 
     public interface IFindMe : IDiscoverable

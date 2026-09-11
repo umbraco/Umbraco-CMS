@@ -29,7 +29,7 @@ public class DeleteTemplateControllerProductionModeTests : ManagementApiTest<Del
     {
         var alias = "test" + Guid.NewGuid().ToString("N");
         var result = await TemplateService.CreateAsync(alias, alias, "<h1>Test</h1>", Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
         _template = result.Result;
 
         MethodSelector = x => x.Delete(CancellationToken.None, _template.Key);
@@ -42,6 +42,6 @@ public class DeleteTemplateControllerProductionModeTests : ManagementApiTest<Del
     {
         var response = await Client.DeleteAsync(Url);
 
-        Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
     }
 }

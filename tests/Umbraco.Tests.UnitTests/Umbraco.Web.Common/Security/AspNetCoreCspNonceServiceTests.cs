@@ -62,7 +62,7 @@ public class AspNetCoreCspNonceServiceTests
 
         // 32 bytes generates ~44 character Base64 string (with padding).
         var decodedBytes = Convert.FromBase64String(result!);
-        Assert.That(decodedBytes.Length, Is.EqualTo(32));
+        Assert.That(decodedBytes, Has.Length.EqualTo(32));
     }
 
     [Test]

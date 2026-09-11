@@ -45,7 +45,7 @@ public class HybridCacheExtensionsTests
         var exists = await HybridCacheExtensions.ExistsAsync<ContentCacheNode?>(_cacheMock.Object, key, CancellationToken.None);
 
         // Assert
-        Assert.IsTrue(exists);
+        Assert.That(exists, Is.True);
     }
 
     [Test]
@@ -77,7 +77,7 @@ public class HybridCacheExtensionsTests
         var exists = await HybridCacheExtensions.ExistsAsync<ContentCacheNode?>(_cacheMock.Object, key, CancellationToken.None);
 
         // Assert
-        Assert.IsFalse(exists);
+        Assert.That(exists, Is.False);
     }
 
     [Test]
@@ -101,8 +101,8 @@ public class HybridCacheExtensionsTests
         var (exists, value) = await HybridCacheExtensions.TryGetValueAsync<string>(_cacheMock.Object, key, CancellationToken.None);
 
         // Assert
-        Assert.IsTrue(exists);
-        Assert.AreEqual(expectedValue, value);
+        Assert.That(exists, Is.True);
+        Assert.That(value, Is.EqualTo(expectedValue));
     }
 
     [Test]
@@ -126,8 +126,8 @@ public class HybridCacheExtensionsTests
         var (exists, value) = await HybridCacheExtensions.TryGetValueAsync<int>(_cacheMock.Object, key, CancellationToken.None);
 
         // Assert
-        Assert.IsTrue(exists);
-        Assert.AreEqual(expectedValue, value);
+        Assert.That(exists, Is.True);
+        Assert.That(value, Is.EqualTo(expectedValue));
     }
 
     [Test]
@@ -150,8 +150,8 @@ public class HybridCacheExtensionsTests
         var (exists, value) = await HybridCacheExtensions.TryGetValueAsync<int?>(_cacheMock.Object, key, CancellationToken.None);
 
         // Assert
-        Assert.IsTrue(exists);
-        Assert.IsNull(value);
+        Assert.That(exists, Is.True);
+        Assert.That(value, Is.Null);
     }
 
     [Test]
@@ -182,7 +182,7 @@ public class HybridCacheExtensionsTests
         var (exists, value) = await HybridCacheExtensions.TryGetValueAsync<object>(_cacheMock.Object, key, CancellationToken.None);
 
         // Assert
-        Assert.IsFalse(exists);
-        Assert.IsNull(value);
+        Assert.That(exists, Is.False);
+        Assert.That(value, Is.Null);
     }
 }

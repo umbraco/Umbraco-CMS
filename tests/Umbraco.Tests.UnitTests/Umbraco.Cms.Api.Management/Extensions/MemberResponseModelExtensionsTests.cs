@@ -27,13 +27,13 @@ public class MemberResponseModelExtensionsTests
 
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(responseModel.IsApproved);
-            Assert.IsFalse(responseModel.IsLockedOut);
-            Assert.IsFalse(responseModel.IsTwoFactorEnabled);
-            Assert.AreEqual(0, responseModel.FailedPasswordAttempts);
-            Assert.IsNull(responseModel.LastLoginDate);
-            Assert.IsNull(responseModel.LastLockoutDate);
-            Assert.IsNull(responseModel.LastPasswordChangeDate);
+            Assert.That(responseModel.IsApproved, Is.False);
+            Assert.That(responseModel.IsLockedOut, Is.False);
+            Assert.That(responseModel.IsTwoFactorEnabled, Is.False);
+            Assert.That(responseModel.FailedPasswordAttempts, Is.EqualTo(0));
+            Assert.That(responseModel.LastLoginDate, Is.Null);
+            Assert.That(responseModel.LastLockoutDate, Is.Null);
+            Assert.That(responseModel.LastPasswordChangeDate, Is.Null);
         });
     }
 
@@ -46,13 +46,13 @@ public class MemberResponseModelExtensionsTests
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(responseModel.IsApproved);
-            Assert.IsTrue(responseModel.IsLockedOut);
-            Assert.IsTrue(responseModel.IsTwoFactorEnabled);
-            Assert.AreEqual(5, responseModel.FailedPasswordAttempts);
-            Assert.AreEqual(_lastLoginDate, responseModel.LastLoginDate);
-            Assert.AreEqual(_lastLockoutDate, responseModel.LastLockoutDate);
-            Assert.AreEqual(_lastPasswordChangeDate, responseModel.LastPasswordChangeDate);
+            Assert.That(responseModel.IsApproved, Is.True);
+            Assert.That(responseModel.IsLockedOut, Is.True);
+            Assert.That(responseModel.IsTwoFactorEnabled, Is.True);
+            Assert.That(responseModel.FailedPasswordAttempts, Is.EqualTo(5));
+            Assert.That(responseModel.LastLoginDate, Is.EqualTo(_lastLoginDate));
+            Assert.That(responseModel.LastLockoutDate, Is.EqualTo(_lastLockoutDate));
+            Assert.That(responseModel.LastPasswordChangeDate, Is.EqualTo(_lastPasswordChangeDate));
         });
     }
 
@@ -69,14 +69,14 @@ public class MemberResponseModelExtensionsTests
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(id, responseModel.Id);
-            Assert.AreEqual("member@umbraco.com", responseModel.Email);
-            Assert.AreEqual("member", responseModel.Username);
-            Assert.AreEqual(MemberKind.Default, responseModel.Kind);
-            Assert.AreEqual("{ \"claim\": \"value\" }", responseModel.ProfileData);
-            Assert.AreEqual(groupKey, responseModel.Groups.Single());
-            Assert.AreEqual("title", responseModel.Values.Single().Alias);
-            Assert.AreEqual("Test Member", responseModel.Variants.Single().Name);
+            Assert.That(responseModel.Id, Is.EqualTo(id));
+            Assert.That(responseModel.Email, Is.EqualTo("member@umbraco.com"));
+            Assert.That(responseModel.Username, Is.EqualTo("member"));
+            Assert.That(responseModel.Kind, Is.EqualTo(MemberKind.Default));
+            Assert.That(responseModel.ProfileData, Is.EqualTo("{ \"claim\": \"value\" }"));
+            Assert.That(responseModel.Groups.Single(), Is.EqualTo(groupKey));
+            Assert.That(responseModel.Values.Single().Alias, Is.EqualTo("title"));
+            Assert.That(responseModel.Variants.Single().Name, Is.EqualTo("Test Member"));
         });
     }
 

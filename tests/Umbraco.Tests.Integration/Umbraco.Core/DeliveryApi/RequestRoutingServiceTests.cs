@@ -61,6 +61,6 @@ public class RequestRoutingServiceTests : UmbracoIntegrationTest
         }
 
         var result = RequestRoutingService.GetContentRoute(requestedRoute);
-        Assert.AreEqual(expectedResult, result);
+        Assert.That(result, Is.EqualTo(expectedResult));
     }
 }

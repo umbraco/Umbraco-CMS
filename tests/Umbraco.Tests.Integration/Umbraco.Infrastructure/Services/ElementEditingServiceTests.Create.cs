@@ -33,8 +33,8 @@ public partial class ElementEditingServiceTests
 
         var result = await ElementEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
 
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.Success));
         VerifyCreate(result.Result.Content);
 
         // re-get and re-test
@@ -42,12 +42,12 @@ public partial class ElementEditingServiceTests
 
         static void VerifyCreate(IElement? createdElement)
         {
-            Assert.IsNotNull(createdElement);
-            Assert.AreNotEqual(Guid.Empty, createdElement.Key);
-            Assert.IsTrue(createdElement.HasIdentity);
-            Assert.AreEqual("Test Create", createdElement.Name);
-            Assert.AreEqual("The title value", createdElement.GetValue<string>("title"));
-            Assert.AreEqual("The text value", createdElement.GetValue<string>("text"));
+            Assert.That(createdElement, Is.Not.Null);
+            Assert.That(createdElement.Key, Is.Not.Empty);
+            Assert.That(createdElement.HasIdentity, Is.True);
+            Assert.That(createdElement.Name, Is.EqualTo("Test Create"));
+            Assert.That(createdElement.GetValue<string>("title"), Is.EqualTo("The title value"));
+            Assert.That(createdElement.GetValue<string>("text"), Is.EqualTo("The text value"));
         }
     }
 
@@ -77,15 +77,15 @@ public partial class ElementEditingServiceTests
         };
 
         var result = await ElementEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
 
         var element = await ElementEditingService.GetAsync(elementKey);
-        Assert.NotNull(element);
-        Assert.AreEqual(container.Id, element.ParentId);
+        Assert.That(element, Is.Not.Null);
+        Assert.That(element.ParentId, Is.EqualTo(container.Id));
 
         var children = GetFolderChildren(containerKey);
-        Assert.AreEqual(1, children.Length);
-        Assert.AreEqual(elementKey, children[0].Key);
+        Assert.That(children, Has.Length.EqualTo(1));
+        Assert.That(children[0].Key, Is.EqualTo(elementKey));
     }
 
     [Test]
@@ -104,12 +104,12 @@ public partial class ElementEditingServiceTests
         };
 
         var result = await ElementEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
-        Assert.IsNotNull(result.Result);
-        Assert.IsTrue(result.Result.Content!.HasIdentity);
-        Assert.AreEqual(null, result.Result.Content!.GetValue<string>("title"));
-        Assert.AreEqual(null, result.Result.Content!.GetValue<string>("text"));
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.Success));
+        Assert.That(result.Result, Is.Not.Null);
+        Assert.That(result.Result.Content!.HasIdentity, Is.True);
+        Assert.That(result.Result.Content!.GetValue<string>("title"), Is.EqualTo(null));
+        Assert.That(result.Result.Content!.GetValue<string>("text"), Is.EqualTo(null));
     }
 
     [TestCase(true)]
@@ -142,21 +142,21 @@ public partial class ElementEditingServiceTests
         var result = await ElementEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
 
         // success is expected regardless of property level validation - the validation error status is communicated in the attempt status (see below)
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(addValidProperties ? ContentEditingOperationStatus.Success : ContentEditingOperationStatus.PropertyValidationError, result.Status);
-        Assert.IsNotNull(result.Result);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(addValidProperties ? ContentEditingOperationStatus.Success : ContentEditingOperationStatus.PropertyValidationError));
+        Assert.That(result.Result, Is.Not.Null);
 
         if (addValidProperties is false)
         {
-            Assert.AreEqual(2, result.Result.ValidationResult.ValidationErrors.Count());
-            Assert.IsNotNull(result.Result.ValidationResult.ValidationErrors.FirstOrDefault(v => v.Alias == "title" && v.ErrorMessages.Length == 1));
-            Assert.IsNotNull(result.Result.ValidationResult.ValidationErrors.FirstOrDefault(v => v.Alias == "text" && v.ErrorMessages.Length == 1));
+            Assert.That(result.Result.ValidationResult.ValidationErrors.Count(), Is.EqualTo(2));
+            Assert.That(result.Result.ValidationResult.ValidationErrors.FirstOrDefault(v => v.Alias == "title" && v.ErrorMessages.Length == 1), Is.Not.Null);
+            Assert.That(result.Result.ValidationResult.ValidationErrors.FirstOrDefault(v => v.Alias == "text" && v.ErrorMessages.Length == 1), Is.Not.Null);
         }
 
         // NOTE: creation must be successful, even if the mandatory property is missing (publishing however should not!)
-        Assert.IsTrue(result.Result.Content!.HasIdentity);
-        Assert.AreEqual(titleValue, result.Result.Content!.GetValue<string>("title"));
-        Assert.AreEqual(textValue, result.Result.Content!.GetValue<string>("text"));
+        Assert.That(result.Result.Content!.HasIdentity, Is.True);
+        Assert.That(result.Result.Content!.GetValue<string>("title"), Is.EqualTo(titleValue));
+        Assert.That(result.Result.Content!.GetValue<string>("text"), Is.EqualTo(textValue));
     }
 
     [Test]
@@ -177,15 +177,15 @@ public partial class ElementEditingServiceTests
         };
 
         var result = await ElementEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
-        Assert.IsNotNull(result.Result.Content);
-        Assert.IsTrue(result.Result.Content.HasIdentity);
-        Assert.AreEqual(key, result.Result.Content.Key);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.Success));
+        Assert.That(result.Result.Content, Is.Not.Null);
+        Assert.That(result.Result.Content.HasIdentity, Is.True);
+        Assert.That(result.Result.Content.Key, Is.EqualTo(key));
 
         var element = await ElementEditingService.GetAsync(key);
-        Assert.IsNotNull(element);
-        Assert.AreEqual(result.Result.Content.Id, element.Id);
+        Assert.That(element, Is.Not.Null);
+        Assert.That(element.Id, Is.EqualTo(result.Result.Content.Id));
     }
 
     [Test]
@@ -211,9 +211,9 @@ public partial class ElementEditingServiceTests
         };
 
         var result = await ElementEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
-        Assert.IsNotNull(result.Result.Content);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.Success));
+        Assert.That(result.Result.Content, Is.Not.Null);
         VerifyCreate(result.Result.Content);
 
         // re-get and re-test
@@ -221,12 +221,12 @@ public partial class ElementEditingServiceTests
 
         static void VerifyCreate(IElement? createdElement)
         {
-            Assert.IsNotNull(createdElement);
-            Assert.AreEqual("The English Name", createdElement.GetCultureName("en-US"));
-            Assert.AreEqual("The Danish Name", createdElement.GetCultureName("da-DK"));
-            Assert.AreEqual("The Invariant Title", createdElement.GetValue<string>("invariantTitle"));
-            Assert.AreEqual("The English Title", createdElement.GetValue<string>("variantTitle", "en-US"));
-            Assert.AreEqual("The Danish Title", createdElement.GetValue<string>("variantTitle", "da-DK"));
+            Assert.That(createdElement, Is.Not.Null);
+            Assert.That(createdElement.GetCultureName("en-US"), Is.EqualTo("The English Name"));
+            Assert.That(createdElement.GetCultureName("da-DK"), Is.EqualTo("The Danish Name"));
+            Assert.That(createdElement.GetValue<string>("invariantTitle"), Is.EqualTo("The Invariant Title"));
+            Assert.That(createdElement.GetValue<string>("variantTitle", "en-US"), Is.EqualTo("The English Title"));
+            Assert.That(createdElement.GetValue<string>("variantTitle", "da-DK"), Is.EqualTo("The Danish Title"));
         }
     }
 
@@ -255,9 +255,9 @@ public partial class ElementEditingServiceTests
         };
 
         var result = await ElementEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
-        Assert.IsNotNull(result.Result.Content);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.Success));
+        Assert.That(result.Result.Content, Is.Not.Null);
         VerifyCreate(result.Result.Content);
 
         // re-get and re-test
@@ -265,14 +265,14 @@ public partial class ElementEditingServiceTests
 
         void VerifyCreate(IElement? createdElement)
         {
-            Assert.IsNotNull(createdElement);
+            Assert.That(createdElement, Is.Not.Null);
             Assert.Multiple(() =>
             {
-                Assert.AreEqual("The Name", createdElement.Name);
-                Assert.AreEqual("The Invariant Title", createdElement.GetValue<string>("invariantTitle"));
-                Assert.AreEqual("The Default Title", createdElement.GetValue<string>("variantTitle", segment: null));
-                Assert.AreEqual("The Seg-1 Title", createdElement.GetValue<string>("variantTitle", segment: "seg-1"));
-                Assert.AreEqual("The Seg-2 Title", createdElement.GetValue<string>("variantTitle", segment: "seg-2"));
+                Assert.That(createdElement.Name, Is.EqualTo("The Name"));
+                Assert.That(createdElement.GetValue<string>("invariantTitle"), Is.EqualTo("The Invariant Title"));
+                Assert.That(createdElement.GetValue<string>("variantTitle", segment: null), Is.EqualTo("The Default Title"));
+                Assert.That(createdElement.GetValue<string>("variantTitle", segment: "seg-1"), Is.EqualTo("The Seg-1 Title"));
+                Assert.That(createdElement.GetValue<string>("variantTitle", segment: "seg-2"), Is.EqualTo("The Seg-2 Title"));
             });
         }
     }
@@ -308,9 +308,9 @@ public partial class ElementEditingServiceTests
         };
 
         var result = await ElementEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
-        Assert.IsNotNull(result.Result.Content);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.Success));
+        Assert.That(result.Result.Content, Is.Not.Null);
         VerifyCreate(result.Result.Content);
 
         // re-get and re-test
@@ -318,18 +318,18 @@ public partial class ElementEditingServiceTests
 
         void VerifyCreate(IElement? createdElement)
         {
-            Assert.IsNotNull(createdElement);
+            Assert.That(createdElement, Is.Not.Null);
             Assert.Multiple(() =>
             {
-                Assert.AreEqual("The English Name", createdElement.GetCultureName("en-US"));
-                Assert.AreEqual("The Danish Name", createdElement.GetCultureName("da-DK"));
-                Assert.AreEqual("The Invariant Title", createdElement.GetValue<string>("invariantTitle"));
-                Assert.AreEqual("The Default Title in English", createdElement.GetValue<string>("variantTitle", culture: "en-US", segment: null));
-                Assert.AreEqual("The Seg-1 Title in English", createdElement.GetValue<string>("variantTitle", culture: "en-US", segment: "seg-1"));
-                Assert.AreEqual("The Seg-2 Title in English", createdElement.GetValue<string>("variantTitle", culture: "en-US", segment: "seg-2"));
-                Assert.AreEqual("The Default Title in Danish", createdElement.GetValue<string>("variantTitle", culture: "da-DK", segment: null));
-                Assert.AreEqual("The Seg-1 Title in Danish", createdElement.GetValue<string>("variantTitle", culture: "da-DK", segment: "seg-1"));
-                Assert.AreEqual("The Seg-2 Title in Danish", createdElement.GetValue<string>("variantTitle", culture: "da-DK", segment: "seg-2"));
+                Assert.That(createdElement.GetCultureName("en-US"), Is.EqualTo("The English Name"));
+                Assert.That(createdElement.GetCultureName("da-DK"), Is.EqualTo("The Danish Name"));
+                Assert.That(createdElement.GetValue<string>("invariantTitle"), Is.EqualTo("The Invariant Title"));
+                Assert.That(createdElement.GetValue<string>("variantTitle", culture: "en-US", segment: null), Is.EqualTo("The Default Title in English"));
+                Assert.That(createdElement.GetValue<string>("variantTitle", culture: "en-US", segment: "seg-1"), Is.EqualTo("The Seg-1 Title in English"));
+                Assert.That(createdElement.GetValue<string>("variantTitle", culture: "en-US", segment: "seg-2"), Is.EqualTo("The Seg-2 Title in English"));
+                Assert.That(createdElement.GetValue<string>("variantTitle", culture: "da-DK", segment: null), Is.EqualTo("The Default Title in Danish"));
+                Assert.That(createdElement.GetValue<string>("variantTitle", culture: "da-DK", segment: "seg-1"), Is.EqualTo("The Seg-1 Title in Danish"));
+                Assert.That(createdElement.GetValue<string>("variantTitle", culture: "da-DK", segment: "seg-2"), Is.EqualTo("The Seg-2 Title in Danish"));
             });
         }
     }
@@ -348,10 +348,10 @@ public partial class ElementEditingServiceTests
         };
 
         var result = await ElementEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.ContentTypeNotFound, result.Status);
-        Assert.IsNotNull(result.Result);
-        Assert.IsNull(result.Result.Content);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.ContentTypeNotFound));
+        Assert.That(result.Result, Is.Not.Null);
+        Assert.That(result.Result.Content, Is.Null);
     }
 
     [Test]
@@ -375,10 +375,10 @@ public partial class ElementEditingServiceTests
         };
 
         var result = await ElementEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.PropertyTypeNotFound, result.Status);
-        Assert.IsNotNull(result.Result);
-        Assert.IsNull(result.Result.Content);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.PropertyTypeNotFound));
+        Assert.That(result.Result, Is.Not.Null);
+        Assert.That(result.Result.Content, Is.Null);
     }
 
     [Test]
@@ -398,10 +398,10 @@ public partial class ElementEditingServiceTests
         };
 
         var result = await ElementEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.ContentTypeCultureVarianceMismatch, result.Status);
-        Assert.IsNotNull(result.Result);
-        Assert.IsNull(result.Result.Content);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.ContentTypeCultureVarianceMismatch));
+        Assert.That(result.Result, Is.Not.Null);
+        Assert.That(result.Result.Content, Is.Null);
     }
 
     [TestCase(ContentVariation.Culture)]
@@ -436,17 +436,17 @@ public partial class ElementEditingServiceTests
         };
 
         var result = await ElementEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.PropertyTypeNotFound, result.Status);
-        Assert.IsNotNull(result.Result);
-        Assert.IsNull(result.Result.Content);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.PropertyTypeNotFound));
+        Assert.That(result.Result, Is.Not.Null);
+        Assert.That(result.Result.Content, Is.Null);
     }
 
     [Test]
     public async Task Cannot_Create_Element_Based_On_NonElement_ContentType()
     {
         var contentType = ContentTypeBuilder.CreateSimpleContentType();
-        Assert.IsFalse(contentType.IsElement);
+        Assert.That(contentType.IsElement, Is.False);
         contentType.AllowedAsRoot = true;
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
@@ -466,8 +466,8 @@ public partial class ElementEditingServiceTests
         };
 
         var result = await ElementEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.NotAllowed, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.NotAllowed));
     }
 
     [Test]
@@ -495,8 +495,8 @@ public partial class ElementEditingServiceTests
         };
 
         var result = await ElementEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.NotAllowed, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.NotAllowed));
     }
 
     [Test]
@@ -512,8 +512,8 @@ public partial class ElementEditingServiceTests
 
         var result = await ElementEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
 
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.NotAllowed, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.NotAllowed));
     }
 
     [Test]
@@ -526,8 +526,8 @@ public partial class ElementEditingServiceTests
 
         var result = await ElementEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
 
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.Success));
     }
 
     [Test]
@@ -540,8 +540,8 @@ public partial class ElementEditingServiceTests
 
         var result = await ElementEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
 
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.NotAllowed, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.NotAllowed));
     }
 
     [Test]
@@ -553,9 +553,9 @@ public partial class ElementEditingServiceTests
 
         var result = await ElementEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
 
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
-        Assert.AreEqual(Constants.System.Root, result.Result.Content!.ParentId);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.Success));
+        Assert.That(result.Result.Content!.ParentId, Is.EqualTo(Constants.System.Root));
     }
 
     [Test]
@@ -581,10 +581,10 @@ public partial class ElementEditingServiceTests
 
         var result = await ElementEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
 
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.ParentNotFound, result.Status);
-        Assert.IsNotNull(result.Result);
-        Assert.IsNull(result.Result.Content);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.ParentNotFound));
+        Assert.That(result.Result, Is.Not.Null);
+        Assert.That(result.Result.Content, Is.Null);
     }
 
     private static ElementCreateModel CreateElementModel(Guid contentTypeKey, Guid? parentKey)

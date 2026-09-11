@@ -103,39 +103,39 @@ public class ContentTypeBuilderTests
             .Build();
 
         // Assert
-        Assert.AreEqual(testId, contentType.Id);
-        Assert.AreEqual(testAlias, contentType.Alias);
-        Assert.AreEqual(testName, contentType.Name);
-        Assert.AreEqual(testKey, contentType.Key);
-        Assert.AreEqual(testCreateDate, contentType.CreateDate);
-        Assert.AreEqual(testUpdateDate, contentType.UpdateDate);
-        Assert.AreEqual(testCreatorId, contentType.CreatorId);
-        Assert.AreEqual(testParentId, contentType.ParentId);
-        Assert.AreEqual(testLevel, contentType.Level);
-        Assert.AreEqual(testPath, contentType.Path);
-        Assert.AreEqual(testSortOrder, contentType.SortOrder);
-        Assert.AreEqual(testDescription, contentType.Description);
-        Assert.AreEqual(testIcon, contentType.Icon);
-        Assert.AreEqual(testThumbnail, contentType.Thumbnail);
-        Assert.AreEqual(testTrashed, contentType.Trashed);
-        Assert.IsNull(contentType.ListView);
-        Assert.AreEqual(2, contentType.PropertyTypes.Count());
+        Assert.That(contentType.Id, Is.EqualTo(testId));
+        Assert.That(contentType.Alias, Is.EqualTo(testAlias));
+        Assert.That(contentType.Name, Is.EqualTo(testName));
+        Assert.That(contentType.Key, Is.EqualTo(testKey));
+        Assert.That(contentType.CreateDate, Is.EqualTo(testCreateDate));
+        Assert.That(contentType.UpdateDate, Is.EqualTo(testUpdateDate));
+        Assert.That(contentType.CreatorId, Is.EqualTo(testCreatorId));
+        Assert.That(contentType.ParentId, Is.EqualTo(testParentId));
+        Assert.That(contentType.Level, Is.EqualTo(testLevel));
+        Assert.That(contentType.Path, Is.EqualTo(testPath));
+        Assert.That(contentType.SortOrder, Is.EqualTo(testSortOrder));
+        Assert.That(contentType.Description, Is.EqualTo(testDescription));
+        Assert.That(contentType.Icon, Is.EqualTo(testIcon));
+        Assert.That(contentType.Thumbnail, Is.EqualTo(testThumbnail));
+        Assert.That(contentType.Trashed, Is.EqualTo(testTrashed));
+        Assert.That(contentType.ListView, Is.Null);
+        Assert.That(contentType.PropertyTypes.Count(), Is.EqualTo(2));
 
         var propertyTypeIds = contentType.PropertyTypes.Select(x => x.Id).OrderBy(x => x).ToArray();
-        Assert.AreEqual(testPropertyTypeIdsIncrementingFrom + 1, propertyTypeIds.Min());
-        Assert.AreEqual(testPropertyTypeIdsIncrementingFrom + 2, propertyTypeIds.Max());
+        Assert.That(propertyTypeIds.Min(), Is.EqualTo(testPropertyTypeIdsIncrementingFrom + 1));
+        Assert.That(propertyTypeIds.Max(), Is.EqualTo(testPropertyTypeIdsIncrementingFrom + 2));
 
         var allowedTemplates = contentType.AllowedTemplates.ToList();
-        Assert.AreEqual(2, allowedTemplates.Count);
-        Assert.AreEqual(testTemplate1.Id, allowedTemplates[0].Id);
-        Assert.AreEqual(testTemplate1.Alias, allowedTemplates[0].Alias);
-        Assert.AreEqual(testTemplate1.Name, allowedTemplates[0].Name);
-        Assert.AreEqual(testTemplate1.Id, contentType.DefaultTemplate.Id);
+        Assert.That(allowedTemplates, Has.Count.EqualTo(2));
+        Assert.That(allowedTemplates[0].Id, Is.EqualTo(testTemplate1.Id));
+        Assert.That(allowedTemplates[0].Alias, Is.EqualTo(testTemplate1.Alias));
+        Assert.That(allowedTemplates[0].Name, Is.EqualTo(testTemplate1.Name));
+        Assert.That(contentType.DefaultTemplate.Id, Is.EqualTo(testTemplate1.Id));
 
         var allowedContentTypes = contentType.AllowedContentTypes.ToList();
-        Assert.AreEqual(2, allowedContentTypes.Count);
-        Assert.AreEqual(testAllowedContentType1.Key, allowedContentTypes[0].Key);
-        Assert.AreEqual(testAllowedContentType1.Alias, allowedContentTypes[0].Alias);
-        Assert.AreEqual(testAllowedContentType1.SortOrder, allowedContentTypes[0].SortOrder);
+        Assert.That(allowedContentTypes, Has.Count.EqualTo(2));
+        Assert.That(allowedContentTypes[0].Key, Is.EqualTo(testAllowedContentType1.Key));
+        Assert.That(allowedContentTypes[0].Alias, Is.EqualTo(testAllowedContentType1.Alias));
+        Assert.That(allowedContentTypes[0].SortOrder, Is.EqualTo(testAllowedContentType1.SortOrder));
     }
 }

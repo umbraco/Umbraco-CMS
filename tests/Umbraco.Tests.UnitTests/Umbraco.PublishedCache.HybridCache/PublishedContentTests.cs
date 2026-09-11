@@ -106,7 +106,7 @@ public class PublishedContentTests
         IPublishedProperty[] reference = observed[0];
         for (var i = 1; i < threadCount; i++)
         {
-            Assert.That(observed[i].Length, Is.EqualTo(reference.Length));
+            Assert.That(observed[i], Has.Length.EqualTo(reference.Length));
             for (var j = 0; j < reference.Length; j++)
             {
                 // Reference equality: every thread observes the same canonical PublishedProperty

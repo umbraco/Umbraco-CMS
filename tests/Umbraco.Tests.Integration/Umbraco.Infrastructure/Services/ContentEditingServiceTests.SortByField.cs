@@ -32,7 +32,7 @@ public partial class ContentEditingServiceTests
         (IContent root, Guid[] childKeysByIndex) = await CreateRootWithChildrenForFieldSorting();
 
         var result = await ContentEditingService.SortByFieldAsync(root.Key, field, direction, culture: null, Constants.Security.SuperUserKey);
-        Assert.AreEqual(ContentEditingOperationStatus.Success, result);
+        Assert.That(result, Is.EqualTo(ContentEditingOperationStatus.Success));
 
         var actualChildKeys = ContentService
             .GetPagedChildren(root.Id, 0, 100, out _, propertyAliases: null, filter: null, ordering: null)
@@ -41,7 +41,7 @@ public partial class ContentEditingServiceTests
             .ToArray();
         var expectedChildKeys = expectedChildIndexes.Select(i => childKeysByIndex[i]).ToArray();
 
-        Assert.AreEqual(expectedChildKeys, actualChildKeys);
+        Assert.That(actualChildKeys, Is.EqualTo(expectedChildKeys));
     }
 
     [Test]
@@ -59,14 +59,14 @@ public partial class ContentEditingServiceTests
             Constants.Security.SuperUserKey)).Result.Content!;
 
         var result = await ContentEditingService.SortByFieldAsync(parent.Key, ContentSortField.Name, Direction.Ascending, culture: null, Constants.Security.SuperUserKey);
-        Assert.AreEqual(ContentEditingOperationStatus.Success, result);
+        Assert.That(result, Is.EqualTo(ContentEditingOperationStatus.Success));
     }
 
     [Test]
     public async Task Sort_Children_By_Field_Returns_NotFound_For_Unknown_Parent()
     {
         var result = await ContentEditingService.SortByFieldAsync(Guid.NewGuid(), ContentSortField.Name, Direction.Ascending, culture: null, Constants.Security.SuperUserKey);
-        Assert.AreEqual(ContentEditingOperationStatus.NotFound, result);
+        Assert.That(result, Is.EqualTo(ContentEditingOperationStatus.NotFound));
     }
 
     [Test]
@@ -113,7 +113,7 @@ public partial class ContentEditingServiceTests
         }
 
         var result = await ContentEditingService.SortByFieldAsync(root.Key, ContentSortField.Name, Direction.Ascending, culture, Constants.Security.SuperUserKey);
-        Assert.AreEqual(ContentEditingOperationStatus.Success, result);
+        Assert.That(result, Is.EqualTo(ContentEditingOperationStatus.Success));
 
         var actualChildKeys = ContentService
             .GetPagedChildren(root.Id, 0, 100, out _, propertyAliases: null, filter: null, ordering: null)
@@ -122,7 +122,7 @@ public partial class ContentEditingServiceTests
             .ToArray();
         var expectedChildKeys = expectedChildIndexes.Select(i => childKeys[i]).ToArray();
 
-        Assert.AreEqual(expectedChildKeys, actualChildKeys);
+        Assert.That(actualChildKeys, Is.EqualTo(expectedChildKeys));
     }
 
     // Proves the invariant-name fallback documented in ContentEditingServiceWithSortingBase.BuildOrdering():
@@ -185,7 +185,7 @@ public partial class ContentEditingServiceTests
         childKeys[2] = invariantChild.Key;
 
         var result = await ContentEditingService.SortByFieldAsync(root.Key, ContentSortField.Name, Direction.Ascending, culture, Constants.Security.SuperUserKey);
-        Assert.AreEqual(ContentEditingOperationStatus.Success, result);
+        Assert.That(result, Is.EqualTo(ContentEditingOperationStatus.Success));
 
         var actualChildKeys = ContentService
             .GetPagedChildren(root.Id, 0, 100, out _, propertyAliases: null, filter: null, ordering: null)
@@ -194,7 +194,7 @@ public partial class ContentEditingServiceTests
             .ToArray();
         var expectedChildKeys = expectedChildIndexes.Select(i => childKeys[i]).ToArray();
 
-        Assert.AreEqual(expectedChildKeys, actualChildKeys);
+        Assert.That(actualChildKeys, Is.EqualTo(expectedChildKeys));
     }
 
     [TestCase(ContentSortField.Name, Direction.Ascending, new[] { 3, 1, 4, 0, 2 })]
@@ -208,7 +208,7 @@ public partial class ContentEditingServiceTests
         Guid[] rootKeysByIndex = await CreateRootContentForFieldSorting();
 
         var result = await ContentEditingService.SortByFieldAsync(parentKey: null, field, direction, culture: null, Constants.Security.SuperUserKey);
-        Assert.AreEqual(ContentEditingOperationStatus.Success, result);
+        Assert.That(result, Is.EqualTo(ContentEditingOperationStatus.Success));
 
         var actualRootKeys = ContentService
             .GetPagedChildren(Constants.System.Root, 0, 100, out _, propertyAliases: null, filter: null, ordering: null)
@@ -217,7 +217,7 @@ public partial class ContentEditingServiceTests
             .ToArray();
         var expectedRootKeys = expectedRootIndexes.Select(i => rootKeysByIndex[i]).ToArray();
 
-        Assert.AreEqual(expectedRootKeys, actualRootKeys);
+        Assert.That(actualRootKeys, Is.EqualTo(expectedRootKeys));
     }
 
     private async Task<(IContent Root, Guid[] ChildKeysByIndex)> CreateRootWithChildrenForFieldSorting()

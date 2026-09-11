@@ -24,7 +24,7 @@ internal class RichTextAllowedMediaTypeValidatorTests
 
         var result = Validate(validator, BuildMarkup(Guid.NewGuid()), allowedMediaTypes);
 
-        Assert.IsEmpty(result);
+        Assert.That(result, Is.Empty);
     }
 
     [Test]
@@ -34,7 +34,7 @@ internal class RichTextAllowedMediaTypeValidatorTests
 
         var result = Validate(validator, "<p>No images here</p>");
 
-        Assert.IsEmpty(result);
+        Assert.That(result, Is.Empty);
     }
 
     [Test]
@@ -45,7 +45,7 @@ internal class RichTextAllowedMediaTypeValidatorTests
 
         var result = Validate(validator, BuildMarkup(Guid.NewGuid()));
 
-        Assert.IsEmpty(result);
+        Assert.That(result, Is.Empty);
     }
 
     [Test]
@@ -84,7 +84,7 @@ internal class RichTextAllowedMediaTypeValidatorTests
 
         var result = Validate(validator, BuildMarkup(Guid.NewGuid()));
 
-        Assert.IsEmpty(result);
+        Assert.That(result, Is.Empty);
     }
 
     [Test]
@@ -109,7 +109,7 @@ internal class RichTextAllowedMediaTypeValidatorTests
 
         var result = Validate(validator, BuildMarkup(Guid.NewGuid()), $"{AllowedTypeKey},{secondTypeKey}");
 
-        Assert.IsEmpty(result);
+        Assert.That(result, Is.Empty);
     }
 
     [Test]
@@ -120,7 +120,7 @@ internal class RichTextAllowedMediaTypeValidatorTests
 
         var result = Validate(validator, BuildMarkup(Guid.NewGuid()), AllowedTypeKey.ToString().ToUpperInvariant());
 
-        Assert.IsEmpty(result);
+        Assert.That(result, Is.Empty);
     }
 
     private static IEnumerable<System.ComponentModel.DataAnnotations.ValidationResult> Validate(

@@ -49,11 +49,11 @@ public class RichTextPropertyValueHandlerTests : ContentTestBase
 
         Assert.Multiple(() =>
         {
-            CollectionAssert.AreEqual(new[] { "H1 Heading #1" }, richTextValue.TextsR1);
-            CollectionAssert.AreEqual(new[] { "H2 Heading #1", "H2 Heading #2" }, richTextValue.TextsR2);
-            CollectionAssert.AreEqual(new[] { "H3 Heading #1", "H3 Heading #2", "H3 Heading #3" }, richTextValue.TextsR3);
+            Assert.That(richTextValue.TextsR1, Is.EqualTo(new[] { "H1 Heading #1" }).AsCollection);
+            Assert.That(richTextValue.TextsR2, Is.EqualTo(new[] { "H2 Heading #1", "H2 Heading #2" }).AsCollection);
+            Assert.That(richTextValue.TextsR3, Is.EqualTo(new[] { "H3 Heading #1", "H3 Heading #2", "H3 Heading #3" }).AsCollection);
 
-            CollectionAssert.AreEqual(new[] { "Paragraph #1 Paragraph #2", "Paragraph #3 Paragraph #4", "Paragraph #5", "Paragraph #6", "List Item #1 List Item #2" }, richTextValue.Texts);
+            Assert.That(richTextValue.Texts, Is.EqualTo(new[] { "Paragraph #1 Paragraph #2", "Paragraph #3 Paragraph #4", "Paragraph #5", "Paragraph #6", "List Item #1 List Item #2" }).AsCollection);
         });
     }
 
@@ -81,7 +81,7 @@ public class RichTextPropertyValueHandlerTests : ContentTestBase
         TestIndexDocument document = documents.Single();
         IndexValue? richTextValue = document.Fields.FirstOrDefault(f => f.FieldName == "richTextValue")?.Value;
         Assert.That(richTextValue, Is.Not.Null);
-        CollectionAssert.AreEqual(new[] { "Some bold text", "A link to somewhere" }, richTextValue.Texts);
+        Assert.That(richTextValue.Texts, Is.EqualTo(new[] { "Some bold text", "A link to somewhere" }).AsCollection);
     }
 
     [TestCase(null)]
@@ -130,7 +130,7 @@ public class RichTextPropertyValueHandlerTests : ContentTestBase
         TestIndexDocument document = documents.Single();
         IndexValue? richTextValue = document.Fields.FirstOrDefault(f => f.FieldName == "richTextValue")?.Value;
         Assert.That(richTextValue, Is.Not.Null);
-        CollectionAssert.AreEqual(new[] { value.ToString() }, richTextValue.Texts);
+        Assert.That(richTextValue.Texts, Is.EqualTo(new[] { value.ToString() }).AsCollection);
     }
 
     [SetUp]

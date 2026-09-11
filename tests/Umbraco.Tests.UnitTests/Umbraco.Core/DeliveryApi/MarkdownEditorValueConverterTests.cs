@@ -30,8 +30,8 @@ public class MarkdownEditorValueConverterTests : PropertyValueConverterTests
         var valueConverter = new MarkdownEditorValueConverter(linkParser, urlParser, new HeyRedMarkdownToHtmlConverter());
 #pragma warning restore CS0618 // Type or member is obsolete
 
-        Assert.AreEqual(typeof(string), valueConverter.GetDeliveryApiPropertyValueType(Mock.Of<IPublishedPropertyType>()));
+        Assert.That(valueConverter.GetDeliveryApiPropertyValueType(Mock.Of<IPublishedPropertyType>()), Is.EqualTo(typeof(string)));
         var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), Mock.Of<IPublishedPropertyType>(), PropertyCacheLevel.Element, inter, false, false);
-        Assert.AreEqual(expected, result);
+        Assert.That(result, Is.EqualTo(expected));
     }
 }

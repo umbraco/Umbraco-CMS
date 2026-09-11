@@ -306,7 +306,7 @@ internal sealed class UserRepositoryTest : UmbracoIntegrationTest
             var result = repository.Count(query);
 
             // Assert
-            Assert.AreEqual(2, result);
+            Assert.That(result, Is.EqualTo(2));
         }
     }
 
@@ -339,7 +339,7 @@ internal sealed class UserRepositoryTest : UmbracoIntegrationTest
                     filter: provider.CreateQuery<IUser>().Where(x => x.Id > -1));
 
                 // Assert
-                Assert.AreEqual(2, totalRecs);
+                Assert.That(totalRecs, Is.EqualTo(2));
             }
             finally
             {
@@ -377,7 +377,7 @@ internal sealed class UserRepositoryTest : UmbracoIntegrationTest
                     filter: provider.CreateQuery<IUser>().Where(x => x.Id == -1));
 
                 // Assert
-                Assert.AreEqual(1, totalRecs);
+                Assert.That(totalRecs, Is.EqualTo(1));
             }
             finally
             {
@@ -441,9 +441,9 @@ internal sealed class UserRepositoryTest : UmbracoIntegrationTest
                 Direction.Ascending,
                 userState: new[] { UserState.Active }).ToArray();
 
-            Assert.AreEqual(1, activeTotal);
-            Assert.AreEqual(1, activeResults.Length);
-            Assert.AreEqual("ActiveUser", activeResults[0].Name);
+            Assert.That(activeTotal, Is.EqualTo(1));
+            Assert.That(activeResults, Has.Length.EqualTo(1));
+            Assert.That(activeResults[0].Name, Is.EqualTo("ActiveUser"));
 
             // Test filtering by Disabled state - should only return the disabled user.
             var disabledResults = repository.GetPagedResultsByQuery(
@@ -455,9 +455,9 @@ internal sealed class UserRepositoryTest : UmbracoIntegrationTest
                 Direction.Ascending,
                 userState: new[] { UserState.Disabled }).ToArray();
 
-            Assert.AreEqual(1, disabledTotal);
-            Assert.AreEqual(1, disabledResults.Length);
-            Assert.AreEqual("DisabledUser", disabledResults[0].Name);
+            Assert.That(disabledTotal, Is.EqualTo(1));
+            Assert.That(disabledResults, Has.Length.EqualTo(1));
+            Assert.That(disabledResults[0].Name, Is.EqualTo("DisabledUser"));
 
             // Test filtering by LockedOut state - should only return the locked out user.
             var lockedOutResults = repository.GetPagedResultsByQuery(
@@ -469,9 +469,9 @@ internal sealed class UserRepositoryTest : UmbracoIntegrationTest
                 Direction.Ascending,
                 userState: new[] { UserState.LockedOut }).ToArray();
 
-            Assert.AreEqual(1, lockedOutTotal);
-            Assert.AreEqual(1, lockedOutResults.Length);
-            Assert.AreEqual("LockedOutUser", lockedOutResults[0].Name);
+            Assert.That(lockedOutTotal, Is.EqualTo(1));
+            Assert.That(lockedOutResults, Has.Length.EqualTo(1));
+            Assert.That(lockedOutResults[0].Name, Is.EqualTo("LockedOutUser"));
 
             // Test filtering by multiple states (Active OR Disabled).
             var multiStateResults = repository.GetPagedResultsByQuery(
@@ -483,8 +483,8 @@ internal sealed class UserRepositoryTest : UmbracoIntegrationTest
                 Direction.Ascending,
                 userState: new[] { UserState.Active, UserState.Disabled }).ToArray();
 
-            Assert.AreEqual(2, multiStateTotal);
-            Assert.AreEqual(2, multiStateResults.Length);
+            Assert.That(multiStateTotal, Is.EqualTo(2));
+            Assert.That(multiStateResults, Has.Length.EqualTo(2));
         }
     }
 
@@ -513,7 +513,7 @@ internal sealed class UserRepositoryTest : UmbracoIntegrationTest
             var updatedUser = repository.Get(user.Key);
 
             // Ensure the Security Stamp is invalidated & no longer the same
-            Assert.AreNotEqual(originalSecurityStamp, updatedUser.SecurityStamp);
+            Assert.That(updatedUser.SecurityStamp, Is.Not.EqualTo(originalSecurityStamp));
         }
     }
 
@@ -540,12 +540,12 @@ internal sealed class UserRepositoryTest : UmbracoIntegrationTest
                 .Where<UserLoginDto>(x => x.SessionId == sessionId));
 
             var isValid = repository.ValidateLoginSession(user.Id, sessionId);
-            Assert.IsFalse(isValid);
+            Assert.That(isValid, Is.False);
 
             // create a new one
             sessionId = repository.CreateLoginSession(user.Id, "1.2.3.4");
             isValid = repository.ValidateLoginSession(user.Id, sessionId);
-            Assert.IsTrue(isValid);
+            Assert.That(isValid, Is.True);
         }
     }
 
@@ -601,14 +601,14 @@ internal sealed class UserRepositoryTest : UmbracoIntegrationTest
             Assert.That(updatedItem.IsApproved, Is.EqualTo(resolved.IsApproved));
             Assert.That(updatedItem.RawPasswordValue, Is.EqualTo(resolved.RawPasswordValue));
             Assert.That(updatedItem.IsLockedOut, Is.EqualTo(resolved.IsLockedOut));
-            Assert.IsTrue(updatedItem.StartContentIds.UnsortedSequenceEqual(resolved.StartContentIds));
-            Assert.IsTrue(updatedItem.StartMediaIds.UnsortedSequenceEqual(resolved.StartMediaIds));
+            Assert.That(updatedItem.StartContentIds.UnsortedSequenceEqual(resolved.StartContentIds), Is.True);
+            Assert.That(updatedItem.StartMediaIds.UnsortedSequenceEqual(resolved.StartMediaIds), Is.True);
             Assert.That(updatedItem.Email, Is.EqualTo(resolved.Email));
             Assert.That(updatedItem.Username, Is.EqualTo(resolved.Username));
             Assert.That(updatedItem.AllowedSections.Count(), Is.EqualTo(resolved.AllowedSections.Count()));
             foreach (var allowedSection in resolved.AllowedSections)
             {
-                Assert.IsTrue(updatedItem.AllowedSections.Contains(allowedSection));
+                Assert.That(updatedItem.AllowedSections, Does.Contain(allowedSection));
             }
         }
     }
@@ -621,14 +621,14 @@ internal sealed class UserRepositoryTest : UmbracoIntegrationTest
         Assert.That(updatedItem.IsApproved, Is.EqualTo(originalUser.IsApproved));
         Assert.That(updatedItem.RawPasswordValue, Is.EqualTo(originalUser.RawPasswordValue));
         Assert.That(updatedItem.IsLockedOut, Is.EqualTo(originalUser.IsLockedOut));
-        Assert.IsTrue(updatedItem.StartContentIds.UnsortedSequenceEqual(originalUser.StartContentIds));
-        Assert.IsTrue(updatedItem.StartMediaIds.UnsortedSequenceEqual(originalUser.StartMediaIds));
+        Assert.That(updatedItem.StartContentIds.UnsortedSequenceEqual(originalUser.StartContentIds), Is.True);
+        Assert.That(updatedItem.StartMediaIds.UnsortedSequenceEqual(originalUser.StartMediaIds), Is.True);
         Assert.That(updatedItem.Email, Is.EqualTo(originalUser.Email));
         Assert.That(updatedItem.Username, Is.EqualTo(originalUser.Username));
         Assert.That(updatedItem.AllowedSections.Count(), Is.EqualTo(originalUser.AllowedSections.Count()));
         foreach (var allowedSection in originalUser.AllowedSections)
         {
-            Assert.IsTrue(updatedItem.AllowedSections.Contains(allowedSection));
+            Assert.That(updatedItem.AllowedSections, Does.Contain(allowedSection));
         }
     }
 

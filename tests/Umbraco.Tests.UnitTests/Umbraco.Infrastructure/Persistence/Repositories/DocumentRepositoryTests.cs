@@ -34,7 +34,7 @@ internal sealed class DocumentRepositoryTests
 
         var result = DocumentRepository.EnsureUniqueUrlSegment("Title", 0, siblings, _shortStringHelper);
 
-        Assert.AreEqual("Title", result);
+        Assert.That(result, Is.EqualTo("Title"));
     }
 
     [Test]
@@ -48,7 +48,7 @@ internal sealed class DocumentRepositoryTests
 
         var result = DocumentRepository.EnsureUniqueUrlSegment("Title.", 0, siblings, _shortStringHelper);
 
-        Assert.AreEqual("Title. (1)", result);
+        Assert.That(result, Is.EqualTo("Title. (1)"));
     }
 
     [Test]
@@ -64,7 +64,7 @@ internal sealed class DocumentRepositoryTests
         var result = DocumentRepository.EnsureUniqueUrlSegment("Title!", 0, siblings, _shortStringHelper);
 
         // "Title! (1)" → segment "title-1" which doesn't collide with "title" or "title"
-        Assert.AreEqual("Title! (1)", result);
+        Assert.That(result, Is.EqualTo("Title! (1)"));
     }
 
     [Test]
@@ -79,7 +79,7 @@ internal sealed class DocumentRepositoryTests
 
         var result = DocumentRepository.EnsureUniqueUrlSegment("Title.", 0, siblings, _shortStringHelper);
 
-        Assert.AreEqual("Title. (2)", result);
+        Assert.That(result, Is.EqualTo("Title. (2)"));
     }
 
     [Test]
@@ -93,7 +93,7 @@ internal sealed class DocumentRepositoryTests
         // Node 5 checking its own name — should not collide with itself.
         var result = DocumentRepository.EnsureUniqueUrlSegment("Title", 5, siblings, _shortStringHelper);
 
-        Assert.AreEqual("Title", result);
+        Assert.That(result, Is.EqualTo("Title"));
     }
 
     [Test]
@@ -109,7 +109,7 @@ internal sealed class DocumentRepositoryTests
 
         var result = DocumentRepository.EnsureUniqueUrlSegment(nodeName, 0, siblings, _shortStringHelper);
 
-        Assert.AreEqual(nodeName, result);
+        Assert.That(result, Is.EqualTo(nodeName));
     }
 
     [Test]
@@ -118,7 +118,7 @@ internal sealed class DocumentRepositoryTests
         // Name consists entirely of characters stripped by the cleaner.
         var result = DocumentRepository.EnsureUniqueUrlSegment("...", 0, Array.Empty<SimilarNodeName>(), _shortStringHelper);
 
-        Assert.AreEqual("...", result);
+        Assert.That(result, Is.EqualTo("..."));
     }
 
     [Test]
@@ -131,7 +131,7 @@ internal sealed class DocumentRepositoryTests
 
         var result = DocumentRepository.EnsureUniqueUrlSegment("title.", 0, siblings, _shortStringHelper);
 
-        Assert.AreEqual("title. (1)", result);
+        Assert.That(result, Is.EqualTo("title. (1)"));
     }
 
     [Test]
@@ -146,7 +146,7 @@ internal sealed class DocumentRepositoryTests
 
         var result = DocumentRepository.EnsureUniqueUrlSegment("Title", 0, siblings, _shortStringHelper);
 
-        Assert.AreEqual("Title", result);
+        Assert.That(result, Is.EqualTo("Title"));
     }
 
     [Test]
@@ -163,7 +163,7 @@ internal sealed class DocumentRepositoryTests
 
         var result = DocumentRepository.EnsureUniqueUrlSegment("Title.", 0, siblings, mock.Object, "da-DK");
 
-        Assert.AreEqual("Title. (1)", result);
+        Assert.That(result, Is.EqualTo("Title. (1)"));
         mock.Verify(x => x.CleanStringForUrlSegment(It.IsAny<string>(), "da-DK"), Times.AtLeastOnce);
     }
 

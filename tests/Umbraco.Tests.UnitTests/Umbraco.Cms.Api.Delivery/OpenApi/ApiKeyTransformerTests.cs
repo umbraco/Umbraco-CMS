@@ -33,15 +33,15 @@ public class ApiKeyTransformerTests
         await _transformer.TransformAsync(document, null!, CancellationToken.None);
 
         // Assert
-        Assert.IsNotNull(document.Components);
-        Assert.IsNotNull(document.Components.SecuritySchemes);
-        Assert.IsTrue(document.Components.SecuritySchemes.ContainsKey("ApiKeyAuth"));
+        Assert.That(document.Components, Is.Not.Null);
+        Assert.That(document.Components.SecuritySchemes, Is.Not.Null);
+        Assert.That(document.Components.SecuritySchemes.ContainsKey("ApiKeyAuth"), Is.True);
 
         var scheme = document.Components.SecuritySchemes["ApiKeyAuth"];
-        Assert.AreEqual(SecuritySchemeType.ApiKey, scheme.Type);
-        Assert.AreEqual(Constants.DeliveryApi.HeaderNames.ApiKey, scheme.Name);
-        Assert.AreEqual(ParameterLocation.Header, scheme.In);
-        Assert.IsNotNull(scheme.Description);
+        Assert.That(scheme.Type, Is.EqualTo(SecuritySchemeType.ApiKey));
+        Assert.That(scheme.Name, Is.EqualTo(Constants.DeliveryApi.HeaderNames.ApiKey));
+        Assert.That(scheme.In, Is.EqualTo(ParameterLocation.Header));
+        Assert.That(scheme.Description, Is.Not.Null);
     }
 
     [Test]
@@ -54,8 +54,8 @@ public class ApiKeyTransformerTests
         await _transformer.TransformAsync(document, null!, CancellationToken.None);
 
         // Assert
-        Assert.IsNotNull(document.Security);
-        Assert.AreEqual(1, document.Security.Count);
+        Assert.That(document.Security, Is.Not.Null);
+        Assert.That(document.Security, Has.Count.EqualTo(1));
     }
 
     [Test]
@@ -77,8 +77,8 @@ public class ApiKeyTransformerTests
         await _transformer.TransformAsync(document, null!, CancellationToken.None);
 
         // Assert
-        Assert.IsTrue(document.Components.Schemas.ContainsKey("ExistingSchema"));
-        Assert.IsTrue(document.Components.SecuritySchemes!.ContainsKey("ApiKeyAuth"));
+        Assert.That(document.Components.Schemas.ContainsKey("ExistingSchema"), Is.True);
+        Assert.That(document.Components.SecuritySchemes!.ContainsKey("ApiKeyAuth"), Is.True);
     }
 
     [Test]
@@ -100,8 +100,8 @@ public class ApiKeyTransformerTests
         await _transformer.TransformAsync(document, null!, CancellationToken.None);
 
         // Assert
-        Assert.IsTrue(document.Components.SecuritySchemes.ContainsKey("ExistingScheme"));
-        Assert.IsTrue(document.Components.SecuritySchemes.ContainsKey("ApiKeyAuth"));
+        Assert.That(document.Components.SecuritySchemes.ContainsKey("ExistingScheme"), Is.True);
+        Assert.That(document.Components.SecuritySchemes.ContainsKey("ApiKeyAuth"), Is.True);
     }
 
     [Test]
@@ -120,7 +120,7 @@ public class ApiKeyTransformerTests
         await _transformer.TransformAsync(document, null!, CancellationToken.None);
 
         // Assert
-        Assert.AreEqual(2, document.Security.Count);
+        Assert.That(document.Security, Has.Count.EqualTo(2));
     }
 
     #endregion
@@ -145,8 +145,8 @@ public class ApiKeyTransformerTests
         await _transformer.TransformAsync(operation, context, CancellationToken.None);
 
         // Assert
-        Assert.IsNotNull(operation.Security);
-        Assert.AreEqual(1, operation.Security.Count);
+        Assert.That(operation.Security, Is.Not.Null);
+        Assert.That(operation.Security, Has.Count.EqualTo(1));
     }
 
     [Test]
@@ -173,7 +173,7 @@ public class ApiKeyTransformerTests
         await _transformer.TransformAsync(operation, context, CancellationToken.None);
 
         // Assert
-        Assert.AreEqual(2, operation.Security.Count);
+        Assert.That(operation.Security, Has.Count.EqualTo(2));
     }
 
     [Test]
@@ -194,10 +194,10 @@ public class ApiKeyTransformerTests
         await _transformer.TransformAsync(operation, context, CancellationToken.None);
 
         // Assert - The security requirement should have one key (the ApiKeyAuth scheme reference)
-        Assert.IsNotNull(operation.Security);
-        Assert.AreEqual(1, operation.Security.Count);
+        Assert.That(operation.Security, Is.Not.Null);
+        Assert.That(operation.Security, Has.Count.EqualTo(1));
         var requirement = operation.Security.First();
-        Assert.AreEqual(1, requirement.Count);
+        Assert.That(requirement, Has.Count.EqualTo(1));
     }
 
     #endregion

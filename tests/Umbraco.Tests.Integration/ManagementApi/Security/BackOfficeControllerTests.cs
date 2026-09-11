@@ -20,7 +20,7 @@ public class BackOfficeControllerTests : ManagementApiUserGroupTestBase<BackOffi
     {
         _currentUserEmail = "testAdmin@umbraco.com";
         var response = await AuthorizedRequest(Constants.Security.AdminGroupKey, "Admin");
-        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, await response.Content.ReadAsStringAsync());
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK), await response.Content.ReadAsStringAsync());
     }
 
     [Test]
@@ -28,7 +28,7 @@ public class BackOfficeControllerTests : ManagementApiUserGroupTestBase<BackOffi
     {
         _currentUserEmail = "testEditor@umbraco.com";
         var response = await AuthorizedRequest(Constants.Security.EditorGroupKey, "Editor");
-        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, await response.Content.ReadAsStringAsync());
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK), await response.Content.ReadAsStringAsync());
     }
 
     [Test]
@@ -36,7 +36,7 @@ public class BackOfficeControllerTests : ManagementApiUserGroupTestBase<BackOffi
     {
         _currentUserEmail = "testSensitiveData@umbraco.com";
         var response = await AuthorizedRequest(Constants.Security.SensitiveDataGroupKey, "SensitiveData");
-        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, await response.Content.ReadAsStringAsync());
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK), await response.Content.ReadAsStringAsync());
     }
 
     [Test]
@@ -44,7 +44,7 @@ public class BackOfficeControllerTests : ManagementApiUserGroupTestBase<BackOffi
     {
         _currentUserEmail = "testTranslator@umbraco.com";
         var response = await AuthorizedRequest(Constants.Security.TranslatorGroupKey, "Translator");
-        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, await response.Content.ReadAsStringAsync());
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK), await response.Content.ReadAsStringAsync());
     }
 
     [Test]
@@ -52,7 +52,7 @@ public class BackOfficeControllerTests : ManagementApiUserGroupTestBase<BackOffi
     {
         _currentUserEmail = "testWriter@umbraco.com";
         var response = await AuthorizedRequest(Constants.Security.WriterGroupKey, "Writer");
-        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, await response.Content.ReadAsStringAsync());
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK), await response.Content.ReadAsStringAsync());
     }
 
     [Test]
@@ -60,7 +60,7 @@ public class BackOfficeControllerTests : ManagementApiUserGroupTestBase<BackOffi
     {
         _currentUserEmail = "testUnauthorized@invalid.test";
         var response = await ClientRequest();
-        Assert.AreEqual(HttpStatusCode.Unauthorized, response.StatusCode, await response.Content.ReadAsStringAsync());
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized), await response.Content.ReadAsStringAsync());
     }
 
     protected override async Task<HttpResponseMessage> ClientRequest()

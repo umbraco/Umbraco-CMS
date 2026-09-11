@@ -28,7 +28,7 @@ public class AspNetCoreSessionManagerTests
         var httpContext = new DefaultHttpContext();
         var sessionManager = CreateSessionManager(httpContext);
 
-        Assert.AreEqual("0", sessionManager.SessionId);
+        Assert.That(sessionManager.SessionId, Is.EqualTo("0"));
     }
 
     [Test]
@@ -43,8 +43,8 @@ public class AspNetCoreSessionManagerTests
 
         Assert.Multiple(() =>
         {
-            Assert.IsNull(result);
-            Assert.AreEqual(0, session.IdReadCount, "Session.Id must not be read when no session cookie is present, as that forces a blocking store load.");
+            Assert.That(result, Is.Null);
+            Assert.That(session.IdReadCount, Is.EqualTo(0), "Session.Id must not be read when no session cookie is present, as that forces a blocking store load.");
         });
     }
 
@@ -59,7 +59,7 @@ public class AspNetCoreSessionManagerTests
 
         var result = sessionManager.SessionId;
 
-        Assert.AreEqual(SessionId, result);
+        Assert.That(result, Is.EqualTo(SessionId));
     }
 
     [Test]
@@ -75,8 +75,8 @@ public class AspNetCoreSessionManagerTests
 
         Assert.Multiple(() =>
         {
-            Assert.IsNull(result);
-            Assert.AreEqual(0, session.IdReadCount, "Session.Id must not be read when the logging mode is None.");
+            Assert.That(result, Is.Null);
+            Assert.That(session.IdReadCount, Is.EqualTo(0), "Session.Id must not be read when the logging mode is None.");
         });
     }
 
@@ -95,10 +95,10 @@ public class AspNetCoreSessionManagerTests
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(cookieValue.GenerateHash<SHA256>(), result);
-            Assert.AreNotEqual(cookieValue, result, "The raw cookie value must not be logged.");
-            Assert.AreEqual(result, resultAgain, "The hash must be stable across reads.");
-            Assert.AreEqual(0, session.IdReadCount, "Session.Id must not be read in CookieHash mode.");
+            Assert.That(result, Is.EqualTo(cookieValue.GenerateHash<SHA256>()));
+            Assert.That(result, Is.Not.EqualTo(cookieValue), "The raw cookie value must not be logged.");
+            Assert.That(resultAgain, Is.EqualTo(result), "The hash must be stable across reads.");
+            Assert.That(session.IdReadCount, Is.EqualTo(0), "Session.Id must not be read in CookieHash mode.");
         });
     }
 
@@ -112,8 +112,8 @@ public class AspNetCoreSessionManagerTests
 
         Assert.Multiple(() =>
         {
-            Assert.IsNull(sessionManager.SessionId);
-            Assert.AreEqual(0, session.IdReadCount);
+            Assert.That(sessionManager.SessionId, Is.Null);
+            Assert.That(session.IdReadCount, Is.EqualTo(0));
         });
     }
 

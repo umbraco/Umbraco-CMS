@@ -15,7 +15,7 @@ public partial class InvariantDocumentTreeTests : IndexTestBase
 
         Assert.Multiple(() =>
         {
-            Assert.That(results.Length, Is.EqualTo(3));
+            Assert.That(results, Has.Length.EqualTo(3));
             Assert.That(
                 results.Select(d => d.Id),
                 Is.EquivalentTo(new[]
@@ -36,7 +36,7 @@ public partial class InvariantDocumentTreeTests : IndexTestBase
 
         Assert.Multiple(() =>
         {
-            Assert.That(results.Length, Is.EqualTo(3));
+            Assert.That(results, Has.Length.EqualTo(3));
             Assert.That(
                 results.Select(d => d.Id),
                 Is.EquivalentTo(new[]
@@ -79,7 +79,7 @@ public partial class InvariantDocumentTreeTests : IndexTestBase
         ISearchResult[] results = index.Searcher.CreateQuery().All().Execute().ToArray();
         Assert.Multiple(() =>
         {
-            Assert.That(results.Length, Is.EqualTo(1));
+            Assert.That(results, Has.Length.EqualTo(1));
             Assert.That(results[0].Id, Is.EqualTo(RootKey.ToString()));
         });
     }
@@ -99,7 +99,7 @@ public partial class InvariantDocumentTreeTests : IndexTestBase
         ISearchResult[] results = index.Searcher.CreateQuery().All().Execute().ToArray();
         Assert.Multiple(() =>
         {
-            Assert.That(results.Length, Is.EqualTo(2));
+            Assert.That(results, Has.Length.EqualTo(2));
             Assert.That(
                 results.Select(d => d.Id),
                 Is.EquivalentTo(new[]
@@ -141,7 +141,7 @@ public partial class InvariantDocumentTreeTests : IndexTestBase
         ISearchResult[] results = index.Searcher.CreateQuery().All().Execute().ToArray();
         Assert.Multiple(() =>
         {
-            Assert.That(results.Length, Is.EqualTo(1));
+            Assert.That(results, Has.Length.EqualTo(1));
             Assert.That(results[0].Id, Is.EqualTo(RootKey.ToString()));
         });
     }
@@ -161,7 +161,7 @@ public partial class InvariantDocumentTreeTests : IndexTestBase
         ISearchResult[] results = index.Searcher.CreateQuery().All().Execute().ToArray();
         Assert.Multiple(() =>
         {
-            Assert.That(results.Length, Is.EqualTo(2));
+            Assert.That(results, Has.Length.EqualTo(2));
             Assert.That(
                 results.Select(d => d.Id),
                 Is.EquivalentTo(new[]
