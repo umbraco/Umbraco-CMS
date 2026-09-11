@@ -1,4 +1,5 @@
 import { Extension } from '../../externals.js';
+import { hasClassNames, splitClassNames } from '../../utils/class-names.function.js';
 import type { Attributes } from '../../externals.js';
 
 declare module '@tiptap/core' {
@@ -48,16 +49,16 @@ export const HtmlClassAttribute = Extension.create<UmbTiptapHtmlClassAttributeOp
 					if (!className) return false;
 					const types = type ? [type] : this.options.types;
 
-					const toggleClasses = className.split(/\s+/).filter((c) => c);
+					const toggleClasses = splitClassNames(className);
 					if (toggleClasses.length === 0) {
 						return true;
 					}
 
 					return types
 						.map((t) => {
-							const existingClass = (editor.getAttributes(t)?.class as string) ?? '';
-							const classes = existingClass.split(/\s+/).filter((c) => c);
-							const hasAllToggleClasses = toggleClasses.every((c) => classes.includes(c));
+							const existingClass = editor.getAttributes(t)?.class as string | undefined;
+							const classes = splitClassNames(existingClass);
+							const hasAllToggleClasses = hasClassNames(existingClass, className);
 
 							let newClasses: Array<string>;
 							if (hasAllToggleClasses) {

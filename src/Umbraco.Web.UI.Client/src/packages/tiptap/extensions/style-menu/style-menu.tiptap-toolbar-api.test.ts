@@ -1,4 +1,4 @@
-import { BulletList, Document, Editor, Heading, ListItem, Paragraph, Text } from '../../externals.js';
+import { Bold, BulletList, Document, Editor, Heading, ListItem, Paragraph, Text } from '../../externals.js';
 import { HtmlClassAttribute } from '../html-attr-class/html-attr-class.tiptap-extension.js';
 import { HtmlIdAttribute } from '../html-attr-id/html-attr-id.tiptap-extension.js';
 import type { MetaTiptapToolbarStyleMenuItem } from '../types.js';
@@ -16,7 +16,7 @@ describe('UmbTiptapToolbarStyleMenuApi', () => {
 	let editor: Editor;
 	let api: UmbTiptapToolbarStyleMenuApi;
 
-	const attributeTypes = ['bulletList', 'heading', 'listItem', 'paragraph'];
+	const attributeTypes = ['bold', 'bulletList', 'heading', 'listItem', 'paragraph'];
 
 	const item = (data: MetaTiptapToolbarStyleMenuItem['data']): MetaTiptapToolbarStyleMenuItem => ({
 		label: 'Test style',
@@ -45,6 +45,7 @@ describe('UmbTiptapToolbarStyleMenuApi', () => {
 				Heading,
 				BulletList,
 				ListItem,
+				Bold,
 				HtmlClassAttribute.configure({ types: attributeTypes }),
 				HtmlIdAttribute.configure({ types: attributeTypes }),
 			],
@@ -123,6 +124,19 @@ describe('UmbTiptapToolbarStyleMenuApi', () => {
 
 			expect(editor.getHTML()).to.include('<h2 class="title--size-5">');
 			expect(api.isActive(editor, item({ class: 'title--size-5' }))).to.equal(true);
+		});
+
+		it('checks the class together with a tag that maps to a mark', () => {
+			setContent('<p><strong class="loud">text</strong></p>', 2);
+
+			expect(api.isActive(editor, item({ tag: 'strong', class: 'loud' }))).to.equal(true);
+			expect(api.isActive(editor, item({ tag: 'strong', class: 'quiet' }))).to.equal(false);
+		});
+
+		it('is not active for a tag that has no matching command', () => {
+			setContent('<p class="loud">text</p>');
+
+			expect(api.isActive(editor, item({ tag: 'aside', class: 'loud' }))).to.equal(false);
 		});
 	});
 });

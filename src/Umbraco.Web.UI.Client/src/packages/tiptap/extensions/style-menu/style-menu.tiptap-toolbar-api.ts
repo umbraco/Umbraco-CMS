@@ -1,4 +1,5 @@
 import { UmbTiptapToolbarElementApiBase } from '../tiptap-toolbar-element-api-base.js';
+import { hasClassNames } from '../../utils/class-names.function.js';
 import type { MetaTiptapToolbarStyleMenuItem } from '../../extensions/types.js';
 import type { ChainedCommands, Editor } from '../../externals.js';
 
@@ -66,19 +67,8 @@ export default class UmbTiptapToolbarStyleMenuApi extends UmbTiptapToolbarElemen
 
 	#hasAttributes(attrs: Record<string, unknown>, id?: string, className?: string): boolean {
 		const idMatch = !id ? true : attrs.id === id;
-		const classMatch = !className ? true : this.#hasClassNames(attrs.class, className);
+		const classMatch = !className ? true : hasClassNames(attrs.class, className);
 		return idMatch && classMatch;
-	}
-
-	#hasClassNames(value: unknown, className: string): boolean {
-		// Compare whole class names (as `toggleClassName` does), so that e.g. `size-1` does not match `size-10`.
-		const classes = String(value ?? '')
-			.split(/\s+/)
-			.filter((c) => c);
-		return className
-			.split(/\s+/)
-			.filter((c) => c)
-			.every((c) => classes.includes(c));
 	}
 
 	override execute(editor?: Editor, item?: MetaTiptapToolbarStyleMenuItem) {
