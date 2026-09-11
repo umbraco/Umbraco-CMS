@@ -56,6 +56,9 @@ export class UmbBlockWorkspaceEditorElement extends UmbLitElement {
 				gap: var(--uui-size-3);
 				min-width: 0;
 			}
+			uui-tag {
+				flex-shrink: 0;
+			}
 			#headline {
 				display: block;
 				white-space: nowrap;
