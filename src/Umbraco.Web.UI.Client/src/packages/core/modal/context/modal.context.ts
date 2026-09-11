@@ -56,6 +56,7 @@ export class UmbModalContext<
 	public readonly backdropBackground?: string;
 	public readonly router: IRouterSlot | null = null;
 	public readonly alias: string | UmbModalToken<ModalData, ModalValue>;
+	public readonly indisposable?: boolean;
 
 	#value;
 	public readonly value;
@@ -72,6 +73,7 @@ export class UmbModalContext<
 	) {
 		super(host);
 		this.key = args.modal?.key || UmbId.new();
+		this.indisposable = args.modal?.indisposable;
 		this.router = args.router ?? null;
 		this.alias = modalAlias;
 
