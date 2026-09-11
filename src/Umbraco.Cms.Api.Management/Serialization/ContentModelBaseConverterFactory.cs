@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Api.Management.Serialization;
 /// derives - at any depth - from <see cref="ContentModelBase{TValueModel, TVariantModel}"/>, so every such
 /// response model gets its <c>Variants</c>/<c>Values</c> ordered consistently without a converter of its own.
 /// </summary>
-public class ContentModelBaseConverterFactory : JsonConverterFactory
+internal sealed class ContentModelBaseConverterFactory : JsonConverterFactory
 {
     public override bool CanConvert(Type typeToConvert) => TryGetContentModelBaseType(typeToConvert, out _);
 

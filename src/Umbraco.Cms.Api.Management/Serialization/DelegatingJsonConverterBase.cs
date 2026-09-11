@@ -25,7 +25,7 @@ namespace Umbraco.Cms.Api.Management.Serialization;
 /// returning a clone derived from the wrong options.
 /// </para>
 /// </remarks>
-public abstract class DelegatingJsonConverterBase<T> : JsonConverter<T>
+internal abstract class DelegatingJsonConverterBase<T> : JsonConverter<T>
 {
     private readonly Lock _lock = new();
     private JsonSerializerOptions? _sourceOptions;

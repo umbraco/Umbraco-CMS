@@ -6,7 +6,7 @@ using Umbraco.Cms.Core.Models.Blocks;
 
 namespace Umbraco.Cms.Api.Management.Serialization;
 
-public class BlockItemDataConverter : DelegatingJsonConverterBase<BlockItemData>
+internal sealed class BlockItemDataConverter : DelegatingJsonConverterBase<BlockItemData>
 {
     public override BlockItemData? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         => JsonSerializer.Deserialize<BlockItemData>(ref reader, GetOptionsWithoutSelf(options));
