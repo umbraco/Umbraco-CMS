@@ -139,3 +139,23 @@ test('can delete a document type', {tag: '@smoke'}, async ({umbracoApi, umbracoU
   // Assert
   expect(await umbracoApi.documentType.doesNameExist(documentTypeName)).toBeFalsy();
 });
+
+test('cannot create a document type with a duplicate name', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  await umbracoApi.documentType.createDefaultDocumentType(documentTypeName);
+  await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
+
+  // Act
+  await umbracoUi.documentType.clickActionsMenuAtRoot();
+  await umbracoUi.documentType.clickCreateActionMenuOption();
+  await umbracoUi.documentType.clickCreateDocumentTypeButton();
+  await umbracoUi.documentType.enterDocumentTypeName(documentTypeName);
+  await umbracoUi.documentType.clickSaveButton();
+
+  // Assert
+  await umbracoUi.documentType.isErrorNotificationVisible();
+  // The attempted duplicate shares the existing item's name, so doesNameExist() would always be
+  // true regardless of outcome. Count matches instead to confirm no second item was created.
+  const rootDocumentTypes = await (await umbracoApi.documentType.getAllAtRoot()).json();
+  expect(rootDocumentTypes.items.filter(item => item.name === documentTypeName)).toHaveLength(1);
+});

@@ -55,6 +55,7 @@ export class ContentUiHelper extends UiBaseLocators {
   private readonly addMultipleTextStringBtn: Locator;
   private readonly multipleTextStringValueTxt: Locator;
   private readonly sliderInput: Locator;
+  private readonly dateInputTxt: Locator;
   private readonly tabItems: Locator;
   private readonly documentWorkspace: Locator;
   private readonly selectAVariantBtn: Locator;
@@ -264,6 +265,7 @@ export class ContentUiHelper extends UiBaseLocators {
       .locator("umb-input-multiple-text-string")
       .getByLabel("Value");
     this.sliderInput = page.locator("umb-property-editor-ui-slider #input");
+    this.dateInputTxt = page.locator("umb-input-date #input");
     this.tabItems = page.locator("uui-tab");
     this.documentWorkspace = page.locator("umb-document-workspace-editor");
     this.selectAVariantBtn = page.getByRole("button", {
@@ -1123,6 +1125,14 @@ export class ContentUiHelper extends UiBaseLocators {
   // Slider
   async changeSliderValue(value: string) {
     await this.sliderInput.fill(value);
+  }
+
+  /**
+   * Enters a value into the date input of the property editor currently in view.
+   * @param value - The date value, in the format the editor expects (e.g. `2026-09-01`)
+   */
+  async enterDateInputValue(value: string) {
+    await this.enterText(this.dateInputTxt, value);
   }
 
   async isDocumentTypeNameVisible(contentName: string, isVisible: boolean = true) {

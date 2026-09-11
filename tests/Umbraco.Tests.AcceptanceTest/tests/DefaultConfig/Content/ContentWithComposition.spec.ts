@@ -4,6 +4,7 @@ import {expect} from "@playwright/test";
 const contentName = 'TestContent';
 const documentTypeName = 'TestDocumentTypeForContent';
 const compositionDocumentTypeName = 'CompositionDocumentType';
+const mandatoryCompositionDocumentTypeName = 'MandatoryCompositionDocumentType';
 const dataTypeName = 'Textstring';
 const groupName = 'TestGroup';
 let compositionDocumentTypeId = null;
@@ -12,6 +13,7 @@ test.beforeEach(async ({umbracoApi, umbracoUi}) => {
   await umbracoApi.document.ensureNameNotExists(contentName);
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   await umbracoApi.documentType.ensureNameNotExists(compositionDocumentTypeName);
+  await umbracoApi.documentType.ensureNameNotExists(mandatoryCompositionDocumentTypeName);
   await umbracoUi.goToBackOffice();
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   compositionDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(compositionDocumentTypeName, dataTypeName, dataTypeData.id, groupName);
@@ -21,6 +23,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.document.ensureNameNotExists(contentName);
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   await umbracoApi.documentType.ensureNameNotExists(compositionDocumentTypeName);
+  await umbracoApi.documentType.ensureNameNotExists(mandatoryCompositionDocumentTypeName);
 });
 
 test('can create content with a document type that has a composition', async ({umbracoApi, umbracoUi}) => {
@@ -57,6 +60,31 @@ test('can edit property value from composition in content', async ({umbracoApi, 
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
+  expect(contentData.values[0].value).toEqual(text);
+});
+
+test('can not publish a mandatory property inherited via composition with an empty value', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const text = 'This is a required property value';
+  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+  const mandatoryCompositionDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(mandatoryCompositionDocumentTypeName, dataTypeName, dataTypeData.id, groupName, false, false, true);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithACompositionAndAllowAsRoot(documentTypeName, mandatoryCompositionDocumentTypeId);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickSaveAndPublishButton();
+
+  // Assert
+  await umbracoUi.content.isErrorNotificationVisible();
+  await umbracoUi.content.enterTextstring(text);
+  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
+
+  // Assert
+  const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.variants[0].state).toBe('Published');
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
   expect(contentData.values[0].value).toEqual(text);
 });

@@ -111,3 +111,23 @@ test('cannot create a stylesheet with an empty name', {tag: '@release'}, async (
   await umbracoUi.stylesheet.isFailedStateButtonVisible();
   expect(await umbracoApi.stylesheet.doesNameExist(stylesheetName)).toBeFalsy();
 });
+
+test('cannot create a stylesheet with a duplicate name', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  await umbracoApi.stylesheet.createDefaultStylesheet(stylesheetName);
+  await umbracoUi.stylesheet.goToSection(ConstantHelper.sections.settings);
+
+  // Act
+  await umbracoUi.stylesheet.clickActionsMenuAtRoot();
+  await umbracoUi.stylesheet.clickCreateActionMenuOption();
+  await umbracoUi.stylesheet.clickNewStylesheetButton();
+  await umbracoUi.stylesheet.enterStylesheetName(stylesheetName);
+  await umbracoUi.stylesheet.clickSaveButton();
+
+  // Assert
+  await umbracoUi.stylesheet.isFailedStateButtonVisible();
+  // The attempted duplicate shares the existing item's name, so doesNameExist() would always be
+  // true regardless of outcome. Count matches instead to confirm no second item was created.
+  const rootStylesheets = await (await umbracoApi.stylesheet.getAllAtRoot()).json();
+  expect(rootStylesheets.items.filter(item => item.name === stylesheetName)).toHaveLength(1);
+});

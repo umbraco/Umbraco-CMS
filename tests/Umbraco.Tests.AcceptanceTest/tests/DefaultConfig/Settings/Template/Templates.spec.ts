@@ -360,3 +360,22 @@ test('cannot create a template with an empty name', {tag: '@smoke'}, async ({umb
   await umbracoUi.template.isFailedStateButtonVisible();
   expect(await umbracoApi.template.doesNameExist(templateName)).toBeFalsy();
 });
+
+test('cannot create a template with a duplicate name', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  await umbracoApi.template.createDefaultTemplate(templateName);
+  await umbracoUi.template.goToSection(ConstantHelper.sections.settings);
+
+  // Act
+  await umbracoUi.template.clickActionsMenuAtRoot();
+  await umbracoUi.template.clickCreateActionMenuOption();
+  await umbracoUi.template.enterTemplateName(templateName);
+  await umbracoUi.template.clickSaveButton();
+
+  // Assert
+  await umbracoUi.template.isFailedStateButtonVisible();
+  // The attempted duplicate shares the existing item's name, so doesNameExist() would always be
+  // true regardless of outcome. Count matches instead to confirm no second item was created.
+  const rootTemplates = await (await umbracoApi.template.getAllAtRoot()).json();
+  expect(rootTemplates.items.filter(item => item.name === templateName)).toHaveLength(1);
+});

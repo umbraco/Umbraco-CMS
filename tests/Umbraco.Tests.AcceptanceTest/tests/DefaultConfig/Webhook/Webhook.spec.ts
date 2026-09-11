@@ -179,3 +179,42 @@ test('cannot add both content event and media event for a webhook', async ({umbr
   await umbracoUi.webhook.isModalMenuItemWithNameDisabled('Media Saved');
   await umbracoUi.webhook.isModalMenuItemWithNameDisabled('Media Deleted');
 });
+
+test('cannot create a webhook without a url', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const event = 'Content Deleted';
+  await umbracoUi.webhook.goToWebhooks();
+
+  // Act
+  await umbracoUi.webhook.clickWebhookCreateButton();
+  await umbracoUi.webhook.enterWebhookName(webhookName);
+  await umbracoUi.webhook.clickChooseEventButton();
+  await umbracoUi.webhook.clickTextButtonWithName(event);
+  await umbracoUi.webhook.clickSubmitButton();
+  await umbracoUi.webhook.clickSaveButton();
+
+  // Assert
+  await umbracoUi.webhook.isErrorNotificationVisible();
+  expect(await umbracoApi.webhook.doesNameExist(webhookName)).toBeFalsy();
+});
+
+test('can create a webhook with a value that is not a valid url', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const event = 'Content Deleted';
+  const invalidUrl = 'notAValidUrl';
+  await umbracoUi.webhook.goToWebhooks();
+
+  // Act
+  await umbracoUi.webhook.clickWebhookCreateButton();
+  await umbracoUi.webhook.enterWebhookName(webhookName);
+  await umbracoUi.webhook.enterUrl(invalidUrl);
+  await umbracoUi.webhook.clickChooseEventButton();
+  await umbracoUi.webhook.clickTextButtonWithName(event);
+  await umbracoUi.webhook.clickSubmitButton();
+  await umbracoUi.webhook.clickSaveButtonAndWaitForWebhookToBeCreated();
+
+  // Assert
+  // The webhook URL field has no format validation, so a value that is not a valid URL is accepted and saved as-is.
+  expect(await umbracoApi.webhook.doesNameExist(webhookName)).toBeTruthy();
+  expect(await umbracoApi.webhook.doesWebhookHaveUrl(webhookName, invalidUrl)).toBeTruthy();
+});

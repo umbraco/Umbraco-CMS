@@ -1,4 +1,4 @@
-import {AliasHelper, ConstantHelper, test} from '@umbraco/acceptance-test-helpers';
+import {AliasHelper, ConstantHelper, NotificationConstantHelper, test} from '@umbraco/acceptance-test-helpers';
 import {expect} from "@playwright/test";
 
 const contentName = 'TestContent';
@@ -99,6 +99,34 @@ test('can remove an image from the image media picker', async ({umbracoApi, umbr
 
   // Assert
   expect(await umbracoApi.document.doesImageMediaPickerContainImage(contentName, AliasHelper.toAlias(dataTypeName), imageId)).toBeFalsy();
+
+  // Clean
+  await umbracoApi.media.ensureNameNotExists(mediaName);
+});
+
+test('can not publish a mandatory image media picker with an empty value', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const dataType = await umbracoApi.dataType.getByName(dataTypeName);
+  await umbracoApi.media.ensureNameNotExists(mediaName);
+  const imageId = await umbracoApi.media.createDefaultMediaWithImage(mediaName);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataType.id, groupName, false, false, true);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickSaveAndPublishButton();
+
+  // Assert
+  await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.nullValue);
+  await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
+  await umbracoUi.content.clickChooseButtonAndSelectMediaWithName(mediaName);
+  await umbracoUi.content.clickChooseModalButton();
+  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBeUpdated();
+
+  // Assert
+  expect(await umbracoApi.document.doesImageMediaPickerContainImage(contentName, AliasHelper.toAlias(dataTypeName), imageId)).toBeTruthy();
 
   // Clean
   await umbracoApi.media.ensureNameNotExists(mediaName);

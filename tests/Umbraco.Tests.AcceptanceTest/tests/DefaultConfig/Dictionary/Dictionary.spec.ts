@@ -213,3 +213,21 @@ test('can search a dictionary item in list when have no results', async ({umbrac
   // Assert
   await umbracoUi.dictionary.isSearchResultMessageDisplayEmpty(emptySearchResultMessage);
 });
+
+test('cannot create a dictionary item with a duplicate name', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  await umbracoApi.dictionary.create(dictionaryName);
+  await umbracoUi.dictionary.goToSection(ConstantHelper.sections.dictionary);
+
+  // Act
+  await umbracoUi.dictionary.clickCreateLink();
+  await umbracoUi.dictionary.enterDictionaryName(dictionaryName);
+  await umbracoUi.dictionary.clickSaveButton();
+
+  // Assert
+  await umbracoUi.dictionary.isErrorNotificationVisible();
+  // The attempted duplicate shares the existing item's name, so doesNameExist() would always be
+  // true regardless of outcome. Count matches instead to confirm no second item was created.
+  const rootDictionaryItems = await (await umbracoApi.dictionary.getAllAtRoot()).json();
+  expect(rootDictionaryItems.items.filter(item => item.name === dictionaryName)).toHaveLength(1);
+});

@@ -90,13 +90,40 @@ This is why `UserGroupUiHelper`/`UserUiHelper` filter with `getByText(name, {exa
 
 ## 4. Test data & isolation
 
-- **Idempotent cleanup**: create with the API, tear down with `ensureNameNotExists()` in both `beforeEach` and `afterEach`.
+- **Idempotent cleanup**: create with the API, tear down with `ensureNameNotExists()` in both `beforeEach` and `afterEach` — not only inline at the end of the test body. An inline-only cleanup line never runs if an earlier assertion in the test throws, leaking the entity into later runs. This is an easy mistake to repeat even when writing carefully — it recurred multiple times in one PR across several files before being caught by review.
+
+  ```ts
+  // ✗ leaks if an earlier assertion throws — this line is only reached on success
+  test('...', async ({umbracoApi, umbracoUi}) => {
+    const dataTypeId = await umbracoApi.dataType.createDefaultNumericWithMinMax(name, 1, 10);
+    // ...assertions that could fail...
+    await umbracoApi.dataType.ensureNameNotExists(name);
+  });
+
+  // ✓ runs regardless of how the test body exits
+  test.afterEach(async ({umbracoApi}) => {
+    await umbracoApi.dataType.ensureNameNotExists(name);
+  });
+  ```
 - **Tests run serially** (`workers: 1`) because specs share fixed entity names (`TestContent`, …) and would collide in parallel. If you add data, keep names unique to your file/test so cleanup can't affect another test.
 - Cleanup caveats to be aware of when debugging leftover state: some `ensureNameNotExists` / `recurseChildren` helpers delete only the **first** match, and list fetches use a single large `take` (no pagination) — duplicates or very large trees can leave residue.
 
 ---
 
-## 5. Generated / ignored files
+## 5. Verify validation behavior — never guess
+
+Assuming a validation message, error state, or rejection behavior from reading source code (or from a similar-looking editor) is wrong often enough to be a named discipline, not an edge case. Always confirm against the live rendered accessibility snapshot (`error-context.md` on a failed run) or the actual API response before writing the assertion — do not infer it from the localization file, a sibling editor, or memory of "how this usually works." Concrete examples of behavior that looked predictable but wasn't:
+
+- Numeric/Decimal min/max at the top level of a content property render Chromium's *native* constraint-validation text (`The value X is less than the allowed minimum value of Y`), not the app's own localized `validation_numberMinimum` string — but the *same* min/max check on a property inside a Block List/Grid renders the app's own message instead (`Value must be less than or equal to 'Y'.`). Same validator, two different rendering paths depending on where the property lives.
+- Mandatory-empty messages vary by editor family for no rule you can predict from the editor's category: most render "Value cannot be null", the newer Date Only/Time Only/Date Time With Time Zone pickers render a distinct "Please select a date" — but the legacy Date Picker, despite sharing the same underlying `<umb-input-date>` component as those three, renders "Value cannot be null" like everything else.
+- Duplicate names are rejected with an error notification for every named entity — Dictionary, DocumentType, MediaType, MemberType, Script, Stylesheet, Template, PartialView — with exactly one exception: DataType silently auto-renames the new one with a `" (1)"` suffix and saves it successfully, with no error at all.
+- A disallowed file extension on Upload File/Upload Vector Graphics is rejected with **no visible feedback whatsoever** — no error message, no notification, just an empty dropzone.
+
+None of these are bugs to work around — they're the actual product behavior, and a test that asserts the wrong one will fail (or worse, silently assert something the product doesn't do). When in doubt, run the scenario once against a live instance and read what actually rendered before deciding what the test should check.
+
+---
+
+## 6. Generated / ignored files
 
 - `console-errors.json` is generated at install/run time and is **git-ignored** — do not commit it. Console errors captured during a run are appended here for inspection; they are not (yet) a failing gate.
 - `.env`, `playwright/.auth/`, and `results/` are also ignored.

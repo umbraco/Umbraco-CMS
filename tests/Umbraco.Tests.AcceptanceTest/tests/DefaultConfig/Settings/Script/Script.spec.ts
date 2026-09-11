@@ -110,3 +110,23 @@ test('cannot create a script with an empty name', {tag: '@release'}, async ({umb
   await umbracoUi.script.isFailedStateButtonVisible();
   expect(await umbracoApi.script.doesNameExist(scriptName)).toBeFalsy();
 });
+
+test('cannot create a script with a duplicate name', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  await umbracoApi.script.createDefaultScript(scriptName);
+  await umbracoUi.script.goToSection(ConstantHelper.sections.settings);
+
+  // Act
+  await umbracoUi.script.clickActionsMenuAtRoot();
+  await umbracoUi.script.clickCreateActionMenuOption();
+  await umbracoUi.script.clickNewJavascriptFileButton();
+  await umbracoUi.script.enterScriptName(scriptName);
+  await umbracoUi.script.clickSaveButton();
+
+  // Assert
+  await umbracoUi.script.isFailedStateButtonVisible();
+  // The attempted duplicate shares the existing item's name, so doesNameExist() would always be
+  // true regardless of outcome. Count matches instead to confirm no second item was created.
+  const rootScripts = await (await umbracoApi.script.getAllAtRoot()).json();
+  expect(rootScripts.items.filter(item => item.name === scriptName)).toHaveLength(1);
+});

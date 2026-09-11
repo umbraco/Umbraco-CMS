@@ -3,34 +3,28 @@ import {expect} from "@playwright/test";
 
 const contentName = 'TestContent';
 const documentTypeName = 'TestDocumentTypeForContent';
-const dataTypeName = 'TestUserPicker';
-const userName = 'TestUserForContent';
-const userEmail = 'testuserforcontent@acceptance.test';
-let userId = '';
-let dataTypeId = '';
+const dataTypeName = 'Custom Date Picker';
+const dateValue = '2026-09-01';
+const expectedValue = '2026-09-01 00:00:00';
 
-test.beforeEach(async ({umbracoApi}) => {
+test.beforeEach(async ({umbracoApi, umbracoUi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   await umbracoApi.document.ensureNameNotExists(contentName);
   await umbracoApi.dataType.ensureNameNotExists(dataTypeName);
-  await umbracoApi.user.ensureNameNotExists(userName);
-  const userGroup = await umbracoApi.userGroup.getByName('Administrators');
-  userId = await umbracoApi.user.createDefaultUser(userName, userEmail, [userGroup.id]);
-  dataTypeId = await umbracoApi.dataType.createDefaultUserPickerDataType(dataTypeName);
+  await umbracoUi.goToBackOffice();
 });
 
 test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.document.ensureNameNotExists(contentName);
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   await umbracoApi.dataType.ensureNameNotExists(dataTypeName);
-  await umbracoApi.user.ensureNameNotExists(userName);
 });
 
-test('can create content with the user picker data type', async ({umbracoApi, umbracoUi}) => {
+test('can create content with the date picker data type', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const expectedState = 'Draft';
+  const dataTypeId = await umbracoApi.dataType.createDefaultDateTimeDataType(dataTypeName);
   await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeId);
-  await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
   // Act
@@ -38,43 +32,43 @@ test('can create content with the user picker data type', async ({umbracoApi, um
   await umbracoUi.content.clickCreateActionMenuOption();
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(contentName);
-  await umbracoUi.content.addUserPicker(userName);
+  await umbracoUi.content.enterDateInputValue(dateValue);
   await umbracoUi.content.clickSaveButtonAndWaitForContentToBeCreated();
 
   // Assert
-  await expect.poll(() => umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
+  expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
-  expect(contentData.values[0].value).toEqual(userId);
+  expect(contentData.values[0].value).toEqual(expectedValue);
 });
 
-test('can publish content with the user picker data type', async ({umbracoApi, umbracoUi}) => {
+test('can publish content with the date picker data type', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const expectedState = 'Published';
+  const dataTypeId = await umbracoApi.dataType.createDefaultDateTimeDataType(dataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeId);
   await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
-  await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
-  await umbracoUi.content.addUserPicker(userName);
+  await umbracoUi.content.enterDateInputValue(dateValue);
   await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await expect.poll(() => umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
+  expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
-  expect(contentData.values[0].value).toEqual(userId);
+  expect(contentData.values[0].value).toEqual(expectedValue);
 });
 
-test('can not publish a mandatory user picker with an empty value', async ({umbracoApi, umbracoUi}) => {
+test('can not publish a mandatory date picker with an empty value', async ({umbracoApi, umbracoUi}) => {
   // Arrange
+  const dataTypeId = await umbracoApi.dataType.createDefaultDateTimeDataType(dataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeId, 'Test Group', false, false, true);
   await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
-  await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
   // Act
@@ -84,12 +78,11 @@ test('can not publish a mandatory user picker with an empty value', async ({umbr
   // Assert
   await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.nullValue);
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
-  await umbracoUi.content.addUserPicker(userName);
-  await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.nullValue, false);
+  await umbracoUi.content.enterDateInputValue(dateValue);
   await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBeUpdated();
 
   // Assert
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
-  expect(contentData.values[0].value).toEqual(userId);
+  expect(contentData.values[0].value).toEqual(expectedValue);
 });

@@ -90,3 +90,22 @@ test('can delete a member type', async ({umbracoApi, umbracoUi}) => {
   expect(await umbracoApi.memberType.doesNameExist(memberTypeName)).toBeFalsy();
   await umbracoUi.memberType.isMemberTypeTreeItemVisible(memberTypeName, false);
 });
+
+test('cannot create a member type with a duplicate name', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  await umbracoApi.memberType.createDefaultMemberType(memberTypeName);
+
+  // Act
+  await umbracoUi.memberType.clickActionsMenuAtRoot();
+  await umbracoUi.memberType.clickCreateActionMenuOption();
+  await umbracoUi.memberType.clickMemberTypeButton();
+  await umbracoUi.memberType.enterMemberTypeName(memberTypeName);
+  await umbracoUi.memberType.clickSaveButton();
+
+  // Assert
+  await umbracoUi.memberType.isErrorNotificationVisible();
+  // The attempted duplicate shares the existing item's name, so doesNameExist() would always be
+  // true regardless of outcome. Count matches instead to confirm no second item was created.
+  const rootMemberTypes = await (await umbracoApi.memberType.getAllAtRoot()).json();
+  expect(rootMemberTypes.items.filter(item => item.name === memberTypeName)).toHaveLength(1);
+});

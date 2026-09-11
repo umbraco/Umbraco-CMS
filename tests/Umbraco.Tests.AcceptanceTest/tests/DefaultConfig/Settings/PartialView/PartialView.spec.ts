@@ -281,3 +281,23 @@ test('cannot create a partial view with an empty name', {tag: '@release'}, async
   await umbracoUi.partialView.isFailedStateButtonVisible();
   expect(await umbracoApi.partialView.doesNameExist(partialViewFileName)).toBeFalsy();
 });
+
+test('cannot create a partial view with a duplicate name', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  await umbracoApi.partialView.createDefaultPartialView(partialViewFileName);
+  await umbracoUi.partialView.goToSection(ConstantHelper.sections.settings);
+
+  // Act
+  await umbracoUi.partialView.clickActionsMenuAtRoot();
+  await umbracoUi.partialView.clickCreateActionMenuOption();
+  await umbracoUi.partialView.clickNewEmptyPartialViewButton();
+  await umbracoUi.partialView.enterPartialViewName(partialViewName);
+  await umbracoUi.partialView.clickSaveButton();
+
+  // Assert
+  await umbracoUi.partialView.isFailedStateButtonVisible();
+  // The attempted duplicate shares the existing item's name, so doesNameExist() would always be
+  // true regardless of outcome. Count matches instead to confirm no second item was created.
+  const rootPartialViews = await (await umbracoApi.partialView.getAllAtRoot()).json();
+  expect(rootPartialViews.items.filter(item => item.name === partialViewFileName)).toHaveLength(1);
+});
