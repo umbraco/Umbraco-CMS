@@ -541,10 +541,10 @@ export class UserGroupApiHelper {
     return false;
   }
 
+  // Pass exact: false when the group may carry extra permissions beyond the ones asserted.
   async doesUserGroupHaveFallbackPermissions(userGroupName: string, permissions: string[], exact: boolean = true) {
     const userGroup = await this.getByName(userGroupName);
     const fallbackPermissions = userGroup.fallbackPermissions;
-    // Pass exact: false when the group may carry extra permissions beyond the ones asserted.
     if (exact && permissions.length !== fallbackPermissions.length) {
       return false;
     }
