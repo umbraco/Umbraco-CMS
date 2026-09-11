@@ -26,6 +26,7 @@ public class CreateDocumentBlueprintFolderController : DocumentBlueprintFolderCo
     /// </summary>
     /// <param name="backOfficeSecurityAccessor">Accessor for back office security operations.</param>
     /// <param name="contentBlueprintContainerService">Service for managing content blueprint containers.</param>
+    /// <param name="authorizationService">The authorization service.</param>
     [ActivatorUtilitiesConstructor]
     public CreateDocumentBlueprintFolderController(
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
@@ -34,6 +35,11 @@ public class CreateDocumentBlueprintFolderController : DocumentBlueprintFolderCo
         : base(backOfficeSecurityAccessor, contentBlueprintContainerService)
         => _authorizationService = authorizationService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="CreateDocumentBlueprintFolderController"/> class.
+    /// </summary>
+    /// <param name="backOfficeSecurityAccessor">Accessor for back office security operations.</param>
+    /// <param name="contentBlueprintContainerService">Service for managing content blueprint containers.</param>
     [Obsolete("Use the constructor with all parameters. Scheduled for removal in Umbraco 21.")]
     public CreateDocumentBlueprintFolderController(
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,

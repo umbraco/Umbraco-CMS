@@ -26,6 +26,7 @@ public class ByKeyDocumentBlueprintFolderController : DocumentBlueprintFolderCon
     /// </summary>
     /// <param name="backOfficeSecurityAccessor">Provides access to back office security features for authorization and authentication.</param>
     /// <param name="contentBlueprintContainerService">Service used to manage content blueprint containers (folders).</param>
+    /// <param name="authorizationService">The authorization service.</param>
     [ActivatorUtilitiesConstructor]
     public ByKeyDocumentBlueprintFolderController(
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
@@ -34,6 +35,11 @@ public class ByKeyDocumentBlueprintFolderController : DocumentBlueprintFolderCon
         : base(backOfficeSecurityAccessor, contentBlueprintContainerService)
         => _authorizationService = authorizationService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ByKeyDocumentBlueprintFolderController"/> class.
+    /// </summary>
+    /// <param name="backOfficeSecurityAccessor">Provides access to back office security features for authorization and authentication.</param>
+    /// <param name="contentBlueprintContainerService">Service used to manage content blueprint containers (folders).</param>
     [Obsolete("Use the constructor with all parameters. Scheduled for removal in Umbraco 21.")]
     public ByKeyDocumentBlueprintFolderController(
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
@@ -45,6 +51,12 @@ public class ByKeyDocumentBlueprintFolderController : DocumentBlueprintFolderCon
     {
     }
 
+    /// <summary>
+    /// Gets a document blueprint folder by its unique key.
+    /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <param name="id">The unique identifier of the document blueprint folder.</param>
+    /// <returns>An <see cref="IActionResult"/> holding the document blueprint folder, if it was found.</returns>
     [HttpGet("{id:guid}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(FolderResponseModel), StatusCodes.Status200OK)]

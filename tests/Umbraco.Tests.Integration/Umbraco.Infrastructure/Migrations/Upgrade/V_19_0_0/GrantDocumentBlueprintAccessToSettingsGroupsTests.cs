@@ -32,8 +32,6 @@ internal sealed class GrantDocumentBlueprintAccessToSettingsGroupsTests : Umbrac
 {
     private IUserGroupService UserGroupService => GetRequiredService<IUserGroupService>();
 
-    private IShortStringHelper ShortStringHelper => GetRequiredService<IShortStringHelper>();
-
     [Test]
     public async Task Grants_Access_To_A_Group_With_Settings_Access()
     {
