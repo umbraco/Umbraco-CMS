@@ -75,10 +75,11 @@ internal abstract class AsyncContentEditingServiceWithSortingBase<TContent, TCon
     /// <summary>
     /// Sorts the specified items.
     /// </summary>
-    /// <param name="items">The items to sort.</param>
-    /// <param name="userId">The user performing the sort operation.</param>
+    /// <param name="orderedKeys">The Guid keys of the items to sort, in the desired order.</param>
+    /// <param name="userKey">The Guid key of the user performing the sort operation.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The operation status.</returns>
-    protected abstract ContentEditingOperationStatus Sort(IEnumerable<TContent> items, int userId);
+    protected abstract Task<ContentEditingOperationStatus> SortAsync(IReadOnlyList<Guid> orderedKeys, Guid userKey, CancellationToken cancellationToken);
 
     /// <summary>
     /// Gets the paged children of the specified parent.
@@ -125,9 +126,7 @@ internal abstract class AsyncContentEditingServiceWithSortingBase<TContent, TCon
                 .SortEntities(children, sortingModels)
                 .ToArray();
 
-            var userId = await GetUserIdAsync(userKey);
-
-            return Sort(sortedChildren, userId);
+            return await SortAsync(sortedChildren.Select(child => child.Key).ToArray(), userKey, CancellationToken.None);
         }
         catch (ArgumentException argumentException)
         {
@@ -170,7 +169,7 @@ internal abstract class AsyncContentEditingServiceWithSortingBase<TContent, TCon
                 return ContentEditingOperationStatus.Success;
             }
 
-            return Sort(orderedChildren, await GetUserIdAsync(userKey));
+            return await SortAsync(orderedChildren.Select(child => child.Key).ToArray(), userKey, CancellationToken.None);
         }
 
         // Default path: persist the resulting order with a single set-based update and a branch cache

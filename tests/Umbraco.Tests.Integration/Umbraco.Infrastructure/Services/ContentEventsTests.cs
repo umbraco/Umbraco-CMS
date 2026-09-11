@@ -829,7 +829,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             IContent[] content1Csorted = new[] { content1C[3], content1C[0], content1C[1], content1C[2] };
 
             ResetEvents();
-            ContentService.Sort(content1Csorted);
+            await ContentService.SortAsync(content1Csorted.Select(c => c.Key).ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
 
             IContent[] content1Cagain = Children(content1).ToArray();
             Assert.AreEqual(4, content1Cagain.Length);
@@ -866,7 +866,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             IContent[] content1Csorted = new[] { content1C[0], content1C[1], content1C[3], content1C[2] };
 
             ResetEvents();
-            ContentService.Sort(content1Csorted);
+            await ContentService.SortAsync(content1Csorted.Select(c => c.Key).ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
 
             IContent[] content1Cagain = Children(content1).ToArray();
             Assert.AreEqual(4, content1Cagain.Length);

@@ -305,10 +305,16 @@ internal sealed class ContentEditingService
         => ContentService.GetChildrenAsync(parentKey, pageIndex * pageSize, pageSize, propertyAliases: null, ordering, CancellationToken.None);
 
     /// <inheritdoc />
-    protected override ContentEditingOperationStatus Sort(IEnumerable<IContent> items, int userId)
+    protected override async Task<ContentEditingOperationStatus> SortAsync(IReadOnlyList<Guid> orderedKeys, Guid userKey, CancellationToken cancellationToken)
     {
-        OperationResult result = ContentService.Sort(items, userId);
-        return OperationResultToOperationStatus(result);
+        Attempt<ContentSortOperationStatus> result = await ContentService.SortAsync(orderedKeys, userKey, cancellationToken);
+        OperationResult operationResult = result.Result switch
+        {
+            ContentSortOperationStatus.Success => OperationResult.Succeed(new EventMessages()),
+            ContentSortOperationStatus.NoOperation => new OperationResult(OperationResultType.NoOperation, new EventMessages()),
+            _ => OperationResult.Cancel(new EventMessages()),
+        };
+        return OperationResultToOperationStatus(operationResult);
     }
 
     /// <inheritdoc />

@@ -187,14 +187,14 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         }
         else
         {
-            IContent[] rotated =
+            Guid[] rotated =
             [
-                byKey[new Guid(SubPage2Key)],
-                byKey[new Guid(SubPage3Key)],
-                byKey[new Guid(SubPageKey)],
+                byKey[new Guid(SubPage2Key)].Key,
+                byKey[new Guid(SubPage3Key)].Key,
+                byKey[new Guid(SubPageKey)].Key,
             ];
 
-            OperationResult result = ContentService.Sort(rotated);
+            Attempt<ContentSortOperationStatus> result = await ContentService.SortAsync(rotated, Constants.Security.SuperUserKey, CancellationToken.None);
             Assert.That(result.Success, Is.True);
         }
 

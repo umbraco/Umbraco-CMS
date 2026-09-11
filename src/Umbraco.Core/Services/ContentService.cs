@@ -1460,73 +1460,88 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
         return Attempt.Succeed(ContentSendToPublicationOperationStatus.Success);
     }
 
-    /// <summary>
-    ///     Sorts a collection of <see cref="IContent" /> objects by updating the SortOrder according
-    ///     to the ordering of items in the passed in <paramref name="items" />.
-    /// </summary>
-    /// <remarks>
-    ///     Using this method will ensure that the Published-state is maintained upon sorting
-    ///     so the cache is updated accordingly - as needed.
-    /// </remarks>
-    /// <param name="items"></param>
-    /// <param name="userId"></param>
-    /// <returns>Result indicating what action was taken when handling the command.</returns>
-    public OperationResult Sort(IEnumerable<IContent> items, int userId = Constants.Security.SuperUserId)
+    /// <inheritdoc />
+    public async Task<Attempt<ContentSortOperationStatus>> SortAsync(IReadOnlyList<Guid> orderedKeys, Guid userKey, CancellationToken cancellationToken)
     {
-        EventMessages evtMsgs = EventMessagesFactory.Get();
-
-        IContent[] itemsA = items.ToArray();
-        if (itemsA.Length == 0)
+        if (orderedKeys.Count == 0)
         {
-            return new OperationResult(OperationResultType.NoOperation, evtMsgs);
+            return Attempt.Fail(ContentSortOperationStatus.NoOperation);
         }
 
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        EventMessages eventMessages = EventMessagesFactory.Get();
+
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.WriteLock(Constants.Locks.ContentTree);
+
+        // Reload within the lock so sorting operates on fully-loaded entities. Callers may pass
+        // partially-loaded content (e.g. loaded with loadTemplates: false or without property data),
+        // and saving those directly would wipe the template and property data (#23120).
+        // GetByIdsAsync returns items in the requested order, preserving the caller's ordering that drives the sort.
+        IContent[] itemsA = (await GetByIdsAsync(orderedKeys, cancellationToken)).ToArray();
+
+        var sortingNotification = new ContentSortingNotification(itemsA, eventMessages);
+        if (await scope.Notifications.PublishCancelableAsync(sortingNotification))
         {
-            scope.WriteLock(Constants.Locks.ContentTree);
-
-            // Reload within the lock so sorting operates on fully-loaded entities. Callers may pass
-            // partially-loaded content (e.g. loaded with loadTemplates: false or without property data),
-            // and saving those directly would wipe the template and property data (#23120).
-            // GetByIdsAsync returns items in the requested order, preserving the caller's ordering that drives the sort.
-            IContent[] reloaded = GetByIdsAsync(itemsA.Select(x => x.Key).ToArray(), CancellationToken.None).GetAwaiter().GetResult().ToArray();
-
-            OperationResult ret = Sort(scope, reloaded, userId, evtMsgs);
             scope.Complete();
-            return ret;
-        }
-    }
-
-    /// <summary>
-    ///     Sorts a collection of <see cref="IContent" /> objects by updating the SortOrder according
-    ///     to the ordering of items identified by the <paramref name="ids" />.
-    /// </summary>
-    /// <remarks>
-    ///     Using this method will ensure that the Published-state is maintained upon sorting
-    ///     so the cache is updated accordingly - as needed.
-    /// </remarks>
-    /// <param name="ids"></param>
-    /// <param name="userId"></param>
-    /// <returns>Result indicating what action was taken when handling the command.</returns>
-    public OperationResult Sort(IEnumerable<int>? ids, int userId = Constants.Security.SuperUserId)
-    {
-        EventMessages evtMsgs = EventMessagesFactory.Get();
-
-        var idsA = ids?.ToArray();
-        if (idsA is null || idsA.Length == 0)
-        {
-            return new OperationResult(OperationResultType.NoOperation, evtMsgs);
+            return Attempt.Fail(ContentSortOperationStatus.CancelledByNotification);
         }
 
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        var savingNotification = new ContentSavingNotification(itemsA, eventMessages);
+        if (await scope.Notifications.PublishCancelableAsync(savingNotification))
         {
-            scope.WriteLock(Constants.Locks.ContentTree);
-            IContent[] itemsA = GetByIdsAsync(ResolveKeys(idsA), CancellationToken.None).GetAwaiter().GetResult().ToArray();
-
-            OperationResult ret = Sort(scope, itemsA, userId, evtMsgs);
             scope.Complete();
-            return ret;
+            return Attempt.Fail(ContentSortOperationStatus.CancelledByNotification);
         }
+
+        int userId = await _userIdKeyResolver.GetAsync(userKey);
+
+        var published = new List<IContent>();
+        var saved = new List<IContent>();
+        var sortOrder = 0;
+
+        foreach (IContent content in itemsA)
+        {
+            // if the current sort order equals that of the content we don't
+            // need to update it, so just increment the sort order and continue.
+            if (content.SortOrder == sortOrder)
+            {
+                sortOrder++;
+                continue;
+            }
+
+            // else update
+            content.SortOrder = sortOrder++;
+            content.WriterId = userId;
+
+            // if it's published, register it, no point running StrategyPublish
+            // since we're not really publishing it and it cannot be cancelled etc
+            if (content.Published)
+            {
+                published.Add(content);
+            }
+
+            // save
+            saved.Add(content);
+            await _asyncDocumentRepository.SaveAsync(content, cancellationToken);
+            await AuditAsync(AuditType.Sort, userId, content.Id, "Sorting content performed by user");
+        }
+
+        // first saved, then sorted
+        scope.Notifications.Publish(
+            new ContentSavedNotification(itemsA, eventMessages).WithStateFrom(savingNotification));
+        scope.Notifications.Publish(
+            new ContentSortedNotification(itemsA, eventMessages).WithStateFrom(sortingNotification));
+
+        scope.Notifications.Publish(
+            new ContentTreeChangeNotification(saved, TreeChangeTypes.RefreshNode, eventMessages));
+
+        if (published.Count > 0)
+        {
+            scope.Notifications.Publish(new ContentPublishedNotification(published, eventMessages));
+        }
+
+        scope.Complete();
+        return Attempt.Succeed(ContentSortOperationStatus.Success);
     }
 
     /// <inheritdoc />
@@ -1568,71 +1583,6 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
 
         scope.Complete();
         return Attempt.Succeed(ContentSortChildrenOperationStatus.Success);
-    }
-
-    private OperationResult Sort(ICoreScope scope, IContent[] itemsA, int userId, EventMessages eventMessages)
-    {
-        var sortingNotification = new ContentSortingNotification(itemsA, eventMessages);
-        var savingNotification = new ContentSavingNotification(itemsA, eventMessages);
-
-        // raise cancelable sorting event
-        if (scope.Notifications.PublishCancelable(sortingNotification))
-        {
-            return OperationResult.Cancel(eventMessages);
-        }
-
-        // raise cancelable saving event
-        if (scope.Notifications.PublishCancelable(savingNotification))
-        {
-            return OperationResult.Cancel(eventMessages);
-        }
-
-        var published = new List<IContent>();
-        var saved = new List<IContent>();
-        var sortOrder = 0;
-
-        foreach (IContent content in itemsA)
-        {
-            // if the current sort order equals that of the content we don't
-            // need to update it, so just increment the sort order and continue.
-            if (content.SortOrder == sortOrder)
-            {
-                sortOrder++;
-                continue;
-            }
-
-            // else update
-            content.SortOrder = sortOrder++;
-            content.WriterId = userId;
-
-            // if it's published, register it, no point running StrategyPublish
-            // since we're not really publishing it and it cannot be cancelled etc
-            if (content.Published)
-            {
-                published.Add(content);
-            }
-
-            // save
-            saved.Add(content);
-            _documentRepository.Save(content);
-            Audit(AuditType.Sort, userId, content.Id, "Sorting content performed by user");
-        }
-
-        // first saved, then sorted
-        scope.Notifications.Publish(
-            new ContentSavedNotification(itemsA, eventMessages).WithStateFrom(savingNotification));
-        scope.Notifications.Publish(
-            new ContentSortedNotification(itemsA, eventMessages).WithStateFrom(sortingNotification));
-
-        scope.Notifications.Publish(
-            new ContentTreeChangeNotification(saved, TreeChangeTypes.RefreshNode, eventMessages));
-
-        if (published.Any())
-        {
-            scope.Notifications.Publish(new ContentPublishedNotification(published, eventMessages));
-        }
-
-        return OperationResult.Succeed(eventMessages);
     }
 
     /// <inheritdoc />

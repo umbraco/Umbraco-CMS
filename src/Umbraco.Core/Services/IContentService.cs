@@ -434,20 +434,19 @@ public interface IContentService : IPublishableContentService<IContent>, IAsyncP
     Task<bool> RecycleBinSmellsAsync(CancellationToken cancellationToken);
 
     /// <summary>
-    ///     Sorts documents.
+    ///     Sorts documents by persisting the supplied (already ordered) keys as the new sort order,
+    ///     firing cancelable sorting/saving notifications and per-item saved/sorted/audit records for
+    ///     every document whose position actually changes.
     /// </summary>
-    /// <param name="items">The documents to sort, in the desired order.</param>
-    /// <param name="userId">The identifier of the user performing the action.</param>
-    /// <returns>The operation result.</returns>
-    OperationResult Sort(IEnumerable<IContent> items, int userId = Constants.Security.SuperUserId);
-
-    /// <summary>
-    ///     Sorts documents.
-    /// </summary>
-    /// <param name="ids">The document identifiers, in the desired order.</param>
-    /// <param name="userId">The identifier of the user performing the action.</param>
-    /// <returns>The operation result.</returns>
-    OperationResult Sort(IEnumerable<int>? ids, int userId = Constants.Security.SuperUserId);
+    /// <param name="orderedKeys">The Guid keys of the documents, in the desired order.</param>
+    /// <param name="userKey">The Guid key of the user performing the action.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>An attempt carrying the operation status.</returns>
+    /// <remarks>
+    ///     Unlike <see cref="SortChildrenAsync" />, this reloads each document, fires cancelable
+    ///     sorting/saving notifications, and only persists/audits items whose sort position changes.
+    /// </remarks>
+    Task<Attempt<ContentSortOperationStatus>> SortAsync(IReadOnlyList<Guid> orderedKeys, Guid userKey, CancellationToken cancellationToken);
 
     /// <summary>
     ///     Sorts the children of a parent by persisting the supplied (already ordered) child keys as the
@@ -459,7 +458,7 @@ public interface IContentService : IPublishableContentService<IContent>, IAsyncP
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>An attempt carrying the operation status.</returns>
     /// <remarks>
-    ///     Unlike <see cref="Sort(IEnumerable{int}?, int)" />, this does not load the children or fire per-item
+    ///     Unlike <see cref="SortAsync" />, this does not load the children or fire per-item
     ///     save/sort notifications; it persists the order directly and refreshes the affected cache branch.
     /// </remarks>
     Task<Attempt<ContentSortChildrenOperationStatus>> SortChildrenAsync(Guid? parentKey, IReadOnlyList<Guid> orderedChildKeys, Guid userKey, CancellationToken cancellationToken);
