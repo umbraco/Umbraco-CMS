@@ -1,4 +1,6 @@
+import { NodeSelection } from '../../externals.js';
 import { UmbTiptapToolbarElementApiBase } from '../tiptap-toolbar-element-api-base.js';
+import { hasClassNames } from '../../utils/class-names.function.js';
 import type { MetaTiptapToolbarStyleMenuItem } from '../../extensions/types.js';
 import type { ChainedCommands, Editor } from '../../externals.js';
 
@@ -17,7 +19,7 @@ export default class UmbTiptapToolbarStyleMenuApi extends UmbTiptapToolbarElemen
 		};
 	}
 
-	#commands: Record<string, UmbTiptapToolbarStyleMenuCommandType> = {
+	readonly #commands: Record<string, UmbTiptapToolbarStyleMenuCommandType> = {
 		h1: this.#headingCommand(1),
 		h2: this.#headingCommand(2),
 		h3: this.#headingCommand(3),
@@ -44,7 +46,7 @@ export default class UmbTiptapToolbarStyleMenuApi extends UmbTiptapToolbarElemen
 
 		const { tag, id, class: className } = item.data;
 		if (tag) return this.#isTagActive(editor, tag, id, className);
-		return this.#hasAncestorWithAttributes(editor, id, className);
+		return this.#hasAttributesAroundSelection(editor, id, className);
 	}
 
 	#isTagActive(editor: Editor, tag: string, id?: string, className?: string): boolean {
@@ -54,9 +56,23 @@ export default class UmbTiptapToolbarStyleMenuApi extends UmbTiptapToolbarElemen
 		return tagMatch && this.#hasAttributes(editor.getAttributes(ext.type), id, className);
 	}
 
-	#hasAncestorWithAttributes(editor: Editor, id?: string, className?: string): boolean {
-		// Without a tag, `execute` toggles the id/class on every node type around the selection, not only on paragraphs,
-		// so the item is active when any ancestor node of the selection carries them.
+	#hasAttributesAroundSelection(editor: Editor, id?: string, className?: string): boolean {
+		// Without a tag, `execute` toggles the id/class on every node and mark type around the selection, so the item
+		// is active when any of them - the selected node, an ancestor node, or a mark on the selection - carries them.
+		return (
+			this.#hasSelectedNodeWithAttributes(editor, id, className) ||
+			this.#hasAncestorNodeWithAttributes(editor, id, className) ||
+			this.#hasMarkWithAttributes(editor, id, className)
+		);
+	}
+
+	#hasSelectedNodeWithAttributes(editor: Editor, id?: string, className?: string): boolean {
+		const { selection } = editor.state;
+		if (!(selection instanceof NodeSelection)) return false;
+		return this.#hasAttributes(selection.node.attrs, id, className);
+	}
+
+	#hasAncestorNodeWithAttributes(editor: Editor, id?: string, className?: string): boolean {
 		const { $from } = editor.state.selection;
 		for (let depth = $from.depth; depth > 0; depth--) {
 			if (this.#hasAttributes($from.node(depth).attrs, id, className)) return true;
@@ -64,21 +80,16 @@ export default class UmbTiptapToolbarStyleMenuApi extends UmbTiptapToolbarElemen
 		return false;
 	}
 
-	#hasAttributes(attrs: Record<string, unknown>, id?: string, className?: string): boolean {
-		const idMatch = !id ? true : attrs.id === id;
-		const classMatch = !className ? true : this.#hasClassNames(attrs.class, className);
-		return idMatch && classMatch;
+	#hasMarkWithAttributes(editor: Editor, id?: string, className?: string): boolean {
+		const { state } = editor;
+		const marks = state.storedMarks ?? state.selection.$from.marks();
+		return marks.some((mark) => this.#hasAttributes(mark.attrs, id, className));
 	}
 
-	#hasClassNames(value: unknown, className: string): boolean {
-		// Compare whole class names (as `toggleClassName` does), so that e.g. `size-1` does not match `size-10`.
-		const classes = String(value ?? '')
-			.split(/\s+/)
-			.filter((c) => c);
-		return className
-			.split(/\s+/)
-			.filter((c) => c)
-			.every((c) => classes.includes(c));
+	#hasAttributes(attrs: Record<string, unknown>, id?: string, className?: string): boolean {
+		const idMatch = !id ? true : attrs.id === id;
+		const classMatch = !className ? true : hasClassNames(attrs.class, className);
+		return idMatch && classMatch;
 	}
 
 	override execute(editor?: Editor, item?: MetaTiptapToolbarStyleMenuItem) {
