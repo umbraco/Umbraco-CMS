@@ -1,5 +1,5 @@
 import { UMB_BLOCK_WORKSPACE_CONTEXT } from './index.js';
-import { css, customElement, html, nothing, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-block-workspace-editor')
@@ -33,14 +33,17 @@ export class UmbBlockWorkspaceEditorElement extends UmbLitElement {
 	private _readOnly?: boolean;
 
 	override render() {
-		return html`<umb-workspace-editor
-			><div slot="header">
-				<h3 id="headline" title="${this._headline}" data-mark="layout-headline">${this._headline}</h3>
-				${this._readOnly
-					? html`<uui-tag look="secondary">${this.localize.term('general_readOnly')}</uui-tag>`
-					: nothing}
-			</div></umb-workspace-editor
-		>`;
+		return html`
+			<umb-workspace-editor>
+				<div slot="header">
+					<h3 id="headline" title=${this._headline} data-mark="layout-headline">${this._headline}</h3>
+					${when(
+						this._readOnly,
+						() => html`<uui-tag look="secondary">${this.localize.term('general_readOnly')}</uui-tag>`,
+					)}
+				</div>
+			</umb-workspace-editor>
+		`;
 	}
 
 	static override readonly styles = [
