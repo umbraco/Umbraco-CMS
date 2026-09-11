@@ -1,5 +1,5 @@
 import { UmbInputDateElement } from './input-date.element.js';
-import { expect, fixture, html } from '@open-wc/testing';
+import { expect, fixture, html, oneEvent } from '@open-wc/testing';
 import { type UmbTestRunnerWindow, defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
 describe('UmbInputDateElement', () => {
 	let element: UmbInputDateElement;
@@ -17,4 +17,46 @@ describe('UmbInputDateElement', () => {
 			await expect(element).shadowDom.to.be.accessible(defaultA11yConfig);
 		});
 	}
+
+	describe('transient invalid input', () => {
+		it('does not reflect an empty native value back while the input is being edited', async () => {
+			element.value = '2026-05-27';
+			await element.updateComplete;
+
+			let inputEvents = 0;
+			element.addEventListener('input', () => inputEvents++);
+
+			const native = element.shadowRoot!.querySelector('input')!;
+			native.value = '';
+			native.dispatchEvent(new Event('input', { bubbles: true, composed: true }));
+
+			expect(element.value).to.equal('2026-05-27');
+			expect(inputEvents).to.equal(0);
+		});
+
+		it('reflects a non-empty native value back via the input event', async () => {
+			element.value = '2026-05-27';
+			await element.updateComplete;
+
+			const native = element.shadowRoot!.querySelector('input')!;
+			native.value = '2026-04-27';
+			native.dispatchEvent(new Event('input', { bubbles: true, composed: true }));
+
+			expect(element.value).to.equal('2026-04-27');
+		});
+
+		it('commits an emptied native value on focusout and dispatches a change event', async () => {
+			element.value = '2026-05-27';
+			await element.updateComplete;
+
+			const native = element.shadowRoot!.querySelector('input')!;
+			native.value = '';
+
+			const changeEvent = oneEvent(element, 'change');
+			native.dispatchEvent(new FocusEvent('focusout', { bubbles: true, composed: true }));
+			await changeEvent;
+
+			expect(element.value).to.equal('');
+		});
+	});
 });
