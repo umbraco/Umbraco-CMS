@@ -13,6 +13,7 @@ export class UmbClipboardPastePropertyValueTranslatorValueResolver<
 	async resolve(
 		clipboardEntryValues: UmbClipboardEntryValuesType,
 		propertyEditorUiAlias: string,
+		config?: unknown,
 	): Promise<PropertyValueType> {
 		if (!clipboardEntryValues.length) {
 			throw new Error('Clipboard entry values are required.');
@@ -31,7 +32,7 @@ export class UmbClipboardPastePropertyValueTranslatorValueResolver<
 			throw new Error(`Value to translate is missing`);
 		}
 
-		return pasteTranslator.translate(valueToTranslate.value);
+		return pasteTranslator.translate(valueToTranslate.value, config);
 	}
 
 	/**
