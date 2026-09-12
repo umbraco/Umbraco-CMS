@@ -165,4 +165,39 @@ describe('UmbDefaultCollectionContext interaction memory', () => {
 			expect(getFilter()).to.include({ skip: PAGE_SIZE * 2 });
 		});
 	});
+
+	it('ignores stale collection responses', async () => {
+		context.setConfig({ pageSize: PAGE_SIZE });
+		(context as any)._init = Promise.resolve();
+
+		let resolveFirst!: (value: { data: { items: Array<{ unique: string }>; total: number } }) => void;
+		let resolveSecond!: (value: { data: { items: Array<{ unique: string }>; total: number } }) => void;
+		const firstRequest = new Promise<{ data: { items: Array<{ unique: string }>; total: number } }>((resolve) => {
+			resolveFirst = resolve;
+		});
+		const secondRequest = new Promise<{ data: { items: Array<{ unique: string }>; total: number } }>((resolve) => {
+			resolveSecond = resolve;
+		});
+
+		(context as any)._repository = {
+			requestCollection: async (filter: { filter?: string }) => {
+				return filter.filter === 'first' ? firstRequest : secondRequest;
+			},
+		};
+
+		(context as any)._filter.setValue({ filter: 'first', skip: 0, take: PAGE_SIZE });
+		const firstPromise = (context as any)._requestCollection();
+
+		(context as any)._filter.setValue({ filter: 'second', skip: 0, take: PAGE_SIZE });
+		const secondPromise = (context as any)._requestCollection();
+
+		resolveSecond({ data: { items: [{ unique: 'second' }], total: 1 } });
+		await secondPromise;
+
+		resolveFirst({ data: { items: [{ unique: 'first' }], total: 1 } });
+		await firstPromise;
+
+		expect((context as any)._items.getValue()).to.eql([{ unique: 'second' }]);
+		expect((context as any)._totalItems.getValue()).to.equal(1);
+	});
 });
