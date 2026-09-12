@@ -478,17 +478,6 @@ internal sealed class ContentEditingService
             return publishResult.Result switch
             {
                 PublishResultType.FailedPublishCancelledByEvent => ContentEditingOperationStatus.CancelledByNotification,
-                PublishResultType.FailedPublishAwaitingRelease => ContentEditingOperationStatus.AwaitingRelease,
-                PublishResultType.FailedPublishCultureAwaitingRelease => ContentEditingOperationStatus.CultureAwaitingRelease,
-                PublishResultType.FailedPublishHasExpired => ContentEditingOperationStatus.HasExpired,
-                PublishResultType.FailedPublishCultureHasExpired => ContentEditingOperationStatus.CultureHasExpired,
-                PublishResultType.FailedPublishPathNotPublished => ContentEditingOperationStatus.PathNotPublished,
-                PublishResultType.FailedPublishContentInvalid => ContentEditingOperationStatus.ContentInvalid,
-                PublishResultType.FailedPublishNothingToPublish => ContentEditingOperationStatus.NothingToPublish,
-                PublishResultType.FailedPublishMandatoryCultureMissing => ContentEditingOperationStatus.MandatoryCultureMissing,
-                PublishResultType.FailedPublishConcurrencyViolation => ContentEditingOperationStatus.ConcurrencyViolation,
-                PublishResultType.FailedPublishUnsavedChanges => ContentEditingOperationStatus.UnsavedChanges,
-                PublishResultType.FailedPublishIsTrashed => ContentEditingOperationStatus.InTrash,
                 _ => ContentEditingOperationStatus.Unknown,
             };
         }
