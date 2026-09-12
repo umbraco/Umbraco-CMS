@@ -12,7 +12,6 @@ import {
 	html,
 	customElement,
 	property,
-	query,
 	state,
 	when,
 	nothing,
@@ -29,12 +28,7 @@ import type { UmbInputEntityElement } from '@umbraco-cms/backoffice/components';
 import type { UmbInputMediaElement } from '@umbraco-cms/backoffice/media';
 import type { UmbInputMediaTypeElement } from '@umbraco-cms/backoffice/media-type';
 import type { UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
-import type {
-	UUIBooleanInputEvent,
-	UUIButtonState,
-	UUIInputElement,
-	UUIInputEvent,
-} from '@umbraco-cms/backoffice/external/uui';
+import type { UUIBooleanInputEvent, UUIButtonState, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbValidationContext, umbBindToValidation } from '@umbraco-cms/backoffice/validation';
 
 @customElement('umb-workspace-package-builder')
@@ -44,9 +38,6 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 
 	@state()
 	private _package?: UmbCreatedPackageDefinition;
-
-	@query('#package-name-input')
-	private _packageNameInput?: UUIInputElement;
 
 	@state()
 	private _submitState?: UUIButtonState;

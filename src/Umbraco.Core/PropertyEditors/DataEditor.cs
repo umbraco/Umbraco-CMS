@@ -217,4 +217,7 @@ public class DataEditor : IDataEditor
         object? targetValue,
         bool canUpdateInvariantData,
         HashSet<string> allowedCultures) => sourceValue;
+
+    /// <inheritdoc />
+    public virtual IEnumerable<string> GetChangedCulturesForPartialPropertyValues(object? sourceValue, object? targetValue, string defaultCulture) => [];
 }

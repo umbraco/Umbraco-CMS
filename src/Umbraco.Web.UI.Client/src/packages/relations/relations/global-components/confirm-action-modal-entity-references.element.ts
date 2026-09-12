@@ -149,8 +149,7 @@ export class UmbConfirmActionModalEntityReferencesElement extends UmbLitElement 
 			<h5 class="uui-h5" id="reference-headline">${this.localize.term(headline)}</h5>
 			<uui-ref-list>
 				${items.map(
-					(item) =>
-						html`<umb-entity-item-ref .item=${item} readonly ?standalone=${total === 1}></umb-entity-item-ref> `,
+					(item) => html`<umb-entity-item-ref .item=${item} ?standalone=${total === 1}></umb-entity-item-ref> `,
 				)}
 			</uui-ref-list>
 			${total > this.#limitItems

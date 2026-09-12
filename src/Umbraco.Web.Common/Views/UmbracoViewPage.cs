@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Html;
-using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -9,16 +8,13 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
-using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Web.Common.ModelBinders;
 using Umbraco.Extensions;
-using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Cms.Web.Common.Views;
 
@@ -100,14 +96,7 @@ public abstract class UmbracoViewPage<TModel> : RazorPage<TModel>
     private GlobalSettings GlobalSettings =>
         Context.RequestServices.GetRequiredService<IOptions<GlobalSettings>>().Value;
 
-    private ContentSettings ContentSettings =>
-        Context.RequestServices.GetRequiredService<IOptions<ContentSettings>>().Value;
-
     private IProfilerHtml ProfilerHtml => Context.RequestServices.GetRequiredService<IProfilerHtml>();
-
-    private IHostingEnvironment HostingEnvironment => Context.RequestServices.GetRequiredService<IHostingEnvironment>();
-
-    private ICspNonceService? CspNonceService => Context.RequestServices.GetService<ICspNonceService>();
 
     /// <inheritdoc />
     public override void Write(object? value)
@@ -129,37 +118,18 @@ public abstract class UmbracoViewPage<TModel> : RazorPage<TModel>
 
     public void WriteUmbracoContent(TagHelperOutput tagHelperOutput)
     {
-        // filter / add preview banner
+        // The preview badge is injected by PreviewBadgeTagHelperComponent instead, so that it also renders
+        // when the <body> element lives in a view that does not inherit UmbracoViewPage (see #23505).
+
         // ASP.NET default value is text/html
         if (Context.Response?.ContentType?.InvariantContains("text/html") ?? false)
         {
-            if (((UmbracoContext?.IsDebug ?? false) || (UmbracoContext?.InPreviewMode ?? false))
+            if (UmbracoContext is { IsDebug: true, InPreviewMode: not true }
                 && tagHelperOutput.TagName != null
                 && tagHelperOutput.TagName.Equals("body", StringComparison.InvariantCultureIgnoreCase))
             {
-                string markupToInject;
-
-                if (UmbracoContext.InPreviewMode)
-                {
-                    // creating previewBadge markup
-                    markupToInject =
-                        string.Format(
-                            ContentSettings.PreviewBadge,
-                            HostingEnvironment.GetBackOfficePath(),
-                            System.Web.HttpUtility.HtmlEncode(Context.Request.GetEncodedUrl()), // Belt and braces - via a browser at least it doesn't seem possible to have anything other than
-                                                                                                // a valid culture code provided in the querystring of this URL.
-                                                                                                // But just to be sure of prevention of an XSS vulnterablity we'll HTML encode here too.
-                                                                                                // An expected URL is untouched by this encoding.
-                            UmbracoContext.PublishedRequest?.PublishedContent?.Key,
-                            CspNonceService?.GetNonceAttribute() ?? string.Empty);
-                }
-                else
-                {
-                    // creating mini-profiler markup
-                    markupToInject = ProfilerHtml.Render();
-                }
-
-                tagHelperOutput.Content.AppendHtml(markupToInject);
+                // creating mini-profiler markup
+                tagHelperOutput.Content.AppendHtml(ProfilerHtml.Render());
             }
         }
     }
