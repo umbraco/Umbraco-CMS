@@ -100,8 +100,8 @@ test('can open content model in a block', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.isElementWorkspaceOpenInBlock(elementTypeName);
 });
 
-// Product gap: the content model row has no remove affordance in the front-end (unlike the settings
-// model, which shows an addable/removable "Choose" placeholder) - verified live, still true today.
+// Product gap: the content model row has no remove affordance in the front-end, unlike the settings
+// model, which shows an addable/removable "Choose" placeholder.
 test.skip('can remove a content model from a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.dataType.createBlockListDataTypeWithABlock(blockListEditorName, elementTypeId);
