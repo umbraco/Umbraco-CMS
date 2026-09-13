@@ -1010,9 +1010,25 @@ export class ContentUiHelper extends UiBaseLocators {
     await this.enterText(this.numericTxt, number.toString());
   }
 
+  async isNumericBelowMinimum(isInvalid: boolean = true) {
+    await this.isInputRangeUnderflow(this.numericTxt, isInvalid);
+  }
+
+  async isNumericAboveMaximum(isInvalid: boolean = true) {
+    await this.isInputRangeOverflow(this.numericTxt, isInvalid);
+  }
+
   // Decimal
   async enterDecimal(number: number) {
     await this.enterText(this.decimalTxt, number.toString());
+  }
+
+  async isDecimalBelowMinimum(isInvalid: boolean = true) {
+    await this.isInputRangeUnderflow(this.decimalTxt, isInvalid);
+  }
+
+  async isDecimalAboveMaximum(isInvalid: boolean = true) {
+    await this.isInputRangeOverflow(this.decimalTxt, isInvalid);
   }
 
   // Radiobox

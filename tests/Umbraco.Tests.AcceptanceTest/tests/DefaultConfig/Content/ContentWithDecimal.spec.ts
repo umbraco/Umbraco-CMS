@@ -21,7 +21,6 @@ test('cannot publish a decimal value below the configured minimum', async ({umbr
   const min = 5;
   const max = 100;
   const belowMin = 1;
-  const warningMessage = `The value ${belowMin} is less than the allowed minimum value of ${min}`;
   const dataTypeId = await umbracoApi.dataType.createDecimalDataTypeWithMinAndMax(customDataTypeName, min, max);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, dataTypeId);
   await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
@@ -35,10 +34,10 @@ test('cannot publish a decimal value below the configured minimum', async ({umbr
   // Assert
   await umbracoUi.content.isFailedStateButtonVisible();
   await umbracoUi.content.isErrorNotificationVisible();
-  await umbracoUi.content.isTextWithMessageVisible(warningMessage);
+  await umbracoUi.content.isDecimalBelowMinimum();
   await umbracoUi.content.enterDecimal(min);
   await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBeUpdated();
-  await umbracoUi.content.isTextWithMessageVisible(warningMessage, false);
+  await umbracoUi.content.isDecimalBelowMinimum(false);
 });
 
 test('cannot publish a decimal value above the configured maximum', async ({umbracoApi, umbracoUi}) => {
@@ -46,7 +45,6 @@ test('cannot publish a decimal value above the configured maximum', async ({umbr
   const min = 0;
   const max = 10;
   const aboveMax = 11;
-  const warningMessage = `The value ${aboveMax} is greater than the allowed maximum value of ${max}`;
   const dataTypeId = await umbracoApi.dataType.createDecimalDataTypeWithMinAndMax(customDataTypeName, min, max);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, dataTypeId);
   await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
@@ -60,10 +58,10 @@ test('cannot publish a decimal value above the configured maximum', async ({umbr
   // Assert
   await umbracoUi.content.isFailedStateButtonVisible();
   await umbracoUi.content.isErrorNotificationVisible();
-  await umbracoUi.content.isTextWithMessageVisible(warningMessage);
+  await umbracoUi.content.isDecimalAboveMaximum();
   await umbracoUi.content.enterDecimal(max);
   await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBeUpdated();
-  await umbracoUi.content.isTextWithMessageVisible(warningMessage, false);
+  await umbracoUi.content.isDecimalAboveMaximum(false);
 });
 
 test('can not publish a mandatory decimal with an empty value', async ({umbracoApi, umbracoUi}) => {

@@ -68,7 +68,6 @@ test('cannot publish a numeric value below the configured minimum', async ({umbr
   const min = 5;
   const max = 100;
   const belowMin = 1;
-  const warningMessage = `The value ${belowMin} is less than the allowed minimum value of ${min}`;
   const dataTypeId = await umbracoApi.dataType.createDefaultNumericDataTypeWithMinAndMax(customDataTypeName, min, max);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, dataTypeId);
   await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
@@ -82,10 +81,10 @@ test('cannot publish a numeric value below the configured minimum', async ({umbr
   // Assert
   await umbracoUi.content.isFailedStateButtonVisible();
   await umbracoUi.content.isErrorNotificationVisible();
-  await umbracoUi.content.isTextWithMessageVisible(warningMessage);
+  await umbracoUi.content.isNumericBelowMinimum();
   await umbracoUi.content.enterNumeric(min);
   await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBeUpdated();
-  await umbracoUi.content.isTextWithMessageVisible(warningMessage, false);
+  await umbracoUi.content.isNumericBelowMinimum(false);
 });
 
 test('cannot publish a numeric value above the configured maximum', async ({umbracoApi, umbracoUi}) => {
@@ -93,7 +92,6 @@ test('cannot publish a numeric value above the configured maximum', async ({umbr
   const min = 0;
   const max = 10;
   const aboveMax = 11;
-  const warningMessage = `The value ${aboveMax} is greater than the allowed maximum value of ${max}`;
   const dataTypeId = await umbracoApi.dataType.createDefaultNumericDataTypeWithMinAndMax(customDataTypeName, min, max);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, dataTypeId);
   await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
@@ -107,10 +105,10 @@ test('cannot publish a numeric value above the configured maximum', async ({umbr
   // Assert
   await umbracoUi.content.isFailedStateButtonVisible();
   await umbracoUi.content.isErrorNotificationVisible();
-  await umbracoUi.content.isTextWithMessageVisible(warningMessage);
+  await umbracoUi.content.isNumericAboveMaximum();
   await umbracoUi.content.enterNumeric(max);
   await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBeUpdated();
-  await umbracoUi.content.isTextWithMessageVisible(warningMessage, false);
+  await umbracoUi.content.isNumericAboveMaximum(false);
 });
 
 test('can not publish a mandatory numeric with an empty value', async ({umbracoApi, umbracoUi}) => {
