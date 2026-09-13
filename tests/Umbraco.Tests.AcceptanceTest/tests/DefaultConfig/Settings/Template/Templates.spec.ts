@@ -374,7 +374,6 @@ test('cannot create a template with a duplicate name', async ({umbracoApi, umbra
 
   // Assert
   await umbracoUi.template.isFailedStateButtonVisible();
-  // doesNameExist() only asserts at least one match, so count instead to prove no duplicate was created.
   const rootTemplates = await (await umbracoApi.template.getAllAtRoot()).json();
   expect(rootTemplates.items.filter(item => item.name === templateName)).toHaveLength(1);
 });

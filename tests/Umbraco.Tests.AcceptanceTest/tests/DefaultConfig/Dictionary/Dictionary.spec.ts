@@ -226,7 +226,6 @@ test('cannot create a dictionary item with a duplicate name', async ({umbracoApi
 
   // Assert
   await umbracoUi.dictionary.isErrorNotificationVisible();
-  // doesNameExist() only asserts at least one match, so count instead to prove no duplicate was created.
   const rootDictionaryItems = await (await umbracoApi.dictionary.getAllAtRoot()).json();
   expect(rootDictionaryItems.items.filter(item => item.name === dictionaryName)).toHaveLength(1);
 });

@@ -125,7 +125,6 @@ test('cannot create a script with a duplicate name', async ({umbracoApi, umbraco
 
   // Assert
   await umbracoUi.script.isFailedStateButtonVisible();
-  // doesNameExist() only asserts at least one match, so count instead to prove no duplicate was created.
   const rootScripts = await (await umbracoApi.script.getAllAtRoot()).json();
   expect(rootScripts.items.filter(item => item.name === scriptName)).toHaveLength(1);
 });
