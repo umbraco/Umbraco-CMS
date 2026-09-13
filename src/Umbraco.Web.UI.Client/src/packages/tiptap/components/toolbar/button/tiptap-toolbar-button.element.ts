@@ -1,9 +1,9 @@
-import type { Editor } from '../../externals.js';
+import type { Editor } from '../../../externals.js';
 import type {
 	ManifestTiptapToolbarExtension,
 	ManifestTiptapToolbarExtensionButtonKind,
-} from '../../extensions/tiptap-toolbar.extension.js';
-import type { UmbTiptapToolbarElementApi } from '../../extensions/types.js';
+} from '../../../extensions/tiptap-toolbar.extension.js';
+import type { UmbTiptapToolbarElementApi } from '../../../extensions/types.js';
 import { customElement, html, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
@@ -18,11 +18,15 @@ export class UmbTiptapToolbarButtonElement<
 	@state()
 	protected isActive = false;
 
+	@state()
+	protected isDisabled = false;
+
 	override connectedCallback() {
 		super.connectedCallback();
 
 		if (this.editor) {
 			this.editor.on('transaction', this.#onEditorUpdate);
+			this.#onEditorUpdate();
 		}
 	}
 
@@ -37,6 +41,7 @@ export class UmbTiptapToolbarButtonElement<
 	readonly #onEditorUpdate = () => {
 		if (this.api && this.editor && this.manifest) {
 			this.isActive = this.api.isActive(this.editor);
+			this.isDisabled = this.api.isDisabled(this.editor);
 		}
 	};
 
@@ -48,7 +53,7 @@ export class UmbTiptapToolbarButtonElement<
 				look=${this.isActive ? 'outline' : 'default'}
 				label=${label}
 				title=${label}
-				?disabled=${this.api?.isDisabled(this.editor)}
+				?disabled=${this.isDisabled}
 				@click=${() => this.api?.execute(this.editor)}>
 				${when(
 					this.manifest?.meta.icon,
