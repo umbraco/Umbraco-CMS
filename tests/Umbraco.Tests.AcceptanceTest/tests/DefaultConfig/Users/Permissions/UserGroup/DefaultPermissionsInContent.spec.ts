@@ -70,9 +70,7 @@ test('can read content node with permission enabled', {tag: '@release'}, async (
   await umbracoUi.content.doesDocumentHaveName(rootDocumentName);
 });
 
-// Product gap (https://github.com/umbraco/Umbraco-CMS/issues/20505): deep-linking to a document the user may not
-// read renders an empty umb-document-workspace-editor instead of Access denied.
-test.skip('can not read content node with permission disabled', async ({umbracoApi, umbracoUi}) => {
+test('can not read content node with permission disabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithReadDocumentPermission(userGroupName, false);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
@@ -85,7 +83,7 @@ test.skip('can not read content node with permission disabled', async ({umbracoA
   await umbracoUi.content.goToWorkspacePath(`/workspace/document/edit/${rootDocumentId}`);
 
   // Assert
-  await umbracoUi.content.doesDocumentWorkspaceHaveText('Not found');
+  await umbracoUi.content.doesDocumentWorkspaceHaveText('Access denied');
 });
 
 test('can create document blueprint with permission enabled', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {

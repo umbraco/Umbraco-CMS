@@ -58,9 +58,7 @@ test('can see property values with UI read but not UI write permission', {tag: '
   await umbracoUi.content.isPropertyEditorUiWithNameReadOnly('text-box');
 });
 
-// Product gap (https://github.com/umbraco/Umbraco-CMS/issues/20505): deep-linking to a document the user may not
-// read renders an empty workspace instead of Access denied.
-test.skip('cannot open content without document read permission even with UI read permission', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+test('cannot open content without document read permission even with UI read permission', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithReadDocumentPermissionAndReadPropertyValueDocumentPermission(userGroupName, false, true);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
@@ -73,7 +71,7 @@ test.skip('cannot open content without document read permission even with UI rea
   await umbracoUi.content.goToWorkspacePath(`/workspace/document/edit/${documentId}`);
 
   // Assert
-  await umbracoUi.content.doesDocumentWorkspaceHaveText('Not found');
+  await umbracoUi.content.doesDocumentWorkspaceHaveText('Access denied');
 });
 
 test('cannot edit property values without UI write permission', async ({umbracoApi, umbracoUi}) => {

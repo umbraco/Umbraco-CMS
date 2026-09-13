@@ -35,8 +35,10 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.userGroup.ensureNameNotExists(userGroupName);
 });
 
-// Product gap (https://github.com/umbraco/Umbraco-CMS/issues/20505): only the final assertion fails, so the
-// granular read-UI permission itself works.
+// Product gap (https://github.com/umbraco/Umbraco-CMS/issues/20505): unlike the document-level read-permission
+// case (fixed - now shows Access denied), a granular per-document permission denial still renders
+// umb-document-workspace-editor completely empty, with no text at all. Only the final assertion is affected;
+// the granular read-UI permission itself works, per the two isPropertyEditorUiWithNameReadOnly checks above.
 test.skip('can only see property values for specific document with read UI enabled', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithPermissionsForSpecificDocumentAndTwoPropertyValues(userGroupName, firstDocumentId, documentTypeId, firstPropertyName[0], true, false, secondPropertyName[0], true, false);
@@ -53,7 +55,7 @@ test.skip('can only see property values for specific document with read UI enabl
   await umbracoUi.content.isPropertyEditorUiWithNameReadOnly(secondPropertyName[1]);
   // The second document is outside the granular permission, so it is absent from the tree and must be deep-linked.
   await umbracoUi.content.goToWorkspacePath(`/workspace/document/edit/${secondDocumentId}`);
-  await umbracoUi.content.doesDocumentWorkspaceHaveText('Not found');
+  await umbracoUi.content.doesDocumentWorkspaceHaveText('Access denied');
 });
 
 test('cannot see specific property value without UI read permission enabled', async ({umbracoApi, umbracoUi}) => {
