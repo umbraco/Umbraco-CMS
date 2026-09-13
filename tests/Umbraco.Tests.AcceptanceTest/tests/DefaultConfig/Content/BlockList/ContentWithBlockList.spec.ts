@@ -14,8 +14,6 @@ let elementTypeId = '';
 test.beforeEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   await umbracoApi.document.ensureNameNotExists(contentName);
-  await umbracoApi.documentType.ensureNameNotExists(numericElementTypeName);
-  await umbracoApi.dataType.ensureNameNotExists(numericDataTypeName);
   const textStringData = await umbracoApi.dataType.getByName(propertyInBlock);
   elementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, propertyInBlock, textStringData.id);
 });

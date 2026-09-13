@@ -6,10 +6,7 @@ const documentTypeName = 'TestDocumentTypeForContent';
 const customDataTypeName = 'Custom Decimal';
 const number = 5.5;
 
-test.beforeEach(async ({umbracoApi, umbracoUi}) => {
-  await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
-  await umbracoApi.document.ensureNameNotExists(contentName);
-  await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
+test.beforeEach(async ({umbracoUi}) => {
   await umbracoUi.goToBackOffice();
 });
 

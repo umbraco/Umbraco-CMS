@@ -10,8 +10,6 @@ const mandatoryDataTypeName = 'MandatoryApprovedColor';
 test.beforeEach(async ({umbracoApi, umbracoUi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   await umbracoApi.document.ensureNameNotExists(contentName);
-  await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
-  await umbracoApi.dataType.ensureNameNotExists(mandatoryDataTypeName);
   await umbracoUi.goToBackOffice();
 });
 

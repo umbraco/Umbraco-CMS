@@ -7,10 +7,7 @@ const dataTypeName = 'Custom Email Address';
 const validEmail = 'test@umbraco.com';
 const invalidEmail = 'not-an-email';
 
-test.beforeEach(async ({umbracoApi, umbracoUi}) => {
-  await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
-  await umbracoApi.document.ensureNameNotExists(contentName);
-  await umbracoApi.dataType.ensureNameNotExists(dataTypeName);
+test.beforeEach(async ({umbracoUi}) => {
   await umbracoUi.goToBackOffice();
 });
 

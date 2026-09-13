@@ -9,10 +9,7 @@ const dateTimeValue = '2026-09-01T14:30';
 // so compute it rather than hardcoding a zone/offset that would only be correct on this one machine.
 const expectedClientTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-test.beforeEach(async ({umbracoApi, umbracoUi}) => {
-  await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
-  await umbracoApi.document.ensureNameNotExists(contentName);
-  await umbracoApi.dataType.ensureNameNotExists(dataTypeName);
+test.beforeEach(async ({umbracoUi}) => {
   await umbracoUi.goToBackOffice();
 });
 

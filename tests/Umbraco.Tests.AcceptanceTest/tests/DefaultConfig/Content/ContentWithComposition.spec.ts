@@ -12,8 +12,6 @@ let compositionDocumentTypeId = null;
 test.beforeEach(async ({umbracoApi, umbracoUi}) => {
   await umbracoApi.document.ensureNameNotExists(contentName);
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
-  await umbracoApi.documentType.ensureNameNotExists(compositionDocumentTypeName);
-  await umbracoApi.documentType.ensureNameNotExists(mandatoryCompositionDocumentTypeName);
   await umbracoUi.goToBackOffice();
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   compositionDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(compositionDocumentTypeName, dataTypeName, dataTypeData.id, groupName);

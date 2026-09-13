@@ -10,7 +10,6 @@ const uploadFilePath = './fixtures/mediaLibrary/';
 test.beforeEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   await umbracoApi.document.ensureNameNotExists(contentName);
-  await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
 });
 
 test.afterEach(async ({umbracoApi}) => {
@@ -132,7 +131,6 @@ test('cannot upload a file with a disallowed extension', async ({umbracoApi, umb
 
 test('can not publish a mandatory upload file with an empty value', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const uploadFileName = 'File.txt';
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id, 'Test Group', false, false, true);
   await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);

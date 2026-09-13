@@ -7,10 +7,7 @@ const dataTypeName = 'Custom Date Picker';
 const dateValue = '2026-09-01';
 const expectedValue = '2026-09-01 00:00:00';
 
-test.beforeEach(async ({umbracoApi, umbracoUi}) => {
-  await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
-  await umbracoApi.document.ensureNameNotExists(contentName);
-  await umbracoApi.dataType.ensureNameNotExists(dataTypeName);
+test.beforeEach(async ({umbracoUi}) => {
   await umbracoUi.goToBackOffice();
 });
 

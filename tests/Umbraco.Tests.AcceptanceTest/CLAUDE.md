@@ -105,6 +105,8 @@ This is why `UserGroupUiHelper`/`UserUiHelper` filter with `getByText(name, {exa
     await umbracoApi.dataType.ensureNameNotExists(name);
   });
   ```
+
+  `afterEach` is what actually prevents a leak, since nothing else deletes the entity once the test ends — that call is never optional. `beforeEach`, on the other hand, only guards against residue from a *previous* run, and almost every `create*()` helper in `lib/helpers/*ApiHelper.ts` already calls `ensureNameNotExists()` on the same name as its own first line — so calling it again in `beforeEach` right before that `create*()` runs is a redundant no-op API call, not extra safety. Only add it to `beforeEach` for a name that a test uses without ever passing it to a self-ensuring `create*()` (e.g. a lookup key that differs from the create's own key, like `ensureIsoCodeNotExists` alongside `createDanishLanguage()`'s internal `ensureNameNotExists('Danish')`), or when the helper you're calling is one of the few that don't self-ensure (e.g. `UserApiHelper.createDefaultUser`/`create`).
 - **Tests run serially** (`workers: 1`) because specs share fixed entity names (`TestContent`, …) and would collide in parallel. If you add data, keep names unique to your file/test so cleanup can't affect another test.
 - Cleanup caveats to be aware of when debugging leftover state: some `ensureNameNotExists` / `recurseChildren` helpers delete only the **first** match, and list fetches use a single large `take` (no pagination) — duplicates or very large trees can leave residue.
 

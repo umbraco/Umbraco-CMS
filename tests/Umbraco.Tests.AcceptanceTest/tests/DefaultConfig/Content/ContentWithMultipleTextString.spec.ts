@@ -6,10 +6,7 @@ const documentTypeName = 'TestDocumentTypeForContent';
 const dataTypeName = 'Custom Multiple Text String';
 const text = 'This is a multiple text string value';
 
-test.beforeEach(async ({umbracoApi, umbracoUi}) => {
-  await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
-  await umbracoApi.document.ensureNameNotExists(contentName);
-  await umbracoApi.dataType.ensureNameNotExists(dataTypeName);
+test.beforeEach(async ({umbracoUi}) => {
   await umbracoUi.goToBackOffice();
 });
 

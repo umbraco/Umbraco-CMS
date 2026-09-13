@@ -7,10 +7,7 @@ const dataTypeName = 'Custom Date Only Picker';
 const dateValue = '2026-09-01';
 const expectedValue = {date: dateValue, timeZone: null};
 
-test.beforeEach(async ({umbracoApi, umbracoUi}) => {
-  await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
-  await umbracoApi.document.ensureNameNotExists(contentName);
-  await umbracoApi.dataType.ensureNameNotExists(dataTypeName);
+test.beforeEach(async ({umbracoUi}) => {
   await umbracoUi.goToBackOffice();
 });
 

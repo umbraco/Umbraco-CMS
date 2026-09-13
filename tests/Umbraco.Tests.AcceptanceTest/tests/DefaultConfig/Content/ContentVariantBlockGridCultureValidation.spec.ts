@@ -9,10 +9,6 @@ const dataTypeName = 'Textstring';
 let dataTypeId = '';
 
 test.beforeEach(async ({umbracoApi}) => {
-  await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
-  await umbracoApi.documentType.ensureNameNotExists(blockElementName);
-  await umbracoApi.document.ensureNameNotExists(contentName);
-  await umbracoApi.dataType.ensureNameNotExists(blockGridName);
   await umbracoApi.language.ensureIsoCodeNotExists('da');
   await umbracoApi.language.createDanishLanguage();
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);

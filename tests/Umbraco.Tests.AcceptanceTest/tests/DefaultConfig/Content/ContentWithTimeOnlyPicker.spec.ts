@@ -7,10 +7,7 @@ const dataTypeName = 'Custom Time Only Picker';
 const timeValue = '14:30';
 const expectedValue = {date: '14:30:00', timeZone: null};
 
-test.beforeEach(async ({umbracoApi, umbracoUi}) => {
-  await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
-  await umbracoApi.document.ensureNameNotExists(contentName);
-  await umbracoApi.dataType.ensureNameNotExists(dataTypeName);
+test.beforeEach(async ({umbracoUi}) => {
   await umbracoUi.goToBackOffice();
 });
 
