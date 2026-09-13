@@ -1,4 +1,4 @@
-import {ConstantHelper, test, AliasHelper} from '@umbraco/acceptance-test-helpers';
+import {ConstantHelper, NotificationConstantHelper, test, AliasHelper} from '@umbraco/acceptance-test-helpers';
 import {expect} from "@playwright/test";
 
 const contentName = 'TestContent';
@@ -31,6 +31,7 @@ test('cannot publish content with an invalid email address format', async ({umbr
 
   // Assert
   await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.invalidEmail);
+  await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
   await umbracoUi.content.enterTextstring(validEmail);
   await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBeUpdated();
   const contentData = await umbracoApi.document.getByName(contentName);
