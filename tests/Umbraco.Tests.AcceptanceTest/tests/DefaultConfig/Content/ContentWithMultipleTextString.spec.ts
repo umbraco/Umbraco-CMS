@@ -3,7 +3,7 @@ import {expect} from "@playwright/test";
 
 const contentName = 'TestContent';
 const documentTypeName = 'TestDocumentTypeForContent';
-const dataTypeName = 'Custom Multiple Text String';
+const customDataTypeName = 'Custom Multiple Text String';
 const text = 'This is a multiple text string value';
 
 test.beforeEach(async ({umbracoUi}) => {
@@ -13,13 +13,13 @@ test.beforeEach(async ({umbracoUi}) => {
 test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.document.ensureNameNotExists(contentName);
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
-  await umbracoApi.dataType.ensureNameNotExists(dataTypeName);
+  await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
 });
 
 test('can not publish a mandatory multiple text string with an empty value', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const dataTypeId = await umbracoApi.dataType.createMultipleTextStringDataType(dataTypeName);
-  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeId, 'Test Group', false, false, true);
+  const dataTypeId = await umbracoApi.dataType.createMultipleTextStringDataType(customDataTypeName);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, dataTypeId, 'Test Group', false, false, true);
   await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
@@ -33,6 +33,6 @@ test('can not publish a mandatory multiple text string with an empty value', asy
   await umbracoUi.content.addMultipleTextStringItem(text);
   await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBeUpdated();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
+  expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(customDataTypeName));
   expect(contentData.values[0].value).toEqual([text]);
 });

@@ -3,7 +3,7 @@ import {expect} from "@playwright/test";
 
 const contentName = 'TestContent';
 const documentTypeName = 'TestDocumentTypeForContent';
-const dataTypeName = 'Custom Slider';
+const customDataTypeName = 'Custom Slider';
 const sliderValue = 10;
 const expectedValue = {from: sliderValue, to: sliderValue};
 
@@ -14,14 +14,14 @@ test.beforeEach(async ({umbracoUi}) => {
 test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.document.ensureNameNotExists(contentName);
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
-  await umbracoApi.dataType.ensureNameNotExists(dataTypeName);
+  await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
 });
 
 test('can create content with the slider data type', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const expectedState = 'Draft';
-  const dataTypeId = await umbracoApi.dataType.createSliderDataType(dataTypeName);
-  await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeId);
+  const dataTypeId = await umbracoApi.dataType.createSliderDataType(customDataTypeName);
+  await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, dataTypeId);
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
   // Act
@@ -36,15 +36,15 @@ test('can create content with the slider data type', async ({umbracoApi, umbraco
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
-  expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
+  expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(customDataTypeName));
   expect(contentData.values[0].value).toEqual(expectedValue);
 });
 
 test('can publish content with the slider data type', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const expectedState = 'Published';
-  const dataTypeId = await umbracoApi.dataType.createSliderDataType(dataTypeName);
-  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeId);
+  const dataTypeId = await umbracoApi.dataType.createSliderDataType(customDataTypeName);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, dataTypeId);
   await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
@@ -57,6 +57,6 @@ test('can publish content with the slider data type', async ({umbracoApi, umbrac
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
-  expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
+  expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(customDataTypeName));
   expect(contentData.values[0].value).toEqual(expectedValue);
 });

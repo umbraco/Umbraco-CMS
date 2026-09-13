@@ -3,7 +3,7 @@ import {expect} from "@playwright/test";
 
 const contentName = 'TestContent';
 const documentTypeName = 'TestDocumentTypeForContent';
-const dataTypeName = 'Custom Email Address';
+const customDataTypeName = 'Custom Email Address';
 const validEmail = 'test@umbraco.com';
 const invalidEmail = 'not-an-email';
 
@@ -14,13 +14,13 @@ test.beforeEach(async ({umbracoUi}) => {
 test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.document.ensureNameNotExists(contentName);
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
-  await umbracoApi.dataType.ensureNameNotExists(dataTypeName);
+  await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
 });
 
 test('cannot publish content with an invalid email address format', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const dataTypeId = await umbracoApi.dataType.createEmailAddressDataType(dataTypeName);
-  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeId);
+  const dataTypeId = await umbracoApi.dataType.createEmailAddressDataType(customDataTypeName);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, dataTypeId);
   await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
@@ -35,6 +35,6 @@ test('cannot publish content with an invalid email address format', async ({umbr
   await umbracoUi.content.enterTextstring(validEmail);
   await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBeUpdated();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
+  expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(customDataTypeName));
   expect(contentData.values[0].value).toEqual(validEmail);
 });
