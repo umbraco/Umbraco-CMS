@@ -14,6 +14,7 @@ test.beforeEach(async ({umbracoUi, umbracoApi}) => {
 
 test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.dataType.ensureNameNotExists(blockGridEditorName);
+  await umbracoApi.documentType.ensureNameNotExists(elementTypeName);
 });
 
 test('can create a block grid editor', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
