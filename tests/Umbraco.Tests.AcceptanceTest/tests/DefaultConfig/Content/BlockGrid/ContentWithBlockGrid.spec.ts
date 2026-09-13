@@ -178,6 +178,7 @@ test('cannot publish content with fewer block elements than the minimum amount',
 
   // Assert
   await umbracoUi.content.isErrorNotificationVisible();
+  await umbracoUi.content.doesFormValidationMessageContainText(`Minimum ${minAmount} entries, requires ${minAmount} more.`);
 });
 
 test('can set the label of create button in root', async ({umbracoApi, umbracoUi}) => {
