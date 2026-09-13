@@ -100,6 +100,24 @@ test('can open content model in a block', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.isElementWorkspaceOpenInBlock(elementTypeName);
 });
 
+// Product gap: the content model row has no remove affordance in the front-end (unlike the settings
+// model, which shows an addable/removable "Choose" placeholder) - verified live, still true today.
+test.skip('can remove a content model from a block', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  await umbracoApi.dataType.createBlockListDataTypeWithABlock(blockListEditorName, elementTypeId);
+
+  // Act
+  await umbracoUi.dataType.goToDataType(blockListEditorName);
+  await umbracoUi.dataType.goToBlockWithName(elementTypeName);
+  await umbracoUi.dataType.removeBlockContentModel();
+  await umbracoUi.dataType.clickConfirmRemoveButton();
+  await umbracoUi.dataType.clickSubmitButton();
+  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
+
+  // Assert
+  // TODO: missing check that the content model is removed
+});
+
 test('can add a settings model to a block', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const secondElementName = 'SecondElementTest';
