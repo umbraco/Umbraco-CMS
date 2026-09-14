@@ -37,7 +37,11 @@ public class LabelPropertyValueEditorTests
 
     [Test]
     public void ToEditor_YieldsATimeAsItsTimeOfDay()
-        => Assert.AreEqual("10:30:00", ToEditor(ValueTypes.Time, new DateTime(2026, 9, 7, 10, 30, 0)));
+        => Assert.AreEqual("10:30:00", TimeToEditor(new DateTime(2026, 9, 7, 10, 30, 0)));
+
+    [Test]
+    public void ToEditor_YieldsAnEmptyStringForATimeWithNoValue()
+        => Assert.AreEqual(string.Empty, TimeToEditor(null));
 
     [Test]
     public void ToEditor_YieldsADateTimeAsAFullTimestamp()
@@ -49,15 +53,29 @@ public class LabelPropertyValueEditorTests
 
     private static object? ToEditor(string valueType, object? storedValue)
     {
-        var attribute = new DataEditorAttribute("Test.Label") { ValueType = valueType };
         var editor = new LabelPropertyEditorBase.LabelPropertyValueEditor(
             Mock.Of<IShortStringHelper>(),
             new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory()),
             Mock.Of<IIOHelper>(),
-            attribute);
+            Attribute(valueType));
 
-        var property = Mock.Of<IProperty>(x => x.GetValue(null, null, false) == storedValue);
-
-        return editor.ToEditor(property);
+        return editor.ToEditor(Property(storedValue));
     }
+
+    private static object? TimeToEditor(object? storedValue)
+    {
+        var editor = new TimeLabelPropertyEditor.TimeLabelPropertyValueEditor(
+            Mock.Of<IShortStringHelper>(),
+            new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory()),
+            Mock.Of<IIOHelper>(),
+            Attribute(ValueTypes.Time));
+
+        return editor.ToEditor(Property(storedValue));
+    }
+
+    private static DataEditorAttribute Attribute(string valueType)
+        => new("Test.Label") { ValueType = valueType };
+
+    private static IProperty Property(object? storedValue)
+        => Mock.Of<IProperty>(x => x.GetValue(null, null, false) == storedValue);
 }

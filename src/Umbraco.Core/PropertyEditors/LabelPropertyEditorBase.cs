@@ -1,13 +1,11 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Globalization;
 using System.Text.Json.Nodes;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Strings;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
@@ -59,7 +57,7 @@ public abstract class LabelPropertyEditorBase : DataEditor, IValueSchemaProvider
     /// <summary>
     /// Provides the property value editor for label properties.
     /// </summary>
-    internal sealed class LabelPropertyValueEditor : DataValueEditor
+    internal class LabelPropertyValueEditor : DataValueEditor
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="LabelPropertyValueEditor"/> class.
@@ -83,8 +81,7 @@ public abstract class LabelPropertyEditorBase : DataEditor, IValueSchemaProvider
         /// <inheritdoc />
         /// <remarks>
         ///     A label presents a string, whatever it stores. The base implementation resolves a stored value
-        ///     that happens to be JSON into an object, and renders anything held in a date column as a full
-        ///     timestamp, so those two cases are formatted here instead.
+        ///     that happens to be JSON into an object, so a label held in a text column is formatted here instead.
         /// </remarks>
         public override object? ToEditor(IProperty property, string? culture = null, string? segment = null)
         {
@@ -92,16 +89,6 @@ public abstract class LabelPropertyEditorBase : DataEditor, IValueSchemaProvider
             if (value is null)
             {
                 return string.Empty;
-            }
-
-            // A time is stored in a date column, so only its time of day carries any meaning.
-            if (ValueType.InvariantEquals(ValueTypes.Time))
-            {
-                Attempt<DateTime?> time = value.TryConvertTo<DateTime?>();
-
-                return time is { Success: true, Result: not null }
-                    ? time.Result.Value.ToString("HH:mm:ss", CultureInfo.InvariantCulture)
-                    : string.Empty;
             }
 
             return ValueTypes.ToStorageType(ValueType) is ValueStorageType.Ntext or ValueStorageType.Nvarchar
