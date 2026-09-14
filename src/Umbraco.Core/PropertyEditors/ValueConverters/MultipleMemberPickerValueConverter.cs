@@ -91,7 +91,7 @@ public class MultipleMemberPickerValueConverter : PropertyValueConverterBase, ID
             : keys
                 .Select(key => _memberService.GetById(key))
                 .WhereNotNull()
-                .Select(member => _publishedMemberCache.Get(member))
+                .Select(member => _publishedMemberCache.Get(member) as IPublishedContent)
                 .WhereNotNull()
                 .ToArray();
     }
