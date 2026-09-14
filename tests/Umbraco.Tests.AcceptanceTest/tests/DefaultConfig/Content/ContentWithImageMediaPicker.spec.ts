@@ -16,6 +16,8 @@ test.beforeEach(async ({umbracoApi}) => {
 test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.document.ensureNameNotExists(contentName);
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
+  await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
+  await umbracoApi.media.ensureNameNotExists(mediaName);
 });
 
 test('can create content with a image media picker', async ({umbracoApi, umbracoUi}) => {
