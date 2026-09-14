@@ -94,17 +94,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
         int userId)
         => CommitContentChangesInternal(scope, content, eventMessages, allLangs, notificationState, userId);
 
-    protected abstract void DeleteLocked(ICoreScope scope, TContent content, EventMessages evtMsgs);
-
-    /// <summary>
-    ///     Async-native equivalent of <see cref="DeleteLocked" />. Defaults to bridging to the sync
-    ///     implementation for content kinds without an async-native delete path yet; override where one exists.
-    /// </summary>
-    protected virtual Task DeleteLockedAsync(ICoreScope scope, TContent content, EventMessages evtMsgs, CancellationToken cancellationToken)
-    {
-        DeleteLocked(scope, content, evtMsgs);
-        return Task.CompletedTask;
-    }
+    protected abstract Task DeleteLockedAsync(ICoreScope scope, TContent content, EventMessages evtMsgs, CancellationToken cancellationToken);
 
     protected abstract SavingNotification<TContent> SavingNotification(TContent content, EventMessages eventMessages);
 

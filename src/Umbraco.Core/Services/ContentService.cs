@@ -1889,32 +1889,6 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
 
     protected override ILogger<ContentService> Logger => _logger;
 
-    protected override void DeleteLocked(ICoreScope scope, IContent content, EventMessages evtMsgs)
-    {
-        void DoDelete(IContent c)
-        {
-            _documentRepository.Delete(c);
-            scope.Notifications.Publish(new ContentDeletedNotification(c, evtMsgs));
-
-            // media files deleted by QueuingEventDispatcher
-        }
-
-        const int pageSize = 500;
-        var total = long.MaxValue;
-        while (total > 0)
-        {
-            // get descendants - ordered from deepest to shallowest
-            PagedModel<IContent> descendantsPage = GetDescendantsAsync(content.Key, 0, pageSize, Ordering.By("Path", Direction.Descending), CancellationToken.None).GetAwaiter().GetResult();
-            total = descendantsPage.Total;
-            foreach (IContent c in descendantsPage.Items)
-            {
-                DoDelete(c);
-            }
-        }
-
-        DoDelete(content);
-    }
-
     /// <inheritdoc cref="AsyncPublishableContentServiceBase{TContent}.DeleteLockedAsync" />
     protected override async Task DeleteLockedAsync(ICoreScope scope, IContent content, EventMessages evtMsgs, CancellationToken cancellationToken)
     {
