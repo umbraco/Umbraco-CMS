@@ -1,6 +1,9 @@
 using System.Linq.Expressions;
 using System.Net;
+using System.Net.Http.Json;
 using NUnit.Framework;
+using Umbraco.Cms.Api.Common.ViewModels.Pagination;
+using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Api.Management.Controllers.DocumentBlueprint.Tree;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.ContentEditing;
@@ -19,6 +22,8 @@ public class ChildrenDocumentBlueprintTreeControllerTests : ManagementApiUserGro
         GetRequiredService<IContentBlueprintEditingService>();
 
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
+
+    private IUserGroupService UserGroupService => GetRequiredService<IUserGroupService>();
 
     private Guid _folderKey;
 
@@ -73,4 +78,34 @@ public class ChildrenDocumentBlueprintTreeControllerTests : ManagementApiUserGro
 
     protected override UserGroupAssertionModel UnauthorizedUserGroupAssertionModel
         => new() { ExpectedStatusCode = HttpStatusCode.Unauthorized };
+
+    [Test]
+    public async Task User_Without_A_Start_Node_Sees_No_Children()
+    {
+        var userGroup = new UserGroupBuilder()
+            .WithAlias(Guid.NewGuid().ToString("N"))
+            .WithName($"Test Group Without A Blueprint Start Node {Guid.NewGuid()}")
+            .WithAllowedSections([Constants.Applications.Library])
+            .Build();
+
+        // The builder defaults every start node to the root, and this test is about a group granted none.
+        userGroup.StartDocumentBlueprintId = null;
+        await UserGroupService.CreateAsync(userGroup, Constants.Security.SuperUserKey);
+
+        await AuthenticateClientAsync(
+            Client,
+            $"noblueprintstartnode{Guid.NewGuid():N}@umbraco.com",
+            UserPassword,
+            userGroup.Key);
+
+        var response = await ClientRequest();
+
+        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, await response.Content.ReadAsStringAsync());
+
+        var result = await response.Content
+            .ReadFromJsonAsync<PagedViewModel<DocumentBlueprintTreeItemResponseModel>>(JsonSerializerOptions);
+
+        Assert.IsNotNull(result);
+        Assert.AreEqual(0, result.Total, "A user with no blueprint start node must not see any children.");
+    }
 }

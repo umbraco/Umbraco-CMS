@@ -443,6 +443,11 @@ public static class UserExtensions
             () =>
             {
                 var startNodeIds = user.CalculateDocumentBlueprintStartNodeIds(entityService, appCaches);
+                if (startNodeIds is null || startNodeIds.Length == 0)
+                {
+                    return [];
+                }
+
                 return entityService
                     .GetAllPaths(UmbracoObjectTypes.DocumentBlueprintContainer, startNodeIds)
                     .Select(x => x.Path)
