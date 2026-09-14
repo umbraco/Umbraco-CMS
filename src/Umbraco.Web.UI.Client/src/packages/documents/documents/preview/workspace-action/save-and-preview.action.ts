@@ -3,12 +3,7 @@ import { UmbDocumentSaveWorkspaceAction } from '../../workspace/actions/save.act
 export class UmbDocumentSaveAndPreviewWorkspaceAction extends UmbDocumentSaveWorkspaceAction {
 	override async execute() {
 		await this._retrieveWorkspaceContext;
-
-		if (!this._workspaceContext) {
-			return;
-		}
-
-		await this._workspaceContext.saveAndPreview(undefined);
+		await this._workspaceContext?.saveAndPreview(undefined);
 	}
 }
 
