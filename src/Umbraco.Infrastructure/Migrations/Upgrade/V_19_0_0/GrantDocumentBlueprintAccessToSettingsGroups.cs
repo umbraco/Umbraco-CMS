@@ -40,7 +40,7 @@ public class GrantDocumentBlueprintAccessToSettingsGroups : AsyncMigrationBase
 
         Sql<ISqlContext> sql = Database.SqlContext.Sql()
             .Update<UserGroupDto>(u => u.Set(x => x.StartDocumentBlueprintId, Constants.System.Root))
-            .WhereIn<UserGroupDto>(x => x.Id, Database.Fetch<int>(groupsWithSettingsAccess))
+            .WhereIn<UserGroupDto>(x => x.Id, groupsWithSettingsAccess)
             .Where<UserGroupDto>(x => x.StartDocumentBlueprintId == null);
 
         Database.Execute(sql);
