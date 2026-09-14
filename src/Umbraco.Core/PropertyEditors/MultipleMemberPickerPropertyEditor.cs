@@ -64,10 +64,17 @@ public class MultipleMemberPickerPropertyEditor : DataEditor, IValueSchemaProvid
             ["description"] = "Keys of the selected members",
         };
 
-        if (configuration is MultipleMemberPickerConfiguration { ValidationLimit: { } validationLimit }
-            && validationLimit.Max is int max && max > 0)
+        if (configuration is MultipleMemberPickerConfiguration { ValidationLimit: { } validationLimit })
         {
-            schema["maxItems"] = max;
+            if (validationLimit.Min is int min && min > 0)
+            {
+                schema["minItems"] = min;
+            }
+
+            if (validationLimit.Max is int max && max > 0)
+            {
+                schema["maxItems"] = max;
+            }
         }
 
         return schema;
