@@ -947,6 +947,10 @@ export class ContentUiHelper extends UiBaseLocators {
     await this.click(this.resetFocalPointBtn);
   }
 
+  async clickCropWithName(name: string) {
+    await this.click(this.page.getByText(name, {exact: true}));
+  }
+
   async setFocalPoint(widthPercentage: number = 50, heightPercentage: number = 50) {
     await this.page.waitForTimeout(ConstantHelper.wait.medium);
     const element = await this.page.locator('#image').boundingBox();

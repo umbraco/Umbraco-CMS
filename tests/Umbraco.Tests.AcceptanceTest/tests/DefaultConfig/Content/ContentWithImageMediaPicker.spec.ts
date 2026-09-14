@@ -263,10 +263,19 @@ test('can add an image from the image media picker with a image crop', async ({u
   const imageId = await umbracoApi.media.createDefaultMediaWithImage(mediaName);
   const dataTypeId = await umbracoApi.dataType.createImageMediaPickerDataTypeWithCrop(customDataTypeName, cropLabel, cropWidth, cropHeight);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, dataTypeId, groupName);
-  await umbracoApi.document.createDocumentWithImageMediaPicker(contentName, documentTypeId, AliasHelper.toAlias(customDataTypeName), imageId);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickChooseButtonAndSelectMediaWithName(mediaName);
+  await umbracoUi.content.clickChooseModalButton();
+  await umbracoUi.content.clickExactLinkWithName(mediaName);
+  await umbracoUi.content.clickCropWithName(cropLabel);
+  await umbracoUi.content.clickSubmitButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
+
+  // Assert
+  expect(await umbracoApi.document.doesImageMediaPickerContainImageWithCrop(contentName, AliasHelper.toAlias(customDataTypeName), imageId, AliasHelper.toAlias(cropLabel))).toBeTruthy();
 });
