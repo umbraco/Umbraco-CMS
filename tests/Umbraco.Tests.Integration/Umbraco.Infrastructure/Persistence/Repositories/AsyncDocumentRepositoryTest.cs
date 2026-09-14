@@ -3659,4 +3659,64 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         Assert.That(startNodeExists, Is.False, "UserStartNode rows referencing the deleted content should be removed.");
         Assert.That(notifyExists, Is.False, "User2NodeNotify rows referencing the deleted content should be removed.");
     }
+
+    [Test]
+    public async Task CheckDataIntegrityAsync_WithConsistentData_ReportsOk()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        ContentDataIntegrityReport report = await repository.CheckDataIntegrityAsync(new ContentDataIntegrityReportOptions(), CancellationToken.None);
+
+        scope.Complete();
+
+        Assert.That(report.Ok, Is.True);
+        Assert.That(report.DetectedIssues, Is.Empty);
+    }
+
+    [Test]
+    public async Task CheckDataIntegrityAsync_DetectsAndFixes_CorruptedLevel()
+    {
+        var scopeAccessor = GetRequiredService<IEFCoreScopeAccessor<UmbracoDbContext>>();
+
+        using var corruptScope = NewScopeProvider.CreateScope();
+        await scopeAccessor.AmbientScope!.ExecuteWithContextAsync<object?>(async db =>
+        {
+            // Corrupt only the level, leaving path/parent untouched, so the mismatch is unambiguous.
+            await db.Nodes
+                .Where(n => n.NodeId == _subpage.Id)
+                .ExecuteUpdateAsync(s => s.SetProperty(n => n.Level, (short)99));
+            return null;
+        });
+        corruptScope.Complete();
+
+        using var detectScope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+        ContentDataIntegrityReport detectedReport = await repository.CheckDataIntegrityAsync(new ContentDataIntegrityReportOptions { FixIssues = false }, CancellationToken.None);
+        detectScope.Complete();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(detectedReport.Ok, Is.False);
+            Assert.That(detectedReport.DetectedIssues.ContainsKey(_subpage.Id), Is.True);
+            Assert.That(detectedReport.DetectedIssues[_subpage.Id].Fixed, Is.False);
+        });
+
+        using var fixScope = NewScopeProvider.CreateScope();
+        ContentDataIntegrityReport fixedReport = await repository.CheckDataIntegrityAsync(new ContentDataIntegrityReportOptions { FixIssues = true }, CancellationToken.None);
+        fixScope.Complete();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(fixedReport.Ok, Is.True);
+            Assert.That(fixedReport.FixedIssues.ContainsKey(_subpage.Id), Is.True);
+        });
+
+        using var verifyScope = NewScopeProvider.CreateScope();
+        short? restoredLevel = await scopeAccessor.AmbientScope!.ExecuteWithContextAsync(db =>
+            db.Nodes.Where(n => n.NodeId == _subpage.Id).Select(n => (short?)n.Level).SingleAsync());
+        verifyScope.Complete();
+
+        Assert.That(restoredLevel, Is.EqualTo((short)2));
+    }
 }

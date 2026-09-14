@@ -1586,15 +1586,17 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
     }
 
     /// <inheritdoc />
-    public override ContentDataIntegrityReport CheckDataIntegrity(ContentDataIntegrityReportOptions options)
-        => CheckDataIntegrity(
+    public override Task<ContentDataIntegrityReport> CheckDataIntegrityAsync(ContentDataIntegrityReportOptions options, CancellationToken cancellationToken)
+        => CheckDataIntegrityAsync(
             options,
             scope =>
             {
                 // The event args needs a content item so we'll make a fake one with enough properties to not cause a null ref
                 var root = new Content("root", -1, new ContentType(_shortStringHelper, -1)) { Id = -1, Key = Guid.Empty };
                 scope.Notifications.Publish(new ContentTreeChangeNotification(root, TreeChangeTypes.RefreshAll, EventMessagesFactory.Get()));
-            });
+                return Task.CompletedTask;
+            },
+            cancellationToken);
 
     #endregion
 

@@ -145,6 +145,11 @@ public class ElementService : PublishableContentServiceBase<IElement>, IElementS
                 scope.Notifications.Publish(new ElementTreeChangeNotification(root, TreeChangeTypes.RefreshAll, EventMessagesFactory.Get()));
             });
 
+    /// <inheritdoc />
+    // No async repository exists for elements yet - bridges to the existing synchronous CheckDataIntegrity engine.
+    public Task<ContentDataIntegrityReport> CheckDataIntegrityAsync(ContentDataIntegrityReportOptions options, CancellationToken cancellationToken)
+        => Task.FromResult(CheckDataIntegrity(options));
+
     #endregion
 
     #region Content Types

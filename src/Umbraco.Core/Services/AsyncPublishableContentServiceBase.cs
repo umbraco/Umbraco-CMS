@@ -1749,19 +1749,19 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
         langs?.Any(x => x.IsDefault && x.IsoCode.InvariantEquals(culture)) ?? false;
 
     /// <inheritdoc />
-    public abstract ContentDataIntegrityReport CheckDataIntegrity(ContentDataIntegrityReportOptions options);
+    public abstract Task<ContentDataIntegrityReport> CheckDataIntegrityAsync(ContentDataIntegrityReportOptions options, CancellationToken cancellationToken);
 
-    protected ContentDataIntegrityReport CheckDataIntegrity(ContentDataIntegrityReportOptions options, Action<ICoreScope> notifyIssuesFixed)
+    protected async Task<ContentDataIntegrityReport> CheckDataIntegrityAsync(ContentDataIntegrityReportOptions options, Func<ICoreScope, Task> notifyIssuesFixed, CancellationToken cancellationToken)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
         scope.WriteLock(WriteLockIds);
 
-        ContentDataIntegrityReport report = _contentRepository.CheckDataIntegrity(options);
+        ContentDataIntegrityReport report = await _asyncContentRepository.CheckDataIntegrityAsync(options, cancellationToken);
 
         if (report.FixedIssues.Count > 0)
         {
-            notifyIssuesFixed(scope);
+            await notifyIssuesFixed(scope);
         }
 
         scope.Complete();

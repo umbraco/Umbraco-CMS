@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using System.Diagnostics;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -21,6 +22,8 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Cms.Infrastructure.Persistence.EFCore;
+using Umbraco.Cms.Infrastructure.Persistence.EFCore.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
@@ -5215,5 +5218,56 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
         // Verify the Key was not changed
         Assert.That(content.Key, Is.EqualTo(originalKey));
+    }
+
+    [Test]
+    public async Task CheckDataIntegrityAsync_WithConsistentData_ReportsOk()
+    {
+        ContentDataIntegrityReport report = await ContentService.CheckDataIntegrityAsync(new ContentDataIntegrityReportOptions(), CancellationToken.None);
+
+        Assert.That(report.Ok, Is.True);
+        Assert.That(report.DetectedIssues, Is.Empty);
+    }
+
+    [Test]
+    public async Task CheckDataIntegrityAsync_FixIssues_CorrectsCorruptedLevel()
+    {
+        var scopeAccessor = GetRequiredService<IEFCoreScopeAccessor<UmbracoDbContext>>();
+
+        using (var corruptScope = NewScopeProvider.CreateScope())
+        {
+            await scopeAccessor.AmbientScope!.ExecuteWithContextAsync<object?>(async db =>
+            {
+                // Corrupt only the level, leaving path/parent untouched, so the mismatch is unambiguous.
+                await db.Nodes
+                    .Where(n => n.NodeId == Subpage.Id)
+                    .ExecuteUpdateAsync(s => s.SetProperty(n => n.Level, (short)99));
+                return null;
+            });
+            corruptScope.Complete();
+        }
+
+        ContentDataIntegrityReport fixedReport = await ContentService.CheckDataIntegrityAsync(new ContentDataIntegrityReportOptions { FixIssues = true }, CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(fixedReport.Ok, Is.True);
+            Assert.That(fixedReport.FixedIssues.ContainsKey(Subpage.Id), Is.True);
+        });
+    }
+
+    [Test]
+    public void CheckDataIntegrity_SyncEntryPoint_DelegatesToAsyncEngine()
+    {
+        // IContentService.CheckDataIntegrity is satisfied by an explicit reabstraction of
+        // IContentServiceBase.CheckDataIntegrity declared directly on IContentService, bridging onto
+        // CheckDataIntegrityAsync - it isn't implemented anywhere in ContentService's own class hierarchy, so
+        // it's only reachable through an IContentService-typed reference, matching how the one production
+        // caller (DatabaseIntegrityCheck) holds it.
+        IContentService contentService = ContentService;
+
+        ContentDataIntegrityReport report = contentService.CheckDataIntegrity(new ContentDataIntegrityReportOptions());
+
+        Assert.That(report.Ok, Is.True);
     }
 }

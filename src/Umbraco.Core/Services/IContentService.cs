@@ -10,12 +10,16 @@ namespace Umbraco.Cms.Core.Services;
 /// </summary>
 public interface IContentService : IPublishableContentService<IContent>, IAsyncPublishableContentService<IContent>
 {
-    // IPublishableContentService<IContent> and IAsyncPublishableContentService<IContent> both derive from a
-    // base interface declaring this member with an identical signature (IContentServiceBase and
-    // IAsyncContentServiceBase respectively), so without redeclaring it here every call site that holds an
-    // IContentService reference and invokes it directly is ambiguous (CS0121). A single implementation still
-    // satisfies both interface members implicitly.
-    new ContentDataIntegrityReport CheckDataIntegrity(ContentDataIntegrityReportOptions options);
+    // Explicit reabstraction of IContentServiceBase.CheckDataIntegrity (required transitively via
+    // IPublishableContentService<IContent> - the same contract Media/Member still implement synchronously).
+    // Bridges onto CheckDataIntegrityAsync, declared on the async side of this same interface, so this default
+    // - not a plain redeclaration, which C# would treat as an unrelated member rather than an override - is
+    // what satisfies the sync member for any implementer. No class anywhere in the async hierarchy (including
+    // ContentService itself) needs to implement a sync member at all.
+    // TODO: Remove this default implementation once Media/Member have their own async repositories and
+    // IContentServiceBase.CheckDataIntegrity itself can be retired in favor of an async-only equivalent.
+    ContentDataIntegrityReport IContentServiceBase.CheckDataIntegrity(ContentDataIntegrityReportOptions options)
+        => CheckDataIntegrityAsync(options, CancellationToken.None).GetAwaiter().GetResult();
 
     #region Blueprints
 
