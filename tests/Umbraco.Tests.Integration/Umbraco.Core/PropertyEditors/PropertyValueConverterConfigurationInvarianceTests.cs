@@ -39,17 +39,12 @@ internal sealed class PropertyValueConverterConfigurationInvarianceTests : Umbra
     /// Converters whose model type legitimately depends on configuration.
     /// </summary>
     /// <remarks>
-    /// The block list and block grid converters name the element types their generic arguments come from, which is
-    /// what a block editor's configuration is. The single block editor is not among them: it holds one block chosen
-    /// from every element type its configuration allows, so its model names none of them. The multi node tree picker
-    /// is deprecated in favour of the dedicated document, media, element and member pickers, and its model is frozen
-    /// as it stands rather than migrated.
+    /// The multi node tree picker is deprecated in favour of the dedicated document, media, element and member pickers,
+    /// and its model is frozen as it stands rather than migrated.
     /// </remarks>
 #pragma warning disable CS0618 // the multi node tree picker is obsolete, and exempt for exactly that reason
     private static readonly Type[] _exemptConverters =
     [
-        typeof(BlockListPropertyValueConverter),
-        typeof(BlockGridPropertyValueConverter),
         typeof(MultiNodeTreePickerValueConverter),
     ];
 
