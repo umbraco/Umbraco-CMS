@@ -92,7 +92,6 @@ public class MultipleDocumentPickerValueConverter : PropertyValueConverterBase, 
             : keys
                 .Select(key => _publishedContentCache.GetById(preview, key))
                 .WhereNotNull()
-                .Where(content => content.ContentType.ItemType == PublishedItemType.Content)
                 .ToArray();
     }
 }
