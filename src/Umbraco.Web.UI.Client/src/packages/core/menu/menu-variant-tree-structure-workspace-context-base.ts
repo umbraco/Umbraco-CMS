@@ -1,38 +1,44 @@
-import type { ManifestWorkspaceContextMenuStructureKind, UmbVariantStructureItemModel } from './types.js';
 import { UMB_MENU_VARIANT_STRUCTURE_WORKSPACE_CONTEXT } from './menu-variant-structure-workspace-context.context-token.js';
 import { UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT } from './section-sidebar-menu/section-context/section-sidebar-menu.section-context.token.js';
+import type { ManifestWorkspaceContextMenuStructureKind, UmbVariantStructureItemModel } from './types.js';
+import type { UmbMenuVariantStructureWorkspaceContext } from './menu-variant-structure-workspace-context.interface.js';
 import type { UmbTreeItemModel, UmbTreeRepository, UmbTreeRootModel } from '@umbraco-cms/backoffice/tree';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
-import { UmbArrayState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { debounce, linkEntityExpansionEntries } from '@umbraco-cms/backoffice/utils';
 import { UmbAncestorsEntityContext, UmbParentEntityContext, type UmbEntityModel } from '@umbraco-cms/backoffice/entity';
+import { UmbArrayState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
+import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
+import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
+import { UMB_MODAL_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { UMB_SECTION_CONTEXT } from '@umbraco-cms/backoffice/section';
 import {
 	UMB_SUBMITTABLE_TREE_ENTITY_WORKSPACE_CONTEXT,
 	UMB_VARIANT_WORKSPACE_CONTEXT,
 	UMB_WORKSPACE_EDIT_PATH_PATTERN,
 	UMB_WORKSPACE_EDIT_VARIANT_PATH_PATTERN,
 } from '@umbraco-cms/backoffice/workspace';
-import { linkEntityExpansionEntries } from '@umbraco-cms/backoffice/utils';
-import { UMB_MODAL_CONTEXT } from '@umbraco-cms/backoffice/modal';
-import { UMB_SECTION_CONTEXT } from '@umbraco-cms/backoffice/section';
-import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 interface UmbMenuVariantTreeStructureWorkspaceContextBaseArgs {
 	treeRepositoryAlias: string;
 }
 
 // TODO: introduce base class for all menu structure workspaces to handle ancestors and parent
-export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends UmbContextBase {
+export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase
+	extends UmbContextBase
+	implements UmbMenuVariantStructureWorkspaceContext
+{
 	manifest?: ManifestWorkspaceContextMenuStructureKind;
 
 	#workspaceContext?: typeof UMB_SUBMITTABLE_TREE_ENTITY_WORKSPACE_CONTEXT.TYPE;
-	#args: UmbMenuVariantTreeStructureWorkspaceContextBaseArgs;
+	readonly #args: UmbMenuVariantTreeStructureWorkspaceContextBaseArgs;
 
-	#structure = new UmbArrayState<UmbVariantStructureItemModel>([], (x) => x.unique);
+	readonly #structure = new UmbArrayState<UmbVariantStructureItemModel>([], (x) => x.unique);
 	public readonly structure = this.#structure.asObservable();
 
-	#parent = new UmbObjectState<UmbVariantStructureItemModel | undefined>(undefined);
+	readonly #parent = new UmbObjectState<UmbVariantStructureItemModel | undefined>(undefined);
 	/**
 	 * @deprecated Will be removed in v.18: Use UMB_PARENT_ENTITY_CONTEXT instead.
 	 */
@@ -40,13 +46,18 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 
 	protected _sectionContext?: typeof UMB_SECTION_CONTEXT.TYPE;
 
-	#parentContext = new UmbParentEntityContext(this);
-	#ancestorContext = new UmbAncestorsEntityContext(this);
+	readonly #parentContext = new UmbParentEntityContext(this);
+	readonly #ancestorContext = new UmbAncestorsEntityContext(this);
 	#sectionSidebarMenuContext?: typeof UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT.TYPE;
 	#isModalContext: boolean = false;
 	#isNew: boolean | undefined = undefined;
 	#variantWorkspaceContext?: typeof UMB_VARIANT_WORKSPACE_CONTEXT.TYPE;
 	#workspaceActiveVariantId?: UmbVariantId;
+	#actionEventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
+	#structureRequestId = 0;
+
+	// Coalesces the unique/isNew/reload-event triggers when they fire in quick succession.
+	readonly #requestStructure = debounce(() => this.#requestStructureImpl(), 100);
 
 	public readonly IS_MENU_VARIANT_STRUCTURE_WORKSPACE_CONTEXT = true;
 
@@ -58,6 +69,12 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 
 		this.consumeContext(UMB_MODAL_CONTEXT, (modalContext) => {
 			this.#isModalContext = modalContext !== undefined;
+		});
+
+		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (instance) => {
+			this.#removeEventListeners();
+			this.#actionEventContext = instance;
+			this.#addEventListeners();
 		});
 
 		this.consumeContext(UMB_SECTION_CONTEXT, (instance) => {
@@ -80,19 +97,29 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 				this.#workspaceContext?.unique,
 				(value) => {
 					if (!value) return;
+					// Clear immediately so the previous entity's breadcrumb/structure isn't shown while the new one loads.
+					this.#clearStructure();
 					this.#requestStructure();
 				},
 				'observeUnique',
 			);
 
+			// isNew is observed on its own, separate from the structure fetch, so the expand decision never
+			// depends on which of the two happens to settle first: whichever settles last (isNew resolving to
+			// false, or the structure fetch resolving) is the one that actually triggers the expand.
 			this.observe(
 				this.#workspaceContext?.isNew,
-				(value) => {
-					// Workspace has changed from new to existing
-					if (value === false && this.#isNew === true) {
+				(isNew) => {
+					// The item has just been created: the structure fetched while new was based on the create-under
+					// parent's identity (the item didn't exist yet), so it must be re-fetched using the item's own
+					// identity - otherwise parent/ancestor data downstream keeps describing the parent it was
+					// created under rather than the entity that now actually exists.
+					if (isNew === false && this.#isNew === true) {
 						this.#requestStructure();
+					} else if (isNew === false) {
+						this.#tryExpandSectionSidebarMenu();
 					}
-					this.#isNew = value;
+					this.#isNew = isNew;
 				},
 				'observeIsNew',
 			);
@@ -131,7 +158,37 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 		});
 	}
 
-	async #requestStructure() {
+	#addEventListeners() {
+		this.#actionEventContext?.addEventListener(
+			UmbRequestReloadStructureForEntityEvent.TYPE,
+			this.#onReloadStructureForEntityRequest as EventListener,
+		);
+	}
+
+	#removeEventListeners() {
+		this.#actionEventContext?.removeEventListener(
+			UmbRequestReloadStructureForEntityEvent.TYPE,
+			this.#onReloadStructureForEntityRequest as EventListener,
+		);
+	}
+
+	readonly #onReloadStructureForEntityRequest = (event: UmbRequestReloadStructureForEntityEvent) => {
+		if (!this.#isCurrentEntityOrAncestor(event.getEntityType(), event.getUnique())) return;
+		this.#requestStructure();
+	};
+
+	#isCurrentEntityOrAncestor(entityType: string, unique: string | null): boolean {
+		if (entityType === this.#workspaceContext?.getEntityType() && unique === this.#workspaceContext?.getUnique()) {
+			return true;
+		}
+
+		return this.#ancestorContext
+			.getAncestors()
+			.some((ancestor) => ancestor.entityType === entityType && ancestor.unique === unique);
+	}
+
+	async #requestStructureImpl() {
+		const requestId = ++this.#structureRequestId;
 		const isNew = this.#workspaceContext?.getIsNew();
 		const uniqueObservable = isNew
 			? this.#workspaceContext?._internal_createUnderParentEntityUnique
@@ -195,15 +252,40 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 			// (e.g. a condition such as IS_NOT_TRASHED flips before the API response arrives).
 			if (!this._host) return;
 
+			// Guard: a newer request has superseded this one; its result would already be stale.
+			if (requestId !== this.#structureRequestId) return;
+
 			this.#structure.setValue(structureItems);
 			this.#setParentData(structureItems);
 			this.#setAncestorData(data);
 
-			const menuItemAlias = this.manifest?.meta?.menuItemAlias;
-			if (menuItemAlias && !this.#isModalContext) {
-				this.#expandSectionSidebarMenu(structureItems, menuItemAlias);
-			}
+			this.#tryExpandSectionSidebarMenu();
 		}
+	}
+
+	/**
+	 * Expands the parent in the section sidebar menu, but only once we know for certain the item isn't still being
+	 * created, and only once the structure has actually been fetched. Reads both conditions fresh, so it's safe to
+	 * call from either the structure-fetch completion or the isNew observer, whichever settles last.
+	 */
+	#tryExpandSectionSidebarMenu() {
+		const menuItemAlias = this.manifest?.meta?.menuItemAlias;
+		if (!menuItemAlias || this.#isModalContext) return;
+
+		// Don't expand the parent for an item that hasn't been created yet.
+		if (this.#workspaceContext?.getIsNew() !== false) return;
+
+		const structureItems = this.#structure.getValue();
+		if (!structureItems.length) return;
+
+		this.#expandSectionSidebarMenu(structureItems, menuItemAlias);
+	}
+
+	#clearStructure() {
+		this.#structure.setValue([]);
+		this.#parent.setValue(undefined);
+		this.#parentContext.setParent(undefined);
+		this.#ancestorContext.setAncestors([]);
 	}
 
 	#setParentData(structureItems: Array<UmbVariantStructureItemModel>) {
@@ -271,6 +353,8 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 	}
 
 	override destroy(): void {
+		this.#requestStructure.cancel();
+		this.#removeEventListeners();
 		super.destroy();
 		this.#structure.destroy();
 		this.#parent.destroy();

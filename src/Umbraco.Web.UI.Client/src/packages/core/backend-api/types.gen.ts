@@ -635,7 +635,7 @@ export type DatatypeConfigurationResponseModel = {
 };
 
 export type DefaultReferenceResponseModel = {
-    $type: string;
+    $type: 'DefaultReferenceResponseModel';
     id: string;
     name?: string | null;
     type?: string | null;
@@ -715,6 +715,7 @@ export type DocumentCollectionResponseModel = {
     flags: Array<FlagModel>;
     creator?: string | null;
     sortOrder: number;
+    hasChildren: boolean;
     documentType: DocumentTypeCollectionReferenceResponseModel;
     isTrashed: boolean;
     isProtected: boolean;
@@ -750,13 +751,13 @@ export type DocumentNotificationResponseModel = {
 };
 
 export type DocumentPermissionPresentationModel = {
-    $type: string;
+    $type: 'DocumentPermissionPresentationModel';
     document: ReferenceByIdModel;
     verbs: Array<string>;
 };
 
 export type DocumentPropertyValuePermissionPresentationModel = {
-    $type: string;
+    $type: 'DocumentPropertyValuePermissionPresentationModel';
     documentType: ReferenceByIdModel;
     propertyType: ReferenceByIdModel;
     verbs: Array<string>;
@@ -772,7 +773,7 @@ export type DocumentRecycleBinItemResponseModel = {
 };
 
 export type DocumentReferenceResponseModel = {
-    $type: string;
+    $type: 'DocumentReferenceResponseModel';
     id: string;
     name?: string | null;
     published?: boolean | null;
@@ -870,7 +871,7 @@ export type DocumentTypePropertyTypeContainerResponseModel = {
 };
 
 export type DocumentTypePropertyTypeReferenceResponseModel = {
-    $type: string;
+    $type: 'DocumentTypePropertyTypeReferenceResponseModel';
     id: string;
     name?: string | null;
     alias?: string | null;
@@ -1348,6 +1349,7 @@ export type MediaCollectionResponseModel = {
     flags: Array<FlagModel>;
     creator?: string | null;
     sortOrder: number;
+    hasChildren: boolean;
     mediaType: MediaTypeCollectionReferenceResponseModel;
 };
 
@@ -1379,7 +1381,7 @@ export type MediaRecycleBinItemResponseModel = {
 };
 
 export type MediaReferenceResponseModel = {
-    $type: string;
+    $type: 'MediaReferenceResponseModel';
     id: string;
     name?: string | null;
     mediaType: TrackedReferenceMediaTypeModel;
@@ -1454,7 +1456,7 @@ export type MediaTypePropertyTypeContainerResponseModel = {
 };
 
 export type MediaTypePropertyTypeReferenceResponseModel = {
-    $type: string;
+    $type: 'MediaTypePropertyTypeReferenceResponseModel';
     id: string;
     name?: string | null;
     alias?: string | null;
@@ -1585,7 +1587,7 @@ export enum MemberKindModel {
 }
 
 export type MemberReferenceResponseModel = {
-    $type: string;
+    $type: 'MemberReferenceResponseModel';
     id: string;
     name?: string | null;
     memberType: TrackedReferenceMemberTypeModel;
@@ -1648,7 +1650,7 @@ export type MemberTypePropertyTypeContainerResponseModel = {
 };
 
 export type MemberTypePropertyTypeReferenceResponseModel = {
-    $type: string;
+    $type: 'MemberTypePropertyTypeReferenceResponseModel';
     id: string;
     name?: string | null;
     alias?: string | null;
@@ -2240,7 +2242,7 @@ export type ProblemDetails = {
     status?: number | null;
     detail?: string | null;
     instance?: string | null;
-    [key: string]: unknown | string | null | string | null | number | null | string | null | string | null | undefined;
+    [key: string]: unknown;
 };
 
 export type ProblemDetailsBuilderModel = {
@@ -2755,7 +2757,7 @@ export enum TreeItemKindModel {
 }
 
 export type UnknownTypePermissionPresentationModel = {
-    $type: string;
+    $type: 'UnknownTypePermissionPresentationModel';
     verbs: Array<string>;
     context: string;
 };
@@ -3293,6 +3295,98 @@ export type WebhookResponseModel = {
     events: Array<WebhookEventResponseModel>;
 };
 
+export type DataTypeSchemaItemResponseModelWritable = {
+    id: string;
+    valueTypeName?: string | null;
+    jsonSchema?: {
+        [key: string]: JsonNodeWritable;
+    } | null;
+    error?: string | null;
+};
+
+export type DataTypeSchemaResponseModelWritable = {
+    valueTypeName?: string | null;
+    jsonSchema?: {
+        [key: string]: JsonNodeWritable;
+    } | null;
+};
+
+export type DocumentBlueprintResponseModelWritable = {
+    values: Array<DocumentValueResponseModel>;
+    variants: Array<DocumentVariantResponseModelWritable>;
+    id: string;
+    flags: Array<FlagModel>;
+    documentType: DocumentTypeReferenceResponseModel;
+};
+
+export type DocumentCollectionResponseModelWritable = {
+    values: Array<DocumentValueResponseModel>;
+    variants: Array<DocumentVariantResponseModelWritable>;
+    id: string;
+    flags: Array<FlagModel>;
+    creator?: string | null;
+    sortOrder: number;
+    hasChildren: boolean;
+    documentType: DocumentTypeCollectionReferenceResponseModel;
+    isTrashed: boolean;
+    isProtected: boolean;
+    ancestors: Array<ReferenceByIdModel>;
+    updater?: string | null;
+};
+
+export type DocumentItemResponseModelWritable = {
+    id: string;
+    flags: Array<FlagModel>;
+    isTrashed: boolean;
+    isProtected: boolean;
+    parent?: ReferenceByIdModel | null;
+    hasChildren: boolean;
+    documentType: DocumentTypeReferenceResponseModel;
+    variants: Array<DocumentVariantItemResponseModelWritable>;
+};
+
+export type DocumentRecycleBinItemResponseModelWritable = {
+    id: string;
+    createDate: string;
+    hasChildren: boolean;
+    parent?: ItemReferenceByIdResponseModel | null;
+    documentType: DocumentTypeReferenceResponseModel;
+    variants: Array<DocumentVariantItemResponseModelWritable>;
+};
+
+export type DocumentReferenceResponseModelWritable = {
+    $type: 'DocumentReferenceResponseModel';
+    id: string;
+    name?: string | null;
+    published?: boolean | null;
+    documentType: TrackedReferenceDocumentTypeModel;
+    variants: Array<DocumentVariantItemResponseModelWritable>;
+};
+
+export type DocumentResponseModelWritable = {
+    values: Array<DocumentValueResponseModel>;
+    variants: Array<DocumentVariantResponseModelWritable>;
+    id: string;
+    flags: Array<FlagModel>;
+    documentType: DocumentTypeReferenceResponseModel;
+    template?: ReferenceByIdModel | null;
+    isTrashed: boolean;
+};
+
+export type DocumentTreeItemResponseModelWritable = {
+    hasChildren: boolean;
+    id: string;
+    parent?: ReferenceByIdModel | null;
+    flags: Array<FlagModel>;
+    noAccess: boolean;
+    isTrashed: boolean;
+    createDate: string;
+    isProtected: boolean;
+    ancestors: Array<ReferenceByIdModel>;
+    documentType: DocumentTypeReferenceResponseModel;
+    variants: Array<DocumentVariantItemResponseModelWritable>;
+};
+
 export type DocumentVariantItemResponseModelWritable = {
     name: string;
     culture?: string | null;
@@ -3311,6 +3405,25 @@ export type DocumentVariantResponseModelWritable = {
     scheduledPublishDate?: string | null;
     scheduledUnpublishDate?: string | null;
     flags: Array<FlagModel>;
+};
+
+export type DocumentVersionResponseModelWritable = {
+    values: Array<DocumentValueResponseModel>;
+    variants: Array<DocumentVariantResponseModelWritable>;
+    id: string;
+    flags: Array<FlagModel>;
+    documentType: DocumentTypeReferenceResponseModel;
+    document?: ReferenceByIdModel | null;
+};
+
+export type FetchResponseModelDataTypeSchemaItemResponseModelWritable = {
+    total: number;
+    items: Array<DataTypeSchemaItemResponseModelWritable>;
+};
+
+export type ItemAncestorsResponseModelDocumentItemResponseModelWritable = {
+    id: string;
+    ancestors: Array<DocumentItemResponseModelWritable>;
 };
 
 export type JsonNodeWritable = {
@@ -3335,6 +3448,56 @@ export type PackageDefinitionResponseModelWritable = {
     id: string;
 };
 
+export type PagedDocumentCollectionResponseModelWritable = {
+    total: number;
+    items: Array<DocumentCollectionResponseModelWritable>;
+};
+
+export type PagedDocumentRecycleBinItemResponseModelWritable = {
+    total: number;
+    items: Array<DocumentRecycleBinItemResponseModelWritable>;
+};
+
+export type PagedDocumentTreeItemResponseModelWritable = {
+    total: number;
+    items: Array<DocumentTreeItemResponseModelWritable>;
+};
+
+export type PagedIReferenceResponseModelWritable = {
+    total: number;
+    items: Array<DefaultReferenceResponseModel | DocumentReferenceResponseModelWritable | DocumentTypePropertyTypeReferenceResponseModel | MediaReferenceResponseModel | MediaTypePropertyTypeReferenceResponseModel | MemberReferenceResponseModel | MemberTypePropertyTypeReferenceResponseModel>;
+};
+
+export type PagedModelDocumentItemResponseModelWritable = {
+    items: Array<DocumentItemResponseModelWritable>;
+    total: number;
+};
+
+export type PagedPackageDefinitionResponseModelWritable = {
+    total: number;
+    items: Array<PackageDefinitionResponseModelWritable>;
+};
+
+export type PagedRelationResponseModelWritable = {
+    total: number;
+    items: Array<RelationResponseModelWritable>;
+};
+
+export type PagedSearchResultResponseModelWritable = {
+    total: number;
+    items: Array<SearchResultResponseModelWritable>;
+};
+
+export type PublishedDocumentResponseModelWritable = {
+    values: Array<DocumentValueResponseModel>;
+    variants: Array<DocumentVariantResponseModelWritable>;
+    id: string;
+    flags: Array<FlagModel>;
+    documentType: DocumentTypeReferenceResponseModel;
+    template?: ReferenceByIdModel | null;
+    isTrashed: boolean;
+};
+
 export type RelationResponseModelWritable = {
     id: string;
     relationType: ReferenceByIdModel;
@@ -3344,6 +3507,18 @@ export type SearchResultResponseModelWritable = {
     id: string;
     score: number;
     fields: Array<FieldPresentationModel>;
+};
+
+export type SubsetDocumentRecycleBinItemResponseModelWritable = {
+    totalBefore: number;
+    totalAfter: number;
+    items: Array<DocumentRecycleBinItemResponseModelWritable>;
+};
+
+export type SubsetDocumentTreeItemResponseModelWritable = {
+    totalBefore: number;
+    totalAfter: number;
+    items: Array<DocumentTreeItemResponseModelWritable>;
 };
 
 export type UpdatePackageRequestModelWritable = {
@@ -7436,7 +7611,7 @@ export type PutDocumentByIdUpdateAndPublishResponses = {
     200: unknown;
 };
 
-export type PutUmbracoManagementApiV11DocumentByIdValidate11Data = {
+export type PutDocumentByIdValidateData = {
     body?: ValidateUpdateDocumentRequestModel;
     path: {
         id: string;
@@ -7445,7 +7620,7 @@ export type PutUmbracoManagementApiV11DocumentByIdValidate11Data = {
     url: '/umbraco/management/api/v1.1/document/{id}/validate';
 };
 
-export type PutUmbracoManagementApiV11DocumentByIdValidate11Errors = {
+export type PutDocumentByIdValidateErrors = {
     /**
      * Bad Request
      */
@@ -7464,9 +7639,9 @@ export type PutUmbracoManagementApiV11DocumentByIdValidate11Errors = {
     404: ProblemDetails;
 };
 
-export type PutUmbracoManagementApiV11DocumentByIdValidate11Error = PutUmbracoManagementApiV11DocumentByIdValidate11Errors[keyof PutUmbracoManagementApiV11DocumentByIdValidate11Errors];
+export type PutDocumentByIdValidateError = PutDocumentByIdValidateErrors[keyof PutDocumentByIdValidateErrors];
 
-export type PutUmbracoManagementApiV11DocumentByIdValidate11Responses = {
+export type PutDocumentByIdValidateResponses = {
     /**
      * OK
      */
@@ -8475,6 +8650,10 @@ export type GetIndexerErrors = {
      * The resource is protected and requires an authentication token
      */
     401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
 };
 
 export type GetIndexerResponses = {
@@ -8504,6 +8683,10 @@ export type GetIndexerByIndexNameErrors = {
      * The resource is protected and requires an authentication token
      */
     401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
 };
 
 export type GetIndexerByIndexNameError = GetIndexerByIndexNameErrors[keyof GetIndexerByIndexNameErrors];
@@ -8535,6 +8718,10 @@ export type PostIndexerByIndexNameRebuildErrors = {
      * The resource is protected and requires an authentication token
      */
     401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
     /**
      * Not Found
      */
@@ -13940,6 +14127,10 @@ export type PostPublishedCacheRebuildErrors = {
      * The resource is protected and requires an authentication token
      */
     401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
 };
 
 export type PostPublishedCacheRebuildResponses = {
@@ -13961,6 +14152,10 @@ export type GetPublishedCacheRebuildStatusErrors = {
      * The resource is protected and requires an authentication token
      */
     401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
 };
 
 export type GetPublishedCacheRebuildStatusResponses = {
@@ -13984,6 +14179,10 @@ export type PostPublishedCacheReloadErrors = {
      * The resource is protected and requires an authentication token
      */
     401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
 };
 
 export type PostPublishedCacheReloadResponses = {
@@ -14720,6 +14919,10 @@ export type GetSearcherErrors = {
      * The resource is protected and requires an authentication token
      */
     401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
 };
 
 export type GetSearcherResponses = {
@@ -14749,6 +14952,10 @@ export type GetSearcherBySearcherNameQueryErrors = {
      * The resource is protected and requires an authentication token
      */
     401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
     /**
      * Not Found
      */

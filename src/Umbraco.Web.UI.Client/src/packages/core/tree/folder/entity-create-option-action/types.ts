@@ -3,8 +3,7 @@ import type {
 	MetaEntityCreateOptionAction,
 } from '@umbraco-cms/backoffice/entity-create-option-action';
 
-export interface ManifestEntityCreateOptionActionFolderKind
-	extends ManifestEntityCreateOptionAction<MetaEntityCreateOptionActionFolderKind> {
+export interface ManifestEntityCreateOptionActionFolderKind extends ManifestEntityCreateOptionAction<MetaEntityCreateOptionActionFolderKind> {
 	type: 'entityCreateOptionAction';
 	kind: 'folder';
 }

@@ -22,13 +22,17 @@ namespace Umbraco.Cms.Web.Common.Middleware;
 public class PreviewAuthenticationMiddleware : IMiddleware
 {
     private readonly ILogger<PreviewAuthenticationMiddleware> _logger;
+#pragma warning disable CS0618 // Type or member is obsolete - all usage has been removed up in V19
     private readonly IPreviewTokenGenerator _previewTokenGenerator;
+#pragma warning restore CS0618 // Type or member is obsolete
     private readonly IPreviewService _previewService;
 
 
     public PreviewAuthenticationMiddleware(
         ILogger<PreviewAuthenticationMiddleware> logger,
+#pragma warning disable CS0618 // Type or member is obsolete - all usage has been removed up in V19
         IPreviewTokenGenerator previewTokenGenerator,
+#pragma warning restore CS0618 // Type or member is obsolete
         IPreviewService previewService)
     {
         _logger = logger;

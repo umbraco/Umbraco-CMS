@@ -7,6 +7,7 @@ namespace Umbraco.Cms.Core.Preview;
 /// Preview tokens allow users to preview unpublished content by generating
 /// secure, time-limited tokens that can be verified on subsequent requests.
 /// </remarks>
+[Obsolete("This has been deprecated and will be removed in Umbraco 19.")]
 public interface IPreviewTokenGenerator
 {
     /// <summary>

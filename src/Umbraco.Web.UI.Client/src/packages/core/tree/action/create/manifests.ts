@@ -1,6 +1,6 @@
-import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbTreeCreateActionButtonElement } from './tree-create-action.element.js';
 import { UmbTreeCreateActionApi } from './tree-create-action.api.js';
+import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
 export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [
 	{

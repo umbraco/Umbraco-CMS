@@ -317,6 +317,7 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 			uui-box.opaque {
 				background-color: transparent;
 				border-color: transparent;
+				--uui-box-default-padding: 0;
 			}
 
 			.container-list {

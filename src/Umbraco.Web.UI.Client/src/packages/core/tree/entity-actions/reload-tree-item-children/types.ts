@@ -1,7 +1,6 @@
 import type { ManifestEntityAction, MetaEntityActionDefaultKind } from '@umbraco-cms/backoffice/entity-action';
 
-export interface ManifestEntityActionReloadTreeItemChildrenKind
-	extends ManifestEntityAction<MetaEntityActionReloadTreeItemChildrenKind> {
+export interface ManifestEntityActionReloadTreeItemChildrenKind extends ManifestEntityAction<MetaEntityActionReloadTreeItemChildrenKind> {
 	type: 'entityAction';
 	kind: 'reloadTreeItemChildren';
 }

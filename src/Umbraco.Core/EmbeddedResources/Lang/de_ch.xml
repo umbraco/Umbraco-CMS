@@ -1553,14 +1553,6 @@
 		<key alias="translation">Übersetzung</key>
 		<key alias="users">Benutzer</key>
 	</area>
-	<area alias="help">
-		<key alias="tours">Touren</key>
-		<key alias="theBestUmbracoVideoTutorials">Die besten Umbraco-Video-Tutorials</key>
-		<key alias="umbracoForum">Besuche our.umbraco.com</key>
-		<key alias="umbracoTv">Besuche umbraco.tv</key>
-		<key alias="umbracoLearningBase">Schaue gratis Tutorials</key>
-		<key alias="umbracoLearningBaseDescription">von Umbraco Learning Base</key>
-	</area>
 	<area alias="settings">
 		<key alias="defaulttemplate">Standardvorlage</key>
 		<key alias="importDocumentTypeHelp">Wählen Sie die lokale .udt-Datei aus, die den zu importierenden Dokumenttyp enthält und fahren Sie mit dem Import fort. Die endgültige Übernahme erfolgt im Anschluss erst nach einer weiteren Bestätigung.</key>

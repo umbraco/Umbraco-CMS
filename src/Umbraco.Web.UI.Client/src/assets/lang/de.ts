@@ -314,6 +314,8 @@ export default {
 		isSensitiveValue:
 			'Dieser Wert ist verborgen.\n      Wenn Sie diesen Wert einsehen müssen, wenden Sie sich bitte an einen Administrator.\n    ',
 		isSensitiveValue_short: 'Dieser Wert ist verborgen.',
+		isSensitiveValueNotice:
+			'Wenn Sie die verborgenen Werte einsehen müssen, wenden Sie sich bitte an einen Administrator.',
 		languagesToPublish: 'Welche Sprache möchten Sie veröffentlichen?',
 		languagesToSendForApproval: 'Welche Sprachen möchten Sie zur Freigabe schicken?',
 		languagesToSchedule: 'Welche Sprachen möchten Sie zu einer bestimmten Zeit veröffentlichen?',
@@ -338,6 +340,8 @@ export default {
 		variantScheduleNotAllowed: 'Plannung ist nicht erlaubt',
 		variantUnpublishNotAllowed: 'Veröffentlichung zurücknehmen ist nicht erlaubt.',
 		saveModalTitle: 'Speichern',
+		saveAndPublishDescendantsModalTitle: 'Speichern und veröffentlichen mit Unterknoten',
+		saveAndScheduleModalTitle: 'Speichern und Veröffentlichung planen',
 	},
 	blueprints: {
 		createBlueprintFrom: 'Erzeuge eine neue Inhaltsvorlage von <em>%0%</em>',
@@ -369,6 +373,8 @@ export default {
 	},
 	media: {
 		clickToUpload: 'Für Upload klicken',
+		browseFilesAction: 'Dateien durchsuchen',
+		dropFilesOr: 'Medien hierher ziehen<br />oder',
 		orClickHereToUpload: 'oder klicken Sie hier um eine Datei zu wählen',
 		disallowedFileType: 'Dieser Dateityp darf nicht hochgeladen werden',
 		invalidFileName: 'Diese Datei kann nicht hochgeladen werden wil der Dateiname ungültig ist.',
@@ -828,6 +834,8 @@ export default {
 		next: 'Weiter',
 		no: 'Nein',
 		nodeName: 'Knoten Name',
+		noResults: 'Keine Ergebnisse',
+		noResultsFor: (query: string) => `Kein Ergebnis für "${query}".`,
 		of: 'von',
 		off: 'Aus',
 		ok: 'Ok',
@@ -1321,6 +1329,17 @@ export default {
 		sortHelp: 'Ziehen Sie die Elemente an ihre gewünschte neue Position.',
 		sortPleaseWait: 'Bitte warten, die Seiten werden sortiert. Das kann einen Moment dauern.',
 		sortEmptyState: 'Dieser Knoten hat keine Unterknoten zum Sortieren',
+		sortByFieldHeadline: 'Nach Feld sortieren',
+		sortByFieldSentence: 'Alle untergeordneten Elemente sortieren nach',
+		sortByFieldDirectionLabel: 'Richtung',
+		sortByFieldAscending: 'Aufsteigend',
+		sortByFieldDescending: 'Absteigend',
+		sortByFieldNameOption: 'Name',
+		sortByFieldCreateDateOption: 'Erstellt',
+		sortByFieldUpdateDateOption: 'Zuletzt bearbeitet',
+		sortIndividuallyHeadline: 'Einzeln sortieren',
+		sortByFieldCultureSentence: 'in',
+		sortByFieldCultureLabel: 'Sprache',
 	},
 	speechBubbles: {
 		editMultiContentPublishedPartialText: '%0% von %1% Dokumenten veröffentlicht.',
@@ -2076,5 +2095,10 @@ export default {
 		routeForbiddenTitle: 'Zugriff verweigert',
 		routeForbiddenDescription:
 			'Sie haben keine Berechtigung, auf diese Seite zuzugreifen. Bitte wenden Sie sich an Ihren Administrator, um Unterstützung zu erhalten.',
+	},
+	picker: {
+		browseTab: 'Durchsuchen',
+		searchTab: 'Suchen',
+		selectedCount: (count: number) => `${count} ${count === 1 ? 'Element' : 'Elemente'} ausgewählt`,
 	},
 } as UmbLocalizationDictionary;

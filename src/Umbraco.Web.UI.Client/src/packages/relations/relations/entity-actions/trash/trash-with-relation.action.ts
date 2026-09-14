@@ -6,7 +6,7 @@ import { UmbTrashEntityAction } from '@umbraco-cms/backoffice/recycle-bin';
 /**
  * Entity action for trashing an item with relations.
  * @class UmbTrashWithRelationEntityAction
- * @augments {UmbEntityActionBase<MetaEntityActionTrashWithRelationKind>}
+ * @augments {UmbTrashEntityAction<MetaEntityActionTrashWithRelationKind>}
  */
 export class UmbTrashWithRelationEntityAction extends UmbTrashEntityAction<MetaEntityActionTrashWithRelationKind> {
 	protected override async _confirmTrash(item: any) {

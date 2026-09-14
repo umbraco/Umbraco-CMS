@@ -171,6 +171,11 @@ public class UmbExternalLoginController : SurfaceController
                 errors.Add(
                     $"The requested provider ({loginInfo.LoginProvider}) has not provided the email claim {ClaimTypes.Email}, the account cannot be linked.");
             }
+            else if (result == MemberSignInManager.AutoLinkSignInResult.FailedNoName)
+            {
+                errors.Add(
+                    $"The requested provider ({loginInfo.LoginProvider}) has not provided a name for the account, the account cannot be linked.");
+            }
             else if (result is MemberSignInManager.AutoLinkSignInResult autoLinkSignInResult &&
                      autoLinkSignInResult.Errors.Count > 0)
             {

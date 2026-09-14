@@ -252,6 +252,7 @@ ASP.NET Core Identity sign-in manager for members.
 **Result Types** (lines 320-348):
 - `ExternalLoginSignInResult.NotAllowed` - Login refused by callback
 - `AutoLinkSignInResult.FailedNoEmail` - No email from provider
+- `AutoLinkSignInResult.FailedNoName` - No name from provider when creating a new account
 - `AutoLinkSignInResult.FailedCreatingUser` - User creation failed
 - `AutoLinkSignInResult.FailedLinkingUser` - Link creation failed
 

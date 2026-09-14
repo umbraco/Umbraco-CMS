@@ -1,5 +1,4 @@
 using Microsoft.Extensions.DependencyInjection;
-using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
@@ -148,7 +147,7 @@ internal sealed partial class BlockListElementLevelVariationTests : BlockEditorE
         return GetPublishedContent(content.Key);
     }
 
-    private IContentType CreateElementTypeWithValidation(ContentVariation contentVariation = ContentVariation.Culture)
+    private async Task<IContentType> CreateElementTypeWithValidationAsync(ContentVariation contentVariation = ContentVariation.Culture)
     {
         var elementType = CreateElementType(contentVariation);
         foreach (var propertyType in elementType.PropertyTypes)
@@ -157,13 +156,13 @@ internal sealed partial class BlockListElementLevelVariationTests : BlockEditorE
             propertyType.ValidationRegExp = "^Valid.*$";
         }
 
-        ContentTypeService.Save(elementType);
+        await ContentTypeService.UpdateAsync(elementType, Constants.Security.SuperUserKey);
         return elementType;
     }
 
     private async Task<(IContentType RootElementType, IContentType NestedElementType)> CreateElementTypeWithValidationAndNestedBlocksAsync()
     {
-        var nestedElementType = CreateElementTypeWithValidation();
+        var nestedElementType = await CreateElementTypeWithValidationAsync();
         var nestedBlockListDataType = await CreateBlockListDataType(nestedElementType);
 
         var rootElementType = new ContentTypeBuilder()
@@ -200,7 +199,7 @@ internal sealed partial class BlockListElementLevelVariationTests : BlockEditorE
             .WithVariations(ContentVariation.Nothing)
             .Done()
             .Build();
-        ContentTypeService.Save(rootElementType);
+        await ContentTypeService.CreateAsync(rootElementType, Constants.Security.SuperUserKey);
 
         return (rootElementType, nestedElementType);
     }

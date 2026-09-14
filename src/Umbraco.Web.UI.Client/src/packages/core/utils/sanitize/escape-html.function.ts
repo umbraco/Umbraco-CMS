@@ -5,8 +5,8 @@ const NON_ALPHANUMERIC_REGEXP = /([^#-~| |!])/g;
 /**
  * Escapes HTML entities in a string.
  * @example escapeHTML('<script>alert("XSS")</script>'), // "&lt;script&gt;alert(&#34;XSS&#34;)&lt;/script&gt;"
- * @param html The HTML string to escape.
- * @returns The sanitized HTML string.
+ * @param {unknown} html The HTML string to escape.
+ * @returns {string} The sanitized HTML string.
  */
 export function escapeHTML(html: unknown): string {
 	if (typeof html !== 'string' && html instanceof String === false) {

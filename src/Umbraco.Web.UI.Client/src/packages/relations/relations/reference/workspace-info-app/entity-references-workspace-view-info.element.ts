@@ -167,11 +167,6 @@ export class UmbEntityReferencesWorkspaceInfoAppElement extends UmbLitElement {
 				justify-content: center;
 				margin-top: var(--uui-size-space-4);
 			}
-
-			uui-pagination {
-				flex: 1;
-				display: inline-block;
-			}
 		`,
 	];
 }

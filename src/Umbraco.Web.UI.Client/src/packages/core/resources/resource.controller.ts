@@ -20,8 +20,8 @@ export class UmbResourceController<T = unknown> extends UmbControllerBase {
 	/**
 	 * Maps any error to an UmbError.
 	 * @internal
-	 * @param {*} error The error to map
-	 * @returns {*} The mapped error
+	 * @param {unknown} error The error to map
+	 * @returns {UmbApiError | UmbCancelError} The mapped error
 	 */
 	mapToUmbError(error: unknown): UmbApiError | UmbCancelError {
 		if (isProblemDetailsLike(error)) {

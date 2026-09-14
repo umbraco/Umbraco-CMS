@@ -1,14 +1,15 @@
 import { UmbMergeContentVariantDataController } from '../controller/merge-content-variant-data.controller.js';
-import type { UmbElementDetailModel } from '../types.js';
+import type { UmbElementDetailModel, UmbElementValueModel } from '../types.js';
 import { UmbVariantId, umbVariantObjectCompare } from '@umbraco-cms/backoffice/variant';
 import { UmbEntityWorkspaceDataManager, type UmbWorkspaceDataManager } from '@umbraco-cms/backoffice/workspace';
 
 /**
- *
- * @param a
- * @param b
+ * Compares two element values by alias and variant.
+ * @param {UmbElementValueModel} a The first value to compare.
+ * @param {UmbElementValueModel} b The second value to compare.
+ * @returns {boolean} True if the values have the same alias and variant.
  */
-function valueObjectCompare(a: any, b: any) {
+function valueObjectCompare(a: UmbElementValueModel, b: UmbElementValueModel): boolean {
 	return a.alias === b.alias && umbVariantObjectCompare(a, b);
 }
 
