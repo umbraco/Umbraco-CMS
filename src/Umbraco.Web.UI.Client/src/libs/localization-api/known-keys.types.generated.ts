@@ -112,6 +112,7 @@ declare global {
 		actions_refreshNode: string;
 		actions_remove: string;
 		actions_rename: string;
+		actions_replace: string;
 		actions_republish: string;
 		actions_resendInvite: string;
 		actions_restore: string;
@@ -430,6 +431,7 @@ declare global {
 		clipboard_labelForCopyAllEntries: string;
 		clipboard_labelForCopyToClipboard: string;
 		clipboard_labelForRemoveAllEntries: string;
+		clipboard_noItemsMessage: string;
 		codeEditor_heightConfigDescription: string;
 		codeEditor_heightConfigLabel: string;
 		codeEditor_label: string;
@@ -1988,10 +1990,21 @@ declare global {
 		shortcuts_toggleAllowAsRoot: string;
 		shortcuts_toggleAllowCultureVariants: string;
 		shortcuts_toggleListView: string;
+		sort_sortByFieldAscending: string;
+		sort_sortByFieldCreateDateOption: string;
+		sort_sortByFieldCultureLabel: string;
+		sort_sortByFieldCultureSentence: string;
+		sort_sortByFieldDescending: string;
+		sort_sortByFieldDirectionLabel: string;
+		sort_sortByFieldHeadline: string;
+		sort_sortByFieldNameOption: string;
+		sort_sortByFieldSentence: string;
+		sort_sortByFieldUpdateDateOption: string;
 		sort_sortCreationDate: string;
 		sort_sortDone: string;
 		sort_sortEmptyState: string;
 		sort_sortHelp: string;
+		sort_sortIndividuallyHeadline: string;
 		sort_sortOrder: string;
 		sort_sortPleaseWait: string;
 		speechBubbles_cannotCopyInformation: string;
