@@ -1,3 +1,4 @@
+import { UMB_BLOCK_WORKSPACE_CONTENT_HAS_PROPERTIES_CONDITION_ALIAS } from '../conditions/constants.js';
 import { UMB_BLOCK_WORKSPACE_CONTEXT } from './block-workspace.context-token.js';
 import {
 	UMB_BLOCK_WORKSPACE_ALIAS,
@@ -80,7 +81,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 				match: UMB_BLOCK_WORKSPACE_ALIAS,
 			},
 			{
-				alias: 'Umb.Condition.BlockWorkspaceContentHasProperties',
+				alias: UMB_BLOCK_WORKSPACE_CONTENT_HAS_PROPERTIES_CONDITION_ALIAS,
 			},
 		],
 		// eslint-disable-next-line @typescript-eslint/naming-convention
