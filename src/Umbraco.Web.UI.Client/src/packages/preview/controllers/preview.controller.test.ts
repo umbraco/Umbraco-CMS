@@ -213,5 +213,33 @@ describe('UmbPreviewController', () => {
 
 			expect(openSpy.calls).to.have.lengthOf(1);
 		});
+
+		it('keeps the existing preview open when the handed-over window is that same tab', async () => {
+			const repository = new FakePreviewRepository(urlInfo({ isExternal: false }));
+			const controller = createController(repository);
+			const handedOver = createHandedOverWindow();
+
+			await controller.preview({ ...ARGS }, handedOver as unknown as WindowProxy);
+			await controller.preview({ ...ARGS }, handedOver as unknown as WindowProxy);
+
+			expect(repository.getPreviewUrlCalls, 'preview URL should be fetched only once').to.have.lengthOf(1);
+			expect(handedOver.closeCount, 'the reused tab must not be closed').to.equal(0);
+			expect(handedOver.focusCount).to.equal(2);
+		});
+
+		it('closes a second handed-over window when an existing preview is focused instead', async () => {
+			const repository = new FakePreviewRepository(urlInfo({ isExternal: false }));
+			const controller = createController(repository);
+			const first = createHandedOverWindow();
+			const second = createHandedOverWindow();
+
+			await controller.preview({ ...ARGS }, first as unknown as WindowProxy);
+			await controller.preview({ ...ARGS }, second as unknown as WindowProxy);
+
+			expect(first.closeCount, 'the existing preview must stay open').to.equal(0);
+			expect(first.focusCount).to.equal(2);
+			expect(second.closeCount, 'the surplus tab must be closed').to.equal(1);
+			expect(second.replacedWith, 'the surplus tab must not be navigated').to.be.null;
+		});
 	});
 });

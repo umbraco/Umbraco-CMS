@@ -262,9 +262,10 @@ export class UmbPreviewContext extends UmbContextBase {
 
 	/**
 	 * Opens the previewed page outside of preview mode.
-	 * @param {WindowProxy | null} [websiteWindow] - A window opened synchronously during the user gesture.
-	 * Safari only allows `window.open` from the gesture's synchronous call stack, and resolving the
-	 * published URL takes an await, so click handlers must open the tab up front and hand it over (#22626).
+	 * @param {WindowProxy | null} [websiteWindow] - A window opened by the caller while the user gesture is still
+	 * active. WebKit only forwards the gesture's activation for about a second, so a tab opened after the published
+	 * URL round-trip gets popup-blocked in Safari (#22626). Click handlers should open the tab before the lookup and
+	 * hand it over here; it is navigated or closed as appropriate.
 	 * @memberof UmbPreviewContext
 	 */
 	async openWebsite(websiteWindow?: WindowProxy | null) {

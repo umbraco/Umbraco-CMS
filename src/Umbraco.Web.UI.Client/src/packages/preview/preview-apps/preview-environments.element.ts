@@ -69,8 +69,8 @@ export class UmbPreviewEnvironmentsElement extends UmbLitElement {
 		if (!this._unique) return;
 		if (!item.urlProviderAlias) return;
 
-		// Opened before the first await so it stays inside the click's synchronous call stack, which is
-		// the only place Safari permits window.open(). The controller adopts or closes it (#22626).
+		// Opened before the preview URL round-trip, while the click's activation is still valid in Safari.
+		// The controller adopts or closes it (#22626).
 		const previewWindow = window.open('', `umbpreview-${this._unique}`);
 
 		try {

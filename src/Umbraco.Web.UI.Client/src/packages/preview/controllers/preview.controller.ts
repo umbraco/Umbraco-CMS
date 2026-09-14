@@ -39,9 +39,10 @@ export class UmbPreviewController extends UmbControllerBase {
 	 * @param {string} args.unique - The unique identifier of the document to preview.
 	 * @param {string | null | undefined} args.culture - The culture to preview, or null/undefined for the default culture.
 	 * @param {string | null | undefined} args.segment - The segment to preview, or null/undefined for no segment.
-	 * @param {WindowProxy | null} [previewWindow] - A window opened synchronously during the user gesture. Safari only
-	 * allows `window.open` from within the gesture's synchronous call stack, and resolving the preview URL takes
-	 * several awaits, so callers reached from a click must open the tab up front and hand it over here (#22626).
+	 * @param {WindowProxy | null} [previewWindow] - A window opened by the caller while the user gesture is still
+	 * active. WebKit only forwards the gesture's activation for about a second, so a tab opened after the preview URL
+	 * round-trip gets popup-blocked in Safari (#22626). Callers reached from a click should open the tab before any
+	 * server call and hand it over here; it is navigated, adopted, or closed as appropriate.
 	 * @returns {Promise<void>} Resolves once the preview window has been opened or focused.
 	 * @memberof UmbPreviewController
 	 */
