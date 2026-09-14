@@ -129,6 +129,27 @@ describe('UmbMenuVariantTreeStructureWorkspaceContextBase', () => {
 			expect(parentContext?.getParent()).to.equal(undefined);
 			expect(ancestorContext?.getAncestors()).to.deep.equal([]);
 		});
+
+		it('does not expand the outgoing entity when isNew re-settles before `unique` updates to the new entity', async () => {
+			// Give the current entity an ancestor chain ending with itself, matching the real tree repository's shape.
+			UmbTestVariantTreeRepository.ancestors = [
+				createTestVariantAncestorItem({ unique: 'parent-unique', entityType: 'test-entity-type' }),
+				createTestVariantAncestorItem({ unique: 'test-unique', entityType: 'test-entity-type' }),
+			];
+			dispatchReloadStructure();
+			await aTimeout(150);
+
+			UmbTestSectionSidebarMenuContext.reset();
+
+			// Navigate to a sibling entity, replaying the exact `load()` ordering the real workspace context uses:
+			// isNew resets and re-settles to false (with getUnique() transiently undefined) before unique updates.
+			workspaceContext.loadDifferentEntity('other-unique');
+
+			const wasOutgoingEntityExpanded = UmbTestSectionSidebarMenuContext.expandItemsCalls.some((call) =>
+				(call as Array<{ unique: string }>).some((entry) => entry.unique === 'test-unique'),
+			);
+			expect(wasOutgoingEntityExpanded).to.equal(false);
+		});
 	});
 
 	describe('reload on UmbRequestReloadStructureForEntityEvent', () => {
