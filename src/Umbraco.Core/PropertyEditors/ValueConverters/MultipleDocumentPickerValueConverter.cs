@@ -14,6 +14,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 /// <summary>
 ///     Provides property value conversion for multiple document picker properties.
 /// </summary>
+[DefaultPropertyValueConverter]
 public class MultipleDocumentPickerValueConverter : PropertyValueConverterBase, IDeliveryApiPropertyValueConverter
 {
     private readonly IJsonSerializer _jsonSerializer;
