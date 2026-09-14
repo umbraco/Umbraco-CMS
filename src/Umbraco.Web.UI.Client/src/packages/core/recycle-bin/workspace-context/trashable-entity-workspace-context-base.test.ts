@@ -42,10 +42,11 @@ describe('UmbTrashableEntityWorkspaceContextBase', () => {
 
 		context = new TestTrashableEntityWorkspaceContext(host);
 
-		// The initial (undefined) `isTrashed` emission calls removeRule() once as a no-op baseline — clear it so
-		// each test's assertions only see calls made by that test's own actions.
+		// The initial (undefined) `isTrashed` emission calls removeRule()/removeState() once as a no-op baseline —
+		// clear them so each test's assertions only see calls made by that test's own actions.
 		await aTimeout(0);
 		workspaceContext.readOnlyGuardRuleCalls.length = 0;
+		workspaceContext.entityStateCalls.length = 0;
 	});
 
 	afterEach(() => {
@@ -106,6 +107,29 @@ describe('UmbTrashableEntityWorkspaceContextBase', () => {
 			workspaceContext.setIsNew(true);
 			await aTimeout(0);
 			expect(isTrashedContext?.getIsTrashed()).to.be.false;
+		});
+	});
+
+	describe('entityState', () => {
+		it('adds a "Trashed" entityState entry alongside the readonly rule when the workspace becomes trashed', async () => {
+			workspaceContext.setIsTrashed(true);
+			await aTimeout(0);
+
+			expect(workspaceContext.entityStateCalls).to.have.lengthOf(1);
+			expect(workspaceContext.entityStateCalls[0].action).to.equal('add');
+			expect(workspaceContext.readOnlyGuardRuleCalls).to.have.lengthOf(1);
+			expect(workspaceContext.readOnlyGuardRuleCalls[0].action).to.equal('add');
+		});
+
+		it('removes the entityState entry alongside the readonly rule when the workspace is no longer trashed', async () => {
+			workspaceContext.setIsTrashed(true);
+			await aTimeout(0);
+			workspaceContext.setIsTrashed(false);
+			await aTimeout(0);
+
+			expect(workspaceContext.entityStateCalls.at(-1)?.action).to.equal('remove');
+			expect(workspaceContext.entityStateCalls.at(-1)?.unique).to.equal(workspaceContext.entityStateCalls[0].unique);
+			expect(workspaceContext.readOnlyGuardRuleCalls.at(-1)?.action).to.equal('remove');
 		});
 	});
 

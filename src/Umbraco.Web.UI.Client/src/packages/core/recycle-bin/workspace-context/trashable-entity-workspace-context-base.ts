@@ -138,9 +138,11 @@ export abstract class UmbTrashableEntityWorkspaceContextBase extends UmbContextB
 		this.#isTrashedContext.setIsTrashed(isTrashed ?? false);
 
 		const guardUnique = `UMB_PREVENT_EDIT_TRASHED_ITEM`;
+		const entityStateUnique = `UMB_TRASHED_ENTITY_STATE`;
 
 		if (!isTrashed) {
 			this.#workspaceContext?.readOnlyGuard.removeRule(guardUnique);
+			this.#workspaceContext?.entityState.removeState(entityStateUnique);
 			return;
 		}
 
@@ -151,6 +153,12 @@ export abstract class UmbTrashableEntityWorkspaceContextBase extends UmbContextB
 
 		// TODO: Change to use property write guard when it supports making the name read-only.
 		this.#workspaceContext?.readOnlyGuard.addRule(rule);
+		this.#workspaceContext?.entityState.addState({
+			unique: entityStateUnique,
+			message: '#content_trashed',
+			look: 'danger',
+			weight: 100,
+		});
 	}
 
 	public override destroy(): void {
