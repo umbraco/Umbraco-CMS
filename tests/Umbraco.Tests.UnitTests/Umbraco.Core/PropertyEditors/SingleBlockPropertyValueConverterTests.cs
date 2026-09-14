@@ -34,15 +34,19 @@ public class SingleBlockPropertyValueConverterTests : BlockPropertyValueConverte
     }
 
     /// <summary>
-    /// The editor holds one block chosen from every element type its data type allows, so the element type a
-    /// property holds does not follow from the configuration - not even when only one is configured today.
+    /// The editor holds only one block chosen from any element type its data type allows, so the property value type
+    /// can only ever be untyped - even if only a single element type is configured as allowed.
     /// </summary>
-    [Test]
-    public void Get_Value_Type_Is_Untyped_When_Several_Element_Types_Are_Configured()
+    [TestCase(false)]
+    [TestCase(true)]
+    public void Get_Value_Type_Is_Untyped_When_Any_Element_Types_Are_Configured(bool singleElementTypeConfiguration)
     {
         SingleBlockPropertyValueConverter editor = CreateConverter();
-        IPublishedPropertyType propertyType =
-            GetPropertyType(ConfigFor((ContentKey1, SettingKey1), (ContentKey2, SettingKey2)));
+        (Guid ContentKey, Guid? SettingsKey)[] blocks = singleElementTypeConfiguration
+            ? [(ContentKey1, SettingKey1)]
+            : [(ContentKey1, SettingKey1), (ContentKey2, SettingKey2)];
+
+        IPublishedPropertyType propertyType = GetPropertyType(ConfigFor(blocks));
 
         Type valueType = editor.GetPropertyValueType(propertyType);
 
