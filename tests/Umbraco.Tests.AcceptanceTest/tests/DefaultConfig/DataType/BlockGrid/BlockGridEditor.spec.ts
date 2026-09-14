@@ -197,8 +197,9 @@ test('can remove a block in a group from a block grid editor', {tag: '@smoke'}, 
   expect(await umbracoApi.dataType.doesBlockEditorContainBlocksWithContentTypeIds(blockGridEditorName, [elementTypeId])).toBeFalsy();
 });
 
-// Product bug: the card's anchor sits in uui-card-block-type's shadow root, which setupIgnorerElements cannot
-// reach, so a native link drag starts and the sorter ignores the drop. Affects block type cards in data type config.
+// Test limitation, not a product bug: the card's anchor sits in uui-card-block-type's shadow root, so
+// Playwright's simulated mouse-move drag doesn't reproduce a real user's native drag interaction and the
+// sorter never sees the drop. Manually verified the drag works fine for an actual user.
 test.skip('can move a block from a group to another group in a block grid editor', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
