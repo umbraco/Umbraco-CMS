@@ -51,7 +51,7 @@ public class ExposeBackOfficeAuthenticationOpenIddictServerEventsHandler : IOpen
         // This event is raised once per generated token, not once per token response, so signing in on every
         // occurrence would write the cookie more than once. The access token is the one token generated both by
         // the initial code exchange and by every refresh grant, making it the point to refresh the cookie from.
-        if (context.TokenType != OpenIddictConstants.TokenTypeIdentifiers.AccessToken)
+        if (context.TokenType is not OpenIddictConstants.TokenTypeIdentifiers.AccessToken)
         {
             return;
         }
