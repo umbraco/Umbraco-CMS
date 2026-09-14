@@ -47,7 +47,6 @@ import {
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import {
-	UMB_VALIDATION_CONTEXT,
 	UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
 	UmbDataPathVariantQuery,
 	UmbServerModelValidatorContext,
