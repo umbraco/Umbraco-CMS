@@ -1,20 +1,26 @@
-import { expect } from '@open-wc/testing';
+import { aTimeout, expect } from '@open-wc/testing';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
+import { UmbContextProvider } from '@umbraco-cms/backoffice/context-api';
 import { UmbCurrentUserContext, UmbCurrentUserStore } from '@umbraco-cms/backoffice/current-user';
 import { UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbPropertyContext, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type {
 	UmbClipboardCopyPropertyValueTranslator,
 	UmbClipboardPastePropertyValueTranslator,
 } from '../value-translator/types.js';
 import { UmbClipboardEntryDetailStore, type UmbClipboardEntryDetailModel } from '../../clipboard-entry/index.js';
+import { UmbClipboardCollectionRepository } from '../../collection/index.js';
 import { UmbClipboardPropertyContext } from './clipboard.property-context.js';
 import { UmbClipboardContext } from '../../context/clipboard.context.js';
 
 const TEST_PROPERTY_EDITOR_UI_ALIAS = 'testPropertyEditorUiAlias';
+const TEST_PROPERTY_EDITOR_UI_ALIAS_WITHOUT_TRANSLATORS = 'testPropertyEditorUiAliasWithoutTranslators';
 const TEST_CLIPBOARD_ENTRY_VALUE_TYPE = 'testClipboardEntryValueType';
+const TEST_INCOMPATIBLE_CLIPBOARD_ENTRY_VALUE_TYPE = 'testIncompatibleClipboardEntryValueType';
+const TEST_UNSUPPORTED_CLIPBOARD_ENTRY_VALUE_TYPE = 'testUnsupportedClipboardEntryValueType';
 
 class UmbTestClipboardCopyPropertyValueTranslator
 	extends UmbControllerBase
@@ -52,6 +58,28 @@ const pasteTranslatorManifest = {
 	api: UmbTestClipboardPastePropertyValueTranslator,
 	weight: 1,
 	fromClipboardEntryValueType: TEST_CLIPBOARD_ENTRY_VALUE_TYPE,
+	toPropertyEditorUi: TEST_PROPERTY_EDITOR_UI_ALIAS,
+};
+
+class UmbTestIncompatibleClipboardPastePropertyValueTranslator
+	extends UmbControllerBase
+	implements UmbClipboardPastePropertyValueTranslator<string, string>
+{
+	async translate(clipboardEntryValue: string): Promise<string> {
+		return clipboardEntryValue;
+	}
+
+	async isCompatibleValue(): Promise<boolean> {
+		return false;
+	}
+}
+
+const incompatiblePasteTranslatorManifest = {
+	type: 'clipboardPastePropertyValueTranslator',
+	alias: 'Test.ClipboardPastePropertyValueTranslator.Incompatible',
+	name: 'Test Incompatible Clipboard Paste Property Value Translator',
+	api: UmbTestIncompatibleClipboardPastePropertyValueTranslator,
+	fromClipboardEntryValueType: TEST_INCOMPATIBLE_CLIPBOARD_ENTRY_VALUE_TYPE,
 	toPropertyEditorUi: TEST_PROPERTY_EDITOR_UI_ALIAS,
 };
 
@@ -172,6 +200,327 @@ describe('UmbClipboardPropertyContext', () => {
 			const values = [{ type: 'unsupported', value: 'test clipboard value' }];
 			const hasSupported = clipboardContext.hasSupportedPasteTranslator(manifests, values);
 			expect(hasSupported).to.be.false;
+		});
+	});
+
+	describe('getCopyTranslatorManifests', () => {
+		beforeEach(async () => {
+			umbExtensionsRegistry.registerMany([copyTranslatorManifest]);
+		});
+
+		afterEach(() => {
+			umbExtensionsRegistry.clear();
+		});
+
+		it('should return the copy property value translator manifests', () => {
+			const manifests = clipboardContext.getCopyTranslatorManifests(TEST_PROPERTY_EDITOR_UI_ALIAS);
+			expect(manifests).to.have.lengthOf(1);
+			expect(manifests[0].alias).to.equal(copyTranslatorManifest.alias);
+		});
+
+		it('should return nothing for a property editor no copy translator targets', () => {
+			const manifests = clipboardContext.getCopyTranslatorManifests(TEST_PROPERTY_EDITOR_UI_ALIAS_WITHOUT_TRANSLATORS);
+			expect(manifests).to.have.lengthOf(0);
+		});
+	});
+
+	// These suites cover what the context derives from the surrounding property, so they provide their own
+	// property and dataset contexts.
+	describe('derived from the surrounding property', () => {
+		let derivingContext: UmbClipboardPropertyContext;
+
+		beforeEach(() => {
+			umbExtensionsRegistry.registerMany([
+				copyTranslatorManifest,
+				pasteTranslatorManifest,
+				incompatiblePasteTranslatorManifest,
+				propertyEditorManifest,
+			]);
+		});
+
+		afterEach(() => {
+			umbExtensionsRegistry.clear();
+		});
+
+		// A real UmbPropertyContext, because it shares the 'UmbPropertyContext' base alias with the clipboard
+		// property context — only the real implementations carry the api alias that resolves them independently.
+		function providePropertyContext(options?: { alias?: string | undefined; label?: string }) {
+			const propertyContext = new UmbPropertyContext(hostElement);
+			// No setAlias: the alias that matters is the editor UI alias, and leaving the property alias unset keeps
+			// UmbPropertyContext from observing the dataset stub's value methods.
+			propertyContext.setLabel(options?.label ?? 'My Property');
+			const alias = options && 'alias' in options ? options.alias : TEST_PROPERTY_EDITOR_UI_ALIAS;
+			propertyContext.setEditorManifest(alias ? ({ alias, meta: { icon: 'icon-document' } } as any) : undefined);
+			return propertyContext;
+		}
+
+		function provideDatasetContext(name = 'My Workspace') {
+			const datasetContext = { getName: () => name, getHostElement: () => hostElement } as any;
+			new UmbContextProvider(hostElement, UMB_PROPERTY_DATASET_CONTEXT, datasetContext).hostConnected();
+		}
+
+		async function createContext() {
+			derivingContext = new UmbClipboardPropertyContext(hostElement);
+			await aTimeout(0);
+			return derivingContext;
+		}
+
+		async function readWrittenEntries() {
+			const { data } = await new UmbClipboardCollectionRepository(hostElement).requestCollection({
+				types: [TEST_CLIPBOARD_ENTRY_VALUE_TYPE],
+			});
+			return data?.items ?? [];
+		}
+
+		function readCurrent<T>(observable: { subscribe: (cb: (value: T) => void) => { unsubscribe: () => void } }): T {
+			let value!: T;
+			const subscription = observable.subscribe((next) => (value = next));
+			subscription.unsubscribe();
+			return value;
+		}
+
+		describe('copyAvailable', () => {
+			it('is true when a copy translator targets the surrounding property editor', async () => {
+				providePropertyContext();
+				provideDatasetContext();
+				const context = await createContext();
+				expect(readCurrent(context.copyAvailable)).to.be.true;
+			});
+
+			it('is false when no copy translator targets the surrounding property editor', async () => {
+				providePropertyContext({ alias: TEST_PROPERTY_EDITOR_UI_ALIAS_WITHOUT_TRANSLATORS });
+				provideDatasetContext();
+				const context = await createContext();
+				expect(readCurrent(context.copyAvailable)).to.be.false;
+			});
+
+			it('is false when the property editor UI alias cannot be resolved', async () => {
+				providePropertyContext({ alias: undefined });
+				provideDatasetContext();
+				const context = await createContext();
+				expect(readCurrent(context.copyAvailable)).to.be.false;
+			});
+		});
+
+		describe('pasteAvailable', () => {
+			it('is true when a paste translator targets the surrounding property editor', async () => {
+				providePropertyContext();
+				provideDatasetContext();
+				const context = await createContext();
+				expect(readCurrent(context.pasteAvailable)).to.be.true;
+			});
+
+			it('is false when no paste translator targets the surrounding property editor', async () => {
+				providePropertyContext({ alias: TEST_PROPERTY_EDITOR_UI_ALIAS_WITHOUT_TRANSLATORS });
+				provideDatasetContext();
+				const context = await createContext();
+				expect(readCurrent(context.pasteAvailable)).to.be.false;
+			});
+
+			it('is false when the property editor UI alias cannot be resolved', async () => {
+				providePropertyContext({ alias: undefined });
+				provideDatasetContext();
+				const context = await createContext();
+				expect(readCurrent(context.pasteAvailable)).to.be.false;
+			});
+		});
+
+		describe('write', () => {
+			it('resolves the copy translator from the derived alias', async () => {
+				providePropertyContext();
+				provideDatasetContext();
+				const context = await createContext();
+
+				await context.write({ propertyValue: 'hello', itemName: 'My Item', icon: 'icon-picture' });
+
+				const entries = await readWrittenEntries();
+				expect(entries).to.have.lengthOf(1);
+				expect(entries[0].icon).to.equal('icon-picture');
+				// The value type is only produced when the alias resolves the copy translator.
+				expect(entries[0].values[0].type).to.equal(TEST_CLIPBOARD_ENTRY_VALUE_TYPE);
+				expect(entries[0].values[0].value).to.equal('hello clipboard value');
+			});
+
+			it('builds the entry name from workspace, property and item', async () => {
+				providePropertyContext({ label: 'My Property' });
+				provideDatasetContext('My Workspace');
+				const context = await createContext();
+
+				await context.write({ propertyValue: 'hello', itemName: 'My Item' });
+
+				const entries = await readWrittenEntries();
+				expect(entries[0].name).to.equal('My Workspace - My Property - My Item');
+			});
+
+			it('omits the item name when none is provided', async () => {
+				providePropertyContext({ label: 'My Property' });
+				provideDatasetContext('My Workspace');
+				const context = await createContext();
+
+				await context.write({ propertyValue: 'hello' });
+
+				const entries = await readWrittenEntries();
+				expect(entries[0].name).to.equal('My Workspace - My Property');
+			});
+
+			it('uses an explicit name instead of deriving one', async () => {
+				providePropertyContext({ label: 'My Property' });
+				provideDatasetContext('My Workspace');
+				const context = await createContext();
+
+				await context.write({ propertyValue: 'hello', name: 'A name of my own' });
+
+				const entries = await readWrittenEntries();
+				expect(entries[0].name).to.equal('A name of my own');
+			});
+
+			it('falls back to the icon of the property editor', async () => {
+				providePropertyContext();
+				provideDatasetContext();
+				const context = await createContext();
+
+				await context.write({ propertyValue: 'hello' });
+
+				const entries = await readWrittenEntries();
+				expect(entries[0].icon).to.equal('icon-document');
+			});
+
+			it('waits for a property context that is provided after the call', async () => {
+				provideDatasetContext('My Workspace');
+				const context = await createContext();
+
+				// This context is an extension behind a dynamic import, so what it derives from can land in either
+				// order.
+				const writing = context.write({ propertyValue: 'hello', itemName: 'My Item' });
+				providePropertyContext({ label: 'My Property' });
+				await writing;
+
+				const entries = await readWrittenEntries();
+				expect(entries).to.have.lengthOf(1);
+				expect(entries[0].name).to.equal('My Workspace - My Property - My Item');
+			});
+
+			it('prefers an explicitly passed alias over the derived one', async () => {
+				providePropertyContext({ alias: TEST_PROPERTY_EDITOR_UI_ALIAS_WITHOUT_TRANSLATORS });
+				provideDatasetContext();
+				const context = await createContext();
+
+				await context.write({
+					propertyValue: 'hello',
+					name: 'An entry written on behalf of another property editor',
+					propertyEditorUiAlias: TEST_PROPERTY_EDITOR_UI_ALIAS,
+				});
+
+				const entries = await readWrittenEntries();
+				expect(entries).to.have.lengthOf(1);
+				expect(entries[0].values[0].type).to.equal(TEST_CLIPBOARD_ENTRY_VALUE_TYPE);
+			});
+
+			it('throws when the property editor UI alias cannot be resolved', async () => {
+				providePropertyContext({ alias: undefined });
+				provideDatasetContext();
+				const context = await createContext();
+
+				let error: unknown;
+				try {
+					await context.write({ propertyValue: 'hello' });
+				} catch (e) {
+					error = e;
+				}
+				expect(error).to.be.instanceOf(Error);
+				expect(await readWrittenEntries()).to.have.lengthOf(0);
+			});
+		});
+
+		describe('readMultiple', () => {
+			it('translates entries back into values for the surrounding property editor', async () => {
+				providePropertyContext();
+				provideDatasetContext();
+				const context = await createContext();
+
+				await context.write({ propertyValue: 'hello property value', itemName: 'My Item' });
+				const [entry] = await readWrittenEntries();
+
+				const propertyValues = await context.readMultiple<string>([entry.unique]);
+
+				// Round-tripped through the copy translator on write and the paste translator on read.
+				expect(propertyValues).to.deep.equal(['hello property value']);
+			});
+		});
+
+		describe('getSupportedPasteEntryValueTypes', () => {
+			it('returns the value types the property editor has a paste translator for', async () => {
+				providePropertyContext();
+				provideDatasetContext();
+				const context = await createContext();
+
+				// Both registered paste translators target the test property editor; the unsupported type has none.
+				const types = await context.getSupportedPasteEntryValueTypes();
+				expect(types).to.have.members([TEST_CLIPBOARD_ENTRY_VALUE_TYPE, TEST_INCOMPATIBLE_CLIPBOARD_ENTRY_VALUE_TYPE]);
+				expect(types).to.not.include(TEST_UNSUPPORTED_CLIPBOARD_ENTRY_VALUE_TYPE);
+			});
+
+			it('waits for a property context that is provided after the call', async () => {
+				provideDatasetContext();
+				const context = await createContext();
+
+				// An empty result would be indistinguishable from "this editor cannot paste anything".
+				const types = context.getSupportedPasteEntryValueTypes();
+				providePropertyContext();
+
+				expect(await types).to.have.members([
+					TEST_CLIPBOARD_ENTRY_VALUE_TYPE,
+					TEST_INCOMPATIBLE_CLIPBOARD_ENTRY_VALUE_TYPE,
+				]);
+			});
+
+			it('throws when the property editor UI alias cannot be resolved', async () => {
+				providePropertyContext({ alias: undefined });
+				provideDatasetContext();
+				const context = await createContext();
+
+				let error: unknown;
+				try {
+					await context.getSupportedPasteEntryValueTypes();
+				} catch (e) {
+					error = e;
+				}
+				expect(error).to.be.instanceOf(Error);
+			});
+		});
+
+		describe('isEntryPastable', () => {
+			function entryWithValueType(type: string) {
+				return { unique: 'entry-unique', values: [{ type, value: 'a clipboard value' }] } as any;
+			}
+
+			it('accepts an entry whose paste translator reports no compatibility constraint', async () => {
+				providePropertyContext();
+				provideDatasetContext();
+				const context = await createContext();
+
+				expect(await context.isEntryPastable(entryWithValueType(TEST_CLIPBOARD_ENTRY_VALUE_TYPE))).to.be.true;
+			});
+
+			it('rejects an entry the paste translator reports as incompatible', async () => {
+				providePropertyContext();
+				provideDatasetContext();
+				const context = await createContext();
+
+				expect(await context.isEntryPastable(entryWithValueType(TEST_INCOMPATIBLE_CLIPBOARD_ENTRY_VALUE_TYPE))).to.be
+					.false;
+			});
+
+			it('rejects an entry of a type no paste translator targets, rather than throwing', async () => {
+				providePropertyContext();
+				provideDatasetContext();
+				const context = await createContext();
+
+				// A defensive path — type filtering happens in the collection — but it must not throw, because it
+				// runs per entry while a list is built.
+				expect(await context.isEntryPastable(entryWithValueType(TEST_UNSUPPORTED_CLIPBOARD_ENTRY_VALUE_TYPE))).to.be
+					.false;
+			});
 		});
 	});
 });

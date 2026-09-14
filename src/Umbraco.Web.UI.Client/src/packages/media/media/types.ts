@@ -4,6 +4,7 @@ import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 import type { UmbContentDetailModel, UmbElementValueModel } from '@umbraco-cms/backoffice/content';
 
 export type * from './audit-log/types.js';
+export type * from './clipboard/types.js';
 export type * from './collection/types.js';
 export type * from './modals/types.js';
 export type * from './recycle-bin/types.js';

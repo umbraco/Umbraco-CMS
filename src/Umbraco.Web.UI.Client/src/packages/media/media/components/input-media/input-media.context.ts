@@ -38,6 +38,13 @@ export class UmbMediaPickerInputContext extends UmbPickerInputContext<
 	}
 
 	override async openPicker(pickerData?: Partial<UmbMediaPickerModalData>, args?: UmbMediaPickerInputContextOpenArgs) {
+		await this.openPickerForValue(pickerData, args);
+	}
+
+	override async openPickerForValue(
+		pickerData?: Partial<UmbMediaPickerModalData>,
+		args?: UmbMediaPickerInputContextOpenArgs,
+	): Promise<UmbMediaPickerModalValue | undefined> {
 		// Load folder types before opening the picker so the filter is ready
 		await this.#loadFolderTypes();
 		const combinedPickerData = {
@@ -69,7 +76,7 @@ export class UmbMediaPickerInputContext extends UmbPickerInputContext<
 			...pickerData?.search?.queryParams,
 		};
 
-		await super.openPicker(combinedPickerData);
+		return super.openPickerForValue(combinedPickerData);
 	}
 
 	async #loadFolderTypes() {
