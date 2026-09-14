@@ -7,6 +7,7 @@ import type {
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbHintController, UmbVariantHint } from '@umbraco-cms/backoffice/hint';
 import {
+	extractFirstJsonQueryContaining,
 	extractJsonQueryProps,
 	umbGetFirstJsonPathBracket,
 	type UmbValidationController,
@@ -69,7 +70,20 @@ export class UmbContentValidationToHintsManager<
 					const queryProps = extractJsonQueryProps(query);
 
 					const alias = queryProps.alias;
-					const variantId = UmbVariantId.CreateFromPartial(queryProps);
+					// Find the first query of this path that contains a culture or segment property, notice this can be several joints into the json path:
+					const queryWithCulture = extractFirstJsonQueryContaining(
+						message.path,
+						(props) => props.culture !== undefined,
+					);
+					const queryWithSegment = extractFirstJsonQueryContaining(
+						message.path,
+						(props) => props.segment !== undefined,
+					);
+					// If no specific culture or segment are found, we will use null for both culture and segment, which will be treated as invariant:
+					const variantId = UmbVariantId.CreateFromPartial({
+						culture: queryWithCulture?.culture ?? null,
+						segment: queryWithSegment?.segment ?? null,
+					});
 
 					structure.getPropertyStructureByAlias(alias).then((property) => {
 						if (!property) return;
@@ -98,12 +112,14 @@ export class UmbContentValidationToHintsManager<
 						this.#hintedMsgs.add(message.key);
 					});
 				});
+				const removeKeys: Array<string> = [];
 				this.#hintedMsgs.forEach((key) => {
 					if (!messages.some((msg) => msg.key === key)) {
 						this.#hintedMsgs.delete(key);
-						hints.removeOne(key);
+						removeKeys.push(key);
 					}
 				});
+				hints.remove(removeKeys);
 			},
 			null,
 		);

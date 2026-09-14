@@ -264,10 +264,10 @@ export class UmbHintController<
 	}
 
 	override destroy(): void {
-		super.destroy();
 		if (this.#inUnprovidingState === true) {
 			return;
 		}
+		super.destroy();
 		this.unprovide();
 		this.#parentHints = undefined;
 		this.#parent = undefined;

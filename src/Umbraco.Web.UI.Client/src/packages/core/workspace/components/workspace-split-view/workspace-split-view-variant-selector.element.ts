@@ -124,6 +124,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 							}
 						}
 					});
+					console.log(this._hintMap);
 					this.requestUpdate('_hintMap');
 				},
 				'umbObserveHints',
