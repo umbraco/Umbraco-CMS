@@ -5,6 +5,7 @@ import { UMB_BLOCK_ENTRY_CONTEXT } from '../../../context/block-entry.context-to
 import { UmbDataPathGeneratorForBlockElementData } from '../../../validation/index.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { mergeObservables, type Observable } from '@umbraco-cms/backoffice/observable-api';
+import { UMB_BLOCK_CONTENT_DATA_PATH_PROPERTY_NAME } from '../../../constants.js';
 
 /**
  * Block action that navigates to the block's content editor workspace.
@@ -38,7 +39,7 @@ export class UmbEditContentBlockAction extends UmbBlockActionBase<MetaBlockActio
 		if (!this.#context) return undefined;
 		return mergeObservables([this.#context.contentKey], ([contentKey]) => {
 			if (!contentKey) return undefined;
-			return UmbDataPathGeneratorForBlockElementData('contentData', { key: contentKey });
+			return UmbDataPathGeneratorForBlockElementData(UMB_BLOCK_CONTENT_DATA_PATH_PROPERTY_NAME, { key: contentKey });
 		});
 	}
 }

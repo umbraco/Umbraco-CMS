@@ -21,7 +21,6 @@ import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-a
 import type { UmbRoute, UmbRouterSlotInitEvent, UmbRouterSlotChangeEvent } from '@umbraco-cms/backoffice/router';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbVariantHint } from '@umbraco-cms/backoffice/hint';
-import type { UmbWorkspaceViewContext } from './workspace-view.context.js';
 
 /**
  * @element umb-workspace-editor
@@ -84,7 +83,7 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 	private _hasSlottedContent?: boolean;
 
 	@state()
-	private _workspaceViews: Array<UmbWorkspaceViewContext> = [];
+	private _workspaceViews: Array<UmbWorkspaceViewController> = [];
 
 	@state()
 	private _hintMap: Map<string, UmbVariantHint> = new Map();
