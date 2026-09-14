@@ -6,6 +6,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// Represents a query step for dynamic root traversal.
 /// </summary>
 [DataContract]
+[Obsolete("This is only used by the now-obsolete multi node tree picker. Scheduled for removal in Umbraco 22.")]
 public class QueryStep
 {
     /// <summary>

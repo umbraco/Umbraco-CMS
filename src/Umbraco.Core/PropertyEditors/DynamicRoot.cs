@@ -7,6 +7,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// than fixed on the data type.
 /// </summary>
 [DataContract]
+[Obsolete("This is only used by the now-obsolete multi node tree picker. Scheduled for removal in Umbraco 22.")]
 public class DynamicRoot
 {
     /// <summary>
