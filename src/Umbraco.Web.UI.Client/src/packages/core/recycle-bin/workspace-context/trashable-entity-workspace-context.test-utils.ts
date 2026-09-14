@@ -4,11 +4,17 @@ import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controlle
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbReadOnlyVariantGuardManager } from '@umbraco-cms/backoffice/utils';
+import type { UmbVariantEntityStateManager } from '@umbraco-cms/backoffice/variant';
 
 @customElement('umb-test-recycle-bin-controller-host')
 export class UmbTestRecycleBinControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
 
 export interface UmbTestReadOnlyGuardRuleCall {
+	action: 'add' | 'remove';
+	unique: string;
+}
+
+export interface UmbTestEntityStateCall {
 	action: 'add' | 'remove';
 	unique: string;
 }
@@ -35,6 +41,12 @@ export class UmbTestTrashableEntityWorkspaceContext implements UmbTrashableEntit
 		addRule: (rule: { unique: string }) => this.readOnlyGuardRuleCalls.push({ action: 'add', unique: rule.unique }),
 		removeRule: (unique: string) => this.readOnlyGuardRuleCalls.push({ action: 'remove', unique }),
 	} as unknown as UmbReadOnlyVariantGuardManager;
+
+	readonly entityStateCalls: Array<UmbTestEntityStateCall> = [];
+	readonly entityState = {
+		addState: (state: { unique: string }) => this.entityStateCalls.push({ action: 'add', unique: state.unique }),
+		removeState: (unique: string) => this.entityStateCalls.push({ action: 'remove', unique }),
+	} as unknown as UmbVariantEntityStateManager;
 
 	reloadCallCount = 0;
 	resetDataCallCount = 0;

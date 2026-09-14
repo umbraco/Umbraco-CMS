@@ -6,6 +6,7 @@ import type { UmbEntityDetailWorkspaceContextArgs, UmbEntityDetailWorkspaceConte
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbEntityContext, type UmbEntityModel, type UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
+import { UmbEntityStateManager } from '@umbraco-cms/backoffice/entity-state';
 import { UMB_DISCARD_CHANGES_MODAL, umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import {
@@ -55,6 +56,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	public readonly persistedData = this._data.persisted;
 	public readonly loading = new UmbStateManager(this);
 	public readonly forbidden = new UmbStateManager(this);
+	public readonly entityState = new UmbEntityStateManager(this);
 
 	protected _getDataPromise?: Promise<
 		UmbRepositoryResponse<DetailModelType> | UmbRepositoryResponseWithAsObservable<DetailModelType>
@@ -524,6 +526,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		super.resetState();
 		this.loading.clear();
 		this.forbidden.clear();
+		this.entityState.clear();
 		this._data.clear();
 		this.#allowNavigateAway = false;
 		this._getDataPromise = undefined;

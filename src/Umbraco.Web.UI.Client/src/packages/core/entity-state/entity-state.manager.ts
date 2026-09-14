@@ -21,7 +21,9 @@ export interface UmbEntityStateEntry extends UmbState {
 	weight?: number;
 }
 
-export class UmbEntityStateManager<EntryType extends UmbEntityStateEntry = UmbEntityStateEntry> extends UmbControllerBase {
+export class UmbEntityStateManager<
+	EntryType extends UmbEntityStateEntry = UmbEntityStateEntry,
+> extends UmbControllerBase {
 	protected readonly _states = new UmbArrayState<EntryType>([], (x) => x.unique);
 
 	/** All states, weight-sorted (highest first). Never excludes — filtering (e.g. by variantId) is the resolving subclass's job. */

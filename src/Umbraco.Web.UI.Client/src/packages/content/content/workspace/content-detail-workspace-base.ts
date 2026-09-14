@@ -44,7 +44,7 @@ import {
 	UmbPropertyValuePresetVariantBuilderController,
 	UmbVariantPropertyGuardManager,
 } from '@umbraco-cms/backoffice/property';
-import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import { UmbVariantEntityStateManager, UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import {
 	UMB_VALIDATION_CONTEXT,
@@ -129,6 +129,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	public readonly IS_CONTENT_WORKSPACE_CONTEXT = true as const;
 
 	public readonly readOnlyGuard = new UmbReadOnlyVariantGuardManager(this);
+	public override readonly entityState = new UmbVariantEntityStateManager(this);
 
 	public readonly propertyViewGuard = new UmbVariantPropertyGuardManager(this);
 	public readonly propertyWriteGuard = new UmbVariantPropertyGuardManager(this);

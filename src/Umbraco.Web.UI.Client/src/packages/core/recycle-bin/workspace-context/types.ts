@@ -1,5 +1,6 @@
 import type { Observable } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbReadOnlyVariantGuardManager } from '@umbraco-cms/backoffice/utils';
+import type { UmbVariantEntityStateManager } from '@umbraco-cms/backoffice/variant';
 import type { UmbEntityWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 
 /**
@@ -11,5 +12,6 @@ export interface UmbTrashableEntityWorkspaceContext extends UmbEntityWorkspaceCo
 	readonly isNew: Observable<boolean | undefined>;
 	reload(): Promise<void>;
 	readonly readOnlyGuard: UmbReadOnlyVariantGuardManager;
+	readonly entityState: UmbVariantEntityStateManager;
 	resetData(): void;
 }

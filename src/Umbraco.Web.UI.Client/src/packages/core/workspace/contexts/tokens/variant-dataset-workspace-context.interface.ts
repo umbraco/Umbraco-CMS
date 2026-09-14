@@ -2,7 +2,12 @@ import type { UmbWorkspaceSplitViewManager } from '../../controllers/workspace-s
 import type { UmbSubmittableWorkspaceContext } from './submittable-workspace-context.interface.js';
 import type { UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
-import type { UmbVariantId, UmbEntityVariantModel, UmbEntityVariantOptionModel } from '@umbraco-cms/backoffice/variant';
+import type {
+	UmbVariantId,
+	UmbEntityVariantModel,
+	UmbEntityVariantOptionModel,
+	UmbVariantEntityStateManager,
+} from '@umbraco-cms/backoffice/variant';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbValidationController } from '@umbraco-cms/backoffice/validation';
 import type { UmbReadOnlyVariantGuardManager } from '@umbraco-cms/backoffice/utils';
@@ -21,6 +26,7 @@ export interface UmbVariantDatasetWorkspaceContext<
 	splitView: UmbWorkspaceSplitViewManager;
 	getVariant(variantId: UmbVariantId): VariantType | undefined;
 	readonly readOnlyGuard: UmbReadOnlyVariantGuardManager;
+	readonly entityState?: UmbVariantEntityStateManager;
 	varies: Observable<boolean | undefined>;
 	variesByCulture: Observable<boolean | undefined>;
 	variesBySegment: Observable<boolean | undefined>;

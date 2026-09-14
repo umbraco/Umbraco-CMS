@@ -15,6 +15,7 @@ import {
 	type UmbTrashableEntityWorkspaceContext,
 } from '@umbraco-cms/backoffice/recycle-bin';
 import type { UmbReadOnlyVariantGuardManager } from '@umbraco-cms/backoffice/utils';
+import type { UmbVariantEntityStateManager } from '@umbraco-cms/backoffice/variant';
 
 @customElement('umb-test-document-recycle-bin-host')
 class UmbTestHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
@@ -29,6 +30,7 @@ class FakeDocumentWorkspaceContext implements UmbTrashableEntityWorkspaceContext
 	readonly isNew = new UmbBooleanState(undefined).asObservable();
 	modalContext: unknown;
 	readonly readOnlyGuard = { addRule: () => {}, removeRule: () => {} } as unknown as UmbReadOnlyVariantGuardManager;
+	readonly entityState = { addState: () => {}, removeState: () => {} } as unknown as UmbVariantEntityStateManager;
 
 	constructor(host: UmbControllerHost) {
 		this.#host = host;
