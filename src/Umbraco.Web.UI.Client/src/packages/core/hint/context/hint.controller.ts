@@ -175,7 +175,7 @@ export class UmbHintController<
 
 		hints.forEach((hint) => {
 			let newPath = hint.path;
-			// If the hint path does not already contain the parent view alias as the first entry, we add it. (This will usually happen, but some Hint Contexts does not have a view alias as they)
+			// If the hint path does not already contain the parent view alias as the first entry, we add it. (This will usually happen, but some Hint Contexts does not have a view alias) [NL]
 			if (viewAlias && newPath[0] !== viewAlias) {
 				newPath = [viewAlias, ...hint.path];
 			}
