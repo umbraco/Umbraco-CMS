@@ -278,6 +278,11 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase
 		const structureItems = this.#structure.getValue();
 		if (!structureItems.length) return;
 
+		// This can run mid-navigation to a different entity, before `unique` itself has been updated - `getUnique()`
+		// is then transiently undefined (distinct from a legitimate `null`, e.g. a root entity), which would defeat
+		// the "exclude the current entity" filter below and expand the outgoing entity's still-cached structure.
+		if (this.#workspaceContext?.getUnique() === undefined) return;
+
 		this.#expandSectionSidebarMenu(structureItems, menuItemAlias);
 	}
 
