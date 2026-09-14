@@ -299,14 +299,10 @@ export class UmbDocumentWorkspaceContext
 	}
 
 	async #handleSaveAndPreview(urlProviderAlias: string) {
-		if (!urlProviderAlias) {
-			throw new Error('Url provider alias is missing');
-		}
+		if (!urlProviderAlias) throw new Error('Url provider alias is missing');
 
 		const unique = this.getUnique();
-		if (!unique) {
-			throw new Error('Unique is missing');
-		}
+		if (!unique) throw new Error('Unique is missing');
 
 		// Construct the preview window before performing any save or validation actions
 		// as the preview window needs to be ready within a very short time after the user initiates the preview action.
