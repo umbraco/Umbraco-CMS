@@ -1,4 +1,5 @@
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Search.Core.Models.Searching;
 
@@ -15,11 +16,10 @@ public partial class InvariantContentTreeTests
             await CreateInvariantDocumentTree(true);
         });
 
-        await WaitForIndexing(indexAlias, () =>
+        await WaitForIndexing(indexAlias, async () =>
         {
             IContent root = ContentService.GetByIdAsync(RootKey, CancellationToken.None).GetAwaiter().GetResult()!;
-            ContentService.MoveToRecycleBin(root);
-            return Task.CompletedTask;
+            await ContentService.MoveToRecycleBinAsync(root, Constants.Security.SuperUserKey, CancellationToken.None);
         });
 
 

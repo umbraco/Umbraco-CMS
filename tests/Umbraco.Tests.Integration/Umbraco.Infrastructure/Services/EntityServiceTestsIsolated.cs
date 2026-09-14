@@ -43,7 +43,7 @@ internal sealed class EntityServiceTestsIsolated : UmbracoIntegrationTest
 
             if (i % 2 == 0)
             {
-                ContentService.MoveToRecycleBin(content);
+                await ContentService.MoveToRecycleBinAsync(content, Constants.Security.SuperUserKey, CancellationToken.None);
             }
         }
 

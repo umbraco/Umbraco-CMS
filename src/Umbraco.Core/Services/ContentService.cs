@@ -848,50 +848,48 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
     #region Move, RecycleBin
 
     /// <inheritdoc />
-    public OperationResult MoveToRecycleBin(IContent content, int userId = Constants.Security.SuperUserId)
+    public async Task<Attempt<ContentMoveToRecycleBinOperationStatus>> MoveToRecycleBinAsync(IContent content, Guid userKey, CancellationToken cancellationToken)
     {
         EventMessages eventMessages = EventMessagesFactory.Get();
         var moves = new List<(IContent, string)>();
 
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.WriteLock(Constants.Locks.ContentTree);
+
+        var originalPath = content.Path;
+        var moveEventInfo = new MoveToRecycleBinEventInfo<IContent>(content, originalPath);
+
+        var movingToRecycleBinNotification = new ContentMovingToRecycleBinNotification(moveEventInfo, eventMessages);
+        if (await scope.Notifications.PublishCancelableAsync(movingToRecycleBinNotification))
         {
-            scope.WriteLock(Constants.Locks.ContentTree);
-
-            var originalPath = content.Path;
-            var moveEventInfo =
-                new MoveToRecycleBinEventInfo<IContent>(content, originalPath);
-
-            var movingToRecycleBinNotification =
-                new ContentMovingToRecycleBinNotification(moveEventInfo, eventMessages);
-            if (scope.Notifications.PublishCancelable(movingToRecycleBinNotification))
-            {
-                scope.Complete();
-                return OperationResult.Cancel(eventMessages); // causes rollback
-            }
-
-            // if it's published we may want to force-unpublish it - that would be backward-compatible... but...
-            // making a radical decision here: trashing is equivalent to moving under an unpublished node so
-            // it's NOT unpublishing, only the content is now masked - allowing us to restore it if wanted
-            // if (content.HasPublishedVersion)
-            // { }
-            PerformMoveLocked(content, Constants.System.RecycleBinContent, null, userId, moves, true);
-            scope.Notifications.Publish(
-                new ContentTreeChangeNotification(content, TreeChangeTypes.RefreshBranch, eventMessages));
-
-            MoveToRecycleBinEventInfo<IContent>[] moveInfo = moves
-                .Select(x => new MoveToRecycleBinEventInfo<IContent>(x.Item1, x.Item2))
-                .ToArray();
-
-            scope.Notifications.Publish(
-                new ContentMovedToRecycleBinNotification(moveInfo, eventMessages).WithStateFrom(
-                    movingToRecycleBinNotification));
-
-            Audit(AuditType.Move, userId, content.Id, $"Moved to recycle bin from parent {originalPath.GetParentIdFromPath()}");
-
             scope.Complete();
+            return Attempt.Fail(ContentMoveToRecycleBinOperationStatus.CancelledByNotification);
         }
 
-        return OperationResult.Succeed(eventMessages);
+        int userId = await _userIdKeyResolver.GetAsync(userKey);
+
+        // if it's published we may want to force-unpublish it - that would be backward-compatible... but...
+        // making a radical decision here: trashing is equivalent to moving under an unpublished node so
+        // it's NOT unpublishing, only the content is now masked - allowing us to restore it if wanted
+        // if (content.HasPublishedVersion)
+        // { }
+        await PerformMoveLockedAsync(content, Constants.System.RecycleBinContent, null, userId, moves, true, cancellationToken);
+        scope.Notifications.Publish(
+            new ContentTreeChangeNotification(content, TreeChangeTypes.RefreshBranch, eventMessages));
+
+        MoveToRecycleBinEventInfo<IContent>[] moveInfo = moves
+            .Select(x => new MoveToRecycleBinEventInfo<IContent>(x.Item1, x.Item2))
+            .ToArray();
+
+        scope.Notifications.Publish(
+            new ContentMovedToRecycleBinNotification(moveInfo, eventMessages).WithStateFrom(
+                movingToRecycleBinNotification));
+
+        await AuditAsync(AuditType.Move, userId, content.Id, $"Moved to recycle bin from parent {originalPath.GetParentIdFromPath()}");
+
+        scope.Complete();
+
+        return Attempt.Succeed(ContentMoveToRecycleBinOperationStatus.Success);
     }
 
     /// <summary>
@@ -941,7 +939,11 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
         // if moving to the recycle bin then use the proper method
         if (parentId == Constants.System.RecycleBinContent)
         {
-            return MoveToRecycleBin(content, userId);
+            Guid userKey = _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult();
+            Attempt<ContentMoveToRecycleBinOperationStatus> result = MoveToRecycleBinAsync(content, userKey, CancellationToken.None).GetAwaiter().GetResult();
+            return result.Success
+                ? OperationResult.Succeed(new EventMessages())
+                : OperationResult.Cancel(new EventMessages());
         }
 
         var moves = new List<(IContent, string)>();
@@ -1130,6 +1132,107 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
 
         content.WriterId = userId;
         _documentRepository.Save(content);
+    }
+
+    // MUST be called from within a write lock on Constants.Locks.ContentTree.
+    // trash indicates whether we are trashing, un-trashing, or not changing anything.
+    private async Task PerformMoveLockedAsync(IContent content, int parentId, IContent? parent, int userId, List<(IContent Content, string OriginalPath)> moves, bool? trash, CancellationToken cancellationToken, bool includeDescendants = true)
+    {
+        content.WriterId = userId;
+        content.ParentId = parentId;
+        content.ParentKey = parentId switch
+        {
+            Constants.System.Root => null,
+            Constants.System.RecycleBinContent => Constants.System.RecycleBinContentKey,
+            _ => parent?.Key,
+        };
+
+        var levelDelta = 1 - content.Level + (parent?.Level ?? 0);
+        var originalLevel = content.Level;
+        var originalPath = content.Path;
+        moves.Add((content, originalPath));
+
+        // Fetch descendants by content's key before saving its own new parent below - GetDescendantsAsync
+        // matches descendants via content's NodeId embedded in their own Path strings, so this must happen
+        // before those descendant rows are mutated by the moves later in this method.
+        var descendants = new List<IContent>();
+        const int pageSize = 500;
+        var page = 0;
+        var total = long.MaxValue;
+        while (page * pageSize < total)
+        {
+            PagedModel<IContent> descendantsPage = await GetDescendantsAsync(content.Key, page++ * pageSize, pageSize, Ordering.By("Path"), cancellationToken);
+            descendants.AddRange(descendantsPage.Items);
+            total = descendantsPage.Total;
+        }
+
+        await PerformMoveContentLockedAsync(content, userId, trash, cancellationToken);
+
+        var paths = new Dictionary<int, string>
+        {
+            [content.Id] = (parent == null
+                ? parentId == Constants.System.RecycleBinContent ? "-1,-20" : Constants.System.RootString
+                : parent.Path) + "," + content.Id,
+        };
+
+        // When restoring a single item out of the recycle bin without its descendants, the descendants must stay
+        // trashed: the item's direct children are re-homed to the recycle bin root (and the rest of the subtree keeps
+        // its relative structure), so nothing is orphaned and it can still be restored on its own later.
+        var leaveDescendantsInRecycleBin = includeDescendants is false
+            && parentId != Constants.System.RecycleBinContent
+            && originalPath.Contains(Constants.System.RecycleBinContentString);
+
+        foreach (IContent descendant in descendants)
+        {
+            moves.Add((descendant, descendant.Path));
+
+            if (leaveDescendantsInRecycleBin)
+            {
+                await LeaveDescendantInRecycleBinLockedAsync(descendant, content.Id, originalLevel, userId, paths, cancellationToken);
+            }
+            else
+            {
+                await PerformMoveDescendantLockedAsync(descendant, levelDelta, userId, trash, paths, cancellationToken);
+            }
+        }
+    }
+
+    // Re-homes a descendant of a restored item within the recycle bin: the restored item's direct children become
+    // top-level recycle bin items, while deeper descendants keep their relative structure below their (now re-homed)
+    // ancestor. The trashed state is left untouched so these items remain in the recycle bin.
+    private async Task LeaveDescendantInRecycleBinLockedAsync(IContent descendant, int restoredItemId, int originalLevel, int userId, Dictionary<int, string> paths, CancellationToken cancellationToken)
+    {
+        var isDirectChild = descendant.ParentId == restoredItemId;
+        descendant.Path = paths[descendant.Id] = isDirectChild
+            ? Constants.System.RecycleBinContentPathPrefix + descendant.Id
+            : paths[descendant.ParentId] + "," + descendant.Id;
+        descendant.Level -= originalLevel;
+        if (isDirectChild)
+        {
+            descendant.ParentId = Constants.System.RecycleBinContent;
+            descendant.ParentKey = Constants.System.RecycleBinContentKey;
+        }
+
+        await PerformMoveContentLockedAsync(descendant, userId, null, cancellationToken);
+    }
+
+    // Moves a descendant along with the item being moved, updating its path and level (parentId is unchanged).
+    private async Task PerformMoveDescendantLockedAsync(IContent descendant, int levelDelta, int userId, bool? trash, Dictionary<int, string> paths, CancellationToken cancellationToken)
+    {
+        descendant.Path = paths[descendant.Id] = paths[descendant.ParentId] + "," + descendant.Id;
+        descendant.Level += levelDelta;
+        await PerformMoveContentLockedAsync(descendant, userId, trash, cancellationToken);
+    }
+
+    private async Task PerformMoveContentLockedAsync(IContent content, int userId, bool? trash, CancellationToken cancellationToken)
+    {
+        if (trash.HasValue)
+        {
+            ((ContentBase)content).Trashed = trash.Value;
+        }
+
+        content.WriterId = userId;
+        await _asyncDocumentRepository.SaveAsync(content, cancellationToken);
     }
 
     /// <summary>

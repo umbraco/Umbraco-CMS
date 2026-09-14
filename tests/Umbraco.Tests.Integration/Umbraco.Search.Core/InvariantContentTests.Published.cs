@@ -1,4 +1,5 @@
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.Common.Builders;
@@ -137,7 +138,7 @@ public partial class InvariantContentTests
     {
         await ContentService.SaveAsync(Root(), null, null, CancellationToken.None);
         ContentService.PublishBranch(Root(), PublishBranchFilter.IncludeUnpublished, ["*"]);
-        ContentService.MoveToRecycleBin(Root());
+        await ContentService.MoveToRecycleBinAsync(Root(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.PublishedContent);
         Assert.That(documents, Has.Count.EqualTo(0));
@@ -148,7 +149,7 @@ public partial class InvariantContentTests
     {
         await ContentService.SaveAsync(Root(), null, null, CancellationToken.None);
         ContentService.PublishBranch(Root(), PublishBranchFilter.IncludeUnpublished, ["*"]);
-        ContentService.MoveToRecycleBin(Child());
+        await ContentService.MoveToRecycleBinAsync(Child(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.PublishedContent);
         Assert.That(documents, Has.Count.EqualTo(1));
@@ -288,11 +289,11 @@ public partial class InvariantContentTests
     }
 
     [Test]
-    public void PublishedStructure_RebuildOmitsTrashedContent()
+    public async Task PublishedStructure_RebuildOmitsTrashedContent()
     {
         ContentService.PublishBranch(Root(), PublishBranchFilter.IncludeUnpublished, ["*"]);
-        ContentService.MoveToRecycleBin(Grandchild());
-        ContentService.MoveToRecycleBin(Child());
+        await ContentService.MoveToRecycleBinAsync(Grandchild(), Constants.Security.SuperUserKey, CancellationToken.None);
+        await ContentService.MoveToRecycleBinAsync(Child(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         // at this point we have:
         // - Root in the content tree root (the only item not in the recycle bin)

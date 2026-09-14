@@ -723,7 +723,7 @@ public class PatchDocumentControllerTests : ManagementApiUserGroupTestBase<Patch
             .WithContentType(contentType)
             .Build();
         await ContentService.SaveAsync(content, null, null, CancellationToken.None);
-        ContentService.MoveToRecycleBin(content);
+        await ContentService.MoveToRecycleBinAsync(content, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var documentKey = content.Key;
 

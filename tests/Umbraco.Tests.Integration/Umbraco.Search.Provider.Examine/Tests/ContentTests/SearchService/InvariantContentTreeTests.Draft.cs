@@ -18,7 +18,7 @@ public partial class InvariantContentTreeTests : SearcherTestBase
         {
             await CreateInvariantDocumentTree(false);
             IContent root = (await ContentService.GetByIdAsync(RootKey, CancellationToken.None))!;
-            ContentService.MoveToRecycleBin(root);
+            await ContentService.MoveToRecycleBinAsync(root, Constants.Security.SuperUserKey, CancellationToken.None);
         });
 
         var indexAlias = GetIndexAlias(false);

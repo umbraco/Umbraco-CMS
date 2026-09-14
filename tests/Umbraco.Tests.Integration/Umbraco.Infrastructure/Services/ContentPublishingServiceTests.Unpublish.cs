@@ -342,7 +342,7 @@ public partial class ContentPublishingServiceTests
     [Test]
     public async Task Can_Unpublish_From_Trash()
     {
-        ContentService.MoveToRecycleBin(Subpage);
+        await ContentService.MoveToRecycleBinAsync(Subpage, Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.IsTrue((await ContentService.GetByIdAsync(Subpage.Key, CancellationToken.None))!.Trashed);
 
         var result = await ContentPublishingService.UnpublishAsync(Subpage.Key, null, Constants.Security.SuperUserKey);

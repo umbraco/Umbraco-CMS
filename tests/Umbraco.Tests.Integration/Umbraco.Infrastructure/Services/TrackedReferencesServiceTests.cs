@@ -178,7 +178,7 @@ internal class TrackedReferencesServiceTests : UmbracoIntegrationTest
     [Test]
     public async Task Get_Pages_That_Reference_Recycle_Bin_Contents()
     {
-        ContentService.MoveToRecycleBin(Root1);
+        await ContentService.MoveToRecycleBinAsync(Root1, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var sut = GetRequiredService<ITrackedReferencesService>();
 

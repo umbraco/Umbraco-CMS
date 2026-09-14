@@ -1014,7 +1014,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
     {
         // trashing the ancestor itself moves the whole branch into the recycle bin, so its
         // descendants stay nested under it (and are themselves marked trashed)
-        ContentService.MoveToRecycleBin(_textpage);
+        await ContentService.MoveToRecycleBinAsync(_textpage, Constants.Security.SuperUserKey, CancellationToken.None);
 
         using var scope = NewScopeProvider.CreateScope();
         var repository = CreateRepository();
@@ -1030,7 +1030,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
     [Test]
     public async Task GetDescendantsAsync_WithIncludeTrashedFalse_ExcludesTrashedDescendants()
     {
-        ContentService.MoveToRecycleBin(_textpage);
+        await ContentService.MoveToRecycleBinAsync(_textpage, Constants.Security.SuperUserKey, CancellationToken.None);
 
         using var scope = NewScopeProvider.CreateScope();
         var repository = CreateRepository();

@@ -48,7 +48,7 @@ public class IndexedEntitySearchServiceWithUserStartNodesTests : BackOfficeTestB
         }
 
         IContent[] contentAtRoot = (await ContentService.GetRootContentAsync(CancellationToken.None)).OrderBy(content => content.SortOrder).ToArray();
-        ContentService.MoveToRecycleBin(contentAtRoot.Last());
+        await ContentService.MoveToRecycleBinAsync(contentAtRoot.Last(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         IMedia[] mediaAtRoot = MediaService.GetRootMedia().OrderBy(media => media.SortOrder).ToArray();
         MediaService.MoveToRecycleBin(mediaAtRoot.Last());

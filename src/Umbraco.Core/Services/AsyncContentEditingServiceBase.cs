@@ -531,6 +531,13 @@ internal abstract class AsyncContentEditingServiceBase<TContent, TContentType, T
     /// <returns>The user ID.</returns>
     protected async Task<int> GetUserIdAsync(Guid userKey) => await _userIdKeyResolver.GetAsync(userKey);
 
+    /// <summary>
+    /// Gets the user key from the user ID.
+    /// </summary>
+    /// <param name="userId">The user ID.</param>
+    /// <returns>The user key.</returns>
+    protected async Task<Guid> GetUserKeyAsync(int userId) => await _userIdKeyResolver.GetAsync(userId);
+
     protected virtual async Task<Attempt<TContentType?, ContentEditingOperationStatus>> TryGetAndValidateContentTypeAsync(Guid contentTypeKey, ContentEditingModelBase contentEditingModelBase)
     {
         TContentType? contentType = await ContentTypeService.GetAsync(contentTypeKey);

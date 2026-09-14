@@ -426,9 +426,10 @@ public interface IContentService : IPublishableContentService<IContent>, IAsyncP
     ///     Moves a document to the recycle bin.
     /// </summary>
     /// <param name="content">The document to move to the recycle bin.</param>
-    /// <param name="userId">The identifier of the user performing the action.</param>
-    /// <returns>The operation result.</returns>
-    OperationResult MoveToRecycleBin(IContent content, int userId = Constants.Security.SuperUserId);
+    /// <param name="userKey">The Guid key of the user performing the action.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>An attempt carrying the operation status.</returns>
+    Task<Attempt<ContentMoveToRecycleBinOperationStatus>> MoveToRecycleBinAsync(IContent content, Guid userKey, CancellationToken cancellationToken);
 
     /// <summary>
     ///     Gets a value indicating whether there is any content in the recycle bin.

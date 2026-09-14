@@ -903,7 +903,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             Assert.IsNotNull(content);
 
             ResetEvents();
-            ContentService.MoveToRecycleBin(content);
+            await ContentService.MoveToRecycleBinAsync(content, Constants.Security.SuperUserKey, CancellationToken.None);
 
             Assert.AreEqual(2, _msgCount);
             Assert.AreEqual(2, _events.Count);
@@ -921,7 +921,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             IContent content = await CreateContent();
             Assert.IsNotNull(content);
 
-            ContentService.MoveToRecycleBin(content);
+            await ContentService.MoveToRecycleBinAsync(content, Constants.Security.SuperUserKey, CancellationToken.None);
 
             ResetEvents();
             ContentService.Move(content, -1);
@@ -946,7 +946,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             ContentService.Publish(content, content.AvailableCultures.ToArray());
 
             ResetEvents();
-            ContentService.MoveToRecycleBin(content);
+            await ContentService.MoveToRecycleBinAsync(content, Constants.Security.SuperUserKey, CancellationToken.None);
 
             Assert.AreEqual(2, _msgCount);
             Assert.AreEqual(2, _events.Count);
@@ -967,7 +967,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             Assert.IsNotNull(content);
 
             ContentService.Publish(content, content.AvailableCultures.ToArray());
-            ContentService.MoveToRecycleBin(content);
+            await ContentService.MoveToRecycleBinAsync(content, Constants.Security.SuperUserKey, CancellationToken.None);
 
             ResetEvents();
             ContentService.Move(content, -1);
@@ -997,7 +997,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
             ResetEvents();
-            ContentService.MoveToRecycleBin(content);
+            await ContentService.MoveToRecycleBinAsync(content, Constants.Security.SuperUserKey, CancellationToken.None);
 
             Assert.AreEqual(2, _msgCount);
             Assert.AreEqual(2, _events.Count);
@@ -1016,7 +1016,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             IContent content1 = await CreateBranch();
 
             ResetEvents();
-            ContentService.MoveToRecycleBin(content1);
+            await ContentService.MoveToRecycleBinAsync(content1, Constants.Security.SuperUserKey, CancellationToken.None);
 
             Assert.AreEqual(14, _msgCount);
             Assert.AreEqual(14, _events.Count);
@@ -1057,7 +1057,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             IContent content = await CreateContent();
             Assert.IsNotNull(content);
 
-            ContentService.MoveToRecycleBin(content);
+            await ContentService.MoveToRecycleBinAsync(content, Constants.Security.SuperUserKey, CancellationToken.None);
 
             ResetEvents();
             await ContentService.EmptyRecycleBinAsync(Constants.Security.SuperUserKey);
@@ -1079,11 +1079,11 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 
             IContent content1 = await CreateContent();
             Assert.IsNotNull(content1);
-            ContentService.MoveToRecycleBin(content1);
+            await ContentService.MoveToRecycleBinAsync(content1, Constants.Security.SuperUserKey, CancellationToken.None);
 
             IContent content2 = await CreateContent();
             Assert.IsNotNull(content2);
-            ContentService.MoveToRecycleBin(content2);
+            await ContentService.MoveToRecycleBinAsync(content2, Constants.Security.SuperUserKey, CancellationToken.None);
 
             ResetEvents();
             await ContentService.EmptyRecycleBinAsync(Constants.Security.SuperUserKey);
@@ -1108,7 +1108,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             IContent content1 = await CreateBranch();
             Assert.IsNotNull(content1);
 
-            ContentService.MoveToRecycleBin(content1);
+            await ContentService.MoveToRecycleBinAsync(content1, Constants.Security.SuperUserKey, CancellationToken.None);
 
             ResetEvents();
 

@@ -575,7 +575,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
         var allTags = TagService.GetAllContentTags();
         Assert.AreEqual(5, allTags.Count());
 
-        ContentService.MoveToRecycleBin(content1);
+        await ContentService.MoveToRecycleBinAsync(content1, Constants.Security.SuperUserKey, CancellationToken.None);
     }
 
     [Test]
@@ -667,7 +667,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
         var allTags = TagService.GetAllContentTags();
         Assert.AreEqual(5, allTags.Count());
 
-        ContentService.MoveToRecycleBin(content1);
+        await ContentService.MoveToRecycleBinAsync(content1, Constants.Security.SuperUserKey, CancellationToken.None);
 
         // no more tags
         tags = TagService.GetTagsForEntity(content1.Id);

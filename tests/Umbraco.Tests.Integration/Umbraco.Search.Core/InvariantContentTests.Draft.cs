@@ -125,7 +125,7 @@ public partial class InvariantContentTests
     {
         await SetupDraftContent();
         ContentService.Save([Root(), Child(), Grandchild(), GreatGrandchild()]);
-        ContentService.MoveToRecycleBin(Root());
+        await ContentService.MoveToRecycleBinAsync(Root(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.DraftContent);
         Assert.That(documents, Has.Count.EqualTo(4));
@@ -153,7 +153,7 @@ public partial class InvariantContentTests
     {
         await SetupDraftContent();
         ContentService.Save([Root(), Child(), Grandchild(), GreatGrandchild()]);
-        ContentService.MoveToRecycleBin(Root());
+        await ContentService.MoveToRecycleBinAsync(Root(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.DraftContent);
         Assert.That(documents, Has.Count.EqualTo(4));
@@ -181,7 +181,7 @@ public partial class InvariantContentTests
     {
         await SetupDraftContent();
         ContentService.Save([Root(), Child(), Grandchild(), GreatGrandchild()]);
-        ContentService.MoveToRecycleBin(Child());
+        await ContentService.MoveToRecycleBinAsync(Child(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.DraftContent);
         Assert.That(documents, Has.Count.EqualTo(4));
@@ -298,7 +298,7 @@ public partial class InvariantContentTests
 
         if (moveToRecycleBinBeforeDeleting)
         {
-            ContentService.MoveToRecycleBin(Root());
+            await ContentService.MoveToRecycleBinAsync(Root(), Constants.Security.SuperUserKey, CancellationToken.None);
         }
 
         await ContentService.DeleteAsync(Root(), null, CancellationToken.None);
@@ -316,7 +316,7 @@ public partial class InvariantContentTests
 
         if (moveToRecycleBinBeforeDeleting)
         {
-            ContentService.MoveToRecycleBin(Child());
+            await ContentService.MoveToRecycleBinAsync(Child(), Constants.Security.SuperUserKey, CancellationToken.None);
         }
 
         await ContentService.DeleteAsync(Child(), null, CancellationToken.None);
@@ -363,8 +363,8 @@ public partial class InvariantContentTests
     public async Task DraftStructure_RebuildIncludesTrashedContent()
     {
         await SetupDraftContent();
-        ContentService.MoveToRecycleBin(Grandchild());
-        ContentService.MoveToRecycleBin(Child());
+        await ContentService.MoveToRecycleBinAsync(Grandchild(), Constants.Security.SuperUserKey, CancellationToken.None);
+        await ContentService.MoveToRecycleBinAsync(Child(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         // at this point we have:
         // - Root in the content tree root (the only item not in the recycle bin)

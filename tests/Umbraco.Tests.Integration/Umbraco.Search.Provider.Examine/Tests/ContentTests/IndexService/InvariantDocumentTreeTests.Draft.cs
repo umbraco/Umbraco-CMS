@@ -48,11 +48,10 @@ public partial class InvariantDocumentTreeTests
     {
         await CreateInvariantDocumentTree(false);
 
-        await WaitForIndexing(Cms.Core.Constants.IndexAliases.DraftContent, () =>
+        await WaitForIndexing(Cms.Core.Constants.IndexAliases.DraftContent, async () =>
         {
             IContent root = ContentService.GetByIdAsync(RootKey, CancellationToken.None).GetAwaiter().GetResult()!;
-            ContentService.MoveToRecycleBin(root);
-            return Task.CompletedTask;
+            await ContentService.MoveToRecycleBinAsync(root, Constants.Security.SuperUserKey, CancellationToken.None);
         });
 
         IIndex index = GetIndex(Cms.Core.Constants.IndexAliases.DraftContent);

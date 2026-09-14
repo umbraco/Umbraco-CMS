@@ -596,7 +596,7 @@ public partial class ContentPublishingServiceTests
     [Test]
     public async Task Cannot_Publish_From_Trash()
     {
-        ContentService.MoveToRecycleBin(Subpage);
+        await ContentService.MoveToRecycleBinAsync(Subpage, Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.IsTrue((await ContentService.GetByIdAsync(Subpage.Key, CancellationToken.None))!.Trashed);
 
         var result = await ContentPublishingService.PublishAsync(Subpage.Key, [new CulturePublishScheduleModel()], Constants.Security.SuperUserKey);

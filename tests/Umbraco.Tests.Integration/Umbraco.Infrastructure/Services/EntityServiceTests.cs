@@ -235,7 +235,7 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
 
         foreach (var content in toDelete)
         {
-            ContentService.MoveToRecycleBin(content);
+            await ContentService.MoveToRecycleBinAsync(content, Constants.Security.SuperUserKey, CancellationToken.None);
         }
 
         // search at root to see if it returns recycled
@@ -277,7 +277,7 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
 
         foreach (var content in toDelete)
         {
-            ContentService.MoveToRecycleBin(content);
+            await ContentService.MoveToRecycleBinAsync(content, Constants.Security.SuperUserKey, CancellationToken.None);
         }
 
         // search at root to see if it returns recycled
@@ -320,7 +320,7 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
 
         foreach (var content in toDelete)
         {
-            ContentService.MoveToRecycleBin(content);
+            await ContentService.MoveToRecycleBinAsync(content, Constants.Security.SuperUserKey, CancellationToken.None);
         }
 
         // get paged entities at recycle bin root
@@ -973,7 +973,7 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
         var children = await CreateDocumentSiblingsTestData();
 
         var trash = children[1];
-        ContentService.MoveToRecycleBin(trash);
+        await ContentService.MoveToRecycleBinAsync(trash, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var target = children[2];
         var result = EntityService.GetSiblings(target.Key, [UmbracoObjectTypes.Document], 1, 1, out long totalBefore, out long totalAfter).ToArray();
@@ -994,7 +994,7 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
 
         for (int i = 0; i <= 3; i++)
         {
-            ContentService.MoveToRecycleBin(children[i]);
+            await ContentService.MoveToRecycleBinAsync(children[i], Constants.Security.SuperUserKey, CancellationToken.None);
         }
 
         var result = EntityService.GetTrashedSiblings(children[1].Key, [UmbracoObjectTypes.Document], 1, 1, out long totalBefore, out long totalAfter).ToArray();

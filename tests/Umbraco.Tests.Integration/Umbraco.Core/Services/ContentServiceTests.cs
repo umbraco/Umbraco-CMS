@@ -89,7 +89,8 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
             .AddNotificationHandler<ContentPublishingNotification, ContentNotificationHandler>()
             .AddNotificationHandler<ContentCopyingNotification, ContentNotificationHandler>()
             .AddNotificationHandler<ContentCopiedNotification, ContentNotificationHandler>()
-            .AddNotificationHandler<ContentSavingNotification, ContentNotificationHandler>();
+            .AddNotificationHandler<ContentSavingNotification, ContentNotificationHandler>()
+            .AddNotificationHandler<ContentMovingToRecycleBinNotification, ContentNotificationHandler>();
 
         builder.Services.AddUnique<IIdKeyMap>(services => new SpyIdKeyMap(ActivatorUtilities.CreateInstance<IdKeyMap>(services)));
     }
@@ -2772,7 +2773,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         var content = await ContentService.GetByIdAsync(Textpage.Key, CancellationToken.None);
 
         // Act
-        ContentService.MoveToRecycleBin(content);
+        await ContentService.MoveToRecycleBinAsync(content, Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Assert
         Assert.That(content.ParentId, Is.EqualTo(-20));
@@ -2806,7 +2807,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         Assert.IsFalse(descendants.Any(x => x.Path.StartsWith("-1,-20,")));
         Assert.IsFalse(descendants.Any(x => x.Trashed));
 
-        ContentService.MoveToRecycleBin(content);
+        await ContentService.MoveToRecycleBinAsync(content, Constants.Security.SuperUserKey, CancellationToken.None);
 
         descendants.Clear();
         page = 0;
@@ -3048,7 +3049,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         Assert.IsTrue(updateDomainResult.Success);
 
         // Act
-        ContentService.MoveToRecycleBin(content1);
+        await ContentService.MoveToRecycleBinAsync(content1, Constants.Security.SuperUserKey, CancellationToken.None);
         await ContentService.EmptyRecycleBinAsync(Constants.Security.SuperUserKey);
         var contents = (await ContentService.GetPagedContentInRecycleBinAsync(0, int.MaxValue, ordering: null, CancellationToken.None)).Items.ToList();
 
@@ -3077,10 +3078,39 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     {
         var content = await ContentService.GetByIdAsync(Subpage.Key, CancellationToken.None);
 
-        ContentService.MoveToRecycleBin(content);
+        await ContentService.MoveToRecycleBinAsync(content, Constants.Security.SuperUserKey, CancellationToken.None);
 
         Assert.That(content!.ParentId, Is.EqualTo(Constants.System.RecycleBinContent));
         Assert.That(content.ParentKey, Is.EqualTo(Constants.System.RecycleBinContentKey));
+    }
+
+    [Test]
+    public async Task MoveToRecycleBinAsync_MovingNotificationCancelled_ReturnsCancelledStatusAndDoesNotMove()
+    {
+        ContentNotificationHandler.MovingContentToRecycleBin = notification =>
+        {
+            notification.Cancel = true;
+        };
+
+        try
+        {
+            var content = await ContentService.GetByIdAsync(Subpage.Key, CancellationToken.None);
+            var originalParentId = content!.ParentId;
+
+            Attempt<ContentMoveToRecycleBinOperationStatus> result = await ContentService.MoveToRecycleBinAsync(content, Constants.Security.SuperUserKey, CancellationToken.None);
+
+            Assert.Multiple(() =>
+            {
+                Assert.IsFalse(result.Success);
+                Assert.AreEqual(ContentMoveToRecycleBinOperationStatus.CancelledByNotification, result.Result);
+                Assert.IsFalse(content.Trashed);
+                Assert.AreEqual(originalParentId, content.ParentId);
+            });
+        }
+        finally
+        {
+            ContentNotificationHandler.MovingContentToRecycleBin = null;
+        }
     }
 
     [Test]
@@ -3136,7 +3166,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     public async Task Copy_Of_Trashed_Content_Is_Not_Trashed()
     {
         // Arrange
-        ContentService.MoveToRecycleBin(Subpage);
+        await ContentService.MoveToRecycleBinAsync(Subpage, Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.That(Subpage.Trashed, Is.True);
 
         // Act
@@ -5111,7 +5141,8 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         INotificationHandler<ContentCopyingNotification>,
         INotificationHandler<ContentCopiedNotification>,
         INotificationHandler<ContentPublishingNotification>,
-        INotificationHandler<ContentSavingNotification>
+        INotificationHandler<ContentSavingNotification>,
+        INotificationHandler<ContentMovingToRecycleBinNotification>
     {
         public static Action<ContentPublishingNotification>? PublishingContent { get; set; }
 
@@ -5121,6 +5152,8 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
         public static Action<ContentSavingNotification>? SavingContent { get; set; }
 
+        public static Action<ContentMovingToRecycleBinNotification>? MovingContentToRecycleBin { get; set; }
+
         public void Handle(ContentCopiedNotification notification) => CopiedContent?.Invoke(notification);
 
         public void Handle(ContentCopyingNotification notification) => CopyingContent?.Invoke(notification);
@@ -5128,6 +5161,8 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         public void Handle(ContentPublishingNotification notification) => PublishingContent?.Invoke(notification);
 
         public void Handle(ContentSavingNotification notification) => SavingContent?.Invoke(notification);
+
+        public void Handle(ContentMovingToRecycleBinNotification notification) => MovingContentToRecycleBin?.Invoke(notification);
     }
 
     private async Task<(ILanguage LangEn, ILanguage LangDa, IContentType contentType)> SetupVariantTest()

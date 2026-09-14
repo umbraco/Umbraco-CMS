@@ -48,11 +48,11 @@ public partial class InvariantContentStructureTests
     }
 
     [Test]
-    public void DraftStructure_WithGrandchildInRecycleBin_YieldsAllDocuments()
+    public async Task DraftStructure_WithGrandchildInRecycleBin_YieldsAllDocuments()
     {
         ContentService.Save([Root(), Child(), Grandchild(), GreatGrandchild()]);
 
-        OperationResult result = ContentService.MoveToRecycleBin(Grandchild());
+        Attempt<ContentMoveToRecycleBinOperationStatus> result = await ContentService.MoveToRecycleBinAsync(Grandchild(), Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.Multiple(() =>
         {
             Assert.That(result.Success, Is.True);
