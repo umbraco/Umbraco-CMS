@@ -70,7 +70,11 @@ internal sealed class MigrateSingleMediaPickerDataTypesTests : UmbracoIntegratio
         await ExecuteMigration();
 
         IDataType migrated = (await DataTypeService.GetAsync(dataType.Key))!;
-        Assert.That(migrated.ConfigurationData.ContainsKey("validationLimit"), Is.False);
+        Assert.Multiple(() =>
+        {
+            Assert.That(migrated.ConfigurationData.ContainsKey("validationLimit"), Is.False);
+            Assert.That(migrated.ConfigurationData.ContainsKey("multiple"), Is.False);
+        });
     }
 
     [Test]
@@ -91,6 +95,8 @@ internal sealed class MigrateSingleMediaPickerDataTypesTests : UmbracoIntegratio
         {
             Assert.That(validationLimit.Min, Is.EqualTo(2));
             Assert.That(validationLimit.Max, Is.EqualTo(5));
+
+            Assert.That(migrated.ConfigurationData.ContainsKey("multiple"), Is.False);
         });
     }
 
@@ -118,6 +124,8 @@ internal sealed class MigrateSingleMediaPickerDataTypesTests : UmbracoIntegratio
             Assert.That(configuration.StartNodeId, Is.EqualTo(startNodeId));
             Assert.That(configuration.EnableLocalFocalPoint, Is.True);
             Assert.That(configuration.IgnoreUserStartNodes, Is.True);
+
+            Assert.That(migrated.ConfigurationData.ContainsKey("multiple"), Is.False);
         });
     }
 

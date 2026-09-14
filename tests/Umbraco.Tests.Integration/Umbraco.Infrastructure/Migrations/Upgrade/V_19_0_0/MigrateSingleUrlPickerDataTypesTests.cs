@@ -84,7 +84,11 @@ internal sealed class MigrateSingleUrlPickerDataTypesTests : UmbracoIntegrationT
 
         IDataType migrated = (await DataTypeService.GetAsync(dataType.Key))!;
         var configuration = migrated.ConfigurationAs<SingleUrlPickerConfiguration>()!;
-        Assert.That(configuration.IgnoreUserStartNodes, Is.True);
+        Assert.Multiple(() =>
+        {
+            Assert.That(configuration.IgnoreUserStartNodes, Is.True);
+            Assert.That(migrated.ConfigurationData.ContainsKey("maxNumber"), Is.False);
+        });
     }
 
     [Test]

@@ -71,7 +71,11 @@ internal sealed class MigrateSingleDropDownDataTypesTests : UmbracoIntegrationTe
 
         IDataType migrated = (await DataTypeService.GetAsync(dataType.Key))!;
         var configuration = migrated.ConfigurationAs<SingleDropDownConfiguration>()!;
-        Assert.That(configuration.Items, Is.EqualTo(new[] { "One", "Two", "Three" }));
+        Assert.Multiple(() =>
+        {
+            Assert.That(configuration.Items, Is.EqualTo(new[] { "One", "Two", "Three" }));
+            Assert.That(migrated.ConfigurationData.ContainsKey("multiple"), Is.False);
+        });
     }
 
     [Test]
