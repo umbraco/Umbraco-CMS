@@ -143,9 +143,7 @@ test('can update a specific element with update permission enabled', async ({umb
   await umbracoApi.element.ensureNameNotExists(newElementName);
 });
 
-// Product bug: with a granular duplicate permission the UI reports success but no duplicate is created. The same
-// flow works when duplicate comes from the fallback permission.
-test.skip('can duplicate a specific element with duplicate permission enabled', async ({umbracoApi, umbracoUi}) => {
+test('can duplicate a specific element with duplicate permission enabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const duplicatedElementName = firstElementName + ' (1)';
   userGroupId = await umbracoApi.userGroup.createUserGroupWithDuplicatePermissionForSpecificElement(userGroupName, firstElementId);
@@ -162,8 +160,12 @@ test.skip('can duplicate a specific element with duplicate permission enabled', 
   // Assert
   await umbracoUi.library.doesSuccessNotificationHaveText(NotificationConstantHelper.success.duplicated);
   expect(await umbracoApi.element.doesNameExist(firstElementName)).toBeTruthy();
-  expect(await umbracoApi.element.doesNameExist(duplicatedElementName)).toBeTruthy();
   await umbracoUi.library.isEntityActionForElementWithNameHidden(secondElementName);
+
+  // The granular permission only covers the source element, not the newly duplicated one, so the test
+  // user has no read access to it - switch to admin to verify it was actually created.
+  await umbracoApi.loginToAdminUser();
+  expect(await umbracoApi.element.doesNameExist(duplicatedElementName)).toBeTruthy();
 
   // Clean
   await umbracoApi.element.ensureNameNotExists(duplicatedElementName);
