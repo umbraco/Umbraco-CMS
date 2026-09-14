@@ -135,10 +135,12 @@ export default {
 		orEdit: '编辑当前域名',
 		inherit: '继承',
 		setLanguage: '语言',
-		setLanguageHelp: '为当前节点下方的节点设置语言，或从父节点继承语言。除非下方另有域名适用，否则同样会应用于当前节点。',
+		setLanguageHelp:
+			'为当前节点下方的节点设置语言，或从父节点继承语言。除非下方另有域名适用，否则同样会应用于当前节点。',
 		setDomains: '域名',
 		addCurrent: '添加当前域名',
-		domainHelpWithVariants: '有效的域名为："example.com" 、 "www.example.com" 、 "example.com:8080" 或 "https://www.example.com/" 。此外，域名还支持一级路径，如 "example.com/en" 或 "/en"。',
+		domainHelpWithVariants:
+			'有效的域名为："example.com" 、 "www.example.com" 、 "example.com:8080" 或 "https://www.example.com/" 。此外，域名还支持一级路径，如 "example.com/en" 或 "/en"。',
 	},
 	auditTrailsElement: {
 		save: '元素已保存',
@@ -387,7 +389,8 @@ export default {
 		nestedContentGroupHelpText: '选择要显示其属性的组。留空时将使用元素类型上的第一个组。',
 		nestedContentTemplateHelpTextPart1: '输入针对每一项求值的 Angular 表达式作为其名称。使用',
 		nestedContentTemplateHelpTextPart2: '来显示项索引',
-		nestedContentNoGroups: '所选元素类型不包含任何受支持的组（此编辑器不支持选项卡，请将其改为组，或改用区块列表编辑器）。',
+		nestedContentNoGroups:
+			'所选元素类型不包含任何受支持的组（此编辑器不支持选项卡，请将其改为组，或改用区块列表编辑器）。',
 		addTextBox: '添加另一个文本框',
 		removeTextBox: '移除此文本框',
 	},
@@ -407,8 +410,7 @@ export default {
 		notFoundTitle: (entityType: string) => `${entityType ?? '项目'}未找到`,
 		notFoundDescription: (entityType: string) => `找不到请求的${entityType ?? '项目'}。请检查 URL 后重试。`,
 		forbiddenTitle: (entityType: string) => `无权访问此${entityType ?? '项目'}`,
-		forbiddenDescription: (entityType: string) =>
-			`您没有访问此${entityType ?? '项目'}的权限。请联系管理员寻求帮助。`,
+		forbiddenDescription: (entityType: string) => `您没有访问此${entityType ?? '项目'}的权限。请联系管理员寻求帮助。`,
 	},
 
 	media: {
@@ -419,8 +421,10 @@ export default {
 		maxFileSize: '最大文件大小为',
 		disallowedFileType: '无法上传此文件，文件类型不受支持',
 		disallowedFileExtension: (extension: string) => `无法上传 .${extension} 文件，没有媒体类型支持此文件类型`,
-		disallowedMediaTypeNotAllowedHere: (extension: string, mediaTypeName: string) => `无法在此处上传 .${extension} 文件，其关联的 ${mediaTypeName} 媒体类型不允许在此位置使用`,
-		disallowedMediaTypesNotAllowedHere: (extension: string, mediaTypeNames: string) => `无法在此处上传 .${extension} 文件，其关联的媒体类型（${mediaTypeNames}）不允许在此位置使用`,
+		disallowedMediaTypeNotAllowedHere: (extension: string, mediaTypeName: string) =>
+			`无法在此处上传 .${extension} 文件，其关联的 ${mediaTypeName} 媒体类型不允许在此位置使用`,
+		disallowedMediaTypesNotAllowedHere: (extension: string, mediaTypeNames: string) =>
+			`无法在此处上传 .${extension} 文件，其关联的媒体类型（${mediaTypeNames}）不允许在此位置使用`,
 		disallowedMediaType: "无法上传此文件，别名为 '%0%' 的媒体类型不允许在此处使用",
 		invalidFileName: '无法上传此文件，文件名无效',
 		invalidFileSize: '无法上传此文件，文件过大',
@@ -431,7 +435,8 @@ export default {
 		fileSecurityValidationFailure: '一个或多个文件安全验证未通过',
 		moveToSameFolderFailed: '父文件夹和目标文件夹不能相同',
 		uploadNotAllowed: '此位置不允许上传。',
-		uploadValidationFailed: (mediaTypeName: string) => `${mediaTypeName} 媒体类型存在必填属性。需要通过"创建"菜单单独上传`,
+		uploadValidationFailed: (mediaTypeName: string) =>
+			`${mediaTypeName} 媒体类型存在必填属性。需要通过"创建"菜单单独上传`,
 	},
 	member: {
 		createNewMember: '创建新会员',
@@ -447,7 +452,8 @@ export default {
 		memberKindExternalOnly: '外部',
 		profileData: '个人资料数据',
 		externalMemberTitle: '外部会员',
-		externalMemberDescription: '此会员由外部身份验证提供程序管理。邮箱、用户名等标识数据由该提供程序维护，而非 Umbraco。',
+		externalMemberDescription:
+			'此会员由外部身份验证提供程序管理。邮箱、用户名等标识数据由该提供程序维护，而非 Umbraco。',
 		memberLockoutNotEnabled: '此会员未启用锁定',
 		memberNotInGroup: "该会员不在 '%0%' 组中",
 	},
@@ -471,21 +477,26 @@ export default {
 		chooseNode: '您想在哪里创建 %0%',
 		createUnder: '创建在',
 		updateData: '选择类型和标题',
-		noDocumentTypes: '此处没有允许用于创建内容的文档类型。你需要在 <strong>设置</strong> 分区的 <strong>文档类型</strong> 中，于 <strong>结构</strong> 下编辑 <strong>允许的子节点类型</strong> 来启用。',
-		noMediaTypes: '此处没有允许用于创建媒体的媒体类型。你需要在 <strong>设置</strong> 分区的 <strong>媒体类型</strong> 中，于 <strong>结构</strong> 下编辑 <strong>允许的子节点类型</strong> 来启用。',
+		noDocumentTypes:
+			'此处没有允许用于创建内容的文档类型。你需要在 <strong>设置</strong> 分区的 <strong>文档类型</strong> 中，于 <strong>结构</strong> 下编辑 <strong>允许的子节点类型</strong> 来启用。',
+		noMediaTypes:
+			'此处没有允许用于创建媒体的媒体类型。你需要在 <strong>设置</strong> 分区的 <strong>媒体类型</strong> 中，于 <strong>结构</strong> 下编辑 <strong>允许的子节点类型</strong> 来启用。',
 		documentTypeWithoutTemplate: '没有模板的文档类型',
 		newFolder: '新建文件夹',
 		newDataType: '新数据类型',
 		createContentBlueprint: '选择要为其创建文档蓝图的文档类型',
 		enterFolderName: '输入文件夹名称',
-		noDocumentTypesAtRoot: '此处没有可用于创建内容的文档类型。你需要在 <strong>设置</strong> 分区的 <strong>文档类型</strong> 中创建。',
+		noDocumentTypesAtRoot:
+			'此处没有可用于创建内容的文档类型。你需要在 <strong>设置</strong> 分区的 <strong>文档类型</strong> 中创建。',
 		noDocumentTypesWithNoSettingsAccess: '内容树中所选的文档不允许在其下创建任何文档。',
 		noDocumentTypesEditPermissions: '编辑此文档类型的权限',
 		noDocumentTypesCreateNew: '创建新的文档类型',
-		noDocumentTypesAllowedAtRoot: '此处没有允许用于创建内容的文档类型。你需要在 <strong>设置</strong> 分区的 <strong>文档类型</strong> 中，于 <strong>结构</strong> 下开启 <strong>允许作为根节点</strong> 选项。',
+		noDocumentTypesAllowedAtRoot:
+			'此处没有允许用于创建内容的文档类型。你需要在 <strong>设置</strong> 分区的 <strong>文档类型</strong> 中，于 <strong>结构</strong> 下开启 <strong>允许作为根节点</strong> 选项。',
 		noMediaTypesWithNoSettingsAccess: '树中所选的媒体不允许在其下创建任何媒体。',
 		noMediaTypesEditPermissions: '编辑此媒体类型的权限',
-		noElementTypes: '此处没有允许用于创建元素的元素类型。你需要在 <strong>设置</strong> 分区的 <strong>文档类型</strong> 中，于 <strong>结构</strong> 下编辑 <strong>允许在库中使用</strong> 选项。',
+		noElementTypes:
+			'此处没有允许用于创建元素的元素类型。你需要在 <strong>设置</strong> 分区的 <strong>文档类型</strong> 中，于 <strong>结构</strong> 下编辑 <strong>允许在库中使用</strong> 选项。',
 		documentTypeWithTemplate: '带模板的文档类型',
 		documentTypeWithTemplateDescription: '一种内容页面的数据定义，编辑者可在内容树中创建，并可直接通过 URL 访问。',
 		documentType: '文档类型',
@@ -579,7 +590,8 @@ export default {
 		recycleBinDeleting: '正在清空回收站，请不要关闭窗口。',
 		recycleBinIsEmpty: '回收站已清空',
 		recycleBinWarning: '从回收站删除的项目将不可恢复',
-		regexSearchError: "<a target='_blank' rel='noopener' href='http://regexlib.com'>regexlib.com</a> 的服务暂时出现问题，我们无法控制，非常抱歉给你带来不便。",
+		regexSearchError:
+			"<a target='_blank' rel='noopener' href='http://regexlib.com'>regexlib.com</a> 的服务暂时出现问题，我们无法控制，非常抱歉给你带来不便。",
 		regexSearchHelp: "搜索正则表达式以向表单字段添加验证。示例：'email'、'zip-code'、'URL'。",
 		removeMacro: '移除宏',
 		requiredField: '必填项',
@@ -627,7 +639,8 @@ export default {
 		confirmremoveusageof: '确定要移除对 <strong>%0%</strong> 的使用吗？',
 		cannotTrashWhenReferenced: (name: string) => `<strong>${name}</strong> 正被其他项引用，无法移入回收站。`,
 		confirmTrash: (name: string) => `确定要将 <strong>${name}</strong> 移入回收站吗？`,
-		cannotBulkTrashWhenReferenced: (total: number) => `所选 <strong>${total} 项</strong>中至少有一项正被其他内容引用，无法移入回收站。`,
+		cannotBulkTrashWhenReferenced: (total: number) =>
+			`所选 <strong>${total} 项</strong>中至少有一项正被其他内容引用，无法移入回收站。`,
 		confirmBulkTrash: (total: number) => `确定要将 <strong>${total} 项</strong>移入回收站吗？`,
 		confirmBulkDelete: (total: number) => `确定要删除 <strong>${total} 项</strong>吗？`,
 		editSelectedMedia: '编辑所选媒体',
@@ -700,7 +713,8 @@ export default {
 		manageIndexes: '管理 Examine 索引',
 		manageIndexesDescription: '允许你查看每个索引的详细信息，并提供一些管理索引的工具',
 		rebuildIndex: '重建索引',
-		rebuildIndexWarning: '此操作将重建索引。<br />视站点内容量而定，这可能需要一段时间。<br />不建议在高访问量时段或编辑者正在编辑内容时重建索引。',
+		rebuildIndexWarning:
+			'此操作将重建索引。<br />视站点内容量而定，这可能需要一段时间。<br />不建议在高访问量时段或编辑者正在编辑内容时重建索引。',
 		searchers: '搜索器',
 		searchDescription: '搜索索引并查看结果',
 		tools: '工具',
@@ -766,7 +780,8 @@ export default {
 		rteRelatedStylesheets: '关联的样式表',
 		rteShowLabel: '显示标签',
 		rteWidthAndHeight: '宽和高',
-		canChangePropertyEditorHelp: '已存储值的数据类型禁止更改属性编辑器。如需允许，可在 appsettings.json 中修改 Umbraco:CMS:DataTypes:CanBeChanged 设置。',
+		canChangePropertyEditorHelp:
+			'已存储值的数据类型禁止更改属性编辑器。如需允许，可在 appsettings.json 中修改 Umbraco:CMS:DataTypes:CanBeChanged 设置。',
 		selectFolder: '选择要移动的文件夹',
 		inTheTree: '到下方树结构中的位置',
 		wasMoved: '已移动到',
@@ -1093,8 +1108,10 @@ export default {
 		databaseHeader: '数据库配置',
 		databaseInstall: '点击<strong>安装</strong>按钮安装 Umbraco %0% 数据库',
 		databaseInstallDone: '%0%数据库安装完成。点击<strong>下一步</strong>继续。',
-		databaseText: '完成此步骤需要了解数据库服务器的相关信息（"连接字符串"）。<br />如有必要请联系你的 ISP。如果安装在本机或本地服务器上，可能需要向系统管理员获取相关信息。',
-		databaseUpgrade: '<p>点击<strong>升级</strong>按钮将数据库升级到 Umbraco %0%</p> <p>不用担心——不会删除任何内容，之后一切照常运行！</p>',
+		databaseText:
+			'完成此步骤需要了解数据库服务器的相关信息（"连接字符串"）。<br />如有必要请联系你的 ISP。如果安装在本机或本地服务器上，可能需要向系统管理员获取相关信息。',
+		databaseUpgrade:
+			'<p>点击<strong>升级</strong>按钮将数据库升级到 Umbraco %0%</p> <p>不用担心——不会删除任何内容，之后一切照常运行！</p>',
 		databaseUpgradeDone: '数据库已更新到版本 %0%。<br />点击<strong>下一步</strong>继续。',
 		databaseUpToDate: '你的数据库已是最新！点击<strong>下一步</strong>继续配置向导',
 		defaultUserChangePass: '<strong>需要修改默认用户密码！</strong>',
@@ -1106,25 +1123,31 @@ export default {
 		permissionsAffectedFolders: '受影响的文件和文件夹',
 		permissionsAffectedFoldersMoreInfo: '此处查看更多信息',
 		permissionsAffectedFoldersText: '你需要授予 ASP.NET 对以下文件/文件夹的修改权限',
-		permissionsAlmostPerfect: '<strong>你的权限设置接近完美！</strong><br /><br />Umbraco 可以正常运行，但无法安装推荐扩展包来充分发挥 Umbraco 的功能。',
+		permissionsAlmostPerfect:
+			'<strong>你的权限设置接近完美！</strong><br /><br />Umbraco 可以正常运行，但无法安装推荐扩展包来充分发挥 Umbraco 的功能。',
 		permissionsHowtoResolve: '如何解决',
 		permissionsHowtoResolveLink: '点击阅读文字版',
 		permissionsHowtoResolveText: '观看我们关于设置 Umbraco 文件夹权限的<strong>视频教程</strong>，或阅读文字版说明。',
-		permissionsMaybeAnIssue: '<strong>你的权限设置可能有问题！</strong><br/><br />Umbraco 可以正常运行，但无法新建文件夹，也无法安装推荐扩展包来充分发挥 Umbraco 的功能。',
+		permissionsMaybeAnIssue:
+			'<strong>你的权限设置可能有问题！</strong><br/><br />Umbraco 可以正常运行，但无法新建文件夹，也无法安装推荐扩展包来充分发挥 Umbraco 的功能。',
 		permissionsNotReady: '<strong>你的权限设置尚未就绪！</strong><br /><br />要运行 Umbraco，你需要更新权限设置。',
 		permissionsPerfect: '<strong>你的权限设置完全正确！</strong><br /><br />Umbraco 已就绪，可以正常运行并安装扩展包！',
 		permissionsResolveFolderIssues: '解决文件夹问题',
 		permissionsResolveFolderIssuesLink: '点此查看ASP.NET和创建文件夹的问题解决方案',
 		permissionsSettingUpPermissions: '设置文件夹权限',
-		permissionsText: 'Umbraco 需要对某些目录的写入/修改权限，以存储图片、PDF 等文件。它还会存储临时数据（即缓存）以提升网站性能。',
+		permissionsText:
+			'Umbraco 需要对某些目录的写入/修改权限，以存储图片、PDF 等文件。它还会存储临时数据（即缓存）以提升网站性能。',
 		runwayFromScratch: '我要从头开始',
-		runwayFromScratchText: '你的网站目前完全为空——如果你想从零开始创建自己的文档类型和模板，这正合适。（<a href="https://umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">了解方法</a>）你仍可稍后安装 Runway：请前往 Developer 分区并选择 Packages。',
+		runwayFromScratchText:
+			'你的网站目前完全为空——如果你想从零开始创建自己的文档类型和模板，这正合适。（<a href="https://umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">了解方法</a>）你仍可稍后安装 Runway：请前往 Developer 分区并选择 Packages。',
 		runwayHeader: '你刚刚搭建了一个干净的 Umbraco 平台。接下来想做什么？',
 		runwayInstalled: '“Runway”已安装',
-		runwayInstalledText: '基础已经就绪。选择你想在其上安装的模块。<br />以下是我们推荐的模块，勾选你想安装的项，或查看 <a href="#" onclick="toggleModules(); return false;" id="toggleModuleList">完整模块列表</a> ',
+		runwayInstalledText:
+			'基础已经就绪。选择你想在其上安装的模块。<br />以下是我们推荐的模块，勾选你想安装的项，或查看 <a href="#" onclick="toggleModules(); return false;" id="toggleModuleList">完整模块列表</a> ',
 		runwayOnlyProUsers: '仅推荐高级用户使用',
 		runwaySimpleSite: '给我一个简单的网站',
-		runwaySimpleSiteText: '<p>"Runway" 是一个提供基础文档类型和模板的简单网站。安装程序可以自动为你设置 Runway，你也可以轻松地编辑、扩展或移除它。它并非必需，没有它 Umbraco 也完全可以正常使用。不过，Runway 基于最佳实践提供了轻松的基础，让你比以往更快上手。如果选择安装 Runway，还可以选择名为 Runway 模块的基础构建块来增强你的 Runway 页面。</p> <small><em>Runway 包含：</em>首页、入门页、模块安装页。<br /> <em>可选模块：</em>顶部导航、站点地图、联系方式、图库。</small>',
+		runwaySimpleSiteText:
+			'<p>"Runway" 是一个提供基础文档类型和模板的简单网站。安装程序可以自动为你设置 Runway，你也可以轻松地编辑、扩展或移除它。它并非必需，没有它 Umbraco 也完全可以正常使用。不过，Runway 基于最佳实践提供了轻松的基础，让你比以往更快上手。如果选择安装 Runway，还可以选择名为 Runway 模块的基础构建块来增强你的 Runway 页面。</p> <small><em>Runway 包含：</em>首页、入门页、模块安装页。<br /> <em>可选模块：</em>顶部导航、站点地图、联系方式、图库。</small>',
 		runwayWhatIsRunway: '"Runway" 是什么？',
 		step1: '步骤 1/5：接受许可协议',
 		step2: '步骤 2/5：数据库配置',
@@ -1133,18 +1156,24 @@ export default {
 		step5: '步骤 5/5：一切就绪，可以开始使用系统。',
 		thankYou: '感谢选择我们的产品',
 		theEndBrowseSite: '<h3>浏览你的新站点</h3> 你刚刚安装了 Runway，不妨看看新网站的样子。',
-		theEndFurtherHelp: '<h3>更多帮助与信息</h3> 从我们屡获殊荣的社区获取帮助，浏览文档，或观看一些免费视频：如何搭建简单网站、如何使用扩展包，以及 Umbraco 术语快速指南',
+		theEndFurtherHelp:
+			'<h3>更多帮助与信息</h3> 从我们屡获殊荣的社区获取帮助，浏览文档，或观看一些免费视频：如何搭建简单网站、如何使用扩展包，以及 Umbraco 术语快速指南',
 		theEndHeader: '系统 %0% 安装完毕',
-		theEndInstallSuccess: '点击下方的"Launch Umbraco"按钮即可<strong>立即开始</strong>。<br />如果你是 <strong>Umbraco 新手</strong>，我们的入门页面有大量资源供你参考。',
-		theEndOpenUmbraco: '<h3>启动 Umbraco</h3> 要管理你的网站，只需打开 Umbraco 后台，开始添加内容、更新模板和样式表，或添加新功能',
+		theEndInstallSuccess:
+			'点击下方的"Launch Umbraco"按钮即可<strong>立即开始</strong>。<br />如果你是 <strong>Umbraco 新手</strong>，我们的入门页面有大量资源供你参考。',
+		theEndOpenUmbraco:
+			'<h3>启动 Umbraco</h3> 要管理你的网站，只需打开 Umbraco 后台，开始添加内容、更新模板和样式表，或添加新功能',
 		Unavailable: '无法连接到数据库。',
 		Version3: '系统版本 3',
 		Version4: '系统版本 4',
 		watch: '观看',
-		welcomeIntro: '本向导将引导你完成 <strong>Umbraco %0%</strong> 的全新安装或从 3.0 版本升级的配置过程。<br /><br />按 <strong>"下一步"</strong> 启动向导。',
+		welcomeIntro:
+			'本向导将引导你完成 <strong>Umbraco %0%</strong> 的全新安装或从 3.0 版本升级的配置过程。<br /><br />按 <strong>"下一步"</strong> 启动向导。',
 		databaseErrorWebConfig: '无法保存 web.config 文件。请手动修改连接字符串。',
-		licenseText: '点击下一步按钮（或在 web.config 中修改 umbracoConfigurationStatus）即表示您接受下方文本框中所述的本软件许可。请注意，此 Umbraco 发行版包含两种不同的许可：框架采用开源 MIT 许可，UI 采用 Umbraco 免费软件许可。',
-		theEndInstallFailed: "要完成安装，您需要手动编辑 <strong>/web.config 文件</strong>，并将底部的 AppSetting 键 <strong>UmbracoConfigurationStatus</strong> 更新为 <strong>'%0%'</strong>。",
+		licenseText:
+			'点击下一步按钮（或在 web.config 中修改 umbracoConfigurationStatus）即表示您接受下方文本框中所述的本软件许可。请注意，此 Umbraco 发行版包含两种不同的许可：框架采用开源 MIT 许可，UI 采用 Umbraco 免费软件许可。',
+		theEndInstallFailed:
+			"要完成安装，您需要手动编辑 <strong>/web.config 文件</strong>，并将底部的 AppSetting 键 <strong>UmbracoConfigurationStatus</strong> 更新为 <strong>'%0%'</strong>。",
 	},
 	language: {
 		cultureCode: '语言代码',
@@ -1243,7 +1272,8 @@ export default {
 		notifications: '通知',
 	},
 	packager: {
-		chooseLocalPackageText: '从本机选择扩展包：点击"浏览"<br />按钮并找到扩展包文件。Umbraco 扩展包通常以 ".umb" 或 ".zip" 为扩展名。',
+		chooseLocalPackageText:
+			'从本机选择扩展包：点击"浏览"<br />按钮并找到扩展包文件。Umbraco 扩展包通常以 ".umb" 或 ".zip" 为扩展名。',
 		packageAuthor: '作者',
 		packageDocumentation: '文档',
 		packageMetaData: '元数据',
@@ -1292,7 +1322,8 @@ export default {
 		packageDownloads: '下载量',
 		packageLikes: '点赞数',
 		packageCompatibility: '兼容性',
-		packageCompatibilityDescription: '此扩展包与以下 Umbraco 版本兼容（由社区成员报告）。报告低于 100% 的版本无法保证完全兼容',
+		packageCompatibilityDescription:
+			'此扩展包与以下 Umbraco 版本兼容（由社区成员报告）。报告低于 100% 的版本无法保证完全兼容',
 		packageExternalSources: '外部来源',
 		packageMigrationsRun: '运行待处理的扩展包迁移',
 		packageMigrationsConfirmText: '是否运行待处理的扩展包迁移？',
@@ -1378,8 +1409,7 @@ export default {
 		defineRootNode: '选择根节点',
 		defineXPathOrigin: '通过 XPath 指定',
 		defineDynamicRoot: '指定动态根节点',
-		unsupportedHeadline: (type: string) =>
-			`<strong>不支持${type ?? '内容'}项</strong><br>编辑器不再支持以下内容。`,
+		unsupportedHeadline: (type: string) => `<strong>不支持${type ?? '内容'}项</strong><br>编辑器不再支持以下内容。`,
 		unsupportedMessage: '如仍需保留此内容，请联系管理员，否则可将其移除。',
 		unsupportedRemove: '移除不受支持的项？',
 	},
@@ -1719,9 +1749,11 @@ export default {
 		renderBody: '渲染子模板',
 		renderBodyDesc: '通过插入 <code>@RenderBody()</code> 占位符来渲染子模板的内容。',
 		defineSection: '定义命名节',
-		defineSectionDesc: '通过将模板的一部分包裹在 <code>@section { ... }</code> 中，将其定义为命名节。随后可在父模板的特定区域中使用 <code>@RenderSection</code> 渲染该节。',
+		defineSectionDesc:
+			'通过将模板的一部分包裹在 <code>@section { ... }</code> 中，将其定义为命名节。随后可在父模板的特定区域中使用 <code>@RenderSection</code> 渲染该节。',
 		renderSection: '渲染命名节',
-		renderSectionDesc: '通过插入 <code>@RenderSection(name)</code> 占位符来渲染子模板中的命名区域。该区域是子模板中由对应的 <code>@section [name]{ ... }</code> 定义包裹的部分。',
+		renderSectionDesc:
+			'通过插入 <code>@RenderSection(name)</code> 占位符来渲染子模板中的命名区域。该区域是子模板中由对应的 <code>@section [name]{ ... }</code> 定义包裹的部分。',
 		sectionName: '节名称',
 		sectionMandatory: '节为必选',
 		sectionMandatoryDesc: '若设为必选，子模板必须包含 <code>@section</code> 定义，否则将显示错误。',
@@ -1799,7 +1831,8 @@ export default {
 		maxItems: '最大项数',
 		maxItemsDescription: '留空或设为 0 表示不限制',
 		warning: '警告',
-		warningText: '<p>修改行配置名称将导致基于此配置的现有内容丢失数据。</p> <p><strong>仅修改标签不会导致数据丢失。</strong></p>',
+		warningText:
+			'<p>修改行配置名称将导致基于此配置的现有内容丢失数据。</p> <p><strong>仅修改标签不会导致数据丢失。</strong></p>',
 		deleteLayout: '您正在删除此布局',
 		deletingARow: '删除行配置名称将导致基于此配置的现有内容丢失数据。',
 		deletingALayout: '修改布局将导致基于此配置的现有内容丢失数据。',
@@ -1821,8 +1854,10 @@ export default {
 		childNodesDescription: '允许在该类型的内容下方创建指定类型的内容',
 		chooseChildNode: '选择子节点',
 		compositionsDescription: '从现有文档类型继承选项卡和属性。新选项卡将添加到当前文档类型或与同名选项卡合并。',
-		compositionsDescriptionMediaType: '从现有媒体类型继承选项卡和属性。新选项卡将添加到当前媒体类型或与同名选项卡合并。',
-		compositionsDescriptionMemberType: '从现有会员类型继承选项卡和属性。新选项卡将添加到当前会员类型或与同名选项卡合并。',
+		compositionsDescriptionMediaType:
+			'从现有媒体类型继承选项卡和属性。新选项卡将添加到当前媒体类型或与同名选项卡合并。',
+		compositionsDescriptionMemberType:
+			'从现有会员类型继承选项卡和属性。新选项卡将添加到当前会员类型或与同名选项卡合并。',
 		compositionInUse: '此文档类型已在组合中使用，因此其自身不能再使用组合。',
 		compositionInUseMediaType: '此媒体类型已在组合中使用，因此其自身不能再使用组合。',
 		compositionInUseMemberType: '此会员类型已在组合中使用，因此其自身不能再使用组合。',
@@ -1915,11 +1950,13 @@ export default {
 		historyCleanupKeepLatestVersionPerDayForDays: '每天最新版本的保留天数',
 		historyCleanupPreventCleanup: '阻止清理',
 		historyCleanupEnableCleanup: '启用清理',
-		historyCleanupGloballyDisabled: '<strong>注意！</strong>历史内容版本的清理已在全局禁用。在启用之前，这些设置不会生效。',
+		historyCleanupGloballyDisabled:
+			'<strong>注意！</strong>历史内容版本的清理已在全局禁用。在启用之前，这些设置不会生效。',
 		searchResultSettings: '可用配置',
 		searchResultEditors: '创建新配置',
 		suggestedEditors: '建议',
-		changeDataTypeHelpText: '已存储值的数据类型禁止更改。如需允许，可在 appsettings.json 中修改 Umbraco:CMS:DataTypes:CanBeChanged 设置。',
+		changeDataTypeHelpText:
+			'已存储值的数据类型禁止更改。如需允许，可在 appsettings.json 中修改 Umbraco:CMS:DataTypes:CanBeChanged 设置。',
 	},
 	webhooks: {
 		addWebhook: '创建 Webhook',
@@ -2147,9 +2184,7 @@ export default {
 		loginnameDescription: '用户名用于登录',
 		emailRequired: '必填：请为该用户填写邮箱地址',
 		emailDescription: (usernameIsEmail: boolean) =>
-			usernameIsEmail
-				? '邮箱用于接收通知、找回密码，并作为登录用户名'
-				: '邮箱用于接收通知和找回密码',
+			usernameIsEmail ? '邮箱用于接收通知、找回密码，并作为登录用户名' : '邮箱用于接收通知和找回密码',
 		access: '访问权限',
 		accessHelp: '基于所属用户组和起始节点，该用户可访问以下节点',
 		assignAccess: '分配访问权限',
@@ -2187,13 +2222,15 @@ export default {
 		invite: '邀请',
 		inviteUser: '邀请用户',
 		sendInvite: '发送邀请',
-		inviteUserHelp: '邀请新用户以授予其 Umbraco 访问权限。系统将向该用户发送邀请邮件，其中包含如何登录 Umbraco 的信息。邀请有效期为 72 小时。',
+		inviteUserHelp:
+			'邀请新用户以授予其 Umbraco 访问权限。系统将向该用户发送邀请邮件，其中包含如何登录 Umbraco 的信息。邀请有效期为 72 小时。',
 		userCreated: '创建成功',
 		userCreatedSuccessHelp: '新用户已成功创建。请使用下方密码登录 Umbraco。',
 		userCreatedApiSuccessHelp: '可通过该用户的个人资料设置其客户端凭据。',
 		userInvited: '邀请已发送',
 		userInvitedSuccessHelp: '邀请已发送给新用户，其中包含如何登录 Umbraco 的详细信息。',
-		userinviteWelcomeMessage: '您好，欢迎来到 Umbraco！只需 1 分钟即可完成准备：我们只需要您设置密码并添加一张头像图片。',
+		userinviteWelcomeMessage:
+			'您好，欢迎来到 Umbraco！只需 1 分钟即可完成准备：我们只需要您设置密码并添加一张头像图片。',
 		userinviteExpiredMessage: '欢迎来到 Umbraco！很遗憾，您的邀请已过期。请联系管理员重新发送。',
 		userinviteAvatarMessage: '上传自己的照片可以让其他用户更容易认出您。点击上方圆形区域上传照片。',
 		defaultInvitationMessage: '正在重新发送邀请…',
@@ -2374,15 +2411,18 @@ export default {
 		checkErrorMessageDifferentExpectedValue: "配置文件 '%3%' 中 '%2%' 的预期值为 '%1%'，但实际值为 '%0%'。",
 		checkErrorMessageUnexpectedValue: "配置文件 '%3%' 中 '%2%' 出现意外值 '%0%'。",
 		macroErrorModeCheckSuccessMessage: "MacroErrors 已设置为 '%0%'。",
-		macroErrorModeCheckErrorMessage: "MacroErrors 已设置为 '%0%'，若宏中出现任何错误，将导致站点中的部分或全部页面无法完整加载。纠正此设置后会将其值设为 '%1%'。",
+		macroErrorModeCheckErrorMessage:
+			"MacroErrors 已设置为 '%0%'，若宏中出现任何错误，将导致站点中的部分或全部页面无法完整加载。纠正此设置后会将其值设为 '%1%'。",
 		httpsCheckValidCertificate: '你的站点证书已被标记为有效。',
 		httpsCheckInvalidCertificate: "证书验证错误：'%0%'",
 		healthCheckInvalidUrl: "ping URL %0% 时出错：'%1%'",
 		httpsCheckIsCurrentSchemeHttps: '你当前%0%使用 HTTPS 方案浏览站点。',
 		compilationDebugCheckSuccessMessage: '调试编译模式已禁用。',
 		compilationDebugCheckErrorMessage: '调试编译模式当前已启用。建议在上线前禁用此设置。',
-		clickJackingCheckHeaderFound: '已找到用于控制站点能否被其他站点以 iframe 嵌入的响应头或 meta 标签 <strong>X-Frame-Options</strong>。',
-		clickJackingCheckHeaderNotFound: '未找到用于控制站点能否被其他站点以 iframe 嵌入的响应头或 meta 标签 <strong>X-Frame-Options</strong>。',
+		clickJackingCheckHeaderFound:
+			'已找到用于控制站点能否被其他站点以 iframe 嵌入的响应头或 meta 标签 <strong>X-Frame-Options</strong>。',
+		clickJackingCheckHeaderNotFound:
+			'未找到用于控制站点能否被其他站点以 iframe 嵌入的响应头或 meta 标签 <strong>X-Frame-Options</strong>。',
 		excessiveHeadersFound: '发现以下泄露网站技术信息的响应头：<strong>%0%</strong>。',
 		excessiveHeadersNotFound: '未发现泄露网站技术信息的响应头。',
 		smtpMailSettingsConnectionSuccess: 'SMTP 设置配置正确，服务运行正常。',
@@ -2390,23 +2430,33 @@ export default {
 		notificationEmailsCheckErrorMessage: '通知邮箱仍设置为默认值 <strong>%0%</strong>。',
 		httpsCheckExpiredCertificate: '您网站的 SSL 证书已过期。',
 		httpsCheckExpiringCertificate: '您网站的 SSL 证书将在 %0% 天后过期。',
-		httpsCheckConfigurationRectifyNotPossible: "appSettings.json 文件中的应用设置 'Umbraco:CMS:Global:UseHttps' 当前为 'false'。当你通过 HTTPS 访问此站点后，应将其设置为 'true'。",
-		httpsCheckConfigurationCheckResult: "appSettings.json 文件中的应用设置 'Umbraco:CMS:Global:UseHttps' 为 '%0%'，你的 Cookie %1%被标记为安全。",
-		umbracoApplicationUrlCheckResultTrue: "应用设置 'Umbraco:CMS:WebRouting:UmbracoApplicationUrl' 已设置为 <strong>%0%</strong>。",
+		httpsCheckConfigurationRectifyNotPossible:
+			"appSettings.json 文件中的应用设置 'Umbraco:CMS:Global:UseHttps' 当前为 'false'。当你通过 HTTPS 访问此站点后，应将其设置为 'true'。",
+		httpsCheckConfigurationCheckResult:
+			"appSettings.json 文件中的应用设置 'Umbraco:CMS:Global:UseHttps' 为 '%0%'，你的 Cookie %1%被标记为安全。",
+		umbracoApplicationUrlCheckResultTrue:
+			"应用设置 'Umbraco:CMS:WebRouting:UmbracoApplicationUrl' 已设置为 <strong>%0%</strong>。",
 		umbracoApplicationUrlCheckResultFalse: "未设置应用设置 'Umbraco:CMS:WebRouting:UmbracoApplicationUrl'。",
-		noSniffCheckHeaderFound: '已找到用于防范 MIME 嗅探漏洞的响应头或 meta 标签 <strong>X-Content-Type-Options</strong>。',
-		noSniffCheckHeaderNotFound: '未找到用于防范 MIME 嗅探漏洞的响应头或 meta 标签 <strong>X-Content-Type-Options</strong>。',
+		noSniffCheckHeaderFound:
+			'已找到用于防范 MIME 嗅探漏洞的响应头或 meta 标签 <strong>X-Content-Type-Options</strong>。',
+		noSniffCheckHeaderNotFound:
+			'未找到用于防范 MIME 嗅探漏洞的响应头或 meta 标签 <strong>X-Content-Type-Options</strong>。',
 		hSTSCheckHeaderFound: '已找到响应头 <strong>Strict-Transport-Security</strong>（即 HSTS 响应头）。',
 		hSTSCheckHeaderNotFound: '未找到响应头 <strong>Strict-Transport-Security</strong>。',
-		hSTSCheckHeaderFoundOnLocalhost: '已找到响应头 <strong>Strict-Transport-Security</strong>（即 HSTS 响应头）。<strong>localhost 上不应存在此响应头。</strong>',
-		hSTSCheckHeaderNotFoundOnLocalhost: '未找到响应头 <strong>Strict-Transport-Security</strong>。localhost 上不应存在此响应头。',
-		xssProtectionCheckHeaderFound: '已找到响应头 <strong>X-XSS-Protection</strong>。<strong>建议不要在你的网站上添加此响应头</strong>。<br />详情可阅读 <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-XSS-Protection" target="_blank" rel="noopener" class="btn-link -underline">Mozilla</a> 网站 ',
+		hSTSCheckHeaderFoundOnLocalhost:
+			'已找到响应头 <strong>Strict-Transport-Security</strong>（即 HSTS 响应头）。<strong>localhost 上不应存在此响应头。</strong>',
+		hSTSCheckHeaderNotFoundOnLocalhost:
+			'未找到响应头 <strong>Strict-Transport-Security</strong>。localhost 上不应存在此响应头。',
+		xssProtectionCheckHeaderFound:
+			'已找到响应头 <strong>X-XSS-Protection</strong>。<strong>建议不要在你的网站上添加此响应头</strong>。<br />详情可阅读 <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-XSS-Protection" target="_blank" rel="noopener" class="btn-link -underline">Mozilla</a> 网站 ',
 		xssProtectionCheckHeaderNotFound: '未找到响应头 <strong>X-XSS-Protection</strong>。',
 		smtpMailSettingsNotFound: "找不到 'Umbraco:CMS:Global:Smtp' 配置。",
 		smtpMailSettingsHostNotConfigured: "找不到 'Umbraco:CMS:Global:Smtp:Host' 配置。",
-		smtpMailSettingsConnectionFail: "无法连接到主机 '%0%'、端口 '%1%' 的 SMTP 服务器。请检查配置 'Umbraco:CMS:Global:Smtp' 中的 SMTP 设置是否正确。",
+		smtpMailSettingsConnectionFail:
+			"无法连接到主机 '%0%'、端口 '%1%' 的 SMTP 服务器。请检查配置 'Umbraco:CMS:Global:Smtp' 中的 SMTP 设置是否正确。",
 		checkGroup: '检查组',
-		helpText: '<p>健康检查器会评估站点在最佳实践设置、配置、潜在问题等方面的情况。只需按下按钮即可轻松修复问题。你还可以添加自己的健康检查，有关自定义健康检查的更多信息请查看<a href="https://docs.umbraco.com/umbraco-cms/extending/health-check" target="_blank" rel="noopener" class="btn-link -underline">文档</a>。</p>',
+		helpText:
+			'<p>健康检查器会评估站点在最佳实践设置、配置、潜在问题等方面的情况。只需按下按钮即可轻松修复问题。你还可以添加自己的健康检查，有关自定义健康检查的更多信息请查看<a href="https://docs.umbraco.com/umbraco-cms/extending/health-check" target="_blank" rel="noopener" class="btn-link -underline">文档</a>。</p>',
 	},
 	redirectUrls: {
 		disableUrlTracker: '禁用 URL 跟踪程序',
@@ -2642,7 +2692,8 @@ export default {
 	},
 	clipboard: {
 		confirmPasteHeadline: '从剪贴板粘贴',
-		confirmPasteOverwriteMessage: (name: string) => `该属性已包含值。粘贴操作将覆盖当前值。要用 <strong>${name}</strong> 替换当前值吗？`,
+		confirmPasteOverwriteMessage: (name: string) =>
+			`该属性已包含值。粘贴操作将覆盖当前值。要用 <strong>${name}</strong> 替换当前值吗？`,
 		noItemsMessage: '剪贴板中没有任何项目。',
 		labelForCopyAllEntries: '复制 %0%',
 		labelForArrayOfItemsFrom: '来自%1%的%0%',
@@ -2663,13 +2714,17 @@ export default {
 
 	profiling: {
 		performanceProfiling: '性能分析',
-		performanceProfilingDescription: '<p>Umbraco 当前运行在调试模式。这意味着你可以使用内置性能分析器来评估页面渲染的性能。</p><p>如果要针对特定页面渲染启用分析器，只需在请求页面时向查询字符串添加 <strong>umbDebug=true</strong>。</p><p>如果要让所有页面渲染默认启用分析器，可以使用下方开关。它会在你的浏览器中设置一个 Cookie，从而自动启用分析器。也就是说，默认启用分析器的只有<em>你的</em>浏览器，其他人不受影响。</p><p><strong>注意：</strong>仅当后台当前与前台网站位于同一 URL 时此功能才有效。</p>',
+		performanceProfilingDescription:
+			'<p>Umbraco 当前运行在调试模式。这意味着你可以使用内置性能分析器来评估页面渲染的性能。</p><p>如果要针对特定页面渲染启用分析器，只需在请求页面时向查询字符串添加 <strong>umbDebug=true</strong>。</p><p>如果要让所有页面渲染默认启用分析器，可以使用下方开关。它会在你的浏览器中设置一个 Cookie，从而自动启用分析器。也就是说，默认启用分析器的只有<em>你的</em>浏览器，其他人不受影响。</p><p><strong>注意：</strong>仅当后台当前与前台网站位于同一 URL 时此功能才有效。</p>',
 		activateByDefault: '默认启用分析器',
 		reminder: '温馨提示',
-		reminderDescription: '<p>切勿让生产站点运行在调试模式。在 appsettings.json、appsettings.{Environment}.json 或环境变量中将 <strong>Umbraco:CMS:Hosting:Debug</strong> 设置为 <strong>false</strong> 即可关闭调试模式。</p>',
-		profilerEnabledDescription: '<p>Umbraco 当前未运行在调试模式，因此无法使用内置分析器。生产站点正应如此。</p><p>在 appsettings.json、appsettings.{Environment}.json 或环境变量中将 <strong>Umbraco:CMS:Hosting:Debug</strong> 设置为 <strong>true</strong> 即可开启调试模式。</p>',
+		reminderDescription:
+			'<p>切勿让生产站点运行在调试模式。在 appsettings.json、appsettings.{Environment}.json 或环境变量中将 <strong>Umbraco:CMS:Hosting:Debug</strong> 设置为 <strong>false</strong> 即可关闭调试模式。</p>',
+		profilerEnabledDescription:
+			'<p>Umbraco 当前未运行在调试模式，因此无法使用内置分析器。生产站点正应如此。</p><p>在 appsettings.json、appsettings.{Environment}.json 或环境变量中将 <strong>Umbraco:CMS:Hosting:Debug</strong> 设置为 <strong>true</strong> 即可开启调试模式。</p>',
 		errorEnablingProfilerTitle: '启用分析器出错',
-		errorEnablingProfilerDescription: '无法启用分析器。请检查您访问后台所用的 URL 是否与前台网站相同，然后重试。如果问题仍然存在，请查看日志了解详情。',
+		errorEnablingProfilerDescription:
+			'无法启用分析器。请检查您访问后台所用的 URL 是否与前台网站相同，然后重试。如果问题仍然存在，请查看日志了解详情。',
 		errorDisablingProfilerTitle: '禁用分析器出错',
 		errorDisablingProfilerDescription: '无法禁用分析器。请重试；如果问题仍然存在，请查看日志了解详情。',
 	},
@@ -2698,19 +2753,23 @@ export default {
 
 	startupDashboard: {
 		fallbackHeadline: '欢迎来到 The Friendly CMS',
-		fallbackDescription: '感谢您选择 Umbraco——我们相信这可能是美好故事的开端。虽然起初可能觉得千头万绪，但我们已经做了大量工作，让学习曲线尽可能平滑快捷。',
+		fallbackDescription:
+			'感谢您选择 Umbraco——我们相信这可能是美好故事的开端。虽然起初可能觉得千头万绪，但我们已经做了大量工作，让学习曲线尽可能平滑快捷。',
 	},
 
 	welcomeDashboard: {
 		umbracoForumHeadline: 'Umbraco 社区论坛',
-		umbracoForumDescription: '论坛是 Umbraco 开发者社区的中心枢纽。开发者、集成商和贡献者在这里提问、分享知识，并协作解决与 Umbraco 相关的一切事务。',
+		umbracoForumDescription:
+			'论坛是 Umbraco 开发者社区的中心枢纽。开发者、集成商和贡献者在这里提问、分享知识，并协作解决与 Umbraco 相关的一切事务。',
 		umbracoForumButton: '访问 Umbraco 社区论坛',
 		umbracoCommunityHeadline: 'Umbraco 社区网站',
-		umbracoCommunityDescription: '有关 Umbraco 的一切都在这里聚集。无论您写作、教学、测试、反馈，还是想与他人交流，都有方式成为友好的 Umbraco 社区的一员。',
+		umbracoCommunityDescription:
+			'有关 Umbraco 的一切都在这里聚集。无论您写作、教学、测试、反馈，还是想与他人交流，都有方式成为友好的 Umbraco 社区的一员。',
 		documentationHeadline: '文档',
 		documentationDescription: '您的 Umbraco 全能指南。通过清晰的示例与讲解，学习入门方法、探索新功能、发现最佳实践。',
 		resourcesHeadline: '资源',
-		resourcesDescription: '探索 Umbraco 资源，学习、构建并提升技能。博客、教程、演示、文档和视频，助您充分利用 Umbraco。',
+		resourcesDescription:
+			'探索 Umbraco 资源，学习、构建并提升技能。博客、教程、演示、文档和视频，助您充分利用 Umbraco。',
 		trainingHeadline: '培训',
 		trainingDescription: '通过官方培训精通 Umbraco。在讲师指导的课程中获得实践经验，考取认证，助力您的技能与职业发展。',
 	},
@@ -2760,7 +2819,8 @@ export default {
 		addBlockType: '添加区块',
 		addBlockGroup: '添加组',
 		insertBlock: '插入区块',
-		createThisFor: (name: string, variantName: string) => (variantName ? `为 ${variantName} 创建 ${name}` : `创建 ${name}`),
+		createThisFor: (name: string, variantName: string) =>
+			variantName ? `为 ${variantName} 创建 ${name}` : `创建 ${name}`,
 		elementTypeDoesNotExist: '无法编辑：元素类型不存在。',
 		elementTypeDoesNotExistHeadline: '错误！',
 		elementTypeDoesNotExistDescription: '此区块的元素类型已不存在',
@@ -2772,7 +2832,8 @@ export default {
 		notExposedDescription: '此区块尚未为该变体创建',
 		areaValidationEntriesNotAllowed: '<strong>%0%</strong> 不允许在此区域使用。',
 		rootValidationEntriesNotAllowed: '<strong>%0%</strong> 不允许在此属性的根级使用。',
-		blockVariantConfigurationNotSupported: '此区块编辑器中的一个或多个区块类型，其元素类型配置了按语言变体或按分段变体。内容项本身未按语言或分段变体时，不支持此配置。',
+		blockVariantConfigurationNotSupported:
+			'此区块编辑器中的一个或多个区块类型，其元素类型配置了按语言变体或按分段变体。内容项本身未按语言或分段变体时，不支持此配置。',
 		block: '区块',
 		tabBlock: '区块',
 		tabBlockTypeSettings: '设置',
@@ -2796,7 +2857,8 @@ export default {
 		scaleHandlerButtonTitle: '拖动缩放',
 		areas: '区域',
 		areasConfigurations: '区域',
-		areasConfigurationsHelp: '要启用区块内嵌套，请定义一个或多个区域。区域遵循其自身网格列配置所定义的布局。每个区域的"列跨度"和"行跨度"可通过所选区域右下角的缩放控制框进行调整。',
+		areasConfigurationsHelp:
+			'要启用区块内嵌套，请定义一个或多个区域。区域遵循其自身网格列配置所定义的布局。每个区域的"列跨度"和"行跨度"可通过所选区域右下角的缩放控制框进行调整。',
 		areasLayoutColumns: '区域的网格列数',
 		areasLayoutColumnsHelp: '定义区域可用的列数。未定义时，将使用为整个布局定义的列数。',
 		areaIdentification: '标识',
@@ -2812,7 +2874,8 @@ export default {
 		deleteArea: '删除区域',
 		confirmDeleteBlockAreaMessage: '确定要删除此区域吗？',
 		confirmDeleteBlockAreaNotice: '当前在此区域中创建的所有区块都将被删除。',
-		areaAliasHelp: '使用 GetBlockGridHTML() 渲染区块网格时，别名将作为 data-area-alias 属性呈现在标记中。可利用该别名属性在 CSS 中定位区域元素。示例：.umb-block-grid__area[data-area-alias="MyAreaAlias"] { ... }',
+		areaAliasHelp:
+			'使用 GetBlockGridHTML() 渲染区块网格时，别名将作为 data-area-alias 属性呈现在标记中。可利用该别名属性在 CSS 中定位区域元素。示例：.umb-block-grid__area[data-area-alias="MyAreaAlias"] { ... }',
 		areaAliasIsNotUnique: '此区域别名必须与该区块其他区域的别名不同。',
 		areaCreateLabelTitle: '创建按钮标签',
 		areaCreateLabelHelp: '覆盖向此区域添加新区块时的按钮标签文本，示例：添加小部件',
@@ -2836,7 +2899,8 @@ export default {
 		rangeAllowed: '区块数量',
 		specifiedAllowance: '允许的区块类型',
 		getSampleHeadline: '安装示例配置',
-		getSampleDescription: '这将添加一些基本区块，帮助你快速上手区块网格编辑器。你将获得标题、富文本、图片区块以及一个双列布局。',
+		getSampleDescription:
+			'这将添加一些基本区块，帮助你快速上手区块网格编辑器。你将获得标题、富文本、图片区块以及一个双列布局。',
 		getSampleButton: '安装',
 	},
 
@@ -2844,9 +2908,11 @@ export default {
 		whatHeadline: '什么是文档蓝图？',
 		whatDescription: '文档蓝图是预定义的内容，创建新内容节点时可以选用。',
 		createHeadline: '如何创建文档蓝图？',
-		createDescription: '<p>创建文档蓝图有两种方式：</p><ul><li>右键点击内容节点并选择"创建文档蓝图"，即可创建新的文档蓝图。</li><li>在设置分区中右键点击"文档蓝图"树，并选择要为其创建文档蓝图的文档类型。</li></ul><p>命名之后，编辑者就可以将此文档蓝图作为新页面的基础来使用。</p>',
+		createDescription:
+			'<p>创建文档蓝图有两种方式：</p><ul><li>右键点击内容节点并选择"创建文档蓝图"，即可创建新的文档蓝图。</li><li>在设置分区中右键点击"文档蓝图"树，并选择要为其创建文档蓝图的文档类型。</li></ul><p>命名之后，编辑者就可以将此文档蓝图作为新页面的基础来使用。</p>',
 		manageHeadline: '如何管理文档蓝图？',
-		manageDescription: '你可以在设置分区的"文档蓝图"树中编辑和删除文档蓝图。展开文档蓝图所基于的文档类型，点击它即可编辑或删除。',
+		manageDescription:
+			'你可以在设置分区的"文档蓝图"树中编辑和删除文档蓝图。展开文档蓝图所基于的文档类型，点击它即可编辑或删除。',
 	},
 
 	preview: {
@@ -2881,10 +2947,12 @@ export default {
 	analytics: {
 		consentForAnalytics: '遥测数据许可',
 		analyticsLevelSavedSuccess: '遥测级别已保存！',
-		analyticsDescription: '为了改进 Umbraco 并基于尽可能相关的信息添加新功能，我们希望从您的安装中收集系统和使用信息。<br>聚合数据将定期共享，同时分享这些指标带来的经验。<br>希望您能帮助我们收集一些有价值的数据。<br><br>我们<strong>不会</strong>收集任何个人数据（如内容、代码、用户信息），并且所有数据都将完全匿名化。',
+		analyticsDescription:
+			'为了改进 Umbraco 并基于尽可能相关的信息添加新功能，我们希望从您的安装中收集系统和使用信息。<br>聚合数据将定期共享，同时分享这些指标带来的经验。<br>希望您能帮助我们收集一些有价值的数据。<br><br>我们<strong>不会</strong>收集任何个人数据（如内容、代码、用户信息），并且所有数据都将完全匿名化。',
 		minimalLevelDescription: '我们只会发送一个匿名化的站点 ID，让我们知道该站点的存在。',
 		basicLevelDescription: '我们会发送匿名化的站点 ID、Umbraco 版本以及已安装的扩展包',
-		detailedLevelDescription: '我们会发送：<ul><li>匿名化的站点 ID、Umbraco 版本以及已安装的扩展包。</li><li>数量统计：根节点、内容节点、媒体、文档类型、模板、语言、域名、用户组、用户、会员、后台外部登录提供程序，以及使用中的属性编辑器。</li><li>系统信息：Web 服务器、服务器操作系统、服务器框架、服务器操作系统语言和数据库提供程序。</li><li>配置设置：Models Builder 模式、是否存在自定义 Umbraco 路径、ASP 环境、是否启用 Delivery API、是否使用了访问保护，以及是否处于调试模式。</li></ul> <em>我们将来可能更改"详细"级别发送的内容。如有更改，将在上方列表中列出。<br>选择"详细"即表示您同意收集当前及未来的匿名化信息。</em>',
+		detailedLevelDescription:
+			'我们会发送：<ul><li>匿名化的站点 ID、Umbraco 版本以及已安装的扩展包。</li><li>数量统计：根节点、内容节点、媒体、文档类型、模板、语言、域名、用户组、用户、会员、后台外部登录提供程序，以及使用中的属性编辑器。</li><li>系统信息：Web 服务器、服务器操作系统、服务器框架、服务器操作系统语言和数据库提供程序。</li><li>配置设置：Models Builder 模式、是否存在自定义 Umbraco 路径、ASP 环境、是否启用 Delivery API、是否使用了访问保护，以及是否处于调试模式。</li></ul> <em>我们将来可能更改"详细"级别发送的内容。如有更改，将在上方列表中列出。<br>选择"详细"即表示您同意收集当前及未来的匿名化信息。</em>',
 	},
 
 	routing: {
@@ -2988,7 +3056,8 @@ export default {
 		detailsHide: '隐藏详情',
 		detailsShow: '显示详情',
 		missingUiTitle: '找不到所配置的属性编辑器 UI。',
-		missingUiDetailsDescription: '此属性编辑器 UI 缺失。请确保您的自定义 UI 已正确注册，且别名与配置匹配。<br/>实现细节请参阅<a href="https://docs.umbraco.com/umbraco-cms/customizing/property-editors/composition/property-editor-ui" target="_blank" rel="noopener">文档</a>。',
+		missingUiDetailsDescription:
+			'此属性编辑器 UI 缺失。请确保您的自定义 UI 已正确注册，且别名与配置匹配。<br/>实现细节请参阅<a href="https://docs.umbraco.com/umbraco-cms/customizing/property-editors/composition/property-editor-ui" target="_blank" rel="noopener">文档</a>。',
 		dataTypeMissingEditor: '未找到属性编辑器',
 		dataTypeMissingEditorMessage: '找不到此属性编辑器。',
 		dataTypeMissingEditorUi: '未找到属性编辑器 UI',
@@ -2997,7 +3066,8 @@ export default {
 
 	dateTimePicker: {
 		local: '本地',
-		differentTimeZoneLabel: (offset: string, localDate: string) => `所选时间（${offset}）相当于你本地时间的 ${localDate}。`,
+		differentTimeZoneLabel: (offset: string, localDate: string) =>
+			`所选时间（${offset}）相当于你本地时间的 ${localDate}。`,
 		config_format: '格式',
 		config_format_datetime: '日期和时间',
 		config_format_dateOnly: '仅日期',
@@ -3012,5 +3082,4 @@ export default {
 		emptyTimeZone: '请选择一个时区',
 		invalidTimeZone: '所选时区无效',
 	},
-
 } as UmbLocalizationDictionary;
