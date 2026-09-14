@@ -387,10 +387,10 @@ public class BackOfficeController : SecurityControllerBase
     /// Keeps the current back-office session alive by renewing the authentication ticket.
     /// </summary>
     /// <remarks>
-    /// The renewal itself is performed by the cookie middleware's OnValidatePrincipal, which forces
-    /// a ticket renewal when it sees a request to this endpoint (see ConfigureBackOfficeCookieOptions).
-    /// The cookie is re-issued with a fresh expiry regardless of the KeepUserLoggedIn setting, so an
-    /// actively-working user can dismiss the session-timeout warning without being logged out. The
+    /// The renewal itself is performed by the cookie middleware's OnValidatePrincipal (see
+    /// ConfigureBackOfficeCookieOptions), which renews the ticket for any authenticated request - this
+    /// endpoint is simply an authenticated no-op that lets an idle client trigger that renewal explicitly,
+    /// so an actively-working user can dismiss the session-timeout warning without being logged out. The
     /// updated expiry is observed on the next request (e.g. GET current-user/configuration).
     /// </remarks>
     /// <returns>200 OK once the session ticket has been renewed.</returns>
