@@ -19,8 +19,8 @@ internal sealed partial class MediaEditingServiceTests
 
         var result = await MediaEditingService.ValidateCreateAsync(createModel);
 
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.NotAllowed, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.NotAllowed));
     }
 
     [Test]
@@ -31,8 +31,8 @@ internal sealed partial class MediaEditingServiceTests
 
         var result = await MediaEditingService.ValidateCreateAsync(createModel);
 
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.NotAllowed, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.NotAllowed));
     }
 
     [Test]
@@ -43,8 +43,8 @@ internal sealed partial class MediaEditingServiceTests
 
         var result = await MediaEditingService.ValidateCreateAsync(createModel);
 
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.Success));
     }
 
     [Test]
@@ -54,8 +54,8 @@ internal sealed partial class MediaEditingServiceTests
 
         var result = await MediaEditingService.ValidateCreateAsync(createModel);
 
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.NotAllowed, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.NotAllowed));
     }
 
     [Test]
@@ -65,8 +65,8 @@ internal sealed partial class MediaEditingServiceTests
 
         var result = await MediaEditingService.ValidateCreateAsync(createModel);
 
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.Success));
     }
 
     [Test]
@@ -78,8 +78,8 @@ internal sealed partial class MediaEditingServiceTests
 
         var result = await MediaEditingService.ValidateCreateAsync(createModel);
 
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.NotAllowed, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.NotAllowed));
     }
 
     private async Task<MediaCreateModel> BuildTestMediaRootCreateModel(bool allowedAsRoot)

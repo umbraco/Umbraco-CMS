@@ -29,7 +29,7 @@ internal sealed class PublishedContentTypeCacheTests : UmbracoIntegrationTestWit
         var contentType = PublishedContentTypeCache.Get(PublishedItemType.Content, ContentType.Key);
 
         // Assert
-        Assert.IsNotNull(contentType);
+        Assert.That(contentType, Is.Not.Null);
     }
 
     [Test]
@@ -37,8 +37,8 @@ internal sealed class PublishedContentTypeCacheTests : UmbracoIntegrationTestWit
     {
         // Arrange
         var contentType = PublishedContentTypeCache.Get(PublishedItemType.Content, Textpage.ContentTypeKey);
-        Assert.IsNotNull(contentType);
-        Assert.AreEqual(1, ContentType.PropertyTypes.Count());
+        Assert.That(contentType, Is.Not.Null);
+        Assert.That(ContentType.PropertyTypes.Count(), Is.EqualTo(1));
 
         // Update the content type
         var updateModel = ContentTypeUpdateHelper.CreateContentTypeUpdateModel(ContentType);
@@ -49,15 +49,15 @@ internal sealed class PublishedContentTypeCacheTests : UmbracoIntegrationTestWit
         var updatedContentType = PublishedContentTypeCache.Get(PublishedItemType.Content, ContentType.Key);
 
         // Assert
-        Assert.IsNotNull(updatedContentType);
-        Assert.AreEqual(0, updatedContentType.PropertyTypes.Count());
+        Assert.That(updatedContentType, Is.Not.Null);
+        Assert.That(updatedContentType.PropertyTypes.Count(), Is.EqualTo(0));
     }
 
     [Test]
     public async Task Published_DocumentType_Gets_Deleted()
     {
         var contentType = PublishedContentTypeCache.Get(PublishedItemType.Content, ContentType.Key);
-        Assert.IsNotNull(contentType);
+        Assert.That(contentType, Is.Not.Null);
 
         await ContentTypeService.DeleteAsync(contentType.Key, Constants.Security.SuperUserKey);
         Assert.Catch(() => PublishedContentTypeCache.Get(PublishedItemType.Content, ContentType.Key));
@@ -71,14 +71,14 @@ internal sealed class PublishedContentTypeCacheTests : UmbracoIntegrationTestWit
         IContentType element = await CreateElementTypeAsync("myElementContent");
 
         IPublishedContentType initial = PublishedContentTypeCache.Get(PublishedItemType.Content, element.Alias);
-        Assert.AreEqual(1, initial.PropertyTypes.Count());
+        Assert.That(initial.PropertyTypes.Count(), Is.EqualTo(1));
 
         // Act — add a property and save; the save should invalidate the primed cache entry.
         await AddPropertyAndSaveAsync(element, "extra");
         IPublishedContentType updated = PublishedContentTypeCache.Get(PublishedItemType.Content, element.Alias);
 
         // Assert
-        Assert.AreEqual(2, updated.PropertyTypes.Count());
+        Assert.That(updated.PropertyTypes.Count(), Is.EqualTo(2));
     }
 
     [Test]
@@ -89,7 +89,7 @@ internal sealed class PublishedContentTypeCacheTests : UmbracoIntegrationTestWit
         IContentType element = await CreateElementTypeAsync("myElementElement");
 
         IPublishedContentType initial = PublishedContentTypeCache.Get(PublishedItemType.Element, element.Alias);
-        Assert.AreEqual(1, initial.PropertyTypes.Count());
+        Assert.That(initial.PropertyTypes.Count(), Is.EqualTo(1));
 
         // Act — add a property and save; the save should invalidate the primed cache entry, and
         // the next Get must successfully resolve an element type via the alias overload.
@@ -97,7 +97,7 @@ internal sealed class PublishedContentTypeCacheTests : UmbracoIntegrationTestWit
         IPublishedContentType updated = PublishedContentTypeCache.Get(PublishedItemType.Element, element.Alias);
 
         // Assert
-        Assert.AreEqual(2, updated.PropertyTypes.Count());
+        Assert.That(updated.PropertyTypes.Count(), Is.EqualTo(2));
     }
 
     [Test]
@@ -111,9 +111,9 @@ internal sealed class PublishedContentTypeCacheTests : UmbracoIntegrationTestWit
         IPublishedContentType byId = PublishedContentTypeCache.Get(PublishedItemType.Element, element.Id);
 
         // Assert
-        Assert.IsNotNull(byId);
-        Assert.AreEqual(PublishedItemType.Element, byId.ItemType);
-        Assert.AreEqual(element.Alias, byId.Alias);
+        Assert.That(byId, Is.Not.Null);
+        Assert.That(byId.ItemType, Is.EqualTo(PublishedItemType.Element));
+        Assert.That(byId.Alias, Is.EqualTo(element.Alias));
     }
 
     [Test]
@@ -125,7 +125,7 @@ internal sealed class PublishedContentTypeCacheTests : UmbracoIntegrationTestWit
         int dataTypeId = element.PropertyTypes.First().DataTypeId;
 
         IPublishedContentType primed = PublishedContentTypeCache.Get(PublishedItemType.Content, element.Alias);
-        Assert.IsNotNull(primed);
+        Assert.That(primed, Is.Not.Null);
 
         // Act — clearing by data-type id must remove every alias-keyed entry pointing at the
         // affected content type, regardless of which itemType prefix was used to insert it.
@@ -134,8 +134,8 @@ internal sealed class PublishedContentTypeCacheTests : UmbracoIntegrationTestWit
 
         // Assert — a fresh instance signals the cache was invalidated rather than re-served,
         // and the freshly loaded type should be structurally equivalent to the one that was cached.
-        Assert.IsFalse(ReferenceEquals(primed, after));
-        Assert.AreEqual(primed.PropertyTypes.Count(), after.PropertyTypes.Count());
+        Assert.That(ReferenceEquals(primed, after), Is.False);
+        Assert.That(after.PropertyTypes.Count(), Is.EqualTo(primed.PropertyTypes.Count()));
     }
 
     [Test]
@@ -157,8 +157,8 @@ internal sealed class PublishedContentTypeCacheTests : UmbracoIntegrationTestWit
 
         // The published child exposes the composition's "title" property, inherited through its parent.
         var publishedChild = PublishedContentTypeCache.Get(PublishedItemType.Content, child.Key);
-        Assert.IsNotNull(publishedChild);
-        Assert.IsTrue(publishedChild.PropertyTypes.Any(p => p.Alias == "title"));
+        Assert.That(publishedChild, Is.Not.Null);
+        Assert.That(publishedChild.PropertyTypes.Any(p => p.Alias == "title"), Is.True);
     }
 
     [Test]
@@ -175,7 +175,7 @@ internal sealed class PublishedContentTypeCacheTests : UmbracoIntegrationTestWit
 
         // Prime the published content type cache for the child; it does not expose "title" yet.
         var before = PublishedContentTypeCache.Get(PublishedItemType.Content, child.Key);
-        Assert.IsFalse(before.PropertyTypes.Any(p => p.Alias == "title"), "precondition: child should not yet expose 'title'");
+        Assert.That(before.PropertyTypes.Any(p => p.Alias == "title"), Is.False, "precondition: child should not yet expose 'title'");
 
         // Add a composition carrying "title" to the (already inherited-from) parent.
         var composition = (await ContentTypeEditingService.CreateAsync(
@@ -184,13 +184,14 @@ internal sealed class PublishedContentTypeCacheTests : UmbracoIntegrationTestWit
         var updateModel = ContentTypeUpdateHelper.CreateContentTypeUpdateModel(parent);
         updateModel.Compositions = [new Composition { CompositionType = CompositionType.Composition, Key = composition.Key }];
         var result = await ContentTypeEditingService.UpdateAsync(parent, updateModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success, result.Status.ToString());
+        Assert.That(result.Success, Is.True, result.Status.ToString());
 
         // Adding the composition to the parent must invalidate the cached published content type of the
         // inheriting child, so the child now exposes the property it inherits through the parent's composition.
         var after = PublishedContentTypeCache.Get(PublishedItemType.Content, child.Key);
-        Assert.IsTrue(
+        Assert.That(
             after.PropertyTypes.Any(p => p.Alias == "title"),
+            Is.True,
             "child published content type should pick up the property composed onto its inherited-from parent");
     }
 
@@ -198,7 +199,7 @@ internal sealed class PublishedContentTypeCacheTests : UmbracoIntegrationTestWit
     {
         ContentTypeCreateModel createModel = ContentTypeEditingBuilder.CreateElementType(alias, alias);
         var attempt = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(attempt.Success);
+        Assert.That(attempt.Success, Is.True);
         return attempt.Result!;
     }
 
@@ -216,6 +217,6 @@ internal sealed class PublishedContentTypeCacheTests : UmbracoIntegrationTestWit
         updateModel.Properties = properties;
 
         var updateAttempt = await ContentTypeEditingService.UpdateAsync(element, updateModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(updateAttempt.Success);
+        Assert.That(updateAttempt.Success, Is.True);
     }
 }

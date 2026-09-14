@@ -59,11 +59,11 @@ internal class TrackedReferencesServiceTests : UmbracoIntegrationTest
             .Build();
 
         var createResult = await ContentTypeService.CreateAsync(ContentType, Constants.Security.SuperUserKey);
-        Assert.IsTrue(createResult.Success);
+        Assert.That(createResult.Success, Is.True);
 
         ContentType.AllowedContentTypes = [new ContentTypeSort(ContentType.Key, 0, ContentType.Alias)];
         var updateResult = await ContentTypeService.UpdateAsync(ContentType, Constants.Security.SuperUserKey);
-        Assert.IsTrue(updateResult.Success);
+        Assert.That(updateResult.Success, Is.True);
 
         Root1 = new ContentBuilder()
             .WithContentType(ContentType)
@@ -105,12 +105,12 @@ internal class TrackedReferencesServiceTests : UmbracoIntegrationTest
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(actual.Success);
-            Assert.AreEqual(1, actual.Result.Total);
+            Assert.That(actual.Success, Is.True);
+            Assert.That(actual.Result.Total, Is.EqualTo(1));
             var item = actual.Result.Items.FirstOrDefault();
-            Assert.AreEqual(Root2.ContentType.Alias, item?.ContentTypeAlias);
-            Assert.AreEqual(Root2.Key, item?.NodeKey);
-            Assert.AreEqual(Root2.Name, item?.NodeName);
+            Assert.That(item?.ContentTypeAlias, Is.EqualTo(Root2.ContentType.Alias));
+            Assert.That(item?.NodeKey, Is.EqualTo(Root2.Key));
+            Assert.That(item?.NodeName, Is.EqualTo(Root2.Name));
         });
     }
 
@@ -123,8 +123,8 @@ internal class TrackedReferencesServiceTests : UmbracoIntegrationTest
 
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(actual.Success);
-            Assert.AreEqual(GetReferencesOperationStatus.ContentNotFound, actual.Status);
+            Assert.That(actual.Success, Is.False);
+            Assert.That(actual.Status, Is.EqualTo(GetReferencesOperationStatus.ContentNotFound));
         });
     }
 
@@ -137,16 +137,16 @@ internal class TrackedReferencesServiceTests : UmbracoIntegrationTest
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(actual.Success);
-            Assert.AreEqual(GetReferencesOperationStatus.Success, actual.Status);
+            Assert.That(actual.Success, Is.True);
+            Assert.That(actual.Status, Is.EqualTo(GetReferencesOperationStatus.Success));
 
             var itemKeys = actual.Result.Items.Select(x => x.NodeKey).ToList();
-            Assert.IsFalse(itemKeys.Contains(Root1.Key)); // Should not return the parent itself (see: https://github.com/umbraco/Umbraco-CMS/pull/21162)
-            Assert.AreEqual(1, itemKeys.Count);
-            Assert.IsTrue(itemKeys.Contains(Child1.Key));
+            Assert.That(itemKeys, Does.Not.Contain(Root1.Key)); // Should not return the parent itself (see: https://github.com/umbraco/Umbraco-CMS/pull/21162)
+            Assert.That(itemKeys, Has.Count.EqualTo(1));
+            Assert.That(itemKeys, Does.Contain(Child1.Key));
 
             var childItem = actual.Result.Items.FirstOrDefault(x => x.NodeKey == Child1.Key);
-            Assert.AreEqual(Child1.Name, childItem?.NodeName);
+            Assert.That(childItem?.NodeName, Is.EqualTo(Child1.Name));
         });
     }
 
@@ -159,8 +159,8 @@ internal class TrackedReferencesServiceTests : UmbracoIntegrationTest
 
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(actual.Success);
-            Assert.AreEqual(GetReferencesOperationStatus.ContentNotFound, actual.Status);
+            Assert.That(actual.Success, Is.False);
+            Assert.That(actual.Status, Is.EqualTo(GetReferencesOperationStatus.ContentNotFound));
         });
     }
 
@@ -171,8 +171,8 @@ internal class TrackedReferencesServiceTests : UmbracoIntegrationTest
 
         var actual = await sut.GetPagedRelationsForItemAsync(Root2.Key, UmbracoObjectTypes.Document, 0, 10, true);
 
-        Assert.IsTrue(actual.Success);
-        Assert.AreEqual(0, actual.Result.Total);
+        Assert.That(actual.Success, Is.True);
+        Assert.That(actual.Result.Total, Is.EqualTo(0));
     }
 
     [Test]
@@ -186,11 +186,11 @@ internal class TrackedReferencesServiceTests : UmbracoIntegrationTest
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(1, actual.Total);
+            Assert.That(actual.Total, Is.EqualTo(1));
             var item = actual.Items.FirstOrDefault();
-            Assert.AreEqual(Root2.ContentType.Alias, item?.ContentTypeAlias);
-            Assert.AreEqual(Root2.Key, item?.NodeKey);
-            Assert.AreEqual(Root2.Name, item?.NodeName);
+            Assert.That(item?.ContentTypeAlias, Is.EqualTo(Root2.ContentType.Alias));
+            Assert.That(item?.NodeKey, Is.EqualTo(Root2.Key));
+            Assert.That(item?.NodeName, Is.EqualTo(Root2.Name));
         });
     }
 }

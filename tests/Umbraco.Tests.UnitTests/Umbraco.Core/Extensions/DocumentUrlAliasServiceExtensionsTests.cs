@@ -20,5 +20,5 @@ public class DocumentUrlAliasServiceExtensionsTests
     [TestCase("Some-Mixed-Case", "some-mixed-case")]
     [TestCase("  /Some/Nested-Alias/  ", "some/nested-alias")]
     public void NormalizeAlias_Trims_Whitespace_And_Slashes_And_Lowercases(string alias, string expected)
-        => Assert.AreEqual(expected, _service.NormalizeAlias(alias));
+        => Assert.That(_service.NormalizeAlias(alias), Is.EqualTo(expected));
 }

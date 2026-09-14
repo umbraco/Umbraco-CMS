@@ -36,7 +36,7 @@ public class AllChildrenAuthorizerTests
 
         var result = await Authorize();
 
-        Assert.IsTrue(result);
+        Assert.That(result, Is.True);
     }
 
     [Test]
@@ -48,7 +48,7 @@ public class AllChildrenAuthorizerTests
 
         var result = await Authorize();
 
-        Assert.IsFalse(result);
+        Assert.That(result, Is.False);
     }
 
     [Test]
@@ -58,7 +58,7 @@ public class AllChildrenAuthorizerTests
 
         var result = await Authorize();
 
-        Assert.IsTrue(result);
+        Assert.That(result, Is.True);
         _authorizationService.Verify(
             x => x.AuthorizeAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<object>(), It.IsAny<string>()),
             Times.Never);
@@ -76,7 +76,7 @@ public class AllChildrenAuthorizerTests
 
         var result = await Authorize();
 
-        Assert.IsTrue(result);
+        Assert.That(result, Is.True);
         _authorizationService.Verify(
             x => x.AuthorizeAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<object>(), Policy),
             Times.Exactly(2));

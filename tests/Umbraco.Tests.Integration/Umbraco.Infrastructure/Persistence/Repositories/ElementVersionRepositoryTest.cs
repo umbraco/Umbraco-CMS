@@ -42,8 +42,8 @@ internal sealed class ElementVersionRepositoryTest : UmbracoIntegrationTest
 
             Assert.Multiple(() =>
             {
-                Assert.AreEqual(1, results.Count);
-                Assert.AreEqual(1, results.First().VersionId);
+                Assert.That(results, Has.Count.EqualTo(1));
+                Assert.That(results.First().VersionId, Is.EqualTo(1));
             });
         }
     }
@@ -76,13 +76,13 @@ internal sealed class ElementVersionRepositoryTest : UmbracoIntegrationTest
 
             Assert.Multiple(() =>
             {
-                Assert.AreEqual(1, results.Count);
+                Assert.That(results, Has.Count.EqualTo(1));
 
                 // We pinned 1 & 3
                 // 4 is current
                 // 5 is published
                 // So all that is left is 2
-                Assert.AreEqual(2, results.First().VersionId);
+                Assert.That(results.First().VersionId, Is.EqualTo(2));
             });
         }
     }
@@ -114,8 +114,8 @@ internal sealed class ElementVersionRepositoryTest : UmbracoIntegrationTest
 
             Assert.Multiple(() =>
             {
-                Assert.AreEqual(2, after.Count);
-                Assert.True(after.All(x => x.Id > 3));
+                Assert.That(after, Has.Count.EqualTo(2));
+                Assert.That(after.All(x => x.Id > 3), Is.True);
             });
         }
     }
@@ -141,11 +141,11 @@ internal sealed class ElementVersionRepositoryTest : UmbracoIntegrationTest
 
             Assert.Multiple(() =>
             {
-                Assert.AreEqual(2, page1.Count());
-                Assert.AreEqual(3, page1Total);
+                Assert.That(page1.Count(), Is.EqualTo(2));
+                Assert.That(page1Total, Is.EqualTo(3));
 
-                Assert.AreEqual(1, page2.Count());
-                Assert.AreEqual(3, page2Total);
+                Assert.That(page2.Count(), Is.EqualTo(1));
+                Assert.That(page2Total, Is.EqualTo(3));
             });
         }
     }
@@ -176,11 +176,11 @@ internal sealed class ElementVersionRepositoryTest : UmbracoIntegrationTest
 
             Assert.Multiple(() =>
             {
-                Assert.AreEqual(2, page1.Count());
-                Assert.AreEqual(3, page1Total);
+                Assert.That(page1.Count(), Is.EqualTo(2));
+                Assert.That(page1Total, Is.EqualTo(3));
 
-                Assert.AreEqual(1, page2.Count());
-                Assert.AreEqual(3, page2Total);
+                Assert.That(page2.Count(), Is.EqualTo(1));
+                Assert.That(page2Total, Is.EqualTo(3));
             });
         }
     }

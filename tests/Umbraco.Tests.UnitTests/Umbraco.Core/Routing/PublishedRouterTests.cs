@@ -58,7 +58,7 @@ public class PublishedRouterTests
                 .CleanedUmbracoUrl);
         var result = publishedRouter.BuildRequest(request);
 
-        Assert.IsFalse(result.Success());
+        Assert.That(result.Success(), Is.False);
     }
 
     [Test]
@@ -75,7 +75,7 @@ public class PublishedRouterTests
         request.SetRedirect("/hello");
         var result = publishedRouter.BuildRequest(request);
 
-        Assert.IsFalse(result.Success());
+        Assert.That(result.Success(), Is.False);
     }
 
     private Mock<IPublishedContent> GetPublishedContentMock()

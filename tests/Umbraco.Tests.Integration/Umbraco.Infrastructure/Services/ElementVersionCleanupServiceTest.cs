@@ -42,9 +42,9 @@ internal class ElementVersionCleanupServiceTest : UmbracoIntegrationTest
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(12, before.ContentVersions); // 10 historic + current draft + current published
-            Assert.AreEqual(12, before.ElementVersions);
-            Assert.AreEqual(12 * 3, before.PropertyData); // CreateSimpleContentType = 3 props
+            Assert.That(before.ContentVersions, Is.EqualTo(12)); // 10 historic + current draft + current published
+            Assert.That(before.ElementVersions, Is.EqualTo(12));
+            Assert.That(before.PropertyData, Is.EqualTo(12 * 3)); // CreateSimpleContentType = 3 props
         });
 
         ElementVersionService.PerformContentVersionCleanup(DateTime.UtcNow.AddHours(1));
@@ -53,9 +53,9 @@ internal class ElementVersionCleanupServiceTest : UmbracoIntegrationTest
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(2, after.ContentVersions); // current draft, current published
-            Assert.AreEqual(2, after.ElementVersions);
-            Assert.AreEqual(6, after.PropertyData); // CreateSimpleContentType = 3 props
+            Assert.That(after.ContentVersions, Is.EqualTo(2)); // current draft, current published
+            Assert.That(after.ElementVersions, Is.EqualTo(2));
+            Assert.That(after.PropertyData, Is.EqualTo(6)); // CreateSimpleContentType = 3 props
         });
     }
 
@@ -82,9 +82,9 @@ internal class ElementVersionCleanupServiceTest : UmbracoIntegrationTest
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(12, before.ContentVersions); // 10 historic + current draft + current published
-            Assert.AreEqual(12, before.ElementVersions);
-            Assert.AreEqual(12 * 3, before.PropertyData); // CreateSimpleContentType = 3 props
+            Assert.That(before.ContentVersions, Is.EqualTo(12)); // 10 historic + current draft + current published
+            Assert.That(before.ElementVersions, Is.EqualTo(12));
+            Assert.That(before.PropertyData, Is.EqualTo(12 * 3)); // CreateSimpleContentType = 3 props
         });
 
         ElementVersionService.PerformContentVersionCleanup(DateTime.UtcNow.AddHours(1));
@@ -94,9 +94,9 @@ internal class ElementVersionCleanupServiceTest : UmbracoIntegrationTest
         // no changes
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(before.ContentVersions, after.ContentVersions);
-            Assert.AreEqual(before.ElementVersions, after.ElementVersions);
-            Assert.AreEqual(before.PropertyData, after.PropertyData);
+            Assert.That(after.ContentVersions, Is.EqualTo(before.ContentVersions));
+            Assert.That(after.ElementVersions, Is.EqualTo(before.ElementVersions));
+            Assert.That(after.PropertyData, Is.EqualTo(before.PropertyData));
         });
     }
 
@@ -131,9 +131,9 @@ internal class ElementVersionCleanupServiceTest : UmbracoIntegrationTest
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(12, before.ContentVersions); // 10 historic + current draft + current published
-            Assert.AreEqual(12, before.ElementVersions);
-            Assert.AreEqual(12 * 3, before.PropertyData); // CreateSimpleContentType = 3 props
+            Assert.That(before.ContentVersions, Is.EqualTo(12)); // 10 historic + current draft + current published
+            Assert.That(before.ElementVersions, Is.EqualTo(12));
+            Assert.That(before.PropertyData, Is.EqualTo(12 * 3)); // CreateSimpleContentType = 3 props
         });
 
         ElementVersionService.PerformContentVersionCleanup(DateTime.UtcNow.AddHours(1));
@@ -142,22 +142,22 @@ internal class ElementVersionCleanupServiceTest : UmbracoIntegrationTest
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(7, after.ContentVersions); // current draft, current published + 5 retained versions
-            Assert.AreEqual(7, after.ElementVersions);
-            Assert.AreEqual(7 * 3, after.PropertyData); // CreateSimpleContentType = 3 props
+            Assert.That(after.ContentVersions, Is.EqualTo(7)); // current draft, current published + 5 retained versions
+            Assert.That(after.ElementVersions, Is.EqualTo(7));
+            Assert.That(after.PropertyData, Is.EqualTo(7 * 3)); // CreateSimpleContentType = 3 props
         });
 
         var allVersions = await ElementVersionService.GetPagedContentVersionsAsync(element.Key, null, 0, 1000);
-        Assert.IsTrue(allVersions.Success);
-        Assert.AreEqual(7, allVersions.Result.Total);
+        Assert.That(allVersions.Success, Is.True);
+        Assert.That(allVersions.Result.Total, Is.EqualTo(7));
 
         var allVersionIds = allVersions.Result.Items.Select(item => item.VersionId).ToArray();
-        Assert.AreNotEqual(element.VersionId, element.PublishedVersionId);
-        Assert.Contains(element.VersionId, allVersionIds);
-        Assert.Contains(element.PublishedVersionId, allVersionIds);
+        Assert.That(element.PublishedVersionId, Is.Not.EqualTo(element.VersionId));
+        Assert.That(allVersionIds, Does.Contain(element.VersionId));
+        Assert.That(allVersionIds, Does.Contain(element.PublishedVersionId));
         foreach (var retainedVersionId in retainedVersionIds)
         {
-            Assert.Contains(retainedVersionId, allVersionIds);
+            Assert.That(allVersionIds, Does.Contain(retainedVersionId));
         }
     }
 

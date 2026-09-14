@@ -28,9 +28,9 @@ public class MediaUrlFactoryTests
         var result = factory.CreateUrls(media).ToList();
 
         // Assert
-        Assert.AreEqual(1, result.Count);
-        Assert.AreEqual($"{BaseUrl}{MediaPath}", result[0].Url);
-        Assert.IsNull(result[0].Culture);
+        Assert.That(result, Has.Count.EqualTo(1));
+        Assert.That(result[0].Url, Is.EqualTo($"{BaseUrl}{MediaPath}"));
+        Assert.That(result[0].Culture, Is.Null);
     }
 
     [Test]
@@ -44,9 +44,9 @@ public class MediaUrlFactoryTests
         var result = factory.CreateUrls(media).ToList();
 
         // Assert
-        Assert.AreEqual(1, result.Count);
-        Assert.AreEqual($"{BaseUrl}{MediaPath}", result[0].Url);
-        Assert.IsNull(result[0].Culture);
+        Assert.That(result, Has.Count.EqualTo(1));
+        Assert.That(result[0].Url, Is.EqualTo($"{BaseUrl}{MediaPath}"));
+        Assert.That(result[0].Culture, Is.Null);
     }
 
     [Test]
@@ -60,9 +60,9 @@ public class MediaUrlFactoryTests
         var result = factory.CreateUrls(media).ToList();
 
         // Assert
-        Assert.AreEqual(1, result.Count);
-        Assert.AreEqual($"{BaseUrl}/media/image{Constants.Conventions.Media.TrashedMediaSuffix}.jpg", result[0].Url);
-        Assert.IsNull(result[0].Culture);
+        Assert.That(result, Has.Count.EqualTo(1));
+        Assert.That(result[0].Url, Is.EqualTo($"{BaseUrl}/media/image{Constants.Conventions.Media.TrashedMediaSuffix}.jpg"));
+        Assert.That(result[0].Culture, Is.Null);
     }
 
     [Test]
@@ -76,9 +76,9 @@ public class MediaUrlFactoryTests
         var result = factory.CreateUrls(media).ToList();
 
         // Assert
-        Assert.AreEqual(1, result.Count);
-        Assert.AreEqual($"{BaseUrl}{MediaPath}", result[0].Url);
-        Assert.IsNull(result[0].Culture);
+        Assert.That(result, Has.Count.EqualTo(1));
+        Assert.That(result[0].Url, Is.EqualTo($"{BaseUrl}{MediaPath}"));
+        Assert.That(result[0].Culture, Is.Null);
     }
 
     [Test]
@@ -92,7 +92,7 @@ public class MediaUrlFactoryTests
         var result = factory.CreateUrls(media).ToList();
 
         // Assert
-        Assert.IsEmpty(result);
+        Assert.That(result, Is.Empty);
     }
 
     [Test]
@@ -119,9 +119,9 @@ public class MediaUrlFactoryTests
         var result = factory.CreateUrls(media).ToList();
 
         // Assert
-        Assert.AreEqual(2, result.Count);
-        Assert.AreEqual($"{BaseUrl}{MediaPath}", result[0].Url);
-        Assert.AreEqual($"{BaseUrl}{secondMediaPath}", result[1].Url);
+        Assert.That(result, Has.Count.EqualTo(2));
+        Assert.That(result[0].Url, Is.EqualTo($"{BaseUrl}{MediaPath}"));
+        Assert.That(result[1].Url, Is.EqualTo($"{BaseUrl}{secondMediaPath}"));
     }
 
     [Test]
@@ -136,10 +136,10 @@ public class MediaUrlFactoryTests
         var result = factory.CreateUrlSets([media]).ToList();
 
         // Assert
-        Assert.AreEqual(1, result.Count);
-        Assert.AreEqual(mediaKey, result[0].Id);
-        Assert.AreEqual(1, result[0].UrlInfos.Count());
-        Assert.AreEqual($"{BaseUrl}{MediaPath}", result[0].UrlInfos.First().Url);
+        Assert.That(result, Has.Count.EqualTo(1));
+        Assert.That(result[0].Id, Is.EqualTo(mediaKey));
+        Assert.That(result[0].UrlInfos.Count(), Is.EqualTo(1));
+        Assert.That(result[0].UrlInfos.First().Url, Is.EqualTo($"{BaseUrl}{MediaPath}"));
     }
 
     [Test]
@@ -159,13 +159,13 @@ public class MediaUrlFactoryTests
         var result = factory.CreateUrlSets([media1, media2]).ToList();
 
         // Assert
-        Assert.AreEqual(2, result.Count);
+        Assert.That(result, Has.Count.EqualTo(2));
 
-        Assert.AreEqual(mediaKey1, result[0].Id);
-        Assert.AreEqual($"{BaseUrl}{mediaPath1}", result[0].UrlInfos.First().Url);
+        Assert.That(result[0].Id, Is.EqualTo(mediaKey1));
+        Assert.That(result[0].UrlInfos.First().Url, Is.EqualTo($"{BaseUrl}{mediaPath1}"));
 
-        Assert.AreEqual(mediaKey2, result[1].Id);
-        Assert.AreEqual($"{BaseUrl}{mediaPath2}", result[1].UrlInfos.First().Url);
+        Assert.That(result[1].Id, Is.EqualTo(mediaKey2));
+        Assert.That(result[1].UrlInfos.First().Url, Is.EqualTo($"{BaseUrl}{mediaPath2}"));
     }
 
     private static MediaUrlFactory CreateFactory(bool enableMediaRecycleBinProtection)

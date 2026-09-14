@@ -48,8 +48,8 @@ internal sealed class DocumentVersionRepositoryTest : UmbracoIntegrationTest
 
             Assert.Multiple(() =>
             {
-                Assert.AreEqual(1, results.Count);
-                Assert.AreEqual(1, results.First().VersionId);
+                Assert.That(results, Has.Count.EqualTo(1));
+                Assert.That(results.First().VersionId, Is.EqualTo(1));
             });
         }
     }
@@ -87,13 +87,13 @@ internal sealed class DocumentVersionRepositoryTest : UmbracoIntegrationTest
 
             Assert.Multiple(() =>
             {
-                Assert.AreEqual(1, results.Count);
+                Assert.That(results, Has.Count.EqualTo(1));
 
                 // We pinned 1 & 3
                 // 4 is current
                 // 5 is published
                 // So all that is left is 2
-                Assert.AreEqual(2, results.First().VersionId);
+                Assert.That(results.First().VersionId, Is.EqualTo(2));
             });
         }
     }
@@ -132,8 +132,8 @@ internal sealed class DocumentVersionRepositoryTest : UmbracoIntegrationTest
 
             Assert.Multiple(() =>
             {
-                Assert.AreEqual(1, results.Count);
-                Assert.AreEqual(1, results.First().VersionId);
+                Assert.That(results, Has.Count.EqualTo(1));
+                Assert.That(results.First().VersionId, Is.EqualTo(1));
             });
         }
     }
@@ -173,7 +173,7 @@ internal sealed class DocumentVersionRepositoryTest : UmbracoIntegrationTest
 
             Assert.Multiple(() =>
             {
-                Assert.AreEqual(2, results.Count);
+                Assert.That(results, Has.Count.EqualTo(2));
 
                 // Should be ordered oldest first (by versionDate ASC, and since all have same date, by id ASC).
                 var ids = results.Select(x => x.VersionId).ToList();
@@ -213,8 +213,8 @@ internal sealed class DocumentVersionRepositoryTest : UmbracoIntegrationTest
 
             Assert.Multiple(() =>
             {
-                Assert.AreEqual(2, after.Count);
-                Assert.True(after.All(x => x.Id > 3));
+                Assert.That(after, Has.Count.EqualTo(2));
+                Assert.That(after.All(x => x.Id > 3), Is.True);
             });
         }
     }
@@ -247,9 +247,9 @@ internal sealed class DocumentVersionRepositoryTest : UmbracoIntegrationTest
             var beforeDocumentVersions = db.Single<int>($"SELECT count(1) FROM {syntax.GetQuotedTableName("umbracoDocumentVersion")}");
             var beforePropertyData = db.Single<int>($"SELECT count(1) FROM {syntax.GetQuotedTableName("umbracoPropertyData")}");
 
-            Assert.Greater(beforeContentVersions, 2, "Should have more than 2 content versions before delete");
-            Assert.Greater(beforeDocumentVersions, 2, "Should have more than 2 document versions before delete");
-            Assert.Greater(beforePropertyData, 6, "Should have more than 6 property data rows before delete");
+            Assert.That(beforeContentVersions, Is.GreaterThan(2), "Should have more than 2 content versions before delete");
+            Assert.That(beforeDocumentVersions, Is.GreaterThan(2), "Should have more than 2 document versions before delete");
+            Assert.That(beforePropertyData, Is.GreaterThan(6), "Should have more than 6 property data rows before delete");
 
             var sut = new DocumentVersionRepository(ScopeAccessor);
             // Delete the 2 historic versions (IDs 1 and 2)
@@ -263,14 +263,14 @@ internal sealed class DocumentVersionRepositoryTest : UmbracoIntegrationTest
             Assert.Multiple(() =>
             {
                 // 2 versions deleted, 2 remain (current draft + current published)
-                Assert.AreEqual(beforeContentVersions - 2, afterContentVersions);
-                Assert.AreEqual(beforeDocumentVersions - 2, afterDocumentVersions);
+                Assert.That(afterContentVersions, Is.EqualTo(beforeContentVersions - 2));
+                Assert.That(afterDocumentVersions, Is.EqualTo(beforeDocumentVersions - 2));
 
                 // CreateSimpleContentType has 3 properties, so 6 property data rows should be removed
-                Assert.AreEqual(beforePropertyData - 6, afterPropertyData);
+                Assert.That(afterPropertyData, Is.EqualTo(beforePropertyData - 6));
 
                 // No culture variation rows for the deleted versions
-                Assert.AreEqual(0, afterCultureVariation);
+                Assert.That(afterCultureVariation, Is.EqualTo(0));
             });
         }
     }
@@ -299,11 +299,11 @@ internal sealed class DocumentVersionRepositoryTest : UmbracoIntegrationTest
 
             Assert.Multiple(() =>
             {
-                Assert.AreEqual(2, page1.Count());
-                Assert.AreEqual(3, page1Total);
+                Assert.That(page1.Count(), Is.EqualTo(2));
+                Assert.That(page1Total, Is.EqualTo(3));
 
-                Assert.AreEqual(1, page2.Count());
-                Assert.AreEqual(3, page2Total);
+                Assert.That(page2.Count(), Is.EqualTo(1));
+                Assert.That(page2Total, Is.EqualTo(3));
             });
         }
     }
@@ -339,11 +339,11 @@ internal sealed class DocumentVersionRepositoryTest : UmbracoIntegrationTest
 
             Assert.Multiple(() =>
             {
-                Assert.AreEqual(2, page1.Count());
-                Assert.AreEqual(3, page1Total);
+                Assert.That(page1.Count(), Is.EqualTo(2));
+                Assert.That(page1Total, Is.EqualTo(3));
 
-                Assert.AreEqual(1, page2.Count());
-                Assert.AreEqual(3, page2Total);
+                Assert.That(page2.Count(), Is.EqualTo(1));
+                Assert.That(page2Total, Is.EqualTo(3));
             });
         }
     }

@@ -17,7 +17,7 @@ public class UmbracoSchemaIdGeneratorTests
 
         // Assert
         Assert.That(result, Does.EndWith("Model"));
-        Assert.AreEqual("UmbracoSchemaIdGeneratorModel", result);
+        Assert.That(result, Is.EqualTo("UmbracoSchemaIdGeneratorModel"));
     }
 
     [Test]
@@ -30,7 +30,7 @@ public class UmbracoSchemaIdGeneratorTests
         var result = UmbracoSchemaIdGenerator.Generate(type);
 
         // Assert
-        Assert.AreEqual("TestModel", result);
+        Assert.That(result, Is.EqualTo("TestModel"));
     }
 
     [Test]
@@ -43,7 +43,7 @@ public class UmbracoSchemaIdGeneratorTests
         var result = UmbracoSchemaIdGenerator.Generate(type);
 
         // Assert
-        Assert.AreEqual("TestModel", result);
+        Assert.That(result, Is.EqualTo("TestModel"));
     }
 
     [Test]
@@ -56,7 +56,7 @@ public class UmbracoSchemaIdGeneratorTests
         var result = UmbracoSchemaIdGenerator.Generate(type);
 
         // Assert
-        Assert.AreEqual("GenericTestClassTestModel", result);
+        Assert.That(result, Is.EqualTo("GenericTestClassTestModel"));
     }
 
     [Test]
@@ -69,7 +69,7 @@ public class UmbracoSchemaIdGeneratorTests
         var result = UmbracoSchemaIdGenerator.Generate(type);
 
         // Assert
-        Assert.AreEqual("PagedTestModel", result);
+        Assert.That(result, Is.EqualTo("PagedTestModel"));
     }
 
     // Test helper classes in Umbraco.Cms namespace

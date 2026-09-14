@@ -26,11 +26,11 @@ internal sealed class WebhookServiceTests : UmbracoIntegrationTest
 
         Assert.Multiple(() =>
         {
-            Assert.IsNotNull(webhook);
-            Assert.AreEqual(1, webhook.Events.Length);
-            Assert.IsTrue(webhook.Events.Contains(webhookEvent));
-            Assert.AreEqual(url, webhook.Url);
-            Assert.IsTrue(webhook.ContentTypeKeys.Contains(key));
+            Assert.That(webhook, Is.Not.Null);
+            Assert.That(webhook.Events, Has.Length.EqualTo(1));
+            Assert.That(webhook.Events.Contains(webhookEvent), Is.True);
+            Assert.That(webhook.Url, Is.EqualTo(url));
+            Assert.That(webhook.ContentTypeKeys.Contains(key), Is.True);
         });
     }
 
@@ -52,13 +52,13 @@ internal sealed class WebhookServiceTests : UmbracoIntegrationTest
 
         Assert.Multiple(() =>
         {
-            Assert.IsNotNull(webhook);
-            Assert.AreEqual(1, webhook.Events.Length);
-            Assert.IsTrue(webhook.Events.Contains(Event));
-            Assert.AreEqual(Url, webhook.Url);
-            Assert.AreEqual(Name, webhook.Name);
-            Assert.AreEqual(Description, webhook.Description);
-            Assert.IsTrue(webhook.ContentTypeKeys.Contains(contentTypeKey));
+            Assert.That(webhook, Is.Not.Null);
+            Assert.That(webhook.Events, Has.Length.EqualTo(1));
+            Assert.That(webhook.Events.Contains(Event), Is.True);
+            Assert.That(webhook.Url, Is.EqualTo(Url));
+            Assert.That(webhook.Name, Is.EqualTo(Name));
+            Assert.That(webhook.Description, Is.EqualTo(Description));
+            Assert.That(webhook.ContentTypeKeys.Contains(contentTypeKey), Is.True);
         });
 
         const string UpdatedName = "Updated name";
@@ -73,9 +73,9 @@ internal sealed class WebhookServiceTests : UmbracoIntegrationTest
 
         Assert.Multiple(() =>
         {
-            Assert.IsNotNull(updatedWebhook);
-            Assert.AreEqual(UpdatedName, updatedWebhook.Name);
-            Assert.AreEqual(UpdatedDescription, updatedWebhook.Description);
+            Assert.That(updatedWebhook, Is.Not.Null);
+            Assert.That(updatedWebhook.Name, Is.EqualTo(UpdatedName));
+            Assert.That(updatedWebhook.Description, Is.EqualTo(UpdatedDescription));
         });
     }
 
@@ -89,10 +89,10 @@ internal sealed class WebhookServiceTests : UmbracoIntegrationTest
 
         Assert.Multiple(() =>
         {
-            Assert.IsNotEmpty(webhooks.Items);
-            Assert.IsNotNull(webhooks.Items.FirstOrDefault(x => x.Key == createdWebhookOne.Result.Key));
-            Assert.IsNotNull(webhooks.Items.FirstOrDefault(x => x.Key == createdWebhookTwo.Result.Key));
-            Assert.IsNotNull(webhooks.Items.FirstOrDefault(x => x.Key == createdWebhookThree.Result.Key));
+            Assert.That(webhooks.Items, Is.Not.Empty);
+            Assert.That(webhooks.Items.FirstOrDefault(x => x.Key == createdWebhookOne.Result.Key), Is.Not.Null);
+            Assert.That(webhooks.Items.FirstOrDefault(x => x.Key == createdWebhookTwo.Result.Key), Is.Not.Null);
+            Assert.That(webhooks.Items.FirstOrDefault(x => x.Key == createdWebhookThree.Result.Key), Is.Not.Null);
         });
     }
 
@@ -107,10 +107,10 @@ internal sealed class WebhookServiceTests : UmbracoIntegrationTest
         var createdWebhook = await WebhookService.CreateAsync(new Webhook(url, true, [key], [webhookEvent]));
         var webhook = await WebhookService.GetAsync(createdWebhook.Result.Key);
 
-        Assert.IsNotNull(webhook);
+        Assert.That(webhook, Is.Not.Null);
         await WebhookService.DeleteAsync(webhook.Key);
         var deletedWebhook = await WebhookService.GetAsync(createdWebhook.Result.Key);
-        Assert.IsNull(deletedWebhook);
+        Assert.That(deletedWebhook, Is.Null);
     }
 
     [Test]
@@ -119,8 +119,8 @@ internal sealed class WebhookServiceTests : UmbracoIntegrationTest
         var createdWebhook = await WebhookService.CreateAsync(new Webhook("https://example.com", events: [Constants.WebhookEvents.Aliases.ContentPublish]));
         var webhook = await WebhookService.GetAsync(createdWebhook.Result.Key);
 
-        Assert.IsNotNull(webhook);
-        Assert.IsEmpty(webhook.ContentTypeKeys);
+        Assert.That(webhook, Is.Not.Null);
+        Assert.That(webhook.ContentTypeKeys, Is.Empty);
     }
 
     [Test]
@@ -131,9 +131,9 @@ internal sealed class WebhookServiceTests : UmbracoIntegrationTest
         await WebhookService.UpdateAsync(createdWebhook.Result);
 
         var updatedWebhook = await WebhookService.GetAsync(createdWebhook.Result.Key);
-        Assert.IsNotNull(updatedWebhook);
-        Assert.AreEqual(1, updatedWebhook.Events.Length);
-        Assert.IsTrue(updatedWebhook.Events.Contains(Constants.WebhookEvents.Aliases.ContentDelete));
+        Assert.That(updatedWebhook, Is.Not.Null);
+        Assert.That(updatedWebhook.Events, Has.Length.EqualTo(1));
+        Assert.That(updatedWebhook.Events.Contains(Constants.WebhookEvents.Aliases.ContentDelete), Is.True);
     }
 
     [Test]
@@ -145,7 +145,7 @@ internal sealed class WebhookServiceTests : UmbracoIntegrationTest
 
         var result = await WebhookService.GetByAliasAsync(Constants.WebhookEvents.Aliases.ContentUnpublish);
 
-        Assert.IsNotEmpty(result);
-        Assert.AreEqual(2, result.Count());
+        Assert.That(result, Is.Not.Empty);
+        Assert.That(result.Count(), Is.EqualTo(2));
     }
 }

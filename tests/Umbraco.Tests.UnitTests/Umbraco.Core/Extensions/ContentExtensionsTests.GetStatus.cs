@@ -13,7 +13,7 @@ public partial class ContentExtensionsTests
         var contentMock = new Mock<IContent>();
         contentMock.SetupGet(c => c.Trashed).Returns(true);
         var result = contentMock.Object.GetStatus(new ContentScheduleCollection());
-        Assert.AreEqual(ContentStatus.Trashed, result);
+        Assert.That(result, Is.EqualTo(ContentStatus.Trashed));
     }
 
     [TestCase(true, ContentStatus.Published)]
@@ -27,7 +27,7 @@ public partial class ContentExtensionsTests
         mock.SetupGet(c => c.Published).Returns(published);
 
         var result = mock.Object.GetStatus(new ContentScheduleCollection());
-        Assert.AreEqual(expectedStatus, result);
+        Assert.That(result, Is.EqualTo(expectedStatus));
     }
 
     [TestCase(1)]
@@ -44,7 +44,7 @@ public partial class ContentExtensionsTests
 
         var schedule = ContentScheduleCollection.CreateWithEntry(null, DateTime.UtcNow.AddMinutes(-1 * minutesFromExpiry));
         var result = mock.Object.GetStatus(schedule);
-        Assert.AreEqual(ContentStatus.Expired, result);
+        Assert.That(result, Is.EqualTo(ContentStatus.Expired));
     }
 
     [TestCase(1)]
@@ -61,7 +61,7 @@ public partial class ContentExtensionsTests
 
         var schedule = ContentScheduleCollection.CreateWithEntry(DateTime.UtcNow.AddMinutes(minutesUntilRelease), null);
         var result = mock.Object.GetStatus(schedule);
-        Assert.AreEqual(ContentStatus.AwaitingRelease, result);
+        Assert.That(result, Is.EqualTo(ContentStatus.AwaitingRelease));
     }
 
     [TestCase(1)]
@@ -79,7 +79,7 @@ public partial class ContentExtensionsTests
 
         var schedule = ContentScheduleCollection.CreateWithEntry(DateTime.UtcNow.AddMinutes(-1 * minutes), DateTime.UtcNow.AddMinutes(minutes));
         var result = mock.Object.GetStatus(schedule);
-        Assert.AreEqual(ContentStatus.Published, result);
+        Assert.That(result, Is.EqualTo(ContentStatus.Published));
     }
 
     [TestCase(1)]
@@ -96,7 +96,7 @@ public partial class ContentExtensionsTests
 
         var schedule = ContentScheduleCollection.CreateWithEntry("en-US", null, DateTime.UtcNow.AddMinutes(-1 * minutesFromExpiry));
         var result = mock.Object.GetStatus(schedule, "en-US");
-        Assert.AreEqual(ContentStatus.Expired, result);
+        Assert.That(result, Is.EqualTo(ContentStatus.Expired));
     }
 
     [TestCase(1)]
@@ -113,7 +113,7 @@ public partial class ContentExtensionsTests
 
         var schedule = ContentScheduleCollection.CreateWithEntry("en-US", DateTime.UtcNow.AddMinutes(minutesUntilRelease), null);
         var result = mock.Object.GetStatus(schedule, "en-US");
-        Assert.AreEqual(ContentStatus.AwaitingRelease, result);
+        Assert.That(result, Is.EqualTo(ContentStatus.AwaitingRelease));
     }
 
     [TestCase(1)]
@@ -131,6 +131,6 @@ public partial class ContentExtensionsTests
 
         var schedule = ContentScheduleCollection.CreateWithEntry("en-US", DateTime.UtcNow.AddMinutes(-1 * minutes), DateTime.UtcNow.AddMinutes(minutes));
         var result = mock.Object.GetStatus(schedule, "en-US");
-        Assert.AreEqual(ContentStatus.Published, result);
+        Assert.That(result, Is.EqualTo(ContentStatus.Published));
     }
 }

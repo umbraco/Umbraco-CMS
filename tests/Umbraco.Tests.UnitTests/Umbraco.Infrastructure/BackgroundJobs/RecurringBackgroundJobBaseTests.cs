@@ -14,7 +14,7 @@ public class RecurringBackgroundJobBaseTests
     {
         var sut = new TestJob(TimeSpan.FromMinutes(7));
 
-        Assert.AreEqual(TimeSpan.FromMinutes(7), sut.Period);
+        Assert.That(sut.Period, Is.EqualTo(TimeSpan.FromMinutes(7)));
     }
 
     [Test]
@@ -22,7 +22,7 @@ public class RecurringBackgroundJobBaseTests
     {
         var sut = new TestJob(Timeout.InfiniteTimeSpan);
 
-        Assert.AreEqual(Timeout.InfiniteTimeSpan, sut.Period);
+        Assert.That(sut.Period, Is.EqualTo(Timeout.InfiniteTimeSpan));
     }
 
     [Test]
@@ -34,7 +34,7 @@ public class RecurringBackgroundJobBaseTests
     {
         var sut = new TestJob(Timeout.InfiniteTimeSpan);
 
-        Assert.AreEqual(RecurringBackgroundJobBase.DefaultIgnoredDelay, sut.IgnoredDelay);
+        Assert.That(sut.IgnoredDelay, Is.EqualTo(RecurringBackgroundJobBase.DefaultIgnoredDelay));
     }
 
     [Test]
@@ -46,8 +46,8 @@ public class RecurringBackgroundJobBaseTests
 
         sut.SetPeriod(TimeSpan.FromMinutes(5));
 
-        Assert.AreEqual(TimeSpan.FromMinutes(5), sut.Period);
-        Assert.AreEqual(1, raised);
+        Assert.That(sut.Period, Is.EqualTo(TimeSpan.FromMinutes(5)));
+        Assert.That(raised, Is.EqualTo(1));
     }
 
     [Test]
@@ -59,7 +59,7 @@ public class RecurringBackgroundJobBaseTests
 
         sut.SetPeriod(TimeSpan.FromMinutes(5));
 
-        Assert.AreEqual(0, raised);
+        Assert.That(raised, Is.EqualTo(0));
     }
 
     [Test]
@@ -71,8 +71,8 @@ public class RecurringBackgroundJobBaseTests
 
         sut.SetPeriod(Timeout.InfiniteTimeSpan);
 
-        Assert.AreEqual(Timeout.InfiniteTimeSpan, sut.Period);
-        Assert.AreEqual(1, raised);
+        Assert.That(sut.Period, Is.EqualTo(Timeout.InfiniteTimeSpan));
+        Assert.That(raised, Is.EqualTo(1));
     }
 
     [Test]
@@ -92,8 +92,8 @@ public class RecurringBackgroundJobBaseTests
 
         sut.SetIgnoredDelay(TimeSpan.FromSeconds(30));
 
-        Assert.AreEqual(TimeSpan.FromSeconds(30), sut.IgnoredDelay);
-        Assert.AreEqual(1, raised);
+        Assert.That(sut.IgnoredDelay, Is.EqualTo(TimeSpan.FromSeconds(30)));
+        Assert.That(raised, Is.EqualTo(1));
     }
 
     [Test]
@@ -106,7 +106,7 @@ public class RecurringBackgroundJobBaseTests
 
         sut.SetIgnoredDelay(TimeSpan.FromSeconds(30));
 
-        Assert.AreEqual(0, raised);
+        Assert.That(raised, Is.EqualTo(0));
     }
 
     [Test]
@@ -118,8 +118,8 @@ public class RecurringBackgroundJobBaseTests
 
         sut.SetIgnoredDelay(Timeout.InfiniteTimeSpan);
 
-        Assert.AreEqual(Timeout.InfiniteTimeSpan, sut.IgnoredDelay);
-        Assert.AreEqual(1, raised);
+        Assert.That(sut.IgnoredDelay, Is.EqualTo(Timeout.InfiniteTimeSpan));
+        Assert.That(raised, Is.EqualTo(1));
     }
 
     [Test]
@@ -140,7 +140,7 @@ public class RecurringBackgroundJobBaseTests
         sut.Dispose();
         sut.SetPeriod(TimeSpan.FromMinutes(6));
 
-        Assert.AreEqual(0, raised);
+        Assert.That(raised, Is.EqualTo(0));
     }
 
     [Test]
@@ -153,7 +153,7 @@ public class RecurringBackgroundJobBaseTests
         sut.Dispose();
         sut.SetIgnoredDelay(TimeSpan.FromSeconds(30));
 
-        Assert.AreEqual(0, raised);
+        Assert.That(raised, Is.EqualTo(0));
     }
 
     private sealed class TestJob : RecurringBackgroundJobBase

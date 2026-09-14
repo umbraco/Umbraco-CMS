@@ -182,9 +182,9 @@ internal sealed class LanguageRepositoryTest : UmbracoIntegrationTest
             // Assert
             Assert.That(languageBR.HasIdentity, Is.True);
             Assert.That(languageBR.Id, Is.EqualTo(6)); // With 5 existing entries the Id should be 6
-            Assert.IsFalse(languageBR.IsDefault);
-            Assert.IsFalse(languageBR.IsMandatory);
-            Assert.IsNull(languageBR.FallbackIsoCode);
+            Assert.That(languageBR.IsDefault, Is.False);
+            Assert.That(languageBR.IsMandatory, Is.False);
+            Assert.That(languageBR.FallbackIsoCode, Is.Null);
         }
     }
 
@@ -204,9 +204,9 @@ internal sealed class LanguageRepositoryTest : UmbracoIntegrationTest
             // Assert
             Assert.That(languageBR.HasIdentity, Is.True);
             Assert.That(languageBR.Id, Is.EqualTo(6)); // With 5 existing entries the Id should be 6
-            Assert.IsTrue(languageBR.IsDefault);
-            Assert.IsTrue(languageBR.IsMandatory);
-            Assert.IsNull(languageBR.FallbackIsoCode);
+            Assert.That(languageBR.IsDefault, Is.True);
+            Assert.That(languageBR.IsMandatory, Is.True);
+            Assert.That(languageBR.FallbackIsoCode, Is.Null);
         }
     }
 
@@ -244,8 +244,8 @@ internal sealed class LanguageRepositoryTest : UmbracoIntegrationTest
             var languageEN = new Language("en-AU", "English (Australia)");
             repository.Save(languageEN);
 
-            Assert.IsTrue(languageBR.IsDefault);
-            Assert.IsTrue(languageBR.IsMandatory);
+            Assert.That(languageBR.IsDefault, Is.True);
+            Assert.That(languageBR.IsMandatory, Is.True);
 
             // Act
             var languageNZ = new Language("en-NZ", "English (New Zealand)") { IsDefault = true, IsMandatory = true };
@@ -253,8 +253,8 @@ internal sealed class LanguageRepositoryTest : UmbracoIntegrationTest
             languageBR = repository.Get(languageBR.Id);
 
             // Assert
-            Assert.IsFalse(languageBR.IsDefault);
-            Assert.IsTrue(languageNZ.IsDefault);
+            Assert.That(languageBR.IsDefault, Is.False);
+            Assert.That(languageNZ.IsDefault, Is.True);
         }
     }
 

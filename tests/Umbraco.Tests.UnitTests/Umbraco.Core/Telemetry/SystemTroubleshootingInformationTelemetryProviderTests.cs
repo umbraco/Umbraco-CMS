@@ -29,8 +29,8 @@ public class SystemTroubleshootingInformationTelemetryProviderTests
         var usageInformation = telemetryProvider.GetInformation().ToArray();
 
         var actual = usageInformation.FirstOrDefault(x => x.Name == Constants.Telemetry.ModelsBuilderMode);
-        Assert.IsNotNull(actual?.Data);
-        Assert.AreEqual(modelsMode, actual.Data);
+        Assert.That(actual?.Data, Is.Not.Null);
+        Assert.That(actual.Data, Is.EqualTo(modelsMode));
     }
 
     [Test]
@@ -44,8 +44,8 @@ public class SystemTroubleshootingInformationTelemetryProviderTests
         var usageInformation = telemetryProvider.GetInformation().ToArray();
 
         var actual = usageInformation.FirstOrDefault(x => x.Name == Constants.Telemetry.RuntimeMode);
-        Assert.IsNotNull(actual?.Data);
-        Assert.AreEqual(runtimeMode.ToString(), actual.Data);
+        Assert.That(actual?.Data, Is.Not.Null);
+        Assert.That(actual.Data, Is.EqualTo(runtimeMode.ToString()));
     }
 
     [Test]
@@ -57,8 +57,8 @@ public class SystemTroubleshootingInformationTelemetryProviderTests
         var usageInformation = telemetryProvider.GetInformation().ToArray();
 
         var actual = usageInformation.FirstOrDefault(x => x.Name == Constants.Telemetry.IsDebug);
-        Assert.IsNotNull(actual?.Data);
-        Assert.AreEqual(isDebug, actual.Data);
+        Assert.That(actual?.Data, Is.Not.Null);
+        Assert.That(actual.Data, Is.EqualTo(isDebug));
     }
 
     [Test]
@@ -74,8 +74,8 @@ public class SystemTroubleshootingInformationTelemetryProviderTests
         var usageInformation = telemetryProvider.GetInformation().ToArray();
         var actual = usageInformation.FirstOrDefault(x => x.Name == Constants.Telemetry.OsLanguage);
 
-        Assert.NotNull(actual?.Data);
-        Assert.AreEqual(culture, actual.Data.ToString());
+        Assert.That(actual?.Data, Is.Not.Null);
+        Assert.That(actual.Data.ToString(), Is.EqualTo(culture));
     }
 
     [Test]
@@ -89,8 +89,8 @@ public class SystemTroubleshootingInformationTelemetryProviderTests
         var usageInformation = telemetryProvider.GetInformation().ToArray();
         var actual = usageInformation.FirstOrDefault(x => x.Name == Constants.Telemetry.AspEnvironment);
 
-        Assert.NotNull(actual?.Data);
-        Assert.AreEqual(environment, actual.Data);
+        Assert.That(actual?.Data, Is.Not.Null);
+        Assert.That(actual.Data, Is.EqualTo(environment));
     }
 
     private SystemTroubleshootingInformationTelemetryProvider CreateProvider(

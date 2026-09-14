@@ -16,7 +16,7 @@ public class TrueFalseValueRequiredValidatorTests
         var validator = new TrueFalseValueRequiredValidator();
 
         var result = validator.ValidateRequired(null, ValueTypes.Integer);
-        Assert.AreEqual(1, result.Count());
+        Assert.That(result.Count(), Is.EqualTo(1));
     }
 
     [Test]
@@ -25,7 +25,7 @@ public class TrueFalseValueRequiredValidatorTests
         var validator = new TrueFalseValueRequiredValidator();
 
         var result = validator.ValidateRequired(false, ValueTypes.Integer);
-        Assert.AreEqual(1, result.Count());
+        Assert.That(result.Count(), Is.EqualTo(1));
     }
 
     [Test]
@@ -34,6 +34,6 @@ public class TrueFalseValueRequiredValidatorTests
         var validator = new TrueFalseValueRequiredValidator();
 
         var result = validator.ValidateRequired(true, ValueTypes.Integer);
-        Assert.IsEmpty(result);
+        Assert.That(result, Is.Empty);
     }
 }

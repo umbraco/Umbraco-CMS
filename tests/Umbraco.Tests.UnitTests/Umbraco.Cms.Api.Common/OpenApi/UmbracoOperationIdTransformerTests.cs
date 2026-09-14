@@ -90,7 +90,7 @@ internal sealed class UmbracoOperationIdTransformerTests
             CreateContext(CreateApiDescription(testCase)),
             CancellationToken.None);
 
-        Assert.AreEqual(expected, operation.OperationId);
+        Assert.That(operation.OperationId, Is.EqualTo(expected));
     }
 
     [Test]
@@ -103,7 +103,7 @@ internal sealed class UmbracoOperationIdTransformerTests
             CreateContext(CreateNonControllerApiDescription()),
             CancellationToken.None);
 
-        Assert.AreEqual("TheFrameworkDefault", operation.OperationId);
+        Assert.That(operation.OperationId, Is.EqualTo("TheFrameworkDefault"));
     }
 
     [Test]

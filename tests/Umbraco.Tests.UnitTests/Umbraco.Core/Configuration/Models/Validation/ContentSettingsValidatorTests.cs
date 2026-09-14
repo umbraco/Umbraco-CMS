@@ -24,7 +24,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Configuration.Models.Validati
             var validator = CreateValidator();
             ContentSettings options = BuildContentSettings();
             ValidateOptionsResult result = validator.Validate("settings", options);
-            Assert.True(result.Succeeded);
+            Assert.That(result.Succeeded, Is.True);
         }
 
         [Test]
@@ -33,7 +33,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Configuration.Models.Validati
             var validator = CreateValidator();
             ContentSettings options = BuildContentSettings(culture: string.Empty);
             ValidateOptionsResult result = validator.Validate("settings", options);
-            Assert.False(result.Succeeded);
+            Assert.That(result.Succeeded, Is.False);
         }
 
         [Test]
@@ -42,7 +42,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Configuration.Models.Validati
             var validator = CreateValidator();
             ContentSettings options = BuildContentSettings(culture: string.Empty);
             ValidateOptionsResult result = validator.Validate("settings", options);
-            Assert.False(result.Succeeded);
+            Assert.That(result.Succeeded, Is.False);
         }
 
         [Test]
@@ -53,7 +53,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Configuration.Models.Validati
 
             validator.Validate("settings", options);
 
-            Assert.AreEqual(0, GetWarningLogCount());
+            Assert.That(GetWarningLogCount(), Is.EqualTo(0));
         }
 
         [TestCase(@"<script{3} src=""{0}/website/preview.js""></script>")]
@@ -67,7 +67,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Configuration.Models.Validati
 
             validator.Validate("settings", options);
 
-            Assert.AreEqual(0, GetWarningLogCount());
+            Assert.That(GetWarningLogCount(), Is.EqualTo(0));
         }
 
         [Test]
@@ -81,8 +81,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Configuration.Models.Validati
 
             Assert.Multiple(() =>
             {
-                Assert.True(result.Succeeded);
-                Assert.AreEqual(1, GetWarningLogCount());
+                Assert.That(result.Succeeded, Is.True);
+                Assert.That(GetWarningLogCount(), Is.EqualTo(1));
             });
         }
 
@@ -97,7 +97,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Configuration.Models.Validati
             validator.Validate("settings", options);
             validator.Validate(Options.DefaultName, BuildContentSettings());
 
-            Assert.AreEqual(1, GetWarningLogCount());
+            Assert.That(GetWarningLogCount(), Is.EqualTo(1));
         }
 
         [Test]
@@ -112,7 +112,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Configuration.Models.Validati
             options.PreviewBadge = @"<script defer src=""{0}/website/preview.js""></script>";
             validator.Validate("settings", options);
 
-            Assert.AreEqual(2, GetWarningLogCount());
+            Assert.That(GetWarningLogCount(), Is.EqualTo(2));
         }
 
         private ContentSettingsValidator CreateValidator() => new(_loggerMock.Object);

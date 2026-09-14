@@ -93,10 +93,10 @@ public class BlockListPropertyValueConverterTests : BlockPropertyValueConverterT
     public void IsConverter_For()
     {
         var editor = CreateConverter();
-        Assert.IsTrue(editor.IsConverter(
-            Mock.Of<IPublishedPropertyType>(x => x.EditorAlias == Constants.PropertyEditors.Aliases.BlockList)));
-        Assert.IsFalse(editor.IsConverter(Mock.Of<IPublishedPropertyType>(x =>
-            x.EditorAlias == Constants.PropertyEditors.Aliases.NestedContent)));
+        Assert.That(editor.IsConverter(
+            Mock.Of<IPublishedPropertyType>(x => x.EditorAlias == Constants.PropertyEditors.Aliases.BlockList)), Is.True);
+        Assert.That(editor.IsConverter(Mock.Of<IPublishedPropertyType>(x =>
+            x.EditorAlias == Constants.PropertyEditors.Aliases.NestedContent)), Is.False);
     }
 
     [Test]
@@ -111,7 +111,7 @@ public class BlockListPropertyValueConverterTests : BlockPropertyValueConverterT
         var valueType = editor.GetPropertyValueType(propType);
 
         // the result is always block list model
-        Assert.AreEqual(typeof(BlockListModel), valueType);
+        Assert.That(valueType, Is.EqualTo(typeof(BlockListModel)));
     }
 
     [Test]
@@ -126,7 +126,7 @@ public class BlockListPropertyValueConverterTests : BlockPropertyValueConverterT
         var valueType = editor.GetPropertyValueType(propType);
 
         // the result is always block list model
-        Assert.AreEqual(typeof(BlockListModel), valueType);
+        Assert.That(valueType, Is.EqualTo(typeof(BlockListModel)));
     }
 
     [Test]
@@ -140,7 +140,7 @@ public class BlockListPropertyValueConverterTests : BlockPropertyValueConverterT
 
         var valueType = editor.GetPropertyValueType(propType);
 
-        Assert.AreEqual(typeof(BlockListItem), valueType);
+        Assert.That(valueType, Is.EqualTo(typeof(BlockListItem)));
     }
 
     [Test]
@@ -156,14 +156,14 @@ public class BlockListPropertyValueConverterTests : BlockPropertyValueConverterT
             editor.ConvertIntermediateToObject(publishedElement, propertyType, PropertyCacheLevel.None, json, false) as
                 BlockListModel;
 
-        Assert.IsNotNull(converted);
-        Assert.AreEqual(0, converted.Count);
+        Assert.That(converted, Is.Not.Null);
+        Assert.That(converted, Is.Empty);
 
         json = string.Empty;
         converted = editor.ConvertIntermediateToObject(publishedElement, propertyType, PropertyCacheLevel.None, json, false) as BlockListModel;
 
-        Assert.IsNotNull(converted);
-        Assert.AreEqual(0, converted.Count);
+        Assert.That(converted, Is.Not.Null);
+        Assert.That(converted, Is.Empty);
     }
 
     [Test]
@@ -179,16 +179,16 @@ public class BlockListPropertyValueConverterTests : BlockPropertyValueConverterT
             editor.ConvertIntermediateToObject(publishedElement, propertyType, PropertyCacheLevel.None, json, false) as
                 BlockListModel;
 
-        Assert.IsNotNull(converted);
-        Assert.AreEqual(0, converted.Count);
+        Assert.That(converted, Is.Not.Null);
+        Assert.That(converted, Is.Empty);
 
         json = @"{
 ""layout"": {},
 ""data"": []}";
         converted = editor.ConvertIntermediateToObject(publishedElement, propertyType, PropertyCacheLevel.None, json, false) as BlockListModel;
 
-        Assert.IsNotNull(converted);
-        Assert.AreEqual(0, converted.Count);
+        Assert.That(converted, Is.Not.Null);
+        Assert.That(converted, Is.Empty);
 
         // Even though there is a layout, there is no data, so the conversion will result in zero elements in total
         json = @"
@@ -210,8 +210,8 @@ public class BlockListPropertyValueConverterTests : BlockPropertyValueConverterT
 
         converted = editor.ConvertIntermediateToObject(publishedElement, propertyType, PropertyCacheLevel.None, json, false) as BlockListModel;
 
-        Assert.IsNotNull(converted);
-        Assert.AreEqual(0, converted.Count);
+        Assert.That(converted, Is.Not.Null);
+        Assert.That(converted, Is.Empty);
 
         // Even though there is a layout and data, the data is invalid (missing required keys) so the conversion will result in zero elements in total
         json = @"
@@ -237,8 +237,8 @@ public class BlockListPropertyValueConverterTests : BlockPropertyValueConverterT
 
         converted = editor.ConvertIntermediateToObject(publishedElement, propertyType, PropertyCacheLevel.None, json, false) as BlockListModel;
 
-        Assert.IsNotNull(converted);
-        Assert.AreEqual(0, converted.Count);
+        Assert.That(converted, Is.Not.Null);
+        Assert.That(converted, Is.Empty);
 
         // Everthing is ok except the udi reference in the layout doesn't match the data so it will be empty
         json = @"
@@ -265,8 +265,8 @@ public class BlockListPropertyValueConverterTests : BlockPropertyValueConverterT
 
         converted = editor.ConvertIntermediateToObject(publishedElement, propertyType, PropertyCacheLevel.None, json, false) as BlockListModel;
 
-        Assert.IsNotNull(converted);
-        Assert.AreEqual(0, converted.Count);
+        Assert.That(converted, Is.Not.Null);
+        Assert.That(converted, Is.Empty);
     }
 
     [Test]
@@ -302,13 +302,13 @@ public class BlockListPropertyValueConverterTests : BlockPropertyValueConverterT
             editor.ConvertIntermediateToObject(publishedElement, propertyType, PropertyCacheLevel.None, json, false) as
                 BlockListModel;
 
-        Assert.IsNotNull(converted);
-        Assert.AreEqual(1, converted.Count);
+        Assert.That(converted, Is.Not.Null);
+        Assert.That(converted, Has.Count.EqualTo(1));
         var item0 = converted[0].Content;
-        Assert.AreEqual(Guid.Parse("1304E1DD-AC87-4396-84FE-8A399231CB3D"), item0.Key);
-        Assert.AreEqual("Test1", item0.ContentType.Alias);
-        Assert.IsNull(converted[0].Settings);
-        Assert.AreEqual(Guid.Parse("1304E1DD-AC87-4396-84FE-8A399231CB3D"), converted[0].ContentKey);
+        Assert.That(item0.Key, Is.EqualTo(Guid.Parse("1304E1DD-AC87-4396-84FE-8A399231CB3D")));
+        Assert.That(item0.ContentType.Alias, Is.EqualTo("Test1"));
+        Assert.That(converted[0].Settings, Is.Null);
+        Assert.That(converted[0].ContentKey, Is.EqualTo(Guid.Parse("1304E1DD-AC87-4396-84FE-8A399231CB3D")));
     }
 
     [Test]
@@ -377,20 +377,20 @@ public class BlockListPropertyValueConverterTests : BlockPropertyValueConverterT
             editor.ConvertIntermediateToObject(publishedElement, propertyType, PropertyCacheLevel.None, json, false) as
                 BlockListModel;
 
-        Assert.IsNotNull(converted);
-        Assert.AreEqual(2, converted.Count);
+        Assert.That(converted, Is.Not.Null);
+        Assert.That(converted, Has.Count.EqualTo(2));
 
         var item0 = converted[0];
-        Assert.AreEqual(Guid.Parse("1304E1DD-AC87-4396-84FE-8A399231CB3D"), item0.Content.Key);
-        Assert.AreEqual("Test1", item0.Content.ContentType.Alias);
-        Assert.AreEqual(Guid.Parse("1F613E26-CE27-4898-908A-561437AF5100"), item0.Settings!.Key);
-        Assert.AreEqual("Setting2", item0.Settings.ContentType.Alias);
+        Assert.That(item0.Content.Key, Is.EqualTo(Guid.Parse("1304E1DD-AC87-4396-84FE-8A399231CB3D")));
+        Assert.That(item0.Content.ContentType.Alias, Is.EqualTo("Test1"));
+        Assert.That(item0.Settings!.Key, Is.EqualTo(Guid.Parse("1F613E26-CE27-4898-908A-561437AF5100")));
+        Assert.That(item0.Settings.ContentType.Alias, Is.EqualTo("Setting2"));
 
         var item1 = converted[1];
-        Assert.AreEqual(Guid.Parse("0A4A416E-547D-464F-ABCC-6F345C17809A"), item1.Content.Key);
-        Assert.AreEqual("Test2", item1.Content.ContentType.Alias);
-        Assert.AreEqual(Guid.Parse("63027539-B0DB-45E7-B704-59762D4E83DD"), item1.Settings!.Key);
-        Assert.AreEqual("Setting1", item1.Settings.ContentType.Alias);
+        Assert.That(item1.Content.Key, Is.EqualTo(Guid.Parse("0A4A416E-547D-464F-ABCC-6F345C17809A")));
+        Assert.That(item1.Content.ContentType.Alias, Is.EqualTo("Test2"));
+        Assert.That(item1.Settings!.Key, Is.EqualTo(Guid.Parse("63027539-B0DB-45E7-B704-59762D4E83DD")));
+        Assert.That(item1.Settings.ContentType.Alias, Is.EqualTo("Setting1"));
     }
 
     [Test]
@@ -474,12 +474,12 @@ public class BlockListPropertyValueConverterTests : BlockPropertyValueConverterT
             editor.ConvertIntermediateToObject(publishedElement, propertyType, PropertyCacheLevel.None, json, false) as
                 BlockListModel;
 
-        Assert.IsNotNull(converted);
-        Assert.AreEqual(1, converted.Count);
+        Assert.That(converted, Is.Not.Null);
+        Assert.That(converted, Has.Count.EqualTo(1));
 
         var item0 = converted[0];
-        Assert.AreEqual(Guid.Parse("0A4A416E-547D-464F-ABCC-6F345C17809A"), item0.Content.Key);
-        Assert.AreEqual("Test2", item0.Content.ContentType.Alias);
-        Assert.IsNull(item0.Settings);
+        Assert.That(item0.Content.Key, Is.EqualTo(Guid.Parse("0A4A416E-547D-464F-ABCC-6F345C17809A")));
+        Assert.That(item0.Content.ContentType.Alias, Is.EqualTo("Test2"));
+        Assert.That(item0.Settings, Is.Null);
     }
 }

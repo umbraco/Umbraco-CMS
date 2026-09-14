@@ -16,8 +16,8 @@ public class ExpressionFilterTests
     {
         var filter = new ExpressionFilter("hello");
 
-        Assert.IsTrue(filter.TakeLogEvent(CreateLogEvent("say hello world")));
-        Assert.IsFalse(filter.TakeLogEvent(CreateLogEvent("say goodbye world")));
+        Assert.That(filter.TakeLogEvent(CreateLogEvent("say hello world")), Is.True);
+        Assert.That(filter.TakeLogEvent(CreateLogEvent("say goodbye world")), Is.False);
     }
 
     [Test]
@@ -26,8 +26,8 @@ public class ExpressionFilterTests
         // Contains an operator, so it is compiled as an expression rather than searched for as a term.
         var filter = new ExpressionFilter("@Level='Error'");
 
-        Assert.IsTrue(filter.TakeLogEvent(CreateLogEvent("boom", LogEventLevel.Error)));
-        Assert.IsFalse(filter.TakeLogEvent(CreateLogEvent("boom", LogEventLevel.Information)));
+        Assert.That(filter.TakeLogEvent(CreateLogEvent("boom", LogEventLevel.Error)), Is.True);
+        Assert.That(filter.TakeLogEvent(CreateLogEvent("boom", LogEventLevel.Information)), Is.False);
     }
 
     [Test]
@@ -35,8 +35,8 @@ public class ExpressionFilterTests
     {
         var filter = new ExpressionFilter("@Level = 'Error'");
 
-        Assert.IsTrue(filter.TakeLogEvent(CreateLogEvent("boom", LogEventLevel.Error)));
-        Assert.IsFalse(filter.TakeLogEvent(CreateLogEvent("boom", LogEventLevel.Information)));
+        Assert.That(filter.TakeLogEvent(CreateLogEvent("boom", LogEventLevel.Error)), Is.True);
+        Assert.That(filter.TakeLogEvent(CreateLogEvent("boom", LogEventLevel.Information)), Is.False);
     }
 
     [TestCase("")]
@@ -45,8 +45,8 @@ public class ExpressionFilterTests
     {
         var filter = new ExpressionFilter(filterExpression);
 
-        Assert.IsTrue(filter.TakeLogEvent(CreateLogEvent("anything at all")));
-        Assert.IsTrue(filter.TakeLogEvent(CreateLogEvent("boom", LogEventLevel.Error)));
+        Assert.That(filter.TakeLogEvent(CreateLogEvent("anything at all")), Is.True);
+        Assert.That(filter.TakeLogEvent(CreateLogEvent("boom", LogEventLevel.Error)), Is.True);
     }
 
     [Test]
@@ -55,8 +55,8 @@ public class ExpressionFilterTests
         // None of these are operators, so the whole thing stays a term to search the message for.
         var filter = new ExpressionFilter("Umbraco.Cms_Core:42");
 
-        Assert.IsTrue(filter.TakeLogEvent(CreateLogEvent("from Umbraco.Cms_Core:42 today")));
-        Assert.IsFalse(filter.TakeLogEvent(CreateLogEvent("from Umbraco.Cms_Core:43 today")));
+        Assert.That(filter.TakeLogEvent(CreateLogEvent("from Umbraco.Cms_Core:42 today")), Is.True);
+        Assert.That(filter.TakeLogEvent(CreateLogEvent("from Umbraco.Cms_Core:43 today")), Is.False);
     }
 
     private static LogEvent CreateLogEvent(string message, LogEventLevel level = LogEventLevel.Information)

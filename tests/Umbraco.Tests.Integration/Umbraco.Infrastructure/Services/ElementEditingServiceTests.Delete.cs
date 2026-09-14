@@ -26,12 +26,12 @@ public partial class ElementEditingServiceTests
         var result = await ElementEditingService.DeleteAsync(referencedElement.Key, Constants.Security.SuperUserKey);
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(result.Success);
-            Assert.AreEqual(ContentEditingOperationStatus.CannotDeleteWhenReferenced, result.Status);
+            Assert.That(result.Success, Is.False);
+            Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.CannotDeleteWhenReferenced));
         });
 
         var element = await ElementEditingService.GetAsync(referencedElement.Key);
-        Assert.IsNotNull(element);
+        Assert.That(element, Is.Not.Null);
     }
 
     [TestCase(true)]
@@ -41,12 +41,12 @@ public partial class ElementEditingServiceTests
         var element = await (variant ? CreateCultureVariantElement() : CreateInvariantElement());
 
         var result = await ElementEditingService.DeleteAsync(element.Key, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.Success));
 
         // re-get and verify deletion
         element = await ElementEditingService.GetAsync(element.Key);
-        Assert.IsNull(element);
+        Assert.That(element, Is.Null);
     }
 
     [Test]
@@ -56,20 +56,20 @@ public partial class ElementEditingServiceTests
         await ElementEditingService.MoveToRecycleBinAsync(element.Key,  Constants.Security.SuperUserKey);
 
         var result = await ElementEditingService.DeleteAsync(element.Key, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.Success));
 
         // re-get and verify deletion
         element = await ElementEditingService.GetAsync(element.Key);
-        Assert.IsNull(element);
+        Assert.That(element, Is.Null);
     }
 
     [Test]
     public async Task Cannot_Delete_Non_Existing()
     {
         var result = await ElementEditingService.DeleteAsync(Guid.NewGuid(), Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.NotFound, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.NotFound));
     }
 
     [Test]
@@ -98,13 +98,13 @@ public partial class ElementEditingServiceTests
             }
         }
 
-        Assert.AreEqual(5, EntityService.GetRootEntities(UmbracoObjectTypes.Element).Count());
-        Assert.AreEqual(5, EntityService.GetPagedTrashedChildren(Constants.System.RecycleBinElementKey, UmbracoObjectTypes.Element, 0, 100, out _).Count());
+        Assert.That(EntityService.GetRootEntities(UmbracoObjectTypes.Element).Count(), Is.EqualTo(5));
+        Assert.That(EntityService.GetPagedTrashedChildren(Constants.System.RecycleBinElementKey, UmbracoObjectTypes.Element, 0, 100, out _).Count(), Is.EqualTo(5));
 
         var result = await ContentTypeService.DeleteAsync(elementType.Key, Constants.Security.SuperUserKey);
-        Assert.AreEqual(ContentTypeOperationStatus.Success, result);
+        Assert.That(result, Is.EqualTo(ContentTypeOperationStatus.Success));
 
-        Assert.AreEqual(0, EntityService.GetRootEntities(UmbracoObjectTypes.Element).Count());
-        Assert.AreEqual(0, EntityService.GetPagedTrashedChildren(Constants.System.RecycleBinElementKey, UmbracoObjectTypes.Element, 0, 100, out _).Count());
+        Assert.That(EntityService.GetRootEntities(UmbracoObjectTypes.Element).Count(), Is.EqualTo(0));
+        Assert.That(EntityService.GetPagedTrashedChildren(Constants.System.RecycleBinElementKey, UmbracoObjectTypes.Element, 0, 100, out _).Count(), Is.EqualTo(0));
     }
 }

@@ -39,14 +39,14 @@ public class ByKeyPublishedElementControllerTests : ManagementApiUserGroupTestBa
             Variants = [new VariantModel { Name = "Test Element Instance" }],
         };
         var createResponse = await ElementEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(createResponse.Success, $"Failed to create element: {createResponse.Status}");
+        Assert.That(createResponse.Success, Is.True, $"Failed to create element: {createResponse.Status}");
         _elementKey = createResponse.Result!.Content!.Key;
 
         var publishResponse = await ElementPublishingService.PublishAsync(
             _elementKey,
             [new CulturePublishScheduleModel { Culture = Constants.System.InvariantCulture }],
             Constants.Security.SuperUserKey);
-        Assert.IsTrue(publishResponse.Success, $"Failed to publish element: {publishResponse.Status}");
+        Assert.That(publishResponse.Success, Is.True, $"Failed to publish element: {publishResponse.Status}");
     }
 
     protected override Expression<Func<ByKeyPublishedElementController, object>> MethodSelector =>

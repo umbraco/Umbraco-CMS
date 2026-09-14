@@ -27,18 +27,18 @@ public partial class UserStartNodeEntitiesServiceElementTests
         // Target is C1-C5, requesting 2 before and 2 after
         // Before C1-C5: C1-C1, C1-C2, C1-C3, C1-C4 = 4 items, returning 2, so totalBefore = 4 - 2 = 2
         // After C1-C5: C1-C6 through C1-C10 (5) + C1-E1, C1-E2 (2) = 7 items, returning 2, so totalAfter = 7 - 2 = 5
-        Assert.AreEqual(2, totalBefore);
-        Assert.AreEqual(5, totalAfter);
-        Assert.AreEqual(5, siblings.Length);
+        Assert.That(totalBefore, Is.EqualTo(2));
+        Assert.That(totalAfter, Is.EqualTo(5));
+        Assert.That(siblings, Has.Length.EqualTo(5));
         Assert.Multiple(() =>
         {
             // Siblings returned: C1-C3, C1-C4, C1-C5, C1-C6, C1-C7
-            Assert.AreEqual(ItemsByName["C1-C3"].Key, siblings[0].Entity.Key);
-            Assert.AreEqual(ItemsByName["C1-C4"].Key, siblings[1].Entity.Key);
-            Assert.AreEqual(ItemsByName["C1-C5"].Key, siblings[2].Entity.Key);
-            Assert.AreEqual(ItemsByName["C1-C6"].Key, siblings[3].Entity.Key);
-            Assert.AreEqual(ItemsByName["C1-C7"].Key, siblings[4].Entity.Key);
-            Assert.IsTrue(siblings.All(s => s.HasAccess));
+            Assert.That(siblings[0].Entity.Key, Is.EqualTo(ItemsByName["C1-C3"].Key));
+            Assert.That(siblings[1].Entity.Key, Is.EqualTo(ItemsByName["C1-C4"].Key));
+            Assert.That(siblings[2].Entity.Key, Is.EqualTo(ItemsByName["C1-C5"].Key));
+            Assert.That(siblings[3].Entity.Key, Is.EqualTo(ItemsByName["C1-C6"].Key));
+            Assert.That(siblings[4].Entity.Key, Is.EqualTo(ItemsByName["C1-C7"].Key));
+            Assert.That(siblings.All(s => s.HasAccess), Is.True);
         });
     }
 
@@ -62,13 +62,13 @@ public partial class UserStartNodeEntitiesServiceElementTests
                 out long totalAfter)
             .ToArray();
 
-        Assert.AreEqual(0, totalBefore);
-        Assert.AreEqual(0, totalAfter);
-        Assert.AreEqual(1, siblings.Length);
+        Assert.That(totalBefore, Is.EqualTo(0));
+        Assert.That(totalAfter, Is.EqualTo(0));
+        Assert.That(siblings, Has.Length.EqualTo(1));
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(ItemsByName["C1-C5"].Key, siblings[0].Entity.Key);
-            Assert.IsTrue(siblings[0].HasAccess);
+            Assert.That(siblings[0].Entity.Key, Is.EqualTo(ItemsByName["C1-C5"].Key));
+            Assert.That(siblings[0].HasAccess, Is.True);
         });
     }
 
@@ -90,13 +90,13 @@ public partial class UserStartNodeEntitiesServiceElementTests
                 out long totalAfter)
             .ToArray();
 
-        Assert.AreEqual(0, totalBefore);
-        Assert.AreEqual(0, totalAfter);
-        Assert.AreEqual(1, siblings.Length);
+        Assert.That(totalBefore, Is.EqualTo(0));
+        Assert.That(totalAfter, Is.EqualTo(0));
+        Assert.That(siblings, Has.Length.EqualTo(1));
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(ItemsByName["C1-C5"].Key, siblings[0].Entity.Key);
-            Assert.IsTrue(siblings[0].HasAccess);
+            Assert.That(siblings[0].Entity.Key, Is.EqualTo(ItemsByName["C1-C5"].Key));
+            Assert.That(siblings[0].HasAccess, Is.True);
         });
     }
 
@@ -118,18 +118,18 @@ public partial class UserStartNodeEntitiesServiceElementTests
                 out long totalAfter)
             .ToArray();
 
-        Assert.AreEqual(0, totalBefore);
-        Assert.AreEqual(1, totalAfter);
-        Assert.AreEqual(3, siblings.Length);
+        Assert.That(totalBefore, Is.EqualTo(0));
+        Assert.That(totalAfter, Is.EqualTo(1));
+        Assert.That(siblings, Has.Length.EqualTo(3));
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(ItemsByName["C1-C3"].Key, siblings[0].Entity.Key);
-            Assert.IsTrue(siblings[0].HasAccess);
-            Assert.AreEqual(ItemsByName["C1-C5"].Key, siblings[1].Entity.Key);
-            Assert.IsTrue(siblings[1].HasAccess);
-            Assert.AreEqual(ItemsByName["C1-C7"].Key, siblings[2].Entity.Key);
-            Assert.IsTrue(siblings[2].HasAccess);
+            Assert.That(siblings[0].Entity.Key, Is.EqualTo(ItemsByName["C1-C3"].Key));
+            Assert.That(siblings[0].HasAccess, Is.True);
+            Assert.That(siblings[1].Entity.Key, Is.EqualTo(ItemsByName["C1-C5"].Key));
+            Assert.That(siblings[1].HasAccess, Is.True);
+            Assert.That(siblings[2].Entity.Key, Is.EqualTo(ItemsByName["C1-C7"].Key));
+            Assert.That(siblings[2].HasAccess, Is.True);
         });
     }
 
@@ -153,13 +153,13 @@ public partial class UserStartNodeEntitiesServiceElementTests
             .ToArray();
 
         // User can see "C1" (to navigate to their start node "C1-C5"), but doesn't have direct access
-        Assert.AreEqual(0, totalBefore);
-        Assert.AreEqual(0, totalAfter);
-        Assert.AreEqual(1, siblings.Length);
+        Assert.That(totalBefore, Is.EqualTo(0));
+        Assert.That(totalAfter, Is.EqualTo(0));
+        Assert.That(siblings, Has.Length.EqualTo(1));
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(ItemsByName["C1"].Key, siblings[0].Entity.Key);
-            Assert.IsFalse(siblings[0].HasAccess);
+            Assert.That(siblings[0].Entity.Key, Is.EqualTo(ItemsByName["C1"].Key));
+            Assert.That(siblings[0].HasAccess, Is.False);
         });
     }
 
@@ -186,17 +186,17 @@ public partial class UserStartNodeEntitiesServiceElementTests
         // and C1-E2 after it
         // Before C1-E1: C1-C1 through C1-C10 = 10 items, returning 2, so totalBefore = 10 - 2 = 8
         // After C1-E1: C1-E2 = 1 item, returning 1 (not 2 since only 1 exists), so totalAfter = 0
-        Assert.AreEqual(8, totalBefore);
-        Assert.AreEqual(0, totalAfter);
-        Assert.AreEqual(4, siblings.Length); // 2 before + target + 1 after
+        Assert.That(totalBefore, Is.EqualTo(8));
+        Assert.That(totalAfter, Is.EqualTo(0));
+        Assert.That(siblings, Has.Length.EqualTo(4)); // 2 before + target + 1 after
         Assert.Multiple(() =>
         {
             // Siblings returned: C1-C9, C1-C10, C1-E1, C1-E2
-            Assert.AreEqual(ItemsByName["C1-C9"].Key, siblings[0].Entity.Key);
-            Assert.AreEqual(ItemsByName["C1-C10"].Key, siblings[1].Entity.Key);
-            Assert.AreEqual(ItemsByName["C1-E1"].Key, siblings[2].Entity.Key);
-            Assert.AreEqual(ItemsByName["C1-E2"].Key, siblings[3].Entity.Key);
-            Assert.IsTrue(siblings.All(s => s.HasAccess));
+            Assert.That(siblings[0].Entity.Key, Is.EqualTo(ItemsByName["C1-C9"].Key));
+            Assert.That(siblings[1].Entity.Key, Is.EqualTo(ItemsByName["C1-C10"].Key));
+            Assert.That(siblings[2].Entity.Key, Is.EqualTo(ItemsByName["C1-E1"].Key));
+            Assert.That(siblings[3].Entity.Key, Is.EqualTo(ItemsByName["C1-E2"].Key));
+            Assert.That(siblings.All(s => s.HasAccess), Is.True);
         });
     }
 }

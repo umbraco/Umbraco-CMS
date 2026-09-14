@@ -96,15 +96,15 @@ internal sealed class TrackRelationsTests : UmbracoIntegrationTestWithContent
         ContentService.Save(c2);
 
         var relations = RelationService.GetByParentId(c2.Id).ToList();
-        Assert.AreEqual(4, relations.Count);
-        Assert.AreEqual(Constants.Conventions.RelationTypes.RelatedMediaAlias, relations[0].RelationType.Alias);
-        Assert.AreEqual(m1.Id, relations[0].ChildId);
-        Assert.AreEqual(Constants.Conventions.RelationTypes.RelatedMediaAlias, relations[1].RelationType.Alias);
-        Assert.AreEqual(m2.Id, relations[1].ChildId);
-        Assert.AreEqual(Constants.Conventions.RelationTypes.RelatedDocumentAlias, relations[2].RelationType.Alias);
-        Assert.AreEqual(c1.Id, relations[2].ChildId);
-        Assert.AreEqual(Constants.Conventions.RelationTypes.RelatedMemberAlias, relations[3].RelationType.Alias);
-        Assert.AreEqual(member.Id, relations[3].ChildId);
+        Assert.That(relations, Has.Count.EqualTo(4));
+        Assert.That(relations[0].RelationType.Alias, Is.EqualTo(Constants.Conventions.RelationTypes.RelatedMediaAlias));
+        Assert.That(relations[0].ChildId, Is.EqualTo(m1.Id));
+        Assert.That(relations[1].RelationType.Alias, Is.EqualTo(Constants.Conventions.RelationTypes.RelatedMediaAlias));
+        Assert.That(relations[1].ChildId, Is.EqualTo(m2.Id));
+        Assert.That(relations[2].RelationType.Alias, Is.EqualTo(Constants.Conventions.RelationTypes.RelatedDocumentAlias));
+        Assert.That(relations[2].ChildId, Is.EqualTo(c1.Id));
+        Assert.That(relations[3].RelationType.Alias, Is.EqualTo(Constants.Conventions.RelationTypes.RelatedMemberAlias));
+        Assert.That(relations[3].ChildId, Is.EqualTo(member.Id));
     }
 
     [Test]
@@ -133,11 +133,11 @@ internal sealed class TrackRelationsTests : UmbracoIntegrationTestWithContent
         ContentService.Save(content);
 
         // Verify the saved notification was published with the correct relations.
-        Assert.AreEqual(2, RelationSavedTracker.SavedRelations.Count);
-        Assert.IsTrue(RelationSavedTracker.SavedRelations.Any(r => r.ChildId == m1.Id && r.RelationType.Alias == Constants.Conventions.RelationTypes.RelatedMediaAlias));
-        Assert.IsTrue(RelationSavedTracker.SavedRelations.Any(r => r.ChildId == m2.Id && r.RelationType.Alias == Constants.Conventions.RelationTypes.RelatedMediaAlias));
-        Assert.IsTrue(RelationSavedTracker.SavedRelations.All(r => r.ParentId == content.Id));
-        Assert.IsTrue(RelationSavedTracker.LastIsAutomatic);
+        Assert.That(RelationSavedTracker.SavedRelations, Has.Count.EqualTo(2));
+        Assert.That(RelationSavedTracker.SavedRelations.Any(r => r.ChildId == m1.Id && r.RelationType.Alias == Constants.Conventions.RelationTypes.RelatedMediaAlias), Is.True);
+        Assert.That(RelationSavedTracker.SavedRelations.Any(r => r.ChildId == m2.Id && r.RelationType.Alias == Constants.Conventions.RelationTypes.RelatedMediaAlias), Is.True);
+        Assert.That(RelationSavedTracker.SavedRelations.All(r => r.ParentId == content.Id), Is.True);
+        Assert.That(RelationSavedTracker.LastIsAutomatic, Is.True);
     }
 
     [Test]
@@ -171,10 +171,10 @@ internal sealed class TrackRelationsTests : UmbracoIntegrationTestWithContent
         ContentService.Save(content);
 
         // Verify the deleted notification was published for the removed relation.
-        Assert.AreEqual(1, RelationDeletedTracker.DeletedRelations.Count);
-        Assert.AreEqual(m2.Id, RelationDeletedTracker.DeletedRelations[0].ChildId);
-        Assert.AreEqual(content.Id, RelationDeletedTracker.DeletedRelations[0].ParentId);
-        Assert.IsTrue(RelationDeletedTracker.LastIsAutomatic);
+        Assert.That(RelationDeletedTracker.DeletedRelations, Has.Count.EqualTo(1));
+        Assert.That(RelationDeletedTracker.DeletedRelations[0].ChildId, Is.EqualTo(m2.Id));
+        Assert.That(RelationDeletedTracker.DeletedRelations[0].ParentId, Is.EqualTo(content.Id));
+        Assert.That(RelationDeletedTracker.LastIsAutomatic, Is.True);
     }
 
     [Test]
@@ -204,10 +204,10 @@ internal sealed class TrackRelationsTests : UmbracoIntegrationTestWithContent
         ContentService.Save(content);
 
         // Verify the deleted notification was published for the removed relation.
-        Assert.AreEqual(1, RelationDeletedTracker.DeletedRelations.Count);
-        Assert.AreEqual(m1.Id, RelationDeletedTracker.DeletedRelations[0].ChildId);
-        Assert.AreEqual(content.Id, RelationDeletedTracker.DeletedRelations[0].ParentId);
-        Assert.IsTrue(RelationDeletedTracker.LastIsAutomatic);
+        Assert.That(RelationDeletedTracker.DeletedRelations, Has.Count.EqualTo(1));
+        Assert.That(RelationDeletedTracker.DeletedRelations[0].ChildId, Is.EqualTo(m1.Id));
+        Assert.That(RelationDeletedTracker.DeletedRelations[0].ParentId, Is.EqualTo(content.Id));
+        Assert.That(RelationDeletedTracker.LastIsAutomatic, Is.True);
     }
 
     [Test]
@@ -236,10 +236,10 @@ internal sealed class TrackRelationsTests : UmbracoIntegrationTestWithContent
         RelationDeletedTracker.Reset();
         ContentService.Save(content);
 
-        Assert.AreEqual(0, RelationSavedTracker.SavedRelations.Count);
-        Assert.AreEqual(0, RelationDeletedTracker.DeletedRelations.Count);
-        Assert.IsNull(RelationSavedTracker.LastIsAutomatic);
-        Assert.IsNull(RelationDeletedTracker.LastIsAutomatic);
+        Assert.That(RelationSavedTracker.SavedRelations, Is.Empty);
+        Assert.That(RelationDeletedTracker.DeletedRelations, Is.Empty);
+        Assert.That(RelationSavedTracker.LastIsAutomatic, Is.Null);
+        Assert.That(RelationDeletedTracker.LastIsAutomatic, Is.Null);
     }
 
     [Test]
@@ -252,7 +252,7 @@ internal sealed class TrackRelationsTests : UmbracoIntegrationTestWithContent
         Assert.That(RelationService.GetByParentId(source.Id).Select(x => x.ChildId), Is.EquivalentTo(new[] { targetA.Id }));
 
         // Unpublish. The document no longer has a live published version, but the property's PublishedValue still holds target A.
-        Assert.IsTrue(ContentService.Unpublish(source).Success);
+        Assert.That(ContentService.Unpublish(source).Success, Is.True);
 
         // Save a draft that re-points the picker to target B.
         IContent draft = ContentService.GetById(source.Id)!;
@@ -278,7 +278,7 @@ internal sealed class TrackRelationsTests : UmbracoIntegrationTestWithContent
 
         // Unpublish. There is no longer a live published version, so the stale published reference to A must be removed,
         // leaving only the draft reference to B.
-        Assert.IsTrue(ContentService.Unpublish(draft).Success);
+        Assert.That(ContentService.Unpublish(draft).Success, Is.True);
 
         Assert.That(RelationService.GetByParentId(source.Id).Select(x => x.ChildId), Is.EquivalentTo(new[] { targetB.Id }));
     }
@@ -312,7 +312,7 @@ internal sealed class TrackRelationsTests : UmbracoIntegrationTestWithContent
         source.Properties["contentPicker"]!.SetValue(Udi.Create(Constants.UdiEntityType.Document, target.Key).ToString());
         ContentService.Save(source);
         PublishResult publishResult = ContentService.Publish(source, ["*"]);
-        Assert.IsTrue(publishResult.Success, publishResult.Result.ToString());
+        Assert.That(publishResult.Success, Is.True, publishResult.Result.ToString());
 
         // The automatic relation exists for the published content before its content type (and the content
         // itself) is deleted.
@@ -322,10 +322,10 @@ internal sealed class TrackRelationsTests : UmbracoIntegrationTestWithContent
         // that later raises ContentUnpublishedNotification for it. Before the fix, ContentRelationsUpdate would
         // try to re-persist the relation for the now-deleted node and throw a foreign key violation.
         ContentTypeOperationStatus status = await ContentTypeService.DeleteAsync(sourceType.Key, Constants.Security.SuperUserKey);
-        Assert.AreEqual(ContentTypeOperationStatus.Success, status);
+        Assert.That(status, Is.EqualTo(ContentTypeOperationStatus.Success));
 
-        Assert.IsNull(ContentService.GetById(source.Id));
-        Assert.IsEmpty(RelationService.GetByChildId(target.Id));
+        Assert.That(ContentService.GetById(source.Id), Is.Null);
+        Assert.That(RelationService.GetByChildId(target.Id), Is.Empty);
     }
 
     private async Task<(IContent Source, IContent TargetA, IContent TargetB)> CreatePublishedContentPickerScenario()
@@ -354,7 +354,7 @@ internal sealed class TrackRelationsTests : UmbracoIntegrationTestWithContent
         source.Properties["contentPicker"]!.SetValue(Udi.Create(Constants.UdiEntityType.Document, targetA.Key).ToString());
         ContentService.Save(source);
         PublishResult publishResult = ContentService.Publish(source, ["*"]);
-        Assert.IsTrue(publishResult.Success, publishResult.Result.ToString());
+        Assert.That(publishResult.Success, Is.True, publishResult.Result.ToString());
 
         return (source, targetA, targetB);
     }

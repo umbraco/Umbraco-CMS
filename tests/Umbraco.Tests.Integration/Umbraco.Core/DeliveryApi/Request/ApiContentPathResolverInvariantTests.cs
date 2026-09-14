@@ -81,22 +81,22 @@ public class ApiContentPathResolverInvariantTests : ApiContentPathResolverTestBa
     [Test]
     public void First_Root_Without_StartItem()
     {
-        Assert.IsEmpty(GetRequiredService<IHttpContextAccessor>().HttpContext!.Request.Headers["Start-Item"].ToString());
+        Assert.That(GetRequiredService<IHttpContextAccessor>().HttpContext!.Request.Headers["Start-Item"].ToString(), Is.Empty);
 
         var content = ApiContentPathResolver.ResolveContentPath("/");
-        Assert.IsNotNull(content);
-        Assert.AreEqual(_contentByName["Root 1"].Key, content.Key);
+        Assert.That(content, Is.Not.Null);
+        Assert.That(content.Key, Is.EqualTo(_contentByName["Root 1"].Key));
     }
 
     [Test]
     [ConfigureBuilder(ActionName = nameof(ConfigureIncludeTopLevelNodeInPath))]
     public void First_Root_Without_StartItem_With_Top_Level_Node_Included()
     {
-        Assert.IsEmpty(GetRequiredService<IHttpContextAccessor>().HttpContext!.Request.Headers["Start-Item"].ToString());
+        Assert.That(GetRequiredService<IHttpContextAccessor>().HttpContext!.Request.Headers["Start-Item"].ToString(), Is.Empty);
 
         var content = ApiContentPathResolver.ResolveContentPath("/");
-        Assert.IsNotNull(content);
-        Assert.AreEqual(_contentByName["Root 1"].Key, content.Key);
+        Assert.That(content, Is.Not.Null);
+        Assert.That(content.Key, Is.EqualTo(_contentByName["Root 1"].Key));
     }
 
     [TestCase(1)]
@@ -104,11 +104,11 @@ public class ApiContentPathResolverInvariantTests : ApiContentPathResolverTestBa
     [TestCase(3)]
     public void First_Root_Child_Without_StartItem(int child)
     {
-        Assert.IsEmpty(GetRequiredService<IHttpContextAccessor>().HttpContext!.Request.Headers["Start-Item"].ToString());
+        Assert.That(GetRequiredService<IHttpContextAccessor>().HttpContext!.Request.Headers["Start-Item"].ToString(), Is.Empty);
 
         var content = ApiContentPathResolver.ResolveContentPath($"/child-{child}");
-        Assert.IsNotNull(content);
-        Assert.AreEqual(_contentByName[$"Root 1/Child {child}"].Key, content.Key);
+        Assert.That(content, Is.Not.Null);
+        Assert.That(content.Key, Is.EqualTo(_contentByName[$"Root 1/Child {child}"].Key));
     }
 
     [TestCase(1, 1)]
@@ -119,11 +119,11 @@ public class ApiContentPathResolverInvariantTests : ApiContentPathResolverTestBa
     [TestCase(3, 1)]
     public void First_Root_Grandchild_Without_StartItem(int child, int grandchild)
     {
-        Assert.IsEmpty(GetRequiredService<IHttpContextAccessor>().HttpContext!.Request.Headers["Start-Item"].ToString());
+        Assert.That(GetRequiredService<IHttpContextAccessor>().HttpContext!.Request.Headers["Start-Item"].ToString(), Is.Empty);
 
         var content = ApiContentPathResolver.ResolveContentPath($"/child-{child}/grandchild-{grandchild}");
-        Assert.IsNotNull(content);
-        Assert.AreEqual(_contentByName[$"Root 1/Child {child}/Grandchild {grandchild}"].Key, content.Key);
+        Assert.That(content, Is.Not.Null);
+        Assert.That(content.Key, Is.EqualTo(_contentByName[$"Root 1/Child {child}/Grandchild {grandchild}"].Key));
     }
 
     [TestCase(1)]
@@ -134,8 +134,8 @@ public class ApiContentPathResolverInvariantTests : ApiContentPathResolverTestBa
         SetRequestStartItem($"root-{root}");
 
         var content = ApiContentPathResolver.ResolveContentPath("/");
-        Assert.IsNotNull(content);
-        Assert.AreEqual(_contentByName[$"Root {root}"].Key, content.Key);
+        Assert.That(content, Is.Not.Null);
+        Assert.That(content.Key, Is.EqualTo(_contentByName[$"Root {root}"].Key));
     }
 
     [TestCase(1)]
@@ -147,8 +147,8 @@ public class ApiContentPathResolverInvariantTests : ApiContentPathResolverTestBa
         SetRequestStartItem($"root-{root}");
 
         var content = ApiContentPathResolver.ResolveContentPath("/");
-        Assert.IsNotNull(content);
-        Assert.AreEqual(_contentByName[$"Root {root}"].Key, content.Key);
+        Assert.That(content, Is.Not.Null);
+        Assert.That(content.Key, Is.EqualTo(_contentByName[$"Root {root}"].Key));
     }
 
     [TestCase(1, 1)]
@@ -162,8 +162,8 @@ public class ApiContentPathResolverInvariantTests : ApiContentPathResolverTestBa
         SetRequestStartItem($"root-{root}");
 
         var content = ApiContentPathResolver.ResolveContentPath($"/child-{child}");
-        Assert.IsNotNull(content);
-        Assert.AreEqual(_contentByName[$"Root {root}/Child {child}"].Key, content.Key);
+        Assert.That(content, Is.Not.Null);
+        Assert.That(content.Key, Is.EqualTo(_contentByName[$"Root {root}/Child {child}"].Key));
     }
 
     [TestCase(1, 1)]
@@ -178,8 +178,8 @@ public class ApiContentPathResolverInvariantTests : ApiContentPathResolverTestBa
         SetRequestStartItem($"root-{root}");
 
         var content = ApiContentPathResolver.ResolveContentPath($"/child-{child}");
-        Assert.IsNotNull(content);
-        Assert.AreEqual(_contentByName[$"Root {root}/Child {child}"].Key, content.Key);
+        Assert.That(content, Is.Not.Null);
+        Assert.That(content.Key, Is.EqualTo(_contentByName[$"Root {root}/Child {child}"].Key));
     }
 
     [TestCase(1, 1, 1)]
@@ -193,8 +193,8 @@ public class ApiContentPathResolverInvariantTests : ApiContentPathResolverTestBa
         SetRequestStartItem($"root-{root}");
 
         var content = ApiContentPathResolver.ResolveContentPath($"/child-{child}/grandchild-{grandchild}");
-        Assert.IsNotNull(content);
-        Assert.AreEqual(_contentByName[$"Root {root}/Child {child}/Grandchild {grandchild}"].Key, content.Key);
+        Assert.That(content, Is.Not.Null);
+        Assert.That(content.Key, Is.EqualTo(_contentByName[$"Root {root}/Child {child}/Grandchild {grandchild}"].Key));
     }
 
     [TestCase("/", 1)]
@@ -205,8 +205,8 @@ public class ApiContentPathResolverInvariantTests : ApiContentPathResolverTestBa
         SetRequestStartItem($"root-{root}");
 
         var content = ApiContentPathResolver.ResolveContentPath(path);
-        Assert.IsNotNull(content);
-        Assert.AreEqual(_contentByName[$"Root {root}"].Key, content.Key);
+        Assert.That(content, Is.Not.Null);
+        Assert.That(content.Key, Is.EqualTo(_contentByName[$"Root {root}"].Key));
     }
 
     [TestCase("/", 1)]
@@ -215,8 +215,8 @@ public class ApiContentPathResolverInvariantTests : ApiContentPathResolverTestBa
     public void Root_By_Path_Without_StartItem(string path, int root)
     {
         var content = ApiContentPathResolver.ResolveContentPath(path);
-        Assert.IsNotNull(content);
-        Assert.AreEqual(_contentByName[$"Root {root}"].Key, content.Key);
+        Assert.That(content, Is.Not.Null);
+        Assert.That(content.Key, Is.EqualTo(_contentByName[$"Root {root}"].Key));
     }
 
     [TestCase(1)]
@@ -228,8 +228,8 @@ public class ApiContentPathResolverInvariantTests : ApiContentPathResolverTestBa
         SetRequestHost("some.host");
 
         var content = ApiContentPathResolver.ResolveContentPath("/");
-        Assert.IsNotNull(content);
-        Assert.AreEqual(_contentByName[$"Root {root}"].Key, content.Key);
+        Assert.That(content, Is.Not.Null);
+        Assert.That(content.Key, Is.EqualTo(_contentByName[$"Root {root}"].Key));
     }
 
     [TestCase("/a", 1)]
@@ -243,7 +243,7 @@ public class ApiContentPathResolverInvariantTests : ApiContentPathResolverTestBa
         SetRequestStartItem($"root-{root}");
 
         var content = ApiContentPathResolver.ResolveContentPath(path);
-        Assert.IsNull(content);
+        Assert.That(content, Is.Null);
     }
 
     [TestCase("/a")]
@@ -253,6 +253,6 @@ public class ApiContentPathResolverInvariantTests : ApiContentPathResolverTestBa
     public void Non_Existant_Descendant_By_Path_Without_StartItem(string path)
     {
         var content = ApiContentPathResolver.ResolveContentPath(path);
-        Assert.IsNull(content);
+        Assert.That(content, Is.Null);
     }
 }

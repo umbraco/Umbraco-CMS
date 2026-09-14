@@ -26,7 +26,7 @@ public class BackOfficeExternalLoginTests : ManagementApiTest<BackOfficeControll
 
         var response = await Client.GetAsync(url);
 
-        Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode, await response.Content.ReadAsStringAsync());
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest), await response.Content.ReadAsStringAsync());
     }
 
     [Test]
@@ -40,18 +40,20 @@ public class BackOfficeExternalLoginTests : ManagementApiTest<BackOfficeControll
     private static void AssertAnonymousGet(string actionName, string expectedRouteTemplate)
     {
         MethodInfo? method = typeof(BackOfficeController).GetMethod(actionName);
-        Assert.IsNotNull(method, $"Action {actionName} should exist");
+        Assert.That(method, Is.Not.Null, $"Action {actionName} should exist");
 
-        Assert.IsNotNull(
+        Assert.That(
             method!.GetCustomAttribute<AllowAnonymousAttribute>(),
+            Is.Not.Null,
             $"{actionName} must be [AllowAnonymous] (login happens before a session exists)");
 
         var httpGet = method.GetCustomAttribute<HttpGetAttribute>();
-        Assert.IsNotNull(httpGet, $"{actionName} must be an [HttpGet]");
-        Assert.AreEqual(expectedRouteTemplate, httpGet!.Template, $"{actionName} route template");
+        Assert.That(httpGet, Is.Not.Null, $"{actionName} must be an [HttpGet]");
+        Assert.That(httpGet!.Template, Is.EqualTo(expectedRouteTemplate), $"{actionName} route template");
 
-        Assert.IsNotNull(
+        Assert.That(
             method.GetCustomAttribute<MapToApiVersionAttribute>(),
+            Is.Not.Null,
             $"{actionName} must carry [MapToApiVersion]");
     }
 }

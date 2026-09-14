@@ -11,7 +11,7 @@ public partial class ContentBlueprintEditingServiceTests
     {
         var containerKey = Guid.NewGuid();
         var container = (await ContentBlueprintContainerService.CreateAsync(containerKey, "Root Container", null, Constants.Security.SuperUserKey)).Result;
-        Assert.AreEqual(0,  GetBlueprintChildren(containerKey).Length);
+        Assert.That(GetBlueprintChildren(containerKey), Is.Empty);
 
         var blueprintKey = Guid.NewGuid();
         await ContentBlueprintEditingService.CreateAsync(SimpleContentBlueprintCreateModel(blueprintKey, null), Constants.Security.SuperUserKey);
@@ -19,22 +19,22 @@ public partial class ContentBlueprintEditingServiceTests
         await ContentBlueprintEditingService.MoveAsync(blueprintKey, containerKey, Constants.Security.SuperUserKey);
 
         var blueprint = await ContentBlueprintEditingService.GetAsync(blueprintKey);
-        Assert.NotNull(blueprint);
+        Assert.That(blueprint, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(container.Id, blueprint.ParentId);
-            Assert.AreEqual($"{container.Path},{blueprint.Id}", blueprint.Path);
+            Assert.That(blueprint.ParentId, Is.EqualTo(container.Id));
+            Assert.That(blueprint.Path, Is.EqualTo($"{container.Path},{blueprint.Id}"));
         });
 
         var result = GetBlueprintChildren(containerKey);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(1, result.Length);
-            Assert.AreEqual(blueprintKey, result.First().Key);
+            Assert.That(result, Has.Length.EqualTo(1));
+            Assert.That(result.First().Key, Is.EqualTo(blueprintKey));
         });
 
         var auditLog = (await AuditService.GetItemsByEntityAsync(blueprint!.Id, 0, 1)).Items.First();
-        Assert.AreEqual(AuditType.Move, auditLog.AuditType);
+        Assert.That(auditLog.AuditType, Is.EqualTo(AuditType.Move));
     }
 
     [Test]
@@ -45,28 +45,28 @@ public partial class ContentBlueprintEditingServiceTests
 
         var blueprintKey = Guid.NewGuid();
         await ContentBlueprintEditingService.CreateAsync(SimpleContentBlueprintCreateModel(blueprintKey, containerKey), Constants.Security.SuperUserKey);
-        Assert.AreEqual(1, GetBlueprintChildren(containerKey).Length);
+        Assert.That(GetBlueprintChildren(containerKey), Has.Length.EqualTo(1));
 
         await ContentBlueprintEditingService.MoveAsync(blueprintKey, null, Constants.Security.SuperUserKey);
-        Assert.AreEqual(0, GetBlueprintChildren(containerKey).Length);
+        Assert.That(GetBlueprintChildren(containerKey), Is.Empty);
 
         var blueprint = await ContentBlueprintEditingService.GetAsync(blueprintKey);
-        Assert.NotNull(blueprint);
+        Assert.That(blueprint, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(Constants.System.Root, blueprint.ParentId);
-            Assert.AreEqual($"{Constants.System.Root},{blueprint.Id}", blueprint.Path);
+            Assert.That(blueprint.ParentId, Is.EqualTo(Constants.System.Root));
+            Assert.That(blueprint.Path, Is.EqualTo($"{Constants.System.Root},{blueprint.Id}"));
         });
 
         var result = GetBlueprintChildren(null);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(1, result.Length);
-            Assert.AreEqual(blueprintKey, result.First().Key);
+            Assert.That(result, Has.Length.EqualTo(1));
+            Assert.That(result.First().Key, Is.EqualTo(blueprintKey));
         });
 
         var auditLog = (await AuditService.GetItemsByEntityAsync(blueprint!.Id, 0, 1)).Items.First();
-        Assert.AreEqual(AuditType.Move, auditLog.AuditType);
+        Assert.That(auditLog.AuditType, Is.EqualTo(AuditType.Move));
     }
 
     [Test]
@@ -83,21 +83,21 @@ public partial class ContentBlueprintEditingServiceTests
         await ContentBlueprintEditingService.MoveAsync(blueprintKey, containerKey2, Constants.Security.SuperUserKey);
 
         var blueprint = await ContentBlueprintEditingService.GetAsync(blueprintKey);
-        Assert.NotNull(blueprint);
+        Assert.That(blueprint, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(container2.Id, blueprint.ParentId);
-            Assert.AreEqual($"{container2.Path},{blueprint.Id}", blueprint.Path);
+            Assert.That(blueprint.ParentId, Is.EqualTo(container2.Id));
+            Assert.That(blueprint.Path, Is.EqualTo($"{container2.Path},{blueprint.Id}"));
         });
 
         var result = GetBlueprintChildren(containerKey2);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(1, result.Length);
-            Assert.AreEqual(blueprintKey, result.First().Key);
+            Assert.That(result, Has.Length.EqualTo(1));
+            Assert.That(result.First().Key, Is.EqualTo(blueprintKey));
         });
 
         var auditLog = (await AuditService.GetItemsByEntityAsync(blueprint!.Id, 0, 1)).Items.First();
-        Assert.AreEqual(AuditType.Move, auditLog.AuditType);
+        Assert.That(auditLog.AuditType, Is.EqualTo(AuditType.Move));
     }
 }

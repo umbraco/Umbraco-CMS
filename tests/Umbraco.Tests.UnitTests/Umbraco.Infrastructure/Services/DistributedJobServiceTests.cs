@@ -29,7 +29,7 @@ public class DistributedJobServiceTests
         DateTime now = _onBoundary;
         var job = Job(TimeSpan.FromMinutes(1), now.AddSeconds(-61));
 
-        Assert.IsTrue(DistributedJobService.IsDue(job, now, aligned: false));
+        Assert.That(DistributedJobService.IsDue(job, now, aligned: false), Is.True);
     }
 
     [Test]
@@ -38,7 +38,7 @@ public class DistributedJobServiceTests
         DateTime now = _onBoundary;
         var job = Job(TimeSpan.FromMinutes(1), now.AddSeconds(-59));
 
-        Assert.IsFalse(DistributedJobService.IsDue(job, now, aligned: false));
+        Assert.That(DistributedJobService.IsDue(job, now, aligned: false), Is.False);
     }
 
     [Test]
@@ -47,7 +47,7 @@ public class DistributedJobServiceTests
         // now is on the :00 boundary, last run was 5s earlier (within the previous period).
         var job = Job(TimeSpan.FromSeconds(10), _onBoundary.AddSeconds(-5));
 
-        Assert.IsTrue(DistributedJobService.IsDue(job, _onBoundary, aligned: true));
+        Assert.That(DistributedJobService.IsDue(job, _onBoundary, aligned: true), Is.True);
     }
 
     [Test]
@@ -56,7 +56,7 @@ public class DistributedJobServiceTests
         // Ran on the :00 boundary; at :07 the most recent boundary is still :00 -> not due until :10.
         var job = Job(TimeSpan.FromSeconds(10), _onBoundary);
 
-        Assert.IsFalse(DistributedJobService.IsDue(job, _onBoundary.AddSeconds(7), aligned: true));
+        Assert.That(DistributedJobService.IsDue(job, _onBoundary.AddSeconds(7), aligned: true), Is.False);
     }
 
     [Test]
@@ -64,7 +64,7 @@ public class DistributedJobServiceTests
     {
         var job = Job(TimeSpan.FromSeconds(10), _onBoundary);
 
-        Assert.IsTrue(DistributedJobService.IsDue(job, _onBoundary.AddSeconds(10), aligned: true));
+        Assert.That(DistributedJobService.IsDue(job, _onBoundary.AddSeconds(10), aligned: true), Is.True);
     }
 
     [Test]
@@ -74,7 +74,7 @@ public class DistributedJobServiceTests
         var job = Job(TimeSpan.FromSeconds(10), _onBoundary.AddSeconds(15));
 
         // At :18 the most recent boundary (:10) is before the finish (:15) -> not due (no back-to-back catch-up).
-        Assert.IsFalse(DistributedJobService.IsDue(job, _onBoundary.AddSeconds(18), aligned: true));
+        Assert.That(DistributedJobService.IsDue(job, _onBoundary.AddSeconds(18), aligned: true), Is.False);
     }
 
     [Test]
@@ -84,7 +84,7 @@ public class DistributedJobServiceTests
         var job = Job(TimeSpan.FromSeconds(10), _onBoundary.AddSeconds(15));
 
         // At :20 a fresh boundary has passed after the finish -> due.
-        Assert.IsTrue(DistributedJobService.IsDue(job, _onBoundary.AddSeconds(20), aligned: true));
+        Assert.That(DistributedJobService.IsDue(job, _onBoundary.AddSeconds(20), aligned: true), Is.True);
     }
 
     [Test]
@@ -93,6 +93,6 @@ public class DistributedJobServiceTests
         // A non-positive period must not divide by zero; alignment falls back to the drift rule (LastRun < now - period).
         var job = Job(TimeSpan.Zero, _onBoundary.AddSeconds(-5));
 
-        Assert.IsTrue(DistributedJobService.IsDue(job, _onBoundary, aligned: true));
+        Assert.That(DistributedJobService.IsDue(job, _onBoundary, aligned: true), Is.True);
     }
 }

@@ -38,10 +38,10 @@ internal sealed class LogViewerQueryRepositoryTest : UmbracoIntegrationTest
 
             var found = repository.GetByName("Test Query");
 
-            Assert.IsNotNull(found);
-            Assert.AreEqual(query.Id, found!.Id);
-            Assert.AreEqual("Test Query", found.Name);
-            Assert.AreEqual("@Level='Error'", found.Query);
+            Assert.That(found, Is.Not.Null);
+            Assert.That(found!.Id, Is.EqualTo(query.Id));
+            Assert.That(found.Name, Is.EqualTo("Test Query"));
+            Assert.That(found.Query, Is.EqualTo("@Level='Error'"));
         }
     }
 
@@ -55,7 +55,7 @@ internal sealed class LogViewerQueryRepositoryTest : UmbracoIntegrationTest
 
             var found = repository.GetByName("nonexistent");
 
-            Assert.IsNull(found);
+            Assert.That(found, Is.Null);
         }
     }
 
@@ -72,10 +72,10 @@ internal sealed class LogViewerQueryRepositoryTest : UmbracoIntegrationTest
             var first = repository.GetByName("Clone Test");
             var second = repository.GetByName("Clone Test");
 
-            Assert.IsNotNull(first);
-            Assert.IsNotNull(second);
-            Assert.AreEqual(first!.Id, second!.Id);
-            Assert.AreNotSame(first, second);
+            Assert.That(first, Is.Not.Null);
+            Assert.That(second, Is.Not.Null);
+            Assert.That(second!.Id, Is.EqualTo(first!.Id));
+            Assert.That(second, Is.Not.SameAs(first));
         }
     }
 
@@ -90,12 +90,12 @@ internal sealed class LogViewerQueryRepositoryTest : UmbracoIntegrationTest
             repository.Save(query);
 
             var first = repository.GetByName("Mutation Test");
-            Assert.IsNotNull(first);
+            Assert.That(first, Is.Not.Null);
             first!.Name = "MUTATED_" + Guid.NewGuid();
 
             var second = repository.GetByName("Mutation Test");
-            Assert.IsNotNull(second);
-            Assert.AreEqual("Mutation Test", second!.Name, "Mutation of a returned entity should not affect the cached copy");
+            Assert.That(second, Is.Not.Null);
+            Assert.That(second!.Name, Is.EqualTo("Mutation Test"), "Mutation of a returned entity should not affect the cached copy");
         }
     }
 }

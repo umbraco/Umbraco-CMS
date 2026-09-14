@@ -56,15 +56,15 @@ internal sealed class MediaTypeRepositoryTest : UmbracoIntegrationTest
 
             var result = repository.Move(contentType, container1).ToArray();
 
-            Assert.AreEqual(2, result.Length);
+            Assert.That(result, Has.Length.EqualTo(2));
 
             // re-get
             contentType = repository.Get(contentType.Id);
             contentType2 = repository.Get(contentType2.Id);
 
-            Assert.AreEqual(container1.Id, contentType.ParentId);
-            Assert.AreNotEqual(result.Single(x => x.Entity.Id == contentType.Id).OriginalPath, contentType.Path);
-            Assert.AreNotEqual(result.Single(x => x.Entity.Id == contentType2.Id).OriginalPath, contentType2.Path);
+            Assert.That(contentType.ParentId, Is.EqualTo(container1.Id));
+            Assert.That(contentType.Path, Is.Not.EqualTo(result.Single(x => x.Entity.Id == contentType.Id).OriginalPath));
+            Assert.That(contentType2.Path, Is.Not.EqualTo(result.Single(x => x.Entity.Id == contentType2.Id).OriginalPath));
         }
     }
 
@@ -82,7 +82,7 @@ internal sealed class MediaTypeRepositoryTest : UmbracoIntegrationTest
             Assert.That(container.Id, Is.GreaterThan(0));
 
             var found = containerRepository.Get(container.Id);
-            Assert.IsNotNull(found);
+            Assert.That(found, Is.Not.Null);
         }
     }
 
@@ -103,7 +103,7 @@ internal sealed class MediaTypeRepositoryTest : UmbracoIntegrationTest
             containerRepository.Delete(container);
 
             var found = containerRepository.Get(container.Id);
-            Assert.IsNull(found);
+            Assert.That(found, Is.Null);
         }
     }
 
@@ -124,7 +124,7 @@ internal sealed class MediaTypeRepositoryTest : UmbracoIntegrationTest
             contentType.ParentId = container.Id;
             repository.Save(contentType);
 
-            Assert.AreEqual(container.Id, contentType.ParentId);
+            Assert.That(contentType.ParentId, Is.EqualTo(container.Id));
         }
     }
 
@@ -149,11 +149,11 @@ internal sealed class MediaTypeRepositoryTest : UmbracoIntegrationTest
             containerRepository.Delete(container);
 
             var found = containerRepository.Get(container.Id);
-            Assert.IsNull(found);
+            Assert.That(found, Is.Null);
 
             contentType = repository.Get(contentType.Id);
-            Assert.IsNotNull(contentType);
-            Assert.AreEqual(-1, contentType.ParentId);
+            Assert.That(contentType, Is.Not.Null);
+            Assert.That(contentType.ParentId, Is.EqualTo(-1));
         }
     }
 
@@ -175,7 +175,7 @@ internal sealed class MediaTypeRepositoryTest : UmbracoIntegrationTest
             // Assert
             Assert.That(contentType.HasIdentity, Is.True);
             Assert.That(contentType.PropertyGroups.All(x => x.HasIdentity), Is.True);
-            Assert.That(contentType.Path.Contains(","), Is.True);
+            Assert.That(contentType.Path, Does.Contain(","));
             Assert.That(contentType.SortOrder, Is.GreaterThan(0));
 
             TestHelper.AssertPropertyValuesAreEqual(contentType, fetched, ignoreProperties: new[] { "UpdateDate" });
@@ -367,7 +367,7 @@ internal sealed class MediaTypeRepositoryTest : UmbracoIntegrationTest
 
             // Assert
             Assert.That(mediaTypeV3.PropertyTypes.Any(x => x.Alias == "title"), Is.False);
-            Assert.That(mediaTypeV2.PropertyGroups.Count, Is.EqualTo(mediaTypeV3.PropertyGroups.Count));
+            Assert.That(mediaTypeV2.PropertyGroups, Has.Count.EqualTo(mediaTypeV3.PropertyGroups.Count));
             Assert.That(mediaTypeV2.PropertyTypes.Count(), Is.EqualTo(mediaTypeV3.PropertyTypes.Count()));
         }
     }
@@ -425,10 +425,10 @@ internal sealed class MediaTypeRepositoryTest : UmbracoIntegrationTest
             var first = repository.Get(mediaType.Key);
             var second = repository.Get(mediaType.Key);
 
-            Assert.IsNotNull(first);
-            Assert.IsNotNull(second);
-            Assert.AreEqual(first.Id, second.Id);
-            Assert.AreNotSame(first, second);
+            Assert.That(first, Is.Not.Null);
+            Assert.That(second, Is.Not.Null);
+            Assert.That(second.Id, Is.EqualTo(first.Id));
+            Assert.That(second, Is.Not.SameAs(first));
         }
     }
 
@@ -442,8 +442,8 @@ internal sealed class MediaTypeRepositoryTest : UmbracoIntegrationTest
             IMediaType mediaType = MediaTypeBuilder.CreateNewMediaType();
             repository.Save(mediaType);
 
-            Assert.IsTrue(repository.Exists(mediaType.Key));
-            Assert.IsFalse(repository.Exists(Guid.NewGuid()));
+            Assert.That(repository.Exists(mediaType.Key), Is.True);
+            Assert.That(repository.Exists(Guid.NewGuid()), Is.False);
         }
     }
 

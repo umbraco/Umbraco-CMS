@@ -13,7 +13,7 @@ internal sealed partial class UserServiceCrudTests
     {
         var userService = CreateUserService();
         var result = await userService.DeleteAsync(Constants.Security.SuperUserKey, Guid.NewGuid());
-        Assert.AreEqual(UserOperationStatus.UserNotFound, result);
+        Assert.That(result, Is.EqualTo(UserOperationStatus.UserNotFound));
     }
 
     [Test]
@@ -30,19 +30,19 @@ internal sealed partial class UserServiceCrudTests
 
         var userService = CreateUserService();
         var creationResult = await userService.CreateAsync(Constants.Security.SuperUserKey, userCreateModel, true);
-        Assert.IsTrue(creationResult.Success);
+        Assert.That(creationResult.Success, Is.True);
         var createdUser = creationResult.Result.CreatedUser;
 
         createdUser!.LastLoginDate = DateTime.UtcNow;
         userService.Save(createdUser);
 
         var result = await userService.DeleteAsync(Constants.Security.SuperUserKey, createdUser.Key);
-        Assert.AreEqual(UserOperationStatus.CannotDeleteUserWithLoginHistory, result);
+        Assert.That(result, Is.EqualTo(UserOperationStatus.CannotDeleteUserWithLoginHistory));
 
         // Asset that it is in fact not deleted
         var postDeletedUser = await userService.GetAsync(createdUser.Key);
-        Assert.IsNotNull(postDeletedUser);
-        Assert.AreEqual(createdUser.Key, postDeletedUser.Key);
+        Assert.That(postDeletedUser, Is.Not.Null);
+        Assert.That(postDeletedUser.Key, Is.EqualTo(createdUser.Key));
     }
 
     [Test]
@@ -59,12 +59,12 @@ internal sealed partial class UserServiceCrudTests
 
         var userService = CreateUserService();
         var creationResult = await userService.CreateAsync(Constants.Security.SuperUserKey, userCreateModel, true);
-        Assert.IsTrue(creationResult.Success);
+        Assert.That(creationResult.Success, Is.True);
 
         var deletionResult = await userService.DeleteAsync(Constants.Security.SuperUserKey, creationResult.Result.CreatedUser!.Key);
-        Assert.AreEqual(UserOperationStatus.Success, deletionResult);
+        Assert.That(deletionResult, Is.EqualTo(UserOperationStatus.Success));
         // Make sure it's actually deleted
         var postDeletedUser = await userService.GetAsync(creationResult.Result.CreatedUser.Key);
-        Assert.IsNull(postDeletedUser);
+        Assert.That(postDeletedUser, Is.Null);
     }
 }

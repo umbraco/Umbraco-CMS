@@ -45,16 +45,16 @@ public class AuditEntryServiceTests
         _auditEntryRepositoryMock.Setup(x => x.Save(It.IsAny<IAuditEntry>()))
             .Callback<IAuditEntry>(item =>
             {
-                Assert.AreEqual(Constants.Security.SuperUserId, item.PerformingUserId);
-                Assert.AreEqual(Constants.Security.SuperUserKey, item.PerformingUserKey);
-                Assert.AreEqual("performingDetails", item.PerformingDetails);
-                Assert.AreEqual("performingIp", item.PerformingIp);
-                Assert.AreEqual(date, item.EventDate);
-                Assert.AreEqual(Constants.Security.UnknownUserId, item.AffectedUserId);
-                Assert.AreEqual(null, item.AffectedUserKey);
-                Assert.AreEqual("affectedDetails", item.AffectedDetails);
-                Assert.AreEqual("umbraco/test", item.EventType);
-                Assert.AreEqual("eventDetails", item.EventDetails);
+                Assert.That(item.PerformingUserId, Is.EqualTo(Constants.Security.SuperUserId));
+                Assert.That(item.PerformingUserKey, Is.EqualTo(Constants.Security.SuperUserKey));
+                Assert.That(item.PerformingDetails, Is.EqualTo("performingDetails"));
+                Assert.That(item.PerformingIp, Is.EqualTo("performingIp"));
+                Assert.That(item.EventDate, Is.EqualTo(date));
+                Assert.That(item.AffectedUserId, Is.EqualTo(Constants.Security.UnknownUserId));
+                Assert.That(item.AffectedUserKey, Is.EqualTo(null));
+                Assert.That(item.AffectedDetails, Is.EqualTo("affectedDetails"));
+                Assert.That(item.EventType, Is.EqualTo("umbraco/test"));
+                Assert.That(item.EventDetails, Is.EqualTo("eventDetails"));
             });
         _userIdKeyResolverMock.Setup(x => x.TryGetAsync(Constants.Security.SuperUserKey))
             .ReturnsAsync(Attempt.Succeed(Constants.Security.SuperUserId));
@@ -71,17 +71,17 @@ public class AuditEntryServiceTests
 
         _auditEntryRepositoryMock.Verify(x => x.Save(It.IsAny<IAuditEntry>()), Times.Once);
 
-        Assert.NotNull(result);
+        Assert.That(result, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(Constants.Security.SuperUserId, result.PerformingUserId);
-            Assert.AreEqual("performingDetails", result.PerformingDetails);
-            Assert.AreEqual("performingIp", result.PerformingIp);
-            Assert.AreEqual(date, result.EventDate);
-            Assert.AreEqual(Constants.Security.UnknownUserId, result.AffectedUserId);
-            Assert.AreEqual("affectedDetails", result.AffectedDetails);
-            Assert.AreEqual("umbraco/test", result.EventType);
-            Assert.AreEqual("eventDetails", result.EventDetails);
+            Assert.That(result.PerformingUserId, Is.EqualTo(Constants.Security.SuperUserId));
+            Assert.That(result.PerformingDetails, Is.EqualTo("performingDetails"));
+            Assert.That(result.PerformingIp, Is.EqualTo("performingIp"));
+            Assert.That(result.EventDate, Is.EqualTo(date));
+            Assert.That(result.AffectedUserId, Is.EqualTo(Constants.Security.UnknownUserId));
+            Assert.That(result.AffectedDetails, Is.EqualTo("affectedDetails"));
+            Assert.That(result.EventType, Is.EqualTo("umbraco/test"));
+            Assert.That(result.EventDetails, Is.EqualTo("eventDetails"));
         });
     }
 
@@ -96,7 +96,7 @@ public class AuditEntryServiceTests
 
         var actualUserId = await ((AuditEntryService)_auditEntryService).GetUserId(_testUserKey);
 
-        Assert.AreEqual(actualUserId, userId);
+        Assert.That(userId, Is.EqualTo(actualUserId));
     }
 
     [Test]
@@ -109,7 +109,7 @@ public class AuditEntryServiceTests
 
         var actualUserId = await ((AuditEntryService)_auditEntryService).GetUserId(_testUserKey);
 
-        Assert.AreEqual(null, actualUserId);
+        Assert.That(actualUserId, Is.EqualTo(null));
     }
 
     [Test]
@@ -123,7 +123,7 @@ public class AuditEntryServiceTests
 
         var actualUserKey = await ((AuditEntryService)_auditEntryService).GetUserKey(userId);
 
-        Assert.AreEqual(actualUserKey, _testUserKey);
+        Assert.That(_testUserKey, Is.EqualTo(actualUserKey));
     }
 
     [Test]
@@ -137,7 +137,7 @@ public class AuditEntryServiceTests
 
         var userKey = await ((AuditEntryService)_auditEntryService).GetUserKey(userId);
 
-        Assert.AreEqual(null, userKey);
+        Assert.That(userKey, Is.EqualTo(null));
     }
 
     private void SetupScopeProviderMock() =>

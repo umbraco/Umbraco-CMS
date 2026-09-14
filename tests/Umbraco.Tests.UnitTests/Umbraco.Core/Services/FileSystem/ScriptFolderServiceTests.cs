@@ -52,8 +52,8 @@ public class ScriptFolderServiceTests
         Attempt<ScriptFolderModel?, ScriptFolderOperationStatus> result =
             await _sut.CreateAsync(new ScriptFolderCreateModel { Name = "valid-folder" });
 
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(ScriptFolderOperationStatus.Success, result.Status);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(ScriptFolderOperationStatus.Success));
         _repository.Verify(x => x.AddFolder(It.IsAny<string>()), Times.Once);
     }
 
@@ -65,8 +65,8 @@ public class ScriptFolderServiceTests
         Attempt<ScriptFolderModel?, ScriptFolderOperationStatus> result =
             await _sut.CreateAsync(new ScriptFolderCreateModel { Name = name });
 
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ScriptFolderOperationStatus.InvalidName, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(ScriptFolderOperationStatus.InvalidName));
         _repository.Verify(x => x.AddFolder(It.IsAny<string>()), Times.Never);
     }
 }

@@ -19,8 +19,8 @@ public partial class ContentPublishingServiceTests
 
         var result = await ContentPublishingService.PublishAsync(Textpage.Key, [new CulturePublishScheduleModel()], Constants.Security.SuperUserKey);
 
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(ContentPublishingOperationStatus.Success, result.Status);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(ContentPublishingOperationStatus.Success));
         VerifyIsPublished(Textpage.Key);
     }
 
@@ -40,8 +40,8 @@ public partial class ContentPublishingServiceTests
 
         var result = await ContentPublishingService.PublishAsync(Subpage.Key, [new CulturePublishScheduleModel()], Constants.Security.SuperUserKey);
 
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(ContentPublishingOperationStatus.Success, result.Status);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(ContentPublishingOperationStatus.Success));
         VerifyIsPublished(Subpage.Key);
     }
 
@@ -53,7 +53,7 @@ public partial class ContentPublishingServiceTests
     {
         var result = await ContentPublishingService.PublishBranchAsync(Textpage.Key, _allCultures, publishBranchFilter, Constants.Security.SuperUserKey, false);
 
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
 
         VerifyIsPublished(Textpage.Key);
 
@@ -83,7 +83,7 @@ public partial class ContentPublishingServiceTests
         VerifyIsNotPublished(Subpage2.Key);
         var result = await ContentPublishingService.PublishBranchAsync(Subpage2.Key, _allCultures, PublishBranchFilter.IncludeUnpublished, Constants.Security.SuperUserKey, false);
 
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
         AssertBranchResultSuccess(result.Result, Subpage2.Key, subpage2Subpage.Key);
         VerifyIsPublished(Subpage2.Key);
         VerifyIsPublished(subpage2Subpage.Key);
@@ -97,8 +97,8 @@ public partial class ContentPublishingServiceTests
 
         var result = await ContentPublishingService.PublishAsync(Textpage.Key, [new CulturePublishScheduleModel()], Constants.Security.SuperUserKey);
 
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentPublishingOperationStatus.CancelledByEvent, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(ContentPublishingOperationStatus.CancelledByEvent));
     }
 
     [Test]
@@ -123,13 +123,13 @@ public partial class ContentPublishingServiceTests
             ],
             Constants.Security.SuperUserKey);
 
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(ContentPublishingOperationStatus.Success, result.Status);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(ContentPublishingOperationStatus.Success));
 
         content = ContentService.GetById(content.Key)!;
-        Assert.AreEqual(2, content.PublishedCultures.Count());
-        Assert.IsTrue(content.PublishedCultures.InvariantContains(langEn.IsoCode));
-        Assert.IsTrue(content.PublishedCultures.InvariantContains(langDa.IsoCode));
+        Assert.That(content.PublishedCultures.Count(), Is.EqualTo(2));
+        Assert.That(content.PublishedCultures.InvariantContains(langEn.IsoCode), Is.True);
+        Assert.That(content.PublishedCultures.InvariantContains(langDa.IsoCode), Is.True);
     }
 
     [Test]
@@ -154,32 +154,32 @@ public partial class ContentPublishingServiceTests
             ],
             Constants.Security.SuperUserKey);
 
-        Assert.IsTrue(publishResult.Success);
-        Assert.AreEqual(ContentPublishingOperationStatus.Success, publishResult.Status);
+        Assert.That(publishResult.Success, Is.True);
+        Assert.That(publishResult.Status, Is.EqualTo(ContentPublishingOperationStatus.Success));
 
         content = ContentService.GetById(content.Key)!;
-        Assert.AreEqual(2, content.PublishedCultures.Count());
-        Assert.IsTrue(content.PublishedCultures.InvariantContains(langEn.IsoCode));
-        Assert.IsTrue(content.PublishedCultures.InvariantContains(langDa.IsoCode));
+        Assert.That(content.PublishedCultures.Count(), Is.EqualTo(2));
+        Assert.That(content.PublishedCultures.InvariantContains(langEn.IsoCode), Is.True);
+        Assert.That(content.PublishedCultures.InvariantContains(langDa.IsoCode), Is.True);
 
         var unpublishResult = await ContentPublishingService.UnpublishAsync(content.Key, new HashSet<string>() { "*" }, Constants.Security.SuperUserKey);
 
-        Assert.IsTrue(unpublishResult.Success);
-        Assert.AreEqual(ContentPublishingOperationStatus.Success, unpublishResult.Result);
+        Assert.That(unpublishResult.Success, Is.True);
+        Assert.That(unpublishResult.Result, Is.EqualTo(ContentPublishingOperationStatus.Success));
 
         content = ContentService.GetById(content.Key)!;
-        Assert.AreEqual(0, content.PublishedCultures.Count());
+        Assert.That(content.PublishedCultures.Count(), Is.EqualTo(0));
 
         publishResult = await ContentPublishingService.PublishAsync(
             content.Key,
             [new CulturePublishScheduleModel { Culture = langDa.IsoCode }],
             Constants.Security.SuperUserKey);
-        Assert.IsTrue(publishResult.Success);
-        Assert.AreEqual(ContentPublishingOperationStatus.Success, publishResult.Status);
+        Assert.That(publishResult.Success, Is.True);
+        Assert.That(publishResult.Status, Is.EqualTo(ContentPublishingOperationStatus.Success));
 
         content = ContentService.GetById(content.Key)!;
-        Assert.AreEqual(1, content.PublishedCultures.Count());
-        Assert.IsTrue(content.PublishedCultures.InvariantContains(langDa.IsoCode));
+        Assert.That(content.PublishedCultures.Count(), Is.EqualTo(1));
+        Assert.That(content.PublishedCultures.InvariantContains(langDa.IsoCode), Is.True);
     }
 
     [Test]
@@ -207,18 +207,18 @@ public partial class ContentPublishingServiceTests
         ContentService.Save(child);
 
         var result = await ContentPublishingService.PublishBranchAsync(root.Key, new[] { langEn.IsoCode, langDa.IsoCode }, PublishBranchFilter.IncludeUnpublished, Constants.Security.SuperUserKey, false);
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
         AssertBranchResultSuccess(result.Result, root.Key, child.Key);
 
         root = ContentService.GetById(root.Key)!;
-        Assert.AreEqual(2, root.PublishedCultures.Count());
-        Assert.IsTrue(root.PublishedCultures.InvariantContains(langEn.IsoCode));
-        Assert.IsTrue(root.PublishedCultures.InvariantContains(langDa.IsoCode));
+        Assert.That(root.PublishedCultures.Count(), Is.EqualTo(2));
+        Assert.That(root.PublishedCultures.InvariantContains(langEn.IsoCode), Is.True);
+        Assert.That(root.PublishedCultures.InvariantContains(langDa.IsoCode), Is.True);
 
         child = ContentService.GetById(child.Key)!;
-        Assert.AreEqual(2, child.PublishedCultures.Count());
-        Assert.IsTrue(child.PublishedCultures.InvariantContains(langEn.IsoCode));
-        Assert.IsTrue(child.PublishedCultures.InvariantContains(langDa.IsoCode));
+        Assert.That(child.PublishedCultures.Count(), Is.EqualTo(2));
+        Assert.That(child.PublishedCultures.InvariantContains(langEn.IsoCode), Is.True);
+        Assert.That(child.PublishedCultures.InvariantContains(langDa.IsoCode), Is.True);
     }
 
     [Test]
@@ -237,12 +237,12 @@ public partial class ContentPublishingServiceTests
 
         var result = await ContentPublishingService.PublishAsync(content.Key, [new CulturePublishScheduleModel { Culture = langEn.IsoCode }], Constants.Security.SuperUserKey);
 
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(ContentPublishingOperationStatus.Success, result.Status);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(ContentPublishingOperationStatus.Success));
 
         content = ContentService.GetById(content.Key)!;
-        Assert.AreEqual(1, content.PublishedCultures.Count());
-        Assert.IsTrue(content.PublishedCultures.First().InvariantEquals(langEn.IsoCode));
+        Assert.That(content.PublishedCultures.Count(), Is.EqualTo(1));
+        Assert.That(content.PublishedCultures.First().InvariantEquals(langEn.IsoCode), Is.True);
     }
 
     [Test]
@@ -270,16 +270,16 @@ public partial class ContentPublishingServiceTests
         ContentService.Save(child);
 
         var result = await ContentPublishingService.PublishBranchAsync(root.Key, new[] { langEn.IsoCode }, PublishBranchFilter.IncludeUnpublished, Constants.Security.SuperUserKey, false);
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
         AssertBranchResultSuccess(result.Result, root.Key, child.Key);
 
         root = ContentService.GetById(root.Key)!;
-        Assert.AreEqual(1, root.PublishedCultures.Count());
-        Assert.IsTrue(root.PublishedCultures.InvariantContains(langEn.IsoCode));
+        Assert.That(root.PublishedCultures.Count(), Is.EqualTo(1));
+        Assert.That(root.PublishedCultures.InvariantContains(langEn.IsoCode), Is.True);
 
         child = ContentService.GetById(child.Key)!;
-        Assert.AreEqual(1, child.PublishedCultures.Count());
-        Assert.IsTrue(child.PublishedCultures.InvariantContains(langEn.IsoCode));
+        Assert.That(child.PublishedCultures.Count(), Is.EqualTo(1));
+        Assert.That(child.PublishedCultures.InvariantContains(langEn.IsoCode), Is.True);
     }
 
     [Test]
@@ -309,16 +309,16 @@ public partial class ContentPublishingServiceTests
         ContentService.Save(child);
 
         var result = await ContentPublishingService.PublishBranchAsync(root.Key, new[] { langEn.IsoCode }, PublishBranchFilter.IncludeUnpublished, Constants.Security.SuperUserKey, false);
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
         AssertBranchResultSuccess(result.Result, root.Key, child.Key);
 
         root = ContentService.GetById(root.Key)!;
-        Assert.AreEqual(1, root.PublishedCultures.Count());
-        Assert.IsTrue(root.PublishedCultures.InvariantContains(langEn.IsoCode));
+        Assert.That(root.PublishedCultures.Count(), Is.EqualTo(1));
+        Assert.That(root.PublishedCultures.InvariantContains(langEn.IsoCode), Is.True);
 
         child = ContentService.GetById(child.Key)!;
-        Assert.AreEqual(1, child.PublishedCultures.Count());
-        Assert.IsTrue(child.PublishedCultures.InvariantContains(langEn.IsoCode));
+        Assert.That(child.PublishedCultures.Count(), Is.EqualTo(1));
+        Assert.That(child.PublishedCultures.InvariantContains(langEn.IsoCode), Is.True);
     }
 
     [Test]
@@ -342,11 +342,11 @@ public partial class ContentPublishingServiceTests
                 new CulturePublishScheduleModel { Culture = langDa.IsoCode }
             ],
             Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(ContentPublishingOperationStatus.Success, result.Status);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(ContentPublishingOperationStatus.Success));
 
         content = ContentService.GetById(content.Key)!;
-        Assert.AreEqual(2, content.PublishedCultures.Count());
+        Assert.That(content.PublishedCultures.Count(), Is.EqualTo(2));
     }
 
     [TestCase(true, "da-DK")]
@@ -384,7 +384,7 @@ public partial class ContentPublishingServiceTests
             ],
             Constants.Security.SuperUserKey);
 
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
 
         content = ContentService.GetById(content.Key)!;
         content.SetValue("variantValue", "EN value updated", culture: "en-US");
@@ -401,18 +401,18 @@ public partial class ContentPublishingServiceTests
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(null, content.GetValue("invariantValue", published: false));
-            Assert.AreEqual("EN value updated", content.GetValue("variantValue", culture: "en-US", published: false));
-            Assert.AreEqual("DA value updated", content.GetValue("variantValue", culture: "da-DK", published: false));
+            Assert.That(content.GetValue("invariantValue", published: false), Is.EqualTo(null));
+            Assert.That(content.GetValue("variantValue", culture: "en-US", published: false), Is.EqualTo("EN value updated"));
+            Assert.That(content.GetValue("variantValue", culture: "da-DK", published: false), Is.EqualTo("DA value updated"));
 
-            Assert.AreEqual("Invariant value", content.GetValue("invariantValue", published: true));
+            Assert.That(content.GetValue("invariantValue", published: true), Is.EqualTo("Invariant value"));
         });
 
         if (expectedSuccess)
         {
             Assert.Multiple(() =>
             {
-                Assert.IsTrue(result.Success);
+                Assert.That(result.Success, Is.True);
 
                 var expectedPublishedEnglishValue = culturesToRepublish.Contains("en-US")
                     ? "EN value updated"
@@ -420,17 +420,17 @@ public partial class ContentPublishingServiceTests
                 var expectedPublishedDanishValue = culturesToRepublish.Contains("da-DK")
                     ? "DA value updated"
                     : "DA value";
-                Assert.AreEqual(expectedPublishedEnglishValue, content.GetValue("variantValue", culture: "en-US", published: true));
-                Assert.AreEqual(expectedPublishedDanishValue, content.GetValue("variantValue", culture: "da-DK", published: true));
+                Assert.That(content.GetValue("variantValue", culture: "en-US", published: true), Is.EqualTo(expectedPublishedEnglishValue));
+                Assert.That(content.GetValue("variantValue", culture: "da-DK", published: true), Is.EqualTo(expectedPublishedDanishValue));
             });
         }
         else
         {
             Assert.Multiple(() =>
             {
-                Assert.IsFalse(result.Success);
-                Assert.AreEqual("EN value", content.GetValue("variantValue", culture: "en-US", published: true));
-                Assert.AreEqual("DA value", content.GetValue("variantValue", culture: "da-DK", published: true));
+                Assert.That(result.Success, Is.False);
+                Assert.That(content.GetValue("variantValue", culture: "en-US", published: true), Is.EqualTo("EN value"));
+                Assert.That(content.GetValue("variantValue", culture: "da-DK", published: true), Is.EqualTo("DA value"));
             });
         }
     }
@@ -439,8 +439,8 @@ public partial class ContentPublishingServiceTests
     public async Task Cannot_Publish_Non_Existing_Content()
     {
         var result = await ContentPublishingService.PublishAsync(Guid.NewGuid(), _allCultures.Select(culture => new CulturePublishScheduleModel { Culture = culture }).ToArray(), Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentPublishingOperationStatus.ContentNotFound, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(ContentPublishingOperationStatus.ContentNotFound));
     }
 
     [Test]
@@ -448,7 +448,7 @@ public partial class ContentPublishingServiceTests
     {
         var key = Guid.NewGuid();
         var result = await ContentPublishingService.PublishBranchAsync(key, _allCultures, PublishBranchFilter.IncludeUnpublished, Constants.Security.SuperUserKey, false);
-        Assert.IsFalse(result);
+        Assert.That((bool)result, Is.False);
         AssertBranchResultFailed(result.Result, (key, ContentPublishingOperationStatus.ContentNotFound));
     }
 
@@ -459,14 +459,14 @@ public partial class ContentPublishingServiceTests
 
         var result = await ContentPublishingService.PublishAsync(content.Key, _allCultures.Select(culture => new CulturePublishScheduleModel { Culture = culture }).ToArray(), Constants.Security.SuperUserKey);
 
-        Assert.IsFalse(result);
-        Assert.AreEqual(ContentPublishingOperationStatus.ContentInvalid, result.Status);
+        Assert.That((bool)result, Is.False);
+        Assert.That(result.Status, Is.EqualTo(ContentPublishingOperationStatus.ContentInvalid));
 
         var invalidPropertyAliases = result.Result.InvalidPropertyAliases.ToArray();
-        Assert.AreEqual(3, invalidPropertyAliases.Length);
-        Assert.Contains("title", invalidPropertyAliases);
-        Assert.Contains("bodyText", invalidPropertyAliases);
-        Assert.Contains("author", invalidPropertyAliases);
+        Assert.That(invalidPropertyAliases, Has.Length.EqualTo(3));
+        Assert.That(invalidPropertyAliases, Does.Contain("title"));
+        Assert.That(invalidPropertyAliases, Does.Contain("bodyText"));
+        Assert.That(invalidPropertyAliases, Does.Contain("author"));
 
         VerifyIsNotPublished(content.Key);
     }
@@ -477,11 +477,11 @@ public partial class ContentPublishingServiceTests
         var content = await CreateInvalidContent(Textpage);
         var child = ContentBuilder.CreateSimpleContent(ContentType, "Child page", content.Id);
         ContentService.Save(child, -1);
-        Assert.AreEqual(content.Id, ContentService.GetById(child.Key)!.ParentId);
+        Assert.That(ContentService.GetById(child.Key)!.ParentId, Is.EqualTo(content.Id));
 
         var result = await ContentPublishingService.PublishBranchAsync(Textpage.Key, _allCultures, PublishBranchFilter.IncludeUnpublished, Constants.Security.SuperUserKey, false);
 
-        Assert.IsFalse(result.Success);
+        Assert.That(result.Success, Is.False);
         AssertBranchResultSuccess(result.Result, Textpage.Key, Subpage.Key, Subpage2.Key, Subpage3.Key);
         AssertBranchResultFailed(result.Result, (content.Key, ContentPublishingOperationStatus.ContentInvalid));
         VerifyIsPublished(Textpage.Key);
@@ -513,11 +513,11 @@ public partial class ContentPublishingServiceTests
                 new CulturePublishScheduleModel { Culture = langDa.IsoCode }
             ],
             Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentPublishingOperationStatus.ContentInvalid, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(ContentPublishingOperationStatus.ContentInvalid));
 
         content = ContentService.GetById(content.Key)!;
-        Assert.AreEqual(0, content.PublishedCultures.Count());
+        Assert.That(content.PublishedCultures.Count(), Is.EqualTo(0));
     }
 
     [Test]
@@ -539,11 +539,11 @@ public partial class ContentPublishingServiceTests
             [new CulturePublishScheduleModel { Culture = langDa.IsoCode }],
             Constants.Security.SuperUserKey);
 
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentPublishingOperationStatus.MandatoryCultureMissing, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(ContentPublishingOperationStatus.MandatoryCultureMissing));
 
         content = ContentService.GetById(content.Key)!;
-        Assert.AreEqual(0, content.PublishedCultures.Count());
+        Assert.That(content.PublishedCultures.Count(), Is.EqualTo(0));
     }
 
     [Test]
@@ -571,14 +571,14 @@ public partial class ContentPublishingServiceTests
         ContentService.Save(child);
 
         var result = await ContentPublishingService.PublishBranchAsync(root.Key, new[] { langEn.IsoCode, langDa.IsoCode }, PublishBranchFilter.IncludeUnpublished, Constants.Security.SuperUserKey, false);
-        Assert.IsFalse(result.Success);
+        Assert.That(result.Success, Is.False);
         AssertBranchResultFailed(result.Result, (root.Key, ContentPublishingOperationStatus.ContentInvalid));
 
         root = ContentService.GetById(root.Key)!;
-        Assert.AreEqual(0, root.PublishedCultures.Count());
+        Assert.That(root.PublishedCultures.Count(), Is.EqualTo(0));
 
         child = ContentService.GetById(child.Key)!;
-        Assert.AreEqual(0, child.PublishedCultures.Count());
+        Assert.That(child.PublishedCultures.Count(), Is.EqualTo(0));
     }
 
     [Test]
@@ -588,8 +588,8 @@ public partial class ContentPublishingServiceTests
 
         var result = await ContentPublishingService.PublishAsync(Subpage.Key, [new CulturePublishScheduleModel()], Constants.Security.SuperUserKey);
 
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentPublishingOperationStatus.PathNotPublished, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(ContentPublishingOperationStatus.PathNotPublished));
         VerifyIsNotPublished(Subpage.Key);
     }
 
@@ -597,12 +597,12 @@ public partial class ContentPublishingServiceTests
     public async Task Cannot_Publish_From_Trash()
     {
         ContentService.MoveToRecycleBin(Subpage);
-        Assert.IsTrue(ContentService.GetById(Subpage.Key)!.Trashed);
+        Assert.That(ContentService.GetById(Subpage.Key)!.Trashed, Is.True);
 
         var result = await ContentPublishingService.PublishAsync(Subpage.Key, [new CulturePublishScheduleModel()], Constants.Security.SuperUserKey);
 
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentPublishingOperationStatus.InTrash, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(ContentPublishingOperationStatus.InTrash));
         VerifyIsNotPublished(Subpage.Key);
     }
 
@@ -614,7 +614,7 @@ public partial class ContentPublishingServiceTests
         ContentService.Save(Textpage);
 
         var result = await ContentPublishingService.PublishAsync(Textpage.Key, [new CulturePublishScheduleModel()], Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
         VerifyIsPublished(Textpage.Key);
 
         ContentType.PropertyTypes.First(pt => pt.Alias == "title").Mandatory = true;
@@ -622,13 +622,13 @@ public partial class ContentPublishingServiceTests
         await ContentTypeService.UpdateAsync(ContentType, Constants.Security.SuperUserKey);
 
         result = await ContentPublishingService.PublishAsync(Textpage.Key, [new CulturePublishScheduleModel()], Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentPublishingOperationStatus.ContentInvalid, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(ContentPublishingOperationStatus.ContentInvalid));
 
         var invalidPropertyAliases = result.Result.InvalidPropertyAliases.ToArray();
-        Assert.AreEqual(2, invalidPropertyAliases.Length);
-        Assert.Contains("title", invalidPropertyAliases);
-        Assert.Contains("author", invalidPropertyAliases);
+        Assert.That(invalidPropertyAliases, Has.Length.EqualTo(2));
+        Assert.That(invalidPropertyAliases, Does.Contain("title"));
+        Assert.That(invalidPropertyAliases, Does.Contain("author"));
 
         // despite the failure to publish, the page should remain published
         VerifyIsPublished(Textpage.Key);
@@ -638,7 +638,7 @@ public partial class ContentPublishingServiceTests
     public async Task Cannot_Republish_Content_After_Adding_Mandatory_Property()
     {
         var result = await ContentPublishingService.PublishAsync(Textpage.Key, [new CulturePublishScheduleModel()], Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
         VerifyIsPublished(Textpage.Key);
 
         ContentType.AddPropertyType(
@@ -649,12 +649,12 @@ public partial class ContentPublishingServiceTests
         await ContentTypeService.UpdateAsync(ContentType, Constants.Security.SuperUserKey);
 
         result = await ContentPublishingService.PublishAsync(Textpage.Key, [new CulturePublishScheduleModel()], Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentPublishingOperationStatus.ContentInvalid, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(ContentPublishingOperationStatus.ContentInvalid));
 
         var invalidPropertyAliases = result.Result.InvalidPropertyAliases.ToArray();
-        Assert.AreEqual(1, invalidPropertyAliases.Length);
-        Assert.Contains("mandatoryProperty", invalidPropertyAliases);
+        Assert.That(invalidPropertyAliases, Has.Length.EqualTo(1));
+        Assert.That(invalidPropertyAliases, Does.Contain("mandatoryProperty"));
 
         // despite the failure to publish, the page should remain published
         VerifyIsPublished(Textpage.Key);
@@ -664,7 +664,7 @@ public partial class ContentPublishingServiceTests
     public async Task Cannot_Republish_Branch_After_Adding_Mandatory_Property()
     {
         var result = await ContentPublishingService.PublishBranchAsync(Textpage.Key, _allCultures, PublishBranchFilter.IncludeUnpublished, Constants.Security.SuperUserKey, false);
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
         VerifyIsPublished(Textpage.Key);
         VerifyIsPublished(Subpage.Key);
         VerifyIsPublished(Subpage2.Key);
@@ -694,8 +694,8 @@ public partial class ContentPublishingServiceTests
         ContentService.Save(textPage);
 
         result = await ContentPublishingService.PublishBranchAsync(Textpage.Key, _allCultures, PublishBranchFilter.IncludeUnpublished, Constants.Security.SuperUserKey, false);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentPublishingOperationStatus.FailedBranch, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(ContentPublishingOperationStatus.FailedBranch));
         AssertBranchResultSuccess(result.Result, Textpage.Key);
         AssertBranchResultFailed(
             result.Result,
@@ -730,8 +730,8 @@ public partial class ContentPublishingServiceTests
             [new CulturePublishScheduleModel { Culture = cultureCode }],
             Constants.Security.SuperUserKey);
 
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentPublishingOperationStatus.InvalidCulture, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(ContentPublishingOperationStatus.InvalidCulture));
     }
 
     [TestCase("de-DE")]
@@ -754,8 +754,8 @@ public partial class ContentPublishingServiceTests
             [new CulturePublishScheduleModel { Culture = cultureCode }],
             Constants.Security.SuperUserKey);
 
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentPublishingOperationStatus.InvalidCulture, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(ContentPublishingOperationStatus.InvalidCulture));
     }
 
     [Test]
@@ -765,7 +765,7 @@ public partial class ContentPublishingServiceTests
             Textpage.Key,
             [new CulturePublishScheduleModel { Culture = "en-US" }],
             Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
     }
 
     [Test]
@@ -779,7 +779,7 @@ public partial class ContentPublishingServiceTests
             ],
             Constants.Security.SuperUserKey);
 
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
     }
 
     [Test]
@@ -790,31 +790,31 @@ public partial class ContentPublishingServiceTests
             [new CulturePublishScheduleModel { Culture = "da-DK" }],
             Constants.Security.SuperUserKey);
 
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentPublishingOperationStatus.InvalidCulture, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(ContentPublishingOperationStatus.InvalidCulture));
     }
 
     private void AssertBranchResultSuccess(ContentPublishingBranchResult result, params Guid[] expectedKeys)
     {
         var items = result.SucceededItems.ToArray();
-        Assert.AreEqual(expectedKeys.Length, items.Length);
+        Assert.That(items, Has.Length.EqualTo(expectedKeys.Length));
         foreach (var key in expectedKeys)
         {
             var item = items.FirstOrDefault(i => i.Key == key);
-            Assert.IsNotNull(item);
-            Assert.AreEqual(ContentPublishingOperationStatus.Success, item.OperationStatus);
+            Assert.That(item, Is.Not.Null);
+            Assert.That(item.OperationStatus, Is.EqualTo(ContentPublishingOperationStatus.Success));
         }
     }
 
     private void AssertBranchResultFailed(ContentPublishingBranchResult result, params (Guid, ContentPublishingOperationStatus)[] expectedFailures)
     {
         var items = result.FailedItems.ToArray();
-        Assert.AreEqual(expectedFailures.Length, items.Length);
+        Assert.That(items, Has.Length.EqualTo(expectedFailures.Length));
         foreach (var (key, status) in expectedFailures)
         {
             var item = items.FirstOrDefault(i => i.Key == key);
-            Assert.IsNotNull(item);
-            Assert.AreEqual(status, item.OperationStatus);
+            Assert.That(item, Is.Not.Null);
+            Assert.That(item.OperationStatus, Is.EqualTo(status));
         }
     }
 }

@@ -79,22 +79,22 @@ internal sealed class EntityRepositoryTest : UmbracoIntegrationTest
             var entities = repo.GetPagedResultsByQuery(query, objectTypes, 0, 20, out var totalRecords, null, null)
                 .ToList();
 
-            Assert.AreEqual(20, entities.Count);
-            Assert.AreEqual(30, totalRecords);
+            Assert.That(entities, Has.Count.EqualTo(20));
+            Assert.That(totalRecords, Is.EqualTo(30));
 
             // add the next page
             entities.AddRange(repo.GetPagedResultsByQuery(query, objectTypes, 1, 20, out totalRecords, null, null));
 
-            Assert.AreEqual(30, entities.Count);
-            Assert.AreEqual(30, totalRecords);
+            Assert.That(entities, Has.Count.EqualTo(30));
+            Assert.That(totalRecords, Is.EqualTo(30));
 
             var contentEntities = entities.OfType<IDocumentEntitySlim>().ToList();
             var mediaEntities = entities.OfType<IMediaEntitySlim>().ToList();
             var memberEntities = entities.OfType<IMemberEntitySlim>().ToList();
 
-            Assert.AreEqual(10, contentEntities.Count);
-            Assert.AreEqual(10, mediaEntities.Count);
-            Assert.AreEqual(10, memberEntities.Count);
+            Assert.That(contentEntities, Has.Count.EqualTo(10));
+            Assert.That(mediaEntities, Has.Count.EqualTo(10));
+            Assert.That(memberEntities, Has.Count.EqualTo(10));
         }
     }
 

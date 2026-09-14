@@ -29,7 +29,7 @@ public class ContentNavigationServiceTest
 
         var success = contentNavigationService.TryGetLevel(rootKey, out var level);
 
-        Assert.IsTrue(success);
+        Assert.That(success, Is.True);
         Assert.That(level, Is.EqualTo(1));
     }
 
@@ -53,7 +53,7 @@ public class ContentNavigationServiceTest
 
         var success = contentNavigationService.TryGetLevel(childKey, out var level);
 
-        Assert.IsTrue(success);
+        Assert.That(success, Is.True);
         Assert.That(level, Is.EqualTo(2));
     }
 
@@ -77,7 +77,7 @@ public class ContentNavigationServiceTest
 
         var success = contentNavigationService.TryGetLevel(grandChildKey, out var level);
 
-        Assert.IsTrue(success);
+        Assert.That(success, Is.True);
         Assert.That(level, Is.EqualTo(3));
     }
 
@@ -112,7 +112,7 @@ public class ContentNavigationServiceTest
 
         var success = contentNavigationService.TryGetChildrenKeys(rootKey, out IEnumerable<Guid> childrenKeys);
 
-        Assert.IsTrue(success);
+        Assert.That(success, Is.True);
         Assert.That(childrenKeys, Is.EqualTo(new[] { childAKey, childBKey, childCKey }));
     }
 
@@ -153,7 +153,7 @@ public class ContentNavigationServiceTest
 
         var success = contentNavigationService.TryGetDescendantsKeys(rootKey, out IEnumerable<Guid> descendantsKeys);
 
-        Assert.IsTrue(success);
+        Assert.That(success, Is.True);
         Assert.That(
             descendantsKeys,
             Is.EqualTo(new[] { childAKey, grandA2Key, grandA1Key, childBKey, grandB2Key, grandB1Key }));
@@ -181,7 +181,7 @@ public class ContentNavigationServiceTest
 
         var success = contentNavigationService.TryGetChildrenKeys(parentKey, out IEnumerable<Guid> childrenKeys);
 
-        Assert.IsTrue(success);
+        Assert.That(success, Is.True);
         Assert.That(childrenKeys, Is.EqualTo(new[] { childAKey, childBKey, childCKey }));
     }
 

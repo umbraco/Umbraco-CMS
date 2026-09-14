@@ -78,7 +78,7 @@ internal sealed class SuppressNotificationsTests : UmbracoIntegrationTest
             MediaService.Save(media);
         }
 
-        Assert.AreEqual(asserted + 1, TestContext.CurrentContext.AssertCount);
+        Assert.That(TestContext.CurrentContext.AssertCount, Is.EqualTo(asserted + 1));
     }
 
     [Test]
@@ -103,7 +103,7 @@ internal sealed class SuppressNotificationsTests : UmbracoIntegrationTest
     private class TestMediaNotificationHandler : INotificationHandler<MediaSavedNotification>
     {
         public void Handle(MediaSavedNotification notification)
-            => Assert.IsNotNull(notification);
+            => Assert.That(notification, Is.Not.Null);
     }
 
     private class TestContentTypeNotificationHandler : INotificationHandler<ContentTypeSavingNotification>

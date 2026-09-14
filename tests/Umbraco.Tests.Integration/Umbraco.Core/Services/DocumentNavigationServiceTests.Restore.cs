@@ -34,20 +34,20 @@ internal sealed partial class DocumentNavigationServiceTests
         Assert.Multiple(() =>
         {
             // Verify siblings count has decreased by one
-            Assert.AreEqual(initialSiblingsKeys.Count() - 1, updatedSiblingsKeys.Count());
+            Assert.That(updatedSiblingsKeys.Count(), Is.EqualTo(initialSiblingsKeys.Count() - 1));
 
             if (targetParentKey is null)
             {
-                Assert.IsNull(restoredItemParentKey);
+                Assert.That(restoredItemParentKey, Is.Null);
             }
             else
             {
-                Assert.IsNotNull(restoredItemParentKey);
-                Assert.AreNotEqual(initialParentKey, restoredItemParentKey);
+                Assert.That(restoredItemParentKey, Is.Not.Null);
+                Assert.That(restoredItemParentKey, Is.Not.EqualTo(initialParentKey));
             }
 
-            Assert.AreEqual(beforeRestoreDescendants, afterRestoreDescendants);
-            Assert.AreEqual(targetParentKey, restoredItemParentKey);
+            Assert.That(afterRestoreDescendants, Is.EqualTo(beforeRestoreDescendants));
+            Assert.That(restoredItemParentKey, Is.EqualTo(targetParentKey));
         });
     }
 
@@ -59,24 +59,24 @@ internal sealed partial class DocumentNavigationServiceTests
 
         // Restore only Child 2, leaving its descendants in the recycle bin.
         var restoreAttempt = await ContentEditingService.RestoreAsync(Child2.Key, Root.Key, Constants.Security.SuperUserKey, includeDescendants: false);
-        Assert.IsTrue(restoreAttempt.Success);
+        Assert.That(restoreAttempt.Success, Is.True);
 
         Assert.Multiple(() =>
         {
             // Child 2 is back in the tree under Root, with no children (they stayed behind).
-            Assert.IsTrue(DocumentNavigationQueryService.TryGetParentKey(Child2.Key, out Guid? restoredParentKey));
-            Assert.AreEqual(Root.Key, restoredParentKey);
+            Assert.That(DocumentNavigationQueryService.TryGetParentKey(Child2.Key, out Guid? restoredParentKey), Is.True);
+            Assert.That(restoredParentKey, Is.EqualTo(Root.Key));
             DocumentNavigationQueryService.TryGetChildrenKeys(Child2.Key, out IEnumerable<Guid> restoredChildren);
-            Assert.IsEmpty(restoredChildren);
+            Assert.That(restoredChildren, Is.Empty);
 
             // Grandchild 3 is now a top-level recycle bin item (its former parent left the bin).
-            Assert.IsFalse(DocumentNavigationQueryService.TryGetParentKey(Grandchild3.Key, out _), "Grandchild 3 should not be in the main tree.");
-            Assert.IsTrue(DocumentNavigationQueryService.TryGetParentKeyInBin(Grandchild3.Key, out Guid? binParentKey));
-            Assert.IsNull(binParentKey, "Grandchild 3 should be a top-level recycle bin item.");
+            Assert.That(DocumentNavigationQueryService.TryGetParentKey(Grandchild3.Key, out _), Is.False, "Grandchild 3 should not be in the main tree.");
+            Assert.That(DocumentNavigationQueryService.TryGetParentKeyInBin(Grandchild3.Key, out Guid? binParentKey), Is.True);
+            Assert.That(binParentKey, Is.Null, "Grandchild 3 should be a top-level recycle bin item.");
 
             // Great-grandchild 1 remains trashed underneath Grandchild 3.
-            Assert.IsTrue(DocumentNavigationQueryService.TryGetParentKeyInBin(GreatGrandchild1.Key, out Guid? greatGrandchildBinParentKey));
-            Assert.AreEqual(Grandchild3.Key, greatGrandchildBinParentKey);
+            Assert.That(DocumentNavigationQueryService.TryGetParentKeyInBin(GreatGrandchild1.Key, out Guid? greatGrandchildBinParentKey), Is.True);
+            Assert.That(greatGrandchildBinParentKey, Is.EqualTo(Grandchild3.Key));
         });
     }
 
@@ -104,12 +104,12 @@ internal sealed partial class DocumentNavigationServiceTests
         if (targetParentKey is null)
         {
             DocumentNavigationQueryService.TryGetRootKeys(out IEnumerable<Guid> rootKeys);
-            Assert.AreEqual(nodeToRestore, rootKeys.Last());
+            Assert.That(rootKeys.Last(), Is.EqualTo(nodeToRestore));
         }
         else
         {
             DocumentNavigationQueryService.TryGetChildrenKeys(targetParentKey.Value, out IEnumerable<Guid> childrenKeys);
-            Assert.AreEqual(nodeToRestore, childrenKeys.Last());
+            Assert.That(childrenKeys.Last(), Is.EqualTo(nodeToRestore));
         }
     }
 }

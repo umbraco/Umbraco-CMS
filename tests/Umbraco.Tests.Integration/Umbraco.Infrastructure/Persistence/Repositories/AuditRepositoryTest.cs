@@ -101,8 +101,8 @@ internal sealed class AuditRepositoryTest : UmbracoIntegrationTest
 
             var page = repo.GetPagedResultsByQuery(sp.CreateQuery<IAuditItem>(), 0, 10, out var total, Direction.Descending, null, null);
 
-            Assert.AreEqual(10, page.Count());
-            Assert.AreEqual(200, total);
+            Assert.That(page.Count(), Is.EqualTo(10));
+            Assert.That(total, Is.EqualTo(200));
         }
     }
 
@@ -144,8 +144,8 @@ internal sealed class AuditRepositoryTest : UmbracoIntegrationTest
                     sp.CreateQuery<IAuditItem>()
                         .Where(x => x.UserId > -2));
 
-                Assert.AreEqual(10, page.Count());
-                Assert.AreEqual(100, total);
+                Assert.That(page.Count(), Is.EqualTo(10));
+                Assert.That(total, Is.EqualTo(100));
             }
             finally
             {
@@ -186,9 +186,9 @@ internal sealed class AuditRepositoryTest : UmbracoIntegrationTest
                     null)
                 .ToArray();
 
-            Assert.AreEqual(9, page.Length);
-            Assert.IsTrue(page.All(x => x.AuditType == AuditType.Publish));
-            Assert.AreEqual(100, total);
+            Assert.That(page, Has.Length.EqualTo(9));
+            Assert.That(page.All(x => x.AuditType == AuditType.Publish), Is.True);
+            Assert.That(total, Is.EqualTo(100));
         }
     }
 
@@ -224,9 +224,9 @@ internal sealed class AuditRepositoryTest : UmbracoIntegrationTest
                         .Where(item => item.Comment == "Content created"))
                 .ToArray();
 
-            Assert.AreEqual(8, page.Length);
-            Assert.IsTrue(page.All(x => x.Comment == "Content created"));
-            Assert.AreEqual(100, total);
+            Assert.That(page, Has.Length.EqualTo(8));
+            Assert.That(page.All(x => x.Comment == "Content created"), Is.True);
+            Assert.That(total, Is.EqualTo(100));
         }
     }
 }

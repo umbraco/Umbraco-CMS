@@ -33,10 +33,10 @@ public class ContentRouteBuilderTests : DeliveryApiTests
 
         var builder = CreateApiContentRouteBuilder(hideTopLevelNodeFromPath, navigationQueryServiceMock.Object, contentCache: contentCache, documentUrlServiceMock: documentUrlServiceMock);
         var result = builder.Build(root);
-        Assert.IsNotNull(result);
-        Assert.AreEqual("/", result.Path);
-        Assert.AreEqual(rootKey, result.StartItem.Id);
-        Assert.AreEqual("the-root", result.StartItem.Path);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Path, Is.EqualTo("/"));
+        Assert.That(result.StartItem.Id, Is.EqualTo(rootKey));
+        Assert.That(result.StartItem.Path, Is.EqualTo("the-root"));
     }
 
     [TestCase(true)]
@@ -61,10 +61,10 @@ public class ContentRouteBuilderTests : DeliveryApiTests
 
         var builder = CreateApiContentRouteBuilder(hideTopLevelNodeFromPath, navigationQueryServiceMock.Object, contentCache: contentCache, documentUrlServiceMock: documentUrlServiceMock);
         var result = builder.Build(child);
-        Assert.IsNotNull(result);
-        Assert.AreEqual("/the-child", result.Path);
-        Assert.AreEqual(rootKey, result.StartItem.Id);
-        Assert.AreEqual("the-root", result.StartItem.Path);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Path, Is.EqualTo("/the-child"));
+        Assert.That(result.StartItem.Id, Is.EqualTo(rootKey));
+        Assert.That(result.StartItem.Path, Is.EqualTo("the-root"));
     }
 
     [TestCase(true)]
@@ -93,10 +93,10 @@ public class ContentRouteBuilderTests : DeliveryApiTests
 
         var builder = CreateApiContentRouteBuilder(hideTopLevelNodeFromPath, navigationQueryServiceMock.Object, contentCache: contentCache, documentUrlServiceMock: documentUrlServiceMock);
         var result = builder.Build(grandchild);
-        Assert.IsNotNull(result);
-        Assert.AreEqual("/the-child/the-grandchild", result.Path);
-        Assert.AreEqual(rootKey, result.StartItem.Id);
-        Assert.AreEqual("the-root", result.StartItem.Path);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Path, Is.EqualTo("/the-child/the-grandchild"));
+        Assert.That(result.StartItem.Id, Is.EqualTo(rootKey));
+        Assert.That(result.StartItem.Path, Is.EqualTo("the-root"));
     }
 
     [Test]
@@ -120,16 +120,16 @@ public class ContentRouteBuilderTests : DeliveryApiTests
 
         var builder = CreateApiContentRouteBuilder(false, navigationQueryServiceMock.Object, contentCache: contentCache, documentUrlServiceMock: documentUrlServiceMock);
         var result = builder.Build(child, "en-us");
-        Assert.IsNotNull(result);
-        Assert.AreEqual("/the-child-en-us", result.Path);
-        Assert.AreEqual(rootKey, result.StartItem.Id);
-        Assert.AreEqual("the-root-en-us", result.StartItem.Path);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Path, Is.EqualTo("/the-child-en-us"));
+        Assert.That(result.StartItem.Id, Is.EqualTo(rootKey));
+        Assert.That(result.StartItem.Path, Is.EqualTo("the-root-en-us"));
 
         result = builder.Build(child, "da-dk");
-        Assert.IsNotNull(result);
-        Assert.AreEqual("/the-child-da-dk", result.Path);
-        Assert.AreEqual(rootKey, result.StartItem.Id);
-        Assert.AreEqual("the-root-da-dk", result.StartItem.Path);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Path, Is.EqualTo("/the-child-da-dk"));
+        Assert.That(result.StartItem.Id, Is.EqualTo(rootKey));
+        Assert.That(result.StartItem.Path, Is.EqualTo("the-root-da-dk"));
     }
 
     [Test]
@@ -153,16 +153,16 @@ public class ContentRouteBuilderTests : DeliveryApiTests
 
         var builder = CreateApiContentRouteBuilder(false, navigationQueryServiceMock.Object, contentCache: contentCache, documentUrlServiceMock: documentUrlServiceMock);
         var result = builder.Build(child, "en-us");
-        Assert.IsNotNull(result);
-        Assert.AreEqual("/the-child", result.Path);
-        Assert.AreEqual(rootKey, result.StartItem.Id);
-        Assert.AreEqual("the-root-en-us", result.StartItem.Path);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Path, Is.EqualTo("/the-child"));
+        Assert.That(result.StartItem.Id, Is.EqualTo(rootKey));
+        Assert.That(result.StartItem.Path, Is.EqualTo("the-root-en-us"));
 
         result = builder.Build(child, "da-dk");
-        Assert.IsNotNull(result);
-        Assert.AreEqual("/the-child", result.Path);
-        Assert.AreEqual(rootKey, result.StartItem.Id);
-        Assert.AreEqual("the-root-da-dk", result.StartItem.Path);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Path, Is.EqualTo("/the-child"));
+        Assert.That(result.StartItem.Id, Is.EqualTo(rootKey));
+        Assert.That(result.StartItem.Path, Is.EqualTo("the-root-da-dk"));
     }
 
     [Test]
@@ -186,16 +186,16 @@ public class ContentRouteBuilderTests : DeliveryApiTests
 
         var builder = CreateApiContentRouteBuilder(false, navigationQueryServiceMock.Object, contentCache: contentCache, documentUrlServiceMock: documentUrlServiceMock);
         var result = builder.Build(child, "en-us");
-        Assert.IsNotNull(result);
-        Assert.AreEqual("/the-child-en-us", result.Path);
-        Assert.AreEqual(rootKey, result.StartItem.Id);
-        Assert.AreEqual("the-root", result.StartItem.Path);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Path, Is.EqualTo("/the-child-en-us"));
+        Assert.That(result.StartItem.Id, Is.EqualTo(rootKey));
+        Assert.That(result.StartItem.Path, Is.EqualTo("the-root"));
 
         result = builder.Build(child, "da-dk");
-        Assert.IsNotNull(result);
-        Assert.AreEqual("/the-child-da-dk", result.Path);
-        Assert.AreEqual(rootKey, result.StartItem.Id);
-        Assert.AreEqual("the-root", result.StartItem.Path);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Path, Is.EqualTo("/the-child-da-dk"));
+        Assert.That(result.StartItem.Id, Is.EqualTo(rootKey));
+        Assert.That(result.StartItem.Path, Is.EqualTo("the-root"));
     }
 
     [TestCase(PublishedItemType.Media)]
@@ -217,8 +217,8 @@ public class ContentRouteBuilderTests : DeliveryApiTests
     public void FallsBackToContentPathIfUrlProviderCannotResolveUrl(string resolvedUrl)
     {
         var result = GetUnRoutableRoute(resolvedUrl, "/the/content/route");
-        Assert.IsNotNull(result);
-        Assert.AreEqual("/the/content/route/", result.Path);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Path, Is.EqualTo("/the/content/route/"));
     }
 
     [TestCase("")]
@@ -227,7 +227,7 @@ public class ContentRouteBuilderTests : DeliveryApiTests
     public void YieldsNullForUnRoutableContent(string contentPath)
     {
         var result = GetUnRoutableRoute(contentPath, contentPath);
-        Assert.IsNull(result);
+        Assert.That(result, Is.Null);
     }
 
     [TestCase(true)]
@@ -259,9 +259,9 @@ public class ContentRouteBuilderTests : DeliveryApiTests
 
         // yes... actually testing the mock setup here. but it's important for the rest of the tests that this behave correct, so we better test it.
         var publishedUrlProvider = SetupPublishedUrlProvider(hideTopLevelNodeFromPath, contentCache, navigationQueryServiceMock.Object, documentUrlServiceMock.Object);
-        Assert.AreEqual(hideTopLevelNodeFromPath ? "/" : "/the-root", publishedUrlProvider.GetUrl(root));
-        Assert.AreEqual(hideTopLevelNodeFromPath ? "/the-child" : "/the-root/the-child", publishedUrlProvider.GetUrl(child));
-        Assert.AreEqual(hideTopLevelNodeFromPath ? "/the-child/the-grandchild" : "/the-root/the-child/the-grandchild", publishedUrlProvider.GetUrl(grandchild));
+        Assert.That(publishedUrlProvider.GetUrl(root), Is.EqualTo(hideTopLevelNodeFromPath ? "/" : "/the-root"));
+        Assert.That(publishedUrlProvider.GetUrl(child), Is.EqualTo(hideTopLevelNodeFromPath ? "/the-child" : "/the-root/the-child"));
+        Assert.That(publishedUrlProvider.GetUrl(grandchild), Is.EqualTo(hideTopLevelNodeFromPath ? "/the-child/the-grandchild" : "/the-root/the-child/the-grandchild"));
     }
 
     [TestCase(true)]
@@ -286,10 +286,10 @@ public class ContentRouteBuilderTests : DeliveryApiTests
 
         var builder = CreateApiContentRouteBuilder(hideTopLevelNodeFromPath, navigationQueryServiceMock.Object, contentCache: contentCache, isPreview: true, documentUrlServiceMock: documentUrlServiceMock);
         var result = builder.Build(child);
-        Assert.IsNotNull(result);
-        Assert.AreEqual($"/{Constants.DeliveryApi.Routing.PreviewContentPathPrefix}{childKey:D}", result.Path);
-        Assert.AreEqual(rootKey, result.StartItem.Id);
-        Assert.AreEqual("the-root", result.StartItem.Path);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Path, Is.EqualTo($"/{Constants.DeliveryApi.Routing.PreviewContentPathPrefix}{childKey:D}"));
+        Assert.That(result.StartItem.Id, Is.EqualTo(rootKey));
+        Assert.That(result.StartItem.Path, Is.EqualTo("the-root"));
     }
 
     [TestCase(true)]
@@ -314,8 +314,8 @@ public class ContentRouteBuilderTests : DeliveryApiTests
 
         var builder = CreateApiContentRouteBuilder(true, navigationQueryServiceMock.Object, addTrailingSlash, contentCache: contentCache, isPreview: true, documentUrlServiceMock: documentUrlServiceMock);
         var result = builder.Build(child);
-        Assert.IsNotNull(result);
-        Assert.AreEqual(addTrailingSlash, result.Path.EndsWith("/"));
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Path.EndsWith("/"), Is.EqualTo(addTrailingSlash));
     }
 
     [TestCase(true)]
@@ -346,14 +346,14 @@ public class ContentRouteBuilderTests : DeliveryApiTests
 
         if (isPreview)
         {
-            Assert.IsNotNull(result);
-            Assert.AreEqual($"/{Constants.DeliveryApi.Routing.PreviewContentPathPrefix}{childKey:D}", result.Path);
-            Assert.AreEqual(rootKey, result.StartItem.Id);
-            Assert.AreEqual("the-root", result.StartItem.Path);
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Path, Is.EqualTo($"/{Constants.DeliveryApi.Routing.PreviewContentPathPrefix}{childKey:D}"));
+            Assert.That(result.StartItem.Id, Is.EqualTo(rootKey));
+            Assert.That(result.StartItem.Path, Is.EqualTo("the-root"));
         }
         else
         {
-            Assert.IsNull(result);
+            Assert.That(result, Is.Null);
         }
     }
 
@@ -383,16 +383,16 @@ public class ContentRouteBuilderTests : DeliveryApiTests
 
         var builder = CreateApiContentRouteBuilder(true, navigationQueryServiceMock.Object, contentCache: contentCache, apiContentPathProvider: apiContentPathProvider.Object, documentUrlServiceMock: documentUrlServiceMock);
         var result = builder.Build(root);
-        Assert.NotNull(result);
-        Assert.AreEqual("/my-custom-path-for-the-root", result.Path);
-        Assert.AreEqual(rootKey, result.StartItem.Id);
-        Assert.AreEqual("the-root", result.StartItem.Path);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Path, Is.EqualTo("/my-custom-path-for-the-root"));
+        Assert.That(result.StartItem.Id, Is.EqualTo(rootKey));
+        Assert.That(result.StartItem.Path, Is.EqualTo("the-root"));
 
         result = builder.Build(child);
-        Assert.NotNull(result);
-        Assert.AreEqual("/my-custom-path-for-the-child", result.Path);
-        Assert.AreEqual(rootKey, result.StartItem.Id);
-        Assert.AreEqual("the-root", result.StartItem.Path);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Path, Is.EqualTo("/my-custom-path-for-the-child"));
+        Assert.That(result.StartItem.Id, Is.EqualTo(rootKey));
+        Assert.That(result.StartItem.Path, Is.EqualTo("the-root"));
     }
 
     private IPublishedContent SetupInvariantPublishedContent(

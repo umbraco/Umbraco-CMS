@@ -73,7 +73,7 @@ public class DeleteCulturesTests : TestBase
             // would have wiped it too, forcing an expensive re-collection from content services.
             IndexDocument? invariantDocAfter = await IndexDocumentRepository.GetAsync(ChildKey, publish);
             Assert.That(invariantDocAfter, Is.Not.Null, "Invariant document cache should be preserved after language deletion");
-            Assert.That(invariantDocAfter!.Fields.Length, Is.EqualTo(invariantFieldsBefore.Length), "Invariant document fields should be unchanged");
+            Assert.That(invariantDocAfter!.Fields, Has.Length.EqualTo(invariantFieldsBefore.Length), "Invariant document fields should be unchanged");
         }
     }
 

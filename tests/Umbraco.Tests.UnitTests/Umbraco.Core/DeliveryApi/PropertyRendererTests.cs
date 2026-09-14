@@ -18,7 +18,7 @@ public class PropertyRendererTests : DeliveryApiTests
         var property = SetupProperty(value, true);
         var renderer = new ApiPropertyRenderer(new NoopPublishedValueFallback());
 
-        Assert.AreEqual(value, renderer.GetPropertyValue(property, false));
+        Assert.That(renderer.GetPropertyValue(property, false), Is.EqualTo(value));
     }
 
     [TestCase(123)]
@@ -30,7 +30,7 @@ public class PropertyRendererTests : DeliveryApiTests
         var property = SetupProperty(value, false);
         var renderer = new ApiPropertyRenderer(new NoopPublishedValueFallback());
 
-        Assert.AreEqual(null, renderer.GetPropertyValue(property, false));
+        Assert.That(renderer.GetPropertyValue(property, false), Is.EqualTo(null));
     }
 
     [TestCase(123)]
@@ -47,7 +47,7 @@ public class PropertyRendererTests : DeliveryApiTests
             .Returns(true);
         var renderer = new ApiPropertyRenderer(customPublishedValueFallback.Object);
 
-        Assert.AreEqual("Default value", renderer.GetPropertyValue(property, false));
+        Assert.That(renderer.GetPropertyValue(property, false), Is.EqualTo("Default value"));
     }
 
     private IPublishedProperty SetupProperty(object? value, bool isValue)

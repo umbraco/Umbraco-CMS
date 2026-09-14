@@ -48,13 +48,13 @@ internal sealed class PublicAccessServiceTests : UmbracoIntegrationTest
         var result = PublicAccessService.Save(entry);
 
         // Assert
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(OperationResultType.Success, result.Result.Result);
-        Assert.IsTrue(entry.HasIdentity);
-        Assert.AreNotEqual(entry.Key, Guid.Empty);
-        Assert.AreEqual(_content.Id, entry.LoginNodeId);
-        Assert.AreEqual(_content.Id, entry.NoAccessNodeId);
-        Assert.AreEqual(_content.Id, entry.ProtectedNodeId);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result.Result, Is.EqualTo(OperationResultType.Success));
+        Assert.That(entry.HasIdentity, Is.True);
+        Assert.That(Guid.Empty, Is.Not.EqualTo(entry.Key));
+        Assert.That(entry.LoginNodeId, Is.EqualTo(_content.Id));
+        Assert.That(entry.NoAccessNodeId, Is.EqualTo(_content.Id));
+        Assert.That(entry.ProtectedNodeId, Is.EqualTo(_content.Id));
     }
 
     [Test]
@@ -72,9 +72,9 @@ internal sealed class PublicAccessServiceTests : UmbracoIntegrationTest
         entry = PublicAccessService.GetEntryForContent(_content);
 
         // Assert
-        Assert.IsTrue(updated.Success);
-        Assert.AreEqual(OperationResultType.Success, updated.Result.Result);
-        Assert.AreEqual(2, entry.Rules.Count());
+        Assert.That(updated.Success, Is.True);
+        Assert.That(updated.Result.Result, Is.EqualTo(OperationResultType.Success));
+        Assert.That(entry.Rules.Count(), Is.EqualTo(2));
     }
 
     [Test]
@@ -93,11 +93,11 @@ internal sealed class PublicAccessServiceTests : UmbracoIntegrationTest
         entry = PublicAccessService.GetEntryForContent(_content);
 
         // Assert
-        Assert.IsTrue(updated1.Success);
-        Assert.IsTrue(updated2.Success);
-        Assert.AreEqual(OperationResultType.Success, updated1.Result.Result);
-        Assert.AreEqual(OperationResultType.Success, updated2.Result.Result);
-        Assert.AreEqual(3, entry.Rules.Count());
+        Assert.That(updated1.Success, Is.True);
+        Assert.That(updated2.Success, Is.True);
+        Assert.That(updated1.Result.Result, Is.EqualTo(OperationResultType.Success));
+        Assert.That(updated2.Result.Result, Is.EqualTo(OperationResultType.Success));
+        Assert.That(entry.Rules.Count(), Is.EqualTo(3));
     }
 
     [Test]
@@ -119,9 +119,9 @@ internal sealed class PublicAccessServiceTests : UmbracoIntegrationTest
         entry = PublicAccessService.GetEntryForContent(_content);
 
         // Assert
-        Assert.IsTrue(removed.Success);
-        Assert.AreEqual(OperationResultType.Success, removed.Result.Result);
-        Assert.AreEqual(1, entry.Rules.Count());
-        Assert.AreEqual("TestValue2", entry.Rules.ElementAt(0).RuleValue);
+        Assert.That(removed.Success, Is.True);
+        Assert.That(removed.Result.Result, Is.EqualTo(OperationResultType.Success));
+        Assert.That(entry.Rules.Count(), Is.EqualTo(1));
+        Assert.That(entry.Rules.ElementAt(0).RuleValue, Is.EqualTo("TestValue2"));
     }
 }

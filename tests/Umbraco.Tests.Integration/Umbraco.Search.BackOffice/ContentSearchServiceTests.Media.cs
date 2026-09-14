@@ -176,7 +176,7 @@ public partial class ContentSearchServiceTests
         {
             Assert.That(result.Total, Is.EqualTo(10));
             Assert.That(result.Items.Count(), Is.EqualTo(10));
-            CollectionAssert.AreEqual(result.Items.Select(item => item.Key), expectedChildrenKeys);
+            Assert.That(expectedChildrenKeys, Is.EqualTo(result.Items.Select(item => item.Key)).AsCollection);
         });
     }
 
@@ -197,7 +197,7 @@ public partial class ContentSearchServiceTests
         {
             Assert.That(result.Total, Is.EqualTo(10));
             Assert.That(result.Items.Count(), Is.EqualTo(10));
-            CollectionAssert.AreEqual(result.Items.Select(item => item.Key), expectedChildrenKeys);
+            Assert.That(expectedChildrenKeys, Is.EqualTo(result.Items.Select(item => item.Key)).AsCollection);
         });
     }
 
@@ -218,7 +218,7 @@ public partial class ContentSearchServiceTests
         {
             Assert.That(result.Total, Is.EqualTo(expectedChildrenOrder.Length));
             Assert.That(result.Items.Count(), Is.EqualTo(expectedChildrenOrder.Length));
-            CollectionAssert.AreEqual(result.Items.Select(item => item.Name), expectedChildrenOrder);
+            Assert.That(expectedChildrenOrder, Is.EqualTo(result.Items.Select(item => item.Name)).AsCollection);
         });
     }
 
@@ -239,7 +239,7 @@ public partial class ContentSearchServiceTests
         {
             Assert.That(result.Total, Is.EqualTo(expectedChildrenOrder.Length));
             Assert.That(result.Items.Count(), Is.EqualTo(expectedChildrenOrder.Length));
-            CollectionAssert.AreEqual(result.Items.Select(item => item.Name), expectedChildrenOrder);
+            Assert.That(expectedChildrenOrder, Is.EqualTo(result.Items.Select(item => item.Name)).AsCollection);
         });
     }
 

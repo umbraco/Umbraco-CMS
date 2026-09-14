@@ -666,7 +666,7 @@ internal sealed class MigrateSingleBlockListTests : UmbracoIntegrationTest
             layoutItems,
             Is.Not.Null,
             $"The value holds no \"{Constants.PropertyEditors.Aliases.SingleBlock}\" layout - it was not converted.");
-        Assert.That(layoutItems!.Length, Is.EqualTo(1));
+        Assert.That(layoutItems!, Has.Length.EqualTo(1));
         Assert.That(layoutItems[0].ContentKey, Is.EqualTo(innerBlockKey));
 
         BlockItemData innerBlock = singleBlockValue.ContentData.Single();

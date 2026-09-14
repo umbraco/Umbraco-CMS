@@ -15,7 +15,7 @@ public partial class MachineIdentityProviderTests
         public void AlwaysReturnsMachineName()
         {
             var provider = new DefaultMachineIdentityProvider();
-            Assert.AreEqual(Environment.MachineName, provider.GetMachineIdentifier());
+            Assert.That(provider.GetMachineIdentifier(), Is.EqualTo(Environment.MachineName));
         }
     }
 }

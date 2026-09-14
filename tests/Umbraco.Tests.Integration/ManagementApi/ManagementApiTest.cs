@@ -99,7 +99,7 @@ public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
 
         Attempt<IUserGroup, UserGroupOperationStatus> userGroupAttempt = await GetRequiredService<IUserGroupService>()
             .CreateAsync(userGroup, Constants.Security.SuperUserKey);
-        Assert.IsTrue(userGroupAttempt.Success, $"Could not create the user group: {userGroupAttempt.Status}");
+        Assert.That(userGroupAttempt.Success, Is.True, $"Could not create the user group: {userGroupAttempt.Status}");
 
         var email = $"{groupAlias}@umbraco.com";
 
@@ -217,7 +217,7 @@ public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
                     NewPassword = password, ResetPasswordToken = token.Result.ToUrlBase64(), UserKey = userKey,
                 });
 
-            Assert.IsTrue(changePasswordAttempt.Success);
+            Assert.That(changePasswordAttempt.Success, Is.True);
 
             scope.Complete();
         }
@@ -228,7 +228,7 @@ public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
         var loginResponse = await client.PostAsync(
             GetManagementApiUrl<BackOfficeController>(x => x.Login(CancellationToken.None, null)), JsonContent.Create(loginModel));
 
-        Assert.AreEqual(HttpStatusCode.OK, loginResponse.StatusCode, await loginResponse.Content.ReadAsStringAsync());
+        Assert.That(loginResponse.StatusCode, Is.EqualTo(HttpStatusCode.OK), await loginResponse.Content.ReadAsStringAsync());
 
         // The login response sets the authentication cookie, and WebApplicationFactoryClientOptions
         // handles cookies by default, so this client is already authenticated. Nothing further is

@@ -86,9 +86,9 @@ internal sealed class MediaServiceTests : UmbracoIntegrationTest
 
         media = MediaService.GetById(media.Id);
 
-        Assert.IsNotNull(media);
-        Assert.AreEqual("Title", media.GetValue("title"));
-        Assert.AreEqual("Body text", media.GetValue("bodyText"));
+        Assert.That(media, Is.Not.Null);
+        Assert.That(media.GetValue("title"), Is.EqualTo("Title"));
+        Assert.That(media.GetValue("bodyText"), Is.EqualTo("Body text"));
     }
 
     [Test]
@@ -100,15 +100,15 @@ internal sealed class MediaServiceTests : UmbracoIntegrationTest
         media.Key = Guid.CreateVersion7();
         var mediaSaveAttempt = MediaService.Save(media);
 
-        Assert.IsFalse(mediaSaveAttempt.Success);
-        Assert.AreEqual(OperationResultType.FailedInvalidKey, mediaSaveAttempt.Result.Result);
+        Assert.That(mediaSaveAttempt.Success, Is.False);
+        Assert.That(mediaSaveAttempt.Result.Result, Is.EqualTo(OperationResultType.FailedInvalidKey));
     }
 
     private async Task<IMediaType> CreateMediaType()
     {
         IMediaType mediaType = MediaTypeBuilder.CreateSimpleMediaType("test", "Test");
         var createMediaTypeResult = await MediaTypeService.CreateAsync(mediaType, Constants.Security.SuperUserKey);
-        Assert.IsTrue(createMediaTypeResult.Success);
+        Assert.That(createMediaTypeResult.Success, Is.True);
         return mediaType;
     }
 
@@ -131,9 +131,9 @@ internal sealed class MediaServiceTests : UmbracoIntegrationTest
 
         // re-get
         media = MediaService.GetById(media.Id);
-        Assert.AreEqual("another title of mine", media.GetValue("title"));
-        Assert.IsNull(media.GetValue("bodyText"));
-        Assert.AreEqual("new author", media.GetValue("author"));
+        Assert.That(media.GetValue("title"), Is.EqualTo("another title of mine"));
+        Assert.That(media.GetValue("bodyText"), Is.Null);
+        Assert.That(media.GetValue("author"), Is.EqualTo("new author"));
     }
 
     /// <summary>
@@ -202,8 +202,8 @@ internal sealed class MediaServiceTests : UmbracoIntegrationTest
                 out var total,
                 filter,
                 Ordering.By("SortOrder"));
-            Assert.AreEqual(11, result.Count());
-            Assert.AreEqual(20, total);
+            Assert.That(result.Count(), Is.EqualTo(11));
+            Assert.That(total, Is.EqualTo(20));
 
             result = MediaService.GetPagedChildren(
                 -1,
@@ -212,8 +212,8 @@ internal sealed class MediaServiceTests : UmbracoIntegrationTest
                 out total,
                 filter,
                 Ordering.By("SortOrder"));
-            Assert.AreEqual(9, result.Count());
-            Assert.AreEqual(20, total);
+            Assert.That(result.Count(), Is.EqualTo(9));
+            Assert.That(total, Is.EqualTo(20));
         }
     }
 
@@ -289,8 +289,8 @@ internal sealed class MediaServiceTests : UmbracoIntegrationTest
         var mediaPath = "/media/test-image.png";
         var resolvedMedia = MediaService.GetMediaByPath(mediaPath);
 
-        Assert.IsNotNull(resolvedMedia);
-        Assert.That(resolvedMedia.GetValue(Constants.Conventions.Media.File).ToString() == mediaPath);
+        Assert.That(resolvedMedia, Is.Not.Null);
+        Assert.That(resolvedMedia.GetValue(Constants.Conventions.Media.File).ToString(), Is.EqualTo(mediaPath));
     }
 
     [Test]
@@ -305,8 +305,8 @@ internal sealed class MediaServiceTests : UmbracoIntegrationTest
         var mediaPath = "/media/test-image.png";
         var resolvedMedia = MediaService.GetMediaByPath(mediaPath);
 
-        Assert.IsNotNull(resolvedMedia);
-        Assert.That(resolvedMedia.GetValue(Constants.Conventions.Media.File).ToString().Contains(mediaPath));
+        Assert.That(resolvedMedia, Is.Not.Null);
+        Assert.That(resolvedMedia.GetValue(Constants.Conventions.Media.File).ToString(), Does.Contain(mediaPath));
     }
 
     [Test]
@@ -323,10 +323,10 @@ internal sealed class MediaServiceTests : UmbracoIntegrationTest
         var service = MediaService;
 
         var entities = service.GetPagedChildren(-1, 0, 6, out var total).ToArray();
-        Assert.That(entities.Length, Is.EqualTo(6));
+        Assert.That(entities, Has.Length.EqualTo(6));
         Assert.That(total, Is.EqualTo(10));
         entities = service.GetPagedChildren(-1, 1, 6, out total).ToArray();
-        Assert.That(entities.Length, Is.EqualTo(4));
+        Assert.That(entities, Has.Length.EqualTo(4));
         Assert.That(total, Is.EqualTo(10));
     }
 
@@ -357,18 +357,18 @@ internal sealed class MediaServiceTests : UmbracoIntegrationTest
 
         // Children in root including the folder - not the descendants in the folder.
         var entities = service.GetPagedChildren(-1, 0, 6, out var total).ToArray();
-        Assert.That(entities.Length, Is.EqualTo(6));
+        Assert.That(entities, Has.Length.EqualTo(6));
         Assert.That(total, Is.EqualTo(10));
         entities = service.GetPagedChildren(-1, 1, 6, out total).ToArray();
-        Assert.That(entities.Length, Is.EqualTo(4));
+        Assert.That(entities, Has.Length.EqualTo(4));
         Assert.That(total, Is.EqualTo(10));
 
         // Children in folder.
         entities = service.GetPagedChildren(mediaFolder.Id, 0, 6, out total).ToArray();
-        Assert.That(entities.Length, Is.EqualTo(6));
+        Assert.That(entities, Has.Length.EqualTo(6));
         Assert.That(total, Is.EqualTo(10));
         entities = service.GetPagedChildren(mediaFolder.Id, 1, 6, out total).ToArray();
-        Assert.That(entities.Length, Is.EqualTo(4));
+        Assert.That(entities, Has.Length.EqualTo(4));
         Assert.That(total, Is.EqualTo(10));
     }
 
@@ -419,7 +419,7 @@ internal sealed class MediaServiceTests : UmbracoIntegrationTest
     /// After the fix, write locks are acquired before publishing notifications, so the deadlock cannot occur.
     /// </remarks>
     [Test]
-    [Timeout(10000)]
+    [CancelAfter(10000)]
     [ConfigureBuilder(ActionName = nameof(ConfigureConcurrencyTest))]
     public async Task Parallel_Media_Save_Does_Not_Deadlock_When_Notification_Handler_Acquires_Read_Lock()
     {
@@ -463,8 +463,9 @@ internal sealed class MediaServiceTests : UmbracoIntegrationTest
         await Task.WhenAll(tasks);
 
         // Assert
-        Assert.IsEmpty(
+        Assert.That(
             exceptions,
+            Is.Empty,
             $"Expected no exceptions but got {exceptions.Count}: {string.Join(", ", exceptions.Select(e => e.Message))}");
 
         // Verify all media items were updated successfully
@@ -480,7 +481,7 @@ internal sealed class MediaServiceTests : UmbracoIntegrationTest
     /// Verifies that parallel media deletes don't deadlock when a notification handler is registered.
     /// </summary>
     [Test]
-    [Timeout(10000)]
+    [CancelAfter(10000)]
     [ConfigureBuilder(ActionName = nameof(ConfigureConcurrencyTest))]
     public async Task Parallel_Media_Delete_Does_Not_Deadlock()
     {
@@ -523,8 +524,9 @@ internal sealed class MediaServiceTests : UmbracoIntegrationTest
         await Task.WhenAll(tasks);
 
         // Assert
-        Assert.IsEmpty(
+        Assert.That(
             exceptions,
+            Is.Empty,
             $"Expected no exceptions but got {exceptions.Count}: {string.Join(", ", exceptions.Select(e => e.Message))}");
 
         // Verify all media items were deleted
@@ -603,13 +605,13 @@ internal sealed class MediaServiceTests : UmbracoIntegrationTest
             .ToArray();
 
         // Children were created in ascending sort order.
-        Assert.AreEqual(childIds.ToArray(), ChildIdsInSortOrder());
+        Assert.That(ChildIdsInSortOrder(), Is.EqualTo(childIds.ToArray()));
 
         var reversed = Enumerable.Reverse(childIds).ToArray();
         var result = MediaService.SortChildren(root.Id, reversed, Constants.Security.SuperUserId);
 
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(reversed, ChildIdsInSortOrder());
+        Assert.That(result.Success, Is.True);
+        Assert.That(ChildIdsInSortOrder(), Is.EqualTo(reversed));
     }
 
     [Test]

@@ -28,10 +28,10 @@ internal sealed partial class UserServiceTests
 
         var result = await UserService.SetAvatarAsync(user.Key, temporaryFileKey);
 
-        Assert.AreEqual(UserOperationStatus.Success, result);
+        Assert.That(result, Is.EqualTo(UserOperationStatus.Success));
 
         var updatedUser = await UserService.GetAsync(user.Key);
-        Assert.IsNotNull(updatedUser?.Avatar);
+        Assert.That(updatedUser?.Avatar, Is.Not.Null);
     }
 
     [Test]
@@ -45,7 +45,7 @@ internal sealed partial class UserServiceTests
 
         var result = await UserService.SetAvatarAsync(user.Key, temporaryFileKey);
 
-        Assert.AreEqual(UserOperationStatus.InvalidAvatar, result);
+        Assert.That(result, Is.EqualTo(UserOperationStatus.InvalidAvatar));
     }
 
     [Test]
@@ -59,6 +59,6 @@ internal sealed partial class UserServiceTests
 
         var result = await UserService.SetAvatarAsync(user.Key, temporaryFileKey);
 
-        Assert.AreEqual(UserOperationStatus.Success, result);
+        Assert.That(result, Is.EqualTo(UserOperationStatus.Success));
     }
 }

@@ -43,12 +43,12 @@ public class BlockEditorComponentTests
         var component = new BlockListPropertyNotificationHandler(Mock.Of<ILogger<BlockListPropertyNotificationHandler>>());
         var result = component.ReplaceBlockEditorKeys(json, GuidFactory);
 
-        Assert.AreEqual(5, guidMap.Count); // 5 keys from Block List (with no sub features)
+        Assert.That(guidMap, Has.Count.EqualTo(5)); // 5 keys from Block List (with no sub features)
         var expected = ReplaceGuids(json, guidMap);
         var expectedJson = _jsonSerializer.Serialize(_jsonSerializer.Deserialize<BlockListValue>(expected));
         var resultJson = _jsonSerializer.Serialize(_jsonSerializer.Deserialize<BlockListValue>(result));
-        Assert.IsNotEmpty(resultJson);
-        Assert.AreEqual(expectedJson, resultJson);
+        Assert.That(resultJson, Is.Not.Empty);
+        Assert.That(resultJson, Is.EqualTo(expectedJson));
     }
 
     [Test]
@@ -74,13 +74,13 @@ public class BlockEditorComponentTests
         var result = component.ReplaceBlockEditorKeys(json, GuidFactory);
 
         // the expected result is that the subFeatures data remains escaped
-        Assert.AreEqual(10, guidMap.Count); // 5 keys from each Block List
+        Assert.That(guidMap, Has.Count.EqualTo(10)); // 5 keys from each Block List
         var expected = ReplaceGuids(GetBlockListJson(innerJsonEscaped), guidMap);
 
         var expectedJson = _jsonSerializer.Serialize(_jsonSerializer.Deserialize<BlockListValue>(expected));
         var resultJson = _jsonSerializer.Serialize(_jsonSerializer.Deserialize<BlockListValue>(result));
-        Assert.IsNotEmpty(resultJson);
-        Assert.AreEqual(expectedJson, resultJson);
+        Assert.That(resultJson, Is.Not.Empty);
+        Assert.That(resultJson, Is.EqualTo(expectedJson));
     }
 
     [Test]
@@ -102,12 +102,12 @@ public class BlockEditorComponentTests
         var component = new BlockListPropertyNotificationHandler(Mock.Of<ILogger<BlockListPropertyNotificationHandler>>());
         var result = component.ReplaceBlockEditorKeys(json, GuidFactory);
 
-        Assert.AreEqual(10, guidMap.Count); // 5 keys from each Block List
+        Assert.That(guidMap, Has.Count.EqualTo(10)); // 5 keys from each Block List
         var expected = ReplaceGuids(GetBlockListJson(innerJson), guidMap);
         var expectedJson = _jsonSerializer.Serialize(_jsonSerializer.Deserialize<BlockListValue>(expected));
         var resultJson = _jsonSerializer.Serialize(_jsonSerializer.Deserialize<BlockListValue>(result));
-        Assert.IsNotEmpty(resultJson);
-        Assert.AreEqual(expectedJson, resultJson);
+        Assert.That(resultJson, Is.Not.Empty);
+        Assert.That(resultJson, Is.EqualTo(expectedJson));
     }
 
     [Test]
@@ -135,13 +135,13 @@ public class BlockEditorComponentTests
         var result = component.ReplaceBlockEditorKeys(json, GuidFactory);
 
         // the expected result is that the subFeatures remains escaped
-        Assert.AreEqual(10, guidMap.Count); // 5 keys from each Block List
+        Assert.That(guidMap, Has.Count.EqualTo(10)); // 5 keys from each Block List
         var expected = ReplaceGuids(GetBlockListJson(GetGridJson(innerJsonEscaped)), guidMap);
 
         var expectedJson = _jsonSerializer.Serialize(_jsonSerializer.Deserialize<BlockListValue>(expected));
         var resultJson = _jsonSerializer.Serialize(_jsonSerializer.Deserialize<BlockListValue>(result));
-        Assert.IsNotEmpty(resultJson);
-        Assert.AreEqual(expectedJson, resultJson);
+        Assert.That(resultJson, Is.Not.Empty);
+        Assert.That(resultJson, Is.EqualTo(expectedJson));
     }
 
     [Test]
@@ -166,13 +166,13 @@ public class BlockEditorComponentTests
         var result = component.ReplaceBlockEditorKeys(json, GuidFactory);
 
         // the expected result is that the subFeatures remains escaped
-        Assert.AreEqual(21, guidMap.Count); // 16 keys from Block Grid + 5 keys from Block List
+        Assert.That(guidMap, Has.Count.EqualTo(21)); // 16 keys from Block Grid + 5 keys from Block List
         var expected = ReplaceGuids(GetBlockGridJson(innerJsonEscaped), guidMap);
 
         var expectedJson = _jsonSerializer.Serialize(_jsonSerializer.Deserialize<BlockGridValue>(expected));
         var resultJson = _jsonSerializer.Serialize(_jsonSerializer.Deserialize<BlockGridValue>(result));
-        Assert.IsNotEmpty(resultJson);
-        Assert.AreEqual(expectedJson, resultJson);
+        Assert.That(resultJson, Is.Not.Empty);
+        Assert.That(resultJson, Is.EqualTo(expectedJson));
     }
 
     [Test]
@@ -193,13 +193,13 @@ public class BlockEditorComponentTests
         var result = component.ReplaceBlockEditorKeys(json, GuidFactory);
 
         // the expected result is that the subFeatures remains unescaped
-        Assert.AreEqual(21, guidMap.Count); // 16 keys from Block Grid + 5 keys from Block List
+        Assert.That(guidMap, Has.Count.EqualTo(21)); // 16 keys from Block Grid + 5 keys from Block List
         var expected = ReplaceGuids(GetBlockGridJson(innerJson), guidMap);
 
         var expectedJson = _jsonSerializer.Serialize(_jsonSerializer.Deserialize<BlockGridValue>(expected));
         var resultJson = _jsonSerializer.Serialize(_jsonSerializer.Deserialize<BlockGridValue>(result));
-        Assert.IsNotEmpty(resultJson);
-        Assert.AreEqual(expectedJson, resultJson);
+        Assert.That(resultJson, Is.Not.Empty);
+        Assert.That(resultJson, Is.EqualTo(expectedJson));
     }
 
     [Test]
@@ -226,16 +226,16 @@ public class BlockEditorComponentTests
         var result = component.ReplaceBlockEditorKeys(json, GuidFactory);
 
         // the expected result is that the subFeatures remains unaltered - the UDIs within should still exist
-        Assert.AreEqual(16, guidMap.Count); // 16 keys from Block Grid (with no sub features applicable for replacement)
+        Assert.That(guidMap, Has.Count.EqualTo(16)); // 16 keys from Block Grid (with no sub features applicable for replacement)
         var expected = ReplaceGuids(GetBlockGridJson(innerJson), guidMap);
 
         var expectedJson = _jsonSerializer.Serialize(_jsonSerializer.Deserialize<BlockGridValue>(expected));
         var resultJson = _jsonSerializer.Serialize(_jsonSerializer.Deserialize<BlockGridValue>(result));
-        Assert.IsNotEmpty(resultJson);
-        Assert.AreEqual(expectedJson, resultJson);
+        Assert.That(resultJson, Is.Not.Empty);
+        Assert.That(resultJson, Is.EqualTo(expectedJson));
 
-        Assert.True(result.Contains("umb://element/eb459ab17259495b90a3d2f6bb299826"));
-        Assert.True(result.Contains("umb://element/7f33e17a00b742cebd1eb7f2af4c56b5"));
+        Assert.That(result, Does.Contain("umb://element/eb459ab17259495b90a3d2f6bb299826"));
+        Assert.That(result, Does.Contain("umb://element/7f33e17a00b742cebd1eb7f2af4c56b5"));
     }
 
     [Test]
@@ -279,14 +279,14 @@ public class BlockEditorComponentTests
         var component = new BlockListPropertyNotificationHandler(Mock.Of<ILogger<BlockListPropertyNotificationHandler>>());
         var result = component.ReplaceBlockEditorKeys(json, GuidFactory);
 
-        Assert.AreEqual(2, guidMap.Count); // layout and settings key only
-        Assert.IsTrue(guidMap.ContainsKey(layoutKey));
-        Assert.IsTrue(guidMap.ContainsKey(settingsKey));
+        Assert.That(guidMap, Has.Count.EqualTo(2)); // layout and settings key only
+        Assert.That(guidMap.ContainsKey(layoutKey), Is.True);
+        Assert.That(guidMap.ContainsKey(settingsKey), Is.True);
         var expected = ReplaceGuids(json, guidMap);
         var expectedJson = _jsonSerializer.Serialize(_jsonSerializer.Deserialize<BlockListValue>(expected));
         var resultJson = _jsonSerializer.Serialize(_jsonSerializer.Deserialize<BlockListValue>(result));
-        Assert.IsNotEmpty(resultJson);
-        Assert.AreEqual(expectedJson, resultJson);
+        Assert.That(resultJson, Is.Not.Empty);
+        Assert.That(resultJson, Is.EqualTo(expectedJson));
     }
 
     [Test]
@@ -361,13 +361,13 @@ public class BlockEditorComponentTests
         var component = new BlockListPropertyNotificationHandler(Mock.Of<ILogger<BlockListPropertyNotificationHandler>>());
         var result = component.ReplaceBlockEditorKeys(json, GuidFactory);
 
-        Assert.AreEqual(5, guidMap.Count); // layout and settings keys only
-        Assert.IsTrue(guidMap.Keys.ContainsAll([rootLayoutKey, rootSettingsKey, area1LayoutKey, area2LayoutKey, area2SettingsKey]));
+        Assert.That(guidMap, Has.Count.EqualTo(5)); // layout and settings keys only
+        Assert.That(guidMap.Keys.ContainsAll([rootLayoutKey, rootSettingsKey, area1LayoutKey, area2LayoutKey, area2SettingsKey]), Is.True);
         var expected = ReplaceGuids(json, guidMap);
         var expectedJson = _jsonSerializer.Serialize(_jsonSerializer.Deserialize<BlockListValue>(expected));
         var resultJson = _jsonSerializer.Serialize(_jsonSerializer.Deserialize<BlockListValue>(result));
-        Assert.IsNotEmpty(resultJson);
-        Assert.AreEqual(expectedJson, resultJson);
+        Assert.That(resultJson, Is.Not.Empty);
+        Assert.That(resultJson, Is.EqualTo(expectedJson));
     }
 
     private string GetBlockListJson(

@@ -42,7 +42,7 @@ public class TelemetryServiceTests
             Mock.Of<IMetricsConsentService>());
 
         var result = await sut.GetTelemetryReportDataAsync();
-        Assert.IsNull(result);
+        Assert.That(result, Is.Null);
     }
 
     [Test]
@@ -61,8 +61,8 @@ public class TelemetryServiceTests
 
         var result = await sut.GetTelemetryReportDataAsync();
 
-        Assert.IsNotNull(result);
-        Assert.AreEqual("9.1.1-rc", result.Version);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Version, Is.EqualTo("9.1.1-rc"));
     }
 
     [Test]
@@ -90,19 +90,19 @@ public class TelemetryServiceTests
 
         var result = await sut.GetTelemetryReportDataAsync();
 
-        Assert.IsNotNull(result);
+        Assert.That(result, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(2, result.Packages.Count());
+            Assert.That(result.Packages.Count(), Is.EqualTo(2));
             var versionPackage = result.Packages.FirstOrDefault(x => x.Name == versionPackageName);
-            Assert.AreEqual(versionPackageId, versionPackage.Id);
-            Assert.AreEqual(versionPackageName, versionPackage.Name);
-            Assert.AreEqual(packageVersion, versionPackage.Version);
+            Assert.That(versionPackage.Id, Is.EqualTo(versionPackageId));
+            Assert.That(versionPackage.Name, Is.EqualTo(versionPackageName));
+            Assert.That(versionPackage.Version, Is.EqualTo(packageVersion));
 
             var noVersionPackage = result.Packages.FirstOrDefault(x => x.Name == noVersionPackageName);
-            Assert.AreEqual(null, noVersionPackage.Id);
-            Assert.AreEqual(noVersionPackageName, noVersionPackage.Name);
-            Assert.AreEqual(null, noVersionPackage.Version);
+            Assert.That(noVersionPackage.Id, Is.EqualTo(null));
+            Assert.That(noVersionPackage.Name, Is.EqualTo(noVersionPackageName));
+            Assert.That(noVersionPackage.Version, Is.EqualTo(null));
         });
     }
 
@@ -127,11 +127,11 @@ public class TelemetryServiceTests
 
         var result = await sut.GetTelemetryReportDataAsync();
 
-        Assert.IsNotNull(result);
+        Assert.That(result, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(1, result.Packages.Count());
-            Assert.AreEqual("TrackingAllowed", result.Packages.First().Name);
+            Assert.That(result.Packages.Count(), Is.EqualTo(1));
+            Assert.That(result.Packages.First().Name, Is.EqualTo("TrackingAllowed"));
         });
     }
 

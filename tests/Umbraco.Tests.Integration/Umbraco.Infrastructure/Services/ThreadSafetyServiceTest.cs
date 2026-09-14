@@ -141,7 +141,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
                         // are being created and disposed concurrently and out of order.
                         var currentScope = ScopeAccessor.AmbientScope;
                         log.LogInformation("[{ThreadId}] Current Scope? {CurrentScope}", Thread.CurrentThread.ManagedThreadId, currentScope?.GetDebugInfo());
-                        Assert.IsNull(currentScope);
+                        Assert.That(currentScope, Is.Null);
 
                         string name1 = "test-" + Guid.NewGuid();
                         IContent content1 = contentService.Create(name1, -1, "umbTextpage");
@@ -189,7 +189,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             {
                 // now look up all items, there should be 40!
                 IEnumerable<IContent> items = contentService.GetRootContent();
-                Assert.AreEqual(2 * MaxThreadCount, items.Count());
+                Assert.That(items.Count(), Is.EqualTo(2 * MaxThreadCount));
             }
             else
             {
@@ -236,7 +236,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
                         // are being created and disposed concurrently and out of order.
                         var currentScope = ScopeAccessor.AmbientScope;
                         log.LogInformation("[{ThreadId}] Current Scope? {CurrentScope}", Thread.CurrentThread.ManagedThreadId, currentScope?.GetDebugInfo());
-                        Assert.IsNull(currentScope);
+                        Assert.That(currentScope, Is.Null);
 
                         string name1 = "test-" + Guid.NewGuid();
                         IMedia media1 = mediaService.CreateMedia(name1, -1, Constants.Conventions.MediaTypes.Folder);
@@ -278,7 +278,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             {
                 // now look up all items, there should be 40!
                 IEnumerable<IMedia> items = mediaService.GetRootMedia();
-                Assert.AreEqual(2 * MaxThreadCount, items.Count());
+                Assert.That(items.Count(), Is.EqualTo(2 * MaxThreadCount));
             }
             else
             {

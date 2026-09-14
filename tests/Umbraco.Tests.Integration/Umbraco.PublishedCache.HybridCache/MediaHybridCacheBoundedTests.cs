@@ -71,7 +71,7 @@ internal sealed class MediaHybridCacheBoundedTests : UmbracoIntegrationTestWithM
         {
             MediaCreateModel media = MediaEditingBuilder.CreateSimpleMedia(CustomMediaType.Key, $"Bounded Media {i}", null);
             var created = await MediaEditingService.CreateAsync(media, Constants.Security.SuperUserKey);
-            Assert.IsTrue(created.Success);
+            Assert.That(created.Success, Is.True);
             keys.Add(media.Key!.Value);
         }
 

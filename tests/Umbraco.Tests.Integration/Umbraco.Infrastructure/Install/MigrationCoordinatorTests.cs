@@ -17,7 +17,7 @@ using Umbraco.Cms.Tests.Integration.Testing;
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Install;
 
 [TestFixture]
-[Timeout(60000)]
+[CancelAfter(60000)]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
 internal sealed class MigrationCoordinatorTests : UmbracoIntegrationTest
 {
@@ -61,7 +61,7 @@ internal sealed class MigrationCoordinatorTests : UmbracoIntegrationTest
         var coordinator = CreateCoordinator("machine-a", CreateUpgradingRuntimeState().Object, claimTimeout: TimeSpan.FromHours(2));
         var result = await coordinator.TryBecomeLeaderAsync(CancellationToken.None);
 
-        Assert.IsTrue(result);
+        Assert.That(result, Is.True);
         var claim = KeyValueService.GetValue(Constants.Conventions.Migrations.UpgradeLockKey);
         Assert.That(claim, Does.StartWith("machine-a|"));
     }
@@ -125,11 +125,11 @@ internal sealed class MigrationCoordinatorTests : UmbracoIntegrationTest
         t1.Join();
         t2.Join();
 
-        Assert.IsNull(ex1, $"Coordinator 1 threw: {ex1}");
-        Assert.IsNull(ex2, $"Coordinator 2 threw: {ex2}");
-        Assert.IsNotNull(result1);
-        Assert.IsNotNull(result2);
-        Assert.AreNotEqual(result1, result2, "Exactly one coordinator should win leadership");
+        Assert.That(ex1, Is.Null, $"Coordinator 1 threw: {ex1}");
+        Assert.That(ex2, Is.Null, $"Coordinator 2 threw: {ex2}");
+        Assert.That(result1, Is.Not.Null);
+        Assert.That(result2, Is.Not.Null);
+        Assert.That(result2, Is.Not.EqualTo(result1), "Exactly one coordinator should win leadership");
 
         var winnerId = result1 == true ? "machine-a" : "machine-b";
         var claim = KeyValueService.GetValue(Constants.Conventions.Migrations.UpgradeLockKey);

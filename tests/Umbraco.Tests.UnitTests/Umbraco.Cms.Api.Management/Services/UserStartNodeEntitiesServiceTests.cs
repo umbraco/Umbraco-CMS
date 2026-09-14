@@ -14,7 +14,7 @@ public class UserStartNodeEntitiesServiceTests
 
         var allowed = UserStartNodeEntitiesService.GetAllowedIds(startNodePaths, parentId: 3);
 
-        CollectionAssert.AreEquivalent(new[] { 4, 9 }, allowed);
+        Assert.That(allowed, Is.EquivalentTo(new[] { 4, 9 }));
     }
 
     [Test]
@@ -24,7 +24,7 @@ public class UserStartNodeEntitiesServiceTests
 
         var allowed = UserStartNodeEntitiesService.GetAllowedIds(startNodePaths, parentId: 99);
 
-        Assert.IsEmpty(allowed);
+        Assert.That(allowed, Is.Empty);
     }
 
     // Regression test for https://github.com/umbraco/Umbraco-CMS/issues/22610: under cultures whose
@@ -48,7 +48,7 @@ public class UserStartNodeEntitiesServiceTests
 
             var allowed = UserStartNodeEntitiesService.GetAllowedIds(startNodePaths, parentId: 3);
 
-            CollectionAssert.AreEqual(new[] { 4 }, allowed);
+            Assert.That(allowed, Is.EqualTo(new[] { 4 }).AsCollection);
         }
         finally
         {

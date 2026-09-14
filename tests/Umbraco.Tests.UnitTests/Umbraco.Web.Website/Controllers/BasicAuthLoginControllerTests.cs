@@ -71,13 +71,13 @@ public class BasicAuthLoginControllerTests
         IActionResult result = await _controller.Login("/some-page");
 
         var viewResult = result as ViewResult;
-        Assert.IsNotNull(viewResult);
+        Assert.That(viewResult, Is.Not.Null);
         Assert.That(viewResult!.ViewName, Is.EqualTo("/umbraco/BasicAuthLogin/Login.cshtml"));
 
         var model = viewResult.Model as BasicAuthLoginModel;
-        Assert.IsNotNull(model);
+        Assert.That(model, Is.Not.Null);
         Assert.That(model!.ReturnPath, Is.EqualTo("/some-page"));
-        Assert.IsNull(model.ErrorMessage);
+        Assert.That(model.ErrorMessage, Is.Null);
     }
 
     /// <summary>
@@ -89,11 +89,11 @@ public class BasicAuthLoginControllerTests
         IActionResult result = await _controller.Login(null);
 
         var viewResult = result as ViewResult;
-        Assert.IsNotNull(viewResult);
+        Assert.That(viewResult, Is.Not.Null);
 
         var model = viewResult!.Model as BasicAuthLoginModel;
-        Assert.IsNotNull(model);
-        Assert.IsNull(model!.ReturnPath);
+        Assert.That(model, Is.Not.Null);
+        Assert.That(model!.ReturnPath, Is.Null);
     }
 
     /// <summary>
@@ -109,7 +109,7 @@ public class BasicAuthLoginControllerTests
         IActionResult result = await _controller.Login("admin", "pass", "/protected-page");
 
         var redirectResult = result as LocalRedirectResult;
-        Assert.IsNotNull(redirectResult);
+        Assert.That(redirectResult, Is.Not.Null);
         Assert.That(redirectResult!.Url, Is.EqualTo("/protected-page"));
     }
 
@@ -126,7 +126,7 @@ public class BasicAuthLoginControllerTests
         IActionResult result = await _controller.Login("admin", "pass", null);
 
         var redirectResult = result as RedirectResult;
-        Assert.IsNotNull(redirectResult);
+        Assert.That(redirectResult, Is.Not.Null);
         Assert.That(redirectResult!.Url, Is.EqualTo("/"));
     }
 
@@ -188,7 +188,7 @@ public class BasicAuthLoginControllerTests
         IActionResult result = await _controller.Login("admin", "pass", "/page");
 
         var redirectResult = result as RedirectToActionResult;
-        Assert.IsNotNull(redirectResult);
+        Assert.That(redirectResult, Is.Not.Null);
         Assert.That(redirectResult!.ActionName, Is.EqualTo("TwoFactor"));
         Assert.That(redirectResult.RouteValues!["returnPath"], Is.EqualTo("/page"));
     }
@@ -232,7 +232,7 @@ public class BasicAuthLoginControllerTests
         IActionResult result = await _controller.Login("admin", "pass", "https://evil.com");
 
         var redirectResult = result as RedirectResult;
-        Assert.IsNotNull(redirectResult);
+        Assert.That(redirectResult, Is.Not.Null);
         Assert.That(redirectResult!.Url, Is.EqualTo("/"));
     }
 
@@ -281,13 +281,13 @@ public class BasicAuthLoginControllerTests
         IActionResult result = await _controller.TwoFactor("/page");
 
         var viewResult = result as ViewResult;
-        Assert.IsNotNull(viewResult);
+        Assert.That(viewResult, Is.Not.Null);
         Assert.That(viewResult!.ViewName, Is.EqualTo("/umbraco/BasicAuthLogin/TwoFactor.cshtml"));
 
         var model = viewResult.Model as BasicAuthTwoFactorModel;
-        Assert.IsNotNull(model);
+        Assert.That(model, Is.Not.Null);
         Assert.That(model!.ReturnPath, Is.EqualTo("/page"));
-        Assert.IsNull(model.ErrorMessage);
+        Assert.That(model.ErrorMessage, Is.Null);
         Assert.That(model.ProviderNames, Is.EquivalentTo(new[] { "UmbracoUserAppAuthenticator" }));
     }
 
@@ -320,7 +320,7 @@ public class BasicAuthLoginControllerTests
             : await controller.TwoFactor("UmbracoUserAppAuthenticator", "000000", "/page");
 
         var viewResult = result as ViewResult;
-        Assert.IsNotNull(viewResult);
+        Assert.That(viewResult, Is.Not.Null);
         Assert.That(viewResult!.ViewName, Is.EqualTo(CustomTwoFactorViewPath));
     }
 
@@ -338,7 +338,7 @@ public class BasicAuthLoginControllerTests
         IActionResult result = await _controller.TwoFactor("/page");
 
         var redirectResult = result as RedirectToActionResult;
-        Assert.IsNotNull(redirectResult);
+        Assert.That(redirectResult, Is.Not.Null);
         Assert.That(redirectResult!.ActionName, Is.EqualTo("Login"));
         Assert.That(redirectResult.RouteValues!["returnPath"], Is.EqualTo("/page"));
     }
@@ -356,7 +356,7 @@ public class BasicAuthLoginControllerTests
         IActionResult result = await _controller.TwoFactor("UmbracoUserAppAuthenticator", "123456", "/page");
 
         var redirectResult = result as LocalRedirectResult;
-        Assert.IsNotNull(redirectResult);
+        Assert.That(redirectResult, Is.Not.Null);
         Assert.That(redirectResult!.Url, Is.EqualTo("/page"));
     }
 
@@ -381,11 +381,11 @@ public class BasicAuthLoginControllerTests
         IActionResult result = await _controller.TwoFactor("UmbracoUserAppAuthenticator", "000000", "/page");
 
         var viewResult = result as ViewResult;
-        Assert.IsNotNull(viewResult);
+        Assert.That(viewResult, Is.Not.Null);
         Assert.That(viewResult!.ViewName, Is.EqualTo("/umbraco/BasicAuthLogin/TwoFactor.cshtml"));
 
         var model = viewResult.Model as BasicAuthTwoFactorModel;
-        Assert.IsNotNull(model);
+        Assert.That(model, Is.Not.Null);
         Assert.That(model!.ErrorMessage, Is.EqualTo("Invalid verification code. Please try again."));
     }
 
@@ -421,10 +421,10 @@ public class BasicAuthLoginControllerTests
         IActionResult result = await _controller.TwoFactor("UmbracoUserAppAuthenticator", string.Empty, "/page");
 
         var viewResult = result as ViewResult;
-        Assert.IsNotNull(viewResult);
+        Assert.That(viewResult, Is.Not.Null);
 
         var model = viewResult!.Model as BasicAuthTwoFactorModel;
-        Assert.IsNotNull(model);
+        Assert.That(model, Is.Not.Null);
         Assert.That(model!.ErrorMessage, Is.EqualTo("Please enter a verification code."));
     }
 
@@ -442,7 +442,7 @@ public class BasicAuthLoginControllerTests
         IActionResult result = await _controller.TwoFactor("UmbracoUserAppAuthenticator", "123456", "https://evil.com");
 
         var redirectResult = result as RedirectResult;
-        Assert.IsNotNull(redirectResult);
+        Assert.That(redirectResult, Is.Not.Null);
         Assert.That(redirectResult.Url, Is.EqualTo("/"));
     }
 
@@ -456,7 +456,7 @@ public class BasicAuthLoginControllerTests
 
         IActionResult result = await _controller.Login("/page");
 
-        Assert.IsInstanceOf<NotFoundResult>(result);
+        Assert.That(result, Is.InstanceOf<NotFoundResult>());
     }
 
     /// <summary>
@@ -470,7 +470,7 @@ public class BasicAuthLoginControllerTests
 
         IActionResult result = await _controller.Login("admin", "pass", "/page");
 
-        Assert.IsInstanceOf<NotFoundResult>(result);
+        Assert.That(result, Is.InstanceOf<NotFoundResult>());
         _signInManagerMock.Verify(
             x => x.PasswordSignInAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>()),
             Times.Never);
@@ -486,7 +486,7 @@ public class BasicAuthLoginControllerTests
 
         IActionResult result = await _controller.TwoFactor("/page");
 
-        Assert.IsInstanceOf<NotFoundResult>(result);
+        Assert.That(result, Is.InstanceOf<NotFoundResult>());
     }
 
     /// <summary>
@@ -499,17 +499,17 @@ public class BasicAuthLoginControllerTests
 
         IActionResult result = await _controller.TwoFactor("UmbracoUserAppAuthenticator", "123456", "/page");
 
-        Assert.IsInstanceOf<NotFoundResult>(result);
+        Assert.That(result, Is.InstanceOf<NotFoundResult>());
     }
 
     private static void AssertLoginViewWithError(IActionResult result, string expectedError)
     {
         var viewResult = result as ViewResult;
-        Assert.IsNotNull(viewResult);
+        Assert.That(viewResult, Is.Not.Null);
         Assert.That(viewResult.ViewName, Is.EqualTo("/umbraco/BasicAuthLogin/Login.cshtml"));
 
         var model = viewResult.Model as BasicAuthLoginModel;
-        Assert.IsNotNull(model);
+        Assert.That(model, Is.Not.Null);
         Assert.That(model.ErrorMessage, Is.EqualTo(expectedError));
     }
 

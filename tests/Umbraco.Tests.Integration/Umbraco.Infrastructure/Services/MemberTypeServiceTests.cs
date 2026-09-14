@@ -34,7 +34,7 @@ internal sealed class MemberTypeServiceTests : UmbracoIntegrationTest
         memberType = MemberTypeService.Get(memberType.Id);
         foreach (var p in memberType.PropertyTypes)
         {
-            Assert.IsFalse(memberType.MemberCanEditProperty(p.Alias));
+            Assert.That(memberType.MemberCanEditProperty(p.Alias), Is.False);
         }
     }
 
@@ -51,10 +51,10 @@ internal sealed class MemberTypeServiceTests : UmbracoIntegrationTest
         memberType = MemberTypeService.Get(memberType.Id);
         foreach (var p in memberType.PropertyTypes.Where(x => x.Alias != prop))
         {
-            Assert.IsFalse(memberType.MemberCanEditProperty(p.Alias));
+            Assert.That(memberType.MemberCanEditProperty(p.Alias), Is.False);
         }
 
-        Assert.IsTrue(memberType.MemberCanEditProperty(prop));
+        Assert.That(memberType.MemberCanEditProperty(prop), Is.True);
     }
 
     [Test]
@@ -67,7 +67,7 @@ internal sealed class MemberTypeServiceTests : UmbracoIntegrationTest
         memberType = MemberTypeService.Get(memberType.Id);
         foreach (var p in memberType.PropertyTypes)
         {
-            Assert.IsFalse(memberType.MemberCanViewProperty(p.Alias));
+            Assert.That(memberType.MemberCanViewProperty(p.Alias), Is.False);
         }
     }
 
@@ -84,10 +84,10 @@ internal sealed class MemberTypeServiceTests : UmbracoIntegrationTest
         memberType = MemberTypeService.Get(memberType.Id);
         foreach (var p in memberType.PropertyTypes.Where(x => x.Alias != prop))
         {
-            Assert.IsFalse(memberType.MemberCanViewProperty(p.Alias));
+            Assert.That(memberType.MemberCanViewProperty(p.Alias), Is.False);
         }
 
-        Assert.IsTrue(memberType.MemberCanViewProperty(prop));
+        Assert.That(memberType.MemberCanViewProperty(prop), Is.True);
     }
 
     [Test]
@@ -108,7 +108,7 @@ internal sealed class MemberTypeServiceTests : UmbracoIntegrationTest
         // re-load it from the db
         member = MemberService.GetById(member.Id);
 
-        Assert.AreEqual(initProps - 1, member.Properties.Count);
+        Assert.That(member.Properties, Has.Count.EqualTo(initProps - 1));
     }
 
     [Test]
@@ -121,8 +121,8 @@ internal sealed class MemberTypeServiceTests : UmbracoIntegrationTest
         var result = await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
 
         // Assert
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentTypeOperationStatus.NameCannotBeEmpty, result.Result);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Result, Is.EqualTo(ContentTypeOperationStatus.NameCannotBeEmpty));
     }
 
     [Test]
@@ -136,8 +136,8 @@ internal sealed class MemberTypeServiceTests : UmbracoIntegrationTest
         memberType2.Description = string.Empty;
         await MemberTypeService.CreateAsync(memberType2, Constants.Security.SuperUserKey);
 
-        Assert.IsNull(memberType.Description);
-        Assert.IsNull(memberType2.Description);
+        Assert.That(memberType.Description, Is.Null);
+        Assert.That(memberType2.Description, Is.Null);
     }
 
     [Test]
@@ -158,9 +158,9 @@ internal sealed class MemberTypeServiceTests : UmbracoIntegrationTest
         // Assert - members are a flat list, so all member types should be returned.
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(baseline.Total + 2, result.Total);
-            Assert.IsTrue(result.Items.Any(x => x.Key == memberType1.Key));
-            Assert.IsTrue(result.Items.Any(x => x.Key == memberType2.Key));
+            Assert.That(result.Total, Is.EqualTo(baseline.Total + 2));
+            Assert.That(result.Items.Any(x => x.Key == memberType1.Key), Is.True);
+            Assert.That(result.Items.Any(x => x.Key == memberType2.Key), Is.True);
         });
     }
 }

@@ -39,14 +39,14 @@ public class BackOfficeSecurityRequirementsTransformerTests
         await _transformer.TransformAsync(document, null!, CancellationToken.None);
 
         // Assert
-        Assert.IsNotNull(document.Components);
-        Assert.IsNotNull(document.Components.SecuritySchemes);
-        Assert.IsTrue(document.Components.SecuritySchemes.ContainsKey("Backoffice-User"));
+        Assert.That(document.Components, Is.Not.Null);
+        Assert.That(document.Components.SecuritySchemes, Is.Not.Null);
+        Assert.That(document.Components.SecuritySchemes.ContainsKey("Backoffice-User"), Is.True);
 
         var scheme = (OpenApiSecurityScheme)document.Components.SecuritySchemes["Backoffice-User"];
-        Assert.AreEqual(SecuritySchemeType.OAuth2, scheme.Type);
-        Assert.AreEqual("Umbraco", scheme.Name);
-        Assert.AreEqual(ParameterLocation.Header, scheme.In);
+        Assert.That(scheme.Type, Is.EqualTo(SecuritySchemeType.OAuth2));
+        Assert.That(scheme.Name, Is.EqualTo("Umbraco"));
+        Assert.That(scheme.In, Is.EqualTo(ParameterLocation.Header));
     }
 
     [Test]
@@ -60,10 +60,10 @@ public class BackOfficeSecurityRequirementsTransformerTests
 
         // Assert
         var scheme = (OpenApiSecurityScheme)document.Components!.SecuritySchemes!["Backoffice-User"];
-        Assert.IsNotNull(scheme.Flows);
-        Assert.IsNotNull(scheme.Flows.AuthorizationCode);
-        Assert.IsNotNull(scheme.Flows.AuthorizationCode.AuthorizationUrl);
-        Assert.IsNotNull(scheme.Flows.AuthorizationCode.TokenUrl);
+        Assert.That(scheme.Flows, Is.Not.Null);
+        Assert.That(scheme.Flows.AuthorizationCode, Is.Not.Null);
+        Assert.That(scheme.Flows.AuthorizationCode.AuthorizationUrl, Is.Not.Null);
+        Assert.That(scheme.Flows.AuthorizationCode.TokenUrl, Is.Not.Null);
     }
 
     [Test]
@@ -76,8 +76,8 @@ public class BackOfficeSecurityRequirementsTransformerTests
         await _transformer.TransformAsync(document, null!, CancellationToken.None);
 
         // Assert
-        Assert.IsNotNull(document.Security);
-        Assert.AreEqual(1, document.Security.Count);
+        Assert.That(document.Security, Is.Not.Null);
+        Assert.That(document.Security, Has.Count.EqualTo(1));
     }
 
     [Test]
@@ -99,9 +99,9 @@ public class BackOfficeSecurityRequirementsTransformerTests
         await _transformer.TransformAsync(document, null!, CancellationToken.None);
 
         // Assert
-        Assert.AreEqual(2, document.Components.SecuritySchemes.Count);
-        Assert.IsTrue(document.Components.SecuritySchemes.ContainsKey("ExistingScheme"));
-        Assert.IsTrue(document.Components.SecuritySchemes.ContainsKey("Backoffice-User"));
+        Assert.That(document.Components.SecuritySchemes, Has.Count.EqualTo(2));
+        Assert.That(document.Components.SecuritySchemes.ContainsKey("ExistingScheme"), Is.True);
+        Assert.That(document.Components.SecuritySchemes.ContainsKey("Backoffice-User"), Is.True);
     }
 
     #endregion
@@ -135,9 +135,9 @@ public class BackOfficeSecurityRequirementsTransformerTests
         await _transformer.TransformAsync(operation, context, CancellationToken.None);
 
         // Assert - Should not add 401 response, and security must be an empty list to override document-level security
-        Assert.IsFalse(operation.Responses?.ContainsKey(StatusCodes.Status401Unauthorized.ToString()) ?? false);
-        Assert.IsNotNull(operation.Security);
-        Assert.IsEmpty(operation.Security);
+        Assert.That(operation.Responses?.ContainsKey(StatusCodes.Status401Unauthorized.ToString()) ?? false, Is.False);
+        Assert.That(operation.Security, Is.Not.Null);
+        Assert.That(operation.Security, Is.Empty);
     }
 
     [Test]
@@ -167,9 +167,9 @@ public class BackOfficeSecurityRequirementsTransformerTests
         await _transformer.TransformAsync(operation, context, CancellationToken.None);
 
         // Assert - Should not add 401 response, and security must be an empty list to override document-level security
-        Assert.IsFalse(operation.Responses?.ContainsKey(StatusCodes.Status401Unauthorized.ToString()) ?? false);
-        Assert.IsNotNull(operation.Security);
-        Assert.IsEmpty(operation.Security);
+        Assert.That(operation.Responses?.ContainsKey(StatusCodes.Status401Unauthorized.ToString()) ?? false, Is.False);
+        Assert.That(operation.Security, Is.Not.Null);
+        Assert.That(operation.Security, Is.Empty);
     }
 
     [Test]
@@ -199,8 +199,8 @@ public class BackOfficeSecurityRequirementsTransformerTests
         await _transformer.TransformAsync(operation, context, CancellationToken.None);
 
         // Assert
-        Assert.IsNotNull(operation.Responses);
-        Assert.IsTrue(operation.Responses.ContainsKey(StatusCodes.Status401Unauthorized.ToString()));
+        Assert.That(operation.Responses, Is.Not.Null);
+        Assert.That(operation.Responses.ContainsKey(StatusCodes.Status401Unauthorized.ToString()), Is.True);
     }
 
     [Test]
@@ -230,8 +230,8 @@ public class BackOfficeSecurityRequirementsTransformerTests
         await _transformer.TransformAsync(operation, context, CancellationToken.None);
 
         // Assert
-        Assert.IsNotNull(operation.Security);
-        Assert.AreEqual(1, operation.Security.Count);
+        Assert.That(operation.Security, Is.Not.Null);
+        Assert.That(operation.Security, Has.Count.EqualTo(1));
     }
 
     [Test]
@@ -261,9 +261,9 @@ public class BackOfficeSecurityRequirementsTransformerTests
         await _transformer.TransformAsync(operation, context, CancellationToken.None);
 
         // Assert - Should have both 401 and 403
-        Assert.IsNotNull(operation.Responses);
-        Assert.IsTrue(operation.Responses.ContainsKey(StatusCodes.Status401Unauthorized.ToString()));
-        Assert.IsTrue(operation.Responses.ContainsKey(StatusCodes.Status403Forbidden.ToString()));
+        Assert.That(operation.Responses, Is.Not.Null);
+        Assert.That(operation.Responses.ContainsKey(StatusCodes.Status401Unauthorized.ToString()), Is.True);
+        Assert.That(operation.Responses.ContainsKey(StatusCodes.Status403Forbidden.ToString()), Is.True);
     }
 
     [Test]
@@ -293,9 +293,9 @@ public class BackOfficeSecurityRequirementsTransformerTests
         await _transformer.TransformAsync(operation, context, CancellationToken.None);
 
         // Assert - Should have both 401 and 403 because IAuthorizationService is injected
-        Assert.IsNotNull(operation.Responses);
-        Assert.IsTrue(operation.Responses.ContainsKey(StatusCodes.Status401Unauthorized.ToString()));
-        Assert.IsTrue(operation.Responses.ContainsKey(StatusCodes.Status403Forbidden.ToString()));
+        Assert.That(operation.Responses, Is.Not.Null);
+        Assert.That(operation.Responses.ContainsKey(StatusCodes.Status401Unauthorized.ToString()), Is.True);
+        Assert.That(operation.Responses.ContainsKey(StatusCodes.Status403Forbidden.ToString()), Is.True);
     }
 
     #endregion

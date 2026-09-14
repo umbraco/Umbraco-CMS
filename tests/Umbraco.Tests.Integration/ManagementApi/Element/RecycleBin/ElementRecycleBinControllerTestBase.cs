@@ -24,7 +24,7 @@ public abstract class ElementRecycleBinControllerTestBase<T> : ManagementApiUser
             $"Test Folder {Guid.NewGuid()}",
             null, // at root
             Constants.Security.SuperUserKey);
-        Assert.IsTrue(containerResult.Success);
+        Assert.That(containerResult.Success, Is.True);
         var container = containerResult.Result!;
 
         // Create a user group with Library section access but with a non-root element start node
@@ -44,6 +44,6 @@ public abstract class ElementRecycleBinControllerTestBase<T> : ManagementApiUser
         var response = await ClientRequest();
 
         // Should be forbidden because user doesn't have root element access
-        Assert.AreEqual(HttpStatusCode.Forbidden, response.StatusCode, await response.Content.ReadAsStringAsync());
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Forbidden), await response.Content.ReadAsStringAsync());
     }
 }

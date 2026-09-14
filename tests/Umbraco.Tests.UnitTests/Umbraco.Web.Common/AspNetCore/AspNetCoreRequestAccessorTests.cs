@@ -26,7 +26,7 @@ public class AspNetCoreRequestAccessorTests
         var accessor = CreateAccessor(context);
 
         Assert.DoesNotThrow(() => accessor.GetRequestValue("umbPageID"));
-        Assert.IsNull(accessor.GetRequestValue("umbPageID"));
+        Assert.That(accessor.GetRequestValue("umbPageID"), Is.Null);
     }
 
     [Test]
@@ -39,7 +39,7 @@ public class AspNetCoreRequestAccessorTests
 
         var accessor = CreateAccessor(context);
 
-        Assert.AreEqual("1046", accessor.GetRequestValue("umbPageID"));
+        Assert.That(accessor.GetRequestValue("umbPageID"), Is.EqualTo("1046"));
     }
 
     [Test]
@@ -51,7 +51,7 @@ public class AspNetCoreRequestAccessorTests
 
         var accessor = CreateAccessor(context);
 
-        Assert.AreEqual("1046", accessor.GetRequestValue("umbPageID"));
+        Assert.That(accessor.GetRequestValue("umbPageID"), Is.EqualTo("1046"));
     }
 
     private static AspNetCoreRequestAccessor CreateAccessor(HttpContext context)

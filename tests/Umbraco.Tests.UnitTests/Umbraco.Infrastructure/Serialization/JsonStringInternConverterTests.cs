@@ -17,13 +17,13 @@ public class JsonStringInternConverterTests
         };
 
         // Ensure the raw value is not interned
-        Assert.IsNull(string.IsInterned(obj.Name));
+        Assert.That(string.IsInterned(obj.Name), Is.Null);
 
         // Ensure the value is interned when deserializing using converter
         var json = JsonSerializer.Serialize(obj);
         obj = JsonSerializer.Deserialize<Test>(json);
 
-        Assert.IsNotNull(string.IsInterned(obj.Name));
+        Assert.That(string.IsInterned(obj.Name), Is.Not.Null);
 
         // Ensure the value is interned when deserializing using options
         json = JsonSerializer.Serialize(Guid.NewGuid().ToString());
@@ -35,7 +35,7 @@ public class JsonStringInternConverterTests
             },
         });
 
-        Assert.IsNotNull(string.IsInterned(str));
+        Assert.That(string.IsInterned(str), Is.Not.Null);
     }
 
     [Test]
@@ -55,7 +55,7 @@ public class JsonStringInternConverterTests
         {
             foreach (string key in obj.Values.Keys)
             {
-                Assert.IsNull(string.IsInterned(key));
+                Assert.That(string.IsInterned(key), Is.Null);
             }
         });
 
@@ -70,13 +70,13 @@ public class JsonStringInternConverterTests
         {
             foreach (string key in obj.Values.Keys)
             {
-                Assert.IsNotNull(string.IsInterned(key));
+                Assert.That(string.IsInterned(key), Is.Not.Null);
             }
         });
 
         // Check that the dictionary is case-insensitive
-        Assert.IsTrue(obj.Values.ContainsKey("Test"));
-        Assert.IsTrue(obj.Values.ContainsKey("test"));
+        Assert.That(obj.Values.ContainsKey("Test"), Is.True);
+        Assert.That(obj.Values.ContainsKey("test"), Is.True);
 
         // Ensure the value is interned when deserializing using options
         json = JsonSerializer.Serialize(new Dictionary<string, int>
@@ -97,13 +97,13 @@ public class JsonStringInternConverterTests
         {
             foreach (string key in dictionary.Keys)
             {
-                Assert.IsNotNull(string.IsInterned(key));
+                Assert.That(string.IsInterned(key), Is.Not.Null);
             }
         });
 
         // Check that the dictionary is case-insensitive
-        Assert.IsTrue(dictionary.ContainsKey("Test"));
-        Assert.IsTrue(dictionary.ContainsKey("test"));
+        Assert.That(dictionary.ContainsKey("Test"), Is.True);
+        Assert.That(dictionary.ContainsKey("test"), Is.True);
     }
 
     public class Test

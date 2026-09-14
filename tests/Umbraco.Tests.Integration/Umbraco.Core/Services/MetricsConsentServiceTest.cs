@@ -23,8 +23,8 @@ internal sealed class MetricsConsentServiceTest : UmbracoIntegrationTest
         await MetricsConsentService.SetConsentLevelAsync(level);
 
         var actual = MetricsConsentService.GetConsentLevel();
-        Assert.IsNotNull(actual);
-        Assert.AreEqual(level, actual);
+        Assert.That(actual, Is.Not.Null);
+        Assert.That(actual, Is.EqualTo(level));
     }
 
     [Test]
@@ -34,6 +34,6 @@ internal sealed class MetricsConsentServiceTest : UmbracoIntegrationTest
 
         var stringValue = KeyValueService.GetValue(Cms.Core.Services.MetricsConsentService.Key);
 
-        Assert.AreEqual("Detailed", stringValue);
+        Assert.That(stringValue, Is.EqualTo("Detailed"));
     }
 }

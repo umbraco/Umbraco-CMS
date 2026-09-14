@@ -30,6 +30,6 @@ public class LanguageXmlTests
         }
 
         // Ensure that at least one file was read.
-        Assert.AreNotEqual(0, readFilesCount);
+        Assert.That(readFilesCount, Is.Not.EqualTo(0));
     }
 }

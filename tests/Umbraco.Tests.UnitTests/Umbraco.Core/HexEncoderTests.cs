@@ -30,7 +30,7 @@ public class HexEncoderTests
         var expected = sb.ToString();
 
         var actual = HexEncoder.Encode(buffer);
-        Assert.AreEqual(expected, actual);
+        Assert.That(actual, Is.EqualTo(expected));
     }
 
     [Test]
@@ -43,7 +43,7 @@ public class HexEncoderTests
         var expected = ToHexString(buffer, '/', 2, 4);
         var actual = HexEncoder.Encode(buffer, '/', 2, 4);
 
-        Assert.AreEqual(expected, actual);
+        Assert.That(actual, Is.EqualTo(expected));
     }
 
     // Reference implementation taken from original extension method.

@@ -17,8 +17,8 @@ public partial class ContentPublishingServiceTests
             _allCultures.Select(culture => new CulturePublishScheduleModel { Culture = culture, Schedule = new ContentScheduleModel { PublishDate = DateTimeOffset.Now.AddDays(1) } }).ToArray(),
             Constants.Security.SuperUserKey);
 
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(ContentPublishingOperationStatus.Success, result.Status);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(ContentPublishingOperationStatus.Success));
         VerifyIsNotPublished(Textpage.Key);
     }
 
@@ -47,8 +47,8 @@ public partial class ContentPublishingServiceTests
             _allCultures.Select(culture => new CulturePublishScheduleModel { Culture = culture, Schedule = new ContentScheduleModel { PublishDate = DateTimeOffset.Now.AddDays(1) } }).ToArray(),
             Constants.Security.SuperUserKey);
 
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(ContentPublishingOperationStatus.Success, result.Status);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(ContentPublishingOperationStatus.Success));
         VerifyIsPublished(Textpage.Key);
         VerifyIsNotPublished(Subpage.Key);
     }

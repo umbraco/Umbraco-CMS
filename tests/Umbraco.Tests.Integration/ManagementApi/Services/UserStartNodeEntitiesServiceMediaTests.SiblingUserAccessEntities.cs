@@ -22,15 +22,15 @@ public partial class UserStartNodeEntitiesServiceMediaTests
                 out long totalAfter)
             .ToArray();
 
-        Assert.AreEqual(2, totalBefore);
-        Assert.AreEqual(3, totalAfter);
-        Assert.AreEqual(5, siblings.Length);
+        Assert.That(totalBefore, Is.EqualTo(2));
+        Assert.That(totalAfter, Is.EqualTo(3));
+        Assert.That(siblings, Has.Length.EqualTo(5));
         Assert.Multiple(() =>
         {
             for (int i = 0; i < 4; i++)
             {
-                Assert.AreEqual(ItemsByName[$"1-{i + 3}"].Key, siblings[i].Entity.Key);
-                Assert.IsTrue(siblings[i].HasAccess);
+                Assert.That(siblings[i].Entity.Key, Is.EqualTo(ItemsByName[$"1-{i + 3}"].Key));
+                Assert.That(siblings[i].HasAccess, Is.True);
             }
         });
     }
@@ -54,13 +54,13 @@ public partial class UserStartNodeEntitiesServiceMediaTests
                 out long totalAfter)
             .ToArray();
 
-        Assert.AreEqual(0, totalBefore);
-        Assert.AreEqual(0, totalAfter);
-        Assert.AreEqual(1, siblings.Length);
+        Assert.That(totalBefore, Is.EqualTo(0));
+        Assert.That(totalAfter, Is.EqualTo(0));
+        Assert.That(siblings, Has.Length.EqualTo(1));
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(ItemsByName[$"1-5"].Key, siblings[0].Entity.Key);
-            Assert.IsTrue(siblings[0].HasAccess);
+            Assert.That(siblings[0].Entity.Key, Is.EqualTo(ItemsByName[$"1-5"].Key));
+            Assert.That(siblings[0].HasAccess, Is.True);
         });
     }
 
@@ -81,13 +81,13 @@ public partial class UserStartNodeEntitiesServiceMediaTests
                 out long totalAfter)
             .ToArray();
 
-        Assert.AreEqual(0, totalBefore);
-        Assert.AreEqual(0, totalAfter);
-        Assert.AreEqual(1, siblings.Length);
+        Assert.That(totalBefore, Is.EqualTo(0));
+        Assert.That(totalAfter, Is.EqualTo(0));
+        Assert.That(siblings, Has.Length.EqualTo(1));
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(ItemsByName[$"1-5"].Key, siblings[0].Entity.Key);
-            Assert.IsTrue(siblings[0].HasAccess);
+            Assert.That(siblings[0].Entity.Key, Is.EqualTo(ItemsByName[$"1-5"].Key));
+            Assert.That(siblings[0].HasAccess, Is.True);
         });
     }
 
@@ -108,17 +108,17 @@ public partial class UserStartNodeEntitiesServiceMediaTests
                 out long totalAfter)
             .ToArray();
 
-        Assert.AreEqual(0, totalBefore);
-        Assert.AreEqual(1, totalAfter);
-        Assert.AreEqual(3, siblings.Length);
+        Assert.That(totalBefore, Is.EqualTo(0));
+        Assert.That(totalAfter, Is.EqualTo(1));
+        Assert.That(siblings, Has.Length.EqualTo(3));
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(ItemsByName[$"1-3"].Key, siblings[0].Entity.Key);
-            Assert.IsTrue(siblings[0].HasAccess);
-            Assert.AreEqual(ItemsByName[$"1-5"].Key, siblings[1].Entity.Key);
-            Assert.IsTrue(siblings[1].HasAccess);
-            Assert.AreEqual(ItemsByName[$"1-7"].Key, siblings[2].Entity.Key);
-            Assert.IsTrue(siblings[2].HasAccess);
+            Assert.That(siblings[0].Entity.Key, Is.EqualTo(ItemsByName[$"1-3"].Key));
+            Assert.That(siblings[0].HasAccess, Is.True);
+            Assert.That(siblings[1].Entity.Key, Is.EqualTo(ItemsByName[$"1-5"].Key));
+            Assert.That(siblings[1].HasAccess, Is.True);
+            Assert.That(siblings[2].Entity.Key, Is.EqualTo(ItemsByName[$"1-7"].Key));
+            Assert.That(siblings[2].HasAccess, Is.True);
         });
     }
 
@@ -139,13 +139,13 @@ public partial class UserStartNodeEntitiesServiceMediaTests
                 out long totalAfter)
             .ToArray();
 
-        Assert.AreEqual(0, totalBefore);
-        Assert.AreEqual(0, totalAfter);
-        Assert.AreEqual(1, siblings.Length);
+        Assert.That(totalBefore, Is.EqualTo(0));
+        Assert.That(totalAfter, Is.EqualTo(0));
+        Assert.That(siblings, Has.Length.EqualTo(1));
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(ItemsByName[$"1-5"].Key, siblings[0].Entity.Key);
-            Assert.IsFalse(siblings[0].HasAccess);
+            Assert.That(siblings[0].Entity.Key, Is.EqualTo(ItemsByName[$"1-5"].Key));
+            Assert.That(siblings[0].HasAccess, Is.False);
         });
     }
 }

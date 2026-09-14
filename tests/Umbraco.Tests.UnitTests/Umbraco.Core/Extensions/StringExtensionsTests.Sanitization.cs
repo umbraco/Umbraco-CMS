@@ -21,7 +21,7 @@ public partial class StringExtensionsTests
     public void DetectIsEmptyJson_ReturnsExpected(string input, bool expected)
     {
         var result = input.DetectIsEmptyJson();
-        Assert.AreEqual(expected, result);
+        Assert.That(result, Is.EqualTo(expected));
     }
 
     [TestCase("", "")] // empty short-circuits
@@ -36,7 +36,7 @@ public partial class StringExtensionsTests
     public void ToValidXmlString_RemovesInvalidCharacters(string input, string expected)
     {
         var result = input.ToValidXmlString();
-        Assert.AreEqual(expected, result);
+        Assert.That(result, Is.EqualTo(expected));
     }
 
     // Lone surrogates cannot survive round-tripping through [TestCase] attribute arguments
@@ -46,8 +46,8 @@ public partial class StringExtensionsTests
     {
         Assert.Multiple(() =>
         {
-            Assert.AreEqual("hi!", "hi\uD83D!".ToValidXmlString()); // lone high
-            Assert.AreEqual("hi!", "hi\uDE00!".ToValidXmlString()); // lone low
+            Assert.That("hi\uD83D!".ToValidXmlString(), Is.EqualTo("hi!")); // lone high
+            Assert.That("hi\uDE00!".ToValidXmlString(), Is.EqualTo("hi!")); // lone low
         });
     }
 }

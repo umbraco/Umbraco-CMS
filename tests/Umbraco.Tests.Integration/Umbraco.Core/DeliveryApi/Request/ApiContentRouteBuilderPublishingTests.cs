@@ -63,8 +63,8 @@ public class ApiContentRouteBuilderPublishingTests : ApiContentRouteBuilderTestB
         SetVariationContext("en-US");
         var publishedContent = GetPublishedContent(grandchild.Key);
         var route = ApiContentRouteBuilder.Build(publishedContent);
-        Assert.IsNotNull(route);
-        Assert.AreEqual("/child-en-us/grandchild-en-us/", route.Path);
+        Assert.That(route, Is.Not.Null);
+        Assert.That(route.Path, Is.EqualTo("/child-en-us/grandchild-en-us/"));
 
         SetVariationContext("da-DK");
         publishedContent = GetPublishedContent(grandchild.Key);
@@ -72,12 +72,12 @@ public class ApiContentRouteBuilderPublishingTests : ApiContentRouteBuilderTestB
 
         if (breakPublishedPath)
         {
-            Assert.IsNull(route);
+            Assert.That(route, Is.Null);
         }
         else
         {
-            Assert.IsNotNull(route);
-            Assert.AreEqual("/child-da-dk/grandchild-da-dk/", route.Path);
+            Assert.That(route, Is.Not.Null);
+            Assert.That(route.Path, Is.EqualTo("/child-da-dk/grandchild-da-dk/"));
         }
     }
 
@@ -131,14 +131,14 @@ public class ApiContentRouteBuilderPublishingTests : ApiContentRouteBuilderTestB
         if (breakPublishedPath)
         {
             var publishedContent = ClearAndEnsureUmbracoContext().Content.GetById(grandchild.Key);
-            Assert.IsNull(publishedContent);
+            Assert.That(publishedContent, Is.Null);
         }
         else
         {
             var publishedContent = GetPublishedContent(grandchild.Key);
             var route = ApiContentRouteBuilder.Build(publishedContent);
-            Assert.IsNotNull(route);
-            Assert.AreEqual("/child/grandchild/", route.Path);
+            Assert.That(route, Is.Not.Null);
+            Assert.That(route.Path, Is.EqualTo("/child/grandchild/"));
         }
     }
 }

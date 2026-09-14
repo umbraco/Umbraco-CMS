@@ -20,7 +20,7 @@ internal sealed class DefaultCultureAccessorTests
     {
         DefaultCultureAccessor sut = CreateSut(level);
 
-        Assert.AreEqual(SiteDefaultCulture, sut.DefaultCulture);
+        Assert.That(sut.DefaultCulture, Is.EqualTo(SiteDefaultCulture));
     }
 
     [TestCase(RuntimeLevel.Boot)]
@@ -31,7 +31,7 @@ internal sealed class DefaultCultureAccessorTests
     {
         DefaultCultureAccessor sut = CreateSut(level);
 
-        Assert.AreEqual(ConfiguredUiLanguage, sut.DefaultCulture);
+        Assert.That(sut.DefaultCulture, Is.EqualTo(ConfiguredUiLanguage));
     }
 
     [Test]
@@ -39,7 +39,7 @@ internal sealed class DefaultCultureAccessorTests
     {
         DefaultCultureAccessor sut = CreateSut(RuntimeLevel.Run, siteDefaultCulture: null);
 
-        Assert.AreEqual(string.Empty, sut.DefaultCulture);
+        Assert.That(sut.DefaultCulture, Is.Empty);
     }
 
     private static DefaultCultureAccessor CreateSut(RuntimeLevel level, string? siteDefaultCulture = SiteDefaultCulture)

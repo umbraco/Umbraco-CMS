@@ -38,13 +38,13 @@ public class PropertyGroupBuilderTests
             .Build();
 
         // Assert
-        Assert.AreEqual(testId, propertyGroup.Id);
-        Assert.AreEqual(testName, propertyGroup.Name);
-        Assert.AreEqual(testSortOrder, propertyGroup.SortOrder);
-        Assert.AreEqual(testCreateDate, propertyGroup.CreateDate);
-        Assert.AreEqual(testUpdateDate, propertyGroup.UpdateDate);
-        Assert.AreEqual(testKey, propertyGroup.Key);
-        Assert.AreEqual(1, propertyGroup.PropertyTypes.Count);
-        Assert.AreEqual(testPropertyTypeId, propertyGroup.PropertyTypes[0].Id);
+        Assert.That(propertyGroup.Id, Is.EqualTo(testId));
+        Assert.That(propertyGroup.Name, Is.EqualTo(testName));
+        Assert.That(propertyGroup.SortOrder, Is.EqualTo(testSortOrder));
+        Assert.That(propertyGroup.CreateDate, Is.EqualTo(testCreateDate));
+        Assert.That(propertyGroup.UpdateDate, Is.EqualTo(testUpdateDate));
+        Assert.That(propertyGroup.Key, Is.EqualTo(testKey));
+        Assert.That(propertyGroup.PropertyTypes, Has.Count.EqualTo(1));
+        Assert.That(propertyGroup.PropertyTypes[0].Id, Is.EqualTo(testPropertyTypeId));
     }
 }

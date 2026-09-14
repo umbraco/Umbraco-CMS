@@ -23,7 +23,7 @@ public partial class StringExtensionsTests
     public void DecodeFromHex_ReturnsExpectedResult(string hexInput, string expected)
     {
         var result = hexInput.DecodeFromHex();
-        Assert.AreEqual(expected, result);
+        Assert.That(result, Is.EqualTo(expected));
     }
 
     [Test]
@@ -39,7 +39,7 @@ public partial class StringExtensionsTests
         var original = "Hello World! 123";
         var hex = original.ConvertToHex();
         var decoded = hex.DecodeFromHex();
-        Assert.AreEqual(original, decoded);
+        Assert.That(decoded, Is.EqualTo(original));
     }
 
     [TestCase("", "")] // empty string
@@ -53,6 +53,6 @@ public partial class StringExtensionsTests
     public void ConvertToHex_ReturnsExpectedResult(string input, string expected)
     {
         var result = input.ConvertToHex();
-        Assert.AreEqual(expected, result);
+        Assert.That(result, Is.EqualTo(expected));
     }
 }

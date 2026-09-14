@@ -44,16 +44,16 @@ public class RelationTypeBuilderTests
             .Build();
 
         // Assert
-        Assert.AreEqual(id, relationType.Id);
-        Assert.AreEqual(alias, relationType.Alias);
-        Assert.AreEqual(name, relationType.Name);
-        Assert.AreEqual(key, relationType.Key);
-        Assert.AreEqual(createDate, relationType.CreateDate);
-        Assert.AreEqual(updateDate, relationType.UpdateDate);
-        Assert.AreEqual(deleteDate, relationType.DeleteDate);
-        Assert.AreEqual(parentObjectType, relationType.ParentObjectType);
-        Assert.AreEqual(childObjectType, relationType.ChildObjectType);
-        Assert.AreEqual(isBidirectional, relationType.IsBidirectional);
-        Assert.AreEqual(isDependency, relationType.IsDependency);
+        Assert.That(relationType.Id, Is.EqualTo(id));
+        Assert.That(relationType.Alias, Is.EqualTo(alias));
+        Assert.That(relationType.Name, Is.EqualTo(name));
+        Assert.That(relationType.Key, Is.EqualTo(key));
+        Assert.That(relationType.CreateDate, Is.EqualTo(createDate));
+        Assert.That(relationType.UpdateDate, Is.EqualTo(updateDate));
+        Assert.That(relationType.DeleteDate, Is.EqualTo(deleteDate));
+        Assert.That(relationType.ParentObjectType, Is.EqualTo(parentObjectType));
+        Assert.That(relationType.ChildObjectType, Is.EqualTo(childObjectType));
+        Assert.That(relationType.IsBidirectional, Is.EqualTo(isBidirectional));
+        Assert.That(relationType.IsDependency, Is.EqualTo(isDependency));
     }
 }

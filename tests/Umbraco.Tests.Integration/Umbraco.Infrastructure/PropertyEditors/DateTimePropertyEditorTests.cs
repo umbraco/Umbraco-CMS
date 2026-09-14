@@ -74,7 +74,7 @@ public class DateTimePropertyEditorTests : UmbracoIntegrationTest
             .Build();
 
         var dataTypeCreateResult = await DataTypeService.CreateAsync(dataType, Constants.Security.SuperUserKey);
-        Assert.IsTrue(dataTypeCreateResult.Success);
+        Assert.That(dataTypeCreateResult.Success, Is.True);
 
         var contentType = new ContentTypeBuilder()
             .WithAlias("contentType")
@@ -93,7 +93,7 @@ public class DateTimePropertyEditorTests : UmbracoIntegrationTest
             .Build();
 
         var contentTypeCreateResult = await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
-        Assert.IsTrue(contentTypeCreateResult.Success);
+        Assert.That(contentTypeCreateResult.Success, Is.True);
 
         var content = new ContentEditingBuilder()
             .WithContentTypeKey(contentType.Key)
@@ -111,11 +111,11 @@ public class DateTimePropertyEditorTests : UmbracoIntegrationTest
                 .Done()
             .Build();
         var createContentResult = await ContentEditingService.CreateAsync(content, Constants.Security.SuperUserKey);
-        Assert.IsTrue(createContentResult.Success);
-        Assert.IsNotNull(createContentResult.Result.Content);
+        Assert.That(createContentResult.Success, Is.True);
+        Assert.That(createContentResult.Result.Content, Is.Not.Null);
         var dateTimeProperty = createContentResult.Result.Content.Properties["dateTime"];
-        Assert.IsNotNull(dateTimeProperty, "After content creation, the property should exist");
-        Assert.IsNotNull(dateTimeProperty.GetValue(), "After content creation, the property value should not be null");
+        Assert.That(dateTimeProperty, Is.Not.Null, "After content creation, the property should exist");
+        Assert.That(dateTimeProperty.GetValue(), Is.Not.Null, "After content creation, the property value should not be null");
 
         var publishResult = await ContentPublishingService.PublishBranchAsync(
             createContentResult.Result.Content.Key,
@@ -124,13 +124,13 @@ public class DateTimePropertyEditorTests : UmbracoIntegrationTest
             Constants.Security.SuperUserKey,
             false);
 
-        Assert.IsTrue(publishResult.Success);
+        Assert.That(publishResult.Success, Is.True);
 
         var publishedContent = await PublishedContentCache.GetByIdAsync(createContentResult.Result.Content.Key, false);
-        Assert.IsNotNull(publishedContent);
+        Assert.That(publishedContent, Is.Not.Null);
 
         var value = publishedContent.GetProperty("dateTime")?.GetValue();
-        Assert.IsNotNull(value);
-        Assert.AreEqual(expectedValue, value);
+        Assert.That(value, Is.Not.Null);
+        Assert.That(value, Is.EqualTo(expectedValue));
     }
 }

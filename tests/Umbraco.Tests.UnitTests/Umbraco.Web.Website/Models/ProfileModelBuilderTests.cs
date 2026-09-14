@@ -58,7 +58,7 @@ public class ProfileModelBuilderTests
         var result = await sut.BuildForCurrentMemberAsync();
 
         // Assert
-        Assert.IsNull(result);
+        Assert.That(result, Is.Null);
     }
 
     [Test]
@@ -94,10 +94,10 @@ public class ProfileModelBuilderTests
         var result = await sut.BuildForCurrentMemberAsync();
 
         // Assert
-        Assert.IsNotNull(result);
-        Assert.AreEqual("Test Member", result!.Name);
-        Assert.AreEqual("test@example.com", result.Email);
-        Assert.AreEqual(memberKey, result.Key);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result!.Name, Is.EqualTo("Test Member"));
+        Assert.That(result.Email, Is.EqualTo("test@example.com"));
+        Assert.That(result.Key, Is.EqualTo(memberKey));
     }
 
     [Test]
@@ -125,11 +125,11 @@ public class ProfileModelBuilderTests
         var result = await sut.BuildForCurrentMemberAsync();
 
         // Assert
-        Assert.IsNotNull(result);
-        Assert.AreEqual("External Member", result!.Name);
-        Assert.AreEqual("external@example.com", result.Email);
-        Assert.AreEqual(memberKey, result.Key);
-        Assert.IsTrue(result.IsApproved);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result!.Name, Is.EqualTo("External Member"));
+        Assert.That(result.Email, Is.EqualTo("external@example.com"));
+        Assert.That(result.Key, Is.EqualTo(memberKey));
+        Assert.That(result.IsApproved, Is.True);
     }
 
     [Test]
@@ -182,7 +182,7 @@ public class ProfileModelBuilderTests
         var result = await sut.BuildForCurrentMemberAsync();
 
         // Assert — MemberProperties should be null/empty since no content properties exist.
-        Assert.IsNotNull(result);
-        Assert.IsTrue(result!.MemberProperties == null || result.MemberProperties.Count == 0);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result!.MemberProperties == null || result.MemberProperties.Count == 0, Is.True);
     }
 }

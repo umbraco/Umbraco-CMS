@@ -30,9 +30,9 @@ internal sealed partial class UserServiceCrudTests
         var result = await userService.ResetPasswordAsync(Constants.Security.SuperUserKey, userKey);
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(result.Success);
-            Assert.AreEqual(UserOperationStatus.Success, result.Status);
-            Assert.IsNotNull(result.Result.ResetPassword);
+            Assert.That(result.Success, Is.True);
+            Assert.That(result.Status, Is.EqualTo(UserOperationStatus.Success));
+            Assert.That(result.Result.ResetPassword, Is.Not.Null);
         });
     }
 
@@ -57,10 +57,10 @@ internal sealed partial class UserServiceCrudTests
         var result = await userService.ResetPasswordAsync(Constants.Security.SuperUserKey, userKey);
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(result.Success);
-            Assert.AreEqual(UserOperationStatus.InvalidUserType, result.Status);
-            Assert.IsNull(result.Result.ResetPassword);
-            Assert.IsNull(result.Exception);
+            Assert.That(result.Success, Is.False);
+            Assert.That(result.Status, Is.EqualTo(UserOperationStatus.InvalidUserType));
+            Assert.That(result.Result.ResetPassword, Is.Null);
+            Assert.That(result.Exception, Is.Null);
         });
     }
 }

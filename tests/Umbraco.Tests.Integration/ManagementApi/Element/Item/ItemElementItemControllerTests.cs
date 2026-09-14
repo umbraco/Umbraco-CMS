@@ -36,7 +36,7 @@ public class ItemElementItemControllerTests : ManagementApiUserGroupTestBase<Ite
             Variants = [new VariantModel { Name = Guid.NewGuid().ToString() }],
         };
         var response = await ElementEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(response.Success, $"Failed to create element: {response.Status}");
+        Assert.That(response.Success, Is.True, $"Failed to create element: {response.Status}");
         _elementKey = response.Result!.Content!.Key;
     }
 

@@ -24,7 +24,7 @@ public class NodeParseTests
         "root[properties[pickerOne[properties[numberOne]],pickerTwo[properties[numberTwo]]]]")]
     [TestCase("header,footerGrid", "root[header,footerGrid]", TestName = "Commas separate nodes at the root level too")]
     public void Can_Parse_Expand_And_Fields_Syntax(string value, string expected)
-        => Assert.AreEqual(expected, ParseProbe.ParseToString(value));
+        => Assert.That(ParseProbe.ParseToString(value), Is.EqualTo(expected));
 
     [TestCase("properties[header")]
     [TestCase("properties[contentPicker[properties[title]]")]

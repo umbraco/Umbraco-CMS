@@ -39,16 +39,16 @@ public class IdKeyMapTests
     public void Can_Resolve_Content_Recycle_Bin_Id_From_Key()
     {
         var result = GetIdKeyMap().GetIdForKey(Constants.System.RecycleBinContentKey, UmbracoObjectTypes.Document);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(Constants.System.RecycleBinContent, result.Result);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result, Is.EqualTo(Constants.System.RecycleBinContent));
     }
 
     [Test]
     public void Can_Resolve_Media_Recycle_Bin_Id_From_Key()
     {
         var result = GetIdKeyMap().GetIdForKey(Constants.System.RecycleBinMediaKey, UmbracoObjectTypes.Media);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(Constants.System.RecycleBinMedia, result.Result);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result, Is.EqualTo(Constants.System.RecycleBinMedia));
     }
 
     [TestCase(UmbracoObjectTypes.Element)]
@@ -56,24 +56,24 @@ public class IdKeyMapTests
     public void Can_Resolve_Element_Recycle_Bin_Id_From_Key(UmbracoObjectTypes objectType)
     {
         var result = GetIdKeyMap().GetIdForKey(Constants.System.RecycleBinElementKey, objectType);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(Constants.System.RecycleBinElement, result.Result);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result, Is.EqualTo(Constants.System.RecycleBinElement));
     }
 
     [Test]
     public void Can_Resolve_Content_Recycle_Bin_Key_From_Id()
     {
         var result = GetIdKeyMap().GetKeyForId(Constants.System.RecycleBinContent, UmbracoObjectTypes.Document);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(Constants.System.RecycleBinContentKey, result.Result);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result, Is.EqualTo(Constants.System.RecycleBinContentKey));
     }
 
     [Test]
     public void Can_Resolve_Media_Recycle_Bin_Key_From_Id()
     {
         var result = GetIdKeyMap().GetKeyForId(Constants.System.RecycleBinMedia, UmbracoObjectTypes.Media);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(Constants.System.RecycleBinMediaKey, result.Result);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result, Is.EqualTo(Constants.System.RecycleBinMediaKey));
     }
 
     [TestCase(UmbracoObjectTypes.Element)]
@@ -81,8 +81,8 @@ public class IdKeyMapTests
     public void Can_Resolve_Element_Recycle_Bin_Key_From_Id(UmbracoObjectTypes objectType)
     {
         var result = GetIdKeyMap().GetKeyForId(Constants.System.RecycleBinElement, objectType);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(Constants.System.RecycleBinElementKey, result.Result);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result, Is.EqualTo(Constants.System.RecycleBinElementKey));
     }
 
     [Test]
@@ -96,12 +96,12 @@ public class IdKeyMapTests
         Assert.Multiple(() =>
         {
             Attempt<int> idAttempt = idKeyMap.GetIdForKey(key, UmbracoObjectTypes.Document);
-            Assert.IsTrue(idAttempt.Success);
-            Assert.AreEqual(1234, idAttempt.Result);
+            Assert.That(idAttempt.Success, Is.True);
+            Assert.That(idAttempt.Result, Is.EqualTo(1234));
 
             Attempt<Guid> keyAttempt = idKeyMap.GetKeyForId(1234, UmbracoObjectTypes.Document);
-            Assert.IsTrue(keyAttempt.Success);
-            Assert.AreEqual(key, keyAttempt.Result);
+            Assert.That(keyAttempt.Success, Is.True);
+            Assert.That(keyAttempt.Result, Is.EqualTo(key));
         });
 
         repository.Verify(
@@ -123,12 +123,12 @@ public class IdKeyMapTests
         Assert.Multiple(() =>
         {
             Attempt<int> idAttempt = idKeyMap.GetIdForKey(key, UmbracoObjectTypes.Media);
-            Assert.IsTrue(idAttempt.Success);
-            Assert.AreEqual(4321, idAttempt.Result);
+            Assert.That(idAttempt.Success, Is.True);
+            Assert.That(idAttempt.Result, Is.EqualTo(4321));
 
             Attempt<Guid> keyAttempt = idKeyMap.GetKeyForId(4321, UmbracoObjectTypes.Media);
-            Assert.IsTrue(keyAttempt.Success);
-            Assert.AreEqual(key, keyAttempt.Result);
+            Assert.That(keyAttempt.Success, Is.True);
+            Assert.That(keyAttempt.Result, Is.EqualTo(key));
         });
 
         repository.Verify(
@@ -149,8 +149,8 @@ public class IdKeyMapTests
 
         // The entries are keyed by identifier alone, so the object type on the value has to be what rejects
         // the mismatch and sends the lookup on to the repository.
-        Assert.IsFalse(idKeyMap.GetIdForKey(key, UmbracoObjectTypes.Media).Success);
-        Assert.IsFalse(idKeyMap.GetKeyForId(1234, UmbracoObjectTypes.Media).Success);
+        Assert.That(idKeyMap.GetIdForKey(key, UmbracoObjectTypes.Media).Success, Is.False);
+        Assert.That(idKeyMap.GetKeyForId(1234, UmbracoObjectTypes.Media).Success, Is.False);
 
         repository.Verify(x => x.GetIdForKey(key, UmbracoObjectTypes.Media), Times.Once);
         repository.Verify(x => x.GetIdForKey(1234, UmbracoObjectTypes.Media), Times.Once);
@@ -164,8 +164,8 @@ public class IdKeyMapTests
         idKeyMap.PopulateCache(Constants.System.RecycleBinContent, Guid.NewGuid(), UmbracoObjectTypes.Document);
 
         Attempt<Guid> keyAttempt = idKeyMap.GetKeyForId(Constants.System.RecycleBinContent, UmbracoObjectTypes.Document);
-        Assert.IsTrue(keyAttempt.Success);
-        Assert.AreEqual(Constants.System.RecycleBinContentKey, keyAttempt.Result);
+        Assert.That(keyAttempt.Success, Is.True);
+        Assert.That(keyAttempt.Result, Is.EqualTo(Constants.System.RecycleBinContentKey));
     }
 
     [Test]
@@ -184,8 +184,8 @@ public class IdKeyMapTests
 
         foreach ((int id, Guid key) in pairs)
         {
-            Assert.AreEqual(id, idKeyMap.GetIdForKey(key, UmbracoObjectTypes.Document).Result);
-            Assert.AreEqual(key, idKeyMap.GetKeyForId(id, UmbracoObjectTypes.Document).Result);
+            Assert.That(idKeyMap.GetIdForKey(key, UmbracoObjectTypes.Document).Result, Is.EqualTo(id));
+            Assert.That(idKeyMap.GetKeyForId(id, UmbracoObjectTypes.Document).Result, Is.EqualTo(key));
         }
     }
 }

@@ -16,7 +16,7 @@ public class IntExtensionsTests
     public void ToGuid_Creates_Expected_Guid(int input, string expected)
     {
         var result = input.ToGuid();
-        Assert.AreEqual(expected, result.ToString());
+        Assert.That(result.ToString(), Is.EqualTo(expected));
     }
 
     [TestCase("00000014-0000-0000-0000-000000000000", 20)]
@@ -29,13 +29,13 @@ public class IntExtensionsTests
         var result = IntExtensions.TryParseFromGuid(Guid.Parse(input), out int? intValue);
         if (expected is null)
         {
-            Assert.IsFalse(result);
-            Assert.IsFalse(intValue.HasValue);
+            Assert.That(result, Is.False);
+            Assert.That(intValue.HasValue, Is.False);
         }
         else
         {
-            Assert.IsTrue(result);
-            Assert.AreEqual(expected, intValue.Value);
+            Assert.That(result, Is.True);
+            Assert.That(intValue.Value, Is.EqualTo(expected));
         }
     }
 }

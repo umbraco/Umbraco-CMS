@@ -34,10 +34,10 @@ internal sealed class ScriptServiceTests : UmbracoIntegrationTest
 
         var result = await ScriptService.CreateAsync(createModel, Constants.Security.SuperUserKey);
 
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(ScriptOperationStatus.Success, result.Status);
-        Assert.IsNotNull(result.Result);
-        Assert.AreEqual("TestScript.js", result.Result.Name);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(ScriptOperationStatus.Success));
+        Assert.That(result.Result, Is.Not.Null);
+        Assert.That(result.Result.Name, Is.EqualTo("TestScript.js"));
     }
 
     [Test]
@@ -49,7 +49,7 @@ internal sealed class ScriptServiceTests : UmbracoIntegrationTest
             Content = "console.log('original');"
         };
         var createResult = await ScriptService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(createResult.Success);
+        Assert.That(createResult.Success, Is.True);
 
         var updateModel = new ScriptUpdateModel
         {
@@ -58,9 +58,9 @@ internal sealed class ScriptServiceTests : UmbracoIntegrationTest
 
         var result = await ScriptService.UpdateAsync(createResult.Result!.Path, updateModel, Constants.Security.SuperUserKey);
 
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(ScriptOperationStatus.Success, result.Status);
-        Assert.IsNotNull(result.Result);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(ScriptOperationStatus.Success));
+        Assert.That(result.Result, Is.Not.Null);
         Assert.That(result.Result.Content, Does.Contain("updated"));
     }
 
@@ -73,14 +73,14 @@ internal sealed class ScriptServiceTests : UmbracoIntegrationTest
             Content = "console.log('test');"
         };
         var createResult = await ScriptService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(createResult.Success);
+        Assert.That(createResult.Success, Is.True);
 
         var result = await ScriptService.DeleteAsync(createResult.Result!.Path, Constants.Security.SuperUserKey);
 
-        Assert.AreEqual(ScriptOperationStatus.Success, result);
+        Assert.That(result, Is.EqualTo(ScriptOperationStatus.Success));
 
         var getResult = await ScriptService.GetAsync(createResult.Result.Path);
-        Assert.IsNull(getResult);
+        Assert.That(getResult, Is.Null);
     }
 
     [Test]
@@ -92,7 +92,7 @@ internal sealed class ScriptServiceTests : UmbracoIntegrationTest
             Content = "console.log('test');"
         };
         var createResult = await ScriptService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(createResult.Success);
+        Assert.That(createResult.Success, Is.True);
 
         var renameModel = new ScriptRenameModel
         {
@@ -101,10 +101,10 @@ internal sealed class ScriptServiceTests : UmbracoIntegrationTest
 
         var result = await ScriptService.RenameAsync(createResult.Result!.Path, renameModel, Constants.Security.SuperUserKey);
 
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(ScriptOperationStatus.Success, result.Status);
-        Assert.IsNotNull(result.Result);
-        Assert.AreEqual("RenamedScript.js", result.Result.Name);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(ScriptOperationStatus.Success));
+        Assert.That(result.Result, Is.Not.Null);
+        Assert.That(result.Result.Name, Is.EqualTo("RenamedScript.js"));
     }
 
     // Cleans up via the service so DeleteAsync is exercised between tests; any deletion regression

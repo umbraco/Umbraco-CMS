@@ -50,7 +50,7 @@ public class RootElementTreeControllerTests : ManagementApiUserGroupTestBase<Roo
             $"Folder 1 {Guid.NewGuid()}",
             null,
             Constants.Security.SuperUserKey);
-        Assert.IsTrue(folder1Result.Success);
+        Assert.That(folder1Result.Success, Is.True);
         var folder1 = folder1Result.Result!;
 
         var folder2Result = await ElementContainerService.CreateAsync(
@@ -58,7 +58,7 @@ public class RootElementTreeControllerTests : ManagementApiUserGroupTestBase<Roo
             $"Folder 2 {Guid.NewGuid()}",
             null,
             Constants.Security.SuperUserKey);
-        Assert.IsTrue(folder2Result.Success);
+        Assert.That(folder2Result.Success, Is.True);
 
         // Create a user group with start node = folder1 only
         var userGroup = new UserGroupBuilder()
@@ -78,12 +78,12 @@ public class RootElementTreeControllerTests : ManagementApiUserGroupTestBase<Roo
         var response = await ClientRequest();
 
         // Should succeed
-        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, await response.Content.ReadAsStringAsync());
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK), await response.Content.ReadAsStringAsync());
 
         // Parse response and verify only folder1 is returned
         var result = await response.Content.ReadFromJsonAsync<PagedViewModel<ElementTreeItemResponseModel>>(JsonSerializerOptions);
-        Assert.IsNotNull(result);
-        Assert.AreEqual(1, result.Total);
-        Assert.AreEqual(folder1.Key, result.Items.First().Id);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Total, Is.EqualTo(1));
+        Assert.That(result.Items.First().Id, Is.EqualTo(folder1.Key));
     }
 }

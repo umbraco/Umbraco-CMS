@@ -96,10 +96,10 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         {
             var saved = notification.SavedEntities.First();
 
-            Assert.AreSame(document, saved);
+            Assert.That(saved, Is.SameAs(document));
 
-            Assert.IsTrue(notification.IsSavingCulture(saved, "en-US"));
-            Assert.IsFalse(notification.IsSavingCulture(saved, "fr-FR"));
+            Assert.That(notification.IsSavingCulture(saved, "en-US"), Is.True);
+            Assert.That(notification.IsSavingCulture(saved, "fr-FR"), Is.False);
 
             savingWasCalled = true;
         };
@@ -108,10 +108,10 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         {
             var saved = notification.SavedEntities.First();
 
-            Assert.AreSame(document, saved);
+            Assert.That(saved, Is.SameAs(document));
 
-            Assert.IsTrue(notification.HasSavedCulture(saved, "en-US"));
-            Assert.IsFalse(notification.HasSavedCulture(saved, "fr-FR"));
+            Assert.That(notification.HasSavedCulture(saved, "en-US"), Is.True);
+            Assert.That(notification.HasSavedCulture(saved, "fr-FR"), Is.False);
 
             savedWasCalled = true;
         };
@@ -119,8 +119,8 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         try
         {
             ContentService.Save(document);
-            Assert.IsTrue(savingWasCalled);
-            Assert.IsTrue(savedWasCalled);
+            Assert.That(savingWasCalled, Is.True);
+            Assert.That(savedWasCalled, Is.True);
         }
         finally
         {
@@ -141,7 +141,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         {
             var saved = notification.SavedEntities.First();
 
-            Assert.IsTrue(document.GetValue<string>("title").IsNullOrWhiteSpace());
+            Assert.That(document.GetValue<string>("title").IsNullOrWhiteSpace(), Is.True);
 
             saved.SetValue("title", "title");
 
@@ -152,13 +152,13 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         {
             var saved = notification.SavedEntities.First();
 
-            Assert.AreSame("title", document.GetValue<string>("title"));
+            Assert.That(document.GetValue<string>("title"), Is.SameAs("title"));
 
             // we're only dealing with invariant here
             var propValue = saved.Properties["title"].Values.First(x => x.Culture == null && x.Segment == null);
 
-            Assert.AreEqual("title", propValue.EditedValue);
-            Assert.IsNull(propValue.PublishedValue);
+            Assert.That(propValue.EditedValue, Is.EqualTo("title"));
+            Assert.That(propValue.PublishedValue, Is.Null);
 
             savedWasCalled = true;
         };
@@ -166,8 +166,8 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         try
         {
             ContentService.Save(document);
-            Assert.IsTrue(savingWasCalled);
-            Assert.IsTrue(savedWasCalled);
+            Assert.That(savingWasCalled, Is.True);
+            Assert.That(savedWasCalled, Is.True);
         }
         finally
         {
@@ -188,10 +188,10 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         {
             var change = notification.Changes.FirstOrDefault();
             var publishedCultures = change?.PublishedCultures?.ToArray();
-            Assert.IsNotNull(publishedCultures);
-            Assert.AreEqual(1, publishedCultures.Length);
-            Assert.IsTrue(publishedCultures.InvariantContains("*"));
-            Assert.IsNull(change.UnpublishedCultures);
+            Assert.That(publishedCultures, Is.Not.Null);
+            Assert.That(publishedCultures, Has.Length.EqualTo(1));
+            Assert.That(publishedCultures.InvariantContains("*"), Is.True);
+            Assert.That(change.UnpublishedCultures, Is.Null);
 
             treeChangeWasCalled = true;
         };
@@ -199,7 +199,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         try
         {
             ContentService.Publish(document, ["*"]);
-            Assert.IsTrue(treeChangeWasCalled);
+            Assert.That(treeChangeWasCalled, Is.True);
         }
         finally
         {
@@ -219,11 +219,11 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         ContentNotificationHandler.TreeChange += notification =>
         {
             var change = notification.Changes.FirstOrDefault();
-            Assert.IsNull(change?.PublishedCultures);
+            Assert.That(change?.PublishedCultures, Is.Null);
             var unpublishedCultures = change?.UnpublishedCultures?.ToArray();
-            Assert.IsNotNull(unpublishedCultures);
-            Assert.AreEqual(1, unpublishedCultures.Length);
-            Assert.IsTrue(unpublishedCultures.InvariantContains("*"));
+            Assert.That(unpublishedCultures, Is.Not.Null);
+            Assert.That(unpublishedCultures, Has.Length.EqualTo(1));
+            Assert.That(unpublishedCultures.InvariantContains("*"), Is.True);
 
             treeChangeWasCalled = true;
         };
@@ -231,7 +231,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         try
         {
             ContentService.Unpublish(document);
-            Assert.IsTrue(treeChangeWasCalled);
+            Assert.That(treeChangeWasCalled, Is.True);
         }
         finally
         {
@@ -257,8 +257,8 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         document.SetCultureName("bonjour", "fr-FR");
         ContentService.Save(document);
 
-        Assert.IsFalse(document.IsCulturePublished("fr-FR"));
-        Assert.IsFalse(document.IsCulturePublished("en-US"));
+        Assert.That(document.IsCulturePublished("fr-FR"), Is.False);
+        Assert.That(document.IsCulturePublished("en-US"), Is.False);
 
         // re-get - dirty properties need resetting
         document = ContentService.GetById(document.Id);
@@ -271,10 +271,10 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         {
             var publishing = notification.PublishedEntities.First();
 
-            Assert.AreSame(document, publishing);
+            Assert.That(publishing, Is.SameAs(document));
 
-            Assert.IsFalse(notification.IsPublishingCulture(publishing, "en-US"));
-            Assert.IsTrue(notification.IsPublishingCulture(publishing, "fr-FR"));
+            Assert.That(notification.IsPublishingCulture(publishing, "en-US"), Is.False);
+            Assert.That(notification.IsPublishingCulture(publishing, "fr-FR"), Is.True);
 
             publishingWasCalled = true;
         };
@@ -283,10 +283,10 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         {
             var published = notification.PublishedEntities.First();
 
-            Assert.AreSame(document, published);
+            Assert.That(published, Is.SameAs(document));
 
-            Assert.IsFalse(notification.HasPublishedCulture(published, "en-US"));
-            Assert.IsTrue(notification.HasPublishedCulture(published, "fr-FR"));
+            Assert.That(notification.HasPublishedCulture(published, "en-US"), Is.False);
+            Assert.That(notification.HasPublishedCulture(published, "fr-FR"), Is.True);
 
             publishedWasCalled = true;
         };
@@ -295,10 +295,10 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         {
             var change = notification.Changes.FirstOrDefault();
             var publishedCultures = change?.PublishedCultures?.ToArray();
-            Assert.IsNotNull(publishedCultures);
-            Assert.AreEqual(1, publishedCultures.Length);
-            Assert.IsTrue(publishedCultures.InvariantContains("fr-FR"));
-            Assert.IsNull(change.UnpublishedCultures);
+            Assert.That(publishedCultures, Is.Not.Null);
+            Assert.That(publishedCultures, Has.Length.EqualTo(1));
+            Assert.That(publishedCultures.InvariantContains("fr-FR"), Is.True);
+            Assert.That(change.UnpublishedCultures, Is.Null);
 
             treeChangeWasCalled = true;
         };
@@ -306,9 +306,9 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         try
         {
             ContentService.Publish(document, new[] { "fr-FR" });
-            Assert.IsTrue(publishingWasCalled);
-            Assert.IsTrue(publishedWasCalled);
-            Assert.IsTrue(treeChangeWasCalled);
+            Assert.That(publishingWasCalled, Is.True);
+            Assert.That(publishedWasCalled, Is.True);
+            Assert.That(treeChangeWasCalled, Is.True);
         }
         finally
         {
@@ -320,8 +320,8 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         document = ContentService.GetById(document.Id);
 
         // ensure it works and does not throw
-        Assert.IsTrue(document.IsCulturePublished("fr-FR"));
-        Assert.IsFalse(document.IsCulturePublished("en-US"));
+        Assert.That(document.IsCulturePublished("fr-FR"), Is.True);
+        Assert.That(document.IsCulturePublished("en-US"), Is.False);
     }
 
     [Test]
@@ -338,7 +338,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         {
             var saved = notification.SavedEntities.First();
 
-            Assert.IsTrue(document.GetValue<string>("title").IsNullOrWhiteSpace());
+            Assert.That(document.GetValue<string>("title").IsNullOrWhiteSpace(), Is.True);
 
             saved.SetValue("title", "title");
 
@@ -349,13 +349,13 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         {
             var saved = notification.SavedEntities.First();
 
-            Assert.AreSame("title", document.GetValue<string>("title"));
+            Assert.That(document.GetValue<string>("title"), Is.SameAs("title"));
 
             // We're only dealing with invariant here.
             var propValue = saved.Properties["title"].Values.First(x => x.Culture == null && x.Segment == null);
 
-            Assert.AreEqual("title", propValue.EditedValue);
-            Assert.AreEqual(null, propValue.PublishedValue);
+            Assert.That(propValue.EditedValue, Is.EqualTo("title"));
+            Assert.That(propValue.PublishedValue, Is.EqualTo(null));
 
             savedWasCalled = true;
         };
@@ -364,7 +364,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         {
             var publishing = notification.PublishedEntities.First();
 
-            Assert.AreEqual("title", publishing.GetValue<string>("title"));
+            Assert.That(publishing.GetValue<string>("title"), Is.EqualTo("title"));
 
             publishingWasCalled = true;
         };
@@ -373,13 +373,13 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         {
             var published = notification.PublishedEntities.First();
 
-            Assert.AreSame("title", document.GetValue<string>("title"));
+            Assert.That(document.GetValue<string>("title"), Is.SameAs("title"));
 
             // We're only dealing with invariant here.
             var propValue = published.Properties["title"].Values.First(x => x.Culture == null && x.Segment == null);
 
-            Assert.AreEqual("title", propValue.EditedValue);
-            Assert.AreEqual("title", propValue.PublishedValue);
+            Assert.That(propValue.EditedValue, Is.EqualTo("title"));
+            Assert.That(propValue.PublishedValue, Is.EqualTo("title"));
 
             publishedWasCalled = true;
         };
@@ -388,10 +388,10 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         {
             ContentService.Save(document);
             ContentService.Publish(document, document.AvailableCultures.ToArray());
-            Assert.IsTrue(savingWasCalled);
-            Assert.IsTrue(savedWasCalled);
-            Assert.IsTrue(publishingWasCalled);
-            Assert.IsTrue(publishedWasCalled);
+            Assert.That(savingWasCalled, Is.True);
+            Assert.That(savedWasCalled, Is.True);
+            Assert.That(publishingWasCalled, Is.True);
+            Assert.That(publishedWasCalled, Is.True);
         }
         finally
         {
@@ -419,9 +419,9 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         {
             IContent saved = notification.SavedEntities.First();
 
-            Assert.IsNotNull(notification.SavedCultures);
-            Assert.IsTrue(notification.SavedCultures.ContainsKey(saved.Key));
-            CollectionAssert.AreEquivalent(new[] { "*" }, notification.SavedCultures[saved.Key]);
+            Assert.That(notification.SavedCultures, Is.Not.Null);
+            Assert.That(notification.SavedCultures.ContainsKey(saved.Key), Is.True);
+            Assert.That(notification.SavedCultures[saved.Key], Is.EquivalentTo(new[] { "*" }));
 
             savedWasCalled = true;
         };
@@ -431,11 +431,11 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         try
         {
             var result = ContentService.SaveAndPublish(document, []);
-            Assert.IsTrue(result.Success);
-            Assert.IsTrue(savingWasCalled);
-            Assert.IsTrue(savedWasCalled, "ContentSavedNotification should fire when saving and publishing.");
-            Assert.IsTrue(publishingWasCalled);
-            Assert.IsTrue(publishedWasCalled);
+            Assert.That(result.Success, Is.True);
+            Assert.That(savingWasCalled, Is.True);
+            Assert.That(savedWasCalled, Is.True, "ContentSavedNotification should fire when saving and publishing.");
+            Assert.That(publishingWasCalled, Is.True);
+            Assert.That(publishedWasCalled, Is.True);
         }
         finally
         {
@@ -469,11 +469,11 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         {
             IContent saved = notification.SavedEntities.First();
 
-            Assert.IsNotNull(notification.SavedCultures);
-            Assert.IsTrue(notification.SavedCultures.ContainsKey(saved.Key));
+            Assert.That(notification.SavedCultures, Is.Not.Null);
+            Assert.That(notification.SavedCultures.ContainsKey(saved.Key), Is.True);
 
             // both cultures were changed as part of the save-and-publish, so both are reported as saved
-            CollectionAssert.AreEquivalent(new[] { "en-US", "fr-FR" }, notification.SavedCultures[saved.Key]);
+            Assert.That(notification.SavedCultures[saved.Key], Is.EquivalentTo(new[] { "en-US", "fr-FR" }));
 
             savedWasCalled = true;
         };
@@ -481,8 +481,8 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         try
         {
             var result = ContentService.SaveAndPublish(document, ["en-US", "fr-FR"]);
-            Assert.IsTrue(result.Success);
-            Assert.IsTrue(savedWasCalled, "ContentSavedNotification should fire when saving and publishing.");
+            Assert.That(result.Success, Is.True);
+            Assert.That(savedWasCalled, Is.True, "ContentSavedNotification should fire when saving and publishing.");
         }
         finally
         {
@@ -516,11 +516,11 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         {
             IContent saved = notification.SavedEntities.First();
 
-            Assert.IsNotNull(notification.SavedCultures);
-            Assert.IsTrue(notification.SavedCultures.ContainsKey(saved.Key));
+            Assert.That(notification.SavedCultures, Is.Not.Null);
+            Assert.That(notification.SavedCultures.ContainsKey(saved.Key), Is.True);
 
             // both cultures were changed, so both are reported as saved - even though only en-US is being published
-            CollectionAssert.AreEquivalent(new[] { "en-US", "fr-FR" }, notification.SavedCultures[saved.Key]);
+            Assert.That(notification.SavedCultures[saved.Key], Is.EquivalentTo(new[] { "en-US", "fr-FR" }));
 
             savedWasCalled = true;
         };
@@ -529,11 +529,11 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         {
             IContent published = notification.PublishedEntities.First();
 
-            Assert.IsNotNull(notification.PublishedCultures);
-            Assert.IsTrue(notification.PublishedCultures.ContainsKey(published.Key));
+            Assert.That(notification.PublishedCultures, Is.Not.Null);
+            Assert.That(notification.PublishedCultures.ContainsKey(published.Key), Is.True);
 
             // only en-US was published
-            CollectionAssert.AreEquivalent(new[] { "en-US" }, notification.PublishedCultures[published.Key]);
+            Assert.That(notification.PublishedCultures[published.Key], Is.EquivalentTo(new[] { "en-US" }));
 
             publishedWasCalled = true;
         };
@@ -541,9 +541,9 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         try
         {
             var result = ContentService.SaveAndPublish(document, ["en-US"]);
-            Assert.IsTrue(result.Success);
-            Assert.IsTrue(savedWasCalled, "ContentSavedNotification should fire when saving and publishing.");
-            Assert.IsTrue(publishedWasCalled, "ContentPublishedNotification should fire when saving and publishing.");
+            Assert.That(result.Success, Is.True);
+            Assert.That(savedWasCalled, Is.True, "ContentSavedNotification should fire when saving and publishing.");
+            Assert.That(publishedWasCalled, Is.True, "ContentPublishedNotification should fire when saving and publishing.");
         }
         finally
         {
@@ -563,8 +563,8 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
 
         ContentService.Save(document);
         var result = ContentService.Publish(document, document.AvailableCultures.ToArray());
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual("title", result.InvalidProperties.First().Alias);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.InvalidProperties.First().Alias, Is.EqualTo("title"));
 
         // when a service operation fails, the object is dirty and should not be re-used,
         // re-create it
@@ -576,7 +576,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         {
             var saved = notification.SavedEntities.First();
 
-            Assert.IsTrue(document.GetValue<string>("title").IsNullOrWhiteSpace());
+            Assert.That(document.GetValue<string>("title").IsNullOrWhiteSpace(), Is.True);
 
             saved.SetValue("title", "title");
 
@@ -587,9 +587,9 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         {
             ContentService.Save(document);
             result = ContentService.Publish(document, document.AvailableCultures.ToArray());
-            Assert.IsTrue(result
-                .Success); // will succeed now because we were able to specify the required value in the Saving event
-            Assert.IsTrue(savingWasCalled);
+            Assert.That(result
+                .Success, Is.True); // will succeed now because we were able to specify the required value in the Saving event
+            Assert.That(savingWasCalled, Is.True);
         }
         finally
         {
@@ -617,8 +617,8 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         ContentService.Save(document);
         ContentService.Publish(document, document.AvailableCultures.ToArray());
 
-        Assert.IsTrue(document.IsCulturePublished("fr-FR"));
-        Assert.IsTrue(document.IsCulturePublished("en-US"));
+        Assert.That(document.IsCulturePublished("fr-FR"), Is.True);
+        Assert.That(document.IsCulturePublished("en-US"), Is.True);
 
         // re-get - dirty properties need resetting
         document = ContentService.GetById(document.Id);
@@ -635,13 +635,13 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         {
             var published = notification.PublishedEntities.First();
 
-            Assert.AreSame(document, published);
+            Assert.That(published, Is.SameAs(document));
 
-            Assert.IsFalse(notification.IsPublishingCulture(published, "en-US"));
-            Assert.IsFalse(notification.IsPublishingCulture(published, "fr-FR"));
+            Assert.That(notification.IsPublishingCulture(published, "en-US"), Is.False);
+            Assert.That(notification.IsPublishingCulture(published, "fr-FR"), Is.False);
 
-            Assert.IsFalse(notification.IsUnpublishingCulture(published, "en-US"));
-            Assert.IsTrue(notification.IsUnpublishingCulture(published, "fr-FR"));
+            Assert.That(notification.IsUnpublishingCulture(published, "en-US"), Is.False);
+            Assert.That(notification.IsUnpublishingCulture(published, "fr-FR"), Is.True);
 
             publishingWasCalled = true;
         };
@@ -650,13 +650,13 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         {
             var published = notification.PublishedEntities.First();
 
-            Assert.AreSame(document, published);
+            Assert.That(published, Is.SameAs(document));
 
-            Assert.IsFalse(notification.HasPublishedCulture(published, "en-US"));
-            Assert.IsFalse(notification.HasPublishedCulture(published, "fr-FR"));
+            Assert.That(notification.HasPublishedCulture(published, "en-US"), Is.False);
+            Assert.That(notification.HasPublishedCulture(published, "fr-FR"), Is.False);
 
-            Assert.IsFalse(notification.HasUnpublishedCulture(published, "en-US"));
-            Assert.IsTrue(notification.HasUnpublishedCulture(published, "fr-FR"));
+            Assert.That(notification.HasUnpublishedCulture(published, "en-US"), Is.False);
+            Assert.That(notification.HasUnpublishedCulture(published, "fr-FR"), Is.True);
 
             publishedWasCalled = true;
         };
@@ -665,10 +665,10 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         {
             var change = notification.Changes.FirstOrDefault();
             var unpublishedCultures = change?.UnpublishedCultures?.ToArray();
-            Assert.IsNotNull(unpublishedCultures);
-            Assert.AreEqual(1, unpublishedCultures.Length);
-            Assert.IsTrue(unpublishedCultures.InvariantContains("fr-FR"));
-            Assert.IsNull(change.PublishedCultures);
+            Assert.That(unpublishedCultures, Is.Not.Null);
+            Assert.That(unpublishedCultures, Has.Length.EqualTo(1));
+            Assert.That(unpublishedCultures.InvariantContains("fr-FR"), Is.True);
+            Assert.That(change.PublishedCultures, Is.Null);
 
             treeChangeWasCalled = true;
         };
@@ -676,9 +676,9 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         try
         {
             ContentService.CommitDocumentChanges(document);
-            Assert.IsTrue(publishingWasCalled);
-            Assert.IsTrue(publishedWasCalled);
-            Assert.IsTrue(treeChangeWasCalled);
+            Assert.That(publishingWasCalled, Is.True);
+            Assert.That(publishedWasCalled, Is.True);
+            Assert.That(treeChangeWasCalled, Is.True);
         }
         finally
         {
@@ -689,8 +689,8 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
 
         document = ContentService.GetById(document.Id);
 
-        Assert.IsFalse(document.IsCulturePublished("fr-FR"));
-        Assert.IsTrue(document.IsCulturePublished("en-US"));
+        Assert.That(document.IsCulturePublished("fr-FR"), Is.False);
+        Assert.That(document.IsCulturePublished("en-US"), Is.True);
     }
 
     [Test]
@@ -704,9 +704,9 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         {
             IContent saved = notification.SavedEntities.First();
 
-            Assert.IsNotNull(notification.SavedCultures);
-            Assert.IsTrue(notification.SavedCultures.ContainsKey(saved.Key));
-            CollectionAssert.AreEquivalent(new[] { "*" }, notification.SavedCultures[saved.Key]);
+            Assert.That(notification.SavedCultures, Is.Not.Null);
+            Assert.That(notification.SavedCultures.ContainsKey(saved.Key), Is.True);
+            Assert.That(notification.SavedCultures[saved.Key], Is.EquivalentTo(new[] { "*" }));
 
             savedWasCalled = true;
         };
@@ -714,7 +714,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         try
         {
             ContentService.Save(document);
-            Assert.IsTrue(savedWasCalled);
+            Assert.That(savedWasCalled, Is.True);
         }
         finally
         {
@@ -752,11 +752,11 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         {
             IContent saved = notification.SavedEntities.First();
 
-            Assert.IsNotNull(notification.SavedCultures);
-            Assert.IsTrue(notification.SavedCultures.ContainsKey(saved.Key));
+            Assert.That(notification.SavedCultures, Is.Not.Null);
+            Assert.That(notification.SavedCultures.ContainsKey(saved.Key), Is.True);
 
             // captured at raise-time even though the entity's change tracking has been reset by persistence
-            CollectionAssert.AreEquivalent(new[] { "en-US" }, notification.SavedCultures[saved.Key]);
+            Assert.That(notification.SavedCultures[saved.Key], Is.EquivalentTo(new[] { "en-US" }));
 
             savedWasCalled = true;
         };
@@ -764,7 +764,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         try
         {
             ContentService.Save(document);
-            Assert.IsTrue(savedWasCalled);
+            Assert.That(savedWasCalled, Is.True);
         }
         finally
         {
@@ -784,9 +784,9 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         {
             IContent published = notification.PublishedEntities.First();
 
-            Assert.IsNotNull(notification.PublishedCultures);
-            Assert.IsTrue(notification.PublishedCultures.ContainsKey(published.Key));
-            CollectionAssert.AreEquivalent(new[] { "*" }, notification.PublishedCultures[published.Key]);
+            Assert.That(notification.PublishedCultures, Is.Not.Null);
+            Assert.That(notification.PublishedCultures.ContainsKey(published.Key), Is.True);
+            Assert.That(notification.PublishedCultures[published.Key], Is.EquivalentTo(new[] { "*" }));
 
             publishedWasCalled = true;
         };
@@ -794,7 +794,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         try
         {
             ContentService.Publish(document, ["*"]);
-            Assert.IsTrue(publishedWasCalled);
+            Assert.That(publishedWasCalled, Is.True);
         }
         finally
         {
@@ -829,9 +829,9 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         {
             IContent published = notification.PublishedEntities.First();
 
-            Assert.IsNotNull(notification.PublishedCultures);
-            Assert.IsTrue(notification.PublishedCultures.ContainsKey(published.Key));
-            CollectionAssert.AreEquivalent(new[] { "fr-FR" }, notification.PublishedCultures[published.Key]);
+            Assert.That(notification.PublishedCultures, Is.Not.Null);
+            Assert.That(notification.PublishedCultures.ContainsKey(published.Key), Is.True);
+            Assert.That(notification.PublishedCultures[published.Key], Is.EquivalentTo(new[] { "fr-FR" }));
 
             publishedWasCalled = true;
         };
@@ -839,7 +839,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         try
         {
             ContentService.Publish(document, new[] { "fr-FR" });
-            Assert.IsTrue(publishedWasCalled);
+            Assert.That(publishedWasCalled, Is.True);
         }
         finally
         {
@@ -860,9 +860,9 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         {
             IContent unpublished = notification.UnpublishedEntities.First();
 
-            Assert.IsNotNull(notification.UnpublishedCultures);
-            Assert.IsTrue(notification.UnpublishedCultures.ContainsKey(unpublished.Key));
-            CollectionAssert.AreEquivalent(new[] { "*" }, notification.UnpublishedCultures[unpublished.Key]);
+            Assert.That(notification.UnpublishedCultures, Is.Not.Null);
+            Assert.That(notification.UnpublishedCultures.ContainsKey(unpublished.Key), Is.True);
+            Assert.That(notification.UnpublishedCultures[unpublished.Key], Is.EquivalentTo(new[] { "*" }));
 
             unpublishedWasCalled = true;
         };
@@ -870,7 +870,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         try
         {
             ContentService.Unpublish(document);
-            Assert.IsTrue(unpublishedWasCalled);
+            Assert.That(unpublishedWasCalled, Is.True);
         }
         finally
         {
@@ -909,9 +909,9 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
             IContent published = notification.PublishedEntities.First();
 
             // unpublishing a single culture is performed as a publish operation
-            Assert.IsNotNull(notification.UnpublishedCultures);
-            Assert.IsTrue(notification.UnpublishedCultures.ContainsKey(published.Key));
-            CollectionAssert.AreEquivalent(new[] { "fr-FR" }, notification.UnpublishedCultures[published.Key]);
+            Assert.That(notification.UnpublishedCultures, Is.Not.Null);
+            Assert.That(notification.UnpublishedCultures.ContainsKey(published.Key), Is.True);
+            Assert.That(notification.UnpublishedCultures[published.Key], Is.EquivalentTo(new[] { "fr-FR" }));
 
             publishedWasCalled = true;
         };
@@ -919,7 +919,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         try
         {
             ContentService.CommitDocumentChanges(document);
-            Assert.IsTrue(publishedWasCalled);
+            Assert.That(publishedWasCalled, Is.True);
         }
         finally
         {
@@ -951,13 +951,13 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
 
         ContentNotificationHandler.SavedContent = notification =>
         {
-            Assert.IsNotNull(notification.SavedCultures);
+            Assert.That(notification.SavedCultures, Is.Not.Null);
 
             // the culture map is keyed per document, so each document reports only its own changed cultures
-            Assert.IsTrue(notification.SavedCultures.ContainsKey(documentOne.Key));
-            Assert.IsTrue(notification.SavedCultures.ContainsKey(documentTwo.Key));
-            CollectionAssert.AreEquivalent(new[] { "en-US" }, notification.SavedCultures[documentOne.Key]);
-            CollectionAssert.AreEquivalent(new[] { "en-US", "fr-FR" }, notification.SavedCultures[documentTwo.Key]);
+            Assert.That(notification.SavedCultures.ContainsKey(documentOne.Key), Is.True);
+            Assert.That(notification.SavedCultures.ContainsKey(documentTwo.Key), Is.True);
+            Assert.That(notification.SavedCultures[documentOne.Key], Is.EquivalentTo(new[] { "en-US" }));
+            Assert.That(notification.SavedCultures[documentTwo.Key], Is.EquivalentTo(new[] { "en-US", "fr-FR" }));
 
             savedWasCalled = true;
         };
@@ -965,7 +965,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         try
         {
             ContentService.Save(new[] { documentOne, documentTwo });
-            Assert.IsTrue(savedWasCalled);
+            Assert.That(savedWasCalled, Is.True);
         }
         finally
         {
@@ -996,8 +996,8 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         ContentNotificationHandler.SavedContent = notification =>
         {
             // the save tracked cultures and found none changed, so the map is present but empty - not null
-            Assert.IsNotNull(notification.SavedCultures);
-            Assert.IsEmpty(notification.SavedCultures);
+            Assert.That(notification.SavedCultures, Is.Not.Null);
+            Assert.That(notification.SavedCultures, Is.Empty);
 
             savedWasCalled = true;
         };
@@ -1005,7 +1005,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         try
         {
             ContentService.Save(document);
-            Assert.IsTrue(savedWasCalled);
+            Assert.That(savedWasCalled, Is.True);
         }
         finally
         {
@@ -1042,11 +1042,11 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         {
             IContent unpublished = notification.UnpublishedEntities.First();
 
-            Assert.IsNotNull(notification.UnpublishedCultures);
-            Assert.IsTrue(notification.UnpublishedCultures.ContainsKey(unpublished.Key));
+            Assert.That(notification.UnpublishedCultures, Is.Not.Null);
+            Assert.That(notification.UnpublishedCultures.ContainsKey(unpublished.Key), Is.True);
 
             // unpublishing the whole document reports every culture that was published, not an empty/partial set
-            CollectionAssert.AreEquivalent(new[] { "en-US", "fr-FR" }, notification.UnpublishedCultures[unpublished.Key]);
+            Assert.That(notification.UnpublishedCultures[unpublished.Key], Is.EquivalentTo(new[] { "en-US", "fr-FR" }));
 
             unpublishedWasCalled = true;
         };
@@ -1054,7 +1054,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         try
         {
             ContentService.Unpublish(document, "*");
-            Assert.IsTrue(unpublishedWasCalled);
+            Assert.That(unpublishedWasCalled, Is.True);
         }
         finally
         {
@@ -1082,14 +1082,14 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
 
         ContentNotificationHandler.SavedContent = notification =>
         {
-            Assert.IsNotNull(notification.SavedCultures);
+            Assert.That(notification.SavedCultures, Is.Not.Null);
 
             // the per-document map keeps each document's cultures separate - the invariant "*" marker is not
             // conflated with the variant document's specific cultures (which a flat list could not represent)
-            Assert.IsTrue(notification.SavedCultures.ContainsKey(invariantDocument.Key));
-            Assert.IsTrue(notification.SavedCultures.ContainsKey(variantDocument.Key));
-            CollectionAssert.AreEquivalent(new[] { "*" }, notification.SavedCultures[invariantDocument.Key]);
-            CollectionAssert.AreEquivalent(new[] { "en-US", "fr-FR" }, notification.SavedCultures[variantDocument.Key]);
+            Assert.That(notification.SavedCultures.ContainsKey(invariantDocument.Key), Is.True);
+            Assert.That(notification.SavedCultures.ContainsKey(variantDocument.Key), Is.True);
+            Assert.That(notification.SavedCultures[invariantDocument.Key], Is.EquivalentTo(new[] { "*" }));
+            Assert.That(notification.SavedCultures[variantDocument.Key], Is.EquivalentTo(new[] { "en-US", "fr-FR" }));
 
             savedWasCalled = true;
         };
@@ -1097,7 +1097,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         try
         {
             ContentService.Save(new[] { invariantDocument, variantDocument });
-            Assert.IsTrue(savedWasCalled);
+            Assert.That(savedWasCalled, Is.True);
         }
         finally
         {
@@ -1119,8 +1119,8 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         ContentNotificationHandler.SavedContent = notification =>
         {
             // invariant content reports the "*" marker only when it changed; a no-op re-save reports nothing
-            Assert.IsNotNull(notification.SavedCultures);
-            Assert.IsEmpty(notification.SavedCultures);
+            Assert.That(notification.SavedCultures, Is.Not.Null);
+            Assert.That(notification.SavedCultures, Is.Empty);
 
             savedWasCalled = true;
         };
@@ -1128,7 +1128,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         try
         {
             ContentService.Save(document);
-            Assert.IsTrue(savedWasCalled);
+            Assert.That(savedWasCalled, Is.True);
         }
         finally
         {
@@ -1150,9 +1150,9 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
 
         ContentNotificationHandler.SavedContent = notification =>
         {
-            Assert.IsNotNull(notification.SavedCultures);
-            Assert.IsTrue(notification.SavedCultures.ContainsKey(document.Key));
-            CollectionAssert.AreEquivalent(new[] { "*" }, notification.SavedCultures[document.Key]);
+            Assert.That(notification.SavedCultures, Is.Not.Null);
+            Assert.That(notification.SavedCultures.ContainsKey(document.Key), Is.True);
+            Assert.That(notification.SavedCultures[document.Key], Is.EquivalentTo(new[] { "*" }));
 
             savedWasCalled = true;
         };
@@ -1160,7 +1160,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         try
         {
             ContentService.Save(document);
-            Assert.IsTrue(savedWasCalled);
+            Assert.That(savedWasCalled, Is.True);
         }
         finally
         {
@@ -1188,15 +1188,15 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         ContentNotificationHandler.PublishedContent = notification =>
         {
             // the branch publish raises a single notification covering every published document
-            Assert.IsTrue(notification.IncludeDescendants);
-            Assert.IsNotNull(notification.PublishedCultures);
+            Assert.That(notification.IncludeDescendants, Is.True);
+            Assert.That(notification.PublishedCultures, Is.Not.Null);
 
             // invariant content, so each published document reports the "*" marker under its own key
-            Assert.AreEqual(2, notification.PublishedCultures.Count);
-            Assert.IsTrue(notification.PublishedCultures.ContainsKey(root.Key), "missing entry for root");
-            Assert.IsTrue(notification.PublishedCultures.ContainsKey(child.Key), "missing entry for child");
-            CollectionAssert.AreEquivalent(new[] { "*" }, notification.PublishedCultures[root.Key]);
-            CollectionAssert.AreEquivalent(new[] { "*" }, notification.PublishedCultures[child.Key]);
+            Assert.That(notification.PublishedCultures, Has.Count.EqualTo(2));
+            Assert.That(notification.PublishedCultures.ContainsKey(root.Key), Is.True, "missing entry for root");
+            Assert.That(notification.PublishedCultures.ContainsKey(child.Key), Is.True, "missing entry for child");
+            Assert.That(notification.PublishedCultures[root.Key], Is.EquivalentTo(new[] { "*" }));
+            Assert.That(notification.PublishedCultures[child.Key], Is.EquivalentTo(new[] { "*" }));
 
             publishedWasCalled = true;
         };
@@ -1204,7 +1204,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         try
         {
             ContentService.PublishBranch(root, PublishBranchFilter.ForceRepublish, ["*"]);
-            Assert.IsTrue(publishedWasCalled);
+            Assert.That(publishedWasCalled, Is.True);
         }
         finally
         {
@@ -1238,14 +1238,14 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
 
         ContentNotificationHandler.PublishedContent = notification =>
         {
-            Assert.IsNotNull(notification.PublishedCultures);
+            Assert.That(notification.PublishedCultures, Is.Not.Null);
 
             // variance is per document: the invariant root reports "*", the variant descendant reports its culture
-            Assert.AreEqual(2, notification.PublishedCultures.Count);
-            Assert.IsTrue(notification.PublishedCultures.ContainsKey(root.Key));
-            Assert.IsTrue(notification.PublishedCultures.ContainsKey(child.Key));
-            CollectionAssert.AreEquivalent(new[] { "*" }, notification.PublishedCultures[root.Key]);
-            CollectionAssert.AreEquivalent(new[] { "en-US" }, notification.PublishedCultures[child.Key]);
+            Assert.That(notification.PublishedCultures, Has.Count.EqualTo(2));
+            Assert.That(notification.PublishedCultures.ContainsKey(root.Key), Is.True);
+            Assert.That(notification.PublishedCultures.ContainsKey(child.Key), Is.True);
+            Assert.That(notification.PublishedCultures[root.Key], Is.EquivalentTo(new[] { "*" }));
+            Assert.That(notification.PublishedCultures[child.Key], Is.EquivalentTo(new[] { "en-US" }));
 
             publishedWasCalled = true;
         };
@@ -1253,7 +1253,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         try
         {
             ContentService.PublishBranch(root, PublishBranchFilter.ForceRepublish, ["*"]);
-            Assert.IsTrue(publishedWasCalled);
+            Assert.That(publishedWasCalled, Is.True);
         }
         finally
         {
@@ -1277,9 +1277,9 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         {
             IContent unpublished = notification.UnpublishedEntities.First();
 
-            Assert.IsNotNull(notification.UnpublishedCultures);
-            Assert.IsTrue(notification.UnpublishedCultures.ContainsKey(unpublished.Key));
-            CollectionAssert.AreEquivalent(new[] { "*" }, notification.UnpublishedCultures[unpublished.Key]);
+            Assert.That(notification.UnpublishedCultures, Is.Not.Null);
+            Assert.That(notification.UnpublishedCultures.ContainsKey(unpublished.Key), Is.True);
+            Assert.That(notification.UnpublishedCultures[unpublished.Key], Is.EquivalentTo(new[] { "*" }));
 
             unpublishedWasCalled = true;
         };
@@ -1287,7 +1287,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         try
         {
             ContentService.Delete(document);
-            Assert.IsTrue(unpublishedWasCalled);
+            Assert.That(unpublishedWasCalled, Is.True);
         }
         finally
         {
@@ -1324,11 +1324,11 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         {
             IContent unpublished = notification.UnpublishedEntities.First();
 
-            Assert.IsNotNull(notification.UnpublishedCultures);
-            Assert.IsTrue(notification.UnpublishedCultures.ContainsKey(unpublished.Key));
+            Assert.That(notification.UnpublishedCultures, Is.Not.Null);
+            Assert.That(notification.UnpublishedCultures.ContainsKey(unpublished.Key), Is.True);
 
             // deleting a published document reports every culture that was published
-            CollectionAssert.AreEquivalent(new[] { "en-US", "fr-FR" }, notification.UnpublishedCultures[unpublished.Key]);
+            Assert.That(notification.UnpublishedCultures[unpublished.Key], Is.EquivalentTo(new[] { "en-US", "fr-FR" }));
 
             unpublishedWasCalled = true;
         };
@@ -1336,7 +1336,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         try
         {
             ContentService.Delete(document);
-            Assert.IsTrue(unpublishedWasCalled);
+            Assert.That(unpublishedWasCalled, Is.True);
         }
         finally
         {
@@ -1370,9 +1370,9 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         {
             IContent unpublished = notification.UnpublishedEntities.First();
 
-            Assert.IsNotNull(notification.UnpublishedCultures);
-            Assert.IsTrue(notification.UnpublishedCultures.ContainsKey(unpublished.Key));
-            CollectionAssert.AreEquivalent(new[] { "en-US", "fr-FR" }, notification.UnpublishedCultures[unpublished.Key]);
+            Assert.That(notification.UnpublishedCultures, Is.Not.Null);
+            Assert.That(notification.UnpublishedCultures.ContainsKey(unpublished.Key), Is.True);
+            Assert.That(notification.UnpublishedCultures[unpublished.Key], Is.EquivalentTo(new[] { "en-US", "fr-FR" }));
 
             unpublishedWasCalled = true;
         };
@@ -1380,7 +1380,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         try
         {
             ContentService.DeleteOfTypes(new[] { _contentType.Id });
-            Assert.IsTrue(unpublishedWasCalled);
+            Assert.That(unpublishedWasCalled, Is.True);
         }
         finally
         {

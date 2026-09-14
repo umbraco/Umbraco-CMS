@@ -25,16 +25,16 @@ public class UserTests
 
         var clone = (User)item.DeepClone();
 
-        Assert.AreNotSame(clone, item);
-        Assert.AreEqual(clone, item);
+        Assert.That(item, Is.Not.SameAs(clone));
+        Assert.That(item, Is.EqualTo(clone));
 
-        Assert.AreEqual(clone.AllowedSections.Count(), item.AllowedSections.Count());
+        Assert.That(item.AllowedSections.Count(), Is.EqualTo(clone.AllowedSections.Count()));
 
         // Verify normal properties with reflection
         var allProps = clone.GetType().GetProperties();
         foreach (var propertyInfo in allProps)
         {
-            Assert.AreEqual(propertyInfo.GetValue(clone, null), propertyInfo.GetValue(item, null));
+            Assert.That(propertyInfo.GetValue(item, null), Is.EqualTo(propertyInfo.GetValue(clone, null)));
         }
     }
 

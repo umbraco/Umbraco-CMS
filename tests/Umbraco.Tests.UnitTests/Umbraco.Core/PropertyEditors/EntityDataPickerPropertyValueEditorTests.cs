@@ -28,14 +28,14 @@ public class EntityDataPickerPropertyValueEditorTests
         var result = editor.Validate(serializedValue, false, null, PropertyValidationContext.Empty());
         if (expectedSuccess)
         {
-            Assert.IsEmpty(result);
+            Assert.That(result, Is.Empty);
         }
         else
         {
-            Assert.AreEqual(1, result.Count());
+            Assert.That(result.Count(), Is.EqualTo(1));
 
             var validationResult = result.First();
-            Assert.AreEqual("validation_entriesShort", validationResult.ErrorMessage);
+            Assert.That(validationResult.ErrorMessage, Is.EqualTo("validation_entriesShort"));
         }
     }
 
@@ -54,14 +54,14 @@ public class EntityDataPickerPropertyValueEditorTests
         var result = editor.Validate(serializedValue, false, null, PropertyValidationContext.Empty());
         if (expectedSuccess)
         {
-            Assert.IsEmpty(result);
+            Assert.That(result, Is.Empty);
         }
         else
         {
-            Assert.AreEqual(1, result.Count());
+            Assert.That(result.Count(), Is.EqualTo(1));
 
             var validationResult = result.First();
-            Assert.AreEqual("validation_entriesExceed", validationResult.ErrorMessage);
+            Assert.That(validationResult.ErrorMessage, Is.EqualTo("validation_entriesExceed"));
         }
     }
 

@@ -44,7 +44,7 @@ internal sealed class DocumentHybridCacheScopeTests : UmbracoIntegrationTestWith
         var textPage = await PublishedContentHybridCache.GetByIdAsync(TextpageId);
 
         // Published page should not be in cache, as we rolled scope back.
-        Assert.IsNull(textPage);
+        Assert.That(textPage, Is.Null);
     }
 
     [Test]
@@ -62,7 +62,7 @@ internal sealed class DocumentHybridCacheScopeTests : UmbracoIntegrationTestWith
         var textPage = await PublishedContentHybridCache.GetByIdAsync(Textpage.Key.Value);
 
         // Published page should not be in cache, as we rolled scope back.
-        Assert.IsNull(textPage);
+        Assert.That(textPage, Is.Null);
     }
 
     [Test]
@@ -81,7 +81,7 @@ internal sealed class DocumentHybridCacheScopeTests : UmbracoIntegrationTestWith
         var publishedPage = await PublishedContentHybridCache.GetByIdAsync(TextpageId);
 
         // Published page should not be in cache, as we rolled scope back.
-        Assert.IsNotNull(publishedPage);
+        Assert.That(publishedPage, Is.Not.Null);
     }
 
     [Test]
@@ -100,7 +100,7 @@ internal sealed class DocumentHybridCacheScopeTests : UmbracoIntegrationTestWith
         var publishedPage = await PublishedContentHybridCache.GetByIdAsync(Textpage.Key.Value);
 
         // Published page should not be in cache, as we rolled scope back.
-        Assert.IsNotNull(publishedPage);
+        Assert.That(publishedPage, Is.Not.Null);
     }
 
     [Test]
@@ -111,7 +111,7 @@ internal sealed class DocumentHybridCacheScopeTests : UmbracoIntegrationTestWith
         {
             Textpage.Key = key;
             var result = await ContentEditingService.CreateAsync(Textpage, Constants.Security.SuperUserKey);
-            Assert.IsTrue(result);
+            Assert.That((bool)result, Is.True);
             var publishResult = await ContentPublishingService.PublishAsync(
                 Textpage.Key.Value,
                 new List<CulturePublishScheduleModel>
@@ -119,12 +119,12 @@ internal sealed class DocumentHybridCacheScopeTests : UmbracoIntegrationTestWith
                     new() { Culture = "*" },
                 },
                 Constants.Security.SuperUserKey);
-            Assert.IsTrue(publishResult.Success);
+            Assert.That(publishResult.Success, Is.True);
 
             scope.Complete();
         }
 
         var published = await PublishedContentHybridCache.GetByIdAsync(key);
-        Assert.IsNotNull(published);
+        Assert.That(published, Is.Not.Null);
     }
 }

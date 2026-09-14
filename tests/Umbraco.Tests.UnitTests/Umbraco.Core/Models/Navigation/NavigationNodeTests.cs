@@ -73,7 +73,7 @@ public class NavigationNodeTests
         IReadOnlyList<Guid> afterAdd = parent.GetOrderedChildren(structure);
 
         Assert.That(afterAdd, Is.Not.SameAs(beforeAdd));
-        Assert.That(afterAdd.Count, Is.EqualTo(3));
+        Assert.That(afterAdd, Has.Count.EqualTo(3));
         Assert.That(afterAdd, Does.Contain(added));
     }
 

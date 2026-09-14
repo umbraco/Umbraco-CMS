@@ -84,31 +84,31 @@ public class BlockEditorDataConverterTests
         BlockListEditorDataConverter converter = CreateConverter();
         BlockEditorData<BlockListValue, BlockListLayoutItem> result = converter.Deserialize(json);
 
-        Assert.AreEqual(1, result.BlockValue.SettingsData.Count);
+        Assert.That(result.BlockValue.SettingsData, Has.Count.EqualTo(1));
 
         BlockItemData settings = result.BlockValue.SettingsData[0];
 
         // The flat legacy values must have been relocated into the Values array...
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(2, settings.Values.Count);
+            Assert.That(settings.Values, Has.Count.EqualTo(2));
 
             BlockPropertyValue? cssClasses = settings.Values.SingleOrDefault(v => v.Alias == "cssClasses");
-            Assert.IsNotNull(cssClasses);
-            Assert.AreEqual("text-xl", cssClasses!.Value?.ToString());
+            Assert.That(cssClasses, Is.Not.Null);
+            Assert.That(cssClasses!.Value?.ToString(), Is.EqualTo("text-xl"));
 
             BlockPropertyValue? customCss = settings.Values.SingleOrDefault(v => v.Alias == "customCSS");
-            Assert.IsNotNull(customCss);
-            Assert.IsNull(customCss!.Value);
+            Assert.That(customCss, Is.Not.Null);
+            Assert.That(customCss!.Value, Is.Null);
 
             // ...and cleared from the raw property values so they are not written back to the DB.
 #pragma warning disable CS0618 // Type or member is obsolete
-            Assert.IsEmpty(settings.RawPropertyValues);
+            Assert.That(settings.RawPropertyValues, Is.Empty);
 #pragma warning restore CS0618 // Type or member is obsolete
 
             // ...and the content block must still be exposed - AmendExpose is the other half of the migration.
-            Assert.AreEqual(1, result.BlockValue.Expose.Count);
-            Assert.AreEqual(_contentKey, result.BlockValue.Expose[0].ContentKey);
+            Assert.That(result.BlockValue.Expose, Has.Count.EqualTo(1));
+            Assert.That(result.BlockValue.Expose[0].ContentKey, Is.EqualTo(_contentKey));
         });
     }
 
@@ -153,27 +153,27 @@ public class BlockEditorDataConverterTests
         BlockGridEditorDataConverter converter = CreateGridConverter();
         BlockEditorData<BlockGridValue, BlockGridLayoutItem> result = converter.Deserialize(json);
 
-        Assert.AreEqual(1, result.BlockValue.SettingsData.Count);
+        Assert.That(result.BlockValue.SettingsData, Has.Count.EqualTo(1));
 
         BlockItemData settings = result.BlockValue.SettingsData[0];
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(2, settings.Values.Count);
+            Assert.That(settings.Values, Has.Count.EqualTo(2));
 
             BlockPropertyValue? cssClasses = settings.Values.SingleOrDefault(v => v.Alias == "cssClasses");
-            Assert.IsNotNull(cssClasses);
-            Assert.AreEqual("text-xl", cssClasses!.Value?.ToString());
+            Assert.That(cssClasses, Is.Not.Null);
+            Assert.That(cssClasses!.Value?.ToString(), Is.EqualTo("text-xl"));
 
             BlockPropertyValue? customCss = settings.Values.SingleOrDefault(v => v.Alias == "customCSS");
-            Assert.IsNotNull(customCss);
-            Assert.IsNull(customCss!.Value);
+            Assert.That(customCss, Is.Not.Null);
+            Assert.That(customCss!.Value, Is.Null);
 
 #pragma warning disable CS0618 // Type or member is obsolete
-            Assert.IsEmpty(settings.RawPropertyValues);
+            Assert.That(settings.RawPropertyValues, Is.Empty);
 #pragma warning restore CS0618 // Type or member is obsolete
 
-            Assert.AreEqual(1, result.BlockValue.Expose.Count);
-            Assert.AreEqual(_contentKey, result.BlockValue.Expose[0].ContentKey);
+            Assert.That(result.BlockValue.Expose, Has.Count.EqualTo(1));
+            Assert.That(result.BlockValue.Expose[0].ContentKey, Is.EqualTo(_contentKey));
         });
     }
 
@@ -203,16 +203,16 @@ public class BlockEditorDataConverterTests
         BlockListEditorDataConverter converter = CreateConverter();
         BlockEditorData<BlockListValue, BlockListLayoutItem> result = converter.Deserialize(json);
 
-        Assert.AreEqual(1, result.BlockValue.ContentData.Count);
+        Assert.That(result.BlockValue.ContentData, Has.Count.EqualTo(1));
 
         BlockItemData content = result.BlockValue.ContentData[0];
         Assert.Multiple(() =>
         {
             BlockPropertyValue? text = content.Values.SingleOrDefault(v => v.Alias == "text");
-            Assert.IsNotNull(text);
-            Assert.AreEqual("Hello world", text!.Value?.ToString());
+            Assert.That(text, Is.Not.Null);
+            Assert.That(text!.Value?.ToString(), Is.EqualTo("Hello world"));
 #pragma warning disable CS0618 // Type or member is obsolete
-            Assert.IsEmpty(content.RawPropertyValues);
+            Assert.That(content.RawPropertyValues, Is.Empty);
 #pragma warning restore CS0618 // Type or member is obsolete
         });
     }
@@ -253,11 +253,11 @@ public class BlockEditorDataConverterTests
         BlockListEditorDataConverter converter = CreateConverter();
         BlockEditorData<BlockListValue, BlockListLayoutItem> result = converter.Deserialize(json);
 
-        Assert.AreEqual(1, result.References.Count);
+        Assert.That(result.References, Has.Count.EqualTo(1));
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(_contentKey, result.References[0].ContentKey);
-            Assert.AreEqual(_settingsKey, result.References[0].SettingsKey);
+            Assert.That(result.References[0].ContentKey, Is.EqualTo(_contentKey));
+            Assert.That(result.References[0].SettingsKey, Is.EqualTo(_settingsKey));
         });
     }
 
@@ -269,8 +269,8 @@ public class BlockEditorDataConverterTests
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(_contentKey, result.BlockValue.ContentData[0].Key);
-            Assert.AreEqual(_settingsKey, result.BlockValue.SettingsData[0].Key);
+            Assert.That(result.BlockValue.ContentData[0].Key, Is.EqualTo(_contentKey));
+            Assert.That(result.BlockValue.SettingsData[0].Key, Is.EqualTo(_settingsKey));
         });
     }
 
@@ -281,12 +281,12 @@ public class BlockEditorDataConverterTests
         BlockEditorData<BlockListValue, BlockListLayoutItem> result = converter.Deserialize(LegacyJsonWithContentAndSettings);
 
         // migrating legacy (pre-block-level-variance) data should expose every content block invariantly
-        Assert.AreEqual(1, result.BlockValue.Expose.Count);
+        Assert.That(result.BlockValue.Expose, Has.Count.EqualTo(1));
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(_contentKey, result.BlockValue.Expose[0].ContentKey);
-            Assert.IsNull(result.BlockValue.Expose[0].Culture);
-            Assert.IsNull(result.BlockValue.Expose[0].Segment);
+            Assert.That(result.BlockValue.Expose[0].ContentKey, Is.EqualTo(_contentKey));
+            Assert.That(result.BlockValue.Expose[0].Culture, Is.Null);
+            Assert.That(result.BlockValue.Expose[0].Segment, Is.Null);
         });
     }
 
@@ -328,12 +328,12 @@ public class BlockEditorDataConverterTests
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(1, result.BlockValue.ContentData[0].Values.Count);
-            Assert.AreEqual(1, result.BlockValue.SettingsData[0].Values.Count);
+            Assert.That(result.BlockValue.ContentData[0].Values, Has.Count.EqualTo(1));
+            Assert.That(result.BlockValue.SettingsData[0].Values, Has.Count.EqualTo(1));
 
             // expose must be left exactly as deserialized - not regenerated by AmendExpose
-            Assert.AreEqual(1, result.BlockValue.Expose.Count);
-            Assert.AreEqual("en-US", result.BlockValue.Expose[0].Culture);
+            Assert.That(result.BlockValue.Expose, Has.Count.EqualTo(1));
+            Assert.That(result.BlockValue.Expose[0].Culture, Is.EqualTo("en-US"));
         });
     }
 
@@ -363,8 +363,8 @@ public class BlockEditorDataConverterTests
 
         Assert.Multiple(() =>
         {
-            Assert.IsEmpty(result.References);
-            Assert.IsEmpty(result.BlockValue.ContentData);
+            Assert.That(result.References, Is.Empty);
+            Assert.That(result.BlockValue.ContentData, Is.Empty);
         });
     }
 
@@ -375,8 +375,8 @@ public class BlockEditorDataConverterTests
 
         var success = converter.TryDeserialize(LegacyJsonWithContentAndSettings, out BlockEditorData<BlockListValue, BlockListLayoutItem>? result);
 
-        Assert.IsTrue(success);
-        Assert.IsNotNull(result);
+        Assert.That(success, Is.True);
+        Assert.That(result, Is.Not.Null);
     }
 
     [Test]
@@ -386,7 +386,7 @@ public class BlockEditorDataConverterTests
 
         var success = converter.TryDeserialize("this is not json", out BlockEditorData<BlockListValue, BlockListLayoutItem>? result);
 
-        Assert.IsFalse(success);
-        Assert.IsNull(result);
+        Assert.That(success, Is.False);
+        Assert.That(result, Is.Null);
     }
 }

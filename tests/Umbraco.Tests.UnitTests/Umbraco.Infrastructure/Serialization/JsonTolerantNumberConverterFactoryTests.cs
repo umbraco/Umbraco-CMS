@@ -21,11 +21,11 @@ public class JsonTolerantNumberConverterFactoryTests
         MultiUrlPickerConfiguration? configuration =
             _serializer.Deserialize<MultiUrlPickerConfiguration>(json);
 
-        Assert.IsNotNull(configuration);
+        Assert.That(configuration, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(0, configuration.MinNumber);
-            Assert.AreEqual(0, configuration.MaxNumber);
+            Assert.That(configuration.MinNumber, Is.EqualTo(0));
+            Assert.That(configuration.MaxNumber, Is.EqualTo(0));
         });
     }
 
@@ -37,11 +37,11 @@ public class JsonTolerantNumberConverterFactoryTests
         MultiNodePickerConfiguration? configuration =
             _serializer.Deserialize<MultiNodePickerConfiguration>(json);
 
-        Assert.IsNotNull(configuration);
+        Assert.That(configuration, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(0, configuration.MinNumber);
-            Assert.AreEqual(0, configuration.MaxNumber);
+            Assert.That(configuration.MinNumber, Is.EqualTo(0));
+            Assert.That(configuration.MaxNumber, Is.EqualTo(0));
         });
     }
 
@@ -52,12 +52,12 @@ public class JsonTolerantNumberConverterFactoryTests
 
         SliderConfiguration? configuration = _serializer.Deserialize<SliderConfiguration>(json);
 
-        Assert.IsNotNull(configuration);
+        Assert.That(configuration, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(0m, configuration.MinimumValue);
-            Assert.AreEqual(0m, configuration.MaximumValue);
-            Assert.AreEqual(0m, configuration.Step);
+            Assert.That(configuration.MinimumValue, Is.EqualTo(0m));
+            Assert.That(configuration.MaximumValue, Is.EqualTo(0m));
+            Assert.That(configuration.Step, Is.EqualTo(0m));
         });
     }
 
@@ -68,8 +68,8 @@ public class JsonTolerantNumberConverterFactoryTests
 
         TextAreaConfiguration? configuration = _serializer.Deserialize<TextAreaConfiguration>(json);
 
-        Assert.IsNotNull(configuration);
-        Assert.AreEqual(0, configuration.MaxChars);
+        Assert.That(configuration, Is.Not.Null);
+        Assert.That(configuration.MaxChars, Is.EqualTo(0));
     }
 
     [TestCase("\"5\"", 5)]
@@ -81,11 +81,11 @@ public class JsonTolerantNumberConverterFactoryTests
         MultiUrlPickerConfiguration? configuration =
             _serializer.Deserialize<MultiUrlPickerConfiguration>(json);
 
-        Assert.IsNotNull(configuration);
+        Assert.That(configuration, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(expected, configuration.MinNumber);
-            Assert.AreEqual(10, configuration.MaxNumber);
+            Assert.That(configuration.MinNumber, Is.EqualTo(expected));
+            Assert.That(configuration.MaxNumber, Is.EqualTo(10));
         });
     }
 
@@ -99,11 +99,11 @@ public class JsonTolerantNumberConverterFactoryTests
         MultiUrlPickerConfiguration? configuration =
             _serializer.Deserialize<MultiUrlPickerConfiguration>(json);
 
-        Assert.IsNotNull(configuration);
+        Assert.That(configuration, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(0, configuration.MinNumber);
-            Assert.AreEqual(10, configuration.MaxNumber);
+            Assert.That(configuration.MinNumber, Is.EqualTo(0));
+            Assert.That(configuration.MaxNumber, Is.EqualTo(10));
         });
     }
 
@@ -115,8 +115,8 @@ public class JsonTolerantNumberConverterFactoryTests
 
         SliderConfiguration? configuration = _serializer.Deserialize<SliderConfiguration>(json);
 
-        Assert.IsNotNull(configuration);
-        Assert.AreEqual(0.5m, configuration.Step);
+        Assert.That(configuration, Is.Not.Null);
+        Assert.That(configuration.Step, Is.EqualTo(0.5m));
     }
 
     [Test]
@@ -128,8 +128,8 @@ public class JsonTolerantNumberConverterFactoryTests
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(serialized.Contains("\"minNumber\":2"), serialized);
-            Assert.IsTrue(serialized.Contains("\"maxNumber\":5"), serialized);
+            Assert.That(serialized, Does.Contain("\"minNumber\":2"), serialized);
+            Assert.That(serialized, Does.Contain("\"maxNumber\":5"), serialized);
         });
     }
 }

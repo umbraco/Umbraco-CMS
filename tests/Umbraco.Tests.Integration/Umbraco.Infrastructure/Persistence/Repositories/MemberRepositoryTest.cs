@@ -215,7 +215,7 @@ internal sealed class MemberRepositoryTest : UmbracoIntegrationTest
 
                 foreach (var p in memberType.CompositionPropertyTypes.Where(x => aliases.Contains(x.Alias)))
                 {
-                    Assert.AreEqual(grp.Id, p.PropertyGroupId.Value);
+                    Assert.That(p.PropertyGroupId.Value, Is.EqualTo(grp.Id));
                 }
 
             }

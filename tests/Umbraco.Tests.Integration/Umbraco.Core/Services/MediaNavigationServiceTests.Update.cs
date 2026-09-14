@@ -39,15 +39,15 @@ internal sealed partial class MediaNavigationServiceTests
         Assert.Multiple(() =>
         {
             // Verify that the item is still present in the navigation structure
-            Assert.IsTrue(nodeExists);
-            Assert.AreEqual(nodeToUpdate, updatedItemKey);
+            Assert.That(nodeExists, Is.True);
+            Assert.That(updatedItemKey, Is.EqualTo(nodeToUpdate));
 
             // Verify that nothing's changed
-            Assert.AreEqual(initialParentKey, updatedParentKey);
-            CollectionAssert.AreEquivalent(initialChildrenKeys, childrenKeysAfterUpdate);
-            CollectionAssert.AreEquivalent(initialDescendantsKeys, descendantsKeysAfterUpdate);
-            CollectionAssert.AreEquivalent(initialAncestorsKeys, ancestorsKeysAfterUpdate);
-            CollectionAssert.AreEquivalent(initialSiblingsKeys, siblingsKeysAfterUpdate);
+            Assert.That(updatedParentKey, Is.EqualTo(initialParentKey));
+            Assert.That(childrenKeysAfterUpdate, Is.EquivalentTo(initialChildrenKeys));
+            Assert.That(descendantsKeysAfterUpdate, Is.EquivalentTo(initialDescendantsKeys));
+            Assert.That(ancestorsKeysAfterUpdate, Is.EquivalentTo(initialAncestorsKeys));
+            Assert.That(siblingsKeysAfterUpdate, Is.EquivalentTo(initialSiblingsKeys));
         });
     }
 }

@@ -37,6 +37,6 @@ public class CreateTemplateControllerProductionModeTests : ManagementApiTest<Cre
 
         var response = await Client.PostAsync(Url, JsonContent.Create(createModel));
 
-        Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
     }
 }

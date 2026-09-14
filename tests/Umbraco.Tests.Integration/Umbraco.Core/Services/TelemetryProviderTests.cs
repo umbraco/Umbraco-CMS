@@ -96,8 +96,8 @@ internal sealed class TelemetryProviderTests : UmbracoIntegrationTest
         IEnumerable<UsageInformation> result = DetailedTelemetryProviders.GetInformation();
 
         // Assert
-        Assert.AreEqual(1, result.First().Data);
-        Assert.AreEqual("DomainCount", result.First().Name);
+        Assert.That(result.First().Data, Is.EqualTo(1));
+        Assert.That(result.First().Name, Is.EqualTo("DomainCount"));
     }
 
     [Test]
@@ -119,7 +119,7 @@ internal sealed class TelemetryProviderTests : UmbracoIntegrationTest
         ContentService.SaveBlueprint(blueprint, null);
 
         var fromBlueprint = await ContentBlueprintEditingService.GetScaffoldedAsync(blueprint.Key);
-        Assert.IsNotNull(fromBlueprint);
+        Assert.That(fromBlueprint, Is.Not.Null);
         fromBlueprint.Name = "My test content";
         ContentService.Save(fromBlueprint);
 
@@ -130,7 +130,7 @@ internal sealed class TelemetryProviderTests : UmbracoIntegrationTest
 
         // Assert
         // TODO : Test multiple roots, with children + grandchildren
-        Assert.AreEqual(1, result.First().Data);
+        Assert.That(result.First().Data, Is.EqualTo(1));
     }
 
     [Test]
@@ -141,9 +141,9 @@ internal sealed class TelemetryProviderTests : UmbracoIntegrationTest
         var langThree = _languageBuilder.WithCultureInfo("sv-SE").Build();
 
         var langTwoResult = await LanguageService.CreateAsync(langTwo, Constants.Security.SuperUserKey);
-        Assert.IsTrue(langTwoResult.Success);
+        Assert.That(langTwoResult.Success, Is.True);
         var langThreeResult = await LanguageService.CreateAsync(langThree, Constants.Security.SuperUserKey);
-        Assert.IsTrue(langThreeResult.Success);
+        Assert.That(langThreeResult.Success, Is.True);
 
         IEnumerable<UsageInformation> result = null;
 
@@ -151,7 +151,7 @@ internal sealed class TelemetryProviderTests : UmbracoIntegrationTest
         result = LanguagesTelemetryProvider.GetInformation();
 
         // Assert
-        Assert.AreEqual(3, result.First().Data);
+        Assert.That(result.First().Data, Is.EqualTo(3));
     }
 
     [Test]
@@ -171,7 +171,7 @@ internal sealed class TelemetryProviderTests : UmbracoIntegrationTest
 
         var result = MediaTelemetryProvider.GetInformation()
             .FirstOrDefault(x => x.Name == Constants.Telemetry.MediaCount);
-        Assert.AreEqual(createdMediaCount, result.Data);
+        Assert.That(result.Data, Is.EqualTo(createdMediaCount));
     }
 
     [Test]
@@ -187,7 +187,7 @@ internal sealed class TelemetryProviderTests : UmbracoIntegrationTest
 
         var result = MediaTelemetryProvider.GetInformation()
             .FirstOrDefault(x => x.Name == Constants.Telemetry.MediaCount);
-        Assert.AreEqual(createdMediaCount, result.Data);
+        Assert.That(result.Data, Is.EqualTo(createdMediaCount));
     }
 
     [Test]
@@ -207,7 +207,7 @@ internal sealed class TelemetryProviderTests : UmbracoIntegrationTest
         var properties = PropertyEditorTelemetryProvider.GetInformation()
             .FirstOrDefault(x => x.Name == Constants.Telemetry.Properties);
         var result = properties.Data as IEnumerable<string>;
-        Assert.AreEqual(1, result?.Count());
+        Assert.That(result?.Count(), Is.EqualTo(1));
     }
 
     [Test]
@@ -225,7 +225,7 @@ internal sealed class TelemetryProviderTests : UmbracoIntegrationTest
         var properties = PropertyEditorTelemetryProvider.GetInformation()
             .FirstOrDefault(x => x.Name == Constants.Telemetry.Properties);
         var result = properties.Data as IEnumerable<string>;
-        Assert.AreEqual(2, result?.Count());
+        Assert.That(result?.Count(), Is.EqualTo(2));
     }
 
     [Test]
@@ -234,7 +234,7 @@ internal sealed class TelemetryProviderTests : UmbracoIntegrationTest
         var result = UserTelemetryProvider.GetInformation()
             .FirstOrDefault(x => x.Name == Constants.Telemetry.UserCount);
 
-        Assert.AreEqual(1, result.Data);
+        Assert.That(result.Data, Is.EqualTo(1));
     }
 
     [Test]
@@ -247,7 +247,7 @@ internal sealed class TelemetryProviderTests : UmbracoIntegrationTest
         var result = UserTelemetryProvider.GetInformation()
             .FirstOrDefault(x => x.Name == Constants.Telemetry.UserCount);
 
-        Assert.AreEqual(2, result.Data);
+        Assert.That(result.Data, Is.EqualTo(2));
     }
 
     [Test]
@@ -260,7 +260,7 @@ internal sealed class TelemetryProviderTests : UmbracoIntegrationTest
         var result = UserTelemetryProvider.GetInformation()
             .FirstOrDefault(x => x.Name == Constants.Telemetry.UserCount);
 
-        Assert.AreEqual(totalUsers + 1, result.Data);
+        Assert.That(result.Data, Is.EqualTo(totalUsers + 1));
     }
 
     [Test]
@@ -268,7 +268,7 @@ internal sealed class TelemetryProviderTests : UmbracoIntegrationTest
     {
         var result = UserTelemetryProvider.GetInformation()
             .FirstOrDefault(x => x.Name == Constants.Telemetry.UserGroupCount);
-        Assert.AreEqual(5, result.Data);
+        Assert.That(result.Data, Is.EqualTo(5));
     }
 
     [Test]
@@ -280,7 +280,7 @@ internal sealed class TelemetryProviderTests : UmbracoIntegrationTest
         var result = UserTelemetryProvider.GetInformation()
             .FirstOrDefault(x => x.Name == Constants.Telemetry.UserGroupCount);
 
-        Assert.AreEqual(6, result.Data);
+        Assert.That(result.Data, Is.EqualTo(6));
     }
 
     [Test]
@@ -296,7 +296,7 @@ internal sealed class TelemetryProviderTests : UmbracoIntegrationTest
         var result = UserTelemetryProvider.GetInformation()
             .FirstOrDefault(x => x.Name == Constants.Telemetry.UserGroupCount);
 
-        Assert.AreEqual(105, result.Data);
+        Assert.That(result.Data, Is.EqualTo(105));
     }
 
     private User BuildUser(int count) =>

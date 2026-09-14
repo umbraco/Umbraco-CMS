@@ -17,24 +17,24 @@ internal sealed partial class PublishStatusServiceTests
     {
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(PublishStatusQueryService.IsPublished(Textpage.Key, DefaultCulture));
-            Assert.IsFalse(PublishStatusQueryService.IsPublished(Subpage.Key, DefaultCulture));
-            Assert.IsFalse(PublishStatusQueryService.IsPublished(Subpage2.Key, DefaultCulture));
-            Assert.IsFalse(PublishStatusQueryService.IsPublished(Subpage3.Key, DefaultCulture));
+            Assert.That(PublishStatusQueryService.IsPublished(Textpage.Key, DefaultCulture), Is.False);
+            Assert.That(PublishStatusQueryService.IsPublished(Subpage.Key, DefaultCulture), Is.False);
+            Assert.That(PublishStatusQueryService.IsPublished(Subpage2.Key, DefaultCulture), Is.False);
+            Assert.That(PublishStatusQueryService.IsPublished(Subpage3.Key, DefaultCulture), Is.False);
 
-            Assert.IsFalse(PublishStatusQueryService.IsPublished(Trashed.Key, DefaultCulture));
+            Assert.That(PublishStatusQueryService.IsPublished(Trashed.Key, DefaultCulture), Is.False);
 
-            Assert.IsFalse(PublishStatusQueryService.IsPublished(Textpage.Key, UnusedCulture));
-            Assert.IsFalse(PublishStatusQueryService.IsPublished(Subpage.Key, UnusedCulture));
-            Assert.IsFalse(PublishStatusQueryService.IsPublished(Subpage2.Key, UnusedCulture));
-            Assert.IsFalse(PublishStatusQueryService.IsPublished(Subpage3.Key, UnusedCulture));
+            Assert.That(PublishStatusQueryService.IsPublished(Textpage.Key, UnusedCulture), Is.False);
+            Assert.That(PublishStatusQueryService.IsPublished(Subpage.Key, UnusedCulture), Is.False);
+            Assert.That(PublishStatusQueryService.IsPublished(Subpage2.Key, UnusedCulture), Is.False);
+            Assert.That(PublishStatusQueryService.IsPublished(Subpage3.Key, UnusedCulture), Is.False);
 
-            Assert.IsFalse(PublishStatusQueryService.IsPublished(Trashed.Key, UnusedCulture));
+            Assert.That(PublishStatusQueryService.IsPublished(Trashed.Key, UnusedCulture), Is.False);
 
-            Assert.IsFalse(PublishStatusQueryService.IsPublishedInAnyCulture(Textpage.Key));
-            Assert.IsFalse(PublishStatusQueryService.IsPublishedInAnyCulture(Subpage.Key));
-            Assert.IsFalse(PublishStatusQueryService.IsPublishedInAnyCulture(Subpage2.Key));
-            Assert.IsFalse(PublishStatusQueryService.IsPublishedInAnyCulture(Subpage3.Key));
+            Assert.That(PublishStatusQueryService.IsPublishedInAnyCulture(Textpage.Key), Is.False);
+            Assert.That(PublishStatusQueryService.IsPublishedInAnyCulture(Subpage.Key), Is.False);
+            Assert.That(PublishStatusQueryService.IsPublishedInAnyCulture(Subpage2.Key), Is.False);
+            Assert.That(PublishStatusQueryService.IsPublishedInAnyCulture(Subpage3.Key), Is.False);
 
         });
     }
@@ -53,19 +53,19 @@ internal sealed partial class PublishStatusServiceTests
         var publishResult = ContentService.Unpublish(subPage2FromDB);
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(publishResults.All(x => x.Result == PublishResultType.SuccessPublish));
-            Assert.IsTrue(publishResult.Success);
-            Assert.IsTrue(PublishStatusQueryService.IsPublished(Textpage.Key, DefaultCulture));
-            Assert.IsFalse(PublishStatusQueryService.IsPublished(Subpage2.Key, DefaultCulture));
-            Assert.IsTrue(PublishStatusQueryService.IsPublished(grandchild.Key, DefaultCulture)); // grandchild is still published, but it will not be routable
+            Assert.That(publishResults.All(x => x.Result == PublishResultType.SuccessPublish), Is.True);
+            Assert.That(publishResult.Success, Is.True);
+            Assert.That(PublishStatusQueryService.IsPublished(Textpage.Key, DefaultCulture), Is.True);
+            Assert.That(PublishStatusQueryService.IsPublished(Subpage2.Key, DefaultCulture), Is.False);
+            Assert.That(PublishStatusQueryService.IsPublished(grandchild.Key, DefaultCulture), Is.True); // grandchild is still published, but it will not be routable
 
-            Assert.IsFalse(PublishStatusQueryService.IsPublished(Textpage.Key, UnusedCulture));
-            Assert.IsFalse(PublishStatusQueryService.IsPublished(Subpage2.Key, UnusedCulture));
-            Assert.IsFalse(PublishStatusQueryService.IsPublished(grandchild.Key, UnusedCulture));
+            Assert.That(PublishStatusQueryService.IsPublished(Textpage.Key, UnusedCulture), Is.False);
+            Assert.That(PublishStatusQueryService.IsPublished(Subpage2.Key, UnusedCulture), Is.False);
+            Assert.That(PublishStatusQueryService.IsPublished(grandchild.Key, UnusedCulture), Is.False);
 
-            Assert.IsTrue(PublishStatusQueryService.IsPublishedInAnyCulture(Textpage.Key));
-            Assert.IsFalse(PublishStatusQueryService.IsPublishedInAnyCulture(Subpage2.Key));
-            Assert.IsTrue(PublishStatusQueryService.IsPublishedInAnyCulture(grandchild.Key));
+            Assert.That(PublishStatusQueryService.IsPublishedInAnyCulture(Textpage.Key), Is.True);
+            Assert.That(PublishStatusQueryService.IsPublishedInAnyCulture(Subpage2.Key), Is.False);
+            Assert.That(PublishStatusQueryService.IsPublishedInAnyCulture(grandchild.Key), Is.True);
         });
     }
 
@@ -75,28 +75,28 @@ internal sealed partial class PublishStatusServiceTests
         var publishResults = ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(publishResults.All(x => x.Result == PublishResultType.SuccessPublish));
-            Assert.IsTrue(PublishStatusQueryService.IsPublished(Textpage.Key, DefaultCulture));
-            Assert.IsTrue(PublishStatusQueryService.IsPublished(Subpage.Key, DefaultCulture));
-            Assert.IsTrue(PublishStatusQueryService.IsPublished(Subpage2.Key, DefaultCulture));
-            Assert.IsTrue(PublishStatusQueryService.IsPublished(Subpage3.Key, DefaultCulture));
+            Assert.That(publishResults.All(x => x.Result == PublishResultType.SuccessPublish), Is.True);
+            Assert.That(PublishStatusQueryService.IsPublished(Textpage.Key, DefaultCulture), Is.True);
+            Assert.That(PublishStatusQueryService.IsPublished(Subpage.Key, DefaultCulture), Is.True);
+            Assert.That(PublishStatusQueryService.IsPublished(Subpage2.Key, DefaultCulture), Is.True);
+            Assert.That(PublishStatusQueryService.IsPublished(Subpage3.Key, DefaultCulture), Is.True);
 
-            Assert.IsFalse(PublishStatusQueryService.IsPublished(Trashed.Key, DefaultCulture));
+            Assert.That(PublishStatusQueryService.IsPublished(Trashed.Key, DefaultCulture), Is.False);
 
-            Assert.IsFalse(PublishStatusQueryService.IsPublished(Textpage.Key, UnusedCulture));
-            Assert.IsFalse(PublishStatusQueryService.IsPublished(Subpage.Key, UnusedCulture));
-            Assert.IsFalse(PublishStatusQueryService.IsPublished(Subpage2.Key, UnusedCulture));
-            Assert.IsFalse(PublishStatusQueryService.IsPublished(Subpage3.Key, UnusedCulture));
+            Assert.That(PublishStatusQueryService.IsPublished(Textpage.Key, UnusedCulture), Is.False);
+            Assert.That(PublishStatusQueryService.IsPublished(Subpage.Key, UnusedCulture), Is.False);
+            Assert.That(PublishStatusQueryService.IsPublished(Subpage2.Key, UnusedCulture), Is.False);
+            Assert.That(PublishStatusQueryService.IsPublished(Subpage3.Key, UnusedCulture), Is.False);
 
-            Assert.IsFalse(PublishStatusQueryService.IsPublished(Trashed.Key, UnusedCulture));
+            Assert.That(PublishStatusQueryService.IsPublished(Trashed.Key, UnusedCulture), Is.False);
 
-            Assert.IsTrue(PublishStatusQueryService.IsPublishedInAnyCulture(Textpage.Key));
-            Assert.IsTrue(PublishStatusQueryService.IsPublishedInAnyCulture(Subpage.Key));
-            Assert.IsTrue(PublishStatusQueryService.IsPublishedInAnyCulture(Subpage2.Key));
-            Assert.IsTrue(PublishStatusQueryService.IsPublishedInAnyCulture(Subpage3.Key));
+            Assert.That(PublishStatusQueryService.IsPublishedInAnyCulture(Textpage.Key), Is.True);
+            Assert.That(PublishStatusQueryService.IsPublishedInAnyCulture(Subpage.Key), Is.True);
+            Assert.That(PublishStatusQueryService.IsPublishedInAnyCulture(Subpage2.Key), Is.True);
+            Assert.That(PublishStatusQueryService.IsPublishedInAnyCulture(Subpage3.Key), Is.True);
 
-            Assert.IsTrue(PublishStatusQueryService.HasPublishedAncestorPath(Textpage.Key));
-            Assert.IsTrue(PublishStatusQueryService.HasPublishedAncestorPath(Subpage.Key));
+            Assert.That(PublishStatusQueryService.HasPublishedAncestorPath(Textpage.Key), Is.True);
+            Assert.That(PublishStatusQueryService.HasPublishedAncestorPath(Subpage.Key), Is.True);
         });
     }
 
@@ -105,16 +105,16 @@ internal sealed partial class PublishStatusServiceTests
     {
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(PublishStatusQueryService.IsPublished(Textpage.Key, DefaultCulture));
-            Assert.IsFalse(PublishStatusQueryService.IsPublished(Subpage.Key, DefaultCulture));
+            Assert.That(PublishStatusQueryService.IsPublished(Textpage.Key, DefaultCulture), Is.False);
+            Assert.That(PublishStatusQueryService.IsPublished(Subpage.Key, DefaultCulture), Is.False);
         });
 
         ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(PublishStatusQueryService.IsPublished(Textpage.Key, DefaultCulture));
-            Assert.IsTrue(PublishStatusQueryService.IsPublished(Subpage.Key, DefaultCulture));
+            Assert.That(PublishStatusQueryService.IsPublished(Textpage.Key, DefaultCulture), Is.True);
+            Assert.That(PublishStatusQueryService.IsPublished(Subpage.Key, DefaultCulture), Is.True);
         });
 
         ContentService.Unpublish(Textpage);
@@ -122,10 +122,10 @@ internal sealed partial class PublishStatusServiceTests
         // Unpublish the root item - the sub page will still be published but it won't have a published path.
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(PublishStatusQueryService.IsPublished(Textpage.Key, DefaultCulture));
-            Assert.IsTrue(PublishStatusQueryService.IsPublished(Subpage.Key, DefaultCulture));
+            Assert.That(PublishStatusQueryService.IsPublished(Textpage.Key, DefaultCulture), Is.False);
+            Assert.That(PublishStatusQueryService.IsPublished(Subpage.Key, DefaultCulture), Is.True);
 
-            Assert.IsFalse(PublishStatusQueryService.HasPublishedAncestorPath(Subpage.Key));
+            Assert.That(PublishStatusQueryService.HasPublishedAncestorPath(Subpage.Key), Is.False);
         });
     }
 
@@ -177,9 +177,9 @@ internal sealed partial class PublishStatusServiceTests
         ContentService.Unpublish(child, cultureToUnpublish);
 
         var publishedCulture = cultureToUnpublish is "en-US" ? "da-DK" : "en-US";
-        Assert.IsTrue(PublishStatusQueryService.HasPublishedAncestorPath(grandchild.Key, publishedCulture));
-        Assert.IsFalse(PublishStatusQueryService.HasPublishedAncestorPath(grandchild.Key, cultureToUnpublish));
-        Assert.IsTrue(PublishStatusQueryService.HasPublishedAncestorPath(grandchild.Key, Constants.System.InvariantCulture));
+        Assert.That(PublishStatusQueryService.HasPublishedAncestorPath(grandchild.Key, publishedCulture), Is.True);
+        Assert.That(PublishStatusQueryService.HasPublishedAncestorPath(grandchild.Key, cultureToUnpublish), Is.False);
+        Assert.That(PublishStatusQueryService.HasPublishedAncestorPath(grandchild.Key, Constants.System.InvariantCulture), Is.True);
     }
 
     [TestCase(true)]
@@ -243,16 +243,16 @@ internal sealed partial class PublishStatusServiceTests
 
         // refresh to get the latest state
         child = ContentService.GetById(child.Key)!;
-        Assert.IsFalse(child.Published);
-        Assert.IsEmpty(child.PublishedCultures);
-        Assert.IsEmpty(child.PublishCultureInfos!);
+        Assert.That(child.Published, Is.False);
+        Assert.That(child.PublishedCultures, Is.Empty);
+        Assert.That(child.PublishCultureInfos!, Is.Empty);
 
-        Assert.IsFalse(PublishStatusQueryService.IsDocumentPublished(child.Key, "en-US"));
-        Assert.IsFalse(PublishStatusQueryService.IsDocumentPublished(child.Key, "da-DK"));
-        Assert.IsFalse(PublishStatusQueryService.IsDocumentPublished(child.Key, Constants.System.InvariantCulture));
+        Assert.That(PublishStatusQueryService.IsDocumentPublished(child.Key, "en-US"), Is.False);
+        Assert.That(PublishStatusQueryService.IsDocumentPublished(child.Key, "da-DK"), Is.False);
+        Assert.That(PublishStatusQueryService.IsDocumentPublished(child.Key, Constants.System.InvariantCulture), Is.False);
 
-        Assert.IsFalse(PublishStatusQueryService.HasPublishedAncestorPath(grandchild.Key, "da-DK"));
-        Assert.IsFalse(PublishStatusQueryService.HasPublishedAncestorPath(grandchild.Key, "en-US"));
-        Assert.IsFalse(PublishStatusQueryService.HasPublishedAncestorPath(grandchild.Key, Constants.System.InvariantCulture));
+        Assert.That(PublishStatusQueryService.HasPublishedAncestorPath(grandchild.Key, "da-DK"), Is.False);
+        Assert.That(PublishStatusQueryService.HasPublishedAncestorPath(grandchild.Key, "en-US"), Is.False);
+        Assert.That(PublishStatusQueryService.HasPublishedAncestorPath(grandchild.Key, Constants.System.InvariantCulture), Is.False);
     }
 }

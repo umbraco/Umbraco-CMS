@@ -37,7 +37,7 @@ public class GetElementPermissionsCurrentUserControllerTests : ManagementApiUser
                 Variants = [new VariantModel { Name = "Test Element Instance" }],
             },
             Constants.Security.SuperUserKey);
-        Assert.IsTrue(response.Success, $"Failed to create element with status {response.Status}.");
+        Assert.That(response.Success, Is.True, $"Failed to create element with status {response.Status}.");
         _elementKey = response.Result.Content!.Key;
     }
 

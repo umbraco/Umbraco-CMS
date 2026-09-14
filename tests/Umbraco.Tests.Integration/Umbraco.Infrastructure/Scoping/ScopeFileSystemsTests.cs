@@ -48,7 +48,7 @@ internal sealed class ScopeFileSystemsTests : UmbracoIntegrationTest
         var physMediaFileSystem = new PhysicalFileSystem(IOHelper, HostingEnvironment, GetRequiredService<ILogger<PhysicalFileSystem>>(), rootPath, rootUrl);
         var mediaFileManager = MediaFileManager;
 
-        Assert.IsFalse(physMediaFileSystem.FileExists("f1.txt"));
+        Assert.That(physMediaFileSystem.FileExists("f1.txt"), Is.False);
 
         using (ScopeProvider.CreateScope(scopeFileSystems: true))
         {
@@ -57,16 +57,16 @@ internal sealed class ScopeFileSystemsTests : UmbracoIntegrationTest
                 MediaFileManager.FileSystem.AddFile("f1.txt", ms);
             }
 
-            Assert.IsTrue(mediaFileManager.FileSystem.FileExists("f1.txt"));
-            Assert.IsFalse(physMediaFileSystem.FileExists("f1.txt"));
+            Assert.That(mediaFileManager.FileSystem.FileExists("f1.txt"), Is.True);
+            Assert.That(physMediaFileSystem.FileExists("f1.txt"), Is.False);
 
-            Assert.IsTrue(mediaFileManager.FileSystem.FileExists("f1.txt"));
-            Assert.IsFalse(physMediaFileSystem.FileExists("f1.txt"));
+            Assert.That(mediaFileManager.FileSystem.FileExists("f1.txt"), Is.True);
+            Assert.That(physMediaFileSystem.FileExists("f1.txt"), Is.False);
         }
 
         // After scope is disposed ensure shadow wrapper didn't commit to physical
-        Assert.IsFalse(mediaFileManager.FileSystem.FileExists("f1.txt"));
-        Assert.IsFalse(physMediaFileSystem.FileExists("f1.txt"));
+        Assert.That(mediaFileManager.FileSystem.FileExists("f1.txt"), Is.False);
+        Assert.That(physMediaFileSystem.FileExists("f1.txt"), Is.False);
     }
 
     [Test]
@@ -77,7 +77,7 @@ internal sealed class ScopeFileSystemsTests : UmbracoIntegrationTest
         var physMediaFileSystem = new PhysicalFileSystem(IOHelper, HostingEnvironment, GetRequiredService<ILogger<PhysicalFileSystem>>(), rootPath, rootUrl);
         var mediaFileManager = MediaFileManager;
 
-        Assert.IsFalse(physMediaFileSystem.FileExists("f1.txt"));
+        Assert.That(physMediaFileSystem.FileExists("f1.txt"), Is.False);
 
         using (var scope = ScopeProvider.CreateScope(scopeFileSystems: true))
         {
@@ -86,18 +86,18 @@ internal sealed class ScopeFileSystemsTests : UmbracoIntegrationTest
                 mediaFileManager.FileSystem.AddFile("f1.txt", ms);
             }
 
-            Assert.IsTrue(mediaFileManager.FileSystem.FileExists("f1.txt"));
-            Assert.IsFalse(physMediaFileSystem.FileExists("f1.txt"));
+            Assert.That(mediaFileManager.FileSystem.FileExists("f1.txt"), Is.True);
+            Assert.That(physMediaFileSystem.FileExists("f1.txt"), Is.False);
 
             scope.Complete();
 
-            Assert.IsTrue(mediaFileManager.FileSystem.FileExists("f1.txt"));
-            Assert.IsFalse(physMediaFileSystem.FileExists("f1.txt"));
+            Assert.That(mediaFileManager.FileSystem.FileExists("f1.txt"), Is.True);
+            Assert.That(physMediaFileSystem.FileExists("f1.txt"), Is.False);
         }
 
         // After scope is disposed ensure shadow wrapper writes to physical file system
-        Assert.IsTrue(mediaFileManager.FileSystem.FileExists("f1.txt"));
-        Assert.IsTrue(physMediaFileSystem.FileExists("f1.txt"));
+        Assert.That(mediaFileManager.FileSystem.FileExists("f1.txt"), Is.True);
+        Assert.That(physMediaFileSystem.FileExists("f1.txt"), Is.True);
     }
 
     [Test]
@@ -117,29 +117,29 @@ internal sealed class ScopeFileSystemsTests : UmbracoIntegrationTest
                 mediaFileManager.FileSystem.AddFile("f1.txt", ms);
             }
 
-            Assert.IsTrue(mediaFileManager.FileSystem.FileExists("f1.txt"));
-            Assert.IsFalse(physMediaFileSystem.FileExists("f1.txt"));
+            Assert.That(mediaFileManager.FileSystem.FileExists("f1.txt"), Is.True);
+            Assert.That(physMediaFileSystem.FileExists("f1.txt"), Is.False);
 
             // execute on another disconnected thread (execution context will not flow)
             var t = taskHelper.ExecuteBackgroundTask(() =>
             {
-                Assert.IsFalse(mediaFileManager.FileSystem.FileExists("f1.txt"));
+                Assert.That(mediaFileManager.FileSystem.FileExists("f1.txt"), Is.False);
 
                 using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
                 {
                     mediaFileManager.FileSystem.AddFile("f2.txt", ms);
                 }
 
-                Assert.IsTrue(mediaFileManager.FileSystem.FileExists("f2.txt"));
-                Assert.IsTrue(physMediaFileSystem.FileExists("f2.txt"));
+                Assert.That(mediaFileManager.FileSystem.FileExists("f2.txt"), Is.True);
+                Assert.That(physMediaFileSystem.FileExists("f2.txt"), Is.True);
 
                 return Task.CompletedTask;
             });
 
             Task.WaitAll(t);
 
-            Assert.IsTrue(mediaFileManager.FileSystem.FileExists("f2.txt"));
-            Assert.IsTrue(physMediaFileSystem.FileExists("f2.txt"));
+            Assert.That(mediaFileManager.FileSystem.FileExists("f2.txt"), Is.True);
+            Assert.That(physMediaFileSystem.FileExists("f2.txt"), Is.True);
         }
     }
 
@@ -176,7 +176,7 @@ internal sealed class ScopeFileSystemsTests : UmbracoIntegrationTest
             Task.WaitAll(t);
         }
 
-        Assert.IsTrue(isThrown);
+        Assert.That(isThrown, Is.True);
     }
 
     [Test]
@@ -207,7 +207,7 @@ internal sealed class ScopeFileSystemsTests : UmbracoIntegrationTest
 
         var detached = scopeProvider.CreateDetachedScope(scopeFileSystems: true);
 
-        Assert.IsNull(scopeProvider.AmbientScope);
+        Assert.That(scopeProvider.AmbientScope, Is.Null);
 
         Assert.Throws<InvalidOperationException>(() =>
         {

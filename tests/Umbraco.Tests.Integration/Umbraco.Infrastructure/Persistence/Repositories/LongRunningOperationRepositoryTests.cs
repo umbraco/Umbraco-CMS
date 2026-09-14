@@ -23,7 +23,7 @@ public class LongRunningOperationRepositoryTests : UmbracoIntegrationTest
         await CreateTestData(repository);
 
         var result = await repository.GetAsync(Guid.NewGuid());
-        Assert.IsNull(result);
+        Assert.That(result, Is.Null);
     }
 
     [Test]
@@ -37,10 +37,10 @@ public class LongRunningOperationRepositoryTests : UmbracoIntegrationTest
         var testOperation = _operations[1];
         var result = await repository.GetAsync(testOperation.Operation.Id);
 
-        Assert.IsNotNull(result);
-        Assert.AreEqual(testOperation.Operation.Id, result.Id);
-        Assert.AreEqual(testOperation.Operation.Type, result.Type);
-        Assert.AreEqual(testOperation.Operation.Status, result.Status);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Id, Is.EqualTo(testOperation.Operation.Id));
+        Assert.That(result.Type, Is.EqualTo(testOperation.Operation.Type));
+        Assert.That(result.Status, Is.EqualTo(testOperation.Operation.Status));
     }
 
     [TestCase("Test", new LongRunningOperationStatus[] { }, 0, 100, 5, 5)]
@@ -64,9 +64,9 @@ public class LongRunningOperationRepositoryTests : UmbracoIntegrationTest
 
         var result = await repository.GetByTypeAsync(type, statuses, skip, take);
 
-        Assert.IsNotNull(result);
-        Assert.AreEqual(expectedCount, result.Items.Count(), "Count of returned items should match the expected count");
-        Assert.AreEqual(expectedTotal, result.Total, "Total count should match the expected total count");
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Items.Count(), Is.EqualTo(expectedCount), "Count of returned items should match the expected count");
+        Assert.That(result.Total, Is.EqualTo(expectedTotal), "Total count should match the expected total count");
     }
 
     [Test]
@@ -78,7 +78,7 @@ public class LongRunningOperationRepositoryTests : UmbracoIntegrationTest
         await CreateTestData(repository);
 
         var result = await repository.GetStatusAsync(Guid.NewGuid());
-        Assert.IsNull(result);
+        Assert.That(result, Is.Null);
     }
 
     [Test]
@@ -90,7 +90,7 @@ public class LongRunningOperationRepositoryTests : UmbracoIntegrationTest
         await CreateTestData(repository);
 
         var result = await repository.GetStatusAsync(_operations[0].Operation.Id);
-        Assert.AreEqual(_operations[0].Operation.Status, result);
+        Assert.That(result, Is.EqualTo(_operations[0].Operation.Status));
     }
 
     [Test]
@@ -110,10 +110,10 @@ public class LongRunningOperationRepositoryTests : UmbracoIntegrationTest
         await repository.CreateAsync(newOperation, DateTimeOffset.UtcNow.AddMinutes(5));
 
         var result = await repository.GetAsync(newOperation.Id);
-        Assert.IsNotNull(result);
-        Assert.AreEqual(newOperation.Id, result.Id);
-        Assert.AreEqual(newOperation.Type, result.Type);
-        Assert.AreEqual(newOperation.Status, result.Status);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Id, Is.EqualTo(newOperation.Id));
+        Assert.That(result.Type, Is.EqualTo(newOperation.Type));
+        Assert.That(result.Status, Is.EqualTo(newOperation.Status));
     }
 
     [Test]
@@ -145,8 +145,8 @@ public class LongRunningOperationRepositoryTests : UmbracoIntegrationTest
         await repository.UpdateStatusAsync(testOperation.Operation.Id, LongRunningOperationStatus.Failed, DateTimeOffset.UtcNow);
 
         var result = await repository.GetAsync(testOperation.Operation.Id);
-        Assert.IsNotNull(result);
-        Assert.AreEqual(LongRunningOperationStatus.Failed, result.Status);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Status, Is.EqualTo(LongRunningOperationStatus.Failed));
     }
 
     [Test]
@@ -162,9 +162,9 @@ public class LongRunningOperationRepositoryTests : UmbracoIntegrationTest
         await repository.SetResultAsync(testOperation.Operation.Id, opResult);
 
         var result = await repository.GetAsync<LongRunningOperationResult>(testOperation.Operation.Id);
-        Assert.IsNotNull(result);
-        Assert.IsNotNull(result.Result);
-        Assert.AreEqual(opResult.Result, result.Result.Result);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Result, Is.Not.Null);
+        Assert.That(result.Result.Result, Is.EqualTo(opResult.Result));
     }
 
     [Test]
@@ -179,13 +179,13 @@ public class LongRunningOperationRepositoryTests : UmbracoIntegrationTest
 
         // Check that the operation is present before cleaning
         var result = await repository.GetAsync(oldOperation.Operation.Id);
-        Assert.IsNotNull(result);
+        Assert.That(result, Is.Not.Null);
 
         await repository.CleanOperationsAsync(DateTimeOffset.UtcNow.AddMinutes(1));
 
         // Check that the operation is removed after cleaning
         result = await repository.GetAsync(oldOperation.Operation.Id);
-        Assert.IsNull(result);
+        Assert.That(result, Is.Null);
     }
 
     private LongRunningOperationRepository CreateRepository(IScopeProvider provider)

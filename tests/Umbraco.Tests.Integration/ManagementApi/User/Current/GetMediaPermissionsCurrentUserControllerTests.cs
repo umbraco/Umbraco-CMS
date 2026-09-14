@@ -23,12 +23,12 @@ public class GetMediaPermissionsCurrentUserControllerTests : ManagementApiUserGr
         var mediaTypeCreateAttempt = await MediaTypeEditingService.CreateAsync(
             MediaTypeEditingBuilder.CreateBasicMediaType(Guid.NewGuid().ToString(), Guid.NewGuid().ToString()),
             Constants.Security.SuperUserKey);
-        Assert.IsTrue(mediaTypeCreateAttempt.Success);
+        Assert.That(mediaTypeCreateAttempt.Success, Is.True);
 
         var response = await MediaEditingService.CreateAsync(
             MediaEditingBuilder.CreateBasicMedia(mediaTypeCreateAttempt.Result.Key, null),
             Constants.Security.SuperUserKey);
-        Assert.IsTrue(response.Success);
+        Assert.That(response.Success, Is.True);
         _mediaKey = response.Result.Content!.Key;
     }
 

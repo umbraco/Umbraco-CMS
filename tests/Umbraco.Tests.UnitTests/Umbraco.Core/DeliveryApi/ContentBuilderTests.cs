@@ -50,16 +50,16 @@ public class ContentBuilderTests : DeliveryApiTests
         var builder = new ApiContentBuilder(new ApiContentNameProvider(), routeBuilder, CreateOutputExpansionStrategyAccessor(), CreateVariationContextAccessor());
         var result = builder.Build(content.Object);
 
-        Assert.NotNull(result);
-        Assert.AreEqual("The page", result.Name);
-        Assert.AreEqual("thePageType", result.ContentType);
-        Assert.AreEqual("/url:url-segment/", result.Route.Path);
-        Assert.AreEqual(key, result.Id);
-        Assert.AreEqual(2, result.Properties.Count);
-        Assert.AreEqual("Delivery API value", result.Properties["deliveryApi"]);
-        Assert.AreEqual("Default value", result.Properties["default"]);
-        Assert.AreEqual(new DateTime(2023, 06, 01), result.CreateDate);
-        Assert.AreEqual(new DateTime(2023, 07, 12), result.UpdateDate);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Name, Is.EqualTo("The page"));
+        Assert.That(result.ContentType, Is.EqualTo("thePageType"));
+        Assert.That(result.Route.Path, Is.EqualTo("/url:url-segment/"));
+        Assert.That(result.Id, Is.EqualTo(key));
+        Assert.That(result.Properties, Has.Count.EqualTo(2));
+        Assert.That(result.Properties["deliveryApi"], Is.EqualTo("Delivery API value"));
+        Assert.That(result.Properties["default"], Is.EqualTo("Default value"));
+        Assert.That(result.CreateDate, Is.EqualTo(new DateTime(2023, 06, 01)));
+        Assert.That(result.UpdateDate, Is.EqualTo(new DateTime(2023, 07, 12)));
     }
 
     [TestCase("en-US", "2023-08-04")]
@@ -96,9 +96,9 @@ public class ContentBuilderTests : DeliveryApiTests
         var builder = new ApiContentBuilder(new ApiContentNameProvider(), routeBuilder.Object, CreateOutputExpansionStrategyAccessor(), variationContextAccessor);
         var result = builder.Build(content.Object);
 
-        Assert.NotNull(result);
-        Assert.AreEqual(new DateTime(2023, 07, 02), result.CreateDate);
-        Assert.AreEqual(DateTime.Parse(expectedUpdateDate), result.UpdateDate);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.CreateDate, Is.EqualTo(new DateTime(2023, 07, 02)));
+        Assert.That(result.UpdateDate, Is.EqualTo(DateTime.Parse(expectedUpdateDate)));
     }
 
     [Test]
@@ -122,8 +122,8 @@ public class ContentBuilderTests : DeliveryApiTests
         var builder = new ApiContentBuilder(customNameProvider.Object, routeBuilder.Object, CreateOutputExpansionStrategyAccessor(), CreateVariationContextAccessor());
         var result = builder.Build(content.Object);
 
-        Assert.NotNull(result);
-        Assert.AreEqual("Custom name for: The page", result.Name);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Name, Is.EqualTo("Custom name for: The page"));
     }
 
     [Test]
@@ -144,6 +144,6 @@ public class ContentBuilderTests : DeliveryApiTests
         var builder = new ApiContentBuilder(new ApiContentNameProvider(), routeBuilder.Object, CreateOutputExpansionStrategyAccessor(), CreateVariationContextAccessor());
         var result = builder.Build(content.Object);
 
-        Assert.Null(result);
+        Assert.That(result, Is.Null);
     }
 }

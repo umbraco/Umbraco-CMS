@@ -2,6 +2,7 @@ using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Persistence.SqlServer.Configuration;
 
@@ -17,7 +18,7 @@ public class ConfigureSqlServerConnectionStringTimeoutsTests
     {
         ConnectionStrings options = PostConfigure(new GlobalSettings());
 
-        Assert.AreEqual(ConnectionString, options.ConnectionString);
+        Assert.That(options.ConnectionString, Is.EqualTo(ConnectionString));
     }
 
     [Test]
@@ -28,7 +29,7 @@ public class ConfigureSqlServerConnectionStringTimeoutsTests
             DatabaseCommandTimeout = TimeSpan.FromMinutes(5),
         });
 
-        Assert.AreEqual(300, new SqlConnectionStringBuilder(options.ConnectionString).CommandTimeout);
+        Assert.That(new SqlConnectionStringBuilder(options.ConnectionString).CommandTimeout, Is.EqualTo(300));
     }
 
     [Test]
@@ -39,7 +40,7 @@ public class ConfigureSqlServerConnectionStringTimeoutsTests
             DatabaseConnectTimeout = TimeSpan.FromMinutes(1),
         });
 
-        Assert.AreEqual(60, new SqlConnectionStringBuilder(options.ConnectionString).ConnectTimeout);
+        Assert.That(new SqlConnectionStringBuilder(options.ConnectionString).ConnectTimeout, Is.EqualTo(60));
     }
 
     [Test]
@@ -55,8 +56,8 @@ public class ConfigureSqlServerConnectionStringTimeoutsTests
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(300, connectionStringBuilder.CommandTimeout);
-            Assert.AreEqual(10, connectionStringBuilder.ConnectTimeout);
+            Assert.That(connectionStringBuilder.CommandTimeout, Is.EqualTo(300));
+            Assert.That(connectionStringBuilder.ConnectTimeout, Is.EqualTo(10));
         });
     }
 
@@ -67,7 +68,7 @@ public class ConfigureSqlServerConnectionStringTimeoutsTests
             new GlobalSettings { DatabaseCommandTimeout = TimeSpan.FromMinutes(5) },
             "Server=.;Database=x;Command Timeout=30");
 
-        Assert.AreEqual(300, new SqlConnectionStringBuilder(options.ConnectionString).CommandTimeout);
+        Assert.That(new SqlConnectionStringBuilder(options.ConnectionString).CommandTimeout, Is.EqualTo(300));
     }
 
     [Test]
@@ -78,7 +79,7 @@ public class ConfigureSqlServerConnectionStringTimeoutsTests
             DatabaseCommandTimeout = TimeSpan.Zero,
         });
 
-        Assert.AreEqual(0, new SqlConnectionStringBuilder(options.ConnectionString).CommandTimeout);
+        Assert.That(new SqlConnectionStringBuilder(options.ConnectionString).CommandTimeout, Is.EqualTo(0));
     }
 
     [Test]
@@ -91,7 +92,7 @@ public class ConfigureSqlServerConnectionStringTimeoutsTests
             sqliteConnectionString,
             providerName: "Microsoft.Data.Sqlite");
 
-        Assert.AreEqual(sqliteConnectionString, options.ConnectionString);
+        Assert.That(options.ConnectionString, Is.EqualTo(sqliteConnectionString));
     }
 
     [Test]
@@ -101,7 +102,7 @@ public class ConfigureSqlServerConnectionStringTimeoutsTests
             new GlobalSettings { DatabaseCommandTimeout = TimeSpan.FromMinutes(5) },
             providerName: "microsoft.data.sqlclient");
 
-        Assert.AreEqual(300, new SqlConnectionStringBuilder(options.ConnectionString).CommandTimeout);
+        Assert.That(new SqlConnectionStringBuilder(options.ConnectionString).CommandTimeout, Is.EqualTo(300));
     }
 
     [Test]
@@ -122,9 +123,9 @@ public class ConfigureSqlServerConnectionStringTimeoutsTests
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(unparseableConnectionString, options.ConnectionString);
-            Assert.AreEqual(1, logger.LogEntries.Count);
-            Assert.AreEqual(LogLevel.Warning, logger.LogEntries[0].Level);
+            Assert.That(options.ConnectionString, Is.EqualTo(unparseableConnectionString));
+            Assert.That(logger.LogEntries, Has.Count.EqualTo(1));
+            Assert.That(logger.LogEntries[0].Level, Is.EqualTo(LogLevel.Warning));
         });
     }
 
@@ -147,9 +148,9 @@ public class ConfigureSqlServerConnectionStringTimeoutsTests
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(ConnectionString, options.ConnectionString);
-            Assert.AreEqual(1, logger.LogEntries.Count);
-            Assert.AreEqual(LogLevel.Warning, logger.LogEntries[0].Level);
+            Assert.That(options.ConnectionString, Is.EqualTo(ConnectionString));
+            Assert.That(logger.LogEntries, Has.Count.EqualTo(1));
+            Assert.That(logger.LogEntries[0].Level, Is.EqualTo(LogLevel.Warning));
         });
     }
 

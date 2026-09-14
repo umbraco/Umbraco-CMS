@@ -20,7 +20,7 @@ public class ContentSettingsExtensionsTests
             AllowedUploadedFileExtensions = new[] { "jpg", "png" }.ToHashSet(),
         };
 
-        Assert.IsTrue(contentSettings.IsFileAllowedForUpload(extension));
+        Assert.That(contentSettings.IsFileAllowedForUpload(extension), Is.True);
     }
 
     [TestCase("gif")]
@@ -33,7 +33,7 @@ public class ContentSettingsExtensionsTests
             AllowedUploadedFileExtensions = new[] { "jpg", "png" }.ToHashSet(),
         };
 
-        Assert.IsFalse(contentSettings.IsFileAllowedForUpload(extension));
+        Assert.That(contentSettings.IsFileAllowedForUpload(extension), Is.False);
     }
 
     [TestCase("jpg")]
@@ -46,7 +46,7 @@ public class ContentSettingsExtensionsTests
             DisallowedUploadedFileExtensions = new[] { "gif", "png" }.ToHashSet(),
         };
 
-        Assert.IsTrue(contentSettings.IsFileAllowedForUpload(extension));
+        Assert.That(contentSettings.IsFileAllowedForUpload(extension), Is.True);
     }
 
     [TestCase("gif")]
@@ -59,7 +59,7 @@ public class ContentSettingsExtensionsTests
             DisallowedUploadedFileExtensions = new[] { "gif", "png" }.ToHashSet(),
         };
 
-        Assert.IsFalse(contentSettings.IsFileAllowedForUpload(extension));
+        Assert.That(contentSettings.IsFileAllowedForUpload(extension), Is.False);
     }
 
     [Test]
@@ -71,7 +71,7 @@ public class ContentSettingsExtensionsTests
             DisallowedUploadedFileExtensions = new[] { "jpg", }.ToHashSet(),
         };
 
-        Assert.IsTrue(contentSettings.IsFileAllowedForUpload("jpg"));
+        Assert.That(contentSettings.IsFileAllowedForUpload("jpg"), Is.True);
     }
 
     [TestCase("png")]
@@ -80,14 +80,14 @@ public class ContentSettingsExtensionsTests
     [TestCase("PNG")]
     [TestCase(" png ")]
     public void IsAllowedImageFileType_Allows_Default_Image_Type(string extension)
-        => Assert.IsTrue(new ContentSettings().IsAllowedImageFileType(extension));
+        => Assert.That(new ContentSettings().IsAllowedImageFileType(extension), Is.True);
 
     [TestCase("exe")]
     [TestCase("")]
     [TestCase("if")] // "if" is a substring of "tiff" in the default image file types but not a valid extension itself.
     [TestCase(".png")] // The extension is expected without a leading period, so a dotted value is not a match.
     public void IsAllowedImageFileType_Rejects_Invalid_Extension(string extension)
-        => Assert.IsFalse(new ContentSettings().IsAllowedImageFileType(extension));
+        => Assert.That(new ContentSettings().IsAllowedImageFileType(extension), Is.False);
 
     [TestCase("heic")]
     [TestCase("png")]
@@ -98,7 +98,7 @@ public class ContentSettingsExtensionsTests
             Imaging = new ContentImagingSettings { ImageFileTypes = new HashSet<string> { "png", "heic" } },
         };
 
-        Assert.IsTrue(contentSettings.IsAllowedImageFileType(extension));
+        Assert.That(contentSettings.IsAllowedImageFileType(extension), Is.True);
     }
 
     [TestCase("jpg")]
@@ -110,7 +110,7 @@ public class ContentSettingsExtensionsTests
             Imaging = new ContentImagingSettings { ImageFileTypes = new HashSet<string> { "png", "heic" } },
         };
 
-        Assert.IsFalse(contentSettings.IsAllowedImageFileType(extension));
+        Assert.That(contentSettings.IsAllowedImageFileType(extension), Is.False);
     }
 
     [TestCase("png")]
@@ -122,6 +122,6 @@ public class ContentSettingsExtensionsTests
             DisallowedUploadedFileExtensions = new HashSet<string> { "png" },
         };
 
-        Assert.IsFalse(contentSettings.IsAllowedImageFileType(extension));
+        Assert.That(contentSettings.IsAllowedImageFileType(extension), Is.False);
     }
 }

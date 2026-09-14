@@ -25,7 +25,7 @@ public partial class UmbracoViewPageTests
         var viewData = GetViewDataDictionary<ContentModel>(model);
         view.ViewData = viewData;
 
-        Assert.AreSame(model, view.Model);
+        Assert.That(view.Model, Is.SameAs(model));
     }
 
     [Test]
@@ -37,7 +37,7 @@ public partial class UmbracoViewPageTests
 
         view.ViewData = viewData;
 
-        Assert.IsInstanceOf<ContentType1>(view.Model);
+        Assert.That(view.Model, Is.InstanceOf<ContentType1>());
     }
 
     [Test]
@@ -49,7 +49,7 @@ public partial class UmbracoViewPageTests
         var viewData = GetViewDataDictionary<ContentType1>(content);
         view.ViewData = viewData;
 
-        Assert.IsInstanceOf<ContentType1>(view.Model);
+        Assert.That(view.Model, Is.InstanceOf<ContentType1>());
     }
 
     [Test]
@@ -73,8 +73,8 @@ public partial class UmbracoViewPageTests
 
         view.ViewData = viewData;
 
-        Assert.IsInstanceOf<ContentModel<ContentType1>>(view.Model);
-        Assert.IsInstanceOf<ContentType1>(view.Model.Content);
+        Assert.That(view.Model, Is.InstanceOf<ContentModel<ContentType1>>());
+        Assert.That(view.Model.Content, Is.InstanceOf<ContentType1>());
     }
 
     [Test]
@@ -86,8 +86,8 @@ public partial class UmbracoViewPageTests
         var viewData = GetViewDataDictionary<ContentModel<ContentType1>>(model);
         view.ViewData = viewData;
 
-        Assert.IsInstanceOf<ContentModel<ContentType1>>(view.Model);
-        Assert.IsInstanceOf<ContentType2>(view.Model.Content);
+        Assert.That(view.Model, Is.InstanceOf<ContentModel<ContentType1>>());
+        Assert.That(view.Model.Content, Is.InstanceOf<ContentType2>());
     }
 
     [Test]
@@ -111,7 +111,7 @@ public partial class UmbracoViewPageTests
 
         view.ViewData = viewData;
 
-        Assert.AreSame(model, view.Model);
+        Assert.That(view.Model, Is.SameAs(model));
     }
 
     [Test]
@@ -124,7 +124,7 @@ public partial class UmbracoViewPageTests
 
         view.SetViewData(viewData);
 
-        Assert.IsInstanceOf<ContentType1>(view.Model);
+        Assert.That(view.Model, Is.InstanceOf<ContentType1>());
     }
 
     [Test]
@@ -138,7 +138,7 @@ public partial class UmbracoViewPageTests
 
         view.SetViewData(viewData);
 
-        Assert.IsInstanceOf<ContentType1>(view.Model);
+        Assert.That(view.Model, Is.InstanceOf<ContentType1>());
     }
 
     [Test]
@@ -162,8 +162,8 @@ public partial class UmbracoViewPageTests
 
         view.ViewData = viewData;
 
-        Assert.IsInstanceOf<ContentModel<ContentType1>>(view.Model);
-        Assert.IsInstanceOf<ContentType1>(view.Model.Content);
+        Assert.That(view.Model, Is.InstanceOf<ContentModel<ContentType1>>());
+        Assert.That(view.Model.Content, Is.InstanceOf<ContentType1>());
     }
 
     [Test]
@@ -176,8 +176,8 @@ public partial class UmbracoViewPageTests
 
         view.SetViewData(viewData);
 
-        Assert.IsInstanceOf<ContentModel<ContentType1>>(view.Model);
-        Assert.IsInstanceOf<ContentType2>(view.Model.Content);
+        Assert.That(view.Model, Is.InstanceOf<ContentModel<ContentType1>>());
+        Assert.That(view.Model.Content, Is.InstanceOf<ContentType2>());
     }
 
     [Test]
@@ -201,7 +201,7 @@ public partial class UmbracoViewPageTests
 
         view.SetViewData(viewData);
 
-        Assert.IsInstanceOf<ContentModel>(view.Model);
+        Assert.That(view.Model, Is.InstanceOf<ContentModel>());
     }
 
     [Test]
@@ -213,8 +213,8 @@ public partial class UmbracoViewPageTests
         var viewData = GetViewDataDictionary<ContentType1>(content);
         view.SetViewData(viewData);
 
-        Assert.IsInstanceOf<ContentModel<ContentType1>>(view.Model);
-        Assert.IsInstanceOf<ContentType1>(view.Model.Content);
+        Assert.That(view.Model, Is.InstanceOf<ContentModel<ContentType1>>());
+        Assert.That(view.Model.Content, Is.InstanceOf<ContentType1>());
     }
 
     [Test]
@@ -227,8 +227,8 @@ public partial class UmbracoViewPageTests
 
         view.SetViewData(viewData);
 
-        Assert.IsInstanceOf<ContentModel<ContentType1>>(view.Model);
-        Assert.IsInstanceOf<ContentType1>(view.Model.Content);
+        Assert.That(view.Model, Is.InstanceOf<ContentModel<ContentType1>>());
+        Assert.That(view.Model.Content, Is.InstanceOf<ContentType1>());
     }
 
     [Test]
@@ -250,7 +250,7 @@ public partial class UmbracoViewPageTests
 
         view.SetViewData(viewData);
 
-        Assert.IsInstanceOf<ContentType1>(view.Model);
+        Assert.That(view.Model, Is.InstanceOf<ContentType1>());
     }
 
     [Test]
@@ -272,7 +272,7 @@ public partial class UmbracoViewPageTests
 
         view.SetViewData(viewData);
 
-        Assert.IsInstanceOf<ContentType1>(view.Model);
+        Assert.That(view.Model, Is.InstanceOf<ContentType1>());
     }
 
     private static ViewDataDictionary<T> GetViewDataDictionary<T>(object model)

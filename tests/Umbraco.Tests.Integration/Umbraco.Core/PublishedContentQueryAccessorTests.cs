@@ -16,7 +16,7 @@ internal sealed class PublishedContentQueryAccessorTests : UmbracoTestServerTest
     public async Task PublishedContentQueryAccessor_WithRequestScope_WillProvideQuery()
     {
         var result = await Client.GetAsync("/demo-published-content-query-accessor");
-        Assert.AreEqual(HttpStatusCode.OK, result.StatusCode);
+        Assert.That(result.StatusCode, Is.EqualTo(HttpStatusCode.OK));
     }
 }
 

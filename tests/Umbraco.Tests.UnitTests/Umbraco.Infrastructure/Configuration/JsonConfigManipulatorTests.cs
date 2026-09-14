@@ -51,9 +51,9 @@ public class JsonConfigManipulatorTests
 
         Assert.Multiple(() =>
         {
-            Assert.IsNull(ReadConnectionString(_globalFilePath), "Connection string should not be written to the first JSON provider.");
-            Assert.AreEqual(ConnectionString, ReadConnectionString(_environmentFilePath), "Connection string should be written to the last JSON provider.");
-            Assert.AreEqual(ProviderName, ReadProviderName(_environmentFilePath));
+            Assert.That(ReadConnectionString(_globalFilePath), Is.Null, "Connection string should not be written to the first JSON provider.");
+            Assert.That(ReadConnectionString(_environmentFilePath), Is.EqualTo(ConnectionString), "Connection string should be written to the last JSON provider.");
+            Assert.That(ReadProviderName(_environmentFilePath), Is.EqualTo(ProviderName));
         });
     }
 
@@ -66,8 +66,8 @@ public class JsonConfigManipulatorTests
 
         await sut.SaveConnectionStringAsync(ConnectionString, ProviderName);
 
-        Assert.AreEqual(ConnectionString, ReadConnectionString(_globalFilePath));
-        Assert.AreEqual(ProviderName, ReadProviderName(_globalFilePath));
+        Assert.That(ReadConnectionString(_globalFilePath), Is.EqualTo(ConnectionString));
+        Assert.That(ReadProviderName(_globalFilePath), Is.EqualTo(ProviderName));
     }
 
     [Test]
@@ -91,9 +91,9 @@ public class JsonConfigManipulatorTests
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(ConnectionString, ReadConnectionString(_globalFilePath), "Connection string should remain in the earlier file.");
-            Assert.IsNull(ReadConnectionString(_environmentFilePath), "Connection string should be removed from the last file.");
-            Assert.IsNull(ReadProviderName(_environmentFilePath));
+            Assert.That(ReadConnectionString(_globalFilePath), Is.EqualTo(ConnectionString), "Connection string should remain in the earlier file.");
+            Assert.That(ReadConnectionString(_environmentFilePath), Is.Null, "Connection string should be removed from the last file.");
+            Assert.That(ReadProviderName(_environmentFilePath), Is.Null);
         });
     }
 
@@ -102,14 +102,15 @@ public class JsonConfigManipulatorTests
     public async Task SaveConnectionStringAsync_SkipsMissingSources(string strayFileName)
     {
         // Non-allowlisted JSON sources whose backing file is missing must be skipped, never created.
-        Assert.IsFalse(
+        Assert.That(
             JsonConfigManipulator.CreatableFileNames.Contains(strayFileName, StringComparer.OrdinalIgnoreCase),
+            Is.False,
             $"Precondition: this case exercises the skip path, so {strayFileName} must not be in JsonConfigManipulator.CreatableFileNames.");
 
         File.WriteAllText(_globalFilePath, "{}");
         File.WriteAllText(_environmentFilePath, "{}");
         var strayFilePath = Path.Combine(_tempPath, strayFileName);
-        Assert.IsFalse(File.Exists(strayFilePath), "Precondition: stray file must not already exist.");
+        Assert.That(File.Exists(strayFilePath), Is.False, "Precondition: stray file must not already exist.");
 
         IConfigurationRoot configuration = new ConfigurationBuilder()
             .SetBasePath(_tempPath)
@@ -123,10 +124,10 @@ public class JsonConfigManipulatorTests
 
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(File.Exists(strayFilePath), $"Connection string must not be written to a non-existent {strayFileName} (no new files should be created).");
-            Assert.IsNull(ReadConnectionString(_globalFilePath), "Connection string should not be written to the first JSON provider.");
-            Assert.AreEqual(ConnectionString, ReadConnectionString(_environmentFilePath), "Connection string should fall through to the last writable JSON provider.");
-            Assert.AreEqual(ProviderName, ReadProviderName(_environmentFilePath));
+            Assert.That(File.Exists(strayFilePath), Is.False, $"Connection string must not be written to a non-existent {strayFileName} (no new files should be created).");
+            Assert.That(ReadConnectionString(_globalFilePath), Is.Null, "Connection string should not be written to the first JSON provider.");
+            Assert.That(ReadConnectionString(_environmentFilePath), Is.EqualTo(ConnectionString), "Connection string should fall through to the last writable JSON provider.");
+            Assert.That(ReadProviderName(_environmentFilePath), Is.EqualTo(ProviderName));
         });
     }
 
@@ -138,7 +139,7 @@ public class JsonConfigManipulatorTests
         File.WriteAllText(_globalFilePath, "{}");
         File.WriteAllText(_environmentFilePath, "{}");
         var creatableFilePath = Path.Combine(_tempPath, creatableFileName);
-        Assert.IsFalse(File.Exists(creatableFilePath), $"Precondition: {creatableFileName} must not exist before the install runs.");
+        Assert.That(File.Exists(creatableFilePath), Is.False, $"Precondition: {creatableFileName} must not exist before the install runs.");
 
         IConfigurationRoot configuration = new ConfigurationBuilder()
             .SetBasePath(_tempPath)
@@ -152,12 +153,12 @@ public class JsonConfigManipulatorTests
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(File.Exists(creatableFilePath), $"{creatableFileName} should be created on first write because it's allowlisted.");
-            Assert.IsNull(ReadConnectionString(_globalFilePath), "Connection string should not be written to the first JSON provider.");
-            Assert.IsNull(ReadConnectionString(_environmentFilePath), $"Connection string should not fall through to {EnvironmentFileName} when the allowlisted source accepts the write.");
-            Assert.AreEqual(ConnectionString, ReadConnectionString(creatableFilePath));
-            Assert.AreEqual(ProviderName, ReadProviderName(creatableFilePath));
-            Assert.AreEqual("./appsettings-schema.json", ReadJsonValue(creatableFilePath, "$schema"), $"Newly created {creatableFileName} should include the $schema reference.");
+            Assert.That(File.Exists(creatableFilePath), Is.True, $"{creatableFileName} should be created on first write because it's allowlisted.");
+            Assert.That(ReadConnectionString(_globalFilePath), Is.Null, "Connection string should not be written to the first JSON provider.");
+            Assert.That(ReadConnectionString(_environmentFilePath), Is.Null, $"Connection string should not fall through to {EnvironmentFileName} when the allowlisted source accepts the write.");
+            Assert.That(ReadConnectionString(creatableFilePath), Is.EqualTo(ConnectionString));
+            Assert.That(ReadProviderName(creatableFilePath), Is.EqualTo(ProviderName));
+            Assert.That(ReadJsonValue(creatableFilePath, "$schema"), Is.EqualTo("./appsettings-schema.json"), $"Newly created {creatableFileName} should include the $schema reference.");
         });
     }
 
@@ -174,8 +175,8 @@ public class JsonConfigManipulatorTests
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(id, ReadJsonValue(_globalFilePath, "Umbraco", "CMS", "Global", "Id"), "Global Id should be written to the first JSON provider (existing behaviour preserved).");
-            Assert.IsNull(ReadJsonValue(_environmentFilePath, "Umbraco", "CMS", "Global", "Id"));
+            Assert.That(ReadJsonValue(_globalFilePath, "Umbraco", "CMS", "Global", "Id"), Is.EqualTo(id), "Global Id should be written to the first JSON provider (existing behaviour preserved).");
+            Assert.That(ReadJsonValue(_environmentFilePath, "Umbraco", "CMS", "Global", "Id"), Is.Null);
         });
     }
 

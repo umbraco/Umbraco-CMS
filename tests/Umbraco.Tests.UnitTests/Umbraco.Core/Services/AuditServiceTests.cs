@@ -51,12 +51,12 @@ public class AuditServiceTests
         _auditRepositoryMock.Setup(x => x.Save(It.IsAny<IAuditItem>()))
             .Callback<IAuditItem>(item =>
             {
-                Assert.AreEqual(type, item.AuditType);
-                Assert.AreEqual(Constants.Security.SuperUserId, item.UserId);
-                Assert.AreEqual(objectId, item.Id);
-                Assert.AreEqual(entityType, item.EntityType);
-                Assert.AreEqual(comment, item.Comment);
-                Assert.AreEqual(parameters, item.Parameters);
+                Assert.That(item.AuditType, Is.EqualTo(type));
+                Assert.That(item.UserId, Is.EqualTo(Constants.Security.SuperUserId));
+                Assert.That(item.Id, Is.EqualTo(objectId));
+                Assert.That(item.EntityType, Is.EqualTo(entityType));
+                Assert.That(item.Comment, Is.EqualTo(comment));
+                Assert.That(item.Parameters, Is.EqualTo(parameters));
             });
 
         _userIdKeyResolverMock.Setup(x => x.TryGetAsync(Constants.Security.SuperUserKey))
@@ -70,8 +70,8 @@ public class AuditServiceTests
             comment,
             parameters);
         _auditRepositoryMock.Verify(x => x.Save(It.IsAny<IAuditItem>()), Times.Once);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(AuditLogOperationStatus.Success, result.Result);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result, Is.EqualTo(AuditLogOperationStatus.Success));
     }
 
     [Test]
@@ -86,8 +86,8 @@ public class AuditServiceTests
             "entityType",
             "comment",
             "parameters");
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(AuditLogOperationStatus.UserNotFound, result.Result);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Result, Is.EqualTo(AuditLogOperationStatus.UserNotFound));
     }
 
     [Test]
@@ -118,8 +118,8 @@ public class AuditServiceTests
         _scopeProviderMock.Setup(x => x.CreateQuery<IAuditItem>()).Returns(Mock.Of<IQuery<IAuditItem>>());
 
         var result = await _auditService.GetItemsAsync(10, 5);
-        Assert.AreEqual(totalRecords, result.Total);
-        Assert.AreEqual(2, result.Items.Count());
+        Assert.That(result.Total, Is.EqualTo(totalRecords));
+        Assert.That(result.Items.Count(), Is.EqualTo(2));
     }
 
     [Test]
@@ -138,8 +138,8 @@ public class AuditServiceTests
         _entityServiceMock.Setup(x => x.GetId(Guid.Empty, UmbracoObjectTypes.Document)).Returns(Attempt<int>.Fail());
 
         var result = await _auditService.GetItemsByKeyAsync(Guid.Empty, UmbracoObjectTypes.Document, 10, 10);
-        Assert.AreEqual(0, result.Total);
-        Assert.AreEqual(0, result.Items.Count());
+        Assert.That(result.Total, Is.EqualTo(0));
+        Assert.That(result.Items.Count(), Is.EqualTo(0));
     }
 
     [Test]
@@ -166,8 +166,8 @@ public class AuditServiceTests
             .Returns(Mock.Of<IQuery<IAuditItem>>());
 
         var result = await _auditService.GetItemsByKeyAsync(Guid.Empty, UmbracoObjectTypes.Document, 10, 5);
-        Assert.AreEqual(totalRecords, result.Total);
-        Assert.AreEqual(2, result.Items.Count());
+        Assert.That(result.Total, Is.EqualTo(totalRecords));
+        Assert.That(result.Items.Count(), Is.EqualTo(2));
     }
 
     [TestCase(Constants.System.Root)]
@@ -175,8 +175,8 @@ public class AuditServiceTests
     public async Task GetItemsByEntityAsync_Returns_No_Results_When_Id_Is_Root_Or_Lower(int userId)
     {
         var result = await _auditService.GetItemsByEntityAsync(userId, 10, 10);
-        Assert.AreEqual(0, result.Total);
-        Assert.AreEqual(0, result.Items.Count());
+        Assert.That(result.Total, Is.EqualTo(0));
+        Assert.That(result.Items.Count(), Is.EqualTo(0));
     }
 
     [Test]
@@ -203,8 +203,8 @@ public class AuditServiceTests
             .Returns(Mock.Of<IQuery<IAuditItem>>());
 
         var result = await _auditService.GetItemsByEntityAsync(1, 10, 5);
-        Assert.AreEqual(totalRecords, result.Total);
-        Assert.AreEqual(2, result.Items.Count());
+        Assert.That(result.Total, Is.EqualTo(totalRecords));
+        Assert.That(result.Items.Count(), Is.EqualTo(2));
     }
 
     [Test]

@@ -134,7 +134,7 @@ public class ContentIndexingNotificationTests : InvariantContentTestBase
 
         if (manipulatedByNotificationHandler)
         {
-            CollectionAssert.AreEqual(titleField.Value.Keywords, new[] { "NotificationHandlerKeyword", document.Id.ToString("D") });
+            Assert.That(new[] { "NotificationHandlerKeyword", document.Id.ToString("D") }, Is.EqualTo(titleField.Value.Keywords).AsCollection);
 
             IndexField? nameField = document.Fields.SingleOrDefault(field => field.FieldName == Constants.FieldNames.Name);
             Assert.That(nameField, Is.Not.Null);

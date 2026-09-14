@@ -26,7 +26,7 @@ public class ApiMediaUrlProviderTests : PropertyValueConverterTests
 
         var apiMediaUrlProvider = new ApiMediaUrlProvider(publishedUrlProvider.Object);
         var result = apiMediaUrlProvider.GetUrl(content.Object);
-        Assert.AreEqual(publishedUrl, result);
+        Assert.That(result, Is.EqualTo(publishedUrl));
     }
 
     [TestCase(PublishedItemType.Content)]

@@ -44,11 +44,11 @@ public class ContentModelBinderTests
         var found = binderProvider.GetBinder(contextMock.Object);
         if (expectNull)
         {
-            Assert.IsNull(found);
+            Assert.That(found, Is.Null);
         }
         else
         {
-            Assert.IsNotNull(found);
+            Assert.That(found, Is.Not.Null);
         }
     }
 
@@ -64,7 +64,7 @@ public class ContentModelBinderTests
         await _contentModelBinder.BindModelAsync(bindingContext);
 
         // Assert
-        Assert.False(bindingContext.Result.IsModelSet);
+        Assert.That(bindingContext.Result.IsModelSet, Is.False);
     }
 
     [Test]
@@ -78,7 +78,7 @@ public class ContentModelBinderTests
         await _contentModelBinder.BindModelAsync(bindingContext);
 
         // Assert
-        Assert.True(bindingContext.Result.IsModelSet);
+        Assert.That(bindingContext.Result.IsModelSet, Is.True);
     }
 
     [Test]
@@ -103,7 +103,7 @@ public class ContentModelBinderTests
         _contentModelBinder.BindModel(bindingContext, pc, typeof(ContentModel));
 
         // Assert
-        Assert.True(bindingContext.Result.IsModelSet);
+        Assert.That(bindingContext.Result.IsModelSet, Is.True);
     }
 
     [Test]
@@ -120,7 +120,7 @@ public class ContentModelBinderTests
             typeof(ContentModel<ContentType1>));
 
         // Assert
-        Assert.True(bindingContext.Result.IsModelSet);
+        Assert.That(bindingContext.Result.IsModelSet, Is.True);
     }
 
     [Test]
@@ -128,7 +128,7 @@ public class ContentModelBinderTests
     {
         var bindingContext = new DefaultModelBindingContext();
         _contentModelBinder.BindModel(bindingContext, null, typeof(ContentType1));
-        Assert.IsNull(bindingContext.Result.Model);
+        Assert.That(bindingContext.Result.Model, Is.Null);
     }
 
     [Test]
@@ -139,7 +139,7 @@ public class ContentModelBinderTests
 
         _contentModelBinder.BindModel(bindingContext, content, typeof(ContentType1));
 
-        Assert.AreSame(content, bindingContext.Result.Model);
+        Assert.That(bindingContext.Result.Model, Is.SameAs(content));
     }
 
     [Test]
@@ -151,7 +151,7 @@ public class ContentModelBinderTests
         var bindingContext = new DefaultModelBindingContext();
         _contentModelBinder.BindModel(bindingContext, renderModel, typeof(IPublishedContent));
 
-        Assert.AreSame(content, bindingContext.Result.Model);
+        Assert.That(bindingContext.Result.Model, Is.SameAs(content));
     }
 
     [Test]
@@ -163,7 +163,7 @@ public class ContentModelBinderTests
         _contentModelBinder.BindModel(bindingContext, content, typeof(ContentModel));
         var bound = (IContentModel)bindingContext.Result.Model;
 
-        Assert.AreSame(content, bound.Content);
+        Assert.That(bound.Content, Is.SameAs(content));
     }
 
     [Test]
@@ -175,7 +175,7 @@ public class ContentModelBinderTests
         _contentModelBinder.BindModel(bindingContext, content, typeof(ContentModel<ContentType1>));
         var bound = (IContentModel)bindingContext.Result.Model;
 
-        Assert.AreSame(content, bound.Content);
+        Assert.That(bound.Content, Is.SameAs(content));
     }
 
     [Test]
@@ -183,7 +183,7 @@ public class ContentModelBinderTests
     {
         var bindingContext = new DefaultModelBindingContext();
         _contentModelBinder.BindModel(bindingContext, null, typeof(ContentModel));
-        Assert.IsNull(bindingContext.Result.Model);
+        Assert.That(bindingContext.Result.Model, Is.Null);
     }
 
     [Test]

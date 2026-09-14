@@ -17,14 +17,14 @@ public partial class ElementPublishingServiceTests
             [new() { Culture = null }],
             Constants.Security.SuperUserKey);
 
-        Assert.IsTrue(publishAttempt.Success);
+        Assert.That(publishAttempt.Success, Is.True);
 
         element = await ElementEditingService.GetAsync(element.Key);
-        Assert.NotNull(element!.PublishDate);
+        Assert.That(element!.PublishDate, Is.Not.Null);
 
         var publishedElement = await ElementCacheService.GetByKeyAsync(element.Key, false);
-        Assert.NotNull(publishedElement);
-        Assert.IsTrue(publishedElement.IsPublished());
+        Assert.That(publishedElement, Is.Not.Null);
+        Assert.That(publishedElement.IsPublished(), Is.True);
     }
 
     [Test]
@@ -38,15 +38,15 @@ public partial class ElementPublishingServiceTests
             [new() { Culture = langEn.IsoCode }],
             Constants.Security.SuperUserKey);
 
-        Assert.IsTrue(publishAttempt.Success);
+        Assert.That(publishAttempt.Success, Is.True);
         element = await ElementEditingService.GetAsync(element.Key);
-        Assert.AreEqual(1, element!.PublishedCultures.Count());
+        Assert.That(element!.PublishedCultures.Count(), Is.EqualTo(1));
 
         var publishedElement = await ElementCacheService.GetByKeyAsync(element.Key, false);
-        Assert.NotNull(publishedElement);
-        Assert.IsTrue(publishedElement.IsPublished(langEn.IsoCode));
-        Assert.IsFalse(publishedElement.IsPublished(langDa.IsoCode));
-        Assert.IsFalse(publishedElement.IsPublished(langBe.IsoCode));
+        Assert.That(publishedElement, Is.Not.Null);
+        Assert.That(publishedElement.IsPublished(langEn.IsoCode), Is.True);
+        Assert.That(publishedElement.IsPublished(langDa.IsoCode), Is.False);
+        Assert.That(publishedElement.IsPublished(langBe.IsoCode), Is.False);
     }
 
     [Test]
@@ -63,15 +63,15 @@ public partial class ElementPublishingServiceTests
             ],
             Constants.Security.SuperUserKey);
 
-        Assert.IsTrue(publishAttempt.Success);
+        Assert.That(publishAttempt.Success, Is.True);
         element = await ElementEditingService.GetAsync(element.Key);
-        Assert.AreEqual(2, element!.PublishedCultures.Count());
+        Assert.That(element!.PublishedCultures.Count(), Is.EqualTo(2));
 
         var publishedElement = await ElementCacheService.GetByKeyAsync(element.Key, false);
-        Assert.NotNull(publishedElement);
-        Assert.IsTrue(publishedElement.IsPublished(langEn.IsoCode));
-        Assert.IsTrue(publishedElement.IsPublished(langDa.IsoCode));
-        Assert.IsFalse(publishedElement.IsPublished(langBe.IsoCode));
+        Assert.That(publishedElement, Is.Not.Null);
+        Assert.That(publishedElement.IsPublished(langEn.IsoCode), Is.True);
+        Assert.That(publishedElement.IsPublished(langDa.IsoCode), Is.True);
+        Assert.That(publishedElement.IsPublished(langBe.IsoCode), Is.False);
     }
 
     [Test]
@@ -89,15 +89,15 @@ public partial class ElementPublishingServiceTests
             ],
             Constants.Security.SuperUserKey);
 
-        Assert.IsTrue(publishAttempt.Success);
+        Assert.That(publishAttempt.Success, Is.True);
         element = await ElementEditingService.GetAsync(element.Key);
-        Assert.AreEqual(3, element!.PublishedCultures.Count());
+        Assert.That(element!.PublishedCultures.Count(), Is.EqualTo(3));
 
         var publishedElement = await ElementCacheService.GetByKeyAsync(element.Key, false);
-        Assert.NotNull(publishedElement);
-        Assert.IsTrue(publishedElement.IsPublished(langEn.IsoCode));
-        Assert.IsTrue(publishedElement.IsPublished(langDa.IsoCode));
-        Assert.IsTrue(publishedElement.IsPublished(langBe.IsoCode));
+        Assert.That(publishedElement, Is.Not.Null);
+        Assert.That(publishedElement.IsPublished(langEn.IsoCode), Is.True);
+        Assert.That(publishedElement.IsPublished(langDa.IsoCode), Is.True);
+        Assert.That(publishedElement.IsPublished(langBe.IsoCode), Is.True);
     }
 
     [Test]
@@ -115,8 +115,8 @@ public partial class ElementPublishingServiceTests
 
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(publishAttempt.Success);
-            Assert.AreEqual(ContentPublishingOperationStatus.InTrash, publishAttempt.Status);
+            Assert.That(publishAttempt.Success, Is.False);
+            Assert.That(publishAttempt.Status, Is.EqualTo(ContentPublishingOperationStatus.InTrash));
         });
     }
 

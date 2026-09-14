@@ -28,9 +28,9 @@ public class FilterMemberFilterControllerTests : MemberSensitiveDataTestBase<Fil
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(model.IsLockedOut);
-            Assert.AreEqual(ExpectedLastLockoutDate, model.LastLockoutDate?.UtcDateTime);
-            Assert.AreEqual(ExpectedLastLoginDate, model.LastLoginDate?.UtcDateTime);
+            Assert.That(model.IsLockedOut, Is.True);
+            Assert.That(model.LastLockoutDate?.UtcDateTime, Is.EqualTo(ExpectedLastLockoutDate));
+            Assert.That(model.LastLoginDate?.UtcDateTime, Is.EqualTo(ExpectedLastLoginDate));
         });
     }
 
@@ -52,7 +52,7 @@ public class FilterMemberFilterControllerTests : MemberSensitiveDataTestBase<Fil
         PagedViewModel<MemberResponseModel> collection =
             await GetAsync<PagedViewModel<MemberResponseModel>>(LockedOutFilterUrl);
 
-        Assert.IsNotNull(collection.Items.SingleOrDefault(x => x.Id == MemberKey));
+        Assert.That(collection.Items.SingleOrDefault(x => x.Id == MemberKey), Is.Not.Null);
     }
 
     [Test]
@@ -62,7 +62,7 @@ public class FilterMemberFilterControllerTests : MemberSensitiveDataTestBase<Fil
 
         HttpResponseMessage response = await Client.GetAsync(LockedOutFilterUrl);
 
-        Assert.AreEqual(HttpStatusCode.Forbidden, response.StatusCode, await response.Content.ReadAsStringAsync());
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Forbidden), await response.Content.ReadAsStringAsync());
     }
 
     [Test]
@@ -72,14 +72,14 @@ public class FilterMemberFilterControllerTests : MemberSensitiveDataTestBase<Fil
 
         HttpResponseMessage response = await Client.GetAsync(ApprovedFilterUrl);
 
-        Assert.AreEqual(HttpStatusCode.Forbidden, response.StatusCode, await response.Content.ReadAsStringAsync());
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Forbidden), await response.Content.ReadAsStringAsync());
     }
 
     private async Task<MemberResponseModel> GetMemberFromCollectionAsync(string url)
     {
         PagedViewModel<MemberResponseModel> collection = await GetAsync<PagedViewModel<MemberResponseModel>>(url);
         MemberResponseModel? model = collection.Items.SingleOrDefault(x => x.Id == MemberKey);
-        Assert.IsNotNull(model);
+        Assert.That(model, Is.Not.Null);
         return model!;
     }
 }

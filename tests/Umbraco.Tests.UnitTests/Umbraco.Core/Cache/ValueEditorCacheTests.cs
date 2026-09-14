@@ -24,8 +24,8 @@ public class ValueEditorCacheTests
 
         Assert.Multiple(() =>
         {
-            Assert.AreSame(firstEditor, secondEditor);
-            Assert.AreEqual(1, dataEditor.ValueEditorCount, "GetValueEditor invoked more than once.");
+            Assert.That(secondEditor, Is.SameAs(firstEditor));
+            Assert.That(dataEditor.ValueEditorCount, Is.EqualTo(1), "GetValueEditor invoked more than once.");
         });
     }
 
@@ -41,7 +41,7 @@ public class ValueEditorCacheTests
         var firstEditor = sut.GetValueEditor(dataEditor1, dataType);
         var secondEditor = sut.GetValueEditor(dataEditor2, dataType);
 
-        Assert.AreNotSame(firstEditor, secondEditor);
+        Assert.That(secondEditor, Is.Not.SameAs(firstEditor));
     }
 
     [Test]
@@ -55,7 +55,7 @@ public class ValueEditorCacheTests
         var firstEditor = sut.GetValueEditor(dataEditor, dataType1);
         var secondEditor = sut.GetValueEditor(dataEditor, dataType2);
 
-        Assert.AreNotSame(firstEditor, secondEditor);
+        Assert.That(secondEditor, Is.Not.SameAs(firstEditor));
     }
 
     [Test]
@@ -78,12 +78,12 @@ public class ValueEditorCacheTests
         sut.ClearCache(new[] { dataType1.Id });
 
         // New value editor objects should be created after it's cleared
-        Assert.AreNotSame(editor1DataType1, sut.GetValueEditor(dataEditor1, dataType1), "Value editor was not cleared from cache");
-        Assert.AreNotSame(editor2DataType1, sut.GetValueEditor(dataEditor2, dataType1), "Value editor was not cleared from cache");
+        Assert.That(sut.GetValueEditor(dataEditor1, dataType1), Is.Not.SameAs(editor1DataType1), "Value editor was not cleared from cache");
+        Assert.That(sut.GetValueEditor(dataEditor2, dataType1), Is.Not.SameAs(editor2DataType1), "Value editor was not cleared from cache");
 
         // But the value editors for data type 2 should be the same
-        Assert.AreSame(editor1Datatype2, sut.GetValueEditor(dataEditor1, dataType2), "Too many editors was cleared from cache");
-        Assert.AreSame(editor2Datatype2, sut.GetValueEditor(dataEditor2, dataType2), "Too many editors was cleared from cache");
+        Assert.That(sut.GetValueEditor(dataEditor1, dataType2), Is.SameAs(editor1Datatype2), "Too many editors was cleared from cache");
+        Assert.That(sut.GetValueEditor(dataEditor2, dataType2), Is.SameAs(editor2Datatype2), "Too many editors was cleared from cache");
     }
 
     private Mock<IDataType> CreateDataTypeMock(int id)

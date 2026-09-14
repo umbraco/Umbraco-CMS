@@ -66,11 +66,11 @@ internal sealed class EntityServiceGetAllPathsTests : UmbracoIntegrationTest
         Assert.DoesNotThrow(() =>
             paths = EntityRepository.GetAllPaths(objectTypeGuid, ids.ToArray()).ToArray());
 
-        Assert.IsNotNull(paths);
-        Assert.AreEqual(ids.Count, paths!.Length, "Should return a path for every requested ID.");
+        Assert.That(paths, Is.Not.Null);
+        Assert.That(paths!, Has.Length.EqualTo(ids.Count), "Should return a path for every requested ID.");
         foreach (var id in ids)
         {
-            Assert.IsTrue(paths.Any(p => p.Id == id), $"Missing path for ID {id}");
+            Assert.That(paths.Any(p => p.Id == id), Is.True, $"Missing path for ID {id}");
         }
 
         scope.Complete();
@@ -106,11 +106,11 @@ internal sealed class EntityServiceGetAllPathsTests : UmbracoIntegrationTest
         Assert.DoesNotThrow(() =>
             paths = EntityRepository.GetAllPaths(objectTypeGuid, keys.ToArray()).ToArray());
 
-        Assert.IsNotNull(paths);
-        Assert.AreEqual(keys.Count, paths!.Length, "Should return a path for every requested key.");
+        Assert.That(paths, Is.Not.Null);
+        Assert.That(paths!, Has.Length.EqualTo(keys.Count), "Should return a path for every requested key.");
         foreach (var key in keys)
         {
-            Assert.IsTrue(paths.Any(p => p.Key == key), $"Missing path for key {key}");
+            Assert.That(paths.Any(p => p.Key == key), Is.True, $"Missing path for key {key}");
         }
 
         scope.Complete();

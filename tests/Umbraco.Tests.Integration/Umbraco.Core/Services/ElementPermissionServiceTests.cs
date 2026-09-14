@@ -101,7 +101,7 @@ internal sealed class ElementPermissionServiceTests : UmbracoIntegrationTest
                 Variants = [new VariantModel { Name = "Test Element" }],
             },
             Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success, $"Failed to create element with status {result.Status}.");
+        Assert.That(result.Success, Is.True, $"Failed to create element with status {result.Status}.");
         return result.Result.Content!.Key;
     }
 
@@ -120,7 +120,7 @@ internal sealed class ElementPermissionServiceTests : UmbracoIntegrationTest
             .WithGranularPermissions(granular)
             .Build();
         var createGroupResult = await UserGroupService.CreateAsync(userGroup, Constants.Security.SuperUserKey);
-        Assert.IsTrue(createGroupResult.Success, $"Failed to create user group with status {createGroupResult.Status}.");
+        Assert.That(createGroupResult.Success, Is.True, $"Failed to create user group with status {createGroupResult.Status}.");
 
         var user = UserService.CreateUserWithIdentity(Guid.NewGuid().ToString(), $"{Guid.NewGuid()}@test.com");
         user.AddGroup(userGroup.ToReadOnlyGroup());

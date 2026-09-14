@@ -21,7 +21,7 @@ public class RecurringBackgroundJobHostedServiceRunnerTests
 
         bool result = sut.TriggerExecution<TestJobA>(NextExecutionStrategy.None);
 
-        Assert.IsTrue(result);
+        Assert.That(result, Is.True);
 
         await StopAsync(sut);
     }
@@ -34,7 +34,7 @@ public class RecurringBackgroundJobHostedServiceRunnerTests
 
         bool result = sut.TriggerExecution<TestJobB>(NextExecutionStrategy.None);
 
-        Assert.IsFalse(result);
+        Assert.That(result, Is.False);
 
         await StopAsync(sut);
     }
@@ -46,7 +46,7 @@ public class RecurringBackgroundJobHostedServiceRunnerTests
 
         bool result = sut.TriggerExecution<TestJobA>(NextExecutionStrategy.None);
 
-        Assert.IsFalse(result);
+        Assert.That(result, Is.False);
     }
 
     [Test]
@@ -57,7 +57,7 @@ public class RecurringBackgroundJobHostedServiceRunnerTests
 
         bool result = sut.TriggerExecution<TestJobA>(NextExecutionStrategy.Reset);
 
-        Assert.IsTrue(result);
+        Assert.That(result, Is.True);
 
         await StopAsync(sut);
     }
@@ -70,7 +70,7 @@ public class RecurringBackgroundJobHostedServiceRunnerTests
 
         bool result = sut.TriggerExecution<TestJobA>(TimeSpan.FromSeconds(10));
 
-        Assert.IsTrue(result);
+        Assert.That(result, Is.True);
 
         await StopAsync(sut);
     }
@@ -86,13 +86,13 @@ public class RecurringBackgroundJobHostedServiceRunnerTests
         await sut.StartAsync(CancellationToken.None);
 
         // Wait for first execution (no delay on TestJobA)
-        Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)), "First execution should complete");
-        Assert.AreEqual(1, executionCount, "Should have executed once initially");
+        Assert.That(await executed.WaitAsync(TimeSpan.FromSeconds(5)), Is.True, "First execution should complete");
+        Assert.That(executionCount, Is.EqualTo(1), "Should have executed once initially");
 
         // Trigger — period is 30s, so without trigger we wouldn't get another
         sut.TriggerExecution<TestJobA>(NextExecutionStrategy.None);
-        Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)), "Triggered execution should complete");
-        Assert.AreEqual(2, executionCount, "Should have executed again after trigger");
+        Assert.That(await executed.WaitAsync(TimeSpan.FromSeconds(5)), Is.True, "Triggered execution should complete");
+        Assert.That(executionCount, Is.EqualTo(2), "Should have executed again after trigger");
 
         await StopAsync(sut);
     }

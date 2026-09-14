@@ -25,9 +25,9 @@ public class HttpSessionIdEnricherTests
 
         enricher.Enrich(CreateLogEvent(), new PassthroughPropertyFactory());
 
-        Assert.AreEqual(
-            1,
+        Assert.That(
             resolver.SessionIdReadCount,
+            Is.EqualTo(1),
             "The session id must be resolved once; a nested log event during resolution must not re-resolve it.");
     }
 
@@ -39,8 +39,8 @@ public class HttpSessionIdEnricherTests
 
         enricher.Enrich(logEvent, new PassthroughPropertyFactory());
 
-        Assert.IsTrue(logEvent.Properties.TryGetValue(HttpSessionIdEnricher.HttpSessionIdPropertyName, out LogEventPropertyValue? value));
-        Assert.AreEqual("the-session-id", ((ScalarValue)value!).Value);
+        Assert.That(logEvent.Properties.TryGetValue(HttpSessionIdEnricher.HttpSessionIdPropertyName, out LogEventPropertyValue? value), Is.True);
+        Assert.That(((ScalarValue)value!).Value, Is.EqualTo("the-session-id"));
     }
 
     [Test]
@@ -51,7 +51,7 @@ public class HttpSessionIdEnricherTests
 
         enricher.Enrich(logEvent, new PassthroughPropertyFactory());
 
-        Assert.IsFalse(logEvent.Properties.ContainsKey(HttpSessionIdEnricher.HttpSessionIdPropertyName));
+        Assert.That(logEvent.Properties.ContainsKey(HttpSessionIdEnricher.HttpSessionIdPropertyName), Is.False);
     }
 
     private static LogEvent CreateLogEvent() =>

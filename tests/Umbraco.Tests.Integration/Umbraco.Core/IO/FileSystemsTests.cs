@@ -22,14 +22,14 @@ internal sealed class FileSystemsTests : UmbracoIntegrationTest
     [Test]
     public void Can_Get_MediaFileManager()
     {
-        Assert.NotNull(MediaFileManager);
+        Assert.That(MediaFileManager, Is.Not.Null);
     }
 
     [Test]
     public void MediaFileManager_Is_Singleton()
     {
         var fileManager2 = GetRequiredService<MediaFileManager>();
-        Assert.AreSame(MediaFileManager, fileManager2);
+        Assert.That(fileManager2, Is.SameAs(MediaFileManager));
     }
 
     [Test]
@@ -42,16 +42,16 @@ internal sealed class FileSystemsTests : UmbracoIntegrationTest
 
         // ~/media/1234/file.txt exists
         var physPath = HostingEnvironment.MapPathWebRoot(Path.Combine("media", virtualPath));
-        Assert.IsTrue(File.Exists(physPath));
+        Assert.That(File.Exists(physPath), Is.True);
 
         // ~/media/1234/file.txt is gone
         MediaFileManager.DeleteMediaFiles(new[] { virtualPath });
-        Assert.IsFalse(File.Exists(physPath));
+        Assert.That(File.Exists(physPath), Is.False);
 
         // ~/media exists
         physPath = Path.GetDirectoryName(physPath); // ~/media/folder
         physPath = Path.GetDirectoryName(physPath); // ~/media
-        Assert.IsTrue(Directory.Exists(physPath));
+        Assert.That(Directory.Exists(physPath), Is.True);
     }
 
     [Test]
@@ -60,12 +60,12 @@ internal sealed class FileSystemsTests : UmbracoIntegrationTest
         CreateMediaFile(MediaFileManager, HostingEnvironment, out string virtualPath, out string physicalPath);
         var directoryName = Path.GetDirectoryName(physicalPath);
 
-        Assert.IsTrue(File.Exists(physicalPath));
-        Assert.IsTrue(Directory.Exists(directoryName));
+        Assert.That(File.Exists(physicalPath), Is.True);
+        Assert.That(Directory.Exists(directoryName), Is.True);
 
         MediaFileManager.DeleteMediaFiles([virtualPath]);
-        Assert.IsFalse(File.Exists(physicalPath));
-        Assert.IsFalse(Directory.Exists(directoryName));
+        Assert.That(File.Exists(physicalPath), Is.False);
+        Assert.That(Directory.Exists(directoryName), Is.False);
     }
 
     [Test]
@@ -80,28 +80,28 @@ internal sealed class FileSystemsTests : UmbracoIntegrationTest
 
         var directoryName = Path.GetDirectoryName(physicalPath);
 
-        Assert.IsTrue(File.Exists(physicalPath));
-        Assert.IsTrue(File.Exists(secondPath));
-        Assert.IsTrue(Directory.Exists(directoryName));
+        Assert.That(File.Exists(physicalPath), Is.True);
+        Assert.That(File.Exists(secondPath), Is.True);
+        Assert.That(Directory.Exists(directoryName), Is.True);
 
         MediaFileManager.DeleteMediaFiles([virtualPath]);
-        Assert.IsFalse(File.Exists(physicalPath));
-        Assert.IsTrue(File.Exists(secondPath));
-        Assert.True(Directory.Exists(directoryName));
+        Assert.That(File.Exists(physicalPath), Is.False);
+        Assert.That(File.Exists(secondPath), Is.True);
+        Assert.That(Directory.Exists(directoryName), Is.True);
     }
 
     [Test]
     public void Can_Add_Suffix_To_Media_Files()
     {
         CreateMediaFile(MediaFileManager, HostingEnvironment, out string virtualPath, out string physicalPath);
-        Assert.IsTrue(File.Exists(physicalPath));
+        Assert.That(File.Exists(physicalPath), Is.True);
 
         MediaFileManager.SuffixMediaFiles([virtualPath], Cms.Core.Constants.Conventions.Media.TrashedMediaSuffix);
-        Assert.IsFalse(File.Exists(physicalPath));
+        Assert.That(File.Exists(physicalPath), Is.False);
 
         var virtualPathWithSuffix = virtualPath.Replace("file.txt", $"file{Cms.Core.Constants.Conventions.Media.TrashedMediaSuffix}.txt");
         physicalPath = HostingEnvironment.MapPathWebRoot(Path.Combine("media", virtualPathWithSuffix));
-        Assert.IsTrue(File.Exists(physicalPath));
+        Assert.That(File.Exists(physicalPath), Is.True);
     }
 
     [Test]
@@ -109,14 +109,14 @@ internal sealed class FileSystemsTests : UmbracoIntegrationTest
     {
         CreateMediaFile(MediaFileManager, HostingEnvironment, out string virtualPath, out string physicalPath);
         MediaFileManager.SuffixMediaFiles([virtualPath], Cms.Core.Constants.Conventions.Media.TrashedMediaSuffix);
-        Assert.IsFalse(File.Exists(physicalPath));
+        Assert.That(File.Exists(physicalPath), Is.False);
 
         MediaFileManager.RemoveSuffixFromMediaFiles([virtualPath], Cms.Core.Constants.Conventions.Media.TrashedMediaSuffix);
-        Assert.IsFalse(File.Exists(physicalPath));
+        Assert.That(File.Exists(physicalPath), Is.False);
 
         var virtualPathWithSuffix = virtualPath.Replace("file.txt", $"file{Cms.Core.Constants.Conventions.Media.TrashedMediaSuffix}.txt");
         physicalPath = HostingEnvironment.MapPathWebRoot(Path.Combine("media", virtualPathWithSuffix));
-        Assert.IsTrue(File.Exists(physicalPath));
+        Assert.That(File.Exists(physicalPath), Is.True);
     }
 
     private static void CreateMediaFile(
@@ -130,6 +130,6 @@ internal sealed class FileSystemsTests : UmbracoIntegrationTest
 
         var memoryStream = new MemoryStream(Encoding.UTF8.GetBytes("test"));
         mediaFileManager.FileSystem.AddFile(virtualPath, memoryStream);
-        Assert.IsTrue(File.Exists(physicalPath));
+        Assert.That(File.Exists(physicalPath), Is.True);
     }
 }

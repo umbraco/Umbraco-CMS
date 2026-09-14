@@ -196,7 +196,7 @@ public class DeliveryApiOutputCacheContentPolicyTests
 
         await ((IOutputCachePolicy)policy).ServeResponseAsync(context, CancellationToken.None);
 
-        Assert.That(context.Tags.Count, Is.EqualTo(initialTagCount));
+        Assert.That(context.Tags, Has.Count.EqualTo(initialTagCount));
     }
 
     [Test]

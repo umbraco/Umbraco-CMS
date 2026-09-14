@@ -56,7 +56,7 @@ internal sealed class ElementCacheRefresherTests : UmbracoIntegrationTest
         _sink.Payloads.Clear();
 
         var result = await ElementPublishingService.UnpublishAsync(elementKey, null, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
 
         AssertElementCacheRefreshed(elementId);
     }
@@ -71,7 +71,7 @@ internal sealed class ElementCacheRefresherTests : UmbracoIntegrationTest
         _sink.Payloads.Clear();
 
         var result = await ElementEditingService.MoveToRecycleBinAsync(elementKey, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
 
         AssertElementCacheRefreshed(elementId);
     }
@@ -108,7 +108,7 @@ internal sealed class ElementCacheRefresherTests : UmbracoIntegrationTest
                 Variants = [new VariantModel { Name = "Reusable element" }],
             },
             Constants.Security.SuperUserKey);
-        Assert.IsTrue(createResult.Success);
+        Assert.That(createResult.Success, Is.True);
 
         var elementKey = createResult.Result.Content!.Key;
 
@@ -116,17 +116,18 @@ internal sealed class ElementCacheRefresherTests : UmbracoIntegrationTest
             elementKey,
             [new CulturePublishScheduleModel { Culture = null }],
             Constants.Security.SuperUserKey);
-        Assert.IsTrue(publishResult.Success);
+        Assert.That(publishResult.Success, Is.True);
 
         return elementKey;
     }
 
     private static void AssertElementCacheRefreshed(int elementId)
-        => Assert.IsTrue(
+        => Assert.That(
             _sink.Payloads.Any(p => p.Id == elementId
                 && (p.ChangeTypes.HasType(TreeChangeTypes.RefreshNode)
                     || p.ChangeTypes.HasType(TreeChangeTypes.RefreshBranch)
                     || p.ChangeTypes.HasType(TreeChangeTypes.Remove))),
+            Is.True,
             $"Expected an element cache refresh for element {elementId} with a node-level change type.");
 
     private sealed class ProbeSink

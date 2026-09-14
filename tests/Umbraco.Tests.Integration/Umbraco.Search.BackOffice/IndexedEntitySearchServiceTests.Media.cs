@@ -151,7 +151,7 @@ public partial class IndexedEntitySearchServiceTests
         {
             Assert.That(result.Total, Is.EqualTo(expectedTotal));
             IMediaEntitySlim[] items = result.Items.OfType<IMediaEntitySlim>().ToArray();
-            Assert.That(items.Length, Is.EqualTo(expectedTotal));
+            Assert.That(items, Has.Length.EqualTo(expectedTotal));
             Assert.That(items.All(item => item.ContentTypeAlias == mediaTypeAlias), Is.True);
         });
     }
@@ -174,7 +174,7 @@ public partial class IndexedEntitySearchServiceTests
         {
             Assert.That(result.Total, Is.EqualTo(10));
             IMediaEntitySlim[] items = result.Items.OfType<IMediaEntitySlim>().ToArray();
-            Assert.That(items.Length, Is.EqualTo(10));
+            Assert.That(items, Has.Length.EqualTo(10));
             Assert.That(items.All(item => item.ContentTypeAlias is "childMediaType"), Is.True);
             Assert.That(items.All(item => item.ParentId == root.Id), Is.True);
         });

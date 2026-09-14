@@ -32,7 +32,7 @@ public class ContentTypeEditingHelperTests
 
         var descendantAliases = parent.GetPropertyAliasesReservedByDescendants(new IContentTypeComposition[] { composition, parent, child });
 
-        CollectionAssert.IsEmpty(descendantAliases);
+        Assert.That(descendantAliases, Is.Empty);
     }
 
     [Test]
@@ -47,7 +47,7 @@ public class ContentTypeEditingHelperTests
 
         var descendantAliases = parent.GetPropertyAliasesReservedByDescendants(new IContentTypeComposition[] { parent, child });
 
-        CollectionAssert.IsEmpty(descendantAliases);
+        Assert.That(descendantAliases, Is.Empty);
     }
 
     [Test]
@@ -62,7 +62,7 @@ public class ContentTypeEditingHelperTests
 
         var descendantAliases = parent.GetPropertyAliasesReservedByDescendants(new IContentTypeComposition[] { parent, child });
 
-        CollectionAssert.AreEquivalent(new[] { "childOwn" }, descendantAliases);
+        Assert.That(descendantAliases, Is.EquivalentTo(new[] { "childOwn" }));
     }
 
     [Test]
@@ -80,7 +80,7 @@ public class ContentTypeEditingHelperTests
 
         var descendantAliases = parent.GetPropertyAliasesReservedByDescendants(new IContentTypeComposition[] { parent, child, grandchild });
 
-        CollectionAssert.AreEquivalent(new[] { "deep" }, descendantAliases);
+        Assert.That(descendantAliases, Is.EquivalentTo(new[] { "deep" }));
     }
 
     private static void AddPropertyType(ContentType contentType, string alias)

@@ -21,14 +21,14 @@ public class RadioButtonsPropertyValueEditorTests
         var result = editor.Validate(value, false, null, PropertyValidationContext.Empty());
         if (expectedSuccess)
         {
-            Assert.IsEmpty(result);
+            Assert.That(result, Is.Empty);
         }
         else
         {
-            Assert.AreEqual(1, result.Count());
+            Assert.That(result.Count(), Is.EqualTo(1));
 
             var validationResult = result.First();
-            Assert.AreEqual("validation_notOneOfOptions", validationResult.ErrorMessage);
+            Assert.That(validationResult.ErrorMessage, Is.EqualTo("validation_notOneOfOptions"));
         }
     }
 

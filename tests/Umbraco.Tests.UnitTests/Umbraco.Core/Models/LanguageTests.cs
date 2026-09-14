@@ -26,20 +26,20 @@ public class LanguageTests
             .Build();
 
         var clone = (Language)item.DeepClone();
-        Assert.AreNotSame(clone, item);
-        Assert.AreEqual(clone, item);
-        Assert.AreEqual(clone.CreateDate, item.CreateDate);
-        Assert.AreEqual(clone.CultureName, item.CultureName);
-        Assert.AreEqual(clone.Id, item.Id);
-        Assert.AreEqual(clone.IsoCode, item.IsoCode);
-        Assert.AreEqual(clone.Key, item.Key);
-        Assert.AreEqual(clone.UpdateDate, item.UpdateDate);
+        Assert.That(item, Is.Not.SameAs(clone));
+        Assert.That(item, Is.EqualTo(clone));
+        Assert.That(item.CreateDate, Is.EqualTo(clone.CreateDate));
+        Assert.That(item.CultureName, Is.EqualTo(clone.CultureName));
+        Assert.That(item.Id, Is.EqualTo(clone.Id));
+        Assert.That(item.IsoCode, Is.EqualTo(clone.IsoCode));
+        Assert.That(item.Key, Is.EqualTo(clone.Key));
+        Assert.That(item.UpdateDate, Is.EqualTo(clone.UpdateDate));
 
         // This double verifies by reflection
         var allProps = clone.GetType().GetProperties();
         foreach (var propertyInfo in allProps)
         {
-            Assert.AreEqual(propertyInfo.GetValue(clone, null), propertyInfo.GetValue(item, null));
+            Assert.That(propertyInfo.GetValue(item, null), Is.EqualTo(propertyInfo.GetValue(clone, null)));
         }
     }
 

@@ -18,8 +18,8 @@ internal class LockingMechanismTests
     {
         var locks = new Dictionary<Guid, Dictionary<int, int>>();
         LockingMechanism.IncrementLock(LockId, _scopeInstanceId, ref locks);
-        Assert.AreEqual(1, locks.Count);
-        Assert.AreEqual(1, locks[_scopeInstanceId][LockId]);
+        Assert.That(locks, Has.Count.EqualTo(1));
+        Assert.That(locks[_scopeInstanceId][LockId], Is.EqualTo(1));
     }
 
     [Test]
@@ -37,9 +37,9 @@ internal class LockingMechanismTests
             }
         };
         LockingMechanism.IncrementLock(LockId, _scopeInstanceId, ref locks);
-        Assert.AreEqual(1, locks.Count);
-        Assert.AreEqual(2, locks[_scopeInstanceId].Count);
-        Assert.AreEqual(101, locks[_scopeInstanceId][LockId]);
-        Assert.AreEqual(200, locks[_scopeInstanceId][LockId2]);
+        Assert.That(locks, Has.Count.EqualTo(1));
+        Assert.That(locks[_scopeInstanceId], Has.Count.EqualTo(2));
+        Assert.That(locks[_scopeInstanceId][LockId], Is.EqualTo(101));
+        Assert.That(locks[_scopeInstanceId][LockId2], Is.EqualTo(200));
     }
 }

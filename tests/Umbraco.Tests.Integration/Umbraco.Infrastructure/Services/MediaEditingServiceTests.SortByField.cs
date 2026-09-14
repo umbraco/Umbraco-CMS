@@ -33,7 +33,7 @@ internal sealed partial class MediaEditingServiceTests
         (IMedia root, Guid[] childKeysByIndex) = await CreateRootWithChildrenForFieldSorting();
 
         var result = await MediaEditingService.SortByFieldAsync(root.Key, field, direction, Constants.Security.SuperUserKey);
-        Assert.AreEqual(ContentEditingOperationStatus.Success, result);
+        Assert.That(result, Is.EqualTo(ContentEditingOperationStatus.Success));
 
         var actualChildKeys = MediaService
             .GetPagedChildren(root.Id, 0, 100, out _)
@@ -42,14 +42,14 @@ internal sealed partial class MediaEditingServiceTests
             .ToArray();
         var expectedChildKeys = expectedChildIndexes.Select(i => childKeysByIndex[i]).ToArray();
 
-        Assert.AreEqual(expectedChildKeys, actualChildKeys);
+        Assert.That(actualChildKeys, Is.EqualTo(expectedChildKeys));
     }
 
     [Test]
     public async Task Sort_Children_By_Field_Returns_NotFound_For_Unknown_Parent()
     {
         var result = await MediaEditingService.SortByFieldAsync(Guid.NewGuid(), ContentSortField.Name, Direction.Ascending, Constants.Security.SuperUserKey);
-        Assert.AreEqual(ContentEditingOperationStatus.NotFound, result);
+        Assert.That(result, Is.EqualTo(ContentEditingOperationStatus.NotFound));
     }
 
     [Test]
@@ -72,7 +72,7 @@ internal sealed partial class MediaEditingServiceTests
         Guid[] rootKeysByIndex = await CreateRootMediaForFieldSorting();
 
         var result = await MediaEditingService.SortByFieldAsync(parentKey: null, field, direction, Constants.Security.SuperUserKey);
-        Assert.AreEqual(ContentEditingOperationStatus.Success, result);
+        Assert.That(result, Is.EqualTo(ContentEditingOperationStatus.Success));
 
         var actualRootKeys = MediaService
             .GetPagedChildren(Constants.System.Root, 0, 100, out _)
@@ -81,7 +81,7 @@ internal sealed partial class MediaEditingServiceTests
             .ToArray();
         var expectedRootKeys = expectedRootIndexes.Select(i => rootKeysByIndex[i]).ToArray();
 
-        Assert.AreEqual(expectedRootKeys, actualRootKeys);
+        Assert.That(actualRootKeys, Is.EqualTo(expectedRootKeys));
     }
 
     [Test]
@@ -90,7 +90,7 @@ internal sealed partial class MediaEditingServiceTests
         var folder = await CreateFolderMediaAsync("Childless");
 
         var result = await MediaEditingService.SortByFieldAsync(folder.Key, ContentSortField.Name, Direction.Ascending, Constants.Security.SuperUserKey);
-        Assert.AreEqual(ContentEditingOperationStatus.Success, result);
+        Assert.That(result, Is.EqualTo(ContentEditingOperationStatus.Success));
     }
 
     private async Task<(IMedia Root, Guid[] ChildKeysByIndex)> CreateRootWithChildrenForFieldSorting()

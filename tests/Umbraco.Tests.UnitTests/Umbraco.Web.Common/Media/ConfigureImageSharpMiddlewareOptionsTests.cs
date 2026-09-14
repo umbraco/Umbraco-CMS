@@ -33,7 +33,7 @@ public class ConfigureImageSharpMiddlewareOptionsTests
 
         await ConfigureAndParse(withHmac: true, context);
 
-        Assert.IsFalse(context.Commands.Contains(ResizeWebProcessor.Width));
+        Assert.That(context.Commands.Contains(ResizeWebProcessor.Width), Is.False);
     }
 
     [Test]
@@ -43,7 +43,7 @@ public class ConfigureImageSharpMiddlewareOptionsTests
 
         await ConfigureAndParse(withHmac: true, context);
 
-        Assert.IsFalse(context.Commands.Contains(ResizeWebProcessor.Height));
+        Assert.That(context.Commands.Contains(ResizeWebProcessor.Height), Is.False);
     }
 
     [Test]
@@ -53,7 +53,7 @@ public class ConfigureImageSharpMiddlewareOptionsTests
 
         await ConfigureAndParse(withHmac: true, context);
 
-        Assert.IsFalse(context.Commands.Contains(ResizeWebProcessor.Width));
+        Assert.That(context.Commands.Contains(ResizeWebProcessor.Width), Is.False);
     }
 
     [Test]
@@ -63,7 +63,7 @@ public class ConfigureImageSharpMiddlewareOptionsTests
 
         await ConfigureAndParse(withHmac: true, context);
 
-        Assert.IsFalse(context.Commands.Contains(ResizeWebProcessor.Height));
+        Assert.That(context.Commands.Contains(ResizeWebProcessor.Height), Is.False);
     }
 
     [Test]
@@ -77,10 +77,10 @@ public class ConfigureImageSharpMiddlewareOptionsTests
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(context.Commands.Contains(ResizeWebProcessor.Width));
-            Assert.AreEqual("800", context.Commands[ResizeWebProcessor.Width]);
-            Assert.IsTrue(context.Commands.Contains(ResizeWebProcessor.Height));
-            Assert.AreEqual("600", context.Commands[ResizeWebProcessor.Height]);
+            Assert.That(context.Commands.Contains(ResizeWebProcessor.Width), Is.True);
+            Assert.That(context.Commands[ResizeWebProcessor.Width], Is.EqualTo("800"));
+            Assert.That(context.Commands.Contains(ResizeWebProcessor.Height), Is.True);
+            Assert.That(context.Commands[ResizeWebProcessor.Height], Is.EqualTo("600"));
         });
     }
 
@@ -91,7 +91,7 @@ public class ConfigureImageSharpMiddlewareOptionsTests
 
         await ConfigureAndParse(withHmac: false, context);
 
-        Assert.IsFalse(context.Commands.Contains(ResizeWebProcessor.Width));
+        Assert.That(context.Commands.Contains(ResizeWebProcessor.Width), Is.False);
     }
 
     private static async Task ConfigureAndParse(bool withHmac, ImageCommandContext context)

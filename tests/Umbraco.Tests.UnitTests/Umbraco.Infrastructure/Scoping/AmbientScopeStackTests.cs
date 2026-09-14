@@ -48,9 +48,9 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Scoping
 
             Assert.Multiple(() =>
             {
-                Assert.AreSame(itemA, ambient[0], "Flow A observed another flow's ambient entry.");
-                Assert.AreSame(itemB, ambient[1], "Flow B observed another flow's ambient entry.");
-                Assert.IsNull(Peek(), "An entry pushed in a branching flow leaked into the calling context.");
+                Assert.That(ambient[0], Is.SameAs(itemA), "Flow A observed another flow's ambient entry.");
+                Assert.That(ambient[1], Is.SameAs(itemB), "Flow B observed another flow's ambient entry.");
+                Assert.That(Peek(), Is.Null, "An entry pushed in a branching flow leaked into the calling context.");
             });
         }
 
@@ -67,11 +67,11 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Scoping
 
             Assert.Multiple(() =>
             {
-                Assert.AreSame(inner, Peek());
-                Assert.AreSame(inner, Pop());
-                Assert.AreSame(outer, Peek());
-                Assert.AreSame(outer, Pop());
-                Assert.IsNull(Peek());
+                Assert.That(Peek(), Is.SameAs(inner));
+                Assert.That(Pop(), Is.SameAs(inner));
+                Assert.That(Peek(), Is.SameAs(outer));
+                Assert.That(Pop(), Is.SameAs(outer));
+                Assert.That(Peek(), Is.Null);
             });
         }
 

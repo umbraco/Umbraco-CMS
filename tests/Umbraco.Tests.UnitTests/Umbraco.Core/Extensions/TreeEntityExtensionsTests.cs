@@ -18,7 +18,7 @@ public class TreeEntityExtensionsTests
         entityMock.SetupGet(m => m.Path).Returns(path);
 
         var result = entityMock.Object.AncestorIds();
-        Assert.AreEqual(expectedIds.Length, result.Length);
+        Assert.That(result, Has.Length.EqualTo(expectedIds.Length));
         Assert.That(expectedIds, Is.EquivalentTo(result));
     }
 }

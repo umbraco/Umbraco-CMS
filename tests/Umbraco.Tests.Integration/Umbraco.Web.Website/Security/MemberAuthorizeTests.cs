@@ -44,8 +44,8 @@ internal sealed class MemberAuthorizeTests : UmbracoTestServerTestBase
         var response = await Client.GetAsync(url);
 
         var cookieAuthenticationOptions = Services.GetService<IOptions<CookieAuthenticationOptions>>();
-        Assert.AreEqual(HttpStatusCode.Redirect, response.StatusCode);
-        Assert.AreEqual(cookieAuthenticationOptions.Value.AccessDeniedPath.ToString(), response.Headers.Location?.AbsolutePath);
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Redirect));
+        Assert.That(response.Headers.Location?.AbsolutePath, Is.EqualTo(cookieAuthenticationOptions.Value.AccessDeniedPath.ToString()));
     }
 
     [Test]
@@ -64,8 +64,8 @@ internal sealed class MemberAuthorizeTests : UmbracoTestServerTestBase
         var response = await Client.GetAsync(url);
 
         var cookieAuthenticationOptions = Services.GetService<IOptions<CookieAuthenticationOptions>>();
-        Assert.AreEqual(HttpStatusCode.Redirect, response.StatusCode);
-        Assert.AreEqual(cookieAuthenticationOptions.Value.AccessDeniedPath.ToString(), response.Headers.Location?.AbsolutePath);
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Redirect));
+        Assert.That(response.Headers.Location?.AbsolutePath, Is.EqualTo(cookieAuthenticationOptions.Value.AccessDeniedPath.ToString()));
     }
 
     [Test]
@@ -78,7 +78,7 @@ internal sealed class MemberAuthorizeTests : UmbracoTestServerTestBase
 
         var response = await Client.GetAsync(url);
 
-        Assert.AreEqual(HttpStatusCode.Unauthorized, response.StatusCode);
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));
     }
 
     [Test]
@@ -96,7 +96,7 @@ internal sealed class MemberAuthorizeTests : UmbracoTestServerTestBase
 
         var response = await Client.GetAsync(url);
 
-        Assert.AreEqual(HttpStatusCode.Forbidden, response.StatusCode);
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Forbidden));
     }
 }
 

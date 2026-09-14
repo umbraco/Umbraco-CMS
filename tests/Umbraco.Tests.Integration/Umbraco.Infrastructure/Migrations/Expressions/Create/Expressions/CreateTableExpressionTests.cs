@@ -26,7 +26,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Migrations.Expres
 
             var column = database.SqlContext.SqlSyntax.GetColumnsInSchema(database).Single();
 
-            Assert.AreEqual("foo", column.TableName);
+            Assert.That(column.TableName, Is.EqualTo("foo"));
         }
 
         [Test]
@@ -45,9 +45,9 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Migrations.Expres
 
             Assert.Multiple(() =>
             {
-                Assert.AreEqual("foo", constraint.Item1);
-                Assert.AreEqual("bar", constraint.Item2);
-                Assert.True(constraint.Item3.StartsWith("PK_"));
+                Assert.That(constraint.Item1, Is.EqualTo("foo"));
+                Assert.That(constraint.Item2, Is.EqualTo("bar"));
+                Assert.That(constraint.Item3, Does.StartWith("PK_"));
             });
         }
 
@@ -67,10 +67,10 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Migrations.Expres
 
             Assert.Multiple(() =>
             {
-                Assert.AreEqual("foo", index.Item1);
-                Assert.AreEqual("MY_SUPER_COOL_INDEX", index.Item2);
-                Assert.AreEqual("bar", index.Item3);
-                Assert.True(index.Item4);
+                Assert.That(index.Item1, Is.EqualTo("foo"));
+                Assert.That(index.Item2, Is.EqualTo("MY_SUPER_COOL_INDEX"));
+                Assert.That(index.Item3, Is.EqualTo("bar"));
+                Assert.That(index.Item4, Is.True);
             });
         }
 
@@ -99,8 +99,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Migrations.Expres
 
             Assert.Multiple(() =>
             {
-                Assert.AreEqual("baz", constraint.Item1);
-                Assert.AreEqual("qux", constraint.Item2);
+                Assert.That(constraint.Item1, Is.EqualTo("baz"));
+                Assert.That(constraint.Item2, Is.EqualTo("qux"));
             });
         }
 

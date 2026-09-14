@@ -28,8 +28,8 @@ internal sealed class
         var result = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(result.Success);
-            Assert.AreEqual(ContentTypeOperationStatus.Success, result.Status);
+            Assert.That(result.Success, Is.True);
+            Assert.That(result.Status, Is.EqualTo(ContentTypeOperationStatus.Success));
         });
     }
 }

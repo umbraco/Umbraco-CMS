@@ -41,11 +41,11 @@ public class MultiNodeTreePickerValidationTests
     {
         if (shouldSucceed)
         {
-            Assert.IsEmpty(result);
+            Assert.That(result, Is.Empty);
         }
         else
         {
-            Assert.IsNotEmpty(result);
+            Assert.That(result, Is.Not.Empty);
         }
     }
 

@@ -17,7 +17,7 @@ public class HmacSecretKeyServiceTests
     {
         HmacSecretKeyService sut = CreateService([]);
 
-        Assert.IsFalse(sut.HasHmacSecretKey());
+        Assert.That(sut.HasHmacSecretKey(), Is.False);
     }
 
     [Test]
@@ -25,7 +25,7 @@ public class HmacSecretKeyServiceTests
     {
         HmacSecretKeyService sut = CreateService([1, 2, 3]);
 
-        Assert.IsTrue(sut.HasHmacSecretKey());
+        Assert.That(sut.HasHmacSecretKey(), Is.True);
     }
 
     [Test]
@@ -36,8 +36,8 @@ public class HmacSecretKeyServiceTests
 
         Attempt<HmacSecretKeyOperationStatus> result = await sut.CreateHmacSecretKeyAsync();
 
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(HmacSecretKeyOperationStatus.Success, result.Result);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result, Is.EqualTo(HmacSecretKeyOperationStatus.Success));
         configManipulatorMock.Verify(
             x => x.SetImagingHmacSecretKeyAsync(It.Is<string>(key =>
                 Convert.FromBase64String(key).Length == 64)),
@@ -52,8 +52,8 @@ public class HmacSecretKeyServiceTests
 
         Attempt<HmacSecretKeyOperationStatus> result = await sut.CreateHmacSecretKeyAsync();
 
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(HmacSecretKeyOperationStatus.KeyExists, result.Result);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Result, Is.EqualTo(HmacSecretKeyOperationStatus.KeyExists));
         configManipulatorMock.Verify(
             x => x.SetImagingHmacSecretKeyAsync(It.IsAny<string>()),
             Times.Never);
@@ -71,9 +71,9 @@ public class HmacSecretKeyServiceTests
 
         Attempt<HmacSecretKeyOperationStatus> result = await sut.CreateHmacSecretKeyAsync();
 
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(HmacSecretKeyOperationStatus.Error, result.Result);
-        Assert.IsNotNull(result.Exception);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Result, Is.EqualTo(HmacSecretKeyOperationStatus.Error));
+        Assert.That(result.Exception, Is.Not.Null);
     }
 
     private static HmacSecretKeyService CreateService(

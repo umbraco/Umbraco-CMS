@@ -35,7 +35,7 @@ public class SyncBootStateAccessorTest : UmbracoIntegrationTest
         var result = syncBootStateAccessor.GetSyncBootState();
 
         // Assert
-        Assert.AreEqual(SyncBootState.ColdBoot, result);
+        Assert.That(result, Is.EqualTo(SyncBootState.ColdBoot));
     }
 
     [Test]
@@ -59,6 +59,6 @@ public class SyncBootStateAccessorTest : UmbracoIntegrationTest
         var result = syncBootStateAccessor.GetSyncBootState();
 
         // Assert
-        Assert.AreEqual(SyncBootState.WarmBoot, result);
+        Assert.That(result, Is.EqualTo(SyncBootState.WarmBoot));
     }
 }

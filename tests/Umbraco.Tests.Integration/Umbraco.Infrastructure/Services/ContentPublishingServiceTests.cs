@@ -153,9 +153,9 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
             .AddNotificationHandler<ContentPublishingNotification, ContentNotificationHandler>()
             .AddNotificationHandler<ContentUnpublishingNotification, ContentNotificationHandler>();
 
-    private void VerifyIsPublished(Guid key) => Assert.IsTrue(ContentService.GetById(key)!.Published);
+    private void VerifyIsPublished(Guid key) => Assert.That(ContentService.GetById(key)!.Published, Is.True);
 
-    private void VerifyIsNotPublished(Guid key) => Assert.IsFalse(ContentService.GetById(key)!.Published);
+    private void VerifyIsNotPublished(Guid key) => Assert.That(ContentService.GetById(key)!.Published, Is.False);
 
     private ILanguageService LanguageService => GetRequiredService<ILanguageService>();
 

@@ -48,12 +48,12 @@ internal sealed class NotificationsRepositoryTest : UmbracoIntegrationTest
             var user = Mock.Of<IUser>(e => e.Id == node.UserId);
 
             repo.TryCreateNotification(user, entity, "A", out Notification? notification);
-            Assert.IsNotNull(notification);
+            Assert.That(notification, Is.Not.Null);
 
-            Assert.AreEqual("A", notification.Action);
-            Assert.AreEqual(node.NodeId, notification.EntityId);
-            Assert.AreEqual(node.NodeObjectType, notification.EntityType);
-            Assert.AreEqual(node.UserId, notification.UserId);
+            Assert.That(notification.Action, Is.EqualTo("A"));
+            Assert.That(notification.EntityId, Is.EqualTo(node.NodeId));
+            Assert.That(notification.EntityType, Is.EqualTo(node.NodeObjectType));
+            Assert.That(notification.UserId, Is.EqualTo(node.UserId));
         }
     }
 
@@ -102,7 +102,7 @@ internal sealed class NotificationsRepositoryTest : UmbracoIntegrationTest
 
             var notifications = repo.GetUserNotifications(userAdmin);
 
-            Assert.AreEqual(5, notifications.Count());
+            Assert.That(notifications.Count(), Is.EqualTo(5));
         }
     }
 
@@ -165,7 +165,7 @@ internal sealed class NotificationsRepositoryTest : UmbracoIntegrationTest
 
             var notifications = repo.GetEntityNotifications(entity1);
 
-            Assert.AreEqual(5, notifications.Count());
+            Assert.That(notifications.Count(), Is.EqualTo(5));
         }
     }
 
@@ -228,7 +228,7 @@ internal sealed class NotificationsRepositoryTest : UmbracoIntegrationTest
 
             var delCount = repo.DeleteNotifications(entity1);
 
-            Assert.AreEqual(5, delCount);
+            Assert.That(delCount, Is.EqualTo(5));
         }
     }
 
@@ -277,7 +277,7 @@ internal sealed class NotificationsRepositoryTest : UmbracoIntegrationTest
 
             var delCount = repo.DeleteNotifications(userAdmin);
 
-            Assert.AreEqual(5, delCount);
+            Assert.That(delCount, Is.EqualTo(5));
         }
     }
 }

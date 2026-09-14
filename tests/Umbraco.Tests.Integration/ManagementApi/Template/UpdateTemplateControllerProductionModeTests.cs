@@ -32,7 +32,7 @@ public class UpdateTemplateControllerProductionModeTests : ManagementApiTest<Upd
         // Create template via the service layer (allowed in production mode).
         var alias = "test" + Guid.NewGuid().ToString("N");
         var result = await TemplateService.CreateAsync(alias, alias, "<h1>Original</h1>", Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
         _template = result.Result;
 
         MethodSelector = x => x.Update(CancellationToken.None, _template.Key, null);
@@ -52,7 +52,7 @@ public class UpdateTemplateControllerProductionModeTests : ManagementApiTest<Upd
 
         var response = await Client.PutAsync(Url, JsonContent.Create(updateModel));
 
-        Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
     }
 
     [Test]
@@ -70,6 +70,6 @@ public class UpdateTemplateControllerProductionModeTests : ManagementApiTest<Upd
 
         var response = await Client.PutAsync(Url, JsonContent.Create(updateModel));
 
-        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
     }
 }

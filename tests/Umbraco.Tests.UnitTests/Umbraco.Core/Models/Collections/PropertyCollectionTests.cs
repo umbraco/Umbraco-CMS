@@ -23,7 +23,7 @@ public class PropertyCollectionTests
             new Property(new PropertyType(TestHelper.ShortStringHelper, "propEditor", ValueStorageType.Nvarchar, "Test")),
         };
 
-        Assert.AreEqual(1, collection.Count);
+        Assert.That(collection, Has.Count.EqualTo(1));
     }
 
     [Test]
@@ -34,7 +34,7 @@ public class PropertyCollectionTests
             new Property(new PropertyType(TestHelper.ShortStringHelper, "propEditor", ValueStorageType.Nvarchar, "test")),
         };
 
-        Assert.IsTrue(collection.Contains("Test"));
+        Assert.That(collection.Contains("Test"), Is.True);
     }
 
     [Test]
@@ -47,8 +47,8 @@ public class PropertyCollectionTests
         var second = collection.FirstOrDefault(x => x.Alias.InvariantEquals("Test"));
 
         Assert.That(first, Is.Null);
-        Assert.That(first == null, Is.True);
-        Assert.That(second == null, Is.True);
+        Assert.That(first, Is.EqualTo(null));
+        Assert.That(second, Is.EqualTo(null));
     }
 
     [Test]
@@ -58,7 +58,7 @@ public class PropertyCollectionTests
         var collection = new PropertyTypeCollection(false, list);
 
         Assert.That(collection.FirstOrDefault(), Is.Null);
-        Assert.That(collection.FirstOrDefault(x => x.Alias.InvariantEquals("Test")) == null, Is.True);
+        Assert.That(collection.FirstOrDefault(x => x.Alias.InvariantEquals("Test")), Is.EqualTo(null));
     }
 
     [Test]
@@ -68,7 +68,7 @@ public class PropertyCollectionTests
         var collection = new PropertyGroupCollection(list);
 
         Assert.That(collection.FirstOrDefault(), Is.Null);
-        Assert.That(collection.FirstOrDefault(x => x.Name.InvariantEquals("Test")) == null, Is.True);
+        Assert.That(collection.FirstOrDefault(x => x.Name.InvariantEquals("Test")), Is.EqualTo(null));
     }
 
     [Test]
@@ -77,8 +77,8 @@ public class PropertyCollectionTests
         var contentType = ContentTypeBuilder.CreateTextPageContentType();
 
         Assert.That(contentType.PropertyGroups, Is.Not.Null);
-        Assert.That(contentType.PropertyGroups.FirstOrDefault(x => x.Name.InvariantEquals("Content")) == null, Is.False);
-        Assert.That(contentType.PropertyGroups.FirstOrDefault(x => x.Name.InvariantEquals("Test")) == null, Is.True);
+        Assert.That(contentType.PropertyGroups.FirstOrDefault(x => x.Name.InvariantEquals("Content")), Is.Not.EqualTo(null));
+        Assert.That(contentType.PropertyGroups.FirstOrDefault(x => x.Name.InvariantEquals("Test")), Is.EqualTo(null));
         Assert.That(contentType.PropertyGroups.Any(x => x.Name.InvariantEquals("Test")), Is.False);
     }
 }

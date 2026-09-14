@@ -51,8 +51,8 @@ public class CacheTests : DeliveryApiTests
             prop1.GetDeliveryApiValue(expanding)!.ToString()
         };
 
-        Assert.AreEqual("Delivery API value: 1", results.First());
-        Assert.AreEqual(expectedConverterHits, results.Distinct().Count());
+        Assert.That(results.First(), Is.EqualTo("Delivery API value: 1"));
+        Assert.That(results.Distinct().Count(), Is.EqualTo(expectedConverterHits));
 
         propertyValueConverter.Verify(
             converter => converter.ConvertIntermediateToDeliveryApiObject(

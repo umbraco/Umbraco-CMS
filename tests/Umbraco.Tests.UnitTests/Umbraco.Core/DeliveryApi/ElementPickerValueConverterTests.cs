@@ -27,7 +27,7 @@ public class ElementPickerValueConverterTests : PropertyValueConverterTests
         publishedPropertyType.SetupGet(p => p.Alias).Returns("test");
 
         var valueConverter = CreateValueConverter();
-        Assert.AreEqual(typeof(IEnumerable<IApiElement>), valueConverter.GetDeliveryApiPropertyValueType(publishedPropertyType.Object));
+        Assert.That(valueConverter.GetDeliveryApiPropertyValueType(publishedPropertyType.Object), Is.EqualTo(typeof(IEnumerable<IApiElement>)));
         var result = valueConverter.ConvertIntermediateToDeliveryApiObject(
             Mock.Of<IPublishedContent>(),
             publishedPropertyType.Object,
@@ -36,13 +36,13 @@ public class ElementPickerValueConverterTests : PropertyValueConverterTests
             false,
             false) as IEnumerable<IApiElement>;
 
-        Assert.NotNull(result);
-        Assert.AreEqual(1, result!.Count());
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result!.Count(), Is.EqualTo(1));
         var element = result.First();
-        Assert.AreEqual(PublishedElement.Key, element.Id);
-        Assert.AreEqual(PublishedElement.Name, element.Name);
-        Assert.AreEqual("TheElementType", element.ContentType);
-        Assert.IsEmpty(element.Properties);
+        Assert.That(element.Id, Is.EqualTo(PublishedElement.Key));
+        Assert.That(element.Name, Is.EqualTo(PublishedElement.Name));
+        Assert.That(element.ContentType, Is.EqualTo("TheElementType"));
+        Assert.That(element.Properties, Is.Empty);
     }
 
     [Test]
@@ -74,7 +74,7 @@ public class ElementPickerValueConverterTests : PropertyValueConverterTests
             .Returns(publishedElement.Object);
 
         var valueConverter = CreateValueConverter();
-        Assert.AreEqual(typeof(IEnumerable<IApiElement>), valueConverter.GetDeliveryApiPropertyValueType(publishedPropertyType.Object));
+        Assert.That(valueConverter.GetDeliveryApiPropertyValueType(publishedPropertyType.Object), Is.EqualTo(typeof(IEnumerable<IApiElement>)));
         var result = valueConverter.ConvertIntermediateToDeliveryApiObject(
             Mock.Of<IPublishedContent>(),
             publishedPropertyType.Object,
@@ -83,14 +83,14 @@ public class ElementPickerValueConverterTests : PropertyValueConverterTests
             false,
             false) as IEnumerable<IApiElement>;
 
-        Assert.NotNull(result);
-        Assert.AreEqual(1, result!.Count());
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result!.Count(), Is.EqualTo(1));
         var element = result.First();
-        Assert.AreEqual(key, element.Id);
-        Assert.AreEqual("The element", element.Name);
-        Assert.AreEqual("theElementType", element.ContentType);
-        Assert.AreEqual(2, element.Properties.Count);
-        Assert.AreEqual("Delivery API value", element.Properties[DeliveryApiPropertyType.Alias]);
-        Assert.AreEqual("Default value", element.Properties[DefaultPropertyType.Alias]);
+        Assert.That(element.Id, Is.EqualTo(key));
+        Assert.That(element.Name, Is.EqualTo("The element"));
+        Assert.That(element.ContentType, Is.EqualTo("theElementType"));
+        Assert.That(element.Properties, Has.Count.EqualTo(2));
+        Assert.That(element.Properties[DeliveryApiPropertyType.Alias], Is.EqualTo("Delivery API value"));
+        Assert.That(element.Properties[DefaultPropertyType.Alias], Is.EqualTo("Default value"));
     }
 }

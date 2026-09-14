@@ -23,16 +23,16 @@ internal sealed class ConsentServiceTests : UmbracoIntegrationTest
         // can register
         var consent =
             ConsentService.RegisterConsent("user/1234", "app1", "do-something", ConsentState.Granted, "no comment");
-        Assert.AreNotEqual(0, consent.Id);
+        Assert.That(consent.Id, Is.Not.EqualTo(0));
 
-        Assert.IsTrue(consent.Current);
-        Assert.AreEqual("user/1234", consent.Source);
-        Assert.AreEqual("app1", consent.Context);
-        Assert.AreEqual("do-something", consent.Action);
-        Assert.AreEqual(ConsentState.Granted, consent.State);
-        Assert.AreEqual("no comment", consent.Comment);
+        Assert.That(consent.Current, Is.True);
+        Assert.That(consent.Source, Is.EqualTo("user/1234"));
+        Assert.That(consent.Context, Is.EqualTo("app1"));
+        Assert.That(consent.Action, Is.EqualTo("do-something"));
+        Assert.That(consent.State, Is.EqualTo(ConsentState.Granted));
+        Assert.That(consent.Comment, Is.EqualTo("no comment"));
 
-        Assert.IsTrue(consent.IsGranted());
+        Assert.That(consent.IsGranted(), Is.True);
 
         // can register more
         ConsentService.RegisterConsent("user/1234", "app1", "do-something-else", ConsentState.Granted, "no comment");
@@ -41,35 +41,35 @@ internal sealed class ConsentServiceTests : UmbracoIntegrationTest
 
         // can get by source
         var consents = ConsentService.LookupConsent("user/1235").ToArray();
-        Assert.IsEmpty(consents);
+        Assert.That(consents, Is.Empty);
 
         consents = ConsentService.LookupConsent("user/1234").ToArray();
-        Assert.AreEqual(2, consents.Length);
-        Assert.IsTrue(consents.All(x => x.Source == "user/1234"));
-        Assert.IsTrue(consents.Any(x => x.Action == "do-something"));
-        Assert.IsTrue(consents.Any(x => x.Action == "do-something-else"));
+        Assert.That(consents, Has.Length.EqualTo(2));
+        Assert.That(consents.All(x => x.Source == "user/1234"), Is.True);
+        Assert.That(consents.Any(x => x.Action == "do-something"), Is.True);
+        Assert.That(consents.Any(x => x.Action == "do-something-else"), Is.True);
 
         // can get by context
         consents = ConsentService.LookupConsent(context: "app3").ToArray();
-        Assert.IsEmpty(consents);
+        Assert.That(consents, Is.Empty);
 
         consents = ConsentService.LookupConsent(context: "app2").ToArray();
-        Assert.AreEqual(1, consents.Length);
+        Assert.That(consents, Has.Length.EqualTo(1));
 
         consents = ConsentService.LookupConsent(context: "app1").ToArray();
-        Assert.AreEqual(3, consents.Length);
-        Assert.IsTrue(consents.Any(x => x.Action == "do-something"));
-        Assert.IsTrue(consents.Any(x => x.Action == "do-something-else"));
+        Assert.That(consents, Has.Length.EqualTo(3));
+        Assert.That(consents.Any(x => x.Action == "do-something"), Is.True);
+        Assert.That(consents.Any(x => x.Action == "do-something-else"), Is.True);
 
         // can get by action
         consents = ConsentService.LookupConsent(action: "do-whatever").ToArray();
-        Assert.IsEmpty(consents);
+        Assert.That(consents, Is.Empty);
 
         consents = ConsentService.LookupConsent(context: "app1", action: "do-something").ToArray();
-        Assert.AreEqual(2, consents.Length);
-        Assert.IsTrue(consents.All(x => x.Action == "do-something"));
-        Assert.IsTrue(consents.Any(x => x.Source == "user/1234"));
-        Assert.IsTrue(consents.Any(x => x.Source == "user/1236"));
+        Assert.That(consents, Has.Length.EqualTo(2));
+        Assert.That(consents.All(x => x.Action == "do-something"), Is.True);
+        Assert.That(consents.Any(x => x.Source == "user/1234"), Is.True);
+        Assert.That(consents.Any(x => x.Source == "user/1236"), Is.True);
 
         // can revoke
         consent = ConsentService.RegisterConsent(
@@ -80,27 +80,27 @@ internal sealed class ConsentServiceTests : UmbracoIntegrationTest
             "no comment");
 
         consents = ConsentService.LookupConsent("user/1234", "app1", "do-something").ToArray();
-        Assert.AreEqual(1, consents.Length);
-        Assert.IsTrue(consents[0].Current);
-        Assert.AreEqual(ConsentState.Revoked, consents[0].State);
+        Assert.That(consents, Has.Length.EqualTo(1));
+        Assert.That(consents[0].Current, Is.True);
+        Assert.That(consents[0].State, Is.EqualTo(ConsentState.Revoked));
 
         // can filter
         consents = ConsentService.LookupConsent(context: "app1", action: "do-", actionStartsWith: true).ToArray();
-        Assert.AreEqual(3, consents.Length);
-        Assert.IsTrue(consents.All(x => x.Context == "app1"));
-        Assert.IsTrue(consents.All(x => x.Action.StartsWith("do-")));
+        Assert.That(consents, Has.Length.EqualTo(3));
+        Assert.That(consents.All(x => x.Context == "app1"), Is.True);
+        Assert.That(consents.All(x => x.Action.StartsWith("do-")), Is.True);
 
         // can get history
         consents = ConsentService.LookupConsent("user/1234", "app1", "do-something", includeHistory: true).ToArray();
-        Assert.AreEqual(1, consents.Length);
-        Assert.IsTrue(consents[0].Current);
-        Assert.AreEqual(ConsentState.Revoked, consents[0].State);
-        Assert.IsTrue(consents[0].IsRevoked());
-        Assert.IsNotNull(consents[0].History);
+        Assert.That(consents, Has.Length.EqualTo(1));
+        Assert.That(consents[0].Current, Is.True);
+        Assert.That(consents[0].State, Is.EqualTo(ConsentState.Revoked));
+        Assert.That(consents[0].IsRevoked(), Is.True);
+        Assert.That(consents[0].History, Is.Not.Null);
         var history = consents[0].History.ToArray();
-        Assert.AreEqual(1, history.Length);
-        Assert.IsFalse(history[0].Current);
-        Assert.AreEqual(ConsentState.Granted, history[0].State);
+        Assert.That(history, Has.Length.EqualTo(1));
+        Assert.That(history[0].Current, Is.False);
+        Assert.That(history[0].State, Is.EqualTo(ConsentState.Granted));
 
         // cannot be stupid
         Assert.Throws<ArgumentException>(() =>
@@ -122,6 +122,6 @@ internal sealed class ConsentServiceTests : UmbracoIntegrationTest
         var consents = ConsentService.LookupConsent("user/1234", action: "consentWithoutComment").ToArray();
 
         // Confirm we got our expected consent record
-        Assert.AreEqual(1, consents.Length);
+        Assert.That(consents, Has.Length.EqualTo(1));
     }
 }

@@ -95,7 +95,7 @@ public class BackOfficeAuthorizationInitializationMiddlewareTests
     }
 
     [Test]
-    [Timeout(5000)] // Fail fast if the semaphore-release regression is reintroduced (deadlock).
+    [CancelAfter(5000)] // Fail fast if the semaphore-release regression is reintroduced (deadlock).
     public async Task Registration_Failure_Does_Not_Leak_Semaphore()
     {
         // Arrange — always throws

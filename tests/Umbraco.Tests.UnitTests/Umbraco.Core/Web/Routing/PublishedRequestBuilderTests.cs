@@ -23,18 +23,18 @@ public class PublishedRequestBuilderTests
         var sut = GetBuilder();
         sut.SetTemplate(Mock.Of<ITemplate>());
 
-        Assert.IsNotNull(sut.Template);
+        Assert.That(sut.Template, Is.Not.Null);
 
         sut.SetInternalRedirect(Mock.Of<IPublishedContent>());
 
-        Assert.IsNull(sut.Template);
-        Assert.IsTrue(sut.IsInternalRedirect);
+        Assert.That(sut.Template, Is.Null);
+        Assert.That(sut.IsInternalRedirect, Is.True);
 
         sut.SetTemplate(Mock.Of<ITemplate>());
         sut.SetPublishedContent(Mock.Of<IPublishedContent>());
 
-        Assert.IsNull(sut.Template);
-        Assert.IsFalse(sut.IsInternalRedirect);
+        Assert.That(sut.Template, Is.Null);
+        Assert.That(sut.IsInternalRedirect, Is.False);
     }
 
     [Test]
@@ -42,14 +42,14 @@ public class PublishedRequestBuilderTests
     {
         var sut = GetBuilder();
 
-        Assert.IsNull(sut.Culture);
+        Assert.That(sut.Culture, Is.Null);
 
         sut.SetDomain(
             new DomainAndUri(
                 new Domain(1, "test", 2, "en-AU", false, 0), new Uri("https://example.com/en-au")));
 
-        Assert.IsNotNull(sut.Domain);
-        Assert.IsNotNull(sut.Culture);
+        Assert.That(sut.Domain, Is.Not.Null);
+        Assert.That(sut.Culture, Is.Not.Null);
     }
 
     [Test]
@@ -79,16 +79,16 @@ public class PublishedRequestBuilderTests
 
         var request = sut.Build();
 
-        Assert.AreEqual(true, request.SetNoCacheHeader);
-        Assert.AreEqual(cacheExt, request.CacheExtensions);
-        Assert.AreEqual(usCulture, request.Culture);
-        Assert.AreEqual(domain, request.Domain);
-        Assert.AreEqual(headers, request.Headers);
-        Assert.AreEqual(true, request.IsInternalRedirect);
-        Assert.AreEqual(content, request.PublishedContent);
-        Assert.AreEqual(redirect, request.RedirectUrl);
-        Assert.AreEqual(302, request.ResponseStatusCode);
-        Assert.AreEqual(template, request.Template);
-        Assert.AreEqual(_baseUri, request.Uri);
+        Assert.That(request.SetNoCacheHeader, Is.EqualTo(true));
+        Assert.That(request.CacheExtensions, Is.EqualTo(cacheExt));
+        Assert.That(request.Culture, Is.EqualTo(usCulture));
+        Assert.That(request.Domain, Is.EqualTo(domain));
+        Assert.That(request.Headers, Is.EqualTo(headers));
+        Assert.That(request.IsInternalRedirect, Is.EqualTo(true));
+        Assert.That(request.PublishedContent, Is.EqualTo(content));
+        Assert.That(request.RedirectUrl, Is.EqualTo(redirect));
+        Assert.That(request.ResponseStatusCode, Is.EqualTo(302));
+        Assert.That(request.Template, Is.EqualTo(template));
+        Assert.That(request.Uri, Is.EqualTo(_baseUri));
     }
 }

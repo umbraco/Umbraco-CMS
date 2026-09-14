@@ -28,7 +28,7 @@ public class BlockGridPropertyValueConverterTests : BlockPropertyValueConverterT
         var valueType = editor.GetPropertyValueType(propertyType);
 
         // the result is always block grid model
-        Assert.AreEqual(typeof(BlockGridModel), valueType);
+        Assert.That(valueType, Is.EqualTo(typeof(BlockGridModel)));
     }
 
     [Test]
@@ -74,14 +74,14 @@ public class BlockGridPropertyValueConverterTests : BlockPropertyValueConverterT
             editor.ConvertIntermediateToObject(publishedElement, propertyType, PropertyCacheLevel.None, json, false) as
                 BlockGridModel;
 
-        Assert.IsNotNull(converted);
-        Assert.AreEqual(1, converted.Count);
-        Assert.AreEqual(Guid.Parse("1304E1DD-AC87-4396-84FE-8A399231CB3D"), converted[0].Content.Key);
-        Assert.AreEqual(Guid.Parse("1304E1DD-AC87-4396-84FE-8A399231CB3D"), converted[0].ContentKey);
-        Assert.AreEqual(ContentAlias1, converted[0].Content.ContentType.Alias);
-        Assert.AreEqual(Guid.Parse("2D3529ED-B47B-4B10-9F6D-4B802DD5DFE2"), converted[0].Settings!.Key);
-        Assert.AreEqual(Guid.Parse("2D3529ED-B47B-4B10-9F6D-4B802DD5DFE2"), converted[0].SettingsKey);
-        Assert.AreEqual(SettingAlias1, converted[0].Settings.ContentType.Alias);
+        Assert.That(converted, Is.Not.Null);
+        Assert.That(converted, Has.Count.EqualTo(1));
+        Assert.That(converted[0].Content.Key, Is.EqualTo(Guid.Parse("1304E1DD-AC87-4396-84FE-8A399231CB3D")));
+        Assert.That(converted[0].ContentKey, Is.EqualTo(Guid.Parse("1304E1DD-AC87-4396-84FE-8A399231CB3D")));
+        Assert.That(converted[0].Content.ContentType.Alias, Is.EqualTo(ContentAlias1));
+        Assert.That(converted[0].Settings!.Key, Is.EqualTo(Guid.Parse("2D3529ED-B47B-4B10-9F6D-4B802DD5DFE2")));
+        Assert.That(converted[0].SettingsKey, Is.EqualTo(Guid.Parse("2D3529ED-B47B-4B10-9F6D-4B802DD5DFE2")));
+        Assert.That(converted[0].Settings.ContentType.Alias, Is.EqualTo(SettingAlias1));
     }
 
     [Test]
@@ -120,13 +120,13 @@ public class BlockGridPropertyValueConverterTests : BlockPropertyValueConverterT
             editor.ConvertIntermediateToObject(publishedElement, propertyType, PropertyCacheLevel.None, json, false) as
                 BlockGridModel;
 
-        Assert.IsNotNull(converted);
-        Assert.AreEqual(1, converted.Count);
+        Assert.That(converted, Is.Not.Null);
+        Assert.That(converted, Has.Count.EqualTo(1));
         var item0 = converted[0].Content;
-        Assert.AreEqual(Guid.Parse("1304E1DD-AC87-4396-84FE-8A399231CB3D"), item0.Key);
-        Assert.AreEqual(Guid.Parse("1304E1DD-AC87-4396-84FE-8A399231CB3D"), converted[0].ContentKey);
-        Assert.AreEqual("Test1", item0.ContentType.Alias);
-        Assert.IsNull(converted[0].Settings);
+        Assert.That(item0.Key, Is.EqualTo(Guid.Parse("1304E1DD-AC87-4396-84FE-8A399231CB3D")));
+        Assert.That(converted[0].ContentKey, Is.EqualTo(Guid.Parse("1304E1DD-AC87-4396-84FE-8A399231CB3D")));
+        Assert.That(item0.ContentType.Alias, Is.EqualTo("Test1"));
+        Assert.That(converted[0].Settings, Is.Null);
     }
 
     [Test]
@@ -175,13 +175,13 @@ public class BlockGridPropertyValueConverterTests : BlockPropertyValueConverterT
             editor.ConvertIntermediateToObject(publishedElement, propertyType, PropertyCacheLevel.None, json, false) as
                 BlockGridModel;
 
-        Assert.IsNotNull(converted);
-        Assert.AreEqual(1, converted.Count);
+        Assert.That(converted, Is.Not.Null);
+        Assert.That(converted, Has.Count.EqualTo(1));
         var item0 = converted[0].Content;
-        Assert.AreEqual(Guid.Parse("1304E1DD-AC87-4396-84FE-8A399231CB3D"), item0.Key);
-        Assert.AreEqual(Guid.Parse("1304E1DD-AC87-4396-84FE-8A399231CB3D"), converted[0].ContentKey);
-        Assert.AreEqual("Test1", item0.ContentType.Alias);
-        Assert.IsNull(converted[0].Settings);
+        Assert.That(item0.Key, Is.EqualTo(Guid.Parse("1304E1DD-AC87-4396-84FE-8A399231CB3D")));
+        Assert.That(converted[0].ContentKey, Is.EqualTo(Guid.Parse("1304E1DD-AC87-4396-84FE-8A399231CB3D")));
+        Assert.That(item0.ContentType.Alias, Is.EqualTo("Test1"));
+        Assert.That(converted[0].Settings, Is.Null);
     }
 
     private BlockGridPropertyValueConverter CreateConverter()

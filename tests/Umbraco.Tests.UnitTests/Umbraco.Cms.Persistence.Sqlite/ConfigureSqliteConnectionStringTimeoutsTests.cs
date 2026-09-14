@@ -2,6 +2,7 @@ using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Persistence.Sqlite.Configuration;
 
@@ -19,7 +20,7 @@ public class ConfigureSqliteConnectionStringTimeoutsTests
     {
         ConnectionStrings options = PostConfigure(new GlobalSettings(), out _);
 
-        Assert.AreEqual(ConnectionString, options.ConnectionString);
+        Assert.That(options.ConnectionString, Is.EqualTo(ConnectionString));
     }
 
     [Test]
@@ -29,7 +30,7 @@ public class ConfigureSqliteConnectionStringTimeoutsTests
             new GlobalSettings { DatabaseCommandTimeout = TimeSpan.FromMinutes(5) },
             out _);
 
-        Assert.AreEqual(300, new SqliteConnectionStringBuilder(options.ConnectionString).DefaultTimeout);
+        Assert.That(new SqliteConnectionStringBuilder(options.ConnectionString).DefaultTimeout, Is.EqualTo(300));
     }
 
     [Test]
@@ -41,9 +42,9 @@ public class ConfigureSqliteConnectionStringTimeoutsTests
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(ConnectionString, options.ConnectionString);
-            Assert.AreEqual(1, logger.LogEntries.Count);
-            Assert.AreEqual(LogLevel.Information, logger.LogEntries[0].Level);
+            Assert.That(options.ConnectionString, Is.EqualTo(ConnectionString));
+            Assert.That(logger.LogEntries, Has.Count.EqualTo(1));
+            Assert.That(logger.LogEntries[0].Level, Is.EqualTo(LogLevel.Information));
             Assert.That(logger.LogEntries[0].Message, Does.Contain("DatabaseConnectTimeout"));
         });
     }
@@ -60,7 +61,7 @@ public class ConfigureSqliteConnectionStringTimeoutsTests
             sut.PostConfigure(name: null, NewOptions(ConnectionString, ProviderName));
         }
 
-        Assert.AreEqual(1, logger.LogEntries.Count);
+        Assert.That(logger.LogEntries, Has.Count.EqualTo(1));
     }
 
     [Test]
@@ -74,7 +75,7 @@ public class ConfigureSqliteConnectionStringTimeoutsTests
             sqlServerConnectionString,
             providerName: "Microsoft.Data.SqlClient");
 
-        Assert.AreEqual(sqlServerConnectionString, options.ConnectionString);
+        Assert.That(options.ConnectionString, Is.EqualTo(sqlServerConnectionString));
     }
 
     [Test]
@@ -85,7 +86,7 @@ public class ConfigureSqliteConnectionStringTimeoutsTests
             out _,
             providerName: "microsoft.data.sqlite");
 
-        Assert.AreEqual(300, new SqliteConnectionStringBuilder(options.ConnectionString).DefaultTimeout);
+        Assert.That(new SqliteConnectionStringBuilder(options.ConnectionString).DefaultTimeout, Is.EqualTo(300));
     }
 
     [Test]
@@ -100,9 +101,9 @@ public class ConfigureSqliteConnectionStringTimeoutsTests
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(unparseableConnectionString, options.ConnectionString);
-            Assert.AreEqual(1, logger.LogEntries.Count);
-            Assert.AreEqual(LogLevel.Warning, logger.LogEntries[0].Level);
+            Assert.That(options.ConnectionString, Is.EqualTo(unparseableConnectionString));
+            Assert.That(logger.LogEntries, Has.Count.EqualTo(1));
+            Assert.That(logger.LogEntries[0].Level, Is.EqualTo(LogLevel.Warning));
         });
     }
 

@@ -35,8 +35,8 @@ internal sealed class MediaEditingServiceTests : UmbracoIntegrationTest
         var imageModel = CreateMediaCreateModel("Image", Guid.NewGuid(), ImageMediaType.Key);
         var imageCreateAttempt = await MediaEditingService.CreateAsync(imageModel, Constants.Security.SuperUserKey);
 
-        Assert.IsFalse(imageCreateAttempt.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.PropertyValidationError, imageCreateAttempt.Status);
+        Assert.That(imageCreateAttempt.Success, Is.False);
+        Assert.That(imageCreateAttempt.Status, Is.EqualTo(ContentEditingOperationStatus.PropertyValidationError));
     }
 
     [Test]
@@ -45,8 +45,8 @@ internal sealed class MediaEditingServiceTests : UmbracoIntegrationTest
         var imageModel = CreateMediaCreateModelWithFile("Image", Guid.NewGuid(), ArticleMediaType.Key);
         var imageCreateAttempt = await MediaEditingService.CreateAsync(imageModel, Constants.Security.SuperUserKey);
 
-        Assert.IsTrue(imageCreateAttempt.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.Success, imageCreateAttempt.Status);
+        Assert.That(imageCreateAttempt.Success, Is.True);
+        Assert.That(imageCreateAttempt.Status, Is.EqualTo(ContentEditingOperationStatus.Success));
     }
 
     [Test]
@@ -55,8 +55,8 @@ internal sealed class MediaEditingServiceTests : UmbracoIntegrationTest
         var imageModel = CreateMediaCreateModelWithFile("Image", Guid.CreateVersion7(), ArticleMediaType.Key);
         var imageCreateAttempt = await MediaEditingService.CreateAsync(imageModel, Constants.Security.SuperUserKey);
 
-        Assert.IsFalse(imageCreateAttempt.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.InvalidKey, imageCreateAttempt.Status);
+        Assert.That(imageCreateAttempt.Success, Is.False);
+        Assert.That(imageCreateAttempt.Status, Is.EqualTo(ContentEditingOperationStatus.InvalidKey));
     }
 
     [Test]
@@ -68,8 +68,8 @@ internal sealed class MediaEditingServiceTests : UmbracoIntegrationTest
         var imageCreateAttempt = await MediaEditingService.CreateAsync(imageModel, Constants.Security.SuperUserKey);
 
         // Assert
-        Assert.IsTrue(imageCreateAttempt.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.Success, imageCreateAttempt.Status);
+        Assert.That(imageCreateAttempt.Success, Is.True);
+        Assert.That(imageCreateAttempt.Status, Is.EqualTo(ContentEditingOperationStatus.Success));
     }
 
     [Test]
@@ -79,7 +79,7 @@ internal sealed class MediaEditingServiceTests : UmbracoIntegrationTest
         var articleModel = CreateMediaCreateModelWithFile("Article", articleKey, ArticleMediaType.Key);
         var articleCreateAttempt = await MediaEditingService.CreateAsync(articleModel, Constants.Security.SuperUserKey);
 
-        Assert.IsTrue(articleCreateAttempt.Success);
+        Assert.That(articleCreateAttempt.Success, Is.True);
 
         var updateModel = new MediaUpdateModel
         {
@@ -97,8 +97,8 @@ internal sealed class MediaEditingServiceTests : UmbracoIntegrationTest
             Variants = articleModel.Variants,
         };
         var articleUpdateAttempt = await MediaEditingService.ValidateUpdateAsync(articleKey, updateModel);
-        Assert.IsFalse(articleUpdateAttempt.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.PropertyValidationError, articleUpdateAttempt.Status);
+        Assert.That(articleUpdateAttempt.Success, Is.False);
+        Assert.That(articleUpdateAttempt.Status, Is.EqualTo(ContentEditingOperationStatus.PropertyValidationError));
     }
 
     private static MediaCreateModel CreateMediaCreateModel(string name, Guid key, Guid mediaTypeKey)

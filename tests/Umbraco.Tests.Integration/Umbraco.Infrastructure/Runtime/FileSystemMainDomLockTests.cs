@@ -73,7 +73,7 @@ internal sealed class FileSystemMainDomLockTests : UmbracoIntegrationTest
 
         var result = await sut.AcquireLockAsync(1000);
 
-        Assert.True(result);
+        Assert.That(result, Is.True);
     }
 
     [Test]
@@ -86,7 +86,7 @@ internal sealed class FileSystemMainDomLockTests : UmbracoIntegrationTest
 
         var result = await sut.AcquireLockAsync(1000);
 
-        Assert.False(result);
+        Assert.That(result, Is.False);
     }
 
     [Test]
@@ -106,8 +106,8 @@ internal sealed class FileSystemMainDomLockTests : UmbracoIntegrationTest
 
         Assert.Multiple(() =>
         {
-            Assert.False(before);
-            Assert.True(after);
+            Assert.That(before, Is.False);
+            Assert.That(after, Is.True);
         });
     }
 }

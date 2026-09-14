@@ -23,7 +23,7 @@ public class FileSystemTreeServiceTests
     {
         var service = new PartialViewTreeService(CreateFileSystems("Upper.CSHTML", "lower.cshtml", "Mixed.CsHtml", "other.txt"));
 
-        CollectionAssert.AreEquivalent(new[] { "Upper.CSHTML", "lower.cshtml", "Mixed.CsHtml" }, service.GetFiles("/"));
+        Assert.That(service.GetFiles("/"), Is.EquivalentTo(new[] { "Upper.CSHTML", "lower.cshtml", "Mixed.CsHtml" }));
     }
 
     [Test]
@@ -31,7 +31,7 @@ public class FileSystemTreeServiceTests
     {
         var service = new ScriptTreeService(CreateFileSystems("Upper.JS", "lower.js", "other.txt"));
 
-        CollectionAssert.AreEquivalent(new[] { "Upper.JS", "lower.js" }, service.GetFiles("/"));
+        Assert.That(service.GetFiles("/"), Is.EquivalentTo(new[] { "Upper.JS", "lower.js" }));
     }
 
     [Test]
@@ -39,7 +39,7 @@ public class FileSystemTreeServiceTests
     {
         var service = new StyleSheetTreeService(CreateFileSystems("Upper.CSS", "lower.css", "other.txt"));
 
-        CollectionAssert.AreEquivalent(new[] { "Upper.CSS", "lower.css" }, service.GetFiles("/"));
+        Assert.That(service.GetFiles("/"), Is.EquivalentTo(new[] { "Upper.CSS", "lower.css" }));
     }
 
     [Test]
@@ -49,7 +49,7 @@ public class FileSystemTreeServiceTests
         // end with ".cshtml" - a culture sensitive comparison would treat the joiner as ignorable and match.
         var service = new PartialViewTreeService(CreateFileSystems("view.cshtml" + ZeroWidthJoiner, "view.cshtml"));
 
-        CollectionAssert.AreEquivalent(new[] { "view.cshtml" }, service.GetFiles("/"));
+        Assert.That(service.GetFiles("/"), Is.EquivalentTo(new[] { "view.cshtml" }));
     }
 
     private const string ZeroWidthJoiner = "\u200D";

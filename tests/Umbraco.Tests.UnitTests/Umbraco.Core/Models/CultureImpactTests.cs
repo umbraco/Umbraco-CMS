@@ -22,20 +22,20 @@ public class CultureImpactTests
             Mock.Of<IContent>(x => x.Published == true),
             new[] { "en-US", "fr-FR" },
             "en-US");
-        Assert.AreEqual("en-US", result); // default culture is being saved so use it
+        Assert.That(result, Is.EqualTo("en-US")); // default culture is being saved so use it
 
         result = BasicImpactFactory.GetCultureForInvariantErrors(
             Mock.Of<IContent>(x => x.Published == false),
             new[] { "fr-FR" },
             "en-US");
-        Assert.AreEqual("fr-FR", result); // default culture not being saved with not published version,
+        Assert.That(result, Is.EqualTo("fr-FR")); // default culture not being saved with not published version,
                                           // use the first culture being saved
 
         result = BasicImpactFactory.GetCultureForInvariantErrors(
             Mock.Of<IContent>(x => x.Published == true),
             new[] { "fr-FR" },
             "en-US");
-        Assert.AreEqual(null, result); // default culture not being saved with published version, use null
+        Assert.That(result, Is.EqualTo(null)); // default culture not being saved with published version, use null
     }
 
     [Test]
@@ -43,14 +43,14 @@ public class CultureImpactTests
     {
         var impact = BasicImpactFactory.ImpactAll();
 
-        Assert.AreEqual(impact.Culture, "*");
+        Assert.That(impact.Culture, Is.EqualTo("*"));
 
-        Assert.IsTrue(impact.ImpactsInvariantProperties);
-        Assert.IsFalse(impact.ImpactsAlsoInvariantProperties);
-        Assert.IsFalse(impact.ImpactsOnlyInvariantCulture);
-        Assert.IsFalse(impact.ImpactsExplicitCulture);
-        Assert.IsTrue(impact.ImpactsAllCultures);
-        Assert.IsFalse(impact.ImpactsOnlyDefaultCulture);
+        Assert.That(impact.ImpactsInvariantProperties, Is.True);
+        Assert.That(impact.ImpactsAlsoInvariantProperties, Is.False);
+        Assert.That(impact.ImpactsOnlyInvariantCulture, Is.False);
+        Assert.That(impact.ImpactsExplicitCulture, Is.False);
+        Assert.That(impact.ImpactsAllCultures, Is.True);
+        Assert.That(impact.ImpactsOnlyDefaultCulture, Is.False);
     }
 
     [Test]
@@ -58,14 +58,14 @@ public class CultureImpactTests
     {
         var impact = BasicImpactFactory.ImpactInvariant();
 
-        Assert.AreEqual(impact.Culture, null);
+        Assert.That(impact.Culture, Is.EqualTo(null));
 
-        Assert.IsTrue(impact.ImpactsInvariantProperties);
-        Assert.IsFalse(impact.ImpactsAlsoInvariantProperties);
-        Assert.IsTrue(impact.ImpactsOnlyInvariantCulture);
-        Assert.IsFalse(impact.ImpactsExplicitCulture);
-        Assert.IsFalse(impact.ImpactsAllCultures);
-        Assert.IsFalse(impact.ImpactsOnlyDefaultCulture);
+        Assert.That(impact.ImpactsInvariantProperties, Is.True);
+        Assert.That(impact.ImpactsAlsoInvariantProperties, Is.False);
+        Assert.That(impact.ImpactsOnlyInvariantCulture, Is.True);
+        Assert.That(impact.ImpactsExplicitCulture, Is.False);
+        Assert.That(impact.ImpactsAllCultures, Is.False);
+        Assert.That(impact.ImpactsOnlyDefaultCulture, Is.False);
     }
 
     [Test]
@@ -73,14 +73,14 @@ public class CultureImpactTests
     {
         var impact = BasicImpactFactory.ImpactExplicit("en-US", true);
 
-        Assert.AreEqual(impact.Culture, "en-US");
+        Assert.That(impact.Culture, Is.EqualTo("en-US"));
 
-        Assert.IsTrue(impact.ImpactsInvariantProperties);
-        Assert.IsTrue(impact.ImpactsAlsoInvariantProperties);
-        Assert.IsFalse(impact.ImpactsOnlyInvariantCulture);
-        Assert.IsTrue(impact.ImpactsExplicitCulture);
-        Assert.IsFalse(impact.ImpactsAllCultures);
-        Assert.IsTrue(impact.ImpactsOnlyDefaultCulture);
+        Assert.That(impact.ImpactsInvariantProperties, Is.True);
+        Assert.That(impact.ImpactsAlsoInvariantProperties, Is.True);
+        Assert.That(impact.ImpactsOnlyInvariantCulture, Is.False);
+        Assert.That(impact.ImpactsExplicitCulture, Is.True);
+        Assert.That(impact.ImpactsAllCultures, Is.False);
+        Assert.That(impact.ImpactsOnlyDefaultCulture, Is.True);
     }
 
     [Test]
@@ -88,14 +88,14 @@ public class CultureImpactTests
     {
         var impact = BasicImpactFactory.ImpactExplicit("en-US", false);
 
-        Assert.AreEqual(impact.Culture, "en-US");
+        Assert.That(impact.Culture, Is.EqualTo("en-US"));
 
-        Assert.IsFalse(impact.ImpactsInvariantProperties);
-        Assert.IsFalse(impact.ImpactsAlsoInvariantProperties);
-        Assert.IsFalse(impact.ImpactsOnlyInvariantCulture);
-        Assert.IsTrue(impact.ImpactsExplicitCulture);
-        Assert.IsFalse(impact.ImpactsAllCultures);
-        Assert.IsFalse(impact.ImpactsOnlyDefaultCulture);
+        Assert.That(impact.ImpactsInvariantProperties, Is.False);
+        Assert.That(impact.ImpactsAlsoInvariantProperties, Is.False);
+        Assert.That(impact.ImpactsOnlyInvariantCulture, Is.False);
+        Assert.That(impact.ImpactsExplicitCulture, Is.True);
+        Assert.That(impact.ImpactsAllCultures, Is.False);
+        Assert.That(impact.ImpactsOnlyDefaultCulture, Is.False);
     }
 
     [Test]
@@ -103,17 +103,17 @@ public class CultureImpactTests
     {
         var success =
             BasicImpactFactory.TryCreate("en-US", true, ContentVariation.Culture, false, false, out var impact);
-        Assert.IsTrue(success);
+        Assert.That(success, Is.True);
 
-        Assert.IsNotNull(impact);
-        Assert.AreEqual(impact.Culture, "en-US");
+        Assert.That(impact, Is.Not.Null);
+        Assert.That(impact.Culture, Is.EqualTo("en-US"));
 
-        Assert.IsTrue(impact.ImpactsInvariantProperties);
-        Assert.IsTrue(impact.ImpactsAlsoInvariantProperties);
-        Assert.IsFalse(impact.ImpactsOnlyInvariantCulture);
-        Assert.IsTrue(impact.ImpactsExplicitCulture);
-        Assert.IsFalse(impact.ImpactsAllCultures);
-        Assert.IsTrue(impact.ImpactsOnlyDefaultCulture);
+        Assert.That(impact.ImpactsInvariantProperties, Is.True);
+        Assert.That(impact.ImpactsAlsoInvariantProperties, Is.True);
+        Assert.That(impact.ImpactsOnlyInvariantCulture, Is.False);
+        Assert.That(impact.ImpactsExplicitCulture, Is.True);
+        Assert.That(impact.ImpactsAllCultures, Is.False);
+        Assert.That(impact.ImpactsOnlyDefaultCulture, Is.True);
     }
 
     [Test]
@@ -121,57 +121,57 @@ public class CultureImpactTests
     {
         var success =
             BasicImpactFactory.TryCreate("en-US", false, ContentVariation.Culture, false, false, out var impact);
-        Assert.IsTrue(success);
+        Assert.That(success, Is.True);
 
-        Assert.IsNotNull(impact);
-        Assert.AreEqual(impact.Culture, "en-US");
+        Assert.That(impact, Is.Not.Null);
+        Assert.That(impact.Culture, Is.EqualTo("en-US"));
 
-        Assert.IsFalse(impact.ImpactsInvariantProperties);
-        Assert.IsFalse(impact.ImpactsAlsoInvariantProperties);
-        Assert.IsFalse(impact.ImpactsOnlyInvariantCulture);
-        Assert.IsTrue(impact.ImpactsExplicitCulture);
-        Assert.IsFalse(impact.ImpactsAllCultures);
-        Assert.IsFalse(impact.ImpactsOnlyDefaultCulture);
+        Assert.That(impact.ImpactsInvariantProperties, Is.False);
+        Assert.That(impact.ImpactsAlsoInvariantProperties, Is.False);
+        Assert.That(impact.ImpactsOnlyInvariantCulture, Is.False);
+        Assert.That(impact.ImpactsExplicitCulture, Is.True);
+        Assert.That(impact.ImpactsAllCultures, Is.False);
+        Assert.That(impact.ImpactsOnlyDefaultCulture, Is.False);
     }
 
     [Test]
     public void TryCreate_AllCultures_For_Invariant()
     {
         var success = BasicImpactFactory.TryCreate("*", false, ContentVariation.Nothing, false, false, out var impact);
-        Assert.IsTrue(success);
+        Assert.That(success, Is.True);
 
-        Assert.IsNotNull(impact);
-        Assert.AreEqual(impact.Culture, null);
+        Assert.That(impact, Is.Not.Null);
+        Assert.That(impact.Culture, Is.EqualTo(null));
 
-        Assert.AreSame(BasicImpactFactory.ImpactInvariant(), impact);
+        Assert.That(impact, Is.SameAs(BasicImpactFactory.ImpactInvariant()));
     }
 
     [Test]
     public void TryCreate_AllCultures_For_Variant()
     {
         var success = BasicImpactFactory.TryCreate("*", false, ContentVariation.Culture, false, false, out var impact);
-        Assert.IsTrue(success);
+        Assert.That(success, Is.True);
 
-        Assert.IsNotNull(impact);
-        Assert.AreEqual(impact.Culture, "*");
+        Assert.That(impact, Is.Not.Null);
+        Assert.That(impact.Culture, Is.EqualTo("*"));
 
-        Assert.AreSame(BasicImpactFactory.ImpactAll(), impact);
+        Assert.That(impact, Is.SameAs(BasicImpactFactory.ImpactAll()));
     }
 
     [Test]
     public void TryCreate_Invariant_For_Variant()
     {
         var success = BasicImpactFactory.TryCreate(null, false, ContentVariation.Culture, false, false, out var impact);
-        Assert.IsFalse(success);
+        Assert.That(success, Is.False);
     }
 
     [Test]
     public void TryCreate_Invariant_For_Invariant()
     {
         var success = BasicImpactFactory.TryCreate(null, false, ContentVariation.Nothing, false, false, out var impact);
-        Assert.IsTrue(success);
+        Assert.That(success, Is.True);
 
-        Assert.AreSame(BasicImpactFactory.ImpactInvariant(), impact);
+        Assert.That(impact, Is.SameAs(BasicImpactFactory.ImpactInvariant()));
     }
 
     [Test]
@@ -185,7 +185,7 @@ public class CultureImpactTests
         });
         var impact = sut.ImpactExplicit("da", false);
 
-        Assert.AreEqual(allowEditInvariantFromNonDefault, impact.ImpactsAlsoInvariantProperties);
+        Assert.That(impact.ImpactsAlsoInvariantProperties, Is.EqualTo(allowEditInvariantFromNonDefault));
     }
 
     private CultureImpactFactory CreateCultureImpactService(ContentSettings contentSettings = null)

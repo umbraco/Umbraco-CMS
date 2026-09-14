@@ -168,7 +168,7 @@ public class BlockListPropertyValueHandlerTests : PropertyValueHandlerTestsBase
         TestIndexDocument document = IndexerAndSearcher.Dump(IndexAliases.PublishedContent).Single();
         IndexValue? tagsValue = document.Fields.FirstOrDefault(f => f.FieldName == Cms.Search.Core.Constants.FieldNames.Tags)?.Value;
         Assert.That(tagsValue, Is.Not.Null);
-        CollectionAssert.AreEquivalent(new[] { "One", "Two", "Three", "Four", "Five", "Six" }, tagsValue.Keywords);
+        Assert.That(tagsValue.Keywords, Is.EquivalentTo(new[] { "One", "Two", "Three", "Four", "Five", "Six" }));
 
         return;
 
@@ -184,21 +184,21 @@ public class BlockListPropertyValueHandlerTests : PropertyValueHandlerTestsBase
 
             Assert.Multiple(() =>
             {
-                CollectionAssert.AreEqual(new[] { "The TextBox value", "The TextArea value", "First", "Second", "Third", "Link One" }, indexValue.Texts);
+                Assert.That(indexValue.Texts, Is.EqualTo(new[] { "The TextBox value", "The TextArea value", "First", "Second", "Third", "Link One" }).AsCollection);
 
-                CollectionAssert.AreEqual(new[] { 1234, 1, 1, 1 }, indexValue.Integers);
+                Assert.That(indexValue.Integers, Is.EqualTo(new[] { 1234, 1, 1, 1 }).AsCollection);
 
-                CollectionAssert.AreEqual(new[] { 56.78m, 1.23m, 2.34m, 5.67m }, indexValue.Decimals);
+                Assert.That(indexValue.Decimals, Is.EqualTo(new[] { 56.78m, 1.23m, 2.34m, 5.67m }).AsCollection);
 
-                CollectionAssert.AreEqual(
-                    new[]
+                Assert.That(
+                    indexValue.DateTimeOffsets,
+                    Is.EqualTo(new[]
                     {
                         new DateTimeOffset(new DateOnly(2001, 02, 03), new TimeOnly(), TimeSpan.Zero),
                         new DateTimeOffset(new DateOnly(2004, 05, 06), new TimeOnly(07, 08, 09), TimeSpan.Zero)
-                    },
-                    indexValue.DateTimeOffsets);
+                    }).AsCollection);
 
-                CollectionAssert.AreEqual(new[] { "One", "Two", "Three", "Four", "Five", "Six", "55bf7f6d-acd2-4f1e-92bd-f0b5c41dbfed" }, indexValue.Keywords);
+                Assert.That(indexValue.Keywords, Is.EqualTo(new[] { "One", "Two", "Three", "Four", "Five", "Six", "55bf7f6d-acd2-4f1e-92bd-f0b5c41dbfed" }).AsCollection);
             });
         }
     }
@@ -332,14 +332,14 @@ public class BlockListPropertyValueHandlerTests : PropertyValueHandlerTestsBase
 
         Assert.Multiple(() =>
         {
-            CollectionAssert.AreEqual(new[] { "TextBox value #1", "TextBox value #2" }, indexValue.Texts);
-            CollectionAssert.AreEqual(new[] { 12, 34 }, indexValue.Integers);
-            CollectionAssert.AreEqual(new[] { "One", "Two", "Three", "Four", "Five", "Six" }, indexValue.Keywords);
+            Assert.That(indexValue.Texts, Is.EqualTo(new[] { "TextBox value #1", "TextBox value #2" }).AsCollection);
+            Assert.That(indexValue.Integers, Is.EqualTo(new[] { 12, 34 }).AsCollection);
+            Assert.That(indexValue.Keywords, Is.EqualTo(new[] { "One", "Two", "Three", "Four", "Five", "Six" }).AsCollection);
         });
 
         IndexValue? tagsValue = document.Fields.FirstOrDefault(f => f.FieldName == Cms.Search.Core.Constants.FieldNames.Tags)?.Value;
         Assert.That(tagsValue, Is.Not.Null);
-        CollectionAssert.AreEquivalent(new[] { "One", "Two", "Three", "Four", "Five", "Six" }, tagsValue.Keywords);
+        Assert.That(tagsValue.Keywords, Is.EquivalentTo(new[] { "One", "Two", "Three", "Four", "Five", "Six" }));
     }
 
     [Test]
@@ -361,15 +361,15 @@ public class BlockListPropertyValueHandlerTests : PropertyValueHandlerTestsBase
 
             IndexValue? indexValueInv = document.Fields.SingleOrDefault(f => f is { FieldName: "rootBlocks", Culture: null })?.Value;
             Assert.That(indexValueInv, Is.Not.Null);
-            CollectionAssert.AreEqual(new[] { "Nested TextArea value INV", "Root TextArea value INV" }, indexValueInv.Texts);
+            Assert.That(indexValueInv.Texts, Is.EqualTo(new[] { "Nested TextArea value INV", "Root TextArea value INV" }).AsCollection);
 
             IndexValue? indexValueEn = document.Fields.SingleOrDefault(f => f is { FieldName: "rootBlocks", Culture: "en-US" })?.Value;
             Assert.That(indexValueEn, Is.Not.Null);
 
             Assert.Multiple(() =>
             {
-                CollectionAssert.AreEqual(new[] { "Nested TextBox value EN", "Root TextBox value EN" }, indexValueEn.Texts);
-                CollectionAssert.AreEqual(new[] { 21, 11 }, indexValueEn.Integers);
+                Assert.That(indexValueEn.Texts, Is.EqualTo(new[] { "Nested TextBox value EN", "Root TextBox value EN" }).AsCollection);
+                Assert.That(indexValueEn.Integers, Is.EqualTo(new[] { 21, 11 }).AsCollection);
             });
 
             IndexValue? indexValueDa = document.Fields.SingleOrDefault(f => f is { FieldName: "rootBlocks", Culture: "da-DK" })?.Value;
@@ -377,8 +377,8 @@ public class BlockListPropertyValueHandlerTests : PropertyValueHandlerTestsBase
 
             Assert.Multiple(() =>
             {
-                CollectionAssert.AreEqual(new[] { "Nested TextBox value DA", "Root TextBox value DA" }, indexValueDa.Texts);
-                CollectionAssert.AreEqual(new[] { 22, 12 }, indexValueDa.Integers);
+                Assert.That(indexValueDa.Texts, Is.EqualTo(new[] { "Nested TextBox value DA", "Root TextBox value DA" }).AsCollection);
+                Assert.That(indexValueDa.Integers, Is.EqualTo(new[] { 22, 12 }).AsCollection);
             });
 
             IndexValue? indexValueDe = document.Fields.SingleOrDefault(f => f is { FieldName: "rootBlocks", Culture: "de-DE" })?.Value;
@@ -386,8 +386,8 @@ public class BlockListPropertyValueHandlerTests : PropertyValueHandlerTestsBase
 
             Assert.Multiple(() =>
             {
-                CollectionAssert.AreEqual(new[] { "Nested TextBox value DE", "Root TextBox value DE" }, indexValueDe.Texts);
-                CollectionAssert.AreEqual(new[] { 23, 13 }, indexValueDe.Integers);
+                Assert.That(indexValueDe.Texts, Is.EqualTo(new[] { "Nested TextBox value DE", "Root TextBox value DE" }).AsCollection);
+                Assert.That(indexValueDe.Integers, Is.EqualTo(new[] { 23, 13 }).AsCollection);
             });
         }
     }
@@ -411,7 +411,7 @@ public class BlockListPropertyValueHandlerTests : PropertyValueHandlerTestsBase
 
             IndexValue? indexValueInv = document.Fields.SingleOrDefault(f => f is { FieldName: "rootBlocks", Culture: null })?.Value;
             Assert.That(indexValueInv, Is.Not.Null);
-            CollectionAssert.AreEqual(new[] { "Nested TextArea value INV", "Root TextArea value INV" }, indexValueInv.Texts);
+            Assert.That(indexValueInv.Texts, Is.EqualTo(new[] { "Nested TextArea value INV", "Root TextArea value INV" }).AsCollection);
 
             IndexValue? indexValueEn = document.Fields.SingleOrDefault(f => f is { FieldName: "rootBlocks", Culture: "en-US" })?.Value;
 
@@ -421,8 +421,8 @@ public class BlockListPropertyValueHandlerTests : PropertyValueHandlerTestsBase
 
                 Assert.Multiple(() =>
                 {
-                    CollectionAssert.AreEqual(new[] { "Nested TextBox value EN", "Root TextBox value EN" }, indexValueEn.Texts);
-                    CollectionAssert.AreEqual(new[] { 21, 11 }, indexValueEn.Integers);
+                    Assert.That(indexValueEn.Texts, Is.EqualTo(new[] { "Nested TextBox value EN", "Root TextBox value EN" }).AsCollection);
+                    Assert.That(indexValueEn.Integers, Is.EqualTo(new[] { 21, 11 }).AsCollection);
                 });
             }
             else
@@ -435,8 +435,8 @@ public class BlockListPropertyValueHandlerTests : PropertyValueHandlerTestsBase
 
             Assert.Multiple(() =>
             {
-                CollectionAssert.AreEqual(new[] { "Nested TextBox value DA", "Root TextBox value DA" }, indexValueDa.Texts);
-                CollectionAssert.AreEqual(new[] { 22, 12 }, indexValueDa.Integers);
+                Assert.That(indexValueDa.Texts, Is.EqualTo(new[] { "Nested TextBox value DA", "Root TextBox value DA" }).AsCollection);
+                Assert.That(indexValueDa.Integers, Is.EqualTo(new[] { 22, 12 }).AsCollection);
             });
 
             IndexValue? indexValueDe = document.Fields.SingleOrDefault(f => f is { FieldName: "rootBlocks", Culture: "de-DE" })?.Value;
@@ -444,8 +444,8 @@ public class BlockListPropertyValueHandlerTests : PropertyValueHandlerTestsBase
 
             Assert.Multiple(() =>
             {
-                CollectionAssert.AreEqual(new[] { "Nested TextBox value DE", "Root TextBox value DE" }, indexValueDe.Texts);
-                CollectionAssert.AreEqual(new[] { 23, 13 }, indexValueDe.Integers);
+                Assert.That(indexValueDe.Texts, Is.EqualTo(new[] { "Nested TextBox value DE", "Root TextBox value DE" }).AsCollection);
+                Assert.That(indexValueDe.Integers, Is.EqualTo(new[] { 23, 13 }).AsCollection);
             });
         }
     }
@@ -527,11 +527,11 @@ public class BlockListPropertyValueHandlerTests : PropertyValueHandlerTestsBase
 
             IndexValue? indexValueEn = document.Fields.FirstOrDefault(f => f is { FieldName: "blocks", Culture: "en-US" })?.Value;
             Assert.That(indexValueEn, Is.Not.Null);
-            CollectionAssert.AreEqual(expectedTextBoxValuesEn, indexValueEn.Texts);
+            Assert.That(indexValueEn.Texts, Is.EqualTo(expectedTextBoxValuesEn).AsCollection);
 
             IndexValue? indexValueDa = document.Fields.FirstOrDefault(f => f is { FieldName: "blocks", Culture: "da-DK" })?.Value;
             Assert.That(indexValueDa, Is.Not.Null);
-            CollectionAssert.AreEqual(expectedTextBoxValuesDa, indexValueDa.Texts);
+            Assert.That(indexValueDa.Texts, Is.EqualTo(expectedTextBoxValuesDa).AsCollection);
         }
     }
 
@@ -607,10 +607,10 @@ public class BlockListPropertyValueHandlerTests : PropertyValueHandlerTestsBase
         IndexValue? blocksValue = documents[0].Fields.FirstOrDefault(f => f.FieldName is "blocks")?.Value;
         Assert.That(blocksValue, Is.Not.Null);
 
-        CollectionAssert.AreEqual(new[] { "H1 Heading #1", "H1 Heading #2" }, blocksValue.TextsR1);
-        CollectionAssert.AreEqual(new[] { "H2 Heading #1", "H2 Heading #2" }, blocksValue.TextsR2);
-        CollectionAssert.AreEqual(new[] { "H3 Heading #1", "H3 Heading #2" }, blocksValue.TextsR3);
-        CollectionAssert.AreEqual(new[] { "Paragraph #1", "Paragraph #2" }, blocksValue.Texts);
+        Assert.That(blocksValue.TextsR1, Is.EqualTo(new[] { "H1 Heading #1", "H1 Heading #2" }).AsCollection);
+        Assert.That(blocksValue.TextsR2, Is.EqualTo(new[] { "H2 Heading #1", "H2 Heading #2" }).AsCollection);
+        Assert.That(blocksValue.TextsR3, Is.EqualTo(new[] { "H3 Heading #1", "H3 Heading #2" }).AsCollection);
+        Assert.That(blocksValue.Texts, Is.EqualTo(new[] { "Paragraph #1", "Paragraph #2" }).AsCollection);
     }
 
     private async Task<IContentType> CreateAllSimpleEditorsElementType(bool forBlockLevelVariance = false)

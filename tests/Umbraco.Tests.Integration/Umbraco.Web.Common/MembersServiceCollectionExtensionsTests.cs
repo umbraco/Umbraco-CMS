@@ -18,8 +18,8 @@ internal sealed class MembersServiceCollectionExtensionsTests : UmbracoIntegrati
     {
         var userStore = Services.GetService<IUserStore<MemberIdentityUser>>();
 
-        Assert.IsNotNull(userStore);
-        Assert.AreEqual(typeof(MemberUserStore), userStore.GetType());
+        Assert.That(userStore, Is.Not.Null);
+        Assert.That(userStore.GetType(), Is.EqualTo(typeof(MemberUserStore)));
     }
 
     [Test]
@@ -27,6 +27,6 @@ internal sealed class MembersServiceCollectionExtensionsTests : UmbracoIntegrati
     {
         var userManager = Services.GetService<IMemberManager>();
 
-        Assert.NotNull(userManager);
+        Assert.That(userManager, Is.Not.Null);
     }
 }

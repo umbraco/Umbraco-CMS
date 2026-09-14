@@ -74,38 +74,38 @@ internal sealed class PartialViewRepositoryTests : UmbracoIntegrationTest
             IPartialView partialView =
                 new PartialView("test-path-1.cshtml") { Content = "// partialView" };
             repository.Save(partialView);
-            Assert.IsTrue(_fileSystem.FileExists("test-path-1.cshtml"));
-            Assert.AreEqual("test-path-1.cshtml", partialView.Path);
-            Assert.AreEqual("/Views/Partials/test-path-1.cshtml", partialView.VirtualPath);
+            Assert.That(_fileSystem.FileExists("test-path-1.cshtml"), Is.True);
+            Assert.That(partialView.Path, Is.EqualTo("test-path-1.cshtml"));
+            Assert.That(partialView.VirtualPath, Is.EqualTo("/Views/Partials/test-path-1.cshtml"));
 
             partialView =
                 new PartialView("path-2/test-path-2.cshtml") { Content = "// partialView" };
             repository.Save(partialView);
-            Assert.IsTrue(_fileSystem.FileExists("path-2/test-path-2.cshtml"));
-            Assert.AreEqual("path-2\\test-path-2.cshtml".Replace("\\", $"{Path.DirectorySeparatorChar}"), partialView.Path);
-            Assert.AreEqual("/Views/Partials/path-2/test-path-2.cshtml", partialView.VirtualPath);
+            Assert.That(_fileSystem.FileExists("path-2/test-path-2.cshtml"), Is.True);
+            Assert.That(partialView.Path, Is.EqualTo("path-2\\test-path-2.cshtml".Replace("\\", $"{Path.DirectorySeparatorChar}")));
+            Assert.That(partialView.VirtualPath, Is.EqualTo("/Views/Partials/path-2/test-path-2.cshtml"));
 
             partialView = repository.Get("path-2/test-path-2.cshtml");
-            Assert.IsNotNull(partialView);
-            Assert.AreEqual("path-2\\test-path-2.cshtml".Replace("\\", $"{Path.DirectorySeparatorChar}"), partialView.Path);
-            Assert.AreEqual("/Views/Partials/path-2/test-path-2.cshtml", partialView.VirtualPath);
+            Assert.That(partialView, Is.Not.Null);
+            Assert.That(partialView.Path, Is.EqualTo("path-2\\test-path-2.cshtml".Replace("\\", $"{Path.DirectorySeparatorChar}")));
+            Assert.That(partialView.VirtualPath, Is.EqualTo("/Views/Partials/path-2/test-path-2.cshtml"));
 
             partialView =
                 new PartialView("path-2\\test-path-3.cshtml") { Content = "// partialView" };
             repository.Save(partialView);
-            Assert.IsTrue(_fileSystem.FileExists("path-2/test-path-3.cshtml"));
-            Assert.AreEqual("path-2\\test-path-3.cshtml".Replace("\\", $"{Path.DirectorySeparatorChar}"), partialView.Path);
-            Assert.AreEqual("/Views/Partials/path-2/test-path-3.cshtml", partialView.VirtualPath);
+            Assert.That(_fileSystem.FileExists("path-2/test-path-3.cshtml"), Is.True);
+            Assert.That(partialView.Path, Is.EqualTo("path-2\\test-path-3.cshtml".Replace("\\", $"{Path.DirectorySeparatorChar}")));
+            Assert.That(partialView.VirtualPath, Is.EqualTo("/Views/Partials/path-2/test-path-3.cshtml"));
 
             partialView = repository.Get("path-2/test-path-3.cshtml");
-            Assert.IsNotNull(partialView);
-            Assert.AreEqual("path-2\\test-path-3.cshtml".Replace("\\", $"{Path.DirectorySeparatorChar}"), partialView.Path);
-            Assert.AreEqual("/Views/Partials/path-2/test-path-3.cshtml", partialView.VirtualPath);
+            Assert.That(partialView, Is.Not.Null);
+            Assert.That(partialView.Path, Is.EqualTo("path-2\\test-path-3.cshtml".Replace("\\", $"{Path.DirectorySeparatorChar}")));
+            Assert.That(partialView.VirtualPath, Is.EqualTo("/Views/Partials/path-2/test-path-3.cshtml"));
 
             partialView = repository.Get("path-2\\test-path-3.cshtml");
-            Assert.IsNotNull(partialView);
-            Assert.AreEqual("path-2\\test-path-3.cshtml".Replace("\\", $"{Path.DirectorySeparatorChar}"), partialView.Path);
-            Assert.AreEqual("/Views/Partials/path-2/test-path-3.cshtml", partialView.VirtualPath);
+            Assert.That(partialView, Is.Not.Null);
+            Assert.That(partialView.Path, Is.EqualTo("path-2\\test-path-3.cshtml".Replace("\\", $"{Path.DirectorySeparatorChar}")));
+            Assert.That(partialView.VirtualPath, Is.EqualTo("/Views/Partials/path-2/test-path-3.cshtml"));
 
             partialView =
                 new PartialView("..\\test-path-4.cshtml") { Content = "// partialView" };
@@ -117,12 +117,12 @@ internal sealed class PartialViewRepositoryTests : UmbracoIntegrationTest
             repository.Save(partialView);
 
             partialView = repository.Get("\\test-path-5.cshtml");
-            Assert.IsNotNull(partialView);
-            Assert.AreEqual("test-path-5.cshtml", partialView.Path);
-            Assert.AreEqual("/Views/Partials/test-path-5.cshtml", partialView.VirtualPath);
+            Assert.That(partialView, Is.Not.Null);
+            Assert.That(partialView.Path, Is.EqualTo("test-path-5.cshtml"));
+            Assert.That(partialView.VirtualPath, Is.EqualTo("/Views/Partials/test-path-5.cshtml"));
 
             partialView = repository.Get("missing.cshtml");
-            Assert.IsNull(partialView);
+            Assert.That(partialView, Is.Null);
 
             Assert.Throws<UnauthorizedAccessException>(() => partialView = repository.Get("..\\test-path-4.cshtml"));
             Assert.Throws<UnauthorizedAccessException>(() => partialView = repository.Get("../../packages.config"));
@@ -152,7 +152,7 @@ internal sealed class PartialViewRepositoryTests : UmbracoIntegrationTest
         repository.Save(partialView);
 
         // Assert - file should NOT be created in production mode
-        Assert.IsFalse(_fileSystem.FileExists("production-test-new.cshtml"));
+        Assert.That(_fileSystem.FileExists("production-test-new.cshtml"), Is.False);
     }
 
     [Test]
@@ -174,7 +174,7 @@ internal sealed class PartialViewRepositoryTests : UmbracoIntegrationTest
 
         IPartialView partialView = new PartialView("production-test-update.cshtml") { Content = "// original content" };
         developmentRepository.Save(partialView);
-        Assert.IsTrue(_fileSystem.FileExists("production-test-update.cshtml"));
+        Assert.That(_fileSystem.FileExists("production-test-update.cshtml"), Is.True);
 
         // Read original content.
         using var originalStream = _fileSystem.OpenFile("production-test-update.cshtml");
@@ -187,7 +187,7 @@ internal sealed class PartialViewRepositoryTests : UmbracoIntegrationTest
         var productionRepository = new PartialViewRepository(fileSystems, productionRuntimeSettings);
 
         IPartialView updatedPartialView = productionRepository.Get("production-test-update.cshtml");
-        Assert.IsNotNull(updatedPartialView);
+        Assert.That(updatedPartialView, Is.Not.Null);
 
         // Modify and try to save.
         updatedPartialView.Content = "// modified content";
@@ -224,7 +224,7 @@ internal sealed class PartialViewRepositoryTests : UmbracoIntegrationTest
         repository.Save(partialView);
 
         // Assert - file should be created in development mode.
-        Assert.IsTrue(_fileSystem.FileExists("development-test.cshtml"));
+        Assert.That(_fileSystem.FileExists("development-test.cshtml"), Is.True);
     }
 
     [Test]
@@ -250,7 +250,7 @@ internal sealed class PartialViewRepositoryTests : UmbracoIntegrationTest
         repository.Save(partialView);
 
         // Assert - file should be created in backoffice development mode.
-        Assert.IsTrue(_fileSystem.FileExists("backoffice-development-test.cshtml"));
+        Assert.That(_fileSystem.FileExists("backoffice-development-test.cshtml"), Is.True);
     }
 
     private void Purge(PhysicalFileSystem fs, string path)

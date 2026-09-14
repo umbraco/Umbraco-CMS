@@ -38,11 +38,11 @@ public class PropertyEditorValueConverterTests
 
         if (expected)
         {
-            Assert.AreEqual(dateTime.Date, ((DateTime)result).Date);
+            Assert.That(((DateTime)result).Date, Is.EqualTo(dateTime.Date));
         }
         else
         {
-            Assert.AreNotEqual(dateTime.Date, ((DateTime)result).Date);
+            Assert.That(((DateTime)result).Date, Is.Not.EqualTo(dateTime.Date));
         }
     }
 
@@ -67,7 +67,7 @@ public class PropertyEditorValueConverterTests
         var result =
             converter.ConvertSourceToIntermediate(null, null, value, false); // does not use type for conversion
 
-        Assert.AreEqual(expected, result);
+        Assert.That(result, Is.EqualTo(expected));
     }
 
     [TestCase("[\"apples\"]", new[] { "apples" })]
@@ -80,7 +80,7 @@ public class PropertyEditorValueConverterTests
         var converter = new CheckboxListValueConverter(new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory()));
         var result = converter.ConvertIntermediateToObject(null, null, PropertyCacheLevel.Unknown, value, false);
 
-        Assert.AreEqual(expected, result);
+        Assert.That(result, Is.EqualTo(expected));
     }
 
     [TestCase("[\"apples\"]", new[] { "apples" })]
@@ -113,7 +113,7 @@ public class PropertyEditorValueConverterTests
         var result =
             converter.ConvertIntermediateToObject(null, publishedPropType, PropertyCacheLevel.Unknown, inter, false);
 
-        Assert.AreEqual(expected, result);
+        Assert.That(result, Is.EqualTo(expected));
     }
 
     [TestCase("1", 1)]
@@ -128,7 +128,7 @@ public class PropertyEditorValueConverterTests
         var inter = converter.ConvertSourceToIntermediate(null, null, value, false);
         var result = converter.ConvertIntermediateToObject(null, null, PropertyCacheLevel.Unknown, inter, false);
 
-        Assert.AreEqual(expected, result);
+        Assert.That(result, Is.EqualTo(expected));
     }
 
     [TestCase("100", 100)]
@@ -144,6 +144,6 @@ public class PropertyEditorValueConverterTests
         var inter = converter.ConvertSourceToIntermediate(null, null, value, false);
         var result = converter.ConvertIntermediateToObject(null, null, PropertyCacheLevel.Unknown, inter, false);
 
-        Assert.AreEqual(expected, result);
+        Assert.That(result, Is.EqualTo(expected));
     }
 }

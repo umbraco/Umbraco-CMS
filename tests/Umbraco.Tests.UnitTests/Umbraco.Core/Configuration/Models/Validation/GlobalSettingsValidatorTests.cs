@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Configuration.Models.Validation;
 
@@ -16,7 +17,7 @@ public class GlobalSettingsValidatorTests
         var validator = new GlobalSettingsValidator();
         var options = new GlobalSettings();
         var result = validator.Validate("settings", options);
-        Assert.True(result.Succeeded);
+        Assert.That(result.Succeeded, Is.True);
     }
 
     [Test]
@@ -26,7 +27,7 @@ public class GlobalSettingsValidatorTests
         var options = new GlobalSettings { Smtp = new SmtpSettings { From = "invalid" } };
 
         var result = validator.Validate("settings", options);
-        Assert.False(result.Succeeded);
+        Assert.That(result.Succeeded, Is.False);
     }
 
     [Test]
@@ -36,7 +37,7 @@ public class GlobalSettingsValidatorTests
         var options = new GlobalSettings { DistributedLockingWriteLockDefaultTimeout = TimeSpan.Parse("00:00:00.099") };
 
         var result = validator.Validate("settings", options);
-        Assert.False(result.Succeeded);
+        Assert.That(result.Succeeded, Is.False);
     }
 
     [Test]
@@ -46,7 +47,7 @@ public class GlobalSettingsValidatorTests
         var options = new GlobalSettings { DistributedLockingWriteLockDefaultTimeout = TimeSpan.Parse("00:00:20") };
 
         var result = validator.Validate("settings", options);
-        Assert.True(result.Succeeded);
+        Assert.That(result.Succeeded, Is.True);
     }
 
     [Test]
@@ -56,7 +57,7 @@ public class GlobalSettingsValidatorTests
         var options = new GlobalSettings { TimeOut = TimeSpan.FromDays(25) };
 
         var result = validator.Validate("settings", options);
-        Assert.False(result.Succeeded);
+        Assert.That(result.Succeeded, Is.False);
     }
 
     [Test]
@@ -66,7 +67,7 @@ public class GlobalSettingsValidatorTests
         var options = new GlobalSettings { TimeOut = TimeSpan.FromHours(12) };
 
         var result = validator.Validate("settings", options);
-        Assert.True(result.Succeeded);
+        Assert.That(result.Succeeded, Is.True);
     }
 
     [Test]
@@ -76,7 +77,7 @@ public class GlobalSettingsValidatorTests
         var options = new GlobalSettings { DatabaseCommandTimeout = TimeSpan.FromSeconds(-1) };
 
         var result = validator.Validate("settings", options);
-        Assert.False(result.Succeeded);
+        Assert.That(result.Succeeded, Is.False);
     }
 
     [Test]
@@ -86,7 +87,7 @@ public class GlobalSettingsValidatorTests
         var options = new GlobalSettings { DatabaseConnectTimeout = TimeSpan.FromSeconds(-1) };
 
         var result = validator.Validate("settings", options);
-        Assert.False(result.Succeeded);
+        Assert.That(result.Succeeded, Is.False);
     }
 
     [Test]
@@ -101,7 +102,7 @@ public class GlobalSettingsValidatorTests
         };
 
         var result = validator.Validate("settings", options);
-        Assert.True(result.Succeeded);
+        Assert.That(result.Succeeded, Is.True);
     }
 
     [Test]
@@ -115,6 +116,6 @@ public class GlobalSettingsValidatorTests
         };
 
         var result = validator.Validate("settings", options);
-        Assert.True(result.Succeeded);
+        Assert.That(result.Succeeded, Is.True);
     }
 }
