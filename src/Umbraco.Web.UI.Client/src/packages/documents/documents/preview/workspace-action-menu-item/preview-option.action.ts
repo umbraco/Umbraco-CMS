@@ -10,7 +10,7 @@ export class UmbDocumentSaveAndPreviewOptionWorkspaceAction extends UmbWorkspace
 		if (!workspaceContext) {
 			throw new Error('The workspace context is missing');
 		}
-		await workspaceContext.saveAndPreview(this.manifest?.meta.urlProviderAlias);
+		await workspaceContext?.saveAndPreview(this.manifest?.meta.urlProviderAlias);
 	}
 }
 
