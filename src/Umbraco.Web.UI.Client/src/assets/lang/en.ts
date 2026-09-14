@@ -1534,6 +1534,17 @@ export default {
 			'Drag the different items up or down below to set how they should be arranged. Or click the column headers to sort the entire collection of items',
 		sortPleaseWait: 'Please wait. Items are being sorted, this can take a while.',
 		sortEmptyState: 'This node has no child nodes to sort',
+		sortByFieldHeadline: 'Sort by field',
+		sortByFieldSentence: 'Sort all children by',
+		sortByFieldDirectionLabel: 'Direction',
+		sortByFieldAscending: 'Ascending',
+		sortByFieldDescending: 'Descending',
+		sortByFieldNameOption: 'Name',
+		sortByFieldCreateDateOption: 'Created',
+		sortByFieldUpdateDateOption: 'Last edited',
+		sortIndividuallyHeadline: 'Sort individually',
+		sortByFieldCultureSentence: 'in',
+		sortByFieldCultureLabel: 'Language',
 	},
 	speechBubbles: {
 		validationFailedHeader: 'Validation',
@@ -2581,6 +2592,7 @@ export default {
 		labelUsedByItems: 'Referenced by',
 		labelDependsOnThis: 'The following items depend on this',
 		labelDependentDescendants: 'The following descending items have dependencies',
+		labelUsedByOtherContent: 'The following items are used by other content',
 		labelMoreReferences: (count: number) => {
 			if (count === 1) return '...and one more item';
 			return `...and ${count} more items`;
