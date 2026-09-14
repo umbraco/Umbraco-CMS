@@ -237,7 +237,7 @@ public class MultipleDocumentPickerPropertyEditor : DataEditor, IValueSchemaProv
                 return [];
             }
 
-            HashSet<Guid> allowedContentTypeKeys = AllowedContentTypeKeysParser.Parse(configuration.AllowedContentTypeKeys);
+            HashSet<Guid> allowedContentTypeKeys = AllowedContentTypeKeysParser.Parse(configuration.AllowedContentTypeIds);
 
             // No filter configured — all document types are allowed.
             if (allowedContentTypeKeys.Count == 0)
