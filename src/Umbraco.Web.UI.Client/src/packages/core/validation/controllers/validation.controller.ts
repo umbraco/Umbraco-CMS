@@ -221,7 +221,6 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 	#readyToSync() {
 		if (this.#sync && this.#parent) {
 			this.#parent.addValidator(this);
-			this.observe(this.messages.messages, this.#transferMessages, 'observeLocalMessages');
 		}
 	}
 
@@ -235,6 +234,7 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 	autoReport() {
 		this.#sync = true;
 		this.#readyToSync();
+		this.observe(this.messages.messages, this.#transferMessages, 'observeLocalMessages');
 	}
 
 	/**
