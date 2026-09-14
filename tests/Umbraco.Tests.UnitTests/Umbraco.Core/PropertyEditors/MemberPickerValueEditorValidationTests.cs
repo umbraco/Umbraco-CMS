@@ -22,7 +22,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
 internal sealed class MemberPickerValueEditorValidationTests
 {
     [Test]
-    public void A_Single_Member_Picker_Allows_A_Member_Of_An_Allowed_Type()
+    public void Single_Member_Picker_Allows_A_Member_Of_An_Allowed_Type()
     {
         var allowedTypeKey = Guid.NewGuid();
         var memberKey = Guid.NewGuid();
@@ -33,7 +33,7 @@ internal sealed class MemberPickerValueEditorValidationTests
     }
 
     [Test]
-    public void A_Single_Member_Picker_Rejects_A_Member_Of_Another_Type()
+    public void Single_Member_Picker_Rejects_A_Member_Of_Another_Type()
     {
         var memberKey = Guid.NewGuid();
         var valueEditor = CreateSingleValueEditor(MemberOfType(memberKey, Guid.NewGuid()));
@@ -43,7 +43,7 @@ internal sealed class MemberPickerValueEditorValidationTests
     }
 
     [Test]
-    public void A_Single_Member_Picker_Allows_Any_Member_When_No_Filter_Is_Configured()
+    public void Single_Member_Picker_Allows_Any_Member_When_No_Filter_Is_Configured()
     {
         var memberKey = Guid.NewGuid();
         var valueEditor = CreateSingleValueEditor(MemberOfType(memberKey, Guid.NewGuid()));
@@ -53,7 +53,7 @@ internal sealed class MemberPickerValueEditorValidationTests
     }
 
     [Test]
-    public void A_Multiple_Member_Picker_Rejects_A_Member_Of_Another_Type()
+    public void Multiple_Member_Picker_Rejects_A_Member_Of_Another_Type()
     {
         var allowedTypeKey = Guid.NewGuid();
         var allowedMemberKey = Guid.NewGuid();
@@ -73,7 +73,7 @@ internal sealed class MemberPickerValueEditorValidationTests
     }
 
     [Test]
-    public void A_Multiple_Member_Picker_Reports_A_Member_That_No_Longer_Exists()
+    public void Multiple_Member_Picker_Reports_A_Member_That_No_Longer_Exists()
     {
         var valueEditor = CreateMultipleValueEditor();
         valueEditor.ConfigurationObject = new MultipleMemberPickerConfiguration { Filter = Guid.NewGuid().ToString() };
@@ -93,7 +93,7 @@ internal sealed class MemberPickerValueEditorValidationTests
     [TestCase(1, 1, true)]
     [TestCase(1, 2, false)]
     [TestCase(0, 2, true)]
-    public void A_Multiple_Member_Picker_Validates_The_Minimum_Number_Of_Members(int memberCount, int min, bool succeed)
+    public void Multiple_Member_Picker_Validates_The_Minimum_Number_Of_Members(int memberCount, int min, bool succeed)
     {
         var valueEditor = CreateMultipleValueEditor();
         valueEditor.ConfigurationObject = new MultipleMemberPickerConfiguration
@@ -107,7 +107,7 @@ internal sealed class MemberPickerValueEditorValidationTests
     [TestCase(1, 2, true)]
     [TestCase(2, 2, true)]
     [TestCase(3, 2, false)]
-    public void A_Multiple_Member_Picker_Validates_The_Maximum_Number_Of_Members(int memberCount, int max, bool succeed)
+    public void Multiple_Member_Picker_Validates_The_Maximum_Number_Of_Members(int memberCount, int max, bool succeed)
     {
         var valueEditor = CreateMultipleValueEditor();
         valueEditor.ConfigurationObject = new MultipleMemberPickerConfiguration

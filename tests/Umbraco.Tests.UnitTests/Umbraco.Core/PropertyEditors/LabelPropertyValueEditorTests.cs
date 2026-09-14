@@ -1,10 +1,8 @@
-using System;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
-using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Serialization;
 
@@ -27,11 +25,11 @@ public class LabelPropertyValueEditorTests
     [TestCase(ValueTypes.String)]
     public void ToEditor_YieldsAJsonShapedValueAsAString(string valueType)
     {
-        const string Stored = """{"a":1}""";
+        const string stored = """{"a":1}""";
 
-        var value = ToEditor(valueType, Stored);
+        var value = ToEditor(valueType, stored);
 
-        Assert.AreEqual(Stored, value);
+        Assert.AreEqual(stored, value);
         Assert.IsInstanceOf<string>(value);
     }
 
