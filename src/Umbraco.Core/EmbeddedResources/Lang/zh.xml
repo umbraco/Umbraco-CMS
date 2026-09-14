@@ -1,14 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<language alias="zh" intName="Chinese (Simple)" localName="中文（简体，中国）" lcid="0804" culture="zh-CN">
+<language alias="zh" intName="Chinese (Simplified)" localName="中文（简体，中国）" lcid="0804" culture="zh-CN">
   <creator>
-    <name>黄仁祥(wanddy@163.com)</name>
+    <name>The Umbraco community</name>
     <link>https://docs.umbraco.com/umbraco-cms/extending/language-files</link>
   </creator>
   <area alias="actions">
-    <key alias="assigndomain">管理主机名</key>
-    <key alias="auditTrail">跟踪审计</key>
+    <key alias="assigndomain">语言与域名</key>
+    <key alias="auditTrail">审计记录</key>
     <key alias="browse">浏览节点</key>
-    <key alias="changeDocType">改变文档类型</key>
+    <key alias="changeDocType">更改文档类型</key>
     <key alias="copy">复制</key>
     <key alias="create">创建</key>
     <key alias="createPackage">创建扩展包</key>
@@ -21,8 +21,8 @@
     <key alias="liveEdit">实时编辑模式</key>
     <key alias="logout">退出</key>
     <key alias="move">移动</key>
-    <key alias="notify">提醒</key>
-    <key alias="protect">公众访问权限</key>
+    <key alias="notify">通知</key>
+    <key alias="protect">访问保护</key>
     <key alias="publish">发布</key>
     <key alias="unpublish">取消发布</key>
     <key alias="refreshNode">重新加载节点</key>
@@ -32,27 +32,138 @@
     <key alias="toInTheTreeStructureBelow">到下列的树结构中</key>
     <key alias="rights">权限</key>
     <key alias="rollback">回滚</key>
-    <key alias="sendtopublish">提交至发布者</key>
+    <key alias="sendtopublish">提交发布</key>
     <key alias="sendToTranslate">发送给翻译</key>
     <key alias="sort">排序</key>
     <key alias="translate">翻译</key>
     <key alias="update">更新</key>
+    <key alias="export">导出</key>
+    <key alias="createGroup">创建组</key>
+    <key alias="editSettings">编辑设置</key>
+    <key alias="enable">启用</key>
+    <key alias="remove">移除</key>
+    <key alias="rename">重命名</key>
+    <key alias="chooseWhereToCopy">选择复制位置</key>
+    <key alias="chooseWhereToImport">选择导入位置</key>
+    <key alias="infiniteEditorChooseWhereToCopy">选择复制所选项的位置</key>
+    <key alias="infiniteEditorChooseWhereToMove">选择移动所选项的位置</key>
+    <key alias="wasMovedTo">已移动到</key>
+    <key alias="wasCopiedTo">已复制到</key>
+    <key alias="wasDeleted">已删除</key>
+    <key alias="setGroup">设置组</key>
+    <key alias="setPermissions">设置权限</key>
+    <key alias="unlock">解锁</key>
+    <key alias="createblueprint">创建文档蓝图</key>
+    <key alias="resendInvite">重新发送邀请</key>
+    <key alias="toggleHideUnavailable">隐藏不可用选项</key>
+    <key alias="changeDataType">更改数据类型</key>
+    <key alias="editContent">编辑内容</key>
   </area>
   <area alias="content">
     <key alias="itemNotPublished">该项没有发布</key>
     <key alias="parentNotPublished">该文档不可见，因为其上级 '%0%' 未发布。</key>
     <key alias="parentNotPublishedAnomaly">该文档已发布，但是没有更新至缓存（内部错误）</key>
-    <key alias="getUrlException">Could not get the URL</key>
-    <key alias="routeError">This document is published but its URL would collide with content %0%</key>
+    <key alias="getUrlException">无法获取 URL</key>
+    <key alias="routeError">此文档已发布，但其 URL 将与内容 %0% 冲突</key>
+    <key alias="parentCultureNotPublished">此语言已发布，但因父级 "%0%" 未发布而不可见</key>
+    <key alias="routeErrorCannotRoute">此文档已发布，但其 URL 无法路由</key>
   </area>
   <area alias="member">
+    <key alias="incorrectPassword">提供的密码不正确。</key>
+    <key alias="duplicateMemberLogin">已存在使用此登录名的会员</key>
+    <key alias="memberHasGroup">该会员已在 '%0%' 组中</key>
+    <key alias="memberHasPassword">该会员已设置密码</key>
+    <key alias="memberLockoutNotEnabled">此会员未启用锁定</key>
+    <key alias="memberNotInGroup">该会员不在 '%0%' 组中</key>
   </area>
   <area alias="errors">
+    <key alias="defaultError">发生了未知错误</key>
+    <key alias="concurrencyError">乐观并发冲突，对象已被修改</key>
   </area>
   <area alias="login">
     <key alias="resetCodeExpired">您单击的链接无效或已过期</key>
-    <key alias="resetPasswordEmailCopySubject">Umbraco: 重置密码</key>
-    <key alias="resetPasswordEmailCopyFormat"><![CDATA[<p>您的用户名登录到 Umbraco 后台是: <strong>%0%</strong></p><p>点击 <a href="%1%"><strong>这里</strong></a> 重置密码，或复制链接粘贴到您的浏览器访问:</p><p><em>%1%</em></p>]]></key>
+    <key alias="resetPasswordEmailCopySubject">Umbraco：重置密码</key>
+    <key alias="resetPasswordEmailCopyFormat"><![CDATA[
+        <html>
+			<head>
+				<meta name='viewport' content='width=device-width'>
+				<meta http-equiv='Content-Type' content='text/html; charset=UTF-8'>
+			</head>
+			<body class='' style='font-family: sans-serif; -webkit-font-smoothing: antialiased; font-size: 14px; color: #392F54; line-height: 22px; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; background: #1d1333; margin: 0; padding: 0;' bgcolor='#1d1333'>
+				<style type='text/css'> @media only screen and (max-width: 620px) {table[class=body] h1 {font-size: 28px !important; margin-bottom: 10px !important; } table[class=body] .wrapper {padding: 32px !important; } table[class=body] .article {padding: 32px !important; } table[class=body] .content {padding: 24px !important; } table[class=body] .container {padding: 0 !important; width: 100% !important; } table[class=body] .main {border-left-width: 0 !important; border-radius: 0 !important; border-right-width: 0 !important; } table[class=body] .btn table {width: 100% !important; } table[class=body] .btn a {width: 100% !important; } table[class=body] .img-responsive {height: auto !important; max-width: 100% !important; width: auto !important; } } .btn-primary table td:hover {background-color: #34495e !important; } .btn-primary a:hover {background-color: #34495e !important; border-color: #34495e !important; } .btn  a:visited {color:#FFFFFF;} </style>
+				<table border="0" cellpadding="0" cellspacing="0" class="body" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background: #1d1333;" bgcolor="#1d1333">
+					<tr>
+						<td style="font-family: sans-serif; font-size: 14px; vertical-align: top; padding: 24px;" valign="top">
+							<table style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;">
+								<tr>
+									<td background="https://umbraco.com/umbraco/assets/img/application/logo.png" bgcolor="#1d1333" width="28" height="28" valign="top" style="font-family: sans-serif; font-size: 14px; vertical-align: top;">
+										<!--[if gte mso 9]> <v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:30px;height:30px;"> <v:fill type="tile" src="https://umbraco.com/umbraco/assets/img/application/logo.png" color="#1d1333" /> <v:textbox inset="0,0,0,0"> <![endif]-->
+<div></div>
+<!--[if gte mso 9]> </v:textbox> </v:rect> <![endif]-->
+</td>
+<td style="font-family: sans-serif; font-size: 14px; vertical-align: top;" valign="top"></td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+<table border='0' cellpadding='0' cellspacing='0' class='body' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background: #1d1333;' bgcolor='#1d1333'>
+<tr>
+<td style='font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'></td>
+<td class='container' style='font-family: sans-serif; font-size: 14px; vertical-align: top; display: block; max-width: 560px; width: 560px; margin: 0 auto; padding: 10px;' valign='top'>
+<div class='content' style='box-sizing: border-box; display: block; max-width: 560px; margin: 0 auto; padding: 10px;'>
+<br>
+<table class='main' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; border-radius: 3px; background: #FFFFFF;' bgcolor='#FFFFFF'>
+<tr>
+<td class='wrapper' style='font-family: sans-serif; font-size: 14px; vertical-align: top; box-sizing: border-box; padding: 50px;' valign='top'>
+<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;'>
+<tr>
+<td style='line-height: 24px; font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'>
+<h1 style='color: #392F54; font-family: sans-serif; font-weight: bold; line-height: 1.4; font-size: 24px; text-align: left; text-transform: capitalize; margin: 0 0 30px;' align='left'>
+															重置密码请求
+														</h1>
+<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
+															您用于登录 Umbraco 后台的用户名是： <strong>%0%</strong>
+</p>
+<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
+<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: auto;'>
+<tbody>
+<tr>
+<td style='font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center; background: #35C786;' align='center' bgcolor='#35C786' valign='top'>
+<a href='%1%' target='_blank' rel='noopener' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>
+																				点击此链接重置密码
+																			</a>
+</td>
+</tr>
+</tbody>
+</table>
+</p>
+<p style='max-width: 400px; display: block; color: #392F54; font-family: sans-serif; font-size: 14px; line-height: 20px; font-weight: normal; margin: 15px 0;'>如果无法点击该链接，请将此 URL 复制并粘贴到浏览器窗口中：</p>
+<table border='0' cellpadding='0' cellspacing='0'>
+<tr>
+<td style='-ms-word-break: break-all; word-break: break-all; font-family: sans-serif; font-size: 11px; line-height:14px;'>
+<font style="-ms-word-break: break-all; word-break: break-all; font-size: 11px; line-height:14px;">
+<a style='-ms-word-break: break-all; word-break: break-all; color: #392F54; text-decoration: underline; font-size: 11px; line-height:15px;' href='%1%'>%1%</a>
+</font>
+</td>
+</tr>
+</table>
+</p>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+<br><br><br>
+</div>
+</td>
+<td style='font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'></td>
+</tr>
+</table>
+</body>
+</html>
+	]]></key>
   </area>
   <area alias="notifications">
     <key alias="mailBody"><![CDATA[
@@ -151,9 +262,148 @@
     <key alias="mailSubject">在 %2%，[%0%] 关于 %1% 的通告已执行。</key>
   </area>
   <area alias="user">
-    <key alias="passwordMismatch">重输的密码和原密码不一致！</key>
+    <key alias="passwordMismatch">新密码与确认密码不一致。</key>
+    <key alias="inviteEmailCopySubject">Umbraco：邀请</key>
+    <key alias="inviteEmailCopyFormat"><![CDATA[
+        <html>
+			<head>
+				<meta name='viewport' content='width=device-width'>
+				<meta http-equiv='Content-Type' content='text/html; charset=UTF-8'>
+			</head>
+			<body class='' style='font-family: sans-serif; -webkit-font-smoothing: antialiased; font-size: 14px; color: #392F54; line-height: 22px; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; background: #1d1333; margin: 0; padding: 0;' bgcolor='#1d1333'>
+				<style type='text/css'> @media only screen and (max-width: 620px) {table[class=body] h1 {font-size: 28px !important; margin-bottom: 10px !important; } table[class=body] .wrapper {padding: 32px !important; } table[class=body] .article {padding: 32px !important; } table[class=body] .content {padding: 24px !important; } table[class=body] .container {padding: 0 !important; width: 100% !important; } table[class=body] .main {border-left-width: 0 !important; border-radius: 0 !important; border-right-width: 0 !important; } table[class=body] .btn table {width: 100% !important; } table[class=body] .btn a {width: 100% !important; } table[class=body] .img-responsive {height: auto !important; max-width: 100% !important; width: auto !important; } } .btn-primary table td:hover {background-color: #34495e !important; } .btn-primary a:hover {background-color: #34495e !important; border-color: #34495e !important; } .btn  a:visited {color:#FFFFFF;} </style>
+				<table border="0" cellpadding="0" cellspacing="0" class="body" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background: #1d1333;" bgcolor="#1d1333">
+					<tr>
+						<td style="font-family: sans-serif; font-size: 14px; vertical-align: top; padding: 24px;" valign="top">
+							<table style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;">
+								<tr>
+									<td background="https://umbraco.com/umbraco/assets/img/application/logo.png" bgcolor="#1d1333" width="28" height="28" valign="top" style="font-family: sans-serif; font-size: 14px; vertical-align: top;">
+										<!--[if gte mso 9]> <v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:30px;height:30px;"> <v:fill type="tile" src="https://umbraco.com/umbraco/assets/img/application/logo.png" color="#1d1333" /> <v:textbox inset="0,0,0,0"> <![endif]-->
+<div></div>
+<!--[if gte mso 9]> </v:textbox> </v:rect> <![endif]-->
+</td>
+<td style="font-family: sans-serif; font-size: 14px; vertical-align: top;" valign="top"></td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+<table border='0' cellpadding='0' cellspacing='0' class='body' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background: #1d1333;' bgcolor='#1d1333'>
+<tr>
+<td style='font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'></td>
+<td class='container' style='font-family: sans-serif; font-size: 14px; vertical-align: top; display: block; max-width: 560px; width: 560px; margin: 0 auto; padding: 10px;' valign='top'>
+<div class='content' style='box-sizing: border-box; display: block; max-width: 560px; margin: 0 auto; padding: 10px;'>
+<br>
+<table class='main' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; border-radius: 3px; background: #FFFFFF;' bgcolor='#FFFFFF'>
+<tr>
+<td class='wrapper' style='font-family: sans-serif; font-size: 14px; vertical-align: top; box-sizing: border-box; padding: 50px;' valign='top'>
+<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;'>
+<tr>
+<td style='line-height: 24px; font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'>
+<h1 style='color: #392F54; font-family: sans-serif; font-weight: bold; line-height: 1.4; font-size: 24px; text-align: left; text-transform: capitalize; margin: 0 0 30px;' align='left'>
+															%0%，您好！
+														</h1>
+<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
+															您已被 <a href="mailto:%4%" style="text-decoration: underline; color: #392F54; -ms-word-break: break-all; word-break: break-all;">%1%</a> 邀请加入 Umbraco 后台。
+														</p>
+<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
+															<a href="mailto:%1%" style="text-decoration: none; color: #392F54; -ms-word-break: break-all; word-break: break-all;">%1%</a> 的留言：
+															<br/>
+<em>%2%</em>
+</p>
+<table border='0' cellpadding='0' cellspacing='0' class='btn btn-primary' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; box-sizing: border-box;'>
+<tbody>
+<tr>
+<td align='left' style='font-family: sans-serif; font-size: 14px; vertical-align: top; padding-bottom: 15px;' valign='top'>
+<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: auto;'>
+<tbody>
+<tr>
+<td style='font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center; background: #35C786;' align='center' bgcolor='#35C786' valign='top'>
+<a href='%3%' target='_blank' rel='noopener' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>
+																							点击此链接接受邀请
+																						</a>
+</td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+</tbody>
+</table>
+<p style='max-width: 400px; display: block; color: #392F54; font-family: sans-serif; font-size: 14px; line-height: 20px; font-weight: normal; margin: 15px 0;'>如果无法点击该链接，请将此 URL 复制并粘贴到浏览器窗口中：</p>
+<table border='0' cellpadding='0' cellspacing='0'>
+<tr>
+<td style='-ms-word-break: break-all; word-break: break-all; font-family: sans-serif; font-size: 11px; line-height:14px;'>
+<font style="-ms-word-break: break-all; word-break: break-all; font-size: 11px; line-height:14px;">
+<a style='-ms-word-break: break-all; word-break: break-all; color: #392F54; text-decoration: underline; font-size: 11px; line-height:15px;' href='%3%'>%3%</a>
+</font>
+</td>
+</tr>
+</table>
+</p>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+<br><br><br>
+</div>
+</td>
+<td style='font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'></td>
+</tr>
+</table>
+</body>
+</html>]]></key>
+    <key alias="duplicateLogin">已存在使用此登录名的用户</key>
+    <key alias="passwordRequiresDigit">密码必须至少包含一个数字（'0'-'9'）</key>
+    <key alias="passwordRequiresLower">密码必须至少包含一个小写字母（'a'-'z'）</key>
+    <key alias="passwordRequiresNonAlphanumeric">密码必须至少包含一个非字母数字字符</key>
+    <key alias="passwordRequiresUniqueChars">密码必须至少使用 %0% 个不同字符</key>
+    <key alias="passwordRequiresUpper">密码必须至少包含一个大写字母（'A'-'Z'）</key>
+    <key alias="passwordTooShort">密码长度不得少于 %0% 个字符</key>
+    <key alias="userHasPassword">该用户已设置密码</key>
+    <key alias="userHasGroup">该用户已在用户组"%0%"中</key>
+    <key alias="userLockoutNotEnabled">该用户未启用锁定功能</key>
+    <key alias="userNotInGroup">该用户不在用户组"%0%"中</key>
   </area>
   <area alias="validation">
+    <key alias="invalidEmail">邮箱无效</key>
+    <key alias="invalidDate">日期无效</key>
+    <key alias="entriesShort"><![CDATA[最少 %0% 项，还差 <strong>%1%</strong> 项。]]></key>
+    <key alias="entriesExceed"><![CDATA[最多 %0% 项，已超出 <strong>%1%</strong> 项。]]></key>
+    <key alias="stringLengthExceeded">字符串长度超过上限：最多 %0% 个字符，已超出 %1% 个。</key>
+    <key alias="entriesAreasMismatch">一个或多个区域未满足内容数量要求。</key>
+    <key alias="invalidMemberGroupName">会员组名称无效</key>
+    <key alias="invalidUserGroupName">用户组名称无效</key>
+    <key alias="invalidToken">令牌无效</key>
+    <key alias="invalidUsername">用户名无效</key>
+    <key alias="duplicateEmail">邮箱"%0%"已被使用</key>
+    <key alias="duplicateUserGroupName">用户组名称"%0%"已被使用</key>
+    <key alias="duplicateMemberGroupName">会员组名称"%0%"已被使用</key>
+    <key alias="duplicateUsername">用户名"%0%"已被使用</key>
+    <key alias="outOfRangeMinimum">值 %0% 低于允许的最小值 %1%。</key>
+    <key alias="outOfRangeMaximum">值 %0% 超过了允许的最大值 %1%。</key>
+    <key alias="outOfRangeSingleItemMinimum">提供了 1 项，低于允许的最小项数 %1%。</key>
+    <key alias="outOfRangeMultipleItemsMinimum">提供了 %0% 项，低于允许的最小项数 %1%。</key>
+    <key alias="outOfRangeMultipleItemsMaximum">提供了 %0% 项，超过了允许的最大项数 %1%。</key>
+    <key alias="invalidStep">值 %0% 与配置的步长 %1% 和最小值 %2% 不符。</key>
+    <key alias="unexpectedRange">值 %0% 不应包含范围。</key>
+    <key alias="invalidRange">值 %0% 的高值不能小于低值。</key>
+    <key alias="minimumRange">范围 %0% 未达到要求的最低范围 %1%。</key>
+    <key alias="invalidMediaType">所选媒体类型无效。</key>
+    <key alias="missingContent">所选内容不存在。</key>
+    <key alias="missingMedia">所选媒体不存在。</key>
+    <key alias="multipleMediaNotAllowed">不允许选择多个媒体。</key>
+    <key alias="notOneOfOptions">值"%0%"不在可用选项中。</key>
+    <key alias="multipleNotOneOfOptions">值"%0%"不在可用选项中。</key>
+    <key alias="invalidColor">所选颜色"%0%"不在可用选项中。</key>
+    <key alias="invalidStartNode">所选项来自错误的文件夹。</key>
+    <key alias="invalidObjectType">所选项的类型不正确。</key>
+    <key alias="invalidNull">值不能为 null</key>
+    <key alias="invalidEmpty">值不能为空</key>
+    <key alias="invalidPattern">值无效，不符合要求的模式</key>
+    <key alias="invalidContentType">所选内容类型无效。</key>
   </area>
   <area alias="healthcheck">
     <!-- The following keys get these tokens passed in:
@@ -162,9 +412,9 @@
 		   2: XPath
 		   3: Configuration file path
 	  -->
-    <key alias="checkSuccessMessage">Value is set to the recommended value: '%0%'.</key>
-    <key alias="checkErrorMessageDifferentExpectedValue">Expected value '%1%' for '%2%' in configuration file '%3%', but found '%0%'.</key>
-    <key alias="checkErrorMessageUnexpectedValue">Found unexpected value '%0%' for '%2%' in configuration file '%3%'.</key>
+    <key alias="checkSuccessMessage">值已设置为推荐值：'%0%'。</key>
+    <key alias="checkErrorMessageDifferentExpectedValue">配置文件 '%3%' 中 '%2%' 的预期值为 '%1%'，但实际值为 '%0%'。</key>
+    <key alias="checkErrorMessageUnexpectedValue">配置文件 '%3%' 中 '%2%' 出现意外值 '%0%'。</key>
     <!-- The following keys get these tokens passed in:
 	     0: Current value
 		   1: Recommended value
@@ -175,13 +425,13 @@
 		   2: Server version
 	  -->
     <!-- The following keys get predefined tokens passed in that are not all the same, like above -->
-    <key alias="httpsCheckValidCertificate">Your site certificate was marked as valid.</key>
-    <key alias="httpsCheckInvalidCertificate">Certificate validation error: '%0%'</key>
-    <key alias="healthCheckInvalidUrl">Error pinging the URL %0% - '%1%'</key>
-    <key alias="httpsCheckIsCurrentSchemeHttps">You are currently %0% viewing the site using the HTTPS scheme.</key>
+    <key alias="httpsCheckValidCertificate">你的站点证书已被标记为有效。</key>
+    <key alias="httpsCheckInvalidCertificate">证书验证错误：'%0%'</key>
+    <key alias="healthCheckInvalidUrl">ping URL %0% 时出错：'%1%'</key>
+    <key alias="httpsCheckIsCurrentSchemeHttps">你当前%0%使用 HTTPS 方案浏览站点。</key>
     <!-- The following keys don't get tokens passed in -->
-    <key alias="compilationDebugCheckSuccessMessage">Debug compilation mode is disabled.</key>
-    <key alias="compilationDebugCheckErrorMessage">Debug compilation mode is currently enabled. It is recommended to disable this setting before go live.</key>
+    <key alias="compilationDebugCheckSuccessMessage">调试编译模式已禁用。</key>
+    <key alias="compilationDebugCheckErrorMessage">调试编译模式当前已启用。建议在上线前禁用此设置。</key>
     <!-- The following keys get these tokens passed in:
 	    0: Comma delimitted list of failed folder paths
   	-->
@@ -194,10 +444,56 @@
     <!-- The following key get these tokens passed in:
 	    0: Comma delimitted list of headers found
   	-->
-    <key alias="excessiveHeadersFound"><![CDATA[The following headers revealing information about the website technology were found: <strong>%0%</strong>.]]></key>
-    <key alias="excessiveHeadersNotFound">No headers revealing information about the website technology were found.</key>
-    <key alias="smtpMailSettingsConnectionSuccess">SMTP settings are configured correctly and the service is operating as expected.</key>
-    <key alias="notificationEmailsCheckSuccessMessage"><![CDATA[Notification email has been set to <strong>%0%</strong>.]]></key>
-    <key alias="notificationEmailsCheckErrorMessage"><![CDATA[Notification email is still set to the default value of <strong>%0%</strong>.]]></key>
+    <key alias="excessiveHeadersFound"><![CDATA[发现以下泄露网站技术信息的响应头：<strong>%0%</strong>。]]></key>
+    <key alias="excessiveHeadersNotFound">未发现泄露网站技术信息的响应头。</key>
+    <key alias="smtpMailSettingsConnectionSuccess">SMTP 设置配置正确，服务运行正常。</key>
+    <key alias="notificationEmailsCheckSuccessMessage"><![CDATA[通知邮箱已设置为 <strong>%0%</strong>。]]></key>
+    <key alias="notificationEmailsCheckErrorMessage"><![CDATA[通知邮箱仍设置为默认值 <strong>%0%</strong>。]]></key>
+    <key alias="httpsCheckExpiredCertificate">您网站的 SSL 证书已过期。</key>
+    <key alias="httpsCheckExpiringCertificate">您网站的 SSL 证书将在 %0% 天后过期。</key>
+    <key alias="httpsCheckNoApplicationUrl">应用程序 URL 不可用。请配置 Umbraco:CMS:WebRouting:UmbracoApplicationUrl，或更改 ApplicationUrlDetection 以启用此检查。</key>
+    <key alias="httpsCheckConfigurationRectifyNotPossible">appSettings.json 文件中的应用设置 'Umbraco:CMS:Global:UseHttps' 当前为 'false'。当你通过 HTTPS 访问此站点后，应将其设置为 'true'。</key>
+    <key alias="httpsCheckConfigurationCheckResult">appSettings.json 文件中的应用设置 'Umbraco:CMS:Global:UseHttps' 为 '%0%'，你的 Cookie %1%被标记为安全。</key>
+    <key alias="runtimeModeCheckSuccessMessage">运行模式已设置为生产。</key>
+    <key alias="runtimeModeCheckErrorMessage">运行模式未设置为生产。对于线上/生产环境，建议将运行模式设置为生产。</key>
+    <key alias="umbracoApplicationUrlCheckResultTrue"><![CDATA[应用设置 'Umbraco:CMS:WebRouting:UmbracoApplicationUrl' 已设置为 <strong>%0%</strong>。]]></key>
+    <key alias="umbracoApplicationUrlCheckResultFalse"><![CDATA[未设置应用设置 'Umbraco:CMS:WebRouting:UmbracoApplicationUrl'，应用程序 URL 将从传入请求自动检测。建议显式设置该值。]]></key>
+    <key alias="umbracoApplicationUrlCheckResultError"><![CDATA[未设置应用设置 'Umbraco:CMS:WebRouting:UmbracoApplicationUrl'，且应用程序 URL 自动检测已禁用（'Umbraco:CMS:WebRouting:ApplicationUrlDetection' 为 'None'）。需要绝对 URL 的功能（如密码重置和邀请邮件）将无法工作。请显式设置应用程序 URL，或启用自动检测。]]></key>
+    <key alias="clickJackingCheckHeaderFound"><![CDATA[已找到用于控制站点能否被其他站点以 iframe 嵌入的响应头或 meta 标签 <strong>X-Frame-Options</strong>。]]></key>
+    <key alias="clickJackingCheckHeaderNotFound"><![CDATA[未找到用于控制站点能否被其他站点以 iframe 嵌入的响应头或 meta 标签 <strong>X-Frame-Options</strong>。]]></key>
+    <key alias="noSniffCheckHeaderFound"><![CDATA[已找到用于防范 MIME 嗅探漏洞的响应头或 meta 标签 <strong>X-Content-Type-Options</strong>。]]></key>
+    <key alias="noSniffCheckHeaderNotFound"><![CDATA[未找到用于防范 MIME 嗅探漏洞的响应头或 meta 标签 <strong>X-Content-Type-Options</strong>。]]></key>
+    <key alias="hSTSCheckHeaderFound"><![CDATA[已找到响应头 <strong>Strict-Transport-Security</strong>（即 HSTS 响应头）。]]></key>
+    <key alias="hSTSCheckHeaderNotFound"><![CDATA[未找到响应头 <strong>Strict-Transport-Security</strong>。]]></key>
+    <key alias="hSTSCheckHeaderFoundOnLocalhost"><![CDATA[已找到响应头 <strong>Strict-Transport-Security</strong>（即 HSTS 响应头）。<strong>localhost 上不应存在此响应头。</strong>]]></key>
+    <key alias="hSTSCheckHeaderNotFoundOnLocalhost"><![CDATA[未找到响应头 <strong>Strict-Transport-Security</strong>。localhost 上不应存在此响应头。]]></key>
+    <key alias="xssProtectionCheckHeaderFound"><![CDATA[已找到响应头 <strong>X-XSS-Protection</strong>。<strong>建议不要在你的网站上添加此响应头</strong>。<br />详情可阅读 <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-XSS-Protection" target="_blank" rel="noopener" class="btn-link -underline">Mozilla</a> 网站 ]]></key>
+    <key alias="xssProtectionCheckHeaderNotFound"><![CDATA[未找到响应头 <strong>X-XSS-Protection</strong>。]]></key>
+    <key alias="smtpMailSettingsNotFound">找不到 'Umbraco:CMS:Global:Smtp' 配置。</key>
+    <key alias="smtpMailSettingsHostNotConfigured">找不到 'Umbraco:CMS:Global:Smtp:Host' 配置。</key>
+    <key alias="smtpMailSettingsConnectionFail">无法连接到主机 '%0%'、端口 '%1%' 的 SMTP 服务器。请检查配置 'Umbraco:CMS:Global:Smtp' 中的 SMTP 设置是否正确。</key>
+    <key alias="imagingHMACSecretKeyCheckSuccessMessage">已配置用于图像 URL 签名的 HMAC 密钥。</key>
+    <key alias="imagingHMACSecretKeyCheckWarningMessage"><![CDATA[未配置用于图像 URL 签名的 HMAC 密钥。建议设置 <strong>Umbraco:CMS:Imaging:HMACSecretKey</strong>，以防未经授权的图像处理请求。]]></key>
+    <key alias="scheduledHealthCheckEmailBody"><![CDATA[<html><body><p>于 %0% %1% 运行的 Umbraco 定时健康检查结果如下：</p>%2%</body></html>]]></key>
+    <key alias="scheduledHealthCheckEmailSubject">Umbraco 健康检查状态：%0%</key>
+    <key alias="contentSecurityPolicyCheckHeaderFound"><![CDATA[已找到响应头 <strong>Content-Security-Policy (CSP)</strong>。]]></key>
+    <key alias="contentSecurityPolicyCheckHeaderNotFound"><![CDATA[未找到用于防范跨站脚本（XSS）攻击及其他代码注入漏洞的响应头 <strong>Content-Security-Policy</strong>（CSP）。]]></key>
+  </area>
+
+  <area alias="analytics">
+    <key alias="minimalLevelDescription">我们只会发送一个匿名化的站点 ID，让我们知道该站点的存在。</key>
+    <key alias="basicLevelDescription">我们会发送匿名化的站点 ID、Umbraco 版本以及已安装的扩展包</key>
+    <key alias="detailedLevelDescription"><![CDATA[我们会发送：<ul><li>匿名化的站点 ID、Umbraco 版本以及已安装的扩展包。</li><li>数量统计：根节点、内容节点、宏、媒体、文档类型、属性类型、组合、模板、语言、域名、用户组、用户、会员、后台外部登录提供程序、Webhook、富文本数据类型、富文本数据类型中使用的块，以及使用中的属性编辑器。</li><li>系统信息：Web 服务器、服务器操作系统、服务器框架、服务器操作系统语言和数据库提供程序。</li><li>配置设置：Models Builder 模式、是否存在自定义 Umbraco 路径、ASP 环境、是否启用 Delivery API、是否使用了访问保护，以及是否处于调试模式。</li></ul> <em>我们将来可能更改"详细"级别发送的内容。如有更改，将在上方列表中列出。<br>选择"详细"即表示您同意收集当前及未来的匿名化信息。</em>]]></key>
+  </area>
+
+  <area alias="webhooks">
+    <key alias="toggleDebug">切换调试模式以获取更多信息。</key>
+  </area>
+
+  <area alias="permissions">
+    <key alias="FolderCreation">文件夹创建</key>
+    <key alias="FileWritingForPackages">扩展包文件写入</key>
+    <key alias="FileWriting">文件写入</key>
+    <key alias="MediaFolderCreation">媒体文件夹创建</key>
   </area>
 </language>
