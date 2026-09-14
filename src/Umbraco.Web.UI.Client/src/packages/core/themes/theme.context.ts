@@ -59,11 +59,7 @@ export class UmbThemeContext extends UmbContextBase {
 						}
 					} else {
 						// We could not load a theme for this alias, so we remove the theme.
-						// Only forget the stored alias if the theme is registered without CSS (e.g. the Light theme).
-						// Themes from packages can be registered after this context is created, so keep the alias until then.
-						if (themes.length > 0) {
-							localStorage.removeItem(LOCAL_STORAGE_KEY);
-						}
+						this.#forgetStoredThemeIfRegistered(themes);
 						this.#styleElement?.childNodes.forEach((node) => node.remove());
 						this.#styleElement?.setAttribute('href', '');
 						this.#styleElement = null;
@@ -78,6 +74,14 @@ export class UmbThemeContext extends UmbContextBase {
 			this.#styleElement?.childNodes.forEach((node) => node.remove());
 			this.#styleElement?.setAttribute('href', '');
 			this.#styleElement = null;
+		}
+	}
+
+	// Only forget the stored alias if the theme is registered without CSS (e.g. the Light theme).
+	// Themes from packages can be registered after this context is created, so keep the alias until then.
+	#forgetStoredThemeIfRegistered(themes: ManifestTheme[]) {
+		if (themes.length > 0) {
+			localStorage.removeItem(LOCAL_STORAGE_KEY);
 		}
 	}
 }
