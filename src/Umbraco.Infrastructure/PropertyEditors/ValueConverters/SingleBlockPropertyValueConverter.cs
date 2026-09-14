@@ -6,7 +6,6 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Logging;
-using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -39,7 +38,6 @@ public class SingleBlockPropertyValueConverter : PropertyValueConverterBase, IDe
     private readonly ILanguageService _languageService;
     private readonly IPropertyRenderingContextAccessor _propertyRenderingContextAccessor;
     private readonly IElementCacheService _elementCacheService;
-    private readonly IContentTypeService _contentTypeService;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SingleBlockPropertyValueConverter"/> class.
@@ -54,35 +52,6 @@ public class SingleBlockPropertyValueConverter : PropertyValueConverterBase, IDe
     /// <param name="languageService">Service used to retrieve language information for fallback resolution.</param>
     /// <param name="propertyRenderingContextAccessor">Accessor for the current property rendering context.</param>
     /// <param name="elementCacheService">The cache for elements.</param>
-    /// <param name="contentTypeService">Service for accessing content types.</param>
-    public SingleBlockPropertyValueConverter(
-        IProfilingLogger proflog,
-        BlockEditorConverter blockConverter,
-        IApiElementBuilder apiElementBuilder,
-        IJsonSerializer jsonSerializer,
-        BlockListPropertyValueConstructorCache constructorCache,
-        IVariationContextAccessor variationContextAccessor,
-        BlockEditorVarianceHandler blockEditorVarianceHandler,
-        ILanguageService languageService,
-        IPropertyRenderingContextAccessor propertyRenderingContextAccessor,
-        IElementCacheService elementCacheService,
-        IContentTypeService contentTypeService)
-    {
-        _proflog = proflog;
-        _blockConverter = blockConverter;
-        _apiElementBuilder = apiElementBuilder;
-        _jsonSerializer = jsonSerializer;
-        _constructorCache = constructorCache;
-        _variationContextAccessor = variationContextAccessor;
-        _blockEditorVarianceHandler = blockEditorVarianceHandler;
-        _languageService = languageService;
-        _propertyRenderingContextAccessor = propertyRenderingContextAccessor;
-        _elementCacheService = elementCacheService;
-        _contentTypeService = contentTypeService;
-    }
-
-    /// <inheritdoc cref="SingleBlockPropertyValueConverter(IProfilingLogger, BlockEditorConverter, IApiElementBuilder, IJsonSerializer, BlockListPropertyValueConstructorCache, IVariationContextAccessor, BlockEditorVarianceHandler, ILanguageService, IPropertyRenderingContextAccessor, IElementCacheService, IContentTypeService)"/>
-    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 21.")]
     public SingleBlockPropertyValueConverter(
         IProfilingLogger proflog,
         BlockEditorConverter blockConverter,
@@ -94,19 +63,17 @@ public class SingleBlockPropertyValueConverter : PropertyValueConverterBase, IDe
         ILanguageService languageService,
         IPropertyRenderingContextAccessor propertyRenderingContextAccessor,
         IElementCacheService elementCacheService)
-        : this(
-            proflog,
-            blockConverter,
-            apiElementBuilder,
-            jsonSerializer,
-            constructorCache,
-            variationContextAccessor,
-            blockEditorVarianceHandler,
-            languageService,
-            propertyRenderingContextAccessor,
-            elementCacheService,
-            StaticServiceProvider.Instance.GetRequiredService<IContentTypeService>())
     {
+        _proflog = proflog;
+        _blockConverter = blockConverter;
+        _apiElementBuilder = apiElementBuilder;
+        _jsonSerializer = jsonSerializer;
+        _constructorCache = constructorCache;
+        _variationContextAccessor = variationContextAccessor;
+        _blockEditorVarianceHandler = blockEditorVarianceHandler;
+        _languageService = languageService;
+        _propertyRenderingContextAccessor = propertyRenderingContextAccessor;
+        _elementCacheService = elementCacheService;
     }
 
     /// <inheritdoc cref="SingleBlockPropertyValueConverter(IProfilingLogger, BlockEditorConverter, IApiElementBuilder, IJsonSerializer, BlockListPropertyValueConstructorCache, IVariationContextAccessor, BlockEditorVarianceHandler, ILanguageService, IPropertyRenderingContextAccessor)"/>
@@ -144,35 +111,14 @@ public class SingleBlockPropertyValueConverter : PropertyValueConverterBase, IDe
 
     /// <inheritdoc />
     /// <remarks>
-    /// The configured element types give the block a model as strong as they allow: the settings type is only part of
-    /// it when the block has one, and a block whose element type cannot be resolved falls back to the untyped model.
+    /// The model is untyped because the editor holds one block chosen from all the element types its data type
+    /// allows, so which element type a property holds is not known from its configuration.
     /// </remarks>
-    public override Type GetPropertyValueType(IPublishedPropertyType propertyType)
-    {
-        BlockListConfiguration.BlockConfiguration? block =
-            propertyType.DataType.ConfigurationAs<SingleBlockConfiguration>()?.Blocks.FirstOrDefault();
-
-        ModelType? contentElementType = ElementModelType(block?.ContentElementTypeKey);
-        if (contentElementType is null)
-        {
-            return typeof(BlockListItem);
-        }
-
-        ModelType? settingsElementType = ElementModelType(block?.SettingsElementTypeKey);
-
-        return settingsElementType is null
-            ? typeof(BlockListItem<>).MakeGenericType(contentElementType)
-            : typeof(BlockListItem<,>).MakeGenericType(contentElementType, settingsElementType);
-    }
+    public override Type GetPropertyValueType(IPublishedPropertyType propertyType) => typeof(BlockListItem);
 
     /// <inheritdoc />
     public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
         => PropertyCacheLevel.Elements;
-
-    private ModelType? ElementModelType(Guid? elementTypeKey)
-        => elementTypeKey is Guid key && _contentTypeService.Get(key) is IContentType elementType
-            ? ModelType.For(elementType.Alias)
-            : null;
 
     /// <inheritdoc />
     public override object? ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview)
