@@ -205,6 +205,26 @@ public class ElementService : PublishableContentServiceBase<IElement>, IElementS
         scope.Complete();
     }
 
+    /// <inheritdoc />
+    // No async repository exists for elements yet - bridges to the existing synchronous DeleteOfTypes engine.
+    // That engine returns void, so cancellation can't be detected here - this always reports Success.
+    public Task<Attempt<ContentDeleteOfTypesOperationStatus>> DeleteOfTypesAsync(IEnumerable<Guid> contentTypeKeys, Guid userKey, CancellationToken cancellationToken)
+    {
+        var contentTypeIds = new List<int>();
+        foreach (Guid contentTypeKey in contentTypeKeys)
+        {
+            Attempt<int> idAttempt = IdKeyMap.GetIdForKeyAsync(contentTypeKey, UmbracoObjectTypes.DocumentType).GetAwaiter().GetResult();
+            if (idAttempt.Success)
+            {
+                contentTypeIds.Add(idAttempt.Result);
+            }
+        }
+
+        int userId = _userIdKeyResolver.GetAsync(userKey).GetAwaiter().GetResult();
+        DeleteOfTypes(contentTypeIds, userId);
+        return Task.FromResult(Attempt.Succeed(ContentDeleteOfTypesOperationStatus.Success));
+    }
+
     #endregion
 
     #region Abstract implementations

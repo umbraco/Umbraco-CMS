@@ -23,16 +23,8 @@ public interface IPublishableContentService<TContent> : IContentServiceBase
     // Save(TContent, ...) has been retired from this interface in favour of the async
     // SaveAsync (declared on IAsyncPublishableContentService<TContent>).
 
-    /// <summary>
-    ///     Deletes all content of given types.
-    /// </summary>
-    /// <param name="contentTypeIds">The content type identifiers.</param>
-    /// <param name="userId">The identifier of the user performing the action.</param>
-    /// <remarks>
-    ///     <para>All non-deleted descendants of the deleted content is moved to the recycle bin.</para>
-    ///     <para>This operation is potentially dangerous and expensive.</para>
-    /// </remarks>
-    void DeleteOfTypes(IEnumerable<int> contentTypeIds, int userId = Constants.Security.SuperUserId);
+    // DeleteOfTypes(IEnumerable<int>, int) has been retired from this interface in favour of the async
+    // DeleteOfTypesAsync (declared on IAsyncPublishableContentService<TContent>).
 
     // PersistContentSchedule(IPublishableContentBase, ContentScheduleCollection) has been retired from
     // this interface in favour of the async PersistContentScheduleAsync (declared on

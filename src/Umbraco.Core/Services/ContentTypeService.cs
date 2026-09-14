@@ -177,7 +177,6 @@ public class ContentTypeService : AsyncContentTypeServiceBase<IContentTypeReposi
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             var typeIdsA = typeIds.ToArray();
-            _contentService.DeleteOfTypes(typeIdsA);
 
             var typeKeys = new List<Guid>();
             foreach (int typeId in typeIdsA)
@@ -191,10 +190,11 @@ public class ContentTypeService : AsyncContentTypeServiceBase<IContentTypeReposi
 
             if (typeKeys.Count > 0)
             {
+                await _contentService.DeleteOfTypesAsync(typeKeys, Constants.Security.SuperUserKey, CancellationToken.None);
                 await _contentService.DeleteBlueprintsOfTypesAsync(typeKeys, Constants.Security.SuperUserKey, CancellationToken.None);
+                await _elementService.DeleteOfTypesAsync(typeKeys, Constants.Security.SuperUserKey, CancellationToken.None);
             }
 
-            _elementService.DeleteOfTypes(typeIdsA);
             scope.Complete();
         }
     }

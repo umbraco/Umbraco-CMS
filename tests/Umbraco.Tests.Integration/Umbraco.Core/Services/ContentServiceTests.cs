@@ -2743,7 +2743,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         var contentType = await ContentTypeService.GetAsync("umbTextpage");
 
         // Act
-        ContentService.DeleteOfType(contentType.Id);
+        await ContentService.DeleteOfTypeAsync(contentType.Key, Constants.Security.SuperUserKey, CancellationToken.None);
         var rootContent = await ContentService.GetRootContentAsync(CancellationToken.None);
         PagedModel<IContent> contents = await ContentService.GetPagedOfTypeAsync(contentType.Key, 0, int.MaxValue, ordering: null, CancellationToken.None);
 

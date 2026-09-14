@@ -2395,7 +2395,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         List<PropertyDataDto> originalPropertyData = await scopeAccessor.AmbientScope!.ExecuteWithContextAsync(db =>
             db.PropertyData.Where(propertyData => propertyData.VersionId == versionId).OrderBy(propertyData => propertyData.Id).ToListAsync());
 
-        // Simulate the effect of ContentService.PerformMoveDescendantLocked on this descendant: Path and
+        // Simulate the effect of ContentService.PerformMoveDescendantLockedAsync on this descendant: Path and
         // Level are set directly, ParentId is left alone.
         content.Path = $"{_subpage2.Path},{_subpage.Id},{content.Id}";
         content.Level = _subpage2.Level + 2;

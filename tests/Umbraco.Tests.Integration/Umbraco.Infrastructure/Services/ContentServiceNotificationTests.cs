@@ -1524,7 +1524,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
 
         try
         {
-            ContentService.DeleteOfTypes(new[] { _contentType.Id });
+            await ContentService.DeleteOfTypesAsync(new[] { _contentType.Key }, Constants.Security.SuperUserKey, CancellationToken.None);
             Assert.IsTrue(unpublishedWasCalled);
         }
         finally

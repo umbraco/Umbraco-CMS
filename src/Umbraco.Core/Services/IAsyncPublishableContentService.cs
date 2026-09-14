@@ -61,6 +61,19 @@ public interface IAsyncPublishableContentService<TContent> : IAsyncContentServic
     Task PersistContentScheduleAsync(IPublishableContentBase content, ContentScheduleCollection contentSchedule, CancellationToken cancellationToken);
 
     /// <summary>
+    ///     Deletes all content of given types.
+    /// </summary>
+    /// <param name="contentTypeKeys">The Guid keys of the content types.</param>
+    /// <param name="userKey">The Guid key of the user performing the action.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <remarks>
+    ///     <para>All non-deleted descendants of the deleted content is moved to the recycle bin.</para>
+    ///     <para>This operation is potentially dangerous and expensive.</para>
+    /// </remarks>
+    /// <returns>An attempt carrying the operation status.</returns>
+    Task<Attempt<ContentDeleteOfTypesOperationStatus>> DeleteOfTypesAsync(IEnumerable<Guid> contentTypeKeys, Guid userKey, CancellationToken cancellationToken);
+
+    /// <summary>
     ///     Saves a content item.
     /// </summary>
     /// <param name="content">The content item to save.</param>

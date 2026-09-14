@@ -328,13 +328,15 @@ public interface IContentService : IPublishableContentService<IContent>, IAsyncP
     /// <summary>
     ///     Deletes all documents of a given document type.
     /// </summary>
-    /// <param name="documentTypeId">The document type identifier.</param>
-    /// <param name="userId">The identifier of the user performing the action.</param>
+    /// <param name="contentTypeKey">The Guid key of the document type.</param>
+    /// <param name="userKey">The Guid key of the user performing the action.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <remarks>
     ///     <para>All non-deleted descendants of the deleted documents are moved to the recycle bin.</para>
     ///     <para>This operation is potentially dangerous and expensive.</para>
     /// </remarks>
-    void DeleteOfType(int documentTypeId, int userId = Constants.Security.SuperUserId);
+    /// <returns>An attempt carrying the operation status.</returns>
+    Task<Attempt<ContentDeleteOfTypesOperationStatus>> DeleteOfTypeAsync(Guid contentTypeKey, Guid userKey, CancellationToken cancellationToken);
 
     /// <summary>
     ///     Deletes versions of a document prior to a given date.

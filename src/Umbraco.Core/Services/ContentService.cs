@@ -348,39 +348,6 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
         return await _asyncDocumentRepository.GetDescendantsWithoutTemplatesAsync(ancestorKey, skip, take, ordering, cancellationToken, includeTrashed);
     }
 
-    // Used only by PerformMoveLocked, which needs to find descendants by a pre-move path prefix string rather
-    // than a resolvable ancestor key - not redirectable onto GetDescendantsAsync's key-based lookup.
-    private IQuery<IContent>? GetPagedDescendantQuery(string contentPath)
-    {
-        IQuery<IContent>? query = Query<IContent>();
-        if (!contentPath.IsNullOrWhiteSpace())
-        {
-            query?.Where(x => x.Path.SqlStartsWith($"{contentPath},", TextColumnType.NVarchar));
-        }
-
-        return query;
-    }
-
-    private IEnumerable<IContent> GetPagedLocked(IQuery<IContent>? query, long pageIndex, int pageSize, out long totalChildren, IQuery<IContent>? filter, Ordering? ordering)
-    {
-        if (pageIndex < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(pageIndex));
-        }
-
-        if (pageSize <= 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(pageSize));
-        }
-
-        if (ordering == null)
-        {
-            throw new ArgumentNullException(nameof(ordering));
-        }
-
-        return _documentRepository.GetPage(query, pageIndex, pageSize, out totalChildren, propertyAliases: null, filter, ordering);
-    }
-
     /// <inheritdoc />
     public async Task<IContent?> GetParentAsync(Guid key, CancellationToken cancellationToken)
     {
@@ -1000,116 +967,6 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
         return Attempt.Succeed(ContentMoveOperationStatus.Success);
     }
 
-    // MUST be called from within WriteLock
-    // trash indicates whether we are trashing, un-trashing, or not changing anything
-    private void PerformMoveLocked(IContent content, int parentId, IContent? parent, int userId, List<(IContent Content, string OriginalPath)> moves, bool? trash, bool includeDescendants = true)
-    {
-        content.WriterId = userId;
-        content.ParentId = parentId;
-        content.ParentKey = parentId switch
-        {
-            Constants.System.Root => null,
-            Constants.System.RecycleBinContent => Constants.System.RecycleBinContentKey,
-            _ => parent?.Key,
-        };
-
-        // get the level delta (old pos to new pos)
-        // note that recycle bin (id:-20) level is 0!
-        var levelDelta = 1 - content.Level + (parent?.Level ?? 0);
-        var originalLevel = content.Level;
-
-        var paths = new Dictionary<int, string>();
-
-        moves.Add((content, content.Path)); // capture original path
-
-        // need to store the original path to lookup descendants based on it below
-        var originalPath = content.Path;
-
-        // these will be updated by the repo because we changed parentId
-        // content.Path = (parent == null ? "-1" : parent.Path) + "," + content.Id;
-        // content.SortOrder = ((ContentRepository) repository).NextChildSortOrder(parentId);
-        // content.Level += levelDelta;
-        PerformMoveContentLocked(content, userId, trash);
-
-        // if uow is not immediate, content.Path will be updated only when the UOW commits,
-        // and because we want it now, we have to calculate it by ourselves
-        // paths[content.Id] = content.Path;
-        paths[content.Id] =
-            (parent == null
-                ? parentId == Constants.System.RecycleBinContent ? "-1,-20" : Constants.System.RootString
-                : parent.Path) + "," + content.Id;
-
-        // When restoring a single item out of the recycle bin without its descendants, the descendants must stay
-        // trashed: the item's direct children are re-homed to the recycle bin root (and the rest of the subtree keeps
-        // its relative structure), so nothing is orphaned and it can still be restored on its own later.
-        var leaveDescendantsInRecycleBin = includeDescendants is false
-            && parentId != Constants.System.RecycleBinContent
-            && originalPath.Contains(Constants.System.RecycleBinContentString);
-
-        const int pageSize = 500;
-        IQuery<IContent>? query = GetPagedDescendantQuery(originalPath);
-        long total;
-        do
-        {
-            // We always page a page 0 because for each page, we are moving the result so the resulting total will be reduced
-            IEnumerable<IContent> descendants =
-                GetPagedLocked(query, 0, pageSize, out total, null, Ordering.By("Path"));
-
-            foreach (IContent descendant in descendants)
-            {
-                moves.Add((descendant, descendant.Path)); // capture original path
-
-                if (leaveDescendantsInRecycleBin)
-                {
-                    LeaveDescendantInRecycleBinLocked(descendant, content.Id, originalLevel, userId, paths);
-                }
-                else
-                {
-                    PerformMoveDescendantLocked(descendant, levelDelta, userId, trash, paths);
-                }
-            }
-        }
-        while (total > pageSize);
-    }
-
-    // Re-homes a descendant of a restored item within the recycle bin: the restored item's direct children become
-    // top-level recycle bin items, while deeper descendants keep their relative structure below their (now re-homed)
-    // ancestor. The trashed state is left untouched so these items remain in the recycle bin.
-    private void LeaveDescendantInRecycleBinLocked(IContent descendant, int restoredItemId, int originalLevel, int userId, Dictionary<int, string> paths)
-    {
-        var isDirectChild = descendant.ParentId == restoredItemId;
-        descendant.Path = paths[descendant.Id] = isDirectChild
-            ? Constants.System.RecycleBinContentPathPrefix + descendant.Id
-            : paths[descendant.ParentId] + "," + descendant.Id;
-        descendant.Level -= originalLevel;
-        if (isDirectChild)
-        {
-            descendant.ParentId = Constants.System.RecycleBinContent;
-            descendant.ParentKey = Constants.System.RecycleBinContentKey;
-        }
-
-        PerformMoveContentLocked(descendant, userId, null);
-    }
-
-    // Moves a descendant along with the item being moved, updating its path and level (parentId is unchanged).
-    private void PerformMoveDescendantLocked(IContent descendant, int levelDelta, int userId, bool? trash, Dictionary<int, string> paths)
-    {
-        descendant.Path = paths[descendant.Id] = paths[descendant.ParentId] + "," + descendant.Id;
-        descendant.Level += levelDelta;
-        PerformMoveContentLocked(descendant, userId, trash);
-    }
-
-    private void PerformMoveContentLocked(IContent content, int userId, bool? trash)
-    {
-        if (trash.HasValue)
-        {
-            ((ContentBase)content).Trashed = trash.Value;
-        }
-
-        content.WriterId = userId;
-        _documentRepository.Save(content);
-    }
-
     // MUST be called from within a write lock on Constants.Locks.ContentTree.
     // trash indicates whether we are trashing, un-trashing, or not changing anything.
     private async Task PerformMoveLockedAsync(IContent content, int parentId, IContent? parent, int userId, List<(IContent Content, string OriginalPath)> moves, bool? trash, CancellationToken cancellationToken, bool includeDescendants = true)
@@ -1709,108 +1566,85 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
 
     #region Content Types
 
-    /// <summary>
-    ///     Deletes all content of specified type. All children of deleted content is moved to Recycle Bin.
-    /// </summary>
-    /// <remarks>
-    ///     <para>This needs extra care and attention as its potentially a dangerous and extensive operation.</para>
-    ///     <para>
-    ///         Deletes content items of the specified type, and only that type. Does *not* handle content types
-    ///         inheritance and compositions, which need to be managed outside of this method.
-    ///     </para>
-    /// </remarks>
-    /// <param name="contentTypeIds">Id of the <see cref="IContentType" /></param>
-    /// <param name="userId">Optional Id of the user issuing the delete operation</param>
-    public override void DeleteOfTypes(IEnumerable<int> contentTypeIds, int userId = Constants.Security.SuperUserId)
+    /// <inheritdoc />
+    public override async Task<Attempt<ContentDeleteOfTypesOperationStatus>> DeleteOfTypesAsync(IEnumerable<Guid> contentTypeKeys, Guid userKey, CancellationToken cancellationToken)
     {
-        // TODO: This currently this is called from the ContentTypeService but that needs to change,
-        // if we are deleting a content type, we should just delete the data and do this operation slightly differently.
-        // This method will recursively go lookup every content item, check if any of it's descendants are
-        // of a different type, move them to the recycle bin, then permanently delete the content items.
-        // The main problem with this is that for every content item being deleted, events are raised...
-        // which we need for many things like keeping caches in sync, but we can surely do this MUCH better.
         var changes = new List<TreeChange<IContent>>();
         var moves = new List<(IContent, string)>();
-        var contentTypeIdsA = contentTypeIds.ToArray();
+        Guid[] contentTypeKeysArray = contentTypeKeys.ToArray();
         EventMessages eventMessages = EventMessagesFactory.Get();
 
-        // using an immediate uow here because we keep making changes with
-        // PerformMoveLocked and DeleteLocked that must be applied immediately,
-        // no point queuing operations
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.WriteLock(Constants.Locks.ContentTree);
+
+        var contents = new List<IContent>();
+        const int pageSize = 500;
+        var page = 0;
+        var total = long.MaxValue;
+        while (page * pageSize < total)
         {
-            scope.WriteLock(Constants.Locks.ContentTree);
-
-            IQuery<IContent> query = Query<IContent>().WhereIn(x => x.ContentTypeId, contentTypeIdsA);
-            IContent[] contents = _documentRepository.Get(query).ToArray();
-
-            if (contents is null)
-            {
-                return;
-            }
-
-            if (scope.Notifications.PublishCancelable(new ContentDeletingNotification(contents, eventMessages)))
-            {
-                scope.Complete();
-                return;
-            }
-
-            // order by level, descending, so deepest first - that way, we cannot move
-            // a content of the deleted type, to the recycle bin (and then delete it...)
-            foreach (IContent content in contents.OrderByDescending(x => x.ParentId))
-            {
-                // if it's not trashed yet, and published, we should unpublish
-                // but... Unpublishing event makes no sense (not going to cancel?) and no need to save
-                // just raise the event
-                if (content.Trashed == false && content.Published)
-                {
-                    scope.Notifications.Publish(new ContentUnpublishedNotification(
-                        content,
-                        eventMessages,
-                        BuildCultureMap(content, content.ContentType.VariesByCulture() ? content.PublishedCultures : ["*"])));
-                }
-
-                // if current content has children, move them to trash
-                IContent c = content;
-                IQuery<IContent> childQuery = Query<IContent>().Where(x => x.ParentId == c.Id);
-                IEnumerable<IContent> children = _documentRepository.Get(childQuery);
-                foreach (IContent child in children)
-                {
-                    // see MoveToRecycleBin
-                    PerformMoveLocked(child, Constants.System.RecycleBinContent, null, userId, moves, true);
-                    changes.Add(new TreeChange<IContent>(content, TreeChangeTypes.RefreshBranch));
-                }
-
-                // delete content
-                // triggers the deleted event (and handles the files)
-                DeleteLocked(scope, content, eventMessages);
-                changes.Add(new TreeChange<IContent>(content, TreeChangeTypes.Remove));
-            }
-
-            MoveToRecycleBinEventInfo<IContent>[] moveInfos = moves
-                .Select(x => new MoveToRecycleBinEventInfo<IContent>(x.Item1, x.Item2))
-                .ToArray();
-            if (moveInfos.Length > 0)
-            {
-                scope.Notifications.Publish(new ContentMovedToRecycleBinNotification(moveInfos, eventMessages));
-            }
-
-            scope.Notifications.Publish(new ContentTreeChangeNotification(changes, eventMessages));
-
-            Audit(AuditType.Delete, userId, Constants.System.Root, $"Delete content of type {string.Join(",", contentTypeIdsA)}");
-
-            scope.Complete();
+            PagedModel<IContent> contentsPage = await GetPagedOfTypesAsync(contentTypeKeysArray, page++ * pageSize, pageSize, ordering: null, cancellationToken);
+            contents.AddRange(contentsPage.Items);
+            total = contentsPage.Total;
         }
+
+        if (await scope.Notifications.PublishCancelableAsync(new ContentDeletingNotification(contents, eventMessages)))
+        {
+            scope.Complete();
+            return Attempt.Fail(ContentDeleteOfTypesOperationStatus.CancelledByNotification);
+        }
+
+        int userId = await _userIdKeyResolver.GetAsync(userKey);
+
+        // order by level, descending, so deepest first - that way, we cannot move
+        // a content of the deleted type, to the recycle bin (and then delete it...)
+        foreach (IContent content in contents.OrderByDescending(x => x.ParentId))
+        {
+            // if it's not trashed yet, and published, we should unpublish
+            // but... Unpublishing event makes no sense (not going to cancel?) and no need to save
+            // just raise the event
+            if (content.Trashed == false && content.Published)
+            {
+                scope.Notifications.Publish(new ContentUnpublishedNotification(
+                    content,
+                    eventMessages,
+                    BuildCultureMap(content, content.ContentType.VariesByCulture() ? content.PublishedCultures : ["*"])));
+            }
+
+            // if current content has children, move them to trash
+            PagedModel<IContent> childrenPage = await GetChildrenAsync(content.Key, 0, int.MaxValue, propertyAliases: null, ordering: null, cancellationToken);
+            foreach (IContent child in childrenPage.Items)
+            {
+                // see MoveToRecycleBinAsync
+                await PerformMoveLockedAsync(child, Constants.System.RecycleBinContent, null, userId, moves, true, cancellationToken);
+                changes.Add(new TreeChange<IContent>(content, TreeChangeTypes.RefreshBranch));
+            }
+
+            // delete content
+            // triggers the deleted event (and handles the files)
+            await DeleteLockedAsync(scope, content, eventMessages, cancellationToken);
+            changes.Add(new TreeChange<IContent>(content, TreeChangeTypes.Remove));
+        }
+
+        MoveToRecycleBinEventInfo<IContent>[] moveInfos = moves
+            .Select(x => new MoveToRecycleBinEventInfo<IContent>(x.Item1, x.Item2))
+            .ToArray();
+        if (moveInfos.Length > 0)
+        {
+            scope.Notifications.Publish(new ContentMovedToRecycleBinNotification(moveInfos, eventMessages));
+        }
+
+        scope.Notifications.Publish(new ContentTreeChangeNotification(changes, eventMessages));
+
+        await AuditAsync(AuditType.Delete, userId, Constants.System.Root, $"Delete content of type {string.Join(",", contentTypeKeysArray)}");
+
+        scope.Complete();
+        return Attempt.Succeed(ContentDeleteOfTypesOperationStatus.Success);
     }
 
-    /// <summary>
-    ///     Deletes all content items of specified type. All children of deleted content item is moved to Recycle Bin.
-    /// </summary>
-    /// <remarks>This needs extra care and attention as its potentially a dangerous and extensive operation</remarks>
-    /// <param name="contentTypeId">Id of the <see cref="IContentType" /></param>
-    /// <param name="userId">Optional id of the user deleting the media</param>
-    public void DeleteOfType(int contentTypeId, int userId = Constants.Security.SuperUserId) =>
-        DeleteOfTypes(new[] { contentTypeId }, userId);
+    /// <inheritdoc />
+    public Task<Attempt<ContentDeleteOfTypesOperationStatus>> DeleteOfTypeAsync(Guid contentTypeKey, Guid userKey, CancellationToken cancellationToken) =>
+        DeleteOfTypesAsync(new[] { contentTypeKey }, userKey, cancellationToken);
 
     #endregion
 

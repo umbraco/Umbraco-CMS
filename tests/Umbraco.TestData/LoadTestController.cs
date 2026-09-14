@@ -347,7 +347,7 @@ public class LoadTestController : Controller
         }
 
         var contentType = await _contentTypeService.GetAsync(ContentAlias);
-        _contentService.DeleteOfType(contentType.Id);
+        await _contentService.DeleteOfTypeAsync(contentType.Key, Constants.Security.SuperUserKey, CancellationToken.None);
 
         return ContentHtml("Cleared.");
     }

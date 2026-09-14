@@ -1834,7 +1834,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
     #region Content Types
 
     /// <inheritdoc />
-    public abstract void DeleteOfTypes(IEnumerable<int> contentTypeIds, int userId = Constants.Security.SuperUserId);
+    public abstract Task<Attempt<ContentDeleteOfTypesOperationStatus>> DeleteOfTypesAsync(IEnumerable<Guid> contentTypeKeys, Guid userKey, CancellationToken cancellationToken);
 
     private IContentType GetContentType(ICoreScope scope, string contentTypeAlias)
     {
