@@ -288,10 +288,10 @@ internal sealed class ContentEditingService
     }
 
     /// <inheritdoc />
-    protected override async Task<IContent?> CopyAsync(IContent content, int newParentId, bool relateToOriginal, bool includeDescendants, Guid userKey)
+    protected override async Task<IContent?> CopyAsync(IContent content, Guid? parentKey, bool relateToOriginal, bool includeDescendants, Guid userKey)
     {
-        var userId = await GetUserIdAsync(userKey);
-        return ContentService.Copy(content, newParentId, relateToOriginal, includeDescendants, userId);
+        Attempt<IContent?, ContentCopyOperationStatus> result = await ContentService.CopyAsync(content, parentKey, relateToOriginal, includeDescendants, userKey, CancellationToken.None);
+        return result.Success ? result.Result : null;
     }
 
     /// <inheritdoc />

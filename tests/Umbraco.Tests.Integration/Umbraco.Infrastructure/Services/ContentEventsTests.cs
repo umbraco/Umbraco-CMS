@@ -1938,7 +1938,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             Assert.IsNotNull(content);
 
             ResetEvents();
-            IContent copy = ContentService.Copy(content, Constants.System.Root, false);
+            IContent copy = (await ContentService.CopyAsync(content, null, false, true, Constants.Security.SuperUserKey, CancellationToken.None)).Result;
 
             Assert.AreEqual(2, _msgCount);
             Assert.AreEqual(2, _events.Count);
@@ -1958,7 +1958,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             ContentService.Publish(content, content.AvailableCultures.ToArray());
 
             ResetEvents();
-            IContent copy = ContentService.Copy(content, Constants.System.Root, false);
+            IContent copy = (await ContentService.CopyAsync(content, null, false, true, Constants.Security.SuperUserKey, CancellationToken.None)).Result;
 
             Assert.AreEqual(2, _msgCount);
             Assert.AreEqual(2, _events.Count);
@@ -1981,7 +1981,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             await ContentService.MoveAsync(content, content2.Key, true, Constants.Security.SuperUserKey, CancellationToken.None);
 
             ResetEvents();
-            IContent copy = ContentService.Copy(content, Constants.System.Root, false);
+            IContent copy = (await ContentService.CopyAsync(content, null, false, true, Constants.Security.SuperUserKey, CancellationToken.None)).Result;
 
             Assert.AreEqual(2, _msgCount);
             Assert.AreEqual(2, _events.Count);
@@ -2001,7 +2001,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             ContentService.Publish(content, content.AvailableCultures.ToArray());
 
             ResetEvents();
-            IContent copy = ContentService.Copy(content, Constants.System.Root, false);
+            IContent copy = (await ContentService.CopyAsync(content, null, false, true, Constants.Security.SuperUserKey, CancellationToken.None)).Result;
 
             IContent[] copyC = Children(copy).ToArray();
             IContent[] copy2C = Children(copyC[0]).ToArray();

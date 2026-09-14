@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
@@ -421,7 +422,7 @@ internal sealed class DomainAndUrlsTests : UmbracoIntegrationTest
     [Test]
     public async Task Cannot_Assign_Already_Used_Domains()
     {
-        var copy = ContentService.Copy(Root, Root.ParentId, false);
+        var copy = (await ContentService.CopyAsync(Root, Root.ParentKey, false, true, Constants.Security.SuperUserKey, CancellationToken.None)).Result;
         ContentService.Publish(copy!, copy!.AvailableCultures.ToArray());
 
         var domainService = GetRequiredService<IDomainService>();

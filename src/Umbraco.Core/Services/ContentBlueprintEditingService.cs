@@ -273,7 +273,7 @@ internal sealed class ContentBlueprintEditingService
     /// Copies the specified content to a new parent. Not supported for blueprints.
     /// </summary>
     /// <param name="content">The content to copy.</param>
-    /// <param name="newParentId">The ID of the new parent.</param>
+    /// <param name="parentKey">The key of the new parent.</param>
     /// <param name="relateToOriginal">Whether to relate the copy to the original.</param>
     /// <param name="includeDescendants">Whether to include descendants in the copy.</param>
     /// <param name="userKey">The key of the user performing the operation.</param>
@@ -281,7 +281,7 @@ internal sealed class ContentBlueprintEditingService
     /// <exception cref="NotImplementedException">Always thrown as this operation is not supported for blueprints.</exception>
     protected override Task<IContent?> CopyAsync(
         IContent content,
-        int newParentId,
+        Guid? parentKey,
         bool relateToOriginal,
         bool includeDescendants,
         Guid userKey) => throw new NotImplementedException();

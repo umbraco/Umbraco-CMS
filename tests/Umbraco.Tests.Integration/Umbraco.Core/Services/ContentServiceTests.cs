@@ -2885,7 +2885,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         var parentPage2 = ContentBuilder.CreateSimpleContent(contentType);
         await ContentService.SaveAsync(parentPage2, null, null, CancellationToken.None);
 
-        var copy = ContentService.Copy(childPage, parentPage2.Id, false, true);
+        var copy = (await ContentService.CopyAsync(childPage, parentPage2.Key, false, true, Constants.Security.SuperUserKey, CancellationToken.None)).Result;
 
         // get the permissions and verify
         var permissions = UserService.GetPermissionsForPath(userGroup, copy.Path, true);
@@ -2952,7 +2952,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         await ContentService.SetPermissionAsync(parentPage2, "B", new[] { userGroup.Key }, CancellationToken.None);
 
         // Now copy, what should happen is the child pages will now have permissions inherited from the new parent
-        var copy = ContentService.Copy(childPage1, parentPage2.Id, false, true);
+        var copy = (await ContentService.CopyAsync(childPage1, parentPage2.Key, false, true, Constants.Security.SuperUserKey, CancellationToken.None)).Result;
 
         descendants.Clear();
         page = 0;
@@ -3179,7 +3179,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         var temp = await ContentService.GetByIdAsync(Subpage.Key, CancellationToken.None);
 
         // Act
-        var copy = ContentService.Copy(temp, temp.ParentId, false);
+        var copy = (await ContentService.CopyAsync(temp, temp.ParentKey, false, true, Constants.Security.SuperUserKey, CancellationToken.None)).Result;
         var content = await ContentService.GetByIdAsync(Subpage.Key, CancellationToken.None);
 
         // Assert
@@ -3196,6 +3196,21 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     }
 
     [Test]
+    public async Task Cannot_Copy_Content_To_A_Parent_That_Does_Not_Exist()
+    {
+        // Arrange
+        var temp = await ContentService.GetByIdAsync(Subpage.Key, CancellationToken.None);
+
+        // Act
+        Attempt<IContent?, ContentCopyOperationStatus> result = await ContentService.CopyAsync(temp!, Guid.NewGuid(), false, true, Constants.Security.SuperUserKey, CancellationToken.None);
+
+        // Assert
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(ContentCopyOperationStatus.ParentNotFound));
+        Assert.That(result.Result, Is.Null);
+    }
+
+    [Test]
     public async Task Copy_Of_Trashed_Content_Is_Not_Trashed()
     {
         // Arrange
@@ -3203,7 +3218,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         Assert.That(Subpage.Trashed, Is.True);
 
         // Act
-        var copy = ContentService.Copy(Subpage, Textpage.Id, false);
+        var copy = (await ContentService.CopyAsync(Subpage, Textpage.Key, false, true, Constants.Security.SuperUserKey, CancellationToken.None)).Result;
 
         // Assert
         Assert.That(copy, Is.Not.Null);
@@ -3220,7 +3235,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
         // umbracoNode's own Root row (id -1) carries Constants.System.RootSystemKey, NOT the semantic
         // "no parent" value ParentKey contracts to - Copy must not let it leak through.
-        IContent? copy = ContentService.Copy(subpage!, Constants.System.Root, false);
+        IContent? copy = (await ContentService.CopyAsync(subpage!, null, false, true, Constants.Security.SuperUserKey, CancellationToken.None)).Result;
 
         Assert.That(copy, Is.Not.Null);
         Assert.That(copy!.ParentKey, Is.Null);
@@ -3237,12 +3252,12 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         IContent? textpage = await ContentService.GetByIdAsync(Textpage.Key, CancellationToken.None);
         var callCountBeforeCopy = idKeyMapSpy.GetKeyForIdAsyncCallCount;
 
-        IContent? copy = ContentService.Copy(textpage!, destination.Id, false, true);
+        IContent? copy = (await ContentService.CopyAsync(textpage!, destination.Key, false, true, Constants.Security.SuperUserKey, CancellationToken.None)).Result;
 
-        // Resolving the new parent from its int id is the one unavoidable lookup (Copy's public
-        // signature only takes an int parentId) - copying Textpage's two descendants must not add any
-        // further IIdKeyMap calls on top of that, regardless of how many descendants are copied.
-        Assert.That(idKeyMapSpy.GetKeyForIdAsyncCallCount, Is.EqualTo(callCountBeforeCopy + 1));
+        // CopyAsync takes the new parent's Guid key directly, so no int->Guid IIdKeyMap resolution is
+        // needed for the parent at all - copying Textpage's two descendants must not add any IIdKeyMap
+        // calls either, regardless of how many descendants are copied.
+        Assert.That(idKeyMapSpy.GetKeyForIdAsyncCallCount, Is.EqualTo(callCountBeforeCopy));
 
         Assert.That(copy, Is.Not.Null);
         Assert.That(copy!.ParentKey, Is.EqualTo(destination.Key));
@@ -3269,7 +3284,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         IContent? copy;
         try
         {
-            copy = ContentService.Copy(textpage!, destination.Id, false, true);
+            copy = (await ContentService.CopyAsync(textpage!, destination.Key, false, true, Constants.Security.SuperUserKey, CancellationToken.None)).Result;
         }
         finally
         {
@@ -3307,7 +3322,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         content = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
 
         // Act
-        var copy = ContentService.Copy(content, content.ParentId, false);
+        var copy = (await ContentService.CopyAsync(content, content.ParentKey, false, true, Constants.Security.SuperUserKey, CancellationToken.None)).Result;
 
         // Assert against umbracoDocumentCultureVariation directly - IContent's re-materialisation
         // after GetById hides the DB-level inconsistency that issue #22540 is actually about.
@@ -3340,7 +3355,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         parent = await ContentService.GetByIdAsync(parent.Key, CancellationToken.None);
 
         // Act: copy the branch (recursive)
-        var copy = ContentService.Copy(parent, parent.ParentId, false, recursive: true);
+        var copy = (await ContentService.CopyAsync(parent, parent.ParentKey, false, true, Constants.Security.SuperUserKey, CancellationToken.None)).Result;
 
         var childCopy = (await ContentService.GetChildrenAsync(copy!.Key, 0, 500, propertyAliases: null, ordering: null, CancellationToken.None))
             .Items
@@ -3421,7 +3436,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
             content.SetValue("title", "New Value");
             await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
-            var copy = ContentService.Copy(content, content.ParentId, false);
+            var copy = (await ContentService.CopyAsync(content, content.ParentKey, false, true, Constants.Security.SuperUserKey, CancellationToken.None)).Result;
             Assert.AreEqual("1", copy.GetValue("title"));
 
             Assert.IsTrue(copyingWasCalled);
@@ -3443,7 +3458,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         Assert.AreEqual(3, await ContentService.CountChildrenAsync(temp.Key, null, CancellationToken.None));
 
         // Act
-        var copy = ContentService.Copy(temp, temp.ParentId, false, true);
+        var copy = (await ContentService.CopyAsync(temp, temp.ParentKey, false, true, Constants.Security.SuperUserKey, CancellationToken.None)).Result;
         var content = await ContentService.GetByIdAsync(Textpage.Key, CancellationToken.None);
 
         // Assert
@@ -3468,7 +3483,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         Assert.AreEqual(3, await ContentService.CountChildrenAsync(temp.Key, null, CancellationToken.None));
 
         // Act
-        var copy = ContentService.Copy(temp, temp.ParentId, false, false);
+        var copy = (await ContentService.CopyAsync(temp, temp.ParentKey, false, false, Constants.Security.SuperUserKey, CancellationToken.None)).Result;
         var content = await ContentService.GetByIdAsync(Textpage.Key, CancellationToken.None);
 
         // Assert
@@ -3525,7 +3540,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         Assert.AreEqual(2, contentTags.Length);
 
         // copy
-        var copy = ContentService.Copy(content, content.ParentId, false);
+        var copy = (await ContentService.CopyAsync(content, content.ParentKey, false, true, Constants.Security.SuperUserKey, CancellationToken.None)).Result;
 
         // copy is not published, so property has value, but no tags have been created
         Assert.AreEqual("[\"hello\",\"world\"]", copy.GetValue(propAlias));

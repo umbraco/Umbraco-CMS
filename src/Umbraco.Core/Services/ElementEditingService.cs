@@ -489,22 +489,22 @@ internal sealed class ElementEditingService
         return Attempt.Succeed(ContentEditingOperationStatus.Success);
     }
 
-    protected override async Task<IElement?> CopyAsync(IElement element, int newParentId, bool relateToOriginal, bool includeDescendants, Guid userKey)
+    protected override async Task<IElement?> CopyAsync(IElement element, Guid? parentKey, bool relateToOriginal, bool includeDescendants, Guid userKey)
     {
-        Guid? newParentKey;
-        if (newParentId is Constants.System.Root)
+        int newParentId;
+        if (parentKey is null)
         {
-            newParentKey = Constants.System.RootKey;
+            newParentId = Constants.System.Root;
         }
         else
         {
-            Attempt<Guid> parentKeyAttempt = await _idKeyMap.GetKeyForIdAsync(newParentId, UmbracoObjectTypes.ElementContainer);
-            if (parentKeyAttempt.Success is false)
+            Attempt<int> parentIdAttempt = await _idKeyMap.GetIdForKeyAsync(parentKey.Value, UmbracoObjectTypes.ElementContainer);
+            if (parentIdAttempt.Success is false)
             {
                 return null;
             }
 
-            newParentKey = parentKeyAttempt.Result;
+            newParentId = parentIdAttempt.Result;
         }
 
         using ICoreScope scope = CoreScopeProvider.CreateCoreScope();
@@ -515,7 +515,7 @@ internal sealed class ElementEditingService
         IElement copy = element.DeepCloneWithResetIdentities();
         copy.ParentId = newParentId;
 
-        var copyingNotification = new ElementCopyingNotification(element, copy, newParentKey, eventMessages);
+        var copyingNotification = new ElementCopyingNotification(element, copy, parentKey, eventMessages);
         if (await scope.Notifications.PublishCancelableAsync(copyingNotification))
         {
             scope.Complete();
@@ -538,7 +538,7 @@ internal sealed class ElementEditingService
 
         scope.Notifications.Publish(new ElementTreeChangeNotification(copy, TreeChangeTypes.RefreshBranch, eventMessages));
         scope.Notifications.Publish(
-            new ElementCopiedNotification(element, copy, newParentKey, relateToOriginal, eventMessages)
+            new ElementCopiedNotification(element, copy, parentKey, relateToOriginal, eventMessages)
                 .WithStateFrom(copyingNotification));
 
         await _auditService.AddAsync(AuditType.Copy, userKey, element.Id, UmbracoObjectTypes.Element.GetName());

@@ -377,31 +377,16 @@ public interface IContentService : IPublishableContentService<IContent>, IAsyncP
     Task<Attempt<ContentMoveOperationStatus>> MoveAsync(IContent content, Guid? parentKey, bool includeDescendants, Guid userKey, CancellationToken cancellationToken);
 
     /// <summary>
-    ///     Copies a document.
+    ///     Copies a document, optionally recursively copying its descendants.
     /// </summary>
     /// <param name="content">The document to copy.</param>
-    /// <param name="parentId">The identifier of the new parent.</param>
+    /// <param name="parentKey">The Guid key of the new parent, or <c>null</c> for the root of the content tree.</param>
     /// <param name="relateToOriginal">Whether to relate the copy to the original.</param>
-    /// <param name="userId">The identifier of the user performing the action.</param>
-    /// <returns>The copied document, or null if the copy failed.</returns>
-    /// <remarks>
-    ///     <para>Recursively copies all children.</para>
-    /// </remarks>
-    IContent? Copy(IContent content, int parentId, bool relateToOriginal, int userId = Constants.Security.SuperUserId);
-
-    /// <summary>
-    ///     Copies a document.
-    /// </summary>
-    /// <param name="content">The document to copy.</param>
-    /// <param name="parentId">The identifier of the new parent.</param>
-    /// <param name="relateToOriginal">Whether to relate the copy to the original.</param>
-    /// <param name="recursive">Whether to recursively copy all children.</param>
-    /// <param name="userId">The identifier of the user performing the action.</param>
-    /// <returns>The copied document, or null if the copy failed.</returns>
-    /// <remarks>
-    ///     <para>Optionally recursively copies all children.</para>
-    /// </remarks>
-    IContent? Copy(IContent content, int parentId, bool relateToOriginal, bool recursive, int userId = Constants.Security.SuperUserId);
+    /// <param name="recursive">Whether to recursively copy all descendants.</param>
+    /// <param name="userKey">The Guid key of the user performing the action.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>An attempt carrying the operation status and the copied document, if successful.</returns>
+    Task<Attempt<IContent?, ContentCopyOperationStatus>> CopyAsync(IContent content, Guid? parentKey, bool relateToOriginal, bool recursive, Guid userKey, CancellationToken cancellationToken);
 
     /// <summary>
     ///     Moves a document to the recycle bin.

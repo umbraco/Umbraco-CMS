@@ -30,7 +30,6 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
     private readonly IAsyncDocumentRepository _asyncDocumentRepository;
     private readonly IAsyncDocumentBlueprintRepository _asyncDocumentBlueprintRepository;
     private readonly IDocumentBlueprintRepository _documentBlueprintRepository;
-    private readonly IDocumentRepository _documentRepository;
     private readonly IEntityRepository _entityRepository;
     private readonly ILanguageRepository _languageRepository;
     private readonly ILogger<ContentService> _logger;
@@ -105,7 +104,6 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
     {
         _asyncDocumentRepository = asyncDocumentRepository;
         _asyncDocumentBlueprintRepository = asyncDocumentBlueprintRepository;
-        _documentRepository = documentRepository;
         _entityRepository = entityRepository;
         _documentBlueprintRepository = documentBlueprintRepository;
         _languageRepository = languageRepository;
@@ -1137,193 +1135,171 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
 
     #region Others
 
-    /// <summary>
-    ///     Copies an <see cref="IContent" /> object by creating a new Content object of the same type and copies all data from
-    ///     the current
-    ///     to the new copy which is returned. Recursively copies all children.
-    /// </summary>
-    /// <param name="content">The <see cref="IContent" /> to copy</param>
-    /// <param name="parentId">Id of the Content's new Parent</param>
-    /// <param name="relateToOriginal">Boolean indicating whether the copy should be related to the original</param>
-    /// <param name="userId">Optional Id of the User copying the Content</param>
-    /// <returns>The newly created <see cref="IContent" /> object</returns>
-    public IContent? Copy(IContent content, int parentId, bool relateToOriginal, int userId = Constants.Security.SuperUserId) => Copy(content, parentId, relateToOriginal, true, userId);
-
-    /// <summary>
-    ///     Copies an <see cref="IContent" /> object by creating a new Content object of the same type and copies all data from
-    ///     the current
-    ///     to the new copy which is returned.
-    /// </summary>
-    /// <param name="content">The <see cref="IContent" /> to copy</param>
-    /// <param name="parentId">Id of the Content's new Parent</param>
-    /// <param name="relateToOriginal">Boolean indicating whether the copy should be related to the original</param>
-    /// <param name="recursive">A value indicating whether to recursively copy children.</param>
-    /// <param name="userId">Optional Id of the User copying the Content</param>
-    /// <returns>The newly created <see cref="IContent" /> object</returns>
-    public IContent? Copy(IContent content, int parentId, bool relateToOriginal, bool recursive, int userId = Constants.Security.SuperUserId)
+    /// <inheritdoc />
+    public async Task<Attempt<IContent?, ContentCopyOperationStatus>> CopyAsync(IContent content, Guid? parentKey, bool relateToOriginal, bool recursive, Guid userKey, CancellationToken cancellationToken)
     {
         EventMessages eventMessages = EventMessagesFactory.Get();
 
         // keep track of updates (copied item key and parent key) for the in-memory navigation structure
         var navigationUpdates = new List<Tuple<Guid, Guid?>>();
 
-        IContent copy = content.DeepCloneWithResetIdentities();
-        copy.ParentId = parentId;
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.WriteLock(Constants.Locks.ContentTree);
 
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        IContent? parent = parentKey.HasValue ? await GetByIdAsync(parentKey.Value, cancellationToken) : null;
+        if (parentKey.HasValue && parent is null)
         {
-            scope.WriteLock(Constants.Locks.ContentTree);
-
-            Guid? parentKey = parentId switch
-            {
-                Constants.System.Root => null,
-                Constants.System.RecycleBinContent => Constants.System.RecycleBinContentKey,
-                _ => TryGetParentKey(parentId, out Guid? realParentKey) ? realParentKey : null,
-            };
-            copy.ParentKey = parentKey;
-            if (scope.Notifications.PublishCancelable(new ContentCopyingNotification(content, copy, parentKey, eventMessages)))
-            {
-                scope.Complete();
-                return null;
-            }
-
-            // note - relateToOriginal is not managed here,
-            // it's just part of the Copied event args so the RelateOnCopyHandler knows what to do
-            // meaning that the event has to trigger for every copied content including descendants
-            var copies = new List<Tuple<IContent, IContent>>();
-
-            // a copy is not published (but not really unpublishing either)
-            // update the create author and last edit author
-            if (copy.Published)
-            {
-                copy.Published = false;
-            }
-
-            // clear any per-culture published state copied from the source - the copy is unpublished,
-            // so no culture variations should be marked as published either (see #22540).
-            copy.ClearPublishInfos();
-
-            // a copy must not inherit the source's trashed state - it's being placed at a new location,
-            // not restored from the recycle bin.
-            if (copy.Trashed)
-            {
-                ((ContentBase)copy).Trashed = false;
-            }
-
-            copy.CreatorId = userId;
-            copy.WriterId = userId;
-
-            // get the current permissions, if there are any explicit ones they need to be copied
-            EntityPermissionCollection currentPermissions = GetPermissionsAsync(content.Key, CancellationToken.None).GetAwaiter().GetResult();
-            currentPermissions.RemoveWhere(p => p.IsDefaultPermissions);
-
-            // save and flush because we need the ID for the recursive Copying events
-            _documentRepository.Save(copy);
-
-            // store navigation update information for copied item
-            var copyHasRealParent = parentId != Constants.System.Root && parentId != Constants.System.RecycleBinContent;
-            navigationUpdates.Add(Tuple.Create(copy.Key, copyHasRealParent ? copy.ParentKey : null));
-
-            // add permissions
-            if (currentPermissions.Count > 0)
-            {
-                var permissionSet = new ContentPermissionSet(copy, currentPermissions);
-                _documentRepository.AddOrUpdatePermissions(permissionSet);
-            }
-
-            // keep track of copies
-            copies.Add(Tuple.Create(content, copy));
-            var idmap = new Dictionary<int, int> { [content.Id] = copy.Id };
-            var copyIdToKeyMap = new Dictionary<int, Guid> { [copy.Id] = copy.Key };
-
-            // process descendants
-            if (recursive)
-            {
-                const int pageSize = 500;
-                var page = 0;
-                var total = long.MaxValue;
-                while (page * pageSize < total)
-                {
-                    PagedModel<IContent> descendantsPage = GetDescendantsAsync(content.Key, page++ * pageSize, pageSize, ordering: null, CancellationToken.None).GetAwaiter().GetResult();
-                    IEnumerable<IContent> descendants = descendantsPage.Items;
-                    total = descendantsPage.Total;
-                    foreach (IContent descendant in descendants)
-                    {
-                        // when copying a branch into itself, the copy of a root would be seen as a descendant
-                        // and would be copied again => filter it out.
-                        if (descendant.Id == copy.Id)
-                        {
-                            continue;
-                        }
-
-                        // if parent has not been copied, skip, else gets its copy id
-                        if (idmap.TryGetValue(descendant.ParentId, out parentId) == false)
-                        {
-                            continue;
-                        }
-
-                        IContent descendantCopy = descendant.DeepCloneWithResetIdentities();
-                        descendantCopy.ParentId = parentId;
-                        descendantCopy.ParentKey = copyIdToKeyMap[parentId];
-
-                        if (scope.Notifications.PublishCancelable(new ContentCopyingNotification(descendant, descendantCopy, descendantCopy.ParentKey, eventMessages)))
-                        {
-                            continue;
-                        }
-
-                        // a copy is not published (but not really unpublishing either)
-                        // update the create author and last edit author
-                        if (descendantCopy.Published)
-                        {
-                            descendantCopy.Published = false;
-                        }
-
-                        // clear any per-culture published state copied from the source - the copy is unpublished,
-                        // so no culture variations should be marked as published either (see #22540).
-                        descendantCopy.ClearPublishInfos();
-
-                        // a copy must not inherit the source's trashed state - it's being placed at a new
-                        // location, not restored from the recycle bin.
-                        if (descendantCopy.Trashed)
-                        {
-                            ((ContentBase)descendantCopy).Trashed = false;
-                        }
-
-                        descendantCopy.CreatorId = userId;
-                        descendantCopy.WriterId = userId;
-
-                        // since the repository relies on the dirty state to figure out whether it needs to update the sort order, we mark it dirty here
-                        descendantCopy.SortOrder = descendantCopy.SortOrder;
-
-                        // save and flush (see above)
-                        _documentRepository.Save(descendantCopy);
-
-                        // store navigation update information for descendants
-                        navigationUpdates.Add(Tuple.Create(descendantCopy.Key, descendantCopy.ParentKey));
-
-                        copies.Add(Tuple.Create(descendant, descendantCopy));
-                        idmap[descendant.Id] = descendantCopy.Id;
-                        copyIdToKeyMap[descendantCopy.Id] = descendantCopy.Key;
-                    }
-                }
-            }
-
-            // not handling tags here, because
-            // - tags should be handled by the content repository
-            // - a copy is unpublished and therefore has no impact on tags in DB
-            scope.Notifications.Publish(
-                new ContentTreeChangeNotification(copy, TreeChangeTypes.RefreshBranch, eventMessages));
-            foreach (Tuple<IContent, IContent> x in CollectionsMarshal.AsSpan(copies))
-            {
-                scope.Notifications.Publish(new ContentCopiedNotification(x.Item1, x.Item2, x.Item2.ParentKey, relateToOriginal, eventMessages));
-            }
-
-            Audit(AuditType.Copy, userId, content.Id);
-
             scope.Complete();
+            return Attempt.FailWithStatus<IContent?, ContentCopyOperationStatus>(ContentCopyOperationStatus.ParentNotFound, null);
         }
 
-        return copy;
+        int userId = await _userIdKeyResolver.GetAsync(userKey);
+
+        IContent copy = content.DeepCloneWithResetIdentities();
+        copy.ParentId = parent?.Id ?? Constants.System.Root;
+        copy.ParentKey = parentKey;
+
+        if (await scope.Notifications.PublishCancelableAsync(new ContentCopyingNotification(content, copy, parentKey, eventMessages)))
+        {
+            scope.Complete();
+            return Attempt.FailWithStatus<IContent?, ContentCopyOperationStatus>(ContentCopyOperationStatus.CancelledByNotification, null);
+        }
+
+        // note - relateToOriginal is not managed here,
+        // it's just part of the Copied event args so the RelateOnCopyHandler knows what to do
+        // meaning that the event has to trigger for every copied content including descendants
+        var copies = new List<Tuple<IContent, IContent>>();
+
+        // a copy is not published (but not really unpublishing either)
+        // update the create author and last edit author
+        if (copy.Published)
+        {
+            copy.Published = false;
+        }
+
+        // clear any per-culture published state copied from the source - the copy is unpublished,
+        // so no culture variations should be marked as published either (see #22540).
+        copy.ClearPublishInfos();
+
+        // a copy must not inherit the source's trashed state - it's being placed at a new location,
+        // not restored from the recycle bin.
+        if (copy.Trashed)
+        {
+            ((ContentBase)copy).Trashed = false;
+        }
+
+        copy.CreatorId = userId;
+        copy.WriterId = userId;
+
+        // get the current permissions, if there are any explicit ones they need to be copied
+        EntityPermissionCollection currentPermissions = await GetPermissionsAsync(content.Key, cancellationToken);
+        currentPermissions.RemoveWhere(p => p.IsDefaultPermissions);
+
+        // save and flush because we need the ID for the recursive Copying events
+        await _asyncDocumentRepository.SaveAsync(copy, cancellationToken);
+
+        // store navigation update information for copied item
+        var copyHasRealParent = parentKey.HasValue && parentKey != Constants.System.RecycleBinContentKey;
+        navigationUpdates.Add(Tuple.Create(copy.Key, copyHasRealParent ? copy.ParentKey : null));
+
+        // add permissions
+        if (currentPermissions.Count > 0)
+        {
+            var permissionSet = new ContentPermissionSet(copy, currentPermissions);
+            await _asyncDocumentRepository.AddOrUpdatePermissionsAsync(permissionSet, cancellationToken);
+        }
+
+        // keep track of copies
+        copies.Add(Tuple.Create(content, copy));
+        var idmap = new Dictionary<int, int> { [content.Id] = copy.Id };
+        var copyIdToKeyMap = new Dictionary<int, Guid> { [copy.Id] = copy.Key };
+
+        // process descendants
+        if (recursive)
+        {
+            const int pageSize = 500;
+            var page = 0;
+            var total = long.MaxValue;
+            while (page * pageSize < total)
+            {
+                PagedModel<IContent> descendantsPage = await GetDescendantsAsync(content.Key, page++ * pageSize, pageSize, ordering: null, cancellationToken);
+                IEnumerable<IContent> descendants = descendantsPage.Items;
+                total = descendantsPage.Total;
+                foreach (IContent descendant in descendants)
+                {
+                    // when copying a branch into itself, the copy of a root would be seen as a descendant
+                    // and would be copied again => filter it out.
+                    if (descendant.Id == copy.Id)
+                    {
+                        continue;
+                    }
+
+                    // if parent has not been copied, skip, else gets its copy id
+                    if (idmap.TryGetValue(descendant.ParentId, out int descendantParentId) == false)
+                    {
+                        continue;
+                    }
+
+                    IContent descendantCopy = descendant.DeepCloneWithResetIdentities();
+                    descendantCopy.ParentId = descendantParentId;
+                    descendantCopy.ParentKey = copyIdToKeyMap[descendantParentId];
+
+                    if (await scope.Notifications.PublishCancelableAsync(new ContentCopyingNotification(descendant, descendantCopy, descendantCopy.ParentKey, eventMessages)))
+                    {
+                        continue;
+                    }
+
+                    // a copy is not published (but not really unpublishing either)
+                    // update the create author and last edit author
+                    if (descendantCopy.Published)
+                    {
+                        descendantCopy.Published = false;
+                    }
+
+                    // clear any per-culture published state copied from the source - the copy is unpublished,
+                    // so no culture variations should be marked as published either (see #22540).
+                    descendantCopy.ClearPublishInfos();
+
+                    // a copy must not inherit the source's trashed state - it's being placed at a new
+                    // location, not restored from the recycle bin.
+                    if (descendantCopy.Trashed)
+                    {
+                        ((ContentBase)descendantCopy).Trashed = false;
+                    }
+
+                    descendantCopy.CreatorId = userId;
+                    descendantCopy.WriterId = userId;
+
+                    // since the repository relies on the dirty state to figure out whether it needs to update the sort order, we mark it dirty here
+                    descendantCopy.SortOrder = descendantCopy.SortOrder;
+
+                    // save and flush (see above)
+                    await _asyncDocumentRepository.SaveAsync(descendantCopy, cancellationToken);
+
+                    // store navigation update information for descendants
+                    navigationUpdates.Add(Tuple.Create(descendantCopy.Key, descendantCopy.ParentKey));
+
+                    copies.Add(Tuple.Create(descendant, descendantCopy));
+                    idmap[descendant.Id] = descendantCopy.Id;
+                    copyIdToKeyMap[descendantCopy.Id] = descendantCopy.Key;
+                }
+            }
+        }
+
+        // not handling tags here, because
+        // - tags should be handled by the content repository
+        // - a copy is unpublished and therefore has no impact on tags in DB
+        scope.Notifications.Publish(
+            new ContentTreeChangeNotification(copy, TreeChangeTypes.RefreshBranch, eventMessages));
+        foreach (Tuple<IContent, IContent> x in CollectionsMarshal.AsSpan(copies))
+        {
+            scope.Notifications.Publish(new ContentCopiedNotification(x.Item1, x.Item2, x.Item2.ParentKey, relateToOriginal, eventMessages));
+        }
+
+        await AuditAsync(AuditType.Copy, userId, content.Id);
+
+        scope.Complete();
+        return Attempt.SucceedWithStatus<IContent?, ContentCopyOperationStatus>(ContentCopyOperationStatus.Success, copy);
     }
 
     private bool TryGetParentKey(int parentId, [NotNullWhen(true)] out Guid? parentKey)
