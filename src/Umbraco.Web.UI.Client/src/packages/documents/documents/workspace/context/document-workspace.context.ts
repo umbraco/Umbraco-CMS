@@ -20,6 +20,7 @@ import { UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD, UMB_DOCUMENT_WORKSPACE_ALIA
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbContentDetailWorkspaceContextBase } from '@umbraco-cms/backoffice/content';
 import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
+import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import { UmbDocumentBlueprintDetailRepository } from '@umbraco-cms/backoffice/document-blueprint';
 import { UmbEntityContentTypeEntityContext } from '@umbraco-cms/backoffice/content-type';
 import { UmbPreviewController } from '@umbraco-cms/backoffice/preview';
@@ -64,6 +65,7 @@ export class UmbDocumentWorkspaceContext
 	#entityContentTypeContext = new UmbEntityContentTypeEntityContext(this);
 	#documentSegmentRepository = new UmbDocumentSegmentRepository(this);
 	#previewController = new UmbPreviewController(this);
+	#localize = new UmbLocalizationController(this);
 
 	constructor(host: UmbControllerHost) {
 		super(host, {
@@ -307,6 +309,7 @@ export class UmbDocumentWorkspaceContext
 		// Construct the preview window before performing any save or validation actions
 		// as the preview window needs to be ready within a very short time after the user initiates the preview action.
 		const previewWindow = window.open('', `umbpreview-${unique}`);
+		this.#showLoadingText(previewWindow);
 
 		let firstVariantId = UmbVariantId.CreateInvariant();
 
@@ -344,6 +347,18 @@ export class UmbDocumentWorkspaceContext
 			},
 			previewWindow,
 		);
+	}
+
+	// A freshly opened tab stays blank until the save completes, so give it a placeholder.
+	// An already open preview tab (or a cross-origin one) is left untouched.
+	#showLoadingText(previewWindow: WindowProxy | null) {
+		try {
+			if (previewWindow?.location.href === 'about:blank') {
+				previewWindow.document.body.textContent = this.#localize.term('general_loading');
+			}
+		} catch {
+			// Cross-origin preview tab; it is already showing content.
+		}
 	}
 
 	public createPropertyDatasetContext(
