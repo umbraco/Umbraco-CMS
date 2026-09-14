@@ -89,7 +89,6 @@ test('cannot see an element folder with read permission disabled', async ({umbra
   await umbracoUi.library.isElementInTreeVisible(folderName, false);
 });
 
-// Currently user cannot see the create action menu even though they have permission to create an element folder
 test('can create an element folder with create permission enabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithCreateElementFolderPermission(userGroupName);
