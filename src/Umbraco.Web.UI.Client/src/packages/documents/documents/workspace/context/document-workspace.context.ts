@@ -306,7 +306,7 @@ export class UmbDocumentWorkspaceContext
 
 		// Construct the preview window before performing any save or validation actions
 		// as the preview window needs to be ready within a very short time after the user initiates the preview action.
-		const previewWindow = window.open('', 'umbpreview');
+		const previewWindow = window.open('', `umbpreview-${unique}`);
 
 		let firstVariantId = UmbVariantId.CreateInvariant();
 
