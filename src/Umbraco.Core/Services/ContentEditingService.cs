@@ -279,8 +279,13 @@ internal sealed class ContentEditingService
         => new Content(name, parentId, contentType);
 
     /// <inheritdoc />
-    protected override OperationResult? Move(IContent content, int newParentId, bool includeDescendants, int userId)
-        => ContentService.Move(content, newParentId, includeDescendants, userId);
+    protected override async Task<OperationResult?> MoveAsync(IContent content, Guid? parentKey, bool includeDescendants, Guid userKey)
+    {
+        Attempt<ContentMoveOperationStatus> result = await ContentService.MoveAsync(content, parentKey, includeDescendants, userKey, CancellationToken.None);
+        return result.Success
+            ? OperationResult.Succeed(new EventMessages())
+            : OperationResult.Cancel(new EventMessages());
+    }
 
     /// <inheritdoc />
     protected override async Task<IContent?> CopyAsync(IContent content, int newParentId, bool relateToOriginal, bool includeDescendants, Guid userKey)

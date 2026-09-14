@@ -679,7 +679,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
         allTags = TagService.GetAllContentTags();
         Assert.AreEqual(0, allTags.Count());
 
-        ContentService.Move(content1, -1);
+        await ContentService.MoveAsync(content1, null, true, Constants.Security.SuperUserKey, CancellationToken.None);
 
         Assert.IsFalse(content1.Published);
 

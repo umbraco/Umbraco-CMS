@@ -258,16 +258,16 @@ internal sealed class ContentBlueprintEditingService
     /// Moves the specified content to a new parent. Not supported for blueprints.
     /// </summary>
     /// <param name="content">The content to move.</param>
-    /// <param name="newParentId">The ID of the new parent.</param>
+    /// <param name="parentKey">The key of the new parent, or null for root.</param>
     /// <param name="includeDescendants">Whether to move the descendants along with the content. Not supported for blueprints.</param>
-    /// <param name="userId">The ID of the user performing the operation.</param>
+    /// <param name="userKey">The key of the user performing the operation.</param>
     /// <returns>Not supported for blueprints.</returns>
     /// <exception cref="NotImplementedException">Always thrown as this operation is not supported for blueprints.</exception>
     /// <remarks>
     /// Some methods from ContentEditingServiceBase are needed, so we need to inherit from it
     /// but there are others that are not required to be implemented in the case of blueprints.
     /// </remarks>
-    protected override OperationResult? Move(IContent content, int newParentId, bool includeDescendants, int userId) => throw new NotImplementedException();
+    protected override Task<OperationResult?> MoveAsync(IContent content, Guid? parentKey, bool includeDescendants, Guid userKey) => throw new NotImplementedException();
 
     /// <summary>
     /// Copies the specified content to a new parent. Not supported for blueprints.

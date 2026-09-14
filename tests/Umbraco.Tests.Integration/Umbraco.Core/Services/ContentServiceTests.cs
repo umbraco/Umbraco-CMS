@@ -3064,13 +3064,46 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         var content = await ContentService.GetByIdAsync(Trashed.Key, CancellationToken.None);
 
         // Act - moving out of recycle bin
-        ContentService.Move(content, Textpage.Id);
+        await ContentService.MoveAsync(content, Textpage.Key, true, Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Assert
         Assert.That(content.ParentId, Is.EqualTo(Textpage.Id));
         Assert.That(content.ParentKey, Is.EqualTo(Textpage.Key));
         Assert.That(content.Trashed, Is.False);
         Assert.That(content.Published, Is.False);
+    }
+
+    [Test]
+    public async Task MoveAsync_RestoringWithoutDescendants_LeavesDescendantsTrashedAtRecycleBinRoot()
+    {
+        var grandchild = ContentBuilder.CreateSimpleContent(ContentType, "Grandchild", Subpage.Id);
+        await ContentService.SaveAsync(grandchild, null, null, CancellationToken.None);
+
+        await ContentService.MoveToRecycleBinAsync(Subpage, Constants.Security.SuperUserKey, CancellationToken.None);
+
+        var trashedGrandchild = await ContentService.GetByIdAsync(grandchild.Key, CancellationToken.None);
+        Assert.Multiple(() =>
+        {
+            Assert.That(Subpage.Trashed, Is.True);
+            Assert.That(trashedGrandchild!.Trashed, Is.True);
+        });
+
+        Attempt<ContentMoveOperationStatus> result = await ContentService.MoveAsync(Subpage, Textpage.Key, false, Constants.Security.SuperUserKey, CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Success, Is.True);
+            Assert.That(Subpage.Trashed, Is.False);
+            Assert.That(Subpage.ParentKey, Is.EqualTo(Textpage.Key));
+        });
+
+        var reloadedGrandchild = await ContentService.GetByIdAsync(grandchild.Key, CancellationToken.None);
+        Assert.Multiple(() =>
+        {
+            Assert.That(reloadedGrandchild!.Trashed, Is.True);
+            Assert.That(reloadedGrandchild.ParentId, Is.EqualTo(Constants.System.RecycleBinContent));
+            Assert.That(reloadedGrandchild.ParentKey, Is.EqualTo(Constants.System.RecycleBinContentKey));
+        });
     }
 
     [Test]
@@ -3124,12 +3157,12 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         IContent? textpage = await ContentService.GetByIdAsync(Textpage.Key, CancellationToken.None);
         var callCountBeforeMove = idKeyMapSpy.GetKeyForIdAsyncCallCount;
 
-        ContentService.Move(textpage!, destination.Id);
+        await ContentService.MoveAsync(textpage!, destination.Key, true, Constants.Security.SuperUserKey, CancellationToken.None);
 
-        // Resolving the new parent from its int id is the one unavoidable lookup (Move's public
-        // signature only takes an int parentId) - moving Textpage's two children must not add any
-        // further IIdKeyMap calls on top of that, regardless of how many descendants are moved.
-        Assert.That(idKeyMapSpy.GetKeyForIdAsyncCallCount, Is.EqualTo(callCountBeforeMove + 1));
+        // MoveAsync takes the new parent's Guid key directly, so no int->Guid IIdKeyMap resolution is
+        // needed for the parent at all - moving Textpage's two children must not add any IIdKeyMap
+        // calls either, regardless of how many descendants are moved.
+        Assert.That(idKeyMapSpy.GetKeyForIdAsyncCallCount, Is.EqualTo(callCountBeforeMove));
 
         Assert.That(textpage!.ParentKey, Is.EqualTo(destination.Key));
 

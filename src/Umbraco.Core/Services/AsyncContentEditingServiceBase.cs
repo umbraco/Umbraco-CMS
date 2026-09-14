@@ -97,11 +97,11 @@ internal abstract class AsyncContentEditingServiceBase<TContent, TContentType, T
     /// Moves content to a new parent.
     /// </summary>
     /// <param name="content">The content to move.</param>
-    /// <param name="newParentId">The new parent identifier.</param>
+    /// <param name="parentKey">The new parent key, or null for root.</param>
     /// <param name="includeDescendants">Whether to move the descendants along with the content.</param>
-    /// <param name="userId">The user performing the operation.</param>
+    /// <param name="userKey">The user performing the operation.</param>
     /// <returns>The operation result.</returns>
-    protected abstract OperationResult? Move(TContent content, int newParentId, bool includeDescendants, int userId);
+    protected abstract Task<OperationResult?> MoveAsync(TContent content, Guid? parentKey, bool includeDescendants, Guid userKey);
 
     /// <summary>
     /// Copies content to a new parent.
@@ -451,8 +451,7 @@ internal abstract class AsyncContentEditingServiceBase<TContent, TContentType, T
             }
         }
 
-        var userId = await GetUserIdAsync(userKey);
-        OperationResult? moveResult = Move(content, parent.ParentId ?? Constants.System.Root, includeDescendants, userId);
+        OperationResult? moveResult = await MoveAsync(content, parentKey, includeDescendants, userKey);
 
         scope.Complete();
 

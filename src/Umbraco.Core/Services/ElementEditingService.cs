@@ -558,7 +558,7 @@ internal sealed class ElementEditingService
     }
 
     // NOTE: We have a custom implementation for Move because ContentEditingServiceBase has no concept of Containers.
-    protected override OperationResult? Move(IElement element, int newParentId, bool includeDescendants, int userId) => throw new NotImplementedException();
+    protected override Task<OperationResult?> MoveAsync(IElement element, Guid? parentKey, bool includeDescendants, Guid userKey) => throw new NotImplementedException();
 
     private async Task<ContentEditingOperationStatus> SaveAsync(IElement content, Guid userKey)
     {

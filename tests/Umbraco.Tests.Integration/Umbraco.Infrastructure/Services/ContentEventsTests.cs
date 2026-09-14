@@ -924,7 +924,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             await ContentService.MoveToRecycleBinAsync(content, Constants.Security.SuperUserKey, CancellationToken.None);
 
             ResetEvents();
-            ContentService.Move(content, -1);
+            await ContentService.MoveAsync(content, null, true, Constants.Security.SuperUserKey, CancellationToken.None);
 
             Assert.AreEqual(2, _msgCount);
             Assert.AreEqual(2, _events.Count);
@@ -970,7 +970,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             await ContentService.MoveToRecycleBinAsync(content, Constants.Security.SuperUserKey, CancellationToken.None);
 
             ResetEvents();
-            ContentService.Move(content, -1);
+            await ContentService.MoveAsync(content, null, true, Constants.Security.SuperUserKey, CancellationToken.None);
 
             Assert.AreEqual(2, _msgCount);
             Assert.AreEqual(2, _events.Count);
@@ -1285,7 +1285,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             Assert.IsNotNull(content2);
 
             ResetEvents();
-            ContentService.Move(content1, content2.Id);
+            await ContentService.MoveAsync(content1, content2.Key, true, Constants.Security.SuperUserKey, CancellationToken.None);
 
             Assert.AreEqual(2, _msgCount);
             Assert.AreEqual(2, _events.Count);
@@ -1306,7 +1306,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             Assert.IsNotNull(content2);
 
             ResetEvents();
-            ContentService.Move(content1, content2.Id);
+            await ContentService.MoveAsync(content1, content2.Key, true, Constants.Security.SuperUserKey, CancellationToken.None);
 
             Assert.AreEqual(2, _msgCount);
             Assert.AreEqual(2, _events.Count);
@@ -1330,7 +1330,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             Assert.IsNotNull(content2);
 
             ResetEvents();
-            ContentService.Move(content1, content2.Id);
+            await ContentService.MoveAsync(content1, content2.Key, true, Constants.Security.SuperUserKey, CancellationToken.None);
 
             Assert.AreEqual(2, _msgCount);
             Assert.AreEqual(2, _events.Count);
@@ -1352,7 +1352,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             ContentService.Publish(content2, content2.AvailableCultures.ToArray());
 
             ResetEvents();
-            ContentService.Move(content1, content2.Id);
+            await ContentService.MoveAsync(content1, content2.Key, true, Constants.Security.SuperUserKey, CancellationToken.None);
 
             Assert.AreEqual(2, _msgCount);
             Assert.AreEqual(2, _events.Count);
@@ -1378,7 +1378,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             ContentService.Unpublish(content2);
 
             ResetEvents();
-            ContentService.Move(content1, content3.Id);
+            await ContentService.MoveAsync(content1, content3.Key, true, Constants.Security.SuperUserKey, CancellationToken.None);
 
             Assert.AreEqual(2, _msgCount);
             Assert.AreEqual(2, _events.Count);
@@ -1400,7 +1400,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             ContentService.Publish(content2, content2.AvailableCultures.ToArray());
 
             ResetEvents();
-            ContentService.Move(content1, content2.Id);
+            await ContentService.MoveAsync(content1, content2.Key, true, Constants.Security.SuperUserKey, CancellationToken.None);
 
             Assert.AreEqual(2, _msgCount);
             Assert.AreEqual(2, _events.Count);
@@ -1426,7 +1426,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             ContentService.Unpublish(content2);
 
             ResetEvents();
-            ContentService.Move(content1, content3.Id);
+            await ContentService.MoveAsync(content1, content3.Key, true, Constants.Security.SuperUserKey, CancellationToken.None);
 
             Assert.AreEqual(2, _msgCount);
             Assert.AreEqual(2, _events.Count);
@@ -1451,7 +1451,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             ContentService.Publish(content2, content2.AvailableCultures.ToArray());
 
             ResetEvents();
-            ContentService.Move(content1, content2.Id);
+            await ContentService.MoveAsync(content1, content2.Key, true, Constants.Security.SuperUserKey, CancellationToken.None);
 
             Assert.AreEqual(2, _msgCount);
             Assert.AreEqual(2, _events.Count);
@@ -1479,7 +1479,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             ContentService.Unpublish(content2);
 
             ResetEvents();
-            ContentService.Move(content1, content3.Id);
+            await ContentService.MoveAsync(content1, content3.Key, true, Constants.Security.SuperUserKey, CancellationToken.None);
 
             Assert.AreEqual(2, _msgCount);
             Assert.AreEqual(2, _events.Count);
@@ -1506,7 +1506,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             ContentService.Publish(content3, content3.AvailableCultures.ToArray());
 
             ResetEvents();
-            ContentService.Move(content2, content3.Id);
+            await ContentService.MoveAsync(content2, content3.Key, true, Constants.Security.SuperUserKey, CancellationToken.None);
 
             Assert.AreEqual(2, _msgCount);
             Assert.AreEqual(2, _events.Count);
@@ -1537,7 +1537,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             ContentService.Unpublish(content3);
 
             ResetEvents();
-            ContentService.Move(content2, content4.Id);
+            await ContentService.MoveAsync(content2, content4.Key, true, Constants.Security.SuperUserKey, CancellationToken.None);
 
             Assert.AreEqual(2, _msgCount);
             Assert.AreEqual(2, _events.Count);
@@ -1565,7 +1565,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             ContentService.Publish(content3, content3.AvailableCultures.ToArray());
 
             ResetEvents();
-            ContentService.Move(content2, content3.Id);
+            await ContentService.MoveAsync(content2, content3.Key, true, Constants.Security.SuperUserKey, CancellationToken.None);
 
             Assert.AreEqual(2, _msgCount);
             Assert.AreEqual(2, _events.Count);
@@ -1598,7 +1598,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             ContentService.Unpublish(content3);
 
             ResetEvents();
-            ContentService.Move(content2, content4.Id);
+            await ContentService.MoveAsync(content2, content4.Key, true, Constants.Security.SuperUserKey, CancellationToken.None);
 
             Assert.AreEqual(2, _msgCount);
             Assert.AreEqual(2, _events.Count);
@@ -1624,7 +1624,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             Assert.IsNotNull(content3);
 
             ResetEvents();
-            ContentService.Move(content2, content3.Id);
+            await ContentService.MoveAsync(content2, content3.Key, true, Constants.Security.SuperUserKey, CancellationToken.None);
 
             Assert.AreEqual(2, _msgCount);
             Assert.AreEqual(2, _events.Count);
@@ -1651,7 +1651,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             Assert.IsNotNull(content3);
 
             ResetEvents();
-            ContentService.Move(content2, content3.Id);
+            await ContentService.MoveAsync(content2, content3.Key, true, Constants.Security.SuperUserKey, CancellationToken.None);
 
             Assert.AreEqual(2, _msgCount);
             Assert.AreEqual(2, _events.Count);
@@ -1673,7 +1673,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             Assert.IsNotNull(content2);
 
             ResetEvents();
-            ContentService.Move(content1, content2.Id);
+            await ContentService.MoveAsync(content1, content2.Key, true, Constants.Security.SuperUserKey, CancellationToken.None);
 
             Assert.AreEqual(14, _msgCount);
             Assert.AreEqual(14, _events.Count);
@@ -1715,7 +1715,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             ContentService.Publish(content2, content2.AvailableCultures.ToArray());
 
             ResetEvents();
-            ContentService.Move(content1, content2.Id);
+            await ContentService.MoveAsync(content1, content2.Key, true, Constants.Security.SuperUserKey, CancellationToken.None);
 
             Assert.AreEqual(14, _msgCount);
             Assert.AreEqual(14, _events.Count);
@@ -1761,7 +1761,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             ContentService.Unpublish(content2);
 
             ResetEvents();
-            ContentService.Move(content1, content3.Id);
+            await ContentService.MoveAsync(content1, content3.Key, true, Constants.Security.SuperUserKey, CancellationToken.None);
 
             Assert.AreEqual(14, _msgCount);
             Assert.AreEqual(14, _events.Count);
@@ -1802,10 +1802,10 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             Assert.IsNotNull(content2);
             ContentService.Publish(content2, content2.AvailableCultures.ToArray());
 
-            ContentService.Move(content1, content2.Id);
+            await ContentService.MoveAsync(content1, content2.Key, true, Constants.Security.SuperUserKey, CancellationToken.None);
 
             ResetEvents();
-            ContentService.Move(content1, -1);
+            await ContentService.MoveAsync(content1, null, true, Constants.Security.SuperUserKey, CancellationToken.None);
 
             Assert.AreEqual(14, _msgCount);
             Assert.AreEqual(14, _events.Count);
@@ -1845,10 +1845,10 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             IContent content2 = await CreateContent();
             Assert.IsNotNull(content2);
 
-            ContentService.Move(content1, content2.Id);
+            await ContentService.MoveAsync(content1, content2.Key, true, Constants.Security.SuperUserKey, CancellationToken.None);
 
             ResetEvents();
-            ContentService.Move(content1, -1);
+            await ContentService.MoveAsync(content1, null, true, Constants.Security.SuperUserKey, CancellationToken.None);
 
             Assert.AreEqual(14, _msgCount);
             Assert.AreEqual(14, _events.Count);
@@ -1893,10 +1893,10 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             ContentService.Publish(content3, content3.AvailableCultures.ToArray());
             ContentService.Unpublish(content2);
 
-            ContentService.Move(content1, content3.Id);
+            await ContentService.MoveAsync(content1, content3.Key, true, Constants.Security.SuperUserKey, CancellationToken.None);
 
             ResetEvents();
-            ContentService.Move(content1, -1);
+            await ContentService.MoveAsync(content1, null, true, Constants.Security.SuperUserKey, CancellationToken.None);
 
             Assert.AreEqual(14, _msgCount);
             Assert.AreEqual(14, _events.Count);
@@ -1978,7 +1978,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             ContentService.Publish(content, content.AvailableCultures.ToArray());
             IContent content2 = await CreateContent();
             Assert.IsNotNull(content2);
-            ContentService.Move(content, content2.Id);
+            await ContentService.MoveAsync(content, content2.Key, true, Constants.Security.SuperUserKey, CancellationToken.None);
 
             ResetEvents();
             IContent copy = ContentService.Copy(content, Constants.System.Root, false);

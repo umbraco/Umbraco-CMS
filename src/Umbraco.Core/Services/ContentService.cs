@@ -892,136 +892,112 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
         return Attempt.Succeed(ContentMoveToRecycleBinOperationStatus.Success);
     }
 
-    /// <summary>
-    ///     Moves an <see cref="IContent" /> object to a new location by changing its parent id.
-    /// </summary>
-    /// <remarks>
-    ///     If the <see cref="IContent" /> object is already published it will be
-    ///     published after being moved to its new location. Otherwise it'll just
-    ///     be saved with a new parent id.
-    /// </remarks>
-    /// <param name="content">The <see cref="IContent" /> to move</param>
-    /// <param name="parentId">Id of the Content's new Parent</param>
-    /// <param name="userId">Optional Id of the User moving the Content</param>
-#pragma warning disable CS0618 // Type or member is obsolete - the int-userId overloads still default to SuperUserId; there is no non-obsolete int equivalent until it is removed in v18
-    public OperationResult Move(IContent content, int parentId, int userId = Constants.Security.SuperUserId)
-#pragma warning restore CS0618 // Type or member is obsolete
-        => Move(content, parentId, true, userId);
-
-    /// <summary>
-    ///     Moves an <see cref="IContent" /> object to a new location by changing its parent id.
-    /// </summary>
-    /// <remarks>
-    ///     If the <see cref="IContent" /> object is already published it will be
-    ///     published after being moved to its new location. Otherwise it'll just
-    ///     be saved with a new parent id.
-    /// </remarks>
-    /// <param name="content">The <see cref="IContent" /> to move.</param>
-    /// <param name="parentId">Id of the Content's new Parent.</param>
-    /// <param name="includeDescendants">
-    ///     Whether to move the descendants of the content along with it. When restoring an item out of the recycle bin
-    ///     this can be set to <c>false</c> to restore only the item itself, leaving its descendants in the recycle bin
-    ///     as top-level bin items.
-    /// </param>
-    /// <param name="userId">Optional Id of the User moving the Content.</param>
-    /// <returns>The operation result.</returns>
-#pragma warning disable CS0618 // Type or member is obsolete - the int-userId overloads still default to SuperUserId; there is no non-obsolete int equivalent until it is removed in v18
-    public OperationResult Move(IContent content, int parentId, bool includeDescendants, int userId = Constants.Security.SuperUserId)
-#pragma warning restore CS0618 // Type or member is obsolete
+    /// <inheritdoc />
+    public async Task<Attempt<ContentMoveOperationStatus>> MoveAsync(IContent content, Guid? parentKey, bool includeDescendants, Guid userKey, CancellationToken cancellationToken)
     {
         EventMessages eventMessages = EventMessagesFactory.Get();
 
-        if (content.ParentId == parentId)
-        {
-            return OperationResult.Succeed(eventMessages);
-        }
-
         // if moving to the recycle bin then use the proper method
-        if (parentId == Constants.System.RecycleBinContent)
+        if (parentKey == Constants.System.RecycleBinContentKey)
         {
-            Guid userKey = _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult();
-            Attempt<ContentMoveToRecycleBinOperationStatus> result = MoveToRecycleBinAsync(content, userKey, CancellationToken.None).GetAwaiter().GetResult();
-            return result.Success
-                ? OperationResult.Succeed(new EventMessages())
-                : OperationResult.Cancel(new EventMessages());
+            if (content.ParentId == Constants.System.RecycleBinContent)
+            {
+                return Attempt.Succeed(ContentMoveOperationStatus.Success);
+            }
+
+            Attempt<ContentMoveToRecycleBinOperationStatus> recycleBinResult = await MoveToRecycleBinAsync(content, userKey, cancellationToken);
+            return recycleBinResult.Success
+                ? Attempt.Succeed(ContentMoveOperationStatus.Success)
+                : Attempt.Fail(ContentMoveOperationStatus.CancelledByNotification);
         }
 
+        if (parentKey is null && content.ParentId == Constants.System.Root)
+        {
+            return Attempt.Succeed(ContentMoveOperationStatus.Success);
+        }
+
+        int userId = await _userIdKeyResolver.GetAsync(userKey);
         var moves = new List<(IContent, string)>();
 
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.WriteLock(Constants.Locks.ContentTree);
+
+        IContent? parent = parentKey.HasValue ? await GetByIdAsync(parentKey.Value, cancellationToken) : null;
+        if (parentKey.HasValue && (parent is null || parent.Trashed))
         {
-            scope.WriteLock(Constants.Locks.ContentTree);
-
-            TryGetParentKey(parentId, out Guid? parentKey);
-            IContent? parent = parentId == Constants.System.Root
-                ? null
-                : parentKey.HasValue ? GetByIdAsync(parentKey.Value, CancellationToken.None).GetAwaiter().GetResult() : null;
-            if (parentId != Constants.System.Root && (parent == null || parent.Trashed))
-            {
-                throw new InvalidOperationException("Parent does not exist or is trashed."); // causes rollback
-            }
-
-            var moveEventInfo = new MoveEventInfo<IContent>(content, content.Path, parentKey);
-
-            var movingNotification = new ContentMovingNotification(moveEventInfo, eventMessages);
-            if (scope.Notifications.PublishCancelable(movingNotification))
-            {
-                scope.Complete();
-                return OperationResult.Cancel(eventMessages); // causes rollback
-            }
-
-            // if content was trashed, and since we're not moving to the recycle bin,
-            // indicate that the trashed status should be changed to false, else just
-            // leave it unchanged
-            var trashed = content.Trashed ? false : (bool?)null;
-
-            // when restoring a single item out of the recycle bin without its descendants, those descendants stay
-            // trashed and are re-homed under the recycle bin root - see PerformMoveLocked
-            var leaveDescendantsInRecycleBin = includeDescendants is false && content.Trashed && parentId != Constants.System.RecycleBinContent;
-
-            // if the content was trashed under another content, and so has a published version,
-            // it cannot move back as published but has to be unpublished first - that's for the
-            // root content, everything underneath will retain its published status
-            if (content.Trashed && content.Published)
-            {
-                // however, it had been masked when being trashed, so there's no need for
-                // any special event here - just change its state
-                content.PublishedState = PublishedState.Unpublishing;
-            }
-
-            PerformMoveLocked(content, parentId, parent, userId, moves, trashed, includeDescendants);
-
-            if (leaveDescendantsInRecycleBin)
-            {
-                // The single RefreshBranch above cannot reconcile the descendants left in the bin (they are no longer
-                // descendants of the restored item), so also refresh the re-homed direct children. The navigation
-                // reconciler then moves them - and their sub-trees - back under the recycle bin root.
-                IContent[] rehomedChildren = moves
-                    .Select(x => x.Item1)
-                    .Where(x => x.ParentId == Constants.System.RecycleBinContent)
-                    .ToArray();
-                scope.Notifications.Publish(
-                    new ContentTreeChangeNotification(content.Yield().Concat(rehomedChildren), TreeChangeTypes.RefreshBranch, eventMessages));
-            }
-            else
-            {
-                scope.Notifications.Publish(
-                    new ContentTreeChangeNotification(content, TreeChangeTypes.RefreshBranch, eventMessages));
-            }
-
-            // changes
-            MoveEventInfo<IContent>[] moveInfo = moves
-                .Select(x => new MoveEventInfo<IContent>(x.Item1, x.Item2, x.Item1.ParentKey))
-                .ToArray();
-
-            scope.Notifications.Publish(
-                new ContentMovedNotification(moveInfo, eventMessages).WithStateFrom(movingNotification));
-
-            Audit(AuditType.Move, userId, content.Id);
-
-            scope.Complete();
-            return OperationResult.Succeed(eventMessages);
+            throw new InvalidOperationException("Parent does not exist or is trashed."); // causes rollback
         }
+
+        int parentId = parent?.Id ?? Constants.System.Root;
+
+        // Content.ParentKey can throw for content whose parent key was never populated (e.g. built and
+        // saved without a subsequent reload) - comparing the resolved int id instead is always safe.
+        if (content.ParentId == parentId)
+        {
+            scope.Complete();
+            return Attempt.Succeed(ContentMoveOperationStatus.Success);
+        }
+
+        var moveEventInfo = new MoveEventInfo<IContent>(content, content.Path, parentKey);
+
+        var movingNotification = new ContentMovingNotification(moveEventInfo, eventMessages);
+        if (await scope.Notifications.PublishCancelableAsync(movingNotification))
+        {
+            scope.Complete();
+            return Attempt.Fail(ContentMoveOperationStatus.CancelledByNotification);
+        }
+
+        // if content was trashed, and since we're not moving to the recycle bin,
+        // indicate that the trashed status should be changed to false, else just
+        // leave it unchanged
+        var trashed = content.Trashed ? false : (bool?)null;
+
+        // when restoring a single item out of the recycle bin without its descendants, those descendants stay
+        // trashed and are re-homed under the recycle bin root - see PerformMoveLockedAsync
+        var leaveDescendantsInRecycleBin = includeDescendants is false && content.Trashed;
+
+        // if the content was trashed under another content, and so has a published version,
+        // it cannot move back as published but has to be unpublished first - that's for the
+        // root content, everything underneath will retain its published status
+        if (content.Trashed && content.Published)
+        {
+            // however, it had been masked when being trashed, so there's no need for
+            // any special event here - just change its state
+            content.PublishedState = PublishedState.Unpublishing;
+        }
+
+        await PerformMoveLockedAsync(content, parentId, parent, userId, moves, trashed, cancellationToken, includeDescendants);
+
+        if (leaveDescendantsInRecycleBin)
+        {
+            // The single RefreshBranch above cannot reconcile the descendants left in the bin (they are no longer
+            // descendants of the restored item), so also refresh the re-homed direct children. The navigation
+            // reconciler then moves them - and their sub-trees - back under the recycle bin root.
+            IContent[] rehomedChildren = moves
+                .Select(x => x.Item1)
+                .Where(x => x.ParentId == Constants.System.RecycleBinContent)
+                .ToArray();
+            scope.Notifications.Publish(
+                new ContentTreeChangeNotification(content.Yield().Concat(rehomedChildren), TreeChangeTypes.RefreshBranch, eventMessages));
+        }
+        else
+        {
+            scope.Notifications.Publish(
+                new ContentTreeChangeNotification(content, TreeChangeTypes.RefreshBranch, eventMessages));
+        }
+
+        // changes
+        MoveEventInfo<IContent>[] moveInfo = moves
+            .Select(x => new MoveEventInfo<IContent>(x.Item1, x.Item2, x.Item1.ParentKey))
+            .ToArray();
+
+        scope.Notifications.Publish(
+            new ContentMovedNotification(moveInfo, eventMessages).WithStateFrom(movingNotification));
+
+        await AuditAsync(AuditType.Move, userId, content.Id);
+
+        scope.Complete();
+        return Attempt.Succeed(ContentMoveOperationStatus.Success);
     }
 
     // MUST be called from within WriteLock

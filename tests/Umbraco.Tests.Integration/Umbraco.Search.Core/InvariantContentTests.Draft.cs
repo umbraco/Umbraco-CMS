@@ -2,6 +2,7 @@ using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Integration.Testing.Search;
@@ -220,8 +221,8 @@ public partial class InvariantContentTests
             .Build();
         await ContentService.SaveAsync(secondRoot, null, null, CancellationToken.None);
 
-        OperationResult moveResult = ContentService.Move(Root(), secondRoot.Id);
-        Assert.That(moveResult.Result, Is.EqualTo(OperationResultType.Success));
+        Attempt<ContentMoveOperationStatus> moveResult = await ContentService.MoveAsync(Root(), secondRoot.Key, true, Constants.Security.SuperUserKey, CancellationToken.None);
+        Assert.That(moveResult.Result, Is.EqualTo(ContentMoveOperationStatus.Success));
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.DraftContent);
         Assert.That(documents, Has.Count.EqualTo(5));
@@ -261,8 +262,8 @@ public partial class InvariantContentTests
             .Build();
         await ContentService.SaveAsync(secondRoot, null, null, CancellationToken.None);
 
-        OperationResult moveResult = ContentService.Move(Child(), secondRoot.Id);
-        Assert.That(moveResult.Result, Is.EqualTo(OperationResultType.Success));
+        Attempt<ContentMoveOperationStatus> moveResult = await ContentService.MoveAsync(Child(), secondRoot.Key, true, Constants.Security.SuperUserKey, CancellationToken.None);
+        Assert.That(moveResult.Result, Is.EqualTo(ContentMoveOperationStatus.Success));
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.DraftContent);
         Assert.That(documents, Has.Count.EqualTo(5));
