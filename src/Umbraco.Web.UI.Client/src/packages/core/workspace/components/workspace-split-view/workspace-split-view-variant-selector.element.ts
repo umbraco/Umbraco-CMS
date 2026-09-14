@@ -11,6 +11,7 @@ import type {
 	UmbEntityVariantModel,
 	UmbEntityVariantOptionModel,
 	UmbPublishableVariantState,
+	UmbVariantEntityStateEntry,
 } from '@umbraco-cms/backoffice/variant';
 import type { UUIInputElement, UUIPopoverContainerElement } from '@umbraco-cms/backoffice/external/uui';
 import { UMB_HINT_CONTEXT } from '@umbraco-cms/backoffice/hint';
@@ -53,6 +54,9 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 	private _readOnlyCultures: Array<string | null> = [];
 
 	@state()
+	private _entityStatesMap: Map<string | null, Array<UmbVariantEntityStateEntry>> = new Map();
+
+	@state()
 	private _variesByCulture = false;
 
 	@state()
@@ -89,6 +93,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 			this.#observeVariants(workspaceContext);
 			this.#observeActiveVariants(workspaceContext);
 			this.#observeReadOnlyCultures(workspaceContext);
+			this.#observeEntityStates(workspaceContext);
 			this.#observeCurrentVariant();
 
 			this.observe(
@@ -275,6 +280,30 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 		}
 	}
 
+	#observeEntityStates(workspaceContext?: UmbVariantDatasetWorkspaceContext) {
+		if (workspaceContext) {
+			this.observe(
+				workspaceContext.entityState?.statesForVariants(
+					createObservablePart(workspaceContext.variantOptions, (options) =>
+						options.map((option) => UmbVariantId.Create(option)),
+					),
+				),
+				(results) => {
+					this._entityStatesMap = new Map((results ?? []).map((r) => [r.variantId.culture, r.states]));
+				},
+				'_observeEntityStates',
+			);
+		} else {
+			this._entityStatesMap = new Map();
+			this.removeUmbControllerByAlias('_observeEntityStates');
+		}
+	}
+
+	#getEntityStatesForCulture(culture?: string | null): Array<UmbVariantEntityStateEntry> {
+		if (culture === undefined) return [];
+		return this._entityStatesMap.get(culture) ?? [];
+	}
+
 	#onPopoverToggle(event: ToggleEvent) {
 		// TODO: This ignorer is just needed for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -396,6 +425,8 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 									? this.localize.term('buttons_closeVersionSelector')
 									: this.localize.term('buttons_openVersionSelector')}>
 								${this.#getVariantSpecInfo(this._activeVariant)}
+								<umb-entity-state-tags .states=${this.#getEntityStatesForCulture(this._activeVariant?.culture)}>
+								</umb-entity-state-tags>
 								${this.#renderReadOnlyTag(this._activeVariant?.culture)}
 								<uui-symbol-expand .open=${this._variantSelectorOpen}></uui-symbol-expand>
 							</uui-button>
@@ -408,7 +439,10 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 									`
 								: ''}
 						`
-					: html`<span id="read-only-tag" slot="append"> ${this.#renderReadOnlyTag(null)} </span>`}
+					: html`<span id="read-only-tag" slot="append">
+							<umb-entity-state-tags .states=${this.#getEntityStatesForCulture(null)}></umb-entity-state-tags>
+							${this.#renderReadOnlyTag(null)}
+						</span>`}
 			</uui-input>
 
 			${this.#selectorIsEnabled()
@@ -461,8 +495,10 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 					${notCreated ? html`<uui-icon class="add-icon" name="icon-add"></uui-icon>` : nothing}
 					<div class="variant-info">
 						<div class="variant-name">
-							${this.#getVariantDisplayName(variantOption)}${this.#renderReadOnlyTag(variantId.culture)}
-							${this.#renderHintBadge(!active ? hint : undefined)}
+							${this.#getVariantDisplayName(variantOption)}
+							<umb-entity-state-tags
+								.states=${this.#getEntityStatesForCulture(variantId.culture)}></umb-entity-state-tags>
+							${this.#renderReadOnlyTag(variantId.culture)} ${this.#renderHintBadge(!active ? hint : undefined)}
 						</div>
 						<div class="variant-details">
 							<span>${this._renderVariantDetails(variantOption)}</span>
@@ -528,9 +564,10 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 					${notCreated ? html`<uui-icon class="add-icon" name="icon-add"></uui-icon>` : nothing}
 					<div class="variant-info">
 						<div class="variant-name">
-							${this.#getVariantDisplayName(variantOption)}${this.#renderReadOnlyTag(
-								variantId.culture,
-							)}${this.#renderHintBadge(!active ? hint : undefined)}
+							${this.#getVariantDisplayName(variantOption)}
+							<umb-entity-state-tags
+								.states=${this.#getEntityStatesForCulture(variantId.culture)}></umb-entity-state-tags>
+							${this.#renderReadOnlyTag(variantId.culture)}${this.#renderHintBadge(!active ? hint : undefined)}
 						</div>
 						<div class="variant-details">
 							<span>${this._renderVariantDetails(variantOption)}</span>
