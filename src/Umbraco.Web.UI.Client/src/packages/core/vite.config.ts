@@ -29,6 +29,7 @@ export default defineConfig({
 			'entity-flag/index': './entity-flag/index.ts',
 			'entity-item/index': './entity-item/index.ts',
 			'entity-sign/index': './entity-sign/index.ts',
+			'entity-state/index': './entity-state/index.ts',
 			'entity/index': './entity/index.ts',
 			'entry-point': 'entry-point.ts',
 			'event/index': './event/index.ts',

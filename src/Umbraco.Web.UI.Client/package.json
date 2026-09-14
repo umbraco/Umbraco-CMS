@@ -51,6 +51,7 @@
 		"./entity-item": "./dist-cms/packages/core/entity-item/index.js",
 		"./entity-sign": "./dist-cms/packages/core/entity-sign/index.js",
 		"./entity-flag": "./dist-cms/packages/core/entity-flag/index.js",
+		"./entity-state": "./dist-cms/packages/core/entity-state/index.js",
 		"./entity": "./dist-cms/packages/core/entity/index.js",
 		"./event": "./dist-cms/packages/core/event/index.js",
 		"./extension": "./dist-cms/packages/core/extension/index.js",
