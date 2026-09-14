@@ -26,6 +26,10 @@ public class RangeSliderValueConverter : SliderValueConverterBase
     /// <summary>
     /// Reads a range from the stored value.
     /// </summary>
+    /// <remarks>
+    /// A single value is read as a range too, as a data type moved to this editor still holds values written
+    /// while it was a single value slider.
+    /// </remarks>
     /// <param name="sourceString">The stored value.</param>
     /// <returns>The range the stored value holds, or an empty range when it holds none.</returns>
     private static Range<decimal> ReadRange(string? sourceString)

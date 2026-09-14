@@ -4,12 +4,11 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 
 /// <summary>
-/// Reads the value the slider editors store.
+/// Holds what the slider value converters share.
 /// </summary>
 /// <remarks>
-/// Both slider editors store their value as a string: a single decimal, or two separated by a comma. The parsing is
-/// deliberately tolerant of the other editor's shape, as a data type that held the other shape before the two were
-/// separated still has values in it.
+/// Both slider editors store their value as a string: a single decimal, or two separated by a comma. Each converter
+/// reads the shape its own editor writes, so only the parsing of a single value is shared.
 /// </remarks>
 public abstract class SliderValueConverterBase : PropertyValueConverterBase
 {
