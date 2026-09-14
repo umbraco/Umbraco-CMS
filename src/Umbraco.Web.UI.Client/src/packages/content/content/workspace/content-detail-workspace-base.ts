@@ -898,12 +898,8 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		// Check variants have a name:
 		const variantsWithoutAName = saveData.variants.filter((x) => !x.name);
 		if (variantsWithoutAName.length > 0) {
-			const validationContext = await this.getContext(UMB_VALIDATION_CONTEXT);
-			if (!validationContext) {
-				throw new Error('Validation context is missing');
-			}
 			variantsWithoutAName.forEach((variant) => {
-				validationContext.messages.addMessage(
+				this.validationContext.messages.addMessage(
 					'client',
 					`$.variants[${UmbDataPathVariantQuery(variant)}].name`,
 					UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
