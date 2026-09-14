@@ -197,9 +197,12 @@ test('can remove a block in a group from a block grid editor', {tag: '@smoke'}, 
   expect(await umbracoApi.dataType.doesBlockEditorContainBlocksWithContentTypeIds(blockGridEditorName, [elementTypeId])).toBeFalsy();
 });
 
-// Test limitation, not a product bug: the card's anchor sits in uui-card-block-type's shadow root, so
-// Playwright's simulated mouse-move drag doesn't reproduce a real user's native drag interaction and the
-// sorter never sees the drop. Manually verified the drag works fine for an actual user.
+// Product bug: cross-group drag never moves the block. Verified this is not a shadow-DOM anchor issue or a
+// Playwright drag-simulation issue - the full native dragstart/dragenter/dragover/drop/dragend cycle fires
+// correctly at the right on-screen coordinates, and the sorter does have handling for dropping into an empty
+// group (UmbSorterController falls back to moveElementTo(0) when the target model is empty). The block still
+// never moves, so the break is somewhere in the hand-off between the two groups' separate UmbSorterController
+// instances during a cross-container drag.
 test.skip('can move a block from a group to another group in a block grid editor', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
