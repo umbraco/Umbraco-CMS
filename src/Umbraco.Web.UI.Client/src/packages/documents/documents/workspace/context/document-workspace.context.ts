@@ -294,21 +294,23 @@ export class UmbDocumentWorkspaceContext
 		await super._handleSave(executionOptions);
 	}
 
-	public async saveAndPreview(urlProviderAlias?: string, previewWindow?: WindowProxy | null): Promise<void> {
-		return await this.#handleSaveAndPreview(urlProviderAlias ?? 'umbDocumentUrlProvider', previewWindow);
+	public saveAndPreview(urlProviderAlias?: string): Promise<void> {
+		return this.#handleSaveAndPreview(urlProviderAlias ?? 'umbDocumentUrlProvider');
 	}
 
-	async #handleSaveAndPreview(urlProviderAlias: string, previewWindow?: WindowProxy | null) {
+	async #handleSaveAndPreview(urlProviderAlias: string) {
 		if (!urlProviderAlias) {
-			previewWindow?.close();
 			throw new Error('Url provider alias is missing');
 		}
 
 		const unique = this.getUnique();
 		if (!unique) {
-			previewWindow?.close();
 			throw new Error('Unique is missing');
 		}
+
+		// Construct the preview window before performing any save or validation actions
+		// as the preview window needs to be ready within a very short time after the user initiates the preview action.
+		const previewWindow = window.open('', 'umbpreview');
 
 		let firstVariantId = UmbVariantId.CreateInvariant();
 
@@ -336,6 +338,7 @@ export class UmbDocumentWorkspaceContext
 			throw error;
 		}
 
+		// Preview the document in the previously opened preview window.
 		await this.#previewController.preview(
 			{
 				unique,
