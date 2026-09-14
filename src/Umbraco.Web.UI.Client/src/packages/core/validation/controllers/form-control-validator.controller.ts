@@ -35,9 +35,7 @@ export class UmbFormControlValidator extends UmbControllerBase implements UmbVal
 				this.#isValid = formControl.validity.valid;
 			}
 			context?.addValidator(this);
-			// Only safe to reveal the *valid* case synchronously here: #dispatchValidationState() is pristine-gated,
-			// so a stale re-validation of a still-present previous dataPath's value is harmlessly ignored while
-			// pristine. Revealing the *invalid* case this early is not safe — see syncControlPristine(). [NL]
+			// If valid by context, then let's make the component pristine, otherwise we will make it dirty, so that the validation message is shown instantly. [NL]
 			if (this.#isValid) {
 				formControl.pristine = true;
 			} else {
