@@ -128,6 +128,7 @@ export class UmbExtensionWithApiSlotElement extends UmbLitElement {
 	 * ```html
 	 * <umb-extension-with-api-slot .type=${['workspaceAction', 'workspaceActionMenuItem']}></umb-extension-with-api-slot>
 	 * ```
+	 * @returns {string | string[] | undefined} The type or types of extensions to render.
 	 */
 	@property({ type: String })
 	public get type(): string | string[] | undefined {
@@ -159,6 +160,7 @@ export class UmbExtensionWithApiSlotElement extends UmbLitElement {
 	 *     .filter=${(manifest) => manifest.meta.look === 'primary'}>
 	 * </umb-extension-with-api-slot>
 	 * ```
+	 * @returns {(manifest: ManifestBase) => boolean} The filter function.
 	 */
 	@property({ type: Object, attribute: false })
 	public get filter(): (manifest: any) => boolean {
@@ -182,6 +184,7 @@ export class UmbExtensionWithApiSlotElement extends UmbLitElement {
 	 *     .elementProps=${{ entityType: 'document', unique: documentId }}>
 	 * </umb-extension-with-api-slot>
 	 * ```
+	 * @returns {Record<string, unknown> | undefined} The element properties.
 	 */
 	@property({ attribute: false })
 	get elementProps(): Record<string, unknown> | undefined {
@@ -214,6 +217,7 @@ export class UmbExtensionWithApiSlotElement extends UmbLitElement {
 	 *     .apiArgs=${(manifest) => [entityContext, manifest.meta.actionType]}>
 	 * </umb-extension-with-api-slot>
 	 * ```
+	 * @returns {Array<unknown> | UmbApiConstructorArgumentsMethodType<ManifestBase> | undefined} The API constructor arguments.
 	 */
 	@property({ attribute: false })
 	get apiArgs(): Array<unknown> | UmbApiConstructorArgumentsMethodType<any> | undefined {
@@ -237,6 +241,7 @@ export class UmbExtensionWithApiSlotElement extends UmbLitElement {
 	 *     .apiProps=${{ saveOnClick: true, validateFirst: false }}>
 	 * </umb-extension-with-api-slot>
 	 * ```
+	 * @returns {Record<string, unknown> | undefined} The API properties.
 	 */
 	@property({ attribute: false })
 	get apiProps(): Record<string, unknown> | undefined {

@@ -1,6 +1,6 @@
+import { UmbTrashEntityBulkAction } from './bulk-trash.action.js';
 import { UMB_ENTITY_BULK_ACTION_DEFAULT_KIND_MANIFEST } from '@umbraco-cms/backoffice/entity-bulk-action';
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbTrashEntityBulkAction } from './bulk-trash.action.js';
 
 export const UMB_ENTITY_BULK_ACTION_TRASH_KIND = 'trash';
 

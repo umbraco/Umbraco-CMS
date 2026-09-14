@@ -103,6 +103,40 @@ describe('UmbTableElement', () => {
 		});
 	});
 
+	describe('select only', () => {
+		function getRow(id: string): HTMLElement {
+			return element.shadowRoot!.querySelector(`uui-table-row[data-sortable-id="${id}"]`) as HTMLElement;
+		}
+
+		it('turns every row into select-only when a selection exists', async () => {
+			element.items = items(['1', '2']);
+			element.selection = ['1'];
+			await element.updateComplete;
+
+			expect(getRow('1').hasAttribute('select-only')).to.be.true;
+			expect(getRow('2').hasAttribute('select-only')).to.be.true;
+		});
+
+		it('keeps a row interactive when it opts out, even while a selection exists', async () => {
+			element.items = [item('1'), item('2', { selectOnly: false })];
+			element.selection = ['1'];
+			await element.updateComplete;
+
+			expect(getRow('2').hasAttribute('select-only')).to.be.false;
+			// The row is still part of selection mode, so it presents its checkbox.
+			expect(getRow('2').hasAttribute('data-selection-mode')).to.be.true;
+		});
+
+		it('keeps a row interactive when it opts out of a select-only configuration', async () => {
+			element.config = { ...config, selectOnly: true };
+			element.items = [item('1'), item('2', { selectOnly: false })];
+			await element.updateComplete;
+
+			expect(getRow('1').hasAttribute('select-only')).to.be.true;
+			expect(getRow('2').hasAttribute('select-only')).to.be.false;
+		});
+	});
+
 	describe('header checkbox state', () => {
 		it('is checked when every selectable row on the current page is selected', async () => {
 			element.items = items(['1', '2', '3', '4']);

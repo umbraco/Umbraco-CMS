@@ -1,6 +1,6 @@
+import type { UmbDocumentVariantOptionModel } from './types.js';
 import { sortVariants as _sortVariants } from '@umbraco-cms/backoffice/variant';
 import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
-import type { UmbDocumentVariantOptionModel } from './types.js';
 
 type VariantType = UmbDocumentVariantOptionModel;
 

@@ -16,8 +16,8 @@ export class UmbNotificationContext extends UmbContextBase {
 
 	/**
 	 * @private
-	 * @param {UmbNotificationOptions<UmbNotificationData>} options
-	 * @returns {*}  {UmbNotificationHandler}
+	 * @param {UmbNotificationOptions} options - The notification options
+	 * @returns {UmbNotificationHandler} The notification handler
 	 * @memberof UmbNotificationContext
 	 */
 	#open<T extends UmbNotificationOptions = UmbNotificationOptions>(options: T): UmbNotificationHandler {
@@ -31,7 +31,7 @@ export class UmbNotificationContext extends UmbContextBase {
 
 	/**
 	 * @private
-	 * @param {string} key
+	 * @param {string} key - The notification key
 	 * @memberof UmbNotificationContext
 	 */
 	private _close(key: string) {
@@ -40,8 +40,7 @@ export class UmbNotificationContext extends UmbContextBase {
 
 	/**
 	 * @private
-	 * @param notificationHandler
-	 * @param {string} key
+	 * @param {UmbNotificationHandler} notificationHandler - The notification handler to close
 	 * @memberof UmbNotificationContext
 	 */
 	private _handleClosed(notificationHandler: UmbNotificationHandler) {
@@ -51,9 +50,9 @@ export class UmbNotificationContext extends UmbContextBase {
 
 	/**
 	 * Opens a notification that automatically goes away after 6 sek.
-	 * @param {UmbNotificationColor} color
-	 * @param {UmbNotificationOptions<UmbNotificationData>} options
-	 * @returns {*}
+	 * @param {UmbNotificationColor} color - The notification color
+	 * @param {UmbNotificationOptions} options - The notification options
+	 * @returns {UmbNotificationHandler} The notification handler
 	 * @memberof UmbNotificationContext
 	 */
 	public peek<T extends UmbNotificationOptions = UmbNotificationOptions>(
@@ -65,9 +64,9 @@ export class UmbNotificationContext extends UmbContextBase {
 
 	/**
 	 * Opens a notification that stays on the screen until dismissed by the user or custom code
-	 * @param {UmbNotificationColor} color
-	 * @param {UmbNotificationOptions<UmbNotificationData>} options
-	 * @returns {*}
+	 * @param {UmbNotificationColor} color - The notification color
+	 * @param {UmbNotificationOptions} options - The notification options
+	 * @returns {UmbNotificationHandler} The notification handler
 	 * @memberof UmbNotificationContext
 	 */
 	public stay<T extends UmbNotificationOptions = UmbNotificationOptions>(

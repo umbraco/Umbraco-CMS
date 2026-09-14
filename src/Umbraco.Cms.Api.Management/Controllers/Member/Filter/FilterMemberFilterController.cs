@@ -26,13 +26,14 @@ public class FilterMemberFilterController : MemberFilterControllerBase
 {
     private readonly IMemberFilterService _memberFilterService;
     private readonly IMemberPresentationFactory _memberPresentationFactory;
+    private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="FilterMemberFilterController"/> class.
     /// </summary>
     /// <param name="memberService">Service used for member management operations (unused, retained for DI compatibility).</param>
     /// <param name="memberPresentationFactory">Factory responsible for creating member presentation models.</param>
-    /// <param name="backOfficeSecurityAccessor">Accessor for back office security context (unused, retained for DI compatibility).</param>
+    /// <param name="backOfficeSecurityAccessor">Accessor for back office security context.</param>
     /// <param name="memberFilterService">Service for combined member filtering across content and external stores.</param>
     // TODO (V19): Remove unused parameters which are only here to avoid ambiguous constructor errors.
     [ActivatorUtilitiesConstructor]
@@ -42,6 +43,7 @@ public class FilterMemberFilterController : MemberFilterControllerBase
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
         IMemberFilterService memberFilterService)
     {
+        _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
         _memberFilterService = memberFilterService;
         _memberPresentationFactory = memberPresentationFactory;
     }
@@ -84,6 +86,16 @@ public class FilterMemberFilterController : MemberFilterControllerBase
         int skip = 0,
         int take = 100)
     {
+        IUser currentUser = CurrentUser(_backOfficeSecurityAccessor);
+
+        // Approval and lockout state are only disclosed to users with access to sensitive data. Filtering by
+        // them would disclose the state of each matched member regardless of the values in the response, so
+        // the filter is refused rather than silently widened.
+        if ((isApproved is not null || isLockedOut is not null) && currentUser.HasAccessToSensitiveData() is false)
+        {
+            return Forbidden();
+        }
+
         var memberFilter = new MemberFilter
         {
             MemberTypeId = memberTypeId,
@@ -95,7 +107,9 @@ public class FilterMemberFilterController : MemberFilterControllerBase
 
         PagedModel<MemberFilterItem> result = await _memberFilterService.FilterAsync(memberFilter, orderBy, orderDirection, skip, take);
 
-        var responseModels = result.Items.Select(_memberPresentationFactory.CreateFilterItemResponseModel).ToList();
+        var responseModels = result.Items
+            .Select(item => _memberPresentationFactory.CreateFilterItemResponseModel(item, currentUser))
+            .ToList();
 
         return Ok(new PagedViewModel<MemberResponseModel>
         {

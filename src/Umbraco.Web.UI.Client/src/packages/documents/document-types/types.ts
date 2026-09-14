@@ -23,8 +23,7 @@ export type UmbDocumentTypeCleanupModel = {
 	keepLatestVersionPerDayForDays?: number | null;
 };
 
-export interface UmbDocumentTypeAvailableCompositionRequestModel
-	extends UmbContentTypeAvailableCompositionRequestModel {
+export interface UmbDocumentTypeAvailableCompositionRequestModel extends UmbContentTypeAvailableCompositionRequestModel {
 	isElement: boolean;
 }
 

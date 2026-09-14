@@ -886,7 +886,8 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
     [Test]
     public void EntityService_Can_Get_Id_For_Key()
     {
-        var result = EntityService.GetId(Guid.Parse("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522"),
+        var result = EntityService.GetId(
+            Guid.Parse("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522"),
             UmbracoObjectTypes.DocumentType);
 
         Assert.IsTrue(result.Success);

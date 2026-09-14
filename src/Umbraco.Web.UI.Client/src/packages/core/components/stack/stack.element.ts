@@ -4,7 +4,7 @@ import { classMap, customElement, css, html, property } from '@umbraco-cms/backo
 /**
  *  @element umb-stack
  *  @description - Element for displaying items in a stack with even spacing between
- *  @augments LitElement
+ *  @augments UmbLitElement
  */
 @customElement('umb-stack')
 export class UmbStackElement extends UmbLitElement {

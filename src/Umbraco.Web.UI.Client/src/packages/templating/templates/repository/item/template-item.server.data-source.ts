@@ -8,7 +8,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 /**
  * A server data source for Template items
  * @class UmbTemplateItemServerDataSource
- * @implements {DocumentTreeDataSource}
+ * @augments {UmbItemServerDataSourceBase}
  */
 export class UmbTemplateItemServerDataSource extends UmbItemServerDataSourceBase<
 	TemplateItemResponseModel,

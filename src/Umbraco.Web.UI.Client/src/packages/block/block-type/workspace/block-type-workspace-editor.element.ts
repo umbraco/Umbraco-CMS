@@ -28,12 +28,16 @@ export class UmbBlockTypeWorkspaceEditorElement extends UmbLitElement {
 			});
 		});
 
-		this.observe(this.#itemManager.items, (items) => {
-			const item = items[0];
-			if (item) {
-				this._name = item.name;
-			}
-		});
+		this.observe(
+			this.#itemManager.items,
+			(items) => {
+				const item = items[0];
+				if (item) {
+					this._name = item.name;
+				}
+			},
+			null,
+		);
 	}
 
 	override render() {

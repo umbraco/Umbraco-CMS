@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Events;
@@ -70,16 +71,22 @@ internal sealed class ServerEventSender :
 {
     private readonly IServerEventRouter _serverEventRouter;
     private readonly IIdKeyMap _idKeyMap;
+    private readonly IEntityService _entityService;
+    private readonly ILogger<ServerEventSender> _logger;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ServerEventSender"/> class.
     /// </summary>
     /// <param name="serverEventRouter">The router responsible for handling server events.</param>
     /// <param name="idKeyMap">The map used to resolve identifier keys.</param>
-    public ServerEventSender(IServerEventRouter serverEventRouter, IIdKeyMap idKeyMap)
+    /// <param name="entityService">The entity service used to resolve entity paths.</param>
+    /// <param name="logger">The logger.</param>
+    public ServerEventSender(IServerEventRouter serverEventRouter, IIdKeyMap idKeyMap, IEntityService entityService, ILogger<ServerEventSender> logger)
     {
         _serverEventRouter = serverEventRouter;
         _idKeyMap = idKeyMap;
+        _entityService = entityService;
+        _logger = logger;
     }
 
     /// <inheritdoc/>
@@ -515,12 +522,18 @@ internal sealed class ServerEventSender :
             {
                 if (seen.Add(movedEvent.Entity.Key))
                 {
-                    await _serverEventRouter.RouteEventAsync(new ServerEvent
-                    {
-                        EventType = Constants.ServerEvents.EventType.Trashed,
-                        EventSource = source,
-                        Key = movedEvent.Entity.Key,
-                    });
+                    await _serverEventRouter.RouteEventAsync(
+                        new ServerEvent
+                        {
+                            EventType = Constants.ServerEvents.EventType.Trashed,
+                            EventSource = source,
+                            Key = movedEvent.Entity.Key,
+                        },
+
+                        // Use the pre-trash path: after the move the entity's own Path is under the
+                        // recycle bin, which HasPathAccess rejects for every non-root user, so start-node
+                        // recipients would never be told their content or media was trashed.
+                        new ServerEventRoutingContext { EntityPath = movedEvent.OriginalPath });
                 }
             }
         }
@@ -642,23 +655,27 @@ internal sealed class ServerEventSender :
 
     private async Task RouteDeletedEvent<T>(string source, T entity)
         where T : IEntity
-        => await _serverEventRouter.RouteEventAsync(new ServerEvent
-        {
-            EventType = Constants.ServerEvents.EventType.Deleted,
-            EventSource = source,
-            Key = entity.Key,
-        });
+        => await _serverEventRouter.RouteEventAsync(
+            new ServerEvent
+            {
+                EventType = Constants.ServerEvents.EventType.Deleted,
+                EventSource = source,
+                Key = entity.Key,
+            },
+            new ServerEventRoutingContext { EntityPath = (entity as IUmbracoEntity)?.Path });
 
     private async Task RouteCreatedOrUpdatedEvent<T>(string source, T entity)
         where T : IEntity
-        => await _serverEventRouter.RouteEventAsync(new ServerEvent
-        {
-            EventType = entity.CreateDate == entity.UpdateDate
-                ? Constants.ServerEvents.EventType.Created
-                : Constants.ServerEvents.EventType.Updated,
-            Key = entity.Key,
-            EventSource = source,
-        });
+        => await _serverEventRouter.RouteEventAsync(
+            new ServerEvent
+            {
+                EventType = entity.CreateDate == entity.UpdateDate
+                    ? Constants.ServerEvents.EventType.Created
+                    : Constants.ServerEvents.EventType.Updated,
+                Key = entity.Key,
+                EventSource = source,
+            },
+            new ServerEventRoutingContext { EntityPath = (entity as IUmbracoEntity)?.Path });
 
     private async Task RouteDocumentUpdatedEventForPublicAccessModification(IEnumerable<PublicAccessEntry> entities)
     {
@@ -676,12 +693,24 @@ internal sealed class ServerEventSender :
                 continue;
             }
 
-            await _serverEventRouter.RouteEventAsync(new ServerEvent
+            IEntitySlim? documentEntity = _entityService.Get(getKeyAttempt.Result, UmbracoObjectTypes.Document);
+            if (documentEntity is null)
             {
-                EventType = Constants.ServerEvents.EventType.Updated,
-                Key = getKeyAttempt.Result,
-                EventSource = Constants.ServerEvents.EventSource.Document,
-            });
+                // Without a path the event cannot be authorized per recipient, so it fails closed
+                // downstream. Log it, as it is unexpected for a document that was just modified.
+                _logger.LogWarning(
+                    "Could not resolve the path for document {DocumentKey} following a public access change; the update event will not reach entity-scoped subscribers.",
+                    getKeyAttempt.Result);
+            }
+
+            await _serverEventRouter.RouteEventAsync(
+                new ServerEvent
+                {
+                    EventType = Constants.ServerEvents.EventType.Updated,
+                    Key = getKeyAttempt.Result,
+                    EventSource = Constants.ServerEvents.EventSource.Document,
+                },
+                new ServerEventRoutingContext { EntityPath = documentEntity?.Path });
         }
     }
 }

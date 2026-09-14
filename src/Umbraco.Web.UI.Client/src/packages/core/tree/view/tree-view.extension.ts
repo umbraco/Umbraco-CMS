@@ -1,8 +1,6 @@
 import type { ManifestElement, ManifestWithDynamicConditions } from '@umbraco-cms/backoffice/extension-api';
 
-export interface ManifestTreeView
-	extends ManifestElement,
-		ManifestWithDynamicConditions<UmbExtensionConditionConfig> {
+export interface ManifestTreeView extends ManifestElement, ManifestWithDynamicConditions<UmbExtensionConditionConfig> {
 	type: 'treeView';
 	/**
 	 * The tree aliases this view applies to. When omitted, the view applies to all trees.
@@ -19,10 +17,7 @@ export interface MetaTreeView {
 
 	/**
 	 * An icon to represent the tree view
-	 * @examples [
-	 *   "icon-list",
-	 *   "icon-grid"
-	 * ]
+	 * @examples ["icon-list", "icon-grid"]
 	 */
 	icon: string;
 }

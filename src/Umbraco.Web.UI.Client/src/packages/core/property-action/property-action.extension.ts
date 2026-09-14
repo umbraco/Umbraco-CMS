@@ -3,7 +3,8 @@ import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controlle
 import type { ManifestElementAndApi, ManifestWithDynamicConditions } from '@umbraco-cms/backoffice/extension-api';
 
 export interface ManifestPropertyAction<MetaType extends MetaPropertyAction = MetaPropertyAction>
-	extends ManifestElementAndApi<UmbControllerHostElement, UmbPropertyAction<MetaType>>,
+	extends
+		ManifestElementAndApi<UmbControllerHostElement, UmbPropertyAction<MetaType>>,
 		ManifestWithDynamicConditions<UmbExtensionConditionConfig> {
 	type: 'propertyAction';
 	forPropertyEditorUis: string[];
@@ -23,19 +24,13 @@ export interface ManifestPropertyActionDefaultKind<
 export interface MetaPropertyActionDefaultKind extends MetaPropertyAction {
 	/**
 	 * An icon to represent the action to be performed
-	 * @examples [
-	 *   "icon-box",
-	 *   "icon-grid"
-	 * ]
+	 * @examples ["icon-box", "icon-grid"]
 	 */
 	icon: string;
 
 	/**
 	 * The friendly name of the action to perform
-	 * @examples [
-	 *   "Create",
-	 *   "Create Content Template"
-	 * ]
+	 * @examples ["Create", "Create Content Template"]
 	 */
 	label: string;
 }

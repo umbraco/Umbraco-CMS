@@ -1,6 +1,6 @@
 import { manifests as examineManifests } from './examine-management-dashboard/manifests.js';
-import { UMB_SECTION_ALIAS_CONDITION_ALIAS } from '@umbraco-cms/backoffice/section';
 import UmbSearchHeaderAppElement from './umb-search-header-app.element.js';
+import { UMB_SECTION_ALIAS_CONDITION_ALIAS } from '@umbraco-cms/backoffice/section';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{

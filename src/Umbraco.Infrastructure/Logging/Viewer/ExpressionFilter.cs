@@ -1,14 +1,14 @@
+using System.Buffers;
 using Serilog.Events;
 using Serilog.Expressions;
 using Umbraco.Cms.Infrastructure.Logging.Viewer;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Logging.Viewer;
 
 // Log Expression Filters (pass in filter exp string)
 internal sealed class ExpressionFilter : ILogFilter
 {
-    private const string ExpressionOperators = "()+=*<>%-";
+    private static readonly SearchValues<char> _expressionOperators = SearchValues.Create("()+=*<>%-");
     private readonly Func<LogEvent, bool>? _filter;
 
     /// <summary>
@@ -31,7 +31,7 @@ internal sealed class ExpressionFilter : ILogFilter
         }
 
         // If the expression is one word and doesn't contain a serilog operator then we can perform a like search
-        if (!filterExpression.Contains(" ") && !filterExpression.ContainsAny(ExpressionOperators.Select(c => c)))
+        if (!filterExpression.Contains(' ') && !filterExpression.ContainsAny(_expressionOperators))
         {
             filter = PerformMessageLikeFilter(filterExpression, customSerilogFunctions);
         }

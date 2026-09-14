@@ -268,7 +268,6 @@ export class UmbBlockGridEntriesContext
 				}
 			})
 			.observeRouteBuilder((routeBuilder) => {
-				// TODO: Does it make any sense that this is a state? Check usage and confirm. [NL]
 				this._catalogueRouteBuilderState.setValue(routeBuilder);
 			});
 
@@ -506,12 +505,12 @@ export class UmbBlockGridEntriesContext
 			throw new Error(`Cannot delete block, missing layout for ${contentKey}`);
 		}
 		// The following loop will only delete the referenced data of sub Layout Entries, as the Layout entry is part of the main Layout Entry they will go away when that is removed. [NL]
-		forEachBlockLayoutEntryOf(layout, async (entry) => {
+		await forEachBlockLayoutEntryOf(layout, async (entry) => {
 			if (entry.settingsKey) {
 				this._manager!.removeOneSettings(entry.settingsKey);
 			}
-			this._manager!.removeOneContent(contentKey);
-			this._manager!.removeExposesOf(contentKey);
+			this._manager!.removeOneContent(entry.contentKey);
+			this._manager!.removeExposesOf(entry.contentKey);
 		});
 
 		await super.delete(contentKey);

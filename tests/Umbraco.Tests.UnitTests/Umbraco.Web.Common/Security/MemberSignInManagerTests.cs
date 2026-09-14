@@ -35,7 +35,9 @@ public class MemberSignInManagerTests
     public UserClaimsPrincipalFactory<MemberIdentityUser> CreateClaimsFactory(MemberManager userMgr)
         => new(userMgr, Options.Create(new IdentityOptions()));
 
-    public MemberSignInManager CreateSut(IdentityOptions? identityOptions = null)
+    public MemberSignInManager CreateSut(
+        IdentityOptions? identityOptions = null,
+        IMemberExternalLoginProviders? externalLoginProviders = null)
     {
         _memberManager = MockMemberManager();
         _mockEventAggregator = new Mock<IEventAggregator>();
@@ -82,7 +84,7 @@ public class MemberSignInManagerTests
             _mockLogger.Object,
             Mock.Of<IAuthenticationSchemeProvider>(),
             Mock.Of<IUserConfirmation<MemberIdentityUser>>(),
-            Mock.Of<IMemberExternalLoginProviders>(),
+            externalLoginProviders ?? Mock.Of<IMemberExternalLoginProviders>(),
             _mockEventAggregator.Object,
             Mock.Of<IOptions<SecuritySettings>>(x => x.Value == new SecuritySettings()),
             new DictionaryAppCache(),
@@ -105,11 +107,34 @@ public class MemberSignInManagerTests
             Mock.Of<IHttpContextAccessor>(),
             Mock.Of<IPublishedModelFactory>());
 
+    private static IMemberExternalLoginProviders MockExternalLoginProviders(string authenticationType)
+    {
+        var options = new MemberExternalLoginProviderOptions
+        {
+            AutoLinkOptions = new MemberExternalSignInAutoLinkOptions(autoLinkExternalAccount: true),
+        };
+        var scheme = new MemberExternalLoginProviderScheme(
+            new MemberExternalLoginProvider(
+                authenticationType,
+                Mock.Of<IOptionsMonitor<MemberExternalLoginProviderOptions>>(x => x.Get(authenticationType) == options)),
+            new AuthenticationScheme(authenticationType, authenticationType, typeof(IAuthenticationHandler)));
+
+        return Mock.Of<IMemberExternalLoginProviders>(x =>
+            x.GetAsync(authenticationType) == Task.FromResult<MemberExternalLoginProviderScheme?>(scheme));
+    }
+
+    private static ExternalLoginInfo CreateExternalLoginInfo(string authenticationType, params Claim[] claims)
+        => new(
+            new ClaimsPrincipal(new ClaimsIdentity(claims)),
+            authenticationType,
+            "provider-key",
+            authenticationType);
+
     [Test]
     public async Task
         WhenPasswordSignInAsyncIsCalled_AndEverythingIsSetup_ThenASignInResultSucceededShouldBeReturnedAsync()
     {
-        // arrange
+        // Arrange
         var userId = "bo8w3d32q9b98";
         var sut = CreateSut();
         var fakeUser = new MemberIdentityUser(777) { UserName = "TestUser" };
@@ -124,34 +149,34 @@ public class MemberSignInManagerTests
         _memberManager.Setup(x => x.IsEmailConfirmedAsync(fakeUser)).ReturnsAsync(true);
         _memberManager.Setup(x => x.IsLockedOutAsync(fakeUser)).ReturnsAsync(false);
 
-        // act
+        // Act
         var actual = await sut.PasswordSignInAsync(fakeUser, password, isPersistent, lockoutOnFailure);
 
-        // assert
+        // Assert
         Assert.IsTrue(actual.Succeeded);
     }
 
     [Test]
     public async Task WhenPasswordSignInAsyncIsCalled_AndTheResultFails_ThenASignInFailedResultShouldBeReturnedAsync()
     {
-        // arrange
+        // Arrange
         var sut = CreateSut();
         var fakeUser = new MemberIdentityUser(777) { UserName = "TestUser" };
         var password = "testPassword";
         var lockoutOnFailure = false;
         var isPersistent = true;
 
-        // act
+        // Act
         var actual = await sut.PasswordSignInAsync(fakeUser, password, isPersistent, lockoutOnFailure);
 
-        // assert
+        // Assert
         Assert.IsFalse(actual.Succeeded);
     }
 
     [Test]
     public async Task Can_Publish_Login_Success_Notification()
     {
-        // arrange
+        // Arrange
         var memberKey = Guid.NewGuid();
         var sut = CreateSut();
         var fakeUser = new MemberIdentityUser(777) { UserName = "TestUser", Key = memberKey };
@@ -163,10 +188,10 @@ public class MemberSignInManagerTests
         _memberManager.Setup(x => x.IsEmailConfirmedAsync(fakeUser)).ReturnsAsync(true);
         _memberManager.Setup(x => x.IsLockedOutAsync(fakeUser)).ReturnsAsync(false);
 
-        // act
+        // Act
         await sut.PasswordSignInAsync(fakeUser, "password", false, false);
 
-        // assert
+        // Assert
         _mockEventAggregator.Verify(
             x => x.Publish(It.Is<MemberLoginSuccessNotification>(n =>
                 n.IpAddress == TestIpAddress && n.MemberKey == memberKey)),
@@ -176,15 +201,15 @@ public class MemberSignInManagerTests
     [Test]
     public async Task Can_Publish_Login_Failed_Notification_When_Password_Wrong()
     {
-        // arrange
+        // Arrange
         var memberKey = Guid.NewGuid();
         var sut = CreateSut();
         var fakeUser = new MemberIdentityUser(777) { UserName = "TestUser", Key = memberKey };
 
-        // act
+        // Act
         await sut.PasswordSignInAsync(fakeUser, "wrong_password", false, false);
 
-        // assert
+        // Assert
         _mockEventAggregator.Verify(
             x => x.Publish(It.Is<MemberLoginFailedNotification>(n =>
                 n.IpAddress == TestIpAddress
@@ -196,16 +221,16 @@ public class MemberSignInManagerTests
     [Test]
     public async Task Can_Publish_Login_Failed_Notification_When_User_Not_Found()
     {
-        // arrange
+        // Arrange
         var sut = CreateSut();
 
         // FindByNameAsync returns null by default on the fresh mock, so the
         // string overload of PasswordSignInAsync calls HandleSignIn with a null user.
 
-        // act
+        // Act
         await sut.PasswordSignInAsync("nonexistent_user", "password", false, false);
 
-        // assert
+        // Assert
         _mockEventAggregator.Verify(
             x => x.Publish(It.Is<MemberLoginFailedNotification>(n =>
                 n.IpAddress == TestIpAddress
@@ -217,7 +242,7 @@ public class MemberSignInManagerTests
     [Test]
     public async Task Can_Publish_Login_Failed_Notification_When_Locked_Out()
     {
-        // arrange
+        // Arrange
         var memberKey = Guid.NewGuid();
         var sut = CreateSut();
         var fakeUser = new MemberIdentityUser(777) { UserName = "TestUser", Key = memberKey };
@@ -225,10 +250,10 @@ public class MemberSignInManagerTests
         _memberManager.Setup(x => x.SupportsUserLockout).Returns(true);
         _memberManager.Setup(x => x.IsLockedOutAsync(fakeUser)).ReturnsAsync(true);
 
-        // act
+        // Act
         await sut.PasswordSignInAsync(fakeUser, "password", false, false);
 
-        // assert
+        // Assert
         _mockEventAggregator.Verify(
             x => x.Publish(It.Is<MemberLoginFailedNotification>(n =>
                 n.IpAddress == TestIpAddress
@@ -240,7 +265,7 @@ public class MemberSignInManagerTests
     [Test]
     public async Task Can_Publish_Login_Failed_Notification_When_Not_Allowed()
     {
-        // arrange
+        // Arrange
         var memberKey = Guid.NewGuid();
         var identityOptions = new IdentityOptions { SignIn = { RequireConfirmedEmail = true } };
         var sut = CreateSut(identityOptions);
@@ -249,10 +274,10 @@ public class MemberSignInManagerTests
         // IsEmailConfirmedAsync returns false by default on the mock,
         // so CanSignInAsync returns false → PreSignInCheck returns NotAllowed.
 
-        // act
+        // Act
         await sut.PasswordSignInAsync(fakeUser, "password", false, false);
 
-        // assert
+        // Assert
         _mockEventAggregator.Verify(
             x => x.Publish(It.Is<MemberLoginFailedNotification>(n =>
                 n.IpAddress == TestIpAddress
@@ -262,19 +287,51 @@ public class MemberSignInManagerTests
     }
 
     [Test]
+    public async Task Cannot_Auto_Link_External_Login_Without_Email_Claim()
+    {
+        // Arrange
+        const string provider = "TestProvider";
+        var sut = CreateSut(externalLoginProviders: MockExternalLoginProviders(provider));
+
+        // Act
+        var actual = await sut.ExternalLoginSignInAsync(CreateExternalLoginInfo(provider), false);
+
+        // Assert
+        Assert.AreSame(MemberSignInManager.AutoLinkSignInResult.FailedNoEmail, actual);
+    }
+
+    [Test]
+    public async Task Cannot_Auto_Link_External_Login_Without_Name_Claim()
+    {
+        // Arrange
+        const string provider = "TestProvider";
+        var sut = CreateSut(externalLoginProviders: MockExternalLoginProviders(provider));
+
+        // The principal carries an email but nothing resolving to ClaimTypes.Name, so auto-linking
+        // gets as far as creating a new member and finds no name to create it with.
+        var loginInfo = CreateExternalLoginInfo(provider, new Claim(ClaimTypes.Email, "test@example.com"));
+
+        // Act
+        var actual = await sut.ExternalLoginSignInAsync(loginInfo, false);
+
+        // Assert
+        Assert.AreSame(MemberSignInManager.AutoLinkSignInResult.FailedNoName, actual);
+    }
+
+    [Test]
     public async Task Can_Publish_Logout_Success_Notification()
     {
-        // arrange
+        // Arrange
         var memberKey = Guid.NewGuid();
         var sut = CreateSut();
         var fakeUser = new MemberIdentityUser(777) { UserName = "TestUser", Key = memberKey };
 
         _memberManager.Setup(x => x.GetUserAsync(It.IsAny<ClaimsPrincipal>())).ReturnsAsync(fakeUser);
 
-        // act
+        // Act
         await sut.SignOutAsync();
 
-        // assert
+        // Assert
         _mockEventAggregator.Verify(
             x => x.Publish(It.Is<MemberLogoutSuccessNotification>(n =>
                 n.IpAddress == TestIpAddress && n.MemberKey == memberKey)),
@@ -284,15 +341,15 @@ public class MemberSignInManagerTests
     [Test]
     public async Task Cannot_Publish_Logout_Notification_When_User_Not_Found()
     {
-        // arrange
+        // Arrange
         var sut = CreateSut();
 
         // GetUserAsync returns null by default on the fresh mock.
 
-        // act
+        // Act
         await sut.SignOutAsync();
 
-        // assert
+        // Assert
         _mockEventAggregator.Verify(
             x => x.Publish(It.IsAny<MemberLogoutSuccessNotification>()),
             Times.Never);

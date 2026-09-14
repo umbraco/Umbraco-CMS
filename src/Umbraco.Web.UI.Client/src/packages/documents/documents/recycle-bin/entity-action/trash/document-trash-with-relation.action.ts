@@ -1,7 +1,9 @@
 import { UMB_DOCUMENT_CONFIGURATION_CONTEXT } from '../../../global-contexts/index.js';
-import { UMB_TRASH_WITH_RELATION_CONFIRM_MODAL } from '@umbraco-cms/backoffice/relations';
+import {
+	UMB_TRASH_WITH_RELATION_CONFIRM_MODAL,
+	UmbTrashWithRelationEntityAction,
+} from '@umbraco-cms/backoffice/relations';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
-import { UmbTrashWithRelationEntityAction } from '@umbraco-cms/backoffice/relations';
 
 export class UmbDocumentTrashWithRelationEntityAction extends UmbTrashWithRelationEntityAction {
 	protected override async _confirmTrash(item: any) {

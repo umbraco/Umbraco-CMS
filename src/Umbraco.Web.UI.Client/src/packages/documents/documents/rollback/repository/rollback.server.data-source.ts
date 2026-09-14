@@ -1,11 +1,15 @@
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { DocumentVersionService } from '@umbraco-cms/backoffice/external/backend-api';
+import {
+	DocumentVersionService,
+	type DocumentVersionResponseModel,
+	type PagedDocumentVersionItemResponseModel,
+} from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
+import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
 
 /**
  * A data source for the Rollback that fetches data from the server
  * @class UmbRollbackServerDataSource
- * @implements {RepositoryDetailDataSource}
  */
 export class UmbRollbackServerDataSource {
 	#host: UmbControllerHost;
@@ -21,22 +25,25 @@ export class UmbRollbackServerDataSource {
 
 	/**
 	 * Get a list of versions for a document
-	 * @param id
-	 * @param culture
-	 * @returns {*}
+	 * @param {string} id - The document unique identifier.
+	 * @param {string} [culture] - The culture to get versions for.
+	 * @returns {Promise<UmbDataSourceResponse<PagedDocumentVersionItemResponseModel>>} The versions for the document.
 	 * @memberof UmbRollbackServerDataSource
 	 */
-	getVersionsByDocumentId(id: string, culture?: string) {
+	getVersionsByDocumentId(
+		id: string,
+		culture?: string,
+	): Promise<UmbDataSourceResponse<PagedDocumentVersionItemResponseModel>> {
 		return tryExecute(this.#host, DocumentVersionService.getDocumentVersion({ query: { documentId: id, culture } }));
 	}
 
 	/**
 	 * Get a specific version by id
-	 * @param versionId
-	 * @returns {*}
+	 * @param {string} versionId - The version unique identifier.
+	 * @returns {Promise<UmbDataSourceResponse<DocumentVersionResponseModel>>} The requested version.
 	 * @memberof UmbRollbackServerDataSource
 	 */
-	getVersionById(versionId: string) {
+	getVersionById(versionId: string): Promise<UmbDataSourceResponse<DocumentVersionResponseModel>> {
 		return tryExecute(this.#host, DocumentVersionService.getDocumentVersionById({ path: { id: versionId } }));
 	}
 

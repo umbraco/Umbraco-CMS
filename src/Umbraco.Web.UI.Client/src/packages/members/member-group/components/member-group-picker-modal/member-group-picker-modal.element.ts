@@ -119,7 +119,6 @@ export class UmbMemberGroupPickerModalElement extends UmbModalBaseElement<
 	static override styles = [
 		css`
 			uui-pagination {
-				display: block;
 				margin-top: var(--uui-size-layout-1);
 			}
 		`,

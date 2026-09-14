@@ -1,6 +1,8 @@
 import { UmbUserRepositoryBase } from '../user-repository-base.js';
 import { UmbNewUserPasswordServerDataSource as UmbNewUserPasswordServerDataSource } from './new-user-password.server.data-source.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { ResetPasswordUserResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type { UmbRepositoryResponse } from '@umbraco-cms/backoffice/repository';
 
 /**
  * A repository for generating and assigning a new password for a user
@@ -22,11 +24,11 @@ export class UmbNewUserPasswordRepository extends UmbUserRepositoryBase {
 
 	/**
 	 * Request a new password for a user
-	 * @param {string} userUnique
-	 * @returns {*}
+	 * @param {string} userUnique - The unique id of the user
+	 * @returns {Promise<UmbRepositoryResponse<ResetPasswordUserResponseModel>>} The new password
 	 * @memberof UmbNewUserPasswordRepository
 	 */
-	async requestNewPassword(userUnique: string) {
+	async requestNewPassword(userUnique: string): Promise<UmbRepositoryResponse<ResetPasswordUserResponseModel>> {
 		if (!userUnique) throw new Error('User unique is missing');
 		await this.init;
 		return this.dataSource.newPassword(userUnique);

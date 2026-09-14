@@ -59,6 +59,7 @@ export default {
 		remove: 'Remove',
 		rename: 'Rename',
 		republish: 'Republish entire site',
+		replace: 'Replace',
 		resendInvite: 'Resend Invitation',
 		restore: 'Restore',
 		rights: 'Permissions',
@@ -211,8 +212,8 @@ export default {
 		sendtopublishvariant: 'Content sent for publishing for languages: %0%',
 		sort: 'Sort child items performed by user',
 		custom: '%0%',
-		contentversionpreventcleanup: 'Clean up disabled for version: %0%',
-		contentversionenablecleanup: 'Clean up enabled for version: %0%',
+		contentversionpreventcleanup: 'Cleanup disabled for version: %0%',
+		contentversionenablecleanup: 'Cleanup enabled for version: %0%',
 		smallAssignDomain: 'Assign Hostname',
 		smallCopy: 'Copy',
 		smallPublish: 'Publish',
@@ -288,9 +289,9 @@ export default {
 		publishedPendingChanges: 'Published (pending changes)',
 		publishStatus: 'Publication Status',
 		publishDescendantsHelp:
-			'Publish <strong>%0%</strong> and all items underneath and thereby making their content publicly available.',
+			'Save and publish <strong>%0%</strong> and publish all items underneath thereby making their content publicly available.',
 		publishDescendantsWithVariantsHelp:
-			'Publish variants and variants of same type underneath and thereby making their content publicly available.',
+			'Save and publish variants and publish variants of same type underneath thereby making their content publicly available.',
 		noVariantsToProcess: 'There are no available variants',
 		releaseDate: 'Publish at',
 		unpublishDate: 'Unpublish at',
@@ -342,6 +343,7 @@ export default {
 		isSensitiveValue:
 			'This value is hidden. If you need access to view this value please contact your website administrator.',
 		isSensitiveValue_short: 'This value is hidden.',
+		isSensitiveValueNotice: 'If you need access to view the hidden values, contact your website administrator.',
 		languagesToPublish: 'What languages would you like to publish?',
 		languagesToSendForApproval: 'What languages would you like to send for approval?',
 		languagesToSchedule: 'What languages would you like to schedule?',
@@ -368,6 +370,8 @@ export default {
 		selectAllVariants: 'Select all variants',
 		saveModalTitle: 'Save',
 		saveAndPublishModalTitle: 'Save and publish',
+		saveAndPublishDescendantsModalTitle: 'Save and publish with descendants',
+		saveAndScheduleModalTitle: 'Save and schedule publishing',
 		publishModalTitle: 'Publish',
 		openSplitViewForVariant: (variant: string) => `Open ${variant} in split view`,
 		sharedAcrossCultures: 'Shared across cultures',
@@ -406,6 +410,8 @@ export default {
 	},
 	media: {
 		clickToUpload: 'Click to upload',
+		browseFilesAction: 'Browse files',
+		dropFilesOr: 'Drag and drop media here<br />or',
 		orClickHereToUpload: 'or click here to choose files',
 		disallowedFileType: 'Cannot upload this file, it does not have an approved file type',
 		disallowedFileExtension: (extension: string) =>
@@ -562,6 +568,7 @@ export default {
 		confirmdeleteNumberOfItems: 'Are you sure you want to delete <strong>%0%</strong> of <strong>%1%</strong> items',
 		confirmdisable: 'Are you sure you want to disable',
 		confirmremove: 'Are you sure you want to remove',
+		confirmRemoveItem: (name: string) => `Are you sure you want to remove${name ? ` <strong>${name}</strong>` : ''}?`,
 		confirmremoveusageof: 'Are you sure you want to remove the usage of <strong>%0%</strong>',
 		confirmlogout: 'Are you sure?',
 		confirmSure: 'Are you sure?',
@@ -941,6 +948,8 @@ export default {
 		no: 'No',
 		nodeName: 'Node Name',
 		notFound: 'Not found',
+		noResults: 'No results',
+		noResultsFor: (query: string) => `No result for "${query}".`,
 		of: 'of',
 		off: 'Off',
 		ok: 'OK',
@@ -1435,7 +1444,7 @@ export default {
 	propertyEditorPicker: {
 		title: 'Select a property editor',
 		openPropertyEditorPicker: 'Select a property editor UI',
-		selectAction: "Select Property Editor",
+		selectAction: 'Select Property Editor',
 	},
 	propertyEditorUIGroups: {
 		advanced: 'Advanced',
@@ -1524,6 +1533,17 @@ export default {
 			'Drag the different items up or down below to set how they should be arranged. Or click the column headers to sort the entire collection of items',
 		sortPleaseWait: 'Please wait. Items are being sorted, this can take a while.',
 		sortEmptyState: 'This node has no child nodes to sort',
+		sortByFieldHeadline: 'Sort by field',
+		sortByFieldSentence: 'Sort all children by',
+		sortByFieldDirectionLabel: 'Direction',
+		sortByFieldAscending: 'Ascending',
+		sortByFieldDescending: 'Descending',
+		sortByFieldNameOption: 'Name',
+		sortByFieldCreateDateOption: 'Created',
+		sortByFieldUpdateDateOption: 'Last edited',
+		sortIndividuallyHeadline: 'Sort individually',
+		sortByFieldCultureSentence: 'in',
+		sortByFieldCultureLabel: 'Language',
 	},
 	speechBubbles: {
 		validationFailedHeader: 'Validation',
@@ -1904,14 +1924,14 @@ export default {
 		removeChildNodeWarning:
 			'Removing a child node will limit the editors options to create different content types beneath a node.',
 		usingEditor: 'using this editor will get updated with the new settings.',
-		historyCleanupHeading: 'History clean up',
-		historyCleanupDescription: 'Allow overriding the global history clean up settings.',
+		historyCleanupHeading: 'History cleanup',
+		historyCleanupDescription: 'Allow overriding the global history cleanup settings.',
 		historyCleanupKeepAllVersionsNewerThanDays: 'Keep all versions newer than days',
 		historyCleanupKeepLatestVersionPerDayForDays: 'Keep latest version per day for days',
-		historyCleanupPreventCleanup: 'Prevent clean up',
-		historyCleanupEnableCleanup: 'Enable clean up',
+		historyCleanupPreventCleanup: 'Prevent cleanup',
+		historyCleanupEnableCleanup: 'Enable cleanup',
 		historyCleanupGloballyDisabled:
-			'<strong>NOTE!</strong> The clean up of historically content versions are disabled globally. These settings will not take effect before it is enabled.',
+			'<strong>NOTE!</strong> The clean up of historical content versions is disabled globally. These settings will not take effect before it is enabled.',
 		changeDataTypeHelpText:
 			'Changing a data type with stored values is disabled. To allow this you can change the Umbraco:CMS:DataTypes:CanBeChanged setting in appsettings.json.',
 		collection: 'Collection',
@@ -2089,6 +2109,11 @@ export default {
 		tableViewLabel: 'Table',
 		children: 'Children',
 		noItems: 'No items',
+	},
+	picker: {
+		browseTab: 'Browse',
+		searchTab: 'Search',
+		selectedCount: (count: number) => `${count} ${count === 1 ? 'item' : 'items'} selected`,
 	},
 	update: {
 		updateAvailable: 'New update ready',
@@ -2445,11 +2470,14 @@ export default {
 		autocompleteLabel: 'Autocomplete',
 	},
 	recycleBin: {
+		restoreItemTo: (from: string, to: string) => `Restore <strong>${from}</strong> to <strong>${to}</strong>`,
 		contentTrashed: 'Trashed content with Id: {0} related to original parent content with Id: {1}',
 		mediaTrashed: 'Trashed media with Id: {0} related to original parent media item with Id: {1}',
 		itemCannotBeRestored: 'Cannot automatically restore this item',
 		itemCannotBeRestoredHelpText:
-			'There is no location where this item can be automatically restored. You can move the item manually using the tree below.',
+			'There is no location where this item can be automatically restored. You can select a new location below.',
+		restoreToTitle: 'Restore to',
+		selectRestoreLocation: 'Select location',
 		wasRestored: 'was restored under',
 	},
 	relationType: {
@@ -2562,6 +2590,7 @@ export default {
 		labelUsedByItems: 'Referenced by',
 		labelDependsOnThis: 'The following items depend on this',
 		labelDependentDescendants: 'The following descending items have dependencies',
+		labelUsedByOtherContent: 'The following items are used by other content',
 		labelMoreReferences: (count: number) => {
 			if (count === 1) return '...and one more item';
 			return `...and ${count} more items`;
@@ -2585,10 +2614,12 @@ export default {
 		searchThisMessageWithGoogle: 'Search this message with Google',
 		searchWithBing: 'Search With Bing',
 		searchThisMessageWithBing: 'Search this message with Bing',
-		searchOurUmbraco: 'Search Our Umbraco',
-		searchThisMessageOnOurUmbracoForumsAndDocs: 'Search this message on Our Umbraco forums and docs',
-		searchOurUmbracoWithGoogle: 'Search Our Umbraco with Google',
-		searchOurUmbracoForumsUsingGoogle: 'Search Our Umbraco forums using Google',
+		searchOurUmbraco: 'Search Umbraco forum',
+		searchThisMessageOnOurUmbracoForumsAndDocs: 'Search this message in the Umbraco forum',
+		searchOurUmbracoWithGoogle: 'Search Umbraco forum with Google',
+		searchOurUmbracoForumsUsingGoogle: 'Search Umbraco forum using Google',
+		searchUmbracoDocs: 'Search Umbraco documentation',
+		searchThisMessageInUmbracoDocs: 'Search this message in the Umbraco documentation',
 		searchUmbracoSource: 'Search Umbraco Source',
 		searchWithinUmbracoSourceCodeOnGithub: 'Search within Umbraco source code on GitHub',
 		searchUmbracoIssues: 'Search Umbraco Issues',
@@ -2636,7 +2667,11 @@ export default {
 		confirmDeleteHeadline: 'Delete from clipboard',
 		confirmDeleteDescription: 'Are you sure you want to delete <strong>{0}</strong> from the clipboard?',
 		confirmClearDescription: 'Are you sure you want to clear the clipboard?',
+		confirmPasteHeadline: 'Paste from clipboard',
+		confirmPasteOverwriteMessage: (name: string) =>
+			`The property already contains a value. Paste from the property action will overwrite the current value. Do you want to replace the current value with <strong>${name}</strong>?`,
 		copySuccessHeadline: 'Copied to clipboard',
+		noItemsMessage: 'There are no items in the clipboard.',
 	},
 	propertyActions: {
 		tooltipForPropertyActionsMenu: 'Open Property Actions',
