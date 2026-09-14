@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System.ComponentModel.DataAnnotations;
@@ -237,7 +237,7 @@ public class MultipleDocumentPickerPropertyEditor : DataEditor, IValueSchemaProv
                 return [];
             }
 
-            HashSet<Guid> allowedContentTypeKeys = AllowedContentTypeKeysParser.Parse(configuration.AllowedContentTypeIds);
+            HashSet<Guid> allowedContentTypeKeys = AllowedContentTypeKeysParser.Parse(configuration.AllowedContentTypeKeys);
 
             // No filter configured — all document types are allowed.
             if (allowedContentTypeKeys.Count == 0)

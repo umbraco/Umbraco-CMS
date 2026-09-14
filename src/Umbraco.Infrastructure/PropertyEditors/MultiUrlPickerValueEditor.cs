@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System.ComponentModel.DataAnnotations;
@@ -105,7 +105,7 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference, I
         _mediaService = mediaService;
         _appCaches = appCaches;
 
-        Validators.Add(new TypedJsonValidatorRunner<LinkDisplay[], MultiUrlPickerConfigurationBase>(
+        Validators.Add(new TypedJsonValidatorRunner<LinkDisplay[], UrlPickerConfigurationBase>(
             _jsonSerializer,
             new MinMaxValidator(localizedTextService)));
     }
@@ -398,7 +398,7 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference, I
         public string? Culture { get; set; }
     }
 
-    internal sealed class MinMaxValidator : ITypedValidator<LinkDisplay[], MultiUrlPickerConfigurationBase>
+    internal sealed class MinMaxValidator : ITypedValidator<LinkDisplay[], UrlPickerConfigurationBase>
     {
         private readonly ILocalizedTextService _localizedTextService;
 
@@ -420,7 +420,7 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference, I
         /// </returns>
         public IEnumerable<ValidationResult> Validate(
             LinkDisplay[]? linksDtos,
-            MultiUrlPickerConfigurationBase? urlPickerConfiguration,
+            UrlPickerConfigurationBase? urlPickerConfiguration,
             string? valueType,
             PropertyValidationContext validationContext)
         {

@@ -73,7 +73,7 @@ internal sealed class MultipleDocumentPickerValueEditorValidationTests
         var valueEditor = CreateValueEditor(DocumentOfType(documentKey, Guid.NewGuid()));
         valueEditor.ConfigurationObject = new MultipleDocumentPickerConfiguration
         {
-            AllowedContentTypeIds = allowedTypeKey.ToString(),
+            AllowedContentTypeKeys = allowedTypeKey.ToString(),
         };
 
         IEnumerable<ValidationResult> result = valueEditor.Validate(
@@ -93,7 +93,7 @@ internal sealed class MultipleDocumentPickerValueEditorValidationTests
         var valueEditor = CreateValueEditor(DocumentOfType(documentKey, allowedTypeKey));
         valueEditor.ConfigurationObject = new MultipleDocumentPickerConfiguration
         {
-            AllowedContentTypeIds = allowedTypeKey.ToString(),
+            AllowedContentTypeKeys = allowedTypeKey.ToString(),
         };
 
         IEnumerable<ValidationResult> result = valueEditor.Validate(
@@ -112,7 +112,7 @@ internal sealed class MultipleDocumentPickerValueEditorValidationTests
         var valueEditor = CreateValueEditor();
         valueEditor.ConfigurationObject = new MultipleDocumentPickerConfiguration
         {
-            AllowedContentTypeIds = allowedTypeKey.ToString(),
+            AllowedContentTypeKeys = allowedTypeKey.ToString(),
         };
 
         IEnumerable<ValidationResult> result = valueEditor.Validate(

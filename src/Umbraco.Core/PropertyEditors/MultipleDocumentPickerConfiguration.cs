@@ -19,7 +19,7 @@ public class MultipleDocumentPickerConfiguration : IIgnoreUserStartNodesConfig
     /// Gets or sets the content type filter for allowed selections.
     /// </summary>
     [ConfigurationField("allowedContentTypes")]
-    public string? AllowedContentTypeIds { get; set; }
+    public string? AllowedContentTypeKeys { get; set; }
 
     /// <summary>
     /// Represents a numeric range with optional minimum and maximum values.

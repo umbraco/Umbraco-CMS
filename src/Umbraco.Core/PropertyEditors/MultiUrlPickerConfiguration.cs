@@ -3,7 +3,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// <summary>
 /// Represents the configuration for the multi URL picker property editor.
 /// </summary>
-public class MultiUrlPickerConfiguration : MultiUrlPickerConfigurationBase
+public class MultiUrlPickerConfiguration : UrlPickerConfigurationBase
 {
     /// <summary>
     /// Gets or sets the minimum number of URLs that must be selected.

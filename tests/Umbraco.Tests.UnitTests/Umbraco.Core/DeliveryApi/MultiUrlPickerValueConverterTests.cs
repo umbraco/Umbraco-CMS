@@ -1,4 +1,4 @@
-﻿using Moq;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
@@ -320,7 +320,7 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
 
     private static IPublishedPropertyType SetupUrlPickerPropertyType(bool multiple)
     {
-        MultiUrlPickerConfigurationBase configuration = multiple
+        UrlPickerConfigurationBase configuration = multiple
             ? new MultiUrlPickerConfiguration { MaxNumber = 10 }
             : new SingleUrlPickerConfiguration();
         var publishedDataType = new PublishedDataType(123, "test", "test", new Lazy<object>(() => configuration));

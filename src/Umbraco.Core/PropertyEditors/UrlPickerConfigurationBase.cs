@@ -3,7 +3,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// <summary>
 /// Represents the configuration shared by the URL picker property editors.
 /// </summary>
-public abstract class MultiUrlPickerConfigurationBase : IIgnoreUserStartNodesConfig
+public abstract class UrlPickerConfigurationBase : IIgnoreUserStartNodesConfig
 {
     /// <inheritdoc />
     [ConfigurationField(Constants.DataTypes.ReservedPreValueKeys.IgnoreUserStartNodes)]
