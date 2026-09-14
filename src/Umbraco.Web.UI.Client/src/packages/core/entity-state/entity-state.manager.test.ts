@@ -43,8 +43,8 @@ describe('UmbEntityStateManager', () => {
 				expect(manager).to.have.property('replaceStates').that.is.a('function');
 			});
 
-			it('has a clearStates method', () => {
-				expect(manager).to.have.property('clearStates').that.is.a('function');
+			it('has a clear method', () => {
+				expect(manager).to.have.property('clear').that.is.a('function');
 			});
 		});
 	});
@@ -200,12 +200,12 @@ describe('UmbEntityStateManager', () => {
 		});
 
 		it('clears all states', () => {
-			manager.clearStates();
+			manager.clear();
 			expect(manager.getStates()).to.deep.equal([]);
 		});
 
 		it('updates the observable', (done) => {
-			manager.clearStates();
+			manager.clear();
 
 			manager.states
 				.subscribe((value) => {

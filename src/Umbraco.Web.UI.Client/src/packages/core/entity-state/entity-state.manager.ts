@@ -85,7 +85,7 @@ export class UmbEntityStateManager<EntryType extends UmbEntityStateEntry = UmbEn
 	}
 
 	/** Clear all states. */
-	clearStates(): void {
+	clear(): void {
 		this._states.setValue([]);
 	}
 
