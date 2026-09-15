@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.DataProtection;
@@ -94,7 +94,10 @@ public class ConfigureBackOfficeCookieOptions : IConfigureNamedOptions<CookieAut
             "Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationMiddleware",
             Constants.Security.BackOfficeAuthenticationType,
             "v2");
-        var ticketDataFormat = new TicketDataFormat(dataProtector);
+
+        var ticketDataFormat = new SecureDataFormat<AuthenticationTicket>(
+            new CompressedTicketSerializer(TicketSerializer.Default),
+            dataProtector);
 
         options.TicketDataFormat = new BackOfficeSecureDataFormat(_globalSettings.TimeOut, ticketDataFormat);
 

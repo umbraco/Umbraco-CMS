@@ -449,6 +449,81 @@ describe('UmbManagementApiDetailDataRequestManager', () => {
 			expect(result.data?.items.map((item) => item.id)).to.include.members(ids);
 		});
 
+		it('returns an error if the readMany API fails', async () => {
+			mockReadMany = async () => {
+				throw { name: 'ApiError', message: 'Read many failed' };
+			};
+
+			manager = new UmbManagementApiDetailDataRequestManager(hostElement, {
+				create: mockCreate,
+				read: mockRead,
+				update: mockUpdate,
+				delete: mockDelete,
+				readMany: mockReadMany,
+				dataCache,
+				inflightRequestCache,
+			});
+
+			const result = await manager.readMany(['item-1', 'item-2']);
+
+			expect(result.error).to.exist;
+			expect(result.data?.items).to.have.lengthOf(0);
+		});
+
+		it('returns the items from the chunks that succeeded when one chunk fails', async () => {
+			// A failing chunk resolves with an error rather than rejecting, so it has to be detected as a failure -
+			// otherwise the caller is handed an array padded with undefined and no error at all.
+			mockReadMany = async (ids: Array<string>) => {
+				if (ids.includes('item-40')) {
+					throw { name: 'ApiError', message: 'Request too long' };
+				}
+				return {
+					data: {
+						items: ids.map((id) => ({ id, name: `Item ${id}` })),
+					},
+				};
+			};
+
+			manager = new UmbManagementApiDetailDataRequestManager(hostElement, {
+				create: mockCreate,
+				read: mockRead,
+				update: mockUpdate,
+				delete: mockDelete,
+				readMany: mockReadMany,
+				dataCache,
+				inflightRequestCache,
+			});
+
+			const ids = Array.from({ length: 45 }, (_, index) => `item-${index}`);
+
+			const result = await manager.readMany(ids);
+
+			expect(result.error).to.exist;
+			expect(result.data?.items).to.have.lengthOf(40);
+			expect(result.data?.items.every((item) => item !== undefined)).to.be.true;
+		});
+
+		it('clears the inflight cache for every id when the readMany API fails', async () => {
+			mockReadMany = async () => {
+				throw { name: 'ApiError', message: 'Read many failed' };
+			};
+
+			manager = new UmbManagementApiDetailDataRequestManager(hostElement, {
+				create: mockCreate,
+				read: mockRead,
+				update: mockUpdate,
+				delete: mockDelete,
+				readMany: mockReadMany,
+				dataCache,
+				inflightRequestCache,
+			});
+
+			await manager.readMany(['item-1', 'item-2']);
+
+			expect(inflightRequestCache.has('read:item-1')).to.be.false;
+			expect(inflightRequestCache.has('read:item-2')).to.be.false;
+		});
+
 		it('uses cached items and only fetches non-cached items when connected', async () => {
 			mockServerEventContext.setIsConnected(true);
 
