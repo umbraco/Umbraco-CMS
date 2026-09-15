@@ -479,6 +479,8 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 			}
 		}
 
+		const readOnly = this.#isReadOnlyCulture(variantId.culture);
+
 		return html`
 			<div class="variant culture-variant ${active ? 'selected' : ''}">
 				${this._variesBySegment && this.#isCreated(variantOption) && subVariantOptions.length > 0
@@ -488,11 +490,9 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 					: nothing}
 
 				<button
-					class="switch-button ${notCreated ? 'add-mode' : ''} ${this.#isReadOnlyCulture(variantId.culture)
-						? 'readonly-mode'
-						: ''}"
+					class="switch-button ${notCreated ? 'add-mode' : ''} ${readOnly ? 'readonly-mode' : ''}"
 					@click=${() => this.#switchVariant(variantOption)}>
-					${notCreated ? html`<uui-icon class="add-icon" name="icon-add"></uui-icon>` : nothing}
+					${notCreated && !readOnly ? html`<uui-icon class="add-icon" name="icon-add"></uui-icon>` : nothing}
 					<div class="variant-info">
 						<div class="variant-name">
 							${this.#getVariantDisplayName(variantOption)}
@@ -553,15 +553,14 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 		const notCreated = this.#isCreateMode(variantOption, variantId);
 		const hint = this._hintMap.get(variantId.toString());
 		const active = this.#isVariantActive(variantId);
+		const readOnly = this.#isReadOnlyCulture(variantId.culture);
 
 		return html`
 			<div class="variant segment-variant ${this.#isVariantActive(variantId) ? 'selected' : ''}">
 				<button
-					class="switch-button ${notCreated ? 'add-mode' : ''} ${this.#isReadOnlyCulture(variantId.culture)
-						? 'readonly-mode'
-						: ''}"
+					class="switch-button ${notCreated ? 'add-mode' : ''} ${readOnly ? 'readonly-mode' : ''}"
 					@click=${() => this.#switchVariant(variantOption)}>
-					${notCreated ? html`<uui-icon class="add-icon" name="icon-add"></uui-icon>` : nothing}
+					${notCreated && !readOnly ? html`<uui-icon class="add-icon" name="icon-add"></uui-icon>` : nothing}
 					<div class="variant-info">
 						<div class="variant-name">
 							${this.#getVariantDisplayName(variantOption)}
@@ -759,6 +758,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 				background: var(--uui-color-surface-emphasis);
 				color: var(--uui-color-interactive-emphasis);
 			}
+
 			.switch-button .variant-info {
 				flex-grow: 1;
 			}
@@ -796,10 +796,17 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 				padding-left: var(--uui-size-space-4);
 			}
 
+			.switch-button.add-mode.readonly-mode {
+				padding-left: var(--uui-size-space-6);
+			}
+
 			.segment-variant > .switch-button {
 				padding-left: var(--uui-size-space-6);
 			}
 			.segment-variant > .switch-button:not(.add-mode) {
+				padding-left: var(--uui-size-16);
+			}
+			.segment-variant > .switch-button.add-mode.readonly-mode {
 				padding-left: var(--uui-size-16);
 			}
 
@@ -814,6 +821,10 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 				right: 0;
 				top: 0;
 				z-index: 1;
+			}
+
+			.switch-button.add-mode.readonly-mode:after {
+				border: none;
 			}
 
 			.switch-button .variant-name {
