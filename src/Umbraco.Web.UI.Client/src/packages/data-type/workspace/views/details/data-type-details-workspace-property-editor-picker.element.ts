@@ -75,7 +75,7 @@ export class UmbDataTypeDetailsWorkspacePropertyEditorPickerElement extends UmbF
 
 		const value = await umbOpenModal(this, UMB_PROPERTY_EDITOR_UI_PICKER_MODAL, {
 			data: {
-				showDeprecated: configuration?.showDeprecatedPropertyEditors,
+				offerDeprecated: configuration?.offerDeprecatedPropertyEditors,
 			},
 			value: {
 				selection: this.propertyEditorUiAlias ? [this.propertyEditorUiAlias] : [],

@@ -25,5 +25,5 @@ public class DatatypeConfigurationResponseModel
     /// <summary>
     /// Gets a value indicating whether deprecated property editors are offered when picking the editor for a data type.
     /// </summary>
-    public required bool ShowDeprecatedPropertyEditors { get; init; }
+    public required bool OfferDeprecatedPropertyEditors { get; init; }
 }

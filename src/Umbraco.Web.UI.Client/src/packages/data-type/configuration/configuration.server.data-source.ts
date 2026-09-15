@@ -15,7 +15,7 @@ export class UmbDataTypesConfigurationServerDataSource extends UmbControllerBase
 
 		if (data) {
 			const mappedData: UmbDataTypesConfigurationModel = {
-				showDeprecatedPropertyEditors: data.showDeprecatedPropertyEditors,
+				offerDeprecatedPropertyEditors: data.offerDeprecatedPropertyEditors,
 			};
 
 			return { data: mappedData };

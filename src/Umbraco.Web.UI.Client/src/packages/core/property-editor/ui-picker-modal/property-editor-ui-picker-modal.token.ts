@@ -5,7 +5,7 @@ export type UmbPropertyEditorUIPickerModalData = {
 	 * Whether to offer the Property Editor UIs that are deprecated.
 	 * @default false
 	 */
-	showDeprecated?: boolean;
+	offerDeprecated?: boolean;
 };
 
 export type UmbPropertyEditorUIPickerModalValue = {

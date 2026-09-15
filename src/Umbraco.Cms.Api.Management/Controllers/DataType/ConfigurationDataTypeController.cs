@@ -40,7 +40,7 @@ public class ConfigurationDataTypeController : DataTypeControllerBase
             CanBeChanged = _dataTypesSettings.CanBeChanged,
             DocumentListViewId = Constants.DataTypes.Guids.ListViewContentGuid,
             MediaListViewId = Constants.DataTypes.Guids.ListViewMediaGuid,
-            ShowDeprecatedPropertyEditors = _dataTypesSettings.ShowDeprecatedPropertyEditors,
+            OfferDeprecatedPropertyEditors = _dataTypesSettings.OfferDeprecatedPropertyEditors,
         };
         return Task.FromResult<IActionResult>(Ok(responseModel));
     }

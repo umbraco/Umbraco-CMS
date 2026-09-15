@@ -169,10 +169,10 @@ public class ContentSettings
     ///     Gets or sets a value indicating whether deprecated property editors should be shown.
     /// </summary>
     /// <remarks>
-    ///     No longer used. The setting moved to <see cref="DataTypesSettings.ShowDeprecatedPropertyEditors" />, and
+    ///     No longer used. The setting moved to <see cref="DataTypesSettings.OfferDeprecatedPropertyEditors" />, and
     ///     only that one is read.
     /// </remarks>
-    [Obsolete("No longer used. Use DataTypesSettings.ShowDeprecatedPropertyEditors instead. Scheduled for removal in Umbraco 21.")]
+    [Obsolete("No longer used. Use DataTypesSettings.OfferDeprecatedPropertyEditors instead. Scheduled for removal in Umbraco 21.")]
     [DefaultValue(StaticShowDeprecatedPropertyEditors)]
     public bool ShowDeprecatedPropertyEditors { get; set; } = StaticShowDeprecatedPropertyEditors;
 

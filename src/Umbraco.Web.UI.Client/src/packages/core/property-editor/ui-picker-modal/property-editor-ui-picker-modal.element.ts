@@ -47,7 +47,7 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbModalBaseElement<
 			this.#propertyEditorUIs = selectablePropertyEditorUis(
 				withSchemaAlias,
 				this.value.selection,
-				this.data?.showDeprecated,
+				this.data?.offerDeprecated,
 			).sort((a, b) => a.meta.label.localeCompare(b.meta.label));
 
 			this.#searchController.setPropertyEditorUIs(this.#propertyEditorUIs);
@@ -159,7 +159,9 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbModalBaseElement<
 									<umb-icon name=${propertyEditorUI.meta.icon} class="icon"></umb-icon>
 									<span class="label" title=${label}>${label}</span>
 									${propertyEditorUI.meta.deprecated
-										? html`<small class="deprecated">${this.localize.term('propertyEditorPicker_deprecatedLabel')}</small>`
+										? html`<small class="deprecated"
+												>${this.localize.term('propertyEditorPicker_deprecatedLabel')}</small
+											>`
 										: nothing}
 								</button>
 							</li>

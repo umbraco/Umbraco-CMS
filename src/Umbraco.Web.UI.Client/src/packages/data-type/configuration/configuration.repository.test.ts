@@ -14,7 +14,7 @@ const { http, HttpResponse } = window.MockServiceWorker;
 const UMB_SLUG = '/data-type';
 
 const configuration: UmbDataTypesConfigurationModel = {
-	showDeprecatedPropertyEditors: true,
+	offerDeprecatedPropertyEditors: true,
 };
 
 @customElement('umb-test-data-types-configuration-repository-host')
@@ -47,7 +47,7 @@ describe('UmbDataTypesConfigurationRepository', () => {
 					canBeChanged: 'True',
 					documentListViewId: 'c0808dd3-8133-4e4b-8ce8-e2bea84a96a4',
 					mediaListViewId: '3a0156c4-3b8c-4803-bdc1-6871faa83fff',
-					showDeprecatedPropertyEditors: true,
+					offerDeprecatedPropertyEditors: true,
 				});
 			}),
 		);

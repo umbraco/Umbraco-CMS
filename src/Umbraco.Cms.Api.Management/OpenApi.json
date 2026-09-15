@@ -42558,7 +42558,7 @@
           "canBeChanged",
           "documentListViewId",
           "mediaListViewId",
-          "showDeprecatedPropertyEditors"
+          "offerDeprecatedPropertyEditors"
         ],
         "type": "object",
         "properties": {
@@ -42573,7 +42573,7 @@
             "type": "string",
             "format": "uuid"
           },
-          "showDeprecatedPropertyEditors": {
+          "offerDeprecatedPropertyEditors": {
             "type": "boolean"
           }
         }

@@ -14,9 +14,9 @@ public class DataTypesSettings
     internal const DataTypeChangeMode StaticDataTypeChangeMode = DataTypeChangeMode.True;
 
     /// <summary>
-    ///     The default value for the <see cref="ShowDeprecatedPropertyEditors" /> setting.
+    ///     The default value for the <see cref="OfferDeprecatedPropertyEditors" /> setting.
     /// </summary>
-    internal const bool StaticShowDeprecatedPropertyEditors = false;
+    internal const bool StaticOfferDeprecatedPropertyEditors = false;
 
     /// <summary>
     /// Gets or sets a value indicating if data types can be changed after they've been used.
@@ -32,6 +32,6 @@ public class DataTypesSettings
     /// A deprecated property editor keeps working for the data types already using it either way. This only governs
     /// whether one can be chosen for a data type that is not already using it.
     /// </remarks>
-    [DefaultValue(StaticShowDeprecatedPropertyEditors)]
-    public bool ShowDeprecatedPropertyEditors { get; set; } = StaticShowDeprecatedPropertyEditors;
+    [DefaultValue(StaticOfferDeprecatedPropertyEditors)]
+    public bool OfferDeprecatedPropertyEditors { get; set; } = StaticOfferDeprecatedPropertyEditors;
 }

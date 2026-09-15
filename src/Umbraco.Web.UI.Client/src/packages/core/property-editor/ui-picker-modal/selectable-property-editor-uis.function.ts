@@ -9,15 +9,15 @@ import type { ManifestPropertyEditorUi } from '../extensions/types.js';
  * @internal
  * @param {Array<ManifestPropertyEditorUi>} propertyEditorUis The Property Editor UIs to narrow.
  * @param {Array<string>} selectedAliases The aliases currently selected.
- * @param {boolean} showDeprecated Whether the deprecated ones are offered anyway.
+ * @param {boolean} offerDeprecated Whether the deprecated ones are offered anyway.
  * @returns {Array<ManifestPropertyEditorUi>} The Property Editor UIs to offer.
  */
 export function selectablePropertyEditorUis(
 	propertyEditorUis: Array<ManifestPropertyEditorUi>,
 	selectedAliases: Array<string>,
-	showDeprecated = false,
+	offerDeprecated = false,
 ): Array<ManifestPropertyEditorUi> {
-	if (showDeprecated) {
+	if (offerDeprecated) {
 		return propertyEditorUis;
 	}
 
