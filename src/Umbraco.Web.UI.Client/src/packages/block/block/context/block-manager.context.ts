@@ -82,13 +82,15 @@ export abstract class UmbBlockManagerContext<
 	protected _layouts = new UmbArrayState(<Array<BlockLayoutType>>[], (x) => x.contentKey);
 	public readonly layouts = this._layouts.asObservable();
 
-	readonly #contents = new UmbArrayState(<Array<UmbBlockDataModel>>[], (x) => x.key);
-	public readonly contents = this.#contents.asObservable();
-	readonly #contentKeys = this.#contents.asObservablePart((x) => x.map((y) => y.key));
+	readonly #contents = new UmbArrayState<UmbBlockDataModel, string, undefined>(undefined, (x) => x.key);
+	// TODO: Remove ?? [] fallback in v.19 (or v.20)
+	public readonly contents = this.#contents.asObservablePart((x) => x ?? []);
+	readonly #contentKeys = this.#contents.asObservablePart((x) => (x ? x.map((y) => y.key) : undefined));
 
-	readonly #settings = new UmbArrayState(<Array<UmbBlockDataModel>>[], (x) => x.key);
-	public readonly settings = this.#settings.asObservable();
-	readonly #settingsKeys = this.#settings.asObservablePart((x) => x.map((y) => y.key));
+	readonly #settings = new UmbArrayState<UmbBlockDataModel, string, undefined>(undefined, (x) => x.key);
+	// TODO: Remove ?? [] fallback in v.19 (or v.20)
+	public readonly settings = this.#settings.asObservablePart((x) => x ?? []);
+	readonly #settingsKeys = this.#settings.asObservablePart((x) => (x ? x.map((y) => y.key) : undefined));
 
 	// TODO: This is a bad seperation of concerns, this should be self initializing, not defined from the outside. [NL]
 	public readonly readOnlyState = new UmbReadOnlyVariantGuardManager(this);
@@ -139,32 +141,34 @@ export abstract class UmbBlockManagerContext<
 	 * Set all contents.
 	 * @param {Array<UmbBlockDataModel>} contents - All contents.
 	 */
-	setContents(contents: Array<UmbBlockDataModel>) {
+	setContents(contents: Array<UmbBlockDataModel> | undefined) {
 		this.#contents.setValue(contents);
 	}
 
+	// TODO: make return undefined when undefined in v.19
 	/**
 	 * Get all contents.
 	 * @returns {Array<UmbBlockDataModel>} - All contents.
 	 */
 	getContents(): Array<UmbBlockDataModel> {
-		return this.#contents.value;
+		return this.#contents.value ?? [];
 	}
 
 	/**
 	 * Set all settings.
 	 * @param {Array<UmbBlockDataModel>} settings - All settings.
 	 */
-	setSettings(settings: Array<UmbBlockDataModel>) {
+	setSettings(settings: Array<UmbBlockDataModel> | undefined) {
 		this.#settings.setValue(settings);
 	}
 
+	// TODO: make return undefined when undefined in v.19
 	/**
 	 * Get all settings.
 	 * @returns {Array<UmbBlockDataModel>} - All settings.
 	 */
 	getSettings(): Array<UmbBlockDataModel> {
-		return this.#settings.value;
+		return this.#settings.value ?? [];
 	}
 
 	/**

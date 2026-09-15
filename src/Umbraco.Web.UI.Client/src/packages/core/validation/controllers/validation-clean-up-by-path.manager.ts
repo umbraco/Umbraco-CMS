@@ -45,14 +45,14 @@ export class UmbValidationCleanUpByPathManager<ItemType = unknown> extends UmbCo
 	 * Creates an instance of UmbValidationCleanUpByPathManager.
 	 * @param {UmbControllerHost} host - The host of this controller.
 	 * @param {UmbValidationController} validationController - The Validation Context to remove messages from.
-	 * @param {Observable<Array<ItemType>>} items - An Observable of the items to observe for removals.
+	 * @param {Observable<Array<ItemType> | undefined>} items - An Observable of the items to observe for removals.
 	 * @param {UmbValidationCleanUpByDataPathDataPathResolver<ItemType>} dataPathResolver - Resolves the validation data path of a given item.
 	 * @param {UmbControllerAlias} [controllerAlias] - An optional controller alias, enables replacing this manager with a new one.
 	 */
 	constructor(
 		host: UmbControllerHost,
 		validationController: UmbValidationController,
-		items: Observable<Array<ItemType>>,
+		items: Observable<Array<ItemType> | undefined>,
 		dataPathResolver: UmbValidationCleanUpByDataPathDataPathResolver<ItemType>,
 		controllerAlias?: UmbControllerAlias,
 	) {
@@ -60,10 +60,13 @@ export class UmbValidationCleanUpByPathManager<ItemType = unknown> extends UmbCo
 		this.#validation = validationController;
 		this.#dataPathResolver = dataPathResolver;
 
-		this.observe(items, (currentItems) => this.#setItems(currentItems ?? []), null);
+		this.observe(items, (currentItems) => this.#setItems(currentItems), null);
 	}
 
-	#setItems(items: Array<ItemType>): void {
+	#setItems(items: Array<ItemType> | undefined): void {
+		if (items === undefined) {
+			return;
+		}
 		const dataPaths = new Set<string>();
 		for (const item of items) {
 			const dataPath = this.#dataPathResolver(item);

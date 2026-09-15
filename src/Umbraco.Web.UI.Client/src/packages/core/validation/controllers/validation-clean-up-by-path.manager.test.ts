@@ -3,7 +3,7 @@ import { UmbValidationController } from './validation.controller.js';
 import { UmbValidationCleanUpByPathManager } from './validation-clean-up-by-path.manager.js';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
-import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState, UmbBasicState } from '@umbraco-cms/backoffice/observable-api';
 
 // TODO: Import instead of local definition. [NL]
 @customElement('umb-controller-host-validation-clean-up-manager-test')
@@ -178,5 +178,80 @@ describe('UmbValidationCleanUpByPathManager', () => {
 		validation.destroy();
 
 		expect(() => items.removeOne('a')).to.not.throw();
+	});
+
+	describe('undefined emissions (items not currently known)', () => {
+		// The items Observable emits `undefined` while the current set is not known yet (e.g. still loading).
+		// That must not be read as "the set is empty" — otherwise every message under scope looks removed. [NL]
+		let unknownableItems: UmbBasicState<Array<TestItem> | undefined>;
+
+		beforeEach(() => {
+			unknownableItems = new UmbBasicState<Array<TestItem> | undefined>(undefined);
+		});
+
+		it('remains a no-op when the very first emission is undefined', async () => {
+			validation.messages.addMessage('server', dataPathOfKey('a'), 'error-a');
+
+			new UmbValidationCleanUpByPathManager<TestItem>(
+				host,
+				validation,
+				unknownableItems.asObservable(),
+				dataPathResolver,
+			);
+
+			expect(validation.messages.getHasAnyMessages()).to.be.true;
+		});
+
+		it('removes nothing when the items become undefined after a baseline was established', async () => {
+			validation.messages.addMessage('server', dataPathOfKey('a'), 'error-a');
+			validation.messages.addMessage('server', dataPathOfKey('b'), 'error-b');
+			unknownableItems.setValue([{ key: 'a' }, { key: 'b' }]);
+
+			new UmbValidationCleanUpByPathManager<TestItem>(
+				host,
+				validation,
+				unknownableItems.asObservable(),
+				dataPathResolver,
+			);
+
+			unknownableItems.setValue(undefined);
+
+			expect(validation.messages.getMessages()?.length).to.equal(2);
+		});
+
+		it('keeps the last known baseline across an undefined emission, so a later real emission still detects removals', async () => {
+			validation.messages.addMessage('server', dataPathOfKey('a'), 'error-a');
+			validation.messages.addMessage('server', dataPathOfKey('b'), 'error-b');
+			unknownableItems.setValue([{ key: 'a' }, { key: 'b' }]);
+
+			new UmbValidationCleanUpByPathManager<TestItem>(
+				host,
+				validation,
+				unknownableItems.asObservable(),
+				dataPathResolver,
+			);
+
+			unknownableItems.setValue(undefined);
+			unknownableItems.setValue([{ key: 'a' }]);
+
+			expect(validation.messages.getMessages()?.length).to.equal(1);
+			expect(validation.messages.getMessages()?.[0].body).to.equal('error-a');
+		});
+
+		it('still treats an empty array (as opposed to undefined) as everything having been removed', async () => {
+			validation.messages.addMessage('server', dataPathOfKey('a'), 'error-a');
+			unknownableItems.setValue([{ key: 'a' }]);
+
+			new UmbValidationCleanUpByPathManager<TestItem>(
+				host,
+				validation,
+				unknownableItems.asObservable(),
+				dataPathResolver,
+			);
+
+			unknownableItems.setValue([]);
+
+			expect(validation.messages.getHasAnyMessages()).to.be.false;
+		});
 	});
 });

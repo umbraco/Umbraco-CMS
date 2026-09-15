@@ -3,7 +3,7 @@ import { UmbValidationController } from './validation.controller.js';
 import { UmbValidationCleanUpByUniqueManager } from './validation-clean-up-by-unique.manager.js';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
-import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState, UmbBasicState } from '@umbraco-cms/backoffice/observable-api';
 
 // TODO: Import instead of local definition. [NL]
 @customElement('umb-controller-host-validation-clean-up-by-unique-manager-test')
@@ -217,5 +217,84 @@ describe('UmbValidationCleanUpByUniqueManager', () => {
 		uniques.removeOne('11111111-1111-1111-1111-111111111111');
 
 		expect(validation.messages.getHasAnyMessages()).to.be.false;
+	});
+
+	describe('undefined emissions (uniques not currently known)', () => {
+		// The uniques Observable emits `undefined` while the current set is not known yet (e.g. still loading).
+		// That must not be read as "the set is empty" — otherwise every message under scope looks removed. [NL]
+		let unknownableUniques: UmbBasicState<Array<string> | undefined>;
+
+		beforeEach(() => {
+			unknownableUniques = new UmbBasicState<Array<string> | undefined>(undefined);
+		});
+
+		it('remains a no-op when the very first emission is undefined', async () => {
+			validation.messages.addMessage('server', propertyPath('title'), 'error-title');
+
+			new UmbValidationCleanUpByUniqueManager(
+				host,
+				validation,
+				'$.values',
+				unknownableUniques.asObservable(),
+				byAlias,
+			);
+
+			expect(validation.messages.getHasAnyMessages()).to.be.true;
+		});
+
+		it('removes nothing when the uniques become undefined after a baseline was established', async () => {
+			validation.messages.addMessage('server', propertyPath('title'), 'error-title');
+			validation.messages.addMessage('server', propertyPath('heading'), 'error-heading');
+			unknownableUniques.setValue(['title', 'heading']);
+
+			new UmbValidationCleanUpByUniqueManager(
+				host,
+				validation,
+				'$.values',
+				unknownableUniques.asObservable(),
+				byAlias,
+			);
+
+			unknownableUniques.setValue(undefined);
+
+			expect(validation.messages.getMessages()?.length).to.equal(2);
+		});
+
+		it('keeps the last known baseline across an undefined emission, so a later real emission still detects removals', async () => {
+			validation.messages.addMessage('server', propertyPath('title'), 'error-title');
+			validation.messages.addMessage('server', propertyPath('heading'), 'error-heading');
+			unknownableUniques.setValue(['title', 'heading']);
+
+			new UmbValidationCleanUpByUniqueManager(
+				host,
+				validation,
+				'$.values',
+				unknownableUniques.asObservable(),
+				byAlias,
+			);
+
+			unknownableUniques.setValue(undefined);
+			unknownableUniques.setValue(['title']);
+
+			expect(validation.messages.getMessages()?.length).to.equal(1);
+			expect(validation.messages.getMessages()?.[0].body).to.equal('error-title');
+		});
+
+		it('still treats an empty array (as opposed to undefined) as everything having been removed', async () => {
+			validation.messages.addMessage('server', propertyPath('title'), 'error-title');
+			unknownableUniques.setValue(['title']);
+
+			new UmbValidationCleanUpByUniqueManager(
+				host,
+				validation,
+				'$.values',
+				unknownableUniques.asObservable(),
+				byAlias,
+			);
+
+			unknownableUniques.setValue([]);
+
+			expect(validation.messages.getHasAnyMessages()).to.be.false;
+		});
 	});
 });

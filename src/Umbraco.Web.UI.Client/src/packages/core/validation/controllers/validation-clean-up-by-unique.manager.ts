@@ -41,7 +41,7 @@ export class UmbValidationCleanUpByUniqueManager extends UmbControllerBase {
 	 * @param {UmbControllerHost} host - The host of this controller.
 	 * @param {UmbValidationController} validationController - The Validation Context to remove messages from.
 	 * @param {string} scopePath - The JSON-Path prefix to scan for messages, e.g. `$.values`. Must not contain a bracket itself, as the first bracket found under it is assumed to be the item's own.
-	 * @param {Observable<Array<string>>} uniques - An Observable of the currently known unique identifiers.
+	 * @param {Observable<Array<string> | undefined>} uniques - An Observable of the currently known unique identifiers.
 	 * @param {UmbValidationCleanUpGetUniqueMethod} getUniqueMethod - Resolves the unique identifier of a message's first-bracket query parameters.
 	 * @param {UmbControllerAlias} [controllerAlias] - An optional controller alias, enables replacing this manager with a new one.
 	 */
@@ -62,6 +62,9 @@ export class UmbValidationCleanUpByUniqueManager extends UmbControllerBase {
 	}
 
 	#gotUniques = (uniques: Array<string> | undefined): void => {
+		if (uniques === undefined) {
+			return;
+		}
 		const currentUniques = new Set(uniques ?? []);
 		const knownUniques = this.#knownUniques;
 		this.#knownUniques = currentUniques;
