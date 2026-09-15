@@ -6,6 +6,7 @@ import type { ManifestPropertyEditorUi } from '../extensions/types.js';
  * Deprecated ones are left out, so they cannot be chosen for a data type that is not already using one. They do
  * keep working where they are in use, and one stays in the set while it is the current selection: without that, a
  * data type using a deprecated editor would open the picker showing nothing selected.
+ * @internal
  * @param {Array<ManifestPropertyEditorUi>} propertyEditorUis The Property Editor UIs to narrow.
  * @param {Array<string>} selectedAliases The aliases currently selected.
  * @param {boolean} showDeprecated Whether the deprecated ones are offered anyway.
