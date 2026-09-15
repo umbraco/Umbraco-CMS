@@ -49,7 +49,7 @@ public class MediaMapDefinition : ContentMapDefinition<IMedia, MediaValueRespons
     /// <param name="commonMapper">The <see cref="CommonMapper"/> instance used for common mapping operations.</param>
     /// <param name="dataValueEditorFactory">The <see cref="IDataValueEditorFactory"/> used to create data value editors.</param>
     /// <param name="contentSettings">The <see cref="IOptionsMonitor{ContentSettings}"/> providing access to content settings options.</param>
-    /// <param name="mediaUrlGenerators">The <see cref="MediaUrlGeneratorCollection"/> used to resolve the path of a media item's stored file.</param>
+    /// <param name="mediaUrlGenerators">Used to resolve the path of a media item's stored file.</param>
     [ActivatorUtilitiesConstructor]
     public MediaMapDefinition(
         PropertyEditorCollection propertyEditorCollection,

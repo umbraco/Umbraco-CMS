@@ -14,10 +14,7 @@ public class MediaCollectionResponseModel : ContentCollectionResponseModelBase<M
     public MediaTypeCollectionReferenceResponseModel MediaType { get; set; } = new();
 
     /// <summary>
-    /// Gets or sets the file extension of the media item, without the leading dot and in lowercase.
+    /// Gets or sets the file extension, without the leading dot and in lowercase; <c>null</c> when there is no file.
     /// </summary>
-    /// <remarks>
-    /// <c>null</c> when the item holds no file, such as a folder.
-    /// </remarks>
     public string? Extension { get; set; }
 }
