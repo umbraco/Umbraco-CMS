@@ -128,7 +128,7 @@ internal interface IDatabaseCacheRepository
     Task RemovePublishedContentAsync(int id);
 
     /// <summary>
-    /// Rebuilds the caches for content, media and/or members based on the content type ids specified.
+    /// Rebuilds the caches for content and/or media based on the content type ids specified.
     /// </summary>
     /// <param name="contentTypeIds">
     ///     If not null will process content for the matching content types, if empty will process all
@@ -137,32 +137,6 @@ internal interface IDatabaseCacheRepository
     /// <param name="mediaTypeIds">
     ///     If not null will process content for the matching media types, if empty will process all
     ///     media.
-    /// </param>
-    /// <param name="memberTypeIds">
-    ///     If not null will process content for the matching members types, if empty will process all
-    ///     members.
-    /// </param>
-    [Obsolete("Use the overload accepting an executeStep delegate. Scheduled for removal in Umbraco 19.")]
-    void Rebuild(
-        IReadOnlyCollection<int>? contentTypeIds = null,
-        IReadOnlyCollection<int>? mediaTypeIds = null,
-        IReadOnlyCollection<int>? memberTypeIds = null)
-        => Rebuild(contentTypeIds, mediaTypeIds, memberTypeIds, null);
-
-    /// <summary>
-    /// Rebuilds the caches for content, media and/or members based on the content type ids specified.
-    /// </summary>
-    /// <param name="contentTypeIds">
-    ///     If not null will process content for the matching content types, if empty will process all
-    ///     content.
-    /// </param>
-    /// <param name="mediaTypeIds">
-    ///     If not null will process content for the matching media types, if empty will process all
-    ///     media.
-    /// </param>
-    /// <param name="memberTypeIds">
-    ///     If not null will process content for the matching members types, if empty will process all
-    ///     members.
     /// </param>
     /// <param name="executeStep">
     ///     Optional delegate that wraps each discrete step (delete, page read + insert) in a scope.
@@ -174,6 +148,5 @@ internal interface IDatabaseCacheRepository
     void Rebuild(
         IReadOnlyCollection<int>? contentTypeIds,
         IReadOnlyCollection<int>? mediaTypeIds,
-        IReadOnlyCollection<int>? memberTypeIds,
         Action<Action>? executeStep);
 }

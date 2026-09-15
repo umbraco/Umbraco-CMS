@@ -289,7 +289,7 @@ public class ContentService : RepositoryService, IContentService
             {
                 // Log the error/warning
                 _logger.LogError(
-                    "User '{UserId}' was unable to rollback content '{ContentId}' to version '{VersionId}'", userId, id, versionId);
+                    "User '{UserId}' was unable to rollback content '{ContentId}' (key '{ContentKey}') to version '{VersionId}'", userId, id, content.Key, versionId);
             }
             else
             {
@@ -297,7 +297,7 @@ public class ContentService : RepositoryService, IContentService
                     new ContentRolledBackNotification(content, evtMsgs).WithStateFrom(rollingBackNotification));
 
                 // Logging & Audit message
-                _logger.LogInformation("User '{UserId}' rolled back content '{ContentId}' to version '{VersionId}'", userId, id, versionId);
+                _logger.LogInformation("User '{UserId}' rolled back content '{ContentId}' (key '{ContentKey}') to version '{VersionId}'", userId, id, content.Key, versionId);
                 Audit(AuditType.RollBack, userId, id, $"Content '{content.Name}' was rolled back to version '{versionId}'");
             }
 
@@ -1844,7 +1844,7 @@ public class ContentService : RepositoryService, IContentService
                 if (scope.Notifications.PublishCancelable(
                         new ContentPublishingNotification(content, eventMessages).WithState(notificationState)))
                 {
-                    _logger.LogInformation("Document {ContentName} (id={ContentId}) cannot be published: {Reason}", content.Name, content.Id, "publishing was cancelled");
+                    _logger.LogInformation("Document {ContentName} (id={ContentId}, key={ContentKey}) cannot be published: {Reason}", content.Name, content.Id, content.Key, "publishing was cancelled");
                     return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, eventMessages, content);
                 }
 
@@ -2167,7 +2167,7 @@ public class ContentService : RepositoryService, IContentService
                     PublishResult result = CommitDocumentChangesInternal(scope, d, evtMsgs, allLangs.Value, savingNotification.State, d.WriterId);
                     if (result.Success == false)
                     {
-                        _logger.LogError(null, "Failed to publish document id={DocumentId}, reason={Reason}.", d.Id, result.Result);
+                        _logger.LogError(null, "Failed to publish document id={DocumentId}, key={DocumentKey}, reason={Reason}.", d.Id, d.Key, result.Result);
                     }
 
                     results.Add(result);
@@ -2180,7 +2180,7 @@ public class ContentService : RepositoryService, IContentService
                     PublishResult result = Unpublish(d, userId: d.WriterId);
                     if (result.Success == false)
                     {
-                        _logger.LogError(null, "Failed to unpublish document id={DocumentId}, reason={Reason}.", d.Id, result.Result);
+                        _logger.LogError(null, "Failed to unpublish document id={DocumentId}, key={DocumentKey}, reason={Reason}.", d.Id, d.Key, result.Result);
                     }
 
                     results.Add(result);
@@ -2245,8 +2245,9 @@ public class ContentService : RepositoryService, IContentService
                         if (invalidProperties != null && invalidProperties.Length > 0)
                         {
                             _logger.LogWarning(
-                                "Scheduled publishing will fail for document {DocumentId} and culture {Culture} because of invalid properties {InvalidProperties}",
+                                "Scheduled publishing will fail for document {DocumentId} (key {DocumentKey}) and culture {Culture} because of invalid properties {InvalidProperties}",
                                 d.Id,
+                                d.Key,
                                 culture,
                                 string.Join(",", invalidProperties.Select(x => x.Alias)));
                         }
@@ -2275,7 +2276,7 @@ public class ContentService : RepositoryService, IContentService
 
                     if (result.Success == false)
                     {
-                        _logger.LogError(null, "Failed to publish document id={DocumentId}, reason={Reason}.", d.Id, result.Result);
+                        _logger.LogError(null, "Failed to publish document id={DocumentId}, key={DocumentKey}, reason={Reason}.", d.Id, d.Key, result.Result);
                     }
 
                     results.Add(result);
@@ -2299,7 +2300,7 @@ public class ContentService : RepositoryService, IContentService
 
                     if (result.Success == false)
                     {
-                        _logger.LogError(null, "Failed to publish document id={DocumentId}, reason={Reason}.", d.Id, result.Result);
+                        _logger.LogError(null, "Failed to publish document id={DocumentId}, key={DocumentKey}, reason={Reason}.", d.Id, d.Key, result.Result);
                     }
 
                     results.Add(result);
@@ -3828,9 +3829,10 @@ public class ContentService : RepositoryService, IContentService
         if (content.PublishedState != PublishedState.Publishing && content.PublishedVersionId == 0)
         {
             _logger.LogInformation(
-                "Document {ContentName} (id={ContentId}) cannot be published: {Reason}",
+                "Document {ContentName} (id={ContentId}, key={ContentKey}) cannot be published: {Reason}",
                 content.Name,
                 content.Id,
+                content.Key,
                 "document does not have published values");
             return new PublishResult(PublishResultType.FailedPublishNothingToPublish, evtMsgs, content);
         }
@@ -3848,12 +3850,12 @@ public class ContentService : RepositoryService, IContentService
                     if (!variesByCulture)
                     {
                         _logger.LogInformation(
-                            "Document {ContentName} (id={ContentId}) cannot be published: {Reason}", content.Name, content.Id, "document has expired");
+                            "Document {ContentName} (id={ContentId}, key={ContentKey}) cannot be published: {Reason}", content.Name, content.Id, content.Key, "document has expired");
                     }
                     else
                     {
                         _logger.LogInformation(
-                            "Document {ContentName} (id={ContentId}) culture {Culture} cannot be published: {Reason}", content.Name, content.Id, culture, "document culture has expired");
+                            "Document {ContentName} (id={ContentId}, key={ContentKey}) culture {Culture} cannot be published: {Reason}", content.Name, content.Id, content.Key, culture, "document culture has expired");
                     }
 
                     return new PublishResult(
@@ -3866,17 +3868,19 @@ public class ContentService : RepositoryService, IContentService
                     if (!variesByCulture)
                     {
                         _logger.LogInformation(
-                            "Document {ContentName} (id={ContentId}) cannot be published: {Reason}",
+                            "Document {ContentName} (id={ContentId}, key={ContentKey}) cannot be published: {Reason}",
                             content.Name,
                             content.Id,
+                            content.Key,
                             "document is awaiting release");
                     }
                     else
                     {
                         _logger.LogInformation(
-                            "Document {ContentName} (id={ContentId}) culture {Culture} cannot be published: {Reason}",
+                            "Document {ContentName} (id={ContentId}, key={ContentKey}) culture {Culture} cannot be published: {Reason}",
                             content.Name,
                             content.Id,
+                            content.Key,
                             culture,
                             "document has culture awaiting release");
                     }
@@ -3890,9 +3894,10 @@ public class ContentService : RepositoryService, IContentService
 
                 case ContentStatus.Trashed:
                     _logger.LogInformation(
-                        "Document {ContentName} (id={ContentId}) cannot be published: {Reason}",
+                        "Document {ContentName} (id={ContentId}, key={ContentKey}) cannot be published: {Reason}",
                         content.Name,
                         content.Id,
+                        content.Key,
                         "document is trashed");
                     return new PublishResult(PublishResultType.FailedPublishIsTrashed, evtMsgs, content);
             }
@@ -3907,9 +3912,10 @@ public class ContentService : RepositoryService, IContentService
             if (!pathIsOk)
             {
                 _logger.LogInformation(
-                    "Document {ContentName} (id={ContentId}) cannot be published: {Reason}",
+                    "Document {ContentName} (id={ContentId}, key={ContentKey}) cannot be published: {Reason}",
                     content.Name,
                     content.Id,
+                    content.Key,
                     "parent is not published");
                 return new PublishResult(PublishResultType.FailedPublishPathNotPublished, evtMsgs, content);
             }
@@ -3956,18 +3962,20 @@ public class ContentService : RepositoryService, IContentService
             if (culturesUnpublishing?.Count > 0)
             {
                 _logger.LogInformation(
-                    "Document {ContentName} (id={ContentId}) cultures: {Cultures} have been unpublished.",
+                    "Document {ContentName} (id={ContentId}, key={ContentKey}) cultures: {Cultures} have been unpublished.",
                     content.Name,
                     content.Id,
+                    content.Key,
                     string.Join(",", culturesUnpublishing));
             }
 
             if (culturesPublishing?.Count > 0)
             {
                 _logger.LogInformation(
-                    "Document {ContentName} (id={ContentId}) cultures: {Cultures} have been published.",
+                    "Document {ContentName} (id={ContentId}, key={ContentKey}) cultures: {Cultures} have been published.",
                     content.Name,
                     content.Id,
+                    content.Key,
                     string.Join(",", culturesPublishing));
             }
 
@@ -3984,7 +3992,7 @@ public class ContentService : RepositoryService, IContentService
             return new PublishResult(PublishResultType.SuccessPublishCulture, evtMsgs, content);
         }
 
-        _logger.LogInformation("Document {ContentName} (id={ContentId}) has been published.", content.Name, content.Id);
+        _logger.LogInformation("Document {ContentName} (id={ContentId}, key={ContentKey}) has been published.", content.Name, content.Id, content.Key);
         return new PublishResult(evtMsgs, content);
     }
 
@@ -4009,7 +4017,7 @@ public class ContentService : RepositoryService, IContentService
         if (notificationResult)
         {
             _logger.LogInformation(
-                "Document {ContentName} (id={ContentId}) cannot be unpublished: unpublishing was cancelled.", content.Name, content.Id);
+                "Document {ContentName} (id={ContentId}, key={ContentKey}) cannot be unpublished: unpublishing was cancelled.", content.Name, content.Id, content.Key);
             return new PublishResult(PublishResultType.FailedUnpublishCancelledByEvent, evtMsgs, content);
         }
 
@@ -4050,7 +4058,7 @@ public class ContentService : RepositoryService, IContentService
         if (pastReleases.Count > 0)
         {
             _logger.LogInformation(
-                "Document {ContentName} (id={ContentId}) had its release date removed, because it was unpublished.", content.Name, content.Id);
+                "Document {ContentName} (id={ContentId}, key={ContentKey}) had its release date removed, because it was unpublished.", content.Name, content.Id, content.Key);
         }
 
         _documentRepository.PersistContentSchedule(content, contentSchedule);
@@ -4058,7 +4066,7 @@ public class ContentService : RepositoryService, IContentService
         // change state to unpublishing
         content.PublishedState = PublishedState.Unpublishing;
 
-        _logger.LogInformation("Document {ContentName} (id={ContentId}) has been unpublished.", content.Name, content.Id);
+        _logger.LogInformation("Document {ContentName} (id={ContentId}, key={ContentKey}) has been unpublished.", content.Name, content.Id, content.Key);
         return attempt;
     }
 

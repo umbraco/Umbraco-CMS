@@ -187,6 +187,7 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 
 	override render() {
 		// TODO: add correct UI elements
+		// TODO: move default slot content to a separate component, and registere as a workspace view. [NL]
 		return html`
 			<umb-entity-detail-workspace-editor>
 				<umb-input-with-alias

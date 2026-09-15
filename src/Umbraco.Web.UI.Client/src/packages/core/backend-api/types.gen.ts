@@ -715,6 +715,7 @@ export type DocumentCollectionResponseModel = {
     flags: Array<FlagModel>;
     creator?: string | null;
     sortOrder: number;
+    hasChildren: boolean;
     documentType: DocumentTypeCollectionReferenceResponseModel;
     isTrashed: boolean;
     isProtected: boolean;
@@ -1348,7 +1349,9 @@ export type MediaCollectionResponseModel = {
     flags: Array<FlagModel>;
     creator?: string | null;
     sortOrder: number;
+    hasChildren: boolean;
     mediaType: MediaTypeCollectionReferenceResponseModel;
+    extension?: string | null;
 };
 
 export type MediaConfigurationResponseModel = {
@@ -1366,6 +1369,7 @@ export type MediaItemResponseModel = {
     parent?: ReferenceByIdModel | null;
     hasChildren: boolean;
     mediaType: MediaTypeReferenceResponseModel;
+    extension?: string | null;
     variants: Array<VariantItemResponseModel>;
 };
 
@@ -1403,6 +1407,7 @@ export type MediaTreeItemResponseModel = {
     isTrashed: boolean;
     createDate: string;
     mediaType: MediaTypeReferenceResponseModel;
+    extension?: string | null;
     variants: Array<VariantItemResponseModel>;
 };
 
@@ -3324,6 +3329,7 @@ export type DocumentCollectionResponseModelWritable = {
     flags: Array<FlagModel>;
     creator?: string | null;
     sortOrder: number;
+    hasChildren: boolean;
     documentType: DocumentTypeCollectionReferenceResponseModel;
     isTrashed: boolean;
     isProtected: boolean;

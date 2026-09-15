@@ -314,6 +314,8 @@ export default {
 		isSensitiveValue:
 			'Dieser Wert ist verborgen.\n      Wenn Sie diesen Wert einsehen müssen, wenden Sie sich bitte an einen Administrator.\n    ',
 		isSensitiveValue_short: 'Dieser Wert ist verborgen.',
+		isSensitiveValueNotice:
+			'Wenn Sie die verborgenen Werte einsehen müssen, wenden Sie sich bitte an einen Administrator.',
 		languagesToPublish: 'Welche Sprache möchten Sie veröffentlichen?',
 		languagesToSendForApproval: 'Welche Sprachen möchten Sie zur Freigabe schicken?',
 		languagesToSchedule: 'Welche Sprachen möchten Sie zu einer bestimmten Zeit veröffentlichen?',
@@ -1327,6 +1329,17 @@ export default {
 		sortHelp: 'Ziehen Sie die Elemente an ihre gewünschte neue Position.',
 		sortPleaseWait: 'Bitte warten, die Seiten werden sortiert. Das kann einen Moment dauern.',
 		sortEmptyState: 'Dieser Knoten hat keine Unterknoten zum Sortieren',
+		sortByFieldHeadline: 'Nach Feld sortieren',
+		sortByFieldSentence: 'Alle untergeordneten Elemente sortieren nach',
+		sortByFieldDirectionLabel: 'Richtung',
+		sortByFieldAscending: 'Aufsteigend',
+		sortByFieldDescending: 'Absteigend',
+		sortByFieldNameOption: 'Name',
+		sortByFieldCreateDateOption: 'Erstellt',
+		sortByFieldUpdateDateOption: 'Zuletzt bearbeitet',
+		sortIndividuallyHeadline: 'Einzeln sortieren',
+		sortByFieldCultureSentence: 'in',
+		sortByFieldCultureLabel: 'Sprache',
 	},
 	speechBubbles: {
 		editMultiContentPublishedPartialText: '%0% von %1% Dokumenten veröffentlicht.',

@@ -437,6 +437,32 @@ public class DocumentUrlAliasServiceTests
     }
 
     /// <summary>
+    /// CreateOrUpdateAliasesAsync is only ever reached via a purely local, in-process notification fired on the
+    /// server that made the edit - never something routed from another server's cache-refresh instruction. So
+    /// when the role is still unresolved, this server is almost always the one originating the change and must
+    /// persist it: Unknown must NOT be treated like Subscriber here, or the write is silently dropped.
+    /// </summary>
+    [Test]
+    public async Task CreateOrUpdateAliasesAsync_OnUnknownRole_WithAliases_StillCallsSave()
+    {
+        // Arrange
+        var (service, aliasRepositoryMock, contentServiceMock) = CreateServiceWithMocks(ServerRole.Unknown);
+
+        var documentKey = Guid.NewGuid();
+        contentServiceMock.Setup(x => x.GetById(documentKey))
+            .Returns(CreateInvariantContentWithAlias(documentKey, "my-alias"));
+
+        // Act
+        await service.CreateOrUpdateAliasesAsync(documentKey);
+
+        // Assert
+        aliasRepositoryMock.Verify(
+            x => x.Save(It.IsAny<IEnumerable<PublishedDocumentUrlAlias>>()),
+            Times.Once,
+            "An unresolved server role must still persist URL aliases for its own edits.");
+    }
+
+    /// <summary>
     /// Regression guard for the subscriber guard: Single and SchedulingPublisher roles must still persist
     /// URL aliases as they did before the fix.
     /// </summary>
