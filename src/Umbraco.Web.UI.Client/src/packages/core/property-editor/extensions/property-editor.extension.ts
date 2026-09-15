@@ -50,8 +50,7 @@ export interface MetaPropertyEditorUi {
 	 */
 	keywords?: string[];
 	/**
-	 * Whether this property editor UI is deprecated. A deprecated property editor UI is not offered when picking
-	 * an editor for a data type, but continues to work for the data types already using it.
+	 * Mark a Property Editor as `deprecated` when it should no longer be possible to create new DataTypes that use it.
 	 * @default false
 	 */
 	deprecated?: boolean;
