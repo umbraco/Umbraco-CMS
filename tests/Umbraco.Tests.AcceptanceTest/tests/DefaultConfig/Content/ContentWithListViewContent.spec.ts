@@ -214,10 +214,12 @@ test('can publish child content from list', async ({umbracoApi, umbracoUi}) => {
   expect(childContentData.variants[0].state).toBe(expectedState);
 });
 
-// Product bug: entity-bulk-action.element.ts swallows any execute() error with an empty catch, so a failed
-// bulk publish from the list view (here, a single-item selection that delegates to the regular publish
-// entity action) gives no feedback at all - the individual "..." row action goes through a different
-// wrapper that does call notifyOnError, so only this bulk-toolbar path is affected.
+// Not a confirmed product bug: this consistently fails in automation (the publish correctly 400s with
+// "Parent not published", but no notification appears), yet manually reproducing the identical action
+// (tick the child's checkbox, click Publish in the selection toolbar, confirm) does show the error
+// notification in a real browser. Ruled out a stale/cold notification-module import as the cause - warming
+// it up earlier in the same test doesn't change the outcome. Left skipped pending an explanation for why
+// automation and manual testing disagree here.
 test.skip('can not publish child content from list when parent is not published', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const expectedState = 'Draft';
