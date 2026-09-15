@@ -1,4 +1,3 @@
-/* eslint-disable local-rules/enforce-umbraco-external-imports */
 import type { Editor, ProseMirrorNode } from '../../../externals.js';
 import type { UmbTiptapMenuElement } from '../../../components/menu/tiptap-menu.element.js';
 import { CellSelection, TableMap } from '@tiptap/pm/tables';

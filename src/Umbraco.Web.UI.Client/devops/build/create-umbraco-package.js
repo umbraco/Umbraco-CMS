@@ -1,10 +1,12 @@
 import { createImportMap } from "../importmap/index.js";
+import { createTiptapImportMap } from "../importmap/tiptap.js";
 import { writeFileSync, rmSync } from "fs";
 import { packageJsonName, packageJsonVersion } from "../package/index.js";
 
 const srcDir = './dist-cms';
 const outputModuleList = `${srcDir}/umbraco-package.json`;
-const importmap = createImportMap({ rootDir: '/umbraco/backoffice', additionalImports: {} });
+const rootDir = '/umbraco/backoffice';
+const importmap = createImportMap({ rootDir, additionalImports: createTiptapImportMap(rootDir) });
 
 const umbracoPackageJson = {
 	name: packageJsonName,
