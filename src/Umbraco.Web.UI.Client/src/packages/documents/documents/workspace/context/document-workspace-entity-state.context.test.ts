@@ -39,7 +39,7 @@ describe('UmbContentDetailWorkspaceContextBase (entityState)', () => {
 	});
 
 	it('clears entityState when a load resets the workspace state', async () => {
-		context.entityState.addState({ unique: 'test-state', message: 'Test state' });
+		context.entityState.addState({ unique: 'test-state', label: 'Test state' });
 		expect(context.entityState.getStates()).to.have.lengthOf(1);
 
 		await context.load(INVARIANT_DOCUMENT_ID);

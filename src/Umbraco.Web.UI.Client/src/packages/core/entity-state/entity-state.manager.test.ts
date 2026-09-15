@@ -8,9 +8,9 @@ class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLEle
 
 describe('UmbEntityStateManager', () => {
 	let manager: UmbEntityStateManager;
-	const stateA: UmbEntityStateEntry = { unique: 'a', message: 'State A' };
-	const stateB: UmbEntityStateEntry = { unique: 'b', message: 'State B' };
-	const stateC: UmbEntityStateEntry = { unique: 'c', message: 'State C' };
+	const stateA: UmbEntityStateEntry = { unique: 'a', label: 'State A' };
+	const stateB: UmbEntityStateEntry = { unique: 'b', label: 'State B' };
+	const stateC: UmbEntityStateEntry = { unique: 'c', label: 'State C' };
 
 	beforeEach(() => {
 		const hostElement = new UmbTestControllerHostElement();
@@ -62,7 +62,7 @@ describe('UmbEntityStateManager', () => {
 
 		it('upserts by unique — adding a repeat unique does not throw and replaces the existing entry', () => {
 			manager.addState(stateA);
-			const updatedStateA: UmbEntityStateEntry = { unique: 'a', message: 'Updated State A' };
+			const updatedStateA: UmbEntityStateEntry = { unique: 'a', label: 'Updated State A' };
 			expect(() => manager.addState(updatedStateA)).to.not.throw();
 			expect(manager.getStates()).to.deep.equal([updatedStateA]);
 		});
@@ -114,9 +114,9 @@ describe('UmbEntityStateManager', () => {
 
 		it('orders states by weight descending', () => {
 			manager.addStates([
-				{ unique: 'low', message: 'Low', weight: 1 },
-				{ unique: 'high', message: 'High', weight: 100 },
-				{ unique: 'mid', message: 'Mid', weight: 50 },
+				{ unique: 'low', label: 'Low', weight: 1 },
+				{ unique: 'high', label: 'High', weight: 100 },
+				{ unique: 'mid', label: 'Mid', weight: 50 },
 			]);
 
 			expect(manager.getStates().map((s) => s.unique)).to.deep.equal(['high', 'mid', 'low']);
@@ -124,8 +124,8 @@ describe('UmbEntityStateManager', () => {
 
 		it('keeps insertion order for equal-weight states', () => {
 			manager.addStates([
-				{ unique: 'first', message: 'First', weight: 10 },
-				{ unique: 'second', message: 'Second', weight: 10 },
+				{ unique: 'first', label: 'First', weight: 10 },
+				{ unique: 'second', label: 'Second', weight: 10 },
 			]);
 
 			expect(manager.getStates().map((s) => s.unique)).to.deep.equal(['first', 'second']);
@@ -133,8 +133,8 @@ describe('UmbEntityStateManager', () => {
 
 		it('defaults a missing weight to 0', () => {
 			manager.addStates([
-				{ unique: 'noWeight', message: 'No weight' },
-				{ unique: 'negative', message: 'Negative', weight: -1 },
+				{ unique: 'noWeight', label: 'No weight' },
+				{ unique: 'negative', label: 'Negative', weight: -1 },
 			]);
 
 			expect(manager.getStates().map((s) => s.unique)).to.deep.equal(['noWeight', 'negative']);
@@ -148,8 +148,8 @@ describe('UmbEntityStateManager', () => {
 
 		it('the states observable is weight-sorted too', (done) => {
 			manager.addStates([
-				{ unique: 'low', message: 'Low', weight: 1 },
-				{ unique: 'high', message: 'High', weight: 100 },
+				{ unique: 'low', label: 'Low', weight: 1 },
+				{ unique: 'high', label: 'High', weight: 100 },
 			]);
 
 			manager.states
@@ -169,28 +169,28 @@ describe('UmbEntityStateManager', () => {
 		it('removes only predicate-matching states and adds the new ones', () => {
 			manager.replaceStates(
 				(s) => s.unique === 'a' || s.unique === 'b',
-				[{ unique: 'a2', message: 'Replacement for A' }],
+				[{ unique: 'a2', label: 'Replacement for A' }],
 			);
 
-			expect(manager.getStates()).to.deep.equal([stateC, { unique: 'a2', message: 'Replacement for A' }]);
+			expect(manager.getStates()).to.deep.equal([stateC, { unique: 'a2', label: 'Replacement for A' }]);
 		});
 
 		it('is a pure append when the predicate matches nothing', () => {
 			manager.replaceStates(
 				(s) => s.unique === 'does-not-exist',
-				[{ unique: 'd', message: 'State D' }],
+				[{ unique: 'd', label: 'State D' }],
 			);
 
-			expect(manager.getStates()).to.deep.equal([stateA, stateB, stateC, { unique: 'd', message: 'State D' }]);
+			expect(manager.getStates()).to.deep.equal([stateA, stateB, stateC, { unique: 'd', label: 'State D' }]);
 		});
 
 		it('is a pure replace when the predicate matches everything', () => {
 			manager.replaceStates(
 				() => true,
-				[{ unique: 'only', message: 'Only state' }],
+				[{ unique: 'only', label: 'Only state' }],
 			);
 
-			expect(manager.getStates()).to.deep.equal([{ unique: 'only', message: 'Only state' }]);
+			expect(manager.getStates()).to.deep.equal([{ unique: 'only', label: 'Only state' }]);
 		});
 	});
 

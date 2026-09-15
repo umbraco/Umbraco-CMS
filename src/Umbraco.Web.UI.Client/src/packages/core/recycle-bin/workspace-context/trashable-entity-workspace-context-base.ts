@@ -155,7 +155,7 @@ export abstract class UmbTrashableEntityWorkspaceContextBase extends UmbContextB
 		this.#workspaceContext?.readOnlyGuard.addRule(rule);
 		this.#workspaceContext?.entityState.addState({
 			unique: entityStateUnique,
-			message: '#content_trashed',
+			label: '#content_trashed',
 			look: 'danger',
 			weight: 100,
 		});

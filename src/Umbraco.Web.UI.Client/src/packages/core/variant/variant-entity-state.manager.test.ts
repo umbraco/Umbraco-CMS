@@ -21,7 +21,7 @@ describe('UmbVariantEntityStateManager', () => {
 
 	describe('getStatesForVariant', () => {
 		it('a universal entry (no variantId) matches every variant', () => {
-			const universal: UmbVariantEntityStateEntry = { unique: 'trashed', message: 'Trashed' };
+			const universal: UmbVariantEntityStateEntry = { unique: 'trashed', label: 'Trashed' };
 			manager.addState(universal);
 
 			expect(manager.getStatesForVariant(englishVariant)).to.deep.equal([universal]);
@@ -30,7 +30,7 @@ describe('UmbVariantEntityStateManager', () => {
 		});
 
 		it('a variant-specific entry matches only its own variant', () => {
-			const englishOnly: UmbVariantEntityStateEntry = { unique: 'en-state', message: 'English', variantId: englishVariant };
+			const englishOnly: UmbVariantEntityStateEntry = { unique: 'en-state', label: 'English', variantId: englishVariant };
 			manager.addState(englishOnly);
 
 			expect(manager.getStatesForVariant(englishVariant)).to.deep.equal([englishOnly]);
@@ -38,10 +38,10 @@ describe('UmbVariantEntityStateManager', () => {
 		});
 
 		it('returns multiple simultaneous entries for the same variant, not just one winner', () => {
-			const universal: UmbVariantEntityStateEntry = { unique: 'trashed', message: 'Trashed', weight: 100 };
+			const universal: UmbVariantEntityStateEntry = { unique: 'trashed', label: 'Trashed', weight: 100 };
 			const englishOnly: UmbVariantEntityStateEntry = {
 				unique: 'en-state',
-				message: 'Published',
+				label: 'Published',
 				weight: 50,
 				variantId: englishVariant,
 			};
@@ -51,15 +51,15 @@ describe('UmbVariantEntityStateManager', () => {
 		});
 
 		it('orders results by weight descending, honoring the inherited getStates', () => {
-			const low: UmbVariantEntityStateEntry = { unique: 'low', message: 'Low', weight: 1, variantId: englishVariant };
-			const high: UmbVariantEntityStateEntry = { unique: 'high', message: 'High', weight: 100, variantId: englishVariant };
+			const low: UmbVariantEntityStateEntry = { unique: 'low', label: 'Low', weight: 1, variantId: englishVariant };
+			const high: UmbVariantEntityStateEntry = { unique: 'high', label: 'High', weight: 100, variantId: englishVariant };
 			manager.addStates([low, high]);
 
 			expect(manager.getStatesForVariant(englishVariant).map((s) => s.unique)).to.deep.equal(['high', 'low']);
 		});
 
 		it('returns an empty array when nothing matches', () => {
-			manager.addState({ unique: 'en-state', message: 'English', variantId: englishVariant });
+			manager.addState({ unique: 'en-state', label: 'English', variantId: englishVariant });
 
 			expect(manager.getStatesForVariant(danishVariant)).to.deep.equal([]);
 		});
@@ -67,7 +67,7 @@ describe('UmbVariantEntityStateManager', () => {
 
 	describe('statesForVariant', () => {
 		it('emits the same result as getStatesForVariant, live', (done) => {
-			const universal: UmbVariantEntityStateEntry = { unique: 'trashed', message: 'Trashed' };
+			const universal: UmbVariantEntityStateEntry = { unique: 'trashed', label: 'Trashed' };
 			manager.addState(universal);
 
 			manager
@@ -80,7 +80,7 @@ describe('UmbVariantEntityStateManager', () => {
 		});
 
 		it('only matches its own variant, not others', (done) => {
-			manager.addState({ unique: 'en-state', message: 'English', variantId: englishVariant });
+			manager.addState({ unique: 'en-state', label: 'English', variantId: englishVariant });
 
 			manager
 				.statesForVariant(danishVariant)
@@ -95,7 +95,7 @@ describe('UmbVariantEntityStateManager', () => {
 			const emitted: Array<Array<UmbVariantEntityStateEntry>> = [];
 			const subscription = manager.statesForVariant(englishVariant).subscribe((value) => emitted.push(value));
 
-			const englishOnly: UmbVariantEntityStateEntry = { unique: 'en-state', message: 'English', variantId: englishVariant };
+			const englishOnly: UmbVariantEntityStateEntry = { unique: 'en-state', label: 'English', variantId: englishVariant };
 			manager.addState(englishOnly);
 
 			subscription.unsubscribe();
@@ -106,8 +106,8 @@ describe('UmbVariantEntityStateManager', () => {
 
 	describe('getStatesForVariants', () => {
 		it('returns each variantId paired with its matching states, matching getStatesForVariant per variant', () => {
-			const universal: UmbVariantEntityStateEntry = { unique: 'trashed', message: 'Trashed' };
-			const englishOnly: UmbVariantEntityStateEntry = { unique: 'en-state', message: 'English', variantId: englishVariant };
+			const universal: UmbVariantEntityStateEntry = { unique: 'trashed', label: 'Trashed' };
+			const englishOnly: UmbVariantEntityStateEntry = { unique: 'en-state', label: 'English', variantId: englishVariant };
 			manager.addStates([universal, englishOnly]);
 
 			expect(manager.getStatesForVariants([englishVariant, danishVariant])).to.deep.equal([
@@ -117,7 +117,7 @@ describe('UmbVariantEntityStateManager', () => {
 		});
 
 		it('returns an empty array for an empty variantId list', () => {
-			manager.addState({ unique: 'trashed', message: 'Trashed' });
+			manager.addState({ unique: 'trashed', label: 'Trashed' });
 
 			expect(manager.getStatesForVariants([])).to.deep.equal([]);
 		});
@@ -125,22 +125,22 @@ describe('UmbVariantEntityStateManager', () => {
 
 	describe('replaceStates scoped by a producer-owned prefix', () => {
 		it('drops only that producer\'s stale variant entries, leaving other producers and other variants untouched', () => {
-			const trashed: UmbVariantEntityStateEntry = { unique: 'trashed', message: 'Trashed' };
+			const trashed: UmbVariantEntityStateEntry = { unique: 'trashed', label: 'Trashed' };
 			const oldEnglishPublishState: UmbVariantEntityStateEntry = {
 				unique: 'UMB_PUBLISH_STATE_en',
-				message: 'Draft',
+				label: 'Draft',
 				variantId: englishVariant,
 			};
 			const danishPublishState: UmbVariantEntityStateEntry = {
 				unique: 'UMB_PUBLISH_STATE_da',
-				message: 'Published',
+				label: 'Published',
 				variantId: danishVariant,
 			};
 			manager.addStates([trashed, oldEnglishPublishState, danishPublishState]);
 
 			const newEnglishPublishState: UmbVariantEntityStateEntry = {
 				unique: 'UMB_PUBLISH_STATE_en',
-				message: 'Published',
+				label: 'Published',
 				variantId: englishVariant,
 			};
 			manager.replaceStates(
@@ -154,7 +154,7 @@ describe('UmbVariantEntityStateManager', () => {
 
 	describe('statesForVariants', () => {
 		it('emits resolved states per variant, and re-emits when the registry changes', (done) => {
-			const universal: UmbVariantEntityStateEntry = { unique: 'trashed', message: 'Trashed' };
+			const universal: UmbVariantEntityStateEntry = { unique: 'trashed', label: 'Trashed' };
 			manager.addState(universal);
 
 			const emitted: Array<Array<{ variantId: UmbVariantId; states: Array<UmbVariantEntityStateEntry> }>> = [];

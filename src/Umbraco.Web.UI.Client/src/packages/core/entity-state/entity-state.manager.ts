@@ -1,13 +1,15 @@
 import type { UmbEntityStateLook } from './entity-state-look.js';
-import type { UmbState } from '@umbraco-cms/backoffice/utils';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 
-export interface UmbEntityStateEntry extends UmbState {
+export interface UmbEntityStateEntry {
+	unique: string;
 	look?: UmbEntityStateLook;
+	/** Short, prominent text shown on the tag itself. */
+	label?: string;
 	/**
 	 * Extra detail shown as a tooltip on hover — rendered via the native `title` attribute for now, until a
-	 * custom tooltip component exists to replace it. Keep `message` itself short and generic; put anything more
+	 * custom tooltip component exists to replace it. Keep `label` itself short and generic; put anything more
 	 * specific here.
 	 */
 	detail?: string;

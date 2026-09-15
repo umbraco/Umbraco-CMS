@@ -57,16 +57,16 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 	 * pushed from `UmbTrashableEntityWorkspaceContextBase`; pushing it again here would double the tag.
 	 */
 	#publishStateConfig: Partial<
-		Record<UmbDocumentVariantState, { message: string; look?: UmbEntityStateLook; weight: number }>
+		Record<UmbDocumentVariantState, { label: string; look?: UmbEntityStateLook; weight: number }>
 	> = {
-		[UmbDocumentVariantState.DRAFT]: { message: '#content_unpublished', weight: 10 },
-		[UmbDocumentVariantState.PUBLISHED]: { message: '#content_published', look: 'positive', weight: 50 },
+		[UmbDocumentVariantState.DRAFT]: { label: '#content_unpublished', weight: 10 },
+		[UmbDocumentVariantState.PUBLISHED]: { label: '#content_published', look: 'positive', weight: 50 },
 		[UmbDocumentVariantState.PUBLISHED_PENDING_CHANGES]: {
-			message: '#content_published',
+			label: '#content_published',
 			look: 'positive',
 			weight: 50,
 		},
-		[UmbDocumentVariantState.NOT_CREATED]: { message: '#content_notCreated', weight: 0 },
+		[UmbDocumentVariantState.NOT_CREATED]: { label: '#content_notCreated', weight: 0 },
 	};
 
 	#init: Promise<unknown>;
@@ -736,7 +736,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 					acc.push({
 						unique: `UMB_PUBLISH_STATE_${variantId.toString()}`,
 						variantId,
-						message: isPendingChanges ? '#content_publishedPendingChanges' : config.message,
+						label: isPendingChanges ? '#content_publishedPendingChanges' : config.label,
 						look: config.look,
 						weight: config.weight,
 					});

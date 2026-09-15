@@ -23,8 +23,8 @@ describe('UmbEntityStateTagsElement', () => {
 
 	it('renders one tag per state, in the given array order', async () => {
 		element.states = [
-			{ unique: 'a', message: 'First' },
-			{ unique: 'b', message: 'Second' },
+			{ unique: 'a', label: 'First' },
+			{ unique: 'b', label: 'Second' },
 		];
 		await element.updateComplete;
 
@@ -43,7 +43,7 @@ describe('UmbEntityStateTagsElement', () => {
 
 	lookCases.forEach(({ look, expectedColor }) => {
 		it(`maps look "${look}" to color "${expectedColor}"`, async () => {
-			const state: UmbEntityStateEntry = { unique: 'a', message: 'Test', look };
+			const state: UmbEntityStateEntry = { unique: 'a', label: 'Test', look };
 			element.states = [state];
 			await element.updateComplete;
 
@@ -52,21 +52,21 @@ describe('UmbEntityStateTagsElement', () => {
 	});
 
 	it('always sets look="secondary" on the rendered tag', async () => {
-		element.states = [{ unique: 'a', message: 'Test' }];
+		element.states = [{ unique: 'a', label: 'Test' }];
 		await element.updateComplete;
 
 		expect(tags()[0].getAttribute('look')).to.equal('secondary');
 	});
 
 	it('sets title to the localized detail when present', async () => {
-		element.states = [{ unique: 'a', message: 'Test', detail: 'Some detail' }];
+		element.states = [{ unique: 'a', label: 'Test', detail: 'Some detail' }];
 		await element.updateComplete;
 
 		expect(tags()[0].getAttribute('title')).to.equal('Some detail');
 	});
 
 	it('omits the title attribute entirely when detail is absent', async () => {
-		element.states = [{ unique: 'a', message: 'Test' }];
+		element.states = [{ unique: 'a', label: 'Test' }];
 		await element.updateComplete;
 
 		expect(tags()[0].hasAttribute('title')).to.be.false;

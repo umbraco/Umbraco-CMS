@@ -29,7 +29,7 @@ export class UmbEntityStateTagsElement extends UmbLitElement {
 					color=${entry.look ? LOOK_TO_UUI_COLOR[entry.look] : 'default'}
 					look="secondary"
 					title=${ifDefined(entry.detail ? this.localize.string(entry.detail) : undefined)}>
-					${this.localize.string(entry.message ?? '')}
+					${this.localize.string(entry.label ?? '')}
 				</uui-tag>
 			`,
 		);

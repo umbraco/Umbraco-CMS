@@ -265,13 +265,13 @@ describe('UmbDocumentPublishingWorkspaceContext', function () {
 		it('pushes a Published entry for a published variant', () => {
 			const states = context.entityState.getStatesForVariant(EN_US);
 			expect(states).to.have.lengthOf(1);
-			expect(states[0]).to.deep.include({ message: '#content_published', look: 'positive', weight: 50 });
+			expect(states[0]).to.deep.include({ label: '#content_published', look: 'positive', weight: 50 });
 		});
 
 		it('pushes a Draft entry for an unpublished variant', () => {
 			const states = context.entityState.getStatesForVariant(DA);
 			expect(states).to.have.lengthOf(1);
-			expect(states[0]).to.deep.include({ message: '#content_unpublished', weight: 10 });
+			expect(states[0]).to.deep.include({ label: '#content_unpublished', weight: 10 });
 			expect(states[0].look).to.be.undefined;
 		});
 
@@ -281,7 +281,7 @@ describe('UmbDocumentPublishingWorkspaceContext', function () {
 
 			const states = context.entityState.getStatesForVariant(INVARIANT);
 			expect(states).to.have.lengthOf(1);
-			expect(states[0]).to.deep.include({ message: '#content_published', look: 'positive', weight: 50 });
+			expect(states[0]).to.deep.include({ label: '#content_published', look: 'positive', weight: 50 });
 		});
 
 		it('pushes a Not created entry for a language with no variant yet', async () => {
@@ -290,23 +290,23 @@ describe('UmbDocumentPublishingWorkspaceContext', function () {
 
 			const states = context.entityState.getStatesForVariant(EN_US);
 			expect(states).to.have.lengthOf(1);
-			expect(states[0]).to.deep.include({ message: '#content_notCreated', weight: 0 });
+			expect(states[0]).to.deep.include({ label: '#content_notCreated', weight: 0 });
 			expect(states[0].look).to.be.undefined;
 		});
 
-		it('overrides the message to pending-changes for a published variant with unsaved changes', async () => {
+		it('overrides the label to pending-changes for a published variant with unsaved changes', async () => {
 			await context.setPropertyValue('variantText', 'Edited English', EN_US);
 			await context.requestSave();
 			await aTimeout(0);
 
 			const enStates = context.entityState.getStatesForVariant(EN_US);
 			expect(enStates).to.have.lengthOf(1);
-			expect(enStates[0]).to.deep.include({ message: '#content_publishedPendingChanges', look: 'positive', weight: 50 });
+			expect(enStates[0]).to.deep.include({ label: '#content_publishedPendingChanges', look: 'positive', weight: 50 });
 
 			// da was never published, so editing en-US must not affect its own Draft entry.
 			const daStates = context.entityState.getStatesForVariant(DA);
 			expect(daStates).to.have.lengthOf(1);
-			expect(daStates[0]).to.deep.include({ message: '#content_unpublished', weight: 10 });
+			expect(daStates[0]).to.deep.include({ label: '#content_unpublished', weight: 10 });
 		});
 
 		it('replaces the stale entry rather than duplicating it when a variant changes state', async () => {
