@@ -116,14 +116,22 @@ stages:
               targetPath: $(Build.SourcesDirectory)/src/Umbraco.Cms/bin/Release
               artifactName: csharp-docs-dlls
           - powershell: |
-              dotnet tool install --global CycloneDX
-              dotnet-CycloneDX $(solution) --spec-version 1.5 --output $(Build.ArtifactStagingDirectory)/bom --filename bom-dotnet.xml
+              dotnet tool install --global Umbraco.Internal.Sbom
+              # umbraco-sbom scans every project in the solution and requires each to be restored.
+              # These two are excluded from the Release build config, so the solution restore/build
+              # skips them; restore them explicitly to avoid a failure.
+              dotnet restore $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest.UmbracoProject/Umbraco.Tests.AcceptanceTest.UmbracoProject.csproj
+              dotnet restore $(Build.SourcesDirectory)/tools/Umbraco.JsonSchema/Umbraco.JsonSchema.csproj
+              umbraco-sbom $(solution) --output-file $(Build.ArtifactStagingDirectory)/bom/bom-dotnet.xml --allow-package nuget:SixLabors.*
+              if ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne 10) { exit $LASTEXITCODE }
+              exit 0
             displayName: 'Generate Backend BOM'
           - powershell: |
-              npm install --global @cyclonedx/cyclonedx-npm
-              cyclonedx-npm -o $(Build.ArtifactStagingDirectory)\bom\bom-login.xml --ignore-npm-errors --verbose
+              dotnet tool install --global Umbraco.Internal.Sbom
+              umbraco-sbom $(Build.SourcesDirectory)/src/Umbraco.Web.UI.Login --output-file $(Build.ArtifactStagingDirectory)/bom-login/bom-login.xml
+              if ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne 10) { exit $LASTEXITCODE }
+              exit 0
             displayName: Generate Login UI BOM
-            workingDirectory: src/Umbraco.Web.UI.Login
           - task: PublishPipelineArtifact@1
             displayName: Publish nupkg
             inputs:
@@ -139,6 +147,11 @@ stages:
             inputs:
               targetPath: $(Build.ArtifactStagingDirectory)/bom
               artifactName: bom-backend
+          - task: PublishPipelineArtifact@1
+            displayName: Publish Login BOM
+            inputs:
+              targetPath: $(Build.ArtifactStagingDirectory)/bom-login
+              artifactName: bom-login
 
       - job: B
         displayName: Build Bellissima Package
@@ -150,11 +163,16 @@ stages:
             lfs: false,
             fetchDepth: 500
           - template: templates/backoffice-install.yml
+          - task: UseDotNet@2
+            displayName: Use .NET SDK from global.json
+            inputs:
+              useGlobalJson: true
           - powershell: |
-              npm install --global @cyclonedx/cyclonedx-npm
-              cyclonedx-npm -o $(Build.ArtifactStagingDirectory)/bom/bom-backoffice.xml --ignore-npm-errors --verbose
+              dotnet tool install --global Umbraco.Internal.Sbom
+              umbraco-sbom $(Build.SourcesDirectory)/src/Umbraco.Web.UI.Client --output-file $(Build.ArtifactStagingDirectory)/bom/bom-backoffice.xml
+              if ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne 10) { exit $LASTEXITCODE }
+              exit 0
             displayName: Generate Backoffice UI BOM
-            workingDirectory: src/Umbraco.Web.UI.Client
           - script: npm run build:for:npm
             displayName: Run build:for:npm
             workingDirectory: src/Umbraco.Web.UI.Client
@@ -220,11 +238,16 @@ stages:
           parameters:
             nodeVersion: ${{ variables.nodeVersion }}
             npm_config_cache: ${{ variables.npm_config_cache }}
+        - task: UseDotNet@2
+          displayName: Use .NET SDK from global.json
+          inputs:
+            useGlobalJson: true
         - powershell: |
-            npm install --global @cyclonedx/cyclonedx-npm
-            cyclonedx-npm -o $(Build.ArtifactStagingDirectory)/bom/bom-e2e.xml --ignore-npm-errors --verbose
+            dotnet tool install --global Umbraco.Internal.Sbom
+            umbraco-sbom $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest --output-file $(Build.ArtifactStagingDirectory)/bom/bom-e2e.xml
+            if ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne 10) { exit $LASTEXITCODE }
+            exit 0
           displayName: Generate E2E Tests BOM
-          workingDirectory: tests/Umbraco.Tests.AcceptanceTest
         - publish: $(Build.ArtifactStagingDirectory)/bom
           artifact: bom-e2e
           displayName: 'Publish E2E BOM'
@@ -784,7 +807,7 @@ stages:
               artifact: "bom-backend"
               bomFilePath: "bom-dotnet.xml"
             - name: "Login"
-              artifact: "bom-backend"
+              artifact: "bom-login"
               bomFilePath: "bom-login.xml"
             - name: "Backoffice"
               artifact: "bom-frontend"
