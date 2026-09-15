@@ -1,3 +1,4 @@
+using System.Threading;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.ContentEditing.Validation;
@@ -79,7 +80,26 @@ public interface IMediaEditingService
     ///     <see cref="Attempt{TResult,TStatus}"/> with the moved <see cref="IMedia"/> item (if successful)
     ///     and <see cref="ContentEditingOperationStatus"/> indicating the operation outcome.
     /// </returns>
+    [Obsolete("Use the overload that takes a CancellationToken instead. Scheduled for removal in Umbraco 19.")]
     Task<Attempt<IMedia?, ContentEditingOperationStatus>> MoveToRecycleBinAsync(Guid key, Guid userKey);
+
+    /// <summary>
+    ///     Moves a media item to the recycle bin, observing a <see cref="CancellationToken" /> so a long move over
+    ///     many descendants can be interrupted.
+    /// </summary>
+    /// <param name="key">The unique identifier of the media item to move to the recycle bin.</param>
+    /// <param name="userKey">The unique identifier of the user performing the operation.</param>
+    /// <param name="cancellationToken">A token that can be used to request cancellation of the move.</param>
+    /// <returns>
+    ///     A task that represents the asynchronous operation. The task result contains an
+    ///     <see cref="Attempt{TResult,TStatus}"/> with the moved <see cref="IMedia"/> item (if successful)
+    ///     and <see cref="ContentEditingOperationStatus"/> indicating the operation outcome.
+    /// </returns>
+    // TODO (V19): Remove the default implementation when the obsolete overload without a CancellationToken is removed.
+#pragma warning disable CS0618 // Type or member is obsolete
+    Task<Attempt<IMedia?, ContentEditingOperationStatus>> MoveToRecycleBinAsync(Guid key, Guid userKey, CancellationToken cancellationToken)
+        => MoveToRecycleBinAsync(key, userKey);
+#pragma warning restore CS0618 // Type or member is obsolete
 
     /// <summary>
     ///     Permanently deletes a media item.
@@ -104,7 +124,27 @@ public interface IMediaEditingService
     ///     <see cref="Attempt{TResult,TStatus}"/> with the moved <see cref="IMedia"/> item (if successful)
     ///     and <see cref="ContentEditingOperationStatus"/> indicating the operation outcome.
     /// </returns>
+    [Obsolete("Use the overload that takes a CancellationToken instead. Scheduled for removal in Umbraco 19.")]
     Task<Attempt<IMedia?, ContentEditingOperationStatus>> MoveAsync(Guid key, Guid? parentKey, Guid userKey);
+
+    /// <summary>
+    ///     Moves a media item to a new parent location, observing a <see cref="CancellationToken" /> so a long move
+    ///     over many descendants can be interrupted.
+    /// </summary>
+    /// <param name="key">The unique identifier of the media item to move.</param>
+    /// <param name="parentKey">The unique identifier of the new parent, or <c>null</c> to move to the root.</param>
+    /// <param name="userKey">The unique identifier of the user performing the operation.</param>
+    /// <param name="cancellationToken">A token that can be used to request cancellation of the move.</param>
+    /// <returns>
+    ///     A task that represents the asynchronous operation. The task result contains an
+    ///     <see cref="Attempt{TResult,TStatus}"/> with the moved <see cref="IMedia"/> item (if successful)
+    ///     and <see cref="ContentEditingOperationStatus"/> indicating the operation outcome.
+    /// </returns>
+    // TODO (V19): Remove the default implementation when the obsolete overload without a CancellationToken is removed.
+#pragma warning disable CS0618 // Type or member is obsolete
+    Task<Attempt<IMedia?, ContentEditingOperationStatus>> MoveAsync(Guid key, Guid? parentKey, Guid userKey, CancellationToken cancellationToken)
+        => MoveAsync(key, parentKey, userKey);
+#pragma warning restore CS0618 // Type or member is obsolete
 
     /// <summary>
     ///     Sorts media items under a specified parent.
@@ -188,4 +228,27 @@ public interface IMediaEditingService
         return RestoreAsync(key, parentKey, userKey);
 #pragma warning restore CS0618 // Type or member is obsolete
     }
+
+    /// <summary>
+    ///     Restores a media item from the recycle bin to a specified parent location, optionally leaving its
+    ///     descendants behind, observing a <see cref="CancellationToken" /> so a long restore over many descendants
+    ///     can be interrupted.
+    /// </summary>
+    /// <param name="key">The unique identifier of the media item to restore.</param>
+    /// <param name="parentKey">The unique identifier of the parent to restore to, or <c>null</c> to restore to the root.</param>
+    /// <param name="userKey">The unique identifier of the user performing the operation.</param>
+    /// <param name="includeDescendants">
+    ///     Whether to restore the descendants of the media item along with it. When <c>false</c>, only the media item
+    ///     itself is restored and its descendants remain in the recycle bin as top-level bin items, ready to be
+    ///     restored later.
+    /// </param>
+    /// <param name="cancellationToken">A token that can be used to request cancellation of the restore.</param>
+    /// <returns>
+    ///     A task that represents the asynchronous operation. The task result contains an
+    ///     <see cref="Attempt{TResult,TStatus}"/> with the restored <see cref="IMedia"/> item (if successful)
+    ///     and <see cref="ContentEditingOperationStatus"/> indicating the operation outcome.
+    /// </returns>
+    // TODO (V19): Remove the default implementation when the obsolete overload without a CancellationToken is removed.
+    Task<Attempt<IMedia?, ContentEditingOperationStatus>> RestoreAsync(Guid key, Guid? parentKey, Guid userKey, bool includeDescendants, CancellationToken cancellationToken)
+        => RestoreAsync(key, parentKey, userKey, includeDescendants);
 }

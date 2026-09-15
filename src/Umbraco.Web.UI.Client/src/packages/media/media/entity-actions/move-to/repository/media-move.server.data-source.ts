@@ -23,10 +23,11 @@ export class UmbMoveMediaServerDataSource implements UmbMoveDataSource {
 	/**
 	 * Move an item for the given id to the target unique
 	 * @param {UmbMoveToRequestArgs} args - The move request arguments
+	 * @param {AbortSignal} [abortSignal] - Aborts the request.
 	 * @returns {UmbDataSourceErrorResponse} A promise that resolves once the media has been moved
 	 * @memberof UmbMoveMediaServerDataSource
 	 */
-	async moveTo(args: UmbMoveToRequestArgs): Promise<UmbDataSourceErrorResponse> {
+	async moveTo(args: UmbMoveToRequestArgs, abortSignal?: AbortSignal): Promise<UmbDataSourceErrorResponse> {
 		if (!args.unique) throw new Error('Unique is missing');
 		if (args.destination.unique === undefined) throw new Error('Destination unique is missing');
 
@@ -37,6 +38,7 @@ export class UmbMoveMediaServerDataSource implements UmbMoveDataSource {
 				body: {
 					target: args.destination.unique ? { id: args.destination.unique } : null,
 				},
+				signal: abortSignal,
 			}),
 		);
 	}

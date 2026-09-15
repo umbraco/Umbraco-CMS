@@ -1,3 +1,4 @@
+using System.Threading;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -96,7 +97,7 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
     /// <param name="userId">The user performing the operation.</param>
     /// <returns>The operation result.</returns>
     protected OperationResult? Move(TContent content, int newParentId, int userId)
-        => Move(content, newParentId, includeDescendants: true, userId);
+        => Move(content, newParentId, includeDescendants: true, userId, CancellationToken.None);
 
     /// <summary>
     /// Moves content to a new parent, optionally leaving its descendants behind.
@@ -108,8 +109,9 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
     /// be set to <c>false</c> to restore only the content item itself, leaving its descendants in the recycle bin.
     /// </param>
     /// <param name="userId">The user performing the operation.</param>
+    /// <param name="cancellationToken">A token that can be used to request cancellation of the move.</param>
     /// <returns>The operation result.</returns>
-    protected abstract OperationResult? Move(TContent content, int newParentId, bool includeDescendants, int userId);
+    protected abstract OperationResult? Move(TContent content, int newParentId, bool includeDescendants, int userId, CancellationToken cancellationToken);
 
     /// <summary>
     /// Copies content to a new parent.
@@ -119,24 +121,27 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
     /// <param name="relateToOriginal">Whether to create a relation to the original.</param>
     /// <param name="includeDescendants">Whether to include descendants in the copy.</param>
     /// <param name="userId">The user performing the operation.</param>
+    /// <param name="cancellationToken">A token that can be used to request cancellation of the copy.</param>
     /// <returns>The copied content, or null if the operation failed.</returns>
-    protected abstract TContent? Copy(TContent content, int newParentId, bool relateToOriginal, bool includeDescendants, int userId);
+    protected abstract TContent? Copy(TContent content, int newParentId, bool relateToOriginal, bool includeDescendants, int userId, CancellationToken cancellationToken);
 
     /// <summary>
     /// Moves content to the recycle bin.
     /// </summary>
     /// <param name="content">The content to move to recycle bin.</param>
     /// <param name="userId">The user performing the operation.</param>
+    /// <param name="cancellationToken">A token that can be used to request cancellation of the move.</param>
     /// <returns>The operation result.</returns>
-    protected abstract OperationResult? MoveToRecycleBin(TContent content, int userId);
+    protected abstract OperationResult? MoveToRecycleBin(TContent content, int userId, CancellationToken cancellationToken);
 
     /// <summary>
     /// Deletes content.
     /// </summary>
     /// <param name="content">The content to delete.</param>
     /// <param name="userId">The user performing the operation.</param>
+    /// <param name="cancellationToken">A token that can be used to request cancellation of the delete. Ignored by implementations for which delete is not cancellable.</param>
     /// <returns>The operation result.</returns>
-    protected abstract OperationResult? Delete(TContent content, int userId);
+    protected abstract OperationResult? Delete(TContent content, int userId, CancellationToken cancellationToken);
 
     /// <summary>
     /// Gets the current content settings.
@@ -272,15 +277,17 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
     /// </summary>
     /// <param name="key">The content key.</param>
     /// <param name="userKey">The user key performing the operation.</param>
+    /// <param name="cancellationToken">A token that can be used to request cancellation of the move.</param>
     /// <returns>An attempt containing the content and operation status.</returns>
-    protected async Task<Attempt<TContent?, ContentEditingOperationStatus>> HandleMoveToRecycleBinAsync(Guid key, Guid userKey)
+    protected async Task<Attempt<TContent?, ContentEditingOperationStatus>> HandleMoveToRecycleBinAsync(Guid key, Guid userKey, CancellationToken cancellationToken = default)
         => await HandleDeletionAsync(
                 key,
                 userKey,
                 ContentTrashStatusRequirement.MustNotBeTrashed,
                 MoveToRecycleBin,
                 ContentSettings.DisableDeleteWhenReferenced,
-                ContentEditingOperationStatus.CannotMoveToRecycleBinWhenReferenced);
+                ContentEditingOperationStatus.CannotMoveToRecycleBinWhenReferenced,
+                cancellationToken);
 
     /// <summary>
     /// Handles deleting content.
@@ -298,7 +305,8 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
                     : ContentTrashStatusRequirement.Irrelevant,
                 Delete,
                 ContentSettings.DisableDeleteWhenReferenced,
-                ContentEditingOperationStatus.CannotDeleteWhenReferenced);
+                ContentEditingOperationStatus.CannotDeleteWhenReferenced,
+                CancellationToken.None);
 
     // helper method to perform move-to-recycle-bin, delete-from-recycle-bin and delete for content as they are very much handled in the same way
     // IContentEditingService methods hitting this (ContentTrashStatusRequirement, calledFunction):
@@ -309,9 +317,10 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         Guid key,
         Guid userKey,
         ContentTrashStatusRequirement trashStatusRequirement,
-        Func<TContent, int, OperationResult?> performDelete,
+        Func<TContent, int, CancellationToken, OperationResult?> performDelete,
         bool disabledWhenReferenced,
-        ContentEditingOperationStatus referenceFailStatus)
+        ContentEditingOperationStatus referenceFailStatus,
+        CancellationToken cancellationToken)
     {
         using ICoreScope scope = CoreScopeProvider.CreateCoreScope();
         TContent? content = ContentService.GetById(key);
@@ -354,7 +363,7 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         }
 
         var userId = await GetUserIdAsync(userKey);
-        OperationResult? deleteResult = performDelete(content, userId);
+        OperationResult? deleteResult = performDelete(content, userId, cancellationToken);
 
         scope.Complete();
 
@@ -372,8 +381,9 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
     /// Whether to move the descendants along with the content. When restoring out of the recycle bin this can be set to
     /// <c>false</c> to restore only the content item itself, leaving its descendants in the recycle bin.
     /// </param>
+    /// <param name="cancellationToken">A token that can be used to request cancellation of the move.</param>
     /// <returns>An attempt containing the content and operation status.</returns>
-    protected async Task<Attempt<TContent?, ContentEditingOperationStatus>> HandleMoveAsync(Guid key, Guid? parentKey, Guid userKey, bool mustBeInRecycleBin = false, bool includeDescendants = true)
+    protected async Task<Attempt<TContent?, ContentEditingOperationStatus>> HandleMoveAsync(Guid key, Guid? parentKey, Guid userKey, bool mustBeInRecycleBin = false, bool includeDescendants = true, CancellationToken cancellationToken = default)
     {
         using ICoreScope scope = CoreScopeProvider.CreateCoreScope();
         TContent? content = ContentService.GetById(key);
@@ -414,7 +424,7 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         }
 
         var userId = await GetUserIdAsync(userKey);
-        OperationResult? moveResult = Move(content, parent.ParentId ?? Constants.System.Root, includeDescendants, userId);
+        OperationResult? moveResult = Move(content, parent.ParentId ?? Constants.System.Root, includeDescendants, userId, cancellationToken);
 
         scope.Complete();
 
@@ -429,8 +439,9 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
     /// <param name="relateToOriginal">Whether to create a relation to the original.</param>
     /// <param name="includeDescendants">Whether to include descendants in the copy.</param>
     /// <param name="userKey">The user key performing the operation.</param>
+    /// <param name="cancellationToken">A token that can be used to request cancellation of the copy.</param>
     /// <returns>An attempt containing the copied content and operation status.</returns>
-    protected async Task<Attempt<TContent?, ContentEditingOperationStatus>> HandleCopyAsync(Guid key, Guid? parentKey, bool relateToOriginal, bool includeDescendants, Guid userKey)
+    protected async Task<Attempt<TContent?, ContentEditingOperationStatus>> HandleCopyAsync(Guid key, Guid? parentKey, bool relateToOriginal, bool includeDescendants, Guid userKey, CancellationToken cancellationToken = default)
     {
         using ICoreScope scope = CoreScopeProvider.CreateCoreScope();
         TContent? content = ContentService.GetById(key);
@@ -448,7 +459,7 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         }
 
         var userId = await GetUserIdAsync(userKey);
-        TContent? copy = Copy(content, parent.ParentId ?? Constants.System.Root, relateToOriginal, includeDescendants, userId);
+        TContent? copy = Copy(content, parent.ParentId ?? Constants.System.Root, relateToOriginal, includeDescendants, userId, cancellationToken);
         scope.Complete();
 
         // we'll assume that we have performed all validations for unsuccessful scenarios above, so a null result here

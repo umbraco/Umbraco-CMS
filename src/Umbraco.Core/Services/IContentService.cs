@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using System.Threading;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
@@ -490,6 +491,7 @@ public interface IContentService : IContentServiceBase<IContent>
     /// </param>
     /// <param name="userId">The identifier of the user performing the action.</param>
     /// <returns>The operation result.</returns>
+    [Obsolete("Use the overload that takes a CancellationToken instead. Scheduled for removal in Umbraco 19.")]
 #pragma warning disable CS0618 // Type or member is obsolete - the int-userId overloads still default to SuperUserId; there is no non-obsolete int equivalent until it is removed in v18
     OperationResult Move(IContent content, int parentId, bool includeDescendants, int userId = Constants.Security.SuperUserId)
 #pragma warning restore CS0618 // Type or member is obsolete
@@ -504,6 +506,26 @@ public interface IContentService : IContentServiceBase<IContent>
 
         return Move(content, parentId, userId);
     }
+
+    /// <summary>
+    ///     Moves a document under a new parent, optionally leaving its descendants behind, observing a
+    ///     <see cref="CancellationToken" /> so a long move over many descendants can be interrupted.
+    /// </summary>
+    /// <param name="content">The document to move.</param>
+    /// <param name="parentId">The identifier of the new parent.</param>
+    /// <param name="includeDescendants">
+    ///     Whether to move the descendants of the document along with it. When restoring a document out of the recycle
+    ///     bin this can be set to <c>false</c> to restore only the document itself, leaving its descendants in the
+    ///     recycle bin as top-level bin items.
+    /// </param>
+    /// <param name="cancellationToken">A token that can be used to request cancellation of the move.</param>
+    /// <param name="userId">The identifier of the user performing the action.</param>
+    /// <returns>The operation result.</returns>
+    // TODO (V19): Remove the default implementation when the obsolete overload without a CancellationToken is removed.
+#pragma warning disable CS0618 // Type or member is obsolete
+    OperationResult Move(IContent content, int parentId, bool includeDescendants, CancellationToken cancellationToken, int userId = Constants.Security.SuperUserId)
+        => Move(content, parentId, includeDescendants, userId);
+#pragma warning restore CS0618 // Type or member is obsolete
 
     /// <summary>
     ///     Copies a document.
@@ -530,7 +552,28 @@ public interface IContentService : IContentServiceBase<IContent>
     /// <remarks>
     ///     <para>Optionally recursively copies all children.</para>
     /// </remarks>
+    [Obsolete("Use the overload that takes a CancellationToken instead. Scheduled for removal in Umbraco 19.")]
     IContent? Copy(IContent content, int parentId, bool relateToOriginal, bool recursive, int userId = Constants.Security.SuperUserId);
+
+    /// <summary>
+    ///     Copies a document, observing a <see cref="CancellationToken" /> so a long recursive copy over many
+    ///     descendants can be interrupted.
+    /// </summary>
+    /// <param name="content">The document to copy.</param>
+    /// <param name="parentId">The identifier of the new parent.</param>
+    /// <param name="relateToOriginal">Whether to relate the copy to the original.</param>
+    /// <param name="recursive">Whether to recursively copy all children.</param>
+    /// <param name="cancellationToken">A token that can be used to request cancellation of the copy.</param>
+    /// <param name="userId">The identifier of the user performing the action.</param>
+    /// <returns>The copied document, or null if the copy failed.</returns>
+    /// <remarks>
+    ///     <para>Optionally recursively copies all children.</para>
+    /// </remarks>
+    // TODO (V19): Remove the default implementation when the obsolete overload without a CancellationToken is removed.
+#pragma warning disable CS0618 // Type or member is obsolete
+    IContent? Copy(IContent content, int parentId, bool relateToOriginal, bool recursive, CancellationToken cancellationToken, int userId = Constants.Security.SuperUserId)
+        => Copy(content, parentId, relateToOriginal, recursive, userId);
+#pragma warning restore CS0618 // Type or member is obsolete
 
     /// <summary>
     ///     Moves a document to the recycle bin.
@@ -538,7 +581,22 @@ public interface IContentService : IContentServiceBase<IContent>
     /// <param name="content">The document to move to the recycle bin.</param>
     /// <param name="userId">The identifier of the user performing the action.</param>
     /// <returns>The operation result.</returns>
+    [Obsolete("Use the overload that takes a CancellationToken instead. Scheduled for removal in Umbraco 19.")]
     OperationResult MoveToRecycleBin(IContent content, int userId = Constants.Security.SuperUserId);
+
+    /// <summary>
+    ///     Moves a document to the recycle bin, observing a <see cref="CancellationToken" /> so a long move over many
+    ///     descendants can be interrupted.
+    /// </summary>
+    /// <param name="content">The document to move to the recycle bin.</param>
+    /// <param name="cancellationToken">A token that can be used to request cancellation of the move.</param>
+    /// <param name="userId">The identifier of the user performing the action.</param>
+    /// <returns>The operation result.</returns>
+    // TODO (V19): Remove the default implementation when the obsolete overload without a CancellationToken is removed.
+#pragma warning disable CS0618 // Type or member is obsolete
+    OperationResult MoveToRecycleBin(IContent content, CancellationToken cancellationToken, int userId = Constants.Security.SuperUserId)
+        => MoveToRecycleBin(content, userId);
+#pragma warning restore CS0618 // Type or member is obsolete
 
     /// <summary>
     ///     Empties the Recycle Bin by deleting all <see cref="IContent" /> that resides in the bin.

@@ -8,7 +8,10 @@ import {
 	UmbRequestReloadChildrenOfEntityEvent,
 	UmbRequestReloadStructureForEntityEvent,
 } from '@umbraco-cms/backoffice/entity-action';
-import { UmbEntityBulkActionBase } from '@umbraco-cms/backoffice/entity-bulk-action';
+import {
+	UmbEntityBulkActionBase,
+	UmbEntityBulkActionProgressController,
+} from '@umbraco-cms/backoffice/entity-bulk-action';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import { UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
@@ -79,16 +82,24 @@ export class UmbTrashEntityBulkAction<
 
 		const succeeded: Array<string> = [];
 
-		for (const unique of uniques) {
-			const { error } = await recycleBinRepository.requestTrash({ unique });
+		await new UmbEntityBulkActionProgressController(this).runWithProgress({
+			headline: '#actions_trashInProgress',
+			uniques,
+			process: async (unique, abortSignal) => {
+				const { error } = await recycleBinRepository.requestTrash({ unique }, abortSignal);
 
-			if (error) {
-				const notification = { data: { message: error.message } };
-				notificationContext?.peek('danger', notification);
-			} else {
-				succeeded.push(unique);
-			}
-		}
+				// Cancelling aborts the in-flight request, which surfaces as an error here - do not report
+				// that as a failed trash.
+				if (error && !abortSignal.aborted) {
+					const notification = { data: { message: error.message } };
+					notificationContext?.peek('danger', notification);
+				} else if (!error) {
+					succeeded.push(unique);
+				}
+
+				return { error };
+			},
+		});
 
 		if (succeeded.length > 0) {
 			const notification = {
