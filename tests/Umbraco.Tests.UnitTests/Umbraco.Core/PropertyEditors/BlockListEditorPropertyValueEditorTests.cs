@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Cache.PropertyEditors;
 using Umbraco.Cms.Core.IO;
@@ -31,17 +32,39 @@ public class BlockListEditorPropertyValueEditorTests
     private static readonly Guid _contentKey = Guid.NewGuid();
 
     [Test]
-    public void Validates_Null_As_Below_Configured_Min()
+    public void Can_Validate_Null_When_Minimum_Configured_And_Not_Mandatory()
     {
         var editor = CreateValueEditor();
-        var result = editor.Validate(null, false, null, PropertyValidationContext.Empty());
-        Assert.AreEqual(1, result.Count());
 
-        var validationResult = result.First();
-        Assert.AreEqual($"validation_entriesShort", validationResult.ErrorMessage);
+        var result = editor.Validate(null, false, null, PropertyValidationContext.Empty());
+
+        Assert.IsEmpty(result);
     }
 
-    [TestCase(0, false)]
+    [Test]
+    public void Cannot_Validate_Null_When_Mandatory()
+    {
+        var editor = CreateValueEditor();
+
+        var result = editor.Validate(null, true, null, PropertyValidationContext.Empty());
+
+        Assert.AreEqual(1, result.Count());
+        Assert.AreEqual(Constants.Validation.ErrorMessages.Properties.Missing, result.First().ErrorMessage);
+    }
+
+    [Test]
+    public void Cannot_Validate_Empty_Blocks_When_Mandatory()
+    {
+        var value = CreateBlocksJson(0);
+        var editor = CreateValueEditor();
+
+        var result = editor.Validate(value, true, null, PropertyValidationContext.Empty());
+
+        Assert.AreEqual(1, result.Count());
+        Assert.AreEqual(Constants.Validation.ErrorMessages.Properties.Empty, result.First().ErrorMessage);
+    }
+
+    [TestCase(0, true)]
     [TestCase(1, false)]
     [TestCase(2, true)]
     [TestCase(3, true)]

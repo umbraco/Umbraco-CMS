@@ -10,7 +10,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 					{
 						alias: 'min',
 						label: 'Minimum',
-						description: 'Enter the minimum amount of text boxes to be displayed',
+						description: '#validation_minimumOnlyWhenInUse',
 						propertyEditorUiAlias: 'Umb.PropertyEditorUi.Integer',
 						config: [{ alias: 'min', value: 0 }],
 					},
