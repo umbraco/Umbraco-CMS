@@ -1,8 +1,7 @@
-import { NodeSelection } from '../../externals.js';
 import { UmbTiptapToolbarElementApiBase } from '../tiptap-toolbar-element-api-base.js';
 import { hasClassNames } from '../../utils/class-names.function.js';
 import type { MetaTiptapToolbarStyleMenuItem } from '../../extensions/types.js';
-import type { ChainedCommands, Editor } from '../../externals.js';
+import type { ChainedCommands, Editor, ProseMirrorNode } from '../../externals.js';
 
 type UmbTiptapToolbarStyleMenuCommandType = {
 	type: string;
@@ -59,19 +58,13 @@ export default class UmbTiptapToolbarStyleMenuApi extends UmbTiptapToolbarElemen
 	}
 
 	#hasAttributesAroundSelection(editor: Editor, data: UmbTiptapToolbarStyleMenuItemData): boolean {
-		// Without a tag, `execute` toggles the id/class on every node and mark type around the selection, so the item
-		// is active when any of them - the selected node, an ancestor node, or a mark on the selection - carries them.
+		// Mirrors the range `editor.getAttributes(type)` reads, so the item is active exactly when toggling it
+		// would remove something, never the reverse.
 		return (
-			this.#hasSelectedNodeWithAttributes(editor, data) ||
+			this.#hasNodeWithAttributes(editor, data) ||
 			this.#hasAncestorNodeWithAttributes(editor, data) ||
 			this.#hasMarkWithAttributes(editor, data)
 		);
-	}
-
-	#hasSelectedNodeWithAttributes(editor: Editor, data: UmbTiptapToolbarStyleMenuItemData): boolean {
-		const { selection } = editor.state;
-		if (!(selection instanceof NodeSelection)) return false;
-		return this.#hasAttributes(selection.node.attrs, data);
 	}
 
 	#hasAncestorNodeWithAttributes(editor: Editor, data: UmbTiptapToolbarStyleMenuItemData): boolean {
@@ -82,21 +75,30 @@ export default class UmbTiptapToolbarStyleMenuApi extends UmbTiptapToolbarElemen
 		return false;
 	}
 
+	#hasNodeWithAttributes(editor: Editor, data: UmbTiptapToolbarStyleMenuItemData): boolean {
+		return this.#someNodeAroundSelection(editor, (node) => this.#hasAttributes(node.attrs, data));
+	}
+
 	#hasMarkWithAttributes(editor: Editor, data: UmbTiptapToolbarStyleMenuItemData): boolean {
-		// Mirrors the range `editor.getAttributes(markType)` reads for a mark command, so a class further into a
-		// non-empty selection is detected here too, not only one at the very start of it.
 		const { state } = editor;
-		const { from, to, empty } = state.selection;
+		const { empty } = state.selection;
 
 		if (empty) {
-			const marks = state.storedMarks ?? state.selection.$from.marks();
+			const marks = [...(state.storedMarks ?? []), ...state.selection.$head.marks()];
 			return marks.some((mark) => this.#hasAttributes(mark.attrs, data));
 		}
 
+		return this.#someNodeAroundSelection(editor, (node) =>
+			node.marks.some((mark) => this.#hasAttributes(mark.attrs, data)),
+		);
+	}
+
+	#someNodeAroundSelection(editor: Editor, predicate: (node: ProseMirrorNode) => boolean): boolean {
+		const { from, to } = editor.state.selection;
 		let matched = false;
-		state.doc.nodesBetween(from, to, (node) => {
+		editor.state.doc.nodesBetween(from, to, (node) => {
 			if (matched) return false;
-			matched = node.marks.some((mark) => this.#hasAttributes(mark.attrs, data));
+			matched = predicate(node);
 			return !matched;
 		});
 		return matched;

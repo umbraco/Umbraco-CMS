@@ -173,6 +173,30 @@ describe('UmbTiptapToolbarStyleMenuApi', () => {
 			expect(api.isActive(editor, item({ class: 'framed' }))).to.equal(true);
 			expect(api.isActive(editor, item({ class: 'unframed' }))).to.equal(false);
 		});
+
+		it('keeps a mark active after a stored mark toggle at the caret', () => {
+			editor.commands.setContent('<p>some <strong class="loud">text</strong> here</p>');
+			editor.commands.setTextSelection(8);
+			expect(api.isActive(editor, item({ class: 'loud' }))).to.equal(true);
+
+			editor.commands.toggleBold();
+
+			expect(api.isActive(editor, item({ class: 'loud' }))).to.equal(true);
+		});
+
+		it('detects a class-only style on a block later in a multi-block selection', () => {
+			editor.commands.setContent('<p>first</p><p class="callout">second</p>');
+			editor.commands.setTextSelection({ from: 2, to: 9 });
+
+			expect(api.isActive(editor, item({ class: 'callout' }))).to.equal(true);
+		});
+
+		it('detects a class-only style on a descendant of the selected node', () => {
+			editor.commands.setContent('<blockquote><p class="callout">text</p></blockquote>');
+			editor.commands.setNodeSelection(0);
+
+			expect(api.isActive(editor, item({ class: 'callout' }))).to.equal(true);
+		});
 	});
 
 	describe('execute', () => {
