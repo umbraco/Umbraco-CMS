@@ -10,10 +10,11 @@ describe('splitClassNames', () => {
 		expect(splitClassNames('  title--size-5   title--bold  ')).to.deep.equal(['title--size-5', 'title--bold']);
 	});
 
-	it('returns an empty array for undefined, null or blank input', () => {
+	it('returns an empty array for undefined, null, blank or non-string input', () => {
 		expect(splitClassNames(undefined)).to.deep.equal([]);
 		expect(splitClassNames(null)).to.deep.equal([]);
 		expect(splitClassNames('   ')).to.deep.equal([]);
+		expect(splitClassNames(42)).to.deep.equal([]);
 	});
 });
 

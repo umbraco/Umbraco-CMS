@@ -4,9 +4,7 @@
  * @returns {Array<string>} The individual class names, in order, with no empty entries.
  */
 export function splitClassNames(value: unknown): Array<string> {
-	return String(value ?? '')
-		.split(/\s+/)
-		.filter((className) => className);
+	return (typeof value === 'string' ? value : '').split(/\s+/).filter(Boolean);
 }
 
 /**
