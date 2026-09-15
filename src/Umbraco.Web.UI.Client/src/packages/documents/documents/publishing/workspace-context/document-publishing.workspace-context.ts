@@ -23,7 +23,8 @@ import {
 	UmbRequestReloadChildrenOfEntityEvent,
 	UmbRequestReloadStructureForEntityEvent,
 } from '@umbraco-cms/backoffice/entity-action';
-import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import { UmbVariantId, type UmbVariantEntityStateEntry } from '@umbraco-cms/backoffice/variant';
+import type { UmbEntityStateLook } from '@umbraco-cms/backoffice/entity-state';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import type { UmbNotificationColor } from '@umbraco-cms/backoffice/notification';
@@ -50,6 +51,23 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 	 * @memberof UmbDocumentPublishingWorkspaceContext
 	 */
 	public readonly publishedPendingChanges = new UmbDocumentPublishedPendingChangesManager(this);
+
+	/**
+	 * TRASHED is intentionally absent — recycle-bin already reports that entity-wide via the universal rule
+	 * pushed from `UmbTrashableEntityWorkspaceContextBase`; pushing it again here would double the tag.
+	 */
+	#publishStateConfig: Partial<
+		Record<UmbDocumentVariantState, { message: string; look?: UmbEntityStateLook; weight: number }>
+	> = {
+		[UmbDocumentVariantState.DRAFT]: { message: '#content_unpublished', weight: 10 },
+		[UmbDocumentVariantState.PUBLISHED]: { message: '#content_published', look: 'positive', weight: 50 },
+		[UmbDocumentVariantState.PUBLISHED_PENDING_CHANGES]: {
+			message: '#content_published',
+			look: 'positive',
+			weight: 50,
+		},
+		[UmbDocumentVariantState.NOT_CREATED]: { message: '#content_notCreated', weight: 0 },
+	};
 
 	#init: Promise<unknown>;
 	#documentWorkspaceContext?: typeof UMB_DOCUMENT_WORKSPACE_CONTEXT.TYPE;
@@ -82,6 +100,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 					action: () => this.saveAndPublish(),
 				});
 				this.#initPendingChanges();
+				this.#observeAndPushVariantStates();
 			})
 				.asPromise({ preventTimeout: true })
 				.catch(() => {
@@ -689,6 +708,47 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 				this.#loadAndProcessLastPublished().catch(() => undefined);
 			},
 			'umbVariesByCultureObserver',
+		);
+	}
+
+	/**
+	 * Pushes one `entityState` entry per variant, describing its publish state (Draft/Published/Published with
+	 * pending changes/Not created). Mirrors how `UmbTrashableEntityWorkspaceContextBase` pushes its own
+	 * (universal) "Trashed" entry, but per-variant and recomputed on every relevant change via `replaceStates`.
+	 */
+	#observeAndPushVariantStates() {
+		if (!this.#documentWorkspaceContext) return;
+		const documentWorkspaceContext = this.#documentWorkspaceContext;
+
+		this.observe(
+			observeMultiple([documentWorkspaceContext.variantOptions, this.publishedPendingChanges.variantsWithChanges]),
+			([options, variantsWithChanges]) => {
+				const entries = options.reduce<Array<UmbVariantEntityStateEntry>>((acc, option) => {
+					const state = option.variant?.state ?? UmbDocumentVariantState.NOT_CREATED;
+					const config = this.#publishStateConfig[state as UmbDocumentVariantState];
+					if (!config) return acc; // TRASHED (or any future unmapped state) — no tag from this producer.
+
+					const variantId = UmbVariantId.Create(option);
+					const isPublishedState =
+						state === UmbDocumentVariantState.PUBLISHED || state === UmbDocumentVariantState.PUBLISHED_PENDING_CHANGES;
+					const isPendingChanges = isPublishedState && variantsWithChanges.some((v) => v.variantId.compare(variantId));
+
+					acc.push({
+						unique: `UMB_PUBLISH_STATE_${variantId.toString()}`,
+						variantId,
+						message: isPendingChanges ? '#content_publishedPendingChanges' : config.message,
+						look: config.look,
+						weight: config.weight,
+					});
+					return acc;
+				}, []);
+
+				documentWorkspaceContext.entityState.replaceStates(
+					(entry) => entry.unique.toString().startsWith('UMB_PUBLISH_STATE_'),
+					entries,
+				);
+			},
+			'_observeAndPushVariantStates',
 		);
 	}
 

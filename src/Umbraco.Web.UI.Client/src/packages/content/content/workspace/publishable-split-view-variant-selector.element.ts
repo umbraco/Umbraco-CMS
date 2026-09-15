@@ -6,10 +6,15 @@ import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { UmbEntityVariantModel, UmbEntityVariantOptionModel } from '@umbraco-cms/backoffice/variant';
 import type { UmbPublishableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
+import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 
 /**
  * Minimal interface that publishable workspace contexts must satisfy
  * for the variant selector to observe pending changes.
+ * @deprecated Deprecated since v17. Publish state is now reported generically via a workspace context's
+ * `entityState` registry (`@umbraco-cms/backoffice/entity-state`), rendered by `<umb-entity-state-tags>`
+ * in the shared `<umb-workspace-split-view-variant-selector>` — no publishable-specific selector subclass
+ * is needed any more. Scheduled for removal in Umbraco 20.
  */
 export interface UmbPublishableWorkspaceContextWithPendingChanges extends UmbPublishableWorkspaceContext {
 	/** Observable state for detecting pending (unpublished) changes per variant. */
@@ -21,7 +26,10 @@ export interface UmbPublishableWorkspaceContextWithPendingChanges extends UmbPub
 /**
  * A variant selector base class that adds publishable-state awareness
  * (pending changes, publish state labels) to the split-view variant selector.
- * Both Document and Element variant selectors extend this.
+ * @deprecated Deprecated since v17. Publish state is now reported generically via a workspace context's
+ * `entityState` registry (`@umbraco-cms/backoffice/entity-state`), rendered by `<umb-entity-state-tags>`
+ * in the shared `<umb-workspace-split-view-variant-selector>` — no publishable-specific selector subclass
+ * is needed any more. Scheduled for removal in Umbraco 20.
  * @abstract
  * @class UmbPublishableSplitViewVariantSelectorElement
  * @augments {UmbWorkspaceSplitViewVariantSelectorElement}
@@ -37,7 +45,7 @@ export abstract class UmbPublishableSplitViewVariantSelectorElement<
 	 */
 	protected abstract getPublishingContextToken(): UmbContextToken<TContext>;
 
-	protected override _variantSorter = sortVariants;
+	public override variantSorter = sortVariants;
 
 	@state()
 	private _variantsWithPendingChanges: Array<UmbPublishedVariantWithPendingChanges> = [];
@@ -57,6 +65,14 @@ export abstract class UmbPublishableSplitViewVariantSelectorElement<
 
 	constructor() {
 		super();
+
+		new UmbDeprecation({
+			deprecated: 'UmbPublishableSplitViewVariantSelectorElement',
+			removeInVersion: '20.0.0',
+			solution:
+				"Publish state is now reported generically via a workspace context's `entityState` registry, rendered by <umb-entity-state-tags> in the shared <umb-workspace-split-view-variant-selector> — no publishable-specific selector subclass is needed any more.",
+		}).warn();
+
 		this.consumeContext(this.getPublishingContextToken(), (instance) => {
 			this.#publishingContext = instance;
 			this.#observePendingChanges();

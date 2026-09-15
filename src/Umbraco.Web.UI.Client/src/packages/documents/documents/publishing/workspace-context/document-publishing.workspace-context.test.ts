@@ -13,8 +13,12 @@ import { UmbDocumentPublishingServerDataSource } from '../repository/document-pu
 import { UmbContentUnpublishEntityAction } from '@umbraco-cms/backoffice/content';
 
 const VARIANT_DOCUMENT_ID = 'variant-documents-variant-document-id';
+const VARIANT_DOCUMENT_TYPE_ID = 'variant-documents-variant-document-type-id';
+const INVARIANT_DOCUMENT_ID = 'variant-documents-invariant-document-id';
+const PARENT_ENTITY = { entityType: 'document', unique: null } as const;
 const EN_US = UmbVariantId.Create({ culture: 'en-US', segment: null });
 const DA = UmbVariantId.Create({ culture: 'da', segment: null });
+const INVARIANT = UmbVariantId.CreateInvariant();
 
 /**
  * Forces the value every modal is submitted with while `run` executes. The test host's modal manager
@@ -252,6 +256,65 @@ describe('UmbDocumentPublishingWorkspaceContext', function () {
 
 			expect(modals, 'no discard prompt').to.not.include(UMB_DISCARD_CHANGES_MODAL.toString());
 			expect(reachedUnpublish, 'went straight to unpublishing').to.be.true;
+		});
+	});
+
+	describe('entityState', () => {
+		// The outer beforeEach already loaded VARIANT_DOCUMENT_ID (en-US: Published, da: Draft).
+
+		it('pushes a Published entry for a published variant', () => {
+			const states = context.entityState.getStatesForVariant(EN_US);
+			expect(states).to.have.lengthOf(1);
+			expect(states[0]).to.deep.include({ message: '#content_published', look: 'positive', weight: 50 });
+		});
+
+		it('pushes a Draft entry for an unpublished variant', () => {
+			const states = context.entityState.getStatesForVariant(DA);
+			expect(states).to.have.lengthOf(1);
+			expect(states[0]).to.deep.include({ message: '#content_unpublished', weight: 10 });
+			expect(states[0].look).to.be.undefined;
+		});
+
+		it('pushes a Published entry for an invariant published document', async () => {
+			await context.load(INVARIANT_DOCUMENT_ID);
+			await aTimeout(0);
+
+			const states = context.entityState.getStatesForVariant(INVARIANT);
+			expect(states).to.have.lengthOf(1);
+			expect(states[0]).to.deep.include({ message: '#content_published', look: 'positive', weight: 50 });
+		});
+
+		it('pushes a Not created entry for a language with no variant yet', async () => {
+			await context.create(PARENT_ENTITY, VARIANT_DOCUMENT_TYPE_ID);
+			await aTimeout(0);
+
+			const states = context.entityState.getStatesForVariant(EN_US);
+			expect(states).to.have.lengthOf(1);
+			expect(states[0]).to.deep.include({ message: '#content_notCreated', weight: 0 });
+			expect(states[0].look).to.be.undefined;
+		});
+
+		it('overrides the message to pending-changes for a published variant with unsaved changes', async () => {
+			await context.setPropertyValue('variantText', 'Edited English', EN_US);
+			await context.requestSave();
+			await aTimeout(0);
+
+			const enStates = context.entityState.getStatesForVariant(EN_US);
+			expect(enStates).to.have.lengthOf(1);
+			expect(enStates[0]).to.deep.include({ message: '#content_publishedPendingChanges', look: 'positive', weight: 50 });
+
+			// da was never published, so editing en-US must not affect its own Draft entry.
+			const daStates = context.entityState.getStatesForVariant(DA);
+			expect(daStates).to.have.lengthOf(1);
+			expect(daStates[0]).to.deep.include({ message: '#content_unpublished', weight: 10 });
+		});
+
+		it('replaces the stale entry rather than duplicating it when a variant changes state', async () => {
+			await context.setPropertyValue('variantText', 'Edited English', EN_US);
+			await context.requestSave();
+			await aTimeout(0);
+
+			expect(context.entityState.getStatesForVariant(EN_US)).to.have.lengthOf(1);
 		});
 	});
 });

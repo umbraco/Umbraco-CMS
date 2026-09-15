@@ -51,11 +51,11 @@ describe('UmbEntityStateTagsElement', () => {
 		});
 	});
 
-	it('always sets look="primary" on the rendered tag', async () => {
+	it('always sets look="secondary" on the rendered tag', async () => {
 		element.states = [{ unique: 'a', message: 'Test' }];
 		await element.updateComplete;
 
-		expect(tags()[0].getAttribute('look')).to.equal('primary');
+		expect(tags()[0].getAttribute('look')).to.equal('secondary');
 	});
 
 	it('sets title to the localized detail when present', async () => {

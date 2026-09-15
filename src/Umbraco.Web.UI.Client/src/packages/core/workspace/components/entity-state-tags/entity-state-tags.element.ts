@@ -27,7 +27,7 @@ export class UmbEntityStateTagsElement extends UmbLitElement {
 			(entry) => html`
 				<uui-tag
 					color=${entry.look ? LOOK_TO_UUI_COLOR[entry.look] : 'default'}
-					look="primary"
+					look="secondary"
 					title=${ifDefined(entry.detail ? this.localize.string(entry.detail) : undefined)}>
 					${this.localize.string(entry.message ?? '')}
 				</uui-tag>
@@ -39,6 +39,10 @@ export class UmbEntityStateTagsElement extends UmbLitElement {
 		css`
 			:host {
 				display: contents;
+			}
+
+			uui-tag {
+				font-size: 11px;
 			}
 		`,
 	];

@@ -17,6 +17,18 @@ import type { UUIInputElement, UUIPopoverContainerElement } from '@umbraco-cms/b
 import { UMB_HINT_CONTEXT } from '@umbraco-cms/backoffice/hint';
 import type { UmbHint, UmbVariantHint } from '@umbraco-cms/backoffice/hint';
 import { createObservablePart, observeMultiple } from '@umbraco-cms/backoffice/observable-api';
+import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const NOOP_VARIANT_SORTER = (a: unknown, b: unknown): number => 0;
+
+// TODO: Fold the "warn once" behavior into UmbDeprecation itself, then drop this shared instance.
+// eslint-disable-next-line prefer-const -- reassigned once that lands
+let deprecatedVariantSorterWarning = new UmbDeprecation({
+	deprecated: 'UmbWorkspaceSplitViewVariantSelectorElement._variantSorter',
+	removeInVersion: '19.0.0',
+	solution: 'Use the public `variantSorter` property instead.',
+});
 
 @customElement('umb-workspace-split-view-variant-selector')
 export class UmbWorkspaceSplitViewVariantSelectorElement<
@@ -69,16 +81,38 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 	private _labelDefault = '';
 
 	/**
-	 * Method to sort variants in the selector.
-	 * Should be overwritten by actual implementation.
+	 * Compares two variant options to determine their sort order in the selector. Defaults to a no-op
+	 * (preserves whatever order `variantOptions` emits in). Takes precedence over the deprecated
+	 * `_variantSorter` when both are set.
 	 * @param {VariantOptionModelType} a - First variant option to compare
 	 * @param {VariantOptionModelType} b - Second variant option to compare
 	 * @returns {number} - Sorting value
 	 */
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	protected _variantSorter = (a: VariantOptionModelType, b: VariantOptionModelType) => {
-		return 0;
-	};
+	public variantSorter: (a: VariantOptionModelType, b: VariantOptionModelType) => number = NOOP_VARIANT_SORTER;
+
+	/**
+	 * @deprecated Deprecated since v17. Use the public `variantSorter` property instead — it wins over this one
+	 * when both are set. Scheduled for removal in Umbraco 19.
+	 */
+	protected _variantSorter: (a: VariantOptionModelType, b: VariantOptionModelType) => number = NOOP_VARIANT_SORTER;
+
+	/**
+	 * Resolves the sorter actually used to order variants: `variantSorter` when set, otherwise the deprecated
+	 * `_variantSorter` as a fallback, otherwise the no-op default.
+	 * @returns {(a: VariantOptionModelType, b: VariantOptionModelType) => number} The effective sorter.
+	 */
+	#getEffectiveVariantSorter(): (a: VariantOptionModelType, b: VariantOptionModelType) => number {
+		if (this.variantSorter !== NOOP_VARIANT_SORTER) {
+			return this.variantSorter;
+		}
+
+		if (this._variantSorter !== NOOP_VARIANT_SORTER) {
+			deprecatedVariantSorterWarning.warn();
+			return this._variantSorter;
+		}
+
+		return NOOP_VARIANT_SORTER;
+	}
 
 	constructor() {
 		super();
@@ -147,7 +181,9 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 		this.observe(
 			workspaceContext?.variantOptions,
 			(variantOptions) => {
-				this._variantOptions = ((variantOptions ?? []) as VariantOptionModelType[]).sort(this._variantSorter);
+				this._variantOptions = ((variantOptions ?? []) as VariantOptionModelType[]).sort(
+					this.#getEffectiveVariantSorter(),
+				);
 				this._cultureVariantOptions = this._variantOptions.filter((variant) => variant.segment === null);
 			},
 			'_observeVariantOptions',
@@ -424,10 +460,10 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 								label=${this._variantSelectorOpen
 									? this.localize.term('buttons_closeVersionSelector')
 									: this.localize.term('buttons_openVersionSelector')}>
-								${this.#getVariantSpecInfo(this._activeVariant)}
 								<umb-entity-state-tags .states=${this.#getEntityStatesForCulture(this._activeVariant?.culture)}>
 								</umb-entity-state-tags>
 								${this.#renderReadOnlyTag(this._activeVariant?.culture)}
+								${this.#getVariantSpecInfo(this._activeVariant)}
 								<uui-symbol-expand .open=${this._variantSelectorOpen}></uui-symbol-expand>
 							</uui-button>
 							${!this._variantSelectorOpen ? this.#renderVariantSelectorHintBadge(firstHintOnInactiveVariant) : nothing}
@@ -684,6 +720,11 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 				display: flex;
 				align-items: center;
 				justify-content: center;
+				margin-right: var(--uui-size-space-2);
+			}
+
+			uui-tag {
+				font-size: 11px;
 			}
 
 			uui-scroll-container {
@@ -742,7 +783,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 				border: none;
 				background: transparent;
 				color: var(--uui-color-current-contrast);
-				padding: var(--uui-size-space-2) var(--uui-size-space-6);
+				padding: var(--uui-size-space-3) var(--uui-size-space-6);
 				font-weight: bold;
 				width: 100%;
 				text-align: left;

@@ -4,9 +4,8 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { ManifestWorkspaceView, UmbActiveVariant } from '@umbraco-cms/backoffice/workspace';
 import type { UmbDeepPartialObject } from '@umbraco-cms/backoffice/utils';
-
-import './document-workspace-split-view-variant-selector.element.js';
 import { UMB_ROUTE_CONTEXT } from '@umbraco-cms/backoffice/router';
+import { sortVariants } from '@umbraco-cms/backoffice/variant';
 
 @customElement('umb-document-workspace-split-view')
 export class UmbDocumentWorkspaceSplitViewElement extends UmbLitElement {
@@ -105,8 +104,9 @@ export class UmbDocumentWorkspaceSplitViewElement extends UmbLitElement {
 									.splitViewIndex=${view.index}
 									.hasCustomVariantSelector=${true}>
 									<umb-icon slot="icon" name=${ifDefined(this._icon)}></umb-icon>
-									<umb-document-workspace-split-view-variant-selector
-										slot="variant-selector"></umb-document-workspace-split-view-variant-selector>
+									<umb-workspace-split-view-variant-selector
+										slot="variant-selector"
+										.variantSorter=${sortVariants}></umb-workspace-split-view-variant-selector>
 								</umb-workspace-split-view>
 							`,
 						)}
