@@ -35,6 +35,18 @@ export class DocumentBlueprintApiHelper {
     return response.status();
   }
 
+  async deleteFolder(id: string) {
+    if (id == null) {
+      return;
+    }
+    const response = await this.api.delete(this.api.baseUrl + '/umbraco/management/api/v1/document-blueprint/folder/' + id);
+    return response.status();
+  }
+
+  private async deleteItem(item) {
+    return item.isFolder ? await this.deleteFolder(item.id) : await this.delete(item.id);
+  }
+
   async update(id: string, documentBlueprint) {
     if (documentBlueprint == null) {
       return;
@@ -63,10 +75,11 @@ export class DocumentBlueprintApiHelper {
       if (child.hasChildren) {
         await this.recurseDeleteChildren(child.id);
       } else {
-        await this.delete(child.id);
+        await this.deleteItem(child);
       }
     }
-    return await this.delete(id);
+    // Only a folder is ever reported as having children, so the emptied node is always a folder.
+    return await this.deleteFolder(id);
   }
 
   private async recurseChildren(name: string, id: string, toDelete: boolean) {
@@ -80,7 +93,7 @@ export class DocumentBlueprintApiHelper {
         if (child.hasChildren) {
           return await this.recurseDeleteChildren(child.id);
         } else {
-          return await this.delete(child.id);
+          return await this.deleteItem(child);
         }
       } else if (child.hasChildren) {
         const result = await this.recurseChildren(name, child.id, toDelete);
@@ -116,9 +129,9 @@ export class DocumentBlueprintApiHelper {
     for (const blueprint of this.api.itemsOf(jsonDocumentBlueprints)) {
       if (blueprint.name === name) {
         if (blueprint.hasChildren) {
-          await this.recurseDeleteChildren(blueprint.id);
+          return await this.recurseDeleteChildren(blueprint.id);
         }
-        return await this.delete(blueprint.id);
+        return await this.deleteItem(blueprint);
       } else if (blueprint.hasChildren) {
         await this.recurseChildren(name, blueprint.id, true);
       }
