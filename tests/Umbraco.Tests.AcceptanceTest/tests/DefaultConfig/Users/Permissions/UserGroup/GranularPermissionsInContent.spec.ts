@@ -84,6 +84,7 @@ test('can create document blueprint for a specific document with create document
   // Act
   await umbracoUi.content.clickActionsMenuForContent(firstDocumentName);
   await umbracoUi.content.clickCreateBlueprintActionMenuOption();
+  await umbracoUi.content.clickModalMenuItemWithName('Document Blueprints');
   await umbracoUi.content.enterDocumentBlueprintName(documentBlueprintName);
   await umbracoUi.content.clickSaveDocumentBlueprintButton();
 
