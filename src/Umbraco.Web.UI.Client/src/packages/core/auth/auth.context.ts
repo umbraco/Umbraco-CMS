@@ -442,13 +442,15 @@ export class UmbAuthContext extends UmbContextBase {
 	}
 
 	/**
-	 * Forces a token refresh against the server (calls `/token`) and returns true if successful.
+	 * Forces a token refresh against the server (calls `/token`).
 	 * Use this when you need to unconditionally refresh — e.g. session timeout keep-alive.
 	 * For per-request token handling, prefer {@link configureClient} which skips the network
 	 * call when the access token is still valid.
 	 * Uses Web Locks to deduplicate concurrent refresh requests across tabs.
 	 * @memberof UmbAuthContext
-	 * @returns {Promise<boolean>} True if the refresh succeeded, otherwise false
+	 * @returns {Promise<boolean>} True if a usable access token is in hand, otherwise false.
+	 * A refresh whose session was superseded while it was in flight reports on the newer
+	 * session rather than on the request's own outcome.
 	 */
 	async validateToken(): Promise<boolean> {
 		return this.#isBypassed || this.makeRefreshTokenRequest();
@@ -456,7 +458,9 @@ export class UmbAuthContext extends UmbContextBase {
 
 	/**
 	 * Attempts to refresh the token using Web Locks to prevent concurrent refresh requests.
-	 * @returns {Promise<boolean>} True if the refresh was successful, otherwise false.
+	 * @returns {Promise<boolean>} True if a usable access token is in hand, otherwise false.
+	 * A refresh whose session was superseded while it was in flight reports on the newer
+	 * session rather than on the request's own outcome.
 	 */
 	async makeRefreshTokenRequest(): Promise<boolean> {
 		// A previous refresh was definitively rejected — retrying cannot succeed
@@ -497,30 +501,32 @@ export class UmbAuthContext extends UmbContextBase {
 	 * Performs the actual refresh request and applies the result.
 	 * A definitive rejection (e.g. `invalid_grant`) marks the session as dead, so every
 	 * subsequent API request does not fire its own doomed refresh attempt, and times the
-	 * user out so the re-authentication flow starts. A failure that belongs to a session
-	 * which has since been superseded is reported against the newer session instead, so
-	 * neither this method nor its callers tear that session down. Transient failures
-	 * (network errors, 5xx) leave the session state untouched so a later attempt can retry.
+	 * user out so the re-authentication flow starts. An outcome that belongs to a session
+	 * which has since been superseded is discarded and reported against the newer session
+	 * instead, so neither this method nor its callers disturb that session. Transient
+	 * failures (network errors, 5xx) leave the session state untouched so a later attempt
+	 * can retry.
 	 * @returns {Promise<boolean>} True if a usable access token is in hand, otherwise false.
 	 */
 	async #performRefresh(): Promise<boolean> {
-		// Capture the session being refreshed so a failure can be attributed to it.
+		// Capture the session being refreshed so the outcome can be attributed to it.
 		const sessionBefore = this.#session.getValue();
 		const result = await this.#client.refreshToken();
-		if (result.response) {
-			this.#updateSession(result.response.expiresIn, result.response.issuedAt);
-			return true;
-		}
 
 		// A newer session replaced the one being refreshed — a sign-in completed via the
-		// sessionUpdate broadcast while the request was in flight. The server rejected the
-		// *old* session, which was meant to die anyway, so the failure says nothing about
-		// the session now in hand. Report on that one instead: callers such as the session
-		// timeout controller time the user out on a false return, which would tear down a
-		// session that is perfectly valid. Mirrors the identity check in
+		// sessionUpdate broadcast while the request was in flight. Whatever came back
+		// describes the superseded session, so it says nothing about the session now in
+		// hand: applying a success would overwrite the newer timings (and re-broadcast
+		// them), and applying a failure would tear down a session that is perfectly valid.
+		// Report on the session actually held instead. Mirrors the identity check in
 		// makeRefreshTokenRequest().
 		if (this.#session.getValue() !== sessionBefore) {
 			return this.#isAccessTokenValid();
+		}
+
+		if (result.response) {
+			this.#updateSession(result.response.expiresIn, result.response.issuedAt);
+			return true;
 		}
 
 		// A rejection with no session in hand means nobody is signed in — not that a session

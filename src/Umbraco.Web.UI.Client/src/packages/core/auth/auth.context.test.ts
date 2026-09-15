@@ -293,8 +293,9 @@ describe('UmbAuthContext', () => {
 			const now = Math.floor(Date.now() / 1000);
 
 			// The session that is about to be rejected server-side
+			const established = nextSessionChange();
 			channel.postMessage({ type: 'sessionUpdate', accessTokenExpiresAt: now + 60, expiresAt: now + 240 });
-			await aTimeout(50);
+			await established;
 
 			let resolveFetch!: (response: Response) => void;
 			let fetchStarted!: () => void;
@@ -336,8 +337,9 @@ describe('UmbAuthContext', () => {
 
 		it('reports success when a transient failure raced a newly established session', async () => {
 			const now = Math.floor(Date.now() / 1000);
+			const established = nextSessionChange();
 			channel.postMessage({ type: 'sessionUpdate', accessTokenExpiresAt: now + 60, expiresAt: now + 240 });
-			await aTimeout(50);
+			await established;
 
 			let rejectFetch!: (error: Error) => void;
 			let fetchStarted!: () => void;
@@ -362,6 +364,53 @@ describe('UmbAuthContext', () => {
 
 			expect(await refreshPromise).to.be.true;
 			expect(context.getIsAuthorized()).to.be.true;
+		});
+
+		// The reordering puts the identity check ahead of the success branch, so a refresh that
+		// succeeds for a session which has since been replaced must not overwrite the newer one.
+		it('does not apply a successful refresh whose session was superseded', async () => {
+			const now = Math.floor(Date.now() / 1000);
+
+			const established = nextSessionChange();
+			channel.postMessage({ type: 'sessionUpdate', accessTokenExpiresAt: now + 60, expiresAt: now + 240 });
+			await established;
+
+			let resolveFetch!: (response: Response) => void;
+			let fetchStarted!: () => void;
+			const fetchInFlight = new Promise<void>((resolve) => {
+				fetchStarted = resolve;
+			});
+			window.fetch = (() => {
+				fetchStarted();
+				return new Promise<Response>((resolve) => {
+					resolveFetch = resolve;
+				});
+			}) as typeof window.fetch;
+
+			const refreshPromise = context.validateToken();
+			await fetchInFlight;
+
+			const superseded = nextSessionChange();
+			channel.postMessage({ type: 'sessionUpdate', accessTokenExpiresAt: now + 600, expiresAt: now + 900 });
+			await superseded;
+
+			let latest: { accessTokenExpiresAt: number; expiresAt: number } | undefined;
+			const subscription = context.session$.subscribe((session) => {
+				latest = session;
+			});
+
+			// Succeeds, with timings that would visibly shorten the session if applied
+			resolveFetch(
+				new Response(JSON.stringify({ access_token: '[redacted]', expires_in: 60, token_type: 'Bearer' }), {
+					status: 200,
+					headers: { 'Content-Type': 'application/json' },
+				}),
+			);
+			await refreshPromise;
+			subscription.unsubscribe();
+
+			expect(latest?.accessTokenExpiresAt, 'the newer session must survive a superseded success').to.equal(now + 600);
+			expect(latest?.expiresAt).to.equal(now + 900);
 		});
 
 		// The cold-boot shape of the same race: no session in hand when the refresh starts, so the
