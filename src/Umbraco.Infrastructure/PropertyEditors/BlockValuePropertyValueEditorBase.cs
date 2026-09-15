@@ -750,8 +750,8 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
             }
         }
 
-        static (Guid ContentKey, string? Culture, string? Segment) ToKey(BlockItemVariation variation) =>
-            (variation.ContentKey, variation.Culture, variation.Segment);
+        static (Guid ContentKey, string? Culture) ToKey(BlockItemVariation variation) =>
+            (variation.ContentKey, variation.Culture);
     }
 
     private void CollectChangedCultures(

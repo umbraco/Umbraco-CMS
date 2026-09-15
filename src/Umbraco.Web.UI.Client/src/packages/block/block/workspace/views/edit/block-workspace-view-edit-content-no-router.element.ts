@@ -1,7 +1,7 @@
-import { UMB_BLOCK_WORKSPACE_CONTEXT } from '../../block-workspace.context-token.js';
+import { UMB_BLOCK_WORKSPACE_CONTEXT } from '../../context/block-workspace.context-token.js';
 import './block-workspace-view-edit-tab.element.js';
 import type { UmbBlockLayoutBaseModel } from '../../../types.js';
-import type UmbBlockElementManager from '../../block-element-manager.js';
+import type UmbBlockElementManager from '../../context/block-element-manager.js';
 import { css, html, customElement, state, repeat, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbContentTypeContainerStructureHelper } from '@umbraco-cms/backoffice/content-type';

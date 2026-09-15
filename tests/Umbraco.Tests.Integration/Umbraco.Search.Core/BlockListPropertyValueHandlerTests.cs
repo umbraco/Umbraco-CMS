@@ -149,7 +149,7 @@ public class BlockListPropertyValueHandlerTests : PropertyValueHandlerTestsBase
             ],
             Expose =
             [
-                new BlockItemVariation(contentElementKey, null, null)
+                new BlockItemVariation(contentElementKey, null)
             ]
         };
         var blocksPropertyValue = JsonSerializer.Serialize(blockListValue);
@@ -256,7 +256,7 @@ public class BlockListPropertyValueHandlerTests : PropertyValueHandlerTestsBase
                                     ],
                                     Expose =
                                     [
-                                        new BlockItemVariation(nestedElement1Key, null, null)
+                                        new BlockItemVariation(nestedElement1Key, null)
                                     ]
                                 })
                         }
@@ -299,7 +299,7 @@ public class BlockListPropertyValueHandlerTests : PropertyValueHandlerTestsBase
                                     ],
                                     Expose =
                                     [
-                                        new BlockItemVariation(nestedElement2Key, null, null)
+                                        new BlockItemVariation(nestedElement2Key, null)
                                     ]
                                 })
                         }
@@ -308,8 +308,8 @@ public class BlockListPropertyValueHandlerTests : PropertyValueHandlerTestsBase
             ],
             Expose =
             [
-                new BlockItemVariation(rootElement1Key, null, null),
-                new BlockItemVariation(rootElement2Key, null, null),
+                new BlockItemVariation(rootElement1Key, null),
+                new BlockItemVariation(rootElement2Key, null),
             ]
         };
         var blocksPropertyValue = JsonSerializer.Serialize(blockListValue);
@@ -490,10 +490,10 @@ public class BlockListPropertyValueHandlerTests : PropertyValueHandlerTestsBase
             ],
             Expose =
             [
-                new BlockItemVariation(contentElement1Key, "en-US", null),
-                new BlockItemVariation(contentElement1Key, "da-DK", null),
-                new BlockItemVariation(contentElement2Key, "en-US", null),
-                new BlockItemVariation(contentElement3Key, "da-DK", null)
+                new BlockItemVariation(contentElement1Key, "en-US"),
+                new BlockItemVariation(contentElement1Key, "da-DK"),
+                new BlockItemVariation(contentElement2Key, "en-US"),
+                new BlockItemVariation(contentElement3Key, "da-DK")
             ]
         };
         var blocksPropertyValue = JsonSerializer.Serialize(blockListValue);
@@ -588,8 +588,8 @@ public class BlockListPropertyValueHandlerTests : PropertyValueHandlerTestsBase
             ],
             Expose =
             [
-                new BlockItemVariation(contentElement1Key, null, null),
-                new BlockItemVariation(contentElement2Key, null, null)
+                new BlockItemVariation(contentElement1Key, null),
+                new BlockItemVariation(contentElement2Key, null)
             ]
         };
         var blocksPropertyValue = JsonSerializer.Serialize(blockListValue);
@@ -883,9 +883,9 @@ public class BlockListPropertyValueHandlerTests : PropertyValueHandlerTestsBase
                                     ],
                                     Expose =
                                     [
-                                        new BlockItemVariation(nestedElement1Key, "en-US", null),
-                                        new BlockItemVariation(nestedElement1Key, "da-DK", null),
-                                        new BlockItemVariation(nestedElement1Key, "de-DE", null),
+                                        new BlockItemVariation(nestedElement1Key, "en-US"),
+                                        new BlockItemVariation(nestedElement1Key, "da-DK"),
+                                        new BlockItemVariation(nestedElement1Key, "de-DE"),
                                     ]
                                 })
                         }
@@ -940,12 +940,12 @@ public class BlockListPropertyValueHandlerTests : PropertyValueHandlerTestsBase
             ],
             Expose =
             [
-                new BlockItemVariation(rootElement1Key, "en-US", null),
-                new BlockItemVariation(rootElement1Key, "da-DK", null),
-                new BlockItemVariation(rootElement1Key, "de-DE", null),
-                new BlockItemVariation(rootElement2Key, "en-US", null),
-                new BlockItemVariation(rootElement2Key, "da-DK", null),
-                new BlockItemVariation(rootElement2Key, "de-DE", null),
+                new BlockItemVariation(rootElement1Key, "en-US"),
+                new BlockItemVariation(rootElement1Key, "da-DK"),
+                new BlockItemVariation(rootElement1Key, "de-DE"),
+                new BlockItemVariation(rootElement2Key, "en-US"),
+                new BlockItemVariation(rootElement2Key, "da-DK"),
+                new BlockItemVariation(rootElement2Key, "de-DE"),
             ]
         };
         var blocksPropertyValue = JsonSerializer.Serialize(blockListValue);

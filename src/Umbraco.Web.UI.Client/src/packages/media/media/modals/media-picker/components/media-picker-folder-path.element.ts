@@ -185,7 +185,6 @@ export class UmbMediaPickerFolderPathElement extends UmbLitElement {
 			variants: [
 				{
 					culture: null,
-					segment: null,
 					name: newName,
 					createDate: null,
 					updateDate: null,

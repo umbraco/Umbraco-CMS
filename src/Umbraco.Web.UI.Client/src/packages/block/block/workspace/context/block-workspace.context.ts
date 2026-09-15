@@ -1,12 +1,12 @@
-import type { UmbBlockDataModel, UmbBlockDataValueModel, UmbBlockLayoutBaseModel } from '../types.js';
-import { UMB_BLOCK_ENTRIES_CONTEXT, UMB_BLOCK_MANAGER_CONTEXT } from '../context/index.js';
-import { UmbBlockWorkspaceEditorElement } from './block-workspace-editor.element.js';
+import type { UmbBlockDataModel, UmbBlockDataValueModel, UmbBlockLayoutBaseModel } from '../../types.js';
+import { UMB_BLOCK_ENTRIES_CONTEXT, UMB_BLOCK_MANAGER_CONTEXT } from '../../context/index.js';
+import { UmbBlockWorkspaceEditorElement } from '../block-workspace-editor.element.js';
 import { UmbBlockElementManager } from './block-element-manager.js';
-import type { UmbBlockWorkspaceOriginData } from './block-workspace.modal-token.js';
-import { UMB_BLOCK_WORKSPACE_VIEW_CONTENT, UMB_BLOCK_WORKSPACE_VIEW_SETTINGS } from './constants.js';
-import { UmbBlockLanguageAccessWorkspaceController } from './block-workspace-language-access.controller.js';
-import { resolveBlockWorkspaceLabelIndex } from './block-workspace-label-index.function.js';
-import { buildBlockLabelValueObject } from './block-workspace-label-value.function.js';
+import type { UmbBlockWorkspaceOriginData } from '../block-workspace.modal-token.js';
+import { UMB_BLOCK_WORKSPACE_VIEW_CONTENT, UMB_BLOCK_WORKSPACE_VIEW_SETTINGS } from '../constants.js';
+import { UmbBlockLanguageAccessWorkspaceController } from '../block-workspace-language-access.controller.js';
+import { resolveBlockWorkspaceLabelIndex } from '../block-workspace-label-index.function.js';
+import { buildBlockLabelValueObject } from '../block-workspace-label-value.function.js';
 import {
 	UmbSubmittableWorkspaceContextBase,
 	type UmbRoutableWorkspaceContext,

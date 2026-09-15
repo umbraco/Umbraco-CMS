@@ -1,46 +1,15 @@
 import { UmbMergeContentVariantDataController } from '../controller/merge-content-variant-data.controller.js';
-import type { UmbElementDetailModel, UmbElementValueModel } from '../types.js';
-import { UmbVariantId, umbVariantObjectCompare } from '@umbraco-cms/backoffice/variant';
+import type { UmbEntryDetailModel } from '../types.js';
+import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbEntityWorkspaceDataManager, type UmbWorkspaceDataManager } from '@umbraco-cms/backoffice/workspace';
 
-/**
- * Compares two element values by alias and variant.
- * @param {UmbElementValueModel} a The first value to compare.
- * @param {UmbElementValueModel} b The second value to compare.
- * @returns {boolean} True if the values have the same alias and variant.
- */
-function valueObjectCompare(a: UmbElementValueModel, b: UmbElementValueModel): boolean {
-	return a.alias === b.alias && umbVariantObjectCompare(a, b);
-}
-
-export class UmbElementWorkspaceDataManager<ModelType extends UmbElementDetailModel>
+export class UmbEntryWorkspaceDataManager<ModelType extends UmbEntryDetailModel>
 	extends UmbEntityWorkspaceDataManager<ModelType>
 	implements UmbWorkspaceDataManager<ModelType>
 {
 	protected _varies?: boolean;
 	protected _variesByCulture?: boolean;
 	protected _variesBySegment?: boolean;
-
-	protected override _sortCurrentData<GivenType extends Partial<ModelType> = Partial<ModelType>>(
-		persistedData: Partial<ModelType>,
-		currentData: GivenType,
-	): GivenType {
-		currentData = super._sortCurrentData(persistedData, currentData);
-		// Sort the values in the same order as the persisted data:
-		const persistedValues = persistedData.values;
-		if (persistedValues && currentData.values) {
-			return {
-				...currentData,
-				values: [...currentData.values].sort(function (a, b) {
-					return (
-						persistedValues.findIndex((x) => valueObjectCompare(x, a)) -
-						persistedValues.findIndex((x) => valueObjectCompare(x, b))
-					);
-				}),
-			};
-		}
-		return currentData;
-	}
 
 	#updateLock = 0;
 	initiatePropertyValueChange() {
@@ -88,21 +57,6 @@ export class UmbElementWorkspaceDataManager<ModelType extends UmbElementDetailMo
 		if (!data) throw new Error('Current data is missing');
 		//if (!data.unique) throw new Error('Unique of current data is missing');
 
-		// If we vary by segment we need to save all segments for a selected culture.
-		// And all segments for the invariant culture.
-		if (this._variesBySegment === true) {
-			const dataSegments = data.values.map((x) => x.segment).filter((x) => x) as Array<string>;
-			variantsToStore = [
-				...variantsToStore,
-				...dataSegments.flatMap((segment) => variantsToStore.map((variant) => variant.toSegment(segment))),
-			];
-
-			selectedVariants = [
-				...selectedVariants,
-				...dataSegments.flatMap((segment) => selectedVariants.map((variant) => variant.toSegment(segment))),
-			];
-		}
-
 		const persistedData = this.getPersisted();
 		return await new UmbMergeContentVariantDataController(this).process(
 			persistedData,
@@ -112,3 +66,11 @@ export class UmbElementWorkspaceDataManager<ModelType extends UmbElementDetailMo
 		);
 	}
 }
+
+// TODO: Remove in v.21 [NL]
+/**
+ * @deprecated Use UmbEntryWorkspaceDataManager instead.
+ * @description This is a deprecated alias for UmbEntryWorkspaceDataManager. It will be removed in future versions.
+ * Use UmbEntryWorkspaceDataManager instead.
+ */
+export const UmbElementWorkspaceDataManager = UmbEntryWorkspaceDataManager;

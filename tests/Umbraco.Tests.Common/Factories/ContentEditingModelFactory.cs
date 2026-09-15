@@ -28,7 +28,7 @@ public class ContentEditingModelFactory : IContentEditingModelFactory
 
             MapProperties(content, properties);
 
-            MapNames(content, properties, variants);
+            MapNames(content, variants);
 
             model.Properties = properties;
             model.Variants = variants;
@@ -36,79 +36,24 @@ public class ContentEditingModelFactory : IContentEditingModelFactory
         }
     }
 
-    private static void MapNames(IContent content, List<PropertyValueModel> properties, List<VariantModel> variants)
+    private static void MapNames(IContent content, List<VariantModel> variants)
     {
-        // Handle variants (content names per culture/segment)
-        var contentVariesByCulture = content.ContentType.VariesByCulture();
-        var contentVariesBySegment = content.ContentType.VariesBySegment();
-        if (contentVariesByCulture || contentVariesBySegment)
+        if (content.ContentType.VariesByCulture())
         {
-            // Get all unique culture/segment combinations from CultureInfos
-            // Add invariant combination
-            var cultureSegmentCombinations = new HashSet<(string? culture, string? segment)> { (null, null) };
-            if (contentVariesByCulture)
-            {
-                // Add cultures
-                foreach (var culture in content.AvailableCultures)
+            variants.AddRange(content
+                .AvailableCultures
+                .Select(culture =>
                 {
-                    cultureSegmentCombinations.Add((culture, null));
-                }
-            }
-
-            // For segment support, we need to extract segments from property values
-            // since content doesn't have "AvailableSegments" like cultures
-            if (contentVariesBySegment)
-            {
-                var segmentsFromProperties = properties
-                    .Where(p => !string.IsNullOrEmpty(p.Segment))
-                    .Select(p => p.Segment)
-                    .Distinct()
-                    .ToList();
-                foreach (var segment in segmentsFromProperties)
-                {
-                    cultureSegmentCombinations.Add((null, segment));
-                    // If content also varies by culture, add culture+segment combinations
-                    if (contentVariesByCulture)
-                    {
-                        foreach (var culture in content.AvailableCultures)
-                        {
-                            cultureSegmentCombinations.Add((culture, segment));
-                        }
-                    }
-                }
-            }
-
-            // Create variants for each combination
-            foreach (var (culture, segment) in cultureSegmentCombinations)
-            {
-                string? variantName;
-                if (culture == null && segment == null)
-                {
-                    // Invariant
-                    variantName = content.Name;
-                }
-                else if (culture != null && segment == null)
-                {
-                    // Culture-specific
-                    variantName = content.GetCultureName(culture);
-                }
-                else
-                {
-                    // For segment-specific or culture+segment combinations,
-                    // we'll use the invariant or culture name as segments don't have separate names
-                    variantName = culture != null ? content.GetCultureName(culture) : content.Name;
-                }
-
-                if (!string.IsNullOrEmpty(variantName))
-                {
-                    variants.Add(new VariantModel { Culture = culture, Segment = segment, Name = variantName });
-                }
-            }
+                    var variantName = content.GetCultureName(culture);
+                    return variantName.IsNullOrWhiteSpace()
+                        ? null
+                        : new VariantModel { Culture = culture, Name = variantName };
+                })
+                .WhereNotNull());
         }
         else
         {
-            // For invariant content, add single variant
-            variants.Add(new VariantModel { Culture = null, Segment = null, Name = content.Name ?? string.Empty });
+            variants.Add(new VariantModel { Culture = null, Name = content.Name ?? string.Empty });
         }
     }
 

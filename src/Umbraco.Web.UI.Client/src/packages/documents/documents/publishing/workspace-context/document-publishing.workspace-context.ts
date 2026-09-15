@@ -23,7 +23,7 @@ import {
 	UmbRequestReloadChildrenOfEntityEvent,
 	UmbRequestReloadStructureForEntityEvent,
 } from '@umbraco-cms/backoffice/entity-action';
-import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import { UmbVariantId, umbExpandVariantIdsWithSegmentOptions } from '@umbraco-cms/backoffice/variant';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import type { UmbNotificationColor } from '@umbraco-cms/backoffice/notification';
@@ -162,7 +162,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 		if (!result?.selection.length) return;
 
 		// Map to the correct format for the API (UmbDocumentVariantPublishModel)
-		const variants =
+		const cultureVariants =
 			result?.selection.map<UmbDocumentVariantPublishModel>((x) => ({
 				variantId: UmbVariantId.FromString(x.unique),
 				schedule: {
@@ -171,9 +171,14 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 				},
 			})) ?? [];
 
-		if (!variants.length) return;
+		if (!cultureVariants.length) return;
 
-		const variantIds = variants.map((x) => x.variantId);
+		let variantIds = cultureVariants.map((x) => x.variantId);
+		variantIds = umbExpandVariantIdsWithSegmentOptions(
+			variantIds,
+			await this.#documentWorkspaceContext.getVariantOptions(),
+		);
+
 		const saveData = await this.#documentWorkspaceContext.constructSaveData(variantIds);
 		await this.#documentWorkspaceContext.runMandatoryValidationForSaveData(saveData, variantIds);
 		await this.#documentWorkspaceContext.askServerToValidate(saveData, variantIds);
@@ -190,7 +195,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 					await this.#documentWorkspaceContext.performCreateOrUpdate(variantIds, saveData);
 
 					// Schedule the document
-					const { error } = await this.#publishingRepository.publish(unique, variants);
+					const { error } = await this.#publishingRepository.publish(unique, cultureVariants);
 					if (error) {
 						throw error;
 					}
@@ -282,11 +287,13 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 		if (!result?.selection.length) return;
 
 		// Map to variantIds
-		const variantIds = result?.selection.map((x) => UmbVariantId.FromString(x)) ?? [];
+		let variantIds = result?.selection.map((x) => UmbVariantId.FromString(x)) ?? [];
 
 		if (!variantIds.length) return;
 
 		const workspaceContext = this.#documentWorkspaceContext;
+
+		variantIds = umbExpandVariantIdsWithSegmentOptions(variantIds, await workspaceContext.getVariantOptions());
 		const saveData = await workspaceContext.constructSaveData(variantIds);
 
 		try {
@@ -497,6 +504,13 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 
 		// User has committed to publishing (modal closed with a selection, or no modal needed).
 		notifyWorkspaceActionStarting(executionOptions);
+
+		if (this.#documentWorkspaceContext.getVariesBySegment()) {
+			variantIds = umbExpandVariantIdsWithSegmentOptions(
+				variantIds,
+				await this.#documentWorkspaceContext.getVariantOptions(),
+			);
+		}
 
 		const saveData = await this.#documentWorkspaceContext.constructSaveData(variantIds);
 		await this.#documentWorkspaceContext.runMandatoryValidationForSaveData(saveData, variantIds);

@@ -143,7 +143,7 @@ public class VariationContextSegmentAccessorTests : UmbracoIntegrationTest
                                         ],
                                     },
                                 ],
-                                Expose = [new BlockItemVariation(contentElementKey, null, null)],
+                                Expose = [new BlockItemVariation(contentElementKey, null)],
                             }),
                     }
                 ],
@@ -246,14 +246,14 @@ public class VariationContextSegmentAccessorTests : UmbracoIntegrationTest
                                                             },
                                                         ],
                                                         SettingsData = [],
-                                                        Expose = [new BlockItemVariation(nestedContentElementKey, null, null)],
+                                                        Expose = [new BlockItemVariation(nestedContentElementKey, null)],
                                                     }),
                                             }
                                         ],
                                     },
                                 ],
                                 SettingsData = [],
-                                Expose = [new BlockItemVariation(contentElementKey, null, null)],
+                                Expose = [new BlockItemVariation(contentElementKey, null)],
                             }),
                     }
                 ],
@@ -345,7 +345,7 @@ public class VariationContextSegmentAccessorTests : UmbracoIntegrationTest
                                         ],
                                     },
                                 ],
-                                Expose = [new BlockItemVariation(reusableElement.Key, null, null)],
+                                Expose = [new BlockItemVariation(reusableElement.Key, null)],
                             }),
                     }
                 ],
@@ -421,7 +421,7 @@ public class VariationContextSegmentAccessorTests : UmbracoIntegrationTest
                                 },
                                 ContentData = [],
                                 SettingsData = [],
-                                Expose = [new BlockItemVariation(reusableElement.Key, null, null)],
+                                Expose = [new BlockItemVariation(reusableElement.Key, null)],
                             }),
                     }
                 ],
@@ -561,7 +561,7 @@ public class VariationContextSegmentAccessorTests : UmbracoIntegrationTest
                                     },
                                 ],
                                 SettingsData = [],
-                                Expose = [new BlockItemVariation(contentElementKey, null, null)],
+                                Expose = [new BlockItemVariation(contentElementKey, null)],
                             }),
                     }
                 ],
@@ -746,7 +746,7 @@ public class VariationContextSegmentAccessorTests : UmbracoIntegrationTest
                             },
                         ],
                         SettingsData = [],
-                        Expose = [new BlockItemVariation(innerBlockKey.Value, null, null)],
+                        Expose = [new BlockItemVariation(innerBlockKey.Value, null)],
                     }),
             });
         }
