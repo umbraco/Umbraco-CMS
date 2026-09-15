@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http.Headers;
 using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
 using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.Formats.Webp;
 using SixLabors.ImageSharp.Web.Commands;
 using SixLabors.ImageSharp.Web.Middleware;
@@ -82,6 +83,21 @@ public sealed class ConfigureImageSharpMiddlewareOptions : IConfigureOptions<Ima
             }
 
             return Task.CompletedTask;
+        };
+
+        // Bound concurrent decoding from here rather than from the middleware: this runs on a cache
+        // miss only, immediately before the decode, so a request the cache can serve never waits.
+        // The middleware owns the slot and gives the place back when the request ends.
+        Func<ImageCommandContext, Configuration, Task<DecoderOptions?>> onBeforeLoadAsync = options.OnBeforeLoadAsync;
+        options.OnBeforeLoadAsync = async (context, configuration) =>
+        {
+            if (context.Context.Items.TryGetValue(ImageProcessingSlot.HttpContextItemKey, out var value)
+                && value is ImageProcessingSlot slot)
+            {
+                await slot.AcquireAsync(context.Context.RequestAborted);
+            }
+
+            return await onBeforeLoadAsync(context, configuration);
         };
 
         // Change Cache-Control header when cache buster value is present
