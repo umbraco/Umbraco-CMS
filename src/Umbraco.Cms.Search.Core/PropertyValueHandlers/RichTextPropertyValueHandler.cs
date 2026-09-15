@@ -1,6 +1,9 @@
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
@@ -25,18 +28,22 @@ internal sealed class RichTextPropertyValueHandler : BlockEditorPropertyValueHan
     /// </summary>
     /// <param name="jsonSerializer">The JSON serializer used to deserialize the rich text property's stored value.</param>
     /// <param name="contentTypeService">The service used to resolve the embedded blocks' element types.</param>
+    /// <param name="elementService">The service used to resolve externally referenced (reusable) elements.</param>
     /// <param name="propertyEditorCollection">The property editor collection used to resolve each embedded block property's editor.</param>
     /// <param name="propertyValueHandlerCollection">The property value handler collection used to index each embedded block property's value.</param>
+    /// <param name="indexingSettings">The indexing settings, used to determine whether external element content should be flattened into the index.</param>
     /// <param name="htmlIndexValueParser">The parser used to extract indexable, relevance-weighted text from the rich text markup.</param>
     /// <param name="logger">The logger used to record diagnostic information when indexing the rich text value or its embedded blocks.</param>
     public RichTextPropertyValueHandler(
         IJsonSerializer jsonSerializer,
         IContentTypeService contentTypeService,
+        IElementService elementService,
         PropertyEditorCollection propertyEditorCollection,
         PropertyValueHandlerCollection propertyValueHandlerCollection,
+        IOptions<IndexingSettings> indexingSettings,
         IHtmlIndexValueParser htmlIndexValueParser,
         ILogger<RichTextPropertyValueHandler> logger)
-        : base(jsonSerializer, contentTypeService, propertyEditorCollection, propertyValueHandlerCollection, logger)
+        : base(jsonSerializer, contentTypeService, elementService, propertyEditorCollection, propertyValueHandlerCollection, indexingSettings, logger)
     {
         _htmlIndexValueParser = htmlIndexValueParser;
         _logger = logger;
@@ -48,6 +55,10 @@ internal sealed class RichTextPropertyValueHandler : BlockEditorPropertyValueHan
         => propertyType.PropertyEditorAlias is Cms.Core.Constants.PropertyEditors.Aliases.RichText;
 
     /// <inheritdoc />
+    protected override BlockValue? ParseBlockValue(IProperty property, string? culture, string? segment, bool published)
+        => ParseBlockValue<RichTextBlockValue>(property, culture, segment, published);
+
+    /// <inheritdoc />
     public override IEnumerable<IndexField> GetIndexFields(IProperty property, string? culture, string? segment, bool published, IContentBase contentContext)
     {
         var source = property.GetValue(culture, segment, published);
@@ -57,7 +68,7 @@ internal sealed class RichTextPropertyValueHandler : BlockEditorPropertyValueHan
         }
 
         Dictionary<(string? Culture, string? Segment), CumulativeIndexValue> blockIndexValues = richTextEditorValue.Blocks is not null
-            ? GetCumulativeIndexValues(richTextEditorValue.Blocks.ContentData, richTextEditorValue.Blocks.Expose, property, culture, segment, published, contentContext)
+            ? GetCumulativeIndexValues(richTextEditorValue.Blocks, property, culture, segment, published, contentContext)
             : new ();
 
         IndexValue? htmlFieldValue = _htmlIndexValueParser.Parse(richTextEditorValue.Markup);
