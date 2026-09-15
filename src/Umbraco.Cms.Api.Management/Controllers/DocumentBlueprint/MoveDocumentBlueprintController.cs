@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.DocumentBlueprint;
 /// Controller for handling move operations on document blueprints.
 /// </summary>
 [ApiVersion("1.0")]
-[Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
+[Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentBlueprints)]
 public class MoveDocumentBlueprintController : DocumentBlueprintControllerBase
 {
     private readonly IContentBlueprintEditingService _contentBlueprintEditingService;
