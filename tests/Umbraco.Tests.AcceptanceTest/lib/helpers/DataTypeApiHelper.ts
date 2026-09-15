@@ -1300,6 +1300,18 @@ export class DataTypeApiHelper {
     return await this.save(dataType);
   }
 
+  async createDecimalDataTypeWithMinAndMax(name: string, min: number, max: number) {
+    await this.ensureNameNotExists(name);
+
+    const dataType = new DecimalDataTypeBuilder()
+      .withName(name)
+      .withMin(min)
+      .withMax(max)
+      .build();
+
+    return await this.save(dataType);
+  }
+
   async createMultipleTextStringDataType(name: string) {
     await this.ensureNameNotExists(name);
 
@@ -2009,6 +2021,18 @@ export class DataTypeApiHelper {
 
     const dataType = new NumericDataTypeBuilder()
       .withName(name)
+      .build();
+
+    return await this.save(dataType);
+  }
+
+  async createDefaultNumericDataTypeWithMinAndMax(name: string, min: number, max: number) {
+    await this.ensureNameNotExists(name);
+
+    const dataType = new NumericDataTypeBuilder()
+      .withName(name)
+      .withMin(min)
+      .withMax(max)
       .build();
 
     return await this.save(dataType);
