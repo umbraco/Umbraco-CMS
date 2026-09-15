@@ -214,7 +214,10 @@ test('can publish child content from list', async ({umbracoApi, umbracoUi}) => {
   expect(childContentData.variants[0].state).toBe(expectedState);
 });
 
-// Product bug: the publish is rejected and the child stays Unpublished, but the list view shows no notification at all.
+// Product bug: entity-bulk-action.element.ts swallows any execute() error with an empty catch, so a failed
+// bulk publish from the list view (here, a single-item selection that delegates to the regular publish
+// entity action) gives no feedback at all - the individual "..." row action goes through a different
+// wrapper that does call notifyOnError, so only this bulk-toolbar path is affected.
 test.skip('can not publish child content from list when parent is not published', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const expectedState = 'Draft';
