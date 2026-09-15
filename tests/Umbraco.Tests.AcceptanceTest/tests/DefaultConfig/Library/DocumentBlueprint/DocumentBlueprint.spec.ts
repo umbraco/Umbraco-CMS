@@ -3,14 +3,17 @@ import {expect} from "@playwright/test";
 
 const documentBlueprintName = 'TestDocumentBlueprints';
 const documentTypeName = 'DocumentTypeForBlueprint';
+const documentBlueprintFolderName = 'BlueprintFolder';
 
 test.beforeEach(async ({umbracoApi}) => {
   await umbracoApi.documentBlueprint.ensureNameNotExists(documentBlueprintName);
+  await umbracoApi.documentBlueprint.ensureNameNotExists(documentBlueprintFolderName);
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
 });
 
 test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.documentBlueprint.ensureNameNotExists(documentBlueprintName);
+  await umbracoApi.documentBlueprint.ensureNameNotExists(documentBlueprintFolderName);
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
 });
 
@@ -126,27 +129,24 @@ test('can create a variant document blueprint', {tag: '@release'}, async ({umbra
 
 test('can create a document blueprint from the content menu in a folder', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const folderName = 'BlueprintFolder';
   const documentTypeId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(documentTypeName);
   await umbracoApi.document.createDefaultDocument(documentBlueprintName, documentTypeId);
-  const folderId = await umbracoApi.documentBlueprint.createFolder(folderName);
+  const folderId = await umbracoApi.documentBlueprint.createFolder(documentBlueprintFolderName);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
   // Act
   await umbracoUi.content.clickActionsMenuForContent(documentBlueprintName);
   await umbracoUi.content.clickCreateBlueprintActionMenuOption();
-  await umbracoUi.content.clickModalMenuItemWithName(folderName);
+  // The folder sits under the blueprint root, which the picker renders collapsed.
+  await umbracoUi.content.openCaretButtonForName('Document Blueprints');
+  await umbracoUi.content.clickModalMenuItemWithName(documentBlueprintFolderName);
   await umbracoUi.content.clickSaveModalButtonAndWaitForDocumentBlueprintToBeCreated();
 
   // Assert
   const children = await umbracoApi.documentBlueprint.getChildren(folderId);
   expect(children.length).toBe(1);
-  expect(children[0].variants[0].name).toBe(documentBlueprintName);
-
-  // Clean
-  await umbracoApi.documentBlueprint.ensureNameNotExists(folderName);
-  await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
+  expect(children[0].name).toBe(documentBlueprintName);
 });
 
 test('cannot save a document blueprint from the content menu without choosing a location', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
