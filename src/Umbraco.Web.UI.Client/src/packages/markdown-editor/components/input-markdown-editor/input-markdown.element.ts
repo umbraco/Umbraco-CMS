@@ -127,7 +127,16 @@ export class UmbInputMarkdownElement extends UmbFormControlMixin<string, typeof 
 		);
 	}
 
-	protected override firstUpdated() {
+	override connectedCallback(): void {
+		super.connectedCallback();
+		// Re-arm the observer if this element is reconnected after a DOM move (e.g. block reordering).
+		if (!this.readonly && this._toolbarElement) {
+			this.#scrollObserver.observe(this._toolbarElement);
+		}
+	}
+
+	protected override firstUpdated(_changedProperties: Map<string, unknown>) {
+		super.firstUpdated(_changedProperties);
 		if (this._toolbarElement) this.#scrollObserver.observe(this._toolbarElement);
 	}
 
