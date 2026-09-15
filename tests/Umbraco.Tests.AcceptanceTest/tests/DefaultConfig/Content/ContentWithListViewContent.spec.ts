@@ -214,10 +214,10 @@ test('can publish child content from list', async ({umbracoApi, umbracoUi}) => {
   expect(childContentData.variants[0].state).toBe(expectedState);
 });
 
-// Product bug: publishing a single selected item from the list view's bulk toolbar swallows the error
-// notification. UmbResourceController#_peekError isn't awaited before it's called, so by the time its
-// async notification lookup resolves, the transient bulk-action host has already been torn down and the
-// lookup silently fails. Confirmed manually with a real, unrecorded click.
+// Product bug (#23930): publishing a single selected item from the list view's bulk toolbar swallows the
+// error notification. UmbResourceController#_peekError isn't awaited before it's called, so by the time
+// its async notification lookup resolves, the transient bulk-action host has already been torn down and
+// the lookup silently fails. Confirmed manually with a real, unrecorded click.
 test.skip('can not publish child content from list when parent is not published', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const expectedState = 'Draft';
