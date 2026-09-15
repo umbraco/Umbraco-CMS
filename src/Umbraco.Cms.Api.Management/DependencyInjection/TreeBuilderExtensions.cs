@@ -14,6 +14,7 @@ internal static class TreeBuilderExtensions
         builder.Services.AddTransient<IDocumentStartNodeTreeFilterService, DocumentStartNodeTreeFilterService>();
         builder.Services.AddTransient<IMediaStartNodeTreeFilterService, MediaStartNodeTreeFilterService>();
         builder.Services.AddTransient<IElementStartNodeTreeFilterService, ElementStartNodeTreeFilterService>();
+        builder.Services.AddTransient<IDocumentBlueprintStartNodeTreeFilterService, DocumentBlueprintStartNodeTreeFilterService>();
 
         builder.Services.AddUnique<IPartialViewTreeService, PartialViewTreeService>();
         builder.Services.AddUnique<IScriptTreeService, ScriptTreeService>();

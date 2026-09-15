@@ -25,6 +25,12 @@ export class UmbUserGroupWorkspaceContext
 	);
 	readonly documentStartNode = this._data.createObservablePartOfCurrent((data) => data?.documentStartNode || null);
 	readonly documentRootAccess = this._data.createObservablePartOfCurrent((data) => data?.documentRootAccess || false);
+	readonly documentBlueprintStartNode = this._data.createObservablePartOfCurrent(
+		(data) => data?.documentBlueprintStartNode || null,
+	);
+	readonly documentBlueprintRootAccess = this._data.createObservablePartOfCurrent(
+		(data) => data?.documentBlueprintRootAccess || false,
+	);
 	readonly elementStartNode = this._data.createObservablePartOfCurrent((data) => data?.elementStartNode || null);
 	readonly elementRootAccess = this._data.createObservablePartOfCurrent((data) => data?.elementRootAccess || false);
 	readonly mediaStartNode = this._data.createObservablePartOfCurrent((data) => data?.mediaStartNode || null);

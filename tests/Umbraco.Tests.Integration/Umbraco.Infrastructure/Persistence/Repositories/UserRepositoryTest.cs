@@ -613,6 +613,52 @@ internal sealed class UserRepositoryTest : UmbracoIntegrationTest
         }
     }
 
+    [Test]
+    public void Can_Persist_Document_Blueprint_Start_Nodes_On_UserRepository()
+    {
+        ICoreScopeProvider provider = ScopeProvider;
+        using (var scope = provider.CreateCoreScope())
+        {
+            var repository = CreateRepository(provider);
+
+            var user = UserBuilderInstance
+                .WithoutIdentity()
+                .WithStartDocumentBlueprintIds([Constants.System.Root])
+                .Build();
+            repository.Save(user);
+            scope.Complete();
+
+            var resolved = repository.Get(user.Key);
+
+            Assert.That(resolved.StartDocumentBlueprintIds, Is.EquivalentTo(new[] { Constants.System.Root }));
+        }
+    }
+
+    [Test]
+    public void Can_Clear_Document_Blueprint_Start_Nodes_On_UserRepository()
+    {
+        ICoreScopeProvider provider = ScopeProvider;
+        using (var scope = provider.CreateCoreScope())
+        {
+            var repository = CreateRepository(provider);
+
+            var user = UserBuilderInstance
+                .WithoutIdentity()
+                .WithStartDocumentBlueprintIds([Constants.System.Root])
+                .Build();
+            repository.Save(user);
+
+            var resolved = repository.Get(user.Key);
+            resolved.StartDocumentBlueprintIds = [];
+            repository.Save(resolved);
+            scope.Complete();
+
+            var updated = repository.Get(user.Key);
+
+            Assert.That(updated.StartDocumentBlueprintIds, Is.Empty, "Taking access away has to persist too.");
+        }
+    }
+
     private void AssertPropertyValues(IUser updatedItem, IUser originalUser)
     {
         Assert.That(updatedItem.Id, Is.EqualTo(originalUser.Id));

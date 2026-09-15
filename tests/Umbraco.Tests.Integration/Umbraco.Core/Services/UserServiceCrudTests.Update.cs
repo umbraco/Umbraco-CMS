@@ -271,12 +271,18 @@ internal sealed partial class UserServiceCrudTests
         Assert.IsTrue(elementContainerResult.Success);
         var elementContainer = elementContainerResult.Result!;
 
+        var blueprintContainerService = GetRequiredService<IContentBlueprintContainerService>();
+        var blueprintContainerResult = await blueprintContainerService.CreateAsync(null, "TestBlueprintFolder", null, Constants.Security.SuperUserKey);
+        Assert.IsTrue(blueprintContainerResult.Success);
+        var blueprintContainer = blueprintContainerResult.Result!;
+
         var userService = CreateUserService(securitySettings: new SecuritySettings { UsernameIsEmail = false });
 
         var (updateModel, createdUser) = await CreateUserForUpdate(userService);
         updateModel.ContentStartNodeKeys = new HashSet<Guid> { contentStartNode.Key };
         updateModel.MediaStartNodeKeys = new HashSet<Guid> { mediaStartNode.Key };
         updateModel.ElementStartNodeKeys = new HashSet<Guid> { elementContainer.Key };
+        updateModel.DocumentBlueprintStartNodeKeys = new HashSet<Guid> { blueprintContainer.Key };
 
         var result = await userService.UpdateAsync(Constants.Security.SuperUserKey, updateModel);
 
@@ -293,15 +299,23 @@ internal sealed partial class UserServiceCrudTests
         Assert.IsNotNull(updatedUser.StartElementIds);
         Assert.AreEqual(1, updatedUser.StartElementIds.Length);
         Assert.AreEqual(elementContainer.Id, updatedUser.StartElementIds.First());
+        Assert.IsNotNull(updatedUser.StartDocumentBlueprintIds);
+        Assert.AreEqual(1, updatedUser.StartDocumentBlueprintIds.Length);
+        Assert.AreEqual(blueprintContainer.Id, updatedUser.StartDocumentBlueprintIds.First());
     }
 
-    [TestCase(false, false, false)]
-    [TestCase(false, true, false)]
-    [TestCase(true, false, false)]
-    [TestCase(true, true, false)]
-    [TestCase(false, false, true)]
-    [TestCase(true, true, true)]
-    public async Task Can_Assign_Root_As_User_Start_Node(bool contentRootAccess, bool mediaRootAccess, bool elementRootAccess)
+    [TestCase(false, false, false, false)]
+    [TestCase(false, true, false, false)]
+    [TestCase(true, false, false, false)]
+    [TestCase(true, true, false, false)]
+    [TestCase(false, false, true, false)]
+    [TestCase(false, false, false, true)]
+    [TestCase(true, true, true, true)]
+    public async Task Can_Assign_Root_As_User_Start_Node(
+        bool contentRootAccess,
+        bool mediaRootAccess,
+        bool elementRootAccess,
+        bool documentBlueprintRootAccess)
     {
         var userService = CreateUserService(securitySettings: new SecuritySettings { UsernameIsEmail = false });
 
@@ -309,6 +323,7 @@ internal sealed partial class UserServiceCrudTests
         updateModel.HasContentRootAccess = contentRootAccess;
         updateModel.HasMediaRootAccess = mediaRootAccess;
         updateModel.HasElementRootAccess = elementRootAccess;
+        updateModel.HasDocumentBlueprintRootAccess = documentBlueprintRootAccess;
 
         var result = await userService.UpdateAsync(Constants.Security.SuperUserKey, updateModel);
 
@@ -348,6 +363,17 @@ internal sealed partial class UserServiceCrudTests
         {
             Assert.IsEmpty(updatedUser.StartElementIds);
         }
+
+        Assert.IsNotNull(updatedUser.StartDocumentBlueprintIds);
+        if (documentBlueprintRootAccess)
+        {
+            Assert.AreEqual(1, updatedUser.StartDocumentBlueprintIds.Length);
+            Assert.AreEqual(Constants.System.Root, updatedUser.StartDocumentBlueprintIds.First());
+        }
+        else
+        {
+            Assert.IsEmpty(updatedUser.StartDocumentBlueprintIds);
+        }
     }
 
     // todo Ideally we would test content and media separately and together (Introduce Testcases for switching permutations)
@@ -364,12 +390,18 @@ internal sealed partial class UserServiceCrudTests
         Assert.IsTrue(elementContainerResult.Success);
         var elementContainer = elementContainerResult.Result!;
 
+        var blueprintContainerService = GetRequiredService<IContentBlueprintContainerService>();
+        var blueprintContainerResult = await blueprintContainerService.CreateAsync(null, "TestBlueprintFolder", null, Constants.Security.SuperUserKey);
+        Assert.IsTrue(blueprintContainerResult.Success);
+        var blueprintContainer = blueprintContainerResult.Result!;
+
         var userService = CreateUserService(securitySettings: new SecuritySettings { UsernameIsEmail = false });
 
         var (updateModel, createdUser) = await CreateUserForUpdate(userService);
         updateModel.ContentStartNodeKeys = new HashSet<Guid> { contentStartNode.Key };
         updateModel.MediaStartNodeKeys = new HashSet<Guid> { mediaStartNode.Key };
         updateModel.ElementStartNodeKeys = new HashSet<Guid> { elementContainer.Key };
+        updateModel.DocumentBlueprintStartNodeKeys = new HashSet<Guid> { blueprintContainer.Key };
 
         await userService.UpdateAsync(Constants.Security.SuperUserKey, updateModel);
 
@@ -378,11 +410,13 @@ internal sealed partial class UserServiceCrudTests
         Assert.IsNotEmpty(updatedUser.StartContentIds!);
         Assert.IsNotEmpty(updatedUser.StartMediaIds!);
         Assert.IsNotEmpty(updatedUser.StartElementIds!);
+        Assert.IsNotEmpty(updatedUser.StartDocumentBlueprintIds!);
 
         updateModel = await MapUserToUpdateModel(updatedUser);
         updateModel.ContentStartNodeKeys = new HashSet<Guid>();
         updateModel.MediaStartNodeKeys = new HashSet<Guid>();
         updateModel.ElementStartNodeKeys = new HashSet<Guid>();
+        updateModel.DocumentBlueprintStartNodeKeys = new HashSet<Guid>();
 
         var result = await userService.UpdateAsync(Constants.Security.SuperUserKey, updateModel);
 
@@ -398,6 +432,9 @@ internal sealed partial class UserServiceCrudTests
 
         Assert.IsNotNull(updatedUser.StartElementIds);
         Assert.IsEmpty(updatedUser.StartElementIds);
+
+        Assert.IsNotNull(updatedUser.StartDocumentBlueprintIds);
+        Assert.IsEmpty(updatedUser.StartDocumentBlueprintIds);
     }
 
     // todo Ideally we would test content and media separately and together (Introduce Testcases for switching permutations)
@@ -410,6 +447,7 @@ internal sealed partial class UserServiceCrudTests
         updateModel.HasContentRootAccess = true;
         updateModel.HasMediaRootAccess = true;
         updateModel.HasElementRootAccess = true;
+        updateModel.HasDocumentBlueprintRootAccess = true;
 
         await userService.UpdateAsync(Constants.Security.SuperUserKey, updateModel);
         var updatedUser = await userService.GetAsync(createdUser.Key);
@@ -422,6 +460,7 @@ internal sealed partial class UserServiceCrudTests
         updateModel.HasContentRootAccess = false;
         updateModel.HasMediaRootAccess = false;
         updateModel.HasElementRootAccess = false;
+        updateModel.HasDocumentBlueprintRootAccess = false;
 
         var result = await userService.UpdateAsync(Constants.Security.SuperUserKey, updateModel);
 
@@ -437,6 +476,9 @@ internal sealed partial class UserServiceCrudTests
 
         Assert.IsNotNull(updatedUser.StartElementIds);
         Assert.IsEmpty(updatedUser.StartElementIds);
+
+        Assert.IsNotNull(updatedUser.StartDocumentBlueprintIds);
+        Assert.IsEmpty(updatedUser.StartDocumentBlueprintIds);
     }
 
     [TestCase(false, false)]

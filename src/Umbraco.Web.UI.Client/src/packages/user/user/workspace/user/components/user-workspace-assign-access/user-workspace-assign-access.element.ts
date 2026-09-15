@@ -19,6 +19,12 @@ export class UmbUserWorkspaceAssignAccessElement extends UmbLitElement {
 	private _documentRootAccess: UmbUserDetailModel['hasDocumentRootAccess'] = false;
 
 	@state()
+	private _documentBlueprintStartNodeUniques: UmbUserDetailModel['documentBlueprintStartNodeUniques'] = [];
+
+	@state()
+	private _documentBlueprintRootAccess: UmbUserDetailModel['hasDocumentBlueprintRootAccess'] = false;
+
+	@state()
 	private _elementStartNodeUniques: UmbUserDetailModel['elementStartNodeUniques'] = [];
 
 	@state()
@@ -60,6 +66,18 @@ export class UmbUserWorkspaceAssignAccessElement extends UmbLitElement {
 				this.#workspaceContext?.hasElementRootAccess,
 				(value) => (this._elementRootAccess = value ?? false),
 				'_observeElementRootAccess',
+			);
+
+			this.observe(
+				this.#workspaceContext?.hasDocumentBlueprintRootAccess,
+				(value) => (this._documentBlueprintRootAccess = value ?? false),
+				'_observeDocumentBlueprintRootAccess',
+			);
+
+			this.observe(
+				this.#workspaceContext?.documentBlueprintStartNodeUniques,
+				(value) => (this._documentBlueprintStartNodeUniques = value ?? []),
+				'_observeDocumentBlueprintStartNodeUniques',
 			);
 
 			this.observe(
@@ -112,6 +130,24 @@ export class UmbUserWorkspaceAssignAccessElement extends UmbLitElement {
 		this.#workspaceContext?.updateProperty('hasDocumentRootAccess', false);
 	}
 
+	#onAllowAllDocumentBlueprintsChange(event: UUIBooleanInputEvent) {
+		event.stopPropagation();
+		const target = event.target;
+		// TODO make contexts method
+		this.#workspaceContext?.updateProperty('hasDocumentBlueprintRootAccess', target.checked);
+		this.#workspaceContext?.updateProperty('documentBlueprintStartNodeUniques', []);
+	}
+
+	#onDocumentBlueprintStartNodeChange(event: CustomEvent & { target: { selection: Array<string> } }) {
+		event.stopPropagation();
+		const target = event.target;
+		const selection: Array<UmbReferenceByUnique> = target.selection.map((unique: string) => ({ unique }));
+		// TODO make contexts method
+		this.#workspaceContext?.updateProperty('documentBlueprintStartNodeUniques', selection);
+		// When specific start nodes are selected, disable root access
+		this.#workspaceContext?.updateProperty('hasDocumentBlueprintRootAccess', false);
+	}
+
 	#onAllowAllElementsChange(event: UUIBooleanInputEvent) {
 		event.stopPropagation();
 		const target = event.target;
@@ -158,7 +194,7 @@ export class UmbUserWorkspaceAssignAccessElement extends UmbLitElement {
 				<div slot="headline"><umb-localize key="user_assignAccess">Assign Access</umb-localize></div>
 				<div id="assign-access">
 					${this.#renderGroupAccess()} ${this.#renderDocumentAccess()} ${this.#renderMediaAccess()}
-					${this.#renderElementAccess()}
+					${this.#renderElementAccess()} ${this.#renderDocumentBlueprintAccess()}
 				</div>
 			</uui-box>
 		`;
@@ -224,6 +260,34 @@ export class UmbUserWorkspaceAssignAccessElement extends UmbLitElement {
 							?folderOnly=${true}
 							@change=${this.#onElementStartNodeChange}>
 						</umb-input-element>
+					`,
+				)}
+			</umb-property-layout>
+		`;
+	}
+
+	#renderDocumentBlueprintAccess() {
+		return html`
+			<umb-property-layout
+				label=${this.localize.term('user_selectDocumentBlueprintStartNode')}
+				description=${this.localize.term('user_selectDocumentBlueprintStartNodeDescription')}>
+				<div slot="editor">
+					<uui-toggle
+						data-mark="input:allow-access-to-all-document-blueprints"
+						style="margin-bottom: var(--uui-size-space-3);"
+						label=${this.localize.term('user_allowAccessToAllDocumentBlueprints')}
+						.checked=${this._documentBlueprintRootAccess}
+						@change=${this.#onAllowAllDocumentBlueprintsChange}></uui-toggle>
+				</div>
+				${when(
+					this._documentBlueprintRootAccess === false,
+					() => html`
+						<umb-input-document-blueprint
+							slot="editor"
+							.selection=${this._documentBlueprintStartNodeUniques.map((reference) => reference.unique)}
+							?folderOnly=${true}
+							@change=${this.#onDocumentBlueprintStartNodeChange}>
+						</umb-input-document-blueprint>
 					`,
 				)}
 			</umb-property-layout>

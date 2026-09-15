@@ -137,6 +137,15 @@ public class UserGroupDto
     public int? StartElementId { get; set; }
 
     /// <summary>
+    /// Gets or sets the identifier of the container that defines the starting point for document blueprint
+    /// access for the user group. A null value indicates no access.
+    /// </summary>
+    [Column("startDocumentBlueprintId")]
+    [NullSetting(NullSetting = NullSettings.Null)]
+    [ForeignKey(typeof(NodeDto), Name = "FK_startDocumentBlueprintId_umbracoNode_id")]
+    public int? StartDocumentBlueprintId { get; set; }
+
+    /// <summary>
     /// Gets or sets the collection of application associations for this user group.
     /// </summary>
     [ResultColumn]

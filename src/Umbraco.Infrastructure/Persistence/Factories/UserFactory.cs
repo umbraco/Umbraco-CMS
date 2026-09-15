@@ -43,6 +43,8 @@ internal static class UserFactory
             dto.UserStartNodeDtos.Where(x => x.StartNodeType == (int)UserStartNodeDto.StartNodeTypeValue.Media)
                 .Select(x => x.StartNode).ToArray(),
             dto.UserStartNodeDtos.Where(x => x.StartNodeType == (int)UserStartNodeDto.StartNodeTypeValue.Element)
+                .Select(x => x.StartNode).ToArray(),
+            dto.UserStartNodeDtos.Where(x => x.StartNodeType == (int)UserStartNodeDto.StartNodeTypeValue.DocumentBlueprint)
                 .Select(x => x.StartNode).ToArray());
 
         try
@@ -148,6 +150,19 @@ internal static class UserFactory
             }
         }
 
+        if (entity.StartDocumentBlueprintIds is not null)
+        {
+            foreach (var startNodeId in entity.StartDocumentBlueprintIds)
+            {
+                dto.UserStartNodeDtos.Add(new UserStartNodeDto
+                {
+                    StartNode = startNodeId,
+                    StartNodeType = (int)UserStartNodeDto.StartNodeTypeValue.DocumentBlueprint,
+                    UserId = entity.Id,
+                });
+            }
+        }
+
         if (entity.HasIdentity)
         {
             dto.Id = entity.Id;
@@ -166,6 +181,7 @@ internal static class UserFactory
             group.StartContentId,
             group.StartMediaId,
             group.StartElementId,
+            group.StartDocumentBlueprintId,
             group.Alias,
             group.UserGroup2LanguageDtos.Select(x => x.LanguageId),
             group.UserGroup2AppDtos.Select(x => x.AppAlias).WhereNotNull().ToArray(),

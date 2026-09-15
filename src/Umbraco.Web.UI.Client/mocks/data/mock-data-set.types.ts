@@ -120,9 +120,11 @@ export type UmbMockDocumentModel = DocumentResponseModel &
 		originalParent?: { id: string } | null;
 	};
 
-export type UmbMockDocumentBlueprintModel = DocumentBlueprintResponseModel &
-	DocumentBlueprintItemResponseModel &
-	DocumentBlueprintTreeItemResponseModel;
+export type UmbMockDocumentBlueprintModel = Omit<DocumentBlueprintResponseModel, 'documentType'> &
+	Omit<DocumentBlueprintItemResponseModel, 'documentType'> &
+	Omit<DocumentBlueprintTreeItemResponseModel, 'documentType'> & {
+		documentType: DocumentTypeReferenceResponseModel | null;
+	};
 
 export type UmbMockDocumentTypeModel = DocumentTypeResponseModel &
 	DocumentTypeTreeItemResponseModel &

@@ -61,6 +61,10 @@ public class UserGroupControllerBase : ManagementApiControllerBase
                 .WithTitle("Element start node key not found")
                 .WithDetail("The assigned element start node does not exist.")
                 .Build()),
+            UserGroupOperationStatus.DocumentBlueprintStartNodeKeyNotFound => NotFound(problemDetailsBuilder
+                .WithTitle("Document blueprint start node key not found")
+                .WithDetail("The assigned document blueprint start node does not exist.")
+                .Build()),
             UserGroupOperationStatus.DocumentPermissionKeyNotFound => NotFound(new ProblemDetailsBuilder()
                 .WithTitle("Document permission key not found")
                 .WithDetail("An assigned document permission does not reference an existing document.")

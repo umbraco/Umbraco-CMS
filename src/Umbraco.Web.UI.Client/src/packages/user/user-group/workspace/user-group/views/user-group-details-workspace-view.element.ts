@@ -33,6 +33,12 @@ export class UmbUserGroupDetailsWorkspaceViewElement extends UmbLitElement imple
 	private _documentRootAccess: UmbUserGroupDetailModel['documentRootAccess'] = false;
 
 	@state()
+	private _documentBlueprintStartNode?: UmbUserGroupDetailModel['documentBlueprintStartNode'];
+
+	@state()
+	private _documentBlueprintRootAccess: UmbUserGroupDetailModel['documentBlueprintRootAccess'] = false;
+
+	@state()
 	private _elementStartNode?: UmbUserGroupDetailModel['elementStartNode'];
 
 	@state()
@@ -75,6 +81,18 @@ export class UmbUserGroupDetailsWorkspaceViewElement extends UmbLitElement imple
 			this.#workspaceContext?.documentStartNode,
 			(value) => (this._documentStartNode = value),
 			'_observeDocumentStartNode',
+		);
+
+		this.observe(
+			this.#workspaceContext?.documentBlueprintRootAccess,
+			(value) => (this._documentBlueprintRootAccess = value ?? false),
+			'_observeDocumentBlueprintRootAccess',
+		);
+
+		this.observe(
+			this.#workspaceContext?.documentBlueprintStartNode,
+			(value) => (this._documentBlueprintStartNode = value),
+			'_observeDocumentBlueprintStartNode',
 		);
 
 		this.observe(
@@ -141,6 +159,22 @@ export class UmbUserGroupDetailsWorkspaceViewElement extends UmbLitElement imple
 		this.#workspaceContext?.updateProperty('documentStartNode', selected ? { unique: selected } : null);
 	}
 
+	#onAllowAllDocumentBlueprintsChange(event: UUIBooleanInputEvent) {
+		event.stopPropagation();
+		const target = event.target;
+		// TODO make contexts method
+		this.#workspaceContext?.updateProperty('documentBlueprintRootAccess', target.checked);
+		this.#workspaceContext?.updateProperty('documentBlueprintStartNode', null);
+	}
+
+	#onDocumentBlueprintStartNodeChange(event: CustomEvent & { target: { selection: Array<string> } }) {
+		event.stopPropagation();
+		const target = event.target;
+		const selected = target.selection?.[0];
+		// TODO make contexts method
+		this.#workspaceContext?.updateProperty('documentBlueprintStartNode', selected ? { unique: selected } : null);
+	}
+
 	#onAllowAllElementsChange(event: UUIBooleanInputEvent) {
 		event.stopPropagation();
 		const target = event.target;
@@ -195,7 +229,7 @@ export class UmbUserGroupDetailsWorkspaceViewElement extends UmbLitElement imple
 						</umb-property-layout>
 
 						${this.#renderLanguageAccess()} ${this.#renderDocumentAccess()} ${this.#renderMediaAccess()}
-						${this.#renderElementAccess()}
+						${this.#renderElementAccess()} ${this.#renderDocumentBlueprintAccess()}
 					</uui-box>
 
 					${this.#renderPermissionGroups()}
@@ -279,6 +313,35 @@ export class UmbUserGroupDetailsWorkspaceViewElement extends UmbLitElement imple
 							?folderOnly=${true}
 							@change=${this.#onElementStartNodeChange}>
 						</umb-input-element>
+					`,
+				)}
+			</umb-property-layout>
+		`;
+	}
+
+	#renderDocumentBlueprintAccess() {
+		return html`
+			<umb-property-layout
+				label=${this.localize.term('user_selectDocumentBlueprintStartNode')}
+				description=${this.localize.term('user_selectDocumentBlueprintStartNodeDescription')}>
+				<div slot="editor">
+					<uui-toggle
+						data-mark="input:allow-access-to-all-document-blueprints"
+						style="margin-bottom: var(--uui-size-space-3);"
+						label=${this.localize.term('user_allowAccessToAllDocumentBlueprints')}
+						.checked=${this._documentBlueprintRootAccess}
+						@change=${this.#onAllowAllDocumentBlueprintsChange}></uui-toggle>
+				</div>
+				${when(
+					this._documentBlueprintRootAccess === false,
+					() => html`
+						<umb-input-document-blueprint
+							slot="editor"
+							max="1"
+							.selection=${this._documentBlueprintStartNode?.unique ? [this._documentBlueprintStartNode.unique] : []}
+							?folderOnly=${true}
+							@change=${this.#onDocumentBlueprintStartNodeChange}>
+						</umb-input-document-blueprint>
 					`,
 				)}
 			</umb-property-layout>
