@@ -968,10 +968,17 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
     }
 
     /// <summary>
-    /// Sorts block item values by culture to ensure consistent JSON serialization order.
+    /// Sorts block item values into a deterministic order so that the serialized JSON is stable.
     /// This prevents false positives in edited state detection where PublishedValue and EditedValue
-    /// differ only in culture order.
+    /// hold the same content in a different sequence.
     /// </summary>
+    /// <remarks>
+    /// Ordering by culture alone is not enough. <see cref="Enumerable.OrderBy{TSource,TKey}(IEnumerable{TSource},Func{TSource,TKey},IComparer{TKey}?)"/>
+    /// is stable, so values sharing a culture keep whatever order the calling path produced,
+    /// and the draft and published paths build their lists differently: the editor write path
+    /// serializes the values as they arrive, while the publish merge appends values the target
+    /// did not already have. The alias and segment are therefore part of the sort key.
+    /// </remarks>
     protected static void SortBlockItemValuesByCulture(TValue blockValue)
     {
         SortBlockItemValuesByCulture(blockValue.ContentData);
@@ -982,7 +989,13 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
     {
         foreach (BlockItemData item in blockItemData)
         {
-            item.Values = [.. item.Values.OrderBy(v => v.Culture, StringComparer.OrdinalIgnoreCase)];
+            item.Values =
+            [
+                .. item.Values
+                    .OrderBy(v => v.Culture, StringComparer.OrdinalIgnoreCase)
+                    .ThenBy(v => v.Alias, StringComparer.Ordinal)
+                    .ThenBy(v => v.Segment, StringComparer.OrdinalIgnoreCase)
+            ];
         }
     }
 }

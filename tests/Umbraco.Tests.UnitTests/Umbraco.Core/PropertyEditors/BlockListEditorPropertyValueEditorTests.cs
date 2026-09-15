@@ -158,6 +158,61 @@ public class BlockListEditorPropertyValueEditorTests
         AssertResultValue(result, 1, "C");
     }
 
+    [Test]
+    public void FromEditor_Serializes_Block_Values_In_A_Stable_Order_Regardless_Of_Input_Order()
+    {
+        // Regression test for #23526. The draft and the published write paths assemble a
+        // block's values in different sequences: FromEditor serializes them as they arrive,
+        // while the publish merge appends the values the target did not already have.
+        // Unless serialization is deterministic the two hold identical content in a different
+        // order, the raw string comparison in PropertyFactory reports the property as edited,
+        // and the document is stuck showing "pending changes" forever.
+        var editor = CreateValueEditor();
+
+        var oneOrder = CreateBlocksJsonWithValueOrder("message", "message2");
+        var otherOrder = CreateBlocksJsonWithValueOrder("message2", "message");
+
+        var first = editor.FromEditor(new ContentPropertyData(oneOrder, null), null);
+        var second = editor.FromEditor(new ContentPropertyData(otherOrder, null), null);
+
+        Assert.AreEqual(first, second);
+    }
+
+    private static JsonObject CreateBlocksJsonWithValueOrder(params string[] aliasesInOrder)
+    {
+        var values = new JsonArray();
+        foreach (var alias in aliasesInOrder)
+        {
+            values.Add(new JsonObject
+            {
+                { "editorAlias", "Umbraco.TextBox" },
+                { "alias", alias },
+                { "value", alias == "message" ? "A" : "B" },
+            });
+        }
+
+        return new JsonObject
+        {
+            {
+                "layout", new JsonObject
+                {
+                    { "Umbraco.BlockList", new JsonArray { CreateLayoutBlockJson() } },
+                }
+            },
+            {
+                "contentData", new JsonArray
+                {
+                    new JsonObject
+                    {
+                        { "contentTypeKey", _contentTypeKey },
+                        { "key", _contentKey },
+                        { "values", values },
+                    },
+                }
+            },
+        };
+    }
+
     private static JsonObject CreateBlocksJson(int numberOfBlocks, string? blockMessagePropertyValue = "A", string? blockMessage2PropertyValue = null)
     {
         var layoutItems = new JsonArray();
