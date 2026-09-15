@@ -6,7 +6,6 @@ import { UmbLitElement, umbDestroyOnDisconnect } from '@umbraco-cms/backoffice/l
 import { stringOrStringArrayContains, UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import { UmbDataPathBlockElementDataQuery } from '@umbraco-cms/backoffice/block';
 import { renderHiddenUfm } from '@umbraco-cms/backoffice/ufm';
-import { UmbElementVariantState } from '@umbraco-cms/backoffice/element';
 import { UmbObserveValidationStateController } from '@umbraco-cms/backoffice/validation';
 import { UUIBlinkAnimationValue, UUIBlinkKeyframes } from '@umbraco-cms/backoffice/external/uui';
 import type {
@@ -120,8 +119,6 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	@state()
 	private _exposed?: boolean;
 
-	private _localExpose?: boolean;
-
 	@state()
 	private _unsupported?: boolean;
 
@@ -153,9 +150,6 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 
 	@property({ type: Boolean, attribute: 'is-reference', reflect: true })
 	private _isExternalContent = false;
-
-	@state()
-	private _externalContentVariantState: string | null | undefined;
 
 	@state()
 	private _isReadOnly = false;
@@ -206,10 +200,10 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			null,
 		);
 		this.observe(
-			this.#context.hasExpose,
-			(exposed) => {
-				this._localExpose = exposed;
-				this.#updateExposedState();
+			this.#context.isExposed,
+			(isExposed) => {
+				this.#updateBlockViewProps({ unpublished: !isExposed });
+				this._exposed = isExposed;
 			},
 			null,
 		);
@@ -231,15 +225,6 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			this.#context.isExternalContent,
 			(isExternalContent) => {
 				this._isExternalContent = isExternalContent;
-				this.#updateExposedState();
-			},
-			null,
-		);
-		this.observe(
-			this.#context.externalContentVariantState,
-			(state) => {
-				this._externalContentVariantState = state;
-				this.#updateExposedState();
 			},
 			null,
 		);
@@ -357,16 +342,6 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	#onUfmResolved = (event: UmbUfmResolvedEvent) => {
 		this.#context.setName(event.detail.text);
 	};
-
-	#updateExposedState() {
-		// External content blocks use the element's variant state; local blocks use the expose entry
-		const isExposed = this._isExternalContent
-			? this._externalContentVariantState === UmbElementVariantState.PUBLISHED ||
-				this._externalContentVariantState === UmbElementVariantState.PUBLISHED_PENDING_CHANGES
-			: this._localExpose;
-		this.#updateBlockViewProps({ unpublished: !isExposed });
-		this._exposed = isExposed;
-	}
 
 	#extensionSlotFilterMethod = (manifest: ManifestBlockEditorCustomView) => {
 		if (this._unsupported) {

@@ -6,7 +6,6 @@ import { stringOrStringArrayContains, UmbDeprecation } from '@umbraco-cms/backof
 import { UmbDataPathBlockElementDataQuery } from '@umbraco-cms/backoffice/block';
 import { renderHiddenUfm } from '@umbraco-cms/backoffice/ufm';
 import { umbDestroyOnDisconnect, UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbElementVariantState } from '@umbraco-cms/backoffice/element';
 import { UmbObserveValidationStateController } from '@umbraco-cms/backoffice/validation';
 import { UUIBlinkAnimationValue, UUIBlinkKeyframes } from '@umbraco-cms/backoffice/external/uui';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
@@ -137,8 +136,6 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	@state()
 	private _exposed?: boolean;
 
-	private _localExpose?: boolean;
-
 	// Unsupported is triggered if the Block Type is not recognized, it can also be triggered by the Content Element Type not existing any longer. [NL]
 	@state()
 	private _unsupported?: boolean;
@@ -192,9 +189,6 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	private _isExternalContent = false;
 
 	@state()
-	private _externalContentVariantState: string | null | undefined;
-
-	@state()
 	private _isReadOnly = false;
 
 	constructor() {
@@ -246,10 +240,10 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			null,
 		);
 		this.observe(
-			this.#context.hasExpose,
-			(exposed) => {
-				this._localExpose = exposed;
-				this.#updateExposedState();
+			this.#context.isExposed,
+			(isExposed) => {
+				this.#updateBlockViewProps({ unpublished: !isExposed });
+				this._exposed = isExposed;
 			},
 			null,
 		);
@@ -271,15 +265,6 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			this.#context.isExternalContent,
 			(isExternalContent) => {
 				this._isExternalContent = isExternalContent;
-				this.#updateExposedState();
-			},
-			null,
-		);
-		this.observe(
-			this.#context.externalContentVariantState,
-			(state) => {
-				this._externalContentVariantState = state;
-				this.#updateExposedState();
 			},
 			null,
 		);
@@ -450,16 +435,6 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	#expose = () => {
 		this.#context.expose();
 	};
-
-	#updateExposedState() {
-		// External content blocks use the element's variant state; local blocks use the expose entry
-		const isExposed = this._isExternalContent
-			? this._externalContentVariantState === UmbElementVariantState.PUBLISHED ||
-				this._externalContentVariantState === UmbElementVariantState.PUBLISHED_PENDING_CHANGES
-			: this._localExpose;
-		this.#updateBlockViewProps({ unpublished: !isExposed });
-		this._exposed = isExposed;
-	}
 
 	#onUfmResolved = (event: UmbUfmResolvedEvent) => {
 		this.#context.setName(event.detail.text);
