@@ -10,8 +10,7 @@ namespace Umbraco.Extensions;
 /// </summary>
 /// <remarks>
 /// Both overloads read the stored file, so every read model reports the same extension for the same item. They
-/// differ only in how they reach it: a slim entity already carries the file's path, while a full media item has to
-/// resolve it from its upload property.
+/// differ only in how they reach it: a slim entity already carries the path, a full media item resolves it.
 /// </remarks>
 public static class MediaFileExtensions
 {

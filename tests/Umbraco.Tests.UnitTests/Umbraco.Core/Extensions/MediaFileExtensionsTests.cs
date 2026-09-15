@@ -29,6 +29,8 @@ public class MediaFileExtensionsTests
         Assert.AreEqual("pdf", entity.GetFileExtension());
     }
 
+    // The media built here carries an upload property and no `umbracoExtension`, which is what a custom media type
+    // can look like. Reading the file keeps such an item labelled everywhere, not only where the property exists.
     [TestCase("/media/abc123/holiday-photo.jpg", "jpg")]
     [TestCase("/media/abc123/HOLIDAY-PHOTO.JPG", "jpg")]
     [TestCase("/media/abc123/archive.tar.gz", "gz")]
@@ -36,16 +38,6 @@ public class MediaFileExtensionsTests
     [TestCase("/media/abc123/README", null)]
     public void Media_Reads_The_Extension_From_The_Stored_File(string mediaPath, string? expected)
         => Assert.AreEqual(expected, CreateMedia(mediaPath).GetFileExtension(CreateMediaUrlGenerators()));
-
-    [Test]
-    public void Media_Reads_The_File_Path_Even_Without_An_Extension_Property()
-    {
-        // A custom media type can carry an upload field without the `umbracoExtension` property. Reading the file
-        // keeps such an item labelled the same way everywhere, rather than only where the property happens to exist.
-        IMedia media = CreateMedia("/media/abc123/report.pdf");
-
-        Assert.AreEqual("pdf", media.GetFileExtension(CreateMediaUrlGenerators()));
-    }
 
     [Test]
     public void Media_Has_No_Extension_When_It_Holds_No_File()
