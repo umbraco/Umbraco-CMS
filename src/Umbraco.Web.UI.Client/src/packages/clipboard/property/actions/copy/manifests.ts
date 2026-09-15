@@ -15,7 +15,7 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 			weight: 1200,
 			meta: {
 				icon: 'icon-clipboard-copy',
-				label: 'Copy',
+				label: '#general_copy',
 			},
 		},
 	},
