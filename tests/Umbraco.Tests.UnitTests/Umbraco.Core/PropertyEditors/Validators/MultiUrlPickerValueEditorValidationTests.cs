@@ -1,4 +1,4 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
@@ -42,6 +42,20 @@ internal class MultiUrlPickerValueEditorValidationTests
         var picker = CreateValueEditor();
 
         picker.ConfigurationObject = new MultiUrlPickerConfiguration() { MaxNumber = max };
+
+        var result = picker.Validate(value, false, null, PropertyValidationContext.Empty());
+        ValidateResult(succeed, result);
+    }
+
+    [TestCase(true, "[{\"icon\":\"icon-document\",\"name\":\"Page 1\",\"published\":true,\"queryString\":null,\"target\":null,\"trashed\":false,\"type\":\"document\",\"unique\":\"7d285be2-7cd5-4c7b-a252-b064e31f049f\",\"url\":\"/\"}]")]
+    [TestCase(false, "[{\"icon\":\"icon-document\",\"name\":\"Page 1\",\"published\":true,\"queryString\":null,\"target\":null,\"trashed\":false,\"type\":\"document\",\"unique\":\"7d285be2-7cd5-4c7b-a252-b064e31f049f\",\"url\":\"/\"},{\"icon\":\"icon-document\",\"name\":\"Page 1\",\"published\":true,\"queryString\":null,\"target\":null,\"trashed\":false,\"type\":\"document\",\"unique\":\"7d285be2-7cd5-4c7b-a252-b064e31f049f\",\"url\":\"/\"}]")]
+    [TestCase(true, "[]")]
+    [TestCase(true, null)]
+    public void Validates_That_A_Single_Url_Picker_Holds_At_Most_One_Link(bool succeed, string? value)
+    {
+        var picker = CreateValueEditor();
+
+        picker.ConfigurationObject = new SingleUrlPickerConfiguration();
 
         var result = picker.Validate(value, false, null, PropertyValidationContext.Empty());
         ValidateResult(succeed, result);

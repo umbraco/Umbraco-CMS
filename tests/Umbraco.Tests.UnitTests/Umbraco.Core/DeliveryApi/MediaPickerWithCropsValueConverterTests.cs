@@ -1,4 +1,4 @@
-using Moq;
+﻿using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.DeliveryApi;
 [TestFixture]
 public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTests
 {
-    private MediaPickerWithCropsValueConverter MediaPickerWithCropsValueConverter()
+    private MediaPickerWithCropsValueConverterBase MediaPickerWithCropsValueConverter(bool multiSelect)
     {
         var serializer = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
         var publishedValueFallback = Mock.Of<IPublishedValueFallback>();
@@ -27,28 +27,55 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
                 publishedValueFallback,
                 CreateOutputExpansionStrategyAccessor()),
             publishedValueFallback);
-        return new MediaPickerWithCropsValueConverter(
-            CacheManager.Media,
-            PublishedUrlProvider,
-            publishedValueFallback,
-            serializer,
-            apiMediaWithCropsBuilder);
+        return multiSelect
+            ? new MediaPickerWithCropsValueConverter(
+                CacheManager.Media,
+                PublishedUrlProvider,
+                publishedValueFallback,
+                serializer,
+                apiMediaWithCropsBuilder)
+            : new SingleMediaPickerValueConverter(
+                CacheManager.Media,
+                PublishedUrlProvider,
+                publishedValueFallback,
+                serializer,
+                apiMediaWithCropsBuilder);
     }
 
     [Test]
-    public void MediaPickerWithCropsValueConverter_InSingleMode_ConvertsValueToCollectionOfApiMedia()
+    public void SingleMediaPickerValueConverter_YieldsOneMediaItem()
+    {
+        var publishedPropertyType = SetupMediaPropertyType(false);
+
+        var valueConverter = MediaPickerWithCropsValueConverter(false);
+
+        Assert.AreEqual(typeof(MediaWithCrops), valueConverter.GetPropertyValueType(publishedPropertyType));
+    }
+
+    [Test]
+    public void MediaPickerWithCropsValueConverter_YieldsACollectionOfMediaItems()
+    {
+        var publishedPropertyType = SetupMediaPropertyType(true);
+
+        var valueConverter = MediaPickerWithCropsValueConverter(true);
+
+        Assert.AreEqual(typeof(IEnumerable<MediaWithCrops>), valueConverter.GetPropertyValueType(publishedPropertyType));
+    }
+
+    [Test]
+    public void SingleMediaPickerValueConverter_ConvertsValueToCollectionOfApiMedia()
     {
         var publishedPropertyType = SetupMediaPropertyType(false);
         var mediaKey = SetupMedia("My media", ".jpg", 200, 400, "My alt text", 800);
 
         var serializer = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
 
-        var valueConverter = MediaPickerWithCropsValueConverter();
+        var valueConverter = MediaPickerWithCropsValueConverter(false);
         Assert.AreEqual(typeof(IEnumerable<IApiMediaWithCrops>), valueConverter.GetDeliveryApiPropertyValueType(publishedPropertyType));
 
         var inter = serializer.Serialize(new[]
         {
-            new MediaPicker3PropertyEditor.MediaPicker3PropertyValueEditor.MediaWithCropsDto
+            new MediaPickerPropertyEditorBase.MediaPickerPropertyValueEditor.MediaWithCropsDto
             {
                 Key = Guid.NewGuid(),
                 MediaKey = mediaKey,
@@ -79,7 +106,7 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
     }
 
     [Test]
-    public void MediaPickerWithCropsValueConverter_InMultiMode_ConvertsValueToMedias()
+    public void MediaPickerWithCropsValueConverter_ConvertsValueToMedias()
     {
         var publishedPropertyType = SetupMediaPropertyType(true);
         var mediaKey1 = SetupMedia("My media", ".jpg", 200, 400, "My alt text", 800);
@@ -87,12 +114,12 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
 
         var serializer = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
 
-        var valueConverter = MediaPickerWithCropsValueConverter();
+        var valueConverter = MediaPickerWithCropsValueConverter(true);
         Assert.AreEqual(typeof(IEnumerable<IApiMediaWithCrops>), valueConverter.GetDeliveryApiPropertyValueType(publishedPropertyType));
 
         var inter = serializer.Serialize(new[]
         {
-            new MediaPicker3PropertyEditor.MediaPicker3PropertyValueEditor.MediaWithCropsDto
+            new MediaPickerPropertyEditorBase.MediaPickerPropertyValueEditor.MediaWithCropsDto
             {
                 Key = Guid.NewGuid(),
                 MediaKey = mediaKey1,
@@ -106,7 +133,7 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
                 },
                 FocalPoint = new ImageCropperValue.ImageCropperFocalPoint { Left = .2m, Top = .4m }
             },
-            new MediaPicker3PropertyEditor.MediaPicker3PropertyValueEditor.MediaWithCropsDto
+            new MediaPickerPropertyEditorBase.MediaPickerPropertyValueEditor.MediaWithCropsDto
             {
                 Key = Guid.NewGuid(),
                 MediaKey = mediaKey2,
@@ -169,12 +196,12 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
 
         var serializer = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
 
-        var valueConverter = MediaPickerWithCropsValueConverter();
+        var valueConverter = MediaPickerWithCropsValueConverter(false);
         Assert.AreEqual(typeof(IEnumerable<IApiMediaWithCrops>), valueConverter.GetDeliveryApiPropertyValueType(publishedPropertyType));
 
         var inter = serializer.Serialize(new[]
         {
-            new MediaPicker3PropertyEditor.MediaPicker3PropertyValueEditor.MediaWithCropsDto
+            new MediaPickerPropertyEditorBase.MediaPickerPropertyValueEditor.MediaWithCropsDto
             {
                 Key = Guid.NewGuid(),
                 MediaKey = mediaKey,
@@ -229,12 +256,12 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
 
         var serializer = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
 
-        var valueConverter = MediaPickerWithCropsValueConverter();
+        var valueConverter = MediaPickerWithCropsValueConverter(false);
         Assert.AreEqual(typeof(IEnumerable<IApiMediaWithCrops>), valueConverter.GetDeliveryApiPropertyValueType(publishedPropertyType));
 
         var inter = serializer.Serialize(new[]
         {
-            new MediaPicker3PropertyEditor.MediaPicker3PropertyValueEditor.MediaWithCropsDto
+            new MediaPickerPropertyEditorBase.MediaPickerPropertyValueEditor.MediaWithCropsDto
             {
                 Key = Guid.NewGuid(),
                 MediaKey = mediaKey,
@@ -271,11 +298,11 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
     [TestCase(null)]
     [TestCase(123)]
     [TestCase("123")]
-    public void MediaPickerWithCropsValueConverter_InSingleMode_ConvertsInvalidValueToEmptyCollection(object inter)
+    public void SingleMediaPickerValueConverter_ConvertsInvalidValueToEmptyCollection(object inter)
     {
         var publishedPropertyType = SetupMediaPropertyType(false);
 
-        var valueConverter = MediaPickerWithCropsValueConverter();
+        var valueConverter = MediaPickerWithCropsValueConverter(false);
 
         var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<IApiMediaWithCrops>;
         Assert.NotNull(result);
@@ -286,11 +313,11 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
     [TestCase(null)]
     [TestCase(123)]
     [TestCase("123")]
-    public void MediaPickerWithCropsValueConverter_InMultiMode_ConvertsInvalidValueToEmptyCollection(object inter)
+    public void MediaPickerWithCropsValueConverter_ConvertsInvalidValueToEmptyCollection(object inter)
     {
         var publishedPropertyType = SetupMediaPropertyType(true);
 
-        var valueConverter = MediaPickerWithCropsValueConverter();
+        var valueConverter = MediaPickerWithCropsValueConverter(true);
 
         var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<IApiMediaWithCrops>;
         Assert.NotNull(result);
@@ -298,14 +325,14 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
     }
 
     [Test]
-    public void MediaPickerWithCropsValueConverter_InSingleMode_ConvertsValueToStronglyTypedMediaWithCrops()
+    public void SingleMediaPickerValueConverter_ConvertsValueToStronglyTypedMediaWithCrops()
     {
         var publishedPropertyType = SetupMediaPropertyType(false);
 
         TestMediaModelOne? media = null;
         var mediaKey = SetupMedia("My media", ".jpg", 200, 400, "My alt text", 800, asModel: inner => media = new TestMediaModelOne(inner));
 
-        var valueConverter = MediaPickerWithCropsValueConverter();
+        var valueConverter = MediaPickerWithCropsValueConverter(false);
         var inter = SerializeMediaWithCropsDtos(mediaKey);
 
         var result = valueConverter.ConvertIntermediateToObject(Mock.Of<IPublishedElement>(), publishedPropertyType, PropertyCacheLevel.Element, inter, false);
@@ -315,7 +342,7 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
     }
 
     [Test]
-    public void MediaPickerWithCropsValueConverter_InMultiMode_ConvertsEachValueToItsOwnStronglyTypedMediaWithCrops()
+    public void MediaPickerWithCropsValueConverter_ConvertsEachValueToItsOwnStronglyTypedMediaWithCrops()
     {
         var publishedPropertyType = SetupMediaPropertyType(true);
 
@@ -324,7 +351,7 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
         var firstMediaKey = SetupMedia("First media", ".jpg", 200, 400, "First alt text", 800, asModel: inner => firstMedia = new TestMediaModelOne(inner));
         var secondMediaKey = SetupMedia("Second media", ".png", 300, 600, "Second alt text", 900, asModel: inner => secondMedia = new TestMediaModelTwo(inner));
 
-        var valueConverter = MediaPickerWithCropsValueConverter();
+        var valueConverter = MediaPickerWithCropsValueConverter(true);
         var inter = SerializeMediaWithCropsDtos(firstMediaKey, secondMediaKey);
 
         // convert twice; the first pass populates the constructor cache, the second one exercises it
@@ -348,7 +375,7 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
     {
         var serializer = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
         return serializer.Serialize(mediaKeys.Select(mediaKey =>
-            new MediaPicker3PropertyEditor.MediaPicker3PropertyValueEditor.MediaWithCropsDto
+            new MediaPickerPropertyEditorBase.MediaPickerPropertyValueEditor.MediaWithCropsDto
             {
                 Key = Guid.NewGuid(),
                 MediaKey = mediaKey,
@@ -359,18 +386,16 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
 
     private IPublishedPropertyType SetupMediaPropertyType(bool multiSelect)
     {
-        var publishedDataType = new PublishedDataType(123, "test", "test", new Lazy<object>(() => new MediaPicker3Configuration
-        {
-            Multiple = multiSelect,
-            EnableLocalFocalPoint = true,
-            Crops = new MediaPicker3Configuration.CropConfiguration[]
-            {
-                new MediaPicker3Configuration.CropConfiguration
-                {
-                    Alias = "one", Width = 200, Height = 100
-                }
-            }
-        }));
+        MediaPickerConfigurationBase configuration = multiSelect
+            ? new MediaPicker3Configuration()
+            : new SingleMediaPickerConfiguration();
+        configuration.EnableLocalFocalPoint = true;
+        configuration.Crops =
+        [
+            new MediaPickerConfigurationBase.CropConfiguration { Alias = "one", Width = 200, Height = 100 }
+        ];
+
+        var publishedDataType = new PublishedDataType(123, "test", "test", new Lazy<object>(() => configuration));
         var publishedPropertyType = new Mock<IPublishedPropertyType>();
         publishedPropertyType.SetupGet(p => p.DataType).Returns(publishedDataType);
 

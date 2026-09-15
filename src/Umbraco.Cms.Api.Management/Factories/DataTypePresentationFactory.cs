@@ -152,16 +152,20 @@ public class DataTypePresentationFactory : IDataTypePresentationFactory
     private ValueStorageType GetEditorValueStorageType(IDataEditor editor, IDictionary<string, object> configurationData)
     {
         // Only editors whose configuration object implements IConfigureValueType derive their storage
-        // type from the configuration. Building the typed configuration object can throw for editors
-        // whose stored configuration doesn't cleanly deserialize into their configuration type; that
-        // must not fail the save, so fall back to the value editor's value type in that case.
+        // type from the configuration. No core editor does any more, but the interface is only obsolete,
+        // so a third-party editor still implementing it has to keep working for its deprecation period.
+        // Building the typed configuration object can throw for editors whose stored configuration doesn't
+        // cleanly deserialize into their configuration type; that must not fail the save, so fall back
+        // to the value editor's value type in that case.
         try
         {
+#pragma warning disable CS0618 // Type or member is obsolete
             if (editor.GetConfigurationEditor().ToConfigurationObject(configurationData, _configurationEditorJsonSerializer)
                 is IConfigureValueType configureValueType)
             {
                 return ValueTypes.ToStorageType(configureValueType.ValueType);
             }
+#pragma warning restore CS0618 // Type or member is obsolete
         }
         catch (Exception)
         {

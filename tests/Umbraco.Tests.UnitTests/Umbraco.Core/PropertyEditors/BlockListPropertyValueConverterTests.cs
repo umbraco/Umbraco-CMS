@@ -82,11 +82,17 @@ public class BlockListPropertyValueConverterTests : BlockPropertyValueConverterT
         Blocks = new[] { new BlockListConfiguration.BlockConfiguration { ContentElementTypeKey = ContentKey1 } },
     };
 
-    private BlockListConfiguration ConfigForSingleBlockMode() => new()
+    /// <summary>
+    /// Configuration as it was left on a data type that had been put in single block mode before that mode became
+    /// the separate single block editor.
+    /// </summary>
+    private BlockListConfiguration ConfigForObsoleteSingleBlockMode() => new()
     {
         Blocks = new[] { new BlockListConfiguration.BlockConfiguration { ContentElementTypeKey = ContentKey1 } },
         ValidationLimit = new() { Min = 1, Max = 1 },
+#pragma warning disable CS0618 // Type or member is obsolete
         UseSingleBlockMode = true,
+#pragma warning restore CS0618 // Type or member is obsolete
     };
 
     [Test]
@@ -130,17 +136,18 @@ public class BlockListPropertyValueConverterTests : BlockPropertyValueConverterT
     }
 
     [Test]
-    public void Get_Value_TypeSingleBlockMode()
+    public void Get_Value_Type_Ignores_Obsolete_Single_Block_Mode_Configuration()
     {
         var editor = CreateConverter();
-        var config = ConfigForSingleBlockMode();
+        var config = ConfigForObsoleteSingleBlockMode();
 
         var dataType = new PublishedDataType(1, "test", "test", new Lazy<object>(() => config));
         var propType = Mock.Of<IPublishedPropertyType>(x => x.DataType == dataType);
 
         var valueType = editor.GetPropertyValueType(propType);
 
-        Assert.AreEqual(typeof(BlockListItem), valueType);
+        // the result is always block list model
+        Assert.AreEqual(typeof(BlockListModel), valueType);
     }
 
     [Test]

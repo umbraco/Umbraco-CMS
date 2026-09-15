@@ -35,8 +35,8 @@ public class FixLabelDataTypeDbTypeFromConfiguration : AsyncMigrationBase
     protected override Task MigrateAsync() => ExecuteMigration(Database, _dataTypeService);
 
     /// <summary>
-    /// Performs the migration: ensures each Label data type's <see cref="IDataType.DatabaseType"/> matches its configured
-    /// <see cref="IConfigureValueType.ValueType"/>, then relocates any property data from <c>varcharValue</c> to
+    /// Performs the migration: ensures each Label data type's <see cref="IDataType.DatabaseType"/> matches the value
+    /// type in its stored configuration, then relocates any property data from <c>varcharValue</c> to
     /// <c>textValue</c> for Label data types whose storage type is <see cref="ValueStorageType.Ntext"/>.
     /// </summary>
     /// <remarks>
@@ -48,8 +48,14 @@ public class FixLabelDataTypeDbTypeFromConfiguration : AsyncMigrationBase
 
         foreach (IDataType dataType in dataTypes)
         {
-            var valueType = dataType.ConfigurationObject is IConfigureValueType configureValueType
-                ? configureValueType.ValueType
+            // Read the value type as it is stored, rather than through the editor's configuration object. The label
+            // editors stopped taking configuration in Umbraco 19, so a data type this migration still has to correct
+            // no longer deserializes into a configuration carrying the value type.
+            var valueType = dataType.ConfigurationData
+                                .TryGetValue(Constants.PropertyEditors.ConfigurationKeys.DataValueType, out var configuredValueType)
+                            && configuredValueType?.ToString() is { Length: > 0 } storedValueType
+                            && ValueTypes.IsValue(storedValueType)
+                ? storedValueType
                 : ValueTypes.String;
 
             ValueStorageType expected = ValueTypes.ToStorageType(valueType);

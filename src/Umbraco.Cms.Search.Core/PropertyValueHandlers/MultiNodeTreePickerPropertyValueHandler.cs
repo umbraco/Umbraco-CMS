@@ -7,6 +7,9 @@ using Umbraco.Cms.Search.Core.Models.Indexing;
 using Umbraco.Extensions;
 using IndexValue = Umbraco.Cms.Search.Core.Models.Indexing.IndexValue;
 
+// The multi node tree picker is obsolete, but must keep working for the whole deprecation period.
+#pragma warning disable CS0618 // Type or member is obsolete
+
 namespace Umbraco.Cms.Search.Core.PropertyValueHandlers;
 
 /// <summary>
@@ -61,3 +64,5 @@ internal sealed class MultiNodeTreePickerPropertyValueHandler : IPropertyValueHa
             : [];
     }
 }
+
+#pragma warning restore CS0618 // Type or member is obsolete

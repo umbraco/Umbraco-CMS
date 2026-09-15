@@ -14,6 +14,7 @@ internal sealed class NoopPropertyValueHandler : IPropertyValueHandler, ICorePro
             or Cms.Core.Constants.PropertyEditors.Aliases.ColorPicker
             or Cms.Core.Constants.PropertyEditors.Aliases.ColorPickerEyeDropper
             or Cms.Core.Constants.PropertyEditors.Aliases.MediaPicker3
+            or Cms.Core.Constants.PropertyEditors.Aliases.SingleMediaPicker
             or Cms.Core.Constants.PropertyEditors.Aliases.ImageCropper
             or Cms.Core.Constants.PropertyEditors.Aliases.UploadField;
 
