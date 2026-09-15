@@ -10,6 +10,8 @@ type UmbTiptapToolbarStyleMenuCommandType = {
 	isActive?: (editor?: Editor) => boolean | undefined;
 };
 
+type UmbTiptapToolbarStyleMenuItemData = NonNullable<MetaTiptapToolbarStyleMenuItem['data']>;
+
 export default class UmbTiptapToolbarStyleMenuApi extends UmbTiptapToolbarElementApiBase {
 	#headingCommand(level: 1 | 2 | 3 | 4 | 5 | 6): UmbTiptapToolbarStyleMenuCommandType {
 		return {
@@ -44,49 +46,64 @@ export default class UmbTiptapToolbarStyleMenuApi extends UmbTiptapToolbarElemen
 	override isActive(editor?: Editor, item?: MetaTiptapToolbarStyleMenuItem) {
 		if (!editor || !item?.data) return false;
 
-		const { tag, id, class: className } = item.data;
-		if (tag) return this.#isTagActive(editor, tag, id, className);
-		return this.#hasAttributesAroundSelection(editor, id, className);
+		const { tag } = item.data;
+		if (tag) return this.#isTagActive(editor, tag, item.data);
+		return this.#hasAttributesAroundSelection(editor, item.data);
 	}
 
-	#isTagActive(editor: Editor, tag: string, id?: string, className?: string): boolean {
+	#isTagActive(editor: Editor, tag: string, data: UmbTiptapToolbarStyleMenuItemData): boolean {
 		const ext = this.#commands[tag];
 		if (!ext) return false;
 		const tagMatch = ext.isActive?.(editor) ?? editor.isActive(ext.type) ?? false;
-		return tagMatch && this.#hasAttributes(editor.getAttributes(ext.type), id, className);
+		return tagMatch && this.#hasAttributes(editor.getAttributes(ext.type), data);
 	}
 
-	#hasAttributesAroundSelection(editor: Editor, id?: string, className?: string): boolean {
+	#hasAttributesAroundSelection(editor: Editor, data: UmbTiptapToolbarStyleMenuItemData): boolean {
 		// Without a tag, `execute` toggles the id/class on every node and mark type around the selection, so the item
 		// is active when any of them - the selected node, an ancestor node, or a mark on the selection - carries them.
 		return (
-			this.#hasSelectedNodeWithAttributes(editor, id, className) ||
-			this.#hasAncestorNodeWithAttributes(editor, id, className) ||
-			this.#hasMarkWithAttributes(editor, id, className)
+			this.#hasSelectedNodeWithAttributes(editor, data) ||
+			this.#hasAncestorNodeWithAttributes(editor, data) ||
+			this.#hasMarkWithAttributes(editor, data)
 		);
 	}
 
-	#hasSelectedNodeWithAttributes(editor: Editor, id?: string, className?: string): boolean {
+	#hasSelectedNodeWithAttributes(editor: Editor, data: UmbTiptapToolbarStyleMenuItemData): boolean {
 		const { selection } = editor.state;
 		if (!(selection instanceof NodeSelection)) return false;
-		return this.#hasAttributes(selection.node.attrs, id, className);
+		return this.#hasAttributes(selection.node.attrs, data);
 	}
 
-	#hasAncestorNodeWithAttributes(editor: Editor, id?: string, className?: string): boolean {
+	#hasAncestorNodeWithAttributes(editor: Editor, data: UmbTiptapToolbarStyleMenuItemData): boolean {
 		const { $from } = editor.state.selection;
 		for (let depth = $from.depth; depth > 0; depth--) {
-			if (this.#hasAttributes($from.node(depth).attrs, id, className)) return true;
+			if (this.#hasAttributes($from.node(depth).attrs, data)) return true;
 		}
 		return false;
 	}
 
-	#hasMarkWithAttributes(editor: Editor, id?: string, className?: string): boolean {
+	#hasMarkWithAttributes(editor: Editor, data: UmbTiptapToolbarStyleMenuItemData): boolean {
+		// Mirrors the range `editor.getAttributes(markType)` reads for a mark command, so a class further into a
+		// non-empty selection is detected here too, not only one at the very start of it.
 		const { state } = editor;
-		const marks = state.storedMarks ?? state.selection.$from.marks();
-		return marks.some((mark) => this.#hasAttributes(mark.attrs, id, className));
+		const { from, to, empty } = state.selection;
+
+		if (empty) {
+			const marks = state.storedMarks ?? state.selection.$from.marks();
+			return marks.some((mark) => this.#hasAttributes(mark.attrs, data));
+		}
+
+		let matched = false;
+		state.doc.nodesBetween(from, to, (node) => {
+			if (matched) return false;
+			matched = node.marks.some((mark) => this.#hasAttributes(mark.attrs, data));
+			return !matched;
+		});
+		return matched;
 	}
 
-	#hasAttributes(attrs: Record<string, unknown>, id?: string, className?: string): boolean {
+	#hasAttributes(attrs: Record<string, unknown>, data: UmbTiptapToolbarStyleMenuItemData): boolean {
+		const { id, class: className } = data;
 		const idMatch = !id ? true : attrs.id === id;
 		const classMatch = !className ? true : hasClassNames(attrs.class, className);
 		return idMatch && classMatch;

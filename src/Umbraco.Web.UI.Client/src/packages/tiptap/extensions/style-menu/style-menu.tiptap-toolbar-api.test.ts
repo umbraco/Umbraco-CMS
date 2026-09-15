@@ -159,6 +159,13 @@ describe('UmbTiptapToolbarStyleMenuApi', () => {
 			expect(api.isActive(editor, item({ class: 'quiet' }))).to.equal(false);
 		});
 
+		it('detects a class-only style on a mark later in a non-empty selection', () => {
+			editor.commands.setContent('<p>plain <strong class="loud">text</strong></p>');
+			editor.commands.setTextSelection({ from: 1, to: 11 });
+
+			expect(api.isActive(editor, item({ class: 'loud' }))).to.equal(true);
+		});
+
 		it('detects a class-only style on a node-selected image', () => {
 			editor.commands.setContent('<p>text</p><img class="framed" src="test.png">');
 			editor.commands.setNodeSelection(6);
@@ -176,6 +183,15 @@ describe('UmbTiptapToolbarStyleMenuApi', () => {
 			api.execute(editor, item({ class: 'callout' }));
 
 			expect(api.isActive(editor, item({ class: 'callout' }))).to.equal(false);
+		});
+
+		it('turns a class-only style on a mark fully off after one toggle', () => {
+			setContent('<p><strong class="loud">text</strong></p>', 2);
+			expect(api.isActive(editor, item({ class: 'loud' }))).to.equal(true);
+
+			api.execute(editor, item({ class: 'loud' }));
+
+			expect(api.isActive(editor, item({ class: 'loud' }))).to.equal(false);
 		});
 	});
 });
