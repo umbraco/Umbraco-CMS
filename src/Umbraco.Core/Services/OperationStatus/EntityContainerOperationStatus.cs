@@ -74,4 +74,13 @@ public enum EntityContainerOperationStatus
     ///     Failure for an an unknown reason.
     /// </summary>
     Unknown,
+
+    /// <summary>
+    ///     The parent of the container cannot be changed by the attempted operation. The container must be moved instead.
+    /// </summary>
+    /// <remarks>
+    ///     Added after <see cref="Unknown" /> rather than beside the other failure statuses, as inserting a member
+    ///     would change the value of every member after it, which is a breaking change.
+    /// </remarks>
+    ParentChangeNotAllowed,
 }
