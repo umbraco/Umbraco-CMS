@@ -47,6 +47,14 @@ export class UmbRouteContext extends UmbContextBase {
 	}
 
 	public registerModal(registration: UmbModalRouteRegistration) {
+		const path = registration.generateModalPath();
+		if (this.#modalRegistrations.some((existing) => existing.generateModalPath() === path)) {
+			console.warn(
+				`[UmbRouteContext] Duplicate modal route '${path}'. Only the first registration will handle it. ` +
+					`Give each registration a unique path, for example via addUniquePaths().`,
+			);
+		}
+
 		this.#modalRegistrations.push(registration);
 		this.#createNewUrlBuilder(registration);
 		this.#generateModalRoutes();
