@@ -214,12 +214,10 @@ test('can publish child content from list', async ({umbracoApi, umbracoUi}) => {
   expect(childContentData.variants[0].state).toBe(expectedState);
 });
 
-// Not a confirmed product bug: this consistently fails in automation (the publish correctly 400s with
-// "Parent not published", but no notification appears), yet manually reproducing the identical action
-// (tick the child's checkbox, click Publish in the selection toolbar, confirm) does show the error
-// notification in a real browser. Ruled out a stale/cold notification-module import as the cause - warming
-// it up earlier in the same test doesn't change the outcome. Left skipped pending an explanation for why
-// automation and manual testing disagree here.
+// Product bug: publishing a single selected item from the list view's bulk toolbar swallows the error
+// notification. UmbResourceController#_peekError isn't awaited before it's called, so by the time its
+// async notification lookup resolves, the transient bulk-action host has already been torn down and the
+// lookup silently fails. Confirmed manually with a real, unrecorded click.
 test.skip('can not publish child content from list when parent is not published', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const expectedState = 'Draft';
