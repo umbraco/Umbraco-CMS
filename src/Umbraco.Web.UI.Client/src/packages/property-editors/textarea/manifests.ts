@@ -7,6 +7,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Text Area Property Editor UI',
 		element: () => import('./property-editor-ui-textarea.element.js'),
 		meta: {
+			supportsVariantChange: true,
 			label: 'Text Area',
 			propertyEditorSchemaAlias: 'Umbraco.TextArea',
 			icon: 'icon-edit',
