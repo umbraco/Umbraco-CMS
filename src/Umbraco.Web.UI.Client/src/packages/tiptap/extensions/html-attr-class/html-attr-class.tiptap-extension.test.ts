@@ -43,4 +43,13 @@ describe('HtmlClassAttribute', () => {
 
 		expect(editor.getHTML()).to.include('<blockquote class="callout"><p class="callout">');
 	});
+
+	it('removes a class from every configured type around the selection when all of them have it', () => {
+		editor.commands.setContent('<blockquote class="callout"><p class="callout">text</p></blockquote>');
+		editor.commands.setTextSelection(2);
+
+		editor.commands.toggleClassName('callout');
+
+		expect(editor.getHTML()).to.not.include('class="callout"');
+	});
 });
