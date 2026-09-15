@@ -182,6 +182,87 @@ describe('UmbAuthContext', () => {
 			expect(url).to.contain('/umbraco/logout');
 		});
 	});
+	describe('Popup authorization flow', () => {
+		type OpenCall = { url: string; target?: string; features?: string };
+		type FakePopup = {
+			closed: boolean;
+			focusCount: number;
+			closeCount: number;
+			replacedWith: string | null;
+			focus: () => void;
+			close: () => void;
+			location: { replace: (url: string) => void };
+		};
+		let openCalls: Array<OpenCall>;
+		let popup: FakePopup;
+		const realOpen = window.open;
+
+		beforeEach(() => {
+			openCalls = [];
+			popup = {
+				closed: false,
+				focusCount: 0,
+				closeCount: 0,
+				replacedWith: null,
+				focus() {
+					this.focusCount++;
+				},
+				close() {
+					this.closeCount++;
+					this.closed = true;
+				},
+				location: {
+					replace: (url: string) => {
+						popup.replacedWith = url;
+					},
+				},
+			};
+			window.open = ((url?: string | URL, target?: string, features?: string) => {
+				openCalls.push({ url: url?.toString() ?? '', target, features });
+				return popup as unknown as WindowProxy;
+			}) as typeof window.open;
+		});
+
+		afterEach(() => {
+			window.open = realOpen;
+		});
+
+		it('opens the popup synchronously within the call and navigates it once the authorization URL is ready', async () => {
+			// Not awaited: the promise only settles when the popup flow completes or the context is destroyed.
+			void context.makeAuthorizationRequest('Umbraco', false);
+
+			expect(openCalls, 'popup must open before the first await').to.have.lengthOf(1);
+			expect(openCalls[0].url).to.equal('');
+			expect(openCalls[0].target).to.equal('umbracoAuthPopup');
+			expect(openCalls[0].features).to.contain('width=600');
+
+			while (!popup.replacedWith) await aTimeout(5);
+
+			const url = new URL(popup.replacedWith);
+			expect(url.pathname).to.contain('/authorize');
+			expect(url.searchParams.get('code_challenge_method')).to.equal('S256');
+			expect(url.searchParams.get('code_challenge')).to.be.a('string').and.not.be.empty;
+			expect(openCalls, 'no second window.open once the popup was handed the URL').to.have.lengthOf(1);
+			expect(popup.focusCount).to.equal(1);
+			expect(popup.closeCount).to.equal(0);
+		});
+
+		it('uses the popup target and features from the provider manifest', async () => {
+			void context.makeAuthorizationRequest('Umbraco', false, undefined, {
+				type: 'authProvider',
+				alias: 'test',
+				name: 'test',
+				forProviderName: 'Umbraco',
+				meta: { behavior: { popupTarget: 'customTarget', popupFeatures: 'width=100' } },
+			});
+
+			expect(openCalls[0].target).to.equal('customTarget');
+			expect(openCalls[0].features).to.equal('width=100');
+
+			while (!popup.replacedWith) await aTimeout(5);
+		});
+	});
+
 	describe('Refresh failure handling', () => {
 		let fetchCalls: Array<string>;
 		let fetchResponder: () => Response;
