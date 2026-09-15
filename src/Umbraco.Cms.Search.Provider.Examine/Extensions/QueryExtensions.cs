@@ -1,5 +1,5 @@
 ﻿using Examine.Search;
-using Umbraco.Cms.Search.Core.Models.Searching.Filtering;
+using Umbraco.Cms.Core.Search.Querying.Filtering;
 using Umbraco.Cms.Search.Provider.Examine.Models.Searching.Filtering;
 
 namespace Umbraco.Cms.Search.Provider.Examine.Extensions;

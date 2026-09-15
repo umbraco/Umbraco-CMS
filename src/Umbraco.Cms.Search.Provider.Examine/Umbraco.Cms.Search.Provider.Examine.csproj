@@ -11,11 +11,40 @@
 
   <ItemGroup>
     <PackageReference Include="Examine" />
+    <PackageReference Include="Umbraco.JsonSchema.Extensions" PrivateAssets="all" GeneratePathProperty="true" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Umbraco.Cms.Api.Common\Umbraco.Cms.Api.Common.csproj" />
+    <ProjectReference Include="..\Umbraco.Cms.Api.Management\Umbraco.Cms.Api.Management.csproj" />
     <ProjectReference Include="..\Umbraco.Cms.Search.Core\Umbraco.Cms.Search.Core.csproj" />
+    <ProjectReference Include="..\Umbraco.Web.Common\Umbraco.Web.Common.csproj" />
   </ItemGroup>
+
+  <!-- Generate this provider's own JSON schema fragment (Umbraco:CMS:Search:Examine), following the pattern
+       Umbraco Forms uses - see Umbraco.Cms.Targets.csproj for the CMS's own (differently-produced) schema,
+       and buildTransitive\Umbraco.Cms.Search.Provider.Examine.props for how consuming sites pick this up. -->
+  <PropertyGroup>
+    <_UmbracoSearchExamineJsonSchemaReference>appsettings-schema.Umbraco.Cms.Search.Examine.json</_UmbracoSearchExamineJsonSchemaReference>
+    <NoWarn>$(NoWarn),NU5100,NU5128</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- Sdk.Razor's default item globbing already picks up these files as Content once they exist on disk;
+         Remove then Include so the explicit metadata below always wins instead of colliding (NETSDK1022). -->
+    <Content Remove="$(_UmbracoSearchExamineJsonSchemaReference)" />
+    <Content Include="$(_UmbracoSearchExamineJsonSchemaReference)" PackagePath="" Visible="false" />
+    <Content Remove="buildTransitive\**" />
+    <Content Include="buildTransitive\**" PackagePath="buildTransitive" />
+  </ItemGroup>
+
+  <Target Name="GenerateAppsettingsSchema" BeforeTargets="Build;CopyUmbracoJsonSchemaFiles" Inputs="$(TargetPath)" Outputs="$(_UmbracoSearchExamineJsonSchemaReference)">
+    <JsonSchemaGenerate AssemblyPath="$(TargetPath)" TypeName="UmbracoSearchExamineSchema" OutputPath="$(_UmbracoSearchExamineJsonSchemaReference)" IncludeObsoleteProperties="false" />
+  </Target>
+
+  <!-- Remove generated JSON schema on clean -->
+  <Target Name="RemoveAppsettingsSchema" AfterTargets="Clean" Condition="Exists('$(_UmbracoSearchExamineJsonSchemaReference)')">
+    <Delete Files="$(_UmbracoSearchExamineJsonSchemaReference)" />
+  </Target>
 
   <ItemGroup>
     <!-- Dont include the client folder as part of packaging nuget build -->
@@ -46,7 +75,6 @@
   <!-- BEGIN: Restore and build the search Examine client project (mirrors the Login block in Umbraco.Cms.StaticAssets) -->
   <PropertyGroup>
     <SearchExamineClientProjectDirectory Condition="'$(SearchExamineClientProjectDirectory)' == ''">$(ProjectDir)Client\</SearchExamineClientProjectDirectory>
-    <SearchCoreClientProjectDirectory Condition="'$(SearchCoreClientProjectDirectory)' == ''">$(ProjectDir)..\Umbraco.Cms.Search.Core.Client\Client\</SearchCoreClientProjectDirectory>
     <BackofficeClientProjectDirectory Condition="'$(BackofficeClientProjectDirectory)' == ''">$(ProjectDir)..\Umbraco.Web.UI.Client\</BackofficeClientProjectDirectory>
     <SearchExamineClientAssetsPath>$(ProjectDir)wwwroot\App_Plugins\UmbracoSearchExamine</SearchExamineClientAssetsPath>
   </PropertyGroup>
@@ -67,18 +95,17 @@
     <Exec Command="npm i --no-fund --no-audit" WorkingDirectory="$(SearchExamineClientProjectDirectory)" />
   </Target>
 
-  <!-- The Core Client and backoffice only need restoring (not building): this client's tsc walks their sources through tsconfig path aliases -->
-  <Target Name="RestoreSearchCoreClient" Inputs="$(SearchCoreClientProjectDirectory)package-lock.json" Outputs="$(SearchCoreClientProjectDirectory)node_modules/.package-lock.json">
-    <Message Importance="high" Text="Restoring Search Core Client NPM packages..." />
-    <Exec Command="npm i --no-fund --no-audit" WorkingDirectory="$(SearchCoreClientProjectDirectory)" />
-  </Target>
-
+  <!-- The backoffice only needs restoring (not building): this client's tsc walks its sources through tsconfig path aliases.
+       Delegate to Umbraco.Cms.StaticAssets's own RestoreBackoffice target (via the MSBuild task, not a ProjectReference)
+       instead of running a second, independent "npm i" against the same Umbraco.Web.UI.Client directory - two concurrent
+       installs into the same node_modules race each other (observed as npm ENOTEMPTY errors when the solution builds
+       both projects in parallel). MSBuild de-duplicates same-project/same-target requests within a build, so whichever
+       of the two projects builds first performs the actual install and the other reuses that result. -->
   <Target Name="RestoreBackofficeClient" Inputs="$(BackofficeClientProjectDirectory)package-lock.json" Outputs="$(BackofficeClientProjectDirectory)node_modules/.package-lock.json">
-    <Message Importance="high" Text="Restoring Backoffice NPM packages..." />
-    <Exec Command="npm i --no-fund --no-audit" WorkingDirectory="$(BackofficeClientProjectDirectory)" />
+    <MSBuild Projects="$(ProjectDir)..\Umbraco.Cms.StaticAssets\Umbraco.Cms.StaticAssets.csproj" Targets="RestoreBackoffice" />
   </Target>
 
-  <Target Name="BuildSearchExamineClient" DependsOnTargets="RestoreSearchExamineClient;RestoreSearchCoreClient;RestoreBackofficeClient">
+  <Target Name="BuildSearchExamineClient" DependsOnTargets="RestoreSearchExamineClient;RestoreBackofficeClient">
     <Message Importance="high" Text="Executing Search Examine Client NPM build script..." />
     <Exec Command="npm run build" WorkingDirectory="$(SearchExamineClientProjectDirectory)" />
     <ItemGroup>

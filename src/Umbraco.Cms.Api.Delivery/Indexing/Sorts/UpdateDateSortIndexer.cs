@@ -3,7 +3,7 @@ using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Api.Delivery.Indexing.Sorts;
 
-public sealed class UpdateDateSortIndexer : IContentIndexHandler
+public sealed class UpdateDateSortIndexer : ISystemContentIndexHandler
 {
     internal const string FieldName = "updateDate";
 
