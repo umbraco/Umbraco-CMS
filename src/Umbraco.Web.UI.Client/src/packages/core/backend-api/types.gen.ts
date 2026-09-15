@@ -6754,6 +6754,10 @@ export type PutDocumentBlueprintByIdMoveData = {
 
 export type PutDocumentBlueprintByIdMoveErrors = {
     /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+    /**
      * The resource is protected and requires an authentication token
      */
     401: unknown;
@@ -6963,6 +6967,10 @@ export type PostDocumentBlueprintFromDocumentData = {
 };
 
 export type PostDocumentBlueprintFromDocumentErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
     /**
      * The resource is protected and requires an authentication token
      */
@@ -7694,6 +7702,37 @@ export type GetDocumentTypeAllowedAtRootResponses = {
 };
 
 export type GetDocumentTypeAllowedAtRootResponse = GetDocumentTypeAllowedAtRootResponses[keyof GetDocumentTypeAllowedAtRootResponses];
+
+export type GetDocumentTypeAllowedForBlueprintData = {
+    body?: never;
+    path?: never;
+    query?: {
+        parentKey?: string;
+        skip?: number;
+        take?: number;
+    };
+    url: '/umbraco/management/api/v1/document-type/allowed-for-blueprint';
+};
+
+export type GetDocumentTypeAllowedForBlueprintErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+};
+
+export type GetDocumentTypeAllowedForBlueprintResponses = {
+    /**
+     * OK
+     */
+    200: PagedAllowedDocumentTypeModel;
+};
+
+export type GetDocumentTypeAllowedForBlueprintResponse = GetDocumentTypeAllowedForBlueprintResponses[keyof GetDocumentTypeAllowedForBlueprintResponses];
 
 export type GetDocumentTypeAllowedInLibraryData = {
     body?: never;

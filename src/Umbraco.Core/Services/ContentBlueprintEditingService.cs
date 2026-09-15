@@ -19,6 +19,7 @@ internal sealed class ContentBlueprintEditingService
     : ContentEditingServiceBase<IContent, IContentType, IContentService, IContentTypeService>, IContentBlueprintEditingService
 {
     private readonly IContentBlueprintContainerService _containerService;
+    private readonly ContentTypeFilterCollection _contentTypeFilters;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ContentBlueprintEditingService"/> class.
@@ -51,7 +52,10 @@ internal sealed class ContentBlueprintEditingService
         ILanguageService languageService,
         IUserService userService)
         : base(contentService, contentTypeService, propertyEditorCollection, dataTypeService, logger, scopeProvider, userIdKeyResolver, validationService, optionsMonitor, relationService, contentTypeFilters, languageService, userService)
-        => _containerService = containerService;
+    {
+        _containerService = containerService;
+        _contentTypeFilters = contentTypeFilters;
+    }
 
     /// <inheritdoc />
     public override Task<IContent?> GetAsync(Guid key)
@@ -231,10 +235,12 @@ internal sealed class ContentBlueprintEditingService
             return Attempt.Fail(ContentEditingOperationStatus.NotFound);
         }
 
+        Guid? targetContainerKey = containerKey == Guid.Empty ? null : containerKey;
+
         var parentId = Constants.System.Root;
-        if (containerKey.HasValue && containerKey.Value != Guid.Empty)
+        if (targetContainerKey.HasValue)
         {
-            EntityContainer? container = await _containerService.GetAsync(containerKey.Value);
+            EntityContainer? container = await _containerService.GetAsync(targetContainerKey.Value);
             if (container is null)
             {
                 return Attempt.Fail(ContentEditingOperationStatus.ParentNotFound);
@@ -246,6 +252,17 @@ internal sealed class ContentBlueprintEditingService
         if (toMove.ParentId == parentId)
         {
             return Attempt.Succeed(ContentEditingOperationStatus.Success);
+        }
+
+        IContentType? contentType = ContentTypeService.Get(toMove.ContentTypeId);
+        if (contentType is null)
+        {
+            return Attempt.Fail(ContentEditingOperationStatus.ContentTypeNotFound);
+        }
+
+        if (await IsAllowedForBlueprintsByContentTypeFilters(contentType, targetContainerKey) is false)
+        {
+            return Attempt.Fail(ContentEditingOperationStatus.NotAllowed);
         }
 
         // NOTE: as long as the parent ID is correct the document repo takes care of updating the rest of the
@@ -267,15 +284,39 @@ internal sealed class ContentBlueprintEditingService
     /// <inheritdoc />
     protected override async Task<(int? ParentId, ContentEditingOperationStatus OperationStatus)> TryGetAndValidateParentIdAsync(Guid? parentKey, IContentType contentType)
     {
+        if (contentType.IsElement)
+        {
+            return (null, ContentEditingOperationStatus.NotAllowed);
+        }
+
         if (parentKey.HasValue is false)
         {
-            return (Constants.System.Root, ContentEditingOperationStatus.Success);
+            return await IsAllowedForBlueprintsByContentTypeFilters(contentType, null)
+                ? (Constants.System.Root, ContentEditingOperationStatus.Success)
+                : (null, ContentEditingOperationStatus.NotAllowed);
         }
 
         EntityContainer? container = await _containerService.GetAsync(parentKey.Value);
-        return container is not null
+        if (container is null)
+        {
+            return (null, ContentEditingOperationStatus.ParentNotFound);
+        }
+
+        // A content type filter could prevent a blueprint of this type from being created under this container.
+        return await IsAllowedForBlueprintsByContentTypeFilters(contentType, parentKey.Value)
             ? (container.Id, ContentEditingOperationStatus.Success)
-            : (null, ContentEditingOperationStatus.ParentNotFound);
+            : (null, ContentEditingOperationStatus.NotAllowed);
+    }
+
+    private async Task<bool> IsAllowedForBlueprintsByContentTypeFilters(IContentType contentType, Guid? parentKey)
+    {
+        IEnumerable<IContentType> filteredContentTypes = [contentType];
+        foreach (IContentTypeFilter filter in _contentTypeFilters)
+        {
+            filteredContentTypes = await filter.FilterAllowedForBlueprintsAsync(filteredContentTypes, parentKey);
+        }
+
+        return filteredContentTypes.Any();
     }
 
     /// <summary>
