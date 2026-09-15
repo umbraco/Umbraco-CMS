@@ -14,11 +14,11 @@ import type { UmbApiError } from '@umbraco-cms/backoffice/resources';
 
 /**
  * The server reports a value that is missing separately from one that is present but empty. That distinction is
- * meaningful over the API, but not to an editor, so the two are presented as the same message.
+ * meaningful over the API, but not when the message is presented, so both map to the same message.
  * @param {string} body - the message as returned by the server.
  * @returns {string} the message to present.
  */
-function toEditorMessage(body: string): string {
+function collapseMissingToEmpty(body: string): string {
 	return body === UMB_VALIDATION_MISSING_LOCALIZATION_KEY ? UMB_VALIDATION_EMPTY_LOCALIZATION_KEY : body;
 }
 
@@ -108,7 +108,7 @@ export class UmbServerModelValidatorContext extends UmbContextBase implements Um
 					}
 
 					newBodies.forEach((body: string) =>
-						messages.push({ type: 'server', key: UmbId.new(), path, body: toEditorMessage(body) }),
+						messages.push({ type: 'server', key: UmbId.new(), path, body: collapseMissingToEmpty(body) }),
 					);
 					//this.#context!.messages.addMessages('server', path, errorBody.errors[path]);
 				});
