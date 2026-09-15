@@ -1,15 +1,16 @@
 import type { UmbTemplateCardElement } from '../template-card/template-card.element.js';
-import '../template-card/template-card.element.js';
 import type { UmbTemplateItemModel } from '../../repository/item/index.js';
 import { UmbTemplateItemRepository } from '../../repository/item/index.js';
 import { UMB_TEMPLATE_PICKER_MODAL } from '../../modals/index.js';
-import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UUIFormControlWithBasicsMixin } from '@umbraco-cms/backoffice/external/uui';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
-import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
-import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
+import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
+
+import '../template-card/template-card.element.js';
 
 @customElement('umb-input-template')
 export class UmbInputTemplateElement extends UUIFormControlWithBasicsMixin(UmbLitElement, '') {
@@ -72,8 +73,10 @@ export class UmbInputTemplateElement extends UUIFormControlWithBasicsMixin(UmbLi
 	@state()
 	private _pickedTemplates: UmbTemplateItemModel[] = [];
 
-	#templateItemRepository = new UmbTemplateItemRepository(this);
-	#templatePath = '';
+	readonly #templateItemRepository = new UmbTemplateItemRepository(this);
+
+	@state()
+	private _templatePath?: string;
 
 	constructor() {
 		super();
@@ -84,7 +87,7 @@ export class UmbInputTemplateElement extends UUIFormControlWithBasicsMixin(UmbLi
 				return { data: { entityType: 'template', preset: {} } };
 			})
 			.observeRouteBuilder((routeBuilder) => {
-				this.#templatePath = routeBuilder({});
+				this._templatePath = routeBuilder({});
 			});
 	}
 
@@ -117,7 +120,7 @@ export class UmbInputTemplateElement extends UUIFormControlWithBasicsMixin(UmbLi
 
 	#onCardChange(e: CustomEvent) {
 		e.stopPropagation();
-		const unique = (e.target as UmbTemplateCardElement).value as string;
+		const unique = (e.target as UmbTemplateCardElement).id as string;
 		this.defaultUnique = unique;
 		this.dispatchEvent(new UmbChangeEvent());
 	}
@@ -171,9 +174,9 @@ export class UmbInputTemplateElement extends UUIFormControlWithBasicsMixin(UmbLi
 					<umb-template-card
 						.id=${template.unique}
 						.name=${template.name}
-						@change=${this.#onCardChange}
-						@open=${() => window.history.pushState({}, '', this.#templatePath + 'edit/' + template.unique)}
-						?default=${template.unique === this.defaultUnique}>
+						.href=${this._templatePath ? this._templatePath + 'edit/' + template.unique : undefined}
+						?default=${template.unique === this.defaultUnique}
+						@change=${this.#onCardChange}>
 						<uui-button
 							slot="actions"
 							compact
@@ -192,7 +195,7 @@ export class UmbInputTemplateElement extends UUIFormControlWithBasicsMixin(UmbLi
 		`;
 	}
 
-	static override styles = [
+	static override readonly styles = [
 		css`
 			:host {
 				display: grid;
