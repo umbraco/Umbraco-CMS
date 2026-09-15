@@ -956,11 +956,15 @@ export class DataTypeApiHelper {
     const blockEditor = await this.getByName(blockGridName);
     // We need to get the GroupKey, so we can use it to find the blocks that use the Key.
     const blockGroupsValue = blockEditor.values.find(value => value.alias === 'blockGroups');
-    if (!blockGroupsValue || blockGroupsValue.value.length === 0) {
+    if (!blockGroupsValue?.value?.length) {
       return false;
     }
 
-    const blockGroupKey = blockGroupsValue.value.find(blockGroup => blockGroup.name === groupName).key;
+    const blockGroup = blockGroupsValue.value.find(blockGroup => blockGroup.name === groupName);
+    if (!blockGroup) {
+      return false;
+    }
+    const blockGroupKey = blockGroup.key;
     const blocksValue = blockEditor.values.find(value => value.alias === 'blocks');
     if (!blocksValue || blocksValue.value.length === 0) {
       return false;
