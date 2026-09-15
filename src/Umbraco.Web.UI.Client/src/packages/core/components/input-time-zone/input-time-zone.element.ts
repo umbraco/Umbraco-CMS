@@ -12,7 +12,7 @@ import {
 } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import {
-	isBelowMinItemCount,
+	isAboveZeroAndBelowMinimum,
 	UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
 	UmbFormControlMixin,
 } from '@umbraco-cms/backoffice/validation';
@@ -144,7 +144,7 @@ export class UmbInputTimeZoneElement extends UmbFormControlMixin<Array<string>, 
 		this.addValidator(
 			'rangeUnderflow',
 			() => this.localize.term('validation_entriesShort', this.min, this.min - this.value.length),
-			() => isBelowMinItemCount(this.value.length, this.min),
+			() => isAboveZeroAndBelowMinimum(this.value.length, this.min),
 		);
 
 		this.addValidator(

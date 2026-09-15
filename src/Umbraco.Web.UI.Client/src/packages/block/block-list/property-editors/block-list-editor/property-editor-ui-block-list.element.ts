@@ -17,7 +17,7 @@ import {
 import { debounceTime } from '@umbraco-cms/backoffice/external/rxjs';
 import {
 	extractJsonQueryProps,
-	isBelowMinItemCount,
+	isAboveZeroAndBelowMinimum,
 	UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
 	UmbFormControlMixin,
 	UmbValidationContext,
@@ -284,7 +284,7 @@ export class UmbPropertyEditorUIBlockListElement
 					this._limitMin,
 					(this._limitMin ?? 0) - this.#entriesContext.getLength(),
 				),
-			() => isBelowMinItemCount(this.#entriesContext.getLength(), this._limitMin),
+			() => isAboveZeroAndBelowMinimum(this.#entriesContext.getLength(), this._limitMin),
 		);
 
 		this.addValidator(

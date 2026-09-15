@@ -237,7 +237,7 @@ public class MultipleTextStringPropertyEditor : DataEditor, IValueSchemaProvider
                     ? strings.Count(s => string.IsNullOrWhiteSpace(s) is false)
                     : 0;
 
-            if (ItemCountValidationHelper.IsBelowMinimum(stringCount, multipleTextStringConfiguration.Min))
+            if (ItemCountValidationHelper.IsAboveZeroAndBelowMinimum(stringCount, multipleTextStringConfiguration.Min))
             {
                 if (stringCount == 1)
                 {

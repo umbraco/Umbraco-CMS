@@ -284,7 +284,7 @@ public class MultiNodeTreePickerPropertyEditor : DataEditor, IValueSchemaProvide
                     return validationResults;
                 }
 
-                if (ItemCountValidationHelper.IsBelowMinimum(entityReferences?.Length ?? 0, configuration.MinNumber))
+                if (ItemCountValidationHelper.IsAboveZeroAndBelowMinimum(entityReferences?.Length ?? 0, configuration.MinNumber))
                 {
                     validationResults.Add(new ValidationResult(
                         _localizedTextService.Localize(

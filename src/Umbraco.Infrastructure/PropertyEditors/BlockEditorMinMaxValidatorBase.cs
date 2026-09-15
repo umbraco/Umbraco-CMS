@@ -46,7 +46,7 @@ internal abstract class BlockEditorMinMaxValidatorBase<TValue, TLayout> : IValue
     {
         var numberOfBlocks = blockEditorData?.Layout?.Count() ?? 0;
 
-        if (ItemCountValidationHelper.IsBelowMinimum(numberOfBlocks, min))
+        if (ItemCountValidationHelper.IsAboveZeroAndBelowMinimum(numberOfBlocks, min))
         {
             yield return new ValidationResult(
                 TextService.Localize(

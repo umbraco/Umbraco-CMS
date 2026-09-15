@@ -30,7 +30,7 @@ import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interact
 import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
 import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 import {
-	isBelowMinItemCount,
+	isAboveZeroAndBelowMinimum,
 	UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
 	UmbFormControlMixin,
 } from '@umbraco-cms/backoffice/validation';
@@ -211,7 +211,7 @@ export class UmbInputMultiUrlElement extends UmbFormControlMixin<string, typeof 
 		this.addValidator(
 			'rangeUnderflow',
 			() => this.minMessage,
-			() => isBelowMinItemCount(this.urls.length, this.min),
+			() => isAboveZeroAndBelowMinimum(this.urls.length, this.min),
 		);
 		this.addValidator(
 			'rangeOverflow',

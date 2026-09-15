@@ -99,7 +99,7 @@ internal sealed class EntityDataPickerPropertyEditor : DataEditor
                     return validationResults;
                 }
 
-                if (ItemCountValidationHelper.IsBelowMinimum(data.Ids.Length, configuration.ValidationLimit.Min))
+                if (ItemCountValidationHelper.IsAboveZeroAndBelowMinimum(data.Ids.Length, configuration.ValidationLimit.Min))
                 {
                     validationResults.Add(new ValidationResult(
                         _localizedTextService.Localize(

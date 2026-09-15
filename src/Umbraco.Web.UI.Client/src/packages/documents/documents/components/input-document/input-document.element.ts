@@ -4,7 +4,7 @@ import { css, customElement, html, nothing, property, repeat, state, when } from
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import {
-	isBelowMinItemCount,
+	isAboveZeroAndBelowMinimum,
 	UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
 	UmbFormControlMixin,
 } from '@umbraco-cms/backoffice/validation';
@@ -165,7 +165,7 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string, typeof 
 		this.addValidator(
 			'rangeUnderflow',
 			() => this.minMessage,
-			() => !this.readonly && isBelowMinItemCount(this.selection.length, this.min),
+			() => !this.readonly && isAboveZeroAndBelowMinimum(this.selection.length, this.min),
 		);
 
 		this.addValidator(

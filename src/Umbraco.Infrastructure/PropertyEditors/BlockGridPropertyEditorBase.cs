@@ -230,7 +230,7 @@ public abstract class BlockGridPropertyEditorBase : DataEditor, IValueSchemaProv
                         continue;
                     }
 
-                    if (ItemCountValidationHelper.IsBelowMinimum(area.Items.Length, areaConfig.MinAllowed)
+                    if (ItemCountValidationHelper.IsAboveZeroAndBelowMinimum(area.Items.Length, areaConfig.MinAllowed)
                         || (areaConfig.MaxAllowed.HasValue && area.Items.Length > areaConfig.MaxAllowed))
                     {
                         validationResults.Add(new ValidationResult(TextService.Localize("validation", "entriesAreasMismatch")));

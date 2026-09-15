@@ -431,7 +431,7 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference, I
 
             var numberOfLinks = linksDtos?.Length ?? 0;
 
-            if (ItemCountValidationHelper.IsBelowMinimum(numberOfLinks, multiUrlPickerConfiguration.MinNumber))
+            if (ItemCountValidationHelper.IsAboveZeroAndBelowMinimum(numberOfLinks, multiUrlPickerConfiguration.MinNumber))
             {
                 return
                 [

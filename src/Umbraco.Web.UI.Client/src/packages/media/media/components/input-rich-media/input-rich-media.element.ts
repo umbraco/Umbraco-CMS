@@ -13,7 +13,7 @@ import { UmbSorterController, UmbSorterResolvePlacementAsGrid } from '@umbraco-c
 import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
 import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
 import {
-	isBelowMinItemCount,
+	isAboveZeroAndBelowMinimum,
 	UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
 	UmbFormControlMixin,
 } from '@umbraco-cms/backoffice/validation';
@@ -257,7 +257,7 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 		this.addValidator(
 			'rangeUnderflow',
 			() => this.minMessage,
-			() => !this.readonly && isBelowMinItemCount(this.value?.length ?? 0, this.min),
+			() => !this.readonly && isAboveZeroAndBelowMinimum(this.value?.length ?? 0, this.min),
 		);
 		this.addValidator(
 			'rangeOverflow',

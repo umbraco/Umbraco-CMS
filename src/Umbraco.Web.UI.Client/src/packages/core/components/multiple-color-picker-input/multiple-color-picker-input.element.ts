@@ -7,7 +7,7 @@ import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type { UmbInputEvent, UmbDeleteEvent } from '@umbraco-cms/backoffice/event';
 import type { UmbSwatchDetails } from '@umbraco-cms/backoffice/models';
-import { isBelowMinItemCount } from '@umbraco-cms/backoffice/validation';
+import { isAboveZeroAndBelowMinimum } from '@umbraco-cms/backoffice/validation';
 
 /**
  * @element umb-multiple-color-picker-input
@@ -106,7 +106,7 @@ export class UmbMultipleColorPickerInputElement extends UUIFormControlMixin(UmbL
 		this.addValidator(
 			'rangeUnderflow',
 			() => this.minMessage,
-			() => isBelowMinItemCount(this._items.length, this.min),
+			() => isAboveZeroAndBelowMinimum(this._items.length, this.min),
 		);
 		this.addValidator(
 			'rangeOverflow',
