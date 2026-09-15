@@ -48,13 +48,11 @@ test('can see property values in block list with UI read but not UI write permis
   await umbracoUi.content.isPropertyEditorUiWithNameReadOnly('text-box');
 });
 
-// Remove .skip when the front-end is ready.
-// Issue link: https://github.com/umbraco/Umbraco-CMS/issues/19395
-test.skip('can edit property values in block list with UI write permission', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+test('can edit property values in block list with UI write permission', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const updatedText = 'Updated test text';
   await umbracoApi.document.createDefaultDocumentWithABlockListEditor(documentName, elementTypeId, documentTypeName, customDataTypeName);
-  userGroupId = await umbracoApi.userGroup.createUserGroupWithUpdateDocumentPermissionAndWritePropertyValueDocumentPermission(userGroupName, true, false);
+  userGroupId = await umbracoApi.userGroup.createUserGroupWithUpdateDocumentPermissionAndWritePropertyValueDocumentPermission(userGroupName, true, true);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
   await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
@@ -107,13 +105,11 @@ test('can see property values in block grid with UI read but not UI write permis
   await umbracoUi.content.isPropertyEditorUiWithNameReadOnly('text-box');
 });
 
-// Remove .skip when the front-end is ready.
-// Issue link: https://github.com/umbraco/Umbraco-CMS/issues/19395
-test.skip('can edit property values in block grid with UI write permission', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+test('can edit property values in block grid with UI write permission', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const updatedText = 'Updated test text';
   await umbracoApi.document.createDefaultDocumentWithABlockGridEditor(documentName, elementTypeId, documentTypeName, customDataTypeName);
-  userGroupId = await umbracoApi.userGroup.createUserGroupWithUpdateDocumentPermissionAndWritePropertyValueDocumentPermission(userGroupName, true, false);
+  userGroupId = await umbracoApi.userGroup.createUserGroupWithUpdateDocumentPermissionAndWritePropertyValueDocumentPermission(userGroupName, true, true);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
   await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();

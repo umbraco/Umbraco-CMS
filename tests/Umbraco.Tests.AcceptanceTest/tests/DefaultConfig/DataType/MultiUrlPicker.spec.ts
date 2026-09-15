@@ -84,8 +84,7 @@ test('can update hide anchor/query string input', async ({umbracoApi, umbracoUi}
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'hideAnchor', true)).toBeTruthy();
 });
 
-// TODO: Remove skip when the front-end is ready. Currently you still can update the minimum greater than the maximum.
-// Issue link: https://github.com/umbraco/Umbraco-CMS/issues/17509
+// Product gap (https://github.com/umbraco/Umbraco-CMS/issues/17509): no min/max cross-validation, the save succeeds.
 test.skip('cannot update the minimum number of items greater than the maximum', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const minimumValue = 5;

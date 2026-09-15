@@ -89,8 +89,7 @@ test('cannot see an element folder with read permission disabled', async ({umbra
   await umbracoUi.library.isElementInTreeVisible(folderName, false);
 });
 
-// Currently user cannot see the create action menu even though they have permission to create an element folder
-test.skip('can create an element folder with create permission enabled', async ({umbracoApi, umbracoUi}) => {
+test('can create an element folder with create permission enabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithCreateElementFolderPermission(userGroupName);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
@@ -299,7 +298,8 @@ test('cannot restore an element folder from the recycle bin without move folder 
   expect(await umbracoApi.element.doesItemExistInRecycleBin(folderName)).toBeTruthy();
 });
 
-// Currently, when open element folder by url the user still can see the folder's content, and the folder's name is visible in the breadcrumb when opening an element inside the folder
+// Product gap: umb-element-folder-workspace-editor has no forbidden handling. A folder the user has no
+// read permission for renders the full folder editor instead of an access-denied state.
 test.skip('cannot see an element inside a folder when read folder permission is disabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const innerElementId = await umbracoApi.element.createDefaultElementWithParent(elementName, elementTypeId, folderId);
@@ -315,7 +315,7 @@ test.skip('cannot see an element inside a folder when read folder permission is 
   await umbracoUi.library.isElementInTreeVisible(folderName, false);
   await umbracoUi.library.isElementInTreeVisible(elementName, false);
   await umbracoUi.library.goToWorkspacePath(`/workspace/element-folder/edit/${folderId}`);
-  await umbracoUi.library.doesElementWorkspaceHaveText('Access denied');
+  await umbracoUi.library.doesElementFolderWorkspaceHaveText('Access denied');
   await umbracoUi.library.goToWorkspacePath(`/workspace/element/edit/${innerElementId}`);
   await umbracoUi.library.isElementReadOnly();
 });

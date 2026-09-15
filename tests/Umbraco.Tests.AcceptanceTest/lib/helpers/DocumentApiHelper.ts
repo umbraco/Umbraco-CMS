@@ -437,6 +437,15 @@ export class DocumentApiHelper {
     );
   }
 
+  async doesImageMediaPickerContainImageWithCrop(id: string, propertyAlias: string, mediaKey: string, cropAlias: string) {
+    const contentData = await this.getByName(id);
+    return contentData.values.some(value =>
+      value.alias === propertyAlias && value.value.some(item =>
+        item.mediaKey === mediaKey && item.crops?.some(crop => crop.alias === cropAlias)
+      )
+    );
+  }
+
   async createDocumentWithUploadFile(documentName: string, documentTypeId: string, dataTypeName: string, uploadFileName: string, mineType: string) {
     await this.ensureNameNotExists(documentName);
     const temporaryFile = await this.api.temporaryFile.createTemporaryFile(uploadFileName, 'File', mineType);
