@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System.Reflection;
@@ -9,7 +9,6 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PropertyEditors.DeliveryApi;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
-using Umbraco.Cms.Infrastructure.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 
@@ -27,8 +26,16 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.PropertyEditors;
 /// <c>Umbraco.SingleBlock</c> was split out of <c>Umbraco.BlockList</c>.
 /// </para>
 /// <para>
-/// The exempt converters below are the whole of the permitted variance, and the list is asserted exactly: a new
-/// offender fails, and so does an entry that has since been fixed.
+/// Both the editors and the configurations to try them with are discovered by reflection: every registered
+/// editor with a typed configuration is permuted over the properties of that configuration. An editor added
+/// later is therefore covered without this test being touched.
+/// </para>
+/// <para>
+/// That reach has limits, and a green run is a regression guard rather than a proof. Each permutation sets one
+/// configuration value against the defaults, so a converter branching on two values together  on collections
+/// or on objects with no meaningful default instance are not seen. What this does catch is the common shape of
+/// the mistake - a flag, or a count compared against one - which is how every offender it was written for had
+/// been implementated.
 /// </para>
 /// </remarks>
 [TestFixture]
@@ -36,7 +43,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.PropertyEditors;
 internal sealed class PropertyValueConverterConfigurationInvarianceTests : UmbracoIntegrationTest
 {
     /// <summary>
-    /// Converters whose model type legitimately depends on configuration.
+    /// Converters excused from the rule.
     /// </summary>
     /// <remarks>
     /// The multi node tree picker is deprecated in favour of the dedicated document, media, element and member pickers,
@@ -170,6 +177,9 @@ internal sealed class PropertyValueConverterConfigurationInvarianceTests : Umbra
     /// Gets the configuration objects to test the editor with: the default, then one per configuration value the
     /// editor exposes, set to each of the values that value can meaningfully take.
     /// </summary>
+    /// <remarks>
+    /// One value varies at a time, so a converter that branches on two of them together is not covered.
+    /// </remarks>
     private static IEnumerable<(string Description, object Configuration)> Permutations(Type configurationType)
     {
         yield return ("default", Activator.CreateInstance(configurationType)!);
@@ -222,6 +232,10 @@ internal sealed class PropertyValueConverterConfigurationInvarianceTests : Umbra
     /// Gets the values a single configuration value can meaningfully take. Values whose domain cannot be enumerated -
     /// collections and objects, for which there is no telling what a valid instance looks like - yield nothing.
     /// </summary>
+    /// <remarks>
+    /// The sets are deliberately small, and chosen to straddle the comparisons an editor is likely to make - a
+    /// flag either way, a count either side of one - rather than to cover the range of the type.
+    /// </remarks>
     private static IEnumerable<object?> CandidateValues(Type configurationType, PropertyInfo property)
     {
         if (_constrainedDomains.TryGetValue(
