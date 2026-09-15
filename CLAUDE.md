@@ -135,8 +135,8 @@ Web.UI → Web.Common → Infrastructure → Core
 **Infrastructure Layer**:
 - `Umbraco.Infrastructure` → `Umbraco.Core`
 - `Umbraco.PublishedCache.*` → `Umbraco.Infrastructure`
-- `Umbraco.Cms.Search.Core` → `Umbraco.Infrastructure` + `Umbraco.Web.Common`
-- `Umbraco.Cms.Search.Provider.Examine` → `Umbraco.Cms.Search.Core`
+- `Umbraco.Cms.Search.Core` → `Umbraco.Infrastructure`
+- `Umbraco.Cms.Search.Provider.Examine` → `Umbraco.Cms.Search.Core` + `Umbraco.Web.Common` + `Umbraco.Cms.Api.Common` + `Umbraco.Cms.Api.Management`
 - `Umbraco.Cms.Persistence.*` → `Umbraco.Infrastructure`
 
 **Web Layer**:
