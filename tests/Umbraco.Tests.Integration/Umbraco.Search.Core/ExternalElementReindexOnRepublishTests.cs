@@ -1,6 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
-using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
@@ -28,11 +27,6 @@ public class ExternalElementReindexOnRepublishTests : PropertyValueHandlerTestsB
     protected override void CustomTestSetup(IUmbracoBuilder builder)
     {
         base.CustomTestSetup(builder);
-
-        // mirrors the other tree-change notification handlers already wired up in TestBase - this one is
-        // needed here specifically to carry an element publish through to the (genuinely distributed)
-        // ElementCacheRefresherNotification that ElementIndexingNotificationHandler reacts to.
-        builder.AddNotificationHandler<ElementTreeChangeNotification, ElementTreeChangeDistributedCacheNotificationHandler>();
 
         // creates the umbExternalBlockElement relation when the referencing document is saved/published, so the
         // element-change handler can find "My Page" as a referencing document.

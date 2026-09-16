@@ -9,6 +9,7 @@ using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Changes;
+using Umbraco.Cms.Search.Core.Cache.Element;
 using Umbraco.Cms.Search.Core.Models.Indexing;
 using Umbraco.Cms.Search.Core.Services.ContentIndexing;
 using Umbraco.Cms.Core.Sync;
@@ -21,15 +22,17 @@ namespace Umbraco.Cms.Search.Core.NotificationHandlers;
 /// other published elements - when external block element indexing is enabled.
 /// </summary>
 /// <remarks>
-/// Unlike the other indexing notification handlers, this one reacts directly to Core's own, genuinely distributed
-/// <see cref="ElementCacheRefresherNotification"/> rather than a Search-owned mirror broadcast (see
-/// <see cref="IndexingNotificationHandlerBase"/>) - elements are not themselves indexed as their own document type
-/// here, only used to trigger a refresh of already-indexed documents, so no origin server needs to be tracked
-/// across the farm: every server that receives the notification independently finds and refreshes the documents
-/// it has indexed. The one tradeoff is that a same-origin-only index registration would be (harmlessly) refreshed
-/// from every server rather than just the originating one.
+/// Ordinary per-element changes are handled via <see cref="ElementChangeCacheRefresherNotification"/> - a
+/// Search-owned broadcast raised only when an element is actually published or unpublished (see
+/// <see cref="ElementPublishStatusNotificationHandler"/>), so a plain draft save of a reusable element never
+/// triggers a reindex of the documents referencing it, since only a published change is ever reflected in the
+/// published index. Core's own, genuinely distributed <see cref="ElementCacheRefresherNotification"/> is still
+/// handled directly, but only for its "refresh all" payload (e.g. after a full element cache reload): that signal
+/// cannot distinguish a save from a publish, so it is not used to react to ordinary per-element changes.
 /// </remarks>
-internal sealed class ElementIndexingNotificationHandler : IndexingNotificationHandlerBase, INotificationHandler<ElementCacheRefresherNotification>
+internal sealed class ElementIndexingNotificationHandler : IndexingNotificationHandlerBase,
+    INotificationHandler<ElementCacheRefresherNotification>,
+    INotificationHandler<ElementChangeCacheRefresherNotification>
 {
     private readonly IContentIndexingService _contentIndexingService;
     private readonly IRelationService _relationService;
@@ -63,9 +66,11 @@ internal sealed class ElementIndexingNotificationHandler : IndexingNotificationH
     }
 
     /// <summary>
-    /// Re-indexes the documents that reference the changed elements described by the notification.
+    /// Re-indexes every document that references any external element, in reaction to a "refresh all" element
+    /// cache payload; any other payload is ignored, since ordinary per-element changes are handled by
+    /// <see cref="Handle(ElementChangeCacheRefresherNotification)"/> instead.
     /// </summary>
-    /// <param name="notification">The notification describing the element changes to react to.</param>
+    /// <param name="notification">The notification describing the element cache changes to react to.</param>
     public void Handle(ElementCacheRefresherNotification notification)
     {
         // external element content only ever participates in the index when the feature is enabled; with it off,
@@ -76,7 +81,8 @@ internal sealed class ElementIndexingNotificationHandler : IndexingNotificationH
         }
 
         if (notification.MessageType != MessageType.RefreshByPayload
-            || notification.MessageObject is not ElementCacheRefresher.JsonPayload[] payloads)
+            || notification.MessageObject is not ElementCacheRefresher.JsonPayload[] payloads
+            || payloads.Any(payload => payload.ChangeTypes.HasType(TreeChangeTypes.RefreshAll)) is false)
         {
             return;
         }
@@ -84,14 +90,29 @@ internal sealed class ElementIndexingNotificationHandler : IndexingNotificationH
         // a RefreshAll payload (Id=0, e.g. from a full element cache reload) carries no specific element id, so we
         // cannot know which elements actually changed - conservatively treat every element ever referenced via an
         // external block relation as changed, to avoid leaving stale flattened content behind.
-        int[] changedElementIds = payloads.Any(payload => payload.ChangeTypes.HasType(TreeChangeTypes.RefreshAll))
-            ? GetAllReferencedElementIds()
-            : payloads
-                .Where(payload => payload.ChangeTypes != TreeChangeTypes.None)
-                .Select(payload => payload.Id)
-                .Distinct()
-                .ToArray();
+        ReindexDocumentsReferencing(GetAllReferencedElementIds(), _originProvider.GetCurrent());
+    }
 
+    /// <summary>
+    /// Re-indexes the documents that reference the elements published or unpublished as described by the notification.
+    /// </summary>
+    /// <param name="notification">The notification describing the element publish status changes to react to.</param>
+    public void Handle(ElementChangeCacheRefresherNotification notification)
+    {
+        // external element content only ever participates in the index when the feature is enabled; with it off,
+        // referencing documents have nothing to refresh.
+        if (_indexingSettings.Value.IndexExternalBlockElements is false)
+        {
+            return;
+        }
+
+        ElementChangeCacheRefresher.JsonPayload[] payloads = GetNotificationPayloads<ElementChangeCacheRefresher.JsonPayload>(notification, out var origin);
+
+        ReindexDocumentsReferencing(payloads.Select(payload => payload.Id).Distinct().ToArray(), origin);
+    }
+
+    private void ReindexDocumentsReferencing(int[] changedElementIds, string origin)
+    {
         if (changedElementIds.Length == 0)
         {
             return;
@@ -107,7 +128,6 @@ internal sealed class ElementIndexingNotificationHandler : IndexingNotificationH
             .Select(key => ContentChange.Document(key, ChangeImpact.Refresh, ContentState.Published))
             .ToArray();
 
-        var origin = _originProvider.GetCurrent();
         ExecuteDeferred(() =>
         {
             // the referencing documents' own content is unchanged, so their persisted index document snapshots are

@@ -2,7 +2,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
@@ -12,6 +11,7 @@ using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence.Relations;
+using Umbraco.Cms.Search.Core.Models.Indexing;
 using Umbraco.Cms.Search.Core.NotificationHandlers;
 using Umbraco.Cms.Search.Core.Services.ContentIndexing;
 using Umbraco.Cms.Tests.Common.Builders;
@@ -42,6 +42,13 @@ public class ElementIndexingNotificationHandlerTests : PropertyValueHandlerTests
     {
         base.ConfigureTestServices(services);
         services.Configure<IndexingSettings>(options => options.IndexExternalBlockElements = true);
+
+        // wraps the real IContentIndexingService so tests can assert whether a reindex was actually triggered,
+        // without relying on index *content* differences that a correct draft-vs-published distinction wouldn't
+        // produce anyway (external element content is always flattened from its published values).
+        services.AddSingleton<ContentIndexingService>();
+        services.AddSingleton<CountingContentIndexingService>();
+        services.AddSingleton<IContentIndexingService>(sp => sp.GetRequiredService<CountingContentIndexingService>());
     }
 
     protected override void CustomTestSetup(IUmbracoBuilder builder)
@@ -55,9 +62,9 @@ public class ElementIndexingNotificationHandlerTests : PropertyValueHandlerTests
             .AddNotificationHandler<ElementSavedNotification, ContentRelationsUpdate>()
             .AddNotificationHandler<ElementPublishedNotification, ContentRelationsUpdate>();
 
-        // broadcasts ElementCacheRefresherNotification (picked up by ElementIndexingNotificationHandler) when an
-        // element is saved/published/unpublished/deleted
-        builder.AddNotificationHandler<ElementTreeChangeNotification, ElementTreeChangeDistributedCacheNotificationHandler>();
+        // the per-element reindex trigger (ElementPublishStatusNotificationHandler -> ElementChangeCacheRefresher
+        // -> ElementIndexingNotificationHandler) is wired up automatically by AddSearchCore() - no test-specific
+        // registration needed.
     }
 
     [Test]
@@ -86,6 +93,45 @@ public class ElementIndexingNotificationHandlerTests : PropertyValueHandlerTests
         ElementService.Publish(updatedElement, ["*"]);
 
         AssertPublishedBlocksTextsContain("Updated text");
+    }
+
+    [Test]
+    public async Task Saving_External_Element_Without_Publishing_Does_Not_Trigger_Reindex()
+    {
+        var countingService = (CountingContentIndexingService)ContentIndexingService;
+
+        var (contentType, elementType) = await SetupBlockListWithElementType();
+
+        Element element = new ElementBuilder()
+            .WithContentType(elementType)
+            .WithName("Reusable element")
+            .Build();
+        element.SetValue("textValue", "Original text");
+        ElementService.Save(element);
+        ElementService.Publish(element, ["*"]);
+
+        Content content = CreatePageWithExternalBlockReference(contentType, element.Key);
+        ContentService.Save(content);
+        ContentService.Publish(content, ["*"]);
+
+        AssertPublishedBlocksTextsContain("Original text");
+
+        countingService.Reset();
+
+        // a plain draft save of the already-published, already-referenced element must not trigger a reindex of
+        // documents referencing it - only a publish makes a difference to the published index.
+        IElement draftElement = ElementService.GetById(element.Key)!;
+        draftElement.SetValue("textValue", "Draft-only text");
+        ElementService.Save(draftElement);
+
+        Assert.That(countingService.HandleCallCount, Is.Zero, "A draft-only element save must not trigger a reindex of documents referencing it.");
+        AssertPublishedBlocksTextsContain("Original text");
+
+        // publishing the same change must trigger the reindex
+        ElementService.Publish(ElementService.GetById(element.Key)!, ["*"]);
+
+        Assert.That(countingService.HandleCallCount, Is.GreaterThan(0), "Publishing the element must trigger a reindex of documents referencing it.");
+        AssertPublishedBlocksTextsContain("Draft-only text");
     }
 
     [Test]
@@ -250,5 +296,26 @@ public class ElementIndexingNotificationHandlerTests : PropertyValueHandlerTests
 
         elementType.AddPropertyType(new PropertyType(ShortStringHelper, blockListDataType, "blocks"));
         await ContentTypeService.UpdateAsync(elementType, Constants.Security.SuperUserKey);
+    }
+
+    // wraps the real ContentIndexingService to count Handle invocations, so tests can assert whether a reindex
+    // was actually triggered.
+    private sealed class CountingContentIndexingService : IContentIndexingService
+    {
+        private readonly ContentIndexingService _inner;
+
+        public CountingContentIndexingService(ContentIndexingService inner) => _inner = inner;
+
+        public int HandleCallCount { get; private set; }
+
+        public void Reset() => HandleCallCount = 0;
+
+        public void Handle(IEnumerable<ContentChange> changes, string origin)
+        {
+            HandleCallCount++;
+            _inner.Handle(changes, origin);
+        }
+
+        public void Rebuild(string indexAlias, string origin) => _inner.Rebuild(indexAlias, origin);
     }
 }

@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
@@ -11,6 +12,7 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Changes;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Infrastructure.Persistence.Relations;
+using Umbraco.Cms.Search.Core.Cache.Element;
 using Umbraco.Cms.Search.Core.NotificationHandlers;
 using Umbraco.Cms.Search.Core.Services.ContentIndexing;
 using Umbraco.Cms.Tests.Common.Builders;
@@ -26,9 +28,9 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Core;
 /// referencing an external element to be re-indexed, rather than being silently ignored.
 /// </summary>
 /// <remarks>
-/// Deliberately does not register <see cref="ElementTreeChangeDistributedCacheNotificationHandler"/>, so that
-/// saving/publishing the element does not itself broadcast a (per-element) <see cref="ElementCacheRefresherNotification"/>
-/// - this isolates the "refresh all" code path from the already-covered per-element one.
+/// Deliberately removes the <see cref="ElementPublishStatusNotificationHandler"/> registrations that
+/// <c>AddSearchCore()</c> wires up by default, so that saving/publishing the element does not itself trigger a
+/// (per-element) reindex - this isolates the "refresh all" code path from the already-covered per-element one.
 /// </remarks>
 public class ElementIndexingNotificationHandlerRefreshAllTests : PropertyValueHandlerTestsBase
 {
@@ -41,6 +43,9 @@ public class ElementIndexingNotificationHandlerRefreshAllTests : PropertyValueHa
     {
         base.ConfigureTestServices(services);
         services.Configure<IndexingSettings>(options => options.IndexExternalBlockElements = true);
+
+        services.RemoveAll<INotificationHandler<ElementPublishedNotification>>();
+        services.RemoveAll<INotificationHandler<ElementUnpublishedNotification>>();
     }
 
     protected override void CustomTestSetup(IUmbracoBuilder builder)
