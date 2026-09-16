@@ -98,25 +98,25 @@ export class UmbSearchIndexStatsBoxElement extends UmbLitElement {
 			<uui-box headline=${this.localize.term('searchManagement_indexInfo')}>
 				<div class="stats-grid">
 					<div class="stat-item">
-						<strong><umb-localize key="searchManagement_indexAlias">Index Alias</umb-localize></strong>
+						<strong><umb-localize key="searchManagement_indexAlias">Alias</umb-localize></strong>
 						<span>${this._indexAlias ?? '—'}</span>
 					</div>
 
 					<div class="stat-item">
-						<strong><umb-localize key="searchManagement_providerName">Provider Name</umb-localize></strong>
+						<strong><umb-localize key="searchManagement_providerName">Provider</umb-localize></strong>
 						<span>${this._providerName ?? '—'}</span>
 					</div>
 
 					<div class="stat-item">
 						<strong>
-							<umb-localize key="searchManagement_tableColumnDocumentCount"> Document Count </umb-localize>
+							<umb-localize key="searchManagement_tableColumnDocumentCount">Document count</umb-localize>
 						</strong>
 						<span>${this.localize.term('searchManagement_documentCount', this._documentCount ?? 0)}</span>
 					</div>
 
 					<div class="stat-item">
 						<strong>
-							<umb-localize key="searchManagement_tableColumnHealthStatus"> Health Status </umb-localize>
+							<umb-localize key="searchManagement_tableColumnHealthStatus">Health status</umb-localize>
 						</strong>
 						<div class="health-status">
 							<uui-tag look="secondary" .color=${this.#getHealthStatusColor(this.#effectiveHealthStatus())}>

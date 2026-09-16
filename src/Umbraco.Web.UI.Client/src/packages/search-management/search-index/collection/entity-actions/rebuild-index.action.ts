@@ -5,9 +5,12 @@ import { UMB_SEARCH_WORKSPACE_CONTEXT } from '../../workspace/search-workspace.c
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import { UMB_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
+import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 
 export class UmbSearchRebuildIndexEntityAction extends UmbEntityActionBase<never> {
 	readonly #repository = new UmbSearchDetailRepository(this);
+	readonly #localize = new UmbLocalizationController(this);
 
 	override async execute() {
 		if (!this.args.unique) {
@@ -17,9 +20,9 @@ export class UmbSearchRebuildIndexEntityAction extends UmbEntityActionBase<never
 		// Show confirm modal first
 		await umbConfirmModal(this, {
 			color: 'warning',
-			headline: '#searchManagement_rebuildConfirmHeadline',
-			content: '#searchManagement_rebuildConfirmMessage',
-			confirmLabel: '#searchManagement_rebuildConfirmLabel',
+			headline: this.#localize.term('searchManagement_rebuildConfirmHeadline'),
+			content: html`${this.#localize.htmlString('#searchManagement_rebuildConfirmMessage', this.args.unique)}`,
+			confirmLabel: this.#localize.term('searchManagement_rebuildConfirmLabel'),
 		});
 
 		// Set loading states BEFORE API call for immediate feedback

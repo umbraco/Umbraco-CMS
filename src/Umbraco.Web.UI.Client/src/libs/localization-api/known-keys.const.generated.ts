@@ -1920,7 +1920,6 @@ export const KNOWN_LOCALIZATION_KEYS: readonly UmbKnownLocalizationKey[] = [
 	'searchManagement_rebuildConfirmHeadline',
 	'searchManagement_rebuildConfirmLabel',
 	'searchManagement_rebuildConfirmMessage',
-	'searchManagement_rebuildIndex',
 	'searchManagement_rebuildStartedMessage',
 	'searchManagement_resultsCount',
 	'searchManagement_resultsRegion',
