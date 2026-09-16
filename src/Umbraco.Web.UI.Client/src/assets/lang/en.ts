@@ -3191,7 +3191,6 @@ export default {
 			'The rebuild of search index "{0}" has started. You can continue working while the process runs in the background.',
 		rebuildCompletedTitle: 'Search Index Rebuild Completed',
 		rebuildCompletedMessage: 'The rebuild of search index "{0}" has completed successfully.',
-		rebuildingIndex: 'Rebuilding index...',
 		rebuildIndex: 'Rebuild Index',
 		indexInfo: 'Index Information',
 		indexAlias: 'Index Alias',

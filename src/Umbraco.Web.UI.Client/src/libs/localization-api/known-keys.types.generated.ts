@@ -1948,7 +1948,6 @@ declare global {
 		searchManagement_rebuildConfirmLabel: string;
 		searchManagement_rebuildConfirmMessage: string;
 		searchManagement_rebuildIndex: string;
-		searchManagement_rebuildingIndex: string;
 		searchManagement_rebuildStartedMessage: string;
 		searchManagement_resultsCount: (count: number) => string;
 		searchManagement_resultsRegion: string;

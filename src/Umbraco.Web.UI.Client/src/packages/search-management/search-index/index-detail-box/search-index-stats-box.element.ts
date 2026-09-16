@@ -1,6 +1,6 @@
 import { UMB_SEARCH_WORKSPACE_CONTEXT } from '../workspace/search-workspace.context-token.js';
-import type { UmbHealthStatusModel } from '../types.js';
-import { html, customElement, state, css } from '@umbraco-cms/backoffice/external/lit';
+import type { UmbHealthStatusModel, UmbSearchIndexState } from '../types.js';
+import { html, customElement, state, css, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
@@ -19,6 +19,9 @@ export class UmbSearchIndexStatsBoxElement extends UmbLitElement {
 
 	@state()
 	private _healthStatus?: UmbHealthStatusModel;
+
+	@state()
+	private _state?: UmbSearchIndexState;
 
 	constructor() {
 		super();
@@ -61,6 +64,19 @@ export class UmbSearchIndexStatsBoxElement extends UmbLitElement {
 			},
 			'_observeHealthStatus',
 		);
+
+		this.observe(
+			this.#workspaceContext?.state,
+			(state) => {
+				this._state = state;
+			},
+			'_observeState',
+		);
+	}
+
+	/** A rebuild the user just started is not reported by the server until the next load. */
+	#effectiveHealthStatus(): UmbHealthStatusModel | undefined {
+		return this._state === 'loading' ? 'Rebuilding' : this._healthStatus;
 	}
 
 	#getHealthStatusColor(status?: UmbHealthStatusModel): string {
@@ -102,10 +118,11 @@ export class UmbSearchIndexStatsBoxElement extends UmbLitElement {
 						<strong>
 							<umb-localize key="searchManagement_tableColumnHealthStatus"> Health Status </umb-localize>
 						</strong>
-						<div>
-							<uui-tag look="primary" .color=${this.#getHealthStatusColor(this._healthStatus)}>
-								${this.localize.term('searchManagement_healthStatus', this._healthStatus ?? 'Unknown')}
+						<div class="health-status">
+							<uui-tag look="secondary" .color=${this.#getHealthStatusColor(this.#effectiveHealthStatus())}>
+								${this.localize.term('searchManagement_healthStatus', this.#effectiveHealthStatus() ?? 'Unknown')}
 							</uui-tag>
+							${this._state === 'loading' ? html`<uui-loader-circle></uui-loader-circle>` : nothing}
 						</div>
 					</div>
 				</div>
@@ -130,6 +147,12 @@ export class UmbSearchIndexStatsBoxElement extends UmbLitElement {
 				display: flex;
 				flex-direction: column;
 				gap: var(--uui-size-space-2);
+			}
+
+			.health-status {
+				display: flex;
+				align-items: center;
+				gap: var(--uui-size-space-3);
 			}
 		`,
 	];

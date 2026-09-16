@@ -71,7 +71,7 @@ export default class UmbSearchRootCollectionViewElement extends UmbLitElement {
 			const editHref = `section/settings/workspace/${UMB_SEARCH_INDEX_ENTITY_TYPE}/edit/${item.unique}`;
 			return {
 				id: item.unique,
-				icon: this.#healthStatusIcon(item),
+				icon: 'icon-search',
 				data: [
 					{
 						columnAlias: 'indexAlias',
@@ -101,23 +101,6 @@ export default class UmbSearchRootCollectionViewElement extends UmbLitElement {
 				],
 			};
 		});
-	}
-
-	#healthStatusIcon(item: UmbSearchIndex) {
-		if (item.state === 'loading') {
-			return 'icon-loading color-blue';
-		}
-		switch (item.healthStatus) {
-			case 'Healthy':
-				return 'icon-check color-green';
-			case 'Rebuilding':
-				return 'icon-time color-yellow';
-			case 'Empty':
-				return 'icon-check color-yellow';
-			default:
-				// Corrupted or any other status
-				return 'icon-alert color-red';
-		}
 	}
 
 	static override readonly styles = [UmbTextStyles];

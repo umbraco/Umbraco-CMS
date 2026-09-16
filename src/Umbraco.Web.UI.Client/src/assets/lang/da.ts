@@ -3015,7 +3015,6 @@ export default {
 			'Genopbygningen af søgeindeks "{0}" er startet. Du kan fortsætte med at arbejde, mens processen kører i baggrunden.',
 		rebuildCompletedTitle: 'Genopbygning af søgeindeks fuldført',
 		rebuildCompletedMessage: 'Genopbygningen af søgeindeks "{0}" er blevet fuldført.',
-		rebuildingIndex: 'Genopbygger indeks...',
 		rebuildIndex: 'Genopbyg indeks',
 		indexInfo: 'Indeks information',
 		indexAlias: 'Indeks alias',
