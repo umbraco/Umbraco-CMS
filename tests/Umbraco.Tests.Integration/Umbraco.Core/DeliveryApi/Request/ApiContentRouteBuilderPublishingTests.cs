@@ -57,7 +57,7 @@ public class ApiContentRouteBuilderPublishingTests : ApiContentRouteBuilderTestB
 
         if (breakPublishedPath)
         {
-            ContentService.Unpublish(child, "da-DK");
+            await ContentService.UnpublishAsync(child, "da-DK", Constants.Security.SuperUserKey, CancellationToken.None);
         }
 
         SetVariationContext("en-US");
@@ -123,7 +123,7 @@ public class ApiContentRouteBuilderPublishingTests : ApiContentRouteBuilderTestB
 
         if (breakPublishedPath)
         {
-            ContentService.Unpublish(child);
+            await ContentService.UnpublishAsync(child, "*", Constants.Security.SuperUserKey, CancellationToken.None);
         }
 
         SetVariationContext("en-US");

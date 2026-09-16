@@ -87,6 +87,15 @@ public class ElementService : PublishableContentServiceBase<IElement>, IElementS
     }
 
     /// <inheritdoc />
+    // No async repository exists for elements yet - bridges to the existing synchronous Unpublish engine.
+    public Task<PublishResult> UnpublishAsync(IElement content, string? culture, Guid userKey, CancellationToken cancellationToken)
+    {
+        int userId = _userIdKeyResolver.GetAsync(userKey).GetAwaiter().GetResult();
+        PublishResult result = Unpublish(content, culture, userId);
+        return Task.FromResult(result);
+    }
+
+    /// <inheritdoc />
     // No async repository exists for elements yet - bridges to the existing synchronous Rollback engine.
     public Task<Attempt<ContentRollbackOperationStatus>> RollbackAsync(Guid key, int versionId, string culture, Guid userKey, CancellationToken cancellationToken)
     {

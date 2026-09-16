@@ -180,7 +180,7 @@ public partial class PublishedContentCacheRefresherTests
         ContentService.PublishBranch(Get(RootKey), publishDescendants ? PublishBranchFilter.IncludeUnpublished : PublishBranchFilter.Default, ["*"]);
         ResetNotificationPayloads();
 
-        ContentService.Unpublish(Get(RootKey));
+        await ContentService.UnpublishAsync(Get(RootKey), "*", Constants.Security.SuperUserKey, CancellationToken.None);
 
         // the result must be same no matter if descendants are included or not, because unpublish explicitly affects the whole branch
         List<PublishedContentCacheRefresher.JsonPayload> payloads = GetNotificationPayloads();
@@ -201,7 +201,7 @@ public partial class PublishedContentCacheRefresherTests
         ContentService.PublishBranch(Get(RootKey), PublishBranchFilter.IncludeUnpublished, ["*"]);
         ResetNotificationPayloads();
 
-        ContentService.Unpublish(Get(ChildKey));
+        await ContentService.UnpublishAsync(Get(ChildKey), "*", Constants.Security.SuperUserKey, CancellationToken.None);
 
         // the result must be same no matter if descendants are included or not, because unpublish explicitly affects the whole branch
         List<PublishedContentCacheRefresher.JsonPayload> payloads = GetNotificationPayloads();
@@ -223,8 +223,8 @@ public partial class PublishedContentCacheRefresherTests
         ContentService.PublishBranch(Get(RootKey), publishDescendants ? PublishBranchFilter.IncludeUnpublished : PublishBranchFilter.Default, ["*"]);
         ResetNotificationPayloads();
 
-        ContentService.Unpublish(Get(RootKey), "da-DK");
-        ContentService.Unpublish(Get(RootKey), "en-US");
+        await ContentService.UnpublishAsync(Get(RootKey), "da-DK", Constants.Security.SuperUserKey, CancellationToken.None);
+        await ContentService.UnpublishAsync(Get(RootKey), "en-US", Constants.Security.SuperUserKey, CancellationToken.None);
 
         // the result must be same no matter if descendants are included or not, because unpublish explicitly affects the whole branch
         List<PublishedContentCacheRefresher.JsonPayload> payloads = GetNotificationPayloads();

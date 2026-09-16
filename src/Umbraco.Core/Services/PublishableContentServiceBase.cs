@@ -1092,7 +1092,23 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         }
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    ///     Unpublishes content.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         By default, unpublishes the content as a whole, but it is possible to specify a culture to be
+    ///         unpublished. Depending on whether that culture is mandatory, and other cultures remain published,
+    ///         the content as a whole may or may not remain published.
+    ///     </para>
+    ///     <para>
+    ///         If the content type is variant, then culture can be either '*' or an actual culture, but neither null nor
+    ///         empty. If the content type is invariant, then culture can be either '*' or null or empty.
+    ///     </para>
+    /// </remarks>
+    /// <param name="content">The content to unpublish.</param>
+    /// <param name="culture">The culture to unpublish, or "*" for all cultures.</param>
+    /// <param name="userId">The identifier of the user performing the action.</param>
     public PublishResult Unpublish(TContent content, string? culture = "*", int userId = Constants.Security.SuperUserId)
     {
         ArgumentNullException.ThrowIfNull(content);

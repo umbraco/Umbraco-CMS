@@ -46,7 +46,7 @@ public partial class InvariantContentStructureTests
         await ContentService.SaveAsync(Root(), null, null, CancellationToken.None);
         ContentService.PublishBranch(Root(), PublishBranchFilter.IncludeUnpublished, ["*"]);
 
-        PublishResult result = ContentService.Unpublish(Root());
+        PublishResult result = await ContentService.UnpublishAsync(Root(), "*", Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.That(result.Success, Is.True);
         Assert.That(Child().Published, Is.True);
 
@@ -60,7 +60,7 @@ public partial class InvariantContentStructureTests
         await ContentService.SaveAsync(Root(), null, null, CancellationToken.None);
         ContentService.PublishBranch(Root(), PublishBranchFilter.IncludeUnpublished, ["*"]);
 
-        PublishResult result = ContentService.Unpublish(Grandchild());
+        PublishResult result = await ContentService.UnpublishAsync(Grandchild(), "*", Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.That(result.Success, Is.True);
         Assert.That(GreatGrandchild().Published, Is.True);
 

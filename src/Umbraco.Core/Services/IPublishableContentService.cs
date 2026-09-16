@@ -59,21 +59,8 @@ public interface IPublishableContentService<TContent> : IContentServiceBase
     /// <returns>The result of the publish operation, or a failure result if saving failed.</returns>
     PublishResult SaveAndPublish(TContent content, string[] culturesToPublish, int userId = Constants.Security.SuperUserId);
 
-    /// <summary>
-    ///     Unpublishes content.
-    /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         By default, unpublishes the content as a whole, but it is possible to specify a culture to be
-    ///         unpublished. Depending on whether that culture is mandatory, and other cultures remain published,
-    ///         the content as a whole may or may not remain published.
-    ///     </para>
-    ///     <para>
-    ///         If the content type is variant, then culture can be either '*' or an actual culture, but neither null nor
-    ///         empty. If the content type is invariant, then culture can be either '*' or null or empty.
-    ///     </para>
-    /// </remarks>
-    PublishResult Unpublish(TContent content, string? culture = "*", int userId = Constants.Security.SuperUserId);
+    // Unpublish(TContent, string?, int) has been retired from this interface in favour of the async
+    // UnpublishAsync (declared on IAsyncPublishableContentService<TContent>).
 
     // Rollback(int, int, string, int) has been retired from this interface in favour of the async
     // RollbackAsync (declared on IAsyncPublishableContentService<TContent>).

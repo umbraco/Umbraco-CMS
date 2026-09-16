@@ -44,11 +44,10 @@ public class InvariantDocumentTests : IndexTestBase
     [Test]
     public async Task CanRemoveUnpublishedDocument()
     {
-        await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, () =>
+        await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, async () =>
         {
             IContent content = ContentService.GetByIdAsync(RootKey, CancellationToken.None).GetAwaiter().GetResult()!;
-            ContentService.Unpublish(content);
-            return Task.CompletedTask;
+            await ContentService.UnpublishAsync(content, "*", Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         });
 
 

@@ -913,7 +913,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
 
         // Act - unpublish only the French culture (the document stays published via the default culture),
         // then rebuild the whole table from scratch.
-        ContentService.Unpublish(content, "fr-FR");
+        await ContentService.UnpublishAsync(content, "fr-FR", Constants.Security.SuperUserKey, CancellationToken.None);
         await DocumentUrlAliasService.RebuildAllAliasesAsync();
 
         // Assert - the still-published culture's alias resolves; the unpublished culture's alias does not.

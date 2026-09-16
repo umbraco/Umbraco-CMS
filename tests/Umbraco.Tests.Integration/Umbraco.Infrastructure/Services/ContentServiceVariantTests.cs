@@ -70,7 +70,7 @@ internal sealed class ContentServiceVariantTests : UmbracoIntegrationTest
         // use correctly cased culture code to publish
         await ContentService.PublishAsync(content, ["en-US"], Constants.Security.SuperUserKey, CancellationToken.None);
 
-        var unpublishResult = ContentService.Unpublish(content, unpublishCultureCode);
+        var unpublishResult = await ContentService.UnpublishAsync(content, unpublishCultureCode, Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.IsTrue(unpublishResult.Success);
 
         content = (await ContentService.GetByIdAsync(content.Key, CancellationToken.None))!;

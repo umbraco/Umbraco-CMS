@@ -124,7 +124,7 @@ public class DistributedContentIndexRefresherContentTests : TestBase
     [TestCase(true, true)]
     public async Task RefreshContent_SinglePublished_SpecificLanguageVariants(bool publishEnglish, bool publishDanish)
     {
-        ContentService.Unpublish(VariantContent());
+        await ContentService.UnpublishAsync(VariantContent(), "*", Constants.Security.SuperUserKey, CancellationToken.None);
 
         var culturesToPublish = new List<string>();
         if (publishEnglish)

@@ -942,7 +942,18 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
     }
 
     /// <inheritdoc />
-    public PublishResult Unpublish(TContent content, string? culture = "*", int userId = Constants.Security.SuperUserId)
+    public async Task<PublishResult> UnpublishAsync(TContent content, string? culture, Guid userKey, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(content);
+
+        int userId = await _userIdKeyResolver.GetAsync(userKey);
+        return await UnpublishAsync(content, culture, userId, cancellationToken);
+    }
+
+    // Takes the resolved int id directly so an internal caller that already holds one (e.g. a content
+    // version's WriterId) doesn't have to round-trip it through a Guid lookup - that round trip is lossy
+    // for a writer id with no matching user (it has no Guid to resolve to or from).
+    private async Task<PublishResult> UnpublishAsync(TContent content, string? culture, int userId, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(content);
 
@@ -954,7 +965,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
         if (publishedState != PublishedState.Published && publishedState != PublishedState.Unpublished)
         {
             throw new InvalidOperationException(
-                $"Cannot save-and-publish (un)publishing content, use the dedicated {nameof(CommitContentChanges)} method.");
+                $"Cannot save-and-publish (un)publishing content, use the dedicated {nameof(CommitContentChangesAsync)} method.");
         }
 
         // cannot accept invariant (null or empty) culture for variant content type
@@ -985,11 +996,10 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
         {
             scope.WriteLock(WriteLockIds);
 
-            // TODO: Await this properly when adjusting this service to our new EF Core approach.
-            var allLangs = _languageRepository.GetAllAsync(CancellationToken.None).GetAwaiter().GetResult().ToList();
+            var allLangs = (await _languageRepository.GetAllAsync(cancellationToken)).ToList();
 
             SavingNotification<TContent> savingNotification = SavingNotification(content, evtMsgs);
-            if (scope.Notifications.PublishCancelable(savingNotification))
+            if (await scope.Notifications.PublishCancelableAsync(savingNotification))
             {
                 return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, content);
             }
@@ -1002,7 +1012,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
                 // We are however unpublishing all cultures, so we will set this to unpublishing.
                 content.UnpublishCulture(culture);
                 content.PublishedState = PublishedState.Unpublishing;
-                PublishResult result = CommitContentChanges(scope, content, evtMsgs, allLangs, savingNotification.State, userId);
+                PublishResult result = await CommitContentChangesAsync(scope, content, evtMsgs, allLangs, savingNotification.State, userId, cancellationToken);
                 scope.Complete();
                 return result;
             }
@@ -1010,13 +1020,13 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
             {
                 // Unpublish the culture, this will change the content state to Publishing! ... which is expected because this will
                 // essentially be re-publishing the content with the requested culture removed.
-                // The call to CommitContentChangesInternal will perform all the checks like if this is a mandatory culture or the last culture being unpublished
+                // The call to CommitContentChangesInternalAsync will perform all the checks like if this is a mandatory culture or the last culture being unpublished
                 // and will then unpublish the content accordingly.
                 // If the result of this is false it means there was no culture to unpublish (i.e. it was already unpublished or it did not exist)
                 var removed = content.UnpublishCulture(culture);
 
                 // Save and publish any changes
-                PublishResult result = CommitContentChanges(scope, content, evtMsgs, allLangs, savingNotification.State, userId);
+                PublishResult result = await CommitContentChangesAsync(scope, content, evtMsgs, allLangs, savingNotification.State, userId, cancellationToken);
 
                 scope.Complete();
 
@@ -1103,7 +1113,12 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
                     // Clear this schedule for this culture
                     contentSchedule.Clear(ContentScheduleAction.Expire, date);
                     _contentRepository.PersistContentSchedule(d, contentSchedule);
-                    PublishResult result = Unpublish(d, userId: d.WriterId);
+
+                    // PerformScheduledPublish is still sync - block on the async engine here rather than
+                    // duplicating its logic, until this method gets its own async conversion. Uses the
+                    // int-userId overload directly: WriterId is passed through as-is, with no Guid round
+                    // trip that would be lossy for a writer id with no matching user.
+                    PublishResult result = UnpublishAsync(d, "*", d.WriterId, CancellationToken.None).GetAwaiter().GetResult();
                     if (result.Success == false)
                     {
                         Logger.LogError(null, "Failed to unpublish content id={ContentId}, reason={Reason}.", d.Id, result.Result);
@@ -1658,7 +1673,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
     ///     </para>
     /// </remarks>
     // TODO (V19): remove CommitContentChangesInternal (the sync method) and this remark once every caller
-    // of the sync engine (Unpublish, SaveAndPublish, PerformScheduledPublish) has an async equivalent.
+    // of the sync engine (SaveAndPublish, PerformScheduledPublish) has an async equivalent.
     protected async Task<PublishResult> CommitContentChangesInternalAsync(
         ICoreScope scope,
         TContent content,

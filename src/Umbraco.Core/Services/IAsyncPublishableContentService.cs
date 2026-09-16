@@ -123,6 +123,27 @@ public interface IAsyncPublishableContentService<TContent> : IAsyncContentServic
     Task<PublishResult> PublishAsync(TContent content, string[] cultures, Guid userKey, CancellationToken cancellationToken);
 
     /// <summary>
+    ///     Unpublishes content.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Unpublishes the content as a whole when <paramref name="culture" /> is "*", but it is possible to
+    ///         specify a single culture to be unpublished. Depending on whether that culture is mandatory, and
+    ///         other cultures remain published, the content as a whole may or may not remain published.
+    ///     </para>
+    ///     <para>
+    ///         If the content type is variant, then culture can be either '*' or an actual culture, but neither null nor
+    ///         empty. If the content type is invariant, then culture can be either '*' or null or empty.
+    ///     </para>
+    /// </remarks>
+    /// <param name="content">The content to unpublish.</param>
+    /// <param name="culture">The culture to unpublish, or "*" for all cultures.</param>
+    /// <param name="userKey">The Guid key of the user performing the action.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>The result of the unpublish operation.</returns>
+    Task<PublishResult> UnpublishAsync(TContent content, string? culture, Guid userKey, CancellationToken cancellationToken);
+
+    /// <summary>
     ///     Gets a version of content.
     /// </summary>
     /// <remarks>

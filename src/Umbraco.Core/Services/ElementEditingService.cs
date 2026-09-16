@@ -21,7 +21,6 @@ internal sealed class ElementEditingService
 {
     private readonly IElementService _elementService;
     private readonly ILogger<ElementEditingService> _logger;
-    private readonly IUserIdKeyResolver _userIdKeyResolver;
     private readonly IElementContainerService _containerService;
     private readonly ContentTypeFilterCollection _contentTypeFilters;
     private readonly IEventMessagesFactory _eventMessagesFactory;
@@ -64,7 +63,6 @@ internal sealed class ElementEditingService
     {
         _elementService = elementService;
         _logger = logger;
-        _userIdKeyResolver = userIdKeyResolver;
         _containerService = containerService;
         _contentTypeFilters = contentTypeFilters;
         _eventMessagesFactory = eventMessagesFactory;
@@ -402,7 +400,7 @@ internal sealed class ElementEditingService
     public async Task<Attempt<IElement?, ContentEditingOperationStatus>> CopyAsync(Guid key, Guid? containerKey, Guid userKey)
         => await HandleCopyAsync(key, containerKey, false, false, userKey);
 
-    internal static async Task<bool> UnpublishTrashedElementOnRestore(IElement element, Guid userKey, IElementService elementService, IUserIdKeyResolver userIdKeyResolver, ILogger logger)
+    internal static async Task<bool> UnpublishTrashedElementOnRestore(IElement element, Guid userKey, IElementService elementService, ILogger logger)
     {
         // this only applies to trashed, published elements
         if (element is not { Trashed: true, Published: true })
@@ -410,8 +408,7 @@ internal sealed class ElementEditingService
             return true;
         }
 
-        var userId = await userIdKeyResolver.GetAsync(userKey);
-        PublishResult result = elementService.Unpublish(element, "*", userId);
+        PublishResult result = await elementService.UnpublishAsync(element, "*", userKey, CancellationToken.None);
 
         // we will accept if custom code cancels the unpublish operation here - all other error states should
         // result in a failed move.
@@ -456,7 +453,7 @@ internal sealed class ElementEditingService
             return Attempt.Fail(ContentEditingOperationStatus.CancelledByNotification);
         }
 
-        var unpublishSuccess = await UnpublishTrashedElementOnRestore(toMove, userKey, ContentService, _userIdKeyResolver, _logger);
+        var unpublishSuccess = await UnpublishTrashedElementOnRestore(toMove, userKey, ContentService, _logger);
         if (unpublishSuccess is false)
         {
             return Attempt.Fail(ContentEditingOperationStatus.Unknown);

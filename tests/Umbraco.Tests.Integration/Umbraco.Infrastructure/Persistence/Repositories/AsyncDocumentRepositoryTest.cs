@@ -3108,7 +3108,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         // fully published — exactly the state IsPathPublishedAsync exists to detect.
         PublishResult publishParent = await ContentService.PublishAsync(_textpage, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
         PublishResult publishChild = await ContentService.PublishAsync(_subpage, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
-        PublishResult unpublishParent = ContentService.Unpublish(_textpage);
+        PublishResult unpublishParent = await ContentService.UnpublishAsync(_textpage, "*", Constants.Security.SuperUserKey, CancellationToken.None);
 
         var repository = CreateRepository();
         bool result = await repository.IsPathPublishedAsync(_subpage, CancellationToken.None);

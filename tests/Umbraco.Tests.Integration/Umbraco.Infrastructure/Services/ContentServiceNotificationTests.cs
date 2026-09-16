@@ -296,7 +296,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
 
         try
         {
-            ContentService.Unpublish(document);
+            await ContentService.UnpublishAsync(document, "*", Constants.Security.SuperUserKey, CancellationToken.None);
             Assert.IsTrue(treeChangeWasCalled);
         }
         finally
@@ -1014,7 +1014,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
 
         try
         {
-            ContentService.Unpublish(document);
+            await ContentService.UnpublishAsync(document, "*", Constants.Security.SuperUserKey, CancellationToken.None);
             Assert.IsTrue(unpublishedWasCalled);
         }
         finally
@@ -1198,7 +1198,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
 
         try
         {
-            ContentService.Unpublish(document, "*");
+            await ContentService.UnpublishAsync(document, "*", Constants.Security.SuperUserKey, CancellationToken.None);
             Assert.IsTrue(unpublishedWasCalled);
         }
         finally

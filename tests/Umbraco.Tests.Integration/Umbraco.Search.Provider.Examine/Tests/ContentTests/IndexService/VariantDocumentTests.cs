@@ -52,11 +52,10 @@ public class VariantDocumentTests : IndexTestBase
         ISearchResults results = index.Searcher.CreateQuery().All().Execute();
         Assert.That(results.TotalItemCount, Is.EqualTo(3));
 
-        await WaitForIndexing(indexAlias, () =>
+        await WaitForIndexing(indexAlias, async () =>
         {
             IContent content = ContentService.GetByIdAsync(RootKey, CancellationToken.None).GetAwaiter().GetResult()!;
-            ContentService.Unpublish(content, "da-DK");
-            return Task.CompletedTask;
+            await ContentService.UnpublishAsync(content, "da-DK", Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         });
 
         results = index.Searcher.CreateQuery().All().Execute();

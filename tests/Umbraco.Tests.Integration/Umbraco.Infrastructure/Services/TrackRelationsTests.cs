@@ -252,7 +252,7 @@ internal sealed class TrackRelationsTests : UmbracoIntegrationTestWithContent
         Assert.That((await RelationService.GetByParentIdAsync(source.Id)).Select(x => x.ChildId), Is.EquivalentTo(new[] { targetA.Id }));
 
         // Unpublish. The document no longer has a live published version, but the property's PublishedValue still holds target A.
-        Assert.IsTrue(ContentService.Unpublish(source).Success);
+        Assert.IsTrue((await ContentService.UnpublishAsync(source, "*", Constants.Security.SuperUserKey, CancellationToken.None)).Success);
 
         // Save a draft that re-points the picker to target B.
         IContent draft = (await ContentService.GetByIdAsync(source.Key, CancellationToken.None))!;
@@ -278,7 +278,7 @@ internal sealed class TrackRelationsTests : UmbracoIntegrationTestWithContent
 
         // Unpublish. There is no longer a live published version, so the stale published reference to A must be removed,
         // leaving only the draft reference to B.
-        Assert.IsTrue(ContentService.Unpublish(draft).Success);
+        Assert.IsTrue((await ContentService.UnpublishAsync(draft, "*", Constants.Security.SuperUserKey, CancellationToken.None)).Success);
 
         Assert.That((await RelationService.GetByParentIdAsync(source.Id)).Select(x => x.ChildId), Is.EquivalentTo(new[] { targetB.Id }));
     }

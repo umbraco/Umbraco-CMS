@@ -337,7 +337,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
     }
 
     [Test]
-    public void GetDocumentKeyByRoute_Published_Then_Unpublished_Documents_Have_No_Published_Route()
+    public async Task GetDocumentKeyByRoute_Published_Then_Unpublished_Documents_Have_No_Published_Route()
     {
         // Arrange
         ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
@@ -351,7 +351,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
         });
 
         // Act
-        ContentService.Unpublish(Textpage);
+        await ContentService.UnpublishAsync(Textpage, "*", Constants.Security.SuperUserKey, CancellationToken.None);
 
         Assert.Multiple(() =>
         {

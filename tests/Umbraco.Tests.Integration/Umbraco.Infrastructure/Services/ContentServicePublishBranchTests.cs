@@ -76,7 +76,7 @@ internal sealed class ContentServicePublishBranchTests : UmbracoIntegrationTest
         IContent ii22 = new Content("ii22", ii2, iContentType);
         ii22.SetValue("ip", "vii22");
         await ContentService.SaveAsync(ii22, null, null, CancellationToken.None);
-        ContentService.Unpublish(ii2);
+        await ContentService.UnpublishAsync(ii2, "*", Constants.Security.SuperUserKey, CancellationToken.None);
 
         // iroot    published    !edited
         //  ii1     published    !edited

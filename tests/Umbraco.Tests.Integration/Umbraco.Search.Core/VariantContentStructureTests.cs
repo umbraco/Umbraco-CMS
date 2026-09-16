@@ -81,7 +81,7 @@ public class VariantContentStructureTests : VariantContentTestBase
         await ContentService.SaveAsync(Root(), null, null, CancellationToken.None);
         ContentService.PublishBranch(Root(), PublishBranchFilter.IncludeUnpublished, ["*"]);
 
-        PublishResult result = ContentService.Unpublish(Root());
+        PublishResult result = await ContentService.UnpublishAsync(Root(), "*", Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.That(result.Success, Is.True);
         Assert.That(Child().Published, Is.True);
 
@@ -96,7 +96,7 @@ public class VariantContentStructureTests : VariantContentTestBase
         await ContentService.SaveAsync(Root(), null, null, CancellationToken.None);
         ContentService.PublishBranch(Root(), PublishBranchFilter.IncludeUnpublished, ["*"]);
 
-        PublishResult result = ContentService.Unpublish(Root(), cultureToUnpublish);
+        PublishResult result = await ContentService.UnpublishAsync(Root(), cultureToUnpublish, Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.That(result.Success, Is.True);
 
         IContent root = Root();
@@ -134,7 +134,7 @@ public class VariantContentStructureTests : VariantContentTestBase
         await ContentService.SaveAsync(Root(), null, null, CancellationToken.None);
         ContentService.PublishBranch(Root(), PublishBranchFilter.IncludeUnpublished, ["*"]);
 
-        PublishResult result = ContentService.Unpublish(Grandchild());
+        PublishResult result = await ContentService.UnpublishAsync(Grandchild(), "*", Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.That(result.Success, Is.True);
         Assert.That(GreatGrandchild().Published, Is.True);
 
@@ -160,10 +160,10 @@ public class VariantContentStructureTests : VariantContentTestBase
         await ContentService.SaveAsync(Root(), null, null, CancellationToken.None);
         ContentService.PublishBranch(Root(), PublishBranchFilter.IncludeUnpublished, ["*"]);
 
-        PublishResult result = ContentService.Unpublish(Grandchild(), "en-US");
+        PublishResult result = await ContentService.UnpublishAsync(Grandchild(), "en-US", Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.That(result.Success, Is.True);
         Assert.That(Grandchild().Published, Is.True);
-        result = ContentService.Unpublish(Grandchild(), "da-DK");
+        result = await ContentService.UnpublishAsync(Grandchild(), "da-DK", Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.That(result.Success, Is.True);
         Assert.That(Grandchild().Published, Is.False);
         Assert.That(GreatGrandchild().Published, Is.True);
@@ -191,7 +191,7 @@ public class VariantContentStructureTests : VariantContentTestBase
         await ContentService.SaveAsync(Root(), null, null, CancellationToken.None);
         ContentService.PublishBranch(Root(), PublishBranchFilter.IncludeUnpublished, ["*"]);
 
-        PublishResult result = ContentService.Unpublish(Grandchild(), cultureToUnpublish);
+        PublishResult result = await ContentService.UnpublishAsync(Grandchild(), cultureToUnpublish, Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.That(result.Success, Is.True);
 
         // grandchild should now be unpublished in a single culture

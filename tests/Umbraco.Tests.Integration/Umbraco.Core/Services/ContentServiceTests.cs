@@ -586,6 +586,44 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     }
 
     [Test]
+    public async Task Perform_Scheduled_Unpublishing_Does_Not_Silently_Reattribute_A_Version_With_No_Known_Writer()
+    {
+        var contentType = ContentTypeBuilder.CreateBasicContentType();
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+
+        var content = ContentBuilder.CreateBasicContent(contentType);
+        var now = DateTime.UtcNow;
+        Assert.IsTrue((await ContentService.SaveAsync(content, null, null, CancellationToken.None)).Success);
+        Assert.IsTrue((await ContentService.PublishAsync(content, content.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None)).Success);
+
+        // Schedule it to expire, then simulate legacy/imported content whose current version has no
+        // matching user - umbracoContentVersion.userId is NULL.
+        var contentSchedule = ContentScheduleCollection.CreateWithEntry(null, now.AddSeconds(5));
+        await ContentService.PersistContentScheduleAsync(content, contentSchedule, CancellationToken.None);
+
+        using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
+        {
+            scope.Database.Execute(
+                "UPDATE umbracoContentVersion SET userId = NULL WHERE nodeId = @0 AND current = 1",
+                content.Id);
+        }
+
+        var results = ContentService.PerformScheduledPublish(now.AddMinutes(1)).ToList();
+
+        // The expiration must succeed; a version with no known writer is not a reason to fail the
+        // unpublish, and it must not be silently re-attributed to the super user either.
+        PublishResult result = results.Single(x => x.Entity.Id == content.Id);
+        Assert.IsTrue(result.Success, result.Result.ToString());
+
+        var unpublished = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
+        Assert.IsFalse(unpublished.Published);
+        Assert.AreEqual(
+            Constants.Security.UnknownUserId,
+            unpublished.WriterId,
+            "A version with no known writer must not be silently re-attributed to the super user.");
+    }
+
+    [Test]
     public async Task Remove_Scheduled_Publishing_Date()
     {
         // Arrange
@@ -1220,7 +1258,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         var published = await ContentService.PublishAsync(content, content.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Act
-        var unpublished = ContentService.Unpublish(content, userId: -1);
+        var unpublished = await ContentService.UnpublishAsync(content, "*", Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Assert
         Assert.That(published.Success, Is.True);
@@ -1246,7 +1284,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         Assert.IsTrue(content.IsCulturePublished(langFr.IsoCode));
         Assert.IsTrue(content.IsCulturePublished(langUk.IsoCode));
 
-        var unpublished = ContentService.Unpublish(content, langFr.IsoCode);
+        var unpublished = await ContentService.UnpublishAsync(content, langFr.IsoCode, Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.IsTrue(unpublished.Success);
         Assert.AreEqual(PublishResultType.SuccessUnpublishCulture, unpublished.Result);
         Assert.IsFalse(content.IsCulturePublished(langFr.IsoCode));
@@ -1271,7 +1309,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         // re-get
         content = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
 
-        var unpublished = ContentService.Unpublish(content, langUk.IsoCode); // first culture
+        var unpublished = await ContentService.UnpublishAsync(content, langUk.IsoCode, Constants.Security.SuperUserKey, CancellationToken.None); // first culture
         Assert.IsTrue(unpublished.Success);
         Assert.AreEqual(PublishResultType.SuccessUnpublishCulture, unpublished.Result);
         Assert.IsFalse(content.IsCulturePublished(langUk.IsoCode));
@@ -1279,7 +1317,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
         content = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
 
-        unpublished = ContentService.Unpublish(content, langFr.IsoCode); // last culture
+        unpublished = await ContentService.UnpublishAsync(content, langFr.IsoCode, Constants.Security.SuperUserKey, CancellationToken.None); // last culture
         Assert.IsTrue(unpublished.Success);
         Assert.AreEqual(PublishResultType.SuccessUnpublishLastCulture, unpublished.Result);
         Assert.IsFalse(content.IsCulturePublished(langFr.IsoCode));
@@ -1317,7 +1355,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         Assert.IsTrue(content.IsCulturePublished(langUk.IsoCode));
         Assert.AreEqual(PublishedState.Published, content.PublishedState);
 
-        var unpublished = ContentService.Unpublish(content, langFr.IsoCode); // first culture
+        var unpublished = await ContentService.UnpublishAsync(content, langFr.IsoCode, Constants.Security.SuperUserKey, CancellationToken.None); // first culture
         Assert.IsTrue(unpublished.Success);
         Assert.AreEqual(PublishResultType.SuccessUnpublishCulture, unpublished.Result);
         Assert.IsFalse(content.IsCulturePublished(langFr.IsoCode));
@@ -1329,7 +1367,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         Assert.IsFalse(content.IsCulturePublished(langFr.IsoCode));
         Assert.IsTrue(content.IsCulturePublished(langUk.IsoCode));
 
-        unpublished = ContentService.Unpublish(content, langUk.IsoCode); // last culture
+        unpublished = await ContentService.UnpublishAsync(content, langUk.IsoCode, Constants.Security.SuperUserKey, CancellationToken.None); // last culture
         Assert.IsTrue(unpublished.Success);
         Assert.AreEqual(PublishResultType.SuccessUnpublishLastCulture, unpublished.Result);
         Assert.IsFalse(content.IsCulturePublished(langFr.IsoCode));
@@ -1379,7 +1417,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         // re-get
         content = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
 
-        var unpublished = ContentService.Unpublish(content, langUk.IsoCode); // unpublish mandatory lang
+        var unpublished = await ContentService.UnpublishAsync(content, langUk.IsoCode, Constants.Security.SuperUserKey, CancellationToken.None); // unpublish mandatory lang
         Assert.IsTrue(unpublished.Success);
         Assert.AreEqual(PublishResultType.SuccessUnpublishMandatoryCulture, unpublished.Result);
         Assert.IsFalse(content.IsCulturePublished(langUk.IsoCode));
@@ -1403,7 +1441,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         // re-get
         content = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
 
-        var unpublished = ContentService.Unpublish(content, langUk.IsoCode);
+        var unpublished = await ContentService.UnpublishAsync(content, langUk.IsoCode, Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.IsTrue(unpublished.Success);
         Assert.AreEqual(PublishResultType.SuccessUnpublishCulture, unpublished.Result);
         Assert.IsFalse(content.IsCulturePublished(langUk.IsoCode));
@@ -1413,7 +1451,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         // Change some data since Unpublish should always Save
         content.SetCultureName("content-en-updated", langUk.IsoCode);
 
-        unpublished = ContentService.Unpublish(content, langUk.IsoCode); // unpublish again
+        unpublished = await ContentService.UnpublishAsync(content, langUk.IsoCode, Constants.Security.SuperUserKey, CancellationToken.None); // unpublish again
         Assert.IsTrue(unpublished.Success);
         Assert.AreEqual(PublishResultType.SuccessUnpublishAlready, unpublished.Result);
         Assert.IsFalse(content.IsCulturePublished(langUk.IsoCode));
@@ -1565,7 +1603,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
         // re-get
         content = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
-        var unpublished = ContentService.Unpublish(content, langFr.IsoCode);
+        var unpublished = await ContentService.UnpublishAsync(content, langFr.IsoCode, Constants.Security.SuperUserKey, CancellationToken.None);
 
         // audit log will only show that french was unpublished
         var lastLog = (await AuditService.GetItemsByEntityAsync(content.Id, 0, 1)).Items.First();
@@ -1574,7 +1612,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         // re-get
         content = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
         content.SetCultureName("content-en", langGb.IsoCode);
-        unpublished = ContentService.Unpublish(content, langGb.IsoCode);
+        unpublished = await ContentService.UnpublishAsync(content, langGb.IsoCode, Constants.Security.SuperUserKey, CancellationToken.None);
 
         // audit log will only show that english was published
         var logs = (await AuditService.GetItemsByEntityAsync(content.Id, 0, int.MaxValue, Direction.Ascending)).Items.ToList();
@@ -1624,7 +1662,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
         Assert.IsTrue(await ContentService.IsPathPublishableAsync(content, CancellationToken.None));
-        ContentService.Unpublish(parent);
+        await ContentService.UnpublishAsync(parent, "*", Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.IsFalse(await ContentService.IsPathPublishableAsync(content, CancellationToken.None));
     }
 
@@ -4402,7 +4440,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
         // unpublish content
         // becomes !Published, Edited
-        ContentService.Unpublish(content);
+        await ContentService.UnpublishAsync(content, "*", Constants.Security.SuperUserKey, CancellationToken.None);
 
         Assert.IsFalse(content.Published);
         Assert.IsTrue(content.Edited);
@@ -4880,7 +4918,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
         // Act
         // cannot just 'save' since we are changing what's published!
-        ContentService.Unpublish(content, langFr.IsoCode);
+        await ContentService.UnpublishAsync(content, langFr.IsoCode, Constants.Security.SuperUserKey, CancellationToken.None);
 
         // content has been published,
         // the french culture is gone
@@ -4945,7 +4983,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
             (langUk, false)); // FR, DE would throw
 
         // Act
-        ContentService.Unpublish(content);
+        await ContentService.UnpublishAsync(content, "*", Constants.Security.SuperUserKey, CancellationToken.None);
 
         // content has been unpublished,
         // but properties, names, etc. retain their 'published' values so the content

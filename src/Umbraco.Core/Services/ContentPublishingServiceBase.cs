@@ -285,7 +285,9 @@ internal abstract class ContentPublishingServiceBase<TContent, TContentService>
             return Attempt<ContentPublishingOperationStatus>.Fail(ContentPublishingOperationStatus.CannotUnpublishWhenReferenced);
         }
 
-        var userId = await _userIdKeyResolver.GetAsync(userKey);
+        // Validated up front rather than left to the helpers below, since the CultureMissing path
+        // returns without reaching any of them - an unresolvable user key must still be rejected.
+        _ = await _userIdKeyResolver.GetAsync(userKey);
 
         // If cultures are provided for non variant content, and they include the default culture, consider
         // the request as valid for unpublishing the content.
@@ -305,7 +307,7 @@ internal abstract class ContentPublishingServiceBase<TContent, TContentService>
         {
             attempt = await UnpublishInvariantAsync(
                 content,
-                userId);
+                userKey);
 
             scope.Complete();
             return attempt;
@@ -321,38 +323,38 @@ internal abstract class ContentPublishingServiceBase<TContent, TContentService>
         {
             attempt = await UnpublishAllCulturesAsync(
                 content,
-                userId);
+                userKey);
         }
         else
         {
             attempt = await UnpublishMultipleCultures(
                 content,
                 cultures,
-                userId);
+                userKey);
         }
         scope.Complete();
 
         return attempt;
     }
 
-    private Task<Attempt<ContentPublishingOperationStatus>> UnpublishAllCulturesAsync(TContent content, int userId)
+    private async Task<Attempt<ContentPublishingOperationStatus>> UnpublishAllCulturesAsync(TContent content, Guid userKey)
     {
         if (content.ContentType.VariesByCulture() is false)
         {
-            return Task.FromResult(Attempt.Fail(ContentPublishingOperationStatus.CannotPublishVariantWhenNotVariant));
+            return Attempt.Fail(ContentPublishingOperationStatus.CannotPublishVariantWhenNotVariant);
         }
 
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
-        PublishResult result = _contentService.Unpublish(content, "*", userId);
+        PublishResult result = await _contentService.UnpublishAsync(content, "*", userKey, CancellationToken.None);
         scope.Complete();
 
         ContentPublishingOperationStatus contentPublishingOperationStatus = ToContentPublishingOperationStatus(result);
-        return Task.FromResult(contentPublishingOperationStatus is ContentPublishingOperationStatus.Success
+        return contentPublishingOperationStatus is ContentPublishingOperationStatus.Success
             ? Attempt.Succeed(ToContentPublishingOperationStatus(result))
-            : Attempt.Fail(ToContentPublishingOperationStatus(result)));
+            : Attempt.Fail(ToContentPublishingOperationStatus(result));
     }
 
-    private async Task<Attempt<ContentPublishingOperationStatus>> UnpublishMultipleCultures(TContent content, ISet<string> cultures, int userId)
+    private async Task<Attempt<ContentPublishingOperationStatus>> UnpublishMultipleCultures(TContent content, ISet<string> cultures, Guid userKey)
     {
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
 
@@ -372,7 +374,7 @@ internal abstract class ContentPublishingServiceBase<TContent, TContentService>
                 return Attempt.Fail(ContentPublishingOperationStatus.InvalidCulture);
             }
 
-            PublishResult result = _contentService.Unpublish(content, culture, userId);
+            PublishResult result = await _contentService.UnpublishAsync(content, culture, userKey, CancellationToken.None);
 
             ContentPublishingOperationStatus contentPublishingOperationStatus = ToContentPublishingOperationStatus(result);
 
@@ -386,22 +388,22 @@ internal abstract class ContentPublishingServiceBase<TContent, TContentService>
         return Attempt.Succeed(ContentPublishingOperationStatus.Success);
     }
 
-    private Task<Attempt<ContentPublishingOperationStatus>> UnpublishInvariantAsync(TContent content, int userId)
+    private async Task<Attempt<ContentPublishingOperationStatus>> UnpublishInvariantAsync(TContent content, Guid userKey)
     {
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
 
         if (content.ContentType.VariesByCulture())
         {
-            return Task.FromResult(Attempt.Fail(ContentPublishingOperationStatus.CannotPublishInvariantWhenVariant));
+            return Attempt.Fail(ContentPublishingOperationStatus.CannotPublishInvariantWhenVariant);
         }
 
-        PublishResult result = _contentService.Unpublish(content, null, userId);
+        PublishResult result = await _contentService.UnpublishAsync(content, null, userKey, CancellationToken.None);
         scope.Complete();
 
         ContentPublishingOperationStatus contentPublishingOperationStatus = ToContentPublishingOperationStatus(result);
-        return Task.FromResult(contentPublishingOperationStatus is ContentPublishingOperationStatus.Success
+        return contentPublishingOperationStatus is ContentPublishingOperationStatus.Success
             ? Attempt.Succeed(ToContentPublishingOperationStatus(result))
-            : Attempt.Fail(ToContentPublishingOperationStatus(result)));
+            : Attempt.Fail(ToContentPublishingOperationStatus(result));
     }
 
     protected static ContentPublishingOperationStatus ToContentPublishingOperationStatus(PublishResult publishResult)

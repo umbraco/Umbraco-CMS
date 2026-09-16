@@ -45,11 +45,10 @@ public partial class InvariantContentTreeTests
             await CreateInvariantDocumentTree(true);
         });
 
-        await WaitForIndexing(indexAlias, () =>
+        await WaitForIndexing(indexAlias, async () =>
         {
             IContent child = ContentService.GetByIdAsync(ChildKey, CancellationToken.None).GetAwaiter().GetResult()!;
-            ContentService.Unpublish(child);
-            return Task.CompletedTask;
+            await ContentService.UnpublishAsync(child, "*", Constants.Security.SuperUserKey, CancellationToken.None);
         });
 
         SearchResult rootResult = await Searcher.SearchAsync(indexAlias, "Root", null, null, null, null, null, null, 0, 100);
@@ -74,11 +73,10 @@ public partial class InvariantContentTreeTests
             await CreateInvariantDocumentTree(true);
         });
 
-        await WaitForIndexing(indexAlias, () =>
+        await WaitForIndexing(indexAlias, async () =>
         {
             IContent grandchild = ContentService.GetByIdAsync(GrandchildKey, CancellationToken.None).GetAwaiter().GetResult()!;
-            ContentService.Unpublish(grandchild);
-            return Task.CompletedTask;
+            await ContentService.UnpublishAsync(grandchild, "*", Constants.Security.SuperUserKey, CancellationToken.None);
         });
 
         SearchResult rootResult = await Searcher.SearchAsync(indexAlias, "Root", null, null, null, null, null, null, 0, 100);
