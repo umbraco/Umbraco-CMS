@@ -20,7 +20,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'workspaceView',
 		kind: 'collection',
 		name: 'Umbraco Search - Workspace View',
-		alias: 'Umb.Search.WorkspaceView.Collection',
+		alias: 'Umbraco.Search.WorkspaceView.Collection',
 		meta: {
 			label: '#searchManagement_treeHeader',
 			pathname: 'indexes',
@@ -37,7 +37,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'menuItem',
 		name: 'Umbraco Search Root Menu Item',
-		alias: 'Umb.Search.Root.MenuItem',
+		alias: 'Umbraco.Search.Root.MenuItem',
 		meta: {
 			label: '#searchManagement_treeHeader',
 			entityType: UMB_SEARCH_ROOT_ENTITY_TYPE,
