@@ -39,7 +39,7 @@ public class ElementPickerPropertyEditorMinMaxValidationTests
     {
         var config = new ElementPickerConfiguration
         {
-            ValidationLimit = new ElementPickerConfiguration.NumberRange { Min = 1 },
+            ValidationLimit = new NumberRange { Min = 1 },
         };
 
         Assert.That(_validator.Validate((List<string>?)null, config, null, PropertyValidationContext.Empty()).Count(), Is.EqualTo(1));
@@ -58,7 +58,7 @@ public class ElementPickerPropertyEditorMinMaxValidationTests
         {
             ValidationLimit = min is null && max is null
                 ? null
-                : new ElementPickerConfiguration.NumberRange { Min = min, Max = max },
+                : new NumberRange { Min = min, Max = max },
         };
 
         List<string> value = Enumerable.Range(0, count).Select(_ => Guid.NewGuid().ToString()).ToList();

@@ -12,8 +12,8 @@ public class ElementPickerConfiguration : IIgnoreUserStartNodesConfig
     /// <summary>
     /// Gets or sets the validation limits for the number of elements allowed.
     /// </summary>
-    [ConfigurationField("validationLimit")]
-    public NumberRange? ValidationLimit { get; set; }
+    [ConfigurationField("validationLimit", Type = typeof(RangeConfigurationField))]
+    public PropertyEditors.NumberRange? ValidationLimit { get; set; }
 
     /// <summary>
     /// Gets or sets the content type filter for allowed selections.
@@ -24,16 +24,8 @@ public class ElementPickerConfiguration : IIgnoreUserStartNodesConfig
     /// <summary>
     /// Represents a numeric range with optional minimum and maximum values.
     /// </summary>
-    public class NumberRange
+    [Obsolete("No longer used by Umbraco; use Umbraco.Cms.Core.PropertyEditors.NumberRange instead. Scheduled for removal in Umbraco 21.")]
+    public class NumberRange : PropertyEditors.NumberRange
     {
-        /// <summary>
-        /// Gets or sets the minimum value of the range.
-        /// </summary>
-        public int? Min { get; set; }
-
-        /// <summary>
-        /// Gets or sets the maximum value of the range.
-        /// </summary>
-        public int? Max { get; set; }
     }
 }

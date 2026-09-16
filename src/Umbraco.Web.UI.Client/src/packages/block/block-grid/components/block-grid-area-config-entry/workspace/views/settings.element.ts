@@ -5,6 +5,7 @@ import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace'
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import type { UmbInputNumberRangeElement } from '@umbraco-cms/backoffice/components';
+import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
 
 @customElement('umb-block-grid-area-type-workspace-view')
 export class UmbBlockGridAreaTypeWorkspaceViewSettingsElement extends UmbLitElement implements UmbWorkspaceViewElement {
@@ -24,24 +25,18 @@ export class UmbBlockGridAreaTypeWorkspaceViewSettingsElement extends UmbLitElem
 		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, async (context) => {
 			this.#dataset = context;
 			this.observe(
-				await this.#dataset?.propertyValueByAlias<number>('minAllowed'),
-				(min) => {
-					this._minValue = min ?? 0;
+				await this.#dataset?.propertyValueByAlias<UmbNumberRangeValueType>('validationLimit'),
+				(range) => {
+					this._minValue = range?.min ?? 0;
+					this._maxValue = range?.max ?? Infinity;
 				},
-				'observeMinAllowed',
-			);
-			this.observe(
-				await this.#dataset?.propertyValueByAlias<number>('maxAllowed'),
-				(max) => {
-					this._maxValue = max ?? Infinity;
-				},
-				'observeMaxAllowed',
+				'observeValidationLimit',
 			);
 		});
 	}
 	#onAllowedRangeChange = (e: UmbChangeEvent) => {
-		this.#dataset?.setPropertyValue('minAllowed', (e!.target! as UmbInputNumberRangeElement).minValue);
-		this.#dataset?.setPropertyValue('maxAllowed', (e!.target! as UmbInputNumberRangeElement).maxValue);
+		const target = e!.target! as UmbInputNumberRangeElement;
+		this.#dataset?.setPropertyValue('validationLimit', { min: target.minValue, max: target.maxValue });
 	};
 
 	override render() {
