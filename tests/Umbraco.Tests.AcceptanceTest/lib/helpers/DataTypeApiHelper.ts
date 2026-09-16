@@ -2026,7 +2026,7 @@ export class DataTypeApiHelper {
     return await this.save(dataType);
   }
 
-  async createDefaultNumericDataTypeWithMinAndMax(name: string, min: number, max: number) {
+  async createNumericDataTypeWithMinAndMax(name: string, min: number, max: number) {
     await this.ensureNameNotExists(name);
 
     const dataType = new NumericDataTypeBuilder()

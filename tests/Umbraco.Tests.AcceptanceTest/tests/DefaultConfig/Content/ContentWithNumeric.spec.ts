@@ -68,7 +68,7 @@ test('cannot publish a numeric value below the configured minimum', async ({umbr
   const min = 5;
   const max = 100;
   const belowMin = 1;
-  const dataTypeId = await umbracoApi.dataType.createDefaultNumericDataTypeWithMinAndMax(customDataTypeName, min, max);
+  const dataTypeId = await umbracoApi.dataType.createNumericDataTypeWithMinAndMax(customDataTypeName, min, max);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, dataTypeId);
   await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
@@ -92,7 +92,7 @@ test('cannot publish a numeric value above the configured maximum', async ({umbr
   const min = 0;
   const max = 10;
   const aboveMax = 11;
-  const dataTypeId = await umbracoApi.dataType.createDefaultNumericDataTypeWithMinAndMax(customDataTypeName, min, max);
+  const dataTypeId = await umbracoApi.dataType.createNumericDataTypeWithMinAndMax(customDataTypeName, min, max);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, dataTypeId);
   await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
