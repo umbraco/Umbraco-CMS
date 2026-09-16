@@ -1,4 +1,4 @@
-import type { UmbUserDetailModel, UmbUserStartNodesModel, UmbUserStateEnum } from '../../types.js';
+import { UmbUserStateEnum, type UmbUserDetailModel, type UmbUserStartNodesModel } from '../../types.js';
 import type { UmbUserDetailRepository } from '../../repository/index.js';
 import { UMB_USER_DETAIL_REPOSITORY_ALIAS } from '../../repository/index.js';
 import { UMB_USER_ENTITY_TYPE } from '../../entity.js';
@@ -15,6 +15,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbRepositoryResponseWithAsObservable } from '@umbraco-cms/backoffice/repository';
 import type { UmbSubmittableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
+import type { UmbEntityStateLook } from '@umbraco-cms/backoffice/entity-state';
 
 type EntityType = UmbUserDetailModel;
 
@@ -42,6 +43,17 @@ export class UmbUserWorkspaceContext
 	#calculatedStartNodes = new UmbObjectState<UmbUserStartNodesModel | undefined>(undefined);
 	readonly calculatedStartNodes = this.#calculatedStartNodes.asObservable();
 
+	/**
+	 * ALL is a filter-only pseudo-value the server never actually returns for a real user; ignored defensively.
+	 */
+	#userStateConfig: Partial<Record<UmbUserStateEnum, { look: UmbEntityStateLook; weight: number }>> = {
+		[UmbUserStateEnum.ACTIVE]: { look: 'positive', weight: 10 },
+		[UmbUserStateEnum.DISABLED]: { look: 'danger', weight: 50 },
+		[UmbUserStateEnum.LOCKED_OUT]: { look: 'danger', weight: 50 },
+		[UmbUserStateEnum.INVITED]: { look: 'warning', weight: 20 },
+		[UmbUserStateEnum.INACTIVE]: { look: 'warning', weight: 20 },
+	};
+
 	constructor(host: UmbControllerHost) {
 		super(host, {
 			workspaceAlias: UMB_USER_WORKSPACE_ALIAS,
@@ -59,6 +71,34 @@ export class UmbUserWorkspaceContext
 				},
 			},
 		]);
+
+		this.#observeAndPushUserState();
+	}
+
+	/**
+	 * Pushes a single `entityState` entry reporting the user's own `state` (Disabled/Locked out/Invited/Inactive).
+	 * Mirrors how the recycle-bin and document-publishing producers push their own rules, but for the plain,
+	 * non-variant half of the registry — a user has no variant concept.
+	 */
+	#observeAndPushUserState() {
+		this.observe(
+			this.state,
+			(state) => {
+				const config = state ? this.#userStateConfig[state] : undefined;
+				if (!config) {
+					this.entityState.removeState('UMB_USER_STATE');
+					return;
+				}
+
+				this.entityState.addState({
+					unique: 'UMB_USER_STATE',
+					label: `#user_state${state}`,
+					look: config.look,
+					weight: config.weight,
+				});
+			},
+			'_observeAndPushUserState',
+		);
 	}
 
 	protected override _getNavigationParentItemPath(entity: UmbEntityModel | undefined): string | undefined {

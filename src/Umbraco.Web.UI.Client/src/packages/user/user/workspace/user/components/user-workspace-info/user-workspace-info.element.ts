@@ -1,9 +1,8 @@
-import type { UmbUserDisplayStatus } from '../../../../utils.js';
-import { TimeFormatOptions, getDisplayStateFromUserStatus } from '../../../../utils.js';
+import { TimeFormatOptions } from '../../../../utils.js';
 import { UMB_USER_WORKSPACE_CONTEXT } from '../../user-workspace.context-token.js';
 import type { UmbUserDetailModel } from '../../../../types.js';
 import { UmbUserKind } from '../../../../utils/index.js';
-import { html, customElement, state, css, repeat, ifDefined, nothing } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, state, css, repeat, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
@@ -13,9 +12,6 @@ type UmbUserWorkspaceInfoItem = { labelKey: string; value: string | number | und
 export class UmbUserWorkspaceInfoElement extends UmbLitElement {
 	@state()
 	private _userInfo: Array<UmbUserWorkspaceInfoItem> = [];
-
-	@state()
-	private _userDisplayState: UmbUserDisplayStatus | null = null;
 
 	#userWorkspaceContext?: typeof UMB_USER_WORKSPACE_CONTEXT.TYPE;
 
@@ -29,7 +25,6 @@ export class UmbUserWorkspaceInfoElement extends UmbLitElement {
 				async (user) => {
 					if (!user) return;
 					this.#setUserInfoItems(user);
-					this._userDisplayState = user.state ? getDisplayStateFromUserStatus(user.state) : null;
 				},
 				'umbUserObserver',
 			);
@@ -82,17 +77,7 @@ export class UmbUserWorkspaceInfoElement extends UmbLitElement {
 
 	override render() {
 		if (this._userInfo.length === 0) return nothing;
-		return html`<uui-box id="user-info">${this.#renderState()} ${this.#renderInfoList()} </uui-box>`;
-	}
-
-	#renderState() {
-		return html`
-			<div id="state" class="user-info-item">
-				<uui-tag look="${ifDefined(this._userDisplayState?.look)}" color="${ifDefined(this._userDisplayState?.color)}">
-					${this.localize.term('user_' + this._userDisplayState?.key)}
-				</uui-tag>
-			</div>
-		`;
+		return html`<uui-box id="user-info">${this.#renderInfoList()}</uui-box>`;
 	}
 
 	#renderInfoList() {
@@ -123,17 +108,8 @@ export class UmbUserWorkspaceInfoElement extends UmbLitElement {
 				display: block;
 			}
 
-			uui-tag {
-				width: fit-content;
-			}
-
 			h4 {
 				margin: 0;
-			}
-
-			#state {
-				border-bottom: 1px solid var(--uui-color-divider);
-				padding-bottom: var(--uui-size-space-4);
 			}
 		`,
 	];

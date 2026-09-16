@@ -112,6 +112,11 @@ export class UmbEntityNamedDetailWorkspaceHeaderElement extends UmbLitElement {
 			#nameInput {
 				flex: 1 1 auto;
 			}
+
+			umb-entity-state-tags {
+				display: inline-block;
+				margin-right: var(--uui-size-space-2);
+			}
 		`,
 	];
 }

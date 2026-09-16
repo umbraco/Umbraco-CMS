@@ -40,10 +40,6 @@ export class UmbEntityStateTagsElement extends UmbLitElement {
 			:host {
 				display: contents;
 			}
-
-			uui-tag {
-				font-size: 10px;
-			}
 		`,
 	];
 }

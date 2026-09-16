@@ -723,10 +723,6 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 				margin-right: var(--uui-size-space-2);
 			}
 
-			uui-tag {
-				font-size: 10px;
-			}
-
 			uui-scroll-container {
 				max-height: 50dvh;
 			}
