@@ -23,6 +23,8 @@ export interface UmbMediaCollectionItemModel extends UmbCollectionItemModel, Umb
 		icon: string;
 		alias: string;
 	};
+	/** The file extension, without the leading dot and in lowercase. Undefined when the item holds no file. */
+	extension?: string;
 	sortOrder?: number;
 	updateDate: Date;
 	updater?: string | null;

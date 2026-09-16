@@ -82,6 +82,7 @@ export class UmbMediaTreeServerDataSource
 				};
 			}),
 			createDate: item.createDate,
+			extension: item.extension ?? undefined,
 			flags: item.flags,
 		};
 	}

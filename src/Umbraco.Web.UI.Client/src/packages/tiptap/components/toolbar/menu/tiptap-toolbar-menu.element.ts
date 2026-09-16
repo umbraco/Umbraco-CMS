@@ -1,15 +1,15 @@
-import type { Editor } from '../../externals.js';
+import type { Editor } from '../../../externals.js';
 import type {
 	ManifestTiptapToolbarExtensionMenuKind,
 	MetaTiptapToolbarMenuItem,
 	UmbTiptapToolbarElementApi,
-} from '../../extensions/index.js';
-import type { UmbCascadingMenuItem } from '../cascading-menu-popover/cascading-menu-popover.element.js';
+} from '../../../extensions/index.js';
+import type { UmbCascadingMenuItem } from '../../cascading-menu-popover/cascading-menu-popover.element.js';
 import { css, customElement, html, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { ManifestMenu } from '@umbraco-cms/backoffice/menu';
 
-import '../cascading-menu-popover/cascading-menu-popover.element.js';
+import '../../cascading-menu-popover/cascading-menu-popover.element.js';
 
 @customElement('umb-tiptap-toolbar-menu')
 export class UmbTiptapToolbarMenuElement extends UmbLitElement {
@@ -17,6 +17,9 @@ export class UmbTiptapToolbarMenuElement extends UmbLitElement {
 
 	@state()
 	protected isActive = false;
+
+	@state()
+	protected isDisabled = false;
 
 	public api?: UmbTiptapToolbarElementApi;
 
@@ -36,6 +39,7 @@ export class UmbTiptapToolbarMenuElement extends UmbLitElement {
 
 		if (this.editor) {
 			this.editor.on('transaction', this.#onEditorUpdate);
+			this.#onEditorUpdate();
 		}
 	}
 
@@ -111,12 +115,13 @@ export class UmbTiptapToolbarMenuElement extends UmbLitElement {
 	readonly #onEditorUpdate = () => {
 		if (this.api && this.editor && this.manifest) {
 			this.isActive = this.api.isActive(this.editor) || this.#isMenuActive(this.#menu) || false;
+			this.isDisabled = this.api.isDisabled(this.editor);
 		}
 	};
 
 	override render() {
 		const label = this.localize.string(this.manifest?.meta.label);
-		const disabled = this.api?.isDisabled(this.editor);
+		const disabled = this.isDisabled;
 		return html`
 			${when(
 				this.manifest?.meta.look === 'icon',

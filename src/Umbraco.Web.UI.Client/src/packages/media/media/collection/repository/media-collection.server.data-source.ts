@@ -46,6 +46,7 @@ export class UmbMediaCollectionServerDataSource implements UmbCollectionDataSour
 					createDate: new Date(variant.createDate),
 					creator: item.creator,
 					icon: item.mediaType.icon,
+					extension: item.extension ?? undefined,
 					// TODO (V20): remove when the deprecated `mediaType` field is removed.
 					mediaType: { unique: contentType.unique, icon: contentType.icon, alias: contentType.alias },
 					name: variant.name,

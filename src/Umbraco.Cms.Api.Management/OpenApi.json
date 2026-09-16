@@ -16625,8 +16625,7 @@
             "name": "baseUrl",
             "in": "query",
             "schema": {
-              "type": "string",
-              "default": "https://our.umbraco.com"
+              "type": "string"
             }
           }
         ],
@@ -46703,6 +46702,12 @@
           "mediaType": {
             "$ref": "#/components/schemas/MediaTypeCollectionReferenceResponseModel"
           },
+          "extension": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
           "creator": {
             "type": [
               "null",
@@ -46784,6 +46789,12 @@
           },
           "mediaType": {
             "$ref": "#/components/schemas/MediaTypeReferenceResponseModel"
+          },
+          "extension": {
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "variants": {
             "type": "array",
@@ -46901,6 +46912,12 @@
         "properties": {
           "mediaType": {
             "$ref": "#/components/schemas/MediaTypeReferenceResponseModel"
+          },
+          "extension": {
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "variants": {
             "type": "array",
