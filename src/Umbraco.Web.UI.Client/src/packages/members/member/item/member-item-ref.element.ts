@@ -3,7 +3,7 @@ import { UMB_MEMBER_MANAGEMENT_SECTION_ALIAS } from '../../section/constants.js'
 import { UMB_EDIT_MEMBER_WORKSPACE_PATH_PATTERN } from '../paths.js';
 import type { UmbMemberItemModel } from './repository/types.js';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
-import { customElement, html, ifDefined, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, ifDefined, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { umbGenerateWorkspaceLink, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS } from '@umbraco-cms/backoffice/section';
@@ -81,12 +81,22 @@ export class UmbMemberItemRefElement extends UmbLitElement {
 				<slot name="actions" slot="actions"></slot>
 				${this.#renderIcon(this.item)}
 			</uui-ref-node-member>
+			<umb-entity-frame><uui-icon name="link"></uui-icon> ${this.item.name}</umb-entity-frame>
 		`;
 	}
 
 	#renderIcon(item: UmbMemberItemModel) {
 		return html`<umb-icon slot="icon" name=${item.memberType.icon || 'icon-user'}></umb-icon>`;
 	}
+
+	static override styles = [
+		css`
+			:host {
+				display: block;
+				position: relative;
+			}
+		`,
+	];
 }
 
 export { UmbMemberItemRefElement as element };

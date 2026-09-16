@@ -145,6 +145,7 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 				${this.#renderIcon()}${this.#renderIsDraft()} ${this.#renderIsTrashed()}
 				${this._ancestorPath ? html`<span slot="detail" class="ancestor-path">${this._ancestorPath}</span>` : nothing}
 			</uui-ref-node>
+			<umb-entity-frame><uui-icon name="link"></uui-icon> ${this._name}</umb-entity-frame>
 		`;
 	}
 
@@ -165,6 +166,11 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 
 	static override styles = [
 		css`
+			:host {
+				display: block;
+				position: relative;
+			}
+
 			.ancestor-path {
 				display: block;
 				overflow: hidden;

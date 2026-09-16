@@ -84,11 +84,17 @@ export class UmbUserItemRefElement extends UmbLitElement {
 					.imgUrls=${this.item.avatarUrls}></umb-user-avatar>
 				<slot name="actions" slot="actions"></slot>
 			</uui-ref-node-user>
+			<umb-entity-frame><uui-icon name="link"></uui-icon> ${this.item.name}</umb-entity-frame>
 		`;
 	}
 
 	static override styles = [
 		css`
+			:host {
+				display: block;
+				position: relative;
+			}
+
 			umb-user-avatar {
 				font-size: var(--uui-size-4);
 			}
