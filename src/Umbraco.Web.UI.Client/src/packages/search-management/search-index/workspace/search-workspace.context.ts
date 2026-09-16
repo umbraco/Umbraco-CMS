@@ -13,7 +13,7 @@ import {
 	type UmbRoutableWorkspaceContext,
 } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbStringState } from '@umbraco-cms/backoffice/observable-api';
+import { mergeObservables, UmbBasicState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 
 export class UmbSearchWorkspaceContext
 	extends UmbEntityNamedDetailWorkspaceContextBase<UmbSearchIndex, UmbSearchDetailRepository>
@@ -23,7 +23,17 @@ export class UmbSearchWorkspaceContext
 	public readonly documentCount = this._data.createObservablePartOfPersisted((x) => x?.documentCount);
 	public readonly healthStatus = this._data.createObservablePartOfPersisted((x) => x?.healthStatus);
 	public readonly providerName = this._data.createObservablePartOfPersisted((x) => x?.providerName);
-	public readonly state = this._data.createObservablePartOfCurrent((x) => x?.state);
+	#pendingState = new UmbBasicState<UmbSearchIndexState | undefined>(undefined);
+
+	/**
+	 * The state of a rebuild the user just triggered, falling back to the state the server reports.
+	 * The pending part is deliberately kept out of the workspace data: writing it there diverges
+	 * current from persisted, which makes the workspace look edited and prompts to discard on exit.
+	 */
+	public readonly state = mergeObservables(
+		[this.#pendingState.asObservable(), this._data.createObservablePartOfPersisted((x) => x?.state)],
+		([pending, persisted]) => pending ?? persisted ?? 'idle',
+	);
 
 	#selectedCulture = new UmbStringState(undefined);
 	public readonly selectedCulture = this.#selectedCulture.asObservable();
@@ -59,6 +69,7 @@ export class UmbSearchWorkspaceContext
 				(indexAlias) => {
 					if (!indexAlias) return;
 					if (indexAlias !== this.getUnique()) return;
+					this.#pendingState.setValue(undefined);
 					void this.reload();
 				},
 				'index-rebuild-completed-detail-observer',
@@ -67,7 +78,7 @@ export class UmbSearchWorkspaceContext
 	}
 
 	setState(state: UmbSearchIndexState) {
-		this._data.updateCurrent({ state });
+		this.#pendingState.setValue(state);
 	}
 }
 
