@@ -54,8 +54,11 @@ export class UmbSearchContext extends UmbContextBase {
 
 				const indexAlias = String(args.eventSource);
 
-				// Emit on the public observable for subscribers
+				// Emit on the public observable for subscribers, then clear it. The value marks a
+				// rebuild that just completed, not a lasting fact, and a retained value would be
+				// replayed to anything subscribing later as though the rebuild had just happened.
 				this.#indexRebuilt.setValue(indexAlias);
+				this.#indexRebuilt.setValue(undefined);
 
 				// Handle user notification if they were waiting
 				if (this.#isUserWaitingForIndexUpdate(indexAlias)) {

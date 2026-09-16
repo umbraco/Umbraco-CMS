@@ -27,6 +27,7 @@ export class UmbSearchIndexSearchBoxElement extends UmbLitElement {
 		void this.#handleSearch();
 	}, 300);
 
+	#searchSequence = 0;
 	#pagination = new UmbPaginationManager();
 	#initialPage?: number;
 	#urlCulture?: string; // Temporary storage for culture from URL params before workspace context connects
@@ -262,9 +263,7 @@ export class UmbSearchIndexSearchBoxElement extends UmbLitElement {
 						this.#isSearchDisabled,
 						() => html`
 							<div class="search-disabled-message">
-								<umb-localize key="searchManagement_searchDisabled">
-									Search is disabled because the index is not healthy. Current status:
-								</umb-localize>
+								<umb-localize key="searchManagement_searchDisabled">Search unavailable. Index status:</umb-localize>
 								${this.localize.term('searchManagement_healthStatus', this._healthStatus ?? 'Unknown')}
 							</div>
 						`,
@@ -307,9 +306,7 @@ export class UmbSearchIndexSearchBoxElement extends UmbLitElement {
 					</div>
 
 					<div id="search-hint" class="visually-hidden">
-						<umb-localize key="searchManagement_searchHint">
-							Press Enter or click Search button to execute search
-						</umb-localize>
+						<umb-localize key="searchManagement_searchHint">Press Enter to search</umb-localize>
 					</div>
 					${when(
 						this._isSearching,
@@ -330,17 +327,14 @@ export class UmbSearchIndexSearchBoxElement extends UmbLitElement {
 	}
 
 	async #handleSearch() {
-		// Prevent concurrent searches
-		if (this._isSearching) {
-			return;
-		}
-
 		// Sync state with current input value
 		this._searchQuery = this.#inputValue;
 
 		if (!this._indexAlias) {
 			return;
 		}
+
+		const sequence = ++this.#searchSequence;
 
 		this._isSearching = true;
 		this._error = undefined;
@@ -360,6 +354,12 @@ export class UmbSearchIndexSearchBoxElement extends UmbLitElement {
 		};
 
 		const { data, error } = await this.#queryRepository.search(request);
+
+		// A newer search started while this one was in flight, so its result is the one that counts.
+		// Returning here also leaves the loading state to that newer search to clear.
+		if (sequence !== this.#searchSequence) {
+			return;
+		}
 
 		if (error || !data) {
 			this._error = this.localize.term('searchManagement_searchError');
@@ -391,8 +391,7 @@ export class UmbSearchIndexSearchBoxElement extends UmbLitElement {
 						<div style="padding: var(--uui-size-2) 0;">
 							<uui-button
 								look="secondary"
-								label="Open"
-								aria-label=${this.localize.term('searchManagement_openEntity', doc.entityType, doc.unique)}
+								label=${this.localize.term('searchManagement_openEntity', doc.entityType, doc.unique)}
 								href=${this.#getModalUrl(doc.unique, doc.entityType)}>
 								${doc.name}
 							</uui-button>
@@ -436,7 +435,6 @@ export class UmbSearchIndexSearchBoxElement extends UmbLitElement {
 
 	#handleKeyDown(e: KeyboardEvent) {
 		if (e.key === 'Enter') {
-			// Execute search immediately (debounced search will be skipped if already searching)
 			void this.#handleSearch();
 		}
 	}
@@ -465,7 +463,7 @@ export class UmbSearchIndexSearchBoxElement extends UmbLitElement {
 		if (this._searchResults.total === 0) {
 			return html`
 				<div class="no-results" role="status" aria-live="polite">
-					<umb-localize key="searchManagement_noResults">No results found</umb-localize>
+					<umb-localize key="searchManagement_noResults">No results</umb-localize>
 				</div>
 			`;
 		}
