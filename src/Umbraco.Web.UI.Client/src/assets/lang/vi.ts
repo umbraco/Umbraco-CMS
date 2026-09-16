@@ -328,6 +328,8 @@ export default {
 		isSensitiveValue:
 			'Giá trị này bị ẩn. Nếu bạn cần quyền truy cập để xem giá trị này, vui lòng liên hệ với quản trị viên trang web của bạn.',
 		isSensitiveValue_short: 'Giá trị này bị ẩn.',
+		isSensitiveValueNotice:
+			'Nếu bạn cần quyền truy cập để xem các giá trị bị ẩn, vui lòng liên hệ với quản trị viên trang web của bạn.',
 		languagesToPublish: 'Bạn muốn xuất bản ngôn ngữ nào?',
 		languagesToSendForApproval: 'Bạn muốn gửi ngôn ngữ nào để phê duyệt?',
 		languagesToSchedule: 'Bạn muốn lên lịch ngôn ngữ nào?',
@@ -354,6 +356,8 @@ export default {
 		selectAllVariants: 'Chọn tất cả các biến thể',
 		saveModalTitle: 'Lưu',
 		saveAndPublishModalTitle: 'Lưu và xuất bản',
+		saveAndPublishDescendantsModalTitle: 'Lưu và xuất bản cùng với các phần tử con',
+		saveAndScheduleModalTitle: 'Lưu và lên lịch xuất bản',
 		publishModalTitle: 'Xuất bản',
 	},
 	blueprints: {
@@ -388,6 +392,8 @@ export default {
 	},
 	media: {
 		clickToUpload: 'Nhấp để tải lên',
+		browseFilesAction: 'Duyệt tệp',
+		dropFilesOr: 'Kéo và thả tệp phương tiện vào đây<br />hoặc',
 		orClickHereToUpload: 'hoặc nhấp vào đây để chọn tệp',
 		disallowedFileType: 'Không thể tải lên tệp này, nó không có loại tệp được phê duyệt',
 		disallowedMediaType: "Không thể tải lên tệp này, loại phương tiện có bí danh '%0%' không được phép ở đây",
@@ -535,7 +541,8 @@ export default {
 		confirmremoveusageof: 'Bạn có chắc chắn muốn xóa việc sử dụng <strong>%0%</strong> không?',
 		confirmlogout: 'Bạn có chắc chắn muốn đăng xuất?',
 		confirmSure: 'Bạn có chắc chắn?',
-		cannotTrashWhenReferenced: (name: string) => `<strong>${name}</strong> không thể được chuyển vào Thùng rác vì nó được tham chiếu bởi các mục khác.`,
+		cannotTrashWhenReferenced: (name: string) =>
+			`<strong>${name}</strong> không thể được chuyển vào Thùng rác vì nó được tham chiếu bởi các mục khác.`,
 		confirmTrash: (name: string) => `Bạn có chắc chắn muốn di chuyển <strong>${name}</strong> vào Thùng rác?`,
 		cannotBulkTrashWhenReferenced: (total: number) =>
 			`<strong>${total} ${total === 1 ? 'mục' : 'các mục'}</strong> đã chọn không thể được chuyển vào Thùng rác vì ít nhất một mục được tham chiếu bởi nội dung khác.`,
@@ -904,6 +911,8 @@ export default {
 		no: 'Không',
 		nodeName: 'Tên nút',
 		notFound: 'Không tìm thấy',
+		noResults: 'Không có kết quả',
+		noResultsFor: (query: string) => `Không tìm thấy kết quả cho "${query}".`,
 		of: 'của',
 		off: 'Tắt',
 		ok: 'OK',
@@ -1449,6 +1458,17 @@ export default {
 			'Kéo các mục khác nhau lên hoặc xuống bên dưới để đặt cách chúng nên được sắp xếp. Hoặc nhấp vào tiêu đề cột để sắp xếp toàn bộ bộ sưu tập các mục',
 		sortPleaseWait: 'Vui lòng chờ. Các mục đang được sắp xếp, điều này có thể mất một thời gian.',
 		sortEmptyState: 'Nút này không có nút con nào để sắp xếp',
+		sortByFieldHeadline: 'Sắp xếp theo trường',
+		sortByFieldSentence: 'Sắp xếp tất cả các mục con theo',
+		sortByFieldDirectionLabel: 'Hướng',
+		sortByFieldAscending: 'Tăng dần',
+		sortByFieldDescending: 'Giảm dần',
+		sortByFieldNameOption: 'Tên',
+		sortByFieldCreateDateOption: 'Ngày tạo',
+		sortByFieldUpdateDateOption: 'Chỉnh sửa lần cuối',
+		sortIndividuallyHeadline: 'Sắp xếp riêng lẻ',
+		sortByFieldCultureSentence: 'bằng',
+		sortByFieldCultureLabel: 'Ngôn ngữ',
 	},
 	speechBubbles: {
 		validationFailedHeader: 'Xác thực',
@@ -1740,8 +1760,10 @@ export default {
 		compositionsDescriptionMemberType:
 			'Kế thừa các tab và thuộc tính từ một loại thành viên hiện có. Các tab mới sẽ được thêm vào loại thành viên hiện tại hoặc được hợp nhất nếu một tab có tên giống hệt tồn tại.',
 		compositionInUse: 'Loại nội dung này đang được sử dụng trong một thành phần, vì vậy không thể tự tạo thành phần.',
-		compositionInUseMediaType: 'Loại phương tiện này đang được sử dụng trong một thành phần, vì vậy không thể tự tạo thành phần.',
-		compositionInUseMemberType: 'Loại thành viên này đang được sử dụng trong một thành phần, vì vậy không thể tự tạo thành phần.',
+		compositionInUseMediaType:
+			'Loại phương tiện này đang được sử dụng trong một thành phần, vì vậy không thể tự tạo thành phần.',
+		compositionInUseMemberType:
+			'Loại thành viên này đang được sử dụng trong một thành phần, vì vậy không thể tự tạo thành phần.',
 		noAvailableCompositions: 'Không có loại nội dung nào có sẵn để sử dụng làm thành phần.',
 		noAvailableCompositionsMediaType: 'Không có loại phương tiện nào có sẵn để sử dụng làm thành phần.',
 		noAvailableCompositionsMemberType: 'Không có loại thành viên nào có sẵn để sử dụng làm thành phần.',
@@ -2469,10 +2491,10 @@ export default {
 		searchThisMessageWithGoogle: 'Tìm kiếm tin nhắn này với Google',
 		searchWithBing: 'Tìm kiếm với Bing',
 		searchThisMessageWithBing: 'Tìm kiếm tin nhắn này bằng Bing',
-		searchOurUmbraco: 'Tìm kiếm Our Umbraco',
-		searchThisMessageOnOurUmbracoForumsAndDocs: 'Tìm kiếm thông báo này trên diễn đàn và tài liệu Our Umbraco',
-		searchOurUmbracoWithGoogle: 'Tìm kiếm Our Umbraco bằng Google',
-		searchOurUmbracoForumsUsingGoogle: 'Tìm kiếm diễn đàn Our Umbraco bằng Google',
+		searchOurUmbraco: 'Tìm kiếm Umbraco',
+		searchThisMessageOnOurUmbracoForumsAndDocs: 'Tìm kiếm thông báo này trên diễn đàn và tài liệu Umbraco',
+		searchOurUmbracoWithGoogle: 'Tìm kiếm Umbraco bằng Google',
+		searchOurUmbracoForumsUsingGoogle: 'Tìm kiếm diễn đàn Umbraco bằng Google',
 		searchUmbracoSource: 'Tìm kiếm mã nguồn Umbraco',
 		searchWithinUmbracoSourceCodeOnGithub: 'Tìm trong mã nguồn Umbraco trên GitHub',
 		searchUmbracoIssues: 'Tìm kiếm vấn đề của Umbraco',
@@ -2549,10 +2571,6 @@ export default {
 			'Cảm ơn bạn đã chọn Umbraco - chúng tôi nghĩ rằng đây có thể là khởi đầu của một điều gì đó tuyệt đẹp. Mặc dù có thể cảm thấy choáng ngợp vào đầu, nhưng chúng tôi đã làm rất nhiều để làm cho đường cong học tập trở nên mượt mà và nhanh chóng nhất có thể.',
 	},
 	welcomeDashboard: {
-		ourUmbracoHeadline: 'Our Umbraco – Cộng đồng thân thiện nhất',
-		ourUmbracoDescription:
-			'Our Umbraco, trang cộng đồng chính thức, là nơi tổng hợp mọi thứ về Umbraco. Dù bạn cần giải đáp thắc mắc, plugin thú vị hay hướng dẫn cách thực hiện trong Umbraco, cộng đồng thân thiện và tuyệt vời nhất thế giới chỉ cách bạn một cú nhấp chuột.',
-		ourUmbracoButton: 'Truy cập Our Umbraco',
 		documentationHeadline: 'Tài liệu',
 		documentationDescription: 'Tìm câu trả lời cho mọi thắc mắc về Umbraco của bạn',
 		communityHeadline: 'Cộng đồng',
@@ -2824,5 +2842,10 @@ export default {
 		resetUrlHeadline: 'Đặt lại URL?',
 		resetUrlMessage: 'Bạn có chắc chắn muốn đặt lại URL này không?',
 		resetUrlLabel: 'Đặt lại',
+	},
+	picker: {
+		browseTab: 'Duyệt',
+		searchTab: 'Tìm kiếm',
+		selectedCount: (count: number) => `Đã chọn ${count} mục`,
 	},
 } as UmbLocalizationDictionary;

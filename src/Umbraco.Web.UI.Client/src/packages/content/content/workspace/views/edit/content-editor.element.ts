@@ -85,7 +85,7 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 				this._hasRootProperties = hasRootProperties;
 				this.#createRoutes();
 			},
-			'observeRootProperties',
+			null,
 		);
 
 		this.consumeContext(UMB_PROPERTY_STRUCTURE_WORKSPACE_CONTEXT, (workspaceContext) => {

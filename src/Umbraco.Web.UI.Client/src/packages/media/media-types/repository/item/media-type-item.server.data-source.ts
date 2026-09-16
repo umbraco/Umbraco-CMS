@@ -8,7 +8,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 /**
  * A data source for Media Type items that fetches data from the server
  * @class UmbMediaTypeItemServerDataSource
- * @implements {UmbItemDataSource}
+ * @augments {UmbItemServerDataSourceBase}
  */
 export class UmbMediaTypeItemServerDataSource extends UmbItemServerDataSourceBase<
 	MediaTypeItemResponseModel,

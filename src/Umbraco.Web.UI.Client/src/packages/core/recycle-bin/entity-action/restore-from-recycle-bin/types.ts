@@ -2,8 +2,7 @@ import type { ManifestEntityAction, MetaEntityActionDefaultKind } from '@umbraco
 import type { UmbItemDataResolverConstructor } from '@umbraco-cms/backoffice/entity-item';
 import type { UmbModalToken, UmbPickerModalData, UmbPickerModalValue } from '@umbraco-cms/backoffice/modal';
 
-export interface ManifestEntityActionRestoreFromRecycleBinKind
-	extends ManifestEntityAction<MetaEntityActionRestoreFromRecycleBinKind> {
+export interface ManifestEntityActionRestoreFromRecycleBinKind extends ManifestEntityAction<MetaEntityActionRestoreFromRecycleBinKind> {
 	type: 'entityAction';
 	kind: 'restoreFromRecycleBin';
 }

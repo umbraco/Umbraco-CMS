@@ -151,10 +151,10 @@ export class UmbRestoreFromRecycleBinModalElement extends UmbModalBaseElement<
 
 	override render() {
 		return html`
-			<umb-body-layout headline="Restore">
+			<umb-body-layout headline=${this.localize.term('general_restore')}>
 				<uui-box>
 					${this._isAutomaticRestore
-						? html` Restore ${this._restoreItemName} to ${this._destinationItemName}`
+						? this.localize.htmlString('#recycleBin_restoreItemTo', this._restoreItemName, this._destinationItemName)
 						: this.#renderCustomSelectDestination()}
 				</uui-box>
 				${this.#renderActions()}
@@ -164,27 +164,38 @@ export class UmbRestoreFromRecycleBinModalElement extends UmbModalBaseElement<
 
 	#renderCustomSelectDestination() {
 		return html`
-			<h4>Cannot automatically restore this item.</h4>
-			<p>There is no location where this item can be automatically restored. You can select a new location below.</p>
-			<h5>Restore to:</h5>
+			<h4><umb-localize key="recycleBin_itemCannotBeRestored"></umb-localize></h4>
+			<p><umb-localize key="recycleBin_itemCannotBeRestoredHelpText"></umb-localize></p>
+			<h5><umb-localize key="recycleBin_restoreToTitle"></umb-localize>:</h5>
 			${this._destinationItem && this._destinationItemName
 				? html`<uui-ref-node name=${this._destinationItemName}>
 						<uui-action-bar slot="actions">
-							<uui-button @click=${() => (this._destinationItem = undefined)} label="Remove"
-								>${this.localize.term('general_remove')}</uui-button
-							>
+							<uui-button
+								@click=${() => (this._destinationItem = undefined)}
+								label=${this.localize.term('general_remove')}></uui-button>
 						</uui-action-bar>
 					</uui-ref-node>`
-				: html` <uui-button id="placeholder" look="placeholder" @click=${this.#onSelectCustomDestination}
-						>Select location</uui-button
-					>`}
+				: html` <uui-button
+						id="placeholder"
+						look="placeholder"
+						label=${this.localize.term('recycleBin_selectRestoreLocation')}
+						@click=${this.#onSelectCustomDestination}></uui-button>`}
 		`;
 	}
 
 	#renderActions() {
 		return html`
-			<uui-button slot="actions" id="cancel" label="Cancel" @click="${this._rejectModal}"></uui-button>
-			<uui-button slot="actions" color="positive" look="primary" label="Restore" @click=${this.#onSubmit}></uui-button>
+			<uui-button
+				slot="actions"
+				id="cancel"
+				label=${this.localize.term('general_cancel')}
+				@click="${this._rejectModal}"></uui-button>
+			<uui-button
+				slot="actions"
+				color="positive"
+				look="primary"
+				label=${this.localize.term('general_restore')}
+				@click=${this.#onSubmit}></uui-button>
 		`;
 	}
 

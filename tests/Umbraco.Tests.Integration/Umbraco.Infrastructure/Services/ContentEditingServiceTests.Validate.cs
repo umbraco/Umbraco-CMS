@@ -156,7 +156,6 @@ public partial class ContentEditingServiceTests
             [
                 new PropertyValueModel { Alias = "invariantTitle", Value = "The updated invariant title" },
                 new PropertyValueModel { Alias = "variantTitle", Value = "The updated English default segment title", Culture = "en-US" },
-                new PropertyValueModel { Alias = "variantTitle", Value = "The updated Danish default segment title", Culture = "da-DK" },
                 new PropertyValueModel { Alias = "variantTitle", Value = "The updated English segment 1 title", Culture = "en-US", Segment = "seg-1" },
                 new PropertyValueModel { Alias = "variantTitle", Value = "The updated Danish segment 1 title", Culture = "da-DK", Segment = "seg-1" },
                 new PropertyValueModel { Alias = "variantTitle", Value = "The updated English segment 2 title", Culture = "en-US", Segment = "seg-2" },
@@ -175,7 +174,7 @@ public partial class ContentEditingServiceTests
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentEditingOperationStatus.PropertyValidationError, result.Status);
         Assert.AreEqual(1, result.Result.ValidationErrors.Count());
-        Assert.AreEqual("#validation_invalidNull", result.Result.ValidationErrors.Single(x => x.Alias == "variantTitle" && x.Culture == "da-DK" && x.Segment == "seg-2").ErrorMessages[0]);
+        Assert.AreEqual("#validation_invalidNull", result.Result.ValidationErrors.Single(x => x.Alias == "variantTitle" && x.Culture == "da-DK" && x.Segment == null).ErrorMessages[0]);
     }
 
     [Test]

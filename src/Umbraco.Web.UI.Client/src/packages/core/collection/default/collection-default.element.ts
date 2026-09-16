@@ -1,6 +1,6 @@
 import { UmbDefaultCollectionContext } from './collection-default.context.js';
 import { UMB_COLLECTION_CONTEXT } from './collection-default.context-token.js';
-import { css, html, customElement, state, nothing } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -98,14 +98,20 @@ export class UmbCollectionDefaultElement extends UmbLitElement {
 	}
 
 	override render() {
-		return this._routes
-			? html`
-					<umb-body-layout header-transparent class=${this._hasItems ? 'has-items' : ''}>
-						<umb-router-slot id="router" .routes=${this._routes}></umb-router-slot>
-						${this.renderToolbar()} ${this._hasItems ? this.#renderContent() : this.#renderEmptyState()}
-					</umb-body-layout>
-				`
-			: nothing;
+		return html`
+			<umb-body-layout header-transparent class=${this._hasItems ? 'has-items' : ''}>
+				${this.#renderBody()}
+			</umb-body-layout>
+		`;
+	}
+
+	#renderBody() {
+		if (!this._initialLoadDone || !this._routes.length) return html`<umb-view-loader></umb-view-loader>`;
+
+		return html`
+			<umb-router-slot id="router" .routes=${this._routes}></umb-router-slot>
+			${this.renderToolbar()} ${this._hasItems ? this.#renderContent() : this._renderEmptyState()}
+		`;
 	}
 
 	protected renderToolbar() {
@@ -124,9 +130,7 @@ export class UmbCollectionDefaultElement extends UmbLitElement {
 		return html`${this.renderPagination()} ${this.renderSelectionActions()}`;
 	}
 
-	#renderEmptyState() {
-		if (!this._initialLoadDone) return html`<umb-view-loader></umb-view-loader>`;
-
+	protected _renderEmptyState() {
 		return html`
 			<div id="empty-state" class="uui-text">
 				<h4>${this.localize.string(this._emptyLabel)}</h4>

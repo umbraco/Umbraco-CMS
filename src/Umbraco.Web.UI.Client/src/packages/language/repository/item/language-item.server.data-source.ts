@@ -8,7 +8,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 /**
  * A server data source for Language items
  * @class UmbLanguageItemServerDataSource
- * @implements {DocumentTreeDataSource}
+ * @augments {UmbItemServerDataSourceBase}
  */
 export class UmbLanguageItemServerDataSource extends UmbItemServerDataSourceBase<
 	LanguageItemResponseModel,

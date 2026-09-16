@@ -159,7 +159,7 @@ Follow the procedure in `references/breaking-changes.md`.
 
 ### 7. Consolidate and Output Review
 
-Merge findings from step 4 (raw review), step 5 (impact analysis), and step 6 (breaking changes). For each finding, assign severity (Critical/Important/Suggestion) and verify it relates to changed code — not pre-existing issues. Before outputting, drop any finding about whitespace, blank lines, formatting, or comment wording. Then present the review in this exact format:
+Merge findings from step 4 (raw review), step 5 (impact analysis), and step 6 (breaking changes). For each finding, assign severity (Critical/Important/Suggestion) and verify it relates to changed code — not pre-existing issues. Before outputting, drop any finding about whitespace, blank lines, formatting, or comment wording — but keep findings about comments or code pitched at the wrong altitude (see the review output guidelines below). Then present the review in this exact format:
 
 ```markdown
 ## PR Review
@@ -246,6 +246,6 @@ This is in such a bad state that the feedback of this review is not sufficient t
 - For complex matters, provide concrete fix suggestions, including code snippets when helpful
 - Keep it constructive — the goal is to help, not gatekeep
 - Don't repeat the same finding for every occurrence — mention it once and note "same pattern in {other files}"
-- Focus on substantive issues only. Do NOT flag purely cosmetic or stylistic concerns. Specifically, never flag: code formatting or whitespace, comment grammar or wording, redundant-but-harmless syntax (e.g., optional chaining after a truthiness check), code duplication that doesn't cause bugs, or HTML template cosmetics. The only exception is when a stylistic issue has a concrete impact on performance or rendering. Note: missing JSDoc/documentation on public or exported APIs is a substantive finding (per coding preferences), not a cosmetic one — flag it as a Suggestion.
+- Focus on substantive issues only. Do NOT flag purely cosmetic or stylistic concerns. Specifically, never flag: code formatting or whitespace, comment grammar or wording, redundant-but-harmless syntax (e.g., optional chaining after a truthiness check), code duplication that doesn't cause bugs, or HTML template cosmetics. The only exception is when a stylistic issue has a concrete impact on performance or rendering. Note: missing JSDoc/documentation on public or exported APIs is a substantive finding (per coding preferences), not a cosmetic one — flag it as a Suggestion. A comment, doc, or branch inside a shared/generic layer that names a specific editor alias, entity type, or manifest type instead of describing the contract (root `CLAUDE.md` §2, General-Purpose by Default) is likewise substantive, not stylistic — flag it as a Suggestion.
 - For breaking changes, reference the specific pattern from the CLAUDE.md that should be applied
 - Do not suggest changes that would themselves introduce breaking changes. If a suggestion would alter public API surface (e.g., changing return types, renaming public members), it is not appropriate for a PR targeting `main` within a major version. Only suggest non-breaking alternatives.

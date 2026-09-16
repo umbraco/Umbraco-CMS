@@ -173,7 +173,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 			async ([contentValues, settingsValues]) => {
 				this.#renderLabel(contentValues, settingsValues);
 			},
-			'observeContentForLabelRender',
+			null,
 		);
 
 		this.routes.setRoutes([
@@ -352,7 +352,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	 * @protected
 	 * @param {string | URL} newUrl The new url that the workspace is navigating to.
 	 * @returns {boolean} true if the workspace is navigating away.
-	 * @memberof UmbEntityWorkspaceContextBase
+	 * @memberof UmbBlockWorkspaceContext
 	 */
 	protected _checkWillNavigateAway(newUrl: string | URL): boolean {
 		return umbWorkspaceWillNavigateAway(this.routes, this.getUnique(), newUrl);

@@ -582,6 +582,36 @@ public class DocumentUrlServiceTests
     }
 
     /// <summary>
+    /// CreateOrUpdateUrlSegmentsAsync is only ever reached via a purely local, in-process notification fired on
+    /// the server that made the edit - never something routed from another server's cache-refresh instruction.
+    /// So when the role is still unresolved, this server is almost always the one originating the change and
+    /// must persist it: Unknown must NOT be treated like Subscriber here, or the write is silently dropped.
+    /// </summary>
+    [Test]
+    public async Task CreateOrUpdateUrlSegmentsAsync_OnUnknownRole_StillCallsRepositorySave()
+    {
+        // Arrange
+        var languages = new List<ILanguage> { CreateMockLanguage(1, "en-US") };
+
+        var urlSegmentProvider = CreateFixedSegmentProvider("test-segment");
+        var urlSegmentProviderCollection = new UrlSegmentProviderCollection(() => [urlSegmentProvider]);
+
+        var (service, repositoryMock) = CreateDocumentUrlServiceWithMocks(
+            urlSegmentProviderCollection, languages, ServerRole.Unknown);
+
+        var contentMock = CreateMockContent(Guid.NewGuid(), variesByCulture: false, isPublished: true);
+
+        // Act
+        await service.CreateOrUpdateUrlSegmentsAsync([contentMock.Object]);
+
+        // Assert
+        repositoryMock.Verify(
+            x => x.Save(It.IsAny<IEnumerable<PublishedDocumentUrlSegment>>()),
+            Times.Once,
+            "An unresolved server role must still persist URL segments for its own edits.");
+    }
+
+    /// <summary>
     /// Regression guard for the subscriber guard: Single and SchedulingPublisher roles must still persist
     /// URL segments as they did before the fix.
     /// </summary>

@@ -14,15 +14,15 @@ public interface ICoreScope : IDisposable, IInstanceIdentifiable
     /// <remarks>
     /// A zero represents a root scope, any value greater than zero represents a child scope.
     /// </remarks>
-    public int Depth => -1;
+    int Depth => -1;
 
     /// <summary>
     ///     Gets the locking mechanism for this scope.
     /// </summary>
-    public ILockingMechanism Locks { get; }
+    ILockingMechanism Locks { get; }
 
     /// <summary>
-    ///     Gets the scope notification publisher
+    ///     Gets the scope notification publisher.
     /// </summary>
     IScopedNotificationPublisher Notifications { get; }
 
@@ -58,14 +58,14 @@ public interface ICoreScope : IDisposable, IInstanceIdentifiable
     /// <summary>
     ///     Write-locks some lock objects.
     /// </summary>
-    /// <param name="timeout">The database timeout in milliseconds</param>
+    /// <param name="timeout">The database timeout.</param>
     /// <param name="lockId">The lock object identifier.</param>
     void WriteLock(TimeSpan timeout, int lockId);
 
     /// <summary>
     ///     Read-locks some lock objects.
     /// </summary>
-    /// <param name="timeout">The database timeout in milliseconds</param>
+    /// <param name="timeout">The database timeout.</param>
     /// <param name="lockId">The lock object identifier.</param>
     void ReadLock(TimeSpan timeout, int lockId);
 

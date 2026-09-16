@@ -4,9 +4,8 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
  *
- * @param host {UmbControllerHost} - The host controller
- * @param args {UmbConfirmModalData} - The data to pass to the modal
- * @param data
+ * @param {UmbControllerHost} host - The host controller
+ * @param {UmbConfirmModalData} data - The data to pass to the modal
  * @returns {UmbOpenModalController} The modal controller instance
  */
 export function umbConfirmModal(host: UmbControllerHost, data: UmbConfirmModalData) {

@@ -715,6 +715,7 @@ export type DocumentCollectionResponseModel = {
     flags: Array<FlagModel>;
     creator?: string | null;
     sortOrder: number;
+    hasChildren: boolean;
     documentType: DocumentTypeCollectionReferenceResponseModel;
     isTrashed: boolean;
     isProtected: boolean;
@@ -1348,7 +1349,9 @@ export type MediaCollectionResponseModel = {
     flags: Array<FlagModel>;
     creator?: string | null;
     sortOrder: number;
+    hasChildren: boolean;
     mediaType: MediaTypeCollectionReferenceResponseModel;
+    extension?: string | null;
 };
 
 export type MediaConfigurationResponseModel = {
@@ -1366,6 +1369,7 @@ export type MediaItemResponseModel = {
     parent?: ReferenceByIdModel | null;
     hasChildren: boolean;
     mediaType: MediaTypeReferenceResponseModel;
+    extension?: string | null;
     variants: Array<VariantItemResponseModel>;
 };
 
@@ -1403,6 +1407,7 @@ export type MediaTreeItemResponseModel = {
     isTrashed: boolean;
     createDate: string;
     mediaType: MediaTypeReferenceResponseModel;
+    extension?: string | null;
     variants: Array<VariantItemResponseModel>;
 };
 
@@ -3324,6 +3329,7 @@ export type DocumentCollectionResponseModelWritable = {
     flags: Array<FlagModel>;
     creator?: string | null;
     sortOrder: number;
+    hasChildren: boolean;
     documentType: DocumentTypeCollectionReferenceResponseModel;
     isTrashed: boolean;
     isProtected: boolean;
@@ -8647,6 +8653,10 @@ export type GetIndexerErrors = {
      * The resource is protected and requires an authentication token
      */
     401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
 };
 
 export type GetIndexerResponses = {
@@ -8676,6 +8686,10 @@ export type GetIndexerByIndexNameErrors = {
      * The resource is protected and requires an authentication token
      */
     401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
 };
 
 export type GetIndexerByIndexNameError = GetIndexerByIndexNameErrors[keyof GetIndexerByIndexNameErrors];
@@ -8707,6 +8721,10 @@ export type PostIndexerByIndexNameRebuildErrors = {
      * The resource is protected and requires an authentication token
      */
     401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
     /**
      * Not Found
      */
@@ -14112,6 +14130,10 @@ export type PostPublishedCacheRebuildErrors = {
      * The resource is protected and requires an authentication token
      */
     401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
 };
 
 export type PostPublishedCacheRebuildResponses = {
@@ -14133,6 +14155,10 @@ export type GetPublishedCacheRebuildStatusErrors = {
      * The resource is protected and requires an authentication token
      */
     401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
 };
 
 export type GetPublishedCacheRebuildStatusResponses = {
@@ -14156,6 +14182,10 @@ export type PostPublishedCacheReloadErrors = {
      * The resource is protected and requires an authentication token
      */
     401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
 };
 
 export type PostPublishedCacheReloadResponses = {
@@ -14892,6 +14922,10 @@ export type GetSearcherErrors = {
      * The resource is protected and requires an authentication token
      */
     401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
 };
 
 export type GetSearcherResponses = {
@@ -14921,6 +14955,10 @@ export type GetSearcherBySearcherNameQueryErrors = {
      * The resource is protected and requires an authentication token
      */
     401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
     /**
      * Not Found
      */

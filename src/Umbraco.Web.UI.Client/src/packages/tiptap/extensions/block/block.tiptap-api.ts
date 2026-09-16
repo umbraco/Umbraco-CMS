@@ -84,9 +84,12 @@ export default class UmbTiptapBlockElementApi extends UmbTiptapExtensionApiBase 
 		if (!editor) return;
 
 		// Find existing blocks in the editor
-		const existingBlocks = Array.from(editor.view.dom.querySelectorAll('umb-rte-block, umb-rte-block-inline')).map(
-			(x) => x.getAttribute(UMB_BLOCK_RTE_DATA_CONTENT_KEY),
-		);
+		const existingBlocks: Array<string> = [];
+		editor.state.doc.descendants((node) => {
+			const contentKey = node.attrs[UMB_BLOCK_RTE_DATA_CONTENT_KEY];
+			if (contentKey) existingBlocks.push(contentKey);
+			return true;
+		});
 
 		// ADD blocks that are in contents but NOT in editor
 		const newBlocks = contents.filter((x) => !existingBlocks.includes(x.key));

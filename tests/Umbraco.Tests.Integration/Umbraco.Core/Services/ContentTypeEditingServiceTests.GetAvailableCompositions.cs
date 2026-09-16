@@ -227,6 +227,79 @@ internal sealed partial class ContentTypeEditingServiceTests
             compositionsResult.Composition.Key == result3.Result!.Key && compositionsResult.Allowed == false));
     }
 
+    [Test]
+    public async Task Parent_With_Inheriting_Child_Has_Available_Compositions()
+    {
+        var parent = CreateBasicContentTypeModelWithSingleProperty("Parent", "parentProperty", false);
+        var parentResult = await ContentTypeEditingService.CreateAsync(parent, Constants.Security.SuperUserKey);
+
+        var child = ContentTypeCreateModel(
+            "Child",
+            compositions: [new Composition { CompositionType = CompositionType.Inheritance, Key = parentResult.Result!.Key }]);
+        var childResult = await ContentTypeEditingService.CreateAsync(child, Constants.Security.SuperUserKey);
+
+        var other = CreateBasicContentTypeModelWithSingleProperty("Other", "otherProperty", false);
+        var otherResult = await ContentTypeEditingService.CreateAsync(other, Constants.Security.SuperUserKey);
+
+        IEnumerable<ContentTypeAvailableCompositionsResult> availableCompositions =
+            await ContentTypeEditingService.GetAvailableCompositionsAsync(
+                parentResult.Result!.Key,
+                Enumerable.Empty<Guid>(),
+                Enumerable.Empty<string>(),
+                false);
+
+        // Being inherited from by "Child" must not lock "Parent" out of having its own compositions
+        Assert.IsTrue(availableCompositions.Any(x => x.Composition.Key == otherResult.Result!.Key && x.Allowed));
+
+        // The inheriting child is never offered as a composition of its own parent
+        Assert.IsFalse(availableCompositions.Any(x => x.Composition.Key == childResult.Result!.Key));
+    }
+
+    [Test]
+    public async Task Composition_Whose_Property_Alias_Collides_With_Descendant_Own_Property_Is_Available_But_Not_Allowed()
+    {
+        var composition = (await ContentTypeEditingService.CreateAsync(CompositionModelWithProperty("Composition", "sharedAlias"), Constants.Security.SuperUserKey)).Result!;
+        var parent = (await ContentTypeEditingService.CreateAsync(ContentTypeCreateModel("Parent"), Constants.Security.SuperUserKey)).Result!;
+        await ContentTypeEditingService.CreateAsync(ChildModelInheriting("Child", parent.Key, "sharedAlias"), Constants.Security.SuperUserKey);
+
+        IEnumerable<ContentTypeAvailableCompositionsResult> availableCompositions =
+            await ContentTypeEditingService.GetAvailableCompositionsAsync(
+                parent.Key,
+                Enumerable.Empty<Guid>(),
+                Enumerable.Empty<string>(),
+                false);
+
+        // the composition would push "sharedAlias" onto Child, which already has its own property of that alias
+        Assert.IsTrue(availableCompositions.Any(x => x.Composition.Key == composition.Key && x.Allowed == false));
+    }
+
+    [Test]
+    public async Task Composition_Already_Used_By_Child_Is_Available_But_Not_Allowed_For_Parent()
+    {
+        var composition = (await ContentTypeEditingService.CreateAsync(CompositionModelWithProperty("Composition", "compositionAlias"), Constants.Security.SuperUserKey)).Result!;
+        var parent = (await ContentTypeEditingService.CreateAsync(ContentTypeCreateModel("Parent"), Constants.Security.SuperUserKey)).Result!;
+
+        var childModel = ContentTypeCreateModel(
+            "Child",
+            compositions:
+            [
+                new Composition { CompositionType = CompositionType.Inheritance, Key = parent.Key },
+                new Composition { CompositionType = CompositionType.Composition, Key = composition.Key },
+            ]);
+        await ContentTypeEditingService.CreateAsync(childModel, Constants.Security.SuperUserKey);
+
+        IEnumerable<ContentTypeAvailableCompositionsResult> availableCompositions =
+            await ContentTypeEditingService.GetAvailableCompositionsAsync(
+                parent.Key,
+                Enumerable.Empty<Guid>(),
+                Enumerable.Empty<string>(),
+                false);
+
+        // the composition is already effective on Child (Parent's descendant); adding it to Parent too would push
+        // its properties onto Child a second time
+        Assert.IsTrue(availableCompositions.Any(x => x.Composition.Key == composition.Key && x.Allowed == false));
+    }
+
     private ContentTypeCreateModel CreateBasicContentTypeModelWithSingleProperty(string contentTypeName, string propertyName, bool isElement)
     {
         var container = ContentTypePropertyContainerModel();

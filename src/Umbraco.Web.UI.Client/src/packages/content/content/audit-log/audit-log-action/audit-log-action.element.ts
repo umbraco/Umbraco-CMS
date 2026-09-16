@@ -7,9 +7,9 @@ import type { UmbEntityAction, UmbEntityActionElement } from '@umbraco-cms/backo
 
 @customElement('umb-audit-log-action')
 export default class UmbAuditLogActionElement<
-		MetaType extends MetaAuditLogActionDefaultKind = MetaAuditLogActionDefaultKind,
-		ApiType extends UmbEntityAction<MetaType> = UmbEntityAction<MetaType>,
-	>
+	MetaType extends MetaAuditLogActionDefaultKind = MetaAuditLogActionDefaultKind,
+	ApiType extends UmbEntityAction<MetaType> = UmbEntityAction<MetaType>,
+>
 	extends UmbLitElement
 	implements UmbEntityActionElement
 {

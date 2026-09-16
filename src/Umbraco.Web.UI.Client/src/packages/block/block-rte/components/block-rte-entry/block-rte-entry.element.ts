@@ -161,7 +161,7 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 				this._isReadOnly = isReadOnly;
 				this.#updateBlockViewProps({ readonly: isReadOnly });
 			},
-			'umbReadOnlyObserver',
+			null,
 		);
 	}
 

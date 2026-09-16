@@ -29,7 +29,7 @@ export class UmbBadgeElement extends LitElement {
 
 	/**
 	 * Bring attention to this badge by applying a bounce animation.
-	 * @type boolean
+	 * @type {boolean}
 	 * @attr
 	 * @default false
 	 */

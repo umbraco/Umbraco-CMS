@@ -721,6 +721,15 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			uui-badge {
 				z-index: 2;
 			}
+
+			.umb-block-grid__block {
+				--umb-block-scale-handler-opacity: 0;
+
+				&:hover,
+				&:focus-within {
+					--umb-block-scale-handler-opacity: 1;
+				}
+			}
 		`,
 	];
 }

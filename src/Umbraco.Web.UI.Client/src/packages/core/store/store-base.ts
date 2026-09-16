@@ -4,7 +4,7 @@ import { UmbStoreUpdateEvent } from './events/store-update.event.js';
 import { UmbStoreAppendEvent } from './events/store-append.event.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
-import type { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
+import type { Observable, UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
@@ -18,7 +18,7 @@ export class UmbStoreBase<StoreItemType = any> extends UmbContextBase implements
 
 	/**
 	 * Append an item to the store
-	 * @param {StoreItemType} item
+	 * @param {StoreItemType} item - The item to append
 	 * @memberof UmbStoreBase
 	 */
 	append(item: StoreItemType) {
@@ -29,7 +29,7 @@ export class UmbStoreBase<StoreItemType = any> extends UmbContextBase implements
 
 	/**
 	 * Appends multiple items to the store
-	 * @param {Array<StoreItemType>} items
+	 * @param {Array<StoreItemType>} items - The items to append
 	 * @memberof UmbStoreBase
 	 */
 	appendItems(items: Array<StoreItemType>) {
@@ -40,8 +40,8 @@ export class UmbStoreBase<StoreItemType = any> extends UmbContextBase implements
 
 	/**
 	 * Updates an item in the store
-	 * @param {string} unique
-	 * @param {Partial<StoreItemType>} data
+	 * @param {string} unique - The unique identifier of the item to update
+	 * @param {Partial<StoreItemType>} data - The (partial) data to update the item with
 	 * @memberof UmbStoreBase
 	 */
 	updateItem(unique: string, data: Partial<StoreItemType>) {
@@ -51,7 +51,7 @@ export class UmbStoreBase<StoreItemType = any> extends UmbContextBase implements
 
 	/**
 	 * Removes an item from the store
-	 * @param {string} unique
+	 * @param {string} unique - The unique identifier of the item to remove
 	 * @memberof UmbStoreBase
 	 */
 	removeItem(unique: string) {
@@ -61,7 +61,7 @@ export class UmbStoreBase<StoreItemType = any> extends UmbContextBase implements
 
 	/**
 	 * Removes multiple items in the store with the given uniques
-	 * @param {string[]} uniques
+	 * @param {string[]} uniques - The unique identifiers of the items to remove
 	 * @memberof UmbStoreBase
 	 */
 	removeItems(uniques: Array<string>) {
@@ -71,8 +71,8 @@ export class UmbStoreBase<StoreItemType = any> extends UmbContextBase implements
 
 	/**
 	 * Returns an array of items with the given uniques
-	 * @param {string[]} uniques
-	 * @returns {Array<StoreItemType>}
+	 * @param {string[]} uniques - The unique identifiers of the items to return
+	 * @returns {Array<StoreItemType>} The matching items
 	 * @memberof UmbStoreBase
 	 */
 	getItems(uniques: Array<string>): Array<StoreItemType> {
@@ -81,9 +81,10 @@ export class UmbStoreBase<StoreItemType = any> extends UmbContextBase implements
 
 	/**
 	 * Returns an observable of the entire store
+	 * @returns {Observable<Array<StoreItemType>>} An observable of the entire store
 	 * @memberof UmbStoreBase
 	 */
-	all() {
+	all(): Observable<Array<StoreItemType>> {
 		return this._data.asObservable();
 	}
 }

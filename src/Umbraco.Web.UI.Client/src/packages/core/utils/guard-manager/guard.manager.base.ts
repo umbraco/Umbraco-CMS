@@ -38,7 +38,8 @@ export abstract class UmbGuardManagerBase<
 
 	/**
 	 * Add a new rule
-	 * @param {RuleType} rule
+	 * @param {RuleType} rule - The rule to add
+	 * @returns {RuleType['unique']} The unique value of the added rule
 	 */
 	addRule(rule: IncomingRuleType): RuleType['unique'] {
 		const newRule = { ...rule } as unknown as RuleType;
@@ -52,7 +53,7 @@ export abstract class UmbGuardManagerBase<
 
 	/**
 	 * Add multiple rules
-	 * @param {RuleType[]} rules
+	 * @param {RuleType[]} rules - The rules to add
 	 */
 	addRules(rules: IncomingRuleType[]) {
 		this._rules.mute();

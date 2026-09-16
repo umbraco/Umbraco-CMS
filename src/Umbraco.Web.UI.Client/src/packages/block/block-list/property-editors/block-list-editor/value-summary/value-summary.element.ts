@@ -1,6 +1,6 @@
+import type { UmbBlockListValueModel } from '../../../types.js';
 import { customElement, html, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbValueSummaryElementBase } from '@umbraco-cms/backoffice/value-summary';
-import type { UmbBlockListValueModel } from '../../../types.js';
 
 @customElement('umb-block-list-property-editor-value-summary')
 export class UmbBlockListPropertyEditorValueSummaryElement extends UmbValueSummaryElementBase<

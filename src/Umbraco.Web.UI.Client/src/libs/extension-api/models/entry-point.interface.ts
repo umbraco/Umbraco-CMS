@@ -18,7 +18,7 @@ export interface UmbEntryPointModule {
 
 	/**
 	 * Function that will be called when the extension is unregistered.
-	 * @remark This does not mean the host element is destroyed, only that the extension is no longer available. You should listen to the host element's `destroy` event if you need to clean up after the host element.
+	 * @remarks This does not mean the host element is destroyed, only that the extension is no longer available. You should listen to the host element's `destroy` event if you need to clean up after the host element.
 	 * @optional
 	 */
 	onUnload: UmbEntryPointOnUnload;

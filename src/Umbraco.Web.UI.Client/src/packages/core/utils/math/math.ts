@@ -119,7 +119,7 @@ export function calculateExtrapolatedValue(initialValue: number, increaseFactor:
  * Find the index for a target value on an array of individual values.
  * @param {number} target - The target value to interpolate to.
  * @param {Array<number>} weights - An array of values to interpolate between.
- * @returns
+ * @returns {number} The interpolated index
  */
 export function getInterpolatedIndexOfPositionInWeightMap(target: number, weights: Array<number>): number {
 	const map = [0];
@@ -154,7 +154,7 @@ export function getInterpolatedIndexOfPositionInWeightMap(target: number, weight
  * Combine the values of an array up to a certain index.
  * @param {number} index - The index to accumulate to, everything after this index will not be accumulated.
  * @param {Array<number>} weights - An array of values to accumulate.
- * @returns
+ * @returns {number} The accumulated value
  */
 export function getAccumulatedValueOfIndex(index: number, weights: Array<number>): number {
 	const len = Math.min(index, weights.length);
@@ -172,7 +172,7 @@ export function getAccumulatedValueOfIndex(index: number, weights: Array<number>
  * @param {number} y - The y coordinate.
  * @param {DOMRect} rect - The rectangle to check.
  * @param {number} expand - The amount to expand or contract the rectangle.
- * @returns
+ * @returns {boolean} True if the point is within the rectangle
  */
 export function isWithinRect(x: number, y: number, rect: DOMRect, expand = 0) {
 	return x > rect.left - expand && x < rect.right + expand && y > rect.top - expand && y < rect.bottom + expand;

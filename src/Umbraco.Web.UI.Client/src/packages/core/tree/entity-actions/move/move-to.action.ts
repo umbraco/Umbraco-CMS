@@ -66,7 +66,10 @@ export class UmbMoveToEntityAction extends UmbEntityActionBase<MetaEntityActionM
 
 	async #requestAncestors() {
 		try {
-			const treeRepository = await createExtensionApiByAlias<UmbTreeRepository>(this, this.args.meta.treeRepositoryAlias);
+			const treeRepository = await createExtensionApiByAlias<UmbTreeRepository>(
+				this,
+				this.args.meta.treeRepositoryAlias,
+			);
 			const { data } =
 				(await treeRepository?.requestTreeItemAncestors({
 					treeItem: { unique: this.args.unique!, entityType: this.args.entityType! },

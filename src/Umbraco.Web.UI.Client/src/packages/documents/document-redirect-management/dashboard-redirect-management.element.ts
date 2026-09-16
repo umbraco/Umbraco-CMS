@@ -319,10 +319,6 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 				}
 			}
 
-			uui-pagination {
-				display: inline-block;
-			}
-
 			.pagination {
 				display: flex;
 				justify-content: center;

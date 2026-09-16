@@ -3,12 +3,13 @@ import type { UmbDictionarySearchItemModel } from './dictionary.search-provider.
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { DictionaryService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbDataSourceResponse, UmbPagedModel } from '@umbraco-cms/backoffice/repository';
 import type { UmbSearchDataSource, UmbSearchRequestArgs } from '@umbraco-cms/backoffice/search';
 
 /**
  * A data source for the Rollback that fetches data from the server
  * @class UmbDictionarySearchServerDataSource
- * @implements {RepositoryDetailDataSource}
+ * @implements {UmbSearchDataSource<UmbDictionarySearchItemModel>}
  */
 export class UmbDictionarySearchServerDataSource implements UmbSearchDataSource<UmbDictionarySearchItemModel> {
 	#host: UmbControllerHost;
@@ -24,11 +25,13 @@ export class UmbDictionarySearchServerDataSource implements UmbSearchDataSource<
 
 	/**
 	 * Get a list of versions for a data
-	 * @param args
-	 * @returns {*}
+	 * @param {UmbSearchRequestArgs} args - The arguments for the search
+	 * @returns {Promise<UmbDataSourceResponse<UmbPagedModel<UmbDictionarySearchItemModel>>>} The search results.
 	 * @memberof UmbDictionarySearchServerDataSource
 	 */
-	async search(args: UmbSearchRequestArgs) {
+	async search(
+		args: UmbSearchRequestArgs,
+	): Promise<UmbDataSourceResponse<UmbPagedModel<UmbDictionarySearchItemModel>>> {
 		const { data, error } = await tryExecute(
 			this.#host,
 			DictionaryService.getDictionary({

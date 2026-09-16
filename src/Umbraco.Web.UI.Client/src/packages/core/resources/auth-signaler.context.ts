@@ -1,3 +1,5 @@
+// eslint-disable-next-line @typescript-eslint/no-unused-vars -- referenced only via {@link} in JSDoc below
+import type { UmbApiInterceptorController } from './api-interceptor.controller.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
@@ -23,7 +25,10 @@ export class UmbAuthSignalerContext extends UmbContextBase {
 		super(host, UMB_AUTH_SIGNALER_CONTEXT);
 	}
 
-	/** Called by the auth context to keep authorization state in sync. */
+	/**
+	 * Called by the auth context to keep authorization state in sync.
+	 * @param {boolean} value - Whether the user is authorized.
+	 */
 	setAuthorized(value: boolean) {
 		this.#isAuthorized.setValue(value);
 	}

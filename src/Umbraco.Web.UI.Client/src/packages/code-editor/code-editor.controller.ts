@@ -33,6 +33,7 @@ export class UmbCodeEditorController extends UmbControllerBase {
 	/**
 	 * The monaco editor object. This is the actual monaco editor object. It is exposed for advanced usage, but mind the fact that editor might be swapped in the future for a different library, so use on your own responsibility. For more information see [monaco editor API](https://microsoft.github.io/monaco-editor/docs.html#interfaces/editor.IStandaloneCodeEditor.html).
 	 * @readonly
+	 * @returns {monaco.editor.IStandaloneCodeEditor | undefined} The monaco editor instance.
 	 * @memberof UmbCodeEditor
 	 */
 	get monacoEditor() {
@@ -66,6 +67,7 @@ export class UmbCodeEditorController extends UmbControllerBase {
 	/**
 	 * Provides the current position of the cursor.
 	 * @readonly
+	 * @returns {UmbCodeEditorCursorPosition | null} The current cursor position.
 	 * @memberof UmbCodeEditor
 	 */
 	get position() {
@@ -77,6 +79,7 @@ export class UmbCodeEditorController extends UmbControllerBase {
 	/**
 	 * Provides positions of all the secondary cursors.
 	 * @readonly
+	 * @returns {UmbCodeEditorCursorPosition[]} The positions of the secondary cursors.
 	 * @memberof UmbCodeEditor
 	 */
 	get secondaryPositions() {
@@ -85,6 +88,7 @@ export class UmbCodeEditorController extends UmbControllerBase {
 
 	/**
 	 * Provides the current value of the editor.
+	 * @returns {string} The current value of the editor.
 	 * @memberof UmbCodeEditor
 	 */
 	get value() {
@@ -105,6 +109,7 @@ export class UmbCodeEditorController extends UmbControllerBase {
 	/**
 	 * Provides the current model of the editor. For advanced usage. Bare in mind that in case of the monaco library being swapped in the future, this might not be available. For more information see [monaco editor model API](https://microsoft.github.io/monaco-editor/docs.html#interfaces/editor.ITextModel.html).
 	 * @readonly
+	 * @returns {monaco.editor.ITextModel | null} The current monaco text model.
 	 * @memberof UmbCodeEditor
 	 */
 	get monacoModel() {
@@ -114,8 +119,8 @@ export class UmbCodeEditorController extends UmbControllerBase {
 
 	/**
 	 * Creates an instance of UmbCodeEditor. You should instantiate this class through the `UmbCodeEditorHost` interface and that should happen when inside DOM nodes of the host container are available, otherwise the editor will not be able to initialize, for example in lit `firstUpdated` lifecycle hook. It will make host emit change and input events when the value of the editor changes.
-	 * @param {UmbCodeEditorHost} host
-	 * @param {CodeEditorConstructorOptions} [options]
+	 * @param {UmbCodeEditorHost} host The host element the editor will be created in.
+	 * @param {CodeEditorConstructorOptions} [options] The options used to create the editor.
 	 * @memberof UmbCodeEditor
 	 */
 	constructor(host: UmbCodeEditorHost, options?: CodeEditorConstructorOptions) {
@@ -178,7 +183,7 @@ export class UmbCodeEditorController extends UmbControllerBase {
 	}
 	/**
 	 * Updates the options of the editor. This is useful for updating the options after the editor has been created.
-	 * @param {CodeEditorConstructorOptions} newOptions
+	 * @param {CodeEditorConstructorOptions} newOptions The new options to apply to the editor.
 	 * @memberof UmbCodeEditor
 	 */
 	updateOptions(newOptions: CodeEditorConstructorOptions) {
@@ -199,7 +204,7 @@ export class UmbCodeEditorController extends UmbControllerBase {
 	}
 	/**
 	 * Provides the current selections of the editor.
-	 * @returns {*}  {UmbCodeEditorSelection[]}
+	 * @returns {UmbCodeEditorSelection[]} The current selections.
 	 * @memberof UmbCodeEditor
 	 */
 	getSelections(): UmbCodeEditorSelection[] {
@@ -208,7 +213,7 @@ export class UmbCodeEditorController extends UmbControllerBase {
 	}
 	/**
 	 * Provides the current positions of the cursor or multiple cursors.
-	 * @returns {*}  {(UmbCodeEditorCursorPosition | null)}
+	 * @returns {(UmbCodeEditorCursorPosition | null)} The current cursor position.
 	 * @memberof UmbCodeEditor
 	 */
 	getPositions(): UmbCodeEditorCursorPosition | null {
@@ -217,7 +222,7 @@ export class UmbCodeEditorController extends UmbControllerBase {
 	}
 	/**
 	 * Inserts text at the current cursor position or multiple cursor positions.
-	 * @param {string} text
+	 * @param {string} text The text to insert.
 	 * @memberof UmbCodeEditor
 	 */
 	insert(text: string) {
@@ -232,9 +237,9 @@ export class UmbCodeEditorController extends UmbControllerBase {
 	}
 	/**
 	 * Looks for a string or matching strings in the editor and returns the ranges of the found strings. Can use regex, case sensitive and more. If you want regex set the isRegex to true in the options.
-	 * @param {string} searchString
-	 * @param {CodeEditorSearchOptions} [searchOptions]
-	 * @returns {*}  {UmbCodeEditorRange[]}
+	 * @param {string} searchString The string or pattern to search for.
+	 * @param {CodeEditorSearchOptions} [searchOptions] The options to use when searching.
+	 * @returns {UmbCodeEditorRange[]} The ranges of the found strings.
 	 * @memberof UmbCodeEditor
 	 */
 	find(
@@ -271,8 +276,8 @@ export class UmbCodeEditorController extends UmbControllerBase {
 	}
 	/**
 	 * Returns the value of the editor for a given range.
-	 * @param {UmbCodeEditorRange} range
-	 * @returns {*}  {string}
+	 * @param {UmbCodeEditorRange} range The range to get the value for.
+	 * @returns {string} The value of the editor for the given range.
 	 * @memberof UmbCodeEditor
 	 */
 	getValueInRange(range: UmbCodeEditorRange): string {
@@ -281,8 +286,8 @@ export class UmbCodeEditorController extends UmbControllerBase {
 	}
 	/**
 	 * Inserts text at a given position.
-	 * @param {string} text
-	 * @param {UmbCodeEditorCursorPosition} position
+	 * @param {string} text The text to insert.
+	 * @param {UmbCodeEditorCursorPosition} position The position to insert the text at.
 	 * @memberof UmbCodeEditor
 	 */
 	insertAtPosition(text: string, position: UmbCodeEditorCursorPosition) {
@@ -302,7 +307,7 @@ export class UmbCodeEditorController extends UmbControllerBase {
 
 	/**
 	 * Selects a range of text in the editor.
-	 * @param {UmbCodeEditorRange} range
+	 * @param {UmbCodeEditorRange} range The range to select.
 	 * @memberof UmbCodeEditor
 	 */
 	select(range: UmbCodeEditorRange) {
@@ -313,7 +318,7 @@ export class UmbCodeEditorController extends UmbControllerBase {
 	/**
 	 * Changes the theme of the editor.
 	 * @template T
-	 * @param {(CodeEditorTheme | T)} theme
+	 * @param {(CodeEditorTheme | T)} theme The theme to apply to the editor.
 	 * @memberof UmbCodeEditor
 	 */
 	setTheme<T extends string>(theme: CodeEditorTheme | T) {
@@ -323,7 +328,7 @@ export class UmbCodeEditorController extends UmbControllerBase {
 
 	/**
 	 * Runs callback on change of model content. (for example when typing)
-	 * @param {() => void} callback
+	 * @param {() => void} callback The callback to run.
 	 * @memberof UmbCodeEditor
 	 */
 	onChangeModelContent(callback: () => void) {
@@ -335,7 +340,7 @@ export class UmbCodeEditorController extends UmbControllerBase {
 
 	/**
 	 * Runs callback on change of model (when the entire model is replaced	)
-	 * @param {() => void} callback
+	 * @param {() => void} callback The callback to run.
 	 * @memberof UmbCodeEditor
 	 */
 	onDidChangeModel(callback: () => void) {
@@ -346,7 +351,7 @@ export class UmbCodeEditorController extends UmbControllerBase {
 	}
 	/**
 	 * Runs callback on change of cursor position. Gives as parameter the new position.
-	 * @param {((e: UmbCodeEditorCursorPositionChangedEvent | undefined) => void)} callback
+	 * @param {((e: UmbCodeEditorCursorPositionChangedEvent | undefined) => void)} callback The callback to run.
 	 * @memberof UmbCodeEditor
 	 */
 	onDidChangeCursorPosition(callback: (e: UmbCodeEditorCursorPositionChangedEvent | undefined) => void) {
@@ -357,7 +362,7 @@ export class UmbCodeEditorController extends UmbControllerBase {
 	}
 	/**
 	 * Runs callback on change of cursor selection. Gives as parameter the new selection.
-	 * @param {((e: UmbCodeEditorCursorSelectionChangedEvent | undefined) => void)} callback
+	 * @param {((e: UmbCodeEditorCursorSelectionChangedEvent | undefined) => void)} callback The callback to run.
 	 * @memberof UmbCodeEditor
 	 */
 	onDidChangeCursorSelection(callback: (e: UmbCodeEditorCursorSelectionChangedEvent | undefined) => void) {

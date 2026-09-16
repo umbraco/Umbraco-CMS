@@ -1,5 +1,7 @@
 import type { UmbApiResponse } from '../types.js';
 import { UmbTryExecuteController } from './try-execute.controller.js';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars -- referenced only via {@link} in JSDoc below
+import type { tryExecute } from './tryExecute.function.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 

@@ -62,7 +62,12 @@ export class UmbCodeBlockElement extends UmbLitElement {
 				${when(
 					this.copy,
 					() => html`
-						<uui-button color=${this._copyState === 'idle' ? 'default' : 'positive'} .label=${this._copyState === 'idle' ? this.localize.term('general_copy') : this.localize.term('general_copied')} @click=${this.copyCode}>
+						<uui-button
+							color=${this._copyState === 'idle' ? 'default' : 'positive'}
+							.label=${this._copyState === 'idle'
+								? this.localize.term('general_copy')
+								: this.localize.term('general_copied')}
+							@click=${this.copyCode}>
 							${when(
 								this._copyState === 'idle',
 								() => html`<uui-icon name="copy"></uui-icon> <umb-localize key="general_copy">Copy</umb-localize>`,
