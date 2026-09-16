@@ -7,7 +7,7 @@ import { UMB_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 
 export class UmbSearchRebuildIndexEntityAction extends UmbEntityActionBase<never> {
-	#repository = new UmbSearchDetailRepository(this);
+	readonly #repository = new UmbSearchDetailRepository(this);
 
 	override async execute() {
 		if (!this.args.unique) {
