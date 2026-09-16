@@ -1,6 +1,7 @@
 import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../workspace/context/document-workspace.context-token.js';
 import type {
 	UmbDocumentDetailModel,
+	UmbDocumentVariantModel,
 	UmbDocumentVariantOptionModel,
 	UmbDocumentVariantPublishModel,
 } from '../../types.js';
@@ -25,6 +26,7 @@ import {
 } from '@umbraco-cms/backoffice/entity-action';
 import { UmbVariantId, type UmbVariantEntityStateEntry } from '@umbraco-cms/backoffice/variant';
 import type { UmbEntityStateLook } from '@umbraco-cms/backoffice/entity-state';
+import { UMB_DATE_TIME_FORMAT_OPTIONS } from '@umbraco-cms/backoffice/utils';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import type { UmbNotificationColor } from '@umbraco-cms/backoffice/notification';
@@ -68,6 +70,30 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 		},
 		[UmbDocumentVariantState.NOT_CREATED]: { label: '#content_notCreated', weight: 0 },
 	};
+
+	/**
+	 * Below the current publish-state entry's weight — a pending schedule is a detail of the current state,
+	 * not a competing one.
+	 */
+	#scheduleStateConfig: Array<{
+		unique: string;
+		label: string;
+		look: UmbEntityStateLook;
+		getDate: (variant: UmbDocumentVariantModel) => string | null;
+	}> = [
+		{
+			unique: 'UMB_SCHEDULED_PUBLISH_STATE',
+			label: '#content_scheduledPublish',
+			look: 'positive',
+			getDate: (v) => v.scheduledPublishDate,
+		},
+		{
+			unique: 'UMB_SCHEDULED_UNPUBLISH_STATE',
+			label: '#content_scheduledUnpublish',
+			look: 'neutral',
+			getDate: (v) => v.scheduledUnpublishDate,
+		},
+	];
 
 	#init: Promise<unknown>;
 	#documentWorkspaceContext?: typeof UMB_DOCUMENT_WORKSPACE_CONTEXT.TYPE;
@@ -713,8 +739,9 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 
 	/**
 	 * Pushes one `entityState` entry per variant, describing its publish state (Draft/Published/Published with
-	 * pending changes/Not created). Mirrors how `UmbTrashableEntityWorkspaceContextBase` pushes its own
-	 * (universal) "Trashed" entry, but per-variant and recomputed on every relevant change via `replaceStates`.
+	 * pending changes/Not created), plus separate "scheduled publish"/"scheduled unpublish" entries for variants
+	 * with a pending schedule. Mirrors how `UmbTrashableEntityWorkspaceContextBase` pushes its own (universal)
+	 * "Trashed" entry, but per-variant and recomputed on every relevant change via `replaceStates`.
 	 */
 	#observeAndPushVariantStates() {
 		if (!this.#documentWorkspaceContext) return;
@@ -724,27 +751,50 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 			observeMultiple([documentWorkspaceContext.variantOptions, this.publishedPendingChanges.variantsWithChanges]),
 			([options, variantsWithChanges]) => {
 				const entries = options.reduce<Array<UmbVariantEntityStateEntry>>((acc, option) => {
+					const variantId = UmbVariantId.Create(option);
 					const state = option.variant?.state ?? UmbDocumentVariantState.NOT_CREATED;
 					const config = this.#publishStateConfig[state as UmbDocumentVariantState];
-					if (!config) return acc; // TRASHED (or any future unmapped state) — no tag from this producer.
 
-					const variantId = UmbVariantId.Create(option);
-					const isPublishedState =
-						state === UmbDocumentVariantState.PUBLISHED || state === UmbDocumentVariantState.PUBLISHED_PENDING_CHANGES;
-					const isPendingChanges = isPublishedState && variantsWithChanges.some((v) => v.variantId.compare(variantId));
+					if (config) {
+						const isPublishedState =
+							state === UmbDocumentVariantState.PUBLISHED ||
+							state === UmbDocumentVariantState.PUBLISHED_PENDING_CHANGES;
+						const isPendingChanges =
+							isPublishedState && variantsWithChanges.some((v) => v.variantId.compare(variantId));
 
-					acc.push({
-						unique: `UMB_PUBLISH_STATE_${variantId.toString()}`,
-						variantId,
-						label: isPendingChanges ? '#content_publishedPendingChanges' : config.label,
-						look: config.look,
-						weight: config.weight,
-					});
+						acc.push({
+							unique: `UMB_PUBLISH_STATE_${variantId.toString()}`,
+							variantId,
+							label: isPendingChanges ? '#content_publishedPendingChanges' : config.label,
+							look: config.look,
+							weight: config.weight,
+						});
+					}
+
+					if (option.variant) {
+						const variant = option.variant;
+						for (const schedule of this.#scheduleStateConfig) {
+							const date = schedule.getDate(variant);
+							if (!date) continue;
+
+							acc.push({
+								unique: `${schedule.unique}_${variantId.toString()}`,
+								variantId,
+								label: schedule.label,
+								look: schedule.look,
+								weight: 5,
+								detail: this.#localize.date(date, UMB_DATE_TIME_FORMAT_OPTIONS),
+							});
+						}
+					}
+
 					return acc;
 				}, []);
 
 				documentWorkspaceContext.entityState.replaceStates(
-					(entry) => entry.unique.toString().startsWith('UMB_PUBLISH_STATE_'),
+					(entry) =>
+						entry.unique.toString().startsWith('UMB_PUBLISH_STATE_') ||
+						entry.unique.toString().startsWith('UMB_SCHEDULED_'),
 					entries,
 				);
 			},

@@ -316,5 +316,58 @@ describe('UmbDocumentPublishingWorkspaceContext', function () {
 
 			expect(context.entityState.getStatesForVariant(EN_US)).to.have.lengthOf(1);
 		});
+
+		it('pushes an additional Scheduled publishing entry, alongside the regular publish-state entry, for a variant with a pending schedule', async () => {
+			const publishTime = new Date(Date.now() + 60 * 60 * 1000).toISOString();
+
+			await answerModalsWith(
+				{ selection: [{ unique: DA.toString(), schedule: { publishTime, unpublishTime: null } }] },
+				() => publishingContext.schedule(),
+			);
+
+			const states = context.entityState.getStatesForVariant(DA);
+			expect(states).to.have.lengthOf(2);
+
+			const scheduled = states.find((s) => s.label === '#content_scheduledPublish');
+			expect(scheduled).to.deep.include({ look: 'positive', weight: 5 });
+			expect(scheduled?.detail).to.be.a('string').that.is.not.empty;
+
+			expect(states.some((s) => s.label !== '#content_scheduledPublish'), 'a regular publish-state entry is still present').to.be.true;
+		});
+
+		it('pushes an additional Scheduled unpublishing entry, alongside the regular publish-state entry, for a variant with a pending unpublish schedule', async () => {
+			const unpublishTime = new Date(Date.now() + 60 * 60 * 1000).toISOString();
+
+			await answerModalsWith(
+				{ selection: [{ unique: EN_US.toString(), schedule: { publishTime: null, unpublishTime } }] },
+				() => publishingContext.schedule(),
+			);
+
+			const states = context.entityState.getStatesForVariant(EN_US);
+			expect(states).to.have.lengthOf(2);
+
+			const scheduled = states.find((s) => s.label === '#content_scheduledUnpublish');
+			expect(scheduled).to.deep.include({ look: 'neutral', weight: 5 });
+			expect(scheduled?.detail).to.be.a('string').that.is.not.empty;
+
+			expect(
+				states.some((s) => s.label !== '#content_scheduledUnpublish'),
+				'a regular publish-state entry is still present',
+			).to.be.true;
+		});
+
+		it('pushes both Scheduled publishing and Scheduled unpublishing entries for a variant with both schedules set', async () => {
+			const publishTime = new Date(Date.now() + 60 * 60 * 1000).toISOString();
+			const unpublishTime = new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString();
+
+			await answerModalsWith(
+				{ selection: [{ unique: DA.toString(), schedule: { publishTime, unpublishTime } }] },
+				() => publishingContext.schedule(),
+			);
+
+			const states = context.entityState.getStatesForVariant(DA);
+			const labels = states.map((s) => s.label);
+			expect(labels).to.include.members(['#content_scheduledPublish', '#content_scheduledUnpublish']);
+		});
 	});
 });

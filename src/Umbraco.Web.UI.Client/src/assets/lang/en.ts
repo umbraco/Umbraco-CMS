@@ -296,7 +296,9 @@ export default {
 		releaseDate: 'Publish at',
 		unpublishDate: 'Unpublish at',
 		removeDate: 'Clear date',
+		scheduledPublish: 'Scheduled publish',
 		scheduledPublishing: 'Scheduled publishing',
+		scheduledUnpublish: 'Scheduled unpublish',
 		setDate: 'Set date',
 		sortDone: 'Sort order is updated',
 		sortHelp:
