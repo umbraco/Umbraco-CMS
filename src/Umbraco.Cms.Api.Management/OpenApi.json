@@ -46241,6 +46241,10 @@
                 "$ref": "#/components/schemas/MediaTypeCollectionReferenceResponseModel"
               }
             ]
+          },
+          "extension": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -46307,6 +46311,10 @@
                 "$ref": "#/components/schemas/MediaTypeReferenceResponseModel"
               }
             ]
+          },
+          "extension": {
+            "type": "string",
+            "nullable": true
           },
           "variants": {
             "type": "array",
@@ -46517,6 +46525,10 @@
                 "$ref": "#/components/schemas/MediaTypeReferenceResponseModel"
               }
             ]
+          },
+          "extension": {
+            "type": "string",
+            "nullable": true
           },
           "variants": {
             "type": "array",
