@@ -27,7 +27,7 @@ export class DocumentApiHelper {
 
   /** Asserts a property value on an already-fetched document, matched by alias rather than position. */
   async doesPropertyHaveValue(documentData: any, alias: string, expectedValue: any, culture: string | null = null, segment: string | null = null): Promise<void> {
-    await this.api.doesPropertyHaveValue(documentData, alias, expectedValue, culture);
+    await this.api.doesPropertyHaveValue(documentData, alias, expectedValue, culture, segment);
   }
 
   /** Asserts how many property values an already-fetched document carries; 0 means nothing is set. */

@@ -119,7 +119,6 @@ export class DocumentTypeApiHelper {
     await this.api.doesPropertyUseDataType(documentTypeData, propertyAlias, dataTypeId);
   }
 
-  /** Asserts the documentType has exactly one property and that it uses `dataTypeId`. */
   /** One property definition, by alias. See {@link ApiHelpers.getPropertyDefinition}. */
   getPropertyDefinition(documentTypeData: any, alias: string): any {
     return this.api.getPropertyDefinition(documentTypeData, alias);
@@ -130,6 +129,7 @@ export class DocumentTypeApiHelper {
     return this.api.getOnlyPropertyDefinition(documentTypeData);
   }
 
+  /** Asserts the documentType has exactly one property and that it uses `dataTypeId`. */
   async doesOnlyPropertyUseDataType(documentTypeData: any, dataTypeId: string): Promise<void> {
     await this.api.doesOnlyPropertyUseDataType(documentTypeData, dataTypeId);
   }

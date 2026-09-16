@@ -531,7 +531,7 @@ The root `CLAUDE.md` §9 comment policy applies here in full — default to no c
 
 **Three comment shapes are never right:**
 
-- **A commented-out test.** The most thoroughly hidden form of disabled test — invisible to `--list`, to every reporter, and to the annotation rule in §4. `tests/DefaultConfig/Packages/CreatedPackages.spec.ts` is 347 lines and 17 tests commented out wholesale behind `// UNCOMMENT WHEN FIXED`, with no issue link; it has been dead since the **v15** era and contributes 0 of the suite's 1651 tests. Use `test.skip` with an annotation instead, so a disabled test is at least countable.
+- **A commented-out test.** The most thoroughly hidden form of disabled test — invisible to `--list`, to every reporter, and to the annotation rule in §4. `CreatedPackages.spec.ts` sat that way since the **v15** era, 15 tests behind `// UNCOMMENT WHEN FIXED` with no issue link, contributing nothing to the suite total and appearing in no report; it is now 15 annotated `test.fixme`, which run no more than before but are at least countable. Use `test.skip`/`test.fixme` with an annotation instead.
 - **A commented-out assertion in a live test.** Strictly worse than deleting it: the test still passes while quietly checking less than it appears to. There are 15, eight of them in `UserGroupsDefaultConfiguration.spec.ts`. Restore it or delete it.
 - **An unanchored TODO.** The root §9 allows TODOs precisely because they are deleted when done — which needs an anchor to hang off: `// TODO (V19): remove once the obsolete overload is gone` or `// TODO: pagination [NL]`. A bare `// TODO: Implement it later` (15 of these) can't rot out loud, so it never gets removed.
 

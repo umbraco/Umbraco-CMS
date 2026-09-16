@@ -22,7 +22,7 @@ export class ElementApiHelper {
 
   /** Asserts a property value on an already-fetched element, matched by alias rather than position. */
   async doesPropertyHaveValue(elementData: any, alias: string, expectedValue: any, culture: string | null = null, segment: string | null = null): Promise<void> {
-    await this.api.doesPropertyHaveValue(elementData, alias, expectedValue, culture);
+    await this.api.doesPropertyHaveValue(elementData, alias, expectedValue, culture, segment);
   }
 
   /** Asserts how many property values an already-fetched element carries; 0 means nothing is set. */

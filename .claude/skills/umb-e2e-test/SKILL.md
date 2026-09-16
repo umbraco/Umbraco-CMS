@@ -41,7 +41,7 @@ It refuses to overwrite an existing file. Then shape the body:
 
 - **Set up via API, assert via UI.** Creating fixtures through `umbracoApi.*` is far faster and less brittle than clicking them into existence. Drive the actual user workflow through `umbracoUi.*`, then confirm the result through the UI state and an API read where that is cheap.
 - **Idempotent cleanup in both hooks.** `ensureNameNotExists()` in `beforeEach` *and* `afterEach` — never a bare `delete()`, which throws when a prior run already removed the entity.
-- **Names unique to the file.** The suite is serial and shares names like `TestContent`; a name reused across files means one spec's cleanup can delete another's fixture.
+- **Clean up anything global.** Shared names are the norm, not a hazard — 167 constants appear in more than one spec, `TestContent` in 79 — and three things make that safe: `workers: 1`, creates that `ensureNameNotExists` first, and idempotent teardown. What actually bites is a `language`, `userGroup`, `user`, `dataType`, `template` or `webhook` left behind, because those are global. See `CLAUDE.md` §4.
 - **Tag it** `{ tag: '@smoke' }` for a critical path, `{ tag: '@release' }` for full release validation. Untagged specs still run in the main suite.
 
 ### 3. Put a new helper in the right layer

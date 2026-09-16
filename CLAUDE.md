@@ -657,7 +657,7 @@ The ones most often needed, with what is only in them:
 - **API Infrastructure**: `/src/Umbraco.Cms.Api.Common/CLAUDE.md` - OpenAPI, authentication, serialization
 - **Management API**: `/src/Umbraco.Cms.Api.Management/CLAUDE.md` - Controllers, view models, OpenApi.json
 - **Backoffice Frontend**: `/src/Umbraco.Web.UI.Client/CLAUDE.md` - Lit web components, extension system, auth client
-- **Acceptance Tests**: `/tests/Umbraco.Tests.AcceptanceTest/CLAUDE.md` - Playwright helper architecture, flakiness-avoidance conventions, the convention audit
+- **Acceptance Tests**: `/tests/Umbraco.Tests.AcceptanceTest/CLAUDE.md` - Playwright helper architecture, flakiness-avoidance conventions, builder payload typing
 - **Integration Tests**: `/tests/Umbraco.Tests.Integration/CLAUDE.md` - Test harness, caching false-green trap
 
 This list is a shortcut, not the set — absence from it does not mean a project has no guide, so check next to the `.csproj` first.

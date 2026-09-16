@@ -135,8 +135,19 @@ export class BackofficeSearchUiHelper extends UiBaseLocators {
     return index ? parseInt(index, 10) : -1;
   }
 
+  /**
+   * A search result row, matched on a **substring** — deliberately, unlike the exact-match rule
+   * for entity names in CLAUDE.md §3.
+   *
+   * A result renders `<span>${label} <small class="ancestors">…</small></span>`, and the data
+   * source populates `ancestors` for anything below root, so the span's text is
+   * `"Name Parent / Path"` — no element holds the name on its own and an exact match finds
+   * nothing for a child entity. The collision the exact rule guards against also does not arise
+   * here: results are scoped to the search modal and to one query, not to a tree that leftover
+   * data accumulates in.
+   */
   private resultByName(name: string) {
-    return this.results.filter({has: this.getTextLocatorWithName(name)});
+    return this.results.filter({hasText: name});
   }
 
   private providerByName(providerName: string) {

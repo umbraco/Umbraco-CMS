@@ -42,6 +42,13 @@ export interface EntityVariant {
  * its `alias` may be null, whereas a value read back off an entity is keyed by a required alias.
  *
  * `editorAlias` and `entityType` are optional because `MemberValueBuilder` sends neither.
+ *
+ * **Neither is in the API contract at all.** `Document/Media/Element/MemberValueModel` in
+ * `OpenApi.json` declare only `culture`, `segment`, `alias` and `value`, so both fields are sent
+ * and ignored. That also bounds what fixing `withEntityType()` achieved: the setter no longer
+ * silently discards its argument, but the argument reaches a field nothing reads. Dropping both
+ * is a payload change across every value builder and wants a running instance, so it is recorded
+ * here rather than done — the same treatment as `allowedInLibrary` and `folder`.
  */
 export interface EntityPropertyValue {
   culture: string | null;

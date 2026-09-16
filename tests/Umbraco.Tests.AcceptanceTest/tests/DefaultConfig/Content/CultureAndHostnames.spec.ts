@@ -74,6 +74,7 @@ test('can update culture and hostname', async ({umbracoApi, umbracoUi}) => {
 
   // Assert
   domainsData = await umbracoApi.document.getDomains(contentId);
+  await umbracoApi.document.doesHaveDomainCount(domainsData, 1);
   await umbracoApi.document.doesHaveDomain(domainsData, updatedDomainName, isoCode);
 });
 

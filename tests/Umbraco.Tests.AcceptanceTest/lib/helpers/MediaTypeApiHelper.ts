@@ -111,7 +111,6 @@ export class MediaTypeApiHelper {
     await this.api.doesPropertyUseDataType(mediaTypeData, propertyAlias, dataTypeId);
   }
 
-  /** Asserts the mediaType has exactly one property and that it uses `dataTypeId`. */
   /** One property definition, by alias. See {@link ApiHelpers.getPropertyDefinition}. */
   getPropertyDefinition(mediaTypeData: any, alias: string): any {
     return this.api.getPropertyDefinition(mediaTypeData, alias);
@@ -122,6 +121,7 @@ export class MediaTypeApiHelper {
     return this.api.getOnlyPropertyDefinition(mediaTypeData);
   }
 
+  /** Asserts the mediaType has exactly one property and that it uses `dataTypeId`. */
   async doesOnlyPropertyUseDataType(mediaTypeData: any, dataTypeId: string): Promise<void> {
     await this.api.doesOnlyPropertyUseDataType(mediaTypeData, dataTypeId);
   }
