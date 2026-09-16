@@ -265,10 +265,10 @@ public class MigrateSingleBlockList : AsyncMigrationBase
         var singleBlockListDataTypesIds = singleBlockListDataTypes.Select(type => type.Id).ToList();
 
         string updateSql = $@"
-UPDATE umbracoDataType
-SET propertyEditorAlias = '{Constants.PropertyEditors.Aliases.SingleBlock}',
-    propertyEditorUiAlias = 'Umb.PropertyEditorUi.BlockSingle'
-WHERE nodeId IN (@0)";
+UPDATE {SqlSyntax.GetQuotedTableName("umbracoDataType")}
+SET {SqlSyntax.GetQuotedColumnName("propertyEditorAlias")} = '{Constants.PropertyEditors.Aliases.SingleBlock}',
+    {SqlSyntax.GetQuotedColumnName("propertyEditorUiAlias")} = 'Umb.PropertyEditorUi.BlockSingle'
+WHERE {SqlSyntax.GetQuotedColumnName("nodeId")} IN (@0)";
         await Database.ExecuteAsync(updateSql, singleBlockListDataTypesIds);
 
         // the element type cache, and the isolated/runtime caches it is built from in the default implementation,
