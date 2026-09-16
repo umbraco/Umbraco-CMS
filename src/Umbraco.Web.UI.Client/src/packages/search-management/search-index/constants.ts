@@ -8,9 +8,9 @@ export const UMB_SEARCH_DETAIL_STORE_ALIAS = 'Umb.Store.SearchIndex';
 export const UMB_SEARCH_QUERY_REPOSITORY_ALIAS = 'Umb.Repository.SearchIndex.Query';
 
 export const UMB_SEARCH_ROOT_COLLECTION_ALIAS = 'Umb.Collection.SearchIndex';
-export const UMB_SEARCH_COLLECTION_VIEW_ALIAS = 'Umbraco.Search.CollectionView.Root';
+export const UMB_SEARCH_COLLECTION_VIEW_ALIAS = 'Umb.CollectionView.SearchIndex.Table';
 
-export const UMB_SEARCH_ROOT_WORKSPACE_ALIAS = 'Umbraco.Search.Workspace.Root';
-export const UMB_SEARCH_WORKSPACE_ALIAS = 'Umbraco.Search.Workspace';
+export const UMB_SEARCH_ROOT_WORKSPACE_ALIAS = 'Umb.Workspace.SearchRoot';
+export const UMB_SEARCH_WORKSPACE_ALIAS = 'Umb.Workspace.SearchIndex';
 
 export const UMB_SEARCH_SERVER_EVENT_TYPE = 'IndexRebuildCompleted';
