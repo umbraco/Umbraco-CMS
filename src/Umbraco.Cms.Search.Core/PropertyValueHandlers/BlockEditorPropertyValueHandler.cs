@@ -167,7 +167,7 @@ internal abstract class BlockEditorPropertyValueHandler : IPropertyValueHandler
 
         foreach (BlockItemData contentData in items)
         {
-            Dictionary<string, IPropertyType>? propertyTypesByAlias = GetPropertyTypesByAlias(contentData.ContentTypeKey, elementTypesByKey, culture, segment);
+            Dictionary<string, IPropertyType>? propertyTypesByAlias = GetPropertyTypesByAlias(contentData.ContentTypeKey, elementTypesByKey, segment);
             if (propertyTypesByAlias is null)
             {
                 continue;
@@ -210,10 +210,16 @@ internal abstract class BlockEditorPropertyValueHandler : IPropertyValueHandler
                         continue;
                     }
 
-                    blockProperty.SetValue(blockPropertyValue.Value, propertyCulture, segment);
+                    // the nested property type can be invariant even though the containing block-list property
+                    // varies by culture (or vice versa) - only pass a culture the property type actually supports,
+                    // so the value is indexed under the correct (e.g. invariant) variation instead of being either
+                    // skipped or rejected by SetValue for a variation it does not support.
+                    var valueCulture = propertyType.VariesByCulture() ? propertyCulture : null;
+
+                    blockProperty.SetValue(blockPropertyValue.Value, valueCulture, segment);
                     if (published)
                     {
-                        blockProperty.PublishValues(propertyCulture ?? "*", segment ?? "*");
+                        blockProperty.PublishValues(valueCulture ?? "*", segment ?? "*");
                     }
 
                     IPropertyValueHandler? blockPropertyValueHandler = _propertyValueHandlerCollection.GetPropertyValueHandler(propertyType);
@@ -226,7 +232,7 @@ internal abstract class BlockEditorPropertyValueHandler : IPropertyValueHandler
                     }
 
                     IndexField[] blockPropertyIndexFields = blockPropertyValueHandler
-                        .GetIndexFields(blockProperty, propertyCulture, segment, published, contentContext)
+                        .GetIndexFields(blockProperty, valueCulture, segment, published, contentContext)
                         .ToArray();
 
                     foreach (IndexField blockPropertyIndexField in blockPropertyIndexFields)
@@ -327,7 +333,7 @@ internal abstract class BlockEditorPropertyValueHandler : IPropertyValueHandler
         return propertyCultures;
     }
 
-    private Dictionary<string, IPropertyType>? GetPropertyTypesByAlias(Guid elementTypeKey, Dictionary<Guid, IContentType> elementTypes, string? requestedCulture, string? requestedSegment)
+    private Dictionary<string, IPropertyType>? GetPropertyTypesByAlias(Guid elementTypeKey, Dictionary<Guid, IContentType> elementTypes, string? requestedSegment)
     {
         if (elementTypes.TryGetValue(elementTypeKey, out IContentType? elementType) is false)
         {
@@ -338,14 +344,9 @@ internal abstract class BlockEditorPropertyValueHandler : IPropertyValueHandler
             .CompositionPropertyTypes
             .Select(propertyType =>
             {
-                // We want to ensure that the nested properties are set to correct variation if the requested variation is explicit.
-                // This is because it's perfectly valid to have a nested property type that's set to invariant even if the parent property varies.
-                // For instance in a block list, the list itself can vary, but the elements can be invariant, at the same time.
-                if (requestedCulture is not null)
-                {
-                    propertyType.Variations |= ContentVariation.Culture;
-                }
-
+                // A nested property type can be segment-invariant even if the containing block property varies by
+                // segment - force it to the requested segment variation in that case, so its value can still be set
+                // and indexed under the block property's own segment context.
                 if (requestedSegment is not null)
                 {
                     propertyType.Variations |= ContentVariation.Segment;
@@ -419,12 +420,11 @@ internal abstract class BlockEditorPropertyValueHandler : IPropertyValueHandler
                         IPropertyType propertyType = elementProperty.PropertyType;
 
                         // as with locally contained blocks, a nested property type set to invariant is still valid
-                        // even if the requested variation is explicit - force it to the requested variation in that case.
-                        if (culture is not null)
-                        {
-                            propertyType.Variations |= ContentVariation.Culture;
-                        }
-
+                        // even if the requested segment variation is explicit - force it to the requested variation
+                        // in that case. Culture is deliberately NOT forced here: unlike segment, forcing it would
+                        // make an invariant property look culture-variant and skip it entirely on the invariant
+                        // (null-culture) pass below, since GetValue() already handles a mismatched culture/segment
+                        // gracefully (returns null) rather than throwing.
                         if (segment is not null)
                         {
                             propertyType.Variations |= ContentVariation.Segment;

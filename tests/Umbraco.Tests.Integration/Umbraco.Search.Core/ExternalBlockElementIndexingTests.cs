@@ -188,6 +188,145 @@ public class ExternalBlockElementIndexingTests : PropertyValueHandlerTestsBase
         CollectionAssert.Contains(publishedValue.Texts, "Some element text");
     }
 
+    [Test]
+    public async Task PropertyLevelVariantBlockList_IncludesInvariantElementsAndProperties()
+    {
+        // an element type with both an invariant and a culture-variant text property (block-level variance)
+        IContentType mixedElementType = new ContentTypeBuilder()
+            .WithAlias("mixedElement")
+            .WithName("Mixed Element")
+            .WithIsElement(true)
+            .WithContentVariation(ContentVariation.Culture)
+            .AddPropertyType()
+            .WithAlias("invariantText")
+            .WithName("Invariant Text")
+            .WithDataTypeId(Constants.DataTypes.Textbox)
+            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.TextBox)
+            .WithVariations(ContentVariation.Nothing)
+            .Done()
+            .AddPropertyType()
+            .WithAlias("variantText")
+            .WithName("Variant Text")
+            .WithDataTypeId(Constants.DataTypes.Textbox)
+            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.TextBox)
+            .WithVariations(ContentVariation.Culture)
+            .Done()
+            .Build();
+        await ContentTypeService.CreateAsync(mixedElementType, Constants.Security.SuperUserKey);
+
+        // a fully invariant, reusable ("library") element type
+        IContentType invariantOnlyElementType = new ContentTypeBuilder()
+            .WithAlias("invariantOnlyElement")
+            .WithName("Invariant Only Element")
+            .WithIsElement(true)
+            .WithAllowedInLibrary(true)
+            .AddPropertyType()
+            .WithAlias("onlyText")
+            .WithName("Only Text")
+            .WithDataTypeId(Constants.DataTypes.Textbox)
+            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.TextBox)
+            .Done()
+            .Build();
+        await ContentTypeService.CreateAsync(invariantOnlyElementType, Constants.Security.SuperUserKey);
+
+        var blockListDataType = new DataType(GetRequiredService<PropertyEditorCollection>()[Constants.PropertyEditors.Aliases.BlockList], GetRequiredService<IConfigurationEditorJsonSerializer>())
+        {
+            ConfigurationData = new Dictionary<string, object>
+            {
+                {
+                    "blocks",
+                    new BlockListConfiguration.BlockConfiguration[]
+                    {
+                        new() { ContentElementTypeKey = mixedElementType.Key },
+                        new() { ContentElementTypeKey = invariantOnlyElementType.Key },
+                    }
+                }
+            },
+            Name = "My Block List",
+            DatabaseType = ValueStorageType.Ntext,
+            ParentId = Constants.System.Root,
+            CreateDate = DateTime.UtcNow
+        };
+        await GetRequiredService<IDataTypeService>().CreateAsync(blockListDataType, Constants.Security.SuperUserKey);
+
+        // the "blocks" property itself varies by culture, unlike the invariant block-list property tested elsewhere
+        IContentType contentType = new ContentTypeBuilder()
+            .WithAlias("pageWithVariantBlocks")
+            .WithName("Page With Variant Blocks")
+            .WithContentVariation(ContentVariation.Culture)
+            .AddPropertyType()
+            .WithAlias("blocks")
+            .WithName("blocks")
+            .WithDataTypeId(blockListDataType.Id)
+            .WithVariations(ContentVariation.Culture)
+            .Done()
+            .Build();
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+
+        // a published, reusable ("library") element with only an invariant property
+        Element libraryElement = new ElementBuilder()
+            .WithContentType(invariantOnlyElementType)
+            .WithName("Library Element")
+            .Build();
+        libraryElement.SetValue("onlyText", "Invariant text in library element");
+        ElementService.Save(libraryElement);
+        ElementService.Publish(libraryElement, ["*"]);
+
+        var mixedElementKey = Guid.NewGuid();
+        var invariantElementKey = Guid.NewGuid();
+
+        var blockListValue = new BlockListValue([
+            new () { ContentKey = mixedElementKey },
+            new () { ContentKey = invariantElementKey },
+            new () { ContentKey = libraryElement.Key, IsExternalContent = true },
+        ])
+        {
+            ContentData =
+            [
+                new (mixedElementKey, mixedElementType.Key, mixedElementType.Alias)
+                {
+                    Values =
+                    [
+                        new () { Alias = "invariantText", Value = "Invariant text in mixed element" },
+                        new () { Alias = "variantText", Value = "Variant text EN", Culture = "en-US" },
+                    ]
+                },
+                new (invariantElementKey, invariantOnlyElementType.Key, invariantOnlyElementType.Alias)
+                {
+                    Values =
+                    [
+                        new () { Alias = "onlyText", Value = "Invariant text in invariant element" },
+                    ]
+                }
+            ],
+            Expose =
+            [
+                new BlockItemVariation(mixedElementKey, "en-US", null),
+                new BlockItemVariation(invariantElementKey, null, null),
+            ]
+        };
+
+        Content content = new ContentBuilder()
+            .WithContentType(contentType)
+            .WithCultureName("en-US", "My Page")
+            .Build();
+        content.Properties["blocks"]!.SetValue(GetRequiredService<IJsonSerializer>().Serialize(blockListValue), "en-US");
+        ContentService.Save(content);
+        ContentService.Publish(content, ["en-US"]);
+
+        TestIndexDocument document = IndexerAndSearcher.Dump(IndexAliases.PublishedContent).Single();
+
+        IndexValue? invariantValue = document.Fields.SingleOrDefault(f => f is { FieldName: "blocks", Culture: null })?.Value;
+        Assert.That(invariantValue, Is.Not.Null, "Invariant blocks/properties should still be indexed even though the containing block-list property varies by culture.");
+        CollectionAssert.AreEquivalent(
+            new[] { "Invariant text in mixed element", "Invariant text in invariant element", "Invariant text in library element" },
+            invariantValue.Texts);
+
+        IndexValue? variantValue = document.Fields.SingleOrDefault(f => f is { FieldName: "blocks", Culture: "en-US" })?.Value;
+        Assert.That(variantValue, Is.Not.Null);
+        CollectionAssert.AreEqual(new[] { "Variant text EN" }, variantValue.Texts);
+    }
+
     private Guid CreateAndPublishElement(IContentType elementType, string textValue)
     {
         Element element = new ElementBuilder()
