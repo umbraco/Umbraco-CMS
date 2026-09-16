@@ -103,6 +103,26 @@ test('cannot publish both cultures when danish has empty mandatory field', async
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
 });
 
+// Product gap (https://github.com/umbraco/Umbraco-CMS/pull/23706): the variant selector should hint that
+// an inactive variant has a validation error, but no hint badge appears for danish while viewing english.
+test.skip('shows a hint on the variant selector for a culture with a validation error', async ({umbracoUi}) => {
+  // Arrange
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  // Select both english and danish in the publish dialog - danish fails due to its empty mandatory field.
+  await umbracoUi.content.clickSaveAndPublishButton();
+  await umbracoUi.content.clickButtonWithName(danishContentName);
+  await umbracoUi.content.clickContainerSaveAndPublishButton();
+  await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
+  await umbracoUi.content.clickSelectVariantButton();
+
+  // Assert
+  await umbracoUi.content.isVariantErrorHintBadgeVisibleForLanguageName('Danish');
+});
+
 test('can publish english variant from actions menu when danish has empty mandatory field', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoUi.goToBackOffice();

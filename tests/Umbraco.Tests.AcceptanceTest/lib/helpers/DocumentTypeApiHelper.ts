@@ -797,7 +797,7 @@ export class DocumentTypeApiHelper {
     return await this.create(documentType);
   }
 
-  async createElementTypeWithRegexValidation(elementName: string, groupName: string = 'TestGroup', dataTypeName: string = 'Textstring', dataTypeId: string, regex: string) {
+  async createElementTypeWithRegexValidation(elementName: string, groupName: string = 'TestGroup', dataTypeName: string = 'Textstring', dataTypeId: string, regex: string, varyByCulture: boolean = false) {
     await this.ensureNameNotExists(elementName);
 
     const crypto = require('crypto');
@@ -819,7 +819,9 @@ export class DocumentTypeApiHelper {
         .withName(dataTypeName)
         .withDataTypeId(dataTypeId)
         .withRegEx(regex)
+        .withVariesByCulture(varyByCulture)
         .done()
+      .withVariesByCulture(varyByCulture)
       .build();
     return await this.create(documentType);
   }

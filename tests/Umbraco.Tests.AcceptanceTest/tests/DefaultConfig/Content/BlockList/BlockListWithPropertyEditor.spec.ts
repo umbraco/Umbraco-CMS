@@ -157,6 +157,76 @@ test('cannot update a variant block list with invalid text', {tag: '@release'}, 
   await umbracoUi.content.doesPropertyContainValue(textStringElementDataTypeName, correctPropertyValue);
 });
 
+// Regression tests for https://github.com/umbraco/Umbraco-CMS/pull/23706
+test('shows a server-side validation error on the right property of a shared block with a culture-varying value', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const textStringElementDataTypeName = 'Textstring';
+  const numberRegex = '^[0-9]+$';
+  const wrongPropertyValue = 'NotANumber';
+  const correctPropertyValue = '12345';
+  await umbracoApi.language.createDanishLanguage();
+  // ElementType property varies by culture, but the block list itself (created below without varying) is shared across cultures.
+  const textStringElementDataType = await umbracoApi.dataType.getByName(textStringElementDataTypeName);
+  elementTypeId = await umbracoApi.documentType.createElementTypeWithRegexValidation(blockName, elementGroupName, textStringElementDataTypeName, textStringElementDataType.id, numberRegex, true);
+  blockListId = await umbracoApi.dataType.createBlockListDataTypeWithABlock(blockListName, elementTypeId);
+  documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, blockListName, blockListId, documentTypeGroupName, true, false);
+  contentId = await umbracoApi.document.createDefaultDocumentWithEnglishCulture(contentName, documentTypeId);
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickAddBlockElementButton();
+  await umbracoUi.content.clickBlockElementWithName(blockName);
+  await umbracoUi.content.enterPropertyValue(textStringElementDataTypeName, wrongPropertyValue);
+  await umbracoUi.content.clickCreateBlockModalButtonAndWaitForModalToClose();
+  await umbracoUi.content.clickSaveAndPublishButton();
+  await umbracoUi.content.clickContainerSaveAndPublishButton();
+
+  // Assert
+  await umbracoUi.content.doesPropertyHaveInvalidBadge(blockListName);
+  await umbracoUi.content.clickEditBlockListEntryWithName(blockName);
+  await umbracoUi.content.doesModalFormValidationMessageContainText(ConstantHelper.validationMessages.invalidValue);
+  // Correct the value and confirm validation updates accordingly.
+  await umbracoUi.content.enterPropertyValue(textStringElementDataTypeName, correctPropertyValue);
+  await umbracoUi.content.clickUpdateBlockModalButtonAndWaitForModalToClose();
+  await umbracoUi.content.clickSaveAndPublishButton();
+  await umbracoUi.content.clickContainerSaveAndPublishButtonAndWaitForContentToBePublished();
+  expect(await umbracoApi.document.isDocumentPublished(contentId)).toBeTruthy();
+});
+
+// Regression tests for https://github.com/umbraco/Umbraco-CMS/pull/23706
+test('clears block list validation after deleting the invalid block', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const textStringElementDataTypeName = 'Textstring';
+  const numberRegex = '^[0-9]+$';
+  const wrongPropertyValue = 'NotANumber';
+  await umbracoApi.language.createDanishLanguage();
+  const textStringElementDataType = await umbracoApi.dataType.getByName(textStringElementDataTypeName);
+  elementTypeId = await umbracoApi.documentType.createElementTypeWithRegexValidation(blockName, elementGroupName, textStringElementDataTypeName, textStringElementDataType.id, numberRegex, true);
+  blockListId = await umbracoApi.dataType.createBlockListDataTypeWithABlock(blockListName, elementTypeId);
+  documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, blockListName, blockListId, documentTypeGroupName, true, false);
+  contentId = await umbracoApi.document.createDefaultDocumentWithEnglishCulture(contentName, documentTypeId);
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickAddBlockElementButton();
+  await umbracoUi.content.clickBlockElementWithName(blockName);
+  await umbracoUi.content.enterPropertyValue(textStringElementDataTypeName, wrongPropertyValue);
+  await umbracoUi.content.clickCreateBlockModalButtonAndWaitForModalToClose();
+  await umbracoUi.content.clickSaveAndPublishButton();
+  await umbracoUi.content.clickContainerSaveAndPublishButton();
+  await umbracoUi.content.doesPropertyHaveInvalidBadge(blockListName);
+
+  // Act
+  await umbracoUi.content.clickDeleteBlockListBlockButton();
+  await umbracoUi.content.clickConfirmToDeleteButton();
+  await umbracoUi.content.clickSaveAndPublishButton();
+  await umbracoUi.content.clickContainerSaveAndPublishButtonAndWaitForContentToBePublished();
+
+  // Assert
+  expect(await umbracoApi.document.isDocumentPublished(contentId)).toBeTruthy();
+  await umbracoUi.content.doesPropertyHaveInvalidBadge(blockListName, false);
+});
+
 test('cannot publish a block list with an empty mandatory multi url picker until a link is added', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   propertyEditorId = await umbracoApi.dataType.createDefaultMultiUrlPickerDataType(propertyEditorName);

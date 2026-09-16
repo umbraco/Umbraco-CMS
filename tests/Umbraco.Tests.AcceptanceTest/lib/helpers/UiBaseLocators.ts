@@ -1296,12 +1296,13 @@ export class UiBaseLocators extends BasePage {
     await this.isVisible(propertyEditorUiLocator, isVisible);
   }
 
-  async doesPropertyHaveInvalidBadge(propertyName: string) {
+  async doesPropertyHaveInvalidBadge(propertyName: string, isVisible: boolean = true) {
     await this.isVisible(
       this.page
         .locator("umb-property-layout")
         .filter({ hasText: propertyName })
         .locator("#invalid-badge uui-badge"),
+      isVisible,
     );
   }
 
