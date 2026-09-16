@@ -1,7 +1,7 @@
 import {DocumentBlueprintsValueBuilder} from './documentBlueprintsValueBuilder';
 import {DocumentBlueprintsVariantBuilder} from './documentBlueprintsVariantBuilder';
 import {ensureIdExists} from '../../helpers/BuilderUtils';
-import {DocumentPayload} from '../types';
+import {DocumentBlueprintPayload} from '../types';
 
 export class DocumentBlueprintsBuilder {
   documentBlueprintsValueBuilder: DocumentBlueprintsValueBuilder[];
@@ -42,7 +42,7 @@ export class DocumentBlueprintsBuilder {
     return this;
   }
 
-  build(): DocumentPayload {
+  build(): DocumentBlueprintPayload {
     this.id = ensureIdExists(this.id);
 
     return {

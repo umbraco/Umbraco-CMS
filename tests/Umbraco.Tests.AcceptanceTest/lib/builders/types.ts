@@ -92,6 +92,13 @@ export interface ContentTypePayloadBase {
   containers: ContentTypeContainer[];
   compositions: ContentTypeComposition[];
   id: string;
+  /**
+   * Sent by all three content-type builders, but **no create schema declares it** —
+   * `Create{Document,Media,Member}TypeRequestModel` have no `folder`. `withFolderId()` is also
+   * never called by any spec or helper, so in practice this is always `null` and the API
+   * ignores it; folders are created through the separate `createFolder` endpoint instead.
+   * Removing it would mean deleting the exported `withFolderId`, so it waits for a major (§2).
+   */
   folder: EntityReference | null;
 }
 
@@ -108,7 +115,21 @@ export interface DocumentTypePayload extends ContentTypePayloadBase {
   };
 }
 
-/** A media-type payload. */
+/**
+ * A media-type payload.
+ *
+ * **Knowingly short of the API's own schema.** `CreateMediaTypeRequestModel` lists
+ * `allowedInLibrary` under `required`, and the document- and member-type builders both send it —
+ * `MediaTypeBuilder` is the only one that does not. The API evidently defaults it, since media
+ * type creation works, so this type matches what is actually sent rather than pretending
+ * otherwise; declaring the field here without the builder emitting it would fail compilation
+ * and describe a payload nobody sends.
+ *
+ * Adding it is a payload change on a widely-used builder, and `allowedInLibrary` governs whether
+ * a media type can be created in the Media library — so if the API's default is `true`, sending
+ * an explicit `false` would make media types uncreatable. That wants verifying against a running
+ * instance before anyone changes it, which is why it is recorded rather than fixed.
+ */
 export interface MediaTypePayload extends ContentTypePayloadBase {
   allowedMediaTypes: AllowedMediaType[];
 }
@@ -126,14 +147,32 @@ export interface EntityPayloadBase {
 }
 
 /**
- * A document, document-blueprint or element payload. Elements are content types too, so they
- * carry `documentType` rather than a type of their own; `template` is document-only.
+ * What a document, document-blueprint and element payload have in common. All three are built
+ * from content types, so all three carry `documentType` rather than a type of their own.
  */
-export interface DocumentPayload extends EntityPayloadBase {
+export interface DocumentLikePayload extends EntityPayloadBase {
   parent: EntityReference | null;
   documentType: EntityReference;
-  template?: EntityReference | null;
 }
+
+/**
+ * A document payload.
+ *
+ * `template` is **required**, not optional: `CreateDocumentRequestModel` lists it under
+ * `required`, and a document sends `null` when no template is assigned rather than omitting the
+ * field. Blueprints and elements use {@link DocumentBlueprintPayload} / {@link ElementPayload},
+ * whose request models have no `template` at all — one shared type across all three would have
+ * to make it optional, and would then stop catching a document payload that drops it.
+ */
+export interface DocumentPayload extends DocumentLikePayload {
+  template: EntityReference | null;
+}
+
+/** A document-blueprint payload — `CreateDocumentBlueprintRequestModel` has no `template`. */
+export type DocumentBlueprintPayload = DocumentLikePayload;
+
+/** An element payload — `CreateElementRequestModel` has no `template`. */
+export type ElementPayload = DocumentLikePayload;
 
 /** A media payload. */
 export interface MediaPayload extends EntityPayloadBase {
