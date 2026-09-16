@@ -250,11 +250,11 @@ Three things they buy:
 
 They take the **already-fetched entity** rather than a name on purpose: `getByName` walks the tree recursively, so a name-based overload would re-request on every assertion.
 
-**184 raw-response assertions remain**, down from 890 (-79%), and the count is budgeted.
+**153 raw-response assertions remain**, down from 890 (-83%).
 
 The two `get*` helpers are what made the deep cases tractable. `getOnlyPropertyValue` in particular replaces `values[0].value` where no alias is in play: it asserts there *is* exactly one property and returns it, so the single-property expectation is stated instead of buried in an index — and a spec that later grows a second property fails loudly rather than silently asserting against whichever sorts first. Both stop at the entity boundary: `getOnlyPropertyValue(data).contentData[0].values[0].value` still indexes into the *block's own* structure, which is that test's actual subject.
 
-**184 remain, and the previous read of them was wrong** — worth knowing, because the mistake is easy to repeat. The conclusion had been "no shape appears more than nine times, spread across roughly twenty-five distinct ones, so writing a helper for each would inflate the package for little". That is true of **exact paths** — there are 86, and the largest is `.id` at ten. It is false of **subjects**: cluster by what is actually being asserted and 86 paths collapse to 13, several of them large and concentrated in two or three files:
+**153 remain, and the previous read of them was wrong** — worth knowing, because the mistake is easy to repeat. The conclusion had been "no shape appears more than nine times, spread across roughly twenty-five distinct ones, so writing a helper for each would inflate the package for little". That is true of **exact paths** — there are 86, and the largest is `.id` at ten. It is false of **subjects**: cluster by what is actually being asserted and 86 paths collapse to 13, several of them large and concentrated in two or three files:
 
 | Subject | Lines | Files |
 |---------|------:|------:|
@@ -270,7 +270,9 @@ The two `get*` helpers are what made the deep cases tractable. `getOnlyPropertyV
 
 **Concentration is what decides whether a helper earns its place, not the raw count.** Twenty-two `.id` assertions across sixteen files are a genuine long tail — a helper would add an indirection per file and buy nothing. Twenty-three property-definition assertions across *three* files are not: they were all `properties[0].<field>`, one positional lookup repeated, which is exactly what `getPropertyValue` was introduced to remove on the values side. That cluster is now `getPropertyDefinition(data, alias)` and `getOnlyPropertyDefinition(data)`.
 
-The next two worth doing on the same grounds are **user-group access flags** (22 lines, 2 files) and **domains** (13 lines, 2 files). The rest are long tail: add a helper when you touch one and it earns its place, and prefer a helper over a new raw assertion.
+Both of the clusters named next have since been done. **User-group access flags** became `doesUserGroupHaveAccess(data, {…})`, which asserts only the keys you pass — and which deliberately does *not* join the older `doesUserGroupContain*` family beside it, because those take a name and refetch (`getByName` walks every group, so four flags cost four walks) and *return* a value under a `does` prefix, the shape this section warns silently passes when a caller forgets `expect()`. **Domains** became `doesHaveDomain(data, name, isoCode)` and `doesHaveDomainCount(data, n)`; the first matches on `domainName` rather than `domains[0]`, since the API promises no order and the index was the same coincidental-pass trap as a hardcoded `.nth(0)`.
+
+What is left is long tail by the same measure — the largest remaining subject is identity (`.id`, `.name`, `.path`) at 22 lines spread over 16 files, where a helper would add an indirection per file and buy nothing. Add one when you touch a shape and it earns its place, and prefer a helper over a new raw assertion.
 
 **One index stays on purpose.** The three "can reorder properties" tests assert `properties[0].name` and `properties[1].name` — there the position *is* the subject, the same exemption a parameterised `.nth(i)` gets. Two of the three asserted only `properties[0]`, which cannot tell a reorder from a property being dropped or duplicated; both now assert the second position too, matching the document-type test that had it right.
 

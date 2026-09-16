@@ -261,8 +261,7 @@ test('can set culture and hostnames for a specific content with culture and host
   // Assert
   const document = await umbracoApi.document.getByName(firstDocumentName);
   const domains = await umbracoApi.document.getDomains(document.id);
-  expect(domains.domains[0].domainName).toEqual(domainName);
-  expect(domains.domains[0].isoCode).toEqual('da');
+  await umbracoApi.document.doesHaveDomain(domains, domainName, 'da');
   await umbracoUi.content.isTreeItemVisible(secondDocumentName, false);
 });
 

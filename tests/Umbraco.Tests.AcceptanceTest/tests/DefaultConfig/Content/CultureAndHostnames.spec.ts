@@ -55,9 +55,8 @@ test('can add a domain', async ({umbracoApi, umbracoUi}) => {
 
   // Assert
   const domainsData = await umbracoApi.document.getDomains(contentId);
-  expect(domainsData.domains.length).toBe(1);
-  expect(domainsData.domains[0].domainName).toEqual(domainName);
-  expect(domainsData.domains[0].isoCode).toEqual(isoCode);
+  await umbracoApi.document.doesHaveDomainCount(domainsData, 1);
+  await umbracoApi.document.doesHaveDomain(domainsData, domainName, isoCode);
 });
 
 test('can update culture and hostname', async ({umbracoApi, umbracoUi}) => {
@@ -75,8 +74,7 @@ test('can update culture and hostname', async ({umbracoApi, umbracoUi}) => {
 
   // Assert
   domainsData = await umbracoApi.document.getDomains(contentId);
-  expect(domainsData.domains[0].domainName).toEqual(updatedDomainName);
-  expect(domainsData.domains[0].isoCode).toEqual(isoCode);
+  await umbracoApi.document.doesHaveDomain(domainsData, updatedDomainName, isoCode);
 });
 
 test('can delete culture and hostname', async ({umbracoApi, umbracoUi}) => {
@@ -93,7 +91,7 @@ test('can delete culture and hostname', async ({umbracoApi, umbracoUi}) => {
 
   // Assert
   domainsData = await umbracoApi.document.getDomains(contentId);
-  expect(domainsData.domains.length).toBe(0);
+  await umbracoApi.document.doesHaveDomainCount(domainsData, 0);
 });
 
 test('can add culture and hostname for multiple languages', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
@@ -117,11 +115,9 @@ test('can add culture and hostname for multiple languages', {tag: '@release'}, a
 
   // Assert
   const domainsData = await umbracoApi.document.getDomains(contentId);
-  expect(domainsData.domains.length).toBe(2);
-  expect(domainsData.domains[0].domainName).toEqual(domainName);
-  expect(domainsData.domains[0].isoCode).toEqual(isoCode);
-  expect(domainsData.domains[1].domainName).toEqual(secondDomainName);
-  expect(domainsData.domains[1].isoCode).toEqual(secondIsoCode);
+  await umbracoApi.document.doesHaveDomainCount(domainsData, 2);
+  await umbracoApi.document.doesHaveDomain(domainsData, domainName, isoCode);
+  await umbracoApi.document.doesHaveDomain(domainsData, secondDomainName, secondIsoCode);
 
   // Clean
   await umbracoApi.language.ensureNameNotExists(secondLanguageName);

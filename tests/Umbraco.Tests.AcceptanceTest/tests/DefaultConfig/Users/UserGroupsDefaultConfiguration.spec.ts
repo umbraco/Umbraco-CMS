@@ -73,10 +73,12 @@ test('the default configuration of Administrators is correct', {tag: '@release'}
   // Fixme - Uncomment this when the front-end is ready. Currently the fallbackPermissions includes some unnecessary values such as ":", "5", "T"
   //expect(await umbracoApi.userGroup.doesUserGroupHaveFallbackPermissions(userGroupName, fallbackPermissions)).toBeTruthy();
   const userGroupData = await umbracoApi.userGroup.getByName(userGroupName);
-  expect(userGroupData.hasAccessToAllLanguages).toEqual(hasAccessToAllLanguages);
-  expect(userGroupData.documentRootAccess).toEqual(documentRootAccess);
-  expect(userGroupData.mediaRootAccess).toEqual(mediaRootAccess);
-  expect(userGroupData.permissions).toEqual(granularPermissions);
+  await umbracoApi.userGroup.doesUserGroupHaveAccess(userGroupData, {
+    hasAccessToAllLanguages,
+    documentRootAccess,
+    mediaRootAccess,
+    permissions: granularPermissions,
+  });
 });
 
 test('the default configuration of Editors is correct', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
@@ -139,10 +141,12 @@ test('the default configuration of Editors is correct', {tag: '@release'}, async
   // Fixme - Uncomment this when the front-end is ready. Currently the fallbackPermissions includes some unnecessary values such as ":", "5", "T"
   //expect(await umbracoApi.userGroup.doesUserGroupHaveFallbackPermissions(userGroupName, fallbackPermissions)).toBeTruthy();
   const userGroupData = await umbracoApi.userGroup.getByName(userGroupName);
-  expect(userGroupData.hasAccessToAllLanguages).toEqual(hasAccessToAllLanguages);
-  expect(userGroupData.documentRootAccess).toEqual(documentRootAccess);
-  expect(userGroupData.mediaRootAccess).toEqual(mediaRootAccess);
-  expect(userGroupData.permissions).toEqual(granularPermissions);
+  await umbracoApi.userGroup.doesUserGroupHaveAccess(userGroupData, {
+    hasAccessToAllLanguages,
+    documentRootAccess,
+    mediaRootAccess,
+    permissions: granularPermissions,
+  });
 });
 
 test('the default configuration of Sensitive data is correct', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
@@ -177,10 +181,12 @@ test('the default configuration of Sensitive data is correct', {tag: '@release'}
   // Fixme - Uncomment this when the front-end is ready. Currently the fallbackPermissions includes some unnecessary values such as ":", "5", "T"
   //expect(await umbracoApi.userGroup.doesUserGroupHaveFallbackPermissions(userGroupName, fallbackPermissions)).toBeTruthy();
   const userGroupData = await umbracoApi.userGroup.getByName(userGroupName);
-  expect(userGroupData.hasAccessToAllLanguages).toEqual(hasAccessToAllLanguages);
-  expect(userGroupData.documentRootAccess).toEqual(documentRootAccess);
-  expect(userGroupData.mediaRootAccess).toEqual(mediaRootAccess);
-  expect(userGroupData.permissions).toEqual(granularPermissions);
+  await umbracoApi.userGroup.doesUserGroupHaveAccess(userGroupData, {
+    hasAccessToAllLanguages,
+    documentRootAccess,
+    mediaRootAccess,
+    permissions: granularPermissions,
+  });
 });
 
 test('the default configuration of Translators data is correct', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
@@ -220,10 +226,12 @@ test('the default configuration of Translators data is correct', {tag: '@release
   // Fixme - Uncomment this when the front-end is ready. Currently the fallbackPermissions includes some unnecessary values such as ":", "5", "T"
   // expect(await umbracoApi.userGroup.doesUserGroupHaveFallbackPermissions(userGroupName, fallbackPermissions)).toBeTruthy();
   const userGroupData = await umbracoApi.userGroup.getByName(userGroupName);
-  expect(userGroupData.hasAccessToAllLanguages).toEqual(hasAccessToAllLanguages);
-  expect(userGroupData.documentRootAccess).toEqual(documentRootAccess);
-  expect(userGroupData.mediaRootAccess).toEqual(mediaRootAccess);
-  expect(userGroupData.permissions).toEqual(granularPermissions);
+  await umbracoApi.userGroup.doesUserGroupHaveAccess(userGroupData, {
+    hasAccessToAllLanguages,
+    documentRootAccess,
+    mediaRootAccess,
+    permissions: granularPermissions,
+  });
 });
 
 test('the default configuration of Writers data is correct', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
@@ -266,8 +274,10 @@ test('the default configuration of Writers data is correct', {tag: '@release'}, 
   // Fixme - Uncomment this when the front-end is ready. Currently the fallbackPermissions includes some unnecessary values such as ":", "5", "T"
   // expect(await umbracoApi.userGroup.doesUserGroupHaveFallbackPermissions(userGroupName, fallbackPermissions)).toBeTruthy();
   const userGroupData = await umbracoApi.userGroup.getByName(userGroupName);
-  expect(userGroupData.hasAccessToAllLanguages).toEqual(hasAccessToAllLanguages);
-  expect(userGroupData.documentRootAccess).toEqual(documentRootAccess);
-  expect(userGroupData.mediaRootAccess).toEqual(mediaRootAccess);
-  expect(userGroupData.permissions).toEqual(granularPermissions);
+  await umbracoApi.userGroup.doesUserGroupHaveAccess(userGroupData, {
+    hasAccessToAllLanguages,
+    documentRootAccess,
+    mediaRootAccess,
+    permissions: granularPermissions,
+  });
 });

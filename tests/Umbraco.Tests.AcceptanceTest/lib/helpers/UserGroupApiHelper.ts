@@ -1,4 +1,5 @@
-﻿import {ApiHelpers} from "./ApiHelpers";
+﻿import {expect} from "@playwright/test";
+import {ApiHelpers} from "./ApiHelpers";
 import {UserGroupBuilder} from "../builders";
 import {ConstantHelper} from "./ConstantHelper";
 
@@ -87,6 +88,33 @@ export class UserGroupApiHelper {
   async doesUserGroupContainLanguage(userGroupName: string, languageName: string) {
     const userGroup = await this.getByName(userGroupName);
     return userGroup.languages.includes(languageName);
+  }
+
+  /**
+   * Asserts the access flags on an **already-fetched** user group.
+   *
+   * Only the keys you pass are checked, so a spec states the flags it cares about and stays
+   * silent on the rest. Deliberately different from the older `doesUserGroupContain*` family
+   * below, which takes a *name* and refetches — `getByName` walks every group to find one, so
+   * asserting four flags that way costs four full walks — and which *returns* a value despite
+   * the `does` prefix, the shape CLAUDE.md §3 warns turns into a silent pass when a call site
+   * forgets to wrap it in `expect()`. This one asserts internally and names the group.
+   */
+  async doesUserGroupHaveAccess(userGroupData: any, expected: {
+    hasAccessToAllLanguages?: boolean;
+    documentRootAccess?: boolean;
+    mediaRootAccess?: boolean;
+    elementRootAccess?: boolean;
+    permissions?: any[];
+  }): Promise<void> {
+    const name = userGroupData?.name ?? '(unnamed)';
+    for (const key of ['hasAccessToAllLanguages', 'documentRootAccess', 'mediaRootAccess', 'elementRootAccess'] as const) {
+      if (expected[key] === undefined) continue;
+      expect(userGroupData?.[key], `Expected user group '${name}' to have ${key} = ${expected[key]}`).toBe(expected[key]);
+    }
+    if (expected.permissions !== undefined) {
+      expect(userGroupData?.permissions, `Expected user group '${name}' to carry ${expected.permissions.length} granular permission(s)`).toEqual(expected.permissions);
+    }
   }
 
   async doesUserGroupContainAccessToAllLanguages(userGroupName: string) {

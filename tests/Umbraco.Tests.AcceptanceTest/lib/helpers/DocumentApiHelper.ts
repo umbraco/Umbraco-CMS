@@ -418,6 +418,28 @@ export class DocumentApiHelper {
     return await response.json();
   }
 
+  /**
+   * Asserts a document carries a domain with this name, bound to this culture.
+   *
+   * Matched by `domainName`, not by position: the API does not promise an order for
+   * `domains`, so `domains[0]` is the same coincidental-pass trap as a hardcoded `.nth(0)`
+   * (CLAUDE.md §3). Where a test genuinely is about ordering, index deliberately instead.
+   */
+  async doesHaveDomain(domainsData: any, domainName: string, isoCode: string): Promise<void> {
+    const domains = domainsData?.domains;
+    expect(Array.isArray(domains), `Expected a domains array, got: ${JSON.stringify(domainsData)?.slice(0, 200)}`).toBeTruthy();
+    const match = domains.find(d => d.domainName === domainName);
+    expect(match, `Expected a domain '${domainName}', found: ${domains.map(d => d.domainName).join(', ') || '(none)'}`).toBeTruthy();
+    expect(match.isoCode, `Expected domain '${domainName}' to be bound to '${isoCode}'`).toBe(isoCode);
+  }
+
+  /** Asserts how many domains a document carries; `0` means none are assigned. */
+  async doesHaveDomainCount(domainsData: any, expectedCount: number): Promise<void> {
+    const domains = domainsData?.domains;
+    expect(Array.isArray(domains), `Expected a domains array, got: ${JSON.stringify(domainsData)?.slice(0, 200)}`).toBeTruthy();
+    expect(domains.length, `Expected ${expectedCount} domain(s), found ${domains.length}: ${domains.map(d => d.domainName).join(', ') || '(none)'}`).toBe(expectedCount);
+  }
+
   async updateDomains(id: string, domains) {
     return await this.api.put(this.api.baseUrl + '/umbraco/management/api/v1/document/' + id + '/domains', domains);
   }

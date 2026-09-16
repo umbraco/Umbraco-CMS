@@ -545,8 +545,7 @@ test('can set culture and hostnames with culture and hostnames permission enable
   // Assert
   const document = await umbracoApi.document.getByName(rootDocumentName);
   const domains = await umbracoApi.document.getDomains(document.id);
-  expect(domains.domains[0].domainName).toEqual(domainName);
-  expect(domains.domains[0].isoCode).toEqual('en-US');
+  await umbracoApi.document.doesHaveDomain(domains, domainName, 'en-US');
 });
 
 test('can not set culture and hostnames with culture and hostnames permission disabled', async ({umbracoApi, umbracoUi}) => {
