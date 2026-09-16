@@ -78,9 +78,9 @@ export class UmbPartialViewWorkspaceEditorElement extends UmbLitElement {
 		// TODO: move default slot content to a separate component, and registere as a workspace view. [NL]
 		return html`
 			<umb-entity-detail-workspace-editor>
-				<umb-workspace-header-name-editable
+				<umb-entity-named-detail-workspace-header
 					slot="header"
-					?readonly=${this._isNew === false || this._isRestricted}></umb-workspace-header-name-editable>
+					?readonly=${this._isNew === false || this._isRestricted}></umb-entity-named-detail-workspace-header>
 				<uui-box>
 					<div slot="header" id="code-editor-menu-container">
 						<umb-templating-insert-menu

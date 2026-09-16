@@ -22,9 +22,9 @@ export class UmbStylesheetWorkspaceEditorElement extends UmbLitElement {
 	override render() {
 		return html`
 			<umb-entity-detail-workspace-editor>
-				<umb-workspace-header-name-editable
+				<umb-entity-named-detail-workspace-header
 					slot="header"
-					?readonly=${this._isNew === false}></umb-workspace-header-name-editable>
+					?readonly=${this._isNew === false}></umb-entity-named-detail-workspace-header>
 			</umb-entity-detail-workspace-editor>
 		`;
 	}

@@ -19,7 +19,7 @@ export class UmbLanguageWorkspaceEditorElement extends UmbLitElement {
 		return html`<umb-entity-detail-workspace-editor show-back-to-parent-button>
 			${this._isNew
 				? html`<h3 slot="header">Add language</h3>`
-				: html`<umb-workspace-header-name-editable slot="header"></umb-workspace-header-name-editable> `}
+				: html`<umb-entity-named-detail-workspace-header slot="header"></umb-entity-named-detail-workspace-header> `}
 		</umb-entity-detail-workspace-editor>`;
 	}
 
