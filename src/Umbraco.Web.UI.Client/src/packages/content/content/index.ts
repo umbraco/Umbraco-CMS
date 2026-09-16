@@ -8,6 +8,7 @@ export * from './manager/index.js';
 export * from './property-dataset-context/index.js';
 export * from './publishing/index.js';
 export * from './rollback/index.js';
+export * from './tree/index.js';
 export * from './workspace/index.js';
 export * from './utils/index.js';
 

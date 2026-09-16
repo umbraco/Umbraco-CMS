@@ -102,7 +102,9 @@ public static partial class UmbracoBuilderExtensions
             .AddUmbracoOptions<BasicAuthSettings>()
             .AddUmbracoOptions<LegacyPasswordMigrationSettings>()
             .AddUmbracoOptions<PackageMigrationSettings>()
+#pragma warning disable CS0618 // Type or member is obsolete
             .AddUmbracoOptions<HelpPageSettings>()
+#pragma warning restore CS0618 // Type or member is obsolete
             .AddUmbracoOptions<DataTypesSettings>()
             .AddUmbracoOptions<WebhookSettings>()
             .AddUmbracoOptions<CacheSettings>()

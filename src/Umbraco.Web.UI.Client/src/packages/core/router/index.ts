@@ -1,6 +1,7 @@
 export * from './route/index.js';
 export * from './contexts/index.js';
 export * from './encode-folder-name.function.js';
+export * from './generate-workspace-link.function.js';
 export * from './modal-registration/constants.js';
 export * from './modal-registration/modal-route-registration.controller.js';
 export * from './path-pattern.class.js';

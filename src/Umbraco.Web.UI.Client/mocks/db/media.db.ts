@@ -140,7 +140,6 @@ const itemMapper = (model: UmbMockMediaModel): MediaItemResponseModel => {
 const collectionMapper = (model: UmbMockMediaModel): MediaCollectionResponseModel => {
 	return {
 		creator: null,
-		hasChildren: model.hasChildren,
 		id: model.id,
 		mediaType: {
 			id: model.mediaType.id,
@@ -151,6 +150,7 @@ const collectionMapper = (model: UmbMockMediaModel): MediaCollectionResponseMode
 		values: model.values,
 		variants: model.variants,
 		flags: model.flags,
+		hasChildren: model.hasChildren,
 	};
 };
 

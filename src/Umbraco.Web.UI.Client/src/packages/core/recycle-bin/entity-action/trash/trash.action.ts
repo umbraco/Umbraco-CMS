@@ -74,19 +74,19 @@ export class UmbTrashEntityAction<
 		const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
 		if (!actionEventContext) throw new Error('Action event context is missing.');
 
-		const event = new UmbRequestReloadStructureForEntityEvent({
-			unique: this.args.unique,
-			entityType: this.args.entityType,
-		});
-
-		actionEventContext.dispatchEvent(event);
-
 		const trashedEvent = new UmbEntityTrashedEvent({
 			unique: this.args.unique,
 			entityType: this.args.entityType,
 		});
 
 		actionEventContext.dispatchEvent(trashedEvent);
+
+		const event = new UmbRequestReloadStructureForEntityEvent({
+			unique: this.args.unique,
+			entityType: this.args.entityType,
+		});
+
+		actionEventContext.dispatchEvent(event);
 	}
 }
 
