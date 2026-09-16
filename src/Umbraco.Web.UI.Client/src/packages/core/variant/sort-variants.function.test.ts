@@ -23,7 +23,6 @@ function makeVariant(
 			variant: {
 				name,
 				culture: null,
-				segment: null,
 				createDate: null,
 				updateDate: null,
 				state: opts.state ?? null,

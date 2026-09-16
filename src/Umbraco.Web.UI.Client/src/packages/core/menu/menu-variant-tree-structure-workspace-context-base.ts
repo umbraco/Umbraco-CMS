@@ -127,9 +127,7 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase
 
 		// find related variant id from structure item:
 		const itemVariantFit = structureItem.variants.find(
-			(variant) =>
-				variant.culture === this.#workspaceActiveVariantId?.culture &&
-				variant.segment === this.#workspaceActiveVariantId?.segment,
+			(variant) => variant.culture === this.#workspaceActiveVariantId?.culture,
 		);
 
 		if (itemVariantFit) {
@@ -216,7 +214,7 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase
 				{
 					unique: root.unique,
 					entityType: root.entityType,
-					variants: [{ name: root.name, culture: null, segment: null }],
+					variants: [{ name: root.name, culture: null }],
 				},
 			];
 		}
@@ -232,7 +230,6 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase
 						return {
 							name: variant.name,
 							culture: variant.culture,
-							segment: variant.segment,
 						};
 					}),
 				};

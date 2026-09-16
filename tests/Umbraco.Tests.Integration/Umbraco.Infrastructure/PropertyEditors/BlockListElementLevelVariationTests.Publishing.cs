@@ -2100,6 +2100,89 @@ internal partial class BlockListElementLevelVariationTests
         }
     }
 
+    [Test]
+    public async Task Performs_Automatic_Segment_Fallback_For_Missing_Segment_Values()
+    {
+        var elementType = await CreateElementType(ContentVariation.Segment);
+        var blockListDataType = await CreateBlockListDataType(elementType);
+        var contentType = await CreateContentType(ContentVariation.Segment, blockListDataType);
+
+        var content = CreateContent(
+            contentType,
+            elementType,
+            new []
+            {
+                new BlockProperty(
+                    new List<BlockPropertyValue>
+                    {
+                        new() { Alias = "invariantText", Value = "English invariantText content value" },
+                        new() { Alias = "variantText", Value = "English variantText content value, default", Segment = null },
+                        new() { Alias = "variantText", Value = "English variantText content value, s1", Segment = "s1" },
+                    },
+                    new List<BlockPropertyValue>
+                    {
+                        new() { Alias = "invariantText", Value = "English invariantText settings value" },
+                        new() { Alias = "variantText", Value = "English variantText settings value, default", Segment = null },
+                        new() { Alias = "variantText", Value = "English variantText settings value, s2", Segment = "s2" }
+                    },
+                    null,
+                    null)
+            },
+            true);
+
+        AssertPropertyValues(
+            null,
+            "English invariantText content value",
+            "English variantText content value, default",
+            "English invariantText settings value",
+            "English variantText settings value, default");
+
+        AssertPropertyValues(
+            "s1",
+            "English invariantText content value",
+            "English variantText content value, s1",
+            "English invariantText settings value",
+            "English variantText settings value, default"); // missing for s1, fallback to default segment value
+
+        AssertPropertyValues(
+            "s2",
+            "English invariantText content value",
+            "English variantText content value, default", // missing for s2, fallback to default segment value
+            "English invariantText settings value",
+            "English variantText settings value, s2");
+
+        void AssertPropertyValues(
+            string? segment,
+            string expectedInvariantContentValue,
+            string expectedVariantContentValue,
+            string expectedInvariantSettingsValue,
+            string expectedVariantSettingsValue)
+        {
+            SetVariationContext(null, segment);
+            var publishedContent = GetPublishedContent(content.Key);
+
+            var publishedValueFallback = GetRequiredService<IPublishedValueFallback>();
+            var value = publishedContent.Value<BlockListModel>(publishedValueFallback, "blocks");
+            Assert.IsNotNull(value);
+            Assert.AreEqual(1, value.Count);
+
+            var blockListItem = value.First();
+            Assert.AreEqual(2, blockListItem.Content.Properties.Count());
+            Assert.Multiple(() =>
+            {
+                Assert.AreEqual(expectedInvariantContentValue, blockListItem.Content.Value<string>("invariantText"));
+                Assert.AreEqual(expectedVariantContentValue, blockListItem.Content.Value<string>("variantText"));
+            });
+
+            Assert.AreEqual(2, blockListItem.Settings.Properties.Count());
+            Assert.Multiple(() =>
+            {
+                Assert.AreEqual(expectedInvariantSettingsValue, blockListItem.Settings.Value<string>("invariantText"));
+                Assert.AreEqual(expectedVariantSettingsValue, blockListItem.Settings.Value<string>("variantText"));
+            });
+        }
+    }
+
     [TestCase(true, true)]
     [TestCase(true, false)]
     [TestCase(false, true)]
@@ -2184,7 +2267,7 @@ internal partial class BlockListElementLevelVariationTests
 
         // Update Expose to only have invariant entry (no culture)
         blockListValue.Expose = blockListValue.Expose
-            .Select(e => new BlockItemVariation(e.ContentKey, null, null))
+            .Select(e => new BlockItemVariation(e.ContentKey, null))
             .DistinctBy(e => e.ContentKey)
             .ToList();
 
@@ -2379,8 +2462,8 @@ internal partial class BlockListElementLevelVariationTests
         var contentKey = blockListValue.Expose[0].ContentKey;
         blockListValue.Expose =
         [
-            new BlockItemVariation(contentKey, "en-US", null),
-            new BlockItemVariation(contentKey, "da-DK", null)
+            new BlockItemVariation(contentKey, "en-US"),
+            new BlockItemVariation(contentKey, "da-DK")
         ];
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
@@ -2419,10 +2502,10 @@ internal partial class BlockListElementLevelVariationTests
             $"variantText property should not have invariant values after changing to variant. Values: {string.Join(", ", variantTextValues.Select(v => $"Culture={v.Culture ?? "null"}:Value={v.Value}"))}");
 
         // Verify Expose entries are not duplicated
-        var exposeGroups = publishedBlockListValue.Expose.GroupBy(e => (e.ContentKey, e.Culture, e.Segment));
+        var exposeGroups = publishedBlockListValue.Expose.GroupBy(e => (e.ContentKey, e.Culture));
         Assert.IsTrue(
             exposeGroups.All(g => g.Count() == 1),
-            $"Duplicate Expose entries found. Expose: {string.Join(", ", publishedBlockListValue.Expose.Select(e => $"{e.ContentKey}:{e.Culture}:{e.Segment}"))}");
+            $"Duplicate Expose entries found. Expose: {string.Join(", ", publishedBlockListValue.Expose.Select(e => $"{e.ContentKey}:{e.Culture}"))}");
 
         void AssertPropertyValues(
             string culture,

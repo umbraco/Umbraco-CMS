@@ -15,5 +15,5 @@ export interface UmbStructureItemModel extends UmbStructureItemModelBase {
 }
 
 export interface UmbVariantStructureItemModel extends UmbStructureItemModelBase {
-	variants: Array<{ name: string; culture: string | null; segment: string | null }>;
+	variants: Array<{ name: string; culture: string | null }>;
 }
