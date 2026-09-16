@@ -51,6 +51,8 @@ describe('UmbFolderWorkspaceEditorElement', () => {
 	const forbiddenView = () => element.shadowRoot!.querySelector('umb-entity-detail-forbidden');
 	const workspaceEditor = () => element.shadowRoot!.querySelector('umb-workspace-editor');
 
+	// The workspace context is consumed asynchronously, so it arrives after the element's first
+	// render. Yield a task to let it land, then await the render its state changes schedule.
 	const settle = async () => {
 		await aTimeout(0);
 		await element.updateComplete;
