@@ -216,6 +216,7 @@ test('can search a dictionary item in list when have no results', async ({umbrac
 
 test('cannot create a dictionary item with a duplicate name', async ({umbracoApi, umbracoUi}) => {
   // Arrange
+  await umbracoApi.dictionary.ensureNameNotExists(dictionaryName);
   await umbracoApi.dictionary.create(dictionaryName);
   await umbracoUi.dictionary.goToSection(ConstantHelper.sections.dictionary);
 

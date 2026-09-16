@@ -1,7 +1,5 @@
 import {ConstantHelper, test} from '@umbraco/acceptance-test-helpers';
 
-// Regression tests for https://github.com/umbraco/Umbraco-CMS/pull/23706
-
 const contentName = 'TestContent';
 const documentTypeName = 'TestDocumentTypeForContent';
 const dataTypeName = 'Textstring';
@@ -22,7 +20,7 @@ test.afterEach(async ({umbracoApi}) => {
 });
 
 // Product gap (#23706): a client-side mandatory error is lost on re-render after switching tabs and
-// culture, even though the field is genuinely still empty when returning to it. Verified live - the
+// culture, even though the field is genuinely still empty when returning to it. Verified live that the
 // validation message renders correctly before switching, then never reappears after switching back.
 test.skip('client-side mandatory error survives a tab switch and a culture switch', async ({umbracoApi, umbracoUi}) => {
   // Arrange

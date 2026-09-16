@@ -30,6 +30,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(blockName);
   await umbracoApi.dataType.ensureNameNotExists(blockListName);
   await umbracoApi.dataType.ensureNameNotExists(propertyEditorName);
+  await umbracoApi.language.ensureIsoCodeNotExists('da');
 });
 
 test('cannot publish a block list with a mandatory radiobox without a value', async ({umbracoApi, umbracoUi}) => {
@@ -157,7 +158,6 @@ test('cannot update a variant block list with invalid text', {tag: '@release'}, 
   await umbracoUi.content.doesPropertyContainValue(textStringElementDataTypeName, correctPropertyValue);
 });
 
-// Regression tests for https://github.com/umbraco/Umbraco-CMS/pull/23706
 test('shows a server-side validation error on the right property of a shared block with a culture-varying value', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringElementDataTypeName = 'Textstring';
@@ -194,7 +194,6 @@ test('shows a server-side validation error on the right property of a shared blo
   expect(await umbracoApi.document.isDocumentPublished(contentId)).toBeTruthy();
 });
 
-// Regression tests for https://github.com/umbraco/Umbraco-CMS/pull/23706
 test('clears block list validation after deleting the invalid block', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringElementDataTypeName = 'Textstring';
