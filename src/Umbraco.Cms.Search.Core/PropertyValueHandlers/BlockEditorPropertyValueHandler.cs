@@ -21,6 +21,12 @@ namespace Umbraco.Cms.Search.Core.PropertyValueHandlers;
 /// </summary>
 internal abstract class BlockEditorPropertyValueHandler : IPropertyValueHandler
 {
+    // Tracks the external elements currently being flattened up the recursion chain, so a circular reference between
+    // reusable elements (an element that, directly or transitively, contains a block referencing itself) is detected
+    // and skipped instead of recursing indefinitely. AsyncLocal so it stays correctly scoped when documents are
+    // indexed concurrently, even though the recursion itself is synchronous.
+    private static readonly AsyncLocal<HashSet<Guid>?> _externalElementAncestryChain = new();
+
     private readonly IJsonSerializer _jsonSerializer;
     private readonly IContentTypeService _contentTypeService;
     private readonly IElementService _elementService;
@@ -385,6 +391,8 @@ internal abstract class BlockEditorPropertyValueHandler : IPropertyValueHandler
 
         var propertyCultures = GetPropertyCultures(property.PropertyType, culture, published, contentContext);
 
+        HashSet<Guid> ancestryChain = _externalElementAncestryChain.Value ??= [];
+
         foreach (IElement element in _elementService.GetByIds(externalContentKeys))
         {
             if (element.Trashed || element.Published is false)
@@ -392,62 +400,79 @@ internal abstract class BlockEditorPropertyValueHandler : IPropertyValueHandler
                 continue;
             }
 
-            foreach (var propertyCulture in propertyCultures)
+            if (ancestryChain.Add(element.Key) is false)
             {
-                foreach (IProperty elementProperty in element.Properties)
+                // this element is already being flattened further up the recursion chain - i.e. it (directly or
+                // transitively) references itself. Skip it here to avoid recursing indefinitely.
+                _logger.LogWarning(
+                    "Circular reference detected while indexing external block element {elementKey} - skipped to avoid infinite recursion.",
+                    element.Key);
+                continue;
+            }
+
+            try
+            {
+                foreach (var propertyCulture in propertyCultures)
                 {
-                    IPropertyType propertyType = elementProperty.PropertyType;
-
-                    // as with locally contained blocks, a nested property type set to invariant is still valid
-                    // even if the requested variation is explicit - force it to the requested variation in that case.
-                    if (culture is not null)
+                    foreach (IProperty elementProperty in element.Properties)
                     {
-                        propertyType.Variations |= ContentVariation.Culture;
-                    }
+                        IPropertyType propertyType = elementProperty.PropertyType;
 
-                    if (segment is not null)
-                    {
-                        propertyType.Variations |= ContentVariation.Segment;
-                    }
-
-                    if (propertyType.VariesByCulture() && propertyCulture is null)
-                    {
-                        continue;
-                    }
-
-                    IDataEditor? editor = _propertyEditorCollection[propertyType.PropertyEditorAlias];
-                    if (editor is null)
-                    {
-                        _logger.LogDebug(
-                            "No property editor found for property editor alias {propertyEditorAlias} - skipped indexing of external element property value.",
-                            propertyType.PropertyEditorAlias);
-                        continue;
-                    }
-
-                    IPropertyValueHandler? elementPropertyValueHandler = _propertyValueHandlerCollection.GetPropertyValueHandler(propertyType);
-                    if (elementPropertyValueHandler is null)
-                    {
-                        _logger.LogDebug(
-                            "No property value handler found for property editor alias {propertyEditorAlias} - skipped indexing of external element property value.",
-                            propertyType.PropertyEditorAlias);
-                        continue;
-                    }
-
-                    IndexField[] elementPropertyIndexFields = elementPropertyValueHandler
-                        .GetIndexFields(elementProperty, propertyCulture, segment, published, contentContext)
-                        .ToArray();
-
-                    foreach (IndexField elementPropertyIndexField in elementPropertyIndexFields)
-                    {
-                        if (cumulativeIndexValuesByVariation.TryGetValue((elementPropertyIndexField.Culture, elementPropertyIndexField.Segment), out CumulativeIndexValue? elementIndexValue) is false)
+                        // as with locally contained blocks, a nested property type set to invariant is still valid
+                        // even if the requested variation is explicit - force it to the requested variation in that case.
+                        if (culture is not null)
                         {
-                            elementIndexValue = new CumulativeIndexValue();
-                            cumulativeIndexValuesByVariation.Add((elementPropertyIndexField.Culture, elementPropertyIndexField.Segment), elementIndexValue);
+                            propertyType.Variations |= ContentVariation.Culture;
                         }
 
-                        AmendCumulativeIndexValue(elementIndexValue, elementPropertyIndexField.Value);
+                        if (segment is not null)
+                        {
+                            propertyType.Variations |= ContentVariation.Segment;
+                        }
+
+                        if (propertyType.VariesByCulture() && propertyCulture is null)
+                        {
+                            continue;
+                        }
+
+                        IDataEditor? editor = _propertyEditorCollection[propertyType.PropertyEditorAlias];
+                        if (editor is null)
+                        {
+                            _logger.LogDebug(
+                                "No property editor found for property editor alias {propertyEditorAlias} - skipped indexing of external element property value.",
+                                propertyType.PropertyEditorAlias);
+                            continue;
+                        }
+
+                        IPropertyValueHandler? elementPropertyValueHandler = _propertyValueHandlerCollection.GetPropertyValueHandler(propertyType);
+                        if (elementPropertyValueHandler is null)
+                        {
+                            _logger.LogDebug(
+                                "No property value handler found for property editor alias {propertyEditorAlias} - skipped indexing of external element property value.",
+                                propertyType.PropertyEditorAlias);
+                            continue;
+                        }
+
+                        IndexField[] elementPropertyIndexFields = elementPropertyValueHandler
+                            .GetIndexFields(elementProperty, propertyCulture, segment, published, contentContext)
+                            .ToArray();
+
+                        foreach (IndexField elementPropertyIndexField in elementPropertyIndexFields)
+                        {
+                            if (cumulativeIndexValuesByVariation.TryGetValue((elementPropertyIndexField.Culture, elementPropertyIndexField.Segment), out CumulativeIndexValue? elementIndexValue) is false)
+                            {
+                                elementIndexValue = new CumulativeIndexValue();
+                                cumulativeIndexValuesByVariation.Add((elementPropertyIndexField.Culture, elementPropertyIndexField.Segment), elementIndexValue);
+                            }
+
+                            AmendCumulativeIndexValue(elementIndexValue, elementPropertyIndexField.Value);
+                        }
                     }
                 }
+            }
+            finally
+            {
+                ancestryChain.Remove(element.Key);
             }
         }
     }
