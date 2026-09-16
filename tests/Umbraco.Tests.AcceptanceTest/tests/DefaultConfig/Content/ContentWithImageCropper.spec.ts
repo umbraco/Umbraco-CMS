@@ -120,5 +120,6 @@ test('can not publish a mandatory image cropper with an empty value', async ({um
   // Assert
   await umbracoUi.content.isErrorNotificationVisible();
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
+  await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.nullValue);
 });
 

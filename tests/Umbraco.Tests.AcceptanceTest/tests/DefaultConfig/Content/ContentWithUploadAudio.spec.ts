@@ -130,5 +130,6 @@ test('can not publish a mandatory upload audio with an empty value', async ({umb
 
   // Assert
   await umbracoUi.content.isErrorNotificationVisible();
+  await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.nullValue);
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
 });

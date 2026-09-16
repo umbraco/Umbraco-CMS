@@ -143,5 +143,6 @@ test('can not publish a mandatory upload file with an empty value', async ({umbr
 
   // Assert
   await umbracoUi.content.isErrorNotificationVisible();
+  await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.nullValue);
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
 });
