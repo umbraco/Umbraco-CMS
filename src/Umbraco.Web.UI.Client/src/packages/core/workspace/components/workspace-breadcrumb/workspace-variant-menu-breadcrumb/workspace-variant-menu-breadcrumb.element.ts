@@ -105,16 +105,16 @@ export class UmbWorkspaceVariantMenuBreadcrumbElement extends UmbLitElement {
 	#getItemVariantName(structureItem: UmbVariantStructureItemModel) {
 		// If the active workspace is a variant, we will try to find the matching variant name.
 		if (!this._workspaceActiveVariantId?.isInvariant()) {
-			const variant = structureItem.variants.find((variantId) => this._workspaceActiveVariantId?.compare(variantId));
+			const variant = structureItem.variants.find(
+				(variant) => variant.culture === this._workspaceActiveVariantId?.culture,
+			);
 			if (variant) {
 				return variant.name;
 			}
 		}
 
 		// Next try to find the variant that matches the current app culture.
-		const variant = structureItem.variants.find(
-			(variant) => variant.culture === this._appCurrentCulture && variant.segment === null,
-		);
+		const variant = structureItem.variants.find((variant) => variant.culture === this._appCurrentCulture);
 		if (variant) {
 			if (this._workspaceActiveVariantId?.isInvariant()) {
 				// If the active variant is invariant, we return the default name as the name without parentheses.
@@ -125,17 +125,13 @@ export class UmbWorkspaceVariantMenuBreadcrumbElement extends UmbLitElement {
 		}
 
 		// Next try to find the variant that matches the app default culture.
-		const defaultVariant = structureItem.variants.find(
-			(variant) => variant.culture === this._appDefaultCulture && variant.segment === null,
-		);
+		const defaultVariant = structureItem.variants.find((variant) => variant.culture === this._appDefaultCulture);
 		if (defaultVariant) {
 			return `(${defaultVariant.name})`;
 		}
 
 		// Next try to find the invariant variant name.
-		const invariantVariant = structureItem.variants.find(
-			(variant) => variant.culture === null && variant.segment === null,
-		);
+		const invariantVariant = structureItem.variants.find((variant) => variant.culture === null);
 		if (invariantVariant) {
 			return invariantVariant.name;
 		}

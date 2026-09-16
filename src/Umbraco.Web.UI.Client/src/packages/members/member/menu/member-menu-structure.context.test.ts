@@ -83,13 +83,12 @@ class UmbTestMemberMenuStructureHostElement extends UmbControllerHostElementMixi
 const ROOT_ITEM: UmbVariantStructureItemModel = {
 	unique: null,
 	entityType: UMB_MEMBER_ROOT_ENTITY_TYPE,
-	variants: [{ name: '#treeHeaders_member', culture: null, segment: null }],
+	variants: [{ name: '#treeHeaders_member', culture: null }],
 };
 
 const INPUT_VARIANT: UmbEntityVariantModel = {
 	name: 'John Doe',
 	culture: null,
-	segment: null,
 	createDate: null,
 	updateDate: null,
 	flags: [],
@@ -98,7 +97,7 @@ const INPUT_VARIANT: UmbEntityVariantModel = {
 const CURRENT_ITEM: UmbVariantStructureItemModel = {
 	unique: 'test-unique',
 	entityType: UMB_MEMBER_ENTITY_TYPE,
-	variants: [{ name: 'John Doe', culture: null, segment: null }],
+	variants: [{ name: 'John Doe', culture: null }],
 };
 
 async function flushMicrotasks() {
