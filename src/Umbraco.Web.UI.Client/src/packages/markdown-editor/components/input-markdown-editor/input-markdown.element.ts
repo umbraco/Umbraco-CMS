@@ -144,6 +144,7 @@ export class UmbInputMarkdownElement extends UmbFormControlMixin<string, typeof 
 		super.updated(changedProperties);
 		if (changedProperties.has('readonly')) {
 			this.#scrollObserver.disconnect();
+			this._isSticky = false;
 			if (!this.readonly && this._toolbarElement) {
 				this.#scrollObserver.observe(this._toolbarElement);
 			}
@@ -153,6 +154,7 @@ export class UmbInputMarkdownElement extends UmbFormControlMixin<string, typeof 
 	override disconnectedCallback(): void {
 		super.disconnectedCallback();
 		this.#scrollObserver.disconnect();
+		this._isSticky = false;
 	}
 
 	#onCodeEditorLoaded(event: UmbCodeEditorLoadedEvent) {
