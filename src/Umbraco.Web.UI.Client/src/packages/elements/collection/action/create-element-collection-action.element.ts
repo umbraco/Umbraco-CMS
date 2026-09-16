@@ -1,6 +1,10 @@
 import { UmbElementTypeStructureRepository } from '../../repository/structure/index.js';
 import { UMB_CREATE_ELEMENT_WORKSPACE_PATH_PATTERN } from '../../paths.js';
 import { UMB_ELEMENT_ROOT_ENTITY_TYPE } from '../../entity.js';
+import {
+	UMB_ELEMENT_USER_PERMISSION_CONDITION_ALIAS,
+	UMB_USER_PERMISSION_ELEMENT_CREATE,
+} from '../../user-permissions/constants.js';
 import type { UmbAllowedElementTypeModel } from '../../repository/structure/index.js';
 import type { UmbElementEntityTypeUnion } from '../../entity.js';
 import {
@@ -15,7 +19,7 @@ import {
 } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbExtensionsApiInitializer } from '@umbraco-cms/backoffice/extension-api';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { createExtensionApiByAlias, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
 import type { ManifestCollectionAction } from '@umbraco-cms/backoffice/collection';
 import type { ManifestEntityCreateOptionAction } from '@umbraco-cms/backoffice/entity-create-option-action';
@@ -50,6 +54,9 @@ export class UmbCreateElementCollectionActionElement extends UmbLitElement {
 
 	#elementTypeStructureRepository = new UmbElementTypeStructureRepository(this);
 
+	// Conditions only report a change, so an unmet permission never calls back — default to denied.
+	#createPermitted = false;
+
 	constructor() {
 		super();
 
@@ -58,15 +65,37 @@ export class UmbCreateElementCollectionActionElement extends UmbLitElement {
 			this._parentUnique = entityContext.getUnique();
 			this._parentEntityType = entityContext.getEntityType();
 			this.#initCreateOptionActions();
+			this.#retrieveAllowedElementTypes();
 		});
+
+		createExtensionApiByAlias(this, UMB_ELEMENT_USER_PERMISSION_CONDITION_ALIAS, [
+			{
+				config: {
+					alias: UMB_ELEMENT_USER_PERMISSION_CONDITION_ALIAS,
+					allOf: [UMB_USER_PERMISSION_ELEMENT_CREATE],
+				},
+				onChange: (permitted: boolean) => {
+					this.#createPermitted = permitted;
+					this.#retrieveAllowedElementTypes();
+				},
+			},
+		]);
 	}
 
-	override async firstUpdated() {
-		const parentUnique = this._parentUnique ?? null;
-		const { data } = await this.#elementTypeStructureRepository.requestAllowedChildrenOf(null, parentUnique);
-		if (data?.items) {
-			this._allowedElementTypes = data.items;
+	async #retrieveAllowedElementTypes() {
+		if (this._parentEntityType === undefined) return;
+
+		if (this.#createPermitted === false) {
+			this._allowedElementTypes = [];
+			this._loaded = true;
+			return;
 		}
+
+		const { data } = await this.#elementTypeStructureRepository.requestAllowedChildrenOf(
+			null,
+			this._parentUnique ?? null,
+		);
+		this._allowedElementTypes = data?.items ?? [];
 		this._loaded = true;
 	}
 
