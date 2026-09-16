@@ -43,7 +43,7 @@ export class UserUiHelper extends UiBaseLocators {
     this.addUserGroupsBtn = page.locator('#userGroups').getByLabel('open', {exact: true});
     this.openUserGroupsBtn = page.locator('[label="Groups"]').getByLabel('open', {exact: true});
     this.chooseUserGroupsBtn = page.locator('umb-user-group-input').getByLabel('Choose');
-    this.updatedNameOfTheUserTxt = page.locator('umb-workspace-header-name-editable').locator('input');
+    this.updatedNameOfTheUserTxt = page.getByTestId('input:workspace-name').locator('#input');
     this.changePasswordBtn = page.getByLabel('Change password');
     this.searchInUserSectionTxt = page.locator('umb-collection-filter-field #input');
     this.userSectionCard = page.locator('uui-card-user');
