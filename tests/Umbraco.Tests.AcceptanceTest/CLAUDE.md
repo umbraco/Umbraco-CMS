@@ -107,9 +107,9 @@ Fixed sleeps (`page.waitForTimeout(...)`, `ConstantHelper.wait.*`) are the singl
 
 **Before blaming the test, check the instance.** Scheduled publishing firing mid-test is a flake the suite guards against *in CI only* — the nightly pipeline copies `SuspendScheduledPublishingComposer` (and SQL Server delayed durability) from `tests/Umbraco.Tests.AcceptanceTest.UmbracoProject/` into the instance it builds. A local instance has neither, and `src/Umbraco.Web.UI` additionally runs ModelsBuilder in `InMemoryAuto`, regenerating models on every content-type change in a suite that changes them constantly. A flake that reproduces only locally is often that difference. See README.md → Prerequisites.
 
-**Known debt — the suite has not finished paying this off.** 91 `waitForTimeout` calls remain, concentrated in `ContentUiHelper`, `LibraryUiHelper` and `UiBaseLocators`. Only **10 of them carry a justification**; the other 81 do not. Treat them as debt, not as precedent: the fact that a neighbouring method sleeps is not a reason for a new one to.
+**Known debt — the suite has not finished paying this off.** 91 `waitForTimeout` calls remain, concentrated in `ContentUiHelper` (23), `LibraryUiHelper` (20) and `UiBaseLocators` (17). **24 carry a justification**; the other 67 do not. Treat them as debt, not as precedent: the fact that a neighbouring method sleeps is not a reason for a new one to.
 
-`BasePage.waitForTimeout()` and `UiHelpers.waitForTimeout()` exist and are exported, so they stay — but reach for them only when there is genuinely no observable state to wait on, and **leave a comment saying what the sleep stands in for** (as `FormsUiHelper` does). That comment is the contract: the audit counts unjustified sleeps only, so a justified one is allowed and does not fail the build. When you remove one, replace it with a wait on the state it was covering for, and verify the spec still passes against a running instance.
+`BasePage.waitForTimeout()` and `UiHelpers.waitForTimeout()` exist and are exported, so they stay — but reach for them only when there is genuinely no observable state to wait on, and **leave a comment saying what the sleep stands in for** (as `FormsUiHelper` does). That comment is the contract, and it is the only thing distinguishing a considered sleep from a hedge — nothing checks it for you. When you remove one, replace it with a wait on the state it was covering for, and verify the spec still passes against a running instance.
 
 ### Waiting for API responses
 `UiBaseLocators.waitForResponseAfterExecutingPromise(url, promise, statusCode, method?)` resolves on the first response whose URL **contains** `url`, whose status matches, and — when `method` is given — whose request method matches. It **returns the affected id**: the `Location` header's last segment for a 201, otherwise the trailing path segment of the response URL. Endpoint constants live in `ConstantHelper.apiEndpoints`, status codes in `ConstantHelper.statusCodes`, methods in `ConstantHelper.httpMethods`.
@@ -124,17 +124,19 @@ Fixed sleeps (`page.waitForTimeout(...)`, `ConstantHelper.wait.*`) are the singl
 ### `this.click()` vs raw `.click()`
 `BasePage.click()` awaits `toBeVisible` before clicking. Use it — that wait is the whole point, and a click on an element that has not rendered yet is a flake with a misleading message.
 
-Two cases legitimately click raw, and the audit does not count either:
+Two cases legitimately click raw:
 
 - **The receiver was already awaited visible.** `hoverAndClick` asserts `toBeVisible` on both locators before clicking, so wrapping it again would add nothing.
 - **The click needs an option `this.click()` cannot express.** It takes only `{force, timeout}`, so a middle-click (`clearTipTapEditor` uses one to avoid opening a block in the RTE) or a modifier click has no wrapper available. Wait for visibility yourself on the line before.
 
-Anything else is counted, at a budget of **0**. What the rule looks for is a click with no visibility wait, not the spelling of the call — it reads back a few lines for a `toBeVisible` or `waitForVisible` naming the same receiver. Its previous version excluded any line matching `locator.click`, which exempted a call purely because its variable was named `locator`, and four of its five findings were false positives while the one real case — a chained `.filter(...).locator(...).click()` with no wait at all — sat in the same list.
+Anything else should use `this.click()`. What matters is whether visibility is awaited, not the spelling of the call — a raw `.click()` a line after a `toBeVisible` on the same receiver is fine, and a chained `.filter(...).locator(...).click()` with no wait at all is not, however tidy it looks.
 
 ### `force: true` needs the same justification as a sleep
 `force: true` switches off Playwright's actionability checks — visibility, stability, hit-target. That is exactly how "the element is covered", "the element is still animating" and "another element is intercepting the click" stop being failures and become passes. It is a legitimate escape hatch (a known-harmless overlay, a control the browser reports as unstable but is fine to hit), but it is never free.
 
-The suite has **79 force clicks, none of them justified** — same debt shape as the sleeps, and budgeted the same way. Write a comment saying which actionability check you are overriding and why it is safe; a force click with no comment is indistinguishable from a masked bug, and the audit counts it.
+The suite has **78 force clicks outside `FormsUiHelper`, none of them justified** — the same debt shape as the sleeps. Write a comment saying which actionability check you are overriding and why it is safe; a force click with no comment is indistinguishable from a masked bug.
+
+Working out whether a given one is still needed takes a run, not a read: the only way to learn which check it overrides is to remove it and see which one then fails.
 
 ### A check either asserts or returns — never both shapes under one name
 `does*` / `is*` / `has*` methods come in two kinds, and **451 of the 464 in `lib/` assert internally** (they `await` an assertion and return void):
@@ -266,13 +268,13 @@ The two `get*` helpers are what made the deep cases tractable. `getOnlyPropertyV
 
 **Concentration is what decides whether a helper earns its place, not the raw count.** Twenty-two `.id` assertions across sixteen files are a genuine long tail — a helper would add an indirection per file and buy nothing. Twenty-three property-definition assertions across *three* files are not: they were all `properties[0].<field>`, one positional lookup repeated, which is exactly what `getPropertyValue` was introduced to remove on the values side. That cluster is now `getPropertyDefinition(data, alias)` and `getOnlyPropertyDefinition(data)`.
 
-The next two worth doing on the same grounds are **user-group access flags** (22 lines, 2 files) and **domains** (13 lines, 2 files). The rest are long tail: add a helper when you touch one and it earns its place, and do not add new raw assertions, since the audit will fail.
+The next two worth doing on the same grounds are **user-group access flags** (22 lines, 2 files) and **domains** (13 lines, 2 files). The rest are long tail: add a helper when you touch one and it earns its place, and prefer a helper over a new raw assertion.
 
 **One index stays on purpose.** The three "can reorder properties" tests assert `properties[0].name` and `properties[1].name` — there the position *is* the subject, the same exemption a parameterised `.nth(i)` gets. Two of the three asserted only `properties[0]`, which cannot tell a reorder from a property being dropped or duplicated; both now assert the second position too, matching the document-type test that had it right.
 
 ### An assertion that cannot distinguish pass from fail
 
-The audit is a text scanner; no rule in it can tell whether a test asserts the *right* thing. Reading specs is the only way to close that gap, and this is the shape to look for:
+No scanner can tell whether a test asserts the *right* thing. Reading specs is the only way to find this, and this is the shape to look for:
 
 ```ts
 // ✗ the filename is `{id}.udt` with or without descendants, so this passes identically
@@ -444,7 +446,7 @@ Rules: a new disabled test needs an annotation, and prefer `type: 'issue'` with 
 The two categories that are not really "skipped tests" at all:
 
 - **`todo` (3)** — `ContentWithBlockGrid`/`ContentWithBlockList` "can move blocks in the content" and `User` "can change from grid to table view". The body is `// TODO: Implement it later`. A skipped empty stub asserts nothing and documents nothing; write it or delete it.
-- **`fixme` (17)** — two in `BlockGridEditor` (moving a block between groups, deleting a group) with complete arrange/act/assert bodies, so something once worked and then didn't; both need one run against a current build to decide product bug vs stale test. The other fifteen are `CreatedPackages`, which had been commented out wholesale since the v15 era: uncommenting them changed nothing about what runs, but it moved 15 tests from invisible to countable, which is why the suite total went from 1651 to 1651. Enable them one at a time against a running instance.
+- **`fixme` (17)** — two in `BlockGridEditor` (moving a block between groups, deleting a group) with complete arrange/act/assert bodies, so something once worked and then didn't; both need one run against a current build to decide product bug vs stale test. The other fifteen are `CreatedPackages`, which had been commented out wholesale since the v15 era: uncommenting them changed nothing about what runs, but it moved 15 tests from invisible to countable, which is why the suite total went from 1636 to 1651. Enable them one at a time against a running instance.
 
 If a test is off because the *feature* was removed, delete it — a permanent skip is not documentation.
 
@@ -480,7 +482,7 @@ abstract getValues(): DataTypeValues
 
 **The part that is easy to get wrong:** annotating the base class alone achieves nothing. Every subclass declared `let values: any[] = []` and pushed into it, so the `any` swallowed the mistake long before it reached the return type — the annotation type-checked and caught precisely zero real errors. The 33 subclasses now declare `const values: DataTypeValues = []`, and with that in place a misspelled `allias:` fails compilation with *"Did you mean to write 'alias'?"*. **An `any` anywhere on the path to `build()` defeats the whole exercise** — so when you touch a builder, check the local the exit returns is declared, not just the exit.
 
-The remaining debt is not in those 33 subclasses — it is in the **sub-builders**, which return an inline object literal or push into a `let values: any = {}`. There a declared return type does do the work: TypeScript's excess-property check fires on a literal in a return position and names the mistake. That is what the audit's `untypedBuilderExit` now counts, so paying it off means giving each sub-builder's item shape an interface — not sprinkling annotations on the exits that are already checked.
+The remaining debt is not in those 33 subclasses — it is in the **sub-builders**, which return an inline object literal or push into a `let values: any = {}`. There a declared return type does do the work: TypeScript's excess-property check fires on a literal in a return position and names the mistake. So paying it off means giving each sub-builder's item shape an interface — not sprinkling annotations on the exits that are already checked.
 
 **What is typed now.** `types.ts` carries the payload envelopes: `EntityVariant` and
 `EntityPropertyValue` for the five variant and five value builders; `DocumentPayload`,
@@ -532,7 +534,7 @@ It survives because the key name and the field name differ *legitimately* almost
 
 When adding or reviewing a setter, check by hand that the field is read in the exit method. Nothing catches this otherwise: not `tsc`, and not a green test run.
 
-**The same class exists one layer up, in the helpers: a parameter the body never reads.** The audit checks for it (`unusedHelperParam`), and the shape to fear is a negation flag — an ignored `isVisible: boolean = true` means a caller passing `false` still gets the *positive* assertion, so the test asserts the opposite of what it reads. The suite currently has **zero** of those; the one finding is a vestigial `pageDocumentTypeAlias` on `TemplateApiHelper.createTemplateWithDisplayingElementPickerVarianceAndIdentityMethods`, copy-pasted from a sibling that does use it to emit a `PageIsDocumentType` line. Nothing asserts that line, so nothing fails — but a spec that passed the argument expecting it would be silently disappointed.
+**The same class exists one layer up, in the helpers: a parameter the body never reads.** The shape to fear is a negation flag — an ignored `isVisible: boolean = true` means a caller passing `false` still gets the *positive* assertion, so the test asserts the opposite of what it reads. The suite currently has **zero** of those; the one finding is a vestigial `pageDocumentTypeAlias` on `TemplateApiHelper.createTemplateWithDisplayingElementPickerVarianceAndIdentityMethods`, copy-pasted from a sibling that does use it to emit a `PageIsDocumentType` line. Nothing asserts that line, so nothing fails — but a spec that passed the argument expecting it would be silently disappointed.
 
 ---
 
