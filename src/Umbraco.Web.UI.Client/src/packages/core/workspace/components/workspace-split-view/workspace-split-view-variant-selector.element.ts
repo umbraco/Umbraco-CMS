@@ -531,12 +531,12 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 					${notCreated && !readOnly ? html`<uui-icon class="add-icon" name="icon-add"></uui-icon>` : nothing}
 					<div class="variant-info">
 						<div class="variant-name">
-							${this.#getVariantDisplayName(variantOption)}
-							<umb-entity-state-tags
-								.states=${this.#getEntityStatesForCulture(variantId.culture)}></umb-entity-state-tags>
-							${this.#renderReadOnlyTag(variantId.culture)} ${this.#renderHintBadge(!active ? hint : undefined)}
+							${this.#getVariantDisplayName(variantOption)} ${this.#renderHintBadge(!active ? hint : undefined)}
 						</div>
 						<div class="variant-details">
+							<umb-entity-state-tags
+								.states=${this.#getEntityStatesForCulture(variantId.culture)}></umb-entity-state-tags>
+							${this.#renderReadOnlyTag(variantId.culture)}
 							<span>${this._renderVariantDetails(variantOption)}</span>
 						</div>
 					</div>
@@ -599,12 +599,12 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 					${notCreated && !readOnly ? html`<uui-icon class="add-icon" name="icon-add"></uui-icon>` : nothing}
 					<div class="variant-info">
 						<div class="variant-name">
-							${this.#getVariantDisplayName(variantOption)}
-							<umb-entity-state-tags
-								.states=${this.#getEntityStatesForCulture(variantId.culture)}></umb-entity-state-tags>
-							${this.#renderReadOnlyTag(variantId.culture)}${this.#renderHintBadge(!active ? hint : undefined)}
+							${this.#getVariantDisplayName(variantOption)}${this.#renderHintBadge(!active ? hint : undefined)}
 						</div>
 						<div class="variant-details">
+							<umb-entity-state-tags
+								.states=${this.#getEntityStatesForCulture(variantId.culture)}></umb-entity-state-tags>
+							${this.#renderReadOnlyTag(variantId.culture)}
 							<span>${this._renderVariantDetails(variantOption)}</span>
 						</div>
 					</div>
@@ -724,7 +724,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 			}
 
 			uui-tag {
-				font-size: 11px;
+				font-size: 10px;
 			}
 
 			uui-scroll-container {
@@ -783,7 +783,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 				border: none;
 				background: transparent;
 				color: var(--uui-color-current-contrast);
-				padding: var(--uui-size-space-3) var(--uui-size-space-6);
+				padding: var(--uui-size-space-2) var(--uui-size-space-6);
 				font-weight: bold;
 				width: 100%;
 				text-align: left;
@@ -872,8 +872,9 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 				margin-bottom: var(--uui-size-space-1);
 			}
 
-			.switch-button.readonly-mode .variant-name {
-				margin-bottom: calc(var(--uui-size-space-1) * -1);
+			.variant-details umb-entity-state-tags {
+				display: inline-block;
+				margin-left: calc(var(--uui-size-space-1) * -1);
 			}
 
 			.add-icon {
