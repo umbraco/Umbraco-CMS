@@ -167,7 +167,7 @@ public class InvariantDocumentTests : SearcherTestBase
         await WaitForIndexing(GetIndexAlias(true), async () =>
         {
             await ContentService.SaveAsync(root, null, null, CancellationToken.None);
-            ContentService.Publish(root, new[] { "*" });
+            await ContentService.PublishAsync(root, new[] { "*" }, Constants.Security.SuperUserKey, CancellationToken.None);
         });
 
         IContent? content = ContentService.GetByIdAsync(RootKey, CancellationToken.None).GetAwaiter().GetResult();
@@ -184,7 +184,7 @@ public class InvariantDocumentTests : SearcherTestBase
             if (publish)
             {
                 await ContentService.SaveAsync(content, null, null, CancellationToken.None);
-                ContentService.Publish(content, ["*"]);
+                await ContentService.PublishAsync(content, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
             }
             else
             {

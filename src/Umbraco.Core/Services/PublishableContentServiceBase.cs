@@ -833,7 +833,17 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         return OperationResult.Succeed(eventMessages);
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    ///     Publishes content.
+    /// </summary>
+    /// <remarks>
+    ///     <para>When a culture is being published, it includes all varying values along with all invariant values.</para>
+    ///     <para>Wildcards (*) can be used as culture identifier to publish all cultures.</para>
+    ///     <para>An empty array (or a wildcard) can be passed for culture invariant content.</para>
+    /// </remarks>
+    /// <param name="content">The content to publish.</param>
+    /// <param name="cultures">The cultures to publish.</param>
+    /// <param name="userId">The identifier of the user performing the action.</param>
     public PublishResult Publish(TContent content, string[] cultures, int userId = Constants.Security.SuperUserId)
     {
         if (content == null)
@@ -2012,11 +2022,19 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
 
     protected async Task AuditAsync(AuditType type, int userId, int objectId, string? message = null, string? parameters = null)
     {
-        Guid userKey = await _userIdKeyResolver.GetAsync(userId);
+        // A content operation must never fail because its audit metadata could not be attributed - a
+        // user id with no matching key (e.g. unknown/imported content) skips the audit entry rather
+        // than aborting the caller.
+        Attempt<Guid> userKeyAttempt = await _userIdKeyResolver.TryGetAsync(userId);
+        if (userKeyAttempt.Success is false)
+        {
+            Logger.LogWarning("Could not resolve a user key for user id {UserId} - skipping the {AuditType} audit entry for {ObjectId}.", userId, type, objectId);
+            return;
+        }
 
         await _auditService.AddAsync(
             type,
-            userKey,
+            userKeyAttempt.Result,
             objectId,
             ContentObjectType.GetName(),
             message,

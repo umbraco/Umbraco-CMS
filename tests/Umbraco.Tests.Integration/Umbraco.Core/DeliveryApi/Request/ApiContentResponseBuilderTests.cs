@@ -73,12 +73,12 @@ public class ApiContentResponseBuilderTests : UmbracoIntegrationTest
             .WithCultureName("da-DK", "Content DA")
             .Build();
         await ContentService.SaveAsync(content, null, null, CancellationToken.None);
-        ContentService.Publish(content, ["*"]);
+        await ContentService.PublishAsync(content, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         Thread.Sleep(200);
         content.SetCultureName("Content DA updated", "da-DK");
         await ContentService.SaveAsync(content, null, null, CancellationToken.None);
-        ContentService.Publish(content, ["da-DK"]);
+        await ContentService.PublishAsync(content, ["da-DK"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         RefreshContentCache();
 

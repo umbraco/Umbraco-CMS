@@ -844,7 +844,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         document.SetValue("value1", "v1en-init", "en");
         document.SetValue("value1", "v1fr-init", "fr");
         await ContentService.SaveAsync(document, null, null, CancellationToken.None);
-        ContentService.Publish(document, document.AvailableCultures.ToArray()); // all values are published which means the document is not 'edited'
+        await ContentService.PublishAsync(document, document.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None); // all values are published which means the document is not 'edited'
 
         document = await ContentService.GetByIdAsync(document.Key, CancellationToken.None);
         Assert.IsFalse(document.IsCultureEdited("en"));
@@ -893,7 +893,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         // update the invariant value and publish
         document.SetValue("value1", "v1inv");
         await ContentService.SaveAsync(document, null, null, CancellationToken.None);
-        ContentService.Publish(document, document.AvailableCultures.ToArray());
+        await ContentService.PublishAsync(document, document.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         document = await ContentService.GetByIdAsync(document.Key, CancellationToken.None);
         Assert.AreEqual("doc1en", document.Name);
@@ -938,7 +938,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         document.SetValue("value1", "v1en2", "en"); // update the value now that it's variant again
         document.SetValue("value1", "v1fr2", "fr"); // update the value now that it's variant again
         await ContentService.SaveAsync(document, null, null, CancellationToken.None);
-        ContentService.Publish(document, document.AvailableCultures.ToArray());
+        await ContentService.PublishAsync(document, document.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         document = await ContentService.GetByIdAsync(document.Key, CancellationToken.None);
         Assert.AreEqual("doc1en", document.Name);
@@ -977,7 +977,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         document.SetCultureName("doc1fr", "fr");
         document.SetValue("value1", "v1en-init");
         await ContentService.SaveAsync(document, null, null, CancellationToken.None); // all values are published which means the document is not 'edited'
-        ContentService.Publish(document, document.AvailableCultures.ToArray());
+        await ContentService.PublishAsync(document, document.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         document = await ContentService.GetByIdAsync(document.Key, CancellationToken.None);
         Assert.IsFalse(document.IsCultureEdited("en"));
@@ -1011,7 +1011,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         // update the culture value and publish
         document.SetValue("value1", "v1en2", "en");
         await ContentService.SaveAsync(document, null, null, CancellationToken.None);
-        ContentService.Publish(document, document.AvailableCultures.ToArray());
+        await ContentService.PublishAsync(document, document.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         document = await ContentService.GetByIdAsync(document.Key, CancellationToken.None);
         Assert.AreEqual("doc1en", document.Name);
@@ -1360,7 +1360,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         document.SetCultureName("doc1fr", "fr");
         document.SetValue("title", "hello world"); // invariant property
         await ContentService.SaveAsync(document, null, null, CancellationToken.None);
-        ContentService.Publish(document, new[] { "fr" }); // Only publish in French
+        await ContentService.PublishAsync(document, new[] { "fr" }, Constants.Security.SuperUserKey, CancellationToken.None); // Only publish in French
 
         document = await ContentService.GetByIdAsync(document.Key, CancellationToken.None);
         Assert.IsNull(document.GetCultureName("en")); // No English version exists
@@ -1409,7 +1409,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         document.SetCultureName("doc1fr", "fr");
         document.SetValue("title", "bonjour monde", "fr"); // variant property value in French only
         await ContentService.SaveAsync(document, null, null, CancellationToken.None);
-        ContentService.Publish(document, new[] { "fr" }); // Only publish in French
+        await ContentService.PublishAsync(document, new[] { "fr" }, Constants.Security.SuperUserKey, CancellationToken.None); // Only publish in French
 
         document = await ContentService.GetByIdAsync(document.Key, CancellationToken.None);
         Assert.IsNull(document.GetCultureName("en")); // No English version exists
@@ -1455,7 +1455,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         document.SetCultureName("doc1fr", "fr");
         document.SetValue("title", "hello world"); // invariant property
         await ContentService.SaveAsync(document, null, null, CancellationToken.None);
-        ContentService.Publish(document, new[] { "fr" }); // Only publish in French
+        await ContentService.PublishAsync(document, new[] { "fr" }, Constants.Security.SuperUserKey, CancellationToken.None); // Only publish in French
 
         document = await ContentService.GetByIdAsync(document.Key, CancellationToken.None);
         Assert.IsNull(document.GetCultureName("en"));
@@ -1505,7 +1505,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         document.Name = "doc1";
         document.SetValue("title", "hello world");
         await ContentService.SaveAsync(document, null, null, CancellationToken.None);
-        ContentService.Publish(document, Array.Empty<string>());
+        await ContentService.PublishAsync(document, Array.Empty<string>(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         document = await ContentService.GetByIdAsync(document.Key, CancellationToken.None);
         Assert.AreEqual("doc1", document.Name);
@@ -1555,7 +1555,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         document.SetCultureName("doc1fr", "fr");
         document.SetValue("title", "hello world"); // invariant property
         await ContentService.SaveAsync(document, null, null, CancellationToken.None);
-        ContentService.Publish(document, new[] { "fr" }); // Only publish in French
+        await ContentService.PublishAsync(document, new[] { "fr" }, Constants.Security.SuperUserKey, CancellationToken.None); // Only publish in French
 
         document = await ContentService.GetByIdAsync(document.Key, CancellationToken.None);
         Assert.IsNull(document.GetCultureName("en")); // No English version exists
@@ -1605,7 +1605,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         document.SetCultureName("doc1fr", "fr");
         document.SetValue("title", "bonjour monde", "fr"); // variant property value in French only
         await ContentService.SaveAsync(document, null, null, CancellationToken.None);
-        ContentService.Publish(document, new[] { "fr" }); // Only publish in French
+        await ContentService.PublishAsync(document, new[] { "fr" }, Constants.Security.SuperUserKey, CancellationToken.None); // Only publish in French
 
         document = await ContentService.GetByIdAsync(document.Key, CancellationToken.None);
         Assert.IsNull(document.GetCultureName("en")); // No English version exists
@@ -1652,7 +1652,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         document.SetCultureName("doc1fr", "fr");
         document.SetValue("title", "hello world"); // invariant property
         await ContentService.SaveAsync(document, null, null, CancellationToken.None);
-        ContentService.Publish(document, new[] { "fr" }); // Only publish in French
+        await ContentService.PublishAsync(document, new[] { "fr" }, Constants.Security.SuperUserKey, CancellationToken.None); // Only publish in French
 
         document = await ContentService.GetByIdAsync(document.Key, CancellationToken.None);
         Assert.IsNull(document.GetCultureName("en"));
@@ -1703,7 +1703,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         document.Name = "doc1";
         document.SetValue("title", "hello world");
         await ContentService.SaveAsync(document, null, null, CancellationToken.None);
-        ContentService.Publish(document, Array.Empty<string>());
+        await ContentService.PublishAsync(document, Array.Empty<string>(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         document = await ContentService.GetByIdAsync(document.Key, CancellationToken.None);
         Assert.AreEqual("doc1", document.Name);

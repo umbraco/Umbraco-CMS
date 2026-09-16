@@ -52,7 +52,7 @@ public class DistributedContentIndexRebuilderTests : TestBase
                 .WithName($"Content {i}")
                 .Build();
             await ContentService.SaveAsync(content, null, null, CancellationToken.None);
-            ContentService.Publish(content, ["*"]);
+            await ContentService.PublishAsync(content, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
         }
 
         IMediaType mediaType = MediaTypeService.Get("Folder")

@@ -53,7 +53,7 @@ internal sealed class DatabaseServerMessengerMainDomTests : UmbracoIntegrationTe
         var content = ContentBuilder.CreateSimpleContent(contentType, "Test Content");
         await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
-        var publishResult = ContentService.Publish(content, Array.Empty<string>());
+        var publishResult = await ContentService.PublishAsync(content, Array.Empty<string>(), Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.That(publishResult.Success, Is.True);
 
         var maxInstructionIdAfterPublish = CacheInstructionService.GetMaxInstructionId();

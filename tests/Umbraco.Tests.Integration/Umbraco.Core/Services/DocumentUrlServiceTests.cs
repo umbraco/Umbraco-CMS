@@ -158,7 +158,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
             .Build();
         content.SetValue(Constants.Conventions.Content.UrlName, "park");
         await ContentService.SaveAsync(content, null, null, CancellationToken.None);
-        var publishResult = ContentService.Publish(content, ["*"]);
+        var publishResult = await ContentService.PublishAsync(content, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.IsTrue(publishResult.Success, $"Publish failed: {publishResult.Result}");
 
         var isoCode = (await LanguageService.GetDefaultLanguageAsync()).IsoCode;
@@ -178,7 +178,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
             .Build();
         content.SetValue(Constants.Conventions.Content.UrlName, "park");
         await ContentService.SaveAsync(content, null, null, CancellationToken.None);
-        var publishResult = ContentService.Publish(content, ["*"]);
+        var publishResult = await ContentService.PublishAsync(content, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.IsTrue(publishResult.Success, $"Publish failed: {publishResult.Result}");
 
         var isoCode = (await LanguageService.GetDefaultLanguageAsync()).IsoCode;
@@ -532,7 +532,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
 
         content.SetValue(Constants.Conventions.Content.UrlName, "custom-url");
         await ContentService.SaveAsync(content, null, null, CancellationToken.None);
-        ContentService.Publish(content, ["en-US"]);
+        await ContentService.PublishAsync(content, ["en-US"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Act
         var urlSegment = DocumentUrlService.GetUrlSegment(content.Key, "en-US", false);
@@ -584,7 +584,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
         content.SetValue(Constants.Conventions.Content.UrlName, "english-custom-url", culture: "en-US");
         content.SetValue(Constants.Conventions.Content.UrlName, "dansk-custom-url", culture: "da-DK");
         await ContentService.SaveAsync(content, null, null, CancellationToken.None);
-        ContentService.Publish(content, ["en-US", "da-DK"]);
+        await ContentService.PublishAsync(content, ["en-US", "da-DK"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Act
         var englishSegment = DocumentUrlService.GetUrlSegment(content.Key, "en-US", false);
@@ -634,7 +634,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
         // Set umbracoUrlName to empty string
         content.SetValue(Constants.Conventions.Content.UrlName, string.Empty);
         await ContentService.SaveAsync(content, null, null, CancellationToken.None);
-        ContentService.Publish(content, ["en-US"]);
+        await ContentService.PublishAsync(content, ["en-US"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Act
         var urlSegment = DocumentUrlService.GetUrlSegment(content.Key, "en-US", false);
@@ -750,7 +750,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
         // Update content to have culture-specific names (required for variant content)
         subpage.SetCultureName("Text Page 1", defaultLanguage!.IsoCode);
         await ContentService.SaveAsync(subpage, -1, null, CancellationToken.None);
-        ContentService.Publish(subpage, [defaultLanguage.IsoCode]);
+        await ContentService.PublishAsync(subpage, [defaultLanguage.IsoCode], Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Assert - URLs should now be stored with specific languageId
         List<PublishedDocumentUrlSegment> segmentsAfter;
@@ -800,7 +800,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
         // Update content with culture-specific name and republish as variant
         subpage.SetCultureName("Text Page 1", defaultLanguage!.IsoCode);
         await ContentService.SaveAsync(subpage, -1, null, CancellationToken.None);
-        ContentService.Publish(subpage, [defaultLanguage.IsoCode]);
+        await ContentService.PublishAsync(subpage, [defaultLanguage.IsoCode], Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Verify URLs are stored with specific languageId (variant)
         List<PublishedDocumentUrlSegment> variantSegments;

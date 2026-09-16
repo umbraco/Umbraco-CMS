@@ -71,7 +71,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
             "tags",
             new[] { "hello", "world", "another", "one" });
         await ContentService.SaveAsync(content1, null, null, CancellationToken.None);
-        ContentService.Publish(content1, content1.AvailableCultures.ToArray());
+        await ContentService.PublishAsync(content1, content1.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         content1 = await ContentService.GetByIdAsync(content1.Key, CancellationToken.None);
 
@@ -134,7 +134,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
             new[] { "hello", "world", "another", "one" },
             culture: "en-US");
         await ContentService.SaveAsync(content1, null, null, CancellationToken.None);
-        ContentService.Publish(content1, content1.AvailableCultures.ToArray());
+        await ContentService.PublishAsync(content1, content1.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         content1 = await ContentService.GetByIdAsync(content1.Key, CancellationToken.None);
 
@@ -194,7 +194,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
             "tags",
             new[] { "hello", "world", "another", "one" });
         await ContentService.SaveAsync(content1, null, null, CancellationToken.None);
-        ContentService.Publish(content1, content1.AvailableCultures.ToArray());
+        await ContentService.PublishAsync(content1, content1.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         contentType.Variations = ContentVariation.Culture;
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
@@ -293,7 +293,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
             new[] { "hello", "world", "another", "one" },
             culture: "en-US");
         await ContentService.SaveAsync(content1, null, null, CancellationToken.None);
-        ContentService.Publish(content1, content1.AvailableCultures.ToArray());
+        await ContentService.PublishAsync(content1, content1.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         contentType.Variations = ContentVariation.Nothing;
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
@@ -368,7 +368,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
             new[] { "hello", "world", "another", "one" },
             culture: "en-US");
         await ContentService.SaveAsync(content1, null, null, CancellationToken.None);
-        ContentService.Publish(content1, content1.AvailableCultures.ToArray());
+        await ContentService.PublishAsync(content1, content1.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         IContent content2 = ContentBuilder.CreateSimpleContent(contentType, "Tagged content 2");
         content2.SetCultureName("name-fr", "fr-FR");
@@ -390,7 +390,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
             new[] { "hello", "world", "another", "one" },
             culture: "en-US");
         await ContentService.SaveAsync(content2, null, null, CancellationToken.None);
-        ContentService.Publish(content2, content2.AvailableCultures.ToArray());
+        await ContentService.PublishAsync(content2, content2.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         //// pretend we already have invariant values
         // using (var scope = ScopeProvider.CreateScope())
@@ -442,7 +442,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
             new[] { "hello", "world", "another", "one" },
             culture: "en-US");
         await ContentService.SaveAsync(content1, null, null, CancellationToken.None);
-        ContentService.Publish(content1, content1.AvailableCultures.ToArray());
+        await ContentService.PublishAsync(content1, content1.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         propertyType.Variations = ContentVariation.Nothing;
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
@@ -520,7 +520,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
             enValue,
             culture: "en-US");
         await ContentService.SaveAsync(content1, null, null, CancellationToken.None);
-        ContentService.Publish(content1, content1.AvailableCultures.ToArray());
+        await ContentService.PublishAsync(content1, content1.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         propertyType.Variations = ContentVariation.Nothing;
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
@@ -556,7 +556,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
             "tags",
             new[] { "hello", "world", "some", "tags", "plus" });
         await ContentService.SaveAsync(content1, null, null, CancellationToken.None);
-        ContentService.Publish(content1, content1.AvailableCultures.ToArray());
+        await ContentService.PublishAsync(content1, content1.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         var content2 = ContentBuilder.CreateSimpleContent(contentType, "Tagged content 2");
         content2.AssignTags(
@@ -567,7 +567,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
             "tags",
             new[] { "hello", "world", "some", "tags" });
         await ContentService.SaveAsync(content2, null, null, CancellationToken.None);
-        ContentService.Publish(content2, content2.AvailableCultures.ToArray());
+        await ContentService.PublishAsync(content2, content2.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         // verify
         var tags = TagService.GetTagsForEntity(content1.Id);
@@ -601,7 +601,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
             "tags",
             new[] { "hello", "world", "some", "tags", "bam" });
         await ContentService.SaveAsync(content1, null, null, CancellationToken.None);
-        ContentService.Publish(content1, content1.AvailableCultures.ToArray());
+        await ContentService.PublishAsync(content1, content1.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         var content2 = ContentBuilder.CreateSimpleContent(contentType, "Tagged content 2");
         content2.AssignTags(
@@ -612,7 +612,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
             "tags",
             new[] { "hello", "world", "some", "tags" });
         await ContentService.SaveAsync(content2, null, null, CancellationToken.None);
-        ContentService.Publish(content2, content2.AvailableCultures.ToArray());
+        await ContentService.PublishAsync(content2, content2.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         // verify
         var tags = TagService.GetTagsForEntity(content1.Id);
@@ -648,7 +648,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
             "tags",
             new[] { "hello", "world", "some", "tags", "plus" });
         await ContentService.SaveAsync(content1, null, null, CancellationToken.None);
-        ContentService.Publish(content1, Array.Empty<string>());
+        await ContentService.PublishAsync(content1, Array.Empty<string>(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         var content2 = ContentBuilder.CreateSimpleContent(contentType, "Tagged content 2", content1.Id);
         content2.AssignTags(
@@ -659,7 +659,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
             "tags",
             new[] { "hello", "world", "some", "tags" });
         await ContentService.SaveAsync(content2, null, null, CancellationToken.None);
-        ContentService.Publish(content2, Array.Empty<string>());
+        await ContentService.PublishAsync(content2, Array.Empty<string>(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         // verify
         var tags = TagService.GetTagsForEntity(content1.Id);
@@ -694,7 +694,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
         Assert.AreEqual(0, allTags.Count());
 
         await ContentService.SaveAsync(content1, null, null, CancellationToken.None);
-        ContentService.Publish(content1, Array.Empty<string>());
+        await ContentService.PublishAsync(content1, Array.Empty<string>(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         Assert.IsTrue(content1.Published);
 
@@ -738,7 +738,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
             "tags",
             new[] { "hello", "world", "some", "tags", "bam" });
         await ContentService.SaveAsync(content1, null, null, CancellationToken.None);
-        ContentService.Publish(content1, content1.AvailableCultures.ToArray());
+        await ContentService.PublishAsync(content1, content1.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         var content2 = ContentBuilder.CreateSimpleContent(contentType, "Tagged content 2");
         content2.AssignTags(
@@ -749,7 +749,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
             "tags",
             new[] { "hello", "world", "some", "tags" });
         await ContentService.SaveAsync(content2, null, null, CancellationToken.None);
-        ContentService.Publish(content2, content2.AvailableCultures.ToArray());
+        await ContentService.PublishAsync(content2, content2.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         ContentService.Unpublish(content1);
         ContentService.Unpublish(content2);
@@ -779,7 +779,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
             "tags",
             new[] { "hello", "world", "some", "tags", "bam" });
         await ContentService.SaveAsync(content1, null, null, CancellationToken.None);
-        ContentService.Publish(content1, Array.Empty<string>());
+        await ContentService.PublishAsync(content1, Array.Empty<string>(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         var content2 = ContentBuilder.CreateSimpleContent(contentType, "Tagged content 2", content1);
         content2.AssignTags(
@@ -790,7 +790,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
             "tags",
             new[] { "hello", "world", "some", "tags" });
         await ContentService.SaveAsync(content2, null, null, CancellationToken.None);
-        ContentService.Publish(content2, Array.Empty<string>());
+        await ContentService.PublishAsync(content2, Array.Empty<string>(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         ContentService.Unpublish(content1);
 
@@ -805,7 +805,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
         var allTags = TagService.GetAllContentTags();
         Assert.AreEqual(0, allTags.Count());
 
-        ContentService.Publish(content1, Array.Empty<string>());
+        await ContentService.PublishAsync(content1, Array.Empty<string>(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         tags = TagService.GetTagsForEntity(content2.Id);
         Assert.AreEqual(4, tags.Count());
@@ -914,7 +914,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
             "tags",
             new[] { "hello", "world", "some", "tags" });
         await ContentService.SaveAsync(content, null, null, CancellationToken.None);
-        ContentService.Publish(content, content.AvailableCultures.ToArray());
+        await ContentService.PublishAsync(content, content.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         // edit tags and save
         content.AssignTags(
@@ -967,7 +967,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
             "tags",
             new[] { "hello", "world", "some", "tags" });
         await ContentService.SaveAsync(content, null, null, CancellationToken.None);
-        ContentService.Publish(content, Array.Empty<string>());
+        await ContentService.PublishAsync(content, Array.Empty<string>(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Assert
         Assert.AreEqual(4, content.Properties["tags"].GetValue().ToString().Split(',').Distinct().Count());
@@ -1005,7 +1005,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
             "tags",
             new[] { "hello", "world", "some", "tags" });
         await ContentService.SaveAsync(content, null, null, CancellationToken.None);
-        ContentService.Publish(content, Array.Empty<string>());
+        await ContentService.PublishAsync(content, Array.Empty<string>(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Act
         content.AssignTags(
@@ -1017,7 +1017,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
             new[] { "another", "world" },
             true);
         await ContentService.SaveAsync(content, null, null, CancellationToken.None);
-        ContentService.Publish(content, Array.Empty<string>());
+        await ContentService.PublishAsync(content, Array.Empty<string>(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Assert
         Assert.AreEqual(5, content.Properties["tags"].GetValue().ToString().Split(',').Distinct().Count());
@@ -1055,12 +1055,12 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
             "tags",
             new[] { "hello", "world", "some", "tags" });
         await ContentService.SaveAsync(content, null, null, CancellationToken.None);
-        ContentService.Publish(content, Array.Empty<string>());
+        await ContentService.PublishAsync(content, Array.Empty<string>(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Act
         content.RemoveTags(PropertyEditorCollection, DataTypeService, IdKeyMap, Serializer, "tags", new[] { "some", "world" });
         await ContentService.SaveAsync(content, null, null, CancellationToken.None);
-        ContentService.Publish(content, Array.Empty<string>());
+        await ContentService.PublishAsync(content, Array.Empty<string>(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Assert
         Assert.AreEqual(2, content.Properties["tags"].GetValue().ToString().Split(',').Distinct().Count());
@@ -1112,7 +1112,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
             new[] { "hello,world,tags", "new" });
 
         await ContentService.SaveAsync(content, null, null, CancellationToken.None);
-        ContentService.Publish(content, content.AvailableCultures.ToArray());
+        await ContentService.PublishAsync(content, content.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Act
         content = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
@@ -1165,7 +1165,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
             new[] { "hello,world,tags", "new" });
 
         await ContentService.SaveAsync(content, null, null, CancellationToken.None);
-        ContentService.Publish(content, content.AvailableCultures.ToArray());
+        await ContentService.PublishAsync(content, content.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Act
         content = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);

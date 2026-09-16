@@ -92,7 +92,7 @@ public class ZeroDowntimeReindexingTests : TestBase
             await ContentService.SaveAsync(content, null, null, CancellationToken.None);
             if (publish)
             {
-                ContentService.Publish(content, ["*"]);
+                await ContentService.PublishAsync(content, ["*"], global::Umbraco.Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
             }
         });
 
@@ -148,7 +148,7 @@ public class ZeroDowntimeReindexingTests : TestBase
             await ContentService.SaveAsync(content, null, null, CancellationToken.None);
             if (publish)
             {
-                ContentService.Publish(content, ["*"]);
+                await ContentService.PublishAsync(content, ["*"], global::Umbraco.Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
             }
         });
 
@@ -382,7 +382,7 @@ public class ZeroDowntimeReindexingTests : TestBase
 
             if (publish)
             {
-                ContentService.Publish(createResult.Result.Content!, ["*"]);
+                await ContentService.PublishAsync(createResult.Result.Content!, ["*"], global::Umbraco.Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
             }
         });
     }

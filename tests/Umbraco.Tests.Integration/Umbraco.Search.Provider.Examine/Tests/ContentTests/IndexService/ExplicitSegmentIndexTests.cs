@@ -463,16 +463,16 @@ public class ExplicitSegmentIndexTests : IndexTestBase
         await WaitForIndexing(GetIndexAlias(true), async () =>
         {
             await ContentService.SaveAsync(docWithAllSegments, null, null, CancellationToken.None);
-            ContentService.Publish(docWithAllSegments, ["*"]);
+            await ContentService.PublishAsync(docWithAllSegments, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
             await ContentService.SaveAsync(docWithOnlyNullSegment, null, null, CancellationToken.None);
-            ContentService.Publish(docWithOnlyNullSegment, ["*"]);
+            await ContentService.PublishAsync(docWithOnlyNullSegment, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
             await ContentService.SaveAsync(docWithOnlySegment1, null, null, CancellationToken.None);
-            ContentService.Publish(docWithOnlySegment1, ["*"]);
+            await ContentService.PublishAsync(docWithOnlySegment1, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
             await ContentService.SaveAsync(docWithSpecialCharacterSegments, null, null, CancellationToken.None);
-            ContentService.Publish(docWithSpecialCharacterSegments, ["*"]);
+            await ContentService.PublishAsync(docWithSpecialCharacterSegments, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         });
     }
 }

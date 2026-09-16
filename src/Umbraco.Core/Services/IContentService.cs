@@ -438,18 +438,8 @@ public interface IContentService : IPublishableContentService<IContent>, IAsyncP
 
     #region Publish Document
 
-    /// <summary>
-    ///     Publishes a document.
-    /// </summary>
-    /// <remarks>
-    ///     <para>When a culture is being published, it includes all varying values along with all invariant values.</para>
-    ///     <para>Wildcards (*) can be used as culture identifier to publish all cultures.</para>
-    ///     <para>An empty array (or a wildcard) can be passed for culture invariant content.</para>
-    /// </remarks>
-    /// <param name="content">The document to publish.</param>
-    /// <param name="cultures">The cultures to publish.</param>
-    /// <param name="userId">The identifier of the user performing the action.</param>
-    PublishResult Publish(IContent content, string[] cultures, int userId = Constants.Security.SuperUserId);
+    // Publish(IContent, string[], int) has been retired from this interface in favour of the async
+    // PublishAsync (declared on IAsyncPublishableContentService<TContent>, inherited here).
 
     /// <summary>
     ///     Publishes a document branch.

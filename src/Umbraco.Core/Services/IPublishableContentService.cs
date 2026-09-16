@@ -30,18 +30,8 @@ public interface IPublishableContentService<TContent> : IContentServiceBase
     // this interface in favour of the async PersistContentScheduleAsync (declared on
     // IAsyncPublishableContentService<TContent>).
 
-    /// <summary>
-    ///     Publishes content
-    /// </summary>
-    /// <remarks>
-    ///     <para>When a culture is being published, it includes all varying values along with all invariant values.</para>
-    ///     <para>Wildcards (*) can be used as culture identifier to publish all cultures.</para>
-    ///     <para>An empty array (or a wildcard) can be passed for culture invariant content.</para>
-    /// </remarks>
-    /// <param name="content">The content to publish.</param>
-    /// <param name="cultures">The cultures to publish.</param>
-    /// <param name="userId">The identifier of the user performing the action.</param>
-    PublishResult Publish(TContent content, string[] cultures, int userId = Constants.Security.SuperUserId);
+    // Publish(TContent, string[], int) has been retired from this interface in favour of the async
+    // PublishAsync (declared on IAsyncPublishableContentService<TContent>).
 
     /// <summary>
     ///     Saves and publishes content in a single scope.

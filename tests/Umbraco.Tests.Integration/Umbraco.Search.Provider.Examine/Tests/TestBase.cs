@@ -59,7 +59,7 @@ public abstract class TestBase : UmbracoIntegrationTest
     protected async Task SaveAndPublishAsync(IContent content)
     {
         await ContentService.SaveAsync(content, null, null, CancellationToken.None);
-        ContentService.Publish(content, ["*"]);
+        await ContentService.PublishAsync(content, ["*"], global::Umbraco.Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
     }
 
     protected override void CustomTestSetup(IUmbracoBuilder builder)

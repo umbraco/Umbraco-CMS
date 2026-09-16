@@ -243,7 +243,7 @@ public class DeleteCulturesTests : TestBase
             await ContentService.SaveAsync(root, null, null, CancellationToken.None);
             if (publish)
             {
-                ContentService.Publish(root, ["*"]);
+                await ContentService.PublishAsync(root, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
             }
         });
     }
@@ -296,7 +296,7 @@ public class DeleteCulturesTests : TestBase
             await ContentService.SaveAsync(root, null, null, CancellationToken.None);
             if (publish)
             {
-                ContentService.Publish(root, ["*"]);
+                await ContentService.PublishAsync(root, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
             }
         });
     }
@@ -353,7 +353,7 @@ public class DeleteCulturesTests : TestBase
             await ContentService.SaveAsync(variantRoot, null, null, CancellationToken.None);
             if (publish)
             {
-                ContentService.Publish(variantRoot, ["*"]);
+                await ContentService.PublishAsync(variantRoot, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
             }
         });
 
@@ -371,7 +371,7 @@ public class DeleteCulturesTests : TestBase
             await ContentService.SaveAsync(invariantRoot, null, null, CancellationToken.None);
             if (publish)
             {
-                ContentService.Publish(invariantRoot, ["*"]);
+                await ContentService.PublishAsync(invariantRoot, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
             }
         });
     }

@@ -75,7 +75,7 @@ internal sealed class DocumentUrlServiceContentTreeChangeTests : UmbracoIntegrat
 
         RootPage = ContentBuilder.CreateSimpleContent(ContentType, "Root Page");
         await ContentService.SaveAsync(RootPage, -1, null, CancellationToken.None);
-        ContentService.Publish(RootPage, []);
+        await ContentService.PublishAsync(RootPage, [], Constants.Security.SuperUserKey, CancellationToken.None);
     }
 
     private ContentType CreateContentTypeWithUrlAlias(int templateId)
@@ -211,7 +211,7 @@ internal sealed class DocumentUrlServiceContentTreeChangeTests : UmbracoIntegrat
         using (ICoreScope scope = CoreScopeProvider.CreateCoreScope(scopedNotificationPublisher: publisher))
         {
             await ContentService.SaveAsync(page, -1, null, CancellationToken.None);
-            ContentService.Publish(page, []);
+            await ContentService.PublishAsync(page, [], Constants.Security.SuperUserKey, CancellationToken.None);
             scope.Complete();
         }
 
@@ -254,7 +254,7 @@ internal sealed class DocumentUrlServiceContentTreeChangeTests : UmbracoIntegrat
         page.SetValue(Constants.Conventions.Content.UrlAlias, "variation-change-alias", isoCode);
         page.ParentId = RootPage.Id;
         await ContentService.SaveAsync(page, -1, null, CancellationToken.None);
-        ContentService.Publish(page, [isoCode]);
+        await ContentService.PublishAsync(page, [isoCode], Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Pre-condition: publish persisted segments and the alias.
         Assert.That(
@@ -308,7 +308,7 @@ internal sealed class DocumentUrlServiceContentTreeChangeTests : UmbracoIntegrat
     {
         var page = ContentBuilder.CreateSimpleContent(ContentType, "Test Page", RootPage.Id);
         await ContentService.SaveAsync(page, -1, null, CancellationToken.None);
-        ContentService.Publish(page, []);
+        await ContentService.PublishAsync(page, [], Constants.Security.SuperUserKey, CancellationToken.None);
 
         var rows = GetDbSegments(page.Key);
 
@@ -328,7 +328,7 @@ internal sealed class DocumentUrlServiceContentTreeChangeTests : UmbracoIntegrat
         var page = ContentBuilder.CreateSimpleContent(ContentType, "Alias Page", RootPage.Id);
         page.SetValue(Constants.Conventions.Content.UrlAlias, "my-integration-alias");
         await ContentService.SaveAsync(page, -1, null, CancellationToken.None);
-        ContentService.Publish(page, []);
+        await ContentService.PublishAsync(page, [], Constants.Security.SuperUserKey, CancellationToken.None);
 
         var aliases = GetDbAliases(page.Key);
 
@@ -387,7 +387,7 @@ internal sealed class DocumentUrlServiceContentTreeChangeTests : UmbracoIntegrat
     {
         var page = ContentBuilder.CreateSimpleContent(ContentType, "URL Cache Test Page", RootPage.Id);
         await ContentService.SaveAsync(page, -1, null, CancellationToken.None);
-        ContentService.Publish(page, []);
+        await ContentService.PublishAsync(page, [], Constants.Security.SuperUserKey, CancellationToken.None);
 
         var rowsBefore = GetDbSegments(page.Key);
         Assert.That(
@@ -424,7 +424,7 @@ internal sealed class DocumentUrlServiceContentTreeChangeTests : UmbracoIntegrat
         var page = ContentBuilder.CreateSimpleContent(ContentType, "Alias Cache Page", RootPage.Id);
         page.SetValue(Constants.Conventions.Content.UrlAlias, "cache-test-alias");
         await ContentService.SaveAsync(page, -1, null, CancellationToken.None);
-        ContentService.Publish(page, []);
+        await ContentService.PublishAsync(page, [], Constants.Security.SuperUserKey, CancellationToken.None);
 
         var isoCode = (await LanguageService.GetDefaultLanguageAsync()).IsoCode;
 

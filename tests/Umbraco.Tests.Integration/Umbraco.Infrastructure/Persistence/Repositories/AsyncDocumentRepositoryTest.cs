@@ -85,7 +85,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
 
         _publishedPage = ContentBuilder.CreateSimpleContent(_contentType, "Published Page");
         await ContentService.SaveAsync(_publishedPage, -1, null, CancellationToken.None);
-        ContentService.Publish(_publishedPage, ["*"]);
+        await ContentService.PublishAsync(_publishedPage, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
     }
 
     private AsyncDocumentRepository CreateRepository() => new(
@@ -477,7 +477,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         doc.SetCultureName("English Name", "en-US");
         doc.SetCultureName("Nom Français", "fr");
         await ContentService.SaveAsync(doc, null, null, CancellationToken.None);
-        ContentService.Publish(doc, doc.AvailableCultures.ToArray());
+        await ContentService.PublishAsync(doc, doc.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         using var scope = NewScopeProvider.CreateScope();
         var repository = CreateRepository();
@@ -498,7 +498,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         doc.SetCultureName("English Name", "en-US");
         doc.SetCultureName("Nom Français", "fr");
         await ContentService.SaveAsync(doc, null, null, CancellationToken.None);
-        ContentService.Publish(doc, doc.AvailableCultures.ToArray());
+        await ContentService.PublishAsync(doc, doc.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Re-fetch so the entity has the published state, then edit fr only.
         doc = (await ContentService.GetByIdAsync(doc.Key, CancellationToken.None))!;
@@ -545,7 +545,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         var content = ContentBuilder.CreateSimpleContent(_contentType, "Templated Page");
         content.TemplateId = _template.Id;
         await ContentService.SaveAsync(content, -1, null, CancellationToken.None);
-        ContentService.Publish(content, ["*"]);
+        await ContentService.PublishAsync(content, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         using var scope = NewScopeProvider.CreateScope();
         var repository = CreateRepository();
@@ -571,7 +571,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         doc.SetCultureName("English Name", "en-US");
         doc.SetCultureName("Nom Français", "fr");
         await ContentService.SaveAsync(doc, null, null, CancellationToken.None);
-        ContentService.Publish(doc, ["en-US"]); // publish only en-US, leave fr as draft
+        await ContentService.PublishAsync(doc, ["en-US"], Constants.Security.SuperUserKey, CancellationToken.None); // publish only en-US, leave fr as draft
 
         using var scope = NewScopeProvider.CreateScope();
         var repository = CreateRepository();
@@ -874,7 +874,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         var content = ContentBuilder.CreateSimpleContent(_contentType, "Templated Child", _textpage.Id);
         content.TemplateId = _template.Id;
         await ContentService.SaveAsync(content, -1, null, CancellationToken.None);
-        ContentService.Publish(content, ["*"]);
+        await ContentService.PublishAsync(content, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         using var scope = NewScopeProvider.CreateScope();
         var repository = CreateRepository();
@@ -896,7 +896,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         var content = ContentBuilder.CreateSimpleContent(_contentType, "Templated Child For Verify", _textpage.Id);
         content.TemplateId = _template.Id;
         await ContentService.SaveAsync(content, -1, null, CancellationToken.None);
-        ContentService.Publish(content, ["*"]);
+        await ContentService.PublishAsync(content, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         using var scope = NewScopeProvider.CreateScope();
         var repository = CreateRepository();
@@ -1049,7 +1049,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         var content = ContentBuilder.CreateSimpleContent(_contentType, "Templated Descendant", _textpage.Id);
         content.TemplateId = _template.Id;
         await ContentService.SaveAsync(content, -1, null, CancellationToken.None);
-        ContentService.Publish(content, ["*"]);
+        await ContentService.PublishAsync(content, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         using var scope = NewScopeProvider.CreateScope();
         var repository = CreateRepository();
@@ -1071,7 +1071,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         var content = ContentBuilder.CreateSimpleContent(_contentType, "Templated Descendant For Verify", _textpage.Id);
         content.TemplateId = _template.Id;
         await ContentService.SaveAsync(content, -1, null, CancellationToken.None);
-        ContentService.Publish(content, ["*"]);
+        await ContentService.PublishAsync(content, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         using var scope = NewScopeProvider.CreateScope();
         var repository = CreateRepository();
@@ -1097,7 +1097,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         doc.SetCultureName("Nom Français", "fr");
         doc.SetValue("variantTitle", "published value", "en-US");
         await ContentService.SaveAsync(doc, null, null, CancellationToken.None);
-        ContentService.Publish(doc, ["en-US", "fr"]);
+        await ContentService.PublishAsync(doc, ["en-US", "fr"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Edit the draft value without re-publishing.
         doc = (await ContentService.GetByIdAsync(doc.Key, CancellationToken.None))!;
@@ -3062,7 +3062,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         // publishing a node whose ancestor path isn't itself published (PublishResultType
         // .FailedPublishPathNotPublished), so a descendant can't be used here without publishing its
         // parent first too.
-        PublishResult publishResult = ContentService.Publish(_textpage, ["*"]);
+        PublishResult publishResult = await ContentService.PublishAsync(_textpage, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
         var repository = CreateRepository();
 
         int count = await repository.CountPublishedAsync(null, CancellationToken.None);
@@ -3106,8 +3106,8 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         // publish both, then unpublish just the parent. Unpublishing a parent does not cascade to
         // children, so _subpage's own Published flag stays true even though the path is no longer
         // fully published — exactly the state IsPathPublishedAsync exists to detect.
-        PublishResult publishParent = ContentService.Publish(_textpage, ["*"]);
-        PublishResult publishChild = ContentService.Publish(_subpage, ["*"]);
+        PublishResult publishParent = await ContentService.PublishAsync(_textpage, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
+        PublishResult publishChild = await ContentService.PublishAsync(_subpage, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
         PublishResult unpublishParent = ContentService.Unpublish(_textpage);
 
         var repository = CreateRepository();
@@ -3125,8 +3125,8 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
     {
         using var scope = NewScopeProvider.CreateScope();
 
-        ContentService.Publish(_textpage, ["*"]);
-        ContentService.Publish(_subpage, ["*"]);
+        await ContentService.PublishAsync(_textpage, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
+        await ContentService.PublishAsync(_subpage, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
         var repository = CreateRepository();
 
         bool result = await repository.IsPathPublishedAsync(_subpage, CancellationToken.None);

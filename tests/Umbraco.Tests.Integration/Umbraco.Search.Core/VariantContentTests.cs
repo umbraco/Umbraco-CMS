@@ -48,7 +48,7 @@ public class VariantContentTests : VariantContentTestBase
         child.SetValue("message", "The updated child message in English (segment-1)", "en-US", "segment-1");
         child.SetValue("message", "The updated child message in English (segment-2)", "en-US", "segment-2");
         await ContentService.SaveAsync(child, null, null, CancellationToken.None);
-        ContentService.Publish(Child(), ["*"]);
+        await ContentService.PublishAsync(Child(), ["*"], global::Umbraco.Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.PublishedContent);
         Assert.That(documents, Has.Count.EqualTo(4));
@@ -72,7 +72,7 @@ public class VariantContentTests : VariantContentTestBase
         child.SetValue("title", "The updated child title in English", "en-US");
         child.SetValue("title", "The updated child title in Danish", "da-DK");
         await ContentService.SaveAsync(child, null, null, CancellationToken.None);
-        ContentService.Publish(Child(), ["*"]);
+        await ContentService.PublishAsync(Child(), ["*"], global::Umbraco.Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.PublishedContent);
         Assert.That(documents, Has.Count.EqualTo(4));
@@ -89,7 +89,7 @@ public class VariantContentTests : VariantContentTestBase
         IContent child = Child();
         child.SetValue("count", 123456);
         await ContentService.SaveAsync(child, null, null, CancellationToken.None);
-        ContentService.Publish(Child(), ["*"]);
+        await ContentService.PublishAsync(Child(), ["*"], global::Umbraco.Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.PublishedContent);
         Assert.That(documents, Has.Count.EqualTo(4));

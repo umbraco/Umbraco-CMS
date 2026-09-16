@@ -42,7 +42,7 @@ internal sealed class ContentServiceVariantTests : UmbracoIntegrationTest
         content.SetValue("title", "Title", valueCultureCode);
         await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
-        var publishResult = ContentService.Publish(content, [publishCultureCode]);
+        var publishResult = await ContentService.PublishAsync(content, [publishCultureCode], Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.IsTrue(publishResult.Success);
 
         content = (await ContentService.GetByIdAsync(content.Key, CancellationToken.None))!;
@@ -68,7 +68,7 @@ internal sealed class ContentServiceVariantTests : UmbracoIntegrationTest
         content.SetValue("title", "Title", valueCultureCode);
         await ContentService.SaveAsync(content, null, null, CancellationToken.None);
         // use correctly cased culture code to publish
-        ContentService.Publish(content, ["en-US"]);
+        await ContentService.PublishAsync(content, ["en-US"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         var unpublishResult = ContentService.Unpublish(content, unpublishCultureCode);
         Assert.IsTrue(unpublishResult.Success);
@@ -140,7 +140,7 @@ internal sealed class ContentServiceVariantTests : UmbracoIntegrationTest
         content.SetValue("title", "Title", "en-gb");
         await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
-        var publishResult = ContentService.Publish(content, ["en-gb"]);
+        var publishResult = await ContentService.PublishAsync(content, ["en-gb"], Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.IsTrue(publishResult.Success);
 
         Assert.Multiple(() =>

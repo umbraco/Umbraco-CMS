@@ -311,7 +311,7 @@ internal sealed class TrackRelationsTests : UmbracoIntegrationTestWithContent
         var source = new ContentBuilder().WithContentType(sourceType).WithName("Source").Build();
         source.Properties["contentPicker"]!.SetValue(Udi.Create(Constants.UdiEntityType.Document, target.Key).ToString());
         await ContentService.SaveAsync(source, null, null, CancellationToken.None);
-        PublishResult publishResult = ContentService.Publish(source, ["*"]);
+        PublishResult publishResult = await ContentService.PublishAsync(source, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.IsTrue(publishResult.Success, publishResult.Result.ToString());
 
         // The automatic relation exists for the published content before its content type (and the content
@@ -353,7 +353,7 @@ internal sealed class TrackRelationsTests : UmbracoIntegrationTestWithContent
         var source = new ContentBuilder().WithContentType(contentType).WithName("Source").Build();
         source.Properties["contentPicker"]!.SetValue(Udi.Create(Constants.UdiEntityType.Document, targetA.Key).ToString());
         await ContentService.SaveAsync(source, null, null, CancellationToken.None);
-        PublishResult publishResult = ContentService.Publish(source, ["*"]);
+        PublishResult publishResult = await ContentService.PublishAsync(source, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.IsTrue(publishResult.Success, publishResult.Result.ToString());
 
         return (source, targetA, targetB);

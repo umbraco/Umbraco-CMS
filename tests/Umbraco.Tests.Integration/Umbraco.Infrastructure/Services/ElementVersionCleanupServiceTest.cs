@@ -31,11 +31,11 @@ internal class ElementVersionCleanupServiceTest : UmbracoIntegrationTest
 
         var element = ElementBuilder.CreateSimpleElement(elementType);
         await ElementService.SaveAsync(element, null, null, CancellationToken.None);
-        ElementService.Publish(element, Array.Empty<string>());
+        await ElementService.PublishAsync(element, Array.Empty<string>(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         for (var i = 0; i < 10; i++)
         {
-            ElementService.Publish(element, Array.Empty<string>());
+            await ElementService.PublishAsync(element, Array.Empty<string>(), Constants.Security.SuperUserKey, CancellationToken.None);
         }
 
         var before = GetReport();
@@ -71,11 +71,11 @@ internal class ElementVersionCleanupServiceTest : UmbracoIntegrationTest
 
         var element = ElementBuilder.CreateSimpleElement(elementType);
         await ElementService.SaveAsync(element, null, null, CancellationToken.None);
-        ElementService.Publish(element, Array.Empty<string>());
+        await ElementService.PublishAsync(element, Array.Empty<string>(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         for (var i = 0; i < 10; i++)
         {
-            ElementService.Publish(element, Array.Empty<string>());
+            await ElementService.PublishAsync(element, Array.Empty<string>(), Constants.Security.SuperUserKey, CancellationToken.None);
         }
 
         var before = GetReport();
@@ -114,12 +114,12 @@ internal class ElementVersionCleanupServiceTest : UmbracoIntegrationTest
 
         var element = ElementBuilder.CreateSimpleElement(elementType);
         await ElementService.SaveAsync(element, null, null, CancellationToken.None);
-        ElementService.Publish(element, Array.Empty<string>());
+        await ElementService.PublishAsync(element, Array.Empty<string>(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         var retainedVersionIds = new List<int>();
         for (var i = 0; i < 10; i++)
         {
-            var result = ElementService.Publish(element, Array.Empty<string>());
+            var result = await ElementService.PublishAsync(element, Array.Empty<string>(), Constants.Security.SuperUserKey, CancellationToken.None);
             if (i < 5)
             {
                 retainedVersionIds.Add(result.Content.VersionId);

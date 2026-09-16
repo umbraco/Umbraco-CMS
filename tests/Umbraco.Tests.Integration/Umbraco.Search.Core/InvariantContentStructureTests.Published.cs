@@ -33,7 +33,7 @@ public partial class InvariantContentStructureTests
     public async Task PublishedRoot_YieldsOnlyRootDocument()
     {
         await ContentService.SaveAsync(Root(), null, null, CancellationToken.None);
-        ContentService.Publish(Root(), ["*"]);
+        await ContentService.PublishAsync(Root(), ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.PublishedContent);
         Assert.That(documents, Has.Count.EqualTo(1));

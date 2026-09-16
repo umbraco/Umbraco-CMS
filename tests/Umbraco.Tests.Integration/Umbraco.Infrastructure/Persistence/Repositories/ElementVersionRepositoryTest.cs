@@ -29,10 +29,10 @@ internal sealed class ElementVersionRepositoryTest : UmbracoIntegrationTest
         var content = ElementBuilder.CreateSimpleElement(contentType);
         await ElementService.SaveAsync(content, null, null, CancellationToken.None);
 
-        ElementService.Publish(content, Array.Empty<string>());
+        await ElementService.PublishAsync(content, Array.Empty<string>(), Constants.Security.SuperUserKey, CancellationToken.None);
         // At this point content has 2 versions, a draft version and a published version.
 
-        ElementService.Publish(content, Array.Empty<string>());
+        await ElementService.PublishAsync(content, Array.Empty<string>(), Constants.Security.SuperUserKey, CancellationToken.None);
         // At this point content has 3 versions, a historic version, a draft version and a published version.
 
         using (ScopeProvider.CreateScope())
@@ -57,11 +57,11 @@ internal sealed class ElementVersionRepositoryTest : UmbracoIntegrationTest
         var content = ElementBuilder.CreateSimpleElement(contentType);
         await ElementService.SaveAsync(content, null, null, CancellationToken.None);
 
-        ElementService.Publish(content, Array.Empty<string>());
+        await ElementService.PublishAsync(content, Array.Empty<string>(), Constants.Security.SuperUserKey, CancellationToken.None);
         // At this point content has 2 versions, a draft version and a published version.
-        ElementService.Publish(content, Array.Empty<string>());
-        ElementService.Publish(content, Array.Empty<string>());
-        ElementService.Publish(content, Array.Empty<string>());
+        await ElementService.PublishAsync(content, Array.Empty<string>(), Constants.Security.SuperUserKey, CancellationToken.None);
+        await ElementService.PublishAsync(content, Array.Empty<string>(), Constants.Security.SuperUserKey, CancellationToken.None);
+        await ElementService.PublishAsync(content, Array.Empty<string>(), Constants.Security.SuperUserKey, CancellationToken.None);
         // At this point content has 5 versions, 3 historic versions, a draft version and a published version.
 
         var allVersions = await ElementService.GetVersionsAsync(content.Key, CancellationToken.None);
@@ -96,10 +96,10 @@ internal sealed class ElementVersionRepositoryTest : UmbracoIntegrationTest
         var content = ElementBuilder.CreateSimpleElement(contentType);
         await ElementService.SaveAsync(content, null, null, CancellationToken.None);
 
-        ElementService.Publish(content, Array.Empty<string>());
-        ElementService.Publish(content, Array.Empty<string>());
-        ElementService.Publish(content, Array.Empty<string>());
-        ElementService.Publish(content, Array.Empty<string>());
+        await ElementService.PublishAsync(content, Array.Empty<string>(), Constants.Security.SuperUserKey, CancellationToken.None);
+        await ElementService.PublishAsync(content, Array.Empty<string>(), Constants.Security.SuperUserKey, CancellationToken.None);
+        await ElementService.PublishAsync(content, Array.Empty<string>(), Constants.Security.SuperUserKey, CancellationToken.None);
+        await ElementService.PublishAsync(content, Array.Empty<string>(), Constants.Security.SuperUserKey, CancellationToken.None);
         using (var scope = ScopeProvider.CreateScope())
         {
             var query = ScopeAccessor.AmbientScope.SqlContext.Sql();
@@ -130,8 +130,8 @@ internal sealed class ElementVersionRepositoryTest : UmbracoIntegrationTest
         var content = ElementBuilder.CreateSimpleElement(contentType);
         await ElementService.SaveAsync(content, null, null, CancellationToken.None);
 
-        ElementService.Publish(content, Array.Empty<string>()); // Draft + Published
-        ElementService.Publish(content, Array.Empty<string>()); // New Draft
+        await ElementService.PublishAsync(content, Array.Empty<string>(), Constants.Security.SuperUserKey, CancellationToken.None); // Draft + Published
+        await ElementService.PublishAsync(content, Array.Empty<string>(), Constants.Security.SuperUserKey, CancellationToken.None); // New Draft
 
         using (ScopeProvider.CreateScope())
         {
@@ -165,8 +165,8 @@ internal sealed class ElementVersionRepositoryTest : UmbracoIntegrationTest
         content.SetCultureName("foo", "en-US");
 
         await ElementService.SaveAsync(content, null, null, CancellationToken.None);
-        ElementService.Publish(content, new[] { "en-US" }); // Draft + Published
-        ElementService.Publish(content, new[] { "en-US" }); // New Draft
+        await ElementService.PublishAsync(content, new[] { "en-US" }, Constants.Security.SuperUserKey, CancellationToken.None); // Draft + Published
+        await ElementService.PublishAsync(content, new[] { "en-US" }, Constants.Security.SuperUserKey, CancellationToken.None); // New Draft
 
         using (ScopeProvider.CreateScope())
         {

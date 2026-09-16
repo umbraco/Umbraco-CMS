@@ -25,6 +25,7 @@ using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.EFCore;
 using Umbraco.Cms.Infrastructure.Persistence.EFCore.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
@@ -463,7 +464,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
             else
             {
                 await ContentService.SaveAsync(c, null, null, CancellationToken.None);
-                var r = ContentService.Publish(c, c.AvailableCultures.ToArray());
+                var r = await ContentService.PublishAsync(c, c.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
 
                 var contentSchedule =
                     ContentScheduleCollection.CreateWithEntry(null, now.AddSeconds(5)); // expire in 5 seconds
@@ -499,7 +500,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
             else
             {
                 await ContentService.SaveAsync(c, null, null, CancellationToken.None);
-                var r = ContentService.Publish(c, c.AvailableCultures.ToArray());
+                var r = await ContentService.PublishAsync(c, c.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
 
                 var contentSchedule =
                     ContentScheduleCollection.CreateWithEntry(
@@ -549,6 +550,42 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     }
 
     [Test]
+    public async Task Perform_Scheduled_Publishing_Does_Not_Silently_Reattribute_A_Version_With_No_Known_Writer()
+    {
+        // Arrange
+        var contentType = ContentTypeBuilder.CreateBasicContentType();
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+
+        var content = ContentBuilder.CreateBasicContent(contentType);
+        var now = DateTime.UtcNow;
+        var contentSchedule = ContentScheduleCollection.CreateWithEntry(now.AddSeconds(5), null);
+        Assert.IsTrue((await ContentService.SaveAsync(content, null, contentSchedule, CancellationToken.None)).Success);
+
+        // Simulate legacy/imported content whose current version has no matching user - umbracoContentVersion.userId is NULL.
+        using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
+        {
+            scope.Database.Execute(
+                "UPDATE umbracoContentVersion SET userId = NULL WHERE nodeId = @0 AND current = 1",
+                content.Id);
+        }
+
+        // Act
+        var results = ContentService.PerformScheduledPublish(now.AddMinutes(1)).ToList();
+
+        // Assert - the release itself must succeed; a version with no known writer is not a reason to fail
+        // the publish, and it must not be silently re-attributed to the super user either.
+        PublishResult result = results.Single(x => x.Entity.Id == content.Id);
+        Assert.IsTrue(result.Success, result.Result.ToString());
+
+        var republished = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
+        Assert.IsTrue(republished.Published);
+        Assert.AreEqual(
+            Constants.Security.UnknownUserId,
+            republished.WriterId,
+            "A version with no known writer must not be silently re-attributed to the super user.");
+    }
+
+    [Test]
     public async Task Remove_Scheduled_Publishing_Date()
     {
         // Arrange
@@ -571,7 +608,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         contentSchedule = await ContentService.GetContentScheduleByContentIdAsync(content.Key, CancellationToken.None);
         sched = contentSchedule.FullSchedule;
         Assert.AreEqual(0, sched.Count);
-        Assert.IsTrue(ContentService.Publish(content, content.AvailableCultures.ToArray()).Success);
+        Assert.IsTrue((await ContentService.PublishAsync(content, content.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None)).Success);
     }
 
     [Test]
@@ -596,7 +633,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         contentSchedule = await ContentService.GetContentScheduleByContentIdAsync(content.Key, CancellationToken.None);
         sched = contentSchedule.FullSchedule;
         Assert.AreEqual(0, sched.Count);
-        Assert.IsTrue(ContentService.Publish(content, content.AvailableCultures.ToArray()).Success);
+        Assert.IsTrue((await ContentService.PublishAsync(content, content.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None)).Success);
     }
 
     [Test]
@@ -610,7 +647,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         {
             content.SetValue("bodyText", "hello world " + Guid.NewGuid());
             await ContentService.SaveAsync(content, null, null, CancellationToken.None);
-            ContentService.Publish(content, content.AvailableCultures.ToArray());
+            await ContentService.PublishAsync(content, content.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
         }
 
         // Assert
@@ -729,8 +766,8 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         Assert.AreEqual(0, await ContentService.CountPublishedAsync(null, CancellationToken.None));
 
         // Act
-        ContentService.Publish(Textpage, ["*"]);
-        ContentService.Publish(Subpage, ["*"]);
+        await ContentService.PublishAsync(Textpage, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
+        await ContentService.PublishAsync(Subpage, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Assert
         Assert.AreEqual(2, await ContentService.CountPublishedAsync(null, CancellationToken.None));
@@ -1022,7 +1059,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         var parent = await ContentService.GetByIdAsync(Textpage.Key, CancellationToken.None);
         Assert.IsFalse(parent.Published);
         await ContentService.SaveAsync(parent, null, null, CancellationToken.None); // publishing parent, so Text Page 2 can be updated.
-        ContentService.Publish(parent, parent.AvailableCultures.ToArray());
+        await ContentService.PublishAsync(parent, parent.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         var content = await ContentService.GetByIdAsync(Subpage.Key, CancellationToken.None);
         Assert.IsFalse(content.Published);
@@ -1035,7 +1072,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         content.Name = "Text Page 2 Updated";
         content.SetValue("author", "Jane Doe");
         await ContentService.SaveAsync(content, null, null, CancellationToken.None); // publishes the current version, creates a version
-        ContentService.Publish(content, content.AvailableCultures.ToArray());
+        await ContentService.PublishAsync(content, content.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         var version2 = content.VersionId;
         Console.WriteLine($"2 e={content.VersionId} p={content.PublishedVersionId}");
@@ -1043,7 +1080,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         content.Name = "Text Page 2 ReUpdated";
         content.SetValue("author", "Bob Hope");
         await ContentService.SaveAsync(content, null, null, CancellationToken.None); // publishes again, creates a version
-        ContentService.Publish(content, content.AvailableCultures.ToArray());
+        await ContentService.PublishAsync(content, content.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         var version3 = content.VersionId;
         Console.WriteLine($"3 e={content.VersionId} p={content.PublishedVersionId}");
@@ -1111,11 +1148,11 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     {
         // Arrange
         var root = await ContentService.GetByIdAsync(Textpage.Key, CancellationToken.None);
-        ContentService.Publish(root!, root!.AvailableCultures.ToArray());
+        await ContentService.PublishAsync(root!, root!.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
         var content = await ContentService.GetByIdAsync(Subpage.Key, CancellationToken.None);
         var contentSchedule = ContentScheduleCollection.CreateWithEntry(null, DateTime.UtcNow.AddSeconds(1));
         await ContentService.PersistContentScheduleAsync(content!, contentSchedule, CancellationToken.None);
-        ContentService.Publish(content, content.AvailableCultures.ToArray());
+        await ContentService.PublishAsync(content, content.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Act
         Thread.Sleep(new TimeSpan(0, 0, 0, 2));
@@ -1132,11 +1169,11 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     {
         // Arrange
         var root = await ContentService.GetByIdAsync(Textpage.Key, CancellationToken.None);
-        ContentService.Publish(root!, root!.AvailableCultures.ToArray());
+        await ContentService.PublishAsync(root!, root!.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
         var content = await ContentService.GetByIdAsync(Subpage.Key, CancellationToken.None);
         var contentSchedule = ContentScheduleCollection.CreateWithEntry(DateTime.UtcNow.AddDays(1), null);
         await ContentService.PersistContentScheduleAsync(content!, contentSchedule, CancellationToken.None);
-        ContentService.Publish(content, content.AvailableCultures.ToArray());
+        await ContentService.PublishAsync(content, content.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Act
         var results = (await ContentService.GetContentSchedulesByKeysAsync([Textpage.Key, Subpage.Key, Subpage2.Key], CancellationToken.None)).ToList();
@@ -1180,7 +1217,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         // Arrange
         var content = await ContentService.GetByIdAsync(Textpage.Key, CancellationToken.None);
         Assert.IsNotNull(content);
-        var published = ContentService.Publish(content, content.AvailableCultures.ToArray(), userId: -1);
+        var published = await ContentService.PublishAsync(content, content.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Act
         var unpublished = ContentService.Unpublish(content, userId: -1);
@@ -1198,7 +1235,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         var (content, langUk, langFr, contentType) = await CreateEnglishAndFrenchDocument();
 
         var saved = await ContentService.SaveAsync(content, null, null, CancellationToken.None);
-        var published = ContentService.Publish(content, new[] { langFr.IsoCode, langUk.IsoCode });
+        var published = await ContentService.PublishAsync(content, new[] { langFr.IsoCode, langUk.IsoCode }, Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.IsTrue(content.IsCulturePublished(langFr.IsoCode));
         Assert.IsTrue(content.IsCulturePublished(langUk.IsoCode));
 
@@ -1228,7 +1265,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         var (content, langUk, langFr, contentType) = await CreateEnglishAndFrenchDocument();
 
         await ContentService.SaveAsync(content, null, null, CancellationToken.None);
-        var published = ContentService.Publish(content, new[] { langFr.IsoCode, langUk.IsoCode });
+        var published = await ContentService.PublishAsync(content, new[] { langFr.IsoCode, langUk.IsoCode }, Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.AreEqual(PublishedState.Published, content.PublishedState);
 
         // re-get
@@ -1250,7 +1287,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
         content = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
 
-        published = ContentService.Publish(content, new[] { langUk.IsoCode });
+        published = await ContentService.PublishAsync(content, new[] { langUk.IsoCode }, Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.AreEqual(PublishedState.Published, content.PublishedState);
         Assert.IsTrue(content.IsCulturePublished(langUk.IsoCode));
         Assert.IsFalse(content.IsCulturePublished(langFr.IsoCode));
@@ -1267,7 +1304,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         var (content, langUk, langFr, contentType) = await CreateEnglishAndFrenchDocument();
 
         var saved = await ContentService.SaveAsync(content, null, null, CancellationToken.None);
-        var published = ContentService.Publish(content, new[] { langFr.IsoCode, langUk.IsoCode });
+        var published = await ContentService.PublishAsync(content, new[] { langFr.IsoCode, langUk.IsoCode }, Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.IsTrue(content.IsCulturePublished(langFr.IsoCode));
         Assert.IsTrue(content.IsCulturePublished(langUk.IsoCode));
         Assert.IsTrue(saved.Success);
@@ -1332,7 +1369,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         content.SetCultureName("content-en", langUk.IsoCode);
 
         var saved = await ContentService.SaveAsync(content, null, null, CancellationToken.None);
-        var published = ContentService.Publish(content, new[] { langFr.IsoCode, langUk.IsoCode });
+        var published = await ContentService.PublishAsync(content, new[] { langFr.IsoCode, langUk.IsoCode }, Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.IsTrue(content.IsCulturePublished(langFr.IsoCode));
         Assert.IsTrue(content.IsCulturePublished(langUk.IsoCode));
         Assert.IsTrue(saved.Success);
@@ -1356,7 +1393,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         var (content, langUk, langFr, contentType) = await CreateEnglishAndFrenchDocument();
 
         var saved = await ContentService.SaveAsync(content, null, null, CancellationToken.None);
-        var published = ContentService.Publish(content, new[] { langFr.IsoCode, langUk.IsoCode });
+        var published = await ContentService.PublishAsync(content, new[] { langFr.IsoCode, langUk.IsoCode }, Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.IsTrue(content.IsCulturePublished(langFr.IsoCode));
         Assert.IsTrue(content.IsCulturePublished(langUk.IsoCode));
         Assert.IsTrue(saved.Success);
@@ -1393,7 +1430,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         var (content, langUk, langFr, contentType) = await CreateEnglishAndFrenchDocument();
 
         var saved = await ContentService.SaveAsync(content, null, null, CancellationToken.None);
-        var published = ContentService.Publish(content, new[] { langFr.IsoCode, langUk.IsoCode });
+        var published = await ContentService.PublishAsync(content, new[] { langFr.IsoCode, langUk.IsoCode }, Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.IsTrue(content.IsCulturePublished(langFr.IsoCode));
         Assert.IsTrue(content.IsCulturePublished(langUk.IsoCode));
         Assert.IsTrue(saved.Success);
@@ -1407,7 +1444,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         content.SetCultureName("content-en-updated", langUk.IsoCode);
 
         saved = await ContentService.SaveAsync(content, null, null, CancellationToken.None);
-        published = ContentService.Publish(content, new string[] { }); // publish without cultures
+        published = await ContentService.PublishAsync(content, new string[] { }, Constants.Security.SuperUserKey, CancellationToken.None); // publish without cultures
         Assert.IsTrue(saved.Success);
         Assert.AreEqual(PublishResultType.FailedPublishNothingToPublish, published.Result);
 
@@ -1450,7 +1487,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         content.SetCultureName("content-fr", langFr.IsoCode);
 
         Assert.IsTrue((await ContentService.SaveAsync(content, null, null, CancellationToken.None)).Success);
-        Assert.IsTrue(ContentService.Publish(content, new[] { langGb.IsoCode, langFr.IsoCode }).Success);
+        Assert.IsTrue((await ContentService.PublishAsync(content, new[] { langGb.IsoCode, langFr.IsoCode }, Constants.Security.SuperUserKey, CancellationToken.None)).Success);
 
         // re-get
         content = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
@@ -1481,7 +1518,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         IContent content = new Content("content", Constants.System.Root, contentType);
         content.SetCultureName("content-fr", langFr.IsoCode);
         await ContentService.SaveAsync(content, null, null, CancellationToken.None);
-        var published = ContentService.Publish(content, new[] { langFr.IsoCode });
+        var published = await ContentService.PublishAsync(content, new[] { langFr.IsoCode }, Constants.Security.SuperUserKey, CancellationToken.None);
 
         // audit log will only show that french was published
         var lastLog = (await AuditService.GetItemsByEntityAsync(content.Id, 0, 1)).Items.First();
@@ -1491,7 +1528,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         content = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
         content.SetCultureName("content-en", langUk.IsoCode);
         await ContentService.SaveAsync(content, null, null, CancellationToken.None);
-        published = ContentService.Publish(content, new[] { langUk.IsoCode });
+        published = await ContentService.PublishAsync(content, new[] { langUk.IsoCode }, Constants.Security.SuperUserKey, CancellationToken.None);
 
         // audit log will only show that english was published
         lastLog = (await AuditService.GetItemsByEntityAsync(content.Id, 0, 1)).Items.First();
@@ -1522,7 +1559,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         content.SetCultureName("content-fr", langFr.IsoCode);
         content.SetCultureName("content-gb", langGb.IsoCode);
         var saved = await ContentService.SaveAsync(content, null, null, CancellationToken.None);
-        var published = ContentService.Publish(content, new[] { langGb.IsoCode, langFr.IsoCode });
+        var published = await ContentService.PublishAsync(content, new[] { langGb.IsoCode, langFr.IsoCode }, Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.IsTrue(saved.Success);
         Assert.IsTrue(published.Success);
 
@@ -1553,7 +1590,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         Assert.IsNotNull(content);
 
         // Act
-        var published = ContentService.Publish(content, content.AvailableCultures.ToArray(), userId: Constants.Security.SuperUserId);
+        var published = await ContentService.PublishAsync(content, content.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Assert
         Assert.That(published.Success, Is.True);
@@ -1568,7 +1605,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         Assert.IsNotNull(content);
 
         // Act
-        var published = ContentService.Publish(content, content.AvailableCultures.ToArray(), userId: -1);
+        var published = await ContentService.PublishAsync(content, content.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Assert
         Assert.That(published.Success, Is.True);
@@ -1582,7 +1619,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         var parent = await ContentService.CreateAsync("parent", (Guid?)null, "umbTextpage", Constants.Security.SuperUserKey, CancellationToken.None);
 
         await ContentService.SaveAsync(parent, null, null, CancellationToken.None);
-        ContentService.Publish(parent, parent.AvailableCultures.ToArray());
+        await ContentService.PublishAsync(parent, parent.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
         var content = await ContentService.CreateAsync("child", parent, "umbTextpage", Constants.Security.SuperUserKey, CancellationToken.None);
         await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
@@ -1626,7 +1663,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
             content.Name = "foo";
             await ContentService.SaveAsync(content, null, null, CancellationToken.None);
             var published =
-                ContentService.Publish(content, content.AvailableCultures.ToArray(), userId: Constants.Security.SuperUserId);
+                await ContentService.PublishAsync(content, content.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
 
             Assert.That(published.Success, Is.True);
             Assert.That(content.Published, Is.True);
@@ -1655,11 +1692,11 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         content.SetCultureName("Name for en-US", "en-US");
         await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
-        Assert.Throws<ArgumentNullException>(() => ContentService.Publish(content, null!));
-        Assert.Throws<ArgumentException>(() => ContentService.Publish(content, new string[] { null }));
-        Assert.Throws<ArgumentException>(() => ContentService.Publish(content, new [] { string.Empty }));
-        Assert.Throws<ArgumentException>(() => ContentService.Publish(content, new[] { "*", null }));
-        Assert.Throws<ArgumentException>(() => ContentService.Publish(content, new[] { "en-US", "*" }));
+        Assert.ThrowsAsync<ArgumentNullException>(() => ContentService.PublishAsync(content, null!, Constants.Security.SuperUserKey, CancellationToken.None));
+        Assert.ThrowsAsync<ArgumentException>(() => ContentService.PublishAsync(content, new string[] { null }, Constants.Security.SuperUserKey, CancellationToken.None));
+        Assert.ThrowsAsync<ArgumentException>(() => ContentService.PublishAsync(content, new [] { string.Empty }, Constants.Security.SuperUserKey, CancellationToken.None));
+        Assert.ThrowsAsync<ArgumentException>(() => ContentService.PublishAsync(content, new[] { "*", null }, Constants.Security.SuperUserKey, CancellationToken.None));
+        Assert.ThrowsAsync<ArgumentException>(() => ContentService.PublishAsync(content, new[] { "en-US", "*" }, Constants.Security.SuperUserKey, CancellationToken.None));
     }
 
     [Test]
@@ -1672,11 +1709,11 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         content.Name = "Content name";
         await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
-        Assert.Throws<ArgumentNullException>(() => ContentService.Publish(content, null!));
-        Assert.Throws<ArgumentException>(() => ContentService.Publish(content, new string[] { null! }));
-        Assert.Throws<ArgumentException>(() => ContentService.Publish(content, new[] { "*", null! }));
-        Assert.Throws<ArgumentException>(() => ContentService.Publish(content, new[] { "en-US" }));
-        Assert.Throws<ArgumentException>(() => ContentService.Publish(content, new[] { "en-US", "*" }));
+        Assert.ThrowsAsync<ArgumentNullException>(() => ContentService.PublishAsync(content, null!, Constants.Security.SuperUserKey, CancellationToken.None));
+        Assert.ThrowsAsync<ArgumentException>(() => ContentService.PublishAsync(content, new string[] { null! }, Constants.Security.SuperUserKey, CancellationToken.None));
+        Assert.ThrowsAsync<ArgumentException>(() => ContentService.PublishAsync(content, new[] { "*", null! }, Constants.Security.SuperUserKey, CancellationToken.None));
+        Assert.ThrowsAsync<ArgumentException>(() => ContentService.PublishAsync(content, new[] { "en-US" }, Constants.Security.SuperUserKey, CancellationToken.None));
+        Assert.ThrowsAsync<ArgumentException>(() => ContentService.PublishAsync(content, new[] { "en-US", "*" }, Constants.Security.SuperUserKey, CancellationToken.None));
     }
 
     [Test]
@@ -1697,7 +1734,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         var parent = await ContentService.GetByIdAsync(Textpage.Key, CancellationToken.None);
 
         await ContentService.SaveAsync(parent, null, null, CancellationToken.None);
-        var parentPublished = ContentService.Publish(parent, parent.AvailableCultures.ToArray());
+        var parentPublished = await ContentService.PublishAsync(parent, parent.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         // parent can publish values
         // and therefore can be published
@@ -1720,7 +1757,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         // and therefore cannot be published,
         // because it did not have a published version at all
         await ContentService.SaveAsync(content, null, null, CancellationToken.None);
-        var contentPublished = ContentService.Publish(content, content.AvailableCultures.ToArray());
+        var contentPublished = await ContentService.PublishAsync(content, content.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.IsFalse(contentPublished.Success);
         Assert.AreEqual(PublishResultType.FailedPublishContentInvalid, contentPublished.Result);
         Assert.IsFalse(content.Published);
@@ -1847,14 +1884,14 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         var parent = await ContentService.GetByIdAsync(Textpage.Key, CancellationToken.None);
         Assert.IsNotNull(parent);
         var parentPublished =
-            ContentService.Publish(
+            await ContentService.PublishAsync(
                 parent,
                 parent.AvailableCultures.ToArray(),
-                userId: Constants.Security
-                    .SuperUserId); // Publish root Home node to enable publishing of 'Subpage.Id'
+                Constants.Security.SuperUserKey,
+                CancellationToken.None); // Publish root Home node to enable publishing of 'Subpage.Id'
 
         // Act
-        var published = ContentService.Publish(content, content.AvailableCultures.ToArray(), userId: Constants.Security.SuperUserId);
+        var published = await ContentService.PublishAsync(content, content.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Assert
         Assert.That(parentPublished.Success, Is.True);
@@ -1875,7 +1912,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         var contentSchedule = ContentScheduleCollection.CreateWithEntry("en-US", null, DateTime.UtcNow.AddMinutes(-5));
         await ContentService.SaveAsync(content, null, contentSchedule, CancellationToken.None);
 
-        var published = ContentService.Publish(content, new[] { "en-US" });
+        var published = await ContentService.PublishAsync(content, new[] { "en-US" }, Constants.Security.SuperUserKey, CancellationToken.None);
 
         Assert.IsFalse(published.Success);
         Assert.AreEqual(PublishResultType.FailedPublishCultureHasExpired, published.Result);
@@ -1893,14 +1930,14 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         var parent = await ContentService.GetByIdAsync(Textpage.Key, CancellationToken.None);
         Assert.IsNotNull(parent);
         var parentPublished =
-            ContentService.Publish(
+            await ContentService.PublishAsync(
                 parent,
                 parent.AvailableCultures.ToArray(),
-                userId: Constants.Security
-                    .SuperUserId); // Publish root Home node to enable publishing of 'Subpage.Id'
+                Constants.Security.SuperUserKey,
+                CancellationToken.None); // Publish root Home node to enable publishing of 'Subpage.Id'
 
         // Act
-        var published = ContentService.Publish(content, content.AvailableCultures.ToArray(), userId: Constants.Security.SuperUserId);
+        var published = await ContentService.PublishAsync(content, content.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Assert
         Assert.That(parentPublished.Success, Is.True);
@@ -1940,7 +1977,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
             .Build();
 
         await contentService.SaveAsync(content, null, null, CancellationToken.None);
-        contentService.Publish(content, Array.Empty<string>());
+        await contentService.PublishAsync(content, Array.Empty<string>(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         content.Properties[0].SetValue("Foo", string.Empty);
         await contentService.SaveAsync(content, null, null, CancellationToken.None);
@@ -1950,7 +1987,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
             CancellationToken.None);
 
         // Act
-        var result = contentService.Publish(content, Array.Empty<string>(), userId: Constants.Security.SuperUserId);
+        var result = await contentService.PublishAsync(content, Array.Empty<string>(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Assert
         Assert.Multiple(() =>
@@ -1996,7 +2033,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
             .Build();
 
         await contentService.SaveAsync(content, null, null, CancellationToken.None);
-        contentService.Publish(content, Array.Empty<string>());
+        await contentService.PublishAsync(content, Array.Empty<string>(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         await contentService.PersistContentScheduleAsync(
             content,
@@ -2005,7 +2042,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         await contentService.SaveAsync(content, null, null, CancellationToken.None);
 
         // Act
-        var result = contentService.Publish(content, Array.Empty<string>(), userId: Constants.Security.SuperUserId);
+        var result = await contentService.PublishAsync(content, Array.Empty<string>(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Assert
         Assert.Multiple(() =>
@@ -2032,7 +2069,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         var contentSchedule = ContentScheduleCollection.CreateWithEntry("en-US", DateTime.UtcNow.AddHours(2), null);
         await ContentService.SaveAsync(content, null, contentSchedule, CancellationToken.None);
 
-        var published = ContentService.Publish(content, new[] { "en-US" });
+        var published = await ContentService.PublishAsync(content, new[] { "en-US" }, Constants.Security.SuperUserKey, CancellationToken.None);
 
         Assert.IsFalse(published.Success);
         Assert.AreEqual(PublishResultType.FailedPublishCultureAwaitingRelease, published.Result);
@@ -2062,7 +2099,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         Assert.IsNotNull(content);
 
         // Act
-        var published = ContentService.Publish(content, content.AvailableCultures.ToArray(), userId: Constants.Security.SuperUserId);
+        var published = await ContentService.PublishAsync(content, content.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Assert
         Assert.That(published.Success, Is.False);
@@ -2079,7 +2116,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
         // Act
         var saved = await ContentService.SaveAsync(content, Constants.Security.SuperUserId, null, CancellationToken.None);
-        var published = ContentService.Publish(content, content.AvailableCultures.ToArray(), userId: Constants.Security.SuperUserId);
+        var published = await ContentService.PublishAsync(content, content.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Assert
         Assert.That(content.HasIdentity, Is.True);
@@ -2104,7 +2141,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
         // Act
         var saved = await ContentService.SaveAsync(content, Constants.Security.SuperUserId, null, CancellationToken.None);
-        var published = ContentService.Publish(content, content.AvailableCultures.ToArray(), userId: Constants.Security.SuperUserId);
+        var published = await ContentService.PublishAsync(content, content.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
         var childContent = await ContentService.CreateAsync("Child", content.Key, "umbTextpage", Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Reset all identity properties
@@ -2113,7 +2150,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         ((Content)childContent).ResetIdentity();
         var childSaved = await ContentService.SaveAsync(childContent, Constants.Security.SuperUserId, null, CancellationToken.None);
         var childPublished =
-            ContentService.Publish(childContent, childContent.AvailableCultures.ToArray(), userId: Constants.Security.SuperUserId);
+            await ContentService.PublishAsync(childContent, childContent.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Assert
         Assert.That(content.HasIdentity, Is.True);
@@ -2533,12 +2570,12 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     {
         // Arrange
         var root = (await ContentService.GetByIdAsync(Textpage.Key, CancellationToken.None))!;
-        var rootPublished = ContentService.Publish(root, root.AvailableCultures.ToArray());
+        var rootPublished = await ContentService.PublishAsync(root, root.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         var content = await ContentService.GetByIdAsync(Subpage.Key, CancellationToken.None);
         content.Properties["title"].SetValue(content.Properties["title"].GetValue() + " Published");
         await ContentService.SaveAsync(content, null, null, CancellationToken.None);
-        var contentPublished = ContentService.Publish(content, content.AvailableCultures.ToArray());
+        var contentPublished = await ContentService.PublishAsync(content, content.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
         var publishedVersion = content.VersionId;
 
         content.Properties["title"].SetValue(content.Properties["title"].GetValue() + " Saved");
@@ -2664,7 +2701,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         content.SetValue("title", "title of mine");
         content.SetValue("bodyText", "hello world");
         await ContentService.SaveAsync(content, null, null, CancellationToken.None);
-        ContentService.Publish(content, content.AvailableCultures.ToArray());
+        await ContentService.PublishAsync(content, content.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         // re-get
         content = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
@@ -2672,7 +2709,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         content.SetValue("bodyText", null); // Clear a value
         content.SetValue("author", "new author"); // Add a value
         await ContentService.SaveAsync(content, null, null, CancellationToken.None);
-        ContentService.Publish(content, content.AvailableCultures.ToArray());
+        await ContentService.PublishAsync(content, content.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         // re-get
         content = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
@@ -2997,18 +3034,20 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         content1.PropertyValues(obj);
         content1.ResetDirtyProperties(false);
         await ContentService.SaveAsync(content1, null, null, CancellationToken.None);
-        Assert.IsTrue(ContentService.Publish(
+        Assert.IsTrue((await ContentService.PublishAsync(
             content1,
             content1.AvailableCultures.ToArray(),
-            userId: -1).Success);
+            Constants.Security.SuperUserKey,
+            CancellationToken.None)).Success);
         var content2 = ContentBuilder.CreateBasicContent(contentType);
         content2.PropertyValues(obj);
         content2.ResetDirtyProperties(false);
         await ContentService.SaveAsync(content2, null, null, CancellationToken.None);
-        Assert.IsTrue(ContentService.Publish(
+        Assert.IsTrue((await ContentService.PublishAsync(
             content2,
             content2.AvailableCultures.ToArray(),
-            userId: -1).Success);
+            Constants.Security.SuperUserKey,
+            CancellationToken.None)).Success);
 
         var editorGroup = await UserGroupService.GetAsync(Constants.Security.EditorGroupKey);
         editorGroup.StartContentId = content1.Id;
@@ -3316,7 +3355,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         var (content, langUk, langFr, _) = await CreateEnglishAndFrenchDocument();
 
         Assert.IsTrue((await ContentService.SaveAsync(content, null, null, CancellationToken.None)).Success);
-        Assert.IsTrue(ContentService.Publish(content, [langFr.IsoCode, langUk.IsoCode]).Success);
+        Assert.IsTrue((await ContentService.PublishAsync(content, [langFr.IsoCode, langUk.IsoCode], Constants.Security.SuperUserKey, CancellationToken.None)).Success);
 
         // re-get to ensure we copy from the persisted state
         content = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
@@ -3343,13 +3382,13 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         parent.SetCultureName("parent-fr", langFr.IsoCode);
         parent.SetCultureName("parent-en", langUk.IsoCode);
         Assert.IsTrue((await ContentService.SaveAsync(parent, null, null, CancellationToken.None)).Success);
-        Assert.IsTrue(ContentService.Publish(parent, [langFr.IsoCode, langUk.IsoCode]).Success);
+        Assert.IsTrue((await ContentService.PublishAsync(parent, [langFr.IsoCode, langUk.IsoCode], Constants.Security.SuperUserKey, CancellationToken.None)).Success);
 
         IContent child = new Content("child", parent.Id, contentType);
         child.SetCultureName("child-fr", langFr.IsoCode);
         child.SetCultureName("child-en", langUk.IsoCode);
         Assert.IsTrue((await ContentService.SaveAsync(child, null, null, CancellationToken.None)).Success);
-        Assert.IsTrue(ContentService.Publish(child, [langFr.IsoCode, langUk.IsoCode]).Success);
+        Assert.IsTrue((await ContentService.PublishAsync(child, [langFr.IsoCode, langUk.IsoCode], Constants.Security.SuperUserKey, CancellationToken.None)).Success);
 
         // re-get to ensure we copy from the persisted state
         parent = await ContentService.GetByIdAsync(parent.Key, CancellationToken.None);
@@ -3532,7 +3571,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         Assert.AreEqual(0, contentTags.Length);
 
         // publish
-        ContentService.Publish(content, new []{ "*" });
+        await ContentService.PublishAsync(content, new []{ "*" }, Constants.Security.SuperUserKey, CancellationToken.None);
 
         // now tags have been set (published)
         Assert.AreEqual("[\"hello\",\"world\"]", content.GetValue(propAlias));
@@ -3548,7 +3587,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         Assert.AreEqual(0, copiedTags.Length);
 
         // publish
-        ContentService.Publish(copy, new []{ "*" });
+        await ContentService.PublishAsync(copy, new []{ "*" }, Constants.Security.SuperUserKey, CancellationToken.None);
 
         // now tags have been set (published)
         copiedTags = TagService.GetTagsForEntity(copy.Id).ToArray();
@@ -3565,7 +3604,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         var parent = await ContentService.GetByIdAsync(Textpage.Key, CancellationToken.None);
         Assert.IsFalse(parent.Published);
         await ContentService.SaveAsync(parent, null, null, CancellationToken.None);
-        ContentService.Publish(parent, parent.AvailableCultures.ToArray()); // publishing parent, so Text Page 2 can be updated.
+        await ContentService.PublishAsync(parent, parent.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None); // publishing parent, so Text Page 2 can be updated.
 
         var content = await ContentService.GetByIdAsync(Subpage.Key, CancellationToken.None);
         Assert.IsFalse(content.Published);
@@ -3582,7 +3621,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         Assert.IsTrue(content.Edited);
 
         await ContentService.SaveAsync(content, null, null, CancellationToken.None);
-        ContentService.Publish(content, content.AvailableCultures.ToArray()); // new version
+        await ContentService.PublishAsync(content, content.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None); // new version
         var version2 = content.VersionId;
         Assert.AreNotEqual(version1, version2);
 
@@ -3609,7 +3648,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         content.Name = "Text Page 2 ReReUpdated";
 
         await ContentService.SaveAsync(content, null, null, CancellationToken.None);
-        ContentService.Publish(content, content.AvailableCultures.ToArray()); // new version
+        await ContentService.PublishAsync(content, content.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None); // new version
         var version3 = content.VersionId;
         Assert.AreNotEqual(version2, version3);
 
@@ -3669,7 +3708,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         Assert.AreEqual("Text Page 2 ReReUpdated", content.Name);
         Assert.AreEqual("Jane Doe", content.GetValue<string>("author"));
         await ContentService.SaveAsync(content, null, null, CancellationToken.None);
-        ContentService.Publish(content, content.AvailableCultures.ToArray());
+        await ContentService.PublishAsync(content, content.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.IsFalse(content.Edited);
         content.Name = "Xxx";
         content.SetValue("author", "Bob Doe");
@@ -3690,12 +3729,12 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         // A document can only be published once its ancestor path is published too.
         var parent = await ContentService.GetByIdAsync(Textpage.Key, CancellationToken.None);
         await ContentService.SaveAsync(parent, null, null, CancellationToken.None);
-        ContentService.Publish(parent, parent.AvailableCultures.ToArray());
+        await ContentService.PublishAsync(parent, parent.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         var content = await ContentService.GetByIdAsync(Subpage.Key, CancellationToken.None);
         content.SetValue("author", "Francis Doe");
         await ContentService.SaveAsync(content, null, null, CancellationToken.None);
-        PublishResult publishResult = ContentService.Publish(content, content.AvailableCultures.ToArray());
+        PublishResult publishResult = await ContentService.PublishAsync(content, content.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.IsTrue(publishResult.Success, publishResult.Result.ToString());
 
         // The currently-published version - a stable rollback target as long as it isn't superseded by a
@@ -3761,7 +3800,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         page.SetValue(p1.Alias, "v1da", langDa.IsoCode);
         Thread.Sleep(1);
         await ContentService.SaveAsync(page, null, null, CancellationToken.None);
-        ContentService.Publish(page, page.AvailableCultures.ToArray());
+        await ContentService.PublishAsync(page, page.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
         var versionId1 = page.VersionId;
 
         Thread.Sleep(10);
@@ -3770,7 +3809,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         page.SetValue(p1.Alias, "v2fr", langFr.IsoCode);
         Thread.Sleep(1);
         await ContentService.SaveAsync(page, null, null, CancellationToken.None);
-        ContentService.Publish(page, new[] { langFr.IsoCode });
+        await ContentService.PublishAsync(page, new[] { langFr.IsoCode }, Constants.Security.SuperUserKey, CancellationToken.None);
         var versionId2 = page.VersionId;
 
         Thread.Sleep(10);
@@ -3779,7 +3818,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         page.SetValue(p1.Alias, "v2da", langDa.IsoCode);
         Thread.Sleep(1);
         await ContentService.SaveAsync(page, null, null, CancellationToken.None);
-        ContentService.Publish(page, new[] { langDa.IsoCode });
+        await ContentService.PublishAsync(page, new[] { langDa.IsoCode }, Constants.Security.SuperUserKey, CancellationToken.None);
         var versionId3 = page.VersionId;
 
         Thread.Sleep(10);
@@ -3790,7 +3829,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         page.SetValue(p1.Alias, "v3da", langDa.IsoCode);
         Thread.Sleep(1);
         await ContentService.SaveAsync(page, null, null, CancellationToken.None);
-        ContentService.Publish(page, page.AvailableCultures.ToArray());
+        await ContentService.PublishAsync(page, page.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
         var versionId4 = page.VersionId;
 
         // now get all versions
@@ -4346,7 +4385,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         // becomes Published, !Edited
         // creates a new version
         // can get published property values
-        ContentService.Publish(content, new []{ "*" });
+        await ContentService.PublishAsync(content, new []{ "*" }, Constants.Security.SuperUserKey, CancellationToken.None);
 
         Assert.IsTrue(content.Published);
         Assert.IsFalse(content.Edited);
@@ -4681,7 +4720,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         AssertPerCulture(content2, (x, c) => x.IsCultureEdited(c), (langFr, true), (langUk, true), (langDe, false));
 
         // Act
-        ContentService.Publish(content, new[] { langFr.IsoCode, langUk.IsoCode });
+        await ContentService.PublishAsync(content, new[] { langFr.IsoCode, langUk.IsoCode }, Constants.Security.SuperUserKey, CancellationToken.None);
 
         // both FR and UK have been published,
         // and content has been published,
@@ -4761,7 +4800,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         // note that content and content2 culture published dates might be slightly different due to roundtrip to database
 
         // Act
-        ContentService.Publish(content, new []{ "*" });
+        await ContentService.PublishAsync(content, new []{ "*" }, Constants.Security.SuperUserKey, CancellationToken.None);
 
         // now it has publish name for invariant neutral
         content2 = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
@@ -4962,7 +5001,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         AssertPerCulture(content2, (x, c) => x.GetPublishDate(c) == DateTime.MinValue, (langUk, false)); // FR, DE would throw
 
         // Act
-        ContentService.Publish(content, new[] { langUk.IsoCode });
+        await ContentService.PublishAsync(content, new[] { langUk.IsoCode }, Constants.Security.SuperUserKey, CancellationToken.None);
 
         content2 = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
 
@@ -5035,7 +5074,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     public async Task Cannot_Publish_Newly_Created_Unsaved_Content()
     {
         var content = await ContentService.CreateAsync("Test", (Guid?)null, "umbTextpage", Constants.Security.SuperUserKey, CancellationToken.None);
-        var publishResult = ContentService.Publish(content, new[] { "*" });
+        var publishResult = await ContentService.PublishAsync(content, new[] { "*" }, Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.AreEqual(PublishResultType.FailedPublishUnsavedChanges, publishResult.Result);
     }
 
@@ -5046,7 +5085,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         await ContentService.SaveAsync(content, null, null, CancellationToken.None);
         content.Name = "Test2";
 
-        var publishResult = ContentService.Publish(content, new[] { "*" });
+        var publishResult = await ContentService.PublishAsync(content, new[] { "*" }, Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.AreEqual(PublishResultType.FailedPublishUnsavedChanges, publishResult.Result);
     }
 
@@ -5066,7 +5105,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
         // reset any state and attempt a publish
         content = (await ContentService.GetByIdAsync(content.Key, CancellationToken.None))!;
-        var result = ContentService.Publish(content, new[] { "*" });
+        var result = await ContentService.PublishAsync(content, new[] { "*" }, Constants.Security.SuperUserKey, CancellationToken.None);
 
         Assert.IsFalse(result.Success);
         Assert.AreEqual(PublishResultType.FailedPublishContentInvalid, result.Result);
@@ -5092,7 +5131,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
         // reset any state and attempt a publish
         content = (await ContentService.GetByIdAsync(content.Key, CancellationToken.None))!;
-        var result = ContentService.Publish(content, new[] { langEn.IsoCode });
+        var result = await ContentService.PublishAsync(content, new[] { langEn.IsoCode }, Constants.Security.SuperUserKey, CancellationToken.None);
 
         Assert.IsTrue(result.Success);
         Assert.AreEqual(PublishResultType.SuccessPublishCulture, result.Result);

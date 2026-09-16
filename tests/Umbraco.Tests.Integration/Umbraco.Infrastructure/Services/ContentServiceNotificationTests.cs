@@ -264,7 +264,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
 
         try
         {
-            ContentService.Publish(document, ["*"]);
+            await ContentService.PublishAsync(document, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
             Assert.IsTrue(treeChangeWasCalled);
         }
         finally
@@ -278,7 +278,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
     {
         IContent document = new Content("content", -1, _contentType);
         await ContentService.SaveAsync(document, null, null, CancellationToken.None);
-        ContentService.Publish(document, ["*"]);
+        await ContentService.PublishAsync(document, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         var treeChangeWasCalled = false;
 
@@ -371,7 +371,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
 
         try
         {
-            ContentService.Publish(document, new[] { "fr-FR" });
+            await ContentService.PublishAsync(document, new[] { "fr-FR" }, Constants.Security.SuperUserKey, CancellationToken.None);
             Assert.IsTrue(publishingWasCalled);
             Assert.IsTrue(publishedWasCalled);
             Assert.IsTrue(treeChangeWasCalled);
@@ -453,7 +453,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         try
         {
             await ContentService.SaveAsync(document, null, null, CancellationToken.None);
-            ContentService.Publish(document, document.AvailableCultures.ToArray());
+            await ContentService.PublishAsync(document, document.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
             Assert.IsTrue(savingWasCalled);
             Assert.IsTrue(savedWasCalled);
             Assert.IsTrue(publishingWasCalled);
@@ -628,7 +628,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         IContent document = new Content("content", -1, _contentType);
 
         await ContentService.SaveAsync(document, null, null, CancellationToken.None);
-        var result = ContentService.Publish(document, document.AvailableCultures.ToArray());
+        var result = await ContentService.PublishAsync(document, document.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.IsFalse(result.Success);
         Assert.AreEqual("title", result.InvalidProperties.First().Alias);
 
@@ -652,7 +652,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         try
         {
             await ContentService.SaveAsync(document, null, null, CancellationToken.None);
-            result = ContentService.Publish(document, document.AvailableCultures.ToArray());
+            result = await ContentService.PublishAsync(document, document.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
             Assert.IsTrue(result
                 .Success); // will succeed now because we were able to specify the required value in the Saving event
             Assert.IsTrue(savingWasCalled);
@@ -681,7 +681,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         document.SetCultureName("hello", "en-US");
         document.SetCultureName("bonjour", "fr-FR");
         await ContentService.SaveAsync(document, null, null, CancellationToken.None);
-        ContentService.Publish(document, document.AvailableCultures.ToArray());
+        await ContentService.PublishAsync(document, document.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         Assert.IsTrue(document.IsCulturePublished("fr-FR"));
         Assert.IsTrue(document.IsCulturePublished("en-US"));
@@ -938,7 +938,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
 
         try
         {
-            ContentService.Publish(document, ["*"]);
+            await ContentService.PublishAsync(document, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
             Assert.IsTrue(publishedWasCalled);
         }
         finally
@@ -983,7 +983,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
 
         try
         {
-            ContentService.Publish(document, new[] { "fr-FR" });
+            await ContentService.PublishAsync(document, new[] { "fr-FR" }, Constants.Security.SuperUserKey, CancellationToken.None);
             Assert.IsTrue(publishedWasCalled);
         }
         finally
@@ -997,7 +997,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
     {
         IContent document = new Content("content", -1, _contentType);
         await ContentService.SaveAsync(document, null, null, CancellationToken.None);
-        ContentService.Publish(document, ["*"]);
+        await ContentService.PublishAsync(document, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         var unpublishedWasCalled = false;
 
@@ -1041,7 +1041,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         document.SetCultureName("hello", "en-US");
         document.SetCultureName("bonjour", "fr-FR");
         await ContentService.SaveAsync(document, null, null, CancellationToken.None);
-        ContentService.Publish(document, document.AvailableCultures.ToArray());
+        await ContentService.PublishAsync(document, document.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         // re-get - dirty properties need resetting
         document = await ContentService.GetByIdAsync(document.Key, CancellationToken.None);
@@ -1176,7 +1176,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         document.SetCultureName("hello", "en-US");
         document.SetCultureName("bonjour", "fr-FR");
         await ContentService.SaveAsync(document, null, null, CancellationToken.None);
-        ContentService.Publish(document, document.AvailableCultures.ToArray());
+        await ContentService.PublishAsync(document, document.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         // re-get - dirty properties need resetting
         document = await ContentService.GetByIdAsync(document.Key, CancellationToken.None);
@@ -1319,11 +1319,11 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
     {
         IContent root = new Content("root", -1, _contentType);
         await ContentService.SaveAsync(root, null, null, CancellationToken.None);
-        ContentService.Publish(root, ["*"]);
+        await ContentService.PublishAsync(root, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         IContent child = new Content("child", root.Id, _contentType);
         await ContentService.SaveAsync(child, null, null, CancellationToken.None);
-        ContentService.Publish(child, ["*"]);
+        await ContentService.PublishAsync(child, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         // re-get - dirty properties need resetting
         root = await ContentService.GetByIdAsync(root.Key, CancellationToken.None);
@@ -1364,7 +1364,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         // invariant root
         IContent root = new Content("root", -1, _contentType);
         await ContentService.SaveAsync(root, null, null, CancellationToken.None);
-        ContentService.Publish(root, ["*"]);
+        await ContentService.PublishAsync(root, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         // variant descendant of the invariant root - a branch can legitimately mix content type variance
         IContentType variantContentType = ContentTypeBuilder.CreateBasicContentType("variantPage", "Variant Page");
@@ -1374,7 +1374,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         IContent child = new Content("child", root.Id, variantContentType);
         child.SetCultureName("child-en", "en-US");
         await ContentService.SaveAsync(child, null, null, CancellationToken.None);
-        ContentService.Publish(child, ["en-US"]);
+        await ContentService.PublishAsync(child, ["en-US"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         // re-get - dirty properties need resetting
         root = await ContentService.GetByIdAsync(root.Key, CancellationToken.None);
@@ -1411,7 +1411,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
     {
         IContent document = new Content("content", -1, _contentType);
         await ContentService.SaveAsync(document, null, null, CancellationToken.None);
-        ContentService.Publish(document, ["*"]);
+        await ContentService.PublishAsync(document, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         // re-get - dirty properties need resetting
         document = await ContentService.GetByIdAsync(document.Key, CancellationToken.None);
@@ -1458,7 +1458,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         document.SetCultureName("hello", "en-US");
         document.SetCultureName("bonjour", "fr-FR");
         await ContentService.SaveAsync(document, null, null, CancellationToken.None);
-        ContentService.Publish(document, document.AvailableCultures.ToArray());
+        await ContentService.PublishAsync(document, document.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         // re-get - dirty properties need resetting
         document = await ContentService.GetByIdAsync(document.Key, CancellationToken.None);
@@ -1507,7 +1507,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         document.SetCultureName("hello", "en-US");
         document.SetCultureName("bonjour", "fr-FR");
         await ContentService.SaveAsync(document, null, null, CancellationToken.None);
-        ContentService.Publish(document, document.AvailableCultures.ToArray());
+        await ContentService.PublishAsync(document, document.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         var unpublishedWasCalled = false;
 

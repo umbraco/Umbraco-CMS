@@ -160,7 +160,7 @@ public class BlockListPropertyValueHandlerTests : PropertyValueHandlerTestsBase
             .WithPropertyValues(new { blocks = blocksPropertyValue })
             .Build();
         await ContentService.SaveAsync(content, null, null, CancellationToken.None);
-        ContentService.Publish(content, ["*"]);
+        await ContentService.PublishAsync(content, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         AssertDocumentFields(IndexAliases.DraftContent);
         AssertDocumentFields(IndexAliases.PublishedContent);
@@ -320,7 +320,7 @@ public class BlockListPropertyValueHandlerTests : PropertyValueHandlerTestsBase
             .WithPropertyValues(new { rootBlocks = blocksPropertyValue })
             .Build();
         await ContentService.SaveAsync(content, null, null, CancellationToken.None);
-        ContentService.Publish(content, ["*"]);
+        await ContentService.PublishAsync(content, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.PublishedContent);
         Assert.That(documents, Has.Count.EqualTo(1));
@@ -505,7 +505,7 @@ public class BlockListPropertyValueHandlerTests : PropertyValueHandlerTestsBase
             .WithPropertyValues(new { blocks = blocksPropertyValue })
             .Build();
         await ContentService.SaveAsync(content, null, null, CancellationToken.None);
-        ContentService.Publish(content, ["*"]);
+        await ContentService.PublishAsync(content, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         AssertDocumentFields(
             IndexAliases.DraftContent,
@@ -960,11 +960,11 @@ public class BlockListPropertyValueHandlerTests : PropertyValueHandlerTestsBase
         await ContentService.SaveAsync(content, null, null, CancellationToken.None);
         if (publishAllCultures)
         {
-            ContentService.Publish(content, ["en-US", "da-DK", "de-DE"]);
+            await ContentService.PublishAsync(content, ["en-US", "da-DK", "de-DE"], Constants.Security.SuperUserKey, CancellationToken.None);
         }
         else
         {
-            ContentService.Publish(content, ["da-DK", "de-DE"]);
+            await ContentService.PublishAsync(content, ["da-DK", "de-DE"], Constants.Security.SuperUserKey, CancellationToken.None);
         }
     }
 }

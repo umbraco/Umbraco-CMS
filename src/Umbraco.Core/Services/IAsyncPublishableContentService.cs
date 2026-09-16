@@ -108,6 +108,21 @@ public interface IAsyncPublishableContentService<TContent> : IAsyncContentServic
     Task<Attempt<ContentRollbackOperationStatus>> RollbackAsync(Guid key, int versionId, string culture, Guid userKey, CancellationToken cancellationToken);
 
     /// <summary>
+    ///     Publishes content.
+    /// </summary>
+    /// <remarks>
+    ///     <para>When a culture is being published, it includes all varying values along with all invariant values.</para>
+    ///     <para>Wildcards (*) can be used as culture identifier to publish all cultures.</para>
+    ///     <para>An empty array (or a wildcard) can be passed for culture invariant content.</para>
+    /// </remarks>
+    /// <param name="content">The content to publish.</param>
+    /// <param name="cultures">The cultures to publish.</param>
+    /// <param name="userKey">The Guid key of the user performing the action.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>The result of the publish operation.</returns>
+    Task<PublishResult> PublishAsync(TContent content, string[] cultures, Guid userKey, CancellationToken cancellationToken);
+
+    /// <summary>
     ///     Gets a version of content.
     /// </summary>
     /// <remarks>

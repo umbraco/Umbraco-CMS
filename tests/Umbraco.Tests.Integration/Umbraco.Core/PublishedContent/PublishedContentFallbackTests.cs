@@ -158,7 +158,7 @@ public class PublishedContentFallbackTests : UmbracoIntegrationTest
             .WithName("Parent")
             .Build();
         await ContentService.SaveAsync(parent, null, null, CancellationToken.None);
-        ContentService.Publish(parent, ["*"]);
+        await ContentService.PublishAsync(parent, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         var child = new ContentBuilder()
             .WithContentType(contentType)
@@ -166,7 +166,7 @@ public class PublishedContentFallbackTests : UmbracoIntegrationTest
             .WithName("Child")
             .Build();
         await ContentService.SaveAsync(child, null, null, CancellationToken.None);
-        ContentService.Publish(child, ["*"]);
+        await ContentService.PublishAsync(child, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         var publishedChild = GetPublishedContent(child.Key);
 
@@ -200,7 +200,7 @@ public class PublishedContentFallbackTests : UmbracoIntegrationTest
         content.SetValue("title", invariantTitle);
         content.SetValue("title", segmentedTitle, segment: "s1");
         await ContentService.SaveAsync(content, null, null, CancellationToken.None);
-        ContentService.Publish(content, ["*"]);
+        await ContentService.PublishAsync(content, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         return GetPublishedContent(content.Key);
     }
@@ -231,7 +231,7 @@ public class PublishedContentFallbackTests : UmbracoIntegrationTest
         content.SetValue("title", englishTitle, culture: "en-US");
         content.SetValue("title", danishTitle, culture: "da-DK");
         await ContentService.SaveAsync(content, null, null, CancellationToken.None);
-        ContentService.Publish(content, ["en-US", "da-DK"]);
+        await ContentService.PublishAsync(content, ["en-US", "da-DK"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         return GetPublishedContent(content.Key);
     }

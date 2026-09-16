@@ -263,12 +263,12 @@ internal class TrackedReferencesServiceElementTests : UmbracoIntegrationTest
         // Create Element1 (will be referenced by Element3)
         Element1 = new Element("Element 1", ElementType);
         await ElementService.SaveAsync(Element1, null, null, CancellationToken.None);
-        ElementService.Publish(Element1, ["*"]);
+        await ElementService.PublishAsync(Element1, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Create Element2 (will be referenced by Element3)
         Element2 = new Element("Element 2", ElementType);
         await ElementService.SaveAsync(Element2, null, null, CancellationToken.None);
-        ElementService.Publish(Element2, ["*"]);
+        await ElementService.PublishAsync(Element2, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Create a folder with an element inside it
         var folderResult = await ElementContainerService.CreateAsync(
@@ -288,13 +288,13 @@ internal class TrackedReferencesServiceElementTests : UmbracoIntegrationTest
         var createResult = await ElementEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         Assert.IsTrue(createResult.Success, $"Create failed with status: {createResult.Status}");
         ElementInFolder = createResult.Result.Content!;
-        ElementService.Publish(ElementInFolder, ["*"]);
+        await ElementService.PublishAsync(ElementInFolder, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Create Element3 that references Element1, Element2 and the element in the folder
         Element3 = new Element("Element 3", ElementType);
         Element3.SetValue("elementPicker", $"[\"{Element1.Key}\", \"{ElementInFolder.Key}\"]");
         Element3.SetValue("elementPicker2", $"[\"{Element2.Key}\"]");
         await ElementService.SaveAsync(Element3, null, null, CancellationToken.None);
-        ElementService.Publish(Element3, ["*"]);
+        await ElementService.PublishAsync(Element3, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
     }
 }

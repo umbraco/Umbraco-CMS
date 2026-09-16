@@ -47,7 +47,7 @@ public partial class InvariantContentTests
         child.SetValue("title", "The updated child title");
         child.SetValue("count", 123456);
         await ContentService.SaveAsync(child, null, null, CancellationToken.None);
-        ContentService.Publish(child, ["*"]);
+        await ContentService.PublishAsync(child, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.PublishedContent);
         Assert.That(documents, Has.Count.EqualTo(4));
@@ -125,7 +125,7 @@ public partial class InvariantContentTests
         child.Name = "The updated child name";
         child.SetValue("tags", "[\"updated-tag1\",\"updated-tag2\",\"updated-tag3\"]");
         await ContentService.SaveAsync(child, null, null, CancellationToken.None);
-        ContentService.Publish(child, ["*"]);
+        await ContentService.PublishAsync(child, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.PublishedContent);
         Assert.That(documents, Has.Count.EqualTo(4));
@@ -169,7 +169,7 @@ public partial class InvariantContentTests
             .WithName("Second Root")
             .Build();
         await ContentService.SaveAsync(secondRoot, null, null, CancellationToken.None);
-        ContentService.Publish(secondRoot, ["*"]);
+        await ContentService.PublishAsync(secondRoot, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         Attempt<ContentMoveOperationStatus> moveResult = await ContentService.MoveAsync(Root(), secondRoot.Key, true, Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.That(moveResult.Result, Is.EqualTo(ContentMoveOperationStatus.Success));
@@ -210,7 +210,7 @@ public partial class InvariantContentTests
             .WithName("Second Root")
             .Build();
         await ContentService.SaveAsync(secondRoot, null, null, CancellationToken.None);
-        ContentService.Publish(secondRoot, ["*"]);
+        await ContentService.PublishAsync(secondRoot, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         Attempt<ContentMoveOperationStatus> moveResult = await ContentService.MoveAsync(Child(), secondRoot.Key, true, Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.That(moveResult.Result, Is.EqualTo(ContentMoveOperationStatus.Success));

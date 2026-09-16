@@ -35,10 +35,10 @@ internal sealed class DocumentVersionRepositoryTest : UmbracoIntegrationTest
         var content = ContentBuilder.CreateSimpleContent(contentType);
         await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
-        ContentService.Publish(content, []);
+        await ContentService.PublishAsync(content, [], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         // At this point content has 2 versions, a draft version and a published version.
 
-        ContentService.Publish(content, []);
+        await ContentService.PublishAsync(content, [], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         // At this point content has 3 versions, a historic version, a draft version and a published version.
 
         using (ScopeProvider.CreateScope())
@@ -67,12 +67,12 @@ internal sealed class DocumentVersionRepositoryTest : UmbracoIntegrationTest
         var content = ContentBuilder.CreateSimpleContent(contentType);
         await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
-        ContentService.Publish(content, []);
+        await ContentService.PublishAsync(content, [], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         // At this point content has 2 versions, a draft version and a published version.
 
-        ContentService.Publish(content, []);
-        ContentService.Publish(content, []);
-        ContentService.Publish(content, []);
+        await ContentService.PublishAsync(content, [], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
+        await ContentService.PublishAsync(content, [], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
+        await ContentService.PublishAsync(content, [], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         // At this point content has 5 versions, 3 historic versions, a draft version and a published version.
 
         var allVersions = await ContentService.GetVersionsAsync(content.Key, CancellationToken.None);
@@ -111,9 +111,9 @@ internal sealed class DocumentVersionRepositoryTest : UmbracoIntegrationTest
         // Create 4 versions in total: 2 historic (1, 2), 1 current draft (3), 1 current published (4).
         var content = ContentBuilder.CreateSimpleContent(contentType);
         await ContentService.SaveAsync(content, null, null, CancellationToken.None);
-        ContentService.Publish(content, []);
-        ContentService.Publish(content, []);
-        ContentService.Publish(content, []);
+        await ContentService.PublishAsync(content, [], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
+        await ContentService.PublishAsync(content, [], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
+        await ContentService.PublishAsync(content, [], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
         using (ScopeProvider.CreateScope())
         {
@@ -151,10 +151,10 @@ internal sealed class DocumentVersionRepositoryTest : UmbracoIntegrationTest
         // Create 5 versions in total: 3 historic (1, 2, 3), 1 current draft (4), 1 current published (5).
         var content = ContentBuilder.CreateSimpleContent(contentType);
         await ContentService.SaveAsync(content, null, null, CancellationToken.None);
-        ContentService.Publish(content, []);
-        ContentService.Publish(content, []);
-        ContentService.Publish(content, []);
-        ContentService.Publish(content, []);
+        await ContentService.PublishAsync(content, [], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
+        await ContentService.PublishAsync(content, [], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
+        await ContentService.PublishAsync(content, [], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
+        await ContentService.PublishAsync(content, [], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
         using (ScopeProvider.CreateScope())
         {
@@ -195,10 +195,10 @@ internal sealed class DocumentVersionRepositoryTest : UmbracoIntegrationTest
         var content = ContentBuilder.CreateSimpleContent(contentType);
         await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
-        ContentService.Publish(content, []);
-        ContentService.Publish(content, []);
-        ContentService.Publish(content, []);
-        ContentService.Publish(content, []);
+        await ContentService.PublishAsync(content, [], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
+        await ContentService.PublishAsync(content, [], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
+        await ContentService.PublishAsync(content, [], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
+        await ContentService.PublishAsync(content, [], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         using (var scope = ScopeProvider.CreateScope())
         {
             var query = ScopeAccessor.AmbientScope.SqlContext.Sql();
@@ -232,9 +232,9 @@ internal sealed class DocumentVersionRepositoryTest : UmbracoIntegrationTest
         var content = ContentBuilder.CreateSimpleContent(contentType);
         await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
-        ContentService.Publish(content, []);
-        ContentService.Publish(content, []);
-        ContentService.Publish(content, []);
+        await ContentService.PublishAsync(content, [], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
+        await ContentService.PublishAsync(content, [], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
+        await ContentService.PublishAsync(content, [], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
         // At this point content has 4 versions: 2 historic, 1 draft, 1 published.
         using (var scope = ScopeProvider.CreateScope())
@@ -288,8 +288,8 @@ internal sealed class DocumentVersionRepositoryTest : UmbracoIntegrationTest
         var content = ContentBuilder.CreateSimpleContent(contentType);
         await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
-        ContentService.Publish(content, []); // Draft + Published
-        ContentService.Publish(content, []); // New Draft
+        await ContentService.PublishAsync(content, [], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None); // Draft + Published
+        await ContentService.PublishAsync(content, [], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None); // New Draft
 
         using (ScopeProvider.CreateScope())
         {
@@ -328,8 +328,8 @@ internal sealed class DocumentVersionRepositoryTest : UmbracoIntegrationTest
         content.SetCultureName("foo", "en-US");
 
         await ContentService.SaveAsync(content, null, null, CancellationToken.None);
-        ContentService.Publish(content, ["en-US"]); // Draft + Published
-        ContentService.Publish(content, ["en-US"]); // New Draft
+        await ContentService.PublishAsync(content, ["en-US"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None); // Draft + Published
+        await ContentService.PublishAsync(content, ["en-US"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None); // New Draft
 
         using (ScopeProvider.CreateScope())
         {

@@ -230,7 +230,7 @@ internal sealed class RichTextPropertyEditorTests : UmbracoIntegrationTest
         var contentResult = await ContentService.SaveAsync(content, null, null, CancellationToken.None);
         Assert.IsTrue(contentResult.Success);
 
-        var publishResult = ContentService.Publish(content, []);
+        var publishResult = await ContentService.PublishAsync(content, [], Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.IsTrue(publishResult.Success);
 
         var publishedContent = await PublishedContentCache.GetByIdAsync(content.Key);
@@ -267,7 +267,7 @@ internal sealed class RichTextPropertyEditorTests : UmbracoIntegrationTest
         var contentResult = await ContentService.SaveAsync(content, null, null, CancellationToken.None);
         Assert.IsTrue(contentResult.Success);
 
-        var publishResult = ContentService.Publish(content, ["en-US"]);
+        var publishResult = await ContentService.PublishAsync(content, ["en-US"], Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.IsTrue(publishResult.Success);
 
         var publishedContent = await PublishedContentCache.GetByIdAsync(content.Key);

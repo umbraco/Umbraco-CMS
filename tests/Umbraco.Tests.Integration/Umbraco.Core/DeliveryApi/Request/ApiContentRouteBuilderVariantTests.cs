@@ -51,7 +51,7 @@ public class ApiContentRouteBuilderVariantTests : ApiContentRouteBuilderTestBase
                 .WithCultureName("da-DK", $"Root {rootNumber} da-DK")
                 .Build();
             await ContentService.SaveAsync(root, null, null, CancellationToken.None);
-            ContentService.Publish(root, ["*"]);
+            await ContentService.PublishAsync(root, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
             _contentByName[$"Root {rootNumber}"] = root;
 
             foreach (var childNumber in Enumerable.Range(1, 3))
@@ -63,7 +63,7 @@ public class ApiContentRouteBuilderVariantTests : ApiContentRouteBuilderTestBase
                     .WithCultureName("da-DK", $"Child {childNumber} da-DK")
                     .Build();
                 await ContentService.SaveAsync(child, null, null, CancellationToken.None);
-                ContentService.Publish(child, ["*"]);
+                await ContentService.PublishAsync(child, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
                 _contentByName[$"Root {rootNumber}/Child {childNumber}"] = child;
 
                 foreach (var grandchildNumber in Enumerable.Range(1, 3))
@@ -75,7 +75,7 @@ public class ApiContentRouteBuilderVariantTests : ApiContentRouteBuilderTestBase
                         .WithCultureName("da-DK", $"Grandchild {grandchildNumber} da-DK")
                         .Build();
                     await ContentService.SaveAsync(grandchild, null, null, CancellationToken.None);
-                    ContentService.Publish(grandchild, ["*"]);
+                    await ContentService.PublishAsync(grandchild, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
                     _contentByName[$"Root {rootNumber}/Child {childNumber}/Grandchild {grandchildNumber}"] = grandchild;
                 }
             }

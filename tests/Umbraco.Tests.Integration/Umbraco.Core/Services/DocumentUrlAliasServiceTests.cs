@@ -339,7 +339,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
         content.SetCultureName("French Page", "fr-FR");
         content.SetValue(Constants.Conventions.Content.UrlAlias, "french-alias", "fr-FR");
         await ContentService.SaveAsync(content, -1, null, CancellationToken.None);
-        ContentService.Publish(content, ["fr-FR"]);
+        await ContentService.PublishAsync(content, ["fr-FR"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Trigger alias creation
         await DocumentUrlAliasService.CreateOrUpdateAliasesAsync(content.Key);
@@ -431,7 +431,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
         content.SetCultureName("German Page", "de-DE");
         content.SetValue(Constants.Conventions.Content.UrlAlias, "german-alias", "de-DE");
         await ContentService.SaveAsync(content, -1, null, CancellationToken.None);
-        ContentService.Publish(content, ["de-DE"]);
+        await ContentService.PublishAsync(content, ["de-DE"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Trigger alias creation
         await DocumentUrlAliasService.CreateOrUpdateAliasesAsync(content.Key);
@@ -456,7 +456,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
         var newPage = ContentBuilder.CreateSimpleContent(ContentType, "New Page", RootPage.Id);
         newPage.SetValue(Constants.Conventions.Content.UrlAlias, "brand-new-alias");
         await ContentService.SaveAsync(newPage, -1, null, CancellationToken.None);
-        ContentService.Publish(newPage, []);
+        await ContentService.PublishAsync(newPage, [], Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Manually trigger alias creation
         await DocumentUrlAliasService.CreateOrUpdateAliasesAsync(newPage.Key);
@@ -479,7 +479,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
         // Update the alias
         content.SetValue(Constants.Conventions.Content.UrlAlias, "updated-alias");
         await ContentService.SaveAsync(content, -1, null, CancellationToken.None);
-        ContentService.Publish(content, []);
+        await ContentService.PublishAsync(content, [], Constants.Security.SuperUserKey, CancellationToken.None);
 
         await DocumentUrlAliasService.CreateOrUpdateAliasesAsync(content.Key);
 
@@ -504,7 +504,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
         // Clear the alias
         content.SetValue(Constants.Conventions.Content.UrlAlias, string.Empty);
         await ContentService.SaveAsync(content, -1, null, CancellationToken.None);
-        ContentService.Publish(content, []);
+        await ContentService.PublishAsync(content, [], Constants.Security.SuperUserKey, CancellationToken.None);
 
         await DocumentUrlAliasService.CreateOrUpdateAliasesAsync(content.Key);
 
@@ -530,7 +530,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
         content.SetValue(Constants.Conventions.Content.UrlAlias, "variant-alias-value", "en-US"); // With culture - it's a variant property
         content.ParentId = RootPage.Id;
         await ContentService.SaveAsync(content, -1, null, CancellationToken.None);
-        ContentService.Publish(content, ["en-US"]);
+        await ContentService.PublishAsync(content, ["en-US"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Act - trigger alias creation
         await DocumentUrlAliasService.CreateOrUpdateAliasesAsync(content.Key);
@@ -572,7 +572,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
         content.SetValue(Constants.Conventions.Content.UrlAlias, "shared-alias-value"); // No culture - it's a shared property
         content.ParentId = RootPage.Id;
         await ContentService.SaveAsync(content, -1, null, CancellationToken.None);
-        ContentService.Publish(content, ["en-US"]);
+        await ContentService.PublishAsync(content, ["en-US"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Act - trigger alias creation
         await DocumentUrlAliasService.CreateOrUpdateAliasesAsync(content.Key);
@@ -618,7 +618,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
         // Clear the alias
         content.SetValue(Constants.Conventions.Content.UrlAlias, string.Empty);
         await ContentService.SaveAsync(content, -1, null, CancellationToken.None);
-        ContentService.Publish(content, []);
+        await ContentService.PublishAsync(content, [], Constants.Security.SuperUserKey, CancellationToken.None);
 
         await DocumentUrlAliasService.CreateOrUpdateAliasesAsync(content.Key);
 
@@ -778,7 +778,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
         var content = (await ContentService.GetByIdAsync(PageWithSingleAlias.Key, CancellationToken.None))!;
         content.SetValue(Constants.Conventions.Content.UrlAlias, "rebuilt-alias");
         await ContentService.SaveAsync(content, -1, null, CancellationToken.None);
-        ContentService.Publish(content, []);
+        await ContentService.PublishAsync(content, [], Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Act - rebuild all aliases
         await DocumentUrlAliasService.RebuildAllAliasesAsync();
@@ -800,7 +800,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
         var content = (await ContentService.GetByIdAsync(PageWithSingleAlias.Key, CancellationToken.None))!;
         content.SetValue(Constants.Conventions.Content.UrlAlias, string.Empty);
         await ContentService.SaveAsync(content, -1, null, CancellationToken.None);
-        ContentService.Publish(content, []);
+        await ContentService.PublishAsync(content, [], Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Act - rebuild all aliases
         await DocumentUrlAliasService.RebuildAllAliasesAsync();
@@ -903,7 +903,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
         content.SetValue(Constants.Conventions.Content.UrlAlias, "default-culture-alias", defaultIsoCode);
         content.SetValue(Constants.Conventions.Content.UrlAlias, "french-culture-alias", "fr-FR");
         await ContentService.SaveAsync(content, -1, null, CancellationToken.None);
-        ContentService.Publish(content, [defaultIsoCode, "fr-FR"]);
+        await ContentService.PublishAsync(content, [defaultIsoCode, "fr-FR"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         await DocumentUrlAliasService.CreateOrUpdateAliasesAsync(content.Key);
 
@@ -928,17 +928,17 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
         var content1 = (await ContentService.GetByIdAsync(PageWithSingleAlias.Key, CancellationToken.None))!;
         content1.SetValue(Constants.Conventions.Content.UrlAlias, string.Empty);
         await ContentService.SaveAsync(content1, -1, null, CancellationToken.None);
-        ContentService.Publish(content1, []);
+        await ContentService.PublishAsync(content1, [], Constants.Security.SuperUserKey, CancellationToken.None);
 
         var content2 = (await ContentService.GetByIdAsync(PageWithMultipleAliases.Key, CancellationToken.None))!;
         content2.SetValue(Constants.Conventions.Content.UrlAlias, string.Empty);
         await ContentService.SaveAsync(content2, -1, null, CancellationToken.None);
-        ContentService.Publish(content2, []);
+        await ContentService.PublishAsync(content2, [], Constants.Security.SuperUserKey, CancellationToken.None);
 
         var content3 = (await ContentService.GetByIdAsync(ChildPage.Key, CancellationToken.None))!;
         content3.SetValue(Constants.Conventions.Content.UrlAlias, string.Empty);
         await ContentService.SaveAsync(content3, -1, null, CancellationToken.None);
-        ContentService.Publish(content3, []);
+        await ContentService.PublishAsync(content3, [], Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Act - rebuild should not throw
         await DocumentUrlAliasService.RebuildAllAliasesAsync();
@@ -1086,7 +1086,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
         content.SetCultureName("Variant Page", "en-US");
         content.SetValue(Constants.Conventions.Content.UrlAlias, "variant-alias", "en-US");
         await ContentService.SaveAsync(content, -1, null, CancellationToken.None);
-        ContentService.Publish(content, ["en-US"]);
+        await ContentService.PublishAsync(content, ["en-US"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         await DocumentUrlAliasService.CreateOrUpdateAliasesAsync(content.Key);
 
@@ -1142,7 +1142,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
         content.SetCultureName("Page With Alias", defaultLanguage!.IsoCode);
         content.SetValue(Constants.Conventions.Content.UrlAlias, "my-single-alias-variant", defaultLanguage.IsoCode);
         await ContentService.SaveAsync(content, -1, null, CancellationToken.None);
-        ContentService.Publish(content, [defaultLanguage.IsoCode]);
+        await ContentService.PublishAsync(content, [defaultLanguage.IsoCode], Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Assert - aliases should now be stored with specific languageId (handler triggered by ContentType save)
         List<PublishedDocumentUrlAlias> aliasesAfter;
@@ -1195,7 +1195,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
         content.SetCultureName("Page With Alias", defaultLanguage!.IsoCode);
         content.SetValue(Constants.Conventions.Content.UrlAlias, "variant-alias", defaultLanguage.IsoCode);
         await ContentService.SaveAsync(content, -1, null, CancellationToken.None);
-        ContentService.Publish(content, [defaultLanguage.IsoCode]);
+        await ContentService.PublishAsync(content, [defaultLanguage.IsoCode], Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Verify aliases are stored with specific languageId (variant) - handler triggered by ContentType save
         List<PublishedDocumentUrlAlias> variantAliases;
@@ -1221,7 +1221,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
         // Set invariant alias value and republish (required because alias value was stored under culture)
         content.SetValue(Constants.Conventions.Content.UrlAlias, "invariant-alias-restored");
         await ContentService.SaveAsync(content, -1, null, CancellationToken.None);
-        ContentService.Publish(content, []);
+        await ContentService.PublishAsync(content, [], Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Assert - aliases should now be stored with NULL languageId (handler triggered by ContentType save)
         List<PublishedDocumentUrlAlias> aliasesAfter;
@@ -1254,8 +1254,8 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
         newPage.SetValue(Constants.Conventions.Content.UrlAlias, propertyValue);
         await ContentService.SaveAsync(newPage, -1, null, CancellationToken.None);
 
-        Assert.DoesNotThrow(
-            () => ContentService.Publish(newPage, []),
+        Assert.DoesNotThrowAsync(
+            () => ContentService.PublishAsync(newPage, [], Constants.Security.SuperUserKey, CancellationToken.None),
             "Publishing content with normalization-colliding tokens in umbracoUrlAlias should not throw.");
 
         Assert.DoesNotThrowAsync(
@@ -1283,7 +1283,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
         newPage.SetValue(Constants.Conventions.Content.UrlAlias, "foelelser, foelelser");
         await ContentService.SaveAsync(newPage, -1, null, CancellationToken.None);
 
-        Assert.DoesNotThrow(() => ContentService.Publish(newPage, []));
+        Assert.DoesNotThrowAsync(() => ContentService.PublishAsync(newPage, [], Constants.Security.SuperUserKey, CancellationToken.None));
 
         Assert.DoesNotThrowAsync(
             () => DocumentUrlAliasService.RebuildAllAliasesAsync(),
@@ -1393,7 +1393,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
         content.SetValue(Constants.Conventions.Content.UrlAlias, "variant-published-alias", defaultLanguage.IsoCode);
         content.ParentId = RootPage.Id;
         await ContentService.SaveAsync(content, -1, null, CancellationToken.None);
-        ContentService.Publish(content, [defaultLanguage.IsoCode]);
+        await ContentService.PublishAsync(content, [defaultLanguage.IsoCode], Constants.Security.SuperUserKey, CancellationToken.None);
 
         await DocumentUrlAliasService.CreateOrUpdateAliasesAsync(content.Key);
 

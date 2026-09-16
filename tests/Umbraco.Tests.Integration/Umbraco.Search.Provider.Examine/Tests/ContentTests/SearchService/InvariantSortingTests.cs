@@ -310,7 +310,7 @@ public class InvariantSortingTests : SearcherTestBase
                     .Build();
 
                 await ContentService.SaveAsync(document, null, null, CancellationToken.None);
-                ContentService.Publish(document, new[] { "*" });
+                await ContentService.PublishAsync(document, new[] { "*" }, Constants.Security.SuperUserKey, CancellationToken.None);
                 keys.Add(document.Key, stringValue);
             }
         });
@@ -351,7 +351,7 @@ public class InvariantSortingTests : SearcherTestBase
                     .Build();
 
                 await ContentService.SaveAsync(document, null, null, CancellationToken.None);
-                ContentService.Publish(document, new[] { "*" });
+                await ContentService.PublishAsync(document, new[] { "*" }, Constants.Security.SuperUserKey, CancellationToken.None);
                 keys.Add(document.Key, dateTimeOffset);
             }
         });
@@ -402,7 +402,7 @@ public class InvariantSortingTests : SearcherTestBase
                     .Build();
 
                 await ContentService.SaveAsync(document, null, null, CancellationToken.None);
-                ContentService.Publish(document, new[] { "*" });
+                await ContentService.PublishAsync(document, new[] { "*" }, Constants.Security.SuperUserKey, CancellationToken.None);
                 keys.Add(document.Key, doubleValue);
             }
         });
@@ -430,7 +430,7 @@ public class InvariantSortingTests : SearcherTestBase
                     .Build();
 
                 await ContentService.SaveAsync(document, null, null, CancellationToken.None);
-                ContentService.Publish(document, new[] { "*" });
+                await ContentService.PublishAsync(document, new[] { "*" }, Constants.Security.SuperUserKey, CancellationToken.None);
                 keys.Add(document.Key, countValue);
             }
         });

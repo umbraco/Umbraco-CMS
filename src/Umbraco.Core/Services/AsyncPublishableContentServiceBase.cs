@@ -94,6 +94,16 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
         int userId)
         => CommitContentChangesInternal(scope, content, eventMessages, allLangs, notificationState, userId);
 
+    protected virtual Task<PublishResult> CommitContentChangesAsync(
+        ICoreScope scope,
+        TContent content,
+        EventMessages eventMessages,
+        IReadOnlyCollection<ILanguage> allLangs,
+        IDictionary<string, object?>? notificationState,
+        int userId,
+        CancellationToken cancellationToken)
+        => CommitContentChangesInternalAsync(scope, content, eventMessages, allLangs, notificationState, userId, cancellationToken);
+
     protected abstract Task DeleteLockedAsync(ICoreScope scope, TContent content, EventMessages evtMsgs, CancellationToken cancellationToken);
 
     protected abstract SavingNotification<TContent> SavingNotification(TContent content, EventMessages eventMessages);
@@ -685,7 +695,26 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
     }
 
     /// <inheritdoc/>
-    public PublishResult Publish(TContent content, string[] cultures, int userId = Constants.Security.SuperUserId)
+    public async Task<PublishResult> PublishAsync(TContent content, string[] cultures, Guid userKey, CancellationToken cancellationToken)
+    {
+        if (content == null)
+        {
+            throw new ArgumentNullException(nameof(content));
+        }
+
+        if (cultures is null)
+        {
+            throw new ArgumentNullException(nameof(cultures));
+        }
+
+        int userId = await _userIdKeyResolver.GetAsync(userKey);
+        return await PublishAsync(content, cultures, userId, cancellationToken);
+    }
+
+    // Takes the resolved int id directly so an internal caller that already holds one (e.g. a content
+    // version's WriterId) doesn't have to round-trip it through a Guid lookup - that round trip is lossy
+    // for a writer id with no matching user (it has no Guid to resolve to or from).
+    private async Task<PublishResult> PublishAsync(TContent content, string[] cultures, int userId, CancellationToken cancellationToken)
     {
         if (content == null)
         {
@@ -721,7 +750,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
         if (publishedState != PublishedState.Published && publishedState != PublishedState.Unpublished)
         {
             throw new InvalidOperationException(
-                $"Cannot save-and-publish (un)publishing content, use the dedicated {nameof(CommitContentChanges)} method.");
+                $"Cannot save-and-publish (un)publishing content, use the dedicated {nameof(CommitContentChangesAsync)} method.");
         }
 
         // cannot accept invariant (null or empty) culture for variant content type
@@ -746,32 +775,29 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
             }
         }
 
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.WriteLock(WriteLockIds);
+
+        IReadOnlyCollection<ILanguage> allLangs = (await _languageRepository.GetAllAsync(cancellationToken)).ToList();
+
+        // this will create the correct culture impact even if culture is * or null
+        IEnumerable<CultureImpact?> impacts =
+            cultures.Select(culture => _cultureImpactFactory.Create(culture, IsDefaultCulture(allLangs, culture), content));
+
+        // publish the culture(s)
+        // we don't care about the response here, this response will be rechecked below but we need to set the culture info values now.
+        var publishTime = DateTime.UtcNow;
+        foreach (CultureImpact? impact in impacts)
         {
-            scope.WriteLock(WriteLockIds);
-
-            // TODO: Await this properly when adjusting this service to our new EF Core approach.
-            var allLangs = _languageRepository.GetAllAsync(CancellationToken.None).GetAwaiter().GetResult().ToList();
-
-            // this will create the correct culture impact even if culture is * or null
-            IEnumerable<CultureImpact?> impacts =
-                cultures.Select(culture => _cultureImpactFactory.Create(culture, IsDefaultCulture(allLangs, culture), content));
-
-            // publish the culture(s)
-            // we don't care about the response here, this response will be rechecked below but we need to set the culture info values now.
-            var publishTime = DateTime.UtcNow;
-            foreach (CultureImpact? impact in impacts)
-            {
-                content.PublishCulture(impact, publishTime, _propertyEditorCollection);
-            }
-
-            // Change state to publishing
-            content.PublishedState = PublishedState.Publishing;
-
-            PublishResult result = CommitContentChanges(scope, content, evtMsgs, allLangs, new Dictionary<string, object?>(), userId);
-            scope.Complete();
-            return result;
+            content.PublishCulture(impact, publishTime, _propertyEditorCollection);
         }
+
+        // Change state to publishing
+        content.PublishedState = PublishedState.Publishing;
+
+        PublishResult result = await CommitContentChangesAsync(scope, content, evtMsgs, allLangs, new Dictionary<string, object?>(), userId, cancellationToken);
+        scope.Complete();
+        return result;
     }
 
     /// <inheritdoc />
@@ -1194,7 +1220,13 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
                     else
                     {
                         _contentRepository.PersistContentSchedule(d, contentSchedule);
-                        result = Publish(d, d.AvailableCultures.ToArray(), userId: d.WriterId);
+
+                        // PerformScheduledPublish is still sync - block on the async engine here rather
+                        // than duplicating its logic, until this method gets its own async conversion.
+                        // Uses the int-userId overload directly, matching the CommitContentChanges calls
+                        // elsewhere in this method: WriterId is passed through as-is, with no Guid round
+                        // trip that would be lossy for a writer id with no matching user.
+                        result = PublishAsync(d, d.AvailableCultures.ToArray(), d.WriterId, CancellationToken.None).GetAwaiter().GetResult();
                     }
 
                     if (result.Success == false)
@@ -1599,6 +1631,403 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
         return publishResult!;
     }
 
+    /// <summary>
+    ///     Handles a lot of business logic cases for how the content should be persisted
+    /// </summary>
+    /// <param name="scope"></param>
+    /// <param name="content"></param>
+    /// <param name="allLangs"></param>
+    /// <param name="notificationState"></param>
+    /// <param name="userId"></param>
+    /// <param name="cancellationToken"></param>
+    /// <param name="branchOne"></param>
+    /// <param name="branchRoot"></param>
+    /// <param name="eventMessages"></param>
+    /// <returns></returns>
+    /// <remarks>
+    ///     <para>
+    ///         Business logic cases such: as unpublishing a mandatory culture, or unpublishing the last culture, checking for
+    ///         pending scheduled publishing, etc... is dealt with in this method.
+    ///         There is quite a lot of cases to take into account along with logic that needs to deal with scheduled
+    ///         saving/publishing, branch saving/publishing, etc...
+    ///     </para>
+    ///     <para>
+    ///         Async port of <see cref="CommitContentChangesInternal" />, used by the members that have adopted the
+    ///         async engine. The two bodies must stay in lockstep until every caller of the sync method has migrated
+    ///         and it can be removed.
+    ///     </para>
+    /// </remarks>
+    // TODO (V19): remove CommitContentChangesInternal (the sync method) and this remark once every caller
+    // of the sync engine (Unpublish, SaveAndPublish, PerformScheduledPublish) has an async equivalent.
+    protected async Task<PublishResult> CommitContentChangesInternalAsync(
+        ICoreScope scope,
+        TContent content,
+        EventMessages eventMessages,
+        IReadOnlyCollection<ILanguage> allLangs,
+        IDictionary<string, object?>? notificationState,
+        int userId,
+        CancellationToken cancellationToken,
+        bool branchOne = false,
+        bool branchRoot = false,
+        bool raiseSavedNotification = false)
+    {
+        if (scope == null)
+        {
+            throw new ArgumentNullException(nameof(scope));
+        }
+
+        if (content == null)
+        {
+            throw new ArgumentNullException(nameof(content));
+        }
+
+        if (eventMessages == null)
+        {
+            throw new ArgumentNullException(nameof(eventMessages));
+        }
+
+        PublishResult? publishResult = null;
+        PublishResult? unpublishResult = null;
+
+        // nothing set = republish it all
+        if (content.PublishedState != PublishedState.Publishing &&
+            content.PublishedState != PublishedState.Unpublishing)
+        {
+            content.PublishedState = PublishedState.Publishing;
+        }
+
+        // State here is either Publishing or Unpublishing
+        // Publishing to unpublish a culture may end up unpublishing everything so these flags can be flipped later
+        var publishing = content.PublishedState == PublishedState.Publishing;
+        var unpublishing = content.PublishedState == PublishedState.Unpublishing;
+
+        var variesByCulture = content.ContentType.VariesByCulture();
+
+        // Track cultures that are being published, changed, unpublished
+        IReadOnlyList<string>? culturesPublishing = null;
+        IReadOnlyList<string>? culturesUnpublishing = null;
+        IReadOnlyList<string>? culturesChanging = variesByCulture
+            ? content.CultureInfos?.Values.Where(x => x.IsDirty()).Select(x => x.Culture).ToList()
+            : null;
+
+        // For a save-and-publish, capture the saved cultures the same way (and at the same point) as the standalone
+        // SaveAsync path - before persistence resets change tracking - so the "saved" notification honours the same
+        // SavedCultures contract: the changed cultures for variant content, or the "*" marker for changed invariant content.
+        IReadOnlyCollection<string>? savedCultures = null;
+        if (raiseSavedNotification)
+        {
+            savedCultures = variesByCulture
+                ? culturesChanging
+                : content.IsDirty() ? ["*"] : [];
+        }
+
+        var isNew = !content.HasIdentity;
+        TreeChangeTypes changeType = isNew || SupportsBranchPublishing is false ? TreeChangeTypes.RefreshNode : TreeChangeTypes.RefreshBranch;
+        var previouslyPublished = content.HasIdentity && content.Published;
+
+        // Inline method to persist the content with the contentRepository since this logic could be called a couple times below
+        async Task SaveContentAsync(TContent c)
+        {
+            // save, always
+            if (c.HasIdentity == false)
+            {
+                c.CreatorId = userId;
+            }
+
+            c.WriterId = userId;
+
+            // saving does NOT change the published version, unless PublishedState is Publishing or Unpublishing
+            await _asyncContentRepository.SaveAsync(c, cancellationToken);
+        }
+
+        if (publishing)
+        {
+            // Determine cultures publishing/unpublishing which will be based on previous calls to content.PublishCulture and ClearPublishInfo
+            culturesUnpublishing = content.GetCulturesUnpublishing();
+            culturesPublishing = GetCulturesPublishing(content);
+
+            // ensure that the content can be published, and publish handling events, business rules, etc
+            publishResult = await StrategyCanPublishAsync(
+                scope,
+                content, /*checkPath:*/
+                !branchOne || branchRoot,
+                culturesPublishing,
+                culturesUnpublishing,
+                eventMessages,
+                allLangs,
+                notificationState,
+                cancellationToken);
+
+            if (publishResult.Success)
+            {
+                // raise Publishing notification
+                if (await scope.Notifications.PublishCancelableAsync(
+                        PublishingNotification(content, eventMessages).WithState(notificationState)))
+                {
+                    Logger.LogInformation("Content {ContentName} (id={ContentId}) cannot be published: {Reason}", content.Name, content.Id, "publishing was cancelled");
+                    return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, eventMessages, content);
+                }
+
+                // note: StrategyPublish flips the PublishedState to Publishing!
+                publishResult = StrategyPublish(content, culturesPublishing, culturesUnpublishing, eventMessages);
+
+                // Check if a culture has been unpublished and if there are no cultures left, and then unpublish content as a whole
+                if (publishResult.Result == PublishResultType.SuccessUnpublishCulture &&
+                    content.PublishCultureInfos?.Count == 0)
+                {
+                    // This is a special case! We are unpublishing the last culture and to persist that we need to re-publish without any cultures
+                    // so the state needs to remain Publishing to do that. However, we then also need to unpublish the content and to do that
+                    // the state needs to be Unpublishing and it cannot be both. This state is used within the contentRepository to know how to
+                    // persist certain things. So before proceeding below, we need to save the Publishing state to publish no cultures, then we can
+                    // mark the content for Unpublishing.
+                    await SaveContentAsync(content);
+
+                    // Set the flag to unpublish and continue
+                    unpublishing = content.Published; // if not published yet, nothing to do
+                }
+            }
+            else
+            {
+                // in a branch, just give up
+                if (branchOne && !branchRoot)
+                {
+                    return publishResult;
+                }
+
+                // Check for mandatory culture missing, and then unpublish content as a whole
+                if (publishResult.Result == PublishResultType.FailedPublishMandatoryCultureMissing)
+                {
+                    publishing = false;
+                    unpublishing = content.Published; // if not published yet, nothing to do
+
+                    // we may end up in a state where we won't publish nor unpublish
+                    // keep going, though, as we want to save anyways
+                }
+
+                // reset published state from temp values (publishing, unpublishing) to original value
+                // (published, unpublished) in order to save the content, unchanged - yes, this is odd,
+                // but: (a) it means we don't reproduce the PublishState logic here and (b) setting the
+                // PublishState to anything other than Publishing or Unpublishing - which is precisely
+                // what we want to do here - throws
+                content.Published = content.Published;
+            }
+        }
+
+        // won't happen in a branch
+        if (unpublishing)
+        {
+            if (culturesUnpublishing is null)
+            {
+                culturesUnpublishing = content.GetCulturesUnpublishing();
+                culturesPublishing = GetCulturesPublishing(content);
+            }
+
+            TContent? newest = await GetByIdAsync(content.Key, cancellationToken); // ensure we have the newest version - in scope
+            if (content.VersionId != newest?.VersionId)
+            {
+                return new PublishResult(PublishResultType.FailedPublishConcurrencyViolation, eventMessages, content);
+            }
+
+            if (content.Published)
+            {
+                // ensure that the content can be unpublished, and unpublish
+                // handling events, business rules, etc
+                // note: StrategyUnpublish flips the PublishedState to Unpublishing!
+                // note: This unpublishes the entire content (not different variants)
+                unpublishResult = await StrategyCanUnpublishAsync(scope, content, eventMessages, notificationState, cancellationToken);
+                if (unpublishResult.Success)
+                {
+                    unpublishResult = await StrategyUnpublishAsync(content, eventMessages, cancellationToken);
+                }
+                else
+                {
+                    // reset published state from temp values (publishing, unpublishing) to original value
+                    // (published, unpublished) in order to save the content, unchanged - yes, this is odd,
+                    // but: (a) it means we don't reproduce the PublishState logic here and (b) setting the
+                    // PublishState to anything other than Publishing or Unpublishing - which is precisely
+                    // what we want to do here - throws
+                    content.Published = content.Published;
+                    return unpublishResult;
+                }
+            }
+            else
+            {
+                // already unpublished - optimistic concurrency collision, really,
+                // and I am not sure at all what we should do, better die fast, else
+                // we may end up corrupting the db
+                throw new InvalidOperationException("Concurrency collision.");
+            }
+        }
+
+        // Persist the content
+        await SaveContentAsync(content);
+
+        // A save-and-publish is also a save, so raise the paired "saved" notification (https://github.com/umbraco/Umbraco-CMS/issues/23523).
+        // Positioned here, after the content is actually persisted, so it does not fire on the cancelled-publishing or
+        // concurrency-violation paths above, which return before reaching this point.
+        if (raiseSavedNotification)
+        {
+            scope.Notifications.Publish(
+                SavedNotification(
+                    content,
+                    eventMessages,
+                    BuildCultureMap(content, savedCultures))
+                .WithState(notificationState));
+        }
+
+        // we have tried to unpublish - won't happen in a branch
+        if (unpublishing)
+        {
+            // and succeeded, trigger events
+            if (unpublishResult?.Success ?? false)
+            {
+                // events and audit
+                scope.Notifications.Publish(
+                    UnpublishedNotification(
+                        content,
+                        eventMessages,
+                        BuildCultureMap(content, variesByCulture ? culturesUnpublishing : ["*"]))
+                    .WithState(notificationState));
+                scope.Notifications.Publish(TreeChangeNotification(
+                    content,
+                    SupportsBranchPublishing ? TreeChangeTypes.RefreshBranch : TreeChangeTypes.RefreshNode,
+                    variesByCulture ? culturesPublishing.IsCollectionEmpty() ? null : culturesPublishing : null,
+                    variesByCulture ? culturesUnpublishing.IsCollectionEmpty() ? null : culturesUnpublishing : ["*"],
+                    eventMessages));
+
+                if (culturesUnpublishing != null)
+                {
+                    // This will mean that that we unpublished a mandatory culture or we unpublished the last culture.
+                    var langs = GetLanguageDetailsForAuditEntry(allLangs, culturesUnpublishing);
+                    await AuditAsync(AuditType.UnpublishVariant, userId, content.Id, $"Unpublished languages: {langs}", langs);
+
+                    PublishResultType? publishResultType = publishResult?.Result ?? unpublishResult?.Result;
+                    if (publishResultType == null)
+                    {
+                        throw new PanicException("publishResultType == null - should not happen");
+                    }
+
+                    switch (publishResultType)
+                    {
+                        case PublishResultType.FailedPublishMandatoryCultureMissing:
+                            // Occurs when a mandatory culture was unpublished (which means we tried publishing the content without a mandatory culture)
+
+                            // Log that the whole content item has been unpublished due to mandatory culture unpublished
+                            await AuditAsync(AuditType.Unpublish, userId, content.Id, "Unpublished (mandatory language unpublished)");
+                            return new PublishResult(PublishResultType.SuccessUnpublishMandatoryCulture, eventMessages, content);
+                        case PublishResultType.SuccessUnpublishCulture:
+                            // Occurs when the last culture is unpublished
+                            await AuditAsync(AuditType.Unpublish, userId, content.Id, "Unpublished (last language unpublished)");
+                            return new PublishResult(PublishResultType.SuccessUnpublishLastCulture, eventMessages, content);
+                    }
+                }
+
+                await AuditAsync(AuditType.Unpublish, userId, content.Id);
+                return new PublishResult(PublishResultType.SuccessUnpublish, eventMessages, content);
+            }
+
+            // or, failed
+            scope.Notifications.Publish(TreeChangeNotification(content, changeType, eventMessages));
+            return new PublishResult(PublishResultType.FailedUnpublish, eventMessages, content); // bah
+        }
+
+        // we have tried to publish
+        if (publishing)
+        {
+            // and succeeded, trigger events
+            if (publishResult?.Success ?? false)
+            {
+                if (isNew == false && previouslyPublished == false && SupportsBranchPublishing)
+                {
+                    changeType = TreeChangeTypes.RefreshBranch; // whole branch
+                }
+                else if (isNew == false && previouslyPublished)
+                {
+                    changeType = TreeChangeTypes.RefreshNode; // single node
+                }
+
+                // invalidate the node/branch
+                // for branches, handled by SaveAndPublishBranch
+                if (!branchOne)
+                {
+                    scope.Notifications.Publish(
+                        TreeChangeNotification(
+                            content,
+                            changeType,
+                            variesByCulture ? culturesPublishing.IsCollectionEmpty() ? null : culturesPublishing : ["*"],
+                            variesByCulture ? culturesUnpublishing.IsCollectionEmpty() ? null : culturesUnpublishing : null,
+                            eventMessages));
+                    scope.Notifications.Publish(
+                        PublishedNotification(
+                            content,
+                            eventMessages,
+                            BuildCultureMap(content, variesByCulture ? culturesPublishing : ["*"]),
+                            BuildCultureMap(content, variesByCulture ? culturesUnpublishing : null))
+                        .WithState(notificationState));
+                }
+
+                // it was not published and now is... descendants that were 'published' (but
+                // had an unpublished ancestor) are 're-published' ie not explicitly published
+                // but back as 'published' nevertheless
+                if (!branchOne && isNew == false && previouslyPublished == false && await HasChildrenAsync(content.Key, cancellationToken))
+                {
+                    TContent[] descendants = GetPublishedDescendantsLocked(content).ToArray();
+                    scope.Notifications.Publish(
+                        PublishedNotification(descendants, eventMessages).WithState(notificationState));
+                }
+
+                switch (publishResult.Result)
+                {
+                    case PublishResultType.SuccessPublish:
+                        await AuditAsync(AuditType.Publish, userId, content.Id);
+                        break;
+                    case PublishResultType.SuccessPublishCulture:
+                        if (culturesPublishing != null)
+                        {
+                            var langs = GetLanguageDetailsForAuditEntry(allLangs, culturesPublishing);
+                            await AuditAsync(AuditType.PublishVariant, userId, content.Id, $"Published languages: {langs}", langs);
+                        }
+
+                        break;
+                    case PublishResultType.SuccessUnpublishCulture:
+                        if (culturesUnpublishing != null)
+                        {
+                            var langs = GetLanguageDetailsForAuditEntry(allLangs, culturesUnpublishing);
+                            await AuditAsync(AuditType.UnpublishVariant, userId, content.Id, $"Unpublished languages: {langs}", langs);
+                        }
+
+                        break;
+                }
+
+                return publishResult;
+            }
+        }
+
+        // should not happen
+        if (branchOne && !branchRoot)
+        {
+            throw new PanicException("branchOne && !branchRoot - should not happen");
+        }
+
+        // if publishing didn't happen or if it has failed, we still need to log which cultures were saved
+        if (!branchOne && (publishResult == null || !publishResult.Success))
+        {
+            if (culturesChanging != null)
+            {
+                var langs = GetLanguageDetailsForAuditEntry(allLangs, culturesChanging);
+                await AuditAsync(AuditType.SaveVariant, userId, content.Id, $"Saved languages: {langs}", langs);
+            }
+            else
+            {
+                await AuditAsync(AuditType.Save, userId, content.Id);
+            }
+        }
+
+        // or, failed
+        scope.Notifications.Publish(TreeChangeNotification(content, changeType, eventMessages));
+        return publishResult!;
+    }
+
     private IReadOnlyList<string>? GetCulturesPublishing(IPublishableContentBase content)
         => content.ContentType.VariesByCulture()
             ? content.PublishCultureInfos?.Values.Where(x => x.IsDirty()).Select(x => x.Culture).ToList()
@@ -1796,11 +2225,19 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
 
     protected async Task AuditAsync(AuditType type, int userId, int objectId, string? message = null, string? parameters = null)
     {
-        Guid userKey = await _userIdKeyResolver.GetAsync(userId);
+        // A content operation must never fail because its audit metadata could not be attributed - a
+        // user id with no matching key (e.g. unknown/imported content) skips the audit entry rather
+        // than aborting the caller.
+        Attempt<Guid> userKeyAttempt = await _userIdKeyResolver.TryGetAsync(userId);
+        if (userKeyAttempt.Success is false)
+        {
+            Logger.LogWarning("Could not resolve a user key for user id {UserId} - skipping the {AuditType} audit entry for {ObjectId}.", userId, type, objectId);
+            return;
+        }
 
         await _auditService.AddAsync(
             type,
-            userKey,
+            userKeyAttempt.Result,
             objectId,
             ContentObjectType.GetName(),
             message,
@@ -2079,6 +2516,180 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
         return new PublishResult(evtMsgs, content);
     }
 
+    private async Task<PublishResult> StrategyCanPublishAsync(
+        ICoreScope scope,
+        TContent content,
+        bool checkPath,
+        IReadOnlyList<string>? culturesPublishing,
+        IReadOnlyCollection<string>? culturesUnpublishing,
+        EventMessages evtMsgs,
+        IReadOnlyCollection<ILanguage> allLangs,
+        IDictionary<string, object?>? notificationState,
+        CancellationToken cancellationToken)
+    {
+        var variesByCulture = content.ContentType.VariesByCulture();
+
+        // If it's null it's invariant
+        CultureImpact[] impactsToPublish = culturesPublishing == null
+                ? new[] { _cultureImpactFactory.ImpactInvariant() }
+            : culturesPublishing.Select(x =>
+                _cultureImpactFactory.ImpactExplicit(
+                        x,
+                        allLangs.Any(lang => lang.IsoCode.InvariantEquals(x) && lang.IsMandatory)))
+                    .ToArray();
+
+        // publish the culture(s)
+        var publishTime = DateTime.UtcNow;
+        if (!impactsToPublish.All(impact => content.PublishCulture(impact, publishTime, _propertyEditorCollection)))
+        {
+            return new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, content);
+        }
+
+        // Validate the property values
+        IProperty[]? invalidProperties = null;
+        if (!impactsToPublish.All(x =>
+                _propertyValidationService.Value.IsPropertyDataValid(content, out invalidProperties, x)))
+        {
+            return new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, content)
+            {
+                InvalidProperties = invalidProperties,
+            };
+        }
+
+        // Check if mandatory languages fails, if this fails it will mean anything that the published flag on the content will
+        // be changed to Unpublished and any culture currently published will not be visible.
+        if (variesByCulture)
+        {
+            if (culturesPublishing == null)
+            {
+                throw new InvalidOperationException(
+                    "Internal error, variesByCulture but culturesPublishing is null.");
+            }
+
+            if (content.Published && culturesPublishing.Count == 0 && culturesUnpublishing?.Count == 0)
+            {
+                // no published cultures = cannot be published
+                // This will occur if for example, a culture that is already unpublished is sent to be unpublished again, or vice versa, in that case
+                // there will be nothing to publish/unpublish.
+                return new PublishResult(PublishResultType.FailedPublishNothingToPublish, evtMsgs, content);
+            }
+
+            // missing mandatory culture = cannot be published
+            IEnumerable<string> mandatoryCultures = allLangs.Where(x => x.IsMandatory).Select(x => x.IsoCode);
+            var mandatoryMissing = mandatoryCultures.Any(x =>
+                !content.PublishedCultures.Contains(x, StringComparer.OrdinalIgnoreCase));
+            if (mandatoryMissing)
+            {
+                return new PublishResult(PublishResultType.FailedPublishMandatoryCultureMissing, evtMsgs, content);
+            }
+
+            if (culturesPublishing.Count == 0 && culturesUnpublishing?.Count > 0)
+            {
+                return new PublishResult(PublishResultType.SuccessUnpublishCulture, evtMsgs, content);
+            }
+        }
+
+        // ensure that the content has published values
+        // either because it is 'publishing' or because it already has a published version
+        if (content.PublishedState != PublishedState.Publishing && content.PublishedVersionId == 0)
+        {
+            Logger.LogInformation(
+                "Content {ContentName} (id={ContentId}) cannot be published: {Reason}",
+                content.Name,
+                content.Id,
+                "content does not have published values");
+            return new PublishResult(PublishResultType.FailedPublishNothingToPublish, evtMsgs, content);
+        }
+
+        ContentScheduleCollection contentSchedule = await _asyncContentRepository.GetContentScheduleAsync(content.Key, cancellationToken);
+
+        // loop over each culture publishing - or InvariantCulture for invariant
+        foreach (var culture in culturesPublishing ?? new[] { Constants.System.InvariantCulture })
+        {
+            // ensure that the content status is correct
+            // note: culture will be string.Empty for invariant
+            switch (content.GetStatus(contentSchedule, culture))
+            {
+                case ContentStatus.Expired:
+                    if (!variesByCulture)
+                    {
+                        Logger.LogInformation(
+                            "Content {ContentName} (id={ContentId}) cannot be published: {Reason}", content.Name, content.Id, "content has expired");
+                    }
+                    else
+                    {
+                        Logger.LogInformation(
+                            "Content {ContentName} (id={ContentId}) culture {Culture} cannot be published: {Reason}", content.Name, content.Id, culture, "content culture has expired");
+                    }
+
+                    return new PublishResult(
+                        !variesByCulture
+                            ? PublishResultType.FailedPublishHasExpired : PublishResultType.FailedPublishCultureHasExpired,
+                        evtMsgs,
+                        content);
+
+                case ContentStatus.AwaitingRelease:
+                    if (!variesByCulture)
+                    {
+                        Logger.LogInformation(
+                            "Content {ContentName} (id={ContentId}) cannot be published: {Reason}",
+                            content.Name,
+                            content.Id,
+                            "content is awaiting release");
+                    }
+                    else
+                    {
+                        Logger.LogInformation(
+                            "Content {ContentName} (id={ContentId}) culture {Culture} cannot be published: {Reason}",
+                            content.Name,
+                            content.Id,
+                            culture,
+                            "content has culture awaiting release");
+                    }
+
+                    return new PublishResult(
+                        !variesByCulture
+                            ? PublishResultType.FailedPublishAwaitingRelease
+                            : PublishResultType.FailedPublishCultureAwaitingRelease,
+                        evtMsgs,
+                        content);
+
+                case ContentStatus.Trashed:
+                    Logger.LogInformation(
+                        "Content {ContentName} (id={ContentId}) cannot be published: {Reason}",
+                        content.Name,
+                        content.Id,
+                        "content is trashed");
+                    return new PublishResult(PublishResultType.FailedPublishIsTrashed, evtMsgs, content);
+            }
+        }
+
+        if (checkPath && SupportsBranchPublishing)
+        {
+            // check if the content can be path-published
+            // root content can be published
+            // else check ancestors - we know we are not trashed
+            var pathIsOk = content.ParentId == Constants.System.Root || await IsPathPublishedAsync(await GetParentAsync(content, cancellationToken), cancellationToken);
+            if (!pathIsOk)
+            {
+                Logger.LogInformation(
+                    "Content {ContentName} (id={ContentId}) cannot be published: {Reason}",
+                    content.Name,
+                    content.Id,
+                    "parent is not published");
+                return new PublishResult(PublishResultType.FailedPublishPathNotPublished, evtMsgs, content);
+            }
+        }
+
+        // If we are both publishing and unpublishing cultures, then return a mixed status
+        if (variesByCulture && culturesPublishing?.Count > 0 && culturesUnpublishing?.Count > 0)
+        {
+            return new PublishResult(PublishResultType.SuccessMixedCulture, evtMsgs, content);
+        }
+
+        return new PublishResult(evtMsgs, content);
+    }
+
     /// <summary>
     ///     Publishes a content item
     /// </summary>
@@ -2171,6 +2782,27 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
         return new PublishResult(PublishResultType.SuccessUnpublish, evtMsgs, content);
     }
 
+    private async Task<PublishResult> StrategyCanUnpublishAsync(
+        ICoreScope scope,
+        TContent content,
+        EventMessages evtMsgs,
+        IDictionary<string, object?>? notificationState,
+        CancellationToken cancellationToken)
+    {
+        // raise Unpublishing notification
+        CancelableEnumerableObjectNotification<TContent> notification = UnpublishingNotification(content, evtMsgs).WithState(notificationState);
+        var notificationResult = await scope.Notifications.PublishCancelableAsync(notification);
+
+        if (notificationResult)
+        {
+            Logger.LogInformation(
+                "Content {ContentName} (id={ContentId}) cannot be unpublished: unpublishing was cancelled.", content.Name, content.Id);
+            return new PublishResult(PublishResultType.FailedUnpublishCancelledByEvent, evtMsgs, content);
+        }
+
+        return new PublishResult(PublishResultType.SuccessUnpublish, evtMsgs, content);
+    }
+
     /// <summary>
     ///     Unpublishes a content item
     /// </summary>
@@ -2209,6 +2841,36 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
         }
 
         _contentRepository.PersistContentSchedule(content, contentSchedule);
+
+        // change state to unpublishing
+        content.PublishedState = PublishedState.Unpublishing;
+
+        Logger.LogInformation("Content {ContentName} (id={ContentId}) has been unpublished.", content.Name, content.Id);
+        return attempt;
+    }
+
+    private async Task<PublishResult> StrategyUnpublishAsync(TContent content, EventMessages evtMsgs, CancellationToken cancellationToken)
+    {
+        var attempt = new PublishResult(PublishResultType.SuccessUnpublish, evtMsgs, content);
+
+        // if the content has any release dates set to before now,
+        // they should be removed so they don't interrupt an unpublish
+        // otherwise it would remain released == published
+        ContentScheduleCollection contentSchedule = await _asyncContentRepository.GetContentScheduleAsync(content.Key, cancellationToken);
+        IReadOnlyList<ContentSchedule> pastReleases =
+            contentSchedule.GetPending(ContentScheduleAction.Expire, DateTime.UtcNow);
+        foreach (ContentSchedule p in pastReleases)
+        {
+            contentSchedule.Remove(p);
+        }
+
+        if (pastReleases.Count > 0)
+        {
+            Logger.LogInformation(
+                "Content {ContentName} (id={ContentId}) had its release date removed, because it was unpublished.", content.Name, content.Id);
+        }
+
+        await _asyncContentRepository.PersistContentScheduleAsync(content, contentSchedule, cancellationToken);
 
         // change state to unpublishing
         content.PublishedState = PublishedState.Unpublishing;

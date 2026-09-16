@@ -306,14 +306,14 @@ internal sealed partial class ContentTypeEditingServiceTests
 
         if (isElement)
         {
-            ElementService.Publish((IElement)instance, ["*"]);
+            await ElementService.PublishAsync((IElement)instance, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
             var elementToEdit = await ElementService.GetByIdAsync(instance.Key, CancellationToken.None);
             elementToEdit!.SetValue(VarianceTestPropertyAlias, "draft edited value", null);
             await ElementService.SaveAsync(elementToEdit, null, null, CancellationToken.None);
         }
         else
         {
-            ContentService.Publish((IContent)instance, ["*"]);
+            await ContentService.PublishAsync((IContent)instance, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
             var contentToEdit = await ContentService.GetByIdAsync(instance.Key, CancellationToken.None);
             contentToEdit!.SetValue(VarianceTestPropertyAlias, "draft edited value", null);
             await ContentService.SaveAsync(contentToEdit, null, null, CancellationToken.None);
@@ -360,14 +360,14 @@ internal sealed partial class ContentTypeEditingServiceTests
         // clean (current == published). The da-DK edit is what will get discarded by the variance change below.
         if (isElement)
         {
-            ElementService.Publish((IElement)instance, ["*"]);
+            await ElementService.PublishAsync((IElement)instance, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
             var elementToEdit = await ElementService.GetByIdAsync(instance.Key, CancellationToken.None);
             elementToEdit!.SetValue(VarianceTestPropertyAlias, "unpublished danish edit", "da-DK");
             await ElementService.SaveAsync(elementToEdit, null, null, CancellationToken.None);
         }
         else
         {
-            ContentService.Publish((IContent)instance, ["*"]);
+            await ContentService.PublishAsync((IContent)instance, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
             var contentToEdit = await ContentService.GetByIdAsync(instance.Key, CancellationToken.None);
             contentToEdit!.SetValue(VarianceTestPropertyAlias, "unpublished danish edit", "da-DK");
             await ContentService.SaveAsync(contentToEdit, null, null, CancellationToken.None);

@@ -33,7 +33,7 @@ internal sealed class DomainAndUrlsTests : UmbracoIntegrationTest
         InstallationSummary = packagingService.InstallCompiledPackageData(xml);
 
         Root = InstallationSummary.ContentInstalled.First();
-        ContentService.Publish(Root, Root.AvailableCultures.ToArray());
+        ContentService.PublishAsync(Root, Root.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None).GetAwaiter().GetResult();
 
         // Note: this SetUp must remain synchronous. EnsureUmbracoContext() below writes to an AsyncLocal
         // (via HybridUmbracoContextAccessor) and AsyncLocal mutations made inside an awaited Task do not
@@ -423,7 +423,7 @@ internal sealed class DomainAndUrlsTests : UmbracoIntegrationTest
     public async Task Cannot_Assign_Already_Used_Domains()
     {
         var copy = (await ContentService.CopyAsync(Root, Root.ParentKey, false, true, Constants.Security.SuperUserKey, CancellationToken.None)).Result;
-        ContentService.Publish(copy!, copy!.AvailableCultures.ToArray());
+        await ContentService.PublishAsync(copy!, copy!.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         var domainService = GetRequiredService<IDomainService>();
         var updateModel = new DomainsUpdateModel

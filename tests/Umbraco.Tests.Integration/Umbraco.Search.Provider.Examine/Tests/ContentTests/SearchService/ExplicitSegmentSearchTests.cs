@@ -1090,16 +1090,16 @@ public class ExplicitSegmentSearchTests : SearcherTestBase
         await WaitForIndexing(GetIndexAlias(true), async () =>
         {
             await ContentService.SaveAsync(docWithAllSegments, null, null, CancellationToken.None);
-            ContentService.Publish(docWithAllSegments, ["*"]);
+            await ContentService.PublishAsync(docWithAllSegments, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
             await ContentService.SaveAsync(docWithOnlyNullSegment, null, null, CancellationToken.None);
-            ContentService.Publish(docWithOnlyNullSegment, ["*"]);
+            await ContentService.PublishAsync(docWithOnlyNullSegment, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
             await ContentService.SaveAsync(docWithOnlySegment1, null, null, CancellationToken.None);
-            ContentService.Publish(docWithOnlySegment1, ["*"]);
+            await ContentService.PublishAsync(docWithOnlySegment1, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
             await ContentService.SaveAsync(docWithOverlappingValues, null, null, CancellationToken.None);
-            ContentService.Publish(docWithOverlappingValues, ["*"]);
+            await ContentService.PublishAsync(docWithOverlappingValues, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
         });
     }
 }

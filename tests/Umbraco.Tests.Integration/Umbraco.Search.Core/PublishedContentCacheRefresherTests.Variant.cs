@@ -25,7 +25,7 @@ public partial class PublishedContentCacheRefresherTests
         else
         {
             await ContentService.SaveAsync(Get(RootKey), null, null, CancellationToken.None);
-            ContentService.Publish(Get(RootKey), ["*"]);
+            await ContentService.PublishAsync(Get(RootKey), ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
         }
 
         // the result must be same no matter if descendants are included or not, because the root was unpublished to begin with
@@ -75,9 +75,9 @@ public partial class PublishedContentCacheRefresherTests
         else
         {
             await ContentService.SaveAsync(Get(RootKey), null, null, CancellationToken.None);
-            ContentService.Publish(Get(RootKey), ["en-US"]);
+            await ContentService.PublishAsync(Get(RootKey), ["en-US"], Constants.Security.SuperUserKey, CancellationToken.None);
             await ContentService.SaveAsync(Get(RootKey), null, null, CancellationToken.None);
-            ContentService.Publish(Get(RootKey), ["da-DK"]);
+            await ContentService.PublishAsync(Get(RootKey), ["da-DK"], Constants.Security.SuperUserKey, CancellationToken.None);
         }
 
         // the result must be same no matter if descendants are included or not, because the root was unpublished to begin with
@@ -118,7 +118,7 @@ public partial class PublishedContentCacheRefresherTests
         else
         {
             await ContentService.SaveAsync(Get(ChildKey), null, null, CancellationToken.None);
-            ContentService.Publish(Get(ChildKey), ["*"]);
+            await ContentService.PublishAsync(Get(ChildKey), ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
         }
 
         // the result must be same no matter if descendants are included or not, because the child was already published
@@ -157,7 +157,7 @@ public partial class PublishedContentCacheRefresherTests
         else
         {
             await ContentService.SaveAsync(Get(ChildKey), null, null, CancellationToken.None);
-            ContentService.Publish(Get(ChildKey), ["*"]);
+            await ContentService.PublishAsync(Get(ChildKey), ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
         }
 
         // the result must be same no matter if descendants are included or not, because the child was already published

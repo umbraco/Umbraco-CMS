@@ -194,12 +194,15 @@ internal abstract class ContentPublishingServiceBase<TContent, TContentService>
         }
 
 
-        var userId = await _userIdKeyResolver.GetAsync(userKey);
+        // Validated up front rather than left to PublishAsync below, since that's only reached when
+        // culturesToPublishImmediately is non-empty - a schedule-only request must still reject an
+        // unresolvable user key rather than silently persisting the schedule.
+        _ = await _userIdKeyResolver.GetAsync(userKey);
 
         PublishResult? result = null;
         if (culturesToPublishImmediately.Any())
         {
-            result = _contentService.Publish(content, culturesToPublishImmediately.ToArray(), userId);
+            result = await _contentService.PublishAsync(content, culturesToPublishImmediately.ToArray(), userKey, CancellationToken.None);
         }
 
         if (result?.Success != false && cultureAndSchedule.Schedules.FullSchedule.Any())

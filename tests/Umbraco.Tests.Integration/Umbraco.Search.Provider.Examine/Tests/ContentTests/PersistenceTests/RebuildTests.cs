@@ -166,7 +166,7 @@ public class RebuildTests : UmbracoIntegrationTest
             await ContentService.SaveAsync(_rootDocument, null, null, CancellationToken.None);
             if (publish)
             {
-                ContentService.Publish(_rootDocument, ["*"]);
+                await ContentService.PublishAsync(_rootDocument, ["*"], global::Umbraco.Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
             }
         });
 
@@ -222,7 +222,7 @@ public class RebuildTests : UmbracoIntegrationTest
 
             if (publish)
             {
-                ContentService.Publish(_rootDocument, ["*"]);
+                await ContentService.PublishAsync(_rootDocument, ["*"], global::Umbraco.Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
             }
         });
     }

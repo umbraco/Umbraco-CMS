@@ -111,7 +111,7 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
                 var contentItem =
                     ContentBuilder.CreateSimpleContent(contentType, "MyName_" + index + "_" + i, parentId);
                 await ContentService.SaveAsync(contentItem, null, null, CancellationToken.None);
-                ContentService.Publish(contentItem, new[] { "*" });
+                await ContentService.PublishAsync(contentItem, new[] { "*" }, Constants.Security.SuperUserKey, CancellationToken.None);
                 parentId = contentItem.Id;
 
                 keys.Add(contentItem.Key);
@@ -165,7 +165,7 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
                     var contentItem =
                         ContentBuilder.CreateSimpleContent(contentType, "MyName_" + index + "_" + i, parentId);
                     await ContentService.SaveAsync(contentItem, null, null, CancellationToken.None);
-                    ContentService.Publish(contentItem, new[] { "*" });
+                    await ContentService.PublishAsync(contentItem, new[] { "*" }, Constants.Security.SuperUserKey, CancellationToken.None);
                     parentId = contentItem.Id;
                 }
             }
@@ -207,17 +207,17 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
 
             var root = ContentBuilder.CreateSimpleContent(contentType1, "Root");
             await ContentService.SaveAsync(root, null, null, CancellationToken.None);
-            ContentService.Publish(root, new[] { "*" });
+            await ContentService.PublishAsync(root, new[] { "*" }, Constants.Security.SuperUserKey, CancellationToken.None);
 
             var level1 = ContentBuilder.CreateSimpleContent(contentType2, "L1", root.Id);
             await ContentService.SaveAsync(level1, null, null, CancellationToken.None);
-            ContentService.Publish(level1, new[] { "*" });
+            await ContentService.PublishAsync(level1, new[] { "*" }, Constants.Security.SuperUserKey, CancellationToken.None);
 
             for (var i = 0; i < 2; i++)
             {
                 var level3 = ContentBuilder.CreateSimpleContent(contentType3, "L2" + i, level1.Id);
                 await ContentService.SaveAsync(level3, null, null, CancellationToken.None);
-                ContentService.Publish(level3, new[] { "*" });
+                await ContentService.PublishAsync(level3, new[] { "*" }, Constants.Security.SuperUserKey, CancellationToken.None);
             }
 
             await ContentTypeService.DeleteAsync(contentType1, Constants.Security.SuperUserKey);
@@ -252,7 +252,7 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
         await ContentTypeService.CreateAsync(contentType1, Constants.Security.SuperUserKey);
         IContent contentItem = ContentBuilder.CreateTextpageContent(contentType1, "Testing", -1);
         await ContentService.SaveAsync(contentItem, null, null, CancellationToken.None);
-        ContentService.Publish(contentItem, new[] { "*" });
+        await ContentService.PublishAsync(contentItem, new[] { "*" }, Constants.Security.SuperUserKey, CancellationToken.None);
         var initProps = contentItem.Properties.Count;
 
         // remove a property
@@ -370,7 +370,7 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
         // Act
         var homeDoc = await cs.CreateAsync("Home Page", (Guid?)null, contentTypeAlias, Constants.Security.SuperUserKey, CancellationToken.None);
         await cs.SaveAsync(homeDoc, null, null, CancellationToken.None);
-        cs.Publish(homeDoc, new[] { "*" });
+        await cs.PublishAsync(homeDoc, new[] { "*" }, Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Assert
         Assert.That(ctBase.HasIdentity, Is.True);

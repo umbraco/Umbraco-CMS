@@ -1664,7 +1664,7 @@ internal partial class BlockListElementLevelVariationTests
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
         await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
-        var publishResult = ContentService.Publish(content, ["en-US", "da-DK"]);
+        var publishResult = await ContentService.PublishAsync(content, ["en-US", "da-DK"], Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.IsTrue(publishResult.Success);
         Assert.IsTrue(publishResult.Content.PublishedCultures.Contains("en-US"));
         Assert.IsTrue(publishResult.Content.PublishedCultures.Contains("da-DK"));
@@ -1704,7 +1704,7 @@ internal partial class BlockListElementLevelVariationTests
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
         await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
-        var publishResult = ContentService.Publish(content, ["en-US"]);
+        var publishResult = await ContentService.PublishAsync(content, ["en-US"], Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.IsTrue(publishResult.Success);
         Assert.IsTrue(publishResult.Content.PublishedCultures.Contains("en-US"));
         Assert.IsFalse(publishResult.Content.PublishedCultures.Contains("da-DK"));
@@ -1744,7 +1744,7 @@ internal partial class BlockListElementLevelVariationTests
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
         await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
-        var publishResult = ContentService.Publish(content, ["*"]);
+        var publishResult = await ContentService.PublishAsync(content, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.IsTrue(publishResult.Success);
         Assert.IsTrue(publishResult.Content.PublishedCultures.Contains("en-US"));
         Assert.IsTrue(publishResult.Content.PublishedCultures.Contains("da-DK"));
@@ -1785,7 +1785,7 @@ internal partial class BlockListElementLevelVariationTests
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
         await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
-        var publishResult = ContentService.Publish(content, ["en-US", "da-DK"]);
+        var publishResult = await ContentService.PublishAsync(content, ["en-US", "da-DK"], Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.Multiple(() =>
         {
             Assert.IsFalse(publishResult.Success);
@@ -1827,7 +1827,7 @@ internal partial class BlockListElementLevelVariationTests
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
         await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
-        var publishResult = ContentService.Publish(content, ["en-US", "da-DK"]);
+        var publishResult = await ContentService.PublishAsync(content, ["en-US", "da-DK"], Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.Multiple(() =>
         {
             Assert.IsFalse(publishResult.Success);
@@ -1872,10 +1872,10 @@ internal partial class BlockListElementLevelVariationTests
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
         await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
-        var publishResult = ContentService.Publish(content, ["en-US"]);
+        var publishResult = await ContentService.PublishAsync(content, ["en-US"], Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.IsTrue(publishResult.Success);
 
-        publishResult = ContentService.Publish(content, ["da-DK"]);
+        publishResult = await ContentService.PublishAsync(content, ["da-DK"], Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.Multiple(() =>
         {
             Assert.IsFalse(publishResult.Success);
@@ -1924,10 +1924,10 @@ internal partial class BlockListElementLevelVariationTests
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
         await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
-        var publishResult = ContentService.Publish(content, ["en-US"]);
+        var publishResult = await ContentService.PublishAsync(content, ["en-US"], Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.IsTrue(publishResult.Success);
 
-        publishResult = ContentService.Publish(content, ["da-DK"]);
+        publishResult = await ContentService.PublishAsync(content, ["da-DK"], Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.Multiple(() =>
         {
             Assert.IsFalse(publishResult.Success);

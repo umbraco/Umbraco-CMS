@@ -58,7 +58,7 @@ public class DateTimeEditorsPropertyValueHandlerTests : PropertyValueHandlerTest
             .Build();
 
         await ContentService.SaveAsync(content, null, null, CancellationToken.None);
-        ContentService.Publish(content, ["*"]);
+        await ContentService.PublishAsync(content, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         TestIndexDocument document = IndexerAndSearcher.Dump(IndexAliases.PublishedContent).Single();
 
@@ -93,7 +93,7 @@ public class DateTimeEditorsPropertyValueHandlerTests : PropertyValueHandlerTest
             .Build();
 
         await ContentService.SaveAsync(content, null, null, CancellationToken.None);
-        ContentService.Publish(content, ["*"]);
+        await ContentService.PublishAsync(content, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         TestIndexDocument document = IndexerAndSearcher.Dump(IndexAliases.PublishedContent).Single();
         Assert.That(document.Fields.Any(f => f.FieldName == "dateOnlyValue"), Is.False);
@@ -112,7 +112,7 @@ public class DateTimeEditorsPropertyValueHandlerTests : PropertyValueHandlerTest
             .Build();
 
         await ContentService.SaveAsync(content, null, null, CancellationToken.None);
-        ContentService.Publish(content, ["*"]);
+        await ContentService.PublishAsync(content, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         TestIndexDocument document = IndexerAndSearcher.Dump(IndexAliases.PublishedContent).Single();
         Assert.That(document.Fields.Any(f => f.FieldName == "dateOnlyValue"), Is.False);

@@ -164,7 +164,7 @@ public class SingleBlockPropertyValueHandlerTests : PropertyValueHandlerTestsBas
             .WithPropertyValues(new { block = blocksPropertyValue })
             .Build();
         await ContentService.SaveAsync(content, null, null, CancellationToken.None);
-        ContentService.Publish(content, ["*"]);
+        await ContentService.PublishAsync(content, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         AssertDocumentFields(IndexAliases.DraftContent);
         AssertDocumentFields(IndexAliases.PublishedContent);
@@ -273,7 +273,7 @@ public class SingleBlockPropertyValueHandlerTests : PropertyValueHandlerTestsBas
             .WithPropertyValues(new { rootBlock = blocksPropertyValue })
             .Build();
         await ContentService.SaveAsync(content, null, null, CancellationToken.None);
-        ContentService.Publish(content, ["*"]);
+        await ContentService.PublishAsync(content, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.PublishedContent);
         Assert.That(documents, Has.Count.EqualTo(1));

@@ -216,7 +216,7 @@ public class InvariantContentProtectionTests : SearcherTestBase
         await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, async () =>
         {
             await ContentService.SaveAsync(root, null, null, CancellationToken.None);
-            ContentService.Publish(root, ["*"]);
+            await ContentService.PublishAsync(root, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
         });
 
         IContent? content = ContentService.GetByIdAsync(RootKey, CancellationToken.None).GetAwaiter().GetResult();

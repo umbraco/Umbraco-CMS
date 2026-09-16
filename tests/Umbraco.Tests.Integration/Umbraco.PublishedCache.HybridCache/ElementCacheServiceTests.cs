@@ -248,7 +248,7 @@ internal sealed class ElementCacheServiceTests : UmbracoIntegrationTest
         element.SetValue("title", "Element Title");
 
         await ElementService.SaveAsync(element, null, null, CancellationToken.None);
-        ElementService.Publish(element, ["*"]);
+        await ElementService.PublishAsync(element, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         return (elementType, element);
     }
