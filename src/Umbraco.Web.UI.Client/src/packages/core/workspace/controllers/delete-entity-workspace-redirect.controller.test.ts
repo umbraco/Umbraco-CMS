@@ -17,6 +17,7 @@ class UmbTestNavigationParentItemPathWorkspaceContext {
 	#entityType: string;
 	#navigationParentItemPath = new UmbStringState<string | undefined>(undefined);
 	readonly navigationParentItemPath = this.#navigationParentItemPath.asObservable();
+	modalContext?: unknown;
 
 	constructor(unique: string | null, entityType: string) {
 		this.#unique = unique;
@@ -181,6 +182,18 @@ describe('UmbDeleteEntityWorkspaceRedirectController', () => {
 
 		expect(history.replaceStateCalls).to.have.lengthOf(2);
 		expect(history.replaceStateCalls[1].url).to.equal('/test/edit/second-parent');
+	});
+
+	it('does not redirect when the workspace is opened in a modal', async () => {
+		workspaceContext.setNavigationParentItemPath('/test/edit/parent-unique');
+		workspaceContext.modalContext = {};
+		createController();
+		await aTimeout(0);
+
+		dispatchDeleted();
+
+		expect(history.replaceStateCalls).to.have.lengthOf(0);
+		expect(history.pushStateCalls).to.have.lengthOf(0);
 	});
 
 	it('stops reacting once destroyed', async () => {

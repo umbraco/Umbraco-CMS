@@ -18,6 +18,7 @@ type UmbDeleteEntityWorkspaceRedirectControllerWorkspaceContext = {
 	getUnique(): UmbEntityUnique | undefined;
 	getEntityType(): string;
 	readonly navigationParentItemPath: Observable<string | undefined>;
+	readonly modalContext?: unknown;
 };
 
 /**
@@ -49,6 +50,9 @@ export class UmbDeleteEntityWorkspaceRedirectController extends UmbControllerBas
 	#onDeleted = ((event: UmbEntityDeletedEvent) => {
 		if (event.getUnique() !== this.#workspaceContext.getUnique()) return;
 		if (event.getEntityType() !== this.#workspaceContext.getEntityType()) return;
+
+		// In a modal, rewriting window.history would unwind the whole modal stack, not just this layer.
+		if (this.#workspaceContext.modalContext) return;
 
 		const path = this.#navigationParentItemPath;
 		if (!path) return;
