@@ -87,7 +87,8 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
             => ConvertIntermediateToBlockGridModel(owner, propertyType, referenceCacheLevel, inter, preview);
 
         /// <inheritdoc />
-        public PropertyCacheLevel GetDeliveryApiPropertyCacheLevel(IPublishedPropertyType propertyType) => GetPropertyCacheLevel(propertyType);
+        public PropertyCacheLevel GetDeliveryApiPropertyCacheLevel(IPublishedPropertyType propertyType)
+            => PropertyCacheLevel.Elements;
 
         /// <inheritdoc />
         public PropertyCacheLevel GetDeliveryApiPropertyCacheLevelForExpansion(IPublishedPropertyType propertyType) => PropertyCacheLevel.Snapshot;
@@ -156,7 +157,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
                 }
 
                 var creator = new BlockGridPropertyValueCreator(_blockConverter, _variationContextAccessor, _propertyRenderingContextAccessor, _blockEditorVarianceHandler, _jsonSerializer, _constructorCache, _languageService);
-                return creator.CreateBlockModelAsync(owner, referenceCacheLevel, intermediateBlockModelValue, preview, configuration.Blocks, configuration.GridColumns).GetAwaiter().GetResult();
+                return creator.CreateBlockModelAsync(owner, referenceCacheLevel, intermediateBlockModelValue, preview, BlockPropertyVariance.OwningPropertyCulture(_variationContextAccessor, owner, propertyType), configuration.Blocks, configuration.GridColumns).GetAwaiter().GetResult();
             }
         }
     }
