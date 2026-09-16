@@ -406,6 +406,8 @@ Name sharing is not the exception, it is the norm: **167 name constants appear i
 The residual risk sits with the **127 `create*` helpers that do not ensure first**: for those, a shared name plus a leftover means a duplicate or a 400 rather than a clean overwrite. If you add a `create*` helper, ensure the name first — that is the habit the suite actually depends on.
 
 So the rule that matters is not "unique names" but "clean up anything global" — see the teardown table below.
+
+**A consequence worth knowing before you bisect anything:** because state accumulates, running one spec on your branch and then the same spec on `main` against the *same instance* does not compare the two. The second run inherits whatever the first cleaned up. A permissions test here failed on a branch and passed on `main` that way, and the difference was entirely the order they ran in — re-running the branch afterwards passed in 9 seconds. If you are attributing a failure to a change, restart the instance between the two runs, or run each twice and compare the pairs.
 - Cleanup caveats to be aware of when debugging leftover state: some `ensureNameNotExists` / `recurseChildren` helpers delete only the **first** match, and list fetches use a single large `take` (no pagination) — duplicates or very large trees can leave residue.
 
 ### What actually has to be torn down
