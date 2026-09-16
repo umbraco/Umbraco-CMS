@@ -193,7 +193,7 @@ The full set lives on `ApiHelpers`, delegated onto the helper each entity is fet
 | `doesVariantHaveState(data, state, culture?)` | publication state | `document`, `element` |
 | `doesVariantHaveName(data, name, culture?)` | variant name | `document`, `element` |
 | `doesHaveVariantCount(data, count)` | how many variants | `document`, `element` |
-| `doesPropertyHaveValue(data, alias, value, culture?)` | one property value, matched by alias | `document`, `element` |
+| `doesPropertyHaveValue(data, alias, value, culture?, segment?)` | one property value, matched by alias | `document`, `element` |
 | `doesHaveValueCount(data, count)` | how many `values` are set; `0` means none | `document`, `element`, `dataType` |
 | `doesDataTypeHaveEditors(data, alias, uiAlias)` | both editor aliases together | `dataType` |
 | `doesHaveContent(data, content)` | file content | `template`, `partialView`, `stylesheet`, `script` |
@@ -202,8 +202,8 @@ The full set lives on `ApiHelpers`, delegated onto the helper each entity is fet
 | `doesPropertyUseDataType(data, alias, id)` | which data type backs a property | `documentType`, `mediaType`, `memberType` |
 | `doesOnlyPropertyUseDataType(data, id)` | exactly one property, backed by that data type | `documentType`, `mediaType`, `memberType` |
 | `isElementType(data, expected?)` | element-type flag | `documentType` |
-| `getPropertyValue(data, alias, culture?)` | **returns** a value for a nested assertion | `document`, `element`, `dataType` |
-| `getOnlyPropertyValue(data)` | **returns** the sole value, asserting there is one | `document`, `element`, `dataType` |
+| `getPropertyValue(data, alias, culture?, segment?)` | **returns** a value for a nested assertion | `document`, `element`, `dataType` |
+| `getOnlyPropertyValue(data, culture?, segment?)` | **returns** the sole value, asserting there is one | `document`, `element`, `dataType` |
 
 Note the deliberate split between `values` and `properties`: a content *item* carries property **values** (`doesHaveValueCount`), a content *type* carries property **definitions** (`doesHavePropertyCount`). Same word, different arrays — the helpers live on different objects so they cannot be confused at a call site.
 
@@ -224,7 +224,9 @@ So an "is there exactly one property?" check must count **distinct aliases**, ne
 The resulting contract:
 
 - `getOnlyPropertyValue(data)` — asserts exactly one distinct alias, returns the **first** entry (what the raw `values[0].value` returned).
-- `getPropertyValue(data, alias)` / `doesPropertyHaveValue(data, alias, value)` — with no culture, several matches is legitimate and the first is used; pass a culture when a specific variant is the subject, and then exactly one match is required.
+- `getPropertyValue(data, alias)` / `doesPropertyHaveValue(data, alias, value)` — with no culture or segment, several matches is legitimate and the first is used.
+- **All three take an optional `culture` *and* `segment`.** Narrow with whichever identifies the entry you mean; the helper then requires exactly one match. This matters because the rule above is about culture **and segment** — a property segmented within a single culture yields several entries that a culture alone cannot separate, so `culture` by itself would fail with `found 2` on exactly the specs these helpers exist to serve.
+- Returning the *first* entry when nothing is narrowed is an ordering dependence, inside helpers introduced to remove one. It is deliberate, because it preserves what the raw `values[0]` did — but it is the reason to pass a culture or segment whenever the property varies and a specific entry is the subject.
 - `doesVariantHaveState` / `doesVariantHaveName` — with no culture, target `variants[0]`, the default variant.
 
 **Think hard before changing any of these semantics** — these helpers back ~700 spec assertions, so a change to what they mean silently changes what all of those specs assert, with no failure to point at the cause.

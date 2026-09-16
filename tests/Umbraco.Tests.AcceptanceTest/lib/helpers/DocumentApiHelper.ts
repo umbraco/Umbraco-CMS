@@ -26,7 +26,7 @@ export class DocumentApiHelper {
   }
 
   /** Asserts a property value on an already-fetched document, matched by alias rather than position. */
-  async doesPropertyHaveValue(documentData: any, alias: string, expectedValue: any, culture: string | null = null): Promise<void> {
+  async doesPropertyHaveValue(documentData: any, alias: string, expectedValue: any, culture: string | null = null, segment: string | null = null): Promise<void> {
     await this.api.doesPropertyHaveValue(documentData, alias, expectedValue, culture);
   }
 
@@ -36,8 +36,8 @@ export class DocumentApiHelper {
   }
 
   /** Returns the document's only property value, asserting there is exactly one. The caller asserts on it. */
-  getOnlyPropertyValue(documentData: any): any {
-    return this.api.getOnlyPropertyValue(documentData);
+  getOnlyPropertyValue(documentData: any, culture: string | null = null, segment: string | null = null): any {
+    return this.api.getOnlyPropertyValue(documentData, culture, segment);
   }
 
   /** Asserts how many variants an already-fetched document carries. */
@@ -46,8 +46,8 @@ export class DocumentApiHelper {
   }
 
   /** Returns a property value from an already-fetched document, looked up by alias. The caller asserts. */
-  getPropertyValue(documentData: any, alias: string, culture: string | null = null): any {
-    return this.api.getPropertyValue(documentData, alias, culture);
+  getPropertyValue(documentData: any, alias: string, culture: string | null = null, segment: string | null = null): any {
+    return this.api.getPropertyValue(documentData, alias, culture, segment);
   }
 
   /** Asserts the name of a variant on an already-fetched document. */

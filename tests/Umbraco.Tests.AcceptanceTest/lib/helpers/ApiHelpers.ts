@@ -232,6 +232,42 @@ export class ApiHelpers {
   }
 
   /**
+   * How one `values` entry is identified in a failure message: the culture and segment it
+   * belongs to, or `invariant` when it has neither.
+   */
+  private describeEntry(entry: any): string {
+    const culture = entry?.culture ?? null;
+    const segment = entry?.segment ?? null;
+    if (culture === null && segment === null) return 'invariant';
+    return [culture ?? 'invariant', segment].filter(x => x !== null && x !== undefined).join('/');
+  }
+
+  /**
+   * Narrows an entity's `values` to one property, by alias and optionally culture and segment.
+   *
+   * A property that varies contributes **one entry per culture and segment**, so an alias alone
+   * can legitimately match several (CLAUDE.md §3). `narrowed` reports whether the caller asked
+   * for a specific one, which is what decides whether several matches is an error or expected.
+   */
+  private selectPropertyEntries(entityData: any, alias: string, culture: string | null, segment: string | null) {
+    const values = entityData?.values;
+    expect(Array.isArray(values), `Expected the entity to carry a values array, got: ${JSON.stringify(entityData)?.slice(0, 200)}`).toBeTruthy();
+
+    const matches = values.filter(v =>
+      v.alias === alias
+      && (culture === null || v.culture === culture)
+      && (segment === null || v.segment === segment));
+
+    const parts: string[] = [];
+    if (culture !== null) parts.push(`culture '${culture}'`);
+    if (segment !== null) parts.push(`segment '${segment}'`);
+    const where = parts.length ? ` for ${parts.join(' and ')}` : '';
+
+    expect(matches.length, `Expected property '${alias}'${where} to be present. Present: ${values.map(v => `${v.alias}(${this.describeEntry(v)})`).join(', ') || '(none)'}`).toBeGreaterThan(0);
+    return {matches, where, narrowed: culture !== null || segment !== null};
+  }
+
+  /**
    * Asserts that a property on an already-fetched entity holds `expectedValue`.
    *
    * Looks the property up **by alias**, not by position: the API does not promise an order
@@ -240,26 +276,20 @@ export class ApiHelpers {
    * @param entityData - an entity carrying `values`, as returned by `getByName`/`get`
    * @param alias - the property alias (see {@link AliasHelper.toAlias})
    * @param expectedValue - compared with `toEqual`, so objects and arrays work
-   * @param culture - for a variant property; omit for invariant
+   * @param culture - for a culture-varying property; omit for invariant
+   * @param segment - for a segmented property; omit to match any segment
    */
-  async doesPropertyHaveValue(entityData: any, alias: string, expectedValue: any, culture: string | null = null): Promise<void> {
-    const values = entityData?.values;
-    expect(Array.isArray(values), `Expected the entity to carry a values array, got: ${JSON.stringify(entityData)?.slice(0, 200)}`).toBeTruthy();
+  async doesPropertyHaveValue(entityData: any, alias: string, expectedValue: any, culture: string | null = null, segment: string | null = null): Promise<void> {
+    const {matches, where, narrowed} = this.selectPropertyEntries(entityData, alias, culture, segment);
 
-    const matches = values.filter(v => v.alias === alias && (culture === null || v.culture === culture));
-    const where = culture === null ? '' : ` for culture '${culture}'`;
-    expect(matches.length, `Expected property '${alias}'${where} to be present. Present: ${values.map(v => v.alias).join(', ') || '(none)'}`).toBeGreaterThan(0);
-
-    // A property that varies contributes one entry per culture/segment, so several matches for a
-    // bare alias is legitimate rather than an error. Assert the first (what the raw `values[0]`
-    // did) and name the culture in the message so a mismatch is diagnosable.
-    if (culture === null && matches.length > 1) {
-      const which = matches[0].culture ?? 'invariant';
-      expect(matches[0].value, `Expected property '${alias}' (${which}; it varies across ${matches.length} culture/segment entries - pass a culture to target one) to equal the expected value`).toEqual(expectedValue);
+    // Several matches with no narrowing is legitimate - the property varies, one entry each - so
+    // assert the first, as the raw `values[0]` did, and say which one that was.
+    if (!narrowed && matches.length > 1) {
+      expect(matches[0].value, `Expected property '${alias}' (${this.describeEntry(matches[0])}; it varies across ${matches.length} entries - pass a culture and/or segment to target one) to equal the expected value`).toEqual(expectedValue);
       return;
     }
 
-    expect(matches.length, `Expected exactly one property '${alias}'${where}, found ${matches.length}`).toBe(1);
+    expect(matches.length, `Expected exactly one property '${alias}'${where}, found ${matches.length}: ${matches.map(m => this.describeEntry(m)).join(', ')}`).toBe(1);
     expect(matches[0].value, `Expected property '${alias}'${where} to equal the expected value`).toEqual(expectedValue);
   }
 
@@ -289,7 +319,7 @@ export class ApiHelpers {
    *
    * Prefer {@link getPropertyValue} whenever the alias is known.
    */
-  getOnlyPropertyValue(entityData: any): any {
+  getOnlyPropertyValue(entityData: any, culture: string | null = null, segment: string | null = null): any {
     const values = entityData?.values;
     expect(Array.isArray(values), `Expected the entity to carry a values array, got: ${JSON.stringify(entityData)?.slice(0, 200)}`).toBeTruthy();
 
@@ -300,9 +330,10 @@ export class ApiHelpers {
     const aliases = [...new Set(values.map(v => v.alias))];
     expect(aliases.length, `Expected the entity to have exactly one property, found ${aliases.length}: ${aliases.join(', ') || '(none)'}`).toBe(1);
 
-    // Returns the first entry, matching what the raw `values[0].value` did. When the property
-    // varies, pass the culture to getPropertyValue instead of relying on this ordering.
-    return values[0].value;
+    // With no culture or segment this returns the first entry, matching what the raw
+    // `values[0].value` did - an ordering the API does not promise, so pass a culture and/or
+    // segment whenever the property varies and a specific one is the subject.
+    return this.getPropertyValue(entityData, values[0].alias, culture, segment);
   }
 
   /**
@@ -409,19 +440,14 @@ export class ApiHelpers {
    * nested assertion (the actual subject of such a test) while dropping the positional
    * `values[0]` lookup that assumed an order the API never promised.
    */
-  getPropertyValue(entityData: any, alias: string, culture: string | null = null): any {
-    const values = entityData?.values;
-    expect(Array.isArray(values), `Expected the entity to carry a values array, got: ${JSON.stringify(entityData)?.slice(0, 200)}`).toBeTruthy();
+  getPropertyValue(entityData: any, alias: string, culture: string | null = null, segment: string | null = null): any {
+    const {matches, where, narrowed} = this.selectPropertyEntries(entityData, alias, culture, segment);
 
-    const matches = values.filter(v => v.alias === alias && (culture === null || v.culture === culture));
-    const where = culture === null ? '' : ` for culture '${culture}'`;
-    expect(matches.length, `Expected property '${alias}'${where} to be present. Present: ${values.map(v => v.alias).join(', ') || '(none)'}`).toBeGreaterThan(0);
-
-    // Several matches for a bare alias means the property varies by culture or segment - one
-    // entry each - which is legitimate. Return the first, as the raw `values[0].value` did;
-    // pass a culture when a specific variant is the subject.
-    if (culture !== null) {
-      expect(matches.length, `Expected exactly one property '${alias}'${where}, found ${matches.length}`).toBe(1);
+    // Several matches with no narrowing means the property varies - one entry per culture and
+    // segment - which is legitimate. Return the first, as the raw `values[0].value` did; pass a
+    // culture and/or segment when a specific one is the subject.
+    if (narrowed) {
+      expect(matches.length, `Expected exactly one property '${alias}'${where}, found ${matches.length}: ${matches.map(m => this.describeEntry(m)).join(', ')}`).toBe(1);
     }
 
     return matches[0].value;

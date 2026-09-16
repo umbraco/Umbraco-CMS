@@ -21,7 +21,7 @@ export class ElementApiHelper {
   }
 
   /** Asserts a property value on an already-fetched element, matched by alias rather than position. */
-  async doesPropertyHaveValue(elementData: any, alias: string, expectedValue: any, culture: string | null = null): Promise<void> {
+  async doesPropertyHaveValue(elementData: any, alias: string, expectedValue: any, culture: string | null = null, segment: string | null = null): Promise<void> {
     await this.api.doesPropertyHaveValue(elementData, alias, expectedValue, culture);
   }
 
@@ -31,8 +31,8 @@ export class ElementApiHelper {
   }
 
   /** Returns the element's only property value, asserting there is exactly one. The caller asserts on it. */
-  getOnlyPropertyValue(elementData: any): any {
-    return this.api.getOnlyPropertyValue(elementData);
+  getOnlyPropertyValue(elementData: any, culture: string | null = null, segment: string | null = null): any {
+    return this.api.getOnlyPropertyValue(elementData, culture, segment);
   }
 
   /** Asserts how many variants an already-fetched element carries. */
@@ -41,8 +41,8 @@ export class ElementApiHelper {
   }
 
   /** Returns a property value from an already-fetched element, looked up by alias. The caller asserts. */
-  getPropertyValue(elementData: any, alias: string, culture: string | null = null): any {
-    return this.api.getPropertyValue(elementData, alias, culture);
+  getPropertyValue(elementData: any, alias: string, culture: string | null = null, segment: string | null = null): any {
+    return this.api.getPropertyValue(elementData, alias, culture, segment);
   }
 
   /** Asserts the name of a variant on an already-fetched element. */
