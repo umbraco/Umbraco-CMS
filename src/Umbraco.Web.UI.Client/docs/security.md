@@ -42,12 +42,13 @@ private _validateName(name: string): boolean {
 
 ### Authentication & Authorization
 
-**OpenID Connect with PKCE** (v17+):
+**Cookie-based authentication** (v19+):
 
-- Backoffice uses PKCE authorization code flow
-- Real tokens are stored exclusively in `__Host-umbAccessToken` / `__Host-umbRefreshToken` httpOnly cookies — JavaScript cannot read them
-- The client-side bearer token value is always the literal string `'[redacted]'` — the server (`HideBackOfficeTokensHandler`) swaps it for the real cookie on each request
-- Never try to read or store real tokens client-side; they are intentionally inaccessible
+- The back-office session is a single httpOnly cookie (default `UMB_UCONTEXT`, via `Security:AuthCookieName`) — JavaScript cannot read it. No client-side tokens, no PKCE flow.
+- The cookie is the sole credential; every request sends it via `credentials: 'include'` (handled by `configureClient()`).
+- Boot probe: `UmbAuthContext` plain-fetches `user/current/configuration` (`credentials: 'include'`, `redirect: 'manual'`); a non-ok response means "not logged in". It bypasses the intercepted client — a 401 there would be queued for re-auth and hang boot.
+- `keepAlive()` re-issues the cookie; sign-out clears it and redirects (no OpenIddict end-session).
+- OpenIddict remains server-side for API users only, never the back-office session.
 
 **Configuring API clients**:
 
@@ -58,12 +59,12 @@ authContext.configureClient(myClient);
 // ✅ For manual fetch calls
 const config = authContext.getOpenApiConfiguration();
 
-// ❌ getLatestToken() is deprecated (returns '[redacted]' anyway) — scheduled for removal v19
-const token = await authContext.getLatestToken();
+// ❌ There is no client-readable token. The token accessors were removed in v19 —
+// getOpenApiConfiguration().token() survives but resolves to undefined, so the SDK sends no header.
 ```
 
-**Do NOT call `validateToken()` per request**:
-`validateToken()` forces a `/token` network call and revokes the previous access token as a side effect (OpenIddict reference tokens). Calling it on every API request causes token churn and ID2019 "token no longer valid" errors in concurrent requests. Use `configureClient()` instead — it has a built-in guard that only refreshes when the access token is actually expired.
+**Do NOT probe the session per request**:
+The boot probe (`user/current/configuration`) runs once at boot and after `keepAlive()`, never per request — the cookie rides along automatically. (Historically the mistake was calling `validateToken()` per request, which revoked the reference token and caused ID2019 errors. That method no longer exists.)
 
 **Authorization Checks**:
 
@@ -84,8 +85,8 @@ async #handleDelete() {
 **Context Security**:
 
 - Use Context API for auth state (`UMB_AUTH_CONTEXT`)
-- Never store tokens in localStorage, sessionStorage, or JS variables
-- Backend handles token refresh via httpOnly cookies
+- Never store credentials in localStorage, sessionStorage, or JS variables
+- The server owns cookie renewal; the client only tracks expiry for the timeout UI
 - All API requests must use `credentials: 'include'` (handled automatically by `configureClient()`)
 
 ### API Security
@@ -164,10 +165,16 @@ html`<p>${this.localize.htmlString('#defaultdialogs_confirmdelete', userControll
 html`<p>${unsafeHTML(this.localize.string('#defaultdialogs_confirmdelete', userControlledName))}</p>`;
 ```
 
-**Modal `content` field** (e.g. `umbConfirmModal`) renders strings via `unsafeHTML` internally. When passing a localized string with user-controlled args, wrap it in a template:
+**Modal `content` field** (e.g. `umbConfirmModal`) renders strings via `unsafeHTML` internally. When passing a localized string with user-controlled args, either pre-escape the args (preferred, `content` stays a plain string) or wrap an `htmlString()` call in a template for keys containing markup. Note `term()`/`string()` take a **bare** key — only `string()`/`htmlString()` resolve a leading `#`, so `term()` never uses one:
 
 ```typescript
-// ✅ Safe — htmlString escapes args, html`...` wraps the directive in a TemplateResult
+// ✅ Preferred — term() returns a plain string; escape user-controlled args at the call site
+umbConfirmModal(this, {
+	headline: '#actions_delete',
+	content: this.localize.term('defaultdialogs_confirmdelete', escapeHTML(item.name ?? '')),
+});
+
+// ✅ Also safe — htmlString escapes args, html`...` wraps the directive in a TemplateResult
 umbConfirmModal(this, {
 	headline: '#actions_delete',
 	content: html`${this.#localize.htmlString('#defaultdialogs_confirmdelete', item.name)}`,

@@ -8,7 +8,7 @@ import { UmbItemServerDataSourceBase } from '@umbraco-cms/backoffice/repository'
 /**
  * A data source for Media items that fetches data from the server
  * @class UmbMediaItemServerDataSource
- * @implements {MediaTreeDataSource}
+ * @augments {UmbItemServerDataSourceBase}
  */
 export class UmbMediaItemServerDataSource extends UmbItemServerDataSourceBase<
 	MediaItemResponseModel,

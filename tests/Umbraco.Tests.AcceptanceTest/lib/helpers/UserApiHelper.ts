@@ -288,8 +288,9 @@ export class UserApiHelper {
   async loginToUser(userName: string, userEmail: string, userPassword: string) {
     const user = await this.getByName(userName);
     if (user.id !== null) {
-      await this.api.revokeTokens();
-      await this.api.updateTokenAndCookie(userEmail, userPassword);
+      // No sign-out first: there is a single authentication cookie, so signing in replaces it. A
+      // failed switch still surfaces, because signIn asserts the response status.
+      await this.api.signIn(userEmail, userPassword);
     }
   }
 

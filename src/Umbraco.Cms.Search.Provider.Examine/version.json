@@ -1,0 +1,24 @@
+{
+  "$schema": "https://raw.githubusercontent.com/dotnet/Nerdbank.GitVersioning/master/src/NerdBank.GitVersioning/version.schema.json",
+  "version": "18.0.0-beta.1",
+  "inherit": false,
+  "assemblyVersion": {
+    "precision": "build"
+  },
+  "gitCommitIdShortFixedLength": 7,
+  "nugetPackageVersion": {
+    "semVer": 2
+  },
+  "publicReleaseRefSpec": [
+    "^refs/heads/main$",
+    "^refs/heads/release/"
+  ],
+  "cloudBuild": {
+    "buildNumber": {
+      "enabled": true
+    }
+  },
+  "release": {
+    "branchName": "release/examine/{version}"
+  }
+}

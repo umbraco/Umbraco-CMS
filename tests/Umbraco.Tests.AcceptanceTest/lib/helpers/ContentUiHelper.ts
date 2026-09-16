@@ -96,8 +96,11 @@ export class ContentUiHelper extends UiBaseLocators {
   private readonly rollbackCancelBtn: Locator;
   private readonly publicAccessBtn: Locator;
   private readonly uuiCheckbox: Locator;
-  private readonly sortBtn: Locator;
   private readonly containerSaveBtn: Locator;
+  private readonly sortBtn: Locator;
+  private readonly sortByFieldTab: Locator;
+  private readonly sortByFieldSelect: Locator;
+  private readonly sortByFieldDirectionSelect: Locator;
   private readonly groupBasedProtectionBtn: Locator;
   private readonly chooseMemberGroupBtn: Locator;
   private readonly selectLoginPageDocument: Locator;
@@ -177,6 +180,7 @@ export class ContentUiHelper extends UiBaseLocators {
   private readonly cascadingMenuContainer: Locator;
   private readonly modalFormValidationMessage: Locator;
   private readonly treePickerSearchTxt: Locator;
+  private readonly treePickerSearchTabBtn: Locator;
   private readonly mediaPickerSearchTxt: Locator;
   private readonly memberPickerSearchTxt: Locator;
   private readonly documentCreateOptionsModal: Locator;
@@ -325,13 +329,16 @@ export class ContentUiHelper extends UiBaseLocators {
     this.documentNotificationsModal = page.locator('umb-document-notifications-modal');
     this.documentNotificationsSaveBtn = this.documentNotificationsModal.getByLabel('Save', {exact: true});
     this.emptyRecycleBinBtn = page.getByTestId('entity-action:Umb.EntityAction.Document.RecycleBin.Empty').locator('#button');
-    this.confirmEmptyRecycleBinBtn = page.locator('#confirm').getByLabel('Empty recycle bin', {exact: true});
+    this.confirmEmptyRecycleBinBtn = page.locator('umb-confirm-modal').locator('#confirm');
     this.duplicateToBtn = page.getByRole('button', {name: 'Duplicate to'});
     this.moveToBtn = page.getByRole('button', {name: 'Move to'});
     this.duplicateBtn = page.getByLabel('Duplicate', {exact: true});
     this.contentTreeRefreshBtn = page.locator('#header').getByLabel('#actions_refreshNode');
     this.sortChildrenBtn = page.getByRole('button', {name: 'Sort children'});
     this.rollbackBtn = this.documentWorkspace.locator('[data-mark="audit-log-action:Umb.AuditLogAction.Document.Rollback"]');
+    this.sortByFieldTab = page.getByTestId('sort-children-of-modal:tab-by-field');
+    this.sortByFieldSelect = page.locator('umb-sort-children-of-content-modal [label="Sort by field"] select');
+    this.sortByFieldDirectionSelect = page.locator('umb-sort-children-of-content-modal [label="Direction"] select');
     this.publishModalBtn = this.backofficeModalContainer.getByLabel('Publish', {exact: true});
     this.unpublishModalBtn = this.backofficeModalContainer.getByLabel('Unpublish', {exact: true});
     this.rollbackContainerBtn = this.container.getByLabel("Rollback");
@@ -483,6 +490,7 @@ export class ContentUiHelper extends UiBaseLocators {
     this.cascadingMenuContainer = page.locator('umb-cascading-menu-popover uui-scroll-container');
     this.modalFormValidationMessage = this.sidebarModal.locator('umb-form-validation-message #messages');
     this.treePickerSearchTxt = this.page.locator('umb-tree-picker-modal #input');
+    this.treePickerSearchTabBtn = this.page.locator('umb-tree-picker-modal').locator('uui-tab[data-mark="picker:tab:search"]');
     this.mediaPickerSearchTxt = this.page.locator('umb-media-picker-modal #search #input');
     this.memberPickerSearchTxt = this.page.locator('umb-member-picker-modal #input');
     // Property Actions
@@ -650,7 +658,12 @@ export class ContentUiHelper extends UiBaseLocators {
     await this.waitForNavigation();
     // Workspace view-links render after the document loads, which can lag under load.
     await this.waitForVisible(this.infoTab, ConstantHelper.timeout.veryLong);
-    await this.click(this.infoTab);
+    // A workspace re-init just after the click can tear down the Info view before it loads the audit log.
+    // Retry until the history renders (saved content always has >=1 entry) to confirm the view stuck.
+    await expect(async () => {
+      await this.click(this.infoTab);
+      await expect(this.historyItems.first()).toBeVisible({timeout: ConstantHelper.timeout.short});
+    }).toPass({timeout: ConstantHelper.timeout.veryLong});
   }
 
   async doesDocumentHaveLink(link: string) {
@@ -1291,10 +1304,7 @@ export class ContentUiHelper extends UiBaseLocators {
   }
 
   async clickConfirmEmptyRecycleBinButton() {
-    // The confirm dialog can re-render after opening, detaching the button; retry the click until it lands.
-    await expect(async () => {
-      await this.click(this.confirmEmptyRecycleBinBtn, {force: true, timeout: ConstantHelper.timeout.short});
-    }).toPass({timeout: ConstantHelper.timeout.medium});
+    await this.click(this.confirmEmptyRecycleBinBtn);
   }
 
   async isDocumentPropertyEditable(propertyName: string, isEditable: boolean = true) {
@@ -1366,16 +1376,16 @@ export class ContentUiHelper extends UiBaseLocators {
   }
 
   async clickRollbackButton() {
-    // Opening Rollback triggers a GET /document-version to load the version history; wait for that response
-    // so the versions are ready before we pick one. The button is located by its stable data-mark (see
-    // rollbackBtn) rather than an accessible-name match, which could resolve late/to a transient element
-    // and swallow the click, opening no modal and hanging this wait.
-    await this.waitForResponseAfterExecutingPromise(
-      '/document-version',
-      this.click(this.rollbackBtn),
-      ConstantHelper.statusCodes.ok,
-      ConstantHelper.httpMethods.get,
-    );
+    // Opening Rollback loads the version history into the modal. On the slow Windows CI leg the click can be
+    // swallowed - it resolves but the handler isn't wired yet, so the modal never opens and a plain
+    // response-wait hangs to timeout. Retry the open (located by its stable data-mark) until the version
+    // list renders, guarded so we don't re-click once it is already showing.
+    await expect(async () => {
+      if ((await this.rollbackItem.count()) === 0) {
+        await this.click(this.rollbackBtn, {force: true});
+      }
+      await expect(this.rollbackItem.first()).toBeVisible({timeout: ConstantHelper.timeout.medium});
+    }).toPass({timeout: ConstantHelper.timeout.veryLong});
   }
 
   async clickRollbackContainerButton(documentId?: string) {
@@ -1456,6 +1466,24 @@ export class ContentUiHelper extends UiBaseLocators {
 
   async clickSortButton() {
     await this.click(this.sortBtn);
+  }
+
+  async clickSortByFieldTab() {
+    await this.click(this.sortByFieldTab);
+  }
+
+  async selectSortByField(fieldName: string) {
+    await this.selectByText(this.sortByFieldSelect, fieldName);
+  }
+
+  async selectSortByFieldDirection(directionName: string) {
+    await this.selectByText(this.sortByFieldDirectionSelect, directionName);
+  }
+
+  async prepareSortByField(fieldName: string, directionName: string) {
+    await this.clickSortByFieldTab();
+    await this.selectSortByField(fieldName);
+    await this.selectSortByFieldDirection(directionName);
   }
 
   async doesIndexDocumentInTreeContainName(parentName: string, childName: string, index: number) {
@@ -1559,6 +1587,11 @@ export class ContentUiHelper extends UiBaseLocators {
 
   async clickDeleteBlockListBlockButton() {
     await this.hoverAndClick(this.blockListEntry, this.deleteBlockEntryBtn);
+  }
+
+  async clickDeleteBlockListBlockButtonAtIndex(index: number) {
+    const blockEntry = this.blockListEntry.nth(index);
+    await this.hoverAndClick(blockEntry, blockEntry.locator('[label="Delete"]'));
   }
 
   async clickCopyBlockListBlockButton(groupName: string, propertyName: string, blockName: string, index: number = 0) {
@@ -2059,6 +2092,8 @@ export class ContentUiHelper extends UiBaseLocators {
   }
 
   async enterSearchKeywordInTreePickerModal(keyword: string) {
+    // The search input lives behind the modal's Search tab and is not visible while the Browse tab is active.
+    await this.click(this.treePickerSearchTabBtn);
     await this.enterText(this.treePickerSearchTxt, keyword);
     await this.pressKey(this.treePickerSearchTxt, 'Enter');
   }
@@ -2232,8 +2267,13 @@ export class ContentUiHelper extends UiBaseLocators {
     await this.hasValue(propertyLocator, value);
   }
 
-  async clickConfirmTrashButtonAndWaitForContentToBeTrashed() {
-    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.document, this.clickConfirmTrashButton(), ConstantHelper.statusCodes.ok);
+  // Bulk trash sends one sequential request per selected item, so waiting on a single
+  // response races the remaining items still in flight — pass the selection count for a bulk trash.
+  async clickConfirmTrashButtonAndWaitForContentToBeTrashed(expectedCount: number = 1) {
+    if (expectedCount === 1) {
+      return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.document, this.clickConfirmTrashButton(), ConstantHelper.statusCodes.ok);
+    }
+    return await this.waitForMultipleResponsesAfterExecutingPromise(ConstantHelper.apiEndpoints.document, this.clickConfirmTrashButton(), ConstantHelper.statusCodes.ok, expectedCount);
   }
 
   async clickConfirmEmptyRecycleBinButtonAndWaitForRecycleBinToBeEmptied() {
@@ -2249,7 +2289,7 @@ export class ContentUiHelper extends UiBaseLocators {
   }
 
   async clickSaveModalButtonAndWaitForDocumentBlueprintToBeCreated() {
-    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.documentBlueprint, this.documentBlueprintSaveBtn.click(), ConstantHelper.statusCodes.created);
+    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.documentBlueprint, this.click(this.documentBlueprintSaveBtn), ConstantHelper.statusCodes.created);
   }
 
   async clickSaveModalButtonAndWaitForNotificationToBeCreated() {

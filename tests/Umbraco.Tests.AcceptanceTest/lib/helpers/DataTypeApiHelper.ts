@@ -157,6 +157,10 @@ export class DataTypeApiHelper {
   // FOLDER
   async getFolder(id: string) {
     const response = await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/data-type/folder/' + id);
+    if (!response.ok()) {
+      return null;
+    }
+
     return await response.json();
   }
 
@@ -1412,15 +1416,18 @@ export class DataTypeApiHelper {
 
   // List View - Media data type
   async updateListViewMediaDataType(alias: string, newValue: any) {
+    return await this.updateListViewMediaDataTypeValues([{alias: alias, value: newValue}]);
+  }
+
+  async updateListViewMediaDataTypeValues(values: {alias: string, value: any}[]) {
     const listViewMediaData = await this.getByName('List View - Media');
-    const valueData = listViewMediaData.values.find(value => value.alias === alias);
-    if (valueData) {
-      valueData.value = newValue;
-    } else {
-      listViewMediaData.values.push({
-        "alias": alias,
-        "value": newValue
-      });
+    for (const {alias, value} of values) {
+      const valueData = listViewMediaData.values.find(v => v.alias === alias);
+      if (valueData) {
+        valueData.value = value;
+      } else {
+        listViewMediaData.values.push({"alias": alias, "value": value});
+      }
     }
     return await this.update(listViewMediaData.id, listViewMediaData);
   }
@@ -1480,6 +1487,17 @@ export class DataTypeApiHelper {
       .build();
 
     return await this.save(dataType);
+  }
+
+  async updateApprovedColorItemLabel(dataTypeName: string, color: string, label: string) {
+    const dataTypeData = await this.getByName(dataTypeName);
+    const itemsValue = dataTypeData.values.find(item => item.alias === 'items');
+    const colorItem = itemsValue?.value?.find(item => item.value === color);
+    if (!colorItem) {
+      throw new Error(`No item with color '${color}' found on data type '${dataTypeName}'.`);
+    }
+    colorItem.label = label;
+    return await this.update(dataTypeData.id, dataTypeData);
   }
 
   async getTiptapExtensionsCount(tipTapName: string) {

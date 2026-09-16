@@ -3,6 +3,7 @@
 
 using System.Text.RegularExpressions;
 using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Net;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 
@@ -13,7 +14,6 @@ namespace Umbraco.Cms.Core.HealthChecks.Checks.Security;
 /// </summary>
 public abstract class BaseHttpHeaderCheck : HealthCheck
 {
-    private static HttpClient? _httpClient;
     private readonly string _header;
     private readonly IHostingEnvironment _hostingEnvironment;
     private readonly string _localizedTextPrefix;
@@ -56,7 +56,7 @@ public abstract class BaseHttpHeaderCheck : HealthCheck
     /// </summary>
     protected abstract string ReadMoreLink { get; }
 
-    private static HttpClient HttpClient => _httpClient ??= new HttpClient();
+    private static HttpClient HttpClient => SharedHttpClient.Instance;
 
     /// <inheritdoc />
     public override async Task<IEnumerable<HealthCheckStatus>> GetStatusAsync()

@@ -9,7 +9,7 @@ export class UmbDocumentSegmentRepository extends UmbRepositoryBase {
 	 * Get available segment options for a document by its ID.
 	 * @param {string} unique The unique identifier of the document.
 	 * @param {UmbDocumentSegmentFilterModel} filter The filter options to apply.
-	 * @returns A promise that resolves with the available segment options.
+	 * @returns {Promise<UmbRepositoryResponse<UmbSegmentResponseModel>>} A promise that resolves with the available segment options.
 	 */
 	async getDocumentByIdSegmentOptions(
 		unique: string,
@@ -17,7 +17,7 @@ export class UmbDocumentSegmentRepository extends UmbRepositoryBase {
 	): Promise<UmbRepositoryResponse<UmbSegmentResponseModel>> {
 		const { data, error } = await tryExecute(
 			this,
-			// eslint-disable-next-line @typescript-eslint/no-deprecated
+
 			DocumentService.getDocumentByIdAvailableSegmentOptions({ path: { id: unique }, query: filter }),
 		);
 
@@ -26,7 +26,7 @@ export class UmbDocumentSegmentRepository extends UmbRepositoryBase {
 				const model: UmbSegmentModel = {
 					alias: item.alias,
 					name: item.name,
-					// eslint-disable-next-line @typescript-eslint/no-deprecated
+
 					cultures: item.cultures,
 				};
 

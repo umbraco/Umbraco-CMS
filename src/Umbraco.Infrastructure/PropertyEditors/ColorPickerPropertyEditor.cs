@@ -35,9 +35,6 @@ public class ColorPickerPropertyEditor : DataEditor, IValueSchemaProvider
         SupportsReadOnly = true;
     }
 
-    /// <inheritdoc/>
-    public override IPropertyIndexValueFactory PropertyIndexValueFactory { get; } = new NoopPropertyIndexValueFactory();
-
     /// <inheritdoc />
     public Type? GetValueType(object? configuration) => typeof(JsonObject);
 

@@ -898,8 +898,8 @@ namespace Umbraco.Cms.Core.Services
             }
 
             // Login is not a member update: UpdateDate is intentionally left untouched, and the
-            // IndexableFieldsChanged state flag tells the Examine indexing handler to skip the
-            // re-index since no indexed field has changed.
+            // IndexableFieldsChanged state flag tells search indexing to skip the re-index since
+            // no indexed field has changed.
             var savingNotification = new MemberSavingNotification(member, evtMsgs);
             savingNotification.State.Add(Constants.Conventions.Member.LoginPropertiesOnlyStateKey, true);
             savingNotification.State.Add(Constants.Conventions.Member.IndexableFieldsChangedStateKey, false);
@@ -1207,12 +1207,13 @@ namespace Umbraco.Cms.Core.Services
         /// </remarks>
         public MemberExportModel? ExportMember(Guid key)
         {
-            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            using ICoreScope scope = ScopeProvider.CreateCoreScope();
             IQuery<IMember>? query = Query<IMember>().Where(x => x.Key == key);
             IMember? member = _memberRepository.Get(query)?.FirstOrDefault();
 
             if (member == null)
             {
+                scope.Complete();
                 return null;
             }
 
@@ -1231,6 +1232,7 @@ namespace Umbraco.Cms.Core.Services
             };
 
             scope.Notifications.Publish(new ExportedMemberNotification(member, model));
+            scope.Complete();
 
             return model;
         }

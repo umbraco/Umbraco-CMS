@@ -26,8 +26,8 @@ export class UmbCurrentUserHistoryUserProfileAppElement extends UmbLitElement {
 		super();
 
 		this.#pagination.setPageSize(PAGE_SIZE);
-		this.observe(this.#pagination.currentPage, (number) => (this._currentPageNumber = number));
-		this.observe(this.#pagination.totalPages, (number) => (this._totalPages = number));
+		this.observe(this.#pagination.currentPage, (number) => (this._currentPageNumber = number), null);
+		this.observe(this.#pagination.totalPages, (number) => (this._totalPages = number), null);
 
 		this.consumeContext(UMB_CURRENT_USER_HISTORY_STORE_CONTEXT, (instance) => {
 			this.#currentUserHistoryStore = instance;

@@ -14,8 +14,8 @@ import { UmbBooleanState, type Observable } from '@umbraco-cms/backoffice/observ
  * A property dataset context that hooks directly into the workspace context.
  */
 export class UmbInvariantWorkspacePropertyDatasetContext<
-		WorkspaceType extends UmbInvariantDatasetWorkspaceContext = UmbInvariantDatasetWorkspaceContext,
-	>
+	WorkspaceType extends UmbInvariantDatasetWorkspaceContext = UmbInvariantDatasetWorkspaceContext,
+>
 	extends UmbContextBase
 	implements UmbPropertyDatasetContext, UmbNameablePropertyDatasetContext
 {
@@ -62,8 +62,8 @@ export class UmbInvariantWorkspacePropertyDatasetContext<
 
 	/**
 	 * @function propertyValueByAlias
-	 * @param {string} propertyAlias
-	 * @returns {Promise<Observable<ReturnType | undefined> | undefined>}
+	 * @param {string} propertyAlias - The alias of the property.
+	 * @returns {Promise<Observable<ReturnType | undefined> | undefined>} An observable of the property value.
 	 * @description Get an Observable for the value of this property.
 	 */
 	async propertyValueByAlias<ReturnType = unknown>(propertyAlias: string) {

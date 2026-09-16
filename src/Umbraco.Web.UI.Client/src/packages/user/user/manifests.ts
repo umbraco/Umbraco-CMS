@@ -5,6 +5,7 @@ import { manifests as entityActionsManifests } from './entity-actions/manifests.
 import { manifests as entityBulkActionManifests } from './entity-bulk-actions/manifests.js';
 import { manifests as inviteManifests } from './invite/manifests.js';
 import { manifests as itemManifests } from './item/manifests.js';
+import { manifests as menuManifests } from './menu/manifests.js';
 import { manifests as menuItemManifests } from './menu-item/manifests.js';
 import { manifests as modalManifests } from './modals/manifests.js';
 import { manifests as propertyEditorManifests } from './property-editor/manifests.js';
@@ -22,6 +23,7 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 	...entityBulkActionManifests,
 	...inviteManifests,
 	...itemManifests,
+	...menuManifests,
 	...menuItemManifests,
 	...modalManifests,
 	...propertyEditorManifests,

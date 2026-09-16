@@ -129,21 +129,6 @@ public static partial class Constants
         public const string BackOfficeTwoFactorRememberMeAuthenticationType = "UmbracoTwoFactorRememberMeCookie";
 
         /// <summary>
-        /// Authentication type and scheme used for backoffice users when it is exposed out of the backoffice context via a cookie.
-        /// </summary>
-        public const string BackOfficeExposedAuthenticationType = "UmbracoBackOfficeExposed";
-
-        /// <summary>
-        /// Represents the name of the authentication cookie used to expose the backoffice authentication token outside the backoffice context.
-        /// </summary>
-        public const string BackOfficeExposedCookieName = $"{SecuritySettings.StaticAuthCookieName}{BackOfficeExposedCookieNamePostfix}";
-
-        /// <summary>
-        /// Represents the postfix for the authentication cookie used to expose the backoffice authentication token outside the backoffice context.
-        /// </summary>
-        public const string BackOfficeExposedCookieNamePostfix = "_EXPOSED";
-
-        /// <summary>
         ///     The prefix used to identify empty password placeholders.
         /// </summary>
         public const string EmptyPasswordPrefix = "___UIDEMPTYPWORD__";

@@ -26,7 +26,7 @@ export interface MetaAuthProvider {
 
 	/**
 	 * The default view of the provider that is shown to the user.
-	 * If no element is provided, then the button will be rendered as a @see {UUIButtonElement} using these options.
+	 * If no element is provided, then the button will be rendered as a button using these options.
 	 */
 	defaultView?: {
 		/**
@@ -70,7 +70,7 @@ export interface MetaAuthProvider {
 		 * The features of the popup that is opened when the user logs in.
 		 * @default 'width=600,height=600,menubar=no,location=no,resizable=yes,scrollbars=yes,status=no,toolbar=no'
 		 * @remarks This is the features of the window that is opened when the user logs in.
-		 * @seehref https://developer.mozilla.org/en-US/docs/Web/API/Window/open#features
+		 * @see https://developer.mozilla.org/en-US/docs/Web/API/Window/open#features
 		 */
 		popupFeatures?: string;
 	};

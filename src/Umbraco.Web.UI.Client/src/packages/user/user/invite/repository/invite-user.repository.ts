@@ -2,6 +2,7 @@ import { UmbUserRepositoryBase } from '../../repository/user-repository-base.js'
 import { UmbInviteUserServerDataSource } from './invite-user-server.data-source.js';
 import type { UmbInviteUserRequestModel, UmbResendUserInviteRequestModel } from './types.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbRepositoryErrorResponse } from '@umbraco-cms/backoffice/repository';
 
 export class UmbInviteUserRepository extends UmbUserRepositoryBase {
 	#inviteSource: UmbInviteUserServerDataSource;
@@ -13,11 +14,11 @@ export class UmbInviteUserRepository extends UmbUserRepositoryBase {
 
 	/**
 	 * Invites a user
-	 * @param {UmbInviteUserRequestModel} request
-	 * @returns {*}
+	 * @param {UmbInviteUserRequestModel} request - The invite request data.
+	 * @returns {Promise<UmbRepositoryErrorResponse>} The result of the invite operation.
 	 * @memberof UmbInviteUserRepository
 	 */
-	async invite(request: UmbInviteUserRequestModel) {
+	async invite(request: UmbInviteUserRequestModel): Promise<UmbRepositoryErrorResponse> {
 		if (!request) throw new Error('Request data is missing');
 		await this.init;
 
@@ -35,12 +36,11 @@ export class UmbInviteUserRepository extends UmbUserRepositoryBase {
 
 	/**
 	 * Resend an invite to a user
-	 * @param {string} userUnique
-	 * @param {InviteUserRequestModel} request
-	 * @returns {*}
+	 * @param {UmbResendUserInviteRequestModel} request - The resend invite request data.
+	 * @returns {Promise<UmbRepositoryErrorResponse>} The result of the resend invite operation.
 	 * @memberof UmbInviteUserRepository
 	 */
-	async resendInvite(request: UmbResendUserInviteRequestModel) {
+	async resendInvite(request: UmbResendUserInviteRequestModel): Promise<UmbRepositoryErrorResponse> {
 		if (!request.user.unique) throw new Error('User unique is missing');
 		if (!request) throw new Error('data is missing');
 		await this.init;

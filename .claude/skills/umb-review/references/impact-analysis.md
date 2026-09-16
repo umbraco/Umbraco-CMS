@@ -92,7 +92,7 @@ Map each changed file to its architectural layer:
 | `src/Umbraco.Core/` | Core |
 | `src/Umbraco.Infrastructure/` | Infrastructure |
 | `src/Umbraco.PublishedCache.*` | Infrastructure |
-| `src/Umbraco.Examine.Lucene/` | Infrastructure |
+| `src/Umbraco.Cms.Search.*` | Infrastructure |
 | `src/Umbraco.Cms.Persistence.*` | Infrastructure |
 | `src/Umbraco.Web.Common/` | Web |
 | `src/Umbraco.Web.UI/` | Web (Application) |

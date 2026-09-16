@@ -1,6 +1,6 @@
-import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbDefaultPickerSearchResultItemContext } from './default-picker-search-result-item.context.js';
 import { UmbDefaultPickerSearchResultItemElement } from './default-picker-search-result-item.element.js';
+import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
 export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [
 	{

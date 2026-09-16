@@ -294,7 +294,7 @@ public static partial class Constants
 
             /// <summary>
             ///     Notification-state key that indicates whether any indexable field changed as part of the save.
-            ///     When explicitly set to <c>false</c>, Examine indexing for the affected member is skipped.
+            ///     When explicitly set to <c>false</c>, search indexing for the affected member is skipped.
             /// </summary>
             public const string IndexableFieldsChangedStateKey = "IndexableFieldsChanged";
         }

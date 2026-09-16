@@ -11,6 +11,10 @@ export * from './entity-actions/sort-children-of/index.js';
 export * from './folder/index.js';
 export * from './tree-item/index.js';
 export * from './tree-item-api/index.js';
+export {
+	UmbTreeItemPickerExpansionManager,
+	type UmbTreeItemPickerExpansionManagerArgs,
+} from './tree-item-picker/tree-item-picker-expansion.manager.js';
 export * from './tree-item-children/index.js';
 export * from './tree-menu-item/index.js';
 export * from './tree.element.js';

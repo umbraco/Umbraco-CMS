@@ -4060,6 +4060,45 @@ rawData
 		sortOrder: 30,
 	});
 
+export const EMPTY_PAGE_DOCUMENT_TYPE_ID = 'e1a7c3f4-9b62-4d18-8a5c-0f3e6d2b7c91';
+
+// A property-less document type used to build a deep and wide document tree, see page-tree.data.ts.
+rawData.push({
+	allowedTemplates: [],
+	defaultTemplate: null,
+	id: EMPTY_PAGE_DOCUMENT_TYPE_ID,
+	alias: 'emptyPage',
+	name: 'Empty Page',
+	description: null,
+	icon: 'icon-document',
+	allowedAsRoot: true,
+	allowedInLibrary: false,
+	variesByCulture: false,
+	variesBySegment: false,
+	isElement: false,
+	hasChildren: false,
+	parent: null,
+	isFolder: false,
+	properties: [],
+	containers: [],
+	allowedDocumentTypes: [
+		{
+			documentType: {
+				id: EMPTY_PAGE_DOCUMENT_TYPE_ID,
+			},
+			sortOrder: 0,
+		},
+	],
+	compositions: [],
+	cleanup: {
+		preventCleanup: false,
+		keepAllVersionsNewerThanDays: null,
+		keepLatestVersionPerDayForDays: null,
+	},
+	flags: [],
+	noAccess: false,
+});
+
 export const data: Array<UmbMockDocumentTypeModel> = rawData.map((dt) => ({
 	...dt,
 	compositions: dt.compositions.map((c) => ({

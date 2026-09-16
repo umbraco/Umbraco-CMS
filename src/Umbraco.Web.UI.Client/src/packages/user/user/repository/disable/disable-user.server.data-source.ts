@@ -21,7 +21,7 @@ export class UmbDisableUserServerDataSource implements UmbDisableUserDataSource 
 
 	/**
 	 * Disables the specified user ids
-	 * @param {string[]} userIds
+	 * @param {string[]} userIds - The ids of the users to disable
 	 * @returns {Promise<void>}
 	 * @memberof UmbDisableUserServerDataSource
 	 */

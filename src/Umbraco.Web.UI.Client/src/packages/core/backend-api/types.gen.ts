@@ -547,6 +547,7 @@ export type CultureReponseModel = {
 
 export type CurrentUserConfigurationResponseModel = {
     keepUserLoggedIn: boolean;
+    timeoutUtc?: null | string;
     passwordConfiguration: PasswordConfigurationResponseModel;
     allowChangePassword: boolean;
     allowTwoFactor: boolean;
@@ -737,6 +738,7 @@ export type DocumentCollectionResponseModel = {
     updater?: null | string;
     creator?: null | string;
     sortOrder: number;
+    hasChildren: boolean;
     id: string;
     flags: Array<FlagModel>;
     values: Array<DocumentValueResponseModel>;
@@ -1182,11 +1184,6 @@ export type FetchResponseModelDataTypeSchemaItemResponseModel = {
     items: Array<DataTypeSchemaItemResponseModel>;
 };
 
-export type FieldPresentationModel = {
-    name: string;
-    values: Array<string>;
-};
-
 export type FileSystemFolderModel = {
     path: string;
 };
@@ -1260,18 +1257,6 @@ export type HealthCheckWithResultPresentationModel = {
     id: string;
 };
 
-export enum HealthStatusModel {
-    HEALTHY = 'Healthy',
-    UNHEALTHY = 'Unhealthy',
-    REBUILDING = 'Rebuilding',
-    CORRUPT = 'Corrupt'
-}
-
-export type HealthStatusResponseModel = {
-    status: HealthStatusModel;
-    message?: null | string;
-};
-
 export type HelpPageResponseModel = {
     name?: null | string;
     description?: null | string;
@@ -1303,19 +1288,6 @@ export type ImportMediaTypeRequestModel = {
 
 export type ImportMemberTypeRequestModel = {
     file: ReferenceByIdModel;
-};
-
-export type IndexResponseModel = {
-    name: string;
-    healthStatus: HealthStatusResponseModel;
-    canRebuild: boolean;
-    searcherName: string;
-    documentCount: number;
-    fieldCount: number;
-    providerProperties?: null | {
-        [key: string]: unknown;
-    };
-    uniqueKeyFieldName?: null | string;
 };
 
 export type InstallRequestModel = {
@@ -1575,6 +1547,7 @@ export type MediaCollectionResponseModel = {
     mediaType: MediaTypeCollectionReferenceResponseModel;
     creator?: null | string;
     sortOrder: number;
+    hasChildren: boolean;
     id: string;
     flags: Array<FlagModel>;
     values: Array<MediaValueResponseModel>;
@@ -2182,11 +2155,6 @@ export type PagedHelpPageResponseModel = {
     items: Array<HelpPageResponseModel>;
 };
 
-export type PagedIndexResponseModel = {
-    total: number;
-    items: Array<IndexResponseModel>;
-};
-
 export type PagedIReferenceResponseModel = {
     total: number;
     items: Array<IReferenceResponseModel>;
@@ -2350,16 +2318,6 @@ export type PagedRelationTypeResponseModel = {
 export type PagedSavedLogSearchResponseModel = {
     total: number;
     items: Array<SavedLogSearchResponseModel>;
-};
-
-export type PagedSearcherResponseModel = {
-    total: number;
-    items: Array<SearcherResponseModel>;
-};
-
-export type PagedSearchResultResponseModel = {
-    total: number;
-    items: Array<SearchResultResponseModel>;
 };
 
 export type PagedSegmentResponseModel = {
@@ -2685,17 +2643,6 @@ export type ScriptResponseModel = {
     name: string;
     parent?: null | FileSystemFolderModel;
     path: string;
-};
-
-export type SearcherResponseModel = {
-    name: string;
-};
-
-export type SearchResultResponseModel = {
-    id: string;
-    score: number;
-    fieldCount: number;
-    fields: Array<FieldPresentationModel>;
 };
 
 export type SecurityConfigurationResponseModel = {
@@ -3542,7 +3489,7 @@ export type WebhookLogResponseModel = {
     key: string;
     webhookKey: string;
     statusCode: string;
-    httpStatusCode?: number;
+    httpStatusCode?: null | number;
     isSuccessStatusCode: boolean;
     date: string;
     eventAlias: string;
@@ -4804,7 +4751,7 @@ export type GetTreeDictionaryRootResponses = {
 
 export type GetTreeDictionaryRootResponse = GetTreeDictionaryRootResponses[keyof GetTreeDictionaryRootResponses];
 
-export type PutUmbracoManagementApiV11DocumentByIdValidate11Data = {
+export type PutDocumentByIdValidateData = {
     body: ValidateUpdateDocumentRequestModel;
     path: {
         id: string;
@@ -4813,7 +4760,7 @@ export type PutUmbracoManagementApiV11DocumentByIdValidate11Data = {
     url: '/umbraco/management/api/v1.1/document/{id}/validate';
 };
 
-export type PutUmbracoManagementApiV11DocumentByIdValidate11Errors = {
+export type PutDocumentByIdValidateErrors = {
     /**
      * Bad Request
      */
@@ -4832,9 +4779,9 @@ export type PutUmbracoManagementApiV11DocumentByIdValidate11Errors = {
     404: ProblemDetails;
 };
 
-export type PutUmbracoManagementApiV11DocumentByIdValidate11Error = PutUmbracoManagementApiV11DocumentByIdValidate11Errors[keyof PutUmbracoManagementApiV11DocumentByIdValidate11Errors];
+export type PutDocumentByIdValidateError = PutDocumentByIdValidateErrors[keyof PutDocumentByIdValidateErrors];
 
-export type PutUmbracoManagementApiV11DocumentByIdValidate11Responses = {
+export type PutDocumentByIdValidateResponses = {
     /**
      * OK
      */
@@ -10341,100 +10288,6 @@ export type GetImportAnalyzeResponses = {
 
 export type GetImportAnalyzeResponse = GetImportAnalyzeResponses[keyof GetImportAnalyzeResponses];
 
-export type GetIndexerData = {
-    body?: never;
-    path?: never;
-    query?: {
-        skip?: number;
-        take?: number;
-    };
-    url: '/umbraco/management/api/v1/indexer';
-};
-
-export type GetIndexerErrors = {
-    /**
-     * The resource is protected and requires an authentication token
-     */
-    401: unknown;
-};
-
-export type GetIndexerResponses = {
-    /**
-     * OK
-     */
-    200: PagedIndexResponseModel;
-};
-
-export type GetIndexerResponse = GetIndexerResponses[keyof GetIndexerResponses];
-
-export type GetIndexerByIndexNameData = {
-    body?: never;
-    path: {
-        indexName: string;
-    };
-    query?: never;
-    url: '/umbraco/management/api/v1/indexer/{indexName}';
-};
-
-export type GetIndexerByIndexNameErrors = {
-    /**
-     * Bad Request
-     */
-    400: ProblemDetails;
-    /**
-     * The resource is protected and requires an authentication token
-     */
-    401: unknown;
-};
-
-export type GetIndexerByIndexNameError = GetIndexerByIndexNameErrors[keyof GetIndexerByIndexNameErrors];
-
-export type GetIndexerByIndexNameResponses = {
-    /**
-     * OK
-     */
-    200: IndexResponseModel;
-};
-
-export type GetIndexerByIndexNameResponse = GetIndexerByIndexNameResponses[keyof GetIndexerByIndexNameResponses];
-
-export type PostIndexerByIndexNameRebuildData = {
-    body?: never;
-    path: {
-        indexName: string;
-    };
-    query?: never;
-    url: '/umbraco/management/api/v1/indexer/{indexName}/rebuild';
-};
-
-export type PostIndexerByIndexNameRebuildErrors = {
-    /**
-     * Bad Request
-     */
-    400: ProblemDetails;
-    /**
-     * The resource is protected and requires an authentication token
-     */
-    401: unknown;
-    /**
-     * Not Found
-     */
-    404: ProblemDetails;
-    /**
-     * Conflict
-     */
-    409: ProblemDetails;
-};
-
-export type PostIndexerByIndexNameRebuildError = PostIndexerByIndexNameRebuildErrors[keyof PostIndexerByIndexNameRebuildErrors];
-
-export type PostIndexerByIndexNameRebuildResponses = {
-    /**
-     * OK
-     */
-    200: unknown;
-};
-
 export type GetInstallSettingsData = {
     body?: never;
     path?: never;
@@ -15769,6 +15622,10 @@ export type PostPublishedCacheRebuildErrors = {
      * The resource is protected and requires an authentication token
      */
     401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
 };
 
 export type PostPublishedCacheRebuildResponses = {
@@ -15790,6 +15647,10 @@ export type GetPublishedCacheRebuildStatusErrors = {
      * The resource is protected and requires an authentication token
      */
     401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
 };
 
 export type GetPublishedCacheRebuildStatusResponses = {
@@ -15813,6 +15674,10 @@ export type PostPublishedCacheReloadErrors = {
      * The resource is protected and requires an authentication token
      */
     401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
 };
 
 export type PostPublishedCacheReloadResponses = {
@@ -16543,67 +16408,6 @@ export type GetTreeScriptSiblingsResponses = {
 };
 
 export type GetTreeScriptSiblingsResponse = GetTreeScriptSiblingsResponses[keyof GetTreeScriptSiblingsResponses];
-
-export type GetSearcherData = {
-    body?: never;
-    path?: never;
-    query?: {
-        skip?: number;
-        take?: number;
-    };
-    url: '/umbraco/management/api/v1/searcher';
-};
-
-export type GetSearcherErrors = {
-    /**
-     * The resource is protected and requires an authentication token
-     */
-    401: unknown;
-};
-
-export type GetSearcherResponses = {
-    /**
-     * OK
-     */
-    200: PagedSearcherResponseModel;
-};
-
-export type GetSearcherResponse = GetSearcherResponses[keyof GetSearcherResponses];
-
-export type GetSearcherBySearcherNameQueryData = {
-    body?: never;
-    path: {
-        searcherName: string;
-    };
-    query?: {
-        term?: string;
-        skip?: number;
-        take?: number;
-    };
-    url: '/umbraco/management/api/v1/searcher/{searcherName}/query';
-};
-
-export type GetSearcherBySearcherNameQueryErrors = {
-    /**
-     * The resource is protected and requires an authentication token
-     */
-    401: unknown;
-    /**
-     * Not Found
-     */
-    404: ProblemDetails;
-};
-
-export type GetSearcherBySearcherNameQueryError = GetSearcherBySearcherNameQueryErrors[keyof GetSearcherBySearcherNameQueryErrors];
-
-export type GetSearcherBySearcherNameQueryResponses = {
-    /**
-     * OK
-     */
-    200: PagedSearchResultResponseModel;
-};
-
-export type GetSearcherBySearcherNameQueryResponse = GetSearcherBySearcherNameQueryResponses[keyof GetSearcherBySearcherNameQueryResponses];
 
 export type GetSecurityConfigurationData = {
     body?: never;

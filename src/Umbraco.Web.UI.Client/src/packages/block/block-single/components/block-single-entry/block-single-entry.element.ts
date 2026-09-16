@@ -587,8 +587,8 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 			}
 
 			:host([is-reference]) .umb-block-single__block {
-				--umb-entity-frame-color: var(--umb-color-reference, #7532c8);
-				--umb-entity-frame-contrast-color: var(--umb-color-reference-contrast, #ffffff);
+				--umb-entity-frame-color: var(--umb-color-reference);
+				--umb-entity-frame-contrast-color: var(--umb-color-reference-contrast);
 			}
 
 			.umb-block-single__block {

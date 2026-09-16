@@ -37,12 +37,8 @@ Open this file in an editor: `/src/Umbraco.Web.UI/appsettings.Development.json` 
 	"CMS": {
 		"Security":{
 			"BackOfficeHost": "http://localhost:5173",
-			"AuthorizeCallbackPathName": "/oauth_complete",
-			"AuthorizeCallbackLogoutPathName": "/logout",
-			"AuthorizeCallbackErrorPathName": "/error",,
-			"BackOfficeTokenCookie": {
-				"SameSite": "None"
-			}
+			"CallbackPathName": "/",
+			"AuthCookieSameSite": "None"
 		},
 	},
 }
@@ -51,7 +47,7 @@ Open this file in an editor: `/src/Umbraco.Web.UI/appsettings.Development.json` 
 This will override the backoffice host URL, enabling the Client to run from a different origin.
 
 > [!NOTE]
-> If you get stuck in a login loop, try clearing your browser cookies for localhost, and make sure that the `Umbraco:Cms:Security:BackOfficeTokenCookie:SameSite` setting is set to `None`.
+> If you get stuck in a login loop, try clearing your browser cookies for localhost, and make sure that the `Umbraco:Cms:Security:AuthCookieSameSite` setting is set to `None`.
 
 #### 2. Start Umbraco
 

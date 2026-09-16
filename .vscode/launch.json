@@ -103,11 +103,9 @@
         "ASPNETCORE_URLS": "https://localhost:44339",
         "UMBRACO__CMS__WEBROUTING__UMBRACOAPPLICATIONURL": "https://localhost:44339",
         "UMBRACO__CMS__SECURITY__BACKOFFICEHOST": "http://localhost:5173",
-        "UMBRACO__CMS__SECURITY__AUTHORIZECALLBACKPATHNAME": "/oauth_complete",
-        "UMBRACO__CMS__SECURITY__AUTHORIZECALLBACKLOGOUTPATHNAME": "/logout",
-        "UMBRACO__CMS__SECURITY__AUTHORIZECALLBACKERRORPATHNAME": "/error",
+        "UMBRACO__CMS__SECURITY__CALLBACKPATHNAME": "/",
         "UMBRACO__CMS__SECURITY__KEEPUSERLOGGEDIN": "true",
-        "UMBRACO__CMS__SECURITY__BACKOFFICETOKENCOOKIE__SAMESITE": "None"
+        "UMBRACO__CMS__SECURITY__AUTHCOOKIESAMESITE": "None"
       },
       "sourceFileMap": {
         "/Views": "${workspaceFolder}/Umbraco.Web.UI/Views"

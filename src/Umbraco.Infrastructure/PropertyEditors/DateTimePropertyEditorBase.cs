@@ -25,19 +25,16 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 public abstract class DateTimePropertyEditorBase : DataEditor, IValueSchemaProvider
 {
     private readonly IIOHelper _ioHelper;
-    private readonly IPropertyIndexValueFactory _propertyIndexValueFactory;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DateTimePropertyEditorBase"/> class.
     /// </summary>
     protected DateTimePropertyEditorBase(
         IDataValueEditorFactory dataValueEditorFactory,
-        IIOHelper ioHelper,
-        IPropertyIndexValueFactory propertyIndexValueFactory)
+        IIOHelper ioHelper)
         : base(dataValueEditorFactory)
     {
         _ioHelper = ioHelper;
-        _propertyIndexValueFactory = propertyIndexValueFactory;
         SupportsReadOnly = true;
     }
 
@@ -79,9 +76,6 @@ public abstract class DateTimePropertyEditorBase : DataEditor, IValueSchemaProvi
     /// <param name="dateTimeDto">An object containing the date and time components to be formatted.</param>
     /// <returns>A string representation of the date and time, formatted for use in the property editor.</returns>
     protected abstract string MapDateToEditorFormat(DateTimeValueConverterBase.DateTimeDto dateTimeDto);
-
-    /// <inheritdoc/>
-    public override IPropertyIndexValueFactory PropertyIndexValueFactory => _propertyIndexValueFactory;
 
     /// <summary>
     /// Provides a data value editor for date and time properties, supporting conversion between editor values and

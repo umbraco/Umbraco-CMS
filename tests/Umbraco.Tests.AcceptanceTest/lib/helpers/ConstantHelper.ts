@@ -247,7 +247,7 @@
 
   public static readonly trashDeleteDialogMessage = {
     referenceHeadline: 'The following items depend on this',
-    bulkReferenceHeadline: 'The following items are used by other content.',
+    bulkReferenceHeadline: 'The following items are used by other content',
     descendingReferenceHeadline: 'The following descending items have dependencies'
   }
 
@@ -310,6 +310,7 @@
     dictionary: '/umbraco/management/api/v1/dictionary',
     dictionaryImport: '/umbraco/management/api/v1/dictionary/import',
     language: '/umbraco/management/api/v1/language',
+    logViewerSavedSearch: '/umbraco/management/api/v1/log-viewer/saved-search',
     media: '/umbraco/management/api/v1/media',
     mediaType: '/umbraco/management/api/v1/media-type',
     memberType: '/umbraco/management/api/v1/member-type',
@@ -333,7 +334,10 @@
     domains: '/domains',
     notifications: '/notifications',
     currentUser: '/umbraco/management/api/v1/user/current',
-    revoke: '/umbraco/management/api/v1/security/back-office/revoke',
+    currentUserConfiguration: '/umbraco/management/api/v1/user/current/configuration',
+    backOfficeLogin: '/umbraco/management/api/v1/security/back-office/login',
+    backOfficeSignOut: '/umbraco/management/api/v1/security/back-office/signout',
+    backOfficeKeepAlive: '/umbraco/management/api/v1/security/back-office/keep-alive',
     documentSearch: '/umbraco/management/api/v1/item/document/search',
     mediaSearch: '/umbraco/management/api/v1/item/media/search',
     memberSearch: '/umbraco/management/api/v1/item/member/search',

@@ -89,10 +89,6 @@ import type {
 	// Health Check
 	HealthCheckGroupPresentationModel,
 	HealthCheckGroupWithResultResponseModel,
-	// Examine
-	IndexResponseModel,
-	PagedIndexResponseModel,
-	SearchResultResponseModel,
 	// Tracked Reference
 	IReferenceResponseModelDefaultReferenceResponseModel,
 	IReferenceResponseModelDocumentReferenceResponseModel,
@@ -117,7 +113,12 @@ export type UmbMockDictionaryModel = DictionaryItemResponseModel &
 	DictionaryItemItemResponseModel &
 	DictionaryOverviewResponseModel;
 
-export type UmbMockDocumentModel = DocumentResponseModel & DocumentTreeItemResponseModel & DocumentItemResponseModel;
+export type UmbMockDocumentModel = DocumentResponseModel &
+	DocumentTreeItemResponseModel &
+	DocumentItemResponseModel & {
+		/** Mock-only: the parent before trashing, used to restore it. Not a real response field. */
+		originalParent?: { id: string } | null;
+	};
 
 export type UmbMockDocumentBlueprintModel = DocumentBlueprintResponseModel &
 	DocumentBlueprintItemResponseModel &
@@ -138,7 +139,12 @@ export type UmbMockElementModel = Omit<ElementResponseModel, 'documentType'> &
 
 export type UmbMockLanguageModel = LanguageResponseModel & LanguageItemResponseModel;
 
-export type UmbMockMediaModel = MediaResponseModel & MediaTreeItemResponseModel & MediaItemResponseModel;
+export type UmbMockMediaModel = MediaResponseModel &
+	MediaTreeItemResponseModel &
+	MediaItemResponseModel & {
+		/** Mock-only: the parent before trashing, used to restore it. Not a real response field. */
+		originalParent?: { id: string } | null;
+	};
 
 export type UmbMockMediaTypeModel = MediaTypeResponseModel &
 	MediaTypeTreeItemResponseModel &
@@ -255,11 +261,6 @@ export interface UmbMockDataSet {
 	// Health check data
 	healthGroups?: Array<HealthCheckGroupWithResultResponseModel & { name: string }>;
 	healthGroupsWithoutResult?: Array<HealthCheckGroupPresentationModel>;
-
-	// Examine/search data
-	examineIndexers?: Array<IndexResponseModel>;
-	examinePagedIndexers?: PagedIndexResponseModel;
-	examineSearchResults?: Array<SearchResultResponseModel>;
 
 	// Tracked references
 	trackedReferenceItems?: Array<UmbMockTrackedReferenceItemModel>;

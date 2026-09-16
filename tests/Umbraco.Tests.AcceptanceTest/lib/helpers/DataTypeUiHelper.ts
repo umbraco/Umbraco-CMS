@@ -191,7 +191,7 @@ export class DataTypeUiHelper extends UiBaseLocators {
     this.heightTxt = page.getByLabel('Height', {exact: true});
     this.propertyCrops = page.getByTestId('property:crops');
     this.createCropBtn = this.propertyCrops.getByRole('button', {name: 'Create'});
-    this.editCropBtn = this.propertyCrops.getByRole('button', {name: 'Edit'});
+    this.editCropBtn = this.propertyCrops.locator('.crop-form uui-button[type="submit"]');
 
     // Range control - the single min/max control shared by Numeric, Decimal, Slider,
     // Multiple Text String and Multi URL Picker. Defined once so the label lookup lives in one place.
@@ -259,8 +259,8 @@ export class DataTypeUiHelper extends UiBaseLocators {
 
     // Block List Editor and Block Grid Editor
     this.addBlockBtn = page.locator('umb-input-block-type #blocks').getByLabel('open');
-    this.minAmountTxt = page.getByLabel('Low value');
-    this.maxAmountTxt = page.getByLabel('High value');
+    this.minAmountTxt = page.getByTestId('property:validationLimit').getByLabel('Low value');
+    this.maxAmountTxt = page.getByTestId('property:validationLimit').getByLabel('High value');
     this.singleBlockModeBtn = this.page.locator('umb-property-layout').filter({hasText: 'Single block mode'}).locator('#toggle');
     this.liveEditingModeBtn = this.page.locator('umb-property-layout').filter({hasText: 'Live editing'}).locator('#toggle');
     this.inlineEditingModeBtn = this.page.locator('umb-property-layout').filter({hasText: 'Inline editing'}).locator('#toggle');

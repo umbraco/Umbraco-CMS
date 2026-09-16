@@ -72,7 +72,7 @@ export const detailHandlers = [
 		const skip = query.get('skip') ? parseInt(query.get('skip') as string, 10) : 0;
 		const take = query.get('take') ? parseInt(query.get('take') as string, 10) : 100;
 
-		let data: Array<IReferenceResponseModel> = [];
+		let data: PagedIReferenceResponseModel['items'] = [];
 
 		if (id === 'all-property-editors-document-id') {
 			data = getReferenceData();

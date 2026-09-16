@@ -33,11 +33,6 @@ import {
 import { data as logs } from './logs.data.js';
 import { data as auditLogs } from './audit-log.data.js';
 import { healthGroups, healthGroupsWithoutResult } from './health-check.data.js';
-import {
-	Indexers as examineIndexers,
-	PagedIndexers as examinePagedIndexers,
-	searchResultMockData as examineSearchResults,
-} from './examine.data.js';
 import { items as trackedReferenceItems } from './tracked-reference.data.js';
 import { data as news } from './umbraco-news.data.js';
 import { data as webhook } from './webhook.data.js';
@@ -78,9 +73,6 @@ export {
 	auditLogs,
 	healthGroups,
 	healthGroupsWithoutResult,
-	examineIndexers,
-	examinePagedIndexers,
-	examineSearchResults,
 	trackedReferenceItems,
 	news,
 	webhook,
@@ -122,9 +114,6 @@ export {
 	auditLogs,
 	healthGroups,
 	healthGroupsWithoutResult,
-	examineIndexers,
-	examinePagedIndexers,
-	examineSearchResults,
 	trackedReferenceItems,
 	news,
 	webhook,

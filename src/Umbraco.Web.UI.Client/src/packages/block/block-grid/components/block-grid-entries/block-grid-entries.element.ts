@@ -25,11 +25,12 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbFormControlValidatorConfig } from '@umbraco-cms/backoffice/validation';
 import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
 import type { UmbSorterConfig, UmbSorterResolvePlacementArgs } from '@umbraco-cms/backoffice/sorter';
+import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
 
 /**
  * Notice this utility method is not really shareable with others as it also takes areas into account. [NL]
- * @param args
- * @returns { null | true }
+ * @param {UmbSorterResolvePlacementArgs<UmbBlockGridLayoutModel, UmbBlockGridEntryElement>} args - the placement arguments to resolve.
+ * @returns { null | true } - null if the item should not move, true if it should be placed vertically.
  */
 function resolvePlacementAsBlockGrid(
 	args: UmbSorterResolvePlacementArgs<UmbBlockGridLayoutModel, UmbBlockGridEntryElement>,
@@ -205,8 +206,21 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 	@state()
 	private _styleElement?: HTMLLinkElement;
 
+	@state()
+	private _catalogueRouteBuilder?: UmbModalRouteBuilder;
+
+	#getPathForCreateBlock(index: number) {
+		return this._catalogueRouteBuilder?.({ view: 'create', index });
+	}
+
+	#getPathForClipboard(index: number) {
+		return this._catalogueRouteBuilder?.({ view: 'clipboard', index });
+	}
+
 	constructor() {
 		super();
+
+		this.observe(this.#context.catalogueRouteBuilder, (builder) => (this._catalogueRouteBuilder = builder), null);
 
 		this.observe(
 			this.#context.layoutEntries,
@@ -402,12 +416,8 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 					this._layoutEntries,
 					(layout) => layout.key,
 					(layout, index) =>
-						html`<umb-block-grid-entry
-							class="umb-block-grid__layout-item"
-							index=${index}
-							.layout=${layout}>
-						</umb-block-grid-entry>
-					`,
+						html`<umb-block-grid-entry class="umb-block-grid__layout-item" index=${index} .layout=${layout}>
+						</umb-block-grid-entry> `,
 				)}
 			</div>
 			${when(this._allowedBlockTypes && this._allowedBlockTypes.length > 0, () => this.#renderCreateButtonGroup())}
@@ -426,7 +436,7 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 		} else if (this._isReadOnly === false) {
 			return html`
 				<uui-button-inline-create
-					href=${this.#context.getPathForCreateBlock(-1) ?? ''}
+					href=${this.#getPathForCreateBlock(-1) ?? ''}
 					label=${this.localize.term('blockEditor_addBlock')}></uui-button-inline-create>
 			`;
 		} else {
@@ -436,7 +446,7 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 
 	#renderCreateButton() {
 		if (this._isReadOnly && this._layoutEntries.length > 0) return nothing;
-		const createPath = this.#context.getPathForCreateBlock(-1);
+		const createPath = this.#getPathForCreateBlock(-1);
 
 		return html`
 			<uui-button
@@ -485,7 +495,7 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 			<uui-button
 				label=${this.localize.term('content_createFromClipboard')}
 				look="placeholder"
-				href=${this.#context.getPathForClipboard(-1) ?? ''}
+				href=${this.#getPathForClipboard(-1) ?? ''}
 				?disabled=${this._isReadOnly}
 				title=${this.localize.term('general_clipboard')}>
 				<uui-icon name="icon-clipboard-paste"></uui-icon>

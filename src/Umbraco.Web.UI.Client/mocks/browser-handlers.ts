@@ -7,7 +7,6 @@ import { handlers as documentHandlers } from './msw-handlers/document/index.js';
 import { handlers as documentTypeHandlers } from './msw-handlers/document-type/index.js';
 import { handlers as dynamicRootHandlers } from './msw-handlers/dynamic-root.handlers.js';
 import { handlers as elementHandlers } from './msw-handlers/element/index.js';
-import { handlers as examineManagementHandlers } from './msw-handlers/examine-management.handlers.js';
 import { handlers as healthCheckHandlers } from './msw-handlers/health-check.handlers.js';
 import { handlers as installHandlers } from './msw-handlers/install.handlers.js';
 import { handlers as languageHandlers } from './msw-handlers/language/index.js';
@@ -54,7 +53,6 @@ const handlers = [
 	...documentTypeHandlers,
 	...dynamicRootHandlers,
 	...elementHandlers,
-	...examineManagementHandlers,
 	...healthCheckHandlers,
 	...installHandlers,
 	...languageHandlers,

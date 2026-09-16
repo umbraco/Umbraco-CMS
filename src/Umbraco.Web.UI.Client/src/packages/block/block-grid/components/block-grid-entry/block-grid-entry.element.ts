@@ -580,7 +580,11 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 						this._invalidLocation,
 						() => html`
 							<uui-tag id="invalidLocation" color="danger">
-								<umb-localize key="blockEditor_invalidDropPosition" .args=${[this._label]}></umb-localize>
+								<umb-localize
+									key="blockEditor_invalidDropPosition"
+									.args=${[
+										this._contentTypeName ?? this.localize.term('blockEditor_unsupportedBlockName'),
+									]}></umb-localize>
 							</uui-tag>
 						`,
 					)}
@@ -799,11 +803,12 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			}
 
 			:host([is-reference]) .umb-block-grid__block {
-				--umb-entity-frame-color: var(--umb-color-reference, #7532c8);
-				--umb-entity-frame-contrast-color: var(--umb-color-reference-contrast, #ffffff);
+				--umb-entity-frame-color: var(--umb-color-reference);
+				--umb-entity-frame-contrast-color: var(--umb-color-reference-contrast);
 			}
 
 			.umb-block-grid__block {
+				--umb-block-scale-handler-opacity: 0;
 				--umb-entity-frame-opacity: 0;
 				--umb-entity-frame-color: var(--uui-color-interactive-emphasis);
 
@@ -812,6 +817,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 				&:hover,
 				&:focus-within {
 					--umb-entity-frame-opacity: 1;
+					--umb-block-scale-handler-opacity: 1;
 				}
 			}
 		`,

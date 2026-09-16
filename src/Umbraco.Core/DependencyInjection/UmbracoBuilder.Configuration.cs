@@ -62,7 +62,7 @@ public static partial class UmbracoBuilderExtensions
         // Register configuration sections.
         builder
             .AddUmbracoOptions<ModelsBuilderSettings>()
-            .AddUmbracoOptions<IndexCreatorSettings>()
+            .AddUmbracoOptions<ExamineSearchProviderSettings>()
             .AddUmbracoOptions<MarketplaceSettings>()
             .AddUmbracoOptions<ContentSettings>()
             .AddUmbracoOptions<DeliveryApiSettings>()
@@ -102,14 +102,15 @@ public static partial class UmbracoBuilderExtensions
             .AddUmbracoOptions<BasicAuthSettings>()
             .AddUmbracoOptions<LegacyPasswordMigrationSettings>()
             .AddUmbracoOptions<PackageMigrationSettings>()
+#pragma warning disable CS0618 // Type or member is obsolete
             .AddUmbracoOptions<HelpPageSettings>()
+#pragma warning restore CS0618 // Type or member is obsolete
             .AddUmbracoOptions<DataTypesSettings>()
             .AddUmbracoOptions<WebhookSettings>()
             .AddUmbracoOptions<CacheSettings>()
             .AddUmbracoOptions<SystemDateMigrationSettings>()
             .AddUmbracoOptions<DistributedJobSettings>()
             .AddUmbracoOptions<ScheduledPublishingSettings>(options => options.ValidateOnStart())
-            .AddUmbracoOptions<BackOfficeTokenCookieSettings>()
             .AddUmbracoOptions<WebsiteSettings>()
             .AddUmbracoOptions<SignalRSettings>();
 

@@ -8,7 +8,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 /**
  * A server data source for Member Type items
  * @class UmbMemberTypeItemServerDataSource
- * @implements {DocumentTreeDataSource}
+ * @augments {UmbItemServerDataSourceBase}
  */
 export class UmbMemberTypeItemServerDataSource extends UmbItemServerDataSourceBase<
 	MemberTypeItemResponseModel,

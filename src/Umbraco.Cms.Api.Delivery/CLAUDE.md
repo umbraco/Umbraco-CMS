@@ -16,7 +16,7 @@ Headless content delivery REST API for Umbraco CMS. Enables frontend application
 - **OpenIddict** - Member authentication (OAuth 2.0)
 - **Asp.Versioning** - API versioning (V1, V2)
 - **Output Caching** - Configurable response caching
-- **Examine/Lucene** - Content querying
+- **Umbraco Search abstractions** (via `IApiContentQueryProvider`) - Content querying; the actual query execution is delegated to whichever search provider is composed (`Umbraco.Cms.Search.DeliveryApi`'s `DeliveryApiContentQueryProvider` by default)
 
 ### Dependencies
 
@@ -35,7 +35,7 @@ Umbraco.Cms.Api.Delivery/
 │   ├── Filters/               # ContentType, Name, CreateDate, UpdateDate
 │   ├── Selectors/             # Ancestors, Children, Descendants
 │   └── Sorts/                 # Name, CreateDate, UpdateDate, Level, SortOrder
-├── Indexing/                  # Lucene index field handlers
+├── Indexing/                  # Provider-agnostic index field handlers (IContentIndexHandler)
 ├── Services/                  # Business logic and query building
 ├── Caching/                   # Output cache policies
 ├── Rendering/                 # Output expansion strategies
@@ -46,7 +46,7 @@ Umbraco.Cms.Api.Delivery/
 ### Design Patterns
 
 1. **Strategy Pattern** - Query handlers (`ISelectorHandler`, `IFilterHandler`, `ISortHandler`)
-2. **Factory Pattern** - `ApiContentQueryFactory` builds Examine queries
+2. **Provider Pattern** - `IApiContentQueryProvider` translates selector/filter/sort options into search-abstraction queries; implemented externally by `Umbraco.Cms.Search.DeliveryApi`'s `DeliveryApiContentQueryProvider`
 3. **Template Method** - `ContentApiControllerBase` for shared controller logic
 4. **Options Pattern** - `DeliveryApiSettings` for all configuration
 
@@ -275,9 +275,9 @@ builder.AddNotificationAsyncHandler<RemovedMemberRolesNotification, RevokeMember
 
 ### External Dependencies
 
-**Examine/Lucene** (via Core):
-- Powers content querying
-- Selector/Filter/Sort handlers build Lucene queries
+**Umbraco Search abstractions** (composed separately, not a direct project reference):
+- `IContentIndexHandler` implementations in `Indexing/` describe fields to whichever search provider is composed
+- Selector/Filter/Sort handlers build provider-agnostic query options, executed by an `IApiContentQueryProvider` (`Umbraco.Cms.Search.DeliveryApi`'s `DeliveryApiContentQueryProvider` by default, which runs them against `ISearcher`)
 
 **OpenIddict** (via Api.Common):
 - Member OAuth 2.0 authentication

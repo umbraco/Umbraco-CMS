@@ -183,7 +183,7 @@ internal abstract class EntityTypeContainerService<TTreeEntity, TEntityContainer
     }
 
     /// <inheritdoc />
-    public async Task<Attempt<EntityContainer?, EntityContainerOperationStatus>> DeleteAsync(Guid id, Guid userKey)
+    public virtual async Task<Attempt<EntityContainer?, EntityContainerOperationStatus>> DeleteAsync(Guid id, Guid userKey)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         WriteLock(scope);

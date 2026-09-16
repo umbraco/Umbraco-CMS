@@ -158,6 +158,8 @@ export default {
 	},
 	media: {
 		clickToUpload: '点击上传',
+		browseFilesAction: '浏览文件',
+		dropFilesOr: '将媒体拖放到此处<br />或',
 		orClickHereToUpload: '或单击此处选择文件',
 		maxFileSize: '最大文件大小为',
 	},
@@ -406,6 +408,8 @@ export default {
 		new: '新的',
 		next: '下一步',
 		no: '否',
+		noResults: '没有结果',
+		noResultsFor: (query: string) => `未找到 "${query}" 的结果。`,
 		of: '属于',
 		ok: '确定',
 		open: '打开',
@@ -721,6 +725,17 @@ export default {
 		sortDone: '排序完成。',
 		sortHelp: '上下拖拽项目或单击列头进行排序',
 		sortPleaseWait: '正在排序请稍候…',
+		sortByFieldHeadline: '按字段排序',
+		sortByFieldSentence: '将所有子项按以下方式排序：',
+		sortByFieldDirectionLabel: '方向',
+		sortByFieldAscending: '升序',
+		sortByFieldDescending: '降序',
+		sortByFieldNameOption: '名称',
+		sortByFieldCreateDateOption: '创建时间',
+		sortByFieldUpdateDateOption: '最后编辑',
+		sortIndividuallyHeadline: '单独排序',
+		sortByFieldCultureSentence: '语言：',
+		sortByFieldCultureLabel: '语言',
 	},
 	speechBubbles: {
 		validationFailedHeader: '验证',
@@ -1068,5 +1083,10 @@ export default {
 	logViewer: {
 		selectAllLogLevelFilters: '全选',
 		deselectAllLogLevelFilters: '取消全选',
+	},
+	picker: {
+		browseTab: '浏览',
+		searchTab: '搜索',
+		selectedCount: (count: number) => `已选择 ${count} 项`,
 	},
 } as UmbLocalizationDictionary;

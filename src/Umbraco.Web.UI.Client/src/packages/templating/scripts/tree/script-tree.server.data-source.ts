@@ -15,7 +15,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 /**
  * A data source for the Script tree that fetches data from the server
  * @class UmbScriptTreeServerDataSource
- * @implements {UmbTreeDataSource}
+ * @augments {UmbTreeServerDataSourceBase}
  */
 export class UmbScriptTreeServerDataSource extends UmbTreeServerDataSourceBase<
 	FileSystemTreeItemPresentationModel,
@@ -42,7 +42,10 @@ const getRootItems = async (args: UmbTreeRootItemsRequestArgs) => {
 	const { data, ...rest } = await ScriptService.getTreeScriptRoot({
 		query: { skip, take },
 	});
-	return { data: { ...data, totalBefore: skip, totalAfter: Math.max(data.total - skip - data.items.length, 0) }, ...rest };
+	return {
+		data: { ...data, totalBefore: skip, totalAfter: Math.max(data.total - skip - data.items.length, 0) },
+		...rest,
+	};
 };
 
 const getChildrenOf = async (args: UmbTreeChildrenOfRequestArgs) => {
@@ -56,7 +59,10 @@ const getChildrenOf = async (args: UmbTreeChildrenOfRequestArgs) => {
 		const { data, ...rest } = await ScriptService.getTreeScriptChildren({
 			query: { parentPath, skip, take },
 		});
-		return { data: { ...data, totalBefore: skip, totalAfter: Math.max(data.total - skip - data.items.length, 0) }, ...rest };
+		return {
+			data: { ...data, totalBefore: skip, totalAfter: Math.max(data.total - skip - data.items.length, 0) },
+			...rest,
+		};
 	}
 };
 

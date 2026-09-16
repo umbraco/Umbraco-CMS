@@ -76,7 +76,7 @@ test('can create a document type folder using create options', {tag: '@release'}
   await umbracoUi.documentType.clickCreateActionMenuOption();
   await umbracoUi.documentType.clickCreateDocumentFolderButton();
   await umbracoUi.documentType.enterFolderName(documentFolderName);
-  await umbracoUi.documentType.clickCreateFolderButton();
+  await umbracoUi.documentType.clickCreateFolderButtonAndWaitForDocumentTypeToBeCreated();
 
   // Assert
   expect(await umbracoApi.documentType.doesNameExist(documentFolderName)).toBeTruthy();
@@ -101,6 +101,7 @@ test('can create a document type in a folder using create options', async ({umbr
   expect(await umbracoApi.documentType.doesNameExist(documentTypeName)).toBeTruthy();
   // Verify the document type is inside the parent folder
   const parentFolderChildren = await umbracoApi.documentType.getChildren(parentFolderId);
+  expect(parentFolderChildren).toHaveLength(1);
   expect(parentFolderChildren[0].name).toBe(documentTypeName);
 });
 
@@ -124,6 +125,7 @@ test('can create a document type with a template in a folder using create option
   expect(await umbracoApi.documentType.doesNameExist(documentTypeName)).toBeTruthy();
   // Verify the document type is inside the parent folder
   const parentFolderChildren = await umbracoApi.documentType.getChildren(parentFolderId);
+  expect(parentFolderChildren).toHaveLength(1);
   expect(parentFolderChildren[0].name).toBe(documentTypeName);
 
   // Clean
@@ -149,6 +151,7 @@ test('can create a element type in a folder using create options', async ({umbra
   expect(documentTypeData.isElement).toBeTruthy();
   // Verify the element type is inside the parent folder
   const parentFolderChildren = await umbracoApi.documentType.getChildren(parentFolderId);
+  expect(parentFolderChildren).toHaveLength(1);
   expect(parentFolderChildren[0].name).toBe(documentTypeName);
 });
 
@@ -164,7 +167,7 @@ test('can create a document type folder in a folder using create options', async
   await umbracoUi.documentType.clickCreateActionMenuOption();
   await umbracoUi.documentType.clickCreateDocumentFolderButton();
   await umbracoUi.documentType.enterFolderName(childFolderName);
-  await umbracoUi.documentType.clickCreateFolderButton();
+  await umbracoUi.documentType.clickCreateFolderButtonAndWaitForDocumentTypeToBeCreated();
 
   // Assert
   const folder = await umbracoApi.documentType.getByName(childFolderName);

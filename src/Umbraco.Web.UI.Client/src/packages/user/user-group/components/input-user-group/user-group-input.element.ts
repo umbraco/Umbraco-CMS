@@ -110,9 +110,9 @@ export class UmbUserGroupInputElement extends UUIFormControlWithBasicsMixin(UmbL
 			() => !!this.max && this.#pickerContext.getSelection().length > this.max,
 		);
 
-		this.observe(this.#pickerContext.selection, (selection) => (this.value = selection.join(',')), '_observeSelection');
-		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems), '_observerItems');
-		this.observe(this.#pickerContext.statuses, (statuses) => (this._statuses = statuses), '_observeStatuses');
+		this.observe(this.#pickerContext.selection, (selection) => (this.value = selection.join(',')), null);
+		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems), null);
+		this.observe(this.#pickerContext.statuses, (statuses) => (this._statuses = statuses), null);
 
 		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
 			.addAdditionalPath(UMB_USER_GROUP_ENTITY_TYPE)

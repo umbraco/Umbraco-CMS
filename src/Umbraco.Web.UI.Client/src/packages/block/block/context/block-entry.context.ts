@@ -17,7 +17,12 @@ import {
 	mergeObservables,
 	observeMultiple,
 } from '@umbraco-cms/backoffice/observable-api';
-import { encodeFilePath, UmbDeprecation, UmbReadOnlyVariantGuardManager } from '@umbraco-cms/backoffice/utils';
+import {
+	encodeFilePath,
+	escapeHTML,
+	UmbDeprecation,
+	UmbReadOnlyVariantGuardManager,
+} from '@umbraco-cms/backoffice/utils';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import { UmbModalRouteRegistrationController, UmbRoutePathAddendumContext } from '@umbraco-cms/backoffice/router';
@@ -331,7 +336,7 @@ export abstract class UmbBlockEntryContext<
 		x ? (x.contentTypeKey ?? undefined) : null,
 	);
 	/**
-	 * @deprecated Use {@link _settingsDataContentTypeKey} instead. This will be removed in Umbraco 18.
+	 * @deprecated Use {@link UmbBlockEntryContext#_settingsDataContentTypeKey} instead. This will be removed in Umbraco 18.
 	 */
 	// eslint-disable-next-line
 	private readonly settingsDataContentTypeKey = this._settingsDataContentTypeKey;
@@ -393,11 +398,15 @@ export abstract class UmbBlockEntryContext<
 				}).warn();
 			}
 			this.#labelRender = new UmbUfmVirtualRenderController(this);
-			this.observe(this.label, (label) => {
-				if (this.#labelRender) {
-					this.#labelRender.markdown = label;
-				}
-			});
+			this.observe(
+				this.label,
+				(label) => {
+					if (this.#labelRender) {
+						this.#labelRender.markdown = label;
+					}
+				},
+				null,
+			);
 			this.#watchContentForLabelRender();
 		}
 
@@ -891,7 +900,7 @@ export abstract class UmbBlockEntryContext<
 		const blockName = this.getName();
 		await umbConfirmModal(this, {
 			headline: this.localize.term('blockEditor_confirmDeleteBlockTitle', blockName),
-			content: this.localize.term('blockEditor_confirmDeleteBlockMessage', blockName),
+			content: this.localize.term('blockEditor_confirmDeleteBlockMessage', escapeHTML(blockName)),
 			confirmLabel: '#general_delete',
 			color: 'danger',
 		});

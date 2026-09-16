@@ -365,7 +365,10 @@ export class UmbPropertyElement extends UmbLitElement {
 			this.#controlValidator?.destroy();
 			oldElement?.removeEventListener('change', this._onPropertyEditorChange as any as EventListener);
 			/** @deprecated The `UmbPropertyValueChangeEvent` has been deprecated, and will be removed in Umbraco 20. [LK] */
-			oldElement?.removeEventListener('property-value-change', this._onLegacyPropertyValueChange as any as EventListener);
+			oldElement?.removeEventListener(
+				'property-value-change',
+				this._onLegacyPropertyValueChange as any as EventListener,
+			);
 			oldElement?.destroy?.();
 
 			this._element = el as ManifestPropertyEditorUi['ELEMENT_TYPE'];
@@ -375,7 +378,10 @@ export class UmbPropertyElement extends UmbLitElement {
 			if (this._element) {
 				this._element.addEventListener('change', this._onPropertyEditorChange as any as EventListener);
 				/** @deprecated The `UmbPropertyValueChangeEvent` has been deprecated, and will be removed in Umbraco 20. [LK] */
-				this._element.addEventListener('property-value-change', this._onLegacyPropertyValueChange as any as EventListener);
+				this._element.addEventListener(
+					'property-value-change',
+					this._onLegacyPropertyValueChange as any as EventListener,
+				);
 				// No need to observe mandatory or label, as we already do so and set it on the _element if present: [NL]
 				this._element.manifest = manifest;
 				this._element.mandatory = this._mandatory;
@@ -485,6 +491,9 @@ export class UmbPropertyElement extends UmbLitElement {
 	}
 
 	#renderPropertyEditor() {
+		if (!this._element) {
+			return html`<umb-view-loader slot="editor"></umb-view-loader>`;
+		}
 		return html`
 			<div id="editor" slot="editor">
 				${this._isReadOnly && this._supportsReadOnly === false ? html`<div id="overlay"></div>` : nothing}

@@ -13,6 +13,7 @@ You can watch a video following these instructions [here](https://www.youtube.co
 - **Node.js 24** (see [`.nvmrc`](./.nvmrc))
 - **A running installed Umbraco instance** on URL: [https://localhost:44339](https://localhost:44339) (default development port)
   - Install using `SqlServer`/`LocalDb` as the tests execute too fast for `SQLite` to handle
+  - Set `Umbraco:CMS:Security:KeepUserLoggedIn` to `true` in that instance's `appsettings.Development.json`. Back-office auth is cookie-only, and this keeps the shared session cookie alive for the length of a run so tests never have to re-authenticate mid-run. CI sets it for every acceptance-test app.
 
 ---
 

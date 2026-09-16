@@ -32,6 +32,14 @@
     var allowUserInvite = EmailSender.CanSendRequiredEmail();
     var allowPasswordReset = SecuritySettings.Value.AllowPasswordReset && EmailSender.CanSendRequiredEmail();
     var disableLocalLogin = ExternalLogins.HasDenyLocalLogin();
+
+    // Where to send the user after login: the path they came from (client-supplied, validated local
+    // by the controller) when present, otherwise the configured back-office path
+    // (CallbackPathName — e.g. "/" when the client is served at the root of a separate host).
+    // The login app resolves this path against back-office-host below, so a configured BackOfficeHost
+    // (dev server / Umbraco Cloud) returns the user to the client host, not this backend's origin.
+    var backOfficeHostOrigin = SecuritySettings.Value.BackOfficeHost?.GetLeftPart(UriPartial.Authority);
+    var returnPath = string.IsNullOrEmpty(Model.ReturnUrl) ? SecuritySettings.Value.CallbackPathName : Model.ReturnUrl;
 }
 
 <!DOCTYPE html>
@@ -84,7 +92,8 @@
 
 <umb-auth
     lang="@GlobalSettings.Value.DefaultUILanguage"
-    return-url="@backOfficePath"
+    return-url="@returnPath"
+    back-office-host="@backOfficeHostOrigin"
     logo-image="@loginLogoImage"
     logo-image-alternative="@loginLogoImageAlternative"
     background-image="@loginBackgroundImage"

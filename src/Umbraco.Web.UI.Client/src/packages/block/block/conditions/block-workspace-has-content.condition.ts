@@ -8,10 +8,7 @@ export class UmbBlockWorkspaceHasContentCondition
 	extends UmbConditionBase<BlockWorkspaceHasContentConditionConfig>
 	implements UmbExtensionCondition
 {
-	constructor(
-		host: UmbControllerHost,
-		args: UmbConditionControllerArguments<BlockWorkspaceHasContentConditionConfig>,
-	) {
+	constructor(host: UmbControllerHost, args: UmbConditionControllerArguments<BlockWorkspaceHasContentConditionConfig>) {
 		super(host, args);
 
 		this.consumeContext(UMB_BLOCK_WORKSPACE_CONTEXT, (context) => {

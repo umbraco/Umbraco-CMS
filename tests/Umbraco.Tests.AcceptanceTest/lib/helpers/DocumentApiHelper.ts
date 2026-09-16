@@ -1939,4 +1939,68 @@ export class DocumentApiHelper {
     const variantEntry = documentData.variants.find(v => v.culture === culture);
     expect(variantEntry?.name).toBe(expectedName);
   }
+
+  /**
+   * Creates a culture-variant document whose invariant Block List property already holds blocks with
+   * a value per culture, plus a matching expose entry per block and culture.
+   * @param documentName - name given to every variant
+   * @param documentTypeId - the document type, expected to vary by culture
+   * @param blockListPropertyAlias - alias of the (invariant) block list property
+   * @param elementTypeId - content element type of every block, expected to vary by culture
+   * @param blockPropertyAlias - alias of the variant property inside the element type
+   * @param blockPropertyEditorAlias - property editor alias of that property
+   * @param cultures - the cultures to create variants for
+   * @param blockValuesPerCulture - one entry per block, mapping culture to that block's value
+   */
+  async createDocumentWithBlockListBlocksInCultures(
+    documentName: string,
+    documentTypeId: string,
+    blockListPropertyAlias: string,
+    elementTypeId: string,
+    blockPropertyAlias: string,
+    blockPropertyEditorAlias: string,
+    cultures: Array<string>,
+    blockValuesPerCulture: Array<Record<string, string>>) {
+    await this.ensureNameNotExists(documentName);
+
+    const crypto = require('crypto');
+    const blockKeys = blockValuesPerCulture.map(() => crypto.randomUUID());
+
+    const documentBuilder = new DocumentBuilder().withDocumentTypeId(documentTypeId);
+
+    for (const culture of cultures) {
+      documentBuilder.addVariant().withName(documentName).withCulture(culture).done();
+    }
+
+    const blockListBuilder = documentBuilder.addValue().withAlias(blockListPropertyAlias).addBlockListValue();
+
+    blockValuesPerCulture.forEach((valuesByCulture, index) => {
+      const contentDataBuilder = blockListBuilder
+        .addContentData()
+        .withContentTypeKey(elementTypeId)
+        .withKey(blockKeys[index]);
+
+      for (const [culture, value] of Object.entries(valuesByCulture)) {
+        contentDataBuilder
+          .addContentDataValue()
+          .withAlias(blockPropertyAlias)
+          .withEditorAlias(blockPropertyEditorAlias)
+          .withCulture(culture)
+          .withValue(value)
+          .done();
+      }
+
+      contentDataBuilder.done();
+
+      for (const culture of Object.keys(valuesByCulture)) {
+        blockListBuilder.addExpose().withContentKey(blockKeys[index]).withCulture(culture).done();
+      }
+
+      blockListBuilder.addLayout().withContentKey(blockKeys[index]).done();
+    });
+
+    const document = blockListBuilder.done().done().build();
+
+    return await this.create(document);
+  }
 }

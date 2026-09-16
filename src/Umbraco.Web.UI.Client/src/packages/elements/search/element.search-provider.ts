@@ -10,7 +10,10 @@ import type { UmbPagedModel, UmbRepositoryResponse } from '@umbraco-cms/backoffi
  * @augments {UmbControllerBase}
  * @implements {UmbSearchProvider<UmbElementSearchItemModel>}
  */
-export class UmbElementSearchProvider extends UmbControllerBase implements UmbSearchProvider<UmbElementSearchItemModel> {
+export class UmbElementSearchProvider
+	extends UmbControllerBase
+	implements UmbSearchProvider<UmbElementSearchItemModel>
+{
 	#repository = new UmbElementSearchRepository(this);
 
 	/**

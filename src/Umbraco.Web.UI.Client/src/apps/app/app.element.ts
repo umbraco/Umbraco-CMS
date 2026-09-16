@@ -2,8 +2,8 @@ import { onInit } from '../../packages/core/entry-point.js';
 import { UmbAppErrorElement } from './app-error.element.js';
 import { UmbAppAuthController } from './app-auth.controller.js';
 import { UmbAppAuthElement } from './app-auth.element.js';
-import { UmbAppOauthElement } from './app-oauth.element.js';
 import { UmbNetworkConnectionStatusManager } from './network-connection-status.manager.js';
+import { UmbOutlineStyleController } from './outline-style.controller.js';
 import type { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 import { UmbAuthContext } from '@umbraco-cms/backoffice/auth';
 import { UmbServerConnection, UmbServerContext } from '@umbraco-cms/backoffice/server';
@@ -14,24 +14,19 @@ import type { Guard, UmbRoute } from '@umbraco-cms/backoffice/router';
 import { pathWithoutBasePath } from '@umbraco-cms/backoffice/router';
 import { RuntimeLevelModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbContextDebugController } from '@umbraco-cms/backoffice/debug';
-import {
-	UmbBundleExtensionInitializer,
-	UmbServerExtensionRegistrator,
-	type ManifestBase,
-} from '@umbraco-cms/backoffice/extension-api';
+import { UmbBundleExtensionInitializer, UmbServerExtensionRegistrator } from '@umbraco-cms/backoffice/extension-api';
+import type { ManifestBase } from '@umbraco-cms/backoffice/extension-api';
 import {
 	UmbAppEntryPointExtensionInitializer,
 	umbExtensionsRegistry,
-	type UmbExtensionManifestKind,
 } from '@umbraco-cms/backoffice/extension-registry';
-import { redirectToStoredPath } from '@umbraco-cms/backoffice/utils';
+import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 import { umbHttpClient } from '@umbraco-cms/backoffice/http-client';
 import { UmbViewContext } from '@umbraco-cms/backoffice/view';
 import { umbLocalizationRegistry } from '@umbraco-cms/backoffice/localization';
 
 import './app-logo.element.js';
-import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
-import { UmbOutlineStyleController } from './outline-style.controller.js';
+import { UMB_CURRENT_USER_CONTEXT, UmbUserEntryPointExtensionInitializer } from '@umbraco-cms/backoffice/current-user';
 
 const CORE_PACKAGES: Array<Promise<{ name: string; extensions: Array<ManifestBase | UmbExtensionManifestKind> }>> = [
 	import('../../packages/block/umbraco-package.js'),
@@ -115,50 +110,6 @@ export class UmbAppElement extends UmbLitElement {
 			component: () => import('../installer/installer.element.js'),
 		},
 		{
-			path: 'oauth_complete',
-			component: UmbAppOauthElement,
-			setup: async (component) => {
-				if (!this.#authContext) {
-					(component as UmbAppOauthElement).failure = true;
-					console.error('[Fatal] Auth context is not available');
-					return;
-				}
-
-				const searchParams = new URLSearchParams(window.location.search);
-				const hasCode = searchParams.has('code');
-				if (!hasCode) {
-					(component as UmbAppOauthElement).failure = true;
-					console.error('[Fatal] No code in query parameters');
-					return;
-				}
-
-				// Check that we are not already authorized
-				if (this.#authContext.getIsAuthorized()) {
-					redirectToStoredPath(this.backofficePath, true);
-					return;
-				}
-
-				// Complete the authorization request (exchanges code, saves session, broadcasts to other tabs)
-				try {
-					const result = await this.#authContext.completeAuthorizationRequest();
-
-					if (result === null) {
-						// No authorization was pending — redirect the user
-						redirectToStoredPath(this.backofficePath, true);
-						return;
-					}
-
-					// For redirect flows (no popup), navigate to the stored path.
-					// Use force=true for a full page navigation so the new page
-					// runs setInitialState() with the fresh httpOnly cookies.
-					redirectToStoredPath(this.backofficePath, true);
-				} catch {
-					(component as UmbAppOauthElement).failure = true;
-					console.error('[Fatal] Authorization request failed');
-				}
-			},
-		},
-		{
 			path: 'upgrade',
 			component: () => import('../upgrader/upgrader.element.js'),
 			guards: [this.#isAuthorizedGuard()],
@@ -171,9 +122,13 @@ export class UmbAppElement extends UmbLitElement {
 		{
 			path: 'logout',
 			component: UmbAppAuthElement,
-			setup: () => {
-				this.#authContext?.clearTokenStorage();
-			},
+		},
+		{
+			// Lander for the popup login flows, local and external: the auth cookie is already set by
+			// the time it loads, so it waits for the session to settle and closes the popup. The opener
+			// learns of the result from the `umb:auth` broadcast, not postMessage.
+			path: 'auth-callback',
+			component: () => import('./app-auth-callback.element.js'),
 		},
 		{
 			path: '**',
@@ -186,6 +141,9 @@ export class UmbAppElement extends UmbLitElement {
 	#serverConnection?: UmbServerConnection;
 	#authController = new UmbAppAuthController(this);
 	#bundleInitializer: UmbBundleExtensionInitializer;
+	// The initializer registers itself as a controller on this host; the reference only pins the instantiation to the app's lifetime.
+	// eslint-disable-next-line no-unused-private-class-members
+	#userEntryPointInitializer?: UmbUserEntryPointExtensionInitializer;
 
 	#currentUser?: typeof UMB_CURRENT_USER_CONTEXT.TYPE;
 	#packageModules?: Promise<Array<{ name: string; extensions: Array<ManifestBase | UmbExtensionManifestKind> }>>;
@@ -270,17 +228,24 @@ export class UmbAppElement extends UmbLitElement {
 		await new UmbServerExtensionRegistrator(this, umbExtensionsRegistry).registerPublicExtensions();
 		const entryPointInitializer = new UmbAppEntryPointExtensionInitializer(this, umbExtensionsRegistry);
 
+		this.#userEntryPointInitializer = new UmbUserEntryPointExtensionInitializer(this, umbExtensionsRegistry);
+
 		// Try to initialise the auth flow and get the runtime status
 		try {
-			// If the runtime level is "install" or ?status=false is set, we should clear any cached tokens
-			// else we should try and set the auth status
 			const searchParams = new URLSearchParams(window.location.search);
-			if (
+			const pathname = pathWithoutBasePath({ start: true, end: false });
+
+			// Skip the session probe when there's nothing to verify: install mode and an explicit
+			// ?status=false both mean "not authenticated", and /logout & /error render without a session —
+			// probing first would just be a wasted round-trip. Otherwise probe the server (the auth cookie)
+			// to establish the session.
+			const skipProbe =
 				(searchParams.has('status') && searchParams.get('status') === 'false') ||
-				this.#serverConnection.getStatus() === RuntimeLevelModel.INSTALL
-			) {
-				await this.#authContext.clearTokenStorage();
-			} else {
+				this.#serverConnection.getStatus() === RuntimeLevelModel.INSTALL ||
+				pathname === '/logout' ||
+				pathname === '/error';
+
+			if (!skipProbe) {
 				await this.#setAuthStatus();
 			}
 
@@ -321,14 +286,6 @@ export class UmbAppElement extends UmbLitElement {
 			throw new Error('[Fatal] AuthContext requested before it was initialized');
 		}
 
-		// The oauth_complete popup must not call setInitialState(): a successful silent
-		// refresh would set isAuthorized=true and cause the oauth_complete handler to
-		// redirect the popup to the backoffice instead of completing the code exchange.
-		// Other windows opened via window.open() (e.g. the preview window) DO need
-		// setInitialState() so they can restore the session from a peer tab.
-		const pathname = pathWithoutBasePath({ start: true, end: false });
-		if (window.opener && pathname === '/oauth_complete') return;
-
 		// Auth context configures umbHttpClient in its constructor, so we only need to set initial state
 		await this.#authContext.setInitialState();
 	}
@@ -363,8 +320,8 @@ export class UmbAppElement extends UmbLitElement {
 	#redirect() {
 		const pathname = pathWithoutBasePath({ start: true, end: false });
 
-		// If we are on the oauth_complete or error page, we should not redirect
-		if (pathname === '/oauth_complete' || pathname === '/error') {
+		// If we are on the error page, we should not redirect
+		if (pathname === '/error') {
 			// Initialize the router
 			history.replaceState(null, '', location.href);
 			return;

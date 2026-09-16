@@ -114,7 +114,7 @@ export class UmbPropertyDatasetContextBase
 
 	/**
 	 * Gets the read-only state of the current variant culture.
-	 * @returns {*}  {boolean}
+	 * @returns {boolean} The read-only state.
 	 */
 	getReadOnly(): boolean {
 		return this.#readOnly.getValue();

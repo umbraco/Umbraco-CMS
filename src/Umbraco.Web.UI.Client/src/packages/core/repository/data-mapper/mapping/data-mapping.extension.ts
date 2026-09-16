@@ -1,8 +1,9 @@
 import type { UmbDataSourceDataMapping } from './types.js';
 import type { ManifestApi } from '@umbraco-cms/backoffice/extension-api';
 
-export interface ManifestDataSourceDataMapping<MetaType extends MetaDataSourceDataMapping = MetaDataSourceDataMapping>
-	extends ManifestApi<UmbDataSourceDataMapping> {
+export interface ManifestDataSourceDataMapping<
+	MetaType extends MetaDataSourceDataMapping = MetaDataSourceDataMapping,
+> extends ManifestApi<UmbDataSourceDataMapping> {
 	type: 'dataSourceDataMapping';
 	forDataSource: string;
 	forDataModel: string;

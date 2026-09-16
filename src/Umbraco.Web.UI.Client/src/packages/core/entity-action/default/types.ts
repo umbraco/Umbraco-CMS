@@ -8,19 +8,13 @@ export interface ManifestEntityActionDefaultKind extends ManifestEntityAction<Me
 export interface MetaEntityActionDefaultKind extends MetaEntityAction {
 	/**
 	 * An icon to represent the action to be performed
-	 * @examples [
-	 *   "icon-box",
-	 *   "icon-grid"
-	 * ]
+	 * @examples ["icon-box", "icon-grid"]
 	 */
 	icon: string;
 
 	/**
 	 * The friendly name of the action to perform
-	 * @examples [
-	 *   "Create",
-	 *   "Create Content Template"
-	 * ]
+	 * @examples ["Create", "Create Content Template"]
 	 */
 	label: string;
 

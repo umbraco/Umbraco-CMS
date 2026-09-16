@@ -203,7 +203,6 @@ public partial class PropertyEditorSchemaServiceTests
         public string? Group => null;
         public bool IsDeprecated => false;
         public IDictionary<string, object>? DefaultConfiguration => null;
-        public IPropertyIndexValueFactory PropertyIndexValueFactory => null!;
 
         public IDataValueEditor GetValueEditor() => null!;
         public IDataValueEditor GetValueEditor(object? configuration) => null!;
@@ -226,7 +225,6 @@ public partial class PropertyEditorSchemaServiceTests
         public string? Group => null;
         public bool IsDeprecated => false;
         public IDictionary<string, object>? DefaultConfiguration => null;
-        public IPropertyIndexValueFactory PropertyIndexValueFactory => null!;
 
         public IDataValueEditor GetValueEditor() => null!;
         public IDataValueEditor GetValueEditor(object? configuration) => null!;

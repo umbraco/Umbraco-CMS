@@ -103,6 +103,44 @@ public class HtmlLocalLinkParserTests
         });
     }
 
+    // Discovering the UDIs applies the same rules as resolving the URLs, as the entity type is what
+    // identifies the target. A tag it cannot be read from yields nothing rather than a guessed type.
+    [TestCase("<a href=\"/{localLink:eed5fc6b-96fd-45a5-a0f1-b1adfb483c2f}\">no type of its own</a>")]
+    [TestCase("<a data-type=\"document\" href=\"/{localLink:eed5fc6b-96fd-45a5-a0f1-b1adfb483c2f}\">data-type only</a>")]
+    [TestCase("<a itemtype=\"document\" href=\"/{localLink:eed5fc6b-96fd-45a5-a0f1-b1adfb483c2f}\">itemtype only</a>")]
+    [TestCase("<abbr type=\"document\" href=\"/{localLink:eed5fc6b-96fd-45a5-a0f1-b1adfb483c2f}\">not an anchor</abbr>")]
+    [TestCase("<a href=\"/other\" type=\"document\">other</a> <a href=\"/{localLink:eed5fc6b-96fd-45a5-a0f1-b1adfb483c2f}\">type on a preceding tag</a>")]
+    public void Returns_No_Udis_From_Unresolvable_LocalLinks(string input)
+    {
+        var parser = new HtmlLocalLinkParser(Mock.Of<IPublishedUrlProvider>());
+
+        var result = parser.FindUdisFromLocalLinks(input).ToList();
+
+        Assert.IsEmpty(result);
+    }
+
+    [TestCase(
+        "<a type=\"document\" href=\"/%7BlocalLink:eed5fc6b-96fd-45a5-a0f1-b1adfb483c2f%7D\">encoded braces</a>",
+        "umb://document/eed5fc6b-96fd-45a5-a0f1-b1adfb483c2f")]
+    [TestCase(
+        "<a data-type=\"media\" type=\"document\" href=\"/{localLink:eed5fc6b-96fd-45a5-a0f1-b1adfb483c2f}\">both attributes</a>",
+        "umb://document/eed5fc6b-96fd-45a5-a0f1-b1adfb483c2f")]
+    [TestCase(
+        "<a type=\"media\" href=\"/{localLink:eed5fc6b-96fd-45a5-a0f1-b1adfb483c2f}\">media</a>",
+        "umb://media/eed5fc6b-96fd-45a5-a0f1-b1adfb483c2f")]
+    public void Returns_Udi_From_Resolvable_LocalLink(string input, string expectedUdi)
+    {
+        var parser = new HtmlLocalLinkParser(Mock.Of<IPublishedUrlProvider>());
+
+        var result = parser.FindUdisFromLocalLinks(input).ToList();
+
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(1, result.Count);
+            Assert.AreEqual(UdiParser.Parse(expectedUdi), result[0]);
+        });
+    }
+
     [TestCase("", "")]
     // current
     [TestCase(
@@ -111,6 +149,13 @@ public class HtmlLocalLinkParserTests
     [TestCase(
         "<a type=\"media\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" title=\"world\">world</a>",
         "<a href=\"/media/1001/my-image.jpg\" title=\"world\">world</a>")]
+
+    // a single quoted type attribute is honoured when reading the entity type, so it has to be
+    // removed from the rendered output too.
+    [TestCase(
+        "<a type='document' href='/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}'>world</a>",
+        "<a href='/my-test-url'>world</a>")]
+
     [TestCase(
         "<a href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\"type=\"document\" title=\"world\">world</a>",
         "<a href=\"/my-test-url\" title=\"world\">world</a>")]
@@ -120,6 +165,16 @@ public class HtmlLocalLinkParserTests
     [TestCase(
         "<p><a type=\"document\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" title=\"world\">world</a></p><p><a href=\"/{localLink:7e21a725-b905-4c5f-86dc-8c41ec116e39}\" title=\"world\" type=\"media\">world</a></p>",
         "<p><a href=\"/my-test-url\" title=\"world\">world</a></p><p><a href=\"/media/1001/my-image.jpg\" title=\"world\">world</a></p>")]
+
+    // every tag is resolved on its own, so two tags holding the same local link and type both get the URL
+    [TestCase(
+        "<p><a type=\"document\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\">one</a><a type=\"document\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\">two</a></p>",
+        "<p><a href=\"/my-test-url\">one</a><a href=\"/my-test-url\">two</a></p>")]
+
+    // the tag and attribute names are matched without regard to case
+    [TestCase(
+        "<A TYPE=\"document\" HREF=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\">world</A>",
+        "<A HREF=\"/my-test-url\">world</A>")]
 
     // attributes order should not matter
     [TestCase(
@@ -140,10 +195,66 @@ public class HtmlLocalLinkParserTests
         "<a type=\"document\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}?v=1\" title=\"world\">world</a>",
         "<a href=\"/my-test-url?v=1\" title=\"world\">world</a>")]
 
+    // the attributes of a single tag may be spread over several lines
+    [TestCase(
+        "<a\n  type=\"document\"\n  href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\"\n  title=\"world\">world</a>",
+        "<a\n  href=\"/my-test-url\"\n  title=\"world\">world</a>")]
+    [TestCase(
+        "<a\n  href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\"\n  type=\"media\">world</a>",
+        "<a\n  href=\"/media/1001/my-image.jpg\">world</a>")]
+
+    // URL encoded braces, as accepted by the legacy pattern and preserved by the ConvertLocalLinks migration
+    [TestCase(
+        "<a type=\"document\" href=\"/%7BlocalLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E%7D\" title=\"world\">world</a>",
+        "<a href=\"/my-test-url\" title=\"world\">world</a>")]
+    [TestCase(
+        "<a type=\"media\" href=\"/%7BlocalLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E%7D\" title=\"world\">world</a>",
+        "<a href=\"/media/1001/my-image.jpg\" title=\"world\">world</a>")]
+    [TestCase(
+        "<a type=\"document\" href=\"/%7BlocalLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E%7D#anchor\" title=\"world\">world</a>",
+        "<a href=\"/my-test-url#anchor\" title=\"world\">world</a>")]
+
     // custom type ignored
     [TestCase(
         "<a type=\"custom\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" title=\"world\">world</a>",
         "<a type=\"custom\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" title=\"world\">world</a>")]
+
+    // an attribute whose name merely ends with "type" is not the type attribute
+    [TestCase(
+        "<a data-type=\"document\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" title=\"world\">world</a>",
+        "<a data-type=\"document\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" title=\"world\">world</a>")]
+    [TestCase(
+        "<a itemtype=\"document\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" title=\"world\">world</a>",
+        "<a itemtype=\"document\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" title=\"world\">world</a>")]
+
+    // the type attribute is still found when an attribute whose name merely ends with "type" precedes it
+    [TestCase(
+        "<a data-type=\"document\" type=\"media\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" title=\"world\">world</a>",
+        "<a data-type=\"document\" href=\"/media/1001/my-image.jpg\" title=\"world\">world</a>")]
+    [TestCase(
+        "<a itemtype=\"media\" type=\"document\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" title=\"world\">world</a>",
+        "<a itemtype=\"media\" href=\"/my-test-url\" title=\"world\">world</a>")]
+
+    // such an attribute also survives untouched when an unrelated local link elsewhere in the value resolves.
+    [TestCase(
+        "<a data-type=\"document\" href=\"/other\">other</a><a type=\"document\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\">world</a>",
+        "<a data-type=\"document\" href=\"/other\">other</a><a href=\"/my-test-url\">world</a>")]
+
+    // the type attribute has to belong to the anchor holding the local link, not to a preceding tag
+    [TestCase(
+        "<a href=\"/other\" type=\"document\">other</a> <a href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" title=\"world\">world</a>",
+        "<a href=\"/other\" type=\"document\">other</a> <a href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" title=\"world\">world</a>")]
+
+    // a local link with no type of its own stays unresolved even when another anchor in the same value
+    // points at the same entity.
+    [TestCase(
+        "<a href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\">no type</a> <a type=\"media\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" title=\"world\">world</a>",
+        "<a href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\">no type</a> <a href=\"/media/1001/my-image.jpg\" title=\"world\">world</a>")]
+
+    // only anchors hold local links, an element whose name merely starts with "a" does not
+    [TestCase(
+        "<abbr type=\"document\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" title=\"world\">world</abbr>",
+        "<abbr type=\"document\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" title=\"world\">world</abbr>")]
 
     // PascalCase type — historic mis-cased values written by the (now fixed) ConvertLocalLinks migration for Umbraco 15 (see #22597).
     [TestCase(
@@ -172,6 +283,17 @@ public class HtmlLocalLinkParserTests
     [TestCase(
         "hello href='{localLink:umb://media/9931BDE0AAC34BABB838909A7B47570E}' world ",
         "hello href='/media/1001/my-image.jpg' world ")]
+
+    // a legacy local link inside an anchor is left to the legacy pattern, as the tag pattern cannot read its type
+    [TestCase(
+        "<a href=\"{localLink:1234}\">world</a>",
+        "<a href=\"/my-test-url\">world</a>")]
+    [TestCase(
+        "<a href=\"{localLink:umb://media/9931BDE0AAC34BABB838909A7B47570E}\">world</a>",
+        "<a href=\"/media/1001/my-image.jpg\">world</a>")]
+    [TestCase(
+        "<a href=\"{localLink:umb://document/9931BDE0AAC34BABB838909A7B47570E}\">legacy</a><a type=\"media\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\">current</a>",
+        "<a href=\"/my-test-url\">legacy</a><a href=\"/media/1001/my-image.jpg\">current</a>")]
 
     // This one has an invalid char so won't match.
     [TestCase(
@@ -325,6 +447,20 @@ public class HtmlLocalLinkParserTests
     [TestCase(UrlMode.Relative, "hello href=\"{localLink:umb://media/9931BDE0AAC34BABB838909A7B47570E}\" world ", "hello href=\"/media/relative/image.jpg\" world ")]
     [TestCase(UrlMode.Absolute, "hello href=\"{localLink:umb://media/9931BDE0AAC34BABB838909A7B47570E}\" world ", "hello href=\"https://example.com/media/absolute/image.jpg\" world ")]
     [TestCase(UrlMode.Auto, "hello href=\"{localLink:umb://media/9931BDE0AAC34BABB838909A7B47570E}\" world ", "hello href=\"/media/relative/image.jpg\" world ")]
+
+    // the URL mode reaches the providers for the current format, not only the legacy one
+    [TestCase(
+        UrlMode.Relative,
+        "<a type=\"document\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\">world</a>",
+        "<a href=\"/relative-url\">world</a>")]
+    [TestCase(
+        UrlMode.Absolute,
+        "<a type=\"document\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\">world</a>",
+        "<a href=\"https://example.com/absolute-url\">world</a>")]
+    [TestCase(
+        UrlMode.Absolute,
+        "<a type=\"media\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\">world</a>",
+        "<a href=\"https://example.com/media/absolute/image.jpg\">world</a>")]
     public void ParseLocalLinks_WithVariousUrlModes_ReturnsCorrectUrls(UrlMode urlMode, string input, string expectedResult)
     {
         // Setup content URL provider that returns different URLs based on UrlMode
@@ -477,6 +613,14 @@ public class HtmlLocalLinkParserTests
     [TestCase(
         "<a href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" type=\"media\" data-culture=\"no-NO\" title=\"world\">world</a>",
         "<a href=\"/media/1001/my-image.jpg\" data-culture=\"no-NO\" title=\"world\">world</a>")]
+
+    // trailing content in the href is preserved for a cultured link, just as it is without a culture
+    [TestCase(
+        "<a type=\"document\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}#anchor\" data-culture=\"en-US\" title=\"world\">world</a>",
+        "<a href=\"/my-test-url#anchor\" data-culture=\"en-US\" title=\"world\">world</a>")]
+    [TestCase(
+        "<a type=\"document\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}?v=1\" data-culture=\"en-US\" title=\"world\">world</a>",
+        "<a href=\"/my-test-url?v=1\" data-culture=\"en-US\" title=\"world\">world</a>")]
     public void EnsureInternalLinks_WithCultureAttribute_ReplacesLinkPreservingCulture(string input, string expected)
     {
         // Arrange

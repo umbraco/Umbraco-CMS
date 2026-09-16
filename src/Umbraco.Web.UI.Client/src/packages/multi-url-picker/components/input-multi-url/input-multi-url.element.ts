@@ -24,6 +24,9 @@ import {
 import { UmbMediaItemRepository, UmbMediaUrlRepository } from '@umbraco-cms/backoffice/media';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
+import { UmbEntityInputInteractionMemoryManager } from '@umbraco-cms/backoffice/entity';
+import { UmbInteractionMemoryScopeContext } from '@umbraco-cms/backoffice/interaction-memory';
+import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
 import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
 import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
@@ -161,6 +164,20 @@ export class UmbInputMultiUrlElement extends UmbFormControlMixin<string, typeof 
 	@property({ type: String })
 	requiredMessage = UMB_VALIDATION_EMPTY_LOCALIZATION_KEY;
 
+	/**
+	 * The memories held by the link picker modal opened from this input, e.g. the last-used media
+	 * folder. Bridged from the interaction-memory scope this input provides.
+	 * @type {(Array<UmbInteractionMemoryModel> | undefined)}
+	 * @attr
+	 */
+	@property({ type: Array, attribute: false })
+	public get interactionMemories(): Array<UmbInteractionMemoryModel> | undefined {
+		return this.#interactionMemoryBridge.getMemories();
+	}
+	public set interactionMemories(value: Array<UmbInteractionMemoryModel> | undefined) {
+		this.#interactionMemoryBridge.setMemories(value);
+	}
+
 	@state()
 	private _modalRoute?: UmbModalRouteBuilder;
 
@@ -171,6 +188,12 @@ export class UmbInputMultiUrlElement extends UmbFormControlMixin<string, typeof 
 	private _resolvedLinkUrls: Array<{ unique: string; url: string }> = [];
 
 	#linkPickerModal;
+
+	// Holds what the link picker modal remembers between opens. The modal is rendered in the modal
+	// portal, not as a descendant of this element, so context is the only channel that reaches it;
+	// upwards it is a property and an `interaction-memories-change` event.
+	#interactionMemoryScope = new UmbInteractionMemoryScopeContext(this);
+	#interactionMemoryBridge = new UmbEntityInputInteractionMemoryManager(this, this.#interactionMemoryScope.memory);
 
 	constructor() {
 		super();

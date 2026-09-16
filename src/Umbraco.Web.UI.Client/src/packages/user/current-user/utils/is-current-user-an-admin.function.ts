@@ -4,7 +4,8 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
  * Check if the current user is an admin
- * @param host
+ * @param {UmbControllerHost} host The controller host
+ * @returns {Promise<boolean>} True if the current user is an admin, otherwise false
  */
 export const isCurrentUserAnAdmin = async (host: UmbControllerHost) => {
 	const ctrl = new UmbContextConsumerController(host, UMB_CURRENT_USER_CONTEXT);

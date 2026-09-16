@@ -8,6 +8,7 @@ import { UmbEntityActionBase, UmbRequestReloadStructureForEntityEvent } from '@u
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import type { UmbDetailRepositoryBase } from '@umbraco-cms/backoffice/repository';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 
 /**
  * Entity action for trashing an item.
@@ -50,7 +51,7 @@ export class UmbTrashFolderEntityAction<
 		// TODO: handle items with variants
 		await umbConfirmModal(this, {
 			headline,
-			content: this.#localize.string(message, folder.name),
+			content: html`${this.#localize.htmlString(message, folder.name)}`,
 			color: 'danger',
 			confirmLabel: '#actions_trash',
 		});

@@ -1,4 +1,5 @@
-import {Page} from "@playwright/test"
+import {expect, Locator, Page} from "@playwright/test";
+import {ConstantHelper} from "./ConstantHelper";
 import {StylesheetUiHelper} from "./StylesheetUiHelper";
 import {umbracoConfig} from "../umbraco.config";
 import {PartialViewUiHelper} from "./PartialViewUiHelper";
@@ -12,7 +13,6 @@ import {RelationTypeUiHelper} from "./RelationTypeUiHelper";
 import {PackageUiHelper} from "./PackageUiHelper";
 import {LanguageUiHelper} from "./LanguageUiHelper";
 import {ModelsBuilderUiHelper} from "./ModelsBuilderUiHelper";
-import {ExamineManagementUiHelper} from "./ExamineManagementUiHelper";
 import {PublishedStatusUiHelper} from "./PublishedStatusUiHelper";
 import {HealthCheckUiHelper} from "./HealthCheckUiHelper";
 import {ProfilingUiHelper} from "./ProfilingUiHelper";
@@ -55,7 +55,6 @@ export class UiHelpers {
   package: PackageUiHelper;
   language: LanguageUiHelper;
   modelsBuilder: ModelsBuilderUiHelper;
-  examineManagement: ExamineManagementUiHelper;
   publishedStatus: PublishedStatusUiHelper;
   healthCheck: HealthCheckUiHelper;
   profiling: ProfilingUiHelper;
@@ -81,9 +80,11 @@ export class UiHelpers {
   library: LibraryUiHelper;
   preview: PreviewUiHelper;
   backofficeSearch: BackofficeSearchUiHelper;
+  private readonly sectionLinks: Locator;
 
   constructor(page: Page) {
     this.page = page;
+    this.sectionLinks = page.getByTestId('section-links');
     this.stylesheet = new StylesheetUiHelper(this.page);
     this.partialView = new PartialViewUiHelper(this.page);
     this.script = new ScriptUiHelper(this.page);
@@ -97,7 +98,6 @@ export class UiHelpers {
     this.package = new PackageUiHelper(this.page);
     this.language = new LanguageUiHelper(this.page);
     this.modelsBuilder = new ModelsBuilderUiHelper(this.page);
-    this.examineManagement = new ExamineManagementUiHelper(this.page);
     this.publishedStatus = new PublishedStatusUiHelper(this.page);
     this.healthCheck = new HealthCheckUiHelper(this.page);
     this.profiling = new ProfilingUiHelper(this.page);
@@ -135,6 +135,7 @@ export class UiHelpers {
 
   async reloadPage() {
     await this.page.reload();
+    await expect(this.sectionLinks).toBeVisible({timeout: ConstantHelper.timeout.navigation});
   }
 
   async goBackPage() {

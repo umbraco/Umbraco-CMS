@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Api.Management.Extensions;
 using Umbraco.Cms.Api.Management.ViewModels.Content;
 using Umbraco.Cms.Api.Management.ViewModels.Member;
 using Umbraco.Cms.Api.Management.ViewModels.Member.Item;
@@ -66,9 +67,15 @@ internal sealed class MemberPresentationFactory : IMemberPresentationFactory
 
         // Get the member groups per role, so we can return the group keys
         responseModel.Groups = roles.Select(x => _memberGroupService.GetByName(x)).WhereNotNull().Select(x => x.Key).ToArray();
-        return currentUser.HasAccessToSensitiveData()
-            ? responseModel
-            : await RemoveSensitiveDataAsync(member, responseModel);
+
+        responseModel.ClearSensitiveValuesFor(currentUser);
+
+        if (currentUser.HasAccessToSensitiveData() is false)
+        {
+            await RemoveSensitivePropertyValuesAsync(member, responseModel);
+        }
+
+        return responseModel;
     }
 
     /// <inheritdoc/>
@@ -92,7 +99,21 @@ internal sealed class MemberPresentationFactory : IMemberPresentationFactory
         => CreateItemResponseModel<IMember>(entity);
 
     /// <inheritdoc/>
-    public async Task<MemberResponseModel> CreateExternalMemberResponseModelAsync(ExternalMemberIdentity member)
+    [Obsolete("Please use the overload taking the current user. Scheduled for removal in Umbraco 19.")]
+    public Task<MemberResponseModel> CreateExternalMemberResponseModelAsync(ExternalMemberIdentity member)
+        => BuildExternalMemberResponseModelAsync(member);
+
+    /// <inheritdoc/>
+    public async Task<MemberResponseModel> CreateExternalMemberResponseModelAsync(ExternalMemberIdentity member, IUser currentUser)
+    {
+        MemberResponseModel responseModel = await BuildExternalMemberResponseModelAsync(member);
+
+        responseModel.ClearSensitiveValuesFor(currentUser);
+
+        return responseModel;
+    }
+
+    private async Task<MemberResponseModel> BuildExternalMemberResponseModelAsync(ExternalMemberIdentity member)
     {
         IEnumerable<string> roles = await _externalMemberService.GetRolesAsync(member.Key);
         IEnumerable<Guid> groupKeys = roles
@@ -140,7 +161,21 @@ internal sealed class MemberPresentationFactory : IMemberPresentationFactory
         };
 
     /// <inheritdoc/>
-    public MemberResponseModel CreateFilterItemResponseModel(MemberFilterItem item) =>
+    [Obsolete("Please use the overload taking the current user. Scheduled for removal in Umbraco 19.")]
+    public MemberResponseModel CreateFilterItemResponseModel(MemberFilterItem item)
+        => BuildFilterItemResponseModel(item);
+
+    /// <inheritdoc/>
+    public MemberResponseModel CreateFilterItemResponseModel(MemberFilterItem item, IUser currentUser)
+    {
+        MemberResponseModel responseModel = BuildFilterItemResponseModel(item);
+
+        responseModel.ClearSensitiveValuesFor(currentUser);
+
+        return responseModel;
+    }
+
+    private static MemberResponseModel BuildFilterItemResponseModel(MemberFilterItem item) =>
         new()
         {
             Id = item.Key,
@@ -159,6 +194,7 @@ internal sealed class MemberPresentationFactory : IMemberPresentationFactory
                 Id = item.MemberTypeKey ?? Guid.Empty,
                 Icon = item.MemberTypeIcon ?? string.Empty,
             },
+            Groups = item.Groups,
         };
 
     private MemberItemResponseModel CreateItemResponseModel<T>(T entity)
@@ -181,18 +217,8 @@ internal sealed class MemberPresentationFactory : IMemberPresentationFactory
             }
         ];
 
-    private async Task<MemberResponseModel> RemoveSensitiveDataAsync(IMember member, MemberResponseModel responseModel)
+    private async Task RemoveSensitivePropertyValuesAsync(IMember member, MemberResponseModel responseModel)
     {
-        // these properties are considered sensitive; some of them are not nullable, so for
-        // those we can't do much more than force revert them to their default values.
-        responseModel.IsApproved = false;
-        responseModel.IsLockedOut = false;
-        responseModel.IsTwoFactorEnabled = false;
-        responseModel.FailedPasswordAttempts = 0;
-        responseModel.LastLoginDate = null;
-        responseModel.LastLockoutDate = null;
-        responseModel.LastPasswordChangeDate = null;
-
         IMemberType memberType = await _memberTypeService.GetAsync(member.ContentType.Key)
                                  ?? throw new InvalidOperationException($"The member type {member.ContentType.Alias} could not be found");
 
@@ -202,8 +228,6 @@ internal sealed class MemberPresentationFactory : IMemberPresentationFactory
         responseModel.Values = responseModel.Values
             .Where(valueModel => sensitivePropertyAliases.InvariantContains(valueModel.Alias) is false)
             .ToArray();
-
-        return responseModel;
     }
 
     private MemberKind GetMemberKind(Guid key)

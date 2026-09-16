@@ -2,7 +2,7 @@ import { UMB_SCRIPT_ENTITY_TYPE, UMB_SCRIPT_FOLDER_ENTITY_TYPE } from '../../ent
 import type { UmbScriptItemModel } from '../../types.js';
 import { UmbManagementApiScriptItemDataRequestManager } from './script-item.server.request-manager.js';
 import { UmbServerFilePathUniqueSerializer } from '@umbraco-cms/backoffice/server-file-system';
-import type { UmbItemDataSource } from '@umbraco-cms/backoffice/repository';
+import type { UmbDataSourceResponse, UmbItemDataSource } from '@umbraco-cms/backoffice/repository';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 
 /**
@@ -16,11 +16,11 @@ export class UmbScriptItemServerDataSource extends UmbControllerBase implements 
 
 	/**
 	 * Fetches the items for the given uniques from the server
-	 * @param {Array<string>} uniques
-	 * @returns {*}
+	 * @param {Array<string>} uniques - The uniques of the scripts to fetch
+	 * @returns {UmbDataSourceResponse<Array<UmbScriptItemModel>>} The requested script items, or an error
 	 * @memberof UmbScriptItemServerDataSource
 	 */
-	async getItems(uniques: Array<string>) {
+	async getItems(uniques: Array<string>): Promise<UmbDataSourceResponse<Array<UmbScriptItemModel>>> {
 		if (!uniques) throw new Error('Uniques are missing');
 
 		const paths = uniques

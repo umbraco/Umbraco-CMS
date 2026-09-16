@@ -213,6 +213,8 @@ export default {
 	},
 	media: {
 		clickToUpload: 'Kliknij, aby załadować plik',
+		browseFilesAction: 'Przeglądaj pliki',
+		dropFilesOr: 'Przeciągnij i upuść pliki multimedialne tutaj<br />lub',
 		orClickHereToUpload: 'lub kliknij tutaj, aby wybrać pliki',
 		disallowedFileType: 'Nie można załadować pliku, typ pliku nie jest akceptowany',
 		maxFileSize: 'Maksymalny rozmiar pliku to',
@@ -504,6 +506,8 @@ export default {
 		new: 'Nowy',
 		next: 'Dalej',
 		no: 'Nie',
+		noResults: 'Brak wyników',
+		noResultsFor: (query: string) => `Brak wyników dla "${query}".`,
 		of: 'z',
 		ok: 'OK',
 		open: 'Otwórz',
@@ -879,6 +883,17 @@ export default {
 		sortHelp:
 			'Przesuń poszczególne elementy w górę oraz w dół aż będą w odpowiedniej kolejności lub kliknij na nagłówku kolumny, aby posortować całą kolekcję elementów',
 		sortPleaseWait: 'Proszę czekać. Trwa sortowanie elementów.',
+		sortByFieldHeadline: 'Sortuj według pola',
+		sortByFieldSentence: 'Sortuj wszystkie elementy podrzędne według',
+		sortByFieldDirectionLabel: 'Kierunek',
+		sortByFieldAscending: 'Rosnąco',
+		sortByFieldDescending: 'Malejąco',
+		sortByFieldNameOption: 'Nazwa',
+		sortByFieldCreateDateOption: 'Utworzono',
+		sortByFieldUpdateDateOption: 'Ostatnia edycja',
+		sortIndividuallyHeadline: 'Sortuj pojedynczo',
+		sortByFieldCultureSentence: 'w języku',
+		sortByFieldCultureLabel: 'Język',
 	},
 	speechBubbles: {
 		validationFailedHeader: 'Walidacja',
@@ -1178,6 +1193,10 @@ export default {
 		templates: 'Szablony',
 		partialViews: 'Częściowe Widoki',
 		partialViewMacros: 'Pliki Makro Częściowych Widoków',
+	},
+	picker: {
+		browseTab: 'Przeglądaj',
+		searchTab: 'Szukaj',
 	},
 	update: {
 		updateAvailable: 'Aktualizacja jest gotowa',
