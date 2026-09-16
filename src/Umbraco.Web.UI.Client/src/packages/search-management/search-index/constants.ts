@@ -2,12 +2,12 @@ export const UMB_SEARCH_ROOT_ENTITY_TYPE = 'search-root';
 export const UMB_SEARCH_INDEX_ENTITY_TYPE = 'search-index';
 export const UMB_SEARCH_DOCUMENT_ENTITY_TYPE = 'search-document';
 
-export const UMB_SEARCH_COLLECTION_REPOSITORY_ALIAS = 'UMB_SEARCH_COLLECTION_REPOSITORY';
-export const UMB_SEARCH_DETAIL_REPOSITORY_ALIAS = 'UmbSearchDetailRepository';
-export const UMB_SEARCH_DETAIL_STORE_ALIAS = 'UmbSearchStore';
-export const UMB_SEARCH_QUERY_REPOSITORY_ALIAS = 'UmbSearchQueryRepository';
+export const UMB_SEARCH_COLLECTION_REPOSITORY_ALIAS = 'Umb.Repository.SearchIndex.Collection';
+export const UMB_SEARCH_DETAIL_REPOSITORY_ALIAS = 'Umb.Repository.SearchIndex.Detail';
+export const UMB_SEARCH_DETAIL_STORE_ALIAS = 'Umb.Store.SearchIndex';
+export const UMB_SEARCH_QUERY_REPOSITORY_ALIAS = 'Umb.Repository.SearchIndex.Query';
 
-export const UMB_SEARCH_ROOT_COLLECTION_ALIAS = 'UMB_SEARCH_ROOT_COLLECTION';
+export const UMB_SEARCH_ROOT_COLLECTION_ALIAS = 'Umb.Collection.SearchIndex';
 export const UMB_SEARCH_COLLECTION_VIEW_ALIAS = 'Umbraco.Search.CollectionView.Root';
 
 export const UMB_SEARCH_ROOT_WORKSPACE_ALIAS = 'Umbraco.Search.Workspace.Root';
