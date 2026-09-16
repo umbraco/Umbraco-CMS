@@ -19,7 +19,8 @@ export const UMB_SEARCH_LEGACY_ROOT_COLLECTION_ALIAS = 'UMB_SEARCH_ROOT_COLLECTI
  * Warns that a legacy alias was resolved, then hands back the module the replacement alias uses.
  * @param {string} deprecated The legacy alias that was resolved.
  * @param {string} replacement The alias that should be referenced instead.
- * @param {Function} load Loader for the implementation the replacement alias registers.
+ * @template T The module the replacement alias loads.
+ * @param {() => Promise<T>} load Loader for the implementation the replacement alias registers.
  * @returns {Promise<T>} The loaded module.
  */
 export async function loadWithDeprecationWarning<T>(

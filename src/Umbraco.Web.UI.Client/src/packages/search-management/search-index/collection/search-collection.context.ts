@@ -25,8 +25,8 @@ export class UmbSearchCollectionContext extends UmbDefaultCollectionContext<UmbS
 	 * Sets the index state for immediate UI feedback.
 	 * This is used when triggering actions that take time (e.g., rebuild).
 	 * The state will be replaced by server-driven state when the collection reloads.
-	 * @param indexAlias
-	 * @param state
+	 * @param {string} indexAlias The alias of the index whose state is changing.
+	 * @param {UmbSearchIndexState} state The state to show for that index.
 	 */
 	setIndexState(indexAlias: string, state: UmbSearchIndexState) {
 		this._items.updateOne(indexAlias, { state });

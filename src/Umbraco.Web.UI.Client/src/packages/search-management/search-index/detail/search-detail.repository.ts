@@ -27,7 +27,7 @@ export class UmbSearchDetailRepository extends UmbDetailRepositoryBase<UmbSearch
 	 * Shows a "rebuild started" notification, calls the API,
 	 * and marks the user as waiting for the completion notification.
 	 * Note: Confirmation modal should be shown by the caller before calling this method.
-	 * @param indexAlias The alias of the index to rebuild
+	 * @param {string} indexAlias The alias of the index to rebuild.
 	 */
 	async rebuildIndex(indexAlias: string): Promise<void> {
 		// Show "rebuild started" notification

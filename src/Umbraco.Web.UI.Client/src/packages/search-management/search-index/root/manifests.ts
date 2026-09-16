@@ -20,6 +20,10 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'workspaceView',
 		kind: 'collection',
 		name: 'Umbraco Search - Workspace View',
+		// Kept on the spelling it shipped with in the standalone Umbraco.Cms.Search package.
+		// Unlike the repository and store aliases, an extension that renders cannot be registered
+		// under a second alias without appearing twice, so this one cannot be renamed and shimmed.
+		// eslint-disable-next-line local-rules/enforce-manifest-alias
 		alias: 'Umbraco.Search.WorkspaceView.Collection',
 		meta: {
 			label: '#searchManagement_treeHeader',
@@ -37,6 +41,10 @@ export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'menuItem',
 		name: 'Umbraco Search Root Menu Item',
+		// Kept on the spelling it shipped with in the standalone Umbraco.Cms.Search package.
+		// Unlike the repository and store aliases, an extension that renders cannot be registered
+		// under a second alias without appearing twice, so this one cannot be renamed and shimmed.
+		// eslint-disable-next-line local-rules/enforce-manifest-alias
 		alias: 'Umbraco.Search.Root.MenuItem',
 		meta: {
 			label: '#searchManagement_treeHeader',

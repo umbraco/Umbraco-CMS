@@ -3,10 +3,10 @@ import {
 	UMB_SEARCH_COLLECTION_VIEW_ALIAS,
 	UMB_SEARCH_ROOT_COLLECTION_ALIAS,
 } from '../constants.js';
+import { UMB_SEARCH_LEGACY_ROOT_COLLECTION_ALIAS, loadWithDeprecationWarning } from '../legacy-aliases.js';
 import { manifests as repositoryManifests } from './repository/manifests.js';
 import { manifests as entityActionManifests } from './entity-actions/manifests.js';
 import { manifests as collectionActionManifests } from './collection-actions/manifests.js';
-import { UMB_SEARCH_LEGACY_ROOT_COLLECTION_ALIAS, loadWithDeprecationWarning } from '../legacy-aliases.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	...repositoryManifests,

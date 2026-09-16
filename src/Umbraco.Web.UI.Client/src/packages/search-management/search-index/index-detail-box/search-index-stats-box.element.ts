@@ -74,7 +74,10 @@ export class UmbSearchIndexStatsBoxElement extends UmbLitElement {
 		);
 	}
 
-	/** A rebuild the user just started is not reported by the server until the next load. */
+	/**
+	 * A rebuild the user just started is not reported by the server until the next load.
+	 * @returns {UmbHealthStatusModel | undefined} The status to display for the index.
+	 */
 	#effectiveHealthStatus(): UmbHealthStatusModel | undefined {
 		return this._state === 'loading' ? 'Rebuilding' : this._healthStatus;
 	}

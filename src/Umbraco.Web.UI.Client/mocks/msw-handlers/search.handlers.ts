@@ -9,9 +9,24 @@ import type {
 import { HealthStatusModel, UmbracoObjectTypesModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 const indexes: Array<IndexResponseModel> = [
-	{ indexAlias: 'DraftContentIndex', providerName: 'search-examine-provider', documentCount: 42, healthStatus: HealthStatusModel.HEALTHY },
-	{ indexAlias: 'PublishedContentIndex', providerName: 'search-examine-provider', documentCount: 38, healthStatus: HealthStatusModel.HEALTHY },
-	{ indexAlias: 'MemberIndex', providerName: 'search-examine-provider', documentCount: 0, healthStatus: HealthStatusModel.EMPTY },
+	{
+		indexAlias: 'DraftContentIndex',
+		providerName: 'search-examine-provider',
+		documentCount: 42,
+		healthStatus: HealthStatusModel.HEALTHY,
+	},
+	{
+		indexAlias: 'PublishedContentIndex',
+		providerName: 'search-examine-provider',
+		documentCount: 38,
+		healthStatus: HealthStatusModel.HEALTHY,
+	},
+	{
+		indexAlias: 'MemberIndex',
+		providerName: 'search-examine-provider',
+		documentCount: 0,
+		healthStatus: HealthStatusModel.EMPTY,
+	},
 ];
 
 const documents: SearchResultResponseModel['documents'] = [
