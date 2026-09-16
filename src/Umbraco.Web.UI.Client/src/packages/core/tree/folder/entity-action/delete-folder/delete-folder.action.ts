@@ -1,6 +1,10 @@
 import type { MetaEntityActionFolderKind, UmbFolderModel } from '../../types.js';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
-import { UmbEntityActionBase, UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
+import {
+	UmbEntityActionBase,
+	UmbEntityDeletedEvent,
+	UmbRequestReloadStructureForEntityEvent,
+} from '@umbraco-cms/backoffice/entity-action';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import type { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
@@ -31,6 +35,14 @@ export class UmbDeleteFolderEntityAction extends UmbEntityActionBase<MetaEntityA
 
 			const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
 			if (!actionEventContext) throw new Error('Action event context is missing');
+
+			const deletedEvent = new UmbEntityDeletedEvent({
+				unique: this.args.unique,
+				entityType: this.args.entityType,
+			});
+
+			actionEventContext.dispatchEvent(deletedEvent);
+
 			const event = new UmbRequestReloadStructureForEntityEvent({
 				unique: this.args.unique,
 				entityType: this.args.entityType,
