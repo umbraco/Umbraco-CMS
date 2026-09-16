@@ -21,6 +21,9 @@ export class UmbTestSubmittableTreeEntityWorkspaceContext {
 	#isNew = new UmbBooleanState(undefined);
 	#createUnderParentUnique = new UmbObjectState<string | null | undefined>(undefined);
 	#createUnderParentEntityType = new UmbStringState<string | undefined>(undefined);
+	// Mirrors `UmbEntityDetailWorkspaceContextBase.getUnique()`, which returns undefined once the previous
+	// entity's data has been cleared but before the new `unique` has been set.
+	#dataCleared = false;
 
 	readonly workspaceAlias = 'Umb.Test.Workspace';
 	readonly unique = this.#unique.asObservable();
@@ -42,6 +45,7 @@ export class UmbTestSubmittableTreeEntityWorkspaceContext {
 	}
 
 	getUnique() {
+		if (this.#dataCleared) return undefined;
 		return this.#unique.getValue();
 	}
 
@@ -68,6 +72,20 @@ export class UmbTestSubmittableTreeEntityWorkspaceContext {
 	setCreateUnderParent(parent: UmbEntityModel) {
 		this.#createUnderParentUnique.setValue(parent.unique);
 		this.#createUnderParentEntityType.setValue(parent.entityType);
+	}
+
+	/**
+	 * Reproduces `UmbEntityDetailWorkspaceContextBase.load()`'s exact ordering when the same workspace context
+	 * instance is reused to navigate to a different existing entity: `isNew` resets and re-settles to `false`
+	 * (with `getUnique()` transiently undefined throughout) before `unique` itself is updated.
+	 * @param {string} unique - The unique of the entity being navigated to.
+	 */
+	loadDifferentEntity(unique: string) {
+		this.#dataCleared = true;
+		this.#isNew.setValue(undefined);
+		this.#isNew.setValue(false);
+		this.#dataCleared = false;
+		this.#unique.setValue(unique);
 	}
 
 	async requestSubmit() {}
@@ -126,4 +144,32 @@ export function createTestAncestorItem(entity: UmbEntityModel, name = entity.uni
 		hasChildren: false,
 		parent: { unique: null, entityType: 'test-root-entity-type' },
 	} as unknown as UmbTreeItemModel;
+}
+
+/**
+ * A minimal `UmbSectionSidebarMenuSectionContext` stand-in. It only implements `expansion.expandItems`,
+ * recording each call so a test can check whether — and how often — the parent tree item was expanded.
+ */
+export class UmbTestSectionSidebarMenuContext {
+	static expandItemsCalls: Array<unknown> = [];
+
+	static reset() {
+		UmbTestSectionSidebarMenuContext.expandItemsCalls = [];
+	}
+
+	#host: UmbControllerHost;
+
+	readonly expansion = {
+		expandItems: (entries: unknown) => {
+			UmbTestSectionSidebarMenuContext.expandItemsCalls.push(entries);
+		},
+	};
+
+	constructor(host: UmbControllerHost) {
+		this.#host = host;
+	}
+
+	getHostElement() {
+		return this.#host.getHostElement();
+	}
 }

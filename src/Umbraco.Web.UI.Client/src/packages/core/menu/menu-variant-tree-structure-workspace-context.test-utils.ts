@@ -1,11 +1,14 @@
-import { UmbTestSubmittableTreeEntityWorkspaceContext } from './menu-tree-structure-workspace-context.test-utils.js';
+import {
+	UmbTestSectionSidebarMenuContext,
+	UmbTestSubmittableTreeEntityWorkspaceContext,
+} from './menu-tree-structure-workspace-context.test-utils.js';
 import type { ManifestApi } from '@umbraco-cms/backoffice/extension-api';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import type { UmbTreeItemModel, UmbTreeRootModel } from '@umbraco-cms/backoffice/tree';
 
-export { UmbTestSubmittableTreeEntityWorkspaceContext };
+export { UmbTestSubmittableTreeEntityWorkspaceContext, UmbTestSectionSidebarMenuContext };
 
 @customElement('umb-test-menu-variant-structure-controller-host')
 export class UmbTestMenuVariantStructureControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}

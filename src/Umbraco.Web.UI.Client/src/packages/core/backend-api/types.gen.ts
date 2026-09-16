@@ -1351,6 +1351,7 @@ export type MediaCollectionResponseModel = {
     sortOrder: number;
     hasChildren: boolean;
     mediaType: MediaTypeCollectionReferenceResponseModel;
+    extension?: string | null;
 };
 
 export type MediaConfigurationResponseModel = {
@@ -1368,6 +1369,7 @@ export type MediaItemResponseModel = {
     parent?: ReferenceByIdModel | null;
     hasChildren: boolean;
     mediaType: MediaTypeReferenceResponseModel;
+    extension?: string | null;
     variants: Array<VariantItemResponseModel>;
 };
 
@@ -1405,6 +1407,7 @@ export type MediaTreeItemResponseModel = {
     isTrashed: boolean;
     createDate: string;
     mediaType: MediaTypeReferenceResponseModel;
+    extension?: string | null;
     variants: Array<VariantItemResponseModel>;
 };
 

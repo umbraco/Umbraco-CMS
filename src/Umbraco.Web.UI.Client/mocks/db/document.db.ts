@@ -177,6 +177,7 @@ const collectionMapper = (model: UmbMockDocumentModel): DocumentCollectionRespon
 		values: model.values,
 		variants: model.variants,
 		flags: model.flags,
+		hasChildren: model.hasChildren,
 	};
 };
 
