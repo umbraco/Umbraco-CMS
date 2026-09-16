@@ -107,7 +107,10 @@ Fixed sleeps (`page.waitForTimeout(...)`, `ConstantHelper.wait.*`) are the singl
 
 **Before blaming the test, check the instance.** Scheduled publishing firing mid-test is a flake the suite guards against *in CI only* — the nightly pipeline copies `SuspendScheduledPublishingComposer` (and SQL Server delayed durability) from `tests/Umbraco.Tests.AcceptanceTest.UmbracoProject/` into the instance it builds. A local instance has neither, and `src/Umbraco.Web.UI` additionally runs ModelsBuilder in `InMemoryAuto`, regenerating models on every content-type change in a suite that changes them constantly. A flake that reproduces only locally is often that difference. See README.md → Prerequisites.
 
-**A long local run degrades its own auth.** In a 473-test run against `src/Umbraco.Web.UI`, `UploadField.spec.ts` failed all seven of its tests about thirty minutes in, and the error context was the **login page** rather than anything to do with upload fields. Re-running those seven against the same hours-old instance failed identically; against a freshly started one they pass in 30 seconds. So when a block of late tests fails at navigation with a redirect to `/umbraco/login`, restart the instance before reading anything into it — the tests are reporting an expired session, not a product defect, and the failure names whatever element the test happened to look for first.
+**A long local run degrades its own auth.** Roughly half an hour in, a block of tests starts
+failing at navigation and the error context shows the **login page** — the session has expired,
+and each test then fails on whatever element it looked for first, so the message names a
+perfectly good locator. Restart the instance before reading anything into it.
 
 **Known debt — the suite has not finished paying this off.** 91 `waitForTimeout` calls remain, concentrated in `ContentUiHelper` (23), `LibraryUiHelper` (20) and `UiBaseLocators` (17). **24 carry a justification**; the other 67 do not. Treat them as debt, not as precedent: the fact that a neighbouring method sleeps is not a reason for a new one to.
 
@@ -219,7 +222,7 @@ Note the deliberate split between `values` and `properties`: a content *item* ca
 ]
 ```
 
-So an "is there exactly one property?" check must count **distinct aliases**, never `values.length`. The first version of `getOnlyPropertyValue` counted entries, and would have failed every variant and segment spec it was written to serve — while passing the invariant ones, which is what makes this shape of mistake easy to ship.
+So an "is there exactly one property?" check must count **distinct aliases**, never `values.length`. Counting entries passes on invariant content and fails on every variant and segment spec, which is what makes this shape of mistake easy to ship.
 
 The resulting contract:
 
@@ -254,27 +257,21 @@ They take the **already-fetched entity** rather than a name on purpose: `getByNa
 
 **153 raw-response assertions remain**, down from 890 (-83%).
 
-The two `get*` helpers are what made the deep cases tractable. `getOnlyPropertyValue` in particular replaces `values[0].value` where no alias is in play: it asserts there *is* exactly one property and returns it, so the single-property expectation is stated instead of buried in an index — and a spec that later grows a second property fails loudly rather than silently asserting against whichever sorts first. Both stop at the entity boundary: `getOnlyPropertyValue(data).contentData[0].values[0].value` still indexes into the *block's own* structure, which is that test's actual subject.
+`getOnlyPropertyValue` covers the case where no alias is in play: it asserts there *is* exactly
+one property and returns it, so the single-property expectation is stated rather than buried in
+an index, and a spec that later grows a second property fails loudly. Both `get*` helpers stop at
+the entity boundary — `getOnlyPropertyValue(data).contentData[0].values[0].value` still indexes
+into the *block's own* structure, which is that test's actual subject.
 
-**153 remain, and the previous read of them was wrong** — worth knowing, because the mistake is easy to repeat. The conclusion had been "no shape appears more than nine times, spread across roughly twenty-five distinct ones, so writing a helper for each would inflate the package for little". That is true of **exact paths** — there are 86, and the largest is `.id` at ten. It is false of **subjects**: cluster by what is actually being asserted and 86 paths collapse to 13, several of them large and concentrated in two or three files:
+**Concentration, not raw count, decides whether a helper earns its place.** Cluster the remaining
+assertions by what they assert and the long tail is real: the largest subject is identity
+(`.id`, `.name`, `.path`) at 22 lines spread over 16 files, where a helper would add an
+indirection per file and buy nothing. The clusters worth extracting were the concentrated ones —
+property definitions (23 lines, 3 files), user-group access flags (22 lines, 2 files) and domains
+(13 lines, 2 files) — each a single positional lookup repeated, and each now a helper. Counting
+by *exact path* instead suggests the opposite and is misleading: 86 distinct paths, none over ten.
 
-| Subject | Lines | Files |
-|---------|------:|------:|
-| property definitions (name, description, dataType, validation, appearance) | 23 | 3 |
-| identity (id / key / path / alias / name) | 22 | 16 |
-| user-group access flags and permissions | 22 | 2 |
-| compositions | 14 | 4 |
-| allowed templates and child types | 13 | 6 |
-| domains | 13 | 2 |
-| property values | 12 | 7 |
-| file content | 9 | 2 |
-| variants, member fields, containers, child variants, pagination | 34 | — |
-
-**Concentration is what decides whether a helper earns its place, not the raw count.** Twenty-two `.id` assertions across sixteen files are a genuine long tail — a helper would add an indirection per file and buy nothing. Twenty-three property-definition assertions across *three* files are not: they were all `properties[0].<field>`, one positional lookup repeated, which is exactly what `getPropertyValue` was introduced to remove on the values side. That cluster is now `getPropertyDefinition(data, alias)` and `getOnlyPropertyDefinition(data)`.
-
-Both of the clusters named next have since been done. **User-group access flags** became `doesUserGroupHaveAccess(data, {…})`, which asserts only the keys you pass — and which deliberately does *not* join the older `doesUserGroupContain*` family beside it, because those take a name and refetch (`getByName` walks every group, so four flags cost four walks) and *return* a value under a `does` prefix, the shape this section warns silently passes when a caller forgets `expect()`. **Domains** became `doesHaveDomain(data, name, isoCode)` and `doesHaveDomainCount(data, n)`; the first matches on `domainName` rather than `domains[0]`, since the API promises no order and the index was the same coincidental-pass trap as a hardcoded `.nth(0)`.
-
-What is left is long tail by the same measure — the largest remaining subject is identity (`.id`, `.name`, `.path`) at 22 lines spread over 16 files, where a helper would add an indirection per file and buy nothing. Add one when you touch a shape and it earns its place, and prefer a helper over a new raw assertion.
+Add a helper when you touch a shape and it earns its place; prefer one over a new raw assertion.
 
 **One index stays on purpose.** The three "can reorder properties" tests assert `properties[0].name` and `properties[1].name` — there the position *is* the subject, the same exemption a parameterised `.nth(i)` gets. Two of the three asserted only `properties[0]`, which cannot tell a reorder from a property being dropped or duplicated; both now assert the second position too, matching the document-type test that had it right.
 
@@ -338,28 +335,16 @@ This is why `UserGroupUiHelper`/`UserUiHelper` match exactly rather than with `h
 
 #### Endpoint constants are checked against the API's own contract
 
-`ConstantHelper.apiEndpoints` hardcodes 46 Management API paths, and 232 more are written inline in the `*ApiHelper` files. Nothing ties them to the API, so a renamed route surfaces as a helper waiting for a response that never arrives — a 60-second timeout with no hint of the cause. When a wait times out for no visible reason, check the path against the committed `src/Umbraco.Cms.Api.Management/OpenApi.json`, which is the contract and needs no running instance. Seven paths had already drifted when this was last checked by hand.
+`ConstantHelper.apiEndpoints` hardcodes 46 Management API paths, and **232 more are written
+inline** in the `*ApiHelper` files. Nothing ties any of them to the API, so a renamed route
+surfaces as a helper waiting for a response that never arrives — a 60-second timeout with no
+hint of the cause. When a wait times out for no visible reason, check the path against the
+committed `src/Umbraco.Cms.Api.Management/OpenApi.json`: it is the contract, and reading it
+needs no running instance. Seven paths had already drifted when this was last checked.
 
-The check covers **inline paths too, not just the constants** — and it has to: only 31 call sites use `ConstantHelper.apiEndpoints`, while **232 write the path inline** in an `*ApiHelper`. Checking constants alone would have verified about a eighth of the suite's API surface. (Migrating those 232 to constants is separate, optional tidying; what matters for correctness is that the route exists.)
-
-Three auth paths are allow-listed — `security/back-office/revoke`, `/token` and `/login` — because OpenIddict middleware serves them rather than an MVC controller, so they never appear in a generated document. If you add an auth-adjacent endpoint, expect to allow-list it. **Anything else failing this rule means the route moved.**
-
-Turning it on found seven paths that had already moved:
-
-| Helper | Was | Now |
-|--------|-----|-----|
-| `DataTypeApiHelper.getItems` | `/tree/data-type/item` | `/item/data-type` |
-| `DictionaryApiHelper.getItems` | `/tree/dictionary/item` | `/item/dictionary` |
-| `RelationTypeApiHelper.getItems` | `/relation-type/item` | `/item/relation-type` |
-| `ScriptApiHelper.getItems` | `/tree/script/item` | `/item/script` |
-| `TemplateApiHelper.getItems` | `/tree/template/item` | `/item/template` |
-| `RelationTypeApiHelper.getAllAtRoot` | `/tree/relation-type/root` | `/relation-type` (no tree endpoint exists) |
-| `PublishedCacheApiHelper.getStatus` | `/published-cache/status` | `/published-cache/rebuild/status` |
-| `UserApiHelper.updateCurrentUserPassword` | `/user/change-password/` | `/user/current/change-password` |
-
-Every one of those methods is uncalled by any spec or helper, so **no test outcome changed** — they were dead published API that would 404 for a consumer. That is also why the fix was safe to make without a running instance: nothing could break. Each replacement was taken from `OpenApi.json`, and for the relation-type one the paged list was confirmed to accept the same `skip`/`take` and return the same `{total, items}` shape `itemsOf` expects.
-
-This check is also the practical coverage for thin API wrappers like `ObjectTypesApiHelper` and `PublishedCacheApiHelper`, which no spec exercises: for a two-line method whose whole job is a URL, "does the route exist" is most of the contract.
+Three auth paths never appear there — `security/back-office/revoke`, `/token` and `/login` —
+because OpenIddict middleware serves them rather than an MVC controller. Anything else missing
+from the document means the route moved.
 
 ### Verify a locator against the component, not against a hunch
 
@@ -376,17 +361,26 @@ That last row is the trap: a collection row's name is a `label` attribute whose 
 
 So before converting a locator: find the element under `src/Umbraco.Web.UI.Client/src/packages/`, read its `render()`, and pick the form that matches what it emits. A pre-existing passing usage of the same form on the same element counts as verification too. Where neither is available, leave the substring form alone.
 
-**The cards are converted, and they needed two different forms** — which is the clearest illustration of why this section says to read the component. Three shared locators on `UiBaseLocators` now hold the difference:
+**The cards needed three different forms, and one of them needed two** — the clearest
+illustration of why this section says to read the component. Three shared locators on
+`UiBaseLocators` hold the difference:
 
 | Card | Binds the name as | Locator |
 |------|-------------------|---------|
-| `uui-card-media` | an **attribute** (`name=${item.name}`) | `getMediaCardWithName` → `uui-card-media[name="..."]` |
-| `uui-card-block-type` | a **property** (`.name=`), not reflected | `getBlockTypeCardWithName` → exact text |
-| `uui-card-user` | a **property** (`.name=`), not reflected | `getUserCardWithName` → exact text |
+| `uui-card-media` | `name=` **attribute** in the collection view and on the picked card; `.name=` **property** plus a `title=` attribute in the picker modal | `getMediaCardWithName` → matches **either** `[name="…"]` or `[title="…"]` |
+| `uui-card-block-type` | `.name=` property, not reflected | `getBlockTypeCardWithName` → exact text |
+| `uui-card-user` | `.name=` property, not reflected | `getUserCardWithName` → exact text |
 
-Only the media card can be matched on the attribute. The other two are bound with Lit's `.name=` property syntax and neither component declares `reflect: true`, so **no `name` attribute exists in the DOM at all** — `[name="..."]` there matches nothing and the failure looks like a missing element rather than a wrong locator. Both render `<span title=${name}>${name}</span>` in their shadow root, so exact text is the form that fits.
+The media row is the one that bites. The *same element* is bound differently depending on where
+it is rendered, so an attribute selector verified against the collection view matched nothing in
+the picker — and because the attribute simply was not there, it failed as "element not found",
+which reads like the media is missing rather than like a wrong locator. A passing usage elsewhere
+is not proof for a different context.
 
-Two things made this checkable without a running site: `@umbraco-ui/uui` ships `vscode.html-custom-data.json` and its compiled elements under `node_modules`, which is where the reflection question is answered; and the substring form being replaced already matched that shadow text, which proves the text is reachable, leaving only substring-vs-exact to change.
+The other two set no `name` attribute at all, since neither component declares `reflect: true`.
+Both render `<span title=${name}>${name}</span>` in their shadow root, so exact text fits. The
+reflection question is answerable without a running site: `@umbraco-ui/uui` ships its compiled
+elements and a `vscode.html-custom-data.json` under `node_modules`.
 
 `{hasText: ...}` remains correct for **structural** filtering — narrowing to a group, tab, property or box by its label (`filter({hasText: 'Document permissions'})`). The rule is about entity names, which are the values leftover data collides on.
 
@@ -409,7 +403,11 @@ The residual risk sits with the **127 `create*` helpers that do not ensure first
 
 So the rule that matters is not "unique names" but "clean up anything global" — see the teardown table below.
 
-**A consequence worth knowing before you bisect anything:** because state accumulates, running one spec on your branch and then the same spec on `main` against the *same instance* does not compare the two. The second run inherits whatever the first cleaned up. A permissions test here failed on a branch and passed on `main` that way, and the difference was entirely the order they ran in — re-running the branch afterwards passed in 9 seconds. If you are attributing a failure to a change, restart the instance between the two runs, or run each twice and compare the pairs.
+**A consequence worth knowing before you bisect anything:** because state accumulates, running
+a spec on your branch and then on `main` against the *same instance* compares the order they ran
+in as much as the code — the second run inherits whatever the first cleaned up. Restart between
+the two, or run each twice and compare the pairs.
+
 - Cleanup caveats to be aware of when debugging leftover state: some `ensureNameNotExists` / `recurseChildren` helpers delete only the **first** match, and list fetches use a single large `take` (no pagination) — duplicates or very large trees can leave residue.
 
 ### What actually has to be torn down
@@ -454,7 +452,7 @@ Rules: a new disabled test needs an annotation, and prefer `type: 'issue'` with 
 The two categories that are not really "skipped tests" at all:
 
 - **`todo` (3)** — `ContentWithBlockGrid`/`ContentWithBlockList` "can move blocks in the content" and `User` "can change from grid to table view". The body is `// TODO: Implement it later`. A skipped empty stub asserts nothing and documents nothing; write it or delete it.
-- **`fixme` (17)** — two in `BlockGridEditor` (moving a block between groups, deleting a group) with complete arrange/act/assert bodies, so something once worked and then didn't; both need one run against a current build to decide product bug vs stale test. The other fifteen are `CreatedPackages`, which had been commented out wholesale since the v15 era: uncommenting them changed nothing about what runs, but it moved 15 tests from invisible to countable, which is why the suite total went from 1636 to 1651. Enable them one at a time against a running instance.
+- **`fixme` (17)** — two in `BlockGridEditor` (moving a block between groups, deleting a group) with complete arrange/act/assert bodies, so something once worked and then didn't; both need one run against a current build to decide product bug vs stale test. The other fifteen are `CreatedPackages`, commented out wholesale since the v15 era and now uncommented as annotated fixmes — countable rather than invisible. Enable them one at a time against a running instance.
 
 If a test is off because the *feature* was removed, delete it — a permanent skip is not documentation.
 
@@ -477,62 +475,32 @@ Sub-builders that reference an existing entity (`*AllowedDocumentTypeBuilder`, `
 
 ### Typing the payloads
 
-The builders are the boundary between specs and the Management API, and it used to be an unchecked one: a payload with a misspelled or missing field compiled happily and came back as an opaque 400, which reads as a confusing test failure rather than a compile error.
+The builders are the boundary between specs and the Management API, and it used to be an unchecked one: a payload with a misspelled or missing field compiled happily and came back as an opaque 400, which reads as a confusing test failure rather than a compile error. `lib/builders/types.ts` now declares the payload envelopes.
 
-`lib/builders/types.ts` now declares the payload envelope (`EntityValue`, `EntityReference`, `DataTypeValues`, `DataTypePayload`). These type the **envelope**, not every leaf: a property `value` is genuinely heterogeneous (string, number, nested block structure) so it stays `any`, while the field names and nesting the API requires are checked. That is where the real mistakes are.
+They type the **envelope**, not every leaf — a property `value` is genuinely heterogeneous (string, number, nested block structure) so it stays `any`, while the field names and nesting the API requires are checked. That is where the real mistakes are. The container, property and composition shapes are `ReturnType<typeof buildContainer>` and friends, derived from `BuilderUtils` rather than restated, so there is one definition to change.
 
-`DataTypeBuilder` — the one abstract base, with 36 subclasses — is wired up:
+**The local declaration is what does the work, not the return type.** This is the part that is easy to get wrong, and getting it wrong looks exactly like getting it right:
 
 ```ts
-build(): DataTypePayload
-abstract getValues(): DataTypeValues
+const values: BlockGridBlockConfiguration = {};
+values.allowAtRot = true;   // error: did you mean allowAtRoot?
+
+const values: any = {};     // or an unannotated `= []`, which infers any[]
+values.allowAtRot = true;   // silent, and a return annotation over it changes nothing
 ```
 
-**The part that is easy to get wrong:** annotating the base class alone achieves nothing. Every subclass declared `let values: any[] = []` and pushed into it, so the `any` swallowed the mistake long before it reached the return type — the annotation type-checked and caught precisely zero real errors. The 33 subclasses now declare `const values: DataTypeValues = []`, and with that in place a misspelled `allias:` fails compilation with *"Did you mean to write 'alias'?"*. **An `any` anywhere on the path to `build()` defeats the whole exercise** — so when you touch a builder, check the local the exit returns is declared, not just the exit.
+So when you touch a builder, check the local the exit returns is declared — annotating the exit alone achieves nothing. Two corollaries:
 
-The remaining debt is not in those 33 subclasses — it is in the **sub-builders**, which return an inline object literal or push into a `let values: any = {}`. There a declared return type does do the work: TypeScript's excess-property check fires on a literal in a return position and names the mistake. So paying it off means giving each sub-builder's item shape an interface — not sprinkling annotations on the exits that are already checked.
+- These interfaces have every property **optional**, because the builders emit a field only when it is set.
+- **Bracket assignment is not checked at all** (`values['label'] = …`), because `noImplicitAny` is off under `strict: false`. Use dot access, or the type buys you nothing.
 
-**What is typed now.** `types.ts` carries the payload envelopes: `EntityVariant` and
-`EntityPropertyValue` for the five variant and five value builders; `DocumentPayload`,
-`MediaPayload` and `MemberPayload` for the entity builders; `DocumentTypePayload`,
-`MediaTypePayload` and `MemberTypePayload` for the three content-type builders, sharing
-`ContentTypePayloadBase`. The container, property and composition shapes inside those are
-`ReturnType<typeof buildContainer>` and friends, derived from `BuilderUtils` rather than
-restated, so there is one definition to change.
+**Verify against `OpenApi.json`, not against the neighbouring builder.** `DocumentPayload` was once shared by the document, blueprint and element builders, which hit two different request models — `CreateDocumentRequestModel` requires `template`, the other two have no such field — so the shared type had to make it optional and then could not catch a document that dropped it. Two known divergences remain, both recorded on the types themselves: `MediaTypeBuilder` omits `allowedInLibrary` though its schema requires it, and all three content-type builders send a `folder` that no schema declares.
 
-Two shapes are deliberately not normalised, because the payload is what the suite has always
-sent and changing it wants a running instance rather than a tidy-up: `MemberVariantBuilder`
-sends `name: ''` where the other four send `null`, and `MemberValueBuilder` omits `editorAlias`
-and `entityType` entirely (hence both optional on `EntityPropertyValue`).
+Two payload shapes are deliberately not normalised, because they are what the suite has always sent and changing them wants a running instance: `MemberVariantBuilder` sends `name: ''` where the other four send `null`, and `MemberValueBuilder` omits `editorAlias` and `entityType` (hence both optional on `EntityPropertyValue`).
 
-The sub-builders are done too — block grid, block list, tiptap, TinyMCE, list view, image
-cropper, media picker, user-group permissions — so **`untypedBuilderExit` is a gate now, not
-debt**: a new exit returning an unchecked shape fails the build.
+`: any` is down from 25 to 12. Nine are correct — a property `value` is heterogeneous, and four `let value: any = null` accumulators hold one. Three are exported signatures that ought to narrow but cannot in a minor (§2), so each carries a `TODO (V19)`.
 
-Most of those built their payload conditionally into a `let values: any = {}` and returned it,
-and that is the shape to know, because the fix is not the return type. **The local declaration
-is what does the work.** With `const values: BlockGridBlockConfiguration = {}`, a
-`values.allowAtRot = …` is an error that names the typo; on an `any` local the identical line
-is silent, and a return annotation over it changes nothing. So these interfaces have every
-property optional — the builders emit a field only when it is set — and the local carries the
-type.
-
-One case needed more than an annotation: `TiptapBlockBuilder` assigned with brackets
-(`values['label'] = …`). Bracket assignment is **not** checked, because `noImplicitAny` is off
-under `strict: false`, so it was converted to dot access. Same payload, and the typo in
-`displayInline` it now catches is the kind with a lowercase L in it.
-
-`: any` is down from 25 to 12, and the remaining 12 split two ways. Nine are correct: a
-property `value` is genuinely heterogeneous, and the four `let value: any = null` accumulators
-hold one. Three are exported signatures that ought to narrow — two `withCulture(culture: any)`
-against a sibling that already declares `string | null`, and `withEditorMode(editorMode: any)`
-whose only caller passes `'Classic'` — but §2 forbids changing an exported signature in a
-minor, so each carries a `TODO (V19)` rather than a change.
-
-When you add a sub-builder, follow the same order: declare the shape in `types.ts` with
-optional properties, declare the **local** with it, annotate the exit, then plant a misspelled
-field and confirm `tsc` names it. That last step is not optional — it is the only thing that
-distinguishes typing that works from typing that looks like it does.
+When you add a sub-builder: declare the shape in `types.ts` with optional properties, declare the **local** with it, annotate the exit, then **plant a misspelled field and confirm `tsc` names it**. That last step is not optional — it is the only thing separating typing that works from typing that looks like it does.
 
 ### The bug class to look for in a builder
 
