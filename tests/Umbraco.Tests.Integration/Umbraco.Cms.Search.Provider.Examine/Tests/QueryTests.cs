@@ -27,6 +27,31 @@ public class QueryTests : SearcherTestBase
             });
     }
 
+    // The searcher appends its own wildcard to every term, so a term that already begins with a
+    // wildcard character would otherwise produce a leading-wildcard query, which Lucene rejects.
+    // Such a term carries no text to match on, leaving the query with no text criterion at all.
+    [TestCase("*")]
+    [TestCase("?")]
+    [TestCase("**")]
+    [TestCase("*?*")]
+    public async Task QueryOfOnlyWildcardCharactersContributesNoTextCriterion(string query)
+    {
+        SearchResult result = await SearchAsync(query: query);
+
+        Assert.That(result.Total, Is.EqualTo(100));
+    }
+
+    [TestCase("single1 *")]
+    [TestCase("* single1")]
+    [TestCase("single1 ?")]
+    public async Task WildcardOnlyTermIsIgnoredAlongsideARealTerm(string query)
+    {
+        SearchResult expected = await SearchAsync(query: "single1");
+        SearchResult result = await SearchAsync(query: query);
+
+        Assert.That(result.Total, Is.EqualTo(expected.Total));
+    }
+
     [Test]
     public async Task CanQueryMultipleDocumentsByWildcardQuery()
     {

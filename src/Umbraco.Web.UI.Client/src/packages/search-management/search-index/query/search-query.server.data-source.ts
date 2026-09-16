@@ -24,6 +24,8 @@ export class UmbSearchQueryServerDataSource extends UmbControllerBase {
 					take: request.take ?? 10,
 				},
 			}),
+			// The search box renders the failure inline, next to the query that caused it.
+			{ disableNotifications: true },
 		);
 
 		if (error || !data) {

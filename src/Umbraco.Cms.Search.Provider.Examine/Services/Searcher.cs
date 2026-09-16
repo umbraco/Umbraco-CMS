@@ -132,7 +132,14 @@ public class Searcher : IExamineSearcher
                 //    documents with "whatever" because the wildcard is applied at the end of the query.
                 // to counter for these cases, we split the query into multiple terms and apply wildcard search to each
                 // term with AND grouping.
-                var terms = query.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                // the clauses built below append a wildcard to each term, so a term that already begins with a
+                // wildcard character would yield a leading-wildcard query, which Lucene rejects outright. such a
+                // term carries no text to match on, so drop it rather than fail the whole search.
+                var terms = query
+                    .Split(' ', StringSplitOptions.RemoveEmptyEntries)
+                    .Select(term => term.TrimStart('*', '?'))
+                    .Where(term => term.Length > 0)
+                    .ToArray();
                 foreach (var term in terms)
                 {
                     searchQuery.And().Group(nestedQuery => CreateAggregatedTextQuery(nestedQuery, term, segment));
