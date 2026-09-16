@@ -324,6 +324,47 @@ export class DocumentTypeApiHelper {
     return await this.create(documentType);
   }
 
+  async createDocumentTypeWithMandatoryCultureVaryingPropertyInTwoTabs(documentTypeName: string, dataTypeName: string, dataTypeId: string, tabName: string, secondTabName: string) {
+    const crypto = require('crypto');
+    const tabId = crypto.randomUUID();
+    const secondTabId = crypto.randomUUID();
+    await this.ensureNameNotExists(documentTypeName);
+
+    const documentType = new DocumentTypeBuilder()
+      .withName(documentTypeName)
+      .withAlias(AliasHelper.toAlias(documentTypeName))
+      .withAllowedAsRoot(true)
+      .addContainer()
+        .withName(tabName)
+        .withId(tabId)
+        .withType("Tab")
+        .withSortOrder(0)
+        .done()
+      .addContainer()
+        .withName(secondTabName)
+        .withId(secondTabId)
+        .withType("Tab")
+        .withSortOrder(1)
+        .done()
+      .addProperty()
+        .withContainerId(tabId)
+        .withAlias(AliasHelper.toAlias(dataTypeName))
+        .withName(dataTypeName)
+        .withDataTypeId(dataTypeId)
+        .withVariesByCulture(true)
+        .withMandatory(true)
+        .done()
+      .addProperty()
+        .withContainerId(secondTabId)
+        .withAlias('secondTabPlaceholder')
+        .withName('Second Tab Placeholder')
+        .withDataTypeId(dataTypeId)
+        .done()
+      .withVariesByCulture(true)
+      .build();
+    return await this.create(documentType);
+  }
+
   async createDocumentTypeWithPropertyEditorInTabAndAnotherTab(documentTypeName: string, dataTypeName: string, dataTypeId: string, tabName: string, secondTabName: string, secondTabDataTypeName: string, secondTabDataTypeId: string, groupName: string = "TestGroup", varyByCulture: boolean = false, allowAsRoot: boolean = false) {
     const crypto = require('crypto');
     const tabId = crypto.randomUUID();

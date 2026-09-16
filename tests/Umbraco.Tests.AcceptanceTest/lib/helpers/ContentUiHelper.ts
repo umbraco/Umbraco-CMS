@@ -60,6 +60,7 @@ export class ContentUiHelper extends UiBaseLocators {
   private readonly documentWorkspace: Locator;
   private readonly selectAVariantBtn: Locator;
   private readonly variantAddModeBtn: Locator;
+  private readonly variantRow: Locator;
   private readonly saveAndCloseBtn: Locator;
   private readonly enterNameInContainerTxt: Locator;
   private readonly listView: Locator;
@@ -272,6 +273,7 @@ export class ContentUiHelper extends UiBaseLocators {
       name: "Open version selector",
     });
     this.variantAddModeBtn = page.locator('.switch-button.add-mode').locator('.variant-name');
+    this.variantRow = page.locator('.variant.culture-variant');
     this.saveAndCloseBtn = page.getByLabel('Save and close');
     this.documentTreeItem = page.locator('umb-document-tree-item');
     this.documentLanguageSelect = page.locator('umb-app-language-select');
@@ -1192,6 +1194,11 @@ export class ContentUiHelper extends UiBaseLocators {
   async clickVariantAddModeButtonForLanguageName(language: string) {
     await this.click(this.variantAddModeBtn.getByText(language));
     await this.page.waitForTimeout(ConstantHelper.wait.short);
+  }
+
+  async isVariantErrorHintBadgeVisibleForLanguageName(language: string, isVisible: boolean = true) {
+    const variantRow = this.variantRow.filter({has: this.page.getByText(language, {exact: true})});
+    await this.isVisible(variantRow.locator('umb-badge'), isVisible);
   }
 
   async clickSaveAndCloseButton() {
