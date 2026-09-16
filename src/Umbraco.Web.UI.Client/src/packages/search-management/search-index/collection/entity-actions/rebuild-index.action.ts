@@ -30,13 +30,22 @@ export class UmbSearchRebuildIndexEntityAction extends UmbEntityActionBase<never
 		}
 
 		// Set loading state for collection view (when triggered from collection)
-		const collectionContext = await this.getContext(UMB_COLLECTION_CONTEXT).catch(() => undefined);
-		if (collectionContext instanceof UmbSearchCollectionContext) {
+		const context = await this.getContext(UMB_COLLECTION_CONTEXT).catch(() => undefined);
+		const collectionContext = context instanceof UmbSearchCollectionContext ? context : undefined;
+		if (collectionContext) {
 			collectionContext.setIndexState(this.args.unique, 'loading');
 		}
 
-		// User confirmed - repository handles: notification → API call
-		await this.#repository.rebuildIndex(this.args.unique);
+		try {
+			// User confirmed - repository handles: notification → API call
+			await this.#repository.rebuildIndex(this.args.unique);
+		} catch (error) {
+			// The loading state is normally cleared by the index-rebuild-completed server event, which
+			// never arrives when the request itself failed - so clear it here or it spins indefinitely.
+			workspaceContext?.setState('error');
+			collectionContext?.setIndexState(this.args.unique, 'error');
+			throw error;
+		}
 	}
 }
 
