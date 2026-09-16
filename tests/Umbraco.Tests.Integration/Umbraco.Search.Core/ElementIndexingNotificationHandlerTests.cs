@@ -192,7 +192,8 @@ public class ElementIndexingNotificationHandlerTests : PropertyValueHandlerTests
             ContentIndexingService,
             GetRequiredService<IRelationService>(),
             GetRequiredService<IOptions<IndexingSettings>>(),
-            GetRequiredService<IOriginProvider>());
+            GetRequiredService<IOriginProvider>(),
+            GetRequiredService<IIndexDocumentService>());
 
         Guid[] referencingDocumentKeys = handler.FindDocumentKeysReferencingElements([leafElement.Id]);
 

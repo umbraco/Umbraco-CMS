@@ -35,6 +35,7 @@ internal sealed class ElementIndexingNotificationHandler : IndexingNotificationH
     private readonly IRelationService _relationService;
     private readonly IOptions<IndexingSettings> _indexingSettings;
     private readonly IOriginProvider _originProvider;
+    private readonly IIndexDocumentService _indexDocumentService;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ElementIndexingNotificationHandler"/> class.
@@ -44,18 +45,21 @@ internal sealed class ElementIndexingNotificationHandler : IndexingNotificationH
     /// <param name="relationService">The service used to traverse element-to-document and element-to-element references.</param>
     /// <param name="indexingSettings">The indexing settings, used to determine whether external element content is indexed at all.</param>
     /// <param name="originProvider">The provider used to determine the current server's origin.</param>
+    /// <param name="indexDocumentService">The service used to flush the change-detection cache for affected documents.</param>
     public ElementIndexingNotificationHandler(
         ICoreScopeProvider coreScopeProvider,
         IContentIndexingService contentIndexingService,
         IRelationService relationService,
         IOptions<IndexingSettings> indexingSettings,
-        IOriginProvider originProvider)
+        IOriginProvider originProvider,
+        IIndexDocumentService indexDocumentService)
         : base(coreScopeProvider)
     {
         _contentIndexingService = contentIndexingService;
         _relationService = relationService;
         _indexingSettings = indexingSettings;
         _originProvider = originProvider;
+        _indexDocumentService = indexDocumentService;
     }
 
     /// <summary>
@@ -104,7 +108,16 @@ internal sealed class ElementIndexingNotificationHandler : IndexingNotificationH
             .ToArray();
 
         var origin = _originProvider.GetCurrent();
-        ExecuteDeferred(() => _contentIndexingService.Handle(changes, origin));
+        ExecuteDeferred(() =>
+        {
+            // the referencing documents' own content is unchanged, so their persisted index document snapshots are
+            // still in the change-detection cache - without flushing them first, the reindex below would just find
+            // and re-use the stale snapshot instead of re-collecting property values (see IIndexDocumentService).
+            // This has to wait until the ambient scope completes, same as the reindex call itself - running it
+            // eagerly, while the triggering save/publish request's own scope is still open, deadlocks.
+            _indexDocumentService.DeleteAsync(documentKeys, true).GetAwaiter().GetResult();
+            _contentIndexingService.Handle(changes, origin);
+        });
     }
 
     // Breadth-first traversal of the "umbExternalBlockElement" relation graph: a changed element can be referenced

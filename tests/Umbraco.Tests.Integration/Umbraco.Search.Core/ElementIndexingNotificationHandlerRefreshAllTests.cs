@@ -90,7 +90,8 @@ public class ElementIndexingNotificationHandlerRefreshAllTests : PropertyValueHa
             ContentIndexingService,
             GetRequiredService<IRelationService>(),
             GetRequiredService<IOptions<IndexingSettings>>(),
-            GetRequiredService<IOriginProvider>());
+            GetRequiredService<IOriginProvider>(),
+            GetRequiredService<IIndexDocumentService>());
         handler.Handle(notification);
 
         AssertPublishedBlocksTextsContain("Updated text");
