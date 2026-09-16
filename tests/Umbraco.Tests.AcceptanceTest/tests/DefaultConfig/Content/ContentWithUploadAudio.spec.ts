@@ -112,24 +112,9 @@ test('can remove an audio file in the content', async ({umbracoApi, umbracoUi}) 
   expect(contentData.values).toEqual([]);
 });
 
-test('cannot upload a file with a disallowed extension', async ({umbracoApi, umbracoUi}) => {
-  // Arrange
-  const dataTypeId = await umbracoApi.dataType.createUploadDataType(customDataTypeName, ['mp3']);
-  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, dataTypeId);
-  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
-  await umbracoUi.goToBackOffice();
-  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
-
-  // Act
-  await umbracoUi.content.goToContentWithName(contentName);
-  await umbracoUi.content.uploadFile(uploadFilePath + 'File.txt');
-  await umbracoUi.content.isInputDropzoneVisible(true);
-  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
-
-  // Assert
-  const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values).toEqual([]);
-});
+// Disallowed-extension rejection is a generic Upload-editor mechanism, covered once in
+// ContentWithUploadFile.spec.ts and once in ContentWithUploadVectorGraphics.spec.ts (SVG's allowlist
+// also matters for XSS, not just UX) - identical here, so not duplicated for every upload variant.
 
 test('can not publish a mandatory upload audio with an empty value', async ({umbracoApi, umbracoUi}) => {
   // Arrange
