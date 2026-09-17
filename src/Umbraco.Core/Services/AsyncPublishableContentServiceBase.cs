@@ -801,7 +801,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
     }
 
     /// <inheritdoc />
-    public PublishResult SaveAndPublish(TContent content, string[] culturesToPublish, int userId = Constants.Security.SuperUserId)
+    public async Task<PublishResult> SaveAndPublishAsync(TContent content, string[] culturesToPublish, Guid userKey, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(content);
         ArgumentNullException.ThrowIfNull(culturesToPublish);
@@ -832,18 +832,20 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
             }
 
             // doesn't vary; publish the invariant culture in a single scope alongside the save
-            return SaveAndPublish(content, userId: userId);
+            return await SaveAndPublishAsync(content, "*", userKey, cancellationToken);
         }
+
+        int userId = await _userIdKeyResolver.GetAsync(userKey);
 
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.WriteLock(WriteLockIds);
 
-        var allLangs = _languageRepository.GetAllAsync(CancellationToken.None).GetAwaiter().GetResult().ToList();
+        var allLangs = (await _languageRepository.GetAllAsync(cancellationToken)).ToList();
 
         EventMessages evtMsgs = EventMessagesFactory.Get();
 
         SavingNotification<TContent> savingNotification = SavingNotification(content, evtMsgs);
-        if (scope.Notifications.PublishCancelable(savingNotification))
+        if (await scope.Notifications.PublishCancelableAsync(savingNotification))
         {
             return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, content);
         }
@@ -858,12 +860,12 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
             content.PublishCulture(impact, DateTime.UtcNow, _propertyEditorCollection);
         }
 
-        PublishResult result = CommitContentChangesInternal(scope, content, evtMsgs, allLangs, savingNotification.State, userId, raiseSavedNotification: true);
+        PublishResult result = await CommitContentChangesInternalAsync(scope, content, evtMsgs, allLangs, savingNotification.State, userId, cancellationToken, raiseSavedNotification: true);
         scope.Complete();
         return result;
     }
 
-    private PublishResult SaveAndPublish(TContent content, string culture = "*", int userId = Constants.Security.SuperUserId)
+    private async Task<PublishResult> SaveAndPublishAsync(TContent content, string culture, Guid userKey, CancellationToken cancellationToken)
     {
         EventMessages evtMsgs = EventMessagesFactory.Get();
 
@@ -889,15 +891,17 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
 
         EnsureNameLengthIsValid(content);
 
+        int userId = await _userIdKeyResolver.GetAsync(userKey);
+
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.WriteLock(WriteLockIds);
 
-        var allLangs = _languageRepository.GetAllAsync(CancellationToken.None).GetAwaiter().GetResult().ToList();
+        var allLangs = (await _languageRepository.GetAllAsync(cancellationToken)).ToList();
 
         // Change state to publishing
         content.PublishedState = PublishedState.Publishing;
         SavingNotification<TContent> savingNotification = SavingNotification(content, evtMsgs);
-        if (scope.Notifications.PublishCancelable(savingNotification))
+        if (await scope.Notifications.PublishCancelableAsync(savingNotification))
         {
             return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, content);
         }
@@ -909,7 +913,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
         // we don't care about the response here, this response will be rechecked below but we need to set the culture info values now.
         content.PublishCulture(impact, DateTime.UtcNow, _propertyEditorCollection);
 
-        PublishResult result = CommitContentChangesInternal(scope, content, evtMsgs, allLangs, savingNotification.State, userId, raiseSavedNotification: true);
+        PublishResult result = await CommitContentChangesInternalAsync(scope, content, evtMsgs, allLangs, savingNotification.State, userId, cancellationToken, raiseSavedNotification: true);
         scope.Complete();
         return result;
     }
@@ -1673,7 +1677,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
     ///     </para>
     /// </remarks>
     // TODO (V19): remove CommitContentChangesInternal (the sync method) and this remark once every caller
-    // of the sync engine (SaveAndPublish, PerformScheduledPublish) has an async equivalent.
+    // of the sync engine (PerformScheduledPublish) has an async equivalent.
     protected async Task<PublishResult> CommitContentChangesInternalAsync(
         ICoreScope scope,
         TContent content,

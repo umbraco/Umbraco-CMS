@@ -368,8 +368,7 @@ internal sealed class ContentEditingService
     {
         try
         {
-            var currentUserId = await GetUserIdAsync(userKey);
-            PublishResult publishResult = ContentService.SaveAndPublish(content, culturesToPublish, userId: currentUserId);
+            PublishResult publishResult = await ContentService.SaveAndPublishAsync(content, culturesToPublish, userKey, CancellationToken.None);
             if (publishResult.Success)
             {
                 return ContentEditingOperationStatus.Success;

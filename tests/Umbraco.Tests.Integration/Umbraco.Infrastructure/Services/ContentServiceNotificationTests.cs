@@ -469,7 +469,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Read_Saved_Notification_When_Save_And_Publishing_Invariant()
+    public async Task Can_Read_Saved_Notification_When_Save_And_Publishing_Invariant()
     {
         // A combined save-and-publish must still raise the paired Saved notification, just like a plain Save does
         // (https://github.com/umbraco/Umbraco-CMS/issues/23523).
@@ -496,7 +496,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
 
         try
         {
-            var result = ContentService.SaveAndPublish(document, []);
+            var result = await ContentService.SaveAndPublishAsync(document, [], Constants.Security.SuperUserKey, CancellationToken.None);
             Assert.IsTrue(result.Success);
             Assert.IsTrue(savingWasCalled);
             Assert.IsTrue(savedWasCalled, "ContentSavedNotification should fire when saving and publishing.");
@@ -546,7 +546,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
 
         try
         {
-            var result = ContentService.SaveAndPublish(document, ["en-US", "fr-FR"]);
+            var result = await ContentService.SaveAndPublishAsync(document, ["en-US", "fr-FR"], Constants.Security.SuperUserKey, CancellationToken.None);
             Assert.IsTrue(result.Success);
             Assert.IsTrue(savedWasCalled, "ContentSavedNotification should fire when saving and publishing.");
         }
@@ -606,7 +606,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
 
         try
         {
-            var result = ContentService.SaveAndPublish(document, ["en-US"]);
+            var result = await ContentService.SaveAndPublishAsync(document, ["en-US"], Constants.Security.SuperUserKey, CancellationToken.None);
             Assert.IsTrue(result.Success);
             Assert.IsTrue(savedWasCalled, "ContentSavedNotification should fire when saving and publishing.");
             Assert.IsTrue(publishedWasCalled, "ContentPublishedNotification should fire when saving and publishing.");
