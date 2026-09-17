@@ -13,10 +13,12 @@ import {
 	UMB_WORKSPACE_EDIT_PATH_PATTERN,
 	UMB_WORKSPACE_EDIT_VARIANT_PATH_PATTERN,
 } from '@umbraco-cms/backoffice/workspace';
-import { linkEntityExpansionEntries } from '@umbraco-cms/backoffice/utils';
+import { debounce, linkEntityExpansionEntries } from '@umbraco-cms/backoffice/utils';
 import { UMB_MODAL_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UMB_SECTION_CONTEXT } from '@umbraco-cms/backoffice/section';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
+import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 
 interface UmbMenuVariantTreeStructureWorkspaceContextBaseArgs {
 	treeRepositoryAlias: string;
@@ -41,6 +43,11 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 	#isNew: boolean | undefined = undefined;
 	#variantWorkspaceContext?: typeof UMB_VARIANT_WORKSPACE_CONTEXT.TYPE;
 	#workspaceActiveVariantId?: UmbVariantId;
+	#actionEventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
+	#structureRequestId = 0;
+
+	// Coalesces the unique/isNew/reload-event triggers when they fire in quick succession.
+	#requestStructure = debounce(() => this.#requestStructureImpl(), 100);
 
 	public readonly IS_MENU_VARIANT_STRUCTURE_WORKSPACE_CONTEXT = true;
 
@@ -50,6 +57,12 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 
 		this.consumeContext(UMB_MODAL_CONTEXT, (modalContext) => {
 			this.#isModalContext = modalContext !== undefined;
+		});
+
+		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (instance) => {
+			this.#removeEventListeners();
+			this.#actionEventContext = instance;
+			this.#addEventListeners();
 		});
 
 		this.consumeContext(UMB_SECTION_CONTEXT, (instance) => {
@@ -72,6 +85,8 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 				this.#workspaceContext?.unique,
 				(value) => {
 					if (!value) return;
+					// Clear immediately so the previous entity's breadcrumb/structure isn't shown while the new one loads.
+					this.#clearStructure();
 					this.#requestStructure();
 				},
 				'observeUnique',
@@ -123,7 +138,37 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 		});
 	}
 
-	async #requestStructure() {
+	#addEventListeners() {
+		this.#actionEventContext?.addEventListener(
+			UmbRequestReloadStructureForEntityEvent.TYPE,
+			this.#onReloadStructureForEntityRequest as EventListener,
+		);
+	}
+
+	#removeEventListeners() {
+		this.#actionEventContext?.removeEventListener(
+			UmbRequestReloadStructureForEntityEvent.TYPE,
+			this.#onReloadStructureForEntityRequest as EventListener,
+		);
+	}
+
+	#onReloadStructureForEntityRequest = (event: UmbRequestReloadStructureForEntityEvent) => {
+		if (!this.#isCurrentEntityOrAncestor(event.getEntityType(), event.getUnique())) return;
+		this.#requestStructure();
+	};
+
+	#isCurrentEntityOrAncestor(entityType: string, unique: string | null): boolean {
+		if (entityType === this.#workspaceContext?.getEntityType() && unique === this.#workspaceContext?.getUnique()) {
+			return true;
+		}
+
+		return this.#ancestorContext
+			.getAncestors()
+			.some((ancestor) => ancestor.entityType === entityType && ancestor.unique === unique);
+	}
+
+	async #requestStructureImpl() {
+		const requestId = ++this.#structureRequestId;
 		const isNew = this.#workspaceContext?.getIsNew();
 		const uniqueObservable = isNew
 			? this.#workspaceContext?._internal_createUnderParentEntityUnique
@@ -187,6 +232,9 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 			// (e.g. a condition such as IS_NOT_TRASHED flips before the API response arrives).
 			if (!this._host) return;
 
+			// Guard: a newer request has superseded this one; its result would already be stale.
+			if (requestId !== this.#structureRequestId) return;
+
 			this.#structure.setValue(structureItems);
 			this.#setParentData(structureItems);
 			this.#setAncestorData(data);
@@ -196,6 +244,12 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 				this.#expandSectionSidebarMenu(structureItems, menuItemAlias);
 			}
 		}
+	}
+
+	#clearStructure() {
+		this.#structure.setValue([]);
+		this.#parentContext.setParent(undefined);
+		this.#ancestorContext.setAncestors([]);
 	}
 
 	#setParentData(structureItems: Array<UmbVariantStructureItemModel>) {
@@ -260,6 +314,8 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 	}
 
 	override destroy(): void {
+		this.#requestStructure.cancel();
+		this.#removeEventListeners();
 		super.destroy();
 		this.#structure.destroy();
 		this.#parentContext.destroy();

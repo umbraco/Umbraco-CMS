@@ -310,6 +310,7 @@
     dictionary: '/umbraco/management/api/v1/dictionary',
     dictionaryImport: '/umbraco/management/api/v1/dictionary/import',
     language: '/umbraco/management/api/v1/language',
+    logViewerSavedSearch: '/umbraco/management/api/v1/log-viewer/saved-search',
     media: '/umbraco/management/api/v1/media',
     mediaType: '/umbraco/management/api/v1/media-type',
     memberType: '/umbraco/management/api/v1/member-type',

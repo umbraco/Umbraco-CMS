@@ -171,13 +171,14 @@ public class TouchServerJobTests
     public async Task Falls_Back_And_Warns_When_TouchTimeout_Invalid()
     {
         // A non-positive timeout is misconfiguration; the job should warn and fall back to a sane default
-        // rather than treating every touch as immediately timed out.
+        // rather than treating every touch as immediately timed out. Validation happens per-attempt (inside
+        // BoundedServerTouch), so the warning is only logged once the job actually runs.
         var sut = CreateTouchServerTask(touchTimeout: TimeSpan.Zero);
-
-        VerifyWarningLogged();
 
         // The fallback timeout is generous, so a normal (fast) touch still completes successfully.
         await sut.RunJobAsync(CancellationToken.None);
+
+        VerifyWarningLogged();
         VerifyServerTouched();
     }
 

@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Api.Management.ViewModels.Media.Item;
 /// <summary>
 /// Represents a response model containing details of a media item returned by the Management API.
 /// </summary>
-public class MediaItemResponseModel : ItemResponseModelBase
+public class MediaItemResponseModel : ItemResponseModelBase, IHasChildren
 {
     /// <summary>
     /// Gets or sets a value indicating whether the media item is trashed.
@@ -19,9 +19,7 @@ public class MediaItemResponseModel : ItemResponseModelBase
     /// </summary>
     public ReferenceByIdModel? Parent { get; set; }
 
-    /// <summary>
-    /// Gets or sets a value indicating whether this media item has any child items.
-    /// </summary>
+    /// <inheritdoc />
     public bool HasChildren { get; set; }
 
     /// <summary>
