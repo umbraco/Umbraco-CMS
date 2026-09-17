@@ -171,6 +171,14 @@ public interface IAsyncPublishableContentService<TContent> : IAsyncContentServic
     Task<PublishResult> SaveAndPublishAsync(TContent content, string[] culturesToPublish, Guid userKey, CancellationToken cancellationToken);
 
     /// <summary>
+    ///     Publishes and unpublishes scheduled content.
+    /// </summary>
+    /// <param name="date">The date to use for determining scheduled actions.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>The publish results.</returns>
+    Task<IEnumerable<PublishResult>> PerformScheduledPublishAsync(DateTime date, CancellationToken cancellationToken);
+
+    /// <summary>
     ///     Gets a version of content.
     /// </summary>
     /// <remarks>

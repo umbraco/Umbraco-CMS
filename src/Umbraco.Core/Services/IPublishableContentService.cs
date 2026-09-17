@@ -42,10 +42,6 @@ public interface IPublishableContentService<TContent> : IContentServiceBase
     // Rollback(int, int, string, int) has been retired from this interface in favour of the async
     // RollbackAsync (declared on IAsyncPublishableContentService<TContent>).
 
-    /// <summary>
-    ///     Publishes and unpublishes scheduled content.
-    /// </summary>
-    /// <param name="date">The date to use for determining scheduled actions.</param>
-    /// <returns>The publish results.</returns>
-    IEnumerable<PublishResult> PerformScheduledPublish(DateTime date);
+    // PerformScheduledPublish(DateTime) has been retired from this interface in favour of the async
+    // PerformScheduledPublishAsync (declared on IAsyncPublishableContentService<TContent>).
 }

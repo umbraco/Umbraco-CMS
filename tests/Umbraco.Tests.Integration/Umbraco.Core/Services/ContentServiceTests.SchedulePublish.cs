@@ -67,7 +67,7 @@ internal sealed partial class ContentServiceTests
         // Note: The base class (UmbracoIntegrationTestWithContent) creates a Subpage with a past
         // release schedule, so more than one result may be returned.
         var publishDate = _schedulePublishDate.AddMinutes(1);
-        var docResults = ContentService.PerformScheduledPublish(publishDate).ToList();
+        var docResults = (await ContentService.PerformScheduledPublishAsync(publishDate, CancellationToken.None)).ToList();
         Assert.IsNotEmpty(docResults, "Document scheduled publishing should process at least one document");
 
         // Verify the element schedule is still intact after document scheduled publishing ran
@@ -137,7 +137,7 @@ internal sealed partial class ContentServiceTests
 
         // Run scheduled publishing for documents - should only process document schedules
         var unpublishDate = _scheduleUnPublishDate.AddMinutes(1);
-        var docResults = ContentService.PerformScheduledPublish(unpublishDate).ToList();
+        var docResults = (await ContentService.PerformScheduledPublishAsync(unpublishDate, CancellationToken.None)).ToList();
         Assert.IsNotEmpty(docResults, "Document scheduled publishing should process at least one document");
 
         // Verify the element expiration schedule is still intact

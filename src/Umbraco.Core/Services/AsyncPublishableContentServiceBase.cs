@@ -1048,32 +1048,33 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
     }
 
     /// <inheritdoc />
-    public IEnumerable<PublishResult> PerformScheduledPublish(DateTime date)
+    public async Task<IEnumerable<PublishResult>> PerformScheduledPublishAsync(DateTime date, CancellationToken cancellationToken)
     {
-        // TODO: Await this properly when adjusting this service to our new EF Core approach.
-        var allLangs = new Lazy<List<ILanguage>>(() => _languageRepository.GetAllAsync(CancellationToken.None).GetAwaiter().GetResult().ToList());
+        // Lazy, and shared by both helpers: the languages are fetched at most once per call, and not at all
+        // when neither helper finds anything scheduled.
+        var allLangs = new Lazy<Task<List<ILanguage>>>(async () => (await _languageRepository.GetAllAsync(cancellationToken)).ToList());
         EventMessages evtMsgs = EventMessagesFactory.Get();
         var results = new List<PublishResult>();
 
-        PerformScheduledPublishingRelease(date, results, evtMsgs, allLangs);
-        PerformScheduledPublishingExpiration(date, results, evtMsgs, allLangs);
+        await PerformScheduledPublishingReleaseAsync(date, results, evtMsgs, allLangs, cancellationToken);
+        await PerformScheduledPublishingExpirationAsync(date, results, evtMsgs, allLangs, cancellationToken);
 
         return results;
     }
 
-    private void PerformScheduledPublishingExpiration(DateTime date, List<PublishResult> results, EventMessages evtMsgs, Lazy<List<ILanguage>> allLangs)
+    private async Task PerformScheduledPublishingExpirationAsync(DateTime date, List<PublishResult> results, EventMessages evtMsgs, Lazy<Task<List<ILanguage>>> allLangs, CancellationToken cancellationToken)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
         // do a fast read without any locks since this executes often to see if we even need to proceed
-        if (_contentRepository.HasContentForExpiration(date))
+        if (await _asyncContentRepository.HasContentForExpirationAsync(date, cancellationToken))
         {
             // now take a write lock since we'll be updating
             scope.WriteLock(WriteLockIds);
 
-            foreach (TContent d in _contentRepository.GetContentForExpiration(date))
+            foreach (TContent d in await _asyncContentRepository.GetContentForExpirationAsync(date, cancellationToken))
             {
-                ContentScheduleCollection contentSchedule = _contentRepository.GetContentSchedule(d.Id);
+                ContentScheduleCollection contentSchedule = await _asyncContentRepository.GetContentScheduleAsync(d.Key, cancellationToken);
                 if (d.ContentType.VariesByCulture())
                 {
                     // find which cultures have pending schedules
@@ -1088,7 +1089,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
                     }
 
                     SavingNotification<TContent> savingNotification = SavingNotification(d, evtMsgs);
-                    if (scope.Notifications.PublishCancelable(savingNotification))
+                    if (await scope.Notifications.PublishCancelableAsync(savingNotification))
                     {
                         results.Add(new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, d));
                         continue;
@@ -1103,8 +1104,8 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
                         d.UnpublishCulture(c);
                     }
 
-                    _contentRepository.PersistContentSchedule(d, contentSchedule);
-                    PublishResult result = CommitContentChanges(scope, d, evtMsgs, allLangs.Value, savingNotification.State, d.WriterId);
+                    await _asyncContentRepository.PersistContentScheduleAsync(d, contentSchedule, cancellationToken);
+                    PublishResult result = await CommitContentChangesAsync(scope, d, evtMsgs, await allLangs.Value, savingNotification.State, d.WriterId, cancellationToken);
                     if (result.Success == false)
                     {
                         Logger.LogError(null, "Failed to publish content id={ContentId}, reason={Reason}.", d.Id, result.Result);
@@ -1116,13 +1117,11 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
                 {
                     // Clear this schedule for this culture
                     contentSchedule.Clear(ContentScheduleAction.Expire, date);
-                    _contentRepository.PersistContentSchedule(d, contentSchedule);
+                    await _asyncContentRepository.PersistContentScheduleAsync(d, contentSchedule, cancellationToken);
 
-                    // PerformScheduledPublish is still sync - block on the async engine here rather than
-                    // duplicating its logic, until this method gets its own async conversion. Uses the
-                    // int-userId overload directly: WriterId is passed through as-is, with no Guid round
-                    // trip that would be lossy for a writer id with no matching user.
-                    PublishResult result = UnpublishAsync(d, "*", d.WriterId, CancellationToken.None).GetAwaiter().GetResult();
+                    // Uses the int-userId overload directly: WriterId is passed through as-is, with no Guid
+                    // round trip that would be lossy for a writer id with no matching user.
+                    PublishResult result = await UnpublishAsync(d, "*", d.WriterId, cancellationToken);
                     if (result.Success == false)
                     {
                         Logger.LogError(null, "Failed to unpublish content id={ContentId}, reason={Reason}.", d.Id, result.Result);
@@ -1132,25 +1131,25 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
                 }
             }
 
-            _contentRepository.ClearSchedule(date, ContentScheduleAction.Expire);
+            await _asyncContentRepository.ClearScheduleAsync(date, ContentScheduleAction.Expire, cancellationToken);
         }
 
         scope.Complete();
     }
 
-    private void PerformScheduledPublishingRelease(DateTime date, List<PublishResult> results, EventMessages evtMsgs, Lazy<List<ILanguage>> allLangs)
+    private async Task PerformScheduledPublishingReleaseAsync(DateTime date, List<PublishResult> results, EventMessages evtMsgs, Lazy<Task<List<ILanguage>>> allLangs, CancellationToken cancellationToken)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
         // do a fast read without any locks since this executes often to see if we even need to proceed
-        if (_contentRepository.HasContentForRelease(date))
+        if (await _asyncContentRepository.HasContentForReleaseAsync(date, cancellationToken))
         {
             // now take a write lock since we'll be updating
             scope.WriteLock(WriteLockIds);
 
-            foreach (TContent d in _contentRepository.GetContentForRelease(date))
+            foreach (TContent d in await _asyncContentRepository.GetContentForReleaseAsync(date, cancellationToken))
             {
-                ContentScheduleCollection contentSchedule = _contentRepository.GetContentSchedule(d.Id);
+                ContentScheduleCollection contentSchedule = await _asyncContentRepository.GetContentScheduleAsync(d.Key, cancellationToken);
                 if (d.ContentType.VariesByCulture())
                 {
                     // find which cultures have pending schedules
@@ -1164,7 +1163,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
                         continue; // shouldn't happen but no point in processing this content if there's nothing there
                     }
                     SavingNotification<TContent> savingNotification = SavingNotification(d, evtMsgs);
-                    if (scope.Notifications.PublishCancelable(savingNotification))
+                    if (await scope.Notifications.PublishCancelableAsync(savingNotification))
                     {
                         results.Add(new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, d));
                         continue;
@@ -1184,7 +1183,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
 
                         // publish the culture values and validate the property values, if validation fails, log the invalid properties so the develeper has an idea of what has failed
                         IProperty[]? invalidProperties = null;
-                        CultureImpact impact = _cultureImpactFactory.ImpactExplicit(culture, IsDefaultCulture(allLangs.Value, culture));
+                        CultureImpact impact = _cultureImpactFactory.ImpactExplicit(culture, IsDefaultCulture(await allLangs.Value, culture));
                         var tryPublish = d.PublishCulture(impact, date, _propertyEditorCollection) &&
                                          _propertyValidationService.Value.IsPropertyDataValid(d, out invalidProperties, impact);
                         if (invalidProperties != null && invalidProperties.Length > 0)
@@ -1214,8 +1213,8 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
                     }
                     else
                     {
-                        _contentRepository.PersistContentSchedule(d, contentSchedule);
-                        result = CommitContentChanges(scope, d, evtMsgs, allLangs.Value, savingNotification.State, d.WriterId);
+                        await _asyncContentRepository.PersistContentScheduleAsync(d, contentSchedule, cancellationToken);
+                        result = await CommitContentChangesAsync(scope, d, evtMsgs, await allLangs.Value, savingNotification.State, d.WriterId, cancellationToken);
                     }
 
                     if (result.Success == false)
@@ -1238,14 +1237,12 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
                     }
                     else
                     {
-                        _contentRepository.PersistContentSchedule(d, contentSchedule);
+                        await _asyncContentRepository.PersistContentScheduleAsync(d, contentSchedule, cancellationToken);
 
-                        // PerformScheduledPublish is still sync - block on the async engine here rather
-                        // than duplicating its logic, until this method gets its own async conversion.
-                        // Uses the int-userId overload directly, matching the CommitContentChanges calls
-                        // elsewhere in this method: WriterId is passed through as-is, with no Guid round
-                        // trip that would be lossy for a writer id with no matching user.
-                        result = PublishAsync(d, d.AvailableCultures.ToArray(), d.WriterId, CancellationToken.None).GetAwaiter().GetResult();
+                        // Uses the int-userId overload directly, matching the CommitContentChangesAsync calls
+                        // elsewhere in this method: WriterId is passed through as-is, with no Guid round trip
+                        // that would be lossy for a writer id with no matching user.
+                        result = await PublishAsync(d, d.AvailableCultures.ToArray(), d.WriterId, cancellationToken);
                     }
 
                     if (result.Success == false)
@@ -1257,7 +1254,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
                 }
             }
 
-            _contentRepository.ClearSchedule(date, ContentScheduleAction.Release);
+            await _asyncContentRepository.ClearScheduleAsync(date, ContentScheduleAction.Release, cancellationToken);
         }
 
         scope.Complete();

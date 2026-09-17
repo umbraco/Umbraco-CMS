@@ -105,6 +105,11 @@ public class ElementService : PublishableContentServiceBase<IElement>, IElementS
     }
 
     /// <inheritdoc />
+    // No async repository exists for elements yet - bridges to the existing synchronous scheduled-publishing engine.
+    public Task<IEnumerable<PublishResult>> PerformScheduledPublishAsync(DateTime date, CancellationToken cancellationToken)
+        => Task.FromResult(PerformScheduledPublish(date));
+
+    /// <inheritdoc />
     // No async repository exists for elements yet - bridges to the existing synchronous Rollback engine.
     public Task<Attempt<ContentRollbackOperationStatus>> RollbackAsync(Guid key, int versionId, string culture, Guid userKey, CancellationToken cancellationToken)
     {

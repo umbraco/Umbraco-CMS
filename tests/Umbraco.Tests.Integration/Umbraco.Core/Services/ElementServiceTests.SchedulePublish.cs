@@ -65,7 +65,7 @@ public partial class ElementServiceTests
 
         // Run scheduled publishing for elements - should only process element schedules
         var publishDate = _schedulePublishDate.AddMinutes(1);
-        var elementResults = ElementService.PerformScheduledPublish(publishDate).ToList();
+        var elementResults = (await ElementService.PerformScheduledPublishAsync(publishDate, CancellationToken.None)).ToList();
         Assert.AreEqual(1, elementResults.Count, "Element scheduled publishing should process one element");
         Assert.IsTrue(elementResults[0].Success, $"Element scheduled publish should succeed, got: {elementResults[0].Result}");
 
@@ -136,7 +136,7 @@ public partial class ElementServiceTests
 
         // Run scheduled publishing for elements - should only process element schedules
         var unpublishDate = _scheduleUnPublishDate.AddMinutes(1);
-        var elementResults = ElementService.PerformScheduledPublish(unpublishDate).ToList();
+        var elementResults = (await ElementService.PerformScheduledPublishAsync(unpublishDate, CancellationToken.None)).ToList();
         Assert.AreEqual(1, elementResults.Count, "Element scheduled unpublishing should process one element");
         Assert.IsTrue(elementResults[0].Success, $"Element scheduled unpublish should succeed, got: {elementResults[0].Result}");
 

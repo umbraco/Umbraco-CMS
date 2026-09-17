@@ -1217,7 +1217,11 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         }
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    ///     Publishes and unpublishes scheduled content.
+    /// </summary>
+    /// <param name="date">The date to use for determining scheduled actions.</param>
+    /// <returns>The publish results.</returns>
     public IEnumerable<PublishResult> PerformScheduledPublish(DateTime date)
     {
         // TODO: Await this properly when adjusting this service to our new EF Core approach.

@@ -515,8 +515,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
             variant.Add(c);
         }
 
-        var runSched = ContentService.PerformScheduledPublish(
-            now.AddMinutes(1)).ToList(); // process anything scheduled before a minute from now
+        var runSched = (await ContentService.PerformScheduledPublishAsync(now.AddMinutes(1), CancellationToken.None)).ToList(); // process anything scheduled before a minute from now
 
         // this is 21 because the test data installed before this test runs has a scheduled item!
         Assert.AreEqual(21, runSched.Count);
@@ -543,8 +542,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
             string.Join(Environment.NewLine, runSched.Select(x => $"{x.Entity.Name} - {x.Result}")));
 
         // re-run the scheduled publishing, there should be no results
-        runSched = ContentService.PerformScheduledPublish(
-            now.AddMinutes(1)).ToList();
+        runSched = (await ContentService.PerformScheduledPublishAsync(now.AddMinutes(1), CancellationToken.None)).ToList();
 
         Assert.AreEqual(0, runSched.Count);
     }
@@ -570,7 +568,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         }
 
         // Act
-        var results = ContentService.PerformScheduledPublish(now.AddMinutes(1)).ToList();
+        var results = (await ContentService.PerformScheduledPublishAsync(now.AddMinutes(1), CancellationToken.None)).ToList();
 
         // Assert - the release itself must succeed; a version with no known writer is not a reason to fail
         // the publish, and it must not be silently re-attributed to the super user either.
@@ -608,7 +606,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
                 content.Id);
         }
 
-        var results = ContentService.PerformScheduledPublish(now.AddMinutes(1)).ToList();
+        var results = (await ContentService.PerformScheduledPublishAsync(now.AddMinutes(1), CancellationToken.None)).ToList();
 
         // The expiration must succeed; a version with no known writer is not a reason to fail the
         // unpublish, and it must not be silently re-attributed to the super user either.
