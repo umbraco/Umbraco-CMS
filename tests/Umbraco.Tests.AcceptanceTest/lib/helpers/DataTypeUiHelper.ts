@@ -1158,8 +1158,10 @@ export class DataTypeUiHelper extends UiBaseLocators {
       (inputs, groupName) => inputs.findIndex((input) => (input as HTMLInputElement).value === groupName),
       name,
     );
-    // A not-found name gives index -1; avoid that and verify the match below instead.
-    const group = this.blockGroups.nth(Math.max(index, 0));
+    if (index === -1) {
+      throw new Error(`No block group found with name '${name}'`);
+    }
+    const group = this.blockGroups.nth(index);
     await expect(group.getByRole('textbox')).toHaveValue(name);
     return group;
   }

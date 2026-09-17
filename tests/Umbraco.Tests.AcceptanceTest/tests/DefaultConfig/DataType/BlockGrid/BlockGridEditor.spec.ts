@@ -5,6 +5,7 @@ const blockGridEditorName = 'TestBlockGridEditor';
 const elementTypeName = 'BlockGridElement';
 const dataTypeName = 'Textstring';
 const groupName = 'testGroup';
+const stylesheetName = 'TestStylesheet.css';
 
 test.beforeEach(async ({umbracoUi, umbracoApi}) => {
   await umbracoApi.dataType.ensureNameNotExists(blockGridEditorName);
@@ -15,6 +16,7 @@ test.beforeEach(async ({umbracoUi, umbracoApi}) => {
 test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.dataType.ensureNameNotExists(blockGridEditorName);
   await umbracoApi.documentType.ensureNameNotExists(elementTypeName);
+  await umbracoApi.stylesheet.ensureNameNotExists(stylesheetName);
 });
 
 test('can create a block grid editor', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
@@ -383,7 +385,6 @@ test('can update grid columns in a block grid editor', async ({umbracoApi, umbra
 
 test('can add a stylesheet a block grid editor', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const stylesheetName = 'TestStylesheet.css';
   await umbracoApi.stylesheet.ensureNameNotExists(stylesheetName);
   await umbracoApi.stylesheet.createDefaultStylesheet(stylesheetName);
   await umbracoApi.dataType.createEmptyBlockGrid(blockGridEditorName);
@@ -395,14 +396,10 @@ test('can add a stylesheet a block grid editor', async ({umbracoApi, umbracoUi})
 
   // Assert
   expect(await umbracoApi.dataType.doesBlockGridContainLayoutStylesheet(blockGridEditorName, stylesheetName)).toBeTruthy();
-
-  // Clean
-  await umbracoApi.stylesheet.ensureNameNotExists(stylesheetName);
 });
 
 test('can remove a stylesheet in a block grid editor', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const stylesheetName = 'TestStylesheet.css';
   await umbracoApi.stylesheet.createDefaultStylesheet(stylesheetName);
   await umbracoApi.dataType.createBlockGridWithLayoutStylesheet(blockGridEditorName, stylesheetName);
 
@@ -414,7 +411,4 @@ test('can remove a stylesheet in a block grid editor', async ({umbracoApi, umbra
 
   // Assert
   expect(await umbracoApi.dataType.doesBlockGridContainLayoutStylesheet(blockGridEditorName, stylesheetName)).toBeFalsy();
-
-  // Clean
-  await umbracoApi.stylesheet.ensureNameNotExists(stylesheetName);
 });

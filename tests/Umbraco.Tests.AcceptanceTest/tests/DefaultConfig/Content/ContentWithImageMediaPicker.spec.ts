@@ -134,41 +134,44 @@ test('image count can not be less than min amount set in image media picker', as
   await umbracoApi.media.ensureNameNotExists(mediaName);
 });
 
-test('image count can not be more than max amount set in image media picker', async ({umbracoApi, umbracoUi}) => {
-  // Arrange
-  const maxAmount = 2;
+test.describe('image count exceeds max amount', () => {
   // Names must not be substrings of one another or the media card locator matches more than one card.
   const firstMediaName = 'AlphaPickerImage';
   const secondMediaName = 'BravoPickerImage';
   const thirdMediaName = 'CharliePickerImage';
-  await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
-  for (const name of [firstMediaName, secondMediaName, thirdMediaName]) {
-    await umbracoApi.media.ensureNameNotExists(name);
-    await umbracoApi.media.createDefaultMediaWithImage(name);
-  }
-  // A max of 1 hides the add button once an image is picked, so the overflow is only reachable above that.
-  const dataTypeId = await umbracoApi.dataType.createImageMediaPickerDataType(customDataTypeName, 0, maxAmount, false, false, true);
-  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, dataTypeId, groupName);
-  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
-  await umbracoUi.goToBackOffice();
-  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
-  // Act
-  await umbracoUi.content.goToContentWithName(contentName);
-  for (const name of [firstMediaName, secondMediaName, thirdMediaName]) {
-    await umbracoUi.content.clickChooseButtonAndSelectMediaWithName(name);
-    await umbracoUi.content.clickChooseModalButton();
-  }
-  await umbracoUi.content.clickSaveAndPublishButton();
+  test.afterEach(async ({umbracoApi}) => {
+    for (const name of [firstMediaName, secondMediaName, thirdMediaName]) {
+      await umbracoApi.media.ensureNameNotExists(name);
+    }
+  });
 
-  // Assert
-  await umbracoUi.content.isErrorNotificationVisible();
+  test('image count can not be more than max amount set in image media picker', async ({umbracoApi, umbracoUi}) => {
+    // Arrange
+    const maxAmount = 2;
+    await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
+    for (const name of [firstMediaName, secondMediaName, thirdMediaName]) {
+      await umbracoApi.media.ensureNameNotExists(name);
+      await umbracoApi.media.createDefaultMediaWithImage(name);
+    }
+    // A max of 1 hides the add button once an image is picked, so the overflow is only reachable above that.
+    const dataTypeId = await umbracoApi.dataType.createImageMediaPickerDataType(customDataTypeName, 0, maxAmount, false, false, true);
+    const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, dataTypeId, groupName);
+    await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+    await umbracoUi.goToBackOffice();
+    await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
-  // Clean
-  await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
-  for (const name of [firstMediaName, secondMediaName, thirdMediaName]) {
-    await umbracoApi.media.ensureNameNotExists(name);
-  }
+    // Act
+    await umbracoUi.content.goToContentWithName(contentName);
+    for (const name of [firstMediaName, secondMediaName, thirdMediaName]) {
+      await umbracoUi.content.clickChooseButtonAndSelectMediaWithName(name);
+      await umbracoUi.content.clickChooseModalButton();
+    }
+    await umbracoUi.content.clickSaveAndPublishButton();
+
+    // Assert
+    await umbracoUi.content.isErrorNotificationVisible();
+  });
 });
 
 test('can add an image from the image media picker with a start node', async ({umbracoApi, umbracoUi}) => {

@@ -39,6 +39,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.loginToAdminUser();
   await umbracoApi.element.ensureNameNotExists(firstElementName);
   await umbracoApi.element.ensureNameNotExists(secondElementName);
+  await umbracoApi.element.ensureNameNotExists(firstElementName + ' (1)');
   await umbracoApi.documentType.ensureNameNotExists(elementTypeName);
   await umbracoApi.userGroup.ensureNameNotExists(userGroupName);
   await umbracoApi.element.emptyRecycleBin();
@@ -166,9 +167,6 @@ test('can duplicate a specific element with duplicate permission enabled', async
   // covers the source element), so switch to admin to verify it was actually created.
   await umbracoApi.loginToAdminUser();
   expect(await umbracoApi.element.doesNameExist(duplicatedElementName)).toBeTruthy();
-
-  // Clean
-  await umbracoApi.element.ensureNameNotExists(duplicatedElementName);
 });
 
 test('can move a specific element with move permission enabled', async ({umbracoApi, umbracoUi}) => {
