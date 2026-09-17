@@ -451,7 +451,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
     ///     </para>
     ///     <para>
     ///         When publishing or unpublishing a single culture, or all cultures, use the publishing operations
-    ///         and <see cref="IAsyncPublishableContentService{TContent}.UnpublishAsync" />. But if the flexibility to both publish and unpublish in a single operation is
+    ///         and <see cref="IPublishableContentService{TContent}.UnpublishAsync" />. But if the flexibility to both publish and unpublish in a single operation is
     ///         required, then this method needs to be used in combination with <see cref="ContentRepositoryExtensions.PublishCulture" />
     ///         and <see cref="ContentRepositoryExtensions.UnpublishCulture" />
     ///         on the content itself - this prepares the content, but does not commit anything - and then, invoke

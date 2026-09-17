@@ -7,17 +7,17 @@ namespace Umbraco.Cms.Core.Services;
 ///     The publishable-content service contract, for documents and elements.
 /// </summary>
 /// <remarks>
-///     This is the async-first contract used while the content, media, and member repositories are migrated to EF
-///     Core. It's implemented by both <see cref="IContentService" /> and <see cref="IElementService" />; only
+///     Every member is asynchronous. This interface began as the async counterpart to a synchronous contract of
+///     the same name, growing one member at a time as each was converted; that conversion is complete, the
+///     synchronous contract is gone, and this has taken its name as the single publishable-content contract.
+///     It is implemented by <see cref="IContentService" /> and <see cref="IElementService" />. Only
 ///     <see cref="IContentService" /> has an async EF Core repository behind it so far, so
-///     <see cref="Umbraco.Cms.Core.Services.ElementService" /> bridges each member onto its existing synchronous
-///     implementation until an async element repository exists. The media and member services are unrelated - they
-///     continue to use the synchronous <see cref="IContentServiceBase{TItem}" /> exclusively. This interface began
-///     empty and grew one member at a time as each synchronous member was converted; that conversion is now
-///     complete, and the synchronous contract it replaced has been removed.
+///     <see cref="Umbraco.Cms.Core.Services.ElementService" /> bridges its members onto a synchronous engine
+///     until an async element repository exists. Media and members are unrelated - they implement
+///     <see cref="IContentServiceBase{TItem}" />, which remains synchronous.
 /// </remarks>
 /// <typeparam name="TContent">The type of content item managed by this service.</typeparam>
-public interface IAsyncPublishableContentService<TContent> : IAsyncContentServiceBase<TContent>
+public interface IPublishableContentService<TContent> : IAsyncContentServiceBase<TContent>
     where TContent : class, IContentBase
 {
     /// <summary>

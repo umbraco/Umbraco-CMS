@@ -8,15 +8,14 @@ namespace Umbraco.Cms.Core.Services;
 /// <summary>
 ///     Defines the ContentService, which is an easy access to operations involving <see cref="IContent" />
 /// </summary>
-public interface IContentService : IContentServiceBase, IAsyncPublishableContentService<IContent>
+public interface IContentService : IContentServiceBase, IPublishableContentService<IContent>
 {
-    // Explicit reabstraction of IContentServiceBase.CheckDataIntegrity (the same contract Media/Member
-    // still implement synchronously, inherited directly here now that IPublishableContentService<IContent>
-    // - which used to carry it - has been retired).
-    // Bridges onto CheckDataIntegrityAsync, declared on the async side of this same interface, so this default
-    // - not a plain redeclaration, which C# would treat as an unrelated member rather than an override - is
-    // what satisfies the sync member for any implementer. No class anywhere in the async hierarchy (including
-    // ContentService itself) needs to implement a sync member at all.
+    // Explicit reabstraction of IContentServiceBase.CheckDataIntegrity - the same contract Media and Member
+    // still implement synchronously, inherited directly here since the synchronous publishable-content
+    // contract that used to carry it was retired.
+    // Bridges onto CheckDataIntegrityAsync, declared on this same interface, so this default - not a plain
+    // redeclaration, which C# would treat as an unrelated member rather than an override - is what satisfies
+    // the sync member for any implementer. No implementer, ContentService included, needs a sync member.
     // TODO: Remove this default implementation once Media/Member have their own async repositories and
     // IContentServiceBase.CheckDataIntegrity itself can be retired in favor of an async-only equivalent.
     ContentDataIntegrityReport IContentServiceBase.CheckDataIntegrity(ContentDataIntegrityReportOptions options)
@@ -315,7 +314,7 @@ public interface IContentService : IContentServiceBase, IAsyncPublishableContent
     #region Save, Delete Document
 
     // Save(IContent, ...) has been retired from this interface in favour of the async SaveAsync
-    // (declared on IAsyncPublishableContentService<IContent>).
+    // (declared on IPublishableContentService<IContent>).
 
     // Save(IEnumerable<IContent>, int) has been retired from this interface in favour of the async
     // SaveAsync (declared on IAsyncContentServiceBase<IContent>). The redeclaration that used to sit here
@@ -436,7 +435,7 @@ public interface IContentService : IContentServiceBase, IAsyncPublishableContent
     #region Publish Document
 
     // Publish(IContent, string[], int) has been retired from this interface in favour of the async
-    // PublishAsync (declared on IAsyncPublishableContentService<TContent>, inherited here).
+    // PublishAsync (declared on IPublishableContentService<TContent>, inherited here).
 
     /// <summary>
     ///     Publishes a document branch.

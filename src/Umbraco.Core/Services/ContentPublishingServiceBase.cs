@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Core.Services;
 
 internal abstract class ContentPublishingServiceBase<TContent, TContentService>
     where TContent : class, IPublishableContentBase
-    where TContentService : IAsyncPublishableContentService<TContent>
+    where TContentService : IPublishableContentService<TContent>
 {
     private readonly ICoreScopeProvider _coreScopeProvider;
     private readonly TContentService _contentService;

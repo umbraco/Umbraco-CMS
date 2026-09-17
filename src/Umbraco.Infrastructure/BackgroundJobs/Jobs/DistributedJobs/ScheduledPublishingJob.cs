@@ -113,7 +113,7 @@ internal class ScheduledPublishingJob : IDistributedBackgroundJob
         }
     }
 
-    private async Task PerformScheduledPublishAsync<TContent>(IAsyncPublishableContentService<TContent> service, string entityType, DateTime date)
+    private async Task PerformScheduledPublishAsync<TContent>(IPublishableContentService<TContent> service, string entityType, DateTime date)
         where TContent : class, IPublishableContentBase
     {
         IEnumerable<PublishResult> results = await service.PerformScheduledPublishAsync(date, CancellationToken.None);

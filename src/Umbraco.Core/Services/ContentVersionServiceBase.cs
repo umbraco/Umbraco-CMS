@@ -23,7 +23,7 @@ internal abstract class ContentVersionServiceBase<TContent>
     private readonly IEventMessagesFactory _eventMessagesFactory;
     private readonly ILanguageRepository _languageRepository;
     private readonly IEntityService _entityService;
-    private readonly IAsyncPublishableContentService<TContent> _asyncContentService;
+    private readonly IPublishableContentService<TContent> _asyncContentService;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
     private readonly ILogger<ContentVersionServiceBase<TContent>> _logger;
     private readonly IOptionsMonitor<ContentSettings> _contentSettings;
@@ -40,7 +40,7 @@ internal abstract class ContentVersionServiceBase<TContent>
         IAuditService auditService,
         ILanguageRepository languageRepository,
         IEntityService entityService,
-        IAsyncPublishableContentService<TContent> asyncContentService,
+        IPublishableContentService<TContent> asyncContentService,
         IUserIdKeyResolver userIdKeyResolver,
         IOptionsMonitor<ContentSettings> contentSettings)
     {

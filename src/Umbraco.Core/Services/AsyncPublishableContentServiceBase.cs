@@ -33,7 +33,7 @@ namespace Umbraco.Cms.Core.Services;
 /// the original <see cref="PublishableContentServiceBase{TContent}"/>, untouched — it will adopt this class (or a
 /// fully-converted successor) once an async element repository exists.
 /// </remarks>
-public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryService, IAsyncPublishableContentService<TContent>
+public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryService, IPublishableContentService<TContent>
     where TContent : class, IPublishableContentBase
 {
     private readonly IAuditService _auditService;
