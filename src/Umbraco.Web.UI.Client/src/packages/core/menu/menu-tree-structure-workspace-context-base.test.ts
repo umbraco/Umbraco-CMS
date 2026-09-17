@@ -1,6 +1,7 @@
 import { UmbMenuTreeStructureWorkspaceContextBase } from './menu-tree-structure-workspace-context-base.js';
 import {
 	UmbTestMenuStructureControllerHostElement,
+	UmbTestSectionContext,
 	UmbTestSectionSidebarMenuContext,
 	UmbTestSubmittableTreeEntityWorkspaceContext,
 	UmbTestTreeRepository,
@@ -8,6 +9,7 @@ import {
 	createTestTreeRepositoryManifest,
 } from './menu-tree-structure-workspace-context.test-utils.js';
 import { UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT } from './section-sidebar-menu/index.js';
+import type { UmbStructureItemModel } from './types.js';
 import { UMB_ANCESTORS_ENTITY_CONTEXT, UMB_PARENT_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
 import { aTimeout, expect } from '@open-wc/testing';
 import { UmbActionEventContext } from '@umbraco-cms/backoffice/action';
@@ -15,7 +17,10 @@ import { UmbContextProviderController } from '@umbraco-cms/backoffice/context-ap
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
-import { UMB_SUBMITTABLE_TREE_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
+import {
+	UMB_SUBMITTABLE_TREE_ENTITY_WORKSPACE_CONTEXT,
+	UMB_WORKSPACE_EDIT_PATH_PATTERN,
+} from '@umbraco-cms/backoffice/workspace';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 
 const TEST_TREE_REPOSITORY_ALIAS = 'Umb.Test.MenuTreeStructureWorkspaceContextBase.TreeRepository';
@@ -55,6 +60,7 @@ describe('UmbMenuTreeStructureWorkspaceContextBase', () => {
 			UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT,
 			new UmbTestSectionSidebarMenuContext(host) as never,
 		);
+		new UmbTestSectionContext(host);
 
 		context = new TestMenuTreeStructureWorkspaceContext(host);
 		context.manifest = {
@@ -223,6 +229,30 @@ describe('UmbMenuTreeStructureWorkspaceContextBase', () => {
 	describe('expanding the sidebar menu', () => {
 		it('expands the resolved parent when opening an existing item', async () => {
 			expect(UmbTestSectionSidebarMenuContext.expandItemsCalls).to.have.lengthOf(1);
+		});
+	});
+
+	describe('getItemHref', () => {
+		function structureItem(overrides: Partial<UmbStructureItemModel>): UmbStructureItemModel {
+			return { unique: 'item-unique', entityType: 'test-entity-type', name: 'Item', isFolder: false, ...overrides };
+		}
+
+		it('returns undefined for a folder-flagged item', () => {
+			expect(context.getItemHref(structureItem({ isFolder: true }))).to.equal(undefined);
+		});
+
+		it('returns undefined for an item with no unique (e.g. the root)', () => {
+			expect(context.getItemHref(structureItem({ unique: null }))).to.equal(undefined);
+		});
+
+		it('returns a generated edit-path link for a non-folder item with a unique', () => {
+			expect(context.getItemHref(structureItem({}))).to.equal(
+				UMB_WORKSPACE_EDIT_PATH_PATTERN.generateAbsolute({
+					sectionName: UmbTestSectionContext.PATHNAME,
+					entityType: 'test-entity-type',
+					unique: 'item-unique',
+				}),
+			);
 		});
 	});
 

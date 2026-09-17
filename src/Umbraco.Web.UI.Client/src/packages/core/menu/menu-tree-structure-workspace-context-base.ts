@@ -10,7 +10,11 @@ import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UMB_MODAL_CONTEXT } from '@umbraco-cms/backoffice/modal';
-import { UMB_SUBMITTABLE_TREE_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
+import { UMB_SECTION_CONTEXT } from '@umbraco-cms/backoffice/section';
+import {
+	UMB_SUBMITTABLE_TREE_ENTITY_WORKSPACE_CONTEXT,
+	UMB_WORKSPACE_EDIT_PATH_PATTERN,
+} from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbTreeRepository, UmbTreeItemModel, UmbTreeRootModel } from '@umbraco-cms/backoffice/tree';
 
@@ -37,6 +41,8 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase
 	 */
 	public readonly parent = this.#parent.asObservable();
 
+	protected _sectionContext?: typeof UMB_SECTION_CONTEXT.TYPE;
+
 	readonly #parentContext = new UmbParentEntityContext(this);
 	readonly #ancestorContext = new UmbAncestorsEntityContext(this);
 	#sectionSidebarMenuContext?: typeof UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT.TYPE;
@@ -62,6 +68,10 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase
 			this.#removeEventListeners();
 			this.#actionEventContext = instance;
 			this.#addEventListeners();
+		});
+
+		this.consumeContext(UMB_SECTION_CONTEXT, (instance) => {
+			this._sectionContext = instance;
 		});
 
 		this.consumeContext(UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT, (instance) => {
@@ -99,6 +109,19 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase
 				},
 				'observeIsNew',
 			);
+		});
+	}
+
+	getItemHref(structureItem: UmbStructureItemModel): string | undefined {
+		if (structureItem.isFolder || !structureItem.unique) return undefined;
+
+		const sectionName = this._sectionContext?.getPathname();
+		if (!sectionName) return undefined;
+
+		return UMB_WORKSPACE_EDIT_PATH_PATTERN.generateAbsolute({
+			sectionName,
+			entityType: structureItem.entityType,
+			unique: structureItem.unique,
 		});
 	}
 
