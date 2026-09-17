@@ -358,7 +358,7 @@ internal sealed class DocumentUrlServiceContentTreeChangeTests : UmbracoIntegrat
         var grandchild = ContentBuilder.CreateSimpleContent(ContentType, "Grandchild", child.Id);
         await ContentService.SaveAsync(grandchild, -1, null, CancellationToken.None);
 
-        ContentService.PublishBranch(parent, PublishBranchFilter.IncludeUnpublished, ["*"]);
+        await ContentService.PublishBranchAsync(parent, PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         Assert.Multiple(() =>
         {
@@ -469,7 +469,7 @@ internal sealed class DocumentUrlServiceContentTreeChangeTests : UmbracoIntegrat
         var child = ContentBuilder.CreateSimpleContent(ContentType, "Child Cache Test", parent.Id);
         await ContentService.SaveAsync(child, -1, null, CancellationToken.None);
 
-        ContentService.PublishBranch(parent, PublishBranchFilter.IncludeUnpublished, ["*"]);
+        await ContentService.PublishBranchAsync(parent, PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         var parentRowsBefore = GetDbSegments(parent.Key);
         var childRowsBefore = GetDbSegments(child.Key);
@@ -528,7 +528,7 @@ internal sealed class DocumentUrlServiceContentTreeChangeTests : UmbracoIntegrat
         child.SetValue(Constants.Conventions.Content.UrlAlias, "child-alias");
         await ContentService.SaveAsync(child, -1, null, CancellationToken.None);
 
-        ContentService.PublishBranch(parent, PublishBranchFilter.IncludeUnpublished, ["*"]);
+        await ContentService.PublishBranchAsync(parent, PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         var isoCode = (await LanguageService.GetDefaultLanguageAsync()).IsoCode;
 

@@ -14,7 +14,7 @@ public class VariantContentTests : VariantContentTestBase
     public async Task PublishedStructure_YieldsAllPublishedDocuments()
     {
         await ContentService.SaveAsync(Root(), null, null, CancellationToken.None);
-        ContentService.PublishBranch(Root(), PublishBranchFilter.IncludeUnpublished, ["*"]);
+        await ContentService.PublishBranchAsync(Root(), PublishBranchFilter.IncludeUnpublished, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.PublishedContent);
         Assert.That(documents, Has.Count.EqualTo(4));
@@ -40,7 +40,7 @@ public class VariantContentTests : VariantContentTestBase
     public async Task PublishedStructure_CanRefreshChild_InSingleCulture()
     {
         await ContentService.SaveAsync(Root(), null, null, CancellationToken.None);
-        ContentService.PublishBranch(Root(), PublishBranchFilter.IncludeUnpublished, ["*"]);
+        await ContentService.PublishBranchAsync(Root(), PublishBranchFilter.IncludeUnpublished, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
         IContent child = Child();
         child.SetValue("title", "The updated child title in English", "en-US");
@@ -66,7 +66,7 @@ public class VariantContentTests : VariantContentTestBase
     public async Task PublishedStructure_CanRefreshChild_InMultipleCultures()
     {
         await ContentService.SaveAsync(Root(), null, null, CancellationToken.None);
-        ContentService.PublishBranch(Root(), PublishBranchFilter.IncludeUnpublished, ["*"]);
+        await ContentService.PublishBranchAsync(Root(), PublishBranchFilter.IncludeUnpublished, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
         IContent child = Child();
         child.SetValue("title", "The updated child title in English", "en-US");
@@ -84,7 +84,7 @@ public class VariantContentTests : VariantContentTestBase
     public async Task PublishedStructure_CanRefreshChild_InvariantCulture()
     {
         await ContentService.SaveAsync(Root(), null, null, CancellationToken.None);
-        ContentService.PublishBranch(Root(), PublishBranchFilter.IncludeUnpublished, ["*"]);
+        await ContentService.PublishBranchAsync(Root(), PublishBranchFilter.IncludeUnpublished, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
         IContent child = Child();
         child.SetValue("count", 123456);
@@ -101,7 +101,7 @@ public class VariantContentTests : VariantContentTestBase
     public async Task PublishedStructure_YieldsSystemFields()
     {
         await ContentService.SaveAsync(Root(), null, null, CancellationToken.None);
-        ContentService.PublishBranch(Root(), PublishBranchFilter.IncludeUnpublished, ["*"]);
+        await ContentService.PublishBranchAsync(Root(), PublishBranchFilter.IncludeUnpublished, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.PublishedContent);
         Assert.That(documents, Has.Count.EqualTo(4));

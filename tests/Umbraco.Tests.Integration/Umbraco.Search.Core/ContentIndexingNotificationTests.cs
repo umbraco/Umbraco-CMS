@@ -24,10 +24,10 @@ public class ContentIndexingNotificationTests : InvariantContentTestBase
     }
 
     [Test]
-    public void PublishedContent_CanManipulateIndexedFields()
+    public async Task PublishedContent_CanManipulateIndexedFields()
     {
         AddOrUpdateIndexingNotificationHandler.ManipulateFields = true;
-        ContentService.PublishBranch(Root(), PublishBranchFilter.IncludeUnpublished, ["*"]);
+        await ContentService.PublishBranchAsync(Root(), PublishBranchFilter.IncludeUnpublished, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.PublishedContent);
         Assert.That(documents, Has.Count.EqualTo(4));
@@ -50,10 +50,10 @@ public class ContentIndexingNotificationTests : InvariantContentTestBase
     }
 
     [Test]
-    public void PublishedContent_CanCancelIndexingForSpecificDocument()
+    public async Task PublishedContent_CanCancelIndexingForSpecificDocument()
     {
         AddOrUpdateIndexingNotificationHandler.CancelIndexingFor = [ChildKey];
-        ContentService.PublishBranch(Root(), PublishBranchFilter.IncludeUnpublished, ["*"]);
+        await ContentService.PublishBranchAsync(Root(), PublishBranchFilter.IncludeUnpublished, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.PublishedContent);
         Assert.That(documents, Has.Count.EqualTo(3));

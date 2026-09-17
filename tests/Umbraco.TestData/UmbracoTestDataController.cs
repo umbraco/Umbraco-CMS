@@ -102,7 +102,7 @@ public class UmbracoTestDataController : SurfaceController
             // so that all content is created before we publish the root branch.
             _ = contentIds.ToList();
 
-            Services.ContentService.PublishBranch(root, PublishBranchFilter.IncludeUnpublished, ["*"]);
+            await Services.ContentService.PublishBranchAsync(root, PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
             scope.Complete();
         }

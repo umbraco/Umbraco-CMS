@@ -13,7 +13,7 @@ public partial class InvariantContentStructureTests
     public async Task PublishedStructure_YieldsAllPublishedDocuments()
     {
         await ContentService.SaveAsync(Root(), null, null, CancellationToken.None);
-        ContentService.PublishBranch(Root(), PublishBranchFilter.IncludeUnpublished, ["*"]);
+        await ContentService.PublishBranchAsync(Root(), PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.PublishedContent);
         Assert.That(documents, Has.Count.EqualTo(4));
@@ -44,7 +44,7 @@ public partial class InvariantContentStructureTests
     public async Task PublishedStructure_WithUnpublishedRoot_YieldsNoDocuments()
     {
         await ContentService.SaveAsync(Root(), null, null, CancellationToken.None);
-        ContentService.PublishBranch(Root(), PublishBranchFilter.IncludeUnpublished, ["*"]);
+        await ContentService.PublishBranchAsync(Root(), PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         PublishResult result = await ContentService.UnpublishAsync(Root(), "*", Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.That(result.Success, Is.True);
@@ -58,7 +58,7 @@ public partial class InvariantContentStructureTests
     public async Task PublishedStructure_WithUnpublishedGrandchild_YieldsNothingBelowChild()
     {
         await ContentService.SaveAsync(Root(), null, null, CancellationToken.None);
-        ContentService.PublishBranch(Root(), PublishBranchFilter.IncludeUnpublished, ["*"]);
+        await ContentService.PublishBranchAsync(Root(), PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         PublishResult result = await ContentService.UnpublishAsync(Grandchild(), "*", Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.That(result.Success, Is.True);
@@ -78,7 +78,7 @@ public partial class InvariantContentStructureTests
     public async Task PublishedStructure_WithGrandchildInRecycleBin_YieldsNothingBelowChild()
     {
         await ContentService.SaveAsync(Root(), null, null, CancellationToken.None);
-        ContentService.PublishBranch(Root(), PublishBranchFilter.IncludeUnpublished, ["*"]);
+        await ContentService.PublishBranchAsync(Root(), PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         Attempt<ContentMoveToRecycleBinOperationStatus> result = await ContentService.MoveToRecycleBinAsync(Grandchild(), Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.That(result.Success, Is.True);
@@ -98,7 +98,7 @@ public partial class InvariantContentStructureTests
     public async Task PublishedStructure_WithGrandchildDeleted_YieldsNothingBelowChild()
     {
         await ContentService.SaveAsync(Root(), null, null, CancellationToken.None);
-        ContentService.PublishBranch(Root(), PublishBranchFilter.IncludeUnpublished, ["*"]);
+        await ContentService.PublishBranchAsync(Root(), PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         Attempt<ContentDeleteOperationStatus> result = await ContentService.DeleteAsync(Grandchild(), null, CancellationToken.None);
         Assert.Multiple(() =>

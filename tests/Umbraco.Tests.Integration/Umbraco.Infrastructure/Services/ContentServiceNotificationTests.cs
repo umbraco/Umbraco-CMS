@@ -741,7 +741,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
 
         try
         {
-            ContentService.CommitDocumentChanges(document);
+            await ContentService.CommitDocumentChangesAsync(document, Constants.Security.SuperUserKey, CancellationToken.None);
             Assert.IsTrue(publishingWasCalled);
             Assert.IsTrue(publishedWasCalled);
             Assert.IsTrue(treeChangeWasCalled);
@@ -1063,7 +1063,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
 
         try
         {
-            ContentService.CommitDocumentChanges(document);
+            await ContentService.CommitDocumentChangesAsync(document, Constants.Security.SuperUserKey, CancellationToken.None);
             Assert.IsTrue(publishedWasCalled);
         }
         finally
@@ -1348,7 +1348,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
 
         try
         {
-            ContentService.PublishBranch(root, PublishBranchFilter.ForceRepublish, ["*"]);
+            await ContentService.PublishBranchAsync(root, PublishBranchFilter.ForceRepublish, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
             Assert.IsTrue(publishedWasCalled);
         }
         finally
@@ -1397,7 +1397,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
 
         try
         {
-            ContentService.PublishBranch(root, PublishBranchFilter.ForceRepublish, ["*"]);
+            await ContentService.PublishBranchAsync(root, PublishBranchFilter.ForceRepublish, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
             Assert.IsTrue(publishedWasCalled);
         }
         finally

@@ -47,7 +47,7 @@ internal sealed partial class PublishStatusServiceTests
         var contentSchedule = ContentScheduleCollection.CreateWithEntry(DateTime.UtcNow.AddMinutes(-5), null);
         await ContentService.SaveAsync(grandchild, -1, contentSchedule, CancellationToken.None);
 
-        var publishResults = ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
+        var publishResults = await ContentService.PublishBranchAsync(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         var subPage2FromDB = ContentService.GetByIdAsync(Subpage2.Key, CancellationToken.None).GetAwaiter().GetResult();
         var publishResult = await ContentService.UnpublishAsync(subPage2FromDB, "*", Constants.Security.SuperUserKey, CancellationToken.None);
@@ -70,9 +70,9 @@ internal sealed partial class PublishStatusServiceTests
     }
 
     [Test]
-    public void Publish_Branch_Updates_Document_Path_Published_Status()
+    public async Task Publish_Branch_Updates_Document_Path_Published_Status()
     {
-        var publishResults = ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
+        var publishResults = await ContentService.PublishBranchAsync(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.Multiple(() =>
         {
             Assert.IsTrue(publishResults.All(x => x.Result == PublishResultType.SuccessPublish));
@@ -109,7 +109,7 @@ internal sealed partial class PublishStatusServiceTests
             Assert.IsFalse(PublishStatusQueryService.IsPublished(Subpage.Key, DefaultCulture));
         });
 
-        ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
+        await ContentService.PublishBranchAsync(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         Assert.Multiple(() =>
         {
@@ -170,7 +170,7 @@ internal sealed partial class PublishStatusServiceTests
             .Build();
         await ContentService.SaveAsync(grandchild, null, null, CancellationToken.None);
 
-        ContentService.PublishBranch(root, PublishBranchFilter.IncludeUnpublished, ["en-US", "da-DK"]);
+        await ContentService.PublishBranchAsync(root, PublishBranchFilter.IncludeUnpublished, ["en-US", "da-DK"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         // must refresh the child instance before unpublishing it, to reflect the state changes from the branch publish above
         child = (await ContentService.GetByIdAsync(child.Key, CancellationToken.None))!;
@@ -223,7 +223,7 @@ internal sealed partial class PublishStatusServiceTests
             .Build();
         await ContentService.SaveAsync(grandchild, null, null, CancellationToken.None);
 
-        ContentService.PublishBranch(root, PublishBranchFilter.IncludeUnpublished, ["en-US", "da-DK"]);
+        await ContentService.PublishBranchAsync(root, PublishBranchFilter.IncludeUnpublished, ["en-US", "da-DK"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         // must refresh the child instance before unpublishing it, to reflect the state changes from the branch publish above
         child = (await ContentService.GetByIdAsync(child.Key, CancellationToken.None))!;

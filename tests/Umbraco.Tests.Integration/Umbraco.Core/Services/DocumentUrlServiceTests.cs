@@ -224,7 +224,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
     [Test]
     public async Task GetUrlSegment_For_Document_With_Parent_Deleted_Does_Not_Have_Url_Segment()
     {
-        ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
+        await ContentService.PublishBranchAsync(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         await ContentService.DeleteAsync(Textpage, null, CancellationToken.None);
 
@@ -238,7 +238,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
     [Test]
     public async Task GetUrlSegment_For_Published_Then_Deleted_Document_Does_Not_Have_Url_Segment()
     {
-        ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
+        await ContentService.PublishBranchAsync(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         await ContentService.DeleteAsync(Subpage2, null, CancellationToken.None);
 
@@ -251,9 +251,9 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
 
     [TestCase("/", ExpectedResult = TextpageKey)]
     [TestCase("/text-page-1", ExpectedResult = SubPageKey)]
-    public string? GetDocumentKeyByUri_Without_Domains_Returns_Expected_DocumentKey(string path)
+    public async Task<string?> GetDocumentKeyByUri_Without_Domains_Returns_Expected_DocumentKey(string path)
     {
-        ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
+        await ContentService.PublishBranchAsync(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         var uri = new Uri("http://example.com" + path);
         return DocumentUrlService.GetDocumentKeyByUri(uri, false)?.ToString()?.ToUpper();
@@ -293,7 +293,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
             .Build();
         await ContentService.SaveAsync(rootPage, -1, null, CancellationToken.None);
         await ContentService.SaveAsync(childPage, -1, null, CancellationToken.None);
-        ContentService.PublishBranch(rootPage, PublishBranchFilter.IncludeUnpublished, ["*"]);
+        await ContentService.PublishBranchAsync(rootPage, PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         var updateDomainResult = await DomainService.UpdateDomainsAsync(
             rootPage.Key,
@@ -319,11 +319,11 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
     [TestCase("/text-page-2", "en-US", false, ExpectedResult = null)]
     [TestCase("/text-page-2-custom", "en-US", false, ExpectedResult = SubPage2Key)] // Uses the segment registered by the custom IIUrlSegmentProvider that does not allow for more than one segment per document.
     [TestCase("/text-page-3", "en-US", false, ExpectedResult = SubPage3Key)]
-    public string? GetDocumentKeyByRoute_Returns_Expected_DocumentKey(string route, string isoCode, bool loadDraft)
+    public async Task<string?> GetDocumentKeyByRoute_Returns_Expected_DocumentKey(string route, string isoCode, bool loadDraft)
     {
         if (loadDraft is false)
         {
-            ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
+            await ContentService.PublishBranchAsync(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
         }
 
         return DocumentUrlService.GetDocumentKeyByRoute(route, isoCode, null, loadDraft)?.ToString()?.ToUpper();
@@ -340,7 +340,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
     public async Task GetDocumentKeyByRoute_Published_Then_Unpublished_Documents_Have_No_Published_Route()
     {
         // Arrange
-        ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
+        await ContentService.PublishBranchAsync(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         Assert.Multiple(() =>
         {
@@ -394,7 +394,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
 
         if (loadDraft is false)
         {
-            ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
+            await ContentService.PublishBranchAsync(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
         }
 
         return DocumentUrlService.GetDocumentKeyByRoute(route, isoCode, null, loadDraft)?.ToString()?.ToUpper();
@@ -412,8 +412,8 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
 
         if (loadDraft is false)
         {
-            ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
-            ContentService.PublishBranch(secondRoot, PublishBranchFilter.IncludeUnpublished, ["*"]);
+            await ContentService.PublishBranchAsync(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
+            await ContentService.PublishBranchAsync(secondRoot, PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
         }
 
         return DocumentUrlService.GetDocumentKeyByRoute(route, isoCode, null, loadDraft)?.ToString()?.ToUpper();
@@ -436,8 +436,8 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
         // Publish both the main root and the second root with descendants
         if (loadDraft is false)
         {
-            ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
-            ContentService.PublishBranch(secondRoot, PublishBranchFilter.IncludeUnpublished, ["*"]);
+            await ContentService.PublishBranchAsync(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
+            await ContentService.PublishBranchAsync(secondRoot, PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
         }
 
         return DocumentUrlService.GetDocumentKeyByRoute(route, isoCode, null, loadDraft)?.ToString()?.ToUpper();
@@ -448,9 +448,9 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
     [TestCase(SubPage2Key, "en-US", ExpectedResult = "/text-page-2-custom")] // Has terminating custom URL segment provider.
     [TestCase(SubPage3Key, "en-US", ExpectedResult = "/text-page-3")]
     [TestCase(SubSubPage1Key, "en-US", ExpectedResult = "/text-page-1-custom/sub-sub-page-1")]
-    public string? GetLegacyRouteFormat_Returns_Expected_Route(string documentKey, string culture)
+    public async Task<string?> GetLegacyRouteFormat_Returns_Expected_Route(string documentKey, string culture)
     {
-        ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
+        await ContentService.PublishBranchAsync(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
         return DocumentUrlService.GetLegacyRouteFormat(Guid.Parse(documentKey), culture, false);
     }
 
@@ -469,7 +469,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
                 DefaultIsoCode = "en-US"
             });
 
-        ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
+        await ContentService.PublishBranchAsync(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
         var route = DocumentUrlService.GetLegacyRouteFormat(Guid.Parse(documentKey), culture, false);
         Assert.AreEqual($"{Textpage.Id}{expectedPath}", route);
     }
@@ -666,7 +666,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
         await LanguageService.CreateAsync(frenchLanguage, Constants.Security.SuperUserKey);
 
         // Publish the content
-        ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
+        await ContentService.PublishBranchAsync(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Act - query with French culture for invariant content (stored with NULL languageId)
         var urlSegment = DocumentUrlService.GetUrlSegment(Subpage.Key, "fr-FR", false);
@@ -683,7 +683,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
         await LanguageService.CreateAsync(frenchLanguage, Constants.Security.SuperUserKey);
 
         // Publish the content
-        ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
+        await ContentService.PublishBranchAsync(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Act - query with French culture for invariant content (stored with NULL languageId)
         var documentKey = DocumentUrlService.GetDocumentKeyByRoute("/text-page-1-custom", "fr-FR", null, false);
@@ -696,7 +696,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
     public async Task Invariant_Content_Stores_Null_LanguageId_In_Database()
     {
         // Arrange - publish content to create URL records
-        ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
+        await ContentService.PublishBranchAsync(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Act - check stored URL segments in database
         List<PublishedDocumentUrlSegment> storedSegments;
@@ -726,7 +726,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
         var defaultLanguage = await LanguageService.GetDefaultLanguageAsync();
 
         // Publish invariant content
-        ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
+        await ContentService.PublishBranchAsync(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Verify URLs are stored with NULL languageId (invariant)
         List<PublishedDocumentUrlSegment> segmentsBefore;
@@ -776,7 +776,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
         var defaultLanguage = await LanguageService.GetDefaultLanguageAsync();
 
         // Publish invariant content first
-        ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
+        await ContentService.PublishBranchAsync(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Verify invariant URLs are stored with NULL languageId
         List<PublishedDocumentUrlSegment> invariantSegments;
@@ -964,7 +964,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
     [Test]
     public async Task RebuildAllUrlsAsync_Handles_Node_With_Inconsistent_Published_State()
     {
-        ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
+        await ContentService.PublishBranchAsync(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         using (var scope = CoreScopeProvider.CreateCoreScope(autoComplete: true))
         {

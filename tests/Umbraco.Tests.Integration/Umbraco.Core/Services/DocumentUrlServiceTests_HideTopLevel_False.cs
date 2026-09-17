@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
@@ -43,11 +44,11 @@ internal sealed class DocumentUrlServiceTests_HideTopLevel_False : UmbracoIntegr
     [TestCase("/textpage/text-page-1", "en-US", false, ExpectedResult = SubPageKey)]
     [TestCase("/textpage/text-page-2", "en-US", false, ExpectedResult = SubPage2Key)]
     [TestCase("/textpage/text-page-3", "en-US", false, ExpectedResult = SubPage3Key)]
-    public string? GetDocumentKeyByRoute_Returns_Expected_Route(string route, string isoCode, bool loadDraft)
+    public async Task<string?> GetDocumentKeyByRoute_Returns_Expected_Route(string route, string isoCode, bool loadDraft)
     {
         if (loadDraft is false)
         {
-            ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
+            await ContentService.PublishBranchAsync(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
         }
 
 
@@ -67,7 +68,7 @@ internal sealed class DocumentUrlServiceTests_HideTopLevel_False : UmbracoIntegr
 
         if (loadDraft is false)
         {
-            ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
+            await ContentService.PublishBranchAsync(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
         }
 
         return DocumentUrlService.GetDocumentKeyByRoute(route, isoCode,  null, loadDraft)?.ToString()?.ToUpper();
@@ -86,8 +87,8 @@ internal sealed class DocumentUrlServiceTests_HideTopLevel_False : UmbracoIntegr
 
         if (loadDraft is false)
         {
-            ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
-            ContentService.PublishBranch(secondRoot, PublishBranchFilter.IncludeUnpublished, ["*"]);
+            await ContentService.PublishBranchAsync(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
+            await ContentService.PublishBranchAsync(secondRoot, PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
         }
 
         return DocumentUrlService.GetDocumentKeyByRoute(route, isoCode,  null, loadDraft)?.ToString()?.ToUpper();
@@ -111,8 +112,8 @@ internal sealed class DocumentUrlServiceTests_HideTopLevel_False : UmbracoIntegr
         // Publish both the main root and the second root with descendants
         if (loadDraft is false)
         {
-            ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
-            ContentService.PublishBranch(secondRoot, PublishBranchFilter.IncludeUnpublished, ["*"]);
+            await ContentService.PublishBranchAsync(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
+            await ContentService.PublishBranchAsync(secondRoot, PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
         }
 
         return DocumentUrlService.GetDocumentKeyByRoute(route, isoCode,  null, loadDraft)?.ToString()?.ToUpper();

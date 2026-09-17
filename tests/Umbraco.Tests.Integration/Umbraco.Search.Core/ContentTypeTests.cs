@@ -73,7 +73,7 @@ public class ContentTypeTests : ContentBaseTestBase
                 .Build();
             await ContentService.SaveAsync(child, null, null, CancellationToken.None);
 
-            ContentService.PublishBranch(root, PublishBranchFilter.IncludeUnpublished, ["*"]);
+            await ContentService.PublishBranchAsync(root, PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
         }
     }
 
@@ -312,7 +312,7 @@ public class ContentTypeTests : ContentBaseTestBase
             .WithContentType(compositionType)
             .Build();
         await ContentService.SaveAsync(compositionContent, null, null, CancellationToken.None);
-        ContentService.PublishBranch(compositionContent, PublishBranchFilter.IncludeUnpublished, ["*"]);
+        await ContentService.PublishBranchAsync(compositionContent, PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Create content of the composing type
         var composingContentKey = Guid.NewGuid();
@@ -321,7 +321,7 @@ public class ContentTypeTests : ContentBaseTestBase
             .WithContentType(composingType)
             .Build();
         await ContentService.SaveAsync(composingContent, null, null, CancellationToken.None);
-        ContentService.PublishBranch(composingContent, PublishBranchFilter.IncludeUnpublished, ["*"]);
+        await ContentService.PublishBranchAsync(composingContent, PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Verify initial state (6 from SetUp + 2 new = 8)
         IReadOnlyList<TestIndexDocument> draftDocuments = IndexerAndSearcher.Dump(IndexAliases.DraftContent);

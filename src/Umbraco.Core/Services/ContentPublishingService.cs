@@ -19,7 +19,6 @@ internal sealed class ContentPublishingService : ContentPublishingServiceBase<IC
 
     private readonly ICoreScopeProvider _coreScopeProvider;
     private readonly IContentService _contentService;
-    private readonly IUserIdKeyResolver _userIdKeyResolver;
     private readonly ILogger<ContentPublishingService> _logger;
     private readonly ILongRunningOperationService _longRunningOperationService;
     private readonly IUmbracoContextFactory _umbracoContextFactory;
@@ -65,7 +64,6 @@ internal sealed class ContentPublishingService : ContentPublishingServiceBase<IC
     {
         _coreScopeProvider = coreScopeProvider;
         _contentService = contentService;
-        _userIdKeyResolver = userIdKeyResolver;
         _logger = logger;
         _longRunningOperationService = longRunningOperationService;
         _umbracoContextFactory = umbracoContextFactory;
@@ -143,8 +141,7 @@ internal sealed class ContentPublishingService : ContentPublishingServiceBase<IC
                 });
         }
 
-        var userId = await _userIdKeyResolver.GetAsync(userKey);
-        IEnumerable<PublishResult> result = _contentService.PublishBranch(content, publishBranchFilter, cultures.ToArray(), userId);
+        IEnumerable<PublishResult> result = await _contentService.PublishBranchAsync(content, publishBranchFilter, cultures.ToArray(), userKey, CancellationToken.None);
         scope.Complete();
 
         var itemResults = result.ToDictionary(r => r.Content.Key, ToContentPublishingOperationStatus);

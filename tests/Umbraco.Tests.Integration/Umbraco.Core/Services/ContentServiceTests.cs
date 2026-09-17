@@ -1825,7 +1825,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         content.SetCultureName("name-da", langDa.IsoCode);
 
         content.PublishCulture(CultureImpact.Explicit(langFr.IsoCode, langFr.IsDefault), DateTime.UtcNow, PropertyEditorCollection);
-        var result = ContentService.CommitDocumentChanges(content);
+        var result = await ContentService.CommitDocumentChangesAsync(content, Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.IsTrue(result.Success);
         content = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
         Assert.IsTrue(content.IsCulturePublished(langFr.IsoCode));
@@ -1834,7 +1834,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         content.UnpublishCulture(langFr.IsoCode);
         content.PublishCulture(CultureImpact.Explicit(langDa.IsoCode, langDa.IsDefault), DateTime.UtcNow, PropertyEditorCollection);
 
-        result = ContentService.CommitDocumentChanges(content);
+        result = await ContentService.CommitDocumentChangesAsync(content, Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.IsTrue(result.Success);
         Assert.AreEqual(PublishResultType.SuccessMixedCulture, result.Result);
 
@@ -1890,7 +1890,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         // publish parent & its branch
         // only those that are not already published
         // only invariant/neutral values
-        var parentPublished = ContentService.PublishBranch(parent, PublishBranchFilter.IncludeUnpublished, parent.AvailableCultures.ToArray());
+        var parentPublished = await ContentService.PublishBranchAsync(parent, PublishBranchFilter.IncludeUnpublished, parent.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         foreach (var result in parentPublished)
         {
@@ -2120,7 +2120,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
         // Act
-        var published = ContentService.PublishBranch(content, PublishBranchFilter.IncludeUnpublished, content.AvailableCultures.ToArray());
+        var published = await ContentService.PublishBranchAsync(content, PublishBranchFilter.IncludeUnpublished, content.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Assert
         Assert.That(published.All(x => x.Success), Is.False);

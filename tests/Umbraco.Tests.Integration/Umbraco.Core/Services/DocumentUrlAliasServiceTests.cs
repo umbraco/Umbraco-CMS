@@ -107,7 +107,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
         await ContentService.SaveAsync(ChildPage, -1, null, CancellationToken.None);
 
         // Publish all content to trigger alias creation
-        ContentService.PublishBranch(RootPage, PublishBranchFilter.IncludeUnpublished, ["*"]);
+        await ContentService.PublishBranchAsync(RootPage, PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
     }
 
     private ContentType CreateContentTypeWithUrlAlias(int templateId)
@@ -657,7 +657,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
         childContent.SetValue(Constants.Conventions.Content.UrlAlias, "child-new-alias");
         await ContentService.SaveAsync(childContent, -1, null, CancellationToken.None);
 
-        ContentService.PublishBranch(parentContent, PublishBranchFilter.IncludeUnpublished, ["*"]);
+        await ContentService.PublishBranchAsync(parentContent, PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         await DocumentUrlAliasService.CreateOrUpdateAliasesWithDescendantsAsync(parentContent.Key);
 

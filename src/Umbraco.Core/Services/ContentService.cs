@@ -441,7 +441,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
     ///     <para>
     ///         This MUST NOT be called from within this service, this used to be a public API and must only be used outside of
     ///         this service.
-    ///         Internally in this service, calls must be made to CommitContentChangesInternal
+    ///         Internally in this service, calls must be made to CommitContentChangesInternalAsync
     ///     </para>
     ///     <para>This is the underlying logic for both publishing and unpublishing any document</para>
     ///     <para>
@@ -451,16 +451,18 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
     ///     </para>
     ///     <para>
     ///         When publishing or unpublishing a single culture, or all cultures, use the publishing operations
-    ///         and <see cref="Unpublish" />. But if the flexibility to both publish and unpublish in a single operation is
+    ///         and <see cref="IAsyncPublishableContentService{TContent}.UnpublishAsync" />. But if the flexibility to both publish and unpublish in a single operation is
     ///         required, then this method needs to be used in combination with <see cref="ContentRepositoryExtensions.PublishCulture" />
     ///         and <see cref="ContentRepositoryExtensions.UnpublishCulture" />
     ///         on the content itself - this prepares the content, but does not commit anything - and then, invoke
-    ///         <see cref="CommitDocumentChanges" /> to actually commit the changes to the database.
+    ///         <see cref="CommitDocumentChangesAsync" /> to actually commit the changes to the database.
     ///     </para>
     ///     <para>The document is *always* saved, even when publishing fails.</para>
     /// </remarks>
-    internal PublishResult CommitDocumentChanges(IContent content, int userId = Constants.Security.SuperUserId)
+    internal async Task<PublishResult> CommitDocumentChangesAsync(IContent content, Guid userKey, CancellationToken cancellationToken)
     {
+        int userId = await _userIdKeyResolver.GetAsync(userKey);
+
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             EventMessages evtMsgs = EventMessagesFactory.Get();
@@ -468,15 +470,14 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
             scope.WriteLock(Constants.Locks.ContentTree);
 
             var savingNotification = new ContentSavingNotification(content, evtMsgs);
-            if (scope.Notifications.PublishCancelable(savingNotification))
+            if (await scope.Notifications.PublishCancelableAsync(savingNotification))
             {
                 return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, content);
             }
 
-            // TODO: Await this properly when adjusting this service to our new EF Core approach.
-            var allLangs = _languageRepository.GetAllAsync(CancellationToken.None).GetAwaiter().GetResult().ToList();
+            var allLangs = (await _languageRepository.GetAllAsync(cancellationToken)).ToList();
 
-            PublishResult result = CommitContentChangesInternal(scope, content, evtMsgs, allLangs, savingNotification.State, userId);
+            PublishResult result = await CommitContentChangesInternalAsync(scope, content, evtMsgs, allLangs, savingNotification.State, userId, cancellationToken);
             scope.Complete();
             return result;
         }
@@ -532,18 +533,19 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
     }
 
     /// <inheritdoc />
-    public IEnumerable<PublishResult> PublishBranch(IContent content, PublishBranchFilter publishBranchFilter, string[] cultures, int userId = Constants.Security.SuperUserId)
+    public async Task<IEnumerable<PublishResult>> PublishBranchAsync(IContent content, PublishBranchFilter publishBranchFilter, string[] cultures, Guid userKey, CancellationToken cancellationToken)
     {
         // note: EditedValue and PublishedValue are objects here, so it is important to .Equals()
         // and not to == them, else we would be comparing references, and that is a bad thing
+
+        int userId = await _userIdKeyResolver.GetAsync(userKey);
 
         cultures = EnsureCultures(content, cultures);
 
         string? defaultCulture;
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
-            // TODO: Await this properly when adjusting this service to our new EF Core approach.
-            defaultCulture = _languageRepository.GetDefaultIsoCodeAsync().GetAwaiter().GetResult();
+            defaultCulture = await _languageRepository.GetDefaultIsoCodeAsync();
             scope.Complete();
         }
 
@@ -583,7 +585,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
                 : null; // null means 'nothing to do'
         }
 
-        return PublishBranch(content, ShouldPublish, PublishBranch_PublishCultures, userId);
+        return await PublishBranchAsync(content, ShouldPublish, PublishBranch_PublishCultures, userId, cancellationToken);
     }
 
     private static string[] EnsureCultures(IContent content, string[] cultures)
@@ -606,12 +608,14 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
     /// <param name="shouldPublish">A function that determines which cultures should be published for each content item. Returns null if the item should not be published.</param>
     /// <param name="publishCultures">A function that handles the actual publishing of cultures for each content item.</param>
     /// <param name="userId">The identifier of the user performing the publish operation.</param>
+    /// <param name="cancellationToken">A cancellation token.</param>
     /// <returns>A collection of <see cref="PublishResult"/> representing the results of publishing each content item in the branch.</returns>
-    internal IEnumerable<PublishResult> PublishBranch(
+    internal async Task<IEnumerable<PublishResult>> PublishBranchAsync(
         IContent document,
         Func<IContent, HashSet<string>?> shouldPublish,
         Func<IContent, HashSet<string>, IReadOnlyCollection<ILanguage>, bool> publishCultures,
-        int userId = Constants.Security.SuperUserId)
+        int userId,
+        CancellationToken cancellationToken)
     {
         if (shouldPublish == null)
         {
@@ -631,8 +635,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
         {
             scope.WriteLock(Constants.Locks.ContentTree);
 
-            // TODO: Await this properly when adjusting this service to our new EF Core approach.
-            var allLangs = _languageRepository.GetAllAsync(CancellationToken.None).GetAwaiter().GetResult().ToList();
+            var allLangs = (await _languageRepository.GetAllAsync(cancellationToken)).ToList();
 
             if (!document.HasIdentity)
             {
@@ -664,7 +667,8 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
 
             // deal with the branch root - if it fails, abort
             HashSet<string>? culturesToPublish = shouldPublish(document);
-            PublishResult? result = PublishBranchItem(scope, document, culturesToPublish, publishCultures, true, publishedDocuments, eventMessages, userId, allLangs, out IDictionary<string, object?>? notificationState);
+            (PublishResult? result, IDictionary<string, object?>? notificationState) =
+                await PublishBranchItemAsync(scope, document, culturesToPublish, publishCultures, true, publishedDocuments, eventMessages, userId, allLangs, cancellationToken);
             if (result != null)
             {
                 results.Add(result);
@@ -691,7 +695,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
 
                 // important to order by Path ASC so make it explicit in case defaults change
                 // ReSharper disable once RedundantArgumentDefaultValue
-                foreach (IContent d in GetDescendantsAsync(document.Key, page * pageSize, pageSize, Ordering.By("Path", Direction.Ascending), CancellationToken.None).GetAwaiter().GetResult().Items)
+                foreach (IContent d in (await GetDescendantsAsync(document.Key, page * pageSize, pageSize, Ordering.By("Path", Direction.Ascending), cancellationToken)).Items)
                 {
                     count++;
 
@@ -704,7 +708,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
 
                     // no need to check path here, parent has to be published here
                     culturesToPublish = shouldPublish(d);
-                    result = PublishBranchItem(scope, d, culturesToPublish, publishCultures, false, publishedDocuments, eventMessages, userId, allLangs, out _);
+                    (result, _) = await PublishBranchItemAsync(scope, d, culturesToPublish, publishCultures, false, publishedDocuments, eventMessages, userId, allLangs, cancellationToken);
                     if (result != null)
                     {
                         results.Add(result);
@@ -724,7 +728,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
             }
             while (count > 0);
 
-            Audit(AuditType.Publish, userId, document.Id, "Branch published");
+            await AuditAsync(AuditType.Publish, userId, document.Id, "Branch published");
 
             // trigger events for the entire branch
             // (SaveAndPublishBranchOne does *not* do it)
@@ -753,7 +757,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
     // shouldPublish: a function determining whether the document has changes that need to be published
     //  note - 'force' is handled by 'editing'
     // publishValues: a function publishing values (using the appropriate PublishCulture calls)
-    private PublishResult? PublishBranchItem(
+    private async Task<(PublishResult? Result, IDictionary<string, object?>? NotificationState)> PublishBranchItemAsync(
         ICoreScope scope,
         IContent document,
         HashSet<string>? culturesToPublish,
@@ -764,48 +768,50 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
         EventMessages evtMsgs,
         int userId,
         IReadOnlyCollection<ILanguage> allLangs,
-        out IDictionary<string, object?>? initialNotificationState)
+        CancellationToken cancellationToken)
     {
-        initialNotificationState = new Dictionary<string, object?>();
+        // TODO: this is never written to, so the branch ContentPublishedNotification always carries an empty state
+        // and cannot see what a ContentSavingNotification handler wrote. Return savingNotification.State instead. [NL]
+        IDictionary<string, object?>? initialNotificationState = new Dictionary<string, object?>();
 
         // we need to guard against unsaved changes before proceeding; the document will be saved, but we're not firing any saved notifications
         if (HasUnsavedChanges(document))
         {
-            return new PublishResult(PublishResultType.FailedPublishUnsavedChanges, evtMsgs, document);
+            return (new PublishResult(PublishResultType.FailedPublishUnsavedChanges, evtMsgs, document), initialNotificationState);
         }
 
         // null = do not include
         if (culturesToPublish == null)
         {
-            return null;
+            return (null, initialNotificationState);
         }
 
         // empty = already published
         if (culturesToPublish.Count == 0)
         {
-            return new PublishResult(PublishResultType.SuccessPublishAlready, evtMsgs, document);
+            return (new PublishResult(PublishResultType.SuccessPublishAlready, evtMsgs, document), initialNotificationState);
         }
 
         var savingNotification = new ContentSavingNotification(document, evtMsgs);
-        if (scope.Notifications.PublishCancelable(savingNotification))
+        if (await scope.Notifications.PublishCancelableAsync(savingNotification))
         {
-            return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, document);
+            return (new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, document), initialNotificationState);
         }
 
         // publish & check if values are valid
         if (!publishCultures(document, culturesToPublish, allLangs))
         {
             // TODO: Based on this callback behavior there is no way to know which properties may have been invalid if this failed, see other results of FailedPublishContentInvalid
-            return new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, document);
+            return (new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, document), initialNotificationState);
         }
 
-        PublishResult result = CommitContentChangesInternal(scope, document, evtMsgs, allLangs, savingNotification.State, userId, true, isRoot);
+        PublishResult result = await CommitContentChangesInternalAsync(scope, document, evtMsgs, allLangs, savingNotification.State, userId, cancellationToken, branchOne: true, branchRoot: isRoot);
         if (result.Success)
         {
             publishedDocuments.Add(document);
         }
 
-        return result;
+        return (result, initialNotificationState);
     }
 
     #endregion

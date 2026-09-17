@@ -94,7 +94,7 @@ public partial class InvariantContentTests
     public async Task PublishedDraftStructure_YieldsSystemFieldsWithTags()
     {
         await ContentService.SaveAsync(Root(), null, null, CancellationToken.None);
-        ContentService.PublishBranch(Root(), PublishBranchFilter.IncludeUnpublished, ["*"]);
+        await ContentService.PublishBranchAsync(Root(), PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         await SetupDraftContent();
         ContentService.Save([Root(), Child(), Grandchild(), GreatGrandchild()]);

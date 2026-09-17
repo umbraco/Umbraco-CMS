@@ -140,11 +140,10 @@ public class VariantContentTreeTests : IndexTestBase
     [TestCase("ja-JP")]
     public async Task PublishedStructureSingleCulture_YieldsAllPublishedDocumentsInOneCultures(string culture)
     {
-        await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, () =>
+        await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, async () =>
         {
-            IContent root = ContentService.GetByIdAsync(RootKey, CancellationToken.None).GetAwaiter().GetResult()!;
-            ContentService.PublishBranch(root, PublishBranchFilter.IncludeUnpublished, [culture]);
-            return Task.CompletedTask;
+            IContent root = (await ContentService.GetByIdAsync(RootKey, CancellationToken.None))!;
+            await ContentService.PublishBranchAsync(root, PublishBranchFilter.IncludeUnpublished, [culture], Constants.Security.SuperUserKey, CancellationToken.None);
         });
 
         VerifyVariance([culture]);
@@ -320,10 +319,9 @@ public class VariantContentTreeTests : IndexTestBase
     }
 
     private async Task PublishEntireStructure() =>
-        await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, () =>
+        await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, async () =>
         {
-            IContent root = ContentService.GetByIdAsync(RootKey, CancellationToken.None).GetAwaiter().GetResult()!;
-            ContentService.PublishBranch(root, PublishBranchFilter.IncludeUnpublished, ["*"]);
-            return Task.CompletedTask;
+            IContent root = (await ContentService.GetByIdAsync(RootKey, CancellationToken.None))!;
+            await ContentService.PublishBranchAsync(root, PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
         });
 }

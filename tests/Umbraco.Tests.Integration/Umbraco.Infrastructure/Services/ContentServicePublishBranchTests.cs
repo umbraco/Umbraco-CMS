@@ -50,7 +50,7 @@ internal sealed class ContentServicePublishBranchTests : UmbracoIntegrationTest
 
         // PublishBranchFilter.Default = publishes those that are actually published, and have changes
         // here: root (root is always published)
-        var r = PublishInvariantBranch(iRoot, PublishBranchFilter.Default, method).ToArray();
+        var r = (await PublishInvariantBranchAsync(iRoot, PublishBranchFilter.Default, method)).ToArray();
 
         // not forcing, ii1 and ii2 not published yet: only root got published
         AssertPublishResults(r, x => x.Content.Name, "iroot");
@@ -88,7 +88,7 @@ internal sealed class ContentServicePublishBranchTests : UmbracoIntegrationTest
 
         // PublishBranchFilter.Default = publishes those that are actually published, and have changes
         // here: nothing
-        r = PublishInvariantBranch(iRoot, PublishBranchFilter.Default, method).ToArray();
+        r = (await PublishInvariantBranchAsync(iRoot, PublishBranchFilter.Default, method)).ToArray();
 
         // not forcing, ii12 and ii2, ii21, ii22 not published yet: only root, ii1, ii11 got published
         AssertPublishResults(r, x => x.Content.Name, "iroot", "ii1", "ii11");
@@ -117,7 +117,7 @@ internal sealed class ContentServicePublishBranchTests : UmbracoIntegrationTest
         // here: iroot and ii11
 
         // not forcing, ii12 and ii2, ii21, ii22 not published yet: only root, ii1, ii11 got published
-        r = PublishInvariantBranch(iRoot, PublishBranchFilter.Default, method).ToArray();
+        r = (await PublishInvariantBranchAsync(iRoot, PublishBranchFilter.Default, method)).ToArray();
         AssertPublishResults(r, x => x.Content.Name, "iroot", "ii1", "ii11");
         AssertPublishResults(
             r,
@@ -128,7 +128,7 @@ internal sealed class ContentServicePublishBranchTests : UmbracoIntegrationTest
 
         // PublishBranchFilter.IncludeUnpublished = publishes everything that has changes
         // here: ii12, ii2, ii22 - ii21 was published already but masked
-        r = PublishInvariantBranch(iRoot, PublishBranchFilter.IncludeUnpublished, method).ToArray();
+        r = (await PublishInvariantBranchAsync(iRoot, PublishBranchFilter.IncludeUnpublished, method)).ToArray();
         AssertPublishResults(
             r,
             x => x.Content.Name,
@@ -187,7 +187,7 @@ internal sealed class ContentServicePublishBranchTests : UmbracoIntegrationTest
         iv1.SetValue("vp", "UPDATED-iv1.de", "de");
         await ContentService.SaveAsync(iv1, null, null, CancellationToken.None);
 
-        var r = ContentService.PublishBranch(vRoot, PublishBranchFilter.Default, vRoot.AvailableCultures.ToArray())
+        var r = (await ContentService.PublishBranchAsync(vRoot, PublishBranchFilter.Default, vRoot.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None))
             .ToArray(); // no culture specified so "*" is used, so all cultures
         Assert.AreEqual(PublishResultType.SuccessPublishAlready, r[0].Result);
         Assert.AreEqual(PublishResultType.SuccessPublishCulture, r[1].Result);
@@ -226,7 +226,7 @@ internal sealed class ContentServicePublishBranchTests : UmbracoIntegrationTest
         iv1.SetValue("vp", "UPDATED-iv1.de", "de");
         var saveResult = await ContentService.SaveAsync(iv1, null, null, CancellationToken.None);
 
-        var r = ContentService.PublishBranch(vRoot, PublishBranchFilter.Default, ["de"]).ToArray();
+        var r = (await ContentService.PublishBranchAsync(vRoot, PublishBranchFilter.Default, ["de"], Constants.Security.SuperUserKey, CancellationToken.None)).ToArray();
         Assert.AreEqual(PublishResultType.SuccessPublishAlready, r[0].Result);
         Assert.AreEqual(PublishResultType.SuccessPublishCulture, r[1].Result);
     }
@@ -272,7 +272,7 @@ internal sealed class ContentServicePublishBranchTests : UmbracoIntegrationTest
 
         // PublishBranchFilter.Default = publishes those that are actually published, and have changes
         // here: nothing
-        var r = ContentService.PublishBranch(vRoot, PublishBranchFilter.Default, ["*"]).ToArray(); // no culture specified = all cultures
+        var r = (await ContentService.PublishBranchAsync(vRoot, PublishBranchFilter.Default, ["*"], Constants.Security.SuperUserKey, CancellationToken.None)).ToArray(); // no culture specified = all cultures
 
         // not forcing, iv1 and iv2 not published yet: only root got published
         AssertPublishResults(r, x => x.Content.Name, "vroot.de");
@@ -305,7 +305,7 @@ internal sealed class ContentServicePublishBranchTests : UmbracoIntegrationTest
         Assert.IsTrue(iv1.IsCulturePublished("ru"));
         Assert.IsFalse(iv1.IsCulturePublished("es"));
 
-        r = ContentService.PublishBranch(vRoot, PublishBranchFilter.Default, ["de"]).ToArray();
+        r = (await ContentService.PublishBranchAsync(vRoot, PublishBranchFilter.Default, ["de"], Constants.Security.SuperUserKey, CancellationToken.None)).ToArray();
 
         // not forcing, iv2 not published yet: only root and iv1 got published
         AssertPublishResults(r, x => x.Content.Name, "vroot.de", "iv1.de");
@@ -386,7 +386,7 @@ internal sealed class ContentServicePublishBranchTests : UmbracoIntegrationTest
     {
         var (iRoot, ii1, iv11) = await Can_Publish_Mixed_Branch();
 
-        var r = ContentService.PublishBranch(iRoot, PublishBranchFilter.Default, ["de"]).ToArray();
+        var r = (await ContentService.PublishBranchAsync(iRoot, PublishBranchFilter.Default, ["de"], Constants.Security.SuperUserKey, CancellationToken.None)).ToArray();
         AssertPublishResults(r, x => x.Content.Name, "iroot", "ii1", "iv11.de");
         AssertPublishResults(
             r,
@@ -412,7 +412,7 @@ internal sealed class ContentServicePublishBranchTests : UmbracoIntegrationTest
     {
         var (iRoot, ii1, iv11) = await Can_Publish_Mixed_Branch();
 
-        var r = ContentService.PublishBranch(iRoot, PublishBranchFilter.Default, ["de", "ru"]).ToArray();
+        var r = (await ContentService.PublishBranchAsync(iRoot, PublishBranchFilter.Default, ["de", "ru"], Constants.Security.SuperUserKey, CancellationToken.None)).ToArray();
         AssertPublishResults(r, x => x.Content.Name, "iroot", "ii1", "iv11.de");
         AssertPublishResults(
             r,
@@ -463,7 +463,7 @@ internal sealed class ContentServicePublishBranchTests : UmbracoIntegrationTest
         ii3.SetValue("ip", "vii3a");
         await ContentService.SaveAsync(ii3, null, null, CancellationToken.None);
 
-        var result = ContentService.PublishBranch(iRoot, publishBranchFilter, ["*"]).ToArray();
+        var result = (await ContentService.PublishBranchAsync(iRoot, publishBranchFilter, ["*"], Constants.Security.SuperUserKey, CancellationToken.None)).ToArray();
 
         var expectedContentNames = GetExpectedContentNamesForForceOptions(publishBranchFilter);
         var expectedPublishResultTypes = GetExpectedPublishResultTypesForForceOptions(publishBranchFilter);
@@ -534,7 +534,7 @@ internal sealed class ContentServicePublishBranchTests : UmbracoIntegrationTest
         await ContentService.SaveAsync(iv3, null, null, CancellationToken.None);
 
         var cultures = culture == "*" ? vRoot.AvailableCultures.ToArray() : new[] { culture };
-        var result = ContentService.PublishBranch(vRoot, publishBranchFilter, cultures).ToArray();
+        var result = (await ContentService.PublishBranchAsync(vRoot, publishBranchFilter, cultures, Constants.Security.SuperUserKey, CancellationToken.None)).ToArray();
 
         var expectedContentNames = GetExpectedContentNamesForForceOptions(publishBranchFilter, true);
         var expectedPublishResultTypes = GetExpectedPublishResultTypesForForceOptions(publishBranchFilter, true);
@@ -657,18 +657,18 @@ internal sealed class ContentServicePublishBranchTests : UmbracoIntegrationTest
         return (iContentType, vContentType);
     }
 
-    private IEnumerable<PublishResult> PublishInvariantBranch(IContent content, PublishBranchFilter publishBranchFilter, int method)
+    private async Task<IEnumerable<PublishResult>> PublishInvariantBranchAsync(IContent content, PublishBranchFilter publishBranchFilter, int method)
     {
         // ReSharper disable RedundantArgumentDefaultValue
         // ReSharper disable ArgumentsStyleOther
         switch (method)
         {
             case 1:
-                return ContentService.PublishBranch(content, publishBranchFilter, content.AvailableCultures.ToArray());
+                return await ContentService.PublishBranchAsync(content, publishBranchFilter, content.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
             case 2:
-                return ContentService.PublishBranch(content, publishBranchFilter, cultures: ["*"]);
+                return await ContentService.PublishBranchAsync(content, publishBranchFilter, cultures: ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
             case 3:
-                return ContentService.PublishBranch(content, publishBranchFilter, cultures: Array.Empty<string>());
+                return await ContentService.PublishBranchAsync(content, publishBranchFilter, cultures: Array.Empty<string>(), Constants.Security.SuperUserKey, CancellationToken.None);
             default:
                 throw new ArgumentOutOfRangeException(nameof(method));
         }

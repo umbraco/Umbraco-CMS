@@ -447,13 +447,14 @@ public interface IContentService : IPublishableContentService<IContent>, IAsyncP
     /// <param name="content">The root document.</param>
     /// <param name="publishBranchFilter">A value indicating options for force publishing unpublished or re-publishing unchanged content.</param>
     /// <param name="cultures">The cultures to publish.</param>
-    /// <param name="userId">The identifier of the user performing the operation.</param>
+    /// <param name="userKey">The key of the user performing the operation.</param>
+    /// <param name="cancellationToken">A cancellation token.</param>
     /// <remarks>
     ///     <para>
     ///         The root of the branch is always published, regardless of <paramref name="publishBranchFilter" />.
     ///     </para>
     /// </remarks>
-    IEnumerable<PublishResult> PublishBranch(IContent content, PublishBranchFilter publishBranchFilter, string[] cultures, int userId = Constants.Security.SuperUserId);
+    Task<IEnumerable<PublishResult>> PublishBranchAsync(IContent content, PublishBranchFilter publishBranchFilter, string[] cultures, Guid userKey, CancellationToken cancellationToken);
 
     /// <summary>
     ///     Gets a value indicating whether a document is path-publishable.

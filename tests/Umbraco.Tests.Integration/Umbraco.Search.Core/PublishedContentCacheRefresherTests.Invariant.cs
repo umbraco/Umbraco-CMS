@@ -19,7 +19,7 @@ public partial class PublishedContentCacheRefresherTests
         if (publishDescendants)
         {
             await ContentService.SaveAsync(Get(RootKey), null, null, CancellationToken.None);
-            ContentService.PublishBranch(Get(RootKey), PublishBranchFilter.IncludeUnpublished, ["*"]);
+            await ContentService.PublishBranchAsync(Get(RootKey), PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
         }
         else
         {
@@ -44,7 +44,7 @@ public partial class PublishedContentCacheRefresherTests
     {
         (Guid RootKey, Guid ChildKey, Guid GrandchildKey) = await SetupInvariantContentTest();
         await ContentService.SaveAsync(Get(RootKey), null, null, CancellationToken.None);
-        ContentService.PublishBranch(Get(RootKey), PublishBranchFilter.IncludeUnpublished, ["*"]);
+        await ContentService.PublishBranchAsync(Get(RootKey), PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
         ResetNotificationPayloads();
 
         if (publishDescendants)
@@ -55,7 +55,7 @@ public partial class PublishedContentCacheRefresherTests
             await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
             await ContentService.SaveAsync(Get(ChildKey), null, null, CancellationToken.None);
-            ContentService.PublishBranch(Get(ChildKey), PublishBranchFilter.IncludeUnpublished, ["*"]);
+            await ContentService.PublishBranchAsync(Get(ChildKey), PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
         }
         else
         {
@@ -80,7 +80,7 @@ public partial class PublishedContentCacheRefresherTests
     {
         (Guid RootKey, Guid ChildKey, Guid GrandchildKey) = await SetupInvariantContentTest();
         await ContentService.SaveAsync(Get(RootKey), null, null, CancellationToken.None);
-        ContentService.PublishBranch(Get(RootKey), PublishBranchFilter.IncludeUnpublished, ["*"]);
+        await ContentService.PublishBranchAsync(Get(RootKey), PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
         ResetNotificationPayloads();
 
         await ContentService.UnpublishAsync(Get(RootKey), "*", Constants.Security.SuperUserKey, CancellationToken.None);
@@ -101,7 +101,7 @@ public partial class PublishedContentCacheRefresherTests
     {
         (Guid RootKey, Guid ChildKey, Guid GrandchildKey) = await SetupInvariantContentTest();
         await ContentService.SaveAsync(Get(RootKey), null, null, CancellationToken.None);
-        ContentService.PublishBranch(Get(RootKey), PublishBranchFilter.IncludeUnpublished, ["*"]);
+        await ContentService.PublishBranchAsync(Get(RootKey), PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
         ResetNotificationPayloads();
 
         await ContentService.UnpublishAsync(Get(ChildKey), "*", Constants.Security.SuperUserKey, CancellationToken.None);
@@ -122,7 +122,7 @@ public partial class PublishedContentCacheRefresherTests
     {
         (Guid RootKey, Guid ChildKey, Guid GrandchildKey) = await SetupInvariantContentTest();
         await ContentService.SaveAsync(Get(RootKey), null, null, CancellationToken.None);
-        ContentService.PublishBranch(Get(RootKey), PublishBranchFilter.IncludeUnpublished, ["*"]);
+        await ContentService.PublishBranchAsync(Get(RootKey), PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
         ResetNotificationPayloads();
 
         await ContentService.MoveToRecycleBinAsync(Get(RootKey), Constants.Security.SuperUserKey, CancellationToken.None);
@@ -142,7 +142,7 @@ public partial class PublishedContentCacheRefresherTests
     {
         (Guid RootKey, Guid ChildKey, Guid GrandchildKey) = await SetupInvariantContentTest();
         await ContentService.SaveAsync(Get(RootKey), null, null, CancellationToken.None);
-        ContentService.PublishBranch(Get(RootKey), PublishBranchFilter.IncludeUnpublished, ["*"]);
+        await ContentService.PublishBranchAsync(Get(RootKey), PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
         ResetNotificationPayloads();
 
         await ContentService.MoveToRecycleBinAsync(Get(ChildKey), Constants.Security.SuperUserKey, CancellationToken.None);
@@ -162,7 +162,7 @@ public partial class PublishedContentCacheRefresherTests
     {
         (Guid RootKey, Guid ChildKey, Guid GrandchildKey) = await SetupInvariantContentTest();
         await ContentService.SaveAsync(Get(RootKey), null, null, CancellationToken.None);
-        ContentService.PublishBranch(Get(RootKey), PublishBranchFilter.IncludeUnpublished, ["*"]);
+        await ContentService.PublishBranchAsync(Get(RootKey), PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
         ResetNotificationPayloads();
 
         await ContentService.DeleteAsync(Get(RootKey), null, CancellationToken.None);
@@ -182,7 +182,7 @@ public partial class PublishedContentCacheRefresherTests
     {
         (Guid RootKey, Guid ChildKey, Guid GrandchildKey) = await SetupInvariantContentTest();
         await ContentService.SaveAsync(Get(RootKey), null, null, CancellationToken.None);
-        ContentService.PublishBranch(Get(RootKey), PublishBranchFilter.IncludeUnpublished, ["*"]);
+        await ContentService.PublishBranchAsync(Get(RootKey), PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
         ResetNotificationPayloads();
 
         await ContentService.DeleteAsync(Get(ChildKey), null, CancellationToken.None);
@@ -202,7 +202,7 @@ public partial class PublishedContentCacheRefresherTests
     {
         (Guid RootKey, Guid ChildKey, Guid GrandchildKey) = await SetupInvariantContentTest();
         await ContentService.SaveAsync(Get(RootKey), null, null, CancellationToken.None);
-        ContentService.PublishBranch(Get(RootKey), PublishBranchFilter.IncludeUnpublished, ["*"]);
+        await ContentService.PublishBranchAsync(Get(RootKey), PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
         await ContentService.MoveToRecycleBinAsync(Get(RootKey), Constants.Security.SuperUserKey, CancellationToken.None);
         ResetNotificationPayloads();
 

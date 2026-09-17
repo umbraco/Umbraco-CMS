@@ -100,7 +100,7 @@ internal sealed class ContentServiceVariantTests : UmbracoIntegrationTest
         child.SetValue("title", "Child Title", valueCultureCode);
         await ContentService.SaveAsync(child, null, null, CancellationToken.None);
 
-        var publishResult = ContentService.PublishBranch(root, PublishBranchFilter.All, [publishCultureCode]);
+        var publishResult = await ContentService.PublishBranchAsync(root, PublishBranchFilter.All, [publishCultureCode], Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.AreEqual(2, publishResult.Count());
         Assert.IsTrue(publishResult.First().Success);
         Assert.IsTrue(publishResult.Last().Success);

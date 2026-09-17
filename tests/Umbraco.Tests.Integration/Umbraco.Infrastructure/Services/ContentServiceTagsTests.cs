@@ -866,7 +866,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
         await ContentService.SaveAsync(child2, null, null, CancellationToken.None);
 
         // Act
-        ContentService.PublishBranch(content, PublishBranchFilter.IncludeUnpublished, content.AvailableCultures.ToArray());
+        await ContentService.PublishBranchAsync(content, PublishBranchFilter.IncludeUnpublished, content.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Assert
         var propertyTypeId = contentType.PropertyTypes.Single(x => x.Alias == "tags").Id;
