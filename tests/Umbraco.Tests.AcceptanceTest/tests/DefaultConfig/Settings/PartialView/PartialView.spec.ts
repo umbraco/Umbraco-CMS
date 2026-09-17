@@ -296,7 +296,6 @@ test('cannot create a partial view with a duplicate name', async ({umbracoApi, u
 
   // Assert
   await umbracoUi.partialView.isFailedStateButtonVisible();
-  // doesNameExist only proves at least one exists; verify no duplicate was created.
   const rootPartialViews = await (await umbracoApi.partialView.getAllAtRoot()).json();
   expect(rootPartialViews.items.filter(item => item.name === partialViewFileName)).toHaveLength(1);
 });

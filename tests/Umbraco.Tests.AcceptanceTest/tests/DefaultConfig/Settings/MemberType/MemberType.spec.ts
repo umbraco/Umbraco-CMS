@@ -104,7 +104,6 @@ test('cannot create a member type with a duplicate name', async ({umbracoApi, um
 
   // Assert
   await umbracoUi.memberType.isErrorNotificationVisible();
-  // doesNameExist only proves at least one exists; verify no duplicate was created.
   const rootMemberTypes = await (await umbracoApi.memberType.getAllAtRoot()).json();
   expect(rootMemberTypes.items.filter(item => item.name === memberTypeName)).toHaveLength(1);
 });

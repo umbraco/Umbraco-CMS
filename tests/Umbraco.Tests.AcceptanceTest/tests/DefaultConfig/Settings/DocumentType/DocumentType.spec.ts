@@ -154,7 +154,6 @@ test('cannot create a document type with a duplicate name', async ({umbracoApi, 
 
   // Assert
   await umbracoUi.documentType.isErrorNotificationVisible();
-  // doesNameExist only proves at least one exists; verify no duplicate was created.
   const rootDocumentTypes = await (await umbracoApi.documentType.getAllAtRoot()).json();
   expect(rootDocumentTypes.items.filter(item => item.name === documentTypeName)).toHaveLength(1);
 });

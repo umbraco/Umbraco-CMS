@@ -111,10 +111,6 @@ test('can remove a mp4 file in the content', async ({umbracoApi, umbracoUi}) => 
   expect(contentData.values).toEqual([]);
 });
 
-// Disallowed-extension rejection is a generic Upload-editor mechanism, covered once in
-// ContentWithUploadFile.spec.ts and once in ContentWithUploadVectorGraphics.spec.ts, so it is
-// not repeated identically for every upload variant.
-
 test('can not publish a mandatory upload video with an empty value', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);

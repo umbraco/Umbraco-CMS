@@ -126,7 +126,6 @@ test('cannot create a stylesheet with a duplicate name', async ({umbracoApi, umb
 
   // Assert
   await umbracoUi.stylesheet.isFailedStateButtonVisible();
-  // doesNameExist only proves at least one exists; verify no duplicate was created.
   const rootStylesheets = await (await umbracoApi.stylesheet.getAllAtRoot()).json();
   expect(rootStylesheets.items.filter(item => item.name === stylesheetName)).toHaveLength(1);
 });
