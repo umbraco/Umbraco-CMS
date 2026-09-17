@@ -3165,6 +3165,61 @@ export default {
 		emptyTimeZone: 'Please select a time zone',
 		invalidTimeZone: 'The selected time zone is not valid',
 	},
+	searchManagement: {
+		treeHeader: 'Search',
+		tableColumnAlias: 'Alias',
+		tableColumnHealthStatus: 'Health status',
+		tableColumnDocumentCount: 'Document count',
+		healthStatus: (status: string) => status,
+		documentCount: (cnt: number | string) => {
+			switch (cnt) {
+				case 0:
+					return 'Empty';
+				case 1:
+					return '1 document';
+				default:
+					return `${cnt} documents`;
+			}
+		},
+		collectionActionReload: 'Refresh',
+		entityActionRebuildIndex: 'Rebuild',
+		rebuildConfirmHeadline: 'Rebuild index',
+		rebuildConfirmMessage:
+			'<strong>{0}</strong> will be rebuilt from scratch. Searching it may return <i>incomplete results</i> until the rebuild finishes.',
+		rebuildConfirmLabel: 'Rebuild',
+		rebuildStartedMessage: 'Rebuilding {0} in the background.',
+		rebuildCompletedTitle: 'Rebuild completed',
+		rebuildCompletedMessage: '{0} has finished rebuilding.',
+		indexInfo: 'Index information',
+		indexAlias: 'Alias',
+		providerName: 'Provider',
+		searchBox: 'Search',
+		searchPlaceholder: 'Search',
+		searchButton: 'Search',
+		noResults: 'No results',
+		resultsCount: (count: number) => `Found ${count} result${count !== 1 ? 's' : ''}`,
+		tableColumnName: 'Name',
+		tableColumnEntityType: 'Type',
+		statsBoxLabel: 'Statistics',
+		searchBoxLabel: 'Search',
+		// Accessibility labels
+		searching: 'Searching...',
+		searchFailed: 'Search failed',
+		searchComplete: (count: number) => `Search complete. Found ${count} result${count !== 1 ? 's' : ''}`,
+		openEntity: (type: string, id: string) => `Open ${type} with ID ${id}`,
+		searchFormLabel: (indexAlias: string) => `Search ${indexAlias} index`,
+		searchInputLabel: 'Search query',
+		searchInputAriaLabel: (indexAlias: string) => `Enter search query for ${indexAlias} index`,
+		searchButtonAriaLabel: 'Execute search',
+		searchHint: 'Press Enter to search',
+		loading: 'Loading search results',
+		resultsRegion: 'Search results',
+		resultsTable: 'Search results table',
+		paginationLabel: 'Search results pages',
+		cultureSelectLabel: 'Culture',
+		searchDisabled: 'Search unavailable. Index status:',
+		searchError: 'Search failed. Try again.',
+	},
 	uiCulture: {
 		ar: 'العربية',
 		bs: 'Bosanski',

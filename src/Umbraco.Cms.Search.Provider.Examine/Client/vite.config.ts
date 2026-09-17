@@ -10,11 +10,7 @@ export default defineConfig({
   ],
   server: {
     fs: {
-      allow: [
-        import.meta.dirname,
-        resolve(import.meta.dirname, '../../Umbraco.Web.UI.Client'),
-        resolve(import.meta.dirname, '../../Umbraco.Cms.Search.Core.Client/Client'),
-      ],
+      allow: [import.meta.dirname, resolve(import.meta.dirname, '../../Umbraco.Web.UI.Client')],
     },
   },
   build: {

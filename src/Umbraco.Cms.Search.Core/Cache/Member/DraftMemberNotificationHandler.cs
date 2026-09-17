@@ -1,8 +1,8 @@
 ﻿using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
+using Umbraco.Cms.Core.Search.Indexing;
 using Umbraco.Cms.Core.Services.Changes;
-using Umbraco.Cms.Search.Core.Services.ContentIndexing;
 
 namespace Umbraco.Cms.Search.Core.Cache.Member;
 
