@@ -1,9 +1,15 @@
 import {expect} from '@playwright/test';
 import {ConstantHelper, test} from '@umbraco/acceptance-test-helpers';
 
+// Raised from the 60s default - chained index polls would otherwise hit the test timeout first.
+test.describe.configure({timeout: 120000});
+
 const documentTypeName = 'SearchIndexSearchBoxDocumentType';
 const documentName = 'SearchIndexSearchBoxDocument';
-let indexAlias = '';
+const indexAlias = 'Umb_Content';
+// Mirrors PAGE_SIZE in search-index-search-box.element.ts - the search box only renders its pagination once
+// the result set spans more than one page.
+const searchResultsPageSize = 10;
 
 test.beforeEach(async ({umbracoApi, umbracoUi}) => {
   await umbracoApi.document.ensureNameNotExists(documentName);
@@ -16,10 +22,17 @@ test.beforeEach(async ({umbracoApi, umbracoUi}) => {
   await umbracoApi.document.publish(documentId);
 
   const indexes = await umbracoApi.searchManagement.getAllIndexes();
-  indexAlias = indexes.items.find((index) => index.indexAlias === 'Umb_Content').indexAlias;
+  const contentIndex = indexes.items.find((index) => index.indexAlias === indexAlias);
+  expect(contentIndex, `the ${indexAlias} index must exist`).toBeTruthy();
+
+  // A healthy index does not imply the document just published has been indexed - indexing is asynchronous -
+  // so wait for the document itself to be findable, which is what every test below depends on.
   await expect
-    .poll(async () => (await umbracoApi.searchManagement.getIndex(indexAlias)).healthStatus, {timeout: ConstantHelper.timeout.pageLoad})
+    .poll(async () => (await umbracoApi.searchManagement.getIndex(indexAlias)).healthStatus, {timeout: ConstantHelper.timeout.veryLong})
     .toBe('Healthy');
+  await expect
+    .poll(async () => (await umbracoApi.searchManagement.search(indexAlias, documentName)).total, {timeout: ConstantHelper.timeout.veryLong})
+    .toBeGreaterThan(0);
 
   await umbracoUi.goToBackOffice();
   await umbracoUi.searchManagement.goToSearchTreeItem();
@@ -48,11 +61,8 @@ test('shows search results for the index content', async ({umbracoApi, umbracoUi
   await umbracoUi.searchManagement.searchForQueryAndWaitForResponse(documentName);
 
   // Assert
-  expect(apiResults.total).toBeGreaterThan(0);
   await umbracoUi.searchManagement.isSearchResultsTableVisible();
   await umbracoUi.searchManagement.isSearchNoResultsMessageVisible(false);
   await umbracoUi.searchManagement.doesSearchResultsTableContainText(documentName);
-
-  // Pagination only renders once results span more than one page
-  await umbracoUi.searchManagement.isSearchPaginationVisible(apiResults.total > 10);
+  await umbracoUi.searchManagement.isSearchPaginationVisible(apiResults.total > searchResultsPageSize);
 });

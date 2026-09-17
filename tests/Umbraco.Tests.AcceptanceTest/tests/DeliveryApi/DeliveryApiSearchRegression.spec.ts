@@ -1,5 +1,8 @@
 import {expect} from '@playwright/test';
-import {ConstantHelper, test} from '@umbraco/acceptance-test-helpers';
+import {test} from '@umbraco/acceptance-test-helpers';
+
+// Raised from the 60s default - chained index polls would otherwise hit the test timeout first.
+test.describe.configure({timeout: 120000});
 
 // Document Type
 const documentTypeName = 'DeliveryApiSearchRegressionDocumentType';
@@ -17,24 +20,6 @@ let documentTypeId = '';
 let secondDocumentTypeId = '';
 let loginPageContentId = '';
 
-// Content indexing is asynchronous and its latency varies, so poll the query itself rather than a flat wait
-// followed by a single check - a flat wait can consistently undershoot under load.
-async function queryUntilNamesPresent(umbracoApi, filter: string | undefined, sort: string | undefined, expectedNames: string[]) {
-  let contentItemsJson;
-  await expect
-    .poll(
-      async () => {
-        const contentItems = await umbracoApi.contentDeliveryApi.getContentItemsFromAQuery(undefined, undefined, filter, sort);
-        contentItemsJson = await contentItems.json();
-        const returnedNames = contentItemsJson.items.map((item: {name: string}) => item.name);
-        return expectedNames.every((name) => returnedNames.includes(name));
-      },
-      {timeout: ConstantHelper.timeout.pageLoad},
-    )
-    .toBe(true);
-  return contentItemsJson;
-}
-
 test.beforeEach(async ({umbracoApi}) => {
   documentTypeId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(documentTypeName) ?? '';
   secondDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(secondDocumentTypeName) ?? '';
@@ -43,6 +28,8 @@ test.beforeEach(async ({umbracoApi}) => {
   await umbracoApi.document.publish(loginPageContentId);
 });
 
+// Teardown belongs here rather than at the end of a test body: a failing test skips its own trailing
+// cleanup, and with workers: 1 that residue lands on the next spec, which gates on index membership.
 test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.document.ensureNameNotExists(protectedContentName);
   await umbracoApi.document.ensureNameNotExists(unprotectedContentName);
@@ -70,37 +57,40 @@ test.describe('filter and sort content items', () => {
     const filter = 'contentType:' + documentTypeData.alias;
     const sort = 'name:asc';
 
-    // Act
-    const contentItemsJson = await queryUntilNamesPresent(umbracoApi, filter, sort, [firstTypeContentNameA, firstTypeContentNameB]);
+    // Act - the total is part of the wait, not a check after it (see DeliveryApiSearchQuery for why)
+    const contentItemsJson = await umbracoApi.contentDeliveryApi.queryUntilNamesPresent(filter, sort, [firstTypeContentNameA, firstTypeContentNameB], 2);
 
     // Assert
     // Only the two documentTypeName items should be returned - the secondDocumentTypeName item and the login page must be excluded
-    expect(contentItemsJson.total).toBe(2);
     expect(contentItemsJson.items[0].name).toBe(firstTypeContentNameB);
     expect(contentItemsJson.items[1].name).toBe(firstTypeContentNameA);
-
-    // Clean
-    await umbracoApi.document.ensureNameNotExists(secondTypeContentName);
-    await umbracoApi.document.ensureNameNotExists(firstTypeContentNameA);
-    await umbracoApi.document.ensureNameNotExists(firstTypeContentNameB);
   });
 
   test('can exclude content items using the contentType IsNot filter operator', async ({umbracoApi}) => {
-    // Arrange
+    // Arrange - the filter needs something of the excluded type to actually exclude, otherwise it passes
+    // just as well when IsNot is a no-op that returns everything
     const secondTypeContentName = includedContentNamePrefix + 'ForIsNot';
     const secondTypeContentId = await umbracoApi.document.createDefaultDocument(secondTypeContentName, secondDocumentTypeId);
     await umbracoApi.document.publish(secondTypeContentId);
+    const firstTypeContentName = excludedContentNamePrefix + 'ForIsNot';
+    const firstTypeContentId = await umbracoApi.document.createDefaultDocument(firstTypeContentName, documentTypeId);
+    await umbracoApi.document.publish(firstTypeContentId);
 
     const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
     // "contentType:!alias" is the IsNot operator - it must exclude everything of that content type.
     const filter = 'contentType:!' + documentTypeData.alias;
 
+    // Prove the excluded document is indexed before asserting its absence, so an unindexed document cannot
+    // stand in for an excluded one.
+    await umbracoApi.contentDeliveryApi.queryUntilNamesPresent('contentType:' + documentTypeData.alias, undefined, [firstTypeContentName]);
+
     // Act
     // The login page (also secondDocumentTypeId) must be included alongside secondTypeContentName - both are excluded by the filter's type.
-    await queryUntilNamesPresent(umbracoApi, filter, undefined, [secondTypeContentName, loginPageContentName]);
+    const contentItemsJson = await umbracoApi.contentDeliveryApi.queryUntilNamesPresent(filter, undefined, [secondTypeContentName, loginPageContentName]);
 
-    // Clean
-    await umbracoApi.document.ensureNameNotExists(secondTypeContentName);
+    // Assert
+    const returnedNames = contentItemsJson.items.map((item: {name: string}) => item.name);
+    expect(returnedNames).not.toContain(firstTypeContentName);
   });
 
   test('can exclude content items using the name DoesNotContain filter operator', async ({umbracoApi}) => {
@@ -115,16 +105,16 @@ test.describe('filter and sort content items', () => {
     // "name:!value" is the DoesNotContain operator
     const filter = 'name:!' + excludedContentNamePrefix;
 
+    // Prove both are indexed before asserting the negation - otherwise an excluded document that simply
+    // has not been indexed yet satisfies the assertion.
+    await umbracoApi.contentDeliveryApi.queryUntilNamesPresent('contentType:' + (await umbracoApi.documentType.getByName(documentTypeName)).alias, undefined, [excludedContentName, includedContentName]);
+
     // Act
-    const contentItemsJson = await queryUntilNamesPresent(umbracoApi, filter, undefined, [includedContentName]);
+    const contentItemsJson = await umbracoApi.contentDeliveryApi.queryUntilNamesPresent(filter, undefined, [includedContentName]);
 
     // Assert
     const returnedNames = contentItemsJson.items.map((item: {name: string}) => item.name);
     expect(returnedNames).not.toContain(excludedContentName);
-
-    // Clean
-    await umbracoApi.document.ensureNameNotExists(excludedContentName);
-    await umbracoApi.document.ensureNameNotExists(includedContentName);
   });
 });
 
@@ -138,20 +128,23 @@ test.describe('member-protected content is excluded from anonymous requests', ()
     await umbracoApi.document.publish(protectedContentId);
     const unprotectedContentId = await umbracoApi.document.createDefaultDocument(unprotectedContentName, documentTypeId) ?? '';
     await umbracoApi.document.publish(unprotectedContentId);
-    await umbracoApi.document.setPublicAccessForDocument(protectedContentId, [memberGroupName], loginPageContentId, loginPageContentId);
-
     const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
     const filter = 'contentType:' + documentTypeData.alias;
 
+    // Both documents must be indexed before protection is applied, otherwise the protected document being
+    // absent below proves nothing - it would simply not have been indexed yet.
+    await umbracoApi.contentDeliveryApi.queryUntilNamesPresent(filter, undefined, [protectedContentName, unprotectedContentName]);
+    await umbracoApi.document.setPublicAccessForDocument(protectedContentId, [memberGroupName], loginPageContentId, loginPageContentId);
+
     // Act
-    // Protection is a second async update on top of the initial index write, so poll until the unprotected
-    // document (indexed after it) appears, proving both writes have landed.
-    const contentItemsJson = await queryUntilNamesPresent(umbracoApi, filter, undefined, [unprotectedContentName]);
+    // Protection is a second async index write on top of the publish, so wait on the disappearance itself
+    // rather than on some other write that has no ordering relationship with it.
+    const contentItemsJson = await umbracoApi.contentDeliveryApi.queryUntilNamesAbsent(filter, undefined, [protectedContentName]);
     const directItem = await umbracoApi.contentDeliveryApi.getContentItemWithId(protectedContentId);
 
     // Assert
     const returnedNames = contentItemsJson.items.map((item: {name: string}) => item.name);
-    expect(returnedNames).not.toContain(protectedContentName);
+    expect(returnedNames).toContain(unprotectedContentName);
 
     // Protected content that exists but requires member access returns 401, not 404 (per ByIdContentApiController).
     expect(directItem.status()).toBe(401);

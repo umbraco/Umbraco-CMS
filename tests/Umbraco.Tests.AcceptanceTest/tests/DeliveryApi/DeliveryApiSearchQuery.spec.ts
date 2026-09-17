@@ -1,5 +1,8 @@
 import {expect} from '@playwright/test';
-import {ConstantHelper, test} from '@umbraco/acceptance-test-helpers';
+import {ApiHelpers, test} from '@umbraco/acceptance-test-helpers';
+
+// Raised from the 60s default - chained index polls would otherwise hit the test timeout first.
+test.describe.configure({timeout: 120000});
 
 // Exercises the new search stack through the Delivery API content query surface
 // (/umbraco/delivery/api/v2/content): name text-matching, skip/take pagination, and
@@ -43,43 +46,15 @@ const renameAfterToken = 'Updatedword';
 
 let documentTypeId = '';
 
-async function createAndPublishDocument(umbracoApi, name: string): Promise<string> {
+async function createAndPublishDocument(umbracoApi: ApiHelpers, name: string): Promise<string> {
   const contentId = await umbracoApi.document.createDefaultDocument(name, documentTypeId) ?? '';
   await umbracoApi.document.publish(contentId);
   return contentId;
 }
 
-async function queryContent(umbracoApi, filter?: string, sort?: string, skip?: number, take?: number) {
+async function queryContent(umbracoApi: ApiHelpers, filter?: string, sort?: string, skip?: number, take?: number) {
   const response = await umbracoApi.contentDeliveryApi.getContentItemsFromAQuery(undefined, undefined, filter, sort, skip, take);
   return await response.json();
-}
-
-// Content indexing is asynchronous and its latency varies, so poll the query itself rather than a flat wait
-// followed by a single check - a flat wait can consistently undershoot under load.
-async function queryUntilNamesPresent(umbracoApi, filter: string | undefined, sort: string | undefined, expectedNames: string[]) {
-  let contentItemsJson;
-  await expect
-    .poll(
-      async () => {
-        contentItemsJson = await queryContent(umbracoApi, filter, sort, 0, 100);
-        const returnedNames = contentItemsJson.items.map((item: {name: string}) => item.name);
-        return expectedNames.every((name) => returnedNames.includes(name));
-      },
-      {timeout: ConstantHelper.timeout.pageLoad},
-    )
-    .toBe(true);
-  return contentItemsJson;
-}
-
-// De-indexing is asynchronous, so poll until the query stops matching. Assert on total rather than on the
-// returned items: total comes from the index, whereas items are the index hits mapped through the published-
-// content cache (GetByIds().WhereNotNull()). A stale index that still matches the document would be masked at
-// the items level - the cache alone drops an unpublished doc, and after a rename it already reports the new
-// name - so only total dropping to zero proves the document actually left the index.
-async function queryUntilTotalIsZero(umbracoApi, filter: string | undefined) {
-  await expect
-    .poll(async () => (await queryContent(umbracoApi, filter)).total, {timeout: ConstantHelper.timeout.pageLoad})
-    .toBe(0);
 }
 
 test.beforeEach(async ({umbracoApi}) => {
@@ -101,26 +76,27 @@ test.describe('name text-matching', () => {
   });
 
   test('can match content whose name contains the search term', async ({umbracoApi}) => {
-    // Act
-    const contentItemsJson = await queryUntilNamesPresent(umbracoApi, 'name:' + zephyrToken, undefined, [zephyrContentNameA, zephyrContentNameB]);
+    // Act - the total is part of the wait, not a check after it: stale entries from the previous test's
+    // teardown leave the index asynchronously and would otherwise inflate the count
+    const contentItemsJson = await umbracoApi.contentDeliveryApi.queryUntilNamesPresent('name:' + zephyrToken, undefined, [zephyrContentNameA, zephyrContentNameB], 2, 0, 100);
 
     // Assert - only the two names containing the token match; the mundane document must be excluded
     const returnedNames = contentItemsJson.items.map((item: {name: string}) => item.name);
     expect(returnedNames).not.toContain(mundaneContentName);
-    expect(contentItemsJson.total).toBe(2);
   });
 
   test('can match a name case-insensitively', async ({umbracoApi}) => {
     // Act - the token is stored capitalised ("Zephyr") but queried in lower case
-    const contentItemsJson = await queryUntilNamesPresent(umbracoApi, 'name:' + zephyrToken.toLowerCase(), undefined, [zephyrContentNameA, zephyrContentNameB]);
+    const contentItemsJson = await umbracoApi.contentDeliveryApi.queryUntilNamesPresent('name:' + zephyrToken.toLowerCase(), undefined, [zephyrContentNameA, zephyrContentNameB], 2, 0, 100);
 
-    // Assert
-    expect(contentItemsJson.total).toBe(2);
+    // Assert - matching case-insensitively must not broaden the match beyond the two Zephyr names
+    const returnedNames = contentItemsJson.items.map((item: {name: string}) => item.name);
+    expect(returnedNames).not.toContain(mundaneContentName);
   });
 
   test('returns no items for a non-matching term', async ({umbracoApi}) => {
     // Arrange - prove indexing has landed so an empty result can only mean "no match"
-    await queryUntilNamesPresent(umbracoApi, 'name:' + zephyrToken, undefined, [zephyrContentNameA]);
+    await umbracoApi.contentDeliveryApi.queryUntilNamesPresent('name:' + zephyrToken, undefined, [zephyrContentNameA]);
 
     // Act
     const contentItemsJson = await queryContent(umbracoApi, 'name:DeliveryApiSearchQueryNoSuchTermXyz');
@@ -140,8 +116,9 @@ test.describe('skip and take pagination', () => {
     const filter = 'name:' + pagingToken;
     const sort = 'name:asc';
 
-    // Wait until every document is queryable before paging, otherwise page boundaries shift under async indexing.
-    await queryUntilNamesPresent(umbracoApi, filter, sort, pagingContentNames);
+    // Wait until every document is queryable - and only those - before paging, otherwise page boundaries
+    // shift under async indexing or stale entries from a previous test.
+    await umbracoApi.contentDeliveryApi.queryUntilNamesPresent(filter, sort, pagingContentNames, pagingContentNames.length, 0, 100);
 
     // Act
     const firstPage = await queryContent(umbracoApi, filter, sort, 0, 2);
@@ -176,32 +153,32 @@ test.describe('content lifecycle updates the index', () => {
     // Arrange
     const contentId = await createAndPublishDocument(umbracoApi, unpublishContentName);
     const filter = 'name:' + unpublishToken;
-    await queryUntilNamesPresent(umbracoApi, filter, undefined, [unpublishContentName]);
+    await umbracoApi.contentDeliveryApi.queryUntilNamesPresent(filter, undefined, [unpublishContentName]);
 
     // Act
     await umbracoApi.document.unpublish(contentId);
 
     // Assert - the index must drop the now-unpublished document, not just the published content cache
-    await queryUntilTotalIsZero(umbracoApi, filter);
+    await umbracoApi.contentDeliveryApi.queryUntilTotalIs(filter, 0);
   });
 
   test('excludes a document moved to the recycle bin from query results', async ({umbracoApi}) => {
     // Arrange
     const contentId = await createAndPublishDocument(umbracoApi, trashContentName);
     const filter = 'name:' + trashToken;
-    await queryUntilNamesPresent(umbracoApi, filter, undefined, [trashContentName]);
+    await umbracoApi.contentDeliveryApi.queryUntilNamesPresent(filter, undefined, [trashContentName]);
 
     // Act
     await umbracoApi.document.moveToRecycleBin(contentId);
 
     // Assert
-    await queryUntilTotalIsZero(umbracoApi, filter);
+    await umbracoApi.contentDeliveryApi.queryUntilTotalIs(filter, 0);
   });
 
   test('reindexes a renamed document under its new name', async ({umbracoApi}) => {
     // Arrange
     const contentId = await createAndPublishDocument(umbracoApi, renameBeforeContentName);
-    await queryUntilNamesPresent(umbracoApi, 'name:' + renameBeforeToken, undefined, [renameBeforeContentName]);
+    await umbracoApi.contentDeliveryApi.queryUntilNamesPresent('name:' + renameBeforeToken, undefined, [renameBeforeContentName]);
 
     // Act - rename and republish
     const document = await umbracoApi.document.getByName(renameBeforeContentName);
@@ -210,7 +187,7 @@ test.describe('content lifecycle updates the index', () => {
     await umbracoApi.document.publish(contentId);
 
     // Assert - the index reflects the update: the old token no longer matches, the new token now does
-    await queryUntilTotalIsZero(umbracoApi, 'name:' + renameBeforeToken);
-    await queryUntilNamesPresent(umbracoApi, 'name:' + renameAfterToken, undefined, [renameAfterContentName]);
+    await umbracoApi.contentDeliveryApi.queryUntilTotalIs('name:' + renameBeforeToken, 0);
+    await umbracoApi.contentDeliveryApi.queryUntilNamesPresent('name:' + renameAfterToken, undefined, [renameAfterContentName]);
   });
 });

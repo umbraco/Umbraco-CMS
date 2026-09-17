@@ -1,5 +1,8 @@
 import {expect} from '@playwright/test';
-import {ConstantHelper, test} from '@umbraco/acceptance-test-helpers';
+import {ApiHelpers, ConstantHelper, test} from '@umbraco/acceptance-test-helpers';
+
+// Raised from the 60s default - chained index polls would otherwise hit the test timeout first.
+test.describe.configure({timeout: 120000});
 
 // SingleBlock
 const singleBlockDocumentTypeName = 'SearchIndexingEdgeCasesSingleBlockDocumentType';
@@ -74,7 +77,7 @@ test.describe('SingleBlock property indexing', () => {
           searchResult = await umbracoApi.searchManagement.search(indexAlias, singleBlockSearchableValue);
           return searchResult.documents.some((document: {id: string}) => document.id === documentId);
         },
-        {timeout: ConstantHelper.timeout.pageLoad},
+        {timeout: ConstantHelper.timeout.veryLong},
       )
       .toBeTruthy();
 
@@ -109,28 +112,33 @@ test.describe('date/time editor indexing', () => {
   // The Delivery API only exposes filter/sort support for a fixed set of system fields (contentType, name,
   // createDate, updateDate, level, sortOrder) - there is no filter handler for arbitrary custom properties, so a
   // custom date property cannot be queried via filter=. Instead, this verifies that DateTimeOffsetPropertyValueHandler
-  // does not break indexing for these previously-unindexed/mishandled editors: the document must still make it into
-  // the index (document count increases, health stays Healthy) and remain fetchable via the Delivery API.
-  // The document count baseline is captured before createDocument() runs, since createDocument() also publishes
-  // the document - capturing it any later would already include the new document in "before".
-  async function verifyDateEditorDocumentIsIndexed(umbracoApi, createDocument: () => Promise<string>) {
-    const indexBefore = await umbracoApi.searchManagement.getIndex(indexAlias);
+  // does not break indexing for these previously-unindexed/mishandled editors: the document must still reach the
+  // index, leave it healthy, and remain fetchable via the Delivery API.
+  //
+  // Assert the document is findable rather than that the index count grew: a count delta races the previous
+  // test's teardown, whose de-index can cancel out the document added here (+1 -1 = 0).
+  async function verifyDateEditorDocumentIsIndexed(umbracoApi: ApiHelpers, documentName: string, createDocument: () => Promise<string>) {
     const documentId = await createDocument();
 
-    // healthStatus turning Healthy doesn't guarantee documentCount has caught up with the latest write yet,
-    // so poll documentCount itself rather than a flat wait followed by a single check.
     await expect
-      .poll(async () => (await umbracoApi.searchManagement.getIndex(indexAlias)).documentCount, {timeout: ConstantHelper.timeout.pageLoad})
-      .toBeGreaterThan(indexBefore.documentCount);
-    const indexAfter = await umbracoApi.searchManagement.getIndex(indexAlias);
-    expect(indexAfter.healthStatus).toBe('Healthy');
+      .poll(
+        async () => {
+          const searchResult = await umbracoApi.searchManagement.search(indexAlias, documentName);
+          return searchResult.documents.some((document: {id: string}) => document.id === documentId);
+        },
+        {timeout: ConstantHelper.timeout.veryLong},
+      )
+      .toBeTruthy();
+
+    const index = await umbracoApi.searchManagement.getIndex(indexAlias);
+    expect(index.healthStatus).toBe('Healthy');
 
     const contentItem = await umbracoApi.contentDeliveryApi.getContentItemWithId(documentId);
     expect(contentItem.status()).toBe(200);
   }
 
   test('a document with a DateOnly property is indexed without error', async ({umbracoApi}) => {
-    await verifyDateEditorDocumentIsIndexed(umbracoApi, async () => {
+    await verifyDateEditorDocumentIsIndexed(umbracoApi, dateOnlyDocumentName, async () => {
       const dateOnlyDataTypeId = await umbracoApi.dataType.createDefaultDateOnlyPickerDataType(dateOnlyDataTypeName) ?? '';
       const value = {date: '2026-01-01T00:00:00.000Z', timeZone: null};
       return await umbracoApi.document.createPublishedDocumentWithValue(dateOnlyDocumentName, value, dateOnlyDataTypeId, templateId, dateOnlyDataTypeName, dateOnlyDocumentTypeName);
@@ -138,7 +146,7 @@ test.describe('date/time editor indexing', () => {
   });
 
   test('a document with a TimeOnly property is indexed without error', async ({umbracoApi}) => {
-    await verifyDateEditorDocumentIsIndexed(umbracoApi, async () => {
+    await verifyDateEditorDocumentIsIndexed(umbracoApi, timeOnlyDocumentName, async () => {
       const timeOnlyDataTypeId = await umbracoApi.dataType.createDefaultTimeOnlyPickerDataType(timeOnlyDataTypeName) ?? '';
       const value = {date: '1970-01-01T12:30:00.000Z', timeZone: null};
       return await umbracoApi.document.createPublishedDocumentWithValue(timeOnlyDocumentName, value, timeOnlyDataTypeId, templateId, timeOnlyDataTypeName, timeOnlyDocumentTypeName);
@@ -146,7 +154,7 @@ test.describe('date/time editor indexing', () => {
   });
 
   test('a document with a DateTimeUnspecified property is indexed without error', async ({umbracoApi}) => {
-    await verifyDateEditorDocumentIsIndexed(umbracoApi, async () => {
+    await verifyDateEditorDocumentIsIndexed(umbracoApi, dateTimeUnspecifiedDocumentName, async () => {
       const dateTimeUnspecifiedDataTypeId = await umbracoApi.dataType.createDefaultDateTimePickerDataType(dateTimeUnspecifiedDataTypeName) ?? '';
       const value = {date: '2026-01-01T12:30:00.000Z', timeZone: null};
       return await umbracoApi.document.createPublishedDocumentWithValue(dateTimeUnspecifiedDocumentName, value, dateTimeUnspecifiedDataTypeId, templateId, dateTimeUnspecifiedDataTypeName, dateTimeUnspecifiedDocumentTypeName);
@@ -154,7 +162,7 @@ test.describe('date/time editor indexing', () => {
   });
 
   test('a document with a DateTimeWithTimeZone property is indexed without error', async ({umbracoApi}) => {
-    await verifyDateEditorDocumentIsIndexed(umbracoApi, async () => {
+    await verifyDateEditorDocumentIsIndexed(umbracoApi, dateTimeWithTimeZoneDocumentName, async () => {
       const dateTimeWithTimeZoneDataTypeId = await umbracoApi.dataType.createDefaultDateTimeWithTimeZonePickerDataType(dateTimeWithTimeZoneDataTypeName) ?? '';
       const value = {date: '2026-01-01T12:30:00.000Z', timeZone: 'Europe/Copenhagen'};
       return await umbracoApi.document.createPublishedDocumentWithValue(dateTimeWithTimeZoneDocumentName, value, dateTimeWithTimeZoneDataTypeId, templateId, dateTimeWithTimeZoneDataTypeName, dateTimeWithTimeZoneDocumentTypeName);

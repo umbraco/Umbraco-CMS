@@ -2,6 +2,10 @@ import {Page, Locator} from "@playwright/test";
 import {UiBaseLocators} from "./UiBaseLocators";
 import {ConstantHelper} from "./ConstantHelper";
 
+/**
+ * Page object for the Search section under Settings: the index collection, an index's stats box and
+ * rebuild action, and the ad-hoc search box on an index.
+ */
 export class SearchManagementUiHelper extends UiBaseLocators {
   private readonly indexTableRows: Locator;
   private readonly reloadIndexListBtn: Locator;
@@ -15,7 +19,6 @@ export class SearchManagementUiHelper extends UiBaseLocators {
   private readonly searchResultsTable: Locator;
   private readonly searchNoResultsMessage: Locator;
   private readonly searchPagination: Locator;
-  private readonly searchCultureSelect: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -37,7 +40,6 @@ export class SearchManagementUiHelper extends UiBaseLocators {
     // text on this element - so target the wrapping element by its class instead.
     this.searchNoResultsMessage = this.searchBox.locator('.no-results');
     this.searchPagination = this.searchBox.locator('uui-pagination');
-    this.searchCultureSelect = this.searchBox.locator('uui-select');
   }
 
   async goToSearchTreeItem() {
@@ -155,10 +157,6 @@ export class SearchManagementUiHelper extends UiBaseLocators {
 
   async isSearchPaginationVisible(isVisible: boolean = true) {
     await this.isVisible(this.searchPagination, isVisible);
-  }
-
-  async isSearchCultureSelectVisible(isVisible: boolean = true) {
-    await this.isVisible(this.searchCultureSelect, isVisible);
   }
 
   async doesSearchResultsTableContainText(text: string) {

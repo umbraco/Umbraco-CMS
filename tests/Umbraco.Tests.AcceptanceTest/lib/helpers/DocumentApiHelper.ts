@@ -1151,16 +1151,11 @@ export class DocumentApiHelper {
     return await this.create(document);
   }
 
-  async createDefaultDocumentWithASingleBlockEditorAndBlockWithValue(documentName: string, documentTypeName: string, singleBlockDataTypeName: string, elementTypeId: string, elementTypePropertyAlias: string, elementTypePropertyValue: string, elementTypePropertyEditorAlias: string, groupName: string, templateId?: string) {
+  async createDefaultDocumentWithASingleBlockEditorAndBlockWithValue(documentName: string, documentTypeName: string, singleBlockDataTypeName: string, elementTypeId: string, elementTypePropertyAlias: string, elementTypePropertyValue: string, elementTypePropertyEditorAlias: string, groupName: string) {
     const crypto = require('crypto');
     const blockContentKey = crypto.randomUUID();
     const singleBlockDataTypeId = await this.api.dataType.createSingleBlockDataTypeWithABlock(singleBlockDataTypeName, elementTypeId) || '';
-    let documentTypeId: string;
-    if (templateId) {
-      documentTypeId = await this.api.documentType.createDocumentTypeWithPropertyEditorAndAllowedTemplate(documentTypeName, singleBlockDataTypeId, singleBlockDataTypeName, templateId) || '';
-    } else {
-      documentTypeId = await this.api.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, singleBlockDataTypeName, singleBlockDataTypeId, groupName) || '';
-    }
+    const documentTypeId = await this.api.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, singleBlockDataTypeName, singleBlockDataTypeId, groupName) || '';
 
     await this.ensureNameNotExists(documentName);
 

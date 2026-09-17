@@ -82,6 +82,7 @@ export class UiHelpers {
   preview: PreviewUiHelper;
   backofficeSearch: BackofficeSearchUiHelper;
   searchManagement: SearchManagementUiHelper;
+  private readonly sectionLinks: Locator;
 
   constructor(page: Page) {
     this.page = page;
