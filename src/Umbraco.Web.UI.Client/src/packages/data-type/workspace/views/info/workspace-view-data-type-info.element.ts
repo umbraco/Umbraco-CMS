@@ -3,6 +3,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
+import type { UmbEntityStateEntry } from '@umbraco-cms/backoffice/entity-state';
 
 @customElement('umb-workspace-view-data-type-info')
 export class UmbWorkspaceViewDataTypeInfoElement extends UmbLitElement implements UmbWorkspaceViewElement {
@@ -17,6 +18,9 @@ export class UmbWorkspaceViewDataTypeInfoElement extends UmbLitElement implement
 
 	@state()
 	private _dataSourceAlias?: string | null;
+
+	@state()
+	private _entityStates: Array<UmbEntityStateEntry> = [];
 
 	private _workspaceContext?: typeof UMB_DATA_TYPE_WORKSPACE_CONTEXT.TYPE;
 
@@ -47,6 +51,10 @@ export class UmbWorkspaceViewDataTypeInfoElement extends UmbLitElement implement
 		this.observe(this._workspaceContext.propertyEditorDataSourceAlias, (dataSourceAlias) => {
 			this._dataSourceAlias = dataSourceAlias;
 		});
+
+		this.observe(this._workspaceContext.entityState.states, (states) => {
+			this._entityStates = states ?? [];
+		});
 	}
 
 	override render() {
@@ -58,9 +66,20 @@ export class UmbWorkspaceViewDataTypeInfoElement extends UmbLitElement implement
 		`;
 	}
 
+	#renderEntityStateTags() {
+		if (!this._entityStates.length) return nothing;
+		return html`
+			<div class="general-item">
+				<strong><umb-localize key="general_status">Status</umb-localize></strong>
+				<umb-entity-state-tags .states=${this._entityStates}></umb-entity-state-tags>
+			</div>
+		`;
+	}
+
 	#renderGeneralInfo() {
 		return html`
 			<uui-box id="general-section" headline="General">
+				${this.#renderEntityStateTags()}
 				<div class="general-item">
 					<strong><umb-localize key="template_id">Id</umb-localize></strong>
 					<span>${this._unique}</span>
@@ -118,6 +137,13 @@ export class UmbWorkspaceViewDataTypeInfoElement extends UmbLitElement implement
 
 			.general-item:not(:last-child) {
 				margin-bottom: var(--uui-size-space-6);
+			}
+
+			.general-item umb-entity-state-tags {
+				display: inline-flex;
+				flex-wrap: wrap;
+				align-items: center;
+				gap: var(--uui-size-space-1);
 			}
 		`,
 	];

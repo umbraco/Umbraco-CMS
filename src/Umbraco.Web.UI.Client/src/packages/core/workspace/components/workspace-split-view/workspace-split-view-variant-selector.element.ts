@@ -869,7 +869,6 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 			}
 
 			.variant-details umb-entity-state-tags {
-				display: inline-block;
 				margin-left: calc(var(--uui-size-space-1) * -1);
 			}
 

@@ -11,6 +11,8 @@ import { UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS } from '@umbraco-cms/backof
 import { UMB_SETTINGS_SECTION_ALIAS } from '@umbraco-cms/backoffice/settings';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import type { UmbMediaTypeItemModel } from '@umbraco-cms/backoffice/media-type';
+import type { UmbEntityStateEntry } from '@umbraco-cms/backoffice/entity-state';
+import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 @customElement('umb-media-workspace-view-info')
 export class UmbMediaWorkspaceViewInfoElement extends UmbLitElement {
@@ -44,6 +46,9 @@ export class UmbMediaWorkspaceViewInfoElement extends UmbLitElement {
 
 	@state()
 	private _isTrashed: boolean = false;
+
+	@state()
+	private _entityStates: Array<UmbEntityStateEntry> = [];
 
 	constructor() {
 		super();
@@ -112,6 +117,16 @@ export class UmbMediaWorkspaceViewInfoElement extends UmbLitElement {
 			},
 			'observeVariants',
 		);
+
+		// Media types cannot vary by culture (no Settings view exposes that toggle), so the invariant
+		// variant is always the right (and only) one.
+		this.observe(
+			this.#workspaceContext?.entityState.statesForVariant(UmbVariantId.CreateInvariant()),
+			(states) => {
+				this._entityStates = states ?? [];
+			},
+			'_observeEntityStates',
+		);
 	}
 
 	override render() {
@@ -127,9 +142,19 @@ export class UmbMediaWorkspaceViewInfoElement extends UmbLitElement {
 		`;
 	}
 
+	#renderEntityStateTags() {
+		if (!this._entityStates.length) return nothing;
+		return html`
+			<div class="general-item">
+				<strong><umb-localize key="general_status">Status</umb-localize></strong>
+				<umb-entity-state-tags .states=${this._entityStates}></umb-entity-state-tags>
+			</div>
+		`;
+	}
+
 	#renderGeneralSection() {
 		return html`
-			${this.#renderTrashState()} ${this.#renderCreateDate()} ${this.#renderUpdateDate()}
+			${this.#renderEntityStateTags()} ${this.#renderCreateDate()} ${this.#renderUpdateDate()}
 			<div class="general-item">
 				<strong><umb-localize key="content_mediaType">Media Type</umb-localize></strong>
 				<uui-ref-node-document-type
@@ -145,20 +170,6 @@ export class UmbMediaWorkspaceViewInfoElement extends UmbLitElement {
 			<div class="general-item">
 				<strong><umb-localize key="template_id">Id</umb-localize></strong>
 				<span>${this._mediaUnique}</span>
-			</div>
-		`;
-	}
-
-	#renderTrashState() {
-		if (!this._isTrashed) return nothing;
-
-		return html`
-			<div class="general-item">
-				<span>
-					<uui-tag color="danger" look="primary" label=${this.localize.term('content_trashed')}>
-						${this.localize.term('content_trashed')}
-					</uui-tag>
-				</span>
 			</div>
 		`;
 	}
@@ -218,6 +229,13 @@ export class UmbMediaWorkspaceViewInfoElement extends UmbLitElement {
 
 			.general-item:not(:last-child) {
 				margin-bottom: var(--uui-size-space-6);
+			}
+
+			.general-item umb-entity-state-tags {
+				display: inline-flex;
+				flex-wrap: wrap;
+				align-items: center;
+				gap: var(--uui-size-space-1);
 			}
 
 			uui-ref-node-document-type[readonly] {

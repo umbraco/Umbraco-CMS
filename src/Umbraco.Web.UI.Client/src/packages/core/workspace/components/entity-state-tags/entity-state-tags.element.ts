@@ -38,7 +38,7 @@ export class UmbEntityStateTagsElement extends UmbLitElement {
 	static override styles = [
 		css`
 			:host {
-				display: contents;
+				display: inline-block;
 			}
 		`,
 	];

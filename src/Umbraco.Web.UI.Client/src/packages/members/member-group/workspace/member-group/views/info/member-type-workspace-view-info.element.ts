@@ -1,8 +1,9 @@
 import { UMB_MEMBER_GROUP_WORKSPACE_CONTEXT } from '../../member-group-workspace.context-token.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
+import type { UmbEntityStateEntry } from '@umbraco-cms/backoffice/entity-state';
 
 @customElement('umb-member-type-workspace-view-member-info')
 export class UmbMemberTypeWorkspaceViewMemberInfoElement extends UmbLitElement implements UmbWorkspaceViewElement {
@@ -11,13 +12,29 @@ export class UmbMemberTypeWorkspaceViewMemberInfoElement extends UmbLitElement i
 	@state()
 	private _unique = '';
 
+	@state()
+	private _entityStates: Array<UmbEntityStateEntry> = [];
+
 	constructor() {
 		super();
 
 		this.consumeContext(UMB_MEMBER_GROUP_WORKSPACE_CONTEXT, async (context) => {
 			this._workspaceContext = context;
 			this._unique = this._workspaceContext?.getUnique() ?? '';
+			this.observe(this._workspaceContext?.entityState.states, (states) => {
+				this._entityStates = states ?? [];
+			});
 		});
+	}
+
+	#renderEntityStateTags() {
+		if (!this._entityStates.length) return nothing;
+		return html`
+			<div class="property">
+				<b><umb-localize key="general_status">Status</umb-localize></b>
+				<umb-entity-state-tags .states=${this._entityStates}></umb-entity-state-tags>
+			</div>
+		`;
 	}
 
 	override render() {
@@ -33,6 +50,7 @@ export class UmbMemberTypeWorkspaceViewMemberInfoElement extends UmbLitElement i
 
 			<div id="right-column">
 				<uui-box headline=${this.localize.term('general_general')}>
+					${this.#renderEntityStateTags()}
 					<div class="property">
 						<b><umb-localize key="general_id">Id</umb-localize></b>
 						<span>${this._unique}</span>
@@ -69,6 +87,13 @@ export class UmbMemberTypeWorkspaceViewMemberInfoElement extends UmbLitElement i
 			.property {
 				display: flex;
 				flex-direction: column;
+			}
+
+			.property umb-entity-state-tags {
+				display: inline-flex;
+				flex-wrap: wrap;
+				align-items: center;
+				gap: var(--uui-size-space-1);
 			}
 		`,
 	];

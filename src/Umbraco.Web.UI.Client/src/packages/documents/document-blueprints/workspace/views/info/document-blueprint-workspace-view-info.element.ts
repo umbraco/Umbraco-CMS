@@ -11,6 +11,8 @@ import { UMB_SETTINGS_SECTION_ALIAS } from '@umbraco-cms/backoffice/settings';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
+import type { UmbEntityStateEntry } from '@umbraco-cms/backoffice/entity-state';
+import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 @customElement('umb-document-blueprint-workspace-view-info')
 export class UmbDocumentBlueprintWorkspaceViewInfoElement extends UmbLitElement implements UmbWorkspaceViewElement {
@@ -34,6 +36,9 @@ export class UmbDocumentBlueprintWorkspaceViewInfoElement extends UmbLitElement 
 
 	@state()
 	private _variant?: UmbDocumentBlueprintVariantModel;
+
+	@state()
+	private _entityStates: Array<UmbEntityStateEntry> = [];
 
 	#workspaceContext?: typeof UMB_DOCUMENT_BLUEPRINT_WORKSPACE_CONTEXT.TYPE;
 
@@ -59,6 +64,7 @@ export class UmbDocumentBlueprintWorkspaceViewInfoElement extends UmbLitElement 
 		this.consumeContext(UMB_DOCUMENT_BLUEPRINT_PROPERTY_DATASET_CONTEXT, (context) => {
 			this.observe(context?.currentVariant, (currentVariant) => {
 				this._variant = currentVariant;
+				this.#observeEntityStatesForVariant();
 			});
 		});
 
@@ -93,6 +99,8 @@ export class UmbDocumentBlueprintWorkspaceViewInfoElement extends UmbLitElement 
 			},
 			'_documentBlueprintUnique',
 		);
+
+		this.#observeEntityStatesForVariant();
 	}
 
 	override render() {
@@ -108,10 +116,34 @@ export class UmbDocumentBlueprintWorkspaceViewInfoElement extends UmbLitElement 
 		`;
 	}
 
+	#observeEntityStatesForVariant() {
+		if (!this._variant || !this.#workspaceContext) {
+			this._entityStates = [];
+			return;
+		}
+		this.observe(
+			this.#workspaceContext.entityState.statesForVariant(UmbVariantId.Create(this._variant)),
+			(states) => {
+				this._entityStates = states ?? [];
+			},
+			'_observeEntityStates',
+		);
+	}
+
+	#renderEntityStateTags() {
+		if (!this._entityStates.length) return nothing;
+		return html`
+			<div class="general-item">
+				<strong><umb-localize key="general_status">Status</umb-localize></strong>
+				<umb-entity-state-tags .states=${this._entityStates}></umb-entity-state-tags>
+			</div>
+		`;
+	}
+
 	#renderGeneralSection() {
 		const editDocumentTypePath = this._routeBuilder?.({ entityType: 'document-type' }) ?? '';
 
-		return html`${this.#renderCreateDate()} ${this.#renderUpdateDate()}
+		return html`${this.#renderEntityStateTags()} ${this.#renderCreateDate()} ${this.#renderUpdateDate()}
 
 			<div class="general-item">
 				<strong><umb-localize key="content_documentType">Document Type</umb-localize></strong>
@@ -179,6 +211,13 @@ export class UmbDocumentBlueprintWorkspaceViewInfoElement extends UmbLitElement 
 
 			.general-item:not(:last-child) {
 				margin-bottom: var(--uui-size-space-6);
+			}
+
+			.general-item umb-entity-state-tags {
+				display: inline-flex;
+				flex-wrap: wrap;
+				align-items: center;
+				gap: var(--uui-size-space-1);
 			}
 
 			uui-ref-node-document-type[readonly] {

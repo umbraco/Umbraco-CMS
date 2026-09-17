@@ -11,6 +11,8 @@ import { UMB_MEMBER_TYPE_ENTITY_TYPE, UmbMemberTypeItemRepository } from '@umbra
 import { UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS } from '@umbraco-cms/backoffice/section';
 import { UMB_SETTINGS_SECTION_ALIAS } from '@umbraco-cms/backoffice/settings';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbEntityStateEntry } from '@umbraco-cms/backoffice/entity-state';
+import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 @customElement('umb-member-workspace-view-member-info')
 export class UmbMemberWorkspaceViewMemberInfoElement extends UmbLitElement implements UmbWorkspaceViewElement {
@@ -40,6 +42,9 @@ export class UmbMemberWorkspaceViewMemberInfoElement extends UmbLitElement imple
 
 	@state()
 	private _hasSettingsAccess: boolean = false;
+
+	@state()
+	private _entityStates: Array<UmbEntityStateEntry> = [];
 
 	#workspaceContext?: typeof UMB_MEMBER_WORKSPACE_CONTEXT.TYPE;
 	#memberTypeItemRepository: UmbMemberTypeItemRepository = new UmbMemberTypeItemRepository(this);
@@ -73,6 +78,10 @@ export class UmbMemberWorkspaceViewMemberInfoElement extends UmbLitElement imple
 			this.observe(this.#workspaceContext?.updateDate, (date) => (this._updateDate = this.#setDateFormat(date)));
 			this.observe(this.#workspaceContext?.unique, (unique) => (this._unique = unique || ''));
 			this.observe(this.#workspaceContext?.kind, (kind) => (this._memberKind = kind));
+			// Members don't vary by culture, so the invariant variant is always the right (and only) one.
+			this.observe(this.#workspaceContext?.entityState.statesForVariant(UmbVariantId.CreateInvariant()), (states) => {
+				this._entityStates = states ?? [];
+			});
 		});
 
 		createExtensionApiByAlias(this, UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS, [
@@ -93,7 +102,17 @@ export class UmbMemberWorkspaceViewMemberInfoElement extends UmbLitElement imple
 	}
 
 	override render() {
-		return this.#renderGeneralSection();
+		return html`${this.#renderGeneralSection()}`;
+	}
+
+	#renderEntityStateTags() {
+		if (!this._entityStates.length) return nothing;
+		return html`
+			<div>
+				<h4><umb-localize key="general_status">Status</umb-localize></h4>
+				<umb-entity-state-tags .states=${this._entityStates}></umb-entity-state-tags>
+			</div>
+		`;
 	}
 
 	#isExternalOnly() {
@@ -103,6 +122,7 @@ export class UmbMemberWorkspaceViewMemberInfoElement extends UmbLitElement imple
 	#renderGeneralSection() {
 		return html`
 			<umb-stack look="compact">
+				${this.#renderEntityStateTags()}
 				<div>
 					<h4><umb-localize key="content_createDate">Created</umb-localize></h4>
 					<span> ${this._createDate} </span>
@@ -148,6 +168,13 @@ export class UmbMemberWorkspaceViewMemberInfoElement extends UmbLitElement imple
 		css`
 			h4 {
 				margin: 0;
+			}
+
+			umb-entity-state-tags {
+				display: inline-flex;
+				flex-wrap: wrap;
+				align-items: center;
+				gap: var(--uui-size-space-1);
 			}
 
 			uui-ref-node[readonly] {
