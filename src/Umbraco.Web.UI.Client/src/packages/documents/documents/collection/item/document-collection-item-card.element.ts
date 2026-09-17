@@ -158,18 +158,13 @@ export class UmbDocumentCollectionItemCardElement extends UmbLitElement implemen
 		return !this.item?.hasChildren && this.selectOnly;
 	}
 
-	// While selectable (e.g. in a picker), the name must not navigate away from the picker; an item with
-	// children is instead opened via the `open` event, drilling further into it.
-	get #href(): string | undefined {
-		return this.selectable ? undefined : this.href;
-	}
-
 	override render() {
 		if (!this.item) return nothing;
+		const href = this.selectable ? undefined : this.href;
 		return html`
 			<uui-card-content-node
 				.name=${this._name}
-				href=${ifDefined(this.#href)}
+				href=${ifDefined(href)}
 				?has-children=${this.item.hasChildren}
 				?selectable=${this.selectable}
 				?select-only=${this.#selectOnly}
