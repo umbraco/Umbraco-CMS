@@ -1109,7 +1109,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
 
         try
         {
-            ContentService.Save(new[] { documentOne, documentTwo });
+            await ContentService.SaveAsync(new[] { documentOne, documentTwo }, Constants.Security.SuperUserKey, CancellationToken.None);
             Assert.IsTrue(savedWasCalled);
         }
         finally
@@ -1241,7 +1241,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
 
         try
         {
-            ContentService.Save(new[] { invariantDocument, variantDocument });
+            await ContentService.SaveAsync(new[] { invariantDocument, variantDocument }, Constants.Security.SuperUserKey, CancellationToken.None);
             Assert.IsTrue(savedWasCalled);
         }
         finally

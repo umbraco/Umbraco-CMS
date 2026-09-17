@@ -52,7 +52,7 @@ internal sealed partial class UserServiceTests : UmbracoIntegrationTest
             ContentBuilder.CreateSimpleContent(contentType), ContentBuilder.CreateSimpleContent(contentType),
             ContentBuilder.CreateSimpleContent(contentType)
         };
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Act
         var permissions = UserService.GetPermissions(user, content[0].Id, content[1].Id, content[2].Id).ToArray();
@@ -80,7 +80,7 @@ internal sealed partial class UserServiceTests : UmbracoIntegrationTest
             ContentBuilder.CreateSimpleContent(contentType), ContentBuilder.CreateSimpleContent(contentType),
             ContentBuilder.CreateSimpleContent(contentType)
         };
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, CancellationToken.None);
         await ContentService.SetPermissionAsync(content[0], ActionBrowse.ActionLetter, new[] { userGroup.Key }, CancellationToken.None);
         await ContentService.SetPermissionAsync(content[0], ActionDelete.ActionLetter, new[] { userGroup.Key }, CancellationToken.None);
         await ContentService.SetPermissionAsync(content[0], ActionMove.ActionLetter, new[] { userGroup.Key }, CancellationToken.None);
@@ -114,7 +114,7 @@ internal sealed partial class UserServiceTests : UmbracoIntegrationTest
             ContentBuilder.CreateSimpleContent(contentType), ContentBuilder.CreateSimpleContent(contentType),
             ContentBuilder.CreateSimpleContent(contentType)
         };
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, CancellationToken.None);
         await ContentService.SetPermissionAsync(content.ElementAt(0), ActionBrowse.ActionLetter, new[] { userGroup.Key }, CancellationToken.None);
         await ContentService.SetPermissionAsync(content.ElementAt(0), ActionDelete.ActionLetter, new[] { userGroup.Key }, CancellationToken.None);
         await ContentService.SetPermissionAsync(content.ElementAt(0), ActionMove.ActionLetter, new[] { userGroup.Key }, CancellationToken.None);
@@ -149,7 +149,7 @@ internal sealed partial class UserServiceTests : UmbracoIntegrationTest
             ContentBuilder.CreateSimpleContent(contentType), ContentBuilder.CreateSimpleContent(contentType),
             ContentBuilder.CreateSimpleContent(contentType)
         };
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, CancellationToken.None);
         await ContentService.SetPermissionAsync(content[0], ActionBrowse.ActionLetter, new[] { userGroup.Key }, CancellationToken.None);
         await ContentService.SetPermissionAsync(content[0], ActionDelete.ActionLetter, new[] { userGroup.Key }, CancellationToken.None);
         await ContentService.SetPermissionAsync(content[0], ActionMove.ActionLetter, new[] { userGroup.Key }, CancellationToken.None);
@@ -193,7 +193,7 @@ internal sealed partial class UserServiceTests : UmbracoIntegrationTest
             ContentBuilder.CreateSimpleContent(contentType), ContentBuilder.CreateSimpleContent(contentType),
             ContentBuilder.CreateSimpleContent(contentType)
         };
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, CancellationToken.None);
 
         // assign permissions - we aren't assigning anything explicit for group3 and nothing explicit for content[2] /w group2
         await ContentService.SetPermissionAsync(content[0], ActionBrowse.ActionLetter, new[] { userGroup1.Key }, CancellationToken.None);
@@ -279,7 +279,7 @@ internal sealed partial class UserServiceTests : UmbracoIntegrationTest
             ContentBuilder.CreateSimpleContent(contentType), ContentBuilder.CreateSimpleContent(contentType),
             ContentBuilder.CreateSimpleContent(contentType)
         };
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, CancellationToken.None);
         await ContentService.SetPermissionAsync(content[0], ActionBrowse.ActionLetter, new[] { userGroup.Key }, CancellationToken.None);
         await ContentService.SetPermissionAsync(content[0], ActionDelete.ActionLetter, new[] { userGroup.Key }, CancellationToken.None);
         await ContentService.SetPermissionAsync(content[0], ActionMove.ActionLetter, new[] { userGroup.Key }, CancellationToken.None);
@@ -1148,7 +1148,7 @@ internal sealed partial class UserServiceTests : UmbracoIntegrationTest
             startContentItems.Add(ContentBuilder.CreateSimpleContent(contentType));
         }
 
-        ContentService.Save(startContentItems);
+        await ContentService.SaveAsync(startContentItems, Constants.Security.SuperUserKey, CancellationToken.None);
 
         return startContentItems.ToArray();
     }

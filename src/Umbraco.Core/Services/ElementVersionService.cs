@@ -33,7 +33,6 @@ internal sealed class ElementVersionService : ContentVersionServiceBase<IElement
             languageRepository,
             entityService,
             contentService,
-            contentService,
             userIdKeyResolver,
             contentSettings)
     {

@@ -8,10 +8,11 @@ namespace Umbraco.Cms.Core.Services;
 /// <summary>
 ///     Defines the ContentService, which is an easy access to operations involving <see cref="IContent" />
 /// </summary>
-public interface IContentService : IPublishableContentService<IContent>, IAsyncPublishableContentService<IContent>
+public interface IContentService : IContentServiceBase, IAsyncPublishableContentService<IContent>
 {
-    // Explicit reabstraction of IContentServiceBase.CheckDataIntegrity (required transitively via
-    // IPublishableContentService<IContent> - the same contract Media/Member still implement synchronously).
+    // Explicit reabstraction of IContentServiceBase.CheckDataIntegrity (the same contract Media/Member
+    // still implement synchronously, inherited directly here now that IPublishableContentService<IContent>
+    // - which used to carry it - has been retired).
     // Bridges onto CheckDataIntegrityAsync, declared on the async side of this same interface, so this default
     // - not a plain redeclaration, which C# would treat as an unrelated member rather than an override - is
     // what satisfies the sync member for any implementer. No class anywhere in the async hierarchy (including
@@ -316,14 +317,10 @@ public interface IContentService : IPublishableContentService<IContent>, IAsyncP
     // Save(IContent, ...) has been retired from this interface in favour of the async SaveAsync
     // (declared on IAsyncPublishableContentService<IContent>).
 
-    /// <summary>
-    ///     Saves documents.
-    /// </summary>
-    /// <param name="contents">The documents to save.</param>
-    /// <param name="userId">The identifier of the user performing the action.</param>
-    /// <returns>The operation result.</returns>
-    // TODO: why only 1 result not 1 per content?!
-    new OperationResult Save(IEnumerable<IContent> contents, int userId = Constants.Security.SuperUserId);
+    // Save(IEnumerable<IContent>, int) has been retired from this interface in favour of the async
+    // SaveAsync (declared on IAsyncContentServiceBase<IContent>). The redeclaration that used to sit here
+    // existed only to resolve the CS0121 ambiguity between the sync and async branches' identical
+    // declarations; both are now gone, so it is no longer needed.
 
     /// <summary>
     ///     Deletes all documents of a given document type.

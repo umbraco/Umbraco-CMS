@@ -163,8 +163,16 @@ public class ElementService : PublishableContentServiceBase<IElement>, IElementS
     }
 
     /// <inheritdoc />
-    Attempt<OperationResult?> IAsyncContentServiceBase<IElement>.Save(IEnumerable<IElement> contents, int userId) =>
-        Attempt.Succeed(Save(contents, userId));
+    // See GetByIdAsync above - same bridge, same reason. Like the single-item SaveAsync, the sync bulk
+    // Save only fails via notification cancellation, so any non-success result maps to that status.
+    public Task<Attempt<ContentSaveOperationStatus>> SaveAsync(IEnumerable<IElement> contents, Guid userKey, CancellationToken cancellationToken)
+    {
+        int userId = _userIdKeyResolver.GetAsync(userKey).GetAwaiter().GetResult();
+        OperationResult result = Save(contents, userId);
+        return Task.FromResult(result.Success
+            ? Attempt.Succeed(ContentSaveOperationStatus.Success)
+            : Attempt.Fail(ContentSaveOperationStatus.CancelledByNotification));
+    }
 
     /// <inheritdoc />
     public override ContentDataIntegrityReport CheckDataIntegrity(ContentDataIntegrityReportOptions options)

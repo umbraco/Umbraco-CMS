@@ -55,7 +55,7 @@ internal sealed partial class UserServiceTests
             children[i] = ContentBuilder.CreateSimpleContent(contentType, $"child-{i}", parent.Id);
         }
 
-        ContentService.Save(children);
+        await ContentService.SaveAsync(children, Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Arrange — realistic permission mix:
         //   - root: explicit Browse + Delete (inherited by most nodes)

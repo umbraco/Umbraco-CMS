@@ -627,62 +627,57 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
     }
 
     /// <inheritdoc />
-    Attempt<OperationResult?> IAsyncContentServiceBase<TContent>.Save(IEnumerable<TContent> contents, int userId) =>
-        Attempt.Succeed(Save(contents, userId));
-
-    /// <inheritdoc />
-    public OperationResult Save(IEnumerable<TContent> contents, int userId = Constants.Security.SuperUserId)
+    public async Task<Attempt<ContentSaveOperationStatus>> SaveAsync(IEnumerable<TContent> contents, Guid userKey, CancellationToken cancellationToken)
     {
         EventMessages eventMessages = EventMessagesFactory.Get();
         TContent[] contentsA = contents.ToArray();
 
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.WriteLock(WriteLockIds);
+
+        SavingNotification<TContent> savingNotification = SavingNotification(contentsA, eventMessages);
+        if (await scope.Notifications.PublishCancelableAsync(savingNotification))
         {
-            scope.WriteLock(WriteLockIds);
-
-            SavingNotification<TContent> savingNotification = SavingNotification(contentsA, eventMessages);
-            if (scope.Notifications.PublishCancelable(savingNotification))
-            {
-                scope.Complete();
-                return OperationResult.Cancel(eventMessages);
-            }
-
-            var savedCultures = new Dictionary<Guid, IReadOnlyCollection<string>>();
-            foreach (TContent content in contentsA)
-            {
-                if (content.HasIdentity == false)
-                {
-                    content.CreatorId = userId;
-                }
-
-                content.WriterId = userId;
-
-                // capture the changing cultures before saving resets change tracking on the entity. Invariant content
-                // reports the "*" marker, but only when something actually changed (mirroring the variant delta).
-                IReadOnlyCollection<string>? culturesChanging = content.ContentType.VariesByCulture()
-                    ? content.CultureInfos?.Values.Where(x => x.IsDirty()).Select(x => x.Culture).ToArray()
-                    : content.IsDirty() ? ["*"] : [];
-                if (culturesChanging is { Count: > 0 })
-                {
-                    savedCultures[content.Key] = culturesChanging;
-                }
-
-                _contentRepository.Save(content);
-            }
-
-            scope.Notifications.Publish(
-                SavedNotification(contentsA, eventMessages, savedCultures).WithStateFrom(savingNotification));
-
-            // TODO: See note above about supressing events
-            scope.Notifications.Publish(TreeChangeNotification(contentsA, TreeChangeTypes.RefreshNode, eventMessages));
-
-            string contentIds = string.Join(", ", contentsA.Select(x => x.Id));
-            Audit(AuditType.Save, userId, Constants.System.Root, $"Saved multiple content items (#{contentIds.Length})");
-
             scope.Complete();
+            return Attempt.Fail(ContentSaveOperationStatus.CancelledByNotification);
         }
 
-        return OperationResult.Succeed(eventMessages);
+        int userId = await _userIdKeyResolver.GetAsync(userKey);
+
+        var savedCultures = new Dictionary<Guid, IReadOnlyCollection<string>>();
+        foreach (TContent content in contentsA)
+        {
+            if (content.HasIdentity == false)
+            {
+                content.CreatorId = userId;
+            }
+
+            content.WriterId = userId;
+
+            // capture the changing cultures before saving resets change tracking on the entity. Invariant content
+            // reports the "*" marker, but only when something actually changed (mirroring the variant delta).
+            IReadOnlyCollection<string>? culturesChanging = content.ContentType.VariesByCulture()
+                ? content.CultureInfos?.Values.Where(x => x.IsDirty()).Select(x => x.Culture).ToArray()
+                : content.IsDirty() ? ["*"] : [];
+            if (culturesChanging is { Count: > 0 })
+            {
+                savedCultures[content.Key] = culturesChanging;
+            }
+
+            await _asyncContentRepository.SaveAsync(content, cancellationToken);
+        }
+
+        scope.Notifications.Publish(
+            SavedNotification(contentsA, eventMessages, savedCultures).WithStateFrom(savingNotification));
+
+        // TODO: See note above about supressing events
+        scope.Notifications.Publish(TreeChangeNotification(contentsA, TreeChangeTypes.RefreshNode, eventMessages));
+
+        await AuditAsync(AuditType.Save, userId, Constants.System.Root, $"Saved multiple content items (#{contentsA.Length})");
+
+        scope.Complete();
+
+        return Attempt.Succeed(ContentSaveOperationStatus.Success);
     }
 
     /// <inheritdoc/>

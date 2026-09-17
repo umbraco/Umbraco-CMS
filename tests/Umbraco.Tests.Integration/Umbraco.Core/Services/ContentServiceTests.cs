@@ -2786,7 +2786,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         var list = new List<IContent> { subpage, subpage2 };
 
         // Act
-        ContentService.Save(list);
+        await ContentService.SaveAsync(list, Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Assert
         Assert.That(list.Any(x => !x.HasIdentity), Is.False);
@@ -2799,7 +2799,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         var hierarchy = (await CreateContentHierarchy()).ToList();
 
         // Act
-        ContentService.Save(hierarchy);
+        await ContentService.SaveAsync(hierarchy, Constants.Security.SuperUserKey, CancellationToken.None);
 
         Assert.That(hierarchy.Any(), Is.True);
         Assert.That(hierarchy.Any(x => x.HasIdentity == false), Is.False);

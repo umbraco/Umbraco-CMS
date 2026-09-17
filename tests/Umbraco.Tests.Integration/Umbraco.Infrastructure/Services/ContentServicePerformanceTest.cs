@@ -91,14 +91,14 @@ internal sealed class ContentServicePerformanceTest : UmbracoIntegrationTest
         }
 
         var roots = ContentBuilder.CreateTextpageContent(contentType1, -1, 10);
-        ContentService.Save(roots);
+        await ContentService.SaveAsync(roots, Constants.Security.SuperUserKey, CancellationToken.None);
         foreach (var root in roots)
         {
             var item1 = ContentBuilder.CreateTextpageContent(contentType1, root.Id, 10);
             var item2 = ContentBuilder.CreateTextpageContent(contentType2, root.Id, 10);
             var item3 = ContentBuilder.CreateTextpageContent(contentType3, root.Id, 10);
 
-            ContentService.Save(item1.Concat(item2).Concat(item3));
+            await ContentService.SaveAsync(item1.Concat(item2).Concat(item3), Constants.Security.SuperUserKey, CancellationToken.None);
         }
 
         var total = new List<IContent>();
@@ -127,7 +127,7 @@ internal sealed class ContentServicePerformanceTest : UmbracoIntegrationTest
 
         // Act
         var watch = Stopwatch.StartNew();
-        ContentService.Save(pages, -1);
+        await ContentService.SaveAsync(pages, Constants.Security.SuperUserKey, CancellationToken.None);
         watch.Stop();
         var elapsed = watch.ElapsedMilliseconds;
 
@@ -147,7 +147,7 @@ internal sealed class ContentServicePerformanceTest : UmbracoIntegrationTest
 
         // Act
         var watch = Stopwatch.StartNew();
-        ContentService.Save(pages, -1);
+        await ContentService.SaveAsync(pages, Constants.Security.SuperUserKey, CancellationToken.None);
         watch.Stop();
         var elapsed = watch.ElapsedMilliseconds;
 
@@ -164,7 +164,7 @@ internal sealed class ContentServicePerformanceTest : UmbracoIntegrationTest
         // Arrange
         var contentType = await ContentTypeService.GetAsync(ContentType.Id);
         var pages = ContentBuilder.CreateTextpageContent(contentType, -1, 100);
-        ContentService.Save(pages, -1);
+        await ContentService.SaveAsync(pages, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var provider = ScopeProvider;
         using (var scope = provider.CreateScope())
@@ -192,7 +192,7 @@ internal sealed class ContentServicePerformanceTest : UmbracoIntegrationTest
         // Arrange
         var contentType = await ContentTypeService.GetAsync(ContentType.Id);
         var pages = ContentBuilder.CreateTextpageContent(contentType, -1, 1000);
-        ContentService.Save(pages, -1);
+        await ContentService.SaveAsync(pages, Constants.Security.SuperUserKey, CancellationToken.None);
 
         using (var scope = ScopeProvider.CreateScope())
         {
@@ -219,7 +219,7 @@ internal sealed class ContentServicePerformanceTest : UmbracoIntegrationTest
         // Arrange
         var contentType = await ContentTypeService.GetAsync(ContentType.Id);
         var pages = ContentBuilder.CreateTextpageContent(contentType, -1, 100);
-        ContentService.Save(pages, -1);
+        await ContentService.SaveAsync(pages, Constants.Security.SuperUserKey, CancellationToken.None);
 
         using (var scope = ScopeProvider.CreateScope())
         {
@@ -249,7 +249,7 @@ internal sealed class ContentServicePerformanceTest : UmbracoIntegrationTest
         // Arrange
         var contentType = await ContentTypeService.GetAsync(ContentType.Id);
         var pages = ContentBuilder.CreateTextpageContent(contentType, -1, 1000);
-        ContentService.Save(pages, -1);
+        await ContentService.SaveAsync(pages, Constants.Security.SuperUserKey, CancellationToken.None);
 
         using (var scope = ScopeProvider.CreateScope())
         {

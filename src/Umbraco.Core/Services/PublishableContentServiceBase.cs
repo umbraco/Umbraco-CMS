@@ -26,7 +26,7 @@ namespace Umbraco.Cms.Core.Services;
 ///
 /// The service interfaces do not expose these methods unless they're needed, so they're only visible on the concrete implementations.
 /// </remarks>
-public abstract class PublishableContentServiceBase<TContent> : RepositoryService, IPublishableContentService<TContent>
+public abstract class PublishableContentServiceBase<TContent> : RepositoryService
     where TContent : class, IPublishableContentBase
 {
     private readonly IAuditService _auditService;
@@ -215,7 +215,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
 
     #region Rollback
 
-    // No longer an interface member (retired from IPublishableContentService<TContent> in favour of
+    // No longer an interface member (retired from the synchronous content-service contract in favour of
     // RollbackAsync) — kept as a plain method because ElementService.RollbackAsync bridges to it
     // until Element has its own async repository.
     public OperationResult Rollback(int id, int versionId, string culture = "*", int userId = Constants.Security.SuperUserId)
@@ -444,7 +444,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         return guidKeyedResults;
     }
 
-    // No longer an interface member (retired from IPublishableContentService<TContent> in favour of
+    // No longer an interface member (retired from the synchronous content-service contract in favour of
     // PersistContentScheduleAsync) — kept as a plain method because ElementService.PersistContentScheduleAsync
     // bridges to it until Element has its own async repository.
     public void PersistContentSchedule(IPublishableContentBase content, ContentScheduleCollection contentSchedule)
@@ -457,7 +457,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         }
     }
 
-    // No longer an interface member (retired from IPublishableContentService<TContent> in favour of
+    // No longer an interface member (retired from the synchronous content-service contract in favour of
     // GetByIdsAsync) — kept as a plain method because ElementService.GetByIdsAsync bridges to it
     // (Task.FromResult(GetByIds(ids))) until Element has its own async repository.
     public IEnumerable<TContent> GetByIds(IEnumerable<Guid> ids)
@@ -774,11 +774,9 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         return OperationResult.Succeed(eventMessages);
     }
 
-    /// <inheritdoc />
-    Attempt<OperationResult?> IPublishableContentService<TContent>.Save(IEnumerable<TContent> contents, int userId) =>
-        Attempt.Succeed(Save(contents, userId));
-
-    /// <inheritdoc />
+    // No longer an interface member (retired from IAsyncContentServiceBase<TContent> in favour of
+    // SaveAsync) — kept as a plain method because ElementService.SaveAsync bridges to it until Element
+    // has its own async repository.
     public OperationResult Save(IEnumerable<TContent> contents, int userId = Constants.Security.SuperUserId)
     {
         EventMessages eventMessages = EventMessagesFactory.Get();
@@ -824,8 +822,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
             // TODO: See note above about supressing events
             scope.Notifications.Publish(TreeChangeNotification(contentsA, TreeChangeTypes.RefreshNode, eventMessages));
 
-            string contentIds = string.Join(", ", contentsA.Select(x => x.Id));
-            Audit(AuditType.Save, userId, Constants.System.Root, $"Saved multiple content items (#{contentIds.Length})");
+            Audit(AuditType.Save, userId, Constants.System.Root, $"Saved multiple content items (#{contentsA.Length})");
 
             scope.Complete();
         }

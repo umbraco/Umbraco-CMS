@@ -1956,12 +1956,4 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
         => new ContentRolledBackNotification(target, messages);
 
     #endregion
-
-    /// <inheritdoc />
-    // AsyncPublishableContentServiceBase<IContent> no longer implements IPublishableContentService<IContent> (that
-    // would re-lock every one of its ~54 members from ever being deleted as they convert one at a time), so this
-    // explicit shim lives here instead of the base class - ContentService is the only type that actually declares
-    // implementing IPublishableContentService<IContent> (transitively, via IContentService).
-    Attempt<OperationResult?> IPublishableContentService<IContent>.Save(IEnumerable<IContent> contents, int userId) =>
-        Attempt.Succeed(base.Save(contents, userId));
 }

@@ -15,7 +15,7 @@ public partial class InvariantContentTests
     public async Task DraftStructure_YieldsAllDocuments()
     {
         await SetupDraftContent();
-        ContentService.Save([Root(), Child(), Grandchild(), GreatGrandchild()]);
+        await ContentService.SaveAsync([Root(), Child(), Grandchild(), GreatGrandchild()], Constants.Security.SuperUserKey, CancellationToken.None);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.DraftContent);
         Assert.That(documents, Has.Count.EqualTo(4));
@@ -41,7 +41,7 @@ public partial class InvariantContentTests
     public async Task DraftStructure_YieldsStructuralFields()
     {
         await SetupDraftContent();
-        ContentService.Save([Root(), Child(), Grandchild(), GreatGrandchild()]);
+        await ContentService.SaveAsync([Root(), Child(), Grandchild(), GreatGrandchild()], Constants.Security.SuperUserKey, CancellationToken.None);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.DraftContent);
         Assert.That(documents, Has.Count.EqualTo(4));
@@ -67,7 +67,7 @@ public partial class InvariantContentTests
     public async Task DraftStructure_YieldsSystemFields()
     {
         await SetupDraftContent();
-        ContentService.Save([Root(), Child(), Grandchild(), GreatGrandchild()]);
+        await ContentService.SaveAsync([Root(), Child(), Grandchild(), GreatGrandchild()], Constants.Security.SuperUserKey, CancellationToken.None);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.DraftContent);
         Assert.That(documents, Has.Count.EqualTo(4));
@@ -97,7 +97,7 @@ public partial class InvariantContentTests
         await ContentService.PublishBranchAsync(Root(), PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         await SetupDraftContent();
-        ContentService.Save([Root(), Child(), Grandchild(), GreatGrandchild()]);
+        await ContentService.SaveAsync([Root(), Child(), Grandchild(), GreatGrandchild()], Constants.Security.SuperUserKey, CancellationToken.None);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.DraftContent);
         Assert.That(documents, Has.Count.EqualTo(4));
@@ -125,7 +125,7 @@ public partial class InvariantContentTests
     public async Task DraftStructure_UpdatesSystemFieldsWhenRootIsTrashed()
     {
         await SetupDraftContent();
-        ContentService.Save([Root(), Child(), Grandchild(), GreatGrandchild()]);
+        await ContentService.SaveAsync([Root(), Child(), Grandchild(), GreatGrandchild()], Constants.Security.SuperUserKey, CancellationToken.None);
         await ContentService.MoveToRecycleBinAsync(Root(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.DraftContent);
@@ -153,7 +153,7 @@ public partial class InvariantContentTests
     public async Task DraftStructure_UpdatesStructuralFieldsWhenRootIsTrashed()
     {
         await SetupDraftContent();
-        ContentService.Save([Root(), Child(), Grandchild(), GreatGrandchild()]);
+        await ContentService.SaveAsync([Root(), Child(), Grandchild(), GreatGrandchild()], Constants.Security.SuperUserKey, CancellationToken.None);
         await ContentService.MoveToRecycleBinAsync(Root(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.DraftContent);
@@ -181,7 +181,7 @@ public partial class InvariantContentTests
     public async Task DraftStructure_UpdatesStructuralFieldsWhenChildIsTrashed()
     {
         await SetupDraftContent();
-        ContentService.Save([Root(), Child(), Grandchild(), GreatGrandchild()]);
+        await ContentService.SaveAsync([Root(), Child(), Grandchild(), GreatGrandchild()], Constants.Security.SuperUserKey, CancellationToken.None);
         await ContentService.MoveToRecycleBinAsync(Child(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.DraftContent);
@@ -211,7 +211,7 @@ public partial class InvariantContentTests
     public async Task DraftStructure_UpdatesStructuralFieldsWhenRootIsMoved()
     {
         await SetupDraftContent();
-        ContentService.Save([Root(), Child(), Grandchild(), GreatGrandchild()]);
+        await ContentService.SaveAsync([Root(), Child(), Grandchild(), GreatGrandchild()], Constants.Security.SuperUserKey, CancellationToken.None);
 
         var secondRootKey = Guid.NewGuid();
         Content secondRoot = new ContentBuilder()
@@ -252,7 +252,7 @@ public partial class InvariantContentTests
     public async Task DraftStructure_UpdatesStructuralFieldsWhenChildIsMoved()
     {
         await SetupDraftContent();
-        ContentService.Save([Root(), Child(), Grandchild(), GreatGrandchild()]);
+        await ContentService.SaveAsync([Root(), Child(), Grandchild(), GreatGrandchild()], Constants.Security.SuperUserKey, CancellationToken.None);
 
         var secondRootKey = Guid.NewGuid();
         Content secondRoot = new ContentBuilder()
@@ -295,7 +295,7 @@ public partial class InvariantContentTests
     public async Task DraftStructure_RemovesAllDocumentsWhenRootIsDeleted(bool moveToRecycleBinBeforeDeleting)
     {
         await SetupDraftContent();
-        ContentService.Save([Root(), Child(), Grandchild(), GreatGrandchild()]);
+        await ContentService.SaveAsync([Root(), Child(), Grandchild(), GreatGrandchild()], Constants.Security.SuperUserKey, CancellationToken.None);
 
         if (moveToRecycleBinBeforeDeleting)
         {
@@ -313,7 +313,7 @@ public partial class InvariantContentTests
     public async Task DraftStructure_RemovesAllDescendantDocumentsWhenChildIsDeleted(bool moveToRecycleBinBeforeDeleting)
     {
         await SetupDraftContent();
-        ContentService.Save([Root(), Child(), Grandchild(), GreatGrandchild()]);
+        await ContentService.SaveAsync([Root(), Child(), Grandchild(), GreatGrandchild()], Constants.Security.SuperUserKey, CancellationToken.None);
 
         if (moveToRecycleBinBeforeDeleting)
         {
@@ -335,7 +335,7 @@ public partial class InvariantContentTests
         await SetupDraftContent();
         if (populateIndexBeforeRebuild)
         {
-            ContentService.Save([Root(), Child(), Grandchild(), GreatGrandchild()]);
+            await ContentService.SaveAsync([Root(), Child(), Grandchild(), GreatGrandchild()], Constants.Security.SuperUserKey, CancellationToken.None);
         }
 
         ContentIndexingService.Rebuild(IndexAliases.DraftContent, DefaultOrigin);

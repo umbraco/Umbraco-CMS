@@ -472,7 +472,7 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
 
         try
         {
-            ElementService.Save(new[] { elementOne, elementTwo });
+            await ElementService.SaveAsync(new[] { elementOne, elementTwo }, Constants.Security.SuperUserKey, CancellationToken.None);
             Assert.IsTrue(savedWasCalled);
         }
         finally
@@ -617,7 +617,7 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
 
         try
         {
-            ElementService.Save(new[] { invariantElement, variantElement });
+            await ElementService.SaveAsync(new[] { invariantElement, variantElement }, Constants.Security.SuperUserKey, CancellationToken.None);
             Assert.IsTrue(savedWasCalled);
         }
         finally

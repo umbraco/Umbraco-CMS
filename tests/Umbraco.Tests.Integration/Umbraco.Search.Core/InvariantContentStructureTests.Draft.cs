@@ -12,7 +12,7 @@ public partial class InvariantContentStructureTests
     [Test]
     public void DraftStructure_YieldsAllDocuments()
     {
-        ContentService.Save([Root(), Child(), Grandchild(), GreatGrandchild()]);
+        ContentService.SaveAsync([Root(), Child(), Grandchild(), GreatGrandchild()], Constants.Security.SuperUserKey, CancellationToken.None).GetAwaiter().GetResult();
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.DraftContent);
         Assert.That(documents, Has.Count.EqualTo(4));
@@ -31,7 +31,7 @@ public partial class InvariantContentStructureTests
     [Test]
     public void DraftStructure_YieldsNoPublishedDocuments()
     {
-        ContentService.Save([Root(), Child(), Grandchild(), GreatGrandchild()]);
+        ContentService.SaveAsync([Root(), Child(), Grandchild(), GreatGrandchild()], Constants.Security.SuperUserKey, CancellationToken.None).GetAwaiter().GetResult();
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.PublishedContent);
         Assert.That(documents, Has.Count.EqualTo(0));
@@ -50,7 +50,7 @@ public partial class InvariantContentStructureTests
     [Test]
     public async Task DraftStructure_WithGrandchildInRecycleBin_YieldsAllDocuments()
     {
-        ContentService.Save([Root(), Child(), Grandchild(), GreatGrandchild()]);
+        ContentService.SaveAsync([Root(), Child(), Grandchild(), GreatGrandchild()], Constants.Security.SuperUserKey, CancellationToken.None).GetAwaiter().GetResult();
 
         Attempt<ContentMoveToRecycleBinOperationStatus> result = await ContentService.MoveToRecycleBinAsync(Grandchild(), Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.Multiple(() =>
@@ -75,7 +75,7 @@ public partial class InvariantContentStructureTests
     [Test]
     public void DraftStructure_WithGrandchildDeleted_YieldsNothingBelowChild()
     {
-        ContentService.Save([Root(), Child(), Grandchild(), GreatGrandchild()]);
+        ContentService.SaveAsync([Root(), Child(), Grandchild(), GreatGrandchild()], Constants.Security.SuperUserKey, CancellationToken.None).GetAwaiter().GetResult();
 
         Attempt<ContentDeleteOperationStatus> result = ContentService.DeleteAsync(Grandchild(), null, CancellationToken.None).GetAwaiter().GetResult();
         Assert.Multiple(() =>

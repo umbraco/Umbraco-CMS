@@ -408,7 +408,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 userId,
                 alias => typeService.Get(alias),
                 key => service.GetByIdAsync(key, CancellationToken.None).GetAwaiter().GetResult(),
-                (contents, saveUserId) => service.Save(contents, saveUserId));
+                (contents, saveUserId) => service.SaveAsync(contents, ResolveUserKey(saveUserId), CancellationToken.None).GetAwaiter().GetResult());
 
         /// <summary>
         /// Imports content base items of a specified type from the provided compiled package content documents using the
@@ -461,7 +461,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 userId,
                 alias => typeService.GetAsync(alias).GetAwaiter().GetResult(),
                 key => service.GetByIdAsync(key, CancellationToken.None).GetAwaiter().GetResult(),
-                (contents, saveUserId) => service.Save(contents, saveUserId));
+                (contents, saveUserId) => service.SaveAsync(contents, ResolveUserKey(saveUserId), CancellationToken.None).GetAwaiter().GetResult());
 
         private IReadOnlyList<TContentBase> ImportContentBase<TContentBase, TContentTypeComposition>(
             IEnumerable<CompiledPackageContentBase> docs,
@@ -537,7 +537,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 userId,
                 alias => typeService.Get(alias),
                 key => service.GetByIdAsync(key, CancellationToken.None).GetAwaiter().GetResult(),
-                (contents, saveUserId) => service.Save(contents, saveUserId));
+                (contents, saveUserId) => service.SaveAsync(contents, ResolveUserKey(saveUserId), CancellationToken.None).GetAwaiter().GetResult());
 
         /// <summary>
         /// Imports and saves package xml as <see cref="IContentBase"/> items using the (asynchronous) document type service.
@@ -593,7 +593,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 userId,
                 alias => typeService.GetAsync(alias).GetAwaiter().GetResult(),
                 key => service.GetByIdAsync(key, CancellationToken.None).GetAwaiter().GetResult(),
-                (contents, saveUserId) => service.Save(contents, saveUserId));
+                (contents, saveUserId) => service.SaveAsync(contents, ResolveUserKey(saveUserId), CancellationToken.None).GetAwaiter().GetResult());
 
         private IEnumerable<TContentBase> ImportContentBase<TContentBase, TContentTypeComposition>(
             IEnumerable<XElement> roots,
