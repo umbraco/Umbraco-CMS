@@ -341,10 +341,10 @@ export abstract class UmbBlockManagerContext<
 		return this._layouts.asObservablePart((source) => source.find((x) => x.contentKey === contentKey));
 	}
 	contentOf(key: string) {
-		return this.#contents.asObservablePart((source) => source.find((x) => x.key === key));
+		return this.#contents.asObservablePart((source) => source?.find((x) => x.key === key));
 	}
 	settingsOf(key: string) {
-		return this.#settings.asObservablePart((source) => source.find((x) => x.key === key));
+		return this.#settings.asObservablePart((source) => source?.find((x) => x.key === key));
 	}
 
 	currentExposeOf(contentKey: string) {
@@ -403,10 +403,10 @@ export abstract class UmbBlockManagerContext<
 		return this.#blockTypes.value.find((x) => x.contentElementTypeKey === contentTypeKey);
 	}
 	getContentOf(contentKey: string) {
-		return this.#contents.value.find((x) => x.key === contentKey);
+		return this.#contents.value?.find((x) => x.key === contentKey);
 	}
 	getSettingsOf(settingsKey: string) {
-		return this.#settings.value.find((x) => x.key === settingsKey);
+		return this.#settings.value?.find((x) => x.key === settingsKey);
 	}
 	// originData param is used by some implementations. [NL] should be here, do not remove it.
 
@@ -447,21 +447,37 @@ export abstract class UmbBlockManagerContext<
 		this.#exposes.filter((x) => !(x.contentKey === contentKey && variantId.compare(x)));
 	}
 
+	/**
+	 * @deprecated this is not working, use the Property Dataset instead.
+	 */
+	// TODO: Deprecate and remove this.
 	setOneContentProperty(key: string, propertyAlias: string, value: unknown) {
 		this.#contents.updateOne(key, { [propertyAlias]: value });
 	}
+	/**
+	 * @deprecated this is not working, use the Property Dataset instead.
+	 */
+	// TODO: Deprecate and remove this.
 	setOneSettingsProperty(key: string, propertyAlias: string, value: unknown) {
 		this.#settings.updateOne(key, { [propertyAlias]: value });
 	}
 
+	/**
+	 * @deprecated this is not working, use the Property Dataset instead.
+	 */
+	// TODO: Deprecate and remove this.
 	contentProperty(key: string, propertyAlias: string) {
 		this.#contents.asObservablePart(
-			(source) => source.find((x) => x.key === key)?.values?.find((values) => values.alias === propertyAlias)?.value,
+			(source) => source?.find((x) => x.key === key)?.values?.find((values) => values.alias === propertyAlias)?.value,
 		);
 	}
+	/**
+	 * @deprecated this is not working, use the Property Dataset instead.
+	 */
+	// TODO: Deprecate and remove this.
 	settingsProperty(key: string, propertyAlias: string) {
 		this.#settings.asObservablePart(
-			(source) => source.find((x) => x.key === key)?.values?.find((values) => values.alias === propertyAlias)?.value,
+			(source) => source?.find((x) => x.key === key)?.values?.find((values) => values.alias === propertyAlias)?.value,
 		);
 	}
 
