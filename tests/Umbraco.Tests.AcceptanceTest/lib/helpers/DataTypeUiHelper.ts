@@ -445,9 +445,7 @@ export class DataTypeUiHelper extends UiBaseLocators {
   }
 
   async moveDataTypeToFolder(folderName: string) {
-    await this.clickMoveToActionMenuOption();
-    await this.click(this.sidebarModal.getByText(folderName, {exact: true}));
-    await this.click(this.chooseModalBtn);
+    await this.moveToFolder(folderName);
   }
 
   async duplicateDataTypeToFolder(folderName: string) {

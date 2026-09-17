@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.DocumentBlueprint;
 /// API controller responsible for handling requests to create document blueprints in the Umbraco CMS.
 /// </summary>
 [ApiVersion("1.0")]
-[Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
+[Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentBlueprints)]
 public class CreateDocumentBlueprintController : DocumentBlueprintControllerBase
 {
     private readonly IDocumentBlueprintEditingPresentationFactory _blueprintEditingPresentationFactory;
