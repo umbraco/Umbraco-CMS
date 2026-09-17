@@ -197,6 +197,3 @@ test('cannot create a webhook without a url', async ({umbracoApi, umbracoUi}) =>
   await umbracoUi.webhook.isErrorNotificationVisible();
   expect(await umbracoApi.webhook.doesNameExist(webhookName)).toBeFalsy();
 });
-
-// Not tested: the webhook URL field has no format validation, accepting values that are not valid URLs.
-// This looks like an oversight rather than intended behavior, so we do not pin it as an accepted spec here.
