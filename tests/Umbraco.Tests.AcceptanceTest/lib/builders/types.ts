@@ -26,9 +26,15 @@ export interface EntityReference {
 /**
  * A variant entry on a document, element, media, member or blueprint payload.
  *
- * `name` is nullable because most builders send `null` when it is unset; `MemberVariantBuilder`
- * sends `''` instead. That difference is deliberate here - it is the payload the suite has always
- * sent, and changing it wants verifying against a running instance rather than tidying by hand.
+ * `DocumentVariantRequestModel.name` and its siblings are **required and non-nullable** in
+ * `OpenApi.json`, so `MemberVariantBuilder`'s `''` is the conforming one and the `null` the
+ * other four emit is the divergence - not the other way round. It is recorded rather than fixed
+ * because changing what the suite sends wants a running instance, not a tidy-up.
+ *
+ * **The `| null` here documents intent; it does not enforce anything.** `strict: false` leaves
+ * `strictNullChecks` off, so `null` is assignable to `string` throughout this package, and
+ * narrowing any of these to `string` would catch nothing while misdescribing what is emitted.
+ * What the types do check is the field *names* and the nesting.
  */
 export interface EntityVariant {
   culture: string | null;
@@ -406,6 +412,9 @@ export interface PackagePayload {
 export interface UserPayload {
   email: string;
   name: string;
+  // TODO (V19): narrow to 'Default' | 'Api' - CreateUserRequestModel.kind is the UserKindModel
+  //   enum, and a literal union is enforced even with strictNullChecks off. Blocked now because
+  //   UserBuilder.withKind(kind: string) is an exported signature (see the guide's section 2).
   kind: string;
   userGroupIds: EntityReference[];
   userName: string;
