@@ -233,25 +233,62 @@ describe('UmbMenuTreeStructureWorkspaceContextBase', () => {
 	});
 
 	describe('getItemHref', () => {
+		const TEST_WORKSPACE_ALIAS = 'Umb.Test.MenuTreeStructureWorkspaceContextBase.Workspace';
+
 		function structureItem(overrides: Partial<UmbStructureItemModel>): UmbStructureItemModel {
 			return { unique: 'item-unique', entityType: 'test-entity-type', name: 'Item', isFolder: false, ...overrides };
 		}
 
-		it('returns undefined for a folder-flagged item', () => {
+		function registerWorkspaceFor(entityType: string) {
+			umbExtensionsRegistry.register({
+				type: 'workspace',
+				alias: TEST_WORKSPACE_ALIAS,
+				name: 'Test Workspace',
+				meta: { entityType },
+			});
+		}
+
+		afterEach(() => {
+			umbExtensionsRegistry.unregister(TEST_WORKSPACE_ALIAS);
+		});
+
+		it('returns undefined for a folder-flagged item whose entity type has no registered workspace', () => {
 			expect(context.getItemHref(structureItem({ isFolder: true }))).to.equal(undefined);
 		});
 
-		it('returns undefined for an item with no unique (e.g. the root)', () => {
-			expect(context.getItemHref(structureItem({ unique: null }))).to.equal(undefined);
+		it('returns undefined for a non-folder item whose entity type has no registered workspace', () => {
+			expect(context.getItemHref(structureItem({}))).to.equal(undefined);
 		});
 
-		it('returns a generated edit-path link for a non-folder item with a unique', () => {
+		it('returns an edit-path link for a folder-flagged item whose entity type has a registered workspace', () => {
+			registerWorkspaceFor('test-entity-type');
+
+			expect(context.getItemHref(structureItem({ isFolder: true }))).to.equal(
+				UMB_WORKSPACE_EDIT_PATH_PATTERN.generateAbsolute({
+					sectionName: UmbTestSectionContext.PATHNAME,
+					entityType: 'test-entity-type',
+					unique: 'item-unique',
+				}),
+			);
+		});
+
+		it('returns an edit-path link for a non-folder item whose entity type has a registered workspace', () => {
+			registerWorkspaceFor('test-entity-type');
+
 			expect(context.getItemHref(structureItem({}))).to.equal(
 				UMB_WORKSPACE_EDIT_PATH_PATTERN.generateAbsolute({
 					sectionName: UmbTestSectionContext.PATHNAME,
 					entityType: 'test-entity-type',
 					unique: 'item-unique',
 				}),
+			);
+		});
+
+		it('returns undefined for an item with no unique (e.g. the root), even if its entity type has a registered workspace', () => {
+			registerWorkspaceFor('test-root-entity-type');
+
+			expect(context.getItemHref(structureItem({ unique: null, entityType: 'test-root-entity-type' }))).to.equal(
+				undefined,
 			);
 		});
 	});

@@ -2,7 +2,7 @@ import { UMB_MENU_STRUCTURE_WORKSPACE_CONTEXT } from './menu-structure-workspace
 import { UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT } from './section-sidebar-menu/index.js';
 import type { ManifestWorkspaceContextMenuStructureKind, UmbStructureItemModel } from './types.js';
 import type { UmbMenuStructureWorkspaceContext } from './menu-structure-workspace-context.interface.js';
-import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
+import { createExtensionApiByAlias, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { debounce, linkEntityExpansionEntries } from '@umbraco-cms/backoffice/utils';
 import { UmbAncestorsEntityContext, UmbParentEntityContext, type UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import { UmbArrayState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
@@ -11,6 +11,7 @@ import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UMB_MODAL_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UMB_SECTION_CONTEXT } from '@umbraco-cms/backoffice/section';
+import type { ManifestWorkspace } from '@umbraco-cms/backoffice/workspace';
 import {
 	UMB_SUBMITTABLE_TREE_ENTITY_WORKSPACE_CONTEXT,
 	UMB_WORKSPACE_EDIT_PATH_PATTERN,
@@ -113,7 +114,7 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase
 	}
 
 	getItemHref(structureItem: UmbStructureItemModel): string | undefined {
-		if (structureItem.isFolder || !structureItem.unique) return undefined;
+		if (!structureItem.unique || !this.#hasWorkspaceForEntityType(structureItem.entityType)) return undefined;
 
 		const sectionName = this._sectionContext?.getPathname();
 		if (!sectionName) return undefined;
@@ -123,6 +124,12 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase
 			entityType: structureItem.entityType,
 			unique: structureItem.unique,
 		});
+	}
+
+	#hasWorkspaceForEntityType(entityType: string): boolean {
+		return umbExtensionsRegistry
+			.getByType<'workspace', ManifestWorkspace>('workspace')
+			.some((manifest) => manifest.meta?.entityType === entityType);
 	}
 
 	#addEventListeners() {
