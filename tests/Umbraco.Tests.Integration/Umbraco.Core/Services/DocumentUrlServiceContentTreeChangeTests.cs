@@ -259,6 +259,10 @@ internal sealed class DocumentUrlServiceContentTreeChangeTests : UmbracoIntegrat
                 Is.True,
                 "The published URL segment must be persisted when the publish is handled by an instance holding the Subscriber role.");
             Assert.That(
+                GetDbSegments(page.Key).Any(s => s.IsDraft),
+                Is.True,
+                "The draft URL segment must be persisted when the publish is handled by an instance holding the Subscriber role.");
+            Assert.That(
                 GetDbAliases(page.Key).Any(a => a.Alias == "subscriber-alias"),
                 Is.True,
                 "URL aliases must be persisted when the publish is handled by an instance holding the Subscriber role.");
