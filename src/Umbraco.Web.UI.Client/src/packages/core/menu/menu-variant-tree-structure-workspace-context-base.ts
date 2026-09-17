@@ -19,6 +19,7 @@ import {
 	UMB_VARIANT_WORKSPACE_CONTEXT,
 	UMB_WORKSPACE_EDIT_PATH_PATTERN,
 	UMB_WORKSPACE_EDIT_VARIANT_PATH_PATTERN,
+	UMB_WORKSPACE_PATH_PATTERN,
 } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
@@ -128,11 +129,15 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase
 	}
 
 	getItemHref(structureItem: UmbVariantStructureItemModel): string | undefined {
+		if (!this.#hasWorkspaceForEntityType(structureItem.entityType)) return undefined;
+
 		const sectionName = this._sectionContext?.getPathname();
 		if (!sectionName) return undefined;
 
 		const unique = structureItem.unique;
-		if (!unique || !this.#hasWorkspaceForEntityType(structureItem.entityType)) return undefined;
+		if (unique === null) {
+			return UMB_WORKSPACE_PATH_PATTERN.generateAbsolute({ sectionName, entityType: structureItem.entityType });
+		}
 
 		// find related variant id from structure item:
 		const itemVariantFit = structureItem.variants.find(

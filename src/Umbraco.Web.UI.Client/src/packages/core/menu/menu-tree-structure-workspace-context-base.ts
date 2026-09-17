@@ -15,6 +15,7 @@ import type { ManifestWorkspace } from '@umbraco-cms/backoffice/workspace';
 import {
 	UMB_SUBMITTABLE_TREE_ENTITY_WORKSPACE_CONTEXT,
 	UMB_WORKSPACE_EDIT_PATH_PATTERN,
+	UMB_WORKSPACE_PATH_PATTERN,
 } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbTreeRepository, UmbTreeItemModel, UmbTreeRootModel } from '@umbraco-cms/backoffice/tree';
@@ -114,10 +115,19 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase
 	}
 
 	getItemHref(structureItem: UmbStructureItemModel): string | undefined {
-		if (!structureItem.unique || !this.#hasWorkspaceForEntityType(structureItem.entityType)) return undefined;
+		if (!this.#hasWorkspaceForEntityType(structureItem.entityType)) return undefined;
 
 		const sectionName = this._sectionContext?.getPathname();
 		if (!sectionName) return undefined;
+
+		if (structureItem.unique === null) {
+			// The root has no unique, so it can't use the edit-by-unique link below - its workspace is
+			// reached by entity type alone.
+			return UMB_WORKSPACE_PATH_PATTERN.generateAbsolute({
+				sectionName,
+				entityType: structureItem.entityType,
+			});
+		}
 
 		return UMB_WORKSPACE_EDIT_PATH_PATTERN.generateAbsolute({
 			sectionName,

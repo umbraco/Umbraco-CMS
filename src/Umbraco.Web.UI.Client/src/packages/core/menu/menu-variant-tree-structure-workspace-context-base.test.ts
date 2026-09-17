@@ -20,6 +20,7 @@ import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice
 import {
 	UMB_SUBMITTABLE_TREE_ENTITY_WORKSPACE_CONTEXT,
 	UMB_WORKSPACE_EDIT_PATH_PATTERN,
+	UMB_WORKSPACE_PATH_PATTERN,
 } from '@umbraco-cms/backoffice/workspace';
 
 const TEST_TREE_REPOSITORY_ALIAS = 'Umb.Test.MenuVariantTreeStructureWorkspaceContextBase.TreeRepository';
@@ -272,11 +273,20 @@ describe('UmbMenuVariantTreeStructureWorkspaceContextBase', () => {
 			);
 		});
 
-		it('returns undefined for an item with no unique (e.g. the root), even if its entity type has a registered workspace', () => {
+		it('returns undefined for a root item (no unique) whose entity type has no registered workspace', () => {
+			expect(context.getItemHref(structureItem({ unique: null, entityType: 'test-root-entity-type' }))).to.equal(
+				undefined,
+			);
+		});
+
+		it('returns a root-path link (no unique segment) for a root item whose entity type has a registered workspace', () => {
 			registerWorkspaceFor('test-root-entity-type');
 
 			expect(context.getItemHref(structureItem({ unique: null, entityType: 'test-root-entity-type' }))).to.equal(
-				undefined,
+				UMB_WORKSPACE_PATH_PATTERN.generateAbsolute({
+					sectionName: UmbTestSectionContext.PATHNAME,
+					entityType: 'test-root-entity-type',
+				}),
 			);
 		});
 	});
