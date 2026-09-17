@@ -1814,11 +1814,11 @@ export class UiBaseLocators extends BasePage {
     );
   }
 
-  async doesCollectionTreeItemTableRowHaveIcon(name: string, icon: string) {
+  async doesCollectionTreeItemTableRowHaveIcon(name: string, icon: string, exact: boolean = true) {
     await this.waitForVisible(this.collectionTreeItemTableRow.first());
     await this.isVisible(
       this.collectionTreeItemTableRow
-        .filter({ has: this.page.getByText(name, { exact: true }) })
+        .filter(exact ? { has: this.page.getByText(name, { exact: true }) } : { hasText: name })
         .locator("umb-icon")
         .locator('[name="' + icon + '"]'),
     );

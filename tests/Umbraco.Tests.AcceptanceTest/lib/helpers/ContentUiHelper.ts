@@ -337,6 +337,7 @@ export class ContentUiHelper extends UiBaseLocators {
     this.sortChildrenBtn = page.getByRole('button', {name: 'Sort children'});
     this.rollbackBtn = this.documentWorkspace.locator('[data-mark="audit-log-action:Umb.AuditLogAction.Document.Rollback"]');
     this.sortByFieldTab = page.getByTestId('sort-children-of-modal:tab-by-field');
+    // Each tree registers its own subclassed modal tag, which does not answer to its parent's.
     this.sortByFieldSelect = page.locator('#sort-by-field [label="Sort by field"] select');
     this.sortByFieldDirectionSelect = page.locator('#sort-by-field [label="Direction"] select');
     this.publishModalBtn = this.backofficeModalContainer.getByLabel('Publish', {exact: true});
