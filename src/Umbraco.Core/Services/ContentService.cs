@@ -29,8 +29,6 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
 {
     private readonly IAsyncDocumentRepository _asyncDocumentRepository;
     private readonly IAsyncDocumentBlueprintRepository _asyncDocumentBlueprintRepository;
-    private readonly IDocumentBlueprintRepository _documentBlueprintRepository;
-    private readonly IEntityRepository _entityRepository;
     private readonly ILanguageRepository _languageRepository;
     private readonly ILogger<ContentService> _logger;
     private readonly Lazy<IPropertyValidationService> _propertyValidationService;
@@ -72,10 +70,8 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
         ILoggerFactory loggerFactory,
         IEventMessagesFactory eventMessagesFactory,
         IDocumentRepository documentRepository,
-        IEntityRepository entityRepository,
         IAuditService auditService,
         IContentTypeRepository contentTypeRepository,
-        IDocumentBlueprintRepository documentBlueprintRepository,
         ILanguageRepository languageRepository,
         Lazy<IPropertyValidationService> propertyValidationService,
         IShortStringHelper shortStringHelper,
@@ -104,8 +100,6 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
     {
         _asyncDocumentRepository = asyncDocumentRepository;
         _asyncDocumentBlueprintRepository = asyncDocumentBlueprintRepository;
-        _entityRepository = entityRepository;
-        _documentBlueprintRepository = documentBlueprintRepository;
         _languageRepository = languageRepository;
         _propertyValidationService = propertyValidationService;
         _shortStringHelper = shortStringHelper;

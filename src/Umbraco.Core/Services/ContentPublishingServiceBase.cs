@@ -1,4 +1,3 @@
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
@@ -24,7 +23,6 @@ internal abstract class ContentPublishingServiceBase<TContent, TContentService>
     private readonly ILanguageService _languageService;
     private ContentSettings _contentSettings;
     private readonly IRelationService _relationService;
-    private readonly ILogger<ContentPublishingServiceBase<TContent, TContentService>> _logger;
 
     protected abstract int WriteLockId { get; }
 
@@ -36,8 +34,7 @@ internal abstract class ContentPublishingServiceBase<TContent, TContentService>
         IContentTypeService contentTypeService,
         ILanguageService languageService,
         IOptionsMonitor<ContentSettings> optionsMonitor,
-        IRelationService relationService,
-        ILogger<ContentPublishingServiceBase<TContent, TContentService>> logger)
+        IRelationService relationService)
     {
         _coreScopeProvider = coreScopeProvider;
         _contentService = contentService;
@@ -46,7 +43,6 @@ internal abstract class ContentPublishingServiceBase<TContent, TContentService>
         _contentTypeService = contentTypeService;
         _languageService = languageService;
         _relationService = relationService;
-        _logger = logger;
         _contentSettings = optionsMonitor.CurrentValue;
         optionsMonitor.OnChange((contentSettings) =>
         {

@@ -59,8 +59,7 @@ internal sealed class ContentPublishingService : ContentPublishingServiceBase<IC
             contentTypeService,
             languageService,
             optionsMonitor,
-            relationService,
-            logger)
+            relationService)
     {
         _coreScopeProvider = coreScopeProvider;
         _contentService = contentService;
