@@ -1,4 +1,5 @@
 export * from './constants.js';
+export * from './legacy-aliases.js';
 export * from './global-context/index.js';
 export * from './conditions/index.js';
 export * from './query/index.js';
