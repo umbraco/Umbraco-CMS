@@ -1818,7 +1818,7 @@ export class UiBaseLocators extends BasePage {
     await this.waitForVisible(this.collectionTreeItemTableRow.first());
     await this.isVisible(
       this.collectionTreeItemTableRow
-        .filter({ hasText: name })
+        .filter({ has: this.page.getByText(name, { exact: true }) })
         .locator("umb-icon")
         .locator('[name="' + icon + '"]'),
     );

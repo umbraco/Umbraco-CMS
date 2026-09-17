@@ -337,8 +337,8 @@ export class ContentUiHelper extends UiBaseLocators {
     this.sortChildrenBtn = page.getByRole('button', {name: 'Sort children'});
     this.rollbackBtn = this.documentWorkspace.locator('[data-mark="audit-log-action:Umb.AuditLogAction.Document.Rollback"]');
     this.sortByFieldTab = page.getByTestId('sort-children-of-modal:tab-by-field');
-    this.sortByFieldSelect = page.locator('umb-sort-children-of-content-modal [label="Sort by field"] select');
-    this.sortByFieldDirectionSelect = page.locator('umb-sort-children-of-content-modal [label="Direction"] select');
+    this.sortByFieldSelect = page.locator('#sort-by-field [label="Sort by field"] select');
+    this.sortByFieldDirectionSelect = page.locator('#sort-by-field [label="Direction"] select');
     this.publishModalBtn = this.backofficeModalContainer.getByLabel('Publish', {exact: true});
     this.unpublishModalBtn = this.backofficeModalContainer.getByLabel('Unpublish', {exact: true});
     this.rollbackContainerBtn = this.container.getByLabel("Rollback");

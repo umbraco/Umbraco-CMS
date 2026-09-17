@@ -164,7 +164,7 @@ export class DataTypeUiHelper extends UiBaseLocators {
     this.ignoreUserStartNodesToggle = page.getByTestId('property:ignoreUserStartNodes').locator('#toggle');
     this.duplicateBtn = this.sidebarModal.getByLabel('Duplicate', {exact: true});
     this.selectAPropertyEditorBtn = page.getByLabel('Select a property editor');
-    this.typeToFilterTxt = page.locator('#filter #input');
+    this.typeToFilterTxt = page.locator('umb-backoffice-modal-container #filter #input');
 
     // Approved Color
     this.includeLabelsToggle = page.locator('#toggle');
@@ -471,8 +471,11 @@ export class DataTypeUiHelper extends UiBaseLocators {
   }
 
   async selectAPropertyEditor(propertyName: string, filterKeyword?: string) {
-    await this.typeToFilterTxt.fill(filterKeyword ? filterKeyword : propertyName);
-    await this.clickTextButtonWithName(propertyName);
+    const propertyEditorOption = this.backofficeModalContainer.getByText(propertyName, {exact: true});
+    await expect(async () => {
+      await this.enterText(this.typeToFilterTxt, filterKeyword ? filterKeyword : propertyName);
+      await this.click(propertyEditorOption, {timeout: ConstantHelper.timeout.short});
+    }).toPass({timeout: ConstantHelper.timeout.long});
   }
 
   // Approved Color
