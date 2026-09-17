@@ -12,7 +12,7 @@ Enterprise-grade CMS built on .NET 10.0. The projects under `src/` and `tests/` 
 
 ### What This Repository Contains
 
-**21 Production Projects** organized in 3 main categories:
+**Production projects** (22 in `umbraco.sln` at the time of writing — count there, not here) organized in 3 main categories:
 
 1. **Core Architecture** (Domain & Infrastructure)
    - `Umbraco.Core` - Interface contracts, domain models, notifications

@@ -18,6 +18,12 @@ Run it before committing; it needs no running site, so there is no excuse to ski
 
 A spec also has to sit **inside a directory that one of the `playwright.config.ts` projects matches** (`DefaultConfig/**`, `DeliveryApi/**`, `SMTP/*.spec.ts`, …). A file written straight into `tests/` type-checks, looks fine, and is silently never run — no project's `testMatch` claims it. `npm run createTest` writes into `tests/DefaultConfig/` for exactly this reason.
 
+And a spec that *is* claimed by a project still needs that project's instance. Every project except
+`defaultConfig` ships a `tests/<Project>/AdditionalSetup/` folder — settings, `App_Plugins`, sometimes a
+`.cs` file that has to be **compiled in** — which nothing installs for you. Skip it and the specs run and
+fail against a feature that was never switched on, which reads as a broken locator rather than a missing
+setup. README.md → *Every project except `defaultConfig` needs its instance set up first* has the procedure.
+
 ---
 
 ## 2. Architecture
@@ -112,7 +118,7 @@ failing at navigation and the error context shows the **login page** — the ses
 and each test then fails on whatever element it looked for first, so the message names a
 perfectly good locator. Restart the instance before reading anything into it.
 
-**Known debt — the suite has not finished paying this off.** 91 `waitForTimeout` calls remain, concentrated in `ContentUiHelper` (23), `LibraryUiHelper` (20) and `UiBaseLocators` (17). **24 carry a justification**; the other 67 do not. Treat them as debt, not as precedent: the fact that a neighbouring method sleeps is not a reason for a new one to.
+**Known debt — the suite has not finished paying this off.** Fixed sleeps remain throughout `lib/`, worst in `ContentUiHelper`, `LibraryUiHelper` and `UiBaseLocators`, and most of them carry no justification. Treat them as debt, not as precedent: the fact that a neighbouring method sleeps is not a reason for a new one to.
 
 `BasePage.waitForTimeout()` and `UiHelpers.waitForTimeout()` exist and are exported, so they stay — but reach for them only when there is genuinely no observable state to wait on, and **leave a comment saying what the sleep stands in for** (as `FormsUiHelper` does). That comment is the contract, and it is the only thing distinguishing a considered sleep from a hedge — nothing checks it for you. When you remove one, replace it with a wait on the state it was covering for, and verify the spec still passes against a running instance.
 
@@ -139,12 +145,12 @@ Anything else should use `this.click()`. What matters is whether visibility is a
 ### `force: true` needs the same justification as a sleep
 `force: true` switches off Playwright's actionability checks — visibility, stability, hit-target. That is exactly how "the element is covered", "the element is still animating" and "another element is intercepting the click" stop being failures and become passes. It is a legitimate escape hatch (a known-harmless overlay, a control the browser reports as unstable but is fine to hit), but it is never free.
 
-The suite has **78 force clicks outside `FormsUiHelper`, none of them justified** — the same debt shape as the sleeps. Write a comment saying which actionability check you are overriding and why it is safe; a force click with no comment is indistinguishable from a masked bug.
+Force clicks are scattered through `lib/` and, outside `FormsUiHelper`, essentially none carry a justification — the same debt shape as the sleeps. Write a comment saying which actionability check you are overriding and why it is safe; a force click with no comment is indistinguishable from a masked bug.
 
 Working out whether a given one is still needed takes a run, not a read: the only way to learn which check it overrides is to remove it and see which one then fails.
 
 ### A check either asserts or returns — never both shapes under one name
-`does*` / `is*` / `has*` methods come in two kinds, and **451 of the 464 in `lib/` assert internally** (they `await` an assertion and return void):
+`does*` / `is*` / `has*` methods come in two kinds, and **most of them assert internally** (they `await` an assertion and return void). Which kind a given one is, is answerable mechanically rather than by reading: `npm run build` emits `.d.ts` files, and a check whose declared return type is `Promise<void>` (or `Promise<void[]>`, a `Promise.all` of asserting checks) asserts internally, while anything else hands a value back.
 
 ```ts
 // asserts internally -> a bare await is the correct call
@@ -171,7 +177,9 @@ So: **a new `does*`/`is*`/`has*` method asserts internally.** If it has to hand 
 
 A real assertion failure reads as a **green test**, with the error demoted to a line a CI summary will skip. Verified by probe, not inferred.
 
-Both halves of this were swept once and were clean at the time: every one of the ~730 migrated call sites is awaited, and the 12 value-returning checks are all wrapped in `expect()`. Neither property is checked automatically, so both are worth a glance in review.
+**The value-returning half is much larger than it looks.** It is concentrated in the API helpers — `DataTypeApiHelper` most of all — and `doesExist` / `doesNameExist` on nearly every entity helper is one of them. So this is not a rare trap to keep in mind; it is a large part of the API-side surface, and a bare `await` on any of them asserts nothing. Run the `.d.ts` check above before trusting a bare await.
+
+Neither property is checked automatically, so both are worth a glance in review. Live examples sit in `Media.spec.ts`: `await umbracoApi.media.doesNameExist(name);` in an Arrange block, with no `expect` around it, asserting nothing.
 
 ### Assert through a helper, not on the raw API response
 
@@ -228,11 +236,11 @@ The resulting contract:
 
 - `getOnlyPropertyValue(data)` — asserts exactly one distinct alias, returns the **first** entry (what the raw `values[0].value` returned).
 - `getPropertyValue(data, alias)` / `doesPropertyHaveValue(data, alias, value)` — with no culture or segment, several matches is legitimate and the first is used.
-- **All three take an optional `culture` *and* `segment`.** Narrow with whichever identifies the entry you mean; the helper then requires exactly one match. This matters because the rule above is about culture **and segment** — a property segmented within a single culture yields several entries that a culture alone cannot separate, so `culture` by itself would fail with `found 2` on exactly the specs these helpers exist to serve.
+- **All three take an optional `culture` *and* `segment`.** Narrow with whichever identifies the entry you mean; the helper then requires exactly one match. This matters because the rule above is about culture **and segment** — a property segmented within a single culture yields several entries that a culture alone cannot separate, so `culture` by itself would fail with `found 2` on exactly the specs these helpers exist to serve. Narrowing is positive-only, though: `null` means *do not filter on this*, so there is no way to ask for the entry whose culture or segment **is** null. Nothing needs that today, but a property carrying both an unsegmented and a segmented entry could not have the unsegmented one targeted.
 - Returning the *first* entry when nothing is narrowed is an ordering dependence, inside helpers introduced to remove one. It is deliberate, because it preserves what the raw `values[0]` did — but it is the reason to pass a culture or segment whenever the property varies and a specific entry is the subject.
 - `doesVariantHaveState` / `doesVariantHaveName` — with no culture, target `variants[0]`, the default variant.
 
-**Think hard before changing any of these semantics** — these helpers back ~700 spec assertions, so a change to what they mean silently changes what all of those specs assert, with no failure to point at the cause.
+**Think hard before changing any of these semantics** — these helpers back most of the suite's API-side assertions, so a change to what they mean silently changes what all of those specs assert, with no failure to point at the cause.
 
 `getPropertyValue` is deliberately named `get*`, not `does*`: it hands a value back, so the caller must assert on it (§3's check-method rule). It exists for the nested shapes a generic assertion cannot cover, and it keeps the nested assertion — which is the actual subject of such a test — while dropping the positional lookup:
 
@@ -249,13 +257,13 @@ Note `doesDataTypeHaveEditors` takes both aliases: a data type with the right `e
 
 Three things they buy:
 
-1. **The shape lives in one place.** `variants[0].state` appeared in 45 spec files; a response change meant 45 edits.
+1. **The shape lives in one place.** `variants[0].state` was spread across dozens of spec files; a response change meant editing every one of them.
 2. **Failures name the entity.** `Expected the default variant of 'TestContent' to be Published` beats `Published != Draft`.
 3. **`doesPropertyHaveValue` matches by alias, not by position** — `values[0]` assumed an ordering the API does not guarantee, so it could pass or fail on seed order alone. This is the same trap as a hardcoded `.nth(0)` (below), on the API side.
 
 They take the **already-fetched entity** rather than a name on purpose: `getByName` walks the tree recursively, so a name-based overload would re-request on every assertion.
 
-**153 raw-response assertions remain**, down from 890 (-83%).
+**Raw-response assertions still remain**, though far fewer than before.
 
 `getOnlyPropertyValue` covers the case where no alias is in play: it asserts there *is* exactly
 one property and returns it, so the single-property expectation is stated rather than buried in
@@ -264,12 +272,12 @@ the entity boundary — `getOnlyPropertyValue(data).contentData[0].values[0].val
 into the *block's own* structure, which is that test's actual subject.
 
 **Concentration, not raw count, decides whether a helper earns its place.** Cluster the remaining
-assertions by what they assert and the long tail is real: the largest subject is identity
-(`.id`, `.name`, `.path`) at 22 lines spread over 16 files, where a helper would add an
+assertions by what they assert, not by exact path, and the long tail is real: identity checks
+(`.id`, `.name`, `.path`) are spread thinly over many files, where a helper would add an
 indirection per file and buy nothing. The clusters worth extracting were the concentrated ones —
-property definitions (23 lines, 3 files), user-group access flags (22 lines, 2 files) and domains
-(13 lines, 2 files) — each a single positional lookup repeated, and each now a helper. Counting
-by *exact path* instead suggests the opposite and is misleading: 86 distinct paths, none over ten.
+property definitions, user-group access flags and domains, each a single positional lookup
+repeated across two or three files, and each now a helper. Clustering by exact path instead
+suggests the opposite and is misleading, because it splits one subject across many paths.
 
 Add a helper when you touch a shape and it earns its place; prefer one over a new raw assertion.
 
@@ -296,7 +304,7 @@ Both dictionary export tests had that shape, and the "with descendants" one is `
 
 **Be most suspicious of a pair of tests whose only difference is a flag.** If both assert the same thing, one of them is not testing its own name. The general question to ask of any assertion: *what would have to break for this to fail?* If the answer is "the download event" in a test named for export contents, the assertion is in the wrong place.
 
-That shape is mechanically findable, which is worth knowing: normalise test names by removing flag words (`with`/`without`, `can`/`cannot`, `enabled`/`disabled`), group tests that collapse to the same key, and compare their assertion lines. Across all 269 specs that produced exactly two candidates, and both were real.
+That shape is mechanically findable, which is worth knowing: normalise test names by removing flag words (`with`/`without`, `can`/`cannot`, `enabled`/`disabled`), group tests that collapse to the same key, and compare their assertion lines. Run across the whole suite it produced only a couple of candidates, and both were real — it is a cheap check, not a big sweep.
 
 #### When the setup cannot exercise the subject
 
@@ -307,11 +315,11 @@ Both now at least assert the pick persisted rather than only that a success noti
 So when a test's subject is a permission, a restriction, or a role-scoped setting, check **who the test runs as** before trusting it. The shared admin bypasses most of them, which makes such a test quietly vacuous rather than failing.
 
 ### Index-based locators only where the index is the subject
-`.nth(i)` is right for "the i-th block" when the index is a parameter and the position is what the test is about — 110 of the suite's 124 uses are that. A **hardcoded** `.nth(0)` / `.nth(2)` is different: it bakes in an assumption about list order that neither the backend nor the seed data promises, and produces exactly the coincidental pass the root `CLAUDE.md` §10 warns about. There are 15. Prefer a locator that names what it wants (a label, a `[name=...]`, an exact text); reach for a literal index only when nothing distinguishes the elements.
+`.nth(i)` is right for "the i-th block" when the index is a parameter and the position is what the test is about, which is the large majority of its uses. A **hardcoded** `.nth(0)` / `.nth(2)` is different: it bakes in an assumption about list order that neither the backend nor the seed data promises, and produces exactly the coincidental pass the root `CLAUDE.md` §10 warns about. A handful remain. Prefer a locator that names what it wants (a label, a `[name=...]`, an exact text); reach for a literal index only when nothing distinguishes the elements.
 
-**Nine of the 15 cannot be checked from this repository**, and it is worth knowing why before trying. They are in `FormsUiHelper`, against `forms-settings-validation` and friends — Umbraco **Forms** elements, whose source is not in this repo. The other locator conventions in this section are verifiable statically because the backoffice source sits under `src/Umbraco.Web.UI.Client/` and `@umbraco-ui/uui` ships its compiled elements; neither is true for Forms. So for those nine the positional index is all there is without a running Forms install, and converting them blind is guessing at which element gets targeted.
+**Most of them cannot be checked from this repository**, and it is worth knowing why before trying. They are in `FormsUiHelper`, against `forms-settings-validation` and friends — Umbraco **Forms** elements, whose source is not in this repo. The other locator conventions in this section are verifiable statically because the backoffice source sits under `src/Umbraco.Web.UI.Client/` and `@umbraco-ui/uui` ships its compiled elements; neither is true for Forms. So for those the positional index is all there is without a running Forms install, and converting them blind is guessing at which element gets targeted.
 
-The remaining six (`DataTypeUiHelper`, `RelationTypeUiHelper`, `UserGroupUiHelper`) target components that *are* readable, but replacing a positional locator there changes which element the helper acts on — so they want one run to confirm, not a static edit.
+The rest (in `DataTypeUiHelper`, `RelationTypeUiHelper` and `UserGroupUiHelper`) target components that *are* readable, but replacing a positional locator there changes which element the helper acts on — so they want one run to confirm, not a static edit.
 
 ### Match names exactly to survive leftover data
 Playwright locators run in **strict mode** — if a locator resolves to more than one element, the action throws. Residue from a crashed/partial run (e.g. a leftover `TestUserGroupNameDescription`) makes a substring locator for `TestUserGroupName` match two rows and fail. Match on exact text whenever the value is an entity name:
@@ -335,8 +343,8 @@ This is why `UserGroupUiHelper`/`UserUiHelper` match exactly rather than with `h
 
 #### Endpoint constants are checked against the API's own contract
 
-`ConstantHelper.apiEndpoints` hardcodes 46 Management API paths, and **232 more are written
-inline** in the `*ApiHelper` files. Nothing ties any of them to the API, so a renamed route
+`ConstantHelper.apiEndpoints` holds a set of Management API paths, and **many more are written
+inline** in the `*ApiHelper` files — the inline ones far outnumber the constants. Nothing ties any of them to the API, so a renamed route
 surfaces as a helper waiting for a response that never arrives — a 60-second timeout with no
 hint of the cause. When a wait times out for no visible reason, check the path against the
 committed `src/Umbraco.Cms.Api.Management/OpenApi.json`: it is the contract, and reading it
@@ -393,13 +401,13 @@ elements and a `vscode.html-custom-data.json` under `node_modules`.
 
 ### Entity names are shared, and that is fine — for a reason worth knowing
 
-Name sharing is not the exception, it is the norm: **167 name constants appear in more than one spec**, `TestDocumentTypeForContent` in 92 files and `TestContent` in 79. Per-file uniqueness is not what keeps the suite safe. Three other things do:
+Name sharing is not the exception, it is the norm: **most entity-name constants appear in more than one spec**, and the common ones — `TestDocumentTypeForContent`, `TestContent` — are in dozens of files each. Per-file uniqueness is not what keeps the suite safe. Three other things do:
 
 1. **`workers: 1`** — nothing runs concurrently, so a shared name is only ever in use by one spec at a time.
-2. **Creates clear the name first** — **279 of the 406 `create*` helpers** call `ensureNameNotExists` as their first act, so a leftover from a crashed run is removed by the next spec that wants that name.
+2. **Creates clear the name first** — **most `create*` helpers** call `ensureNameNotExists` as their first act, so a leftover from a crashed run is removed by the next spec that wants that name.
 3. **Teardown is idempotent** in both hooks, so running it twice, or on something already gone, is harmless.
 
-The residual risk sits with the **127 `create*` helpers that do not ensure first**: for those, a shared name plus a leftover means a duplicate or a 400 rather than a clean overwrite. If you add a `create*` helper, ensure the name first — that is the habit the suite actually depends on.
+The residual risk sits with the **minority that do not ensure first**: for those, a shared name plus a leftover means a duplicate or a 400 rather than a clean overwrite. If you add a `create*` helper, ensure the name first — that is the habit the suite actually depends on.
 
 So the rule that matters is not "unique names" but "clean up anything global" — see the teardown table below.
 
@@ -430,7 +438,7 @@ Note the last two: the leaked names (`TestDocumentType`, `TestMemberGroup`) are 
 
 ### A disabled test carries an annotation, not a comment
 
-79 of the suite's 1651 tests are off (`test.skip` / `test.fixme`). That is a standing claim about what the product is *not* covered for, so it has to be answerable without grepping. Every one carries a machine-readable annotation:
+A number of tests are off (`test.skip` / `test.fixme`). That is a standing claim about what the product is *not* covered for, so it has to be answerable without grepping. Every one carries a machine-readable annotation:
 
 ```ts
 test.skip('can create content with block grid area with min allowed',
@@ -440,19 +448,21 @@ test.skip('can create content with block grid area with min allowed',
 
 Annotations show up in every reporter (and in the HTML report's test detail), so `--reporter=json` answers "what are we not testing, and what is it blocked on?" directly. A comment above the test does not.
 
-| `type` | Means | Current |
-|--------|-------|---------|
-| `issue` | Blocked on a tracked GitHub issue or PR — description carries the link | 25 |
-| `blocked` | Blocked on product behaviour with no issue filed yet ("the front-end does not support…") | 34 |
-| `todo` | Never implemented — the body is an empty stub | 3 |
-| `fixme` | Fully implemented but disabled | 17 |
+| `type` | Means |
+|--------|-------|
+| `issue` | Blocked on a tracked GitHub issue or PR — description carries the link |
+| `blocked` | Blocked on product behaviour with no issue filed yet ("the front-end does not support…") |
+| `todo` | Never implemented — the body is an empty stub |
+| `fixme` | Fully implemented but disabled |
+
+`npx playwright test --list --reporter=json` is the way to get the current tally and what each is blocked on; a number written here would be wrong within a week.
 
 Rules: a new disabled test needs an annotation, and prefer `type: 'issue'` with a link — a `blocked` entry carrying only prose is how a test stays off for two years.
 
 The two categories that are not really "skipped tests" at all:
 
-- **`todo` (3)** — `ContentWithBlockGrid`/`ContentWithBlockList` "can move blocks in the content" and `User` "can change from grid to table view". The body is `// TODO: Implement it later`. A skipped empty stub asserts nothing and documents nothing; write it or delete it.
-- **`fixme` (17)** — two in `BlockGridEditor` (moving a block between groups, deleting a group) with complete arrange/act/assert bodies, so something once worked and then didn't; both need one run against a current build to decide product bug vs stale test. The other fifteen are `CreatedPackages`, commented out wholesale since the v15 era and now uncommented as annotated fixmes — countable rather than invisible. Enable them one at a time against a running instance.
+- **`todo`** — `ContentWithBlockGrid`/`ContentWithBlockList` "can move blocks in the content" and `User` "can change from grid to table view". The body is `// TODO: Implement it later`. A skipped empty stub asserts nothing and documents nothing; write it or delete it.
+- **`fixme`** — two in `BlockGridEditor` (moving a block between groups, deleting a group) with complete arrange/act/assert bodies, so something once worked and then didn't; both need one run against a current build to decide product bug vs stale test. The rest are `CreatedPackages`, commented out wholesale since the v15 era and now uncommented as annotated fixmes — countable rather than invisible. Enable them one at a time against a running instance.
 
 If a test is off because the *feature* was removed, delete it — a permanent skip is not documentation.
 
@@ -460,14 +470,14 @@ If a test is off because the *feature* was removed, delete it — a permanent sk
 
 ## 5. Builders
 
-`lib/builders/` (114 files) builds the JSON payloads specs send to the Management API. Two conventions hold across all of it and should keep holding:
+`lib/builders/` builds the JSON payloads specs send to the Management API. Two conventions hold across all of it and should keep holding:
 
-- **Fluent setters return `this`; nested setters return the sub-builder.** `withX()` returns `this`; `addX()` returns a new child builder that ends with `.done()` to climb back. All 68 `addX()` methods follow this — there are no broken chains.
-- **There are four exit names, and the distinction is real:** `build()` (48 files) is the payload a spec sends; `getValues()` (50) is the `DataTypeBuilder` hook returning the `{alias, value}` array; `getValue()` (13) is a value sub-builder returning one property value; `done()` (62) climbs back to the parent. A class with none of the first three is unfinished — but check for `getValue()` before concluding that.
+- **Fluent setters return `this`; nested setters return the sub-builder.** `withX()` returns `this`; `addX()` returns a new child builder that ends with `.done()` to climb back. **Most follow this, but seven do not** — they return `this`, so a `.addX(…).done()` on one of them is a `TypeError`, not a chain: `addColumnSpanOptions` (block grid), `addStylesheet` and `addBlock` (TinyMCE), `addGroup` (member), `addSection` and `addLanguage` (user group), `addUserGroupId` (user). They take a scalar rather than opening a sub-builder, so the name is the problem more than the return — prefer `withX` for a new one of those.
+- **There are four exit names, and the distinction is real:** `build()` is the payload a spec sends; `getValues()` is the `DataTypeBuilder` hook returning the `{alias, value}` array; `getValue()` is a value sub-builder returning one property value; `done()` climbs back to the parent. A class with none of the first three is unfinished — but check for `getValue()` before concluding that.
 
 ### Client-side id generation is not uniform
 
-13 builders call `ensureIdExists` in `build()` and so emit a client-generated GUID — `document`, `element`, `member`, `dataType`, the three content types, and the property/area/group sub-builders. **`media`, `userGroup` and `user` do not**: they emit `id: null` and let the server assign, even though they are the same category of top-level entity builder.
+Most top-level entity builders call `ensureIdExists` in `build()` and so emit a client-generated GUID — `document`, `element`, `member`, `dataType`, the three content types, and the property/area/group sub-builders. **`media`, `userGroup` and `user` do not**: they emit `id: null` and let the server assign, even though they are the same category of top-level entity builder.
 
 Both work, because `ApiHelpers.create()` reads the new id from the `Location` header either way. But the point of `ensureIdExists` is that a spec can know an entity's id *before* creating it, and for those three you cannot. Aligning them is a payload change across many specs, so it wants verifying against a running instance rather than doing blind.
 
@@ -489,16 +499,17 @@ const values: any = {};     // or an unannotated `= []`, which infers any[]
 values.allowAtRot = true;   // silent, and a return annotation over it changes nothing
 ```
 
-So when you touch a builder, check the local the exit returns is declared — annotating the exit alone achieves nothing. Two corollaries:
+So the rule is narrower than "annotate the exit": **an object literal returned directly *is* checked by the exit's return type** — that is what protects the many builders written as `build(): XPayload { return {…}; }`, which are the majority. What escapes is an **intermediate local**: build the payload into a variable and the annotation on the exit checks only the variable's type, which an `any` satisfies. So when a builder accumulates into a local, that local is what needs declaring. Two corollaries:
 
 - These interfaces have every property **optional**, because the builders emit a field only when it is set.
 - **Bracket assignment is not checked at all** (`values['label'] = …`), because `noImplicitAny` is off under `strict: false`. Use dot access, or the type buys you nothing.
+- **Nullability is not checked either.** `strict: false` also leaves `strictNullChecks` off, so `null` is assignable to `string` and every `| null` in `types.ts` documents intent rather than enforcing it. Narrowing one to `string` catches nothing. A string-literal union (`'Default' | 'Api'`) *is* enforced, which is why that is the shape worth reaching for.
 
 **Verify against `OpenApi.json`, not against the neighbouring builder.** `DocumentPayload` was once shared by the document, blueprint and element builders, which hit two different request models — `CreateDocumentRequestModel` requires `template`, the other two have no such field — so the shared type had to make it optional and then could not catch a document that dropped it. Two known divergences remain, both recorded on the types themselves: `MediaTypeBuilder` omits `allowedInLibrary` though its schema requires it, and all three content-type builders send a `folder` that no schema declares.
 
 Two payload shapes are deliberately not normalised, because they are what the suite has always sent and changing them wants a running instance: `MemberVariantBuilder` sends `name: ''` where the other four send `null`, and `MemberValueBuilder` omits `editorAlias` and `entityType` (hence both optional on `EntityPropertyValue`).
 
-`: any` is down from 25 to 12. Nine are correct — a property `value` is heterogeneous, and four `let value: any = null` accumulators hold one. Three are exported signatures that ought to narrow but cannot in a minor (§2), so each carries a `TODO (V19)`.
+`: any` is much reduced but not gone. The ones that remain are mostly correct — a property `value` is heterogeneous, and four `let value: any = null` accumulators hold one. Three are exported signatures that ought to narrow but cannot in a minor (§2), so each carries a `TODO (V19)`.
 
 When you add a sub-builder: declare the shape in `types.ts` with optional properties, declare the **local** with it, annotate the exit, then **plant a misspelled field and confirm `tsc` names it**. That last step is not optional — it is the only thing separating typing that works from typing that looks like it does.
 
@@ -527,20 +538,20 @@ When adding or reviewing a setter, check by hand that the field is read in the e
 
 The root `CLAUDE.md` §9 comment policy applies here in full — default to no comment; write one for a non-obvious *why*, an invariant the types don't enforce, or an edge case deliberately handled.
 
-**JSDoc coverage is 3% (71 of 2671 public helper methods) and that is correct, not a gap.** `clickSaveAndPublishButton()` and `enterElementName(name)` say what they do; a `/** Clicks the save and publish button. */` above them is the noise the root §9 tells you not to write. JSDoc in `lib/` sits exactly where the contract is *not* obvious — `BasePage`'s primitives (what does `isVisible(locator, isVisible)` actually assert?), the response-waiting helpers, `BuilderUtils`, and the two assertion helpers in §3. Keep it that way: document the surprising, not the self-evident. Don't run a coverage sweep.
+**JSDoc coverage is deliberately low, and that is correct, not a gap.** `clickSaveAndPublishButton()` and `enterElementName(name)` say what they do; a `/** Clicks the save and publish button. */` above them is the noise the root §9 tells you not to write. JSDoc in `lib/` sits exactly where the contract is *not* obvious — `BasePage`'s primitives (what does `isVisible(locator, isVisible)` actually assert?), the response-waiting helpers, `BuilderUtils`, and the two assertion helpers in §3. Keep it that way: document the surprising, not the self-evident. Don't run a coverage sweep.
 
 **Three comment shapes are never right:**
 
 - **A commented-out test.** The most thoroughly hidden form of disabled test — invisible to `--list`, to every reporter, and to the annotation rule in §4. `CreatedPackages.spec.ts` sat that way since the **v15** era, 15 tests behind `// UNCOMMENT WHEN FIXED` with no issue link, contributing nothing to the suite total and appearing in no report; it is now 15 annotated `test.fixme`, which run no more than before but are at least countable. Use `test.skip`/`test.fixme` with an annotation instead.
-- **A commented-out assertion in a live test.** Strictly worse than deleting it: the test still passes while quietly checking less than it appears to. There are 15, eight of them in `UserGroupsDefaultConfiguration.spec.ts`. Restore it or delete it.
-- **An unanchored TODO.** The root §9 allows TODOs precisely because they are deleted when done — which needs an anchor to hang off: `// TODO (V19): remove once the obsolete overload is gone` or `// TODO: pagination [NL]`. A bare `// TODO: Implement it later` (15 of these) can't rot out loud, so it never gets removed.
+- **A commented-out assertion in a live test.** Strictly worse than deleting it: the test still passes while quietly checking less than it appears to. Several remain, concentrated in `UserGroupsDefaultConfiguration.spec.ts`. Restore it or delete it.
+- **An unanchored TODO.** The root §9 allows TODOs precisely because they are deleted when done — which needs an anchor to hang off: `// TODO (V19): remove once the obsolete overload is gone` or `// TODO: pagination [NL]`. A bare `// TODO: Implement it later` can't rot out loud, so it never gets removed.
 
 ### Keeping the docs true
 
 Three rules, each learned from a way this file and `README.md` went stale:
 
 - **Don't restate what a config file owns.** Point at it, or document only what it can't say — *why* `workers: 1`, not *that* it is 1. The README carried a 30s test timeout against a config saying 60s, and "2 retries on CI, 0 locally" against `retries: 2` unconditionally. A number living in two places disagrees eventually.
-- **Give debt a count and a location, not an adjective.** "Prefer deterministic waits" coexisted with 95 sleeps for as long as it named no number. "91, worst in `ContentUiHelper`, `LibraryUiHelper`, `UiBaseLocators`" can be checked by anyone reading it.
+- **Give debt a location and a way to re-derive it, not a number.** "Prefer deterministic waits" says nothing actionable; naming `ContentUiHelper`, `LibraryUiHelper` and `UiBaseLocators` as the worst offenders does. A hand-counted total looks more rigorous and is worse: it is wrong by the next commit, nothing regenerates it, and a reader who greps gets a different answer and stops trusting the page. Where a count really is load-bearing, write down the command that produces it instead.
 - **A rename is a doc change.** The npm package moved to the `@umbraco-cms` scope and reached none of the three READMEs, so the consumer-facing `npm install` line was wrong for months. Any change to a published name, script, or path sweeps the docs in the same PR.
 
 ---
