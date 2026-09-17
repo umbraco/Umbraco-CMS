@@ -54,6 +54,16 @@ You can watch a video following these instructions [here](https://www.youtube.co
 | `npm run smokeTest` | Run quick smoke tests (`@smoke` tagged) |
 | `npm run smokeTestSqlite` | Smoke tests excluding User tests (SQLite limitation) |
 | `npm run releaseTest` | Run comprehensive release tests (`@release` tagged) |
+| `npm run richTextEditorTest` | Rich text editor — Tiptap, TinyMCE, the RTE data types and their rendering |
+| `npm run blockEditorTest` | Block grid and block list, in both the data type and the content workspace |
+| `npm run documentTypeTest` | Document types and element types, plus the content specs driven by their settings |
+| `npm run dataTypeTest` | Every data type / property editor spec — the broadest of these, and the slowest |
+| `npm run mediaTest` | Media, media types, the media pickers and media start nodes |
+| `npm run memberTest` | Members, member groups, member types and the member pickers |
+| `npm run userTest` | Users, user groups and permissions |
+| `npm run languageTest` | Languages, cultures and variant content |
+| `npm run templatingTest` | Templates, partial views, stylesheets and scripts |
+| `npm run renderingTest` | Front-end rendering of content |
 | `npm run all` | Run all test suites |
 | `npm run testSqlite` | Run tests excluding User tests (SQLite limitation) |
 | `npm run testWindows` | Run tests excluding RelationType tests |
@@ -63,6 +73,25 @@ You can watch a video following these instructions [here](https://www.youtube.co
 | `npm run typecheck` | Type-check `lib/` **and** `tests/` |
 
 > Every `test`/`ui`/`smokeTest`/… script runs `npm run build` first, so `lib/` changes are picked up automatically.
+
+> **The area scripts** (`richTextEditorTest` … `renderingTest`) exist so a change to one product area can be
+> checked without running the whole suite. They overlap on purpose — a media picker spec is in both
+> `mediaTest` and `dataTypeTest`, which is the point: each is an entry point from a different direction.
+> To see what one covers before running it, append `--list` to the underlying command.
+
+> They filter on the **spec file path**, not on a tag, so a new spec dropped into an area directory is picked
+> up with no script change. Two things to know before adding one:
+>
+> - A positional filter is a **case-insensitive regex matched against the absolute path**. A bare `Users`
+>   therefore matches every spec on a machine whose checkout lives under `C:\Users\…`, and a bare `Script`
+>   matches `UserGroupsDescription.spec.ts`. That is why each fragment is written `"DefaultConfig.*Media"` —
+>   the prefix anchors the match inside the test tree, and a leading separator (`"DefaultConfig.*/Script"`)
+>   pins it to a directory when the word is a common substring.
+> - Multiple fragments are OR-ed, and `/` works as the separator on Windows too.
+>
+> So add an area as one anchored fragment per directory or filename that identifies it, then confirm it with
+> `npx playwright test "DefaultConfig.*YourArea" --list` before committing — that is the only thing that shows
+> a fragment matching more than you meant.
 
 ### Before committing
 
@@ -184,7 +213,7 @@ It scaffolds a spec that already follows the conventions below — idempotent cl
 2. **API for setup**: Create test data via API (faster than UI)
 3. **UI for validation**: Test actual user workflows through the UI
 4. **Test independence**: Each test should run standalone without depending on other tests
-5. **Clear the name before creating**: entity names are shared widely across specs (`TestContent` appears in 79 files), and what keeps that safe is `workers: 1` plus `create*` helpers that call `ensureNameNotExists` first — not per-file uniqueness. If you add a `create*` helper, ensure the name first. See [CLAUDE.md](./CLAUDE.md) §4.
+5. **Clear the name before creating**: entity names are shared widely across specs (`TestContent` appears in dozens of them), and what keeps that safe is `workers: 1` plus `create*` helpers that call `ensureNameNotExists` first — not per-file uniqueness. If you add a `create*` helper, ensure the name first. See [CLAUDE.md](./CLAUDE.md) §4.
 6. **Descriptive names**: Use clear, descriptive test and variable names
 7. **Clean up**: Always clean up test data in `afterEach`
 
@@ -260,20 +289,58 @@ Every authenticated project declares `dependencies: ['setup']` and reuses the st
 
 > **A spec must live under a directory one of these projects matches.** A file written straight into `tests/` matches no `testMatch` pattern and is silently never run — which is why `npm run createTest` writes into `tests/DefaultConfig/` by default (pass a second argument to target another project directory).
 
+### Every project except `defaultConfig` needs its instance set up first
+
+This is the part the Playwright config cannot tell you, and it is why these specs look unrunnable when
+they are not: each of those projects ships a `tests/<Project>/AdditionalSetup/` folder whose contents have
+to be installed into the Umbraco instance **before** the project will pass. Point a plain instance at
+`--project=deliveryApi` and the tests run — they just fail, because the feature under test was never
+switched on.
+
+| Project | `AdditionalSetup` carries |
+|---------|---------------------------|
+| `extensionRegistry` | `appsettings.json`, nine `App_Plugins` bundles, **and `Segments/MySegmentService.cs`** |
+| `entityDataPicker` | `appsettings.json` + the `picker-data-source` plugin |
+| `deliveryApi` | `appsettings.json` + a replacement `Program.cs` |
+| `authProviderLateRegistration` | the `LateAuthProvider` plugin (no appsettings) |
+| `externalLoginAzureADB2C` | `appsettings.json`, a `Login` plugin, four `.cs` files |
+| `contentSettingConfig`, `imagingSettingConfig`, `smtp`, `unattendedInstallConfig` | `appsettings.json` only |
+
+`build/nightly-E2E-build-template.yml` is the reference implementation, and it is three copies into the
+instance root: every `*.json` at the top level, any `App_Plugins` directory, and every `*.cs` **recursively,
+preserving its relative path**. Reproduce those three by hand and the project passes.
+
+Two traps when the instance is `src/Umbraco.Web.UI` rather than the pipeline-built project:
+
+- **Do not copy `DeliveryApi/AdditionalSetup/Program.cs` over it.** That file has no
+  `appsettings.Local.json` line, so it silently drops your connection string and unattended-install
+  settings. Add `UseDeliveryApi` to `<DefineConstants>` in `Umbraco.Web.UI.csproj` instead — the
+  `#if UseDeliveryApi` block is already there, and everything else keeps working.
+- **A `.cs` file means a rebuild.** `extensionRegistry` reads as flaky without one: no `ISegmentService` is
+  registered, so the variant selector never renders and every segment test fails on a locator that is
+  perfectly correct.
+
+> `appsettings.Local.json` is added inside `#if DEBUG` in `Program.cs`, so **a Release build ignores it
+> entirely** — no connection string, no unattended install, and the instance sits at `serverStatus: Install`
+> serving a login page with no fields. Run the local instance in Debug. Relatedly, unattended install will
+> populate an empty SQL Server database but will not create one, so the database must exist first.
+
 ---
 
 ## Configuration Details
 
-Key settings in `playwright.config.ts`:
+`playwright.config.ts` owns the timeouts, retries, worker count, trace mode, browser and
+`testIdAttribute`. Read it there rather than here — a value written in two places disagrees
+eventually, which is how this file once advertised a 30s timeout against a config saying 60s.
 
-- **Test timeout**: 60 seconds per test
-- **Expect timeout**: 5 seconds for assertions
-- **Retries**: 2 — everywhere, not just on CI
-- **Workers**: 1 (sequential execution; specs share fixed entity names and would collide in parallel)
-- **Trace**: `retain-on-failure` (switch to `on-first-retry` locally to roughly halve run time)
-- **Browser**: Desktop Chrome with `ignoreHTTPSErrors`
-- **Test identifier**: `data-mark` attribute (so `getByTestId()` reads `data-mark`)
-- **`forbidOnly`**: enabled on CI — a stray `test.only` fails the build
+The two choices it cannot explain itself:
+
+- **`workers: 1` is not a performance setting.** Specs share fixed entity names and would
+  collide in parallel; see [CLAUDE.md](./CLAUDE.md) section 4.
+- **`testIdAttribute` is `data-mark`**, so `getByTestId()` reads `data-mark`, not
+  `data-testid`. Worth knowing before a locator mystifies you.
+
+Locally, switching `trace` to `on-first-retry` roughly halves run time.
 
 ---
 

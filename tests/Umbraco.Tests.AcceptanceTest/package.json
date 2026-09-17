@@ -27,6 +27,16 @@
     "smokeTest": "npm run build && npx playwright test DefaultConfig --grep \"@smoke\"",
     "smokeTestSqlite": "npm run build && npx playwright test DefaultConfig --grep \"@smoke\" --grep-invert \"Users\"",
     "releaseTest": "npm run build && npx playwright test DefaultConfig --grep \"@release\"",
+    "richTextEditorTest": "npm run build && npx playwright test \"DefaultConfig.*RichTextEditor\" \"DefaultConfig.*Tiptap\" \"DefaultConfig.*TinyMCE\"",
+    "documentTypeTest": "npm run build && npx playwright test \"DefaultConfig.*DocumentType\" \"DefaultConfig.*ElementType\"",
+    "dataTypeTest": "npm run build && npx playwright test \"DefaultConfig.*DataType\"",
+    "blockEditorTest": "npm run build && npx playwright test \"DefaultConfig.*BlockGrid\" \"DefaultConfig.*BlockList\"",
+    "mediaTest": "npm run build && npx playwright test \"DefaultConfig.*Media\"",
+    "memberTest": "npm run build && npx playwright test \"DefaultConfig.*Member\"",
+    "userTest": "npm run build && npx playwright test \"DefaultConfig.*Users\"",
+    "templatingTest": "npm run build && npx playwright test \"DefaultConfig.*Template\" \"DefaultConfig.*PartialView\" \"DefaultConfig.*Stylesheet\" \"DefaultConfig.*/Script\"",
+    "languageTest": "npm run build && npx playwright test \"DefaultConfig.*Language\" \"DefaultConfig.*Culture\" \"DefaultConfig.*Variant\"",
+    "renderingTest": "npm run build && npx playwright test \"DefaultConfig.*RenderingContent\"",
     "testWindows": "npm run build && npx playwright test DefaultConfig --grep-invert \"RelationType\""
   },
   "repository": {
