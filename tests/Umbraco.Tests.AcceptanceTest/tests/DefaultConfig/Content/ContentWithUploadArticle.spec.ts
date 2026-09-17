@@ -112,8 +112,8 @@ test('can remove an article file in the content', async ({umbracoApi, umbracoUi}
 });
 
 // Disallowed-extension rejection is a generic Upload-editor mechanism, covered once in
-// ContentWithUploadFile.spec.ts and once in ContentWithUploadVectorGraphics.spec.ts (SVG's allowlist
-// also matters for XSS, not just UX) - identical here, so not duplicated for every upload variant.
+// ContentWithUploadFile.spec.ts and once in ContentWithUploadVectorGraphics.spec.ts, so it is
+// not repeated identically for every upload variant.
 
 test('can not publish a mandatory upload article with an empty value', async ({umbracoApi, umbracoUi}) => {
   // Arrange

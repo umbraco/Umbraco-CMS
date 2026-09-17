@@ -20,7 +20,8 @@ const propertyEditorName = 'ProperyEditorInBlockName';
 let propertyEditorId = null;
 const optionValues = ['testOption1', 'testOption2'];
 
-test.beforeEach(async ({umbracoUi}) => {
+test.beforeEach(async ({umbracoApi, umbracoUi}) => {
+  await umbracoApi.language.ensureIsoCodeNotExists('da');
   await umbracoUi.goToBackOffice();
 });
 

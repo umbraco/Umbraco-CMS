@@ -112,7 +112,7 @@ test.skip('shows a hint on the variant selector for a culture with a validation 
 
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
-  // Select both english and danish in the publish dialog - danish fails due to its empty mandatory field.
+  // Select both english and danish in the publish dialog; danish fails due to its empty mandatory field.
   await umbracoUi.content.clickSaveAndPublishButton();
   await umbracoUi.content.clickButtonWithName(danishContentName);
   await umbracoUi.content.clickContainerSaveAndPublishButton();
