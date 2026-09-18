@@ -1,3 +1,4 @@
+using System.Threading;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Services.OperationStatus;
@@ -79,7 +80,22 @@ public interface IContentEditingService
     /// <param name="key">The unique identifier of the content item to move.</param>
     /// <param name="userKey">The unique identifier of the user performing the action.</param>
     /// <returns>An attempt containing the moved content item or an error status.</returns>
+    [Obsolete("Use the overload that takes a CancellationToken instead. Scheduled for removal in Umbraco 19.")]
     Task<Attempt<IContent?, ContentEditingOperationStatus>> MoveToRecycleBinAsync(Guid key, Guid userKey);
+
+    /// <summary>
+    ///     Moves a content item to the recycle bin, observing a <see cref="CancellationToken" /> so a long move over
+    ///     many descendants can be interrupted.
+    /// </summary>
+    /// <param name="key">The unique identifier of the content item to move.</param>
+    /// <param name="userKey">The unique identifier of the user performing the action.</param>
+    /// <param name="cancellationToken">A token that can be used to request cancellation of the move.</param>
+    /// <returns>An attempt containing the moved content item or an error status.</returns>
+    // TODO (V19): Remove the default implementation when the obsolete overload without a CancellationToken is removed.
+#pragma warning disable CS0618 // Type or member is obsolete
+    Task<Attempt<IContent?, ContentEditingOperationStatus>> MoveToRecycleBinAsync(Guid key, Guid userKey, CancellationToken cancellationToken)
+        => MoveToRecycleBinAsync(key, userKey);
+#pragma warning restore CS0618 // Type or member is obsolete
 
     /// <summary>
     ///     Deletes a content item if it is in the recycle bin.
@@ -96,7 +112,23 @@ public interface IContentEditingService
     /// <param name="parentKey">The unique identifier of the new parent, or <c>null</c> to move to the root.</param>
     /// <param name="userKey">The unique identifier of the user performing the action.</param>
     /// <returns>An attempt containing the moved content item or an error status.</returns>
+    [Obsolete("Use the overload that takes a CancellationToken instead. Scheduled for removal in Umbraco 19.")]
     Task<Attempt<IContent?, ContentEditingOperationStatus>> MoveAsync(Guid key, Guid? parentKey, Guid userKey);
+
+    /// <summary>
+    ///     Moves a content item to a new parent, observing a <see cref="CancellationToken" /> so a long move over
+    ///     many descendants can be interrupted.
+    /// </summary>
+    /// <param name="key">The unique identifier of the content item to move.</param>
+    /// <param name="parentKey">The unique identifier of the new parent, or <c>null</c> to move to the root.</param>
+    /// <param name="userKey">The unique identifier of the user performing the action.</param>
+    /// <param name="cancellationToken">A token that can be used to request cancellation of the move.</param>
+    /// <returns>An attempt containing the moved content item or an error status.</returns>
+    // TODO (V19): Remove the default implementation when the obsolete overload without a CancellationToken is removed.
+#pragma warning disable CS0618 // Type or member is obsolete
+    Task<Attempt<IContent?, ContentEditingOperationStatus>> MoveAsync(Guid key, Guid? parentKey, Guid userKey, CancellationToken cancellationToken)
+        => MoveAsync(key, parentKey, userKey);
+#pragma warning restore CS0618 // Type or member is obsolete
 
     /// <summary>
     ///     Copies a content item to a new location.
@@ -107,7 +139,25 @@ public interface IContentEditingService
     /// <param name="includeDescendants">Whether to also copy all descendant content items.</param>
     /// <param name="userKey">The unique identifier of the user performing the action.</param>
     /// <returns>An attempt containing the copied content item or an error status.</returns>
+    [Obsolete("Use the overload that takes a CancellationToken instead. Scheduled for removal in Umbraco 19.")]
     Task<Attempt<IContent?, ContentEditingOperationStatus>> CopyAsync(Guid key, Guid? parentKey, bool relateToOriginal, bool includeDescendants, Guid userKey);
+
+    /// <summary>
+    ///     Copies a content item to a new location, observing a <see cref="CancellationToken" /> so a long copy over
+    ///     many descendants can be interrupted.
+    /// </summary>
+    /// <param name="key">The unique identifier of the content item to copy.</param>
+    /// <param name="parentKey">The unique identifier of the parent for the copy, or <c>null</c> for the root.</param>
+    /// <param name="relateToOriginal">Whether to create a relation between the copy and the original.</param>
+    /// <param name="includeDescendants">Whether to also copy all descendant content items.</param>
+    /// <param name="userKey">The unique identifier of the user performing the action.</param>
+    /// <param name="cancellationToken">A token that can be used to request cancellation of the copy.</param>
+    /// <returns>An attempt containing the copied content item or an error status.</returns>
+    // TODO (V19): Remove the default implementation when the obsolete overload without a CancellationToken is removed.
+#pragma warning disable CS0618 // Type or member is obsolete
+    Task<Attempt<IContent?, ContentEditingOperationStatus>> CopyAsync(Guid key, Guid? parentKey, bool relateToOriginal, bool includeDescendants, Guid userKey, CancellationToken cancellationToken)
+        => CopyAsync(key, parentKey, relateToOriginal, includeDescendants, userKey);
+#pragma warning restore CS0618 // Type or member is obsolete
 
     /// <summary>
     ///     Sorts content items under a parent.
@@ -175,4 +225,22 @@ public interface IContentEditingService
         return RestoreAsync(key, parentKey, userKey);
 #pragma warning restore CS0618 // Type or member is obsolete
     }
+
+    /// <summary>
+    ///     Restores a content item from the recycle bin, optionally leaving its descendants behind, observing a
+    ///     <see cref="CancellationToken" /> so a long restore over many descendants can be interrupted.
+    /// </summary>
+    /// <param name="key">The unique identifier of the content item to restore.</param>
+    /// <param name="parentKey">The unique identifier of the parent to restore to, or <c>null</c> for the original location.</param>
+    /// <param name="userKey">The unique identifier of the user performing the action.</param>
+    /// <param name="includeDescendants">
+    ///     Whether to restore the descendants of the content item along with it. When <c>false</c>, only the content
+    ///     item itself is restored and its descendants remain in the recycle bin as top-level bin items, ready to be
+    ///     restored later.
+    /// </param>
+    /// <param name="cancellationToken">A token that can be used to request cancellation of the restore.</param>
+    /// <returns>An attempt containing the restored content item or an error status.</returns>
+    // TODO (V19): Remove the default implementation when the obsolete overload without a CancellationToken is removed.
+    Task<Attempt<IContent?, ContentEditingOperationStatus>> RestoreAsync(Guid key, Guid? parentKey, Guid userKey, bool includeDescendants, CancellationToken cancellationToken)
+        => RestoreAsync(key, parentKey, userKey, includeDescendants);
 }

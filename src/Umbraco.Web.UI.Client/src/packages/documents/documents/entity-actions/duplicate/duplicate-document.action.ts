@@ -11,6 +11,7 @@ import {
 	UmbDocumentTypeStructureRepository,
 } from '@umbraco-cms/backoffice/document-type';
 import { linkEntityExpansionEntries } from '@umbraco-cms/backoffice/utils';
+import { UmbEntityBulkActionProgressController } from '@umbraco-cms/backoffice/entity-bulk-action';
 
 export class UmbDuplicateDocumentEntityAction extends UmbEntityActionBase<never> {
 	override async execute() {
@@ -38,11 +39,18 @@ export class UmbDuplicateDocumentEntityAction extends UmbEntityActionBase<never>
 		const destinationUnique = value.destination.unique;
 		if (destinationUnique === undefined) throw new Error('Destination Unique is not available');
 
-		const { error } = await duplicateRepository.requestDuplicate({
-			unique: this.args.unique,
-			destination: { unique: destinationUnique },
-			relateToOriginal: value.relateToOriginal,
-			includeDescendants: value.includeDescendants,
+		const { error } = await new UmbEntityBulkActionProgressController(this).runIndeterminate({
+			headline: '#actions_copyInProgress',
+			operation: (abortSignal) =>
+				duplicateRepository.requestDuplicate(
+					{
+						unique: this.args.unique!,
+						destination: { unique: destinationUnique },
+						relateToOriginal: value.relateToOriginal,
+						includeDescendants: value.includeDescendants,
+					},
+					abortSignal,
+				),
 		});
 
 		if (error) {

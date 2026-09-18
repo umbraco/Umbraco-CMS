@@ -11,13 +11,20 @@ export function isApiError(error: unknown): error is { body?: string; status?: n
 }
 
 /**
- * Checks if the given error is an instance of CancelError.
+ * Checks if the given error is an instance of CancelError, or a `fetch()` `AbortError` raised by aborting an
+ * `AbortSignal` passed into a request.
  * @param {unknown} error The error to check
- * @returns {boolean} True if the error is an instance of CancelError, false otherwise
+ * @returns {boolean} True if the error represents a cancelled request, false otherwise
  * @deprecated Use {UmbApiCancelError.isUmbApiCancelError}` instead and map your object to {UmbApiCancelError} if needed.
  */
-export function isCancelError(error: unknown): error is Error {
-	return error instanceof Error && (error.name === 'CancelError' || (error as Error).message === 'Request aborted');
+export function isCancelError(error: unknown): error is Error | DOMException {
+	// A fetch() abort rejects with a DOMException, which is not an instanceof Error, so it cannot be folded into
+	// the Error branch below.
+	if (error instanceof DOMException) {
+		return error.name === 'AbortError';
+	}
+
+	return error instanceof Error && (error.name === 'CancelError' || error.message === 'Request aborted');
 }
 
 /**

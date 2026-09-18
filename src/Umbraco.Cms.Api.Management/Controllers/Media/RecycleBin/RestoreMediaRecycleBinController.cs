@@ -80,7 +80,8 @@ public class RestoreMediaRecycleBinController : MediaRecycleBinControllerBase
             id,
             moveDocumentRequestModel.Target?.Id,
             CurrentUserKey(_backOfficeSecurityAccessor),
-            includeDescendants: true);
+            includeDescendants: true,
+            cancellationToken);
 
         return result.Success
             ? Ok()
