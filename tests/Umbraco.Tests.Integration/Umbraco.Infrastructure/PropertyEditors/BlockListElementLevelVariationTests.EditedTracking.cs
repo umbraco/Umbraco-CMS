@@ -122,6 +122,49 @@ internal sealed partial class BlockListElementLevelVariationTests
     }
 
     [Test]
+    public async Task Editing_Invariant_Value_In_An_Existing_Block_Marks_The_Invariant_As_Edited()
+    {
+        var elementType = await CreateElementType(ContentVariation.Culture);
+        var blockListDataType = await CreateBlockListDataType(elementType);
+        var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType);
+
+        var blockContentKey = Guid.NewGuid();
+        var blockSettingsKey = Guid.NewGuid();
+
+        var content = new ContentBuilder()
+            .WithContentType(contentType)
+            .WithCultureName("en-US", "Home (en)")
+            .WithCultureName("da-DK", "Home (da)")
+            .Build();
+
+        // the block is exposed only to da-DK
+        var blockListValue = BlockListPropertyValue(elementType, blockContentKey, blockSettingsKey, CreateBlockPropertySingleCulture("da-DK", "Danish only"));
+        content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue), null, null);
+        ContentService.Save(content);
+        PublishContent(content, contentType);
+
+        // edit only the invariant value, in place, of the same block - which remains exposed only to da-DK
+        var updatedBlockProperty = new BlockProperty(
+            new List<BlockPropertyValue>
+            {
+                new() { Alias = "invariantText", Culture = null, Value = "Invariant updated" },
+                new() { Alias = "variantText", Culture = "da-DK", Value = "Danish only" },
+            },
+            new List<BlockPropertyValue>(),
+            null,
+            null);
+        var updatedBlockListValue = BlockListPropertyValue(elementType, blockContentKey, blockSettingsKey, updatedBlockProperty);
+        content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(updatedBlockListValue), null, null);
+        ContentService.Save(content);
+
+        IContent? updated = ContentService.GetById(content.Id);
+        Assert.IsNotNull(updated);
+        Assert.IsTrue(updated!.IsCultureEdited(Constants.System.InvariantCulture));
+        Assert.IsFalse(updated.IsCultureEdited("da-DK"));
+        Assert.IsFalse(updated.IsCultureEdited("en-US"));
+    }
+
+    [Test]
     public async Task Reordering_Existing_Blocks_Marks_The_Invariant_As_Edited()
     {
         var elementType = await CreateElementType(ContentVariation.Culture);
