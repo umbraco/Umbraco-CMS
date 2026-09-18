@@ -16,6 +16,9 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbDocumentRedirectUrlModel } from '@umbraco-cms/backoffice/document';
 import type { UUIButtonState, UUIPaginationElement, UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 
+// The value the server sends for content it cannot build a URL for (Constants.Routing.Unroutable).
+const UMB_UNROUTABLE_URL = '#';
+
 @customElement('umb-dashboard-redirect-management')
 export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 	#repository = new UmbDocumentRedirectManagementRepository(this);
@@ -34,6 +37,9 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 
 	@state()
 	private _filter?: string;
+
+	@state()
+	private _loading = true;
 
 	@property({ type: Number, attribute: 'items-per-page' })
 	itemsPerPage = 20;
@@ -58,15 +64,19 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 		if (data) this._trackerEnabled = data.enabled;
 	}
 
-	async #getRedirectData(filter: string | undefined = undefined) {
+	async #getRedirectData(): Promise<boolean> {
 		const skip = this.page * this.itemsPerPage - this.itemsPerPage;
-		const { data } = await this.#repository.requestRedirects({ filter, take: this.itemsPerPage, skip });
-		if (!data) return;
+		const { data } = await this.#repository.requestRedirects({
+			filter: this._filter,
+			take: this.itemsPerPage,
+			skip,
+		});
+		this._loading = false;
+		if (!data) return false;
 
 		this._total = data.total;
 		this._redirectData = data.items;
-
-		if (filter !== undefined) this._buttonState = 'success';
+		return true;
 	}
 
 	#onPageChange(event: UUIPaginationEvent) {
@@ -97,20 +107,21 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 		const { error } = await this.#repository.delete(unique);
 		if (error) return;
 
-		this._redirectData = this._redirectData?.filter((x) => x.unique !== unique);
+		await this.#getRedirectData();
 	}
 
 	#onKeypress(e: KeyboardEvent) {
 		if (e.key === 'Enter') this.#onSearch();
 	}
 
-	#onSearch() {
-		this._buttonState = 'waiting';
-		this._filter = this._search?.value ?? '';
+	async #onSearch() {
+		const filter = this._search?.value.trim();
+		this._filter = filter || undefined;
 		if (this._pagination) this._pagination.current = 1;
 		this.page = 1;
 
-		this.#getRedirectData(this._search.value);
+		this._buttonState = 'waiting';
+		this._buttonState = (await this.#getRedirectData()) ? 'success' : 'failed';
 	}
 
 	async #showTrackerInfo() {
@@ -166,16 +177,21 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 					</uui-tag>
 				</uui-button>
 			</div>
-			${when(
-				this._redirectData?.length,
-				() => html`
-					<uui-box id="redirect-wrapper">
-						${when(!this._trackerEnabled, () => html`<div id="grey-out"></div>`)} ${this.#renderTable()}
-					</uui-box>
-				`,
-				() => (this._filter !== undefined ? this.#renderZeroResults() : this.#renderNoRedirects()),
-			)}
-			${this.#renderPagination()}
+			${this.#renderContent()} ${this.#renderPagination()}
+		`;
+	}
+
+	#renderContent() {
+		if (this._loading) return html`<uui-loader></uui-loader>`;
+
+		if (!this._redirectData?.length) {
+			return this._filter !== undefined ? this.#renderZeroResults() : this.#renderNoRedirects();
+		}
+
+		return html`
+			<uui-box id="redirect-wrapper">
+				${when(!this._trackerEnabled, () => html`<div id="grey-out"></div>`)} ${this.#renderTable()}
+			</uui-box>
 		`;
 	}
 
@@ -205,6 +221,7 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 					<uui-table-head-cell>${this.localize.term('redirectUrls_originalUrl')}</uui-table-head-cell>
 					<uui-table-head-cell style="width:10%;"></uui-table-head-cell>
 					<uui-table-head-cell>${this.localize.term('redirectUrls_redirectedTo')}</uui-table-head-cell>
+					<uui-table-head-cell style="width:15%;">${this.localize.term('content_createDate')}</uui-table-head-cell>
 					<uui-table-head-cell style="width:10%;">${this.localize.term('general_actions')}</uui-table-head-cell>
 				</uui-table-head>
 				${this.#renderTableData()}
@@ -221,18 +238,13 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 				(data) => html`
 					<uui-table-row>
 						<uui-table-cell>${data.culture || '*'}</uui-table-cell>
-						<uui-table-cell>
-							<a href=${data.originalUrl || '#'} target="_blank">
-								<span>${data.originalUrl}</span>
-							</a>
-						</uui-table-cell>
+						<uui-table-cell>${this.#renderUrl(data.originalUrl)}</uui-table-cell>
 						<uui-table-cell>
 							<uui-icon name="icon-arrow-right"></uui-icon>
 						</uui-table-cell>
+						<uui-table-cell>${this.#renderUrl(data.destinationUrl)}</uui-table-cell>
 						<uui-table-cell>
-							<a href=${data.destinationUrl || '#'} target="_blank">
-								<span>${data.destinationUrl}</span>
-							</a>
+							<umb-localize-date .date=${data.created}></umb-localize-date>
 						</uui-table-cell>
 						<uui-table-cell>
 							<uui-action-bar>
@@ -248,6 +260,22 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 					</uui-table-row>
 				`,
 			)}
+		`;
+	}
+
+	// The configured UrlProviderMode can make every URL absolute, which crowds out the part of the
+	// URL that differs. Only the host the backoffice itself is served from is redundant, so trim
+	// that one and leave any other host visible - on a multi-domain install it is what tells two
+	// otherwise identical paths apart. The link itself keeps the full URL.
+	#renderUrl(url: string) {
+		if (!url || url === UMB_UNROUTABLE_URL) return html`<span>${url}</span>`;
+
+		const display = url.startsWith(window.location.origin) ? url.slice(window.location.origin.length) || '/' : url;
+
+		return html`
+			<a href=${url} title=${url} target="_blank" rel="noopener noreferrer">
+				<span>${display}</span>
+			</a>
 		`;
 	}
 
