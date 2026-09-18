@@ -70,8 +70,8 @@ test('the default configuration of Administrators is correct', {tag: '@release'}
   await umbracoUi.userGroup.doesUserGroupSectionsHaveCount(uiSections.length);
   // The install seed grants this group the Forms section, which has no UI tab without the package installed.
   expect(await umbracoApi.userGroup.doesUserGroupHaveSections(userGroupName, [...sections, "Umb.Section.Forms"])).toBeTruthy();
-  // exact:false - the seed's fallbackPermissions still include a few extra junk values (e.g. ':', '5', 'T')
-  // beyond the ones asserted here, so an exact-length match would fail on unrelated seed noise.
+  // exact:false, because the seed's fallbackPermissions still include a few extra junk values
+  // (e.g. ':', '5', 'T') beyond the ones asserted here, so an exact-length match would fail on unrelated seed noise.
   expect(await umbracoApi.userGroup.doesUserGroupHaveFallbackPermissions(userGroupName, [...fallbackDocumentPermissions, ...fallbackElementPermissions], false)).toBeTruthy();
   const userGroupData = await umbracoApi.userGroup.getByName(userGroupName);
   expect(userGroupData.hasAccessToAllLanguages).toEqual(hasAccessToAllLanguages);

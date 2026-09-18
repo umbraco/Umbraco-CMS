@@ -49,7 +49,7 @@ test('can see root element start node and children', async ({umbracoApi, umbraco
   await umbracoUi.library.isChildElementInTreeVisible(rootFolderName, childElementTwoName);
 });
 
-// Feature gap: a plain element cannot be a start node - UserPresentationFactory resolves them as
+// Feature gap: a plain element cannot be a start node. UserPresentationFactory resolves them as
 // UmbracoObjectTypes.ElementContainer, so the user gets no element access and no Library tab.
 test.skip('can see parent of start node but not access it', async ({umbracoApi, umbracoUi}) => {
   // Arrange

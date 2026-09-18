@@ -58,7 +58,7 @@ test('can update step size value', async ({umbracoApi, umbracoUi}) => {
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'step', stepSizeValue)).toBeTruthy();
 });
 
-// Removed: the "Allow decimals" setting no longer exists on the Numeric data type - there is no
+// Removed: the "Allow decimals" setting no longer exists on the Numeric data type. There is no
 // allowDecimals property left anywhere in the backoffice client.
 test.skip('can allow decimals', async ({umbracoApi, umbracoUi}) => {
   // Arrange

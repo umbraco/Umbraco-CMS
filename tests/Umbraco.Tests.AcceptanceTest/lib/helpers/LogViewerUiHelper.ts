@@ -84,7 +84,7 @@ export class LogViewerUiHelper extends UiBaseLocators {
       return await this.click(this.sortLogByTimestampBtn);
     }
     // The log viewer polls this endpoint on its own timer, so a generic endpoint match can resolve on an unrelated
-    // poll response - match the orderDirection param/value pair alone to target the response this toggle triggered.
+    // poll response. Match the orderDirection param/value pair alone to target the response this toggle triggered.
     return await this.waitForResponseAfterExecutingPromise(`orderDirection=${orderDirection}`, this.click(this.sortLogByTimestampBtn), ConstantHelper.statusCodes.ok, ConstantHelper.httpMethods.get);
   }
 

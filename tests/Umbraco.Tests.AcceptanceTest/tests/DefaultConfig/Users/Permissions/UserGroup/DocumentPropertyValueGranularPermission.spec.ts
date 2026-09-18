@@ -36,7 +36,7 @@ test.afterEach(async ({umbracoApi}) => {
 });
 
 // Product gap (https://github.com/umbraco/Umbraco-CMS/issues/20505): unlike the document-level read-permission
-// case (fixed - now shows Access denied), a granular per-document permission denial still renders
+// case (now fixed to show Access denied), a granular per-document permission denial still renders
 // umb-document-workspace-editor completely empty, with no text at all. Only the final assertion is affected;
 // the granular read-UI permission itself works, per the two isPropertyEditorUiWithNameReadOnly checks above.
 test.skip('can only see property values for specific document with read UI enabled', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
