@@ -20,19 +20,47 @@ namespace Umbraco.Cms.Core.Events;
 /// </summary>
 public class AddUnroutableContentWarningsWhenPublishingNotificationHandler : INotificationAsyncHandler<ContentPublishedNotification>
 {
-    private readonly IPublishedRouter _publishedRouter;
+    private readonly IPublishedUrlInfoProvider _publishedUrlInfoProvider;
     private readonly IUmbracoContextAccessor _umbracoContextAccessor;
-    private readonly ILanguageService _languageService;
     private readonly ILocalizedTextService _localizedTextService;
-    private readonly IContentService _contentService;
-    private readonly IVariationContextAccessor _variationContextAccessor;
-    private readonly ILoggerFactory _loggerFactory;
-    private readonly UriUtility _uriUtility;
-    private readonly IPublishedUrlProvider _publishedUrlProvider;
-    private readonly IDocumentNavigationQueryService _navigationQueryService;
-    private readonly IPublishedContentStatusFilteringService _publishedContentStatusFilteringService;
     private readonly IEventMessagesFactory _eventMessagesFactory;
     private readonly ContentSettings _contentSettings;
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="AddUnroutableContentWarningsWhenPublishingNotificationHandler" /> class.
+    /// </summary>
+    [Obsolete("Please use the constructor taking an IPublishedUrlInfoProvider. Scheduled for removal in Umbraco 19.")]
+    public AddUnroutableContentWarningsWhenPublishingNotificationHandler(
+        IPublishedRouter publishedRouter,
+        IUmbracoContextAccessor umbracoContextAccessor,
+        ILanguageService languageService,
+        ILocalizedTextService localizedTextService,
+        IContentService contentService,
+        IVariationContextAccessor variationContextAccessor,
+        ILoggerFactory loggerFactory,
+        UriUtility uriUtility,
+        IPublishedUrlProvider publishedUrlProvider,
+        IDocumentNavigationQueryService navigationQueryService,
+        IPublishedContentStatusFilteringService publishedContentStatusFilteringService,
+        IEventMessagesFactory eventMessagesFactory,
+        IOptions<ContentSettings> contentSettings)
+        : this(
+            publishedRouter,
+            umbracoContextAccessor,
+            languageService,
+            localizedTextService,
+            contentService,
+            variationContextAccessor,
+            loggerFactory,
+            uriUtility,
+            publishedUrlProvider,
+            navigationQueryService,
+            publishedContentStatusFilteringService,
+            eventMessagesFactory,
+            contentSettings,
+            StaticServiceProvider.Instance.GetRequiredService<IPublishedUrlInfoProvider>())
+    {
+    }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="AddUnroutableContentWarningsWhenPublishingNotificationHandler" /> class.
@@ -50,8 +78,10 @@ public class AddUnroutableContentWarningsWhenPublishingNotificationHandler : INo
     /// <param name="publishedContentStatusFilteringService">The published content status filtering service.</param>
     /// <param name="eventMessagesFactory">The event messages factory.</param>
     /// <param name="contentSettings">The content settings.</param>
+    /// <param name="publishedUrlInfoProvider">The provider of URL information for published content.</param>
     public AddUnroutableContentWarningsWhenPublishingNotificationHandler(
-        IPublishedRouter publishedRouter,
+#pragma warning disable IDE0060 // Remove unused parameter
+        IPublishedRouter publishedRouter, // TODO (V19): Remove the unused parameters once the obsolete constructor is removed.
         IUmbracoContextAccessor umbracoContextAccessor,
         ILanguageService languageService,
         ILocalizedTextService localizedTextService,
@@ -63,19 +93,13 @@ public class AddUnroutableContentWarningsWhenPublishingNotificationHandler : INo
         IDocumentNavigationQueryService navigationQueryService,
         IPublishedContentStatusFilteringService publishedContentStatusFilteringService,
         IEventMessagesFactory eventMessagesFactory,
-        IOptions<ContentSettings> contentSettings)
+        IOptions<ContentSettings> contentSettings,
+        IPublishedUrlInfoProvider publishedUrlInfoProvider)
+#pragma warning restore IDE0060 // Remove unused parameter
     {
-        _publishedRouter = publishedRouter;
+        _publishedUrlInfoProvider = publishedUrlInfoProvider;
         _umbracoContextAccessor = umbracoContextAccessor;
-        _languageService = languageService;
         _localizedTextService = localizedTextService;
-        _contentService = contentService;
-        _variationContextAccessor = variationContextAccessor;
-        _loggerFactory = loggerFactory;
-        _uriUtility = uriUtility;
-        _publishedUrlProvider = publishedUrlProvider;
-        _navigationQueryService = navigationQueryService;
-        _publishedContentStatusFilteringService = publishedContentStatusFilteringService;
         _eventMessagesFactory = eventMessagesFactory;
         _contentSettings = contentSettings.Value;
     }
@@ -88,54 +112,61 @@ public class AddUnroutableContentWarningsWhenPublishingNotificationHandler : INo
             return;
         }
 
+        if (_umbracoContextAccessor.TryGetUmbracoContext(out _) is false)
+        {
+            return;
+        }
+
         foreach (IContent content in notification.PublishedEntities)
         {
-            string[]? successfulCultures;
-            if (content.ContentType.VariesByCulture() is false)
-            {
-                // successfulCultures will be null here - change it to a wildcard and utilize this below
-                successfulCultures = ["*"];
-            }
-            else
-            {
-                successfulCultures = content.PublishedCultures.ToArray();
-            }
+            // Invariant content has a single set of URLs, so a wildcard covers every culture reported.
+            string[] publishedCultures = content.ContentType.VariesByCulture()
+                ? content.PublishedCultures.ToArray()
+                : ["*"];
 
-            if (successfulCultures?.Any() is not true)
+            if (publishedCultures.Length == 0)
             {
-                return;
+                continue;
             }
 
-            if (!_umbracoContextAccessor.TryGetUmbracoContext(out IUmbracoContext? umbracoContext))
+            UrlInfo[] urls = (await _publishedUrlInfoProvider.GetAllAsync(content)).ToArray();
+
+            foreach (var culture in publishedCultures)
             {
-                return;
-            }
+                UrlInfo[] cultureUrls = urls
+                    .Where(u => culture == "*" || u.Culture.InvariantEquals(culture))
+                    .ToArray();
 
-            UrlInfo[] urls = (await content.GetContentUrlsAsync(
-                _publishedRouter,
-                umbracoContext,
-                _languageService,
-                _localizedTextService,
-                _contentService,
-                _variationContextAccessor,
-                _loggerFactory.CreateLogger<IContent>(),
-                _uriUtility,
-                _publishedUrlProvider,
-                _navigationQueryService,
-                _publishedContentStatusFilteringService)).ToArray();
-
-
-            EventMessages eventMessages = _eventMessagesFactory.Get();
-            foreach (var culture in successfulCultures)
-            {
-                if (urls.Where(u => u.Culture == culture || culture == "*").All(u => u.Url is null))
+                if (cultureUrls.Any(u => u.Url is not null))
                 {
-                    eventMessages.Add(new EventMessage("Content published", "The document does not have a URL, possibly due to a naming collision with another document. More details can be found under Info.", EventMessageType.Warning));
-
-                    // only add one warning here, even though there might actually be more
-                    break;
+                    continue;
                 }
+
+                _eventMessagesFactory.Get().Add(CreateWarning(cultureUrls));
+
+                // Only add one warning here, even though there might actually be more.
+                break;
             }
         }
+    }
+
+    private EventMessage CreateWarning(IEnumerable<UrlInfo> unroutableUrls)
+    {
+        var reasons = unroutableUrls
+            .Select(u => u.Message)
+            .WhereNotNull()
+            .Where(m => m.Length > 0)
+            .Distinct()
+            .Select(m => m.EnsureEndsWith('.'))
+            .ToArray();
+
+        var message = reasons.Length == 0
+            ? _localizedTextService.Localize("content", "unroutableContentWarning")
+            : _localizedTextService.Localize("content", "unroutableContentWarningWithReason", [string.Join(" ", reasons)]);
+
+        return new EventMessage(
+            _localizedTextService.Localize("content", "unroutableContentWarningHeader"),
+            message,
+            EventMessageType.Warning);
     }
 }
