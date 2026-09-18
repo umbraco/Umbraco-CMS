@@ -31,7 +31,7 @@ public abstract class RuntimeAppCacheTests : AppCacheTests
     {
         AppPolicyCache.Insert("DateTimeTest", () => DateTime.Now, TimeSpan.FromMilliseconds(20));
 
-        // Poll for the expiration instead of sleeping for a fixed time and assuming that outlasted it.
+        // Expiry is observed lazily on read, so the test must poll.
         Assert.That(
             () => AppCache.GetCacheItem<DateTime>("DateTimeTest"),
             Is.EqualTo(default(DateTime)).After(5000, 20),
