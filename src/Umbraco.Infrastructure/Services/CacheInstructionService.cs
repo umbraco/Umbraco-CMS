@@ -185,10 +185,8 @@ namespace Umbraco.Cms
                 int lastId)
             {
                 using (!_profilingLogger.IsEnabled(Core.Logging.LogLevel.Debug) ? null : _profilingLogger.DebugDuration<CacheInstructionService>("Syncing from database..."))
-                using (ICoreScope scope = ScopeProvider.CreateCoreScope())
                 {
                     var numberOfInstructionsProcessed = ProcessDatabaseInstructions(cacheRefreshers, cancellationToken, localIdentity, ref lastId);
-                    scope.Complete();
                     return ProcessInstructionsResult.AsCompleted(numberOfInstructionsProcessed, lastId);
                 }
             }
@@ -202,7 +200,6 @@ namespace Umbraco.Cms
                 lock (_syncLock)
                 {
                     using (!_profilingLogger.IsEnabled(Core.Logging.LogLevel.Debug) ? null : _profilingLogger.DebugDuration<CacheInstructionService>("Syncing from database..."))
-                    using (ICoreScope scope = ScopeProvider.CreateCoreScope())
                     {
                         _repositoryCacheVersionService.SetCachesSyncedAsync();
                         var lastId = _lastSyncedManager.GetLastSyncedExternalAsync().GetAwaiter().GetResult() ?? 0;
@@ -215,7 +212,6 @@ namespace Umbraco.Cms
                             _lastSyncedManager.SaveLastSyncedInternalAsync(lastId).GetAwaiter().GetResult();
                         }
 
-                        scope.Complete();
                         return ProcessInstructionsResult.AsCompleted(numberOfInstructionsProcessed, lastId);
                     }
                 }
@@ -230,7 +226,6 @@ namespace Umbraco.Cms
                 lock (_syncLock)
                 {
                     using (!_profilingLogger.IsEnabled(Core.Logging.LogLevel.Debug) ? null : _profilingLogger.DebugDuration<CacheInstructionService>("Syncing from database..."))
-                    using (ICoreScope scope = ScopeProvider.CreateCoreScope())
                     {
                         _repositoryCacheVersionService.SetCachesSyncedAsync();
                         var lastId = _lastSyncedManager.GetLastSyncedInternalAsync().GetAwaiter().GetResult() ?? 0;
@@ -242,7 +237,6 @@ namespace Umbraco.Cms
                             _lastSyncedManager.SaveLastSyncedInternalAsync(lastId).GetAwaiter().GetResult();
                         }
 
-                        scope.Complete();
                         return ProcessInstructionsResult.AsCompleted(numberOfInstructionsProcessed, lastId);
                     }
                 }
@@ -294,8 +288,19 @@ namespace Umbraco.Cms
                 // It would have been nice to do this in a Query instead of Fetch using a data reader to save
                 // some memory however we cannot do that because inside of this loop the cache refreshers are also
                 // performing some lookups which cannot be done with an active reader open.
-                IEnumerable<CacheInstruction> pendingInstructions =
-                    _cacheInstructionRepository.GetPendingInstructions(lastId, MaxInstructionsToRetrieve);
+                //
+                // The read gets a scope of its own, so that its transaction is committed before the cache refreshers
+                // run. Refreshing the caches for a large batch can take minutes, and holding a read transaction open
+                // on umbracoCacheInstruction for that long blocks writing new instructions - which is what every
+                // content or schema change on this server has to do.
+                List<CacheInstruction> pendingInstructions;
+                using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+                {
+                    pendingInstructions = _cacheInstructionRepository
+                        .GetPendingInstructions(lastId, MaxInstructionsToRetrieve)
+                        .ToList();
+                }
+
                 lastId = 0;
                 foreach (CacheInstruction instruction in pendingInstructions)
                 {
