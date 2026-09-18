@@ -34,6 +34,7 @@ internal sealed class FileUploadPropertyValueEditor : DataValueEditor, IDisposab
     private readonly ITemporaryFileService _temporaryFileService;
     private readonly IScopeProvider _scopeProvider;
     private readonly IFileStreamSecurityValidator _fileStreamSecurityValidator;
+    private readonly IFileUploadPathResolver _fileUploadPathResolver;
     private readonly FileUploadValueParser _valueParser;
 
     private ContentSettings _contentSettings;
@@ -52,6 +53,7 @@ internal sealed class FileUploadPropertyValueEditor : DataValueEditor, IDisposab
     /// <param name="temporaryFileService">Manages temporary files used during file upload processes.</param>
     /// <param name="scopeProvider">Provides database scope management for transactional operations.</param>
     /// <param name="fileStreamSecurityValidator">Validates file streams for security during upload and access.</param>
+    /// <param name="fileUploadPathResolver">Resolves the storage path for uploaded files.</param>
     public FileUploadPropertyValueEditor(
         DataEditorAttribute attribute,
         MediaFileManager mediaFileManager,
@@ -61,13 +63,15 @@ internal sealed class FileUploadPropertyValueEditor : DataValueEditor, IDisposab
         IIOHelper ioHelper,
         ITemporaryFileService temporaryFileService,
         IScopeProvider scopeProvider,
-        IFileStreamSecurityValidator fileStreamSecurityValidator)
+        IFileStreamSecurityValidator fileStreamSecurityValidator,
+        IFileUploadPathResolver fileUploadPathResolver)
         : base(shortStringHelper, jsonSerializer, ioHelper, attribute)
     {
         _mediaFileManager = mediaFileManager;
         _temporaryFileService = temporaryFileService;
         _scopeProvider = scopeProvider;
         _fileStreamSecurityValidator = fileStreamSecurityValidator;
+        _fileUploadPathResolver = fileUploadPathResolver;
         _valueParser = new FileUploadValueParser(jsonSerializer);
 
         _contentSettings = contentSettings.CurrentValue;
@@ -219,8 +223,8 @@ internal sealed class FileUploadPropertyValueEditor : DataValueEditor, IDisposab
             return null;
         }
 
-        // get the filepath
-        string filepath = GetMediaPath(file, dataTypeConfiguration, contentKey, propertyTypeKey);
+        // resolve the storage path; IFileUploadPathResolver is the point of extensibility for where files are stored
+        string filepath = _fileUploadPathResolver.ResolvePath(file.FileName, dataTypeConfiguration, contentKey, propertyTypeKey);
 
         using (Stream filestream = file.OpenReadStream())
         {
@@ -235,16 +239,6 @@ internal sealed class FileUploadPropertyValueEditor : DataValueEditor, IDisposab
         }
 
         return filepath;
-    }
-
-    /// <summary>
-    /// Provides media path.
-    /// </summary>
-    /// <returns>File system relative path</returns>
-    private string GetMediaPath(TemporaryFileModel file, object? dataTypeConfiguration, Guid contentKey, Guid propertyTypeKey)
-    {
-        // in case we are using the old path scheme, try to re-use numbers (bah...)
-        return _mediaFileManager.GetMediaPath(file.FileName, contentKey, propertyTypeKey);
     }
 
     /// <summary>
