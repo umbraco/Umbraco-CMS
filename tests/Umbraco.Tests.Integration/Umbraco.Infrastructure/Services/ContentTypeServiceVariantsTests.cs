@@ -883,12 +883,14 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey); // This is going to have to re-normalize the "Edited" flag
 
         document = ContentService.GetById(document.Id);
-        Assert.IsTrue(
+        Assert.IsFalse(
             document.IsCultureEdited(
-                "en")); // This will remain true because there is now a pending change for the invariant property data which is flagged under the default lang
+                "en")); // The pending change is now tracked as invariant, not attributed to the default lang
         Assert.IsFalse(
             document.IsCultureEdited(
                 "fr")); // This will be false because nothing has changed for this culture and the property no longer reflects variant changes
+        Assert.IsTrue(
+            document.IsCultureEdited(Constants.System.InvariantCulture)); // The pending invariant change is tracked distinctly
         Assert.IsTrue(document.Edited);
 
         // update the invariant value and publish
@@ -1043,6 +1045,56 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
             document.IsCultureEdited("en")); // The variant published AND edited values are copied over to the invariant
         Assert.IsFalse(document.IsCultureEdited("fr"));
         Assert.IsFalse(document.Edited);
+    }
+
+    [Test]
+    public async Task Change_Property_Variations_From_Variant_To_Invariant_Renormalizes_Invariant_Edited_Distinctly()
+    {
+        // Reverse direction of the test above: a culture-variant property with a genuine PENDING (unpublished)
+        // edit on the default culture gets switched to invariant. RenormalizeEditedFlags must not attribute
+        // that edit to any specific culture (the historical bug this pins), and must correctly recompute the
+        // distinct invariant-edited signal rather than leaving it stale.
+        await CreateFrenchAndEnglishLangs();
+
+        var contentType = CreateContentType(ContentVariation.Culture);
+        var properties = CreatePropertyCollection(("value1", ContentVariation.Culture));
+        contentType.PropertyGroups.Add(new PropertyGroup(properties) { Alias = "content", Name = "Content" });
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+
+        var document = (IContent)new Content("document", -1, contentType);
+        document.SetCultureName("doc1en", "en");
+        document.SetCultureName("doc1fr", "fr");
+        document.SetValue("value1", "v1en-init", "en");
+        document.SetValue("value1", "v1fr-init", "fr");
+        ContentService.Save(document);
+        ContentService.Publish(document, document.AvailableCultures.ToArray());
+
+        document = ContentService.GetById(document.Id);
+        Assert.IsFalse(document.IsCultureEdited("en"));
+        Assert.IsFalse(document.IsCultureEdited("fr"));
+        Assert.IsFalse(document.IsCultureEdited(Constants.System.InvariantCulture));
+
+        // edit the default culture's value only, without publishing - a genuine pending culture-specific edit
+        document.SetValue("value1", "v1en2", "en");
+        ContentService.Save(document);
+
+        document = ContentService.GetById(document.Id);
+        Assert.IsTrue(document.IsCultureEdited("en"));
+        Assert.IsFalse(document.IsCultureEdited("fr"));
+        Assert.IsFalse(document.IsCultureEdited(Constants.System.InvariantCulture));
+
+        // switch the property to invariant - the default culture's (edited) value is migrated to the
+        // invariant slot, and this triggers RenormalizeEditedFlags
+        contentType.PropertyTypes.First(x => x.Alias == "value1").Variations = ContentVariation.Nothing;
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+
+        document = ContentService.GetById(document.Id);
+
+        // the pending edit is now invariant - it must not be attributed to any specific culture
+        Assert.IsFalse(document.IsCultureEdited("en"));
+        Assert.IsFalse(document.IsCultureEdited("fr"));
+        Assert.IsTrue(document.IsCultureEdited(Constants.System.InvariantCulture));
+        Assert.IsTrue(document.Edited);
     }
 
     [Test]

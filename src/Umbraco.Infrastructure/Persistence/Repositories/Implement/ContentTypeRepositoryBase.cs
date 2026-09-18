@@ -1346,7 +1346,9 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
     /// <remarks>
     ///     If this is not done, then in some cases the "edited" value for a particular culture for a document will remain true
     ///     when it should be false if the property was changed to invariant. In order to do this we need to recalculate this value based on the values
-    ///     stored for each property, culture and current/published version.
+    ///     stored for each property, culture and current/published version. This also recalculates the invariant-edited
+    ///     flag (<see cref="IPublishableContentDto{TContentVersionDto}.InvariantEdited"/>), tracked distinctly from any
+    ///     specific culture's edited state, for the same reason.
     ///
     ///     Some of the sql statements in this function have a tendency to take a lot of parameters (nodeIds)
     ///     as the WhereIn Npoco method translates all the nodeIds being passed in as parameters when using the SqlClient provider.
@@ -1363,8 +1365,6 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
         {
             return;
         }
-
-        var defaultLang = LanguageRepository.GetDefaultId();
 
         // This will build up a query to get the property values of both the current and the published version so that we can check
         // based on the current variance of each item to see if it's 'edited' value should be true/false.
@@ -1411,6 +1411,12 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
 
         // keep track of which node to mark or unmark as edited
         var editedDocument = new Dictionary<int, bool>();
+
+        // keep track of which node to mark or unmark as having an edited invariant property, tracked
+        // distinctly from editedDocument above and only populated for nodes whose invariant properties
+        // were actually evaluated in this pass - see the remarks on the InvariantEdited bulk update below
+        // for why this isn't merged into a single (Edited, InvariantEdited) update.
+        var invariantEditedDocument = new Dictionary<int, bool>();
         var nodeId = -1;
         var propertyTypeId = -1;
 
@@ -1452,21 +1458,39 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
                     editedDocument[row.NodeId] = editedDocument.TryGetValue(row.NodeId, out var edited)
                         ? edited |= false
                         : false;
+
+                    if (!propVariations.VariesByCulture())
+                    {
+                        invariantEditedDocument[row.NodeId] = invariantEditedDocument.TryGetValue(row.NodeId, out var invariantEdited)
+                            ? invariantEdited |= false
+                            : false;
+                    }
                 }
                 else if (pubRow == null)
                 {
                     // this would mean that that this property is 'edited' since there is no published version
                     editedLanguageVersions[(row.NodeId, row.LanguageId)] = true;
                     editedDocument[row.NodeId] = true;
+
+                    if (!propVariations.VariesByCulture())
+                    {
+                        invariantEditedDocument[row.NodeId] = true;
+                    }
                 }
 
                 // compare the property values, if they differ from versions then flag the current version as edited
                 else if (IsPropertyValueChanged(pubRow, row))
                 {
-                    // Here we would check if the property is invariant, in which case the edited language should be indicated by the default lang
-                    editedLanguageVersions[
-                        (row.NodeId, !propVariations.VariesByCulture() ? defaultLang : row.LanguageId)] = true;
+                    // row.LanguageId is already null for an invariant property, so this tracks invariant
+                    // edits distinctly - it is never attributed to a specific culture (e.g. the default
+                    // language), matching how the normal content-save pipeline tracks invariant edits.
+                    editedLanguageVersions[(row.NodeId, row.LanguageId)] = true;
                     editedDocument[row.NodeId] = true;
+
+                    if (!propVariations.VariesByCulture())
+                    {
+                        invariantEditedDocument[row.NodeId] = true;
+                    }
                 }
 
                 // reset
@@ -1533,6 +1557,30 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
             foreach (IEnumerable<KeyValuePair<int, bool>> batch in groupByValue.InGroupsOf(Constants.Sql.MaxParameterCount))
             {
                 Database.Execute(Sql().Update<TContentDto>(u => u.Set(x => x.Edited, groupByValue.Key))
+                    .WhereIn<TContentDto>(x => x.NodeId, batch.Select(x => x.Key)));
+            }
+        }
+
+        // Now bulk update the invariant-edited flag on the top-level content table.
+        //
+        // This is deliberately a SEPARATE dictionary (invariantEditedDocument) and a separate update pass,
+        // rather than folding InvariantEdited into the Edited update above as one combined (Edited,
+        // InvariantEdited) value per node. The two updates cover different node sets: editedDocument gets
+        // an entry for a node as soon as ANY processed property contributes to its edited state, while
+        // invariantEditedDocument only gets an entry when a processed property is itself invariant. A node
+        // can therefore appear in editedDocument without appearing here - e.g. when only a culture-variant
+        // property (not an invariant one) among propertyTypeIds triggered its entry. If InvariantEdited were
+        // written alongside Edited in a single combined statement, such a node's InvariantEdited would have
+        // to default to some value - most naturally false - which would silently clear a genuinely pending
+        // invariant edit that has nothing to do with this particular variance change. Keeping this as its
+        // own pass, touching only the nodes whose invariant properties were actually evaluated here, avoids
+        // that at the cost of a second statement per batch.
+        foreach (IGrouping<bool, KeyValuePair<int, bool>> groupByValue in invariantEditedDocument.GroupBy(x => x.Value))
+        {
+            // update in batches to account for maximum parameter count
+            foreach (IEnumerable<KeyValuePair<int, bool>> batch in groupByValue.InGroupsOf(Constants.Sql.MaxParameterCount))
+            {
+                Database.Execute(Sql().Update<TContentDto>(u => u.Set(x => x.InvariantEdited, groupByValue.Key))
                     .WhereIn<TContentDto>(x => x.NodeId, batch.Select(x => x.Key)));
             }
         }
