@@ -164,8 +164,9 @@ export class UmbPropertyElement extends UmbLitElement {
 			'observeValidationState',
 		);
 
-		// Let's re-create the Property Editor UI element unless it supports changing variant. [NL]
-		if (this.#manifest?.meta.supportsVariantChange !== true) {
+		// Only re-create when moving between data paths, as the element may hold state belonging to the
+		// previous one, and only if the editor does not handle the switch itself. [NL]
+		if (oldDataPath !== undefined && this.#manifest?.meta.supportsVariantChange !== true) {
 			this.#initiateEditor();
 		} else {
 			// If not re-creating the element, we can just setup the validation: [NL]
