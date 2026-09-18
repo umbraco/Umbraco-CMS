@@ -48,27 +48,6 @@ test('can see root element start node and children', async ({umbracoApi, umbraco
   await umbracoUi.library.isChildElementInTreeVisible(rootFolderName, childElementTwoName);
 });
 
-// Feature gap: a plain element cannot be a start node. UserGroupPresentationFactory resolves them as
-// UmbracoObjectTypes.ElementContainer, so creating the user group returns 404.
-test.skip('can see parent of start node but not access it', async ({umbracoApi, umbracoUi}) => {
-  // Arrange
-  userGroupId = await umbracoApi.userGroup.createUserGroupWithElementStartNode(userGroupName, childElementOneId);
-  await umbracoApi.user.setUserPermissionsForElement(testUser.name, testUser.email, testUser.password, userGroupId);
-  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
-  await umbracoUi.goToBackOffice();
-
-  // Act
-  await umbracoUi.user.goToSection(ConstantHelper.sections.library, false);
-
-  // Assert
-  await umbracoUi.library.isElementInTreeVisible(rootFolderName);
-  await umbracoUi.library.goToElementWithName(rootFolderName);
-  await umbracoUi.library.doesElementWorkspaceHaveText('Access denied');
-  await umbracoUi.library.openElementCaretButtonForName(rootFolderName);
-  await umbracoUi.library.isChildElementInTreeVisible(rootFolderName, childElementOneName);
-  await umbracoUi.library.isChildElementInTreeVisible(rootFolderName, childElementTwoName, false);
-});
-
 test('cannot see any element when no element start nodes specified', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createSimpleUserGroupWithLibrarySection(userGroupName);

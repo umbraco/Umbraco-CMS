@@ -51,32 +51,6 @@ test('can see root element start node and children', async ({umbracoApi, umbraco
 
 // Feature gap: a plain element cannot be a start node. UserPresentationFactory resolves them as
 // UmbracoObjectTypes.ElementContainer, so the user gets no element access and no Library tab.
-test.skip('can see parent of start node but not access it', async ({umbracoApi, umbracoUi}) => {
-  // Arrange
-  await umbracoApi.user.setUserPermissionsForElement(testUser.name, testUser.email, testUser.password, userGroupId!, [childElementOneId!]);
-  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
-  await umbracoUi.goToBackOffice();
-
-  // Act
-  await umbracoUi.user.goToSection(ConstantHelper.sections.library, false);
-
-  // Assert
-  // Get initial URL (should be on library section)
-  const initialUrl = umbracoUi.page.url();
-
-  await umbracoUi.library.isElementInTreeVisible(rootFolderName);
-  await umbracoUi.library.goToElementWithName(rootFolderName);
-
-  // Assert - URL should not have changed (no navigation occurred)
-  const currentUrl = umbracoUi.page.url();
-  expect(currentUrl).toBe(initialUrl);
-
-  await umbracoUi.library.openElementCaretButtonForName(rootFolderName);
-  await umbracoUi.library.isChildElementInTreeVisible(rootFolderName, childElementOneName);
-  await umbracoUi.library.isChildElementInTreeVisible(rootFolderName, childElementTwoName, false);
-});
-
-// Feature gap, as above: a plain element cannot be a start node, so the user has no element access.
 test.skip('see no-access view when deep-linking to restricted element', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.user.setUserPermissionsForElement(testUser.name, testUser.email, testUser.password, userGroupId!, [childElementOneId!]);

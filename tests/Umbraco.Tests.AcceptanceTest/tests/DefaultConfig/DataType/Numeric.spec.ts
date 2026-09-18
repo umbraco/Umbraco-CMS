@@ -58,21 +58,6 @@ test('can update step size value', async ({umbracoApi, umbracoUi}) => {
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'step', stepSizeValue)).toBeTruthy();
 });
 
-// Removed: the "Allow decimals" setting no longer exists on the Numeric data type. There is no
-// allowDecimals property left anywhere in the backoffice client.
-test.skip('can allow decimals', async ({umbracoApi, umbracoUi}) => {
-  // Arrange
-  await umbracoApi.dataType.createDefaultNumericDataType(customDataTypeName);
-  await umbracoUi.dataType.goToDataType(customDataTypeName);
-
-  // Act
-  await umbracoUi.dataType.clickAllowDecimalsToggle();
-  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
-
-  // Assert
-  expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'allowDecimals', true)).toBeTruthy();
-});
-
 // Product gap (https://github.com/umbraco/Umbraco-CMS/issues/17509): no min/max cross-validation, the save succeeds.
 test.skip('cannot update the minimum greater than the maximum', async ({umbracoApi, umbracoUi}) => {
   // Arrange
