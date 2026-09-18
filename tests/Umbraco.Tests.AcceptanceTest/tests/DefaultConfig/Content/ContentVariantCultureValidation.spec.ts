@@ -67,7 +67,7 @@ test('can publish english variant after visiting danish that has empty mandatory
   // Assert
   await umbracoUi.content.isSuccessNotificationVisible();
   await umbracoUi.content.isErrorNotificationVisible(false);
-  await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.nullValue, false);
+  await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.emptyValue, false);
 });
 
 test('cannot publish danish variant with empty mandatory field', async ({umbracoUi}) => {
@@ -83,7 +83,7 @@ test('cannot publish danish variant with empty mandatory field', async ({umbraco
   await umbracoUi.content.clickContainerSaveAndPublishButton();
 
   // Assert
-  await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.nullValue);
+  await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.emptyValue);
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
 });
 
