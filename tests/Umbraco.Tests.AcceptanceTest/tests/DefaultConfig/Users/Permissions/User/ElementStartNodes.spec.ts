@@ -49,23 +49,6 @@ test('can see root element start node and children', async ({umbracoApi, umbraco
   await umbracoUi.library.isChildElementInTreeVisible(rootFolderName, childElementTwoName);
 });
 
-// Feature gap: a plain element cannot be a start node. UserPresentationFactory resolves them as
-// UmbracoObjectTypes.ElementContainer, so the user gets no element access and no Library tab.
-test.skip('see no-access view when deep-linking to restricted element', async ({umbracoApi, umbracoUi}) => {
-  // Arrange
-  await umbracoApi.user.setUserPermissionsForElement(testUser.name, testUser.email, testUser.password, userGroupId!, [childElementOneId!]);
-  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
-  await umbracoUi.goToBackOffice();
-
-  // Act
-  await umbracoUi.user.goToSection(ConstantHelper.sections.library, false);
-
-  // Assert
-  await umbracoUi.library.isElementInTreeVisible(rootFolderName);
-  await umbracoUi.page.goto(`${umbracoUi.page.url().replace('/collection', '')}/workspace/element/edit/${childElementOneId!}`);
-  await umbracoUi.library.doesElementWorkspaceHaveText('Access denied');
-});
-
 test('cannot see any element when no element start nodes specified', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.user.setUserPermissionsForElement(testUser.name, testUser.email, testUser.password, userGroupId);
