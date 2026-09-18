@@ -1987,7 +1987,7 @@ internal class AsyncDocumentRepository
     /// referencing it — <c>DocumentRepository</c> is slated for removal once the EF Core migration
     /// completes, so this repository must not depend on it.
     /// </remarks>
-    private static string? EnsureUniqueUrlSegment(
+    internal static string? EnsureUniqueUrlSegment(
         string? nodeName,
         int nodeId,
         IEnumerable<SimilarNodeName> siblings,

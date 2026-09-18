@@ -5,11 +5,12 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
+using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.EFCore;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Persistence.Repositories;
 
 [TestFixture]
-internal sealed class DocumentRepositoryTests
+internal sealed class AsyncDocumentRepositoryUrlSegmentTests
 {
     private IShortStringHelper _shortStringHelper = null!;
 
@@ -32,7 +33,7 @@ internal sealed class DocumentRepositoryTests
             new() { Id = 1, Name = "Other" },
         };
 
-        var result = DocumentRepository.EnsureUniqueUrlSegment("Title", 0, siblings, _shortStringHelper);
+        var result = AsyncDocumentRepository.EnsureUniqueUrlSegment("Title", 0, siblings, _shortStringHelper);
 
         Assert.AreEqual("Title", result);
     }
@@ -46,7 +47,7 @@ internal sealed class DocumentRepositoryTests
             new() { Id = 1, Name = "Title" },
         };
 
-        var result = DocumentRepository.EnsureUniqueUrlSegment("Title.", 0, siblings, _shortStringHelper);
+        var result = AsyncDocumentRepository.EnsureUniqueUrlSegment("Title.", 0, siblings, _shortStringHelper);
 
         Assert.AreEqual("Title. (1)", result);
     }
@@ -61,7 +62,7 @@ internal sealed class DocumentRepositoryTests
             new() { Id = 2, Name = "Title." },
         };
 
-        var result = DocumentRepository.EnsureUniqueUrlSegment("Title!", 0, siblings, _shortStringHelper);
+        var result = AsyncDocumentRepository.EnsureUniqueUrlSegment("Title!", 0, siblings, _shortStringHelper);
 
         // "Title! (1)" → segment "title-1" which doesn't collide with "title" or "title"
         Assert.AreEqual("Title! (1)", result);
@@ -77,7 +78,7 @@ internal sealed class DocumentRepositoryTests
             new() { Id = 2, Name = "Title 1" }, // produces segment "title-1", same as "Title. (1)"
         };
 
-        var result = DocumentRepository.EnsureUniqueUrlSegment("Title.", 0, siblings, _shortStringHelper);
+        var result = AsyncDocumentRepository.EnsureUniqueUrlSegment("Title.", 0, siblings, _shortStringHelper);
 
         Assert.AreEqual("Title. (2)", result);
     }
@@ -91,7 +92,7 @@ internal sealed class DocumentRepositoryTests
         };
 
         // Node 5 checking its own name — should not collide with itself.
-        var result = DocumentRepository.EnsureUniqueUrlSegment("Title", 5, siblings, _shortStringHelper);
+        var result = AsyncDocumentRepository.EnsureUniqueUrlSegment("Title", 5, siblings, _shortStringHelper);
 
         Assert.AreEqual("Title", result);
     }
@@ -107,7 +108,7 @@ internal sealed class DocumentRepositoryTests
             new() { Id = 1, Name = "Title" },
         };
 
-        var result = DocumentRepository.EnsureUniqueUrlSegment(nodeName, 0, siblings, _shortStringHelper);
+        var result = AsyncDocumentRepository.EnsureUniqueUrlSegment(nodeName, 0, siblings, _shortStringHelper);
 
         Assert.AreEqual(nodeName, result);
     }
@@ -116,7 +117,7 @@ internal sealed class DocumentRepositoryTests
     public void EnsureUniqueUrlSegment_Returns_Name_When_Segment_Is_Empty_After_Cleaning()
     {
         // Name consists entirely of characters stripped by the cleaner.
-        var result = DocumentRepository.EnsureUniqueUrlSegment("...", 0, Array.Empty<SimilarNodeName>(), _shortStringHelper);
+        var result = AsyncDocumentRepository.EnsureUniqueUrlSegment("...", 0, Array.Empty<SimilarNodeName>(), _shortStringHelper);
 
         Assert.AreEqual("...", result);
     }
@@ -129,7 +130,7 @@ internal sealed class DocumentRepositoryTests
             new() { Id = 1, Name = "TITLE" },
         };
 
-        var result = DocumentRepository.EnsureUniqueUrlSegment("title.", 0, siblings, _shortStringHelper);
+        var result = AsyncDocumentRepository.EnsureUniqueUrlSegment("title.", 0, siblings, _shortStringHelper);
 
         Assert.AreEqual("title. (1)", result);
     }
@@ -144,7 +145,7 @@ internal sealed class DocumentRepositoryTests
             new() { Id = 3, Name = "   " },
         };
 
-        var result = DocumentRepository.EnsureUniqueUrlSegment("Title", 0, siblings, _shortStringHelper);
+        var result = AsyncDocumentRepository.EnsureUniqueUrlSegment("Title", 0, siblings, _shortStringHelper);
 
         Assert.AreEqual("Title", result);
     }
@@ -161,7 +162,7 @@ internal sealed class DocumentRepositoryTests
             new() { Id = 1, Name = "Title" },
         };
 
-        var result = DocumentRepository.EnsureUniqueUrlSegment("Title.", 0, siblings, mock.Object, "da-DK");
+        var result = AsyncDocumentRepository.EnsureUniqueUrlSegment("Title.", 0, siblings, mock.Object, "da-DK");
 
         Assert.AreEqual("Title. (1)", result);
         mock.Verify(x => x.CleanStringForUrlSegment(It.IsAny<string>(), "da-DK"), Times.AtLeastOnce);
