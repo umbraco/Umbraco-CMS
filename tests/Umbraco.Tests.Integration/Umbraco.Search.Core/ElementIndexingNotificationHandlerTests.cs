@@ -14,6 +14,7 @@ using Umbraco.Cms.Infrastructure.Persistence.Relations;
 using Umbraco.Cms.Search.Core.Models.Indexing;
 using Umbraco.Cms.Search.Core.NotificationHandlers;
 using Umbraco.Cms.Search.Core.Services.ContentIndexing;
+using Umbraco.Cms.Tests.Integration.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Integration.Testing.Search;
@@ -27,6 +28,10 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Core;
 /// </summary>
 public class ElementIndexingNotificationHandlerTests : PropertyValueHandlerTestsBase
 {
+    private const string IntermediateText = "Intermediate text";
+
+    private const string LeafText = "Original leaf text";
+
     private IJsonSerializer JsonSerializer => GetRequiredService<IJsonSerializer>();
 
     private IConfigurationEditorJsonSerializer ConfigurationEditorJsonSerializer => GetRequiredService<IConfigurationEditorJsonSerializer>();
@@ -35,13 +40,20 @@ public class ElementIndexingNotificationHandlerTests : PropertyValueHandlerTests
 
     private IElementService ElementService => GetRequiredService<IElementService>();
 
+    private IElementEditingService ElementEditingService => GetRequiredService<IElementEditingService>();
+
     [SetUp]
     public void SetUp() => IndexerAndSearcher.Reset();
+
+    public static void EnableExternalBlockElementIndexing(IUmbracoBuilder builder)
+        => builder.Services.Configure<IndexingSettings>(options => options.IndexExternalBlockElements = true);
+
+    public static void DisableExternalBlockElementIndexing(IUmbracoBuilder builder)
+        => builder.Services.Configure<IndexingSettings>(options => options.IndexExternalBlockElements = false);
 
     protected override void ConfigureTestServices(IServiceCollection services)
     {
         base.ConfigureTestServices(services);
-        services.Configure<IndexingSettings>(options => options.IndexExternalBlockElements = true);
 
         // wraps the real IContentIndexingService so tests can assert whether a reindex was actually triggered,
         // without relying on index *content* differences that a correct draft-vs-published distinction wouldn't
@@ -54,6 +66,10 @@ public class ElementIndexingNotificationHandlerTests : PropertyValueHandlerTests
     protected override void CustomTestSetup(IUmbracoBuilder builder)
     {
         base.CustomTestSetup(builder);
+
+        // enabled here rather than in ConfigureTestServices, so a [ConfigureBuilder] attribute on an individual
+        // test can still turn it back off - builder attributes are executed before ConfigureTestServices.
+        EnableExternalBlockElementIndexing(builder);
 
         // creates the umbExternalBlockElement relation when the referencing document or element is saved/published
         builder
@@ -244,6 +260,237 @@ public class ElementIndexingNotificationHandlerTests : PropertyValueHandlerTests
         Guid[] referencingDocumentKeys = handler.FindDocumentKeysReferencingElements([leafElement.Id]);
 
         Assert.That(referencingDocumentKeys, Is.Empty);
+    }
+
+    [Test]
+    [ConfigureBuilder(ActionName = nameof(DisableExternalBlockElementIndexing))]
+    public async Task Does_Not_Reindex_Referencing_Document_When_External_Block_Element_Indexing_Is_Disabled()
+    {
+        var (contentType, elementType) = await SetupBlockListWithElementType();
+
+        Element element = new ElementBuilder()
+            .WithContentType(elementType)
+            .WithName("Reusable element")
+            .Build();
+        element.SetValue("textValue", "Original text");
+        ElementService.Save(element);
+        ElementService.Publish(element, ["*"]);
+
+        Content content = CreatePageWithExternalBlockReference(contentType, element.Key);
+        ContentService.Save(content);
+        ContentService.Publish(content, ["*"]);
+
+        IndexerAndSearcher.Reset();
+
+        IElement updatedElement = ElementService.GetById(element.Key)!;
+        updatedElement.SetValue("textValue", "Updated text");
+        ElementService.Save(updatedElement);
+        ElementService.Publish(updatedElement, ["*"]);
+
+        Assert.That(IndexerAndSearcher.Dump(IndexAliases.PublishedContent), Is.Empty);
+    }
+
+    [Test]
+    public async Task Can_Remove_Transitively_Referenced_Element_Content_From_Referencing_Document_When_Leaf_Element_Is_Unpublished()
+    {
+        var structure = await SetupNestedExternalReferenceStructure();
+
+        ElementService.Unpublish(ElementService.GetById(structure.LeafElement.Key)!);
+
+        AssertPublishedBlocksTexts(absent: [LeafText], present: [IntermediateText]);
+    }
+
+    [Test]
+    public async Task Can_Remove_Transitively_Referenced_Element_Content_From_Referencing_Document_When_Leaf_Element_Is_Trashed()
+    {
+        var structure = await SetupNestedExternalReferenceStructure();
+
+        Assert.That((await ElementEditingService.MoveToRecycleBinAsync(structure.LeafElement.Key, Constants.Security.SuperUserKey)).Success, Is.True);
+
+        AssertPublishedBlocksTexts(absent: [LeafText], present: [IntermediateText]);
+    }
+
+    [Test]
+    public async Task Can_Keep_Transitively_Referenced_Element_Content_Out_Of_Referencing_Document_When_Trashed_Leaf_Element_Is_Deleted()
+    {
+        var structure = await SetupNestedExternalReferenceStructure();
+
+        // trashing already drops the leaf element's content from the document; permanently deleting the trashed
+        // element must not resurface it, even though the relation is gone with the node and nothing re-indexes again.
+        Assert.That((await ElementEditingService.MoveToRecycleBinAsync(structure.LeafElement.Key, Constants.Security.SuperUserKey)).Success, Is.True);
+        Assert.That((await ElementEditingService.DeleteFromRecycleBinAsync(structure.LeafElement.Key, Constants.Security.SuperUserKey)).Success, Is.True);
+
+        AssertPublishedBlocksTexts(absent: [LeafText], present: [IntermediateText]);
+    }
+
+    [Test]
+    public async Task Can_Keep_Transitively_Referenced_Element_Content_Out_Of_Referencing_Document_When_Trashed_Leaf_Element_Is_Restored()
+    {
+        var structure = await SetupNestedExternalReferenceStructure();
+
+        Assert.That((await ElementEditingService.MoveToRecycleBinAsync(structure.LeafElement.Key, Constants.Security.SuperUserKey)).Success, Is.True);
+
+        // restore brings the element back unpublished, so its content must stay out until it is published again
+        Assert.That((await ElementEditingService.RestoreAsync(structure.LeafElement.Key, null, Constants.Security.SuperUserKey)).Success, Is.True);
+
+        AssertPublishedBlocksTexts(absent: [LeafText], present: [IntermediateText]);
+    }
+
+    [Test]
+    public async Task Can_Remove_Transitively_Referenced_Element_Content_From_Referencing_Document_When_Intermediate_Element_Is_Unpublished()
+    {
+        var structure = await SetupNestedExternalReferenceStructure();
+
+        // the leaf content is only reachable through the intermediate element, so unpublishing the intermediate
+        // element must drop both from the document.
+        ElementService.Unpublish(ElementService.GetById(structure.IntermediateElement.Key)!);
+
+        AssertPublishedBlocksValueIsNull();
+    }
+
+    [Test]
+    public async Task Cannot_Find_Referencing_Document_Through_Element_Picker_Reference()
+    {
+        var (contentType, elementType) = await SetupBlockListWithElementType();
+
+        Element element = new ElementBuilder()
+            .WithContentType(elementType)
+            .WithName("Reusable element")
+            .Build();
+        element.SetValue("textValue", "Original text");
+        ElementService.Save(element);
+        ElementService.Publish(element, ["*"]);
+
+        // two documents reference the same element: one embeds it as external block content (its content is
+        // flattened into the document's index), the other only picks it by id (nothing is flattened).
+        Content externalBlockDocument = CreatePageWithExternalBlockReference(contentType, element.Key);
+        ContentService.Save(externalBlockDocument);
+        ContentService.Publish(externalBlockDocument, ["*"]);
+
+        IContentType pickerContentType = await CreateElementPickerContentType();
+        Content pickerDocument = new ContentBuilder()
+            .WithContentType(pickerContentType)
+            .WithName("Picker page")
+            .Build();
+        pickerDocument.Properties["elementPicker"]!.SetValue(JsonSerializer.Serialize(new[] { element.Key }));
+        ContentService.Save(pickerDocument);
+        ContentService.Publish(pickerDocument, ["*"]);
+
+        IRelationService relationService = GetRequiredService<IRelationService>();
+        Assert.Multiple(() =>
+        {
+            Assert.That(
+                relationService.GetByParent(externalBlockDocument, Constants.Conventions.RelationTypes.RelatedExternalBlockElementAlias),
+                Has.Exactly(1).Items);
+            Assert.That(
+                relationService.GetByParent(pickerDocument, Constants.Conventions.RelationTypes.RelatedElementAlias),
+                Has.Exactly(1).Items);
+            Assert.That(
+                relationService.GetByParent(pickerDocument, Constants.Conventions.RelationTypes.RelatedExternalBlockElementAlias),
+                Is.Empty);
+        });
+
+        var handler = new ElementIndexingNotificationHandler(
+            GetRequiredService<ICoreScopeProvider>(),
+            ContentIndexingService,
+            relationService,
+            GetRequiredService<IOptions<IndexingSettings>>(),
+            GetRequiredService<IOriginProvider>(),
+            GetRequiredService<IIndexDocumentService>());
+
+        Guid[] referencingDocumentKeys = handler.FindDocumentKeysReferencingElements([element.Id]);
+
+        // the traversal follows umbExternalBlockElement only, which is the entire reason that relation type exists
+        // separately from the generic umbElement one the picker emits.
+        Assert.Multiple(() =>
+        {
+            Assert.That(referencingDocumentKeys, Does.Contain(externalBlockDocument.Key));
+            Assert.That(referencingDocumentKeys, Does.Not.Contain(pickerDocument.Key));
+        });
+    }
+
+    private async Task<IContentType> CreateElementPickerContentType()
+    {
+        var elementPickerDataType = new DataType(PropertyEditorCollection[Constants.PropertyEditors.Aliases.ElementPicker], ConfigurationEditorJsonSerializer)
+        {
+            Name = "My Element Picker",
+            DatabaseType = ValueStorageType.Ntext,
+            ParentId = Constants.System.Root,
+            CreateDate = DateTime.UtcNow
+        };
+        await GetRequiredService<IDataTypeService>().CreateAsync(elementPickerDataType, Constants.Security.SuperUserKey);
+
+        IContentType contentType = new ContentTypeBuilder()
+            .WithAlias("pageWithElementPicker")
+            .WithName("Page With Element Picker")
+            .AddPropertyType()
+            .WithAlias("elementPicker")
+            .WithName("elementPicker")
+            .WithDataTypeId(elementPickerDataType.Id)
+            .Done()
+            .Build();
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+
+        return contentType;
+    }
+
+    // Document -> (external) intermediate element -> (external) leaf element, all published, so the document's
+    // published index entry holds the content of both elements.
+    private async Task<(Content Document, Element IntermediateElement, Element LeafElement)> SetupNestedExternalReferenceStructure()
+    {
+        var (contentType, elementType) = await SetupBlockListWithElementType();
+        await AddBlocksPropertyToElementType(elementType);
+
+        Element leafElement = new ElementBuilder()
+            .WithContentType(elementType)
+            .WithName("Leaf element")
+            .Build();
+        leafElement.SetValue("textValue", LeafText);
+        ElementService.Save(leafElement);
+        ElementService.Publish(leafElement, ["*"]);
+
+        Element intermediateElement = new ElementBuilder()
+            .WithContentType(elementType)
+            .WithName("Intermediate element")
+            .Build();
+        intermediateElement.SetValue("textValue", IntermediateText);
+        intermediateElement.SetValue("blocks", JsonSerializer.Serialize(ExternalBlockListValue(leafElement.Key)));
+        ElementService.Save(intermediateElement);
+        ElementService.Publish(intermediateElement, ["*"]);
+
+        Content document = CreatePageWithExternalBlockReference(contentType, intermediateElement.Key);
+        ContentService.Save(document);
+        ContentService.Publish(document, ["*"]);
+
+        AssertPublishedBlocksTextsContain(IntermediateText, LeafText);
+
+        return (document, intermediateElement, leafElement);
+    }
+
+    private void AssertPublishedBlocksTexts(string[] absent, string[] present)
+    {
+        TestIndexDocument publishedDocument = IndexerAndSearcher.Dump(IndexAliases.PublishedContent).Single();
+        IndexValue? publishedValue = publishedDocument.Fields.FirstOrDefault(f => f.FieldName == "blocks")?.Value;
+        Assert.That(publishedValue, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            foreach (var absentText in absent)
+            {
+                CollectionAssert.DoesNotContain(publishedValue.Texts, absentText);
+            }
+
+            foreach (var presentText in present)
+            {
+                CollectionAssert.Contains(publishedValue.Texts, presentText);
+            }
+        });
+    }
+
+    private void AssertPublishedBlocksValueIsNull()
+    {
+        TestIndexDocument publishedDocument = IndexerAndSearcher.Dump(IndexAliases.PublishedContent).Single();
+        IndexValue? publishedValue = publishedDocument.Fields.FirstOrDefault(f => f.FieldName == "blocks")?.Value;
+        Assert.That(publishedValue, Is.Null);
     }
 
     private static BlockListValue ExternalBlockListValue(Guid externalElementKey)
