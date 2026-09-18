@@ -7,7 +7,7 @@ Image processing library using **ImageSharp 4.x** and **ImageSharp.Web** for on-
 ## 1. Architecture
 
 **Type**: Class Library (NuGet Package)
-**Target Framework**: .NET 10.0
+**Target Framework**: .NET 11.0
 **Purpose**: Provide image manipulation via query string parameters
 
 ### Key Technologies

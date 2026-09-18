@@ -113,7 +113,7 @@
       "type": "generated",
       "generator": "switch",
       "datatype": "text",
-      "description": "Used to calculate the dotnet version to use, for latest we want to use dotnet 10 and for LTS we want to use dotnet 10",
+      "description": "Used to calculate the dotnet version to use, for latest we want to use dotnet 11 and for LTS we want to use dotnet 11",
       "replaces": "DOTNET_VERSION_FROM_TEMPLATE",
       "parameters": {
         "evaluator": "C++",
@@ -121,11 +121,11 @@
         "cases": [
           {
             "condition": "(UmbracoRelease == 'Latest')",
-            "value": "net10.0"
+            "value": "net11.0"
           },
           {
             "condition": "(UmbracoRelease == 'LTS')",
-            "value": "net10.0"
+            "value": "net11.0"
           }
         ]
       }
