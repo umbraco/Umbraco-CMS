@@ -45,6 +45,7 @@
     invalidEmail: 'Invalid email',
     emptyManualLinkPicker: 'Please enter an URL or Anchor.',
     needMoreItems: 'This field needs more items',
+    exceedsAllowedAmount: 'This field exceeds the allowed amount of items',
   }
 
   public static readonly inputTypes = {

@@ -128,6 +128,7 @@ test('image count can not be less than min amount set in image media picker', as
 
   // Assert
   await umbracoUi.content.isErrorNotificationVisible();
+  await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.needMoreItems);
 
   // Clean
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
@@ -171,6 +172,7 @@ test.describe('image count exceeds max amount', () => {
 
     // Assert
     await umbracoUi.content.isErrorNotificationVisible();
+    await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.exceedsAllowedAmount);
   });
 });
 

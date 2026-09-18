@@ -59,13 +59,13 @@ test('can see parent of start node but not access it', async ({umbracoApi, umbra
 
   // Act
   await umbracoUi.user.goToSection(ConstantHelper.sections.media, false);
+  await umbracoUi.page.waitForURL('**/section/media/collection');
+  const initialUrl = umbracoUi.page.url();
+  // A folder the user cannot access is rendered disabled and without an href, so clicking it must not navigate.
+  await umbracoUi.media.goToMediaWithName(rootFolderName);
 
   // Assert
   await umbracoUi.media.isMediaTreeItemVisible(rootFolderName);
-  // A folder the user cannot access is rendered disabled and without an href, so clicking it must not navigate.
-  await umbracoUi.page.waitForURL('**/section/media/collection');
-  const initialUrl = umbracoUi.page.url();
-  await umbracoUi.media.goToMediaWithName(rootFolderName);
   expect(umbracoUi.page.url()).toBe(initialUrl);
   await umbracoUi.media.openMediaCaretButtonForName(rootFolderName);
   await umbracoUi.media.isChildMediaVisible(rootFolderName, childFolderOneName);

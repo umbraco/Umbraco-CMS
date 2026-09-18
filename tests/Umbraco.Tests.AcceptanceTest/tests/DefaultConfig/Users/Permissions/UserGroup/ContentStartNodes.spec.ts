@@ -67,12 +67,12 @@ test('can see parent of start node but not access it', async ({umbracoApi, umbra
 
   // Act
   await umbracoUi.userGroup.goToSection(ConstantHelper.sections.content, false);
+  const initialUrl = umbracoUi.page.url();
+  // A node the user cannot access is rendered disabled and without an href, so clicking it must not navigate.
+  await umbracoUi.content.goToContentWithName(rootDocumentName, false);
 
   // Assert
   await umbracoUi.content.isContentInTreeVisible(rootDocumentName);
-  // A node the user cannot access is rendered disabled and without an href, so clicking it must not navigate.
-  const initialUrl = umbracoUi.page.url();
-  await umbracoUi.content.goToContentWithName(rootDocumentName, false);
   expect(umbracoUi.page.url()).toBe(initialUrl);
   await umbracoUi.content.openContentCaretButtonForName(rootDocumentName);
   await umbracoUi.content.isChildContentInTreeVisible(rootDocumentName, childDocumentOneName);
