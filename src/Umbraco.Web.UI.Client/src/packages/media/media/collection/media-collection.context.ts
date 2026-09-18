@@ -4,9 +4,17 @@ import { UMB_MEDIA_GRID_COLLECTION_VIEW_ALIAS } from './views/constants.js';
 import type { UmbMediaCollectionFilterModel, UmbMediaCollectionItemModel } from './types.js';
 import type { UmbFileDropzoneItemStatus } from '@umbraco-cms/backoffice/dropzone';
 import { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
+import type { UmbCollectionConfiguration } from '@umbraco-cms/backoffice/collection';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
+import {
+	UMB_MEDIA_COLLECTION_ORDER_BY_OPTIONS,
+	UmbMediaCollectionSortPreferenceRepository,
+	mergeMediaCollectionSortPreference,
+} from './sort-preference/index.js';
+import type { UmbMediaCollectionOrderByOption } from './sort-preference/types.js';
+
 export class UmbMediaCollectionContext extends UmbDefaultCollectionContext<
 	UmbMediaCollectionItemModel,
 	UmbMediaCollectionFilterModel
@@ -14,14 +22,71 @@ export class UmbMediaCollectionContext extends UmbDefaultCollectionContext<
 	#placeholders = new UmbArrayState<UmbMediaCollectionItemModel>([], (x) => x.unique);
 	public readonly placeholders = this.#placeholders.asObservable();
 
+	#orderByOptions = new UmbArrayState<UmbMediaCollectionOrderByOption>(UMB_MEDIA_COLLECTION_ORDER_BY_OPTIONS, (x) => x.unique);
+	orderByOptions = this.#orderByOptions.asObservable();
+
+	#activeOrderByOption = new UmbStringState<string | undefined>(undefined);
+	activeOrderByOption = this.#activeOrderByOption.asObservable();
+
+	#sortPreferenceRepository = new UmbMediaCollectionSortPreferenceRepository(this);
+	#pendingConfig?: UmbCollectionConfiguration;
+	#preferenceLoaded = false;
+
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_MEDIA_GRID_COLLECTION_VIEW_ALIAS);
+
+		this.#loadSortPreference();
+
+		this.observe(
+			this.filter,
+			(filter) => {
+				const { orderBy, orderDirection } = filter as UmbMediaCollectionFilterModel;
+				const option = this.#orderByOptions
+					.getValue()
+					.find((x) => x.config.orderBy === orderBy && x.config.orderDirection === orderDirection);
+				if (option) {
+					this.#activeOrderByOption.setValue(option.unique);
+				}
+			},
+			null,
+		);
+	}
+
+	async #loadSortPreference() {
+		const { data } = await this.#sortPreferenceRepository.requestPreference();
+		this.#preferenceLoaded = true;
+
+		const config = this.#pendingConfig ?? this.getConfig();
+		if (config) {
+			super.setConfig(mergeMediaCollectionSortPreference(config, data));
+			this.#pendingConfig = undefined;
+		}
+	}
+
+	override setConfig(config: UmbCollectionConfiguration) {
+		if (!this.#preferenceLoaded) {
+			this.#pendingConfig = config;
+			super.setConfig(config);
+			return;
+		}
+
+		this.#sortPreferenceRepository.requestPreference().then(({ data }) => {
+			super.setConfig(mergeMediaCollectionSortPreference(config, data));
+		});
+	}
+
+	setActiveOrderByOption(unique: string) {
+		const option = this.#orderByOptions.getValue().find((x) => x.unique === unique);
+		if (!option) return;
+
+		this.#activeOrderByOption.setValue(unique);
+		this.setFilter({ orderBy: option.config.orderBy, orderDirection: option.config.orderDirection });
+		this.#sortPreferenceRepository.savePreference(option.config);
 	}
 
 	setPlaceholders(partial: Array<{ unique: string; status: UmbFileDropzoneItemStatus; name?: string }>) {
 		const items = this._items.getValue();
 
-		// We do not want to set a placeholder which unique already exists in the collection.
 		const date = new Date();
 		const placeholders: Array<UmbMediaCollectionItemModel> = partial
 			.filter((placeholder) => !items.find((item) => item.unique === placeholder.unique))
