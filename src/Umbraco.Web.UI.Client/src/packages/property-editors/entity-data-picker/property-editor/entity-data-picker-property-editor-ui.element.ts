@@ -202,6 +202,7 @@ export class UmbEntityDataPickerPropertyEditorUIElement
 
 	override render() {
 		return html`<umb-input-entity-data
+			.pickerAlias=${this._dataSourceAlias}
 			.selection=${this.value?.ids ?? []}
 			.dataSourceApi=${this._dataSourceApi}
 			.dataSourceConfig=${this._dataSourceConfig}

@@ -21,6 +21,10 @@ import { UmbModalRouteRegistrationController, type UmbModalRouteSetupReturn } fr
 import { UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 
+// The unique-path key used to disambiguate a picker's modal route by setUniquePathSegment. Kept as
+// a constant so a caller can never accidentally collide with it via its own addUniquePaths() call.
+const PICKER_ALIAS_PATH_KEY = 'pickerAlias';
+
 export class UmbPickerInputContext<
 	PickedItemType extends UmbItemModel = UmbItemModel,
 	PickerItemType extends UmbItemModel = UmbItemModel,
@@ -131,6 +135,37 @@ export class UmbPickerInputContext<
 		}
 	}
 
+	#uniquePathSegment?: string;
+
+	/**
+	 * Sets a path segment that makes this picker's modal route unique among other pickers registered under the same
+	 * modal alias in the same routing scope. Without one, two pickers sharing a modal alias (for example, two
+	 * different tree-backed pickers rendered outside of `umb-property`) would register the exact same route, and
+	 * whichever registered first would answer for both.
+	 *
+	 * This disambiguates by picker *kind* (what the picker picks), not by instance: two pickers given the *same*
+	 * segment, rendered together outside `umb-property`, still collide. A caller that can render more than one
+	 * instance of the same kind side by side must scope its own route addendum instead, the same way `umb-property`
+	 * already does per property alias.
+	 * @param {string | undefined} pathSegment A path segment identifying what this picker picks, e.g. a data source alias.
+	 * @memberof UmbPickerInputContext
+	 */
+	setUniquePathSegment(pathSegment: string | undefined) {
+		this.#uniquePathSegment = pathSegment;
+		if (this.#modalRouteRegistered) {
+			this.#createPickerModalRoute();
+		}
+	}
+
+	/**
+	 * Gets the unique path segment used to disambiguate this picker's modal route.
+	 * @returns {string | undefined} The path segment.
+	 * @memberof UmbPickerInputContext
+	 */
+	getUniquePathSegment(): string | undefined {
+		return this.#uniquePathSegment;
+	}
+
 	/**
 	 * Gets the modal alias/token used for the picker modal.
 	 * @returns {string | UmbModalToken<UmbPickerModalData<PickerItemType>, PickerModalValueType>} The modal alias or token.
@@ -209,12 +244,21 @@ export class UmbPickerInputContext<
 	>;
 
 	#createPickerModalRoute() {
+		this.#pickerModalRouteRegistration?.destroy();
+
 		if (!this.modalAlias) {
-			this.#pickerModalRouteRegistration?.destroy();
 			return;
 		}
 
-		this.#pickerModalRouteRegistration = new UmbModalRouteRegistrationController(this, this.modalAlias)
+		this.#pickerModalRouteRegistration = new UmbModalRouteRegistrationController(this, this.modalAlias);
+
+		if (this.#uniquePathSegment) {
+			this.#pickerModalRouteRegistration
+				.addUniquePaths([PICKER_ALIAS_PATH_KEY])
+				.setUniquePathValue(PICKER_ALIAS_PATH_KEY, this.#uniquePathSegment);
+		}
+
+		this.#pickerModalRouteRegistration
 			.onSetup(() => {
 				return {
 					data: this.#getPickerModalDataArgs(),

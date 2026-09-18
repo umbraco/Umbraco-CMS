@@ -49,6 +49,7 @@ export class UmbInputExtensionElement extends UmbFormControlMixin<string | undef
 
 	override render() {
 		return html`<umb-input-entity-data
+			picker-alias="extension"
 			.dataSourceApi=${this.#dataSource}
 			.dataSourceConfig=${this.#dataSourceConfig}
 			.value=${this.value}

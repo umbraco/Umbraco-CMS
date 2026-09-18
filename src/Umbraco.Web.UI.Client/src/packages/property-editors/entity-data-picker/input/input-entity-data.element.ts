@@ -63,6 +63,24 @@ export class UmbInputEntityDataElement extends UmbFormControlMixin<string | unde
 	}
 
 	/**
+	 * A path segment identifying what this picker picks, e.g. a data source alias. Disambiguates this picker's modal
+	 * route from another entity-data picker rendered in the same scope, so it does not open the wrong tree.
+	 *
+	 * This disambiguates by picker kind, not by instance: two pickers given the same value, rendered together
+	 * outside `umb-property`, still collide. A view that renders more than one of the same kind side by side must
+	 * scope its own route addendum instead, the same way `umb-property` already does per property alias.
+	 * @type {string}
+	 * @attr picker-alias
+	 */
+	@property({ type: String, attribute: 'picker-alias' })
+	public set pickerAlias(value: string | undefined) {
+		this.#pickerInputContext.setUniquePathSegment(value);
+	}
+	public get pickerAlias(): string | undefined {
+		return this.#pickerInputContext.getUniquePathSegment();
+	}
+
+	/**
 	 * This is a minimum amount of selected items in this input.
 	 * @type {number}
 	 * @attr
