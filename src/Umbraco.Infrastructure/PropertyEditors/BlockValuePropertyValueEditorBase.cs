@@ -708,9 +708,12 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
     {
         var changedCultures = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-        CollectChangedCultures(sourceBlockValue?.ContentData ?? [], targetBlockValue?.ContentData ?? [], defaultCulture, changedCultures);
-        CollectChangedCultures(sourceBlockValue?.SettingsData ?? [], targetBlockValue?.SettingsData ?? [], defaultCulture, changedCultures);
-        CollectChangedExposureCultures(sourceBlockValue?.Expose ?? [], targetBlockValue?.Expose ?? [], defaultCulture, changedCultures);
+        IList<BlockItemVariation> sourceExpose = sourceBlockValue?.Expose ?? [];
+        IList<BlockItemVariation> targetExpose = targetBlockValue?.Expose ?? [];
+
+        CollectChangedCultures(sourceBlockValue?.ContentData ?? [], targetBlockValue?.ContentData ?? [], sourceExpose, targetExpose, defaultCulture, changedCultures);
+        CollectChangedCultures(sourceBlockValue?.SettingsData ?? [], targetBlockValue?.SettingsData ?? [], sourceExpose, targetExpose, defaultCulture, changedCultures);
+        CollectChangedExposureCultures(sourceExpose, targetExpose, defaultCulture, changedCultures);
 
         return changedCultures;
     }
@@ -757,6 +760,8 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
     private void CollectChangedCultures(
         List<BlockItemData> sourceBlockItems,
         List<BlockItemData> targetBlockItems,
+        IList<BlockItemVariation> sourceExpose,
+        IList<BlockItemVariation> targetExpose,
         string defaultCulture,
         HashSet<string> changedCultures)
     {
@@ -764,7 +769,9 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
         Dictionary<Guid, BlockItemData> targetBlockItemsByKey = ToBlockItemsByKey(targetBlockItems);
 
         // blocks removed entirely (present in published, gone from edited): every value they held is an edit
-        // for its own culture (its removal is the change).
+        // for its own culture. A value that is itself culture-invariant is only ever rendered for the
+        // cultures the block was exposed to - not to every culture - so it's attributed to those instead of
+        // the default culture.
         foreach (BlockItemData targetBlockItem in targetBlockItems)
         {
             if (sourceBlockItemsByKey.ContainsKey(targetBlockItem.Key))
@@ -774,7 +781,7 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
 
             foreach (BlockPropertyValue targetBlockPropertyValue in targetBlockItem.Values)
             {
-                changedCultures.Add(targetBlockPropertyValue.Culture ?? defaultCulture);
+                AddCultureForRemovedOrAddedBlockValue(targetBlockPropertyValue.Culture, targetBlockItem.Key, targetExpose, defaultCulture, changedCultures);
             }
         }
 
@@ -782,10 +789,11 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
         {
             if (targetBlockItemsByKey.TryGetValue(sourceBlockItem.Key, out BlockItemData? targetBlockItem) is false)
             {
-                // block newly added in the edited value: every value it holds is an edit for its own culture.
+                // block newly added in the edited value: every value it holds is an edit for its own culture,
+                // with culture-invariant values attributed to the block's exposed cultures (see above).
                 foreach (BlockPropertyValue sourceBlockPropertyValue in sourceBlockItem.Values)
                 {
-                    changedCultures.Add(sourceBlockPropertyValue.Culture ?? defaultCulture);
+                    AddCultureForRemovedOrAddedBlockValue(sourceBlockPropertyValue.Culture, sourceBlockItem.Key, sourceExpose, defaultCulture, changedCultures);
                 }
 
                 continue;
@@ -879,6 +887,41 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
 
         static (string Alias, string? Culture, string? Segment) ToKey(BlockPropertyValue value) =>
             (value.Alias, value.Culture, value.Segment);
+    }
+
+    /// <summary>
+    /// Attributes a value belonging to a wholly added or removed block to a culture. A culture-variant value is
+    /// attributed to its own culture directly. A culture-invariant value is attributed to whichever culture(s)
+    /// the block itself was exposed to - since a block only ever renders for its exposed cultures, an invariant
+    /// value inside it is never actually "visible" for anything else - falling back to
+    /// <paramref name="defaultCulture"/> only when the block carries no culture-specific exposure at all.
+    /// </summary>
+    private static void AddCultureForRemovedOrAddedBlockValue(
+        string? valueCulture,
+        Guid blockKey,
+        IList<BlockItemVariation> expose,
+        string defaultCulture,
+        HashSet<string> changedCultures)
+    {
+        if (valueCulture is not null)
+        {
+            changedCultures.Add(valueCulture);
+            return;
+        }
+
+        var exposedCultures = expose
+            .Where(variation => variation.ContentKey == blockKey && variation.Culture is not null)
+            .Select(variation => variation.Culture!)
+            .ToArray();
+
+        if (exposedCultures.Length > 0)
+        {
+            changedCultures.UnionWith(exposedCultures);
+        }
+        else
+        {
+            changedCultures.Add(defaultCulture);
+        }
     }
 
     private bool BlockPropertyValuesAreEqual(object? sourceValue, object? targetValue)

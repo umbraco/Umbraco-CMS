@@ -123,12 +123,89 @@ internal sealed class PropertyFactoryTests
         Assert.IsNull(editedCultures);
     }
 
-    private static IPropertyType CreatePropertyType(string alias, ContentVariation variations)
-        => new PropertyTypeBuilder()
+    [Test]
+    public void BuildDtos_InvariantEditWithGranularCultureReporting_TracksReportedCulturesOnly()
+    {
+        const string editorAlias = "test.blockLevelVariance";
+        IPropertyType invariantType = CreatePropertyType("invariantProp", ContentVariation.Nothing, editorAlias);
+
+        IProperty[] properties =
+        {
+            CreateProperty(1, invariantType, culture: null, published: "old", edited: "new"),
+        };
+
+        var dataEditorMock = new Mock<IDataEditor>();
+        dataEditorMock.Setup(x => x.Alias).Returns(editorAlias);
+        dataEditorMock.Setup(x => x.CanMergePartialPropertyValues(invariantType)).Returns(true);
+        dataEditorMock
+            .Setup(x => x.GetChangedCulturesForPartialPropertyValues("new", "old", Constants.System.InvariantCulture))
+            .Returns(["fr-FR", Constants.System.InvariantCulture]);
+
+        PropertyFactory.BuildDtos(
+            ContentVariation.Culture,
+            currentVersionId: 2,
+            publishedVersionId: 1,
+            properties,
+            CreateLanguageRepository(),
+            CreatePropertyEditorCollection(dataEditorMock.Object),
+            out var edited,
+            out HashSet<string>? editedCultures);
+
+        Assert.IsTrue(edited);
+        Assert.IsNotNull(editedCultures);
+        Assert.IsTrue(editedCultures!.Contains("fr-FR"));
+        Assert.IsTrue(editedCultures.Contains(Constants.System.InvariantCulture));
+        Assert.AreEqual(2, editedCultures.Count);
+    }
+
+    [Test]
+    public void BuildDtos_InvariantEditWithGranularReportingReturningNoCultures_FallsBackToInvariantSentinel()
+    {
+        const string editorAlias = "test.blockLevelVariance";
+        IPropertyType invariantType = CreatePropertyType("invariantProp", ContentVariation.Nothing, editorAlias);
+
+        IProperty[] properties =
+        {
+            CreateProperty(1, invariantType, culture: null, published: "old", edited: "new"),
+        };
+
+        var dataEditorMock = new Mock<IDataEditor>();
+        dataEditorMock.Setup(x => x.Alias).Returns(editorAlias);
+        dataEditorMock.Setup(x => x.CanMergePartialPropertyValues(invariantType)).Returns(true);
+        dataEditorMock
+            .Setup(x => x.GetChangedCulturesForPartialPropertyValues("new", "old", Constants.System.InvariantCulture))
+            .Returns([]);
+
+        PropertyFactory.BuildDtos(
+            ContentVariation.Culture,
+            currentVersionId: 2,
+            publishedVersionId: 1,
+            properties,
+            CreateLanguageRepository(),
+            CreatePropertyEditorCollection(dataEditorMock.Object),
+            out var edited,
+            out HashSet<string>? editedCultures);
+
+        Assert.IsTrue(edited);
+        Assert.IsNotNull(editedCultures);
+        Assert.IsTrue(editedCultures!.Contains(Constants.System.InvariantCulture));
+        Assert.AreEqual(1, editedCultures.Count);
+    }
+
+    private static IPropertyType CreatePropertyType(string alias, ContentVariation variations, string? propertyEditorAlias = null)
+    {
+        PropertyTypeBuilder<NullPropertyTypeBuilderParent> builder = new PropertyTypeBuilder()
             .WithAlias(alias)
             .WithSupportsPublishing(true)
-            .WithVariations(variations)
-            .Build();
+            .WithVariations(variations);
+
+        if (propertyEditorAlias is not null)
+        {
+            builder = builder.WithPropertyEditorAlias(propertyEditorAlias);
+        }
+
+        return builder.Build();
+    }
 
     private static IProperty CreateProperty(int id, IPropertyType propertyType, string? culture, object? published, object? edited)
         => Property.CreateWithValues(
