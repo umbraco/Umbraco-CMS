@@ -82,6 +82,12 @@ export class UmbDefaultCollectionContext<
 	protected _selectOnly = new UmbBooleanState(undefined);
 	public readonly selectOnly = this._selectOnly.asObservable();
 
+	#hideItemActions = new UmbBooleanState(false);
+	public readonly hideItemActions = this.#hideItemActions.asObservable();
+
+	#hideCollectionActions = new UmbBooleanState(false);
+	public readonly hideCollectionActions = this.#hideCollectionActions.asObservable();
+
 	#workspacePathBuilder = new UmbBasicState<UmbModalRouteBuilder | undefined>(undefined);
 	public readonly workspacePathBuilder = this.#workspacePathBuilder.asObservable();
 
@@ -201,6 +207,8 @@ export class UmbDefaultCollectionContext<
 		if (!this.#config) return;
 
 		this.#configureSelection();
+		this.#hideItemActions.setValue(this.#config.hideItemActions ?? false);
+		this.#hideCollectionActions.setValue(this.#config.hideCollectionActions ?? false);
 		this.bulkAction.setConfig(this.#config.bulkActionConfiguration);
 
 		// Observe bulk actions to enable selection when bulk actions are available
