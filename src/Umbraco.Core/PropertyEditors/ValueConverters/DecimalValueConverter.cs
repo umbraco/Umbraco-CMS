@@ -47,7 +47,7 @@ public class DecimalValueConverter : PropertyValueConverterBase
         // is it a double?
         if (source is double sourceDouble)
         {
-            return sourceDouble.ToRoundTripDecimal();
+            return sourceDouble.ToShortestDecimal();
         }
 
         // is it an integer?

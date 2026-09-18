@@ -98,7 +98,7 @@ public class LabelValueConverter : PropertyValueConverterBase
 
                 if (source is double sourceDouble)
                 {
-                    return sourceDouble.ToRoundTripDecimal();
+                    return sourceDouble.ToShortestDecimal();
                 }
 
                 return 0M;

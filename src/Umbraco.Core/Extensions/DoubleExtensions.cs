@@ -20,7 +20,7 @@ public static class DoubleExtensions
     ///     is the intended one.
     /// </remarks>
     /// <exception cref="OverflowException">The value is not finite or is outside the range of <see cref="decimal" />.</exception>
-    public static decimal ToRoundTripDecimal(this double value)
+    public static decimal ToShortestDecimal(this double value)
     {
         if (double.IsFinite(value) is false)
         {
@@ -30,8 +30,8 @@ public static class DoubleExtensions
         return decimal.Parse(value.ToString("R", CultureInfo.InvariantCulture), NumberStyles.Float, CultureInfo.InvariantCulture);
     }
 
-    /// <inheritdoc cref="ToRoundTripDecimal(double)" />
-    public static decimal ToRoundTripDecimal(this float value)
+    /// <inheritdoc cref="ToShortestDecimal(double)" />
+    public static decimal ToShortestDecimal(this float value)
     {
         if (float.IsFinite(value) is false)
         {
