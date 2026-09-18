@@ -7,7 +7,7 @@ import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbBooleanState, UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
-import { UMB_WORKSPACE_EDIT_PATH_PATTERN } from '@umbraco-cms/backoffice/workspace';
+import { UMB_WORKSPACE_EDIT_PATH_PATTERN, UMB_WORKSPACE_PATH_PATTERN } from '@umbraco-cms/backoffice/workspace';
 import { debounce, UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import { UmbEntityContext, UmbParentEntityContext } from '@umbraco-cms/backoffice/entity';
 import { UMB_SECTION_CONTEXT } from '@umbraco-cms/backoffice/section';
@@ -347,10 +347,16 @@ export abstract class UmbTreeItemApiContextBase<
 	}
 
 	constructPath(pathname: string, entityType: string, unique: string | null): string {
+		// A `null` unique means this tree item is the tree's root pseudo-entity, not a real, persisted item — it
+		// has no `edit/:unique` page of its own, so link to the workspace's bare path instead.
+		if (unique === null) {
+			return UMB_WORKSPACE_PATH_PATTERN.generateAbsolute({ sectionName: pathname, entityType });
+		}
+
 		return UMB_WORKSPACE_EDIT_PATH_PATTERN.generateAbsolute({
 			sectionName: pathname,
 			entityType,
-			unique: unique ?? 'null',
+			unique,
 		});
 	}
 }

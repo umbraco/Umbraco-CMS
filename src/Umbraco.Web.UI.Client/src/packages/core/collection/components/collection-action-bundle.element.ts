@@ -10,6 +10,9 @@ export class UmbCollectionActionBundleElement extends UmbLitElement {
 	constructor() {
 		super();
 
+		/**
+		 * We observe hideCollectionActions until we have conditions on Collection Actions. To avoid Action appearing in modals, later we will make it possible and remove this. [NL]
+		 */
 		this.consumeContext(UMB_COLLECTION_CONTEXT, (context) => {
 			this.observe(
 				context?.hideCollectionActions,
