@@ -950,6 +950,15 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
                 CopyTagData(null, defaultLanguageId, propertyTypeIds, impactedIds);
                 RenormalizeDocumentEditedFlags(propertyTypeIds, impactedDocumentIds);
                 RenormalizeElementEditedFlags(propertyTypeIds, impactedElementIds);
+
+                // The property types in this grouping just stopped being invariant, so RenormalizeEditedFlags
+                // above never re-evaluates InvariantEdited for them (it only recomputes InvariantEdited for
+                // properties that are *currently* invariant). Any content type left with no other invariant,
+                // publishable property type can only have a stale InvariantEdited value at this point - clear it.
+                ClearStaleInvariantEditedFlags<DocumentVersionDto, DocumentDto>(
+                    GetContentTypeIdsWithNoRemainingInvariantProperties(propertyTypeIds, impactedByIsElement[false]));
+                ClearStaleInvariantEditedFlags<ElementVersionDto, ElementDto>(
+                    GetContentTypeIdsWithNoRemainingInvariantProperties(propertyTypeIds, impactedByIsElement[true]));
             }
             else if (fromCultureEnabled && !toCultureEnabled)
             {
@@ -960,6 +969,55 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
                 RenormalizeElementEditedFlags(propertyTypeIds, impactedElementIds);
             }
         }
+    }
+
+    /// <summary>
+    ///     Gets the IDs of the content types in <paramref name="contentTypes"/> that, once the property types in
+    ///     <paramref name="propertyTypeIds"/> are excluded, have no remaining invariant, publishable property type.
+    /// </summary>
+    /// <remarks>
+    ///     Used after a property type stops being invariant: for such a content type, nothing can still be
+    ///     contributing to <see cref="IPublishableContentDto{TContentVersionDto}.InvariantEdited"/>, so any
+    ///     existing <c>true</c> value left over from before the change is necessarily stale.
+    /// </remarks>
+    private static List<int> GetContentTypeIdsWithNoRemainingInvariantProperties(
+        IReadOnlyCollection<int> propertyTypeIds,
+        IEnumerable<IContentTypeComposition> contentTypes)
+        => contentTypes
+            .Where(contentType => contentType.CompositionPropertyTypes.Any(propertyType =>
+                propertyType.SupportsPublishing
+                && propertyType.VariesByCulture() is false
+                && propertyTypeIds.Contains(propertyType.Id) is false) is false)
+            .Select(contentType => contentType.Id)
+            .ToList();
+
+    /// <summary>
+    ///     Forces <see cref="IPublishableContentDto{TContentVersionDto}.InvariantEdited"/> to <c>false</c> for every
+    ///     node of the given content types.
+    /// </summary>
+    /// <remarks>
+    ///     Only call this for content types that are known to have no remaining invariant, publishable property
+    ///     type - see <see cref="GetContentTypeIdsWithNoRemainingInvariantProperties"/>.
+    /// </remarks>
+    private void ClearStaleInvariantEditedFlags<TContentVersionDto, TContentDto>(IReadOnlyCollection<int> contentTypeIds)
+        where TContentVersionDto : class, IContentVersionDto
+        where TContentDto : class, IPublishableContentDto<TContentVersionDto>
+    {
+        if (contentTypeIds.Count == 0)
+        {
+            return;
+        }
+
+        Sql<ISqlContext> nodeIdsForContentTypes = Sql()
+            .Select<ContentDto>(x => x.NodeId)
+            .From<ContentDto>()
+            .WhereIn<ContentDto>(x => x.ContentTypeId, contentTypeIds);
+
+        Database.Execute(Sql()
+            .Update<TContentDto>(u => u.Set(x => x.InvariantEdited, false))
+            .WhereIn(
+                (Expression<Func<TContentDto, object?>>)(x => x.NodeId),
+                nodeIdsForContentTypes));
     }
 
     /// <summary>
