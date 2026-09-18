@@ -251,6 +251,16 @@ export default class UmbAuthElement extends UmbLitElement {
 	}
 
 	async firstUpdated() {
+		// A server redirect (e.g. from an external login provider that still requires a second factor)
+		// can land here with `?flow=mfa` on a fresh page load, where `isMfaEnabled` hasn't been set by a
+		// same-page login() call. Resolve it from the pending two-factor cookie before rendering settles,
+		// the same way login() would have populated it from a 402 response.
+		const searchParams = new URLSearchParams(window.location.search);
+		if (searchParams.get('flow')?.toLowerCase() === 'mfa' && !this.#authContext.isMfaEnabled) {
+			await this.#authContext.loadPendingTwoFactorInfo();
+			this.requestUpdate();
+		}
+
 		// Bind the (slim) Backoffice controller to this element so that we can use utilities from the Backoffice app.
 		await new UmbSlimBackofficeController(this).register(this);
 
@@ -369,6 +379,15 @@ export default class UmbAuthElement extends UmbLitElement {
 	}
 
 	private _renderFlowAndStatus() {
+		const searchParams = new URLSearchParams(window.location.search);
+		let flow = this.flow || searchParams.get('flow')?.toLowerCase();
+
+		// A pending MFA sign-in (e.g. continuing after an external login provider) must still be
+		// completable even when local username/password login is disabled - the two are unrelated.
+		if (flow === 'mfa' && this.#authContext.isMfaEnabled) {
+			return html` <umb-mfa-page></umb-mfa-page>`;
+		}
+
 		if (this.disableLocalLogin) {
 			return html`
 				<umb-error-layout no-back-link>
@@ -380,8 +399,6 @@ export default class UmbAuthElement extends UmbLitElement {
 			`;
 		}
 
-		const searchParams = new URLSearchParams(window.location.search);
-		let flow = this.flow || searchParams.get('flow')?.toLowerCase();
 		const status = searchParams.get('status');
 
 		if (status === 'resetCodeExpired') {
@@ -393,16 +410,12 @@ export default class UmbAuthElement extends UmbLitElement {
 			</umb-error-layout>`;
 		}
 
-		// validate
-		if (flow) {
-			if (flow === 'mfa' && !this.#authContext.isMfaEnabled) {
-				flow = undefined;
-			}
+		// Reaching here with flow 'mfa' means it wasn't enabled above - fall through to the default login page.
+		if (flow === 'mfa') {
+			flow = undefined;
 		}
 
 		switch (flow) {
-			case 'mfa':
-				return html` <umb-mfa-page></umb-mfa-page>`;
 			case 'reset':
 				return html` <umb-reset-password-page></umb-reset-password-page>`;
 			case 'reset-password':
