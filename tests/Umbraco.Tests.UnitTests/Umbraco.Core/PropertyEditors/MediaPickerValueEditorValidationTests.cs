@@ -1,4 +1,4 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
@@ -16,7 +16,7 @@ using Umbraco.Cms.Infrastructure.Serialization;
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
 
 [TestFixture]
-internal class MediaPicker3ValueEditorValidationTests
+internal class MediaPickerValueEditorValidationTests
 {
     [TestCase(true, true)]
     [TestCase(false, false)]
@@ -184,7 +184,7 @@ internal class MediaPicker3ValueEditorValidationTests
         var mediaTypeKey = Guid.NewGuid();
         const string mediaTypeAlias = "Alias";
 
-        valueEditor.ConfigurationObject = new MediaPicker3Configuration { Multiple = true, Filter = $"{mediaTypeKey}" };
+        valueEditor.ConfigurationObject = new MediaPicker3Configuration { Filter = $"{mediaTypeKey}" };
 
         var mediaTypeMock = new Mock<IMediaType>();
         mediaTypeMock.Setup(x => x.Key).Returns(mediaTypeKey);
@@ -207,11 +207,13 @@ internal class MediaPicker3ValueEditorValidationTests
     [TestCase("[ {\n  \" key\" : \"20266ebe-1f7e-4cf3-a694-7a5fb210223b\",\n  \"mediaKey\" : \"7AD39018-0920-4818-89D3-26F47DBCE62E\",\n  \"mediaTypeAlias\" : \"\",\n  \"crops\" : [ ],\n  \"focalPoint\" : null\n}, {\n  \" key\" : \"1C70519E-C3AE-4D45-8E48-30B3D02E455E\",\n  \"mediaKey\" : \"E243A7E2-8D2E-4DC9-88FB-822350A40142\",\n  \"mediaTypeAlias\" : \"\",\n  \"crops\" : [ ],\n  \"focalPoint\" : null\n} ]", true, true)]
     [TestCase("[]", true, true)]
     [TestCase("[]", false, true)]
-    public void Validates_Multiple(string value, bool multiple, bool succeed)
+    public void Validates_The_Number_Of_Items_The_Editor_Holds(string value, bool multiple, bool succeed)
     {
         var (valueEditor, mediaTypeServiceMock, _, mediaNavigationQueryServiceMock) = CreateValueEditor();
 
-        valueEditor.ConfigurationObject = new MediaPicker3Configuration() { Multiple = multiple };
+        valueEditor.ConfigurationObject = multiple
+            ? new MediaPicker3Configuration()
+            : new SingleMediaPickerConfiguration();
 
         var result = valueEditor.Validate(value, false, null, PropertyValidationContext.Empty());
         ValidateResult(succeed, result);
@@ -227,7 +229,7 @@ internal class MediaPicker3ValueEditorValidationTests
     {
         var (valueEditor, mediaTypeServiceMock, _, mediaNavigationQueryServiceMock) = CreateValueEditor();
 
-        valueEditor.ConfigurationObject = new MediaPicker3Configuration() { Multiple = true, ValidationLimit = new MediaPicker3Configuration.NumberRange { Min = min } };
+        valueEditor.ConfigurationObject = new MediaPicker3Configuration { ValidationLimit = new MediaPicker3Configuration.NumberRange { Min = min } };
 
         var result = valueEditor.Validate(value, false, null, PropertyValidationContext.Empty());
 
@@ -245,7 +247,7 @@ internal class MediaPicker3ValueEditorValidationTests
     {
         var (valueEditor, mediaTypeServiceMock, _, mediaNavigationQueryServiceMock) = CreateValueEditor();
 
-        valueEditor.ConfigurationObject = new MediaPicker3Configuration() { Multiple = true, ValidationLimit = new MediaPicker3Configuration.NumberRange { Max = max } };
+        valueEditor.ConfigurationObject = new MediaPicker3Configuration { ValidationLimit = new MediaPicker3Configuration.NumberRange { Max = max } };
 
         var result = valueEditor.Validate(value, false, null, PropertyValidationContext.Empty());
         ValidateResult(succeed, result);
@@ -263,12 +265,12 @@ internal class MediaPicker3ValueEditorValidationTests
         }
     }
 
-    private static (MediaPicker3PropertyEditor.MediaPicker3PropertyValueEditor ValueEditor, Mock<IMediaTypeService> MediaTypeServiceMock, Mock<IMediaService> MediaServiceMock, Mock<IMediaNavigationQueryService> MediaNavigationQueryServiceMock) CreateValueEditor()
+    private static (MediaPickerPropertyEditorBase.MediaPickerPropertyValueEditor ValueEditor, Mock<IMediaTypeService> MediaTypeServiceMock, Mock<IMediaService> MediaServiceMock, Mock<IMediaNavigationQueryService> MediaNavigationQueryServiceMock) CreateValueEditor()
     {
         var mediaTypeServiceMock = new Mock<IMediaTypeService>();
         var mediaServiceMock = new Mock<IMediaService>();
         var mediaNavigationQueryServiceMock = new Mock<IMediaNavigationQueryService>();
-        var valueEditor = new MediaPicker3PropertyEditor.MediaPicker3PropertyValueEditor(
+        var valueEditor = new MediaPickerPropertyEditorBase.MediaPickerPropertyValueEditor(
             Mock.Of<IShortStringHelper>(),
             new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory()),
             Mock.Of<IIOHelper>(),

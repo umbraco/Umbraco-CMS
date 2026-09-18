@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
@@ -250,7 +250,7 @@ public class InvariantSortingTests : SearcherTestBase
             .AddPropertyType()
             .WithAlias("dropDown")
             .WithDataTypeId(Constants.DataTypes.DropDownSingle)
-            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.DropDownListFlexible)
+            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.MultipleDropDown)
             .Done()
             .Build();
         await ContentTypeService.CreateAsync(ContentType, Constants.Security.SuperUserKey);

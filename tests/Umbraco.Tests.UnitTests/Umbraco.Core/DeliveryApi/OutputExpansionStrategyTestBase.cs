@@ -1,4 +1,4 @@
-using Moq;
+﻿using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
@@ -402,7 +402,7 @@ public abstract class OutputExpansionStrategyTestBase : PropertyValueConverterTe
         var serializer = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
         var value = serializer.Serialize(new[]
         {
-            new MediaPicker3PropertyEditor.MediaPicker3PropertyValueEditor.MediaWithCropsDto
+            new MediaPickerPropertyEditorBase.MediaPickerPropertyValueEditor.MediaWithCropsDto
             {
                 MediaKey = pickedMediaKey
             }

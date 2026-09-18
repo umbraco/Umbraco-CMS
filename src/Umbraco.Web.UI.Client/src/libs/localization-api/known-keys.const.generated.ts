@@ -1739,6 +1739,7 @@ export const KNOWN_LOCALIZATION_KEYS: readonly UmbKnownLocalizationKey[] = [
 	'prompt_unsavedChangesWarning',
 	'propertyActions_tooltipForPropertyActionsMenu',
 	'propertyActions_tooltipForPropertyActionsMenuClose',
+	'propertyEditorPicker_deprecatedLabel',
 	'propertyEditorPicker_openPropertyEditorPicker',
 	'propertyEditorPicker_selectAction',
 	'propertyEditorPicker_title',

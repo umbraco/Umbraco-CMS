@@ -58,7 +58,7 @@ public class SliderPropertyValueEditorTests
     [TestCase("123.45", 123.45)]
     public void Can_Parse_Single_Value_To_Editor(string value, decimal expected)
     {
-        var toEditor = ToEditor(value) as SliderPropertyEditor.SliderPropertyValueEditor.SliderRange;
+        var toEditor = ToEditor(value) as SliderPropertyEditorBase.SliderPropertyValueEditor.SliderRange;
         Assert.IsNotNull(toEditor);
         Assert.AreEqual(toEditor.From, expected);
         Assert.AreEqual(toEditor.To, expected);
@@ -73,7 +73,7 @@ public class SliderPropertyValueEditorTests
     [TestCase("10.45,15.3", 10.45, 15.3)]
     public void Can_Parse_Range_Value_To_Editor(string value, decimal expectedFrom, decimal expectedTo)
     {
-        var toEditor = ToEditor(value) as SliderPropertyEditor.SliderPropertyValueEditor.SliderRange;
+        var toEditor = ToEditor(value) as SliderPropertyEditorBase.SliderPropertyValueEditor.SliderRange;
         Assert.IsNotNull(toEditor);
         Assert.AreEqual(toEditor.From, expectedFrom);
         Assert.AreEqual(toEditor.To, expectedTo);
@@ -320,7 +320,7 @@ public class SliderPropertyValueEditorTests
         }
     }
 
-    private static SliderPropertyEditor.SliderPropertyValueEditor CreateValueEditor(bool enableRange = true, decimal step = 0.2m, decimal minimumRange = 0m)
+    private static SliderPropertyEditorBase.SliderPropertyValueEditor CreateValueEditor(bool enableRange = true, decimal step = 0.2m, decimal minimumRange = 0m)
     {
         var localizedTextServiceMock = new Mock<ILocalizedTextService>();
         localizedTextServiceMock.Setup(x => x.Localize(
@@ -329,21 +329,28 @@ public class SliderPropertyValueEditorTests
                 It.IsAny<CultureInfo>(),
                 It.IsAny<IDictionary<string, string>>()))
             .Returns((string key, string alias, CultureInfo culture, IDictionary<string, string> args) => $"{key}_{alias}");
-        return new SliderPropertyEditor.SliderPropertyValueEditor(
+        return new SliderPropertyEditorBase.SliderPropertyValueEditor(
             Mock.Of<IShortStringHelper>(),
             new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory()),
             Mock.Of<IIOHelper>(),
             new DataEditorAttribute("alias"),
             localizedTextServiceMock.Object)
         {
-            ConfigurationObject = new SliderConfiguration
-            {
-                EnableRange = enableRange,
-                MinimumValue = 1.1m,
-                MaximumValue = 1.9m,
-                Step = step,
-                MinimumRange = minimumRange,
-            },
+            // The editor that holds a range is identified by its own configuration type, not by a flag.
+            ConfigurationObject = enableRange
+                ? new RangeSliderConfiguration
+                {
+                    MinimumValue = 1.1m,
+                    MaximumValue = 1.9m,
+                    Step = step,
+                    MinimumRange = minimumRange,
+                }
+                : new SliderConfiguration
+                {
+                    MinimumValue = 1.1m,
+                    MaximumValue = 1.9m,
+                    Step = step,
+                },
         };
     }
 }

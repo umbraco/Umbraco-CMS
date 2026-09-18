@@ -49,6 +49,11 @@ export interface MetaPropertyEditorUi {
 	 * @example ["text", "input", "string"]
 	 */
 	keywords?: string[];
+	/**
+	 * Mark a Property Editor as `deprecated` when it should no longer be possible to create new DataTypes that use it.
+	 * @default false
+	 */
+	deprecated?: boolean;
 }
 
 // Model

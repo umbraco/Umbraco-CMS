@@ -1,7 +1,9 @@
 import {DataTypeBuilder} from './dataTypeBuilder';
 
+// There is one label editor per type of value it holds, so the type is chosen by targeting an editor
+// rather than by configuring a value type.
 export class LabelDataTypeBuilder extends DataTypeBuilder {
-  umbracoDataValueType: string;
+  labelTemplate: string;
 
   constructor() {
     super();
@@ -9,17 +11,23 @@ export class LabelDataTypeBuilder extends DataTypeBuilder {
     this.editorUiAlias = 'Umb.PropertyEditorUi.Label';
   }
 
-  withDataValueType(umbracoDataValueType: string) {
-    this.umbracoDataValueType = umbracoDataValueType;
+  withEditor(editorAlias: string, editorUiAlias: string) {
+    this.editorAlias = editorAlias;
+    this.editorUiAlias = editorUiAlias;
+    return this;
+  }
+
+  withLabelTemplate(labelTemplate: string) {
+    this.labelTemplate = labelTemplate;
     return this;
   }
 
   getValues() {
     let values: any = [];
-    if (this.umbracoDataValueType !== undefined) {
+    if (this.labelTemplate !== undefined) {
       values.push({
-        alias: 'umbracoDataValueType',
-        value: this.umbracoDataValueType
+        alias: 'labelTemplate',
+        value: this.labelTemplate
       });
     }
     return values;

@@ -57,6 +57,28 @@ public class DefaultPropertyValueConverterShadowingTests
             Constants.PropertyEditors.Aliases.MediaPicker3,
             jsonConverterFirst ? [jsonConverter, mediaPickerConverter] : [mediaPickerConverter, jsonConverter]);
 
+        // The media picker holds any number of items, whatever its configuration says.
+        Assert.AreEqual(typeof(IEnumerable<MediaWithCrops>), propertyType.ModelClrType);
+    }
+
+    [TestCase(true)]
+    [TestCase(false)]
+    public void SingleMediaPicker_ResolvesSingleMediaPickerValueConverterOverJsonValueConverter(bool jsonConverterFirst)
+    {
+        IPropertyValueConverter jsonConverter = new JsonValueConverter(
+            PropertyEditors(Constants.PropertyEditors.Aliases.SingleMediaPicker, ValueTypes.Json),
+            Mock.Of<ILogger<JsonValueConverter>>());
+        IPropertyValueConverter mediaPickerConverter = new SingleMediaPickerValueConverter(
+            Mock.Of<IPublishedMediaCache>(),
+            Mock.Of<IPublishedUrlProvider>(),
+            Mock.Of<IPublishedValueFallback>(),
+            Mock.Of<IJsonSerializer>(),
+            Mock.Of<IApiMediaWithCropsBuilder>());
+
+        IPublishedPropertyType propertyType = PublishedPropertyType(
+            Constants.PropertyEditors.Aliases.SingleMediaPicker,
+            jsonConverterFirst ? [jsonConverter, mediaPickerConverter] : [mediaPickerConverter, jsonConverter]);
+
         Assert.AreEqual(typeof(MediaWithCrops), propertyType.ModelClrType);
     }
 
