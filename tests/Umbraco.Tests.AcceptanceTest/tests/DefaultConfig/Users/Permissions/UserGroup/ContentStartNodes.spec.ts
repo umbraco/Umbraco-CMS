@@ -1,5 +1,4 @@
 import {ConstantHelper, test} from '@umbraco/acceptance-test-helpers';
-import {expect} from '@playwright/test';
 
 const testUser = ConstantHelper.testUserCredentials;
 
@@ -67,13 +66,11 @@ test('can see parent of start node but not access it', async ({umbracoApi, umbra
 
   // Act
   await umbracoUi.userGroup.goToSection(ConstantHelper.sections.content, false);
-  const initialUrl = umbracoUi.page.url();
-  // A node the user cannot access is rendered disabled and without an href, so clicking it must not navigate.
-  await umbracoUi.content.goToContentWithName(rootDocumentName, false);
 
   // Assert
   await umbracoUi.content.isContentInTreeVisible(rootDocumentName);
-  expect(umbracoUi.page.url()).toBe(initialUrl);
+  // A node the user cannot access is rendered disabled and without an href, so clicking it must not navigate.
+  await umbracoUi.content.isUrlUnchangedAfter(() => umbracoUi.content.goToContentWithName(rootDocumentName, false));
   await umbracoUi.content.openContentCaretButtonForName(rootDocumentName);
   await umbracoUi.content.isChildContentInTreeVisible(rootDocumentName, childDocumentOneName);
   await umbracoUi.content.isChildContentInTreeVisible(rootDocumentName, childDocumentTwoName, false);
