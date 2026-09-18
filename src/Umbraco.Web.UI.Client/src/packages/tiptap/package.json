@@ -6,7 +6,7 @@
 		"build": "vite build"
 	},
 	"dependencies": {
-		"@tiptap/core": "3.29.2",
+		"@tiptap/core": "3.30.4",
 		"@tiptap/extension-image": "3.29.2",
 		"@tiptap/extension-subscript": "3.29.2",
 		"@tiptap/extension-superscript": "3.29.2",
