@@ -26,6 +26,7 @@ test.beforeEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(elementTypeName);
   await umbracoApi.element.ensureNameNotExists(firstElementName);
   await umbracoApi.element.ensureNameNotExists(secondElementName);
+  await umbracoApi.element.ensureNameNotExists(firstElementName + ' (1)');
   await umbracoApi.user.ensureNameNotExists(testUser.name);
   await umbracoApi.userGroup.ensureNameNotExists(userGroupName);
   const dataType = await umbracoApi.dataType.getByName(dataTypeName);
