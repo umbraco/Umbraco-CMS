@@ -285,10 +285,6 @@ namespace Umbraco.Cms
                 var processed = new HashSet<RefreshInstruction>();
                 var numberOfInstructionsProcessed = 0;
 
-                // It would have been nice to do this in a Query instead of Fetch using a data reader to save
-                // some memory however we cannot do that because inside of this loop the cache refreshers are also
-                // performing some lookups which cannot be done with an active reader open.
-                //
                 // The read gets a scope of its own, so that its transaction is committed before the cache refreshers
                 // run. Refreshing the caches for a large batch can take minutes, and holding a read transaction open
                 // on umbracoCacheInstruction for that long blocks writing new instructions - which is what every
