@@ -19,19 +19,25 @@ Image processing library using **ImageSharp 3.x** and **ImageSharp.Web** for on-
 
 - `Umbraco.Web.Common` - Web infrastructure
 
-### Project Structure (7 source files)
+### Project Structure (13 source files)
 
 ```
 Umbraco.Cms.Imaging.ImageSharp/
 ├── ImageSharpComposer.cs                    # Auto-registration via IComposer
 ├── UmbracoBuilderExtensions.cs              # DI setup and middleware configuration
-├── ConfigureImageSharpMiddlewareOptions.cs  # Middleware options (caching, HMAC, size limits)
+├── ConfigureImageSharpMiddlewareOptions.cs  # Middleware options (caching, HMAC, size limits, decode throttle)
 ├── ConfigurePhysicalFileSystemCacheOptions.cs # File cache location
+├── ImageProcessingThrottleMiddleware.cs     # Bounds concurrent processing; owns the slot lifetime
+├── ImageProcessingSlot.cs                   # One request's claim on the concurrency limit
+├── ImageProcessingMemory.cs                 # Derives and applies the memory bounds (shared with ImageSharp2)
+├── ImageProcessingThrottle.cs               # How long a request waits, and how it is turned away
+├── ImageProcessingUnavailableException.cs   # Raised from the decode hook when the wait is given up on
 ├── ImageProcessors/
 │   └── CropWebProcessor.cs                  # Custom crop processor with EXIF awareness
 └── Media/
     ├── ImageSharpDimensionExtractor.cs      # Extract image dimensions (EXIF-aware)
-    └── ImageSharpImageUrlGenerator.cs       # Generate query string URLs for processing
+    ├── ImageSharpImageUrlGenerator.cs       # Generate query string URLs for processing
+    └── ImageSharpImageUrlTokenGenerator.cs  # Re-sign image URLs after an HMAC key rotation
 ```
 
 ### Relationship to ImageSharp2
@@ -62,11 +68,16 @@ Images are processed via URL query parameters handled by ImageSharp.Web middlewa
 
 ### Pipeline Integration
 
-ImageSharp middleware runs **before** static files in `UmbracoBuilderExtensions.cs:44-50`:
+ImageSharp middleware runs **before** static files, with the processing throttle registered ahead of
+it, in `UmbracoBuilderExtensions.cs`:
 ```csharp
 options.AddFilter(new UmbracoPipelineFilter(nameof(ImageSharpComposer))
 {
-    PrePipeline = prePipeline => prePipeline.UseImageSharp()
+    PrePipeline = prePipeline =>
+    {
+        prePipeline.UseMiddleware<ImageProcessingThrottleMiddleware>();
+        prePipeline.UseImageSharp();
+    }
 });
 ```
 
@@ -121,12 +132,113 @@ if (_options.HMACSecretKey.Length != 0 && _requestAuthorizationUtilities is not 
         "Resize": {
           "MaxWidth": 5000,
           "MaxHeight": 5000
+        },
+        "Memory": {
+          "Enabled": true,
+          "MaximumPoolSizeMegabytes": 0,
+          "MaximumConcurrentProcessing": 0,
+          "MaximumDecodedImageMegabytes": 0
         }
       }
     }
   }
 }
 ```
+
+### Memory Settings (`ImagingMemorySettings`)
+
+Each numeric value defaults to `0`, meaning "derive from the memory available to the process"
+(`GC.GetGCMemoryInfo().TotalAvailableMemoryBytes`, which honours a container limit).
+
+| Setting | Purpose | Default |
+|---------|---------|---------|
+| `Enabled` | Master switch for imaging memory management. When `false`, none of the three bounds is applied and ImageSharp's own memory behaviour is left untouched. | `true` |
+| `MaximumPoolSizeMegabytes` | Caps the unmanaged buffer pool ImageSharp retains between requests | available / 32, clamped to 16-64 MB |
+| `MaximumConcurrentProcessing` | Caps how many images are processed at once | (available / 2) / 64 MB, capped at processor count |
+| `MaximumDecodedImageMegabytes` | Caps any single buffer allocated while decoding an image | available / 4, clamped to 256-1024 MB |
+
+`ImagingMemorySettings` in `Umbraco.Core` carries only these four values. What each is derived as,
+and whether it applies at all, lives in `ImageProcessingMemory` in this project — the policy only
+means anything against ImageSharp's own defaults, which Core knows nothing about.
+
+All three bounds are default-on but **conditional**, so an upgrade changes nothing on a host that
+was never at risk. Each has its own engagement test, and setting a value explicitly overrides that
+test — an operator who names a number gets it.
+
+| Bound | Engages when | Test |
+|-------|--------------|------|
+| Pool cap | Under 4 GB is available to the process | `ImageProcessingMemory.RequiresPoolSizeLimit` |
+| Single image | Under 4 GB is available to the process | `ImageProcessingMemory.RequiresAllocationLimit` |
+| Concurrency | The memory budget cannot feed as many concurrent decodes as there are processors | `ImageProcessingMemory.RequiresConcurrencyLimit` |
+
+The tests deliberately differ. Concurrency is about *peak* — it only needs bounding where memory is
+tighter than the core count, since decoding is CPU bound and the processor count caps it
+otherwise. The pool cap is about *retention*, and ImageSharp's default there is an eighth of
+available memory on **any 64-bit host** — [`GetDefaultMaxPoolSizeBytes`](https://github.com/SixLabors/ImageSharp/blob/v3.1.12/src/ImageSharp/Memory/Allocators/UniformUnmanagedMemoryPoolMemoryAllocator.cs#L156)
+returns `total / 8` when `Environment.Is64BitProcess`, and a flat 128 MB otherwise. It is never
+disproportionate; it is a problem only in absolute terms, where that eighth competes with the memory
+the rest of the site needs. Hence a flat memory threshold rather than a ratio — and note that
+reusing `RequiresConcurrencyLimit` for the pool would switch it off on the low-core 2 GB host where
+the retention was actually measured.
+
+The single-image ceiling exists because the concurrency bound assumes a cost per image
+(`EstimatedMegabytesPerImage`, measured against a 12 megapixel JPEG). Peak is `count x size`, and
+bounding only the count leaves the size trusted — a 100 megapixel source decodes to roughly 400 MB,
+so even a derived limit of 3 would exhaust a 512 MB container. This bounds the other factor, and it
+maps onto ImageSharp's `AllocationLimitMegabytes`, whose own default is a flat 1 GB on a 32-bit
+process and 4 GB on a 64-bit one.
+
+It applies **per allocation, not per image**: a decode makes several, so the total can still exceed
+the ceiling. What it caps is the dominant one — the pixel buffer, roughly `width x height x 3` for a
+JPEG — which is enough to catch a source far larger than the host can serve. Over the limit,
+ImageSharp throws `InvalidMemoryOperationException` wrapped in an `InvalidImageContentException`
+blaming "possibly degenerate dimensions", so `ImageProcessingThrottleMiddleware` logs a warning
+naming the setting before letting the failure through. Note this is unrelated to `Resize.MaxWidth`
+and `Resize.MaxHeight`, which bound the *output* dimensions, not the source decode.
+
+A request over the limit waits, then after `ImageProcessingThrottle.WaitTimeout` (30 seconds) is
+turned away with `503` and a `Retry-After`, logged as a warning. It must not be let through
+unthrottled on expiry instead — concurrent decodes are the thing being bounded, so that reinstates
+the OOM under sustained load.
+
+`Enabled: false` remains the one-setting escape hatch that restores stock ImageSharp behaviour.
+
+Each bound reports itself at startup — Information when it engages, naming the resolved value, and
+Debug when it does not, so an unaffected site running at Information says nothing. Those lines are
+the first thing to ask for when diagnosing either an exit 137 or an unexplained change in image
+throughput.
+
+**Why these exist**: a source image is decoded at full resolution before any processor runs, and
+`ImageSharpMiddleware` only de-duplicates concurrent requests for the *same* URL. A page of distinct
+thumbnails therefore decodes every source in parallel, so peak memory is
+`concurrent requests x decoded source size` — measured at ~60 MB for one 300x300 thumbnail of a
+4000x3000 JPEG. Unbounded, that exhausts a container limit and the process is killed (exit 137).
+
+The concurrency cap is applied in two stages, and requests over it wait rather than being rejected.
+
+1. `ImageProcessingThrottleMiddleware`, registered ahead of `UseImageSharp()` in the pre-pipeline,
+   decides whether a request *could* decode: it needs a registered processor command and a format
+   that resolves to a configured image format, so an unrelated response like
+   `/export.csv?format=xlsx` is left alone. For those that qualify it publishes an
+   `ImageProcessingSlot` on `HttpContext.Items` and releases it when the request ends.
+2. `ConfigureImageSharpMiddlewareOptions` wires `OnBeforeLoadAsync`, which ImageSharp invokes on a
+   cache **miss** only, after the source is resolved and immediately before the decode. That is
+   where the wait happens, so a cache hit never queues behind a decode.
+
+Splitting it this way keeps the wait precise while leaving the release somewhere it is guaranteed to
+run — the hook has no matching "after" callback, and the middleware's `finally` does. The slot is
+held until the request ends rather than freed when processing finishes, because the decoded image
+stays in memory while the result is encoded and cached.
+
+**ImageSharp 2.x differs here.** ImageSharp.Web 2.0.2 has no `OnBeforeLoadAsync` (its earliest hook,
+`OnParseCommandsAsync`, runs before the cache check), so `Umbraco.Cms.Imaging.ImageSharp2` waits in
+the middleware for anything its request filter matches — cache hits included. The two copies of
+`ImageProcessingThrottleMiddleware` are therefore *not* interchangeable; the v2 copy is the coarser
+fallback.
+
+ImageSharp's own pool default is an eighth of available memory on a 64-bit process, released only on
+a gen2 collection and then at most 50% per minute, which leaves a container sitting well above its
+working set at rest. This memory is unmanaged, so no `DOTNET_GC*` setting governs it.
 
 ### Security: Max Dimension Limits
 
