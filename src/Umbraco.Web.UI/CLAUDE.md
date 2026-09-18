@@ -4,7 +4,7 @@ Main ASP.NET Core web application for running Umbraco CMS. This is the developme
 
 **Project Type**: ASP.NET Core Web Application
 **SDK**: Microsoft.NET.Sdk.Web
-**Target Framework**: net10.0
+**Target Framework**: net11.0
 **IsPackable**: false (not published as NuGet package)
 **Namespace**: Umbraco.Cms.Web.UI
 
