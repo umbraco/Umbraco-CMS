@@ -11,11 +11,6 @@ public abstract class RuntimeAppCacheTests : AppCacheTests
 {
     internal abstract IAppPolicyCache AppPolicyCache { get; }
 
-    // The cached and the expired half of this used to be one test that inserted with a 20 millisecond
-    // expiration and then asserted the value was still cached. Those assertions raced the expiration and
-    // failed with default(DateTime) whenever the agent stalled for longer than that between two adjacent
-    // statements. They are now two tests: neither the caching nor the expiring one depends on how long the
-    // machine takes to get from one line to the next.
     [Test]
     public void Can_Add_Struct_Strongly_Typed_With_Null()
     {
