@@ -1,6 +1,7 @@
 import { manifests as searchIndexManifests } from './search-index/manifests.js';
+import { manifests as examineManifests } from './examine/manifests.js';
 
-export const manifests: Array<UmbExtensionManifest> = [...searchIndexManifests];
+export const manifests: Array<UmbExtensionManifest> = [...searchIndexManifests, ...examineManifests];
 
 export const name = 'Umbraco.Core.SearchManagement';
 export const extensions = [

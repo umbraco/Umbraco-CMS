@@ -114,6 +114,11 @@ public static class UmbracoBuilderExtensions
                     options.AddDocumentTransformer((openApiDocument, _, _) =>
                     {
                         openApiDocument.Info.Version = "1.0";
+
+                        // The document is committed to source control and the TypeScript client is generated
+                        // from it, so it must not carry the host it happened to be fetched from. The
+                        // Management API document clears this for the same reason.
+                        openApiDocument.Servers?.Clear();
                         return Task.CompletedTask;
                     });
 

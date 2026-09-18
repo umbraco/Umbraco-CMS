@@ -228,12 +228,12 @@ Lives inside the backoffice client as an ordinary package — no separate bundle
 
 #### Examine Client (Umbraco.Cms.Search.Provider.Examine)
 
-A simpler **single-bundle**, standalone npm workspace (`examine-bundle.js` ~11kb) that provides:
+The Examine provider's own UI, which provides:
 - `UmbSearchExamineProviderRepository` - Fetches search document fields from the Examine API
 - `UmbSearchExamineShowFieldsEntityAction` - Entity action to view document fields
 - `UmbSearchExamineShowFieldsModal` - Modal displaying indexed fields with filtering, expand/collapse, and copy
 
-Output goes to `wwwroot/App_Plugins/UmbracoSearchExamine/` (gitignored, built by Vite). It resolves `UMB_SEARCH_WORKSPACE_CONTEXT` from `@umbraco-cms/backoffice/search-management` via its generated tsconfig aliases — see [Examine Client CLAUDE.md](../Umbraco.Cms.Search.Provider.Examine/CLAUDE.md).
+It is a module of the same backoffice package, at `search-management/examine`, so it needs no build or bundle of its own and reaches `UMB_SEARCH_WORKSPACE_CONTEXT` as a sibling import — see [Examine provider CLAUDE.md](../Umbraco.Cms.Search.Provider.Examine/CLAUDE.md).
 
 ## Key Concepts
 

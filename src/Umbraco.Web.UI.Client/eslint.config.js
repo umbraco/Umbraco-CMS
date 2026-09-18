@@ -35,7 +35,9 @@ export default [
 			'src/packages/core/icon-registry/icons.ts',
 			'src/**/*.test.ts',
 			'src/packages/core/backend-api',
+			'src/packages/search-management/examine/api',
 			'src/packages/core/openapi-ts.*.js',
+			'src/packages/search-management/examine/openapi-ts.config.js',
 		],
 	},
 
