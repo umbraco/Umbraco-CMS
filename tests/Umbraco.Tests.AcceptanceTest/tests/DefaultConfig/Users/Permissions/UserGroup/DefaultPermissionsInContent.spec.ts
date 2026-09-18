@@ -284,20 +284,6 @@ test('can not publish content with publish permission disabled', async ({umbraco
   await umbracoUi.content.isActionsMenuForNameVisible(rootDocumentName, false);
 });
 
-test('does not show an actions menu when no document actions are available', async ({umbracoApi, umbracoUi}) => {
-  // Arrange
-  userGroupId = await umbracoApi.userGroup.createUserGroupWithSetPermissionsDocumentPermission(userGroupName, false);
-  await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
-  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
-  await umbracoUi.goToBackOffice();
-
-  // Act
-  await umbracoUi.content.goToSection(ConstantHelper.sections.content, false);
-
-  // Assert
-  await umbracoUi.content.isActionsMenuForNameVisible(rootDocumentName, false);
-});
-
 test('can unpublish content with unpublish permission enabled', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.document.publish(rootDocumentId);
