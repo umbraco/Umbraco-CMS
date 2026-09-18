@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.OpenApi;
+using Microsoft.OpenApi;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Api.Common.Attributes;
@@ -124,6 +125,10 @@ public sealed class BackOfficeOpenApiDocumentBuilder
             lowercasedDocumentName,
             options =>
             {
+                // The OpenAPI version is part of the contract consumed by generated clients, so it is fixed here rather than
+                // following the framework default, which moved to 3.2 in ASP.NET Core 11.
+                options.OpenApiVersion = OpenApiSpecVersion.OpenApi3_1;
+
                 // ShouldInclude matches [MapToApi] case-insensitively to align with how documents are registered.
                 options.ShouldInclude = apiDescription =>
                     apiDescription.ActionDescriptor.EndpointMetadata
