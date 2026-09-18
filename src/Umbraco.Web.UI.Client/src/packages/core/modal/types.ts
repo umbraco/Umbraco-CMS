@@ -45,4 +45,10 @@ export interface UmbModalConfig {
 	 * Set the title of the modal, this is used as Browser Title
 	 */
 	title?: string;
+
+	/**
+	 * Prevents the modal from automatically closing when backend routing or navigation occurs.
+	 * default false
+	 */
+	indisposable?: boolean;
 }
