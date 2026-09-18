@@ -35,6 +35,13 @@ public class DocumentDto : IPublishableContentDto<DocumentVersionDto>
     [Column(IPublishableContentDto<DocumentVersionDto>.Columns.Edited)]
     public bool Edited { get; set; }
 
+    /// <summary>
+    /// Gets or sets a value indicating whether an invariant property of this document has been edited since it was last published or saved.
+    /// </summary>
+    [Column(IPublishableContentDto<DocumentVersionDto>.Columns.InvariantEdited)]
+    [Constraint(Default = "0")]
+    public bool InvariantEdited { get; set; }
+
     // [Column("publishDate")]
     // [NullSetting(NullSetting = NullSettings.Null)] // is contentVersionDto.VersionDate for the published version
     // public DateTime? PublishDate { get; set; }
