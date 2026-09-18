@@ -1,9 +1,23 @@
+using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core.Blocks;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DeliveryApi;
+using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Logging;
+using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PropertyEditors.DeliveryApi;
+using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
+using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Infrastructure.HybridCache;
 using Umbraco.Cms.Tests.Common;
 
@@ -70,13 +84,17 @@ public class CacheTests : DeliveryApiTests
     [TestCase(PropertyCacheLevel.Elements, "value: en-US", "value: en-US")]
     [TestCase(PropertyCacheLevel.Element, "value: en-US", "value: da-DK")]
     [TestCase(PropertyCacheLevel.None, "value: en-US", "value: da-DK")]
-    public void PublishedElementProperty_DeliveryApiValue_MustNotLeakAmbientCultureAcrossSeparateInstances_WhenConverterDependsOnAmbientContext(
+    public void PublishedElementProperty_DeliveryApiValue_CultureIsolationAcrossSeparateInstances_DependsOnCacheLevel(
         PropertyCacheLevel cacheLevel, string expectedFirstResult, string expectedSecondResult)
     {
         // Simulates a converter (like the Rich Text block converter) whose Delivery API output depends on the
         // ambient VariationContext even though the property itself is invariant - e.g. it embeds culture-variant
         // blocks. Two SEPARATE PublishedProperty instances (as a fresh request would build) share the same
         // backing elements cache, mirroring how the elements cache persists across real, separate HTTP requests.
+        //
+        // At PropertyCacheLevel.Elements, the second instance intentionally reuses the first instance's cached
+        // value - that's the leak this cache level allows, and the second test case asserts it happens.
+        // Element and None both re-invoke the converter per instance, so they correctly isolate cultures.
         var variationContextAccessor = new TestVariationContextAccessor();
 
         var propertyValueConverter = new Mock<IDeliveryApiPropertyValueConverter>();
@@ -114,12 +132,62 @@ public class CacheTests : DeliveryApiTests
         var firstRequestProperty = new PublishedProperty(propertyType, element.Object, variationContextAccessor, CreatePropertyRenderingContextAccessor(), false, [propertyData], elementsCache, cacheLevel);
         var firstResult = firstRequestProperty.GetDeliveryApiValue(false)!.ToString();
 
-        // A second, separate request for a different ambient culture must not see the first request's value.
+        // A second, separate request for a different ambient culture - only isolated from the first when the
+        // cache level forces the converter to be re-invoked (see the leak note above).
         variationContextAccessor.VariationContext = new VariationContext("da-DK");
         var secondRequestProperty = new PublishedProperty(propertyType, element.Object, variationContextAccessor, CreatePropertyRenderingContextAccessor(), false, [propertyData], elementsCache, cacheLevel);
         var secondResult = secondRequestProperty.GetDeliveryApiValue(false)!.ToString();
 
         Assert.AreEqual(expectedFirstResult, firstResult);
         Assert.AreEqual(expectedSecondResult, secondResult);
+    }
+
+    [Test]
+    public void RteBlockRenderingValueConverter_GetDeliveryApiPropertyCacheLevel_IsNone()
+    {
+        RteBlockRenderingValueConverter converter = CreateRteBlockRenderingValueConverter();
+
+        Assert.AreEqual(PropertyCacheLevel.None, converter.GetDeliveryApiPropertyCacheLevel(Mock.Of<IPublishedPropertyType>()));
+    }
+
+    // Exercises the concrete converter rather than a mock, so this fails if GetDeliveryApiPropertyCacheLevel
+    // regresses back to PropertyCacheLevel.Elements (the bug behind #23951: cached RTE block content leaking
+    // its rendered culture into later requests for a different culture).
+    private static RteBlockRenderingValueConverter CreateRteBlockRenderingValueConverter()
+    {
+        var variationContextAccessor = new TestVariationContextAccessor();
+        var blockEditorVarianceHandler = new BlockEditorVarianceHandler(
+            Mock.Of<ILanguageService>(),
+            Mock.Of<IContentTypeService>(),
+            variationContextAccessor);
+
+        var deliveryApiSettingsMonitor = new Mock<IOptionsMonitor<DeliveryApiSettings>>();
+        deliveryApiSettingsMonitor.SetupGet(m => m.CurrentValue).Returns(new DeliveryApiSettings());
+
+        var contentSettingsMonitor = new Mock<IOptionsMonitor<ContentSettings>>();
+        contentSettingsMonitor.SetupGet(m => m.CurrentValue).Returns(new ContentSettings());
+
+        return new RteBlockRenderingValueConverter(
+            new HtmlLocalLinkParser(Mock.Of<IPublishedUrlProvider>()),
+            new HtmlUrlParser(contentSettingsMonitor.Object, NullLogger<HtmlUrlParser>.Instance, Mock.Of<IProfilingLogger>(), Mock.Of<IIOHelper>()),
+            new HtmlImageSourceParser(_ => string.Empty, Mock.Of<IImageUrlTokenGenerator>()),
+            Mock.Of<IApiRichTextElementParser>(),
+            Mock.Of<IApiRichTextMarkupParser>(),
+            Mock.Of<IPartialViewBlockEngine>(),
+            new BlockEditorConverter(
+                Mock.Of<IPublishedContentTypeCache>(),
+                Mock.Of<IPublishedModelFactory>(),
+                variationContextAccessor,
+                blockEditorVarianceHandler,
+                Mock.Of<IBlockElementService>()),
+            Mock.Of<IJsonSerializer>(),
+            Mock.Of<IApiElementBuilder>(),
+            new RichTextBlockPropertyValueConstructorCache(),
+            NullLogger<RteBlockRenderingValueConverter>.Instance,
+            variationContextAccessor,
+            blockEditorVarianceHandler,
+            deliveryApiSettingsMonitor.Object,
+            Mock.Of<ILanguageService>(),
+            new TestPropertyRenderingContextAccessor());
     }
 }
