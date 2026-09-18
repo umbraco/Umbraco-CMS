@@ -6,7 +6,7 @@ import { UmbBooleanState, UmbStringState } from '@umbraco-cms/backoffice/observa
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
-import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
+import { UMB_SERVER_CONTEXT, UmbSignalRReconnectPolicy } from '@umbraco-cms/backoffice/server';
 import type { HubConnection, IHttpConnectionOptions } from '@umbraco-cms/backoffice/external/signalr';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
@@ -105,10 +105,13 @@ export class UmbPreviewContext extends UmbContextBase {
 	async #initHubConnection(serverUrl: string, serverContext?: typeof UMB_SERVER_CONTEXT.TYPE) {
 		const previewHubUrl = `${serverUrl}/umbraco/PreviewHub`;
 
-		// Make sure that no previous connection exists.
+		// Make sure that no previous connection exists, otherwise an orphaned connection would keep
+		// reconnecting in the background. Clear the reference before stopping so the old connection's
+		// onclose handler sees it is no longer the active one and stays silent.
 		if (this.#connection) {
-			await this.#connection.stop();
+			const previousConnection = this.#connection;
 			this.#connection = undefined;
+			await previousConnection.stop();
 		}
 
 		const skipNegotiation = serverContext?.getServerConnection()?.getSignalRSkipNegotiation() ?? false;
@@ -120,7 +123,14 @@ export class UmbPreviewContext extends UmbContextBase {
 			hubOptions.transport = HttpTransportType.WebSockets;
 		}
 
-		this.#connection = new HubConnectionBuilder().withUrl(previewHubUrl, hubOptions).build();
+		this.#connection = new HubConnectionBuilder()
+			.withUrl(previewHubUrl, hubOptions)
+			.withAutomaticReconnect(new UmbSignalRReconnectPolicy())
+			.build();
+
+		// Capture this specific connection so its onclose handler can tell whether it is still the active
+		// one; if it has since been replaced or cleared, the close was deliberate and should stay silent.
+		const connection = this.#connection;
 
 		this.#connection.on('refreshed', (payload) => {
 			if (payload === this.#unique.getValue()) {
@@ -128,7 +138,34 @@ export class UmbPreviewContext extends UmbContextBase {
 			}
 		});
 
+		this.#connection.onreconnecting(() => {
+			this.#notificationContext?.peek('warning', {
+				data: {
+					headline: this.#localize.term('general_preview'),
+					message: this.#localize.term('preview_connectionReconnecting'),
+				},
+			});
+		});
+
+		this.#connection.onreconnected(() => {
+			// A 'refreshed' event may have been missed while disconnected, so reload the iframe to catch up.
+			this.#setPreviewUrl({ rnd: Math.random() });
+			this.#notificationContext?.peek('positive', {
+				data: {
+					headline: this.#localize.term('general_preview'),
+					message: this.#localize.term('preview_connectionRestored'),
+				},
+			});
+		});
+
 		this.#connection.onclose(() => {
+			// With automatic reconnect, onclose only fires when we stop the connection ourselves (teardown,
+			// exit, or replacing it) or for a close that cannot be recovered. Only warn when this is still
+			// the active connection — i.e. an unexpected drop we did not initiate.
+			if (this.#connection !== connection) {
+				return;
+			}
+
 			this.#notificationContext?.peek('warning', {
 				data: {
 					headline: this.#localize.term('general_preview'),
