@@ -67,6 +67,8 @@ public static class UmbracoBuilderExtensions
 
         builder.Services.TryAddEnumerable(ServiceDescriptor
             .Singleton<IPostConfigureOptions<ConnectionStrings>, ConfigureSqliteConnectionStringTimeouts>());
+        builder.Services.TryAddEnumerable(ServiceDescriptor
+            .Singleton<IPostConfigureOptions<ConnectionStrings>, ConfigureSqliteConnectionStringCacheMode>());
 
         return builder;
     }
