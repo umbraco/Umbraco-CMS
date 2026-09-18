@@ -1,5 +1,6 @@
 import { UMB_DATA_TYPE_FOLDER_ENTITY_TYPE } from '../../entity.js';
 import { UMB_DATA_TYPE_ROOT_WORKSPACE_ALIAS } from '../../data-type-root/index.js';
+import { UMB_DATA_TYPE_MENU_ITEM_ALIAS } from '../../menu/constants.js';
 import { UMB_DATA_TYPE_FOLDER_REPOSITORY_ALIAS } from './repository/index.js';
 import { manifests as workspaceManifests } from './workspace/manifests.js';
 import { manifests as repositoryManifests } from './repository/manifests.js';
@@ -42,6 +43,34 @@ export const manifests: Array<UmbExtensionManifest> = [
 			{
 				alias: UMB_WORKSPACE_CONDITION_ALIAS,
 				oneOf: [UMB_DATA_TYPE_ROOT_WORKSPACE_ALIAS, UMB_DATA_TYPE_FOLDER_WORKSPACE_ALIAS],
+			},
+		],
+	},
+	{
+		type: 'workspaceContext',
+		kind: 'menuStructure',
+		name: 'Data Type Folder Menu Structure Workspace Context',
+		alias: 'Umb.Context.DataTypeFolder.Menu.Structure',
+		api: () => import('../../menu/data-type-menu-structure.context.js'),
+		meta: {
+			menuItemAlias: UMB_DATA_TYPE_MENU_ITEM_ALIAS,
+		},
+		conditions: [
+			{
+				alias: UMB_WORKSPACE_CONDITION_ALIAS,
+				match: UMB_DATA_TYPE_FOLDER_WORKSPACE_ALIAS,
+			},
+		],
+	},
+	{
+		type: 'workspaceFooterApp',
+		kind: 'menuBreadcrumb',
+		alias: 'Umb.WorkspaceFooterApp.DataTypeFolder.Breadcrumb',
+		name: 'Data Type Folder Breadcrumb Workspace Footer App',
+		conditions: [
+			{
+				alias: UMB_WORKSPACE_CONDITION_ALIAS,
+				match: UMB_DATA_TYPE_FOLDER_WORKSPACE_ALIAS,
 			},
 		],
 	},
