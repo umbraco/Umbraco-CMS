@@ -30,6 +30,7 @@ steps:
     displayName: Use .NET SDK from global.json
     inputs:
       useGlobalJson: true
+      includePreviewVersions: true
 
   - template: templates/e2e-install.yml
     parameters:
