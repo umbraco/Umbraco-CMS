@@ -53,8 +53,8 @@ public class DecimalPropertyValueEditorTests
 
     [SetCulture("it-IT")]
     [SetUICulture("it-IT")]
-    [TestCase("123,45", 123.45)]
-    [TestCase("1.234,56", 1234.56)]
+    [TestCase("123,45", "123.45")]
+    [TestCase("1.234,56", "1234.56")]
     [TestCase("123.45", 12345)]
     [TestCase("1,234.56", null)]
     public void Can_Parse_Values_From_Editor_Using_Culture_With_Non_EnUs_Decimal_Separator(object value, decimal? expected)

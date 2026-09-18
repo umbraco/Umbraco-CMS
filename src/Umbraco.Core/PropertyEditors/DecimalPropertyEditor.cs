@@ -11,6 +11,7 @@ using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Extensions;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
@@ -106,8 +107,8 @@ public class DecimalPropertyEditor : DataEditor, IValueSchemaProvider
             => value switch
             {
                 decimal d => d,
-                double db => (decimal)db,
-                float f => (decimal)f,
+                double db => db.ToRoundTripDecimal(),
+                float f => f.ToRoundTripDecimal(),
                 IFormattable f => decimal.TryParse(f.ToString(null, CultureInfo.InvariantCulture), NumberStyles.Any, CultureInfo.InvariantCulture, out var parsedDecimalValue)
                         ? parsedDecimalValue
                         : null,
@@ -253,7 +254,7 @@ public class DecimalPropertyEditor : DataEditor, IValueSchemaProvider
                     step = 0.000001;
                 }
 
-                if (ValidationHelper.IsValueValidForStep((decimal)parsedDecimalValue, (decimal)min, (decimal)step) is false)
+                if (ValidationHelper.IsValueValidForStep(parsedDecimalValue.ToRoundTripDecimal(), min.ToRoundTripDecimal(), step.ToRoundTripDecimal()) is false)
                 {
                     yield return new ValidationResult(
                         LocalizedTextService.Localize("validation", "invalidStep", [parsedDecimalValue.ToString(), step.ToString(), min.ToString()]),

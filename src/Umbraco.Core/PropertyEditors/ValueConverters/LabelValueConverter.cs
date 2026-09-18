@@ -1,5 +1,6 @@
 using System.Globalization;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 
@@ -97,7 +98,7 @@ public class LabelValueConverter : PropertyValueConverterBase
 
                 if (source is double sourceDouble)
                 {
-                    return Convert.ToDecimal(sourceDouble);
+                    return sourceDouble.ToRoundTripDecimal();
                 }
 
                 return 0M;
