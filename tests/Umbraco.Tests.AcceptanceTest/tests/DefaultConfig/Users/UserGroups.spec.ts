@@ -120,7 +120,7 @@ test('can update a user group', {tag: '@release'}, async ({umbracoApi, umbracoUi
   await umbracoUi.reloadPage();
   await umbracoUi.userGroup.doesUserGroupHaveDocumentPermission(allPermissions.uiDocumentPermission[0]);
   const userGroupData = await umbracoApi.userGroup.getByName(userGroupName);
-  expect(userGroupData.fallbackPermissions).toContain(allPermissions.verbDocumentPermission[0]);
+  await umbracoApi.userGroup.doesHaveFallbackPermission(userGroupData, allPermissions.verbDocumentPermission[0]);
 });
 
 test('can delete a user group', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
@@ -444,7 +444,7 @@ test('can enable all permissions for a user group', async ({umbracoApi, umbracoU
   await umbracoUi.userGroup.doesUserGroupHaveElementPermissionEnabled(allPermissions.uiElementPermission);
   const userGroupData = await umbracoApi.userGroup.getByName(userGroupName);
   const allFallbackPermissions = [...allPermissions.verbDocumentPermission, ...allPermissions.verbElementPermission];
-  expect(userGroupData.fallbackPermissions).toEqual(allFallbackPermissions);
+  await umbracoApi.userGroup.doesHaveFallbackPermissions(userGroupData, allFallbackPermissions);
 });
 
 test('can add granular permission to a specific document for a user group', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {

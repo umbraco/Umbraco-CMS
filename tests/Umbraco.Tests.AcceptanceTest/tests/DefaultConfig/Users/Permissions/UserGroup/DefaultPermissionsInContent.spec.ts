@@ -411,7 +411,7 @@ test('can duplicate content with duplicate permission enabled', {tag: '@release'
   await umbracoUi.content.isContentInTreeVisible(duplicatedContentName);
   const rootContent = await umbracoApi.document.getByName(rootDocumentName);
   const rootDuplicatedContent = await umbracoApi.document.getByName(duplicatedContentName);
-  expect(umbracoApi.document.getOnlyPropertyValue(rootContent)).toEqual(rootDuplicatedContent.values[0].value);
+  expect(umbracoApi.document.getOnlyPropertyValue(rootContent)).toEqual(umbracoApi.document.getOnlyPropertyValue(rootDuplicatedContent));
 });
 
 test('can not duplicate content with duplicate permission disabled', async ({umbracoApi, umbracoUi}) => {

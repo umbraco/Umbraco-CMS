@@ -369,6 +369,25 @@ export class ApiHelpers {
     return properties[0];
   }
 
+  /**
+   * One domain on an already-fetched domains response, matched by `domainName` rather than by
+   * position. The raw form indexed `domains[0]`/`domains[1]`, assuming an ordering the API does
+   * not promise - the same trap `getPropertyValue` fixes on the values side.
+   */
+  getDomain(domainsData: any, domainName: string): any {
+    const domains = domainsData?.domains;
+    expect(Array.isArray(domains), `Expected the domains response to carry a domains array, got: ${JSON.stringify(domainsData)?.slice(0, 200)}`).toBeTruthy();
+    const match = domains.find(d => d.domainName === domainName);
+    expect(match, `Expected a domain named '${domainName}', found: ${domains.map(d => d.domainName).join(', ') || '(none)'}`).toBeTruthy();
+    return match;
+  }
+
+  async doesHaveDomainCount(domainsData: any, expectedCount: number): Promise<void> {
+    const domains = domainsData?.domains;
+    expect(Array.isArray(domains), `Expected the domains response to carry a domains array, got: ${JSON.stringify(domainsData)?.slice(0, 200)}`).toBeTruthy();
+    expect(domains.length, `Expected ${expectedCount} domain(s), found ${domains.length}: ${domains.map(d => d.domainName).join(', ') || '(none)'}`).toBe(expectedCount);
+  }
+
   /** Asserts how many variants an already-fetched document or element carries. */
   async doesHaveVariantCount(entityData: any, expectedCount: number): Promise<void> {
     const variants = entityData?.variants;

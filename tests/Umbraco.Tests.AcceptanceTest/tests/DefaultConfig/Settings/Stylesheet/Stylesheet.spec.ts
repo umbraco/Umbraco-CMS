@@ -44,7 +44,7 @@ test('can create a stylesheet with content', async ({umbracoApi, umbracoUi}) => 
   // Assert
   expect(await umbracoApi.stylesheet.doesNameExist(stylesheetName)).toBeTruthy();
   const stylesheetData = await umbracoApi.stylesheet.getByName(stylesheetName);
-  expect(stylesheetData.content).toEqual(stylesheetContent);
+  await umbracoApi.stylesheet.doesHaveContent(stylesheetData, stylesheetContent);
   await umbracoUi.stylesheet.isStylesheetRootTreeItemVisible(stylesheetName);
 });
 
@@ -62,7 +62,7 @@ test('can update a stylesheet', {tag: '@smoke'}, async ({umbracoApi, umbracoUi})
 
   // Assert
   const stylesheetData = await umbracoApi.stylesheet.getByName(stylesheetName);
-  expect(stylesheetData.content).toEqual(updatedContent);
+  await umbracoApi.stylesheet.doesHaveContent(stylesheetData, updatedContent);
 });
 
 test('can delete a stylesheet', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {

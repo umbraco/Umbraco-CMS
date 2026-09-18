@@ -578,6 +578,16 @@ export class UserGroupApiHelper {
     return permissions.every(item => fallbackPermissions.includes(item));
   }
 
+  async doesHaveFallbackPermission(userGroupData: any, permission: string): Promise<void> {
+    const fallbackPermissions = userGroupData?.fallbackPermissions ?? [];
+    expect(fallbackPermissions, `Expected user group '${userGroupData?.name}' to have fallback permission '${permission}', found: ${fallbackPermissions.join(', ') || '(none)'}`).toContain(permission);
+  }
+
+  async doesHaveFallbackPermissions(userGroupData: any, permissions: string[]): Promise<void> {
+    const fallbackPermissions = userGroupData?.fallbackPermissions ?? [];
+    expect(fallbackPermissions, `Expected user group '${userGroupData?.name}' to have exactly these fallback permissions: ${permissions.join(', ') || '(none)'}, found: ${fallbackPermissions.join(', ') || '(none)'}`).toEqual(permissions);
+  }
+
   async convertApiDocumentPermissionsToUiDocumentPermissions(apiPermissions: string[]) {
     return apiPermissions.map(permission => {
       for (const key in ConstantHelper.userGroupDocumentPermissionsSettings) {

@@ -45,6 +45,14 @@ export class DocumentApiHelper {
     await this.api.doesHaveVariantCount(documentData, expectedCount);
   }
 
+  getDomain(domainsData: any, domainName: string): any {
+    return this.api.getDomain(domainsData, domainName);
+  }
+
+  async doesHaveDomainCount(domainsData: any, expectedCount: number): Promise<void> {
+    await this.api.doesHaveDomainCount(domainsData, expectedCount);
+  }
+
   /** Returns a property value from an already-fetched document, looked up by alias. The caller asserts. */
   getPropertyValue(documentData: any, alias: string, culture: string | null = null, segment: string | null = null): any {
     return this.api.getPropertyValue(documentData, alias, culture, segment);
@@ -431,13 +439,6 @@ export class DocumentApiHelper {
     const match = domains.find(d => d.domainName === domainName);
     expect(match, `Expected a domain '${domainName}', found: ${domains.map(d => d.domainName).join(', ') || '(none)'}`).toBeTruthy();
     expect(match.isoCode, `Expected domain '${domainName}' to be bound to '${isoCode}'`).toBe(isoCode);
-  }
-
-  /** Asserts how many domains a document carries; `0` means none are assigned. */
-  async doesHaveDomainCount(domainsData: any, expectedCount: number): Promise<void> {
-    const domains = domainsData?.domains;
-    expect(Array.isArray(domains), `Expected a domains array, got: ${JSON.stringify(domainsData)?.slice(0, 200)}`).toBeTruthy();
-    expect(domains.length, `Expected ${expectedCount} domain(s), found ${domains.length}: ${domains.map(d => d.domainName).join(', ') || '(none)'}`).toBe(expectedCount);
   }
 
   async updateDomains(id: string, domains) {
