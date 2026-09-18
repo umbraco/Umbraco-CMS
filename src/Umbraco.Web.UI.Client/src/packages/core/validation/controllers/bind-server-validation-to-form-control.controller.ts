@@ -19,12 +19,15 @@ export class UmbBindServerValidationToFormControl extends UmbControllerBase {
 	#controlValidator?: ReturnType<UmbFormControlMixinInterface<unknown>['addValidator']>;
 	#messages: Array<UmbValidationMessage> = [];
 	#isValid = false;
+	// Keep track of the value set, so we can determine if we should remove server validation when the value changes. [NL]
+	#gotValue = false;
 
 	#value?: unknown;
 	set value(value: unknown) {
-		if (this.#isValid) {
-			// If valid lets just parse it on [NL]
+		if (this.#isValid || !this.#gotValue) {
+			// If valid, or set value set, lets just parse it on [NL]
 			this.#value = value;
+			this.#gotValue = true;
 		} else {
 			// If not valid lets see if we should remove server validation [NL]
 			if (!defaultMemoization(this.#value, value)) {

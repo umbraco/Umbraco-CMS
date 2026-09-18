@@ -6,6 +6,7 @@ export const manifest: ManifestPropertyEditorUi = {
 	name: 'Block Grid Layout Stylesheet Property Editor UI',
 	element: () => import('./property-editor-ui-block-grid-layout-stylesheet.element.js'),
 	meta: {
+		supportsVariantChange: true,
 		label: 'Block Grid Layout Stylesheet',
 		icon: 'icon-document',
 		group: '#propertyEditorUIGroups_common',

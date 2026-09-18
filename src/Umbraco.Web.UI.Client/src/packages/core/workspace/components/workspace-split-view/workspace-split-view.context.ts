@@ -93,13 +93,13 @@ export class UmbWorkspaceSplitViewContext extends UmbContextBase {
 			this.observe(
 				this.#workspaceContext && variantId
 					? createObservablePart(this.#workspaceContext.variantOptions, (variants) =>
-							variants.find((v) => v.unique === variantId.toString()),
+							variants.some((v) => v.unique === variantId.toString()),
 						)
 					: undefined,
-				(variantOption) => {
-					this.#notFound.setValue(variantOption === undefined);
+				(variantExists) => {
+					this.#notFound.setValue(variantExists === false);
 
-					if (!variantOption || !variantId || !this.#workspaceContext) return;
+					if (!variantExists || !variantId || !this.#workspaceContext) return;
 
 					// Finish setting up the split view context by providing the validation context and creating the dataset context for the active variant.
 					const validationContext = this.#workspaceContext?.getVariantValidationContext(variantId);

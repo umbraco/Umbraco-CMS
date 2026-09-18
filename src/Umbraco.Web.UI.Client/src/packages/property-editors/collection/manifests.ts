@@ -10,6 +10,7 @@ const propertyEditorUiManifest: ManifestPropertyEditorUi = {
 	name: 'Collection Property Editor UI',
 	element: () => import('./property-editor-ui-collection.element.js'),
 	meta: {
+		supportsVariantChange: true,
 		label: 'Collection',
 		propertyEditorSchemaAlias: 'Umbraco.ListView',
 		icon: 'icon-layers',
