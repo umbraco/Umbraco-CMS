@@ -24,7 +24,7 @@ export class UmbCollectionActionBundleElement extends UmbLitElement {
 
 	override render() {
 		if (this._hideCollectionActions) return nothing;
-		return html`<umb-extension-with-api-slot type="collectionAction"></umb-extension-with-api-slot>`;
+		return html`<umb-extension-slot type="collectionAction"></umb-extension-slot>`;
 	}
 
 	static override readonly styles = [
