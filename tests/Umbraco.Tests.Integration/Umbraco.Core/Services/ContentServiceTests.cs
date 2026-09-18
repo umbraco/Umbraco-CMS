@@ -1084,7 +1084,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     }
 
     [Test]
-    public async Task Pending_Invariant_Property_Changes_Affect_Default_Language_Edited_State()
+    public async Task Pending_Invariant_Property_Changes_Affect_Invariant_Edited_State()
     {
         // Arrange
         var langGb = new LanguageBuilder()
@@ -1124,6 +1124,8 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         Assert.IsTrue(content.IsCulturePublished(langFr.IsoCode));
         Assert.IsFalse(content.IsCultureEdited(langGb.IsoCode));
         Assert.IsFalse(content.IsCultureEdited(langFr.IsoCode));
+        Assert.IsFalse(content.IsCultureEdited(null));
+        Assert.IsFalse(content.IsCultureEdited(Constants.System.InvariantCulture));
 
         // update the invariant property and save a pending version
         content.SetValue("metakeywords", "hello");
@@ -1134,8 +1136,19 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         Assert.AreEqual(PublishedState.Published, content.PublishedState);
         Assert.IsTrue(content.IsCulturePublished(langGb.IsoCode));
         Assert.IsTrue(content.IsCulturePublished(langFr.IsoCode));
-        Assert.IsTrue(content.IsCultureEdited(langGb.IsoCode));
+
+        // the invariant edit is tracked distinctly - it does not flag either culture as edited
+        Assert.IsFalse(content.IsCultureEdited(langGb.IsoCode));
         Assert.IsFalse(content.IsCultureEdited(langFr.IsoCode));
+        Assert.IsTrue(content.IsCultureEdited(null));
+        Assert.IsTrue(content.IsCultureEdited(Constants.System.InvariantCulture));
+
+        // the signal is durably persisted, not just reconstructed in-memory
+        using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+        {
+            var documentDto = scope.Database.Fetch<DocumentDto>("WHERE nodeId = @0", content.Id).Single();
+            Assert.IsTrue(documentDto.InvariantEdited);
+        }
     }
 
     [Test]

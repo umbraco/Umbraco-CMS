@@ -377,7 +377,8 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
 
         doc = ContentService.GetById(doc.Id); // re-get
         Assert.AreEqual("hello world", doc.GetValue("title"));
-        Assert.IsTrue(doc.IsCultureEdited("en-US")); // invariant prop changes show up on default lang
+        Assert.IsTrue(doc.IsCultureEdited("en-US")); // never published yet, so every available culture is edited regardless of the invariant prop
+        Assert.IsTrue(doc.IsCultureEdited(Constants.System.InvariantCulture)); // the invariant prop change is also tracked distinctly
         Assert.IsTrue(doc.Edited);
 
         // change the property type to be variant
@@ -395,7 +396,8 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         doc = ContentService.GetById(doc.Id); // re-get
 
         Assert.AreEqual("hello world", doc.GetValue("title"));
-        Assert.IsTrue(doc.IsCultureEdited("en-US")); // invariant prop changes show up on default lang
+        Assert.IsTrue(doc.IsCultureEdited("en-US")); // never published yet, so every available culture is edited regardless of the invariant prop
+        Assert.IsTrue(doc.IsCultureEdited(Constants.System.InvariantCulture)); // the invariant prop change is also tracked distinctly
         Assert.IsTrue(doc.Edited);
     }
 
@@ -992,10 +994,11 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         Assert.AreEqual("doc1fr", document.GetCultureName("fr"));
         Assert.AreEqual("v1en", document.GetValue("value1"));
         Assert.AreEqual("v1en-init", document.GetValue("value1", published: true));
-        Assert.IsTrue(
+        Assert.IsFalse(
             document.IsCultureEdited(
-                "en")); // This is true because the invariant property reflects changes on the default lang
+                "en")); // Invariant property edits are tracked distinctly, not on the default lang
         Assert.IsFalse(document.IsCultureEdited("fr"));
+        Assert.IsTrue(document.IsCultureEdited(Constants.System.InvariantCulture));
         Assert.IsTrue(document.Edited);
 
         // switch property type to Culture

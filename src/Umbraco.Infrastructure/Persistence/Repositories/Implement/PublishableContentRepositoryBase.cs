@@ -1101,6 +1101,7 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
 
         dto.NodeId = nodeDto.NodeId;
         entity.Edited = dto.Edited = !dto.Published || edited; // if not published, always edited
+        entity.InvariantEdited = dto.InvariantEdited = !dto.Published || (editedCultures != null && editedCultures.Contains(Constants.System.InvariantCulture));
         Database.Insert(dto);
 
         // persist the variations
@@ -1371,6 +1372,7 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
             }
 
             entity.Edited = dto.Edited = !dto.Published || edited; // if not published, always edited
+            entity.InvariantEdited = dto.InvariantEdited = !dto.Published || (editedCultures != null && editedCultures.Contains(Constants.System.InvariantCulture));
             Database.Update(dto);
 
             // if entity is publishing, update tags, else leave tags there

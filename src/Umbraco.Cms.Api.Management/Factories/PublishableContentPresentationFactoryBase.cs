@@ -81,6 +81,12 @@ internal abstract class PublishableContentPresentationFactoryBase<TEntity, TVari
             models.Add(model);
         }
 
+        // include a single invariant (culture = null) entry representing the content's invariant properties,
+        // distinct from any specific culture
+        TVariantItemResponseModel invariantModel = CreateVariantItemResponseModel(entity.Name ?? string.Empty, PublishableVariantStateHelper.GetState(entity, null), null);
+        await PopulateFlagsAsync(invariantModel);
+        models.Add(invariantModel);
+
         return models;
     }
 

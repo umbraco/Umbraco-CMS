@@ -1,4 +1,5 @@
 using System.Globalization;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
 
@@ -307,7 +308,7 @@ public static class ContentRepositoryExtensions
         else
         {
             var editedCultures = new HashSet<string>(
-                cultures.Where(x => !x.IsNullOrWhiteSpace())!,
+                cultures.Where(x => !x.IsNullOrWhiteSpace() && x != Constants.System.InvariantCulture)!,
                 StringComparer.OrdinalIgnoreCase);
             content.EditedCultures = editedCultures.Count > 0 ? editedCultures : null;
         }

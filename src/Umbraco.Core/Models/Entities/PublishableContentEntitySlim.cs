@@ -36,4 +36,7 @@ public abstract class PublishableContentEntitySlim : ContentEntitySlim
 
     /// <inheritdoc />
     public bool Edited { get; set; }
+
+    /// <inheritdoc />
+    public bool InvariantEdited { get; set; }
 }
