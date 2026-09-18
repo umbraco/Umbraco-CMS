@@ -12,6 +12,7 @@ const rootDocumentName = 'RootDocument';
 
 test.beforeEach(async ({umbracoApi, umbracoUi}) => {
   await umbracoApi.redirectManagement.setStatus(enableStatus);
+  await umbracoApi.redirectManagement.deleteAllRedirects();
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   documentTypeId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(documentTypeName);
   await umbracoUi.goToBackOffice();
@@ -25,6 +26,7 @@ test.beforeEach(async ({umbracoApi, umbracoUi}) => {
 
 test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.redirectManagement.setStatus(enableStatus);
+  await umbracoApi.redirectManagement.deleteAllRedirects();
   await umbracoApi.document.ensureNameNotExists(contentName);
   await umbracoApi.document.ensureNameNotExists(rootDocumentName);
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);

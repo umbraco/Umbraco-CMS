@@ -737,6 +737,7 @@ export type DocumentCollectionResponseModel = {
     updater?: null | string;
     creator?: null | string;
     sortOrder: number;
+    hasChildren: boolean;
     id: string;
     flags: Array<FlagModel>;
     values: Array<DocumentValueResponseModel>;
@@ -1571,8 +1572,10 @@ export type ManifestResponseModel = {
 
 export type MediaCollectionResponseModel = {
     mediaType: MediaTypeCollectionReferenceResponseModel;
+    extension?: null | string;
     creator?: null | string;
     sortOrder: number;
+    hasChildren: boolean;
     id: string;
     flags: Array<FlagModel>;
     values: Array<MediaValueResponseModel>;
@@ -1589,6 +1592,7 @@ export type MediaItemResponseModel = {
     parent?: null | ReferenceByIdModel;
     hasChildren: boolean;
     mediaType: MediaTypeReferenceResponseModel;
+    extension?: null | string;
     variants: Array<VariantItemResponseModel>;
     id: string;
     flags: Array<FlagModel>;
@@ -1614,6 +1618,7 @@ export type MediaResponseModel = {
 
 export type MediaTreeItemResponseModel = {
     mediaType: MediaTypeReferenceResponseModel;
+    extension?: null | string;
     variants: Array<VariantItemResponseModel>;
     noAccess: boolean;
     isTrashed: boolean;

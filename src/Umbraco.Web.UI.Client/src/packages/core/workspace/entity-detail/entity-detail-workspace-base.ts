@@ -453,6 +453,14 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		return this._data.getHasUnpersistedChanges();
 	}
 
+	/**
+	 * Resets the data back to the last persisted state, discarding any local changes.
+	 * @memberof UmbEntityDetailWorkspaceContextBase
+	 */
+	public resetData(): void {
+		this._data.resetCurrent();
+	}
+
 	override resetState() {
 		super.resetState();
 		this.loading.clear();

@@ -50,7 +50,7 @@ test('can bulk trash content nodes without a relation in list view', async ({umb
   await umbracoUi.content.clickTrashSelectedListItems();
   // Verify the references list not displayed
   await umbracoUi.content.isReferenceHeadlineVisible(false);
-  await umbracoUi.content.clickConfirmTrashButtonAndWaitForContentToBeTrashed();
+  await umbracoUi.content.clickConfirmTrashButtonAndWaitForContentToBeTrashed(2);
 
   // // Assert
   await expect.poll(() => umbracoApi.document.doesNameExist(firstChildContentName)).toBeFalsy();
@@ -82,7 +82,7 @@ test('can bulk trash content nodes with a relation in list view', async ({umbrac
   await umbracoUi.content.doesReferenceHeadlineHaveText(referenceHeadline);
   await umbracoUi.content.doesReferenceItemsHaveCount(1);
   await umbracoUi.content.isReferenceItemNameVisible(firstChildContentName);
-  await umbracoUi.content.clickConfirmTrashButtonAndWaitForContentToBeTrashed();
+  await umbracoUi.content.clickConfirmTrashButtonAndWaitForContentToBeTrashed(2);
 
   // Assert
   await expect.poll(() => umbracoApi.document.doesNameExist(firstChildContentName)).toBeFalsy();
@@ -110,7 +110,7 @@ test('can bulk trash content nodes without a relation in grid view', async ({umb
   await umbracoUi.content.clickTrashSelectedListItems();
   // Verify the references list not displayed
   await umbracoUi.content.isReferenceHeadlineVisible(false);
-  await umbracoUi.content.clickConfirmTrashButtonAndWaitForContentToBeTrashed();
+  await umbracoUi.content.clickConfirmTrashButtonAndWaitForContentToBeTrashed(2);
 
   // // Assert
   await expect.poll(() => umbracoApi.document.doesNameExist(firstChildContentName)).toBeFalsy();
@@ -141,7 +141,7 @@ test('can bulk trash content nodes with a relation in grid view', async ({umbrac
   await umbracoUi.content.doesReferenceHeadlineHaveText(referenceHeadline);
   await umbracoUi.content.doesReferenceItemsHaveCount(1);
   await umbracoUi.content.isReferenceItemNameVisible(firstChildContentName);
-  await umbracoUi.content.clickConfirmTrashButtonAndWaitForContentToBeTrashed();
+  await umbracoUi.content.clickConfirmTrashButtonAndWaitForContentToBeTrashed(2);
 
   // Assert
   await expect.poll(() => umbracoApi.document.doesNameExist(firstChildContentName)).toBeFalsy();
