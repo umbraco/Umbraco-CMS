@@ -11,7 +11,6 @@ using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 using Umbraco.Cms.Persistence.Sqlite.Configuration;
 using Umbraco.Cms.Persistence.Sqlite.Interceptors;
 using Umbraco.Cms.Persistence.Sqlite.Services;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Persistence.Sqlite;
 
@@ -48,23 +47,9 @@ public static class UmbracoBuilderExtensions
         DbProviderFactories.UnregisterFactory(Constants.ProviderName);
         DbProviderFactories.RegisterFactory(Constants.ProviderName, SqliteFactory.Instance);
 
-        // Prevent accidental creation of SQLite database files
-        builder.Services.PostConfigureAll<ConnectionStrings>(options =>
-        {
-            // Skip empty connection string and other providers
-            if (!options.IsConnectionStringConfigured() || options.ProviderName != Constants.ProviderName)
-            {
-                return;
-            }
-
-            var connectionStringBuilder = new SqliteConnectionStringBuilder(options.ConnectionString);
-            if (connectionStringBuilder.Mode == SqliteOpenMode.ReadWriteCreate)
-            {
-                connectionStringBuilder.Mode = SqliteOpenMode.ReadWrite;
-                options.ConnectionString = connectionStringBuilder.ConnectionString;
-            }
-        });
-
+        // Correct the configured connection string before it is used
+        builder.Services.TryAddEnumerable(ServiceDescriptor
+            .Singleton<IPostConfigureOptions<ConnectionStrings>, ConfigureSqliteConnectionStringMode>());
         builder.Services.TryAddEnumerable(ServiceDescriptor
             .Singleton<IPostConfigureOptions<ConnectionStrings>, ConfigureSqliteConnectionStringTimeouts>());
         builder.Services.TryAddEnumerable(ServiceDescriptor
