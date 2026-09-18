@@ -476,6 +476,9 @@ internal class AsyncDocumentRepository
                     contentVersionFilter: contentVersion => true)
                 .OrderByDescending(joined => joined.ContentVersion.Current)
                 .ThenByDescending(joined => joined.ContentVersion.VersionDate)
+                // Versions saved within the same clock tick share a VersionDate, so without an id tiebreak
+                // their relative order is whatever the provider happens to return.
+                .ThenByDescending(joined => joined.ContentVersion.Id)
                 .Select(ToDocumentRow)
                 .ToListAsync(cancellationToken);
 

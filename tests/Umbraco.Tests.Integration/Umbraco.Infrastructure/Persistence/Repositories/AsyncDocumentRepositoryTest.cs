@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
@@ -88,9 +89,46 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         await ContentService.PublishAsync(_publishedPage, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
     }
 
-    private AsyncDocumentRepository CreateRepository() => new(
+    private CountingDbCommandInterceptor CommandCounter => GetRequiredService<CountingDbCommandInterceptor>();
+
+    /// <summary>
+    ///     Attaches the command counter so tests can assert on query cost. Registered here rather than in
+    ///     <c>CustomTestSetup</c> because this hook runs last, after the harness has rewrapped the same descriptor
+    ///     for its own reasons.
+    /// </summary>
+    protected override void ConfigureTestServices(IServiceCollection services)
+    {
+        services.AddSingleton<CountingDbCommandInterceptor>();
+
+        ServiceDescriptor descriptor = services.Single(d => d.ServiceType == typeof(DbContextOptions<UmbracoDbContext>));
+        Func<IServiceProvider, object> originalFactory = descriptor.ImplementationFactory!;
+        services.Remove(descriptor);
+        services.AddSingleton<DbContextOptions<UmbracoDbContext>>(serviceProvider =>
+        {
+            var options = (DbContextOptions<UmbracoDbContext>)originalFactory(serviceProvider);
+            return new DbContextOptionsBuilder<UmbracoDbContext>(options)
+                .AddInterceptors(serviceProvider.GetRequiredService<CountingDbCommandInterceptor>())
+                .Options;
+        });
+    }
+
+    /// <summary>
+    ///     A cache that actually caches. The default is <see cref="AppCaches.Disabled" />, so a test that means to
+    ///     exercise the repository cache policy must opt in explicitly - otherwise it passes whatever the policy does.
+    /// </summary>
+    private static AppCaches CreateRealAppCaches() => new(
+        new ObjectCacheAppCache(),
+        new DictionaryAppCache(),
+        new IsolatedCaches(_ => new ObjectCacheAppCache()));
+
+    private AsyncDocumentRepository CreateRepository() => CreateRepository(AppCaches.Disabled);
+
+    private AsyncDocumentRepository CreateRepository(AppCaches appCaches) =>
+        CreateRepository(appCaches, Mock.Of<IEventAggregator>());
+
+    private AsyncDocumentRepository CreateRepository(AppCaches appCaches, IEventAggregator eventAggregator) => new(
         GetRequiredService<IEFCoreScopeAccessor<UmbracoDbContext>>(),
-        AppCaches.Disabled,
+        appCaches,
         LoggerFactory,
         GetRequiredService<ILanguageRepository>(),
         GetRequiredService<IRelationRepository>(),
@@ -98,7 +136,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         GetRequiredService<PropertyEditorCollection>(),
         GetRequiredService<DataValueReferenceFactoryCollection>(),
         GetRequiredService<IDataTypeService>(),
-        Mock.Of<IEventAggregator>(),
+        eventAggregator,
         Mock.Of<IRepositoryCacheVersionService>(),
         Mock.Of<ICacheSyncService>(),
         GetRequiredService<IContentTypeRepository>(),
@@ -173,6 +211,41 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         scope.Complete();
     }
 
+    /// <summary>
+    ///     ParentKey is resolved by a self-join inside the document query, not by a follow-up lookup, so reading a
+    ///     document that has a parent must cost exactly what reading a root document costs. Comparing the two is the
+    ///     assertion; an absolute command count is not, because a single read also fans out across property data,
+    ///     content types, variations and templates, several of them through collaborators with their own caching.
+    /// </summary>
+    [Test]
+    public async Task GetAsync_ForNonRootContent_ResolvesParentKey_WithoutAnExtraQuery()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        // First read pays one-off costs - content type hydration, id/key mapping - that would otherwise
+        // land on whichever document happened to be read first and swamp the comparison.
+        await repository.GetAsync(_textpage.Key, CancellationToken.None);
+
+        CommandCounter.Enabled = true;
+        CommandCounter.Reset();
+        await repository.GetAsync(_publishedPage.Key, CancellationToken.None);
+        var rootCount = CommandCounter.Count;
+
+        CommandCounter.Reset();
+        await repository.GetAsync(_subpage.Key, CancellationToken.None);
+        var nonRootCount = CommandCounter.Count;
+        var nonRootCommands = string.Join(" | ", CommandCounter.Commands);
+        CommandCounter.Enabled = false;
+
+        Assert.That(
+            nonRootCount,
+            Is.EqualTo(rootCount),
+            $"reading a child cost {nonRootCount} commands against {rootCount} for a root document, so ParentKey is "
+            + $"no longer coming from the self-join. Commands: {nonRootCommands}");
+        scope.Complete();
+    }
+
     [Test]
     public async Task GetAsync_PopulatesNodeMetadata()
     {
@@ -192,6 +265,23 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
             Assert.That(result.CreateDate, Is.EqualTo(_subpage.CreateDate).Within(TimeSpan.FromSeconds(1)));
         });
         scope.Complete();
+    }
+
+    /// <summary>
+    ///     A document straight out of the repository must look untouched. If hydration leaves properties marked
+    ///     dirty, callers that save conditionally will write rows nobody asked them to write.
+    /// </summary>
+    [Test]
+    public async Task GetAsync_FreshlyHydratedEntity_HasNoDirtyProperties()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        IContent? result = await repository.GetAsync(_subpage2.Key, CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(result, Is.Not.Null);
+        Assert.That(((Content)result!).IsDirty(), Is.False);
     }
 
     [Test]
@@ -666,21 +756,82 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         Assert.That(result!.Properties, Is.Not.Empty);
     }
 
+    /// <summary>
+    ///     Builds a known sequence of versions and asserts the exact order returned, most recent first. The weaker
+    ///     "at least two versions" form this replaced could not tell a correct ordering from a reversed one.
+    /// </summary>
     [Test]
     public async Task GetAllVersionsAsync_WithMultipleVersions_ReturnsAllInOrder()
     {
-        // _publishedPage was created via SaveAndPublish which inserts two ContentVersion rows:
-        // one pre-publish draft and one post-publish current version. That guarantees >= 2 versions.
         using var scope = NewScopeProvider.CreateScope();
         var repository = CreateRepository();
 
-        IEnumerable<IContent> results = await repository.GetAllVersionsAsync(_publishedPage.Key, CancellationToken.None);
+        IContent content = ContentBuilder.CreateSimpleContent(_contentType, "Versioned Page", _textpage.Id);
+        await repository.SaveAsync(content, CancellationToken.None);
+        var expected = new List<int> { content.VersionId };
+
+        for (var i = 1; i <= 3; i++)
+        {
+            content.Name = $"name-{i}";
+            content.SetValue("title", $"title-{i}");
+            content.PublishedState = PublishedState.Publishing;
+            await repository.SaveAsync(content, CancellationToken.None);
+            expected.Add(content.VersionId);
+        }
+
+        IEnumerable<IContent> results = await repository.GetAllVersionsAsync(content.Key, CancellationToken.None);
         scope.Complete();
 
-        IContent[] versions = results.ToArray();
-        Assert.That(versions, Has.Length.GreaterThanOrEqualTo(2));
-        // Current version (Current = true) is ordered first, and it is the published one.
-        Assert.That(versions[0].Published, Is.True, "first result should be the current published version");
+        var actual = results.Select(version => version.VersionId).ToArray();
+        Assert.Multiple(() =>
+        {
+            Assert.That(actual, Is.EqualTo(expected.Distinct().Reverse().ToArray()));
+            Assert.That(results.First().Published, Is.True, "the current version should be first and published");
+        });
+    }
+
+    /// <summary>
+    ///     An older version must report the name and the property values it held at the time, not the live ones.
+    /// </summary>
+    /// <remarks>
+    ///     PublishCulture is what gives a property a published value, and only properties that have one produce
+    ///     property rows for the version being frozen. Publishing without it leaves the superseded version with no
+    ///     property rows at all, because the write path deletes existing rows that the new set does not account for.
+    /// </remarks>
+    [Test]
+    public async Task GetVersionAsync_ForAnOlderVersion_ReturnsThatVersionsNameAndPropertyValues()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        IContent content = ContentBuilder.CreateSimpleContent(_contentType, "Historical Page", _textpage.Id);
+        await repository.SaveAsync(content, CancellationToken.None);
+
+        var versionIds = new List<int>();
+        for (var i = 1; i <= 4; i++)
+        {
+            content.Name = $"name-{i}";
+            content.SetValue("title", $"title-{i}");
+            content.PublishCulture(CultureImpact.Invariant, DateTime.UtcNow, GetRequiredService<PropertyEditorCollection>());
+            content.PublishedState = PublishedState.Publishing;
+            await repository.SaveAsync(content, CancellationToken.None);
+            versionIds.Add(content.VersionId);
+        }
+
+        // A publishing save freezes the state it was given and leaves VersionId pointing at the NEW draft that
+        // continues from it, so the id captured on iteration i identifies the version carrying name-(i+1).
+        IContent? older = await repository.GetVersionAsync(versionIds[0], CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(older, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(older!.VersionId, Is.EqualTo(versionIds[0]));
+            Assert.That(older.Name, Is.EqualTo("name-2"));
+            Assert.That(older.GetValue("title"), Is.EqualTo("title-2"));
+            Assert.That(content.Name, Is.EqualTo("name-4"), "the live entity should be unaffected");
+            Assert.That(content.GetValue("title"), Is.EqualTo("title-4"));
+        });
     }
 
     [Test]
@@ -1615,26 +1766,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
     public async Task PersistNewItemAsync_FiresContentRefreshNotification()
     {
         var eventAggregatorMock = new Mock<IEventAggregator>();
-        var repository = new AsyncDocumentRepository(
-            GetRequiredService<IEFCoreScopeAccessor<UmbracoDbContext>>(),
-            AppCaches.Disabled,
-            LoggerFactory,
-            GetRequiredService<ILanguageRepository>(),
-            GetRequiredService<IRelationRepository>(),
-            GetRequiredService<IRelationTypeRepository>(),
-            GetRequiredService<PropertyEditorCollection>(),
-            GetRequiredService<DataValueReferenceFactoryCollection>(),
-            GetRequiredService<IDataTypeService>(),
-            eventAggregatorMock.Object,
-            Mock.Of<IRepositoryCacheVersionService>(),
-            Mock.Of<ICacheSyncService>(),
-            GetRequiredService<IContentTypeRepository>(),
-            GetRequiredService<ITemplateRepository>(),
-            GetRequiredService<IIdKeyMap>(),
-            GetRequiredService<ITagRepository>(),
-            GetRequiredService<IJsonSerializer>(),
-            new Lazy<IUserGroupService>(GetRequiredService<IUserGroupService>),
-            GetRequiredService<IShortStringHelper>());
+        var repository = CreateRepository(AppCaches.Disabled, eventAggregatorMock.Object);
 
         var content = ContentBuilder.CreateSimpleContent(_contentType, "Notify Page", _textpage.Id);
 
@@ -1679,6 +1811,24 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
 
         Assert.That(content.UpdateDate, Is.EqualTo(originalUpdateDate),
             "a no-op save must not touch UpdateDate, proving the early-return guard skipped the write");
+    }
+
+    [Test]
+    public async Task PersistUpdatedItemAsync_TemplateIdSetToNull_ClearsTemplate()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        IContent content = (await repository.GetAsync(_subpage.Key, CancellationToken.None))!;
+        Assert.That(content.TemplateId, Is.Not.Null, "fixture document should start with a template");
+
+        content.TemplateId = null;
+        await repository.SaveAsync(content, CancellationToken.None);
+
+        IContent? updated = await repository.GetAsync(_subpage.Key, CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(updated!.TemplateId.HasValue, Is.False);
     }
 
     [Test]
@@ -1828,26 +1978,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         await repository.SaveAsync(content, CancellationToken.None);
 
         var eventAggregatorMock = new Mock<IEventAggregator>();
-        var notifyingRepository = new AsyncDocumentRepository(
-            GetRequiredService<IEFCoreScopeAccessor<UmbracoDbContext>>(),
-            AppCaches.Disabled,
-            LoggerFactory,
-            GetRequiredService<ILanguageRepository>(),
-            GetRequiredService<IRelationRepository>(),
-            GetRequiredService<IRelationTypeRepository>(),
-            GetRequiredService<PropertyEditorCollection>(),
-            GetRequiredService<DataValueReferenceFactoryCollection>(),
-            GetRequiredService<IDataTypeService>(),
-            eventAggregatorMock.Object,
-            Mock.Of<IRepositoryCacheVersionService>(),
-            Mock.Of<ICacheSyncService>(),
-            GetRequiredService<IContentTypeRepository>(),
-            GetRequiredService<ITemplateRepository>(),
-            GetRequiredService<IIdKeyMap>(),
-            GetRequiredService<ITagRepository>(),
-            GetRequiredService<IJsonSerializer>(),
-            new Lazy<IUserGroupService>(GetRequiredService<IUserGroupService>),
-            GetRequiredService<IShortStringHelper>());
+        var notifyingRepository = CreateRepository(AppCaches.Disabled, eventAggregatorMock.Object);
 
         content.Name = "Notify Update Page Renamed";
         await notifyingRepository.SaveAsync(content, CancellationToken.None);
@@ -2310,26 +2441,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
                     .GetAwaiter().GetResult();
             });
 
-        var notifyingRepository = new AsyncDocumentRepository(
-            GetRequiredService<IEFCoreScopeAccessor<UmbracoDbContext>>(),
-            AppCaches.Disabled,
-            LoggerFactory,
-            GetRequiredService<ILanguageRepository>(),
-            GetRequiredService<IRelationRepository>(),
-            GetRequiredService<IRelationTypeRepository>(),
-            GetRequiredService<PropertyEditorCollection>(),
-            GetRequiredService<DataValueReferenceFactoryCollection>(),
-            GetRequiredService<IDataTypeService>(),
-            eventAggregatorMock.Object,
-            Mock.Of<IRepositoryCacheVersionService>(),
-            Mock.Of<ICacheSyncService>(),
-            GetRequiredService<IContentTypeRepository>(),
-            GetRequiredService<ITemplateRepository>(),
-            GetRequiredService<IIdKeyMap>(),
-            GetRequiredService<ITagRepository>(),
-            GetRequiredService<IJsonSerializer>(),
-            new Lazy<IUserGroupService>(GetRequiredService<IUserGroupService>),
-            GetRequiredService<IShortStringHelper>());
+        var notifyingRepository = CreateRepository(AppCaches.Disabled, eventAggregatorMock.Object);
 
         content.PublishedState = PublishedState.Publishing;
         await notifyingRepository.SaveAsync(content, CancellationToken.None);
@@ -2448,26 +2560,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         await repository.SaveAsync(content, CancellationToken.None);
 
         var eventAggregatorMock = new Mock<IEventAggregator>();
-        var notifyingRepository = new AsyncDocumentRepository(
-            GetRequiredService<IEFCoreScopeAccessor<UmbracoDbContext>>(),
-            AppCaches.Disabled,
-            LoggerFactory,
-            GetRequiredService<ILanguageRepository>(),
-            GetRequiredService<IRelationRepository>(),
-            GetRequiredService<IRelationTypeRepository>(),
-            GetRequiredService<PropertyEditorCollection>(),
-            GetRequiredService<DataValueReferenceFactoryCollection>(),
-            GetRequiredService<IDataTypeService>(),
-            eventAggregatorMock.Object,
-            Mock.Of<IRepositoryCacheVersionService>(),
-            Mock.Of<ICacheSyncService>(),
-            GetRequiredService<IContentTypeRepository>(),
-            GetRequiredService<ITemplateRepository>(),
-            GetRequiredService<IIdKeyMap>(),
-            GetRequiredService<ITagRepository>(),
-            GetRequiredService<IJsonSerializer>(),
-            new Lazy<IUserGroupService>(GetRequiredService<IUserGroupService>),
-            GetRequiredService<IShortStringHelper>());
+        var notifyingRepository = CreateRepository(AppCaches.Disabled, eventAggregatorMock.Object);
 
         content.Path = $"{_subpage2.Path},{_subpage.Id},{content.Id}";
         content.Level = _subpage2.Level + 2;
@@ -3600,6 +3693,23 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
 
         Assert.That(result.Items.Select(c => c.Key), Does.Contain(_subpage.Key),
             "GetAncestorsAsync must include trashed ancestors, unlike GetByLevelAsync's trashed exclusion");
+    }
+
+    [Test]
+    public async Task DeleteAsync_ThenGetAsync_ReturnsNull()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        var content = ContentBuilder.CreateSimpleContent(_contentType, "Textpage 2 Child Node", _trashed.Id);
+        await repository.SaveAsync(content, CancellationToken.None);
+
+        await repository.DeleteAsync(content, CancellationToken.None);
+
+        IContent? deleted = await repository.GetAsync(content.Key, CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(deleted, Is.Null);
     }
 
     [Test]
