@@ -64,16 +64,16 @@ test('can rebuild the index', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) =
 
   await umbracoUi.searchManagement.doesRebuildStartedNotificationHaveText(`"${indexAlias}" has started`);
 
-  // The index is still usable and this spec's document survived. Note this holds before the rebuild starts
-  // too, so it is a sanity check, not evidence the rebuild ran.
+  // The index is still usable. Note this holds before the rebuild starts too, so it is a sanity check,
+  // not evidence the rebuild ran.
   const index = await umbracoApi.searchManagement.getIndex(indexAlias);
   expect(index.healthStatus).toBe('Healthy');
-  const searchResult = await umbracoApi.searchManagement.search(indexAlias, documentName);
-  expect(searchResult.documents.some((document: {id: string}) => document.id === documentId)).toBe(true);
-});
 
-// TODO (V19): assert rebuild completion once the server broadcasts IndexRebuildCompleted.
-//
-// Nothing observable proves the rebuild ran: the endpoint queues background work and answers immediately, and
-// "Rebuilding" is unreachable while ZeroDowntimeIndexing defaults to false. The back office does subscribe to
-// the completion event, but the server never emits it.
+  // The PUT only confirms the rebuild was queued, not that repopulation reached this document yet.
+  await expect
+    .poll(
+      async () => (await umbracoApi.searchManagement.search(indexAlias, documentName)).documents.some((document: {id: string}) => document.id === documentId),
+      {timeout: ConstantHelper.timeout.veryLong},
+    )
+    .toBeTruthy();
+});

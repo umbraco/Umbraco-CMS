@@ -1752,6 +1752,34 @@ export class DocumentApiHelper {
     return contentId;
   }
 
+  async createDocumentWithTwoCultureSpecificValues(documentName: string, documentTypeId: string, dataTypeName: string, firstCulture: string, firstValue: string, secondCulture: string, secondValue: string) {
+    await this.ensureNameNotExists(documentName);
+
+    const document = new DocumentBuilder()
+      .withDocumentTypeId(documentTypeId)
+      .addVariant()
+        .withName(documentName)
+        .withCulture(firstCulture)
+        .done()
+      .addVariant()
+        .withName(documentName)
+        .withCulture(secondCulture)
+        .done()
+      .addValue()
+        .withAlias(AliasHelper.toAlias(dataTypeName))
+        .withValue(firstValue)
+        .withCulture(firstCulture)
+        .done()
+      .addValue()
+        .withAlias(AliasHelper.toAlias(dataTypeName))
+        .withValue(secondValue)
+        .withCulture(secondCulture)
+        .done()
+      .build();
+
+    return await this.create(document);
+  }
+
   async createDefaultDocumentWithOneDocumentLink(documentName: string, linkedDocumentName: string, linkedDocumentId: string, documentTypeName: string = 'Test Document Type') {
     const multiURLPickerDataTypeName = 'Multi URL Picker';
     // Get the url of the linked document

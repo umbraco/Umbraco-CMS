@@ -33,11 +33,13 @@ test('can see the index list with the expected columns and indexes', {tag: '@smo
 test('can refresh the index list', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const indexes = await umbracoApi.searchManagement.getAllIndexes();
-  const indexAlias = indexes.items[0].indexAlias;
+  expect(indexes.items.length).toBeGreaterThan(0);
 
   // Act
   await umbracoUi.searchManagement.clickRefreshListButtonAndWaitForReload();
 
   // Assert
-  await umbracoUi.searchManagement.isIndexRowVisible(indexAlias);
+  for (const index of indexes.items) {
+    await umbracoUi.searchManagement.isIndexRowVisible(index.indexAlias);
+  }
 });

@@ -31,15 +31,16 @@ export class SearchManagementApiHelper {
   }
 
   /**
-   * Runs a free-text search against an index.
+   * Runs a free-text search against an index, optionally scoped to a culture.
    *
-   * The endpoint also accepts filters, facets, sorters, culture and segment; add them here as parameters
-   * when a test needs them.
+   * The endpoint also accepts filters/facets/sorters/segment - add `segment` here when a test needs it, but
+   * not filters/facets/sorters: as of writing, sending any of those as JSON always fails with a 400.
    */
-  async search(indexAlias: string, query?: string, skip = 0, take = 100) {
+  async search(indexAlias: string, query?: string, culture?: string, skip = 0, take = 100) {
     const response = await this.api.post(this.api.baseUrl + `${ConstantHelper.apiEndpoints.searchQuery}?skip=${skip}&take=${take}`, {
       indexAlias: indexAlias,
-      query: query
+      query: query,
+      culture: culture
     });
     return await response.json();
   }

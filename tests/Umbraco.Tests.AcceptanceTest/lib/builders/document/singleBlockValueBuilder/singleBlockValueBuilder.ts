@@ -9,14 +9,12 @@ export class SingleBlockValueBuilder {
   singleBlockContentDataBuilder: SingleBlockContentDataBuilder[];
   singleBlockExposeBuilder: SingleBlockExposeBuilder[];
   singleBlockLayoutBuilder: SingleBlockLayoutBuilder[];
-  singleBlockSettingDataBuilder: [];
 
   constructor(parentBuilder: DocumentValueBuilder | DocumentBlueprintsValueBuilder) {
     this.parentBuilder = parentBuilder;
     this.singleBlockContentDataBuilder = [];
     this.singleBlockExposeBuilder = [];
     this.singleBlockLayoutBuilder = [];
-    this.singleBlockSettingDataBuilder = [];
   }
 
   addContentData() {

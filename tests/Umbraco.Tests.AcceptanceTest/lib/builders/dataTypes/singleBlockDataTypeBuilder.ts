@@ -20,7 +20,6 @@ export class SingleBlockDataTypeBuilder extends DataTypeBuilder {
   getValues() {
     let values: any[] = [];
 
-    // Add blocks alias and value if present
     if (this.singleBlockBlockBuilder && this.singleBlockBlockBuilder.length > 0) {
       values.push({
         alias: 'blocks',

@@ -31,6 +31,25 @@ const dateTimeUnspecifiedDocumentTypeName = 'SearchIndexingEdgeCasesDateTimeUnsp
 const dateTimeWithTimeZoneDocumentTypeName = 'SearchIndexingEdgeCasesDateTimeWithTimeZoneDocumentType';
 const dateEditorsTemplateName = 'SearchIndexingEdgeCasesDateEditorsTemplate';
 
+// Culture-scoped search
+const cultureDocumentTypeName = 'SearchIndexingEdgeCasesCultureDocumentType';
+const cultureDocumentName = 'SearchIndexingEdgeCasesCultureDocument';
+const cultureGroupName = 'CultureGroup';
+const englishIsoCode = 'en-US';
+const danishIsoCode = 'da';
+const englishSearchableValue = 'CultureScopedSearchEnglishValue1234567890';
+const danishSearchableValue = 'CultureScopedSearchDanishValue1234567890';
+
+// Media
+const mediaFileName = 'SearchIndexingEdgeCasesMediaFile';
+
+// Member
+const memberTypeName = 'SearchIndexingEdgeCasesMemberType';
+const memberName = 'SearchIndexingEdgeCasesMember';
+const memberEmail = 'searchindexingedgecasesmember@acceptancetest.umbraco.com';
+const memberUsername = 'searchindexingedgecasesmember';
+const memberPassword = '0123456789';
+
 let indexAlias = '';
 
 test.beforeEach(async ({umbracoApi}) => {
@@ -167,5 +186,120 @@ test.describe('date/time editor indexing', () => {
       const value = {date: '2026-01-01T12:30:00.000Z', timeZone: 'Europe/Copenhagen'};
       return await umbracoApi.document.createPublishedDocumentWithValue(dateTimeWithTimeZoneDocumentName, value, dateTimeWithTimeZoneDataTypeId, templateId, dateTimeWithTimeZoneDataTypeName, dateTimeWithTimeZoneDocumentTypeName);
     });
+  });
+});
+
+test.describe('culture-scoped ad-hoc search', () => {
+  test.beforeEach(async ({umbracoApi}) => {
+    await umbracoApi.language.createDanishLanguage();
+  });
+
+  test.afterEach(async ({umbracoApi}) => {
+    await umbracoApi.document.ensureNameNotExists(cultureDocumentName);
+    await umbracoApi.documentType.ensureNameNotExists(cultureDocumentTypeName);
+    await umbracoApi.language.ensureIsoCodeNotExists(danishIsoCode);
+  });
+
+  test('a search scoped to a culture only matches that culture\'s variant value', async ({umbracoApi}) => {
+    // Arrange - the property must vary by culture too, so Umb_Content indexes it per culture, not once shared.
+    const textstringDataType = await umbracoApi.dataType.getByName(textstringDataTypeName);
+    const cultureDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(cultureDocumentTypeName, textstringDataTypeName, textstringDataType.id, cultureGroupName, true, true) ?? '';
+    const documentId = await umbracoApi.document.createDocumentWithTwoCultureSpecificValues(cultureDocumentName, cultureDocumentTypeId, textstringDataTypeName, englishIsoCode, englishSearchableValue, danishIsoCode, danishSearchableValue) ?? '';
+    await umbracoApi.document.publishDocumentWithCultures(documentId, [englishIsoCode, danishIsoCode]);
+
+    // Wait for both culture variants to be indexed before asserting anything is absent below - otherwise
+    // "not found" could just mean "not indexed yet" rather than "correctly scoped by culture".
+    await expect
+      .poll(
+        async () => (await umbracoApi.searchManagement.search(indexAlias, englishSearchableValue, englishIsoCode)).documents.some((document: {id: string}) => document.id === documentId),
+        {timeout: ConstantHelper.timeout.veryLong},
+      )
+      .toBeTruthy();
+    await expect
+      .poll(
+        async () => (await umbracoApi.searchManagement.search(indexAlias, danishSearchableValue, danishIsoCode)).documents.some((document: {id: string}) => document.id === documentId),
+        {timeout: ConstantHelper.timeout.veryLong},
+      )
+      .toBeTruthy();
+
+    // Assert - each culture's value must not be visible when the search is scoped to the other culture
+    const englishScopedDanishSearch = await umbracoApi.searchManagement.search(indexAlias, danishSearchableValue, englishIsoCode);
+    expect(englishScopedDanishSearch.documents.some((document: {id: string}) => document.id === documentId)).toBe(false);
+
+    const danishScopedEnglishSearch = await umbracoApi.searchManagement.search(indexAlias, englishSearchableValue, danishIsoCode);
+    expect(danishScopedEnglishSearch.documents.some((document: {id: string}) => document.id === documentId)).toBe(false);
+  });
+});
+
+test.describe('media indexing', () => {
+  let mediaIndexAlias = '';
+
+  test.beforeEach(async ({umbracoApi}) => {
+    const indexes = await umbracoApi.searchManagement.getAllIndexes();
+    const mediaIndex = indexes.items.find((index) => index.indexAlias === 'Umb_Media');
+    expect(mediaIndex, 'the Umb_Media index must exist').toBeTruthy();
+    mediaIndexAlias = mediaIndex!.indexAlias;
+  });
+
+  test.afterEach(async ({umbracoApi}) => {
+    await umbracoApi.media.ensureNameNotExists(mediaFileName);
+  });
+
+  test('a media item is indexed and findable by name', async ({umbracoApi}) => {
+    // Arrange
+    const mediaId = await umbracoApi.media.createDefaultMediaFile(mediaFileName) ?? '';
+
+    // Act - media has no draft/published distinction, so unlike the document tests above there's no
+    // publish() call.
+    let searchResult;
+    await expect
+      .poll(
+        async () => {
+          searchResult = await umbracoApi.searchManagement.search(mediaIndexAlias, mediaFileName);
+          return searchResult.documents.some((document: {id: string}) => document.id === mediaId);
+        },
+        {timeout: ConstantHelper.timeout.veryLong},
+      )
+      .toBeTruthy();
+
+    // Assert
+    expect(searchResult.total).toBeGreaterThan(0);
+  });
+});
+
+test.describe('member indexing', () => {
+  let memberIndexAlias = '';
+
+  test.beforeEach(async ({umbracoApi}) => {
+    const indexes = await umbracoApi.searchManagement.getAllIndexes();
+    const memberIndex = indexes.items.find((index) => index.indexAlias === 'Umb_Members');
+    expect(memberIndex, 'the Umb_Members index must exist').toBeTruthy();
+    memberIndexAlias = memberIndex!.indexAlias;
+  });
+
+  test.afterEach(async ({umbracoApi}) => {
+    await umbracoApi.member.ensureNameNotExists(memberName);
+    await umbracoApi.memberType.ensureNameNotExists(memberTypeName);
+  });
+
+  test('a member is indexed and findable by name', async ({umbracoApi}) => {
+    // Arrange
+    const memberTypeId = await umbracoApi.memberType.createDefaultMemberType(memberTypeName) ?? '';
+    const memberId = await umbracoApi.member.createDefaultMember(memberName, memberTypeId, memberEmail, memberUsername, memberPassword) ?? '';
+
+    // Act
+    let searchResult;
+    await expect
+      .poll(
+        async () => {
+          searchResult = await umbracoApi.searchManagement.search(memberIndexAlias, memberName);
+          return searchResult.documents.some((document: {id: string}) => document.id === memberId);
+        },
+        {timeout: ConstantHelper.timeout.veryLong},
+      )
+      .toBeTruthy();
+
+    // Assert
+    expect(searchResult.total).toBeGreaterThan(0);
   });
 });
