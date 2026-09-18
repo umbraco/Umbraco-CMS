@@ -39,10 +39,9 @@ internal sealed class ConfigureSqliteConnectionStringMode : IPostConfigureOption
         {
             // The connection string cannot be rewritten, so leave it alone rather than failing to configure
             // options - which would surface as an obscure startup failure rather than a connection error.
-            _logger.LogWarning(
-                exception,
-                "The connection mode could not be applied, because the connection string could not be parsed. "
-                + "Set \"Mode=ReadWrite\" in the connection string instead.");
+            const string message = "The connection mode could not be applied, because the connection string "
+                + "could not be parsed. Set \"Mode=ReadWrite\" in the connection string instead.";
+            _logger.LogWarning(exception, message);
             return;
         }
 

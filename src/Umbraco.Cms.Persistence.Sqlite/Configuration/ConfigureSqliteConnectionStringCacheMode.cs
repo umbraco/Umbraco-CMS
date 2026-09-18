@@ -54,10 +54,9 @@ internal sealed class ConfigureSqliteConnectionStringCacheMode : IPostConfigureO
         {
             // The connection string cannot be rewritten, so leave it alone rather than failing to configure
             // options - which would surface as an obscure startup failure rather than a connection error.
-            _logger.LogWarning(
-                exception,
-                "Shared-cache mode could not be removed, because the connection string could not be parsed. "
-                + "Remove \"Cache=Shared\" from the connection string instead.");
+            const string message = "Shared-cache mode could not be removed, because the connection string "
+                + "could not be parsed. Remove \"Cache=Shared\" from the connection string instead.";
+            _logger.LogWarning(exception, message);
             return;
         }
 
