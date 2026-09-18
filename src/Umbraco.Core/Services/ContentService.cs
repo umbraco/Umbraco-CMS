@@ -49,11 +49,8 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
     /// <param name="provider">The core scope provider.</param>
     /// <param name="loggerFactory">The logger factory.</param>
     /// <param name="eventMessagesFactory">The event messages factory.</param>
-    /// <param name="documentRepository">The document repository.</param>
-    /// <param name="entityRepository">The entity repository.</param>
     /// <param name="auditService">The audit service.</param>
     /// <param name="contentTypeRepository">The content type repository.</param>
-    /// <param name="documentBlueprintRepository">The document blueprint repository.</param>
     /// <param name="languageRepository">The language repository.</param>
     /// <param name="propertyValidationService">The property validation service.</param>
     /// <param name="shortStringHelper">The short string helper.</param>
@@ -69,7 +66,6 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
         IEventMessagesFactory eventMessagesFactory,
-        IDocumentRepository documentRepository,
         IAuditService auditService,
         IContentTypeRepository contentTypeRepository,
         ILanguageRepository languageRepository,
@@ -89,7 +85,6 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
             eventMessagesFactory,
             auditService,
             contentTypeRepository,
-            documentRepository,
             asyncDocumentRepository,
             languageRepository,
             propertyValidationService,
@@ -1518,13 +1513,14 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
     ///     Gets a collection of <see cref="IContent" /> descendants by the first Parent.
     /// </summary>
     /// <param name="content"><see cref="IContent" /> item to retrieve Descendants from</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>An Enumerable list of <see cref="IContent" /> objects</returns>
-    internal IEnumerable<IContent> GetPublishedDescendants(IContent content)
+    internal async Task<IReadOnlyCollection<IContent>> GetPublishedDescendantsAsync(IContent content, CancellationToken cancellationToken)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             scope.ReadLock(Constants.Locks.ContentTree);
-            return GetPublishedDescendantsLocked(content).ToArray(); // ToArray important in uow!
+            return await GetPublishedDescendantsLockedAsync(content, cancellationToken);
         }
     }
 

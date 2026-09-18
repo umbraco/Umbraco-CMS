@@ -38,7 +38,6 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
 {
     private readonly IAuditService _auditService;
     private readonly IContentTypeRepository _contentTypeRepository;
-    private readonly IPublishableContentRepository<TContent> _contentRepository;
     private readonly IAsyncPublishableContentRepository<TContent> _asyncContentRepository;
     private readonly ILanguageRepository _languageRepository;
     private readonly Lazy<IPropertyValidationService> _propertyValidationService;
@@ -53,7 +52,6 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
         IEventMessagesFactory eventMessagesFactory,
         IAuditService auditService,
         IContentTypeRepository contentTypeRepository,
-        IPublishableContentRepository<TContent> contentRepository,
         IAsyncPublishableContentRepository<TContent> asyncContentRepository,
         ILanguageRepository languageRepository,
         Lazy<IPropertyValidationService> propertyValidationService,
@@ -65,7 +63,6 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
     {
         _auditService = auditService;
         _contentTypeRepository = contentTypeRepository;
-        _contentRepository = contentRepository;
         _asyncContentRepository = asyncContentRepository;
         _languageRepository = languageRepository;
         _propertyValidationService = propertyValidationService;
@@ -1579,7 +1576,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
                 // but back as 'published' nevertheless
                 if (!branchOne && isNew == false && previouslyPublished == false && await HasChildrenAsync(content.Key, cancellationToken))
                 {
-                    TContent[] descendants = GetPublishedDescendantsLocked(content).ToArray();
+                    IReadOnlyCollection<TContent> descendants = await GetPublishedDescendantsLockedAsync(content, cancellationToken);
                     scope.Notifications.Publish(
                         PublishedNotification(descendants, eventMessages).WithState(notificationState));
                 }
@@ -1800,28 +1797,49 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
 
     #region Internal Methods
 
-    internal IEnumerable<TContent> GetPublishedDescendantsLocked(TContent content)
+    internal async Task<IReadOnlyCollection<TContent>> GetPublishedDescendantsLockedAsync(TContent content, CancellationToken cancellationToken)
     {
-        var pathMatch = content.Path + ",";
-        IQuery<TContent> query = Query<TContent>()
-            .Where(x => x.Id != content.Id && x.Path.StartsWith(pathMatch) /*&& culture.Trashed == false*/);
-        IEnumerable<TContent> contents = _contentRepository.Get(query);
+        // Every descendant is returned regardless of publish state - neither this call nor the repository
+        // filters on it - so the walk below only skips nodes whose Path and ParentId disagree. It depends on
+        // ordering by Path ascending: a node's path is a strict prefix of each of its descendants', so that
+        // ordering is a pre-order walk in which a parent is always seen before its children. Ordering by
+        // anything else breaks the walk silently, dropping whole branches rather than failing.
+        // TODO [NL]: the name and the caller both assume this is filtered to published descendants, but no
+        // filter has ever been applied - so the caller notifies 'published' for descendants that are not
+        // published. Decide whether to filter here or to stop notifying, rather than leaving both wrong.
+        var descendants = new List<TContent>();
+        var parents = new HashSet<int> { content.Id };
 
-        // beware! contents contains all published version below content
-        // including those that are not directly published because below an unpublished content
-        // these must be filtered out here
-        var parents = new List<int> { content.Id };
-        if (contents is not null)
+        int count;
+        var page = 0;
+        const int pageSize = 100;
+        do
         {
-            foreach (TContent c in contents)
+            count = 0;
+
+            PagedModel<TContent> descendantsPage = await _asyncContentRepository.GetDescendantsAsync(
+                content.Key,
+                page * pageSize,
+                pageSize,
+                Ordering.By("Path", Direction.Ascending),
+                cancellationToken);
+
+            foreach (TContent c in descendantsPage.Items)
             {
+                count++;
+
                 if (parents.Contains(c.ParentId))
                 {
-                    yield return c;
+                    descendants.Add(c);
                     parents.Add(c.Id);
                 }
             }
+
+            page++;
         }
+        while (count > 0);
+
+        return descendants;
     }
 
     #endregion

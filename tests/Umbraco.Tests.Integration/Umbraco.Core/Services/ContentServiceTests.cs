@@ -2618,7 +2618,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         Assert.AreEqual(publishedVersion, content.VersionId);
 
         // Act
-        var publishedDescendants = ContentService.GetPublishedDescendants(root).ToList();
+        var publishedDescendants = (await ContentService.GetPublishedDescendantsAsync(root, CancellationToken.None)).ToList();
         Assert.AreNotEqual(0, publishedDescendants.Count);
 
         // Assert
@@ -2645,6 +2645,39 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         Assert.That(currentContent.Properties["title"].GetValue(published: true), Contains.Substring("Published"));
         Assert.That(currentContent.Properties["title"].GetValue(), Contains.Substring("Saved"));
         Assert.That(currentContent.VersionId, Is.EqualTo(publishedContentVersion.VersionId));
+    }
+
+    [Test]
+    public async Task Get_Published_Descendants_Walks_Into_Branches_Whose_Parent_Sorts_Late()
+    {
+        // The descendant walk only keeps a node once its parent has already been seen, so descendants must
+        // arrive parent-before-child. Sort order alone does not give that: sort order restarts at 0 under
+        // every parent, so a first child of a later sibling sorts ahead of its own parent and the whole
+        // branch is dropped. The fixture's own tree is flat, so it cannot catch this; this one is
+        // deliberately deep enough to.
+        var root = (await ContentService.GetByIdAsync(Textpage.Key, CancellationToken.None))!;
+
+        Content firstChild = ContentBuilder.CreateSimpleContent(ContentType, "First Child", root.Id);
+        await ContentService.SaveAsync(firstChild, null, null, CancellationToken.None);
+
+        Content secondChild = ContentBuilder.CreateSimpleContent(ContentType, "Second Child", root.Id);
+        await ContentService.SaveAsync(secondChild, null, null, CancellationToken.None);
+
+        // First child of the *second* sibling - sort order 0, so it sorts ahead of its own parent.
+        Content grandchild = ContentBuilder.CreateSimpleContent(ContentType, "Grandchild", secondChild.Id);
+        await ContentService.SaveAsync(grandchild, null, null, CancellationToken.None);
+
+        var descendants = (await ContentService.GetPublishedDescendantsAsync(root, CancellationToken.None)).ToList();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(descendants.Any(x => x.Id == firstChild.Id), Is.True, "first child missing");
+            Assert.That(descendants.Any(x => x.Id == secondChild.Id), Is.True, "second child missing");
+            Assert.That(
+                descendants.Any(x => x.Id == grandchild.Id),
+                Is.True,
+                "grandchild missing - the walk dropped a branch whose parent sorted after it");
+        });
     }
 
     [Test]
