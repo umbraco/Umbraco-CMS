@@ -70,7 +70,23 @@ export default [
 			'local-rules/enforce-umbraco-external-imports': [
 				'error',
 				{
-					exceptions: ['@umbraco-cms', '@open-wc/testing', '@storybook', 'msw', '.', 'vite', 'uuid', 'diff'],
+					// '@tiptap/core', '@tiptap/pm/' and 'prosemirror-' are importmap-provided (see
+					// src/external/tiptap) — resolving in the browser is exactly what this rule exists to
+					// guarantee, so these are legitimate exceptions rather than a carve-out. Keep this list
+					// in sync with devops/importmap/tiptap.js — see devops/importmap/check-tiptap-parity.js.
+					exceptions: [
+						'@umbraco-cms',
+						'@open-wc/testing',
+						'@storybook',
+						'msw',
+						'.',
+						'vite',
+						'uuid',
+						'diff',
+						'@tiptap/core',
+						'@tiptap/pm/',
+						'prosemirror-',
+					],
 				},
 			],
 			'jsdoc/check-tag-names': [
