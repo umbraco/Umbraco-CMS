@@ -175,6 +175,11 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
             return true;
         });
 
+        // The cache policy clears the entry keyed by the integer id, but reads here are keyed by Guid, so
+        // without this a deleted document keeps being served from cache. The insert and update paths already
+        // compensate the same way.
+        IsolatedCache.Clear(RepositoryCacheKeys.GetGuidKey<TEntity>(entity.Key));
+
         entity.DeleteDate = DateTime.UtcNow;
     }
 

@@ -147,6 +147,64 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         new Lazy<IUserGroupService>(GetRequiredService<IUserGroupService>),
         GetRequiredService<IShortStringHelper>());
 
+    /// <summary>
+    ///     Regression guard for umbraco/Umbraco-CMS#21756: with anything already in the cache, GetAll must still
+    ///     return every document rather than only the cached ones. Covered for data types, media and templates
+    ///     already; this is the document equivalent.
+    /// </summary>
+    [Test]
+    public async Task GetAllAsync_WithWarmCache_ReturnsAllDocuments()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository(CreateRealAppCaches());
+
+        // Warm the cache with a single document, so the policy's prefix search finds something.
+        await repository.GetAsync(_textpage.Key, CancellationToken.None);
+
+        IEnumerable<IContent> all = await repository.GetAllAsync(CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(all.Count(), Is.EqualTo(5));
+    }
+
+    [Test]
+    public async Task GetManyAsync_WithPartiallyWarmCache_ReturnsAllRequestedKeys()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository(CreateRealAppCaches());
+
+        await repository.GetAsync(_textpage.Key, CancellationToken.None);
+
+        IEnumerable<IContent> results = await repository.GetManyAsync(
+            [_textpage.Key, _subpage.Key, _subpage2.Key], CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(results.Select(x => x.Key), Is.EquivalentTo(new[] { _textpage.Key, _subpage.Key, _subpage2.Key }));
+    }
+
+    /// <summary>
+    ///     A second read of the same document must not go back to the database.
+    /// </summary>
+    [Test]
+    public async Task GetAsync_SecondCall_IsServedFromCache()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository(CreateRealAppCaches());
+
+        await repository.GetAsync(_textpage.Key, CancellationToken.None);
+
+        CommandCounter.Enabled = true;
+        CommandCounter.Reset();
+        IContent? second = await repository.GetAsync(_textpage.Key, CancellationToken.None);
+        var commandCount = CommandCounter.Count;
+        CommandCounter.Enabled = false;
+        scope.Complete();
+
+        Assert.That(second, Is.Not.Null);
+        Assert.That(commandCount, Is.Zero, "a cached read should issue no commands");
+    }
+
+
     [Test]
     public async Task GetAsync_WithExistingKey_ReturnsSingleDocument()
     {
@@ -3121,6 +3179,93 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
+    public async Task ExistsAsync_ForExistingKey_ReturnsTrue()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        var exists = await repository.ExistsAsync(_textpage.Key, CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(exists, Is.True);
+    }
+
+    [Test]
+    public async Task ExistsAsync_ForUnknownKey_ReturnsFalse()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        var exists = await repository.ExistsAsync(Guid.NewGuid(), CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(exists, Is.False);
+    }
+
+    [Test]
+    public async Task CountAsync_CountsEveryDocumentRegardlessOfState()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        var count = await repository.CountAsync(CancellationToken.None);
+        scope.Complete();
+
+        // CreateTestData seeds the textpage, two subpages, a trashed item and a published page.
+        Assert.That(count, Is.EqualTo(5));
+    }
+
+    [Test]
+    public async Task CountAsync_WithContentTypeAlias_NarrowsToMatchingType()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        var matching = await repository.CountAsync(_contentType.Alias, CancellationToken.None);
+        var nonMatching = await repository.CountAsync("aliasThatMatchesNothing", CancellationToken.None);
+        scope.Complete();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(matching, Is.EqualTo(5));
+            Assert.That(nonMatching, Is.Zero);
+        });
+    }
+
+    [Test]
+    public async Task CountChildrenAsync_CountsOnlyDirectChildren()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        var children = await repository.CountChildrenAsync(_textpage.Key, CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(children, Is.EqualTo(2));
+    }
+
+    [Test]
+    public async Task CountDescendantsAsync_CountsTheWholeSubtree()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        var grandchild = ContentBuilder.CreateSimpleContent(_contentType, "Grandchild", _subpage.Id);
+        await repository.SaveAsync(grandchild, CancellationToken.None);
+
+        var descendants = await repository.CountDescendantsAsync(_textpage.Key, CancellationToken.None);
+        var children = await repository.CountChildrenAsync(_textpage.Key, CancellationToken.None);
+        scope.Complete();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(descendants, Is.EqualTo(3), "two subpages plus the grandchild");
+            Assert.That(children, Is.EqualTo(2), "the grandchild is not a direct child");
+        });
+    }
+
+
+    [Test]
     public async Task CountPublishedAsync_CountsOnlyPublishedNonTrashedDocuments()
     {
         using var scope = NewScopeProvider.CreateScope();
@@ -3694,6 +3839,31 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         Assert.That(result.Items.Select(c => c.Key), Does.Contain(_subpage.Key),
             "GetAncestorsAsync must include trashed ancestors, unlike GetByLevelAsync's trashed exclusion");
     }
+
+    /// <summary>
+    ///     Deleting must invalidate the cached document, not just the database row. The read and the delete have to
+    ///     agree on which cache key identifies the entity, or a deleted document keeps being served.
+    /// </summary>
+    [Test]
+    public async Task DeleteAsync_WithRealCache_ThenGetAsync_ReturnsNull()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository(CreateRealAppCaches());
+
+        var content = ContentBuilder.CreateSimpleContent(_contentType, "Cached Doomed Node", _trashed.Id);
+        await repository.SaveAsync(content, CancellationToken.None);
+
+        // Populate the cache entry the read path uses before removing the row behind it.
+        Assert.That(await repository.GetAsync(content.Key, CancellationToken.None), Is.Not.Null);
+
+        await repository.DeleteAsync(content, CancellationToken.None);
+
+        IContent? deleted = await repository.GetAsync(content.Key, CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(deleted, Is.Null);
+    }
+
 
     [Test]
     public async Task DeleteAsync_ThenGetAsync_ReturnsNull()

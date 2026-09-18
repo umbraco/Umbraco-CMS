@@ -19,7 +19,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.EFCore;
 public abstract class AsyncEntityRepositoryBase<TKey, TEntity> : AsyncRepositoryBase, IAsyncReadWriteRepository<TKey, TEntity>
     where TEntity : class, IEntity
 {
-    private static AsyncRepositoryCachePolicyOptions? _defaultOptions;
+    // Instance-level: the callback closes over AmbientScope, so a shared static would pin whichever repository
+    // instance happened to build it first and hand that instance's scope to every later one.
+    private AsyncRepositoryCachePolicyOptions? _defaultOptions;
 
 
     /// <summary>

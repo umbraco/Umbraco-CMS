@@ -237,6 +237,21 @@ internal abstract class AsyncContentRepositoryBase<TEntity, TRepository>
         }
     }
 
+    /// <summary>
+    ///     Counts through the node table for the same reason <see cref="PerformExistsAsync" /> does. The base's
+    ///     count runs only once something is already cached, which is why this went unnoticed for so long.
+    /// </summary>
+    protected override AsyncRepositoryCachePolicyOptions DefaultOptions =>
+        field ??= new AsyncRepositoryCachePolicyOptions(() => CountAsync(CancellationToken.None));
+
+    /// <summary>
+    ///     Checks existence against the node table rather than the generic base's <c>DbSet&lt;TEntity&gt;()</c>, which
+    ///     cannot work here: <typeparamref name="TEntity" /> is an interface and so is not part of the EF Core model.
+    /// </summary>
+    protected override Task<bool> PerformExistsAsync(Guid key) =>
+        AmbientScope.ExecuteWithContextAsync(db =>
+            db.Nodes.AnyAsync(node => node.UniqueId == key && node.NodeObjectType == NodeObjectTypeKey));
+
     /// <inheritdoc />
     public virtual Task<int> CountAsync(CancellationToken cancellationToken) =>
         AmbientScope.ExecuteWithContextAsync(db =>
