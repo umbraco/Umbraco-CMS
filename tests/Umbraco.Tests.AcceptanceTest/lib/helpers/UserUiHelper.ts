@@ -16,6 +16,7 @@ export class UserUiHelper extends UiBaseLocators {
   private readonly userSectionCard: Locator;
   private readonly statusBtn: Locator;
   private readonly groupBtn: Locator;
+  private readonly typeBtn: Locator;
   private readonly chooseUserGroupsBtn: Locator;
   private readonly allowAccessToAllDocumentsToggle: Locator;
   private readonly allowAccessToAllMediaToggle: Locator;
@@ -49,6 +50,7 @@ export class UserUiHelper extends UiBaseLocators {
     this.userSectionCard = page.locator('uui-card-user');
     this.statusBtn = page.locator('uui-button', {hasText: 'Status'});
     this.groupBtn = page.locator('uui-button', {hasText: 'Groups'});
+    this.typeBtn = page.locator('uui-button', {hasText: 'Type'});
     this.allowAccessToAllDocumentsToggle = page.locator('umb-property-layout').filter({hasText: 'Allow access to all documents'}).locator('#toggle');
     this.allowAccessToAllMediaToggle = page.locator('umb-property-layout').filter({hasText: 'Allow access to all media'}).locator('#toggle');
     this.mediaInput = page.locator('umb-input-media');
@@ -177,6 +179,11 @@ export class UserUiHelper extends UiBaseLocators {
   async filterByGroupName(groupName: string) {
     await this.click(this.groupBtn);
     await this.click(this.page.locator('label').filter({hasText: groupName}));
+  }
+
+  async filterByTypeName(typeName: string) {
+    await this.click(this.typeBtn);
+    await this.click(this.page.locator('label').filter({hasText: typeName}));
   }
 
   async isPasswordUpdatedForUserWithId(userId: string) {
