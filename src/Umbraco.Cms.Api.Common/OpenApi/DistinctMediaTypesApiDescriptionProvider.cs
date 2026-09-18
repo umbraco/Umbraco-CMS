@@ -13,9 +13,12 @@ namespace Umbraco.Cms.Api.Common.OpenApi;
 internal sealed class DistinctMediaTypesApiDescriptionProvider : IApiDescriptionProvider
 {
     /// <summary>
+    /// Gets the order in which this provider is executed.
+    /// </summary>
+    /// <remarks>
     /// Providers run <see cref="OnProvidersExecuted"/> in descending order, so the lowest order runs last, after every
     /// provider that adds or clones descriptions.
-    /// </summary>
+    /// </remarks>
     public int Order => int.MinValue;
 
     /// <inheritdoc />
