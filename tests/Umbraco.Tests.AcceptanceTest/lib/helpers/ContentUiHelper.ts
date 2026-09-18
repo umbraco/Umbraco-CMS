@@ -233,7 +233,6 @@ export class ContentUiHelper extends UiBaseLocators {
     this.enterTagTxt = page.getByPlaceholder('Enter tag');
     this.menuItemTree = page.locator('umb-menu-item-tree-default');
     this.confirmToUnpublishBtn = page.locator('umb-content-unpublish-modal').getByLabel('Unpublish');
-    this.confirmToPublishBtn = page.locator('umb-content-publish-modal').getByLabel('Publish');
     this.dropdown = page.locator("select#native");
     this.splitView = page.locator("#splitViews");
     this.setADateTxt = page.getByLabel("Set a date…");
@@ -476,8 +475,8 @@ export class ContentUiHelper extends UiBaseLocators {
       '[label="Select all"]',
     );
     this.confirmToPublishBtn = page
-      .locator("umb-content-publish-modal")
-      .getByLabel("Publish");
+      .locator("uui-dialog-layout")
+      .getByRole("button", {name: "Publish", exact: true});
     // Publish with descendants
     this.documentPublishWithDescendantsModal = page.locator('umb-document-publish-with-descendants-modal');
     this.publishWithDescendantsBtn = this.workspaceActionMenuItem.getByLabel('Publish with descendants', {exact: true});
@@ -951,6 +950,10 @@ export class ContentUiHelper extends UiBaseLocators {
 
   async clickResetFocalPointButton() {
     await this.click(this.resetFocalPointBtn);
+  }
+
+  async clickCropWithName(name: string) {
+    await this.click(this.page.getByText(name, {exact: true}));
   }
 
   async setFocalPoint(widthPercentage: number = 50, heightPercentage: number = 50) {
@@ -2269,11 +2272,12 @@ export class ContentUiHelper extends UiBaseLocators {
 
   // Bulk trash sends one sequential request per selected item, so waiting on a single
   // response races the remaining items still in flight — pass the selection count for a bulk trash.
+  // The generic document endpoint also matches the tree/collection refreshes between trashes, so match the trash request alone.
   async clickConfirmTrashButtonAndWaitForContentToBeTrashed(expectedCount: number = 1) {
     if (expectedCount === 1) {
-      return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.document, this.clickConfirmTrashButton(), ConstantHelper.statusCodes.ok);
+      return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.moveToRecycleBin, this.clickConfirmTrashButton(), ConstantHelper.statusCodes.ok);
     }
-    return await this.waitForMultipleResponsesAfterExecutingPromise(ConstantHelper.apiEndpoints.document, this.clickConfirmTrashButton(), ConstantHelper.statusCodes.ok, expectedCount);
+    return await this.waitForMultipleResponsesAfterExecutingPromise(ConstantHelper.apiEndpoints.moveToRecycleBin, this.clickConfirmTrashButton(), ConstantHelper.statusCodes.ok, expectedCount);
   }
 
   async clickConfirmEmptyRecycleBinButtonAndWaitForRecycleBinToBeEmptied() {

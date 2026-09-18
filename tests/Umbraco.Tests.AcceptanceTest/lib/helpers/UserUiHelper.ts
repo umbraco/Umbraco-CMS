@@ -5,6 +5,8 @@ import {ConstantHelper} from "./ConstantHelper";
 
 export class UserUiHelper extends UiBaseLocators {
   private readonly usersBtn: Locator;
+  private readonly userTableCollectionView: Locator;
+  private readonly userGridCollectionView: Locator;
   private readonly createUserBtn: Locator;
   private readonly nameOfTheUserTxt: Locator;
   private readonly userEmailTxt: Locator;
@@ -37,6 +39,8 @@ export class UserUiHelper extends UiBaseLocators {
   constructor(page: Page) {
     super(page);
     this.usersBtn = page.getByLabel('Users');
+    this.userTableCollectionView = page.getByTestId('collection-view:Umb.CollectionView.User.Table');
+    this.userGridCollectionView = page.getByTestId('collection-view:Umb.CollectionView.User.Grid');
     this.createUserBtn = page.getByLabel('Create user');
     this.nameOfTheUserTxt = page.getByLabel('name', {exact: true});
     this.userEmailTxt = page.getByLabel('email');
@@ -240,6 +244,14 @@ export class UserUiHelper extends UiBaseLocators {
   async goToUsers() {
     await this.goToSection(ConstantHelper.sections.users);
     await this.clickUsersMenu();
+  }
+
+  async isUserTableViewVisible(isVisible: boolean = true) {
+    await this.isVisible(this.userTableCollectionView, isVisible);
+  }
+
+  async isUserGridViewVisible(isVisible: boolean = true) {
+    await this.isVisible(this.userGridCollectionView, isVisible);
   }
 
   async goToUserWithName(name: string) {

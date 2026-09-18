@@ -44,6 +44,18 @@ export class BasePage {
   }
 
   /**
+   * Runs an action and asserts it did not navigate the page, e.g. clicking a disabled tree item.
+   * Takes a callback rather than a live promise, unlike waitForResponseAfterExecutingPromise, because
+   * the URL must be captured before the action starts, not raced against it.
+   * @param action - The action expected to leave the current URL unchanged
+   */
+  async isUrlUnchangedAfter(action: () => Promise<void>): Promise<void> {
+    const initialUrl = this.page.url();
+    await action();
+    expect(this.page.url()).toBe(initialUrl);
+  }
+
+  /**
    * Double-clicks an element after verifying it is visible.
    * @param locator - The element to double-click
    * @param options - Optional configuration
