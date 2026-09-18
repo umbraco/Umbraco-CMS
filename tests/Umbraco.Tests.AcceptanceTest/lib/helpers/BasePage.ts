@@ -490,6 +490,47 @@ export class BasePage {
   }
 
   /**
+   * Asserts that an input's value fails the browser's native type constraint — for example an
+   * `<input type="email">` holding a value that is not a valid address. Asserts the constraint-validation
+   * state rather than the browser's message text, which varies by engine version and locale.
+   * @param locator - The input to check
+   */
+  async isInputTypeMismatched(locator: Locator, timeout?: number): Promise<void> {
+    await expect
+      .poll(() => locator.evaluate((el: HTMLInputElement) => el.validity?.typeMismatch ?? false),
+        {timeout: timeout ?? ConstantHelper.timeout.medium})
+      .toBeTruthy();
+  }
+
+  /**
+   * Asserts an input's value against the browser's native range constraint — for example an
+   * `<input type="number">` holding a value below its configured minimum. Asserts the constraint-validation
+   * state rather than the browser's message text, which varies by engine version and locale.
+   * @param locator - The input to check
+   * @param isInvalid - Whether the value should currently violate the minimum (default true)
+   */
+  async isInputRangeUnderflow(locator: Locator, isInvalid: boolean = true, timeout?: number): Promise<void> {
+    await expect
+      .poll(() => locator.evaluate((el: HTMLInputElement) => el.validity?.rangeUnderflow ?? false),
+        {timeout: timeout ?? ConstantHelper.timeout.medium})
+      .toBe(isInvalid);
+  }
+
+  /**
+   * Asserts an input's value against the browser's native range constraint — for example an
+   * `<input type="number">` holding a value above its configured maximum. Asserts the constraint-validation
+   * state rather than the browser's message text, which varies by engine version and locale.
+   * @param locator - The input to check
+   * @param isInvalid - Whether the value should currently violate the maximum (default true)
+   */
+  async isInputRangeOverflow(locator: Locator, isInvalid: boolean = true, timeout?: number): Promise<void> {
+    await expect
+      .poll(() => locator.evaluate((el: HTMLInputElement) => el.validity?.rangeOverflow ?? false),
+        {timeout: timeout ?? ConstantHelper.timeout.medium})
+      .toBe(isInvalid);
+  }
+
+  /**
    * Asserts that an element contains specific text.
    * @param locator - The element to check
    * @param text - The text to look for

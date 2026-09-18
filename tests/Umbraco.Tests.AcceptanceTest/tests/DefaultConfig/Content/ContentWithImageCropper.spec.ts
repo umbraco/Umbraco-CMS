@@ -1,4 +1,4 @@
-import {ConstantHelper, test, AliasHelper} from '@umbraco/acceptance-test-helpers';
+import {ConstantHelper, NotificationConstantHelper, test, AliasHelper} from '@umbraco/acceptance-test-helpers';
 import {expect} from "@playwright/test";
 
 const contentName = 'TestContent';
@@ -104,5 +104,22 @@ test('can create content with the custom image cropper data type', {tag: '@smoke
 
   // Clean
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
+});
+
+test('can not publish a mandatory image cropper with an empty value', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id, 'Test Group', false, false, true);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickSaveAndPublishButton();
+
+  // Assert
+  await umbracoUi.content.isErrorNotificationVisible();
+  await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
+  await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.nullValue);
 });
 

@@ -1,9 +1,10 @@
-﻿import {ConstantHelper, test, AliasHelper} from '@umbraco/acceptance-test-helpers';
+﻿import {ConstantHelper, NotificationConstantHelper, test, AliasHelper} from '@umbraco/acceptance-test-helpers';
 import {expect} from "@playwright/test";
 
 const contentName = 'TestContent';
 const documentTypeName = 'TestDocumentTypeForContent';
 const dataTypeName = 'Numeric';
+const customDataTypeName = 'Custom Numeric';
 const number = 10;
 
 test.beforeEach(async ({umbracoApi, umbracoUi}) => {
@@ -15,6 +16,7 @@ test.beforeEach(async ({umbracoApi, umbracoUi}) => {
 test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.document.ensureNameNotExists(contentName);
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
+  await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
 });
 
 test('can create content with the numeric data type', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
@@ -59,5 +61,69 @@ test('can publish content with the numeric data type', async ({umbracoApi, umbra
   expect(contentData.variants[0].state).toBe(expectedState);
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
   expect(contentData.values[0].value).toEqual(number);
+});
+
+test('cannot publish a numeric value below the configured minimum', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const min = 5;
+  const max = 100;
+  const belowMin = 1;
+  const dataTypeId = await umbracoApi.dataType.createNumericDataTypeWithMinAndMax(customDataTypeName, min, max);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, dataTypeId);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.enterNumeric(belowMin);
+  await umbracoUi.content.clickSaveAndPublishButton();
+
+  // Assert
+  await umbracoUi.content.isFailedStateButtonVisible();
+  await umbracoUi.content.isErrorNotificationVisible();
+  await umbracoUi.content.isNumericBelowMinimum();
+  await umbracoUi.content.enterNumeric(min);
+  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBeUpdated();
+  await umbracoUi.content.isNumericBelowMinimum(false);
+});
+
+test('cannot publish a numeric value above the configured maximum', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const min = 0;
+  const max = 10;
+  const aboveMax = 11;
+  const dataTypeId = await umbracoApi.dataType.createNumericDataTypeWithMinAndMax(customDataTypeName, min, max);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, dataTypeId);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.enterNumeric(aboveMax);
+  await umbracoUi.content.clickSaveAndPublishButton();
+
+  // Assert
+  await umbracoUi.content.isFailedStateButtonVisible();
+  await umbracoUi.content.isErrorNotificationVisible();
+  await umbracoUi.content.isNumericAboveMaximum();
+  await umbracoUi.content.enterNumeric(max);
+  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBeUpdated();
+  await umbracoUi.content.isNumericAboveMaximum(false);
+});
+
+test('can not publish a mandatory numeric with an empty value', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id, 'Test Group', false, false, true);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickSaveAndPublishButton();
+
+  // Assert
+  await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.nullValue);
+  await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
 });
 
