@@ -185,7 +185,6 @@ test('can fetch a media item by its path', async ({umbracoApi}) => {
 test('can fetch a media item by its path with special characters', async ({umbracoApi}) => {
   // Arrange
   const mediaTypeName = 'Image';
-  // Create an image item at root level and its name has special characters
   const mediaId = await umbracoApi.media.createDefaultMediaWithImage(specialCharacterImageName);
   // Umbraco slugifies the name into the URL segment, so the path has to be read off the item rather than
   // derived from the name.
