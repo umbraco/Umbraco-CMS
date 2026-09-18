@@ -9,6 +9,7 @@ using Umbraco.Cms.Search.Core.Cache;
 using Umbraco.Cms.Search.Core.Notifications;
 using Umbraco.Cms.Search.Core.Cache.Content;
 using Umbraco.Cms.Search.Core.Cache.ContentType;
+using Umbraco.Cms.Search.Core.Cache.Element;
 using Umbraco.Cms.Search.Core.Cache.Index;
 using Umbraco.Cms.Search.Core.Cache.Language;
 using Umbraco.Cms.Search.Core.Cache.Media;
@@ -84,6 +85,7 @@ public static class UmbracoBuilderExtensions
         builder.Services.AddTransient<PublishedContentNotificationHandler>();
         builder.Services.AddTransient<DraftMediaNotificationHandler>();
         builder.Services.AddTransient<DraftMemberNotificationHandler>();
+        builder.Services.AddTransient<ElementPublishStatusNotificationHandler>();
 
         builder.Services.AddTransient<RebuildIndexNotificationHandler>();
         builder.Services.AddTransient<IDistributedContentIndexRefresher, DistributedContentIndexRefresher>();
@@ -110,6 +112,8 @@ public static class UmbracoBuilderExtensions
             .AddNotificationHandler<DraftMediaCacheRefresherNotification, ContentIndexingNotificationHandler>()
             .AddNotificationHandler<DraftMemberCacheRefresherNotification, ContentIndexingNotificationHandler>()
             .AddNotificationHandler<PublishedContentCacheRefresherNotification, ContentIndexingNotificationHandler>()
+            .AddNotificationHandler<Umbraco.Cms.Core.Notifications.ElementCacheRefresherNotification, ElementIndexingNotificationHandler>()
+            .AddNotificationHandler<ElementChangeCacheRefresherNotification, ElementIndexingNotificationHandler>()
             .AddNotificationAsyncHandler<PublicAccessDetailedCacheRefresherNotification, PublicAccessIndexingNotificationHandler>();
 
         builder
