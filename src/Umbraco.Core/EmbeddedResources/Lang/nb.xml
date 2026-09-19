@@ -40,6 +40,10 @@
     <key alias="itemNotPublished">Denne noden er enda ikke publisert</key>
     <key alias="parentNotPublished">Dette dokumentet er publisert, men ikke synlig ettersom den overliggende siden '%0%' ikke er publisert</key>
     <key alias="parentNotPublishedAnomaly">Intern feil: dokumentet er publisert men finnes ikke i hurtigbuffer</key>
+    <key alias="unroutableContentWarningHeader">Innhold publisert</key>
+    <key alias="unroutableContentWarning">Dokumentet har ingen URL. Flere detaljer finnes under "Info".</key>
+    <key alias="unroutableContentWarningWithReason">Dokumentet har ingen URL. %0% Flere detaljer finnes under "Info".</key>
+    <key alias="routeErrorNoDomainForCulture">Dette dokumentet er publisert på '%0%', men har ingen URL fordi det ikke er standardspråket og ingen vertsnavn er tildelt det</key>
   </area>
   <area alias="member">
   </area>

@@ -4,6 +4,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
@@ -161,9 +162,94 @@ internal sealed class PublishedUrlInfoProviderTests : PublishedUrlInfoProviderTe
         // Assert the url of child of second root is not exposed
         Assert.AreEqual(1, childOfSecondRootUrls.Count);
         Assert.IsNull(childOfSecondRootUrls.First().Url);
+        Assert.That(childOfSecondRootUrls.First().Message, Does.Contain("Textpage > Text Page 1"), "The colliding document should be reported by its path.");
         Assert.AreEqual(Constants.UrlProviders.Content, childOfSecondRootUrls.First().Provider);
 
         // Ensure the url without hide top level is not finding the child of second root
         Assert.AreNotEqual(childOfSecondRoot.Key, DocumentUrlService.GetDocumentKeyByRoute("/second-root/text-page-1/", "en-US", null, false));
+    }
+
+    [Test]
+    public async Task Cannot_Get_Url_For_Non_Default_Culture_Without_Hostname_And_Reports_The_Language()
+    {
+        var danishLanguage = new LanguageBuilder().WithCultureInfo("da-DK").WithCultureName("Danish").Build();
+        await LanguageService.CreateAsync(danishLanguage, Constants.Security.SuperUserKey);
+        IContentType variantType = await CreateVariantContentTypeAsync();
+
+        var rootPage = new ContentBuilder().WithContentType(variantType).WithCultureName("da-DK", "Forside").Build();
+        ContentService.Save(rootPage, -1);
+        ContentService.PublishBranch(rootPage, PublishBranchFilter.IncludeUnpublished, ["da-DK"]);
+
+        var urls = await PublishedUrlInfoProvider.GetAllAsync(rootPage, "da-DK");
+
+        UrlInfo info = urls.Single();
+        Assert.IsNull(info.Url);
+        Assert.AreEqual(
+            GetRequiredService<ILocalizedTextService>().Localize("content", "routeErrorNoDomainForCulture", ["Danish"]),
+            info.Message);
+    }
+
+    [Test]
+    public async Task Cannot_Get_Url_When_Ancestor_Is_Unpublished_In_Culture_And_Reports_The_Ancestor()
+    {
+        var danishLanguage = new LanguageBuilder().WithCultureInfo("da-DK").WithCultureName("Danish").Build();
+        await LanguageService.CreateAsync(danishLanguage, Constants.Security.SuperUserKey);
+        IContentType variantType = await CreateVariantContentTypeAsync();
+
+        var rootPage = new ContentBuilder().WithContentType(variantType).WithCultureName("en-US", "Root Page").WithCultureName("da-DK", "Forside").Build();
+        ContentService.Save(rootPage, -1);
+        var childPage = new ContentBuilder().WithContentType(variantType).WithParent(rootPage).WithCultureName("en-US", "Child Page").WithCultureName("da-DK", "Underside").Build();
+        ContentService.Save(childPage, -1);
+        ContentService.PublishBranch(rootPage, PublishBranchFilter.IncludeUnpublished, ["en-US", "da-DK"]);
+        ContentService.Unpublish(rootPage, "en-US");
+
+        // Re-read the child so its publish state reflects the branch publish, not the pre-publish in-memory instance.
+        IContent publishedChild = ContentService.GetById(childPage.Key)!;
+        var urls = await PublishedUrlInfoProvider.GetAllAsync(publishedChild, "en-US");
+
+        UrlInfo info = urls.Single();
+        Assert.IsNull(info.Url);
+        Assert.AreEqual(
+            GetRequiredService<ILocalizedTextService>().Localize("content", "parentCultureNotPublished", ["Root Page"]),
+            info.Message);
+    }
+
+    [Test]
+    public async Task Can_Treat_Invariant_Ancestor_As_Published_In_Every_Culture()
+    {
+        var danishLanguage = new LanguageBuilder().WithCultureInfo("da-DK").WithCultureName("Danish").Build();
+        await LanguageService.CreateAsync(danishLanguage, Constants.Security.SuperUserKey);
+        IContentType variantType = await CreateVariantContentTypeAsync();
+
+        // A variant child, published only in the non-default culture, under the fixture's invariant root.
+        ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
+        var childPage = new ContentBuilder().WithContentType(variantType).WithParent(Textpage).WithCultureName("da-DK", "Underside").Build();
+        ContentService.Save(childPage, -1);
+        ContentService.Publish(childPage, ["da-DK"]);
+
+        var urls = await PublishedUrlInfoProvider.GetAllAsync(ContentService.GetById(childPage.Key)!, "da-DK");
+
+        // The invariant root must not be reported as unpublished in the culture; the real reason is the missing hostname.
+        UrlInfo info = urls.Single();
+        Assert.IsNull(info.Url);
+        Assert.AreEqual(
+            GetRequiredService<ILocalizedTextService>().Localize("content", "routeErrorNoDomainForCulture", ["Danish"]),
+            info.Message);
+    }
+
+    private async Task<IContentType> CreateVariantContentTypeAsync()
+    {
+        var template = TemplateBuilder.CreateTextPageTemplate("variantTemplate");
+        FileService.SaveTemplate(template);
+        var contentType = new ContentTypeBuilder()
+            .WithAlias("variantPage")
+            .WithName("Variant Page")
+            .WithContentVariation(ContentVariation.Culture)
+            .WithAllowAsRoot(true)
+            .WithDefaultTemplateId(template.Id)
+            .Build();
+        contentType.AllowedContentTypes = [new ContentTypeSort(contentType.Key, 0, contentType.Alias)];
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+        return contentType;
     }
 }

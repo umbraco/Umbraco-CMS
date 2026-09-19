@@ -45,6 +45,10 @@
     <key alias="itemNotPublished">Detta objekt är inte publicerat</key>
     <key alias="parentNotPublished">Detta dokument är publicerat men syns inte eftersom den överordnade sidan %0% inte är publicerad</key>
     <key alias="parentNotPublishedAnomaly">Oops: detta dokument är publicerat men finns inte i cacheminnet (internt fel)</key>
+    <key alias="unroutableContentWarningHeader">Innehåll publicerat</key>
+    <key alias="unroutableContentWarning">Dokumentet har ingen URL. Mer information finns under "Info".</key>
+    <key alias="unroutableContentWarningWithReason">Dokumentet har ingen URL. %0% Mer information finns under "Info".</key>
+    <key alias="routeErrorNoDomainForCulture">Detta dokument är publicerat på '%0%' men har ingen URL eftersom det inte är standardspråket och inget värdnamn har tilldelats det</key>
   </area>
   <area alias="errors">
   </area>
