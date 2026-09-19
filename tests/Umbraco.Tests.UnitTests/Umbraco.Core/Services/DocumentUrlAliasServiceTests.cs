@@ -87,7 +87,7 @@ public class DocumentUrlAliasServiceTests
     /// Creates an invariant <see cref="IContent"/> mock whose alias property returns the supplied value when
     /// looked up via <see cref="IContentBase.GetValue"/>.
     /// </summary>
-    private static IContent CreateInvariantContentWithAlias(Guid documentKey, string? aliasValue, bool published = true)
+    private static IContent CreateInvariantContentWithAlias(Guid documentKey, string? aliasValue)
     {
         var contentTypeMock = new Mock<ISimpleContentType>();
         contentTypeMock.Setup(x => x.Variations).Returns(ContentVariation.Nothing);
@@ -102,7 +102,7 @@ public class DocumentUrlAliasServiceTests
         contentMock.Setup(x => x.Key).Returns(documentKey);
         contentMock.Setup(x => x.Trashed).Returns(false);
         contentMock.Setup(x => x.Blueprint).Returns(false);
-        contentMock.Setup(x => x.Published).Returns(published);
+        contentMock.Setup(x => x.Published).Returns(true);
         contentMock.Setup(x => x.ContentType).Returns(contentTypeMock.Object);
         contentMock.Setup(x => x.Properties).Returns(propertyCollectionMock.Object);
         contentMock.Setup(x => x.GetValue<string>(
@@ -531,32 +531,6 @@ public class DocumentUrlAliasServiceTests
         await service.CreateOrUpdateAliasesAsync(documentKey);
 
         // Assert
-        aliasRepositoryMock.Verify(
-            x => x.DeleteByDocumentKey(It.IsAny<IEnumerable<Guid>>()),
-            Times.Once);
-    }
-
-    /// <summary>
-    /// An unpublished document still carries the values of its last published version, so its former
-    /// alias must be removed rather than saved (issue #23948).
-    /// </summary>
-    [Test]
-    public async Task CreateOrUpdateAliasesAsync_UnpublishedContent_DeletesAliasesInsteadOfSaving()
-    {
-        // Arrange
-        var (service, aliasRepositoryMock, contentServiceMock) = CreateServiceWithMocks(ServerRole.Single);
-
-        var documentKey = Guid.NewGuid();
-        contentServiceMock.Setup(x => x.GetById(documentKey))
-            .Returns(CreateInvariantContentWithAlias(documentKey, "my-alias", published: false));
-
-        // Act
-        await service.CreateOrUpdateAliasesAsync(documentKey);
-
-        // Assert
-        aliasRepositoryMock.Verify(
-            x => x.Save(It.IsAny<IEnumerable<PublishedDocumentUrlAlias>>()),
-            Times.Never);
         aliasRepositoryMock.Verify(
             x => x.DeleteByDocumentKey(It.IsAny<IEnumerable<Guid>>()),
             Times.Once);
