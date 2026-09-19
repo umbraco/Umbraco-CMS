@@ -1246,6 +1246,119 @@ internal partial class BlockListElementLevelVariationTests
     }
 
     [Test]
+    public async Task Removing_Nested_Block_Property_Value_Is_Propagated_To_Published_Value()
+    {
+        var nestedElementType = CreateElementType(ContentVariation.Culture);
+        var nestedBlockListDataType = await CreateBlockListDataType(nestedElementType);
+
+        var rootElementType = new ContentTypeBuilder()
+            .WithAlias("myRootElementType")
+            .WithName("My Root Element Type")
+            .WithIsElement(true)
+            .WithContentVariation(ContentVariation.Culture)
+            .AddPropertyType()
+            .WithAlias("invariantText")
+            .WithName("Invariant text")
+            .WithDataTypeId(Constants.DataTypes.Textbox)
+            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.TextBox)
+            .WithValueStorageType(ValueStorageType.Nvarchar)
+            .WithVariations(ContentVariation.Nothing)
+            .Done()
+            .AddPropertyType()
+            .WithAlias("variantText")
+            .WithName("Variant text")
+            .WithDataTypeId(Constants.DataTypes.Textbox)
+            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.TextBox)
+            .WithValueStorageType(ValueStorageType.Nvarchar)
+            .WithVariations(ContentVariation.Culture)
+            .Done()
+            .AddPropertyType()
+            .WithAlias("nestedBlocks")
+            .WithName("Nested blocks")
+            .WithDataTypeId(nestedBlockListDataType.Id)
+            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.BlockList)
+            .WithValueStorageType(ValueStorageType.Ntext)
+            .WithVariations(ContentVariation.Nothing)
+            .Done()
+            .Build();
+        await ContentTypeService.CreateAsync(rootElementType, Constants.Security.SuperUserKey);
+        var rootBlockListDataType = await CreateBlockListDataType(rootElementType);
+        var contentType = CreateContentType(ContentVariation.Culture, rootBlockListDataType);
+
+        var nestedElementContentKey = Guid.NewGuid();
+        var nestedElementSettingsKey = Guid.NewGuid();
+        var content = CreateContent(
+            contentType,
+            rootElementType,
+            new List<BlockPropertyValue>
+            {
+                new()
+                {
+                    Alias = "nestedBlocks",
+                    Value = BlockListPropertyValue(
+                        nestedElementType,
+                        nestedElementContentKey,
+                        nestedElementSettingsKey,
+                        new BlockProperty(
+                            new List<BlockPropertyValue>
+                            {
+                                new() { Alias = "invariantText", Value = "The nested invariant content value" },
+                                new() { Alias = "variantText", Value = "The nested content value in English", Culture = "en-US" },
+                                new() { Alias = "variantText", Value = "The nested content value in Danish", Culture = "da-DK" },
+                            },
+                            [],
+                            null,
+                            null))
+                },
+                new() { Alias = "invariantText", Value = "The root invariant content value" },
+                new() { Alias = "variantText", Value = "The root content value in English", Culture = "en-US" },
+                new() { Alias = "variantText", Value = "The root content value in Danish", Culture = "da-DK" },
+            },
+            [],
+            true);
+
+        AssertNestedBlocks(expectPresent: true);
+
+        // remove the nested blocks property value entirely from the root block (not just its content)
+        var blockListValue = JsonSerializer.Deserialize<BlockListValue>((string)content.Properties["blocks"]!.GetValue()!);
+        blockListValue!.ContentData[0].Values.RemoveAll(v => v.Alias == "nestedBlocks");
+        content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
+        ContentService.Save(content);
+
+        // the removal must have reached the draft value - a failure below can only mean the merge
+        // failed to propagate the removal to the published value.
+        var draftValue = JsonSerializer.Deserialize<BlockListValue>(content.GetValue<string>("blocks")!);
+        Assert.IsFalse(
+            draftValue!.ContentData[0].Values.Any(v => v.Alias == "nestedBlocks"),
+            "Test setup error: the removal did not reach the draft value.");
+
+        // publish only the non-default culture: the nested value doesn't itself belong to any one culture,
+        // so it must be reconciled regardless of which single culture triggers the merge.
+        PublishContent(content, contentType, ["da-DK"]);
+
+        AssertNestedBlocks(expectPresent: false);
+
+        void AssertNestedBlocks(bool expectPresent)
+        {
+            foreach (var culture in new[] { "en-US", "da-DK" })
+            {
+                SetVariationContext(culture, null);
+                var rootBlock = GetPublishedContent(content.Key).Value<BlockListModel>("blocks");
+                Assert.IsNotNull(rootBlock);
+
+                var nestedBlocks = rootBlock![0].Content.Value<BlockListModel>("nestedBlocks");
+                Assert.AreEqual(
+                    expectPresent,
+                    nestedBlocks is not null && nestedBlocks.Count > 0,
+                    $"Unexpected nested block presence for culture '{culture}'.");
+
+                // the unrelated root-level value must survive untouched.
+                Assert.AreEqual("The root invariant content value", rootBlock[0].Content.Value<string>("invariantText"));
+            }
+        }
+    }
+
+    [Test]
     public async Task Can_Publish_With_Blocks_In_One_Language()
     {
         var elementType = CreateElementType(ContentVariation.Culture);
