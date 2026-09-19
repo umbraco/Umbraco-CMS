@@ -48,6 +48,7 @@ const mapper = (item: MediaItemResponseModel): UmbMediaItemModel => {
 			collection: item.mediaType.collection ? { unique: item.mediaType.collection.id } : null,
 		},
 		name: item.variants[0]?.name, // TODO: get correct variant name
+		extension: item.extension ?? undefined,
 		parent: item.parent ? { unique: item.parent.id } : null,
 		variants: item.variants.map((variant) => {
 			return {

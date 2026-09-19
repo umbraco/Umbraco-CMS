@@ -70,6 +70,12 @@ const getAncestorsOf = (args: UmbTreeAncestorsOfRequestArgs) =>
 	});
 
 const mapper = (item: MediaRecycleBinItemResponseModel): UmbMediaRecycleBinTreeItemModel => {
+	const contentType = {
+		unique: item.mediaType.id,
+		icon: item.mediaType.icon,
+		collection: item.mediaType.collection ? { unique: item.mediaType.collection.id } : null,
+	};
+
 	return {
 		unique: item.id,
 		parent: {
@@ -80,11 +86,9 @@ const mapper = (item: MediaRecycleBinItemResponseModel): UmbMediaRecycleBinTreeI
 		noAccess: false,
 		isTrashed: true,
 		hasChildren: item.hasChildren,
-		mediaType: {
-			unique: item.mediaType.id,
-			icon: item.mediaType.icon,
-			collection: item.mediaType.collection ? { unique: item.mediaType.collection.id } : null,
-		},
+		contentType,
+		// TODO (V20): remove when the deprecated `mediaType` field is removed.
+		mediaType: contentType,
 		variants: item.variants.map((variant) => {
 			return {
 				name: variant.name,

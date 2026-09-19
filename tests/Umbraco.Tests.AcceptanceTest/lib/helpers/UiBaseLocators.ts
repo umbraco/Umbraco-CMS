@@ -1416,6 +1416,10 @@ export class UiBaseLocators extends BasePage {
     );
   }
 
+  async doesSelectedValidationOptionHaveValue(value: string) {
+    await this.hasValue(this.validation, value);
+  }
+
   // Composition & Structure Methods
   async clickCompositionsButton() {
     await this.click(this.compositionsBtn);
