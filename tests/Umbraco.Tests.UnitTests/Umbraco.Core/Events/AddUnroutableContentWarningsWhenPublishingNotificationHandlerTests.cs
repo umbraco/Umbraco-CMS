@@ -92,6 +92,22 @@ public class AddUnroutableContentWarningsWhenPublishingNotificationHandlerTests
     }
 
     [Test]
+    public async Task Can_Treat_Reasons_As_Duplicates_Regardless_Of_Their_Terminator()
+    {
+        IContent content = CreateInvariantContent();
+        SetupUrls(
+            content,
+            UrlInfo.AsMessage("URL cannot be routed", Constants.UrlProviders.Content, "en-US"),
+            UrlInfo.AsMessage("URL cannot be routed.", Constants.UrlProviders.Content, "da-DK"),
+            UrlInfo.AsMessage("\u8A72\u6587\u6A94\u672A\u767C\u5E03\u3002", Constants.UrlProviders.Content, "zh-TW"));
+
+        await CreateHandler().HandleAsync(CreateNotification(content), CancellationToken.None);
+
+        EventMessage message = _eventMessages.GetAll().Single();
+        Assert.That(message.Message, Is.EqualTo($"{WarningWithReason}:URL cannot be routed. \u8A72\u6587\u6A94\u672A\u767C\u5E03\u3002"));
+    }
+
+    [Test]
     public async Task Can_Warn_Without_A_Reason_When_None_Is_Reported()
     {
         IContent content = CreateInvariantContent();
@@ -163,20 +179,20 @@ public class AddUnroutableContentWarningsWhenPublishingNotificationHandlerTests
                 => tokens is { Count: > 0 } ? $"{alias}:{tokens["0"]}" : alias);
 
         return new AddUnroutableContentWarningsWhenPublishingNotificationHandler(
-            Mock.Of<IPublishedRouter>(),
+            _publishedUrlInfoProvider.Object,
             umbracoContextAccessor.Object,
-            Mock.Of<ILanguageService>(),
             localizedTextService.Object,
+            eventMessagesFactory.Object,
+            Options.Create(new ContentSettings { ShowUnroutableContentWarnings = showWarnings }),
+            Mock.Of<IPublishedRouter>(),
+            Mock.Of<ILanguageService>(),
             Mock.Of<IContentService>(),
             Mock.Of<IVariationContextAccessor>(),
             NullLoggerFactory.Instance,
             new UriUtility(Mock.Of<IHostingEnvironment>()),
             Mock.Of<IPublishedUrlProvider>(),
             Mock.Of<IDocumentNavigationQueryService>(),
-            Mock.Of<IPublishedContentStatusFilteringService>(),
-            eventMessagesFactory.Object,
-            Options.Create(new ContentSettings { ShowUnroutableContentWarnings = showWarnings }),
-            _publishedUrlInfoProvider.Object);
+            Mock.Of<IPublishedContentStatusFilteringService>());
     }
 
     private void SetupUrls(IContent content, params UrlInfo[] urls)

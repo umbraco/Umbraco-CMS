@@ -214,6 +214,29 @@ internal sealed class PublishedUrlInfoProviderTests : PublishedUrlInfoProviderTe
             info.Message);
     }
 
+    [Test]
+    public async Task Can_Treat_Invariant_Ancestor_As_Published_In_Every_Culture()
+    {
+        var danishLanguage = new LanguageBuilder().WithCultureInfo("da-DK").WithCultureName("Danish").Build();
+        await LanguageService.CreateAsync(danishLanguage, Constants.Security.SuperUserKey);
+        IContentType variantType = await CreateVariantContentTypeAsync();
+
+        // A variant child, published only in the non-default culture, under the fixture's invariant root.
+        ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
+        var childPage = new ContentBuilder().WithContentType(variantType).WithParent(Textpage).WithCultureName("da-DK", "Underside").Build();
+        ContentService.Save(childPage, -1);
+        ContentService.Publish(childPage, ["da-DK"]);
+
+        var urls = await PublishedUrlInfoProvider.GetAllAsync(ContentService.GetById(childPage.Key)!, "da-DK");
+
+        // The invariant root must not be reported as unpublished in the culture; the real reason is the missing hostname.
+        UrlInfo info = urls.Single();
+        Assert.IsNull(info.Url);
+        Assert.AreEqual(
+            GetRequiredService<ILocalizedTextService>().Localize("content", "routeErrorNoDomainForCulture", ["Danish"]),
+            info.Message);
+    }
+
     private async Task<IContentType> CreateVariantContentTypeAsync()
     {
         var template = TemplateBuilder.CreateTextPageTemplate("variantTemplate");
