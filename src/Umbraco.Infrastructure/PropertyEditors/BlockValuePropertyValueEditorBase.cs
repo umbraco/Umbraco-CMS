@@ -955,7 +955,7 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
                     : mergingDataEditor!.MergePartialPropertyValueForCulture(sourceBlockPropertyValue.Value, targetBlockPropertyValue.Value, culture);
             }
 
-            // Remove any values that are present in the target, but no longer is present in the source,
+            // Remove any values that are present in the target, but no longer present in the source,
             // to ensure they're not contained in any future publish.
             if (targetBlockItemExisted)
             {
