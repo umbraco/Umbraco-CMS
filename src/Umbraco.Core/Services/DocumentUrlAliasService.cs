@@ -458,6 +458,13 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
     {
         var aliases = new List<PublishedDocumentUrlAlias>();
 
+        // An unpublished document keeps the property values of its last published version,
+        // so GetValue(published: true) alone would still return its former alias.
+        if (document.Published is false)
+        {
+            return aliases;
+        }
+
         // Check if the alias property itself varies by culture (not just the content type).
         // A variant content type can have a shared (invariant) alias property.
         IProperty? aliasProperty = document.Properties.FirstOrDefault(p => p.Alias == Constants.Conventions.Content.UrlAlias);

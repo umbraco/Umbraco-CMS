@@ -126,8 +126,10 @@ internal class DocumentUrlAliasRepository : IDocumentUrlAliasRepository
             .InnerJoin<ContentVersionDto>("cv").On<PropertyDataDto, ContentVersionDto>((pd, cv) => pd.VersionId == cv.Id, "pd", "cv")
             .InnerJoin<DocumentVersionDto>("dv").On<ContentVersionDto, DocumentVersionDto>((cv, dv) => cv.Id == dv.Id, "cv", "dv")
             .InnerJoin<NodeDto>("n").On<ContentVersionDto, NodeDto>((cv, n) => cv.NodeId == n.NodeId, "cv", "n")
+            .InnerJoin<DocumentDto>("d").On<NodeDto, DocumentDto>((n, d) => n.NodeId == d.NodeId, "n", "d")
             .Where<PropertyTypeDto>(pt => pt.Alias == Constants.Conventions.Content.UrlAlias, "pt")
             .Where<DocumentVersionDto>(dv => dv.Published == true, "dv")
+            .Where<DocumentDto>(d => d.Published == true, "d") // Unpublishing keeps the last published version flagged
             .Where<NodeDto>(n => n.Trashed == false, "n")
             .Where<NodeDto>(n => n.NodeObjectType == Constants.ObjectTypes.Document, "n") // Exclude blueprints
             .Append($"AND (pd.{QuotedColName("textValue")} IS NOT NULL OR pd.{QuotedColName("varcharValue")} IS NOT NULL)");
