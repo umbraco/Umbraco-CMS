@@ -115,6 +115,10 @@ export class UmbPickerInputContext<
 	}
 
 	setSelection(selection: Array<string | null>) {
+		if (!Array.isArray(selection)) {
+			this.#itemManager.setUniques([]);
+			return;
+		}
 		// Note: Currently we do not support picking root item. So we filter out null values:
 		this.#itemManager.setUniques(selection.filter((value) => value !== null) as Array<string>);
 	}

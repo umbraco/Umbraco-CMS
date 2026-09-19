@@ -110,8 +110,9 @@ export class UmbInputEntityDataElement extends UmbFormControlMixin<string | unde
 
 	@property({ type: Array })
 	public set selection(uniques: Array<string>) {
-		this.#pickerInputContext.setSelection(uniques);
-		this.#sorter.setModel(uniques);
+		const safeUniques = Array.isArray(uniques) ? uniques : [];
+		this.#pickerInputContext.setSelection(safeUniques);
+		this.#sorter.setModel(safeUniques);
 	}
 	public get selection(): Array<string> {
 		return this.#pickerInputContext.getSelection();
