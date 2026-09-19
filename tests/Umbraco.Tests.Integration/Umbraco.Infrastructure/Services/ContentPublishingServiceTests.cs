@@ -148,6 +148,37 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
         return contentType;
     }
 
+    private async Task<IContentType> SetupSegmentVariantTest(ContentVariation variation)
+    {
+        var key = Guid.NewGuid();
+        var contentType = new ContentTypeBuilder()
+            .WithAlias("segmentVariantContent")
+            .WithName("Segment Variant Content")
+            .WithKey(key)
+            .WithContentVariation(variation)
+            .AddAllowedContentType()
+                .WithKey(key)
+                .WithAlias("segmentVariantContent")
+                .Done()
+            .AddPropertyGroup()
+                .WithAlias("content")
+                .WithName("Content")
+                .WithSupportsPublishing(true)
+                .AddPropertyType()
+                    .WithAlias("title")
+                    .WithName("Title")
+                    .WithVariations(variation)
+                    .WithValidationRegExp("^Valid.*$")
+                    .Done()
+                .Done()
+            .Build();
+
+        contentType.AllowedAsRoot = true;
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+
+        return contentType;
+    }
+
     protected override void CustomTestSetup(IUmbracoBuilder builder)
         => builder
             .AddNotificationHandler<ContentPublishingNotification, ContentNotificationHandler>()
