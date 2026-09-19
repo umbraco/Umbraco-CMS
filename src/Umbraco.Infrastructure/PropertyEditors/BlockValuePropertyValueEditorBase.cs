@@ -904,6 +904,7 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
         foreach (BlockItemData sourceBlockItem in sourceBlockItems)
         {
             BlockItemData? targetBlockItem = targetBlockItems.FirstOrDefault(i => i.Key == sourceBlockItem.Key);
+            var targetBlockItemExisted = targetBlockItem is not null;
             if (targetBlockItem is null)
             {
                 targetBlockItem = new BlockItemData(
@@ -953,6 +954,13 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
                     ? sourceBlockPropertyValue.Value
                     : mergingDataEditor!.MergePartialPropertyValueForCulture(sourceBlockPropertyValue.Value, targetBlockPropertyValue.Value, culture);
             }
+
+            // Remove any values that are present in the target, but no longer is present in the source,
+            // to ensure they're not contained in any future publish.
+            if (targetBlockItemExisted)
+            {
+                RemoveValuesMissingFromSource(sourceBlockItem, targetBlockItem, culture);
+            }
         }
 
         // After merging, remove stale values when property variation changed.
@@ -970,6 +978,30 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
             });
         }
     }
+
+    // Removes target values that have no corresponding entries in the source, scoped to the culture currently
+    // being merged. A value that itself doesn't vary by culture but nests further partial-mergeable data
+    // (e.g. blocks within blocks) is always reconciled here, mirroring the additive merge's equivalent exemption
+    // above; any other value is only removed when it belongs to the culture currently being published.
+    private void RemoveValuesMissingFromSource(BlockItemData sourceBlockItem, BlockItemData targetBlockItem, string? culture)
+        => targetBlockItem.Values.RemoveAll(targetBlockPropertyValue =>
+        {
+            var sourceHasValue = sourceBlockItem.Values.Any(v =>
+                v.Alias == targetBlockPropertyValue.Alias &&
+                v.Culture == targetBlockPropertyValue.Culture &&
+                v.Segment == targetBlockPropertyValue.Segment);
+            if (sourceHasValue)
+            {
+                return false;
+            }
+
+            IDataEditor? mergingDataEditor = null;
+            var shouldPerformPartialMerge = targetBlockPropertyValue.PropertyType is not null
+                              && _propertyEditors.TryGet(targetBlockPropertyValue.PropertyType.PropertyEditorAlias, out mergingDataEditor)
+                              && mergingDataEditor.CanMergePartialPropertyValues(targetBlockPropertyValue.PropertyType);
+
+            return shouldPerformPartialMerge || targetBlockPropertyValue.Culture == culture;
+        });
 
     /// <summary>
     /// Sorts block item values by culture to ensure consistent JSON serialization order.
