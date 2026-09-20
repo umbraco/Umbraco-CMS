@@ -1,6 +1,7 @@
 using System.Security.Cryptography;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.IdentityModel.Tokens;
 using OpenIddict.Server;
 using OpenIddict.Validation;
@@ -41,6 +42,10 @@ public static class UmbracoBuilderAuthExtensions
 
     private static void ConfigureOpenIddict(IUmbracoBuilder builder)
     {
+        // Registered before the handler that consumes it, so a site can supply its own paths by registering
+        // an IOpenIddictPathsToHandleProvider ahead of this call.
+        builder.Services.TryAddSingleton<IOpenIddictPathsToHandleProvider, OpenIddictPathsToHandleProvider>();
+
         builder.Services.AddOpenIddict()
             // Register the OpenIddict server components.
             .AddServer(options =>
