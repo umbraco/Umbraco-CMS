@@ -32,6 +32,10 @@ public static class UmbracoBuilderAuthExtensions
     /// </remarks>
     public static IUmbracoBuilder AddUmbracoOpenIddict(this IUmbracoBuilder builder)
     {
+        // Registered with TryAdd, so a site can supply its own paths by registering an
+        // IOpenIddictPathsToHandleProvider before this call.
+        builder.Services.TryAddSingleton<IOpenIddictPathsToHandleProvider, OpenIddictPathsToHandleProvider>();
+
         if (builder.Services.Any(x => !x.IsKeyedService && x.ImplementationType == typeof(OpenIddictCleanupJob)) is false)
         {
             ConfigureOpenIddict(builder);
@@ -42,10 +46,6 @@ public static class UmbracoBuilderAuthExtensions
 
     private static void ConfigureOpenIddict(IUmbracoBuilder builder)
     {
-        // Registered before the handler that consumes it, so a site can supply its own paths by registering
-        // an IOpenIddictPathsToHandleProvider ahead of this call.
-        builder.Services.TryAddSingleton<IOpenIddictPathsToHandleProvider, OpenIddictPathsToHandleProvider>();
-
         builder.Services.AddOpenIddict()
             // Register the OpenIddict server components.
             .AddServer(options =>
