@@ -10,6 +10,7 @@ on:
     paths:
       - src/Umbraco.Web.UI.Client/**
       - src/**/OpenApi.json
+      - .github/workflows/test-backoffice.yml
   pull_request:
     branches:
       - main
@@ -19,6 +20,7 @@ on:
     paths:
       - src/Umbraco.Web.UI.Client/**
       - src/**/OpenApi.json
+      - .github/workflows/test-backoffice.yml
 
   # Allows GitHub to use this workflow to validate the merge queue
   merge_group:
