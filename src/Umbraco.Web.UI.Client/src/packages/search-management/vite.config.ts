@@ -16,7 +16,7 @@ export default defineConfig({
 			// Listing the manifests alone is not enough: manualChunks assigns a module to a chunk
 			// regardless of who imports it, so a globalContext or store left off this list still lands
 			// in the lazy chunk and the entry then pulls that whole chunk in at boot to reach it.
-			eagerModules: ['umbraco-package', 'manifests', 'constants', 'legacy-aliases', 'global-context', '.store.'],
+			eagerModules: ['umbraco-package', 'manifests', 'constants', 'global-context', '.store.'],
 		},
 	}),
 });
