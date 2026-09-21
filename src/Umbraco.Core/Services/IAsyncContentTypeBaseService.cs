@@ -6,10 +6,6 @@ namespace Umbraco.Cms.Core.Services;
 /// <summary>
 ///     The contract implemented by every content type service (document, media and member types).
 /// </summary>
-/// <remarks>
-///     The synchronous <see cref="IContentTypeBaseService{TItem}" /> remains for external implementors only; no
-///     content type service in the CMS implements it.
-/// </remarks>
 /// <typeparam name="TItem">The type of the item.</typeparam>
 public interface IAsyncContentTypeBaseService<TItem> : IService
     where TItem : IContentTypeComposition
