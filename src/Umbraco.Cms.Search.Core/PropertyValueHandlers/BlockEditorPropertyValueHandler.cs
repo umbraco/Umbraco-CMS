@@ -419,17 +419,6 @@ internal abstract class BlockEditorPropertyValueHandler : IPropertyValueHandler
                     {
                         IPropertyType propertyType = elementProperty.PropertyType;
 
-                        // as with locally contained blocks, a nested property type set to invariant is still valid
-                        // even if the requested segment variation is explicit - force it to the requested variation
-                        // in that case. Culture is deliberately NOT forced here: unlike segment, forcing it would
-                        // make an invariant property look culture-variant and skip it entirely on the invariant
-                        // (null-culture) pass below, since GetValue() already handles a mismatched culture/segment
-                        // gracefully (returns null) rather than throwing.
-                        if (segment is not null)
-                        {
-                            propertyType.Variations |= ContentVariation.Segment;
-                        }
-
                         if (propertyType.VariesByCulture() && propertyCulture is null)
                         {
                             continue;
@@ -453,16 +442,27 @@ internal abstract class BlockEditorPropertyValueHandler : IPropertyValueHandler
                             continue;
                         }
 
+                        // unlike a locally contained block - whose synthetic Property is freshly written under the
+                        // requested segment, so reading it back under that same segment always finds it - this is
+                        // the element's own real, already-stored property: it only has a value under a segment it
+                        // itself actually varies by. Reading it at the requested segment regardless would miss an
+                        // invariant property's value entirely, since that is only ever stored under the invariant
+                        // (null) segment. Read at the element's own supported segment instead, then re-home the
+                        // result under the requested segment - the segment the containing block is actually indexed
+                        // under - exactly as a locally contained block's value is.
+                        var elementReadSegment = propertyType.VariesBySegment() ? segment : null;
+
                         IndexField[] elementPropertyIndexFields = elementPropertyValueHandler
-                            .GetIndexFields(elementProperty, propertyCulture, segment, published, contentContext)
+                            .GetIndexFields(elementProperty, propertyCulture, elementReadSegment, published, contentContext)
                             .ToArray();
 
                         foreach (IndexField elementPropertyIndexField in elementPropertyIndexFields)
                         {
-                            if (cumulativeIndexValuesByVariation.TryGetValue((elementPropertyIndexField.Culture, elementPropertyIndexField.Segment), out CumulativeIndexValue? elementIndexValue) is false)
+                            (string? Culture, string? Segment) variation = (elementPropertyIndexField.Culture, segment);
+                            if (cumulativeIndexValuesByVariation.TryGetValue(variation, out CumulativeIndexValue? elementIndexValue) is false)
                             {
                                 elementIndexValue = new CumulativeIndexValue();
-                                cumulativeIndexValuesByVariation.Add((elementPropertyIndexField.Culture, elementPropertyIndexField.Segment), elementIndexValue);
+                                cumulativeIndexValuesByVariation.Add(variation, elementIndexValue);
                             }
 
                             AmendCumulativeIndexValue(elementIndexValue, elementPropertyIndexField.Value);
