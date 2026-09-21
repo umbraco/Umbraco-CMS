@@ -38,11 +38,13 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             INotificationHandler<ContentDeletingVersionsNotification>,
             INotificationHandler<ContentRefreshNotification>
         {
-            private readonly IDocumentRepository _documentRepository;
+            private readonly IAsyncDocumentRepository _documentRepository;
+            private readonly IIdKeyMap _idKeyMap;
 
-            public TestNotificationHandler(IDocumentRepository documentRepository)
+            public TestNotificationHandler(IAsyncDocumentRepository documentRepository, IIdKeyMap idKeyMap)
             {
                 _documentRepository = documentRepository;
+                _idKeyMap = idKeyMap;
             }
 
             public void Handle(ContentCacheRefresherNotification args)
@@ -129,41 +131,57 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
                 {
                     return;
                 }
-                IContent[] entities = new[] { notification.Entity }; // args.Entities
+                IContent entity = notification.Entity;
+                PublishedState publishedState = ((Content)entity).PublishedState;
+
+                // The repository reads are Guid-keyed and async, and this handler implements a synchronous
+                // interface contract, so they are bridged here rather than inside a projection.
+                string xstate = entity.Published ? "p" : "u";
+                if (publishedState == PublishedState.Publishing)
+                {
+                    xstate += "+" + (entity.ParentId == -1 || IsParentPathPublished(entity) ? "p" : "m");
+                }
+                else if (publishedState == PublishedState.Unpublishing)
+                {
+                    xstate += "-u";
+                }
+                else
+                {
+                    xstate += "=" + (entity.Published
+                        ? _documentRepository.IsPathPublishedAsync(entity, CancellationToken.None).GetAwaiter().GetResult() ? "p" : "m"
+                        : "u");
+                }
 
                 var e = new EventInstance
                 {
                     Message = _msgCount++,
                     Sender = "ContentRepository",
                     Name = "Refresh",
-                    Args = string.Join(",", entities.Select(x =>
-                    {
-                        PublishedState publishedState = ((Content)x).PublishedState;
-
-                        string xstate = x.Published ? "p" : "u";
-                        if (publishedState == PublishedState.Publishing)
-                        {
-                            xstate += "+" + (x.ParentId == -1 || _documentRepository.IsPathPublished(_documentRepository.Get(x.ParentId)) ? "p" : "m");
-                        }
-                        else if (publishedState == PublishedState.Unpublishing)
-                        {
-                            xstate += "-u";
-                        }
-                        else
-                        {
-                            xstate += "=" + (x.Published ? _documentRepository.IsPathPublished(x) ? "p" : "m" : "u");
-                        }
-
-                        return $"{x.Id}.{xstate}";
-                    }))
+                    Args = $"{entity.Id}.{xstate}",
                 };
                 _events.Add(e);
             }
+
+            private bool IsParentPathPublished(IContent entity)
+            {
+                Attempt<Guid> parentKey = _idKeyMap
+                    .GetKeyForIdAsync(entity.ParentId, UmbracoObjectTypes.Document)
+                    .GetAwaiter().GetResult();
+                if (parentKey.Success is false)
+                {
+                    return false;
+                }
+
+                IContent? parent = _documentRepository.GetAsync(parentKey.Result, CancellationToken.None)
+                    .GetAwaiter().GetResult();
+                return _documentRepository.IsPathPublishedAsync(parent, CancellationToken.None)
+                    .GetAwaiter().GetResult();
+            }
         }
+
         protected override void CustomTestSetup(IUmbracoBuilder builder)
         {
             builder.AddUmbracoHybridCache();
-            builder.Services.AddUnique<IServerMessenger, LocalServerMessenger>();
             builder.Services.AddUnique<IServerMessenger, LocalServerMessenger>();
             builder
                 .AddNotificationHandler<ContentCacheRefresherNotification, TestNotificationHandler>()

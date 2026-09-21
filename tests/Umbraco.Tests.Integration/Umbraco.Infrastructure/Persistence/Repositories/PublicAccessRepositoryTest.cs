@@ -23,7 +23,7 @@ internal sealed class PublicAccessRepositoryTest : UmbracoIntegrationTest
 {
     private IContentTypeRepository ContentTypeRepository => GetRequiredService<IContentTypeRepository>();
 
-    private DocumentRepository DocumentRepository => (DocumentRepository)GetRequiredService<IDocumentRepository>();
+    private IAsyncDocumentRepository DocumentRepository => GetRequiredService<IAsyncDocumentRepository>();
 
     private PublicAccessRepository CreateRepository() =>
         new(
@@ -259,7 +259,7 @@ internal sealed class PublicAccessRepositoryTest : UmbracoIntegrationTest
             for (var i = 0; i < count; i++)
             {
                 var c = new Content("test" + i, -1, ct);
-                DocumentRepository.Save(c);
+                await DocumentRepository.SaveAsync(c, CancellationToken.None);
                 result.Add(c);
             }
 

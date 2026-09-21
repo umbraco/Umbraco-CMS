@@ -30,7 +30,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, WithApplication = true, Logger = UmbracoTestOptions.Logger.Console)]
 internal sealed class UserRepositoryTest : UmbracoIntegrationTest
 {
-    private IDocumentRepository DocumentRepository => GetRequiredService<IDocumentRepository>();
+    private IAsyncDocumentRepository DocumentRepository => GetRequiredService<IAsyncDocumentRepository>();
 
     private IContentTypeRepository ContentTypeRepository => GetRequiredService<IContentTypeRepository>();
 
@@ -568,7 +568,7 @@ internal sealed class UserRepositoryTest : UmbracoIntegrationTest
             var content = ContentBuilder.CreateBasicContent(ct);
             var media = MediaBuilder.CreateSimpleMedia(mt, "asdf", -1);
 
-            DocumentRepository.Save(content);
+            await DocumentRepository.SaveAsync(content, CancellationToken.None);
             MediaRepository.Save(media);
 
             var user = CreateAndCommitUserWithGroup(userRepository, userGroupRepository);

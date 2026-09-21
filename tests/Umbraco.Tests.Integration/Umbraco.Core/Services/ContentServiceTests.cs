@@ -76,7 +76,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
     private PropertyEditorCollection PropertyEditorCollection => GetRequiredService<PropertyEditorCollection>();
 
-    private IDocumentRepository DocumentRepository => GetRequiredService<IDocumentRepository>();
+    private IAsyncDocumentRepository DocumentRepository => GetRequiredService<IAsyncDocumentRepository>();
 
     private IJsonSerializer Serializer => GetRequiredService<IJsonSerializer>();
 
@@ -4074,7 +4074,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
             foreach (var content in list)
             {
-                repository.Save(content.Value);
+                await repository.SaveAsync(content.Value, CancellationToken.None);
             }
 
             Assert.That(c.Value.HasIdentity, Is.True);

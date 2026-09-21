@@ -50,7 +50,7 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
 
     private IMediaTypeRepository MediaTypeRepository => GetRequiredService<IMediaTypeRepository>();
 
-    private IDocumentRepository DocumentRepository => GetRequiredService<IDocumentRepository>();
+    private IAsyncDocumentRepository DocumentRepository => GetRequiredService<IAsyncDocumentRepository>();
 
     private IContentService ContentService => GetRequiredService<IContentService>();
 
@@ -848,7 +848,7 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
             var contentType = await repository.GetAsync(_textpageContentType.Id, CancellationToken.None);
 
             var subpage = ContentBuilder.CreateTextpageContent(contentType, "Text Page 1", contentType.Id);
-            DocumentRepository.Save(subpage);
+            await DocumentRepository.SaveAsync(subpage, CancellationToken.None);
 
             // Act
             contentType.RemovePropertyType("keywords");
@@ -873,7 +873,7 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
             var contentType = await repository.GetAsync(_textpageContentType.Id, CancellationToken.None);
 
             var subpage = ContentBuilder.CreateTextpageContent(contentType, "Text Page 1", contentType.Id);
-            DocumentRepository.Save(subpage);
+            await DocumentRepository.SaveAsync(subpage, CancellationToken.None);
 
             // Act
             var propertyGroup = contentType.PropertyGroups.First(x => x.Name == "Meta");
@@ -906,7 +906,7 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
             var contentType = await repository.GetAsync(_textpageContentType.Id, CancellationToken.None);
 
             var subpage = ContentBuilder.CreateTextpageContent(contentType, "Text Page 1", contentType.Id);
-            DocumentRepository.Save(subpage);
+            await DocumentRepository.SaveAsync(subpage, CancellationToken.None);
 
             var propertyGroup = contentType.PropertyGroups.First(x => x.Name == "Meta");
             propertyGroup.PropertyTypes.Add(
@@ -921,12 +921,12 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
             await repository.SaveAsync(contentType, CancellationToken.None);
 
             // Act
-            var content = DocumentRepository.Get(subpage.Id);
+            var content = await DocumentRepository.GetAsync(subpage.Key, CancellationToken.None);
             content.SetValue("metaAuthor", "John Doe");
-            DocumentRepository.Save(content);
+            await DocumentRepository.SaveAsync(content, CancellationToken.None);
 
             // Assert
-            var updated = DocumentRepository.Get(subpage.Id);
+            var updated = await DocumentRepository.GetAsync(subpage.Key, CancellationToken.None);
             Assert.That(updated.GetValue("metaAuthor").ToString(), Is.EqualTo("John Doe"));
             Assert.That(contentType.PropertyTypes.Count(), Is.EqualTo(5));
             Assert.That(contentType.PropertyTypes.Any(x => x.Alias == "metaAuthor"), Is.True);
@@ -946,7 +946,7 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
             var contentType = await repository.GetAsync(_textpageContentType.Id, CancellationToken.None);
 
             var subpage = ContentBuilder.CreateTextpageContent(contentType, "Text Page 1", contentType.Id);
-            DocumentRepository.Save(subpage);
+            await DocumentRepository.SaveAsync(subpage, CancellationToken.None);
 
             // Remove PropertyType
             contentType.RemovePropertyType("keywords");
@@ -965,12 +965,12 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
             await repository.SaveAsync(contentType, CancellationToken.None);
 
             // Act
-            var content = DocumentRepository.Get(subpage.Id);
+            var content = await DocumentRepository.GetAsync(subpage.Key, CancellationToken.None);
             content.SetValue("metaAuthor", "John Doe");
-            DocumentRepository.Save(content);
+            await DocumentRepository.SaveAsync(content, CancellationToken.None);
 
             // Assert
-            var updated = DocumentRepository.Get(subpage.Id);
+            var updated = await DocumentRepository.GetAsync(subpage.Key, CancellationToken.None);
             Assert.That(updated.GetValue("metaAuthor").ToString(), Is.EqualTo("John Doe"));
             Assert.That(updated.Properties.First(x => x.Alias == "description").GetValue(), Is.EqualTo("This is the meta description for a textpage"));
 
@@ -996,7 +996,7 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
             var result = await repository.HasContentNodesAsync(contentTypeId, CancellationToken.None);
 
             var subpage = ContentBuilder.CreateTextpageContent(contentType, "Test Page 1", contentType.Id);
-            DocumentRepository.Save(subpage);
+            await DocumentRepository.SaveAsync(subpage, CancellationToken.None);
 
             var result2 = await repository.HasContentNodesAsync(contentTypeId, CancellationToken.None);
 
@@ -1075,7 +1075,7 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
             object obj = new { title = "test title" };
             content.PropertyValues(obj);
             content.ResetDirtyProperties(false);
-            contentRepository.Save(content);
+            await contentRepository.SaveAsync(content, CancellationToken.None);
 
             // Update variation on element type
             elementType.Variations = ContentVariation.Culture;

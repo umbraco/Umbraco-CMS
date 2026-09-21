@@ -26,7 +26,7 @@ internal sealed class ContentServicePerformanceTest : UmbracoIntegrationTest
     [SetUp]
     public async Task SetUpData() => await CreateTestDataAsync();
 
-    private DocumentRepository DocumentRepository => (DocumentRepository)GetRequiredService<IDocumentRepository>();
+    private IAsyncDocumentRepository DocumentRepository => GetRequiredService<IAsyncDocumentRepository>();
 
     private ITemplateService TemplateService => GetRequiredService<ITemplateService>();
 
@@ -173,7 +173,7 @@ internal sealed class ContentServicePerformanceTest : UmbracoIntegrationTest
 
             // Act
             var watch = Stopwatch.StartNew();
-            var contents = repository.GetMany();
+            var contents = await repository.GetAllAsync(CancellationToken.None);
             watch.Stop();
             var elapsed = watch.ElapsedMilliseconds;
 
@@ -200,7 +200,7 @@ internal sealed class ContentServicePerformanceTest : UmbracoIntegrationTest
 
             // Act
             var watch = Stopwatch.StartNew();
-            var contents = repository.GetMany();
+            var contents = await repository.GetAllAsync(CancellationToken.None);
             watch.Stop();
             var elapsed = watch.ElapsedMilliseconds;
 
@@ -226,10 +226,10 @@ internal sealed class ContentServicePerformanceTest : UmbracoIntegrationTest
             var repository = DocumentRepository;
 
             // Act
-            var contents = repository.GetMany();
+            var contents = await repository.GetAllAsync(CancellationToken.None);
 
             var watch = Stopwatch.StartNew();
-            var contentsCached = repository.GetMany();
+            var contentsCached = await repository.GetAllAsync(CancellationToken.None);
             watch.Stop();
             var elapsed = watch.ElapsedMilliseconds;
 
@@ -256,10 +256,10 @@ internal sealed class ContentServicePerformanceTest : UmbracoIntegrationTest
             var repository = DocumentRepository;
 
             // Act
-            var contents = repository.GetMany();
+            var contents = await repository.GetAllAsync(CancellationToken.None);
 
             var watch = Stopwatch.StartNew();
-            var contentsCached = repository.GetMany();
+            var contentsCached = await repository.GetAllAsync(CancellationToken.None);
             watch.Stop();
             var elapsed = watch.ElapsedMilliseconds;
 

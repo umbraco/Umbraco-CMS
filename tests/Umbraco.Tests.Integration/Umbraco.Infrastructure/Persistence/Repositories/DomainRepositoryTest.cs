@@ -17,7 +17,7 @@ internal sealed class DomainRepositoryTest : UmbracoIntegrationTest
 {
     private ILanguageRepository LanguageRepository => GetRequiredService<ILanguageRepository>();
 
-    private IDocumentRepository DocumentRepository => GetRequiredService<IDocumentRepository>();
+    private IAsyncDocumentRepository DocumentRepository => GetRequiredService<IAsyncDocumentRepository>();
 
     private IContentTypeRepository ContentTypeRepository => GetRequiredService<IContentTypeRepository>();
 
@@ -35,7 +35,7 @@ internal sealed class DomainRepositoryTest : UmbracoIntegrationTest
             var ct = ContentTypeBuilder.CreateBasicContentType("test", "Test");
             await ContentTypeRepository.SaveAsync(ct, CancellationToken.None);
             var content = new Content("test", -1, ct) { CreatorId = 0, WriterId = 0 };
-            DocumentRepository.Save(content);
+            await DocumentRepository.SaveAsync(content, CancellationToken.None);
             scope.Complete();
             efCoreScope.Complete();
             return (content, ct);
@@ -148,7 +148,7 @@ internal sealed class DomainRepositoryTest : UmbracoIntegrationTest
         using (var scope = ScopeProvider.CreateScope())
         {
             var content2 = new Content("test", -1, ct) { CreatorId = 0, WriterId = 0 };
-            DocumentRepository.Save(content2);
+            await DocumentRepository.SaveAsync(content2, CancellationToken.None);
             scope.Complete();
 
             var domain = (IDomain)new UmbracoDomain("test.com") { RootContentId = content1.Id, LanguageId = lang1!.Id };
@@ -307,7 +307,7 @@ internal sealed class DomainRepositoryTest : UmbracoIntegrationTest
             for (var i = 0; i < 2; i++)
             {
                 var c = new Content("test" + i, -1, ct) { CreatorId = 0, WriterId = 0 };
-                DocumentRepository.Save(c);
+                await DocumentRepository.SaveAsync(c, CancellationToken.None);
                 contentItems.Add(c);
             }
 
@@ -353,7 +353,7 @@ internal sealed class DomainRepositoryTest : UmbracoIntegrationTest
             for (var i = 0; i < 2; i++)
             {
                 var c = new Content("test" + i, -1, ct) { CreatorId = 0, WriterId = 0 };
-                DocumentRepository.Save(c);
+                await DocumentRepository.SaveAsync(c, CancellationToken.None);
                 contentItems.Add(c);
             }
 
