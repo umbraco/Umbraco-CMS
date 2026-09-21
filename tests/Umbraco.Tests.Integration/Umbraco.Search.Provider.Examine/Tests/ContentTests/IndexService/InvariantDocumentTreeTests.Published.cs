@@ -56,7 +56,7 @@ public partial class InvariantDocumentTreeTests : IndexTestBase
         await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, async () =>
         {
             IContent root = ContentService.GetByIdAsync(RootKey, CancellationToken.None).GetAwaiter().GetResult()!;
-            await ContentService.UnpublishAsync(root, "*", Constants.Security.SuperUserKey, CancellationToken.None);
+            await ContentService.UnpublishAsync(root, "*", Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         });
 
         IIndex index = GetIndex(Cms.Core.Constants.IndexAliases.PublishedContent);
@@ -71,7 +71,7 @@ public partial class InvariantDocumentTreeTests : IndexTestBase
         await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, async () =>
         {
             IContent child = ContentService.GetByIdAsync(ChildKey, CancellationToken.None).GetAwaiter().GetResult()!;
-            await ContentService.UnpublishAsync(child, "*", Constants.Security.SuperUserKey, CancellationToken.None);
+            await ContentService.UnpublishAsync(child, "*", Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         });
 
         IIndex index = GetIndex(Cms.Core.Constants.IndexAliases.PublishedContent);
@@ -90,7 +90,7 @@ public partial class InvariantDocumentTreeTests : IndexTestBase
         await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, async () =>
         {
             IContent grandChild = ContentService.GetByIdAsync(GrandchildKey, CancellationToken.None).GetAwaiter().GetResult()!;
-            await ContentService.UnpublishAsync(grandChild, "*", Constants.Security.SuperUserKey, CancellationToken.None);
+            await ContentService.UnpublishAsync(grandChild, "*", Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         });
 
         IIndex index = GetIndex(Cms.Core.Constants.IndexAliases.PublishedContent);
@@ -115,7 +115,7 @@ public partial class InvariantDocumentTreeTests : IndexTestBase
         await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, async () =>
         {
             IContent root = ContentService.GetByIdAsync(RootKey, CancellationToken.None).GetAwaiter().GetResult()!;
-            await ContentService.MoveToRecycleBinAsync(root, Constants.Security.SuperUserKey, CancellationToken.None);
+            await ContentService.MoveToRecycleBinAsync(root, Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         });
 
         IIndex index = GetIndex(Cms.Core.Constants.IndexAliases.PublishedContent);
@@ -130,7 +130,7 @@ public partial class InvariantDocumentTreeTests : IndexTestBase
         await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, async () =>
         {
             IContent child = ContentService.GetByIdAsync(ChildKey, CancellationToken.None).GetAwaiter().GetResult()!;
-            await ContentService.MoveToRecycleBinAsync(child, Constants.Security.SuperUserKey, CancellationToken.None);
+            await ContentService.MoveToRecycleBinAsync(child, Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         });
 
         IIndex index = GetIndex(Cms.Core.Constants.IndexAliases.PublishedContent);
@@ -149,7 +149,7 @@ public partial class InvariantDocumentTreeTests : IndexTestBase
         await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, async () =>
         {
             IContent grandChild = ContentService.GetByIdAsync(GrandchildKey, CancellationToken.None).GetAwaiter().GetResult()!;
-            await ContentService.MoveToRecycleBinAsync(grandChild, Constants.Security.SuperUserKey, CancellationToken.None);
+            await ContentService.MoveToRecycleBinAsync(grandChild, Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         });
 
         IIndex index = GetIndex(Cms.Core.Constants.IndexAliases.PublishedContent);

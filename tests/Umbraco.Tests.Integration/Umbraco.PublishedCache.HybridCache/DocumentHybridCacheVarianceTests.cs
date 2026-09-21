@@ -69,7 +69,7 @@ internal sealed class DocumentHybridCacheVarianceTests : UmbracoIntegrationTest
             .WithName("Variance Render Test")
             .Build();
         content.SetValue("title", "invariant title");
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
         await ContentService.PublishAsync(content, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Routing sets this before rendering; simulate it so a culture-less read resolves like a real request.
@@ -113,7 +113,7 @@ internal sealed class DocumentHybridCacheVarianceTests : UmbracoIntegrationTest
             .WithCultureName(defaultCulture, "Variance Render Test")
             .Build();
         content.SetValue("title", "variant title", defaultCulture);
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
         await ContentService.PublishAsync(content, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Routing sets this before rendering; simulate it so a culture-less read resolves like a real request.
@@ -159,7 +159,7 @@ internal sealed class DocumentHybridCacheVarianceTests : UmbracoIntegrationTest
             .WithCultureName(defaultCulture, "Variance Render Test")
             .Build();
         content.SetValue("title", "invariant title");
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
         await ContentService.PublishAsync(content, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Routing sets this before rendering; simulate it so a culture-less read resolves like a real request.
@@ -202,7 +202,7 @@ internal sealed class DocumentHybridCacheVarianceTests : UmbracoIntegrationTest
             .WithCultureName(defaultCulture, "Variance Render Test")
             .Build();
         content.SetValue("title", "variant title", defaultCulture);
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
         await ContentService.PublishAsync(content, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Routing sets this before rendering; simulate it so a culture-less read resolves like a real request.

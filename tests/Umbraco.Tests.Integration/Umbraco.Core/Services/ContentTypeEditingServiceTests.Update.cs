@@ -617,7 +617,7 @@ internal sealed partial class ContentTypeEditingServiceTests
             content.Properties[property.Alias]!.SetValue(property.Name);
         }
 
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         if (propertyMoveOperation == PropertyMoveOperation.ToEarlier)
         {
@@ -1572,7 +1572,7 @@ internal sealed partial class ContentTypeEditingServiceTests
         var contentType = (await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result!;
 
         var content = await ContentService.CreateAsync("Test Content", (Guid?)null, contentType.Alias, Constants.Security.SuperUserKey, CancellationToken.None);
-        var saveResult = await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        var saveResult = await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
         Assert.IsTrue(saveResult.Success);
 
         var updateModel = ContentTypeUpdateModel("Test", "test", isElement: true);
@@ -1590,7 +1590,7 @@ internal sealed partial class ContentTypeEditingServiceTests
         var contentType = (await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result!;
 
         var element = new Element("Test Element", contentType);
-        var saveResult = await ElementService.SaveAsync(element, null, null, CancellationToken.None);
+        var saveResult = await ElementService.SaveAsync(element, Constants.Security.SuperUserKey, null, CancellationToken.None);
         Assert.IsTrue(saveResult.Success);
 
         var updateModel = ContentTypeUpdateModel("Test", "test");

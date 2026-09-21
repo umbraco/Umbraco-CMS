@@ -30,20 +30,20 @@ public class DistributedContentIndexRefresherContentTests : TestBase
     {
         await GetRequiredService<ILanguageService>().CreateAsync(
             new LanguageBuilder().WithCultureInfo("da-DK").Build(),
-            Constants.Security.SuperUserKey);
+            Cms.Core.Constants.Security.SuperUserKey);
 
         IContentType variantContentType = new ContentTypeBuilder()
             .WithAlias("variant")
             .WithContentVariation(ContentVariation.CultureAndSegment)
             .WithAllowAsRoot(true)
             .Build();
-        await ContentTypeService.CreateAsync(variantContentType, Constants.Security.SuperUserKey);
+        await ContentTypeService.CreateAsync(variantContentType, Cms.Core.Constants.Security.SuperUserKey);
 
         IContentType invariantContentType = new ContentTypeBuilder()
             .WithAlias("invariant")
             .WithAllowAsRoot(true)
             .Build();
-        await ContentTypeService.CreateAsync(invariantContentType, Constants.Security.SuperUserKey);
+        await ContentTypeService.CreateAsync(invariantContentType, Cms.Core.Constants.Security.SuperUserKey);
 
         _variantContentKey = Guid.NewGuid();
         IContent variantContent = new ContentBuilder()
@@ -52,8 +52,8 @@ public class DistributedContentIndexRefresherContentTests : TestBase
             .WithCultureName("en-US", "Variant EN")
             .WithCultureName("da-DK", "Variant DA")
             .Build();
-        await ContentService.SaveAsync(variantContent, null, null, CancellationToken.None);
-        await ContentService.PublishAsync(variantContent, ["en-US", "da-DK"], Constants.Security.SuperUserKey, CancellationToken.None);
+        await ContentService.SaveAsync(variantContent, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishAsync(variantContent, ["en-US", "da-DK"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
         _invariantContentKey = Guid.NewGuid();
         IContent invariantContent = new ContentBuilder()
@@ -61,8 +61,8 @@ public class DistributedContentIndexRefresherContentTests : TestBase
             .WithContentType(invariantContentType)
             .WithName("Invariant")
             .Build();
-        await ContentService.SaveAsync(invariantContent, null, null, CancellationToken.None);
-        await ContentService.PublishAsync(invariantContent, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
+        await ContentService.SaveAsync(invariantContent, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishAsync(invariantContent, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
         IndexerAndSearcher.Reset();
     }
@@ -124,7 +124,7 @@ public class DistributedContentIndexRefresherContentTests : TestBase
     [TestCase(true, true)]
     public async Task RefreshContent_SinglePublished_SpecificLanguageVariants(bool publishEnglish, bool publishDanish)
     {
-        await ContentService.UnpublishAsync(VariantContent(), "*", Constants.Security.SuperUserKey, CancellationToken.None);
+        await ContentService.UnpublishAsync(VariantContent(), "*", Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
         var culturesToPublish = new List<string>();
         if (publishEnglish)
@@ -135,7 +135,7 @@ public class DistributedContentIndexRefresherContentTests : TestBase
         {
             culturesToPublish.Add("da-DK");
         }
-        await ContentService.PublishAsync(VariantContent(), culturesToPublish.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
+        await ContentService.PublishAsync(VariantContent(), culturesToPublish.ToArray(), Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
         IndexerAndSearcher.Reset();
         Assert.That(IndexerAndSearcher.Dump(IndexAliases.PublishedContent), Is.Empty);

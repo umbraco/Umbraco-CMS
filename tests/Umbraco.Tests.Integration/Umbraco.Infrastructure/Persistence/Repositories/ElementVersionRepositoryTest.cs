@@ -27,7 +27,7 @@ internal sealed class ElementVersionRepositoryTest : UmbracoIntegrationTest
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var content = ElementBuilder.CreateSimpleElement(contentType);
-        await ElementService.SaveAsync(content, null, null, CancellationToken.None);
+        await ElementService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         await ElementService.PublishAsync(content, Array.Empty<string>(), Constants.Security.SuperUserKey, CancellationToken.None);
         // At this point content has 2 versions, a draft version and a published version.
@@ -55,7 +55,7 @@ internal sealed class ElementVersionRepositoryTest : UmbracoIntegrationTest
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var content = ElementBuilder.CreateSimpleElement(contentType);
-        await ElementService.SaveAsync(content, null, null, CancellationToken.None);
+        await ElementService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         await ElementService.PublishAsync(content, Array.Empty<string>(), Constants.Security.SuperUserKey, CancellationToken.None);
         // At this point content has 2 versions, a draft version and a published version.
@@ -94,7 +94,7 @@ internal sealed class ElementVersionRepositoryTest : UmbracoIntegrationTest
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var content = ElementBuilder.CreateSimpleElement(contentType);
-        await ElementService.SaveAsync(content, null, null, CancellationToken.None);
+        await ElementService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         await ElementService.PublishAsync(content, Array.Empty<string>(), Constants.Security.SuperUserKey, CancellationToken.None);
         await ElementService.PublishAsync(content, Array.Empty<string>(), Constants.Security.SuperUserKey, CancellationToken.None);
@@ -128,7 +128,7 @@ internal sealed class ElementVersionRepositoryTest : UmbracoIntegrationTest
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var content = ElementBuilder.CreateSimpleElement(contentType);
-        await ElementService.SaveAsync(content, null, null, CancellationToken.None);
+        await ElementService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         await ElementService.PublishAsync(content, Array.Empty<string>(), Constants.Security.SuperUserKey, CancellationToken.None); // Draft + Published
         await ElementService.PublishAsync(content, Array.Empty<string>(), Constants.Security.SuperUserKey, CancellationToken.None); // New Draft
@@ -164,7 +164,7 @@ internal sealed class ElementVersionRepositoryTest : UmbracoIntegrationTest
         var content = ElementBuilder.CreateSimpleElement(contentType, "foo", culture: "en-US");
         content.SetCultureName("foo", "en-US");
 
-        await ElementService.SaveAsync(content, null, null, CancellationToken.None);
+        await ElementService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
         await ElementService.PublishAsync(content, new[] { "en-US" }, Constants.Security.SuperUserKey, CancellationToken.None); // Draft + Published
         await ElementService.PublishAsync(content, new[] { "en-US" }, Constants.Security.SuperUserKey, CancellationToken.None); // New Draft
 

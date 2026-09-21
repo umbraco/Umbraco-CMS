@@ -74,7 +74,7 @@ internal partial class BlockListElementLevelVariationTests
         blockListValue.SettingsData[0].Values[2].Value = "The second settings value in Danish";
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
         PublishContent(content, contentType, ["en-US"]);
 
         AssertPropertyValues(
@@ -200,7 +200,7 @@ internal partial class BlockListElementLevelVariationTests
         blockListValue.SettingsData[0].Values[1].Value = "Danish variantText settings value (updated)";
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue), "da-DK");
 
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
         PublishContent(content, contentType, ["en-US"]);
 
         AssertPropertyValues(
@@ -387,7 +387,7 @@ internal partial class BlockListElementLevelVariationTests
         blockListValue.ContentData[0].Values[3].Value = "The second root content value in Danish";
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
         PublishContent(content, contentType, ["en-US"]);
 
         AssertPropertyValues(
@@ -626,7 +626,7 @@ internal partial class BlockListElementLevelVariationTests
         blockListValue.ContentData[0].Values[4].Value = "The second root content value in Danish";
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
         PublishContent(content, contentType, ["en-US"]);
 
         AssertPropertyValues(
@@ -766,7 +766,7 @@ internal partial class BlockListElementLevelVariationTests
         blockListValue.ContentData[0].Values[6].Value = "The second content value in Danish (Segment 2)";
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
         PublishContent(content, contentType, ["en-US"]);
 
         AssertPropertyValues(
@@ -881,7 +881,7 @@ internal partial class BlockListElementLevelVariationTests
         blockListValue.ContentData[0].Values[3].Value = "The second content value (Segment 2)";
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
         PublishContent(content, contentType);
 
         AssertPropertyValues(null, "The second invariant content value", "The second content value");
@@ -965,7 +965,7 @@ internal partial class BlockListElementLevelVariationTests
             ]);
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
         PublishContent(content, contentType, ["en-US", "da-DK"]);
 
         AssertPropertyValues("en-US", 3, blocks =>
@@ -1010,7 +1010,7 @@ internal partial class BlockListElementLevelVariationTests
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
 
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
         PublishContent(content, contentType, ["en-US"]);
 
         AssertPropertyValues("en-US", 2, blocks =>
@@ -1085,7 +1085,7 @@ internal partial class BlockListElementLevelVariationTests
             ]);
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
         PublishContent(content, contentType, ["en-US", "da-DK"]);
 
         AssertPropertyValues("en-US", 1, blocks =>
@@ -1135,7 +1135,7 @@ internal partial class BlockListElementLevelVariationTests
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
 
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
         PublishContent(content, contentType, ["en-US"]);
 
         AssertPropertyValues("en-US", 2, blocks =>
@@ -1223,7 +1223,7 @@ internal partial class BlockListElementLevelVariationTests
         ];
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
         PublishContent(content, contentType, ["en-US", "da-DK"]);
 
         AssertPropertyValues("en-US", 2, blocks =>
@@ -1250,7 +1250,7 @@ internal partial class BlockListElementLevelVariationTests
         ];
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
         PublishContent(content, contentType, ["da-DK"]);
 
         AssertPropertyValues("da-DK", 2, blocks =>
@@ -1321,7 +1321,7 @@ internal partial class BlockListElementLevelVariationTests
         ];
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
         PublishContent(content, contentType, ["en-US", "da-DK"]);
 
         foreach (var culture in new[] { "en-US", "da-DK" })
@@ -1342,7 +1342,7 @@ internal partial class BlockListElementLevelVariationTests
         ];
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         // note how publishing in one language affects both due to the invariance of the block element type
         PublishContent(content, contentType, ["en-US"]);
@@ -1423,7 +1423,7 @@ internal partial class BlockListElementLevelVariationTests
         ];
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
         PublishContent(content, contentType, ["en-US", "da-DK"]);
 
         AssertPropertyValues("en-US", 2, blocks =>
@@ -1449,7 +1449,7 @@ internal partial class BlockListElementLevelVariationTests
         ];
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         PublishContent(content, contentType, ["da-DK"]);
 
@@ -1514,7 +1514,7 @@ internal partial class BlockListElementLevelVariationTests
         ];
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         PublishContent(content, contentType, ["da-DK"]);
 
@@ -1537,7 +1537,7 @@ internal partial class BlockListElementLevelVariationTests
         blockListValue.SettingsData[0].Values[2].Value = "The second settings value in Danish";
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
         PublishContent(content, contentType, ["da-DK"]);
 
         AssertPropertyValues("en-US", 0);
@@ -1602,7 +1602,7 @@ internal partial class BlockListElementLevelVariationTests
         ];
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         PublishContent(content, contentType, ["da-DK"]);
 
@@ -1662,7 +1662,7 @@ internal partial class BlockListElementLevelVariationTests
             ]);
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         var publishResult = await ContentService.PublishAsync(content, ["en-US", "da-DK"], Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.IsTrue(publishResult.Success);
@@ -1702,7 +1702,7 @@ internal partial class BlockListElementLevelVariationTests
             ]);
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         var publishResult = await ContentService.PublishAsync(content, ["en-US"], Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.IsTrue(publishResult.Success);
@@ -1742,7 +1742,7 @@ internal partial class BlockListElementLevelVariationTests
             ]);
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         var publishResult = await ContentService.PublishAsync(content, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.IsTrue(publishResult.Success);
@@ -1783,7 +1783,7 @@ internal partial class BlockListElementLevelVariationTests
             ]);
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         var publishResult = await ContentService.PublishAsync(content, ["en-US", "da-DK"], Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.Multiple(() =>
@@ -1825,7 +1825,7 @@ internal partial class BlockListElementLevelVariationTests
             ]);
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         var publishResult = await ContentService.PublishAsync(content, ["en-US", "da-DK"], Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.Multiple(() =>
@@ -1870,7 +1870,7 @@ internal partial class BlockListElementLevelVariationTests
             ]);
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         var publishResult = await ContentService.PublishAsync(content, ["en-US"], Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.IsTrue(publishResult.Success);
@@ -1922,7 +1922,7 @@ internal partial class BlockListElementLevelVariationTests
         ];
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         var publishResult = await ContentService.PublishAsync(content, ["en-US"], Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.IsTrue(publishResult.Success);
@@ -2189,7 +2189,7 @@ internal partial class BlockListElementLevelVariationTests
             .ToList();
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         // 5. Publish selected cultures
         string[] culturesToPublish = republishEnglish && republishDanish
@@ -2306,7 +2306,7 @@ internal partial class BlockListElementLevelVariationTests
         ];
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
         PublishContent(content, ["en-US", "da-DK"]);
 
         // Verify initial state - both cultures should see the same invariant value
@@ -2384,7 +2384,7 @@ internal partial class BlockListElementLevelVariationTests
         ];
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         // 5. Publish selected cultures
         string[] culturesToPublish = republishEnglish && republishDanish
@@ -2576,7 +2576,7 @@ internal partial class BlockListElementLevelVariationTests
         ];
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
         PublishContent(content, contentType, ["en-US", "da-DK"]);
 
         SetVariationContext("en-US", null);

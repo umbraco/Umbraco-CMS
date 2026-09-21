@@ -36,7 +36,7 @@ public class DeleteCulturesTests : TestBase
             Assert.That(doc!.Fields.Any(f => f.Culture == "da-DK"), Is.True);
         }
 
-        await LanguageService.DeleteAsync("da-DK", Constants.Security.SuperUserKey);
+        await LanguageService.DeleteAsync("da-DK", Cms.Core.Constants.Security.SuperUserKey);
         await WaitForUpdatesAsync();
 
         using (ScopeProvider.CreateScope(autoComplete: true))
@@ -63,7 +63,7 @@ public class DeleteCulturesTests : TestBase
             invariantFieldsBefore = invariantDoc!.Fields;
         }
 
-        await LanguageService.DeleteAsync("da-DK", Constants.Security.SuperUserKey);
+        await LanguageService.DeleteAsync("da-DK", Cms.Core.Constants.Security.SuperUserKey);
         await WaitForUpdatesAsync();
 
         using (ScopeProvider.CreateScope(autoComplete: true))
@@ -91,7 +91,7 @@ public class DeleteCulturesTests : TestBase
         }
 
         // Delete ja-JP only; en-US and fr-FR should remain
-        await LanguageService.DeleteAsync("ja-JP", Constants.Security.SuperUserKey);
+        await LanguageService.DeleteAsync("ja-JP", Cms.Core.Constants.Security.SuperUserKey);
         await WaitForUpdatesAsync();
 
         using (ScopeProvider.CreateScope(autoComplete: true))
@@ -210,8 +210,8 @@ public class DeleteCulturesTests : TestBase
             .WithCultureInfo("ja-JP")
             .Build();
 
-        await LanguageService.CreateAsync(langDk, Constants.Security.SuperUserKey);
-        await LanguageService.CreateAsync(langJp, Constants.Security.SuperUserKey);
+        await LanguageService.CreateAsync(langDk, Cms.Core.Constants.Security.SuperUserKey);
+        await LanguageService.CreateAsync(langJp, Cms.Core.Constants.Security.SuperUserKey);
 
         IContentType contentType = new ContentTypeBuilder()
             .WithAlias("variantType")
@@ -223,7 +223,7 @@ public class DeleteCulturesTests : TestBase
                 .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.TextBox)
                 .Done()
             .Build();
-        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+        await ContentTypeService.CreateAsync(contentType, Cms.Core.Constants.Security.SuperUserKey);
 
         Content root = new ContentBuilder()
             .WithKey(RootKey)
@@ -240,10 +240,10 @@ public class DeleteCulturesTests : TestBase
         var indexAlias = GetIndexAlias(publish);
         await WaitForIndexing(indexAlias, async () =>
         {
-            await ContentService.SaveAsync(root, null, null, CancellationToken.None);
+            await ContentService.SaveAsync(root, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
             if (publish)
             {
-                await ContentService.PublishAsync(root, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
+                await ContentService.PublishAsync(root, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
             }
         });
     }
@@ -260,9 +260,9 @@ public class DeleteCulturesTests : TestBase
             .WithCultureInfo("fr-FR")
             .Build();
 
-        await LanguageService.CreateAsync(langDk, Constants.Security.SuperUserKey);
-        await LanguageService.CreateAsync(langJp, Constants.Security.SuperUserKey);
-        await LanguageService.CreateAsync(langFr, Constants.Security.SuperUserKey);
+        await LanguageService.CreateAsync(langDk, Cms.Core.Constants.Security.SuperUserKey);
+        await LanguageService.CreateAsync(langJp, Cms.Core.Constants.Security.SuperUserKey);
+        await LanguageService.CreateAsync(langFr, Cms.Core.Constants.Security.SuperUserKey);
 
         IContentType contentType = new ContentTypeBuilder()
             .WithAlias("variantType")
@@ -274,7 +274,7 @@ public class DeleteCulturesTests : TestBase
                 .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.TextBox)
                 .Done()
             .Build();
-        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+        await ContentTypeService.CreateAsync(contentType, Cms.Core.Constants.Security.SuperUserKey);
 
         Content root = new ContentBuilder()
             .WithKey(RootKey)
@@ -293,10 +293,10 @@ public class DeleteCulturesTests : TestBase
         var indexAlias = GetIndexAlias(publish);
         await WaitForIndexing(indexAlias, async () =>
         {
-            await ContentService.SaveAsync(root, null, null, CancellationToken.None);
+            await ContentService.SaveAsync(root, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
             if (publish)
             {
-                await ContentService.PublishAsync(root, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
+                await ContentService.PublishAsync(root, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
             }
         });
     }
@@ -307,7 +307,7 @@ public class DeleteCulturesTests : TestBase
             .WithCultureInfo("da-DK")
             .Build();
 
-        await LanguageService.CreateAsync(langDk, Constants.Security.SuperUserKey);
+        await LanguageService.CreateAsync(langDk, Cms.Core.Constants.Security.SuperUserKey);
 
         // Variant content type
         IContentType variantType = new ContentTypeBuilder()
@@ -320,7 +320,7 @@ public class DeleteCulturesTests : TestBase
                 .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.TextBox)
                 .Done()
             .Build();
-        await ContentTypeService.CreateAsync(variantType, Constants.Security.SuperUserKey);
+        await ContentTypeService.CreateAsync(variantType, Cms.Core.Constants.Security.SuperUserKey);
 
         // Invariant content type
         IContentType invariantType = new ContentTypeBuilder()
@@ -333,7 +333,7 @@ public class DeleteCulturesTests : TestBase
                 .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.TextBox)
                 .Done()
             .Build();
-        await ContentTypeService.CreateAsync(invariantType, Constants.Security.SuperUserKey);
+        await ContentTypeService.CreateAsync(invariantType, Cms.Core.Constants.Security.SuperUserKey);
 
         var indexAlias = GetIndexAlias(publish);
 
@@ -350,10 +350,10 @@ public class DeleteCulturesTests : TestBase
 
         await WaitForIndexing(indexAlias, async () =>
         {
-            await ContentService.SaveAsync(variantRoot, null, null, CancellationToken.None);
+            await ContentService.SaveAsync(variantRoot, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
             if (publish)
             {
-                await ContentService.PublishAsync(variantRoot, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
+                await ContentService.PublishAsync(variantRoot, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
             }
         });
 
@@ -368,10 +368,10 @@ public class DeleteCulturesTests : TestBase
 
         await WaitForIndexing(indexAlias, async () =>
         {
-            await ContentService.SaveAsync(invariantRoot, null, null, CancellationToken.None);
+            await ContentService.SaveAsync(invariantRoot, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
             if (publish)
             {
-                await ContentService.PublishAsync(invariantRoot, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
+                await ContentService.PublishAsync(invariantRoot, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
             }
         });
     }

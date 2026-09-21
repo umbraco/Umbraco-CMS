@@ -40,7 +40,7 @@ public class VariantContentTreeTests : IndexTestBase
         await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, async () =>
         {
             IContent root = ContentService.GetByIdAsync(RootKey, CancellationToken.None).GetAwaiter().GetResult()!;
-            await ContentService.UnpublishAsync(root, "*", Constants.Security.SuperUserKey, CancellationToken.None);
+            await ContentService.UnpublishAsync(root, "*", Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         });
 
         IIndex publishedIndex = GetIndex(Cms.Core.Constants.IndexAliases.PublishedContent);
@@ -74,7 +74,7 @@ public class VariantContentTreeTests : IndexTestBase
         await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, async () =>
         {
             IContent child = ContentService.GetByIdAsync(ChildKey, CancellationToken.None).GetAwaiter().GetResult()!;
-            await ContentService.UnpublishAsync(child, "*", Constants.Security.SuperUserKey, CancellationToken.None);
+            await ContentService.UnpublishAsync(child, "*", Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         });
 
         IIndex publishedIndex = GetIndex(Cms.Core.Constants.IndexAliases.PublishedContent);
@@ -108,7 +108,7 @@ public class VariantContentTreeTests : IndexTestBase
         await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, async () =>
         {
             IContent grandChild = ContentService.GetByIdAsync(GrandchildKey, CancellationToken.None).GetAwaiter().GetResult()!;
-            await ContentService.UnpublishAsync(grandChild, "*", Constants.Security.SuperUserKey, CancellationToken.None);
+            await ContentService.UnpublishAsync(grandChild, "*", Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         });
 
         IIndex publishedIndex = GetIndex(Cms.Core.Constants.IndexAliases.PublishedContent);
@@ -143,7 +143,7 @@ public class VariantContentTreeTests : IndexTestBase
         await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, async () =>
         {
             IContent root = (await ContentService.GetByIdAsync(RootKey, CancellationToken.None))!;
-            await ContentService.PublishBranchAsync(root, PublishBranchFilter.IncludeUnpublished, [culture], Constants.Security.SuperUserKey, CancellationToken.None);
+            await ContentService.PublishBranchAsync(root, PublishBranchFilter.IncludeUnpublished, [culture], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         });
 
         VerifyVariance([culture]);
@@ -159,7 +159,7 @@ public class VariantContentTreeTests : IndexTestBase
         await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, async () =>
         {
             IContent root = ContentService.GetByIdAsync(RootKey, CancellationToken.None).GetAwaiter().GetResult()!;
-            PublishResult result = await ContentService.UnpublishAsync(root, cultureToUnpublish, Constants.Security.SuperUserKey, CancellationToken.None);
+            PublishResult result = await ContentService.UnpublishAsync(root, cultureToUnpublish, Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
             Assert.That(result.Success, Is.True);
         });
 
@@ -225,8 +225,8 @@ public class VariantContentTreeTests : IndexTestBase
             .WithCultureInfo("ja-JP")
             .Build();
 
-        await LanguageService.CreateAsync(langDk, Constants.Security.SuperUserKey);
-        await LanguageService.CreateAsync(langJp, Constants.Security.SuperUserKey);
+        await LanguageService.CreateAsync(langDk, Cms.Core.Constants.Security.SuperUserKey);
+        await LanguageService.CreateAsync(langJp, Cms.Core.Constants.Security.SuperUserKey);
 
         IContentType contentType = new ContentTypeBuilder()
             .WithAlias("variant")
@@ -245,9 +245,9 @@ public class VariantContentTreeTests : IndexTestBase
             .Done()
             .Build();
 
-        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+        await ContentTypeService.CreateAsync(contentType, Cms.Core.Constants.Security.SuperUserKey);
         contentType.AllowedContentTypes = [new ContentTypeSort(contentType.Key, 0, contentType.Alias)];
-        await ContentTypeService.UpdateAsync(contentType, Constants.Security.SuperUserKey);
+        await ContentTypeService.UpdateAsync(contentType, Cms.Core.Constants.Security.SuperUserKey);
 
         Content root = new ContentBuilder()
             .WithKey(RootKey)
@@ -268,7 +268,7 @@ public class VariantContentTreeTests : IndexTestBase
         root.SetValue("body", "ル-ト-ボディ-segment-1", "ja-JP", "segment-1");
         root.SetValue("body", "ル-ト-ボディ-segment-2", "ja-JP", "segment-2");
 
-        await ContentService.SaveAsync(root, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(root, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         Content child = new ContentBuilder()
             .WithKey(ChildKey)
@@ -290,7 +290,7 @@ public class VariantContentTreeTests : IndexTestBase
         child.SetValue("body", "子供-ボディ-segment-1", "ja-JP", "segment-1");
         child.SetValue("body", "子供-ボディ-segment-2", "ja-JP", "segment-2");
 
-        await ContentService.SaveAsync(child, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(child, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         Content grandchild = new ContentBuilder()
             .WithKey(GrandchildKey)
@@ -314,7 +314,7 @@ public class VariantContentTreeTests : IndexTestBase
 
         await WaitForIndexing(Cms.Core.Constants.IndexAliases.DraftContent, async () =>
         {
-            await ContentService.SaveAsync(grandchild, null, null, CancellationToken.None);
+            await ContentService.SaveAsync(grandchild, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
         });
     }
 
@@ -322,6 +322,6 @@ public class VariantContentTreeTests : IndexTestBase
         await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, async () =>
         {
             IContent root = (await ContentService.GetByIdAsync(RootKey, CancellationToken.None))!;
-            await ContentService.PublishBranchAsync(root, PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
+            await ContentService.PublishBranchAsync(root, PublishBranchFilter.IncludeUnpublished, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         });
 }

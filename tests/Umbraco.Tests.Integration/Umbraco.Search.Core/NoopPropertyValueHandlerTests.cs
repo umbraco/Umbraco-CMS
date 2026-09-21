@@ -43,8 +43,8 @@ public class NoopPropertyValueHandlerTests : ContentTestBase
                 })
             .Build();
 
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
-        await ContentService.PublishAsync(content, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
+        await ContentService.SaveAsync(content, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishAsync(content, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.PublishedContent);
         Assert.That(documents, Has.Count.EqualTo(1));
@@ -90,7 +90,7 @@ public class NoopPropertyValueHandlerTests : ContentTestBase
             .WithAlias(Constants.PropertyEditors.Aliases.EmailAddress)
             .Done()
             .Build();
-        await dataTypeService.CreateAsync(emailDataType, Constants.Security.SuperUserKey);
+        await dataTypeService.CreateAsync(emailDataType, Cms.Core.Constants.Security.SuperUserKey);
 
         DataType colorPickerWithLabelsDataType = new DataTypeBuilder()
             .WithId(0)
@@ -105,7 +105,7 @@ public class NoopPropertyValueHandlerTests : ContentTestBase
             { "useLabel", true },
             { "items", new [] { new { value = "123456", label = "test" } } }
         };
-        await dataTypeService.CreateAsync(colorPickerWithLabelsDataType, Constants.Security.SuperUserKey);
+        await dataTypeService.CreateAsync(colorPickerWithLabelsDataType, Cms.Core.Constants.Security.SuperUserKey);
 
         DataType colorPickerWithoutLabelsDataType = new DataTypeBuilder()
             .WithId(0)
@@ -120,7 +120,7 @@ public class NoopPropertyValueHandlerTests : ContentTestBase
             { "useLabel", false },
             { "items", new [] { new { value = "123456", label = "test" } } }
         };
-        await dataTypeService.CreateAsync(colorPickerWithoutLabelsDataType, Constants.Security.SuperUserKey);
+        await dataTypeService.CreateAsync(colorPickerWithoutLabelsDataType, Cms.Core.Constants.Security.SuperUserKey);
 
         DataType colorPickerEyeDropperDataType = new DataTypeBuilder()
             .WithId(0)
@@ -130,7 +130,7 @@ public class NoopPropertyValueHandlerTests : ContentTestBase
             .WithAlias(Constants.PropertyEditors.Aliases.ColorPickerEyeDropper)
             .Done()
             .Build();
-        await dataTypeService.CreateAsync(colorPickerEyeDropperDataType, Constants.Security.SuperUserKey);
+        await dataTypeService.CreateAsync(colorPickerEyeDropperDataType, Cms.Core.Constants.Security.SuperUserKey);
 
         DataType mediaPicker3DataType = new DataTypeBuilder()
             .WithId(0)
@@ -140,7 +140,7 @@ public class NoopPropertyValueHandlerTests : ContentTestBase
             .WithAlias(Constants.PropertyEditors.Aliases.MediaPicker3)
             .Done()
             .Build();
-        await dataTypeService.CreateAsync(mediaPicker3DataType, Constants.Security.SuperUserKey);
+        await dataTypeService.CreateAsync(mediaPicker3DataType, Cms.Core.Constants.Security.SuperUserKey);
 
         IContentType contentType = new ContentTypeBuilder()
             .WithAlias("allEditors")
@@ -180,7 +180,7 @@ public class NoopPropertyValueHandlerTests : ContentTestBase
             .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.UploadField)
             .Done()
             .Build();
-        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+        await ContentTypeService.CreateAsync(contentType, Cms.Core.Constants.Security.SuperUserKey);
     }
 
     protected override void CustomTestSetup(IUmbracoBuilder builder)

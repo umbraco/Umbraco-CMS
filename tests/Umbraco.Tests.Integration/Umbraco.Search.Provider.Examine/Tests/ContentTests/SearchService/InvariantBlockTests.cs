@@ -83,7 +83,7 @@ public class InvariantBlockTests : SearcherTestBase
     {
         ContentType elementType = ContentTypeBuilder.CreateAllTypesContentType("myElementType", "My Element Type");
         elementType.IsElement = true;
-        await ContentTypeService.CreateAsync(elementType, Constants.Security.SuperUserKey);
+        await ContentTypeService.CreateAsync(elementType, Cms.Core.Constants.Security.SuperUserKey);
 
         IContentType blockListContentType = await CreateBlockListContentType(elementType);
 
@@ -129,7 +129,7 @@ public class InvariantBlockTests : SearcherTestBase
         var indexAlias = GetIndexAlias(false);
         await WaitForIndexing(indexAlias, async () =>
         {
-            await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+            await ContentService.SaveAsync(content, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
         });
     }
 
@@ -155,7 +155,7 @@ public class InvariantBlockTests : SearcherTestBase
             CreateDate = CurrentDateTime,
         };
 
-        await DataTypeService.CreateAsync(blockListDataType, Constants.Security.SuperUserKey);
+        await DataTypeService.CreateAsync(blockListDataType, Cms.Core.Constants.Security.SuperUserKey);
 
         IContentType contentType = new ContentTypeBuilder()
             .WithAlias("myPage")
@@ -166,7 +166,7 @@ public class InvariantBlockTests : SearcherTestBase
             .WithDataTypeId(blockListDataType.Id)
             .Done()
             .Build();
-        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+        await ContentTypeService.CreateAsync(contentType, Cms.Core.Constants.Security.SuperUserKey);
 
         // re-fetch to wire up all key bindings (particularly to the datatype)
         return await ContentTypeService.GetAsync(contentType.Key) ?? null!;

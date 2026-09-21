@@ -31,7 +31,7 @@ public partial class ElementServiceTests : UmbracoIntegrationTest
         element.SetValue("title", "The Element Title");
 
         // Act
-        var result = await ElementService.SaveAsync(element, null, null, CancellationToken.None);
+        var result = await ElementService.SaveAsync(element, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         // Assert
         Assert.That(result.Success, Is.True);

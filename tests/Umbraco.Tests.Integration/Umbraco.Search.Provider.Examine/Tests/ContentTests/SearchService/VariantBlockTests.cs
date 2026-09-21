@@ -78,7 +78,7 @@ public class VariantBlockTests : SearcherTestBase
 
     private async Task CreateBlockContent()
     {
-        await LanguageService.CreateAsync(new Language("da-DK", "Danish"), Constants.Security.SuperUserKey);
+        await LanguageService.CreateAsync(new Language("da-DK", "Danish"), Cms.Core.Constants.Security.SuperUserKey);
         ContentType elementType = ContentTypeBuilder.CreateAllTypesContentType("myElementType", "My Element Type");
         elementType.Variations = ContentVariation.Culture;
         elementType.PropertyTypes.First(p => p.Alias == "singleLineText").Variations = ContentVariation.Culture;
@@ -86,7 +86,7 @@ public class VariantBlockTests : SearcherTestBase
         elementType.PropertyTypes.First(p => p.Alias == "number").Variations = ContentVariation.Culture;
 
         elementType.IsElement = true;
-        await ContentTypeService.CreateAsync(elementType, Constants.Security.SuperUserKey);
+        await ContentTypeService.CreateAsync(elementType, Cms.Core.Constants.Security.SuperUserKey);
 
         IContentType blockListContentType = await CreateBlockListContentType(elementType);
 
@@ -136,7 +136,7 @@ public class VariantBlockTests : SearcherTestBase
         var indexAlias = GetIndexAlias(false);
         await WaitForIndexing(indexAlias, async () =>
         {
-            await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+            await ContentService.SaveAsync(content, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
         });
     }
 
@@ -160,7 +160,7 @@ public class VariantBlockTests : SearcherTestBase
             CreateDate = CurrentDateTime,
         };
 
-        await DataTypeService.CreateAsync(blockListDataType, Constants.Security.SuperUserKey);
+        await DataTypeService.CreateAsync(blockListDataType, Cms.Core.Constants.Security.SuperUserKey);
 
         IContentType contentType = new ContentTypeBuilder()
             .WithAlias("myPage")
@@ -172,7 +172,7 @@ public class VariantBlockTests : SearcherTestBase
             .Done()
             .WithContentVariation(ContentVariation.Culture)
             .Build();
-        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+        await ContentTypeService.CreateAsync(contentType, Cms.Core.Constants.Security.SuperUserKey);
 
         // re-fetch to wire up all key bindings (particularly to the datatype)
         return await ContentTypeService.GetAsync(contentType.Key) ?? null!;

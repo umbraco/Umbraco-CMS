@@ -12,8 +12,8 @@ public partial class InvariantContentStructureTests
     [Test]
     public async Task PublishedStructure_YieldsAllPublishedDocuments()
     {
-        await ContentService.SaveAsync(Root(), null, null, CancellationToken.None);
-        await ContentService.PublishBranchAsync(Root(), PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
+        await ContentService.SaveAsync(Root(), Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishBranchAsync(Root(), PublishBranchFilter.IncludeUnpublished, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.PublishedContent);
         Assert.That(documents, Has.Count.EqualTo(4));
@@ -32,8 +32,8 @@ public partial class InvariantContentStructureTests
     [Test]
     public async Task PublishedRoot_YieldsOnlyRootDocument()
     {
-        await ContentService.SaveAsync(Root(), null, null, CancellationToken.None);
-        await ContentService.PublishAsync(Root(), ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
+        await ContentService.SaveAsync(Root(), Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishAsync(Root(), ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.PublishedContent);
         Assert.That(documents, Has.Count.EqualTo(1));
@@ -43,10 +43,10 @@ public partial class InvariantContentStructureTests
     [Test]
     public async Task PublishedStructure_WithUnpublishedRoot_YieldsNoDocuments()
     {
-        await ContentService.SaveAsync(Root(), null, null, CancellationToken.None);
-        await ContentService.PublishBranchAsync(Root(), PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
+        await ContentService.SaveAsync(Root(), Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishBranchAsync(Root(), PublishBranchFilter.IncludeUnpublished, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
-        PublishResult result = await ContentService.UnpublishAsync(Root(), "*", Constants.Security.SuperUserKey, CancellationToken.None);
+        PublishResult result = await ContentService.UnpublishAsync(Root(), "*", Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.That(result.Success, Is.True);
         Assert.That(Child().Published, Is.True);
 
@@ -57,10 +57,10 @@ public partial class InvariantContentStructureTests
     [Test]
     public async Task PublishedStructure_WithUnpublishedGrandchild_YieldsNothingBelowChild()
     {
-        await ContentService.SaveAsync(Root(), null, null, CancellationToken.None);
-        await ContentService.PublishBranchAsync(Root(), PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
+        await ContentService.SaveAsync(Root(), Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishBranchAsync(Root(), PublishBranchFilter.IncludeUnpublished, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
-        PublishResult result = await ContentService.UnpublishAsync(Grandchild(), "*", Constants.Security.SuperUserKey, CancellationToken.None);
+        PublishResult result = await ContentService.UnpublishAsync(Grandchild(), "*", Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.That(result.Success, Is.True);
         Assert.That(GreatGrandchild().Published, Is.True);
 
@@ -77,10 +77,10 @@ public partial class InvariantContentStructureTests
     [Test]
     public async Task PublishedStructure_WithGrandchildInRecycleBin_YieldsNothingBelowChild()
     {
-        await ContentService.SaveAsync(Root(), null, null, CancellationToken.None);
-        await ContentService.PublishBranchAsync(Root(), PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
+        await ContentService.SaveAsync(Root(), Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishBranchAsync(Root(), PublishBranchFilter.IncludeUnpublished, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
-        Attempt<ContentMoveToRecycleBinOperationStatus> result = await ContentService.MoveToRecycleBinAsync(Grandchild(), Constants.Security.SuperUserKey, CancellationToken.None);
+        Attempt<ContentMoveToRecycleBinOperationStatus> result = await ContentService.MoveToRecycleBinAsync(Grandchild(), Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.That(result.Success, Is.True);
         Assert.That(GreatGrandchild().Trashed, Is.True);
 
@@ -97,10 +97,10 @@ public partial class InvariantContentStructureTests
     [Test]
     public async Task PublishedStructure_WithGrandchildDeleted_YieldsNothingBelowChild()
     {
-        await ContentService.SaveAsync(Root(), null, null, CancellationToken.None);
-        await ContentService.PublishBranchAsync(Root(), PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
+        await ContentService.SaveAsync(Root(), Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishBranchAsync(Root(), PublishBranchFilter.IncludeUnpublished, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
-        Attempt<ContentDeleteOperationStatus> result = await ContentService.DeleteAsync(Grandchild(), null, CancellationToken.None);
+        Attempt<ContentDeleteOperationStatus> result = await ContentService.DeleteAsync(Grandchild(), Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.Multiple(() =>
         {
             Assert.That(result.Success, Is.True);

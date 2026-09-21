@@ -473,11 +473,11 @@ internal sealed partial class UserServiceTests : UmbracoIntegrationTest
         await ContentTypeService.UpdateAsync(contentType, Constants.Security.SuperUserKey);
 
         var parent = ContentBuilder.CreateSimpleContent(contentType);
-        await ContentService.SaveAsync(parent, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(parent, Constants.Security.SuperUserKey, null, CancellationToken.None);
         var child1 = ContentBuilder.CreateSimpleContent(contentType, "child1", parent.Id);
-        await ContentService.SaveAsync(child1, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(child1, Constants.Security.SuperUserKey, null, CancellationToken.None);
         var child2 = ContentBuilder.CreateSimpleContent(contentType, "child2", child1.Id);
-        await ContentService.SaveAsync(child2, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(child2, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         await ContentService.SetPermissionAsync(parent, ActionBrowse.ActionLetter, new[] { userGroup.Key }, CancellationToken.None);
         await ContentService.SetPermissionAsync(parent, ActionDelete.ActionLetter, new[] { userGroup.Key }, CancellationToken.None);

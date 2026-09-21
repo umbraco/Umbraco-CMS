@@ -12,7 +12,7 @@ public partial class InvariantContentStructureTests
     [Test]
     public void DraftStructure_YieldsAllDocuments()
     {
-        ContentService.SaveAsync([Root(), Child(), Grandchild(), GreatGrandchild()], Constants.Security.SuperUserKey, CancellationToken.None).GetAwaiter().GetResult();
+        ContentService.SaveAsync([Root(), Child(), Grandchild(), GreatGrandchild()], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None).GetAwaiter().GetResult();
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.DraftContent);
         Assert.That(documents, Has.Count.EqualTo(4));
@@ -31,7 +31,7 @@ public partial class InvariantContentStructureTests
     [Test]
     public void DraftStructure_YieldsNoPublishedDocuments()
     {
-        ContentService.SaveAsync([Root(), Child(), Grandchild(), GreatGrandchild()], Constants.Security.SuperUserKey, CancellationToken.None).GetAwaiter().GetResult();
+        ContentService.SaveAsync([Root(), Child(), Grandchild(), GreatGrandchild()], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None).GetAwaiter().GetResult();
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.PublishedContent);
         Assert.That(documents, Has.Count.EqualTo(0));
@@ -40,7 +40,7 @@ public partial class InvariantContentStructureTests
     [Test]
     public async Task DraftRoot_YieldsOnlyDraftRoot()
     {
-        await ContentService.SaveAsync(Root(), null, null, CancellationToken.None);
+        await ContentService.SaveAsync(Root(), Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.DraftContent);
         Assert.That(documents, Has.Count.EqualTo(1));
@@ -50,9 +50,9 @@ public partial class InvariantContentStructureTests
     [Test]
     public async Task DraftStructure_WithGrandchildInRecycleBin_YieldsAllDocuments()
     {
-        ContentService.SaveAsync([Root(), Child(), Grandchild(), GreatGrandchild()], Constants.Security.SuperUserKey, CancellationToken.None).GetAwaiter().GetResult();
+        ContentService.SaveAsync([Root(), Child(), Grandchild(), GreatGrandchild()], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None).GetAwaiter().GetResult();
 
-        Attempt<ContentMoveToRecycleBinOperationStatus> result = await ContentService.MoveToRecycleBinAsync(Grandchild(), Constants.Security.SuperUserKey, CancellationToken.None);
+        Attempt<ContentMoveToRecycleBinOperationStatus> result = await ContentService.MoveToRecycleBinAsync(Grandchild(), Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.Multiple(() =>
         {
             Assert.That(result.Success, Is.True);
@@ -75,9 +75,9 @@ public partial class InvariantContentStructureTests
     [Test]
     public void DraftStructure_WithGrandchildDeleted_YieldsNothingBelowChild()
     {
-        ContentService.SaveAsync([Root(), Child(), Grandchild(), GreatGrandchild()], Constants.Security.SuperUserKey, CancellationToken.None).GetAwaiter().GetResult();
+        ContentService.SaveAsync([Root(), Child(), Grandchild(), GreatGrandchild()], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None).GetAwaiter().GetResult();
 
-        Attempt<ContentDeleteOperationStatus> result = ContentService.DeleteAsync(Grandchild(), null, CancellationToken.None).GetAwaiter().GetResult();
+        Attempt<ContentDeleteOperationStatus> result = ContentService.DeleteAsync(Grandchild(), Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None).GetAwaiter().GetResult();
         Assert.Multiple(() =>
         {
             Assert.That(result.Success, Is.True);

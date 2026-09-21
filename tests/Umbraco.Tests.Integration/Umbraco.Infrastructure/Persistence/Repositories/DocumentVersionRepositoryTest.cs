@@ -33,7 +33,7 @@ internal sealed class DocumentVersionRepositoryTest : UmbracoIntegrationTest
         await ContentTypeService.CreateAsync(contentType, Cms.Core.Constants.Security.SuperUserKey);
 
         var content = ContentBuilder.CreateSimpleContent(contentType);
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, global::Umbraco.Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         await ContentService.PublishAsync(content, [], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         // At this point content has 2 versions, a draft version and a published version.
@@ -65,7 +65,7 @@ internal sealed class DocumentVersionRepositoryTest : UmbracoIntegrationTest
         await ContentTypeService.CreateAsync(contentType, Cms.Core.Constants.Security.SuperUserKey);
 
         var content = ContentBuilder.CreateSimpleContent(contentType);
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, global::Umbraco.Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         await ContentService.PublishAsync(content, [], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         // At this point content has 2 versions, a draft version and a published version.
@@ -110,7 +110,7 @@ internal sealed class DocumentVersionRepositoryTest : UmbracoIntegrationTest
 
         // Create 4 versions in total: 2 historic (1, 2), 1 current draft (3), 1 current published (4).
         var content = ContentBuilder.CreateSimpleContent(contentType);
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, global::Umbraco.Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
         await ContentService.PublishAsync(content, [], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         await ContentService.PublishAsync(content, [], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         await ContentService.PublishAsync(content, [], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
@@ -150,7 +150,7 @@ internal sealed class DocumentVersionRepositoryTest : UmbracoIntegrationTest
 
         // Create 5 versions in total: 3 historic (1, 2, 3), 1 current draft (4), 1 current published (5).
         var content = ContentBuilder.CreateSimpleContent(contentType);
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, global::Umbraco.Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
         await ContentService.PublishAsync(content, [], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         await ContentService.PublishAsync(content, [], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         await ContentService.PublishAsync(content, [], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
@@ -193,7 +193,7 @@ internal sealed class DocumentVersionRepositoryTest : UmbracoIntegrationTest
         await ContentTypeService.CreateAsync(contentType, Cms.Core.Constants.Security.SuperUserKey);
 
         var content = ContentBuilder.CreateSimpleContent(contentType);
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, global::Umbraco.Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         await ContentService.PublishAsync(content, [], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         await ContentService.PublishAsync(content, [], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
@@ -230,7 +230,7 @@ internal sealed class DocumentVersionRepositoryTest : UmbracoIntegrationTest
         await ContentTypeService.CreateAsync(contentType, Cms.Core.Constants.Security.SuperUserKey);
 
         var content = ContentBuilder.CreateSimpleContent(contentType);
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, global::Umbraco.Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         await ContentService.PublishAsync(content, [], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         await ContentService.PublishAsync(content, [], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
@@ -286,7 +286,7 @@ internal sealed class DocumentVersionRepositoryTest : UmbracoIntegrationTest
         await ContentTypeService.CreateAsync(contentType, Cms.Core.Constants.Security.SuperUserKey);
 
         var content = ContentBuilder.CreateSimpleContent(contentType);
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, global::Umbraco.Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         await ContentService.PublishAsync(content, [], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None); // Draft + Published
         await ContentService.PublishAsync(content, [], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None); // New Draft
@@ -327,7 +327,7 @@ internal sealed class DocumentVersionRepositoryTest : UmbracoIntegrationTest
         var content = ContentBuilder.CreateSimpleContent(contentType, "foo", culture: "en-US");
         content.SetCultureName("foo", "en-US");
 
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, global::Umbraco.Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
         await ContentService.PublishAsync(content, ["en-US"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None); // Draft + Published
         await ContentService.PublishAsync(content, ["en-US"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None); // New Draft
 

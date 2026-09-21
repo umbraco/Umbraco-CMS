@@ -527,7 +527,7 @@ internal sealed class ElementEditingService
         copy.CreatorId = userId;
         copy.WriterId = userId;
 
-        Attempt<ContentSaveOperationStatus> saveResult = await ContentService.SaveAsync(copy, userId, null, CancellationToken.None);
+        Attempt<ContentSaveOperationStatus> saveResult = await ContentService.SaveAsync(copy, userKey, null, CancellationToken.None);
         if (saveResult.Success is false)
         {
             return null;
@@ -550,7 +550,8 @@ internal sealed class ElementEditingService
 
     protected override async Task<OperationResult?> DeleteAsync(IElement element, int userId)
     {
-        Attempt<ContentDeleteOperationStatus> result = await ContentService.DeleteAsync(element, userId, CancellationToken.None);
+        Attempt<ContentDeleteOperationStatus> result =
+            await ContentService.DeleteAsync(element, await GetUserKeyAsync(userId), CancellationToken.None);
         return result.Success ? OperationResult.Succeed(new EventMessages()) : OperationResult.Cancel(new EventMessages());
     }
 
@@ -561,8 +562,7 @@ internal sealed class ElementEditingService
     {
         try
         {
-            var currentUserId = await GetUserIdAsync(userKey);
-            Attempt<ContentSaveOperationStatus> saveResult = await ContentService.SaveAsync(content, currentUserId, null, CancellationToken.None);
+            Attempt<ContentSaveOperationStatus> saveResult = await ContentService.SaveAsync(content, userKey, null, CancellationToken.None);
             return saveResult.Result switch
             {
                 // these are the only result states currently expected from SaveAsync

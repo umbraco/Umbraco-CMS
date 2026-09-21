@@ -48,7 +48,7 @@ internal sealed class RelationServiceTests : UmbracoIntegrationTest
         for (var i = 0; i < 3; i++)
         {
             var c1 = ContentBuilder.CreateBasicContent(contentType);
-            await ContentService.SaveAsync(c1, null, null, CancellationToken.None);
+            await ContentService.SaveAsync(c1, Constants.Security.SuperUserKey, null, CancellationToken.None);
             createdContent.Add(c1);
         }
 
@@ -111,7 +111,7 @@ internal sealed class RelationServiceTests : UmbracoIntegrationTest
             content.Properties["bodyText"].SetValue(@"<p>
         <img src='/media/12312.jpg' data-udi='umb://media/" + m1.Key.ToString("N") + @"' />
 </p>");
-            await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+            await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
         }
 
         for (var i = 0; i < 6; i++)
@@ -145,7 +145,7 @@ internal sealed class RelationServiceTests : UmbracoIntegrationTest
 
             // 'bodyText' is a property with a RTE property editor which we knows automatically tracks relations
             content.Properties["bodyText"].SetValue(@"<div data-udi='umb://member/" + member.Key.ToString("N") + @"'></div>");
-            await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+            await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
         }
 
         for (var i = 0; i < 6; i++)
@@ -168,13 +168,13 @@ internal sealed class RelationServiceTests : UmbracoIntegrationTest
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var parentA = ContentBuilder.CreateBasicContent(contentType);
-        await ContentService.SaveAsync(parentA, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(parentA, Constants.Security.SuperUserKey, null, CancellationToken.None);
         var childA = ContentBuilder.CreateBasicContent(contentType);
-        await ContentService.SaveAsync(childA, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(childA, Constants.Security.SuperUserKey, null, CancellationToken.None);
         var parentB = ContentBuilder.CreateBasicContent(contentType);
-        await ContentService.SaveAsync(parentB, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(parentB, Constants.Security.SuperUserKey, null, CancellationToken.None);
         var childB = ContentBuilder.CreateBasicContent(contentType);
-        await ContentService.SaveAsync(childB, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(childB, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         await RelationService.RelateAsync(parentA.Id, childA.Id, Constants.Conventions.RelationTypes.RelatedElementAlias);
         await RelationService.RelateAsync(parentB.Id, childB.Id, Constants.Conventions.RelationTypes.RelatedElementAlias);
@@ -310,7 +310,7 @@ internal sealed class RelationServiceTests : UmbracoIntegrationTest
 
         var c1 = ContentBuilder.CreateBasicContent(ct);
         var c2 = MediaBuilder.CreateMediaImage(mt, -1);
-        await ContentService.SaveAsync(c1, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(c1, Constants.Security.SuperUserKey, null, CancellationToken.None);
         MediaService.Save(c2);
 
         var r = new Relation(c1.Id, c2.Id, rt);
@@ -342,7 +342,7 @@ internal sealed class RelationServiceTests : UmbracoIntegrationTest
         {
             var c1 = ContentBuilder.CreateBasicContent(ct);
             var c2 = MediaBuilder.CreateMediaImage(mt, -1);
-            await ContentService.SaveAsync(c1, null, null, CancellationToken.None);
+            await ContentService.SaveAsync(c1, Constants.Security.SuperUserKey, null, CancellationToken.None);
             MediaService.Save(c2);
 
             relations.Add(new Relation(c1.Id, c2.Id, rt));

@@ -60,7 +60,7 @@ public class CustomContentIndexRegistrationTests : ContentBaseTestBase
                         title = "The content title"
                     })
                 .Build(),
-            null,
+            Cms.Core.Constants.Security.SuperUserKey,
             null,
             CancellationToken.None);
 
@@ -118,7 +118,7 @@ public class CustomContentIndexRegistrationTests : ContentBaseTestBase
     [Test]
     public async Task CustomIndexRegistration_CanContainAllTypesOfContent()
     {
-        await ContentService.SaveAsync(Content(), null, null, CancellationToken.None);
+        await ContentService.SaveAsync(Content(), Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
         MediaService.Save(Media());
         MemberService.Save(Member());
 

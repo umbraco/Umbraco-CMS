@@ -37,7 +37,7 @@ internal sealed class DocumentBlueprintRepositoryTest : UmbracoIntegrationTest
         await ContentTypeService.CreateAsync(_contentType, Constants.Security.SuperUserKey);
 
         _textpage = ContentBuilder.CreateSimpleContent(_contentType);
-        await ContentService.SaveAsync(_textpage, -1, null, CancellationToken.None);
+        await ContentService.SaveAsync(_textpage, Constants.Security.SuperUserKey, null, CancellationToken.None);
     }
 
     private DocumentBlueprintRepository CreateRepository() => new(

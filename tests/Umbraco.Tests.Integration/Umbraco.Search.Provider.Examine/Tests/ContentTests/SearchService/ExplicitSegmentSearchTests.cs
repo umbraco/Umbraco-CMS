@@ -959,7 +959,7 @@ public class ExplicitSegmentSearchTests : SearcherTestBase
         ILanguage langDk = new LanguageBuilder()
             .WithCultureInfo("da-DK")
             .Build();
-        await LanguageService.CreateAsync(langDk, Constants.Security.SuperUserKey);
+        await LanguageService.CreateAsync(langDk, Cms.Core.Constants.Security.SuperUserKey);
 
         DataType decimalDataType = new DataTypeBuilder()
             .WithId(0)
@@ -969,7 +969,7 @@ public class ExplicitSegmentSearchTests : SearcherTestBase
             .WithAlias(Constants.PropertyEditors.Aliases.Decimal)
             .Done()
             .Build();
-        await DataTypeService.CreateAsync(decimalDataType, Constants.Security.SuperUserKey);
+        await DataTypeService.CreateAsync(decimalDataType, Cms.Core.Constants.Security.SuperUserKey);
 
         IContentType contentType = new ContentTypeBuilder()
             .WithAlias("segmentTestType")
@@ -999,7 +999,7 @@ public class ExplicitSegmentSearchTests : SearcherTestBase
             .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.DateTime)
             .Done()
             .Build();
-        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+        await ContentTypeService.CreateAsync(contentType, Cms.Core.Constants.Security.SuperUserKey);
 
         // Document 1: Has distinct values in null-segment, segment-1, and segment-2
         // This allows us to test that searches are isolated to the correct segment
@@ -1089,17 +1089,17 @@ public class ExplicitSegmentSearchTests : SearcherTestBase
 
         await WaitForIndexing(GetIndexAlias(true), async () =>
         {
-            await ContentService.SaveAsync(docWithAllSegments, null, null, CancellationToken.None);
-            await ContentService.PublishAsync(docWithAllSegments, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
+            await ContentService.SaveAsync(docWithAllSegments, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
+            await ContentService.PublishAsync(docWithAllSegments, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
-            await ContentService.SaveAsync(docWithOnlyNullSegment, null, null, CancellationToken.None);
-            await ContentService.PublishAsync(docWithOnlyNullSegment, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
+            await ContentService.SaveAsync(docWithOnlyNullSegment, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
+            await ContentService.PublishAsync(docWithOnlyNullSegment, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
-            await ContentService.SaveAsync(docWithOnlySegment1, null, null, CancellationToken.None);
-            await ContentService.PublishAsync(docWithOnlySegment1, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
+            await ContentService.SaveAsync(docWithOnlySegment1, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
+            await ContentService.PublishAsync(docWithOnlySegment1, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
-            await ContentService.SaveAsync(docWithOverlappingValues, null, null, CancellationToken.None);
-            await ContentService.PublishAsync(docWithOverlappingValues, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
+            await ContentService.SaveAsync(docWithOverlappingValues, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
+            await ContentService.PublishAsync(docWithOverlappingValues, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         });
     }
 }

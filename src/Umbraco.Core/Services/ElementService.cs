@@ -145,8 +145,9 @@ public class ElementService : PublishableContentServiceBase<IElement>, IElementS
     // See GetByIdAsync above - same bridge, same reason. Element's sync Save only fails via notification
     // cancellation (its two validation checks still throw, unconverted), so any non-success result maps to
     // CancelledByNotification.
-    public Task<Attempt<ContentSaveOperationStatus>> SaveAsync(IElement content, int? userId, ContentScheduleCollection? contentSchedule, CancellationToken cancellationToken)
+    public Task<Attempt<ContentSaveOperationStatus>> SaveAsync(IElement content, Guid userKey, ContentScheduleCollection? contentSchedule, CancellationToken cancellationToken)
     {
+        int userId = _userIdKeyResolver.GetAsync(userKey).GetAwaiter().GetResult();
         OperationResult result = Save(content, userId, contentSchedule);
         return Task.FromResult(result.Success
             ? Attempt.Succeed(ContentSaveOperationStatus.Success)
@@ -154,9 +155,10 @@ public class ElementService : PublishableContentServiceBase<IElement>, IElementS
     }
 
     /// <inheritdoc />
-    public Task<Attempt<ContentDeleteOperationStatus>> DeleteAsync(IElement content, int? userId, CancellationToken cancellationToken)
+    public Task<Attempt<ContentDeleteOperationStatus>> DeleteAsync(IElement content, Guid userKey, CancellationToken cancellationToken)
     {
-        OperationResult result = Delete(content, userId ?? Constants.Security.SuperUserId);
+        int userId = _userIdKeyResolver.GetAsync(userKey).GetAwaiter().GetResult();
+        OperationResult result = Delete(content, userId);
         return Task.FromResult(result.Success
             ? Attempt.Succeed(ContentDeleteOperationStatus.Success)
             : Attempt.Fail(ContentDeleteOperationStatus.CancelledByNotification));

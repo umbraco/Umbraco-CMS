@@ -19,7 +19,7 @@ public partial class InvariantContentTreeTests
         await WaitForIndexing(indexAlias, async () =>
         {
             IContent root = ContentService.GetByIdAsync(RootKey, CancellationToken.None).GetAwaiter().GetResult()!;
-            await ContentService.MoveToRecycleBinAsync(root, Constants.Security.SuperUserKey, CancellationToken.None);
+            await ContentService.MoveToRecycleBinAsync(root, Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         });
 
 
@@ -48,7 +48,7 @@ public partial class InvariantContentTreeTests
         await WaitForIndexing(indexAlias, async () =>
         {
             IContent child = ContentService.GetByIdAsync(ChildKey, CancellationToken.None).GetAwaiter().GetResult()!;
-            await ContentService.UnpublishAsync(child, "*", Constants.Security.SuperUserKey, CancellationToken.None);
+            await ContentService.UnpublishAsync(child, "*", Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         });
 
         SearchResult rootResult = await Searcher.SearchAsync(indexAlias, "Root", null, null, null, null, null, null, 0, 100);
@@ -76,7 +76,7 @@ public partial class InvariantContentTreeTests
         await WaitForIndexing(indexAlias, async () =>
         {
             IContent grandchild = ContentService.GetByIdAsync(GrandchildKey, CancellationToken.None).GetAwaiter().GetResult()!;
-            await ContentService.UnpublishAsync(grandchild, "*", Constants.Security.SuperUserKey, CancellationToken.None);
+            await ContentService.UnpublishAsync(grandchild, "*", Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         });
 
         SearchResult rootResult = await Searcher.SearchAsync(indexAlias, "Root", null, null, null, null, null, null, 0, 100);

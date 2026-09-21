@@ -70,7 +70,7 @@ public class EmptyDocumentRecycleBinController : DocumentRecycleBinControllerBas
             return Forbidden();
         }
 
-        Attempt<ContentEmptyRecycleBinOperationStatus> result = await _contentService.EmptyRecycleBinAsync(CurrentUserKey(_backOfficeSecurityAccessor));
+        Attempt<ContentEmptyRecycleBinOperationStatus> result = await _contentService.EmptyRecycleBinAsync(CurrentUserKey(_backOfficeSecurityAccessor), cancellationToken);
         return result.Success
             ? Ok()
             : OperationStatusResult(result.Result, problemDetailsBuilder => result.Result switch

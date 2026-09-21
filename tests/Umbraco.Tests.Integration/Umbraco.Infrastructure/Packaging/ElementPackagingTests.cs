@@ -53,7 +53,7 @@ internal sealed class ElementPackagingTests : UmbracoIntegrationTest
 
         Element element = new Element("My Element", elementType);
         element.SetValue("title", "The Element Title");
-        await ElementService.SaveAsync(element, null, null, CancellationToken.None);
+        await ElementService.SaveAsync(element, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         var xml = Serializer.Serialize(element);
 
@@ -78,7 +78,7 @@ internal sealed class ElementPackagingTests : UmbracoIntegrationTest
 
         Element element = new Element("My Element", elementType);
         element.SetValue("title", "The Element Title");
-        await ElementService.SaveAsync(element, null, null, CancellationToken.None);
+        await ElementService.SaveAsync(element, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         var elementKey = element.Key;
 
@@ -95,7 +95,7 @@ internal sealed class ElementPackagingTests : UmbracoIntegrationTest
                         Serializer.Serialize(element)))));
 
         // Remove the originals so the install genuinely re-creates them (import skips items whose key already exists).
-        await ElementService.DeleteAsync(element, null, CancellationToken.None);
+        await ElementService.DeleteAsync(element, Constants.Security.SuperUserKey, CancellationToken.None);
         await ContentTypeService.DeleteAsync(elementType, Constants.Security.SuperUserKey);
 
         Assert.That(await ElementService.GetByIdAsync(elementKey, CancellationToken.None), Is.Null);
@@ -137,7 +137,7 @@ internal sealed class ElementPackagingTests : UmbracoIntegrationTest
 
         IElement element = new Element("My Element", containerB.Id, elementType);
         element.SetValue("title", "Nested Title");
-        await ElementService.SaveAsync(element, null, null, CancellationToken.None);
+        await ElementService.SaveAsync(element, Constants.Security.SuperUserKey, null, CancellationToken.None);
         var elementKey = element.Key;
 
         // Reload so Level/Path (used to resolve the ancestor folders) are populated.
@@ -163,7 +163,7 @@ internal sealed class ElementPackagingTests : UmbracoIntegrationTest
                         serialized))));
 
         // Remove the originals (leaf-first) so the install genuinely re-creates them.
-        await ElementService.DeleteAsync(element, null, CancellationToken.None);
+        await ElementService.DeleteAsync(element, Constants.Security.SuperUserKey, CancellationToken.None);
         await ElementContainerService.DeleteAsync(containerB.Key, Constants.Security.SuperUserKey);
         await ElementContainerService.DeleteAsync(containerA.Key, Constants.Security.SuperUserKey);
         await ContentTypeService.DeleteAsync(elementType, Constants.Security.SuperUserKey);
@@ -205,7 +205,7 @@ internal sealed class ElementPackagingTests : UmbracoIntegrationTest
 
         IElement element = new Element("My Element", container.Id, elementType);
         element.SetValue("title", "Renamed Folder Title");
-        await ElementService.SaveAsync(element, null, null, CancellationToken.None);
+        await ElementService.SaveAsync(element, Constants.Security.SuperUserKey, null, CancellationToken.None);
         var elementKey = element.Key;
 
         // Reload so Level/Path are populated, then serialize.
@@ -228,7 +228,7 @@ internal sealed class ElementPackagingTests : UmbracoIntegrationTest
                         serialized))));
 
         // Remove the element so the install genuinely re-creates it, but keep the (renamed) container.
-        await ElementService.DeleteAsync(element, null, CancellationToken.None);
+        await ElementService.DeleteAsync(element, Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.That(await ElementService.GetByIdAsync(elementKey, CancellationToken.None), Is.Null);
 
         // Act

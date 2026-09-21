@@ -33,7 +33,7 @@ public class VariantDocumentTests : IndexTestBase
         await WaitForIndexing(indexAlias, () =>
         {
             IContent content = ContentService.GetByIdAsync(RootKey, CancellationToken.None).GetAwaiter().GetResult()!;
-            ContentService.DeleteAsync(content, null, CancellationToken.None).GetAwaiter().GetResult();
+            ContentService.DeleteAsync(content, Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None).GetAwaiter().GetResult();
             return Task.CompletedTask;
         });
 
@@ -245,7 +245,7 @@ public class VariantDocumentTests : IndexTestBase
 
         await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, async () =>
         {
-            await ContentService.SaveAsync(root, null, null, CancellationToken.None);
+            await ContentService.SaveAsync(root, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
             await ContentService.PublishAsync(root, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         });
 
@@ -261,7 +261,7 @@ public class VariantDocumentTests : IndexTestBase
 
         await WaitForIndexing(GetIndexAlias(true), async () =>
         {
-            await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+            await ContentService.SaveAsync(content, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
             await ContentService.PublishAsync(content, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         });
     }

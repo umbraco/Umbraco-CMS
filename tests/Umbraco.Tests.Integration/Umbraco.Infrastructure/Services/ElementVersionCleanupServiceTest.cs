@@ -30,7 +30,7 @@ internal class ElementVersionCleanupServiceTest : UmbracoIntegrationTest
         await ContentTypeService.CreateAsync(elementType, Constants.Security.SuperUserKey);
 
         var element = ElementBuilder.CreateSimpleElement(elementType);
-        await ElementService.SaveAsync(element, null, null, CancellationToken.None);
+        await ElementService.SaveAsync(element, Constants.Security.SuperUserKey, null, CancellationToken.None);
         await ElementService.PublishAsync(element, Array.Empty<string>(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         for (var i = 0; i < 10; i++)
@@ -70,7 +70,7 @@ internal class ElementVersionCleanupServiceTest : UmbracoIntegrationTest
         await ContentTypeService.CreateAsync(elementType, Constants.Security.SuperUserKey);
 
         var element = ElementBuilder.CreateSimpleElement(elementType);
-        await ElementService.SaveAsync(element, null, null, CancellationToken.None);
+        await ElementService.SaveAsync(element, Constants.Security.SuperUserKey, null, CancellationToken.None);
         await ElementService.PublishAsync(element, Array.Empty<string>(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         for (var i = 0; i < 10; i++)
@@ -113,7 +113,7 @@ internal class ElementVersionCleanupServiceTest : UmbracoIntegrationTest
         await ContentTypeService.CreateAsync(elementType, Constants.Security.SuperUserKey);
 
         var element = ElementBuilder.CreateSimpleElement(elementType);
-        await ElementService.SaveAsync(element, null, null, CancellationToken.None);
+        await ElementService.SaveAsync(element, Constants.Security.SuperUserKey, null, CancellationToken.None);
         await ElementService.PublishAsync(element, Array.Empty<string>(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         var retainedVersionIds = new List<int>();

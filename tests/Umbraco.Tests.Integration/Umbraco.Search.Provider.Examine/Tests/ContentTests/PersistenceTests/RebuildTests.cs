@@ -163,7 +163,7 @@ public class RebuildTests : UmbracoIntegrationTest
         _rootDocument.Name = "Updated Document Name";
         await WaitForIndexing(indexAlias, async () =>
         {
-            await ContentService.SaveAsync(_rootDocument, null, null, CancellationToken.None);
+            await ContentService.SaveAsync(_rootDocument, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
             if (publish)
             {
                 await ContentService.PublishAsync(_rootDocument, ["*"], global::Umbraco.Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);

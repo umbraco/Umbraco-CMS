@@ -89,7 +89,7 @@ public class ZeroDowntimeReindexingTests : TestBase
         {
             IContent content = ContentService.GetByIdAsync(_createdContentKey, CancellationToken.None).GetAwaiter().GetResult()!;
             content.Name = "Updated During Rebuild";
-            await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+            await ContentService.SaveAsync(content, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
             if (publish)
             {
                 await ContentService.PublishAsync(content, ["*"], global::Umbraco.Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
@@ -145,7 +145,7 @@ public class ZeroDowntimeReindexingTests : TestBase
         {
             IContent content = ContentService.GetByIdAsync(_createdContentKey, CancellationToken.None).GetAwaiter().GetResult()!;
             content.Name = "Rebuilt Content";
-            await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+            await ContentService.SaveAsync(content, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
             if (publish)
             {
                 await ContentService.PublishAsync(content, ["*"], global::Umbraco.Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);

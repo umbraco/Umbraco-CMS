@@ -45,7 +45,7 @@ internal sealed partial class PublishStatusServiceTests
         var grandchild = ContentBuilder.CreateSimpleContent(ContentType, "Grandchild", Subpage2.Id);
 
         var contentSchedule = ContentScheduleCollection.CreateWithEntry(DateTime.UtcNow.AddMinutes(-5), null);
-        await ContentService.SaveAsync(grandchild, -1, contentSchedule, CancellationToken.None);
+        await ContentService.SaveAsync(grandchild, Constants.Security.SuperUserKey, contentSchedule, CancellationToken.None);
 
         var publishResults = await ContentService.PublishBranchAsync(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
@@ -152,7 +152,7 @@ internal sealed partial class PublishStatusServiceTests
             .WithCultureName("en-US", "Root EN")
             .WithCultureName("da-DK", "Root DA")
             .Build();
-        await ContentService.SaveAsync(root, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(root, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         IContent child = new ContentBuilder()
             .WithContentType(contentType)
@@ -160,7 +160,7 @@ internal sealed partial class PublishStatusServiceTests
             .WithCultureName("da-DK", "Child DA")
             .WithParent(root)
             .Build();
-        await ContentService.SaveAsync(child, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(child, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         IContent grandchild = new ContentBuilder()
             .WithContentType(contentType)
@@ -168,7 +168,7 @@ internal sealed partial class PublishStatusServiceTests
             .WithCultureName("da-DK", "Grandchild DA")
             .WithParent(child)
             .Build();
-        await ContentService.SaveAsync(grandchild, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(grandchild, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         await ContentService.PublishBranchAsync(root, PublishBranchFilter.IncludeUnpublished, ["en-US", "da-DK"], Constants.Security.SuperUserKey, CancellationToken.None);
 
@@ -205,7 +205,7 @@ internal sealed partial class PublishStatusServiceTests
             .WithCultureName("en-US", "Root EN")
             .WithCultureName("da-DK", "Root DA")
             .Build();
-        await ContentService.SaveAsync(root, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(root, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         IContent child = new ContentBuilder()
             .WithContentType(contentType)
@@ -213,7 +213,7 @@ internal sealed partial class PublishStatusServiceTests
             .WithCultureName("da-DK", "Child DA")
             .WithParent(root)
             .Build();
-        await ContentService.SaveAsync(child, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(child, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         IContent grandchild = new ContentBuilder()
             .WithContentType(contentType)
@@ -221,7 +221,7 @@ internal sealed partial class PublishStatusServiceTests
             .WithCultureName("da-DK", "Grandchild DA")
             .WithParent(child)
             .Build();
-        await ContentService.SaveAsync(grandchild, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(grandchild, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         await ContentService.PublishBranchAsync(root, PublishBranchFilter.IncludeUnpublished, ["en-US", "da-DK"], Constants.Security.SuperUserKey, CancellationToken.None);
 

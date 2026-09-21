@@ -93,7 +93,7 @@ public class PublishedContentQueryTests : TestBase
 
         await WaitForIndexing(GetIndexAlias(true), async () =>
         {
-            await ContentService.UnpublishAsync(ContentService.GetByIdAsync(ChildBetaKey, CancellationToken.None).GetAwaiter().GetResult()!, "*", Constants.Security.SuperUserKey, CancellationToken.None);
+            await ContentService.UnpublishAsync(ContentService.GetByIdAsync(ChildBetaKey, CancellationToken.None).GetAwaiter().GetResult()!, "*", Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         });
 
         PublishedSearchResult[] results = PublishedContentQuery.Search("Beta").ToArray();

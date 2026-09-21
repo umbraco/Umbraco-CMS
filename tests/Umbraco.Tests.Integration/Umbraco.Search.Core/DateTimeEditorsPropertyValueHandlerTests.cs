@@ -57,8 +57,8 @@ public class DateTimeEditorsPropertyValueHandlerTests : PropertyValueHandlerTest
             })
             .Build();
 
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
-        await ContentService.PublishAsync(content, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
+        await ContentService.SaveAsync(content, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishAsync(content, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
         TestIndexDocument document = IndexerAndSearcher.Dump(IndexAliases.PublishedContent).Single();
 
@@ -92,8 +92,8 @@ public class DateTimeEditorsPropertyValueHandlerTests : PropertyValueHandlerTest
             .WithName("Date Time Editors")
             .Build();
 
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
-        await ContentService.PublishAsync(content, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
+        await ContentService.SaveAsync(content, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishAsync(content, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
         TestIndexDocument document = IndexerAndSearcher.Dump(IndexAliases.PublishedContent).Single();
         Assert.That(document.Fields.Any(f => f.FieldName == "dateOnlyValue"), Is.False);
@@ -111,8 +111,8 @@ public class DateTimeEditorsPropertyValueHandlerTests : PropertyValueHandlerTest
             })
             .Build();
 
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
-        await ContentService.PublishAsync(content, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
+        await ContentService.SaveAsync(content, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishAsync(content, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
         TestIndexDocument document = IndexerAndSearcher.Dump(IndexAliases.PublishedContent).Single();
         Assert.That(document.Fields.Any(f => f.FieldName == "dateOnlyValue"), Is.False);
@@ -136,7 +136,7 @@ public class DateTimeEditorsPropertyValueHandlerTests : PropertyValueHandlerTest
             })
             .Build();
 
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         TestIndexDocument document = IndexerAndSearcher.Dump(IndexAliases.DraftContent).Single();
         Assert.Multiple(() =>
@@ -156,16 +156,16 @@ public class DateTimeEditorsPropertyValueHandlerTests : PropertyValueHandlerTest
         IDataTypeService dataTypeService = GetRequiredService<IDataTypeService>();
 
         DataType dateOnlyDataType = BuildJsonDateDataType(Constants.PropertyEditors.Aliases.DateOnly, "Date Only");
-        await dataTypeService.CreateAsync(dateOnlyDataType, Constants.Security.SuperUserKey);
+        await dataTypeService.CreateAsync(dateOnlyDataType, Cms.Core.Constants.Security.SuperUserKey);
 
         DataType timeOnlyDataType = BuildJsonDateDataType(Constants.PropertyEditors.Aliases.TimeOnly, "Time Only");
-        await dataTypeService.CreateAsync(timeOnlyDataType, Constants.Security.SuperUserKey);
+        await dataTypeService.CreateAsync(timeOnlyDataType, Cms.Core.Constants.Security.SuperUserKey);
 
         DataType dateTimeUnspecifiedDataType = BuildJsonDateDataType(Constants.PropertyEditors.Aliases.DateTimeUnspecified, "Date Time Unspecified");
-        await dataTypeService.CreateAsync(dateTimeUnspecifiedDataType, Constants.Security.SuperUserKey);
+        await dataTypeService.CreateAsync(dateTimeUnspecifiedDataType, Cms.Core.Constants.Security.SuperUserKey);
 
         DataType dateTimeWithTimeZoneDataType = BuildJsonDateDataType(Constants.PropertyEditors.Aliases.DateTimeWithTimeZone, "Date Time With Time Zone");
-        await dataTypeService.CreateAsync(dateTimeWithTimeZoneDataType, Constants.Security.SuperUserKey);
+        await dataTypeService.CreateAsync(dateTimeWithTimeZoneDataType, Cms.Core.Constants.Security.SuperUserKey);
 
         DataType legacyDateTimeDataType = new DataTypeBuilder()
             .WithId(0)
@@ -175,7 +175,7 @@ public class DateTimeEditorsPropertyValueHandlerTests : PropertyValueHandlerTest
             .WithAlias(Constants.PropertyEditors.Aliases.DateTime)
             .Done()
             .Build();
-        await dataTypeService.CreateAsync(legacyDateTimeDataType, Constants.Security.SuperUserKey);
+        await dataTypeService.CreateAsync(legacyDateTimeDataType, Cms.Core.Constants.Security.SuperUserKey);
 
         IContentType contentType = new ContentTypeBuilder()
             .WithAlias(ContentTypeAlias)
@@ -206,7 +206,7 @@ public class DateTimeEditorsPropertyValueHandlerTests : PropertyValueHandlerTest
             .Done()
             .Build();
 
-        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+        await ContentTypeService.CreateAsync(contentType, Cms.Core.Constants.Security.SuperUserKey);
     }
 
     private static DataType BuildJsonDateDataType(string editorAlias, string name)

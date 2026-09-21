@@ -309,14 +309,14 @@ internal sealed partial class ContentTypeEditingServiceTests
             await ElementService.PublishAsync((IElement)instance, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
             var elementToEdit = await ElementService.GetByIdAsync(instance.Key, CancellationToken.None);
             elementToEdit!.SetValue(VarianceTestPropertyAlias, "draft edited value", null);
-            await ElementService.SaveAsync(elementToEdit, null, null, CancellationToken.None);
+            await ElementService.SaveAsync(elementToEdit, Constants.Security.SuperUserKey, null, CancellationToken.None);
         }
         else
         {
             await ContentService.PublishAsync((IContent)instance, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
             var contentToEdit = await ContentService.GetByIdAsync(instance.Key, CancellationToken.None);
             contentToEdit!.SetValue(VarianceTestPropertyAlias, "draft edited value", null);
-            await ContentService.SaveAsync(contentToEdit, null, null, CancellationToken.None);
+            await ContentService.SaveAsync(contentToEdit, Constants.Security.SuperUserKey, null, CancellationToken.None);
         }
 
         var propertyType = contentType.PropertyTypes.Single(p => p.Alias == VarianceTestPropertyAlias);
@@ -363,14 +363,14 @@ internal sealed partial class ContentTypeEditingServiceTests
             await ElementService.PublishAsync((IElement)instance, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
             var elementToEdit = await ElementService.GetByIdAsync(instance.Key, CancellationToken.None);
             elementToEdit!.SetValue(VarianceTestPropertyAlias, "unpublished danish edit", "da-DK");
-            await ElementService.SaveAsync(elementToEdit, null, null, CancellationToken.None);
+            await ElementService.SaveAsync(elementToEdit, Constants.Security.SuperUserKey, null, CancellationToken.None);
         }
         else
         {
             await ContentService.PublishAsync((IContent)instance, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
             var contentToEdit = await ContentService.GetByIdAsync(instance.Key, CancellationToken.None);
             contentToEdit!.SetValue(VarianceTestPropertyAlias, "unpublished danish edit", "da-DK");
-            await ContentService.SaveAsync(contentToEdit, null, null, CancellationToken.None);
+            await ContentService.SaveAsync(contentToEdit, Constants.Security.SuperUserKey, null, CancellationToken.None);
         }
 
         var propertyType = contentType.PropertyTypes.Single(p => p.Alias == VarianceTestPropertyAlias);
@@ -427,7 +427,7 @@ internal sealed partial class ContentTypeEditingServiceTests
             element.SetValue(VarianceTestPropertyAlias, value, culture);
         }
 
-        await ElementService.SaveAsync(element, null, null, CancellationToken.None);
+        await ElementService.SaveAsync(element, Constants.Security.SuperUserKey, null, CancellationToken.None);
         return element;
     }
 
@@ -452,7 +452,7 @@ internal sealed partial class ContentTypeEditingServiceTests
             content.SetValue(VarianceTestPropertyAlias, value, culture);
         }
 
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
         return content;
     }
 }

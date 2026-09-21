@@ -48,7 +48,7 @@ public class ApiContentPathResolverInvariantTests : ApiContentPathResolverTestBa
                 .WithContentType(contentType)
                 .WithName($"Root {rootNumber}")
                 .Build();
-            await ContentService.SaveAsync(root, null, null, CancellationToken.None);
+            await ContentService.SaveAsync(root, Constants.Security.SuperUserKey, null, CancellationToken.None);
             await ContentService.PublishAsync(root, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
             _contentByName[root.Name!] = root;
 
@@ -59,7 +59,7 @@ public class ApiContentPathResolverInvariantTests : ApiContentPathResolverTestBa
                     .WithParent(root)
                     .WithName($"Child {childNumber}")
                     .Build();
-                await ContentService.SaveAsync(child, null, null, CancellationToken.None);
+                await ContentService.SaveAsync(child, Constants.Security.SuperUserKey, null, CancellationToken.None);
                 await ContentService.PublishAsync(child, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
                 _contentByName[$"{root.Name!}/{child.Name!}"] = child;
 
@@ -70,7 +70,7 @@ public class ApiContentPathResolverInvariantTests : ApiContentPathResolverTestBa
                         .WithParent(child)
                         .WithName($"Grandchild {grandchildNumber}")
                         .Build();
-                    await ContentService.SaveAsync(grandchild, null, null, CancellationToken.None);
+                    await ContentService.SaveAsync(grandchild, Constants.Security.SuperUserKey, null, CancellationToken.None);
                     await ContentService.PublishAsync(grandchild, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
                     _contentByName[$"{root.Name!}/{child.Name!}/{grandchild.Name!}"] = grandchild;
                 }

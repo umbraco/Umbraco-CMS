@@ -307,7 +307,7 @@ public class InvariantFilterTests : SearcherTestBase
             .Done()
             .Build();
 
-        await DataTypeService.CreateAsync(dataType, Constants.Security.SuperUserKey);
+        await DataTypeService.CreateAsync(dataType, Cms.Core.Constants.Security.SuperUserKey);
         IContentType contentType = new ContentTypeBuilder()
             .WithAlias("invariant")
             .AddPropertyType()
@@ -331,9 +331,9 @@ public class InvariantFilterTests : SearcherTestBase
             .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.Decimal)
             .Done()
             .Build();
-        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+        await ContentTypeService.CreateAsync(contentType, Cms.Core.Constants.Security.SuperUserKey);
         contentType.AllowedContentTypes = [new ContentTypeSort(contentType.Key, 0, contentType.Alias)];
-        await ContentTypeService.UpdateAsync(contentType, Constants.Security.SuperUserKey);
+        await ContentTypeService.UpdateAsync(contentType, Cms.Core.Constants.Security.SuperUserKey);
 
         Content root = new ContentBuilder()
             .WithKey(RootKey)
@@ -351,7 +351,7 @@ public class InvariantFilterTests : SearcherTestBase
 
         await WaitForIndexing(GetIndexAlias(false), async () =>
         {
-            await ContentService.SaveAsync(root, null, null, CancellationToken.None);
+            await ContentService.SaveAsync(root, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
 
 
             Content child = new ContentBuilder()
@@ -369,7 +369,7 @@ public class InvariantFilterTests : SearcherTestBase
                     })
                 .Build();
 
-            await ContentService.SaveAsync(child, null, null, CancellationToken.None);
+            await ContentService.SaveAsync(child, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
 
             Content grandchild = new ContentBuilder()
                 .WithKey(GrandchildKey)
@@ -386,7 +386,7 @@ public class InvariantFilterTests : SearcherTestBase
                     })
                 .Build();
 
-            await ContentService.SaveAsync(grandchild, null, null, CancellationToken.None);
+            await ContentService.SaveAsync(grandchild, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
         });
 
 

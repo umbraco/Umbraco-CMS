@@ -46,7 +46,9 @@ internal sealed class FileUploadContentCopiedOrScaffoldedNotificationHandler : F
     public void Handle(ContentCopiedNotification notification) => Handle(
         notification.Original,
         notification.Copy,
-        (IContent c) => _contentService.SaveAsync(c, null, null, CancellationToken.None).GetAwaiter().GetResult());
+        (IContent c) => _contentService
+            .SaveAsync(c, Constants.Security.SuperUserKey, null, CancellationToken.None)
+            .GetAwaiter().GetResult());
 
     /// <inheritdoc/>
     public void Handle(ContentScaffoldedNotification notification) => Handle(notification.Original, notification.Scaffold);

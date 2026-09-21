@@ -307,7 +307,8 @@ internal sealed class ContentEditingService
     /// <inheritdoc />
     protected override async Task<OperationResult?> DeleteAsync(IContent content, int userId)
     {
-        Attempt<ContentDeleteOperationStatus> result = await ContentService.DeleteAsync(content, userId, CancellationToken.None);
+        Attempt<ContentDeleteOperationStatus> result =
+            await ContentService.DeleteAsync(content, await GetUserKeyAsync(userId), CancellationToken.None);
         return result.Success ? OperationResult.Succeed(new EventMessages()) : OperationResult.Cancel(new EventMessages());
     }
 
@@ -345,8 +346,7 @@ internal sealed class ContentEditingService
     {
         try
         {
-            var currentUserId = await GetUserIdAsync(userKey);
-            Attempt<ContentSaveOperationStatus> saveResult = await ContentService.SaveAsync(content, currentUserId, null, CancellationToken.None);
+            Attempt<ContentSaveOperationStatus> saveResult = await ContentService.SaveAsync(content, userKey, null, CancellationToken.None);
             return saveResult.Result switch
             {
                 // these are the only result states currently expected from SaveAsync

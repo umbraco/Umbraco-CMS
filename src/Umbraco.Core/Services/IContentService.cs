@@ -577,5 +577,5 @@ public interface IContentService : IContentServiceBase, IPublishableContentServi
     /// </summary>
     /// <param name="userId">The unique identifier of the user emptying the Recycle Bin.</param>
     /// <returns>An attempt carrying the operation status.</returns>
-    Task<Attempt<ContentEmptyRecycleBinOperationStatus>> EmptyRecycleBinAsync(Guid userId);
+    Task<Attempt<ContentEmptyRecycleBinOperationStatus>> EmptyRecycleBinAsync(Guid userKey, CancellationToken cancellationToken);
 }

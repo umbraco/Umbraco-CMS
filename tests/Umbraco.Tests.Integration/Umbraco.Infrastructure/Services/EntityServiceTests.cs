@@ -67,13 +67,13 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
         var contentType = ContentTypeService.GetAsync("umbTextpage").GetAwaiter().GetResult();
 
         var root = ContentBuilder.CreateSimpleContent(contentType);
-        await ContentService.SaveAsync(root, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(root, Constants.Security.SuperUserKey, null, CancellationToken.None);
         var rootId = root.Id;
         var ids = new List<int>();
         for (var i = 0; i < 10; i++)
         {
             var c1 = ContentBuilder.CreateSimpleContent(contentType, Guid.NewGuid().ToString(), root);
-            await ContentService.SaveAsync(c1, null, null, CancellationToken.None);
+            await ContentService.SaveAsync(c1, Constants.Security.SuperUserKey, null, CancellationToken.None);
             ids.Add(c1.Id);
             root = c1; // make a hierarchy
         }
@@ -132,12 +132,12 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
         var contentType = ContentTypeService.GetAsync("umbTextpage").GetAwaiter().GetResult();
 
         var root = ContentBuilder.CreateSimpleContent(contentType);
-        await ContentService.SaveAsync(root, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(root, Constants.Security.SuperUserKey, null, CancellationToken.None);
         var ids = new List<int>();
         for (var i = 0; i < 10; i++)
         {
             var c1 = ContentBuilder.CreateSimpleContent(contentType, Guid.NewGuid().ToString(), root);
-            await ContentService.SaveAsync(c1, null, null, CancellationToken.None);
+            await ContentService.SaveAsync(c1, Constants.Security.SuperUserKey, null, CancellationToken.None);
             ids.Add(c1.Id);
         }
 
@@ -182,18 +182,18 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
         var contentType = ContentTypeService.GetAsync("umbTextpage").GetAwaiter().GetResult();
 
         var root = ContentBuilder.CreateSimpleContent(contentType);
-        await ContentService.SaveAsync(root, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(root, Constants.Security.SuperUserKey, null, CancellationToken.None);
         var count = 0;
         for (var i = 0; i < 10; i++)
         {
             var c1 = ContentBuilder.CreateSimpleContent(contentType, Guid.NewGuid().ToString(), root);
-            await ContentService.SaveAsync(c1, null, null, CancellationToken.None);
+            await ContentService.SaveAsync(c1, Constants.Security.SuperUserKey, null, CancellationToken.None);
             count++;
 
             for (var j = 0; j < 5; j++)
             {
                 var c2 = ContentBuilder.CreateSimpleContent(contentType, Guid.NewGuid().ToString(), c1);
-                await ContentService.SaveAsync(c2, null, null, CancellationToken.None);
+                await ContentService.SaveAsync(c2, Constants.Security.SuperUserKey, null, CancellationToken.None);
                 count++;
             }
         }
@@ -214,12 +214,12 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
         var contentType = ContentTypeService.GetAsync("umbTextpage").GetAwaiter().GetResult();
 
         var root = ContentBuilder.CreateSimpleContent(contentType);
-        await ContentService.SaveAsync(root, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(root, Constants.Security.SuperUserKey, null, CancellationToken.None);
         var toDelete = new List<IContent>();
         for (var i = 0; i < 10; i++)
         {
             var c1 = ContentBuilder.CreateSimpleContent(contentType, Guid.NewGuid().ToString(), root);
-            await ContentService.SaveAsync(c1, null, null, CancellationToken.None);
+            await ContentService.SaveAsync(c1, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
             if (i % 2 == 0)
             {
@@ -229,7 +229,7 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
             for (var j = 0; j < 5; j++)
             {
                 var c2 = ContentBuilder.CreateSimpleContent(contentType, Guid.NewGuid().ToString(), c1);
-                await ContentService.SaveAsync(c2, null, null, CancellationToken.None);
+                await ContentService.SaveAsync(c2, Constants.Security.SuperUserKey, null, CancellationToken.None);
             }
         }
 
@@ -256,12 +256,12 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
         var contentType = ContentTypeService.GetAsync("umbTextpage").GetAwaiter().GetResult();
 
         var root = ContentBuilder.CreateSimpleContent(contentType);
-        await ContentService.SaveAsync(root, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(root, Constants.Security.SuperUserKey, null, CancellationToken.None);
         var toDelete = new List<IContent>();
         for (var i = 0; i < 10; i++)
         {
             var c1 = ContentBuilder.CreateSimpleContent(contentType, Guid.NewGuid().ToString(), root);
-            await ContentService.SaveAsync(c1, null, null, CancellationToken.None);
+            await ContentService.SaveAsync(c1, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
             if (i % 2 == 0)
             {
@@ -271,7 +271,7 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
             for (var j = 0; j < 5; j++)
             {
                 var c2 = ContentBuilder.CreateSimpleContent(contentType, Guid.NewGuid().ToString(), c1);
-                await ContentService.SaveAsync(c2, null, null, CancellationToken.None);
+                await ContentService.SaveAsync(c2, Constants.Security.SuperUserKey, null, CancellationToken.None);
             }
         }
 
@@ -299,12 +299,12 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
         var contentType = ContentTypeService.GetAsync("umbTextpage").GetAwaiter().GetResult();
 
         var root = ContentBuilder.CreateSimpleContent(contentType);
-        await ContentService.SaveAsync(root, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(root, Constants.Security.SuperUserKey, null, CancellationToken.None);
         var toDelete = new List<IContent>();
         for (var i = 0; i < 10; i++)
         {
             var c1 = ContentBuilder.CreateSimpleContent(contentType, Guid.NewGuid().ToString(), root);
-            await ContentService.SaveAsync(c1, null, null, CancellationToken.None);
+            await ContentService.SaveAsync(c1, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
             if (i % 2 == 0)
             {
@@ -314,7 +314,7 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
             for (var j = 0; j < 5; j++)
             {
                 var c2 = ContentBuilder.CreateSimpleContent(contentType, Guid.NewGuid().ToString(), c1);
-                await ContentService.SaveAsync(c2, null, null, CancellationToken.None);
+                await ContentService.SaveAsync(c2, Constants.Security.SuperUserKey, null, CancellationToken.None);
             }
         }
 
@@ -342,17 +342,17 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
         var contentType = ContentTypeService.GetAsync("umbTextpage").GetAwaiter().GetResult();
 
         var root = ContentBuilder.CreateSimpleContent(contentType);
-        await ContentService.SaveAsync(root, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(root, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         for (var i = 0; i < 10; i++)
         {
             var c1 = ContentBuilder.CreateSimpleContent(contentType, "ssss" + Guid.NewGuid(), root);
-            await ContentService.SaveAsync(c1, null, null, CancellationToken.None);
+            await ContentService.SaveAsync(c1, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
             for (var j = 0; j < 5; j++)
             {
                 var c2 = ContentBuilder.CreateSimpleContent(contentType, "tttt" + Guid.NewGuid(), c1);
-                await ContentService.SaveAsync(c2, null, null, CancellationToken.None);
+                await ContentService.SaveAsync(c2, Constants.Security.SuperUserKey, null, CancellationToken.None);
             }
         }
 
@@ -704,7 +704,7 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
         var c1 = ContentBuilder.CreateSimpleContent(contentType, "Test");
         c1.SetCultureName("Test - FR", _langFr.IsoCode);
         c1.SetCultureName("Test - ES", _langEs.IsoCode);
-        await ContentService.SaveAsync(c1, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(c1, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         var result = EntityService.Get(c1.Id, UmbracoObjectTypes.Document);
         Assert.AreEqual("Test - FR", result.Name); // got name from default culture
@@ -726,7 +726,7 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
 
         var root = ContentBuilder.CreateSimpleContent(contentType);
         root.SetCultureName("Root", _langFr.IsoCode); // else cannot save
-        await ContentService.SaveAsync(root, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(root, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         for (var i = 0; i < 10; i++)
         {
@@ -741,7 +741,7 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
                 c1.SetCultureName("Test", _langFr.IsoCode); // else cannot save
             }
 
-            await ContentService.SaveAsync(c1, null, null, CancellationToken.None);
+            await ContentService.SaveAsync(c1, Constants.Security.SuperUserKey, null, CancellationToken.None);
         }
 
         var entities = EntityService.GetChildren(root.Id, UmbracoObjectTypes.Document).ToArray();
@@ -937,12 +937,12 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
         var contentType = ContentTypeService.GetAsync("umbTextpage").GetAwaiter().GetResult();
 
         var root = ContentBuilder.CreateSimpleContent(contentType);
-        await ContentService.SaveAsync(root, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(root, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         var child = ContentBuilder.CreateSimpleContent(contentType, Guid.NewGuid().ToString(), root);
-        await ContentService.SaveAsync(child, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(child, Constants.Security.SuperUserKey, null, CancellationToken.None);
         var grandChild = ContentBuilder.CreateSimpleContent(contentType, Guid.NewGuid().ToString(), child);
-        await ContentService.SaveAsync(grandChild, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(grandChild, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         var result = EntityService.GetPathKeys(grandChild);
         Assert.AreEqual($"{root.Key},{child.Key},{grandChild.Key}", string.Join(",", result));
@@ -989,7 +989,7 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
     [Test]
     public async Task EntityService_Siblings_Returns_Trashed_Siblings()
     {
-        await ContentService.EmptyRecycleBinAsync(Constants.Security.SuperUserKey);
+        await ContentService.EmptyRecycleBinAsync(Constants.Security.SuperUserKey, CancellationToken.None);
         var children = await CreateDocumentSiblingsTestData();
 
         for (int i = 0; i <= 3; i++)
@@ -1166,14 +1166,14 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
         var contentType = await ContentTypeService.GetAsync("umbTextpage");
 
         var root = ContentBuilder.CreateSimpleContent(contentType);
-        await ContentService.SaveAsync(root, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(root, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         var children = new List<Content>();
 
         for (int i = 0; i < count; i++)
         {
             var child = ContentBuilder.CreateSimpleContent(contentType, Guid.NewGuid().ToString(), root);
-            await ContentService.SaveAsync(child, null, null, CancellationToken.None);
+            await ContentService.SaveAsync(child, Constants.Security.SuperUserKey, null, CancellationToken.None);
             children.Add(child);
         }
 
@@ -1213,21 +1213,21 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
             // Create and Save Content "Homepage" based on "umbTextpage" -> 1053
             _textpage = ContentBuilder.CreateSimpleContent(_contentType);
             _textpage.Key = new Guid("B58B3AD4-62C2-4E27-B1BE-837BD7C533E0");
-            await ContentService.SaveAsync(_textpage, -1, null, CancellationToken.None);
+            await ContentService.SaveAsync(_textpage, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
             // Create and Save Content "Text Page 1" based on "umbTextpage" -> 1054
             _subpage = ContentBuilder.CreateSimpleContent(_contentType, "Text Page 1", _textpage.Id);
             var contentSchedule = ContentScheduleCollection.CreateWithEntry(DateTime.UtcNow.AddMinutes(-5), null);
-            await ContentService.SaveAsync(_subpage, -1, contentSchedule, CancellationToken.None);
+            await ContentService.SaveAsync(_subpage, Constants.Security.SuperUserKey, contentSchedule, CancellationToken.None);
 
             // Create and Save Content "Text Page 2" based on "umbTextpage" -> 1055
             _subpage2 = ContentBuilder.CreateSimpleContent(_contentType, "Text Page 2", _textpage.Id);
-            await ContentService.SaveAsync(_subpage2, -1, null, CancellationToken.None);
+            await ContentService.SaveAsync(_subpage2, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
             // Create and Save Content "Text Page Deleted" based on "umbTextpage" -> 1056
             _trashed = ContentBuilder.CreateSimpleContent(_contentType, "Text Page Deleted", -20);
             _trashed.Trashed = true;
-            await ContentService.SaveAsync(_trashed, -1, null, CancellationToken.None);
+            await ContentService.SaveAsync(_trashed, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
             // Create and Save folder-Media -> 1057
             _folderMediaType = MediaTypeService.Get(1031);

@@ -83,7 +83,7 @@ internal sealed class RichTextElementLevelVariationTests : BlockEditorElementVar
         }
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(richTextValue));
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
         PublishContent(content, ["en-US"]);
 
         AssertPropertyValues(
@@ -219,7 +219,7 @@ internal sealed class RichTextElementLevelVariationTests : BlockEditorElementVar
         richTextValue.Blocks.SettingsData[1].Values[2].Value = "#3: The second settings value in Danish";
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(richTextValue));
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
         PublishContent(content, ["en-US"]);
 
         AssertPropertyValues("en-US", 2, blocks =>
@@ -311,7 +311,7 @@ internal sealed class RichTextElementLevelVariationTests : BlockEditorElementVar
             .Replace("The end", "The end updated");
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(richTextValue));
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
         PublishContent(content, ["en-US"]);
 
         AssertPropertyValuesForAllCultures(markup =>
@@ -560,7 +560,7 @@ internal sealed class RichTextElementLevelVariationTests : BlockEditorElementVar
             content.Properties["blocks"]!.SetValue(propertyValue);
         }
 
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
         return content;
     }
 
@@ -656,7 +656,7 @@ internal sealed class RichTextElementLevelVariationTests : BlockEditorElementVar
             .ToList();
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(richTextValue));
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         // 5. Publish selected cultures
         string[] culturesToPublish = republishEnglish && republishDanish
@@ -822,7 +822,7 @@ internal sealed class RichTextElementLevelVariationTests : BlockEditorElementVar
         ];
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(richTextValue));
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         // 5. Publish selected cultures
         string[] culturesToPublish = republishEnglish && republishDanish

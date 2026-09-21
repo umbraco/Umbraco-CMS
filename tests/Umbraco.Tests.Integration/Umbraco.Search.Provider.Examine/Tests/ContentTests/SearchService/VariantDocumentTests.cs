@@ -93,7 +93,7 @@ public class VariantDocumentTests : SearcherTestBase
         SearchResult results = await Searcher.SearchAsync(indexAlias, name, null, null, null, culture, null, null, 0, 100);
         Assert.That(results.Total, Is.EqualTo(1));
 
-        await LanguageService.DeleteAsync(culture, Constants.Security.SuperUserKey);
+        await LanguageService.DeleteAsync(culture, Cms.Core.Constants.Security.SuperUserKey);
 
         // We can't wait for indexing here, as it's an entire rebuild, not just a single action.
         await Task.Delay(4000);
@@ -113,8 +113,8 @@ public class VariantDocumentTests : SearcherTestBase
             .WithCultureInfo("ja-JP")
             .Build();
 
-        await LanguageService.CreateAsync(langDk, Constants.Security.SuperUserKey);
-        await LanguageService.CreateAsync(langJp, Constants.Security.SuperUserKey);
+        await LanguageService.CreateAsync(langDk, Cms.Core.Constants.Security.SuperUserKey);
+        await LanguageService.CreateAsync(langJp, Cms.Core.Constants.Security.SuperUserKey);
 
         IContentType contentType = new ContentTypeBuilder()
             .WithAlias("variant")
@@ -132,7 +132,7 @@ public class VariantDocumentTests : SearcherTestBase
             .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.TextBox)
             .Done()
             .Build();
-        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+        await ContentTypeService.CreateAsync(contentType, Cms.Core.Constants.Security.SuperUserKey);
 
         Content root = new ContentBuilder()
             .WithKey(RootKey)
@@ -155,8 +155,8 @@ public class VariantDocumentTests : SearcherTestBase
 
         await WaitForIndexing(GetIndexAlias(true), async () =>
         {
-            await ContentService.SaveAsync(root, null, null, CancellationToken.None);
-            await ContentService.PublishAsync(root, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
+            await ContentService.SaveAsync(root, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
+            await ContentService.PublishAsync(root, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         });
 
         IContent? content = ContentService.GetByIdAsync(RootKey, CancellationToken.None).GetAwaiter().GetResult();
@@ -171,8 +171,8 @@ public class VariantDocumentTests : SearcherTestBase
 
         await WaitForIndexing(GetIndexAlias(true), async () =>
         {
-            await ContentService.SaveAsync(content, null, null, CancellationToken.None);
-            await ContentService.PublishAsync(content, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
+            await ContentService.SaveAsync(content, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
+            await ContentService.PublishAsync(content, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         });
     }
 }

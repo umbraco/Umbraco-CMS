@@ -40,7 +40,7 @@ public class InvariantDocumentTests : SearcherTestBase
         await WaitForIndexing(GetIndexAlias(true), () =>
         {
             IContent? content = ContentService.GetByIdAsync(RootKey, CancellationToken.None).GetAwaiter().GetResult();
-            ContentService.DeleteAsync(content!, null, CancellationToken.None).GetAwaiter().GetResult();
+            ContentService.DeleteAsync(content!, Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None).GetAwaiter().GetResult();
             return Task.CompletedTask;
         });
 
@@ -124,7 +124,7 @@ public class InvariantDocumentTests : SearcherTestBase
             .Done()
             .Build();
 
-        await DataTypeService.CreateAsync(dataType, Constants.Security.SuperUserKey);
+        await DataTypeService.CreateAsync(dataType, Cms.Core.Constants.Security.SuperUserKey);
         IContentType contentType = new ContentTypeBuilder()
             .WithAlias("invariant")
             .AddPropertyType()
@@ -148,7 +148,7 @@ public class InvariantDocumentTests : SearcherTestBase
             .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.Decimal)
             .Done()
             .Build();
-        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+        await ContentTypeService.CreateAsync(contentType, Cms.Core.Constants.Security.SuperUserKey);
 
         Content root = new ContentBuilder()
             .WithKey(RootKey)
@@ -166,8 +166,8 @@ public class InvariantDocumentTests : SearcherTestBase
 
         await WaitForIndexing(GetIndexAlias(true), async () =>
         {
-            await ContentService.SaveAsync(root, null, null, CancellationToken.None);
-            await ContentService.PublishAsync(root, new[] { "*" }, Constants.Security.SuperUserKey, CancellationToken.None);
+            await ContentService.SaveAsync(root, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
+            await ContentService.PublishAsync(root, new[] { "*" }, Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         });
 
         IContent? content = ContentService.GetByIdAsync(RootKey, CancellationToken.None).GetAwaiter().GetResult();
@@ -183,12 +183,12 @@ public class InvariantDocumentTests : SearcherTestBase
         {
             if (publish)
             {
-                await ContentService.SaveAsync(content, null, null, CancellationToken.None);
-                await ContentService.PublishAsync(content, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
+                await ContentService.SaveAsync(content, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
+                await ContentService.PublishAsync(content, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
             }
             else
             {
-                await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+                await ContentService.SaveAsync(content, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
             }
         });
     }

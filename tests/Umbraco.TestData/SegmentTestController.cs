@@ -171,7 +171,7 @@ public class SegmentTestController : SurfaceController
         }
 
         content.SetValue(propertyAlias, value, culture, segment);
-        await Services.ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        await Services.ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         return Content($"Segment value has been set on content {contentId} for property {propertyAlias}");
     }

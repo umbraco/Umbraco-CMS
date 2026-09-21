@@ -34,7 +34,7 @@ internal partial class BlockListElementLevelVariationTests
         var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType);
         var content = await CreateContent(contentType, elementType, [], false);
         content.SetCultureName("Home (de)", "de-DE");
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         var blockListValue = BlockListPropertyValue(
             elementType,
@@ -82,7 +82,7 @@ internal partial class BlockListElementLevelVariationTests
             ]);
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
 
         blockListValue.ContentData[0].Values.Single(v => v.Culture == null).Value = "#1: The second invariant content value";
@@ -192,7 +192,7 @@ internal partial class BlockListElementLevelVariationTests
         var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType);
         var content = await CreateContent(contentType, elementType, [], false);
         content.SetCultureName("Home (de)", "de-DE");
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
 
         var blockListValue = BlockListPropertyValue(
@@ -324,7 +324,7 @@ internal partial class BlockListElementLevelVariationTests
         var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType);
         var content = await CreateContent(contentType, elementType, [], false);
         content.SetCultureName("Home (de)", "de-DE");
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         var blockListValue = BlockListPropertyValue(
             elementType,
@@ -372,7 +372,7 @@ internal partial class BlockListElementLevelVariationTests
             ]);
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         blockListValue.ContentData[0].Values.Single(v => v.Culture == null).Value = "#1: The second invariant content value";
         blockListValue.ContentData[0].Values.Single(v => v.Culture == "en-US").Value = "#1: The second content value in English";
@@ -485,7 +485,7 @@ internal partial class BlockListElementLevelVariationTests
         var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType);
         var content = await CreateContent(contentType, elementType, [], false);
         content.SetCultureName("Home (de)", "de-DE");
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         var blockListValue = BlockListPropertyValue(
             elementType,
@@ -608,7 +608,7 @@ internal partial class BlockListElementLevelVariationTests
         var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType);
         var content = await CreateContent(contentType, elementType, [], false);
         content.SetCultureName("Home (de)", "de-DE");
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         var firstContentElementKey = Guid.NewGuid();
         var firstSettingsElementKey = Guid.NewGuid();
@@ -662,7 +662,7 @@ internal partial class BlockListElementLevelVariationTests
             ]);
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         var newContentElementKey = Guid.NewGuid();
         RemoveBlock(blockListValue, firstContentElementKey);
@@ -773,7 +773,7 @@ internal partial class BlockListElementLevelVariationTests
         var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType);
         var content = await CreateContent(contentType, elementType, [], false);
         content.SetCultureName("Home (de)", "de-DE");
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         var firstContentElementKey = Guid.NewGuid();
         var firstSettingsElementKey = Guid.NewGuid();
@@ -824,7 +824,7 @@ internal partial class BlockListElementLevelVariationTests
             ]);
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         var newContentElementKey = Guid.NewGuid();
         RemoveBlock(blockListValue, firstContentElementKey);
@@ -898,7 +898,7 @@ internal partial class BlockListElementLevelVariationTests
         var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType);
         var content = await CreateContent(contentType, elementType, [], false);
         content.SetCultureName("Home (de)", "de-DE");
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         var blockListValue = BlockListPropertyValue(
             elementType,
@@ -947,7 +947,7 @@ internal partial class BlockListElementLevelVariationTests
 
         var serializedBlockListValue = JsonSerializer.Serialize(blockListValue);
         content.Properties["blocks"]!.SetValue(serializedBlockListValue);
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         var updateModel = new ContentUpdateModel
         {
@@ -1001,7 +1001,7 @@ internal partial class BlockListElementLevelVariationTests
         var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType);
         var content = await CreateContent(contentType, elementType, [], false);
         content.SetCultureName("Home (de)", "de-DE");
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         var firstContentElementKey = Guid.NewGuid();
         var firstSettingsElementKey = Guid.NewGuid();
@@ -1055,7 +1055,7 @@ internal partial class BlockListElementLevelVariationTests
             ]);
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         // remove a value the limited user can remove
         blockListValue.ContentData.First().Values.RemoveAll(value => value.Culture == "da-DK");
@@ -1198,7 +1198,7 @@ internal partial class BlockListElementLevelVariationTests
             [],
             false);
         content.SetCultureName("Home (de)", "de-DE");
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         var blockListValue = JsonSerializer.Deserialize<BlockListValue>((string)content.Properties["blocks"]!.GetValue()!);
         blockListValue.ContentData[0].Values[0].Value = BlockListPropertyValue(

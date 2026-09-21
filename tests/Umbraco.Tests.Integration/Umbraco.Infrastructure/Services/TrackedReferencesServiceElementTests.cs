@@ -262,12 +262,12 @@ internal class TrackedReferencesServiceElementTests : UmbracoIntegrationTest
 
         // Create Element1 (will be referenced by Element3)
         Element1 = new Element("Element 1", ElementType);
-        await ElementService.SaveAsync(Element1, null, null, CancellationToken.None);
+        await ElementService.SaveAsync(Element1, Constants.Security.SuperUserKey, null, CancellationToken.None);
         await ElementService.PublishAsync(Element1, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Create Element2 (will be referenced by Element3)
         Element2 = new Element("Element 2", ElementType);
-        await ElementService.SaveAsync(Element2, null, null, CancellationToken.None);
+        await ElementService.SaveAsync(Element2, Constants.Security.SuperUserKey, null, CancellationToken.None);
         await ElementService.PublishAsync(Element2, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Create a folder with an element inside it
@@ -294,7 +294,7 @@ internal class TrackedReferencesServiceElementTests : UmbracoIntegrationTest
         Element3 = new Element("Element 3", ElementType);
         Element3.SetValue("elementPicker", $"[\"{Element1.Key}\", \"{ElementInFolder.Key}\"]");
         Element3.SetValue("elementPicker2", $"[\"{Element2.Key}\"]");
-        await ElementService.SaveAsync(Element3, null, null, CancellationToken.None);
+        await ElementService.SaveAsync(Element3, Constants.Security.SuperUserKey, null, CancellationToken.None);
         await ElementService.PublishAsync(Element3, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
     }
 }

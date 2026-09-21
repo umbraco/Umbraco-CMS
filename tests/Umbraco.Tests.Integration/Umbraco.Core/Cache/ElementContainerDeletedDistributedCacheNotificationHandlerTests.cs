@@ -107,7 +107,7 @@ internal sealed class ElementContainerDeletedDistributedCacheNotificationHandler
     private async Task<IElement> CreateElementUnder(int parentId, IContentType elementType)
     {
         var element = new Element($"Element {Guid.NewGuid():N}", parentId, elementType);
-        Attempt<ContentSaveOperationStatus> saveResult = await ElementService.SaveAsync(element, null, null, CancellationToken.None);
+        Attempt<ContentSaveOperationStatus> saveResult = await ElementService.SaveAsync(element, Constants.Security.SuperUserKey, null, CancellationToken.None);
         Assert.IsTrue(saveResult.Success, "Failed to save element.");
         return element;
     }

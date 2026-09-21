@@ -52,7 +52,7 @@ internal class RichTextEditorWithReusableContentTests : BlockEditorWithReusableC
 
         var content = contentBuilder.Build();
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(richTextValue));
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         PublishContent(content, ["*"]);
 

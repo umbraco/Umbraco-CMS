@@ -204,7 +204,7 @@ public class ImageCropperPropertyEditor : DataEditor,
         // if updated, re-save the copy with the updated value
         if (isUpdated)
         {
-            await _contentService.SaveAsync(notification.Copy, null, null, cancellationToken);
+            await _contentService.SaveAsync(notification.Copy, Constants.Security.SuperUserKey, null, cancellationToken);
         }
     }
 

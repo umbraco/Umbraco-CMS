@@ -21,7 +21,7 @@ public abstract class PropertyValueHandlerTestsBase : ContentTestBase
             .WithAlias(Constants.PropertyEditors.Aliases.Decimal)
             .Done()
             .Build();
-        await dataTypeService.CreateAsync(decimalDataType, Constants.Security.SuperUserKey);
+        await dataTypeService.CreateAsync(decimalDataType, Cms.Core.Constants.Security.SuperUserKey);
 
         DataType dateOnlyDataType = new DataTypeBuilder()
             .WithId(0)
@@ -31,7 +31,7 @@ public abstract class PropertyValueHandlerTestsBase : ContentTestBase
             .WithAlias(Constants.PropertyEditors.Aliases.DateOnly)
             .Done()
             .Build();
-        await dataTypeService.CreateAsync(dateOnlyDataType, Constants.Security.SuperUserKey);
+        await dataTypeService.CreateAsync(dateOnlyDataType, Cms.Core.Constants.Security.SuperUserKey);
 
         DataType timeOnlyDataType = new DataTypeBuilder()
             .WithId(0)
@@ -41,7 +41,7 @@ public abstract class PropertyValueHandlerTestsBase : ContentTestBase
             .WithAlias(Constants.PropertyEditors.Aliases.TimeOnly)
             .Done()
             .Build();
-        await dataTypeService.CreateAsync(timeOnlyDataType, Constants.Security.SuperUserKey);
+        await dataTypeService.CreateAsync(timeOnlyDataType, Cms.Core.Constants.Security.SuperUserKey);
 
         DataType dateTimeWithTimeZoneDataType = new DataTypeBuilder()
             .WithId(0)
@@ -51,7 +51,7 @@ public abstract class PropertyValueHandlerTestsBase : ContentTestBase
             .WithAlias(Constants.PropertyEditors.Aliases.DateTimeWithTimeZone)
             .Done()
             .Build();
-        await dataTypeService.CreateAsync(dateTimeWithTimeZoneDataType, Constants.Security.SuperUserKey);
+        await dataTypeService.CreateAsync(dateTimeWithTimeZoneDataType, Cms.Core.Constants.Security.SuperUserKey);
 
         DataType dateTimeUnspecifiedDataType = new DataTypeBuilder()
             .WithId(0)
@@ -61,7 +61,7 @@ public abstract class PropertyValueHandlerTestsBase : ContentTestBase
             .WithAlias(Constants.PropertyEditors.Aliases.DateTimeUnspecified)
             .Done()
             .Build();
-        await dataTypeService.CreateAsync(dateTimeUnspecifiedDataType, Constants.Security.SuperUserKey);
+        await dataTypeService.CreateAsync(dateTimeUnspecifiedDataType, Cms.Core.Constants.Security.SuperUserKey);
 
         DataType tagsAsCsvDataType = new DataTypeBuilder()
             .WithId(0)
@@ -75,7 +75,7 @@ public abstract class PropertyValueHandlerTestsBase : ContentTestBase
         {
             { "storageType", TagsStorageType.Csv }
         };
-        await dataTypeService.CreateAsync(tagsAsCsvDataType, Constants.Security.SuperUserKey);
+        await dataTypeService.CreateAsync(tagsAsCsvDataType, Cms.Core.Constants.Security.SuperUserKey);
 
         DataType tagsAsJsonDataType = new DataTypeBuilder()
             .WithId(0)
@@ -89,7 +89,7 @@ public abstract class PropertyValueHandlerTestsBase : ContentTestBase
         {
             { "storageType", TagsStorageType.Json }
         };
-        await dataTypeService.CreateAsync(tagsAsCsvDataType, Constants.Security.SuperUserKey);
+        await dataTypeService.CreateAsync(tagsAsCsvDataType, Cms.Core.Constants.Security.SuperUserKey);
 
         DataType multipleTextstringsDataType = new DataTypeBuilder()
             .WithId(0)
@@ -99,7 +99,7 @@ public abstract class PropertyValueHandlerTestsBase : ContentTestBase
             .WithAlias(Constants.PropertyEditors.Aliases.MultipleTextstring)
             .Done()
             .Build();
-        await dataTypeService.CreateAsync(multipleTextstringsDataType, Constants.Security.SuperUserKey);
+        await dataTypeService.CreateAsync(multipleTextstringsDataType, Cms.Core.Constants.Security.SuperUserKey);
 
         DataType contentPickerDataType = new DataTypeBuilder()
             .WithId(0)
@@ -109,7 +109,7 @@ public abstract class PropertyValueHandlerTestsBase : ContentTestBase
             .WithAlias(Constants.PropertyEditors.Aliases.ContentPicker)
             .Done()
             .Build();
-        await dataTypeService.CreateAsync(contentPickerDataType, Constants.Security.SuperUserKey);
+        await dataTypeService.CreateAsync(contentPickerDataType, Cms.Core.Constants.Security.SuperUserKey);
 
         DataType sliderSingleDataType = new DataTypeBuilder()
             .WithId(0)
@@ -123,7 +123,7 @@ public abstract class PropertyValueHandlerTestsBase : ContentTestBase
         {
             { "enableRange", false }
         };
-        await dataTypeService.CreateAsync(sliderSingleDataType, Constants.Security.SuperUserKey);
+        await dataTypeService.CreateAsync(sliderSingleDataType, Cms.Core.Constants.Security.SuperUserKey);
 
         DataType sliderRangeDataType = new DataTypeBuilder()
             .WithId(0)
@@ -137,7 +137,7 @@ public abstract class PropertyValueHandlerTestsBase : ContentTestBase
         {
             { "enableRange", true }
         };
-        await dataTypeService.CreateAsync(sliderRangeDataType, Constants.Security.SuperUserKey);
+        await dataTypeService.CreateAsync(sliderRangeDataType, Cms.Core.Constants.Security.SuperUserKey);
 
         DataType multiUrlPickerDataType = new DataTypeBuilder()
             .WithId(0)
@@ -147,7 +147,7 @@ public abstract class PropertyValueHandlerTestsBase : ContentTestBase
             .WithAlias(Constants.PropertyEditors.Aliases.MultiUrlPicker)
             .Done()
             .Build();
-        await dataTypeService.CreateAsync(multiUrlPickerDataType, Constants.Security.SuperUserKey);
+        await dataTypeService.CreateAsync(multiUrlPickerDataType, Cms.Core.Constants.Security.SuperUserKey);
 
         DataType dropdownSingleDataType = new DataTypeBuilder()
             .WithId(0)
@@ -162,7 +162,7 @@ public abstract class PropertyValueHandlerTestsBase : ContentTestBase
             { "multiple", false },
             { "items", new [] { "One", "Two", "Three" } }
         };
-        await dataTypeService.CreateAsync(dropdownSingleDataType, Constants.Security.SuperUserKey);
+        await dataTypeService.CreateAsync(dropdownSingleDataType, Cms.Core.Constants.Security.SuperUserKey);
 
         DataType dropdownMultipleDataType = new DataTypeBuilder()
             .WithId(0)
@@ -177,7 +177,7 @@ public abstract class PropertyValueHandlerTestsBase : ContentTestBase
             { "multiple", true },
             { "items", new [] { "One", "Two", "Three" } }
         };
-        await dataTypeService.CreateAsync(dropdownMultipleDataType, Constants.Security.SuperUserKey);
+        await dataTypeService.CreateAsync(dropdownMultipleDataType, Cms.Core.Constants.Security.SuperUserKey);
 
         DataType radioButtonListDataType = new DataTypeBuilder()
             .WithId(0)
@@ -191,7 +191,7 @@ public abstract class PropertyValueHandlerTestsBase : ContentTestBase
         {
             { "items", new [] { "One", "Two", "Three" } }
         };
-        await dataTypeService.CreateAsync(radioButtonListDataType, Constants.Security.SuperUserKey);
+        await dataTypeService.CreateAsync(radioButtonListDataType, Cms.Core.Constants.Security.SuperUserKey);
 
         DataType checkBoxListDataType = new DataTypeBuilder()
             .WithId(0)
@@ -205,7 +205,7 @@ public abstract class PropertyValueHandlerTestsBase : ContentTestBase
         {
             { "items", new [] { "One", "Two", "Three" } }
         };
-        await dataTypeService.CreateAsync(checkBoxListDataType, Constants.Security.SuperUserKey);
+        await dataTypeService.CreateAsync(checkBoxListDataType, Cms.Core.Constants.Security.SuperUserKey);
 
         IContentType contentType = new ContentTypeBuilder()
             .WithAlias("allSimpleEditors")
@@ -331,7 +331,7 @@ public abstract class PropertyValueHandlerTestsBase : ContentTestBase
             .Done()
             .Build();
 
-        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+        await ContentTypeService.CreateAsync(contentType, Cms.Core.Constants.Security.SuperUserKey);
         return contentType;
     }
 

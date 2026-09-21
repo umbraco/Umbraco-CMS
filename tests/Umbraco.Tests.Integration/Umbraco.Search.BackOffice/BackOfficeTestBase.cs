@@ -83,7 +83,7 @@ public abstract class BackOfficeTestBase : TestBase
                         title = $"root title single{i}root"
                     })
                 .Build();
-            await ContentService.SaveAsync(root, null, null, CancellationToken.None);
+            await ContentService.SaveAsync(root, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
             for (var j = 0; j < 10; j++)
             {
@@ -99,7 +99,7 @@ public abstract class BackOfficeTestBase : TestBase
                             title = $"child title single{j}child triple{j / 3}child oddeven{j % 2}child shared shared{i}"
                         })
                     .Build();
-                await ContentService.SaveAsync(child, null, null, CancellationToken.None);
+                await ContentService.SaveAsync(child, Constants.Security.SuperUserKey, null, CancellationToken.None);
             }
         }
     }

@@ -34,7 +34,7 @@ public interface IPublishableContentService<TContent> : IAsyncContentServiceBase
     /// <param name="ids">The unique identifiers of the content items.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The content items, in the order requested.</returns>
-    Task<IEnumerable<TContent>> GetByIdsAsync(IEnumerable<Guid> ids, CancellationToken cancellationToken);
+    Task<IEnumerable<TContent>> GetByIdsAsync(IEnumerable<Guid> keys, CancellationToken cancellationToken);
 
     /// <summary>
     ///     Gets a dictionary of content keys and their matching content schedules.
@@ -50,7 +50,7 @@ public interface IPublishableContentService<TContent> : IAsyncContentServiceBase
     /// <param name="contentId">The unique identifier of the content to load schedule for.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The <see cref="ContentScheduleCollection" />.</returns>
-    Task<ContentScheduleCollection> GetContentScheduleByContentIdAsync(Guid contentId, CancellationToken cancellationToken);
+    Task<ContentScheduleCollection> GetContentScheduleByContentIdAsync(Guid contentKey, CancellationToken cancellationToken);
 
     /// <summary>
     ///     Persists publish/unpublish schedule for a content node.
@@ -81,7 +81,7 @@ public interface IPublishableContentService<TContent> : IAsyncContentServiceBase
     /// <param name="contentSchedule">The content schedule to persist alongside the save, or <c>null</c> to leave the schedule unchanged.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>An attempt carrying the operation status.</returns>
-    Task<Attempt<ContentSaveOperationStatus>> SaveAsync(TContent content, int? userId, ContentScheduleCollection? contentSchedule, CancellationToken cancellationToken);
+    Task<Attempt<ContentSaveOperationStatus>> SaveAsync(TContent content, Guid userKey, ContentScheduleCollection? contentSchedule, CancellationToken cancellationToken);
 
     /// <summary>
     ///     Deletes a content item.
@@ -94,7 +94,7 @@ public interface IPublishableContentService<TContent> : IAsyncContentServiceBase
     ///     <para>This method will also delete associated media files, child content and possibly associated domains.</para>
     ///     <para>This method entirely clears the content from the database.</para>
     /// </remarks>
-    Task<Attempt<ContentDeleteOperationStatus>> DeleteAsync(TContent content, int? userId, CancellationToken cancellationToken);
+    Task<Attempt<ContentDeleteOperationStatus>> DeleteAsync(TContent content, Guid userKey, CancellationToken cancellationToken);
 
     /// <summary>
     ///     Rolls content back to a prior version.

@@ -237,7 +237,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
             ? new Content(name, parent, contentType, userId)
             : new Content(name, Constants.System.Root, contentType, userId);
 
-        await SaveAsync(content, userId, null, cancellationToken);
+        await SaveAsync(content, userKey, null, cancellationToken);
 
         scope.Complete();
 
@@ -265,7 +265,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
 
         var content = new Content(name, parent, contentType, userId);
 
-        await SaveAsync(content, userId, null, cancellationToken);
+        await SaveAsync(content, userKey, null, cancellationToken);
 
         scope.Complete();
         return content;
@@ -1064,9 +1064,10 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
     /// <summary>
     /// Empties the Recycle Bin by deleting all <see cref="IContent"/> items that reside in the bin asynchronously.
     /// </summary>
-    /// <param name="userId">The unique key of the user performing the operation.</param>
+    /// <param name="userKey">The unique key of the user performing the operation.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>An attempt carrying the operation status.</returns>
-    public async Task<Attempt<ContentEmptyRecycleBinOperationStatus>> EmptyRecycleBinAsync(Guid userId)
+    public async Task<Attempt<ContentEmptyRecycleBinOperationStatus>> EmptyRecycleBinAsync(Guid userKey, CancellationToken cancellationToken)
     {
         var deleted = new List<IContent>();
         EventMessages eventMessages = EventMessagesFactory.Get();
@@ -1074,7 +1075,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.WriteLock(Constants.Locks.ContentTree);
 
-        int intUserId = await _userIdKeyResolver.GetAsync(userId);
+        int intUserId = await _userIdKeyResolver.GetAsync(userKey);
 
         // emptying the recycle bin means deleting whatever is in there - do it properly!
         PagedModel<IContent> contentsPage = await GetChildrenAsync(Constants.System.RecycleBinContentKey, 0, int.MaxValue, propertyAliases: null, ordering: null, CancellationToken.None);
@@ -1342,7 +1343,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
         // have always changed if it's been saved in the back office but that's not really fail safe.
 
         // Save before raising event
-        Attempt<ContentSaveOperationStatus> saveResult = await SaveAsync(content, userId, null, cancellationToken);
+        Attempt<ContentSaveOperationStatus> saveResult = await SaveAsync(content, userKey, null, cancellationToken);
 
         // always complete (but maybe return a failed status)
         scope.Complete();

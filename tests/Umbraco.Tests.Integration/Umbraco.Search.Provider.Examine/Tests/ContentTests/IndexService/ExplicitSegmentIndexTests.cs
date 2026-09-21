@@ -462,16 +462,16 @@ public class ExplicitSegmentIndexTests : IndexTestBase
 
         await WaitForIndexing(GetIndexAlias(true), async () =>
         {
-            await ContentService.SaveAsync(docWithAllSegments, null, null, CancellationToken.None);
+            await ContentService.SaveAsync(docWithAllSegments, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
             await ContentService.PublishAsync(docWithAllSegments, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
-            await ContentService.SaveAsync(docWithOnlyNullSegment, null, null, CancellationToken.None);
+            await ContentService.SaveAsync(docWithOnlyNullSegment, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
             await ContentService.PublishAsync(docWithOnlyNullSegment, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
-            await ContentService.SaveAsync(docWithOnlySegment1, null, null, CancellationToken.None);
+            await ContentService.SaveAsync(docWithOnlySegment1, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
             await ContentService.PublishAsync(docWithOnlySegment1, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
-            await ContentService.SaveAsync(docWithSpecialCharacterSegments, null, null, CancellationToken.None);
+            await ContentService.SaveAsync(docWithSpecialCharacterSegments, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
             await ContentService.PublishAsync(docWithSpecialCharacterSegments, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         });
     }

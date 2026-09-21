@@ -70,7 +70,7 @@ internal class TrackedReferencesServiceTests : UmbracoIntegrationTest
             .WithName("Root 1")
             .Build();
 
-        await ContentService.SaveAsync(Root1, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(Root1, Constants.Security.SuperUserKey, null, CancellationToken.None);
         await ContentService.PublishAsync(Root1, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         Child1 = new ContentBuilder()
@@ -79,7 +79,7 @@ internal class TrackedReferencesServiceTests : UmbracoIntegrationTest
             .WithParentId(Root1.Id)
             .Build();
 
-        await ContentService.SaveAsync(Child1, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(Child1, Constants.Security.SuperUserKey, null, CancellationToken.None);
         await ContentService.PublishAsync(Child1, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         Root2 = new ContentBuilder()
@@ -92,7 +92,7 @@ internal class TrackedReferencesServiceTests : UmbracoIntegrationTest
             })
             .Build();
 
-        await ContentService.SaveAsync(Root2, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(Root2, Constants.Security.SuperUserKey, null, CancellationToken.None);
         await ContentService.PublishAsync(Root2, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
     }
 

@@ -76,7 +76,7 @@ internal sealed class ElementHybridCacheStaleSetRaceTests : UmbracoIntegrationTe
         await GetRequiredService<IContentTypeService>().CreateAsync(elementType, Constants.Security.SuperUserKey);
 
         _element = ElementBuilder.CreateSimpleElement(elementType);
-        await GetRequiredService<IElementService>().SaveAsync(_element, null, null, CancellationToken.None);
+        await GetRequiredService<IElementService>().SaveAsync(_element, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         _databaseCacheRepository = new Mock<IDatabaseCacheRepository>();
         _hybridCache = GetRequiredService<Microsoft.Extensions.Caching.Hybrid.HybridCache>();

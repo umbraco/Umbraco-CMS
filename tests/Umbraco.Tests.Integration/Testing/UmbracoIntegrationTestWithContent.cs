@@ -56,28 +56,28 @@ public abstract class UmbracoIntegrationTestWithContent : UmbracoIntegrationTest
         // Create and Save Content "Homepage" based on "umbTextpage" -> 1053
         Textpage = ContentBuilder.CreateSimpleContent(ContentType, "Textpage");
         Textpage.Key = new Guid(TextpageKey);
-        await ContentService.SaveAsync(Textpage, -1, null, CancellationToken.None);
+        await ContentService.SaveAsync(Textpage, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         // Create and Save Content "Text Page 1" based on "umbTextpage" -> 1054
         Subpage = ContentBuilder.CreateSimpleContent(ContentType, "Text Page 1", Textpage.Id);
         Subpage.Key = new Guid(SubPageKey);
         var contentSchedule = ContentScheduleCollection.CreateWithEntry(DateTime.UtcNow.AddMinutes(-5), null);
-        await ContentService.SaveAsync(Subpage, -1, contentSchedule, CancellationToken.None);
+        await ContentService.SaveAsync(Subpage, Constants.Security.SuperUserKey, contentSchedule, CancellationToken.None);
 
         // Create and Save Content "Text Page 1" based on "umbTextpage" -> 1055
         Subpage2 = ContentBuilder.CreateSimpleContent(ContentType, "Text Page 2", Textpage.Id);
         Subpage2.Key = new Guid(SubPage2Key);
-        await ContentService.SaveAsync(Subpage2, -1, null, CancellationToken.None);
+        await ContentService.SaveAsync(Subpage2, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
 
         Subpage3 = ContentBuilder.CreateSimpleContent(ContentType, "Text Page 3", Textpage.Id);
         Subpage3.Key = new Guid(SubPage3Key);
-        await ContentService.SaveAsync(Subpage3, -1, null, CancellationToken.None);
+        await ContentService.SaveAsync(Subpage3, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         // Create and Save Content "Text Page Deleted" based on "umbTextpage" -> 1056
         Trashed = ContentBuilder.CreateSimpleContent(ContentType, "Text Page Deleted", -20);
         Trashed.Trashed = true;
         Trashed.Key = new Guid(TrashedKey);
-        await ContentService.SaveAsync(Trashed, -1, null, CancellationToken.None);
+        await ContentService.SaveAsync(Trashed, Constants.Security.SuperUserKey, null, CancellationToken.None);
     }
 }

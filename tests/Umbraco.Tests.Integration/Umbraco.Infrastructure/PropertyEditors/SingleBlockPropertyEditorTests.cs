@@ -57,7 +57,7 @@ internal sealed class SingleBlockPropertyEditorTests : UmbracoIntegrationTest
         await ContentTypeService.CreateAsync(textPageContentType, Constants.Security.SuperUserKey);
 
         var textPage = ContentBuilder.CreateTextpageContent(textPageContentType, "My Picked Content", -1);
-        await ContentService.SaveAsync(textPage, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(textPage, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         var allTypesType = ContentTypeBuilder.CreateAllTypesContentType("allTypesType", "All Types type");
         allTypesType.IsElement = true;
@@ -121,7 +121,7 @@ internal sealed class SingleBlockPropertyEditorTests : UmbracoIntegrationTest
             .WithName("My Blocks")
             .WithPropertyValues(new { block = blocksPropertyValue })
             .Build();
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         var valueEditor = await GetValueEditor(singleBlockContentType);
         var toEditorValue = valueEditor.ToEditor(content.Properties["block"]!) as SingleBlockValue;
@@ -161,7 +161,7 @@ internal sealed class SingleBlockPropertyEditorTests : UmbracoIntegrationTest
         await ContentTypeService.CreateAsync(textPageContentType, Constants.Security.SuperUserKey);
 
         var textPage = ContentBuilder.CreateTextpageContent(textPageContentType, "My Picked Content", -1);
-        await ContentService.SaveAsync(textPage, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(textPage, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         var allTypesType = ContentTypeBuilder.CreateAllTypesContentType("allTypesType", "All Types type");
         allTypesType.IsElement = true;
@@ -259,7 +259,7 @@ internal sealed class SingleBlockPropertyEditorTests : UmbracoIntegrationTest
             .WithName("My Blocks")
             .WithPropertyValues(new { block = blocksPropertyValue })
             .Build();
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         // convert to updateModel and run validation
         var updateModel = await ContentEditingModelFactory.CreateFromAsync(content);
@@ -279,7 +279,7 @@ internal sealed class SingleBlockPropertyEditorTests : UmbracoIntegrationTest
         await ContentTypeService.CreateAsync(textPageContentType, Constants.Security.SuperUserKey);
 
         var textPage = ContentBuilder.CreateTextpageContent(textPageContentType, "My Picked Content", -1);
-        await ContentService.SaveAsync(textPage, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(textPage, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         var allTypesType = ContentTypeBuilder.CreateAllTypesContentType("allTypesType", "All Types type");
         allTypesType.IsElement = true;
@@ -346,7 +346,7 @@ internal sealed class SingleBlockPropertyEditorTests : UmbracoIntegrationTest
             .Build();
 
         // No validation, should just save
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         // convert to updateModel and run validation
         var updateModel = await ContentEditingModelFactory.CreateFromAsync(content);
@@ -372,7 +372,7 @@ internal sealed class SingleBlockPropertyEditorTests : UmbracoIntegrationTest
         await ContentTypeService.CreateAsync(textPageContentType, Constants.Security.SuperUserKey);
 
         var textPage = ContentBuilder.CreateTextpageContent(textPageContentType, "My Picked Content", -1);
-        await ContentService.SaveAsync(textPage, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(textPage, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         var elementType = ContentTypeBuilder.CreateAllTypesContentType("allTypesType", "All Types type");
         elementType.IsElement = true;
@@ -417,7 +417,7 @@ internal sealed class SingleBlockPropertyEditorTests : UmbracoIntegrationTest
             .WithName("My Blocks")
             .WithPropertyValues(new { block = blocksPropertyValue })
             .Build();
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         var valueEditor = await GetValueEditor(singleBlockContentType);
 
@@ -475,7 +475,7 @@ internal sealed class SingleBlockPropertyEditorTests : UmbracoIntegrationTest
             .WithName("My Blocks")
             .WithPropertyValues(new { block = blockPropertyValue })
             .Build();
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         var valueEditor = await GetValueEditor(singleBlockContentType);
 
@@ -551,7 +551,7 @@ internal sealed class SingleBlockPropertyEditorTests : UmbracoIntegrationTest
             .WithCultureName("da-DK", "My Blocks DA")
             .WithPropertyValues(new { block = blockPropertyValue })
             .Build();
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         var valueEditor = await GetValueEditor(singleBlockContentType);
 
@@ -615,7 +615,7 @@ internal sealed class SingleBlockPropertyEditorTests : UmbracoIntegrationTest
             .WithName("My Blocks")
             .WithPropertyValues(new { block = blockPropertyValue })
             .Build();
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         elementType.Variations = ContentVariation.Culture;
         elementType.PropertyTypes.First(pt => pt.Alias == "singleLineText").Variations = ContentVariation.Culture;
@@ -698,7 +698,7 @@ internal sealed class SingleBlockPropertyEditorTests : UmbracoIntegrationTest
             .WithName("My Blocks")
             .WithPropertyValues(new { block = blockPropertyValue })
             .Build();
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         elementType.PropertyTypes.First(pt => pt.Alias == "singleLineText").Variations = ContentVariation.Nothing;
         elementType.Variations = ContentVariation.Nothing;

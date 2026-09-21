@@ -64,7 +64,7 @@ internal sealed class DocumentUrlServiceTests_HideTopLevel_False : UmbracoIntegr
         var subsubpage = ContentBuilder.CreateSimpleContent(ContentType, "Sub Page 1", Subpage.Id);
         subsubpage.Key = new Guid("DF49F477-12F2-4E33-8563-91A7CC1DCDBB");
         var contentSchedule = ContentScheduleCollection.CreateWithEntry(DateTime.UtcNow.AddMinutes(-5), null);
-        await ContentService.SaveAsync(subsubpage, -1, contentSchedule, CancellationToken.None);
+        await ContentService.SaveAsync(subsubpage, Constants.Security.SuperUserKey, contentSchedule, CancellationToken.None);
 
         if (loadDraft is false)
         {
@@ -83,7 +83,7 @@ internal sealed class DocumentUrlServiceTests_HideTopLevel_False : UmbracoIntegr
         var secondRoot = ContentBuilder.CreateSimpleContent(ContentType, "Second Root", null);
         secondRoot.Key = new Guid("8E21BCD4-02CA-483D-84B0-1FC92702E198");
         var contentSchedule = ContentScheduleCollection.CreateWithEntry(DateTime.UtcNow.AddMinutes(-5), null);
-        await ContentService.SaveAsync(secondRoot, -1, contentSchedule, CancellationToken.None);
+        await ContentService.SaveAsync(secondRoot, Constants.Security.SuperUserKey, contentSchedule, CancellationToken.None);
 
         if (loadDraft is false)
         {
@@ -102,12 +102,12 @@ internal sealed class DocumentUrlServiceTests_HideTopLevel_False : UmbracoIntegr
         // Create a second root
         var secondRoot = ContentBuilder.CreateSimpleContent(ContentType, "Second Root", null);
         var contentSchedule = ContentScheduleCollection.CreateWithEntry(DateTime.UtcNow.AddMinutes(-5), null);
-        await ContentService.SaveAsync(secondRoot, -1, contentSchedule, CancellationToken.None);
+        await ContentService.SaveAsync(secondRoot, Constants.Security.SuperUserKey, contentSchedule, CancellationToken.None);
 
         // Create a child of second root
         var childOfSecondRoot = ContentBuilder.CreateSimpleContent(ContentType, "Child of Second Root", secondRoot);
         childOfSecondRoot.Key = new Guid("FF6654FB-BC68-4A65-8C6C-135567F50BD6");
-        await ContentService.SaveAsync(childOfSecondRoot, -1, contentSchedule, CancellationToken.None);
+        await ContentService.SaveAsync(childOfSecondRoot, Constants.Security.SuperUserKey, contentSchedule, CancellationToken.None);
 
         // Publish both the main root and the second root with descendants
         if (loadDraft is false)

@@ -13,7 +13,7 @@ public class VariantContentTests : VariantContentTestBase
     [Test]
     public async Task PublishedStructure_YieldsAllPublishedDocuments()
     {
-        await ContentService.SaveAsync(Root(), null, null, CancellationToken.None);
+        await ContentService.SaveAsync(Root(), Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
         await ContentService.PublishBranchAsync(Root(), PublishBranchFilter.IncludeUnpublished, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.PublishedContent);
@@ -39,7 +39,7 @@ public class VariantContentTests : VariantContentTestBase
     [Test]
     public async Task PublishedStructure_CanRefreshChild_InSingleCulture()
     {
-        await ContentService.SaveAsync(Root(), null, null, CancellationToken.None);
+        await ContentService.SaveAsync(Root(), Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
         await ContentService.PublishBranchAsync(Root(), PublishBranchFilter.IncludeUnpublished, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
         IContent child = Child();
@@ -47,7 +47,7 @@ public class VariantContentTests : VariantContentTestBase
         child.SetValue("message", "The updated child message in English (default)", "en-US");
         child.SetValue("message", "The updated child message in English (segment-1)", "en-US", "segment-1");
         child.SetValue("message", "The updated child message in English (segment-2)", "en-US", "segment-2");
-        await ContentService.SaveAsync(child, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(child, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
         await ContentService.PublishAsync(Child(), ["*"], global::Umbraco.Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.PublishedContent);
@@ -65,13 +65,13 @@ public class VariantContentTests : VariantContentTestBase
     [Test]
     public async Task PublishedStructure_CanRefreshChild_InMultipleCultures()
     {
-        await ContentService.SaveAsync(Root(), null, null, CancellationToken.None);
+        await ContentService.SaveAsync(Root(), Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
         await ContentService.PublishBranchAsync(Root(), PublishBranchFilter.IncludeUnpublished, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
         IContent child = Child();
         child.SetValue("title", "The updated child title in English", "en-US");
         child.SetValue("title", "The updated child title in Danish", "da-DK");
-        await ContentService.SaveAsync(child, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(child, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
         await ContentService.PublishAsync(Child(), ["*"], global::Umbraco.Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.PublishedContent);
@@ -83,12 +83,12 @@ public class VariantContentTests : VariantContentTestBase
     [Test]
     public async Task PublishedStructure_CanRefreshChild_InvariantCulture()
     {
-        await ContentService.SaveAsync(Root(), null, null, CancellationToken.None);
+        await ContentService.SaveAsync(Root(), Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
         await ContentService.PublishBranchAsync(Root(), PublishBranchFilter.IncludeUnpublished, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
         IContent child = Child();
         child.SetValue("count", 123456);
-        await ContentService.SaveAsync(child, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(child, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
         await ContentService.PublishAsync(Child(), ["*"], global::Umbraco.Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.PublishedContent);
@@ -100,7 +100,7 @@ public class VariantContentTests : VariantContentTestBase
     [Test]
     public async Task PublishedStructure_YieldsSystemFields()
     {
-        await ContentService.SaveAsync(Root(), null, null, CancellationToken.None);
+        await ContentService.SaveAsync(Root(), Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
         await ContentService.PublishBranchAsync(Root(), PublishBranchFilter.IncludeUnpublished, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.PublishedContent);

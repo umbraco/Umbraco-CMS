@@ -53,8 +53,8 @@ public class ProtectedContentTests : InvariantContentTestBase
             ]));
         Assert.That(entryResult.Success, Is.True);
 
-        await ContentService.SaveAsync(Root(), null, null, CancellationToken.None);
-        await ContentService.PublishBranchAsync(Root(), PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
+        await ContentService.SaveAsync(Root(), Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishBranchAsync(Root(), PublishBranchFilter.IncludeUnpublished, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.PublishedContent);
         Assert.That(documents, Has.Count.EqualTo(4));
@@ -71,8 +71,8 @@ public class ProtectedContentTests : InvariantContentTestBase
     [Test]
     public async Task PublishedStructure_CanAddContentProtectionWithoutRepublishing()
     {
-        await ContentService.SaveAsync(Root(), null, null, CancellationToken.None);
-        await ContentService.PublishBranchAsync(Root(), PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
+        await ContentService.SaveAsync(Root(), Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishBranchAsync(Root(), PublishBranchFilter.IncludeUnpublished, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
         IContent root = Root();
         Attempt<OperationResult?> entryResult = await PublicAccessService.SaveAsync(
@@ -121,8 +121,8 @@ public class ProtectedContentTests : InvariantContentTestBase
             ]));
         Assert.That(entryResult.Success, Is.True);
 
-        await ContentService.SaveAsync(Root(), null, null, CancellationToken.None);
-        await ContentService.PublishBranchAsync(Root(), PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
+        await ContentService.SaveAsync(Root(), Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishBranchAsync(Root(), PublishBranchFilter.IncludeUnpublished, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
         PublicAccessEntry? entry = await PublicAccessService.GetEntryForContentAsync(root);
         Assert.That(entry, Is.Not.Null);

@@ -83,7 +83,7 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
 
         try
         {
-            await ElementService.SaveAsync(element, null, null, CancellationToken.None);
+            await ElementService.SaveAsync(element, Constants.Security.SuperUserKey, null, CancellationToken.None);
             Assert.IsTrue(savedWasCalled);
         }
         finally
@@ -101,7 +101,7 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
         IElement element = new Element("content", -1, _elementType);
         element.SetCultureName("hello", "en-US");
         element.SetCultureName("bonjour", "fr-FR");
-        await ElementService.SaveAsync(element, null, null, CancellationToken.None);
+        await ElementService.SaveAsync(element, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         // re-get - dirty properties need resetting
         element = ElementService.GetById(element.Id);
@@ -126,7 +126,7 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
 
         try
         {
-            await ElementService.SaveAsync(element, null, null, CancellationToken.None);
+            await ElementService.SaveAsync(element, Constants.Security.SuperUserKey, null, CancellationToken.None);
             Assert.IsTrue(savedWasCalled);
         }
         finally
@@ -264,7 +264,7 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
     public async Task Can_Read_Published_Cultures_For_Invariant()
     {
         IElement element = new Element("content", -1, _elementType);
-        await ElementService.SaveAsync(element, null, null, CancellationToken.None);
+        await ElementService.SaveAsync(element, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         var publishedWasCalled = false;
 
@@ -299,7 +299,7 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
         IElement element = new Element("content", -1, _elementType);
         element.SetCultureName("hello", "en-US");
         element.SetCultureName("bonjour", "fr-FR");
-        await ElementService.SaveAsync(element, null, null, CancellationToken.None);
+        await ElementService.SaveAsync(element, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         // re-get - dirty properties need resetting
         element = ElementService.GetById(element.Id);
@@ -332,7 +332,7 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
     public async Task Can_Read_Unpublished_Cultures_For_Invariant()
     {
         IElement element = new Element("content", -1, _elementType);
-        await ElementService.SaveAsync(element, null, null, CancellationToken.None);
+        await ElementService.SaveAsync(element, Constants.Security.SuperUserKey, null, CancellationToken.None);
         ElementService.Publish(element, ["*"]);
 
         var unpublishedWasCalled = false;
@@ -369,7 +369,7 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
         IElement element = new Element("content", -1, _elementType);
         element.SetCultureName("hello", "en-US");
         element.SetCultureName("bonjour", "fr-FR");
-        await ElementService.SaveAsync(element, null, null, CancellationToken.None);
+        await ElementService.SaveAsync(element, Constants.Security.SuperUserKey, null, CancellationToken.None);
         ElementService.Publish(element, element.AvailableCultures.ToArray());
 
         // re-get - dirty properties need resetting
@@ -410,7 +410,7 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
         IElement element = new Element("content", -1, _elementType);
         element.SetCultureName("hello", "en-US");
         element.SetCultureName("bonjour", "fr-FR");
-        await ElementService.SaveAsync(element, null, null, CancellationToken.None);
+        await ElementService.SaveAsync(element, Constants.Security.SuperUserKey, null, CancellationToken.None);
         ElementService.Publish(element, element.AvailableCultures.ToArray());
 
         // re-get - dirty properties need resetting
@@ -488,7 +488,7 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
 
         IElement element = new Element("content", -1, _elementType);
         element.SetCultureName("hello", "en-US");
-        await ElementService.SaveAsync(element, null, null, CancellationToken.None);
+        await ElementService.SaveAsync(element, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         // re-get so nothing is dirty, then re-save without changes
         element = ElementService.GetById(element.Id);
@@ -506,7 +506,7 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
 
         try
         {
-            await ElementService.SaveAsync(element, null, null, CancellationToken.None);
+            await ElementService.SaveAsync(element, Constants.Security.SuperUserKey, null, CancellationToken.None);
             Assert.IsTrue(savedWasCalled);
         }
         finally
@@ -519,7 +519,7 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
     public async Task Can_Read_Empty_Saved_Cultures_For_No_Op_Invariant_Re_Save()
     {
         IElement element = new Element("content", -1, _elementType);
-        await ElementService.SaveAsync(element, null, null, CancellationToken.None);
+        await ElementService.SaveAsync(element, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         // re-get so nothing is dirty, then re-save without changes
         element = ElementService.GetById(element.Id);
@@ -537,7 +537,7 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
 
         try
         {
-            await ElementService.SaveAsync(element, null, null, CancellationToken.None);
+            await ElementService.SaveAsync(element, Constants.Security.SuperUserKey, null, CancellationToken.None);
             Assert.IsTrue(savedWasCalled);
         }
         finally
@@ -550,7 +550,7 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
     public async Task Can_Read_Star_Marker_Saved_Cultures_For_Changed_Invariant_Save()
     {
         IElement element = new Element("content", -1, _elementType);
-        await ElementService.SaveAsync(element, null, null, CancellationToken.None);
+        await ElementService.SaveAsync(element, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         // re-get so nothing is dirty, then make a genuine change before re-saving
         element = ElementService.GetById(element.Id);
@@ -569,7 +569,7 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
 
         try
         {
-            await ElementService.SaveAsync(element, null, null, CancellationToken.None);
+            await ElementService.SaveAsync(element, Constants.Security.SuperUserKey, null, CancellationToken.None);
             Assert.IsTrue(savedWasCalled);
         }
         finally
@@ -630,7 +630,7 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
     public async Task Can_Read_Unpublished_Cultures_When_Deleting_Invariant()
     {
         IElement element = new Element("content", -1, _elementType);
-        await ElementService.SaveAsync(element, null, null, CancellationToken.None);
+        await ElementService.SaveAsync(element, Constants.Security.SuperUserKey, null, CancellationToken.None);
         ElementService.Publish(element, ["*"]);
 
         // re-get - dirty properties need resetting
@@ -670,7 +670,7 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
         IElement element = new Element("content", -1, _elementType);
         element.SetCultureName("hello", "en-US");
         element.SetCultureName("bonjour", "fr-FR");
-        await ElementService.SaveAsync(element, null, null, CancellationToken.None);
+        await ElementService.SaveAsync(element, Constants.Security.SuperUserKey, null, CancellationToken.None);
         ElementService.Publish(element, element.AvailableCultures.ToArray());
 
         // re-get - dirty properties need resetting
@@ -712,7 +712,7 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
         IElement element = new Element("content", -1, _elementType);
         element.SetCultureName("hello", "en-US");
         element.SetCultureName("bonjour", "fr-FR");
-        await ElementService.SaveAsync(element, null, null, CancellationToken.None);
+        await ElementService.SaveAsync(element, Constants.Security.SuperUserKey, null, CancellationToken.None);
         ElementService.Publish(element, element.AvailableCultures.ToArray());
 
         var unpublishedWasCalled = false;

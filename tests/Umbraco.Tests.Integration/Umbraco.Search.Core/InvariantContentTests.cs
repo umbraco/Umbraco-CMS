@@ -16,7 +16,7 @@ public partial class InvariantContentTests : InvariantContentTestBase
             content.SetValue("title", content.GetValue<string>("title") + " (draft)");
             content.SetValue("count", content.GetValue<int>("count") + 1);
             content.SetValue("tags", content.GetValue<string>("tags")!.TrimEnd("]") + ",\"draft\"]");
-            await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+            await ContentService.SaveAsync(content, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
         }
 
         IndexerAndSearcher.Reset();

@@ -14,8 +14,8 @@ public partial class InvariantContentTests
     [Test]
     public async Task PublishedStructure_YieldsAllPublishedDocuments()
     {
-        await ContentService.SaveAsync(Root(), null, null, CancellationToken.None);
-        await ContentService.PublishBranchAsync(Root(), PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
+        await ContentService.SaveAsync(Root(), Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishBranchAsync(Root(), PublishBranchFilter.IncludeUnpublished, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.PublishedContent);
         Assert.That(documents, Has.Count.EqualTo(4));
@@ -40,14 +40,14 @@ public partial class InvariantContentTests
     [Test]
     public async Task PublishedStructure_CanRefreshChild()
     {
-        await ContentService.SaveAsync(Root(), null, null, CancellationToken.None);
-        await ContentService.PublishBranchAsync(Root(), PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
+        await ContentService.SaveAsync(Root(), Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishBranchAsync(Root(), PublishBranchFilter.IncludeUnpublished, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
         IContent child = Child();
         child.SetValue("title", "The updated child title");
         child.SetValue("count", 123456);
-        await ContentService.SaveAsync(child, null, null, CancellationToken.None);
-        await ContentService.PublishAsync(child, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
+        await ContentService.SaveAsync(child, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishAsync(child, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.PublishedContent);
         Assert.That(documents, Has.Count.EqualTo(4));
@@ -66,8 +66,8 @@ public partial class InvariantContentTests
     [Test]
     public async Task PublishedStructure_YieldsStructuralFields()
     {
-        await ContentService.SaveAsync(Root(), null, null, CancellationToken.None);
-        await ContentService.PublishBranchAsync(Root(), PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
+        await ContentService.SaveAsync(Root(), Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishBranchAsync(Root(), PublishBranchFilter.IncludeUnpublished, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.PublishedContent);
         Assert.That(documents, Has.Count.EqualTo(4));
@@ -92,8 +92,8 @@ public partial class InvariantContentTests
     [Test]
     public async Task PublishedStructure_YieldsSystemFields()
     {
-        await ContentService.SaveAsync(Root(), null, null, CancellationToken.None);
-        await ContentService.PublishBranchAsync(Root(), PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
+        await ContentService.SaveAsync(Root(), Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishBranchAsync(Root(), PublishBranchFilter.IncludeUnpublished, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.PublishedContent);
         Assert.That(documents, Has.Count.EqualTo(4));
@@ -118,14 +118,14 @@ public partial class InvariantContentTests
     [Test]
     public async Task PublishedStructure_CanUpdateEditableSystemFields()
     {
-        await ContentService.SaveAsync(Root(), null, null, CancellationToken.None);
-        await ContentService.PublishBranchAsync(Root(), PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
+        await ContentService.SaveAsync(Root(), Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishBranchAsync(Root(), PublishBranchFilter.IncludeUnpublished, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
         IContent child = Child();
         child.Name = "The updated child name";
         child.SetValue("tags", "[\"updated-tag1\",\"updated-tag2\",\"updated-tag3\"]");
-        await ContentService.SaveAsync(child, null, null, CancellationToken.None);
-        await ContentService.PublishAsync(child, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
+        await ContentService.SaveAsync(child, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishAsync(child, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.PublishedContent);
         Assert.That(documents, Has.Count.EqualTo(4));
@@ -137,9 +137,9 @@ public partial class InvariantContentTests
     [Test]
     public async Task PublishedStructure_RemovesAllPublishedDocumentsWhenRootIsTrashed()
     {
-        await ContentService.SaveAsync(Root(), null, null, CancellationToken.None);
-        await ContentService.PublishBranchAsync(Root(), PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
-        await ContentService.MoveToRecycleBinAsync(Root(), Constants.Security.SuperUserKey, CancellationToken.None);
+        await ContentService.SaveAsync(Root(), Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishBranchAsync(Root(), PublishBranchFilter.IncludeUnpublished, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
+        await ContentService.MoveToRecycleBinAsync(Root(), Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.PublishedContent);
         Assert.That(documents, Has.Count.EqualTo(0));
@@ -148,9 +148,9 @@ public partial class InvariantContentTests
     [Test]
     public async Task PublishedStructure_RemovesAllPublishedDescendantDocumentsWhenChildIsTrashed()
     {
-        await ContentService.SaveAsync(Root(), null, null, CancellationToken.None);
-        await ContentService.PublishBranchAsync(Root(), PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
-        await ContentService.MoveToRecycleBinAsync(Child(), Constants.Security.SuperUserKey, CancellationToken.None);
+        await ContentService.SaveAsync(Root(), Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishBranchAsync(Root(), PublishBranchFilter.IncludeUnpublished, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
+        await ContentService.MoveToRecycleBinAsync(Child(), Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.PublishedContent);
         Assert.That(documents, Has.Count.EqualTo(1));
@@ -160,7 +160,7 @@ public partial class InvariantContentTests
     [Test]
     public async Task PublishedStructure_UpdatesStructuralFieldsWhenRootIsMoved()
     {
-        await ContentService.PublishBranchAsync(Root(), PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
+        await ContentService.PublishBranchAsync(Root(), PublishBranchFilter.IncludeUnpublished, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
         var secondRootKey = Guid.NewGuid();
         Content secondRoot = new ContentBuilder()
@@ -168,10 +168,10 @@ public partial class InvariantContentTests
             .WithContentType(ContentTypeService.GetAsync(Root().ContentType.Key).GetAwaiter().GetResult()!)
             .WithName("Second Root")
             .Build();
-        await ContentService.SaveAsync(secondRoot, null, null, CancellationToken.None);
-        await ContentService.PublishAsync(secondRoot, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
+        await ContentService.SaveAsync(secondRoot, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishAsync(secondRoot, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
-        Attempt<ContentMoveOperationStatus> moveResult = await ContentService.MoveAsync(Root(), secondRoot.Key, true, Constants.Security.SuperUserKey, CancellationToken.None);
+        Attempt<ContentMoveOperationStatus> moveResult = await ContentService.MoveAsync(Root(), secondRoot.Key, true, Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.That(moveResult.Result, Is.EqualTo(ContentMoveOperationStatus.Success));
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.PublishedContent);
@@ -201,7 +201,7 @@ public partial class InvariantContentTests
     [Test]
     public async Task PublishedStructure_UpdatesStructuralFieldsWhenChildIsMoved()
     {
-        await ContentService.PublishBranchAsync(Root(), PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
+        await ContentService.PublishBranchAsync(Root(), PublishBranchFilter.IncludeUnpublished, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
         var secondRootKey = Guid.NewGuid();
         Content secondRoot = new ContentBuilder()
@@ -209,10 +209,10 @@ public partial class InvariantContentTests
             .WithContentType(ContentTypeService.GetAsync(Root().ContentType.Key).GetAwaiter().GetResult()!)
             .WithName("Second Root")
             .Build();
-        await ContentService.SaveAsync(secondRoot, null, null, CancellationToken.None);
-        await ContentService.PublishAsync(secondRoot, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
+        await ContentService.SaveAsync(secondRoot, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishAsync(secondRoot, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
-        Attempt<ContentMoveOperationStatus> moveResult = await ContentService.MoveAsync(Child(), secondRoot.Key, true, Constants.Security.SuperUserKey, CancellationToken.None);
+        Attempt<ContentMoveOperationStatus> moveResult = await ContentService.MoveAsync(Child(), secondRoot.Key, true, Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.That(moveResult.Result, Is.EqualTo(ContentMoveOperationStatus.Success));
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.PublishedContent);
@@ -243,7 +243,7 @@ public partial class InvariantContentTests
     [Test]
     public async Task PublishedStructure_RemovesChildAndDescendantsWhenMovedToAnUnpublishedParent()
     {
-        await ContentService.PublishBranchAsync(Root(), PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
+        await ContentService.PublishBranchAsync(Root(), PublishBranchFilter.IncludeUnpublished, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
         var secondRootKey = Guid.NewGuid();
         Content secondRoot = new ContentBuilder()
@@ -251,9 +251,9 @@ public partial class InvariantContentTests
             .WithContentType(ContentTypeService.GetAsync(Root().ContentType.Key).GetAwaiter().GetResult()!)
             .WithName("Second Root")
             .Build();
-        await ContentService.SaveAsync(secondRoot, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(secondRoot, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
 
-        Attempt<ContentMoveOperationStatus> moveResult = await ContentService.MoveAsync(Child(), secondRoot.Key, true, Constants.Security.SuperUserKey, CancellationToken.None);
+        Attempt<ContentMoveOperationStatus> moveResult = await ContentService.MoveAsync(Child(), secondRoot.Key, true, Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.That(moveResult.Result, Is.EqualTo(ContentMoveOperationStatus.Success));
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.PublishedContent);
@@ -266,7 +266,7 @@ public partial class InvariantContentTests
     [Test]
     public async Task PublishedStructure_RebuildIndexYieldsAllDocuments()
     {
-        await ContentService.PublishBranchAsync(Root(), PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
+        await ContentService.PublishBranchAsync(Root(), PublishBranchFilter.IncludeUnpublished, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         ContentIndexingService.Rebuild(IndexAliases.PublishedContent, DefaultOrigin);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.PublishedContent);
@@ -292,9 +292,9 @@ public partial class InvariantContentTests
     [Test]
     public async Task PublishedStructure_RebuildOmitsTrashedContent()
     {
-        await ContentService.PublishBranchAsync(Root(), PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
-        await ContentService.MoveToRecycleBinAsync(Grandchild(), Constants.Security.SuperUserKey, CancellationToken.None);
-        await ContentService.MoveToRecycleBinAsync(Child(), Constants.Security.SuperUserKey, CancellationToken.None);
+        await ContentService.PublishBranchAsync(Root(), PublishBranchFilter.IncludeUnpublished, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
+        await ContentService.MoveToRecycleBinAsync(Grandchild(), Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
+        await ContentService.MoveToRecycleBinAsync(Child(), Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
         // at this point we have:
         // - Root in the content tree root (the only item not in the recycle bin)

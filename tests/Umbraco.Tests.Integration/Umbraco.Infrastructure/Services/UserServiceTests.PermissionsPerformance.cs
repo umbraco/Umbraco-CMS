@@ -44,10 +44,10 @@ internal sealed partial class UserServiceTests
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var root = ContentBuilder.CreateSimpleContent(contentType, "root");
-        await ContentService.SaveAsync(root, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(root, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         var parent = ContentBuilder.CreateSimpleContent(contentType, "parent", root.Id);
-        await ContentService.SaveAsync(parent, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(parent, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         var children = new Content[childCount];
         for (var i = 0; i < childCount; i++)

@@ -36,13 +36,13 @@ internal sealed class ContentServicePublishBranchTests : UmbracoIntegrationTest
 
         IContent iRoot = new Content("iroot", -1, iContentType);
         iRoot.SetValue("ip", "iroot");
-        await ContentService.SaveAsync(iRoot, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(iRoot, Constants.Security.SuperUserKey, null, CancellationToken.None);
         IContent ii1 = new Content("ii1", iRoot, iContentType);
         ii1.SetValue("ip", "vii1");
-        await ContentService.SaveAsync(ii1, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(ii1, Constants.Security.SuperUserKey, null, CancellationToken.None);
         IContent ii2 = new Content("ii2", iRoot, iContentType);
         ii2.SetValue("ip", "vii2");
-        await ContentService.SaveAsync(ii2, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(ii2, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         // iroot    !published   !edited
         //  ii1     !published   !edited
@@ -62,20 +62,20 @@ internal sealed class ContentServicePublishBranchTests : UmbracoIntegrationTest
 
         IContent ii11 = new Content("ii11", ii1, iContentType);
         ii11.SetValue("ip", "vii11");
-        await ContentService.SaveAsync(ii11, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(ii11, Constants.Security.SuperUserKey, null, CancellationToken.None);
         await ContentService.PublishAsync(ii11, ii11.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
         IContent ii12 = new Content("ii12", ii1, iContentType);
         ii11.SetValue("ip", "vii12");
-        await ContentService.SaveAsync(ii12, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(ii12, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         await ContentService.PublishAsync(ii2, ii2.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
         IContent ii21 = new Content("ii21", ii2, iContentType);
         ii21.SetValue("ip", "vii21");
-        await ContentService.SaveAsync(ii21, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(ii21, Constants.Security.SuperUserKey, null, CancellationToken.None);
         await ContentService.PublishAsync(ii21, ii21.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
         IContent ii22 = new Content("ii22", ii2, iContentType);
         ii22.SetValue("ip", "vii22");
-        await ContentService.SaveAsync(ii22, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(ii22, Constants.Security.SuperUserKey, null, CancellationToken.None);
         await ContentService.UnpublishAsync(ii2, "*", Constants.Security.SuperUserKey, CancellationToken.None);
 
         // iroot    published    !edited
@@ -101,9 +101,9 @@ internal sealed class ContentServicePublishBranchTests : UmbracoIntegrationTest
 
         // prepare
         iRoot.SetValue("ip", "changed");
-        await ContentService.SaveAsync(iRoot, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(iRoot, Constants.Security.SuperUserKey, null, CancellationToken.None);
         ii11.SetValue("ip", "changed");
-        await ContentService.SaveAsync(ii11, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(ii11, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         // iroot    published    edited     ***
         //  ii1     published    !edited
@@ -168,7 +168,7 @@ internal sealed class ContentServicePublishBranchTests : UmbracoIntegrationTest
         vRoot.SetValue("vp", "vroot.de", "de");
         vRoot.SetValue("vp", "vroot.ru", "ru");
         vRoot.SetValue("vp", "vroot.es", "es");
-        await ContentService.SaveAsync(vRoot, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(vRoot, Constants.Security.SuperUserKey, null, CancellationToken.None);
         await ContentService.PublishAsync(vRoot, vRoot.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         // create/publish child
@@ -180,12 +180,12 @@ internal sealed class ContentServicePublishBranchTests : UmbracoIntegrationTest
         iv1.SetValue("vp", "iv1.de", "de");
         iv1.SetValue("vp", "iv1.ru", "ru");
         iv1.SetValue("vp", "iv1.es", "es");
-        await ContentService.SaveAsync(iv1, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(iv1, Constants.Security.SuperUserKey, null, CancellationToken.None);
         await ContentService.PublishAsync(iv1, iv1.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         // update the child
         iv1.SetValue("vp", "UPDATED-iv1.de", "de");
-        await ContentService.SaveAsync(iv1, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(iv1, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         var r = (await ContentService.PublishBranchAsync(vRoot, PublishBranchFilter.Default, vRoot.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None))
             .ToArray(); // no culture specified so "*" is used, so all cultures
@@ -207,7 +207,7 @@ internal sealed class ContentServicePublishBranchTests : UmbracoIntegrationTest
         vRoot.SetValue("vp", "vroot.de", "de");
         vRoot.SetValue("vp", "vroot.ru", "ru");
         vRoot.SetValue("vp", "vroot.es", "es");
-        await ContentService.SaveAsync(vRoot, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(vRoot, Constants.Security.SuperUserKey, null, CancellationToken.None);
         await ContentService.PublishAsync(vRoot, vRoot.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         // create/publish child
@@ -219,12 +219,12 @@ internal sealed class ContentServicePublishBranchTests : UmbracoIntegrationTest
         iv1.SetValue("vp", "iv1.de", "de");
         iv1.SetValue("vp", "iv1.ru", "ru");
         iv1.SetValue("vp", "iv1.es", "es");
-        await ContentService.SaveAsync(iv1, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(iv1, Constants.Security.SuperUserKey, null, CancellationToken.None);
         await ContentService.PublishAsync(iv1, iv1.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         // update the child
         iv1.SetValue("vp", "UPDATED-iv1.de", "de");
-        var saveResult = await ContentService.SaveAsync(iv1, null, null, CancellationToken.None);
+        var saveResult = await ContentService.SaveAsync(iv1, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         var r = (await ContentService.PublishBranchAsync(vRoot, PublishBranchFilter.Default, ["de"], Constants.Security.SuperUserKey, CancellationToken.None)).ToArray();
         Assert.AreEqual(PublishResultType.SuccessPublishAlready, r[0].Result);
@@ -244,7 +244,7 @@ internal sealed class ContentServicePublishBranchTests : UmbracoIntegrationTest
         vRoot.SetValue("vp", "vroot.de", "de");
         vRoot.SetValue("vp", "vroot.ru", "ru");
         vRoot.SetValue("vp", "vroot.es", "es");
-        await ContentService.SaveAsync(vRoot, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(vRoot, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         IContent iv1 = new Content("iv1", vRoot, vContentType, "de");
         iv1.SetCultureName("iv1.de", "de");
@@ -254,7 +254,7 @@ internal sealed class ContentServicePublishBranchTests : UmbracoIntegrationTest
         iv1.SetValue("vp", "iv1.de", "de");
         iv1.SetValue("vp", "iv1.ru", "ru");
         iv1.SetValue("vp", "iv1.es", "es");
-        await ContentService.SaveAsync(iv1, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(iv1, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         IContent iv2 = new Content("iv2", vRoot, vContentType, "de");
         iv2.SetCultureName("iv2.de", "de");
@@ -264,7 +264,7 @@ internal sealed class ContentServicePublishBranchTests : UmbracoIntegrationTest
         iv2.SetValue("vp", "iv2.de", "de");
         iv2.SetValue("vp", "iv2.ru", "ru");
         iv2.SetValue("vp", "iv2.es", "es");
-        await ContentService.SaveAsync(iv2, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(iv2, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         // vroot    !published   !edited
         //  iv1     !published   !edited
@@ -283,7 +283,7 @@ internal sealed class ContentServicePublishBranchTests : UmbracoIntegrationTest
         vRoot.SetValue("vp", "changed.de", "de");
         vRoot.SetValue("vp", "changed.ru", "ru");
         vRoot.SetValue("vp", "changed.es", "es");
-        await ContentService.SaveAsync(vRoot, null, null, CancellationToken.None); // now root has drafts in all cultures
+        await ContentService.SaveAsync(vRoot, Constants.Security.SuperUserKey, null, CancellationToken.None); // now root has drafts in all cultures
 
         await ContentService.PublishAsync(iv1, new[] { "de", "ru" }, Constants.Security.SuperUserKey, CancellationToken.None); // now iv1 de and ru are published
 
@@ -291,7 +291,7 @@ internal sealed class ContentServicePublishBranchTests : UmbracoIntegrationTest
         iv1.SetValue("vp", "changed.de", "de");
         iv1.SetValue("vp", "changed.ru", "ru");
         iv1.SetValue("vp", "changed.es", "es");
-        await ContentService.SaveAsync(iv1, null, null, CancellationToken.None); // now iv1 has drafts in all cultures
+        await ContentService.SaveAsync(iv1, Constants.Security.SuperUserKey, null, CancellationToken.None); // now iv1 has drafts in all cultures
 
         // validate - everything published for root, because no culture was specified = all
         Assert.IsTrue(vRoot.Published);
@@ -351,23 +351,23 @@ internal sealed class ContentServicePublishBranchTests : UmbracoIntegrationTest
         // invariant root -> invariant -> variant
         IContent iRoot = new Content("iroot", -1, iContentType);
         iRoot.SetValue("ip", "iroot");
-        await ContentService.SaveAsync(iRoot, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(iRoot, Constants.Security.SuperUserKey, null, CancellationToken.None);
         await ContentService.PublishAsync(iRoot, iRoot.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
         IContent ii1 = new Content("ii1", iRoot, iContentType);
         ii1.SetValue("ip", "vii1");
-        await ContentService.SaveAsync(ii1, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(ii1, Constants.Security.SuperUserKey, null, CancellationToken.None);
         await ContentService.PublishAsync(ii1, ii1.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
         ii1.SetValue("ip", "changed");
-        await ContentService.SaveAsync(ii1, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(ii1, Constants.Security.SuperUserKey, null, CancellationToken.None);
         IContent iv11 = new Content("iv11.de", ii1, vContentType, "de");
         iv11.SetValue("ip", "iv11");
         iv11.SetValue("vp", "iv11.de", "de");
         iv11.SetValue("vp", "iv11.ru", "ru");
         iv11.SetValue("vp", "iv11.es", "es");
-        await ContentService.SaveAsync(iv11, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(iv11, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         iv11.SetCultureName("iv11.ru", "ru");
-        await ContentService.SaveAsync(iv11, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(iv11, Constants.Security.SuperUserKey, null, CancellationToken.None);
         var xxx = await ContentService.PublishAsync(iv11, new[] { "de", "ru" }, Constants.Security.SuperUserKey, CancellationToken.None);
 
         Assert.AreEqual("iv11.de", iv11.GetValue("vp", "de", published: true));
@@ -376,7 +376,7 @@ internal sealed class ContentServicePublishBranchTests : UmbracoIntegrationTest
         iv11.SetValue("ip", "changed");
         iv11.SetValue("vp", "changed.de", "de");
         iv11.SetValue("vp", "changed.ru", "ru");
-        await ContentService.SaveAsync(iv11, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(iv11, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         return (iRoot, ii1, iv11);
     }
@@ -444,24 +444,24 @@ internal sealed class ContentServicePublishBranchTests : UmbracoIntegrationTest
         // Create content (published root, published child, unpublished child, changed child).
         IContent iRoot = new Content("iroot", -1, iContentType);
         iRoot.SetValue("ip", "iroot");
-        await ContentService.SaveAsync(iRoot, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(iRoot, Constants.Security.SuperUserKey, null, CancellationToken.None);
         await ContentService.PublishAsync(iRoot, iRoot.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         IContent ii1 = new Content("ii1", iRoot, iContentType);
         ii1.SetValue("ip", "vii1");
-        await ContentService.SaveAsync(ii1, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(ii1, Constants.Security.SuperUserKey, null, CancellationToken.None);
         await ContentService.PublishAsync(ii1, ii1.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         IContent ii2 = new Content("ii2", iRoot, iContentType);
         ii2.SetValue("ip", "vii2");
-        await ContentService.SaveAsync(ii2, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(ii2, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         IContent ii3 = new Content("ii3", iRoot, iContentType);
         ii3.SetValue("ip", "vii3");
-        await ContentService.SaveAsync(ii3, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(ii3, Constants.Security.SuperUserKey, null, CancellationToken.None);
         await ContentService.PublishAsync(ii3, ii3.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
         ii3.SetValue("ip", "vii3a");
-        await ContentService.SaveAsync(ii3, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(ii3, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         var result = (await ContentService.PublishBranchAsync(iRoot, publishBranchFilter, ["*"], Constants.Security.SuperUserKey, CancellationToken.None)).ToArray();
 
@@ -493,7 +493,7 @@ internal sealed class ContentServicePublishBranchTests : UmbracoIntegrationTest
         vRoot.SetValue("ip", "vroot");
         vRoot.SetValue("vp", "vroot.de", "de");
         vRoot.SetValue("vp", "vroot.ru", "ru");
-        await ContentService.SaveAsync(vRoot, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(vRoot, Constants.Security.SuperUserKey, null, CancellationToken.None);
         await ContentService.PublishAsync(vRoot, vRoot.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         IContent iv1 = new Content("iv1", vRoot, vContentType, "de");
@@ -502,7 +502,7 @@ internal sealed class ContentServicePublishBranchTests : UmbracoIntegrationTest
         iv1.SetValue("ip", "iv1");
         iv1.SetValue("vp", "iv1.de", "de");
         iv1.SetValue("vp", "iv1.ru", "ru");
-        await ContentService.SaveAsync(iv1, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(iv1, Constants.Security.SuperUserKey, null, CancellationToken.None);
         await ContentService.PublishAsync(iv1, iv1.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         IContent iv2 = new Content("iv2", vRoot, vContentType, "de");
@@ -511,7 +511,7 @@ internal sealed class ContentServicePublishBranchTests : UmbracoIntegrationTest
         iv2.SetValue("ip", "iv2");
         iv2.SetValue("vp", "iv2.de", "de");
         iv2.SetValue("vp", "iv2.ru", "ru");
-        await ContentService.SaveAsync(iv2, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(iv2, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         // When testing with a specific culture, publish the other one, so we can test that
         // the specified unpublished culture is handled correctly.
@@ -526,12 +526,12 @@ internal sealed class ContentServicePublishBranchTests : UmbracoIntegrationTest
         iv3.SetValue("ip", "iv3");
         iv3.SetValue("vp", "iv3.de", "de");
         iv3.SetValue("vp", "iv3.ru", "ru");
-        await ContentService.SaveAsync(iv3, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(iv3, Constants.Security.SuperUserKey, null, CancellationToken.None);
         await ContentService.PublishAsync(iv3, iv3.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
         iv3.SetValue("ip", "iv3a");
         iv3.SetValue("vp", "iv3a.de", "de");
         iv3.SetValue("vp", "iv3a.ru", "ru");
-        await ContentService.SaveAsync(iv3, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(iv3, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         var cultures = culture == "*" ? vRoot.AvailableCultures.ToArray() : new[] { culture };
         var result = (await ContentService.PublishBranchAsync(vRoot, publishBranchFilter, cultures, Constants.Security.SuperUserKey, CancellationToken.None)).ToArray();

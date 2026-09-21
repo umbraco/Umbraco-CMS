@@ -40,7 +40,7 @@ internal sealed class ContentServiceVariantTests : UmbracoIntegrationTest
         IContent content = await ContentService.CreateAsync("Test Item", null, contentType, Constants.Security.SuperUserKey, CancellationToken.None);
         content.SetCultureName("Test item", cultureNameCultureCode);
         content.SetValue("title", "Title", valueCultureCode);
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         var publishResult = await ContentService.PublishAsync(content, [publishCultureCode], Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.IsTrue(publishResult.Success);
@@ -66,7 +66,7 @@ internal sealed class ContentServiceVariantTests : UmbracoIntegrationTest
         IContent content = await ContentService.CreateAsync("Test Item", null, contentType, Constants.Security.SuperUserKey, CancellationToken.None);
         content.SetCultureName("Test item", cultureNameCultureCode);
         content.SetValue("title", "Title", valueCultureCode);
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
         // use correctly cased culture code to publish
         await ContentService.PublishAsync(content, ["en-US"], Constants.Security.SuperUserKey, CancellationToken.None);
 
@@ -93,12 +93,12 @@ internal sealed class ContentServiceVariantTests : UmbracoIntegrationTest
         IContent root = await ContentService.CreateAsync("Root", null, contentType, Constants.Security.SuperUserKey, CancellationToken.None);
         root.SetCultureName("Root", cultureNameCultureCode);
         root.SetValue("title", "Root Title", valueCultureCode);
-        await ContentService.SaveAsync(root, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(root, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         var child = await ContentService.CreateAsync("Child", root.Key, contentType, Constants.Security.SuperUserKey, CancellationToken.None);
         child.SetCultureName("Child", cultureNameCultureCode);
         child.SetValue("title", "Child Title", valueCultureCode);
-        await ContentService.SaveAsync(child, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(child, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         var publishResult = await ContentService.PublishBranchAsync(root, PublishBranchFilter.All, [publishCultureCode], Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.AreEqual(2, publishResult.Count());
@@ -138,7 +138,7 @@ internal sealed class ContentServiceVariantTests : UmbracoIntegrationTest
         IContent content = await ContentService.CreateAsync("Test Item", null, contentType, Constants.Security.SuperUserKey, CancellationToken.None);
         content.SetCultureInfo("en-gb", "Test item", DateTime.UtcNow);
         content.SetValue("title", "Title", "en-gb");
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         var publishResult = await ContentService.PublishAsync(content, ["en-gb"], Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.IsTrue(publishResult.Success);

@@ -43,7 +43,7 @@ public class DistributedContentIndexRebuilderTests : TestBase
             .WithAlias("theContent")
             .WithAllowAsRoot(true)
             .Build();
-        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+        await ContentTypeService.CreateAsync(contentType, Cms.Core.Constants.Security.SuperUserKey);
 
         for (var i = 0; i < 5; i++)
         {
@@ -51,8 +51,8 @@ public class DistributedContentIndexRebuilderTests : TestBase
                 .WithContentType(contentType)
                 .WithName($"Content {i}")
                 .Build();
-            await ContentService.SaveAsync(content, null, null, CancellationToken.None);
-            await ContentService.PublishAsync(content, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
+            await ContentService.SaveAsync(content, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
+            await ContentService.PublishAsync(content, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         }
 
         IMediaType mediaType = MediaTypeService.Get("Folder")
@@ -71,7 +71,7 @@ public class DistributedContentIndexRebuilderTests : TestBase
             .WithAlias("theMember")
             .Build();
 
-        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
+        await MemberTypeService.CreateAsync(memberType, Cms.Core.Constants.Security.SuperUserKey);
 
         for (var i = 0; i < 5; i++)
         {

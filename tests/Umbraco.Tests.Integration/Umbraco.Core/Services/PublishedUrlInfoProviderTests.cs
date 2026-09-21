@@ -106,12 +106,12 @@ internal sealed class PublishedUrlInfoProviderTests : PublishedUrlInfoProviderTe
         // Create a second root
         var secondRoot = ContentBuilder.CreateSimpleContent(ContentType, "Second Root", null);
         var contentSchedule = ContentScheduleCollection.CreateWithEntry(DateTime.UtcNow.AddMinutes(-5), null);
-        await ContentService.SaveAsync(secondRoot, -1, contentSchedule, CancellationToken.None);
+        await ContentService.SaveAsync(secondRoot, Constants.Security.SuperUserKey, contentSchedule, CancellationToken.None);
 
         // Create a child of second root
         var childOfSecondRoot = ContentBuilder.CreateSimpleContent(ContentType, Subpage.Name, secondRoot);
         childOfSecondRoot.Key = new Guid("FF6654FB-BC68-4A65-8C6C-135567F50BD6");
-        await ContentService.SaveAsync(childOfSecondRoot, -1, contentSchedule, CancellationToken.None);
+        await ContentService.SaveAsync(childOfSecondRoot, Constants.Security.SuperUserKey, contentSchedule, CancellationToken.None);
 
         // Publish both the main root and the second root with descendants
         await ContentService.PublishBranchAsync(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
@@ -137,12 +137,12 @@ internal sealed class PublishedUrlInfoProviderTests : PublishedUrlInfoProviderTe
         // Create a second root
         var secondRoot = ContentBuilder.CreateSimpleContent(ContentType, "Second Root", null);
         var contentSchedule = ContentScheduleCollection.CreateWithEntry(DateTime.UtcNow.AddMinutes(-5), null);
-        await ContentService.SaveAsync(secondRoot, -1, contentSchedule, CancellationToken.None);
+        await ContentService.SaveAsync(secondRoot, Constants.Security.SuperUserKey, contentSchedule, CancellationToken.None);
 
         // Create a child of second root
         var childOfSecondRoot = ContentBuilder.CreateSimpleContent(ContentType, Subpage.Name, secondRoot);
         childOfSecondRoot.Key = new Guid("FF6654FB-BC68-4A65-8C6C-135567F50BD6");
-        await ContentService.SaveAsync(childOfSecondRoot, -1, contentSchedule, CancellationToken.None);
+        await ContentService.SaveAsync(childOfSecondRoot, Constants.Security.SuperUserKey, contentSchedule, CancellationToken.None);
 
         // Publish both the main root and the second root with descendants
         await ContentService.PublishBranchAsync(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);

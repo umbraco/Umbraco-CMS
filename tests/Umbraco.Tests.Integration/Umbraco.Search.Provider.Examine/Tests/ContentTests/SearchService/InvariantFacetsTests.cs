@@ -239,7 +239,7 @@ public class InvariantFacetsTests : SearcherTestBase
             .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.Integer)
             .Done()
             .Build();
-        await ContentTypeService.CreateAsync(ContentType, Constants.Security.SuperUserKey);
+        await ContentTypeService.CreateAsync(ContentType, Cms.Core.Constants.Security.SuperUserKey);
     }
 
     private async Task CreateDatetimeDocType()
@@ -252,7 +252,7 @@ public class InvariantFacetsTests : SearcherTestBase
             .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.DateTime)
             .Done()
             .Build();
-        await ContentTypeService.CreateAsync(ContentType, Constants.Security.SuperUserKey);
+        await ContentTypeService.CreateAsync(ContentType, Cms.Core.Constants.Security.SuperUserKey);
     }
 
     private async Task CreateDatetimeDocuments(DateTimeOffset[] values)
@@ -288,7 +288,7 @@ public class InvariantFacetsTests : SearcherTestBase
             .Done()
             .Build();
 
-        await DataTypeService.CreateAsync(dataType, Constants.Security.SuperUserKey);
+        await DataTypeService.CreateAsync(dataType, Cms.Core.Constants.Security.SuperUserKey);
         ContentType = new ContentTypeBuilder()
             .WithAlias("invariant")
             .AddPropertyType()
@@ -297,7 +297,7 @@ public class InvariantFacetsTests : SearcherTestBase
             .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.Decimal)
             .Done()
             .Build();
-        await ContentTypeService.CreateAsync(ContentType, Constants.Security.SuperUserKey);
+        await ContentTypeService.CreateAsync(ContentType, Cms.Core.Constants.Security.SuperUserKey);
     }
 
     private async Task CreateDecimalDocuments(double[] values)
@@ -357,7 +357,7 @@ public class InvariantFacetsTests : SearcherTestBase
             .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.DropDownListFlexible)
             .Done()
             .Build();
-        await ContentTypeService.CreateAsync(ContentType, Constants.Security.SuperUserKey);
+        await ContentTypeService.CreateAsync(ContentType, Cms.Core.Constants.Security.SuperUserKey);
     }
 
     private async Task CreateDropDownDocuments(string[] values)

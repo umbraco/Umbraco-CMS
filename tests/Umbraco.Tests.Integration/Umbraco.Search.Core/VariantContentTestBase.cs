@@ -14,7 +14,7 @@ public abstract class VariantContentTestBase : ContentTestBase
     {
         await GetRequiredService<ILanguageService>().CreateAsync(
             new LanguageBuilder().WithCultureInfo("da-DK").Build(),
-            Constants.Security.SuperUserKey);
+            Cms.Core.Constants.Security.SuperUserKey);
 
         IContentType contentType = new ContentTypeBuilder()
             .WithAlias("variant")
@@ -38,9 +38,9 @@ public abstract class VariantContentTestBase : ContentTestBase
             .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.TextBox)
             .Done()
             .Build();
-        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+        await ContentTypeService.CreateAsync(contentType, Cms.Core.Constants.Security.SuperUserKey);
         contentType.AllowedContentTypes = [new ContentTypeSort(contentType.Key, 0, contentType.Alias)];
-        await ContentTypeService.UpdateAsync(contentType, Constants.Security.SuperUserKey);
+        await ContentTypeService.UpdateAsync(contentType, Cms.Core.Constants.Security.SuperUserKey);
 
         Content root = new ContentBuilder()
             .WithKey(RootKey)
@@ -51,7 +51,7 @@ public abstract class VariantContentTestBase : ContentTestBase
         SetTitle(root, "The root title");
         SetMessage(root, "The root message");
         root.SetValue("count", 12);
-        await ContentService.SaveAsync(root, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(root, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         Content child = new ContentBuilder()
             .WithKey(ChildKey)
@@ -63,7 +63,7 @@ public abstract class VariantContentTestBase : ContentTestBase
         SetTitle(child, "The child title");
         SetMessage(child, "The child message");
         child.SetValue("count", 34);
-        await ContentService.SaveAsync(child, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(child, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         Content grandchild = new ContentBuilder()
             .WithKey(GrandchildKey)
@@ -75,7 +75,7 @@ public abstract class VariantContentTestBase : ContentTestBase
         SetTitle(grandchild, "The grandchild title");
         SetMessage(grandchild, "The grandchild message");
         grandchild.SetValue("count", 56);
-        await ContentService.SaveAsync(grandchild, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(grandchild, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         Content greatGrandchild = new ContentBuilder()
             .WithKey(GreatGrandchildKey)
@@ -87,7 +87,7 @@ public abstract class VariantContentTestBase : ContentTestBase
         SetTitle(greatGrandchild, "The great grandchild title");
         SetMessage(greatGrandchild, "The great grandchild message");
         greatGrandchild.SetValue("count", 78);
-        await ContentService.SaveAsync(greatGrandchild, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(greatGrandchild, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         IndexerAndSearcher.Reset();
     }

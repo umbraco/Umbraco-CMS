@@ -49,7 +49,7 @@ public class MarkdownPropertyValueHandlerTests : ContentTestBase
                 })
             .Build();
 
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.DraftContent);
         Assert.That(documents, Has.Count.EqualTo(1));
@@ -86,7 +86,7 @@ public class MarkdownPropertyValueHandlerTests : ContentTestBase
                 })
             .Build();
 
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.DraftContent);
         Assert.That(documents, Has.Count.EqualTo(1));
@@ -111,7 +111,7 @@ public class MarkdownPropertyValueHandlerTests : ContentTestBase
                 })
             .Build();
 
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.DraftContent);
         Assert.That(documents, Has.Count.EqualTo(1));
@@ -135,7 +135,7 @@ public class MarkdownPropertyValueHandlerTests : ContentTestBase
                 })
             .Build();
 
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.DraftContent);
         Assert.That(documents, Has.Count.EqualTo(1));
@@ -158,7 +158,7 @@ public class MarkdownPropertyValueHandlerTests : ContentTestBase
             .WithAlias(Constants.PropertyEditors.Aliases.MarkdownEditor)
             .Done()
             .Build();
-        await GetRequiredService<IDataTypeService>().CreateAsync(markdownDataType, Constants.Security.SuperUserKey);
+        await GetRequiredService<IDataTypeService>().CreateAsync(markdownDataType, Cms.Core.Constants.Security.SuperUserKey);
 
         _contentType = new ContentTypeBuilder()
             .WithAlias("markdownEditor")
@@ -169,7 +169,7 @@ public class MarkdownPropertyValueHandlerTests : ContentTestBase
             .Done()
             .Build();
 
-        await ContentTypeService.CreateAsync(_contentType, Constants.Security.SuperUserKey);
+        await ContentTypeService.CreateAsync(_contentType, Cms.Core.Constants.Security.SuperUserKey);
 
         IndexerAndSearcher.Reset();
     }

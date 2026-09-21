@@ -250,7 +250,7 @@ public partial class ContentEditingServiceTests
             // Setting the dates marks them dirty, so they are persisted as-is rather than being stamped with "now".
             child.CreateDate = baseDate.AddDays(createOffset);
             child.UpdateDate = baseDate.AddDays(100 + updateOffset);
-            await ContentService.SaveAsync(child, null, null, CancellationToken.None);
+            await ContentService.SaveAsync(child, Constants.Security.SuperUserKey, null, CancellationToken.None);
         }
 
         return (root, childKeys);
@@ -260,7 +260,7 @@ public partial class ContentEditingServiceTests
     {
         foreach (var existingRoot in await ContentService.GetRootContentAsync(CancellationToken.None))
         {
-            await ContentService.DeleteAsync(existingRoot, null, CancellationToken.None);
+            await ContentService.DeleteAsync(existingRoot, Constants.Security.SuperUserKey, CancellationToken.None);
         }
 
         var rootContentType = ContentTypeBuilder.CreateBasicContentType(alias: "rootPage", name: "Root Page");
@@ -284,7 +284,7 @@ public partial class ContentEditingServiceTests
             // Setting the dates marks them dirty, so they are persisted as-is rather than being stamped with "now".
             root.CreateDate = baseDate.AddDays(createOffset);
             root.UpdateDate = baseDate.AddDays(100 + updateOffset);
-            await ContentService.SaveAsync(root, null, null, CancellationToken.None);
+            await ContentService.SaveAsync(root, Constants.Security.SuperUserKey, null, CancellationToken.None);
         }
 
         return rootKeys;

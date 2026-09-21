@@ -120,7 +120,7 @@ public class ContentServiceTests : UmbracoIntegrationTest
 
         await WaitForIndexing(indexAlias, async () =>
         {
-            await ContentService.SaveAsync(_rootDocument, null, null, CancellationToken.None);
+            await ContentService.SaveAsync(_rootDocument, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
             if (publish)
             {
                 await ContentService.PublishAsync(_rootDocument, ["*"], global::Umbraco.Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
@@ -154,7 +154,7 @@ public class ContentServiceTests : UmbracoIntegrationTest
         // Delete the content
         await WaitForIndexing(indexAlias, () =>
         {
-            ContentService.DeleteAsync(_rootDocument, null, CancellationToken.None).GetAwaiter().GetResult();
+            ContentService.DeleteAsync(_rootDocument, Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None).GetAwaiter().GetResult();
             return Task.CompletedTask;
         });
 

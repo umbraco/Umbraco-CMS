@@ -91,7 +91,7 @@ internal sealed class EntityXmlSerializerTests : UmbracoIntegrationTest
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var content = ContentBuilder.CreateTextpageContent(contentType, "Root Home", -1);
-        await ContentService.SaveAsync(content, Constants.Security.SuperUserId, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         var nodeName = content.ContentType.Alias.ToSafeAlias(ShortStringHelper);
         var urlName =

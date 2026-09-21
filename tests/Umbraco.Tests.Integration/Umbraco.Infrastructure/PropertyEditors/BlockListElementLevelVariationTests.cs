@@ -58,7 +58,7 @@ internal sealed partial class BlockListElementLevelVariationTests : BlockEditorE
             content.Properties["blocks"]!.SetValue(propertyValue, blocksProperty.Culture, blocksProperty.Segment);
         }
 
-        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         if (publishContent)
         {

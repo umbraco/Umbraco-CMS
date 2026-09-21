@@ -243,7 +243,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
         content.CopyFrom(version, culture);
 
         int userId = await _userIdKeyResolver.GetAsync(userKey);
-        Attempt<ContentSaveOperationStatus> saveResult = await SaveAsync(content, userId, null, cancellationToken);
+        Attempt<ContentSaveOperationStatus> saveResult = await SaveAsync(content, userKey, null, cancellationToken);
 
         if (saveResult.Success)
         {
@@ -553,7 +553,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
     #region Save, Publish, Unpublish
 
     /// <inheritdoc />
-    public async Task<Attempt<ContentSaveOperationStatus>> SaveAsync(TContent content, int? userId, ContentScheduleCollection? contentSchedule, CancellationToken cancellationToken)
+    public async Task<Attempt<ContentSaveOperationStatus>> SaveAsync(TContent content, Guid userKey, ContentScheduleCollection? contentSchedule, CancellationToken cancellationToken)
     {
         PublishedState publishedState = content.PublishedState;
         if (publishedState != PublishedState.Published && publishedState != PublishedState.Unpublished)
@@ -578,14 +578,14 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
             return Attempt.Fail(ContentSaveOperationStatus.CancelledByNotification);
         }
 
-        userId ??= Constants.Security.SuperUserId;
+        int userId = await _userIdKeyResolver.GetAsync(userKey);
 
         if (content.HasIdentity == false)
         {
-            content.CreatorId = userId.Value;
+            content.CreatorId = userId;
         }
 
-        content.WriterId = userId.Value;
+        content.WriterId = userId;
 
         List<string>? culturesChanging = content.ContentType.VariesByCulture()
             ? content.CultureInfos?.Values.Where(x => x.IsDirty()).Select(x => x.Culture).ToList()
@@ -611,11 +611,11 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
         {
             IEnumerable<ILanguage> allLangs = await _languageRepository.GetAllAsync(cancellationToken);
             var langs = GetLanguageDetailsForAuditEntry(allLangs, culturesChanging);
-            await AuditAsync(AuditType.SaveVariant, userId.Value, content.Id, $"Saved languages: {langs}", langs);
+            await AuditAsync(AuditType.SaveVariant, userId, content.Id, $"Saved languages: {langs}", langs);
         }
         else
         {
-            await AuditAsync(AuditType.Save, userId.Value, content.Id);
+            await AuditAsync(AuditType.Save, userId, content.Id);
         }
 
         scope.Complete();
@@ -1643,9 +1643,9 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
     #region Delete
 
     /// <inheritdoc />
-    public async Task<Attempt<ContentDeleteOperationStatus>> DeleteAsync(TContent content, int? userId, CancellationToken cancellationToken)
+    public async Task<Attempt<ContentDeleteOperationStatus>> DeleteAsync(TContent content, Guid userKey, CancellationToken cancellationToken)
     {
-        userId ??= Constants.Security.SuperUserId;
+        int userId = await _userIdKeyResolver.GetAsync(userKey);
         EventMessages eventMessages = EventMessagesFactory.Get();
 
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
@@ -1671,7 +1671,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
         await DeleteLockedAsync(scope, content, eventMessages, cancellationToken);
 
         scope.Notifications.Publish(TreeChangeNotification(content, TreeChangeTypes.Remove, eventMessages));
-        await AuditAsync(AuditType.Delete, userId.Value, content.Id);
+        await AuditAsync(AuditType.Delete, userId, content.Id);
 
         scope.Complete();
 

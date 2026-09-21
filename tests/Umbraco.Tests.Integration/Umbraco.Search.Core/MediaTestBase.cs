@@ -57,11 +57,11 @@ public abstract class MediaTestBase : ContentBaseTestBase
             .Done()
             .Done()
             .Build();
-        await MediaTypeService.CreateAsync(mediaType, Constants.Security.SuperUserKey);
+        await MediaTypeService.CreateAsync(mediaType, Cms.Core.Constants.Security.SuperUserKey);
 
         IMediaType folderType = MediaTypeService.Get(Constants.Conventions.MediaTypes.Folder) ?? throw new InvalidOperationException("Media type \"Folder\" was not found");
         folderType.AllowedContentTypes = [new ContentTypeSort(folderType.Key, 0, folderType.Alias), new ContentTypeSort(mediaType.Key, 1, mediaType.Alias)];
-        await MediaTypeService.UpdateAsync(folderType, Constants.Security.SuperUserKey);
+        await MediaTypeService.UpdateAsync(folderType, Cms.Core.Constants.Security.SuperUserKey);
 
         Media rootFolder = new MediaBuilder()
             .WithKey(RootFolderKey)

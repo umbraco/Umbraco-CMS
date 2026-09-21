@@ -87,7 +87,7 @@ public class MemberTests : ContentBaseTestBase
         Assert.That(memberType, Is.Not.Null);
 
         memberType.SetIsSensitiveProperty("organization", true);
-        await memberTypeService.UpdateAsync(memberType, Constants.Security.SuperUserKey);
+        await memberTypeService.UpdateAsync(memberType, Cms.Core.Constants.Security.SuperUserKey);
 
         MemberService.Save([MemberOne(), MemberTwo(), MemberThree()]);
 
@@ -141,7 +141,7 @@ public class MemberTests : ContentBaseTestBase
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.Member);
         Assert.That(documents, Has.Count.EqualTo(3));
 
-        await MemberTypeService.DeleteAsync(MemberOne().ContentType.Key, Constants.Security.SuperUserKey);
+        await MemberTypeService.DeleteAsync(MemberOne().ContentType.Key, Cms.Core.Constants.Security.SuperUserKey);
 
         documents = IndexerAndSearcher.Dump(IndexAliases.Media);
         Assert.That(documents, Has.Count.EqualTo(0));
@@ -206,7 +206,7 @@ public class MemberTests : ContentBaseTestBase
             .Done()
             .Done()
             .Build();
-        await GetRequiredService<IMemberTypeService>().CreateAsync(memberType, Constants.Security.SuperUserKey);
+        await GetRequiredService<IMemberTypeService>().CreateAsync(memberType, Cms.Core.Constants.Security.SuperUserKey);
 
         MemberService.Save(
             new MemberBuilder()
