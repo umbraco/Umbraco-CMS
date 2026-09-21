@@ -16,6 +16,7 @@ using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore;
@@ -490,6 +491,55 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         Assert.That(results.Count(), Is.EqualTo(5));
         scope.Complete();
     }
+
+    /// <summary>
+    ///     Property rows are matched to the items they belong to, even when an item in the middle of the batch has
+    ///     no properties at all.
+    /// </summary>
+    /// <remarks>
+    ///     A structural guard rather than a regression test: property data is looked up per version id, so the
+    ///     positional skip this covers (U4-9438) cannot happen here the way it did when rows were consumed in
+    ///     sequence. It exists so a future change back to positional consumption fails loudly.
+    /// </remarks>
+    [Test]
+    public async Task GetManyAsync_WithAPropertylessItemInTheMiddle_AssignsPropertyValuesToTheRightItems()
+    {
+        var emptyContentType = ContentTypeBuilder.CreateBasicContentType("umbEmpty", "Empty");
+        await ContentTypeService.CreateAsync(emptyContentType, Constants.Security.SuperUserKey);
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        IContent first = ContentBuilder.CreateSimpleContent(_contentType, "First With Properties", _textpage.Id);
+        first.SetValue("title", "first title");
+        await repository.SaveAsync(first, CancellationToken.None);
+
+        IContent middle = ContentBuilder.CreateBasicContent(emptyContentType);
+        middle.Name = "Middle Without Properties";
+        middle.ParentId = _textpage.Id;
+        await repository.SaveAsync(middle, CancellationToken.None);
+
+        IContent last = ContentBuilder.CreateSimpleContent(_contentType, "Last With Properties", _textpage.Id);
+        last.SetValue("title", "last title");
+        await repository.SaveAsync(last, CancellationToken.None);
+
+        IContent[] results = (await repository.GetManyAsync([first.Key, middle.Key, last.Key], CancellationToken.None))
+            .ToArray();
+        scope.Complete();
+
+        IContent resolvedFirst = results.Single(x => x.Key == first.Key);
+        IContent resolvedMiddle = results.Single(x => x.Key == middle.Key);
+        IContent resolvedLast = results.Single(x => x.Key == last.Key);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(resolvedFirst.GetValue("title"), Is.EqualTo("first title"));
+            Assert.That(resolvedLast.GetValue("title"), Is.EqualTo("last title"));
+            Assert.That(resolvedMiddle.Properties.Any(x => x.Alias == "title"), Is.False,
+                "the propertyless item must not acquire another item's property");
+        });
+    }
+
 
     [Test]
     public async Task GetManyAsync_DeduplicatesKeys()
@@ -2084,6 +2134,28 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         });
     }
 
+    /// <summary>
+    ///     Names with characters that a URL segment would strip must survive a save unchanged (U4-2791, U4-2607).
+    ///     The write path runs URL segment collision detection over sibling names, which is exactly the logic that
+    ///     historically rewrote names like these.
+    /// </summary>
+    [TestCase("test@umbraco.org")]
+    [TestCase("@lightgiants")]
+    public async Task PersistNewItemAsync_NameWithSpecialCharacters_PersistsVerbatim(string name)
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        IContent content = ContentBuilder.CreateSimpleContent(_contentType, name, _textpage.Id);
+        await repository.SaveAsync(content, CancellationToken.None);
+
+        IContent? persisted = await repository.GetAsync(content.Key, CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(persisted!.Name, Is.EqualTo(name));
+    }
+
+
     [Test]
     public async Task PersistNewItemAsync_UrlSegmentCollisionWithoutLiteralNameCollision_AppendsNumericSuffix()
     {
@@ -2378,6 +2450,47 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
                 "the published version must keep the property values it was published with");
         });
     }
+
+    /// <summary>
+    ///     GetAll returns one entity per node no matter how many versions each node has accumulated. Re-read in a
+    ///     fresh scope so nothing is served from the first scope's state.
+    /// </summary>
+    [Test]
+    [LongRunning]
+    public async Task GetAllAsync_AfterManyVersionsPerNode_ReturnsOneEntityPerNode()
+    {
+        int countBefore;
+
+        using (var scope = NewScopeProvider.CreateScope())
+        {
+            var repository = CreateRepository();
+            IContent[] all = (await repository.GetAllAsync(CancellationToken.None)).ToArray();
+            countBefore = all.Length;
+
+            foreach (IContent content in all)
+            {
+                for (var i = 0; i < 3; i++)
+                {
+                    content.SetValue("title", $"churned-{i}");
+                    content.PublishCulture(CultureImpact.Invariant, DateTime.UtcNow, GetRequiredService<PropertyEditorCollection>());
+                    content.PublishedState = PublishedState.Publishing;
+                    await repository.SaveAsync(content, CancellationToken.None);
+                }
+            }
+
+            scope.Complete();
+        }
+
+        using (var scope = NewScopeProvider.CreateScope())
+        {
+            var repository = CreateRepository();
+            IContent[] all = (await repository.GetAllAsync(CancellationToken.None)).ToArray();
+            scope.Complete();
+
+            Assert.That(all, Has.Length.EqualTo(countBefore));
+        }
+    }
+
 
     [Test]
     public async Task PersistUpdatedItemAsync_Unpublish_SetsPublishedFalseNoNewVersionRow()
