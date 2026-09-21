@@ -110,7 +110,7 @@ dotnet test tests/Umbraco.Tests.Integration/Umbraco.Tests.Integration.csproj --f
 
 ### Client Development (Backoffice UI)
 
-The search index management UI is part of the main backoffice client — `src/Umbraco.Web.UI.Client/src/packages/search-management/` — built and versioned together with the rest of the backoffice. It consumes the Management API's generated `SearchService` client (`@umbraco-cms/backoffice/external/backend-api`) like any other package; there is no separate OpenAPI document or generated client for it.
+The search index management UI is part of the main backoffice client — `src/Umbraco.Web.UI.Client/src/packages/search-management/` — built and versioned together with the rest of the backoffice. It consumes the Management API's generated `SearchService` client (`@umbraco-cms/backoffice/external/backend-api`) like any other package, so the index management UI itself needs no OpenAPI document of its own.
 
 ```bash
 # From src/Umbraco.Web.UI.Client
@@ -119,7 +119,7 @@ npm run build
 npm run dev
 ```
 
-The Examine provider keeps its own **standalone npm project** at `src/Umbraco.Cms.Search.Provider.Examine/Client/` (its own `package.json`, `tsconfig.json`, `.nvmrc`, and OpenAPI document) — see [Examine Client CLAUDE.md](../Umbraco.Cms.Search.Provider.Examine/CLAUDE.md). That client resolves imports into the backoffice (including `@umbraco-cms/backoffice/search-management`) via generated tsconfig path aliases, same as any other in-repo consumer of the backoffice client's sources.
+The Examine provider's own UI is a module of that same package, at `search-management/examine/`, rather than a separate npm project — see [the Examine provider's CLAUDE.md](../Umbraco.Cms.Search.Provider.Examine/CLAUDE.md). It exports nothing, because it has no extension points: its manifests ride the package's bundle. It does have models generated from the provider's own committed OpenAPI document, since that API is not part of the Management API document.
 
 ### Test Site
 

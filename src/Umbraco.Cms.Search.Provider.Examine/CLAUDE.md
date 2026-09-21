@@ -21,11 +21,11 @@ Keeping it there rather than in an `/App_Plugins` bundle of its own means it is 
 The controllers extend `ManagementApiControllerBase` but map to their own OpenAPI document via `[MapToApi]`, and route under `examine/api/v{version}` rather than the Management API path. The document is registered in `UmbracoBuilderExtensions.AddExamineSearchProvider`, which also:
 
 - clears `Servers`, so the committed schema does not carry the host it was fetched from
-- applies `ActionNameOperationIdTransformer`, so operation IDs are the action name and the generated client gets concise method names
+- applies `ActionNameOperationIdTransformer`, so operation IDs are the action name and the generated types are named after it rather than after the path
 
-### Regenerating the client
+### Regenerating the models
 
-`OpenApi.json` in this project is committed and is the input to the generated TypeScript client, exactly as `Umbraco.Cms.Api.Management/OpenApi.json` is for the core client. Changing a controller, its route or its models means regenerating both, in this order:
+`OpenApi.json` in this project is committed and is the input to the generated TypeScript, exactly as `Umbraco.Cms.Api.Management/OpenApi.json` is for the core client. Only the models are generated: requests go through `umbHttpClient`, which already carries the back-office cookie configuration, so generating an SDK would vendor a second copy of the hey-api fetch runtime for a single endpoint. Changing a controller, its route or its models means regenerating both, in this order:
 
 ```bash
 # 1. with the site running, refresh the committed schema
