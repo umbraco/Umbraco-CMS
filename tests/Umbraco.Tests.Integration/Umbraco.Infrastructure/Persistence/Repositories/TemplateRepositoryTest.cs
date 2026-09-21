@@ -529,7 +529,7 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
                 new PropertyEditorCollection(new DataEditorCollection(() => Enumerable.Empty<IDataEditor>()));
             var dataValueReferences =
                 new DataValueReferenceFactoryCollection(() => Enumerable.Empty<IDataValueReferenceFactory>(), new NullLogger<DataValueReferenceFactoryCollection>());
-            var contentRepo = GetRequiredService<IAsyncDocumentRepository>();
+            var contentRepo = GetRequiredService<IDocumentRepository>();
 
             var template = TemplateBuilder.CreateTextPageTemplate();
             await templateService.CreateAsync(template, Constants.Security.SuperUserKey); // else, FK violation on contentType!

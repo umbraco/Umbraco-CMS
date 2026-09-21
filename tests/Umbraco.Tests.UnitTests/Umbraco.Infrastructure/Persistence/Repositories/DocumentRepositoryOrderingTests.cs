@@ -6,14 +6,14 @@ using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.EFCore;
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Persistence.Repositories;
 
 [TestFixture]
-internal sealed class AsyncDocumentRepositoryOrderingTests
+internal sealed class DocumentRepositoryOrderingTests
 {
     // Deliberately gives the row with the HIGHER NodeId the earlier position in the source sequence,
     // decoupling "sequence order" from "NodeId order". A real SQLite integration test can't construct
     // this: there, NodeId == insertion order == the engine's incidental scan order for freshly-created
     // rows, so a missing tiebreak coincidentally still produces NodeId-ascending output and the bug
     // goes undetected. Here, in-memory sequence order is fully under the test's control.
-    private static List<AsyncDocumentRepository.DocumentJoinRow> CreateTiedRows() =>
+    private static List<DocumentRepository.DocumentJoinRow> CreateTiedRows() =>
     [
         CreateRow(nodeId: 200, sortOrder: 0, path: "-1,999"),
         CreateRow(nodeId: 100, sortOrder: 0, path: "-1,999"),
@@ -25,13 +25,13 @@ internal sealed class AsyncDocumentRepositoryOrderingTests
     // different from the correct path-tiebreak result of {100, 200}. Reusing CreateTiedRows() here would
     // NOT be discriminating: both rows also share SortOrder there, so the fallback default ordering would
     // coincidentally tiebreak to the same {100, 200} the correct implementation produces.
-    private static List<AsyncDocumentRepository.DocumentJoinRow> CreatePathTiedRowsWithDistinctSortOrder() =>
+    private static List<DocumentRepository.DocumentJoinRow> CreatePathTiedRowsWithDistinctSortOrder() =>
     [
         CreateRow(nodeId: 200, sortOrder: 1, path: "-1,999"),
         CreateRow(nodeId: 100, sortOrder: 2, path: "-1,999"),
     ];
 
-    private static AsyncDocumentRepository.DocumentJoinRow CreateRow(int nodeId, int sortOrder, string path) =>
+    private static DocumentRepository.DocumentJoinRow CreateRow(int nodeId, int sortOrder, string path) =>
         new()
         {
             Node = new NodeDto
@@ -50,9 +50,9 @@ internal sealed class AsyncDocumentRepositoryOrderingTests
             ContentType = new ContentTypeDto { Alias = "alias" },
         };
 
-    private static List<int> ApplyOrderingAndGetNodeIds(Ordering? ordering, List<AsyncDocumentRepository.DocumentJoinRow>? rows = null)
+    private static List<int> ApplyOrderingAndGetNodeIds(Ordering? ordering, List<DocumentRepository.DocumentJoinRow>? rows = null)
     {
-        IOrderedQueryable<AsyncDocumentRepository.DocumentJoinRow> ordered = AsyncDocumentRepository.ApplyDocumentOrdering(
+        IOrderedQueryable<DocumentRepository.DocumentJoinRow> ordered = DocumentRepository.ApplyDocumentOrdering(
             (rows ?? CreateTiedRows()).AsQueryable(),
             ordering,
             pathSelector: row => row.Node.Path);

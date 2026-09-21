@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Core.Persistence.Repositories;
 /// <summary>
 ///     Defines the async repository contract for <see cref="IContent" /> document entities.
 /// </summary>
-public interface IAsyncDocumentRepository : IAsyncPublishableContentRepository<IContent>
+public interface IDocumentRepository : IAsyncPublishableContentRepository<IContent>
 {
     /// <summary>
     ///     Gets a paged list of direct children of a document node, without loading template information.

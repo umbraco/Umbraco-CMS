@@ -26,7 +26,7 @@ internal sealed class ContentServicePerformanceTest : UmbracoIntegrationTest
     [SetUp]
     public async Task SetUpData() => await CreateTestDataAsync();
 
-    private IAsyncDocumentRepository DocumentRepository => GetRequiredService<IAsyncDocumentRepository>();
+    private IDocumentRepository DocumentRepository => GetRequiredService<IDocumentRepository>();
 
     private ITemplateService TemplateService => GetRequiredService<ITemplateService>();
 

@@ -50,7 +50,7 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
 
     private IMediaTypeRepository MediaTypeRepository => GetRequiredService<IMediaTypeRepository>();
 
-    private IAsyncDocumentRepository DocumentRepository => GetRequiredService<IAsyncDocumentRepository>();
+    private IDocumentRepository DocumentRepository => GetRequiredService<IDocumentRepository>();
 
     private IContentService ContentService => GetRequiredService<IContentService>();
 

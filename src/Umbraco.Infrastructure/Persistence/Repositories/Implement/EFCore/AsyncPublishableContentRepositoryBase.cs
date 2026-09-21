@@ -482,7 +482,7 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
     ///     Resolves a sibling-unique name for <paramref name="nodeName" /> among the other nodes sharing
     ///     <paramref name="parentId" />. The default implementation only resolves literal duplicate names
     ///     (via <see cref="SimilarNodeName.GetUniqueName(IEnumerable{SimilarNodeName},int,string)" />) — override
-    ///     to add further uniqueness checks (e.g. URL segment collisions), as <c>AsyncDocumentRepository</c> does.
+    ///     to add further uniqueness checks (e.g. URL segment collisions), as <c>DocumentRepository</c> does.
     /// </summary>
     protected virtual async Task<string?> EnsureUniqueNodeNameAsync(UmbracoDbContext db, int parentId, string? nodeName, int id)
     {
@@ -500,7 +500,7 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
     ///     and resolves a sibling-unique name for <paramref name="nodeName" />, returning both so overrides of
     ///     <see cref="EnsureUniqueNodeNameAsync" /> can run further checks against the same sibling list without
     ///     re-querying. Deliberately unfiltered (no name-prefix narrowing) — unlike NPoco's generic
-    ///     Media/DataType-oriented sibling fetch, a URL-segment collision check (see <c>AsyncDocumentRepository</c>)
+    ///     Media/DataType-oriented sibling fetch, a URL-segment collision check (see <c>DocumentRepository</c>)
     ///     needs the full sibling list, since two names with different literal prefixes can still collide on
     ///     URL segment.
     /// </summary>

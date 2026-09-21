@@ -27,14 +27,14 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.EFCore;
 /// <summary>
 ///     Provides an EF Core backed async repository for <see cref="IContent" /> document entities.
 /// </summary>
-internal class AsyncDocumentRepository
+internal class DocumentRepository
     : AsyncPublishableContentRepositoryBase<
         IContent,
-        AsyncDocumentRepository,
+        DocumentRepository,
         DocumentDto,
         DocumentVersionDto,
         DocumentCultureVariationDto>,
-      IAsyncDocumentRepository
+      IDocumentRepository
 {
     private readonly ITemplateRepository _templateRepository;
     private readonly IIdKeyMap _idKeyMap;
@@ -44,7 +44,7 @@ internal class AsyncDocumentRepository
     private readonly IShortStringHelper _shortStringHelper;
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="AsyncDocumentRepository" /> class.
+    ///     Initializes a new instance of the <see cref="DocumentRepository" /> class.
     /// </summary>
     /// <param name="scopeAccessor">The EF Core scope accessor.</param>
     /// <param name="appCaches">The application caches.</param>
@@ -69,7 +69,7 @@ internal class AsyncDocumentRepository
     ///     <see cref="AsyncPermissionRepository{TEntity}" /> for the full explanation.
     /// </param>
     /// <param name="shortStringHelper">The short string helper, used to detect URL segment collisions between sibling names.</param>
-    public AsyncDocumentRepository(
+    public DocumentRepository(
         IEFCoreScopeAccessor<UmbracoDbContext> scopeAccessor,
         AppCaches appCaches,
         ILoggerFactory loggerFactory,
@@ -119,7 +119,7 @@ internal class AsyncDocumentRepository
     protected override Guid NodeObjectTypeKey => Constants.ObjectTypes.Document;
 
     /// <inheritdoc />
-    protected override AsyncDocumentRepository This => this;
+    protected override DocumentRepository This => this;
 
     /// <inheritdoc />
     protected override async Task<IContent?> PerformGetAsync(Guid key)
@@ -1154,7 +1154,7 @@ internal class AsyncDocumentRepository
     // syntax only (never a positional constructor call) - EF Core cannot translate member access
     // into a type built from a constructor call when a subsequent OrderBy targets it (see the note
     // on ApplyDocumentOrdering below), but member-init projections translate and order correctly.
-    // Internal (not private), matching ApplyDocumentOrdering below, so AsyncDocumentRepositoryOrderingTests
+    // Internal (not private), matching ApplyDocumentOrdering below, so DocumentRepositoryOrderingTests
     // can construct real instances to exercise ordering directly.
     internal sealed class DocumentJoinRow
     {
@@ -1253,7 +1253,7 @@ internal class AsyncDocumentRepository
     ///     Applies document paging/ordering to a query, breaking ties on node id for stable paging.
     /// </summary>
     /// <remarks>
-    ///     Internal (not private) so AsyncDocumentRepositoryOrderingTests can exercise the tiebreak logic
+    ///     Internal (not private) so DocumentRepositoryOrderingTests can exercise the tiebreak logic
     ///     directly, decoupling it from a real database's incidental row order.
     /// </remarks>
     internal static IOrderedQueryable<DocumentJoinRow> ApplyDocumentOrdering(

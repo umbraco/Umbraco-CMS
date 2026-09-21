@@ -30,7 +30,7 @@ public class DocumentUrlService : IDocumentUrlService, IMemoryCacheSizeReporter
 
     private readonly ILogger<DocumentUrlService> _logger;
     private readonly IDocumentUrlRepository _documentUrlRepository;
-    private readonly IAsyncDocumentRepository _documentRepository;
+    private readonly IDocumentRepository _documentRepository;
     private readonly ICoreScopeProvider _coreScopeProvider;
     private readonly GlobalSettings _globalSettings;
     private readonly WebRoutingSettings _webRoutingSettings;
@@ -166,7 +166,7 @@ public class DocumentUrlService : IDocumentUrlService, IMemoryCacheSizeReporter
     public DocumentUrlService(
         ILogger<DocumentUrlService> logger,
         IDocumentUrlRepository documentUrlRepository,
-        IAsyncDocumentRepository documentRepository,
+        IDocumentRepository documentRepository,
         ICoreScopeProvider coreScopeProvider,
         IOptions<GlobalSettings> globalSettings,
         IOptions<WebRoutingSettings> webRoutingSettings,

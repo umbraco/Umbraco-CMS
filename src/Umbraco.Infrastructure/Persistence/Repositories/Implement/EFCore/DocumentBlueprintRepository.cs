@@ -16,10 +16,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.EFCore;
 /// <summary>
 ///     Provides an EF Core backed async repository for <see cref="IContent" /> document blueprint (content template) entities.
 /// </summary>
-internal sealed class AsyncDocumentBlueprintRepository : AsyncDocumentRepository, IAsyncDocumentBlueprintRepository
+internal sealed class DocumentBlueprintRepository : DocumentRepository, IDocumentBlueprintRepository
 {
     /// <summary>
-    ///     Initializes a new instance of the <see cref="AsyncDocumentBlueprintRepository" /> class.
+    ///     Initializes a new instance of the <see cref="DocumentBlueprintRepository" /> class.
     /// </summary>
     /// <param name="scopeAccessor">The EF Core scope accessor.</param>
     /// <param name="appCaches">The application caches.</param>
@@ -43,7 +43,7 @@ internal sealed class AsyncDocumentBlueprintRepository : AsyncDocumentRepository
     ///     avoid a circular dependency back through <see cref="IContentService" />.
     /// </param>
     /// <param name="shortStringHelper">The short string helper, used to detect URL segment collisions between sibling names.</param>
-    public AsyncDocumentBlueprintRepository(
+    public DocumentBlueprintRepository(
         IEFCoreScopeAccessor<UmbracoDbContext> scopeAccessor,
         AppCaches appCaches,
         ILoggerFactory loggerFactory,

@@ -76,7 +76,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
     private PropertyEditorCollection PropertyEditorCollection => GetRequiredService<PropertyEditorCollection>();
 
-    private IAsyncDocumentRepository DocumentRepository => GetRequiredService<IAsyncDocumentRepository>();
+    private IDocumentRepository DocumentRepository => GetRequiredService<IDocumentRepository>();
 
     private IJsonSerializer Serializer => GetRequiredService<IJsonSerializer>();
 

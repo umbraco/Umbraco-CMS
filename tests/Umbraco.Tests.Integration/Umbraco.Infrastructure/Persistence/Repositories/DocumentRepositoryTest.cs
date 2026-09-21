@@ -32,7 +32,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
+internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
 {
     private ITemplate _template = null!;
     private ContentType _contentType = null!;
@@ -122,12 +122,12 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         new DictionaryAppCache(),
         new IsolatedCaches(_ => new ObjectCacheAppCache()));
 
-    private AsyncDocumentRepository CreateRepository() => CreateRepository(AppCaches.Disabled);
+    private DocumentRepository CreateRepository() => CreateRepository(AppCaches.Disabled);
 
-    private AsyncDocumentRepository CreateRepository(AppCaches appCaches) =>
+    private DocumentRepository CreateRepository(AppCaches appCaches) =>
         CreateRepository(appCaches, Mock.Of<IEventAggregator>());
 
-    private AsyncDocumentRepository CreateRepository(AppCaches appCaches, IEventAggregator eventAggregator) => new(
+    private DocumentRepository CreateRepository(AppCaches appCaches, IEventAggregator eventAggregator) => new(
         GetRequiredService<IEFCoreScopeAccessor<UmbracoDbContext>>(),
         appCaches,
         LoggerFactory,
@@ -1120,7 +1120,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         // Exercises ApplyDocumentOrdering's "contenttypealias" arm specifically. The ContentType join
         // became a LEFT JOIN (DocumentJoinRow.ContentType is nullable) when the per-method join chains
         // were consolidated, so the selector is now a null-guarded ternary rather than a guaranteed-non-null
-        // property access - this is the one arm no other test in this file or AsyncDocumentRepositoryOrderingTests
+        // property access - this is the one arm no other test in this file or DocumentRepositoryOrderingTests
         // exercises, so a regression here (e.g. simplifying the ternary to `?.`, which cannot appear inside
         // an Expression<Func<...>> tree) would go unnoticed without this test.
         // "zzzSecondType" sorts alphabetically AFTER _contentType's alias ("umbTextpage") but is created

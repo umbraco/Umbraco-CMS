@@ -17,7 +17,7 @@ internal sealed class DomainRepositoryTest : UmbracoIntegrationTest
 {
     private ILanguageRepository LanguageRepository => GetRequiredService<ILanguageRepository>();
 
-    private IAsyncDocumentRepository DocumentRepository => GetRequiredService<IAsyncDocumentRepository>();
+    private IDocumentRepository DocumentRepository => GetRequiredService<IDocumentRepository>();
 
     private IContentTypeRepository ContentTypeRepository => GetRequiredService<IContentTypeRepository>();
 

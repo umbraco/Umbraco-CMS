@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.EFCore;
 /// </summary>
 /// <remarks>
 ///     Mirrors the NPoco <c>PermissionRepository{TEntity}</c> sub-repository — manually constructed by the
-///     owning repository (e.g. <see cref="AsyncDocumentRepository" />), not DI-registered.
+///     owning repository (e.g. <see cref="DocumentRepository" />), not DI-registered.
 /// </remarks>
 internal sealed class AsyncPermissionRepository<TEntity> : AsyncRepositoryBase
     where TEntity : class, IEntity

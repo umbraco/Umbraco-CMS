@@ -26,7 +26,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
 
     private IContentTypeRepository ContentTypeRepository => GetRequiredService<IContentTypeRepository>();
 
-    private IAsyncDocumentRepository DocumentRepository => GetRequiredService<IAsyncDocumentRepository>();
+    private IDocumentRepository DocumentRepository => GetRequiredService<IDocumentRepository>();
 
     private IMediaRepository MediaRepository => GetRequiredService<IMediaRepository>();
 

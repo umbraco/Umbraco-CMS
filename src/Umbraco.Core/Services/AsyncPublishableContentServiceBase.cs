@@ -22,7 +22,7 @@ namespace Umbraco.Cms.Core.Services;
 /// <remarks>
 /// This is a copy of <see cref="PublishableContentServiceBase{TContent}"/>, not a subclass of it — mirroring the
 /// same "AsyncX" scaffolding pattern already used throughout the NPoco-to-EF-Core repository migration (e.g.
-/// <see cref="Umbraco.Cms.Core.Persistence.Repositories.IAsyncDocumentRepository"/> alongside <c>IDocumentRepository</c>).
+/// <see cref="Umbraco.Cms.Core.Persistence.Repositories.IDocumentRepository"/> alongside <c>IDocumentRepository</c>).
 /// Members are converted to their async, <see cref="IAsyncPublishableContentRepository{TContent}"/>-backed
 /// equivalents one at a time; once a member's sync equivalent has no remaining internal callers, the sync member
 /// is deleted from this class entirely. The end state is a fully async class with none of the original sync

@@ -21,7 +21,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-internal sealed class AsyncDocumentBlueprintRepositoryTest : UmbracoIntegrationTest
+internal sealed class DocumentBlueprintRepositoryTest : UmbracoIntegrationTest
 {
     private ContentType _contentType = null!;
     private Content _textpage = null!;
@@ -40,7 +40,7 @@ internal sealed class AsyncDocumentBlueprintRepositoryTest : UmbracoIntegrationT
         await ContentService.SaveAsync(_textpage, -1, null, CancellationToken.None);
     }
 
-    private AsyncDocumentBlueprintRepository CreateRepository() => new(
+    private DocumentBlueprintRepository CreateRepository() => new(
         GetRequiredService<IEFCoreScopeAccessor<UmbracoDbContext>>(),
         AppCaches.Disabled,
         LoggerFactory,
@@ -61,7 +61,7 @@ internal sealed class AsyncDocumentBlueprintRepositoryTest : UmbracoIntegrationT
         new Lazy<IUserGroupService>(GetRequiredService<IUserGroupService>),
         GetRequiredService<IShortStringHelper>());
 
-    private AsyncDocumentRepository CreateDocumentRepository() => new(
+    private DocumentRepository CreateDocumentRepository() => new(
         GetRequiredService<IEFCoreScopeAccessor<UmbracoDbContext>>(),
         AppCaches.Disabled,
         LoggerFactory,

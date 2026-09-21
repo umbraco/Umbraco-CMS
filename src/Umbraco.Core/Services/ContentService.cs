@@ -27,8 +27,8 @@ namespace Umbraco.Cms.Core.Services;
 /// </summary>
 public class ContentService : AsyncPublishableContentServiceBase<IContent>, IContentService
 {
-    private readonly IAsyncDocumentRepository _asyncDocumentRepository;
-    private readonly IAsyncDocumentBlueprintRepository _asyncDocumentBlueprintRepository;
+    private readonly IDocumentRepository _documentRepository;
+    private readonly IDocumentBlueprintRepository _documentBlueprintRepository;
     private readonly ILanguageRepository _languageRepository;
     private readonly ILogger<ContentService> _logger;
     private readonly Lazy<IPropertyValidationService> _propertyValidationService;
@@ -60,8 +60,8 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
     /// <param name="idKeyMap">The ID key map.</param>
     /// <param name="optionsMonitor">The content settings options monitor.</param>
     /// <param name="relationService">The relation service.</param>
-    /// <param name="asyncDocumentRepository">The async (EF Core) document repository.</param>
-    /// <param name="asyncDocumentBlueprintRepository">The async (EF Core) document blueprint repository.</param>
+    /// <param name="documentRepository">The document repository.</param>
+    /// <param name="documentBlueprintRepository">The document blueprint repository.</param>
     public ContentService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -77,15 +77,15 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
         IIdKeyMap idKeyMap,
         IOptionsMonitor<ContentSettings> optionsMonitor,
         IRelationService relationService,
-        IAsyncDocumentRepository asyncDocumentRepository,
-        IAsyncDocumentBlueprintRepository asyncDocumentBlueprintRepository)
+        IDocumentRepository documentRepository,
+        IDocumentBlueprintRepository documentBlueprintRepository)
         : base(
             provider,
             loggerFactory,
             eventMessagesFactory,
             auditService,
             contentTypeRepository,
-            asyncDocumentRepository,
+            documentRepository,
             languageRepository,
             propertyValidationService,
             cultureImpactFactory,
@@ -93,8 +93,8 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
             propertyEditorCollection,
             idKeyMap)
     {
-        _asyncDocumentRepository = asyncDocumentRepository;
-        _asyncDocumentBlueprintRepository = asyncDocumentBlueprintRepository;
+        _documentRepository = documentRepository;
+        _documentBlueprintRepository = documentBlueprintRepository;
         _languageRepository = languageRepository;
         _propertyValidationService = propertyValidationService;
         _shortStringHelper = shortStringHelper;
@@ -122,7 +122,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.WriteLock(Constants.Locks.ContentTree);
-        await _asyncDocumentRepository.ReplaceContentPermissionsAsync(permissionSet, cancellationToken);
+        await _documentRepository.ReplaceContentPermissionsAsync(permissionSet, cancellationToken);
         scope.Complete();
     }
 
@@ -133,7 +133,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.WriteLock(Constants.Locks.ContentTree);
-        await _asyncDocumentRepository.AssignEntityPermissionAsync(entity, permission, groupKeys, cancellationToken);
+        await _documentRepository.AssignEntityPermissionAsync(entity, permission, groupKeys, cancellationToken);
         scope.Complete();
     }
 
@@ -142,7 +142,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.ReadLock(Constants.Locks.ContentTree);
-        EntityPermissionCollection result = await _asyncDocumentRepository.GetPermissionsForEntityAsync(contentKey, cancellationToken);
+        EntityPermissionCollection result = await _documentRepository.GetPermissionsForEntityAsync(contentKey, cancellationToken);
         scope.Complete();
         return result;
     }
@@ -280,7 +280,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
         scope.ReadLock(Constants.Locks.ContentTree);
-        return await _asyncDocumentRepository.GetByLevelAsync(level, skip, take, ordering, cancellationToken);
+        return await _documentRepository.GetByLevelAsync(level, skip, take, ordering, cancellationToken);
     }
 
     /// <inheritdoc />
@@ -288,7 +288,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
         scope.ReadLock(Constants.Locks.ContentTree);
-        return await _asyncDocumentRepository.GetAncestorsAsync(key, skip, take, cancellationToken);
+        return await _documentRepository.GetAncestorsAsync(key, skip, take, cancellationToken);
     }
 
     /// <inheritdoc />
@@ -302,7 +302,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
 
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
         scope.ReadLock(Constants.Locks.ContentTree);
-        return await _asyncDocumentRepository.GetChildrenAsync(parentKey, skip, take, propertyAliases, ordering, cancellationToken);
+        return await _documentRepository.GetChildrenAsync(parentKey, skip, take, propertyAliases, ordering, cancellationToken);
     }
 
     /// <inheritdoc />
@@ -312,7 +312,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
 
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
         scope.ReadLock(Constants.Locks.ContentTree);
-        return await _asyncDocumentRepository.GetChildrenWithoutTemplatesAsync(parentKey, skip, take, propertyAliases, ordering, cancellationToken);
+        return await _documentRepository.GetChildrenWithoutTemplatesAsync(parentKey, skip, take, propertyAliases, ordering, cancellationToken);
     }
 
     /// <inheritdoc />
@@ -322,7 +322,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
 
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
         scope.ReadLock(Constants.Locks.ContentTree);
-        return await _asyncDocumentRepository.GetDescendantsAsync(ancestorKey, skip, take, ordering, cancellationToken, includeTrashed);
+        return await _documentRepository.GetDescendantsAsync(ancestorKey, skip, take, ordering, cancellationToken, includeTrashed);
     }
 
     /// <inheritdoc />
@@ -332,7 +332,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
 
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
         scope.ReadLock(Constants.Locks.ContentTree);
-        return await _asyncDocumentRepository.GetDescendantsWithoutTemplatesAsync(ancestorKey, skip, take, ordering, cancellationToken, includeTrashed);
+        return await _documentRepository.GetDescendantsWithoutTemplatesAsync(ancestorKey, skip, take, ordering, cancellationToken, includeTrashed);
     }
 
     /// <inheritdoc />
@@ -355,7 +355,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.ReadLock(Constants.Locks.ContentTree);
-        IEnumerable<IContent> result = await _asyncDocumentRepository.GetRootContentAsync(cancellationToken);
+        IEnumerable<IContent> result = await _documentRepository.GetRootContentAsync(cancellationToken);
         scope.Complete();
         return result;
     }
@@ -367,7 +367,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
 
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.ReadLock(Constants.Locks.ContentTree);
-        PagedModel<IContent> result = await _asyncDocumentRepository.GetPagedRecycleBinAsync(skip, take, ordering, cancellationToken);
+        PagedModel<IContent> result = await _documentRepository.GetPagedRecycleBinAsync(skip, take, ordering, cancellationToken);
         scope.Complete();
         return result;
     }
@@ -377,7 +377,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.ReadLock(Constants.Locks.ContentTree);
-        bool result = await _asyncDocumentRepository.RecycleBinSmellsAsync(cancellationToken);
+        bool result = await _documentRepository.RecycleBinSmellsAsync(cancellationToken);
         scope.Complete();
         return result;
     }
@@ -1058,7 +1058,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
         }
 
         content.WriterId = userId;
-        await _asyncDocumentRepository.SaveAsync(content, cancellationToken);
+        await _documentRepository.SaveAsync(content, cancellationToken);
     }
 
     /// <summary>
@@ -1191,7 +1191,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
         currentPermissions.RemoveWhere(p => p.IsDefaultPermissions);
 
         // save and flush because we need the ID for the recursive Copying events
-        await _asyncDocumentRepository.SaveAsync(copy, cancellationToken);
+        await _documentRepository.SaveAsync(copy, cancellationToken);
 
         // store navigation update information for copied item
         var copyHasRealParent = parentKey.HasValue && parentKey != Constants.System.RecycleBinContentKey;
@@ -1201,7 +1201,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
         if (currentPermissions.Count > 0)
         {
             var permissionSet = new ContentPermissionSet(copy, currentPermissions);
-            await _asyncDocumentRepository.AddOrUpdatePermissionsAsync(permissionSet, cancellationToken);
+            await _documentRepository.AddOrUpdatePermissionsAsync(permissionSet, cancellationToken);
         }
 
         // keep track of copies
@@ -1269,7 +1269,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
                     descendantCopy.SortOrder = descendantCopy.SortOrder;
 
                     // save and flush (see above)
-                    await _asyncDocumentRepository.SaveAsync(descendantCopy, cancellationToken);
+                    await _documentRepository.SaveAsync(descendantCopy, cancellationToken);
 
                     // store navigation update information for descendants
                     navigationUpdates.Add(Tuple.Create(descendantCopy.Key, descendantCopy.ParentKey));
@@ -1429,7 +1429,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
 
             // save
             saved.Add(content);
-            await _asyncDocumentRepository.SaveAsync(content, cancellationToken);
+            await _documentRepository.SaveAsync(content, cancellationToken);
             await AuditAsync(AuditType.Sort, userId, content.Id, "Sorting content performed by user");
         }
 
@@ -1463,7 +1463,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.WriteLock(Constants.Locks.ContentTree);
 
-        await _asyncDocumentRepository.UpdateSortOrderAsync(orderedChildKeys, cancellationToken);
+        await _documentRepository.UpdateSortOrderAsync(orderedChildKeys, cancellationToken);
 
         // Sort order lives in umbracoNode; neither the published cache nor the content repository cache keeps
         // a separate serialized copy of it, so refreshing the affected branch (which invalidates both and has
@@ -1627,7 +1627,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.ReadLock(Constants.Locks.ContentTree);
-        IContent? blueprint = await _asyncDocumentBlueprintRepository.GetAsync(key, cancellationToken);
+        IContent? blueprint = await _documentBlueprintRepository.GetAsync(key, cancellationToken);
         if (blueprint is not null)
         {
             blueprint.Blueprint = true;
@@ -1656,7 +1656,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
 
         content.WriterId = userId;
 
-        await _asyncDocumentBlueprintRepository.SaveAsync(content, cancellationToken);
+        await _documentBlueprintRepository.SaveAsync(content, cancellationToken);
 
         await AuditAsync(AuditType.Save, userId, content.Id, $"Saved content template: {content.Name}");
 
@@ -1685,7 +1685,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
         int userId = await _userIdKeyResolver.GetAsync(userKey);
         content.WriterId = userId;
 
-        await _asyncDocumentBlueprintRepository.SaveAsync(content, cancellationToken);
+        await _documentBlueprintRepository.SaveAsync(content, cancellationToken);
 
         await AuditAsync(AuditType.Move, userId, content.Id);
 
@@ -1708,7 +1708,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.WriteLock(Constants.Locks.ContentTree);
 
-        await _asyncDocumentBlueprintRepository.DeleteAsync(content, cancellationToken);
+        await _documentBlueprintRepository.DeleteAsync(content, cancellationToken);
 
         scope.Notifications.Publish(new ContentDeletedBlueprintNotification(content, evtMsgs));
         scope.Notifications.Publish(new ContentTreeChangeNotification(content, TreeChangeTypes.Remove, evtMsgs));
@@ -1785,11 +1785,11 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
         IEnumerable<IContent> blueprints;
         if (contentTypeKeys.Length == 0)
         {
-            blueprints = await _asyncDocumentBlueprintRepository.GetAllAsync(cancellationToken);
+            blueprints = await _documentBlueprintRepository.GetAllAsync(cancellationToken);
         }
         else
         {
-            PagedModel<IContent> paged = await _asyncDocumentBlueprintRepository.GetPagedOfContentTypesAsync(
+            PagedModel<IContent> paged = await _documentBlueprintRepository.GetPagedOfContentTypesAsync(
                 contentTypeKeys, 0, int.MaxValue, Ordering.By("sortOrder"), cancellationToken);
             blueprints = paged.Items;
         }
@@ -1820,11 +1820,11 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
         IEnumerable<IContent> blueprints;
         if (contentTypeKeysArray.Length == 0)
         {
-            blueprints = await _asyncDocumentBlueprintRepository.GetAllAsync(cancellationToken);
+            blueprints = await _documentBlueprintRepository.GetAllAsync(cancellationToken);
         }
         else
         {
-            PagedModel<IContent> paged = await _asyncDocumentBlueprintRepository.GetPagedOfContentTypesAsync(
+            PagedModel<IContent> paged = await _documentBlueprintRepository.GetPagedOfContentTypesAsync(
                 contentTypeKeysArray, 0, int.MaxValue, Ordering.By("sortOrder"), cancellationToken);
             blueprints = paged.Items;
         }
@@ -1836,7 +1836,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
             foreach (IContent blueprint in blueprintsArray)
             {
                 blueprint.Blueprint = true;
-                await _asyncDocumentBlueprintRepository.DeleteAsync(blueprint, cancellationToken);
+                await _documentBlueprintRepository.DeleteAsync(blueprint, cancellationToken);
             }
 
             scope.Notifications.Publish(new ContentDeletedBlueprintNotification(blueprintsArray, evtMsgs));
@@ -1866,7 +1866,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
     {
         async Task DoDeleteAsync(IContent c)
         {
-            await _asyncDocumentRepository.DeleteAsync(c, cancellationToken);
+            await _documentRepository.DeleteAsync(c, cancellationToken);
             scope.Notifications.Publish(new ContentDeletedNotification(c, evtMsgs));
 
             // media files deleted by QueuingEventDispatcher

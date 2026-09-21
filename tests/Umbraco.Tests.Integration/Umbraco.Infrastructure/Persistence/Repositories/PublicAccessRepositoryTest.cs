@@ -23,7 +23,7 @@ internal sealed class PublicAccessRepositoryTest : UmbracoIntegrationTest
 {
     private IContentTypeRepository ContentTypeRepository => GetRequiredService<IContentTypeRepository>();
 
-    private IAsyncDocumentRepository DocumentRepository => GetRequiredService<IAsyncDocumentRepository>();
+    private IDocumentRepository DocumentRepository => GetRequiredService<IDocumentRepository>();
 
     private PublicAccessRepository CreateRepository() =>
         new(

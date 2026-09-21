@@ -38,10 +38,10 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             INotificationHandler<ContentDeletingVersionsNotification>,
             INotificationHandler<ContentRefreshNotification>
         {
-            private readonly IAsyncDocumentRepository _documentRepository;
+            private readonly IDocumentRepository _documentRepository;
             private readonly IIdKeyMap _idKeyMap;
 
-            public TestNotificationHandler(IAsyncDocumentRepository documentRepository, IIdKeyMap idKeyMap)
+            public TestNotificationHandler(IDocumentRepository documentRepository, IIdKeyMap idKeyMap)
             {
                 _documentRepository = documentRepository;
                 _idKeyMap = idKeyMap;
