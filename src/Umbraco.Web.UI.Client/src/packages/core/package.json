@@ -4,7 +4,7 @@
 	"type": "module",
 	"scripts": {
 		"build": "vite build",
-		"generate:server-api": "openapi-ts --file openapi-ts.config.js"
+		"generate:server-api": "openapi-ts"
 	},
 	"dependencies": {
 		"@types/diff": "^7.0.2",

@@ -36,7 +36,7 @@ export default [
 			'src/**/*.test.ts',
 			'src/packages/core/backend-api',
 			'src/packages/search-management/examine/api',
-			'src/packages/core/openapi-ts.*.js',
+			'src/packages/core/openapi-ts.config.ts',
 			'src/packages/search-management/openapi-ts.config.ts',
 		],
 	},

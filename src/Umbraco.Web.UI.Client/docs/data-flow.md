@@ -43,7 +43,7 @@ API clients are auto-generated from the backend OpenAPI specification.
 npm run generate:server-api
 ```
 
-This reads `src/packages/core/openapi-ts.config.js` and outputs typed service classes and models to `src/packages/core/backend-api/`, from the Management API's committed `OpenApi.json`.
+This reads `src/packages/core/openapi-ts.config.ts` and outputs typed service classes and models to `src/packages/core/backend-api/`, from the Management API's committed `OpenApi.json`.
 
 A package whose API is **not** part of the Management API document generates its own from its own committed schema, through an `openapi-ts.config.ts` beside its `package.json` and a package-local `generate:server-api` script. Generate only what is needed: for a single endpoint the models alone are enough, and calling `umbHttpClient` directly avoids vendoring a second copy of the hey-api fetch runtime. `search-management` does this for the Examine provider.
 
