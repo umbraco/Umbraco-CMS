@@ -119,7 +119,7 @@ npm run build
 npm run dev
 ```
 
-The Examine provider's own UI is a module of that same package, at `search-management/examine/`, rather than a separate npm project — see [the Examine provider's CLAUDE.md](../Umbraco.Cms.Search.Provider.Examine/CLAUDE.md). It exports nothing, because it has no extension points: its manifests ride the package's bundle. It does have models generated from the provider's own committed OpenAPI document, since that API is not part of the Management API document.
+The Examine provider's own UI is a module of that same package, at `search-management/examine/`, rather than a separate npm project — see [the Examine provider's CLAUDE.md](../Umbraco.Cms.Search.Provider.Examine/CLAUDE.md). Its manifests ride the package's bundle, and the only thing it exports is the fields modal's alias. It does have models generated from the provider's own committed OpenAPI document, since that API is not part of the Management API document.
 
 ### Test Site
 

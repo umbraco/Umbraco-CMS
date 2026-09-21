@@ -12,7 +12,7 @@ An Examine (Lucene) implementation of the search abstractions in `Umbraco.Cms.Se
 
 The provider's backoffice UI lives in the backoffice client, not here, at `Umbraco.Web.UI.Client/src/packages/search-management/examine`. It adds a **"Show Fields"** entity action to search results, opening a deep-linkable sidebar modal listing a document's indexed fields.
 
-It is gated by the `Umb.Search.Condition.IndexProviderName` condition matching this provider's name, so it appears only on indexes this provider owns. Nothing is exported from that module: it has no extension points, so it is registered through the package's bundle and is otherwise private.
+It is gated by the `Umb.Search.Condition.IndexProviderName` condition matching this provider's name, so it appears only on indexes this provider owns. Its manifests are registered through the package's bundle. The module is otherwise private, exporting only `UMB_SEARCH_DOCUMENT_FIELDS_MODAL_ALIAS`, so the fields modal can be opened from elsewhere.
 
 Keeping it there rather than in an `/App_Plugins` bundle of its own means it is served from the cache-busted backoffice asset path (which carries a long-lived `Cache-Control`, unlike `/App_Plugins`), and needs no separate frontend build in the pipeline.
 
