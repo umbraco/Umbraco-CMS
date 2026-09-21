@@ -32,7 +32,6 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddUnique<IDataTypeRepository, DataTypeRepository>();
         builder.Services.AddUnique<IDictionaryRepository, DictionaryRepository>();
         builder.Services.AddUnique<IDocumentBlueprintContainerRepository, DocumentBlueprintContainerRepository>();
-        builder.Services.AddUnique<IDocumentRepository, DocumentRepository>();
         builder.Services.AddUnique<IAsyncDocumentBlueprintRepository, AsyncDocumentBlueprintRepository>();
         builder.Services.AddUnique<IAsyncDocumentRepository, AsyncDocumentRepository>();
         builder.Services.AddUnique<IDocumentVersionRepository, DocumentVersionRepository>();
