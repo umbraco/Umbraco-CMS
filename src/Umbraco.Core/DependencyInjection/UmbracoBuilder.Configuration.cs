@@ -22,7 +22,7 @@ public static partial class UmbracoBuilderExtensions
     /// <param name="configure">Optional action to configure the <see cref="OptionsBuilder{TOptions}" />.</param>
     /// <returns>The <see cref="IUmbracoBuilder" />.</returns>
     /// <exception cref="ArgumentException">Thrown when <typeparamref name="TOptions" /> does not have the <see cref="UmbracoOptionsAttribute" />.</exception>
-    public static IUmbracoBuilder AddUmbracoOptions<TOptions>(this IUmbracoBuilder builder, Action<OptionsBuilder<TOptions>>? configure = null)
+    private static IUmbracoBuilder AddUmbracoOptions<TOptions>(this IUmbracoBuilder builder, Action<OptionsBuilder<TOptions>>? configure = null)
         where TOptions : class
     {
         UmbracoOptionsAttribute? umbracoOptionsAttribute = typeof(TOptions).GetCustomAttribute<UmbracoOptionsAttribute>();

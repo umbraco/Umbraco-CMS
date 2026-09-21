@@ -45,12 +45,14 @@ public static class UmbracoBuilderExtensions
 
         builder.Services.AddSingleton<AddExamineSearchProviderMarker>();
 
-        builder.AddUmbracoOptions<ExamineSearchProviderSettings>();
+        IConfigurationSection section = builder.Config.GetSection(Umbraco.Cms.Core.Constants.Configuration.ConfigSearchExamine);
+        builder.Services.AddOptions<ExamineSearchProviderSettings>()
+            .Bind(section)
+            .ValidateDataAnnotations();
 
         // The settings are registered as options above, but the zero-downtime branch below needs the value
         // synchronously at composition time, so read the section directly instead of resolving IOptions<T> -
         // meaning this value cannot be changed later by an IConfigureOptions<ExamineSearchProviderSettings>.
-        IConfigurationSection section = builder.Config.GetSection(Umbraco.Cms.Core.Constants.Configuration.ConfigSearchExamine);
         ExamineSearchProviderSettings settings = section.Get<ExamineSearchProviderSettings>() ?? new ExamineSearchProviderSettings();
 
         if (settings.ZeroDowntimeIndexing)
