@@ -22,14 +22,16 @@ interface UmbViteDefaultConfigArgs {
 	 * by default, which is cheap on a fast connection and expensive on a slow one.
 	 *
 	 * `eagerModules` names the modules that must stay out of that chunk: anything the application
-	 * instantiates at startup rather than on demand. Put a module in the lazy chunk by mistake and
-	 * the whole chunk loads at boot, so a package opts in only once it knows which of its modules
-	 * are eager.
+	 * instantiates at startup rather than on demand. They are emitted as their own chunk, because
+	 * leaving them for Rollup to place lets it hoist them into the lazy chunk and have the entry
+	 * import that statically, which loads the whole chunk at boot. Put a module in the lazy chunk
+	 * by mistake and it loads at boot too, so a package opts in only once it knows which of its
+	 * modules are eager.
 	 */
 	lazyChunk?: {
 		/** Chunk name. Defaults to `lazy`. */
 		name?: string;
-		/** Module id fragments or patterns to leave for Rollup to place. */
+		/** Module id fragments or patterns to emit in the eager chunk instead. */
 		eagerModules?: Array<string | RegExp>;
 	};
 }
@@ -62,8 +64,11 @@ export const getDefaultConfig = (args: UmbViteDefaultConfigArgs): UserConfig => 
 						? {
 								manualChunks(id: string) {
 									if (!id.startsWith(packageRoot)) return;
-									if (lazyChunk.eagerModules && isEager(id, lazyChunk.eagerModules)) return;
-									return lazyChunk.name ?? 'lazy';
+									const name = lazyChunk.name ?? 'lazy';
+									if (lazyChunk.eagerModules && isEager(id, lazyChunk.eagerModules)) {
+										return `${name}-eager`;
+									}
+									return name;
 								},
 							}
 						: {}),
