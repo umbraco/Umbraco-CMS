@@ -1,16 +1,10 @@
-export interface UmbExamineFieldModel {
-	name: string;
-	type: string;
-	values: Array<string>;
-}
+import type { DocumentModel, FieldModel, IndexDocumentModel } from './api/index.js';
 
-export interface UmbExamineIndexDocumentModel {
-	fields: Array<UmbExamineFieldModel>;
-}
+export type UmbExamineFieldModel = FieldModel;
 
-export interface UmbExamineDocumentModel {
-	documents: Array<UmbExamineIndexDocumentModel>;
-}
+export type UmbExamineIndexDocumentModel = IndexDocumentModel;
+
+export type UmbExamineDocumentModel = DocumentModel;
 
 export interface UmbExamineShowFieldsModalData {
 	documentUnique: string;
