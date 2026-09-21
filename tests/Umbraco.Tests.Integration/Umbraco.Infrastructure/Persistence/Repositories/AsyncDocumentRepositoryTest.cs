@@ -832,6 +832,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         {
             content.Name = $"name-{i}";
             content.SetValue("title", $"title-{i}");
+            content.PublishCulture(CultureImpact.Invariant, DateTime.UtcNow, GetRequiredService<PropertyEditorCollection>());
             content.PublishedState = PublishedState.Publishing;
             await repository.SaveAsync(content, CancellationToken.None);
             expected.Add(content.VersionId);
@@ -2258,6 +2259,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
     {
         var scopeAccessor = GetRequiredService<IEFCoreScopeAccessor<UmbracoDbContext>>();
         var content = ContentBuilder.CreateSimpleContent(_contentType, "Publish On Create Page", _textpage.Id);
+        content.PublishCulture(CultureImpact.Invariant, DateTime.UtcNow, GetRequiredService<PropertyEditorCollection>());
         content.PublishedState = PublishedState.Publishing;
 
         using var scope = NewScopeProvider.CreateScope();
@@ -2322,6 +2324,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         int originalDraftVersionId = content.VersionId;
 
         // Step 2: first publish - exercises the simple "no prior published version" case.
+        content.PublishCulture(CultureImpact.Invariant, DateTime.UtcNow, GetRequiredService<PropertyEditorCollection>());
         content.PublishedState = PublishedState.Publishing;
         await repository.SaveAsync(content, CancellationToken.None);
         int firstPublishedVersionId = content.PublishedVersionId;
@@ -2333,6 +2336,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         // Step 3: change something, then publish again - exercises the "unpublish the old published
         // version" branch, since a prior published version now exists.
         content.SetValue("title", "Changed for second publish");
+        content.PublishCulture(CultureImpact.Invariant, DateTime.UtcNow, GetRequiredService<PropertyEditorCollection>());
         content.PublishedState = PublishedState.Publishing;
         await repository.SaveAsync(content, CancellationToken.None);
         int secondPublishedVersionId = content.PublishedVersionId;
@@ -2355,6 +2359,8 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         ContentVersionDto thirdDraftContentVersion = await scopeAccessor.AmbientScope!.ExecuteWithContextAsync(db =>
             db.ContentVersions.FirstAsync(contentVersion => contentVersion.Id == thirdDraftVersionId));
 
+        IContent? secondPublishedVersion = await repository.GetVersionAsync(secondPublishedVersionId, CancellationToken.None);
+
         scope.Complete();
 
         Assert.Multiple(() =>
@@ -2366,6 +2372,10 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
             Assert.That(thirdDraftRow.Published, Is.False, "a brand new draft row must exist and not be published");
             Assert.That(thirdDraftContentVersion.Current, Is.True);
             Assert.That(secondPublishedVersionId, Is.Not.EqualTo(thirdDraftVersionId));
+            Assert.That(
+                secondPublishedVersion?.GetValue("title"),
+                Is.EqualTo("Changed for second publish"),
+                "the published version must keep the property values it was published with");
         });
     }
 
@@ -2380,6 +2390,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
 
         await repository.SaveAsync(content, CancellationToken.None);
 
+        content.PublishCulture(CultureImpact.Invariant, DateTime.UtcNow, GetRequiredService<PropertyEditorCollection>());
         content.PublishedState = PublishedState.Publishing;
         await repository.SaveAsync(content, CancellationToken.None);
         int nodeId = content.Id;
@@ -2414,6 +2425,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         var scopeAccessor = GetRequiredService<IEFCoreScopeAccessor<UmbracoDbContext>>();
         var content = ContentBuilder.CreateSimpleContent(contentType, "Tagged Page", _textpage.Id);
         content.SetValue("tags", "[\"red\",\"blue\"]");
+        content.PublishCulture(CultureImpact.Invariant, DateTime.UtcNow, GetRequiredService<PropertyEditorCollection>());
         content.PublishedState = PublishedState.Publishing;
 
         using var scope = NewScopeProvider.CreateScope();
@@ -2453,6 +2465,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
 
         // Second save: HasIdentity is now true, so this routes through PersistUpdatedItemAsync with
         // publishing == true — the specific "publish an existing draft via update" path.
+        content.PublishCulture(CultureImpact.Invariant, DateTime.UtcNow, GetRequiredService<PropertyEditorCollection>());
         content.PublishedState = PublishedState.Publishing;
         await repository.SaveAsync(content, CancellationToken.None);
 
@@ -2501,6 +2514,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
 
         var notifyingRepository = CreateRepository(AppCaches.Disabled, eventAggregatorMock.Object);
 
+        content.PublishCulture(CultureImpact.Invariant, DateTime.UtcNow, GetRequiredService<PropertyEditorCollection>());
         content.PublishedState = PublishedState.Publishing;
         await notifyingRepository.SaveAsync(content, CancellationToken.None);
         scope.Complete();
@@ -2523,6 +2537,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         using var scope = NewScopeProvider.CreateScope();
         var repository = CreateRepository();
 
+        content.PublishCulture(CultureImpact.Invariant, DateTime.UtcNow, GetRequiredService<PropertyEditorCollection>());
         content.PublishedState = PublishedState.Publishing;
         await repository.SaveAsync(content, CancellationToken.None);
         int nodeId = content.Id;
