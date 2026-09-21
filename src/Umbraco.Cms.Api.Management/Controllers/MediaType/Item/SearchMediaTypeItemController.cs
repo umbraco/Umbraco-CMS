@@ -46,16 +46,16 @@ public class SearchMediaTypeItemController : MediaTypeItemControllerBase
     [ProducesResponseType(typeof(PagedModel<MediaTypeItemResponseModel>), StatusCodes.Status200OK)]
     [EndpointSummary("Searches media type items.")]
     [EndpointDescription("Searches media type items by the provided query with pagination support.")]
-    public Task<IActionResult> Search(CancellationToken cancellationToken, string query, int skip = 0, int take = 100)
+    public async Task<IActionResult> Search(CancellationToken cancellationToken, string query, int skip = 0, int take = 100)
     {
         PagedModel<IEntitySlim> searchResult = _entitySearchService.Search(UmbracoObjectTypes.MediaType, query, skip, take);
         if (searchResult.Items.Any() is false)
         {
-            return Task.FromResult<IActionResult>(Ok(new PagedModel<MediaTypeItemResponseModel> { Total = searchResult.Total }));
+            return Ok(new PagedModel<MediaTypeItemResponseModel> { Total = searchResult.Total });
         }
 
         Guid[] keys = searchResult.Items.Select(item => item.Key).ToArray();
-        IEnumerable<IMediaType> mediaTypes = _mediaTypeService.GetMany(keys.EmptyNull());
+        IEnumerable<IMediaType> mediaTypes = await _mediaTypeService.GetManyAsync(keys);
         IEnumerable<IMediaType> orderedMediaTypes = OrderByRequestedIds(mediaTypes, keys);
 
         var result = new PagedModel<MediaTypeItemResponseModel>
@@ -64,6 +64,6 @@ public class SearchMediaTypeItemController : MediaTypeItemControllerBase
             Total = searchResult.Total,
         };
 
-        return Task.FromResult<IActionResult>(Ok(result));
+        return Ok(result);
     }
 }

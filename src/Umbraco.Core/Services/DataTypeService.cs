@@ -397,17 +397,15 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// <returns>A list of content type compositions.</returns>
         private async Task<List<IContentTypeComposition>> GetReferencedContentTypesAsync(List<(string PropertyAlias, Udi Udi)> pagedUsages)
         {
-            // The document-type repository is async-only. Media/member repositories are still
-            // synchronous (NPoco) and use the generic helper below.
-            Guid[] documentTypeKeys = GetContentTypeKeys(pagedUsages, Constants.UdiEntityType.DocumentType);
-            IEnumerable<IContentTypeComposition> documentTypes = documentTypeKeys.Length > 0
-                ? await _contentTypeRepository.GetManyAsync(documentTypeKeys, CancellationToken.None)
-                : [];
-            IEnumerable<IContentTypeComposition> mediaTypes = GetContentTypes(
+            IEnumerable<IContentTypeComposition> documentTypes = await GetContentTypesAsync(
+                pagedUsages,
+                Constants.UdiEntityType.DocumentType,
+                _contentTypeRepository);
+            IEnumerable<IContentTypeComposition> mediaTypes = await GetContentTypesAsync(
                 pagedUsages,
                 Constants.UdiEntityType.MediaType,
                 _mediaTypeRepository);
-            IEnumerable<IContentTypeComposition> memberTypes = GetContentTypes(
+            IEnumerable<IContentTypeComposition> memberTypes = await GetContentTypesAsync(
                 pagedUsages,
                 Constants.UdiEntityType.MemberType,
                 _memberTypeRepository);
@@ -422,15 +420,15 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// <param name="entityType">The entity type to filter by.</param>
         /// <param name="repository">The repository to query.</param>
         /// <returns>A collection of content types.</returns>
-        private static IEnumerable<T> GetContentTypes<T>(
+        private static async Task<IEnumerable<T>> GetContentTypesAsync<T>(
             IEnumerable<(string PropertyAlias, Udi Udi)> dataTypeUsages,
             string entityType,
-            IContentTypeRepositoryBase<T> repository)
+            IAsyncContentTypeRepositoryBase<T> repository)
             where T : IContentTypeComposition
         {
             Guid[] contentTypeKeys = GetContentTypeKeys(dataTypeUsages, entityType);
             return contentTypeKeys.Length > 0
-                ? repository.GetMany(contentTypeKeys)
+                ? await repository.GetManyAsync(contentTypeKeys, CancellationToken.None)
                 : [];
         }
 

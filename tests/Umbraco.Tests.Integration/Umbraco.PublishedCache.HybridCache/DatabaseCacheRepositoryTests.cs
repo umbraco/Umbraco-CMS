@@ -63,7 +63,7 @@ internal sealed class DatabaseCacheRepositoryTests : UmbracoIntegrationTestWithC
         await base.CreateTestDataAsync();
 
         // Add a few media items so the media-side methods have something to read.
-        MediaType = MediaTypeService.Get("image")!;
+        MediaType = (await MediaTypeService.GetAsync("image"))!;
         MediaItem1 = new MediaBuilder().WithName("Image 1").WithMediaType(MediaType).Build();
         MediaItem2 = new MediaBuilder().WithName("Image 2").WithMediaType(MediaType).Build();
         MediaItem3 = new MediaBuilder().WithName("Image 3").WithMediaType(MediaType).Build();

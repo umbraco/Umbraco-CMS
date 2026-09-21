@@ -181,7 +181,7 @@ public class MemberTypeService : AsyncContentTypeServiceBase<IMemberTypeReposito
         {
             scope.ReadLock(ReadLockIds);
 
-            using (IEnumerator<IMemberType> e = _memberTypeRepository.GetMany(Array.Empty<int>()).GetEnumerator())
+            using (IEnumerator<IMemberType> e = _memberTypeRepository.GetManyAsync(Array.Empty<int>(), CancellationToken.None).GetAwaiter().GetResult().GetEnumerator())
             {
                 if (e.MoveNext() == false)
                 {

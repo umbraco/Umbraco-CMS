@@ -19,8 +19,8 @@ internal sealed partial class MediaNavigationServiceTests : MediaNavigationServi
         //        - Image 4
 
         // Media Types
-        FolderMediaType = MediaTypeService.Get(Constants.Conventions.MediaTypes.Folder);
-        ImageMediaType = MediaTypeService.Get(Constants.Conventions.MediaTypes.Image);
+        FolderMediaType = await MediaTypeService.GetAsync(Constants.Conventions.MediaTypes.Folder);
+        ImageMediaType = await MediaTypeService.GetAsync(Constants.Conventions.MediaTypes.Image);
         ImageMediaType.PropertyTypes.First(x => x.Alias == "umbracoFile").Mandatory = false;
         await MediaTypeService.CreateAsync(ImageMediaType, Constants.Security.SuperUserKey);
 

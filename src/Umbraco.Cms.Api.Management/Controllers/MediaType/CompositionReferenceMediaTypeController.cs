@@ -45,7 +45,7 @@ public class CompositionReferenceMediaTypeController : MediaTypeControllerBase
             return OperationStatusResult(ContentTypeOperationStatus.NotFound);
         }
 
-        IEnumerable<IMediaType> composedOf = _mediaTypeService.GetComposedOf(mediaType.Id);
+        IEnumerable<IMediaType> composedOf = await _mediaTypeService.GetComposedOfAsync(mediaType.Id);
         List<MediaTypeCompositionResponseModel> responseModels = _umbracoMapper.MapEnumerable<IMediaType, MediaTypeCompositionResponseModel>(composedOf);
 
         return Ok(responseModels);

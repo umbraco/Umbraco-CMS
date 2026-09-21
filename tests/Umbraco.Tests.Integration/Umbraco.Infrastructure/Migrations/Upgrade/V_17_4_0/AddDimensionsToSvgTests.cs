@@ -61,7 +61,7 @@ internal sealed class AddDimensionsToSvgTests : UmbracoIntegrationTest
 
         await ExecuteMigration();
 
-        IMediaType mediaType = MediaTypeService.Get(Constants.Conventions.MediaTypes.VectorGraphicsAlias)!;
+        IMediaType mediaType = (await MediaTypeService.GetAsync(Constants.Conventions.MediaTypes.VectorGraphicsAlias))!;
         IPropertyType? width = mediaType.PropertyTypes.SingleOrDefault(x => x.Alias == Constants.Conventions.Media.Width);
         IPropertyType? height = mediaType.PropertyTypes.SingleOrDefault(x => x.Alias == Constants.Conventions.Media.Height);
 
@@ -84,7 +84,7 @@ internal sealed class AddDimensionsToSvgTests : UmbracoIntegrationTest
         // against that state must not duplicate the properties or change their keys.
         await ExecuteMigration();
 
-        IMediaType mediaType = MediaTypeService.Get(Constants.Conventions.MediaTypes.VectorGraphicsAlias)!;
+        IMediaType mediaType = (await MediaTypeService.GetAsync(Constants.Conventions.MediaTypes.VectorGraphicsAlias))!;
         IPropertyType[] widths = mediaType.PropertyTypes.Where(x => x.Alias == Constants.Conventions.Media.Width).ToArray();
         IPropertyType[] heights = mediaType.PropertyTypes.Where(x => x.Alias == Constants.Conventions.Media.Height).ToArray();
 
@@ -99,12 +99,12 @@ internal sealed class AddDimensionsToSvgTests : UmbracoIntegrationTest
 
     private async Task RemoveDimensionPropertiesToSimulatePreMigrationState()
     {
-        IMediaType mediaType = MediaTypeService.Get(Constants.Conventions.MediaTypes.VectorGraphicsAlias)!;
+        IMediaType mediaType = (await MediaTypeService.GetAsync(Constants.Conventions.MediaTypes.VectorGraphicsAlias))!;
         mediaType.RemovePropertyType(Constants.Conventions.Media.Width);
         mediaType.RemovePropertyType(Constants.Conventions.Media.Height);
         await MediaTypeService.UpdateAsync(mediaType, Constants.Security.SuperUserKey);
 
-        IMediaType reloaded = MediaTypeService.Get(Constants.Conventions.MediaTypes.VectorGraphicsAlias)!;
+        IMediaType reloaded = (await MediaTypeService.GetAsync(Constants.Conventions.MediaTypes.VectorGraphicsAlias))!;
         Assert.That(
             reloaded.PropertyTypes.Any(x =>
                 x.Alias == Constants.Conventions.Media.Width || x.Alias == Constants.Conventions.Media.Height),

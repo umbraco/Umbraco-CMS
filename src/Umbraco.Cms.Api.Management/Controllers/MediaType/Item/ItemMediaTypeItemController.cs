@@ -39,17 +39,17 @@ public class ItemMediaTypeItemController : MediaTypeItemControllerBase
     [ProducesResponseType(typeof(IEnumerable<MediaTypeItemResponseModel>), StatusCodes.Status200OK)]
     [EndpointSummary("Gets a collection of media type items.")]
     [EndpointDescription("Gets a collection of media type items identified by the provided Ids.")]
-    public Task<IActionResult> Item(
+    public async Task<IActionResult> Item(
         CancellationToken cancellationToken,
         [FromQuery(Name = "id")] HashSet<Guid> ids)
     {
         if (ids.Count is 0)
         {
-            return Task.FromResult<IActionResult>(Ok(Enumerable.Empty<MediaTypeItemResponseModel>()));
+            return Ok(Enumerable.Empty<MediaTypeItemResponseModel>());
         }
 
-        IEnumerable<IMediaType> mediaTypes = _mediaTypeService.GetMany(ids);
+        IEnumerable<IMediaType> mediaTypes = await _mediaTypeService.GetManyAsync(ids);
         List<MediaTypeItemResponseModel> responseModels = _mapper.MapEnumerable<IMediaType, MediaTypeItemResponseModel>(mediaTypes);
-        return Task.FromResult<IActionResult>(Ok(responseModels));
+        return Ok(responseModels);
     }
 }

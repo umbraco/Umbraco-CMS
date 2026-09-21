@@ -157,7 +157,7 @@ public class ContentTypeSchemaServiceTests
         var cachedType = Mock.Of<IMediaType>(x => x.Alias == "cachedType" && x.PropertyTypes == Array.Empty<IPropertyType>());
         var uncachedType = Mock.Of<IMediaType>(x => x.Alias == "uncachedType");
 
-        _mediaTypeServiceMock.Setup(x => x.GetAll()).Returns([cachedType, uncachedType]);
+        _mediaTypeServiceMock.Setup(x => x.GetAllAsync()).ReturnsAsync([cachedType, uncachedType]);
         _publishedContentTypeCacheMock.Setup(x => x.Get(PublishedItemType.Media, "cachedType"))
             .Returns(Mock.Of<IPublishedContentType>(x =>
                 x.Alias == "cachedType" &&

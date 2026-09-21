@@ -109,7 +109,7 @@ public class MigrateSingleBlockList : AsyncMigrationBase
         IEnumerable<IPropertyType> contentPropertyTypes = allContentTypes
             .SelectMany(ct => ct.PropertyTypes);
 
-        IMediaType[] allMediaTypes = _mediaTypeService.GetAll().ToArray();
+        IMediaType[] allMediaTypes = (await _mediaTypeService.GetAllAsync()).ToArray();
         IEnumerable<IPropertyType> mediaPropertyTypes = allMediaTypes
             .SelectMany(ct => ct.PropertyTypes);
 

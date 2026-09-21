@@ -36,9 +36,9 @@ internal sealed partial class MediaTypeEditingServiceTests
     [Test]
     public async Task Can_Create_In_A_Folder()
     {
-        var containerResult = MediaTypeService.CreateContainer(Constants.System.Root, Guid.NewGuid(), "Test folder");
+        var containerResult = await MediaTypeContainerService.CreateAsync(null, "Test folder", Constants.System.RootKey, Constants.Security.SuperUserKey);
         Assert.IsTrue(containerResult.Success);
-        var container = containerResult.Result?.Entity;
+        var container = containerResult.Result;
         Assert.IsNotNull(container);
 
         var createModel = MediaTypeCreateModel("Test", "test", containerKey: container.Key);

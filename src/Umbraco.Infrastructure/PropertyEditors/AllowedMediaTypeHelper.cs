@@ -62,7 +62,7 @@ internal sealed class AllowedMediaTypeHelper
 
     private string? GetMediaTypeKey(string typeAlias)
     {
-        string? GetMediaTypeKeyFromService(string alias) => _mediaTypeService.Get(alias)?.Key.ToString();
+        string? GetMediaTypeKeyFromService(string alias) => _mediaTypeService.GetAsync(alias).GetAwaiter().GetResult()?.Key.ToString();
 
         if (_appCaches.RequestCache.IsAvailable is false)
         {

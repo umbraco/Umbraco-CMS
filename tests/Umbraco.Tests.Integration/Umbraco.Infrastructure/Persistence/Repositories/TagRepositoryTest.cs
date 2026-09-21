@@ -664,7 +664,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
             DocumentRepository.Save(content2);
 
             var mediaType = MediaTypeBuilder.CreateImageMediaType("image2");
-            MediaTypeRepository.Save(mediaType);
+            await MediaTypeRepository.SaveAsync(mediaType, CancellationToken.None);
 
             var media1 = MediaBuilder.CreateMediaImage(mediaType, -1);
             MediaRepository.Save(media1);
@@ -742,7 +742,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
             DocumentRepository.Save(content1);
 
             var mediaType = MediaTypeBuilder.CreateImageMediaType("image2");
-            MediaTypeRepository.Save(mediaType);
+            await MediaTypeRepository.SaveAsync(mediaType, CancellationToken.None);
 
             var media1 = MediaBuilder.CreateMediaImage(mediaType, -1);
             MediaRepository.Save(media1);
@@ -799,7 +799,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
             DocumentRepository.Save(content1);
 
             var mediaType = MediaTypeBuilder.CreateImageMediaType("image2");
-            MediaTypeRepository.Save(mediaType);
+            await MediaTypeRepository.SaveAsync(mediaType, CancellationToken.None);
 
             var media1 = MediaBuilder.CreateMediaImage(mediaType, -1);
             MediaRepository.Save(media1);
@@ -891,7 +891,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
             DocumentRepository.Save(content2);
 
             var mediaType = MediaTypeBuilder.CreateImageMediaType("image2");
-            MediaTypeRepository.Save(mediaType);
+            await MediaTypeRepository.SaveAsync(mediaType, CancellationToken.None);
 
             var media1 = MediaBuilder.CreateMediaImage(mediaType, -1);
             MediaRepository.Save(media1);
@@ -985,7 +985,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
             DocumentRepository.Save(content2);
 
             var mediaType = MediaTypeBuilder.CreateImageMediaType("image2");
-            MediaTypeRepository.Save(mediaType);
+            await MediaTypeRepository.SaveAsync(mediaType, CancellationToken.None);
 
             var media1 = MediaBuilder.CreateMediaImage(mediaType, -1);
             MediaRepository.Save(media1);

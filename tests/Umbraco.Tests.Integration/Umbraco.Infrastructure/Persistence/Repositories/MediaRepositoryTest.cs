@@ -412,7 +412,7 @@ internal sealed class MediaRepositoryTest : UmbracoIntegrationTest
     public void QueryMedia_ContentTypeIdFilter()
     {
         // Arrange
-        var folderMediaType = MediaTypeService.Get(1031);
+        var folderMediaType = MediaTypeService.GetAsync(1031).GetAwaiter().GetResult();
         var provider = ScopeProvider;
         using (var scope = provider.CreateScope())
         {
@@ -699,17 +699,17 @@ internal sealed class MediaRepositoryTest : UmbracoIntegrationTest
     public void CreateTestData()
     {
         // Create and Save folder-Media -> (1051)
-        var folderMediaType = MediaTypeService.Get(1031);
+        var folderMediaType = MediaTypeService.GetAsync(1031).GetAwaiter().GetResult();
         _testFolder = MediaBuilder.CreateMediaFolder(folderMediaType, -1);
         MediaService.Save(_testFolder, -1);
 
         // Create and Save image-Media -> (1052)
-        var imageMediaType = MediaTypeService.Get(1032);
+        var imageMediaType = MediaTypeService.GetAsync(1032).GetAwaiter().GetResult();
         _testImage = MediaBuilder.CreateMediaImage(imageMediaType, _testFolder.Id);
         MediaService.Save(_testImage, -1);
 
         // Create and Save file-Media -> (1053)
-        var fileMediaType = MediaTypeService.Get(1033);
+        var fileMediaType = MediaTypeService.GetAsync(1033).GetAwaiter().GetResult();
         _testFile = MediaBuilder.CreateMediaFile(fileMediaType, _testFolder.Id);
         MediaService.Save(_testFile, -1);
     }

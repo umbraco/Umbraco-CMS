@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Core.Services.Navigation;
 ///     and implements both <see cref="IMediaNavigationQueryService"/> and <see cref="IMediaNavigationManagementService"/>
 ///     to provide a complete set of navigation operations for media content.
 /// </remarks>
-internal sealed class MediaNavigationService : ContentNavigationServiceBase<IMediaType, IMediaTypeService>, IMediaNavigationQueryService, IMediaNavigationManagementService, IMemoryCacheSizeReporter
+internal sealed class MediaNavigationService : AsyncContentNavigationServiceBase<IMediaType, IMediaTypeService>, IMediaNavigationQueryService, IMediaNavigationManagementService, IMemoryCacheSizeReporter
 {
     /// <inheritdoc />
     public string CacheName => "Media navigation";

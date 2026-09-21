@@ -120,7 +120,7 @@ internal sealed partial class MediaTypeEditingServiceTests
     [TestCase(Constants.Conventions.MediaTypes.Image)]
     public async Task Cannot_Change_Alias_Of_System_Media_Type(string mediaTypeAlias)
     {
-        var mediaType = MediaTypeService.Get(mediaTypeAlias);
+        var mediaType = await MediaTypeService.GetAsync(mediaTypeAlias);
         Assert.IsNotNull(mediaType);
 
         var updateModel = MediaTypeUpdateModel(mediaTypeAlias, $"{mediaTypeAlias}_updated");

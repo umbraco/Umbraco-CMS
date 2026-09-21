@@ -55,8 +55,8 @@ public class SearchMediaTypeItemControllerTests
         IMediaType mediaTypeA = Mock.Of<IMediaType>(x => x.Key == keyA);
         IMediaType mediaTypeB = Mock.Of<IMediaType>(x => x.Key == keyB);
         _mediaTypeService
-            .Setup(x => x.GetMany(It.IsAny<IEnumerable<Guid>>()))
-            .Returns(new[] { mediaTypeC, mediaTypeA, mediaTypeB });
+            .Setup(x => x.GetManyAsync(It.IsAny<IEnumerable<Guid>>()))
+            .ReturnsAsync(new[] { mediaTypeC, mediaTypeA, mediaTypeB });
 
         _mapper
             .Setup(x => x.MapEnumerable<IMediaType, MediaTypeItemResponseModel>(It.IsAny<IEnumerable<IMediaType>>()))

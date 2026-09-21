@@ -379,8 +379,8 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
     [Test]
     public void EntityService_Can_Get_Paged_Media_Children()
     {
-        var folderType = MediaTypeService.Get(1031);
-        var imageMediaType = MediaTypeService.Get(1032);
+        var folderType = MediaTypeService.GetAsync(1031).GetAwaiter().GetResult();
+        var imageMediaType = MediaTypeService.GetAsync(1032).GetAwaiter().GetResult();
 
         var root = MediaBuilder.CreateMediaFolder(folderType, -1);
         MediaService.Save(root);
@@ -445,8 +445,8 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
     [LongRunning]
     public void EntityService_Can_Get_Paged_Media_Descendants()
     {
-        var folderType = MediaTypeService.Get(1031);
-        var imageMediaType = MediaTypeService.Get(1032);
+        var folderType = MediaTypeService.GetAsync(1031).GetAwaiter().GetResult();
+        var imageMediaType = MediaTypeService.GetAsync(1032).GetAwaiter().GetResult();
 
         var root = MediaBuilder.CreateMediaFolder(folderType, -1);
         MediaService.Save(root);
@@ -478,8 +478,8 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
     [LongRunning]
     public void EntityService_Can_Get_Paged_Media_Descendants_Including_Recycled()
     {
-        var folderType = MediaTypeService.Get(1031);
-        var imageMediaType = MediaTypeService.Get(1032);
+        var folderType = MediaTypeService.GetAsync(1031).GetAwaiter().GetResult();
+        var imageMediaType = MediaTypeService.GetAsync(1032).GetAwaiter().GetResult();
 
         var root = MediaBuilder.CreateMediaFolder(folderType, -1);
         MediaService.Save(root);
@@ -521,8 +521,8 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
     [LongRunning]
     public void EntityService_Can_Get_Paged_Media_Descendants_Without_Recycled()
     {
-        var folderType = MediaTypeService.Get(1031);
-        var imageMediaType = MediaTypeService.Get(1032);
+        var folderType = MediaTypeService.GetAsync(1031).GetAwaiter().GetResult();
+        var imageMediaType = MediaTypeService.GetAsync(1032).GetAwaiter().GetResult();
 
         var root = MediaBuilder.CreateMediaFolder(folderType, -1);
         MediaService.Save(root);
@@ -565,8 +565,8 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
     [LongRunning]
     public void EntityService_Can_Get_Paged_Trashed_Media_Children()
     {
-        var folderType = MediaTypeService.Get(1031);
-        var imageMediaType = MediaTypeService.Get(1032);
+        var folderType = MediaTypeService.GetAsync(1031).GetAwaiter().GetResult();
+        var imageMediaType = MediaTypeService.GetAsync(1032).GetAwaiter().GetResult();
 
         var root = MediaBuilder.CreateMediaFolder(folderType, -1);
         MediaService.Save(root);
@@ -610,8 +610,8 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
     [LongRunning]
     public void EntityService_Can_Get_Paged_Media_Descendants_With_Search()
     {
-        var folderType = MediaTypeService.Get(1031);
-        var imageMediaType = MediaTypeService.Get(1032);
+        var folderType = MediaTypeService.GetAsync(1031).GetAwaiter().GetResult();
+        var imageMediaType = MediaTypeService.GetAsync(1032).GetAwaiter().GetResult();
 
         var root = MediaBuilder.CreateMediaFolder(folderType, -1);
         MediaService.Save(root);
@@ -1230,18 +1230,18 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
             ContentService.Save(_trashed, -1);
 
             // Create and Save folder-Media -> 1057
-            _folderMediaType = MediaTypeService.Get(1031);
+            _folderMediaType = await MediaTypeService.GetAsync(1031);
             _folder = MediaBuilder.CreateMediaFolder(_folderMediaType, -1);
             MediaService.Save(_folder, -1);
             _folderId = _folder.Id;
 
             // Create and Save image-Media -> 1058
-            _imageMediaType = MediaTypeService.Get(1032);
+            _imageMediaType = await MediaTypeService.GetAsync(1032);
             _image = MediaBuilder.CreateMediaImage(_imageMediaType, _folder.Id);
             MediaService.Save(_image, -1);
 
             // Create and Save file-Media -> 1059
-            var fileMediaType = MediaTypeService.Get(1033);
+            var fileMediaType = await MediaTypeService.GetAsync(1033);
             var file = MediaBuilder.CreateMediaFile(fileMediaType, _folder.Id);
             MediaService.Save(file, -1);
 

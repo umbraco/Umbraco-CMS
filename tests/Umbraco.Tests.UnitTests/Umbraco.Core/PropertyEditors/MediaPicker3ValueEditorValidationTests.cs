@@ -120,11 +120,11 @@ internal class MediaPicker3ValueEditorValidationTests
 
         if (findsMediaType)
         {
-            mediaTypeServiceMock.Setup(x => x.Get(mediaTypeAlias)).Returns(mediaTypeMock.Object);
+            mediaTypeServiceMock.Setup(x => x.GetAsync(mediaTypeAlias)).ReturnsAsync(mediaTypeMock.Object);
         }
         else
         {
-            mediaTypeServiceMock.Setup(x => x.Get(It.IsAny<string>())).Returns((IMediaType)null);
+            mediaTypeServiceMock.Setup(x => x.GetAsync(It.IsAny<string>())).ReturnsAsync((IMediaType)null);
         }
 
         if (valueProvidesMediaTypeAlias is false)
@@ -154,7 +154,7 @@ internal class MediaPicker3ValueEditorValidationTests
 
         var mediaTypeMock = new Mock<IMediaType>();
         mediaTypeMock.Setup(x => x.Key).Returns(mediaTypeKey);
-        mediaTypeServiceMock.Setup(x => x.Get(mediaTypeAlias)).Returns(mediaTypeMock.Object);
+        mediaTypeServiceMock.Setup(x => x.GetAsync(mediaTypeAlias)).ReturnsAsync(mediaTypeMock.Object);
 
         if (mediaFound)
         {
@@ -188,7 +188,7 @@ internal class MediaPicker3ValueEditorValidationTests
 
         var mediaTypeMock = new Mock<IMediaType>();
         mediaTypeMock.Setup(x => x.Key).Returns(mediaTypeKey);
-        mediaTypeServiceMock.Setup(x => x.Get(mediaTypeAlias)).Returns(mediaTypeMock.Object);
+        mediaTypeServiceMock.Setup(x => x.GetAsync(mediaTypeAlias)).ReturnsAsync(mediaTypeMock.Object);
 
         var mediaMock = new Mock<IMedia>();
         mediaMock.SetupGet(x => x.ContentType.Alias).Returns(mediaTypeAlias);

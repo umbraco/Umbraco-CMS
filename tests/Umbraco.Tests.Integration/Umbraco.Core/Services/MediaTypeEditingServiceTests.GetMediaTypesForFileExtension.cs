@@ -61,7 +61,7 @@ internal sealed partial class MediaTypeEditingServiceTests
     public async Task Returns_Multiple_Specific_Matches_And_Fallback()
     {
         // Configure Article to also accept .jpg
-        var mediaType = MediaTypeService.Get(Constants.Conventions.MediaTypes.ArticleAlias)!;
+        var mediaType = (await MediaTypeService.GetAsync(Constants.Conventions.MediaTypes.ArticleAlias))!;
         var uploadPropertyType = mediaType.PropertyTypes.Single(pt => pt.Alias == Constants.Conventions.Media.File);
 
         var dataTypeService = GetRequiredService<IDataTypeService>();
@@ -88,7 +88,7 @@ internal sealed partial class MediaTypeEditingServiceTests
     public async Task Supports_Skip_Take_With_Match_Info()
     {
         // Configure Article to also accept .jpg so we have 3 results: Image, Article, File.
-        var mediaType = MediaTypeService.Get(Constants.Conventions.MediaTypes.ArticleAlias)!;
+        var mediaType = (await MediaTypeService.GetAsync(Constants.Conventions.MediaTypes.ArticleAlias))!;
         var uploadPropertyType = mediaType.PropertyTypes.Single(pt => pt.Alias == Constants.Conventions.Media.File);
 
         var dataTypeService = GetRequiredService<IDataTypeService>();
