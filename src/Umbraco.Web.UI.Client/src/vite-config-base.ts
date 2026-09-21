@@ -1,3 +1,4 @@
+import { normalizePath } from 'vite';
 import type { BuildOptions, UserConfig, LibraryOptions } from 'vite';
 
 interface UmbViteDefaultConfigArgs {
@@ -45,7 +46,10 @@ export const getDefaultConfig = (args: UmbViteDefaultConfigArgs): UserConfig => 
 	const minChunkSize = args.minChunkSize ?? DEFAULT_MIN_CHUNK_SIZE;
 	const lazyChunk = args.lazyChunk;
 	// Rollup reports absolute ids, and only this package's own modules should be coalesced.
-	const packageRoot = process.cwd();
+	// Vite gives those ids forward slashes on every platform, while `cwd()` is backslashed on
+	// Windows, so normalise before comparing or the guard never matches there and the package
+	// silently falls back to one chunk per dynamic import.
+	const packageRoot = normalizePath(process.cwd());
 	return {
 		build: {
 			target: 'es2022',
