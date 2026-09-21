@@ -64,8 +64,17 @@ export class UmbLanguageItemRefElement extends UmbLitElement {
 	static override styles = [
 		css`
 			:host {
+				--umb-entity-frame-opacity: 0;
+				--umb-entity-frame-color: var(--umb-color-reference);
+				--umb-entity-frame-contrast-color: var(--umb-color-reference-contrast);
+
 				display: block;
 				position: relative;
+			}
+
+			:host(:hover),
+			:host(:focus-within) {
+				--umb-entity-frame-opacity: 1;
 			}
 		`,
 	];
