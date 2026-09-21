@@ -39,15 +39,15 @@ namespace Umbraco.Cms.Search.Core.Cache;
  * This custom cache refresher for public access changes has a better granularity, which means we can
  * make an informed decision of how much to re-index when public access changes occur.
  *
- * ## Element change cache refresher ##
+ * ## Published element cache refresher ##
  *
  * The same "cannot tell save from publish" problem described above for content also applies to elements: the core
  * distributed caching for element changes broadcasts the same tree change type regardless of whether the element
  * was published or merely saved as a draft. Reindexing every document referencing an element on every draft save
  * would be wasteful, since only a published change is ever reflected in the published index.
  *
- * This custom cache refresher is only ever broadcast from an actual element publish or unpublish, giving that
- * missing level of granularity.
+ * This custom cache refresher is only ever broadcast from an actual element publish, unpublish or move to the
+ * recycle bin, giving that missing level of granularity.
  *
  */
 
@@ -89,8 +89,9 @@ public static class UmbracoBuilderExtensions
         builder.AddNotificationHandler<MemberTypeChangedNotification, MemberTypeNotificationHandler>();
         builder.AddNotificationHandler<LanguageDeletedNotification, LanguageNotificationHandler>();
 
-        builder.AddNotificationHandler<ElementPublishedNotification, ElementPublishStatusNotificationHandler>();
-        builder.AddNotificationHandler<ElementUnpublishedNotification, ElementPublishStatusNotificationHandler>();
+        builder.AddNotificationHandler<ElementPublishedNotification, PublishedElementNotificationHandler>();
+        builder.AddNotificationHandler<ElementUnpublishedNotification, PublishedElementNotificationHandler>();
+        builder.AddNotificationHandler<ElementMovedToRecycleBinNotification, PublishedElementNotificationHandler>();
 
         return builder;
     }
