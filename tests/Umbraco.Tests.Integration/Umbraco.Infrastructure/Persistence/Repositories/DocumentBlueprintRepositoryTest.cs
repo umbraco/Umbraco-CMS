@@ -130,8 +130,10 @@ internal sealed class DocumentBlueprintRepositoryTest : UmbracoIntegrationTest
         await documentRepository.SaveAsync(regularChild, CancellationToken.None);
         await blueprintRepository.SaveAsync(blueprint, CancellationToken.None);
 
+        // Ordering is resolved by the service layer, not defaulted by the repository, so a direct
+        // repository call has to supply what ContentService.GetChildrenAsync would have.
         PagedModel<IContent> children = await documentRepository.GetChildrenAsync(
-            _textpage.Key, 0, 100, null, null, CancellationToken.None);
+            _textpage.Key, 0, 100, null, Ordering.By("sortOrder"), CancellationToken.None);
         scope.Complete();
 
         Assert.Multiple(() =>
