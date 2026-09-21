@@ -1,5 +1,5 @@
 import type { UmbSearchIndex } from '../types.js';
-import { UMB_SEARCH_INDEX_ENTITY_TYPE } from '../constants.js';
+import { UMB_EDIT_SEARCH_INDEX_WORKSPACE_PATH_PATTERN } from '../workspace/paths.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { customElement, html, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UMB_COLLECTION_CONTEXT, type UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
@@ -68,7 +68,7 @@ export default class UmbSearchRootCollectionViewElement extends UmbLitElement {
 
 	#createTable(items: UmbSearchIndex[]) {
 		this._tableItems = items?.map((item) => {
-			const editHref = `section/settings/workspace/${UMB_SEARCH_INDEX_ENTITY_TYPE}/edit/${item.unique}`;
+			const editHref = UMB_EDIT_SEARCH_INDEX_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: item.unique });
 			return {
 				id: item.unique,
 				icon: 'icon-search',

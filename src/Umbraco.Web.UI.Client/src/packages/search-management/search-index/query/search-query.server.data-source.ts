@@ -37,7 +37,7 @@ export class UmbSearchQueryServerDataSource extends UmbControllerBase {
 			unique: apiDoc.id,
 			objectType: String(apiDoc.objectType),
 			entityType: this.#getEntityType(String(apiDoc.objectType)),
-			name: apiDoc.name ?? 'Unknown',
+			name: apiDoc.name ?? '',
 			icon: apiDoc.icon ?? 'icon-document',
 		}));
 

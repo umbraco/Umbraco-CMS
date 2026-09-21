@@ -1,7 +1,7 @@
 import { UmbSearchExamineProviderRepository } from './examine-provider.repository.js';
 import type { UmbExamineFieldModel, UmbExamineIndexDocumentModel, UmbExamineShowFieldsModalData } from './types.js';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import { html, when, css, nothing, state } from '@umbraco-cms/backoffice/external/lit';
+import { html, when, css, nothing, state, customElement } from '@umbraco-cms/backoffice/external/lit';
 
 import './document-fields.element.js';
 
@@ -14,6 +14,7 @@ interface CultureDocument {
 	fields: Array<UmbExamineFieldModel>;
 }
 
+@customElement('umb-search-examine-show-fields-modal')
 export class UmbSearchExamineShowFieldsModal extends UmbModalBaseElement<UmbExamineShowFieldsModalData> {
 	@state()
 	private _cultureDocuments: Array<CultureDocument> = [];
@@ -60,7 +61,7 @@ export class UmbSearchExamineShowFieldsModal extends UmbModalBaseElement<UmbExam
 		const culture = cultureField?.values[0] ?? INVARIANT_CULTURE;
 		return {
 			culture,
-			label: culture === INVARIANT_CULTURE ? 'Invariant' : culture,
+			label: culture === INVARIANT_CULTURE ? this.localize.term('searchExamine_invariantCulture') : culture,
 			fields: doc.fields,
 		};
 	}
@@ -151,4 +152,8 @@ export class UmbSearchExamineShowFieldsModal extends UmbModalBaseElement<UmbExam
 
 export { UmbSearchExamineShowFieldsModal as element };
 
-customElements.define('umb-search-examine-show-fields-modal', UmbSearchExamineShowFieldsModal);
+declare global {
+	interface HTMLElementTagNameMap {
+		'umb-search-examine-show-fields-modal': UmbSearchExamineShowFieldsModal;
+	}
+}

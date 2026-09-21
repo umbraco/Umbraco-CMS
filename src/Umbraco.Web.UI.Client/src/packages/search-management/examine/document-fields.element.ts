@@ -1,5 +1,5 @@
 import type { UmbExamineFieldModel } from './types.js';
-import { html, repeat, when, css, nothing, state, property } from '@umbraco-cms/backoffice/external/lit';
+import { html, repeat, when, css, nothing, state, property, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 const MAX_VALUE_LENGTH = 100;
@@ -8,6 +8,7 @@ const MAX_VALUE_LENGTH = 100;
 // several analyzers, so the name alone does not identify a row.
 const fieldIdentity = (field: UmbExamineFieldModel) => `${field.name}|${field.type}`;
 
+@customElement('umb-search-examine-document-fields')
 export class UmbSearchExamineDocumentFieldsElement extends UmbLitElement {
 	@property({ type: Array })
 	fields: Array<UmbExamineFieldModel> = [];
@@ -313,4 +314,8 @@ export class UmbSearchExamineDocumentFieldsElement extends UmbLitElement {
 	];
 }
 
-customElements.define('umb-search-examine-document-fields', UmbSearchExamineDocumentFieldsElement);
+declare global {
+	interface HTMLElementTagNameMap {
+		'umb-search-examine-document-fields': UmbSearchExamineDocumentFieldsElement;
+	}
+}

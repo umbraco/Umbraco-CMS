@@ -76,4 +76,22 @@ export const handlers = [
 			facets: [],
 		});
 	}),
+
+	// The Examine provider serves its own document off a route of its own, outside the
+	// Management API path, so it cannot go through `umbracoPath`.
+	http.get('/umbraco/examine/api/v1/:indexAlias/document/:documentKey', ({ params }) => {
+		return HttpResponse.json({
+			key: String(params.documentKey),
+			documents: [
+				{
+					fields: [
+						{ name: 'Sys_Culture', type: 'keywords', values: ['none'] },
+						{ name: 'Umb_Name', type: 'keywords', values: ['Mock document'] },
+						{ name: 'Umb_Name', type: 'textsr1', values: ['Mock document'] },
+						{ name: 'Umb_Id', type: 'keywords', values: [String(params.documentKey)] },
+					],
+				},
+			],
+		});
+	}),
 ];

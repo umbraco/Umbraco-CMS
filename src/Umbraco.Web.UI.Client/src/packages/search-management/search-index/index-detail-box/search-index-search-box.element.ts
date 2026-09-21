@@ -393,7 +393,7 @@ export class UmbSearchIndexSearchBoxElement extends UmbLitElement {
 								look="secondary"
 								label=${this.localize.term('searchManagement_openEntity', doc.entityType, doc.unique)}
 								href=${this.#getModalUrl(doc.unique, doc.entityType)}>
-								${doc.name}
+								${doc.name || this.localize.term('general_unknown')}
 							</uui-button>
 							<div><small>${doc.unique}</small></div>
 						</div>

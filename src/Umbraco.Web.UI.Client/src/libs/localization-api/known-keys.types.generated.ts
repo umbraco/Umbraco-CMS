@@ -1936,6 +1936,7 @@ declare global {
 		searchExamine_filterLabel: string;
 		searchExamine_filterPlaceholder: string;
 		searchExamine_headline: string;
+		searchExamine_invariantCulture: string;
 		searchExamine_loadError: string;
 		searchExamine_noFields: string;
 		searchExamine_noFieldsMatch: string;

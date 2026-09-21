@@ -3167,6 +3167,7 @@ export default {
 	},
 	searchExamine: {
 	  showFields: 'Show Fields',
+	  invariantCulture: 'Invariant',
 	  headline: 'Search Document Fields',
 	  filterPlaceholder: 'Filter fields by name or value...',
 	  filterLabel: 'Filter fields by name or value',

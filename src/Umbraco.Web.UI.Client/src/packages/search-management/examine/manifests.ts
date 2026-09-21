@@ -1,11 +1,4 @@
-import type { ManifestElement } from '@umbraco-cms/backoffice/extension-api';
-
-// Declare the searchIndexDetailBox type so it is recognized in this package's manifest array.
-declare global {
-	interface UmbExtensionManifestMap {
-		umbExamineSearchIndexDetailBox: ManifestElement & { type: 'searchIndexDetailBox' };
-	}
-}
+import { UMB_EXAMINE_SHOW_FIELDS_MODAL_ALIAS } from './constants.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -30,7 +23,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 	},
 	{
 		type: 'modal',
-		alias: 'Umb.Modal.SearchDocumentFields',
+		alias: UMB_EXAMINE_SHOW_FIELDS_MODAL_ALIAS,
 		name: 'Umbraco Search Provider Examine - Fields Modal',
 		element: () => import('./show-fields.modal.js'),
 	},

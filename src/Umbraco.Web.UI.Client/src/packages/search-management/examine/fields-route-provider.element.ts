@@ -1,11 +1,10 @@
 import type { UmbExamineShowFieldsModalData } from './types.js';
+import { UMB_EXAMINE_SHOW_FIELDS_MODAL_ALIAS } from './constants.js';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { customElement, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-
-const MODAL_ALIAS = 'Umb.Modal.SearchDocumentFields';
 
 /** Module-level export shared with the entity action for URL construction. */
 export let fieldsRouteBuilder: UmbModalRouteBuilder | undefined;
@@ -25,7 +24,7 @@ export class UmbExamineFieldsRouteProviderElement extends UmbLitElement {
 
 			this.#indexAlias = context.getUnique() ?? undefined;
 
-			new UmbModalRouteRegistrationController<UmbExamineShowFieldsModalData>(this, MODAL_ALIAS)
+			new UmbModalRouteRegistrationController<UmbExamineShowFieldsModalData>(this, UMB_EXAMINE_SHOW_FIELDS_MODAL_ALIAS)
 				.addAdditionalPath(':documentUnique/:culture')
 				.onSetup((params) => {
 					return {
@@ -58,3 +57,9 @@ export class UmbExamineFieldsRouteProviderElement extends UmbLitElement {
 }
 
 export default UmbExamineFieldsRouteProviderElement;
+
+declare global {
+	interface HTMLElementTagNameMap {
+		'umb-examine-fields-route-provider': UmbExamineFieldsRouteProviderElement;
+	}
+}

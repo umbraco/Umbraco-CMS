@@ -1909,6 +1909,7 @@ export const KNOWN_LOCALIZATION_KEYS: readonly UmbKnownLocalizationKey[] = [
 	'searchExamine_filterLabel',
 	'searchExamine_filterPlaceholder',
 	'searchExamine_headline',
+	'searchExamine_invariantCulture',
 	'searchExamine_loadError',
 	'searchExamine_noFields',
 	'searchExamine_noFieldsMatch',
