@@ -91,7 +91,8 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
             .AddNotificationHandler<ContentCopyingNotification, ContentNotificationHandler>()
             .AddNotificationHandler<ContentCopiedNotification, ContentNotificationHandler>()
             .AddNotificationHandler<ContentSavingNotification, ContentNotificationHandler>()
-            .AddNotificationHandler<ContentMovingToRecycleBinNotification, ContentNotificationHandler>();
+            .AddNotificationHandler<ContentMovingToRecycleBinNotification, ContentNotificationHandler>()
+            .AddNotificationHandler<ContentDeletingVersionsNotification, ContentNotificationHandler>();
 
         builder.Services.AddUnique<IIdKeyMap>(services => new SpyIdKeyMap(ActivatorUtilities.CreateInstance<IdKeyMap>(services)));
     }
@@ -4140,6 +4141,45 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
             Is.EqualTo("{\"date\":\"2025-01-22T18:33:01.0000000+01:00\",\"timeZone\":\"Europe/Copenhagen\"}"));
     }
 
+    /// <summary>
+    ///     A handler that vetoes the delete must be reported to the caller. Returning a bare Task, as this did
+    ///     before, left "versions deleted" and "delete refused" indistinguishable.
+    /// </summary>
+    [Test]
+    public async Task Delete_Versions_Cancelled_By_Notification_Reports_The_Cancellation()
+    {
+        IContent content = (await ContentService.GetByIdAsync(Textpage.Key, CancellationToken.None))!;
+
+        // Create a second version so there is something a delete could actually remove.
+        content.SetValue("title", "second version");
+        content.PublishCulture(CultureImpact.Invariant, DateTime.UtcNow, GetRequiredService<PropertyEditorCollection>());
+        content.PublishedState = PublishedState.Publishing;
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
+
+        var versionsBefore = (await ContentService.GetVersionsAsync(Textpage.Key, CancellationToken.None)).Count();
+
+        ContentNotificationHandler.DeletingContentVersions = notification => notification.Cancel = true;
+        try
+        {
+            Attempt<ContentVersionOperationStatus> result = await ContentService.DeleteVersionsAsync(
+                Textpage.Key, DateTime.UtcNow, Constants.Security.SuperUserKey, CancellationToken.None);
+
+            var versionsAfter = (await ContentService.GetVersionsAsync(Textpage.Key, CancellationToken.None)).Count();
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.Success, Is.False, "a vetoed delete must not report success");
+                Assert.That(result.Result, Is.EqualTo(ContentVersionOperationStatus.CancelledByNotification));
+                Assert.That(versionsAfter, Is.EqualTo(versionsBefore), "no version should have been deleted");
+            });
+        }
+        finally
+        {
+            ContentNotificationHandler.DeletingContentVersions = null;
+        }
+    }
+
+
     [Test]
     [LongRunning]
     public async Task Can_Delete_Previous_Versions_Not_Latest()
@@ -5297,7 +5337,8 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         INotificationHandler<ContentCopiedNotification>,
         INotificationHandler<ContentPublishingNotification>,
         INotificationHandler<ContentSavingNotification>,
-        INotificationHandler<ContentMovingToRecycleBinNotification>
+        INotificationHandler<ContentMovingToRecycleBinNotification>,
+        INotificationHandler<ContentDeletingVersionsNotification>
     {
         public static Action<ContentPublishingNotification>? PublishingContent { get; set; }
 
@@ -5309,6 +5350,8 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
         public static Action<ContentMovingToRecycleBinNotification>? MovingContentToRecycleBin { get; set; }
 
+        public static Action<ContentDeletingVersionsNotification>? DeletingContentVersions { get; set; }
+
         public void Handle(ContentCopiedNotification notification) => CopiedContent?.Invoke(notification);
 
         public void Handle(ContentCopyingNotification notification) => CopyingContent?.Invoke(notification);
@@ -5318,6 +5361,8 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         public void Handle(ContentSavingNotification notification) => SavingContent?.Invoke(notification);
 
         public void Handle(ContentMovingToRecycleBinNotification notification) => MovingContentToRecycleBin?.Invoke(notification);
+
+        public void Handle(ContentDeletingVersionsNotification notification) => DeletingContentVersions?.Invoke(notification);
     }
 
     private async Task<(ILanguage LangEn, ILanguage LangDa, IContentType contentType)> SetupVariantTest()

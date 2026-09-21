@@ -341,7 +341,8 @@ public interface IContentService : IContentServiceBase, IPublishableContentServi
     /// <param name="versionDate">The date before which versions should be deleted.</param>
     /// <param name="userKey">The Guid key of the user performing the action.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
-    Task DeleteVersionsAsync(Guid key, DateTime versionDate, Guid userKey, CancellationToken cancellationToken);
+    /// <returns>An attempt carrying the operation status.</returns>
+    Task<Attempt<ContentVersionOperationStatus>> DeleteVersionsAsync(Guid key, DateTime versionDate, Guid userKey, CancellationToken cancellationToken);
 
     /// <summary>
     ///     Deletes a version of a document.
@@ -351,7 +352,8 @@ public interface IContentService : IContentServiceBase, IPublishableContentServi
     /// <param name="deletePriorVersions">Whether to also delete versions prior to the specified version.</param>
     /// <param name="userKey">The Guid key of the user performing the action.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
-    Task DeleteVersionAsync(Guid key, int versionId, bool deletePriorVersions, Guid userKey, CancellationToken cancellationToken);
+    /// <returns>An attempt carrying the operation status.</returns>
+    Task<Attempt<ContentVersionOperationStatus>> DeleteVersionAsync(Guid key, int versionId, bool deletePriorVersions, Guid userKey, CancellationToken cancellationToken);
 
     #endregion
 

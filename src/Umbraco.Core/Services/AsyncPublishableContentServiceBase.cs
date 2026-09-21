@@ -396,12 +396,13 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
     }
 
     /// <inheritdoc />
-    public async Task PersistContentScheduleAsync(IPublishableContentBase content, ContentScheduleCollection contentSchedule, CancellationToken cancellationToken)
+    public async Task<Attempt<ContentScheduleOperationStatus>> PersistContentScheduleAsync(IPublishableContentBase content, ContentScheduleCollection contentSchedule, CancellationToken cancellationToken)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.WriteLock(WriteLockIds);
         await _asyncContentRepository.PersistContentScheduleAsync(content, contentSchedule, cancellationToken);
         scope.Complete();
+        return Attempt.Succeed(ContentScheduleOperationStatus.Success);
     }
 
     /// <inheritdoc />
@@ -1691,7 +1692,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
     /// <param name="versionDate">Latest version date</param>
     /// <param name="userKey">Guid key of the User deleting versions of a Content object</param>
     /// <param name="cancellationToken">The cancellation token.</param>
-    public async Task DeleteVersionsAsync(Guid key, DateTime versionDate, Guid userKey, CancellationToken cancellationToken)
+    public async Task<Attempt<ContentVersionOperationStatus>> DeleteVersionsAsync(Guid key, DateTime versionDate, Guid userKey, CancellationToken cancellationToken)
     {
         int userId = await _userIdKeyResolver.GetAsync(userKey);
         EventMessages evtMsgs = EventMessagesFactory.Get();
@@ -1704,7 +1705,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
         if (scope.Notifications.PublishCancelable(deletingVersionsNotification))
         {
             scope.Complete();
-            return;
+            return Attempt.Fail(ContentVersionOperationStatus.CancelledByNotification);
         }
 
         await _asyncContentRepository.DeleteVersionsAsync(key, versionDate, cancellationToken);
@@ -1715,6 +1716,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
         await AuditAsync(AuditType.Delete, userId, Constants.System.Root, "Delete (by version date)");
 
         scope.Complete();
+        return Attempt.Succeed(ContentVersionOperationStatus.Success);
     }
 
     /// <summary>
@@ -1726,7 +1728,8 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
     /// <param name="deletePriorVersions">Boolean indicating whether to delete versions prior to the versionId</param>
     /// <param name="userKey">Guid key of the User deleting versions of a Content object</param>
     /// <param name="cancellationToken">The cancellation token.</param>
-    public async Task DeleteVersionAsync(Guid key, int versionId, bool deletePriorVersions, Guid userKey, CancellationToken cancellationToken)
+    /// <returns>An attempt carrying the operation status.</returns>
+    public async Task<Attempt<ContentVersionOperationStatus>> DeleteVersionAsync(Guid key, int versionId, bool deletePriorVersions, Guid userKey, CancellationToken cancellationToken)
     {
         int userId = await _userIdKeyResolver.GetAsync(userKey);
         EventMessages evtMsgs = EventMessagesFactory.Get();
@@ -1737,7 +1740,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
         if (scope.Notifications.PublishCancelable(deletingVersionsNotification))
         {
             scope.Complete();
-            return;
+            return Attempt.Fail(ContentVersionOperationStatus.CancelledByNotification);
         }
 
         if (deletePriorVersions)
@@ -1761,6 +1764,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
         await AuditAsync(AuditType.Delete, userId, Constants.System.Root, "Delete (by version)");
 
         scope.Complete();
+        return Attempt.Succeed(ContentVersionOperationStatus.Success);
     }
 
     #endregion

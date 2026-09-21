@@ -71,10 +71,10 @@ public class ElementService : PublishableContentServiceBase<IElement>, IElementS
 
     /// <inheritdoc />
     // See GetByIdsAsync above - same bridge, same reason.
-    public Task PersistContentScheduleAsync(IPublishableContentBase content, ContentScheduleCollection contentSchedule, CancellationToken cancellationToken)
+    public Task<Attempt<ContentScheduleOperationStatus>> PersistContentScheduleAsync(IPublishableContentBase content, ContentScheduleCollection contentSchedule, CancellationToken cancellationToken)
     {
         PersistContentSchedule(content, contentSchedule);
-        return Task.CompletedTask;
+        return Task.FromResult(Attempt.Succeed(ContentScheduleOperationStatus.Success));
     }
 
     /// <inheritdoc />

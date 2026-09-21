@@ -58,7 +58,8 @@ public interface IPublishableContentService<TContent> : IAsyncContentServiceBase
     /// <param name="content">The content to persist the schedule for.</param>
     /// <param name="contentSchedule">The content schedule collection.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
-    Task PersistContentScheduleAsync(IPublishableContentBase content, ContentScheduleCollection contentSchedule, CancellationToken cancellationToken);
+    /// <returns>An attempt carrying the operation status.</returns>
+    Task<Attempt<ContentScheduleOperationStatus>> PersistContentScheduleAsync(IPublishableContentBase content, ContentScheduleCollection contentSchedule, CancellationToken cancellationToken);
 
     /// <summary>
     ///     Deletes all content of given types.

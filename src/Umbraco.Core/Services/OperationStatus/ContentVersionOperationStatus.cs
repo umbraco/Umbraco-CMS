@@ -33,5 +33,10 @@ public enum ContentVersionOperationStatus
     /// <summary>
     ///     The rollback operation was canceled by a notification handler.
     /// </summary>
-    RollBackCanceled
+    RollBackCanceled,
+
+    /// <summary>
+    ///     The operation was cancelled by a notification handler.
+    /// </summary>
+    CancelledByNotification
 }
