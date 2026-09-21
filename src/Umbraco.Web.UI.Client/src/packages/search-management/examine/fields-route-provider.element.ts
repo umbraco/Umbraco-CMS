@@ -1,5 +1,4 @@
 import type { UmbExamineShowFieldsModalData } from './types.js';
-import { UMB_EXAMINE_SHOW_FIELDS_MODAL_ALIAS } from './constants.js';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
@@ -8,6 +7,9 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 /** Module-level export shared with the entity action for URL construction. */
 export let fieldsRouteBuilder: UmbModalRouteBuilder | undefined;
+
+// Must match the modal manifest's alias in manifests.ts.
+const MODAL_ALIAS = 'Umb.Modal.SearchDocumentFields';
 
 @customElement('umb-examine-fields-route-provider')
 export class UmbExamineFieldsRouteProviderElement extends UmbLitElement {
@@ -24,7 +26,7 @@ export class UmbExamineFieldsRouteProviderElement extends UmbLitElement {
 
 			this.#indexAlias = context.getUnique() ?? undefined;
 
-			new UmbModalRouteRegistrationController<UmbExamineShowFieldsModalData>(this, UMB_EXAMINE_SHOW_FIELDS_MODAL_ALIAS)
+			new UmbModalRouteRegistrationController<UmbExamineShowFieldsModalData>(this, MODAL_ALIAS)
 				.addAdditionalPath(':documentUnique/:culture')
 				.onSetup((params) => {
 					return {

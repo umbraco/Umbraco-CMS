@@ -58,6 +58,23 @@ import type { CreateWebhookRequestModel } from '@umbraco-cms/backoffice/external
 
 **Never call generated services directly from elements or contexts.** Always go through a data source and repository.
 
+### When there is no generated service
+
+Not every endpoint has one. An API outside the Management API document may generate only its models, and some have no generated output at all. Where no typed service exists, call `umbHttpClient` directly — it is the same pre-configured client the generated services use, so it carries the back-office cookie configuration and the response interceptors.
+
+Type the call from whatever the generator did produce, so the schema still backs it:
+
+```typescript
+umbHttpClient.get<GetDocumentResponses, GetDocumentErrors, true>({
+	url: DOCUMENT_URL, // typed as GetDocumentData['url'], so a path change is a compile error
+	path: { indexAlias, documentKey } satisfies GetDocumentData['path'],
+});
+```
+
+Pass `true` as the third type argument. The generated services default `ThrowOnError` to `true` to match the client's own config, but the bare verb methods default to `false`, which widens the result to include a branch without `data`.
+
+This stays behind a repository like any other call; it is the transport that differs, not the layering. `search-management/examine` does this for the Examine provider's own API, and `Umbraco.Web.UI.Login` goes further still, calling `fetch` directly from its auth repository because it has no generated client at all.
+
 ---
 
 ## Caching & Request Deduplication

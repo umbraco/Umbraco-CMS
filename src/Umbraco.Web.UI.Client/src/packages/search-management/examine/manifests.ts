@@ -1,5 +1,3 @@
-import { UMB_EXAMINE_SHOW_FIELDS_MODAL_ALIAS } from './constants.js';
-
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'entityAction',
@@ -23,7 +21,10 @@ export const manifests: Array<UmbExtensionManifest> = [
 	},
 	{
 		type: 'modal',
-		alias: UMB_EXAMINE_SHOW_FIELDS_MODAL_ALIAS,
+		// Must match MODAL_ALIAS in fields-route-provider.element.ts. They cannot share a
+		// constant: an exported string const has to be UMB_-prefixed, and every UMB_ const has to
+		// be re-exported from the package entry, which this module deliberately does not do.
+		alias: 'Umb.Modal.SearchDocumentFields',
 		name: 'Umbraco Search Provider Examine - Fields Modal',
 		element: () => import('./show-fields.modal.js'),
 	},
