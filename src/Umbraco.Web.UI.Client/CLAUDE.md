@@ -179,7 +179,7 @@ When using `@umbraco-cms/backoffice`:
 
 | File                            | Purpose                                                          |
 | ------------------------------- | ---------------------------------------------------------------- |
-| `package.json`                  | Root package with exports and workspace references               |
+| `package.json`                  | Root package: exports, workspace references, and `@hey-api/openapi-ts` for every workspace that generates a client |
 | `devops/publish/cleanse-pkg.js` | Script that runs during `npm pack` to hoist and convert versions |
 | `src/external/*`                | Dependency wrapper packages                                      |
-| `src/packages/core`             | Contains `@hey-api/openapi-ts` and other utilities               |
+| `src/packages/core`             | Generated backend API client and other utilities                 |
