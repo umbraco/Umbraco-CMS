@@ -36,26 +36,6 @@ public interface IPackageDataInstallation
     IReadOnlyList<IMemberType> ImportMemberTypes(IEnumerable<XElement> docTypeElements, int userId) => throw new NotImplementedException();
 
     /// <summary>
-    ///     Imports and saves content base items from a compiled package.
-    /// </summary>
-    /// <typeparam name="TContentBase">The type of content base being imported (e.g., <see cref="IContent"/> or <see cref="IMedia"/>).</typeparam>
-    /// <typeparam name="TContentTypeComposition">The type of content type composition.</typeparam>
-    /// <param name="docs">The compiled package content base items to import.</param>
-    /// <param name="importedDocumentTypes">A dictionary of imported document types keyed by their alias.</param>
-    /// <param name="userId">The id of the user performing the import.</param>
-    /// <param name="typeService">The service for managing content types.</param>
-    /// <param name="service">The service for managing content.</param>
-    /// <returns>A read-only list of imported content base items.</returns>
-    IReadOnlyList<TContentBase> ImportContentBase<TContentBase, TContentTypeComposition>(
-        IEnumerable<CompiledPackageContentBase> docs,
-        IDictionary<string, TContentTypeComposition> importedDocumentTypes,
-        int userId,
-        IContentTypeBaseService<TContentTypeComposition> typeService,
-        IContentServiceBase<TContentBase> service)
-        where TContentBase : class, IContentBase
-        where TContentTypeComposition : IContentTypeComposition;
-
-    /// <summary>
     ///     Imports and saves content base items from a compiled package, using the (asynchronous) document type service.
     /// </summary>
     /// <typeparam name="TContentBase">The type of content base being imported (e.g., <see cref="IContent"/>).</typeparam>
@@ -65,7 +45,6 @@ public interface IPackageDataInstallation
     /// <param name="typeService">The document type service.</param>
     /// <param name="service">The service for managing content.</param>
     /// <returns>A read-only list of imported content base items.</returns>
-    /// TODO EFCore : Remove this once media and member types have been migrated, and we can use IContentTypeBaseService again.
     IReadOnlyList<TContentBase> ImportContentBase<TContentBase>(
         IEnumerable<CompiledPackageContentBase> docs,
         IDictionary<string, IContentType> importedDocumentTypes,
@@ -88,7 +67,6 @@ public interface IPackageDataInstallation
     /// <param name="typeService">The media type service.</param>
     /// <param name="service">The service for managing content.</param>
     /// <returns>A read-only list of imported content base items.</returns>
-    /// TODO EFCore : Remove this once member types have been migrated, and we can use IContentTypeBaseService again.
     IReadOnlyList<TContentBase> ImportContentBase<TContentBase>(
         IEnumerable<CompiledPackageContentBase> docs,
         IDictionary<string, IMediaType> importedDocumentTypes,

@@ -90,7 +90,7 @@ internal sealed class MediaRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Retrievals_By_Id_And_Key_After_Save_Are_Cached()
+    public async Task Retrievals_By_Id_And_Key_After_Save_Are_Cached()
     {
         var realCache = new AppCaches(
             new ObjectCacheAppCache(),
@@ -107,7 +107,7 @@ internal sealed class MediaRepositoryTest : UmbracoIntegrationTest
 
         database.EnableSqlCount = false;
 
-        var media = CreateMedia(repository, mediaTypeRepository);
+        var media = await CreateMedia(repository, mediaTypeRepository);
 
         database.EnableSqlCount = true;
 
@@ -126,7 +126,7 @@ internal sealed class MediaRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Retrieval_By_Key_After_Retrieval_By_Id_Is_Cached()
+    public async Task Retrieval_By_Key_After_Retrieval_By_Id_Is_Cached()
     {
         var realCache = new AppCaches(
             new ObjectCacheAppCache(),
@@ -143,7 +143,7 @@ internal sealed class MediaRepositoryTest : UmbracoIntegrationTest
 
         database.EnableSqlCount = false;
 
-        var media = CreateMedia(repository, mediaTypeRepository);
+        var media = await CreateMedia(repository, mediaTypeRepository);
 
         database.EnableSqlCount = true;
 
@@ -167,7 +167,7 @@ internal sealed class MediaRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Retrieval_By_Id_After_Retrieval_By_Key_Is_Cached()
+    public async Task Retrieval_By_Id_After_Retrieval_By_Key_Is_Cached()
     {
         var realCache = new AppCaches(
             new ObjectCacheAppCache(),
@@ -184,7 +184,7 @@ internal sealed class MediaRepositoryTest : UmbracoIntegrationTest
 
         database.EnableSqlCount = false;
 
-        var media = CreateMedia(repository, mediaTypeRepository);
+        var media = await CreateMedia(repository, mediaTypeRepository);
 
         database.EnableSqlCount = true;
 
@@ -207,10 +207,10 @@ internal sealed class MediaRepositoryTest : UmbracoIntegrationTest
         Assert.AreEqual(0, database.SqlCount);
     }
 
-    private Media CreateMedia(MediaRepository repository, MediaTypeRepository mediaTypeRepository)
+    private async Task<Media> CreateMedia(MediaRepository repository, MediaTypeRepository mediaTypeRepository)
     {
         var mediaType = MediaTypeBuilder.CreateSimpleMediaType("umbTextpage1", "Textpage");
-        mediaTypeRepository.Save(mediaType);
+        await mediaTypeRepository.SaveAsync(mediaType, CancellationToken.None);
 
         var media = MediaBuilder.CreateSimpleMedia(mediaType, "hello", -1);
         repository.Save(media);
@@ -218,7 +218,7 @@ internal sealed class MediaRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void SaveMedia()
+    public async Task SaveMedia()
     {
         // Arrange
         var provider = ScopeProvider;
@@ -226,11 +226,11 @@ internal sealed class MediaRepositoryTest : UmbracoIntegrationTest
         {
             var repository = CreateRepository(provider, out var mediaTypeRepository);
 
-            var mediaType = mediaTypeRepository.Get(1032);
+            var mediaType = await mediaTypeRepository.GetAsync(1032, CancellationToken.None);
             var image = MediaBuilder.CreateMediaImage(mediaType, -1);
 
             // Act
-            mediaTypeRepository.Save(mediaType);
+            await mediaTypeRepository.SaveAsync(mediaType, CancellationToken.None);
             repository.Save(image);
 
             var fetched = repository.Get(image.Id);
@@ -244,7 +244,7 @@ internal sealed class MediaRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void SaveMediaMultiple()
+    public async Task SaveMediaMultiple()
     {
         // Arrange
         var provider = ScopeProvider;
@@ -252,7 +252,7 @@ internal sealed class MediaRepositoryTest : UmbracoIntegrationTest
         {
             var repository = CreateRepository(provider, out var mediaTypeRepository);
 
-            var mediaType = mediaTypeRepository.Get(1032);
+            var mediaType = await mediaTypeRepository.GetAsync(1032, CancellationToken.None);
             var file = MediaBuilder.CreateMediaFile(mediaType, -1);
 
             // Act
@@ -675,7 +675,7 @@ internal sealed class MediaRepositoryTest : UmbracoIntegrationTest
     /// the fix is applied.
     /// </remarks>
     [Test]
-    public void GetMany_By_Guid_With_Warm_Cache_Returns_All()
+    public async Task GetMany_By_Guid_With_Warm_Cache_Returns_All()
     {
         var realCache = new AppCaches(
             new ObjectCacheAppCache(),
@@ -687,7 +687,7 @@ internal sealed class MediaRepositoryTest : UmbracoIntegrationTest
         using var scope = provider.CreateScope();
         var repository = CreateRepository(provider, out var mediaTypeRepository, realCache);
 
-        var media = CreateMedia(repository, mediaTypeRepository);
+        var media = await CreateMedia(repository, mediaTypeRepository);
 
         var guidRepo = (IReadRepository<Guid, IMedia>)repository;
 

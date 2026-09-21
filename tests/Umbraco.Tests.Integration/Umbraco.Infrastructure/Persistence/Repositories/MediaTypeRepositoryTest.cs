@@ -30,7 +30,7 @@ internal sealed class MediaTypeRepositoryTest : UmbracoIntegrationTest
     private ILanguageRepository LanguageRepository => GetRequiredService<ILanguageRepository>();
 
     [Test]
-    public void Can_Move()
+    public async Task Can_Move()
     {
         var provider = ScopeProvider;
         using (var scope = provider.CreateScope())
@@ -48,21 +48,21 @@ internal sealed class MediaTypeRepositoryTest : UmbracoIntegrationTest
             IMediaType contentType =
                 MediaTypeBuilder.CreateNewMediaType();
             contentType.ParentId = container2.Id;
-            repository.Save(contentType);
+            await repository.SaveAsync(contentType, CancellationToken.None);
 
             // create a
             var contentType2 =
                 (IMediaType)new MediaType(ShortStringHelper, contentType, "hello") { Name = "Blahasdfsadf" };
             contentType.ParentId = contentType.Id;
-            repository.Save(contentType2);
+            await repository.SaveAsync(contentType2, CancellationToken.None);
 
             var result = repository.Move(contentType, container1).ToArray();
 
             Assert.AreEqual(2, result.Length);
 
             // re-get
-            contentType = repository.Get(contentType.Id);
-            contentType2 = repository.Get(contentType2.Id);
+            contentType = await repository.GetAsync(contentType.Id, CancellationToken.None);
+            contentType2 = await repository.GetAsync(contentType2.Id, CancellationToken.None);
 
             Assert.AreEqual(container1.Id, contentType.ParentId);
             Assert.AreNotEqual(result.Single(x => x.Entity.Id == contentType.Id).OriginalPath, contentType.Path);
@@ -110,7 +110,7 @@ internal sealed class MediaTypeRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Create_Container_Containing_Media_Types()
+    public async Task Can_Create_Container_Containing_Media_Types()
     {
         var provider = ScopeProvider;
         using (var scope = provider.CreateScope())
@@ -124,14 +124,14 @@ internal sealed class MediaTypeRepositoryTest : UmbracoIntegrationTest
             var contentType =
                 MediaTypeBuilder.CreateSimpleMediaType("test", "Test", propertyGroupAlias: "testGroup", propertyGroupName: "testGroup");
             contentType.ParentId = container.Id;
-            repository.Save(contentType);
+            await repository.SaveAsync(contentType, CancellationToken.None);
 
             Assert.AreEqual(container.Id, contentType.ParentId);
         }
     }
 
     [Test]
-    public void Can_Delete_Container_Containing_Media_Types()
+    public async Task Can_Delete_Container_Containing_Media_Types()
     {
         var provider = ScopeProvider;
         using (var scope = provider.CreateScope())
@@ -145,7 +145,7 @@ internal sealed class MediaTypeRepositoryTest : UmbracoIntegrationTest
             IMediaType contentType =
                 MediaTypeBuilder.CreateSimpleMediaType("test", "Test", propertyGroupAlias: "testGroup", propertyGroupName: "testGroup");
             contentType.ParentId = container.Id;
-            repository.Save(contentType);
+            await repository.SaveAsync(contentType, CancellationToken.None);
 
             // Act
             containerRepository.Delete(container);
@@ -153,14 +153,14 @@ internal sealed class MediaTypeRepositoryTest : UmbracoIntegrationTest
             var found = containerRepository.Get(container.Id);
             Assert.IsNull(found);
 
-            contentType = repository.Get(contentType.Id);
+            contentType = await repository.GetAsync(contentType.Id, CancellationToken.None);
             Assert.IsNotNull(contentType);
             Assert.AreEqual(-1, contentType.ParentId);
         }
     }
 
     [Test]
-    public void Can_Perform_Add_On_MediaTypeRepository()
+    public async Task Can_Perform_Add_On_MediaTypeRepository()
     {
         // Arrange
         var provider = ScopeProvider;
@@ -170,9 +170,9 @@ internal sealed class MediaTypeRepositoryTest : UmbracoIntegrationTest
 
             // Act
             var contentType = MediaTypeBuilder.CreateNewMediaType();
-            repository.Save(contentType);
+            await repository.SaveAsync(contentType, CancellationToken.None);
 
-            var fetched = repository.Get(contentType.Id);
+            var fetched = await repository.GetAsync(contentType.Id, CancellationToken.None);
 
             // Assert
             Assert.That(contentType.HasIdentity, Is.True);
@@ -185,7 +185,7 @@ internal sealed class MediaTypeRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Perform_Update_On_MediaTypeRepository()
+    public async Task Can_Perform_Update_On_MediaTypeRepository()
     {
         // Arrange
         var provider = ScopeProvider;
@@ -194,10 +194,10 @@ internal sealed class MediaTypeRepositoryTest : UmbracoIntegrationTest
             var repository = CreateRepository(provider);
 
             var videoMediaType = MediaTypeBuilder.CreateNewMediaType();
-            repository.Save(videoMediaType);
+            await repository.SaveAsync(videoMediaType, CancellationToken.None);
 
             // Act
-            var mediaType = repository.Get(videoMediaType.Id);
+            var mediaType = await repository.GetAsync(videoMediaType.Id, CancellationToken.None);
 
             mediaType.Thumbnail = "Doc2.png";
             mediaType.PropertyGroups["media"].PropertyTypes.Add(
@@ -209,7 +209,7 @@ internal sealed class MediaTypeRepositoryTest : UmbracoIntegrationTest
                     SortOrder = 1,
                     DataTypeId = -88
                 });
-            repository.Save(mediaType);
+            await repository.SaveAsync(mediaType, CancellationToken.None);
 
             var dirty = ((MediaType)mediaType).IsDirty();
 
@@ -222,7 +222,7 @@ internal sealed class MediaTypeRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Perform_Delete_On_MediaTypeRepository()
+    public async Task Can_Perform_Delete_On_MediaTypeRepository()
     {
         // Arrange
         var provider = ScopeProvider;
@@ -232,12 +232,12 @@ internal sealed class MediaTypeRepositoryTest : UmbracoIntegrationTest
 
             // Act
             var mediaType = MediaTypeBuilder.CreateNewMediaType();
-            repository.Save(mediaType);
+            await repository.SaveAsync(mediaType, CancellationToken.None);
 
-            var contentType2 = repository.Get(mediaType.Id);
-            repository.Delete(contentType2);
+            var contentType2 = await repository.GetAsync(mediaType.Id, CancellationToken.None);
+            await repository.DeleteAsync(contentType2, CancellationToken.None);
 
-            var exists = repository.Exists(mediaType.Id);
+            var exists = await repository.ExistsAsync(mediaType.Id, CancellationToken.None);
 
             // Assert
             Assert.That(exists, Is.False);
@@ -245,7 +245,7 @@ internal sealed class MediaTypeRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Perform_Get_On_MediaTypeRepository()
+    public async Task Can_Perform_Get_On_MediaTypeRepository()
     {
         // Arrange
         var provider = ScopeProvider;
@@ -254,7 +254,7 @@ internal sealed class MediaTypeRepositoryTest : UmbracoIntegrationTest
             var repository = CreateRepository(provider);
 
             // Act
-            var mediaType = repository.Get(1033); // File
+            var mediaType = await repository.GetAsync(1033, CancellationToken.None); // File
 
             // Assert
             Assert.That(mediaType, Is.Not.Null);
@@ -264,7 +264,7 @@ internal sealed class MediaTypeRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Perform_Get_By_Guid_On_MediaTypeRepository()
+    public async Task Can_Perform_Get_By_Guid_On_MediaTypeRepository()
     {
         // Arrange
         var provider = ScopeProvider;
@@ -272,10 +272,10 @@ internal sealed class MediaTypeRepositoryTest : UmbracoIntegrationTest
         {
             var repository = CreateRepository(provider);
 
-            var mediaType = repository.Get(1033); // File
+            var mediaType = await repository.GetAsync(1033, CancellationToken.None); // File
 
             // Act
-            mediaType = repository.Get(mediaType.Key);
+            mediaType = await repository.GetAsync(mediaType.Key, CancellationToken.None);
 
             // Assert
             Assert.That(mediaType, Is.Not.Null);
@@ -285,7 +285,7 @@ internal sealed class MediaTypeRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Perform_GetAll_On_MediaTypeRepository()
+    public async Task Can_Perform_GetAll_On_MediaTypeRepository()
     {
         // Arrange
         var provider = ScopeProvider;
@@ -294,7 +294,7 @@ internal sealed class MediaTypeRepositoryTest : UmbracoIntegrationTest
             var repository = CreateRepository(provider);
 
             // Act
-            var mediaTypes = repository.GetMany();
+            var mediaTypes = await repository.GetAllAsync(CancellationToken.None);
             var count =
                 ScopeAccessor.AmbientScope.Database.ExecuteScalar<int>(
                     "SELECT COUNT(*) FROM umbracoNode WHERE nodeObjectType = @NodeObjectType",
@@ -307,7 +307,7 @@ internal sealed class MediaTypeRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Perform_GetAll_By_Guid_On_MediaTypeRepository()
+    public async Task Can_Perform_GetAll_By_Guid_On_MediaTypeRepository()
     {
         // Arrange
         var provider = ScopeProvider;
@@ -315,10 +315,10 @@ internal sealed class MediaTypeRepositoryTest : UmbracoIntegrationTest
         {
             var repository = CreateRepository(provider);
 
-            var allGuidIds = repository.GetMany().Select(x => x.Key).ToArray();
+            var allGuidIds = (await repository.GetAllAsync(CancellationToken.None)).Select(x => x.Key).ToArray();
 
             // Act
-            var mediaTypes = ((IReadRepository<Guid, IMediaType>)repository).GetMany(allGuidIds);
+            var mediaTypes = await repository.GetManyAsync(allGuidIds, CancellationToken.None);
 
             var count =
                 ScopeAccessor.AmbientScope.Database.ExecuteScalar<int>(
@@ -332,7 +332,7 @@ internal sealed class MediaTypeRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Perform_Exists_On_MediaTypeRepository()
+    public async Task Can_Perform_Exists_On_MediaTypeRepository()
     {
         // Arrange
         var provider = ScopeProvider;
@@ -341,7 +341,7 @@ internal sealed class MediaTypeRepositoryTest : UmbracoIntegrationTest
             var repository = CreateRepository(provider);
 
             // Act
-            var exists = repository.Exists(1032); // Image
+            var exists = await repository.ExistsAsync(1032, CancellationToken.None); // Image
 
             // Assert
             Assert.That(exists, Is.True);
@@ -349,7 +349,7 @@ internal sealed class MediaTypeRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Update_MediaType_With_PropertyType_Removed()
+    public async Task Can_Update_MediaType_With_PropertyType_Removed()
     {
         // Arrange
         var provider = ScopeProvider;
@@ -358,14 +358,14 @@ internal sealed class MediaTypeRepositoryTest : UmbracoIntegrationTest
             var repository = CreateRepository(provider);
 
             var mediaType = MediaTypeBuilder.CreateNewMediaType();
-            repository.Save(mediaType);
+            await repository.SaveAsync(mediaType, CancellationToken.None);
 
             // Act
-            var mediaTypeV2 = repository.Get(mediaType.Id);
+            var mediaTypeV2 = await repository.GetAsync(mediaType.Id, CancellationToken.None);
             mediaTypeV2.PropertyGroups["media"].PropertyTypes.Remove("title");
-            repository.Save(mediaTypeV2);
+            await repository.SaveAsync(mediaTypeV2, CancellationToken.None);
 
-            var mediaTypeV3 = repository.Get(mediaType.Id);
+            var mediaTypeV3 = await repository.GetAsync(mediaType.Id, CancellationToken.None);
 
             // Assert
             Assert.That(mediaTypeV3.PropertyTypes.Any(x => x.Alias == "title"), Is.False);
@@ -375,7 +375,7 @@ internal sealed class MediaTypeRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Verify_PropertyTypes_On_Video_MediaType()
+    public async Task Can_Verify_PropertyTypes_On_Video_MediaType()
     {
         // Arrange
         var provider = ScopeProvider;
@@ -385,10 +385,10 @@ internal sealed class MediaTypeRepositoryTest : UmbracoIntegrationTest
 
             var mediaType = MediaTypeBuilder.CreateNewMediaType();
 
-            repository.Save(mediaType);
+            await repository.SaveAsync(mediaType, CancellationToken.None);
 
             // Act
-            var contentType = repository.Get(mediaType.Id);
+            var contentType = await repository.GetAsync(mediaType.Id, CancellationToken.None);
 
             // Assert
             Assert.That(contentType.PropertyTypes.Count(), Is.EqualTo(2));
@@ -397,7 +397,7 @@ internal sealed class MediaTypeRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Verify_PropertyTypes_On_File_MediaType()
+    public async Task Can_Verify_PropertyTypes_On_File_MediaType()
     {
         // Arrange
         var provider = ScopeProvider;
@@ -406,7 +406,7 @@ internal sealed class MediaTypeRepositoryTest : UmbracoIntegrationTest
             var repository = CreateRepository(provider);
 
             // Act
-            var contentType = repository.Get(1033); // File
+            var contentType = await repository.GetAsync(1033, CancellationToken.None); // File
 
             // Assert
             Assert.That(contentType.PropertyTypes.Count(), Is.EqualTo(3));
@@ -415,17 +415,17 @@ internal sealed class MediaTypeRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Get_By_Guid_Returns_Deep_Clone_Not_Cached_Instance()
+    public async Task Get_By_Guid_Returns_Deep_Clone_Not_Cached_Instance()
     {
         var provider = ScopeProvider;
         using (var scope = provider.CreateScope())
         {
             var repository = CreateRepository(provider);
             IMediaType mediaType = MediaTypeBuilder.CreateNewMediaType();
-            repository.Save(mediaType);
+            await repository.SaveAsync(mediaType, CancellationToken.None);
 
-            var first = repository.Get(mediaType.Key);
-            var second = repository.Get(mediaType.Key);
+            var first = await repository.GetAsync(mediaType.Key, CancellationToken.None);
+            var second = await repository.GetAsync(mediaType.Key, CancellationToken.None);
 
             Assert.IsNotNull(first);
             Assert.IsNotNull(second);
@@ -435,17 +435,17 @@ internal sealed class MediaTypeRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Exists_By_Guid_Returns_Correct_Result()
+    public async Task Exists_By_Guid_Returns_Correct_Result()
     {
         var provider = ScopeProvider;
         using (var scope = provider.CreateScope())
         {
             var repository = CreateRepository(provider);
             IMediaType mediaType = MediaTypeBuilder.CreateNewMediaType();
-            repository.Save(mediaType);
+            await repository.SaveAsync(mediaType, CancellationToken.None);
 
-            Assert.IsTrue(repository.Exists(mediaType.Key));
-            Assert.IsFalse(repository.Exists(Guid.NewGuid()));
+            Assert.IsTrue(await repository.ExistsAsync(mediaType.Key, CancellationToken.None));
+            Assert.IsFalse(await repository.ExistsAsync(Guid.NewGuid(), CancellationToken.None));
         }
     }
 
