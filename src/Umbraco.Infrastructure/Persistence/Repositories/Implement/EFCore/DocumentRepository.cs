@@ -644,13 +644,25 @@ internal class DocumentRepository
 
         return AmbientScope.ExecuteWithContextAsync(async db =>
         {
-            int parentNodeId = await ResolveNodeIdAsync(db, ancestorKey, cancellationToken);
+            // Matching on the ancestor's own path plus a separator keeps the predicate anchored. A leading
+            // wildcard matches the same rows but can never use an index and is not sargable, so the anchored
+            // form is the one worth keeping if umbracoNode.path is ever indexed. Root's seeded path is "-1",
+            // so this produces "-1," for it - every content path begins with that.
+            var ancestor = await db.Nodes
+                .Where(node => node.UniqueId == ancestorKey)
+                .Select(node => new { node.NodeId, node.Path })
+                .SingleOrDefaultAsync(cancellationToken);
 
-            string pathMatch = parentNodeId == -1 ? "-1," : $",{parentNodeId},";
+            if (ancestor is null)
+            {
+                return new PagedModel<IContent> { Total = 0, Items = Enumerable.Empty<IContent>() };
+            }
+
+            var pathMatch = $"{ancestor.Path},";
 
             int total = await db.Nodes
                 .Where(node => node.NodeObjectType == NodeObjectTypeKey
-                    && EF.Functions.Like(node.Path, $"%{pathMatch}%")
+                    && EF.Functions.Like(node.Path, $"{pathMatch}%")
                     && (includeTrashed || node.Trashed == false))
                 .CountAsync(cancellationToken);
 
@@ -662,7 +674,7 @@ internal class DocumentRepository
             IQueryable<DocumentJoinRow> baseQuery = BuildBaseQuery(
                 db,
                 db.Nodes.Where(node => node.NodeObjectType == NodeObjectTypeKey
-                    && EF.Functions.Like(node.Path, $"%{pathMatch}%")
+                    && EF.Functions.Like(node.Path, $"{pathMatch}%")
                     && (includeTrashed || node.Trashed == false)));
 
             bool isCustomFieldOrdering = ordering?.IsCustomField == true;
@@ -688,7 +700,7 @@ internal class DocumentRepository
             {
                 List<int> candidateNodeIds = await db.Nodes
                     .Where(node => node.NodeObjectType == NodeObjectTypeKey
-                        && EF.Functions.Like(node.Path, $"%{pathMatch}%")
+                        && EF.Functions.Like(node.Path, $"{pathMatch}%")
                         && (includeTrashed || node.Trashed == false))
                     .Select(node => node.NodeId)
                     .ToListAsync(cancellationToken);
