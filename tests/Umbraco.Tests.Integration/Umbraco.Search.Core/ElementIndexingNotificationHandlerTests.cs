@@ -78,7 +78,7 @@ public class ElementIndexingNotificationHandlerTests : PropertyValueHandlerTests
             .AddNotificationHandler<ElementSavedNotification, ContentRelationsUpdate>()
             .AddNotificationHandler<ElementPublishedNotification, ContentRelationsUpdate>();
 
-        // the per-element reindex trigger (ElementPublishStatusNotificationHandler -> ElementChangeCacheRefresher
+        // the per-element reindex trigger (PublishedElementNotificationHandler -> PublishedElementCacheRefresher
         // -> ElementIndexingNotificationHandler) is wired up automatically by AddSearchCore() - no test-specific
         // registration needed.
     }
@@ -254,7 +254,6 @@ public class ElementIndexingNotificationHandlerTests : PropertyValueHandlerTests
             ContentIndexingService,
             GetRequiredService<IRelationService>(),
             GetRequiredService<IOptions<IndexingSettings>>(),
-            GetRequiredService<IOriginProvider>(),
             GetRequiredService<IIndexDocumentService>());
 
         Guid[] referencingDocumentKeys = handler.FindDocumentKeysReferencingElements([leafElement.Id]);
@@ -395,7 +394,6 @@ public class ElementIndexingNotificationHandlerTests : PropertyValueHandlerTests
             ContentIndexingService,
             relationService,
             GetRequiredService<IOptions<IndexingSettings>>(),
-            GetRequiredService<IOriginProvider>(),
             GetRequiredService<IIndexDocumentService>());
 
         Guid[] referencingDocumentKeys = handler.FindDocumentKeysReferencingElements([element.Id]);

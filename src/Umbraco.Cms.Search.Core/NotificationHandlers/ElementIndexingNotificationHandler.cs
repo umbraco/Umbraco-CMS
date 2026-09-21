@@ -1,18 +1,13 @@
 using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
-using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Services.Changes;
 using Umbraco.Cms.Search.Core.Cache.Element;
 using Umbraco.Cms.Search.Core.Models.Indexing;
 using Umbraco.Cms.Search.Core.Services.ContentIndexing;
-using Umbraco.Cms.Core.Sync;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Search.Core.NotificationHandlers;
@@ -22,22 +17,17 @@ namespace Umbraco.Cms.Search.Core.NotificationHandlers;
 /// other published elements - when external block element indexing is enabled.
 /// </summary>
 /// <remarks>
-/// Ordinary per-element changes are handled via <see cref="ElementChangeCacheRefresherNotification"/> - a
-/// Search-owned broadcast raised only when an element is actually published or unpublished (see
-/// <see cref="ElementPublishStatusNotificationHandler"/>), so a plain draft save of a reusable element never
-/// triggers a reindex of the documents referencing it, since only a published change is ever reflected in the
-/// published index. Core's own, genuinely distributed <see cref="ElementCacheRefresherNotification"/> is still
-/// handled directly, but only for its "refresh all" payload (e.g. after a full element cache reload): that signal
-/// cannot distinguish a save from a publish, so it is not used to react to ordinary per-element changes.
+/// Reacts to <see cref="PublishedElementCacheRefresherNotification"/> - a Search-owned broadcast raised only when
+/// an element is actually published, unpublished or trashed (see <see cref="PublishedElementNotificationHandler"/>)
+/// - so a plain draft save of a reusable element never triggers a reindex of the documents referencing it, since
+/// only a published change is ever reflected in the published index.
 /// </remarks>
 internal sealed class ElementIndexingNotificationHandler : IndexingNotificationHandlerBase,
-    INotificationHandler<ElementCacheRefresherNotification>,
-    INotificationHandler<ElementChangeCacheRefresherNotification>
+    INotificationHandler<PublishedElementCacheRefresherNotification>
 {
     private readonly IContentIndexingService _contentIndexingService;
     private readonly IRelationService _relationService;
     private readonly IOptions<IndexingSettings> _indexingSettings;
-    private readonly IOriginProvider _originProvider;
     private readonly IIndexDocumentService _indexDocumentService;
 
     /// <summary>
@@ -47,57 +37,26 @@ internal sealed class ElementIndexingNotificationHandler : IndexingNotificationH
     /// <param name="contentIndexingService">The service used to re-index the affected documents.</param>
     /// <param name="relationService">The service used to traverse element-to-document and element-to-element references.</param>
     /// <param name="indexingSettings">The indexing settings, used to determine whether external element content is indexed at all.</param>
-    /// <param name="originProvider">The provider used to determine the current server's origin.</param>
     /// <param name="indexDocumentService">The service used to flush the change-detection cache for affected documents.</param>
     public ElementIndexingNotificationHandler(
         ICoreScopeProvider coreScopeProvider,
         IContentIndexingService contentIndexingService,
         IRelationService relationService,
         IOptions<IndexingSettings> indexingSettings,
-        IOriginProvider originProvider,
         IIndexDocumentService indexDocumentService)
         : base(coreScopeProvider)
     {
         _contentIndexingService = contentIndexingService;
         _relationService = relationService;
         _indexingSettings = indexingSettings;
-        _originProvider = originProvider;
         _indexDocumentService = indexDocumentService;
     }
 
     /// <summary>
-    /// Re-indexes every document that references any external element, in reaction to a "refresh all" element
-    /// cache payload; any other payload is ignored, since ordinary per-element changes are handled by
-    /// <see cref="Handle(ElementChangeCacheRefresherNotification)"/> instead.
-    /// </summary>
-    /// <param name="notification">The notification describing the element cache changes to react to.</param>
-    public void Handle(ElementCacheRefresherNotification notification)
-    {
-        // external element content only ever participates in the index when the feature is enabled; with it off,
-        // referencing documents have nothing to refresh.
-        if (_indexingSettings.Value.IndexExternalBlockElements is false)
-        {
-            return;
-        }
-
-        if (notification.MessageType != MessageType.RefreshByPayload
-            || notification.MessageObject is not ElementCacheRefresher.JsonPayload[] payloads
-            || payloads.Any(payload => payload.ChangeTypes.HasType(TreeChangeTypes.RefreshAll)) is false)
-        {
-            return;
-        }
-
-        // a RefreshAll payload (Id=0, e.g. from a full element cache reload) carries no specific element id, so we
-        // cannot know which elements actually changed - conservatively treat every element ever referenced via an
-        // external block relation as changed, to avoid leaving stale flattened content behind.
-        ReindexDocumentsReferencing(GetAllReferencedElementIds(), _originProvider.GetCurrent());
-    }
-
-    /// <summary>
-    /// Re-indexes the documents that reference the elements published or unpublished as described by the notification.
+    /// Re-indexes the documents that reference the elements published, unpublished or trashed as described by the notification.
     /// </summary>
     /// <param name="notification">The notification describing the element publish status changes to react to.</param>
-    public void Handle(ElementChangeCacheRefresherNotification notification)
+    public void Handle(PublishedElementCacheRefresherNotification notification)
     {
         // external element content only ever participates in the index when the feature is enabled; with it off,
         // referencing documents have nothing to refresh.
@@ -106,7 +65,7 @@ internal sealed class ElementIndexingNotificationHandler : IndexingNotificationH
             return;
         }
 
-        ElementChangeCacheRefresher.JsonPayload[] payloads = GetNotificationPayloads<ElementChangeCacheRefresher.JsonPayload>(notification, out var origin);
+        PublishedElementCacheRefresher.JsonPayload[] payloads = GetNotificationPayloads<PublishedElementCacheRefresher.JsonPayload>(notification, out var origin);
 
         ReindexDocumentsReferencing(payloads.Select(payload => payload.Id).Distinct().ToArray(), origin);
     }
@@ -183,11 +142,4 @@ internal sealed class ElementIndexingNotificationHandler : IndexingNotificationH
                 batch,
                 [Umbraco.Cms.Core.Constants.Conventions.RelationTypes.RelatedExternalBlockElementAlias],
                 entityType));
-
-    private int[] GetAllReferencedElementIds()
-        => _relationService
-            .GetByRelationTypeAlias(Umbraco.Cms.Core.Constants.Conventions.RelationTypes.RelatedExternalBlockElementAlias)
-            .Select(relation => relation.ChildId)
-            .Distinct()
-            .ToArray();
 }
