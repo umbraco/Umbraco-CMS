@@ -135,7 +135,7 @@ export class UmbElementItemRefElement extends UmbLitElement {
 		return html`<uui-tag size="s" slot="tag" look="secondary" color="default">Draft</uui-tag>`;
 	}
 
-	static override styles = [
+	static override readonly styles = [
 		css`
 			:host {
 				--umb-entity-frame-opacity: 0;

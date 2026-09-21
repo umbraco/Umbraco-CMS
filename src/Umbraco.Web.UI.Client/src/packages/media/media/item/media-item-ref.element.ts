@@ -90,7 +90,7 @@ export class UmbMediaItemRefElement extends UmbLitElement {
 		return html`<umb-icon slot="icon" name=${item.mediaType.icon}></umb-icon>`;
 	}
 
-	static override styles = [
+	static override readonly styles = [
 		css`
 			:host {
 				--umb-entity-frame-opacity: 0;

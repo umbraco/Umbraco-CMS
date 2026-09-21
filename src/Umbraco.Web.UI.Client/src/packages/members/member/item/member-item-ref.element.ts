@@ -89,7 +89,7 @@ export class UmbMemberItemRefElement extends UmbLitElement {
 		return html`<umb-icon slot="icon" name=${item.memberType.icon || 'icon-user'}></umb-icon>`;
 	}
 
-	static override styles = [
+	static override readonly styles = [
 		css`
 			:host {
 				--umb-entity-frame-opacity: 0;

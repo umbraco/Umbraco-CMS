@@ -61,7 +61,7 @@ export class UmbLanguageItemRefElement extends UmbLitElement {
 		`;
 	}
 
-	static override styles = [
+	static override readonly styles = [
 		css`
 			:host {
 				--umb-entity-frame-opacity: 0;
