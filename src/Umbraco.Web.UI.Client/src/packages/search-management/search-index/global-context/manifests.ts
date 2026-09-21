@@ -1,3 +1,5 @@
+import { UmbSearchContext } from './search.global-context.js';
+
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'globalContext',
@@ -7,6 +9,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 		// eslint-disable-next-line local-rules/enforce-manifest-alias
 		alias: 'Umbraco.Search.GlobalContext',
 		name: 'Umbraco Search Global Context',
-		api: () => import('./search.global-context.js'),
+		api: UmbSearchContext,
 	},
 ];

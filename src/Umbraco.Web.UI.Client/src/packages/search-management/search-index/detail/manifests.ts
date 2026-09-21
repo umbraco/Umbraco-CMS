@@ -1,5 +1,6 @@
 import { UMB_SEARCH_DETAIL_REPOSITORY_ALIAS, UMB_SEARCH_DETAIL_STORE_ALIAS } from '../constants.js';
 import { UMB_SEARCH_LEGACY_DETAIL_REPOSITORY_ALIAS, loadWithDeprecationWarning } from '../legacy-aliases.js';
+import { UmbSearchDetailStore } from './search-detail.store.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -25,6 +26,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'store',
 		name: 'Umbraco Search Detail Store',
 		alias: UMB_SEARCH_DETAIL_STORE_ALIAS,
-		api: () => import('./search-detail.store.js'),
+		api: UmbSearchDetailStore,
 	},
 ];

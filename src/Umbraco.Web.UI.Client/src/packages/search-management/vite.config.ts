@@ -11,9 +11,11 @@ export default defineConfig({
 	...getDefaultConfig({
 		dist,
 		lazyChunk: {
-			// Core instantiates globalContext and store extensions at startup (see core/entry-point.ts),
-			// and the manifests themselves are what the bundle entry loads, so none of these may end up
-			// in the chunk that is meant to load only on entering the subsection.
+			// The manifests are what the bundle entry loads, so they and everything they reference by
+			// value must stay out of the chunk that is meant to load only on entering the subsection.
+			// Listing the manifests alone is not enough: manualChunks assigns a module to a chunk
+			// regardless of who imports it, so a globalContext or store left off this list still lands
+			// in the lazy chunk and the entry then pulls that whole chunk in at boot to reach it.
 			eagerModules: ['umbraco-package', 'manifests', 'constants', 'legacy-aliases', 'global-context', '.store.'],
 		},
 	}),
