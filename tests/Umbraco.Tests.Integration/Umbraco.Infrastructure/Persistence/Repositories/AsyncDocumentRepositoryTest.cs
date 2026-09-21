@@ -184,6 +184,40 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
     }
 
     /// <summary>
+    ///     A cached read must never outlive the write that changed it. The cache policy keys its own writes by the
+    ///     integer id while reads are keyed by Guid, so the repository clears the Guid entry itself after persisting -
+    ///     without that, an update would keep serving the value it replaced.
+    /// </summary>
+    [Test]
+    public async Task SaveAsync_ThenGetAsync_ReflectsTheWriteRatherThanACachedCopy()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository(CreateRealAppCaches());
+
+        IContent content = ContentBuilder.CreateSimpleContent(_contentType, "Cache Write Through", _textpage.Id);
+        content.SetValue("title", "first value");
+        await repository.SaveAsync(content, CancellationToken.None);
+
+        IContent? afterInsert = await repository.GetAsync(content.Key, CancellationToken.None);
+
+        content.Name = "Cache Write Through Renamed";
+        content.SetValue("title", "second value");
+        await repository.SaveAsync(content, CancellationToken.None);
+
+        IContent? afterUpdate = await repository.GetAsync(content.Key, CancellationToken.None);
+        scope.Complete();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(afterInsert!.GetValue("title"), Is.EqualTo("first value"));
+            Assert.That(afterUpdate!.Name, Is.EqualTo("Cache Write Through Renamed"));
+            Assert.That(afterUpdate.GetValue("title"), Is.EqualTo("second value"),
+                "the read after an update must not be served from the pre-update cache entry");
+        });
+    }
+
+
+    /// <summary>
     ///     A second read of the same document must not go back to the database.
     /// </summary>
     [Test]
@@ -645,6 +679,95 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
         return contentType;
     }
+
+    // Helper: a culture-variant content type carrying one variant property AND one invariant property, so a
+    // single document exercises both variation levels at once.
+    private async Task<IContentType> CreateMixedVarianceContentTypeAsync()
+    {
+        var propertyCollection = new PropertyTypeCollection(true)
+        {
+            new PropertyType(ShortStringHelper, "mixedVariantTitle", ValueStorageType.Ntext)
+            {
+                Alias = "mixedVariantTitle",
+                DataTypeId = -88,
+                Variations = ContentVariation.Culture,
+            },
+            new PropertyType(ShortStringHelper, "mixedInvariantBody", ValueStorageType.Ntext)
+            {
+                Alias = "mixedInvariantBody",
+                DataTypeId = -88,
+                Variations = ContentVariation.Nothing,
+            },
+        };
+
+        var contentType = ContentTypeBuilder.CreateBasicContentType("umbMixedVariant", "Mixed Variant");
+        contentType.Variations = ContentVariation.Culture;
+        contentType.PropertyGroups.Add(new PropertyGroup(propertyCollection) { Alias = "content", Name = "Content" });
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+        return contentType;
+    }
+
+    /// <summary>
+    ///     A page of results holding both invariant and culture-variant documents must resolve each row at its own
+    ///     variation level: the name from the right source, and every property from the variation that property
+    ///     declares. A result set of one kind only cannot catch a mix-up between the two.
+    /// </summary>
+    [Test]
+    public async Task GetChildrenAsync_WithMixedVariantAndInvariantChildren_ResolvesEachAtItsOwnVariation()
+    {
+        IContentType variantContentType = await CreateMixedVarianceContentTypeAsync();
+
+        IContent root = ContentBuilder.CreateSimpleContent(_contentType, "Mixed Variance Root");
+        await ContentService.SaveAsync(root, null, null, CancellationToken.None);
+
+        const int childCount = 25;
+        for (var i = 0; i < childCount; i++)
+        {
+            var isInvariant = i % 2 == 0;
+            if (isInvariant)
+            {
+                IContent invariantChild = ContentBuilder.CreateSimpleContent(_contentType, $"INV_{i}", root.Id);
+                await ContentService.SaveAsync(invariantChild, null, null, CancellationToken.None);
+                continue;
+            }
+
+            IContent variantChild = ContentBuilder.CreateBasicContent(variantContentType);
+            variantChild.ParentId = root.Id;
+            variantChild.SetCultureName($"VAR_{i}", "en-US");
+            variantChild.SetValue("mixedVariantTitle", $"variant title {i}", "en-US");
+            variantChild.SetValue("mixedInvariantBody", $"invariant body {i}");
+            await ContentService.SaveAsync(variantChild, null, null, CancellationToken.None);
+        }
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        PagedModel<IContent> page = await repository.GetChildrenAsync(
+            root.Key, 0, 20, null, Ordering.By("UpdateDate"), CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(page.Total, Is.EqualTo(childCount));
+        Assert.Multiple(() =>
+        {
+            foreach (IContent child in page.Items)
+            {
+                var isInvariant = child.ContentType.Alias == _contentType.Alias;
+                var name = isInvariant ? child.Name : child.CultureInfos["en-US"].Name;
+                var expectedPrefix = isInvariant ? "INV" : "VAR";
+
+                Assert.That(name, Does.StartWith(expectedPrefix),
+                    $"name for {child.ContentType.Alias} came from the wrong source");
+
+                foreach (IProperty property in child.Properties)
+                {
+                    var culture = property.PropertyType.Variations.VariesByNothing() ? null : "en-US";
+                    Assert.That(property.GetValue(culture), Is.Not.Null,
+                        $"property {property.Alias} has no value at its own variation");
+                }
+            }
+        });
+    }
+
 
     [Test]
     public async Task GetAsync_VariantDocument_HasDraftCultureNames()
