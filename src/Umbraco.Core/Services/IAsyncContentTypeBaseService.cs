@@ -4,12 +4,11 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 namespace Umbraco.Cms.Core.Services;
 
 /// <summary>
-///     Asynchronous counterpart of <see cref="IContentTypeBaseService{TItem}" />.
+///     The contract implemented by every content type service (document, media and member types).
 /// </summary>
 /// <remarks>
-///     This is the async-first contract used while the content-type repositories are migrated to EF Core. For now it is
-///     only implemented by the document-type service; the media- and member-type services continue to use the
-///     synchronous <see cref="IContentTypeBaseService{TItem}" /> until their repositories are migrated.
+///     The synchronous <see cref="IContentTypeBaseService{TItem}" /> remains for external implementors only; no
+///     content type service in the CMS implements it.
 /// </remarks>
 /// <typeparam name="TItem">The type of the item.</typeparam>
 public interface IAsyncContentTypeBaseService<TItem> : IService

@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Core.Services.Navigation;
 ///     the media navigation structure and its recycle bin.
 /// </summary>
 /// <remarks>
-///     This service extends <see cref="ContentNavigationServiceBase{TContentType, TContentTypeService}"/>
+///     This service extends <see cref="AsyncContentNavigationServiceBase{TContentType, TContentTypeService}"/>
 ///     and implements both <see cref="IMediaNavigationQueryService"/> and <see cref="IMediaNavigationManagementService"/>
 ///     to provide a complete set of navigation operations for media content.
 /// </remarks>
