@@ -4,6 +4,10 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 const MAX_VALUE_LENGTH = 100;
 
+// A field name can appear more than once, as one logical field may be indexed under
+// several analyzers, so the name alone does not identify a row.
+const fieldIdentity = (field: UmbExamineFieldModel) => `${field.name}|${field.type}`;
+
 export class UmbSearchExamineDocumentFieldsElement extends UmbLitElement {
 	@property({ type: Array })
 	fields: Array<UmbExamineFieldModel> = [];
@@ -41,7 +45,7 @@ export class UmbSearchExamineDocumentFieldsElement extends UmbLitElement {
 
 	#renderValue(field: UmbExamineFieldModel, value: string, index: number, showIndex: boolean) {
 		const isLong = value.length > MAX_VALUE_LENGTH;
-		const fieldKey = `${field.name}-${index}`;
+		const fieldKey = `${fieldIdentity(field)}-${index}`;
 		const isExpanded = this._expandedFields.has(fieldKey);
 		const indexPrefix = showIndex
 			? html`<span class="value-index" title=${this.localize.term('searchExamine_valueIndex', index + 1)}>
@@ -137,7 +141,7 @@ export class UmbSearchExamineDocumentFieldsElement extends UmbLitElement {
 									<tbody>
 										${repeat(
 											this.#filteredAndSortedFields,
-											(field) => field.name,
+											(field) => fieldIdentity(field),
 											(field) => this.#renderField(field),
 										)}
 									</tbody>
