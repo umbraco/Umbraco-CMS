@@ -1079,6 +1079,7 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
         // persist the content version dto
         ContentVersionDto contentVersionDto = dto.ContentVersionDto.ContentVersionDto;
         contentVersionDto.NodeId = nodeDto.NodeId;
+        contentVersionDto.Key = Guid.NewGuid();
         contentVersionDto.Current = !publishing;
         Database.Insert(contentVersionDto);
         entity.VersionId = contentVersionDto.Id;
@@ -1285,7 +1286,7 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
             // Ensure existing version retains current preventCleanup flag (both saving and publishing).
             contentVersionDto.PreventCleanup = version.PreventCleanup;
 
-            Database.Update(contentVersionDto);
+            Database.Update(contentVersionDto, ContentVersionDto.UpdatableColumnNames);
             Database.Update(entityVersionDto);
 
             // and, if publishing, insert new content & entity version dtos

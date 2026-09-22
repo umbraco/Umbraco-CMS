@@ -335,7 +335,6 @@ internal sealed class ContentBaseFactory
         var dto = new ContentVersionDto
         {
             Id = entity.VersionId,
-            Key = Guid.NewGuid(),
             NodeId = entity.Id,
             VersionDate = entity.UpdateDate,
             UserId = entity.WriterId,

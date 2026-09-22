@@ -247,6 +247,32 @@ internal sealed class MediaRepositoryTest : UmbracoIntegrationTest
         Assert.AreEqual(0, database.SqlCount);
     }
 
+    /// <summary>
+    ///     A version key identifies one version row for as long as it exists, so saving again must not mint a new
+    ///     one - anything holding a version key would otherwise be pointing at nothing after the next save.
+    /// </summary>
+    [Test]
+    public void Saving_Twice_Keeps_The_Content_Version_Key()
+    {
+        var provider = ScopeProvider;
+        var scopeAccessor = ScopeAccessor;
+
+        using var scope = provider.CreateScope();
+        var repository = CreateRepository(provider, out MediaTypeRepository mediaTypeRepository);
+        var database = scopeAccessor.AmbientScope.Database;
+
+        Media media = CreateMedia(repository, mediaTypeRepository);
+        Guid keyAfterInsert = database.SingleOrDefault<ContentVersionDto>("WHERE id = @0", media.VersionId).Key;
+
+        media.Name = "renamed";
+        repository.Save(media);
+        Guid keyAfterUpdate = database.SingleOrDefault<ContentVersionDto>("WHERE id = @0", media.VersionId).Key;
+
+        scope.Complete();
+
+        Assert.That(keyAfterUpdate, Is.EqualTo(keyAfterInsert));
+    }
+
     private Media CreateMedia(MediaRepository repository, MediaTypeRepository mediaTypeRepository)
     {
         var mediaType = MediaTypeBuilder.CreateSimpleMediaType("umbTextpage1", "Textpage");

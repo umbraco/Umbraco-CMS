@@ -24,6 +24,20 @@ public class ContentVersionDto
     private const string NodeIdColumnName = Constants.DatabaseSchema.Columns.NodeIdName;
     private const string PreventCleanupColumnName = "preventCleanup";
 
+    /// <summary>
+    /// The columns an update may write. The key identifies a version row for as long as that row exists, so it is
+    /// assigned once, when the row is inserted, and never rewritten by an update.
+    /// </summary>
+    internal static readonly string[] UpdatableColumnNames =
+    [
+        NodeIdColumnName,
+        VersionDateColumnName,
+        UserIdColumnName,
+        CurrentColumnName,
+        TextColumnName,
+        PreventCleanupColumnName,
+    ];
+
     private int? _userId;
 
     /// <summary>
