@@ -741,6 +741,13 @@ export class UiBaseLocators extends BasePage {
     await this.page.waitForTimeout(ConstantHelper.wait.short);
   }
 
+  /**
+   * Asserts that the save button is disabled, as it is while required fields are incomplete.
+   */
+  async isSaveButtonDisabled() {
+    await this.isDisabled(this.saveBtn);
+  }
+
   async clickChooseButton() {
     await this.click(this.chooseBtn);
   }
@@ -1289,12 +1296,13 @@ export class UiBaseLocators extends BasePage {
     await this.isVisible(propertyEditorUiLocator, isVisible);
   }
 
-  async doesPropertyHaveInvalidBadge(propertyName: string) {
+  async doesPropertyHaveInvalidBadge(propertyName: string, isVisible: boolean = true) {
     await this.isVisible(
       this.page
         .locator("umb-property-layout")
         .filter({ hasText: propertyName })
         .locator("#invalid-badge uui-badge"),
+      isVisible,
     );
   }
 

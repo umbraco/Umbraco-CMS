@@ -4,17 +4,20 @@ import {expect} from '@playwright/test';
 const nameOfTheUser = 'TestUser';
 const userEmail = 'TestUser@EmailTest.test';
 const defaultUserGroupName = 'Writers';
+const existingUserName = 'ExistingUser';
 let userCount = null;
 
 test.beforeEach(async ({umbracoUi, umbracoApi}) => {
   await umbracoUi.goToBackOffice();
   await umbracoApi.user.ensureNameNotExists(nameOfTheUser);
+  await umbracoApi.user.ensureNameNotExists(existingUserName);
 });
 
 test.afterEach(async ({umbracoApi, umbracoUi}) => {
   // Waits so we can try to avoid db locks
   await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
   await umbracoApi.user.ensureNameNotExists(nameOfTheUser);
+  await umbracoApi.user.ensureNameNotExists(existingUserName);
 });
 
 test('can create a user', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
@@ -697,4 +700,43 @@ test.fixme('can allow access to all elements for a user', async ({umbracoApi, um
   // Assert
   const userData = await umbracoApi.user.getByName(nameOfTheUser);
   expect(userData.hasElementRootAccess).toBeTruthy();
+});
+
+test('cannot create a user with an invalid email format', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  await umbracoUi.user.goToUsers();
+
+  // Act
+  await umbracoUi.user.clickCreateActionWithOptionName('User');
+  await umbracoUi.user.enterNameOfTheUser(nameOfTheUser);
+  await umbracoUi.user.enterUserEmail('invalidEmailFormat');
+  await umbracoUi.user.clickChooseButton();
+  await umbracoUi.user.clickButtonWithName(defaultUserGroupName);
+  await umbracoUi.user.clickChooseModalButton();
+  await umbracoUi.user.clickCreateUserButton();
+
+  // Assert
+  // The browser's native email-format validation blocks submission, so the dialog never closes and no API call is made
+  await umbracoUi.user.isUserEmailInvalid();
+  expect(await umbracoApi.user.doesNameExist(nameOfTheUser)).toBeFalsy();
+});
+
+test('cannot create a user with a duplicate email', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
+  await umbracoApi.user.createDefaultUser(existingUserName, userEmail, [userGroup.id]);
+  await umbracoUi.user.goToUsers();
+
+  // Act
+  await umbracoUi.user.clickCreateActionWithOptionName('User');
+  await umbracoUi.user.enterNameOfTheUser(nameOfTheUser);
+  await umbracoUi.user.enterUserEmail(userEmail);
+  await umbracoUi.user.clickChooseButton();
+  await umbracoUi.user.clickButtonWithName(defaultUserGroupName);
+  await umbracoUi.user.clickChooseModalButton();
+  await umbracoUi.user.clickCreateUserButton();
+
+  // Assert
+  await umbracoUi.user.isErrorNotificationVisible();
+  expect(await umbracoApi.user.doesNameExist(nameOfTheUser)).toBeFalsy();
 });
