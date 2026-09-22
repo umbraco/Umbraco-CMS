@@ -183,3 +183,83 @@ test('can search and see only allowed member types', async ({umbracoApi, umbraco
   expect(contentData.values[0].value[0]['unique']).toEqual(allowedTestMemberId);
   expect(contentData.values[0].value[0]['type']).toEqual('member');
 });
+
+test('can pick multiple items with a multi node tree picker', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const firstPickerItemName = 'First Picker Item';
+  const secondPickerItemName = 'Second Picker Item';
+  const pickerItemDocumentTypeName = 'MultiPickerItemDocumentType';
+  const pickerItemDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(pickerItemDocumentTypeName);
+  const firstPickerItemId = await umbracoApi.document.createDefaultDocument(firstPickerItemName, pickerItemDocumentTypeId);
+  const secondPickerItemId = await umbracoApi.document.createDefaultDocument(secondPickerItemName, pickerItemDocumentTypeId);
+  // No min/max configured, so the picker defaults to unlimited selection.
+  const customDataTypeId = await umbracoApi.dataType.createDefaultContentPickerSourceDataType(customDataTypeName);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickChooseButton();
+  await umbracoUi.content.selectLinkByName(firstPickerItemName);
+  await umbracoUi.content.selectLinkByName(secondPickerItemName);
+  await umbracoUi.content.clickChooseModalButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
+
+  // Assert
+  const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.values[0].value.length).toBe(2);
+  const pickedIds = contentData.values[0].value.map((item: {unique: string}) => item.unique);
+  expect(pickedIds).toContain(firstPickerItemId);
+  expect(pickedIds).toContain(secondPickerItemId);
+
+  // Clean
+  await umbracoApi.document.ensureNameNotExists(firstPickerItemName);
+  await umbracoApi.document.ensureNameNotExists(secondPickerItemName);
+  await umbracoApi.documentType.ensureNameNotExists(pickerItemDocumentTypeName);
+});
+
+test('can see validation error clear when minimum number of items is met', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const minNumberDataTypeName = 'MinNumberMultiNodeTreePicker';
+  const minNumberDocumentTypeName = 'MinNumberDocumentType';
+  const firstPickerItemName = 'First Picker Item';
+  const secondPickerItemName = 'Second Picker Item';
+  const pickerItemDocumentTypeName = 'MultiPickerItemDocumentType';
+  const pickerItemDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(pickerItemDocumentTypeName);
+  await umbracoApi.document.createDefaultDocument(firstPickerItemName, pickerItemDocumentTypeId);
+  await umbracoApi.document.createDefaultDocument(secondPickerItemName, pickerItemDocumentTypeId);
+  const minNumberDataTypeId = await umbracoApi.dataType.createMultiNodeTreePickerDataTypeWithMinNumberOfItems(minNumberDataTypeName, 2);
+  const minNumberDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(minNumberDocumentTypeName, minNumberDataTypeName, minNumberDataTypeId, 'TestGroup', false, false, true);
+  await umbracoApi.document.createDefaultDocument(contentName, minNumberDocumentTypeId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickChooseButton();
+  await umbracoUi.content.selectLinkByName(firstPickerItemName);
+  await umbracoUi.content.clickChooseModalButton();
+  // Try to save with only 1 item picked (min is 2)
+  await umbracoUi.content.clickSaveAndPublishButton();
+  await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.minimumTwoEntriesRequiresOneMore);
+  // Add a second item
+  await umbracoUi.content.clickChooseButton();
+  await umbracoUi.content.selectLinkByName(secondPickerItemName);
+  await umbracoUi.content.clickChooseModalButton();
+  // Validation should clear
+  await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.minimumTwoEntriesRequiresOneMore, false);
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
+
+  // Assert
+  const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.values[0].value.length).toBe(2);
+
+  // Clean
+  await umbracoApi.document.ensureNameNotExists(firstPickerItemName);
+  await umbracoApi.document.ensureNameNotExists(secondPickerItemName);
+  await umbracoApi.documentType.ensureNameNotExists(pickerItemDocumentTypeName);
+  await umbracoApi.documentType.ensureNameNotExists(minNumberDocumentTypeName);
+  await umbracoApi.dataType.ensureNameNotExists(minNumberDataTypeName);
+});
