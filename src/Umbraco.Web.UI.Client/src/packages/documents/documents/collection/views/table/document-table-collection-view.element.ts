@@ -142,10 +142,10 @@ export class UmbDocumentTableCollectionViewElement extends UmbCollectionViewElem
 		this._tableItems = this._items.map((item) => {
 			if (!item.unique) throw new Error('Item id is missing.');
 
-			// While selectable (e.g. in a picker), the name must not navigate away from the picker. An item with
+			// While select-only (i.e. in a picker), the name must not navigate away from the picker. An item with
 			// children still needs a way to be opened, so it drills further into it via an open event instead.
 			const editPath = UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: item.unique });
-			const href = this._selectable ? undefined : editPath;
+			const href = this._selectOnly ? undefined : editPath;
 			const onOpen = item.hasChildren
 				? () => this.dispatchEvent(new UmbTreeItemOpenEvent({ unique: item.unique, entityType: item.entityType }))
 				: undefined;
