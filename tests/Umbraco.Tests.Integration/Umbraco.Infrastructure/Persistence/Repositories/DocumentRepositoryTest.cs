@@ -1094,6 +1094,143 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
         }
     }
 
+    /// <summary>
+    ///     The slim overload is a window onto the same sequence the unpaged overload returns, so it must preserve
+    ///     that order rather than establish one of its own.
+    /// </summary>
+    [Test]
+    public async Task GetAllVersionsSlimAsync_ReturnsTheSameOrderAsTheUnpagedOverload()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        IContent content = await CreateContentWithVersionsAsync(repository, "Slim Ordering Page", 4);
+
+        var all = (await repository.GetAllVersionsAsync(content.Key, CancellationToken.None))
+            .Select(version => version.VersionId).ToArray();
+        var slim = (await repository.GetAllVersionsSlimAsync(content.Key, 0, int.MaxValue, CancellationToken.None))
+            .Select(version => version.VersionId).ToArray();
+        scope.Complete();
+
+        Assert.That(slim, Is.EqualTo(all));
+    }
+
+    /// <summary>
+    ///     Consecutive pages must tile the full sequence exactly - no version repeated across a page boundary, none
+    ///     skipped over it.
+    /// </summary>
+    [Test]
+    public async Task GetAllVersionsSlimAsync_ConsecutivePagesTileTheFullSequence()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        IContent content = await CreateContentWithVersionsAsync(repository, "Slim Paging Page", 5);
+
+        var all = (await repository.GetAllVersionsAsync(content.Key, CancellationToken.None))
+            .Select(version => version.VersionId).ToArray();
+
+        var paged = new List<int>();
+        for (var skip = 0; skip < all.Length; skip += 2)
+        {
+            paged.AddRange(
+                (await repository.GetAllVersionsSlimAsync(content.Key, skip, 2, CancellationToken.None))
+                .Select(version => version.VersionId));
+        }
+
+        scope.Complete();
+
+        Assert.That(paged, Is.EqualTo(all));
+    }
+
+    /// <summary>
+    ///     A page that starts past the end of the sequence is empty rather than an error or a clamped last page.
+    /// </summary>
+    [Test]
+    public async Task GetAllVersionsSlimAsync_WithSkipBeyondTheVersionCount_ReturnsEmpty()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        IContent content = await CreateContentWithVersionsAsync(repository, "Slim Overshoot Page", 3);
+
+        var count = (await repository.GetAllVersionsAsync(content.Key, CancellationToken.None)).Count();
+        IEnumerable<IContent> results =
+            await repository.GetAllVersionsSlimAsync(content.Key, count, 10, CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(results, Is.Empty);
+    }
+
+    [Test]
+    public async Task GetAllVersionsSlimAsync_WithTakeOfZero_ReturnsEmpty()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        IContent content = await CreateContentWithVersionsAsync(repository, "Slim Empty Take Page", 3);
+
+        IEnumerable<IContent> results =
+            await repository.GetAllVersionsSlimAsync(content.Key, 0, 0, CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(results, Is.Empty);
+    }
+
+    /// <summary>
+    ///     A page asking for more than remains returns what remains, rather than padding or failing.
+    /// </summary>
+    [Test]
+    public async Task GetAllVersionsSlimAsync_WithTakeLargerThanTheRemainder_ReturnsOnlyTheRemainder()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        IContent content = await CreateContentWithVersionsAsync(repository, "Slim Remainder Page", 4);
+
+        var all = (await repository.GetAllVersionsAsync(content.Key, CancellationToken.None))
+            .Select(version => version.VersionId).ToArray();
+        var remainder = (await repository.GetAllVersionsSlimAsync(content.Key, 1, 1000, CancellationToken.None))
+            .Select(version => version.VersionId).ToArray();
+        scope.Complete();
+
+        Assert.That(remainder, Is.EqualTo(all.Skip(1).ToArray()));
+    }
+
+    [Test]
+    public async Task GetAllVersionsSlimAsync_WithNonExistentNodeKey_ReturnsEmpty()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        IEnumerable<IContent> results =
+            await repository.GetAllVersionsSlimAsync(Guid.NewGuid(), 0, 10, CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(results, Is.Empty);
+    }
+
+    /// <summary>
+    ///     Saves <paramref name="revisions" /> publishing revisions of a new content item, so the node has a
+    ///     predictable number of versions to page over.
+    /// </summary>
+    private async Task<IContent> CreateContentWithVersionsAsync(IDocumentRepository repository, string name, int revisions)
+    {
+        IContent content = ContentBuilder.CreateSimpleContent(_contentType, name, _textpage.Id);
+        await repository.SaveAsync(content, CancellationToken.None);
+
+        for (var i = 1; i <= revisions; i++)
+        {
+            content.Name = $"{name}-{i}";
+            content.SetValue("title", $"title-{i}");
+            content.PublishCulture(CultureImpact.Invariant, DateTime.UtcNow, GetRequiredService<PropertyEditorCollection>());
+            content.PublishedState = PublishedState.Publishing;
+            await repository.SaveAsync(content, CancellationToken.None);
+        }
+
+        return content;
+    }
+
     [Test]
     public async Task GetChildrenAsync_WithChildren_ReturnsDirectChildrenOnly()
     {

@@ -14,6 +14,7 @@ using Umbraco.Cms.Core.Dictionary;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -693,6 +694,266 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
         var topVersions = await ContentService.GetVersionIdsAsync(content.Key, 0, 4, CancellationToken.None);
         Assert.AreEqual(4, topVersions.Count());
+    }
+
+    /// <summary>
+    ///     The paged overload must return the same versions, in the same order, as the unpaged one - a page is a
+    ///     window onto that sequence, not a differently ordered result.
+    /// </summary>
+    [Test]
+    [LongRunning]
+    public async Task GetVersionsSlimAsync_ReturnsAPageOfTheUnpagedSequence()
+    {
+        IContent content = await ContentService.CreateAndSaveAsync("Slim Versions", (Guid?)null, "umbTextpage", Constants.Security.SuperUserKey, CancellationToken.None);
+        for (var i = 0; i < 4; i++)
+        {
+            content.SetValue("bodyText", $"body {i}");
+            await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
+            await ContentService.PublishAsync(content, content.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
+        }
+
+        var all = (await ContentService.GetVersionsAsync(content.Key, CancellationToken.None))
+            .Select(version => version.VersionId).ToArray();
+
+        // Asymmetric skip and take, so a page built from them transposed is a different page.
+        var page = (await ContentService.GetVersionsSlimAsync(content.Key, 1, 3, CancellationToken.None))
+            .Select(version => version.VersionId).ToArray();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(all.Length, Is.GreaterThan(4), "the fixture needs more versions than the page size");
+            Assert.That(page, Is.EqualTo(all.Skip(1).Take(3).ToArray()));
+        });
+    }
+
+    [Test]
+    public async Task GetVersionsSlimAsync_WithUnknownKey_ReturnsEmpty()
+    {
+        IEnumerable<IContent> results = await ContentService.GetVersionsSlimAsync(Guid.NewGuid(), 0, 10, CancellationToken.None);
+
+        Assert.That(results, Is.Empty);
+    }
+
+    /// <summary>
+    ///     A caller that supplies no ordering gets sort order, which is what makes the result stable enough to page
+    ///     over. The fixture names items in the reverse of their sort order, so an implementation that fell back to
+    ///     name - or to whatever the provider returned - would produce a visibly different sequence.
+    /// </summary>
+    [Test]
+    public async Task GetPagedOfTypesAsync_WithNullOrdering_OrdersBySortOrder()
+    {
+        (Guid contentTypeKey, _) = await CreateOrderingFixtureAsync();
+
+        PagedModel<IContent> result = await ContentService.GetPagedOfTypesAsync(
+            [contentTypeKey], 0, 10, ordering: null, CancellationToken.None);
+
+        Assert.That(result.Items.Select(item => item.Name), Is.EqualTo(new[] { "C page", "B page", "A page" }));
+    }
+
+    [Test]
+    public async Task GetPagedOfTypesAsync_WithExplicitOrdering_UsesItInsteadOfTheDefault()
+    {
+        (Guid contentTypeKey, _) = await CreateOrderingFixtureAsync();
+
+        PagedModel<IContent> result = await ContentService.GetPagedOfTypesAsync(
+            [contentTypeKey], 0, 10, Ordering.By("name"), CancellationToken.None);
+
+        Assert.That(result.Items.Select(item => item.Name), Is.EqualTo(new[] { "A page", "B page", "C page" }));
+    }
+
+    /// <summary>
+    ///     The singular overload is the plural one narrowed to a single content type, so the two must agree.
+    /// </summary>
+    [Test]
+    public async Task GetPagedOfTypeAsync_IsEquivalentToThePluralOverloadWithOneKey()
+    {
+        (Guid contentTypeKey, _) = await CreateOrderingFixtureAsync();
+
+        PagedModel<IContent> singular = await ContentService.GetPagedOfTypeAsync(
+            contentTypeKey, 0, 10, ordering: null, CancellationToken.None);
+        PagedModel<IContent> plural = await ContentService.GetPagedOfTypesAsync(
+            [contentTypeKey], 0, 10, ordering: null, CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(singular.Total, Is.EqualTo(plural.Total));
+            Assert.That(
+                singular.Items.Select(item => item.Key),
+                Is.EqualTo(plural.Items.Select(item => item.Key)));
+        });
+    }
+
+    /// <summary>
+    ///     No content types means no content. Treating an empty filter as "everything" would make the callers that
+    ///     rebuild on content type change walk the whole tree.
+    /// </summary>
+    [Test]
+    public async Task GetPagedOfTypesAsync_WithNoContentTypeKeys_ReturnsEmpty()
+    {
+        PagedModel<IContent> result = await ContentService.GetPagedOfTypesAsync(
+            [], 0, 10, ordering: null, CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Items, Is.Empty);
+            Assert.That(result.Total, Is.Zero);
+        });
+    }
+
+    [Test]
+    public async Task GetPagedOfTypesAsync_WithUnknownContentTypeKey_ReturnsEmpty()
+    {
+        PagedModel<IContent> result = await ContentService.GetPagedOfTypesAsync(
+            [Guid.NewGuid()], 0, 10, ordering: null, CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Items, Is.Empty);
+            Assert.That(result.Total, Is.Zero);
+        });
+    }
+
+    /// <summary>
+    ///     Total is the size of the whole match, not of the page returned - a caller pages until it has seen Total
+    ///     items, so a Total that tracked the page size would loop forever or stop early.
+    /// </summary>
+    [Test]
+    public async Task GetPagedOfTypesAsync_TotalCountsAllMatchesNotJustThePage()
+    {
+        (Guid contentTypeKey, _) = await CreateOrderingFixtureAsync();
+
+        PagedModel<IContent> firstPage = await ContentService.GetPagedOfTypesAsync(
+            [contentTypeKey], 0, 2, ordering: null, CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(firstPage.Items.Count(), Is.EqualTo(2));
+            Assert.That(firstPage.Total, Is.EqualTo(3));
+        });
+    }
+
+    [Test]
+    public async Task GetPagedOfTypesAsync_WithSkipBeyondTheTotal_ReturnsNoItemsButTheRealTotal()
+    {
+        (Guid contentTypeKey, _) = await CreateOrderingFixtureAsync();
+
+        PagedModel<IContent> result = await ContentService.GetPagedOfTypesAsync(
+            [contentTypeKey], 100, 10, ordering: null, CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Items, Is.Empty);
+            Assert.That(result.Total, Is.EqualTo(3));
+        });
+    }
+
+    /// <summary>
+    ///     Creates a content type of its own with three items whose names run in the reverse of their sort order, so
+    ///     sort order and name produce visibly different sequences and the result set is not shared with the fixture.
+    /// </summary>
+    private async Task<(Guid ContentTypeKey, IContent[] Items)> CreateOrderingFixtureAsync()
+    {
+        ContentType contentType = ContentTypeBuilder.CreateSimpleContentType("orderingPage", "Ordering Page");
+        contentType.Key = Guid.NewGuid();
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+
+        var items = new List<IContent>();
+        foreach (var name in new[] { "C page", "B page", "A page" })
+        {
+            IContent item = ContentBuilder.CreateSimpleContent(contentType, name, Textpage.Id);
+            await ContentService.SaveAsync(item, Constants.Security.SuperUserKey, null, CancellationToken.None);
+            items.Add(item);
+        }
+
+        return (contentType.Key, items.ToArray());
+    }
+
+    // SetPermissionsAsync is obsolete but still the only path that replaces a node's whole permission set, and
+    // RemoveContentPermissionsAsync depends on it, so it stays covered until it is removed.
+#pragma warning disable CS0618 // Type or member is obsolete
+
+    [Test]
+    public async Task SetPermissionsAsync_ThenGetPermissionsAsync_RoundTripsThePermissions()
+    {
+        UserGroup group = await CreateUserGroupAsync("perm-roundtrip");
+
+        await ContentService.SetPermissionsAsync(
+            PermissionSetFor(Textpage, group, "A", "B"), CancellationToken.None);
+
+        EntityPermissionCollection permissions = await ContentService.GetPermissionsAsync(Textpage.Key, CancellationToken.None);
+
+        EntityPermission permission = permissions.Single(p => p.UserGroupId == group.Id);
+        Assert.That(permission.AssignedPermissions, Is.EquivalentTo(new[] { "A", "B" }));
+    }
+
+    /// <summary>
+    ///     The contract is to replace the node's permissions, so a permission that is absent from the new set must
+    ///     be gone afterwards - merging would make it impossible to revoke one.
+    /// </summary>
+    [Test]
+    public async Task SetPermissionsAsync_ReplacesRatherThanMergesWithTheExistingPermissions()
+    {
+        UserGroup group = await CreateUserGroupAsync("perm-replace");
+        await ContentService.SetPermissionAsync(Textpage, "A", [group.Key], CancellationToken.None);
+
+        await ContentService.SetPermissionsAsync(
+            PermissionSetFor(Textpage, group, "B"), CancellationToken.None);
+
+        EntityPermissionCollection permissions = await ContentService.GetPermissionsAsync(Textpage.Key, CancellationToken.None);
+
+        EntityPermission permission = permissions.Single(p => p.UserGroupId == group.Id);
+        Assert.That(permission.AssignedPermissions, Is.EquivalentTo(new[] { "B" }));
+    }
+
+    /// <summary>
+    ///     An empty set revokes everything for the node. This is what clearing a node's permissions is built on, so
+    ///     an implementation that treated "no permissions supplied" as "nothing to do" would silently keep them.
+    /// </summary>
+    [Test]
+    public async Task SetPermissionsAsync_WithAnEmptyPermissionSet_ClearsThePermissionsForThatEntity()
+    {
+        UserGroup group = await CreateUserGroupAsync("perm-clear");
+        await ContentService.SetPermissionAsync(Textpage, "A", [group.Key], CancellationToken.None);
+
+        await ContentService.SetPermissionsAsync(
+            new EntityPermissionSet(Textpage.Id, new EntityPermissionCollection()), CancellationToken.None);
+
+        EntityPermissionCollection permissions = await ContentService.GetPermissionsAsync(Textpage.Key, CancellationToken.None);
+
+        Assert.That(permissions.Where(p => p.UserGroupId == group.Id), Is.Empty);
+    }
+
+    /// <summary>
+    ///     Replacing one node's permissions must leave every other node's alone - the replace is scoped to the
+    ///     entity in the set, not to the user group.
+    /// </summary>
+    [Test]
+    public async Task SetPermissionsAsync_DoesNotAffectPermissionsOnOtherEntities()
+    {
+        UserGroup group = await CreateUserGroupAsync("perm-scope");
+        await ContentService.SetPermissionAsync(Subpage, "A", [group.Key], CancellationToken.None);
+
+        await ContentService.SetPermissionsAsync(
+            PermissionSetFor(Textpage, group, "B"), CancellationToken.None);
+
+        EntityPermissionCollection untouched = await ContentService.GetPermissionsAsync(Subpage.Key, CancellationToken.None);
+
+        EntityPermission permission = untouched.Single(p => p.UserGroupId == group.Id);
+        Assert.That(permission.AssignedPermissions, Is.EquivalentTo(new[] { "A" }));
+    }
+
+    private static EntityPermissionSet PermissionSetFor(IContent content, UserGroup group, params string[] permissions) =>
+        new(
+            content.Id,
+            new EntityPermissionCollection([new EntityPermission(group.Id, content.Id, new HashSet<string>(permissions))]));
+
+#pragma warning restore CS0618 // Type or member is obsolete
+
+    private async Task<UserGroup> CreateUserGroupAsync(string alias)
+    {
+        UserGroup group = UserGroupBuilder.CreateUserGroup(alias);
+        await UserGroupService.CreateAsync(group, Constants.Security.SuperUserKey);
+        return group;
     }
 
     [Test]
