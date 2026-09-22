@@ -1851,9 +1851,6 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
 
     #region Auditing
 
-    protected void Audit(AuditType type, int userId, int objectId, string? message = null, string? parameters = null) =>
-        AuditAsync(type, userId, objectId, message, parameters).GetAwaiter().GetResult();
-
     protected async Task AuditAsync(AuditType type, int userId, int objectId, string? message = null, string? parameters = null)
     {
         // A content operation must never fail because its audit metadata could not be attributed - a
