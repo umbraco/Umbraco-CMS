@@ -1177,9 +1177,9 @@ internal partial class BlockListElementLevelVariationTests
     [ConfigureBuilder(ActionName = nameof(ConfigureAllowEditInvariantFromNonDefaultTrue))]
     public async Task Removing_Block_Property_Value_Is_Propagated_To_Published_Value(string removedAlias, string? removedCulture, string[] culturesToPublish)
     {
-        var elementType = CreateElementType(ContentVariation.Culture);
+        var elementType = await CreateElementType(ContentVariation.Culture);
         var blockListDataType = await CreateBlockListDataType(elementType);
-        var contentType = CreateContentType(ContentVariation.Culture, blockListDataType);
+        var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType);
 
         var content = CreateContent(contentType, elementType, [], false);
         var blockListValue = BlockListPropertyValue(
@@ -1248,7 +1248,7 @@ internal partial class BlockListElementLevelVariationTests
     [Test]
     public async Task Removing_Nested_Block_Property_Value_Is_Propagated_To_Published_Value()
     {
-        var nestedElementType = CreateElementType(ContentVariation.Culture);
+        var nestedElementType = await CreateElementType(ContentVariation.Culture);
         var nestedBlockListDataType = await CreateBlockListDataType(nestedElementType);
 
         var rootElementType = new ContentTypeBuilder()
@@ -1283,7 +1283,7 @@ internal partial class BlockListElementLevelVariationTests
             .Build();
         await ContentTypeService.CreateAsync(rootElementType, Constants.Security.SuperUserKey);
         var rootBlockListDataType = await CreateBlockListDataType(rootElementType);
-        var contentType = CreateContentType(ContentVariation.Culture, rootBlockListDataType);
+        var contentType = await CreateContentType(ContentVariation.Culture, rootBlockListDataType);
 
         var nestedElementContentKey = Guid.NewGuid();
         var nestedElementSettingsKey = Guid.NewGuid();
