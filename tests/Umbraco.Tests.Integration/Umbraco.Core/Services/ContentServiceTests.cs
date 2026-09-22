@@ -726,6 +726,39 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         });
     }
 
+    /// <summary>
+    ///     Deleting prior versions is a cleanup of history, so the published version must survive it - otherwise
+    ///     the document goes offline as a side effect of tidying up.
+    /// </summary>
+    [Test]
+    public async Task DeleteVersionAsync_WithDeletePriorVersions_KeepsThePublishedVersion()
+    {
+        IContent content = await ContentService.CreateAndSaveAsync("Prior Versions", (Guid?)null, "umbTextpage", Constants.Security.SuperUserKey, CancellationToken.None);
+        content.SetValue("bodyText", "published body");
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
+        Assert.That((await ContentService.PublishAsync(content, content.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None)).Success, Is.True);
+
+        IContent published = (await ContentService.GetByIdAsync(content.Key, CancellationToken.None))!;
+        var publishedVersionId = published.PublishedVersionId;
+
+        published.SetValue("bodyText", "draft body");
+        await ContentService.SaveAsync(published, Constants.Security.SuperUserKey, null, CancellationToken.None);
+
+        Attempt<ContentVersionOperationStatus> result = await ContentService.DeleteVersionAsync(
+            content.Key, published.VersionId, deletePriorVersions: true, Constants.Security.SuperUserKey, CancellationToken.None);
+
+        IContent? reloaded = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Success, Is.True);
+            Assert.That(reloaded, Is.Not.Null);
+            Assert.That(reloaded!.Published, Is.True);
+            Assert.That(reloaded.PublishedVersionId, Is.EqualTo(publishedVersionId));
+            Assert.That(reloaded.GetValue("bodyText", published: true), Is.EqualTo("published body"));
+        });
+    }
+
     [Test]
     public async Task GetVersionsSlimAsync_WithUnknownKey_ReturnsEmpty()
     {

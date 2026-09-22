@@ -111,10 +111,58 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
     /// <returns>The DTO ready to be saved to the database.</returns>
     protected abstract TEntityDto BuildEntityDto(TEntity entity);
 
+    /// <summary>
+    ///     Deletes the versions of a node that predate <paramref name="versionDate" />, sparing the published one.
+    /// </summary>
+    /// <remarks>
+    ///     A published version stops being the current version as soon as a draft is saved on top of it, so the
+    ///     current-version exclusion alone would take published content offline.
+    /// </remarks>
+    public override async Task DeleteVersionsAsync(Guid nodeKey, DateTime versionDate, CancellationToken cancellationToken)
+    {
+        IEnumerable<int> versionIds = await AmbientScope.ExecuteWithContextAsync(async db =>
+        {
+            return await db.ContentVersions
+                .Join(db.Nodes, version => version.NodeId, node => node.NodeId, (version, node) => new { version, node })
+                .Join(db.Set<TContentVersionDto>(), joined => joined.version.Id, typedVersion => typedVersion.Id, (joined, typedVersion) => new { joined.version, joined.node, typedVersion })
+                .Where(joined => joined.node.UniqueId == nodeKey
+                    && !joined.version.Current
+                    && !joined.typedVersion.Published
+                    && joined.version.VersionDate < versionDate)
+                .Select(joined => joined.version.Id)
+                .ToListAsync(cancellationToken);
+        });
+
+        foreach (int versionId in versionIds)
+        {
+            await PerformDeleteVersionAsync(versionId, cancellationToken);
+        }
+    }
+
     /// <inheritdoc />
     protected override async Task PerformDeleteVersionAsync(int versionId, CancellationToken cancellationToken) =>
         await AmbientScope.ExecuteWithContextAsync(async db =>
         {
+            var version = await db.ContentVersions
+                .Where(contentVersion => contentVersion.Id == versionId)
+                .Join(db.Set<TContentVersionDto>(), contentVersion => contentVersion.Id, typedVersion => typedVersion.Id, (contentVersion, typedVersion) => new { contentVersion.Current, typedVersion.Published })
+                .SingleOrDefaultAsync(cancellationToken);
+
+            if (version is null)
+            {
+                return true;
+            }
+
+            if (version.Current)
+            {
+                throw new InvalidOperationException("Cannot delete the current version.");
+            }
+
+            if (version.Published)
+            {
+                throw new InvalidOperationException("Cannot delete the published version.");
+            }
+
             await db.PropertyData
                 .Where(x => x.VersionId == versionId)
                 .ExecuteDeleteAsync(cancellationToken);

@@ -10,6 +10,9 @@ internal interface IContentVersionDto
     /// <summary>Gets the primary key, shared with <see cref="ContentVersionDto.Id" />.</summary>
     int Id { get; }
 
+    /// <summary>Gets a value indicating whether this version is the published one.</summary>
+    bool Published { get; }
+
     /// <summary>
     /// Gets the shared content version row containing version metadata (name, date, writer).
     /// Not a database column — populated by the repository after query.

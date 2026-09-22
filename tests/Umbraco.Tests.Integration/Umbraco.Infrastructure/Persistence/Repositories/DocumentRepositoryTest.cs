@@ -1197,6 +1197,70 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
         Assert.That(remainder, Is.EqualTo(all.Skip(1).ToArray()));
     }
 
+    /// <summary>
+    ///     Deleting versions older than a cutoff must spare the published version. It is not the current version
+    ///     once a draft exists, so a filter that only excludes the current one takes the live content offline.
+    /// </summary>
+    [Test]
+    public async Task DeleteVersionsAsync_KeepsThePublishedVersion()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        IContent content = ContentBuilder.CreateSimpleContent(_contentType, "Published Version Page", _textpage.Id);
+        content.SetValue("title", "published title");
+        content.PublishCulture(CultureImpact.Invariant, DateTime.UtcNow, GetRequiredService<PropertyEditorCollection>());
+        content.PublishedState = PublishedState.Publishing;
+        await repository.SaveAsync(content, CancellationToken.None);
+        var publishedVersionId = content.PublishedVersionId;
+
+        // A later draft, so the published version is neither current nor newer than the cutoff.
+        content.Name = "draft name";
+        content.SetValue("title", "draft title");
+        await repository.SaveAsync(content, CancellationToken.None);
+
+        await repository.DeleteVersionsAsync(content.Key, DateTime.UtcNow, CancellationToken.None);
+
+        IContent? reloaded = await repository.GetAsync(content.Key, CancellationToken.None);
+        IContent? publishedVersion = await repository.GetVersionAsync(publishedVersionId, CancellationToken.None);
+        scope.Complete();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(publishedVersion, Is.Not.Null, "the published version row must survive the cleanup");
+            Assert.That(reloaded, Is.Not.Null);
+            Assert.That(reloaded!.Published, Is.True, "the document must still be published");
+            Assert.That(reloaded.PublishedVersionId, Is.EqualTo(publishedVersionId));
+            Assert.That(reloaded.GetValue("title", published: true), Is.EqualTo("published title"));
+        });
+    }
+
+    /// <summary>
+    ///     Deleting a single version refuses the published one outright, so a caller that computed the wrong id
+    ///     fails loudly instead of taking the live content offline.
+    /// </summary>
+    [Test]
+    public async Task DeleteVersionAsync_ForThePublishedVersion_Throws()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        IContent content = ContentBuilder.CreateSimpleContent(_contentType, "Protected Version Page", _textpage.Id);
+        content.PublishCulture(CultureImpact.Invariant, DateTime.UtcNow, GetRequiredService<PropertyEditorCollection>());
+        content.PublishedState = PublishedState.Publishing;
+        await repository.SaveAsync(content, CancellationToken.None);
+        var publishedVersionId = content.PublishedVersionId;
+
+        content.Name = "draft name";
+        await repository.SaveAsync(content, CancellationToken.None);
+
+        Assert.That(
+            async () => await repository.DeleteVersionAsync(publishedVersionId, CancellationToken.None),
+            Throws.InstanceOf<InvalidOperationException>());
+
+        scope.Complete();
+    }
+
     [Test]
     public async Task GetAllVersionsSlimAsync_WithNonExistentNodeKey_ReturnsEmpty()
     {
