@@ -1,4 +1,5 @@
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_18_0_0;
@@ -11,7 +12,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_18_0_0;
 /// </summary>
 public class AddContentVersionKeyColumn : AsyncMigrationBase
 {
-    const string indexName = "IX_umbracoContentVersion_key";
+    private const string IndexName = "IX_umbracoContentVersion_key";
 
     public AddContentVersionKeyColumn(IMigrationContext context)
         : base(context)
@@ -34,22 +35,44 @@ public class AddContentVersionKeyColumn : AsyncMigrationBase
             return;
         }
 
-        // Add the column. Existing rows will get a default empty Guid.
         AddColumn<ContentVersionDto>(tableName, columnName);
 
-        // Populate each existing row with a new Guid.
-        var versions = await Database.FetchAsync<ContentVersionDto>($"SELECT * FROM {tableName}");
-        foreach (ContentVersionDto version in versions)
+        await AssignKeysToExistingRowsAsync(tableName, columnName);
+
+        if (IndexExists(IndexName) is false)
         {
-            version.Key = Guid.NewGuid();
-            await Database.ExecuteAsync(
-                $"UPDATE {tableName} SET {columnName} = @0 WHERE {ContentVersionDto.PrimaryKeyColumnName} = @1",
-                [version.Key, version.Id]);
+            CreateIndex<ContentVersionDto>(IndexName);
+        }
+    }
+
+    /// <summary>
+    /// Gives every row a distinct key. SQL Server evaluates its <c>NEWID()</c> default per row while adding the
+    /// column, so only SQLite - whose default is a single placeholder value - has rows left to fill.
+    /// </summary>
+    private async Task AssignKeysToExistingRowsAsync(string tableName, string columnName)
+    {
+        if (DatabaseType.IsSqlite() is false)
+        {
+            return;
         }
 
-        if (IndexExists(indexName) is false)
-        {
-            CreateIndex<ContentVersionDto>(indexName);
-        }
+        var quotedTable = SqlSyntax.GetQuotedTableName(tableName);
+        var quotedColumn = SqlSyntax.GetQuotedColumnName(columnName);
+
+        // A version 4 Guid built from SQLite's own randomness, uppercase to match how Guids are written here.
+        // random() is re-evaluated per row, so each row gets its own value.
+        await Database.ExecuteAsync(
+            $"""
+             UPDATE {quotedTable}
+             SET {quotedColumn} = upper(
+                 substr(hex(randomblob(4)), 1, 8) || '-' ||
+                 substr(hex(randomblob(2)), 1, 4) || '-4' ||
+                 substr(hex(randomblob(2)), 2, 3) || '-' ||
+                 substr('89ab', 1 + (abs(random()) % 4), 1) ||
+                 substr(hex(randomblob(2)), 2, 3) || '-' ||
+                 substr(hex(randomblob(6)), 1, 12))
+             WHERE {quotedColumn} = @0
+             """,
+            new object[] { Guid.Empty.ToString() });
     }
 }
