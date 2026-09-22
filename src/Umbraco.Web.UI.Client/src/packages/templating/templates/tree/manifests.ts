@@ -1,20 +1,22 @@
 import { UMB_TEMPLATE_ENTITY_TYPE, UMB_TEMPLATE_ROOT_ENTITY_TYPE } from '../entity.js';
-import { UMB_TEMPLATE_TREE_ITEM_CHILDREN_COLLECTION_ALIAS } from './tree-item-children/constants.js';
 import { manifests as reloadTreeItemChildrenManifest } from './reload-tree-item-children/manifests.js';
 import { manifests as treeItemChildrenManifests } from './tree-item-children/manifests.js';
+import { manifests as viewManifests } from './views/manifests.js';
 import { UmbTemplateTreeStore } from './template-tree.store.js';
-import { UMB_TEMPLATE_TREE_REPOSITORY_ALIAS } from './constants.js';
+import {
+	UMB_TEMPLATE_TREE_ALIAS,
+	UMB_TEMPLATE_TREE_REPOSITORY_ALIAS,
+	UMB_TEMPLATE_TREE_STORE_ALIAS,
+} from './constants.js';
 import { UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
+import { UMB_TREE_ALIAS_CONDITION } from '@umbraco-cms/backoffice/tree';
+import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
-/**
- * @deprecated Use {@link UMB_TEMPLATE_TREE_REPOSITORY_ALIAS} instead. This will be removed in Umbraco 18.
- */
-export const UMB_TEMPLATE_TREE_STORE_ALIAS = 'Umb.Store.Template.Tree';
-export const UMB_TEMPLATE_TREE_ALIAS = 'Umb.Tree.Template';
+export { UMB_TEMPLATE_TREE_REPOSITORY_ALIAS, UMB_TEMPLATE_TREE_STORE_ALIAS, UMB_TEMPLATE_TREE_ALIAS };
 
 const UMB_TEMPLATE_ROOT_WORKSPACE_ALIAS = 'Umb.Workspace.Template.Root';
 
-export const manifests: Array<UmbExtensionManifest> = [
+export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [
 	{
 		type: 'repository',
 		alias: UMB_TEMPLATE_TREE_REPOSITORY_ALIAS,
@@ -54,15 +56,27 @@ export const manifests: Array<UmbExtensionManifest> = [
 		},
 	},
 	{
+		type: 'treeAction',
+		kind: 'create',
+		name: 'Template Tree Create Action',
+		alias: 'Umb.TreeAction.Template.Create',
+		conditions: [
+			{
+				alias: UMB_TREE_ALIAS_CONDITION,
+				match: UMB_TEMPLATE_TREE_ALIAS,
+			},
+		],
+	},
+	{
 		type: 'workspaceView',
-		kind: 'collection',
-		alias: 'Umb.WorkspaceView.Template.TreeItemChildrenCollection',
-		name: 'Template Tree Item Children Collection Workspace View',
+		kind: 'tree',
+		alias: 'Umb.WorkspaceView.Template.Tree',
+		name: 'Template Tree Item Children Workspace View',
 		meta: {
-			label: '#general_items',
-			pathname: 'items',
-			icon: 'icon-grid',
-			collectionAlias: UMB_TEMPLATE_TREE_ITEM_CHILDREN_COLLECTION_ALIAS,
+			label: '#tree_children',
+			pathname: 'children',
+			icon: 'icon-bulleted-list',
+			treeAlias: UMB_TEMPLATE_TREE_ALIAS,
 		},
 		conditions: [
 			{
@@ -73,4 +87,5 @@ export const manifests: Array<UmbExtensionManifest> = [
 	},
 	...reloadTreeItemChildrenManifest,
 	...treeItemChildrenManifests,
+	...viewManifests,
 ];
