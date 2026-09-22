@@ -136,17 +136,12 @@ public partial class UmbracoPlan : MigrationPlan
         To<V_18_0_0.AddContentVersionCleanupPolicyDto>("{E3F7A9B2-1C4D-4E8F-A7B6-5C9D0E1F2A3B}");
         To<V_18_0_0.AddPublicAccessDto>("{58DA5EFB-8C47-4B51-BCFF-576CEACD202F}");
         To<V_18_0_0.AddDistributedJobDto>("{62FE7B44-AA9A-4B2F-8ECF-263E4E6C2AFA}");
-        To<V_18_0_0.AddContentVersionKeyColumn>("{04DD2827-59B0-4A00-AC28-77C32F1CEE60}");
-        To<V_18_0_0.AddDocumentRepositoryDtos>("{D7E8F9A0-B1C2-4D3E-A4F5-6B7C8D9E0F1A}");
         To<V_18_0_0.AddConsentDto>("{34EEA465-0378-4319-85B7-DBD2C7613741}");
-        To<V_18_0_0.AddDictionaryDto>("{6F1A9C3E-8B2D-4A5F-9E0C-7D3B1A2F4E6D}");
         To<V_18_0_0.AddContentTypeDtos>("{56319F0E-879F-43DE-9865-3B85A63D3C5B}");
         To<V_18_0_0.AddMemberPropertyTypeDto>("{11905736-2BC5-492C-8DCA-17500E774855}");
         To<V_18_0_0.AddRedirectUrlDto>("{72B8BF0F-28C1-4FE3-ABD7-122D5E962C1C}");
-        To<V_18_0_0.AddContentTypeDtosBasic>("{9C4E7A1F-2B8D-4E6C-A3F5-1D8B6C9E0A72}");
-        To<V_18_0_0.ReconcileEfCoreRepositoriesMerge>("{7B3E9A4C-1D6F-4A82-B5E3-2F8C0D9A6B41}");
-        To<V_19_0_0.AddUserGroup2GranularPermissionDto>("{DE5E1EC8-EB36-4980-A08A-66BC9561C263}");
-        To<V_19_0_0.AddUserGroupUserStartNodeUser2NodeNotifyDtos>("{9BBE3C53-8AD8-4EE4-86BC-48DCBCFC1296}");
+        To<V_18_0_0.AddContentVersionKeyColumn>("{04DD2827-59B0-4A00-AC28-77C32F1CEE60}");
+        To<V_19_0_0.ReconcileDocumentRepositoryModel>("{740529F1-B2FF-44C6-B4F8-5EA30D400C8A}");
     }
 
     /// <summary>

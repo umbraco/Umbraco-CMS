@@ -1,21 +1,22 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
 namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
 {
     /// <inheritdoc />
-    public partial class AddUserGroupUserStartNodeUser2NodeNotifyDtos : Migration
+    public partial class ReconcileDocumentRepositoryModel : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+
         }
     }
 }

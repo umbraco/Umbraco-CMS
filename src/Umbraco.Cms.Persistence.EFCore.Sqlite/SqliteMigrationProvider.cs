@@ -63,17 +63,12 @@ public class SqliteMigrationProvider : IMigrationProvider
             EFCoreMigration.AddPublicAccessDto => typeof(Migrations.AddPublicAccessDto),
             EFCoreMigration.AddDistributedJobDto => typeof(Migrations.AddDistributedJobDto),
             EFCoreMigration.AddDomainDto => typeof(Migrations.AddDomainDto),
-            EFCoreMigration.AddDocumentRepositoryDtos => typeof(Migrations.AddDocumentRepositoryDtos),
-            EFCoreMigration.AddContentVersionKeyColumn => typeof(Migrations.AddContentVersionKeyColumn),
             EFCoreMigration.AddConsentDto => typeof(Migrations.AddConsentDto),
             EFCoreMigration.AddDictionaryDto => typeof(Migrations.AddDictionaryDtos),
             EFCoreMigration.AddContentTypeDtos => typeof(Migrations.AddContentTypeDtos),
             EFCoreMigration.MemberPropertyTypeToEFCore => typeof(Migrations.MemberPropertyTypeToEFCore),
             EFCoreMigration.AddRedirectUrlDto => typeof(Migrations.AddRedirectUrlDto),
-            EFCoreMigration.AddContentTypeDtosBasic => typeof(Migrations.AddContentTypeDtosBasic),
-            EFCoreMigration.ReconcileEfCoreRepositoriesMerge => typeof(Migrations.ReconcileEfCoreRepositoriesMerge),
-            EFCoreMigration.AddUserGroup2GranularPermissionDto => typeof(Migrations.AddUserGroup2GranularPermissionDto),
-            EFCoreMigration.AddUserGroupUserStartNodeUser2NodeNotifyDtos => typeof(Migrations.AddUserGroupUserStartNodeUser2NodeNotifyDtos),
+            EFCoreMigration.ReconcileDocumentRepositoryModel => typeof(Migrations.ReconcileDocumentRepositoryModel),
             _ => throw new ArgumentOutOfRangeException(nameof(migration), $@"Not expected migration value: {migration}")
         };
 }

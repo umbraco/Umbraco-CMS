@@ -12,15 +12,15 @@ using Umbraco.Cms.Infrastructure.Persistence.EFCore;
 namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
 {
     [DbContext(typeof(UmbracoDbContext))]
-    [Migration("20260827103941_AddUserGroupUserStartNodeUser2NodeNotifyDtos")]
-    partial class AddUserGroupUserStartNodeUser2NodeNotifyDtos
+    [Migration("20260922125350_ReconcileDocumentRepositoryModel")]
+    partial class ReconcileDocumentRepositoryModel
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.10")
+                .HasAnnotation("ProductVersion", "10.0.12")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
