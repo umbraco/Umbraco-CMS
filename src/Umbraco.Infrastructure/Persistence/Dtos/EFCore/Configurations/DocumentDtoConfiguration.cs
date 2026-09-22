@@ -25,7 +25,7 @@ public class DocumentDtoConfiguration : IEntityTypeConfiguration<DocumentDto>
         builder.HasOne<ContentDto>()
             .WithMany()
             .HasForeignKey(x => x.NodeId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.NoAction);
 
         // IX_umbracoDocument_Published
         builder.HasIndex(x => x.Published)

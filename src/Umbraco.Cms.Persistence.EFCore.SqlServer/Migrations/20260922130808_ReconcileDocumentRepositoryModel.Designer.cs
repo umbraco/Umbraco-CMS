@@ -12,7 +12,7 @@ using Umbraco.Cms.Infrastructure.Persistence.EFCore;
 namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
 {
     [DbContext(typeof(UmbracoDbContext))]
-    [Migration("20260922125350_ReconcileDocumentRepositoryModel")]
+    [Migration("20260922130808_ReconcileDocumentRepositoryModel")]
     partial class ReconcileDocumentRepositoryModel
     {
         /// <inheritdoc />
@@ -466,6 +466,9 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
 
                     b.HasKey("NodeId");
 
+                    b.HasIndex("ContentTypeId")
+                        .HasDatabaseName("IX_umbracoContent_contentTypeId");
+
                     b.ToTable("umbracoContent", (string)null);
                 });
 
@@ -476,6 +479,7 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                         .HasColumnName("id");
 
                     b.Property<string>("Action")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("action");
 
@@ -492,6 +496,8 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                         .HasColumnName("nodeId");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("LanguageId");
 
                     b.HasIndex("NodeId");
 
@@ -670,6 +676,7 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                         .HasColumnName("languageId");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("name");
 
@@ -689,6 +696,8 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
 
                     b.HasIndex("LanguageId")
                         .HasDatabaseName("IX_umbracoContentVersionCultureVariation_LanguageId");
+
+                    b.HasIndex("UpdateUserId");
 
                     b.HasIndex("VersionId", "LanguageId")
                         .IsUnique()
@@ -746,6 +755,8 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                     b.HasIndex("Key")
                         .IsUnique()
                         .HasDatabaseName("IX_umbracoContentVersion_key");
+
+                    b.HasIndex("UserId");
 
                     b.HasIndex("VersionDate")
                         .HasDatabaseName("IX_umbracoContentVersion_VersionDate");
@@ -2028,6 +2039,7 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Alias")
+                        .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)")
                         .HasColumnName("userGroupAlias");
@@ -2058,6 +2070,7 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                         .HasColumnName("key");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)")
                         .HasColumnName("userGroupName");
@@ -2083,8 +2096,7 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
 
                     b.HasIndex("Alias")
                         .IsUnique()
-                        .HasDatabaseName("IX_umbracoUserGroup_userGroupAlias")
-                        .HasFilter("[userGroupAlias] IS NOT NULL");
+                        .HasDatabaseName("IX_umbracoUserGroup_userGroupAlias");
 
                     b.HasIndex("Key")
                         .IsUnique()
@@ -2092,8 +2104,7 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
 
                     b.HasIndex("Name")
                         .IsUnique()
-                        .HasDatabaseName("IX_umbracoUserGroup_userGroupName")
-                        .HasFilter("[userGroupName] IS NOT NULL");
+                        .HasDatabaseName("IX_umbracoUserGroup_userGroupName");
 
                     b.HasIndex("StartContentId");
 
@@ -2288,19 +2299,31 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
 
             modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.ContentDto", b =>
                 {
+                    b.HasOne("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.ContentTypeDto", null)
+                        .WithMany()
+                        .HasForeignKey("ContentTypeId")
+                        .HasPrincipalKey("NodeId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
                     b.HasOne("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.NodeDto", null)
                         .WithMany()
                         .HasForeignKey("NodeId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
                 });
 
             modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.ContentScheduleDto", b =>
                 {
+                    b.HasOne("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.LanguageDto", null)
+                        .WithMany()
+                        .HasForeignKey("LanguageId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
                     b.HasOne("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.ContentDto", null)
                         .WithMany()
                         .HasForeignKey("NodeId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
                 });
 
@@ -2342,13 +2365,18 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                     b.HasOne("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.LanguageDto", null)
                         .WithMany()
                         .HasForeignKey("LanguageId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
+
+                    b.HasOne("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.UserDto", null)
+                        .WithMany()
+                        .HasForeignKey("UpdateUserId")
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.ContentVersionDto", null)
                         .WithMany()
                         .HasForeignKey("VersionId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
                 });
 
@@ -2357,8 +2385,13 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                     b.HasOne("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.ContentDto", null)
                         .WithMany()
                         .HasForeignKey("NodeId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
+
+                    b.HasOne("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.UserDto", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.NoAction);
                 });
 
             modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.DataTypeDto", b =>
@@ -2389,13 +2422,13 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                     b.HasOne("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.LanguageDto", null)
                         .WithMany()
                         .HasForeignKey("LanguageId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.NodeDto", null)
                         .WithMany()
                         .HasForeignKey("NodeId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
                 });
 
@@ -2404,7 +2437,7 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                     b.HasOne("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.ContentDto", null)
                         .WithMany()
                         .HasForeignKey("NodeId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
                 });
 
@@ -2419,7 +2452,7 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                         .WithMany()
                         .HasForeignKey("UniqueId")
                         .HasPrincipalKey("UniqueId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
                 });
 
@@ -2434,7 +2467,7 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                         .WithMany()
                         .HasForeignKey("UniqueId")
                         .HasPrincipalKey("UniqueId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
                 });
 
@@ -2443,7 +2476,7 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                     b.HasOne("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.ContentVersionDto", null)
                         .WithMany()
                         .HasForeignKey("Id")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
                 });
 
@@ -2515,10 +2548,16 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                         .HasForeignKey("LanguageId")
                         .OnDelete(DeleteBehavior.NoAction);
 
+                    b.HasOne("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.PropertyTypeDto", null)
+                        .WithMany()
+                        .HasForeignKey("PropertyTypeId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
                     b.HasOne("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.ContentVersionDto", null)
                         .WithMany()
                         .HasForeignKey("VersionId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
                 });
 
@@ -2586,7 +2625,7 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                     b.HasOne("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.LanguageDto", null)
                         .WithMany()
                         .HasForeignKey("LanguageId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .OnDelete(DeleteBehavior.NoAction);
                 });
 
             modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.TagRelationshipDto", b =>
@@ -2594,20 +2633,23 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                     b.HasOne("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.ContentDto", null)
                         .WithMany()
                         .HasForeignKey("NodeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired()
+                        .HasConstraintName("FK_cmsTagRelationship_cmsContent");
 
                     b.HasOne("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.PropertyTypeDto", null)
                         .WithMany()
                         .HasForeignKey("PropertyTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired()
+                        .HasConstraintName("FK_cmsTagRelationship_cmsPropertyType");
 
                     b.HasOne("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.TagDto", null)
                         .WithMany()
                         .HasForeignKey("TagId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired()
+                        .HasConstraintName("FK_cmsTagRelationship_cmsTags_id");
                 });
 
             modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.User2NodeNotifyDto", b =>
@@ -2634,6 +2676,13 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                         .HasForeignKey("UniqueId")
                         .HasPrincipalKey("UniqueId")
                         .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.UserGroupDto", null)
+                        .WithMany()
+                        .HasForeignKey("UserGroupKey")
+                        .HasPrincipalKey("Key")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.UserGroupDto", b =>

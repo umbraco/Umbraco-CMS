@@ -2394,7 +2394,7 @@ internal class DocumentRepository
                 {
                     VersionId = entity.VersionId,
                     LanguageId = languageId,
-                    Name = cultureInfo.Name,
+                    Name = cultureInfo.Name ?? throw new InvalidOperationException("A content culture must have a name."),
                     UpdateDate = entity.GetUpdateDate(cultureInfo.Culture) ?? DateTime.MinValue,
                 });
             }
@@ -2418,7 +2418,7 @@ internal class DocumentRepository
                 {
                     VersionId = entity.PublishedVersionId,
                     LanguageId = languageId,
-                    Name = cultureInfo.Name,
+                    Name = cultureInfo.Name ?? throw new InvalidOperationException("A content culture must have a name."),
                     UpdateDate = entity.GetPublishDate(cultureInfo.Culture) ?? DateTime.MinValue,
                 });
             }

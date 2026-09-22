@@ -25,7 +25,7 @@ public class DocumentVersionDtoConfiguration : IEntityTypeConfiguration<Document
         builder.HasOne<ContentVersionDto>()
             .WithMany()
             .HasForeignKey(x => x.Id)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.NoAction);
 
         // IX_umbracoDocumentVersion_id_published (composite on Id+Published)
         // Note: SQL Server included columns (TemplateId) are added by SqlServerDocumentVersionDtoModelCustomizer.

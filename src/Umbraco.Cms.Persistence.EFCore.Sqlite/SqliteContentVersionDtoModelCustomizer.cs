@@ -7,8 +7,8 @@ using Umbraco.Cms.Infrastructure.Persistence.EFCore;
 namespace Umbraco.Cms.Persistence.EFCore.Sqlite;
 
 /// <summary>
-/// Overrides the <c>versionDate</c> column default for SQLite, replacing the SQL Server-specific
-/// <c>GETUTCDATE()</c> expression with the SQLite equivalent <c>datetime('now')</c>.
+/// Overrides the <c>versionDate</c> column default for SQLite, matching the <c>CURRENT_TIMESTAMP</c>
+/// the SQLite syntax provider writes for a current-UTC default.
 /// </summary>
 public class SqliteContentVersionDtoModelCustomizer : IEFCoreModelCustomizer<ContentVersionDto>
 {
@@ -18,5 +18,5 @@ public class SqliteContentVersionDtoModelCustomizer : IEFCoreModelCustomizer<Con
     /// <inheritdoc />
     public void Customize(EntityTypeBuilder<ContentVersionDto> builder) =>
         builder.Property(x => x.VersionDate)
-            .HasDefaultValueSql("datetime('now')");
+            .HasDefaultValueSql("CURRENT_TIMESTAMP");
 }

@@ -35,7 +35,7 @@ public class ContentVersionCultureVariationDto
     /// <summary>
     /// Gets or sets the name associated with this culture variation of the content version.
     /// </summary>
-    public string? Name { get; set; }
+    public string Name { get; set; } = string.Empty;
 
     /// <summary>
     /// Gets or sets the date and time when the content version culture variation was last updated.

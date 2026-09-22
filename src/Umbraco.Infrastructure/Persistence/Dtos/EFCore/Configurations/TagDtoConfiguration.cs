@@ -46,6 +46,6 @@ public class TagDtoConfiguration : IEntityTypeConfiguration<TagDto>
         builder.HasOne<LanguageDto>()
             .WithMany()
             .HasForeignKey(x => x.LanguageId)
-            .OnDelete(DeleteBehavior.SetNull);
+            .OnDelete(DeleteBehavior.NoAction);
     }
 }

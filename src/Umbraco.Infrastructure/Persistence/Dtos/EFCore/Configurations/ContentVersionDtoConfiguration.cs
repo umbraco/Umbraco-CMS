@@ -46,7 +46,13 @@ public class ContentVersionDtoConfiguration : IEntityTypeConfiguration<ContentVe
         builder.HasOne<ContentDto>()
             .WithMany()
             .HasForeignKey(x => x.NodeId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.NoAction);
+
+        // FK: UserId -> umbracoUser.id
+        builder.HasOne<UserDto>()
+            .WithMany()
+            .HasForeignKey(x => x.UserId)
+            .OnDelete(DeleteBehavior.NoAction);
 
         // IX_umbracoContentVersion_NodeId (composite on NodeId+Current)
         // Note: SQL Server included columns are added by SqlServerContentVersionDtoModelCustomizer.

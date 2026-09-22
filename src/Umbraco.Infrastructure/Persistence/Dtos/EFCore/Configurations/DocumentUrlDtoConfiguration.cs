@@ -37,7 +37,7 @@ public class DocumentUrlDtoConfiguration : IEntityTypeConfiguration<DocumentUrlD
             .WithMany()
             .HasForeignKey(x => x.UniqueId)
             .HasPrincipalKey(x => x.UniqueId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.NoAction);
 
         // FK: LanguageId -> umbracoLanguage.id
         builder.HasOne<LanguageDto>()

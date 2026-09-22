@@ -31,13 +31,18 @@ public class UserGroup2GranularPermissionDtoConfiguration : IEntityTypeConfigura
             .HasColumnName(UserGroup2GranularPermissionDto.ContextColumnName)
             .IsRequired();
 
-        // FK: uniqueId -> umbracoNode.uniqueId. No relationship is modeled for userGroupKey since
-        // UserGroupDto has not been ported to EF Core yet — the DB-level FK to umbracoUserGroup.key
-        // still exists (created by NPoco), it's just invisible to this model.
+        // FK: uniqueId -> umbracoNode.uniqueId
         builder.HasOne<NodeDto>()
             .WithMany()
             .HasForeignKey(x => x.UniqueId)
             .HasPrincipalKey(x => x.UniqueId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        // FK: userGroupKey -> umbracoUserGroup.key
+        builder.HasOne<UserGroupDto>()
+            .WithMany()
+            .HasForeignKey(x => x.UserGroupKey)
+            .HasPrincipalKey(x => x.Key)
             .OnDelete(DeleteBehavior.NoAction);
 
         // IX_umbracoUserGroup2GranularPermissionDto_UserGroupKey_UniqueId

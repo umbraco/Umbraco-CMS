@@ -21,11 +21,13 @@ public class UserGroupDtoConfiguration : IEntityTypeConfiguration<UserGroupDto>
 
         builder.Property(x => x.Alias)
             .HasColumnName("userGroupAlias")
-            .HasMaxLength(200);
+            .HasMaxLength(200)
+            .IsRequired();
 
         builder.Property(x => x.Name)
             .HasColumnName("userGroupName")
-            .HasMaxLength(200);
+            .HasMaxLength(200)
+            .IsRequired();
 
         builder.Property(x => x.Description)
             .HasColumnName("description");

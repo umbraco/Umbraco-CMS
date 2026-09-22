@@ -37,13 +37,13 @@ public class DocumentCultureVariationDtoConfiguration : IEntityTypeConfiguration
         builder.HasOne<NodeDto>()
             .WithMany()
             .HasForeignKey(x => x.NodeId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.NoAction);
 
         // FK: LanguageId -> umbracoLanguage.id
         builder.HasOne<LanguageDto>()
             .WithMany()
             .HasForeignKey(x => x.LanguageId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.NoAction);
 
         // IX_umbracoDocumentCultureVariation_NodeId (unique, composite on NodeId+LanguageId)
         builder.HasIndex(x => new { x.NodeId, x.LanguageId })

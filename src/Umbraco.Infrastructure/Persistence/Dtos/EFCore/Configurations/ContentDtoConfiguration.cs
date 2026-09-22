@@ -18,11 +18,22 @@ public class ContentDtoConfiguration : IEntityTypeConfiguration<ContentDto>
         builder.Property(x => x.ContentTypeId)
             .HasColumnName(ContentDto.ContentTypeIdColumnName);
 
+        // IX_umbracoContent_contentTypeId
+        builder.HasIndex(x => x.ContentTypeId)
+            .HasDatabaseName($"IX_{ContentDto.TableName}_{ContentDto.ContentTypeIdColumnName}");
+
         // FK: NodeId -> umbracoNode.id
         builder.HasOne<NodeDto>()
             .WithMany()
             .HasForeignKey(x => x.NodeId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.NoAction);
+
+        // FK: ContentTypeId -> cmsContentType.nodeId
+        builder.HasOne<ContentTypeDto>()
+            .WithMany()
+            .HasForeignKey(x => x.ContentTypeId)
+            .HasPrincipalKey(x => x.NodeId)
+            .OnDelete(DeleteBehavior.NoAction);
 
         builder.Ignore(x => x.NodeDto);
     }

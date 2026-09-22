@@ -53,12 +53,18 @@ public class PropertyDataDtoConfiguration : IEntityTypeConfiguration<PropertyDat
         builder.HasOne<ContentVersionDto>()
             .WithMany()
             .HasForeignKey(x => x.VersionId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.NoAction);
 
         // FK: LanguageId -> umbracoLanguage.id
         builder.HasOne<LanguageDto>()
             .WithMany()
             .HasForeignKey(x => x.LanguageId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        // FK: PropertyTypeId -> cmsPropertyType.id
+        builder.HasOne<PropertyTypeDto>()
+            .WithMany()
+            .HasForeignKey(x => x.PropertyTypeId)
             .OnDelete(DeleteBehavior.NoAction);
 
         // IX_umbracoPropertyData_VersionId (unique, composite on VersionId+PropertyTypeId+LanguageId+Segment)

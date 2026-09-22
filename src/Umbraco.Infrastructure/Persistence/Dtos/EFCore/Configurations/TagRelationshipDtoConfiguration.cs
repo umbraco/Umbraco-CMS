@@ -30,18 +30,21 @@ public class TagRelationshipDtoConfiguration : IEntityTypeConfiguration<TagRelat
         builder.HasOne<ContentDto>()
             .WithMany()
             .HasForeignKey(x => x.NodeId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .HasConstraintName($"FK_{TagRelationshipDto.TableName}_cmsContent")
+            .OnDelete(DeleteBehavior.NoAction);
 
         // FK: TagId -> cmsTags.id
         builder.HasOne<TagDto>()
             .WithMany()
             .HasForeignKey(x => x.TagId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .HasConstraintName($"FK_{TagRelationshipDto.TableName}_{TagDto.TableName}_id")
+            .OnDelete(DeleteBehavior.NoAction);
 
         // FK: PropertyTypeId -> cmsPropertyType.id
         builder.HasOne<PropertyTypeDto>()
             .WithMany()
             .HasForeignKey(x => x.PropertyTypeId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .HasConstraintName($"FK_{TagRelationshipDto.TableName}_cmsPropertyType")
+            .OnDelete(DeleteBehavior.NoAction);
     }
 }

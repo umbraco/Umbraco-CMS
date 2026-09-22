@@ -588,7 +588,7 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
         // note: the code below means we are going to unique-ify every culture names, regardless
         // of whether the name has changed (ie the culture has been updated) - some saving culture
         // fr-FR could cause culture en-UK name to change - not sure that is clean
-        ILookup<int, (int Id, string? Name, int LanguageId)> namesByLanguage = names
+        ILookup<int, (int Id, string Name, int LanguageId)> namesByLanguage = names
             .Select(n => (n.Id, n.Name, n.LanguageId))
             .ToLookup(n => n.LanguageId);
 
@@ -605,7 +605,7 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
                 continue;
             }
 
-            IEnumerable<(int Id, string? Name, int LanguageId)> cultureNames = namesByLanguage[langId.Value];
+            IEnumerable<(int Id, string Name, int LanguageId)> cultureNames = namesByLanguage[langId.Value];
             if (!cultureNames.Any())
             {
                 continue;

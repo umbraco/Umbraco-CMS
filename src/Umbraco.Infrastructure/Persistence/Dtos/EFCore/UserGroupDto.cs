@@ -24,12 +24,12 @@ public class UserGroupDto
     /// <summary>
     /// Gets or sets the alias of the user group.
     /// </summary>
-    public string? Alias { get; set; }
+    public string Alias { get; set; } = string.Empty;
 
     /// <summary>
     /// Gets or sets the name of the user group.
     /// </summary>
-    public string? Name { get; set; }
+    public string Name { get; set; } = string.Empty;
 
     /// <summary>
     /// Gets or sets a textual description providing additional information about the user group.

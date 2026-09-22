@@ -22,7 +22,8 @@ public class ContentVersionCultureVariationDtoConfiguration : IEntityTypeConfigu
             .HasColumnName(ContentVersionCultureVariationDto.LanguageIdColumnName);
 
         builder.Property(x => x.Name)
-            .HasColumnName(ContentVersionCultureVariationDto.NameColumnName);
+            .HasColumnName(ContentVersionCultureVariationDto.NameColumnName)
+            .IsRequired();
 
         builder.Property(x => x.UpdateDate)
             .HasColumnName(ContentVersionCultureVariationDto.UpdateDateColumnName);
@@ -34,13 +35,19 @@ public class ContentVersionCultureVariationDtoConfiguration : IEntityTypeConfigu
         builder.HasOne<ContentVersionDto>()
             .WithMany()
             .HasForeignKey(x => x.VersionId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.NoAction);
 
         // FK: LanguageId -> umbracoLanguage.id
         builder.HasOne<LanguageDto>()
             .WithMany()
             .HasForeignKey(x => x.LanguageId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.NoAction);
+
+        // FK: UpdateUserId -> umbracoUser.id
+        builder.HasOne<UserDto>()
+            .WithMany()
+            .HasForeignKey(x => x.UpdateUserId)
+            .OnDelete(DeleteBehavior.NoAction);
 
         // IX_umbracoContentVersionCultureVariation_VersionId (unique, composite on VersionId+LanguageId)
         // Note: SQL Server included columns are added by SqlServerContentVersionCultureVariationDtoModelCustomizer.

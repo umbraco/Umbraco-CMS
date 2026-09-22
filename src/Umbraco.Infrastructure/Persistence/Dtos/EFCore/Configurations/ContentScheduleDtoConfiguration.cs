@@ -25,12 +25,19 @@ public class ContentScheduleDtoConfiguration : IEntityTypeConfiguration<ContentS
             .HasColumnName(ContentScheduleDto.DateColumnName);
 
         builder.Property(x => x.Action)
-            .HasColumnName(ContentScheduleDto.ActionColumnName);
+            .HasColumnName(ContentScheduleDto.ActionColumnName)
+            .IsRequired();
 
         // FK: NodeId -> umbracoContent.nodeId
         builder.HasOne<ContentDto>()
             .WithMany()
             .HasForeignKey(x => x.NodeId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.NoAction);
+
+        // FK: LanguageId -> umbracoLanguage.id
+        builder.HasOne<LanguageDto>()
+            .WithMany()
+            .HasForeignKey(x => x.LanguageId)
+            .OnDelete(DeleteBehavior.NoAction);
     }
 }

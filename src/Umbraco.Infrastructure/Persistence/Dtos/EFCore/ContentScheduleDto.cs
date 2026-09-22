@@ -38,5 +38,5 @@ public class ContentScheduleDto
     /// <summary>
     /// Gets or sets the action to be performed as part of the content schedule.
     /// </summary>
-    public string? Action { get; set; }
+    public string Action { get; set; } = string.Empty;
 }
