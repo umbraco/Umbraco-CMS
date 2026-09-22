@@ -1,4 +1,5 @@
 export * from './collection/constants.js';
+export * from './configuration/constants.js';
 export * from './data-type-root/constants.js';
 export * from './entity-actions/constants.js';
 export * from './menu/constants.js';

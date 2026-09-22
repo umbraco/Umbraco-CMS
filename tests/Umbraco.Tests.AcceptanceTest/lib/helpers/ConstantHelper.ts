@@ -68,7 +68,8 @@
   public static readonly contentPickerSettings = {
     0: ['Accepted types', 'Limit to specific types'],
     1: ['Start node', ''],
-    2: ['Ignore user start nodes', 'Selecting this option allows a user to choose nodes that they normally dont have access to.']
+    2: ['Dynamic root', 'Resolve the start node from the content being edited, when no start node is set'],
+    3: ['Ignore user start nodes', 'Selecting this option allows a user to choose nodes that they normally dont have access to.']
   }
 
   public static readonly datePickerSettings = {
@@ -77,9 +78,12 @@
   }
 
   public static readonly dropdownSettings = {
-    0: ['Enable multiple choice', ''],
-    1: ['Add options', ''],
-    2: ['Placeholder', '']
+    0: ['Add options', '']
+  }
+
+  public static readonly singleDropdownSettings = {
+    0: ['Add options', ''],
+    1: ['Placeholder', '']
   }
 
   public static readonly imageCropperSettings = {
@@ -88,17 +92,25 @@
 
   public static readonly mediaPickerSettings = {
     0: ['Accepted types', 'Limit to specific types'],
-    1: ['Pick multiple items', 'Outputs a IEnumerable'],
-    2: ['Amount', 'Set a required range of medias'],
-    3: ['Start node', ''],
+    1: ['Amount', 'Set a required range of medias'],
+    2: ['Start node', ''],
+    3: ['Dynamic root', 'Resolve the start node from the content being edited, when no start node is set'],
     4: ['Enable Focal Point', ''],
     5: ['Image Crops', 'Local crops, stored on document'],
     6: ['Ignore User Start Nodes', 'Selecting this option allows a user to choose nodes that they normally dont have access to.'],
   }
 
+  public static readonly singleMediaPickerSettings = {
+    0: ['Accepted types', 'Limit to specific types'],
+    1: ['Start node', ''],
+    2: ['Dynamic root', 'Resolve the start node from the content being edited, when no start node is set'],
+    3: ['Enable Focal Point', ''],
+    4: ['Image Crops', 'Local crops, stored on document'],
+    5: ['Ignore User Start Nodes', "Selecting this option allows a user to choose nodes that they normally don't have access to."],
+  }
+
   public static readonly labelSettings = {
-    0: ['Value type', 'The type of value to store'],
-    1: ['Label template', 'Enter a template for the label.'],
+    0: ['Label template', 'Enter a template for the label.'],
   }
 
   public static readonly listViewSettings = {
@@ -110,6 +122,46 @@
     5: ['Workspace View icon', "The icon for the Collection's Workspace View."],
     6: ['Workspace View name', "The name of the Collection's Workspace View (default if empty: Child Items)."],
     7: ['Show Content Workspace View First', "Enable this to show the Content Workspace View by default instead of the Collection's."],
+  }
+
+  public static readonly sliderSettings = {
+    0: ['Minimum value', ''],
+    1: ['Maximum value', ''],
+    2: ['Initial value', ''],
+    3: ['Step increments', '']
+  }
+
+  public static readonly rangeSliderSettings = {
+    0: ['Minimum value', ''],
+    1: ['Maximum value', ''],
+    2: ['Minimum range', ''],
+    3: ['Initial low value', ''],
+    4: ['Initial high value', ''],
+    5: ['Step increments', '']
+  }
+
+  public static readonly multipleDocumentPickerSettings = {
+    0: ['Accepted types', 'Limit to specific types'],
+    1: ['Amount', 'Set a required range of documents'],
+    2: ['Start node', ''],
+    3: ['Dynamic root', 'Resolve the start node from the content being edited, when no start node is set'],
+    4: ['Ignore user start nodes', "Selecting this option allows a user to choose nodes that they normally don't have access to."]
+  }
+
+  public static readonly memberPickerSettings = {
+    0: ['Accepted types', 'Limit to specific member types']
+  }
+
+  public static readonly multipleMemberPickerSettings = {
+    0: ['Accepted types', 'Limit to specific member types'],
+    1: ['Amount', 'Set a required range of members']
+  }
+
+  public static readonly singleUrlPickerSettings = {
+    0: ['Ignore user start nodes', "Selecting this option allows a user to choose nodes that they normally don't have access to."],
+    1: ['Overlay Size', 'Select the width of the overlay.'],
+    2: ['Hide anchor/query string input', 'Selecting this hides the anchor/query string input field in the link picker overlay.'],
+    3: ['Culture-specific document links', 'Enable specifying a culture when linking to documents.']
   }
 
   public static readonly multiURLPickerSettings = {
