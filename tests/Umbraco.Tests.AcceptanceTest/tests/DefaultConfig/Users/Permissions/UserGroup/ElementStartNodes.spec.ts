@@ -48,28 +48,7 @@ test('can see root element start node and children', async ({umbracoApi, umbraco
   await umbracoUi.library.isChildElementInTreeVisible(rootFolderName, childElementTwoName);
 });
 
-// Skip this test since currently the front-end does not support adding a specific element as start nodes
-test.skip('can see parent of start node but not access it', async ({umbracoApi, umbracoUi}) => {
-  // Arrange
-  userGroupId = await umbracoApi.userGroup.createUserGroupWithElementStartNode(userGroupName, childElementOneId);
-  await umbracoApi.user.setUserPermissionsForElement(testUser.name, testUser.email, testUser.password, userGroupId);
-  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
-  await umbracoUi.goToBackOffice();
-
-  // Act
-  await umbracoUi.user.goToSection(ConstantHelper.sections.library, false);
-
-  // Assert
-  await umbracoUi.library.isElementInTreeVisible(rootFolderName);
-  await umbracoUi.library.goToElementWithName(rootFolderName);
-  await umbracoUi.library.doesElementWorkspaceHaveText('Access denied');
-  await umbracoUi.library.openElementCaretButtonForName(rootFolderName);
-  await umbracoUi.library.isChildElementInTreeVisible(rootFolderName, childElementOneName);
-  await umbracoUi.library.isChildElementInTreeVisible(rootFolderName, childElementTwoName, false);
-});
-
-// Currently the front-end does not support adding a specific element as start nodes
-test.skip('cannot see any element when no element start nodes specified', async ({umbracoApi, umbracoUi}) => {
+test('cannot see any element when no element start nodes specified', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createSimpleUserGroupWithLibrarySection(userGroupName);
   await umbracoApi.user.setUserPermissionsForElement(testUser.name, testUser.email, testUser.password, userGroupId);
@@ -80,5 +59,7 @@ test.skip('cannot see any element when no element start nodes specified', async 
   await umbracoUi.user.goToSection(ConstantHelper.sections.library, false);
 
   // Assert
+  // Guards the absence check below from passing vacuously.
+  await umbracoUi.library.isSectionWithNameVisible('Library');
   await umbracoUi.library.isElementInTreeVisible(rootFolderName, false);
 });

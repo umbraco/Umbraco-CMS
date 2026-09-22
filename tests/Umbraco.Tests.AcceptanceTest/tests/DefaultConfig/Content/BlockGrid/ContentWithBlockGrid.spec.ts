@@ -144,8 +144,7 @@ test('cannot add block element if allow in root is disabled', async ({umbracoApi
   await umbracoUi.content.isAddBlockElementButtonVisible(false);
 });
 
-// Skip this test due to this issue: https://github.com/umbraco/Umbraco-CMS/issues/22121
-test.skip('cannot add number of block element greater than the maximum amount', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+test('cannot add number of block element greater than the maximum amount', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const customDataTypeId = await umbracoApi.dataType.createBlockGridWithABlockAndMinAndMaxAmount(customDataTypeName, elementTypeId, 0, 0);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
@@ -255,6 +254,7 @@ test('can add settings model for the block in the content', async ({umbracoApi, 
   await umbracoApi.documentType.ensureNameNotExists(settingModelName);
 });
 
+// Unwritten: addBlockElementBtn resolves with .first(), so it reopens the existing block instead of adding a second.
 test.skip('can move blocks in the content', async ({umbracoApi, umbracoUi}) => {
   // TODO: Implement it later
 });

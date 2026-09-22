@@ -1,4 +1,3 @@
-import {expect} from "@playwright/test";
 import {ConstantHelper, test} from "@umbraco/acceptance-test-helpers";
 
 const testUser = ConstantHelper.testUserCredentials;
@@ -62,14 +61,8 @@ test('can see parent of start node but not access it', async ({umbracoApi, umbra
   // Assert
   await umbracoUi.media.isMediaTreeItemVisible(rootFolderName);
   await umbracoUi.page.waitForURL('**/section/media/collection');
-  const initialUrl = umbracoUi.page.url();
-
-  await umbracoUi.media.goToMediaWithName(rootFolderName);
-
-  // URL should not have changed (folder is visible but not accessible, so no navigation occurred)
-  const currentUrl = umbracoUi.page.url();
-  expect(currentUrl).toBe(initialUrl);
-
+  // A folder the user cannot access is rendered disabled and without an href, so clicking it must not navigate.
+  await umbracoUi.media.isUrlUnchangedAfter(() => umbracoUi.media.goToMediaWithName(rootFolderName));
   await umbracoUi.media.openMediaCaretButtonForName(rootFolderName);
   await umbracoUi.media.isChildMediaVisible(rootFolderName, childFolderOneName);
   await umbracoUi.media.isChildMediaVisible(rootFolderName, childFolderTwoName, false);

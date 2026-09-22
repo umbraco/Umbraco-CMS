@@ -100,7 +100,8 @@ test('can open content model in a block', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.isElementWorkspaceOpenInBlock(elementTypeName);
 });
 
-// Skip this test as it is impossible to remove a content model in front-end
+// Product gap: the content model row has no remove affordance in the front-end, unlike the settings
+// model, which shows an addable/removable "Choose" placeholder.
 test.skip('can remove a content model from a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.dataType.createBlockListDataTypeWithABlock(blockListEditorName, elementTypeId);
@@ -271,7 +272,7 @@ test('can delete a icon color from a block', async ({umbracoApi, umbracoUi}) => 
   expect(blockData.values[0].value[0].iconColor).toEqual('');
 });
 
-// TODO: Remove skip when the front-end is ready. Currently it is not possible to update a stylesheet to a block
+// Product gap: there is no custom stylesheet editor on a block; the block-type package never references one.
 test.skip('can update a custom stylesheet for a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const stylesheetName = 'TestStylesheet.css';
@@ -305,7 +306,7 @@ test.skip('can update a custom stylesheet for a block', async ({umbracoApi, umbr
   await umbracoApi.stylesheet.ensureNameNotExists(secondStylesheetName);
 });
 
-// TODO: Remove skip when the front-end is ready. Currently it is not possible to delete a stylesheet to a block
+// Product gap: there is no custom stylesheet editor on a block; the block-type package never references one.
 test.skip('can delete a custom stylesheet from a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const stylesheetName = 'TestStylesheet.css';

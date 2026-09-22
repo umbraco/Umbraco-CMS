@@ -49,50 +49,7 @@ test('can see root element start node and children', async ({umbracoApi, umbraco
   await umbracoUi.library.isChildElementInTreeVisible(rootFolderName, childElementTwoName);
 });
 
-// Currently the front-end does not support adding a specific element as start nodes
-test.skip('can see parent of start node but not access it', async ({umbracoApi, umbracoUi}) => {
-  // Arrange
-  await umbracoApi.user.setUserPermissionsForElement(testUser.name, testUser.email, testUser.password, userGroupId!, [childElementOneId!]);
-  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
-  await umbracoUi.goToBackOffice();
-
-  // Act
-  await umbracoUi.user.goToSection(ConstantHelper.sections.library, false);
-
-  // Assert
-  // Get initial URL (should be on library section)
-  const initialUrl = umbracoUi.page.url();
-
-  await umbracoUi.library.isElementInTreeVisible(rootFolderName);
-  await umbracoUi.library.goToElementWithName(rootFolderName);
-
-  // Assert - URL should not have changed (no navigation occurred)
-  const currentUrl = umbracoUi.page.url();
-  expect(currentUrl).toBe(initialUrl);
-
-  await umbracoUi.library.openElementCaretButtonForName(rootFolderName);
-  await umbracoUi.library.isChildElementInTreeVisible(rootFolderName, childElementOneName);
-  await umbracoUi.library.isChildElementInTreeVisible(rootFolderName, childElementTwoName, false);
-});
-
-// Currently the front-end does not support adding a specific element as start nodes
-test.skip('see no-access view when deep-linking to restricted element', async ({umbracoApi, umbracoUi}) => {
-  // Arrange
-  await umbracoApi.user.setUserPermissionsForElement(testUser.name, testUser.email, testUser.password, userGroupId!, [childElementOneId!]);
-  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
-  await umbracoUi.goToBackOffice();
-
-  // Act
-  await umbracoUi.user.goToSection(ConstantHelper.sections.library, false);
-
-  // Assert
-  await umbracoUi.library.isElementInTreeVisible(rootFolderName);
-  await umbracoUi.page.goto(`${umbracoUi.page.url().replace('/collection', '')}/workspace/element/edit/${childElementOneId!}`);
-  await umbracoUi.library.doesElementWorkspaceHaveText('Access denied');
-});
-
-// Currently the front-end does not support adding a specific element as start nodes
-test.skip('cannot see any element when no element start nodes specified', async ({umbracoApi, umbracoUi}) => {
+test('cannot see any element when no element start nodes specified', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.user.setUserPermissionsForElement(testUser.name, testUser.email, testUser.password, userGroupId);
   await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
@@ -102,5 +59,7 @@ test.skip('cannot see any element when no element start nodes specified', async 
   await umbracoUi.user.goToSection(ConstantHelper.sections.library, false);
 
   // Assert
+  // Guards the absence check below from passing vacuously.
+  await umbracoUi.library.isSectionWithNameVisible('Library');
   await umbracoUi.library.isElementInTreeVisible(rootFolderName, false);
 });
