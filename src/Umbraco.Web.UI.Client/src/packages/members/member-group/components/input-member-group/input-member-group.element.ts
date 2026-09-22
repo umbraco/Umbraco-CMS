@@ -4,9 +4,7 @@ import { css, customElement, html, nothing, property, repeat, state, when } from
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
-import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import type { UmbRepositoryItemsStatus } from '@umbraco-cms/backoffice/repository';
 import '@umbraco-cms/backoffice/entity-item';
@@ -24,7 +22,7 @@ export class UmbInputMemberGroupElement extends UmbFormControlMixin<string, type
 			return modelEntry;
 		},
 		identifier: 'Umb.SorterIdentifier.InputMemberGroup',
-		itemSelector: 'uui-ref-node',
+		itemSelector: 'umb-entity-item-ref',
 		containerSelector: 'uui-ref-list',
 		onChange: ({ model }) => {
 			this.selection = model;
@@ -129,9 +127,6 @@ export class UmbInputMemberGroupElement extends UmbFormControlMixin<string, type
 	requiredMessage?: string;
 
 	@state()
-	private _editMemberGroupPath = '';
-
-	@state()
 	private _items?: Array<UmbMemberGroupItemModel>;
 
 	@state()
@@ -141,15 +136,6 @@ export class UmbInputMemberGroupElement extends UmbFormControlMixin<string, type
 
 	constructor() {
 		super();
-
-		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
-			.addAdditionalPath('member-group')
-			.onSetup(() => {
-				return { data: { entityType: 'member-group', preset: {} } };
-			})
-			.observeRouteBuilder((routeBuilder) => {
-				this._editMemberGroupPath = routeBuilder({});
-			});
 
 		this.addValidator(
 			'valueMissing',
@@ -184,7 +170,7 @@ export class UmbInputMemberGroupElement extends UmbFormControlMixin<string, type
 		});
 	}
 
-	#removeItem(unique: string) {
+	#onRemove(unique: string) {
 		this.#pickerContext.requestRemoveItem(unique);
 	}
 
@@ -203,50 +189,26 @@ export class UmbInputMemberGroupElement extends UmbFormControlMixin<string, type
 						const unique = status.unique;
 						const item = this._items?.find((x) => x.unique === unique);
 						const isError = status.state.type === 'error';
-
-						// For error state, use umb-entity-item-ref
-						if (isError) {
-							return html`
-								<umb-entity-item-ref
-									id=${unique}
-									?error=${true}
-									.errorMessage=${status.state.error}
-									.errorDetail=${unique}
-									?readonly=${this.readonly}
-									?standalone=${this.max === 1}>
-									${when(
-										!this.readonly,
-										() => html`
-											<uui-action-bar slot="actions">
-												<uui-button
-													label=${this.localize.term('general_remove')}
-													@click=${() => this.#removeItem(unique)}></uui-button>
-											</uui-action-bar>
-										`,
-									)}
-								</umb-entity-item-ref>
-							`;
-						}
-
-						// For successful items, use uui-ref-node
-						if (!item) return nothing;
 						return html`
-							<uui-ref-node
-								name=${item.name}
+							<umb-entity-item-ref
 								id=${unique}
-								href="${this._editMemberGroupPath}edit/${unique}"
-								?readonly=${this.readonly}>
-								<uui-action-bar slot="actions">
-									${when(
-										!this.readonly,
-										() =>
-											html`<uui-button
-												@click=${() => this.#removeItem(unique)}
-												label=${this.localize.term('general_remove')}></uui-button>`,
-									)}
-								</uui-action-bar>
-								<umb-icon slot="icon" name="icon-users"></umb-icon>
-							</uui-ref-node>
+								.item=${item}
+								?error=${isError}
+								.errorMessage=${status.state.error}
+								.errorDetail=${unique}
+								?readonly=${this.readonly}
+								?standalone=${this.max === 1}>
+								${when(
+									!this.readonly,
+									() => html`
+										<uui-action-bar slot="actions">
+											<uui-button
+												label=${this.localize.term('general_remove')}
+												@click=${() => this.#onRemove(unique)}></uui-button>
+										</uui-action-bar>
+									`,
+								)}
+							</umb-entity-item-ref>
 						`;
 					},
 				)}
