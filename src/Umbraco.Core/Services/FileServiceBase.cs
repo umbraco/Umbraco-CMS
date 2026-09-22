@@ -106,8 +106,9 @@ public abstract class FileServiceBase<TRepository, TEntity> : RepositoryService,
     /// <inheritdoc />
     public Task SetContentStreamAsync(string path, Stream content)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
         Repository.SetFileContent(path, content);
+        scope.Complete();
         return Task.CompletedTask;
     }
 

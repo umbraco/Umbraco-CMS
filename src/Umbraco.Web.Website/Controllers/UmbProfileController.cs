@@ -137,7 +137,7 @@ public class UmbProfileController : SurfaceController
             throw new InvalidOperationException($"Could not find a member with key: {member?.Key}.");
         }
 
-        IMemberType? memberType = _memberTypeService.Get(member.ContentTypeId);
+        IMemberType? memberType = await _memberTypeService.GetAsync(member.ContentTypeId);
 
         foreach (MemberPropertyModel property in model.MemberProperties
 

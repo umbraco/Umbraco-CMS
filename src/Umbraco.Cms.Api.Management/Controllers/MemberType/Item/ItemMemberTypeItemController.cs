@@ -39,17 +39,17 @@ public class ItemMemberTypeItemController : MemberTypeItemControllerBase
     [ProducesResponseType(typeof(IEnumerable<MemberTypeItemResponseModel>), StatusCodes.Status200OK)]
     [EndpointSummary("Gets a collection of member type items.")]
     [EndpointDescription("Gets a collection of member type items identified by the provided Ids.")]
-    public Task<IActionResult> Item(
+    public async Task<IActionResult> Item(
         CancellationToken cancellationToken,
         [FromQuery(Name = "id")] HashSet<Guid> ids)
     {
         if (ids.Count is 0)
         {
-            return Task.FromResult<IActionResult>(Ok(Enumerable.Empty<MemberTypeItemResponseModel>()));
+            return Ok(Enumerable.Empty<MemberTypeItemResponseModel>());
         }
 
-        IEnumerable<IMemberType> memberTypes = _memberTypeService.GetMany(ids);
+        IEnumerable<IMemberType> memberTypes = await _memberTypeService.GetManyAsync(ids);
         List<MemberTypeItemResponseModel> responseModels = _mapper.MapEnumerable<IMemberType, MemberTypeItemResponseModel>(memberTypes);
-        return Task.FromResult<IActionResult>(Ok(responseModels));
+        return Ok(responseModels);
     }
 }

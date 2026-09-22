@@ -42,7 +42,7 @@ public class DataTypeReferencePresentationFactory : IDataTypeReferencePresentati
         {
             { UmbracoObjectTypes.DocumentType.GetUdiType(), keys => _contentTypeService.GetManyAsync(keys).GetAwaiter().GetResult() },
             { UmbracoObjectTypes.MediaType.GetUdiType(), keys => _mediaTypeService.GetMany(keys) },
-            { UmbracoObjectTypes.MemberType.GetUdiType(), keys => _memberTypeService.GetMany(keys) }
+            { UmbracoObjectTypes.MemberType.GetUdiType(), keys => _memberTypeService.GetManyAsync(keys).GetAwaiter().GetResult() }
         };
 
         foreach (IGrouping<string, KeyValuePair<Udi, IEnumerable<string>>> usagesByEntityType in dataTypeUsages.GroupBy(u => u.Key.EntityType))

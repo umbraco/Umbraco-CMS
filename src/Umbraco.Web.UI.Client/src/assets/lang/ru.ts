@@ -196,6 +196,8 @@ export default {
 		isSensitiveValue:
 			'Это значение скрыто. Если Вам нужен доступ к просмотру этого значения, свяжитесь с администратором веб-сайта.',
 		isSensitiveValue_short: 'Это значение скрыто.',
+		isSensitiveValueNotice:
+			'Если Вам нужен доступ к просмотру скрытых значений, свяжитесь с администратором веб-сайта.',
 		itemChanged: 'Этот документ был изменен после публикации',
 		itemNotPublished: 'Этот документ не опубликован',
 		lastPublished: 'Документ опубликован',
@@ -1098,6 +1100,17 @@ export default {
 		sortHelp:
 			'Перетаскивайте элементы на нужное место вверх или вниз для определения необходимого Вам порядка сортировки. Также можно использовать заголовки столбцов, чтобы отсортировать все элементы сразу.',
 		sortPleaseWait: 'Пожалуйста, подождите... Страницы сортируются, это может занять некоторое время.',
+		sortByFieldHeadline: 'Сортировать по полю',
+		sortByFieldSentence: 'Сортировать все дочерние элементы по',
+		sortByFieldDirectionLabel: 'Направление',
+		sortByFieldAscending: 'По возрастанию',
+		sortByFieldDescending: 'По убыванию',
+		sortByFieldNameOption: 'Имя',
+		sortByFieldCreateDateOption: 'Создано',
+		sortByFieldUpdateDateOption: 'Последнее изменение',
+		sortIndividuallyHeadline: 'Сортировать по отдельности',
+		sortByFieldCultureSentence: 'на языке',
+		sortByFieldCultureLabel: 'Язык',
 	},
 	speechBubbles: {
 		contentPublishedFailedByEvent: 'Процесс публикации был отменен установленным пакетом дополнений.',

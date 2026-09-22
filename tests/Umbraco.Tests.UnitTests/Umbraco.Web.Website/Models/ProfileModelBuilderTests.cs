@@ -82,7 +82,7 @@ public class ProfileModelBuilderTests
 
         var mockMemberType = new Mock<IMemberType>();
         mockMemberType.Setup(x => x.PropertyTypes).Returns(Enumerable.Empty<IPropertyType>());
-        _mockMemberTypeService.Setup(x => x.Get("Member")).Returns(mockMemberType.Object);
+        _mockMemberTypeService.Setup(x => x.GetAsync("Member")).ReturnsAsync(mockMemberType.Object);
 
         var mockMember = new Mock<IMember>();
         mockMember.Setup(x => x.Key).Returns(memberKey);
@@ -156,7 +156,7 @@ public class ProfileModelBuilderTests
 
         // Assert — neither IMemberService nor IMemberTypeService should be called.
         _mockMemberService.Verify(x => x.GetById(It.IsAny<Guid>()), Times.Never);
-        _mockMemberTypeService.Verify(x => x.Get(It.IsAny<string>()), Times.Never);
+        _mockMemberTypeService.Verify(x => x.GetAsync(It.IsAny<string>()), Times.Never);
     }
 
     [Test]

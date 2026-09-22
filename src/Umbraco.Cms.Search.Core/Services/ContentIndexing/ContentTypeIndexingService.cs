@@ -75,7 +75,7 @@ internal sealed class ContentTypeIndexingService : IContentTypeIndexingService
         {
             UmbracoObjectTypes.Document => await GetDocumentKeysByContentTypesAsync(contentTypeKeys, cancellationToken),
             UmbracoObjectTypes.Media => GetMediaKeysByMediaTypes(contentTypeKeys),
-            UmbracoObjectTypes.Member => GetMemberKeysByMemberTypes(contentTypeKeys),
+            UmbracoObjectTypes.Member => await GetMemberKeysByMemberTypesAsync(contentTypeKeys),
             _ => [],
         };
 
@@ -148,12 +148,10 @@ internal sealed class ContentTypeIndexingService : IContentTypeIndexingService
         return keys.ToArray();
     }
 
-    private Guid[] GetMemberKeysByMemberTypes(Guid[] memberTypeKeys)
+    private async Task<Guid[]> GetMemberKeysByMemberTypesAsync(Guid[] memberTypeKeys)
     {
-        int[] directMemberTypeIds = memberTypeKeys
-            .Select(key => _memberTypeService.Get(key))
-            .Where(mt => mt is not null)
-            .Select(mt => mt!.Id)
+        int[] directMemberTypeIds = (await _memberTypeService.GetManyAsync(memberTypeKeys))
+            .Select(mt => mt.Id)
             .ToArray();
 
         if (directMemberTypeIds.Length == 0)
@@ -161,7 +159,7 @@ internal sealed class ContentTypeIndexingService : IContentTypeIndexingService
             return [];
         }
 
-        int[] allMemberTypeIds = ExpandWithDependentContentTypes(_memberTypeService, directMemberTypeIds);
+        int[] allMemberTypeIds = await ExpandWithDependentMemberTypesAsync(directMemberTypeIds);
 
         var keys = new List<Guid>();
         foreach (int memberTypeId in allMemberTypeIds)
@@ -183,6 +181,12 @@ internal sealed class ContentTypeIndexingService : IContentTypeIndexingService
     private async Task<int[]> ExpandWithDependentContentTypesAsync(int[] contentTypeIds)
     {
         IContentType[] allTypes = (await _contentTypeService.GetAllAsync()).ToArray();
+        return ExpandWithDependentContentTypes(allTypes, contentTypeIds);
+    }
+
+    private async Task<int[]> ExpandWithDependentMemberTypesAsync(int[] contentTypeIds)
+    {
+        IMemberType[] allTypes = (await _memberTypeService.GetAllAsync()).ToArray();
         return ExpandWithDependentContentTypes(allTypes, contentTypeIds);
     }
 

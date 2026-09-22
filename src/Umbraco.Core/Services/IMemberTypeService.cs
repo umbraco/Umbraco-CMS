@@ -5,7 +5,7 @@ namespace Umbraco.Cms.Core.Services;
 /// <summary>
 ///     Manages <see cref="IMemberType" /> objects.
 /// </summary>
-public interface IMemberTypeService : IContentTypeBaseService<IMemberType>
+public interface IMemberTypeService : IAsyncContentTypeBaseService<IMemberType>
 {
     /// <summary>
     ///     Gets the alias of the default <see cref="IMemberType" />.

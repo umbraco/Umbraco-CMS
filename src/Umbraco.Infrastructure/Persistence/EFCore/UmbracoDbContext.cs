@@ -126,6 +126,8 @@ public class UmbracoDbContext : DbContext
 
     public required DbSet<PropertyTypeDto> PropertyTypes { get; set; }
 
+    public required DbSet<MemberPropertyTypeDto> MemberPropertyTypes { get; set; }
+
     public required DbSet<TagDto> Tags { get; set; }
 
     public required DbSet<TagRelationshipDto> TagRelationships { get; set; }

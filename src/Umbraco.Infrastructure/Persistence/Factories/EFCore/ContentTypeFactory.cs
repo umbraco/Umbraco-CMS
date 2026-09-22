@@ -140,6 +140,32 @@ internal static class ContentTypeFactory
         };
     }
 
+    /// <summary>
+    /// Creates a collection of <see cref="MemberPropertyTypeDto"/> objects representing the property types defined
+    /// on the specified <see cref="IMemberType"/>.
+    /// </summary>
+    /// <param name="entity">The member type entity whose property types will be converted to DTOs.</param>
+    /// <returns>An enumerable of <see cref="MemberPropertyTypeDto"/> for each property type on the member type, or an empty collection if none exist.</returns>
+    public static IEnumerable<MemberPropertyTypeDto> BuildMemberPropertyTypeDtos(IMemberType entity)
+    {
+        // MemberCanEditProperty/MemberCanViewProperty/IsSensitiveProperty are only exposed on the
+        // concrete MemberType class, not on IMemberType, so a non-MemberType implementation has no
+        // member-specific metadata to persist.
+        if (entity is not MemberType memberType || memberType.PropertyTypes.Any() == false)
+        {
+            return Enumerable.Empty<MemberPropertyTypeDto>();
+        }
+
+        return memberType.PropertyTypes.Select(x => new MemberPropertyTypeDto
+        {
+            NodeId = entity.Id,
+            PropertyTypeId = x.Id,
+            CanEdit = memberType.MemberCanEditProperty(x.Alias),
+            ViewOnProfile = memberType.MemberCanViewProperty(x.Alias),
+            IsSensitive = memberType.IsSensitiveProperty(x.Alias),
+        }).ToList();
+    }
+
     private static NodeDto BuildNodeDto(IUmbracoEntity entity, Guid nodeObjectType) => new()
     {
         CreateDate = entity.CreateDate,

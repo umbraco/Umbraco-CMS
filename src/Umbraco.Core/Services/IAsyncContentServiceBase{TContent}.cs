@@ -10,8 +10,10 @@ namespace Umbraco.Cms.Core.Services;
 ///     Started as a pure 1:1 copy of <see cref="IContentServiceBase{TItem}" /> plus <see cref="GetByIdAsync" />.
 ///     Both of the members it inherited have since been converted - <c>GetById(Guid)</c> to
 ///     <see cref="GetByIdAsync" />, and the plural <c>Save</c> to <see cref="SaveAsync" /> - so this tier is now
-///     fully asynchronous. It is implemented by <see cref="IContentService" /> and <see cref="IElementService" />;
-///     media and members remain on the synchronous <see cref="IContentServiceBase{TItem}" />.
+///     fully asynchronous. <see cref="IContentService" /> and <see cref="IElementService" /> back it with genuinely
+///     asynchronous implementations; <see cref="IMemberService" /> implements it by delegating to its synchronous
+///     members, which it does because members share the asynchronous content editing base with documents and
+///     elements. Media remains on the synchronous <see cref="IContentServiceBase{TItem}" /> alone.
 /// </remarks>
 /// <typeparam name="TContent">The type of content item managed by this service.</typeparam>
 public interface IAsyncContentServiceBase<TContent> : IAsyncContentServiceBase

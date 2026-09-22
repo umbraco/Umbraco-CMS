@@ -21,7 +21,7 @@ namespace Umbraco.Cms.Core.Services;
 ///     available for members in the system. It extends the base content type service functionality
 ///     with member-specific behavior.
 /// </remarks>
-public class MemberTypeService : ContentTypeServiceBase<IMemberTypeRepository, IMemberType>, IMemberTypeService
+public class MemberTypeService : AsyncContentTypeServiceBase<IMemberTypeRepository, IMemberType>, IMemberTypeService
 {
     private readonly IMemberTypeRepository _memberTypeRepository;
 
@@ -203,20 +203,22 @@ public class MemberTypeService : ContentTypeServiceBase<IMemberTypeRepository, I
     ///     Deletes all members that use the specified member type IDs.
     /// </summary>
     /// <param name="typeIds">The IDs of the member types whose members should be deleted.</param>
-    protected override void DeleteItemsOfTypes(IEnumerable<int> typeIds)
+    protected override Task DeleteItemsOfTypesAsync(IEnumerable<int> typeIds)
     {
         foreach (var typeId in typeIds)
         {
             MemberService.DeleteMembersOfType(typeId);
         }
+
+        return Task.CompletedTask;
     }
 
     /// <inheritdoc />
     /// <remarks>
     /// Unlike document and media types, members are a flat list, so all member types are allowed at root.
     /// </remarks>
-    protected override IEnumerable<IMemberType> GetAllowedAtRootCandidates()
-        => _memberTypeRepository.GetMany(Array.Empty<int>()).ToArray();
+    protected override Task<IEnumerable<IMemberType>> GetAllowedAtRootCandidatesAsync()
+        => _memberTypeRepository.GetManyAsync(Array.Empty<int>(), CancellationToken.None);
 
     /// <inheritdoc />
     /// <remarks>

@@ -58,8 +58,8 @@ public class MemberTypeTreeControllerBase : FolderTreeControllerBase<MemberTypeT
 
     protected override async Task<MemberTypeTreeItemResponseModel[]> MapTreeItemViewModelsAsync(Guid? parentKey, IEntitySlim[] entities)
     {
-        var memberTypes = _memberTypeService
-            .GetMany(entities.Select(entity => entity.Id).ToArray())
+        var memberTypes = (await _memberTypeService
+            .GetManyAsync(entities.Select(entity => entity.Id).ToArray()))
             .ToDictionary(contentType => contentType.Id);
 
         IEnumerable<Task<MemberTypeTreeItemResponseModel>> tasks = entities.Select(async entity =>

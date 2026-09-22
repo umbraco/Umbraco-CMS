@@ -50,7 +50,7 @@ internal sealed class MediaSearchService : ContentSearchServiceBase<IMedia>, IMe
             Attempt<int> keyToId = await _idKeyMap.GetIdForKeyAsync(parentId.Value, UmbracoObjectTypes.Media);
             if (keyToId.Success is false)
             {
-                _logger.LogWarning("Could not obtain an ID for parent key: {parentId} (object type: Media)", parentId);
+                _logger.LogWarning("Could not obtain an ID for parent key: {parentKey} (object type: Media)", parentId);
                 return new PagedModel<IMedia>(0, []);
             }
 

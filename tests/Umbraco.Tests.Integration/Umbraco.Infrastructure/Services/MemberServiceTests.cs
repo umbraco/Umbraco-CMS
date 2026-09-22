@@ -56,9 +56,9 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Get_By_Username()
+    public async Task Can_Get_By_Username()
     {
-        var memberType = MemberTypeService.Get("member");
+        var memberType = await MemberTypeService.GetAsync("member");
         IMember member = new Member("xname", "xemail", "xusername", "xrawpassword", memberType, true);
         MemberService.Save(member);
 
@@ -69,10 +69,10 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Set_Last_Login_Date()
+    public async Task Can_Set_Last_Login_Date()
     {
         var now = DateTime.UtcNow;
-        var memberType = MemberTypeService.Get("member");
+        var memberType = await MemberTypeService.GetAsync("member");
         IMember member = new Member("xname", "xemail", "xusername", "xrawpassword", memberType, true)
         {
             LastLoginDate = now,
@@ -94,9 +94,9 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
 
     // These might seem like some somewhat pointless tests, but there's some funky things going on in MemberRepository when saving.
     [Test]
-    public void Can_Set_Failed_Password_Attempts()
+    public async Task Can_Set_Failed_Password_Attempts()
     {
-        var memberType = MemberTypeService.Get("member");
+        var memberType = await MemberTypeService.GetAsync("member");
         IMember member = new Member("xname", "xemail", "xusername", "xrawpassword", memberType, true)
         {
             FailedPasswordAttempts = 1
@@ -112,9 +112,9 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Set_Is_Approved()
+    public async Task Can_Set_Is_Approved()
     {
-        var memberType = MemberTypeService.Get("member");
+        var memberType = await MemberTypeService.GetAsync("member");
         IMember member = new Member("xname", "xemail", "xusername", "xrawpassword", memberType, true);
         MemberService.Save(member);
 
@@ -127,9 +127,9 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Set_Is_Locked_Out()
+    public async Task Can_Set_Is_Locked_Out()
     {
-        var memberType = MemberTypeService.Get("member");
+        var memberType = await MemberTypeService.GetAsync("member");
         IMember member =
             new Member("xname", "xemail", "xusername", "xrawpassword", memberType, true) { IsLockedOut = false };
         MemberService.Save(member);
@@ -143,10 +143,10 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Set_Last_Lockout_Date()
+    public async Task Can_Set_Last_Lockout_Date()
     {
         var now = DateTime.UtcNow;
-        var memberType = MemberTypeService.Get("member");
+        var memberType = await MemberTypeService.GetAsync("member");
         IMember member =
             new Member("xname", "xemail", "xusername", "xrawpassword", memberType, true) { LastLockoutDate = now };
         MemberService.Save(member);
@@ -162,10 +162,10 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_set_Last_Login_Date()
+    public async Task Can_set_Last_Login_Date()
     {
         var now = DateTime.UtcNow;
-        var memberType = MemberTypeService.Get("member");
+        var memberType = await MemberTypeService.GetAsync("member");
         IMember member =
             new Member("xname", "xemail", "xusername", "xrawpassword", memberType, true) { LastLoginDate = now };
         MemberService.Save(member);
@@ -181,10 +181,10 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Set_Last_Password_Change_Date()
+    public async Task Can_Set_Last_Password_Change_Date()
     {
         var now = DateTime.UtcNow;
-        var memberType = MemberTypeService.Get("member");
+        var memberType = await MemberTypeService.GetAsync("member");
         IMember member = new Member("xname", "xemail", "xusername", "xrawpassword", memberType, true)
         {
             LastPasswordChangeDate = now
@@ -202,9 +202,9 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Create_Member_With_Properties()
+    public async Task Can_Create_Member_With_Properties()
     {
-        var memberType = MemberTypeService.Get("member");
+        var memberType = await MemberTypeService.GetAsync("member");
         IMember member = new Member("xname", "xemail", "xusername", "xrawpassword", memberType, true);
         MemberService.Save(member);
 
@@ -1101,7 +1101,7 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
     [Test]
     public async Task Can_Get_Multiple_By_Key()
     {
-        var memberType = MemberTypeService.Get("member");
+        var memberType = await MemberTypeService.GetAsync("member");
         IMember memberA = new Member("aname", "a@email", "ausername", "arawpassword", memberType, true);
         MemberService.Save(memberA);
 

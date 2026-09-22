@@ -78,7 +78,7 @@ public sealed class UmbracoServices
             _mediaTypeService.GetAll().Cast<IContentTypeComposition>().ToArray()));
         types.AddRange(GetTypes(
             PublishedItemType.Member,
-            _memberTypeService.GetAll().Cast<IContentTypeComposition>().ToArray()));
+            _memberTypeService.GetAllAsync().GetAwaiter().GetResult().Cast<IContentTypeComposition>().ToArray()));
 
         return EnsureDistinctAliases(types);
     }
@@ -111,7 +111,7 @@ public sealed class UmbracoServices
     /// <returns>A list of <see cref="TypeModel"/> objects representing the member types.</returns>
     public IList<TypeModel> GetMemberTypes()
     {
-        IContentTypeComposition[] memberTypes = _memberTypeService.GetAll().Cast<IContentTypeComposition>().ToArray();
+        IContentTypeComposition[] memberTypes = _memberTypeService.GetAllAsync().GetAwaiter().GetResult().Cast<IContentTypeComposition>().ToArray();
         return GetTypes(PublishedItemType.Member, memberTypes); // aliases have to be unique here
     }
 

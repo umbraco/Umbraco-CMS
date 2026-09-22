@@ -21,9 +21,9 @@ namespace Umbraco.Cms.Core.Services;
 ///     functionality such as handling sensitive property access control.
 /// </remarks>
 internal sealed class MemberContentEditingService
-    : ContentEditingServiceBase<IMember, IMemberType, IMemberService, IMemberTypeService>, IMemberContentEditingService
+    : AsyncContentEditingServiceBase<IMember, IMemberType, IMemberService, IMemberTypeService>, IMemberContentEditingService
 {
-    private readonly ILogger<ContentEditingServiceBase<IMember, IMemberType, IMemberService, IMemberTypeService>> _logger;
+    private readonly ILogger<AsyncContentEditingServiceBase<IMember, IMemberType, IMemberService, IMemberTypeService>> _logger;
     private readonly IUserService _userService;
 
     /// <summary>
@@ -46,7 +46,7 @@ internal sealed class MemberContentEditingService
         IMemberTypeService contentTypeService,
         PropertyEditorCollection propertyEditorCollection,
         IDataTypeService dataTypeService,
-        ILogger<ContentEditingServiceBase<IMember, IMemberType, IMemberService, IMemberTypeService>> logger,
+        ILogger<AsyncContentEditingServiceBase<IMember, IMemberType, IMemberService, IMemberTypeService>> logger,
         ICoreScopeProvider scopeProvider,
         IUserIdKeyResolver userIdKeyResolver,
         IMemberValidationService memberValidationService,
@@ -118,20 +118,20 @@ internal sealed class MemberContentEditingService
         => throw new NotSupportedException("Member creation is not supported by this service. This should never be called.");
 
     /// <inheritdoc />
-    protected override OperationResult? Move(IMember member, int newParentId, bool includeDescendants, int userId)
+    protected override Task<OperationResult?> MoveAsync(IMember member, Guid? parentKey, bool includeDescendants, Guid userKey)
         => throw new InvalidOperationException("Move is not supported for members");
 
     /// <inheritdoc />
-    protected override Task<IMember?> CopyAsync(IMember member, int newParentId, bool relateToOriginal, bool includeDescendants, Guid userKey)
+    protected override Task<IMember?> CopyAsync(IMember member, Guid? parentKey, bool relateToOriginal, bool includeDescendants, Guid userKey)
         => throw new NotSupportedException("Copy is not supported for Member");
 
     /// <inheritdoc />
-    protected override OperationResult? MoveToRecycleBin(IMember member, int userId)
+    protected override Task<OperationResult?> MoveToRecycleBinAsync(IMember member, int userId)
         => throw new InvalidOperationException("Recycle bin is not supported for members");
 
     /// <inheritdoc />
-    protected override OperationResult? Delete(IMember member, int userId)
-        => ContentService.Delete(member, userId).Result;
+    protected override Task<OperationResult?> DeleteAsync(IMember member, int userId)
+        => Task.FromResult(ContentService.Delete(member, userId).Result);
 
     /// <summary>
     ///     Saves the specified member with the given user ID.

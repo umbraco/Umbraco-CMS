@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Core.Services;
 /// <summary>
 ///     Defines the MemberService, which is an easy access to operations involving (umbraco) members.
 /// </summary>
-public interface IMemberService : IMembershipMemberService, IContentServiceBase<IMember>
+public interface IMemberService : IMembershipMemberService, IContentServiceBase<IMember>, IAsyncContentServiceBase<IMember>
 {
     /// <summary>
     ///     Gets a list of paged <see cref="IMember" /> objects

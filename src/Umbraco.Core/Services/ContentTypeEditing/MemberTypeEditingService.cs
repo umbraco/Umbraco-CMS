@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Core.Services.ContentTypeEditing;
 ///     This service handles creating and updating member types including their properties,
 ///     compositions, and member-specific settings such as property sensitivity and visibility.
 /// </remarks>
-internal sealed class MemberTypeEditingService : ContentTypeEditingServiceBase<IMemberType, IMemberTypeService, MemberTypePropertyTypeModel, MemberTypePropertyContainerModel>, IMemberTypeEditingService
+internal sealed class MemberTypeEditingService : AsyncContentTypeEditingServiceBase<IMemberType, IMemberTypeService, MemberTypePropertyTypeModel, MemberTypePropertyContainerModel>, IMemberTypeEditingService
 {
     private readonly IMemberTypeService _memberTypeService;
     private readonly IUserService _userService;

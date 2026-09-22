@@ -9,6 +9,7 @@ using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services
@@ -443,6 +444,14 @@ namespace Umbraco.Cms.Core.Services
             return GetMemberFromRepository(id);
         }
 
+        /// <inheritdoc />
+        /// <remarks>
+        ///     Members are not yet backed by an asynchronous repository, so this resolves synchronously. It exists
+        ///     because members share the asynchronous content editing base with documents and elements.
+        /// </remarks>
+        public Task<IMember?> GetByIdAsync(Guid key, CancellationToken cancellationToken)
+            => Task.FromResult(GetById(key));
+
         /// <summary>
         /// Gets a list of paged <see cref="IMember"/> objects
         /// </summary>
@@ -862,6 +871,22 @@ namespace Umbraco.Cms.Core.Services
         public void Save(IEnumerable<IMember> members)
             => Save(members, Constants.Security.SuperUserId);
 
+        /// <inheritdoc />
+        /// <remarks>
+        ///     Members are not yet backed by an asynchronous repository, so this resolves synchronously. The
+        ///     synchronous overload reports cancellation through <see cref="OperationResultType.FailedCancelledByEvent" />,
+        ///     which is the only failure it can produce.
+        /// </remarks>
+        public async Task<Attempt<ContentSaveOperationStatus>> SaveAsync(IEnumerable<IMember> members, Guid userKey, CancellationToken cancellationToken)
+        {
+            var userId = await _userIdKeyResolver.GetAsync(userKey);
+            Attempt<OperationResult?> result = Save(members, userId);
+
+            return result.Success
+                ? Attempt.Succeed(ContentSaveOperationStatus.Success)
+                : Attempt.Fail(ContentSaveOperationStatus.CancelledByNotification);
+        }
+
         /// <inheritdoc/>
         /// <remarks>
         /// <para>
@@ -1167,6 +1192,11 @@ namespace Umbraco.Cms.Core.Services
         public ContentDataIntegrityReport CheckDataIntegrity(ContentDataIntegrityReportOptions options)
             => throw new InvalidOperationException("Data integrity checks are not (yet) implemented for members.");
 
+        /// <inheritdoc />
+        /// <exception cref="InvalidOperationException">Data integrity checks are not implemented for members.</exception>
+        public Task<ContentDataIntegrityReport> CheckDataIntegrityAsync(ContentDataIntegrityReportOptions options, CancellationToken cancellationToken)
+            => throw new InvalidOperationException("Data integrity checks are not (yet) implemented for members.");
+
         #endregion
 
         #region Private Methods
@@ -1207,12 +1237,13 @@ namespace Umbraco.Cms.Core.Services
         /// </remarks>
         public MemberExportModel? ExportMember(Guid key)
         {
-            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            using ICoreScope scope = ScopeProvider.CreateCoreScope();
             IQuery<IMember>? query = Query<IMember>().Where(x => x.Key == key);
             IMember? member = _memberRepository.Get(query)?.FirstOrDefault();
 
             if (member == null)
             {
+                scope.Complete();
                 return null;
             }
 
@@ -1231,6 +1262,7 @@ namespace Umbraco.Cms.Core.Services
             };
 
             scope.Notifications.Publish(new ExportedMemberNotification(member, model));
+            scope.Complete();
 
             return model;
         }

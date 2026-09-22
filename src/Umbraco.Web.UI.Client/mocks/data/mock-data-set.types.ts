@@ -113,7 +113,12 @@ export type UmbMockDictionaryModel = DictionaryItemResponseModel &
 	DictionaryItemItemResponseModel &
 	DictionaryOverviewResponseModel;
 
-export type UmbMockDocumentModel = DocumentResponseModel & DocumentTreeItemResponseModel & DocumentItemResponseModel;
+export type UmbMockDocumentModel = DocumentResponseModel &
+	DocumentTreeItemResponseModel &
+	DocumentItemResponseModel & {
+		/** Mock-only: the parent before trashing, used to restore it. Not a real response field. */
+		originalParent?: { id: string } | null;
+	};
 
 export type UmbMockDocumentBlueprintModel = DocumentBlueprintResponseModel &
 	DocumentBlueprintItemResponseModel &
@@ -134,7 +139,12 @@ export type UmbMockElementModel = Omit<ElementResponseModel, 'documentType'> &
 
 export type UmbMockLanguageModel = LanguageResponseModel & LanguageItemResponseModel;
 
-export type UmbMockMediaModel = MediaResponseModel & MediaTreeItemResponseModel & MediaItemResponseModel;
+export type UmbMockMediaModel = MediaResponseModel &
+	MediaTreeItemResponseModel &
+	MediaItemResponseModel & {
+		/** Mock-only: the parent before trashing, used to restore it. Not a real response field. */
+		originalParent?: { id: string } | null;
+	};
 
 export type UmbMockMediaTypeModel = MediaTypeResponseModel &
 	MediaTypeTreeItemResponseModel &

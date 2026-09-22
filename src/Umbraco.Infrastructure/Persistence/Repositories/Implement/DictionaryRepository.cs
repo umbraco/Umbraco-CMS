@@ -504,15 +504,22 @@ internal sealed class DictionaryRepository : AsyncEntityRepositoryBase<Guid, IDi
             return query;
         }
 
-        if (_dictionarySettings.CurrentValue.EnableValueSearch)
-        {
-            return query.Where(x =>
-                x.Key.StartsWith(filter) ||
-                x.LanguageText.Any(lt => lt.Value.Contains(filter)));
-        }
+        DictionarySettings settings = _dictionarySettings.CurrentValue;
 
-        // Search only in keys
-        return query.Where(x => x.Key.StartsWith(filter));
+        // The key match and the optional value match are combined in a single predicate so the OR is
+        // translated into one query rather than a union.
+        return (settings.KeySearchMode, settings.EnableValueSearch) switch
+        {
+            (DictionaryKeySearchMode.StartsWith, false) => query.Where(x => x.Key.StartsWith(filter)),
+            (DictionaryKeySearchMode.StartsWith, true) => query.Where(x =>
+                x.Key.StartsWith(filter) ||
+                x.LanguageText.Any(lt => lt.Value.Contains(filter))),
+            (DictionaryKeySearchMode.Contains, false) => query.Where(x => x.Key.Contains(filter)),
+            (DictionaryKeySearchMode.Contains, true) => query.Where(x =>
+                x.Key.Contains(filter) ||
+                x.LanguageText.Any(lt => lt.Value.Contains(filter))),
+            _ => throw new ArgumentOutOfRangeException(nameof(settings.KeySearchMode), settings.KeySearchMode, null),
+        };
     }
 
     /// <summary>

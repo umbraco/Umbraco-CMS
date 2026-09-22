@@ -253,7 +253,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
         else
         {
             Logger.LogError(
-                "User '{UserId}' was unable to rollback content '{ContentId}' to version '{VersionId}'", userId, content.Id, versionId);
+                "User '{UserId}' was unable to rollback content '{ContentId}' (key '{ContentKey}') to version '{VersionId}'", userId, content.Id, content.Key, versionId);
         }
 
         scope.Complete();
@@ -1092,7 +1092,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
                     PublishResult result = await CommitContentChangesAsync(scope, d, evtMsgs, await allLangs.Value, savingNotification.State, d.WriterId, cancellationToken);
                     if (result.Success == false)
                     {
-                        Logger.LogError(null, "Failed to publish content id={ContentId}, reason={Reason}.", d.Id, result.Result);
+                        Logger.LogError(null, "Failed to publish content id={ContentId}, key={ContentKey}, reason={Reason}.", d.Id, d.Key, result.Result);
                     }
 
                     results.Add(result);
@@ -1108,7 +1108,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
                     PublishResult result = await UnpublishAsync(d, "*", d.WriterId, cancellationToken);
                     if (result.Success == false)
                     {
-                        Logger.LogError(null, "Failed to unpublish content id={ContentId}, reason={Reason}.", d.Id, result.Result);
+                        Logger.LogError(null, "Failed to unpublish content id={ContentId}, key={ContentKey}, reason={Reason}.", d.Id, d.Key, result.Result);
                     }
 
                     results.Add(result);
@@ -1173,8 +1173,9 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
                         if (invalidProperties != null && invalidProperties.Length > 0)
                         {
                             Logger.LogWarning(
-                                "Scheduled publishing will fail for content {ContentId} and culture {Culture} because of invalid properties {InvalidProperties}",
+                                "Scheduled publishing will fail for content {ContentId} (key {ContentKey}) and culture {Culture} because of invalid properties {InvalidProperties}",
                                 d.Id,
+                                d.Key,
                                 culture,
                                 string.Join(",", invalidProperties.Select(x => x.Alias)));
                         }
@@ -1203,7 +1204,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
 
                     if (result.Success == false)
                     {
-                        Logger.LogError(null, "Failed to publish content id={ContentId}, reason={Reason}.", d.Id, result.Result);
+                        Logger.LogError(null, "Failed to publish content id={ContentId}, key={ContentKey}, reason={Reason}.", d.Id, d.Key, result.Result);
                     }
 
                     results.Add(result);
@@ -1231,7 +1232,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
 
                     if (result.Success == false)
                     {
-                        Logger.LogError(null, "Failed to publish content id={ContentId}, reason={Reason}.", d.Id, result.Result);
+                        Logger.LogError(null, "Failed to publish content id={ContentId}, key={ContentKey}, reason={Reason}.", d.Id, d.Key, result.Result);
                     }
 
                     results.Add(result);
@@ -1370,7 +1371,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
                 if (await scope.Notifications.PublishCancelableAsync(
                         PublishingNotification(content, eventMessages).WithState(notificationState)))
                 {
-                    Logger.LogInformation("Content {ContentName} (id={ContentId}) cannot be published: {Reason}", content.Name, content.Id, "publishing was cancelled");
+                    Logger.LogInformation("Content {ContentName} (id={ContentId}, key={ContentKey}) cannot be published: {Reason}", content.Name, content.Id, content.Key, "publishing was cancelled");
                     return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, eventMessages, content);
                 }
 
@@ -2039,9 +2040,10 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
         if (content.PublishedState != PublishedState.Publishing && content.PublishedVersionId == 0)
         {
             Logger.LogInformation(
-                "Content {ContentName} (id={ContentId}) cannot be published: {Reason}",
+                "Content {ContentName} (id={ContentId}, key={ContentKey}) cannot be published: {Reason}",
                 content.Name,
                 content.Id,
+                content.Key,
                 "content does not have published values");
             return new PublishResult(PublishResultType.FailedPublishNothingToPublish, evtMsgs, content);
         }
@@ -2059,12 +2061,12 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
                     if (!variesByCulture)
                     {
                         Logger.LogInformation(
-                            "Content {ContentName} (id={ContentId}) cannot be published: {Reason}", content.Name, content.Id, "content has expired");
+                            "Content {ContentName} (id={ContentId}, key={ContentKey}) cannot be published: {Reason}", content.Name, content.Id, content.Key, "content has expired");
                     }
                     else
                     {
                         Logger.LogInformation(
-                            "Content {ContentName} (id={ContentId}) culture {Culture} cannot be published: {Reason}", content.Name, content.Id, culture, "content culture has expired");
+                            "Content {ContentName} (id={ContentId}, key={ContentKey}) culture {Culture} cannot be published: {Reason}", content.Name, content.Id, content.Key, culture, "content culture has expired");
                     }
 
                     return new PublishResult(
@@ -2077,17 +2079,19 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
                     if (!variesByCulture)
                     {
                         Logger.LogInformation(
-                            "Content {ContentName} (id={ContentId}) cannot be published: {Reason}",
+                            "Content {ContentName} (id={ContentId}, key={ContentKey}) cannot be published: {Reason}",
                             content.Name,
                             content.Id,
+                            content.Key,
                             "content is awaiting release");
                     }
                     else
                     {
                         Logger.LogInformation(
-                            "Content {ContentName} (id={ContentId}) culture {Culture} cannot be published: {Reason}",
+                            "Content {ContentName} (id={ContentId}, key={ContentKey}) culture {Culture} cannot be published: {Reason}",
                             content.Name,
                             content.Id,
+                            content.Key,
                             culture,
                             "content has culture awaiting release");
                     }
@@ -2101,9 +2105,10 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
 
                 case ContentStatus.Trashed:
                     Logger.LogInformation(
-                        "Content {ContentName} (id={ContentId}) cannot be published: {Reason}",
+                        "Content {ContentName} (id={ContentId}, key={ContentKey}) cannot be published: {Reason}",
                         content.Name,
                         content.Id,
+                        content.Key,
                         "content is trashed");
                     return new PublishResult(PublishResultType.FailedPublishIsTrashed, evtMsgs, content);
             }
@@ -2118,9 +2123,10 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
             if (!pathIsOk)
             {
                 Logger.LogInformation(
-                    "Content {ContentName} (id={ContentId}) cannot be published: {Reason}",
+                    "Content {ContentName} (id={ContentId}, key={ContentKey}) cannot be published: {Reason}",
                     content.Name,
                     content.Id,
+                    content.Key,
                     "parent is not published");
                 return new PublishResult(PublishResultType.FailedPublishPathNotPublished, evtMsgs, content);
             }
@@ -2167,18 +2173,20 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
             if (culturesUnpublishing?.Count > 0)
             {
                 Logger.LogInformation(
-                    "Content {ContentName} (id={ContentId}) cultures: {Cultures} have been unpublished.",
+                    "Content {ContentName} (id={ContentId}, key={ContentKey}) cultures: {Cultures} have been unpublished.",
                     content.Name,
                     content.Id,
+                    content.Key,
                     string.Join(",", culturesUnpublishing));
             }
 
             if (culturesPublishing?.Count > 0)
             {
                 Logger.LogInformation(
-                    "Content {ContentName} (id={ContentId}) cultures: {Cultures} have been published.",
+                    "Content {ContentName} (id={ContentId}, key={ContentKey}) cultures: {Cultures} have been published.",
                     content.Name,
                     content.Id,
+                    content.Key,
                     string.Join(",", culturesPublishing));
             }
 
@@ -2195,7 +2203,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
             return new PublishResult(PublishResultType.SuccessPublishCulture, evtMsgs, content);
         }
 
-        Logger.LogInformation("Content {ContentName} (id={ContentId}) has been published.", content.Name, content.Id);
+        Logger.LogInformation("Content {ContentName} (id={ContentId}, key={ContentKey}) has been published.", content.Name, content.Id, content.Key);
         return new PublishResult(evtMsgs, content);
     }
 
@@ -2213,7 +2221,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
         if (notificationResult)
         {
             Logger.LogInformation(
-                "Content {ContentName} (id={ContentId}) cannot be unpublished: unpublishing was cancelled.", content.Name, content.Id);
+                "Content {ContentName} (id={ContentId}, key={ContentKey}) cannot be unpublished: unpublishing was cancelled.", content.Name, content.Id, content.Key);
             return new PublishResult(PublishResultType.FailedUnpublishCancelledByEvent, evtMsgs, content);
         }
 
@@ -2238,7 +2246,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
         if (pastReleases.Count > 0)
         {
             Logger.LogInformation(
-                "Content {ContentName} (id={ContentId}) had its release date removed, because it was unpublished.", content.Name, content.Id);
+                "Content {ContentName} (id={ContentId}, key={ContentKey}) had its release date removed, because it was unpublished.", content.Name, content.Id, content.Key);
         }
 
         await _asyncContentRepository.PersistContentScheduleAsync(content, contentSchedule, cancellationToken);
@@ -2246,7 +2254,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
         // change state to unpublishing
         content.PublishedState = PublishedState.Unpublishing;
 
-        Logger.LogInformation("Content {ContentName} (id={ContentId}) has been unpublished.", content.Name, content.Id);
+        Logger.LogInformation("Content {ContentName} (id={ContentId}, key={ContentKey}) has been unpublished.", content.Name, content.Id, content.Key);
         return attempt;
     }
 

@@ -39,11 +39,11 @@ public class ExportMemberTypeController : MemberTypeControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [EndpointSummary("Exports a member type.")]
     [EndpointDescription("Exports the member type identified by the provided Id to a downloadable format.")]
-    public IActionResult Export(
+    public async Task<IActionResult> Export(
         CancellationToken cancellationToken,
         Guid id)
     {
-        IMemberType? memberType = _memberTypeService.Get(id);
+        IMemberType? memberType = await _memberTypeService.GetAsync(id);
         if (memberType is null)
         {
             return OperationStatusResult(ContentTypeOperationStatus.NotFound);

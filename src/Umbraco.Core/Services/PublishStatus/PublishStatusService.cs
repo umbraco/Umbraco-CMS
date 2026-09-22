@@ -52,7 +52,7 @@ public abstract class PublishStatusService
             return culture == Constants.System.InvariantCulture || publishedCultures.Contains(culture, StringComparer.InvariantCultureIgnoreCase);
         }
 
-        _logger.LogDebug("{EntityType} {Key} not found in the publish status cache", _entityTypeName, key);
+        _logger.LogDebug("{EntityType} {EntityKey} not found in the publish status cache", _entityTypeName, key);
         return false;
     }
 
@@ -68,7 +68,7 @@ public abstract class PublishStatusService
             return publishedCultures.Count > 0;
         }
 
-        _logger.LogDebug("{EntityType} {Key} not found in the publish status cache", _entityTypeName, key);
+        _logger.LogDebug("{EntityType} {EntityKey} not found in the publish status cache", _entityTypeName, key);
         return false;
     }
 

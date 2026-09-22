@@ -2177,6 +2177,7 @@ internal class DocumentRepository
             item.PublishedVersionId,
             item.Properties,
             LanguageRepository,
+            PropertyEditors,
             out bool edited,
             out HashSet<string>? editedCultures).ToList();
 
@@ -2268,6 +2269,7 @@ internal class DocumentRepository
             publishedVersionId,
             item.Properties,
             LanguageRepository,
+            PropertyEditors,
             out bool edited,
             out HashSet<string>? editedCultures).ToList();
 

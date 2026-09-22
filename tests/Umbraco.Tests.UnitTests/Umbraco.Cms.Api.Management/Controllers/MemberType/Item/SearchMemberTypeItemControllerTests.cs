@@ -55,8 +55,8 @@ public class SearchMemberTypeItemControllerTests
         IMemberType memberTypeA = Mock.Of<IMemberType>(x => x.Key == keyA);
         IMemberType memberTypeB = Mock.Of<IMemberType>(x => x.Key == keyB);
         _memberTypeService
-            .Setup(x => x.GetMany(It.IsAny<IEnumerable<Guid>>()))
-            .Returns(new[] { memberTypeC, memberTypeA, memberTypeB });
+            .Setup(x => x.GetManyAsync(It.IsAny<IEnumerable<Guid>>()))
+            .ReturnsAsync(new[] { memberTypeC, memberTypeA, memberTypeB });
 
         _mapper
             .Setup(x => x.MapEnumerable<IMemberType, MemberTypeItemResponseModel>(It.IsAny<IEnumerable<IMemberType>>()))

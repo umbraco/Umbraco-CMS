@@ -25,7 +25,7 @@ internal sealed class ElementCacheService : IElementCacheService, IMemoryCacheSi
     private readonly ICacheNodeFactory _cacheNodeFactory;
     private readonly IEnumerable<IElementSeedKeyProvider> _seedKeyProviders;
     private readonly IPublishedModelFactory _publishedModelFactory;
-    private readonly IPreviewService _previewService;
+    private readonly IPreviewSessionService _previewSessionService;
     private readonly CacheSettings _cacheSettings;
     private readonly ILogger<ElementCacheService> _logger;
     private HashSet<Guid>? _seedKeys;
@@ -74,7 +74,7 @@ internal sealed class ElementCacheService : IElementCacheService, IMemoryCacheSi
         ICacheNodeFactory cacheNodeFactory,
         IEnumerable<IElementSeedKeyProvider> seedKeyProviders,
         IPublishedModelFactory publishedModelFactory,
-        IPreviewService previewService,
+        IPreviewSessionService previewSessionService,
         IOptions<CacheSettings> cacheSettings,
         ILogger<ElementCacheService> logger,
         IConvertedPublishedContentCacheFactory cacheFactory)
@@ -86,7 +86,7 @@ internal sealed class ElementCacheService : IElementCacheService, IMemoryCacheSi
         _cacheNodeFactory = cacheNodeFactory;
         _seedKeyProviders = seedKeyProviders;
         _publishedModelFactory = publishedModelFactory;
-        _previewService = previewService;
+        _previewSessionService = previewSessionService;
         _cacheSettings = cacheSettings.Value;
         _logger = logger;
         _publishedElementCache = cacheFactory.Create<string, IPublishedElement>(_cacheSettings.Entry.Element.MaximumLocalCacheItems, CacheName);
@@ -103,7 +103,7 @@ internal sealed class ElementCacheService : IElementCacheService, IMemoryCacheSi
 
     public async Task<IPublishedElement?> GetByKeyAsync(Guid key, bool? preview = null)
     {
-        bool calculatedPreview = preview ?? _previewService.IsInPreview();
+        bool calculatedPreview = preview ?? _previewSessionService.IsActive();
         return await GetNodeAsync(key, calculatedPreview);
     }
 
@@ -365,7 +365,6 @@ internal sealed class ElementCacheService : IElementCacheService, IMemoryCacheSi
 
     public void Rebuild(IReadOnlyCollection<int> elementTypeIds)
         => _databaseCacheRepository.Rebuild(
-            null,
             null,
             null,
             elementTypeIds.ToList(),

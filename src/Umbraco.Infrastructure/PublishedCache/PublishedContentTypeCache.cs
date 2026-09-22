@@ -80,11 +80,6 @@ public class PublishedContentTypeCache : IPublishedContentTypeCache
     /// <param name="id">An identifier.</param>
     public void ClearContentType(int id)
     {
-        if (_logger.IsEnabled(LogLevel.Debug))
-        {
-            _logger.LogDebug("Clear content type w/id {ContentTypeId}", id);
-        }
-
         try
         {
             _lock.EnterUpgradeableReadLock();
@@ -92,6 +87,11 @@ public class PublishedContentTypeCache : IPublishedContentTypeCache
             if (_typesById.TryGetValue(id, out IPublishedContentType? type) == false)
             {
                 return;
+            }
+
+            if (_logger.IsEnabled(LogLevel.Debug))
+            {
+                _logger.LogDebug("Clear content type w/id {ContentTypeId}, key {ContentTypeKey}", id, type.Key);
             }
 
             try
@@ -376,7 +376,7 @@ public class PublishedContentTypeCache : IPublishedContentTypeCache
             PublishedItemType.Content => _contentTypeService is null ? null : _contentTypeService.GetAsync(key).GetAwaiter().GetResult(),
             PublishedItemType.Element => _contentTypeService is null ? null : _contentTypeService.GetAsync(key).GetAwaiter().GetResult(),
             PublishedItemType.Media => _mediaTypeService?.Get(key),
-            PublishedItemType.Member => _memberTypeService?.Get(key),
+            PublishedItemType.Member => _memberTypeService?.GetAsync(key).GetAwaiter().GetResult(),
             _ => throw new ArgumentOutOfRangeException(nameof(itemType)),
         };
         if (contentType == null)
@@ -395,7 +395,7 @@ public class PublishedContentTypeCache : IPublishedContentTypeCache
             PublishedItemType.Content => _contentTypeService is null ? null : _contentTypeService.GetAsync(alias).GetAwaiter().GetResult(),
             PublishedItemType.Element => _contentTypeService is null ? null : _contentTypeService.GetAsync(alias).GetAwaiter().GetResult(),
             PublishedItemType.Media => _mediaTypeService?.Get(alias),
-            PublishedItemType.Member => _memberTypeService?.Get(alias),
+            PublishedItemType.Member => _memberTypeService?.GetAsync(alias).GetAwaiter().GetResult(),
             _ => throw new ArgumentOutOfRangeException(nameof(itemType)),
         };
         if (contentType == null)
@@ -414,7 +414,7 @@ public class PublishedContentTypeCache : IPublishedContentTypeCache
             PublishedItemType.Content => _contentTypeService is null ? null : _contentTypeService.GetAsync(id).GetAwaiter().GetResult(),
             PublishedItemType.Element => _contentTypeService is null ? null : _contentTypeService.GetAsync(id).GetAwaiter().GetResult(),
             PublishedItemType.Media => _mediaTypeService?.Get(id),
-            PublishedItemType.Member => _memberTypeService?.Get(id),
+            PublishedItemType.Member => _memberTypeService?.GetAsync(id).GetAwaiter().GetResult(),
             _ => throw new ArgumentOutOfRangeException(nameof(itemType)),
         };
         if (contentType == null)

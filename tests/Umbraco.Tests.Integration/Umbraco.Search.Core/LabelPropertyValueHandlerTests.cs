@@ -24,7 +24,7 @@ public class LabelPropertyValueHandlerTests : ContentTestBase
                     decimalValue = 56.78m,
                     integerValue = 1234,
                     stringValue = "The label value",
-                    timeValue = DateTime.MinValue.Add(new TimeSpan(1, 2, 3, 4)),
+                    timeValue = new DateTime(1900, 01, 01).Add(new TimeSpan(02, 03, 04)),
                     dateTimeValue = new DateTime(2004, 05, 06, 07, 08, 09)
                 })
             .Build();
