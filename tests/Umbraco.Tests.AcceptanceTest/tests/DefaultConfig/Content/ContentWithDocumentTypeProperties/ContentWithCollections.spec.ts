@@ -129,3 +129,60 @@ test('can search in a collection of content', async ({umbracoApi, umbracoUi}) =>
   await umbracoApi.document.ensureNameNotExists(secondChildContentName);
   await umbracoApi.documentType.ensureNameNotExists(childDocumentTypeName);
 });
+
+test('can open a child from the grid view', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const childDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentType(childDocumentTypeName);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedChildNodeAndCollectionId(documentTypeName, childDocumentTypeId, dataTypeData.id);
+  const contentId = await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  const childDocumentId = await umbracoApi.document.createDefaultDocumentWithParent(firstChildContentName, childDocumentTypeId, contentId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.isDocumentGridViewVisible();
+
+  // Act
+  // An early click can be lost while the collection re-renders, leaving the workspace unopened.
+  // Retry until the edit route is actually loaded.
+  await expect(async () => {
+    await umbracoUi.content.clickContentCardWithName(firstChildContentName);
+    await umbracoUi.content.waitForWorkspaceEditRoute('document');
+  }).toPass({timeout: ConstantHelper.timeout.veryLong});
+
+  // Assert
+  // The click must have opened the child's own edit workspace, not just any document route.
+  await expect(umbracoUi.content.page).toHaveURL(new RegExp(childDocumentId));
+
+  // Clean
+  await umbracoApi.document.ensureNameNotExists(firstChildContentName);
+  await umbracoApi.documentType.ensureNameNotExists(childDocumentTypeName);
+});
+
+test('can open a child from the table view', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const childDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentType(childDocumentTypeName);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedChildNodeAndCollectionId(documentTypeName, childDocumentTypeId, dataTypeData.id);
+  const contentId = await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  const childDocumentId = await umbracoApi.document.createDefaultDocumentWithParent(firstChildContentName, childDocumentTypeId, contentId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.changeToListView();
+  await umbracoUi.content.isDocumentListViewVisible();
+
+  // Act
+  // An early click can be lost while the table re-renders, leaving the workspace unopened.
+  // Retry until the edit route is actually loaded.
+  await expect(async () => {
+    await umbracoUi.content.goToContentInListViewWithName(firstChildContentName);
+    await umbracoUi.content.waitForWorkspaceEditRoute('document');
+  }).toPass({timeout: ConstantHelper.timeout.veryLong});
+
+  // Assert
+  // The click must have opened the child's own edit workspace, not just any document route.
+  await expect(umbracoUi.content.page).toHaveURL(new RegExp(childDocumentId));
+
+  // Clean
+  await umbracoApi.document.ensureNameNotExists(firstChildContentName);
+  await umbracoApi.documentType.ensureNameNotExists(childDocumentTypeName);
+});
