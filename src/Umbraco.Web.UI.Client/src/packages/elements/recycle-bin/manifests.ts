@@ -7,6 +7,7 @@ import { manifests as menuManifests } from './menu/manifests.js';
 import { manifests as repositoryManifests } from './repository/manifests.js';
 import { manifests as rootManifests } from './root/manifests.js';
 import { manifests as treeManifests } from './tree/manifests.js';
+import { manifests as workspaceContextManifests } from './workspace-context/manifests.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	...collectionManifests,
@@ -18,4 +19,5 @@ export const manifests: Array<UmbExtensionManifest> = [
 	...repositoryManifests,
 	...rootManifests,
 	...treeManifests,
+	...workspaceContextManifests,
 ];
