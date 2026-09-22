@@ -235,10 +235,6 @@ export class UmbInputMemberGroupElement extends UmbFormControlMixin<string, type
 			#btn-add {
 				width: 100%;
 			}
-
-			uui-ref-node[drag-placeholder] {
-				opacity: 0.2;
-			}
 		`,
 	];
 }
