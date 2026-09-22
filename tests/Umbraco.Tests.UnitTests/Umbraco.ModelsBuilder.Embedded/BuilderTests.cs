@@ -1,6 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System.Linq;
 using System.Text;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -559,6 +560,81 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 
         Console.WriteLine(genChild);
         Assert.AreEqual(expectedChild.ClearLf(), genChild);
+    }
+
+    [Test]
+    public void GenerateType_That_Is_Both_A_Base_Class_And_Composed()
+    {
+        // A base document type ("Parent") that BOTH has a composition ("MetaData") AND is inherited from by
+        // a child ("PageDefault"). See issue #23103. The child must inherit the composition through the base
+        // class - it must not re-declare the composition interface nor re-emit the inherited composition property.
+        var metaData = new TypeModel
+        {
+            Id = 3,
+            Alias = "metaData",
+            ClrName = "MetaData",
+            Name = "metaDataName",
+            ParentId = 0,
+            BaseType = null,
+            ItemType = TypeModel.ItemTypes.Content,
+            IsMixin = true,
+        };
+        metaData.Properties.Add(new PropertyModel
+        {
+            Alias = "metaProperty",
+            ClrName = "MetaProperty",
+            Name = "metaPropertyName",
+            ModelClrType = typeof(string),
+            ClrTypeName = typeof(string).FullName,
+        });
+
+        var parent = new TypeModel
+        {
+            Id = 1,
+            Alias = "parent",
+            ClrName = "Parent",
+            Name = "parentName",
+            ParentId = 0,
+            IsParent = true,
+            BaseType = null,
+            ItemType = TypeModel.ItemTypes.Content,
+        };
+        parent.MixinTypes.Add(metaData);
+
+        var child = new TypeModel
+        {
+            Id = 2,
+            Alias = "pageDefault",
+            ClrName = "PageDefault",
+            Name = "pageDefaultName",
+            ParentId = 1,
+            BaseType = parent,
+            ItemType = TypeModel.ItemTypes.Content,
+        };
+
+        TypeModel[] types = { metaData, parent, child };
+        var builder = new TextBuilder(new ModelsBuilderSettings(), types);
+        var models = builder.GetModelsToGenerate().ToList();
+
+        string Generate(string clrName)
+        {
+            var sb = new StringBuilder();
+            builder.Generate(sb, models.Single(m => m.ClrName == clrName));
+            return sb.ToString();
+        }
+
+        var parentGen = Generate("Parent");
+        var childGen = Generate("PageDefault");
+
+        // The base type implements the composition interface and exposes the composition's property
+        Assert.IsTrue(parentGen.Contains("public partial class Parent : PublishedContentModel, IMetaData"), parentGen);
+        Assert.IsTrue(parentGen.Contains("MetaProperty"), parentGen);
+
+        // The child inherits the base type only; it must not re-declare the composition interface
+        // nor re-emit the composition property (both are inherited via the base class).
+        Assert.IsTrue(childGen.Contains("public partial class PageDefault : Parent"), childGen);
+        Assert.IsFalse(childGen.Contains("IMetaData"), childGen);
+        Assert.IsFalse(childGen.Contains("MetaProperty"), childGen);
     }
 
     [Test]

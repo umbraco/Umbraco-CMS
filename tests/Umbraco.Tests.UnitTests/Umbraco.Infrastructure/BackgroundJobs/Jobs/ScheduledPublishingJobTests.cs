@@ -24,6 +24,7 @@ public class ScheduledPublishingJobTests
     private Mock<IContentService> _mockContentService;
     private Mock<IElementService> _mockElementService;
     private Mock<ILogger<ScheduledPublishingJob>> _mockLogger;
+    private Mock<ICoreScope> _mockScope;
 
     [Test]
     public async Task Does_Not_Execute_When_Not_Enabled()
@@ -41,6 +42,27 @@ public class ScheduledPublishingJobTests
         await sut.ExecuteAsync();
         VerifyScheduledPublishingPerformed();
         VerifyElementScheduledPublishingPerformed();
+    }
+
+    [Test]
+    public async Task Completes_Scope_After_Performing_Scheduled_Publishing()
+    {
+        var sut = CreateScheduledPublishing();
+        await sut.ExecuteAsync();
+        _mockScope.Verify(x => x.Complete(), Times.Once);
+    }
+
+    [Test]
+    public async Task Does_Not_Complete_Scope_When_Scheduled_Publishing_Throws()
+    {
+        var sut = CreateScheduledPublishing();
+        _mockContentService
+            .Setup(x => x.PerformScheduledPublish(It.IsAny<DateTime>()))
+            .Throws<InvalidOperationException>();
+
+        await sut.ExecuteAsync();
+
+        _mockScope.Verify(x => x.Complete(), Times.Never);
     }
 
     [Test]
@@ -83,6 +105,7 @@ public class ScheduledPublishingJobTests
 
         var mockServerMessenger = new Mock<IServerMessenger>();
 
+        _mockScope = new Mock<ICoreScope>();
         var mockScopeProvider = new Mock<ICoreScopeProvider>();
         mockScopeProvider
             .Setup(x => x.CreateCoreScope(
@@ -93,7 +116,7 @@ public class ScheduledPublishingJobTests
                 It.IsAny<bool?>(),
                 It.IsAny<bool>(),
                 It.IsAny<bool>()))
-            .Returns(Mock.Of<IScope>());
+            .Returns(_mockScope.Object);
 
         var scheduledPublishingSettings =
             Mock.Of<IOptionsMonitor<ScheduledPublishingSettings>>(x => x.CurrentValue == (settings ?? new ScheduledPublishingSettings()));

@@ -243,6 +243,10 @@ export class MemberTypeApiHelper {
   // Folder
   async getFolder(id: string) {
     const response = await this.api.get(this.api.baseUrl + ConstantHelper.apiEndpoints.memberTypeFolder + '/' + id);
+    if (!response.ok()) {
+      return null;
+    }
+
     return await response.json();
   }
 

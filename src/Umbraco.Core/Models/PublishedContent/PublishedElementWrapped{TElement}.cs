@@ -62,6 +62,9 @@ public abstract class PublishedElementWrapped<TElement> : IPublishedElement
     /// <inheritdoc />
     public virtual bool IsPublished(string? culture = null) => _content.IsPublished(culture);
 
+    /// <inheritdoc />
+    public virtual int? OwningContentId => _content.OwningContentId;
+
     /// <summary>
     ///     Gets the wrapped content.
     /// </summary>

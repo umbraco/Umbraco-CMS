@@ -252,6 +252,7 @@ ASP.NET Core Identity sign-in manager for members.
 **Result Types** (lines 320-348):
 - `ExternalLoginSignInResult.NotAllowed` - Login refused by callback
 - `AutoLinkSignInResult.FailedNoEmail` - No email from provider
+- `AutoLinkSignInResult.FailedNoName` - No name from provider when creating a new account
 - `AutoLinkSignInResult.FailedCreatingUser` - User creation failed
 - `AutoLinkSignInResult.FailedLinkingUser` - Link creation failed
 
@@ -264,10 +265,11 @@ ASP.NET Core Identity sign-in manager for members.
 - Debug mode: Rethrows exception for stack trace
 - Production: Shows `BootFailed.html` error page
 
-**PreviewAuthenticationMiddleware** (lines 22-84):
+**PreviewAuthenticationMiddleware** (lines 14-75):
 - Adds backoffice identity to principal for preview requests
 - Skips client-side requests and backoffice paths
-- Uses `IPreviewService.TryGetPreviewClaimsIdentityAsync()`
+- Re-authenticates the request against the backoffice cookie scheme (`context.AuthenticateAsync(Constants.Security.BackOfficeAuthenticationType)`) — preview no longer carries its own token/identity, it rides the backoffice's long-lived auth cookie
+- On success, flags the request as an active preview session via `IPreviewSessionService.Start()` (in `Umbraco.Core`) — `PublishedContentStatusFilteringService` and the HybridCache document/element services read this back via `IsActive()` to decide draft vs. published content
 
 **UmbracoBackOfficeCacheHeadersMiddleware**:
 - Sets `Cache-Control: public, max-age=31536000, immutable` on responses under the cache-busted backoffice asset prefix (`/umbraco/backoffice/<hash>/…`); `no-cache` in debug mode

@@ -34,7 +34,7 @@ internal sealed class ExternalLoginProviderStartupHandler : INotificationAsyncHa
     public async Task HandleAsync(UmbracoApplicationStartingNotification notification, CancellationToken cancellationToken)
     {
         if (_runtimeState.Level != RuntimeLevel.Run ||
-            _serverRoleAccessor.CurrentServerRole == ServerRole.Subscriber)
+            _serverRoleAccessor.CurrentServerRole is ServerRole.Subscriber or ServerRole.Unknown)
         {
             return;
         }

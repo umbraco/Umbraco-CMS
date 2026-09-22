@@ -82,7 +82,7 @@ internal class ScheduledPublishingJob : IDistributedBackgroundJob
             //    but then what should be its "scope"? could we attach it to scopes?
             // - and we should definitively *not* have to flush it here (should be auto)
             using UmbracoContextReference contextReference = _umbracoContextFactory.EnsureUmbracoContext();
-            using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
+            using ICoreScope scope = _scopeProvider.CreateCoreScope();
 
             /* We used to assume that there will never be two instances running concurrently where (IsMainDom && ServerRole == SchedulingPublisher)
              * However this is possible during an azure deployment slot swap for the SchedulingPublisher instance when trying to achieve zero downtime deployments.
@@ -96,6 +96,8 @@ internal class ScheduledPublishingJob : IDistributedBackgroundJob
 
                 PerformScheduledPublish(_contentService, Constants.UdiEntityType.Document, date);
                 PerformScheduledPublish(_elementService, Constants.UdiEntityType.Element, date);
+
+                scope.Complete();
             }
             finally
             {
