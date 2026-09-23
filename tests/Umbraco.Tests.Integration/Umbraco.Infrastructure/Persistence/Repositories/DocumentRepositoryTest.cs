@@ -1521,6 +1521,40 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
             "GetChildrenAsync must populate TemplateId for content with a template assigned");
     }
 
+    /// <summary>
+    ///     Saving a draft over a published document updates the existing draft version rather than adding one,
+    ///     so version history does not grow on every save.
+    /// </summary>
+    [Test]
+    public async Task SaveAsync_OfAPublishedDocument_DoesNotCreateANewVersionRow()
+    {
+        var scopeAccessor = GetRequiredService<IEFCoreScopeAccessor<UmbracoDbContext>>();
+
+        IContent page = ContentBuilder.CreateSimpleContent(_contentType, "Version Row Count");
+        await ContentService.SaveAsync(page, Constants.Security.SuperUserKey, null, CancellationToken.None);
+        PublishResult publish = await ContentService.PublishAsync(
+            page, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
+        Assert.That(publish.Success, Is.True, "guard: the document must be published");
+
+        using var scope = NewScopeProvider.CreateScope();
+        var countBefore = await scopeAccessor.AmbientScope!.ExecuteWithContextAsync(db =>
+            db.ContentVersions.CountAsync(version => version.NodeId == page.Id));
+
+        page.SetValue("title", "edited once");
+        await ContentService.SaveAsync(page, Constants.Security.SuperUserKey, null, CancellationToken.None);
+        page.SetValue("title", "edited twice");
+        await ContentService.SaveAsync(page, Constants.Security.SuperUserKey, null, CancellationToken.None);
+
+        var countAfter = await scopeAccessor.AmbientScope!.ExecuteWithContextAsync(db =>
+            db.ContentVersions.CountAsync(version => version.NodeId == page.Id));
+        scope.Complete();
+
+        Assert.That(
+            countAfter,
+            Is.EqualTo(countBefore),
+            "each draft save must reuse the current version row rather than add one");
+    }
+
     [Test]
     public async Task GetDescendantsAsync_WithDescendants_ReturnsAllDescendants()
     {
