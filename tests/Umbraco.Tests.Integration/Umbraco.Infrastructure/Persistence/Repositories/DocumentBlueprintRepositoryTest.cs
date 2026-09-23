@@ -40,9 +40,16 @@ internal sealed class DocumentBlueprintRepositoryTest : UmbracoIntegrationTest
         await ContentService.SaveAsync(_textpage, Constants.Security.SuperUserKey, null, CancellationToken.None);
     }
 
-    private DocumentBlueprintRepository CreateRepository() => new(
+    private static AppCaches CreateRealAppCaches() => new(
+        new DeepCloneAppCache(new ObjectCacheAppCache()),
+        new DictionaryAppCache(),
+        new IsolatedCaches(_ => new DeepCloneAppCache(new ObjectCacheAppCache())));
+
+    private DocumentBlueprintRepository CreateRepository() => CreateRepository(AppCaches.Disabled);
+
+    private DocumentBlueprintRepository CreateRepository(AppCaches appCaches) => new(
         GetRequiredService<IEFCoreScopeAccessor<UmbracoDbContext>>(),
-        AppCaches.Disabled,
+        appCaches,
         LoggerFactory,
         GetRequiredService<ILanguageRepository>(),
         GetRequiredService<IRelationRepository>(),
@@ -60,9 +67,11 @@ internal sealed class DocumentBlueprintRepositoryTest : UmbracoIntegrationTest
         GetRequiredService<IJsonSerializer>(),
         GetRequiredService<IShortStringHelper>());
 
-    private DocumentRepository CreateDocumentRepository() => new(
+    private DocumentRepository CreateDocumentRepository() => CreateDocumentRepository(AppCaches.Disabled);
+
+    private DocumentRepository CreateDocumentRepository(AppCaches appCaches) => new(
         GetRequiredService<IEFCoreScopeAccessor<UmbracoDbContext>>(),
-        AppCaches.Disabled,
+        appCaches,
         LoggerFactory,
         GetRequiredService<ILanguageRepository>(),
         GetRequiredService<IRelationRepository>(),
@@ -141,4 +150,26 @@ internal sealed class DocumentBlueprintRepositoryTest : UmbracoIntegrationTest
                 "a document blueprint must not be returned by a plain document repository's child query");
         });
     }
+    [Test]
+    public async Task GetAsync_OnPlainDocumentRepository_DoesNotServeACachedBlueprint()
+    {
+        AppCaches caches = CreateRealAppCaches();
+        var blueprint = ContentBuilder.CreateSimpleContent(_contentType, "Cached Blueprint", _textpage.Id);
+
+        using var scope = NewScopeProvider.CreateScope();
+        var blueprintRepository = CreateRepository(caches);
+        var documentRepository = CreateDocumentRepository(caches);
+
+        await blueprintRepository.SaveAsync(blueprint, CancellationToken.None);
+        await blueprintRepository.GetAsync(blueprint.Key, CancellationToken.None);
+
+        IContent? asDocument = await documentRepository.GetAsync(blueprint.Key, CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(
+            asDocument,
+            Is.Null,
+            "a blueprint cached by the blueprint repository must not be served as a document");
+    }
+
 }

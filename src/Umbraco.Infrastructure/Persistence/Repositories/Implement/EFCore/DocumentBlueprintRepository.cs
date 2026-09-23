@@ -84,5 +84,12 @@ internal sealed class DocumentBlueprintRepository : DocumentRepository, IDocumen
     protected override bool EnsureUniqueNaming => false; // duplicates are allowed
 
     /// <inheritdoc />
+    /// <remarks>
+    ///     Blueprints are IContent too, so without a prefix of their own they would share the document
+    ///     repository's cache entries and each could be served in place of the other.
+    /// </remarks>
+    protected override string EntityTypeCacheKeyPrefix => RepositoryCacheKeys.GetGuidKey<IContent>() + "Blueprint_";
+
+    /// <inheritdoc />
     protected override Guid NodeObjectTypeKey => Constants.ObjectTypes.DocumentBlueprint;
 }

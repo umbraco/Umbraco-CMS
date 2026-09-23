@@ -32,18 +32,22 @@ internal sealed class AsyncGuidReadRepositoryCachePolicy<TEntity> : AsyncDefault
     /// <summary>
     ///     Initializes a new instance of the <see cref="AsyncGuidReadRepositoryCachePolicy{TEntity}"/> class.
     /// </summary>
+    /// <param name="entityTypeCacheKey">
+    ///     The cache key prefix to file entries under, for repositories that share an entity type with another
+    ///     and must not share its entries. Defaults to the prefix for <typeparamref name="TEntity" />.
+    /// </param>
     public AsyncGuidReadRepositoryCachePolicy(
         IAppPolicyCache cache,
         IScopeAccessor scopeAccessor,
         AsyncRepositoryCachePolicyOptions options,
         IRepositoryCacheVersionService repositoryCacheVersionService,
-        ICacheSyncService cacheSyncService)
-        : base(cache, scopeAccessor, options, repositoryCacheVersionService, cacheSyncService)
-    {
-    }
+        ICacheSyncService cacheSyncService,
+        string? entityTypeCacheKey = null)
+        : base(cache, scopeAccessor, options, repositoryCacheVersionService, cacheSyncService) =>
+        EntityTypeCacheKey = entityTypeCacheKey ?? RepositoryCacheKeys.GetGuidKey<TEntity>();
 
     /// <inheritdoc />
-    protected override string EntityTypeCacheKey { get; } = RepositoryCacheKeys.GetGuidKey<TEntity>();
+    protected override string EntityTypeCacheKey { get; }
 
     /// <inheritdoc />
     protected override string GetEntityCacheKey(TEntity entity) => GetEntityCacheKey(entity.Key);

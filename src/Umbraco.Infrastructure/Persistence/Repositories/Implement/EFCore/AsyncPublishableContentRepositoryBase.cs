@@ -226,7 +226,7 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
         // We need to flush the isolated cache by key explicitly here. The ContentCacheRefresher does the same
         // thing, but by the time it's invoked, custom notification handlers might have already consumed the
         // cached version. The insert and update paths flush for the same reason.
-        IsolatedCache.Clear(RepositoryCacheKeys.GetGuidKey<TEntity>(entity.Key));
+        IsolatedCache.Clear(EntityTypeCacheKeyPrefix + entity.Key);
 
         entity.DeleteDate = DateTime.UtcNow;
     }

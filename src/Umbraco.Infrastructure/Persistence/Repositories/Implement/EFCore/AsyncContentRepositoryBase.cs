@@ -121,7 +121,18 @@ internal abstract class AsyncContentRepositoryBase<TEntity, TRepository>
             ScopeAccessor,
             DefaultOptions,
             RepositoryCacheVersionService,
-            CacheSyncService);
+            CacheSyncService,
+            EntityTypeCacheKeyPrefix);
+
+    /// <summary>
+    ///     Gets the cache key prefix this repository files its entities under.
+    /// </summary>
+    /// <remarks>
+    ///     Two repositories over the same entity type would otherwise share one prefix, and each could serve
+    ///     entries the other cached. ContentCacheRefresher clears by prefix, so a longer prefix that starts
+    ///     with this one is still invalidated.
+    /// </remarks>
+    protected virtual string EntityTypeCacheKeyPrefix => RepositoryCacheKeys.GetGuidKey<TEntity>();
 
     /// <inheritdoc />
     public abstract Guid RecycleBinKey { get; }
