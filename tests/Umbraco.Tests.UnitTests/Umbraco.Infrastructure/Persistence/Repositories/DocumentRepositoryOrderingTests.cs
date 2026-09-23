@@ -121,4 +121,36 @@ internal sealed class DocumentRepositoryOrderingTests
         Assert.That(nodeIds, Is.EqualTo(new[] { 100, 200 }));
     }
 
+    [Test]
+    public void ApplyVariantNameOrdering_WithTiedNames_BreaksTieByAscendingNodeId()
+    {
+        // Every node whose culture has no variant name falls back to the same node.Text, so ties here are
+        // ordinary rather than exotic - and a database-backed test cannot reliably reproduce the source order
+        // that would expose a missing tiebreak.
+        var rows = new[]
+        {
+            new { Name = (string?)"Same", NodeId = 200 },
+            new { Name = (string?)"Same", NodeId = 100 },
+        }.AsQueryable();
+
+        var ascending = DocumentRepository
+            .ApplyVariantNameOrdering(rows, row => row.Name, row => row.NodeId, descending: false)
+            .Select(row => row.NodeId)
+            .ToList();
+
+        var descending = DocumentRepository
+            .ApplyVariantNameOrdering(rows, row => row.Name, row => row.NodeId, descending: true)
+            .Select(row => row.NodeId)
+            .ToList();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(ascending, Is.EqualTo(new[] { 100, 200 }));
+            Assert.That(
+                descending,
+                Is.EqualTo(new[] { 100, 200 }),
+                "the tiebreak stays ascending on node id even when the name ordering is descending");
+        });
+    }
+
 }

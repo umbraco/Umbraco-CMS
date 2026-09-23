@@ -1372,6 +1372,20 @@ internal class DocumentRepository
     private static string? UserNameById(IQueryable<UserDto> users, int? userId) =>
         users.Where(user => user.Id == userId).Select(user => user.UserName).FirstOrDefault();
 
+    // Ties in the variant name are common - every node falling back to node.Text shares one - so the node id
+    // breaks them, keeping paged results stable and non-duplicated across separate fetches. Mirrors NPoco's
+    // ContentRepositoryBase.PreparePageSql, which unconditionally appends "ORDER BY umbracoNode.id" after any
+    // user ordering (see http://issues.umbraco.org/issue/U4-8831). Internal so the tiebreak can be exercised
+    // directly against a sequence with tied names, which a database-backed test cannot reliably produce.
+    internal static IOrderedQueryable<TRow> ApplyVariantNameOrdering<TRow>(
+        IQueryable<TRow> source,
+        Expression<Func<TRow, string?>> variantNameSelector,
+        Expression<Func<TRow, int>> nodeIdSelector,
+        bool descending)
+        => descending
+            ? source.OrderByDescending(variantNameSelector).ThenBy(nodeIdSelector)
+            : source.OrderBy(variantNameSelector).ThenBy(nodeIdSelector);
+
     // The four typed PropertyData value columns, plus the SortableValue override some property editors
     // (e.g. IDataValueSortable) populate to take priority over the raw column. Mirrors the column
     // priority in ContentRepositoryBase.ApplyCustomOrdering (NPoco), but compares each with its native
@@ -1528,13 +1542,11 @@ internal class DocumentRepository
 
         bool descending = ordering.Direction == Direction.Descending;
 
-        // ThenBy NodeId breaks ties in variantName (e.g. many nodes sharing a fallback node.Text) so
-        // paged results stay stable/non-duplicated across separate fetches — mirrors NPoco's
-        // ContentRepositoryBase.PreparePageSql, which unconditionally appends "ORDER BY umbracoNode.id"
-        // after any user ordering (see http://issues.umbraco.org/issue/U4-8831).
-        var ordered = descending
-            ? withVariantName.OrderByDescending(joined => joined.variantName).ThenBy(joined => joined.joined.Node.NodeId)
-            : withVariantName.OrderBy(joined => joined.variantName).ThenBy(joined => joined.joined.Node.NodeId);
+        var ordered = ApplyVariantNameOrdering(
+            withVariantName,
+            joined => joined.variantName,
+            joined => joined.joined.Node.NodeId,
+            descending);
 
         return await ordered
             .Skip(skip)
