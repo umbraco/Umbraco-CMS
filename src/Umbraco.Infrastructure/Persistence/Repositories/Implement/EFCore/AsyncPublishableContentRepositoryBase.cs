@@ -223,9 +223,9 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
             return true;
         });
 
-        // The cache policy clears the entry keyed by the integer id, but reads here are keyed by Guid, so
-        // without this a deleted document keeps being served from cache. The insert and update paths already
-        // compensate the same way.
+        // We need to flush the isolated cache by key explicitly here. The ContentCacheRefresher does the same
+        // thing, but by the time it's invoked, custom notification handlers might have already consumed the
+        // cached version. The insert and update paths flush for the same reason.
         IsolatedCache.Clear(RepositoryCacheKeys.GetGuidKey<TEntity>(entity.Key));
 
         entity.DeleteDate = DateTime.UtcNow;
@@ -396,7 +396,11 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
                 }
             }
 
-            return entities;
+            // Scheduled publishing walks this sequence in order and needs a parent handled before its children.
+            // Each batch above is hydrated and returned on its own, so the ordering is applied once, here.
+            return entities
+                .OrderBy(entity => entity.Level)
+                .ThenBy(entity => entity.SortOrder);
         });
 
     /// <inheritdoc />
@@ -426,8 +430,7 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
         db.Nodes.Join(db.Set<TEntityDto>().Where(e => e.Published), n => n.NodeId, e => e.NodeId, (n, e) => n);
 
     /// <inheritdoc />
-    public virtual Task<bool> IsPathPublishedAsync(TEntity? content, CancellationToken cancellationToken) =>
-        throw new NotImplementedException();
+    public abstract Task<bool> IsPathPublishedAsync(TEntity? content, CancellationToken cancellationToken);
 
     /// <inheritdoc />
     public virtual Task<IDictionary<Guid, IEnumerable<ContentSchedule>>> GetContentSchedulesByKeysAsync(Guid[] contentKeys, CancellationToken cancellationToken)

@@ -117,10 +117,12 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
     ///     A cache that actually caches. The default is <see cref="AppCaches.Disabled" />, so a test that means to
     ///     exercise the repository cache policy must opt in explicitly - otherwise it passes whatever the policy does.
     /// </summary>
+    // Mirrors AppCaches.Create: the deep-cloning wrapper is what stops a cached entity being handed out as a
+    // live reference that callers can mutate, so a fixture without it observes aliasing production cannot.
     private static AppCaches CreateRealAppCaches() => new(
-        new ObjectCacheAppCache(),
+        new DeepCloneAppCache(new ObjectCacheAppCache()),
         new DictionaryAppCache(),
-        new IsolatedCaches(_ => new ObjectCacheAppCache()));
+        new IsolatedCaches(_ => new DeepCloneAppCache(new ObjectCacheAppCache())));
 
     private DocumentRepository CreateRepository() => CreateRepository(AppCaches.Disabled);
 
@@ -145,7 +147,6 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
         GetRequiredService<IIdKeyMap>(),
         GetRequiredService<ITagRepository>(),
         GetRequiredService<IJsonSerializer>(),
-        new Lazy<IUserGroupService>(GetRequiredService<IUserGroupService>),
         GetRequiredService<IShortStringHelper>());
 
     /// <summary>
@@ -239,6 +240,31 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
         Assert.That(commandCount, Is.Zero, "a cached read should issue no commands");
     }
 
+
+    /// <summary>
+    ///     The cache policy writes an entity to the cache as it persists it, so the next read is served without
+    ///     touching the database. That only holds if writes are keyed the way reads are - keying a write by the
+    ///     integer id under a Guid-keyed prefix files it where no read will ever look.
+    /// </summary>
+    [Test]
+    public async Task SaveAsync_CachesTheDocumentWhereGetAsyncLooksForIt()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository(CreateRealAppCaches());
+
+        IContent content = ContentBuilder.CreateSimpleContent(_contentType, "Cache Key Alignment", _textpage.Id);
+        await repository.SaveAsync(content, CancellationToken.None);
+
+        CommandCounter.Enabled = true;
+        CommandCounter.Reset();
+        IContent? afterSave = await repository.GetAsync(content.Key, CancellationToken.None);
+        var commandCount = CommandCounter.Count;
+        CommandCounter.Enabled = false;
+        scope.Complete();
+
+        Assert.That(afterSave, Is.Not.Null);
+        Assert.That(commandCount, Is.Zero, "the read after a save should be served from the entry the save wrote");
+    }
 
     [Test]
     public async Task GetAsync_WithExistingKey_ReturnsSingleDocument()

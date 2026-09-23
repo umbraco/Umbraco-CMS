@@ -184,6 +184,10 @@ internal abstract class AsyncContentRepositoryBase<TEntity, TRepository>
                 .Where(joined => joined.node.UniqueId == nodeKey)
                 .OrderByDescending(joined => joined.version.Current)
                 .ThenByDescending(joined => joined.version.VersionDate)
+                // Versions saved within the same clock tick share a VersionDate, so without an id tiebreak
+                // their relative order is whatever the provider happens to return - and paging over an
+                // unstable order can repeat or skip a version.
+                .ThenByDescending(joined => joined.version.Id)
                 .Skip(skip)
                 .Take(take)
                 .Select(joined => joined.version.Id)
