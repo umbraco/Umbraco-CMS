@@ -442,6 +442,7 @@ declare global {
 		codefile_deleteItemFailed: string;
 		collection_addCollectionConfiguration: string;
 		collection_cardViewLabel: string;
+		collection_gridViewLabel: string;
 		collection_listViewLabel: string;
 		collection_noItemsTitle: string;
 		collection_tableViewLabel: string;

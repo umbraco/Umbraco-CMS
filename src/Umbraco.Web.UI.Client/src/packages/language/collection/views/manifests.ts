@@ -10,7 +10,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		alias: UMB_LANGUAGE_TABLE_COLLECTION_VIEW_ALIAS,
 		name: 'Language Table Collection View',
 		meta: {
-			label: 'Table',
+			label: '#collection_tableViewLabel',
 			icon: 'icon-table',
 			pathName: 'table',
 			columns: [

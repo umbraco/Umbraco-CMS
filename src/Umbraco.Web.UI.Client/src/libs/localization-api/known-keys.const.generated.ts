@@ -415,6 +415,7 @@ export const KNOWN_LOCALIZATION_KEYS: readonly UmbKnownLocalizationKey[] = [
 	'codefile_deleteItemFailed',
 	'collection_addCollectionConfiguration',
 	'collection_cardViewLabel',
+	'collection_gridViewLabel',
 	'collection_listViewLabel',
 	'collection_noItemsTitle',
 	'collection_tableViewLabel',

@@ -256,6 +256,7 @@ export default {
 		noItemsTitle: 'No items',
 		addCollectionConfiguration: 'Add collection',
 		cardViewLabel: 'Cards',
+		gridViewLabel: 'Grid',
 		listViewLabel: 'List',
 		tableViewLabel: 'Table',
 	},
