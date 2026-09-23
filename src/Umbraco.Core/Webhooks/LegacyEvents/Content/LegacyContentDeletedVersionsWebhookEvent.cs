@@ -42,9 +42,14 @@ public class LegacyContentDeletedVersionsWebhookEvent : WebhookEventBase<Content
     public override string Alias => Constants.WebhookEvents.Aliases.ContentDeletedVersions;
 
     /// <inheritdoc />
-    public override object ConvertNotificationToRequestPayload(ContentDeletedVersionsNotification notification)
+    public override object? ConvertNotificationToRequestPayload(ContentDeletedVersionsNotification notification)
     {
+        // TODO (V20): await this once the webhook payload contract goes async.
         Attempt<int> attempt = _idKeyMap.GetIdForKeyAsync(notification.Key, UmbracoObjectTypes.Document).GetAwaiter().GetResult();
+        if (attempt.Success is false)
+        {
+            return null;
+        }
 
         return new
         {

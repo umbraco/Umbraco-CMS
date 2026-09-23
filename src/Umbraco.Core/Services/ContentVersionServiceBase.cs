@@ -134,10 +134,14 @@ internal abstract class ContentVersionServiceBase<TContent>
             return Attempt<ContentVersionOperationStatus>.Fail(ContentVersionOperationStatus.NotFound);
         }
 
-        Guid key = _entityService.GetKey(version.ContentId, ItemObjectType).Result;
+        Attempt<Guid> keyAttempt = _entityService.GetKey(version.ContentId, ItemObjectType);
+        if (keyAttempt.Success is false)
+        {
+            return Attempt<ContentVersionOperationStatus>.Fail(ContentVersionOperationStatus.ContentNotFound);
+        }
 
         Attempt<ContentRollbackOperationStatus> rollBackResult = await _asyncContentService.RollbackAsync(
-            key,
+            keyAttempt.Result,
             version.VersionId,
             culture ?? "*",
             userKey,
@@ -248,9 +252,17 @@ internal abstract class ContentVersionServiceBase<TContent>
             foreach (ContentVersionMeta version in filteredContentVersions)
             {
                 EventMessages messages = _eventMessagesFactory.Get();
-                Guid key = _entityService.GetKey(version.ContentId, ItemObjectType).Result;
+                Attempt<Guid> keyAttempt = _entityService.GetKey(version.ContentId, ItemObjectType);
+                if (keyAttempt.Success is false)
+                {
+                    _logger.LogWarning(
+                        "Could not resolve a key for content [{ContentId}], skipping cleanup of ContentVersion [{VersionId}]",
+                        version.ContentId,
+                        version.VersionId);
+                    continue;
+                }
 
-                if (scope.Notifications.PublishCancelable(DeletingVersionsNotification(key, messages, version.VersionId)))
+                if (scope.Notifications.PublishCancelable(DeletingVersionsNotification(keyAttempt.Result, messages, version.VersionId)))
                 {
                     if (_logger.IsEnabled(LogLevel.Debug))
                     {
@@ -292,9 +304,13 @@ internal abstract class ContentVersionServiceBase<TContent>
                 foreach (ContentVersionMeta version in groupEnumerated)
                 {
                     EventMessages messages = _eventMessagesFactory.Get();
-                    Guid key = _entityService.GetKey(version.ContentId, ItemObjectType).Result;
+                    Attempt<Guid> keyAttempt = _entityService.GetKey(version.ContentId, ItemObjectType);
+                    if (keyAttempt.Success is false)
+                    {
+                        continue;
+                    }
 
-                    scope.Notifications.Publish(DeletedVersionsNotification(key, messages, version.VersionId));
+                    scope.Notifications.Publish(DeletedVersionsNotification(keyAttempt.Result, messages, version.VersionId));
                 }
 
                 scope.Complete();
