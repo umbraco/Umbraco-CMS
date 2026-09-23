@@ -206,12 +206,12 @@ export class ContentUiHelper extends UiBaseLocators {
   private readonly cardContentNode: Locator;
   private readonly documentPickerModal: Locator;
   private readonly collectionCardInDocumentPickerModal: Locator;
-  private readonly treeViewSwitchBtn: Locator;
-  private readonly treeViewClassicOptionBtn: Locator;
-  private readonly treeViewTableOptionBtn: Locator;
-  private readonly treeTableView: Locator;
-  private readonly treeTableRow: Locator;
-  private readonly selectableTreeTableRow: Locator;
+  private readonly treeViewSwitchBtnInPickerModal: Locator;
+  private readonly treeViewClassicOptionBtnInPickerModal: Locator;
+  private readonly treeViewTableOptionBtnInPickerModal: Locator;
+  private readonly treeTableViewInPickerModal: Locator;
+  private readonly treeTableRowInPickerModal: Locator;
+  private readonly selectableTreeTableRowInPickerModal: Locator;
   private readonly containerSetupBtn: Locator;
   private readonly containerEditBtn: Locator;
   private readonly loginPageSelectedItem: Locator;
@@ -450,13 +450,13 @@ export class ContentUiHelper extends UiBaseLocators {
     this.documentPickerModal = page.locator('umb-document-picker-modal');
     this.collectionCardInDocumentPickerModal = this.documentPickerModal.locator('uui-card-content-node');
     // Tree View (Browse tab of a picker, not a collection)
-    this.treeViewSwitchBtn = page.locator('[data-mark="tree:switch-view"]');
+    this.treeViewSwitchBtnInPickerModal = this.sidebarModal.locator('[data-mark="tree:switch-view"]');
     // The alias suffix (Classic/Table) is stable across entity types, but the entity segment isn't, so match on suffix only.
-    this.treeViewClassicOptionBtn = page.locator('[data-mark^="tree:switch-view:"][data-mark$=".Classic"]');
-    this.treeViewTableOptionBtn = page.locator('[data-mark^="tree:switch-view:"][data-mark$=".Table"]');
-    this.treeTableView = page.locator('umb-table-tree-view');
-    this.treeTableRow = this.sidebarModal.locator('umb-table-tree-view uui-table-row');
-    this.selectableTreeTableRow = this.sidebarModal.locator('umb-table-tree-view uui-table-row[selectable]');
+    this.treeViewClassicOptionBtnInPickerModal = this.sidebarModal.locator('[data-mark^="tree:switch-view:"][data-mark$=".Classic"]');
+    this.treeViewTableOptionBtnInPickerModal = this.sidebarModal.locator('[data-mark^="tree:switch-view:"][data-mark$=".Table"]');
+    this.treeTableViewInPickerModal = this.sidebarModal.locator('umb-table-tree-view');
+    this.treeTableRowInPickerModal = this.sidebarModal.locator('umb-table-tree-view uui-table-row');
+    this.selectableTreeTableRowInPickerModal = this.sidebarModal.locator('umb-table-tree-view uui-table-row[selectable]');
     // Public Access
     this.containerSetupBtn = this.container.getByLabel('Setup');
     this.containerEditBtn = this.container.getByLabel('Edit');
@@ -2190,29 +2190,29 @@ export class ContentUiHelper extends UiBaseLocators {
   }
 
   async changeTreeToTableView() {
-    await this.click(this.treeViewSwitchBtn);
-    await this.click(this.treeViewTableOptionBtn);
+    await this.click(this.treeViewSwitchBtnInPickerModal);
+    await this.click(this.treeViewTableOptionBtnInPickerModal);
   }
 
   async changeTreeToTreeView() {
-    await this.click(this.treeViewSwitchBtn);
-    await this.click(this.treeViewClassicOptionBtn);
+    await this.click(this.treeViewSwitchBtnInPickerModal);
+    await this.click(this.treeViewClassicOptionBtnInPickerModal);
   }
 
   async isTreeTableViewVisible(isVisible: boolean = true) {
-    await this.isVisible(this.treeTableView, isVisible);
+    await this.isVisible(this.treeTableViewInPickerModal, isVisible);
   }
 
   async clickOpenButtonInTreeTableRowWithName(name: string) {
-    await this.click(this.treeTableRow.filter({hasText: name}).locator('[data-mark="table-row:open"]'));
+    await this.click(this.treeTableRowInPickerModal.filter({hasText: name}).locator('[data-mark="table-row:open"]'));
   }
 
   async selectTreeTableRowWithName(name: string) {
-    await this.click(this.treeTableRow.filter({hasText: name}));
+    await this.click(this.treeTableRowInPickerModal.filter({hasText: name}));
   }
 
   async isTreeTableRowSelectableForName(name: string, isSelectable: boolean = true) {
-    await this.hasCount(this.selectableTreeTableRow.filter({hasText: name}), isSelectable ? 1 : 0);
+    await this.hasCount(this.selectableTreeTableRowInPickerModal.filter({hasText: name}), isSelectable ? 1 : 0);
   }
 
   async selectContentCardWithName(contentName: string) {
