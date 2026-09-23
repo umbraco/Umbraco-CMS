@@ -1,12 +1,11 @@
-import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { ServerService } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbBasicState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbExtensionsManifestInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { UmbSysinfoRepository } from '@umbraco-cms/backoffice/sysinfo';
 import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
+import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 import type { ManifestSection } from '@umbraco-cms/backoffice/section';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbExtensionManifestInitializer } from '@umbraco-cms/backoffice/extension-api';
@@ -25,7 +24,11 @@ export class UmbBackofficeContext extends UmbContextBase {
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_BACKOFFICE_CONTEXT);
 
-		this.#getVersion();
+		this.consumeContext(UMB_SERVER_CONTEXT, (serverContext) => {
+			this.observe(serverContext?.serverInformation, (info) => {
+				this.#setVersion(info?.version);
+			});
+		});
 
 		this.consumeContext(UMB_CURRENT_USER_CONTEXT, (userContext) => {
 			this.observe(
@@ -49,15 +52,16 @@ export class UmbBackofficeContext extends UmbContextBase {
 		});
 	}
 
-	async #getVersion() {
-		const { data } = await tryExecute(this._host, ServerService.getServerInformation(), { disableNotifications: true });
-		if (!data) return;
-
+	#setVersion(rawVersion?: string) {
+		if (!rawVersion) {
+			this.#version.setValue(undefined);
+			return;
+		}
 		// A quick semver parser (to remove the unwanted bits) [LK]
 		// https://semver.org/#is-there-a-suggested-regular-expression-regex-to-check-a-semver-string
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		const [semVer, major, minor, patch, prerelease, buildmetadata] =
-			data.version.match(
+			rawVersion.match(
 				/^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$/,
 			) ?? [];
 

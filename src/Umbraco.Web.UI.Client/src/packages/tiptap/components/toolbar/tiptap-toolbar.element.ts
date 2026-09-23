@@ -37,6 +37,9 @@ export class UmbTiptapToolbarElement extends UmbLitElement {
 	@property({ attribute: false })
 	toolbar: UmbTiptapToolbarValue = [[[]]];
 
+	@property({ type: Boolean, reflect: true })
+	scrolling = false;
+
 	override connectedCallback(): void {
 		super.connectedCallback();
 		this.#attached = true;
@@ -124,7 +127,9 @@ export class UmbTiptapToolbarElement extends UmbLitElement {
 			right: 0;
 			padding: var(--uui-size-3);
 			z-index: 9999999;
+		}
 
+		:host([scrolling]) {
 			box-shadow:
 				0 2px 2px -2px rgba(34, 47, 62, 0.1),
 				0 8px 8px -4px rgba(34, 47, 62, 0.07);

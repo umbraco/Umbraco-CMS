@@ -56,8 +56,15 @@ public interface IAsyncContentTypeBaseService<TItem> : IService
     Task<IEnumerable<TItem>> GetDescendantsAsync(int id, bool andSelf);
 
     /// <summary>
-    ///     Gets all content types that are composed of a given content type (composition axis).
+    ///     Gets all content types that are composed of a given content type (both composition users and inheritance children).
     /// </summary>
+    /// <param name="id">The identifier of the composition content type.</param>
+    /// <returns>A collection of content types that use the specified composition.</returns>
+    /// <remarks>
+    ///     To restrict the result to a single relationship kind use the
+    ///     <see cref="Umbraco.Extensions.ContentTypeServiceExtensions.GetComposedOfAsync{TItem}(IAsyncContentTypeBaseService{TItem}, int, ComposedOfType)" />
+    ///     extension.
+    /// </remarks>
     Task<IEnumerable<TItem>> GetComposedOfAsync(int id);
 
     /// <summary>
