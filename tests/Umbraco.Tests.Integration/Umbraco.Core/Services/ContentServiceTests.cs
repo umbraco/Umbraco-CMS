@@ -1165,6 +1165,26 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     }
 
     [Test]
+    public async Task Saving_A_New_Document_Populates_Its_ParentKey()
+    {
+        // Constructed from a raw parent id, so the parent's key is unknown until the write path resolves it -
+        // unlike SetParent, which captures it from a parent entity already in memory.
+        Content child = ContentBuilder.CreateSimpleContent(ContentType, "Child", Textpage.Id);
+        Assert.That(child.TryGetParentKey(out _), Is.False, "guard: the key must be unknown before saving");
+
+        await ContentService.SaveAsync(child, Constants.Security.SuperUserKey, null, CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(child.TryGetParentKey(out Guid? parentKey), Is.True);
+            Assert.That(
+                parentKey,
+                Is.EqualTo(Textpage.Key),
+                "the write path must populate ParentKey, rather than leave the saved entity needing a lookup");
+        });
+    }
+
+    [Test]
     public async Task GetParentAsync_ByEntity_Uses_Content_ParentKey_Without_Calling_IIdKeyMap()
     {
         var idKeyMapSpy = (SpyIdKeyMap)IdKeyMap;

@@ -120,7 +120,9 @@ public class AddDomainWarningsWhenPublishingNotificationHandler : INotificationA
     {
         if (content?.ParentId is not -1 && content?.HasIdentity is false)
         {
-            content = content.ParentKey is null ? null : await _contentService.GetByIdAsync(content.ParentKey.Value, cancellationToken);
+            content = content.TryGetParentKey(out Guid? parentKey)
+                ? parentKey is null ? null : await _contentService.GetByIdAsync(parentKey.Value, cancellationToken)
+                : await GetByIdAsync(content.ParentId, cancellationToken);
         }
 
         if (content?.ParentId == -1)

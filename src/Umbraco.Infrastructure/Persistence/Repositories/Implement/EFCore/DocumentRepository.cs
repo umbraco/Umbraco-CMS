@@ -257,6 +257,7 @@ internal class DocumentRepository
                     item.Path = string.Concat(parent.Path, ",", item.Id);
                     item.Level = parent.Level + 1;
                     item.SortOrder = await GetNewChildSortOrderAsync(db, item.ParentId, 0);
+                    item.ParentKey = ResolveParentKey(item.ParentId, parent);
                 }
             }
 
@@ -2109,7 +2110,14 @@ internal class DocumentRepository
         item.Path = nodeDto.Path;
         item.SortOrder = sortOrder;
         item.Level = level;
+        item.ParentKey = ResolveParentKey(item.ParentId, parent);
     }
+
+    // Root's node row exists (umbracoNode id -1) but carries Constants.System.RootSystemKey, not the
+    // semantic "no parent" value ParentKey contracts to, so its key must not be taken from the row. Every
+    // other parent - the recycle bin included - carries the key the contract expects.
+    private static Guid? ResolveParentKey(int parentId, NodeDto parent) =>
+        parentId == Constants.System.Root ? null : parent.UniqueId;
 
     private static async Task PersistNewContentAsync(UmbracoDbContext db, IContent item, DocumentDto dto)
     {

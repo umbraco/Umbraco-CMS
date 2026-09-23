@@ -105,27 +105,27 @@ internal sealed class SystemFieldsContentIndexer : ISystemFieldsContentIndexer
 
         // content is normally hydrated via a repository read path, which already populates ParentKey -
         // fall back to IIdKeyMap only for the rare caller-supplied entity that hasn't gone through one.
-        try
+        // ParentId is positive here, so a populated key is necessarily a real one; anything else falls through.
+        if (content.TryGetParentKey(out Guid? parentKey) && parentKey.HasValue)
         {
-            parentId = content.ParentKey!;
+            parentId = parentKey.Value;
             return true;
         }
-        catch (NotSupportedException)
-        {
-            Attempt<Guid> parentKeyAttempt = _idKeyMap.GetKeyForIdAsync(content.ParentId, objectType).GetAwaiter().GetResult();
-            if (parentKeyAttempt.Success is false)
-            {
-                _logger.LogWarning(
-                    "Could not resolve parent key for parent ID {parentId} - aborting indexing of content item {contentKey}.",
-                    content.ParentId,
-                    content.Key);
-                parentId = null;
-                return false;
-            }
 
-            parentId = parentKeyAttempt.Result;
-            return true;
+        // TODO (V20): await this once the indexer contract goes async.
+        Attempt<Guid> parentKeyAttempt = _idKeyMap.GetKeyForIdAsync(content.ParentId, objectType).GetAwaiter().GetResult();
+        if (parentKeyAttempt.Success is false)
+        {
+            _logger.LogWarning(
+                "Could not resolve parent key for parent ID {parentId} - aborting indexing of content item {contentKey}.",
+                content.ParentId,
+                content.Key);
+            parentId = null;
+            return false;
         }
+
+        parentId = parentKeyAttempt.Result;
+        return true;
     }
 
     private bool TryGetPathIds(IContentBase content, UmbracoObjectTypes objectType, out IList<Guid> pathIds)

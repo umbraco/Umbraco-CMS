@@ -24,6 +24,12 @@ public interface IContentBase : IUmbracoEntity, IRememberBeingDirty
     ///         when this entity is a direct child of a recycle bin pseudo-node.
     ///     </para>
     ///     <para>
+    ///         Is also <c>null</c> when the parent's key is not known - for instance on an entity constructed
+    ///         from a raw parent id alone, where resolving a real parent's key would require a database
+    ///         round-trip. That is indistinguishable here from being at the root; use
+    ///         <see cref="TryGetParentKey" /> to tell the two apart.
+    ///     </para>
+    ///     <para>
     ///         Implementations populate and maintain this value directly - at repository hydration time, and
     ///         whenever <see cref="ITreeEntity.ParentId" /> or <see cref="ITreeEntity.SetParent" /> change it -
     ///         so reading it never requires a database round-trip. The setter exists for repository read paths
@@ -34,6 +40,19 @@ public interface IContentBase : IUmbracoEntity, IRememberBeingDirty
     ///     </para>
     /// </remarks>
     Guid? ParentKey { get; set; }
+
+    /// <summary>
+    ///     Gets the key of the parent entity, reporting whether it is known.
+    /// </summary>
+    /// <param name="parentKey">
+    ///     When this method returns <c>true</c>, the parent's key - which is <c>null</c> when this entity is at
+    ///     the root. When it returns <c>false</c>, <c>null</c>.
+    /// </param>
+    /// <returns>
+    ///     <c>true</c> when the parent's key is known, either because it has been populated or because it can be
+    ///     inferred from <see cref="ITreeEntity.ParentId" /> alone; otherwise <c>false</c>.
+    /// </returns>
+    bool TryGetParentKey(out Guid? parentKey);
 
     /// <summary>
     ///     Integer Id of the default ContentType

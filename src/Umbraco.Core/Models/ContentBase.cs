@@ -90,52 +90,18 @@ public abstract class ContentBase : TreeEntityBase, IContentBase
     public int VersionId { get; set; }
 
     /// <inheritdoc cref="IContentBase.ParentKey" />
-    /// <exception cref="NotSupportedException">
-    ///     Thrown when the parent is a real (non-root, non-recycle-bin) entity whose key has not been
-    ///     populated - see the remarks below.
-    /// </exception>
     /// <remarks>
     ///     Once explicitly populated (via the setter, or <see cref="SetParent" />), that value is returned
     ///     as-is. Until then - e.g. for an entity freshly constructed via the raw <c>parentId</c> constructor,
     ///     where only an int parent id is known - the root and recycle-bin pseudo-parents are inferred from
     ///     <see cref="ParentId" /> alone; any other (real) parent's key cannot be known without an external
-    ///     lookup, so this throws <see cref="NotSupportedException" /> rather than reach for an ambient service
-    ///     locator to perform one. Callers that hit this must populate the value themselves first, via the
-    ///     repository read path or <see cref="SetParent" /> with the parent object in memory.
+    ///     lookup, so this reads as <c>null</c> rather than reach for an ambient service locator to perform one.
+    ///     Callers that must distinguish that from being at the root use <see cref="TryGetParentKey" />.
     /// </remarks>
     [DataMember]
     public Guid? ParentKey
     {
-        get
-        {
-            if (_hasParentKey)
-            {
-                return _parentKey;
-            }
-
-            if (ParentId == Constants.System.Root)
-            {
-                return Constants.System.RootKey;
-            }
-
-            Guid? recycleBinKey = this switch
-            {
-                IContent when ParentId == Constants.System.RecycleBinContent => Constants.System.RecycleBinContentKey,
-                IMedia when ParentId == Constants.System.RecycleBinMedia => Constants.System.RecycleBinMediaKey,
-                IElement when ParentId == Constants.System.RecycleBinElement => Constants.System.RecycleBinElementKey,
-                _ => null,
-            };
-
-            if (recycleBinKey.HasValue)
-            {
-                return recycleBinKey;
-            }
-
-            throw new NotSupportedException(
-                $"{nameof(ParentKey)} is not available for parent id {ParentId}: it can only be resolved from " +
-                "ParentId alone for the root and recycle-bin pseudo-parents. Populate ParentKey via the " +
-                "repository read path or SetParent before reading it.");
-        }
+        get => TryGetParentKey(out Guid? parentKey) ? parentKey : null;
 
         set
         {
@@ -162,24 +128,41 @@ public abstract class ContentBase : TreeEntityBase, IContentBase
     }
 
     /// <inheritdoc />
+    public bool TryGetParentKey(out Guid? parentKey)
+    {
+        if (_hasParentKey)
+        {
+            parentKey = _parentKey;
+            return true;
+        }
+
+        if (ParentId == Constants.System.Root)
+        {
+            parentKey = Constants.System.RootKey;
+            return true;
+        }
+
+        Guid? recycleBinKey = this switch
+        {
+            IContent when ParentId == Constants.System.RecycleBinContent => Constants.System.RecycleBinContentKey,
+            IMedia when ParentId == Constants.System.RecycleBinMedia => Constants.System.RecycleBinMediaKey,
+            IElement when ParentId == Constants.System.RecycleBinElement => Constants.System.RecycleBinElementKey,
+            _ => null,
+        };
+
+        parentKey = recycleBinKey;
+        return recycleBinKey.HasValue;
+    }
+
+    /// <inheritdoc />
     public override void SetParent(ITreeEntity? parent)
     {
         base.SetParent(parent);
 
         // Eagerly capture the parent's key: Key is always available in memory, even for an unsaved parent
-        // (unlike Id, which ParentId's getter defers resolving until the parent is persisted). A non-null
-        // parent that isn't an IContentBase carries no key to capture - leave ParentKey unresolved rather
-        // than silently treat it as root.
-        if (parent is null or IContentBase)
-        {
-            _parentKey = (parent as IContentBase)?.Key;
-            _hasParentKey = true;
-        }
-        else
-        {
-            _parentKey = null;
-            _hasParentKey = false;
-        }
+        // (unlike Id, which ParentId's getter defers resolving until the parent is persisted).
+        _parentKey = parent?.Key;
+        _hasParentKey = true;
     }
 
     /// <summary>

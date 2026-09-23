@@ -388,12 +388,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
         }
 
         // not trashed and has a parent: publishable if the parent is path-published
-        Guid? parentKey;
-        try
-        {
-            parentKey = content.ParentKey;
-        }
-        catch (NotSupportedException)
+        if (content.TryGetParentKey(out Guid? parentKey) is false)
         {
             Attempt<Guid> parentKeyAttempt = await _idKeyMap.GetKeyForIdAsync(content.ParentId, UmbracoObjectTypes.Document);
             parentKey = parentKeyAttempt.Success ? parentKeyAttempt.Result : null;
