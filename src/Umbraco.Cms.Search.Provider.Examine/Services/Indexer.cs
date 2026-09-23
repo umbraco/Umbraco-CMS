@@ -125,17 +125,7 @@ public class Indexer : IExamineIndexer
     /// <param name="toMerge">The IndexValue to merge into the original.</param>
     /// <returns>A new IndexValue containing the merged values.</returns>
     protected virtual IndexValue MergeIndexValue(IndexValue original, IndexValue toMerge) =>
-        new()
-        {
-            Keywords = MergeValues(original.Keywords, toMerge.Keywords),
-            Integers = MergeValues(original.Integers, toMerge.Integers),
-            Decimals = MergeValues(original.Decimals, toMerge.Decimals),
-            DateTimeOffsets = MergeValues(original.DateTimeOffsets, toMerge.DateTimeOffsets),
-            Texts = MergeValues(original.Texts, toMerge.Texts),
-            TextsR1 = MergeValues(original.TextsR1, toMerge.TextsR1),
-            TextsR2 = MergeValues(original.TextsR2, toMerge.TextsR2),
-            TextsR3 = MergeValues(original.TextsR3, toMerge.TextsR3),
-        };
+        original.Merge(toMerge);
 
     /// <summary>
     /// Merges two value collections by concatenating and removing duplicates.
