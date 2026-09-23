@@ -4,7 +4,7 @@ import { UMB_USER_MANAGEMENT_SECTION_ALIAS } from '../../section/constants.js';
 import { UMB_EDIT_USER_WORKSPACE_PATH_PATTERN } from '../paths.js';
 import { css, customElement, html, ifDefined, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
+import { umbGenerateWorkspaceLink, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS } from '@umbraco-cms/backoffice/section';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
@@ -56,19 +56,25 @@ export class UmbUserItemRefElement extends UmbLitElement {
 			});
 	}
 
-	#getHref(item: UmbUserItemModel) {
-		if (!this._editPath) return;
-		const path = UMB_EDIT_USER_WORKSPACE_PATH_PATTERN.generateLocal({ unique: item.unique });
-		return `${this._editPath}/${path}`;
+	#getLink(item: UmbUserItemModel) {
+		if (!item.unique) return;
+		return umbGenerateWorkspaceLink({
+			pattern: UMB_EDIT_USER_WORKSPACE_PATH_PATTERN,
+			params: { unique: item.unique },
+			routePath: this._editPath,
+		});
 	}
 
 	override render() {
 		if (!this.item) return nothing;
 
+		const link = this.#getLink(this.item);
+
 		return html`
 			<uui-ref-node-user
 				name=${this.item.name}
-				href=${ifDefined(this.#getHref(this.item))}
+				href=${ifDefined(link?.href)}
+				target=${ifDefined(link?.target)}
 				?readonly=${this.readonly || !this._userHasSectionAccess}
 				?standalone=${this.standalone}>
 				<umb-user-avatar
@@ -78,11 +84,26 @@ export class UmbUserItemRefElement extends UmbLitElement {
 					.imgUrls=${this.item.avatarUrls}></umb-user-avatar>
 				<slot name="actions" slot="actions"></slot>
 			</uui-ref-node-user>
+			<umb-entity-frame><uui-icon name="link"></uui-icon> ${this.item.name}</umb-entity-frame>
 		`;
 	}
 
 	static override styles = [
 		css`
+			:host {
+				--umb-entity-frame-opacity: 0;
+				--umb-entity-frame-color: var(--umb-color-reference);
+				--umb-entity-frame-contrast-color: var(--umb-color-reference-contrast);
+
+				display: block;
+				position: relative;
+			}
+
+			:host(:hover),
+			:host(:focus-within) {
+				--umb-entity-frame-opacity: 1;
+			}
+
 			umb-user-avatar {
 				font-size: var(--uui-size-4);
 			}

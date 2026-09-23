@@ -132,7 +132,8 @@ public class SingleBlockPropertyValueConverter : PropertyValueConverterBase, IDe
     }
 
     /// <inheritdoc />
-    public PropertyCacheLevel GetDeliveryApiPropertyCacheLevel(IPublishedPropertyType propertyType) => GetPropertyCacheLevel(propertyType);
+    public PropertyCacheLevel GetDeliveryApiPropertyCacheLevel(IPublishedPropertyType propertyType)
+        => PropertyCacheLevel.Elements;
 
     /// <inheritdoc />
     public PropertyCacheLevel GetDeliveryApiPropertyCacheLevelForExpansion(IPublishedPropertyType propertyType) => PropertyCacheLevel.Snapshot;
