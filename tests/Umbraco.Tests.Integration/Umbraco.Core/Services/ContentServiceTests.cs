@@ -571,7 +571,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
         {
             scope.Database.Execute(
-                "UPDATE umbracoContentVersion SET userId = NULL WHERE nodeId = @0 AND current = 1",
+                "UPDATE umbracoContentVersion SET userId = NULL WHERE nodeId = @0 AND [current] = 1",
                 content.Id);
         }
 
@@ -610,7 +610,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
         {
             scope.Database.Execute(
-                "UPDATE umbracoContentVersion SET userId = NULL WHERE nodeId = @0 AND current = 1",
+                "UPDATE umbracoContentVersion SET userId = NULL WHERE nodeId = @0 AND [current] = 1",
                 content.Id);
         }
 
