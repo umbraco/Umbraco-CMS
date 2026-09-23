@@ -120,7 +120,7 @@ internal abstract class AsyncContentEditingServiceBase<TContent, TContentType, T
     /// <param name="content">The content to move to recycle bin.</param>
     /// <param name="userId">The user performing the operation.</param>
     /// <returns>The operation result.</returns>
-    protected abstract Task<OperationResult?> MoveToRecycleBinAsync(TContent content, int userId);
+    protected abstract Task<OperationResult?> MoveToRecycleBinAsync(TContent content, Guid userKey);
 
     /// <summary>
     /// Deletes content.
@@ -128,7 +128,7 @@ internal abstract class AsyncContentEditingServiceBase<TContent, TContentType, T
     /// <param name="content">The content to delete.</param>
     /// <param name="userId">The user performing the operation.</param>
     /// <returns>The operation result.</returns>
-    protected abstract Task<OperationResult?> DeleteAsync(TContent content, int userId);
+    protected abstract Task<OperationResult?> DeleteAsync(TContent content, Guid userKey);
 
     /// <summary>
     /// Gets the current content settings.
@@ -342,7 +342,7 @@ internal abstract class AsyncContentEditingServiceBase<TContent, TContentType, T
         Guid key,
         Guid userKey,
         ContentTrashStatusRequirement trashStatusRequirement,
-        Func<TContent, int, Task<OperationResult?>> performDelete,
+        Func<TContent, Guid, Task<OperationResult?>> performDelete,
         bool disabledWhenReferenced,
         ContentEditingOperationStatus referenceFailStatus)
     {
@@ -386,8 +386,7 @@ internal abstract class AsyncContentEditingServiceBase<TContent, TContentType, T
             }
         }
 
-        var userId = await GetUserIdAsync(userKey);
-        OperationResult? deleteResult = await performDelete(content, userId);
+        OperationResult? deleteResult = await performDelete(content, userKey);
 
         scope.Complete();
 
@@ -535,7 +534,6 @@ internal abstract class AsyncContentEditingServiceBase<TContent, TContentType, T
     /// </summary>
     /// <param name="userId">The user ID.</param>
     /// <returns>The user key.</returns>
-    protected async Task<Guid> GetUserKeyAsync(int userId) => await _userIdKeyResolver.GetAsync(userId);
 
     protected virtual async Task<Attempt<TContentType?, ContentEditingOperationStatus>> TryGetAndValidateContentTypeAsync(Guid contentTypeKey, ContentEditingModelBase contentEditingModelBase)
     {

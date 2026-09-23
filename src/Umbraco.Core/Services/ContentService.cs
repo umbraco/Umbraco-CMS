@@ -877,9 +877,14 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
         scope.WriteLock(Constants.Locks.ContentTree);
 
         IContent? parent = parentKey.HasValue ? await GetByIdAsync(parentKey.Value, cancellationToken) : null;
-        if (parentKey.HasValue && (parent is null || parent.Trashed))
+        if (parentKey.HasValue && parent is null)
         {
-            throw new InvalidOperationException("Parent does not exist or is trashed."); // causes rollback
+            return Attempt.Fail(ContentMoveOperationStatus.ParentNotFound);
+        }
+
+        if (parent?.Trashed is true)
+        {
+            return Attempt.Fail(ContentMoveOperationStatus.ParentTrashed);
         }
 
         int parentId = parent?.Id ?? Constants.System.Root;
@@ -1136,6 +1141,15 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.WriteLock(Constants.Locks.ContentTree);
 
+        // The recycle bin is not a content item and cannot be copied into - deleting a copy is what the bin
+        // is for. Rejected up front so it reports the same way as any other parent that cannot be resolved,
+        // rather than depending on the bin failing to load as content.
+        if (parentKey == Constants.System.RecycleBinContentKey)
+        {
+            scope.Complete();
+            return Attempt.FailWithStatus<IContent?, ContentCopyOperationStatus>(ContentCopyOperationStatus.ParentNotFound, null);
+        }
+
         IContent? parent = parentKey.HasValue ? await GetByIdAsync(parentKey.Value, cancellationToken) : null;
         if (parentKey.HasValue && parent is null)
         {
@@ -1189,8 +1203,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
         await _documentRepository.SaveAsync(copy, cancellationToken);
 
         // store navigation update information for copied item
-        var copyHasRealParent = parentKey.HasValue && parentKey != Constants.System.RecycleBinContentKey;
-        navigationUpdates.Add(Tuple.Create(copy.Key, copyHasRealParent ? copy.ParentKey : null));
+        navigationUpdates.Add(Tuple.Create(copy.Key, parentKey.HasValue ? copy.ParentKey : null));
 
         // add permissions
         if (currentPermissions.Count > 0)

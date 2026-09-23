@@ -303,7 +303,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
     /// <param name="contentTypeAlias">The optional content type alias to filter by.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The count of child content items.</returns>
-    public async Task<int> CountChildrenAsync(Guid parentKey, string? contentTypeAlias, CancellationToken cancellationToken)
+    public async Task<int> CountChildrenAsync(Guid? parentKey, string? contentTypeAlias, CancellationToken cancellationToken)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.ReadLock(ReadLockIds);
@@ -321,7 +321,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
     /// <param name="contentTypeAlias">The optional content type alias to filter by.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The count of descendant content items.</returns>
-    public async Task<int> CountDescendantsAsync(Guid parentKey, string? contentTypeAlias, CancellationToken cancellationToken)
+    public async Task<int> CountDescendantsAsync(Guid? parentKey, string? contentTypeAlias, CancellationToken cancellationToken)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.ReadLock(ReadLockIds);

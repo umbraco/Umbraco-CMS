@@ -14,4 +14,14 @@ public enum ContentMoveOperationStatus
     ///     The operation was cancelled by a notification handler.
     /// </summary>
     CancelledByNotification,
+
+    /// <summary>
+    ///     The specified parent was not found.
+    /// </summary>
+    ParentNotFound,
+
+    /// <summary>
+    ///     The specified parent is in the recycle bin.
+    /// </summary>
+    ParentTrashed,
 }

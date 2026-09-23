@@ -129,7 +129,7 @@ public interface IAsyncContentRepository<TEntity> : IAsyncReadWriteRepository<Gu
     /// <param name="parentKey">The Guid key of the parent node.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The number of direct children.</returns>
-    Task<int> CountChildrenAsync(Guid parentKey, CancellationToken cancellationToken);
+    Task<int> CountChildrenAsync(Guid? parentKey, CancellationToken cancellationToken);
 
     /// <summary>
     ///     Gets the count of direct child content items under a given parent, filtered by content type alias.
@@ -138,7 +138,7 @@ public interface IAsyncContentRepository<TEntity> : IAsyncReadWriteRepository<Gu
     /// <param name="contentTypeAlias">The alias of the content type to filter by.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The number of direct children of the specified type.</returns>
-    Task<int> CountChildrenAsync(Guid parentKey, string contentTypeAlias, CancellationToken cancellationToken);
+    Task<int> CountChildrenAsync(Guid? parentKey, string contentTypeAlias, CancellationToken cancellationToken);
 
     /// <summary>
     ///     Gets the count of all descendant content items under a given ancestor.
@@ -146,7 +146,7 @@ public interface IAsyncContentRepository<TEntity> : IAsyncReadWriteRepository<Gu
     /// <param name="parentKey">The Guid key of the ancestor node.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The number of descendants.</returns>
-    Task<int> CountDescendantsAsync(Guid parentKey, CancellationToken cancellationToken);
+    Task<int> CountDescendantsAsync(Guid? parentKey, CancellationToken cancellationToken);
 
     /// <summary>
     ///     Gets the count of all descendant content items under a given ancestor, filtered by content type alias.
@@ -155,7 +155,7 @@ public interface IAsyncContentRepository<TEntity> : IAsyncReadWriteRepository<Gu
     /// <param name="contentTypeAlias">The alias of the content type to filter by.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The number of descendants of the specified type.</returns>
-    Task<int> CountDescendantsAsync(Guid parentKey, string contentTypeAlias, CancellationToken cancellationToken);
+    Task<int> CountDescendantsAsync(Guid? parentKey, string contentTypeAlias, CancellationToken cancellationToken);
 
     /// <summary>
     ///     Gets a paged list of direct children of a content node.

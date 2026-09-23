@@ -127,12 +127,16 @@ internal sealed class MemberContentEditingService
         => throw new NotSupportedException("Copy is not supported for Member");
 
     /// <inheritdoc />
-    protected override Task<OperationResult?> MoveToRecycleBinAsync(IMember member, int userId)
+    protected override Task<OperationResult?> MoveToRecycleBinAsync(IMember member, Guid userKey)
         => throw new InvalidOperationException("Recycle bin is not supported for members");
 
     /// <inheritdoc />
-    protected override Task<OperationResult?> DeleteAsync(IMember member, int userId)
-        => Task.FromResult(ContentService.Delete(member, userId).Result);
+    protected override async Task<OperationResult?> DeleteAsync(IMember member, Guid userKey)
+    {
+        // The member service is still synchronous and identifies its user by id.
+        var userId = await GetUserIdAsync(userKey);
+        return ContentService.Delete(member, userId).Result;
+    }
 
     /// <summary>
     ///     Saves the specified member with the given user ID.

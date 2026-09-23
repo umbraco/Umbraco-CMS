@@ -545,13 +545,13 @@ internal sealed class ElementEditingService
         return copy;
     }
 
-    protected override Task<OperationResult?> MoveToRecycleBinAsync(IElement element, int userId)
+    protected override Task<OperationResult?> MoveToRecycleBinAsync(IElement element, Guid userKey)
         => throw new NotImplementedException("Explicitly implemented elsewhere by this service");
 
-    protected override async Task<OperationResult?> DeleteAsync(IElement element, int userId)
+    protected override async Task<OperationResult?> DeleteAsync(IElement element, Guid userKey)
     {
         Attempt<ContentDeleteOperationStatus> result =
-            await ContentService.DeleteAsync(element, await GetUserKeyAsync(userId), CancellationToken.None);
+            await ContentService.DeleteAsync(element, userKey, CancellationToken.None);
         return result.Success ? OperationResult.Succeed(new EventMessages()) : OperationResult.Cancel(new EventMessages());
     }
 

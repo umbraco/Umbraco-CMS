@@ -281,10 +281,10 @@ internal abstract class AsyncContentRepositoryBase<TEntity, TRepository>
                 .CountAsync(cancellationToken));
 
     /// <inheritdoc />
-    public virtual Task<int> CountChildrenAsync(Guid parentKey, CancellationToken cancellationToken) =>
+    public virtual Task<int> CountChildrenAsync(Guid? parentKey, CancellationToken cancellationToken) =>
         AmbientScope.ExecuteWithContextAsync(async db =>
         {
-            int parentNodeId = await ResolveNodeIdAsync(db, parentKey, cancellationToken);
+            int parentNodeId = await ResolveParentNodeIdAsync(db, parentKey, cancellationToken);
 
             return await db.Nodes
                 .Where(node => node.NodeObjectType == NodeObjectTypeKey && node.ParentId == parentNodeId)
@@ -292,10 +292,10 @@ internal abstract class AsyncContentRepositoryBase<TEntity, TRepository>
         });
 
     /// <inheritdoc />
-    public virtual Task<int> CountChildrenAsync(Guid parentKey, string contentTypeAlias, CancellationToken cancellationToken) =>
+    public virtual Task<int> CountChildrenAsync(Guid? parentKey, string contentTypeAlias, CancellationToken cancellationToken) =>
         AmbientScope.ExecuteWithContextAsync(async db =>
         {
-            int parentNodeId = await ResolveNodeIdAsync(db, parentKey, cancellationToken);
+            int parentNodeId = await ResolveParentNodeIdAsync(db, parentKey, cancellationToken);
 
             return await NodesFilteredByContentTypeAlias(db, contentTypeAlias)
                 .Where(node => node.ParentId == parentNodeId)
@@ -303,10 +303,10 @@ internal abstract class AsyncContentRepositoryBase<TEntity, TRepository>
         });
 
     /// <inheritdoc />
-    public virtual Task<int> CountDescendantsAsync(Guid parentKey, CancellationToken cancellationToken) =>
+    public virtual Task<int> CountDescendantsAsync(Guid? parentKey, CancellationToken cancellationToken) =>
         AmbientScope.ExecuteWithContextAsync(async db =>
         {
-            int parentNodeId = await ResolveNodeIdAsync(db, parentKey, cancellationToken);
+            int parentNodeId = await ResolveParentNodeIdAsync(db, parentKey, cancellationToken);
 
             string pathMatch = parentNodeId == -1 ? "-1," : $",{parentNodeId},";
 
@@ -316,10 +316,10 @@ internal abstract class AsyncContentRepositoryBase<TEntity, TRepository>
         });
 
     /// <inheritdoc />
-    public virtual Task<int> CountDescendantsAsync(Guid parentKey, string contentTypeAlias, CancellationToken cancellationToken) =>
+    public virtual Task<int> CountDescendantsAsync(Guid? parentKey, string contentTypeAlias, CancellationToken cancellationToken) =>
         AmbientScope.ExecuteWithContextAsync(async db =>
         {
-            int parentNodeId = await ResolveNodeIdAsync(db, parentKey, cancellationToken);
+            int parentNodeId = await ResolveParentNodeIdAsync(db, parentKey, cancellationToken);
 
             string pathMatch = parentNodeId == -1 ? "-1," : $",{parentNodeId},";
 
@@ -349,6 +349,18 @@ internal abstract class AsyncContentRepositoryBase<TEntity, TRepository>
             .Where(node => node.UniqueId == key)
             .Select(node => node.NodeId)
             .SingleOrDefaultAsync(cancellationToken);
+
+    /// <summary>
+    ///     Resolves the node id of a parent, treating <c>null</c> as the root of the tree.
+    /// </summary>
+    /// <remarks>
+    ///     Root has no Guid identity at all - <see cref="Constants.System.RootKey" /> is deliberately
+    ///     <c>null</c> - so it cannot be resolved by key.
+    /// </remarks>
+    protected static async Task<int> ResolveParentNodeIdAsync(UmbracoDbContext db, Guid? parentKey, CancellationToken cancellationToken)
+        => parentKey.HasValue
+            ? await ResolveNodeIdAsync(db, parentKey.Value, cancellationToken)
+            : Constants.System.Root;
 
     /// <inheritdoc />
     public abstract Task<PagedModel<TEntity>> GetChildrenAsync(Guid? parentKey, int skip, int take, string[]? propertyAliases, Ordering? ordering, CancellationToken cancellationToken);

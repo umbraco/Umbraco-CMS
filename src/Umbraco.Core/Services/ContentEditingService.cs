@@ -295,9 +295,8 @@ internal sealed class ContentEditingService
     }
 
     /// <inheritdoc />
-    protected override async Task<OperationResult?> MoveToRecycleBinAsync(IContent content, int userId)
+    protected override async Task<OperationResult?> MoveToRecycleBinAsync(IContent content, Guid userKey)
     {
-        Guid userKey = await GetUserKeyAsync(userId);
         Attempt<ContentMoveToRecycleBinOperationStatus> result = await ContentService.MoveToRecycleBinAsync(content, userKey, CancellationToken.None);
         return result.Success
             ? OperationResult.Succeed(new EventMessages())
@@ -305,10 +304,10 @@ internal sealed class ContentEditingService
     }
 
     /// <inheritdoc />
-    protected override async Task<OperationResult?> DeleteAsync(IContent content, int userId)
+    protected override async Task<OperationResult?> DeleteAsync(IContent content, Guid userKey)
     {
         Attempt<ContentDeleteOperationStatus> result =
-            await ContentService.DeleteAsync(content, await GetUserKeyAsync(userId), CancellationToken.None);
+            await ContentService.DeleteAsync(content, userKey, CancellationToken.None);
         return result.Success ? OperationResult.Succeed(new EventMessages()) : OperationResult.Cancel(new EventMessages());
     }
 

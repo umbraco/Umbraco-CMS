@@ -295,7 +295,7 @@ internal sealed class ContentBlueprintEditingService
     /// <param name="userId">The ID of the user performing the operation.</param>
     /// <returns>Not supported for blueprints.</returns>
     /// <exception cref="NotImplementedException">Always thrown as this operation is not supported for blueprints.</exception>
-    protected override Task<OperationResult?> MoveToRecycleBinAsync(IContent content, int userId) => throw new NotImplementedException();
+    protected override Task<OperationResult?> MoveToRecycleBinAsync(IContent content, Guid userKey) => throw new NotImplementedException();
 
     /// <summary>
     /// Deletes the specified content. Not supported for blueprints.
@@ -304,7 +304,7 @@ internal sealed class ContentBlueprintEditingService
     /// <param name="userId">The ID of the user performing the operation.</param>
     /// <returns>Not supported for blueprints.</returns>
     /// <exception cref="NotImplementedException">Always thrown as this operation is not supported for blueprints.</exception>
-    protected override Task<OperationResult?> DeleteAsync(IContent content, int userId) => throw new NotImplementedException();
+    protected override Task<OperationResult?> DeleteAsync(IContent content, Guid userKey) => throw new NotImplementedException();
 
     /// <summary>
     /// Saves a blueprint with the specified user key.

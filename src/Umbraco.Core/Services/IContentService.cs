@@ -89,6 +89,14 @@ public interface IContentService : IPublishableContentService<IContent>
     #region Get, Count Documents
 
     /// <summary>
+    ///     Counts published content items, optionally filtered by content type alias.
+    /// </summary>
+    /// <param name="contentTypeAlias">The content type alias to filter by, or <c>null</c> for all types.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>The count of published content items matching the filter.</returns>
+    Task<int> CountPublishedAsync(string? contentTypeAlias, CancellationToken cancellationToken);
+
+    /// <summary>
     ///     Gets a paged list of documents at a given level.
     /// </summary>
     /// <remarks>
@@ -279,7 +287,7 @@ public interface IContentService : IPublishableContentService<IContent>
     /// <param name="contentTypeAlias">The document type alias, or null for all types.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The child document count.</returns>
-    Task<int> CountChildrenAsync(Guid parentKey, string? contentTypeAlias, CancellationToken cancellationToken);
+    Task<int> CountChildrenAsync(Guid? parentKey, string? contentTypeAlias, CancellationToken cancellationToken);
 
     /// <summary>
     ///     Counts descendant documents of a given parent, of a given document type.
@@ -288,7 +296,7 @@ public interface IContentService : IPublishableContentService<IContent>
     /// <param name="contentTypeAlias">The document type alias, or null for all types.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The descendant document count.</returns>
-    Task<int> CountDescendantsAsync(Guid parentKey, string? contentTypeAlias, CancellationToken cancellationToken);
+    Task<int> CountDescendantsAsync(Guid? parentKey, string? contentTypeAlias, CancellationToken cancellationToken);
 
     /// <summary>
     ///     Gets a value indicating whether a document has children.
