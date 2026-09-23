@@ -50,12 +50,14 @@ internal sealed class DocumentRepositoryOrderingTests
             ContentType = new ContentTypeDto { Alias = "alias" },
         };
 
+    private static readonly List<UserDto> _users = [];
+
     private static List<int> ApplyOrderingAndGetNodeIds(Ordering? ordering, List<DocumentRepository.DocumentJoinRow>? rows = null)
     {
         IOrderedQueryable<DocumentRepository.DocumentJoinRow> ordered = DocumentRepository.ApplyDocumentOrdering(
             (rows ?? CreateTiedRows()).AsQueryable(),
-            ordering,
-            pathSelector: row => row.Node.Path);
+            _users.AsQueryable(),
+            ordering);
 
         return ordered.Select(row => row.Node.NodeId).ToList();
     }
@@ -101,4 +103,22 @@ internal sealed class DocumentRepositoryOrderingTests
             "tied Path must break the tie by ascending NodeId — a missing \"path\" case would instead fall " +
             "through to the SortOrder default and produce {200, 100}");
     }
+    [Test]
+    public void ApplyDocumentOrdering_UnknownField_IsRejected()
+    {
+        Assert.Throws<NotSupportedException>(
+            () => ApplyOrderingAndGetNodeIds(Ordering.By("somethingNobodySupports")),
+            "ordering by an unsupported field must be reported rather than quietly served in sort order");
+    }
+
+    [Test]
+    public void ApplyDocumentOrdering_NoOrdering_FallsBackToSortOrder()
+    {
+        // Distinct from an unsupported field: callers that pass no ordering at all are asking for the
+        // repository's natural order, and must not be rejected.
+        List<int> nodeIds = ApplyOrderingAndGetNodeIds(ordering: null);
+
+        Assert.That(nodeIds, Is.EqualTo(new[] { 100, 200 }));
+    }
+
 }

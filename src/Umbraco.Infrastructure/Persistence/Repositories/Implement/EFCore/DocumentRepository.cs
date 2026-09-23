@@ -276,7 +276,7 @@ internal class DocumentRepository
                 // isMoving guard.
                 await OnUowRefreshedEntityAsync(item, CancellationToken.None);
                 item.ResetDirtyProperties();
-                IsolatedCache.Clear(RepositoryCacheKeys.GetGuidKey<IContent>(item.Key));
+                IsolatedCache.Clear(EntityTypeCacheKeyPrefix + item.Key);
                 return true;
             }
 
@@ -416,7 +416,7 @@ internal class DocumentRepository
             // We need to flush the isolated cache by key explicitly here. The ContentCacheRefresher does
             // the same thing, but by the time it's invoked, custom notification handlers might have
             // already consumed the cached version.
-            IsolatedCache.Clear(RepositoryCacheKeys.GetGuidKey<IContent>(item.Key));
+            IsolatedCache.Clear(EntityTypeCacheKeyPrefix + item.Key);
 
             return true;
         });
@@ -483,6 +483,36 @@ internal class DocumentRepository
             }
 
             return await AssembleEntitiesAsync(rows, db);
+        });
+
+    /// <inheritdoc />
+    /// <remarks>
+    ///     Pages in SQL and hydrates without property data or templates - variants are still loaded, because
+    ///     this feeds rollback, which needs them.
+    /// </remarks>
+    public override Task<IEnumerable<IContent>> GetAllVersionsSlimAsync(Guid nodeKey, int skip, int take, CancellationToken cancellationToken) =>
+        AmbientScope.ExecuteWithContextAsync(async db =>
+        {
+            List<DocumentRow> rows = await BuildBaseQuery(
+                    db,
+                    db.Nodes.Where(node => node.UniqueId == nodeKey && node.NodeObjectType == NodeObjectTypeKey),
+                    contentVersionFilter: contentVersion => true)
+                .OrderByDescending(joined => joined.ContentVersion.Current)
+                .ThenByDescending(joined => joined.ContentVersion.VersionDate)
+                // Versions saved within the same clock tick share a VersionDate, so without an id tiebreak
+                // paging over them can repeat or skip a version.
+                .ThenByDescending(joined => joined.ContentVersion.Id)
+                .Skip(skip)
+                .Take(take)
+                .Select(ToDocumentRow)
+                .ToListAsync(cancellationToken);
+
+            if (rows.Count == 0)
+            {
+                return Enumerable.Empty<IContent>();
+            }
+
+            return await AssembleEntitiesAsync(rows, db, propertyAliases: [], loadTemplates: false);
         });
 
     /// <inheritdoc />
@@ -610,7 +640,7 @@ internal class DocumentRepository
             {
                 // Invariant name ordering falls through here: ApplyDocumentOrdering's default "name"
                 // arm uses node.Text, equivalent to COALESCE(NULL, node.Text) in NPoco's invariant path.
-                IOrderedQueryable<DocumentJoinRow> orderedQuery = ApplyDocumentOrdering(baseQuery, ordering);
+                IOrderedQueryable<DocumentJoinRow> orderedQuery = ApplyDocumentOrdering(baseQuery, db.Users, ordering);
 
                 return await orderedQuery
                     .Skip(skip)
@@ -720,8 +750,7 @@ internal class DocumentRepository
             {
                 // Invariant name ordering falls through here: ApplyDocumentOrdering's default "name"
                 // arm uses node.Text, equivalent to COALESCE(NULL, node.Text) in NPoco's invariant path.
-                IOrderedQueryable<DocumentJoinRow> orderedQuery = ApplyDocumentOrdering(
-                    baseQuery, ordering, pathSelector: joined => joined.Node.Path);
+                IOrderedQueryable<DocumentJoinRow> orderedQuery = ApplyDocumentOrdering(baseQuery, db.Users, ordering);
 
                 return await orderedQuery
                     .Skip(skip)
@@ -832,7 +861,7 @@ internal class DocumentRepository
 
             async Task<IReadOnlyList<DocumentRow>> FetchDefaultOrdered()
             {
-                IOrderedQueryable<DocumentJoinRow> orderedQuery = ApplyDocumentOrdering(baseQuery, ordering);
+                IOrderedQueryable<DocumentJoinRow> orderedQuery = ApplyDocumentOrdering(baseQuery, db.Users, ordering);
 
                 return await orderedQuery
                     .Skip(skip)
@@ -910,7 +939,7 @@ internal class DocumentRepository
 
             async Task<IReadOnlyList<DocumentRow>> FetchDefaultOrdered()
             {
-                IOrderedQueryable<DocumentJoinRow> orderedQuery = ApplyDocumentOrdering(baseQuery, ordering);
+                IOrderedQueryable<DocumentJoinRow> orderedQuery = ApplyDocumentOrdering(baseQuery, db.Users, ordering);
 
                 return await orderedQuery
                     .Skip(skip)
@@ -1062,8 +1091,7 @@ internal class DocumentRepository
 
             async Task<IReadOnlyList<DocumentRow>> FetchDefaultOrdered()
             {
-                IOrderedQueryable<DocumentJoinRow> orderedQuery = ApplyDocumentOrdering(
-                    baseQuery, ordering, pathSelector: joined => joined.Node.Path);
+                IOrderedQueryable<DocumentJoinRow> orderedQuery = ApplyDocumentOrdering(baseQuery, db.Users, ordering);
 
                 return await orderedQuery
                     .Skip(skip)
@@ -1150,11 +1178,24 @@ internal class DocumentRepository
     // wrapper: IAppPolicyCache.Get only accepts a synchronous factory, and wrapping this async query in one
     // would mean sync-over-async (GetAwaiter().GetResult()) — the exact anti-pattern already avoided
     // elsewhere in this file for language/tag lookups.
-    public Task<bool> RecycleBinSmellsAsync(CancellationToken cancellationToken) =>
-        AmbientScope.ExecuteWithContextAsync(db =>
+    public async Task<bool> RecycleBinSmellsAsync(CancellationToken cancellationToken)
+    {
+        // Answered on every backoffice tree render, so it is cached either way. ContentCacheRefresher
+        // clears this key on refresh, so the answer cannot outlive a change to what is in the bin.
+        var cached = AppCaches.RuntimeCache.GetCacheItem<bool?>(RecycleBinCacheKey);
+        if (cached.HasValue)
+        {
+            return cached.Value;
+        }
+
+        var smells = await AmbientScope.ExecuteWithContextAsync(db =>
             db.Nodes.AnyAsync(
                 node => node.NodeObjectType == NodeObjectTypeKey && node.ParentId == Constants.System.RecycleBinContent,
                 cancellationToken));
+
+        AppCaches.RuntimeCache.Insert(RecycleBinCacheKey, () => (bool?)smells);
+        return smells;
+    }
 
     // Shared join shape spanning Nodes/Documents/Content/ContentVersions/DocumentVersions, the
     // LEFT JOINed ContentType, published version, and parent node. Built via object-initializer
@@ -1265,11 +1306,13 @@ internal class DocumentRepository
     /// </remarks>
     internal static IOrderedQueryable<DocumentJoinRow> ApplyDocumentOrdering(
         IQueryable<DocumentJoinRow> source,
-        Ordering? ordering,
-        Expression<Func<DocumentJoinRow, string?>>? pathSelector = null)
+        IQueryable<UserDto> users,
+        Ordering? ordering)
     {
         bool descending = ordering?.Direction == Direction.Descending;
-        string? orderBy = ordering?.OrderBy?.ToLowerInvariant();
+        // No ordering at all means sort order - the default every caller relies on - which is distinct from
+        // asking for a field this repository cannot order by.
+        string orderBy = ordering?.OrderBy is { Length: > 0 } field ? field.ToLowerInvariant() : "sortorder";
         IOrderedQueryable<DocumentJoinRow> ordered = orderBy switch
         {
             // Invariant name ordering (node.Text). Culture-specific name ordering is handled
@@ -1286,28 +1329,35 @@ internal class DocumentRepository
             "id" => descending
                 ? source.OrderByDescending(joined => joined.Node.NodeId)
                 : source.OrderBy(joined => joined.Node.NodeId),
+            // Ordered by the user's name rather than their id, which is the order a caller listing
+            // "owner" or "updater" is asking for. Owner is who created the node; updater is who created
+            // its latest draft version.
             "owner" => descending
-                ? source.OrderByDescending(joined => joined.Node.UserId)
-                : source.OrderBy(joined => joined.Node.UserId),
+                ? source.OrderByDescending(joined => UserNameById(users, joined.Node.UserId))
+                : source.OrderBy(joined => UserNameById(users, joined.Node.UserId)),
+            "updater" => descending
+                ? source.OrderByDescending(joined => UserNameById(users, joined.ContentVersion.UserId))
+                : source.OrderBy(joined => UserNameById(users, joined.ContentVersion.UserId)),
+            // The document's own published flag, not the current version's - a draft version of a
+            // published document carries Published = false on umbracoDocumentVersion.
             "published" => descending
-                ? source.OrderByDescending(joined => joined.DocumentVersion.Published)
-                : source.OrderBy(joined => joined.DocumentVersion.Published),
+                ? source.OrderByDescending(joined => joined.Document.Published)
+                : source.OrderBy(joined => joined.Document.Published),
             // Null-propagating operators aren't valid inside an Expression<Func<...>> tree - use a
             // conditional instead of ContentType?.Alias.
             "contenttypealias" => descending
                 ? source.OrderByDescending(joined => joined.ContentType == null ? null : joined.ContentType.Alias)
                 : source.OrderBy(joined => joined.ContentType == null ? null : joined.ContentType.Alias),
-            // Only reachable when the caller passes a pathSelector (GetDescendantsCoreAsync and
-            // GetPagedOfContentTypesAsync) — a missing pathSelector falls through to the default arm below,
-            // exactly like every other caller that doesn't support "path" ordering today.
-            "path" when pathSelector is not null => descending
-                ? source.OrderByDescending(pathSelector)
-                : source.OrderBy(pathSelector),
-            // Custom-field ordering (ordering.IsCustomField) is intercepted by callers before reaching
-            // this method — see ResolveCustomFieldOrderedNodeIdsAsync.
-            _ => descending
+            "path" => descending
+                ? source.OrderByDescending(joined => joined.Node.Path)
+                : source.OrderBy(joined => joined.Node.Path),
+            "sortorder" => descending
                 ? source.OrderByDescending(joined => joined.Node.SortOrder)
                 : source.OrderBy(joined => joined.Node.SortOrder),
+            // Custom-field ordering (ordering.IsCustomField) is intercepted by callers before reaching
+            // this method — see ResolveCustomFieldOrderedNodeIdsAsync. Anything else is rejected rather
+            // than quietly ordered by something the caller did not ask for.
+            _ => throw new NotSupportedException($"Ordering by {ordering?.OrderBy} not supported."),
         };
 
         // Break ties on node id so paged results stay stable/non-duplicated across separate fetches —
@@ -1316,6 +1366,11 @@ internal class DocumentRepository
         // when already ordering by id, since that's already unique.
         return orderBy == "id" ? ordered : ordered.ThenBy(joined => joined.Node.NodeId);
     }
+
+    // Correlated subquery rather than a join, so the extra lookup is only paid for when a caller actually
+    // orders by a user name.
+    private static string? UserNameById(IQueryable<UserDto> users, int? userId) =>
+        users.Where(user => user.Id == userId).Select(user => user.UserName).FirstOrDefault();
 
     // The four typed PropertyData value columns, plus the SortableValue override some property editors
     // (e.g. IDataValueSortable) populate to take priority over the raw column. Mirrors the column
@@ -1424,7 +1479,15 @@ internal class DocumentRepository
             return [];
         }
 
-        List<DocumentRow> unorderedRows = await fetchRowsForPageNodeIds(pageNodeIds);
+        // A page is only as small as the caller asked for, and callers pass int.MaxValue to mean "all of
+        // them", so the node ids going into the fetch predicate are batched like any other runtime-sized
+        // set. The ordering is restored once, over the whole page.
+        var unorderedRows = new List<DocumentRow>();
+        foreach (IEnumerable<int> batch in pageNodeIds.InGroupsOf(Constants.Sql.MaxParameterCount))
+        {
+            unorderedRows.AddRange(await fetchRowsForPageNodeIds(batch.ToList()));
+        }
+
         return ReorderRowsByNodeIds(unorderedRows, pageNodeIds);
     }
 
