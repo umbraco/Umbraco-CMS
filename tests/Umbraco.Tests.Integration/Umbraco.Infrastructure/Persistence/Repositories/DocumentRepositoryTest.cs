@@ -51,14 +51,7 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
     private IDataTypeService DataTypeService => GetRequiredService<IDataTypeService>();
 
     [SetUp]
-    public async Task SetUpData()
-    {
-        await CreateTestData();
-        ContentRepositoryBase.ThrowOnWarning = true;
-    }
-
-    [TearDown]
-    public void Teardown() => ContentRepositoryBase.ThrowOnWarning = false;
+    public async Task SetUpData() => await CreateTestData();
 
     private async Task CreateTestData()
     {

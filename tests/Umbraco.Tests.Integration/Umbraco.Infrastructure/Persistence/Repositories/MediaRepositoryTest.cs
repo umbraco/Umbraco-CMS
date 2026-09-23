@@ -116,9 +116,9 @@ internal sealed class MediaRepositoryTest : UmbracoIntegrationTest
 
         var database = scopeAccessor.AmbientScope.Database;
 
-        // ParentKey is resolved via a self-join in GetBaseQuery (see ContentDto.ParentUniqueId) - if that were
-        // ever replaced by a separate follow-up query, this count would go up, and the TDD-honesty revert
-        // check for this test confirms exactly that.
+        // ParentKey is resolved by a self-join in GetBaseQuery (see ContentDto.ParentUniqueId); resolving it
+        // with a follow-up query instead would raise the count asserted below.
+        // Disabling the count resets it to zero, so this pair is how the counter is cleared before the call.
         database.EnableSqlCount = false;
         database.EnableSqlCount = true;
 
