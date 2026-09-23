@@ -16,7 +16,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 			columns: [
 				{
 					field: 'userGroupUniques',
-					label: '#user_usergroups',
+					label: 'User Groups',
 					valueType: UMB_USER_GROUP_REFERENCES_VALUE_TYPE,
 				},
 				{
