@@ -988,6 +988,7 @@ File: `Persistence/EFCore/UmbracoDbContext.cs`
 **Rules**:
 - **Only add DbSets for primary entity DTOs** that repositories query directly
 - **Do NOT add DbSets for junction/reference tables** (e.g., `Webhook2EventsDto`, `Webhook2HeadersDto`) — these are discovered via navigation properties or accessed via `db.Set<T>()`
+  - **Exception**: a junction table a repository bulk-deletes directly (`ExecuteDeleteAsync`) does get a DbSet, because that call needs one. The document repository does this for several of its junction tables.
 - Pattern: `public required DbSet<FooDto> Foos { get; set; }`
 
 **Example**:

@@ -227,8 +227,7 @@ internal class DocumentRepository
             // Check if this entity is being moved as a descendant as part of a bulk moving operation.
             // When moving, only Path + Level + UpdateDate are dirty, so we can skip version creation,
             // property-data reconciliation, culture-variation reconciliation and tag updates entirely —
-            // we cannot roll a bulk move back anyway. Mirrors NPoco's
-            // PublishableContentRepositoryBase.PersistUpdatedItem fast path.
+            // we cannot roll a bulk move back anyway.
             var isMoving = item.IsMoving();
 
             var publishing = item.PublishedState == PublishedState.Publishing;
@@ -364,8 +363,8 @@ internal class DocumentRepository
                 }
 
                 // Replace (rather than update) the content version variations — only for versionToDelete,
-                // and the entity variations — for the whole node, unconditionally. Mirrors NPoco's
-                // delete-then-reinsert for these two tables (no diff-reconcile needed here, unlike PropertyData).
+                // and the entity variations — for the whole node, unconditionally. These two tables are
+                // deleted and reinserted rather than diff-reconciled, unlike PropertyData.
                 await db.ContentVersionCultureVariations.Where(variation => variation.VersionId == versionToDelete).ExecuteDeleteAsync();
                 await db.DocumentCultureVariations.Where(variation => variation.NodeId == item.Id).ExecuteDeleteAsync();
 
@@ -783,8 +782,8 @@ internal class DocumentRepository
     public override Task<IEnumerable<IContent>> GetRecycleBinAsync(CancellationToken cancellationToken) =>
         AmbientScope.ExecuteWithContextAsync<IEnumerable<IContent>>(async db =>
         {
-            // Mirrors NPoco's ContentRepositoryBase.GetRecycleBin: every trashed node of this object type,
-            // regardless of tree depth — not just the direct children of the recycle bin folder itself.
+            // Every trashed node of this object type, regardless of tree depth — not just the direct
+            // children of the recycle bin folder itself.
             List<DocumentRow> rows = await BuildBaseQuery(
                     db, db.Nodes.Where(node => node.NodeObjectType == NodeObjectTypeKey && node.Trashed))
                 .Select(ToDocumentRow)
@@ -1373,9 +1372,9 @@ internal class DocumentRepository
         users.Where(user => user.Id == userId).Select(user => user.UserName).FirstOrDefault();
 
     // Ties in the variant name are common - every node falling back to node.Text shares one - so the node id
-    // breaks them, keeping paged results stable and non-duplicated across separate fetches. Mirrors NPoco's
-    // ContentRepositoryBase.PreparePageSql, which unconditionally appends "ORDER BY umbracoNode.id" after any
-    // user ordering (see http://issues.umbraco.org/issue/U4-8831). Internal so the tiebreak can be exercised
+    // breaks them, keeping paged results stable and non-duplicated across separate fetches; the node id is
+    // appended after any user ordering for that reason (see http://issues.umbraco.org/issue/U4-8831).
+    // Internal so the tiebreak can be exercised
     // directly against a sequence with tied names, which a database-backed test cannot reliably produce.
     internal static IOrderedQueryable<TRow> ApplyVariantNameOrdering<TRow>(
         IQueryable<TRow> source,
@@ -1776,7 +1775,7 @@ internal class DocumentRepository
                 documentCultureVariationsByNodeId.GetValueOrDefault(row.Node.NodeId, []),
                 isoCodeByLanguageId);
 
-            // Mirrors NPoco's MapDtoToContent/batch mapping (U4-1946): applying culture variations above
+            // Applying culture variations above
             // dirties the entity via CultureInfos/PublishCultureInfos collection-changed notifications, so a
             // freshly-assembled entity must be reset to a clean state before being handed to the caller.
             entity.ResetDirtyProperties(false);
@@ -1868,7 +1867,7 @@ internal class DocumentRepository
 
         // Document culture variations — nodeIds is unbounded for GetAll; batch accordingly.
         var allDocumentCultureVariations = new List<DocumentCultureVariationDto>();
-        foreach (IEnumerable<int> batch in nodeIds.InGroupsOf(Core.Constants.Sql.MaxParameterCount))
+        foreach (IEnumerable<int> batch in nodeIds.InGroupsOf(Constants.Sql.MaxParameterCount))
         {
             var batchIds = batch.ToList();
             allDocumentCultureVariations.AddRange(await db.DocumentCultureVariations
@@ -1945,7 +1944,7 @@ internal class DocumentRepository
     }
 
     // Flips the entity's in-memory published state to match what was just persisted — shared by
-    // PersistNewItemAsync and PersistUpdatedItemAsync. Mirrors NPoco's PersistNewItem/PersistUpdatedItem.
+    // PersistNewItemAsync and PersistUpdatedItemAsync.
     private async Task ApplyPostPublishFlagFlipsAsync(IContent item)
     {
         if (item.PublishedState == PublishedState.Publishing)
@@ -2036,8 +2035,7 @@ internal class DocumentRepository
         }
     }
 
-    // Clears tags for an item. Ported from ContentRepositoryBase.ClearEntityTags — a plain synchronous
-    // call, no scope/await concerns.
+    // Clears tags for an item. Synchronous: there is no scope or await concern here.
     private void ClearEntityTags(IContent entity) => _tagRepository.RemoveAll(entity.Id);
 
     private static void AssignDefaultTemplateIfMissing(IContent entity)
@@ -2129,8 +2127,7 @@ internal class DocumentRepository
     }
 
     // Inserts (or converts a reserved placeholder into) the umbracoNode row, resolving Path/Level/SortOrder
-    // from the parent, then patches the Path once the real NodeId is known. Mirrors NPoco's PersistNewItem
-    // node-handling block.
+    // from the parent, then patches the Path once the real NodeId is known.
     private async Task PersistNewNodeAsync(UmbracoDbContext db, IContent item, DocumentDto dto)
     {
         NodeDto parent = await GetParentNodeDtoAsync(db, item.ParentId);
@@ -2273,7 +2270,7 @@ internal class DocumentRepository
 
     // Populates PropertyDataDto.SortableValue for any property whose editor implements IDataValueSortable,
     // so custom-field ordering (see ResolveCustomFieldOrderedNodeIdsAsync) can prioritize it over the raw
-    // typed columns. Mirrors NPoco's ContentRepositoryBase.SetEntitySortableValues exactly.
+    // typed columns.
     private void SetEntitySortableValues(IContentBase entity, IEnumerable<PropertyDataDto> propertyDtos)
     {
         var dtosByPropertyTypeId = propertyDtos.GroupBy(dto => dto.PropertyTypeId).ToDictionary(group => group.Key, group => group.ToList());

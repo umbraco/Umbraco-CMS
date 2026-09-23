@@ -480,14 +480,13 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
             dto.Action == ContentScheduleAction.Release.ToString() ? ContentScheduleAction.Release : ContentScheduleAction.Expire);
 
     /// <summary>
-    ///     Gets a value indicating whether saving must keep names unique among siblings. Mirrors NPoco's
-    ///     <c>PublishableContentRepositoryBase.EnsureUniqueNaming</c>.
+    ///     Gets a value indicating whether saving must keep names unique among siblings.
     /// </summary>
     protected virtual bool EnsureUniqueNaming => true;
 
     /// <summary>
     ///     Ensures the entity has a valid, sibling-unique invariant name and, for variant content, sibling-unique
-    ///     names per culture. Ported from NPoco's <c>PublishableContentRepositoryBase.SanitizeNames</c>.
+    ///     names per culture.
     /// </summary>
     protected async Task SanitizeNamesAsync(UmbracoDbContext db, TEntity content, bool publishing)
     {

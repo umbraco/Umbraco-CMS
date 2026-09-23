@@ -113,9 +113,8 @@ internal sealed class AsyncPermissionRepository<TEntity> : AsyncRepositoryBase
     /// </summary>
     public Task AddOrUpdatePermissionsAsync(ContentPermissionSet permission, CancellationToken cancellationToken)
     {
-        // Mirrors NPoco's PermissionRepository.PersistUpdatedItem guard — both PersistNewItem and
-        // PersistUpdatedItem end up here regardless of HasIdentity, since PersistNewItem just forwards
-        // to PersistUpdatedItem in the NPoco version too.
+        // Both the insert and update paths end up here regardless of HasIdentity, because the insert path
+        // forwards to this one.
         if (((IEntity)permission).HasIdentity == false)
         {
             throw new InvalidOperationException("Cannot create permissions for an entity without an Id");

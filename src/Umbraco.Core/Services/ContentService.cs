@@ -269,17 +269,21 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
     /// <inheritdoc />
     public async Task<PagedModel<IContent>> GetByLevelAsync(int level, int skip, int take, Ordering? ordering, CancellationToken cancellationToken)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.ReadLock(Constants.Locks.ContentTree);
-        return await _documentRepository.GetByLevelAsync(level, skip, take, ordering, cancellationToken);
+        PagedModel<IContent> result = await _documentRepository.GetByLevelAsync(level, skip, take, ordering, cancellationToken);
+        scope.Complete();
+        return result;
     }
 
     /// <inheritdoc />
     public async Task<PagedModel<IContent>> GetAncestorsAsync(Guid key, int skip, int take, CancellationToken cancellationToken)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.ReadLock(Constants.Locks.ContentTree);
-        return await _documentRepository.GetAncestorsAsync(key, skip, take, cancellationToken);
+        PagedModel<IContent> result = await _documentRepository.GetAncestorsAsync(key, skip, take, cancellationToken);
+        scope.Complete();
+        return result;
     }
 
     /// <inheritdoc />
@@ -291,9 +295,11 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
     {
         ordering ??= Ordering.By("sortOrder");
 
-        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.ReadLock(Constants.Locks.ContentTree);
-        return await _documentRepository.GetChildrenAsync(parentKey, skip, take, propertyAliases, ordering, cancellationToken);
+        PagedModel<IContent> result = await _documentRepository.GetChildrenAsync(parentKey, skip, take, propertyAliases, ordering, cancellationToken);
+        scope.Complete();
+        return result;
     }
 
     /// <inheritdoc />
@@ -301,9 +307,11 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
     {
         ordering ??= Ordering.By("sortOrder");
 
-        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.ReadLock(Constants.Locks.ContentTree);
-        return await _documentRepository.GetChildrenWithoutTemplatesAsync(parentKey, skip, take, propertyAliases, ordering, cancellationToken);
+        PagedModel<IContent> result = await _documentRepository.GetChildrenWithoutTemplatesAsync(parentKey, skip, take, propertyAliases, ordering, cancellationToken);
+        scope.Complete();
+        return result;
     }
 
     /// <inheritdoc />
@@ -311,9 +319,11 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
     {
         ordering ??= Ordering.By("Path");
 
-        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.ReadLock(Constants.Locks.ContentTree);
-        return await _documentRepository.GetDescendantsAsync(ancestorKey, skip, take, ordering, cancellationToken, includeTrashed);
+        PagedModel<IContent> result = await _documentRepository.GetDescendantsAsync(ancestorKey, skip, take, ordering, cancellationToken, includeTrashed);
+        scope.Complete();
+        return result;
     }
 
     /// <inheritdoc />
@@ -321,9 +331,11 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
     {
         ordering ??= Ordering.By("Path");
 
-        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.ReadLock(Constants.Locks.ContentTree);
-        return await _documentRepository.GetDescendantsWithoutTemplatesAsync(ancestorKey, skip, take, ordering, cancellationToken, includeTrashed);
+        PagedModel<IContent> result = await _documentRepository.GetDescendantsWithoutTemplatesAsync(ancestorKey, skip, take, ordering, cancellationToken, includeTrashed);
+        scope.Complete();
+        return result;
     }
 
     /// <inheritdoc />
@@ -1487,10 +1499,12 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
     /// <returns>An Enumerable list of <see cref="IContent" /> objects</returns>
     internal async Task<IReadOnlyCollection<IContent>> GetPublishedDescendantsAsync(IContent content, CancellationToken cancellationToken)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             scope.ReadLock(Constants.Locks.ContentTree);
-            return await GetPublishedDescendantsLockedAsync(content, cancellationToken);
+            IReadOnlyCollection<IContent> result = await GetPublishedDescendantsLockedAsync(content, cancellationToken);
+            scope.Complete();
+            return result;
         }
     }
 

@@ -270,10 +270,12 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
     /// <inheritdoc/>
     public async Task<int> CountPublishedAsync(string? contentTypeAlias, CancellationToken cancellationToken)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             scope.ReadLock(ReadLockIds);
-            return await _asyncContentRepository.CountPublishedAsync(contentTypeAlias, cancellationToken);
+            int result = await _asyncContentRepository.CountPublishedAsync(contentTypeAlias, cancellationToken);
+            scope.Complete();
+            return result;
         }
     }
 
@@ -337,10 +339,12 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
     /// <inheritdoc/>
     public async Task<TContent?> GetByIdAsync(Guid key, CancellationToken cancellationToken)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             scope.ReadLock(ReadLockIds);
-            return await _asyncContentRepository.GetAsync(key, cancellationToken);
+            TContent? result = await _asyncContentRepository.GetAsync(key, cancellationToken);
+            scope.Complete();
+            return result;
         }
     }
 
@@ -353,21 +357,25 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
             return Enumerable.Empty<TContent>();
         }
 
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             scope.ReadLock(ReadLockIds);
             IEnumerable<TContent> items = await _asyncContentRepository.GetManyAsync(idsA, cancellationToken);
             var index = items.ToDictionary(x => x.Key, x => x);
-            return idsA.Select(x => index.GetValueOrDefault(x)).WhereNotNull();
+            IEnumerable<TContent> result = idsA.Select(x => index.GetValueOrDefault(x)).WhereNotNull();
+            scope.Complete();
+            return result;
         }
     }
 
     /// <inheritdoc />
     public async Task<ContentScheduleCollection> GetContentScheduleByContentIdAsync(Guid contentId, CancellationToken cancellationToken)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.ReadLock(ReadLockIds);
-        return await _asyncContentRepository.GetContentScheduleAsync(contentId, cancellationToken);
+        ContentScheduleCollection result = await _asyncContentRepository.GetContentScheduleAsync(contentId, cancellationToken);
+        scope.Complete();
+        return result;
     }
 
     /// <inheritdoc />
@@ -378,9 +386,11 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
             return ImmutableDictionary<Guid, IEnumerable<ContentSchedule>>.Empty;
         }
 
-        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.ReadLock(ReadLockIds);
-        return await _asyncContentRepository.GetContentSchedulesByKeysAsync(keys, cancellationToken);
+        IDictionary<Guid, IEnumerable<ContentSchedule>> result = await _asyncContentRepository.GetContentSchedulesByKeysAsync(keys, cancellationToken);
+        scope.Complete();
+        return result;
     }
 
     /// <inheritdoc />

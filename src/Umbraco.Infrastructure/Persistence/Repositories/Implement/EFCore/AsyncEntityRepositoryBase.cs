@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Persistence;
@@ -182,13 +183,13 @@ public abstract class AsyncEntityRepositoryBase<TKey, TEntity> : AsyncRepository
 
         // can't query more than 2000 ids at a time... but if someone is really querying 2000+ entities,
         // the additional overhead of fetching them in groups is minimal compared to the lookup time of each group
-        if (keys.Length <= Core.Constants.Sql.MaxParameterCount)
+        if (keys.Length <= Constants.Sql.MaxParameterCount)
         {
             return await CachePolicy.GetManyAsync(keys, PerformGetManyAsync, PerformGetAllAsync);
         }
 
         var entities = new List<TEntity>();
-        foreach (IEnumerable<TKey> group in keys.InGroupsOf(Core.Constants.Sql.MaxParameterCount))
+        foreach (IEnumerable<TKey> group in keys.InGroupsOf(Constants.Sql.MaxParameterCount))
         {
             TEntity[] groups = await CachePolicy.GetManyAsync(group.ToArray(), PerformGetManyAsync, PerformGetAllAsync);
             entities.AddRange(groups);
