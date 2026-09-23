@@ -67,7 +67,8 @@ public interface IPackageDataInstallation
     /// <param name="typeService">The service for managing content types.</param>
     /// <param name="service">The async service for managing content.</param>
     /// <returns>A read-only list of imported content base items.</returns>
-    /// TODO EFCore : Remove this once media and member types have been migrated, and we can use the IContentServiceBase overload again.
+    // TODO (V20): remove this overload once media and member types have an async service and the
+    // IContentServiceBase overload can be used again.
     IReadOnlyList<TContentBase> ImportContentBase<TContentBase, TContentTypeComposition>(
         IEnumerable<CompiledPackageContentBase> docs,
         IDictionary<string, TContentTypeComposition> importedDocumentTypes,
@@ -91,7 +92,8 @@ public interface IPackageDataInstallation
     /// <param name="typeService">The document type service.</param>
     /// <param name="service">The service for managing content.</param>
     /// <returns>A read-only list of imported content base items.</returns>
-    /// TODO EFCore : Remove this once media and member types have been migrated, and we can use IContentTypeBaseService again.
+    // TODO (V20): remove this overload once media and member types have an async service and
+    // IContentTypeBaseService can be used again.
     IReadOnlyList<TContentBase> ImportContentBase<TContentBase>(
         IEnumerable<CompiledPackageContentBase> docs,
         IDictionary<string, IContentType> importedDocumentTypes,
@@ -116,7 +118,8 @@ public interface IPackageDataInstallation
     /// <param name="typeService">The document type service.</param>
     /// <param name="service">The async service for managing content.</param>
     /// <returns>A read-only list of imported content base items.</returns>
-    /// TODO EFCore : Remove this once media and member types have been migrated, and we can use IContentTypeBaseService again.
+    // TODO (V20): remove this overload once media and member types have an async service and
+    // IContentTypeBaseService can be used again.
     IReadOnlyList<TContentBase> ImportContentBase<TContentBase>(
         IEnumerable<CompiledPackageContentBase> docs,
         IDictionary<string, IContentType> importedDocumentTypes,

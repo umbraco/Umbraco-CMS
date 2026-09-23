@@ -408,7 +408,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 userId,
                 alias => typeService.Get(alias),
                 key => service.GetByIdAsync(key, CancellationToken.None).GetAwaiter().GetResult(),
-                (contents, saveUserId) => service.SaveAsync(contents, ResolveUserKey(saveUserId), CancellationToken.None).GetAwaiter().GetResult());
+                (contents, saveUserId) => SaveImportedContent(contents, saveUserId, service));
 
         /// <summary>
         /// Imports content base items of a specified type from the provided compiled package content documents using the
@@ -461,7 +461,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 userId,
                 alias => typeService.GetAsync(alias).GetAwaiter().GetResult(),
                 key => service.GetByIdAsync(key, CancellationToken.None).GetAwaiter().GetResult(),
-                (contents, saveUserId) => service.SaveAsync(contents, ResolveUserKey(saveUserId), CancellationToken.None).GetAwaiter().GetResult());
+                (contents, saveUserId) => SaveImportedContent(contents, saveUserId, service));
 
         private IReadOnlyList<TContentBase> ImportContentBase<TContentBase, TContentTypeComposition>(
             IEnumerable<CompiledPackageContentBase> docs,
@@ -537,7 +537,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 userId,
                 alias => typeService.Get(alias),
                 key => service.GetByIdAsync(key, CancellationToken.None).GetAwaiter().GetResult(),
-                (contents, saveUserId) => service.SaveAsync(contents, ResolveUserKey(saveUserId), CancellationToken.None).GetAwaiter().GetResult());
+                (contents, saveUserId) => SaveImportedContent(contents, saveUserId, service));
 
         /// <summary>
         /// Imports and saves package xml as <see cref="IContentBase"/> items using the (asynchronous) document type service.
@@ -593,7 +593,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 userId,
                 alias => typeService.GetAsync(alias).GetAwaiter().GetResult(),
                 key => service.GetByIdAsync(key, CancellationToken.None).GetAwaiter().GetResult(),
-                (contents, saveUserId) => service.SaveAsync(contents, ResolveUserKey(saveUserId), CancellationToken.None).GetAwaiter().GetResult());
+                (contents, saveUserId) => SaveImportedContent(contents, saveUserId, service));
 
         private IEnumerable<TContentBase> ImportContentBase<TContentBase, TContentTypeComposition>(
             IEnumerable<XElement> roots,
@@ -2571,10 +2571,43 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         #endregion
 
         // Resolves an int user id to its Guid key, falling back to SuperUserKey for unknown ids.
+        // The import reports what it created, so a save that the service refuses would otherwise leave the
+        // summary claiming content that is not there.
+        private void SaveImportedContent<TContentBase>(
+            IEnumerable<TContentBase> contents,
+            int userId,
+            IAsyncContentServiceBase<TContentBase> service)
+            where TContentBase : class, IContentBase
+        {
+            Attempt<ContentSaveOperationStatus> result =
+                service.SaveAsync(contents, ResolveUserKey(userId), CancellationToken.None).GetAwaiter().GetResult();
+
+            if (result.Success is false)
+            {
+                _logger.LogError(
+                    "Failed to save imported content while installing package data: {Status}.",
+                    result.Result);
+            }
+        }
+
         private Guid ResolveUserKey(int userId)
         {
             Attempt<Guid> attempt = _userIdKeyResolver.TryGetAsync(userId).GetAwaiter().GetResult();
-            return attempt.Success ? attempt.Result : Constants.Security.SuperUserKey;
+            if (attempt.Success)
+            {
+                return attempt.Result;
+            }
+
+            // Falling back to the super user is the only way to attribute the import at all, but doing it for
+            // a user that simply could not be resolved silently rewrites who performed it.
+            if (userId != Constants.Security.SuperUserId)
+            {
+                _logger.LogWarning(
+                    "Could not resolve a key for user {UserId} while importing package data; the import is attributed to the super user instead.",
+                    userId);
+            }
+
+            return Constants.Security.SuperUserKey;
         }
 
         // Walks a '/'-separated parent path and creates each missing folder via the supplied folder service callbacks.
