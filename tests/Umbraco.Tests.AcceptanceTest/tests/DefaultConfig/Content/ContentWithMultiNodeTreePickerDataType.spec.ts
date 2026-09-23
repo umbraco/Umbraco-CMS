@@ -311,3 +311,163 @@ test('can browse into a collection and pick an item from it', async ({umbracoApi
   await umbracoApi.documentType.ensureNameNotExists(collectionDocumentTypeName);
   await umbracoApi.documentType.ensureNameNotExists(collectionChildDocumentTypeName);
 });
+
+test('can switch a collection to table view within the picker', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const collectionContentName = 'Collection Root Content';
+  const collectionDocumentTypeName = 'CollectionDocumentType';
+  const collectionChildDocumentTypeName = 'CollectionChildDocumentType';
+  const collectionItemName = 'Collection Item';
+  const listViewDataTypeName = 'List View - Content';
+
+  const collectionChildDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentType(collectionChildDocumentTypeName);
+  const listViewDataTypeData = await umbracoApi.dataType.getByName(listViewDataTypeName);
+  const collectionDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedChildNodeAndCollectionId(collectionDocumentTypeName, collectionChildDocumentTypeId, listViewDataTypeData.id);
+  const collectionContentId = await umbracoApi.document.createDefaultDocument(collectionContentName, collectionDocumentTypeId);
+  await umbracoApi.document.createDefaultDocumentWithParent(collectionItemName, collectionChildDocumentTypeId, collectionContentId);
+  const customDataTypeId = await umbracoApi.dataType.createDefaultContentPickerSourceDataType(customDataTypeName);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickChooseButton();
+  await umbracoUi.content.openCaretButtonForName(collectionContentName, true);
+  await umbracoUi.content.changeToListView();
+
+  // Assert
+  await umbracoUi.content.isDocumentListViewVisible();
+
+  // Clean
+  await umbracoApi.document.ensureNameNotExists(collectionContentName);
+  await umbracoApi.document.ensureNameNotExists(collectionItemName);
+  await umbracoApi.documentType.ensureNameNotExists(collectionDocumentTypeName);
+  await umbracoApi.documentType.ensureNameNotExists(collectionChildDocumentTypeName);
+});
+
+test('can sort a collection by name within the picker', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const collectionContentName = 'Collection Root Content';
+  const collectionDocumentTypeName = 'CollectionDocumentType';
+  const collectionChildDocumentTypeName = 'CollectionChildDocumentType';
+  const firstCollectionItemName = 'Middle Collection Item';
+  const secondCollectionItemName = 'Apple Collection Item';
+  const thirdCollectionItemName = 'Zebra Collection Item';
+  const listViewDataTypeName = 'List View - Content';
+
+  const collectionChildDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentType(collectionChildDocumentTypeName);
+  const listViewDataTypeData = await umbracoApi.dataType.getByName(listViewDataTypeName);
+  const collectionDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedChildNodeAndCollectionId(collectionDocumentTypeName, collectionChildDocumentTypeId, listViewDataTypeData.id);
+  const collectionContentId = await umbracoApi.document.createDefaultDocument(collectionContentName, collectionDocumentTypeId);
+  await umbracoApi.document.createDefaultDocumentWithParent(firstCollectionItemName, collectionChildDocumentTypeId, collectionContentId);
+  await umbracoApi.document.createDefaultDocumentWithParent(secondCollectionItemName, collectionChildDocumentTypeId, collectionContentId);
+  await umbracoApi.document.createDefaultDocumentWithParent(thirdCollectionItemName, collectionChildDocumentTypeId, collectionContentId);
+  const customDataTypeId = await umbracoApi.dataType.createDefaultContentPickerSourceDataType(customDataTypeName);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickChooseButton();
+  await umbracoUi.content.openCaretButtonForName(collectionContentName, true);
+  await umbracoUi.content.changeToListView();
+  await umbracoUi.content.clickNameButtonInListView();
+
+  // Assert
+  await umbracoUi.content.doesFirstItemInListViewHaveName(secondCollectionItemName);
+
+  // Clean
+  await umbracoApi.document.ensureNameNotExists(collectionContentName);
+  await umbracoApi.document.ensureNameNotExists(firstCollectionItemName);
+  await umbracoApi.document.ensureNameNotExists(secondCollectionItemName);
+  await umbracoApi.document.ensureNameNotExists(thirdCollectionItemName);
+  await umbracoApi.documentType.ensureNameNotExists(collectionDocumentTypeName);
+  await umbracoApi.documentType.ensureNameNotExists(collectionChildDocumentTypeName);
+});
+
+test('can filter a collection within the picker', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const collectionContentName = 'Collection Root Content';
+  const collectionDocumentTypeName = 'CollectionDocumentType';
+  const collectionChildDocumentTypeName = 'CollectionChildDocumentType';
+  const firstCollectionItemName = 'First Collection Item';
+  const secondCollectionItemName = 'Second Collection Item';
+  const listViewDataTypeName = 'List View - Content';
+
+  const collectionChildDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentType(collectionChildDocumentTypeName);
+  const listViewDataTypeData = await umbracoApi.dataType.getByName(listViewDataTypeName);
+  const collectionDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedChildNodeAndCollectionId(collectionDocumentTypeName, collectionChildDocumentTypeId, listViewDataTypeData.id);
+  const collectionContentId = await umbracoApi.document.createDefaultDocument(collectionContentName, collectionDocumentTypeId);
+  await umbracoApi.document.createDefaultDocumentWithParent(firstCollectionItemName, collectionChildDocumentTypeId, collectionContentId);
+  await umbracoApi.document.createDefaultDocumentWithParent(secondCollectionItemName, collectionChildDocumentTypeId, collectionContentId);
+  const customDataTypeId = await umbracoApi.dataType.createDefaultContentPickerSourceDataType(customDataTypeName);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickChooseButton();
+  await umbracoUi.content.openCaretButtonForName(collectionContentName, true);
+  await umbracoUi.content.changeToListView();
+  await umbracoUi.content.searchByKeywordInCollection(firstCollectionItemName);
+
+  // Assert
+  await umbracoUi.content.doesListViewContainCount(1);
+  await umbracoUi.content.doesFirstItemInListViewHaveName(firstCollectionItemName);
+
+  // Clean
+  await umbracoApi.document.ensureNameNotExists(collectionContentName);
+  await umbracoApi.document.ensureNameNotExists(firstCollectionItemName);
+  await umbracoApi.document.ensureNameNotExists(secondCollectionItemName);
+  await umbracoApi.documentType.ensureNameNotExists(collectionDocumentTypeName);
+  await umbracoApi.documentType.ensureNameNotExists(collectionChildDocumentTypeName);
+});
+
+test('can select an item from a collection table view within the picker', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const collectionContentName = 'Collection Root Content';
+  const collectionDocumentTypeName = 'CollectionDocumentType';
+  const collectionChildDocumentTypeName = 'CollectionChildDocumentType';
+  const firstCollectionItemName = 'First Collection Item';
+  const secondCollectionItemName = 'Second Collection Item';
+  const listViewDataTypeName = 'List View - Content';
+
+  const collectionChildDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentType(collectionChildDocumentTypeName);
+  const listViewDataTypeData = await umbracoApi.dataType.getByName(listViewDataTypeName);
+  const collectionDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedChildNodeAndCollectionId(collectionDocumentTypeName, collectionChildDocumentTypeId, listViewDataTypeData.id);
+  const collectionContentId = await umbracoApi.document.createDefaultDocument(collectionContentName, collectionDocumentTypeId);
+  const firstCollectionItemId = await umbracoApi.document.createDefaultDocumentWithParent(firstCollectionItemName, collectionChildDocumentTypeId, collectionContentId);
+  await umbracoApi.document.createDefaultDocumentWithParent(secondCollectionItemName, collectionChildDocumentTypeId, collectionContentId);
+  const customDataTypeId = await umbracoApi.dataType.createDefaultContentPickerSourceDataType(customDataTypeName);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickChooseButton();
+  await umbracoUi.content.openCaretButtonForName(collectionContentName, true);
+  await umbracoUi.content.changeToListView();
+  await umbracoUi.content.selectContentWithNameInListView(firstCollectionItemName);
+  await umbracoUi.content.clickChooseModalButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
+
+  // Assert
+  const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.values[0].value[0]['unique']).toEqual(firstCollectionItemId);
+  expect(contentData.values[0].value[0]['type']).toEqual('document');
+
+  // Clean
+  await umbracoApi.document.ensureNameNotExists(collectionContentName);
+  await umbracoApi.document.ensureNameNotExists(firstCollectionItemName);
+  await umbracoApi.document.ensureNameNotExists(secondCollectionItemName);
+  await umbracoApi.documentType.ensureNameNotExists(collectionDocumentTypeName);
+  await umbracoApi.documentType.ensureNameNotExists(collectionChildDocumentTypeName);
+});
