@@ -312,6 +312,7 @@ export const KNOWN_LOCALIZATION_KEYS: readonly UmbKnownLocalizationKey[] = [
 	'blockEditor_tabLibrary',
 	'blockEditor_thumbnail',
 	'blockEditor_transferToElementLibrary',
+	'blockEditor_transferToElementLibraryUnsavedText',
 	'blockEditor_unsupportedBlockDescription',
 	'blockEditor_unsupportedBlockName',
 	'blueprints_blankBlueprint',

@@ -32,7 +32,8 @@ import {
 } from '@umbraco-cms/backoffice/property';
 import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
 import { UmbDataTypeDetailRepository } from '@umbraco-cms/backoffice/data-type';
-import { UmbElementDetailRepository } from '@umbraco-cms/backoffice/element';
+import { UmbElementDetailRepository, UmbElementTransferRepository } from '@umbraco-cms/backoffice/element';
+import { UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
 import { UMB_MODAL_MANAGER_CONTEXT, umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 
 export type UmbBlockDataObjectModel<LayoutEntryType extends UmbBlockLayoutBaseModel> = {
@@ -103,6 +104,7 @@ export abstract class UmbBlockManagerContext<
 		(x) => x.key,
 	);
 	#elementRepository = new UmbElementDetailRepository(this);
+	#elementTransferRepository = new UmbElementTransferRepository(this);
 	#pendingElementFetches = new Set<string>();
 
 	readonly #settings = new UmbArrayState(<Array<UmbBlockDataModel>>[], (x) => x.key);
@@ -539,8 +541,7 @@ export abstract class UmbBlockManagerContext<
 		const layout = this._layouts.getValue().find((x) => x.key === key);
 		if (!layout) return;
 		const contentKey = layout.contentKey;
-		const content = this.getContentOf(contentKey);
-		if (!content) return;
+		if (!this.getContentOf(contentKey)) return;
 
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT).catch(() => undefined);
 		if (!modalManager) return;
@@ -550,30 +551,24 @@ export abstract class UmbBlockManagerContext<
 			.catch(() => undefined);
 		if (!result) return;
 
-		const { data: scaffold } = await this.#elementRepository.createScaffold({
-			documentType: { unique: content.contentTypeKey, collection: null },
-			values: content.values,
-			variants: [
-				{
-					culture: null,
-					segment: null,
-					state: null,
-					name: result.name,
-					publishDate: null,
-					createDate: null,
-					updateDate: null,
-				},
-			],
-		});
-		if (!scaffold) return;
+		// the server reads the block's values out of the owner's stored data and finds which property holds
+		// it, so all it needs is which content item and which block.
+		const entityContext = await this.getContext(UMB_ENTITY_CONTEXT).catch(() => undefined);
+		const owner = entityContext?.getUnique();
+		if (!owner) return;
 
-		const { data: created } = await this.#elementRepository.create(scaffold, result.parentUnique);
-		if (!created) return;
+		const { data: elementUnique } = await this.#elementTransferRepository.transferFromBlock({
+			owner,
+			block: contentKey,
+			parent: result.parentUnique,
+			name: result.name,
+		});
+		if (!elementUnique) return;
 
 		this.#contents.removeOne(contentKey);
 		this.removeExposesOf(contentKey);
 		this._layouts.updateOne(key, {
-			contentKey: created.unique,
+			contentKey: elementUnique,
 			isExternalContent: true,
 		} as Partial<BlockLayoutType>);
 	}

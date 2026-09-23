@@ -339,6 +339,7 @@ declare global {
 		blockEditor_tabLibrary: string;
 		blockEditor_thumbnail: string;
 		blockEditor_transferToElementLibrary: string;
+		blockEditor_transferToElementLibraryUnsavedText: string;
 		blockEditor_unsupportedBlockDescription: string;
 		blockEditor_unsupportedBlockName: string;
 		blueprints_blankBlueprint: string;

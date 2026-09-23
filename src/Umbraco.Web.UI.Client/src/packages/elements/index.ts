@@ -15,6 +15,7 @@ export * from './recycle-bin/index.js';
 export * from './reference/index.js';
 export * from './repository/index.js';
 export * from './rollback/index.js';
+export * from './transfer/index.js';
 export * from './variant-state.js';
 
 export type * from './types.js';

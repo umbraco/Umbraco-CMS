@@ -324,6 +324,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IElementEditingService, ElementEditingService>();
             Services.AddUnique<IContentPublishingService, ContentPublishingService>();
             Services.AddUnique<IElementPublishingService, ElementPublishingService>();
+            Services.AddUnique<IBlockElementResolver, BlockElementResolver>();
             Services.AddUnique<IContentValidationService, ContentValidationService>();
             Services.AddUnique<IElementValidationService, ElementValidationService>();
             Services.AddUnique<IContentVersionCleanupPolicy, DefaultContentVersionCleanupPolicy>();

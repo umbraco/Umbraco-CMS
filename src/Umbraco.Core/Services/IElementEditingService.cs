@@ -39,6 +39,31 @@ public interface IElementEditingService
     Task<Attempt<ElementCreateResult, ContentEditingOperationStatus>> CreateAsync(ElementCreateModel createModel, Guid userKey);
 
     /// <summary>
+    ///     Creates an element from a block held in a content item's property, reproducing the cultures the
+    ///     block is currently live in.
+    /// </summary>
+    /// <param name="createModel">Which block to take, and where to put the element.</param>
+    /// <param name="allowPublish">
+    ///     Whether publishing in the Library is permitted here, which the caller decides. Reproducing the
+    ///     block's live state is best effort: passing <c>true</c> does not guarantee it, since a culture whose
+    ///     values do not validate, or a subset that would leave a mandatory language uncovered, lands as draft
+    ///     instead. Passing <c>false</c> takes the same fallback for every culture, leaving an element that
+    ///     holds the owner's draft values and is published nowhere.
+    /// </param>
+    /// <param name="userKey">The unique identifier of the user performing the operation.</param>
+    /// <returns>An attempt containing the created element or an error status.</returns>
+    /// <remarks>
+    ///     Everything about the element is read from what the owner has stored: its published values become the
+    ///     element's published version, its draft values the element's draft. Nothing comes from the caller
+    ///     except the name and where to put it, which is why this does not go through the ordinary create
+    ///     pipeline - there are no caller-supplied fields to validate or narrow.
+    /// </remarks>
+    Task<Attempt<IElement?, ElementCreateFromBlockOperationStatus>> CreateFromBlockAsync(
+        CreateElementFromBlockModel createModel,
+        bool allowPublish,
+        Guid userKey);
+
+    /// <summary>
     ///     Creates and publishes a new element.
     /// </summary>
     /// <param name="createModel">The model containing the element data.</param>

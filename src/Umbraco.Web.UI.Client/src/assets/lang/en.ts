@@ -2982,6 +2982,8 @@ export default {
 			'This content is no longer supported in this Editor. If you are missing this content, please contact your administrator. Otherwise delete it.',
 		tabLibrary: 'Library',
 		transferToElementLibrary: 'Transfer to Library',
+		transferToElementLibraryUnsavedText:
+			'This item has unsaved changes. Save before transferring the block to the Library.',
 		disconnectFromElementLibrary: 'Disconnect from Library',
 		disconnectFromElementLibraryConfirm:
 			'This will create a local copy of the Element content. The Library Element will not be affected.',

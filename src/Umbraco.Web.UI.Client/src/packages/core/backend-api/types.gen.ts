@@ -287,6 +287,14 @@ export type CreateDocumentTypeTemplateRequestModel = {
     isDefault: boolean;
 };
 
+export type CreateElementFromBlockRequestModel = {
+    id?: null | string;
+    owner: ReferenceByIdModel;
+    block: ReferenceByIdModel;
+    parent?: null | ReferenceByIdModel;
+    name: string;
+};
+
 export type CreateElementRequestModel = {
     documentType: ReferenceByIdModel;
     parent?: null | ReferenceByIdModel;
@@ -9342,6 +9350,41 @@ export type GetElementFolderByIdReferencedDescendantsResponses = {
 };
 
 export type GetElementFolderByIdReferencedDescendantsResponse = GetElementFolderByIdReferencedDescendantsResponses[keyof GetElementFolderByIdReferencedDescendantsResponses];
+
+export type PostElementFromBlockData = {
+    body: CreateElementFromBlockRequestModel;
+    path?: never;
+    query?: never;
+    url: '/umbraco/management/api/v1/element/from-block';
+};
+
+export type PostElementFromBlockErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type PostElementFromBlockError = PostElementFromBlockErrors[keyof PostElementFromBlockErrors];
+
+export type PostElementFromBlockResponses = {
+    /**
+     * Created
+     */
+    201: unknown;
+};
 
 export type PostElementValidateData = {
     body: CreateElementRequestModel;

@@ -94,6 +94,82 @@ public class BlockListEditorPropertyValueEditorTests
     }
 
     [Test]
+    public void GetBlockValue_Returns_Null_For_Null_Value()
+    {
+        var editor = CreateValueEditor();
+        var result = editor.GetBlockValue(null);
+        Assert.IsNull(result);
+    }
+
+    [Test]
+    public void GetBlockValue_Returns_The_Content_Data_Held_By_The_Value()
+    {
+        var value = CreateBlockJsonWithExpose([new BlockItemVariation(_contentKey, null, null)]);
+        var editor = CreateValueEditor();
+
+        var result = editor.GetBlockValue(value);
+
+        Assert.IsNotNull(result);
+        var contentData = result.ContentData.Single(x => x.Key == _contentKey);
+        Assert.AreEqual(_contentTypeKey, contentData.ContentTypeKey);
+        Assert.AreEqual("A", contentData.Values.Single(x => x.Alias == "message").Value);
+    }
+
+    [Test]
+    public void GetBlockValue_Returns_The_Exposures_Held_By_The_Value()
+    {
+        var value = CreateBlockJsonWithExpose(
+        [
+            new BlockItemVariation(_contentKey, "da-dk", null),
+            new BlockItemVariation(_contentKey, "en-us", null),
+        ]);
+        var editor = CreateValueEditor();
+
+        var result = editor.GetBlockValue(value);
+
+        Assert.IsNotNull(result);
+        CollectionAssert.AreEquivalent(new[] { "da-dk", "en-us" }, result.Expose.Select(x => x.Culture));
+    }
+
+    [Test]
+    public void GetBlockValue_Returns_Null_When_The_Value_Holds_No_Layout()
+    {
+        var editor = CreateValueEditor();
+
+        Assert.IsNull(editor.GetBlockValue(new JsonObject()));
+    }
+
+    [Test]
+    public void GetBlockValue_Returns_No_Exposures_When_The_Value_Holds_None()
+    {
+        var value = CreateBlockJsonWithExpose([]);
+        var editor = CreateValueEditor();
+
+        var result = editor.GetBlockValue(value);
+
+        Assert.IsNotNull(result);
+        Assert.IsEmpty(result.Expose);
+    }
+
+    private static JsonObject CreateBlockJsonWithExpose(IEnumerable<BlockItemVariation> expose)
+    {
+        var exposeArray = new JsonArray();
+        foreach (BlockItemVariation variation in expose)
+        {
+            exposeArray.Add(new JsonObject
+            {
+                { "contentKey", variation.ContentKey },
+                { "culture", variation.Culture },
+                { "segment", variation.Segment },
+            });
+        }
+
+        var blockJson = CreateBlocksJson(1);
+        blockJson["expose"] = exposeArray;
+        return blockJson;
+    }
+
+    [Test]
     public void FromEditor_With_Null_Current_Value_Returns_Expected_Json_Value()
     {
         var editedValue = CreateBlocksJson(1);

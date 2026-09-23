@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// <summary>
 /// Serves as the base class for property value editors that process block-based property values, parameterized by specific value (<typeparamref name="TValue"/>) and layout (<typeparamref name="TLayout"/>) types.
 /// </summary>
-public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataValueEditor, IDataValueReference, IDataValueTags
+public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataValueEditor, IDataValueReference, IDataValueTags, IBlockValueEditor
     where TValue : BlockValue<TLayout>, new()
     where TLayout : class, IBlockLayoutItem, new()
 {
@@ -897,6 +897,32 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
         // deserialization, so for non-primitive values they are typically boxed JsonElements - a struct
         // whose default equality is not a structural comparison. Round-trip through the serializer instead.
         return _jsonSerializer.Serialize(sourceValue) == _jsonSerializer.Serialize(targetValue);
+    }
+
+    /// <summary>
+    /// Gets the block value behind a property value.
+    /// </summary>
+    /// <param name="value">The property value to read the block value from.</param>
+    /// <returns>
+    /// The block value, or <c>null</c> if the property value is empty or holds no block layout.
+    /// </returns>
+    /// <remarks>
+    /// The value is deserialized and cleaned on every call, so each caller gets its own instance and is free
+    /// to read whatever it needs from it - <see cref="BlockValue.ContentData" />,
+    /// <see cref="BlockValue.SettingsData" />, <see cref="BlockValue.Expose" /> or the layout.
+    /// </remarks>
+    /// <inheritdoc />
+    public BlockValue? GetBlockValue(object? value)
+    {
+        if (value is null)
+        {
+            return null;
+        }
+
+        BlockEditorData<TValue, TLayout>? blockEditorData = BlockEditorValues.DeserializeAndClean(value);
+        return blockEditorData?.Layout is not null
+            ? blockEditorData.BlockValue
+            : null;
     }
 
     protected TValue MergeBlockEditorDataForCulture(TValue sourceBlockValue, TValue targetBlockValue, string? culture)

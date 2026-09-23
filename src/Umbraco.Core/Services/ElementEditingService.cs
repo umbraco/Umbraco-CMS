@@ -4,6 +4,7 @@ using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Notifications;
@@ -28,6 +29,7 @@ internal sealed class ElementEditingService
     private readonly IIdKeyMap _idKeyMap;
     private readonly IAuditService _auditService;
     private readonly IRelationService _relationService;
+    private readonly IBlockElementResolver _blockElementResolver;
 
     public ElementEditingService(
         IElementService elementService,
@@ -46,7 +48,8 @@ internal sealed class ElementEditingService
         IIdKeyMap idKeyMap,
         ILanguageService languageService,
         IUserService userService,
-        IAuditService auditService)
+        IAuditService auditService,
+        IBlockElementResolver blockElementResolver)
         : base(
             elementService,
             contentTypeService,
@@ -71,6 +74,7 @@ internal sealed class ElementEditingService
         _idKeyMap = idKeyMap;
         _auditService = auditService;
         _relationService = relationService;
+        _blockElementResolver = blockElementResolver;
     }
 
     /// <inheritdoc/>
@@ -135,6 +139,141 @@ internal sealed class ElementEditingService
     /// <inheritdoc />
     public async Task<Attempt<ElementCreateResult, ContentEditingOperationStatus>> CreateAndPublishAsync(ElementCreateModel createModel, string[] culturesToPublish, Guid userKey)
         => await HandleCreateAsync(createModel, culturesToPublish, userKey);
+
+    /// <inheritdoc />
+    public async Task<Attempt<IElement?, ElementCreateFromBlockOperationStatus>> CreateFromBlockAsync(
+        CreateElementFromBlockModel createModel,
+        bool allowPublish,
+        Guid userKey)
+    {
+        Attempt<BlockElementSource, ElementCreateFromBlockOperationStatus> source = _blockElementResolver.Resolve(createModel.OwnerKey, createModel.BlockKey);
+        if (source.Success is false)
+        {
+            return Attempt.FailWithStatus<IElement?, ElementCreateFromBlockOperationStatus>(source.Status, null);
+        }
+
+        IContentType? elementType = ContentTypeService.Get(source.Result.ContentTypeKey);
+        if (elementType is null)
+        {
+            return Attempt.FailWithStatus<IElement?, ElementCreateFromBlockOperationStatus>(ElementCreateFromBlockOperationStatus.ContentTypeNotFound, null);
+        }
+
+        if (IsAllowedLibraryElement(elementType) is false)
+        {
+            return Attempt.FailWithStatus<IElement?, ElementCreateFromBlockOperationStatus>(ElementCreateFromBlockOperationStatus.NotAllowed, null);
+        }
+
+        // the ordinary create path's parent check, so a content type filter forbidding this element type
+        // under the target folder is honoured here too.
+        (int? ParentId, ContentEditingOperationStatus OperationStatus) parent = await TryGetAndValidateParentIdAsync(createModel.ParentKey, elementType);
+        if (parent.OperationStatus is not ContentEditingOperationStatus.Success)
+        {
+            return Attempt.FailWithStatus<IElement?, ElementCreateFromBlockOperationStatus>(
+                parent.OperationStatus is ContentEditingOperationStatus.ParentNotFound
+                    ? ElementCreateFromBlockOperationStatus.ParentNotFound
+                    : ElementCreateFromBlockOperationStatus.NotAllowed,
+                null);
+        }
+
+        using ICoreScope scope = CoreScopeProvider.CreateCoreScope();
+        scope.WriteLock(Constants.Locks.ElementTree);
+
+        IElement element = New(string.Empty, parent.ParentId ?? Constants.System.Root, elementType);
+        if (createModel.Key.HasValue)
+        {
+            element.Key = createModel.Key.Value;
+        }
+
+        // build from what was live, so the element's published version is what the site was showing; where
+        // nothing was live there is nothing to reproduce and the owner's draft is all there is.
+        IReadOnlyList<BlockPropertyValue> publishedValues = source.Result.PublishedValues ?? source.Result.DraftValues;
+        ApplyNames(element, elementType, createModel.Name, publishedValues.Select(value => value.Culture));
+        ApplyStoredValues(element, elementType, publishedValues);
+
+        IReadOnlyCollection<string?> publishableCultures = allowPublish && source.Result.LiveCultures.Count > 0
+            ? await _blockElementResolver.ResolvePublishableCulturesAsync(element, elementType, source.Result.LiveCultures)
+            : [];
+
+        if (publishableCultures.Count > 0)
+        {
+            // an invariant element type throws if given any culture at all.
+            ContentEditingOperationStatus publishStatus = elementType.VariesByCulture()
+                ? await SaveAndPublish(element, [.. publishableCultures.Select(culture => culture!)], userKey)
+                : await SaveAndPublish(element, [], userKey);
+
+            if (publishStatus is not ContentEditingOperationStatus.Success)
+            {
+                return Attempt.FailWithStatus<IElement?, ElementCreateFromBlockOperationStatus>(MapSaveStatus(publishStatus), null);
+            }
+        }
+
+        // the owner's draft on top of what was published. Where nothing was published this is the only write,
+        // and where the draft says the same as the published version there is nothing left to write at all -
+        // saving anyway would leave the new element looking like it had pending changes it does not have.
+        ApplyStoredValues(element, elementType, source.Result.DraftValues);
+        if (element.HasIdentity is false || element.IsDirty())
+        {
+            ContentEditingOperationStatus saveStatus = await SaveAsync(element, userKey);
+            if (saveStatus is not ContentEditingOperationStatus.Success)
+            {
+                return Attempt.FailWithStatus<IElement?, ElementCreateFromBlockOperationStatus>(MapSaveStatus(saveStatus), null);
+            }
+        }
+
+        scope.Complete();
+        return Attempt.SucceedWithStatus<IElement?, ElementCreateFromBlockOperationStatus>(ElementCreateFromBlockOperationStatus.Success, element);
+    }
+
+    /// <summary>
+    ///     Applies a block's stored property values to an element.
+    /// </summary>
+    /// <remarks>
+    ///     Values read out of a stored property value have already been through their value editors on the way
+    ///     into storage, so they are applied exactly as they are.
+    /// </remarks>
+    internal static void ApplyStoredValues(IElement element, IContentType elementType, IEnumerable<BlockPropertyValue> values)
+    {
+        Dictionary<string, IPropertyType> propertyTypesByAlias = PropertyTypesByAlias(elementType);
+
+        foreach (BlockPropertyValue value in values)
+        {
+            if (propertyTypesByAlias.ContainsKey(value.Alias) is false)
+            {
+                continue;
+            }
+
+            element.SetValue(value.Alias, value.Value, value.Culture, value.Segment);
+        }
+    }
+
+    /// <summary>
+    ///     Names an element after the request, in every culture it holds values for.
+    /// </summary>
+    internal static void ApplyNames(IElement element, IContentType elementType, string name, IEnumerable<string?> cultures)
+    {
+        if (elementType.VariesByCulture() is false)
+        {
+            element.Name = name;
+            return;
+        }
+
+        foreach (string culture in cultures.WhereNotNull().Distinct())
+        {
+            element.SetCultureName(name, culture);
+        }
+    }
+
+    // an alias the element type does not have cannot be stored at all - SetValue throws on it, which would
+    // take down the whole operation over a single stale value.
+    private static Dictionary<string, IPropertyType> PropertyTypesByAlias(IContentType elementType)
+        => elementType.CompositionPropertyTypes.ToDictionary(propertyType => propertyType.Alias);
+
+    private static ElementCreateFromBlockOperationStatus MapSaveStatus(ContentEditingOperationStatus status)
+        => status switch
+        {
+            ContentEditingOperationStatus.CancelledByNotification => ElementCreateFromBlockOperationStatus.CancelledByNotification,
+            _ => ElementCreateFromBlockOperationStatus.Unknown,
+        };
 
     private async Task<Attempt<ElementCreateResult, ContentEditingOperationStatus>> HandleCreateAsync(ElementCreateModel createModel, string[]? culturesToPublish, Guid userKey)
     {
