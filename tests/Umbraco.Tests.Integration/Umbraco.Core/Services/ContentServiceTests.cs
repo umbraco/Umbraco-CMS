@@ -93,7 +93,13 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
             .AddNotificationHandler<ContentCopiedNotification, ContentNotificationHandler>()
             .AddNotificationHandler<ContentSavingNotification, ContentNotificationHandler>()
             .AddNotificationHandler<ContentMovingToRecycleBinNotification, ContentNotificationHandler>()
-            .AddNotificationHandler<ContentDeletingVersionsNotification, ContentNotificationHandler>();
+            .AddNotificationHandler<ContentDeletingVersionsNotification, ContentNotificationHandler>()
+            .AddNotificationHandler<ContentDeletingNotification, ContentNotificationHandler>()
+            .AddNotificationHandler<ContentMovingNotification, ContentNotificationHandler>()
+            .AddNotificationHandler<ContentEmptyingRecycleBinNotification, ContentNotificationHandler>()
+            .AddNotificationHandler<ContentSortingNotification, ContentNotificationHandler>()
+            .AddNotificationHandler<ContentRollingBackNotification, ContentNotificationHandler>()
+            .AddNotificationHandler<ContentSendingToPublishNotification, ContentNotificationHandler>();
 
         builder.Services.AddUnique<IIdKeyMap>(services => new SpyIdKeyMap(ActivatorUtilities.CreateInstance<IdKeyMap>(services)));
     }
@@ -3540,6 +3546,295 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     }
 
     [Test]
+    public async Task DeleteAsync_DeletingNotificationCancelled_ReturnsCancelledStatusAndDoesNotDelete()
+    {
+        ContentNotificationHandler.DeletingContent = notification => notification.Cancel = true;
+
+        try
+        {
+            IContent content = (await ContentService.GetByIdAsync(Subpage.Key, CancellationToken.None))!;
+
+            Attempt<ContentDeleteOperationStatus> result =
+                await ContentService.DeleteAsync(content, Constants.Security.SuperUserKey, CancellationToken.None);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.Success, Is.False);
+                Assert.That(result.Result, Is.EqualTo(ContentDeleteOperationStatus.CancelledByNotification));
+            });
+            Assert.That(
+                await ContentService.GetByIdAsync(Subpage.Key, CancellationToken.None),
+                Is.Not.Null,
+                "a vetoed delete must leave the document in place");
+        }
+        finally
+        {
+            ContentNotificationHandler.DeletingContent = null;
+        }
+    }
+
+    [Test]
+    public async Task MoveAsync_MovingNotificationCancelled_ReturnsCancelledStatusAndDoesNotMove()
+    {
+        ContentNotificationHandler.MovingContent = notification => notification.Cancel = true;
+
+        try
+        {
+            IContent content = (await ContentService.GetByIdAsync(Subpage.Key, CancellationToken.None))!;
+            var originalParentId = content.ParentId;
+
+            Attempt<ContentMoveOperationStatus> result = await ContentService.MoveAsync(
+                content, Subpage2.Key, includeDescendants: false, Constants.Security.SuperUserKey, CancellationToken.None);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.Success, Is.False);
+                Assert.That(result.Result, Is.EqualTo(ContentMoveOperationStatus.CancelledByNotification));
+            });
+            IContent reloaded = (await ContentService.GetByIdAsync(Subpage.Key, CancellationToken.None))!;
+            Assert.That(reloaded.ParentId, Is.EqualTo(originalParentId), "a vetoed move must not be persisted");
+        }
+        finally
+        {
+            ContentNotificationHandler.MovingContent = null;
+        }
+    }
+
+    [Test]
+    public async Task EmptyRecycleBinAsync_EmptyingNotificationCancelled_ReturnsCancelledStatusAndDoesNotEmpty()
+    {
+        ContentNotificationHandler.EmptyingRecycleBin = notification => notification.Cancel = true;
+
+        try
+        {
+            Attempt<ContentEmptyRecycleBinOperationStatus> result =
+                await ContentService.EmptyRecycleBinAsync(Constants.Security.SuperUserKey, CancellationToken.None);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.Success, Is.False);
+                Assert.That(result.Result, Is.EqualTo(ContentEmptyRecycleBinOperationStatus.CancelledByNotification));
+            });
+            Assert.That(
+                await ContentService.GetByIdAsync(Trashed.Key, CancellationToken.None),
+                Is.Not.Null,
+                "a vetoed empty must leave the contents of the bin in place");
+        }
+        finally
+        {
+            ContentNotificationHandler.EmptyingRecycleBin = null;
+        }
+    }
+
+    [Test]
+    public async Task SortAsync_SortingNotificationCancelled_ReturnsCancelledStatusAndDoesNotReorder()
+    {
+        ContentNotificationHandler.SortingContent = notification => notification.Cancel = true;
+
+        try
+        {
+            var originalSortOrder = (await ContentService.GetByIdAsync(Subpage2.Key, CancellationToken.None))!.SortOrder;
+
+            Attempt<ContentSortOperationStatus> result = await ContentService.SortAsync(
+                [Subpage2.Key, Subpage.Key, Subpage3.Key], Constants.Security.SuperUserKey, CancellationToken.None);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.Success, Is.False);
+                Assert.That(result.Result, Is.EqualTo(ContentSortOperationStatus.CancelledByNotification));
+            });
+            IContent reloaded = (await ContentService.GetByIdAsync(Subpage2.Key, CancellationToken.None))!;
+            Assert.That(reloaded.SortOrder, Is.EqualTo(originalSortOrder), "a vetoed sort must not be persisted");
+        }
+        finally
+        {
+            ContentNotificationHandler.SortingContent = null;
+        }
+    }
+
+    [Test]
+    public async Task RollbackAsync_RollingBackNotificationCancelled_ReturnsCancelledStatus()
+    {
+        // Publishing under an unpublished ancestor fails silently, so the parent is published first and both
+        // results are asserted - otherwise no second version is created and the test would be measuring nothing.
+        IContent parent = (await ContentService.GetByIdAsync(Textpage.Key, CancellationToken.None))!;
+        PublishResult parentPublish = await ContentService.PublishAsync(parent, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
+        Assert.That(parentPublish.Success, Is.True, "guard: the ancestor must be published");
+
+        IContent content = (await ContentService.GetByIdAsync(Subpage.Key, CancellationToken.None))!;
+        PublishResult publish = await ContentService.PublishAsync(content, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
+        Assert.That(publish.Success, Is.True, "guard: the document must be published");
+
+        // A draft save reuses the current version row, so the earlier version only becomes a separate row
+        // once it has been published.
+        content.SetValue("title", "second");
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
+
+        var versionIds = (await ContentService.GetVersionIdsAsync(Subpage.Key, 0, 10, CancellationToken.None)).ToList();
+        Assert.That(versionIds, Has.Count.GreaterThan(1), "guard: rolling back needs an earlier version to roll back to");
+
+        ContentNotificationHandler.RollingBackContent = notification => notification.Cancel = true;
+
+        try
+        {
+            Attempt<ContentRollbackOperationStatus> result = await ContentService.RollbackAsync(
+                Subpage.Key, versionIds[^1], "*", Constants.Security.SuperUserKey, CancellationToken.None);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.Success, Is.False);
+                Assert.That(result.Result, Is.EqualTo(ContentRollbackOperationStatus.CancelledByNotification));
+            });
+        }
+        finally
+        {
+            ContentNotificationHandler.RollingBackContent = null;
+        }
+    }
+
+    [Test]
+    public async Task CopyAsync_CopyingNotificationCancelled_ReturnsCancelledStatusAndDoesNotCopy()
+    {
+        ContentNotificationHandler.CopyingContent = notification => notification.Cancel = true;
+
+        try
+        {
+            IContent content = (await ContentService.GetByIdAsync(Subpage.Key, CancellationToken.None))!;
+            var childCountBefore = await ContentService.CountChildrenAsync(Textpage.Key, null, CancellationToken.None);
+
+            Attempt<IContent?, ContentCopyOperationStatus> result = await ContentService.CopyAsync(
+                content, Textpage.Key, relateToOriginal: false, recursive: false,
+                Constants.Security.SuperUserKey, CancellationToken.None);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.Success, Is.False);
+                Assert.That(result.Status, Is.EqualTo(ContentCopyOperationStatus.CancelledByNotification));
+            });
+            Assert.That(
+                await ContentService.CountChildrenAsync(Textpage.Key, null, CancellationToken.None),
+                Is.EqualTo(childCountBefore),
+                "a vetoed copy must not be persisted");
+        }
+        finally
+        {
+            ContentNotificationHandler.CopyingContent = null;
+        }
+    }
+
+    [Test]
+    public async Task DeleteOfTypesAsync_DeletingNotificationCancelled_ReturnsCancelledStatusAndDoesNotDelete()
+    {
+        ContentNotificationHandler.DeletingContent = notification => notification.Cancel = true;
+
+        try
+        {
+            Attempt<ContentDeleteOfTypesOperationStatus> result = await ContentService.DeleteOfTypesAsync(
+                [ContentType.Key], Constants.Security.SuperUserKey, CancellationToken.None);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.Success, Is.False);
+                Assert.That(result.Result, Is.EqualTo(ContentDeleteOfTypesOperationStatus.CancelledByNotification));
+            });
+            Assert.That(
+                await ContentService.GetByIdAsync(Subpage.Key, CancellationToken.None),
+                Is.Not.Null,
+                "a vetoed delete-of-types must leave the documents in place");
+        }
+        finally
+        {
+            ContentNotificationHandler.DeletingContent = null;
+        }
+    }
+
+    [Test]
+    public async Task SendToPublicationAsync_SendingNotificationCancelled_ReturnsCancelledStatus()
+    {
+        ContentNotificationHandler.SendingContentToPublish = notification => notification.Cancel = true;
+
+        try
+        {
+            IContent content = (await ContentService.GetByIdAsync(Subpage.Key, CancellationToken.None))!;
+
+            Attempt<ContentSendToPublicationOperationStatus> result = await ContentService.SendToPublicationAsync(
+                content, Constants.Security.SuperUserKey, CancellationToken.None);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.Success, Is.False);
+                Assert.That(result.Result, Is.EqualTo(ContentSendToPublicationOperationStatus.CancelledByNotification));
+            });
+        }
+        finally
+        {
+            ContentNotificationHandler.SendingContentToPublish = null;
+        }
+    }
+
+    [Test]
+    public async Task HasChildrenAsync_WithChildren_IsTrue()
+    {
+        Assert.That(await ContentService.HasChildrenAsync(Textpage.Key, CancellationToken.None), Is.True);
+    }
+
+    [Test]
+    public async Task HasChildrenAsync_WithoutChildren_IsFalse()
+    {
+        Assert.That(await ContentService.HasChildrenAsync(Subpage.Key, CancellationToken.None), Is.False);
+    }
+
+    [Test]
+    public async Task HasChildrenAsync_WithUnknownKey_IsFalse()
+    {
+        Assert.That(await ContentService.HasChildrenAsync(Guid.NewGuid(), CancellationToken.None), Is.False);
+    }
+
+    [Test]
+    public async Task SortAsync_WithNoKeys_ReportsNoOperation()
+    {
+        Attempt<ContentSortOperationStatus> result =
+            await ContentService.SortAsync([], Constants.Security.SuperUserKey, CancellationToken.None);
+
+        Assert.That(result.Result, Is.EqualTo(ContentSortOperationStatus.NoOperation));
+    }
+
+    [Test]
+    public async Task SortChildrenAsync_WithNoKeys_ReportsNoOperation()
+    {
+        Attempt<ContentSortChildrenOperationStatus> result = await ContentService.SortChildrenAsync(
+            Textpage.Key, [], Constants.Security.SuperUserKey, CancellationToken.None);
+
+        Assert.That(result.Result, Is.EqualTo(ContentSortChildrenOperationStatus.NoOperation));
+    }
+
+    [Test]
+    public async Task RollbackAsync_WithUnknownKey_ReportsContentNotFound()
+    {
+        Attempt<ContentRollbackOperationStatus> result = await ContentService.RollbackAsync(
+            Guid.NewGuid(), 1, "*", Constants.Security.SuperUserKey, CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Success, Is.False);
+            Assert.That(result.Result, Is.EqualTo(ContentRollbackOperationStatus.ContentNotFound));
+        });
+    }
+
+    [Test]
+    public async Task SendToPublicationAsync_WithNullContent_ReportsNotFound()
+    {
+        Attempt<ContentSendToPublicationOperationStatus> result = await ContentService.SendToPublicationAsync(
+            null, Constants.Security.SuperUserKey, CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Success, Is.False);
+            Assert.That(result.Result, Is.EqualTo(ContentSendToPublicationOperationStatus.NotFound));
+        });
+    }
+
+    [Test]
     public async Task MoveToRecycleBinAsync_MovingNotificationCancelled_ReturnsCancelledStatusAndDoesNotMove()
     {
         ContentNotificationHandler.MovingContentToRecycleBin = notification =>
@@ -5652,7 +5947,13 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         INotificationHandler<ContentPublishingNotification>,
         INotificationHandler<ContentSavingNotification>,
         INotificationHandler<ContentMovingToRecycleBinNotification>,
-        INotificationHandler<ContentDeletingVersionsNotification>
+        INotificationHandler<ContentDeletingVersionsNotification>,
+        INotificationHandler<ContentDeletingNotification>,
+        INotificationHandler<ContentMovingNotification>,
+        INotificationHandler<ContentEmptyingRecycleBinNotification>,
+        INotificationHandler<ContentSortingNotification>,
+        INotificationHandler<ContentRollingBackNotification>,
+        INotificationHandler<ContentSendingToPublishNotification>
     {
         public static Action<ContentPublishingNotification>? PublishingContent { get; set; }
 
@@ -5666,6 +5967,18 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
         public static Action<ContentDeletingVersionsNotification>? DeletingContentVersions { get; set; }
 
+        public static Action<ContentDeletingNotification>? DeletingContent { get; set; }
+
+        public static Action<ContentMovingNotification>? MovingContent { get; set; }
+
+        public static Action<ContentEmptyingRecycleBinNotification>? EmptyingRecycleBin { get; set; }
+
+        public static Action<ContentSortingNotification>? SortingContent { get; set; }
+
+        public static Action<ContentRollingBackNotification>? RollingBackContent { get; set; }
+
+        public static Action<ContentSendingToPublishNotification>? SendingContentToPublish { get; set; }
+
         public void Handle(ContentCopiedNotification notification) => CopiedContent?.Invoke(notification);
 
         public void Handle(ContentCopyingNotification notification) => CopyingContent?.Invoke(notification);
@@ -5677,6 +5990,18 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         public void Handle(ContentMovingToRecycleBinNotification notification) => MovingContentToRecycleBin?.Invoke(notification);
 
         public void Handle(ContentDeletingVersionsNotification notification) => DeletingContentVersions?.Invoke(notification);
+
+        public void Handle(ContentDeletingNotification notification) => DeletingContent?.Invoke(notification);
+
+        public void Handle(ContentMovingNotification notification) => MovingContent?.Invoke(notification);
+
+        public void Handle(ContentEmptyingRecycleBinNotification notification) => EmptyingRecycleBin?.Invoke(notification);
+
+        public void Handle(ContentSortingNotification notification) => SortingContent?.Invoke(notification);
+
+        public void Handle(ContentRollingBackNotification notification) => RollingBackContent?.Invoke(notification);
+
+        public void Handle(ContentSendingToPublishNotification notification) => SendingContentToPublish?.Invoke(notification);
     }
 
     private async Task<(ILanguage LangEn, ILanguage LangDa, IContentType contentType)> SetupVariantTest()
