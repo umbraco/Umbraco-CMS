@@ -1,7 +1,6 @@
 using System.Diagnostics;
 using System.Reflection;
 using Examine;
-using Examine.Lucene.Providers;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.HostedServices;
@@ -12,7 +11,6 @@ using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Search.Core.Cache.Language;
 using Umbraco.Cms.Search.Core.DependencyInjection;
 using Umbraco.Cms.Search.Core.NotificationHandlers;
-using Umbraco.Cms.Search.Provider.Examine.Services;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 using Umbraco.Cms.Tests.Integration.Testing.Search;
@@ -33,11 +31,6 @@ public abstract class TestBase : UmbracoIntegrationTest
     protected static readonly Guid RootKey = Guid.Parse("D9EBF985-C65C-4341-955F-FFADA160F6D9");
     protected static readonly Guid ChildKey = Guid.Parse("C84E91B2-3351-4BA9-9906-09C2260D77EC");
     protected static readonly Guid GrandchildKey = Guid.Parse("201858C2-5AC2-4505-AC2E-E4BF38F39AC4");
-    // How long to wait, after the most recent commit, without seeing another one before
-    // considering indexing settled. A single batch of updates can trigger more than one
-    // underlying Lucene commit, so waiting for just the first one is not sufficient.
-    private static readonly TimeSpan _indexingQuietPeriod = TimeSpan.FromMilliseconds(500);
-    private long _lastCommitTimestamp = -1;
 
     protected DateTime CurrentDateTime { get; set; }
 
@@ -93,43 +86,22 @@ public abstract class TestBase : UmbracoIntegrationTest
 
     protected async Task WaitForIndexing(string indexAlias, Func<Task> indexUpdatingAction)
     {
-        var activeIndexManager = GetRequiredService<IActiveIndexManager>();
-        var physicalName = activeIndexManager.IsRebuilding(indexAlias)
-            ? activeIndexManager.ResolveShadowIndexName(indexAlias)
-            : activeIndexManager.ResolveActiveIndexName(indexAlias);
-        var index = (LuceneIndex)GetRequiredService<IExamineManager>().GetIndex(physicalName);
-        index.IndexCommitted += IndexCommited;
+        await indexUpdatingAction();
 
-        try
+        // A single content operation can write to several indexes (draft and published, active and shadow),
+        // so wait for every index to settle rather than inferring completion from the timing of commits.
+        TestIndex[] indexes = GetRequiredService<IExamineManager>().Indexes.OfType<TestIndex>().ToArray();
+        var stopWatch = Stopwatch.StartNew();
+        while (indexes.Any(index => index.IsSettled is false))
         {
-            await indexUpdatingAction();
-
-            var stopWatch = Stopwatch.StartNew();
-
-            // Wait for at least one commit, then keep waiting until no further commit has
-            // been observed for a quiet period, since a single batch of updates can trigger
-            // more than one underlying Lucene commit.
-            long lastCommitTimestamp;
-            while ((lastCommitTimestamp = Interlocked.Read(ref _lastCommitTimestamp)) < 0
-                   || Stopwatch.GetElapsedTime(lastCommitTimestamp) < _indexingQuietPeriod)
+            if (stopWatch.Elapsed > TimeSpan.FromSeconds(30))
             {
-                if (stopWatch.Elapsed > TimeSpan.FromSeconds(30))
-                {
-                    throw new TimeoutException("Indexing timed out");
-                }
-
-                await Task.Delay(50);
+                throw new TimeoutException($"Indexing of {indexAlias} timed out");
             }
-        }
-        finally
-        {
-            Interlocked.Exchange(ref _lastCommitTimestamp, -1);
-            index.IndexCommitted -= IndexCommited;
+
+            await Task.Delay(50);
         }
     }
-
-    private void IndexCommited(object? sender, EventArgs e)
-        => Interlocked.Exchange(ref _lastCommitTimestamp, Stopwatch.GetTimestamp());
 
     protected static string GetIndexAlias(bool publish) => publish ? Constants.IndexAliases.PublishedContent : Constants.IndexAliases.DraftContent;
 }
