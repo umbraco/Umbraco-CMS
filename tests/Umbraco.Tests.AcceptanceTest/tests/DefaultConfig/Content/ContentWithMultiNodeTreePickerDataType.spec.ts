@@ -471,3 +471,108 @@ test('can select an item from a collection table view within the picker', async 
   await umbracoApi.documentType.ensureNameNotExists(collectionDocumentTypeName);
   await umbracoApi.documentType.ensureNameNotExists(collectionChildDocumentTypeName);
 });
+
+test('can only pick allowed types from a collection grid view within the picker', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const collectionContentName = 'Collection Root Content';
+  const collectionDocumentTypeName = 'CollectionDocumentType';
+  const allowedCollectionChildDocumentTypeName = 'AllowedCollectionChildDocumentType';
+  const notAllowedCollectionChildDocumentTypeName = 'NotAllowedCollectionChildDocumentType';
+  const allowedCollectionItemName = 'Permitted Collection Item';
+  const notAllowedCollectionItemName = 'Restricted Collection Item';
+  const listViewDataTypeName = 'List View - Content';
+
+  const allowedCollectionChildDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentType(allowedCollectionChildDocumentTypeName);
+  const notAllowedCollectionChildDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentType(notAllowedCollectionChildDocumentTypeName);
+  const listViewDataTypeData = await umbracoApi.dataType.getByName(listViewDataTypeName);
+  const collectionDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedChildNodesAndCollectionId(collectionDocumentTypeName, [allowedCollectionChildDocumentTypeId, notAllowedCollectionChildDocumentTypeId], listViewDataTypeData.id);
+  const collectionContentId = await umbracoApi.document.createDefaultDocument(collectionContentName, collectionDocumentTypeId);
+  const allowedCollectionItemId = await umbracoApi.document.createDefaultDocumentWithParent(allowedCollectionItemName, allowedCollectionChildDocumentTypeId, collectionContentId);
+  await umbracoApi.document.createDefaultDocumentWithParent(notAllowedCollectionItemName, notAllowedCollectionChildDocumentTypeId, collectionContentId);
+  // The picker is restricted to the allowed child type only, so the other type's item appears in the collection but cannot be picked.
+  const customDataTypeId = await umbracoApi.dataType.createMultiNodeTreePickerDataTypeWithAllowedTypes(customDataTypeName, allowedCollectionChildDocumentTypeId);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickChooseButton();
+  await umbracoUi.content.openCaretButtonForName(collectionContentName, true);
+
+  // Assert
+  await umbracoUi.content.isContentCardSelectableForName(notAllowedCollectionItemName, false);
+  await umbracoUi.content.isContentCardSelectableForName(allowedCollectionItemName);
+
+  // Act
+  await umbracoUi.content.clickCollectionCardInPickerModal(allowedCollectionItemName);
+  await umbracoUi.content.clickChooseModalButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
+
+  // Assert
+  const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.values[0].value[0]['unique']).toEqual(allowedCollectionItemId);
+  expect(contentData.values[0].value[0]['type']).toEqual('document');
+
+  // Clean
+  await umbracoApi.document.ensureNameNotExists(collectionContentName);
+  await umbracoApi.document.ensureNameNotExists(allowedCollectionItemName);
+  await umbracoApi.document.ensureNameNotExists(notAllowedCollectionItemName);
+  await umbracoApi.documentType.ensureNameNotExists(collectionDocumentTypeName);
+  await umbracoApi.documentType.ensureNameNotExists(allowedCollectionChildDocumentTypeName);
+  await umbracoApi.documentType.ensureNameNotExists(notAllowedCollectionChildDocumentTypeName);
+});
+
+test('can only pick allowed types from a collection table view within the picker', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const collectionContentName = 'Collection Root Content';
+  const collectionDocumentTypeName = 'CollectionDocumentType';
+  const allowedCollectionChildDocumentTypeName = 'AllowedCollectionChildDocumentType';
+  const notAllowedCollectionChildDocumentTypeName = 'NotAllowedCollectionChildDocumentType';
+  const allowedCollectionItemName = 'Permitted Collection Item';
+  const notAllowedCollectionItemName = 'Restricted Collection Item';
+  const listViewDataTypeName = 'List View - Content';
+
+  const allowedCollectionChildDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentType(allowedCollectionChildDocumentTypeName);
+  const notAllowedCollectionChildDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentType(notAllowedCollectionChildDocumentTypeName);
+  const listViewDataTypeData = await umbracoApi.dataType.getByName(listViewDataTypeName);
+  const collectionDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedChildNodesAndCollectionId(collectionDocumentTypeName, [allowedCollectionChildDocumentTypeId, notAllowedCollectionChildDocumentTypeId], listViewDataTypeData.id);
+  const collectionContentId = await umbracoApi.document.createDefaultDocument(collectionContentName, collectionDocumentTypeId);
+  const allowedCollectionItemId = await umbracoApi.document.createDefaultDocumentWithParent(allowedCollectionItemName, allowedCollectionChildDocumentTypeId, collectionContentId);
+  await umbracoApi.document.createDefaultDocumentWithParent(notAllowedCollectionItemName, notAllowedCollectionChildDocumentTypeId, collectionContentId);
+  // The picker is restricted to the allowed child type only, so the other type's item appears in the collection but cannot be picked.
+  const customDataTypeId = await umbracoApi.dataType.createMultiNodeTreePickerDataTypeWithAllowedTypes(customDataTypeName, allowedCollectionChildDocumentTypeId);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickChooseButton();
+  await umbracoUi.content.openCaretButtonForName(collectionContentName, true);
+  await umbracoUi.content.changeToListView();
+
+  // Assert
+  await umbracoUi.content.isListViewTableRowSelectableForName(notAllowedCollectionItemName, false);
+  await umbracoUi.content.isListViewTableRowSelectableForName(allowedCollectionItemName);
+
+  // Act
+  await umbracoUi.content.selectContentWithNameInListView(allowedCollectionItemName);
+  await umbracoUi.content.clickChooseModalButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
+
+  // Assert
+  const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.values[0].value[0]['unique']).toEqual(allowedCollectionItemId);
+  expect(contentData.values[0].value[0]['type']).toEqual('document');
+
+  // Clean
+  await umbracoApi.document.ensureNameNotExists(collectionContentName);
+  await umbracoApi.document.ensureNameNotExists(allowedCollectionItemName);
+  await umbracoApi.document.ensureNameNotExists(notAllowedCollectionItemName);
+  await umbracoApi.documentType.ensureNameNotExists(collectionDocumentTypeName);
+  await umbracoApi.documentType.ensureNameNotExists(allowedCollectionChildDocumentTypeName);
+  await umbracoApi.documentType.ensureNameNotExists(notAllowedCollectionChildDocumentTypeName);
+});

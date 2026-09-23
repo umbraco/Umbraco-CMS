@@ -1130,6 +1130,10 @@ export class ContentUiHelper extends UiBaseLocators {
     await this.click(this.listViewTableRow.filter({hasText: name}));
   }
 
+  async isListViewTableRowSelectableForName(name: string, isSelectable: boolean = true) {
+    await this.isVisible(this.listViewTableRow.filter({hasText: name}).locator('uui-checkbox'), isSelectable);
+  }
+
   async clickPublishSelectedListItems() {
     await this.click(this.publishSelectedListItems);
   }
@@ -2161,6 +2165,10 @@ export class ContentUiHelper extends UiBaseLocators {
 
   async clickContentCardWithName(name: string) {
     await this.click(this.cardContentNode.filter({hasText: name}).locator('#name'));
+  }
+
+  async isContentCardSelectableForName(name: string, isSelectable: boolean = true) {
+    await this.isVisible(this.cardContentNode.filter({hasText: name}).locator('uui-checkbox'), isSelectable);
   }
 
   async clickCollectionCardInPickerModal(name: string) {
