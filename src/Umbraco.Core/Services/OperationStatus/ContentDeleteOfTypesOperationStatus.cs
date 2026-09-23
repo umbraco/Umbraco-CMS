@@ -14,4 +14,9 @@ public enum ContentDeleteOfTypesOperationStatus
     ///     The operation was cancelled by a notification handler.
     /// </summary>
     CancelledByNotification,
+
+    /// <summary>
+    ///     One of the specified content types was not found.
+    /// </summary>
+    NotFound,
 }

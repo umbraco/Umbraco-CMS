@@ -13,6 +13,13 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
 
+/// <summary>
+///     Manages elements.
+/// </summary>
+/// <remarks>
+///     There is no asynchronous element repository, so the asynchronous contract is satisfied by bridging onto the
+///     synchronous engine inherited from <see cref="PublishableContentServiceBase{TContent}" />.
+/// </remarks>
 public class ElementService : PublishableContentServiceBase<IElement>, IElementService
 {
     private readonly IElementRepository _elementRepository;
@@ -57,20 +64,15 @@ public class ElementService : PublishableContentServiceBase<IElement>, IElementS
     #region Others
 
     /// <inheritdoc />
-    // No async repository exists for elements yet - wraps the synchronous lookup so the async contract can be
-    // satisfied now, without blocking the eventual real EF Core migration.
     public Task<IElement?> GetByIdAsync(Guid key, CancellationToken cancellationToken) => Task.FromResult(GetById(key));
 
     /// <inheritdoc />
-    // See GetByIdAsync above - same bridge, same reason.
     public Task<IEnumerable<IElement>> GetByIdsAsync(IEnumerable<Guid> ids, CancellationToken cancellationToken) => Task.FromResult(GetByIds(ids));
 
     /// <inheritdoc />
-    // See GetByIdAsync above - same bridge, same reason.
     public Task<int> CountPublishedAsync(string? contentTypeAlias, CancellationToken cancellationToken) => Task.FromResult(CountPublished(contentTypeAlias));
 
     /// <inheritdoc />
-    // See GetByIdsAsync above - same bridge, same reason.
     public Task<Attempt<ContentScheduleOperationStatus>> PersistContentScheduleAsync(IPublishableContentBase content, ContentScheduleCollection contentSchedule, CancellationToken cancellationToken)
     {
         PersistContentSchedule(content, contentSchedule);
@@ -78,102 +80,95 @@ public class ElementService : PublishableContentServiceBase<IElement>, IElementS
     }
 
     /// <inheritdoc />
-    // No async repository exists for elements yet - bridges to the existing synchronous Publish engine.
-    public Task<PublishResult> PublishAsync(IElement content, string[] cultures, Guid userKey, CancellationToken cancellationToken)
+    public async Task<PublishResult> PublishAsync(IElement content, string[] cultures, Guid userKey, CancellationToken cancellationToken)
     {
-        int userId = _userIdKeyResolver.GetAsync(userKey).GetAwaiter().GetResult();
-        PublishResult result = Publish(content, cultures, userId);
-        return Task.FromResult(result);
+        int userId = await _userIdKeyResolver.GetAsync(userKey);
+        return Publish(content, cultures, userId);
     }
 
     /// <inheritdoc />
-    // No async repository exists for elements yet - bridges to the existing synchronous Unpublish engine.
-    public Task<PublishResult> UnpublishAsync(IElement content, string? culture, Guid userKey, CancellationToken cancellationToken)
+    public async Task<PublishResult> UnpublishAsync(IElement content, string? culture, Guid userKey, CancellationToken cancellationToken)
     {
-        int userId = _userIdKeyResolver.GetAsync(userKey).GetAwaiter().GetResult();
-        PublishResult result = Unpublish(content, culture, userId);
-        return Task.FromResult(result);
+        int userId = await _userIdKeyResolver.GetAsync(userKey);
+        return Unpublish(content, culture, userId);
     }
 
     /// <inheritdoc />
-    // No async repository exists for elements yet - bridges to the existing synchronous SaveAndPublish engine.
-    public Task<PublishResult> SaveAndPublishAsync(IElement content, string[] culturesToPublish, Guid userKey, CancellationToken cancellationToken)
+    public async Task<PublishResult> SaveAndPublishAsync(IElement content, string[] culturesToPublish, Guid userKey, CancellationToken cancellationToken)
     {
-        int userId = _userIdKeyResolver.GetAsync(userKey).GetAwaiter().GetResult();
-        PublishResult result = SaveAndPublish(content, culturesToPublish, userId);
-        return Task.FromResult(result);
+        int userId = await _userIdKeyResolver.GetAsync(userKey);
+        return SaveAndPublish(content, culturesToPublish, userId);
     }
 
     /// <inheritdoc />
-    // No async repository exists for elements yet - bridges to the existing synchronous scheduled-publishing engine.
     public Task<IEnumerable<PublishResult>> PerformScheduledPublishAsync(DateTime date, CancellationToken cancellationToken)
         => Task.FromResult(PerformScheduledPublish(date));
 
     /// <inheritdoc />
-    // No async repository exists for elements yet - bridges to the existing synchronous Rollback engine.
-    public Task<Attempt<ContentRollbackOperationStatus>> RollbackAsync(Guid key, int versionId, string culture, Guid userKey, CancellationToken cancellationToken)
+    public async Task<Attempt<ContentRollbackOperationStatus>> RollbackAsync(Guid key, int versionId, string culture, Guid userKey, CancellationToken cancellationToken)
     {
-        Attempt<int> idAttempt = IdKeyMap.GetIdForKeyAsync(key, ContentObjectType).GetAwaiter().GetResult();
+        Attempt<int> idAttempt = await IdKeyMap.GetIdForKeyAsync(key, ContentObjectType);
         if (idAttempt.Success == false)
         {
-            return Task.FromResult(Attempt.Fail(ContentRollbackOperationStatus.ContentNotFound));
+            return Attempt.Fail(ContentRollbackOperationStatus.ContentNotFound);
         }
 
-        int userId = _userIdKeyResolver.GetAsync(userKey).GetAwaiter().GetResult();
+        int userId = await _userIdKeyResolver.GetAsync(userKey);
         OperationResult result = Rollback(idAttempt.Result, versionId, culture, userId);
 
-        return Task.FromResult(result.Result switch
+        return result.Result switch
         {
             OperationResultType.Success => Attempt.Succeed(ContentRollbackOperationStatus.Success),
             OperationResultType.FailedCancelledByEvent => Attempt.Fail(ContentRollbackOperationStatus.CancelledByNotification),
             OperationResultType.FailedCannot => Attempt.Fail(ContentRollbackOperationStatus.ContentNotFound),
             _ => Attempt.Fail(ContentRollbackOperationStatus.SaveFailed),
-        });
+        };
     }
 
     /// <inheritdoc />
-    // See GetByIdAsync above - same bridge, same reason.
     public Task<IDictionary<Guid, IEnumerable<ContentSchedule>>> GetContentSchedulesByKeysAsync(Guid[] keys, CancellationToken cancellationToken) =>
         Task.FromResult(GetContentSchedulesByKeys(keys));
 
     /// <inheritdoc />
-    // See GetByIdAsync above - same bridge, same reason.
     public Task<ContentScheduleCollection> GetContentScheduleByContentIdAsync(Guid contentId, CancellationToken cancellationToken) =>
         Task.FromResult(GetContentScheduleByContentId(contentId));
 
     /// <inheritdoc />
-    // See GetByIdAsync above - same bridge, same reason. Element's sync Save only fails via notification
-    // cancellation (its two validation checks still throw, unconverted), so any non-success result maps to
-    // CancelledByNotification.
-    public Task<Attempt<ContentSaveOperationStatus>> SaveAsync(IElement content, Guid userKey, ContentScheduleCollection? contentSchedule, CancellationToken cancellationToken)
+    /// <remarks>
+    ///     A synchronous save reports failure only when a notification handler cancels it - its validation
+    ///     failures throw - so every non-success result maps to <see cref="ContentSaveOperationStatus.CancelledByNotification" />.
+    /// </remarks>
+    public async Task<Attempt<ContentSaveOperationStatus>> SaveAsync(IElement content, Guid userKey, ContentScheduleCollection? contentSchedule, CancellationToken cancellationToken)
     {
-        int userId = _userIdKeyResolver.GetAsync(userKey).GetAwaiter().GetResult();
+        int userId = await _userIdKeyResolver.GetAsync(userKey);
         OperationResult result = Save(content, userId, contentSchedule);
-        return Task.FromResult(result.Success
+        return result.Success
             ? Attempt.Succeed(ContentSaveOperationStatus.Success)
-            : Attempt.Fail(ContentSaveOperationStatus.CancelledByNotification));
+            : Attempt.Fail(ContentSaveOperationStatus.CancelledByNotification);
     }
 
     /// <inheritdoc />
-    public Task<Attempt<ContentDeleteOperationStatus>> DeleteAsync(IElement content, Guid userKey, CancellationToken cancellationToken)
+    public async Task<Attempt<ContentDeleteOperationStatus>> DeleteAsync(IElement content, Guid userKey, CancellationToken cancellationToken)
     {
-        int userId = _userIdKeyResolver.GetAsync(userKey).GetAwaiter().GetResult();
+        int userId = await _userIdKeyResolver.GetAsync(userKey);
         OperationResult result = Delete(content, userId);
-        return Task.FromResult(result.Success
+        return result.Success
             ? Attempt.Succeed(ContentDeleteOperationStatus.Success)
-            : Attempt.Fail(ContentDeleteOperationStatus.CancelledByNotification));
+            : Attempt.Fail(ContentDeleteOperationStatus.CancelledByNotification);
     }
 
     /// <inheritdoc />
-    // See GetByIdAsync above - same bridge, same reason. Like the single-item SaveAsync, the sync bulk
-    // Save only fails via notification cancellation, so any non-success result maps to that status.
-    public Task<Attempt<ContentSaveOperationStatus>> SaveAsync(IEnumerable<IElement> contents, Guid userKey, CancellationToken cancellationToken)
+    /// <remarks>
+    ///     A synchronous save reports failure only when a notification handler cancels it - its validation
+    ///     failures throw - so every non-success result maps to <see cref="ContentSaveOperationStatus.CancelledByNotification" />.
+    /// </remarks>
+    public async Task<Attempt<ContentSaveOperationStatus>> SaveAsync(IEnumerable<IElement> contents, Guid userKey, CancellationToken cancellationToken)
     {
-        int userId = _userIdKeyResolver.GetAsync(userKey).GetAwaiter().GetResult();
+        int userId = await _userIdKeyResolver.GetAsync(userKey);
         OperationResult result = Save(contents, userId);
-        return Task.FromResult(result.Success
+        return result.Success
             ? Attempt.Succeed(ContentSaveOperationStatus.Success)
-            : Attempt.Fail(ContentSaveOperationStatus.CancelledByNotification));
+            : Attempt.Fail(ContentSaveOperationStatus.CancelledByNotification);
     }
 
     /// <inheritdoc />
@@ -188,7 +183,6 @@ public class ElementService : PublishableContentServiceBase<IElement>, IElementS
             });
 
     /// <inheritdoc />
-    // No async repository exists for elements yet - bridges to the existing synchronous CheckDataIntegrity engine.
     public Task<ContentDataIntegrityReport> CheckDataIntegrityAsync(ContentDataIntegrityReportOptions options, CancellationToken cancellationToken)
         => Task.FromResult(CheckDataIntegrity(options));
 
@@ -197,7 +191,7 @@ public class ElementService : PublishableContentServiceBase<IElement>, IElementS
     #region Content Types
 
     /// <inheritdoc/>
-    public override void DeleteOfTypes(IEnumerable<int> contentTypeIds, int userId = Constants.Security.SuperUserId)
+    public override OperationResult DeleteOfTypes(IEnumerable<int> contentTypeIds, int userId = Constants.Security.SuperUserId)
     {
         var changes = new List<TreeChange<IElement>>();
         var contentTypeIdsA = contentTypeIds.ToArray();
@@ -212,13 +206,13 @@ public class ElementService : PublishableContentServiceBase<IElement>, IElementS
         if (elements.Length is 0)
         {
             scope.Complete();
-            return;
+            return OperationResult.Succeed(eventMessages);
         }
 
         if (scope.Notifications.PublishCancelable(new ElementDeletingNotification(elements, eventMessages)))
         {
             scope.Complete();
-            return;
+            return OperationResult.Cancel(eventMessages);
         }
 
         foreach (IElement element in elements)
@@ -245,26 +239,29 @@ public class ElementService : PublishableContentServiceBase<IElement>, IElementS
         Audit(AuditType.Delete, userId, Constants.System.Root, $"Delete element of type {string.Join(",", contentTypeIdsA)}");
 
         scope.Complete();
+        return OperationResult.Succeed(eventMessages);
     }
 
     /// <inheritdoc />
-    // No async repository exists for elements yet - bridges to the existing synchronous DeleteOfTypes engine.
-    // That engine returns void, so cancellation can't be detected here - this always reports Success.
-    public Task<Attempt<ContentDeleteOfTypesOperationStatus>> DeleteOfTypesAsync(IEnumerable<Guid> contentTypeKeys, Guid userKey, CancellationToken cancellationToken)
+    public async Task<Attempt<ContentDeleteOfTypesOperationStatus>> DeleteOfTypesAsync(IEnumerable<Guid> contentTypeKeys, Guid userKey, CancellationToken cancellationToken)
     {
         var contentTypeIds = new List<int>();
         foreach (Guid contentTypeKey in contentTypeKeys)
         {
-            Attempt<int> idAttempt = IdKeyMap.GetIdForKeyAsync(contentTypeKey, UmbracoObjectTypes.DocumentType).GetAwaiter().GetResult();
-            if (idAttempt.Success)
+            Attempt<int> idAttempt = await IdKeyMap.GetIdForKeyAsync(contentTypeKey, UmbracoObjectTypes.DocumentType);
+            if (idAttempt.Success == false)
             {
-                contentTypeIds.Add(idAttempt.Result);
+                return Attempt.Fail(ContentDeleteOfTypesOperationStatus.NotFound);
             }
+
+            contentTypeIds.Add(idAttempt.Result);
         }
 
-        int userId = _userIdKeyResolver.GetAsync(userKey).GetAwaiter().GetResult();
-        DeleteOfTypes(contentTypeIds, userId);
-        return Task.FromResult(Attempt.Succeed(ContentDeleteOfTypesOperationStatus.Success));
+        int userId = await _userIdKeyResolver.GetAsync(userKey);
+        OperationResult result = DeleteOfTypes(contentTypeIds, userId);
+        return result.Success
+            ? Attempt.Succeed(ContentDeleteOfTypesOperationStatus.Success)
+            : Attempt.Fail(ContentDeleteOfTypesOperationStatus.CancelledByNotification);
     }
 
     #endregion

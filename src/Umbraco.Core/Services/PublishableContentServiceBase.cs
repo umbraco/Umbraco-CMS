@@ -226,7 +226,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         TContent? content = GetById(id);
 
         // Get the version
-        TContent? version = GetVersionAsync(versionId, CancellationToken.None).GetAwaiter().GetResult();
+        TContent? version = GetVersion(versionId);
 
         // Good old null checks
         if (content == null || version == null || content.Trashed)
@@ -552,55 +552,73 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         }
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    ///     Gets a single version of a content item.
+    /// </summary>
+    /// <param name="versionId">Id of the version to get.</param>
+    /// <param name="cancellationToken">A cancellation token.</param>
+    /// <returns>The version, or <c>null</c> when it does not exist.</returns>
     public Task<TContent?> GetVersionAsync(int versionId, CancellationToken cancellationToken)
-    {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
-        scope.ReadLock(ReadLockIds);
-        TContent? result = _contentRepository.GetVersion(versionId);
-        scope.Complete();
-        return Task.FromResult(result);
-    }
+        => Task.FromResult(GetVersion(versionId));
 
-    /// <inheritdoc />
-    public Task<IEnumerable<TContent>> GetVersionsAsync(Guid contentKey, CancellationToken cancellationToken)
+    /// <summary>
+    ///     Gets every version of a content item, newest first.
+    /// </summary>
+    /// <param name="contentKey">Key of the content item.</param>
+    /// <param name="cancellationToken">A cancellation token.</param>
+    /// <returns>The versions, or an empty collection when the content item does not exist.</returns>
+    public async Task<IEnumerable<TContent>> GetVersionsAsync(Guid contentKey, CancellationToken cancellationToken)
     {
-        Attempt<int> idAttempt = IdKeyMap.GetIdForKeyAsync(contentKey, ContentObjectType).GetAwaiter().GetResult();
+        Attempt<int> idAttempt = await IdKeyMap.GetIdForKeyAsync(contentKey, ContentObjectType);
         if (idAttempt.Success is false)
         {
-            return Task.FromResult(Enumerable.Empty<TContent>());
+            return Enumerable.Empty<TContent>();
         }
 
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.ReadLock(ReadLockIds);
         IEnumerable<TContent> result = _contentRepository.GetAllVersions(idAttempt.Result);
         scope.Complete();
-        return Task.FromResult(result);
+        return result;
     }
 
-    /// <inheritdoc />
-    public Task<IEnumerable<TContent>> GetVersionsSlimAsync(Guid contentKey, int skip, int take, CancellationToken cancellationToken)
+    /// <summary>
+    ///     Gets a page of versions of a content item, newest first, without their property data.
+    /// </summary>
+    /// <param name="contentKey">Key of the content item.</param>
+    /// <param name="skip">Number of versions to skip.</param>
+    /// <param name="take">Number of versions to take.</param>
+    /// <param name="cancellationToken">A cancellation token.</param>
+    /// <returns>The versions, or an empty collection when the content item does not exist.</returns>
+    public async Task<IEnumerable<TContent>> GetVersionsSlimAsync(Guid contentKey, int skip, int take, CancellationToken cancellationToken)
     {
-        Attempt<int> idAttempt = IdKeyMap.GetIdForKeyAsync(contentKey, ContentObjectType).GetAwaiter().GetResult();
+        Attempt<int> idAttempt = await IdKeyMap.GetIdForKeyAsync(contentKey, ContentObjectType);
         if (idAttempt.Success is false)
         {
-            return Task.FromResult(Enumerable.Empty<TContent>());
+            return Enumerable.Empty<TContent>();
         }
 
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.ReadLock(ReadLockIds);
         IEnumerable<TContent> result = _contentRepository.GetAllVersionsSlim(idAttempt.Result, skip, take);
         scope.Complete();
-        return Task.FromResult(result);
+        return result;
     }
 
-    /// <inheritdoc />
-    public Task<IEnumerable<int>> GetVersionIdsAsync(Guid contentKey, int skip, int take, CancellationToken cancellationToken)
+    /// <summary>
+    ///     Gets a page of version ids of a content item, newest first.
+    /// </summary>
+    /// <param name="contentKey">Key of the content item.</param>
+    /// <param name="skip">Number of version ids to skip.</param>
+    /// <param name="take">Number of version ids to take.</param>
+    /// <param name="cancellationToken">A cancellation token.</param>
+    /// <returns>The version ids, or an empty collection when the content item does not exist.</returns>
+    public async Task<IEnumerable<int>> GetVersionIdsAsync(Guid contentKey, int skip, int take, CancellationToken cancellationToken)
     {
-        Attempt<int> idAttempt = IdKeyMap.GetIdForKeyAsync(contentKey, ContentObjectType).GetAwaiter().GetResult();
+        Attempt<int> idAttempt = await IdKeyMap.GetIdForKeyAsync(contentKey, ContentObjectType);
         if (idAttempt.Success is false)
         {
-            return Task.FromResult(Enumerable.Empty<int>());
+            return Enumerable.Empty<int>();
         }
 
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
@@ -611,7 +629,16 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         int maxRows = skip > int.MaxValue - take ? int.MaxValue : skip + take;
         IEnumerable<int> result = _contentRepository.GetVersionIds(idAttempt.Result, maxRows).Skip(skip);
         scope.Complete();
-        return Task.FromResult(result);
+        return result;
+    }
+
+    private TContent? GetVersion(int versionId)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.ReadLock(ReadLockIds);
+        TContent? result = _contentRepository.GetVersion(versionId);
+        scope.Complete();
+        return result;
     }
 
     /// <summary>
@@ -1905,6 +1932,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
     /// <param name="userId">Optional Id of the User deleting versions of a Content object</param>
     public void DeleteVersions(int id, DateTime versionDate, int userId = Constants.Security.SuperUserId)
     {
+        // TODO (V20): await this once an asynchronous element repository lets this engine go async.
         Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForIdAsync(id, ContentObjectType).GetAwaiter().GetResult();
         if (keyAttempt.Success is false)
         {
@@ -1947,6 +1975,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
     /// <param name="userId">Optional Id of the User deleting versions of a Content object</param>
     public void DeleteVersion(int id, int versionId, bool deletePriorVersions, int userId = Constants.Security.SuperUserId)
     {
+        // TODO (V20): await this once an asynchronous element repository lets this engine go async.
         Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForIdAsync(id, ContentObjectType).GetAwaiter().GetResult();
         if (keyAttempt.Success is false)
         {
@@ -1968,7 +1997,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
 
             if (deletePriorVersions)
             {
-                TContent? content = GetVersionAsync(versionId, CancellationToken.None).GetAwaiter().GetResult();
+                TContent? content = GetVersion(versionId);
                 DeleteVersions(id, content?.UpdateDate ?? DateTime.UtcNow, userId);
             }
 
@@ -2093,7 +2122,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
     #region Content Types
 
     /// <inheritdoc />
-    public abstract void DeleteOfTypes(IEnumerable<int> contentTypeIds, int userId = Constants.Security.SuperUserId);
+    public abstract OperationResult DeleteOfTypes(IEnumerable<int> contentTypeIds, int userId = Constants.Security.SuperUserId);
 
     private IContentType GetContentType(ICoreScope scope, string contentTypeAlias)
     {
