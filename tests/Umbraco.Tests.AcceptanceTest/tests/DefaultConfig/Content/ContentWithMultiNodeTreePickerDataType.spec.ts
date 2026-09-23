@@ -667,3 +667,179 @@ test('can only pick allowed types from a collection table view within the picker
   await umbracoApi.documentType.ensureNameNotExists(allowedCollectionChildDocumentTypeName);
   await umbracoApi.documentType.ensureNameNotExists(notAllowedCollectionChildDocumentTypeName);
 });
+
+test('can switch the tree to table view within the picker', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const itemName = 'Tree Table View Item';
+  const itemDocumentTypeName = 'TreeTableViewItemDocumentType';
+
+  const itemDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(itemDocumentTypeName);
+  await umbracoApi.document.createDefaultDocument(itemName, itemDocumentTypeId);
+  const customDataTypeId = await umbracoApi.dataType.createDefaultContentPickerSourceDataType(customDataTypeName);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickChooseButton();
+  await umbracoUi.content.changeTreeToTableView();
+
+  // Assert
+  await umbracoUi.content.isTreeTableViewVisible();
+
+  // Clean
+  await umbracoApi.document.ensureNameNotExists(itemName);
+  await umbracoApi.documentType.ensureNameNotExists(itemDocumentTypeName);
+});
+
+test('can drill into an item with children by clicking it in the table view', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const parentContentName = 'Table Drillable Parent';
+  const childContentName = 'Table Drillable Child';
+  const parentDocumentTypeName = 'TableDrillableParentDocumentType';
+  const childDocumentTypeName = 'TableDrillableChildDocumentType';
+
+  const childDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentType(childDocumentTypeName);
+  const parentDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedChildNode(parentDocumentTypeName, childDocumentTypeId);
+  const parentContentId = await umbracoApi.document.createDefaultDocument(parentContentName, parentDocumentTypeId);
+  const childContentId = await umbracoApi.document.createDefaultDocumentWithParent(childContentName, childDocumentTypeId, parentContentId);
+  const customDataTypeId = await umbracoApi.dataType.createDefaultContentPickerSourceDataType(customDataTypeName);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickChooseButton();
+  await umbracoUi.content.changeTreeToTableView();
+  await umbracoUi.content.clickOpenButtonInTreeTableRowWithName(parentContentName);
+  await umbracoUi.content.selectTreeTableRowWithName(childContentName);
+  await umbracoUi.content.clickChooseModalButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
+
+  // Assert
+  const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.values[0].value[0]['unique']).toEqual(childContentId);
+  expect(contentData.values[0].value[0]['type']).toEqual('document');
+
+  // Clean
+  await umbracoApi.document.ensureNameNotExists(parentContentName);
+  await umbracoApi.document.ensureNameNotExists(childContentName);
+  await umbracoApi.documentType.ensureNameNotExists(parentDocumentTypeName);
+  await umbracoApi.documentType.ensureNameNotExists(childDocumentTypeName);
+});
+
+test('can select an item in the tree table view within the picker', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const itemName = 'Tree Table Select Item';
+  const itemDocumentTypeName = 'TreeTableSelectItemDocumentType';
+
+  const itemDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(itemDocumentTypeName);
+  const itemId = await umbracoApi.document.createDefaultDocument(itemName, itemDocumentTypeId);
+  const customDataTypeId = await umbracoApi.dataType.createDefaultContentPickerSourceDataType(customDataTypeName);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickChooseButton();
+  await umbracoUi.content.changeTreeToTableView();
+  await umbracoUi.content.selectTreeTableRowWithName(itemName);
+  await umbracoUi.content.clickChooseModalButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
+
+  // Assert
+  const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.values[0].value[0]['unique']).toEqual(itemId);
+  expect(contentData.values[0].value[0]['type']).toEqual('document');
+
+  // Clean
+  await umbracoApi.document.ensureNameNotExists(itemName);
+  await umbracoApi.documentType.ensureNameNotExists(itemDocumentTypeName);
+});
+
+test('can select multiple items in the tree table view within the picker', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const firstItemName = 'First Tree Table Item';
+  const secondItemName = 'Second Tree Table Item';
+  const itemDocumentTypeName = 'MultiSelectTreeTableItemDocumentType';
+
+  const itemDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(itemDocumentTypeName);
+  const firstItemId = await umbracoApi.document.createDefaultDocument(firstItemName, itemDocumentTypeId);
+  const secondItemId = await umbracoApi.document.createDefaultDocument(secondItemName, itemDocumentTypeId);
+  // No min/max configured, so the picker defaults to unlimited selection.
+  const customDataTypeId = await umbracoApi.dataType.createDefaultContentPickerSourceDataType(customDataTypeName);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickChooseButton();
+  await umbracoUi.content.changeTreeToTableView();
+  await umbracoUi.content.selectTreeTableRowWithName(firstItemName);
+  await umbracoUi.content.selectTreeTableRowWithName(secondItemName);
+  await umbracoUi.content.clickChooseModalButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
+
+  // Assert
+  const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.values[0].value.length).toBe(2);
+  const pickedIds = contentData.values[0].value.map((item: {unique: string}) => item.unique);
+  expect(pickedIds).toContain(firstItemId);
+  expect(pickedIds).toContain(secondItemId);
+
+  // Clean
+  await umbracoApi.document.ensureNameNotExists(firstItemName);
+  await umbracoApi.document.ensureNameNotExists(secondItemName);
+  await umbracoApi.documentType.ensureNameNotExists(itemDocumentTypeName);
+});
+
+test('can only select allowed types in the tree table view within the picker', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const allowedItemName = 'Permitted Tree Table Item';
+  const notAllowedItemName = 'Restricted Tree Table Item';
+  const allowedItemDocumentTypeName = 'PermittedTreeTableItemDocumentType';
+  const notAllowedItemDocumentTypeName = 'RestrictedTreeTableItemDocumentType';
+
+  const allowedItemDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(allowedItemDocumentTypeName);
+  const notAllowedItemDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(notAllowedItemDocumentTypeName);
+  const allowedItemId = await umbracoApi.document.createDefaultDocument(allowedItemName, allowedItemDocumentTypeId);
+  await umbracoApi.document.createDefaultDocument(notAllowedItemName, notAllowedItemDocumentTypeId);
+  const customDataTypeId = await umbracoApi.dataType.createMultiNodeTreePickerDataTypeWithAllowedTypes(customDataTypeName, allowedItemDocumentTypeId);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickChooseButton();
+  await umbracoUi.content.changeTreeToTableView();
+
+  // Assert
+  await umbracoUi.content.isTreeTableRowSelectableForName(notAllowedItemName, false);
+  await umbracoUi.content.isTreeTableRowSelectableForName(allowedItemName);
+
+  // Act
+  await umbracoUi.content.selectTreeTableRowWithName(allowedItemName);
+  await umbracoUi.content.clickChooseModalButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
+
+  // Assert
+  const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.values[0].value[0]['unique']).toEqual(allowedItemId);
+  expect(contentData.values[0].value[0]['type']).toEqual('document');
+
+  // Clean
+  await umbracoApi.document.ensureNameNotExists(allowedItemName);
+  await umbracoApi.document.ensureNameNotExists(notAllowedItemName);
+  await umbracoApi.documentType.ensureNameNotExists(allowedItemDocumentTypeName);
+  await umbracoApi.documentType.ensureNameNotExists(notAllowedItemDocumentTypeName);
+});
