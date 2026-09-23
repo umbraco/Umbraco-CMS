@@ -690,7 +690,9 @@ export class UiBaseLocators extends BasePage {
     await this.waitForVisible(menuItem, ConstantHelper.timeout.long);
     const isCaretButtonOpen = await menuItem.getAttribute("show-children");
     if (isCaretButtonOpen === null) {
-      await this.clickCaretButtonForName(name);
+      // Click through menuItem (already scoped above), not clickCaretButtonForName - that resolves
+      // the item page-wide, which finds a same-named item's caret behind an open modal instead.
+      await this.click(menuItem.locator("#caret-button").first());
     }
   }
 

@@ -263,3 +263,51 @@ test('can see validation error clear when minimum number of items is met', async
   await umbracoApi.documentType.ensureNameNotExists(minNumberDocumentTypeName);
   await umbracoApi.dataType.ensureNameNotExists(minNumberDataTypeName);
 });
+
+// The picker opens at an unrestricted root (no start node configured), so this exercises browsing/drilling
+// into a node that has a collection from a higher tree level, then picking an item from that collection -
+// not a picker configured to land on a collection directly.
+test('can browse into a collection and pick an item from it', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const collectionContentName = 'Collection Root Content';
+  const collectionDocumentTypeName = 'CollectionDocumentType';
+  const collectionChildDocumentTypeName = 'CollectionChildDocumentType';
+  const firstCollectionItemName = 'First Collection Item';
+  const secondCollectionItemName = 'Second Collection Item';
+  const listViewDataTypeName = 'List View - Content';
+
+  const collectionChildDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentType(collectionChildDocumentTypeName);
+  const listViewDataTypeData = await umbracoApi.dataType.getByName(listViewDataTypeName);
+  const collectionDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedChildNodeAndCollectionId(collectionDocumentTypeName, collectionChildDocumentTypeId, listViewDataTypeData.id);
+  const collectionContentId = await umbracoApi.document.createDefaultDocument(collectionContentName, collectionDocumentTypeId);
+  const firstCollectionItemId = await umbracoApi.document.createDefaultDocumentWithParent(firstCollectionItemName, collectionChildDocumentTypeId, collectionContentId);
+  await umbracoApi.document.createDefaultDocumentWithParent(secondCollectionItemName, collectionChildDocumentTypeId, collectionContentId);
+  // No start node restriction, so the picker opens at the tree root, where the collection node above
+  // appears as a normal (root-allowed) item to browse into.
+  const customDataTypeId = await umbracoApi.dataType.createDefaultContentPickerSourceDataType(customDataTypeName);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickChooseButton();
+  // The caret drills into the node (its name would select it instead).
+  await umbracoUi.content.openCaretButtonForName(collectionContentName, true);
+  await umbracoUi.content.clickCollectionCardInPickerModal(firstCollectionItemName);
+  await umbracoUi.content.clickChooseModalButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
+
+  // Assert
+  const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.values[0].value[0]['unique']).toEqual(firstCollectionItemId);
+  expect(contentData.values[0].value[0]['type']).toEqual('document');
+
+  // Clean
+  await umbracoApi.document.ensureNameNotExists(collectionContentName);
+  await umbracoApi.document.ensureNameNotExists(firstCollectionItemName);
+  await umbracoApi.document.ensureNameNotExists(secondCollectionItemName);
+  await umbracoApi.documentType.ensureNameNotExists(collectionDocumentTypeName);
+  await umbracoApi.documentType.ensureNameNotExists(collectionChildDocumentTypeName);
+});

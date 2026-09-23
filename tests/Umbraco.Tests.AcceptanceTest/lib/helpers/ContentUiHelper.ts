@@ -203,6 +203,8 @@ export class ContentUiHelper extends UiBaseLocators {
   private readonly manualLinkRemoveBtn: Locator;
   private readonly cardCollectionView: Locator;
   private readonly cardContentNode: Locator;
+  private readonly documentPickerModal: Locator;
+  private readonly collectionCardInDocumentPickerModal: Locator;
   private readonly containerSetupBtn: Locator;
   private readonly containerEditBtn: Locator;
   private readonly loginPageSelectedItem: Locator;
@@ -437,6 +439,8 @@ export class ContentUiHelper extends UiBaseLocators {
     // Card Collection View
     this.cardCollectionView = page.locator('umb-card-collection-view');
     this.cardContentNode = this.cardCollectionView.locator('uui-card-content-node');
+    this.documentPickerModal = page.locator('umb-document-picker-modal');
+    this.collectionCardInDocumentPickerModal = this.documentPickerModal.locator('uui-card-content-node');
     // Public Access
     this.containerSetupBtn = this.container.getByLabel('Setup');
     this.containerEditBtn = this.container.getByLabel('Edit');
@@ -2154,6 +2158,10 @@ export class ContentUiHelper extends UiBaseLocators {
 
   async clickContentCardWithName(name: string) {
     await this.click(this.cardContentNode.filter({hasText: name}).locator('#name'));
+  }
+
+  async clickCollectionCardInPickerModal(name: string) {
+    await this.click(this.collectionCardInDocumentPickerModal.filter({hasText: name}));
   }
 
   async selectContentCardWithName(contentName: string) {
