@@ -1,5 +1,5 @@
-import {ConstantHelper, NotificationConstantHelper, test} from '@umbraco/acceptance-test-helpers';
-import {expect} from "@playwright/test";
+import {ApiHelpers, ConstantHelper, NotificationConstantHelper, test} from '@umbraco/acceptance-test-helpers';
+import {BrowserContext, expect} from "@playwright/test";
 
 const contentName = 'TestContent';
 const documentTypeName = 'TestDocumentTypeForContent';
@@ -310,6 +310,97 @@ test('can browse into a collection and pick an item from it', async ({umbracoApi
   await umbracoApi.document.ensureNameNotExists(secondCollectionItemName);
   await umbracoApi.documentType.ensureNameNotExists(collectionDocumentTypeName);
   await umbracoApi.documentType.ensureNameNotExists(collectionChildDocumentTypeName);
+});
+
+test.describe('can pick multiple items from a collection within the picker', () => {
+  // The collection (document type + root + 2 children) is read-only for these tests - only browsed, never
+  // mutated - so it's safe to create once in beforeAll and share across both tests. The host content that
+  // actually receives the picked value is still created fresh per test, so one test's save can't leave
+  // picked items in place for the other to trivially pass against.
+  const collectionContentName = 'Collection Root Content';
+  const collectionDocumentTypeName = 'CollectionDocumentType';
+  const collectionChildDocumentTypeName = 'CollectionChildDocumentType';
+  const firstCollectionItemName = 'First Collection Item';
+  const secondCollectionItemName = 'Second Collection Item';
+
+  let sharedContext: BrowserContext;
+  let firstCollectionItemId: string;
+  let secondCollectionItemId: string;
+
+  test.beforeAll(async ({browser}, testInfo) => {
+    sharedContext = await browser.newContext(testInfo.project.use);
+    const sharedApi = new ApiHelpers(await sharedContext.newPage());
+    await sharedApi.isLoginStateValid();
+
+    const listViewDataTypeName = 'List View - Content';
+    const collectionChildDocumentTypeId = await sharedApi.documentType.createDefaultDocumentType(collectionChildDocumentTypeName);
+    const listViewDataTypeData = await sharedApi.dataType.getByName(listViewDataTypeName);
+    const collectionDocumentTypeId = await sharedApi.documentType.createDocumentTypeWithAllowedChildNodeAndCollectionId(collectionDocumentTypeName, collectionChildDocumentTypeId, listViewDataTypeData.id);
+    const collectionContentId = await sharedApi.document.createDefaultDocument(collectionContentName, collectionDocumentTypeId);
+    firstCollectionItemId = await sharedApi.document.createDefaultDocumentWithParent(firstCollectionItemName, collectionChildDocumentTypeId, collectionContentId);
+    secondCollectionItemId = await sharedApi.document.createDefaultDocumentWithParent(secondCollectionItemName, collectionChildDocumentTypeId, collectionContentId);
+  });
+
+  test.afterAll(async () => {
+    const sharedApi = new ApiHelpers(await sharedContext.newPage());
+    await sharedApi.document.ensureNameNotExists(collectionContentName);
+    await sharedApi.document.ensureNameNotExists(firstCollectionItemName);
+    await sharedApi.document.ensureNameNotExists(secondCollectionItemName);
+    await sharedApi.documentType.ensureNameNotExists(collectionDocumentTypeName);
+    await sharedApi.documentType.ensureNameNotExists(collectionChildDocumentTypeName);
+    await sharedContext.close();
+  });
+
+  test('can pick multiple items from a collection browsed via the picker', async ({umbracoApi, umbracoUi}) => {
+    // Arrange - No min/max configured, so the picker defaults to unlimited selection.
+    const customDataTypeId = await umbracoApi.dataType.createDefaultContentPickerSourceDataType(customDataTypeName);
+    const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
+    await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+    await umbracoUi.goToBackOffice();
+    await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+    // Act
+    await umbracoUi.content.goToContentWithName(contentName);
+    await umbracoUi.content.clickChooseButton();
+    await umbracoUi.content.openCaretButtonForName(collectionContentName, true);
+    await umbracoUi.content.clickCollectionCardInPickerModal(firstCollectionItemName);
+    await umbracoUi.content.clickCollectionCardInPickerModal(secondCollectionItemName);
+    await umbracoUi.content.clickChooseModalButton();
+    await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
+
+    // Assert
+    const contentData = await umbracoApi.document.getByName(contentName);
+    expect(contentData.values[0].value.length).toBe(2);
+    const pickedIds = contentData.values[0].value.map((item: {unique: string}) => item.unique);
+    expect(pickedIds).toContain(firstCollectionItemId);
+    expect(pickedIds).toContain(secondCollectionItemId);
+  });
+
+  test('can pick multiple items from a collection table view within the picker', async ({umbracoApi, umbracoUi}) => {
+    // Arrange - No min/max configured, so the picker defaults to unlimited selection.
+    const customDataTypeId = await umbracoApi.dataType.createDefaultContentPickerSourceDataType(customDataTypeName);
+    const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
+    await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+    await umbracoUi.goToBackOffice();
+    await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+    // Act
+    await umbracoUi.content.goToContentWithName(contentName);
+    await umbracoUi.content.clickChooseButton();
+    await umbracoUi.content.openCaretButtonForName(collectionContentName, true);
+    await umbracoUi.content.changeToListView();
+    await umbracoUi.content.selectContentWithNameInListView(firstCollectionItemName);
+    await umbracoUi.content.selectContentWithNameInListView(secondCollectionItemName);
+    await umbracoUi.content.clickChooseModalButton();
+    await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
+
+    // Assert
+    const contentData = await umbracoApi.document.getByName(contentName);
+    expect(contentData.values[0].value.length).toBe(2);
+    const pickedIds = contentData.values[0].value.map((item: {unique: string}) => item.unique);
+    expect(pickedIds).toContain(firstCollectionItemId);
+    expect(pickedIds).toContain(secondCollectionItemId);
+  });
 });
 
 test('can switch a collection to table view within the picker', async ({umbracoApi, umbracoUi}) => {
