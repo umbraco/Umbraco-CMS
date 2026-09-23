@@ -324,12 +324,13 @@ test.describe('can pick multiple items from a collection within the picker', () 
   const secondCollectionItemName = 'Second Collection Item';
 
   let sharedContext: BrowserContext;
+  let sharedApi: ApiHelpers;
   let firstCollectionItemId: string;
   let secondCollectionItemId: string;
 
   test.beforeAll(async ({browser}, testInfo) => {
     sharedContext = await browser.newContext(testInfo.project.use);
-    const sharedApi = new ApiHelpers(await sharedContext.newPage());
+    sharedApi = new ApiHelpers(await sharedContext.newPage());
     await sharedApi.isLoginStateValid();
 
     const listViewDataTypeName = 'List View - Content';
@@ -342,7 +343,6 @@ test.describe('can pick multiple items from a collection within the picker', () 
   });
 
   test.afterAll(async () => {
-    const sharedApi = new ApiHelpers(await sharedContext.newPage());
     await sharedApi.document.ensureNameNotExists(collectionContentName);
     await sharedApi.document.ensureNameNotExists(firstCollectionItemName);
     await sharedApi.document.ensureNameNotExists(secondCollectionItemName);
