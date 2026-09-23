@@ -154,6 +154,9 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	@state()
 	private _isReadOnly = false;
 
+	@state()
+	private _externalContentName?: string;
+
 	constructor() {
 		super();
 		this.#init();
@@ -186,8 +189,8 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 		this.observe(
 			this.#context.label,
 			(label) => {
-				this.#updateBlockViewProps({ label });
 				this._label = label;
+				this.#updateBlockLabel();
 			},
 			null,
 		);
@@ -225,6 +228,18 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			this.#context.isExternalContent,
 			(isExternalContent) => {
 				this._isExternalContent = isExternalContent;
+			},
+			null,
+		);
+		this.observe(
+			this.#context.externalContentName,
+			(name) => {
+				this._externalContentName = name;
+				// The Element's name is its identity, so it takes over as the block's name/label instead of the block type's UFM label template.
+				if (name) {
+					this.#context.setName(name);
+				}
+				this.#updateBlockLabel();
 			},
 			null,
 		);
@@ -302,6 +317,10 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	#updateBlockViewProps(incoming: Partial<UmbBlockEditorCustomViewProperties<UmbBlockListLayoutModel>>) {
 		this._blockViewProps = { ...this._blockViewProps, ...incoming };
 		this.requestUpdate('_blockViewProps');
+	}
+
+	#updateBlockLabel() {
+		this.#updateBlockViewProps({ label: this._externalContentName ?? this._label });
 	}
 
 	override connectedCallback(): void {
@@ -387,10 +406,14 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	}
 
 	#renderUfm() {
+		if (this._externalContentName) {
+			return html`<span slot="name">${this._externalContentName}</span>`;
+		}
 		return renderUfm(this._label, this.#blockValue, this.#onUfmResolved, 'name');
 	}
 
 	#renderHiddenUfm() {
+		if (this._externalContentName) return nothing;
 		return renderHiddenUfm(this._label, this.#blockValue, this.#onUfmResolved);
 	}
 

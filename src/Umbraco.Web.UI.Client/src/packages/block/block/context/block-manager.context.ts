@@ -10,6 +10,10 @@ import { UMB_BLOCK_TRANSFER_TO_ELEMENT_LIBRARY_MODAL } from '../modals/transfer-
 import { UMB_BLOCK_CONTENT_DATA_PATH_PROPERTY_NAME, UMB_BLOCK_SETTINGS_DATA_PATH_PROPERTY_NAME } from '../constants.js';
 import { umbBlockExposeSortCompare } from '../utils/block-expose-sort-compare.function.js';
 import { UMB_BLOCK_MANAGER_CONTEXT } from './block-manager.context-token.js';
+import {
+	findExternalContentVariant,
+	type UmbBlockManagerExternalContentVariantModel,
+} from './block-manager-external-content.function.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import {
@@ -109,7 +113,7 @@ export abstract class UmbBlockManagerContext<
 		([local, external]) => [...(local ?? []), ...(external ?? [])],
 	);
 	readonly #externalContentVariants = new UmbArrayState(
-		<Array<{ key: string; variants: Array<{ culture: string | null; state: string | null }> }>>[],
+		<Array<{ key: string; variants: Array<UmbBlockManagerExternalContentVariantModel> }>>[],
 		(x) => x.key,
 	);
 	#elementRepository = new UmbElementDetailRepository(this);
@@ -409,12 +413,19 @@ export abstract class UmbBlockManagerContext<
 	externalContentStateOf(key: string) {
 		return mergeObservables(
 			[this.#externalContentVariants.asObservablePart((source) => source.find((x) => x.key === key)), this.variantId],
-			([entry, variantId]) => {
-				if (!entry?.variants.length) return null;
-				if (!variantId) return entry.variants[0]?.state ?? null;
-				const match = entry.variants.find((v) => v.culture === variantId.culture);
-				return match?.state ?? entry.variants[0]?.state ?? null;
-			},
+			([entry, variantId]) => findExternalContentVariant(entry?.variants, variantId)?.state ?? null,
+		);
+	}
+
+	/**
+	 * Returns an observable of the external content's name (from the Element it references), matching the
+	 * current variant. Emits null if the external content has not resolved yet, or is not external content.
+	 * @param key
+	 */
+	externalContentNameOf(key: string) {
+		return mergeObservables(
+			[this.#externalContentVariants.asObservablePart((source) => source.find((x) => x.key === key)), this.variantId],
+			([entry, variantId]) => findExternalContentVariant(entry?.variants, variantId)?.name ?? null,
 		);
 	}
 
@@ -446,6 +457,7 @@ export abstract class UmbBlockManagerContext<
 						variants: data.variants.map((v) => ({
 							culture: v.culture ?? null,
 							state: v.state ?? null,
+							name: v.name ?? null,
 						})),
 					});
 				}
