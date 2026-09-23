@@ -28,7 +28,7 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 		name: 'Content Workspace Collection View',
 		weight: 1000,
 		meta: {
-			label: 'Child items',
+			label: '#content_childItems',
 			pathname: 'collection',
 			icon: 'icon-grid',
 		},

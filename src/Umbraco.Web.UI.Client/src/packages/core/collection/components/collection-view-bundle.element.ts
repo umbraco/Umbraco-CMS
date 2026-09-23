@@ -119,7 +119,7 @@ export class UmbCollectionViewBundleElement extends UmbLitElement {
 	#renderItem(view: UmbCollectionViewLayout) {
 		return html`
 			<uui-menu-item
-				label=${view.label}
+				label=${this.localize.string(view.label)}
 				@click-label=${() => this.#onClick(view)}
 				?active=${view.manifest.alias === this._currentView?.manifest.alias}>
 				<umb-icon slot="icon" name=${view.icon}></umb-icon>
