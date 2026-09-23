@@ -64,6 +64,6 @@ internal sealed class MediaSearchService : ContentSearchServiceBase<IMedia>, IMe
     }
 
     /// <inheritdoc />
-    protected override IEnumerable<IMedia> GetItems(IEnumerable<Guid> keys)
-        => _mediaService.GetByIds(keys);
+    protected override Task<IEnumerable<IMedia>> GetItemsAsync(IEnumerable<Guid> keys, CancellationToken cancellationToken)
+        => Task.FromResult(_mediaService.GetByIds(keys));
 }

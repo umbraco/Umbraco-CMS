@@ -2,9 +2,7 @@
 // See LICENSE for more details.
 
 using System.Text.RegularExpressions;
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
@@ -24,9 +22,10 @@ public static class ContentServiceExtensions
     /// </summary>
     /// <param name="contentService">The content service.</param>
     /// <param name="ids">The UDI identifiers of the content items to retrieve.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A collection of content items matching the specified UDIs.</returns>
     /// <exception cref="InvalidOperationException">Thrown when any UDI is not a <see cref="GuidUdi"/>.</exception>
-    public static IEnumerable<IContent> GetByIds(this IContentService contentService, IEnumerable<Udi> ids)
+    public static Task<IEnumerable<IContent>> GetByIdsAsync(this IContentService contentService, IEnumerable<Udi> ids, CancellationToken cancellationToken)
     {
         var guids = new List<GuidUdi>();
         foreach (Udi udi in ids)
@@ -40,19 +39,21 @@ public static class ContentServiceExtensions
             guids.Add(guidUdi);
         }
 
-        return contentService.GetByIdsAsync(guids.Select(x => x.Guid), CancellationToken.None).GetAwaiter().GetResult();
+        return contentService.GetByIdsAsync(guids.Select(x => x.Guid), cancellationToken);
     }
 
     /// <summary>
     ///     Method to create an IContent object based on the Udi of a parent
     /// </summary>
-    /// <param name="contentService"></param>
-    /// <param name="name"></param>
-    /// <param name="parentId"></param>
-    /// <param name="contentTypeAlias"></param>
-    /// <param name="userId"></param>
-    /// <returns></returns>
-    public static IContent CreateContent(this IContentService contentService, string name, Udi parentId, string contentTypeAlias, int userId = Constants.Security.SuperUserId)
+    /// <param name="contentService">The content service.</param>
+    /// <param name="name">The name of the content item to create.</param>
+    /// <param name="parentId">The UDI of the parent to create the content item under.</param>
+    /// <param name="contentTypeAlias">The alias of the content type to create.</param>
+    /// <param name="userKey">The key of the user creating the content item.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>The created content item.</returns>
+    /// <exception cref="InvalidOperationException">Thrown when the UDI is not a <see cref="GuidUdi"/>.</exception>
+    public static async Task<IContent> CreateContentAsync(this IContentService contentService, string name, Udi parentId, string contentTypeAlias, Guid userKey, CancellationToken cancellationToken)
     {
         if (parentId is not GuidUdi guidUdi)
         {
@@ -60,16 +61,13 @@ public static class ContentServiceExtensions
                                                 " which is required by content");
         }
 
-        IContent? parent = contentService.GetByIdAsync(guidUdi.Guid, CancellationToken.None).GetAwaiter().GetResult();
+        IContent? parent = await contentService.GetByIdAsync(guidUdi.Guid, cancellationToken);
         if (parent is null)
         {
             throw new ArgumentNullException(nameof(parentId), "No content found for the specified parent UDI.");
         }
 
-        IUserIdKeyResolver userIdKeyResolver = StaticServiceProvider.Instance.GetRequiredService<IUserIdKeyResolver>();
-        Guid userKey = userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult();
-
-        return contentService.CreateAsync(name, parent, contentTypeAlias, userKey, CancellationToken.None).GetAwaiter().GetResult();
+        return await contentService.CreateAsync(name, parent, contentTypeAlias, userKey, cancellationToken);
     }
 
     /// <summary>
@@ -88,21 +86,17 @@ public static class ContentServiceExtensions
     /// Gets all anchor values from Rich Text Editor properties of a content item.
     /// </summary>
     /// <param name="contentService">The content service.</param>
-    /// <param name="id">The content item identifier.</param>
+    /// <param name="key">The content item key.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <param name="culture">The culture to use, or "*" for all cultures. Defaults to "*".</param>
     /// <returns>A collection of anchor values found in the RTE properties.</returns>
-    public static IEnumerable<string> GetAnchorValuesFromRTEs(this IContentService contentService, int id, string? culture = "*")
+    public static async Task<IEnumerable<string>> GetAnchorValuesFromRTEsAsync(this IContentService contentService, Guid key, CancellationToken cancellationToken, string? culture = "*")
     {
         var result = new List<string>();
 
         culture = culture is not "*" ? culture : null;
 
-        IIdKeyMap idKeyMap = StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>();
-        Attempt<Guid> keyAttempt = idKeyMap.GetKeyForIdAsync(id, UmbracoObjectTypes.Document).GetAwaiter().GetResult();
-        IContent? content = keyAttempt.Success
-            ? contentService.GetByIdAsync(keyAttempt.Result, CancellationToken.None).GetAwaiter().GetResult()
-            : null;
-
+        IContent? content = await contentService.GetByIdAsync(key, cancellationToken);
         if (content is null)
         {
             return result;

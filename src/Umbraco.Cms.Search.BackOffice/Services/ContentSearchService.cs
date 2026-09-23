@@ -37,6 +37,6 @@ internal sealed class ContentSearchService : ContentSearchServiceBase<IContent>,
         => await _contentService.GetChildrenAsync(parentId, skip, take, propertyAliases: null, ordering, CancellationToken.None);
 
     /// <inheritdoc />
-    protected override IEnumerable<IContent> GetItems(IEnumerable<Guid> keys)
-        => _contentService.GetByIdsAsync(keys, CancellationToken.None).GetAwaiter().GetResult();
+    protected override Task<IEnumerable<IContent>> GetItemsAsync(IEnumerable<Guid> keys, CancellationToken cancellationToken)
+        => _contentService.GetByIdsAsync(keys, cancellationToken);
 }

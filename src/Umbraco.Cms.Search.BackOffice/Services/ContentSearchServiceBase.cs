@@ -55,8 +55,9 @@ internal abstract class ContentSearchServiceBase<TContent> : IndexedSearchServic
     /// Retrieves content items by key, used to hydrate search results with full items.
     /// </summary>
     /// <param name="keys">The keys of the items to retrieve.</param>
+    /// <param name="cancellationToken">A cancellation token.</param>
     /// <returns>The matching items, in no guaranteed order.</returns>
-    protected abstract IEnumerable<TContent> GetItems(IEnumerable<Guid> keys);
+    protected abstract Task<IEnumerable<TContent>> GetItemsAsync(IEnumerable<Guid> keys, CancellationToken cancellationToken);
 
     /// <summary>
     /// Searches for children via the search index and hydrates the matching items, preserving result order.
@@ -98,7 +99,7 @@ internal abstract class ContentSearchServiceBase<TContent> : IndexedSearchServic
 
         Guid[] resultKeys = result.Documents.Select(d => d.Id).ToArray();
         TContent[] resultItems = resultKeys.Length > 0
-            ? GetItems(resultKeys)
+            ? (await GetItemsAsync(resultKeys, CancellationToken.None))
                 // unfortunately we can't explicitly rely on the underlying services ordering the requested
                 // items correctly, so we need to enforce correct ordering here.
                 .OrderBy(item => resultKeys.IndexOf(item.Key))
