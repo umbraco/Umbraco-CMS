@@ -2171,15 +2171,13 @@ internal class DocumentRepository
 
     private async Task<(bool Edited, HashSet<string>? EditedCultures)> PersistNewPropertyDataAsync(UmbracoDbContext db, IContent item)
     {
-        List<PropertyDataDto> propertyDataDtos = PropertyFactory.BuildEFCoreDtos(
+        (List<PropertyDataDto> propertyDataDtos, var edited, HashSet<string>? editedCultures) = await PropertyFactory.BuildEFCoreDtosAsync(
             item.ContentType.Variations,
             item.VersionId,
             item.PublishedVersionId,
             item.Properties,
             LanguageRepository,
-            PropertyEditors,
-            out bool edited,
-            out HashSet<string>? editedCultures).ToList();
+            PropertyEditors);
 
         SetEntitySortableValues(item, propertyDataDtos);
 
@@ -2263,15 +2261,13 @@ internal class DocumentRepository
             trackedById[propertyData.Id] = propertyData;
         }
 
-        List<PropertyDataDto> propertyDataDtos = PropertyFactory.BuildEFCoreDtos(
+        (List<PropertyDataDto> propertyDataDtos, var edited, HashSet<string>? editedCultures) = await PropertyFactory.BuildEFCoreDtosAsync(
             item.ContentType.Variations,
             item.VersionId,
             publishedVersionId,
             item.Properties,
             LanguageRepository,
-            PropertyEditors,
-            out bool edited,
-            out HashSet<string>? editedCultures).ToList();
+            PropertyEditors);
 
         SetEntitySortableValues(item, propertyDataDtos);
 

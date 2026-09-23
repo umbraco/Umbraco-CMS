@@ -256,40 +256,52 @@ internal static class PropertyFactory
 
     /// <summary>
     ///     Creates a collection of EF Core <see cref="EFCoreDtos.PropertyDataDto"/> from a collection of <see cref="Property"/>.
-    ///     Mirrors <see cref="BuildDtos(ContentVariation, int, int, IEnumerable{IProperty}, ILanguageRepository, PropertyEditorCollection, out bool, out HashSet{string})"/>
-    ///     exactly, save for skipping <see cref="EFCoreDtos.PropertyDataDto.SortableValue"/> (not yet ported).
     /// </summary>
     /// <param name="contentVariation">
     ///     The <see cref="ContentVariation" /> of the entity containing the collection of <see cref="Property" />
     /// </param>
-    /// <param name="currentVersionId"></param>
-    /// <param name="publishedVersionId"></param>
+    /// <param name="currentVersionId">The identifier of the current version.</param>
+    /// <param name="publishedVersionId">The identifier of the published version, or 0 when there is none.</param>
     /// <param name="properties">The properties to map</param>
-    /// <param name="languageRepository"></param>
+    /// <param name="languageRepository">The language repository used to resolve language identifiers from culture ISO codes.</param>
     /// <param name="propertyEditors">
     ///     The collection of registered property editors, used to determine which specific culture(s) an edit
     ///     applies to when a property is culture-invariant but its data editor carries per-culture nested data.
     /// </param>
-    /// <param name="edited">out parameter indicating that one or more properties have been edited</param>
-    /// <param name="editedCultures">
-    ///     Out parameter containing a collection of edited cultures when the contentVariation varies by culture.
-    ///     The value of this will be used to populate the edited cultures in the umbracoDocumentCultureVariation table.
-    /// </param>
-    /// <returns></returns>
-    public static IEnumerable<EFCoreDtos.PropertyDataDto> BuildEFCoreDtos(
+    /// <returns>
+    ///     The mapped DTOs, whether one or more properties have been edited, and - when the content variation varies
+    ///     by culture - the edited cultures used to populate the umbracoDocumentCultureVariation table.
+    /// </returns>
+    public static async Task<(List<EFCoreDtos.PropertyDataDto> Dtos, bool Edited, HashSet<string>? EditedCultures)> BuildEFCoreDtosAsync(
         ContentVariation contentVariation,
         int currentVersionId,
         int publishedVersionId,
         IEnumerable<IProperty> properties,
         ILanguageRepository languageRepository,
-        PropertyEditorCollection propertyEditors,
-        out bool edited,
-        out HashSet<string>? editedCultures)
+        PropertyEditorCollection propertyEditors)
     {
         var propertyDataDtos = new List<EFCoreDtos.PropertyDataDto>();
-        edited = false;
-        editedCultures = null; // don't allocate unless necessary
+        var edited = false;
+        HashSet<string>? editedCultures = null; // don't allocate unless necessary
         string? defaultCulture = null; // don't allocate unless necessary
+
+        IEnumerable<ILanguage> languages = await languageRepository.GetAllAsync(CancellationToken.None);
+        var languageIdsByIsoCode = languages.ToDictionary(language => language.IsoCode, language => language.Id, StringComparer.OrdinalIgnoreCase);
+
+        int? LanguageIdByIsoCode(string? isoCode)
+        {
+            if (isoCode is null)
+            {
+                return null;
+            }
+
+            if (languageIdsByIsoCode.TryGetValue(isoCode, out var languageId))
+            {
+                return languageId;
+            }
+
+            throw new ArgumentException($"Code {isoCode} does not correspond to an existing language.", nameof(isoCode));
+        }
 
         var entityVariesByCulture = contentVariation.VariesByCulture();
 
@@ -315,13 +327,13 @@ internal static class PropertyFactory
                     // deal with published value
                     if ((propertyValue.PublishedValue != null || isSegmentValue) && publishedVersionId > 0)
                     {
-                        propertyDataDtos.Add(BuildEFCoreDto(publishedVersionId, property, languageRepository.GetIdByIsoCodeAsync(propertyValue.Culture).GetAwaiter().GetResult(), propertyValue.Segment, propertyValue.PublishedValue));
+                        propertyDataDtos.Add(BuildEFCoreDto(publishedVersionId, property, LanguageIdByIsoCode(propertyValue.Culture), propertyValue.Segment, propertyValue.PublishedValue));
                     }
 
                     // deal with edit value
                     if (propertyValue.EditedValue != null || isSegmentValue)
                     {
-                        propertyDataDtos.Add(BuildEFCoreDto(currentVersionId, property, languageRepository.GetIdByIsoCodeAsync(propertyValue.Culture).GetAwaiter().GetResult(), propertyValue.Segment, propertyValue.EditedValue));
+                        propertyDataDtos.Add(BuildEFCoreDto(currentVersionId, property, LanguageIdByIsoCode(propertyValue.Culture), propertyValue.Segment, propertyValue.EditedValue));
                     }
 
                     // property.Values will contain ALL of it's values, both variant and invariant which will be populated if the
@@ -355,7 +367,7 @@ internal static class PropertyFactory
                             // flag culture as edited if it contains an edited invariant property
                             if (defaultCulture == null)
                             {
-                                defaultCulture = languageRepository.GetDefaultIsoCodeAsync().GetAwaiter().GetResult();
+                                defaultCulture = await languageRepository.GetDefaultIsoCodeAsync();
                             }
 
                             // the property itself is invariant, but its data editor may carry per-culture
@@ -393,7 +405,7 @@ internal static class PropertyFactory
                     // not publishing = only deal with edit values
                     if (propertyValue.EditedValue != null)
                     {
-                        propertyDataDtos.Add(BuildEFCoreDto(currentVersionId, property, languageRepository.GetIdByIsoCodeAsync(propertyValue.Culture).GetAwaiter().GetResult(), propertyValue.Segment, propertyValue.EditedValue));
+                        propertyDataDtos.Add(BuildEFCoreDto(currentVersionId, property, LanguageIdByIsoCode(propertyValue.Culture), propertyValue.Segment, propertyValue.EditedValue));
                     }
                 }
 
@@ -401,7 +413,7 @@ internal static class PropertyFactory
             }
         }
 
-        return propertyDataDtos;
+        return (propertyDataDtos, edited, editedCultures);
     }
 
     private static EFCoreDtos.PropertyDataDto BuildEFCoreDto(int versionId, IProperty property, int? languageId, string? segment, object? value)
