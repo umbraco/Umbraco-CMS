@@ -22,9 +22,12 @@ namespace Umbraco.Cms.Core.Configuration.Models;
 public class ImagingMemorySettings
 {
     /// <summary>
-    /// Whether image processing memory is managed by default.
+    /// Whether image processing memory is managed by default. Off in v17/v18 so a minor upgrade
+    /// cannot change how an existing site allocates image memory; on from v19, where it ships with
+    /// the major.
     /// </summary>
-    internal const bool StaticEnabled = true;
+    // TODO (V19): Default to true.
+    internal const bool StaticEnabled = false;
 
     /// <summary>
     /// The default maximum pool size, in megabytes. Zero means it is derived from the available memory.
@@ -60,10 +63,11 @@ public class ImagingMemorySettings
     /// Gets or sets a value indicating whether image processing memory is managed.
     /// </summary>
     /// <remarks>
-    /// When enabled (the default), the pool the imaging library retains between requests is capped and
-    /// the number of images decoded at the same time is bounded on hosts where memory is the binding
-    /// constraint. Set to <c>false</c> to leave the imaging library's own memory behaviour untouched -
-    /// none of the pool cap, the concurrency bound or the single-image ceiling is applied.
+    /// When enabled, the pool the imaging library retains between requests is capped and the number
+    /// of images decoded at the same time is bounded on hosts where the memory available to the
+    /// process is limited. Left <c>false</c> by default in this version, so the imaging library's own
+    /// memory behaviour is untouched unless a site opts in; set to <c>true</c> to apply the pool cap,
+    /// the concurrency bound and the single-image ceiling.
     /// </remarks>
     [DefaultValue(StaticEnabled)]
     public bool Enabled { get; set; } = StaticEnabled;

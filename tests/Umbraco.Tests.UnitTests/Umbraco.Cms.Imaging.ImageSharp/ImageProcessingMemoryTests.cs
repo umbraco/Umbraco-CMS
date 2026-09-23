@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using SixLabors.ImageSharp.Memory;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Imaging.ImageSharp;
 using Configuration = SixLabors.ImageSharp.Configuration;
@@ -64,7 +65,7 @@ public class ImageProcessingMemoryTests
     [Test]
     public void Configure_WhenMemoryIsConstrained_ReplacesTheAllocator()
     {
-        LogCapture logs = Configure(new ImagingMemorySettings(), ConstrainedMemoryBytes);
+        LogCapture logs = Configure(new ImagingMemorySettings { Enabled = true }, ConstrainedMemoryBytes);
 
         Assert.Multiple(() =>
         {
@@ -76,7 +77,7 @@ public class ImageProcessingMemoryTests
     [Test]
     public void Configure_WhenMemoryIsConstrained_ReportsTheResolvedBounds()
     {
-        var settings = new ImagingMemorySettings();
+        var settings = new ImagingMemorySettings { Enabled = true };
 
         LogCapture logs = Configure(settings, ConstrainedMemoryBytes);
 
@@ -99,7 +100,7 @@ public class ImageProcessingMemoryTests
     [Test]
     public void Configure_WhenMemoryIsAmple_LeavesTheAllocatorAlone()
     {
-        LogCapture logs = Configure(new ImagingMemorySettings(), AmpleMemoryBytes);
+        LogCapture logs = Configure(new ImagingMemorySettings { Enabled = true }, AmpleMemoryBytes);
 
         Assert.Multiple(() =>
         {
@@ -109,10 +110,11 @@ public class ImageProcessingMemoryTests
     }
 
     /// <summary>
-    /// Explicit bounds, but the feature switched off: neither may be applied.
+    /// Explicit bounds, but the feature switched off on a host they would have applied to: nothing
+    /// is applied, but the switch is named at Information so an operator can find it.
     /// </summary>
     [Test]
-    public void Configure_WhenDisabled_LeavesTheAllocatorAlone()
+    public void Configure_WhenDisabledButWouldHaveEngaged_LeavesTheAllocatorAloneAndNamesTheSwitch()
     {
         var settings = new ImagingMemorySettings
         {
@@ -126,7 +128,26 @@ public class ImageProcessingMemoryTests
         Assert.Multiple(() =>
         {
             Assert.That(Configuration.Default.MemoryAllocator, Is.SameAs(_originalAllocator));
-            Assert.That(logs.Levels, Is.EqualTo(new[] { LogLevel.Debug, LogLevel.Debug }));
+            Assert.That(logs.Levels, Is.EqualTo(new[] { LogLevel.Information }));
+            Assert.That(
+                logs.WithProperty("SettingPath").Properties["SettingPath"],
+                Is.EqualTo($"{Constants.Configuration.ConfigImaging}:Memory:{nameof(ImagingMemorySettings.Enabled)}"));
+        });
+    }
+
+    /// <summary>
+    /// The feature switched off on a host no bound would have engaged on in any case: nothing worth
+    /// saying at Information, so a site running at that level stays quiet.
+    /// </summary>
+    [Test]
+    public void Configure_WhenDisabledAndUnaffected_SaysNothingAtInformation()
+    {
+        LogCapture logs = Configure(new ImagingMemorySettings { Enabled = false }, AmpleMemoryBytes);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(Configuration.Default.MemoryAllocator, Is.SameAs(_originalAllocator));
+            Assert.That(logs.Levels, Is.EqualTo(new[] { LogLevel.Debug }));
         });
     }
 
@@ -137,7 +158,7 @@ public class ImageProcessingMemoryTests
     [Test]
     public void Configure_WhenOnlyOneBoundApplies_ReportsEachSeparately()
     {
-        var settings = new ImagingMemorySettings { MaximumPoolSizeMegabytes = 128 };
+        var settings = new ImagingMemorySettings { Enabled = true, MaximumPoolSizeMegabytes = 128 };
 
         LogCapture logs = Configure(settings, AmpleMemoryBytes);
 
@@ -170,7 +191,7 @@ public class ImageProcessingMemoryTests
         Assert.Multiple(() =>
         {
             Assert.That(Configuration.Default.MemoryAllocator, Is.SameAs(_originalAllocator));
-            Assert.That(logs.Levels, Is.EqualTo(new[] { LogLevel.Debug, LogLevel.Debug }));
+            Assert.That(logs.Levels, Is.EqualTo(new[] { LogLevel.Information }));
         });
     }
 
@@ -259,7 +280,7 @@ public class ImageProcessingMemoryTests
     [TestCase(2048)]
     public void RequiresPoolSizeLimit_WhenMemoryIsLow_IsTrue(int availableMegabytes)
     {
-        var settings = new ImagingMemorySettings();
+        var settings = new ImagingMemorySettings { Enabled = true };
 
         Assert.That(ImageProcessingMemory.RequiresPoolSizeLimit(settings, availableMegabytes * OneMegabyte), Is.True);
     }
@@ -270,7 +291,7 @@ public class ImageProcessingMemoryTests
     [TestCase(65536)]
     public void RequiresPoolSizeLimit_WhenMemoryIsAmple_IsFalse(int availableMegabytes)
     {
-        var settings = new ImagingMemorySettings();
+        var settings = new ImagingMemorySettings { Enabled = true };
 
         Assert.That(ImageProcessingMemory.RequiresPoolSizeLimit(settings, availableMegabytes * OneMegabyte), Is.False);
     }
@@ -278,7 +299,7 @@ public class ImageProcessingMemoryTests
     [Test]
     public void RequiresPoolSizeLimit_WhenConfigured_IsTrueEvenWithAmpleMemory()
     {
-        var settings = new ImagingMemorySettings { MaximumPoolSizeMegabytes = 128 };
+        var settings = new ImagingMemorySettings { Enabled = true, MaximumPoolSizeMegabytes = 128 };
 
         Assert.That(ImageProcessingMemory.RequiresPoolSizeLimit(settings, 65536 * OneMegabyte), Is.True);
     }
@@ -347,7 +368,7 @@ public class ImageProcessingMemoryTests
     [TestCase(2048)]
     public void RequiresAllocationLimit_WhenMemoryIsLow_IsTrue(int availableMegabytes)
     {
-        var settings = new ImagingMemorySettings();
+        var settings = new ImagingMemorySettings { Enabled = true };
 
         Assert.That(ImageProcessingMemory.RequiresAllocationLimit(settings, availableMegabytes * OneMegabyte), Is.True);
     }
@@ -357,7 +378,7 @@ public class ImageProcessingMemoryTests
     [TestCase(65536)]
     public void RequiresAllocationLimit_WhenMemoryIsAmple_IsFalse(int availableMegabytes)
     {
-        var settings = new ImagingMemorySettings();
+        var settings = new ImagingMemorySettings { Enabled = true };
 
         Assert.That(ImageProcessingMemory.RequiresAllocationLimit(settings, availableMegabytes * OneMegabyte), Is.False);
     }
@@ -365,7 +386,7 @@ public class ImageProcessingMemoryTests
     [Test]
     public void RequiresAllocationLimit_WhenConfigured_IsTrueEvenWithAmpleMemory()
     {
-        var settings = new ImagingMemorySettings { MaximumDecodedImageMegabytes = 512 };
+        var settings = new ImagingMemorySettings { Enabled = true, MaximumDecodedImageMegabytes = 512 };
 
         Assert.That(ImageProcessingMemory.RequiresAllocationLimit(settings, 65536 * OneMegabyte), Is.True);
     }
@@ -381,38 +402,36 @@ public class ImageProcessingMemoryTests
     [Test]
     public void RequiresConcurrencyLimit_WhenConfigured_IsAlwaysTrue()
     {
-        var settings = new ImagingMemorySettings { MaximumConcurrentProcessing = 4 };
+        var settings = new ImagingMemorySettings { Enabled = true, MaximumConcurrentProcessing = 4 };
 
         // Explicit configuration is honoured even on a host with memory to spare.
-        Assert.That(ImageProcessingMemory.RequiresConcurrencyLimit(settings, 64L * 1024 * OneMegabyte, 4), Is.True);
+        Assert.That(ImageProcessingMemory.RequiresConcurrencyLimit(settings, 64L * 1024 * OneMegabyte), Is.True);
     }
 
-    // Memory is the binding constraint: it affords fewer concurrent decodes than there are
-    // processors, so an unbounded page of thumbnails would exhaust it.
-    [TestCase(384, 28)] // Many cores, little memory - the container that gets OOM-killed.
-    [TestCase(256, 8)]
-    [TestCase(1024, 32)]
-    public void RequiresConcurrencyLimit_WhenMemoryIsTheBindingConstraint_IsTrue(
-        int availableMegabytes,
-        int processorCount)
+    // Engaged wherever memory is limited, on the same threshold as the pool cap and the single-image
+    // ceiling. The low-core case is the point of #23556: requests in flight are thread pool bound,
+    // not core bound, so a 1-core host still holds many decodes at once and needs the gate as much
+    // as the many-core container does.
+    [TestCase(384)] // Many cores, little memory - the container that gets OOM-killed.
+    [TestCase(256)]
+    [TestCase(1024)]
+    [TestCase(1792)] // A 1-core B1 App Service SKU, which the earlier processor-count test left uncovered.
+    public void RequiresConcurrencyLimit_WhenMemoryIsLow_IsTrue(int availableMegabytes)
     {
-        var settings = new ImagingMemorySettings();
+        var settings = new ImagingMemorySettings { Enabled = true };
 
-        Assert.That(ImageProcessingMemory.RequiresConcurrencyLimit(settings, availableMegabytes * OneMegabyte, processorCount), Is.True);
+        Assert.That(ImageProcessingMemory.RequiresConcurrencyLimit(settings, availableMegabytes * OneMegabyte), Is.True);
     }
 
-    // The processor count already bounds concurrent decodes below what memory could hold, so a
-    // limit would only add latency without preventing anything.
-    [TestCase(512, 4)] // Derived concurrency equals the processor count - not strictly constrained.
-    [TestCase(2048, 4)]
-    [TestCase(65536, 8)]
-    public void RequiresConcurrencyLimit_WhenMemoryIsNotTheBindingConstraint_IsFalse(
-        int availableMegabytes,
-        int processorCount)
+    // Above the threshold the imaging library's own behaviour is not disproportionate, so bounding
+    // concurrency would only add latency without protecting against anything.
+    [TestCase(4096)]
+    [TestCase(65536)]
+    public void RequiresConcurrencyLimit_WhenMemoryIsAmple_IsFalse(int availableMegabytes)
     {
-        var settings = new ImagingMemorySettings();
+        var settings = new ImagingMemorySettings { Enabled = true };
 
-        Assert.That(ImageProcessingMemory.RequiresConcurrencyLimit(settings, availableMegabytes * OneMegabyte, processorCount), Is.False);
+        Assert.That(ImageProcessingMemory.RequiresConcurrencyLimit(settings, availableMegabytes * OneMegabyte), Is.False);
     }
 
     [Test]
@@ -422,7 +441,15 @@ public class ImageProcessingMemoryTests
         // feature is off.
         var settings = new ImagingMemorySettings { Enabled = false, MaximumConcurrentProcessing = 4 };
 
-        Assert.That(ImageProcessingMemory.RequiresConcurrencyLimit(settings, 384 * OneMegabyte, 28), Is.False);
+        Assert.That(ImageProcessingMemory.RequiresConcurrencyLimit(settings, 384 * OneMegabyte), Is.False);
+    }
+
+    [Test]
+    public void Enabled_DefaultsToFalse()
+    {
+        // Off by default in v17/v18 so a minor upgrade does not change how an existing site
+        // allocates image memory. TODO (V19): this flips to true.
+        Assert.That(new ImagingMemorySettings().Enabled, Is.False);
     }
 
     /// <summary>

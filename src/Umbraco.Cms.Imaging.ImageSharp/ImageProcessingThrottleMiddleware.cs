@@ -20,7 +20,8 @@ namespace Umbraco.Cms.Imaging.ImageSharp;
 /// distinct thumbnails decodes every source at full resolution in parallel. Peak memory is then
 /// the number of concurrent requests multiplied by the size of a decoded source, which on a host
 /// with a hard memory limit is enough to have the process killed. Requests over the limit wait
-/// here instead. The gate engages only when memory is the binding constraint (see
+/// here instead. The gate engages only where imaging memory management is on and the memory
+/// available to the process is limited (see
 /// <see cref="ImageProcessingMemory.RequiresConcurrencyLimit" />); on any other host no semaphore
 /// is created and every request passes straight through.
 /// </para>
@@ -103,7 +104,7 @@ public sealed class ImageProcessingThrottleMiddleware
         var availableMemoryMegabytes = availableMemoryBytes / 1024 / 1024;
 
         ImagingMemorySettings memory = imagingSettings.Value.Memory;
-        if (ImageProcessingMemory.RequiresConcurrencyLimit(memory, availableMemoryBytes, processorCount))
+        if (ImageProcessingMemory.RequiresConcurrencyLimit(memory, availableMemoryBytes))
         {
             var maximumConcurrentProcessing = ImageProcessingMemory.ResolveMaximumConcurrentProcessing(memory, availableMemoryBytes, processorCount);
             _semaphore = new SemaphoreSlim(maximumConcurrentProcessing, maximumConcurrentProcessing);

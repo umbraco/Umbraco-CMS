@@ -134,7 +134,7 @@ if (_options.HMACSecretKey.Length != 0 && _requestAuthorizationUtilities is not 
           "MaxHeight": 5000
         },
         "Memory": {
-          "Enabled": true,
+          "Enabled": false,
           "MaximumPoolSizeMegabytes": 0,
           "MaximumConcurrentProcessing": 0,
           "MaximumDecodedImageMegabytes": 0
@@ -152,7 +152,7 @@ Each numeric value defaults to `0`, meaning "derive from the memory available to
 
 | Setting | Purpose | Default |
 |---------|---------|---------|
-| `Enabled` | Master switch for imaging memory management. When `false`, none of the three bounds is applied and ImageSharp's own memory behaviour is left untouched. | `true` |
+| `Enabled` | Master switch for imaging memory management. When `false`, none of the three bounds is applied and ImageSharp's own memory behaviour is left untouched. | `false` in v17/v18, `true` from v19 |
 | `MaximumPoolSizeMegabytes` | Caps the unmanaged buffer pool ImageSharp retains between requests | available / 32, clamped to 16-64 MB |
 | `MaximumConcurrentProcessing` | Caps how many images are processed at once | (available / 2) / 64 MB, capped at processor count |
 | `MaximumDecodedImageMegabytes` | Caps any single buffer allocated while decoding an image | available / 4, clamped to 256-1024 MB |
@@ -161,25 +161,31 @@ Each numeric value defaults to `0`, meaning "derive from the memory available to
 and whether it applies at all, lives in `ImageProcessingMemory` in this project — the policy only
 means anything against ImageSharp's own defaults, which Core knows nothing about.
 
-All three bounds are default-on but **conditional**, so an upgrade changes nothing on a host that
-was never at risk. Each has its own engagement test, and setting a value explicitly overrides that
-test — an operator who names a number gets it.
+The feature is **off by default in v17/v18** and **on from v19** (`Enabled`), so a minor upgrade
+cannot change how an existing site allocates image memory — a site opts in until the major ships it
+on. When enabled, each bound is still **conditional** — it engages only where it earns its keep —
+and setting a value explicitly overrides that test, so an operator who names a number gets it.
 
 | Bound | Engages when | Test |
 |-------|--------------|------|
 | Pool cap | Under 4 GB is available to the process | `ImageProcessingMemory.RequiresPoolSizeLimit` |
 | Single image | Under 4 GB is available to the process | `ImageProcessingMemory.RequiresAllocationLimit` |
-| Concurrency | The memory budget cannot feed as many concurrent decodes as there are processors | `ImageProcessingMemory.RequiresConcurrencyLimit` |
+| Concurrency | Under 4 GB is available to the process | `ImageProcessingMemory.RequiresConcurrencyLimit` |
 
-The tests deliberately differ. Concurrency is about *peak* — it only needs bounding where memory is
-tighter than the core count, since decoding is CPU bound and the processor count caps it
-otherwise. The pool cap is about *retention*, and ImageSharp's default there is an eighth of
-available memory on **any 64-bit host** — [`GetDefaultMaxPoolSizeBytes`](https://github.com/SixLabors/ImageSharp/blob/v3.1.12/src/ImageSharp/Memory/Allocators/UniformUnmanagedMemoryPoolMemoryAllocator.cs#L156)
+All three engage on the same flat memory threshold. The pool cap is about *retention*, and
+ImageSharp's default there is an eighth of available memory on **any 64-bit host** — [`GetDefaultMaxPoolSizeBytes`](https://github.com/SixLabors/ImageSharp/blob/v3.1.12/src/ImageSharp/Memory/Allocators/UniformUnmanagedMemoryPoolMemoryAllocator.cs#L156)
 returns `total / 8` when `Environment.Is64BitProcess`, and a flat 128 MB otherwise. It is never
 disproportionate; it is a problem only in absolute terms, where that eighth competes with the memory
-the rest of the site needs. Hence a flat memory threshold rather than a ratio — and note that
-reusing `RequiresConcurrencyLimit` for the pool would switch it off on the low-core 2 GB host where
-the retention was actually measured.
+the rest of the site needs. Hence a flat memory threshold rather than a ratio.
+
+Concurrency once engaged on a different test — `derived < ProcessorCount`, on the reasoning that
+decoding is CPU bound so the cores already cap it. But requests in flight are thread-pool bound, not
+core bound, so a low-core host still holds many concurrent decodes, and that test left the gate off
+on exactly the low-core, memory-limited instances that most needed it — a 1-core B1 App Service SKU
+being the case in point ([#23556](https://github.com/umbraco/Umbraco-CMS/issues/23556)). It now
+engages on the shared memory threshold, and `ProcessorCount` survives only as an upper **clamp** on
+the resolved value (`ResolveMaximumConcurrentProcessing`), so on a host with cores to spare the bound
+simply lands there.
 
 The single-image ceiling exists because the concurrency bound assumes a cost per image
 (`EstimatedMegabytesPerImage`, measured against a 12 megapixel JPEG). Peak is `count x size`, and
@@ -201,7 +207,11 @@ turned away with `503` and a `Retry-After`, logged as a warning. It must not be 
 unthrottled on expiry instead — concurrent decodes are the thing being bounded, so that reinstates
 the OOM under sustained load.
 
-`Enabled: false` remains the one-setting escape hatch that restores stock ImageSharp behaviour.
+`Enabled: false` is the one-setting escape hatch that restores stock ImageSharp behaviour — and,
+until v19, the default. When it is off on a host a bound *would* have engaged on, `Configure` says so
+once at **Information**, naming the switch (`Umbraco:CMS:Imaging:Memory:Enabled`) — so an operator
+staring at an exit 137 on a memory-limited box is pointed at the setting rather than left to find it.
+On a host no bound would have engaged on, it stays quiet (Debug), so an unaffected site says nothing.
 
 Each bound reports itself at startup — Information when it engages, naming the resolved value, and
 Debug when it does not, so an unaffected site running at Information says nothing. Those lines are

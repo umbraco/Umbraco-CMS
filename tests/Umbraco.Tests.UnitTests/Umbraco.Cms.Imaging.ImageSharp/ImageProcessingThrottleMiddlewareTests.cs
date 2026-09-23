@@ -88,8 +88,8 @@ public class ImageProcessingThrottleMiddlewareTests
     }
 
     /// <summary>
-    /// Ample memory for a single processor: the processor count already bounds concurrent decodes,
-    /// so the gate steps aside rather than serialising requests the cache could serve.
+    /// Memory above the threshold the bounds engage on: the gate steps aside rather than serialising
+    /// requests the cache could serve, so no semaphore is created and every request passes through.
     /// </summary>
     [Test]
     public Task InvokeAsync_WhenMemoryIsNotConstrained_DoesNotThrottle()
@@ -187,7 +187,7 @@ public class ImageProcessingThrottleMiddlewareTests
                 decodeStarted.SetResult();
                 await releaseDecode.Task;
             },
-            new ImagingMemorySettings { MaximumConcurrentProcessing = 1 });
+            new ImagingMemorySettings { Enabled = true, MaximumConcurrentProcessing = 1 });
 
         Task decode = middleware.InvokeAsync(CreateContext(ImagePath, ("width", "400")));
         await decodeStarted.Task;
@@ -224,7 +224,7 @@ public class ImageProcessingThrottleMiddlewareTests
                     "Failed to allocate buffers for possibly degenerate dimensions.",
                     new InvalidMemoryOperationException("Unable to allocate."));
             },
-            new ImagingMemorySettings { MaximumConcurrentProcessing = Limit },
+            new ImagingMemorySettings { Enabled = true, MaximumConcurrentProcessing = Limit },
             logger: logger);
 
         Assert.ThrowsAsync<InvalidImageContentException>(
@@ -237,19 +237,19 @@ public class ImageProcessingThrottleMiddlewareTests
     }
 
     private static ImageProcessingThrottleMiddleware CreateMiddleware(RequestDelegate next)
-        => Build(next, new ImagingMemorySettings { MaximumConcurrentProcessing = Limit });
+        => Build(next, new ImagingMemorySettings { Enabled = true, MaximumConcurrentProcessing = Limit });
 
     private static ImageProcessingThrottleMiddleware CreateDisabledMiddleware(RequestDelegate next)
         => Build(next, new ImagingMemorySettings { Enabled = false, MaximumConcurrentProcessing = Limit });
 
     /// <summary>
-    /// Derived settings (zero) against 2 GB and a single processor, so memory is not the binding
-    /// constraint and no limit is enforced.
+    /// Derived settings (zero) against ample memory - above the threshold the bounds engage on - so
+    /// no limit is enforced whatever the processor count.
     /// </summary>
     /// <param name="next">The next middleware in the pipeline.</param>
     /// <returns>The middleware under test.</returns>
     private static ImageProcessingThrottleMiddleware CreateUnconstrainedMiddleware(RequestDelegate next)
-        => Build(next, new ImagingMemorySettings(), availableMemoryBytes: 2048L * 1024 * 1024, processorCount: 1);
+        => Build(next, new ImagingMemorySettings { Enabled = true }, availableMemoryBytes: 8192L * 1024 * 1024, processorCount: 1);
 
     private static ImageProcessingThrottleMiddleware Build(
         RequestDelegate next,

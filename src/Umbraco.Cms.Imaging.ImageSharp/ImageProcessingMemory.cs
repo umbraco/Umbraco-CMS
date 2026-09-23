@@ -112,6 +112,12 @@ internal static class ImageProcessingMemory
 
         var availableMemoryMegabytes = availableMemoryBytes / 1024 / 1024;
 
+        if (memory.Enabled is false)
+        {
+            LogDisabled(logger, memory, availableMemoryBytes, availableMemoryMegabytes);
+            return;
+        }
+
         // ImageSharp pools unmanaged memory sized against the available memory and releases it only
         // on a gen2 collection, so on a memory constrained host it sits at rest well above what the
         // site needs, and it will decode a source of any size into that memory. Both are left to
@@ -178,6 +184,35 @@ internal static class ImageProcessingMemory
     }
 
     /// <summary>
+    /// Reports that imaging memory management is off, naming the switch on a host the bounds would
+    /// have engaged on so an operator staring at an out-of-memory kill can find it.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    /// <param name="memory">The imaging memory settings.</param>
+    /// <param name="availableMemoryBytes">The memory available to the process.</param>
+    /// <param name="availableMemoryMegabytes">The memory available to the process, in megabytes.</param>
+    private static void LogDisabled(
+        ILogger logger,
+        ImagingMemorySettings memory,
+        long availableMemoryBytes,
+        long availableMemoryMegabytes)
+    {
+        if (WouldApply(memory, availableMemoryBytes))
+        {
+            logger.LogInformation(
+                "{AvailableMemoryMegabytes} MB available to this process; imaging memory management is disabled, so the imaging library's own memory behaviour stands. Set {SettingPath} to true to bound it.",
+                availableMemoryMegabytes,
+                $"{Constants.Configuration.ConfigImaging}:Memory:{nameof(ImagingMemorySettings.Enabled)}");
+        }
+        else if (logger.IsEnabled(LogLevel.Debug))
+        {
+            logger.LogDebug(
+                "Imaging memory management is disabled; with {AvailableMemoryMegabytes} MB available to the process, no bound would have engaged in any case.",
+                availableMemoryMegabytes);
+        }
+    }
+
+    /// <summary>
     /// Reports a decode that could not be served within the configured ceiling.
     /// </summary>
     /// <param name="context">The request context.</param>
@@ -205,25 +240,24 @@ internal static class ImageProcessingMemory
     /// </summary>
     /// <param name="memory">The imaging memory settings.</param>
     /// <param name="availableMemoryBytes">The memory available to the process.</param>
-    /// <param name="processorCount">The number of processors available to the process.</param>
     /// <returns>
-    /// <c>true</c> when a limit is configured explicitly, or when the memory budget cannot cover as
-    /// many concurrent decodes as the processors would otherwise run; otherwise <c>false</c>.
+    /// <c>true</c> when a limit is configured explicitly, or when the memory available to the
+    /// process is low enough that an unbounded page of thumbnails could exhaust it; otherwise
+    /// <c>false</c>.
     /// </returns>
     /// <remarks>
-    /// Decoding is CPU bound, so the processor count already caps how many images decode at once.
-    /// A concurrency limit only earns its keep when memory is the tighter constraint - a container
-    /// with a low limit relative to its core count. Everywhere else - an uncapped host, or a host
-    /// with few cores relative to its memory - bounding concurrency would only add latency to
-    /// requests the cache can serve without protecting against anything.
+    /// Engaged on the same memory threshold as the pool cap and the single-image ceiling. It once
+    /// engaged only where the derived concurrency fell below the processor count, on the reasoning
+    /// that decoding is CPU bound so the cores already capped it - but requests in flight are thread
+    /// pool bound, not core bound, so a low-core host holds far more concurrent decodes than it has
+    /// cores, and that test left the gate off on exactly the low-core, memory-limited instances that
+    /// most needed it (#23556). The resolved value is still clamped to the processor count, so on a
+    /// host with cores to spare the bound simply lands there.
     /// </remarks>
-    internal static bool RequiresConcurrencyLimit(
-        ImagingMemorySettings memory,
-        long availableMemoryBytes,
-        int processorCount)
+    internal static bool RequiresConcurrencyLimit(ImagingMemorySettings memory, long availableMemoryBytes)
         => memory.Enabled
            && (memory.MaximumConcurrentProcessing > 0
-               || DeriveConcurrentProcessing(availableMemoryBytes) < processorCount);
+               || IsMemoryManaged(availableMemoryBytes));
 
     /// <summary>
     /// Resolves the number of images that may be processed at the same time, deriving a value when
@@ -265,7 +299,7 @@ internal static class ImageProcessingMemory
     internal static bool RequiresPoolSizeLimit(ImagingMemorySettings memory, long availableMemoryBytes)
         => memory.Enabled
            && (memory.MaximumPoolSizeMegabytes > 0
-               || availableMemoryBytes < MemoryManagementThresholdMegabytes * (long)OneMegabyte);
+               || IsMemoryManaged(availableMemoryBytes));
 
     /// <summary>
     /// Resolves the size of the pool the imaging library retains between requests, deriving a value
@@ -305,7 +339,7 @@ internal static class ImageProcessingMemory
     internal static bool RequiresAllocationLimit(ImagingMemorySettings memory, long availableMemoryBytes)
         => memory.Enabled
            && (memory.MaximumDecodedImageMegabytes > 0
-               || availableMemoryBytes < MemoryManagementThresholdMegabytes * (long)OneMegabyte);
+               || IsMemoryManaged(availableMemoryBytes));
 
     /// <summary>
     /// Resolves the size of the buffers a single image may be decoded into, deriving a value when
@@ -328,4 +362,29 @@ internal static class ImageProcessingMemory
 
     private static long DeriveConcurrentProcessing(long availableMemoryBytes)
         => availableMemoryBytes / ConcurrencyMemoryShareDivisor / (EstimatedMegabytesPerImage * OneMegabyte);
+
+    /// <summary>
+    /// Gets a value indicating whether the memory available to the process is low enough that the
+    /// imaging library's own defaults compete with the memory the rest of the site needs. This is
+    /// the single threshold all three derived bounds engage on.
+    /// </summary>
+    /// <param name="availableMemoryBytes">The memory available to the process.</param>
+    private static bool IsMemoryManaged(long availableMemoryBytes)
+        => availableMemoryBytes < MemoryManagementThresholdMegabytes * (long)OneMegabyte;
+
+    /// <summary>
+    /// Gets a value indicating whether any imaging memory bound would apply on this host were the
+    /// feature enabled.
+    /// </summary>
+    /// <param name="memory">The imaging memory settings.</param>
+    /// <param name="availableMemoryBytes">The memory available to the process.</param>
+    /// <returns>
+    /// <c>true</c> when the host is one the bounds would engage on, so an operator who has turned
+    /// the feature off on a host it would have protected can be pointed back at the switch.
+    /// </returns>
+    internal static bool WouldApply(ImagingMemorySettings memory, long availableMemoryBytes)
+        => IsMemoryManaged(availableMemoryBytes)
+           || memory.MaximumPoolSizeMegabytes > 0
+           || memory.MaximumConcurrentProcessing > 0
+           || memory.MaximumDecodedImageMegabytes > 0;
 }
