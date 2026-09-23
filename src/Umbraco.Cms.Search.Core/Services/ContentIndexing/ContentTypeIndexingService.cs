@@ -102,10 +102,13 @@ internal sealed class ContentTypeIndexingService : IContentTypeIndexingService
         while (true)
         {
             PagedModel<IContent> page = await _contentService.GetPagedOfTypesAsync(allContentTypeKeys, skip, take, ordering: null, cancellationToken);
-            keys.AddRange(page.Items.Select(c => c.Key));
+            Guid[] pageKeys = page.Items.Select(c => c.Key).ToArray();
+            keys.AddRange(pageKeys);
             skip += take;
 
-            if (keys.Count >= page.Total)
+            // An empty page means there is nothing further to read whatever the reported total says. Relying on
+            // the total alone spins forever if it ever exceeds what the query can actually return.
+            if (pageKeys.Length == 0 || keys.Count >= page.Total)
             {
                 break;
             }

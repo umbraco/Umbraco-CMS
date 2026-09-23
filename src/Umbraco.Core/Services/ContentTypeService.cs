@@ -186,6 +186,14 @@ public class ContentTypeService : AsyncContentTypeServiceBase<IContentTypeReposi
                 {
                     typeKeys.Add(keyAttempt.Result);
                 }
+                else
+                {
+                    // Dropping it silently would leave content of that type behind while the caller is told the
+                    // delete succeeded.
+                    LoggerFactory.CreateLogger<ContentTypeService>().LogWarning(
+                        "Could not resolve a key for content type {ContentTypeId}; its content was not deleted.",
+                        typeId);
+                }
             }
 
             if (typeKeys.Count > 0)
