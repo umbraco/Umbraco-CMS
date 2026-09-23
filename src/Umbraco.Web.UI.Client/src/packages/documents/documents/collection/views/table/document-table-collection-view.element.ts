@@ -105,11 +105,13 @@ export class UmbDocumentTableCollectionViewElement extends UmbCollectionViewElem
 			};
 		}
 
-		// The rows carry their own selectability, so they are rebuilt when selection becomes available as well.
+		// The rows carry their own selectability and href, so they are rebuilt when selection or select-only
+		// mode changes too - not just when the underlying items change.
 		if (
 			changedProperties.has('_items') ||
 			changedProperties.has('_userDefinedProperties') ||
 			changedProperties.has('_selectable') ||
+			changedProperties.has('_selectOnly') ||
 			changedProperties.has('_hideItemActions')
 		) {
 			this.#createTableHeadings();
