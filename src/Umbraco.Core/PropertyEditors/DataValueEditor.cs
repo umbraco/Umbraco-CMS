@@ -431,14 +431,6 @@ public class DataValueEditor : IDataValueEditor
     }
 
     /// <summary>
-    /// Adds the specified <see cref="IContent"/> item to the request cache using its unique key.
-    /// </summary>
-    /// <param name="content">The content item to cache.</param>
-    /// <param name="requestCache">The request cache in which to store the content item.</param>
-    [Obsolete("This method is available for support of request caching retrieved entities in derived property value editors. " +
-          "The intention is to supersede this with lazy loaded read locks, which will make this unnecessary. " +
-          "Scheduled for removal in Umbraco 19.")]
-    /// <summary>
     /// Gets a content item by key, serving it from the request cache when it is already there.
     /// </summary>
     /// <remarks>
@@ -476,6 +468,14 @@ public class DataValueEditor : IDataValueEditor
         return content;
     }
 
+    /// <summary>
+    /// Adds the specified <see cref="IContent"/> item to the request cache using its unique key.
+    /// </summary>
+    /// <param name="content">The content item to cache.</param>
+    /// <param name="requestCache">The request cache in which to store the content item.</param>
+    [Obsolete("This method is available for support of request caching retrieved entities in derived property value editors. " +
+          "The intention is to supersede this with lazy loaded read locks, which will make this unnecessary. " +
+          "Scheduled for removal in Umbraco 19.")]
     protected static void CacheContentById(IContent content, IRequestCache requestCache)
     {
         if (requestCache.IsAvailable is false)

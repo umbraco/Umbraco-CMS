@@ -422,7 +422,7 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
     ///     Nodes of this repository's entity kind whose table-level "published" flag (<see cref="IPublishableContentDto{TVersionDto}.Published" />) is set.
     /// </summary>
     /// <remarks>
-    ///     Callers still need to filter by <see cref="NodeObjectTypeKey" />/<c>Trashed</c> themselves —
+    ///     Callers still need to filter by <c>NodeObjectTypeKey</c>/<c>Trashed</c> themselves —
     ///     this only joins on the published flag. <c>protected</c> so <see cref="IsPathPublishedAsync" />
     ///     overrides in concrete repositories can reuse it.
     /// </remarks>
@@ -547,7 +547,7 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
     }
 
     /// <summary>
-    ///     Fetches every sibling under <paramref name="parentId" /> (of this repository's <see cref="NodeObjectTypeKey" />)
+    ///     Fetches every sibling under <paramref name="parentId" /> (of this repository's <c>NodeObjectTypeKey</c>)
     ///     and resolves a sibling-unique name for <paramref name="nodeName" />, returning both so overrides of
     ///     <see cref="EnsureUniqueNodeNameAsync" /> can run further checks against the same sibling list without
     ///     re-querying. Deliberately unfiltered (no name-prefix narrowing) — unlike NPoco's generic

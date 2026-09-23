@@ -772,6 +772,7 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
     /// <param name="children">The child content items to serialize.</param>
     /// <param name="xml">The parent XML element to add children to.</param>
     /// <param name="published">Whether to serialize the published version.</param>
+    /// <param name="templateCache">Cache of templates by id, shared across a serialization run.</param>
     private void SerializeChildren(IEnumerable<IContent> children, XElement xml, bool published, Dictionary<int, ITemplate?> templateCache)
     {
         foreach (IContent child in children)

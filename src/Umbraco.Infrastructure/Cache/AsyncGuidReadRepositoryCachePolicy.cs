@@ -32,6 +32,11 @@ internal sealed class AsyncGuidReadRepositoryCachePolicy<TEntity> : AsyncDefault
     /// <summary>
     ///     Initializes a new instance of the <see cref="AsyncGuidReadRepositoryCachePolicy{TEntity}"/> class.
     /// </summary>
+    /// <param name="cache">The application policy cache.</param>
+    /// <param name="scopeAccessor">The scope accessor for accessing the current scope.</param>
+    /// <param name="options">The cache policy options.</param>
+    /// <param name="repositoryCacheVersionService">The service for managing cache version synchronization.</param>
+    /// <param name="cacheSyncService">The service for synchronizing cache changes across servers.</param>
     /// <param name="entityTypeCacheKey">
     ///     The cache key prefix to file entries under, for repositories that share an entity type with another
     ///     and must not share its entries. Defaults to the prefix for <typeparamref name="TEntity" />.

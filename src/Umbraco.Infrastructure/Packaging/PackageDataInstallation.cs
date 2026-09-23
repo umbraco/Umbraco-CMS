@@ -88,6 +88,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         /// <param name="dataTypeContainerService">The data type container service for resolving data type folders.</param>
         /// <param name="elementService">The element service for installing element instances.</param>
         /// <param name="elementContainerService">The element container service for managing element folders.</param>
+    /// <param name="contentTypeContainerService">The content type container service.</param>
         public PackageDataInstallation(
             IDataValueEditorFactory dataValueEditorFactory,
             ILogger<PackageDataInstallation> logger,

@@ -1250,6 +1250,11 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
     /// <param name="branchOne"></param>
     /// <param name="branchRoot"></param>
     /// <param name="eventMessages"></param>
+    /// <param name="raiseSavedNotification">
+    ///     Whether to raise the "saved" notification once the content is persisted. The save-and-publish entry
+    ///     points enable it, because they combine a save and a publish and the paired "saved" notification still
+    ///     has to fire.
+    /// </param>
     /// <returns></returns>
     /// <remarks>
     ///     <para>

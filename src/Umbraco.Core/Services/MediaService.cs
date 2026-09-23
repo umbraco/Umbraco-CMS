@@ -48,50 +48,6 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="entityRepository">The <see cref="IEntityRepository"/> for entity operations.</param>
         /// <param name="shortStringHelper">The <see cref="IShortStringHelper"/> for string operations.</param>
         /// <param name="userIdKeyResolver">The <see cref="IUserIdKeyResolver"/> for resolving user IDs.</param>
-        [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 21.")]
-        public MediaService(
-            ICoreScopeProvider provider,
-            MediaFileManager mediaFileManager,
-            ILoggerFactory loggerFactory,
-            IEventMessagesFactory eventMessagesFactory,
-            IMediaRepository mediaRepository,
-            IAuditService auditService,
-            IMediaTypeRepository mediaTypeRepository,
-            IEntityRepository entityRepository,
-            IShortStringHelper shortStringHelper,
-            IUserIdKeyResolver userIdKeyResolver,
-            IMediaPathScheme mediaPathScheme,
-            ILogger<MediaService> logger)
-            : this(
-                provider,
-                mediaFileManager,
-                loggerFactory,
-                eventMessagesFactory,
-                mediaRepository,
-                auditService,
-                mediaTypeRepository,
-                entityRepository,
-                shortStringHelper,
-                userIdKeyResolver,
-                mediaPathScheme,
-                logger,
-                StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>())
-        {
-        }
-
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="MediaService"/> class.
-        /// </summary>
-        /// <param name="provider">The <see cref="ICoreScopeProvider"/> for database scope management.</param>
-        /// <param name="mediaFileManager">The <see cref="MediaFileManager"/> for media file operations.</param>
-        /// <param name="loggerFactory">The <see cref="ILoggerFactory"/> for creating loggers.</param>
-        /// <param name="eventMessagesFactory">The <see cref="IEventMessagesFactory"/> for creating event messages.</param>
-        /// <param name="mediaRepository">The <see cref="IMediaRepository"/> for media persistence.</param>
-        /// <param name="auditService">The <see cref="IAuditService"/> for audit logging.</param>
-        /// <param name="mediaTypeRepository">The <see cref="IMediaTypeRepository"/> for media type persistence.</param>
-        /// <param name="entityRepository">The <see cref="IEntityRepository"/> for entity operations.</param>
-        /// <param name="shortStringHelper">The <see cref="IShortStringHelper"/> for string operations.</param>
-        /// <param name="userIdKeyResolver">The <see cref="IUserIdKeyResolver"/> for resolving user IDs.</param>
         /// <param name="mediaPathScheme">The <see cref="IMediaPathScheme"/> for media path resolution.</param>
         /// <param name="logger">The <see cref="ILogger{MediaService}"/> for logging.</param>
         /// <param name="idKeyMap">The <see cref="IIdKeyMap"/> for resolving between int ids and Guid keys.</param>

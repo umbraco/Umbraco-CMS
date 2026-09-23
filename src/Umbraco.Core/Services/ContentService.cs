@@ -400,11 +400,6 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
         return parent is null || await IsPathPublishedAsync(parent, cancellationToken);
     }
 
-    /// <summary>
-    /// Checks if the <see cref="IContent"/> and all its ancestors are published.
-    /// </summary>
-    /// <param name="content">The content to check.</param>
-    /// <returns><c>true</c> if the content and all its ancestors are published; otherwise, <c>false</c>.</returns>
     #endregion
 
     #region Save, Publish, Unpublish
@@ -1499,16 +1494,6 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
         }
     }
 
-    /// <summary>
-    /// Gets the published descendants of the specified content item while holding the content tree lock.
-    /// </summary>
-    /// <param name="content">The content item to retrieve published descendants from.</param>
-    /// <returns>An enumerable of published <see cref="IContent"/> descendants.</returns>
-    /// <remarks>
-    /// This method should only be called within a scope that already holds the content tree read lock.
-    /// The returned contents include all published versions below the content, but are filtered to exclude
-    /// items that are not directly published because they are below an unpublished content.
-    /// </remarks>
     #endregion
 
     #region Content Types
@@ -1647,7 +1632,8 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
     /// Moves a content blueprint to a different container.
     /// </summary>
     /// <param name="content">The blueprint content to move.</param>
-    /// <param name="userId">The optional ID of the user moving the blueprint.</param>
+    /// <param name="userKey">The key of the user moving the blueprint.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     public async Task<Attempt<ContentBlueprintOperationStatus>> MoveBlueprintAsync(IContent content, Guid userKey, CancellationToken cancellationToken)
     {
         EventMessages evtMsgs = EventMessagesFactory.Get();
@@ -1675,7 +1661,8 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
     /// Deletes a content blueprint.
     /// </summary>
     /// <param name="content">The blueprint content to delete.</param>
-    /// <param name="userId">The optional ID of the user deleting the blueprint.</param>
+    /// <param name="userKey">The key of the user deleting the blueprint.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     public async Task<Attempt<ContentBlueprintOperationStatus>> DeleteBlueprintAsync(IContent content, Guid userKey, CancellationToken cancellationToken)
     {
         EventMessages evtMsgs = EventMessagesFactory.Get();
@@ -1699,7 +1686,8 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
     /// </summary>
     /// <param name="blueprint">The blueprint to create the content from.</param>
     /// <param name="name">The name for the new content.</param>
-    /// <param name="userId">The optional ID of the user creating the content.</param>
+    /// <param name="userKey">The key of the user creating the content.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The newly created <see cref="IContent"/> based on the blueprint.</returns>
     public async Task<IContent> CreateBlueprintFromContentAsync(
         IContent blueprint,

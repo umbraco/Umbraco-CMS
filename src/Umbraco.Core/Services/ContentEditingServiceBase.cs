@@ -53,6 +53,8 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
     /// <param name="optionsMonitor">The content settings options monitor.</param>
     /// <param name="relationService">The relation service.</param>
     /// <param name="contentTypeFilters">The content type filter collection.</param>
+    /// <param name="languageService">The language service.</param>
+    /// <param name="userService">The user service.</param>
     protected ContentEditingServiceBase(
         TContentService contentService,
         TContentTypeService contentTypeService,

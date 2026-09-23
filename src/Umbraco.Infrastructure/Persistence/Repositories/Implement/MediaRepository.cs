@@ -56,6 +56,7 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
     /// <param name="eventAggregator">Publishes and subscribes to domain events.</param>
     /// <param name="repositoryCacheVersionService">Service for managing cache versioning for repositories.</param>
     /// <param name="cacheSyncService">Service for synchronizing cache across distributed environments.</param>
+    /// <param name="idKeyMap">The ID/key map.</param>
     public MediaRepository(
         IScopeAccessor scopeAccessor,
         AppCaches cache,

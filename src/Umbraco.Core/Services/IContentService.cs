@@ -154,7 +154,7 @@ public interface IContentService : IPublishableContentService<IContent>
     /// <returns>An Enumerable list of <see cref="IContent" /> objects</returns>
     /// <remarks>
     ///     The content returned from this method may be culture variant, in which case you can use
-    ///     <see cref="Umbraco.Extensions.ContentExtensions.GetStatus(IContent, ContentScheduleCollection, string?)" /> to get the status for a specific culture.
+    ///     <see cref="Umbraco.Extensions.ContentExtensions.GetStatus(IPublishableContentBase, ContentScheduleCollection, string?)" /> to get the status for a specific culture.
     /// </remarks>
     Task<IEnumerable<IContent>> GetContentForExpirationAsync(DateTime date, CancellationToken cancellationToken);
 
@@ -166,7 +166,7 @@ public interface IContentService : IPublishableContentService<IContent>
     /// <returns>An Enumerable list of <see cref="IContent" /> objects</returns>
     /// <remarks>
     ///     The content returned from this method may be culture variant, in which case you can use
-    ///     <see cref="Umbraco.Extensions.ContentExtensions.GetStatus(IContent, ContentScheduleCollection, string?)" /> to get the status for a specific culture.
+    ///     <see cref="Umbraco.Extensions.ContentExtensions.GetStatus(IPublishableContentBase, ContentScheduleCollection, string?)" /> to get the status for a specific culture.
     /// </remarks>
     Task<IEnumerable<IContent>> GetContentForReleaseAsync(DateTime date, CancellationToken cancellationToken);
 
@@ -488,7 +488,7 @@ public interface IContentService : IPublishableContentService<IContent>
     /// <param name="permissionSet">The permission set to apply.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <remarks>Replaces all permissions with the new set of permissions.</remarks>
-    [Obsolete("Use IUserGroup.GranularPermissions (persisted via IUserGroupService) to manage document permissions instead. Scheduled for removal in Umbraco 21.")]
+    [Obsolete("Use IUserGroup.GranularPermissions (persisted via IUserGroupService) to manage document permissions instead. Scheduled for removal in Umbraco 22.")]
     Task SetPermissionsAsync(EntityPermissionSet permissionSet, CancellationToken cancellationToken);
 
     /// <summary>
@@ -499,7 +499,7 @@ public interface IContentService : IPublishableContentService<IContent>
     /// <param name="groupKeys">The Guid keys of the groups to assign the permission to.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <remarks>Adds the permission to existing permissions.</remarks>
-    [Obsolete("Use IUserGroup.GranularPermissions (persisted via IUserGroupService) to manage document permissions instead. Scheduled for removal in Umbraco 21.")]
+    [Obsolete("Use IUserGroup.GranularPermissions (persisted via IUserGroupService) to manage document permissions instead. Scheduled for removal in Umbraco 22.")]
     Task SetPermissionAsync(IContent entity, string permission, IEnumerable<Guid> groupKeys, CancellationToken cancellationToken);
 
     #endregion
@@ -566,7 +566,8 @@ public interface IContentService : IPublishableContentService<IContent>
     /// <summary>
     ///     Empties the Recycle Bin asynchronously by deleting all <see cref="IContent" /> that resides in the bin.
     /// </summary>
-    /// <param name="userId">The unique identifier of the user emptying the Recycle Bin.</param>
+    /// <param name="userKey">The key of the user emptying the Recycle Bin.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>An attempt carrying the operation status.</returns>
     Task<Attempt<ContentEmptyRecycleBinOperationStatus>> EmptyRecycleBinAsync(Guid userKey, CancellationToken cancellationToken);
 }

@@ -76,7 +76,7 @@ public static class ContentServiceExtensions
     /// <param name="contentService"></param>
     /// <param name="contentId"></param>
     /// <param name="cancellationToken">The cancellation token.</param>
-    [Obsolete("Use IUserGroup.GranularPermissions (persisted via IUserGroupService) to manage document permissions instead. Scheduled for removal in Umbraco 21.")]
+    [Obsolete("Use IUserGroup.GranularPermissions (persisted via IUserGroupService) to manage document permissions instead. Scheduled for removal in Umbraco 22.")]
 #pragma warning disable CS0618 // Type or member is obsolete
     public static Task RemoveContentPermissionsAsync(this IContentService contentService, int contentId, CancellationToken cancellationToken) =>
         contentService.SetPermissionsAsync(new EntityPermissionSet(contentId, new EntityPermissionCollection()), cancellationToken);

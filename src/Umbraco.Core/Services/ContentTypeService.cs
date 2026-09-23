@@ -37,6 +37,7 @@ public class ContentTypeService : AsyncContentTypeServiceBase<IContentTypeReposi
     /// <param name="contentTypeFilters">The content type filter collection.</param>
     /// <param name="templateService">The template service.</param>
     /// <param name="idKeyMap">The ID/key map.</param>
+    /// <param name="elementService">The element service.</param>
     public ContentTypeService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,

@@ -484,9 +484,7 @@ public class PackagesRepository : ICreatedPackagesRepository
 
         root.Add(rootDictionaryItems);
 
-        /// <summary>
-        ///     Appends a dictionary element to the root and tracks it as processed.
-        /// </summary>
+        // Appends a dictionary element to the root and tracks it as processed.
         static void AppendDictionaryElement(
             XElement rootDictionaryItems,
             Dictionary<Guid, (IDictionaryItem dictionaryItem, XElement serializedDictionaryValue)> items,

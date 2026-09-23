@@ -1492,13 +1492,16 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
             raiseSavedNotification: false);
 
     /// <inheritdoc cref="CommitContentChangesInternal(ICoreScope, TContent, EventMessages, IReadOnlyCollection{ILanguage}, IDictionary{string, object}, int, bool, bool)" />
-    /// <param name="raiseSavedNotification">
-    ///     Whether to raise the "saved" notification once the content is persisted. Enabled by the save-and-publish entry
-    ///     points, which combine a save and a publish, so the paired "saved" notification still fires.
-    /// </param>
     /// <remarks>
-    ///     A separate overload rather than an optional parameter on the one above, because adding a parameter to a
-    ///     protected member of a public class is a binary breaking change.
+    ///     <para>
+    ///         <c>raiseSavedNotification</c> raises the "saved" notification once the content is persisted. The
+    ///         save-and-publish entry points enable it, because they combine a save and a publish and the paired
+    ///         "saved" notification still has to fire.
+    ///     </para>
+    ///     <para>
+    ///         A separate overload rather than an optional parameter on the one above, because adding a parameter to a
+    ///         protected member of a public class is a binary breaking change.
+    ///     </para>
     /// </remarks>
     protected PublishResult CommitContentChangesInternal(
         ICoreScope scope,

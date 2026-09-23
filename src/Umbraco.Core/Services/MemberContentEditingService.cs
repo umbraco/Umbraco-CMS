@@ -41,6 +41,7 @@ internal sealed class MemberContentEditingService
     /// <param name="optionsMonitor">The options monitor for content settings.</param>
     /// <param name="relationService">The relation service for managing content relations.</param>
     /// <param name="contentTypeFilters">The collection of content type filters.</param>
+    /// <param name="languageService">The language service.</param>
     public MemberContentEditingService(
         IMemberService contentService,
         IMemberTypeService contentTypeService,

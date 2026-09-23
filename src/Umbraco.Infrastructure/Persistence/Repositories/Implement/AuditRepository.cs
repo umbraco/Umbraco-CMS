@@ -155,8 +155,8 @@ internal sealed class AuditRepository : AsyncEntityRepositoryBase<int, IAuditIte
     /// <inheritdoc />
     /// <remarks>
     ///     Audit log entries are append-only. The base <see cref="AsyncEntityRepositoryBase{TKey,TEntity}.SaveAsync"/>
-    ///     routes here whenever <see cref="IAuditItem.HasIdentity"/> is <see langword="true"/>, which is always the
-    ///     case because <see cref="AuditItem.Id"/> stores the audited entity's NodeId (never zero). To preserve the
+    ///     routes here whenever <c>HasIdentity</c> is <see langword="true"/>, which is always the
+    ///     case because <c>Id</c> stores the audited entity's NodeId (never zero). To preserve the
     ///     legacy "every save creates a new row" contract we delegate to <see cref="PersistNewItemAsync"/>.
     /// </remarks>
     protected override Task PersistUpdatedItemAsync(IAuditItem item) => PersistNewItemAsync(item);

@@ -31,7 +31,7 @@ public interface IPublishableContentService<TContent> : IAsyncContentServiceBase
     /// <summary>
     ///     Gets content items by their unique identifiers.
     /// </summary>
-    /// <param name="ids">The unique identifiers of the content items.</param>
+    /// <param name="keys">The unique identifiers of the content items.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The content items, in the order requested.</returns>
     Task<IEnumerable<TContent>> GetByIdsAsync(IEnumerable<Guid> keys, CancellationToken cancellationToken);
@@ -47,7 +47,7 @@ public interface IPublishableContentService<TContent> : IAsyncContentServiceBase
     /// <summary>
     ///     Gets publish/unpublish schedule for a content node.
     /// </summary>
-    /// <param name="contentId">The unique identifier of the content to load schedule for.</param>
+    /// <param name="contentKey">The unique identifier of the content to load schedule for.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The <see cref="ContentScheduleCollection" />.</returns>
     Task<ContentScheduleCollection> GetContentScheduleByContentIdAsync(Guid contentKey, CancellationToken cancellationToken);
@@ -78,7 +78,7 @@ public interface IPublishableContentService<TContent> : IAsyncContentServiceBase
     ///     Saves a content item.
     /// </summary>
     /// <param name="content">The content item to save.</param>
-    /// <param name="userId">The identifier of the user performing the action, or <c>null</c> to use the super user.</param>
+    /// <param name="userKey">The key of the user performing the action.</param>
     /// <param name="contentSchedule">The content schedule to persist alongside the save, or <c>null</c> to leave the schedule unchanged.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>An attempt carrying the operation status.</returns>
@@ -88,7 +88,7 @@ public interface IPublishableContentService<TContent> : IAsyncContentServiceBase
     ///     Deletes a content item.
     /// </summary>
     /// <param name="content">The content item to delete.</param>
-    /// <param name="userId">The identifier of the user performing the action, or <c>null</c> to use the super user.</param>
+    /// <param name="userKey">The key of the user performing the action.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>An attempt carrying the operation status.</returns>
     /// <remarks>

@@ -103,10 +103,10 @@ internal sealed class LanguageRepository : AsyncEntityRepositoryBase<Guid, ILang
     }
 
     /// <summary>
-    /// Gets the ISO code for the language with the specified ID.
+    /// Gets the ISO code for the language with the specified key.
     /// </summary>
-    /// <param name="id">The ID of the language to look up.</param>
-    /// <param name="throwOnNotFound">If true, throws an exception when the language ID is not found; otherwise returns null.</param>
+    /// <param name="key">The key of the language to look up.</param>
+    /// <param name="throwOnNotFound">If true, throws an exception when the language key is not found; otherwise returns null.</param>
     /// <returns>The ISO code of the language if found; otherwise null.</returns>
     public async Task<string?> GetIsoCodeByKeyAsync(Guid? key, bool throwOnNotFound = true)
     {
