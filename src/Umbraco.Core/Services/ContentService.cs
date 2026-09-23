@@ -39,7 +39,6 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
     private readonly IIdKeyMap _idKeyMap;
     private ContentSettings _contentSettings;
     private readonly IRelationService _relationService;
-    private IQuery<IContent>? _queryNotTrashed;
 
     #region Constructors
 
@@ -217,11 +216,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
 
         int userId = await _userIdKeyResolver.GetAsync(userKey);
 
-        IContentType contentType = GetContentType(contentTypeAlias)
-            // + locks
-            ??
-            // causes rollback
-            throw new ArgumentException("No content type with that alias.", nameof(contentTypeAlias));
+        IContentType contentType = await GetContentTypeAsync(scope, contentTypeAlias, cancellationToken);
 
         IContent? parent = null;
         if (parentKey.HasValue)
@@ -257,11 +252,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
 
         int userId = await _userIdKeyResolver.GetAsync(userKey);
 
-        IContentType contentType = GetContentType(contentTypeAlias)
-        // + locks
-            ??
-            // causes rollback
-            throw new ArgumentException("No content type with that alias.", nameof(contentTypeAlias));
+        IContentType contentType = await GetContentTypeAsync(scope, contentTypeAlias, cancellationToken);
 
         var content = new Content(name, parent, contentType, userId);
 
@@ -404,7 +395,8 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
         }
         catch (NotSupportedException)
         {
-            TryGetParentKey(content.ParentId, out parentKey);
+            Attempt<Guid> parentKeyAttempt = await _idKeyMap.GetKeyForIdAsync(content.ParentId, UmbracoObjectTypes.Document);
+            parentKey = parentKeyAttempt.Success ? parentKeyAttempt.Result : null;
         }
 
         IContent? parent = parentKey is null
@@ -1078,7 +1070,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
         int intUserId = await _userIdKeyResolver.GetAsync(userKey);
 
         // emptying the recycle bin means deleting whatever is in there - do it properly!
-        PagedModel<IContent> contentsPage = await GetChildrenAsync(Constants.System.RecycleBinContentKey, 0, int.MaxValue, propertyAliases: null, ordering: null, CancellationToken.None);
+        PagedModel<IContent> contentsPage = await GetChildrenAsync(Constants.System.RecycleBinContentKey, 0, int.MaxValue, propertyAliases: null, ordering: null, cancellationToken);
         IContent[] contents = contentsPage.Items.ToArray();
 
         var emptyingRecycleBinNotification = new ContentEmptyingRecycleBinNotification(contents, eventMessages);
@@ -1111,7 +1103,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
                 continue;
             }
 
-            await DeleteLockedAsync(scope, content, eventMessages, CancellationToken.None);
+            await DeleteLockedAsync(scope, content, eventMessages, cancellationToken);
             deleted.Add(content);
         }
 
@@ -1297,19 +1289,6 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
         scope.Complete();
         return Attempt.SucceedWithStatus<IContent?, ContentCopyOperationStatus>(ContentCopyOperationStatus.Success, copy);
     }
-
-    private bool TryGetParentKey(int parentId, [NotNullWhen(true)] out Guid? parentKey)
-    {
-        Attempt<Guid> parentKeyAttempt = _idKeyMap.GetKeyForIdAsync(parentId, UmbracoObjectTypes.Document).GetAwaiter().GetResult();
-        parentKey = parentKeyAttempt.Success ? parentKeyAttempt.Result : null;
-        return parentKeyAttempt.Success;
-    }
-
-    private Guid[] ResolveKeys(IEnumerable<int> ids) =>
-        ids.Select(id => _idKeyMap.GetKeyForIdAsync(id, UmbracoObjectTypes.Document).GetAwaiter().GetResult())
-            .Where(attempt => attempt.Success)
-            .Select(attempt => attempt.Result)
-            .ToArray();
 
     /// <inheritdoc />
     public async Task<Attempt<ContentSendToPublicationOperationStatus>> SendToPublicationAsync(IContent? content, Guid userKey, CancellationToken cancellationToken)

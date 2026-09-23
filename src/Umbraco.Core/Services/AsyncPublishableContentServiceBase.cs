@@ -1703,7 +1703,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
 
         var deletingVersionsNotification =
             new ContentDeletingVersionsNotification(key, evtMsgs, dateToRetain: versionDate);
-        if (scope.Notifications.PublishCancelable(deletingVersionsNotification))
+        if (await scope.Notifications.PublishCancelableAsync(deletingVersionsNotification))
         {
             scope.Complete();
             return Attempt.Fail(ContentVersionOperationStatus.CancelledByNotification);
@@ -1738,7 +1738,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.WriteLock(WriteLockIds);
         var deletingVersionsNotification = new ContentDeletingVersionsNotification(key, evtMsgs, versionId);
-        if (scope.Notifications.PublishCancelable(deletingVersionsNotification))
+        if (await scope.Notifications.PublishCancelableAsync(deletingVersionsNotification))
         {
             scope.Complete();
             return Attempt.Fail(ContentVersionOperationStatus.CancelledByNotification);
@@ -1872,10 +1872,6 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
             parameters);
     }
 
-    // TODO: Await this properly when adjusting this service to our new EF Core approach.
-    protected string GetLanguageDetailsForAuditEntry(IEnumerable<string> affectedCultures)
-        => GetLanguageDetailsForAuditEntry(_languageRepository.GetAllAsync(CancellationToken.None).GetAwaiter().GetResult(), affectedCultures);
-
     protected static string GetLanguageDetailsForAuditEntry(IEnumerable<ILanguage> languages, IEnumerable<string> affectedCultures)
     {
         IEnumerable<string> languageIsoCodes = languages
@@ -1890,29 +1886,6 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
 
     /// <inheritdoc />
     public abstract Task<Attempt<ContentDeleteOfTypesOperationStatus>> DeleteOfTypesAsync(IEnumerable<Guid> contentTypeKeys, Guid userKey, CancellationToken cancellationToken);
-
-    private IContentType GetContentType(ICoreScope scope, string contentTypeAlias)
-    {
-        if (contentTypeAlias == null)
-        {
-            throw new ArgumentNullException(nameof(contentTypeAlias));
-        }
-
-        if (string.IsNullOrWhiteSpace(contentTypeAlias))
-        {
-            throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(contentTypeAlias));
-        }
-
-        scope.ReadLock(ReadLockIds);
-
-        IContentType? contentType = _contentTypeRepository.GetAsync(contentTypeAlias, CancellationToken.None).GetAwaiter().GetResult()
-                                    ??
-                                    // causes rollback
-                                    throw new Exception($"No ContentType matching the passed in Alias: '{contentTypeAlias}'" +
-                                                        $" was found");
-
-        return contentType;
-    }
 
     protected async Task<IContentType> GetContentTypeAsync(ICoreScope scope, string contentTypeAlias, CancellationToken cancellationToken)
     {
@@ -1935,24 +1908,6 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
                                                         $" was found");
 
         return contentType;
-    }
-
-    protected IContentType GetContentType(string contentTypeAlias)
-    {
-        if (contentTypeAlias == null)
-        {
-            throw new ArgumentNullException(nameof(contentTypeAlias));
-        }
-
-        if (string.IsNullOrWhiteSpace(contentTypeAlias))
-        {
-            throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(contentTypeAlias));
-        }
-
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            return GetContentType(scope, contentTypeAlias);
-        }
     }
 
     #endregion

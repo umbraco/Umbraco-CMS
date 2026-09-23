@@ -8,19 +8,8 @@ namespace Umbraco.Cms.Core.Services;
 /// <summary>
 ///     Defines the ContentService, which is an easy access to operations involving <see cref="IContent" />
 /// </summary>
-public interface IContentService : IContentServiceBase, IPublishableContentService<IContent>
+public interface IContentService : IPublishableContentService<IContent>
 {
-    // Explicit reabstraction of IContentServiceBase.CheckDataIntegrity - the same contract Media and Member
-    // still implement synchronously, inherited directly here since the synchronous publishable-content
-    // contract that used to carry it was retired.
-    // Bridges onto CheckDataIntegrityAsync, declared on this same interface, so this default - not a plain
-    // redeclaration, which C# would treat as an unrelated member rather than an override - is what satisfies
-    // the sync member for any implementer. No implementer, ContentService included, needs a sync member.
-    // TODO: Remove this default implementation once Media/Member have their own async repositories and
-    // IContentServiceBase.CheckDataIntegrity itself can be retired in favor of an async-only equivalent.
-    ContentDataIntegrityReport IContentServiceBase.CheckDataIntegrity(ContentDataIntegrityReportOptions options)
-        => CheckDataIntegrityAsync(options, CancellationToken.None).GetAwaiter().GetResult();
-
     #region Blueprints
 
     /// <summary>

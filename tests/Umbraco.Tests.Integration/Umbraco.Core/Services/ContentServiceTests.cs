@@ -5785,18 +5785,4 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         });
     }
 
-    [Test]
-    public void CheckDataIntegrity_SyncEntryPoint_DelegatesToAsyncEngine()
-    {
-        // IContentService.CheckDataIntegrity is satisfied by an explicit reabstraction of
-        // IContentServiceBase.CheckDataIntegrity declared directly on IContentService, bridging onto
-        // CheckDataIntegrityAsync - it isn't implemented anywhere in ContentService's own class hierarchy, so
-        // it's only reachable through an IContentService-typed reference, matching how the one production
-        // caller (DatabaseIntegrityCheck) holds it.
-        IContentService contentService = ContentService;
-
-        ContentDataIntegrityReport report = contentService.CheckDataIntegrity(new ContentDataIntegrityReportOptions());
-
-        Assert.That(report.Ok, Is.True);
-    }
 }
