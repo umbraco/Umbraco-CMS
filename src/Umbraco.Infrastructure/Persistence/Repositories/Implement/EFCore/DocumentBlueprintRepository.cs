@@ -38,10 +38,6 @@ internal sealed class DocumentBlueprintRepository : DocumentRepository, IDocumen
     /// <param name="idKeyMap">The ID/key map, used to resolve data type configuration for sortable property values.</param>
     /// <param name="tagRepository">The tag repository, used to persist tag values for tag-enabled properties on publish.</param>
     /// <param name="jsonSerializer">The JSON serializer, used to parse legacy JSON-stored tag values.</param>
-    /// <param name="userGroupService">
-    ///     The user group service, used to resolve user group keys to IDs for permission storage. Resolved lazily to
-    ///     avoid a circular dependency back through <see cref="IContentService" />.
-    /// </param>
     /// <param name="shortStringHelper">The short string helper, used to detect URL segment collisions between sibling names.</param>
     public DocumentBlueprintRepository(
         IEFCoreScopeAccessor<UmbracoDbContext> scopeAccessor,
@@ -61,7 +57,6 @@ internal sealed class DocumentBlueprintRepository : DocumentRepository, IDocumen
         IIdKeyMap idKeyMap,
         ITagRepository tagRepository,
         IJsonSerializer jsonSerializer,
-        Lazy<IUserGroupService> userGroupService,
         IShortStringHelper shortStringHelper)
         : base(
             scopeAccessor,
@@ -81,7 +76,6 @@ internal sealed class DocumentBlueprintRepository : DocumentRepository, IDocumen
             idKeyMap,
             tagRepository,
             jsonSerializer,
-            userGroupService,
             shortStringHelper)
     {
     }

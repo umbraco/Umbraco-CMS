@@ -63,11 +63,6 @@ internal class DocumentRepository
     /// <param name="idKeyMap">The ID/key map, used to resolve data type configuration for sortable property values.</param>
     /// <param name="tagRepository">The tag repository, used to persist tag values for tag-enabled properties on publish.</param>
     /// <param name="jsonSerializer">The JSON serializer, used to parse legacy JSON-stored tag values.</param>
-    /// <param name="userGroupService">
-    ///     The user group service, used to resolve user group keys to IDs for permission storage. Resolved lazily to
-    ///     avoid a circular dependency back through <see cref="IContentService" /> — see the matching parameter on
-    ///     <see cref="AsyncPermissionRepository{TEntity}" /> for the full explanation.
-    /// </param>
     /// <param name="shortStringHelper">The short string helper, used to detect URL segment collisions between sibling names.</param>
     public DocumentRepository(
         IEFCoreScopeAccessor<UmbracoDbContext> scopeAccessor,
@@ -87,7 +82,6 @@ internal class DocumentRepository
         IIdKeyMap idKeyMap,
         ITagRepository tagRepository,
         IJsonSerializer jsonSerializer,
-        Lazy<IUserGroupService> userGroupService,
         IShortStringHelper shortStringHelper)
         : base(
             scopeAccessor,
@@ -108,7 +102,7 @@ internal class DocumentRepository
         _idKeyMap = idKeyMap;
         _tagRepository = tagRepository;
         _jsonSerializer = jsonSerializer;
-        _permissionRepository = new AsyncPermissionRepository<IContent>(scopeAccessor, appCaches, userGroupService);
+        _permissionRepository = new AsyncPermissionRepository<IContent>(scopeAccessor, appCaches);
         _shortStringHelper = shortStringHelper;
     }
 
@@ -1654,6 +1648,10 @@ internal class DocumentRepository
                 }
             }
 
+            // Deliberately not gated on the document's own published flag: an unpublished document keeps its
+            // published property values and names so it can be republished in exactly its previous state.
+            int publishedVersionId = row.PublishedContentVersion?.Id ?? 0;
+
             var versionPropertyDtos = new List<PropertyDataDto>();
             if (propertyDtosByVersionId.TryGetValue(row.ContentVersion.Id, out List<PropertyDataDto>? currentProps))
             {
@@ -1664,15 +1662,15 @@ internal class DocumentRepository
                 // purely by VersionId == publishedVersionId, so without a distinct draft-side entry every
                 // value would be published-only, leaving the unqualified (draft) accessor empty. Mirrors the
                 // "dirty corner case" handled the same way in ContentRepositoryBase.GetPropertyCollections.
-                if (row.ContentVersion.Id == row.PublishedContentVersion?.Id)
+                if (row.ContentVersion.Id == publishedVersionId)
                 {
                     versionPropertyDtos.AddRange(currentProps.Select(dto => dto.Clone(-1)));
                 }
             }
 
-            if (row.PublishedContentVersion is not null &&
-                row.PublishedContentVersion.Id != row.ContentVersion.Id &&
-                propertyDtosByVersionId.TryGetValue(row.PublishedContentVersion.Id, out List<PropertyDataDto>? pubProps))
+            if (publishedVersionId > 0 &&
+                publishedVersionId != row.ContentVersion.Id &&
+                propertyDtosByVersionId.TryGetValue(publishedVersionId, out List<PropertyDataDto>? pubProps))
             {
                 versionPropertyDtos.AddRange(pubProps);
             }
@@ -1691,14 +1689,14 @@ internal class DocumentRepository
                     await PropertyFactory.BuildEntities(
                         compositionProperties,
                         versionPropertyDtos,
-                        row.PublishedContentVersion?.Id ?? 0,
+                        publishedVersionId,
                         LanguageRepository));
             }
 
             ApplyVariations(
                 entity,
                 row.ContentVersion.Id,
-                row.PublishedContentVersion?.Id ?? 0,
+                publishedVersionId,
                 contentVersionCultureVariationsByVersionId,
                 documentCultureVariationsByNodeId.GetValueOrDefault(row.Node.NodeId, []),
                 isoCodeByLanguageId);
