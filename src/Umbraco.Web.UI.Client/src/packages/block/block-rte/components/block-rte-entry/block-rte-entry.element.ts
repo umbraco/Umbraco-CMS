@@ -380,6 +380,7 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 				.icon=${this._icon}
 				.index=${this._blockViewProps.index}
 				.unpublished=${!this._exposed}
+				.isExternalContent=${this._isExternalContent}
 				.content=${this._blockViewProps.content}
 				.settings=${this._blockViewProps.settings}
 				.config=${this._blockViewProps.config}>
