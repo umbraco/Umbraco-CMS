@@ -34,7 +34,7 @@ internal sealed class MediaListViewServiceTests : ContentListViewServiceTestsBas
     public async Task Can_Get_List_View_Items_At_Root()
     {
         // Arrange
-        CreateTenMediaItemsFromTwoMediaTypesAtRoot();
+        await CreateTenMediaItemsFromTwoMediaTypesAtRoot();
         var descendants = MediaService.GetPagedDescendants(Constants.System.Root, 0, int.MaxValue, out _);
 
         // Act
@@ -66,7 +66,7 @@ internal sealed class MediaListViewServiceTests : ContentListViewServiceTestsBas
     public async Task Can_Get_Items_With_Default_List_View_Configuration()
     {
         // Arrange
-        CreateTenMediaItemsFromTwoMediaTypesAtRoot();
+        await CreateTenMediaItemsFromTwoMediaTypesAtRoot();
 
         // Act
         var result = await MediaListViewService.GetListViewItemsByKeyAsync(
