@@ -1148,6 +1148,13 @@ export class ContentUiHelper extends UiBaseLocators {
     await this.isVisible(this.listViewTableRow.filter({hasText: name}).locator('uui-checkbox'), isSelectable);
   }
 
+  async selectCheckboxInListViewTableRowWithName(name: string) {
+    // An item with children renders its name as an "open" button rather than plain text, so clicking
+    // the row itself can land on that button and drill in instead of selecting. The checkbox is the
+    // only click target guaranteed to select such a row.
+    await this.click(this.listViewTableRow.filter({hasText: name}).locator('uui-checkbox'), {force: true});
+  }
+
   async clickPublishSelectedListItems() {
     await this.click(this.publishSelectedListItems);
   }

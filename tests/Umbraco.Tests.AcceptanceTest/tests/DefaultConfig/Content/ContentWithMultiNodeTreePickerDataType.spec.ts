@@ -312,6 +312,219 @@ test('can browse into a collection and pick an item from it', async ({umbracoApi
   await umbracoApi.documentType.ensureNameNotExists(collectionChildDocumentTypeName);
 });
 
+test('can drill into a nested collection within the picker', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const collectionContentName = 'Collection Root Content';
+  const collectionDocumentTypeName = 'CollectionDocumentType';
+  const nestedCollectionContentName = 'Nested Collection Content';
+  const nestedCollectionDocumentTypeName = 'NestedCollectionDocumentType';
+  const nestedCollectionItemName = 'Nested Collection Item';
+  const nestedCollectionItemDocumentTypeName = 'NestedCollectionItemDocumentType';
+  const listViewDataTypeName = 'List View - Content';
+
+  const listViewDataTypeData = await umbracoApi.dataType.getByName(listViewDataTypeName);
+  const nestedCollectionItemDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentType(nestedCollectionItemDocumentTypeName);
+  // The nested collection document type is itself configured as a collection, so drilling into it
+  // from the outer collection's grid must land on its own collection view, not a plain workspace.
+  const nestedCollectionDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedChildNodeAndCollectionId(nestedCollectionDocumentTypeName, nestedCollectionItemDocumentTypeId, listViewDataTypeData.id);
+  const collectionDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedChildNodeAndCollectionId(collectionDocumentTypeName, nestedCollectionDocumentTypeId, listViewDataTypeData.id);
+  const collectionContentId = await umbracoApi.document.createDefaultDocument(collectionContentName, collectionDocumentTypeId);
+  const nestedCollectionContentId = await umbracoApi.document.createDefaultDocumentWithParent(nestedCollectionContentName, nestedCollectionDocumentTypeId, collectionContentId);
+  const nestedCollectionItemId = await umbracoApi.document.createDefaultDocumentWithParent(nestedCollectionItemName, nestedCollectionItemDocumentTypeId, nestedCollectionContentId);
+  // No start node restriction, so the picker opens at the tree root, where the collection node above
+  // appears as a normal (root-allowed) item to browse into.
+  const customDataTypeId = await umbracoApi.dataType.createDefaultContentPickerSourceDataType(customDataTypeName);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickChooseButton();
+  // The caret drills into the node (its name would select it instead).
+  await umbracoUi.content.openCaretButtonForName(collectionContentName, true);
+  // The nested collection item has children, so clicking its card drills into its own collection
+  // view instead of selecting it.
+  await umbracoUi.content.clickCollectionCardInPickerModal(nestedCollectionContentName);
+  await umbracoUi.content.clickCollectionCardInPickerModal(nestedCollectionItemName);
+  await umbracoUi.content.clickChooseModalButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
+
+  // Assert
+  const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.values[0].value[0]['unique']).toEqual(nestedCollectionItemId);
+  expect(contentData.values[0].value[0]['type']).toEqual('document');
+
+  // Clean
+  await umbracoApi.document.ensureNameNotExists(collectionContentName);
+  await umbracoApi.document.ensureNameNotExists(nestedCollectionContentName);
+  await umbracoApi.document.ensureNameNotExists(nestedCollectionItemName);
+  await umbracoApi.documentType.ensureNameNotExists(collectionDocumentTypeName);
+  await umbracoApi.documentType.ensureNameNotExists(nestedCollectionDocumentTypeName);
+  await umbracoApi.documentType.ensureNameNotExists(nestedCollectionItemDocumentTypeName);
+});
+
+test('can drill into a nested collection using the table view within the picker', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const collectionContentName = 'Collection Root Content';
+  const collectionDocumentTypeName = 'CollectionDocumentType';
+  const nestedCollectionContentName = 'Nested Collection Content';
+  const nestedCollectionDocumentTypeName = 'NestedCollectionDocumentType';
+  const nestedCollectionItemName = 'Nested Collection Item';
+  const nestedCollectionItemDocumentTypeName = 'NestedCollectionItemDocumentType';
+  const listViewDataTypeName = 'List View - Content';
+
+  const listViewDataTypeData = await umbracoApi.dataType.getByName(listViewDataTypeName);
+  const nestedCollectionItemDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentType(nestedCollectionItemDocumentTypeName);
+  // The nested collection document type is itself configured as a collection, so drilling into it
+  // from the outer collection's table view must land on its own collection view, not a plain workspace.
+  const nestedCollectionDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedChildNodeAndCollectionId(nestedCollectionDocumentTypeName, nestedCollectionItemDocumentTypeId, listViewDataTypeData.id);
+  const collectionDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedChildNodeAndCollectionId(collectionDocumentTypeName, nestedCollectionDocumentTypeId, listViewDataTypeData.id);
+  const collectionContentId = await umbracoApi.document.createDefaultDocument(collectionContentName, collectionDocumentTypeId);
+  const nestedCollectionContentId = await umbracoApi.document.createDefaultDocumentWithParent(nestedCollectionContentName, nestedCollectionDocumentTypeId, collectionContentId);
+  const nestedCollectionItemId = await umbracoApi.document.createDefaultDocumentWithParent(nestedCollectionItemName, nestedCollectionItemDocumentTypeId, nestedCollectionContentId);
+  // No start node restriction, so the picker opens at the tree root, where the collection node above
+  // appears as a normal (root-allowed) item to browse into.
+  const customDataTypeId = await umbracoApi.dataType.createDefaultContentPickerSourceDataType(customDataTypeName);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickChooseButton();
+  await umbracoUi.content.openCaretButtonForName(collectionContentName, true);
+  await umbracoUi.content.changeToListView();
+  // In table view, an item with children renders its name as an "open" button rather than a plain
+  // label, so clicking the name drills into it instead of picking it.
+  await umbracoUi.content.goToContentInListViewWithName(nestedCollectionContentName);
+  // Drilling in lands on a fresh collection view, which opens in its own default view mode.
+  await umbracoUi.content.changeToListView();
+  await umbracoUi.content.selectContentWithNameInListView(nestedCollectionItemName);
+  await umbracoUi.content.clickChooseModalButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
+
+  // Assert
+  const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.values[0].value[0]['unique']).toEqual(nestedCollectionItemId);
+  expect(contentData.values[0].value[0]['type']).toEqual('document');
+
+  // Clean
+  await umbracoApi.document.ensureNameNotExists(collectionContentName);
+  await umbracoApi.document.ensureNameNotExists(nestedCollectionContentName);
+  await umbracoApi.document.ensureNameNotExists(nestedCollectionItemName);
+  await umbracoApi.documentType.ensureNameNotExists(collectionDocumentTypeName);
+  await umbracoApi.documentType.ensureNameNotExists(nestedCollectionDocumentTypeName);
+  await umbracoApi.documentType.ensureNameNotExists(nestedCollectionItemDocumentTypeName);
+});
+
+test('can select an item with children from a collection within the picker', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const collectionContentName = 'Collection Root Content';
+  const collectionDocumentTypeName = 'CollectionDocumentType';
+  const itemWithChildDocumentTypeName = 'ItemWithChildDocumentType';
+  const itemWithChildContentName = 'Item With Child';
+  const grandChildDocumentTypeName = 'GrandChildDocumentType';
+  const grandChildContentName = 'Grandchild Of Collection Item';
+  const listViewDataTypeName = 'List View - Content';
+
+  const listViewDataTypeData = await umbracoApi.dataType.getByName(listViewDataTypeName);
+  const grandChildDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentType(grandChildDocumentTypeName);
+  const itemWithChildDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedChildNode(itemWithChildDocumentTypeName, grandChildDocumentTypeId);
+  const collectionDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedChildNodeAndCollectionId(collectionDocumentTypeName, itemWithChildDocumentTypeId, listViewDataTypeData.id);
+  const collectionContentId = await umbracoApi.document.createDefaultDocument(collectionContentName, collectionDocumentTypeId);
+  const itemWithChildContentId = await umbracoApi.document.createDefaultDocumentWithParent(itemWithChildContentName, itemWithChildDocumentTypeId, collectionContentId);
+  await umbracoApi.document.createDefaultDocumentWithParent(grandChildContentName, grandChildDocumentTypeId, itemWithChildContentId);
+  const customDataTypeId = await umbracoApi.dataType.createDefaultContentPickerSourceDataType(customDataTypeName);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickChooseButton();
+  await umbracoUi.content.openCaretButtonForName(collectionContentName, true);
+
+  // Assert
+  // The item has children, so clicking its card body would drill into it instead of selecting it -
+  // the checkbox is the only way to pick it directly.
+  await umbracoUi.content.isContentCardSelectableForName(itemWithChildContentName);
+
+  // Act
+  await umbracoUi.content.selectContentCardWithName(itemWithChildContentName);
+  await umbracoUi.content.clickChooseModalButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
+
+  // Assert
+  const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.values[0].value[0]['unique']).toEqual(itemWithChildContentId);
+  expect(contentData.values[0].value[0]['type']).toEqual('document');
+
+  // Clean
+  await umbracoApi.document.ensureNameNotExists(collectionContentName);
+  await umbracoApi.document.ensureNameNotExists(itemWithChildContentName);
+  await umbracoApi.document.ensureNameNotExists(grandChildContentName);
+  await umbracoApi.documentType.ensureNameNotExists(collectionDocumentTypeName);
+  await umbracoApi.documentType.ensureNameNotExists(itemWithChildDocumentTypeName);
+  await umbracoApi.documentType.ensureNameNotExists(grandChildDocumentTypeName);
+});
+
+test('can select an item with children from a collection table view within the picker', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const collectionContentName = 'Collection Root Content';
+  const collectionDocumentTypeName = 'CollectionDocumentType';
+  const itemWithChildDocumentTypeName = 'ItemWithChildDocumentType';
+  const itemWithChildContentName = 'Item With Child';
+  const grandChildDocumentTypeName = 'GrandChildDocumentType';
+  const grandChildContentName = 'Grandchild Of Collection Item';
+  const listViewDataTypeName = 'List View - Content';
+
+  const listViewDataTypeData = await umbracoApi.dataType.getByName(listViewDataTypeName);
+  const grandChildDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentType(grandChildDocumentTypeName);
+  const itemWithChildDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedChildNode(itemWithChildDocumentTypeName, grandChildDocumentTypeId);
+  const collectionDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedChildNodeAndCollectionId(collectionDocumentTypeName, itemWithChildDocumentTypeId, listViewDataTypeData.id);
+  const collectionContentId = await umbracoApi.document.createDefaultDocument(collectionContentName, collectionDocumentTypeId);
+  const itemWithChildContentId = await umbracoApi.document.createDefaultDocumentWithParent(itemWithChildContentName, itemWithChildDocumentTypeId, collectionContentId);
+  await umbracoApi.document.createDefaultDocumentWithParent(grandChildContentName, grandChildDocumentTypeId, itemWithChildContentId);
+  const customDataTypeId = await umbracoApi.dataType.createDefaultContentPickerSourceDataType(customDataTypeName);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickChooseButton();
+  await umbracoUi.content.openCaretButtonForName(collectionContentName, true);
+  await umbracoUi.content.changeToListView();
+
+  // Assert
+  // In table view an item with children renders its name as an "open" button, so only the checkbox
+  // can select it directly without drilling in.
+  await umbracoUi.content.isListViewTableRowSelectableForName(itemWithChildContentName);
+
+  // Act
+  await umbracoUi.content.selectCheckboxInListViewTableRowWithName(itemWithChildContentName);
+  await umbracoUi.content.clickChooseModalButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
+
+  // Assert
+  const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.values[0].value[0]['unique']).toEqual(itemWithChildContentId);
+  expect(contentData.values[0].value[0]['type']).toEqual('document');
+
+  // Clean
+  await umbracoApi.document.ensureNameNotExists(collectionContentName);
+  await umbracoApi.document.ensureNameNotExists(itemWithChildContentName);
+  await umbracoApi.document.ensureNameNotExists(grandChildContentName);
+  await umbracoApi.documentType.ensureNameNotExists(collectionDocumentTypeName);
+  await umbracoApi.documentType.ensureNameNotExists(itemWithChildDocumentTypeName);
+  await umbracoApi.documentType.ensureNameNotExists(grandChildDocumentTypeName);
+});
+
 test.describe('can pick multiple items from a collection within the picker', () => {
   // The collection (document type + root + 2 children) is read-only for these tests - only browsed, never
   // mutated - so it's safe to create once in beforeAll and share across both tests. The host content that

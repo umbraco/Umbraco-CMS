@@ -158,6 +158,44 @@ test('can open a child from the grid view', {tag: '@smoke'}, async ({umbracoApi,
   await umbracoApi.documentType.ensureNameNotExists(childDocumentTypeName);
 });
 
+test('can navigate into a nested collection', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const grandChildDocumentTypeName = 'TestGrandChildDocumentType';
+  const grandChildContentName = 'Grandchild Content';
+  const grandChildDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentType(grandChildDocumentTypeName);
+  // The child document type is itself configured as a collection, so opening it from the parent's
+  // grid must land on its own collection view rather than a plain workspace.
+  const childDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedChildNodeAndCollectionId(childDocumentTypeName, grandChildDocumentTypeId, dataTypeData.id);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedChildNodeAndCollectionId(documentTypeName, childDocumentTypeId, dataTypeData.id);
+  const contentId = await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  const childContentId = await umbracoApi.document.createDefaultDocumentWithParent(firstChildContentName, childDocumentTypeId, contentId);
+  await umbracoApi.document.createDefaultDocumentWithParent(grandChildContentName, grandChildDocumentTypeId, childContentId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.isDocumentGridViewVisible();
+
+  // Act
+  // An early click can be lost while the collection re-renders, leaving the workspace unopened.
+  // Retry until the edit route is actually loaded.
+  await expect(async () => {
+    await umbracoUi.content.clickContentCardWithName(firstChildContentName);
+    await umbracoUi.content.waitForWorkspaceEditRoute('document');
+  }).toPass({timeout: ConstantHelper.timeout.veryLong});
+
+  // Assert
+  // The click must have opened the nested collection's own edit workspace, not just any document route.
+  await expect(umbracoUi.content.page).toHaveURL(new RegExp(childContentId));
+  await umbracoUi.content.isDocumentGridViewVisible();
+  await umbracoUi.content.isContentWithNameVisibleInGrid(grandChildContentName);
+
+  // Clean
+  await umbracoApi.document.ensureNameNotExists(firstChildContentName);
+  await umbracoApi.document.ensureNameNotExists(grandChildContentName);
+  await umbracoApi.documentType.ensureNameNotExists(childDocumentTypeName);
+  await umbracoApi.documentType.ensureNameNotExists(grandChildDocumentTypeName);
+});
+
 test('can open a child from the table view', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const childDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentType(childDocumentTypeName);
