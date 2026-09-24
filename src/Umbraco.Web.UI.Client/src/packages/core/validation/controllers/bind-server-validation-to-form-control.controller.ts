@@ -18,7 +18,7 @@ export class UmbBindServerValidationToFormControl extends UmbControllerBase {
 
 	#controlValidator?: ReturnType<UmbFormControlMixinInterface<unknown>['addValidator']>;
 	#messages: Array<UmbValidationMessage> = [];
-	#isValid = false;
+	#isValid?: boolean;
 	// Keep track of the value set, so we can determine if we should remove server validation when the value changes. [NL]
 	#gotValue = false;
 
@@ -30,7 +30,7 @@ export class UmbBindServerValidationToFormControl extends UmbControllerBase {
 			this.#gotValue = true;
 		} else {
 			// If not valid lets see if we should remove server validation [NL]
-			if (!defaultMemoization(this.#value, value)) {
+			if (!defaultMemoization(this.#value, value) && this.#isValid === false) {
 				this.#value = value;
 				// Only remove server validations from validation context [NL]
 				const toRemove = this.#messages.filter((x) => x.type === 'server').map((msg) => msg.key);
@@ -49,10 +49,10 @@ export class UmbBindServerValidationToFormControl extends UmbControllerBase {
 				context?.messages?.messagesOfNotTypeAndPath('client', dataPath),
 				(messages) => {
 					this.#messages = messages ?? [];
-					this.#isValid = this.#messages.length === 0;
-					if (!this.#isValid) {
+					this.#isValid = messages === undefined ? undefined : this.#messages.length === 0;
+					if (this.#isValid === false) {
 						this.#setup();
-					} else {
+					} else if (this.#isValid === true) {
 						this.#demolish();
 					}
 				},
@@ -66,11 +66,9 @@ export class UmbBindServerValidationToFormControl extends UmbControllerBase {
 			this.#controlValidator = this.#control.addValidator(
 				'customError',
 				() => this.#messages.map((x) => x.body).join(', '),
-				() => !this.#isValid,
+				() => this.#isValid === false,
 			);
 			//this.#control.addEventListener('change', this.#onControlChange);
-			// Legacy event, used by some controls:
-			//this.#control.addEventListener('property-value-change', this.#onControlChange);
 		}
 		this.#control.checkValidity();
 	}
@@ -80,8 +78,6 @@ export class UmbBindServerValidationToFormControl extends UmbControllerBase {
 
 		this.#control.removeValidator(this.#controlValidator);
 		//this.#control.removeEventListener('change', this.#onControlChange);
-		// Legacy event, used by some controls:
-		//this.#control.removeEventListener('property-value-change', this.#onControlChange);
 		this.#controlValidator = undefined;
 		this.#control.checkValidity();
 	}
@@ -95,7 +91,7 @@ export class UmbBindServerValidationToFormControl extends UmbControllerBase {
 	 * Resets the validation state of this validator.
 	 */
 	reset(): void {
-		this.#isValid = false;
+		this.#isValid = undefined;
 		this.#control.pristine = true; // Make sure the control goes back into not-validation-mode/'untouched'/pristine state.
 	}
 
