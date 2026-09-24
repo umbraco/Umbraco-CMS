@@ -9,7 +9,6 @@ import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controlle
 import { UmbArrayState, UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 import type { UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
-import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type { UmbStartNodeAccessValue } from '@umbraco-cms/backoffice/property-editor';
 
 /** Stands in for `UmbUserWorkspaceContext`, exposing only the access-related state the element reads and writes. */
@@ -95,9 +94,11 @@ describe('UmbUserWorkspaceAssignAccessElement', () => {
 		host.provideContext(UMB_USER_WORKSPACE_CONTEXT, context as never);
 		await aTimeout(0);
 
-		// The rendered `umb-property` elements read from this same context, so it's the property editor UIs' view of
-		// the workspace data — not an implementation detail.
-		dataset = (await element.getContext(UMB_PROPERTY_DATASET_CONTEXT))!;
+		// The rendered `umb-property` elements read from the dataset hosted by the element's own
+		// `umb-property-dataset`, so it's the property editor UIs' view of the workspace data — not an
+		// implementation detail.
+		const datasetElement = element.shadowRoot!.querySelector('umb-property-dataset')!;
+		dataset = (datasetElement as unknown as { context: UmbPropertyDatasetContext }).context;
 	});
 
 	async function datasetValueByAlias<ValueType>(alias: string) {
@@ -132,6 +133,19 @@ describe('UmbUserWorkspaceAssignAccessElement', () => {
 			await aTimeout(0);
 
 			expect(await datasetValueByAlias('mediaAccess')).to.deep.equal({ rootAccess: true, startNodes: [] });
+		});
+
+		it('does not write workspace-originated values back to the workspace context', async () => {
+			// A value pushed in from the workspace (e.g. the workspace data being cleared after deletion) must not
+			// echo back into a `set*` call, or an unrelated navigation will look like it has unpersisted changes.
+			context.setUserGroupUniques([{ unique: 'group-1' }]);
+			context.setDocumentAccessState({ rootAccess: false, startNodes: [{ unique: 'doc-1' }] });
+			context.setMediaAccessState({ rootAccess: true, startNodes: [] });
+			await aTimeout(0);
+
+			expect(context.setUserGroupsCalls).to.be.empty;
+			expect(context.setDocumentAccessCalls).to.be.empty;
+			expect(context.setMediaAccessCalls).to.be.empty;
 		});
 	});
 
