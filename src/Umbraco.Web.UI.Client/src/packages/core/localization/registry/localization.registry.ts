@@ -203,7 +203,7 @@ export class UmbLocalizationRegistry {
 					}
 				}
 			} catch (error) {
-				console.error(`Error loading localization extension "${extension.alias}":`, error);
+				console.error(`Localization extension "${extension.alias}" failed to load and was skipped:`, error);
 			}
 		}
 

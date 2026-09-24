@@ -375,10 +375,12 @@ describe('UmbLocalizationRegistry with a failing extension', () => {
 
 	let registry: UmbLocalizationRegistry;
 	let originalConsoleError: typeof console.error;
+	let loggedErrors: unknown[][];
 
 	beforeEach(() => {
 		originalConsoleError = console.error;
-		console.error = () => {};
+		loggedErrors = [];
+		console.error = (...args: unknown[]) => loggedErrors.push(args);
 		umbExtensionsRegistry.register(broken);
 		registry = new UmbLocalizationRegistry(umbExtensionsRegistry);
 	});
@@ -403,6 +405,13 @@ describe('UmbLocalizationRegistry with a failing extension', () => {
 		await aTimeout(0);
 
 		expect(registry.localizations.get('en-us')).to.have.property('general_fromBrokenInline', 'Inline from broken');
+	});
+
+	it('logs the alias of the failing extension', async () => {
+		registry.loadLanguage('en-us');
+		await aTimeout(0);
+
+		expect(loggedErrors.some(([message]) => String(message).includes(broken.alias))).to.be.true;
 	});
 
 	it('still loads a language requested afterwards', async () => {
