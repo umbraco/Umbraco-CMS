@@ -33,9 +33,9 @@ internal sealed class MediaHybridCacheMockTests : UmbracoIntegrationTest
     private IMediaService MediaService => GetRequiredService<IMediaService>();
 
     [SetUp]
-    public void SetUp()
+    public async Task SetUp()
     {
-        IMediaType mediaType = MediaTypeService.Get("image")!;
+        IMediaType mediaType = (await MediaTypeService.GetAsync("image"))!;
         _mediaItem = new MediaBuilder()
             .WithName("Test Media Item")
             .WithMediaType(mediaType)
@@ -177,7 +177,7 @@ internal sealed class MediaHybridCacheMockTests : UmbracoIntegrationTest
     [Test]
     public async Task GetByKeysAsync_PreservesInputOrder_AcrossMixedCacheHits()
     {
-        IMediaType mediaType = MediaTypeService.Get("image")!;
+        IMediaType mediaType = (await MediaTypeService.GetAsync("image"))!;
         var mediaB = new MediaBuilder().WithName("Test Media Item B").WithMediaType(mediaType).Build();
         MediaService.Save(mediaB);
         var mediaC = new MediaBuilder().WithName("Test Media Item C").WithMediaType(mediaType).Build();

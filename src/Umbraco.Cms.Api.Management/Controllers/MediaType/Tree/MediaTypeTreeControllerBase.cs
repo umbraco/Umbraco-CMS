@@ -58,8 +58,8 @@ public class MediaTypeTreeControllerBase : FolderTreeControllerBase<MediaTypeTre
 
     protected override async Task<MediaTypeTreeItemResponseModel[]> MapTreeItemViewModelsAsync(Guid? parentKey, IEntitySlim[] entities)
     {
-        var mediaTypes = _mediaTypeService
-            .GetMany(entities.Select(entity => entity.Id).ToArray())
+        var mediaTypes = (await _mediaTypeService
+            .GetManyAsync(entities.Select(entity => entity.Id).ToArray()))
             .ToDictionary(contentType => contentType.Id);
 
         IEnumerable<Task<MediaTypeTreeItemResponseModel>> tasks = entities.Select(async entity =>

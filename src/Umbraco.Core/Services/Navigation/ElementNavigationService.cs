@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Core.Services.Navigation;
 ///     the element navigation structure and its recycle bin.
 /// </summary>
 /// <remarks>
-///     This service extends <see cref="ContentNavigationServiceBase{TContentType, TContentTypeService}"/>
+///     This service extends <see cref="AsyncContentNavigationServiceBase{TContentType, TContentTypeService}"/>
 ///     and implements both <see cref="IElementNavigationQueryService"/> and <see cref="IElementNavigationManagementService"/>
 ///     to provide a complete set of navigation operations for element content.
 ///     The element tree includes both elements and element containers (folders),

@@ -55,7 +55,7 @@ public class DistributedContentIndexRebuilderTests : TestBase
             ContentService.Publish(content, ["*"]);
         }
 
-        IMediaType mediaType = MediaTypeService.Get("Folder")
+        IMediaType mediaType = await MediaTypeService.GetAsync("Folder")
                                ?? throw new InvalidOperationException("Could not find the Folder media type");
 
         for (var i = 0; i < 5; i++)

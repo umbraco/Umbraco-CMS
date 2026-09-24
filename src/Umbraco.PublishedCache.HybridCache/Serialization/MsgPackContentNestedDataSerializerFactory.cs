@@ -43,7 +43,7 @@ internal sealed class MsgPackContentNestedDataSerializerFactory : IContentCacheD
 
         if ((types & ContentCacheDataSerializerEntityType.Media) == ContentCacheDataSerializerEntityType.Media)
         {
-            foreach (IMediaType ct in _mediaTypeService.GetAll())
+            foreach (IMediaType ct in _mediaTypeService.GetAllAsync().GetAwaiter().GetResult())
             {
                 contentTypes[ct.Id] = ct;
             }

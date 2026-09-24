@@ -44,7 +44,7 @@ public class AddDimensionsToSvg : AsyncMigrationBase
     /// <inheritdoc/>
     protected override async Task MigrateAsync()
     {
-        IMediaType? vectorGraphicsMediaType = _mediaTypeService.Get(Constants.Conventions.MediaTypes.VectorGraphicsAlias);
+        IMediaType? vectorGraphicsMediaType = await _mediaTypeService.GetAsync(Constants.Conventions.MediaTypes.VectorGraphicsAlias);
 
         if (vectorGraphicsMediaType is null)
         {

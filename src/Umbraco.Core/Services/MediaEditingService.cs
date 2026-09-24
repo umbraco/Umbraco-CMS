@@ -15,9 +15,9 @@ namespace Umbraco.Cms.Core.Services;
 ///     and managing <see cref="IMedia"/> items through the editing API.
 /// </summary>
 internal sealed class MediaEditingService
-    : ContentEditingServiceWithSortingBase<IMedia, IMediaType, IMediaService, IMediaTypeService>, IMediaEditingService
+    : AsyncContentEditingServiceWithSortingBase<IMedia, IMediaType, IMediaService, IMediaTypeService>, IMediaEditingService
 {
-    private readonly ILogger<ContentEditingServiceBase<IMedia, IMediaType, IMediaService, IMediaTypeService>> _logger;
+    private readonly ILogger<AsyncContentEditingServiceBase<IMedia, IMediaType, IMediaService, IMediaTypeService>> _logger;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="MediaEditingService"/> class.
@@ -39,7 +39,7 @@ internal sealed class MediaEditingService
         IMediaTypeService contentTypeService,
         PropertyEditorCollection propertyEditorCollection,
         IDataTypeService dataTypeService,
-        ILogger<ContentEditingServiceBase<IMedia, IMediaType, IMediaService, IMediaTypeService>> logger,
+        ILogger<AsyncContentEditingServiceBase<IMedia, IMediaType, IMediaService, IMediaTypeService>> logger,
         ICoreScopeProvider scopeProvider,
         IUserIdKeyResolver userIdKeyResolver,
         ITreeEntitySortingService treeEntitySortingService,
@@ -211,8 +211,11 @@ internal sealed class MediaEditingService
         => ContentService.Delete(media, userId).Result;
 
     /// <inheritdoc />
-    protected override IEnumerable<IMedia> GetPagedChildren(int parentId, int pageIndex, int pageSize, Ordering? ordering, out long total)
-        => ContentService.GetPagedChildren(parentId, pageIndex, pageSize, out total, filter: null, ordering: ordering);
+    protected override Task<IEnumerable<IMedia>> GetPagedChildrenAsync(int parentId, int pageIndex, int pageSize, Ordering? ordering, out long total)
+    {
+        IEnumerable<IMedia> pagedChildren = ContentService.GetPagedChildren(parentId, pageIndex, pageSize, out total, filter: null, ordering: ordering);
+        return Task.FromResult(pagedChildren);
+    }
 
     /// <inheritdoc />
     protected override ContentEditingOperationStatus Sort(IEnumerable<IMedia> items, int userId)

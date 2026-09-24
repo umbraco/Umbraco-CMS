@@ -137,7 +137,7 @@ public partial class IndexedEntitySearchServiceTests
     [TestCase("childMediaType", true, 10)]
     public async Task Media_CanFindAllByMediaType(string mediaTypeAlias, bool? trashed, int expectedTotal)
     {
-        Guid mediaTypeKey = MediaTypeService.Get(mediaTypeAlias)?.Key
+        Guid mediaTypeKey = (await MediaTypeService.GetAsync(mediaTypeAlias))?.Key
                             ?? throw new InvalidOperationException($"Could not find {mediaTypeAlias}.");
 
         PagedModel<IEntitySlim> result = await IndexedEntitySearchService.SearchAsync(
@@ -160,7 +160,7 @@ public partial class IndexedEntitySearchServiceTests
     public async Task Media_CanCombineParentAndMediaTypeFiltering()
     {
         IMedia root = MediaService.GetRootMedia().Last();
-        Guid mediaTypeKey = MediaTypeService.Get("childMediaType")?.Key
+        Guid mediaTypeKey = (await MediaTypeService.GetAsync("childMediaType"))?.Key
                             ?? throw new InvalidOperationException("Could not find childMediaType");
 
         PagedModel<IEntitySlim> result = await IndexedEntitySearchService.SearchAsync(

@@ -192,7 +192,7 @@ internal sealed class MemberRepositoryTest : UmbracoIntegrationTest
             var repository = CreateRepository(provider);
 
             var memberType = MemberTypeBuilder.CreateSimpleMemberType();
-            MemberTypeRepository.Save(memberType);
+            MemberTypeRepository.SaveAsync(memberType, CancellationToken.None).GetAwaiter().GetResult();
 
             var member =
                 MemberBuilder.CreateSimpleMember(memberType, "Johnny Hefty", "johnny@example.com", "123", "hefty");
@@ -232,7 +232,7 @@ internal sealed class MemberRepositoryTest : UmbracoIntegrationTest
             var repository = CreateRepository(provider);
 
             var memberType = MemberTypeBuilder.CreateSimpleMemberType();
-            MemberTypeRepository.Save(memberType);
+            MemberTypeRepository.SaveAsync(memberType, CancellationToken.None).GetAwaiter().GetResult();
 
             var member =
                 MemberBuilder.CreateSimpleMember(memberType, "Johnny Hefty", "johnny@example.com", "123", "hefty");
@@ -260,7 +260,7 @@ internal sealed class MemberRepositoryTest : UmbracoIntegrationTest
             var repository = CreateRepository(provider);
 
             var memberType = MemberTypeBuilder.CreateSimpleMemberType();
-            MemberTypeRepository.Save(memberType);
+            MemberTypeRepository.SaveAsync(memberType, CancellationToken.None).GetAwaiter().GetResult();
 
             var member =
                 MemberBuilder.CreateSimpleMember(memberType, "Johnny Hefty", "johnny@example.com", "123", "hefty");
@@ -312,7 +312,7 @@ internal sealed class MemberRepositoryTest : UmbracoIntegrationTest
             if (memberType == null)
             {
                 memberType = MemberTypeBuilder.CreateSimpleMemberType();
-                MemberTypeRepository.Save(memberType);
+                MemberTypeRepository.SaveAsync(memberType, CancellationToken.None).GetAwaiter().GetResult();
             }
 
             var member = MemberBuilder.CreateSimpleMember(memberType, name ?? "Johnny Hefty", email ?? "johnny@example.com", password ?? "123", username ?? "hefty", key);
@@ -331,7 +331,7 @@ internal sealed class MemberRepositoryTest : UmbracoIntegrationTest
             var repository = CreateRepository(provider);
 
             var memberType = MemberTypeBuilder.CreateSimpleMemberType(alias);
-            MemberTypeRepository.Save(memberType);
+            MemberTypeRepository.SaveAsync(memberType, CancellationToken.None).GetAwaiter().GetResult();
             scope.Complete();
             return memberType;
         }

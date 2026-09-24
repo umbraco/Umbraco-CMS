@@ -17,7 +17,7 @@ internal sealed partial class MediaEditingServiceTests
 
     private async Task<IMedia> CreateFolderMediaAsync(string name)
     {
-        var folderMediaType = MediaTypeService.Get(Constants.Conventions.MediaTypes.Folder);
+        var folderMediaType = await MediaTypeService.GetAsync(Constants.Conventions.MediaTypes.Folder);
         var createModel = new MediaCreateModel
         {
             ContentTypeKey = folderMediaType!.Key,

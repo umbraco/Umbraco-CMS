@@ -101,7 +101,7 @@ namespace Umbraco.Cms.Core.Services
             var mediaTypeId = 0;
             if (string.IsNullOrWhiteSpace(mediaTypeAlias) == false)
             {
-                IMediaType? mediaType = _mediaTypeRepository.Get(mediaTypeAlias);
+                IMediaType? mediaType = _mediaTypeRepository.GetAsync(mediaTypeAlias, CancellationToken.None).GetAwaiter().GetResult();
                 if (mediaType == null)
                 {
                     return 0;
@@ -1702,8 +1702,7 @@ namespace Umbraco.Cms.Core.Services
             using ICoreScope scope = ScopeProvider.CreateCoreScope();
             scope.ReadLock(Constants.Locks.MediaTypes);
 
-            IQuery<IMediaType> query = Query<IMediaType>().Where(x => x.Alias == mediaTypeAlias);
-            IMediaType? mediaType = _mediaTypeRepository.Get(query)?.FirstOrDefault();
+            IMediaType? mediaType = _mediaTypeRepository.GetAsync(mediaTypeAlias, CancellationToken.None).GetAwaiter().GetResult();
 
             if (mediaType == null)
             {

@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Services.Navigation;
 
 /// <summary>
 /// Tests for the per-<see cref="NavigationNode"/> ordered-children cache as exercised through
-/// the service-level mutation methods on <see cref="ContentNavigationServiceBase{TContentType, TContentTypeService}"/>.
+/// the service-level mutation methods on <see cref="AsyncContentNavigationServiceBase{TContentType, TContentTypeService}"/>.
 /// Verifies that service-level <c>Move</c>, <c>Add</c>, and <c>UpdateSortOrder</c> correctly
 /// invalidate the per-parent ordered-children cache on every affected parent.
 /// </summary>

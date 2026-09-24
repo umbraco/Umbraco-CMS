@@ -652,7 +652,7 @@ public class PackagesRepository : ICreatedPackagesRepository
                 continue;
             }
 
-            IMediaType? mediaType = _mediaTypeService.Get(outInt);
+            IMediaType? mediaType = _mediaTypeService.GetAsync(outInt).GetAwaiter().GetResult();
             if (mediaType == null)
             {
                 continue;
@@ -861,7 +861,7 @@ public class PackagesRepository : ICreatedPackagesRepository
     {
         if (mediaType.ParentId > 0)
         {
-            IMediaType? parent = _mediaTypeService.Get(mediaType.ParentId);
+            IMediaType? parent = _mediaTypeService.GetAsync(mediaType.ParentId).GetAwaiter().GetResult();
 
             // could be a container
             if (parent != null)

@@ -31,7 +31,7 @@ internal sealed class ContentTypeSchemaService : IContentTypeSchemaService
 
     /// <inheritdoc/>
     public IReadOnlyCollection<ContentTypeSchemaInfo> GetMediaTypes()
-        => GetContentTypeSchemaInfos(PublishedItemType.Media, _mediaTypeService.GetAll());
+        => GetContentTypeSchemaInfos(PublishedItemType.Media, _mediaTypeService.GetAllAsync().GetAwaiter().GetResult());
 
     private List<ContentTypeSchemaInfo> GetContentTypeSchemaInfos(
         PublishedItemType itemType,

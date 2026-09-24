@@ -37,31 +37,6 @@ public static class ContentTypeServiceExtensions
     /// <param name="composedOfType">Which relationships to include: composition, inheritance, or both.</param>
     /// <returns>The content types that build upon the specified content type in the requested way.</returns>
     /// <remarks>
-    ///     A convenience filter over <see cref="IContentTypeBaseService{TItem}.GetComposedOf(int)" />. Inheritance and
-    ///     composition share the same underlying storage; a referencing content type is an inheritance child when its
-    ///     tree parent is <paramref name="id" />, otherwise it is a true composition user.
-    /// </remarks>
-    public static IEnumerable<TItem> GetComposedOf<TItem>(
-        this IContentTypeBaseService<TItem> contentTypeBaseService,
-        int id,
-        ComposedOfType composedOfType)
-        where TItem : IContentTypeComposition
-        => composedOfType switch
-        {
-            ComposedOfType.Composition => contentTypeBaseService.GetComposedOf(id).Where(x => x.ParentId != id),
-            ComposedOfType.Inheritance => contentTypeBaseService.GetComposedOf(id).Where(x => x.ParentId == id),
-            _ => contentTypeBaseService.GetComposedOf(id),
-        };
-
-    /// <summary>
-    ///     Gets the content types that are composed of a given content type, restricted to the requested relationship kind.
-    /// </summary>
-    /// <typeparam name="TItem">The content type kind (document, media or member type).</typeparam>
-    /// <param name="contentTypeBaseService">The content type service.</param>
-    /// <param name="id">The identifier of the composition content type.</param>
-    /// <param name="composedOfType">Which relationships to include: composition, inheritance, or both.</param>
-    /// <returns>The content types that build upon the specified content type in the requested way.</returns>
-    /// <remarks>
     ///     A convenience filter over <see cref="IAsyncContentTypeBaseService{TItem}.GetComposedOfAsync(int)" />. Inheritance
     ///     and composition share the same underlying storage; a referencing content type is an inheritance child when its
     ///     tree parent is <paramref name="id" />, otherwise it is a true composition user.

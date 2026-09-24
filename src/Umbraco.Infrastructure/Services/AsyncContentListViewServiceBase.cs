@@ -9,10 +9,8 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Infrastructure.Services;
 
 /// <summary>
-/// Asynchronous counterpart of <see cref="ContentListViewServiceBase{TContent, TContentType, TContentTypeService}" />,
-/// used while the content type repositories are migrated to EF Core. It runs against the asynchronous
-/// <see cref="IAsyncContentTypeBaseService{TContentType}" /> contract; the media list view service continues to use the
-/// synchronous base until its repository is migrated.
+/// Shared list view (collection) logic for content types, running against the asynchronous
+/// <see cref="IAsyncContentTypeBaseService{TContentType}" /> contract.
 /// </summary>
 internal abstract class AsyncContentListViewServiceBase<TContent, TContentType, TContentTypeService>
     where TContent : class, IContentBase

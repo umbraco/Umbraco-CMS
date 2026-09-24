@@ -30,8 +30,8 @@ public class EnsureDefaultMediaFolderHasDefaultCollection : AsyncMigrationBase
 
     protected override async Task MigrateAsync()
     {
-        IMediaType? folderMediaType = _mediaTypeService
-            .Get(Constants.MediaTypes.Guids.FolderGuid);
+        IMediaType? folderMediaType = await _mediaTypeService
+            .GetAsync(Constants.MediaTypes.Guids.FolderGuid);
 
         if (folderMediaType is null || folderMediaType.ListView is not null)
         {

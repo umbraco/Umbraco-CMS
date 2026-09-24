@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Core.Services.ContentTypeEditing;
 ///     This service handles creating and updating media types including their properties,
 ///     compositions, and file extension configurations for upload property editors.
 /// </remarks>
-internal sealed class MediaTypeEditingService : ContentTypeEditingServiceBase<IMediaType, IMediaTypeService, MediaTypePropertyTypeModel, MediaTypePropertyContainerModel>, IMediaTypeEditingService
+internal sealed class MediaTypeEditingService : AsyncContentTypeEditingServiceBase<IMediaType, IMediaTypeService, MediaTypePropertyTypeModel, MediaTypePropertyContainerModel>, IMediaTypeEditingService
 {
     private readonly IMediaTypeService _mediaTypeService;
     private readonly IDataTypeService _dataTypeService;
@@ -113,7 +113,7 @@ internal sealed class MediaTypeEditingService : ContentTypeEditingServiceBase<IM
     {
         fileExtension = fileExtension.TrimStart('.').ToLowerInvariant();
 
-        IMediaType[] candidateMediaTypes = _mediaTypeService.GetAll().Where(mt => mt.CompositionPropertyTypes.Any(pt => pt.Alias == Constants.Conventions.Media.File)).ToArray();
+        IMediaType[] candidateMediaTypes = (await _mediaTypeService.GetAllAsync()).Where(mt => mt.CompositionPropertyTypes.Any(pt => pt.Alias == Constants.Conventions.Media.File)).ToArray();
         var results = new List<MediaTypeFileExtensionMatchResult>();
 
         // is this an image format supported by the image cropper?
@@ -157,13 +157,12 @@ internal sealed class MediaTypeEditingService : ContentTypeEditingServiceBase<IM
     }
 
     /// <inheritdoc />
-    public Task<PagedModel<IMediaType>> GetFolderMediaTypes(int skip, int take)
+    public async Task<PagedModel<IMediaType>> GetFolderMediaTypes(int skip, int take)
     {
         // we'll consider it a "folder" media type if it:
         // - does not contain an umbracoFile property
         // - has any allowed types below itself
-        var folderMediaTypes = _mediaTypeService
-            .GetAll()
+        var folderMediaTypes = (await _mediaTypeService.GetAllAsync())
             .Where(mt =>
                 mt.CompositionPropertyTypes.Any(pt => pt.Alias == Constants.Conventions.Media.File) is false
                 && mt.AllowedContentTypes?.Any() is true)
@@ -172,18 +171,18 @@ internal sealed class MediaTypeEditingService : ContentTypeEditingServiceBase<IM
         // as a special case, the "Folder" system media type must always be included
         if (folderMediaTypes.Any(mediaType => mediaType.Alias == Constants.Conventions.MediaTypes.Folder) is false)
         {
-            IMediaType? defaultFolderMediaType = _mediaTypeService.Get(Constants.Conventions.MediaTypes.Folder);
+            IMediaType? defaultFolderMediaType = await _mediaTypeService.GetAsync(Constants.Conventions.MediaTypes.Folder);
             if (defaultFolderMediaType is not null)
             {
                 folderMediaTypes.Add(defaultFolderMediaType);
             }
         }
 
-        return Task.FromResult(new PagedModel<IMediaType>
+        return new PagedModel<IMediaType>
         {
             Items = folderMediaTypes.Skip(skip).Take(take),
             Total = folderMediaTypes.Count
-        });
+        };
     }
 
     /// <inheritdoc />
