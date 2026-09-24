@@ -313,6 +313,24 @@ internal abstract class BlockEditorPropertyValueHandler : IPropertyValueHandler
             .WhereNotNull()
             .ToArray();
 
+    /// <summary>
+    /// Recursively flattens a set of layout items and any layout items they themselves contain (e.g. block grid areas).
+    /// </summary>
+    /// <param name="layoutItems">The layout items to flatten.</param>
+    /// <returns>The layout items and all of their contained layout items.</returns>
+    private static IEnumerable<IBlockLayoutItem> FlattenLayoutItems(IEnumerable<IBlockLayoutItem> layoutItems)
+    {
+        foreach (IBlockLayoutItem layoutItem in layoutItems)
+        {
+            yield return layoutItem;
+
+            foreach (IBlockLayoutItem containedLayoutItem in FlattenLayoutItems(layoutItem.GetContainedLayouts()))
+            {
+                yield return containedLayoutItem;
+            }
+        }
+    }
+
     private string?[] GetPropertyCultures(IPropertyType propertyType, string? requestedCulture, bool published, IContentBase contentContext)
     {
         // block level variance can cause invariant culture to expand into multiple concrete cultures
@@ -412,62 +430,7 @@ internal abstract class BlockEditorPropertyValueHandler : IPropertyValueHandler
 
             try
             {
-                foreach (var propertyCulture in propertyCultures)
-                {
-                    foreach (IProperty elementProperty in element.Properties)
-                    {
-                        IPropertyType propertyType = elementProperty.PropertyType;
-
-                        if (propertyType.VariesByCulture() && propertyCulture is null)
-                        {
-                            continue;
-                        }
-
-                        IDataEditor? editor = _propertyEditorCollection[propertyType.PropertyEditorAlias];
-                        if (editor is null)
-                        {
-                            _logger.LogDebug(
-                                "No property editor found for property editor alias {propertyEditorAlias} - skipped indexing of external element property value.",
-                                propertyType.PropertyEditorAlias);
-                            continue;
-                        }
-
-                        IPropertyValueHandler? elementPropertyValueHandler = _propertyValueHandlerCollection.GetPropertyValueHandler(propertyType);
-                        if (elementPropertyValueHandler is null)
-                        {
-                            _logger.LogDebug(
-                                "No property value handler found for property editor alias {propertyEditorAlias} - skipped indexing of external element property value.",
-                                propertyType.PropertyEditorAlias);
-                            continue;
-                        }
-
-                        // unlike a locally contained block - whose synthetic Property is freshly written under the
-                        // requested segment, so reading it back under that same segment always finds it - this is
-                        // the element's own real, already-stored property: it only has a value under a segment it
-                        // itself actually varies by. Reading it at the requested segment regardless would miss an
-                        // invariant property's value entirely, since that is only ever stored under the invariant
-                        // (null) segment. Read at the element's own supported segment instead, then re-home the
-                        // result under the requested segment - the segment the containing block is actually indexed
-                        // under - exactly as a locally contained block's value is.
-                        var elementReadSegment = propertyType.VariesBySegment() ? segment : null;
-
-                        IndexField[] elementPropertyIndexFields = elementPropertyValueHandler
-                            .GetIndexFields(elementProperty, propertyCulture, elementReadSegment, published, contentContext)
-                            .ToArray();
-
-                        foreach (IndexField elementPropertyIndexField in elementPropertyIndexFields)
-                        {
-                            (string? Culture, string? Segment) variation = (elementPropertyIndexField.Culture, segment);
-                            if (cumulativeIndexValuesByVariation.TryGetValue(variation, out CumulativeIndexValue? elementIndexValue) is false)
-                            {
-                                elementIndexValue = new CumulativeIndexValue();
-                                cumulativeIndexValuesByVariation.Add(variation, elementIndexValue);
-                            }
-
-                            AmendCumulativeIndexValue(elementIndexValue, elementPropertyIndexField.Value);
-                        }
-                    }
-                }
+                AmendWithElementIndexValues(element, propertyCultures, segment, published, contentContext, cumulativeIndexValuesByVariation);
             }
             finally
             {
@@ -476,22 +439,72 @@ internal abstract class BlockEditorPropertyValueHandler : IPropertyValueHandler
         }
     }
 
-    /// <summary>
-    /// Recursively flattens a set of layout items and any layout items they themselves contain (e.g. block grid areas).
-    /// </summary>
-    /// <param name="layoutItems">The layout items to flatten.</param>
-    /// <returns>The layout items and all of their contained layout items.</returns>
-    private static IEnumerable<IBlockLayoutItem> FlattenLayoutItems(IEnumerable<IBlockLayoutItem> layoutItems)
+    private void AmendWithElementIndexValues(
+        IElement element,
+        string?[] propertyCultures,
+        string? segment,
+        bool published,
+        IContentBase contentContext,
+        Dictionary<(string? Culture, string? Segment), CumulativeIndexValue> cumulativeIndexValuesByVariation)
     {
-        foreach (IBlockLayoutItem layoutItem in layoutItems)
+        foreach (var propertyCulture in propertyCultures)
         {
-            yield return layoutItem;
-
-            foreach (IBlockLayoutItem containedLayoutItem in FlattenLayoutItems(layoutItem.GetContainedLayouts()))
+            foreach (IProperty elementProperty in element.Properties)
             {
-                yield return containedLayoutItem;
+                foreach (IndexField elementPropertyIndexField in GetElementPropertyIndexFields(elementProperty, propertyCulture, segment, published, contentContext))
+                {
+                    // re-home the value under the requested segment - the segment the containing block is actually
+                    // indexed under - exactly as a locally contained block's value is.
+                    (string? Culture, string? Segment) variation = (elementPropertyIndexField.Culture, segment);
+                    if (cumulativeIndexValuesByVariation.TryGetValue(variation, out CumulativeIndexValue? elementIndexValue) is false)
+                    {
+                        elementIndexValue = new CumulativeIndexValue();
+                        cumulativeIndexValuesByVariation.Add(variation, elementIndexValue);
+                    }
+
+                    AmendCumulativeIndexValue(elementIndexValue, elementPropertyIndexField.Value);
+                }
             }
         }
+    }
+
+    private IndexField[] GetElementPropertyIndexFields(IProperty elementProperty, string? culture, string? segment, bool published, IContentBase contentContext)
+    {
+        IPropertyType propertyType = elementProperty.PropertyType;
+
+        if (propertyType.VariesByCulture() && culture is null)
+        {
+            return [];
+        }
+
+        IDataEditor? editor = _propertyEditorCollection[propertyType.PropertyEditorAlias];
+        if (editor is null)
+        {
+            _logger.LogDebug(
+                "No property editor found for property editor alias {propertyEditorAlias} - skipped indexing of external element property value.",
+                propertyType.PropertyEditorAlias);
+            return [];
+        }
+
+        IPropertyValueHandler? elementPropertyValueHandler = _propertyValueHandlerCollection.GetPropertyValueHandler(propertyType);
+        if (elementPropertyValueHandler is null)
+        {
+            _logger.LogDebug(
+                "No property value handler found for property editor alias {propertyEditorAlias} - skipped indexing of external element property value.",
+                propertyType.PropertyEditorAlias);
+            return [];
+        }
+
+        // unlike a locally contained block - whose synthetic Property is freshly written under the requested segment,
+        // so reading it back under that same segment always finds it - this is the element's own real, already-stored
+        // property: it only has a value under a segment it itself actually varies by. Reading it at the requested
+        // segment regardless would miss an invariant property's value entirely, since that is only ever stored under
+        // the invariant (null) segment. Read at the element's own supported segment instead.
+        var elementReadSegment = propertyType.VariesBySegment() ? segment : null;
+
+        return elementPropertyValueHandler
+            .GetIndexFields(elementProperty, culture, elementReadSegment, published, contentContext)
+            .ToArray();
     }
 
     /// <summary>
