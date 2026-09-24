@@ -24,6 +24,9 @@ export class UmbUserWorkspaceAssignAccessElement extends UmbLitElement {
 		this.#observeDatasetProperty<UmbStartNodeAccessValue>('mediaAccess', (value) =>
 			value ? this.#workspaceContext?.setMediaAccess(value) : undefined,
 		);
+		this.#observeDatasetProperty<UmbStartNodeAccessValue>('elementAccess', (value) =>
+			value ? this.#workspaceContext?.setElementAccess(value) : undefined,
+		);
 
 		this.consumeContext(UMB_USER_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance;
@@ -53,6 +56,15 @@ export class UmbUserWorkspaceAssignAccessElement extends UmbLitElement {
 						startNodes: startNodes ?? [],
 					}),
 				'_observeMediaAccess',
+			);
+			this.observe(
+				observeMultiple([instance.hasElementRootAccess, instance.elementStartNodeUniques]),
+				([rootAccess, startNodes]) =>
+					this.#dataset.setPropertyValue('elementAccess', {
+						rootAccess: rootAccess ?? false,
+						startNodes: startNodes ?? [],
+					}),
+				'_observeElementAccess',
 			);
 		});
 	}
@@ -84,6 +96,13 @@ export class UmbUserWorkspaceAssignAccessElement extends UmbLitElement {
 				description: this.localize.term('user_mediastartnodehelp'),
 				propertyEditorUiAlias: 'Umb.PropertyEditorUi.MediaStartNodeAccess',
 				config: [{ alias: 'rootAccessLabel', value: this.localize.term('user_allowAccessToAllMedia') }],
+			},
+			{
+				alias: 'elementAccess',
+				label: this.localize.term('user_selectElementStartNode'),
+				description: this.localize.term('user_selectElementStartNodeDescription'),
+				propertyEditorUiAlias: 'Umb.PropertyEditorUi.ElementStartNodeAccess',
+				config: [{ alias: 'rootAccessLabel', value: this.localize.term('user_allowAccessToAllElements') }],
 			},
 		];
 	}
