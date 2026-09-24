@@ -9,7 +9,6 @@ const manifest: ManifestPropertyEditorUi = {
 		label: 'User Group Picker',
 		icon: 'icon-users',
 		group: '#propertyEditorUIGroups_people',
-		supportsReadOnly: true,
 	},
 };
 

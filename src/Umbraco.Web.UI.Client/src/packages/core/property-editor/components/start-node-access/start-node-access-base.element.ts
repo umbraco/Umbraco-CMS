@@ -111,7 +111,7 @@ export abstract class UmbPropertyEditorUiStartNodeAccessElementBase
 		`;
 	}
 
-	static override styles = [
+	static override readonly styles = [
 		css`
 			:host {
 				display: flex;
