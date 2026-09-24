@@ -14,4 +14,13 @@ internal sealed class BlockElementSource
     ///     Gets the block's values as the owner has them stored.
     /// </summary>
     public required IReadOnlyList<BlockPropertyValue> Values { get; init; }
+
+    /// <summary>
+    ///     Gets the variations the block has been created for.
+    /// </summary>
+    /// <remarks>
+    ///     Which variations a block exists in is what it is exposed in, which is not the same as what it holds
+    ///     values for - a block created for a culture and left empty is still created for it.
+    /// </remarks>
+    public required IReadOnlyList<BlockItemVariation> Variations { get; init; }
 }

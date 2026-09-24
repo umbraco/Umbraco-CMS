@@ -68,7 +68,7 @@ internal sealed class BlockElementResolver : IBlockElementResolver
             return Fail(ElementCreateFromBlockOperationStatus.OwnerNotFound);
         }
 
-        BlockItemData? block = FindStoredBlockInAnyProperty(owner.Properties, _propertyEditorCollection, blockKey);
+        StoredBlock? block = FindStoredBlockInAnyProperty(owner.Properties, _propertyEditorCollection, blockKey);
         if (block is null)
         {
             return Fail(ElementCreateFromBlockOperationStatus.BlockNotFound);
@@ -78,8 +78,9 @@ internal sealed class BlockElementResolver : IBlockElementResolver
             ElementCreateFromBlockOperationStatus.Success,
             new BlockElementSource
             {
-                ContentTypeKey = block.ContentTypeKey,
-                Values = block.Values.ToArray(),
+                ContentTypeKey = block.Content.ContentTypeKey,
+                Values = block.Content.Values.ToArray(),
+                Variations = block.Variations,
             });
     }
 
@@ -91,7 +92,9 @@ internal sealed class BlockElementResolver : IBlockElementResolver
     ///     alone identifies it, and a block nested inside another sits in the value of the outermost property,
     ///     which a caller looking at the nested block has no way to name.
     /// </remarks>
-    internal static BlockItemData? FindStoredBlockInAnyProperty(
+    internal sealed record StoredBlock(BlockItemData Content, IReadOnlyList<BlockItemVariation> Variations);
+
+    internal static StoredBlock? FindStoredBlockInAnyProperty(
         IEnumerable<IProperty> properties,
         PropertyEditorCollection propertyEditors,
         Guid blockKey)
@@ -104,7 +107,7 @@ internal sealed class BlockElementResolver : IBlockElementResolver
                 continue;
             }
 
-            BlockItemData? block = FindStoredBlock(property, blockValueEditor, propertyEditors, blockKey);
+            StoredBlock? block = FindStoredBlock(property, blockValueEditor, propertyEditors, blockKey);
             if (block is not null)
             {
                 return block;
@@ -125,7 +128,7 @@ internal sealed class BlockElementResolver : IBlockElementResolver
     ///     it is the only value there is.
     ///     </para>
     /// </remarks>
-    internal static BlockItemData? FindStoredBlock(
+    internal static StoredBlock? FindStoredBlock(
         IProperty property,
         IBlockValueEditor blockValueEditor,
         PropertyEditorCollection propertyEditors,
@@ -133,7 +136,7 @@ internal sealed class BlockElementResolver : IBlockElementResolver
     {
         foreach (IPropertyValue propertyValue in property.Values)
         {
-            BlockItemData? block = FindBlock(blockValueEditor.GetBlockValue(propertyValue.EditedValue), propertyEditors, blockKey);
+            StoredBlock? block = FindBlock(blockValueEditor.GetBlockValue(propertyValue.EditedValue), propertyEditors, blockKey);
             if (block is not null)
             {
                 return block;
@@ -143,7 +146,7 @@ internal sealed class BlockElementResolver : IBlockElementResolver
         return null;
     }
 
-    private static BlockItemData? FindBlock(
+    private static StoredBlock? FindBlock(
         BlockValue? blockValue,
         PropertyEditorCollection propertyEditors,
         Guid blockKey)
@@ -156,7 +159,9 @@ internal sealed class BlockElementResolver : IBlockElementResolver
         BlockItemData? match = blockValue.ContentData.FirstOrDefault(x => x.Key == blockKey);
         if (match is not null)
         {
-            return match;
+            // the variations a block is exposed in are recorded by the value that contains it, not by the
+            // block itself, so they have to be taken here while that container is in hand.
+            return new StoredBlock(match, [.. blockValue.Expose.Where(x => x.ContentKey == blockKey)]);
         }
 
         // a block's own properties can be block editors holding further blocks, so the search continues
@@ -166,7 +171,7 @@ internal sealed class BlockElementResolver : IBlockElementResolver
             foreach (BlockPropertyValue propertyValue in content.Values)
             {
                 BlockValue? nested = NestedBlockValue(propertyValue, propertyEditors);
-                BlockItemData? nestedMatch = nested is null ? null : FindBlock(nested, propertyEditors, blockKey);
+                StoredBlock? nestedMatch = nested is null ? null : FindBlock(nested, propertyEditors, blockKey);
                 if (nestedMatch is not null)
                 {
                     return nestedMatch;
@@ -191,5 +196,6 @@ internal sealed class BlockElementResolver : IBlockElementResolver
             {
                 ContentTypeKey = Guid.Empty,
                 Values = [],
+                Variations = [],
             });
 }

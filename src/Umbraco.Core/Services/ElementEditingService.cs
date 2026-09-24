@@ -32,6 +32,7 @@ internal sealed class ElementEditingService
     private readonly IRelationService _relationService;
     private readonly IBlockElementResolver _blockElementResolver;
     private readonly IBlockEditorVarianceHandler _blockEditorVarianceHandler;
+    private readonly ILanguageService _languageService;
 
     public ElementEditingService(
         IElementService elementService,
@@ -79,6 +80,7 @@ internal sealed class ElementEditingService
         _relationService = relationService;
         _blockElementResolver = blockElementResolver;
         _blockEditorVarianceHandler = blockEditorVarianceHandler;
+        _languageService = languageService;
     }
 
     /// <inheritdoc/>
@@ -196,7 +198,12 @@ internal sealed class ElementEditingService
 
         // the element is created as a draft holding what the block holds. Publishing it is the editor's to do,
         // the same as for any other element they have not published yet.
-        ApplyNames(element, elementType, createModel.Name, values.Select(value => value.Culture));
+        ApplyNames(
+            element,
+            elementType,
+            createModel.Name,
+            source.Result.Variations,
+            await _languageService.GetDefaultIsoCodeAsync());
         ApplyStoredValues(element, elementType, values);
 
         ContentEditingOperationStatus saveStatus = await SaveAsync(element, userKey);
@@ -235,7 +242,12 @@ internal sealed class ElementEditingService
     /// <summary>
     ///     Names an element after the request, in every culture it holds values for.
     /// </summary>
-    internal static void ApplyNames(IElement element, IContentType elementType, string name, IEnumerable<string?> cultures)
+    internal static void ApplyNames(
+        IElement element,
+        IContentType elementType,
+        string name,
+        IEnumerable<BlockItemVariation> variations,
+        string defaultIsoCode)
     {
         if (elementType.VariesByCulture() is false)
         {
@@ -243,7 +255,10 @@ internal sealed class ElementEditingService
             return;
         }
 
-        foreach (string culture in cultures.WhereNotNull().Distinct())
+        // an element with no name at all cannot be saved, so the default culture stands in where the block
+        // says nothing usable - an opaque save failure is worse than a name in one culture.
+        var cultures = variations.Select(variation => variation.Culture).WhereNotNull().Distinct().ToArray();
+        foreach (var culture in cultures.Length > 0 ? cultures : [defaultIsoCode])
         {
             element.SetCultureName(name, culture);
         }

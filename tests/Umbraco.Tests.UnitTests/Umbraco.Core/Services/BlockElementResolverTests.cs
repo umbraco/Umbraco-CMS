@@ -19,11 +19,11 @@ public class BlockElementResolverTests
         Guid blockKey = Guid.NewGuid();
         IProperty property = PropertyOf("blocks", Slot("da-dk", null, "da-value"), Slot("en-us", null, "en-value"));
 
-        BlockItemData? result = BlockElementResolver.FindStoredBlock(
+        BlockElementResolver.StoredBlock? result = BlockElementResolver.FindStoredBlock(
             property, EditorFinding(blockKey, "en-value"), EmptyPropertyEditors(), blockKey);
 
         Assert.IsNotNull(result);
-        Assert.AreEqual(blockKey, result.Key);
+        Assert.AreEqual(blockKey, result.Content.Key);
     }
 
     [Test]
@@ -32,7 +32,7 @@ public class BlockElementResolverTests
         Guid blockKey = Guid.NewGuid();
         IProperty property = PropertyOf("blocks", Slot(null, null, "value"));
 
-        BlockItemData? result = BlockElementResolver.FindStoredBlock(
+        BlockElementResolver.StoredBlock? result = BlockElementResolver.FindStoredBlock(
             property, EditorFinding(blockKey), EmptyPropertyEditors(), blockKey);
 
         Assert.IsNull(result);
@@ -44,7 +44,7 @@ public class BlockElementResolverTests
         Guid blockKey = Guid.NewGuid();
         IDataValueEditor blockEditor = BlockValueEditorFinding(blockKey, "second-value");
 
-        BlockItemData? result = BlockElementResolver.FindStoredBlockInAnyProperty(
+        BlockElementResolver.StoredBlock? result = BlockElementResolver.FindStoredBlockInAnyProperty(
             [
                 PropertyOf("blocks", Slot(null, null, "first-value")),
                 PropertyOf("blocks", Slot(null, null, "second-value")),
@@ -53,7 +53,7 @@ public class BlockElementResolverTests
             blockKey);
 
         Assert.IsNotNull(result);
-        Assert.AreEqual(blockKey, result.Key);
+        Assert.AreEqual(blockKey, result.Content.Key);
     }
 
     [Test]
@@ -62,7 +62,7 @@ public class BlockElementResolverTests
         Guid blockKey = Guid.NewGuid();
         IDataValueEditor blockEditor = BlockValueEditorFinding(blockKey, "value");
 
-        BlockItemData? result = BlockElementResolver.FindStoredBlockInAnyProperty(
+        BlockElementResolver.StoredBlock? result = BlockElementResolver.FindStoredBlockInAnyProperty(
             [
                 PropertyOf("textbox", Slot(null, null, "value")),
                 PropertyOf("blocks", Slot(null, null, "value")),
@@ -71,7 +71,7 @@ public class BlockElementResolverTests
             blockKey);
 
         Assert.IsNotNull(result);
-        Assert.AreEqual(blockKey, result.Key);
+        Assert.AreEqual(blockKey, result.Content.Key);
     }
 
     [Test]
@@ -79,7 +79,7 @@ public class BlockElementResolverTests
     {
         Guid blockKey = Guid.NewGuid();
 
-        BlockItemData? result = BlockElementResolver.FindStoredBlockInAnyProperty(
+        BlockElementResolver.StoredBlock? result = BlockElementResolver.FindStoredBlockInAnyProperty(
             [PropertyOf("blocks", Slot(null, null, "value"))],
             PropertyEditors(("blocks", BlockValueEditorFinding(blockKey))),
             blockKey);
@@ -108,13 +108,35 @@ public class BlockElementResolverTests
 
         IDataValueEditor blockEditor = BlockValueEditorReturning(("outer-raw", outerValue), ("nested-raw", nestedValue));
 
-        BlockItemData? result = BlockElementResolver.FindStoredBlockInAnyProperty(
+        BlockElementResolver.StoredBlock? result = BlockElementResolver.FindStoredBlockInAnyProperty(
             [PropertyOf("blocks", Slot(null, null, "outer-raw"))],
             PropertyEditors(("blocks", blockEditor)),
             nestedKey);
 
         Assert.IsNotNull(result);
-        Assert.AreEqual(nestedKey, result.Key);
+        Assert.AreEqual(nestedKey, result.Content.Key);
+    }
+
+    [Test]
+    public void The_Variations_The_Block_Is_Exposed_In_Come_Back_With_It()
+    {
+        // expose lives on the value containing the block, not on the block, so it can only be picked up while
+        // that container is in hand - and it, not the values, says which variations the block exists in.
+        Guid blockKey = Guid.NewGuid();
+        var blockValue = new BlockListValue();
+        blockValue.ContentData.Add(new BlockItemData(blockKey, Guid.NewGuid(), "block"));
+        blockValue.Expose.Add(new BlockItemVariation(blockKey, "en-US", null));
+        blockValue.Expose.Add(new BlockItemVariation(blockKey, "pt-PT", null));
+        blockValue.Expose.Add(new BlockItemVariation(Guid.NewGuid(), "da-DK", null));
+
+        BlockElementResolver.StoredBlock? result = BlockElementResolver.FindStoredBlock(
+            PropertyOf("blocks", Slot(null, null, "value")),
+            BlockValueEditorReturningRaw(("value", blockValue)),
+            EmptyPropertyEditors(),
+            blockKey);
+
+        Assert.IsNotNull(result);
+        CollectionAssert.AreEquivalent(new[] { "en-US", "pt-PT" }, result.Variations.Select(x => x.Culture));
     }
 
     private static PropertyEditorCollection EmptyPropertyEditors()
@@ -170,6 +192,19 @@ public class BlockElementResolverTests
         var editor = new Mock<IDataValueEditor>();
         editor
             .As<IBlockValueEditor>()
+            .Setup(x => x.GetBlockValue(It.IsAny<object?>()))
+            .Returns((object? value) => values.FirstOrDefault(x => Equals(x.Stored, value)).Parsed);
+
+        return editor.Object;
+    }
+
+    /// <summary>
+    ///     An <see cref="IBlockValueEditor" /> handing back the given block values as they are.
+    /// </summary>
+    private static IBlockValueEditor BlockValueEditorReturningRaw(params (object Stored, BlockValue Parsed)[] values)
+    {
+        var editor = new Mock<IBlockValueEditor>();
+        editor
             .Setup(x => x.GetBlockValue(It.IsAny<object?>()))
             .Returns((object? value) => values.FirstOrDefault(x => Equals(x.Stored, value)).Parsed);
 

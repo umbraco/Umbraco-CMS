@@ -96,11 +96,54 @@ public class ElementEditingServiceTests
         Assert.AreEqual("invariant", element.GetValue("message"));
     }
 
+    [Test]
+    public void A_Variant_Element_Is_Named_In_Every_Culture_The_Block_Was_Created_For()
+    {
+        // which cultures a block exists in is what it is exposed in, not what it happens to hold values for -
+        // a block created for a culture but left empty is still created for it.
+        IContentType elementType = CreateVariantElementType();
+        IElement element = new Element(string.Empty, elementType);
+        Guid blockKey = Guid.NewGuid();
+
+        ElementEditingService.ApplyNames(
+            element,
+            elementType,
+            "Shared block",
+            [new BlockItemVariation(blockKey, "en-US", null), new BlockItemVariation(blockKey, "pt-PT", null)],
+            defaultIsoCode: "en-US");
+
+        Assert.AreEqual("Shared block", element.GetCultureName("en-US"));
+        Assert.AreEqual("Shared block", element.GetCultureName("pt-PT"));
+    }
+
+    [Test]
+    public void A_Variant_Element_Is_Named_In_The_Default_Culture_When_The_Block_Is_Exposed_Nowhere()
+    {
+        // nothing to derive a culture from, and an unnamed element cannot be saved at all - the default
+        // culture keeps that from turning into an opaque failure.
+        IContentType elementType = CreateVariantElementType();
+        IElement element = new Element(string.Empty, elementType);
+
+        ElementEditingService.ApplyNames(element, elementType, "Shared block", [], defaultIsoCode: "en-US");
+
+        Assert.AreEqual("Shared block", element.GetCultureName("en-US"));
+    }
+
     private static IContentType CreateElementType()
         => new ContentTypeBuilder()
             .WithIsElement(true)
             .AddPropertyType()
                 .WithAlias("message")
+                .Done()
+            .Build();
+
+    private static IContentType CreateVariantElementType()
+        => new ContentTypeBuilder()
+            .WithIsElement(true)
+            .WithContentVariation(ContentVariation.Culture)
+            .AddPropertyType()
+                .WithAlias("message")
+                .WithVariations(ContentVariation.Culture)
                 .Done()
             .Build();
 }
