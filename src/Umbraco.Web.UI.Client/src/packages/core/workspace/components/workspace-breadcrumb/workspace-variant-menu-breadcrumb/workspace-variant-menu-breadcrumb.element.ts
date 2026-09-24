@@ -31,7 +31,7 @@ export class UmbWorkspaceVariantMenuBreadcrumbElement extends UmbLitElement {
 	@state()
 	private _appCurrentCulture?: string;
 
-	#workspaceContext?: UmbVariantDatasetWorkspaceContext;
+	#variantWorkspaceContext?: UmbVariantDatasetWorkspaceContext;
 	#appLanguageContext?: UmbAppLanguageContext;
 	#menuStructureContext?: typeof UMB_MENU_VARIANT_STRUCTURE_WORKSPACE_CONTEXT.TYPE;
 
@@ -58,7 +58,7 @@ export class UmbWorkspaceVariantMenuBreadcrumbElement extends UmbLitElement {
 
 		this.consumeContext(UMB_VARIANT_WORKSPACE_CONTEXT, (instance) => {
 			if (!instance) return;
-			this.#workspaceContext = instance;
+			this.#variantWorkspaceContext = instance;
 			this.#observeWorkspaceActiveVariant();
 			this.#observeStructure();
 		});
@@ -71,11 +71,11 @@ export class UmbWorkspaceVariantMenuBreadcrumbElement extends UmbLitElement {
 	}
 
 	#observeStructure() {
-		if (!this.#menuStructureContext || !this.#workspaceContext) return;
+		if (!this.#menuStructureContext || !this.#variantWorkspaceContext) return;
 
 		this.observe(this.#menuStructureContext.structure, (value) => {
-			if (!this.#workspaceContext) return;
-			const unique = this.#workspaceContext.getUnique();
+			if (!this.#variantWorkspaceContext) return;
+			const unique = this.#variantWorkspaceContext.getUnique();
 			// exclude the current unique from the structure. We append this with an observer of the name
 			this._structure = value.filter((structureItem) => structureItem.unique !== unique);
 		});
@@ -83,7 +83,7 @@ export class UmbWorkspaceVariantMenuBreadcrumbElement extends UmbLitElement {
 
 	#observeWorkspaceActiveVariant() {
 		this.observe(
-			this.#workspaceContext?.splitView.firstActiveVariantInfo,
+			this.#variantWorkspaceContext?.splitView.firstActiveVariantInfo,
 			(variantInfo) => {
 				if (!variantInfo) return;
 				this._workspaceActiveVariantId = UmbVariantId.Create(variantInfo);
@@ -95,7 +95,7 @@ export class UmbWorkspaceVariantMenuBreadcrumbElement extends UmbLitElement {
 
 	#observeActiveVariantName() {
 		this.observe(
-			this.#workspaceContext?.name(this._workspaceActiveVariantId),
+			this.#variantWorkspaceContext?.name(this._workspaceActiveVariantId),
 			(value) => (this._name = value || ''),
 			observeWorkspaceNameSymbol,
 		);
