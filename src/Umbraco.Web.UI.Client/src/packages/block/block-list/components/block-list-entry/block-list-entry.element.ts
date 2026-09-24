@@ -53,7 +53,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	public get contentKey(): string | undefined {
 		return this._contentKey;
 	}
-	private _contentKey?: string | undefined;
+	private _contentKey: string | undefined;
 
 	#context = new UmbBlockListEntryContext(this);
 
@@ -420,9 +420,10 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 						`,
 					)}
 					${this.#renderActionBar()}
-					${!this._showContentEdit && this._contentInvalid
-						? html`<uui-badge attention color="invalid" label="Invalid content">!</uui-badge>`
-						: nothing}
+					${when(
+						!this._showContentEdit && this._contentInvalid,
+						() => html`<uui-badge attention color="invalid" label="Invalid content">!</uui-badge>`,
+					)}
 				</div>
 			`,
 		);

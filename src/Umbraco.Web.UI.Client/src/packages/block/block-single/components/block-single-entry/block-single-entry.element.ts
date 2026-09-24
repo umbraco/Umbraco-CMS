@@ -54,9 +54,9 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 			'observeMessagesForContent',
 		);
 	}
-	private _contentKey?: string | undefined;
+	private _contentKey: string | undefined;
 
-	#context = new UmbBlockSingleEntryContext(this);
+	readonly #context = new UmbBlockSingleEntryContext(this);
 
 	@state()
 	private _contentTypeAlias?: string;
@@ -282,23 +282,38 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 		);
 	}
 
-	#expose = () => {
+	readonly #expose = () => {
 		this.#context.expose();
 	};
 
-	#onUfmResolved = (event: UmbUfmResolvedEvent) => {
+	readonly #onUfmResolved = (event: UmbUfmResolvedEvent) => {
 		this.#context.setName(event.detail.text);
 	};
 
-	#renderHiddenUfm() {
-		const blockValue = {
+	get #blockValue() {
+		return {
 			...this._blockViewProps.content,
 			$settings: this._blockViewProps.settings,
 		};
-		return renderHiddenUfm(this._label, blockValue, this.#onUfmResolved);
 	}
 
-	#extensionSlotFilterMethod = (manifest: ManifestBlockEditorCustomView) => {
+	#renderUfm() {
+		return html`
+			<umb-ufm-render
+				slot="name"
+				inline
+				.markdown=${this._label}
+				.value=${this.#blockValue}
+				@umb-ufm-resolved=${this.#onUfmResolved}>
+			</umb-ufm-render>
+		`;
+	}
+
+	#renderHiddenUfm() {
+		return renderHiddenUfm(this._label, this.#blockValue, this.#onUfmResolved);
+	}
+
+	readonly #extensionSlotFilterMethod = (manifest: ManifestBlockEditorCustomView) => {
 		if (this._unsupported) {
 			// If the block is unsupported, we should not allow any custom views to render.
 			return false;
@@ -316,43 +331,51 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 		return true;
 	};
 
-	#extensionSlotRenderMethod = (ext: UmbExtensionElementInitializer<ManifestBlockEditorCustomView>) => {
+	readonly #extensionSlotRenderMethod = (ext: UmbExtensionElementInitializer<ManifestBlockEditorCustomView>) => {
 		ext.component?.setAttribute('part', 'component');
-		return html`${this.#renderHiddenUfm()}
-		${when(
-			this._exposed || this._isReadOnly,
-			() => ext.component,
-			() => html`
-				<div style="min-height: var(--uui-size-16);">
-					${ext.component}
-					<umb-block-overlay-expose-button
-						.contentTypeName=${this._contentTypeName}
-						@click=${this.#expose}></umb-block-overlay-expose-button>
-				</div>
-			`,
-		)}`;
+		return html`
+			${this.#renderHiddenUfm()}
+			${when(
+				this._exposed || this._isReadOnly,
+				() => ext.component,
+				() => html`
+					<div style="min-height: var(--uui-size-16);">
+						${ext.component}
+						<umb-block-overlay-expose-button
+							.contentTypeName=${this._contentTypeName}
+							@click=${this.#expose}></umb-block-overlay-expose-button>
+					</div>
+				`,
+			)}
+		`;
 	};
 
 	#renderRefBlock() {
-		return html`<umb-ref-single-block
-			.label=${this._label}
-			.icon=${this._icon}
-			.unpublished=${!this._exposed}
-			.config=${this._blockViewProps.config}
-			.content=${this._blockViewProps.content}
-			.settings=${this._blockViewProps.settings}
-			${umbDestroyOnDisconnect()}></umb-ref-single-block>`;
+		return html`
+			<umb-ref-single-block
+				.icon=${this._icon}
+				.unpublished=${!this._exposed}
+				.config=${this._blockViewProps.config}
+				.content=${this._blockViewProps.content}
+				.settings=${this._blockViewProps.settings}
+				${umbDestroyOnDisconnect()}>
+				${this.#renderUfm()}
+			</umb-ref-single-block>
+		`;
 	}
 
 	#renderInlineBlock() {
-		return html`<umb-inline-single-block
-			.label=${this._label}
-			.icon=${this._icon}
-			.unpublished=${!this._exposed}
-			.config=${this._blockViewProps.config}
-			.content=${this._blockViewProps.content}
-			.settings=${this._blockViewProps.settings}
-			${umbDestroyOnDisconnect()}></umb-inline-single-block>`;
+		return html`
+			<umb-inline-single-block
+				.icon=${this._icon}
+				.unpublished=${!this._exposed}
+				.config=${this._blockViewProps.config}
+				.content=${this._blockViewProps.content}
+				.settings=${this._blockViewProps.settings}
+				${umbDestroyOnDisconnect()}>
+				${this.#renderUfm()}
+			</umb-inline-single-block>
+		`;
 	}
 
 	#renderUnsupportedBlock() {
@@ -362,11 +385,12 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 				.config=${this._blockViewProps.config}
 				.content=${this._blockViewProps.content}
 				.settings=${this._blockViewProps.settings}
-				${umbDestroyOnDisconnect()}></umb-unsupported-single-block>
+				${umbDestroyOnDisconnect()}>
+			</umb-unsupported-single-block>
 		`;
 	}
 
-	#renderBuiltinBlockView = () => {
+	readonly #renderBuiltinBlockView = () => {
 		if (this._unsupported) {
 			return this.#renderUnsupportedBlock();
 		}
@@ -377,24 +401,26 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 	};
 
 	#renderBlock() {
-		return this.contentKey && (this._contentTypeAlias || this._unsupported)
-			? html`
-					<div class="umb-block-single__block">
-						<umb-extension-slot
-							type="blockEditorCustomView"
-							default-element=${this._inlineEditingMode ? 'umb-inline-single-block' : 'umb-ref-single-block'}
-							.renderMethod=${this.#extensionSlotRenderMethod}
-							.fallbackRenderMethod=${this.#renderBuiltinBlockView}
-							.props=${this._blockViewProps}
-							.filter=${this.#extensionSlotFilterMethod}
-							single></umb-extension-slot>
-						${this.#renderActionBar()}
-						${!this._showContentEdit && this._contentInvalid
-							? html`<uui-badge attention color="invalid" label="Invalid content">!</uui-badge>`
-							: nothing}
-					</div>
-				`
-			: nothing;
+		return when(
+			this.contentKey && (this._contentTypeAlias || this._unsupported),
+			() => html`
+				<div class="umb-block-single__block">
+					<umb-extension-slot
+						type="blockEditorCustomView"
+						default-element=${this._inlineEditingMode ? 'umb-inline-single-block' : 'umb-ref-single-block'}
+						.renderMethod=${this.#extensionSlotRenderMethod}
+						.fallbackRenderMethod=${this.#renderBuiltinBlockView}
+						.props=${this._blockViewProps}
+						.filter=${this.#extensionSlotFilterMethod}
+						single></umb-extension-slot>
+					${this.#renderActionBar()}
+					${when(
+						!this._showContentEdit && this._contentInvalid,
+						() => html`<uui-badge attention color="invalid" label="Invalid content">!</uui-badge>`,
+					)}
+				</div>
+			`,
+		);
 	}
 
 	#renderActionBar() {
@@ -406,7 +432,7 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 		return this.#renderBlock();
 	}
 
-	static override styles = [
+	static override readonly styles = [
 		UUIBlinkKeyframes,
 		css`
 			:host {
