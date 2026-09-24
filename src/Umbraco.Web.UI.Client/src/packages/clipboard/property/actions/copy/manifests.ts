@@ -1,5 +1,6 @@
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_PROPERTY_ACTION_DEFAULT_KIND_MANIFEST } from '@umbraco-cms/backoffice/property-action';
+import { UMB_ACTION_GROUP_CLIPBOARD } from '@umbraco-cms/backoffice/action';
 
 export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [
 	{
@@ -11,6 +12,7 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 			...UMB_PROPERTY_ACTION_DEFAULT_KIND_MANIFEST.manifest,
 			type: 'propertyAction',
 			kind: 'copyToClipboard',
+			group: UMB_ACTION_GROUP_CLIPBOARD,
 			api: () => import('./copy-to-clipboard.property-action.js'),
 			weight: 1200,
 			meta: {

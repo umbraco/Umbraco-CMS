@@ -5,12 +5,14 @@ import {
 } from '../../../user-permissions/constants.js';
 import { UMB_WORKSPACE_ENTITY_IS_NEW_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
 import { UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS } from '@umbraco-cms/backoffice/recycle-bin';
+import { UMB_ACTION_GROUP_PUBLISHING } from '@umbraco-cms/backoffice/action';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'workspaceActionMenuItem',
 		kind: 'default',
 		alias: 'Umb.Document.WorkspaceActionMenuItem.SchedulePublishing',
+		group: UMB_ACTION_GROUP_PUBLISHING,
 		name: 'Schedule publishing',
 		weight: 20,
 		api: () => import('./save-and-schedule.action.js'),

@@ -1,6 +1,7 @@
 import { UmbTrashEntityAction } from './trash.action.js';
 import { UMB_ENTITY_ACTION_DEFAULT_KIND_MANIFEST } from '@umbraco-cms/backoffice/entity-action';
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
+import { UMB_ACTION_GROUP_DELETE } from '@umbraco-cms/backoffice/action';
 
 export const UMB_ENTITY_ACTION_TRASH_KIND_MANIFEST: UmbExtensionManifestKind = {
 	type: 'kind',
@@ -11,6 +12,7 @@ export const UMB_ENTITY_ACTION_TRASH_KIND_MANIFEST: UmbExtensionManifestKind = {
 		...UMB_ENTITY_ACTION_DEFAULT_KIND_MANIFEST.manifest,
 		type: 'entityAction',
 		kind: 'trash',
+		group: UMB_ACTION_GROUP_DELETE,
 		api: UmbTrashEntityAction,
 		weight: 1150,
 		meta: {

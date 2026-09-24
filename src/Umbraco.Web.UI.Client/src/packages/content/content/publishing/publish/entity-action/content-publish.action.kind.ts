@@ -1,5 +1,6 @@
 import { UMB_ENTITY_ACTION_DEFAULT_KIND_MANIFEST } from '@umbraco-cms/backoffice/entity-action';
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
+import { UMB_ACTION_GROUP_PUBLISHING } from '@umbraco-cms/backoffice/action';
 
 export const UMB_ENTITY_ACTION_CONTENT_PUBLISH_KIND_MANIFEST: UmbExtensionManifestKind = {
 	type: 'kind',
@@ -10,6 +11,7 @@ export const UMB_ENTITY_ACTION_CONTENT_PUBLISH_KIND_MANIFEST: UmbExtensionManife
 		...UMB_ENTITY_ACTION_DEFAULT_KIND_MANIFEST.manifest,
 		type: 'entityAction',
 		kind: 'contentPublish',
+		group: UMB_ACTION_GROUP_PUBLISHING,
 		api: () => import('./content-publish.action.js'),
 		weight: 600,
 		forEntityTypes: [],

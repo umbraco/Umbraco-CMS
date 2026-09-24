@@ -4,14 +4,16 @@ import { manifests as repositoryManifests } from './repository/manifests.js';
 import { manifests as modalManifests } from './modal/manifests.js';
 import type { ManifestEntityAction } from '@umbraco-cms/backoffice/entity-action';
 import { UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS } from '@umbraco-cms/backoffice/recycle-bin';
+import { UMB_ACTION_GROUP_SETTINGS } from '@umbraco-cms/backoffice/action';
 
 const actionManifests: Array<ManifestEntityAction> = [
 	{
 		type: 'entityAction',
 		kind: 'default',
 		alias: 'Umb.EntityAction.Document.Notifications',
+		group: UMB_ACTION_GROUP_SETTINGS,
 		name: 'Notifications',
-		weight: 100,
+		weight: 101,
 		api: () => import('./document-notifications.action.js'),
 		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		meta: {
