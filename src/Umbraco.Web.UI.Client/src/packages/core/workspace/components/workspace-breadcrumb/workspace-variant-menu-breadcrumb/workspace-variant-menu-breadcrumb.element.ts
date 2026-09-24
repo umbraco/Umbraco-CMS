@@ -103,6 +103,11 @@ export class UmbWorkspaceVariantMenuBreadcrumbElement extends UmbLitElement {
 
 	// TODO: we should move the fallback name logic to a helper class. It will be used in multiple places
 	#getItemVariantName(structureItem: UmbVariantStructureItemModel) {
+		// Folders aren't variant content, so they have no variants to match against - use their flat name directly.
+		if (structureItem.isFolder && structureItem.name) {
+			return structureItem.name;
+		}
+
 		// If the active workspace is a variant, we will try to find the matching variant name.
 		if (!this._workspaceActiveVariantId?.isInvariant()) {
 			const variant = structureItem.variants.find((variantId) => this._workspaceActiveVariantId?.compare(variantId));
