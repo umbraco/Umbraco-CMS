@@ -14,9 +14,9 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence.Relations;
 using Umbraco.Cms.Search.Core.NotificationHandlers;
 using Umbraco.Cms.Search.Core.Services.ContentIndexing;
-using Umbraco.Cms.Tests.Integration.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
+using Umbraco.Cms.Tests.Integration.Attributes;
 using Umbraco.Cms.Tests.Integration.Testing.Search;
 using IndexValue = Umbraco.Cms.Core.Search.Indexing.IndexValue;
 

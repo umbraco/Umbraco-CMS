@@ -55,10 +55,6 @@ internal sealed class RichTextPropertyValueHandler : BlockEditorPropertyValueHan
         => propertyType.PropertyEditorAlias is Cms.Core.Constants.PropertyEditors.Aliases.RichText;
 
     /// <inheritdoc />
-    protected override BlockValue? ParseBlockValue(IProperty property, string? culture, string? segment, bool published)
-        => ParseBlockValue<RichTextBlockValue>(property, culture, segment, published);
-
-    /// <inheritdoc />
     public override IEnumerable<IndexField> GetIndexFields(IProperty property, string? culture, string? segment, bool published, IContentBase contentContext)
     {
         var source = property.GetValue(culture, segment, published);
@@ -87,4 +83,8 @@ internal sealed class RichTextPropertyValueHandler : BlockEditorPropertyValueHan
             ? ToIndexFields(blockIndexValues, property.Alias)
             : [];
     }
+
+    /// <inheritdoc />
+    protected override BlockValue? ParseBlockValue(IProperty property, string? culture, string? segment, bool published)
+        => ParseBlockValue<RichTextBlockValue>(property, culture, segment, published);
 }

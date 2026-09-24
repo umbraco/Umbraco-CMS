@@ -69,6 +69,51 @@ internal sealed class ElementIndexingNotificationHandler : IndexingNotificationH
         ReindexDocumentsReferencing(payloads.Select(payload => payload.Id).Distinct().ToArray(), origin);
     }
 
+    /// <summary>
+    /// Finds the documents that reference the given elements, directly or transitively through other published elements.
+    /// </summary>
+    /// <remarks>
+    /// Performs a breadth-first traversal of the external block element relation graph: a changed element can be
+    /// referenced directly by documents, or by other elements (which are themselves referenced by documents, or
+    /// further elements). Climbing only continues through a published element - an unpublished element's content
+    /// (and anything nested below it) is not part of any document's published index, so a change below it cannot
+    /// affect one further up.
+    /// <para>
+    /// Internal (rather than private) so integration tests can verify the traversal directly - the pruning at an
+    /// unpublished intermediate element has no observable effect on index content (the index-time flattening already
+    /// excludes it independently), so it can only be verified by calling this method directly.
+    /// </para>
+    /// </remarks>
+    /// <param name="elementIds">The IDs of the changed elements.</param>
+    /// <returns>The keys of the documents referencing the elements.</returns>
+    internal Guid[] FindDocumentKeysReferencingElements(int[] elementIds)
+    {
+        var documentKeys = new HashSet<Guid>();
+        var visitedElementIds = new HashSet<int>(elementIds);
+        var currentLevel = elementIds;
+
+        while (currentLevel.Length > 0)
+        {
+            foreach (IUmbracoEntity document in GetParentEntities(currentLevel, UmbracoObjectTypes.Document))
+            {
+                documentKeys.Add(document.Key);
+            }
+
+            var nextLevel = new HashSet<int>();
+            foreach (IUmbracoEntity entity in GetParentEntities(currentLevel, UmbracoObjectTypes.Element))
+            {
+                if (visitedElementIds.Add(entity.Id) && entity is IPublishableContentEntitySlim { Published: true })
+                {
+                    nextLevel.Add(entity.Id);
+                }
+            }
+
+            currentLevel = nextLevel.ToArray();
+        }
+
+        return documentKeys.ToArray();
+    }
+
     private void ReindexDocumentsReferencing(int[] changedElementIds, string origin)
     {
         if (changedElementIds.Length == 0)
@@ -96,42 +141,6 @@ internal sealed class ElementIndexingNotificationHandler : IndexingNotificationH
             _indexDocumentService.DeleteAsync(documentKeys, true).GetAwaiter().GetResult();
             _contentIndexingService.Handle(changes, origin);
         });
-    }
-
-    // Breadth-first traversal of the "umbExternalBlockElement" relation graph: a changed element can be referenced
-    // directly by documents, or by other elements (which are themselves referenced by documents, or further
-    // elements). Climbing is only continued through a published element - an unpublished element's content (and
-    // anything nested below it) is not part of any document's published index, so a change below it cannot affect
-    // one further up.
-    // Internal (rather than private) so integration tests can verify the traversal directly - the pruning at an
-    // unpublished intermediate element has no observable effect on index *content* (the index-time flattening
-    // already excludes it independently), so it can only be verified by calling this method directly.
-    internal Guid[] FindDocumentKeysReferencingElements(int[] elementIds)
-    {
-        var documentKeys = new HashSet<Guid>();
-        var visitedElementIds = new HashSet<int>(elementIds);
-        var currentLevel = elementIds;
-
-        while (currentLevel.Length > 0)
-        {
-            foreach (IUmbracoEntity document in GetParentEntities(currentLevel, UmbracoObjectTypes.Document))
-            {
-                documentKeys.Add(document.Key);
-            }
-
-            var nextLevel = new HashSet<int>();
-            foreach (IUmbracoEntity entity in GetParentEntities(currentLevel, UmbracoObjectTypes.Element))
-            {
-                if (visitedElementIds.Add(entity.Id) && entity is IPublishableContentEntitySlim { Published: true })
-                {
-                    nextLevel.Add(entity.Id);
-                }
-            }
-
-            currentLevel = nextLevel.ToArray();
-        }
-
-        return documentKeys.ToArray();
     }
 
     private IEnumerable<IUmbracoEntity> GetParentEntities(int[] childIds, UmbracoObjectTypes entityType)
