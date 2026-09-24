@@ -20,6 +20,7 @@ export default {
 		browse: 'Gennemse elementer',
 		changeDocType: 'Skift dokumenttype',
 		changeDataType: 'Skift datatype',
+		clear: 'Ryd',
 		copy: 'Kopier',
 		copyTo: 'Kopier til',
 		create: 'Opret',
@@ -44,6 +45,7 @@ export default {
 		refreshNode: 'Genindlæs elementer',
 		remove: 'Fjern',
 		republish: 'Genudgiv hele sitet',
+		replace: 'Erstat',
 		rename: 'Omdøb',
 		restore: 'Gendan',
 		chooseWhereToCopy: 'Vælg hvor du vil kopiere',
@@ -815,6 +817,7 @@ export default {
 		close: 'Luk',
 		closewindow: 'Luk vindue',
 		closepane: 'Luk vindue',
+		clipboard: 'Udklipsholder',
 		comment: 'Kommentar',
 		confirm: 'Bekræft',
 		constrain: 'Proportioner',
@@ -1496,6 +1499,17 @@ export default {
 			'Træk de forskellige sider op eller ned for at indstille hvordan de skal arrangeres, eller klik\n      på kolonnehovederne for at sortere hele rækken af sider\n    ',
 		sortPleaseWait: 'Vent venligst mens siderne sorteres. Det kan tage et stykke tid.',
 		sortEmptyState: 'Denne node har ingen under noder at sortere',
+		sortByFieldHeadline: 'Sortér efter felt',
+		sortByFieldSentence: 'Sortér alle underelementer efter',
+		sortByFieldDirectionLabel: 'Retning',
+		sortByFieldAscending: 'Stigende',
+		sortByFieldDescending: 'Faldende',
+		sortByFieldNameOption: 'Navn',
+		sortByFieldCreateDateOption: 'Oprettet',
+		sortByFieldUpdateDateOption: 'Sidst redigeret',
+		sortIndividuallyHeadline: 'Sortér individuelt',
+		sortByFieldCultureSentence: 'på',
+		sortByFieldCultureLabel: 'Sprog',
 	},
 	speechBubbles: {
 		editMultiContentPublishedPartialText: '%0% af %1% dokumenter udgivet.',
@@ -2476,10 +2490,12 @@ export default {
 		searchThisMessageWithGoogle: 'Søg efter denne besked på Google',
 		searchWithBing: 'Søg med Bing',
 		searchThisMessageWithBing: 'Søg efter denne besked på Bing',
-		searchOurUmbraco: 'Søg på Our Umbraco',
-		searchThisMessageOnOurUmbracoForumsAndDocs: 'Søg efter denne besked på Our Umbraco forum og dokumentation',
-		searchOurUmbracoWithGoogle: 'Søg på Our Umbraco med Google',
-		searchOurUmbracoForumsUsingGoogle: 'Søg på Our Umbraco forum med Google',
+		searchOurUmbraco: 'Søg på Umbraco forummet',
+		searchThisMessageOnOurUmbracoForumsAndDocs: 'Søg efter denne besked på Umbraco forummet',
+		searchOurUmbracoWithGoogle: 'Søg på Umbraco forummet med Google',
+		searchOurUmbracoForumsUsingGoogle: 'Søg på Umbraco forummet med Google',
+		searchUmbracoDocs: 'Søg i Umbraco dokumentationen',
+		searchThisMessageInUmbracoDocs: 'Søg efter denne besked i Umbraco dokumentationen',
 		searchUmbracoSource: 'Søg i Umbraco kildekoden',
 		searchWithinUmbracoSourceCodeOnGithub: 'Søg i Umbraco kildekoden på Github',
 		searchUmbracoIssues: 'Søg i Umbraco issues',
@@ -2526,7 +2542,12 @@ export default {
 		labelForCopyToClipboard: 'Kopier til udklipsholder',
 		confirmDeleteHeadline: 'Slet fra udklipsholderen',
 		confirmDeleteDescription: 'Er du sikker på at du vil slette <strong>{0}</strong> fra udklipsholderen?',
+		confirmClearDescription: 'Er du sikker på at du vil rydde udklipsholderen?',
+		confirmPasteHeadline: 'Indsæt fra udklipsholderen',
+		confirmPasteOverwriteMessage: (name: string) =>
+			`Egenskaben indeholder allerede en værdi. Indsæt fra egenskabsaktionen vil overskrive den nuværende værdi. Vil du erstatte den nuværende værdi med <strong>${name}</strong>?`,
 		copySuccessHeadline: 'Kopieret til udklipsholder',
+		noItemsMessage: 'Der er ingen elementer i udklipsholderen.',
 	},
 	propertyActions: {
 		tooltipForPropertyActionsMenu: 'Åbn egenskabshandlinger',
@@ -2954,5 +2975,118 @@ export default {
 		browseTab: 'Gennemse',
 		searchTab: 'Søg',
 		selectedCount: (count: number) => `${count} ${count === 1 ? 'element' : 'elementer'} valgt`,
+	},
+	searchExamine: {
+	  showFields: 'Vis felter',
+	  headline: 'Søgedokumentfelter',
+	  filterPlaceholder: 'Filtrer felter efter navn eller v\u00E6rdi...',
+	  filterLabel: 'Filtrer felter efter navn eller v\u00E6rdi',
+	  fieldCount: (count: number) => {
+	    switch (count) {
+	      case 1:
+	        return '1 felt';
+	      default:
+	        return `${count} felter`;
+	    }
+	  },
+	  tableColumnName: 'Navn',
+	  tableColumnValue: 'V\u00E6rdi',
+	  copyValue: 'Kopi\u00E9r v\u00E6rdi',
+	  seeMore: 'Se mere',
+	  seeLess: 'Se mindre',
+	  noFieldsMatch: 'Ingen felter matcher dit filter.',
+	  noFields: 'Dette dokument har ingen indekserede felter.',
+	  loadError: 'Kunne ikke indl\u00E6se dokumentfelter. Pr\u00F8v venligst igen.',
+	  valueIndex: (index: number) => `V\u00E6rdi ${index}`,
+	  fieldType: (type: string) => {
+	    switch (type) {
+	      case 'keywords':
+	        return 'N\u00F8gleord (eksakt match)';
+	      case 'texts':
+	        return 'Fuldtekst';
+	      case 'textsr1':
+	        return 'Fuldtekst (Boost: H\u00F8j)';
+	      case 'textsr2':
+	        return 'Fuldtekst (Boost: Medium)';
+	      case 'textsr3':
+	        return 'Fuldtekst (Boost: Lav)';
+	      case 'integers':
+	        return 'Heltal';
+	      case 'decimals':
+	        return 'Decimal';
+	      case 'datetimeoffsets':
+	        return 'Dato/tid';
+	      default:
+	        return type;
+	    }
+	  },
+	},
+	searchManagement: {
+		treeHeader: 'Søgning',
+		tableColumnAlias: 'Alias',
+		tableColumnHealthStatus: 'Status',
+		tableColumnDocumentCount: 'Antal dokumenter',
+		healthStatus: (status: string) => {
+			switch (status) {
+				case 'Empty':
+					return 'Tom';
+				case 'Corrupted':
+					return 'Fejl: Korrupt';
+				case 'Rebuilding':
+					return 'Gen-indekserer';
+				case 'Healthy':
+					return 'God';
+				default:
+					return 'Fejl: Ukendt';
+			}
+		},
+		documentCount: (cnt: number | string) => {
+			switch (cnt) {
+				case 0:
+					return 'Tom';
+				case 1:
+					return '1 dokument';
+				default:
+					return `${cnt} dokumenter`;
+			}
+		},
+		collectionActionReload: 'Opdater',
+		entityActionRebuildIndex: 'Genopbyg',
+		rebuildConfirmHeadline: 'Genopbyg indeks',
+		rebuildConfirmMessage:
+			'<strong>{0}</strong> genopbygges fra bunden. Søgning i indekset kan give <i>ufuldstændige resultater</i>, indtil genopbygningen er færdig.',
+		rebuildConfirmLabel: 'Genopbyg',
+		rebuildStartedMessage: 'Genopbygger {0} i baggrunden.',
+		rebuildCompletedTitle: 'Genopbygning fuldført',
+		rebuildCompletedMessage: '{0} er færdig med at genopbygge.',
+		indexInfo: 'Indeksinformation',
+		indexAlias: 'Alias',
+		providerName: 'Udbyder',
+		searchBox: 'Søg',
+		searchPlaceholder: 'Søg',
+		searchButton: 'Søg',
+		noResults: 'Ingen resultater',
+		resultsCount: (count: number) => `Fandt ${count} resultat${count !== 1 ? 'er' : ''}`,
+		tableColumnName: 'Navn',
+		tableColumnEntityType: 'Type',
+		statsBoxLabel: 'Statistik',
+		searchBoxLabel: 'Søgning',
+		// Accessibility labels
+		searching: 'Søger...',
+		searchFailed: 'Søgning fejlede',
+		searchComplete: (count: number) => `Søgning færdig. Fandt ${count} resultat${count !== 1 ? 'er' : ''}`,
+		openEntity: (type: string, id: string) => `Åbn ${type} med ID ${id}`,
+		searchFormLabel: (indexAlias: string) => `Søg i ${indexAlias} indeks`,
+		searchInputLabel: 'Søgeforespørgsel',
+		searchInputAriaLabel: (indexAlias: string) => `Indtast søgeforespørgsel for ${indexAlias} indeks`,
+		searchButtonAriaLabel: 'Udfør søgning',
+		searchHint: 'Tryk Enter for at søge',
+		loading: 'Indlæser søgeresultater',
+		resultsRegion: 'Søgeresultater',
+		resultsTable: 'Tabel med søgeresultater',
+		paginationLabel: 'Sider med søgeresultater',
+		cultureSelectLabel: 'Kultur',
+		searchDisabled: 'Søgning utilgængelig. Indeksstatus:',
+		searchError: 'Søgningen fejlede. Prøv igen.',
 	},
 } as UmbLocalizationDictionary;

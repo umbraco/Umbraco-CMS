@@ -1,14 +1,15 @@
-import type { ManifestWorkspaceContextMenuStructureKind, UmbStructureItemModel } from './types.js';
 import { UMB_MENU_STRUCTURE_WORKSPACE_CONTEXT } from './menu-structure-workspace-context.context-token.js';
 import { UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT } from './section-sidebar-menu/index.js';
+import type { ManifestWorkspaceContextMenuStructureKind, UmbStructureItemModel } from './types.js';
+import type { UmbMenuStructureWorkspaceContext } from './menu-structure-workspace-context.interface.js';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { debounce, linkEntityExpansionEntries } from '@umbraco-cms/backoffice/utils';
-import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbAncestorsEntityContext, UmbParentEntityContext, type UmbEntityModel } from '@umbraco-cms/backoffice/entity';
+import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
-import { UMB_MODAL_CONTEXT } from '@umbraco-cms/backoffice/modal';
-import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
+import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
+import { UMB_MODAL_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UMB_SECTION_CONTEXT } from '@umbraco-cms/backoffice/section';
 import {
 	UMB_SUBMITTABLE_TREE_ENTITY_WORKSPACE_CONTEXT,
@@ -22,19 +23,22 @@ interface UmbMenuTreeStructureWorkspaceContextBaseArgs {
 }
 
 // TODO: introduce base class for all menu structure workspaces to handle ancestors and parent
-export abstract class UmbMenuTreeStructureWorkspaceContextBase extends UmbContextBase {
+export abstract class UmbMenuTreeStructureWorkspaceContextBase
+	extends UmbContextBase
+	implements UmbMenuStructureWorkspaceContext
+{
 	manifest?: ManifestWorkspaceContextMenuStructureKind;
 
 	#workspaceContext?: typeof UMB_SUBMITTABLE_TREE_ENTITY_WORKSPACE_CONTEXT.TYPE;
-	#args: UmbMenuTreeStructureWorkspaceContextBaseArgs;
+	readonly #args: UmbMenuTreeStructureWorkspaceContextBaseArgs;
 
-	#structure = new UmbArrayState<UmbStructureItemModel>([], (x) => x.unique);
+	readonly #structure = new UmbArrayState<UmbStructureItemModel>([], (x) => x.unique);
 	public readonly structure = this.#structure.asObservable();
 
 	protected _sectionContext?: typeof UMB_SECTION_CONTEXT.TYPE;
 
-	#parentContext = new UmbParentEntityContext(this);
-	#ancestorContext = new UmbAncestorsEntityContext(this);
+	readonly #parentContext = new UmbParentEntityContext(this);
+	readonly #ancestorContext = new UmbAncestorsEntityContext(this);
 	#sectionSidebarMenuContext?: typeof UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT.TYPE;
 	#isModalContext: boolean = false;
 	#isNew: boolean | undefined = undefined;
@@ -42,7 +46,7 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase extends UmbContex
 	#structureRequestId = 0;
 
 	// Coalesces the unique/isNew/reload-event triggers when they fire in quick succession.
-	#requestStructure = debounce(() => this.#requestStructureImpl(), 100);
+	readonly #requestStructure = debounce(() => this.#requestStructureImpl(), 100);
 
 	constructor(host: UmbControllerHost, args: UmbMenuTreeStructureWorkspaceContextBaseArgs) {
 		super(host, UMB_MENU_STRUCTURE_WORKSPACE_CONTEXT);
@@ -79,15 +83,21 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase extends UmbContex
 				'observeUnique',
 			);
 
+			// isNew is observed on its own, separate from the structure fetch, so the expand decision never
+			// depends on which of the two happens to settle first: whichever settles last (isNew resolving to
+			// false, or the structure fetch resolving) is the one that actually triggers the expand.
 			this.observe(
 				this.#workspaceContext?.isNew,
-				(value) => {
-					// Workspace has changed from new to existing
-					if (value === false && this.#isNew === true) {
-						// TODO: We do not need to request here as we already know the structure and unique
+				(isNew) => {
+					// The item has just been created: the structure fetched while new was based on the parent (the
+					// item didn't exist yet), so it must be re-fetched using the item's own identity - otherwise the
+					// structure never ends with the item itself, which the breadcrumb relies on when trimming it.
+					if (isNew === false && this.#isNew === true) {
 						this.#requestStructure();
+					} else if (isNew === false) {
+						this.#tryExpandSectionSidebarMenu();
 					}
-					this.#isNew = value;
+					this.#isNew = isNew;
 				},
 				'observeIsNew',
 			);
@@ -121,7 +131,7 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase extends UmbContex
 		);
 	}
 
-	#onReloadStructureForEntityRequest = (event: UmbRequestReloadStructureForEntityEvent) => {
+	readonly #onReloadStructureForEntityRequest = (event: UmbRequestReloadStructureForEntityEvent) => {
 		if (!this.#isCurrentEntityOrAncestor(event.getEntityType(), event.getUnique())) return;
 		this.#requestStructure();
 	};
@@ -214,10 +224,25 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase extends UmbContex
 		this.#structure.setValue(structureItems);
 		this.#setParentData(structureItems);
 
+		this.#tryExpandSectionSidebarMenu();
+	}
+
+	/**
+	 * Expands the parent in the section sidebar menu, but only once we know for certain the item isn't still being
+	 * created, and only once the structure has actually been fetched. Reads both conditions fresh, so it's safe to
+	 * call from either the structure-fetch completion or the isNew observer, whichever settles last.
+	 */
+	#tryExpandSectionSidebarMenu() {
 		const menuItemAlias = this.manifest?.meta?.menuItemAlias;
-		if (menuItemAlias && !this.#isModalContext) {
-			this.#expandSectionSidebarMenu(structureItems, menuItemAlias);
-		}
+		if (!menuItemAlias || this.#isModalContext) return;
+
+		// Don't expand the parent for an item that hasn't been created yet.
+		if (this.#workspaceContext?.getIsNew() !== false) return;
+
+		const structureItems = this.#structure.getValue();
+		if (!structureItems.length) return;
+
+		this.#expandSectionSidebarMenu(structureItems, menuItemAlias);
 	}
 
 	#clearStructure() {
