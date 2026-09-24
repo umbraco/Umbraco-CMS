@@ -1,32 +1,25 @@
 import { UMB_USER_WORKSPACE_CONTEXT } from '../../user-workspace.context-token.js';
-import { css, customElement, html, ifDefined, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, ifDefined, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
-import { UmbPropertyDatasetContextBase } from '@umbraco-cms/backoffice/property';
+import type { UmbPropertyDatasetElement, UmbPropertyValueData } from '@umbraco-cms/backoffice/property';
 import type { PropertyEditorSettingsProperty, UmbStartNodeAccessValue } from '@umbraco-cms/backoffice/property-editor';
 
 @customElement('umb-user-workspace-assign-access')
 export class UmbUserWorkspaceAssignAccessElement extends UmbLitElement {
 	#workspaceContext?: typeof UMB_USER_WORKSPACE_CONTEXT.TYPE;
 
-	readonly #dataset = new UmbPropertyDatasetContextBase(this);
+	@state()
+	private _values: Array<UmbPropertyValueData> = [
+		{ alias: 'userGroups', value: [] },
+		{ alias: 'documentAccess', value: { rootAccess: false, startNodes: [] } },
+		{ alias: 'mediaAccess', value: { rootAccess: false, startNodes: [] } },
+		{ alias: 'elementAccess', value: { rootAccess: false, startNodes: [] } },
+	];
 
 	constructor() {
 		super();
-
-		this.#observeDatasetProperty<Array<UmbReferenceByUnique>>('userGroups', (value) =>
-			this.#workspaceContext?.setUserGroups(value ?? []),
-		);
-		this.#observeDatasetProperty<UmbStartNodeAccessValue>('documentAccess', (value) =>
-			value ? this.#workspaceContext?.setDocumentAccess(value) : undefined,
-		);
-		this.#observeDatasetProperty<UmbStartNodeAccessValue>('mediaAccess', (value) =>
-			value ? this.#workspaceContext?.setMediaAccess(value) : undefined,
-		);
-		this.#observeDatasetProperty<UmbStartNodeAccessValue>('elementAccess', (value) =>
-			value ? this.#workspaceContext?.setElementAccess(value) : undefined,
-		);
 
 		this.consumeContext(UMB_USER_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance;
@@ -34,45 +27,59 @@ export class UmbUserWorkspaceAssignAccessElement extends UmbLitElement {
 
 			this.observe(
 				instance.userGroupUniques,
-				(value) => this.#dataset.setPropertyValue('userGroups', value ?? []),
+				(value) => this.#setValue('userGroups', value ?? []),
 				'_observeUserGroupAccess',
 			);
 
 			this.observe(
 				observeMultiple([instance.hasDocumentRootAccess, instance.documentStartNodeUniques]),
 				([rootAccess, startNodes]) =>
-					this.#dataset.setPropertyValue('documentAccess', {
-						rootAccess: rootAccess ?? false,
-						startNodes: startNodes ?? [],
-					}),
+					this.#setValue('documentAccess', { rootAccess: rootAccess ?? false, startNodes: startNodes ?? [] }),
 				'_observeDocumentAccess',
 			);
 
 			this.observe(
 				observeMultiple([instance.hasMediaRootAccess, instance.mediaStartNodeUniques]),
 				([rootAccess, startNodes]) =>
-					this.#dataset.setPropertyValue('mediaAccess', {
-						rootAccess: rootAccess ?? false,
-						startNodes: startNodes ?? [],
-					}),
+					this.#setValue('mediaAccess', { rootAccess: rootAccess ?? false, startNodes: startNodes ?? [] }),
 				'_observeMediaAccess',
 			);
+
 			this.observe(
 				observeMultiple([instance.hasElementRootAccess, instance.elementStartNodeUniques]),
 				([rootAccess, startNodes]) =>
-					this.#dataset.setPropertyValue('elementAccess', {
-						rootAccess: rootAccess ?? false,
-						startNodes: startNodes ?? [],
-					}),
+					this.#setValue('elementAccess', { rootAccess: rootAccess ?? false, startNodes: startNodes ?? [] }),
 				'_observeElementAccess',
 			);
 		});
 	}
 
-	#observeDatasetProperty<ValueType>(alias: string, callback: (value: ValueType | undefined) => void) {
-		this.#dataset.propertyValueByAlias<ValueType>(alias).then((valueSource) => {
-			this.observe(valueSource, callback, `_observeDatasetProperty_${alias}`);
-		});
+	#setValue(alias: string, value: unknown) {
+		this._values = this._values.map((entry) => (entry.alias === alias ? { alias, value } : entry));
+	}
+
+	#onChange(event: Event & { target: UmbPropertyDatasetElement }) {
+		const values = event.target.value;
+
+		const userGroups = values.find((entry) => entry.alias === 'userGroups')?.value as
+			| Array<UmbReferenceByUnique>
+			| undefined;
+		this.#workspaceContext?.setUserGroups(userGroups ?? []);
+
+		const documentAccess = values.find((entry) => entry.alias === 'documentAccess')?.value as
+			| UmbStartNodeAccessValue
+			| undefined;
+		if (documentAccess) this.#workspaceContext?.setDocumentAccess(documentAccess);
+
+		const mediaAccess = values.find((entry) => entry.alias === 'mediaAccess')?.value as
+			| UmbStartNodeAccessValue
+			| undefined;
+		if (mediaAccess) this.#workspaceContext?.setMediaAccess(mediaAccess);
+
+		const elementAccess = values.find((entry) => entry.alias === 'elementAccess')?.value as
+			| UmbStartNodeAccessValue
+			| undefined;
+		if (elementAccess) this.#workspaceContext?.setElementAccess(elementAccess);
 	}
 
 	#getFields(): Array<PropertyEditorSettingsProperty> {
@@ -110,19 +117,21 @@ export class UmbUserWorkspaceAssignAccessElement extends UmbLitElement {
 	override render() {
 		return html`
 			<uui-box .headline=${this.localize.term('user_assignAccess')}>
-				${repeat(
-					this.#getFields(),
-					(field) => field.alias,
-					(field) => html`
-						<umb-property
-							alias=${field.alias}
-							label=${field.label}
-							description=${ifDefined(field.description)}
-							property-editor-ui-alias=${field.propertyEditorUiAlias}
-							.config=${field.config}>
-						</umb-property>
-					`,
-				)}
+				<umb-property-dataset .value=${this._values} @change=${this.#onChange}>
+					${repeat(
+						this.#getFields(),
+						(field) => field.alias,
+						(field) => html`
+							<umb-property
+								alias=${field.alias}
+								label=${field.label}
+								description=${ifDefined(field.description)}
+								property-editor-ui-alias=${field.propertyEditorUiAlias}
+								.config=${field.config}>
+							</umb-property>
+						`,
+					)}
+				</umb-property-dataset>
 			</uui-box>
 		`;
 	}
