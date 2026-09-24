@@ -68,7 +68,9 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 	{
 		type: 'workspaceView',
 		kind: 'tree',
-		alias: 'Umb.WorkspaceView.Script.Tree',
+		// TODO (V20): rename alias to 'Umb.WorkspaceView.Script.Tree' — kept as the old
+		// TreeItemChildrenCollection alias so existing plugin conditions/overrides don't break.
+		alias: 'Umb.WorkspaceView.Script.TreeItemChildrenCollection',
 		name: 'Script Tree Item Children Workspace View',
 		meta: {
 			label: '#tree_children',
