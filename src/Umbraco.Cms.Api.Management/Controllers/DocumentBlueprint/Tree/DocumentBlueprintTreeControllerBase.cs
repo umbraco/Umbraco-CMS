@@ -91,4 +91,16 @@ public class DocumentBlueprintTreeControllerBase : FolderTreeControllerBase<Docu
             }
             return responseModel;
         }).ToArray();
+
+    protected override DocumentBlueprintTreeItemResponseModel MapTreeItemViewModel(Guid? parentKey, IEntitySlim entity)
+    {
+        DocumentBlueprintTreeItemResponseModel responseModel = base.MapTreeItemViewModel(parentKey, entity);
+
+        if (entity is IDocumentEntitySlim documentEntitySlim)
+        {
+            responseModel.Variants = _documentPresentationFactory.CreateVariantsItemResponseModels(documentEntitySlim);
+        }
+
+        return responseModel;
+    }
 }

@@ -43420,7 +43420,8 @@
           "hasChildren",
           "id",
           "isFolder",
-          "name"
+          "name",
+          "variants"
         ],
         "type": "object",
         "properties": {
@@ -43462,6 +43463,16 @@
               }
             ],
             "nullable": true
+          },
+          "variants": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DocumentVariantItemResponseModel"
+                }
+              ]
+            }
           }
         },
         "additionalProperties": false
