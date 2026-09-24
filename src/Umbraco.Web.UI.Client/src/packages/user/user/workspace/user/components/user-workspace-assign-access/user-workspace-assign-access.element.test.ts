@@ -1,7 +1,6 @@
 import { UMB_USER_WORKSPACE_CONTEXT } from '../../user-workspace.context-token.js';
 import { UMB_USER_ENTITY_TYPE } from '../../../../entity.js';
-import type { UmbUserWorkspaceAssignAccessElement } from './user-workspace-assign-access.element.js';
-import './user-workspace-assign-access.element.js';
+import { UmbUserWorkspaceAssignAccessElement } from './user-workspace-assign-access.element.js';
 import { aTimeout, expect, fixture, html } from '@open-wc/testing';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
@@ -107,7 +106,7 @@ describe('UmbUserWorkspaceAssignAccessElement', () => {
 	}
 
 	it('is defined with its own instance', () => {
-		expect(element).to.exist;
+		expect(element).to.be.instanceOf(UmbUserWorkspaceAssignAccessElement);
 	});
 
 	describe('workspace context → property dataset', () => {

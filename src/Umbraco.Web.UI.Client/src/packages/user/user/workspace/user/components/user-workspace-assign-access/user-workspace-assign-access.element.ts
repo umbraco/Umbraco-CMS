@@ -57,9 +57,10 @@ export class UmbUserWorkspaceAssignAccessElement extends UmbLitElement {
 		});
 	}
 
-	async #observeDatasetProperty<ValueType>(alias: string, callback: (value: ValueType | undefined) => void) {
-		const valueSource = await this.#dataset.propertyValueByAlias<ValueType>(alias);
-		this.observe(valueSource, callback, `_observeDatasetProperty_${alias}`);
+	#observeDatasetProperty<ValueType>(alias: string, callback: (value: ValueType | undefined) => void) {
+		this.#dataset.propertyValueByAlias<ValueType>(alias).then((valueSource) => {
+			this.observe(valueSource, callback, `_observeDatasetProperty_${alias}`);
+		});
 	}
 
 	#getFields(): Array<PropertyEditorSettingsProperty> {
