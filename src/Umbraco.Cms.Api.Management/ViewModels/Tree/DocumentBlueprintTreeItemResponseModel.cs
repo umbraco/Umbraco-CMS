@@ -13,8 +13,6 @@ public class DocumentBlueprintTreeItemResponseModel : FolderTreeItemResponseMode
     /// </summary>
     public DocumentTypeReferenceResponseModel? DocumentType { get; set; }
 
-    /// <summary>
-    /// Gets or sets the collection of variants for the item. Folders have a single invariant variant.
-    /// </summary>
+    /// Gets or sets the collection of variants for document blueprint items. Folders have no variants.
     public IEnumerable<DocumentVariantItemResponseModel> Variants { get; set; } = Enumerable.Empty<DocumentVariantItemResponseModel>();
 }
