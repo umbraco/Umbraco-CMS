@@ -169,26 +169,27 @@ export class UmbHintController<
 	#propagateHints = (hints: Array<UmbHint>) => {
 		if (!this.#parent) return;
 
-		this.#parent!.initiateChange();
+		this.#parent.initiateChange();
 
 		const viewAlias = this.getViewAlias();
 
-		hints.forEach((hint) => {
+		// Remove hints that are not in the local hints anymore:
+		const toRemove = this.#parentHints?.filter((hint) => !hints.find((m) => m.unique === hint.unique));
+		if (toRemove) {
+			this.#parent.remove(toRemove.map((hint) => hint.unique));
+		}
+
+		const newHints = hints.map((hint) => {
 			let newPath = hint.path;
 			// If the hint path does not already contain the parent view alias as the first entry, we add it. (This will usually happen, but some Hint Contexts does not have a view alias) [NL]
 			if (viewAlias && newPath[0] !== viewAlias) {
 				newPath = [viewAlias, ...hint.path];
 			}
-			this.#parent!.addOne({ ...hint, path: newPath });
+			return { ...hint, path: newPath };
 		});
+		this.#parent.add(newHints);
 
-		// Remove hints that are not in the local hints anymore:
-		const toRemove = this.#parentHints?.filter((hint) => !hints.find((m) => m.unique === hint.unique));
-		if (toRemove) {
-			this.#parent!.remove(toRemove.map((hint) => hint.unique));
-		}
-
-		this.#parent!.finishChange();
+		this.#parent.finishChange();
 	};
 
 	initiateChange() {
