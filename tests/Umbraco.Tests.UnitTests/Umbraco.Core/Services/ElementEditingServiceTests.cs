@@ -75,6 +75,27 @@ public class ElementEditingServiceTests
         Assert.AreEqual("value", element.GetValue("message"));
     }
 
+    [Test]
+    public void Values_The_Content_Type_Cannot_Hold_In_Their_Variation_Are_Ignored()
+    {
+        // block values carry the variation they were stored under, which is the block's own variance
+        // intersected with whatever contained it. Lifted out, that intersection no longer applies, and
+        // SetValue throws on a variation the property type does not support - a 500 over one stale value.
+        IContentType elementType = CreateElementType();
+        IElement element = new Element("element", elementType);
+
+        Assert.DoesNotThrow(() => ElementEditingService.ApplyStoredValues(
+            element,
+            elementType,
+            [
+                new BlockPropertyValue { Alias = "message", Value = "cultured", Culture = "en-US" },
+                new BlockPropertyValue { Alias = "message", Value = "segmented", Segment = "mobile" },
+                new BlockPropertyValue { Alias = "message", Value = "invariant" },
+            ]));
+
+        Assert.AreEqual("invariant", element.GetValue("message"));
+    }
+
     private static IContentType CreateElementType()
         => new ContentTypeBuilder()
             .WithIsElement(true)

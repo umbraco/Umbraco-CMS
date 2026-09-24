@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 /// <summary>
 /// Handles value variance for the Block Editor property editor, determining how property values differ based on culture and segment.
 /// </summary>
-public sealed class BlockEditorVarianceHandler
+public sealed class BlockEditorVarianceHandler : IBlockEditorVarianceHandler
 {
     private readonly ILanguageService _languageService;
     private readonly IContentTypeService _contentTypeService;

@@ -9,6 +9,7 @@ using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.Changes;
 using Umbraco.Cms.Core.Services.Filters;
@@ -30,6 +31,7 @@ internal sealed class ElementEditingService
     private readonly IAuditService _auditService;
     private readonly IRelationService _relationService;
     private readonly IBlockElementResolver _blockElementResolver;
+    private readonly IBlockEditorVarianceHandler _blockEditorVarianceHandler;
 
     public ElementEditingService(
         IElementService elementService,
@@ -49,7 +51,8 @@ internal sealed class ElementEditingService
         ILanguageService languageService,
         IUserService userService,
         IAuditService auditService,
-        IBlockElementResolver blockElementResolver)
+        IBlockElementResolver blockElementResolver,
+        IBlockEditorVarianceHandler blockEditorVarianceHandler)
         : base(
             elementService,
             contentTypeService,
@@ -75,6 +78,7 @@ internal sealed class ElementEditingService
         _auditService = auditService;
         _relationService = relationService;
         _blockElementResolver = blockElementResolver;
+        _blockEditorVarianceHandler = blockEditorVarianceHandler;
     }
 
     /// <inheritdoc/>
@@ -183,10 +187,17 @@ internal sealed class ElementEditingService
             element.Key = createModel.Key.Value;
         }
 
+        // the variation on a block's stored values is its own variance intersected with whatever contained it.
+        // Standing alone, the element's own type is the whole story, so the values are realigned to it before
+        // they are applied - otherwise a value stored under a variation the element cannot hold is dropped.
+        IList<BlockPropertyValue> values = await _blockEditorVarianceHandler.AlignPropertyVarianceAsync(
+            [.. source.Result.Values.Where(value => value.PropertyType is not null)],
+            culture: null);
+
         // the element is created as a draft holding what the block holds. Publishing it is the editor's to do,
         // the same as for any other element they have not published yet.
-        ApplyNames(element, elementType, createModel.Name, source.Result.Values.Select(value => value.Culture));
-        ApplyStoredValues(element, elementType, source.Result.Values);
+        ApplyNames(element, elementType, createModel.Name, values.Select(value => value.Culture));
+        ApplyStoredValues(element, elementType, values);
 
         ContentEditingOperationStatus saveStatus = await SaveAsync(element, userKey);
         if (saveStatus is not ContentEditingOperationStatus.Success)
@@ -211,7 +222,8 @@ internal sealed class ElementEditingService
 
         foreach (BlockPropertyValue value in values)
         {
-            if (propertyTypesByAlias.ContainsKey(value.Alias) is false)
+            if (propertyTypesByAlias.TryGetValue(value.Alias, out IPropertyType? propertyType) is false
+                || propertyType.SupportsVariation(value.Culture, value.Segment) is false)
             {
                 continue;
             }
@@ -237,8 +249,8 @@ internal sealed class ElementEditingService
         }
     }
 
-    // an alias the element type does not have cannot be stored at all - SetValue throws on it, which would
-    // take down the whole operation over a single stale value.
+    // an alias the element type does not have, or a variation it does not support, cannot be stored at all -
+    // SetValue throws on either, which would take down the whole operation over a single stale value.
     private static Dictionary<string, IPropertyType> PropertyTypesByAlias(IContentType elementType)
         => elementType.CompositionPropertyTypes.ToDictionary(propertyType => propertyType.Alias);
 

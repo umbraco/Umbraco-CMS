@@ -176,6 +176,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<BlockGridPropertyValueConstructorCache>();
         builder.Services.AddSingleton<RichTextBlockPropertyValueConstructorCache>();
         builder.Services.AddSingleton<BlockEditorVarianceHandler>();
+        builder.Services.AddSingleton<IBlockEditorVarianceHandler>(factory => factory.GetRequiredService<BlockEditorVarianceHandler>());
 
         // register *all* checks, except those marked [HideFromTypeFinder] of course
         builder.Services.AddSingleton<Core.HealthChecks.NotificationMethods.IMarkdownToHtmlConverter, MarkdownToHtmlConverter>();
