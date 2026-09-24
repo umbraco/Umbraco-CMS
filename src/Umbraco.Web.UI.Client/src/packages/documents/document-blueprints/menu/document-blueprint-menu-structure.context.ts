@@ -1,9 +1,9 @@
 import { UMB_DOCUMENT_BLUEPRINT_TREE_REPOSITORY_ALIAS } from '../tree/index.js';
-import { UmbMenuTreeStructureWorkspaceContextBase } from '@umbraco-cms/backoffice/menu';
+import { UmbMenuVariantTreeStructureWorkspaceContextBase } from '@umbraco-cms/backoffice/menu';
 
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
-export class UmbDocumentBlueprintMenuStructureWorkspaceContext extends UmbMenuTreeStructureWorkspaceContextBase {
+export class UmbDocumentBlueprintMenuStructureWorkspaceContext extends UmbMenuVariantTreeStructureWorkspaceContextBase {
 	constructor(host: UmbControllerHost) {
 		super(host, { treeRepositoryAlias: UMB_DOCUMENT_BLUEPRINT_TREE_REPOSITORY_ALIAS });
 	}
