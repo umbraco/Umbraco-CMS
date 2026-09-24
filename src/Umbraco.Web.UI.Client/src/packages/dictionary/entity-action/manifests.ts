@@ -1,7 +1,7 @@
 import { UMB_DICTIONARY_ENTITY_TYPE, UMB_DICTIONARY_ROOT_ENTITY_TYPE } from '../entity.js';
 import { UMB_DICTIONARY_DETAIL_REPOSITORY_ALIAS, UMB_DICTIONARY_ITEM_REPOSITORY_ALIAS } from '../repository/index.js';
 import { manifests as moveManifests } from './move-to/manifests.js';
-import { UMB_ACTION_GROUP_IMPORT_EXPORT, UMB_ACTION_GROUP_CREATE } from '@umbraco-cms/backoffice/action';
+import { UMB_ACTION_GROUP_TRANSFER, UMB_ACTION_GROUP_CREATE } from '@umbraco-cms/backoffice/action';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -23,7 +23,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'entityAction',
 		kind: 'default',
 		alias: 'Umb.EntityAction.Dictionary.Export',
-		group: UMB_ACTION_GROUP_IMPORT_EXPORT,
+		group: UMB_ACTION_GROUP_TRANSFER,
 		name: 'Export Dictionary Entity Action',
 		weight: 400,
 		api: () => import('./export/export.action.js'),
@@ -38,7 +38,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'entityAction',
 		kind: 'default',
 		alias: 'Umb.EntityAction.Dictionary.Import',
-		group: UMB_ACTION_GROUP_IMPORT_EXPORT,
+		group: UMB_ACTION_GROUP_TRANSFER,
 		name: 'Import Dictionary Entity Action',
 		weight: 300,
 		api: () => import('./import/import.action.js'),
