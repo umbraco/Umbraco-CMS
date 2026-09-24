@@ -15,6 +15,12 @@ export interface ManifestWorkspaceActionMenuItem<
 	 * @required
 	 */
 	forWorkspaceActions: string | string[];
+	/**
+	 * The group this action belongs to. Actions are still ordered by `weight`; a separator is rendered
+	 * between two adjacent actions whose groups differ. Actions without a group form a group of their own.
+	 * @example 'publishing'
+	 */
+	group?: string;
 	meta: MetaType;
 }
 

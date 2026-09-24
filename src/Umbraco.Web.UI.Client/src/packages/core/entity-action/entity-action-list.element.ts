@@ -3,9 +3,13 @@ import type { ManifestEntityAction, MetaEntityAction } from './entity-action.ext
 import { UmbEntityContext, UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
 import { html, customElement, property, state, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbApiConstructorArgumentsMethodType } from '@umbraco-cms/backoffice/extension-api';
+import type {
+	UmbApiConstructorArgumentsMethodType,
+	UmbExtensionElementAndApiInitializer,
+} from '@umbraco-cms/backoffice/extension-api';
 import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
+import { umbRenderGroupSeparator } from '@umbraco-cms/backoffice/extension-registry';
 
 const umbEntityActionListDeprecation = new UmbDeprecation({
 	deprecated: 'The `entityType` and `unique` properties on `<umb-entity-action-list>`.',
@@ -101,6 +105,20 @@ export class UmbEntityActionListElement extends UmbLitElement {
 	#firstEntityAction?: HTMLElement;
 
 	#hasRenderedOnce?: boolean;
+	#previousManifest?: ManifestEntityAction;
+
+	#renderEntityAction = (ext: UmbExtensionElementAndApiInitializer<ManifestEntityAction>, i: number) => {
+		if (!this.#hasRenderedOnce && i === 0) {
+			this.#firstEntityAction = ext.component;
+			this.#firstEntityAction?.focus();
+			this.#hasRenderedOnce = true;
+		}
+
+		const previous = i === 0 ? undefined : this.#previousManifest;
+		this.#previousManifest = ext.manifest;
+		return html`${umbRenderGroupSeparator(previous, ext.manifest!)}${ext.component}`;
+	};
+
 	override render() {
 		return this._filter
 			? html`
@@ -109,14 +127,7 @@ export class UmbEntityActionListElement extends UmbLitElement {
 						.filter=${this._filter}
 						.elementProps=${this._props}
 						.apiArgs=${this._apiArgs}
-						.renderMethod=${(ext: any, i: number) => {
-							if (!this.#hasRenderedOnce && i === 0) {
-								this.#firstEntityAction = ext.component;
-								this.#firstEntityAction?.focus();
-								this.#hasRenderedOnce = true;
-							}
-							return ext.component;
-						}}></umb-extension-with-api-slot>
+						.renderMethod=${this.#renderEntityAction}></umb-extension-with-api-slot>
 				`
 			: '';
 	}

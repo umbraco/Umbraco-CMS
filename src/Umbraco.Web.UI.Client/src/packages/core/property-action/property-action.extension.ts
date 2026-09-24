@@ -8,6 +8,12 @@ export interface ManifestPropertyAction<MetaType extends MetaPropertyAction = Me
 		ManifestWithDynamicConditions<UmbExtensionConditionConfig> {
 	type: 'propertyAction';
 	forPropertyEditorUis: string[];
+	/**
+	 * The group this action belongs to. Actions are still ordered by `weight`; a separator is rendered
+	 * between two adjacent actions whose groups differ. Actions without a group form a group of their own.
+	 * @example 'clipboard'
+	 */
+	group?: string;
 	meta: MetaType;
 }
 
