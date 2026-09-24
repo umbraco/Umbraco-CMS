@@ -32,9 +32,7 @@ export class UmbBindServerValidationToFormControl extends UmbControllerBase {
 			// If not valid lets see if we should remove server validation [NL]
 			if (!defaultMemoization(this.#value, value) && this.#isValid === false) {
 				this.#value = value;
-				// Only remove server validations from validation context [NL]
-				const toRemove = this.#messages.filter((x) => x.type === 'server').map((msg) => msg.key);
-				this.#context?.messages?.removeMessageByKeys(toRemove);
+				this.#clear();
 			}
 		}
 	}
@@ -68,7 +66,8 @@ export class UmbBindServerValidationToFormControl extends UmbControllerBase {
 				() => this.#messages.map((x) => x.body).join(', '),
 				() => this.#isValid === false,
 			);
-			//this.#control.addEventListener('change', this.#onControlChange);
+			this.#value = this.#control.value;
+			this.#control.addEventListener('change', this.#onChange);
 		}
 		this.#control.checkValidity();
 	}
@@ -76,10 +75,24 @@ export class UmbBindServerValidationToFormControl extends UmbControllerBase {
 	#demolish() {
 		if (!this.#control || !this.#controlValidator) return;
 
+		this.#value = this.#control.value;
 		this.#control.removeValidator(this.#controlValidator);
-		//this.#control.removeEventListener('change', this.#onControlChange);
+		this.#control.removeEventListener('change', this.#onChange);
 		this.#controlValidator = undefined;
 		this.#control.checkValidity();
+	}
+
+	#onChange = (): void => {
+		if (!defaultMemoization(this.#value, this.#control.value) && this.#isValid === false) {
+			this.#value = this.#control.value;
+			this.#clear();
+		}
+	};
+
+	#clear(): void {
+		// Only remove server validations from validation context [NL]
+		const toRemove = this.#messages.filter((x) => x.type === 'server').map((msg) => msg.key);
+		this.#context?.messages?.removeMessageByKeys(toRemove);
 	}
 
 	validate(): Promise<void> {

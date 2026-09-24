@@ -393,9 +393,6 @@ export class UmbPropertyElement extends UmbLitElement {
 					(value) => {
 						// Set the value on the element:
 						this._element!.value = value;
-						if (this.#validationMessageBinder) {
-							this.#validationMessageBinder.value = value;
-						}
 					},
 					null,
 				);
@@ -453,7 +450,6 @@ export class UmbPropertyElement extends UmbLitElement {
 		this.#controlValidator = new UmbFormControlValidator(this, this._element as any, dataPath);
 		if (dataPath) {
 			this.#validationMessageBinder = new UmbBindServerValidationToFormControl(this, this._element as any, dataPath);
-			this.#validationMessageBinder.value = this.#propertyContext.getValue();
 		}
 	}
 
