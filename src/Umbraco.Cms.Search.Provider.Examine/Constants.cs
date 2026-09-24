@@ -85,7 +85,7 @@ internal static class Constants
     }
 
     /// <summary>
-    /// Names of this provider's own system fields (distinct from <see cref="Umbraco.Cms.Search.Core.Constants.FieldNames"/>).
+    /// Names of this provider's own system fields (distinct from <see cref="Umbraco.Cms.Core.Constants.IndexFieldNames"/>).
     /// </summary>
     public static class SystemFields
     {

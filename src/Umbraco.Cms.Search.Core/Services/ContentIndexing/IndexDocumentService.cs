@@ -1,8 +1,6 @@
 ﻿using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Scoping;
-using Umbraco.Cms.Search.Core.Models.Indexing;
-using Umbraco.Cms.Search.Core.Models.Persistence;
-using Umbraco.Cms.Search.Core.Persistence;
+using Umbraco.Cms.Core.Search.Indexing;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Search.Core.Services.ContentIndexing;

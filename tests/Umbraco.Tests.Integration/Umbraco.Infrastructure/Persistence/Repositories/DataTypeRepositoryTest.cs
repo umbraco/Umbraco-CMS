@@ -4,11 +4,12 @@
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
-using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Tests.Common.Builders;
@@ -374,7 +375,7 @@ internal sealed class DataTypeRepositoryTest : UmbracoIntegrationTest
             .WithId(0)
             .WithName("Test Data Type")
             .AddEditor()
-                .WithAlias(Cms.Core.Constants.PropertyEditors.Aliases.TextBox)
+                .WithAlias(Constants.PropertyEditors.Aliases.TextBox)
                 .Done()
             .Build();
 

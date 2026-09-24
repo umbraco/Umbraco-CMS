@@ -2976,4 +2976,117 @@ export default {
 		searchTab: 'Søg',
 		selectedCount: (count: number) => `${count} ${count === 1 ? 'element' : 'elementer'} valgt`,
 	},
+	searchExamine: {
+	  showFields: 'Vis felter',
+	  headline: 'Søgedokumentfelter',
+	  filterPlaceholder: 'Filtrer felter efter navn eller v\u00E6rdi...',
+	  filterLabel: 'Filtrer felter efter navn eller v\u00E6rdi',
+	  fieldCount: (count: number) => {
+	    switch (count) {
+	      case 1:
+	        return '1 felt';
+	      default:
+	        return `${count} felter`;
+	    }
+	  },
+	  tableColumnName: 'Navn',
+	  tableColumnValue: 'V\u00E6rdi',
+	  copyValue: 'Kopi\u00E9r v\u00E6rdi',
+	  seeMore: 'Se mere',
+	  seeLess: 'Se mindre',
+	  noFieldsMatch: 'Ingen felter matcher dit filter.',
+	  noFields: 'Dette dokument har ingen indekserede felter.',
+	  loadError: 'Kunne ikke indl\u00E6se dokumentfelter. Pr\u00F8v venligst igen.',
+	  valueIndex: (index: number) => `V\u00E6rdi ${index}`,
+	  fieldType: (type: string) => {
+	    switch (type) {
+	      case 'keywords':
+	        return 'N\u00F8gleord (eksakt match)';
+	      case 'texts':
+	        return 'Fuldtekst';
+	      case 'textsr1':
+	        return 'Fuldtekst (Boost: H\u00F8j)';
+	      case 'textsr2':
+	        return 'Fuldtekst (Boost: Medium)';
+	      case 'textsr3':
+	        return 'Fuldtekst (Boost: Lav)';
+	      case 'integers':
+	        return 'Heltal';
+	      case 'decimals':
+	        return 'Decimal';
+	      case 'datetimeoffsets':
+	        return 'Dato/tid';
+	      default:
+	        return type;
+	    }
+	  },
+	},
+	searchManagement: {
+		treeHeader: 'Søgning',
+		tableColumnAlias: 'Alias',
+		tableColumnHealthStatus: 'Status',
+		tableColumnDocumentCount: 'Antal dokumenter',
+		healthStatus: (status: string) => {
+			switch (status) {
+				case 'Empty':
+					return 'Tom';
+				case 'Corrupted':
+					return 'Fejl: Korrupt';
+				case 'Rebuilding':
+					return 'Gen-indekserer';
+				case 'Healthy':
+					return 'God';
+				default:
+					return 'Fejl: Ukendt';
+			}
+		},
+		documentCount: (cnt: number | string) => {
+			switch (cnt) {
+				case 0:
+					return 'Tom';
+				case 1:
+					return '1 dokument';
+				default:
+					return `${cnt} dokumenter`;
+			}
+		},
+		collectionActionReload: 'Opdater',
+		entityActionRebuildIndex: 'Genopbyg',
+		rebuildConfirmHeadline: 'Genopbyg indeks',
+		rebuildConfirmMessage:
+			'<strong>{0}</strong> genopbygges fra bunden. Søgning i indekset kan give <i>ufuldstændige resultater</i>, indtil genopbygningen er færdig.',
+		rebuildConfirmLabel: 'Genopbyg',
+		rebuildStartedMessage: 'Genopbygger {0} i baggrunden.',
+		rebuildCompletedTitle: 'Genopbygning fuldført',
+		rebuildCompletedMessage: '{0} er færdig med at genopbygge.',
+		indexInfo: 'Indeksinformation',
+		indexAlias: 'Alias',
+		providerName: 'Udbyder',
+		searchBox: 'Søg',
+		searchPlaceholder: 'Søg',
+		searchButton: 'Søg',
+		noResults: 'Ingen resultater',
+		resultsCount: (count: number) => `Fandt ${count} resultat${count !== 1 ? 'er' : ''}`,
+		tableColumnName: 'Navn',
+		tableColumnEntityType: 'Type',
+		statsBoxLabel: 'Statistik',
+		searchBoxLabel: 'Søgning',
+		// Accessibility labels
+		searching: 'Søger...',
+		searchFailed: 'Søgning fejlede',
+		searchComplete: (count: number) => `Søgning færdig. Fandt ${count} resultat${count !== 1 ? 'er' : ''}`,
+		openEntity: (type: string, id: string) => `Åbn ${type} med ID ${id}`,
+		searchFormLabel: (indexAlias: string) => `Søg i ${indexAlias} indeks`,
+		searchInputLabel: 'Søgeforespørgsel',
+		searchInputAriaLabel: (indexAlias: string) => `Indtast søgeforespørgsel for ${indexAlias} indeks`,
+		searchButtonAriaLabel: 'Udfør søgning',
+		searchHint: 'Tryk Enter for at søge',
+		loading: 'Indlæser søgeresultater',
+		resultsRegion: 'Søgeresultater',
+		resultsTable: 'Tabel med søgeresultater',
+		paginationLabel: 'Sider med søgeresultater',
+		cultureSelectLabel: 'Kultur',
+		searchDisabled: 'Søgning utilgængelig. Indeksstatus:',
+		searchError: 'Søgningen fejlede. Prøv igen.',
+	},
 } as UmbLocalizationDictionary;
