@@ -549,7 +549,7 @@ public class BlockListPropertyValueHandlerTests : PropertyValueHandlerTestsBase
                     Values = [new () { Alias = "textBoxValue", Value = "Shared block value" }]
                 }
             ],
-            Expose = [new BlockItemVariation(sharedElementKey, null, null)]
+            Expose = [new BlockItemVariation(sharedElementKey, null)]
         };
 
         var enElementKey = Guid.NewGuid();
@@ -561,7 +561,7 @@ public class BlockListPropertyValueHandlerTests : PropertyValueHandlerTestsBase
                     Values = [new () { Alias = "textBoxValue", Value = "Variant block value EN" }]
                 }
             ],
-            Expose = [new BlockItemVariation(enElementKey, null, null)]
+            Expose = [new BlockItemVariation(enElementKey, null)]
         };
 
         var daElementKey = Guid.NewGuid();
@@ -573,7 +573,7 @@ public class BlockListPropertyValueHandlerTests : PropertyValueHandlerTestsBase
                     Values = [new () { Alias = "textBoxValue", Value = "Variant block value DA" }]
                 }
             ],
-            Expose = [new BlockItemVariation(daElementKey, null, null)]
+            Expose = [new BlockItemVariation(daElementKey, null)]
         };
 
         Content content = new ContentBuilder()
