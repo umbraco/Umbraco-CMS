@@ -329,8 +329,8 @@ export class ContentUiHelper extends UiBaseLocators {
     this.uuiCheckbox = page.locator('uui-checkbox');
     this.sortBtn = page.getByLabel('Sort', {exact: true});
     this.sortByFieldTab = page.getByTestId('sort-children-of-modal:tab-by-field');
-    this.sortByFieldSelect = page.locator('umb-sort-children-of-content-modal [label="Sort by field"] select');
-    this.sortByFieldDirectionSelect = page.locator('umb-sort-children-of-content-modal [label="Direction"] select');
+    this.sortByFieldSelect = page.locator('umb-sort-children-of-document-modal [label="Sort by field"] select');
+    this.sortByFieldDirectionSelect = page.locator('umb-sort-children-of-document-modal [label="Direction"] select');
     this.containerSaveBtn = this.container.getByLabel('Save');
     this.groupBasedProtectionBtn = page.locator('span').filter({hasText: 'Group based protection'});
     this.chooseMemberGroupBtn = page.locator('umb-input-member-group').getByLabel('Choose');
