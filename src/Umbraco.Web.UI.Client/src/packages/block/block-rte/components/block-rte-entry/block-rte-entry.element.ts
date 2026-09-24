@@ -368,6 +368,11 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 				--umb-block-entry-actions-opacity: 1;
 			}
 
+			:host([settings-invalid]),
+			:host([content-invalid]) {
+				--umb-block-entry-actions-opacity: 1;
+			}
+
 			:host(.ProseMirror-selectednode) {
 				--uui-color-default-contrast: initial;
 				outline: 3px solid var(--uui-color-focus);
