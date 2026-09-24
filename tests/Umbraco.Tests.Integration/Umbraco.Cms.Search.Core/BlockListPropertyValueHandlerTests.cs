@@ -536,6 +536,84 @@ public class BlockListPropertyValueHandlerTests : PropertyValueHandlerTestsBase
     }
 
     [Test]
+    public async Task PropertyLevelVariation_CanBeIndexed()
+    {
+        var (contentType, elementType) = await SetupPropertyLevelVarianceTest();
+
+        var sharedElementKey = Guid.NewGuid();
+        var sharedBlockListValue = new BlockListValue([new () { ContentKey = sharedElementKey }])
+        {
+            ContentData = [
+                new (sharedElementKey, elementType.Key, elementType.Alias)
+                {
+                    Values = [new () { Alias = "textBoxValue", Value = "Shared block value" }]
+                }
+            ],
+            Expose = [new BlockItemVariation(sharedElementKey, null, null)]
+        };
+
+        var enElementKey = Guid.NewGuid();
+        var enBlockListValue = new BlockListValue([new () { ContentKey = enElementKey }])
+        {
+            ContentData = [
+                new (enElementKey, elementType.Key, elementType.Alias)
+                {
+                    Values = [new () { Alias = "textBoxValue", Value = "Variant block value EN" }]
+                }
+            ],
+            Expose = [new BlockItemVariation(enElementKey, null, null)]
+        };
+
+        var daElementKey = Guid.NewGuid();
+        var daBlockListValue = new BlockListValue([new () { ContentKey = daElementKey }])
+        {
+            ContentData = [
+                new (daElementKey, elementType.Key, elementType.Alias)
+                {
+                    Values = [new () { Alias = "textBoxValue", Value = "Variant block value DA" }]
+                }
+            ],
+            Expose = [new BlockItemVariation(daElementKey, null, null)]
+        };
+
+        Content content = new ContentBuilder()
+            .WithContentType(contentType)
+            .WithCultureName("en-US", "My Blocks EN")
+            .WithCultureName("da-DK", "My Blocks DA")
+            .Build();
+        content.SetValue("blocksShared", JsonSerializer.Serialize(sharedBlockListValue));
+        content.SetValue("blocksVariant", JsonSerializer.Serialize(enBlockListValue), "en-US");
+        content.SetValue("blocksVariant", JsonSerializer.Serialize(daBlockListValue), "da-DK");
+        ContentService.Save(content);
+        ContentService.Publish(content, ["en-US", "da-DK"]);
+
+        AssertDocumentFields(IndexAliases.DraftContent);
+        AssertDocumentFields(IndexAliases.PublishedContent);
+
+        return;
+
+        void AssertDocumentFields(string indexAlias)
+        {
+            IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(indexAlias);
+            Assert.That(documents, Has.Count.EqualTo(1));
+
+            TestIndexDocument document = documents.Single();
+
+            IndexValue? sharedValue = document.Fields.SingleOrDefault(f => f is { FieldName: "blocksShared", Culture: null })?.Value;
+            Assert.That(sharedValue, Is.Not.Null);
+            CollectionAssert.AreEqual(new[] { "Shared block value" }, sharedValue.Texts);
+
+            IndexValue? variantValueEn = document.Fields.SingleOrDefault(f => f is { FieldName: "blocksVariant", Culture: "en-US" })?.Value;
+            Assert.That(variantValueEn, Is.Not.Null);
+            CollectionAssert.AreEqual(new[] { "Variant block value EN" }, variantValueEn.Texts);
+
+            IndexValue? variantValueDa = document.Fields.SingleOrDefault(f => f is { FieldName: "blocksVariant", Culture: "da-DK" })?.Value;
+            Assert.That(variantValueDa, Is.Not.Null);
+            CollectionAssert.AreEqual(new[] { "Variant block value DA" }, variantValueDa.Texts);
+        }
+    }
+
+    [Test]
     public async Task BlockLevelVariation_SupportsMultipleTextRelevance()
     {
         var (contentType, elementType) = await SetupMultipleTextRelevanceTest();
@@ -667,6 +745,53 @@ public class BlockListPropertyValueHandlerTests : PropertyValueHandlerTestsBase
         {
             contentType.Variations = ContentVariation.Culture;
         }
+
+        await ContentTypeService.UpdateAsync(contentType, Constants.Security.SuperUserKey);
+
+        return (contentType, elementType);
+    }
+
+    private async Task<(IContentType ContentType, IContentType ElementType)> SetupPropertyLevelVarianceTest()
+    {
+        IContentType elementType = await CreateAllSimpleEditorsElementType();
+
+        var blockListDataType = new DataType(PropertyEditorCollection[Constants.PropertyEditors.Aliases.BlockList], ConfigurationEditorJsonSerializer)
+        {
+            ConfigurationData = new Dictionary<string, object>
+            {
+                {
+                    "blocks",
+                    new BlockListConfiguration.BlockConfiguration[]
+                    {
+                        new() { ContentElementTypeKey = elementType.Key }
+                    }
+                }
+            },
+            Name = "My Property Variant Block List",
+            DatabaseType = ValueStorageType.Ntext,
+            ParentId = Constants.System.Root,
+            CreateDate = DateTime.UtcNow
+        };
+
+        await GetRequiredService<IDataTypeService>().CreateAsync(blockListDataType, Constants.Security.SuperUserKey);
+
+        IContentType contentType = new ContentTypeBuilder()
+            .WithAlias("blockEditorPropertyVariant")
+            .WithName("Block Editor Property Variant")
+            .AddPropertyType()
+            .WithAlias("blocksShared")
+            .WithName("blocksShared")
+            .WithDataTypeId(blockListDataType.Id)
+            .Done()
+            .AddPropertyType()
+            .WithAlias("blocksVariant")
+            .WithName("blocksVariant")
+            .WithDataTypeId(blockListDataType.Id)
+            .Done()
+            .Build();
+
+        contentType.Variations = ContentVariation.Culture;
+        contentType.PropertyTypes.First(p => p.Alias == "blocksVariant").Variations = ContentVariation.Culture;
 
         await ContentTypeService.UpdateAsync(contentType, Constants.Security.SuperUserKey);
 
