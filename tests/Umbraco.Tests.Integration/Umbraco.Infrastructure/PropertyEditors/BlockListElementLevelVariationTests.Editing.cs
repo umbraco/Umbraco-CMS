@@ -1603,14 +1603,8 @@ internal partial class BlockListElementLevelVariationTests
             cultures = [null];
         }
 
-        var segments = elementType.VariesBySegment()
-            ? contentData.Values.Select(value => value.Segment)
-                .Distinct()
-                .ToArray()
-            : [null];
-
-        foreach (var exposeItem in cultures.SelectMany(culture => segments.Select(segment =>
-                     new BlockItemVariation(contentData.Key, culture, segment))))
+        foreach (var exposeItem in cultures.Select(culture =>
+                     new BlockItemVariation(contentData.Key, culture)))
         {
             listValue.Expose.Add(exposeItem);
         }

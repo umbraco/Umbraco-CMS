@@ -462,7 +462,7 @@ internal sealed class MigrateSingleBlockListTests : UmbracoIntegrationTest
                         Constants.PropertyEditors.Aliases.BlockList,
                         new BlockListLayoutItem { ContentKey = outerBlockKey }),
                     ContentData = [outerBlock],
-                    Expose = [new BlockItemVariation(outerBlockKey, null, null)],
+                    Expose = [new BlockItemVariation(outerBlockKey, null)],
                 });
             case ContainerEditor.BlockGrid:
                 return JsonSerializer.Serialize(new BlockGridValue
@@ -471,7 +471,7 @@ internal sealed class MigrateSingleBlockListTests : UmbracoIntegrationTest
                         Constants.PropertyEditors.Aliases.BlockGrid,
                         new BlockGridLayoutItem { ContentKey = outerBlockKey, ColumnSpan = 12, RowSpan = 1 }),
                     ContentData = [outerBlock],
-                    Expose = [new BlockItemVariation(outerBlockKey, null, null)],
+                    Expose = [new BlockItemVariation(outerBlockKey, null)],
                 });
             case ContainerEditor.RichText:
                 return JsonSerializer.Serialize(new RichTextEditorValue
@@ -483,7 +483,7 @@ internal sealed class MigrateSingleBlockListTests : UmbracoIntegrationTest
                             Constants.PropertyEditors.Aliases.RichText,
                             new RichTextBlockLayoutItem { ContentKey = outerBlockKey }),
                         ContentData = [outerBlock],
-                        Expose = [new BlockItemVariation(outerBlockKey, null, null)],
+                        Expose = [new BlockItemVariation(outerBlockKey, null)],
                     },
                 });
             default:
@@ -502,7 +502,7 @@ internal sealed class MigrateSingleBlockListTests : UmbracoIntegrationTest
                 Constants.PropertyEditors.Aliases.BlockList,
                 new BlockListLayoutItem { ContentKey = blockKey }),
             ContentData = [BuildBlockItemData(blockKey, elementType, propertyAlias, propertyValue)],
-            Expose = [new BlockItemVariation(blockKey, null, null)],
+            Expose = [new BlockItemVariation(blockKey, null)],
         };
 
     private static BlockItemData BuildBlockItemData(

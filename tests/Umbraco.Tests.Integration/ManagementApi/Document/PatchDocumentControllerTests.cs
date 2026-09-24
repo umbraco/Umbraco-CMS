@@ -1422,10 +1422,10 @@ public class PatchDocumentControllerTests : ManagementApiUserGroupTestBase<Patch
             SettingsData = new List<BlockItemData>(),
             Expose = new List<BlockItemVariation>
             {
-                new BlockItemVariation(textBlock1Key, "en-US", null),
-                new BlockItemVariation(textBlock1Key, "da-DK", null),
-                new BlockItemVariation(textBlock2Key, "en-US", null),
-                new BlockItemVariation(textBlock2Key, "da-DK", null)
+                new BlockItemVariation(textBlock1Key, "en-US"),
+                new BlockItemVariation(textBlock1Key, "da-DK"),
+                new BlockItemVariation(textBlock2Key, "en-US"),
+                new BlockItemVariation(textBlock2Key, "da-DK")
             }
         };
         var blockListJson = jsonSerializer.Serialize(blockListValue);
@@ -1478,8 +1478,8 @@ public class PatchDocumentControllerTests : ManagementApiUserGroupTestBase<Patch
             SettingsData = new List<BlockItemData>(),
             Expose = new List<BlockItemVariation>
             {
-                new BlockItemVariation(areaBlockKey, null, null),
-                new BlockItemVariation(listContainerKey, null, null)
+                new BlockItemVariation(areaBlockKey, null),
+                new BlockItemVariation(listContainerKey, null)
             }
         };
         var blockGridJson = jsonSerializer.Serialize(blockGridValue);
@@ -1506,7 +1506,7 @@ public class PatchDocumentControllerTests : ManagementApiUserGroupTestBase<Patch
             SettingsData = new List<BlockItemData>(),
             Expose = new List<BlockItemVariation>
             {
-                new BlockItemVariation(gridContainerKey, null, null)
+                new BlockItemVariation(gridContainerKey, null)
             }
         };
 
