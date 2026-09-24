@@ -1,5 +1,6 @@
 import { UMB_VARIANT_WORKSPACE_CONTEXT } from '../../../contexts/index.js';
 import type { UmbVariantDatasetWorkspaceContext } from '../../../contexts/index.js';
+import { UMB_ENTITY_NAMED_DETAIL_WORKSPACE_CONTEXT } from '../../../entity-detail/index.js';
 import { css, customElement, html, ifDefined, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -32,6 +33,7 @@ export class UmbWorkspaceVariantMenuBreadcrumbElement extends UmbLitElement {
 	private _appCurrentCulture?: string;
 
 	#variantWorkspaceContext?: UmbVariantDatasetWorkspaceContext;
+	#namedDetailWorkspaceContext?: typeof UMB_ENTITY_NAMED_DETAIL_WORKSPACE_CONTEXT.TYPE;
 	#appLanguageContext?: UmbAppLanguageContext;
 	#menuStructureContext?: typeof UMB_MENU_VARIANT_STRUCTURE_WORKSPACE_CONTEXT.TYPE;
 
@@ -63,6 +65,15 @@ export class UmbWorkspaceVariantMenuBreadcrumbElement extends UmbLitElement {
 			this.#observeStructure();
 		});
 
+		// Fallback name source for workspaces with no variance (e.g. folders), which have no variant context to
+		// supply the breadcrumb's last segment from.
+		this.consumeContext(UMB_ENTITY_NAMED_DETAIL_WORKSPACE_CONTEXT, (instance) => {
+			if (!instance) return;
+			this.#namedDetailWorkspaceContext = instance;
+			this.observe(instance.name, (value) => (this._name = value || ''), observeWorkspaceNameSymbol);
+			this.#observeStructure();
+		});
+
 		this.consumeContext(UMB_MENU_VARIANT_STRUCTURE_WORKSPACE_CONTEXT, (instance) => {
 			if (!instance) return;
 			this.#menuStructureContext = instance;
@@ -71,11 +82,11 @@ export class UmbWorkspaceVariantMenuBreadcrumbElement extends UmbLitElement {
 	}
 
 	#observeStructure() {
-		if (!this.#menuStructureContext || !this.#variantWorkspaceContext) return;
+		if (!this.#menuStructureContext) return;
+		if (!this.#variantWorkspaceContext && !this.#namedDetailWorkspaceContext) return;
 
 		this.observe(this.#menuStructureContext.structure, (value) => {
-			if (!this.#variantWorkspaceContext) return;
-			const unique = this.#variantWorkspaceContext.getUnique();
+			const unique = this.#variantWorkspaceContext?.getUnique() ?? this.#namedDetailWorkspaceContext?.getUnique();
 			// exclude the current unique from the structure. We append this with an observer of the name
 			this._structure = value.filter((structureItem) => structureItem.unique !== unique);
 		});
