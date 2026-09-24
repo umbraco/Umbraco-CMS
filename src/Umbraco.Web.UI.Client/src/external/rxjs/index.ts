@@ -12,7 +12,6 @@ export {
 	first,
 	firstValueFrom,
 	from,
-	isObservable,
 	lastValueFrom,
 	map,
 	of,
