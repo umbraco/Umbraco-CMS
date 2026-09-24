@@ -83,7 +83,6 @@ public class CreateElementFromBlockController : ElementControllerBase
 
         Attempt<IElement?, ElementCreateFromBlockOperationStatus> result = await _elementEditingService.CreateFromBlockAsync(
             MapCreateModel(requestModel),
-            allowPublish: await AuthorizePublishInLibraryAsync(requestModel.Parent?.Id) is { Succeeded: true },
             CurrentUserKey(_backOfficeSecurityAccessor));
 
         return result.Success
@@ -160,25 +159,6 @@ public class CreateElementFromBlockController : ElementControllerBase
         => await _authorizationService.AuthorizeResourceAsync(
             User,
             ElementContainerPermissionResource.WithKeys(ActionElementNew.ActionLetter, parentKey),
-            AuthorizationPolicies.ElementFolderPermissionByResource);
-
-    /// <summary>
-    /// Determines whether the current user may publish in the target Library folder.
-    /// </summary>
-    /// <remarks>
-    /// Unlike the create permission this is not a gate: the result is passed to the service as data, so the
-    /// element is created either way. Reproducing the block's live state is best effort, and lacking the grant
-    /// is one more reason it may not happen, alongside values that fail validation.
-    /// <para>
-    /// <c>CulturesToCheck</c> is deliberately omitted, unlike every other publish endpoint. The published version
-    /// is built from the owner's own live property value (see <see cref="IElementEditingService" />), so nothing
-    /// can become public that the editor could not already see.
-    /// </para>
-    /// </remarks>
-    private async Task<AuthorizationResult> AuthorizePublishInLibraryAsync(Guid? parentKey)
-        => await _authorizationService.AuthorizeResourceAsync(
-            User,
-            ElementContainerPermissionResource.WithKeys(ActionElementPublish.ActionLetter, parentKey),
             AuthorizationPolicies.ElementFolderPermissionByResource);
 
     private static CreateElementFromBlockModel MapCreateModel(CreateElementFromBlockRequestModel requestModel)

@@ -143,7 +143,6 @@ internal sealed class ElementEditingService
     /// <inheritdoc />
     public async Task<Attempt<IElement?, ElementCreateFromBlockOperationStatus>> CreateFromBlockAsync(
         CreateElementFromBlockModel createModel,
-        bool allowPublish,
         Guid userKey)
     {
         Attempt<BlockElementSource, ElementCreateFromBlockOperationStatus> source = _blockElementResolver.Resolve(createModel.OwnerKey, createModel.BlockKey);
@@ -184,40 +183,15 @@ internal sealed class ElementEditingService
             element.Key = createModel.Key.Value;
         }
 
-        // build from what was live, so the element's published version is what the site was showing; where
-        // nothing was live there is nothing to reproduce and the owner's draft is all there is.
-        IReadOnlyList<BlockPropertyValue> publishedValues = source.Result.PublishedValues ?? source.Result.DraftValues;
-        ApplyNames(element, elementType, createModel.Name, publishedValues.Select(value => value.Culture));
-        ApplyStoredValues(element, elementType, publishedValues);
+        // the element is created as a draft holding what the block holds. Publishing it is the editor's to do,
+        // the same as for any other element they have not published yet.
+        ApplyNames(element, elementType, createModel.Name, source.Result.Values.Select(value => value.Culture));
+        ApplyStoredValues(element, elementType, source.Result.Values);
 
-        IReadOnlyCollection<string?> publishableCultures = allowPublish && source.Result.LiveCultures.Count > 0
-            ? await _blockElementResolver.ResolvePublishableCulturesAsync(element, elementType, source.Result.LiveCultures)
-            : [];
-
-        if (publishableCultures.Count > 0)
+        ContentEditingOperationStatus saveStatus = await SaveAsync(element, userKey);
+        if (saveStatus is not ContentEditingOperationStatus.Success)
         {
-            // an invariant element type throws if given any culture at all.
-            ContentEditingOperationStatus publishStatus = elementType.VariesByCulture()
-                ? await SaveAndPublish(element, [.. publishableCultures.Select(culture => culture!)], userKey)
-                : await SaveAndPublish(element, [], userKey);
-
-            if (publishStatus is not ContentEditingOperationStatus.Success)
-            {
-                return Attempt.FailWithStatus<IElement?, ElementCreateFromBlockOperationStatus>(MapSaveStatus(publishStatus), null);
-            }
-        }
-
-        // the owner's draft on top of what was published. Where nothing was published this is the only write,
-        // and where the draft says the same as the published version there is nothing left to write at all -
-        // saving anyway would leave the new element looking like it had pending changes it does not have.
-        ApplyStoredValues(element, elementType, source.Result.DraftValues);
-        if (element.HasIdentity is false || element.IsDirty())
-        {
-            ContentEditingOperationStatus saveStatus = await SaveAsync(element, userKey);
-            if (saveStatus is not ContentEditingOperationStatus.Success)
-            {
-                return Attempt.FailWithStatus<IElement?, ElementCreateFromBlockOperationStatus>(MapSaveStatus(saveStatus), null);
-            }
+            return Attempt.FailWithStatus<IElement?, ElementCreateFromBlockOperationStatus>(MapSaveStatus(saveStatus), null);
         }
 
         scope.Complete();
