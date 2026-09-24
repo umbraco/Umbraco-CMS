@@ -1,7 +1,6 @@
 using System.Security.Cryptography;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.IdentityModel.Tokens;
 using OpenIddict.Server;
 using OpenIddict.Validation;
@@ -13,6 +12,7 @@ using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Infrastructure.BackgroundJobs;
 using Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs.DistributedJobs;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Common.DependencyInjection;
 
@@ -32,10 +32,6 @@ public static class UmbracoBuilderAuthExtensions
     /// </remarks>
     public static IUmbracoBuilder AddUmbracoOpenIddict(this IUmbracoBuilder builder)
     {
-        // Registered with TryAdd, so a site can supply its own paths by registering an
-        // IOpenIddictPathsToHandleProvider before this call.
-        builder.Services.TryAddSingleton<IOpenIddictPathsToHandleProvider, OpenIddictPathsToHandleProvider>();
-
         if (builder.Services.Any(x => !x.IsKeyedService && x.ImplementationType == typeof(OpenIddictCleanupJob)) is false)
         {
             ConfigureOpenIddict(builder);
@@ -46,6 +42,8 @@ public static class UmbracoBuilderAuthExtensions
 
     private static void ConfigureOpenIddict(IUmbracoBuilder builder)
     {
+        builder.Services.AddUnique<IOpenIddictPathsToHandleProvider, OpenIddictPathsToHandleProvider>();
+
         builder.Services.AddOpenIddict()
             // Register the OpenIddict server components.
             .AddServer(options =>

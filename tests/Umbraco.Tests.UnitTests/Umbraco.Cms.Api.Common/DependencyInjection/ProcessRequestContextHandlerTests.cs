@@ -19,59 +19,59 @@ internal class ProcessRequestContextHandlerTests
 
     [TestCase("/.well-known/openid-configuration")]
     [TestCase("/.well-known/jwks")]
-    public void Default_provider_handles_the_well_known_endpoints(string path)
+    public void GetPathsToHandle_Default_IncludesWellKnownEndpoint(string path)
     {
         Assert.That(PathsToHandle(), Does.Contain(path));
     }
 
     [Test]
-    public void Default_provider_handles_the_back_office_path()
+    public void GetPathsToHandle_Default_IncludesBackOfficePath()
     {
         Assert.That(PathsToHandle(), Does.Contain(BackOfficePath));
     }
 
     [Test]
-    public void Server_request_outside_the_handled_paths_is_skipped()
+    public async Task HandleAsync_ServerRequest_OutsideHandledPaths_IsSkipped()
     {
         OpenIddictServerEvents.ProcessRequestContext context = ServerContext();
 
-        HandlerFor("/my-own-oidc/token").HandleAsync(context);
+        await HandlerFor("/my-own-oidc/token").HandleAsync(context);
 
         Assert.That(context.IsRequestSkipped, Is.True);
     }
 
     [Test]
-    public void Server_request_within_a_provided_path_is_handled()
+    public async Task HandleAsync_ServerRequest_WithinProvidedPath_IsHandled()
     {
         OpenIddictServerEvents.ProcessRequestContext context = ServerContext();
 
-        HandlerFor("/my-own-oidc/token", "/my-own-oidc/").HandleAsync(context);
+        await HandlerFor("/my-own-oidc/token", "/my-own-oidc/").HandleAsync(context);
 
         Assert.That(context.IsRequestSkipped, Is.False);
     }
 
     [Test]
-    public void Validation_request_within_a_provided_path_is_handled()
+    public async Task HandleAsync_ValidationRequest_WithinProvidedPath_IsHandled()
     {
         OpenIddictValidationEvents.ProcessRequestContext context = ValidationContext();
 
-        HandlerFor("/my-own-oidc/token", "/my-own-oidc/").HandleAsync(context);
+        await HandlerFor("/my-own-oidc/token", "/my-own-oidc/").HandleAsync(context);
 
         Assert.That(context.IsRequestSkipped, Is.False);
     }
 
     [Test]
-    public void Validation_request_outside_the_handled_paths_is_skipped()
+    public async Task HandleAsync_ValidationRequest_OutsideHandledPaths_IsSkipped()
     {
         OpenIddictValidationEvents.ProcessRequestContext context = ValidationContext();
 
-        HandlerFor("/my-own-oidc/token").HandleAsync(context);
+        await HandlerFor("/my-own-oidc/token").HandleAsync(context);
 
         Assert.That(context.IsRequestSkipped, Is.True);
     }
 
     [Test]
-    public void A_derived_provider_can_add_to_the_default_paths()
+    public void GetPathsToHandle_DerivedProvider_AddsToDefaultPaths()
     {
         var paths = new CustomPathsProvider().GetPathsToHandle().ToArray();
 
@@ -83,13 +83,13 @@ internal class ProcessRequestContextHandlerTests
     }
 
     [Test]
-    public void A_request_without_a_path_is_handled()
+    public async Task HandleAsync_RequestWithoutPath_IsHandled()
     {
         // The handler cannot tell whether an unresolved path is one of ours, so it defers to OpenIddict
         // rather than skipping a request that may need processing.
         OpenIddictServerEvents.ProcessRequestContext context = ServerContext();
 
-        HandlerFor(null).HandleAsync(context);
+        await HandlerFor(null).HandleAsync(context);
 
         Assert.That(context.IsRequestSkipped, Is.False);
     }

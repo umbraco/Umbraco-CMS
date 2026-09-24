@@ -10,7 +10,8 @@ namespace Umbraco.Cms.Api.Common.DependencyInjection;
 ///         endpoints, which would otherwise be skipped alongside the front-end requests.
 ///     </para>
 ///     <para>
-///         Derive from <see cref="OpenIddictPathsToHandleProvider"/> to keep the Umbraco paths and add your own.
+///         Derive from <see cref="OpenIddictPathsToHandleProvider"/> to keep the Umbraco paths and add your own,
+///         and register it in a composer with <c>builder.Services.AddUnique</c>.
 ///     </para>
 /// </remarks>
 public interface IOpenIddictPathsToHandleProvider
