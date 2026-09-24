@@ -9,6 +9,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'entityAction',
 		kind: 'duplicateTo',
 		alias: 'Umb.EntityAction.Document.DuplicateTo',
+		weight: 650,
 		name: 'Duplicate Document To Entity Action',
 		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		api: () => import('./duplicate-document.action.js'),

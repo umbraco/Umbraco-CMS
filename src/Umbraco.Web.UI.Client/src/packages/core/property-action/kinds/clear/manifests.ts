@@ -2,6 +2,7 @@ import { UMB_PROPERTY_ACTION_DEFAULT_KIND_MANIFEST } from '../default/index.js';
 import UmbClearPropertyAction from './property-action-clear.controller.js';
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_WRITABLE_PROPERTY_CONDITION_ALIAS } from '@umbraco-cms/backoffice/property';
+import { UMB_ACTION_GROUP_DELETE } from '@umbraco-cms/backoffice/action';
 
 export const UMB_PROPERTY_ACTION_CLEAR_KIND_MANIFEST: UmbExtensionManifestKind = {
 	type: 'kind',
@@ -11,6 +12,7 @@ export const UMB_PROPERTY_ACTION_CLEAR_KIND_MANIFEST: UmbExtensionManifestKind =
 	manifest: {
 		...UMB_PROPERTY_ACTION_DEFAULT_KIND_MANIFEST.manifest,
 		api: UmbClearPropertyAction,
+		group: UMB_ACTION_GROUP_DELETE,
 		meta: {
 			icon: 'icon-delete',
 			label: '#actions_clear',

@@ -1,11 +1,13 @@
 import { UMB_MEDIA_TYPE_ENTITY_TYPE } from '../../entity.js';
 import { manifests as repositoryManifests } from './repository/manifests.js';
+import { UMB_ACTION_GROUP_TRANSFER } from '@umbraco-cms/backoffice/action';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'entityAction',
 		kind: 'default',
 		alias: 'Umb.EntityAction.MediaType.Export',
+		group: UMB_ACTION_GROUP_TRANSFER,
 		name: 'Export Media Type Entity Action',
 		forEntityTypes: [UMB_MEDIA_TYPE_ENTITY_TYPE],
 		api: () => import('./media-type-export.action.js'),

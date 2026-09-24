@@ -1,12 +1,14 @@
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
 import { UMB_USER_PERMISSION_DOCUMENT_CREATE_BLUEPRINT } from '../../user-permissions/document/constants.js';
 import { UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS } from '@umbraco-cms/backoffice/recycle-bin';
+import { UMB_ACTION_GROUP_CREATE } from '@umbraco-cms/backoffice/action';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'entityAction',
 		kind: 'default',
 		alias: 'Umb.EntityAction.Document.CreateBlueprint',
+		group: UMB_ACTION_GROUP_CREATE,
 		name: 'Create Document Blueprint Entity Action',
 		weight: 1000,
 		api: () => import('./create-blueprint.action.js'),

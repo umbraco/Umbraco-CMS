@@ -2,12 +2,14 @@ import { UMB_MEMBER_MANAGEMENT_SECTION_ALIAS } from '../section/constants.js';
 import { UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS } from '@umbraco-cms/backoffice/section';
 import { UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS } from '@umbraco-cms/backoffice/recycle-bin';
 import { UMB_DOCUMENT_ENTITY_TYPE, UMB_USER_PERMISSION_DOCUMENT_PUBLIC_ACCESS } from '@umbraco-cms/backoffice/document';
+import { UMB_ACTION_GROUP_SETTINGS } from '@umbraco-cms/backoffice/action';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'entityAction',
 		kind: 'default',
 		alias: 'Umb.EntityAction.Document.PublicAccess',
+		group: UMB_ACTION_GROUP_SETTINGS,
 		name: 'Document Public Access Entity Action',
 		weight: 200,
 		api: () => import('./public-access.action.js'),

@@ -1,10 +1,12 @@
 import { UMB_USER_ENTITY_TYPE } from '../../../entity.js';
+import { UMB_ACTION_GROUP_USER } from '@umbraco-cms/backoffice/action';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'entityAction',
 		kind: 'default',
 		alias: 'Umb.EntityAction.User.ResendInvite',
+		group: UMB_ACTION_GROUP_USER,
 		name: 'Resend Invite User Entity Action',
 		weight: 500,
 		api: () => import('./resend-invite.action.js'),

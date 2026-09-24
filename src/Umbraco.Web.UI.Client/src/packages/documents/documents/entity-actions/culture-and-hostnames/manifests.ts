@@ -1,12 +1,14 @@
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
 import { UMB_USER_PERMISSION_DOCUMENT_CULTURE_AND_HOSTNAMES } from '../../user-permissions/document/constants.js';
 import { UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS } from '@umbraco-cms/backoffice/recycle-bin';
+import { UMB_ACTION_GROUP_SETTINGS } from '@umbraco-cms/backoffice/action';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'entityAction',
 		kind: 'default',
 		alias: 'Umb.EntityAction.Document.CultureAndHostnames',
+		group: UMB_ACTION_GROUP_SETTINGS,
 		name: 'Culture And Hostnames Document Entity Action',
 		weight: 400,
 		api: () => import('./culture-and-hostnames.action.js'),
