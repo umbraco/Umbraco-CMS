@@ -4,10 +4,9 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Search.Indexing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Search.Core.Cache.Element;
-using Umbraco.Cms.Search.Core.Models.Indexing;
-using Umbraco.Cms.Search.Core.Services.ContentIndexing;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Search.Core.NotificationHandlers;
