@@ -4,7 +4,7 @@ import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import type { HTMLElementConstructor } from '@umbraco-cms/backoffice/extension-api';
 
 export interface UmbBlockRefNameSlot {
-	/** @deprecated Use the `name` slot to project a `<umb-ufm-render>` instead. Will be removed in Umbraco 20. [LK] */
+	/** @deprecated Use the `name` slot to project a `<umb-ufm-render>` instead. Will be removed in Umbraco 20. */
 	label: string | undefined;
 }
 
@@ -12,6 +12,7 @@ export interface UmbBlockRefNameSlot {
  * Type of the class returned by {@link UmbBlockRefNameSlotMixin}, exposing the protected `renderNameSlot`.
  */
 export declare abstract class UmbBlockRefNameSlotElement extends HTMLElement implements UmbBlockRefNameSlot {
+	/** @deprecated Use the `name` slot to project a `<umb-ufm-render>` instead. Will be removed in Umbraco 20. */
 	label: string | undefined;
 	protected _hasNameSlotContent: boolean;
 

@@ -52,7 +52,7 @@ describe('UmbBlockRefNameSlotMixin', () => {
 
 	it('renders no fallback when nothing is slotted and label is undefined', async () => {
 		await elementUpdated(element);
-		expect(element.shadowRoot!.querySelector('umb-ufm-render')).to.not.exist;
+		expect(element.shadowRoot!.querySelector('umb-ufm-render')).to.equal(null);
 	});
 
 	it('renders the label as a fallback umb-ufm-render when nothing is slotted', async () => {
@@ -68,14 +68,14 @@ describe('UmbBlockRefNameSlotMixin', () => {
 	it('hides the fallback once content is slotted into the name slot', async () => {
 		element.label = 'Hello world';
 		await elementUpdated(element);
-		expect(element.shadowRoot!.querySelector('umb-ufm-render')).to.exist;
+		expect(element.shadowRoot!.querySelector('umb-ufm-render')).to.not.equal(null);
 
 		const projected = document.createElement('span');
 		projected.slot = 'name';
 		element.appendChild(projected);
 		await aTimeout(0);
 
-		expect(element.shadowRoot!.querySelector('umb-ufm-render')).to.not.exist;
+		expect(element.shadowRoot!.querySelector('umb-ufm-render')).to.equal(null);
 	});
 
 	it('shows the fallback again once the slotted content is removed', async () => {
@@ -84,12 +84,12 @@ describe('UmbBlockRefNameSlotMixin', () => {
 		projected.slot = 'name';
 		element.appendChild(projected);
 		await aTimeout(0);
-		expect(element.shadowRoot!.querySelector('umb-ufm-render')).to.not.exist;
+		expect(element.shadowRoot!.querySelector('umb-ufm-render')).to.equal(null);
 
 		element.removeChild(projected);
 		await aTimeout(0);
 
-		expect(element.shadowRoot!.querySelector('umb-ufm-render')).to.exist;
+		expect(element.shadowRoot!.querySelector('umb-ufm-render')).to.not.equal(null);
 	});
 
 	it('forwards the name slot and the fallback into a nested slot when slotName is given', async () => {
@@ -136,7 +136,7 @@ describe('UmbBlockRefNameSlotMixin', () => {
 			const warnCalls = warnStub.calls.filter((args) =>
 				String(args[0]).includes('umb-test-block-ref-name-slot-warn.label'),
 			);
-			expect(warnCalls.length).to.equal(1);
+			expect(warnCalls).to.have.lengthOf(1);
 			expect(String(warnCalls[0][0])).to.include('20.0.0');
 		});
 	});

@@ -4,7 +4,7 @@ import { UmbBlockGridEntryContext } from './block-grid-entry.context.js';
 import { css, customElement, html, nothing, property, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
 import { UmbDataPathBlockElementDataQuery } from '@umbraco-cms/backoffice/block';
-import { renderHiddenUfm } from '@umbraco-cms/backoffice/ufm';
+import { renderHiddenUfm, renderUfm } from '@umbraco-cms/backoffice/ufm';
 import { umbDestroyOnDisconnect, UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbObserveValidationStateController } from '@umbraco-cms/backoffice/validation';
 import { UUIBlinkAnimationValue, UUIBlinkKeyframes } from '@umbraco-cms/backoffice/external/uui';
@@ -393,15 +393,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	}
 
 	#renderUfm() {
-		return html`
-			<umb-ufm-render
-				slot="name"
-				inline
-				.markdown=${this._label}
-				.value=${this.#blockValue}
-				@umb-ufm-resolved=${this.#onUfmResolved}>
-			</umb-ufm-render>
-		`;
+		return renderUfm(this._label, this.#blockValue, this.#onUfmResolved);
 	}
 
 	#renderHiddenUfm() {

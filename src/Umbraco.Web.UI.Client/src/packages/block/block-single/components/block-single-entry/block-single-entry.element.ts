@@ -5,7 +5,7 @@ import { css, customElement, html, nothing, property, state, when } from '@umbra
 import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
 import { UmbLitElement, umbDestroyOnDisconnect } from '@umbraco-cms/backoffice/lit-element';
 import { UmbDataPathBlockElementDataQuery } from '@umbraco-cms/backoffice/block';
-import { renderHiddenUfm } from '@umbraco-cms/backoffice/ufm';
+import { renderHiddenUfm, renderUfm } from '@umbraco-cms/backoffice/ufm';
 import { UmbObserveValidationStateController } from '@umbraco-cms/backoffice/validation';
 import { UUIBlinkAnimationValue, UUIBlinkKeyframes } from '@umbraco-cms/backoffice/external/uui';
 import type {
@@ -298,15 +298,7 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 	}
 
 	#renderUfm() {
-		return html`
-			<umb-ufm-render
-				slot="name"
-				inline
-				.markdown=${this._label}
-				.value=${this.#blockValue}
-				@umb-ufm-resolved=${this.#onUfmResolved}>
-			</umb-ufm-render>
-		`;
+		return renderUfm(this._label, this.#blockValue, this.#onUfmResolved);
 	}
 
 	#renderHiddenUfm() {

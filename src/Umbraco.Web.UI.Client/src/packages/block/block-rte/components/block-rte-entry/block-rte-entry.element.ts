@@ -2,7 +2,7 @@ import { UmbBlockRteEntryContext } from '../../context/block-rte-entry.context.j
 import { UMB_BLOCK_RTE } from '../../constants.js';
 import type { UmbBlockRteLayoutModel } from '../../types.js';
 import { css, customElement, html, nothing, property, when, state } from '@umbraco-cms/backoffice/external/lit';
-import { renderHiddenUfm } from '@umbraco-cms/backoffice/ufm';
+import { renderHiddenUfm, renderUfm } from '@umbraco-cms/backoffice/ufm';
 import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
 import { UmbDataPathBlockElementDataQuery } from '@umbraco-cms/backoffice/block';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -278,15 +278,7 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 	}
 
 	#renderUfm() {
-		return html`
-			<umb-ufm-render
-				slot="name"
-				inline
-				.markdown=${this._label}
-				.value=${this.#blockValue}
-				@umb-ufm-resolved=${this.#onUfmResolved}>
-			</umb-ufm-render>
-		`;
+		return renderUfm(this._label, this.#blockValue, this.#onUfmResolved);
 	}
 
 	#renderHiddenUfm() {

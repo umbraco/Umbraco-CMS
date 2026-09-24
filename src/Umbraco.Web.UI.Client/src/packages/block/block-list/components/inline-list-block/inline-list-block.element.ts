@@ -154,16 +154,16 @@ export class UmbInlineListBlockElement extends UmbBlockRefNameSlotMixin(UmbLitEl
 		this._workspaceContext.load(this.#contentKey);
 	}
 
-	#onClick() {
+	readonly #onClick = () => {
 		this.#toggleOpen();
-	}
+	};
 
-	#onKeydown(event: KeyboardEvent) {
+	readonly #onKeydown = (event: KeyboardEvent) => {
 		if (event.key !== ' ' && event.key !== 'Enter') return;
 		event.preventDefault();
 		event.stopPropagation();
 		this.#toggleOpen();
-	}
+	};
 
 	#toggleOpen() {
 		this._isOpen = !this._isOpen;
