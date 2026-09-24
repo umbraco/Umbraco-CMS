@@ -13,6 +13,8 @@ import type { UmbVariantStructureItemModel } from '@umbraco-cms/backoffice/menu'
 const observeDefaultLanguageSymbol = Symbol();
 const observeCurrentLanguageSymbol = Symbol();
 const observeWorkspaceActiveVariantSymbol = Symbol();
+// Shared by the variant and named-detail name observers below - registering a second controller under the same
+// alias destroys the first, so this only works because a context can never satisfy both of their discriminators.
 const observeWorkspaceNameSymbol = Symbol();
 
 @customElement('umb-workspace-variant-menu-breadcrumb')
