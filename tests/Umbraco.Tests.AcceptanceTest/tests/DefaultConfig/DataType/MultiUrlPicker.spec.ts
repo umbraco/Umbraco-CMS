@@ -27,7 +27,7 @@ test('can update minimum number of items value', async ({umbracoApi, umbracoUi})
   await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
 
   // Assert
-  expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'minNumber', minimumValue)).toBeTruthy();
+  expect(await umbracoApi.dataType.doesDataTypeHaveRangeValue(customDataTypeName, 'validationLimit', minimumValue)).toBeTruthy();
 });
 
 test('can update maximum number of items value', async ({umbracoApi, umbracoUi}) => {
@@ -41,7 +41,7 @@ test('can update maximum number of items value', async ({umbracoApi, umbracoUi})
   await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
 
   // Assert
-  expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'maxNumber', maximumValue)).toBeTruthy();
+  expect(await umbracoApi.dataType.doesDataTypeHaveRangeValue(customDataTypeName, 'validationLimit', undefined, maximumValue)).toBeTruthy();
 });
 
 test('can enable ignore user start nodes', async ({umbracoApi, umbracoUi}) => {
@@ -84,9 +84,7 @@ test('can update hide anchor/query string input', async ({umbracoApi, umbracoUi}
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'hideAnchor', true)).toBeTruthy();
 });
 
-// TODO: Remove skip when the front-end is ready. Currently you still can update the minimum greater than the maximum.
-// Issue link: https://github.com/umbraco/Umbraco-CMS/issues/17509
-test.skip('cannot update the minimum number of items greater than the maximum', async ({umbracoApi, umbracoUi}) => {
+test('cannot update the minimum number of items greater than the maximum', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const minimumValue = 5;
   const maximumValue = 2;

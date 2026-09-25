@@ -180,7 +180,7 @@ public abstract class BlockListPropertyEditorBase : DataEditor, IValueSchemaProv
             {
                 var blockConfig = (BlockListConfiguration?)dataTypeConfiguration;
 
-                BlockListConfiguration.NumberRange? validationLimit = blockConfig?.ValidationLimit;
+                NumberRange? validationLimit = blockConfig?.ValidationLimit;
                 if (validationLimit == null)
                 {
                     return Array.Empty<ValidationResult>();

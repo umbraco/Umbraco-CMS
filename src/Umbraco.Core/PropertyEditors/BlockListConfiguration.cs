@@ -17,8 +17,8 @@ public class BlockListConfiguration
     /// <summary>
     ///     Gets or sets the validation limit for the number of blocks.
     /// </summary>
-    [ConfigurationField("validationLimit")]
-    public NumberRange ValidationLimit { get; set; } = new();
+    [ConfigurationField("validationLimit", Type = typeof(RangeConfigurationField))]
+    public PropertyEditors.NumberRange ValidationLimit { get; set; } = new();
 
     /// <summary>
     ///     Gets or sets a value indicating whether single block mode is enabled.
@@ -42,16 +42,8 @@ public class BlockListConfiguration
     /// <summary>
     ///     Represents a number range with optional minimum and maximum values.
     /// </summary>
-    public class NumberRange
+    [Obsolete("No longer used by Umbraco; use Umbraco.Cms.Core.PropertyEditors.NumberRange instead. Scheduled for removal in Umbraco 21.")]
+    public class NumberRange : PropertyEditors.NumberRange
     {
-        /// <summary>
-        ///     Gets or sets the minimum number of blocks allowed.
-        /// </summary>
-        public int? Min { get; set; }
-
-        /// <summary>
-        ///     Gets or sets the maximum number of blocks allowed.
-        /// </summary>
-        public int? Max { get; set; }
     }
 }
