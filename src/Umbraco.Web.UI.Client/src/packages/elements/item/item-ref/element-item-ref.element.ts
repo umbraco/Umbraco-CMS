@@ -2,7 +2,7 @@ import { UMB_ELEMENT_ENTITY_TYPE } from '../../entity.js';
 import { UMB_EDIT_ELEMENT_WORKSPACE_PATH_PATTERN } from '../../paths.js';
 import { UmbElementItemDataResolver } from '../data-resolver/element-item-data-resolver.js';
 import type { UmbElementItemModel } from '../types.js';
-import { customElement, html, ifDefined, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, ifDefined, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { umbGenerateWorkspaceLink, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbDeselectedEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
@@ -116,6 +116,7 @@ export class UmbElementItemRefElement extends UmbLitElement {
 				<slot name="actions" slot="actions"></slot>
 				${this.#renderIcon()}${this.#renderIsDraft()} ${this.#renderIsTrashed()}
 			</uui-ref-node>
+			<umb-entity-frame><uui-icon name="link"></uui-icon> ${this._name}</umb-entity-frame>
 		`;
 	}
 
@@ -133,6 +134,24 @@ export class UmbElementItemRefElement extends UmbLitElement {
 		if (!this._isDraft) return nothing;
 		return html`<uui-tag size="s" slot="tag" look="secondary" color="default">Draft</uui-tag>`;
 	}
+
+	static override readonly styles = [
+		css`
+			:host {
+				--umb-entity-frame-opacity: 0;
+				--umb-entity-frame-color: var(--umb-color-reference);
+				--umb-entity-frame-contrast-color: var(--umb-color-reference-contrast);
+
+				display: block;
+				position: relative;
+			}
+
+			:host(:hover),
+			:host(:focus-within) {
+				--umb-entity-frame-opacity: 1;
+			}
+		`,
+	];
 }
 
 export { UmbElementItemRefElement as element };
