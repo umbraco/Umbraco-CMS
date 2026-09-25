@@ -153,6 +153,13 @@ export class UmbUserWorkspaceContext
 		});
 	}
 
+	setDocumentBlueprintAccess(value: UmbStartNodeAccessValue) {
+		this._data.updateCurrent({
+			hasDocumentBlueprintRootAccess: value.rootAccess,
+			documentBlueprintStartNodeUniques: value.startNodes,
+		});
+	}
+
 	// TODO: implement upload progress
 	uploadAvatar(file: File) {
 		const unique = this.getUnique();
