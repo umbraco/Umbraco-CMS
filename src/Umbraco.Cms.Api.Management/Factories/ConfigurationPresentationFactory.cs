@@ -53,7 +53,9 @@ public class ConfigurationPresentationFactory : IConfigurationPresentationFactor
         {
             DisableDeleteWhenReferenced = _contentSettings.DisableDeleteWhenReferenced,
             DisableUnpublishWhenReferenced = _contentSettings.DisableUnpublishWhenReferenced,
-            AllowEditInvariantFromNonDefault = _contentSettings.AllowEditInvariantFromNonDefault,
+#pragma warning disable CS0618 // Obsolete — kept schema-stable; gating moved to HasAccessToInvariantForVariant.
+            AllowEditInvariantFromNonDefault = true,
+#pragma warning restore CS0618
             AllowNonExistingSegmentsCreation = _segmentSettings.AllowCreation,
         };
 
@@ -109,7 +111,9 @@ public class ConfigurationPresentationFactory : IConfigurationPresentationFactor
         {
             DisableDeleteWhenReferenced = _contentSettings.DisableDeleteWhenReferenced,
             DisableUnpublishWhenReferenced = _contentSettings.DisableUnpublishWhenReferenced,
-            AllowEditInvariantFromNonDefault = _contentSettings.AllowEditInvariantFromNonDefault,
+#pragma warning disable CS0618 // Obsolete — kept schema-stable; gating moved to HasAccessToInvariantForVariant.
+            AllowEditInvariantFromNonDefault = true,
+#pragma warning restore CS0618
             AllowNonExistingSegmentsCreation = _segmentSettings.AllowCreation,
         };
 }

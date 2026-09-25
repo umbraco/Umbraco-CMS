@@ -18,6 +18,13 @@ public class DocumentConfigurationResponseModel
     /// <summary>
     /// Gets or sets a value indicating whether editing the invariant language is allowed from a non-default language.
     /// </summary>
+    /// <remarks>
+    ///     No longer consulted by the backoffice. Invariant-property editing is gated by the
+    ///     <c>HasAccessToInvariantForVariant</c> user-group permission, surfaced on the
+    ///     current-user response. The server always returns <c>true</c> here so older clients
+    ///     that still read the field behave as if the legacy config flag were permissive.
+    /// </remarks>
+    [Obsolete("No longer consulted. Gated by the HasAccessToInvariantForVariant user-group permission. Scheduled for removal in Umbraco 20.")]
     public required bool AllowEditInvariantFromNonDefault { get; set; }
 
     /// <summary>
