@@ -31,9 +31,12 @@ public class PropertyDataDtoConfiguration : IEntityTypeConfiguration<PropertyDat
         builder.Property(x => x.IntegerValue)
             .HasColumnName("intValue");
 
+        // The setter normalises away the trailing zeros a fixed-scale column pads the value with, so
+        // materialisation has to go through it rather than write the backing field directly.
         builder.Property(x => x.DecimalValue)
             .HasColumnName("decimalValue")
-            .HasPrecision(20, 9);
+            .HasPrecision(20, 9)
+            .UsePropertyAccessMode(PropertyAccessMode.Property);
 
         builder.Property(x => x.DateValue)
             .HasColumnName("dateValue");

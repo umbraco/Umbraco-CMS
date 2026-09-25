@@ -185,45 +185,12 @@ public class UmbracoDbContextProviderCustomizerTests
     }
 
     private static UmbracoDbContext CreateSqlServerContext()
-        => CreateContext(
+        => UmbracoDbContextTestFactory.Create(
             optionsBuilder => optionsBuilder.UseSqlServer("Server=.;Database=x;"),
             GetSqlServerCustomizers());
 
     private static UmbracoDbContext CreateSqliteContext()
-        => CreateContext(
+        => UmbracoDbContextTestFactory.Create(
             optionsBuilder => optionsBuilder.UseSqlite("Data Source=:memory:"),
             GetSqliteCustomizers());
-
-    /// <summary>
-    ///     Builds a context whose model can be read without opening a connection. EF Core caches the model per
-    ///     options set, so a per-instance cache key keeps each test's model independent of the others.
-    /// </summary>
-    private static UmbracoDbContext CreateContext(
-        Action<DbContextOptionsBuilder<UmbracoDbContext>> useProvider,
-        IEnumerable<IEFCoreModelCustomizer> customizers)
-    {
-        var services = new ServiceCollection();
-        services.AddLogging();
-        services.AddOptions();
-        services.Configure<ConnectionStrings>(connectionStrings =>
-        {
-            connectionStrings.ConnectionString = "placeholder";
-            connectionStrings.ProviderName = null;
-        });
-
-        IServiceProvider serviceProvider = services.BuildServiceProvider();
-
-        var optionsBuilder = new DbContextOptionsBuilder<UmbracoDbContext>()
-            .UseApplicationServiceProvider(serviceProvider)
-            .ReplaceService<IModelCacheKeyFactory, PerInstanceModelCacheKeyFactory>();
-        useProvider(optionsBuilder);
-
-        return new UmbracoDbContext(optionsBuilder.Options, customizers);
-    }
-
-    private class PerInstanceModelCacheKeyFactory : IModelCacheKeyFactory
-    {
-        public object Create(DbContext context, bool designTime)
-            => (context.ContextId, designTime);
-    }
 }
