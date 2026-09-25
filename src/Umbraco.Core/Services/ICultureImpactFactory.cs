@@ -15,10 +15,11 @@ public interface ICultureImpactFactory
     /// <param name="culture">The culture code.</param>
     /// <param name="isDefault">A value indicating whether the culture is the default culture.</param>
     /// <param name="content">The content item.</param>
+    /// <param name="includeInvariantForVariant">Whether invariant properties should be included for variant content.</param>
     /// <remarks>
     /// <para>Validates that the culture is compatible with the variation.</para>
     /// </remarks>
-    CultureImpact? Create(string culture, bool isDefault, IContentBase content);
+    CultureImpact? Create(string culture, bool isDefault, IContentBase content, bool includeInvariantForVariant);
 
     /// <summary>
     /// Gets the impact of 'all' cultures (including the invariant culture).
@@ -35,7 +36,8 @@ public interface ICultureImpactFactory
     /// </summary>
     /// <param name="culture">The culture code.</param>
     /// <param name="isDefault">A value indicating whether the culture is the default culture.</param>
-    CultureImpact ImpactExplicit(string? culture, bool isDefault);
+    /// <param name="includeInvariantForVariant">Whether invariant properties should be included for variant content.</param>
+    CultureImpact ImpactExplicit(string? culture, bool isDefault, bool includeInvariantForVariant);
 
     /// <summary>
     /// Utility method to return the culture used for invariant property errors based on what cultures are being actively saved,

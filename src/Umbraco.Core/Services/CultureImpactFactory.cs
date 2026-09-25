@@ -1,7 +1,3 @@
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Extensions;
 
@@ -13,25 +9,10 @@ namespace Umbraco.Cms.Core.Services;
 /// </summary>
 public class CultureImpactFactory : ICultureImpactFactory
 {
-    private ContentSettings _contentSettings;
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="CultureImpactFactory"/> class.
-    /// </summary>
-    /// <param name="contentSettings">The content settings options monitor.</param>
-    public CultureImpactFactory(IOptionsMonitor<ContentSettings> contentSettings)
-    {
-        _contentSettings = contentSettings.CurrentValue;
-
-        contentSettings.OnChange(x => _contentSettings = x);
-    }
-
     /// <inheritdoc/>
-    public CultureImpact? Create(string? culture, bool isDefault, IContentBase content)
+    public CultureImpact? Create(string? culture, bool isDefault, IContentBase content, bool includeInvariantForVariant)
     {
-        // The legacy AllowEditInvariantFromNonDefault config flag is no longer consulted — invariant
-        // property editing is gated upstream by the HasAccessToInvariantForVariant user-group permission.
-        TryCreate(culture, isDefault, content.ContentType.Variations, true, false, out CultureImpact? impact);
+        TryCreate(culture, isDefault, content.ContentType.Variations, true, includeInvariantForVariant, out CultureImpact? impact);
 
         return impact;
     }
@@ -43,7 +24,7 @@ public class CultureImpactFactory : ICultureImpactFactory
     public CultureImpact ImpactInvariant() => CultureImpact.Invariant;
 
     /// <inheritdoc/>
-    public CultureImpact ImpactExplicit(string? culture, bool isDefault)
+    public CultureImpact ImpactExplicit(string? culture, bool isDefault, bool includeInvariantForVariant)
     {
         if (culture is null)
         {
@@ -60,8 +41,7 @@ public class CultureImpactFactory : ICultureImpactFactory
             throw new ArgumentException("Culture \"*\" is not explicit.");
         }
 
-        // The legacy AllowEditInvariantFromNonDefault config flag is no longer consulted.
-        return new CultureImpact(culture, isDefault);
+        return new CultureImpact(culture, isDefault, includeInvariantForVariant);
     }
 
     /// <inheritdoc/>
@@ -100,13 +80,13 @@ public class CultureImpactFactory : ICultureImpactFactory
     /// <param name="isDefault">A value indicating whether the culture is the default culture.</param>
     /// <param name="variation">A content variation.</param>
     /// <param name="throwOnFail">A value indicating whether to throw if the impact cannot be created.</param>
-    /// <param name="editInvariantFromNonDefault">A value indicating if publishing invariant properties from non-default language.</param>
+    /// <param name="allowEditInvariantForVariant">A value indicating if editing (publishing) invariant properties is permitted for variant content.</param>
     /// <param name="impact">The impact if it could be created, otherwise null.</param>
     /// <returns>A value indicating whether the impact could be created.</returns>
     /// <remarks>
     /// <para>Validates that the culture is compatible with the variation.</para>
     /// </remarks>
-    internal bool TryCreate(string? culture, bool isDefault, ContentVariation variation, bool throwOnFail, bool editInvariantFromNonDefault, out CultureImpact? impact)
+    internal bool TryCreate(string? culture, bool isDefault, ContentVariation variation, bool throwOnFail, bool allowEditInvariantForVariant, out CultureImpact? impact)
     {
         impact = null;
 
@@ -181,7 +161,7 @@ public class CultureImpactFactory : ICultureImpactFactory
         }
 
         // return specific impact
-        impact = new CultureImpact(culture, isDefault, editInvariantFromNonDefault);
+        impact = new CultureImpact(culture, isDefault, allowEditInvariantForVariant);
         return true;
     }
 }

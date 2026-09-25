@@ -64,6 +64,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
     /// <param name="idKeyMap">The ID key map.</param>
     /// <param name="optionsMonitor">The content settings options monitor.</param>
     /// <param name="relationService">The relation service.</param>
+    /// <param name="serviceProvider">The service provider for resolving services without causing circular references.</param>
     public ContentService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -81,7 +82,8 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
         PropertyEditorCollection propertyEditorCollection,
         IIdKeyMap idKeyMap,
         IOptionsMonitor<ContentSettings> optionsMonitor,
-        IRelationService relationService)
+        IRelationService relationService,
+        IServiceProvider serviceProvider)
         : base(
             provider,
             loggerFactory,
@@ -94,7 +96,8 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
             cultureImpactFactory,
             userIdKeyResolver,
             propertyEditorCollection,
-            idKeyMap)
+            idKeyMap,
+            serviceProvider)
     {
         _documentRepository = documentRepository;
         _entityRepository = entityRepository;
@@ -113,6 +116,132 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
         });
         _relationService = relationService;
         _logger = loggerFactory.CreateLogger<ContentService>();
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ContentService"/> class.
+    /// </summary>
+    /// <param name="provider">The core scope provider.</param>
+    /// <param name="loggerFactory">The logger factory.</param>
+    /// <param name="eventMessagesFactory">The event messages factory.</param>
+    /// <param name="documentRepository">The document repository.</param>
+    /// <param name="entityRepository">The entity repository.</param>
+    /// <param name="auditService">The audit service.</param>
+    /// <param name="contentTypeRepository">The content type repository.</param>
+    /// <param name="documentBlueprintRepository">The document blueprint repository.</param>
+    /// <param name="languageRepository">The language repository.</param>
+    /// <param name="propertyValidationService">The property validation service.</param>
+    /// <param name="shortStringHelper">The short string helper.</param>
+    /// <param name="cultureImpactFactory">The culture impact factory.</param>
+    /// <param name="userIdKeyResolver">The user ID key resolver.</param>
+    /// <param name="propertyEditorCollection">The property editor collection.</param>
+    /// <param name="idKeyMap">The ID key map.</param>
+    /// <param name="optionsMonitor">The content settings options monitor.</param>
+    /// <param name="relationService">The relation service.</param>
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 20.")]
+    public ContentService(
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IDocumentRepository documentRepository,
+        IEntityRepository entityRepository,
+        IAuditService auditService,
+        IContentTypeRepository contentTypeRepository,
+        IDocumentBlueprintRepository documentBlueprintRepository,
+        ILanguageRepository languageRepository,
+        Lazy<IPropertyValidationService> propertyValidationService,
+        IShortStringHelper shortStringHelper,
+        ICultureImpactFactory cultureImpactFactory,
+        IUserIdKeyResolver userIdKeyResolver,
+        PropertyEditorCollection propertyEditorCollection,
+        IIdKeyMap idKeyMap,
+        IOptionsMonitor<ContentSettings> optionsMonitor,
+        IRelationService relationService)
+        : this(
+            provider,
+            loggerFactory,
+            eventMessagesFactory,
+            documentRepository,
+            entityRepository,
+            auditService,
+            contentTypeRepository,
+            documentBlueprintRepository,
+            languageRepository,
+            propertyValidationService,
+            shortStringHelper,
+            cultureImpactFactory,
+            userIdKeyResolver,
+            propertyEditorCollection,
+            idKeyMap,
+            optionsMonitor,
+            relationService,
+            StaticServiceProvider.Instance.GetRequiredService<IServiceProvider>())
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ContentService"/> class.
+    /// </summary>
+    /// <param name="provider">The core scope provider.</param>
+    /// <param name="loggerFactory">The logger factory.</param>
+    /// <param name="eventMessagesFactory">The event messages factory.</param>
+    /// <param name="documentRepository">The document repository.</param>
+    /// <param name="entityRepository">The entity repository.</param>
+    /// <param name="auditRepository">The audit repository.</param>
+    /// <param name="auditService">The audit service.</param>
+    /// <param name="contentTypeRepository">The content type repository.</param>
+    /// <param name="documentBlueprintRepository">The document blueprint repository.</param>
+    /// <param name="languageRepository">The language repository.</param>
+    /// <param name="propertyValidationService">The property validation service.</param>
+    /// <param name="shortStringHelper">The short string helper.</param>
+    /// <param name="cultureImpactFactory">The culture impact factory.</param>
+    /// <param name="userIdKeyResolver">The user ID key resolver.</param>
+    /// <param name="propertyEditorCollection">The property editor collection.</param>
+    /// <param name="idKeyMap">The ID key map.</param>
+    /// <param name="optionsMonitor">The content settings options monitor.</param>
+    /// <param name="relationService">The relation service.</param>
+    /// <param name="serviceProvider">The service provider for resolving services without causing circular references.</param>
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 20.")]
+    public ContentService(
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IDocumentRepository documentRepository,
+        IEntityRepository entityRepository,
+        IAuditRepository auditRepository,
+        IAuditService auditService,
+        IContentTypeRepository contentTypeRepository,
+        IDocumentBlueprintRepository documentBlueprintRepository,
+        ILanguageRepository languageRepository,
+        Lazy<IPropertyValidationService> propertyValidationService,
+        IShortStringHelper shortStringHelper,
+        ICultureImpactFactory cultureImpactFactory,
+        IUserIdKeyResolver userIdKeyResolver,
+        PropertyEditorCollection propertyEditorCollection,
+        IIdKeyMap idKeyMap,
+        IOptionsMonitor<ContentSettings> optionsMonitor,
+        IRelationService relationService,
+        IServiceProvider serviceProvider)
+        : this(
+            provider,
+            loggerFactory,
+            eventMessagesFactory,
+            documentRepository,
+            entityRepository,
+            auditService,
+            contentTypeRepository,
+            documentBlueprintRepository,
+            languageRepository,
+            propertyValidationService,
+            shortStringHelper,
+            cultureImpactFactory,
+            userIdKeyResolver,
+            propertyEditorCollection,
+            idKeyMap,
+            optionsMonitor,
+            relationService,
+            serviceProvider)
+    {
     }
 
     /// <summary>
@@ -806,7 +935,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
     }
 
     // utility 'PublishCultures' func used by SaveAndPublishBranch
-    private bool PublishBranch_PublishCultures(IContent content, HashSet<string> culturesToPublish, IReadOnlyCollection<ILanguage> allLangs)
+    private bool PublishBranch_PublishCultures(IContent content, HashSet<string> culturesToPublish, IReadOnlyCollection<ILanguage> allLangs, IUser user)
     {
         // variant content type - publish specified cultures
         // invariant content type - publish only the invariant culture
@@ -816,7 +945,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
         {
             return culturesToPublish.All(culture =>
             {
-                CultureImpact? impact = _cultureImpactFactory.Create(culture, IsDefaultCulture(allLangs, culture), content);
+                CultureImpact? impact = _cultureImpactFactory.Create(culture, IsDefaultCulture(allLangs, culture), content, includeInvariantForVariant: user.HasAccessToInvariantForVariant());
                 return content.PublishCulture(impact, publishTime, _propertyEditorCollection) &&
                        _propertyValidationService.Value.IsPropertyDataValid(content, out _, impact);
             });
@@ -932,7 +1061,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
     internal IEnumerable<PublishResult> PublishBranch(
         IContent document,
         Func<IContent, HashSet<string>?> shouldPublish,
-        Func<IContent, HashSet<string>, IReadOnlyCollection<ILanguage>, bool> publishCultures,
+        Func<IContent, HashSet<string>, IReadOnlyCollection<ILanguage>, IUser, bool> publishCultures,
         int userId = Constants.Security.SuperUserId)
     {
         if (shouldPublish == null)
@@ -951,6 +1080,8 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
 
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
+            IUser user = GetRequiredUser(userId);
+
             scope.WriteLock(Constants.Locks.ContentTree);
 
             var allLangs = _languageRepository.GetMany().ToList();
@@ -985,7 +1116,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
 
             // deal with the branch root - if it fails, abort
             HashSet<string>? culturesToPublish = shouldPublish(document);
-            PublishResult? result = PublishBranchItem(scope, document, culturesToPublish, publishCultures, true, publishedDocuments, eventMessages, userId, allLangs, out IDictionary<string, object?>? notificationState);
+            PublishResult? result = PublishBranchItem(scope, document, culturesToPublish, publishCultures, true, publishedDocuments, eventMessages, user, allLangs, out IDictionary<string, object?>? notificationState);
             if (result != null)
             {
                 results.Add(result);
@@ -1025,7 +1156,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
 
                     // no need to check path here, parent has to be published here
                     culturesToPublish = shouldPublish(d);
-                    result = PublishBranchItem(scope, d, culturesToPublish, publishCultures, false, publishedDocuments, eventMessages, userId, allLangs, out _);
+                    result = PublishBranchItem(scope, d, culturesToPublish, publishCultures, false, publishedDocuments, eventMessages, user, allLangs, out _);
                     if (result != null)
                     {
                         results.Add(result);
@@ -1079,11 +1210,11 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
         IContent document,
         HashSet<string>? culturesToPublish,
         Func<IContent, HashSet<string>, IReadOnlyCollection<ILanguage>,
-            bool> publishCultures,
+            IUser, bool> publishCultures,
         bool isRoot,
         ICollection<IContent> publishedDocuments,
         EventMessages evtMsgs,
-        int userId,
+        IUser user,
         IReadOnlyCollection<ILanguage> allLangs,
         out IDictionary<string, object?>? initialNotificationState)
     {
@@ -1114,13 +1245,13 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
         }
 
         // publish & check if values are valid
-        if (!publishCultures(document, culturesToPublish, allLangs))
+        if (!publishCultures(document, culturesToPublish, allLangs, user))
         {
             // TODO: Based on this callback behavior there is no way to know which properties may have been invalid if this failed, see other results of FailedPublishContentInvalid
             return new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, document);
         }
 
-        PublishResult result = CommitContentChangesInternal(scope, document, evtMsgs, allLangs, savingNotification.State, userId, true, isRoot);
+        PublishResult result = CommitContentChangesInternal(scope, document, evtMsgs, allLangs, savingNotification.State, user.Id, true, isRoot);
         if (result.Success)
         {
             publishedDocuments.Add(document);

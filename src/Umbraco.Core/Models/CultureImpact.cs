@@ -11,6 +11,7 @@ namespace Umbraco.Cms.Core.Models;
 ///         the invariant culture, or a specific culture.
 ///     </para>
 /// </remarks>
+// TODO KJA: The CultureImpact still carries notions of default culture (ImpactsOnlyDefaultCulture) - this should be removed.
 public sealed class CultureImpact
 {
     /// <summary>
@@ -18,8 +19,8 @@ public sealed class CultureImpact
     /// </summary>
     /// <param name="culture">The culture code.</param>
     /// <param name="isDefault">A value indicating whether the culture is the default culture.</param>
-    /// <param name="allowEditInvariantFromNonDefault">A value indicating if publishing invariant properties from non-default language.</param>
-    internal CultureImpact(string? culture, bool isDefault = false, bool allowEditInvariantFromNonDefault = false)
+    /// <param name="includeInvariantForVariant">A value indicating if editing (publishing) invariant properties should be included for variant content.</param>
+    internal CultureImpact(string? culture, bool isDefault = false, bool includeInvariantForVariant = false)
     {
         if (culture != null && culture.IsNullOrWhiteSpace())
         {
@@ -35,7 +36,7 @@ public sealed class CultureImpact
 
         ImpactsOnlyDefaultCulture = isDefault;
 
-        AllowEditInvariantFromNonDefault = allowEditInvariantFromNonDefault;
+        IncludeInvariantForVariant = includeInvariantForVariant;
     }
 
     /// <summary>
@@ -121,13 +122,9 @@ public sealed class CultureImpact
     ///     even though it does not impact the invariant culture, neither directly (ImpactsInvariantCulture)
     ///     nor indirectly (ImpactsAllCultures).
     /// </summary>
-    /// <remarks>
-    ///     Invariant properties are carried by every explicit-culture impact; the decision of whether
-    ///     the editing user is allowed to mutate invariant property values is gated upstream at the
-    ///     service boundary (see <c>ContentEditingServiceBase.EnsureOnlyAllowedFieldsAreUpdated</c>
-    ///     and <c>PropertyValidationContext.ValidateInvariantProperties</c>).
-    /// </remarks>
-    public bool ImpactsAlsoInvariantProperties => !ImpactsOnlyInvariantCulture && !ImpactsAllCultures;
+    public bool ImpactsAlsoInvariantProperties => !ImpactsOnlyInvariantCulture &&
+                                                  !ImpactsAllCultures &&
+                                                  (ImpactsOnlyDefaultCulture || IncludeInvariantForVariant);
 
     /// <summary>
     ///     Gets the behavior flags for this culture impact.
@@ -231,12 +228,7 @@ public sealed class CultureImpact
     }
 
     /// <summary>
-    ///     Gets a value indicating whether editing invariant properties from a non-default language is allowed.
+    ///     Gets a value indicating whether editing invariant properties for variant content.
     /// </summary>
-    /// <remarks>
-    ///     No longer consulted in the publish pipeline. Invariant-property editing is gated by the
-    ///     <c>HasAccessToInvariantForVariant</c> user-group permission.
-    /// </remarks>
-    [Obsolete("No longer used. Invariant-property editing is gated by the HasAccessToInvariantForVariant user-group permission. Scheduled for removal in Umbraco 20.")]
-    public bool AllowEditInvariantFromNonDefault { get; }
+    public bool IncludeInvariantForVariant { get; }
 }

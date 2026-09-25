@@ -18,6 +18,7 @@ public class ElementService : PublishableContentServiceBase<IElement>, IElementS
     private readonly ILogger<ElementService> _logger;
     private readonly IShortStringHelper _shortStringHelper;
 
+    // TODO KJA: breaking change in constructor.
     public ElementService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -31,7 +32,8 @@ public class ElementService : PublishableContentServiceBase<IElement>, IElementS
         IUserIdKeyResolver userIdKeyResolver,
         PropertyEditorCollection propertyEditorCollection,
         IIdKeyMap idKeyMap,
-        IShortStringHelper shortStringHelper)
+        IShortStringHelper shortStringHelper,
+        IServiceProvider serviceProvider)
         : base(
             provider,
             loggerFactory,
@@ -44,7 +46,8 @@ public class ElementService : PublishableContentServiceBase<IElement>, IElementS
             cultureImpactFactory,
             userIdKeyResolver,
             propertyEditorCollection,
-            idKeyMap)
+            idKeyMap,
+            serviceProvider)
     {
         _elementRepository = elementRepository;
         _shortStringHelper = shortStringHelper;

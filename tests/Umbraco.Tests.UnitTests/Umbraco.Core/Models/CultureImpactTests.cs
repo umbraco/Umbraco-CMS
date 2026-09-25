@@ -3,10 +3,8 @@
 
 using Moq;
 using NUnit.Framework;
-using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Tests.Common;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models;
 
@@ -68,10 +66,11 @@ public class CultureImpactTests
         Assert.IsFalse(impact.ImpactsOnlyDefaultCulture);
     }
 
-    [Test]
-    public void Explicit_Default_Culture()
+    [TestCase(true)]
+    [TestCase(false)]
+    public void Explicit_Default_Culture(bool allowEditInvariantForVariant)
     {
-        var impact = BasicImpactFactory.ImpactExplicit("en-US", true);
+        var impact = BasicImpactFactory.ImpactExplicit("en-US", true, allowEditInvariantForVariant);
 
         Assert.AreEqual(impact.Culture, "en-US");
 
@@ -83,19 +82,17 @@ public class CultureImpactTests
         Assert.IsTrue(impact.ImpactsOnlyDefaultCulture);
     }
 
-    [Test]
-    public void Explicit_NonDefault_Culture()
+    [TestCase(true)]
+    [TestCase(false)]
+    public void Explicit_NonDefault_Culture(bool allowEditInvariantForVariant)
     {
-        var impact = BasicImpactFactory.ImpactExplicit("en-US", false);
+        var impact = BasicImpactFactory.ImpactExplicit("en-US", false, allowEditInvariantForVariant);
 
         Assert.AreEqual(impact.Culture, "en-US");
 
         Assert.IsFalse(impact.ImpactsInvariantProperties);
 
-        // Invariant properties now travel with any explicit culture impact. Whether the editing user
-        // is actually allowed to mutate invariant property values is gated upstream at the service
-        // boundary via the HasAccessToInvariantForVariant user-group permission.
-        Assert.IsTrue(impact.ImpactsAlsoInvariantProperties);
+        Assert.AreEqual(allowEditInvariantForVariant, impact.ImpactsAlsoInvariantProperties);
         Assert.IsFalse(impact.ImpactsOnlyInvariantCulture);
         Assert.IsTrue(impact.ImpactsExplicitCulture);
         Assert.IsFalse(impact.ImpactsAllCultures);
@@ -120,20 +117,19 @@ public class CultureImpactTests
         Assert.IsTrue(impact.ImpactsOnlyDefaultCulture);
     }
 
-    [Test]
-    public void TryCreate_Explicit_NonDefault_Culture()
+    [TestCase(true)]
+    [TestCase(false)]
+    public void TryCreate_Explicit_NonDefault_Culture(bool allowEditInvariantForVariant)
     {
         var success =
-            BasicImpactFactory.TryCreate("en-US", false, ContentVariation.Culture, false, false, out var impact);
+            BasicImpactFactory.TryCreate("en-US", false, ContentVariation.Culture, false, allowEditInvariantForVariant, out var impact);
         Assert.IsTrue(success);
 
         Assert.IsNotNull(impact);
         Assert.AreEqual(impact.Culture, "en-US");
 
         Assert.IsFalse(impact.ImpactsInvariantProperties);
-
-        // Invariant properties now travel with any explicit culture impact — permission gating lives upstream.
-        Assert.IsTrue(impact.ImpactsAlsoInvariantProperties);
+        Assert.AreEqual(allowEditInvariantForVariant, impact.ImpactsAlsoInvariantProperties);
         Assert.IsFalse(impact.ImpactsOnlyInvariantCulture);
         Assert.IsTrue(impact.ImpactsExplicitCulture);
         Assert.IsFalse(impact.ImpactsAllCultures);
@@ -183,24 +179,13 @@ public class CultureImpactTests
     [Test]
     [TestCase(true)]
     [TestCase(false)]
-    public void AllowEditInvariantFromNonDefault_Config_No_Longer_Affects_ImpactsAlsoInvariantProperties(bool allowEditInvariantFromNonDefault)
+    public void Edit_Invariant_From_Variant_Impacts_Invariant_Properties(bool allowEditInvariantFromVariant)
     {
-        var sut = CreateCultureImpactService(new ContentSettings
-        {
-            AllowEditInvariantFromNonDefault = allowEditInvariantFromNonDefault
-        });
-        var impact = sut.ImpactExplicit("da", false);
+        var sut = CreateCultureImpactService();
+        var impact = sut.ImpactExplicit("da", false, allowEditInvariantFromVariant);
 
-        // Regardless of the legacy config flag, an explicit non-default culture impact always
-        // carries invariant properties. The upstream permission check decides whether the user
-        // is allowed to mutate those values.
-        Assert.IsTrue(impact.ImpactsAlsoInvariantProperties);
+        Assert.AreEqual(allowEditInvariantFromVariant, impact.ImpactsAlsoInvariantProperties);
     }
 
-    private CultureImpactFactory CreateCultureImpactService(ContentSettings contentSettings = null)
-    {
-        contentSettings ??= new ContentSettings { AllowEditInvariantFromNonDefault = false, };
-
-        return new CultureImpactFactory(new TestOptionsMonitor<ContentSettings>(contentSettings));
-    }
+    private CultureImpactFactory CreateCultureImpactService() => new CultureImpactFactory();
 }

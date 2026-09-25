@@ -1,8 +1,10 @@
 using System.Collections.Immutable;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
@@ -38,7 +40,9 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
     private readonly IUserIdKeyResolver _userIdKeyResolver;
     private readonly PropertyEditorCollection _propertyEditorCollection;
     private readonly IIdKeyMap _idKeyMap;
+    private readonly IServiceProvider _serviceProvider;
 
+    // TODO KJA: breaking change in constructor.
     protected PublishableContentServiceBase(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -51,7 +55,8 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         ICultureImpactFactory cultureImpactFactory,
         IUserIdKeyResolver userIdKeyResolver,
         PropertyEditorCollection propertyEditorCollection,
-        IIdKeyMap idKeyMap)
+        IIdKeyMap idKeyMap,
+        IServiceProvider serviceProvider)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _auditService = auditService;
@@ -63,6 +68,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         _userIdKeyResolver = userIdKeyResolver;
         _propertyEditorCollection = propertyEditorCollection;
         _idKeyMap = idKeyMap;
+        _serviceProvider = serviceProvider;
     }
 
     protected abstract UmbracoObjectTypes ContentObjectType { get; }
@@ -869,13 +875,15 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
 
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
+            IUser user = GetRequiredUser(userId);
+
             scope.WriteLock(WriteLockIds);
 
             var allLangs = _languageRepository.GetMany().ToList();
 
             // this will create the correct culture impact even if culture is * or null
             IEnumerable<CultureImpact?> impacts =
-                cultures.Select(culture => _cultureImpactFactory.Create(culture, IsDefaultCulture(allLangs, culture), content));
+                cultures.Select(culture => _cultureImpactFactory.Create(culture, IsDefaultCulture(allLangs, culture), content, includeInvariantForVariant: user.HasAccessToInvariantForVariant()));
 
             // publish the culture(s)
             // we don't care about the response here, this response will be rechecked below but we need to set the culture info values now.
@@ -942,8 +950,12 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
             return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, content);
         }
 
-        IEnumerable<CultureImpact> impacts =
-            culturesToPublish.Select(x => _cultureImpactFactory.ImpactExplicit(x, IsDefaultCulture(allLangs, x)));
+        IUser user = GetRequiredUser(userId);
+        IEnumerable<CultureImpact> impacts = culturesToPublish
+            .Select(x => _cultureImpactFactory.ImpactExplicit(
+                x,
+                IsDefaultCulture(allLangs, x),
+                includeInvariantForVariant: user.HasAccessToInvariantForVariant()));
 
         // publish the culture(s)
         // we don't care about the response here, this response will be rechecked below but we need to set the culture info values now.
@@ -1006,7 +1018,12 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         }
 
         // this will create the correct culture impact even if culture is * or null
-        var impact = _cultureImpactFactory.Create(culture, IsDefaultCulture(allLangs, culture), content);
+        IUser user = GetRequiredUser(userId);
+        var impact = _cultureImpactFactory.Create(
+            culture,
+            IsDefaultCulture(allLangs, culture),
+            content,
+            includeInvariantForVariant: user.HasAccessToInvariantForVariant());
 
         // publish the culture(s)
         // we don't care about the response here, this response will be rechecked below but we need to set the culture info values now.
@@ -1275,7 +1292,8 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
 
                         // publish the culture values and validate the property values, if validation fails, log the invalid properties so the develeper has an idea of what has failed
                         IProperty[]? invalidProperties = null;
-                        CultureImpact impact = _cultureImpactFactory.ImpactExplicit(culture, IsDefaultCulture(allLangs.Value, culture));
+                        // TODO KJA: hardcoding allowEditInvariantForVariant as true works for now, but will need replacing with an opt-in for including invariant-for-variant per scheduled culture
+                        CultureImpact impact = _cultureImpactFactory.ImpactExplicit(culture, IsDefaultCulture(allLangs.Value, culture), includeInvariantForVariant: true);
                         var tryPublish = d.PublishCulture(impact, date, _propertyEditorCollection) &&
                                          _propertyValidationService.Value.IsPropertyDataValid(d, out invalidProperties, impact);
                         if (invalidProperties != null && invalidProperties.Length > 0)
@@ -1498,7 +1516,8 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
                 culturesUnpublishing,
                 eventMessages,
                 allLangs,
-                notificationState);
+                notificationState,
+                userId);
 
             if (publishResult.Success)
             {
@@ -1931,6 +1950,10 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         return report;
     }
 
+    protected IUser GetRequiredUser(int userId)
+        => _serviceProvider.GetRequiredService<IUserService>().GetUserById(userId)
+           ?? throw new ArgumentException("Could not find the supplied user", nameof(userId));
+
     #endregion
 
     #region Internal Methods
@@ -2063,17 +2086,20 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         IReadOnlyCollection<string>? culturesUnpublishing,
         EventMessages evtMsgs,
         IReadOnlyCollection<ILanguage> allLangs,
-        IDictionary<string, object?>? notificationState)
+        IDictionary<string, object?>? notificationState,
+        int userId)
     {
         var variesByCulture = content.ContentType.VariesByCulture();
+        IUser user = GetRequiredUser(userId);
 
         // If it's null it's invariant
         CultureImpact[] impactsToPublish = culturesPublishing == null
                 ? new[] { _cultureImpactFactory.ImpactInvariant() }
             : culturesPublishing.Select(x =>
-                _cultureImpactFactory.ImpactExplicit(
+                    _cultureImpactFactory.ImpactExplicit(
                         x,
-                        allLangs.Any(lang => lang.IsoCode.InvariantEquals(x) && lang.IsMandatory)))
+                        allLangs.Any(lang => lang.IsoCode.InvariantEquals(x) && lang.IsMandatory),
+                        includeInvariantForVariant: user.HasAccessToInvariantForVariant()))
                     .ToArray();
 
         // publish the culture(s)
