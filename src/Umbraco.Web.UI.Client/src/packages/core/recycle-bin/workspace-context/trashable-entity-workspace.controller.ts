@@ -5,7 +5,7 @@ import type { UmbTrashableEntityWorkspaceContext } from './types.js';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbVariantGuardRule } from '@umbraco-cms/backoffice/utils';
+import type { UmbGuardRule } from '@umbraco-cms/backoffice/utils';
 
 /**
  * Adds recycle-bin support (readonly-when-trashed, reload on trash/restore, redirect to parent when the current
@@ -142,8 +142,7 @@ export class UmbTrashableEntityWorkspaceController extends UmbControllerBase {
 		// `permitted: true` on one and `permitted: false` on the other to mean the same thing.
 		this.#workspaceContext?.readOnlyGuard?.addRule({ unique: guardUnique, permitted: true });
 
-		// No `variantId` set — a blanket rule, applying to every variant.
-		const nameWriteGuardRule: UmbVariantGuardRule = { unique: guardUnique, permitted: false };
+		const nameWriteGuardRule: UmbGuardRule = { unique: guardUnique, permitted: false };
 		this.#workspaceContext?.nameWriteGuard?.addRule(nameWriteGuardRule);
 	}
 
