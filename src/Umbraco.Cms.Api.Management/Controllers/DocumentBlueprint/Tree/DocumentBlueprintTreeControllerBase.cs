@@ -80,24 +80,14 @@ public class DocumentBlueprintTreeControllerBase : FolderTreeControllerBase<Docu
         }
     }
 
-    protected override DocumentBlueprintTreeItemResponseModel[] MapTreeItemViewModels(Guid? parentId, IEntitySlim[] entities)
-        => entities.Select(entity =>
-        {
-            DocumentBlueprintTreeItemResponseModel responseModel = MapTreeItemViewModel(parentId, entity);
-            if (entity is IDocumentEntitySlim documentEntitySlim)
-            {
-                responseModel.HasChildren = false;
-                responseModel.DocumentType = _documentPresentationFactory.CreateDocumentTypeReferenceResponseModel(documentEntitySlim);
-            }
-            return responseModel;
-        }).ToArray();
-
     protected override DocumentBlueprintTreeItemResponseModel MapTreeItemViewModel(Guid? parentKey, IEntitySlim entity)
     {
         DocumentBlueprintTreeItemResponseModel responseModel = base.MapTreeItemViewModel(parentKey, entity);
 
-        if (entity is IDocumentEntitySlim documentEntitySlim)
+        if (responseModel.IsFolder is false && entity is IDocumentEntitySlim documentEntitySlim)
         {
+            responseModel.HasChildren = false;
+            responseModel.DocumentType = _documentPresentationFactory.CreateDocumentTypeReferenceResponseModel(documentEntitySlim);
             responseModel.Variants = _documentPresentationFactory.CreateVariantsItemResponseModels(documentEntitySlim);
         }
 
