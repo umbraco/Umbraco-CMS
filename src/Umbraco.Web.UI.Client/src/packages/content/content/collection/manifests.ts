@@ -15,7 +15,7 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 			element: () => import('./content-collection-workspace-view.element.js'),
 			weight: 300,
 			meta: {
-				label: 'Collection',
+				label: '#contentTypeEditor_collection',
 				pathname: 'collection',
 				icon: 'icon-grid',
 			},
