@@ -7,7 +7,7 @@ Development-time library enabling **InMemoryAuto** ModelsBuilder mode with runti
 ## 1. Architecture
 
 **Type**: Class Library (NuGet Package)
-**Target Framework**: .NET 10.0
+**Target Framework**: .NET 11.0
 **Purpose**: Enable hot-reload of ModelsBuilder models during development
 
 ### Key Technologies

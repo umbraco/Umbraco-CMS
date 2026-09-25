@@ -39,7 +39,6 @@
     <PackageReference Include="MailKit" />
     <PackageReference Include="Markdig" />
     <PackageReference Include="Markdown" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
     <PackageReference Include="Microsoft.Extensions.Http" />

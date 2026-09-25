@@ -651,6 +651,8 @@ export class DocumentService {
      * Gets available segments.
      *
      * Gets a collection of available content segments for the system.
+     *
+     * @deprecated
      */
     public static getDocumentByIdAvailableSegmentOptions<ThrowOnError extends boolean = true>(options: Options<GetDocumentByIdAvailableSegmentOptionsData, ThrowOnError>): RequestResult<GetDocumentByIdAvailableSegmentOptionsResponses, GetDocumentByIdAvailableSegmentOptionsErrors, ThrowOnError> {
         return (options.client ?? client).get<GetDocumentByIdAvailableSegmentOptionsResponses, GetDocumentByIdAvailableSegmentOptionsErrors, ThrowOnError>({
@@ -2831,6 +2833,8 @@ export class HelpService {
      * Gets help information.
      *
      * Gets help information and documentation resources for the Umbraco back office.
+     *
+     * @deprecated
      */
     public static getHelp<ThrowOnError extends boolean = true>(options?: Options<GetHelpData, ThrowOnError>): RequestResult<GetHelpResponses, GetHelpErrors, ThrowOnError> {
         return (options?.client ?? client).get<GetHelpResponses, GetHelpErrors, ThrowOnError>({
@@ -5306,6 +5310,8 @@ export class RedirectManagementService {
      * Deprecated. No longer changes the redirect URL tracking status.
      *
      * This endpoint is deprecated and no longer modifies the configuration. To toggle redirect URL tracking, set the Umbraco:CMS:WebRouting:DisableRedirectUrlTracking configuration key instead.
+     *
+     * @deprecated
      */
     public static postRedirectManagementStatus<ThrowOnError extends boolean = true>(options?: Options<PostRedirectManagementStatusData, ThrowOnError>): RequestResult<PostRedirectManagementStatusResponses, PostRedirectManagementStatusErrors, ThrowOnError> {
         return (options?.client ?? client).post<PostRedirectManagementStatusResponses, PostRedirectManagementStatusErrors, ThrowOnError>({
@@ -5726,6 +5732,8 @@ export class ServerService {
      * Checks for available upgrades.
      *
      * Checks if there are any available upgrades for the Umbraco installation.
+     *
+     * @deprecated
      */
     public static getServerUpgradeCheck<ThrowOnError extends boolean = true>(options?: Options<GetServerUpgradeCheckData, ThrowOnError>): RequestResult<GetServerUpgradeCheckResponses, GetServerUpgradeCheckErrors, ThrowOnError> {
         return (options?.client ?? client).get<GetServerUpgradeCheckResponses, GetServerUpgradeCheckErrors, ThrowOnError>({

@@ -3,7 +3,7 @@
 Front-end website functionality for Umbraco CMS. Provides Surface controllers, member authentication/registration, content routing, and Razor view engine support for rendering published content.
 
 **Project Type**: Class Library (NuGet package)
-**Target Framework**: net10.0
+**Target Framework**: net11.0
 **Package ID**: Umbraco.Cms.Web.Website
 **Namespace**: Umbraco.Cms.Web.Website
 **Dependencies**: Umbraco.Web.Common
