@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.DtoCustomization;
 /// </summary>
 public class SqlServerUserGroup2GranularPermissionDtoModelCustomizer : IEFCoreModelCustomizer<UserGroup2GranularPermissionDto>
 {
-    public string? ProviderName => Constants.ProviderNames.SQLServer;
+    public string? ProviderName => Constants.ProviderNames.EFCore.SQLServer;
 
     public void Customize(EntityTypeBuilder<UserGroup2GranularPermissionDto> builder) =>
         builder.HasIndex(x => x.UserGroupKey)

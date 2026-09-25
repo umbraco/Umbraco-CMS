@@ -80,6 +80,38 @@ public class SqliteSyntaxProviderTests
         Assert.DoesNotThrow(() => Execute(connection, sql), sql);
     }
 
+    /// <summary>
+    ///     SQLite only accepts a constant default on an added column, so a date column cannot fall back to the
+    ///     current timestamp the way a freshly created table can.
+    /// </summary>
+    [Test]
+    public void Add_Column_Statement_For_A_Non_Nullable_Date_Column_Runs_Against_A_Populated_Table()
+    {
+        var sut = new SqliteSyntaxProvider(
+            Options.Create(new GlobalSettings()),
+            Mock.Of<ILogger<SqliteSyntaxProvider>>());
+
+        TableDefinition table = DefinitionFactory.GetTableDefinition(typeof(ContentVersionCultureVariationDto), sut);
+        ColumnDefinition column = table.Columns.Single(x => x.PropertyType == typeof(DateTime));
+
+        using var connection = new SqliteConnection("Data Source=:memory:");
+        connection.Open();
+
+        Execute(connection, "CREATE TABLE [umbracoContentVersionCultureVariation] ([id] INTEGER PRIMARY KEY AUTOINCREMENT, [versionId] INTEGER NOT NULL)");
+        Execute(connection, "INSERT INTO [umbracoContentVersionCultureVariation] ([versionId]) VALUES (1)");
+
+        var sql = string.Format(
+            sut.AddColumn,
+            sut.GetQuotedTableName(ContentVersionCultureVariationDto.TableName),
+            sut.FormatAddColumn(column));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(column.IsNullable, Is.False);
+            Assert.DoesNotThrow(() => Execute(connection, sql), sql);
+        });
+    }
+
     private static void Execute(SqliteConnection connection, string sql)
     {
         using SqliteCommand command = connection.CreateCommand();

@@ -12,7 +12,7 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.DtoCustomization;
 /// </summary>
 public class SqlServerDocumentUrlAliasDtoModelCustomizer : IEFCoreModelCustomizer<DocumentUrlAliasDto>
 {
-    public string? ProviderName => Constants.ProviderNames.SQLServer;
+    public string? ProviderName => Constants.ProviderNames.EFCore.SQLServer;
 
     public void Customize(EntityTypeBuilder<DocumentUrlAliasDto> builder) =>
         builder.HasKey(x => x.Id)

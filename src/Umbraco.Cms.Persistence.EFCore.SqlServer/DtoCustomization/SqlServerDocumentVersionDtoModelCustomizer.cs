@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.DtoCustomization;
 /// </summary>
 public class SqlServerDocumentVersionDtoModelCustomizer : IEFCoreModelCustomizer<DocumentVersionDto>
 {
-    public string? ProviderName => Constants.ProviderNames.SQLServer;
+    public string? ProviderName => Constants.ProviderNames.EFCore.SQLServer;
 
     public void Customize(EntityTypeBuilder<DocumentVersionDto> builder)
     {

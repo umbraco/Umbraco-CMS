@@ -12,7 +12,7 @@ using Umbraco.Cms.Infrastructure.Persistence.EFCore;
 namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
 {
     [DbContext(typeof(UmbracoDbContext))]
-    [Migration("20260922130808_ReconcileDocumentRepositoryModel")]
+    [Migration("20260924083011_ReconcileDocumentRepositoryModel")]
     partial class ReconcileDocumentRepositoryModel
     {
         /// <inheritdoc />
@@ -703,6 +703,8 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                         .IsUnique()
                         .HasDatabaseName("IX_umbracoContentVersionCultureVariation_VersionId");
 
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("VersionId", "LanguageId"), new[] { "Id", "Name", "UpdateDate", "UpdateUserId" });
+
                     b.ToTable("umbracoContentVersionCultureVariation", (string)null);
                 });
 
@@ -752,6 +754,8 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                     b.HasIndex("Current")
                         .HasDatabaseName("IX_umbracoContentVersion_Current");
 
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Current"), new[] { "NodeId" });
+
                     b.HasIndex("Key")
                         .IsUnique()
                         .HasDatabaseName("IX_umbracoContentVersion_key");
@@ -763,6 +767,8 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
 
                     b.HasIndex("NodeId", "Current")
                         .HasDatabaseName("IX_umbracoContentVersion_NodeId");
+
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("NodeId", "Current"), new[] { "Id", "VersionDate", "Text", "UserId", "PreventCleanup" });
 
                     b.ToTable("umbracoContentVersion", (string)null);
                 });
@@ -962,6 +968,8 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
 
                     b.HasKey("Id");
 
+                    SqlServerKeyBuilderExtensions.IsClustered(b.HasKey("Id"), false);
+
                     b.HasIndex("LanguageId");
 
                     b.HasIndex("Alias", "LanguageId")
@@ -1009,12 +1017,15 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
 
                     b.HasKey("NodeId");
 
+                    SqlServerKeyBuilderExtensions.IsClustered(b.HasKey("NodeId"), false);
+
                     b.HasIndex("LanguageId");
 
                     b.HasIndex("UniqueId", "LanguageId", "IsDraft", "UrlSegment")
                         .IsUnique()
-                        .HasDatabaseName("IX_umbracoDocumentUrl")
-                        .HasFilter("[languageId] IS NOT NULL");
+                        .HasDatabaseName("IX_umbracoDocumentUrl");
+
+                    SqlServerIndexBuilderExtensions.IsClustered(b.HasIndex("UniqueId", "LanguageId", "IsDraft", "UrlSegment"));
 
                     b.ToTable("umbracoDocumentUrl", (string)null);
                 });
@@ -1038,8 +1049,12 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                     b.HasIndex("Published")
                         .HasDatabaseName("IX_umbracoDocumentVersion_published");
 
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Published"), new[] { "Id", "TemplateId" });
+
                     b.HasIndex("Id", "Published")
                         .HasDatabaseName("IX_umbracoDocumentVersion_id_published");
+
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Id", "Published"), new[] { "TemplateId" });
 
                     b.ToTable("umbracoDocumentVersion", (string)null);
                 });
@@ -1417,17 +1432,27 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                         .IsUnique()
                         .HasDatabaseName("IX_umbracoNode_UniqueId");
 
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("UniqueId"), new[] { "ParentId", "Level", "Path", "SortOrder", "Trashed", "UserId", "Text", "CreateDate" });
+
                     b.HasIndex("NodeObjectType", "Trashed")
                         .HasDatabaseName("IX_umbracoNode_ObjectType");
+
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("NodeObjectType", "Trashed"), new[] { "UniqueId", "ParentId", "Level", "Path", "SortOrder", "UserId", "Text", "CreateDate" });
 
                     b.HasIndex("ParentId", "NodeObjectType")
                         .HasDatabaseName("IX_umbracoNode_parentId_nodeObjectType");
 
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("ParentId", "NodeObjectType"), new[] { "Trashed", "UserId", "Level", "Path", "SortOrder", "UniqueId", "Text", "CreateDate" });
+
                     b.HasIndex("NodeObjectType", "Trashed", "SortOrder", "NodeId")
                         .HasDatabaseName("IX_umbracoNode_ObjectType_trashed_sorted");
 
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("NodeObjectType", "Trashed", "SortOrder", "NodeId"), new[] { "UniqueId", "ParentId", "Level", "Path", "UserId", "Text", "CreateDate" });
+
                     b.HasIndex("Level", "ParentId", "SortOrder", "NodeObjectType", "Trashed")
                         .HasDatabaseName("IX_umbracoNode_Level");
+
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Level", "ParentId", "SortOrder", "NodeObjectType", "Trashed"), new[] { "UserId", "Path", "UniqueId", "CreateDate" });
 
                     b.ToTable("umbracoNode", (string)null);
                 });
@@ -1676,6 +1701,8 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                     b.HasIndex("CreateDateUtc")
                         .HasDatabaseName("IX_umbracoRedirectUrl_culture_hash");
 
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("CreateDateUtc"), new[] { "Culture", "Url", "UrlHash", "ContentKey" });
+
                     b.HasIndex("UrlHash", "ContentKey", "Culture", "CreateDateUtc")
                         .IsUnique()
                         .HasDatabaseName("IX_umbracoRedirectUrl")
@@ -1819,6 +1846,8 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                     b.HasIndex("LanguageId", "Group")
                         .HasDatabaseName("IX_cmsTags_languageId_group");
 
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("LanguageId", "Group"), new[] { "Id", "Text" });
+
                     b.HasIndex("Group", "Text", "LanguageId")
                         .IsUnique()
                         .HasDatabaseName("IX_cmsTags")
@@ -1848,6 +1877,8 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
 
                     b.HasIndex("TagId", "NodeId")
                         .HasDatabaseName("IX_cmsTagRelationship_tagId_nodeId");
+
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("TagId", "NodeId"), new[] { "PropertyTypeId" });
 
                     b.ToTable("cmsTagRelationship", (string)null);
                 });
@@ -2025,6 +2056,8 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
 
                     b.HasIndex("UserGroupKey")
                         .HasDatabaseName("IX_umbracoUserGroup2GranularPermission_UserGroupKey_UniqueId");
+
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("UserGroupKey"), new[] { "UniqueId" });
 
                     b.ToTable("umbracoUserGroup2GranularPermission", (string)null);
                 });
