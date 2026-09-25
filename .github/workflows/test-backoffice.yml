@@ -49,7 +49,7 @@ jobs:
       - run: npm run generate:icons
       - run: npm run build:for:cms
       - run: npm run check:paths
-      - run: npm run generate:jsonschema:dist
+      - run: npm run generate:jsonschema
 
   test:
     runs-on: ubuntu-latest
