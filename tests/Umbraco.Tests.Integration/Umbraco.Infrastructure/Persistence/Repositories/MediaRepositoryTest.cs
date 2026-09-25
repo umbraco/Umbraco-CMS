@@ -273,6 +273,58 @@ internal sealed class MediaRepositoryTest : UmbracoIntegrationTest
         Assert.That(keyAfterUpdate, Is.EqualTo(keyAfterInsert));
     }
 
+    [Test]
+    public void Save_Of_New_Media_Populates_ParentKey_On_The_Cached_Entity()
+    {
+        var realCache = new AppCaches(
+            new ObjectCacheAppCache(),
+            new DictionaryAppCache(),
+            new IsolatedCaches(t => new ObjectCacheAppCache()));
+
+        var provider = ScopeProvider;
+        var scopeAccessor = ScopeAccessor;
+
+        using var scope = provider.CreateScope();
+        var repository = CreateRepository(provider, out var mediaTypeRepository, realCache);
+        var database = scopeAccessor.AmbientScope.Database;
+
+        var mediaType = mediaTypeRepository.Get(1032);
+        var image = MediaBuilder.CreateMediaImage(mediaType, _testFolder.Id);
+        repository.Save(image);
+
+        database.EnableSqlCount = true;
+        IMedia? cached = repository.Get(image.Id);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(database.SqlCount, Is.Zero, "the saved instance is served from the repository cache");
+            Assert.That(image.ParentKey, Is.EqualTo(_testFolder.Key));
+            Assert.That(cached!.ParentKey, Is.EqualTo(_testFolder.Key));
+        });
+    }
+
+    [Test]
+    public void Save_Of_Moved_Media_Populates_ParentKey_For_The_New_Parent()
+    {
+        var provider = ScopeProvider;
+
+        using var scope = provider.CreateScope();
+        var repository = CreateRepository(provider, out var mediaTypeRepository);
+
+        var folderMediaType = mediaTypeRepository.Get(1031);
+        var otherFolder = MediaBuilder.CreateMediaFolder(folderMediaType, -1);
+        repository.Save(otherFolder);
+
+        var mediaType = mediaTypeRepository.Get(1032);
+        var image = MediaBuilder.CreateMediaImage(mediaType, _testFolder.Id);
+        repository.Save(image);
+
+        image.ParentId = otherFolder.Id;
+        repository.Save(image);
+
+        Assert.That(image.ParentKey, Is.EqualTo(otherFolder.Key));
+    }
+
     private Media CreateMedia(MediaRepository repository, MediaTypeRepository mediaTypeRepository)
     {
         var mediaType = MediaTypeBuilder.CreateSimpleMediaType("umbTextpage1", "Textpage");

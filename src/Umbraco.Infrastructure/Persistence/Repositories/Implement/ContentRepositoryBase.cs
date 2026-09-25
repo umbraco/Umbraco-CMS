@@ -1269,6 +1269,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             return sortOrder + 1 ?? first;
         }
 
+        // Root is the one parent whose node row must not supply the key: null is the "no parent" value ParentKey
+        // contracts to. Every other parent, the recycle bin included, carries the key the contract expects.
+        private protected static Guid? ResolveParentKey(int parentId, NodeDto parent) =>
+            parentId == Constants.System.Root ? null : parent.UniqueId;
+
         protected virtual NodeDto GetParentNodeDto(int parentId)
         {
             SqlTemplate? template = SqlContext.Templates.Get(Constants.SqlTemplates.VersionableRepository.GetParentNode, tsql => tsql

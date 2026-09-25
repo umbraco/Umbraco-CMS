@@ -1070,6 +1070,7 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
         entity.Path = nodeDto.Path;
         entity.SortOrder = sortOrder;
         entity.Level = level;
+        entity.ParentKey = ResolveParentKey(entity.ParentId, parent);
 
         // persist the content dto
         ContentDto contentDto = dto.ContentDto;
@@ -1258,6 +1259,7 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
                 entity.Path = string.Concat(parent.Path, ",", entity.Id);
                 entity.Level = parent.Level + 1;
                 entity.SortOrder = GetNewChildSortOrder(entity.ParentId, 0);
+                entity.ParentKey = ResolveParentKey(entity.ParentId, parent);
             }
         }
 
