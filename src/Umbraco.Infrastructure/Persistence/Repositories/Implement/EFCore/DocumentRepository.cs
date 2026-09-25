@@ -1639,7 +1639,7 @@ internal class DocumentRepository
             .ToArray();
 
         return templateIds.Length > 0
-            ? [.._templateRepository.GetMany(templateIds).Select(template => template.Id)]
+            ? [.. _templateRepository.GetMany(templateIds).Select(template => template.Id)]
             : [];
     }
 

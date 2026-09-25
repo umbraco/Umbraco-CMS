@@ -2051,7 +2051,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
         Assert.ThrowsAsync<ArgumentNullException>(() => ContentService.PublishAsync(content, null!, Constants.Security.SuperUserKey, CancellationToken.None));
         Assert.ThrowsAsync<ArgumentException>(() => ContentService.PublishAsync(content, new string[] { null }, Constants.Security.SuperUserKey, CancellationToken.None));
-        Assert.ThrowsAsync<ArgumentException>(() => ContentService.PublishAsync(content, new [] { string.Empty }, Constants.Security.SuperUserKey, CancellationToken.None));
+        Assert.ThrowsAsync<ArgumentException>(() => ContentService.PublishAsync(content, new[] { string.Empty }, Constants.Security.SuperUserKey, CancellationToken.None));
         Assert.ThrowsAsync<ArgumentException>(() => ContentService.PublishAsync(content, new[] { "*", null }, Constants.Security.SuperUserKey, CancellationToken.None));
         Assert.ThrowsAsync<ArgumentException>(() => ContentService.PublishAsync(content, new[] { "en-US", "*" }, Constants.Security.SuperUserKey, CancellationToken.None));
     }
@@ -4377,7 +4377,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         Assert.AreEqual(0, contentTags.Length);
 
         // publish
-        await ContentService.PublishAsync(content, new []{ "*" }, Constants.Security.SuperUserKey, CancellationToken.None);
+        await ContentService.PublishAsync(content, new[] { "*" }, Constants.Security.SuperUserKey, CancellationToken.None);
 
         // now tags have been set (published)
         Assert.AreEqual("[\"hello\",\"world\"]", content.GetValue(propAlias));
@@ -4393,7 +4393,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         Assert.AreEqual(0, copiedTags.Length);
 
         // publish
-        await ContentService.PublishAsync(copy, new []{ "*" }, Constants.Security.SuperUserKey, CancellationToken.None);
+        await ContentService.PublishAsync(copy, new[] { "*" }, Constants.Security.SuperUserKey, CancellationToken.None);
 
         // now tags have been set (published)
         copiedTags = TagService.GetTagsForEntity(copy.Id).ToArray();
@@ -5230,7 +5230,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         // becomes Published, !Edited
         // creates a new version
         // can get published property values
-        await ContentService.PublishAsync(content, new []{ "*" }, Constants.Security.SuperUserKey, CancellationToken.None);
+        await ContentService.PublishAsync(content, new[] { "*" }, Constants.Security.SuperUserKey, CancellationToken.None);
 
         Assert.IsTrue(content.Published);
         Assert.IsFalse(content.Edited);
@@ -5645,7 +5645,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         // note that content and content2 culture published dates might be slightly different due to roundtrip to database
 
         // Act
-        await ContentService.PublishAsync(content, new []{ "*" }, Constants.Security.SuperUserKey, CancellationToken.None);
+        await ContentService.PublishAsync(content, new[] { "*" }, Constants.Security.SuperUserKey, CancellationToken.None);
 
         // now it has publish name for invariant neutral
         content2 = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
