@@ -120,10 +120,20 @@ export class UmbUserGroupWorkspaceContext
 		this._data.updateCurrent({ description });
 	}
 
+	/**
+	 * Sets the sections the user group grants access to.
+	 * @param {Array<string>} sections - The section aliases.
+	 * @memberof UmbUserGroupWorkspaceContext
+	 */
 	setSections(sections: Array<string>) {
 		this.updateProperty('sections', sections);
 	}
 
+	/**
+	 * Sets the user group language access.
+	 * @param {UmbStartNodeAccessValue} value - The language root access and start nodes.
+	 * @memberof UmbUserGroupWorkspaceContext
+	 */
 	setLanguageAccess(value: UmbStartNodeAccessValue) {
 		this._data.updateCurrent({
 			hasAccessToAllLanguages: value.rootAccess,
@@ -131,6 +141,11 @@ export class UmbUserGroupWorkspaceContext
 		});
 	}
 
+	/**
+	 * Sets the user group document access.
+	 * @param {UmbStartNodeAccessValue} value - The document root access and start node.
+	 * @memberof UmbUserGroupWorkspaceContext
+	 */
 	setDocumentAccess(value: UmbStartNodeAccessValue) {
 		this._data.updateCurrent({
 			documentRootAccess: value.rootAccess,
@@ -138,6 +153,11 @@ export class UmbUserGroupWorkspaceContext
 		});
 	}
 
+	/**
+	 * Sets the user group media access.
+	 * @param {UmbStartNodeAccessValue} value - The media root access and start node.
+	 * @memberof UmbUserGroupWorkspaceContext
+	 */
 	setMediaAccess(value: UmbStartNodeAccessValue) {
 		this._data.updateCurrent({
 			mediaRootAccess: value.rootAccess,
