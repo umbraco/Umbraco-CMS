@@ -126,12 +126,29 @@ internal sealed class ContentBlueprintEditingService
     }
 
     /// <inheritdoc />
+    [Obsolete("Please use the overload taking all parameters. Scheduled for removal in Umbraco 21.")]
     public async Task<Attempt<ContentCreateResult, ContentEditingOperationStatus>> CreateFromContentAsync(Guid contentKey, string name, Guid? key, Guid userKey)
+        => await CreateFromContentAsync(contentKey, name, key, null, userKey);
+
+    /// <inheritdoc />
+    public async Task<Attempt<ContentCreateResult, ContentEditingOperationStatus>> CreateFromContentAsync(Guid contentKey, string name, Guid? key, Guid? parentKey, Guid userKey)
     {
         IContent? content = ContentService.GetById(contentKey);
         if (content is null)
         {
             return Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, new ContentCreateResult());
+        }
+
+        IContentType? contentType = ContentTypeService.Get(content.ContentTypeId);
+        if (contentType is null)
+        {
+            return Attempt.FailWithStatus(ContentEditingOperationStatus.ContentTypeNotFound, new ContentCreateResult());
+        }
+
+        (int? ParentId, ContentEditingOperationStatus OperationStatus) parent = await TryGetAndValidateParentIdAsync(parentKey, contentType);
+        if (parent.OperationStatus is not ContentEditingOperationStatus.Success)
+        {
+            return Attempt.FailWithStatus(parent.OperationStatus, new ContentCreateResult());
         }
 
         if (ValidateUniqueName(name, content) is false)
@@ -142,6 +159,7 @@ internal sealed class ContentBlueprintEditingService
         // Create Blueprint
         var currentUserId = await GetUserIdAsync(userKey);
         IContent blueprint = ContentService.CreateBlueprintFromContent(content, name, currentUserId);
+        blueprint.ParentId = parent.ParentId ?? Constants.System.Root;
 
         if (key.HasValue)
         {

@@ -43,6 +43,11 @@ public static class AuthorizationPolicies
     public const string SectionAccessForContentTree = nameof(SectionAccessForContentTree);
     public const string SectionAccessForElementTree = nameof(SectionAccessForElementTree);
 
+    /// <summary>
+    ///     Requires access to a section that shows the document blueprint tree.
+    /// </summary>
+    public const string SectionAccessForDocumentBlueprintTree = nameof(SectionAccessForDocumentBlueprintTree);
+
     // Single tree access
     public const string TreeAccessDocuments = nameof(TreeAccessDocuments);
 
