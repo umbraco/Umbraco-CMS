@@ -22,7 +22,7 @@ export class UmbMediaStartNodeAccessPropertyEditorUIElement extends UmbPropertyE
 	}
 }
 
-export default UmbMediaStartNodeAccessPropertyEditorUIElement;
+export { UmbMediaStartNodeAccessPropertyEditorUIElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {

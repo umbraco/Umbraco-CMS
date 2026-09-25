@@ -20,7 +20,7 @@ export class UmbDocumentStartNodeAccessPropertyEditorUIElement extends UmbProper
 	}
 }
 
-export default UmbDocumentStartNodeAccessPropertyEditorUIElement;
+export { UmbDocumentStartNodeAccessPropertyEditorUIElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
