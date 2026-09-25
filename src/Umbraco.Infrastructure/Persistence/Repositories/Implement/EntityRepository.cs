@@ -463,9 +463,10 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
         {
             List<DocumentEntityDto>? cdtos = Database.Fetch<DocumentEntityDto>(sql);
 
-            return cdtos.Count == 0
-                ? Enumerable.Empty<IEntitySlim>()
-                : BuildVariants(cdtos.Select(BuildDocumentEntity)).ToList();
+            // The query may span content and container object types, so each row is built by its own object type.
+            EntitySlim[] contentEntities = cdtos.Select(BuildEntity).ToArray();
+            BuildVariants(contentEntities.OfType<DocumentEntitySlim>());
+            return contentEntities;
         }
 
         IEnumerable<BaseDto>? dtos = isMedia

@@ -4,6 +4,7 @@
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Services;
@@ -60,6 +61,47 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
     private IContentTypeContainerService ContentTypeContainerService => GetRequiredService<IContentTypeContainerService>();
 
     public IContentTypeEditingService ContentTypeEditingService => GetRequiredService<IContentTypeEditingService>();
+
+    private IContentBlueprintContainerService ContentBlueprintContainerService => GetRequiredService<IContentBlueprintContainerService>();
+
+    private IContentBlueprintEditingService ContentBlueprintEditingService => GetRequiredService<IContentBlueprintEditingService>();
+
+    [Test]
+    public async Task EntityService_Builds_Siblings_Of_Mixed_Object_Types_By_Their_Own_Object_Type()
+    {
+        var containerKey = Guid.NewGuid();
+        var containerResult = await ContentBlueprintContainerService.CreateAsync(containerKey, "Blueprint Siblings Folder", null, Constants.Security.SuperUserKey);
+        Assert.IsTrue(containerResult.Success);
+
+        var blueprintKey = Guid.NewGuid();
+        var blueprintResult = await ContentBlueprintEditingService.CreateAsync(
+            new ContentBlueprintCreateModel
+            {
+                Key = blueprintKey,
+                ContentTypeKey = _contentType.Key,
+                Variants = [new VariantModel { Name = "Blueprint Siblings Blueprint" }],
+            },
+            Constants.Security.SuperUserKey);
+        Assert.IsTrue(blueprintResult.Success);
+
+        var siblings = EntityService.GetSiblings(
+                blueprintKey,
+                [UmbracoObjectTypes.DocumentBlueprintContainer, UmbracoObjectTypes.DocumentBlueprint],
+                10,
+                10,
+                out _,
+                out _)
+            .ToArray();
+
+        var container = siblings.Single(x => x.Key == containerKey);
+        var blueprint = siblings.Single(x => x.Key == blueprintKey);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(Constants.ObjectTypes.DocumentBlueprintContainer, container.NodeObjectType);
+            Assert.IsNotInstanceOf<IDocumentEntitySlim>(container);
+            Assert.IsInstanceOf<IDocumentEntitySlim>(blueprint);
+        });
+    }
 
     [Test]
     public void EntityService_Can_Get_Paged_Descendants_Ordering_Path()
