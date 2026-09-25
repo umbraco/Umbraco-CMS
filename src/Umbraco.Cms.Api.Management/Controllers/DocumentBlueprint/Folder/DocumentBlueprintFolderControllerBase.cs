@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.DocumentBlueprint.Folder;
 /// </summary>
 [VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.DocumentBlueprint}/folder")]
 [ApiExplorerSettings(GroupName = "Document Blueprint")]
-[Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
+[Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentBlueprints)]
 public abstract class DocumentBlueprintFolderControllerBase : FolderManagementControllerBase<IContent>
 {
     protected DocumentBlueprintFolderControllerBase(

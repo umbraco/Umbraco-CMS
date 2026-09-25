@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.DocumentBlueprint;
 /// API controller responsible for handling requests to create document blueprints in the Umbraco CMS.
 /// </summary>
 [ApiVersion("1.0")]
-[Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
+[Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentBlueprints)]
 public class CreateDocumentBlueprintController : DocumentBlueprintControllerBase
 {
     private readonly IDocumentBlueprintEditingPresentationFactory _blueprintEditingPresentationFactory;
@@ -57,7 +57,6 @@ public class CreateDocumentBlueprintController : DocumentBlueprintControllerBase
     {
         ContentBlueprintCreateModel model = _blueprintEditingPresentationFactory.MapCreateModel(requestModel);
 
-        // We don't need to validate user access because we "only" require access to the Settings section to create new blueprints from scratch
         Attempt<ContentCreateResult, ContentEditingOperationStatus> result = await _contentBlueprintEditingService.CreateAsync(model, CurrentUserKey(_backOfficeSecurityAccessor));
 
         return result.Success
