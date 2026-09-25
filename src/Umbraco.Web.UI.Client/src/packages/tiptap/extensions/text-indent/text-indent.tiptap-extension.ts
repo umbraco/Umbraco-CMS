@@ -1,5 +1,3 @@
-/* eslint-disable local-rules/enforce-umbraco-external-imports */
-
 /* This Source Code has been derived from Tiptiz.
  * https://github.com/tiptiz/editor/blob/main/packages/tiptiz-extension-indent/src/indent.ts
  * SPDX-License-Identifier: MIT

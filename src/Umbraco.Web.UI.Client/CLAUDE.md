@@ -159,10 +159,14 @@ Why: Normalizes to conventional semver format
 		"@umbraco-ui/uui": "^2.0.0",
 		"monaco-editor": "^0.55.1",
 		"@tiptap/core": "^3.16.0",
+		"prosemirror-state": "^1.4.4",
+		"prosemirror-view": "^1.41.9",
 		"@hey-api/openapi-ts": ">=0.99.0 <1.0.0"
 	}
 }
 ```
+
+`@tiptap/core`, `@tiptap/pm/*` and the 13 underlying `prosemirror-*` packages are also served at their **bare** npm specifiers via the importmap (not just `@umbraco-cms/backoffice/...`) — see `src/packages/tiptap/CLAUDE.md`. This lets a Tiptap extension published as a normal npm package (including ones outside this monorepo, e.g. Tiptap Pro extensions) import `@tiptap/pm/state` directly and still share the one ProseMirror instance the RTE runs on, which extensions that rely on `PluginKey`/`Decoration` identity require.
 
 ### Plugin Developer Guide
 

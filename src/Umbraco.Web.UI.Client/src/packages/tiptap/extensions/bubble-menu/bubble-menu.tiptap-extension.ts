@@ -1,5 +1,3 @@
-/* eslint-disable local-rules/enforce-umbraco-external-imports */
-
 import { Extension } from '../../externals.js';
 import type { Editor } from '../../externals.js';
 import { Plugin } from '@tiptap/pm/state';
