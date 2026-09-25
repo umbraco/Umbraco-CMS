@@ -145,6 +145,7 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 				${this.#renderIcon()}${this.#renderIsDraft()} ${this.#renderIsTrashed()}
 				${this._ancestorPath ? html`<span slot="detail" class="ancestor-path">${this._ancestorPath}</span>` : nothing}
 			</uui-ref-node>
+			<umb-entity-frame><uui-icon name="link"></uui-icon> ${this._name}</umb-entity-frame>
 		`;
 	}
 
@@ -165,6 +166,20 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 
 	static override styles = [
 		css`
+			:host {
+				--umb-entity-frame-opacity: 0;
+				--umb-entity-frame-color: var(--umb-color-reference);
+				--umb-entity-frame-contrast-color: var(--umb-color-reference-contrast);
+
+				display: block;
+				position: relative;
+			}
+
+			:host(:hover),
+			:host(:focus-within) {
+				--umb-entity-frame-opacity: 1;
+			}
+
 			.ancestor-path {
 				display: block;
 				overflow: hidden;
