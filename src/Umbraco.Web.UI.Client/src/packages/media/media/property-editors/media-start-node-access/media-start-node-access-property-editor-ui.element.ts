@@ -1,9 +1,9 @@
 import { UmbMediaPickerFolderFilter } from '../../components/input-media/input-media.context.js';
 import { customElement, html } from '@umbraco-cms/backoffice/external/lit';
-import { UmbPropertyEditorUiStartNodeAccessElementBase } from '@umbraco-cms/backoffice/property-editor';
+import { UmbStartNodeAccessPropertyEditorUiElementBase } from '@umbraco-cms/backoffice/property-editor';
 
-@customElement('umb-media-start-node-access-property-editor-ui')
-export class UmbMediaStartNodeAccessPropertyEditorUIElement extends UmbPropertyEditorUiStartNodeAccessElementBase {
+@customElement('umb-property-editor-ui-media-start-node-access')
+export class UmbMediaStartNodeAccessPropertyEditorUIElement extends UmbStartNodeAccessPropertyEditorUiElementBase {
 	#onChange(event: CustomEvent & { target: { selection: Array<string> } }) {
 		this._onPick(event.target.selection);
 	}
@@ -26,6 +26,6 @@ export { UmbMediaStartNodeAccessPropertyEditorUIElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-media-start-node-access-property-editor-ui': UmbMediaStartNodeAccessPropertyEditorUIElement;
+		'umb-property-editor-ui-media-start-node-access': UmbMediaStartNodeAccessPropertyEditorUIElement;
 	}
 }

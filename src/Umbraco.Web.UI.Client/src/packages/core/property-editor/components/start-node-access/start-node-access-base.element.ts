@@ -22,7 +22,7 @@ export type UmbStartNodeAccessValue = {
  * Subclasses only need to implement `renderPicker()`, rendering the entity-specific input bound to
  * `_selection`/`_onPick` and forwarding `readonly`/`_min`/`_max`.
  */
-export abstract class UmbPropertyEditorUiStartNodeAccessElementBase
+export abstract class UmbStartNodeAccessPropertyEditorUiElementBase
 	extends UmbLitElement
 	implements UmbPropertyEditorUiElement
 {

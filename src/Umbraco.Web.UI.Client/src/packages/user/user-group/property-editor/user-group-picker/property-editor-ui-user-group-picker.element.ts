@@ -9,7 +9,7 @@ import type {
 } from '@umbraco-cms/backoffice/property-editor';
 
 @customElement('umb-property-editor-ui-user-group-picker')
-export class UmbPropertyEditorUIUserGroupPickerElement extends UmbLitElement implements UmbPropertyEditorUiElement {
+export class UmbUserGroupPickerPropertyEditorUIElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	@property({ attribute: false })
 	public value: Array<UmbReferenceByUnique> = [];
 
@@ -44,10 +44,10 @@ export class UmbPropertyEditorUIUserGroupPickerElement extends UmbLitElement imp
 	}
 }
 
-export { UmbPropertyEditorUIUserGroupPickerElement as element };
+export { UmbUserGroupPickerPropertyEditorUIElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-property-editor-ui-user-group-picker': UmbPropertyEditorUIUserGroupPickerElement;
+		'umb-property-editor-ui-user-group-picker': UmbUserGroupPickerPropertyEditorUIElement;
 	}
 }

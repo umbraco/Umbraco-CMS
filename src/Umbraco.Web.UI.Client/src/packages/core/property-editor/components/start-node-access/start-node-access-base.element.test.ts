@@ -1,9 +1,9 @@
-import { UmbPropertyEditorUiStartNodeAccessElementBase } from './start-node-access-base.element.js';
+import { UmbStartNodeAccessPropertyEditorUiElementBase } from './start-node-access-base.element.js';
 import { expect, fixture, html } from '@open-wc/testing';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 
 @customElement('umb-test-start-node-access')
-class UmbTestStartNodeAccessElement extends UmbPropertyEditorUiStartNodeAccessElementBase {
+class UmbTestStartNodeAccessElement extends UmbStartNodeAccessPropertyEditorUiElementBase {
 	public pick(selection: Array<string>) {
 		this._onPick(selection);
 	}
@@ -13,7 +13,7 @@ class UmbTestStartNodeAccessElement extends UmbPropertyEditorUiStartNodeAccessEl
 	}
 }
 
-describe('UmbPropertyEditorUiStartNodeAccessElementBase', () => {
+describe('UmbStartNodeAccessPropertyEditorUiElementBase', () => {
 	let element: UmbTestStartNodeAccessElement;
 
 	beforeEach(async () => {
