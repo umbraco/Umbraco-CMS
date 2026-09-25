@@ -5,7 +5,7 @@ import type { UmbTrashableEntityWorkspaceContext } from './types.js';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbVariantGuardRule } from '@umbraco-cms/backoffice/utils';
+import type { UmbGuardRule } from '@umbraco-cms/backoffice/utils';
 
 /**
  * Adds recycle-bin support (readonly-when-trashed, reload on trash/restore, redirect to parent when the current
@@ -132,17 +132,18 @@ export class UmbTrashableEntityWorkspaceController extends UmbControllerBase {
 		const guardUnique = `UMB_PREVENT_EDIT_TRASHED_ITEM`;
 
 		if (!isTrashed) {
-			this.#workspaceContext?.readOnlyGuard.removeRule(guardUnique);
+			this.#workspaceContext?.readOnlyGuard?.removeRule(guardUnique);
+			this.#workspaceContext?.nameWriteGuard?.removeRule(guardUnique);
 			return;
 		}
 
-		const rule: UmbVariantGuardRule = {
-			unique: guardUnique,
-			permitted: true,
-		};
+		// `readOnlyGuard`'s rule reads as "permitted to be read-only" (true = locked), the opposite sense of
+		// `nameWriteGuard`'s, whose rule reads as "permitted to write" (false = blocked) — so trashed needs
+		// `permitted: true` on one and `permitted: false` on the other to mean the same thing.
+		this.#workspaceContext?.readOnlyGuard?.addRule({ unique: guardUnique, permitted: true });
 
-		// TODO: Change to use property write guard when it supports making the name read-only.
-		this.#workspaceContext?.readOnlyGuard.addRule(rule);
+		const nameWriteGuardRule: UmbGuardRule = { unique: guardUnique, permitted: false };
+		this.#workspaceContext?.nameWriteGuard?.addRule(nameWriteGuardRule);
 	}
 
 	public override destroy(): void {
