@@ -251,7 +251,7 @@
 		</key>
 		<key alias="parentNotPublishedAnomaly">Ups! Dieses Dokument ist veröffentlicht aber nicht im internen Cache aufzufinden: Systemfehler.</key>
 		<key alias="getUrlException">Der URL wurde nicht gefunden</key>
-		<key alias="routeError">Dieses Dokument wurde veröffentlicht, aber sein URL würde mit Inhalt %0% kollidieren</key>
+		<key alias="routeError">Dieses Dokument wurde veröffentlicht, aber sein URL würde mit Inhalt '%0%' kollidieren</key>
 		<key alias="routeErrorCannotRoute">Dieses Dokument wurde veröffentlicht, aber sein URL kann nicht aufgelöst (routed) werden</key>
 		<key alias="publish">Veröffentlichen</key>
 		<key alias="published">Veröffentlicht</key>
