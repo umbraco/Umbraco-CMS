@@ -11,6 +11,10 @@ export interface UmbEntityBulkActionProgressModalData {
 	 * Whether the dialog shows a determinate counter (with cancel) or an indeterminate spinner.
 	 */
 	mode: 'determinate' | 'indeterminate';
+	/**
+	 * Shows a Cancel button in indeterminate mode. Ignored in determinate mode, which always has one.
+	 */
+	cancellable?: boolean;
 }
 
 export interface UmbEntityBulkActionProgressModalValue {

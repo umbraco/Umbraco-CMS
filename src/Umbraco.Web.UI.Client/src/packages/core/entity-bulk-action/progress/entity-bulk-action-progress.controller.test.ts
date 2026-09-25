@@ -15,11 +15,24 @@ class UmbTestEntityBulkActionProgressHostElement extends UmbControllerHostElemen
  */
 class FakeModal {
 	#resolved = false;
+	#resolveSubmit?: () => void;
+	#rejectSubmit?: () => void;
+	#submitPromise = new Promise<void>((resolve, reject) => {
+		this.#resolveSubmit = resolve;
+		this.#rejectSubmit = reject;
+	});
 	setValueCalls: Array<UmbEntityBulkActionProgressModalValue> = [];
 	submitCalls = 0;
 
+	constructor() {
+		// Prevent "unhandled rejection" noise in tests that resolve() the modal without ever calling onSubmit().
+		this.#submitPromise.catch(() => {});
+	}
+
+	/** Simulates the user closing the dialog (cancel, escape or backdrop) - `onSubmit()` rejects. */
 	resolve() {
 		this.#resolved = true;
+		this.#rejectSubmit?.();
 	}
 	isResolved() {
 		return this.#resolved;
@@ -30,6 +43,10 @@ class FakeModal {
 	submit() {
 		this.#resolved = true;
 		this.submitCalls++;
+		this.#resolveSubmit?.();
+	}
+	onSubmit() {
+		return this.#submitPromise;
 	}
 }
 
@@ -210,6 +227,68 @@ describe('UmbEntityBulkActionProgressController', () => {
 			expect(nextModal.submitCalls).to.equal(1);
 			// Guard against a hanging timer leaking into subsequent tests.
 			await aTimeout(0);
+		});
+
+		describe('cancellable', () => {
+			it('invokes the operation factory eagerly, before the delay timer fires', async () => {
+				let calledImmediately = false;
+				const resultPromise = controller.runIndeterminate({
+					headline: 'Moving',
+					operation: () => {
+						calledImmediately = true;
+						return Promise.resolve('done');
+					},
+					delayMs: 1000,
+				});
+
+				// Only a microtask has elapsed - nowhere near the 1000ms delay - yet the factory has already run.
+				await aTimeout(0);
+				expect(calledImmediately).to.equal(true);
+
+				await resultPromise;
+			});
+
+			it('marks the modal cancellable and aborts the signal when the user cancels, because operation is a factory', async () => {
+				let receivedSignal: AbortSignal | undefined;
+				let rejected: unknown;
+
+				const resultPromise = controller
+					.runIndeterminate<string>({
+						headline: 'Moving',
+						operation: (signal) =>
+							new Promise((_resolve, reject) => {
+								receivedSignal = signal;
+								signal.addEventListener('abort', () => reject(new Error('aborted')));
+							}),
+						delayMs: 10,
+					})
+					.catch((error) => {
+						rejected = error;
+					});
+
+				// Let the delay elapse so the modal opens and wires up the onSubmit() listener.
+				await aTimeout(20);
+				expect(openArgs[0].data.mode).to.equal('indeterminate');
+				expect(openArgs[0].data.cancellable).to.be.true;
+
+				nextModal.resolve(); // simulate the user clicking Cancel
+				await resultPromise;
+
+				expect(receivedSignal?.aborted).to.be.true;
+				expect((rejected as Error)?.message).to.equal('aborted');
+				// Already resolved by the user's cancel - the finally guard must not touch it again.
+				expect(nextModal.submitCalls).to.equal(0);
+			});
+
+			it('does not mark the modal cancellable when operation is a plain Promise, since there is no signal to abort', async () => {
+				await controller.runIndeterminate({
+					headline: 'Moving',
+					operation: new Promise((resolve) => setTimeout(() => resolve('slow'), 60)),
+					delayMs: 10,
+				});
+
+				expect(openArgs[0].data.cancellable).to.equal(false);
+			});
 		});
 	});
 });

@@ -33,8 +33,9 @@ export interface UmbBulkTreePickerActionArgs {
 	/**
 	 * Performs the actual bulk operation against the chosen destination (`null` = root). Called once the
 	 * user has picked a destination; its returned promise is awaited behind an indeterminate progress dialog.
+	 * The `abortSignal` is aborted if the user cancels while the dialog is showing.
 	 */
-	perform: (destinationUnique: string | null) => Promise<unknown>;
+	perform: (destinationUnique: string | null, abortSignal: AbortSignal) => Promise<unknown>;
 }
 
 /**
@@ -64,7 +65,7 @@ export class UmbBulkTreePickerActionController extends UmbControllerBase {
 
 		await new UmbEntityBulkActionProgressController(this).runIndeterminate({
 			headline: args.progressHeadline,
-			operation: args.perform(destinationUnique),
+			operation: (abortSignal) => args.perform(destinationUnique, abortSignal),
 			delayMs: 400,
 		});
 
