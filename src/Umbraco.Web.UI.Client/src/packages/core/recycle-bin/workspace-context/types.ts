@@ -1,5 +1,5 @@
 import type { Observable } from '@umbraco-cms/backoffice/observable-api';
-import type { UmbReadOnlyVariantGuardManager } from '@umbraco-cms/backoffice/utils';
+import type { UmbGuardRule, UmbReadOnlyGuardManager } from '@umbraco-cms/backoffice/utils';
 import type { UmbEntityWorkspaceContext, UmbNameWriteGuardManager } from '@umbraco-cms/backoffice/workspace';
 
 /**
@@ -11,7 +11,7 @@ export interface UmbTrashableEntityWorkspaceContext extends UmbEntityWorkspaceCo
 	readonly isNew: Observable<boolean | undefined>;
 	readonly navigationParentItemPath: Observable<string | undefined>;
 	reload(): Promise<void>;
-	readonly readOnlyGuard?: UmbReadOnlyVariantGuardManager;
+	readonly readOnlyGuard?: UmbReadOnlyGuardManager<UmbGuardRule>;
 	readonly nameWriteGuard?: UmbNameWriteGuardManager;
 	resetData(): void;
 }

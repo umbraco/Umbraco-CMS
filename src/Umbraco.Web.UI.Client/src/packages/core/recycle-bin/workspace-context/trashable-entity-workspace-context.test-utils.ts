@@ -3,7 +3,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
-import type { UmbReadOnlyVariantGuardManager } from '@umbraco-cms/backoffice/utils';
+import type { UmbGuardRule, UmbReadOnlyGuardManager } from '@umbraco-cms/backoffice/utils';
 import type { UmbNameWriteGuardManager } from '@umbraco-cms/backoffice/workspace';
 
 @customElement('umb-test-recycle-bin-controller-host')
@@ -39,7 +39,7 @@ export class UmbTestTrashableEntityWorkspaceContext implements UmbTrashableEntit
 		addRule: (rule: { unique: string; permitted: boolean }) =>
 			this.readOnlyGuardRuleCalls.push({ action: 'add', unique: rule.unique, permitted: rule.permitted }),
 		removeRule: (unique: string) => this.readOnlyGuardRuleCalls.push({ action: 'remove', unique }),
-	} as unknown as UmbReadOnlyVariantGuardManager;
+	} as unknown as UmbReadOnlyGuardManager<UmbGuardRule>;
 
 	readonly nameWriteGuardRuleCalls: Array<UmbTestGuardRuleCall> = [];
 	readonly nameWriteGuard = {
