@@ -21,20 +21,13 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 
 /**
- * Displays an image with an interactive focal point that can be positioned
- * by clicking or dragging on the image.
- *
- * The focal point can also be adjusted using the keyboard when the focal
- * point is focused. Arrow keys move the focal point by 10 pixels, while
- * holding Shift moves it by 1 pixel.
- *
- * The focal point uses normalized coordinates between 0 and 1. The default
- * focal point is the center of the image: { left: 0.5, top: 0.5 }.
+ * Displays an image with an interactive focal point, set by clicking, dragging,
+ * or using the arrow keys (hold Shift for finer steps) when focused.
  *
  * @element umb-image-cropper-focus-setter
  * @fires focalpoint-change - Dispatched when the focal point changes.
  *
- * @attr {boolean} hideFocalPoint - Hides the focal point and disables
+ * @attr {boolean} hidefocalpoint - Hides the focal point and disables
  * interaction with it.
  * @attr {boolean} disabled - Disables focal point interaction.
  * @attr {string} src - The image source URL.
@@ -42,6 +35,7 @@ import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
  * @cssprop --umb-image-cropper-focus-setter-background - Background shown
  * behind the image. Defaults to a checkerboard pattern that helps reveal
  * transparent areas.
+ */
 @customElement('umb-image-cropper-focus-setter')
 export class UmbImageCropperFocusSetterElement extends UmbLitElement {
 	@query('#image')
@@ -60,9 +54,9 @@ export class UmbImageCropperFocusSetterElement extends UmbLitElement {
 	private _coords = { x: 0, y: 0 };
 
 	/**
- 	* The current focal point as normalized coordinates between 0 and 1.
- 	* Defaults to the center of the image when not set.
- 	*/
+	 * The current focal point as normalized coordinates between 0 and 1.
+	 * Defaults to the center of the image when not set.
+	 */
 	@property({ attribute: false })
 	set focalPoint(value) {
 		this.#focalPoint = value;
@@ -314,7 +308,7 @@ export class UmbImageCropperFocusSetterElement extends UmbLitElement {
 		:host(:not([hidefocalpoint])) #wrapper {
 			cursor: crosshair;
 		}
-		
+
 		#image {
 			margin: auto;
 			position: relative;
@@ -327,7 +321,7 @@ export class UmbImageCropperFocusSetterElement extends UmbLitElement {
 			background-size: 10px 10px;
 			background-repeat: repeat;
 		}
-		
+
 		#focal-point {
 			content: '';
 			display: block;
