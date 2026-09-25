@@ -260,11 +260,39 @@ export class UmbPreviewContext extends UmbContextBase {
 		return this.getHostElement().shadowRoot?.querySelector('#wrapper') as HTMLElement;
 	}
 
-	async openWebsite() {
-		let url = await this.#getPublishedUrl();
+	/**
+	 * Opens the previewed page outside of preview mode.
+	 * @param {WindowProxy | null} [websiteWindow] - A window opened by the caller while the user gesture is still
+	 * active. WebKit only forwards the gesture's activation for about a second, so a tab opened after the published
+	 * URL round-trip gets popup-blocked in Safari (#22626). Click handlers should open the tab before the lookup and
+	 * hand it over here; it is navigated or closed as appropriate.
+	 * @memberof UmbPreviewContext
+	 */
+	async openWebsite(websiteWindow?: WindowProxy | null) {
+		let url: string | null;
+		try {
+			url = await this.#getPublishedUrl();
+		} catch (error) {
+			websiteWindow?.close();
+			throw error;
+		}
 
 		if (!url) {
 			url = this.#previewUrl.getValue() as string;
+		}
+
+		if (!url) {
+			websiteWindow?.close();
+			return;
+		}
+
+		if (websiteWindow) {
+			// window.open() resolves a relative URL against this document, but navigating another window
+			// resolves against *its* document — about:blank, which has no base — and silently does
+			// nothing. Resolve here so a relative URL behaves the same either way.
+			websiteWindow.location.replace(new URL(url, window.location.href).toString());
+			websiteWindow.focus();
+			return;
 		}
 
 		window.open(url, '_blank');
