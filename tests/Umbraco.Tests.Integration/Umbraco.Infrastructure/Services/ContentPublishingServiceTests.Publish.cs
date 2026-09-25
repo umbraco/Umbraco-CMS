@@ -349,11 +349,10 @@ public partial class ContentPublishingServiceTests
         Assert.AreEqual(2, content.PublishedCultures.Count());
     }
 
-    // TODO KJA: Fix this; must validate invariant properties contextually before publishing - see also note in ContentPublishingServiceBase.ValidateCurrentContentAsync()
-    [TestCase(true, "da-DK")]
-    [TestCase(false, "en-US")]
-    [TestCase(false, "en-US", "da-DK")]
-    public async Task Publish_Invalid_Invariant_Property_WithoutAllowEditInvariantFromNonDefault(bool expectedSuccess, params string[] culturesToRepublish)
+    [TestCase("da-DK")]
+    [TestCase("en-US")]
+    [TestCase("en-US", "da-DK")]
+    public async Task Publish_Invalid_Invariant_Property_WithoutAccessToInvariantForVariant(params string[] culturesToRepublish)
     {
         var userGroupService = GetRequiredService<IUserGroupService>();
         var userService = GetRequiredService<IUserService>();
@@ -368,15 +367,14 @@ public partial class ContentPublishingServiceTests
         var userGroupResult = await userGroupService.CreateAsync(group, Constants.Security.SuperUserKey, [user.Key]);
         Assert.IsTrue(userGroupResult.Success);
 
-        await Publish_Invalid_Invariant_Property(expectedSuccess, user.Key, culturesToRepublish);
+        await Publish_Invalid_Invariant_Property(true, user.Key, culturesToRepublish);
     }
 
-    [TestCase(false, "da-DK")]
-    [TestCase(false, "en-US")]
-    [TestCase(false, "en-US", "da-DK")]
-    [ConfigureBuilder(ActionName = nameof(ConfigureAllowEditInvariantFromNonDefaultTrue))]
-    public async Task Publish_Invalid_Invariant_Property_WithAllowEditInvariantFromNonDefault(bool expectedSuccess, params string[] culturesToRepublish)
-        => await Publish_Invalid_Invariant_Property(expectedSuccess, Constants.Security.SuperUserKey, culturesToRepublish);
+    [TestCase("da-DK")]
+    [TestCase("en-US")]
+    [TestCase("en-US", "da-DK")]
+    public async Task Publish_Invalid_Invariant_Property_WithAccessToInvariantForVariant(params string[] culturesToRepublish)
+        => await Publish_Invalid_Invariant_Property(false, Constants.Security.SuperUserKey, culturesToRepublish);
 
     private async Task Publish_Invalid_Invariant_Property(bool expectedSuccess, Guid userKeyForPublishing, params string[] culturesToRepublish)
     {

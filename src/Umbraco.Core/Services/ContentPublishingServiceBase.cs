@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.ContentPublishing;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Extensions;
@@ -24,6 +25,7 @@ internal abstract class ContentPublishingServiceBase<TContent, TContentService>
     private readonly ILanguageService _languageService;
     private ContentSettings _contentSettings;
     private readonly IRelationService _relationService;
+    private readonly IUserService _userService;
     private readonly ILogger<ContentPublishingServiceBase<TContent, TContentService>> _logger;
 
     protected abstract int WriteLockId { get; }
@@ -37,6 +39,7 @@ internal abstract class ContentPublishingServiceBase<TContent, TContentService>
         ILanguageService languageService,
         IOptionsMonitor<ContentSettings> optionsMonitor,
         IRelationService relationService,
+        IUserService userService,
         ILogger<ContentPublishingServiceBase<TContent, TContentService>> logger)
     {
         _coreScopeProvider = coreScopeProvider;
@@ -46,6 +49,7 @@ internal abstract class ContentPublishingServiceBase<TContent, TContentService>
         _contentTypeService = contentTypeService;
         _languageService = languageService;
         _relationService = relationService;
+        _userService = userService;
         _logger = logger;
         _contentSettings = optionsMonitor.CurrentValue;
         optionsMonitor.OnChange((contentSettings) =>
@@ -182,7 +186,7 @@ internal abstract class ContentPublishingServiceBase<TContent, TContentService>
             }
         }
 
-        ContentValidationResult validationResult = await ValidateCurrentContentAsync(content, cultures);
+        ContentValidationResult validationResult = await ValidateCurrentContentAsync(content, cultures, userKey);
         if (validationResult.ValidationErrors.Any())
         {
             scope.Complete();
@@ -231,8 +235,10 @@ internal abstract class ContentPublishingServiceBase<TContent, TContentService>
             });
     }
 
-    private async Task<ContentValidationResult> ValidateCurrentContentAsync(TContent content, string[] cultures)
+    private async Task<ContentValidationResult> ValidateCurrentContentAsync(TContent content, string[] cultures, Guid userKey)
     {
+        IUser user = await _userService.GetRequiredUserAsync(userKey);
+
         IEnumerable<string?> effectiveCultures = content.ContentType.VariesByCulture()
             ? cultures.Union([null])
             : [null];
@@ -240,7 +246,6 @@ internal abstract class ContentPublishingServiceBase<TContent, TContentService>
         // Would be better to be able to use a mapper/factory, but currently all that functionality is very much presentation logic.
         var model = new ContentUpdateModel()
         {
-            // NOTE KJA: this needs redoing; we need to make an informed decision whether to include invariant properties, depending on if editing invariant properties is allowed on all variants, or if the default language is included in cultures
             Properties = effectiveCultures.SelectMany(culture =>
                 content.Properties.Select(property => property.PropertyType.VariesByCulture() == (culture is not null)
                     ? new PropertyValueModel
@@ -261,7 +266,7 @@ internal abstract class ContentPublishingServiceBase<TContent, TContentService>
         };
 
         IContentType? contentType = _contentTypeService.Get(content.ContentType.Key)!;
-        ContentValidationResult validationResult = await _contentValidationService.ValidatePropertiesAsync(model, contentType, cultures);
+        ContentValidationResult validationResult = await _contentValidationService.ValidatePropertiesAsync(model, contentType, cultures, user.HasAccessToInvariantForVariant());
         return validationResult;
     }
 

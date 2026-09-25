@@ -38,11 +38,13 @@ internal abstract class ContentValidationServiceBase<TContentType>
     /// <param name="contentEditingModelBase">The content editing model to validate.</param>
     /// <param name="contentType">The content type to validate against.</param>
     /// <param name="culturesToValidate">Optional cultures to restrict validation to.</param>
+    /// <param name="validateCultureInvariantProperties">Whether to include culture invariant properties in the validation.</param>
     /// <returns>The validation result containing any validation errors.</returns>
     protected async Task<ContentValidationResult> HandlePropertiesValidationAsync(
         ContentEditingModelBase contentEditingModelBase,
         TContentType contentType,
-        IEnumerable<string?>? culturesToValidate = null)
+        IEnumerable<string?>? culturesToValidate = null,
+        bool validateCultureInvariantProperties = true)
     {
         var validationErrors = new List<PropertyValidationError>();
 
@@ -75,17 +77,20 @@ internal abstract class ContentValidationServiceBase<TContentType>
                 .WhereNotNull())
             .ToArray();
 
-        foreach (IPropertyType propertyType in invariantPropertyTypes)
+        if (validateCultureInvariantProperties)
         {
-            var validationContext = new PropertyValidationContext
+            foreach (IPropertyType propertyType in invariantPropertyTypes)
             {
-                Culture = null, Segment = null, CulturesBeingValidated = cultures, SegmentsBeingValidated = segments
-            };
+                var validationContext = new PropertyValidationContext
+                {
+                    Culture = null, Segment = null, CulturesBeingValidated = cultures, SegmentsBeingValidated = segments
+                };
 
-            PropertyValueModel? propertyValueModel = contentEditingModelBase
-                .Properties
-                .FirstOrDefault(propertyValue => propertyValue.Alias == propertyType.Alias && propertyValue.Culture is null && propertyValue.Segment is null);
-            validationErrors.AddRange(ValidateProperty(propertyType, propertyValueModel, validationContext));
+                PropertyValueModel? propertyValueModel = contentEditingModelBase
+                    .Properties
+                    .FirstOrDefault(propertyValue => propertyValue.Alias == propertyType.Alias && propertyValue.Culture is null && propertyValue.Segment is null);
+                validationErrors.AddRange(ValidateProperty(propertyType, propertyValueModel, validationContext));
+            }
         }
 
         foreach (IPropertyType propertyType in cultureVariantPropertyTypes)
@@ -104,19 +109,22 @@ internal abstract class ContentValidationServiceBase<TContentType>
             }
         }
 
-        foreach (IPropertyType propertyType in segmentVariantPropertyTypes)
+        if (validateCultureInvariantProperties)
         {
-            foreach (var segment in segments)
+            foreach (IPropertyType propertyType in segmentVariantPropertyTypes)
             {
-                var validationContext = new PropertyValidationContext
+                foreach (var segment in segments)
                 {
-                    Culture = null, Segment = segment, CulturesBeingValidated = cultures, SegmentsBeingValidated = segments
-                };
+                    var validationContext = new PropertyValidationContext
+                    {
+                        Culture = null, Segment = segment, CulturesBeingValidated = cultures, SegmentsBeingValidated = segments
+                    };
 
-                PropertyValueModel? propertyValueModel = contentEditingModelBase
-                    .Properties
-                    .FirstOrDefault(propertyValue => propertyValue.Alias == propertyType.Alias && propertyValue.Culture is null && propertyValue.Segment.InvariantEquals(segment));
-                validationErrors.AddRange(ValidateProperty(propertyType, propertyValueModel, validationContext));
+                    PropertyValueModel? propertyValueModel = contentEditingModelBase
+                        .Properties
+                        .FirstOrDefault(propertyValue => propertyValue.Alias == propertyType.Alias && propertyValue.Culture is null && propertyValue.Segment.InvariantEquals(segment));
+                    validationErrors.AddRange(ValidateProperty(propertyType, propertyValueModel, validationContext));
+                }
             }
         }
 
