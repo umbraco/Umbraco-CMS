@@ -12,6 +12,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbRoutableWorkspaceContext, UmbSubmittableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import type { UmbUserPermissionModel } from '@umbraco-cms/backoffice/user-permission';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
+import type { UmbStartNodeAccessValue } from '@umbraco-cms/backoffice/property-editor';
 
 export class UmbUserGroupWorkspaceContext
 	extends UmbEntityNamedDetailWorkspaceContextBase<UmbUserGroupDetailModel, UmbUserGroupDetailRepository>
@@ -117,6 +118,31 @@ export class UmbUserGroupWorkspaceContext
 	 */
 	setDescription(description: string) {
 		this._data.updateCurrent({ description });
+	}
+
+	setSections(sections: Array<string>) {
+		this.updateProperty('sections', sections);
+	}
+
+	setLanguageAccess(value: UmbStartNodeAccessValue) {
+		this._data.updateCurrent({
+			hasAccessToAllLanguages: value.rootAccess,
+			languages: value.startNodes.map((startNode) => startNode.unique),
+		});
+	}
+
+	setDocumentAccess(value: UmbStartNodeAccessValue) {
+		this._data.updateCurrent({
+			documentRootAccess: value.rootAccess,
+			documentStartNode: value.startNodes[0] ? { unique: value.startNodes[0].unique } : null,
+		});
+	}
+
+	setMediaAccess(value: UmbStartNodeAccessValue) {
+		this._data.updateCurrent({
+			mediaRootAccess: value.rootAccess,
+			mediaStartNode: value.startNodes[0] ? { unique: value.startNodes[0].unique } : null,
+		});
 	}
 }
 
