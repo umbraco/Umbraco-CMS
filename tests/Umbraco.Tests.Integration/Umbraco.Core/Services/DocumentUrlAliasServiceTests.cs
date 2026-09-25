@@ -1412,5 +1412,79 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
         Assert.That(await DocumentUrlAliasService.GetDocumentKeysByAliasAsync("variant-draft-alias", defaultLanguage.IsoCode), Is.Empty);
     }
 
+    [Test]
+    public async Task Unpublished_Document_Does_Not_Resolve_Via_Its_Former_Alias()
+    {
+        var isoCode = (await LanguageService.GetDefaultLanguageAsync()).IsoCode;
+        var pageAKey = new Guid(PageWithSingleAliasKey);
+
+        // Page A is published (from setup) with alias "my-single-alias". Unpublish it,
+        // then change its alias and save without publishing (issue #23948).
+        var pageA = ContentService.GetById(pageAKey)!;
+        ContentService.Unpublish(pageA);
+        pageA = ContentService.GetById(pageAKey)!;
+        pageA.SetValue(Constants.Conventions.Content.UrlAlias, "archived-single-alias");
+        ContentService.Save(pageA, -1);
+
+        // Page B takes over the alias and is published.
+        var pageB = ContentBuilder.CreateSimpleContent(ContentType, "Page B", RootPage.Id);
+        pageB.SetValue(Constants.Conventions.Content.UrlAlias, "my-single-alias");
+        ContentService.Save(pageB, -1);
+        ContentService.Publish(pageB, ["*"]);
+
+        var result = (await DocumentUrlAliasService.GetDocumentKeysByAliasAsync("my-single-alias", isoCode)).ToList();
+
+        Assert.That(result, Does.Not.Contain(pageAKey), "Unpublished page should not resolve via its former alias.");
+        Assert.That(result, Is.EqualTo(new[] { pageB.Key }));
+    }
+
+    [Test]
+    public async Task RebuildAllAliasesAsync_Ignores_Alias_For_Unpublished_Document()
+    {
+        var isoCode = (await LanguageService.GetDefaultLanguageAsync()).IsoCode;
+        var pageAKey = new Guid(PageWithSingleAliasKey);
+
+        ContentService.Unpublish(ContentService.GetById(pageAKey)!);
+        await DocumentUrlAliasService.RebuildAllAliasesAsync();
+
+        Assert.That(await DocumentUrlAliasService.GetDocumentKeysByAliasAsync("my-single-alias", isoCode), Is.Empty);
+    }
+
+    [Test]
+    public async Task CreateOrUpdateAliasesAsync_Ignores_Alias_For_Unpublished_Culture()
+    {
+        var secondLanguage = new LanguageBuilder()
+            .WithCultureInfo("fr-FR")
+            .WithIsDefault(false)
+            .Build();
+        await LanguageService.CreateAsync(secondLanguage, Constants.Security.SuperUserKey);
+
+        var defaultIsoCode = (await LanguageService.GetDefaultLanguageAsync()).IsoCode;
+
+        var template = TemplateBuilder.CreateTextPageTemplate("unpublishCultureRefreshTemplate");
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+
+        var variantContentType = CreateCultureVariantContentTypeWithUrlAlias(template.Id, "pageWithAliasUnpublishCultureRefresh");
+        await ContentTypeService.CreateAsync(variantContentType, Constants.Security.SuperUserKey);
+
+        var content = new ContentBuilder()
+            .WithContentType(variantContentType)
+            .WithCultureName(defaultIsoCode, "Multi Culture Page")
+            .WithCultureName("fr-FR", "Page Multi Culture")
+            .Build();
+        content.ParentId = RootPage.Id;
+        content.SetValue(Constants.Conventions.Content.UrlAlias, "default-culture-alias", defaultIsoCode);
+        content.SetValue(Constants.Conventions.Content.UrlAlias, "french-culture-alias", "fr-FR");
+        ContentService.Save(content, -1);
+        ContentService.Publish(content, [defaultIsoCode, "fr-FR"]);
+
+        // Unpublish only the French culture; the document stays published via the default culture.
+        ContentService.Unpublish(content, "fr-FR");
+        await DocumentUrlAliasService.CreateOrUpdateAliasesAsync(content.Key);
+
+        Assert.That(await DocumentUrlAliasService.GetDocumentKeysByAliasAsync("default-culture-alias", defaultIsoCode), Does.Contain(content.Key));
+        Assert.That(await DocumentUrlAliasService.GetDocumentKeysByAliasAsync("french-culture-alias", "fr-FR"), Is.Empty);
+    }
+
     #endregion
 }
