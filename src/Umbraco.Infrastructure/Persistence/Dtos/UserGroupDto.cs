@@ -112,6 +112,15 @@ public class UserGroupDto
     public bool HasAccessToAllLanguages { get; set; }
 
     /// <summary>
+    /// Gets or sets a value indicating whether the user group can edit invariant (shared) property data
+    /// on variant content. The permission is not consulted when editing invariant content types.
+    /// </summary>
+    [Column("hasAccessToInvariantForVariant")]
+    [NullSetting(NullSetting = NullSettings.NotNull)]
+    [Constraint(Default = "1")]
+    public bool HasAccessToInvariantForVariant { get; set; } = true;
+
+    /// <summary>
     /// Gets or sets the ID of the root content node that members of the user group start at in the content tree.
     /// A null value indicates no specific start node is set.
     /// </summary>

@@ -32,6 +32,7 @@ public class UserGroup : EntityBase, IUserGroup, IReadOnlyUserGroup
     private string _name;
     private string? _description;
     private bool _hasAccessToAllLanguages;
+    private bool _hasAccessToInvariantForVariant = true;
     private ISet<string> _permissions;
     private ISet<IGranularPermission> _granularPermissions;
     private List<string> _sectionCollection;
@@ -141,6 +142,14 @@ public class UserGroup : EntityBase, IUserGroup, IReadOnlyUserGroup
     {
         get => _hasAccessToAllLanguages;
         set => SetPropertyValueAndDetectChanges(value, ref _hasAccessToAllLanguages, nameof(HasAccessToAllLanguages));
+    }
+
+    /// <inheritdoc />
+    [DataMember]
+    public bool HasAccessToInvariantForVariant
+    {
+        get => _hasAccessToInvariantForVariant;
+        set => SetPropertyValueAndDetectChanges(value, ref _hasAccessToInvariantForVariant, nameof(HasAccessToInvariantForVariant));
     }
 
     /// <inheritdoc />

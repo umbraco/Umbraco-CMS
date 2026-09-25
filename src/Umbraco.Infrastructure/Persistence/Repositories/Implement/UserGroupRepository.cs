@@ -517,6 +517,7 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
                 x => x.Name,
                 x => x.Description,
                 x => x.HasAccessToAllLanguages,
+                x => x.HasAccessToInvariantForVariant,
                 x => x.Key,
                 x => x.DefaultPermissions)
             .AndBy<UserGroup2AppDto>(x => x.AppAlias, x => x.UserGroupId);

@@ -50,7 +50,8 @@ public class ReadOnlyUserGroup : IReadOnlyUserGroup, IEquatable<ReadOnlyUserGrou
             allowedSections,
             permissions,
             granularPermissions,
-            hasAccessToAllLanguages)
+            hasAccessToAllLanguages,
+            hasAccessToInvariantForVariant: true)
     {
     }
 
@@ -83,26 +84,12 @@ public class ReadOnlyUserGroup : IReadOnlyUserGroup, IEquatable<ReadOnlyUserGrou
             allowedSections,
             permissions,
             granularPermissions,
-            hasAccessToAllLanguages)
+            hasAccessToAllLanguages,
+            hasAccessToInvariantForVariant: true)
     {
     }
 
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="ReadOnlyUserGroup" /> class.
-    /// </summary>
-    /// <param name="id">The unique identifier for the user group.</param>
-    /// <param name="key">The unique key for the user group.</param>
-    /// <param name="name">The name of the user group.</param>
-    /// <param name="description">The description of the user group.</param>
-    /// <param name="icon">The icon for the user group.</param>
-    /// <param name="startContentId">The starting content node identifier.</param>
-    /// <param name="startMediaId">The starting media node identifier.</param>
-    /// <param name="alias">The alias of the user group.</param>
-    /// <param name="allowedLanguages">The collection of allowed language identifiers.</param>
-    /// <param name="allowedSections">The collection of allowed section aliases.</param>
-    /// <param name="permissions">The set of permissions.</param>
-    /// <param name="granularPermissions">The set of granular permissions.</param>
-    /// <param name="hasAccessToAllLanguages">Indicates whether the group has access to all languages.</param>
+    [Obsolete("Please use the constructor that includes all parameters. Scheduled for removal in Umbraco 20.")]
     public ReadOnlyUserGroup(
         int id,
         Guid key,
@@ -118,6 +105,59 @@ public class ReadOnlyUserGroup : IReadOnlyUserGroup, IEquatable<ReadOnlyUserGrou
         ISet<string> permissions,
         ISet<IGranularPermission> granularPermissions,
         bool hasAccessToAllLanguages)
+        : this(
+            id,
+            key,
+            name,
+            description,
+            icon,
+            startContentId,
+            startMediaId,
+            startElementId,
+            alias,
+            allowedLanguages,
+            allowedSections,
+            permissions,
+            granularPermissions,
+            hasAccessToAllLanguages,
+            hasAccessToInvariantForVariant: true)
+    {
+    }
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="ReadOnlyUserGroup" /> class.
+    /// </summary>
+    /// <param name="id">The unique identifier for the user group.</param>
+    /// <param name="key">The unique key for the user group.</param>
+    /// <param name="name">The name of the user group.</param>
+    /// <param name="description">The description of the user group.</param>
+    /// <param name="icon">The icon for the user group.</param>
+    /// <param name="startContentId">The starting content node identifier.</param>
+    /// <param name="startMediaId">The starting media node identifier.</param>
+    /// <param name="startElementId">The starting element node identifier.</param>
+    /// <param name="alias">The alias of the user group.</param>
+    /// <param name="allowedLanguages">The collection of allowed language identifiers.</param>
+    /// <param name="allowedSections">The collection of allowed section aliases.</param>
+    /// <param name="permissions">The set of permissions.</param>
+    /// <param name="granularPermissions">The set of granular permissions.</param>
+    /// <param name="hasAccessToAllLanguages">Indicates whether the group has access to all languages.</param>
+    /// <param name="hasAccessToInvariantForVariant">Indicates whether the group can edit invariant (shared) property data on variant content.</param>
+    public ReadOnlyUserGroup(
+        int id,
+        Guid key,
+        string? name,
+        string? description,
+        string? icon,
+        int? startContentId,
+        int? startMediaId,
+        int? startElementId,
+        string? alias,
+        IEnumerable<int> allowedLanguages,
+        IEnumerable<string> allowedSections,
+        ISet<string> permissions,
+        ISet<IGranularPermission> granularPermissions,
+        bool hasAccessToAllLanguages,
+        bool hasAccessToInvariantForVariant)
     {
         Id = id;
         Key = key;
@@ -133,6 +173,7 @@ public class ReadOnlyUserGroup : IReadOnlyUserGroup, IEquatable<ReadOnlyUserGrou
         StartMediaId = startMediaId == 0 ? null : startMediaId;
         StartElementId = startElementId == 0 ? null : startElementId;
         HasAccessToAllLanguages = hasAccessToAllLanguages;
+        HasAccessToInvariantForVariant = hasAccessToInvariantForVariant;
         Permissions = permissions;
         GranularPermissions = granularPermissions;
     }
@@ -165,6 +206,9 @@ public class ReadOnlyUserGroup : IReadOnlyUserGroup, IEquatable<ReadOnlyUserGrou
 
     /// <inheritdoc />
     public bool HasAccessToAllLanguages { get; set; }
+
+    /// <inheritdoc />
+    public bool HasAccessToInvariantForVariant { get; set; }
 
     /// <inheritdoc />
     public IEnumerable<int> AllowedLanguages { get; private set; }
