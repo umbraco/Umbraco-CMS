@@ -42,6 +42,25 @@ public abstract class UserStartNodeFolderTreeControllerBase<TItem> : FolderTreeC
     }
 
     /// <summary>
+    /// Initializes a new instance of the <see cref="UserStartNodeFolderTreeControllerBase{TItem}"/> class.
+    /// </summary>
+    /// <param name="entityService">The entity service.</param>
+    /// <param name="flagProviders">The flag provider collection.</param>
+    /// <param name="entitySearchService">The entity search service.</param>
+    /// <param name="idKeyMap">The id key map.</param>
+    /// <param name="treeFilterService">The user start node tree filter service.</param>
+    protected UserStartNodeFolderTreeControllerBase(
+        IEntityService entityService,
+        FlagProviderCollection flagProviders,
+        IEntitySearchService entitySearchService,
+        IIdKeyMap idKeyMap,
+        IUserStartNodeTreeFilterService treeFilterService)
+        : base(entityService, flagProviders, entitySearchService, idKeyMap)
+    {
+        _treeFilterService = treeFilterService;
+    }
+
+    /// <summary>
     /// Configures the controller to ignore user start nodes for a specific data type.
     /// </summary>
     /// <param name="dataTypeKey">The data type key, or <c>null</c> to disable.</param>

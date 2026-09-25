@@ -59,6 +59,20 @@ public class ContentPermissions
     }
 
     /// <summary>
+    ///     Checks if the user has path access to an item in a tree that has no recycle bin.
+    /// </summary>
+    /// <param name="path">The path of the item.</param>
+    /// <param name="startNodeIds">The user's start node IDs.</param>
+    /// <returns><c>true</c> if the user has access; otherwise, <c>false</c>.</returns>
+    /// <remarks>
+    ///     Deliberately not an overload of <see cref="HasPathAccess(string, int[], int)" />: for a tree that does
+    ///     have a recycle bin, omitting the identifier would silently grant access to trashed items, so the two
+    ///     cases must not be distinguishable by argument count alone.
+    /// </remarks>
+    public static bool HasPathAccessWithoutRecycleBin(string? path, int[]? startNodeIds)
+        => HasPathAccess(path, startNodeIds, recycleBinId: null);
+
+    /// <summary>
     ///     Checks if the user has path access to a content item.
     /// </summary>
     /// <param name="path">The path of the content item.</param>
@@ -66,6 +80,9 @@ public class ContentPermissions
     /// <param name="recycleBinId">The recycle bin ID.</param>
     /// <returns><c>true</c> if the user has access; otherwise, <c>false</c>.</returns>
     public static bool HasPathAccess(string? path, int[]? startNodeIds, int recycleBinId)
+        => HasPathAccess(path, startNodeIds, (int?)recycleBinId);
+
+    private static bool HasPathAccess(string? path, int[]? startNodeIds, int? recycleBinId)
     {
         if (string.IsNullOrWhiteSpace(path))
         {
@@ -88,7 +105,8 @@ public class ContentPermissions
 
         // only users with root access have access to the recycle bin,
         // if the above check didn't pass then access is denied
-        if (formattedPath.Contains(string.Concat(",", recycleBinId.ToString(CultureInfo.InvariantCulture), ",")))
+        if (recycleBinId.HasValue
+            && formattedPath.Contains(string.Concat(",", recycleBinId.Value.ToString(CultureInfo.InvariantCulture), ",")))
         {
             return false;
         }

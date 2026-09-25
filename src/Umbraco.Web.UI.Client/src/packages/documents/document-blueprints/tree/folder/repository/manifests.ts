@@ -3,8 +3,10 @@ import {
 	UMB_DOCUMENT_BLUEPRINT_FOLDER_STORE_ALIAS,
 } from './constants.js';
 import { UmbDocumentBlueprintFolderStore } from './document-blueprint-folder.store.js';
+import { manifests as itemManifests } from './item/manifests.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
+	...itemManifests,
 	{
 		type: 'repository',
 		alias: UMB_DOCUMENT_BLUEPRINT_FOLDER_REPOSITORY_ALIAS,

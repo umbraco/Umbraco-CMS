@@ -22,6 +22,11 @@ public static class AuthorizationPolicies
 
     public const string ElementFolderPermissionByResource = nameof(ElementFolderPermissionByResource);
 
+    /// <summary>
+    ///     Requires that the user has access to the document blueprints in the request.
+    /// </summary>
+    public const string DocumentBlueprintPermissionByResource = nameof(DocumentBlueprintPermissionByResource);
+
     // Single section access
     public const string SectionAccessContent = nameof(SectionAccessContent);
     public const string SectionAccessPackages = nameof(SectionAccessPackages);

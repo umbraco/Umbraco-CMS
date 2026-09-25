@@ -37,11 +37,17 @@ class UmbTestUserGroupWorkspaceContext {
 	#elementStartNode = new UmbObjectState<{ unique: string } | null>(null);
 	readonly elementStartNode = this.#elementStartNode.asObservable();
 
+	#documentBlueprintRootAccess = new UmbBooleanState(false);
+	readonly documentBlueprintRootAccess = this.#documentBlueprintRootAccess.asObservable();
+	#documentBlueprintStartNode = new UmbObjectState<{ unique: string } | null>(null);
+	readonly documentBlueprintStartNode = this.#documentBlueprintStartNode.asObservable();
+
 	readonly setSectionsCalls: Array<Array<string>> = [];
 	readonly setLanguageAccessCalls: Array<UmbStartNodeAccessValue> = [];
 	readonly setDocumentAccessCalls: Array<UmbStartNodeAccessValue> = [];
 	readonly setMediaAccessCalls: Array<UmbStartNodeAccessValue> = [];
 	readonly setElementAccessCalls: Array<UmbStartNodeAccessValue> = [];
+	readonly setDocumentBlueprintAccessCalls: Array<UmbStartNodeAccessValue> = [];
 
 	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
@@ -80,6 +86,11 @@ class UmbTestUserGroupWorkspaceContext {
 		this.#elementStartNode.setValue(value.startNodes[0] ? { unique: value.startNodes[0].unique } : null);
 	}
 
+	setDocumentBlueprintAccessState(value: UmbStartNodeAccessValue) {
+		this.#documentBlueprintRootAccess.setValue(value.rootAccess);
+		this.#documentBlueprintStartNode.setValue(value.startNodes[0] ? { unique: value.startNodes[0].unique } : null);
+	}
+
 	setSections(sections: Array<string>) {
 		this.setSectionsCalls.push(sections);
 	}
@@ -98,6 +109,10 @@ class UmbTestUserGroupWorkspaceContext {
 
 	setElementAccess(value: UmbStartNodeAccessValue) {
 		this.setElementAccessCalls.push(value);
+	}
+
+	setDocumentBlueprintAccess(value: UmbStartNodeAccessValue) {
+		this.setDocumentBlueprintAccessCalls.push(value);
 	}
 }
 
@@ -181,6 +196,16 @@ describe('UmbUserGroupWorkspaceAssignAccessElement', () => {
 			expect(await datasetValueByAlias('elementAccess')).to.deep.equal({ rootAccess: true, startNodes: [] });
 		});
 
+		it('merges document blueprint root access and the single start node into a single value', async () => {
+			context.setDocumentBlueprintAccessState({ rootAccess: true, startNodes: [] });
+			await aTimeout(0);
+
+			expect(await datasetValueByAlias('documentBlueprintAccess')).to.deep.equal({
+				rootAccess: true,
+				startNodes: [],
+			});
+		});
+
 		it('does not write workspace-originated values back to the workspace context', async () => {
 			// A value pushed in from the workspace (e.g. the workspace data being cleared after deletion) must not
 			// echo back into a `set*` call, or an unrelated navigation will look like it has unpersisted changes.
@@ -236,6 +261,14 @@ describe('UmbUserGroupWorkspaceAssignAccessElement', () => {
 			await aTimeout(0);
 
 			expect(context.setElementAccessCalls.at(-1)).to.deep.equal(value);
+		});
+
+		it('writes a changed document blueprint access value back to the workspace context', async () => {
+			const value: UmbStartNodeAccessValue = { rootAccess: false, startNodes: [{ unique: 'blueprint-folder-1' }] };
+			dataset.setPropertyValue('documentBlueprintAccess', value);
+			await aTimeout(0);
+
+			expect(context.setDocumentBlueprintAccessCalls.at(-1)).to.deep.equal(value);
 		});
 	});
 });
