@@ -1062,7 +1062,6 @@ internal partial class BlockListElementLevelVariationTests
     [TestCase("variantText", "en-US", new[] { "en-US" })]
     [TestCase("variantText", "da-DK", new[] { "en-US", "da-DK" })]
     [TestCase("variantText", "da-DK", new[] { "da-DK" })]
-    [ConfigureBuilder(ActionName = nameof(ConfigureAllowEditInvariantFromNonDefaultTrue))]
     public async Task Removing_Block_Property_Value_Is_Propagated_To_Published_Value(string removedAlias, string? removedCulture, string[] culturesToPublish)
     {
         var elementType = await CreateElementType(ContentVariation.Culture);
@@ -1667,7 +1666,6 @@ internal partial class BlockListElementLevelVariationTests
     }
 
     [Test]
-    [ConfigureBuilder(ActionName = nameof(ConfigureAllowEditInvariantFromNonDefaultTrue))]
     public async Task Can_Publish_Invariant_Properties_Without_Default_Culture_With_AllowEditInvariantFromNonDefault()
     {
         var elementType = await CreateElementType(ContentVariation.Culture);
@@ -1756,6 +1754,7 @@ internal partial class BlockListElementLevelVariationTests
     }
 
     [Test]
+    // TODO KJA: Fix this; block editor publishing must take into account the current HasAccessToInvariantForVariant state
     public async Task Cannot_Publish_Invariant_Properties_Without_Default_Culture_Without_AllowEditInvariantFromNonDefault()
     {
         var elementType = await CreateElementType(ContentVariation.Culture);
