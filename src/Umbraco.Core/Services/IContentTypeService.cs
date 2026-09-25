@@ -10,6 +10,21 @@ namespace Umbraco.Cms.Core.Services;
 public interface IContentTypeService : IContentTypeBaseService<IContentType>
 {
     /// <summary>
+    ///     Gets the content types a document blueprint can be created for.
+    /// </summary>
+    /// <param name="parentKey">The key of the container the document blueprint is created in, or <c>null</c> at the root.</param>
+    /// <param name="skip">The amount of items to skip.</param>
+    /// <param name="take">The amount of items to take.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains a paged model of the allowed content types.</returns>
+    /// <remarks>
+    ///     The container is not itself configurable; <paramref name="parentKey" /> is passed to the registered
+    ///     <see cref="Filters.IContentTypeFilter" /> implementations so they can narrow the result for that context.
+    /// </remarks>
+    // TODO (V20): Remove the default implementation.
+    Task<PagedModel<IContentType>> GetAllAllowedForBlueprintsAsync(Guid? parentKey, int skip, int take)
+        => Task.FromResult(new PagedModel<IContentType>());
+
+    /// <summary>
     ///     Gets all property type aliases.
     /// </summary>
     /// <returns>An enumerable collection of all property type aliases.</returns>

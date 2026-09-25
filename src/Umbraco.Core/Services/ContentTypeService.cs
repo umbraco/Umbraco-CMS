@@ -22,6 +22,7 @@ public class ContentTypeService : ContentTypeServiceBase<IContentTypeRepository,
     private readonly ITemplateService _templateService;
     private readonly IContentService _contentService;
     private readonly IElementService _elementService;
+    private readonly ContentTypeFilterCollection _contentTypeFilters;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="ContentTypeService" /> class.
@@ -67,6 +68,7 @@ public class ContentTypeService : ContentTypeServiceBase<IContentTypeRepository,
         _templateService = templateService;
         _contentService = contentService;
         _elementService = elementService;
+        _contentTypeFilters = contentTypeFilters;
     }
 
     [Obsolete("Use the non-obsolete constructor. Scheduled for removal in Umbraco 19.")]
@@ -319,6 +321,29 @@ public class ContentTypeService : ContentTypeServiceBase<IContentTypeRepository,
 
     /// <inheritdoc />
     protected override Guid ContainedObjectType => Constants.ObjectTypes.DocumentType;
+
+    /// <inheritdoc />
+    public async Task<PagedModel<IContentType>> GetAllAllowedForBlueprintsAsync(Guid? parentKey, int skip, int take)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        scope.ReadLock(ReadLockIds);
+
+        IQuery<IContentType> query = ScopeProvider.CreateQuery<IContentType>().Where(x => x.IsElement == false);
+        IEnumerable<IContentType> contentTypes = Repository.Get(query);
+
+        foreach (IContentTypeFilter filter in _contentTypeFilters)
+        {
+            contentTypes = await filter.FilterAllowedForBlueprintsAsync(contentTypes, parentKey);
+        }
+
+        IContentType[] materialized = contentTypes.ToArray();
+
+        return new PagedModel<IContentType>
+        {
+            Total = materialized.Length,
+            Items = materialized.Skip(skip).Take(take),
+        };
+    }
 
     /// <summary>
     ///     Gets the content service.

@@ -224,4 +224,25 @@ public partial class ContentBlueprintEditingServiceTests
         });
         Assert.IsNull(result.Result.Content);
     }
+
+    [Test]
+    public async Task Cannot_Create_From_Content_For_Content_Type_Excluded_By_Content_Type_Filter()
+    {
+        var content = await CreateInvariantContent();
+        ExcludingContentTypeFilter.ExcludedContentTypeKey = content.ContentType.Key;
+
+        var result = await ContentBlueprintEditingService.CreateFromContentAsync(
+            content.Key,
+            "Test Create From Content Blueprint",
+            null,
+            null,
+            Constants.Security.SuperUserKey);
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsFalse(result.Success);
+            Assert.AreEqual(ContentEditingOperationStatus.NotAllowed, result.Status);
+        });
+        Assert.IsNull(result.Result.Content);
+    }
 }
