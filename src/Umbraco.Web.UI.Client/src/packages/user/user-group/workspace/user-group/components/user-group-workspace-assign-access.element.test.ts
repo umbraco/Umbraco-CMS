@@ -32,10 +32,16 @@ class UmbTestUserGroupWorkspaceContext {
 	#mediaStartNode = new UmbObjectState<{ unique: string } | null>(null);
 	readonly mediaStartNode = this.#mediaStartNode.asObservable();
 
+	#elementRootAccess = new UmbBooleanState(false);
+	readonly elementRootAccess = this.#elementRootAccess.asObservable();
+	#elementStartNode = new UmbObjectState<{ unique: string } | null>(null);
+	readonly elementStartNode = this.#elementStartNode.asObservable();
+
 	readonly setSectionsCalls: Array<Array<string>> = [];
 	readonly setLanguageAccessCalls: Array<UmbStartNodeAccessValue> = [];
 	readonly setDocumentAccessCalls: Array<UmbStartNodeAccessValue> = [];
 	readonly setMediaAccessCalls: Array<UmbStartNodeAccessValue> = [];
+	readonly setElementAccessCalls: Array<UmbStartNodeAccessValue> = [];
 
 	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
@@ -69,6 +75,11 @@ class UmbTestUserGroupWorkspaceContext {
 		this.#mediaStartNode.setValue(value.startNodes[0] ? { unique: value.startNodes[0].unique } : null);
 	}
 
+	setElementAccessState(value: UmbStartNodeAccessValue) {
+		this.#elementRootAccess.setValue(value.rootAccess);
+		this.#elementStartNode.setValue(value.startNodes[0] ? { unique: value.startNodes[0].unique } : null);
+	}
+
 	setSections(sections: Array<string>) {
 		this.setSectionsCalls.push(sections);
 	}
@@ -83,6 +94,10 @@ class UmbTestUserGroupWorkspaceContext {
 
 	setMediaAccess(value: UmbStartNodeAccessValue) {
 		this.setMediaAccessCalls.push(value);
+	}
+
+	setElementAccess(value: UmbStartNodeAccessValue) {
+		this.setElementAccessCalls.push(value);
 	}
 }
 
@@ -102,9 +117,7 @@ describe('UmbUserGroupWorkspaceAssignAccessElement', () => {
 				<umb-user-group-workspace-assign-access></umb-user-group-workspace-assign-access>
 			</umb-test-user-group-assign-access-host>`,
 		);
-		element = host.querySelector(
-			'umb-user-group-workspace-assign-access',
-		) as UmbUserGroupWorkspaceAssignAccessElement;
+		element = host.querySelector('umb-user-group-workspace-assign-access') as UmbUserGroupWorkspaceAssignAccessElement;
 
 		context = new UmbTestUserGroupWorkspaceContext(host);
 		host.provideContext(UMB_USER_GROUP_WORKSPACE_CONTEXT, context as never);
@@ -161,6 +174,13 @@ describe('UmbUserGroupWorkspaceAssignAccessElement', () => {
 			expect(await datasetValueByAlias('mediaAccess')).to.deep.equal({ rootAccess: true, startNodes: [] });
 		});
 
+		it('merges element root access and the single start node into a single value', async () => {
+			context.setElementAccessState({ rootAccess: true, startNodes: [] });
+			await aTimeout(0);
+
+			expect(await datasetValueByAlias('elementAccess')).to.deep.equal({ rootAccess: true, startNodes: [] });
+		});
+
 		it('does not write workspace-originated values back to the workspace context', async () => {
 			// A value pushed in from the workspace (e.g. the workspace data being cleared after deletion) must not
 			// echo back into a `set*` call, or an unrelated navigation will look like it has unpersisted changes.
@@ -168,12 +188,13 @@ describe('UmbUserGroupWorkspaceAssignAccessElement', () => {
 			context.setLanguageAccessState({ rootAccess: false, startNodes: [{ unique: 'en-us' }] });
 			context.setDocumentAccessState({ rootAccess: false, startNodes: [{ unique: 'doc-1' }] });
 			context.setMediaAccessState({ rootAccess: true, startNodes: [] });
+			context.setElementAccessState({ rootAccess: true, startNodes: [] });
 			await aTimeout(0);
 
 			expect(context.setSectionsCalls).to.be.empty;
 			expect(context.setLanguageAccessCalls).to.be.empty;
 			expect(context.setDocumentAccessCalls).to.be.empty;
-			expect(context.setMediaAccessCalls).to.be.empty;
+			expect(context.setElementAccessCalls).to.be.empty;
 		});
 	});
 
@@ -207,6 +228,14 @@ describe('UmbUserGroupWorkspaceAssignAccessElement', () => {
 			await aTimeout(0);
 
 			expect(context.setMediaAccessCalls.at(-1)).to.deep.equal(value);
+		});
+
+		it('writes a changed element access value back to the workspace context', async () => {
+			const value: UmbStartNodeAccessValue = { rootAccess: false, startNodes: [{ unique: 'element-1' }] };
+			dataset.setPropertyValue('elementAccess', value);
+			await aTimeout(0);
+
+			expect(context.setElementAccessCalls.at(-1)).to.deep.equal(value);
 		});
 	});
 });

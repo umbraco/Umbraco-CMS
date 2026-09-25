@@ -15,6 +15,7 @@ export class UmbUserGroupWorkspaceAssignAccessElement extends UmbLitElement {
 		{ alias: 'languageAccess', value: { rootAccess: false, startNodes: [] } },
 		{ alias: 'documentAccess', value: { rootAccess: false, startNodes: [] } },
 		{ alias: 'mediaAccess', value: { rootAccess: false, startNodes: [] } },
+		{ alias: 'elementAccess', value: { rootAccess: false, startNodes: [] } },
 	];
 
 	constructor() {
@@ -55,6 +56,16 @@ export class UmbUserGroupWorkspaceAssignAccessElement extends UmbLitElement {
 					}),
 				'_observeMediaAccess',
 			);
+
+			this.observe(
+				observeMultiple([instance.elementRootAccess, instance.elementStartNode]),
+				([rootAccess, startNode]) =>
+					this.#setValue('elementAccess', {
+						rootAccess: rootAccess ?? false,
+						startNodes: startNode ? [{ unique: startNode.unique }] : [],
+					}),
+				'_observeElementAccess',
+			);
 		});
 	}
 
@@ -82,6 +93,11 @@ export class UmbUserGroupWorkspaceAssignAccessElement extends UmbLitElement {
 			| UmbStartNodeAccessValue
 			| undefined;
 		if (mediaAccess) this.#workspaceContext?.setMediaAccess(mediaAccess);
+
+		const elementAccess = values.find((entry) => entry.alias === 'elementAccess')?.value as
+			| UmbStartNodeAccessValue
+			| undefined;
+		if (elementAccess) this.#workspaceContext?.setElementAccess(elementAccess);
 	}
 
 	#getFields(): Array<PropertyEditorSettingsProperty> {
@@ -116,6 +132,16 @@ export class UmbUserGroupWorkspaceAssignAccessElement extends UmbLitElement {
 				propertyEditorUiAlias: 'Umb.PropertyEditorUi.MediaStartNodeAccess',
 				config: [
 					{ alias: 'rootAccessLabel', value: this.localize.term('user_allowAccessToAllMedia') },
+					{ alias: 'validationLimit', value: { min: 0, max: 1 } },
+				],
+			},
+			{
+				alias: 'elementAccess',
+				label: this.localize.term('user_selectElementStartNode'),
+				description: this.localize.term('user_selectElementStartNodeDescription'),
+				propertyEditorUiAlias: 'Umb.PropertyEditorUi.ElementStartNodeAccess',
+				config: [
+					{ alias: 'rootAccessLabel', value: this.localize.term('user_allowAccessToAllElements') },
 					{ alias: 'validationLimit', value: { min: 0, max: 1 } },
 				],
 			},

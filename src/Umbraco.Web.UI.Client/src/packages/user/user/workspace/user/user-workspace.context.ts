@@ -140,6 +140,13 @@ export class UmbUserWorkspaceContext
 		});
 	}
 
+	setElementAccess(value: UmbStartNodeAccessValue) {
+		this._data.updateCurrent({
+			hasElementRootAccess: value.rootAccess,
+			elementStartNodeUniques: value.startNodes,
+		});
+	}
+
 	// TODO: implement upload progress
 	uploadAvatar(file: File) {
 		const unique = this.getUnique();

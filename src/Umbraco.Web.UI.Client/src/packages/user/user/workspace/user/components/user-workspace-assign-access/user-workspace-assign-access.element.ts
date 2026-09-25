@@ -15,6 +15,7 @@ export class UmbUserWorkspaceAssignAccessElement extends UmbLitElement {
 		{ alias: 'userGroups', value: [] },
 		{ alias: 'documentAccess', value: { rootAccess: false, startNodes: [] } },
 		{ alias: 'mediaAccess', value: { rootAccess: false, startNodes: [] } },
+		{ alias: 'elementAccess', value: { rootAccess: false, startNodes: [] } },
 	];
 
 	constructor() {
@@ -43,6 +44,13 @@ export class UmbUserWorkspaceAssignAccessElement extends UmbLitElement {
 					this.#setValue('mediaAccess', { rootAccess: rootAccess ?? false, startNodes: startNodes ?? [] }),
 				'_observeMediaAccess',
 			);
+
+			this.observe(
+				observeMultiple([instance.hasElementRootAccess, instance.elementStartNodeUniques]),
+				([rootAccess, startNodes]) =>
+					this.#setValue('elementAccess', { rootAccess: rootAccess ?? false, startNodes: startNodes ?? [] }),
+				'_observeElementAccess',
+			);
 		});
 	}
 
@@ -67,6 +75,11 @@ export class UmbUserWorkspaceAssignAccessElement extends UmbLitElement {
 			| UmbStartNodeAccessValue
 			| undefined;
 		if (mediaAccess) this.#workspaceContext?.setMediaAccess(mediaAccess);
+
+		const elementAccess = values.find((entry) => entry.alias === 'elementAccess')?.value as
+			| UmbStartNodeAccessValue
+			| undefined;
+		if (elementAccess) this.#workspaceContext?.setElementAccess(elementAccess);
 	}
 
 	#getFields(): Array<PropertyEditorSettingsProperty> {
@@ -90,6 +103,13 @@ export class UmbUserWorkspaceAssignAccessElement extends UmbLitElement {
 				description: this.localize.term('user_mediastartnodehelp'),
 				propertyEditorUiAlias: 'Umb.PropertyEditorUi.MediaStartNodeAccess',
 				config: [{ alias: 'rootAccessLabel', value: this.localize.term('user_allowAccessToAllMedia') }],
+			},
+			{
+				alias: 'elementAccess',
+				label: this.localize.term('user_selectElementStartNode'),
+				description: this.localize.term('user_selectElementStartNodeDescription'),
+				propertyEditorUiAlias: 'Umb.PropertyEditorUi.ElementStartNodeAccess',
+				config: [{ alias: 'rootAccessLabel', value: this.localize.term('user_allowAccessToAllElements') }],
 			},
 		];
 	}

@@ -166,6 +166,18 @@ export class UmbUserGroupWorkspaceContext
 			mediaStartNode: value.startNodes[0] ? { unique: value.startNodes[0].unique } : null,
 		});
 	}
+
+	/**
+	 * Sets the user group element access.
+	 * @param {UmbStartNodeAccessValue} value - The element root access and start node.
+	 * @memberof UmbUserGroupWorkspaceContext
+	 */
+	setElementAccess(value: UmbStartNodeAccessValue) {
+		this._data.updateCurrent({
+			elementRootAccess: value.rootAccess,
+			elementStartNode: value.startNodes[0] ? { unique: value.startNodes[0].unique } : null,
+		});
+	}
 }
 
 export { UmbUserGroupWorkspaceContext as api };
