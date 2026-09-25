@@ -14,6 +14,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UUIInterfaceColor, UUIInterfaceLook } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbExtensionElementAndApiInitializer } from '@umbraco-cms/backoffice/extension-api';
+import { umbRenderGroupSeparator } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-workspace-action-menu')
 export class UmbWorkspaceActionMenuElement extends UmbLitElement {
@@ -73,7 +74,7 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 						${repeat(
 							this.items,
 							(ext) => ext.alias,
-							(ext) => ext.component,
+							(ext, i) => html`${umbRenderGroupSeparator(this.items[i - 1]?.manifest, ext.manifest!)}${ext.component}`,
 						)}
 					</uui-scroll-container>
 				</umb-popover-layout>
