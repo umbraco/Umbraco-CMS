@@ -815,10 +815,17 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
 
     protected async Task<HashSet<string>> GetAllowedCulturesForEditingUser(Guid userKey)
     {
-        IUser user = await _userService.GetAsync(userKey)
-                      ?? throw new InvalidOperationException($"Could not find user by key {userKey} when editing or validating content.");
+        IUser user = await GetUserAsync(userKey);
+        return await GetAllowedCulturesForEditingUserAsync(user);
+    }
 
-        var allowedLanguageIds = (await user.CalculateAllowedLanguageIdsAsync(_languageService))!;
+    private async Task<IUser> GetUserAsync(Guid userKey)
+        => await _userService.GetAsync(userKey)
+           ?? throw new InvalidOperationException($"Could not find user by key {userKey} when editing or validating content.");
+
+    private async Task<HashSet<string>> GetAllowedCulturesForEditingUserAsync(IUser user)
+    {
+        var allowedLanguageIds = await user.CalculateAllowedLanguageIdsAsync(_languageService);
 
         return (await _languageService.GetIsoCodesByIdsAsync(allowedLanguageIds)).ToHashSet();
     }
@@ -836,15 +843,13 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
 
         TContent? existingContent = await GetAsync(contentWithPotentialUnallowedChanges.Key);
 
-        HashSet<string>? allowedCultures = await GetAllowedCulturesForEditingUser(userKey);
-
-        ILanguage? defaultLanguage = await _languageService.GetDefaultLanguageAsync();
+        IUser user = await GetUserAsync(userKey);
+        HashSet<string> allowedCultures = await GetAllowedCulturesForEditingUserAsync(user);
+        var hasAccessToInvariantForVariant = user.HasAccessToInvariantForVariant();
 
         var disallowedCultures = (contentWithPotentialUnallowedChanges.EditedCultures ??
                                contentWithPotentialUnallowedChanges.PublishedCultures)
             .Where(culture => allowedCultures.Contains(culture) is false).ToList();
-
-        var allowedToEditDefaultLanguage = allowedCultures.Contains(defaultLanguage?.IsoCode ?? string.Empty);
 
         var variantProperties = new List<IProperty>();
         var invariantWithVariantSupportProperties = new List<(IProperty Property, IDataEditor DataEditor)>();
@@ -878,8 +883,8 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
             }
         }
 
-        // If property does not support merging, we still need to overwrite if we are not allowed to edit invariant properties.
-        if (ContentSettings.AllowEditInvariantFromNonDefault is false && allowedToEditDefaultLanguage is false)
+        // If the user lacks the invariant-for-variant permission, overwrite invariant property values with the persisted ones.
+        if (hasAccessToInvariantForVariant is false)
         {
             foreach (IProperty property in invariantProperties)
             {
@@ -902,7 +907,7 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
             var mergedValue = propertyWithEditor.DataEditor.MergeVariantInvariantPropertyValue(
                 currentValue,
                 editedValue,
-                ContentSettings.AllowEditInvariantFromNonDefault || (defaultLanguage is not null && allowedCultures.Contains(defaultLanguage.IsoCode)),
+                hasAccessToInvariantForVariant,
                 allowedCultures);
 
             propertyWithEditor.Property.SetValue(mergedValue, null, null);

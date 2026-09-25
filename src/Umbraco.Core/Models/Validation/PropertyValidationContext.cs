@@ -26,6 +26,18 @@ public sealed class PropertyValidationContext
     public required IEnumerable<string?> SegmentsBeingValidated { get; init; }
 
     /// <summary>
+    ///     Gets a value indicating whether invariant (shared) properties should be validated in this context.
+    /// </summary>
+    /// <remarks>
+    ///     Defaults to <c>true</c> so callers that don't populate it (migrations, internal consistency checks,
+    ///     system validations) behave permissively. Content-editing paths compute this as
+    ///     <c>content.ContentType.VariesByCulture() is false || user.HasAccessToInvariantForVariant()</c> —
+    ///     i.e. invariant content types always validate invariant properties, and variant content types only
+    ///     do so when the editing user holds the permission.
+    /// </remarks>
+    public bool ValidateInvariantProperties { get; init; } = true;
+
+    /// <summary>
     ///     Creates an empty property validation context with no culture or segment.
     /// </summary>
     /// <returns>An empty property validation context.</returns>

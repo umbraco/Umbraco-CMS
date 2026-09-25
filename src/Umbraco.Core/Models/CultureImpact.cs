@@ -117,13 +117,17 @@ public sealed class CultureImpact
     public bool ImpactsInvariantProperties => Culture == null || Culture == "*" || ImpactsOnlyDefaultCulture;
 
     /// <summary>
-    ///     Gets a value indicating whether this also impact impacts the invariant properties,
+    ///     Gets a value indicating whether this impact also impacts the invariant properties,
     ///     even though it does not impact the invariant culture, neither directly (ImpactsInvariantCulture)
     ///     nor indirectly (ImpactsAllCultures).
     /// </summary>
-    public bool ImpactsAlsoInvariantProperties => !ImpactsOnlyInvariantCulture &&
-                                                  !ImpactsAllCultures &&
-                                                  (ImpactsOnlyDefaultCulture || AllowEditInvariantFromNonDefault);
+    /// <remarks>
+    ///     Invariant properties are carried by every explicit-culture impact; the decision of whether
+    ///     the editing user is allowed to mutate invariant property values is gated upstream at the
+    ///     service boundary (see <c>ContentEditingServiceBase.EnsureOnlyAllowedFieldsAreUpdated</c>
+    ///     and <c>PropertyValidationContext.ValidateInvariantProperties</c>).
+    /// </remarks>
+    public bool ImpactsAlsoInvariantProperties => !ImpactsOnlyInvariantCulture && !ImpactsAllCultures;
 
     /// <summary>
     ///     Gets the behavior flags for this culture impact.
@@ -229,5 +233,10 @@ public sealed class CultureImpact
     /// <summary>
     ///     Gets a value indicating whether editing invariant properties from a non-default language is allowed.
     /// </summary>
+    /// <remarks>
+    ///     No longer consulted in the publish pipeline. Invariant-property editing is gated by the
+    ///     <c>HasAccessToInvariantForVariant</c> user-group permission.
+    /// </remarks>
+    [Obsolete("No longer used. Invariant-property editing is gated by the HasAccessToInvariantForVariant user-group permission. Scheduled for removal in Umbraco 20.")]
     public bool AllowEditInvariantFromNonDefault { get; }
 }

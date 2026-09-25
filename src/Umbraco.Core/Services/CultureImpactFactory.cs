@@ -29,7 +29,9 @@ public class CultureImpactFactory : ICultureImpactFactory
     /// <inheritdoc/>
     public CultureImpact? Create(string? culture, bool isDefault, IContentBase content)
     {
-        TryCreate(culture, isDefault, content.ContentType.Variations, true, _contentSettings.AllowEditInvariantFromNonDefault, out CultureImpact? impact);
+        // The legacy AllowEditInvariantFromNonDefault config flag is no longer consulted — invariant
+        // property editing is gated upstream by the HasAccessToInvariantForVariant user-group permission.
+        TryCreate(culture, isDefault, content.ContentType.Variations, true, false, out CultureImpact? impact);
 
         return impact;
     }
@@ -58,7 +60,8 @@ public class CultureImpactFactory : ICultureImpactFactory
             throw new ArgumentException("Culture \"*\" is not explicit.");
         }
 
-        return new CultureImpact(culture, isDefault, _contentSettings.AllowEditInvariantFromNonDefault);
+        // The legacy AllowEditInvariantFromNonDefault config flag is no longer consulted.
+        return new CultureImpact(culture, isDefault);
     }
 
     /// <inheritdoc/>
