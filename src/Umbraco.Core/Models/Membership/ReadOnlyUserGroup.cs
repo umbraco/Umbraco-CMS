@@ -89,7 +89,7 @@ public class ReadOnlyUserGroup : IReadOnlyUserGroup, IEquatable<ReadOnlyUserGrou
     {
     }
 
-    [Obsolete("Please use the constructor that includes all parameters. Scheduled for removal in Umbraco 20.")]
+    [Obsolete("Please use the constructor that includes all parameters. Scheduled for removal in Umbraco 21.")]
     public ReadOnlyUserGroup(
         int id,
         Guid key,

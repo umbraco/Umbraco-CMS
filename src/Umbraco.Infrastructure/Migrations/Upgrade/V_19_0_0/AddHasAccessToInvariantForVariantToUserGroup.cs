@@ -12,7 +12,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_19_0_0;
 /// </summary>
 /// <remarks>
 ///     This is the last consumer of <see cref="ContentSettings.AllowEditInvariantFromNonDefault"/>.
-///     Do not remove the setting until Umbraco 20 per the obsoletion schedule.
+///     Do not remove the setting until Umbraco 21 per the obsoletion schedule.
 /// </remarks>
 public class AddHasAccessToInvariantForVariantToUserGroup : AsyncMigrationBase
 {

@@ -138,7 +138,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
     /// <param name="idKeyMap">The ID key map.</param>
     /// <param name="optionsMonitor">The content settings options monitor.</param>
     /// <param name="relationService">The relation service.</param>
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 20.")]
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 21.")]
     public ContentService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -201,7 +201,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
     /// <param name="optionsMonitor">The content settings options monitor.</param>
     /// <param name="relationService">The relation service.</param>
     /// <param name="serviceProvider">The service provider for resolving services without causing circular references.</param>
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 20.")]
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 21.")]
     public ContentService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,

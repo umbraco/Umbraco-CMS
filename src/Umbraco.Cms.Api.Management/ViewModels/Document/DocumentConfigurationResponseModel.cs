@@ -24,7 +24,7 @@ public class DocumentConfigurationResponseModel
     ///     current-user response. The server always returns <c>true</c> here so older clients
     ///     that still read the field behave as if the legacy config flag were permissive.
     /// </remarks>
-    [Obsolete("No longer consulted. Gated by the HasAccessToInvariantForVariant user-group permission. Scheduled for removal in Umbraco 20.")]
+    [Obsolete("No longer consulted. Gated by the HasAccessToInvariantForVariant user-group permission. Scheduled for removal in Umbraco 21.")]
     public required bool AllowEditInvariantFromNonDefault { get; set; }
 
     /// <summary>

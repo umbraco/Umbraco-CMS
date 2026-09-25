@@ -86,7 +86,7 @@ public class ContentSettings
     /// <summary>
     ///     The default value for allowing edit of invariant properties from non-default language.
     /// </summary>
-    [Obsolete("No longer used. Superseded by the HasAccessToInvariantForVariant user-group permission. Scheduled for removal in Umbraco 20.")]
+    [Obsolete("No longer used. Superseded by the HasAccessToInvariantForVariant user-group permission. Scheduled for removal in Umbraco 21.")]
     internal const bool StaticAllowEditInvariantFromNonDefault = false;
 
     /// <summary>
@@ -232,11 +232,11 @@ public class ContentSettings
     /// <remarks>
     ///     No longer consulted by the content editing pipeline. Invariant-property editing is gated by the
     ///     <c>HasAccessToInvariantForVariant</c> user-group permission. The setting is read once during the
-    ///     v18 upgrade migration to backfill existing user groups — remove no earlier than Umbraco 20.
+    ///     v18 upgrade migration to backfill existing user groups — remove no earlier than Umbraco 21.
     /// </remarks>
 #pragma warning disable CS0618 // Type or member is obsolete
     [DefaultValue(StaticAllowEditInvariantFromNonDefault)]
-    [Obsolete("No longer used. Superseded by the HasAccessToInvariantForVariant user-group permission. Scheduled for removal in Umbraco 20.")]
+    [Obsolete("No longer used. Superseded by the HasAccessToInvariantForVariant user-group permission. Scheduled for removal in Umbraco 21.")]
     public bool AllowEditInvariantFromNonDefault { get; set; } = StaticAllowEditInvariantFromNonDefault;
 #pragma warning restore CS0618 // Type or member is obsolete
 
