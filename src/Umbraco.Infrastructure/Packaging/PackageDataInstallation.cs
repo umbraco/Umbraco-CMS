@@ -88,7 +88,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         /// <param name="dataTypeContainerService">The data type container service for resolving data type folders.</param>
         /// <param name="elementService">The element service for installing element instances.</param>
         /// <param name="elementContainerService">The element container service for managing element folders.</param>
-    /// <param name="contentTypeContainerService">The content type container service.</param>
+        /// <param name="contentTypeContainerService">The content type container service.</param>
         public PackageDataInstallation(
             IDataValueEditorFactory dataValueEditorFactory,
             ILogger<PackageDataInstallation> logger,
@@ -380,7 +380,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 userId,
                 alias => typeService.Get(alias),
                 service.GetById,
-                (contents, saveUserId) => service.Save(contents, saveUserId));
+                (contents, saveUserId) => SaveImportedContent(contents, saveUserId, service));
 
         /// <summary>
         /// Imports content base items of a specified type from the provided compiled package content documents,
@@ -435,7 +435,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 userId,
                 alias => typeService.GetAsync(alias).GetAwaiter().GetResult(),
                 service.GetById,
-                (contents, saveUserId) => service.Save(contents, saveUserId));
+                (contents, saveUserId) => SaveImportedContent(contents, saveUserId, service));
 
         /// <summary>
         /// Imports content base items of a specified type from the provided compiled package content documents using
@@ -470,7 +470,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             int userId,
             Func<string, TContentTypeComposition?> findContentType,
             Func<Guid, TContentBase?> getById,
-            Action<IEnumerable<TContentBase>, int> save)
+            Func<IEnumerable<TContentBase>, int, bool> save)
             where TContentBase : class, IContentBase
             where TContentTypeComposition : IContentTypeComposition
             => docs.SelectMany(x =>
@@ -509,7 +509,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 userId,
                 alias => typeService.Get(alias),
                 service.GetById,
-                (contents, saveUserId) => service.Save(contents, saveUserId));
+                (contents, saveUserId) => SaveImportedContent(contents, saveUserId, service));
 
         /// <summary>
         /// Imports and saves package xml as <see cref="IContentBase"/> items, using the async content service of
@@ -565,7 +565,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 userId,
                 alias => typeService.GetAsync(alias).GetAwaiter().GetResult(),
                 service.GetById,
-                (contents, saveUserId) => service.Save(contents, saveUserId));
+                (contents, saveUserId) => SaveImportedContent(contents, saveUserId, service));
 
         /// <summary>
         /// Imports and saves package xml as <see cref="IContentBase"/> items using the (asynchronous) document type
@@ -603,18 +603,18 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             int userId,
             Func<string, TContentTypeComposition?> findContentType,
             Func<Guid, TContentBase?> getById,
-            Action<IEnumerable<TContentBase>, int> save)
+            Func<IEnumerable<TContentBase>, int, bool> save)
             where TContentBase : class, IContentBase
             where TContentTypeComposition : IContentTypeComposition
         {
             var contents = ParseContentBaseRootXml(roots, parentId, importedDocumentTypes, findContentType, getById)
                 .ToList();
-            if (contents.Any())
+            if (contents.Count == 0)
             {
-                save(contents, userId);
+                return contents;
             }
 
-            return contents;
+            return save(contents, userId) ? contents : Enumerable.Empty<TContentBase>();
 
             //var attribute = element.Attribute("isDoc");
             //if (attribute != null)
@@ -2571,10 +2571,8 @@ namespace Umbraco.Cms.Infrastructure.Packaging
 
         #endregion
 
-        // Resolves an int user id to its Guid key, falling back to SuperUserKey for unknown ids.
-        // The import reports what it created, so a save that the service refuses would otherwise leave the
-        // summary claiming content that is not there.
-        private void SaveImportedContent<TContentBase>(
+        // The import reports what it created, so the caller must know when the service refused the save.
+        private bool SaveImportedContent<TContentBase>(
             IEnumerable<TContentBase> contents,
             int userId,
             IAsyncContentServiceBase<TContentBase> service)
@@ -2589,8 +2587,29 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                     "Failed to save imported content while installing package data: {Status}.",
                     result.Result);
             }
+
+            return result.Success;
         }
 
+        private bool SaveImportedContent<TContentBase>(
+            IEnumerable<TContentBase> contents,
+            int userId,
+            IContentServiceBase<TContentBase> service)
+            where TContentBase : class, IContentBase
+        {
+            Attempt<OperationResult?> result = service.Save(contents, userId);
+
+            if (result.Success is false)
+            {
+                _logger.LogError(
+                    "Failed to save imported content while installing package data: {Status}.",
+                    result.Result?.Result);
+            }
+
+            return result.Success;
+        }
+
+        // Resolves an int user id to its Guid key, falling back to SuperUserKey for unknown ids.
         private Guid ResolveUserKey(int userId)
         {
             Attempt<Guid> attempt = _userIdKeyResolver.TryGetAsync(userId).GetAwaiter().GetResult();

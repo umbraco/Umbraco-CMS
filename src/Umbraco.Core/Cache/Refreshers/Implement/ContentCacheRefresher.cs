@@ -342,6 +342,7 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
 
     private void HandleMemoryCache(JsonPayload payload)
     {
+        // TODO (V20): await this once the ICacheRefresher contract goes async.
         Attempt<Guid> attempt = _idKeyMap.GetKeyForIdAsync(payload.Id, UmbracoObjectTypes.Document).GetAwaiter().GetResult();
         Guid key = payload.Key ?? attempt.Result;
 
@@ -404,6 +405,7 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
     {
         if (payload.ChangeTypes.HasType(TreeChangeTypes.Remove))
         {
+            // TODO (V20): await this once the ICacheRefresher contract goes async.
             Attempt<Guid> attempt = _idKeyMap.GetKeyForIdAsync(payload.Id, UmbracoObjectTypes.Document).GetAwaiter().GetResult();
             Guid key = payload.Key ?? attempt.Result;
 
@@ -429,6 +431,7 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
 
         if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshNode))
         {
+            // TODO (V20): await this once the ICacheRefresher contract goes async.
             Attempt<Guid> attempt = _idKeyMap.GetKeyForIdAsync(payload.Id, UmbracoObjectTypes.Document).GetAwaiter().GetResult();
             Guid key = payload.Key ?? attempt.Result;
             _documentUrlService.UpdateUrlSegmentCacheAsync(key).GetAwaiter().GetResult();
@@ -437,6 +440,7 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
 
         if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshBranch))
         {
+            // TODO (V20): await this once the ICacheRefresher contract goes async.
             Attempt<Guid> attempt = _idKeyMap.GetKeyForIdAsync(payload.Id, UmbracoObjectTypes.Document).GetAwaiter().GetResult();
             Guid key = payload.Key ?? attempt.Result;
 
@@ -466,6 +470,7 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
 
         if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshNode))
         {
+            // TODO (V20): await this once the ICacheRefresher contract goes async.
             IContent? content = _contentService.GetByIdAsync(payload.Key.Value, CancellationToken.None).GetAwaiter().GetResult();
 
             if (content is null)
@@ -478,6 +483,7 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
 
         if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshBranch))
         {
+            // TODO (V20): await this once the ICacheRefresher contract goes async.
             IContent? content = _contentService.GetByIdAsync(payload.Key.Value, CancellationToken.None).GetAwaiter().GetResult();
 
             if (content is null)
@@ -485,6 +491,7 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
                 return;
             }
 
+            // TODO (V20): await this once the ICacheRefresher contract goes async.
             IEnumerable<IContent> descendants = _contentService.GetDescendantsAsync(content.Key, 0, int.MaxValue, ordering: null, CancellationToken.None).GetAwaiter().GetResult().Items;
             foreach (IContent descendant in content.Yield().Concat(descendants))
             {

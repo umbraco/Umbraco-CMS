@@ -67,6 +67,15 @@ public class PublicAccessCheckerTests
         => Mock.Get(memberManager).Setup(x => x.GetUserAsync(It.IsAny<ClaimsPrincipal>()))
             .Returns(Task.FromResult(memberIdentityUser));
 
+    private static void MockContentLookup(IIdKeyMap idKeyMap, IContentService contentService, int contentId, IContent content)
+    {
+        var contentKey = Guid.NewGuid();
+        Mock.Get(idKeyMap).Setup(x => x.GetKeyForIdAsync(contentId, It.IsAny<UmbracoObjectTypes>()))
+            .ReturnsAsync(Attempt.Succeed(contentKey));
+        Mock.Get(contentService).Setup(x => x.GetByIdAsync(contentKey, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(content);
+    }
+
     private PublicAccessEntry GetPublicAccessEntry(string usernameRuleValue, string roleRuleValue)
         => new(
             Guid.NewGuid(),
@@ -129,8 +138,7 @@ public class PublicAccessCheckerTests
     {
         var sut = CreateSut(memberManager, publicAccessService, contentService, idKeyMap, out var httpContext);
 
-        Mock.Get(idKeyMap).Setup(x => x.GetKeyForIdAsync(123, It.IsAny<UmbracoObjectTypes>())).ReturnsAsync(Attempt.Succeed(Guid.NewGuid()));
-        Mock.Get(contentService).Setup(x => x.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>())).ReturnsAsync(protectedNode);
+        MockContentLookup(idKeyMap, contentService, 123, protectedNode);
         Mock.Get(publicAccessService).Setup(x => x.GetEntryForContentAsync(It.IsAny<IContent>()))
             .ReturnsAsync(new PublicAccessEntry(
                 protectedNode,
@@ -202,8 +210,7 @@ public class PublicAccessCheckerTests
         httpContext.User = GetLoggedInUser();
         MockGetUserAsync(memberManager, new MemberIdentityUser { IsApproved = true });
         MockGetRolesAsync(memberManager);
-        Mock.Get(idKeyMap).Setup(x => x.GetKeyForIdAsync(123, It.IsAny<UmbracoObjectTypes>())).ReturnsAsync(Attempt.Succeed(Guid.NewGuid()));
-        Mock.Get(contentService).Setup(x => x.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>())).ReturnsAsync((IContent)null);
+        MockContentLookup(idKeyMap, contentService, 123, (IContent)null);
 
         var result = await sut.HasMemberAccessToContentAsync(123);
         Assert.AreEqual(PublicAccessStatus.AccessAccepted, result);
@@ -222,8 +229,7 @@ public class PublicAccessCheckerTests
         httpContext.User = GetLoggedInUser();
         MockGetUserAsync(memberManager, new MemberIdentityUser { IsApproved = true });
         MockGetRolesAsync(memberManager);
-        Mock.Get(idKeyMap).Setup(x => x.GetKeyForIdAsync(123, It.IsAny<UmbracoObjectTypes>())).ReturnsAsync(Attempt.Succeed(Guid.NewGuid()));
-        Mock.Get(contentService).Setup(x => x.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>())).ReturnsAsync(content);
+        MockContentLookup(idKeyMap, contentService, 123, content);
         Mock.Get(publicAccessService).Setup(x => x.GetEntryForContentAsync(content)).ReturnsAsync((PublicAccessEntry)null);
 
         var result = await sut.HasMemberAccessToContentAsync(123);
@@ -243,8 +249,7 @@ public class PublicAccessCheckerTests
         httpContext.User = GetLoggedInUser();
         MockGetUserAsync(memberManager, new MemberIdentityUser { UserName = "MyUsername", IsApproved = true });
         MockGetRolesAsync(memberManager);
-        Mock.Get(idKeyMap).Setup(x => x.GetKeyForIdAsync(123, It.IsAny<UmbracoObjectTypes>())).ReturnsAsync(Attempt.Succeed(Guid.NewGuid()));
-        Mock.Get(contentService).Setup(x => x.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>())).ReturnsAsync(content);
+        MockContentLookup(idKeyMap, contentService, 123, content);
         Mock.Get(publicAccessService).Setup(x => x.GetEntryForContentAsync(content))
             .ReturnsAsync(GetPublicAccessEntry(string.Empty, string.Empty));
 
@@ -265,8 +270,7 @@ public class PublicAccessCheckerTests
         httpContext.User = GetLoggedInUser();
         MockGetUserAsync(memberManager, new MemberIdentityUser { UserName = "MyUsername", IsApproved = true });
         MockGetRolesAsync(memberManager);
-        Mock.Get(idKeyMap).Setup(x => x.GetKeyForIdAsync(123, It.IsAny<UmbracoObjectTypes>())).ReturnsAsync(Attempt.Succeed(Guid.NewGuid()));
-        Mock.Get(contentService).Setup(x => x.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>())).ReturnsAsync(content);
+        MockContentLookup(idKeyMap, contentService, 123, content);
         Mock.Get(publicAccessService).Setup(x => x.GetEntryForContentAsync(content))
             .ReturnsAsync(GetPublicAccessEntry("MyUsername", string.Empty));
 
@@ -287,8 +291,7 @@ public class PublicAccessCheckerTests
         httpContext.User = GetLoggedInUser();
         MockGetUserAsync(memberManager, new MemberIdentityUser { UserName = "MyUsername", IsApproved = true });
         MockGetRolesAsync(memberManager);
-        Mock.Get(idKeyMap).Setup(x => x.GetKeyForIdAsync(123, It.IsAny<UmbracoObjectTypes>())).ReturnsAsync(Attempt.Succeed(Guid.NewGuid()));
-        Mock.Get(contentService).Setup(x => x.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>())).ReturnsAsync(content);
+        MockContentLookup(idKeyMap, contentService, 123, content);
         Mock.Get(publicAccessService).Setup(x => x.GetEntryForContentAsync(content))
             .ReturnsAsync(GetPublicAccessEntry(string.Empty, "role1"));
 

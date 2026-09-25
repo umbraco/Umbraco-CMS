@@ -367,6 +367,7 @@ public class PackagesRepository : ICreatedPackagesRepository
                 continue;
             }
 
+            // TODO (V20): await this once the IPackagesRepository contract goes async.
             Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForIdAsync(outInt, UmbracoObjectTypes.DataType).GetAwaiter().GetResult();
             if (keyAttempt.Success is false)
             {
@@ -680,6 +681,7 @@ public class PackagesRepository : ICreatedPackagesRepository
             if (contentNodeId > 0)
             {
                 // load content from umbraco.
+                // TODO (V20): await this once the IPackagesRepository contract goes async.
                 Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForIdAsync(contentNodeId, UmbracoObjectTypes.Document).GetAwaiter().GetResult();
                 IContent? content = keyAttempt.Success
                     ? _contentService.GetByIdAsync(keyAttempt.Result, CancellationToken.None).GetAwaiter().GetResult()

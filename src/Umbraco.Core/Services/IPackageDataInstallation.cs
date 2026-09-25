@@ -77,9 +77,6 @@ public interface IPackageDataInstallation
         IAsyncContentServiceBase<TContentBase> service)
         where TContentBase : class, IContentBase
         where TContentTypeComposition : IContentTypeComposition
-
-        // TODO (EF Core): Remove this method and its throwing default implementation once media and member
-        // types have been migrated and the generic ImportContentBase overload can be used instead.
         => throw new NotImplementedException();
 
     /// <summary>
@@ -101,9 +98,6 @@ public interface IPackageDataInstallation
         IContentTypeService typeService,
         IContentServiceBase<TContentBase> service)
         where TContentBase : class, IContentBase
-
-        // TODO (EF Core): Remove this method and its throwing default implementation once media and member
-        // types have been migrated and the generic ImportContentBase overload can be used instead.
         => throw new NotImplementedException();
 
     /// <summary>
@@ -127,9 +121,6 @@ public interface IPackageDataInstallation
         IContentTypeService typeService,
         IAsyncContentServiceBase<TContentBase> service)
         where TContentBase : class, IContentBase
-
-        // TODO (EF Core): Remove this method and its throwing default implementation once media and member
-        // types have been migrated and the generic ImportContentBase overload can be used instead.
         => throw new NotImplementedException();
 
     /// <summary>

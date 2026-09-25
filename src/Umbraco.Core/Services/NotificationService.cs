@@ -296,6 +296,11 @@ public class NotificationService : INotificationService
         // we know they are descending from the service so we know that newest is first
         // we are only selecting the top 2 rows since that is all we need
         var allVersions = _contentService.GetVersionIdsAsync(contentKey, 0, 2, CancellationToken.None).GetAwaiter().GetResult().ToList();
+        if (allVersions.Count == 0)
+        {
+            return null;
+        }
+
         var prevVersionIndex = allVersions.Count > 1 ? 1 : 0;
         return _contentService.GetVersionAsync(allVersions[prevVersionIndex], CancellationToken.None).GetAwaiter().GetResult();
     }

@@ -20,6 +20,7 @@ public class ContentTypeService : AsyncContentTypeServiceBase<IContentTypeReposi
     private readonly IContentService _contentService;
     private readonly IElementService _elementService;
     private readonly IIdKeyMap _idKeyMap;
+    private readonly ILogger<ContentTypeService> _logger;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="ContentTypeService" /> class.
@@ -69,6 +70,7 @@ public class ContentTypeService : AsyncContentTypeServiceBase<IContentTypeReposi
         _contentService = contentService;
         _elementService = elementService;
         _idKeyMap = idKeyMap;
+        _logger = loggerFactory.CreateLogger<ContentTypeService>();
     }
 
     /// <inheritdoc />
@@ -191,7 +193,7 @@ public class ContentTypeService : AsyncContentTypeServiceBase<IContentTypeReposi
                 {
                     // Dropping it silently would leave content of that type behind while the caller is told the
                     // delete succeeded.
-                    LoggerFactory.CreateLogger<ContentTypeService>().LogWarning(
+                    _logger.LogWarning(
                         "Could not resolve a key for content type {ContentTypeId}; its content was not deleted.",
                         typeId);
                 }

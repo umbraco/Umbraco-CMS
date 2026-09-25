@@ -42,21 +42,35 @@ public class LegacyContentDeletedVersionsWebhookEvent : WebhookEventBase<Content
     public override string Alias => Constants.WebhookEvents.Aliases.ContentDeletedVersions;
 
     /// <inheritdoc />
+    /// <remarks>
+    /// The legacy payload identifies the content by its integer id, so a key that cannot be resolved has no payload
+    /// to send and the webhook is not fired.
+    /// </remarks>
+    public override bool ShouldFireWebhookForNotification(ContentDeletedVersionsNotification notificationObject)
+        => TryGetId(notificationObject.Key, out _);
+
+    /// <inheritdoc />
     public override object? ConvertNotificationToRequestPayload(ContentDeletedVersionsNotification notification)
     {
-        // TODO (V20): await this once the webhook payload contract goes async.
-        Attempt<int> attempt = _idKeyMap.GetIdForKeyAsync(notification.Key, UmbracoObjectTypes.Document).GetAwaiter().GetResult();
-        if (attempt.Success is false)
+        if (TryGetId(notification.Key, out int id) is false)
         {
             return null;
         }
 
         return new
         {
-            Id = attempt.Result,
+            Id = id,
             notification.DeletePriorVersions,
             notification.SpecificVersion,
             notification.DateToRetain
         };
+    }
+
+    private bool TryGetId(Guid key, out int id)
+    {
+        // TODO (V20): await this once the webhook payload contract goes async.
+        Attempt<int> attempt = _idKeyMap.GetIdForKeyAsync(key, UmbracoObjectTypes.Document).GetAwaiter().GetResult();
+        id = attempt.Result;
+        return attempt.Success;
     }
 }

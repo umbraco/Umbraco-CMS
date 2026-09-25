@@ -26,6 +26,7 @@ public class ContentTelemetryProvider : IDetailedTelemetryProvider
     /// </returns>
     public IEnumerable<UsageInformation> GetInformation()
     {
+        // TODO (V20): await this once the IDetailedTelemetryProvider contract goes async.
         IEnumerable<IContent> rootNodes = _contentService.GetRootContentAsync(CancellationToken.None).GetAwaiter().GetResult();
         var nodes = rootNodes.Count();
         yield return new UsageInformation(Constants.Telemetry.RootCount, nodes);

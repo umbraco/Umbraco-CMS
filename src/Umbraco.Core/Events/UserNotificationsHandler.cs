@@ -21,16 +21,16 @@ namespace Umbraco.Cms.Core.Events;
 ///     Handles content-related notifications to send user notifications.
 /// </summary>
 public sealed class UserNotificationsHandler :
-    INotificationHandler<ContentSavedNotification>,
-    INotificationHandler<ContentSortedNotification>,
-    INotificationHandler<ContentPublishedNotification>,
-    INotificationHandler<ContentMovedNotification>,
-    INotificationHandler<ContentMovedToRecycleBinNotification>,
-    INotificationHandler<ContentCopiedNotification>,
-    INotificationHandler<ContentRolledBackNotification>,
-    INotificationHandler<ContentUnpublishedNotification>,
-    INotificationHandler<AssignedUserGroupPermissionsNotification>,
-    INotificationHandler<PublicAccessEntrySavedNotification>
+    INotificationAsyncHandler<ContentSavedNotification>,
+    INotificationAsyncHandler<ContentSortedNotification>,
+    INotificationAsyncHandler<ContentPublishedNotification>,
+    INotificationAsyncHandler<ContentMovedNotification>,
+    INotificationAsyncHandler<ContentMovedToRecycleBinNotification>,
+    INotificationAsyncHandler<ContentCopiedNotification>,
+    INotificationAsyncHandler<ContentRolledBackNotification>,
+    INotificationAsyncHandler<ContentUnpublishedNotification>,
+    INotificationAsyncHandler<AssignedUserGroupPermissionsNotification>,
+    INotificationAsyncHandler<PublicAccessEntrySavedNotification>
 {
     private readonly ActionCollection _actions;
     private readonly IContentService _contentService;
@@ -53,23 +53,27 @@ public sealed class UserNotificationsHandler :
     }
 
     /// <inheritdoc />
-    public void Handle(AssignedUserGroupPermissionsNotification notification)
+    public async Task HandleAsync(AssignedUserGroupPermissionsNotification notification, CancellationToken cancellationToken)
     {
-        IContent[]? entities = _contentService.GetByIdsAsync(ResolveKeys(notification.EntityPermissions.Select(e => e.EntityId)), CancellationToken.None).GetAwaiter().GetResult().ToArray();
-        if (entities?.Any() == false)
+        Guid[] keys = await ResolveKeysAsync(notification.EntityPermissions.Select(e => e.EntityId));
+        IContent[] entities = (await _contentService.GetByIdsAsync(keys, cancellationToken)).ToArray();
+        if (entities.Any() == false)
         {
             return;
         }
 
-        _notifier.Notify(_actions.GetAction<ActionRights>(), entities!);
+        _notifier.Notify(_actions.GetAction<ActionRights>(), entities);
     }
 
     /// <inheritdoc />
-    public void Handle(ContentCopiedNotification notification) =>
+    public Task HandleAsync(ContentCopiedNotification notification, CancellationToken cancellationToken)
+    {
         _notifier.Notify(_actions.GetAction<ActionCopy>(), notification.Original);
+        return Task.CompletedTask;
+    }
 
     /// <inheritdoc />
-    public void Handle(ContentMovedNotification notification)
+    public Task HandleAsync(ContentMovedNotification notification, CancellationToken cancellationToken)
     {
         // notify about the move for all moved items
         _notifier.Notify(
@@ -85,22 +89,35 @@ public sealed class UserNotificationsHandler :
         {
             _notifier.Notify(_actions.GetAction<ActionRestore>(), restoredEntities);
         }
+
+        return Task.CompletedTask;
     }
 
     /// <inheritdoc />
-    public void Handle(ContentMovedToRecycleBinNotification notification) => _notifier.Notify(
-        _actions.GetAction<ActionDelete>(), notification.MoveInfoCollection.Select(m => m.Entity).ToArray());
+    public Task HandleAsync(ContentMovedToRecycleBinNotification notification, CancellationToken cancellationToken)
+    {
+        _notifier.Notify(
+            _actions.GetAction<ActionDelete>(),
+            notification.MoveInfoCollection.Select(m => m.Entity).ToArray());
+        return Task.CompletedTask;
+    }
 
     /// <inheritdoc />
-    public void Handle(ContentPublishedNotification notification) =>
+    public Task HandleAsync(ContentPublishedNotification notification, CancellationToken cancellationToken)
+    {
         _notifier.Notify(_actions.GetAction<ActionPublish>(), notification.PublishedEntities.ToArray());
+        return Task.CompletedTask;
+    }
 
     /// <inheritdoc />
-    public void Handle(ContentRolledBackNotification notification) =>
+    public Task HandleAsync(ContentRolledBackNotification notification, CancellationToken cancellationToken)
+    {
         _notifier.Notify(_actions.GetAction<ActionRollback>(), notification.Entity);
+        return Task.CompletedTask;
+    }
 
     /// <inheritdoc />
-    public void Handle(ContentSavedNotification notification)
+    public Task HandleAsync(ContentSavedNotification notification, CancellationToken cancellationToken)
     {
         var newEntities = new List<IContent>();
         var updatedEntities = new List<IContent>();
@@ -123,10 +140,11 @@ public sealed class UserNotificationsHandler :
 
         _notifier.Notify(_actions.GetAction<ActionNew>(), newEntities.ToArray());
         _notifier.Notify(_actions.GetAction<ActionUpdate>(), updatedEntities.ToArray());
+        return Task.CompletedTask;
     }
 
     /// <inheritdoc />
-    public void Handle(ContentSortedNotification notification)
+    public async Task HandleAsync(ContentSortedNotification notification, CancellationToken cancellationToken)
     {
         var parentKeys = notification.SortedEntities.Select(x => x.ParentKey).Distinct().ToList();
         if (parentKeys.Count != 1)
@@ -143,7 +161,7 @@ public sealed class UserNotificationsHandler :
             return;
         }
 
-        IContent? parent = _contentService.GetByIdAsync(parentKey.Value, CancellationToken.None).GetAwaiter().GetResult();
+        IContent? parent = await _contentService.GetByIdAsync(parentKey.Value, cancellationToken);
         if (parent == null)
         {
             return; // this shouldn't happen
@@ -153,13 +171,17 @@ public sealed class UserNotificationsHandler :
     }
 
     /// <inheritdoc />
-    public void Handle(ContentUnpublishedNotification notification) =>
+    public Task HandleAsync(ContentUnpublishedNotification notification, CancellationToken cancellationToken)
+    {
         _notifier.Notify(_actions.GetAction<ActionUnpublish>(), notification.UnpublishedEntities.ToArray());
+        return Task.CompletedTask;
+    }
 
     /// <inheritdoc />
-    public void Handle(PublicAccessEntrySavedNotification notification)
+    public async Task HandleAsync(PublicAccessEntrySavedNotification notification, CancellationToken cancellationToken)
     {
-        IContent[] entities = _contentService.GetByIdsAsync(ResolveKeys(notification.SavedEntities.Select(e => e.ProtectedNodeId)), CancellationToken.None).GetAwaiter().GetResult().ToArray();
+        Guid[] keys = await ResolveKeysAsync(notification.SavedEntities.Select(e => e.ProtectedNodeId));
+        IContent[] entities = (await _contentService.GetByIdsAsync(keys, cancellationToken)).ToArray();
         if (entities.Any() == false)
         {
             return;
@@ -168,11 +190,20 @@ public sealed class UserNotificationsHandler :
         _notifier.Notify(_actions.GetAction<ActionProtect>(), entities);
     }
 
-    private Guid[] ResolveKeys(IEnumerable<int> ids) =>
-        ids.Select(id => _idKeyMap.GetKeyForIdAsync(id, UmbracoObjectTypes.Document).GetAwaiter().GetResult())
-            .Where(attempt => attempt.Success)
-            .Select(attempt => attempt.Result)
-            .ToArray();
+    private async Task<Guid[]> ResolveKeysAsync(IEnumerable<int> ids)
+    {
+        var keys = new List<Guid>();
+        foreach (int id in ids)
+        {
+            Attempt<Guid> attempt = await _idKeyMap.GetKeyForIdAsync(id, UmbracoObjectTypes.Document);
+            if (attempt.Success)
+            {
+                keys.Add(attempt.Result);
+            }
+        }
+
+        return keys.ToArray();
+    }
 
     /// <summary>
     ///     This class is used to send the notifications

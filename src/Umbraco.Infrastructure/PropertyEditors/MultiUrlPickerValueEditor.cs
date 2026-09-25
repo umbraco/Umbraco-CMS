@@ -141,6 +141,7 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference, I
 
         if (contentKeys.Count > 0)
         {
+            // TODO (V20): await this once the ICacheReferencedEntities contract goes async.
             IEnumerable<IContent> contentItems = _contentService.GetByIdsAsync(contentKeys, CancellationToken.None).GetAwaiter().GetResult();
             foreach (IContent content in contentItems)
             {

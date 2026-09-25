@@ -145,6 +145,7 @@ public class UserEditorAuthorizationHelper
                 }
                 else
                 {
+                    // TODO (V20): await this once the UserEditorAuthorizationHelper contract goes async.
                     Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForIdAsync(contentId, UmbracoObjectTypes.Document).GetAwaiter().GetResult();
                     IContent? content = keyAttempt.Success
                         ? _contentService.GetByIdAsync(keyAttempt.Result, CancellationToken.None).GetAwaiter().GetResult()

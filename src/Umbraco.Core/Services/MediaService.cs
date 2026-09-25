@@ -986,6 +986,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="userId">The identifier of the user performing the delete operation.</param>
         private void DeleteVersions(ICoreScope scope, bool wlock, int id, DateTime versionDate, int userId = Constants.Security.SuperUserId)
         {
+            // TODO (V20): await this once the IMediaService contract goes async.
             Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForIdAsync(id, UmbracoObjectTypes.Media).GetAwaiter().GetResult();
             if (keyAttempt.Success is false)
             {
@@ -1022,6 +1023,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="userId">Optional Id of the User deleting versions of a Media object</param>
         public void DeleteVersion(int id, int versionId, bool deletePriorVersions, int userId = Constants.Security.SuperUserId)
         {
+            // TODO (V20): await this once the IMediaService contract goes async.
             Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForIdAsync(id, UmbracoObjectTypes.Media).GetAwaiter().GetResult();
             if (keyAttempt.Success is false)
             {

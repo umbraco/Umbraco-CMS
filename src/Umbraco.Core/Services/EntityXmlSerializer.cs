@@ -136,6 +136,7 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
             var total = long.MaxValue;
             while (skip < total)
             {
+                // TODO (V20): await this once the IEntityXmlSerializer contract goes async.
                 PagedModel<IContent> page = _contentService.GetChildrenAsync(content.Key, skip, pageSize, propertyAliases: null, ordering: null, CancellationToken.None).GetAwaiter().GetResult();
                 total = page.Total;
                 SerializeChildren(page.Items, xml, published, templateCache);
@@ -620,6 +621,7 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
         foreach (IPropertyType propertyType in propertyTypes)
         {
             IDataType? definition = null;
+            // TODO (V20): await this once the IEntityXmlSerializer contract goes async.
             Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForIdAsync(propertyType.DataTypeId, UmbracoObjectTypes.DataType).GetAwaiter().GetResult();
             if (keyAttempt.Success)
             {
@@ -786,6 +788,7 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
             var total = long.MaxValue;
             while (skip < total)
             {
+                // TODO (V20): await this once the IEntityXmlSerializer contract goes async.
                 PagedModel<IContent> grandChildren = _contentService.GetChildrenAsync(child.Key, skip, pageSize, propertyAliases: null, ordering: null, CancellationToken.None).GetAwaiter().GetResult();
                 total = grandChildren.Total;
                 skip += pageSize;
