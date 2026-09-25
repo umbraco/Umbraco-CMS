@@ -409,40 +409,18 @@ public class DocumentUrlAliasServiceTests
     }
 
     /// <summary>
-    /// On a subscriber the scheduling publisher has already written the aliases, so the subscriber must not
-    /// re-persist them — doing so crashes on a read-only database (issue #22570). This covers the path where
-    /// the document has aliases and would otherwise hit <c>Save</c>.
-    /// </summary>
-    [Test]
-    public async Task CreateOrUpdateAliasesAsync_OnSubscriber_WithAliases_DoesNotCallSave()
-    {
-        // Arrange
-        var (service, aliasRepositoryMock, contentServiceMock) = CreateServiceWithMocks(ServerRole.Subscriber);
-
-        var documentKey = Guid.NewGuid();
-        contentServiceMock.Setup(x => x.GetById(documentKey))
-            .Returns(CreateInvariantContentWithAlias(documentKey, "my-alias"));
-
-        // Act
-        await service.CreateOrUpdateAliasesAsync(documentKey);
-
-        // Assert
-        aliasRepositoryMock.Verify(
-            x => x.Save(It.IsAny<IEnumerable<PublishedDocumentUrlAlias>>()),
-            Times.Never,
-            "Subscribers must not persist URL aliases — the publisher already has.");
-        aliasRepositoryMock.Verify(
-            x => x.DeleteByDocumentKey(It.IsAny<IEnumerable<Guid>>()),
-            Times.Never);
-    }
-
-    /// <summary>
-    /// Regression guard for the subscriber guard: Single and SchedulingPublisher roles must still persist
-    /// URL aliases as they did before the fix.
+    /// CreateOrUpdateAliasesAsync runs for a change made on this server, after the content write has committed on
+    /// this server's connection, and no other server persists the aliases for that change (they only refresh their
+    /// in-memory cache from the instruction). The write must therefore happen whatever the elected server role: an
+    /// instance serving the backoffice can hold the Subscriber role (a second backoffice replica, or the surviving
+    /// instance during a deployment), and skipping there loses the aliases on every server after its next restart.
+    /// Unknown is included because the role is unresolved at boot.
     /// </summary>
     [TestCase(ServerRole.Single)]
     [TestCase(ServerRole.SchedulingPublisher)]
-    public async Task CreateOrUpdateAliasesAsync_OnSingleOrPublisher_WithAliases_CallsSave(ServerRole role)
+    [TestCase(ServerRole.Subscriber)]
+    [TestCase(ServerRole.Unknown)]
+    public async Task CreateOrUpdateAliasesAsync_WithAliases_CallsSave_ForAnyServerRole(ServerRole role)
     {
         // Arrange
         var (service, aliasRepositoryMock, contentServiceMock) = CreateServiceWithMocks(role);
@@ -458,18 +436,21 @@ public class DocumentUrlAliasServiceTests
         aliasRepositoryMock.Verify(
             x => x.Save(It.IsAny<IEnumerable<PublishedDocumentUrlAlias>>()),
             Times.Once,
-            $"The {role} role must continue to persist URL aliases.");
+            $"The {role} role must persist URL aliases for changes made on this server.");
     }
 
     /// <summary>
-    /// Covers the alternate branch of the guard: when a document has no alias value the
-    /// <see cref="IDocumentUrlAliasRepository.DeleteByDocumentKey"/> path must also be skipped on subscribers.
+    /// The alternate branch of the write: when a document no longer has any alias value, its stale aliases must be
+    /// deleted for a change made on this server whatever the elected server role.
     /// </summary>
-    [Test]
-    public async Task CreateOrUpdateAliasesAsync_OnSubscriber_WithNoAliases_DoesNotCallDeleteByDocumentKey()
+    [TestCase(ServerRole.Single)]
+    [TestCase(ServerRole.SchedulingPublisher)]
+    [TestCase(ServerRole.Subscriber)]
+    [TestCase(ServerRole.Unknown)]
+    public async Task CreateOrUpdateAliasesAsync_WithNoAliases_CallsDeleteByDocumentKey_ForAnyServerRole(ServerRole role)
     {
         // Arrange
-        var (service, aliasRepositoryMock, contentServiceMock) = CreateServiceWithMocks(ServerRole.Subscriber);
+        var (service, aliasRepositoryMock, contentServiceMock) = CreateServiceWithMocks(role);
 
         var documentKey = Guid.NewGuid();
         contentServiceMock.Setup(x => x.GetById(documentKey))
@@ -481,31 +462,8 @@ public class DocumentUrlAliasServiceTests
         // Assert
         aliasRepositoryMock.Verify(
             x => x.DeleteByDocumentKey(It.IsAny<IEnumerable<Guid>>()),
-            Times.Never,
-            "Subscribers must not delete URL aliases.");
-    }
-
-    /// <summary>
-    /// Regression guard: the Single role must continue to delete stale aliases when a document no longer
-    /// has any alias value.
-    /// </summary>
-    [Test]
-    public async Task CreateOrUpdateAliasesAsync_OnSingle_WithNoAliases_CallsDeleteByDocumentKey()
-    {
-        // Arrange
-        var (service, aliasRepositoryMock, contentServiceMock) = CreateServiceWithMocks(ServerRole.Single);
-
-        var documentKey = Guid.NewGuid();
-        contentServiceMock.Setup(x => x.GetById(documentKey))
-            .Returns(CreateInvariantContentWithAlias(documentKey, aliasValue: null));
-
-        // Act
-        await service.CreateOrUpdateAliasesAsync(documentKey);
-
-        // Assert
-        aliasRepositoryMock.Verify(
-            x => x.DeleteByDocumentKey(It.IsAny<IEnumerable<Guid>>()),
-            Times.Once);
+            Times.Once,
+            $"The {role} role must delete stale URL aliases for changes made on this server.");
     }
 
     #endregion

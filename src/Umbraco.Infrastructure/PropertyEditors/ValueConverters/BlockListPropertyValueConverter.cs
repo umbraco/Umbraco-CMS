@@ -152,7 +152,8 @@ public class BlockListPropertyValueConverter : PropertyValueConverterBase, IDeli
     }
 
     /// <inheritdoc />
-    public PropertyCacheLevel GetDeliveryApiPropertyCacheLevel(IPublishedPropertyType propertyType) => GetPropertyCacheLevel(propertyType);
+    public PropertyCacheLevel GetDeliveryApiPropertyCacheLevel(IPublishedPropertyType propertyType)
+        => PropertyCacheLevel.Elements;
 
     /// <inheritdoc />
     public PropertyCacheLevel GetDeliveryApiPropertyCacheLevelForExpansion(IPublishedPropertyType propertyType) => PropertyCacheLevel.Snapshot;
@@ -197,7 +198,7 @@ public class BlockListPropertyValueConverter : PropertyValueConverterBase, IDeli
             }
 
             var creator = new BlockListPropertyValueCreator(_blockConverter, _variationContextAccessor, _propertyRenderingContextAccessor, _blockEditorVarianceHandler, _jsonSerializer, _constructorCache, _languageService);
-            return creator.CreateBlockModelAsync(owner, referenceCacheLevel, intermediateBlockModelValue, preview, configuration.Blocks).GetAwaiter().GetResult();
+            return creator.CreateBlockModelAsync(owner, referenceCacheLevel, intermediateBlockModelValue, preview, BlockPropertyVariance.OwningPropertyCulture(_variationContextAccessor, owner, propertyType), configuration.Blocks).GetAwaiter().GetResult();
         }
     }
 }

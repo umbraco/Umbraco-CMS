@@ -12,14 +12,24 @@ export class RedirectManagementApiHelper {
     return await response.json(); 
   }
 
+  /**
+   * @returns the raw {@link APIResponse}, not parsed JSON — the endpoint responds 200 with no body,
+   * and parsing that as JSON throws "Unexpected end of JSON input".
+   */
   async delete(id: string) {
-    const response = await this.api.delete(this.api.baseUrl + '/umbraco/management/api/v1/redirect-management/' + id);
-    return await response.json(); 
+    return await this.api.delete(this.api.baseUrl + '/umbraco/management/api/v1/redirect-management/' + id);
   }
 
   async getAll() {
     const response = await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/redirect-management?skip=0&take=1000');
-    return await response.json(); 
+    return await response.json();
+  }
+
+  // Redirects survive content deletion by design, so tests asserting on redirect counts must clear these explicitly.
+  async deleteAllRedirects() {
+    for (const redirect of this.api.itemsOf(await this.getAll())) {
+      await this.delete(redirect.id);
+    }
   }
 
   async getStatus() {

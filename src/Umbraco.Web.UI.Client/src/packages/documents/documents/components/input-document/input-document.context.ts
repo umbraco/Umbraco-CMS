@@ -61,13 +61,31 @@ export class UmbDocumentPickerInputContext extends UmbPickerInputContext<
 		await super.openPicker(combinedPickerData);
 	}
 
+	/**
+	 * Resolves the display name for a picked document, using the variant aware item data resolver.
+	 * @param {string} unique The unique identifier of the document.
+	 * @returns {Promise<string>} The resolved display name.
+	 * @memberof UmbDocumentPickerInputContext
+	 */
 	protected override async _requestItemName(unique: string): Promise<string> {
 		const item = this.getSelectedItemByUnique(unique);
-		const resolver = new UmbDocumentItemDataResolver(this);
-		resolver.setData(item);
-		const name = await resolver.getName();
-		this.removeUmbController(resolver);
-		return name ?? '#general_notFound';
+
+		// A selection can hold uniques that no longer resolve to an item. The resolver cannot name
+		// something it has no data for, so let the base implementation supply the fallback label.
+		if (item) {
+			const resolver = new UmbDocumentItemDataResolver(this);
+			resolver.setData(item);
+			try {
+				const name = await resolver.getName();
+				if (name) {
+					return name;
+				}
+			} finally {
+				this.removeUmbController(resolver);
+			}
+		}
+
+		return super._requestItemName(unique);
 	}
 
 	#pickableFilter = (

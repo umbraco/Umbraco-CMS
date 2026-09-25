@@ -65,6 +65,13 @@ export class UmbMediaThumbnailElement extends UmbLitElement {
 	icon = 'icon-picture';
 
 	/**
+	 * The file extension to label the fallback icon with, without the leading dot.
+	 * @description Rendered only when there is no preview image.
+	 */
+	@property({ type: String, attribute: 'file-ext' })
+	fileExt?: string;
+
+	/**
 	 * The `loading` state of the thumbnail.
 	 * @enum {'lazy' | 'eager'}
 	 * @default 'lazy'
@@ -161,7 +168,11 @@ export class UmbMediaThumbnailElement extends UmbLitElement {
 					loading=${this.loading}
 					decoding="async"
 					draggable="false" />`,
-			() => html`<umb-icon id="icon" name=${this.icon}></umb-icon>`,
+			() =>
+				html`<umb-icon id="icon" name=${this.icon}></umb-icon> ${when(
+						this.fileExt,
+						(fileExt) => html`<small id="file-ext">${fileExt}</small>`,
+					)}`,
 		);
 	}
 
@@ -188,6 +199,7 @@ export class UmbMediaThumbnailElement extends UmbLitElement {
 				position: relative;
 				overflow: hidden;
 				display: flex;
+				flex-direction: column;
 				justify-content: center;
 				align-items: center;
 				width: 100%;
@@ -218,6 +230,27 @@ export class UmbMediaThumbnailElement extends UmbLitElement {
 				width: 100%;
 				height: 100%;
 				font-size: var(--uui-size-8);
+			}
+
+			/* Filling the box is only right while the icon is alone in it. */
+			#icon:has(+ #file-ext) {
+				height: auto;
+			}
+
+			#file-ext {
+				flex: none;
+				max-width: 10ch;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				margin-top: var(--uui-size-space-2);
+				padding: 0 var(--uui-size-space-2);
+				border-radius: var(--uui-border-radius);
+				background-color: var(--uui-color-surface-alt);
+				font-size: var(--uui-type-small-size);
+				font-weight: 700;
+				line-height: 1.5;
+				text-transform: uppercase;
+				white-space: nowrap;
 			}
 		`,
 	];

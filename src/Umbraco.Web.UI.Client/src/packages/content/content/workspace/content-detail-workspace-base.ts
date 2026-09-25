@@ -1,5 +1,5 @@
 import type { UmbContentDetailModel, UmbElementValueModel } from '../types.js';
-import { UmbContentCollectionManager } from '../collection/index.js';
+import { UmbContentCollectionConfigurationContext, UmbContentCollectionManager } from '../collection/index.js';
 import { UmbContentWorkspaceDataManager } from '../manager/index.js';
 import { UmbMergeContentVariantDataController } from '../controller/merge-content-variant-data.controller.js';
 import type { UmbContentVariantPickerData, UmbContentVariantPickerValue } from '../variant-picker/index.js';
@@ -20,7 +20,7 @@ import { firstValueFrom, map } from '@umbraco-cms/backoffice/external/rxjs';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UmbContentTypeStructureManager } from '@umbraco-cms/backoffice/content-type';
 import { UmbDataTypeItemRepositoryManager } from '@umbraco-cms/backoffice/data-type';
-import { UmbReadOnlyVariantGuardManager } from '@umbraco-cms/backoffice/utils';
+import { UmbDeprecation, UmbReadOnlyVariantGuardManager } from '@umbraco-cms/backoffice/utils';
 import {
 	notifyWorkspaceActionStarting,
 	UmbEntityDetailWorkspaceContextBase,
@@ -38,7 +38,7 @@ import {
 	UmbRequestReloadStructureForEntityEvent,
 } from '@umbraco-cms/backoffice/entity-action';
 import type { UmbEntityActionEvent } from '@umbraco-cms/backoffice/entity-action';
-import { UmbLanguageCollectionRepository } from '@umbraco-cms/backoffice/language';
+import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
 import {
 	UmbPropertyValueFlatMapperController,
 	UmbPropertyValuePresetVariantBuilderController,
@@ -164,9 +164,9 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 
 	readonly collection: UmbContentCollectionManager;
 
+	readonly #collectionConfiguration = new UmbContentCollectionConfigurationContext(this);
+
 	/* Variant Options */
-	// TODO: Optimize this so it uses either a App Language Context? [NL]
-	#languageRepository = new UmbLanguageCollectionRepository(this);
 	#languages = new UmbArrayState<UmbLanguageDetailModel>([], (x) => x.unique);
 	/**
 	 * @private
@@ -235,6 +235,14 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		this.varies = this.structure.ownerContentTypeObservablePart((x) =>
 			x ? x.variesByCulture || x.variesBySegment : undefined,
 		);
+
+		this.#collectionConfiguration.setCollectionAlias(args.collectionAlias);
+		this.observe(
+			this.structure.ownerContentTypeObservablePart((x) => x?.collection?.unique),
+			(dataTypeUnique) => this.#collectionConfiguration.setDataTypeUnique(dataTypeUnique ?? undefined),
+			null,
+		);
+		this.observe(this.unique, (unique) => this.#collectionConfiguration.setUnique(unique ?? null), null);
 
 		this.collection = new UmbContentCollectionManager<ContentTypeDetailModelType>(
 			this,
@@ -408,13 +416,22 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			null,
 		);
 
-		this.loadLanguages();
+		// Languages are requested once per app session by UMB_APP_LANGUAGE_CONTEXT; every workspace observes
+		// that shared state instead of each issuing its own request for the full language collection.
+		this.consumeContext(UMB_APP_LANGUAGE_CONTEXT, (appLanguageContext) => {
+			this.observe(appLanguageContext?.languages, (languages) => this.#languages.setValue(languages ?? []), null);
+		});
 	}
 
+	/**
+	 * @deprecated No need to call loadLanguages, will be removed in v.20.
+	 */
 	public async loadLanguages() {
-		// TODO: If we don't end up having a Global Context for languages, then we should at least change this into using a asObservable which should be returned from the repository. [Nl]
-		const { data } = await this.#languageRepository.requestAllItems();
-		this.#languages.setValue(data?.items ?? []);
+		new UmbDeprecation({
+			deprecated: 'UmbContentDetailWorkspaceContextBase.loadLanguages is deprecated.',
+			removeInVersion: '20.0.0',
+			solution: 'No need to call loadLanguages.',
+		}).warn();
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -989,6 +1006,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			);
 			if (valid || this.#ignoreValidationResultOnSubmit) {
 				await this.performCreateOrUpdate(variantIds, saveData);
+				this.evaluateValidationMode();
 			} else {
 				return Promise.reject('Validation issues prevent saving');
 			}
@@ -1189,7 +1207,6 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 
 	public override destroy(): void {
 		this.structure.destroy();
-		this.#languageRepository.destroy();
 		super.destroy();
 	}
 }

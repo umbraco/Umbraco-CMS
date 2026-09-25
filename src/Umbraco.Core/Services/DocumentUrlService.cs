@@ -288,12 +288,25 @@ public class DocumentUrlService : IDocumentUrlService, IMemoryCacheSizeReporter
     }
 
     /// <summary>
-    /// Indicates whether this instance should skip database writes for URL segments.
+    /// Indicates whether this instance should skip the database writes that are not tied to a local content change,
+    /// i.e. the start-up rebuild of URL segments.
     /// </summary>
     /// <remarks>
-    /// On a <see cref="ServerRole.Subscriber"/> the scheduling publisher has already persisted URL segments to
-    /// the database before issuing the cache-refresh instruction that routed us here. Re-writing them locally is
-    /// redundant at best, and blows up when the subscriber is configured against a read-only database connection.
+    /// The server role says which instance runs the scheduled jobs; it says nothing about which instance serves the
+    /// backoffice. Under the default election the publisher flag goes to whichever instance touches the server
+    /// registration first and moves whenever the holder is away for the stale timeout, so a front-end instance can be
+    /// the publisher while the only backoffice instance is a <see cref="ServerRole.Subscriber"/> for as long as that
+    /// front-end keeps running. The two only line up when roles are configured explicitly.
+    /// An explicitly configured subscriber is a dedicated front-end server that may run on a read-only database
+    /// connection; it never makes content changes, and the publisher maintains the persisted URL segments on its
+    /// behalf, so the rebuild is gated on the role. <see cref="CreateOrUpdateUrlSegmentsAsync(IEnumerable{IContent})"/>
+    /// and friends are not gated when they run for a change made on this server: reaching them means a content
+    /// write has already committed on this connection, so the connection is writable whatever the role reads, and no
+    /// other server persists the segments for that change (other servers receive a cache instruction and only
+    /// refresh their in-memory cache). Skipping the write there would leave the document unroutable on every server
+    /// after its next restart.
+    /// <see cref="ServerRole.Unknown"/> is deliberately not grouped with Subscriber, so a server whose role is not
+    /// yet resolved still rebuilds.
     /// The in-memory cache is updated via deferred scope-context enlistments regardless of this flag.
     /// </remarks>
     private bool SkipDatabaseWrites() => _serverRoleAccessor.CurrentServerRole is ServerRole.Subscriber;
@@ -635,7 +648,7 @@ public class DocumentUrlService : IDocumentUrlService, IMemoryCacheSizeReporter
             }
         }
 
-        if (!skipDatabaseWrite && toSave.Count > 0 && SkipDatabaseWrites() is false)
+        if (skipDatabaseWrite is false && toSave.Count > 0)
         {
             scope.WriteLock(Constants.Locks.DocumentUrls);
             _documentUrlRepository.Save(toSave);

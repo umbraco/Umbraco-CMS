@@ -4,7 +4,7 @@
 
 **Umbraco.Core** is the foundational layer of Umbraco CMS, containing the core domain models, services interfaces, events/notifications system, and essential abstractions. This project has NO database implementation and minimal external dependencies - it focuses on defining contracts and business logic.
 
-**Package ID**: `Umbraco.Cms.Core`  
+**Package ID**: `Umbraco.Cms.Core`
 **Namespace**: `Umbraco.Cms.Core`
 
 ### What Lives Here vs. Other Projects
@@ -147,8 +147,9 @@ in-memory cache — implement `IDistributedCacheNotificationHandler` (sync) or
 interfaces, so the handler still fires on normal publishes *and* survives the distributed-cache-only
 filter. No DI change is needed — filtering is by resolved instance type.
 
-When you do this, ensure the handler is safe in the extra scopes it now runs in — e.g. guard against
-DB writes on read-only `Subscriber` servers (see `DocumentUrlService.SkipDatabaseWrites()`).
+When you do this, ensure the handler is safe in the extra scopes it now runs in. Do not gate a write that
+follows a local content commit on server role: the elected `Subscriber` role can be held by any instance,
+including one serving the backoffice (see `DocumentUrlService.SkipDatabaseWrites()` for the split).
 
 ### 3. Composer Pattern (DI Registration)
 
@@ -162,10 +163,10 @@ public class MyComposer : IComposer
     {
         // Register services
         builder.Services.AddSingleton<IMyService, MyService>();
-        
+
         // Add to collections
         builder.PropertyEditors().Add<MyPropertyEditor>();
-        
+
         // Register notification handlers
         builder.AddNotificationHandler<ContentSavedNotification, MyHandler>();
     }
@@ -202,14 +203,14 @@ IEntity                     - Base: Id, Key, CreateDate, UpdateDate
 public class MyService
 {
     private readonly ICoreScopeProvider _scopeProvider;
-    
+
     public void DoWork()
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
-        
+
         // Do database work
         // Access repositories
-        
+
         scope.Complete(); // Commit transaction
     }
 }
@@ -229,12 +230,12 @@ Property editors define how data is edited and stored:
 public class MyPropertyEditor : IDataEditor
 {
     public string Alias => "My.PropertyEditor";
-    
+
     public IDataValueEditor GetValueEditor()
     {
         return new MyDataValueEditor();
     }
-    
+
     public IConfigurationEditor GetConfigurationEditor()
     {
         return new MyConfigurationEditor();
@@ -257,12 +258,12 @@ public class MyEntityCacheRefresher : CacheRefresherBase<MyEntityCacheRefresher>
 {
     public override Guid RefresherUniqueId => new Guid("...");
     public override string Name => "My Entity Cache Refresher";
-    
+
     public override void RefreshAll()
     {
         // Clear all cache
     }
-    
+
     public override void Refresh(int id)
     {
         // Clear cache for specific entity
@@ -388,7 +389,7 @@ public class MyContentHandler : INotificationHandler<ContentSavingNotification>
         {
             // Validate, modify, or react
         }
-        
+
         // Cancel if needed (for cancellable notifications)
         // notification.Cancel = true;
     }
@@ -408,7 +409,7 @@ public class MyPropertyEditor : DataEditor
     public MyPropertyEditor(IDataValueEditorFactory dataValueEditorFactory)
         : base(dataValueEditorFactory)
     { }
-    
+
     protected override IDataValueEditor CreateValueEditor()
     {
         return DataValueEditorFactory.Create<MyValueEditor>(Attribute!);
@@ -426,21 +427,21 @@ public class MyService
 {
     private readonly IContentService _contentService;
     private readonly ICoreScopeProvider _scopeProvider;
-    
+
     public async Task UpdateContentAsync(Guid key)
     {
         using var scope = _scopeProvider.CreateCoreScope();
-        
+
         IContent? content = _contentService.GetById(key);
         if (content == null)
             return;
-        
+
         // Modify content
         content.SetValue("propertyAlias", "new value");
-        
+
         // Save (triggers notifications)
         var result = _contentService.Save(content);
-        
+
         scope.Complete();
     }
 }
@@ -520,6 +521,7 @@ Internal types are accessible in test projects for more thorough testing.
 7. **Published vs Draft** - `IContent` is draft, `IPublishedContent` is published
 8. **Constants** - Use constants instead of magic strings (property editor aliases, etc.)
 9. **Distributed-cache-only publishers skip plain handlers** - handlers doing durable work (e.g. DB writes) must implement `IDistributedCacheNotificationHandler` / `IDistributedCacheAsyncNotificationHandler<T>`, or they won't fire under Umbraco Deploy and similar restricted scopes.
+10. **Outbound HTTP** - new code injects `IHttpClientFactory` and uses a named client from `AddHttpClients()`; `SharedHttpClient` is only a shim for call sites that can't take that dependency without a breaking change. Never publish an `HttpClient` before configuring it, or mutate a shared one's `DefaultRequestHeaders` after first use - `HttpHeaders` isn't thread safe.
 
 ## Navigation Tips
 

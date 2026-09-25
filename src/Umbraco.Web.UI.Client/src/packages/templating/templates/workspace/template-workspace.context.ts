@@ -2,6 +2,7 @@ import type { UmbTemplateDetailModel } from '../types.js';
 import type { UmbTemplateItemModel, UmbTemplateDetailRepository } from '../repository/index.js';
 import { UMB_TEMPLATE_DETAIL_REPOSITORY_ALIAS, UmbTemplateItemRepository } from '../repository/index.js';
 import { UMB_TEMPLATE_ENTITY_TYPE } from '../entity.js';
+import { UMB_EDIT_TEMPLATE_WORKSPACE_PATH_PATTERN } from '../paths.js';
 import { UMB_TEMPLATE_WORKSPACE_ALIAS } from './manifests.js';
 import { UmbTemplateWorkspaceEditorElement } from './template-workspace-editor.element.js';
 import type { UmbRoutableWorkspaceContext, UmbSubmittableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
@@ -14,6 +15,7 @@ import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { IRoutingInfo, PageComponent } from '@umbraco-cms/backoffice/router';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
+import { UMB_SETTINGS_SECTION_PATH } from '@umbraco-cms/backoffice/settings';
 
 export class UmbTemplateWorkspaceContext
 	extends UmbEntityNamedDetailWorkspaceContextBase<UmbTemplateDetailModel, UmbTemplateDetailRepository>
@@ -63,6 +65,11 @@ export class UmbTemplateWorkspaceContext
 				},
 			},
 		]);
+	}
+
+	protected override _getNavigationParentItemPath(entity: UmbEntityModel | undefined): string | undefined {
+		if (!entity?.unique) return UMB_SETTINGS_SECTION_PATH;
+		return UMB_EDIT_TEMPLATE_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: entity.unique });
 	}
 
 	override async load(unique: string) {
