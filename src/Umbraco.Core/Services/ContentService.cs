@@ -935,7 +935,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
     }
 
     // utility 'PublishCultures' func used by SaveAndPublishBranch
-    private bool PublishBranch_PublishCultures(IContent content, HashSet<string> culturesToPublish, IReadOnlyCollection<ILanguage> allLangs, IUser user)
+    private bool PublishBranch_PublishCultures(IContent content, HashSet<string> culturesToPublish, IUser user)
     {
         // variant content type - publish specified cultures
         // invariant content type - publish only the invariant culture
@@ -945,7 +945,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
         {
             return culturesToPublish.All(culture =>
             {
-                CultureImpact? impact = _cultureImpactFactory.Create(culture, IsDefaultCulture(allLangs, culture), content, includeInvariantForVariant: user.HasAccessToInvariantForVariant());
+                CultureImpact? impact = _cultureImpactFactory.Create(culture, content, includeInvariantForVariant: user.HasAccessToInvariantForVariant());
                 return content.PublishCulture(impact, publishTime, _propertyEditorCollection) &&
                        _propertyValidationService.Value.IsPropertyDataValid(content, out _, impact);
             });
@@ -1061,7 +1061,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
     internal IEnumerable<PublishResult> PublishBranch(
         IContent document,
         Func<IContent, HashSet<string>?> shouldPublish,
-        Func<IContent, HashSet<string>, IReadOnlyCollection<ILanguage>, IUser, bool> publishCultures,
+        Func<IContent, HashSet<string>, IUser, bool> publishCultures,
         int userId = Constants.Security.SuperUserId)
     {
         if (shouldPublish == null)
@@ -1209,8 +1209,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
         ICoreScope scope,
         IContent document,
         HashSet<string>? culturesToPublish,
-        Func<IContent, HashSet<string>, IReadOnlyCollection<ILanguage>,
-            IUser, bool> publishCultures,
+        Func<IContent, HashSet<string>, IUser, bool> publishCultures,
         bool isRoot,
         ICollection<IContent> publishedDocuments,
         EventMessages evtMsgs,
@@ -1245,7 +1244,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
         }
 
         // publish & check if values are valid
-        if (!publishCultures(document, culturesToPublish, allLangs, user))
+        if (!publishCultures(document, culturesToPublish, user))
         {
             // TODO: Based on this callback behavior there is no way to know which properties may have been invalid if this failed, see other results of FailedPublishContentInvalid
             return new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, document);

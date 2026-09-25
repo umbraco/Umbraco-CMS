@@ -10,9 +10,9 @@ namespace Umbraco.Cms.Core.Services;
 public class CultureImpactFactory : ICultureImpactFactory
 {
     /// <inheritdoc/>
-    public CultureImpact? Create(string? culture, bool isDefault, IContentBase content, bool includeInvariantForVariant)
+    public CultureImpact? Create(string? culture, IContentBase content, bool includeInvariantForVariant)
     {
-        TryCreate(culture, isDefault, content.ContentType.Variations, true, includeInvariantForVariant, out CultureImpact? impact);
+        TryCreate(culture, content.ContentType.Variations, true, includeInvariantForVariant, out CultureImpact? impact);
 
         return impact;
     }
@@ -24,7 +24,7 @@ public class CultureImpactFactory : ICultureImpactFactory
     public CultureImpact ImpactInvariant() => CultureImpact.Invariant;
 
     /// <inheritdoc/>
-    public CultureImpact ImpactExplicit(string? culture, bool isDefault, bool includeInvariantForVariant)
+    public CultureImpact ImpactExplicit(string? culture, bool includeInvariantForVariant)
     {
         if (culture is null)
         {
@@ -41,7 +41,7 @@ public class CultureImpactFactory : ICultureImpactFactory
             throw new ArgumentException("Culture \"*\" is not explicit.");
         }
 
-        return new CultureImpact(culture, isDefault, includeInvariantForVariant);
+        return new CultureImpact(culture, includeInvariantForVariant);
     }
 
     /// <inheritdoc/>
@@ -77,7 +77,6 @@ public class CultureImpactFactory : ICultureImpactFactory
     /// in the context of a content item variation.
     /// </summary>
     /// <param name="culture">The culture code.</param>
-    /// <param name="isDefault">A value indicating whether the culture is the default culture.</param>
     /// <param name="variation">A content variation.</param>
     /// <param name="throwOnFail">A value indicating whether to throw if the impact cannot be created.</param>
     /// <param name="allowEditInvariantForVariant">A value indicating if editing (publishing) invariant properties is permitted for variant content.</param>
@@ -86,7 +85,7 @@ public class CultureImpactFactory : ICultureImpactFactory
     /// <remarks>
     /// <para>Validates that the culture is compatible with the variation.</para>
     /// </remarks>
-    internal bool TryCreate(string? culture, bool isDefault, ContentVariation variation, bool throwOnFail, bool allowEditInvariantForVariant, out CultureImpact? impact)
+    internal bool TryCreate(string? culture, ContentVariation variation, bool throwOnFail, bool allowEditInvariantForVariant, out CultureImpact? impact)
     {
         impact = null;
 
@@ -104,17 +103,6 @@ public class CultureImpactFactory : ICultureImpactFactory
                 return false;
             }
 
-            // ... and it cannot be default
-            if (isDefault)
-            {
-                if (throwOnFail)
-                {
-                    throw new InvalidOperationException("The invariant culture can not be the default culture.");
-                }
-
-                return false;
-            }
-
             impact = ImpactInvariant();
             return true;
         }
@@ -122,17 +110,6 @@ public class CultureImpactFactory : ICultureImpactFactory
         // if culture is 'all'...
         if (culture == "*")
         {
-            // ... it cannot be default
-            if (isDefault)
-            {
-                if (throwOnFail)
-                {
-                    throw new InvalidOperationException("The 'all' culture can not be the default culture.");
-                }
-
-                return false;
-            }
-
             // if variation does not vary by culture, then impact is invariant
             impact = variation.VariesByCulture() ? ImpactAll() : ImpactInvariant();
             return true;
@@ -161,7 +138,7 @@ public class CultureImpactFactory : ICultureImpactFactory
         }
 
         // return specific impact
-        impact = new CultureImpact(culture, isDefault, allowEditInvariantForVariant);
+        impact = new CultureImpact(culture, allowEditInvariantForVariant);
         return true;
     }
 }

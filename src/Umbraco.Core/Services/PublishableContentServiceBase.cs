@@ -883,7 +883,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
 
             // this will create the correct culture impact even if culture is * or null
             IEnumerable<CultureImpact?> impacts =
-                cultures.Select(culture => _cultureImpactFactory.Create(culture, IsDefaultCulture(allLangs, culture), content, includeInvariantForVariant: user.HasAccessToInvariantForVariant()));
+                cultures.Select(culture => _cultureImpactFactory.Create(culture, content, includeInvariantForVariant: user.HasAccessToInvariantForVariant()));
 
             // publish the culture(s)
             // we don't care about the response here, this response will be rechecked below but we need to set the culture info values now.
@@ -954,7 +954,6 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         IEnumerable<CultureImpact> impacts = culturesToPublish
             .Select(x => _cultureImpactFactory.ImpactExplicit(
                 x,
-                IsDefaultCulture(allLangs, x),
                 includeInvariantForVariant: user.HasAccessToInvariantForVariant()));
 
         // publish the culture(s)
@@ -1021,7 +1020,6 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         IUser user = GetRequiredUser(userId);
         var impact = _cultureImpactFactory.Create(
             culture,
-            IsDefaultCulture(allLangs, culture),
             content,
             includeInvariantForVariant: user.HasAccessToInvariantForVariant());
 
@@ -1293,7 +1291,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
                         // publish the culture values and validate the property values, if validation fails, log the invalid properties so the develeper has an idea of what has failed
                         IProperty[]? invalidProperties = null;
                         // TODO KJA: hardcoding allowEditInvariantForVariant as true works for now, but will need replacing with an opt-in for including invariant-for-variant per scheduled culture
-                        CultureImpact impact = _cultureImpactFactory.ImpactExplicit(culture, IsDefaultCulture(allLangs.Value, culture), includeInvariantForVariant: true);
+                        CultureImpact impact = _cultureImpactFactory.ImpactExplicit(culture, includeInvariantForVariant: true);
                         var tryPublish = d.PublishCulture(impact, date, _propertyEditorCollection) &&
                                          _propertyValidationService.Value.IsPropertyDataValid(d, out invalidProperties, impact);
                         if (invalidProperties != null && invalidProperties.Length > 0)
@@ -1926,9 +1924,6 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
 
     protected static bool HasUnsavedChanges(TContent content) => content.HasIdentity is false || content.IsDirty();
 
-    protected static bool IsDefaultCulture(IReadOnlyCollection<ILanguage>? langs, string culture) =>
-        langs?.Any(x => x.IsDefault && x.IsoCode.InvariantEquals(culture)) ?? false;
-
     /// <inheritdoc />
     public abstract ContentDataIntegrityReport CheckDataIntegrity(ContentDataIntegrityReportOptions options);
 
@@ -2098,7 +2093,6 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
             : culturesPublishing.Select(x =>
                     _cultureImpactFactory.ImpactExplicit(
                         x,
-                        allLangs.Any(lang => lang.IsoCode.InvariantEquals(x) && lang.IsMandatory),
                         includeInvariantForVariant: user.HasAccessToInvariantForVariant()))
                     .ToArray();
 
