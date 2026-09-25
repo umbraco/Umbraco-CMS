@@ -52,14 +52,21 @@ internal sealed class DocumentUrlServiceContentTreeChangeTests : UmbracoIntegrat
 
     private Content RootPage { get; set; } = null!;
 
+    private MutableServerRoleAccessor _serverRoleAccessor = null!;
+
     protected override void CustomTestSetup(IUmbracoBuilder builder)
     {
+        _serverRoleAccessor = new MutableServerRoleAccessor();
+        builder.Services.AddUnique<IServerRoleAccessor>(_serverRoleAccessor);
         builder.Services.AddUnique<IServerMessenger, ScopedRepositoryTests.LocalServerMessenger>();
         builder.AddNotificationHandler<ContentTreeChangeNotification, ContentTreeChangeDistributedCacheNotificationHandler>();
         builder.AddNotificationAsyncHandler<UmbracoApplicationStartingNotification, DocumentUrlServiceInitializerNotificationHandler>();
         builder.AddNotificationAsyncHandler<UmbracoApplicationStartingNotification, DocumentUrlAliasServiceInitializerNotificationHandler>();
         // DocumentUrlServiceContentTreeChangeNotificationHandler is globally registered via UmbracoBuilder.cs
     }
+
+    [TearDown]
+    public void ResetServerRole() => _serverRoleAccessor.CurrentServerRole = ServerRole.Single;
 
     [SetUp]
     public async Task SetUpTestData()
@@ -225,6 +232,40 @@ internal sealed class DocumentUrlServiceContentTreeChangeTests : UmbracoIntegrat
                 GetDbAliases(page.Key).Any(a => a.Alias == "distributed-cache-alias"),
                 Is.True,
                 "URL aliases must be persisted to the database even when publishing under a distributed-cache-only notification publisher.");
+        });
+    }
+
+    /// <summary>
+    /// The elected <see cref="ServerRole.Subscriber"/> role can be held by an instance that serves the backoffice,
+    /// for example a second backoffice replica behind a load balancer, or the surviving instance during a rolling
+    /// deployment. A publish handled there is the only write anyone makes for that change (other servers only
+    /// refresh their in-memory cache from the instruction), so it must still persist URL segments and aliases;
+    /// otherwise the document is unroutable on every server after its next restart.
+    /// </summary>
+    [Test]
+    public void Publish_OnElectedSubscriber_StillWritesUrlSegmentsAndAliasesToDatabase()
+    {
+        _serverRoleAccessor.CurrentServerRole = ServerRole.Subscriber;
+
+        var page = ContentBuilder.CreateSimpleContent(ContentType, "Subscriber Page", RootPage.Id);
+        page.SetValue(Constants.Conventions.Content.UrlAlias, "subscriber-alias");
+        ContentService.Save(page, -1);
+        ContentService.Publish(page, []);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(
+                GetDbSegments(page.Key).Any(s => s.IsDraft is false),
+                Is.True,
+                "The published URL segment must be persisted when the publish is handled by an instance holding the Subscriber role.");
+            Assert.That(
+                GetDbSegments(page.Key).Any(s => s.IsDraft),
+                Is.True,
+                "The draft URL segment must be persisted when the publish is handled by an instance holding the Subscriber role.");
+            Assert.That(
+                GetDbAliases(page.Key).Any(a => a.Alias == "subscriber-alias"),
+                Is.True,
+                "URL aliases must be persisted when the publish is handled by an instance holding the Subscriber role.");
         });
     }
 
@@ -577,5 +618,10 @@ internal sealed class DocumentUrlServiceContentTreeChangeTests : UmbracoIntegrat
                 Does.Contain(child.Key),
                 "Child alias must be resolvable after UpdateAliasCacheWithDescendantsAsync.");
         });
+    }
+
+    private sealed class MutableServerRoleAccessor : IServerRoleAccessor
+    {
+        public ServerRole CurrentServerRole { get; set; } = ServerRole.Single;
     }
 }
