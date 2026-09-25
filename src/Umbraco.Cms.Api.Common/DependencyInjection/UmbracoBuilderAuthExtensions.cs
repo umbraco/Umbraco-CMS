@@ -12,6 +12,7 @@ using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Infrastructure.BackgroundJobs;
 using Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs.DistributedJobs;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Common.DependencyInjection;
 
@@ -41,6 +42,8 @@ public static class UmbracoBuilderAuthExtensions
 
     private static void ConfigureOpenIddict(IUmbracoBuilder builder)
     {
+        builder.Services.AddUnique<IOpenIddictPathsToHandleProvider, OpenIddictPathsToHandleProvider>();
+
         builder.Services.AddOpenIddict()
             // Register the OpenIddict server components.
             .AddServer(options =>
