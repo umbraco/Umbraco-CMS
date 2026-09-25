@@ -12,7 +12,7 @@ using Umbraco.Cms.Infrastructure.Persistence.EFCore;
 namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
 {
     [DbContext(typeof(UmbracoDbContext))]
-    [Migration("20260924083011_ReconcileDocumentRepositoryModel")]
+    [Migration("20260925071337_ReconcileDocumentRepositoryModel")]
     partial class ReconcileDocumentRepositoryModel
     {
         /// <inheritdoc />
@@ -2052,10 +2052,10 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                         .HasName("PK_umbracoUserGroup2GranularPermissionDto");
 
                     b.HasIndex("UniqueId")
-                        .HasDatabaseName("IX_umbracoUserGroup2GranularPermission_UniqueId");
+                        .HasDatabaseName("IX_umbracoUserGroup2GranularPermissionDto_UniqueId");
 
                     b.HasIndex("UserGroupKey")
-                        .HasDatabaseName("IX_umbracoUserGroup2GranularPermission_UserGroupKey_UniqueId");
+                        .HasDatabaseName("IX_umbracoUserGroup2GranularPermissionDto_UserGroupKey_UniqueId");
 
                     SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("UserGroupKey"), new[] { "UniqueId" });
 

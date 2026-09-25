@@ -15,6 +15,6 @@ public class SqlServerUserGroup2GranularPermissionDtoModelCustomizer : IEFCoreMo
 
     public void Customize(EntityTypeBuilder<UserGroup2GranularPermissionDto> builder) =>
         builder.HasIndex(x => x.UserGroupKey)
-            .HasDatabaseName($"IX_{UserGroup2GranularPermissionDto.TableName}_UserGroupKey_UniqueId")
+            .HasDatabaseName("IX_umbracoUserGroup2GranularPermissionDto_UserGroupKey_UniqueId")
             .IncludeProperties(x => x.UniqueId);
 }

@@ -11,7 +11,7 @@ using Umbraco.Cms.Infrastructure.Persistence.EFCore;
 namespace Umbraco.Cms.Persistence.EFCore.Sqlite.Migrations
 {
     [DbContext(typeof(UmbracoDbContext))]
-    [Migration("20260922130837_ReconcileDocumentRepositoryModel")]
+    [Migration("20260925071347_ReconcileDocumentRepositoryModel")]
     partial class ReconcileDocumentRepositoryModel
     {
         /// <inheritdoc />
@@ -2075,10 +2075,10 @@ namespace Umbraco.Cms.Persistence.EFCore.Sqlite.Migrations
                         .HasName("PK_umbracoUserGroup2GranularPermissionDto");
 
                     b.HasIndex("UniqueId")
-                        .HasDatabaseName("IX_umbracoUserGroup2GranularPermission_UniqueId");
+                        .HasDatabaseName("IX_umbracoUserGroup2GranularPermissionDto_UniqueId");
 
                     b.HasIndex("UserGroupKey")
-                        .HasDatabaseName("IX_umbracoUserGroup2GranularPermission_UserGroupKey_UniqueId");
+                        .HasDatabaseName("IX_umbracoUserGroup2GranularPermissionDto_UserGroupKey_UniqueId");
 
                     b.ToTable("umbracoUserGroup2GranularPermission", (string)null);
                 });

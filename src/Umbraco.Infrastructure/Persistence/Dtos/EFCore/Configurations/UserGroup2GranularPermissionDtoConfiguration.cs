@@ -45,13 +45,12 @@ public class UserGroup2GranularPermissionDtoConfiguration : IEntityTypeConfigura
             .HasPrincipalKey(x => x.Key)
             .OnDelete(DeleteBehavior.NoAction);
 
-        // IX_umbracoUserGroup2GranularPermissionDto_UserGroupKey_UniqueId
-        // Note: SQL Server included columns are added by SqlServerUserGroup2GranularPermissionDtoModelCustomizer.
+        // The index names carry the "Dto" suffix the existing schema was created with.
+        // SQL Server included columns are added by SqlServerUserGroup2GranularPermissionDtoModelCustomizer.
         builder.HasIndex(x => x.UserGroupKey)
-            .HasDatabaseName($"IX_{UserGroup2GranularPermissionDto.TableName}_UserGroupKey_UniqueId");
+            .HasDatabaseName("IX_umbracoUserGroup2GranularPermissionDto_UserGroupKey_UniqueId");
 
-        // IX_umbracoUserGroup2GranularPermissionDto_UniqueId
         builder.HasIndex(x => x.UniqueId)
-            .HasDatabaseName($"IX_{UserGroup2GranularPermissionDto.TableName}_UniqueId");
+            .HasDatabaseName("IX_umbracoUserGroup2GranularPermissionDto_UniqueId");
     }
 }

@@ -41,7 +41,7 @@ public class UmbracoDbContextProviderCustomizerTests
         yield return new TestCaseData(typeof(TagDto), $"IX_{TagDto.TableName}_languageId_group", nameof(TagDto.Text));
         yield return new TestCaseData(typeof(TagRelationshipDto), $"IX_{TagRelationshipDto.TableName}_tagId_nodeId", nameof(TagRelationshipDto.PropertyTypeId));
         yield return new TestCaseData(typeof(RedirectUrlDto), $"IX_{RedirectUrlDto.TableName}_culture_hash", nameof(RedirectUrlDto.UrlHash));
-        yield return new TestCaseData(typeof(UserGroup2GranularPermissionDto), $"IX_{UserGroup2GranularPermissionDto.TableName}_UserGroupKey_UniqueId", nameof(UserGroup2GranularPermissionDto.UniqueId));
+        yield return new TestCaseData(typeof(UserGroup2GranularPermissionDto), "IX_umbracoUserGroup2GranularPermissionDto_UserGroupKey_UniqueId", nameof(UserGroup2GranularPermissionDto.UniqueId));
     }
 
     [Test]
