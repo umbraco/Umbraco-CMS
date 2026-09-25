@@ -2,7 +2,7 @@ import { UMB_MENU_VARIANT_STRUCTURE_WORKSPACE_CONTEXT } from './menu-variant-str
 import { UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT } from './section-sidebar-menu/section-context/section-sidebar-menu.section-context.token.js';
 import type { ManifestWorkspaceContextMenuStructureKind, UmbVariantStructureItemModel } from './types.js';
 import type { UmbMenuVariantStructureWorkspaceContext } from './menu-variant-structure-workspace-context.interface.js';
-import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
+import { createExtensionApiByAlias, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { debounce, linkEntityExpansionEntries } from '@umbraco-cms/backoffice/utils';
 import { UmbAncestorsEntityContext, UmbParentEntityContext, type UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
@@ -12,11 +12,13 @@ import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UMB_MODAL_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UMB_SECTION_CONTEXT } from '@umbraco-cms/backoffice/section';
+import type { ManifestWorkspace } from '@umbraco-cms/backoffice/workspace';
 import {
 	UMB_SUBMITTABLE_TREE_ENTITY_WORKSPACE_CONTEXT,
 	UMB_VARIANT_WORKSPACE_CONTEXT,
 	UMB_WORKSPACE_EDIT_PATH_PATTERN,
 	UMB_WORKSPACE_EDIT_VARIANT_PATH_PATTERN,
+	UMB_WORKSPACE_PATH_PATTERN,
 } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbTreeItemModel, UmbTreeRepository, UmbTreeRootModel } from '@umbraco-cms/backoffice/tree';
@@ -119,11 +121,15 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase
 	}
 
 	getItemHref(structureItem: UmbVariantStructureItemModel): string | undefined {
+		if (!this.#hasWorkspaceForEntityType(structureItem.entityType)) return undefined;
+
 		const sectionName = this._sectionContext?.getPathname();
 		if (!sectionName) return undefined;
 
 		const unique = structureItem.unique;
-		if (!unique) return undefined;
+		if (unique === null) {
+			return UMB_WORKSPACE_PATH_PATTERN.generateAbsolute({ sectionName, entityType: structureItem.entityType });
+		}
 
 		// find related variant id from structure item:
 		const itemVariantFit = structureItem.variants.find(
@@ -148,6 +154,12 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase
 			entityType: structureItem.entityType,
 			unique,
 		});
+	}
+
+	#hasWorkspaceForEntityType(entityType: string): boolean {
+		return umbExtensionsRegistry
+			.getByType<'workspace', ManifestWorkspace>('workspace')
+			.some((manifest) => manifest.meta?.entityType === entityType);
 	}
 
 	#addEventListeners() {
@@ -269,6 +281,11 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase
 
 		const structureItems = this.#structure.getValue();
 		if (!structureItems.length) return;
+
+		// This can run mid-navigation to a different entity, before `unique` itself has been updated - `getUnique()`
+		// is then transiently undefined (distinct from a legitimate `null`, e.g. a root entity), which would defeat
+		// the "exclude the current entity" filter below and expand the outgoing entity's still-cached structure.
+		if (this.#workspaceContext?.getUnique() === undefined) return;
 
 		this.#expandSectionSidebarMenu(structureItems, menuItemAlias);
 	}

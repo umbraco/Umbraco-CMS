@@ -4,7 +4,7 @@ export * from './entity-bulk-action/index.js';
 export { UmbRecycleBinRepositoryBase } from './recycle-bin-repository-base.js';
 export { UmbIsTrashedEntityContext } from './contexts/is-trashed/index.js';
 export {
-	UmbTrashableEntityWorkspaceContextBase,
+	UmbTrashableEntityWorkspaceController,
 	UMB_TRASHABLE_ENTITY_WORKSPACE_CONTEXT,
 } from './workspace-context/index.js';
 

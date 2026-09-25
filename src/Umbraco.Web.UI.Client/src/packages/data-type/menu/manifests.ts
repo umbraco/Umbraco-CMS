@@ -1,5 +1,4 @@
 import { UMB_DATA_TYPE_WORKSPACE_ALIAS } from '../workspace/constants.js';
-import { UMB_DATA_TYPE_FOLDER_WORKSPACE_ALIAS } from '../tree/constants.js';
 import { UMB_DATA_TYPE_MENU_ITEM_ALIAS } from './constants.js';
 import { UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
 
@@ -42,34 +41,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 			{
 				alias: UMB_WORKSPACE_CONDITION_ALIAS,
 				match: UMB_DATA_TYPE_WORKSPACE_ALIAS,
-			},
-		],
-	},
-	{
-		type: 'workspaceContext',
-		kind: 'menuStructure',
-		name: 'Data Type Folder Menu Structure Workspace Context',
-		alias: 'Umb.Context.DataTypeFolder.Menu.Structure',
-		api: () => import('./data-type-menu-structure.context.js'),
-		meta: {
-			menuItemAlias: UMB_DATA_TYPE_MENU_ITEM_ALIAS,
-		},
-		conditions: [
-			{
-				alias: UMB_WORKSPACE_CONDITION_ALIAS,
-				match: UMB_DATA_TYPE_FOLDER_WORKSPACE_ALIAS,
-			},
-		],
-	},
-	{
-		type: 'workspaceFooterApp',
-		kind: 'menuBreadcrumb',
-		alias: 'Umb.WorkspaceFooterApp.DataTypeFolder.Breadcrumb',
-		name: 'Data Type Folder Breadcrumb Workspace Footer App',
-		conditions: [
-			{
-				alias: UMB_WORKSPACE_CONDITION_ALIAS,
-				match: UMB_DATA_TYPE_FOLDER_WORKSPACE_ALIAS,
 			},
 		],
 	},

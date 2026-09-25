@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Umbraco.Cms.Search.Core.Configuration;
+using Umbraco.Cms.Core.Search;
+using Umbraco.Cms.Core.Search.Configuration;
 
 namespace Umbraco.Cms.Search.Core.Services;
 
