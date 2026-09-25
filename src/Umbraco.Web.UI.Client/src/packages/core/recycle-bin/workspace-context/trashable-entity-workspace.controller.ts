@@ -137,13 +137,14 @@ export class UmbTrashableEntityWorkspaceController extends UmbControllerBase {
 			return;
 		}
 
-		const rule: UmbVariantGuardRule = {
-			unique: guardUnique,
-			permitted: true,
-		};
+		// `readOnlyGuard`'s rule reads as "permitted to be read-only" (true = locked), the opposite sense of
+		// `nameWriteGuard`'s, whose rule reads as "permitted to write" (false = blocked) — so trashed needs
+		// `permitted: true` on one and `permitted: false` on the other to mean the same thing.
+		this.#workspaceContext?.readOnlyGuard?.addRule({ unique: guardUnique, permitted: true });
 
-		this.#workspaceContext?.readOnlyGuard?.addRule(rule);
-		this.#workspaceContext?.nameWriteGuard?.addRule(rule);
+		// No `variantId` set — a blanket rule, applying to every variant.
+		const nameWriteGuardRule: UmbVariantGuardRule = { unique: guardUnique, permitted: false };
+		this.#workspaceContext?.nameWriteGuard?.addRule(nameWriteGuardRule);
 	}
 
 	public override destroy(): void {

@@ -12,6 +12,7 @@ export class UmbTestRecycleBinControllerHostElement extends UmbControllerHostEle
 export interface UmbTestGuardRuleCall {
 	action: 'add' | 'remove';
 	unique: string;
+	permitted?: boolean;
 }
 
 /**
@@ -35,13 +36,15 @@ export class UmbTestTrashableEntityWorkspaceContext implements UmbTrashableEntit
 
 	readonly readOnlyGuardRuleCalls: Array<UmbTestGuardRuleCall> = [];
 	readonly readOnlyGuard = {
-		addRule: (rule: { unique: string }) => this.readOnlyGuardRuleCalls.push({ action: 'add', unique: rule.unique }),
+		addRule: (rule: { unique: string; permitted: boolean }) =>
+			this.readOnlyGuardRuleCalls.push({ action: 'add', unique: rule.unique, permitted: rule.permitted }),
 		removeRule: (unique: string) => this.readOnlyGuardRuleCalls.push({ action: 'remove', unique }),
 	} as unknown as UmbReadOnlyVariantGuardManager;
 
 	readonly nameWriteGuardRuleCalls: Array<UmbTestGuardRuleCall> = [];
 	readonly nameWriteGuard = {
-		addRule: (rule: { unique: string }) => this.nameWriteGuardRuleCalls.push({ action: 'add', unique: rule.unique }),
+		addRule: (rule: { unique: string; permitted: boolean }) =>
+			this.nameWriteGuardRuleCalls.push({ action: 'add', unique: rule.unique, permitted: rule.permitted }),
 		removeRule: (unique: string) => this.nameWriteGuardRuleCalls.push({ action: 'remove', unique }),
 	} as unknown as UmbNameWriteGuardManager;
 

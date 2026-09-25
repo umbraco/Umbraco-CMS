@@ -62,6 +62,8 @@ describe('UmbTrashableEntityWorkspaceController', () => {
 
 			expect(workspaceContext.readOnlyGuardRuleCalls).to.have.lengthOf(1);
 			expect(workspaceContext.readOnlyGuardRuleCalls[0].action).to.equal('add');
+			// `permitted: true` here means "permitted to be read-only" — i.e. locked.
+			expect(workspaceContext.readOnlyGuardRuleCalls[0].permitted).to.be.true;
 		});
 
 		it('removes the readonly rule when the workspace is no longer trashed', async () => {
@@ -125,6 +127,9 @@ describe('UmbTrashableEntityWorkspaceController', () => {
 
 			expect(workspaceContext.nameWriteGuardRuleCalls).to.have.lengthOf(1);
 			expect(workspaceContext.nameWriteGuardRuleCalls[0].action).to.equal('add');
+			// `permitted: false` here means "not permitted to write" — i.e. blocked. The opposite polarity from
+			// readOnlyGuard's rule, since a write guard's `permitted` means "permitted to write", not "read-only".
+			expect(workspaceContext.nameWriteGuardRuleCalls[0].permitted).to.be.false;
 		});
 
 		it('removes the name write rule when the workspace is no longer trashed', async () => {
