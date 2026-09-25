@@ -926,6 +926,20 @@ export class DocumentTypeApiHelper {
     return await this.create(documentType);
   }
 
+  async createDocumentTypeWithAllowedChildNodesAndCollectionId(documentTypeName: string, allowedChildNodeIds: string[], collectionId: string) {
+    await this.ensureNameNotExists(documentTypeName);
+
+    const builder = new DocumentTypeBuilder()
+      .withName(documentTypeName)
+      .withAlias(AliasHelper.toAlias(documentTypeName))
+      .withAllowedAsRoot(true);
+    for (const allowedChildNodeId of allowedChildNodeIds) {
+      builder.addAllowedDocumentType().withId(allowedChildNodeId).done();
+    }
+    const documentType = builder.withCollectionId(collectionId).build();
+    return await this.create(documentType);
+  }
+
   async createDocumentTypeWithCollectionId(documentTypeName: string, collectionId: string) {
     await this.ensureNameNotExists(documentTypeName);
 
