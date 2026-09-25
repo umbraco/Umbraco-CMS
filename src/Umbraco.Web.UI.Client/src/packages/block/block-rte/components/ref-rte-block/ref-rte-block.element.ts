@@ -1,5 +1,5 @@
 import { UMB_BLOCK_RTE_ENTRY_CONTEXT } from '../../context/block-rte-entry.context-token.js';
-import { css, customElement, html, property } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, property, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbBlockDataType, UmbBlockLabelUfmValueType } from '@umbraco-cms/backoffice/block';
 import type { UmbBlockEditorCustomViewConfiguration } from '@umbraco-cms/backoffice/block-custom-view';
@@ -36,6 +36,13 @@ export class UmbRefRteBlockElement extends UmbLitElement {
 	@property({ type: Boolean, reflect: true })
 	unpublished?: boolean;
 
+	/**
+	 * Whether the Block is backed by external (library element) content, so the unpublished tooltip
+	 * reflects the library element's own publish state rather than the local expose entry.
+	 */
+	@property({ type: Boolean, attribute: false })
+	isExternalContent?: boolean;
+
 	@property({ attribute: false })
 	content?: UmbBlockDataType;
 
@@ -61,7 +68,19 @@ export class UmbRefRteBlockElement extends UmbLitElement {
 					.value=${blockValue}
 					@umb-ufm-resolved=${this.#onUfmResolved}>
 				</umb-ufm-render>
+				${when(this.unpublished, () => this.#renderDraftTag())}
 			</uui-ref-node>
+		`;
+	}
+
+	#renderDraftTag() {
+		const titleKey = this.isExternalContent
+			? 'blockEditor_notPublishedLibraryElementDescription'
+			: 'blockEditor_notExposedDescription';
+		return html`
+			<uui-tag slot="name" look="secondary" title=${this.localize.term(titleKey)}>
+				<umb-localize key="blockEditor_notExposedLabel"></umb-localize>
+			</uui-tag>
 		`;
 	}
 

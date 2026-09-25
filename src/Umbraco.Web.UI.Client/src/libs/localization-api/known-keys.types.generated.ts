@@ -319,6 +319,7 @@ declare global {
 		blockEditor_layoutOptions: string;
 		blockEditor_notExposedDescription: string;
 		blockEditor_notExposedLabel: string;
+		blockEditor_notPublishedLibraryElementDescription: string;
 		blockEditor_pickSpecificAllowance: string;
 		blockEditor_propertyEditorNotSupported: string;
 		blockEditor_rangeAllowed: string;

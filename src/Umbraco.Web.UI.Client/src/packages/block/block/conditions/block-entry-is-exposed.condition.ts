@@ -4,6 +4,10 @@ import { UmbConditionBase } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbConditionControllerArguments, UmbExtensionCondition } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
+/**
+ * Deliberately observes `hasExpose`, not `isExposed`: it gates the action that creates the local expose
+ * entry for the current variant, which is unaffected by an external content block's own publish state.
+ */
 export class UmbBlockEntryIsExposedCondition
 	extends UmbConditionBase<UmbBlockEntryIsExposedConditionConfig>
 	implements UmbExtensionCondition
