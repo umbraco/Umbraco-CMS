@@ -1,4 +1,6 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
@@ -18,7 +20,39 @@ public class ElementService : PublishableContentServiceBase<IElement>, IElementS
     private readonly ILogger<ElementService> _logger;
     private readonly IShortStringHelper _shortStringHelper;
 
-    // TODO KJA: breaking change in constructor.
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 21.")]
+    public ElementService(
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IAuditService auditService,
+        IContentTypeRepository contentTypeRepository,
+        IElementRepository elementRepository,
+        ILanguageRepository languageRepository,
+        Lazy<IPropertyValidationService> propertyValidationService,
+        ICultureImpactFactory cultureImpactFactory,
+        IUserIdKeyResolver userIdKeyResolver,
+        PropertyEditorCollection propertyEditorCollection,
+        IIdKeyMap idKeyMap,
+        IShortStringHelper shortStringHelper)
+        : this(
+            provider,
+            loggerFactory,
+            eventMessagesFactory,
+            auditService,
+            contentTypeRepository,
+            elementRepository,
+            languageRepository,
+            propertyValidationService,
+            cultureImpactFactory,
+            userIdKeyResolver,
+            propertyEditorCollection,
+            idKeyMap,
+            shortStringHelper,
+            StaticServiceProvider.Instance.GetRequiredService<IServiceProvider>())
+    {
+    }
+
     public ElementService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
