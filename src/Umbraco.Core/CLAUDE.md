@@ -147,8 +147,9 @@ in-memory cache — implement `IDistributedCacheNotificationHandler` (sync) or
 interfaces, so the handler still fires on normal publishes *and* survives the distributed-cache-only
 filter. No DI change is needed — filtering is by resolved instance type.
 
-When you do this, ensure the handler is safe in the extra scopes it now runs in — e.g. guard against
-DB writes on read-only `Subscriber` servers (see `DocumentUrlService.SkipDatabaseWrites()`).
+When you do this, ensure the handler is safe in the extra scopes it now runs in. Do not gate a write that
+follows a local content commit on server role: the elected `Subscriber` role can be held by any instance,
+including one serving the backoffice (see `DocumentUrlService.SkipDatabaseWrites()` for the split).
 
 ### 3. Composer Pattern (DI Registration)
 

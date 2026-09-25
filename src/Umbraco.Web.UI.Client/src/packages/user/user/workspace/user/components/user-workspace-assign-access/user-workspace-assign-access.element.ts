@@ -1,328 +1,162 @@
 import { UMB_USER_WORKSPACE_CONTEXT } from '../../user-workspace.context-token.js';
-import type { UmbUserDetailModel } from '../../../../types.js';
-import { css, customElement, html, when, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, ifDefined, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
-import type { UmbUserGroupInputElement } from '@umbraco-cms/backoffice/user-group';
-import type { UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import type { UmbPropertyDatasetElement, UmbPropertyValueData } from '@umbraco-cms/backoffice/property';
+import type { PropertyEditorSettingsProperty, UmbStartNodeAccessValue } from '@umbraco-cms/backoffice/property-editor';
 
 @customElement('umb-user-workspace-assign-access')
 export class UmbUserWorkspaceAssignAccessElement extends UmbLitElement {
-	@state()
-	private _userGroupUniques: UmbUserDetailModel['userGroupUniques'] = [];
-
-	@state()
-	private _documentStartNodeUniques: UmbUserDetailModel['documentStartNodeUniques'] = [];
-
-	@state()
-	private _documentRootAccess: UmbUserDetailModel['hasDocumentRootAccess'] = false;
-
-	@state()
-	private _documentBlueprintStartNodeUniques: UmbUserDetailModel['documentBlueprintStartNodeUniques'] = [];
-
-	@state()
-	private _documentBlueprintRootAccess: UmbUserDetailModel['hasDocumentBlueprintRootAccess'] = false;
-
-	@state()
-	private _elementStartNodeUniques: UmbUserDetailModel['elementStartNodeUniques'] = [];
-
-	@state()
-	private _elementRootAccess: UmbUserDetailModel['hasElementRootAccess'] = false;
-
-	@state()
-	private _mediaStartNodeUniques: UmbUserDetailModel['mediaStartNodeUniques'] = [];
-
-	@state()
-	private _mediaRootAccess: UmbUserDetailModel['hasMediaRootAccess'] = false;
-
 	#workspaceContext?: typeof UMB_USER_WORKSPACE_CONTEXT.TYPE;
+
+	@state()
+	private _values: Array<UmbPropertyValueData> = [
+		{ alias: 'userGroups', value: [] },
+		{ alias: 'documentAccess', value: { rootAccess: false, startNodes: [] } },
+		{ alias: 'mediaAccess', value: { rootAccess: false, startNodes: [] } },
+		{ alias: 'elementAccess', value: { rootAccess: false, startNodes: [] } },
+		{ alias: 'documentBlueprintAccess', value: { rootAccess: false, startNodes: [] } },
+	];
 
 	constructor() {
 		super();
 
 		this.consumeContext(UMB_USER_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance;
+			if (!instance) return;
 
 			this.observe(
-				this.#workspaceContext?.userGroupUniques,
-				(value) => (this._userGroupUniques = value ?? []),
+				instance.userGroupUniques,
+				(value) => this.#setValue('userGroups', value ?? []),
 				'_observeUserGroupAccess',
 			);
 
 			this.observe(
-				this.#workspaceContext?.hasDocumentRootAccess,
-				(value) => (this._documentRootAccess = value ?? false),
-				'_observeDocumentRootAccess',
+				observeMultiple([instance.hasDocumentRootAccess, instance.documentStartNodeUniques]),
+				([rootAccess, startNodes]) =>
+					this.#setValue('documentAccess', { rootAccess: rootAccess ?? false, startNodes: startNodes ?? [] }),
+				'_observeDocumentAccess',
 			);
 
 			this.observe(
-				this.#workspaceContext?.documentStartNodeUniques,
-				(value) => (this._documentStartNodeUniques = value ?? []),
-				'_observeDocumentStartNode',
+				observeMultiple([instance.hasMediaRootAccess, instance.mediaStartNodeUniques]),
+				([rootAccess, startNodes]) =>
+					this.#setValue('mediaAccess', { rootAccess: rootAccess ?? false, startNodes: startNodes ?? [] }),
+				'_observeMediaAccess',
 			);
 
 			this.observe(
-				this.#workspaceContext?.hasElementRootAccess,
-				(value) => (this._elementRootAccess = value ?? false),
-				'_observeElementRootAccess',
+				observeMultiple([instance.hasElementRootAccess, instance.elementStartNodeUniques]),
+				([rootAccess, startNodes]) =>
+					this.#setValue('elementAccess', { rootAccess: rootAccess ?? false, startNodes: startNodes ?? [] }),
+				'_observeElementAccess',
 			);
 
 			this.observe(
-				this.#workspaceContext?.hasDocumentBlueprintRootAccess,
-				(value) => (this._documentBlueprintRootAccess = value ?? false),
-				'_observeDocumentBlueprintRootAccess',
-			);
-
-			this.observe(
-				this.#workspaceContext?.documentBlueprintStartNodeUniques,
-				(value) => (this._documentBlueprintStartNodeUniques = value ?? []),
-				'_observeDocumentBlueprintStartNodeUniques',
-			);
-
-			this.observe(
-				this.#workspaceContext?.elementStartNodeUniques,
-				(value) => (this._elementStartNodeUniques = value ?? []),
-				'_observeElementStartNode',
-			);
-
-			this.observe(
-				this.#workspaceContext?.hasMediaRootAccess,
-				(value) => (this._mediaRootAccess = value ?? false),
-				'_observeMediaRootAccess',
-			);
-
-			this.observe(
-				this.#workspaceContext?.mediaStartNodeUniques,
-				(value) => (this._mediaStartNodeUniques = value ?? []),
-				'_observeMediaStartNode',
+				observeMultiple([instance.hasDocumentBlueprintRootAccess, instance.documentBlueprintStartNodeUniques]),
+				([rootAccess, startNodes]) =>
+					this.#setValue('documentBlueprintAccess', { rootAccess: rootAccess ?? false, startNodes: startNodes ?? [] }),
+				'_observeDocumentBlueprintAccess',
 			);
 		});
 	}
 
-	#onUserGroupsChange(event: CustomEvent) {
-		event.stopPropagation();
-		const target = event.target as UmbUserGroupInputElement;
-		const selection: Array<UmbReferenceByUnique> = target.selection.map((unique) => {
-			return { unique };
-		});
-		// TODO make contexts method
-		this.#workspaceContext?.updateProperty('userGroupUniques', selection);
+	#setValue(alias: string, value: unknown) {
+		this._values = this._values.map((entry) => (entry.alias === alias ? { alias, value } : entry));
 	}
 
-	#onAllowAllDocumentsChange(event: UUIBooleanInputEvent) {
-		event.stopPropagation();
-		const target = event.target;
-		// TODO make contexts method
-		this.#workspaceContext?.updateProperty('hasDocumentRootAccess', target.checked);
-		this.#workspaceContext?.updateProperty('documentStartNodeUniques', []);
+	#onChange(event: Event & { target: UmbPropertyDatasetElement }) {
+		const values = event.target.value;
+
+		const userGroups = values.find((entry) => entry.alias === 'userGroups')?.value as
+			| Array<UmbReferenceByUnique>
+			| undefined;
+		this.#workspaceContext?.setUserGroups(userGroups ?? []);
+
+		const documentAccess = values.find((entry) => entry.alias === 'documentAccess')?.value as
+			| UmbStartNodeAccessValue
+			| undefined;
+		if (documentAccess) this.#workspaceContext?.setDocumentAccess(documentAccess);
+
+		const mediaAccess = values.find((entry) => entry.alias === 'mediaAccess')?.value as
+			| UmbStartNodeAccessValue
+			| undefined;
+		if (mediaAccess) this.#workspaceContext?.setMediaAccess(mediaAccess);
+
+		const elementAccess = values.find((entry) => entry.alias === 'elementAccess')?.value as
+			| UmbStartNodeAccessValue
+			| undefined;
+		if (elementAccess) this.#workspaceContext?.setElementAccess(elementAccess);
+
+		const documentBlueprintAccess = values.find((entry) => entry.alias === 'documentBlueprintAccess')?.value as
+			| UmbStartNodeAccessValue
+			| undefined;
+		if (documentBlueprintAccess) this.#workspaceContext?.setDocumentBlueprintAccess(documentBlueprintAccess);
 	}
 
-	#onDocumentStartNodeChange(event: CustomEvent) {
-		event.stopPropagation();
-		// TODO: get back to this when media have been decoupled from users.
-		// The event target is deliberately set to any to avoid an import cycle with media.
-		const target = event.target as any;
-		const selection: Array<UmbReferenceByUnique> = target.selection.map((unique: string) => ({ unique }));
-		// TODO make contexts method
-		this.#workspaceContext?.updateProperty('documentStartNodeUniques', selection);
-		// When specific start nodes are selected, disable root access
-		this.#workspaceContext?.updateProperty('hasDocumentRootAccess', false);
-	}
-
-	#onAllowAllDocumentBlueprintsChange(event: UUIBooleanInputEvent) {
-		event.stopPropagation();
-		const target = event.target;
-		// TODO make contexts method
-		this.#workspaceContext?.updateProperty('hasDocumentBlueprintRootAccess', target.checked);
-		this.#workspaceContext?.updateProperty('documentBlueprintStartNodeUniques', []);
-	}
-
-	#onDocumentBlueprintStartNodeChange(event: CustomEvent & { target: { selection: Array<string> } }) {
-		event.stopPropagation();
-		const target = event.target;
-		const selection: Array<UmbReferenceByUnique> = target.selection.map((unique: string) => ({ unique }));
-		// TODO make contexts method
-		this.#workspaceContext?.updateProperty('documentBlueprintStartNodeUniques', selection);
-		// When specific start nodes are selected, disable root access
-		this.#workspaceContext?.updateProperty('hasDocumentBlueprintRootAccess', false);
-	}
-
-	#onAllowAllElementsChange(event: UUIBooleanInputEvent) {
-		event.stopPropagation();
-		const target = event.target;
-		// TODO make contexts method
-		this.#workspaceContext?.updateProperty('hasElementRootAccess', target.checked);
-		this.#workspaceContext?.updateProperty('elementStartNodeUniques', []);
-	}
-
-	#onElementStartNodeChange(event: CustomEvent & { target: { selection: Array<string> } }) {
-		event.stopPropagation();
-		// TODO: get back to this when media have been decoupled from users.
-		// The event target is deliberately set to any to avoid an import cycle with media.
-		const target = event.target;
-		const selection: Array<UmbReferenceByUnique> = target.selection.map((unique: string) => ({ unique }));
-		// TODO make contexts method
-		this.#workspaceContext?.updateProperty('elementStartNodeUniques', selection);
-		// When specific start nodes are selected, disable root access
-		this.#workspaceContext?.updateProperty('hasElementRootAccess', false);
-	}
-
-	#onAllowAllMediaChange(event: UUIBooleanInputEvent) {
-		event.stopPropagation();
-		const target = event.target;
-		// TODO make contexts method
-		this.#workspaceContext?.updateProperty('hasMediaRootAccess', target.checked);
-		this.#workspaceContext?.updateProperty('mediaStartNodeUniques', []);
-	}
-
-	#onMediaStartNodeChange(event: CustomEvent) {
-		event.stopPropagation();
-		// TODO: get back to this when media have been decoupled from users.
-		// The event target is deliberately set to any to avoid an import cycle with media.
-		const target = event.target as any;
-		const selection: Array<UmbReferenceByUnique> = target.selection.map((unique: string) => ({ unique }));
-		// TODO make contexts method
-		this.#workspaceContext?.updateProperty('mediaStartNodeUniques', selection);
-		// When specific start nodes are selected, disable root access
-		this.#workspaceContext?.updateProperty('hasMediaRootAccess', false);
+	#getFields(): Array<PropertyEditorSettingsProperty> {
+		return [
+			{
+				alias: 'userGroups',
+				label: this.localize.term('general_groups'),
+				description: this.localize.term('user_groupsHelp'),
+				propertyEditorUiAlias: 'Umb.PropertyEditorUi.UserGroupPicker',
+			},
+			{
+				alias: 'documentAccess',
+				label: this.localize.term('user_startnodes'),
+				description: this.localize.term('user_startnodeshelp'),
+				propertyEditorUiAlias: 'Umb.PropertyEditorUi.DocumentStartNodeAccess',
+				config: [{ alias: 'rootAccessLabel', value: this.localize.term('user_allowAccessToAllDocuments') }],
+			},
+			{
+				alias: 'mediaAccess',
+				label: this.localize.term('defaultdialogs_selectMediaStartNode'),
+				description: this.localize.term('user_mediastartnodehelp'),
+				propertyEditorUiAlias: 'Umb.PropertyEditorUi.MediaStartNodeAccess',
+				config: [{ alias: 'rootAccessLabel', value: this.localize.term('user_allowAccessToAllMedia') }],
+			},
+			{
+				alias: 'elementAccess',
+				label: this.localize.term('user_selectElementStartNode'),
+				description: this.localize.term('user_selectElementStartNodeDescription'),
+				propertyEditorUiAlias: 'Umb.PropertyEditorUi.ElementStartNodeAccess',
+				config: [{ alias: 'rootAccessLabel', value: this.localize.term('user_allowAccessToAllElements') }],
+			},
+			{
+				alias: 'documentBlueprintAccess',
+				label: this.localize.term('user_selectDocumentBlueprintStartNode'),
+				description: this.localize.term('user_selectDocumentBlueprintStartNodeDescription'),
+				propertyEditorUiAlias: 'Umb.PropertyEditorUi.DocumentBlueprintStartNodeAccess',
+				config: [{ alias: 'rootAccessLabel', value: this.localize.term('user_allowAccessToAllDocumentBlueprints') }],
+			},
+		];
 	}
 
 	override render() {
 		return html`
-			<uui-box>
-				<div slot="headline"><umb-localize key="user_assignAccess">Assign Access</umb-localize></div>
-				<div id="assign-access">
-					${this.#renderGroupAccess()} ${this.#renderDocumentAccess()} ${this.#renderMediaAccess()}
-					${this.#renderElementAccess()} ${this.#renderDocumentBlueprintAccess()}
-				</div>
+			<uui-box .headline=${this.localize.term('user_assignAccess')}>
+				<umb-property-dataset .value=${this._values} @change=${this.#onChange}>
+					${repeat(
+						this.#getFields(),
+						(field) => field.alias,
+						(field) => html`
+							<umb-property
+								alias=${field.alias}
+								label=${field.label}
+								description=${ifDefined(field.description)}
+								property-editor-ui-alias=${field.propertyEditorUiAlias}
+								.config=${field.config}>
+							</umb-property>
+						`,
+					)}
+				</umb-property-dataset>
 			</uui-box>
 		`;
 	}
 
-	#renderGroupAccess() {
-		return html`
-			<umb-property-layout
-				label=${this.localize.term('general_groups')}
-				description=${this.localize.term('user_groupsHelp')}>
-				<umb-user-group-input
-					slot="editor"
-					.selection=${this._userGroupUniques.map((reference) => reference.unique)}
-					@change=${this.#onUserGroupsChange}></umb-user-group-input>
-			</umb-property-layout>
-		`;
-	}
-
-	#renderDocumentAccess() {
-		return html`
-			<umb-property-layout
-				label=${this.localize.term('user_startnodes')}
-				description=${this.localize.term('user_startnodeshelp')}>
-				<div slot="editor">
-					<uui-toggle
-						style="margin-bottom: var(--uui-size-space-3);"
-						label=${this.localize.term('user_allowAccessToAllDocuments')}
-						.checked=${this._documentRootAccess}
-						@change=${this.#onAllowAllDocumentsChange}></uui-toggle>
-				</div>
-				${when(
-					this._documentRootAccess === false,
-					() => html`
-						<umb-input-document
-							slot="editor"
-							.selection=${this._documentStartNodeUniques.map((reference) => reference.unique)}
-							@change=${this.#onDocumentStartNodeChange}>
-						</umb-input-document>
-					`,
-				)}
-			</umb-property-layout>
-		`;
-	}
-
-	#renderElementAccess() {
-		return html`
-			<umb-property-layout
-				label=${this.localize.term('user_selectElementStartNode')}
-				description=${this.localize.term('user_selectElementStartNodeDescription')}>
-				<div slot="editor">
-					<uui-toggle
-						style="margin-bottom: var(--uui-size-space-3);"
-						label=${this.localize.term('user_allowAccessToAllElements')}
-						.checked=${this._elementRootAccess}
-						@change=${this.#onAllowAllElementsChange}></uui-toggle>
-				</div>
-				${when(
-					this._elementRootAccess === false,
-					() => html`
-						<umb-input-element
-							slot="editor"
-							.selection=${this._elementStartNodeUniques.map((reference) => reference.unique)}
-							?folderOnly=${true}
-							@change=${this.#onElementStartNodeChange}>
-						</umb-input-element>
-					`,
-				)}
-			</umb-property-layout>
-		`;
-	}
-
-	#renderDocumentBlueprintAccess() {
-		return html`
-			<umb-property-layout
-				label=${this.localize.term('user_selectDocumentBlueprintStartNode')}
-				description=${this.localize.term('user_selectDocumentBlueprintStartNodeDescription')}>
-				<div slot="editor">
-					<uui-toggle
-						data-mark="input:allow-access-to-all-document-blueprints"
-						style="margin-bottom: var(--uui-size-space-3);"
-						label=${this.localize.term('user_allowAccessToAllDocumentBlueprints')}
-						.checked=${this._documentBlueprintRootAccess}
-						@change=${this.#onAllowAllDocumentBlueprintsChange}></uui-toggle>
-				</div>
-				${when(
-					this._documentBlueprintRootAccess === false,
-					() => html`
-						<umb-input-document-blueprint
-							slot="editor"
-							.selection=${this._documentBlueprintStartNodeUniques.map((reference) => reference.unique)}
-							?folderOnly=${true}
-							@change=${this.#onDocumentBlueprintStartNodeChange}>
-						</umb-input-document-blueprint>
-					`,
-				)}
-			</umb-property-layout>
-		`;
-	}
-
-	#renderMediaAccess() {
-		return html`
-			<umb-property-layout
-				label=${this.localize.term('defaultdialogs_selectMediaStartNode')}
-				description=${this.localize.term('user_mediastartnodehelp')}>
-				<div slot="editor">
-					<uui-toggle
-						style="margin-bottom: var(--uui-size-space-3);"
-						label=${this.localize.term('user_allowAccessToAllMedia')}
-						.checked=${this._mediaRootAccess}
-						@change=${this.#onAllowAllMediaChange}></uui-toggle>
-				</div>
-				${when(
-					this._mediaRootAccess === false,
-					() => html`
-						<umb-input-media
-							slot="editor"
-							folder-filter="foldersOnly"
-							.selection=${this._mediaStartNodeUniques.map((reference) => reference.unique)}
-							@change=${this.#onMediaStartNodeChange}>
-						</umb-input-media>
-					`,
-				)}
-			</umb-property-layout>
-		`;
-	}
-
-	static override styles = [
-		UmbTextStyles,
+	static override readonly styles = [
 		css`
 			:host {
 				display: block;

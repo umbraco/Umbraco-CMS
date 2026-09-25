@@ -2,9 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Services.Entities;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.Common.Builders;
@@ -134,15 +132,21 @@ public abstract class UserStartNodeEntitiesServiceTestsBase : UmbracoIntegration
     /// <summary>
     /// Builds a user with the specified start node IDs (type-specific implementation).
     /// </summary>
-    protected abstract Cms.Core.Models.Membership.User BuildUserWithStartNodes(int[] startNodeIds);
+    /// <param name="startNodeIds">The start node IDs to assign to the user.</param>
+    /// <returns>The created user.</returns>
+    protected abstract Core.Models.Membership.User BuildUserWithStartNodes(int[] startNodeIds);
 
     /// <summary>
     /// Gets the start node paths for the user (type-specific implementation).
     /// </summary>
-    protected abstract string[]? GetStartNodePaths(Cms.Core.Models.Membership.User user);
+    /// <param name="user">The user to get the start node paths for.</param>
+    /// <returns>The start node paths, or null if none could be calculated.</returns>
+    protected abstract string[]? GetStartNodePaths(Core.Models.Membership.User user);
 
     /// <summary>
     /// Calculates the start node IDs for the user (type-specific implementation).
     /// </summary>
-    protected abstract int[]? CalculateStartNodeIds(Cms.Core.Models.Membership.User user);
+    /// <param name="user">The user to calculate the start node IDs for.</param>
+    /// <returns>The start node IDs, or null if none could be calculated.</returns>
+    protected abstract int[]? CalculateStartNodeIds(Core.Models.Membership.User user);
 }

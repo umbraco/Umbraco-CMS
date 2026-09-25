@@ -107,7 +107,9 @@ export class UmbDocumentTreeItemContext extends UmbDefaultTreeItemContext<
 		super.setTreeItem(treeItem);
 		this.#item.setData(treeItem);
 
-		const documentTypeUnique = treeItem?.documentType.unique;
+		// TODO (V20): drop the `documentType` fallback when the deprecated field is removed.
+		// eslint-disable-next-line @typescript-eslint/no-deprecated
+		const documentTypeUnique = (treeItem?.contentType ?? treeItem?.documentType)?.unique;
 
 		this.#entityContentTypeContext.setEntityType(documentTypeUnique ? UMB_DOCUMENT_TYPE_ENTITY_TYPE : undefined);
 		this.#entityContentTypeContext.setUnique(documentTypeUnique);
