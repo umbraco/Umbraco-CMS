@@ -1,6 +1,6 @@
 import type { Observable } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbReadOnlyVariantGuardManager } from '@umbraco-cms/backoffice/utils';
-import type { UmbEntityWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
+import type { UmbEntityWorkspaceContext, UmbNameWriteGuardManager } from '@umbraco-cms/backoffice/workspace';
 
 /**
  * The minimal contract a workspace context must satisfy for recycle-bin support to be plugged into it.
@@ -11,6 +11,7 @@ export interface UmbTrashableEntityWorkspaceContext extends UmbEntityWorkspaceCo
 	readonly isNew: Observable<boolean | undefined>;
 	readonly navigationParentItemPath: Observable<string | undefined>;
 	reload(): Promise<void>;
-	readonly readOnlyGuard: UmbReadOnlyVariantGuardManager;
+	readonly readOnlyGuard?: UmbReadOnlyVariantGuardManager;
+	readonly nameWriteGuard?: UmbNameWriteGuardManager;
 	resetData(): void;
 }
