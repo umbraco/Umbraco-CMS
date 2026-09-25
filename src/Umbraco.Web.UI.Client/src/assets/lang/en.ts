@@ -433,6 +433,8 @@ export default {
 		uploadNotAllowed: 'Upload is not allowed in this location.',
 		uploadValidationFailed: (mediaTypeName: string) =>
 			`The ${mediaTypeName} media type has one or more required properties. It will need to be uploaded individually via the 'Create' menu`,
+		sortLastUploadedFirst: 'Last uploaded first',
+		sortLastEditedOldest: 'Last edited (oldest first)',
 	},
 	member: {
 		'2fa': 'Two-Factor Authentication',

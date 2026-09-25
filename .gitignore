@@ -28,6 +28,7 @@
 [Rr]elease/
 
 # Tools
+.tools/
 _ReSharper*/
 _NCrunch_*/
 *.ncrunchsolution
