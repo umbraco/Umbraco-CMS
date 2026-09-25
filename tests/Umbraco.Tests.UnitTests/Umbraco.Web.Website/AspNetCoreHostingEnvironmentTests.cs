@@ -125,6 +125,110 @@ public class AspNetCoreHostingEnvironmentTests
         Assert.AreEqual(url, sut.ApplicationMainUrl);
     }
 
+    [TestCase("http://localhost:5000", "https://legit-site.com")]
+    [TestCase("https://127.0.0.1", "http://legit-site.com")]
+    [TestCase("http://[::1]:8080", "https://legit-site.com")]
+    public void EnsureApplicationMainUrl_FirstRequest_ReplacesLoopbackUrl(string loopback, string replacement)
+    {
+        var sut = CreateWithDefaultConfig(ApplicationUrlDetection.FirstRequest);
+
+        sut.EnsureApplicationMainUrl(new Uri(loopback));
+        sut.EnsureApplicationMainUrl(new Uri(replacement));
+
+        Assert.AreEqual(new Uri(replacement), sut.ApplicationMainUrl, "A loopback URL is never useful as the public URL and is replaced");
+    }
+
+    [Test]
+    public void EnsureApplicationMainUrl_FirstRequest_LoopbackDoesNotReplaceLoopback()
+    {
+        var sut = CreateWithDefaultConfig(ApplicationUrlDetection.FirstRequest);
+
+        var first = new Uri("http://localhost:5000");
+        sut.EnsureApplicationMainUrl(first);
+        sut.EnsureApplicationMainUrl(new Uri("http://127.0.0.1:5000"));
+
+        Assert.AreEqual(first, sut.ApplicationMainUrl);
+    }
+
+    [Test]
+    public void EnsureApplicationMainUrl_FirstRequest_LocksAfterLeavingLoopback()
+    {
+        var sut = CreateWithDefaultConfig(ApplicationUrlDetection.FirstRequest);
+
+        var legitimateUrl = new Uri("https://legit-site.com");
+        sut.EnsureApplicationMainUrl(new Uri("http://localhost:5000"));
+        sut.EnsureApplicationMainUrl(legitimateUrl);
+        sut.EnsureApplicationMainUrl(new Uri("https://non-configured-site.com"));
+
+        Assert.AreEqual(legitimateUrl, sut.ApplicationMainUrl, "Once a non-loopback URL is set, other hosts are ignored");
+    }
+
+    [TestCase("http://legit-site.com", "https://legit-site.com")]
+    [TestCase("http://legit-site.com:5000", "https://legit-site.com:5001")]
+    [TestCase("http://legit-site.com/site", "https://legit-site.com/site")]
+    [TestCase("http://LEGIT-SITE.com", "https://legit-site.com")]
+    [TestCase("http://localhost:5000", "https://localhost:5001")]
+    [TestCase("http://legit-site.com/Site", "https://legit-site.com/site")]
+    public void EnsureApplicationMainUrl_FirstRequest_UpgradesSameHostToHttps(string http, string https)
+    {
+        var sut = CreateWithDefaultConfig(ApplicationUrlDetection.FirstRequest);
+
+        sut.EnsureApplicationMainUrl(new Uri(http));
+        sut.EnsureApplicationMainUrl(new Uri(https));
+
+        Assert.AreEqual(new Uri(https), sut.ApplicationMainUrl, "HTTPS for the same host and path replaces HTTP");
+    }
+
+    [TestCase("http://legit-site.com", "https://non-configured-site.com")]
+    [TestCase("http://legit-site.com/site", "https://legit-site.com/other")]
+    [TestCase("http://legit-site.com", "http://non-configured-site.com")]
+    public void EnsureApplicationMainUrl_FirstRequest_HttpsForAnotherHostOrPathDoesNotUnlock(string http, string other)
+    {
+        var sut = CreateWithDefaultConfig(ApplicationUrlDetection.FirstRequest);
+
+        var locked = new Uri(http);
+        sut.EnsureApplicationMainUrl(locked);
+        sut.EnsureApplicationMainUrl(new Uri(other));
+
+        Assert.AreEqual(locked, sut.ApplicationMainUrl, "The upgrade path must not let a request change the host or path");
+    }
+
+    [Test]
+    public void EnsureApplicationMainUrl_FirstRequest_DoesNotDowngradeToHttp()
+    {
+        var sut = CreateWithDefaultConfig(ApplicationUrlDetection.FirstRequest);
+
+        var https = new Uri("https://legit-site.com");
+        sut.EnsureApplicationMainUrl(https);
+        sut.EnsureApplicationMainUrl(new Uri("http://legit-site.com"));
+
+        Assert.AreEqual(https, sut.ApplicationMainUrl);
+    }
+
+    [Test]
+    public void EnsureApplicationMainUrl_FirstRequest_ConcurrentUpgradesConvergeOnHttpsNonLoopback()
+    {
+        var sut = CreateWithDefaultConfig(ApplicationUrlDetection.FirstRequest);
+        sut.EnsureApplicationMainUrl(new Uri("http://localhost:5000"));
+
+        var candidates = new[]
+        {
+            new Uri("http://legit-site.com"),
+            new Uri("https://legit-site.com"),
+            new Uri("https://non-configured-site.com"),
+            new Uri("http://127.0.0.1:5000"),
+        };
+
+        Parallel.For(0, 1000, i => sut.EnsureApplicationMainUrl(candidates[i % candidates.Length]));
+
+        Assert.That(
+            sut.ApplicationMainUrl,
+            Is.EqualTo(new Uri("https://legit-site.com")).Or.EqualTo(new Uri("https://non-configured-site.com")),
+            "The first non-loopback host wins the lock; a same-host HTTPS request may then upgrade it, and no request may downgrade it or change the host afterwards");
+        Assert.AreEqual(Uri.UriSchemeHttps, sut.ApplicationMainUrl!.Scheme);
+        Assert.IsFalse(sut.ApplicationMainUrl.IsLoopback);
+    }
+
     [Test]
     public void EnsureApplicationMainUrl_NoneMode_NeverSetsUrl()
     {
@@ -188,6 +292,101 @@ public class AspNetCoreHostingEnvironmentTests
         sut.EnsureApplicationMainUrl(url);
 
         Assert.AreEqual(url, sut.ApplicationMainUrl, "Repeated same URL is a no-op");
+    }
+
+    [TestCase("https://site-a.com", "http://site-a.com")]
+    [TestCase("https://site-a.com", "http://site-b.com")]
+    public void EnsureApplicationMainUrl_EveryRequest_DoesNotDowngradeToHttp(string https, string http)
+    {
+        var sut = CreateWithDefaultConfig(ApplicationUrlDetection.EveryRequest);
+
+        sut.EnsureApplicationMainUrl(new Uri(https));
+        sut.EnsureApplicationMainUrl(new Uri(http));
+
+        Assert.AreEqual(new Uri(https), sut.ApplicationMainUrl, "An HTTPS URL is never replaced by an HTTP one");
+    }
+
+    [Test]
+    public void EnsureApplicationMainUrl_EveryRequest_StillSwitchesHostWhenUpgradingToHttps()
+    {
+        var sut = CreateWithDefaultConfig(ApplicationUrlDetection.EveryRequest);
+
+        var upgraded = new Uri("https://site-b.com");
+        sut.EnsureApplicationMainUrl(new Uri("http://site-a.com"));
+        sut.EnsureApplicationMainUrl(upgraded);
+
+        Assert.AreEqual(upgraded, sut.ApplicationMainUrl, "EveryRequest keeps switching hosts; only downgrades are refused");
+    }
+
+    [TestCase("http://site-a.com", "http://localhost")]
+    [TestCase("https://site-a.com", "https://127.0.0.1")]
+    [TestCase("http://site-a.com", "https://localhost:5001")]
+    public void EnsureApplicationMainUrl_EveryRequest_DoesNotReplaceWithLoopback(string real, string loopback)
+    {
+        var sut = CreateWithDefaultConfig(ApplicationUrlDetection.EveryRequest);
+
+        sut.EnsureApplicationMainUrl(new Uri(real));
+        sut.EnsureApplicationMainUrl(new Uri(loopback));
+
+        Assert.AreEqual(new Uri(real), sut.ApplicationMainUrl, "A loopback URL is never useful as the public URL");
+    }
+
+    [TestCase("http://localhost:5000", "https://site-a.com")]
+    [TestCase("https://localhost:5001", "http://site-a.com")]
+    public void EnsureApplicationMainUrl_EveryRequest_ReplacesLoopbackWithNonLoopback(string loopback, string real)
+    {
+        var sut = CreateWithDefaultConfig(ApplicationUrlDetection.EveryRequest);
+
+        sut.EnsureApplicationMainUrl(new Uri(loopback));
+        sut.EnsureApplicationMainUrl(new Uri(real));
+
+        Assert.AreEqual(new Uri(real), sut.ApplicationMainUrl, "Leaving loopback wins even when the scheme goes from HTTPS to HTTP");
+    }
+
+    [Test]
+    public void EnsureApplicationMainUrl_EveryRequest_LoopbackToLoopbackFollowsSchemeRule()
+    {
+        var sut = CreateWithDefaultConfig(ApplicationUrlDetection.EveryRequest);
+
+        var https = new Uri("https://localhost:5001");
+        sut.EnsureApplicationMainUrl(https);
+        sut.EnsureApplicationMainUrl(new Uri("http://localhost:5000"));
+
+        Assert.AreEqual(https, sut.ApplicationMainUrl);
+    }
+
+    [Test]
+    public void EnsureApplicationMainUrl_EveryRequest_LoopbackToLoopbackWithSameSchemeStillSwitches()
+    {
+        var sut = CreateWithDefaultConfig(ApplicationUrlDetection.EveryRequest);
+
+        var second = new Uri("http://127.0.0.1:5000");
+        sut.EnsureApplicationMainUrl(new Uri("http://localhost:5000"));
+        sut.EnsureApplicationMainUrl(second);
+
+        Assert.AreEqual(second, sut.ApplicationMainUrl, "Between two loopback URLs the legacy host switch still applies");
+    }
+
+    [Test]
+    public void EnsureApplicationMainUrl_EveryRequest_ConcurrentRequestsNeverDowngrade()
+    {
+        var sut = CreateWithDefaultConfig(ApplicationUrlDetection.EveryRequest);
+        sut.EnsureApplicationMainUrl(new Uri("http://site-a.com"));
+
+        var candidates = new[]
+        {
+            new Uri("https://site-b.com"),
+            new Uri("http://site-c.com"),
+            new Uri("http://localhost:5000"),
+            new Uri("https://127.0.0.1"),
+        };
+
+        Parallel.For(0, 1000, i => sut.EnsureApplicationMainUrl(candidates[i % candidates.Length]));
+
+        Assert.AreEqual(
+            new Uri("https://site-b.com"),
+            sut.ApplicationMainUrl,
+            "Once an HTTPS non-loopback host has been applied, no interleaving may apply an HTTP or loopback candidate over it");
     }
 
     [Test]
