@@ -4,10 +4,33 @@ import type { UmbTreeItemModelBase } from '../types.js';
 import { expect, waitUntil } from '@open-wc/testing';
 import { ignoreResizeObserverLoopErrors } from '@umbraco-cms/internal/test-utils';
 import { UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
+import { UmbTreeItemOpenEvent } from '../tree-item/events/tree-item-open.event.js';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type { ManifestSearchProvider, UmbSearchProvider } from '@umbraco-cms/backoffice/search';
 
 const SEARCH_PROVIDER_ALIAS = 'Umb.Test.TreePickerModal.SearchProvider';
+const TREE_ALIAS = 'Umb.Test.TreePickerModal.Tree';
+const TREE_REPOSITORY_ALIAS = 'Umb.Test.TreePickerModal.TreeRepository';
+
+const ROOT = { unique: null, entityType: 'test-root', name: 'Root' };
+
+/** Knows one node, so anything else is a node the tree does not have. */
+class UmbTestTreeRepository {
+	async requestTreeRoot() {
+		return { data: ROOT };
+	}
+
+	async requestTreeItemAncestors({ treeItem }: { treeItem: { unique: string } }) {
+		return {
+			data:
+				treeItem.unique === 'known'
+					? [{ unique: 'known', entityType: 'test-item', name: 'Known', hasChildren: true, isFolder: false }]
+					: [],
+		};
+	}
+
+	destroy() {}
+}
 
 class UmbTestSearchProvider implements UmbSearchProvider {
 	async search() {
@@ -31,17 +54,33 @@ describe('UmbTreePickerModalElement', () => {
 			api: UmbTestSearchProvider,
 		} as ManifestSearchProvider);
 
+		umbExtensionsRegistry.registerMany([
+			{ type: 'repository', alias: TREE_REPOSITORY_ALIAS, name: 'Test Tree Repository', api: UmbTestTreeRepository },
+			{ type: 'tree', alias: TREE_ALIAS, name: 'Test Tree', meta: { repositoryAlias: TREE_REPOSITORY_ALIAS } },
+		] as Array<never>);
+
 		element = new UmbTreePickerModalElement<UmbTreeItemModelBase>();
 	});
 
 	afterEach(() => {
 		element.remove();
 		umbExtensionsRegistry.unregister(SEARCH_PROVIDER_ALIAS);
+		umbExtensionsRegistry.unregister(TREE_ALIAS);
+		umbExtensionsRegistry.unregister(TREE_REPOSITORY_ALIAS);
 		restoreErrorHandler();
 	});
 
 	function getTabs() {
 		return element.shadowRoot?.querySelector('uui-tab-group');
+	}
+
+	function getCrumbs() {
+		const breadcrumb = element.shadowRoot?.querySelector('umb-tree-item-picker-breadcrumb');
+		return [...(breadcrumb?.shadowRoot?.querySelectorAll('uui-breadcrumb-item') ?? [])];
+	}
+
+	function getNotFound() {
+		return element.shadowRoot?.querySelector('#not-found');
 	}
 
 	function getPane(id: 'browse' | 'search') {
@@ -113,6 +152,27 @@ describe('UmbTreePickerModalElement', () => {
 			await clickTab('search');
 
 			expect(getPane('browse')?.querySelector('umb-tree')).to.equal(tree);
+		});
+	});
+
+	// The location manager reports a node it cannot resolve as `null`, which must not be read as "still loading" — the
+	// modal has to say so rather than leave the tree standing at a level the user did not browse to.
+	describe('browsing to a node the tree does not have', () => {
+		beforeEach(async () => {
+			await setup({ treeAlias: TREE_ALIAS });
+			// The initial trail has to be in place first, or the load that establishes it lands after the navigation.
+			await waitUntil(() => getCrumbs().length === 1, 'the root breadcrumb was never loaded');
+
+			element.dispatchEvent(new UmbTreeItemOpenEvent({ unique: 'gone', entityType: 'test-item' }));
+			await waitUntil(() => !!getNotFound(), 'the not-found state was never rendered');
+		});
+
+		it('renders the not-found state instead of the tree', () => {
+			expect(getPane('browse')?.querySelector('umb-tree')).to.not.exist;
+		});
+
+		it('keeps the breadcrumb, so the user can browse back out', () => {
+			expect(getPane('browse')?.querySelector('umb-tree-item-picker-breadcrumb')).to.exist;
 		});
 	});
 

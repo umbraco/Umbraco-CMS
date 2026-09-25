@@ -989,6 +989,7 @@ export default {
 		status: 'Status',
 		submit: 'Submit',
 		success: 'Success',
+		switchView: 'Switch view',
 		type: 'Type',
 		typeName: 'Type Name',
 		typeToSearch: 'Type to search...',
