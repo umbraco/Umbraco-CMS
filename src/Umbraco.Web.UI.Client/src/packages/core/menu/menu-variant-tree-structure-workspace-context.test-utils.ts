@@ -65,11 +65,12 @@ export const createTestVariantTreeRepositoryManifest = (alias: string): Manifest
 export function createTestVariantAncestorItem(
 	entity: UmbEntityModel,
 	name = entity.unique ?? 'unnamed',
+	isFolder = false,
 ): UmbTestVariantTreeItemModel {
 	return {
 		...entity,
 		name,
-		isFolder: false,
+		isFolder,
 		hasChildren: false,
 		parent: { unique: null, entityType: 'test-root-entity-type' },
 		variants: [{ name, culture: null, segment: null }],
