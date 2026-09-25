@@ -13,13 +13,14 @@ namespace Umbraco.Cms.Core.Cache;
 /// <typeparam name="TEntity">The type of the entity.</typeparam>
 /// <remarks>
 ///     <para>
-///         The synchronous NPoco repositories cache their Guid-keyed reads under the
-///         <c>"uRepoGuid_{TypeName}_"</c> prefix (see <see cref="GuidReadRepositoryCachePolicy{TEntity}" />), and
-///         <c>ContentCacheRefresher</c> already clears that exact prefix on every save/refresh. The base
-///         <see cref="AsyncDefaultRepositoryCachePolicy{TEntity, TKey}" /> instead defaults to the int-style
-///         <c>"uRepo_{TypeName}_"</c> prefix even when keyed by <see cref="Guid" />, so its entries were never
-///         invalidated by the existing NPoco-side clearing logic. This policy reuses the exact same
-///         <c>"uRepoGuid_"</c> prefix so async reads share the already-correct invalidation wiring.
+///         Guid-keyed reads are cached under the <c>"uRepoGuid_{TypeName}_"</c> prefix (see
+///         <see cref="GuidReadRepositoryCachePolicy{TEntity}" />), and <c>ContentCacheRefresher</c> clears a
+///         refreshed item by its exact key under that prefix; a branch refresh or removal clears by matching on
+///         the cached entities' paths instead. The base
+///         <see cref="AsyncDefaultRepositoryCachePolicy{TEntity, TKey}" /> defaults to the int-style
+///         <c>"uRepo_{TypeName}_"</c> prefix even when keyed by <see cref="Guid" />, which that refresher never
+///         touches. This policy uses the same <c>"uRepoGuid_"</c> prefix so its entries are the ones the
+///         refresher clears.
 ///     </para>
 ///     <para>
 ///         The base also keys its writes by the entity's integer identifier, which under a Guid-keyed prefix

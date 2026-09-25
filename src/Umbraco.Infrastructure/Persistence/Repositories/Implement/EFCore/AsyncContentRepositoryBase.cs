@@ -129,8 +129,10 @@ internal abstract class AsyncContentRepositoryBase<TEntity, TRepository>
     /// </summary>
     /// <remarks>
     ///     Two repositories over the same entity type would otherwise share one prefix, and each could serve
-    ///     entries the other cached. ContentCacheRefresher clears by prefix, so a longer prefix that starts
-    ///     with this one is still invalidated.
+    ///     entries the other cached. ContentCacheRefresher clears a refreshed item by its exact key under the
+    ///     default prefix, so entries filed under a longer prefix are not reached by it; only a branch refresh
+    ///     or removal, which matches on the cached entities' paths, clears those. A repository with its own
+    ///     prefix therefore clears its own entries as it persists.
     /// </remarks>
     protected virtual string EntityTypeCacheKeyPrefix => RepositoryCacheKeys.GetGuidKey<TEntity>();
 
@@ -217,8 +219,8 @@ internal abstract class AsyncContentRepositoryBase<TEntity, TRepository>
         var versionId = await AmbientScope.ExecuteWithContextAsync(async db =>
         {
             return await db.ContentVersions
-                .Where(x => x.Key == versionKey)
-                .Select(x => x.Id)
+                .Where(contentVersion => contentVersion.Key == versionKey)
+                .Select(contentVersion => contentVersion.Id)
                 .FirstOrDefaultAsync(cancellationToken);
         });
 
@@ -241,8 +243,8 @@ internal abstract class AsyncContentRepositoryBase<TEntity, TRepository>
         {
             return await db.ContentVersions
                 .Join(db.Nodes, version => version.NodeId, node => node.NodeId, (version, node) => new { version, node })
-                .Where(x => x.node.UniqueId == nodeKey && !x.version.Current && x.version.VersionDate < versionDate)
-                .Select(x => x.version.Id)
+                .Where(joined => joined.node.UniqueId == nodeKey && !joined.version.Current && joined.version.VersionDate < versionDate)
+                .Select(joined => joined.version.Id)
                 .ToListAsync(cancellationToken);
         });
 
@@ -393,10 +395,10 @@ internal abstract class AsyncContentRepositoryBase<TEntity, TRepository>
             var lastLevel = -1;
 
             List<NodeDto> nodes = await db.Nodes
-                .Where(n => n.NodeObjectType == NodeObjectTypeKey)
-                .OrderBy(n => n.Level)
-                .ThenBy(n => n.ParentId)
-                .ThenBy(n => n.SortOrder)
+                .Where(node => node.NodeObjectType == NodeObjectTypeKey)
+                .OrderBy(node => node.Level)
+                .ThenBy(node => node.ParentId)
+                .ThenBy(node => node.SortOrder)
                 .ToListAsync(cancellationToken);
 
             foreach (NodeDto node in nodes)
@@ -412,7 +414,7 @@ internal abstract class AsyncContentRepositoryBase<TEntity, TRepository>
 
                 string[] pathParts = node.Path
                     .Split(Constants.CharArrays.Comma)
-                    .Where(x => !rootIds.Contains(int.Parse(x, CultureInfo.InvariantCulture)))
+                    .Where(pathPart => !rootIds.Contains(int.Parse(pathPart, CultureInfo.InvariantCulture)))
                     .ToArray();
 
                 ContentDataIntegrityReport.IssueType? issue = null;
@@ -470,11 +472,11 @@ internal abstract class AsyncContentRepositoryBase<TEntity, TRepository>
                 foreach (NodeDto node in updated)
                 {
                     await db.Nodes
-                        .Where(n => n.NodeId == node.NodeId)
+                        .Where(storedNode => storedNode.NodeId == node.NodeId)
                         .ExecuteUpdateAsync(
-                            s => s
-                                .SetProperty(n => n.Level, node.Level)
-                                .SetProperty(n => n.Path, node.Path),
+                            setters => setters
+                                .SetProperty(storedNode => storedNode.Level, node.Level)
+                                .SetProperty(storedNode => storedNode.Path, node.Path),
                             cancellationToken);
 
                     if (report.TryGetValue(node.NodeId, out ContentDataIntegrityReportEntry? entry))

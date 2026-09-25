@@ -1379,6 +1379,177 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
             "items must sort by ascending content-type alias, proving the null-guarded ContentType join is actually used for ordering, not silently ignored");
     }
 
+    /// <summary>
+    ///     Creates a second backoffice user, so documents can carry a creator or writer other than the super user. The
+    ///     login sorts after the super user's under any collation, which the user-name ordering tests rely on.
+    /// </summary>
+    private async Task<IUser> CreateSecondUserAsync()
+    {
+        Attempt<UserCreationResult, UserOperationStatus> creation = await GetRequiredService<IUserService>().CreateAsync(
+            Constants.Security.SuperUserKey,
+            new UserCreateModel
+            {
+                UserName = "zzz-second-user@example.com",
+                Email = "zzz-second-user@example.com",
+                Name = "Second User",
+                UserGroupKeys = new HashSet<Guid> { Constants.Security.AdminGroupKey },
+            },
+            approveUser: true);
+
+        Assert.That(creation.Success, Is.True, $"could not create the second user: {creation.Status}");
+        return creation.Result.CreatedUser!;
+    }
+
+    /// <summary>
+    ///     Saves a child under <paramref name="parent" /> as <paramref name="createdBy" />, then saves it again as
+    ///     <paramref name="lastWrittenBy" />, so its creator and writer can be made to differ.
+    /// </summary>
+    private async Task<IContent> CreateChildWithDistinctCreatorAndWriterAsync(IContent parent, string name, Guid createdBy, Guid lastWrittenBy)
+    {
+        IContent child = ContentBuilder.CreateSimpleContent(_contentType, name, parent.Id);
+        await ContentService.SaveAsync(child, createdBy, null, CancellationToken.None);
+
+        child.SetValue("title", $"{name} edited");
+        await ContentService.SaveAsync(child, lastWrittenBy, null, CancellationToken.None);
+        return child;
+    }
+
+    /// <summary>
+    ///     Owner and updater order by the user's name, looked up from the users table inside the query, rather than by
+    ///     the user id the row carries or by the children's own sort order. Three children whose creator and writer
+    ///     differ pin down which user each ordering reads: the first is created by the super user and last written by
+    ///     the second user, the second is the reverse, and the third is the super user's throughout. Every expected
+    ///     order differs from plain creation order in both directions, so a fallback to sort order cannot pass.
+    /// </summary>
+    [TestCase("owner", Direction.Ascending, new[] { 0, 2, 1 })]
+    [TestCase("owner", Direction.Descending, new[] { 1, 0, 2 })]
+    [TestCase("updater", Direction.Ascending, new[] { 1, 2, 0 })]
+    [TestCase("updater", Direction.Descending, new[] { 0, 1, 2 })]
+    public async Task GetChildrenAsync_OrderedByUser_SortsByUserNameThenNodeId(string orderBy, Direction direction, int[] expectedChildIndexes)
+    {
+        IUser superUser = (await GetRequiredService<IUserService>().GetAsync(Constants.Security.SuperUserKey))!;
+        IUser secondUser = await CreateSecondUserAsync();
+        Assert.That(
+            string.Compare(superUser.Username, secondUser.Username, StringComparison.OrdinalIgnoreCase),
+            Is.LessThan(0),
+            "the expected orders assume the super user's login sorts before the second user's");
+
+        IContent parent = ContentBuilder.CreateSimpleContent(_contentType, "User Ordering Parent");
+        await ContentService.SaveAsync(parent, Constants.Security.SuperUserKey, null, CancellationToken.None);
+
+        IContent[] children =
+        [
+            await CreateChildWithDistinctCreatorAndWriterAsync(parent, "Child 0", createdBy: Constants.Security.SuperUserKey, lastWrittenBy: secondUser.Key),
+            await CreateChildWithDistinctCreatorAndWriterAsync(parent, "Child 1", createdBy: secondUser.Key, lastWrittenBy: Constants.Security.SuperUserKey),
+            await CreateChildWithDistinctCreatorAndWriterAsync(parent, "Child 2", createdBy: Constants.Security.SuperUserKey, lastWrittenBy: Constants.Security.SuperUserKey),
+        ];
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        PagedModel<IContent> result = await repository.GetChildrenAsync(
+            parent.Key, skip: 0, take: 100, propertyAliases: null, ordering: Ordering.By(orderBy, direction), CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(
+            result.Items.Select(child => child.Key),
+            Is.EqualTo(expectedChildIndexes.Select(index => children[index].Key)),
+            $"children ordered by {orderBy} {direction} must follow the user names, breaking ties by ascending node id");
+    }
+
+    private async Task<(IContent Parent, Guid[] ChildKeys)> CreateParentWithChildrenAsync(string name, int childCount)
+    {
+        IContent parent = ContentBuilder.CreateSimpleContent(_contentType, name);
+        await ContentService.SaveAsync(parent, Constants.Security.SuperUserKey, null, CancellationToken.None);
+
+        var childKeys = new List<Guid>();
+        for (var index = 0; index < childCount; index++)
+        {
+            IContent child = ContentBuilder.CreateSimpleContent(_contentType, $"{name} Child {index}", parent.Id);
+            await ContentService.SaveAsync(child, Constants.Security.SuperUserKey, null, CancellationToken.None);
+            childKeys.Add(child.Key);
+        }
+
+        return (parent, childKeys.ToArray());
+    }
+
+    /// <summary>
+    ///     A page of children is hydrated from a fixed set of queries, so a page of ten must cost exactly as many
+    ///     commands as a page of one. A count that grows with the page is a per-item round trip. The comparison is the
+    ///     assertion; the absolute count is an implementation detail.
+    /// </summary>
+    [Test]
+    public async Task GetChildrenAsync_CommandCount_DoesNotGrowWithTheNumberOfChildren()
+    {
+        (IContent parentOfOne, _) = await CreateParentWithChildrenAsync("Parent Of One", childCount: 1);
+        (IContent parentOfTen, _) = await CreateParentWithChildrenAsync("Parent Of Ten", childCount: 10);
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        // The first read pays one-off costs - content type hydration, id/key mapping - that would otherwise
+        // land on whichever page happened to be read first and swamp the comparison.
+        await repository.GetChildrenAsync(
+            _textpage.Key, skip: 0, take: 100, propertyAliases: null, ordering: Ordering.By("sortOrder"), CancellationToken.None);
+
+        CommandCounter.Enabled = true;
+        CommandCounter.Reset();
+        PagedModel<IContent> pageOfOne = await repository.GetChildrenAsync(
+            parentOfOne.Key, skip: 0, take: 100, propertyAliases: null, ordering: Ordering.By("sortOrder"), CancellationToken.None);
+        var oneChildCount = CommandCounter.Count;
+
+        CommandCounter.Reset();
+        PagedModel<IContent> pageOfTen = await repository.GetChildrenAsync(
+            parentOfTen.Key, skip: 0, take: 100, propertyAliases: null, ordering: Ordering.By("sortOrder"), CancellationToken.None);
+        var tenChildrenCount = CommandCounter.Count;
+        var tenChildrenCommands = string.Join(" | ", CommandCounter.Commands);
+        CommandCounter.Enabled = false;
+        scope.Complete();
+
+        Assert.That(pageOfOne.Items.Count(), Is.EqualTo(1));
+        Assert.That(pageOfTen.Items.Count(), Is.EqualTo(10));
+        Assert.That(
+            tenChildrenCount,
+            Is.EqualTo(oneChildCount),
+            $"reading ten children cost {tenChildrenCount} commands against {oneChildCount} for one child, so something is "
+            + $"being fetched per item. Commands: {tenChildrenCommands}");
+    }
+
+    /// <summary>
+    ///     The same rule for a read by keys: ten keys must cost exactly as many commands as one.
+    /// </summary>
+    [Test]
+    public async Task GetManyAsync_CommandCount_DoesNotGrowWithTheNumberOfKeys()
+    {
+        (_, Guid[] oneKey) = await CreateParentWithChildrenAsync("Parent Of One", childCount: 1);
+        (_, Guid[] tenKeys) = await CreateParentWithChildrenAsync("Parent Of Ten", childCount: 10);
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        await repository.GetManyAsync([_textpage.Key], CancellationToken.None);
+
+        CommandCounter.Enabled = true;
+        CommandCounter.Reset();
+        IEnumerable<IContent> oneDocument = await repository.GetManyAsync(oneKey, CancellationToken.None);
+        var oneKeyCount = CommandCounter.Count;
+
+        CommandCounter.Reset();
+        IEnumerable<IContent> tenDocuments = await repository.GetManyAsync(tenKeys, CancellationToken.None);
+        var tenKeysCount = CommandCounter.Count;
+        var tenKeysCommands = string.Join(" | ", CommandCounter.Commands);
+        CommandCounter.Enabled = false;
+        scope.Complete();
+
+        Assert.That(oneDocument.Count(), Is.EqualTo(1));
+        Assert.That(tenDocuments.Count(), Is.EqualTo(10));
+        Assert.That(
+            tenKeysCount,
+            Is.EqualTo(oneKeyCount),
+            $"reading ten documents cost {tenKeysCount} commands against {oneKeyCount} for one, so something is "
+            + $"being fetched per item. Commands: {tenKeysCommands}");
+    }
+
     [Test]
     public async Task GetChildrenAsync_WithNullParentKey_ReturnsRootContent()
     {

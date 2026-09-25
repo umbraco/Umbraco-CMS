@@ -1,4 +1,5 @@
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.EFCore;
@@ -31,7 +32,16 @@ internal sealed class DocumentRepositoryOrderingTests
         CreateRow(nodeId: 100, sortOrder: 2, path: "-1,999"),
     ];
 
-    private static DocumentRepository.DocumentJoinRow CreateRow(int nodeId, int sortOrder, string path) =>
+    // The user with the LOWER id has the LATER name, so ordering by user id and ordering by user name give
+    // opposite results. Creator and writer are swapped between the two rows, so "owner" and "updater" also
+    // disagree with each other, and neither ascending result matches the source sequence order.
+    private static List<DocumentRepository.DocumentJoinRow> CreateRowsWithDistinctCreatorAndWriter() =>
+    [
+        CreateRow(nodeId: 200, sortOrder: 0, path: "-1,999", creatorUserId: 5, writerUserId: 1),
+        CreateRow(nodeId: 100, sortOrder: 0, path: "-1,999", creatorUserId: 1, writerUserId: 5),
+    ];
+
+    private static DocumentRepository.DocumentJoinRow CreateRow(int nodeId, int sortOrder, string path, int creatorUserId = -1, int? writerUserId = null) =>
         new()
         {
             Node = new NodeDto
@@ -41,16 +51,20 @@ internal sealed class DocumentRepositoryOrderingTests
                 Text = "Same",
                 Path = path,
                 CreateDate = DateTime.MinValue,
-                UserId = -1,
+                UserId = creatorUserId,
             },
             Document = new DocumentDto { NodeId = nodeId },
             Content = new ContentDto { NodeId = nodeId },
-            ContentVersion = new ContentVersionDto { NodeId = nodeId, VersionDate = DateTime.MinValue },
+            ContentVersion = new ContentVersionDto { NodeId = nodeId, VersionDate = DateTime.MinValue, UserId = writerUserId },
             DocumentVersion = new DocumentVersionDto { Published = false },
             ContentType = new ContentTypeDto { Alias = "alias" },
         };
 
-    private static readonly List<UserDto> _users = [];
+    private static readonly List<UserDto> _users =
+    [
+        new() { Id = 5, UserName = "aaa" },
+        new() { Id = 1, UserName = "zzz" },
+    ];
 
     private static List<int> ApplyOrderingAndGetNodeIds(Ordering? ordering, List<DocumentRepository.DocumentJoinRow>? rows = null)
     {
@@ -103,6 +117,7 @@ internal sealed class DocumentRepositoryOrderingTests
             "tied Path must break the tie by ascending NodeId — a missing \"path\" case would instead fall " +
             "through to the SortOrder default and produce {200, 100}");
     }
+
     [Test]
     public void ApplyDocumentOrdering_UnknownField_IsRejected()
     {
@@ -111,14 +126,16 @@ internal sealed class DocumentRepositoryOrderingTests
             "ordering by an unsupported field must be reported rather than quietly served in sort order");
     }
 
-    [Test]
-    public void ApplyDocumentOrdering_NoOrdering_FallsBackToSortOrder()
+    [TestCase("owner", Direction.Ascending, new[] { 200, 100 })]
+    [TestCase("owner", Direction.Descending, new[] { 100, 200 })]
+    [TestCase("updater", Direction.Ascending, new[] { 100, 200 })]
+    [TestCase("updater", Direction.Descending, new[] { 200, 100 })]
+    public void ApplyDocumentOrdering_ByUser_OrdersByUserNameNotUserId(string orderBy, Direction direction, int[] expectedNodeIds)
     {
-        // Distinct from an unsupported field: callers that pass no ordering at all are asking for the
-        // repository's natural order, and must not be rejected.
-        List<int> nodeIds = ApplyOrderingAndGetNodeIds(ordering: null);
+        List<int> nodeIds = ApplyOrderingAndGetNodeIds(Ordering.By(orderBy, direction), CreateRowsWithDistinctCreatorAndWriter());
 
-        Assert.That(nodeIds, Is.EqualTo(new[] { 100, 200 }));
+        Assert.That(nodeIds, Is.EqualTo(expectedNodeIds),
+            $"{orderBy} must order by the user's name resolved from the users sequence - ordering by the user id the row carries gives the reverse");
     }
 
     [Test]
@@ -152,5 +169,4 @@ internal sealed class DocumentRepositoryOrderingTests
                 "the tiebreak stays ascending on node id even when the name ordering is descending");
         });
     }
-
 }

@@ -164,19 +164,19 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
             }
 
             await db.PropertyData
-                .Where(x => x.VersionId == versionId)
+                .Where(propertyData => propertyData.VersionId == versionId)
                 .ExecuteDeleteAsync(cancellationToken);
 
             await db.ContentVersionCultureVariations
-                .Where(x => x.VersionId == versionId)
+                .Where(cultureVariation => cultureVariation.VersionId == versionId)
                 .ExecuteDeleteAsync(cancellationToken);
 
             await db.Set<TContentVersionDto>()
-                .Where(x => x.Id == versionId)
+                .Where(entityVersion => entityVersion.Id == versionId)
                 .ExecuteDeleteAsync(cancellationToken);
 
             await db.ContentVersions
-                .Where(x => x.Id == versionId)
+                .Where(contentVersion => contentVersion.Id == versionId)
                 .ExecuteDeleteAsync(cancellationToken);
 
             return true;
@@ -200,25 +200,25 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
         {
             await PersistEntitySpecificDeleteClausesAsync(db, nodeId);
 
-            await db.ContentSchedules.Where(x => x.NodeId == nodeId).ExecuteDeleteAsync();
-            await db.User2NodeNotifies.Where(x => x.NodeId == nodeId).ExecuteDeleteAsync();
+            await db.ContentSchedules.Where(contentSchedule => contentSchedule.NodeId == nodeId).ExecuteDeleteAsync();
+            await db.User2NodeNotifies.Where(notification => notification.NodeId == nodeId).ExecuteDeleteAsync();
 
-            IQueryable<Guid> uniqueIdQuery = db.Nodes.Where(n => n.NodeId == nodeId).Select(n => n.UniqueId);
+            IQueryable<Guid> uniqueIdQuery = db.Nodes.Where(node => node.NodeId == nodeId).Select(node => node.UniqueId);
             await db.UserGroup2GranularPermissions
-                .Where(x => x.UniqueId.HasValue && uniqueIdQuery.Contains(x.UniqueId.Value))
+                .Where(granularPermission => granularPermission.UniqueId.HasValue && uniqueIdQuery.Contains(granularPermission.UniqueId.Value))
                 .ExecuteDeleteAsync();
 
-            await db.UserStartNodes.Where(x => x.StartNode == nodeId).ExecuteDeleteAsync();
-            await db.Relations.Where(x => x.ParentId == nodeId).ExecuteDeleteAsync();
-            await db.Relations.Where(x => x.ChildId == nodeId).ExecuteDeleteAsync();
-            await db.TagRelationships.Where(x => x.NodeId == nodeId).ExecuteDeleteAsync();
+            await db.UserStartNodes.Where(startNode => startNode.StartNode == nodeId).ExecuteDeleteAsync();
+            await db.Relations.Where(relation => relation.ParentId == nodeId).ExecuteDeleteAsync();
+            await db.Relations.Where(relation => relation.ChildId == nodeId).ExecuteDeleteAsync();
+            await db.TagRelationships.Where(tagRelationship => tagRelationship.NodeId == nodeId).ExecuteDeleteAsync();
 
-            IQueryable<int> versionIdQuery = db.ContentVersions.Where(x => x.NodeId == nodeId).Select(x => x.Id);
-            await db.PropertyData.Where(x => versionIdQuery.Contains(x.VersionId)).ExecuteDeleteAsync();
-            await db.ContentVersionCultureVariations.Where(x => versionIdQuery.Contains(x.VersionId)).ExecuteDeleteAsync();
-            await db.ContentVersions.Where(x => x.NodeId == nodeId).ExecuteDeleteAsync();
-            await db.Content.Where(x => x.NodeId == nodeId).ExecuteDeleteAsync();
-            await db.Nodes.Where(x => x.NodeId == nodeId).ExecuteDeleteAsync();
+            IQueryable<int> versionIdQuery = db.ContentVersions.Where(contentVersion => contentVersion.NodeId == nodeId).Select(contentVersion => contentVersion.Id);
+            await db.PropertyData.Where(propertyData => versionIdQuery.Contains(propertyData.VersionId)).ExecuteDeleteAsync();
+            await db.ContentVersionCultureVariations.Where(cultureVariation => versionIdQuery.Contains(cultureVariation.VersionId)).ExecuteDeleteAsync();
+            await db.ContentVersions.Where(contentVersion => contentVersion.NodeId == nodeId).ExecuteDeleteAsync();
+            await db.Content.Where(content => content.NodeId == nodeId).ExecuteDeleteAsync();
+            await db.Nodes.Where(node => node.NodeId == nodeId).ExecuteDeleteAsync();
 
             return true;
         });
@@ -252,7 +252,7 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
             }
 
             List<ContentScheduleDto> rows = await db.ContentSchedules
-                .Where(cs => cs.NodeId == nodeId)
+                .Where(contentSchedule => contentSchedule.NodeId == nodeId)
                 .ToListAsync(cancellationToken);
 
             foreach (ContentScheduleDto row in rows)
@@ -272,8 +272,8 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
             // PersistUpdatedPropertyDataAsync.
             Dictionary<Guid, ContentScheduleDto> existing = await db.ContentSchedules
                 .AsTracking()
-                .Where(cs => cs.NodeId == content.Id)
-                .ToDictionaryAsync(cs => cs.Id, cancellationToken);
+                .Where(contentSchedule => contentSchedule.NodeId == content.Id)
+                .ToDictionaryAsync(contentSchedule => contentSchedule.Id, cancellationToken);
 
             var keepIds = new HashSet<Guid>();
 
@@ -319,7 +319,7 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
         AmbientScope.ExecuteWithContextAsync<object>(async db =>
         {
             await db.ContentSchedules
-                .Where(cs => cs.Date <= date)
+                .Where(contentSchedule => contentSchedule.Date <= date)
                 .Where(IsForThisObjectType(db))
                 .ExecuteDeleteAsync(cancellationToken);
         });
@@ -330,7 +330,7 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
         {
             string actionString = action.ToString();
             await db.ContentSchedules
-                .Where(cs => cs.Date <= date && cs.Action == actionString)
+                .Where(contentSchedule => contentSchedule.Date <= date && contentSchedule.Action == actionString)
                 .Where(IsForThisObjectType(db))
                 .ExecuteDeleteAsync(cancellationToken);
         });
@@ -348,7 +348,7 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
         {
             string actionString = action.ToString();
             return db.ContentSchedules
-                .Where(cs => cs.Action == actionString && cs.Date <= date)
+                .Where(contentSchedule => contentSchedule.Action == actionString && contentSchedule.Date <= date)
                 .AnyAsync(IsForThisObjectType(db), cancellationToken);
         });
 
@@ -356,7 +356,7 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
     // ContentScheduleDto against belonging to this repository's entity kind, since ContentSchedules
     // itself carries no object-type column of its own.
     private Expression<Func<ContentScheduleDto, bool>> IsForThisObjectType(UmbracoDbContext db) =>
-        cs => db.Nodes.Any(n => n.NodeId == cs.NodeId && n.NodeObjectType == NodeObjectTypeKey);
+        contentSchedule => db.Nodes.Any(node => node.NodeId == contentSchedule.NodeId && node.NodeObjectType == NodeObjectTypeKey);
 
     /// <inheritdoc />
     public virtual Task<IEnumerable<TEntity>> GetContentForExpirationAsync(DateTime date, CancellationToken cancellationToken) =>
@@ -371,8 +371,8 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
         {
             string actionString = action.ToString();
             List<Guid> keys = await db.ContentSchedules
-                .Where(cs => cs.Action == actionString && cs.Date <= date)
-                .Join(db.Nodes.Where(n => n.NodeObjectType == NodeObjectTypeKey), cs => cs.NodeId, n => n.NodeId, (cs, n) => n.UniqueId)
+                .Where(contentSchedule => contentSchedule.Action == actionString && contentSchedule.Date <= date)
+                .Join(db.Nodes.Where(node => node.NodeObjectType == NodeObjectTypeKey), contentSchedule => contentSchedule.NodeId, node => node.NodeId, (contentSchedule, node) => node.UniqueId)
                 .Distinct()
                 .ToListAsync(cancellationToken);
 
@@ -408,7 +408,7 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
         AmbientScope.ExecuteWithContextAsync(async db =>
         {
             IQueryable<NodeDto> query = PublishedNodes(db)
-                .Where(n => n.NodeObjectType == NodeObjectTypeKey && !n.Trashed);
+                .Where(node => node.NodeObjectType == NodeObjectTypeKey && !node.Trashed);
 
             if (!string.IsNullOrWhiteSpace(contentTypeAlias))
             {
@@ -427,7 +427,7 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
     ///     overrides in concrete repositories can reuse it.
     /// </remarks>
     protected static IQueryable<NodeDto> PublishedNodes(UmbracoDbContext db) =>
-        db.Nodes.Join(db.Set<TEntityDto>().Where(e => e.Published), n => n.NodeId, e => e.NodeId, (n, e) => n);
+        db.Nodes.Join(db.Set<TEntityDto>().Where(entityDto => entityDto.Published), node => node.NodeId, entityDto => entityDto.NodeId, (node, entityDto) => node);
 
     /// <inheritdoc />
     public abstract Task<bool> IsPathPublishedAsync(TEntity? content, CancellationToken cancellationToken);
@@ -449,8 +449,8 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
                 List<Guid> batchKeys = batch.ToList();
 
                 List<(Guid Key, ContentScheduleDto Dto)> rows = await db.ContentSchedules
-                    .Join(db.Nodes.Where(n => batchKeys.Contains(n.UniqueId)), cs => cs.NodeId, n => n.NodeId, (cs, n) => new { n.UniqueId, cs })
-                    .Select(joined => new ValueTuple<Guid, ContentScheduleDto>(joined.UniqueId, joined.cs))
+                    .Join(db.Nodes.Where(node => batchKeys.Contains(node.UniqueId)), contentSchedule => contentSchedule.NodeId, node => node.NodeId, (contentSchedule, node) => new { node.UniqueId, contentSchedule })
+                    .Select(joined => new ValueTuple<Guid, ContentScheduleDto>(joined.UniqueId, joined.contentSchedule))
                     .ToListAsync(cancellationToken);
 
                 foreach (IGrouping<Guid, (Guid Key, ContentScheduleDto Dto)> group in rows.GroupBy(row => row.Key))
@@ -574,12 +574,12 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
 
         // get names per culture, at same level (ie all siblings)
         var names = await db.ContentVersionCultureVariations
-            .Join(db.ContentVersions.Where(cv => cv.Current), ccv => ccv.VersionId, cv => cv.Id, (ccv, cv) => new { ccv, cv })
+            .Join(db.ContentVersions.Where(contentVersion => contentVersion.Current), cultureVariation => cultureVariation.VersionId, contentVersion => contentVersion.Id, (cultureVariation, contentVersion) => new { cultureVariation, contentVersion })
             .Join(
-                db.Nodes.Where(n => n.NodeObjectType == NodeObjectTypeKey && n.ParentId == content.ParentId && n.NodeId != content.Id),
-                joined => joined.cv.NodeId,
+                db.Nodes.Where(node => node.NodeObjectType == NodeObjectTypeKey && node.ParentId == content.ParentId && node.NodeId != content.Id),
+                joined => joined.contentVersion.NodeId,
                 node => node.NodeId,
-                (joined, node) => new { joined.ccv.Id, joined.ccv.Name, joined.ccv.LanguageId })
+                (joined, node) => new { joined.cultureVariation.Id, joined.cultureVariation.Name, joined.cultureVariation.LanguageId })
             .ToListAsync();
 
         if (names.Count == 0)
@@ -591,8 +591,8 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
         // of whether the name has changed (ie the culture has been updated) - some saving culture
         // fr-FR could cause culture en-UK name to change - not sure that is clean
         ILookup<int, (int Id, string Name, int LanguageId)> namesByLanguage = names
-            .Select(n => (n.Id, n.Name, n.LanguageId))
-            .ToLookup(n => n.LanguageId);
+            .Select(name => (name.Id, name.Name, name.LanguageId))
+            .ToLookup(name => name.LanguageId);
 
         if (content.CultureInfos is null)
         {
@@ -614,7 +614,7 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
             }
 
             // get a unique name (literal duplicates first, then subclass-specific checks)
-            List<SimilarNodeName> otherNames = cultureNames.Select(n => new SimilarNodeName { Id = n.Id, Name = n.Name }).ToList();
+            List<SimilarNodeName> otherNames = cultureNames.Select(cultureName => new SimilarNodeName { Id = cultureName.Id, Name = cultureName.Name }).ToList();
             var uniqueName = SimilarNodeName.GetUniqueName(otherNames, content.Id, cultureInfo.Name);
             uniqueName = await EnsureUniqueVariantNameAsync(uniqueName, content.Id, otherNames, cultureInfo.Culture);
 

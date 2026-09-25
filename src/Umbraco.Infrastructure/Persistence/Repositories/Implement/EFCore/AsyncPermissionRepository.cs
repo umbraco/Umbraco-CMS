@@ -85,7 +85,7 @@ internal sealed class AsyncPermissionRepository<TEntity> : AsyncRepositoryBase
             List<Guid> groupKeyList = groupKeys.ToList();
 
             await db.UserGroup2GranularPermissions
-                .Where(p => p.Permission == permission && p.UniqueId == entity.Key && groupKeyList.Contains(p.UserGroupKey))
+                .Where(granularPermission => granularPermission.Permission == permission && granularPermission.UniqueId == entity.Key && groupKeyList.Contains(granularPermission.UserGroupKey))
                 .ExecuteDeleteAsync(cancellationToken);
 
             db.UserGroup2GranularPermissions.AddRange(groupKeyList.Select(groupKey => new UserGroup2GranularPermissionDto
@@ -130,19 +130,19 @@ internal sealed class AsyncPermissionRepository<TEntity> : AsyncRepositoryBase
             .Select(node => node.UniqueId)
             .SingleAsync(cancellationToken);
 
-        await db.UserGroup2GranularPermissions.Where(p => p.UniqueId == entityKey).ExecuteDeleteAsync(cancellationToken);
+        await db.UserGroup2GranularPermissions.Where(granularPermission => granularPermission.UniqueId == entityKey).ExecuteDeleteAsync(cancellationToken);
 
-        List<int> groupIds = permissionSet.PermissionsSet.Select(p => p.UserGroupId).Distinct().ToList();
+        List<int> groupIds = permissionSet.PermissionsSet.Select(entityPermission => entityPermission.UserGroupId).Distinct().ToList();
         Dictionary<int, Guid> idToKey = await db.UserGroups
             .Where(userGroup => groupIds.Contains(userGroup.Id))
             .ToDictionaryAsync(userGroup => userGroup.Id, userGroup => userGroup.Key, cancellationToken);
 
-        db.UserGroup2GranularPermissions.AddRange(permissionSet.PermissionsSet.SelectMany(p =>
-            p.AssignedPermissions.Select(assignedPermission => new UserGroup2GranularPermissionDto
+        db.UserGroup2GranularPermissions.AddRange(permissionSet.PermissionsSet.SelectMany(entityPermission =>
+            entityPermission.AssignedPermissions.Select(assignedPermission => new UserGroup2GranularPermissionDto
             {
                 Permission = assignedPermission,
                 UniqueId = entityKey,
-                UserGroupKey = idToKey[p.UserGroupId],
+                UserGroupKey = idToKey[entityPermission.UserGroupId],
                 Context = DocumentGranularPermission.ContextType,
             })));
 

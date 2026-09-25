@@ -21,6 +21,11 @@ namespace Umbraco.Cms.Tests.Integration.Testing;
 ///     <para>
 ///         Counting is off until <see cref="Enabled" /> is set, so that arrange steps do not contribute to the total.
 ///     </para>
+///     <para>
+///         Only commands issued through the intercepted <c>DbContext</c> are seen. Collaborators that still query
+///         through NPoco on the shared connection do not register here, so an equal count proves the EF Core side of
+///         an operation is fixed-cost, not that the operation makes no other round-trips.
+///     </para>
 /// </remarks>
 internal sealed class CountingDbCommandInterceptor : DbCommandInterceptor
 {

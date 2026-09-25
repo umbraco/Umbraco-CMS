@@ -423,37 +423,37 @@ internal class DocumentRepository
     /// <inheritdoc />
     protected override Task PersistEntitySpecificDeleteClausesAsync(UmbracoDbContext db, int nodeId)
     {
-        IQueryable<Guid> uniqueIdQuery = db.Nodes.Where(n => n.NodeId == nodeId).Select(n => n.UniqueId);
+        IQueryable<Guid> uniqueIdQuery = db.Nodes.Where(node => node.NodeId == nodeId).Select(node => node.UniqueId);
 
         return PersistEntitySpecificDeleteClausesCoreAsync(db, nodeId, uniqueIdQuery);
     }
 
     private static async Task PersistEntitySpecificDeleteClausesCoreAsync(UmbracoDbContext db, int nodeId, IQueryable<Guid> uniqueIdQuery)
     {
-        await db.RedirectUrls.Where(x => uniqueIdQuery.Contains(x.ContentKey)).ExecuteDeleteAsync();
+        await db.RedirectUrls.Where(redirectUrl => uniqueIdQuery.Contains(redirectUrl.ContentKey)).ExecuteDeleteAsync();
 
         await db.UserGroups
-            .Where(x => x.StartContentId == nodeId)
-            .ExecuteUpdateAsync(setters => setters.SetProperty(x => x.StartContentId, (int?)null));
+            .Where(userGroup => userGroup.StartContentId == nodeId)
+            .ExecuteUpdateAsync(setters => setters.SetProperty(userGroup => userGroup.StartContentId, (int?)null));
 
-        await db.Domains.Where(x => x.RootStructureId == nodeId).ExecuteDeleteAsync();
-        await db.Documents.Where(x => x.NodeId == nodeId).ExecuteDeleteAsync();
-        await db.DocumentCultureVariations.Where(x => x.NodeId == nodeId).ExecuteDeleteAsync();
+        await db.Domains.Where(domain => domain.RootStructureId == nodeId).ExecuteDeleteAsync();
+        await db.Documents.Where(document => document.NodeId == nodeId).ExecuteDeleteAsync();
+        await db.DocumentCultureVariations.Where(cultureVariation => cultureVariation.NodeId == nodeId).ExecuteDeleteAsync();
 
-        IQueryable<int> versionIdQuery = db.ContentVersions.Where(x => x.NodeId == nodeId).Select(x => x.Id);
-        await db.DocumentVersions.Where(x => versionIdQuery.Contains(x.Id)).ExecuteDeleteAsync();
+        IQueryable<int> versionIdQuery = db.ContentVersions.Where(contentVersion => contentVersion.NodeId == nodeId).Select(contentVersion => contentVersion.Id);
+        await db.DocumentVersions.Where(documentVersion => versionIdQuery.Contains(documentVersion.Id)).ExecuteDeleteAsync();
 
         IQueryable<Guid> accessIdQuery = db.Access
-            .Where(x => x.NodeId == nodeId || x.LoginNodeId == nodeId || x.NoAccessNodeId == nodeId)
-            .Select(x => x.Id);
-        await db.AccessRules.Where(x => accessIdQuery.Contains(x.AccessId)).ExecuteDeleteAsync();
+            .Where(access => access.NodeId == nodeId || access.LoginNodeId == nodeId || access.NoAccessNodeId == nodeId)
+            .Select(access => access.Id);
+        await db.AccessRules.Where(accessRule => accessIdQuery.Contains(accessRule.AccessId)).ExecuteDeleteAsync();
 
-        await db.Access.Where(x => x.NodeId == nodeId).ExecuteDeleteAsync();
-        await db.Access.Where(x => x.LoginNodeId == nodeId).ExecuteDeleteAsync();
-        await db.Access.Where(x => x.NoAccessNodeId == nodeId).ExecuteDeleteAsync();
+        await db.Access.Where(access => access.NodeId == nodeId).ExecuteDeleteAsync();
+        await db.Access.Where(access => access.LoginNodeId == nodeId).ExecuteDeleteAsync();
+        await db.Access.Where(access => access.NoAccessNodeId == nodeId).ExecuteDeleteAsync();
 
-        await db.DocumentUrls.Where(x => uniqueIdQuery.Contains(x.UniqueId)).ExecuteDeleteAsync();
-        await db.DocumentUrlAliases.Where(x => uniqueIdQuery.Contains(x.UniqueId)).ExecuteDeleteAsync();
+        await db.DocumentUrls.Where(documentUrl => uniqueIdQuery.Contains(documentUrl.UniqueId)).ExecuteDeleteAsync();
+        await db.DocumentUrlAliases.Where(documentUrlAlias => uniqueIdQuery.Contains(documentUrlAlias.UniqueId)).ExecuteDeleteAsync();
     }
 
     /// <inheritdoc />
@@ -1141,10 +1141,6 @@ internal class DocumentRepository
         _permissionRepository.AddOrUpdatePermissionsAsync(permission, cancellationToken);
 
     /// <inheritdoc />
-    // Ported from NPoco's DocumentRepository.IsPathPublished, with one deliberate fix: that version has a
-    // latent null-dereference for a null content parameter (the fast-fail/succeed-fast null-conditional
-    // checks both fall through without returning, then it crashes unguarded on content.Path.Split) — this
-    // version returns false for null up front instead of reproducing that bug.
     public override Task<bool> IsPathPublishedAsync(IContent? content, CancellationToken cancellationToken)
     {
         if (content is null || content.Path.StartsWith($"{Constants.System.Root},{Constants.System.RecycleBinContent},", StringComparison.Ordinal))
@@ -1171,16 +1167,13 @@ internal class DocumentRepository
     }
 
     /// <inheritdoc />
-    // Checks for a direct child of the recycle bin folder node itself (Constants.System.RecycleBinContent),
-    // not "any trashed node anywhere" — mirrors NPoco's PublishableContentRepositoryBase.RecycleBinSmells,
-    // which is CountChildren(RecycleBinId) > 0. Deliberately does not replicate NPoco's IAppPolicyCache
-    // wrapper: IAppPolicyCache.Get only accepts a synchronous factory, and wrapping this async query in one
-    // would mean sync-over-async (GetAwaiter().GetResult()) — the exact anti-pattern already avoided
-    // elsewhere in this file for language/tag lookups.
+    // A direct child of the recycle bin node is what makes the bin non-empty; anything trashed deeper down
+    // has such an ancestor. The cached answer is read and then inserted in two steps rather than through
+    // IAppPolicyCache.Get, whose factory is synchronous and would force this query to block on its result.
     public async Task<bool> RecycleBinSmellsAsync(CancellationToken cancellationToken)
     {
-        // Answered on every backoffice tree render, so it is cached either way. ContentCacheRefresher
-        // clears this key on refresh, so the answer cannot outlive a change to what is in the bin.
+        // Answered on every backoffice tree render, so it is cached. ContentCacheRefresher clears this key
+        // on refresh, so the answer cannot outlive a change to what is in the bin.
         var cached = AppCaches.RuntimeCache.GetCacheItem<bool?>(RecycleBinCacheKey);
         if (cached.HasValue)
         {
@@ -1330,13 +1323,15 @@ internal class DocumentRepository
                 : source.OrderBy(joined => joined.Node.NodeId),
             // Ordered by the user's name rather than their id, which is the order a caller listing
             // "owner" or "updater" is asking for. Owner is who created the node; updater is who created
-            // its latest draft version.
+            // its latest draft version. The name is a correlated subquery written out in each key selector:
+            // the query provider only translates what it can see in the expression tree, and the lookup is
+            // then only paid for when a caller orders by a user name.
             "owner" => descending
-                ? source.OrderByDescending(joined => UserNameById(users, joined.Node.UserId))
-                : source.OrderBy(joined => UserNameById(users, joined.Node.UserId)),
+                ? source.OrderByDescending(joined => users.Where(user => user.Id == joined.Node.UserId).Select(user => user.UserName).FirstOrDefault())
+                : source.OrderBy(joined => users.Where(user => user.Id == joined.Node.UserId).Select(user => user.UserName).FirstOrDefault()),
             "updater" => descending
-                ? source.OrderByDescending(joined => UserNameById(users, joined.ContentVersion.UserId))
-                : source.OrderBy(joined => UserNameById(users, joined.ContentVersion.UserId)),
+                ? source.OrderByDescending(joined => users.Where(user => user.Id == joined.ContentVersion.UserId).Select(user => user.UserName).FirstOrDefault())
+                : source.OrderBy(joined => users.Where(user => user.Id == joined.ContentVersion.UserId).Select(user => user.UserName).FirstOrDefault()),
             // The document's own published flag, not the current version's - a draft version of a
             // published document carries Published = false on umbracoDocumentVersion.
             "published" => descending
@@ -1365,11 +1360,6 @@ internal class DocumentRepository
         // when already ordering by id, since that's already unique.
         return orderBy == "id" ? ordered : ordered.ThenBy(joined => joined.Node.NodeId);
     }
-
-    // Correlated subquery rather than a join, so the extra lookup is only paid for when a caller actually
-    // orders by a user name.
-    private static string? UserNameById(IQueryable<UserDto> users, int? userId) =>
-        users.Where(user => user.Id == userId).Select(user => user.UserName).FirstOrDefault();
 
     // Ties in the variant name are common - every node falling back to node.Text shares one - so the node id
     // breaks them, keeping paged results stable and non-duplicated across separate fetches; the node id is
@@ -2069,11 +2059,6 @@ internal class DocumentRepository
     /// If a collision is detected (e.g. "Title" and "Title." both produce segment "title"),
     /// a numeric suffix is appended to the name until uniqueness is achieved.
     /// </summary>
-    /// <remarks>
-    /// Ported directly from NPoco's <c>DocumentRepository.EnsureUniqueUrlSegment</c> rather than
-    /// referencing it — <c>DocumentRepository</c> is slated for removal once the EF Core migration
-    /// completes, so this repository must not depend on it.
-    /// </remarks>
     internal static string? EnsureUniqueUrlSegment(
         string? nodeName,
         int nodeId,
@@ -2305,19 +2290,9 @@ internal class DocumentRepository
     // Diff-reconciles PropertyData rows for the given version against the freshly built values for the
     // entity's current properties: matches existing rows by (PropertyTypeId, VersionId, LanguageId,
     // Segment), updates matches in place, inserts new rows for unmatched values, and deletes rows that no
-    // longer have a corresponding value. Mirrors NPoco's ContentRepositoryBase.ReplacePropertyValues,
-    // omitting NPoco's row-level pessimistic lock (ForUpdate()/UPDLOCK) on the fetch. This is safe because
-    // every caller reaches this method through ContentService/PublishableContentServiceBase, which always
-    // acquires the global Constants.Locks.ContentTree write lock before saving/publishing — a real
-    // cross-server database lock (see IDistributedLockingMechanism.WriteLock), not just an in-process one.
-    // EFCoreScope shares the ambient NPoco scope's physical connection/transaction
-    // (_shareUmbracoConnection = true), so that lock already serializes this read-then-write sequence
-    // across servers; a per-row UPDLOCK here would be redundant defense-in-depth, not a fix for a real race.
-    // Note that NPoco's own ForUpdate() was itself narrow, not a strong guarantee being weakened here: per
-    // its doc comment it "will not work for all queries, only simple ones" — it patches only the first
-    // FROM-prefixed SQL fragment in the query (SqlServerSyntaxProvider.InsertForUpdateHint) and silently
-    // no-ops if no such fragment is found, so it never handled joins, multiple FROMs, or aliased tables
-    // robustly either.
+    // longer have a corresponding value. The fetch takes no row lock: every caller holds the ContentTree
+    // write lock, and the scope shares one connection and transaction, so that lock already serializes this
+    // read-then-write sequence.
     private async Task<(bool Edited, HashSet<string>? EditedCultures)> PersistUpdatedPropertyDataAsync(
         UmbracoDbContext db, IContent item, int versionId, int publishedVersionId)
     {
