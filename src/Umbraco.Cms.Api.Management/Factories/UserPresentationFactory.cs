@@ -406,6 +406,7 @@ public class UserPresentationFactory : IUserPresentationFactory
             presentationGroups.SelectMany(x => x.FallbackPermissions).ToHashSet());
 
         var hasAccessToAllLanguages = presentationGroups.Any(x => x.HasAccessToAllLanguages);
+        var hasAccessToInvariantForVariant = presentationGroups.Any(x => x.HasAccessToInvariantForVariant);
 
         var allowedSections = presentationGroups.SelectMany(x => x.Sections).ToHashSet();
 
@@ -427,6 +428,7 @@ public class UserPresentationFactory : IUserPresentationFactory
             Permissions = permissions,
             FallbackPermissions = fallbackPermissions,
             HasAccessToAllLanguages = hasAccessToAllLanguages,
+            HasAccessToInvariantForVariant = hasAccessToInvariantForVariant,
             HasAccessToSensitiveData = user.HasAccessToSensitiveData(),
             AllowedSections = allowedSections,
             IsAdmin = user.IsAdmin(),
