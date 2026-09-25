@@ -2,7 +2,7 @@ import { UmbBlockRteEntryContext } from '../../context/block-rte-entry.context.j
 import { UMB_BLOCK_RTE } from '../../constants.js';
 import type { UmbBlockRteLayoutModel } from '../../types.js';
 import { css, customElement, html, nothing, property, when, state } from '@umbraco-cms/backoffice/external/lit';
-import { renderHiddenUfm } from '@umbraco-cms/backoffice/ufm';
+import { renderHiddenUfm, renderUfm } from '@umbraco-cms/backoffice/ufm';
 import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
 import { UmbDataPathBlockElementDataQuery } from '@umbraco-cms/backoffice/block';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -43,9 +43,9 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 	public get contentKey(): string | undefined {
 		return this._contentKey;
 	}
-	private _contentKey?: string | undefined;
+	private _contentKey: string | undefined;
 
-	#context = new UmbBlockRteEntryContext(this);
+	readonly #context = new UmbBlockRteEntryContext(this);
 
 	@state()
 	private _showContentEdit = false;
@@ -261,24 +261,31 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 		return isForBlockEditor && isForContentTypeAlias;
 	};
 
-	#expose = () => {
+	readonly #expose = () => {
 		this.#context.expose();
 	};
 
-	#onUfmResolved = (event: UmbUfmResolvedEvent) => {
+	readonly #onUfmResolved = (event: UmbUfmResolvedEvent) => {
 		this.#context.setName(event.detail.text);
 	};
 
-	#renderHiddenUfm() {
-		const blockValue = {
+	get #blockValue() {
+		return {
 			...this._blockViewProps.content,
 			$settings: this._blockViewProps.settings,
 			$index: this._blockViewProps.index,
 		};
-		return renderHiddenUfm(this._label, blockValue, this.#onUfmResolved);
 	}
 
-	#extensionSlotRenderMethod = (ext: UmbExtensionElementInitializer<ManifestBlockEditorCustomView>) => {
+	#renderUfm() {
+		return renderUfm(this._label, this.#blockValue, this.#onUfmResolved);
+	}
+
+	#renderHiddenUfm() {
+		return renderHiddenUfm(this._label, this.#blockValue, this.#onUfmResolved);
+	}
+
+	readonly #extensionSlotRenderMethod = (ext: UmbExtensionElementInitializer<ManifestBlockEditorCustomView>) => {
 		ext.component?.setAttribute('part', 'component');
 		return when(
 			this._exposed || this._isReadOnly,
@@ -327,7 +334,7 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 		return html`<umb-unsupported-rte-block></umb-unsupported-rte-block>`;
 	}
 
-	#renderBuiltinBlockView = () => {
+	readonly #renderBuiltinBlockView = () => {
 		if (this.unsupported) {
 			return this.#renderUnsupportedBlock();
 		}
@@ -337,13 +344,14 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 	#renderRefBlock() {
 		return html`
 			<umb-ref-rte-block
-				.label=${this._label}
 				.icon=${this._icon}
 				.index=${this._blockViewProps.index}
 				.unpublished=${!this._exposed}
 				.content=${this._blockViewProps.content}
 				.settings=${this._blockViewProps.settings}
-				.config=${this._blockViewProps.config}></umb-ref-rte-block>
+				.config=${this._blockViewProps.config}
+				>${this.#renderUfm()}</umb-ref-rte-block
+			>
 		`;
 	}
 
