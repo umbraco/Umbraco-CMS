@@ -3,11 +3,13 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Navigation;
@@ -889,6 +891,223 @@ public class DocumentUrlServiceTests
             x => x.Save(It.IsAny<IEnumerable<PublishedDocumentUrlSegment>>()),
             Times.Never,
             "UpdateUrlSegmentCacheWithDescendantsAsync must not write URL segments to the database.");
+    }
+
+    #endregion
+
+    #region GetLegacyRouteFormat Tests
+
+    /// <summary>
+    /// Route resolved by <see cref="GetLegacyRouteFormat_NonDraft_Invariant_DocumentNotPublished_ReturnsUnroutable"/> and friends
+    /// once a document key has a real cached URL segment and the publish status guard lets resolution through.
+    /// </summary>
+    private const string SeededLegacyRoute = "/test-segment";
+
+    /// <summary>
+    /// Creates a DocumentUrlService for testing <see cref="DocumentUrlService.GetLegacyRouteFormat"/>, with the
+    /// mocks that guard publish status returned so each test can configure them. The rest of the route-building
+    /// pipeline (domain lookup, url segment cache, default culture) is wired up to succeed for a single root-level
+    /// document with one cached segment, so a test can tell a "blocked by the publish status guard" result apart
+    /// from a "blocked for an unrelated reason" result: if the guard did not block, <see cref="SeededLegacyRoute"/>
+    /// comes back instead of <see cref="Constants.Routing.Unroutable"/>.
+    /// </summary>
+    private static (
+        DocumentUrlService Service,
+        Mock<IIdKeyMap> IdKeyMap,
+        Mock<IDocumentNavigationQueryService> NavigationQueryService,
+        Mock<IPublishStatusQueryService> PublishStatusQueryService) CreateDocumentUrlServiceForLegacyRouteTests()
+    {
+        var loggerMock = Mock.Of<ILogger<DocumentUrlService>>();
+        var documentUrlRepositoryMock = Mock.Of<IDocumentUrlRepository>();
+        var documentRepositoryMock = Mock.Of<IDocumentRepository>();
+        var globalSettingsMock = Options.Create(new GlobalSettings());
+        var webRoutingSettingsMock = Options.Create(new WebRoutingSettings());
+        var contentServiceMock = Mock.Of<IContentService>();
+        var urlSegmentProvider = CreateFixedSegmentProvider("test-segment");
+        var urlSegmentProviderCollection = new UrlSegmentProviderCollection(() => [urlSegmentProvider]);
+
+        var languages = new List<ILanguage> { CreateMockLanguage(1, "en-US") };
+        var languageServiceMock = new Mock<ILanguageService>();
+        languageServiceMock.Setup(x => x.GetAllAsync()).ReturnsAsync(languages);
+        languageServiceMock.Setup(x => x.GetDefaultIsoCodeAsync()).ReturnsAsync("en-US");
+
+        var keyValueServiceMock = Mock.Of<IKeyValueService>();
+        var idKeyMapMock = new Mock<IIdKeyMap>();
+        var documentNavigationQueryServiceMock = new Mock<IDocumentNavigationQueryService>();
+        var publishStatusQueryServiceMock = new Mock<IPublishStatusQueryService>();
+        var domainCacheServiceMock = new Mock<IDomainCacheService>();
+        domainCacheServiceMock.Setup(x => x.GetAssigned(It.IsAny<int>(), It.IsAny<bool>())).Returns(Enumerable.Empty<Domain>());
+        var defaultCultureAccessorMock = Mock.Of<IDefaultCultureAccessor>();
+        var serverRoleAccessorMock = Mock.Of<IServerRoleAccessor>();
+
+        // Enlist must execute its callback immediately for the seeded segment (below) to actually land in the
+        // in-memory cache — UpdateCache/RemoveFromCache defer their work through scopeContext.Enlist.
+        var scopeContextMock = new Mock<IScopeContext>();
+        scopeContextMock.Setup(x => x.Enlist<bool>(
+                It.IsAny<string>(),
+                It.IsAny<Func<bool>>(),
+                It.IsAny<Action<bool, bool>?>(),
+                It.IsAny<int>()))
+            .Returns((string _, Func<bool> creator, Action<bool, bool>? _, int _) => creator());
+
+        var coreScopeProviderMock = new Mock<ICoreScopeProvider>();
+        coreScopeProviderMock.Setup(x => x.CreateCoreScope(
+                It.IsAny<IsolationLevel>(),
+                It.IsAny<RepositoryCacheMode>(),
+                It.IsAny<IEventDispatcher?>(),
+                It.IsAny<IScopedNotificationPublisher?>(),
+                It.IsAny<bool?>(),
+                It.IsAny<bool>(),
+                It.IsAny<bool>()))
+            .Returns(Mock.Of<ICoreScope>());
+        coreScopeProviderMock.Setup(x => x.Context).Returns(scopeContextMock.Object);
+
+        var service = new DocumentUrlService(
+            loggerMock,
+            documentUrlRepositoryMock,
+            documentRepositoryMock,
+            coreScopeProviderMock.Object,
+            globalSettingsMock,
+            webRoutingSettingsMock,
+            urlSegmentProviderCollection,
+            contentServiceMock,
+            new DefaultShortStringHelper(new DefaultShortStringHelperConfig()),
+            languageServiceMock.Object,
+            keyValueServiceMock,
+            idKeyMapMock.Object,
+            documentNavigationQueryServiceMock.Object,
+            publishStatusQueryServiceMock.Object,
+            domainCacheServiceMock.Object,
+            defaultCultureAccessorMock,
+            serverRoleAccessorMock);
+
+        return (service, idKeyMapMock, documentNavigationQueryServiceMock, publishStatusQueryServiceMock);
+    }
+
+    /// <summary>
+    /// Configures the preamble checks (id lookup and ancestors-or-self lookup) that
+    /// <see cref="DocumentUrlService.GetLegacyRouteFormat"/> performs before evaluating publish status, and seeds a
+    /// real cached URL segment for the document so that — if the publish status guard fails to block a request it
+    /// should — resolution succeeds all the way through to <see cref="SeededLegacyRoute"/> instead of coincidentally
+    /// hitting <see cref="Constants.Routing.Unroutable"/> for an unrelated reason (e.g. a missing segment).
+    /// </summary>
+    private static async Task SetupSuccessfulPreambleAsync(DocumentUrlService service, Mock<IIdKeyMap> idKeyMap, Mock<IDocumentNavigationQueryService> navigationQueryService, Guid documentKey)
+    {
+        idKeyMap.Setup(x => x.GetIdForKey(documentKey, UmbracoObjectTypes.Document)).Returns(Attempt.Succeed(1));
+
+        IEnumerable<Guid> ancestorsOrSelfKeys = new[] { documentKey };
+        navigationQueryService.Setup(x => x.TryGetAncestorsOrSelfKeys(documentKey, out ancestorsOrSelfKeys)).Returns(true);
+
+        var contentMock = CreateMockContent(documentKey, variesByCulture: false, isPublished: true);
+        await service.CreateOrUpdateUrlSegmentsAsync([contentMock.Object]);
+    }
+
+    [Test]
+    public async Task GetLegacyRouteFormat_Draft_Does_Not_Check_Publish_Status()
+    {
+        var (service, idKeyMap, navigationQueryService, publishStatusQueryService) = CreateDocumentUrlServiceForLegacyRouteTests();
+        var documentKey = Guid.NewGuid();
+        await SetupSuccessfulPreambleAsync(service, idKeyMap, navigationQueryService, documentKey);
+
+        service.GetLegacyRouteFormat(documentKey, "en-US", isDraft: true);
+
+        publishStatusQueryService.Verify(x => x.IsDocumentPublished(It.IsAny<Guid>(), It.IsAny<string>()), Times.Never);
+        publishStatusQueryService.Verify(x => x.IsDocumentPublishedInAnyCulture(It.IsAny<Guid>()), Times.Never);
+        publishStatusQueryService.Verify(x => x.HasPublishedAncestorPath(It.IsAny<Guid>()), Times.Never);
+        publishStatusQueryService.Verify(x => x.HasPublishedAncestorPath(It.IsAny<Guid>(), It.IsAny<string>()), Times.Never);
+    }
+
+    [Test]
+    public async Task GetLegacyRouteFormat_NonDraft_Invariant_DocumentNotPublished_ReturnsUnroutable()
+    {
+        var (service, idKeyMap, navigationQueryService, publishStatusQueryService) = CreateDocumentUrlServiceForLegacyRouteTests();
+        var documentKey = Guid.NewGuid();
+        await SetupSuccessfulPreambleAsync(service, idKeyMap, navigationQueryService, documentKey);
+
+        publishStatusQueryService.Setup(x => x.IsDocumentPublishedInAnyCulture(documentKey)).Returns(false);
+        publishStatusQueryService.Setup(x => x.HasPublishedAncestorPath(documentKey)).Returns(true);
+
+        var result = service.GetLegacyRouteFormat(documentKey, culture: null, isDraft: false);
+
+        Assert.AreEqual(Constants.Routing.Unroutable, result);
+    }
+
+    [Test]
+    public async Task GetLegacyRouteFormat_NonDraft_Invariant_AncestorNotPublished_ReturnsUnroutable()
+    {
+        var (service, idKeyMap, navigationQueryService, publishStatusQueryService) = CreateDocumentUrlServiceForLegacyRouteTests();
+        var documentKey = Guid.NewGuid();
+        await SetupSuccessfulPreambleAsync(service, idKeyMap, navigationQueryService, documentKey);
+
+        // The document itself is published, but an ancestor is not — this is the scenario the fix addresses.
+        publishStatusQueryService.Setup(x => x.IsDocumentPublishedInAnyCulture(documentKey)).Returns(true);
+        publishStatusQueryService.Setup(x => x.HasPublishedAncestorPath(documentKey)).Returns(false);
+
+        var result = service.GetLegacyRouteFormat(documentKey, culture: null, isDraft: false);
+
+        Assert.AreEqual(Constants.Routing.Unroutable, result);
+    }
+
+    [Test]
+    public async Task GetLegacyRouteFormat_NonDraft_Culture_DocumentNotPublishedInCulture_ReturnsUnroutable()
+    {
+        var (service, idKeyMap, navigationQueryService, publishStatusQueryService) = CreateDocumentUrlServiceForLegacyRouteTests();
+        var documentKey = Guid.NewGuid();
+        await SetupSuccessfulPreambleAsync(service, idKeyMap, navigationQueryService, documentKey);
+
+        publishStatusQueryService.Setup(x => x.IsDocumentPublished(documentKey, "en-US")).Returns(false);
+        publishStatusQueryService.Setup(x => x.HasPublishedAncestorPath(documentKey, "en-US")).Returns(true);
+
+        var result = service.GetLegacyRouteFormat(documentKey, "en-US", isDraft: false);
+
+        Assert.AreEqual(Constants.Routing.Unroutable, result);
+    }
+
+    [Test]
+    public async Task GetLegacyRouteFormat_NonDraft_Culture_AncestorNotPublishedInCulture_ReturnsUnroutable()
+    {
+        var (service, idKeyMap, navigationQueryService, publishStatusQueryService) = CreateDocumentUrlServiceForLegacyRouteTests();
+        var documentKey = Guid.NewGuid();
+        await SetupSuccessfulPreambleAsync(service, idKeyMap, navigationQueryService, documentKey);
+
+        // The document itself is published in the requested culture, but an ancestor is not — this is the
+        // scenario the fix addresses.
+        publishStatusQueryService.Setup(x => x.IsDocumentPublished(documentKey, "en-US")).Returns(true);
+        publishStatusQueryService.Setup(x => x.HasPublishedAncestorPath(documentKey, "en-US")).Returns(false);
+
+        var result = service.GetLegacyRouteFormat(documentKey, "en-US", isDraft: false);
+
+        Assert.AreEqual(Constants.Routing.Unroutable, result);
+    }
+
+    [Test]
+    public async Task GetLegacyRouteFormat_NonDraft_Invariant_PublishedDocumentAndAncestors_ReturnsRoute()
+    {
+        var (service, idKeyMap, navigationQueryService, publishStatusQueryService) = CreateDocumentUrlServiceForLegacyRouteTests();
+        var documentKey = Guid.NewGuid();
+        await SetupSuccessfulPreambleAsync(service, idKeyMap, navigationQueryService, documentKey);
+
+        publishStatusQueryService.Setup(x => x.IsDocumentPublishedInAnyCulture(documentKey)).Returns(true);
+        publishStatusQueryService.Setup(x => x.HasPublishedAncestorPath(documentKey)).Returns(true);
+
+        var result = service.GetLegacyRouteFormat(documentKey, culture: null, isDraft: false);
+
+        Assert.AreEqual(SeededLegacyRoute, result);
+    }
+
+    [Test]
+    public async Task GetLegacyRouteFormat_NonDraft_Culture_PublishedDocumentAndAncestors_ReturnsRoute()
+    {
+        var (service, idKeyMap, navigationQueryService, publishStatusQueryService) = CreateDocumentUrlServiceForLegacyRouteTests();
+        var documentKey = Guid.NewGuid();
+        await SetupSuccessfulPreambleAsync(service, idKeyMap, navigationQueryService, documentKey);
+
+        publishStatusQueryService.Setup(x => x.IsDocumentPublished(documentKey, "en-US")).Returns(true);
+        publishStatusQueryService.Setup(x => x.HasPublishedAncestorPath(documentKey, "en-US")).Returns(true);
+
+        var result = service.GetLegacyRouteFormat(documentKey, "en-US", isDraft: false);
+
+        Assert.AreEqual(SeededLegacyRoute, result);
     }
 
     #endregion
