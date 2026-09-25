@@ -99,8 +99,10 @@ describe('UmbTrashableEntityWorkspaceController', () => {
 			await aTimeout(0);
 			expect(isTrashedContext?.getIsTrashed()).to.be.false;
 		});
+	});
 
-		it('does not throw when the workspace context does not implement the guard', async () => {
+	describe('optional guards', () => {
+		it('does not throw when the workspace context does not implement either guard', async () => {
 			const guardlessHost = new UmbTestRecycleBinControllerHostElement();
 			document.body.appendChild(guardlessHost);
 
