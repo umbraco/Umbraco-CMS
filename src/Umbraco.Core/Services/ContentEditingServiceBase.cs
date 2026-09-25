@@ -847,8 +847,12 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         HashSet<string> allowedCultures = await GetAllowedCulturesForEditingUserAsync(user);
         var hasAccessToInvariantForVariant = user.HasAccessToInvariantForVariant();
 
-        var disallowedCultures = (contentWithPotentialUnallowedChanges.EditedCultures ??
-                               contentWithPotentialUnallowedChanges.PublishedCultures)
+        // EditedCultures only reflects cultures that already had a pending edit *before* this update began - it
+        // does not account for previously-published cultures being touched by this update for the first time
+        // since their last publish. Union with PublishedCultures so an already-published, previously-clean
+        // culture is still considered a candidate for reverting a disallowed edit.
+        var disallowedCultures = (contentWithPotentialUnallowedChanges.EditedCultures ?? [])
+            .Union(contentWithPotentialUnallowedChanges.PublishedCultures, StringComparer.OrdinalIgnoreCase)
             .Where(culture => allowedCultures.Contains(culture) is false).ToList();
 
         var variantProperties = new List<IProperty>();
