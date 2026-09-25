@@ -5,8 +5,9 @@ import { manifests as workspaceManifests } from './workspace/manifests.js';
 import { manifests as entityActionManifests } from './entity-actions/manifests.js';
 import { manifests as propertyEditorsManifests } from './property-editors/manifests.js';
 import * as entryPointModule from './entry-point.js';
+import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifests: Array<UmbExtensionManifest> = [
+export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [
 	...repositoryManifests,
 	...menuManifests,
 	...treeManifests,
