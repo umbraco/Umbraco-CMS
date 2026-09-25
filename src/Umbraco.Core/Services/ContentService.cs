@@ -766,8 +766,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
         IReadOnlyCollection<ILanguage> allLangs,
         CancellationToken cancellationToken)
     {
-        // TODO: this is never written to, so the branch ContentPublishedNotification always carries an empty state
-        // and cannot see what a ContentSavingNotification handler wrote. Return savingNotification.State instead. [NL]
+        // Until the saving notification has been published there is no handler state to carry forward.
         IDictionary<string, object?>? initialNotificationState = new Dictionary<string, object?>();
 
         // we need to guard against unsaved changes before proceeding; the document will be saved, but we're not firing any saved notifications
@@ -791,14 +790,14 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
         var savingNotification = new ContentSavingNotification(document, evtMsgs);
         if (await scope.Notifications.PublishCancelableAsync(savingNotification))
         {
-            return (new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, document), initialNotificationState);
+            return (new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, document), savingNotification.State);
         }
 
         // publish & check if values are valid
         if (!publishCultures(document, culturesToPublish, allLangs))
         {
             // TODO: Based on this callback behavior there is no way to know which properties may have been invalid if this failed, see other results of FailedPublishContentInvalid
-            return (new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, document), initialNotificationState);
+            return (new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, document), savingNotification.State);
         }
 
         PublishResult result = await CommitContentChangesInternalAsync(scope, document, evtMsgs, allLangs, savingNotification.State, userId, cancellationToken, branchOne: true, branchRoot: isRoot);
@@ -807,7 +806,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
             publishedDocuments.Add(document);
         }
 
-        return (result, initialNotificationState);
+        return (result, savingNotification.State);
     }
 
     #endregion

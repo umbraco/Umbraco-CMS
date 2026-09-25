@@ -1358,6 +1358,44 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
     }
 
     [Test]
+    public async Task Branch_Publish_Published_Notification_Carries_State_From_The_Root_Saving_Notification()
+    {
+        IContent root = new Content("root", -1, _contentType);
+        await ContentService.SaveAsync(root, Constants.Security.SuperUserKey, null, CancellationToken.None);
+        IContent child = new Content("child", root.Id, _contentType);
+        await ContentService.SaveAsync(child, Constants.Security.SuperUserKey, null, CancellationToken.None);
+        root = await ContentService.GetByIdAsync(root.Key, CancellationToken.None);
+
+        var publishedWasCalled = false;
+
+        ContentNotificationHandler.SavingContent = notification =>
+        {
+            if (notification.SavedEntities.Any(entity => entity.Key == root.Key))
+            {
+                notification.State["probe"] = "set while saving the root";
+            }
+        };
+
+        ContentNotificationHandler.PublishedContent = notification =>
+        {
+            Assert.That(notification.IncludeDescendants, Is.True);
+            Assert.That(notification.State, Contains.Key("probe").WithValue("set while saving the root"));
+            publishedWasCalled = true;
+        };
+
+        try
+        {
+            await ContentService.PublishBranchAsync(root, PublishBranchFilter.ForceRepublish, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
+            Assert.That(publishedWasCalled, Is.True);
+        }
+        finally
+        {
+            ContentNotificationHandler.SavingContent = null;
+            ContentNotificationHandler.PublishedContent = null;
+        }
+    }
+
+    [Test]
     [LongRunning]
     public async Task Can_Read_Per_Document_Published_Cultures_For_Branch_Publish_With_Mixed_Variance()
     {
