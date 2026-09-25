@@ -184,6 +184,18 @@ export class UmbUserGroupWorkspaceContext
 			elementStartNode: value.startNodes[0] ? { unique: value.startNodes[0].unique } : null,
 		});
 	}
+
+	/**
+	 * Sets the user group document blueprint access.
+	 * @param {UmbStartNodeAccessValue} value - The document blueprint root access and start node.
+	 * @memberof UmbUserGroupWorkspaceContext
+	 */
+	setDocumentBlueprintAccess(value: UmbStartNodeAccessValue) {
+		this._data.updateCurrent({
+			documentBlueprintRootAccess: value.rootAccess,
+			documentBlueprintStartNode: value.startNodes[0] ? { unique: value.startNodes[0].unique } : null,
+		});
+	}
 }
 
 export { UmbUserGroupWorkspaceContext as api };
