@@ -16,7 +16,7 @@ public class MultiNodeTreePickerPropertyValueHandlerTests : ContentTestBase
     private IContentType _contentType;
 
     [Test]
-    public void ExplicitDocumentPicker_CanBeIndexed()
+    public async Task ExplicitDocumentPicker_CanBeIndexed()
     {
         Content content = new ContentBuilder()
             .WithContentType(_contentType)
@@ -28,8 +28,8 @@ public class MultiNodeTreePickerPropertyValueHandlerTests : ContentTestBase
                 })
             .Build();
 
-        ContentService.Save(content);
-        ContentService.Publish(content, ["*"]);
+        await ContentService.SaveAsync(content, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishAsync(content, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.PublishedContent);
         Assert.That(documents, Has.Count.EqualTo(1));
@@ -40,7 +40,7 @@ public class MultiNodeTreePickerPropertyValueHandlerTests : ContentTestBase
     }
 
     [Test]
-    public void ImplicitDocumentPicker_CanBeIndexed()
+    public async Task ImplicitDocumentPicker_CanBeIndexed()
     {
         Content content = new ContentBuilder()
             .WithContentType(_contentType)
@@ -52,8 +52,8 @@ public class MultiNodeTreePickerPropertyValueHandlerTests : ContentTestBase
                 })
             .Build();
 
-        ContentService.Save(content);
-        ContentService.Publish(content, ["*"]);
+        await ContentService.SaveAsync(content, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishAsync(content, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.PublishedContent);
         Assert.That(documents, Has.Count.EqualTo(1));
@@ -64,7 +64,7 @@ public class MultiNodeTreePickerPropertyValueHandlerTests : ContentTestBase
     }
 
     [Test]
-    public void NonDocumentPicker_IsIgnored()
+    public async Task NonDocumentPicker_IsIgnored()
     {
         Content content = new ContentBuilder()
             .WithContentType(_contentType)
@@ -77,8 +77,8 @@ public class MultiNodeTreePickerPropertyValueHandlerTests : ContentTestBase
                 })
             .Build();
 
-        ContentService.Save(content);
-        ContentService.Publish(content, ["*"]);
+        await ContentService.SaveAsync(content, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishAsync(content, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.PublishedContent);
         Assert.That(documents, Has.Count.EqualTo(1));
@@ -91,7 +91,7 @@ public class MultiNodeTreePickerPropertyValueHandlerTests : ContentTestBase
     }
 
     [Test]
-    public void ExplicitDocumentPicker_DisregardsInvalidValues()
+    public async Task ExplicitDocumentPicker_DisregardsInvalidValues()
     {
         Content content = new ContentBuilder()
             .WithContentType(_contentType)
@@ -103,8 +103,8 @@ public class MultiNodeTreePickerPropertyValueHandlerTests : ContentTestBase
                 })
             .Build();
 
-        ContentService.Save(content);
-        ContentService.Publish(content, ["*"]);
+        await ContentService.SaveAsync(content, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishAsync(content, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.PublishedContent);
         Assert.That(documents, Has.Count.EqualTo(1));
@@ -128,7 +128,7 @@ public class MultiNodeTreePickerPropertyValueHandlerTests : ContentTestBase
             ParentId = Constants.System.Root,
             CreateDate = DateTime.UtcNow
         };
-        await dataTypeService.CreateAsync(implicitPickerDataType, Constants.Security.SuperUserKey);
+        await dataTypeService.CreateAsync(implicitPickerDataType, Cms.Core.Constants.Security.SuperUserKey);
 
         var explicitPickerDataType = new DataType(propertyEditorCollection[Constants.PropertyEditors.Aliases.MultiNodeTreePicker], configurationEditorJsonSerializer)
         {
@@ -148,7 +148,7 @@ public class MultiNodeTreePickerPropertyValueHandlerTests : ContentTestBase
             ParentId = Constants.System.Root,
             CreateDate = DateTime.UtcNow
         };
-        await dataTypeService.CreateAsync(explicitPickerDataType, Constants.Security.SuperUserKey);
+        await dataTypeService.CreateAsync(explicitPickerDataType, Cms.Core.Constants.Security.SuperUserKey);
 
         var mediaPickerDataType = new DataType(propertyEditorCollection[Constants.PropertyEditors.Aliases.MultiNodeTreePicker], configurationEditorJsonSerializer)
         {
@@ -168,7 +168,7 @@ public class MultiNodeTreePickerPropertyValueHandlerTests : ContentTestBase
             ParentId = Constants.System.Root,
             CreateDate = DateTime.UtcNow
         };
-        await dataTypeService.CreateAsync(explicitPickerDataType, Constants.Security.SuperUserKey);
+        await dataTypeService.CreateAsync(explicitPickerDataType, Cms.Core.Constants.Security.SuperUserKey);
 
         var memberPickerDataType = new DataType(propertyEditorCollection[Constants.PropertyEditors.Aliases.MultiNodeTreePicker], configurationEditorJsonSerializer)
         {
@@ -188,7 +188,7 @@ public class MultiNodeTreePickerPropertyValueHandlerTests : ContentTestBase
             ParentId = Constants.System.Root,
             CreateDate = DateTime.UtcNow
         };
-        await dataTypeService.CreateAsync(explicitPickerDataType, Constants.Security.SuperUserKey);
+        await dataTypeService.CreateAsync(explicitPickerDataType, Cms.Core.Constants.Security.SuperUserKey);
 
         _contentType = new ContentTypeBuilder()
             .WithAlias("allMultiNodeTreePickerEditors")
@@ -214,7 +214,7 @@ public class MultiNodeTreePickerPropertyValueHandlerTests : ContentTestBase
             .Done()
             .Build();
 
-        await ContentTypeService.CreateAsync(_contentType, Constants.Security.SuperUserKey);
+        await ContentTypeService.CreateAsync(_contentType, Cms.Core.Constants.Security.SuperUserKey);
 
         IndexerAndSearcher.Reset();
     }

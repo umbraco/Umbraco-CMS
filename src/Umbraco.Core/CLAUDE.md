@@ -430,7 +430,7 @@ public class MyService
     {
         using var scope = _scopeProvider.CreateCoreScope();
 
-        IContent? content = _contentService.GetById(key);
+        IContent? content = await _contentService.GetByIdAsync(key, CancellationToken.None);
         if (content == null)
             return;
 
@@ -438,7 +438,8 @@ public class MyService
         content.SetValue("propertyAlias", "new value");
 
         // Save (triggers notifications)
-        var result = _contentService.Save(content);
+        Attempt<ContentSaveOperationStatus> result =
+            await _contentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         scope.Complete();
     }

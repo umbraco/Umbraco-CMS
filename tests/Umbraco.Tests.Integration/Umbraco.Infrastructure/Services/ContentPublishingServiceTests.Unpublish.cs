@@ -69,9 +69,9 @@ public partial class ContentPublishingServiceTests
         VerifyIsPublished(Subpage2.Key);
         VerifyIsPublished(Subpage3.Key);
         // ... but should no longer be routable because the parent is unpublished
-        Assert.IsFalse(ContentService.IsPathPublished(Subpage));
-        Assert.IsFalse(ContentService.IsPathPublished(Subpage2));
-        Assert.IsFalse(ContentService.IsPathPublished(Subpage3));
+        Assert.IsFalse(await ContentService.IsPathPublishedAsync(Subpage, CancellationToken.None));
+        Assert.IsFalse(await ContentService.IsPathPublishedAsync(Subpage2, CancellationToken.None));
+        Assert.IsFalse(await ContentService.IsPathPublishedAsync(Subpage3, CancellationToken.None));
     }
 
     [Test]
@@ -147,7 +147,7 @@ public partial class ContentPublishingServiceTests
             .Build();
         content.SetValue("title", "EN title", culture: langEn.IsoCode);
         content.SetValue("title", "DA title", culture: langDa.IsoCode);
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
         await ContentPublishingService.PublishAsync(
             content.Key,
             [
@@ -162,7 +162,7 @@ public partial class ContentPublishingServiceTests
         Assert.AreEqual(ContentPublishingOperationStatus.Success, result.Result);
         VerifyIsPublished(content.Key);
 
-        content = ContentService.GetById(content.Key)!;
+        content = (await ContentService.GetByIdAsync(content.Key, CancellationToken.None))!;
         Assert.AreEqual(1, content.PublishedCultures.Count());
         Assert.IsTrue(content.PublishedCultures.InvariantContains(langDa.IsoCode));
     }
@@ -179,7 +179,7 @@ public partial class ContentPublishingServiceTests
             .Build();
         content.SetValue("title", "EN title", culture: langEn.IsoCode);
         content.SetValue("title", "DA title", culture: langDa.IsoCode);
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
         await ContentPublishingService.PublishAsync(
             content.Key,
             [
@@ -194,7 +194,7 @@ public partial class ContentPublishingServiceTests
         Assert.AreEqual(ContentPublishingOperationStatus.Success, result.Result);
         VerifyIsNotPublished(content.Key);
 
-        content = ContentService.GetById(content.Key)!;
+        content = (await ContentService.GetByIdAsync(content.Key, CancellationToken.None))!;
         Assert.AreEqual(0, content.PublishedCultures.Count());
     }
 
@@ -210,7 +210,7 @@ public partial class ContentPublishingServiceTests
             .Build();
         content.SetValue("title", "EN title", culture: langEn.IsoCode);
         content.SetValue("title", "DA title", culture: langDa.IsoCode);
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
         await ContentPublishingService.PublishAsync(
             content.Key,
             [
@@ -225,7 +225,7 @@ public partial class ContentPublishingServiceTests
         Assert.AreEqual(ContentPublishingOperationStatus.Success, result.Result);
         VerifyIsNotPublished(content.Key);
 
-        content = ContentService.GetById(content.Key)!;
+        content = (await ContentService.GetByIdAsync(content.Key, CancellationToken.None))!;
         Assert.AreEqual(0, content.PublishedCultures.Count());
     }
 
@@ -248,7 +248,7 @@ public partial class ContentPublishingServiceTests
         content.SetValue("title", "EN title", culture: langEn.IsoCode);
         content.SetValue("title", "DA title", culture: langDa.IsoCode);
         content.SetValue("title", "SE title", culture: langSe.IsoCode);
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
         await ContentPublishingService.PublishAsync(
             content.Key,
             [
@@ -259,14 +259,14 @@ public partial class ContentPublishingServiceTests
             Constants.Security.SuperUserKey);
 
         VerifyIsPublished(content.Key);
-        content = ContentService.GetById(content.Key)!;
+        content = (await ContentService.GetByIdAsync(content.Key, CancellationToken.None))!;
         Assert.AreEqual(3, content.PublishedCultures.Count());
 
         var result = await ContentPublishingService.UnpublishAsync(content.Key, new HashSet<string> { langDa.IsoCode, langSe.IsoCode }, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
         Assert.AreEqual(ContentPublishingOperationStatus.Success, result.Result);
         VerifyIsPublished(content.Key);
-        content = ContentService.GetById(content.Key)!;
+        content = (await ContentService.GetByIdAsync(content.Key, CancellationToken.None))!;
         Assert.AreEqual(1, content.PublishedCultures.Count());
     }
 
@@ -282,7 +282,7 @@ public partial class ContentPublishingServiceTests
             .Build();
         content.SetValue("title", "EN title", culture: langEn.IsoCode);
         content.SetValue("title", "DA title", culture: langDa.IsoCode);
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
         await ContentPublishingService.PublishAsync(
             content.Key,
             [
@@ -293,7 +293,7 @@ public partial class ContentPublishingServiceTests
 
         VerifyIsPublished(content.Key);
 
-        content = ContentService.GetById(content.Key)!;
+        content = (await ContentService.GetByIdAsync(content.Key, CancellationToken.None))!;
         Assert.AreEqual(2, content.PublishedCultures.Count());
 
         var result = await ContentPublishingService.UnpublishAsync(content.Key, new HashSet<string> { langEn.IsoCode }, Constants.Security.SuperUserKey);
@@ -301,7 +301,7 @@ public partial class ContentPublishingServiceTests
         Assert.AreEqual(ContentPublishingOperationStatus.Success, result.Result);
         VerifyIsNotPublished(content.Key);
 
-        content = ContentService.GetById(content.Key)!;
+        content = (await ContentService.GetByIdAsync(content.Key, CancellationToken.None))!;
         Assert.AreEqual(0, content.PublishedCultures.Count());
     }
 
@@ -317,7 +317,7 @@ public partial class ContentPublishingServiceTests
             .Build();
         content.SetValue("title", "EN title", culture: langEn.IsoCode);
         content.SetValue("title", "DA title", culture: langDa.IsoCode);
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
         await ContentPublishingService.PublishAsync(
             content.Key,
             [
@@ -327,7 +327,7 @@ public partial class ContentPublishingServiceTests
             Constants.Security.SuperUserKey);
         VerifyIsPublished(content.Key);
 
-        content = ContentService.GetById(content.Key)!;
+        content = (await ContentService.GetByIdAsync(content.Key, CancellationToken.None))!;
         Assert.AreEqual(2, content.PublishedCultures.Count());
 
         var result = await ContentPublishingService.UnpublishAsync(content.Key, new HashSet<string>() { langDa.IsoCode }, Constants.Security.SuperUserKey);
@@ -335,15 +335,15 @@ public partial class ContentPublishingServiceTests
         Assert.AreEqual(ContentPublishingOperationStatus.Success, result.Result);
         VerifyIsPublished(content.Key);
 
-        content = ContentService.GetById(content.Key)!;
+        content = (await ContentService.GetByIdAsync(content.Key, CancellationToken.None))!;
         Assert.AreEqual(1, content.PublishedCultures.Count());
     }
 
     [Test]
     public async Task Can_Unpublish_From_Trash()
     {
-        ContentService.MoveToRecycleBin(Subpage);
-        Assert.IsTrue(ContentService.GetById(Subpage.Key)!.Trashed);
+        await ContentService.MoveToRecycleBinAsync(Subpage, Constants.Security.SuperUserKey, CancellationToken.None);
+        Assert.IsTrue((await ContentService.GetByIdAsync(Subpage.Key, CancellationToken.None))!.Trashed);
 
         var result = await ContentPublishingService.UnpublishAsync(Subpage.Key, null, Constants.Security.SuperUserKey);
 
@@ -365,7 +365,7 @@ public partial class ContentPublishingServiceTests
             .Build();
         content.SetValue("title", "EN title", culture: langEn.IsoCode);
         content.SetValue("title", "DA title", culture: langDa.IsoCode);
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
         await ContentPublishingService.PublishAsync(
             content.Key,
             [
@@ -380,7 +380,7 @@ public partial class ContentPublishingServiceTests
         Assert.AreEqual(ContentPublishingOperationStatus.InvalidCulture, result.Result);
         VerifyIsPublished(content.Key);
 
-        content = ContentService.GetById(content.Key)!;
+        content = (await ContentService.GetByIdAsync(content.Key, CancellationToken.None))!;
         Assert.AreEqual(2, content.PublishedCultures.Count());
     }
 
@@ -397,7 +397,7 @@ public partial class ContentPublishingServiceTests
             .Build();
         content.SetValue("title", "EN title", culture: langEn.IsoCode);
         content.SetValue("title", "DA title", culture: langDa.IsoCode);
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
         await ContentPublishingService.PublishAsync(
             content.Key,
             [
@@ -413,7 +413,7 @@ public partial class ContentPublishingServiceTests
         Assert.AreEqual(ContentPublishingOperationStatus.InvalidCulture, result.Result);
         VerifyIsPublished(content.Key);
 
-        content = ContentService.GetById(content.Key)!;
+        content = (await ContentService.GetByIdAsync(content.Key, CancellationToken.None))!;
         Assert.AreEqual(2, content.PublishedCultures.Count());
     }
 

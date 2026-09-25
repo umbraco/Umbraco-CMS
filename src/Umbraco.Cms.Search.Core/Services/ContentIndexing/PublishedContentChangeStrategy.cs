@@ -2,6 +2,7 @@ using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Search.Core.Extensions;
@@ -24,6 +25,8 @@ internal sealed class PublishedContentChangeStrategy : ContentChangeStrategyBase
     private readonly IMediaService _mediaService;
     private readonly IMemberService _memberService;
     private readonly IEventAggregator _eventAggregator;
+    private readonly IUmbracoDatabaseFactory _umbracoDatabaseFactory;
+    private readonly IIdKeyMap _idKeyMap;
     private readonly ILogger<PublishedContentChangeStrategy> _logger;
 
     /// <inheritdoc />
@@ -38,9 +41,9 @@ internal sealed class PublishedContentChangeStrategy : ContentChangeStrategyBase
     /// <param name="mediaService">The service used to retrieve media and enumerate the media tree.</param>
     /// <param name="memberService">The service used to retrieve members.</param>
     /// <param name="eventAggregator">The event aggregator used to publish the cancelable content indexing notification.</param>
-    /// <param name="umbracoDatabaseFactory">The database factory passed to the base class for paged descendant enumeration.</param>
-    /// <param name="idKeyMap">The map passed to the base class for resolving root item keys.</param>
-    /// <param name="logger">The logger used to record unsupported index object types.</param>
+    /// <param name="umbracoDatabaseFactory">The database factory used to build queries for paged media descendant enumeration.</param>
+    /// <param name="idKeyMap">The map used to resolve a media root item's key to its numeric ID.</param>
+    /// <param name="logger">The logger used to record unsupported index object types, passed to the base class for rebuild cancellations.</param>
     public PublishedContentChangeStrategy(
         IContentIndexingDataCollectionService contentIndexingDataCollectionService,
         IContentProtectionProvider contentProtectionProvider,
@@ -51,7 +54,7 @@ internal sealed class PublishedContentChangeStrategy : ContentChangeStrategyBase
         IUmbracoDatabaseFactory umbracoDatabaseFactory,
         IIdKeyMap idKeyMap,
         ILogger<PublishedContentChangeStrategy> logger)
-        : base(umbracoDatabaseFactory, idKeyMap, logger)
+        : base(logger)
     {
         _contentIndexingDataCollectionService = contentIndexingDataCollectionService;
         _contentProtectionProvider = contentProtectionProvider;
@@ -60,6 +63,8 @@ internal sealed class PublishedContentChangeStrategy : ContentChangeStrategyBase
         _memberService = memberService;
         _logger = logger;
         _eventAggregator = eventAggregator;
+        _umbracoDatabaseFactory = umbracoDatabaseFactory;
+        _idKeyMap = idKeyMap;
     }
 
     /// <inheritdoc />
@@ -90,7 +95,7 @@ internal sealed class PublishedContentChangeStrategy : ContentChangeStrategyBase
             }
             else
             {
-                IContentBase? content = GetContent(change);
+                IContentBase? content = await GetContentAsync(change, cancellationToken);
                 if (content is null || content.Trashed)
                 {
                     pendingRemovals.Add(change);
@@ -119,7 +124,7 @@ internal sealed class PublishedContentChangeStrategy : ContentChangeStrategyBase
 
         if (indexInfo.ContainedObjectTypes.Contains(UmbracoObjectTypes.Document))
         {
-            foreach (IContent content in _contentService.GetRootContent())
+            foreach (IContent content in await _contentService.GetRootContentAsync(cancellationToken))
             {
                 if (cancellationToken.IsCancellationRequested)
                 {
@@ -222,20 +227,31 @@ internal sealed class PublishedContentChangeStrategy : ContentChangeStrategyBase
         {
             case UmbracoObjectTypes.Document:
                 await EnumerateDescendantsByPath<IContent>(
-                    objectType,
                     content.Key,
-                    (id, pageIndex, pageSize, query, ordering) => _contentService
-                        .GetPagedDescendants(id, pageIndex, pageSize, out _, query, ordering)
-                        .ToArray(),
+                    async (rootKey, skip, take, ordering) =>
+                        (await _contentService.GetDescendantsAsync(rootKey, skip, take, ordering, cancellationToken, includeTrashed: SupportsTrashedContent)).Items.ToArray(),
                     ProcessDescendants);
                 break;
             case UmbracoObjectTypes.Media:
                 await EnumerateDescendantsByPath<IMedia>(
-                    objectType,
                     content.Key,
-                    (id, pageIndex, pageSize, query, ordering) => _mediaService
-                        .GetPagedDescendants(id, pageIndex, pageSize, out _, query, ordering)
-                        .ToArray(),
+                    async (rootKey, skip, take, ordering) =>
+                    {
+                        Attempt<int> rootIdAttempt = await _idKeyMap.GetIdForKeyAsync(rootKey, UmbracoObjectTypes.Media);
+                        if (rootIdAttempt.Success is false)
+                        {
+                            _logger.LogWarning("Could not resolve ID for {objectType} item {rootId} - aborting enumeration of descendants.", UmbracoObjectTypes.Media, rootKey);
+                            return [];
+                        }
+
+                        IQuery<IMedia> query = _umbracoDatabaseFactory.SqlContext.Query<IMedia>();
+                        if (SupportsTrashedContent is false)
+                        {
+                            query = query.Where(media => media.Trashed == false);
+                        }
+
+                        return _mediaService.GetPagedDescendants(rootIdAttempt.Result, skip / take, take, out _, query, ordering).ToArray();
+                    },
                     ProcessDescendants);
                 break;
         }
@@ -244,7 +260,7 @@ internal sealed class PublishedContentChangeStrategy : ContentChangeStrategyBase
     private async Task<Variation[]> UpdateIndexAsync(ContentIndexInfo[] indexInfos, IContentBase content, UmbracoObjectTypes objectType, CancellationToken cancellationToken)
     {
         Variation[] variations = objectType is UmbracoObjectTypes.Document
-            ? RoutablePublishedVariations(content)
+            ? await RoutablePublishedVariationsAsync(content, cancellationToken)
             : NonDocumentVariations(content);
         if (variations.Length is 0)
         {
@@ -316,10 +332,10 @@ internal sealed class PublishedContentChangeStrategy : ContentChangeStrategyBase
         }
     }
 
-    private IContentBase? GetContent(ContentChange change)
+    private async Task<IContentBase?> GetContentAsync(ContentChange change, CancellationToken cancellationToken)
         => change.ObjectType switch
         {
-            UmbracoObjectTypes.Document => _contentService.GetById(change.Id),
+            UmbracoObjectTypes.Document => await _contentService.GetByIdAsync(change.Id, cancellationToken),
             UmbracoObjectTypes.Media => _mediaService.GetById(change.Id),
             UmbracoObjectTypes.Member => _memberService.GetById(change.Id),
             _ => throw new ArgumentOutOfRangeException(nameof(change), change.ObjectType, "This strategy only supports documents, media and members")
@@ -332,7 +348,7 @@ internal sealed class PublishedContentChangeStrategy : ContentChangeStrategyBase
 
     // NOTE: for the time being, segments are not individually publishable, but it will likely happen at some point,
     //       so this method deals with variations - not cultures.
-    private Variation[] RoutablePublishedVariations(IContentBase content)
+    private async Task<Variation[]> RoutablePublishedVariationsAsync(IContentBase content, CancellationToken cancellationToken)
     {
         if (content.IsPublished() is false)
         {
@@ -348,7 +364,10 @@ internal sealed class PublishedContentChangeStrategy : ContentChangeStrategyBase
         // now iterate all ancestors and make sure all cultures are published all the way up the tree
         foreach (var ancestorId in content.AncestorIds())
         {
-            IContent? ancestor = _contentService.GetById(ancestorId);
+            Attempt<Guid> ancestorKeyAttempt = await _idKeyMap.GetKeyForIdAsync(ancestorId, UmbracoObjectTypes.Document);
+            IContent? ancestor = ancestorKeyAttempt.Success
+                ? await _contentService.GetByIdAsync(ancestorKeyAttempt.Result, cancellationToken)
+                : null;
             if (ancestor is null || ancestor.Published is false)
             {
                 // no published ancestor => don't index anything

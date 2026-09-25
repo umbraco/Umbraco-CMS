@@ -58,7 +58,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
                     ScopeAccessor.AmbientScope.Database.Execute("SET LOCK_TIMEOUT 60000");
                 }
 
-                service.Save(content);
+                service.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None).GetAwaiter().GetResult();
                 scope.Complete();
             }
         }
@@ -144,7 +144,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
                         Assert.IsNull(currentScope);
 
                         string name1 = "test-" + Guid.NewGuid();
-                        IContent content1 = contentService.Create(name1, -1, "umbTextpage");
+                        IContent content1 = contentService.CreateAsync(name1, (Guid?)null, "umbTextpage", Constants.Security.SuperUserKey, CancellationToken.None).GetAwaiter().GetResult();
 
                         log.LogInformation("[{ThreadId}] Saving content #1.", Thread.CurrentThread.ManagedThreadId);
                         Save(contentService, content1);
@@ -152,7 +152,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
                         Thread.Sleep(100); // quick pause for maximum overlap!
 
                         string name2 = "test-" + Guid.NewGuid();
-                        IContent content2 = contentService.Create(name2, -1, "umbTextpage");
+                        IContent content2 = contentService.CreateAsync(name2, (Guid?)null, "umbTextpage", Constants.Security.SuperUserKey, CancellationToken.None).GetAwaiter().GetResult();
 
                         log.LogInformation("[{ThreadId}] Saving content #2.", Thread.CurrentThread.ManagedThreadId);
                         Save(contentService, content2);
@@ -188,7 +188,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             if (exceptions.Count == 0)
             {
                 // now look up all items, there should be 40!
-                IEnumerable<IContent> items = contentService.GetRootContent();
+                IEnumerable<IContent> items = contentService.GetRootContentAsync(CancellationToken.None).GetAwaiter().GetResult();
                 Assert.AreEqual(2 * MaxThreadCount, items.Count());
             }
             else

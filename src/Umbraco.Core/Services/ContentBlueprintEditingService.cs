@@ -35,6 +35,8 @@ internal sealed class ContentBlueprintEditingService
     /// <param name="optionsMonitor">The content settings options monitor.</param>
     /// <param name="relationService">The relation service.</param>
     /// <param name="contentTypeFilters">The content type filter collection.</param>
+    /// <param name="languageService">The language service.</param>
+    /// <param name="userService">The user service.</param>
     public ContentBlueprintEditingService(
         IContentService contentService,
         IContentTypeService contentTypeService,
@@ -54,19 +56,16 @@ internal sealed class ContentBlueprintEditingService
         => _containerService = containerService;
 
     /// <inheritdoc />
-    public override Task<IContent?> GetAsync(Guid key)
-    {
-        IContent? blueprint = ContentService.GetBlueprintById(key);
-        return Task.FromResult(blueprint);
-    }
+    public override async Task<IContent?> GetAsync(Guid key) =>
+        await ContentService.GetBlueprintByIdAsync(key, CancellationToken.None);
 
     /// <inheritdoc />
-    public Task<IContent?> GetScaffoldedAsync(Guid key)
+    public async Task<IContent?> GetScaffoldedAsync(Guid key)
     {
-        IContent? blueprint = ContentService.GetBlueprintById(key);
+        IContent? blueprint = await ContentService.GetBlueprintByIdAsync(key, CancellationToken.None);
         if (blueprint is null)
         {
-            return Task.FromResult<IContent?>(null);
+            return null;
         }
 
         IContent scaffold = blueprint.DeepCloneWithResetIdentities();
@@ -75,7 +74,7 @@ internal sealed class ContentBlueprintEditingService
         scope.Notifications.Publish(new ContentScaffoldedNotification(blueprint, scaffold, Constants.System.Root, new EventMessages()));
         scope.Complete();
 
-        return Task.FromResult<IContent?>(scaffold);
+        return scaffold;
     }
 
     /// <inheritdoc />
@@ -87,7 +86,7 @@ internal sealed class ContentBlueprintEditingService
             return Attempt.FailWithStatus<PagedModel<IContent>?, ContentEditingOperationStatus>(ContentEditingOperationStatus.ContentTypeNotFound, null);
         }
 
-        IContent[] blueprints = ContentService.GetBlueprintsForContentTypes([contentType.Id]).ToArray();
+        IContent[] blueprints = (await ContentService.GetBlueprintsForContentTypesAsync(CancellationToken.None, contentType.Key)).ToArray();
 
         var result = new PagedModel<IContent>
         {
@@ -114,7 +113,7 @@ internal sealed class ContentBlueprintEditingService
 
         IContent blueprint = result.Result.Content!;
 
-        if (ValidateUniqueNames(createModel.Variants, blueprint) is false)
+        if (await ValidateUniqueNamesAsync(createModel.Variants, blueprint) is false)
         {
             return Attempt.FailWithStatus(ContentEditingOperationStatus.DuplicateName, new ContentCreateResult());
         }
@@ -128,20 +127,19 @@ internal sealed class ContentBlueprintEditingService
     /// <inheritdoc />
     public async Task<Attempt<ContentCreateResult, ContentEditingOperationStatus>> CreateFromContentAsync(Guid contentKey, string name, Guid? key, Guid userKey)
     {
-        IContent? content = ContentService.GetById(contentKey);
+        IContent? content = await ContentService.GetByIdAsync(contentKey, CancellationToken.None);
         if (content is null)
         {
             return Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, new ContentCreateResult());
         }
 
-        if (ValidateUniqueName(name, content) is false)
+        if (await ValidateUniqueNameAsync(name, content) is false)
         {
             return Attempt.FailWithStatus(ContentEditingOperationStatus.DuplicateName, new ContentCreateResult());
         }
 
         // Create Blueprint
-        var currentUserId = await GetUserIdAsync(userKey);
-        IContent blueprint = ContentService.CreateBlueprintFromContent(content, name, currentUserId);
+        IContent blueprint = await ContentService.CreateBlueprintFromContentAsync(content, name, userKey, CancellationToken.None);
 
         if (key.HasValue)
         {
@@ -163,7 +161,7 @@ internal sealed class ContentBlueprintEditingService
             return Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, new ContentUpdateResult());
         }
 
-        if (ValidateUniqueNames(updateModel.Variants, blueprint) is false)
+        if (await ValidateUniqueNamesAsync(updateModel.Variants, blueprint) is false)
         {
             return Attempt.FailWithStatus(ContentEditingOperationStatus.DuplicateName, new ContentUpdateResult());
         }
@@ -196,8 +194,7 @@ internal sealed class ContentBlueprintEditingService
         }
 
         // Delete blueprint
-        var performingUserId = await GetUserIdAsync(userKey);
-        ContentService.DeleteBlueprint(blueprint, performingUserId);
+        await ContentService.DeleteBlueprintAsync(blueprint, userKey, CancellationToken.None);
 
         scope.Complete();
         return Attempt.SucceedWithStatus<IContent?, ContentEditingOperationStatus>(ContentEditingOperationStatus.Success, blueprint);
@@ -234,8 +231,7 @@ internal sealed class ContentBlueprintEditingService
         //       structural node data like path, level, sort orders etc.
         toMove.ParentId = parentId;
 
-        var userId = await GetUserIdAsync(userKey);
-        ContentService.MoveBlueprint(toMove, userId);
+        await ContentService.MoveBlueprintAsync(toMove, userKey, CancellationToken.None);
 
         scope.Complete();
 
@@ -264,22 +260,22 @@ internal sealed class ContentBlueprintEditingService
     /// Moves the specified content to a new parent. Not supported for blueprints.
     /// </summary>
     /// <param name="content">The content to move.</param>
-    /// <param name="newParentId">The ID of the new parent.</param>
+    /// <param name="parentKey">The key of the new parent, or null for root.</param>
     /// <param name="includeDescendants">Whether to move the descendants along with the content. Not supported for blueprints.</param>
-    /// <param name="userId">The ID of the user performing the operation.</param>
+    /// <param name="userKey">The key of the user performing the operation.</param>
     /// <returns>Not supported for blueprints.</returns>
     /// <exception cref="NotImplementedException">Always thrown as this operation is not supported for blueprints.</exception>
     /// <remarks>
     /// Some methods from ContentEditingServiceBase are needed, so we need to inherit from it
     /// but there are others that are not required to be implemented in the case of blueprints.
     /// </remarks>
-    protected override OperationResult? Move(IContent content, int newParentId, bool includeDescendants, int userId) => throw new NotImplementedException();
+    protected override Task<ContentEditingOperationStatus> MoveAsync(IContent content, Guid? parentKey, bool includeDescendants, Guid userKey) => throw new NotImplementedException();
 
     /// <summary>
     /// Copies the specified content to a new parent. Not supported for blueprints.
     /// </summary>
     /// <param name="content">The content to copy.</param>
-    /// <param name="newParentId">The ID of the new parent.</param>
+    /// <param name="parentKey">The key of the new parent.</param>
     /// <param name="relateToOriginal">Whether to relate the copy to the original.</param>
     /// <param name="includeDescendants">Whether to include descendants in the copy.</param>
     /// <param name="userKey">The key of the user performing the operation.</param>
@@ -287,7 +283,7 @@ internal sealed class ContentBlueprintEditingService
     /// <exception cref="NotImplementedException">Always thrown as this operation is not supported for blueprints.</exception>
     protected override Task<IContent?> CopyAsync(
         IContent content,
-        int newParentId,
+        Guid? parentKey,
         bool relateToOriginal,
         bool includeDescendants,
         Guid userKey) => throw new NotImplementedException();
@@ -296,19 +292,19 @@ internal sealed class ContentBlueprintEditingService
     /// Moves the specified content to the recycle bin. Not supported for blueprints.
     /// </summary>
     /// <param name="content">The content to move to recycle bin.</param>
-    /// <param name="userId">The ID of the user performing the operation.</param>
+    /// <param name="userKey">The key of the user performing the operation.</param>
     /// <returns>Not supported for blueprints.</returns>
     /// <exception cref="NotImplementedException">Always thrown as this operation is not supported for blueprints.</exception>
-    protected override OperationResult? MoveToRecycleBin(IContent content, int userId) => throw new NotImplementedException();
+    protected override Task<OperationResult?> MoveToRecycleBinAsync(IContent content, Guid userKey) => throw new NotImplementedException();
 
     /// <summary>
     /// Deletes the specified content. Not supported for blueprints.
     /// </summary>
     /// <param name="content">The content to delete.</param>
-    /// <param name="userId">The ID of the user performing the operation.</param>
+    /// <param name="userKey">The key of the user performing the operation.</param>
     /// <returns>Not supported for blueprints.</returns>
     /// <exception cref="NotImplementedException">Always thrown as this operation is not supported for blueprints.</exception>
-    protected override OperationResult? Delete(IContent content, int userId) => throw new NotImplementedException();
+    protected override Task<OperationResult?> DeleteAsync(IContent content, Guid userKey) => throw new NotImplementedException();
 
     /// <summary>
     /// Saves a blueprint with the specified user key.
@@ -316,11 +312,8 @@ internal sealed class ContentBlueprintEditingService
     /// <param name="blueprint">The blueprint to save.</param>
     /// <param name="userKey">The unique identifier of the user performing the save.</param>
     /// <param name="createdFromContent">The optional content item the blueprint was created from.</param>
-    private async Task SaveAsync(IContent blueprint, Guid userKey, IContent? createdFromContent = null)
-    {
-        var currentUserId = await GetUserIdAsync(userKey);
-        ContentService.SaveBlueprint(blueprint, createdFromContent, currentUserId);
-    }
+    private async Task SaveAsync(IContent blueprint, Guid userKey, IContent? createdFromContent = null) =>
+        await ContentService.SaveBlueprintAsync(blueprint, createdFromContent, userKey, CancellationToken.None);
 
     /// <summary>
     /// Validates that the specified name is unique among blueprints of the same content type.
@@ -328,9 +321,9 @@ internal sealed class ContentBlueprintEditingService
     /// <param name="name">The name to validate.</param>
     /// <param name="content">The content item to check against.</param>
     /// <returns><c>true</c> if the name is unique; otherwise, <c>false</c>.</returns>
-    private bool ValidateUniqueName(string name, IContent content)
+    private async Task<bool> ValidateUniqueNameAsync(string name, IContent content)
     {
-        IEnumerable<IContent> existing = ContentService.GetBlueprintsForContentTypes(content.ContentTypeId);
+        IEnumerable<IContent> existing = await ContentService.GetBlueprintsForContentTypesAsync(CancellationToken.None, content.ContentType.Key);
         return existing.Any(c => c.Name == name && c.Id != content.Id) is false;
     }
 
@@ -340,9 +333,9 @@ internal sealed class ContentBlueprintEditingService
     /// <param name="variants">The variants containing names to validate.</param>
     /// <param name="content">The content item to check against.</param>
     /// <returns><c>true</c> if all names are unique; otherwise, <c>false</c>.</returns>
-    private bool ValidateUniqueNames(IEnumerable<VariantModel> variants, IContent content)
+    private async Task<bool> ValidateUniqueNamesAsync(IEnumerable<VariantModel> variants, IContent content)
     {
-        IContent[] existing = ContentService.GetBlueprintsForContentTypes(content.ContentTypeId).ToArray();
+        IContent[] existing = (await ContentService.GetBlueprintsForContentTypesAsync(CancellationToken.None, content.ContentType.Key)).ToArray();
         foreach (VariantModel variant in variants)
         {
             if (existing.Any(c => c.GetCultureName(variant.Culture) == variant.Name && c.Id != content.Id))

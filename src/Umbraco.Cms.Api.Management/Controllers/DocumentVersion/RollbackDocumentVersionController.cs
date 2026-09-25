@@ -58,7 +58,7 @@ public class RollbackDocumentVersionController : DocumentVersionControllerBase
     public async Task<IActionResult> Rollback(CancellationToken cancellationToken, Guid id, string? culture)
     {
         Attempt<IContent?, ContentVersionOperationStatus> getContentAttempt =
-            await _contentVersionService.GetAsync(id);
+            await _contentVersionService.GetAsync(id, cancellationToken);
         if (getContentAttempt.Success is false || getContentAttempt.Result is null)
         {
             return MapFailure(getContentAttempt.Status);

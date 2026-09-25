@@ -20,19 +20,19 @@ public abstract class DeletedVersionsNotificationBase<T> : StatefulNotification
     /// <summary>
     ///     Initializes a new instance of the <see cref="DeletedVersionsNotificationBase{T}"/> class.
     /// </summary>
-    /// <param name="id">The ID of the entity whose versions are being deleted.</param>
+    /// <param name="key">The Guid key of the entity whose versions are being deleted.</param>
     /// <param name="messages">The event messages collection.</param>
     /// <param name="specificVersion">The specific version to delete, or default to delete based on other criteria.</param>
     /// <param name="deletePriorVersions">Whether to delete all versions prior to the specified version.</param>
     /// <param name="dateToRetain">The date before which versions should be deleted.</param>
     protected DeletedVersionsNotificationBase(
-        int id,
+        Guid key,
         EventMessages messages,
         int specificVersion = default,
         bool deletePriorVersions = false,
         DateTime dateToRetain = default)
     {
-        Id = id;
+        Key = key;
         Messages = messages;
         SpecificVersion = specificVersion;
         DeletePriorVersions = deletePriorVersions;
@@ -40,9 +40,9 @@ public abstract class DeletedVersionsNotificationBase<T> : StatefulNotification
     }
 
     /// <summary>
-    ///     Gets the ID of the entity whose versions are being deleted.
+    ///     Gets the Guid key of the entity whose versions are being deleted.
     /// </summary>
-    public int Id { get; }
+    public Guid Key { get; }
 
     /// <summary>
     ///     Gets the event messages collection.

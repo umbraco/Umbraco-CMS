@@ -529,24 +529,7 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
                 new PropertyEditorCollection(new DataEditorCollection(() => Enumerable.Empty<IDataEditor>()));
             var dataValueReferences =
                 new DataValueReferenceFactoryCollection(() => Enumerable.Empty<IDataValueReferenceFactory>(), new NullLogger<DataValueReferenceFactoryCollection>());
-            var contentRepo = new DocumentRepository(
-                scopeAccessor,
-                AppCaches.Disabled,
-                LoggerFactory.CreateLogger<DocumentRepository>(),
-                LoggerFactory,
-                contentTypeRepository,
-                templateRepository,
-                tagRepository,
-                languageRepository,
-                relationRepository,
-                relationTypeRepository,
-                propertyEditors,
-                dataValueReferences,
-                dataTypeService,
-                serializer,
-                Mock.Of<IEventAggregator>(),
-                Mock.Of<IRepositoryCacheVersionService>(),
-                Mock.Of<ICacheSyncService>());
+            var contentRepo = GetRequiredService<IDocumentRepository>();
 
             var template = TemplateBuilder.CreateTextPageTemplate();
             await templateService.CreateAsync(template, Constants.Security.SuperUserKey); // else, FK violation on contentType!
@@ -556,10 +539,10 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
             await contentTypeRepository.SaveAsync(contentType, CancellationToken.None);
 
             var textpage = ContentBuilder.CreateSimpleContent(contentType);
-            contentRepo.Save(textpage);
+            await contentRepo.SaveAsync(textpage, CancellationToken.None);
 
             textpage.TemplateId = template.Id;
-            contentRepo.Save(textpage);
+            await contentRepo.SaveAsync(textpage, CancellationToken.None);
 
             // Act
             var templates = templateRepository.Get("textPage");

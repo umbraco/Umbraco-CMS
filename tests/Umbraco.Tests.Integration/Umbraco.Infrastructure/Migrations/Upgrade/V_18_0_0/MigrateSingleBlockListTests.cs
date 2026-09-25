@@ -90,7 +90,7 @@ internal sealed class MigrateSingleBlockListTests : UmbracoIntegrationTest
         var innerBlockKey = Guid.NewGuid();
         var outerBlockKey = Guid.NewGuid();
 
-        Content content = SaveContent(
+        Content content = await SaveContentAsync(
             schema,
             BuildOuterValueJson(schema, outerBlockKey, BuildNestedSingleBlockListJson(schema, innerBlockKey)));
 
@@ -112,7 +112,7 @@ internal sealed class MigrateSingleBlockListTests : UmbracoIntegrationTest
         // Values that have not been re-saved since they were written by a pre-v14 (Newtonsoft) serializer carry
         // Pascal cased "Layout"/"ContentData" property names. JsonBlockValueConverter reads both spellings, so the
         // migration has to cope with them too.
-        Content content = SaveContent(
+        Content content = await SaveContentAsync(
             schema,
             ToPascalCasedPropertyNames(BuildOuterValueJson(
                 schema,
@@ -140,7 +140,7 @@ internal sealed class MigrateSingleBlockListTests : UmbracoIntegrationTest
             NestedPropertyAlias,
             BuildNestedSingleBlockListJson(schema, innerBlockKey)));
 
-        Content content = SaveContent(schema, BuildOuterValueJson(schema, outerBlockKey, intermediateJson));
+        Content content = await SaveContentAsync(schema, BuildOuterValueJson(schema, outerBlockKey, intermediateJson));
 
         await ExecuteMigrationAsync();
 
@@ -164,7 +164,7 @@ internal sealed class MigrateSingleBlockListTests : UmbracoIntegrationTest
             schema.NestedDataType.Id,
             Constants.PropertyEditors.Aliases.BlockList);
 
-        Content content = SaveContent(
+        Content content = await SaveContentAsync(
             pageContentType,
             "Top level page",
             BuildNestedSingleBlockListJson(schema, innerBlockKey));
@@ -184,7 +184,7 @@ internal sealed class MigrateSingleBlockListTests : UmbracoIntegrationTest
         var innerBlockKey = Guid.NewGuid();
         var outerBlockKey = Guid.NewGuid();
 
-        Content content = SaveContent(
+        Content content = await SaveContentAsync(
             schema,
             BuildOuterValueJson(
                 schema,
@@ -209,7 +209,7 @@ internal sealed class MigrateSingleBlockListTests : UmbracoIntegrationTest
 
         // A single block mode Block List holding no block at all: neither the layout lookup nor the access of the
         // first layout item in the conversion may throw.
-        Content content = SaveContent(
+        Content content = await SaveContentAsync(
             schema,
             BuildOuterValueJson(schema, outerBlockKey, JsonSerializer.Serialize(new BlockListValue())));
 
@@ -532,10 +532,10 @@ internal sealed class MigrateSingleBlockListTests : UmbracoIntegrationTest
             .Replace("\"settingsData\":", "\"SettingsData\":")
             .Replace("\"expose\":", "\"Expose\":");
 
-    private Content SaveContent(TestSchema schema, string propertyValue)
-        => SaveContent(schema.PageContentType, "Page", propertyValue);
+    private Task<Content> SaveContentAsync(TestSchema schema, string propertyValue)
+        => SaveContentAsync(schema.PageContentType, "Page", propertyValue);
 
-    private Content SaveContent(IContentType contentType, string name, string propertyValue)
+    private async Task<Content> SaveContentAsync(IContentType contentType, string name, string propertyValue)
     {
         // The value is set directly rather than through a value editor, so the database holds exactly the
         // pre-migration JSON the test built.
@@ -545,7 +545,7 @@ internal sealed class MigrateSingleBlockListTests : UmbracoIntegrationTest
             .Build();
         content.SetValue(OuterPropertyAlias, propertyValue);
 
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         return content;
     }

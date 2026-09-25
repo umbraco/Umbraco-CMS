@@ -19,6 +19,8 @@ public class ContentTypeService : AsyncContentTypeServiceBase<IContentTypeReposi
     private readonly ITemplateService _templateService;
     private readonly IContentService _contentService;
     private readonly IElementService _elementService;
+    private readonly IIdKeyMap _idKeyMap;
+    private readonly ILogger<ContentTypeService> _logger;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="ContentTypeService" /> class.
@@ -35,6 +37,8 @@ public class ContentTypeService : AsyncContentTypeServiceBase<IContentTypeReposi
     /// <param name="userIdKeyResolver">The user ID key resolver.</param>
     /// <param name="contentTypeFilters">The content type filter collection.</param>
     /// <param name="templateService">The template service.</param>
+    /// <param name="idKeyMap">The ID/key map.</param>
+    /// <param name="elementService">The element service.</param>
     public ContentTypeService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -48,7 +52,8 @@ public class ContentTypeService : AsyncContentTypeServiceBase<IContentTypeReposi
         IEventAggregator eventAggregator,
         IUserIdKeyResolver userIdKeyResolver,
         ContentTypeFilterCollection contentTypeFilters,
-        ITemplateService templateService)
+        ITemplateService templateService,
+        IIdKeyMap idKeyMap)
         : base(
             provider,
             loggerFactory,
@@ -64,6 +69,8 @@ public class ContentTypeService : AsyncContentTypeServiceBase<IContentTypeReposi
         _templateService = templateService;
         _contentService = contentService;
         _elementService = elementService;
+        _idKeyMap = idKeyMap;
+        _logger = loggerFactory.CreateLogger<ContentTypeService>();
     }
 
     /// <inheritdoc />
@@ -168,18 +175,39 @@ public class ContentTypeService : AsyncContentTypeServiceBase<IContentTypeReposi
     }
 
     /// <inheritdoc />
-    protected override Task DeleteItemsOfTypesAsync(IEnumerable<int> typeIds)
+    protected override async Task DeleteItemsOfTypesAsync(IEnumerable<int> typeIds)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             var typeIdsA = typeIds.ToArray();
-            _contentService.DeleteOfTypes(typeIdsA);
-            _contentService.DeleteBlueprintsOfTypes(typeIdsA);
-            _elementService.DeleteOfTypes(typeIdsA);
+
+            var typeKeys = new List<Guid>();
+            foreach (int typeId in typeIdsA)
+            {
+                Attempt<Guid> keyAttempt = await _idKeyMap.GetKeyForIdAsync(typeId, UmbracoObjectTypes.DocumentType);
+                if (keyAttempt.Success)
+                {
+                    typeKeys.Add(keyAttempt.Result);
+                }
+                else
+                {
+                    // Dropping it silently would leave content of that type behind while the caller is told the
+                    // delete succeeded.
+                    _logger.LogWarning(
+                        "Could not resolve a key for content type {ContentTypeId}; its content was not deleted.",
+                        typeId);
+                }
+            }
+
+            if (typeKeys.Count > 0)
+            {
+                await _contentService.DeleteOfTypesAsync(typeKeys, Constants.Security.SuperUserKey, CancellationToken.None);
+                await _contentService.DeleteBlueprintsOfTypesAsync(typeKeys, Constants.Security.SuperUserKey, CancellationToken.None);
+                await _elementService.DeleteOfTypesAsync(typeKeys, Constants.Security.SuperUserKey, CancellationToken.None);
+            }
+
             scope.Complete();
         }
-
-        return Task.CompletedTask;
     }
 
     #region Notifications

@@ -311,14 +311,14 @@ public class DeliveryApiContentQueryProviderTests : TestBase
                 .WithContentType(pageType)
                 .WithName("Alpha Site")
                 .Build();
-            SaveAndPublish(rootAlpha);
+            await SaveAndPublishAsync(rootAlpha);
 
             Content rootZulu = new ContentBuilder()
                 .WithKey(RootZuluKey)
                 .WithContentType(landingType)
                 .WithName("Zulu Site")
                 .Build();
-            SaveAndPublish(rootZulu);
+            await SaveAndPublishAsync(rootZulu);
 
             Content childBeta = new ContentBuilder()
                 .WithKey(ChildBetaKey)
@@ -326,7 +326,7 @@ public class DeliveryApiContentQueryProviderTests : TestBase
                 .WithParent(rootAlpha)
                 .WithName("Beta Page")
                 .Build();
-            SaveAndPublish(childBeta);
+            await SaveAndPublishAsync(childBeta);
 
             Content childGamma = new ContentBuilder()
                 .WithKey(ChildGammaKey)
@@ -334,7 +334,7 @@ public class DeliveryApiContentQueryProviderTests : TestBase
                 .WithParent(rootAlpha)
                 .WithName("Gamma Page")
                 .Build();
-            SaveAndPublish(childGamma);
+            await SaveAndPublishAsync(childGamma);
 
             Content grandchildDelta = new ContentBuilder()
                 .WithKey(GrandchildDeltaKey)
@@ -342,7 +342,7 @@ public class DeliveryApiContentQueryProviderTests : TestBase
                 .WithParent(childBeta)
                 .WithName("Delta Page")
                 .Build();
-            SaveAndPublish(grandchildDelta);
+            await SaveAndPublishAsync(grandchildDelta);
         });
     }
 }

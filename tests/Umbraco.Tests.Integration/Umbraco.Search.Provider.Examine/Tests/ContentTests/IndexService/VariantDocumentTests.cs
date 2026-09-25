@@ -33,8 +33,8 @@ public class VariantDocumentTests : IndexTestBase
         var indexAlias = GetIndexAlias(publish);
         await WaitForIndexing(indexAlias, () =>
         {
-            IContent content = ContentService.GetById(RootKey)!;
-            ContentService.Delete(content);
+            IContent content = ContentService.GetByIdAsync(RootKey, CancellationToken.None).GetAwaiter().GetResult()!;
+            ContentService.DeleteAsync(content, Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None).GetAwaiter().GetResult();
             return Task.CompletedTask;
         });
 
@@ -53,11 +53,10 @@ public class VariantDocumentTests : IndexTestBase
         ISearchResults results = index.Searcher.CreateQuery().All().Execute();
         Assert.That(results.TotalItemCount, Is.EqualTo(3));
 
-        await WaitForIndexing(indexAlias, () =>
+        await WaitForIndexing(indexAlias, async () =>
         {
-            IContent content = ContentService.GetById(RootKey)!;
-            ContentService.Unpublish(content, "da-DK");
-            return Task.CompletedTask;
+            IContent content = ContentService.GetByIdAsync(RootKey, CancellationToken.None).GetAwaiter().GetResult()!;
+            await ContentService.UnpublishAsync(content, "da-DK", Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         });
 
         results = index.Searcher.CreateQuery().All().Execute();
@@ -248,28 +247,26 @@ public class VariantDocumentTests : IndexTestBase
         root.SetValue("body", "ボディ-segment-1", "ja-JP", "segment-1");
         root.SetValue("body", "ボディ-segment-2", "ja-JP", "segment-2");
 
-        await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, () =>
+        await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, async () =>
         {
-            ContentService.Save(root);
-            ContentService.Publish(root, ["*"]);
-            return Task.CompletedTask;
+            await ContentService.SaveAsync(root, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
+            await ContentService.PublishAsync(root, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         });
 
-        IContent? content = ContentService.GetById(RootKey);
+        IContent? content = ContentService.GetByIdAsync(RootKey, CancellationToken.None).GetAwaiter().GetResult();
         Assert.That(content, Is.Not.Null);
     }
 
 
     private async Task UpdateProperty(string propertyName, object value, string culture)
     {
-        IContent content = ContentService.GetById(RootKey)!;
+        IContent content = ContentService.GetByIdAsync(RootKey, CancellationToken.None).GetAwaiter().GetResult()!;
         content.SetValue(propertyName, value, culture);
 
-        await WaitForIndexing(GetIndexAlias(true), () =>
+        await WaitForIndexing(GetIndexAlias(true), async () =>
         {
-            ContentService.Save(content);
-            ContentService.Publish(content, ["*"]);
-            return Task.CompletedTask;
+            await ContentService.SaveAsync(content, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
+            await ContentService.PublishAsync(content, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         });
     }
 }

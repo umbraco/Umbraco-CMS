@@ -477,7 +477,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             // ensure it's single-line as NPoco PagingHelper has issues with multi-lines
             psql = Sql(psql.SQL.ToSingleLine(), psql.Arguments);
 
-            // replace the magic culture parameter (see DocumentRepository.GetBaseQuery())
+            // replace the magic culture parameter a repository's own base query may have parameterised
             if (!ordering.Culture.IsNullOrWhiteSpace())
             {
                 for (var i = 0; i < psql.Arguments.Length; i++)
@@ -588,10 +588,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     return GetAliasedField(SqlSyntax.GetFieldName<NodeDto>(x => x.Text!), sql);
                 }
 
-                // "variantName" alias is defined in DocumentRepository.GetBaseQuery
-                // TODO: what if it is NOT a document but a ... media or whatever?
-                // previously, we inserted the join+select *here* so we were sure to have it,
-                // but now that's not the case anymore!
+                // No repository still deriving from this base defines a "variantName" alias in its query -
+                // the document repository was the only one that did, and its NPoco implementation is gone.
+                // Ordering by name with a culture is therefore unsatisfiable here; it was already so for
+                // media and members, which do not vary by culture.
                 return "variantName";
             }
 
@@ -1268,6 +1268,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
             return sortOrder + 1 ?? first;
         }
+
+        // Root is the one parent whose node row must not supply the key: null is the "no parent" value ParentKey
+        // contracts to. Every other parent, the recycle bin included, carries the key the contract expects.
+        private protected static Guid? ResolveParentKey(int parentId, NodeDto parent) =>
+            parentId == Constants.System.Root ? null : parent.UniqueId;
 
         protected virtual NodeDto GetParentNodeDto(int parentId)
         {

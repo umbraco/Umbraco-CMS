@@ -61,10 +61,12 @@ public static class PublicAccessServiceExtensions
     /// <param name="contentService">The content service for retrieving the document.</param>
     /// <param name="username">The username to check access for.</param>
     /// <param name="currentMemberRoles">The current member roles of the user.</param>
+    /// <param name="idKeyMap">The id-key map used to resolve the document id to a key.</param>
     /// <returns><c>true</c> if the user has access; otherwise, <c>false</c>.</returns>
-    public static async Task<bool> HasAccessAsync(this IPublicAccessService publicAccessService, int documentId, IContentService contentService, string username, IEnumerable<string> currentMemberRoles)
+    public static async Task<bool> HasAccessAsync(this IPublicAccessService publicAccessService, int documentId, IContentService contentService, string username, IEnumerable<string> currentMemberRoles, IIdKeyMap idKeyMap)
     {
-        IContent? content = contentService.GetById(documentId);
+        Attempt<Guid> keyAttempt = await idKeyMap.GetKeyForIdAsync(documentId, UmbracoObjectTypes.Document);
+        IContent? content = keyAttempt.Success ? await contentService.GetByIdAsync(keyAttempt.Result, CancellationToken.None) : null;
         if (content == null)
         {
             return true;

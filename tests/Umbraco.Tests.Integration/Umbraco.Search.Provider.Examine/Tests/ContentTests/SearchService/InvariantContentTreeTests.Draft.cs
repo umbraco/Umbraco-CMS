@@ -17,8 +17,8 @@ public partial class InvariantContentTreeTests : SearcherTestBase
         await WaitForIndexing(GetIndexAlias(false), async () =>
         {
             await CreateInvariantDocumentTree(false);
-            IContent root = ContentService.GetById(RootKey)!;
-            ContentService.MoveToRecycleBin(root);
+            IContent root = (await ContentService.GetByIdAsync(RootKey, CancellationToken.None))!;
+            await ContentService.MoveToRecycleBinAsync(root, Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         });
 
         var indexAlias = GetIndexAlias(false);
@@ -49,8 +49,8 @@ public partial class InvariantContentTreeTests : SearcherTestBase
 
         await WaitForIndexing(indexAlias, () =>
         {
-            IContent child = ContentService.GetById(ChildKey)!;
-            ContentService.Delete(child);
+            IContent child = ContentService.GetByIdAsync(ChildKey, CancellationToken.None).GetAwaiter().GetResult()!;
+            ContentService.DeleteAsync(child, Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None).GetAwaiter().GetResult();
             return Task.CompletedTask;
         });
 
@@ -78,8 +78,8 @@ public partial class InvariantContentTreeTests : SearcherTestBase
 
         await WaitForIndexing(indexAlias, () =>
         {
-            IContent grandchild = ContentService.GetById(GrandchildKey)!;
-            ContentService.Delete(grandchild);
+            IContent grandchild = ContentService.GetByIdAsync(GrandchildKey, CancellationToken.None).GetAwaiter().GetResult()!;
+            ContentService.DeleteAsync(grandchild, Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None).GetAwaiter().GetResult();
             return Task.CompletedTask;
         });
 
@@ -152,11 +152,11 @@ public partial class InvariantContentTreeTests : SearcherTestBase
 
         if (publish)
         {
-            SaveAndPublish(root);
+            await SaveAndPublishAsync(root);
         }
         else
         {
-            ContentService.Save(root);
+            await ContentService.SaveAsync(root, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
         }
 
 
@@ -177,11 +177,11 @@ public partial class InvariantContentTreeTests : SearcherTestBase
 
         if (publish)
         {
-            SaveAndPublish(child);
+            await SaveAndPublishAsync(child);
         }
         else
         {
-            ContentService.Save(child);
+            await ContentService.SaveAsync(child, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
         }
 
         Content grandchild = new ContentBuilder()
@@ -201,11 +201,11 @@ public partial class InvariantContentTreeTests : SearcherTestBase
 
         if (publish)
         {
-            SaveAndPublish(grandchild);
+            await SaveAndPublishAsync(grandchild);
         }
         else
         {
-            ContentService.Save(grandchild);
+            await ContentService.SaveAsync(grandchild, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
         }
     }
 }

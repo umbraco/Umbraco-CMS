@@ -11,8 +11,8 @@ public sealed class ElementDeletingVersionsNotification : DeletingVersionsNotifi
     /// <summary>
     ///  Initializes a new instance of the <see cref="ElementDeletingVersionsNotification"/>.
     /// </summary>
-    /// <param name="id">
-    /// Gets the ID of the <see cref="IElement"/> object being deleted.
+    /// <param name="key">
+    /// Gets the Guid key of the <see cref="IElement"/> object being deleted.
     /// </param>
     /// <param name="messages">
     /// Initializes a new instance of the <see cref="EventMessages"/>.
@@ -26,8 +26,8 @@ public sealed class ElementDeletingVersionsNotification : DeletingVersionsNotifi
     /// <param name="dateToRetain">
     /// Gets the latest version date.
     /// </param>
-    public ElementDeletingVersionsNotification(int id, EventMessages messages, int specificVersion = default, bool deletePriorVersions = false, DateTime dateToRetain = default)
-        : base(id, messages, specificVersion, deletePriorVersions, dateToRetain)
+    public ElementDeletingVersionsNotification(Guid key, EventMessages messages, int specificVersion = default, bool deletePriorVersions = false, DateTime dateToRetain = default)
+        : base(key, messages, specificVersion, deletePriorVersions, dateToRetain)
     {
     }
 }

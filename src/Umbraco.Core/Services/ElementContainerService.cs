@@ -22,7 +22,6 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
     private readonly IEntityRepository _entityRepository;
     private readonly IEntityService _entityService;
     private readonly IElementRepository _elementRepository;
-    private readonly IUserIdKeyResolver _userIdKeyResolver;
     private readonly IElementService _elementService;
     private readonly IOptionsMonitor<ContentSettings> _contentSettingsOptions;
     private readonly IRelationService _relationService;
@@ -51,7 +50,6 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
     {
         _entityContainerRepository = entityContainerRepository;
         _entityRepository = entityRepository;
-        _userIdKeyResolver = userIdKeyResolver;
         _entityService = entityService;
         _elementRepository = elementRepository;
         _elementService = elementService;
@@ -331,7 +329,7 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
                     descendantElement.Level += levelDelta;
 
                     // make sure the element is unpublished if it is moved from trash
-                    var unpublishSuccess = await ElementEditingService.UnpublishTrashedElementOnRestore(descendantElement, userKey, _elementService, _userIdKeyResolver, _logger);
+                    var unpublishSuccess = await ElementEditingService.UnpublishTrashedElementOnRestore(descendantElement, userKey, _elementService, _logger);
                     if (unpublishSuccess is false)
                     {
                         return Attempt.Fail(EntityContainerOperationStatus.Unknown);

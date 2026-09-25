@@ -141,7 +141,8 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference, I
 
         if (contentKeys.Count > 0)
         {
-            IEnumerable<IContent> contentItems = _contentService.GetByIds(contentKeys);
+            // TODO (V20): await this once the ICacheReferencedEntities contract goes async.
+            IEnumerable<IContent> contentItems = _contentService.GetByIdsAsync(contentKeys, CancellationToken.None).GetAwaiter().GetResult();
             foreach (IContent content in contentItems)
             {
                 CacheContentById(content, _appCaches.RequestCache);
@@ -246,7 +247,8 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference, I
                     if (dto.Udi.EntityType == Constants.UdiEntityType.Document)
                     {
                         url = _publishedUrlProvider.GetUrl(dto.Udi.Guid, UrlMode.Relative, dto.Culture ?? culture);
-                        IContent? c = GetAndCacheContentById(dto.Udi.Guid, _appCaches.RequestCache, _contentService);
+                        // TODO (V20): await this once the value editor contract goes async.
+                        IContent? c = GetAndCacheContentByIdAsync(dto.Udi.Guid, _appCaches.RequestCache, _contentService, CancellationToken.None).GetAwaiter().GetResult();
 
                         if (c is not null)
                         {

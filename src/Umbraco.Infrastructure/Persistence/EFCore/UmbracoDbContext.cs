@@ -64,6 +64,14 @@ public class UmbracoDbContext : DbContext
 
     public required DbSet<UserDto> Users { get; set; }
 
+    public required DbSet<UserGroupDto> UserGroups { get; set; }
+
+    public required DbSet<UserGroup2GranularPermissionDto> UserGroup2GranularPermissions { get; set; }
+
+    public required DbSet<UserStartNodeDto> UserStartNodes { get; set; }
+
+    public required DbSet<User2NodeNotifyDto> User2NodeNotifies { get; set; }
+
     public required DbSet<AuditEntryDto> AuditEntries { get; set; }
 
     public required DbSet<LongRunningOperationDto> LongRunningOperations { get; set; }
@@ -80,11 +88,33 @@ public class UmbracoDbContext : DbContext
 
     public required DbSet<DistributedJobDto> DistributedJob { get; set; }
 
+    public required DbSet<ContentDto> Content { get; set; }
+
+    public required DbSet<ContentVersionDto> ContentVersions { get; set; }
+
+    public required DbSet<ContentVersionCultureVariationDto> ContentVersionCultureVariations { get; set; }
+
+    public required DbSet<DocumentDto> Documents { get; set; }
+
+    public required DbSet<DocumentVersionDto> DocumentVersions { get; set; }
+
+    public required DbSet<DocumentCultureVariationDto> DocumentCultureVariations { get; set; }
+
+    public required DbSet<DocumentUrlDto> DocumentUrls { get; set; }
+
+    public required DbSet<DocumentUrlAliasDto> DocumentUrlAliases { get; set; }
+
+    public required DbSet<PropertyDataDto> PropertyData { get; set; }
+
+    public required DbSet<ContentScheduleDto> ContentSchedules { get; set; }
+
+    public required DbSet<DataTypeDto> DataTypes { get; set; }
+
+    public required DbSet<ContentTypeDto> ContentTypes { get; set; }
+
     public required DbSet<ConsentDto> Consents { get; set; }
 
     public required DbSet<DictionaryDto> DictionaryEntries { get; set; }
-
-    public required DbSet<ContentTypeDto> ContentTypes { get; set; }
 
     public required DbSet<ContentType2ContentTypeDto> ContentTypeComposition { get; set; }
 
@@ -98,7 +128,9 @@ public class UmbracoDbContext : DbContext
 
     public required DbSet<MemberPropertyTypeDto> MemberPropertyTypes { get; set; }
 
-    public required DbSet<DataTypeDto> DataTypes { get; set; }
+    public required DbSet<TagDto> Tags { get; set; }
+
+    public required DbSet<TagRelationshipDto> TagRelationships { get; set; }
 
     public required DbSet<RedirectUrlDto> RedirectUrls { get; set; }
 

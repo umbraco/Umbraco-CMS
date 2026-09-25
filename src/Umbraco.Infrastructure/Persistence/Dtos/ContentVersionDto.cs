@@ -15,6 +15,7 @@ public class ContentVersionDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.ContentVersion;
     public const string PrimaryKeyColumnName = Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
+    public const string KeyColumnName = "key";
     public const string VersionDateColumnName = "versionDate";
 
     private const string UserIdColumnName = "userId";
@@ -22,6 +23,20 @@ public class ContentVersionDto
     private const string TextColumnName = "text";
     private const string NodeIdColumnName = Constants.DatabaseSchema.Columns.NodeIdName;
     private const string PreventCleanupColumnName = "preventCleanup";
+
+    /// <summary>
+    /// The columns an update may write. The key identifies a version row for as long as that row exists, so it is
+    /// assigned once, when the row is inserted, and never rewritten by an update.
+    /// </summary>
+    internal static readonly string[] UpdatableColumnNames =
+    [
+        NodeIdColumnName,
+        VersionDateColumnName,
+        UserIdColumnName,
+        CurrentColumnName,
+        TextColumnName,
+        PreventCleanupColumnName,
+    ];
 
     private int? _userId;
 
@@ -31,6 +46,15 @@ public class ContentVersionDto
     [Column(PrimaryKeyColumnName)]
     [PrimaryKeyColumn]
     public int Id { get; set; }
+
+    /// <summary>
+    /// Gets or sets the globally unique key for the content version.
+    /// </summary>
+    [Column(KeyColumnName)]
+    [NullSetting(NullSetting = NullSettings.NotNull)]
+    [Constraint(Default = SystemMethods.NewGuid)]
+    [Index(IndexTypes.UniqueNonClustered, Name = "IX_" + TableName + "_key")]
+    public Guid Key { get; set; }
 
     /// <summary>
     /// Gets or sets the unique identifier of the node for this content version.

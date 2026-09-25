@@ -5,6 +5,7 @@ using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Extensions;
+using EFCoreDtos = Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Factories;
 
@@ -40,6 +41,54 @@ internal static class PropertyFactory
             if (xdtos.TryGetValue(propertyType.Id, out IEnumerable<PropertyDataDto>? propDtos))
             {
                 foreach (PropertyDataDto propDto in propDtos)
+                {
+                    propertyId = propDto.Id;
+                    values.Add(new Property.InitialPropertyValue(
+                        await languageRepository.GetIsoCodeByIdAsync(propDto.LanguageId),
+                        propDto.Segment,
+                        propDto.VersionId == publishedVersionId,
+                        propDto.Value));
+                }
+            }
+
+            var property = Property.CreateWithValues(propertyId, propertyType, values.ToArray());
+            properties.Add(property);
+        }
+
+        return properties;
+    }
+
+    /// <summary>
+    /// Builds a collection of <see cref="IProperty"/> entities from EF Core property data DTOs.
+    /// </summary>
+    /// <param name="propertyTypes">An array of property types to build properties for. If null, an empty collection is returned.</param>
+    /// <param name="dtos">A read-only collection of EF Core property data DTOs containing property data for all property types.</param>
+    /// <param name="publishedVersionId">The identifier of the published version, used to determine which property values are considered published.</param>
+    /// <param name="languageRepository">The language repository used to resolve language ISO codes from language IDs in the property data.</param>
+    /// <returns>An enumerable collection of <see cref="IProperty"/> entities.</returns>
+    public static async Task<IEnumerable<IProperty>> BuildEntities(
+        IPropertyType[]? propertyTypes,
+        IReadOnlyCollection<EFCoreDtos.PropertyDataDto> dtos,
+        int publishedVersionId,
+        ILanguageRepository languageRepository)
+    {
+        var properties = new List<IProperty>();
+        var xdtos = dtos.GroupBy(x => x.PropertyTypeId)
+            .ToDictionary(x => x.Key, x => (IEnumerable<EFCoreDtos.PropertyDataDto>)x);
+
+        if (propertyTypes is null)
+        {
+            return properties;
+        }
+
+        foreach (IPropertyType propertyType in propertyTypes)
+        {
+            var values = new List<Property.InitialPropertyValue>();
+            int propertyId = default;
+
+            if (xdtos.TryGetValue(propertyType.Id, out IEnumerable<EFCoreDtos.PropertyDataDto>? propDtos))
+            {
+                foreach (EFCoreDtos.PropertyDataDto propDto in propDtos)
                 {
                     propertyId = propDto.Id;
                     values.Add(new Property.InitialPropertyValue(
@@ -203,6 +252,221 @@ internal static class PropertyFactory
         }
 
         return propertyDataDtos;
+    }
+
+    /// <summary>
+    ///     Creates a collection of EF Core <see cref="EFCoreDtos.PropertyDataDto"/> from a collection of <see cref="Property"/>.
+    /// </summary>
+    /// <param name="contentVariation">
+    ///     The <see cref="ContentVariation" /> of the entity containing the collection of <see cref="Property" />
+    /// </param>
+    /// <param name="currentVersionId">The identifier of the current version.</param>
+    /// <param name="publishedVersionId">The identifier of the published version, or 0 when there is none.</param>
+    /// <param name="properties">The properties to map</param>
+    /// <param name="languageRepository">The language repository used to resolve language identifiers from culture ISO codes.</param>
+    /// <param name="propertyEditors">
+    ///     The collection of registered property editors, used to determine which specific culture(s) an edit
+    ///     applies to when a property is culture-invariant but its data editor carries per-culture nested data.
+    /// </param>
+    /// <returns>
+    ///     The mapped DTOs, whether one or more properties have been edited, and - when the content variation varies
+    ///     by culture - the edited cultures used to populate the umbracoDocumentCultureVariation table.
+    /// </returns>
+    public static async Task<(List<EFCoreDtos.PropertyDataDto> Dtos, bool Edited, HashSet<string>? EditedCultures)> BuildEFCoreDtosAsync(
+        ContentVariation contentVariation,
+        int currentVersionId,
+        int publishedVersionId,
+        IEnumerable<IProperty> properties,
+        ILanguageRepository languageRepository,
+        PropertyEditorCollection propertyEditors)
+    {
+        var propertyDataDtos = new List<EFCoreDtos.PropertyDataDto>();
+        var edited = false;
+        HashSet<string>? editedCultures = null; // don't allocate unless necessary
+        string? defaultCulture = null; // don't allocate unless necessary
+
+        IEnumerable<ILanguage> languages = await languageRepository.GetAllAsync(CancellationToken.None);
+        var languageIdsByIsoCode = languages.ToDictionary(language => language.IsoCode, language => language.Id, StringComparer.OrdinalIgnoreCase);
+
+        int? LanguageIdByIsoCode(string? isoCode)
+        {
+            if (isoCode is null)
+            {
+                return null;
+            }
+
+            if (languageIdsByIsoCode.TryGetValue(isoCode, out var languageId))
+            {
+                return languageId;
+            }
+
+            throw new ArgumentException($"Code {isoCode} does not correspond to an existing language.", nameof(isoCode));
+        }
+
+        var entityVariesByCulture = contentVariation.VariesByCulture();
+
+        // create dtos for each property values, but only for values that do actually exist
+        // ie have a non-null value, everything else is just ignored and won't have a db row
+        foreach (IProperty property in properties)
+        {
+            if (property.PropertyType.SupportsPublishing)
+            {
+                // create the resulting hashset if it's not created and the entity varies by culture
+                if (entityVariesByCulture && editedCultures == null)
+                {
+                    editedCultures = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                }
+
+                // publishing = deal with edit and published values
+                foreach (IPropertyValue propertyValue in property.Values)
+                {
+                    var isInvariantValue = propertyValue.Culture == null && propertyValue.Segment == null;
+                    var isCultureValue = propertyValue.Culture != null;
+                    var isSegmentValue = propertyValue.Segment != null;
+
+                    // deal with published value
+                    if ((propertyValue.PublishedValue != null || isSegmentValue) && publishedVersionId > 0)
+                    {
+                        propertyDataDtos.Add(BuildEFCoreDto(publishedVersionId, property, LanguageIdByIsoCode(propertyValue.Culture), propertyValue.Segment, propertyValue.PublishedValue));
+                    }
+
+                    // deal with edit value
+                    if (propertyValue.EditedValue != null || isSegmentValue)
+                    {
+                        propertyDataDtos.Add(BuildEFCoreDto(currentVersionId, property, LanguageIdByIsoCode(propertyValue.Culture), propertyValue.Segment, propertyValue.EditedValue));
+                    }
+
+                    // property.Values will contain ALL of it's values, both variant and invariant which will be populated if the
+                    // administrator has previously changed the property type to be variant vs invariant.
+                    // We need to check for this scenario here because otherwise the editedCultures and edited flags
+                    // will end up incorrectly set in the umbracoDocumentCultureVariation table so here we need to
+                    // only process edited cultures based on the current value type and how the property varies.
+                    // The above logic will still persist the currently saved property value for each culture in case the admin
+                    // decides to swap the property's variance again, in which case the edited flag will be recalculated.
+                    if ((property.PropertyType.VariesByCulture() && isInvariantValue) ||
+                        (!property.PropertyType.VariesByCulture() && isCultureValue))
+                    {
+                        continue;
+                    }
+
+                    // use explicit equals here, else object comparison fails at comparing eg strings
+                    var sameValues = propertyValue?.PublishedValue == null
+                        ? propertyValue?.EditedValue == null
+                        : propertyValue.PublishedValue.Equals(propertyValue.EditedValue);
+
+                    edited |= !sameValues;
+
+                    if (entityVariesByCulture && !sameValues)
+                    {
+                        if (isCultureValue && propertyValue?.Culture is not null)
+                        {
+                            editedCultures?.Add(propertyValue.Culture); // report culture as edited
+                        }
+                        else if (isInvariantValue)
+                        {
+                            // flag culture as edited if it contains an edited invariant property
+                            if (defaultCulture == null)
+                            {
+                                defaultCulture = await languageRepository.GetDefaultIsoCodeAsync();
+                            }
+
+                            // the property itself is invariant, but its data editor may carry per-culture
+                            // nested data (e.g. a Block List/Grid property whose element types vary by
+                            // culture) - ask it which specific culture(s) actually changed, instead of
+                            // blindly attributing the edit to the default culture.
+                            string[]? changedCultures = null;
+                            if (propertyEditors.TryGet(property.PropertyType.PropertyEditorAlias, out IDataEditor? dataEditor) &&
+                                dataEditor.CanMergePartialPropertyValues(property.PropertyType))
+                            {
+                                changedCultures = dataEditor
+                                    .GetChangedCulturesForPartialPropertyValues(
+                                        propertyValue?.EditedValue,
+                                        propertyValue?.PublishedValue,
+                                        defaultCulture)
+                                    .ToArray();
+                            }
+
+                            if (changedCultures is { Length: > 0 })
+                            {
+                                editedCultures?.UnionWith(changedCultures);
+                            }
+                            else
+                            {
+                                editedCultures?.Add(defaultCulture);
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                foreach (IPropertyValue propertyValue in property.Values)
+                {
+                    // not publishing = only deal with edit values
+                    if (propertyValue.EditedValue != null)
+                    {
+                        propertyDataDtos.Add(BuildEFCoreDto(currentVersionId, property, LanguageIdByIsoCode(propertyValue.Culture), propertyValue.Segment, propertyValue.EditedValue));
+                    }
+                }
+
+                edited = true;
+            }
+        }
+
+        return (propertyDataDtos, edited, editedCultures);
+    }
+
+    private static EFCoreDtos.PropertyDataDto BuildEFCoreDto(int versionId, IProperty property, int? languageId, string? segment, object? value)
+    {
+        var dto = new EFCoreDtos.PropertyDataDto { VersionId = versionId, PropertyTypeId = property.PropertyTypeId };
+
+        if (languageId.HasValue)
+        {
+            dto.LanguageId = languageId;
+        }
+
+        if (segment != null)
+        {
+            dto.Segment = segment;
+        }
+
+        if (property.ValueStorageType == ValueStorageType.Integer)
+        {
+            if (value is bool || property.PropertyType.PropertyEditorAlias == Constants.PropertyEditors.Aliases.Boolean)
+            {
+                dto.IntegerValue = value != null && string.IsNullOrEmpty(value.ToString()) ? 0 : Convert.ToInt32(value);
+            }
+            else if (value != null && string.IsNullOrWhiteSpace(value.ToString()) == false &&
+                     int.TryParse(value.ToString(), NumberStyles.Integer, CultureInfo.InvariantCulture, out var val))
+            {
+                dto.IntegerValue = val;
+            }
+        }
+        else if (property.ValueStorageType == ValueStorageType.Decimal && value != null)
+        {
+            if (decimal.TryParse(value.ToString(), out var val))
+            {
+                dto.DecimalValue = val; // property value should be normalized already
+            }
+        }
+        else if (property.ValueStorageType == ValueStorageType.Date && value != null &&
+                 string.IsNullOrWhiteSpace(value.ToString()) == false)
+        {
+            if (DateTime.TryParse(value.ToString(), out DateTime date))
+            {
+                dto.DateValue = date;
+            }
+        }
+        else if (property.ValueStorageType == ValueStorageType.Ntext && value != null)
+        {
+            dto.TextValue = value.ToString();
+        }
+        else if (property.ValueStorageType == ValueStorageType.Nvarchar && value != null)
+        {
+            dto.VarcharValue = value.ToString();
+        }
+
+        return dto;
     }
 
     private static PropertyDataDto BuildDto(int versionId, IProperty property, int? languageId, string? segment, object? value)

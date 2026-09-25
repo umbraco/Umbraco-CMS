@@ -1,5 +1,7 @@
 using System.Globalization;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
@@ -29,6 +31,7 @@ namespace Umbraco.Cms.Core.Services
         private readonly MediaFileManager _mediaFileManager;
         private readonly IMediaPathScheme _mediaPathScheme;
         private readonly ILogger<MediaService> _logger;
+        private readonly IIdKeyMap _idKeyMap;
 
         #region Constructors
 
@@ -45,6 +48,9 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="entityRepository">The <see cref="IEntityRepository"/> for entity operations.</param>
         /// <param name="shortStringHelper">The <see cref="IShortStringHelper"/> for string operations.</param>
         /// <param name="userIdKeyResolver">The <see cref="IUserIdKeyResolver"/> for resolving user IDs.</param>
+        /// <param name="mediaPathScheme">The <see cref="IMediaPathScheme"/> for media path resolution.</param>
+        /// <param name="logger">The <see cref="ILogger{MediaService}"/> for logging.</param>
+        /// <param name="idKeyMap">The <see cref="IIdKeyMap"/> for resolving between int ids and Guid keys.</param>
         public MediaService(
             ICoreScopeProvider provider,
             MediaFileManager mediaFileManager,
@@ -57,7 +63,8 @@ namespace Umbraco.Cms.Core.Services
             IShortStringHelper shortStringHelper,
             IUserIdKeyResolver userIdKeyResolver,
             IMediaPathScheme mediaPathScheme,
-            ILogger<MediaService> logger)
+            ILogger<MediaService> logger,
+            IIdKeyMap idKeyMap)
             : base(provider, loggerFactory, eventMessagesFactory)
         {
             _mediaFileManager = mediaFileManager;
@@ -69,6 +76,7 @@ namespace Umbraco.Cms.Core.Services
             _userIdKeyResolver = userIdKeyResolver;
             _mediaPathScheme = mediaPathScheme;
             _logger = logger;
+            _idKeyMap = idKeyMap;
         }
 
         #endregion
@@ -978,6 +986,14 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="userId">The identifier of the user performing the delete operation.</param>
         private void DeleteVersions(ICoreScope scope, bool wlock, int id, DateTime versionDate, int userId = Constants.Security.SuperUserId)
         {
+            // TODO (V20): await this once the IMediaService contract goes async.
+            Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForIdAsync(id, UmbracoObjectTypes.Media).GetAwaiter().GetResult();
+            if (keyAttempt.Success is false)
+            {
+                return;
+            }
+
+            Guid key = keyAttempt.Result;
             EventMessages evtMsgs = EventMessagesFactory.Get();
 
             if (wlock)
@@ -985,7 +1001,7 @@ namespace Umbraco.Cms.Core.Services
                 scope.WriteLock(Constants.Locks.MediaTree);
             }
 
-            var deletingVersionsNotification = new MediaDeletingVersionsNotification(id, evtMsgs, dateToRetain: versionDate);
+            var deletingVersionsNotification = new MediaDeletingVersionsNotification(key, evtMsgs, dateToRetain: versionDate);
             if (scope.Notifications.PublishCancelable(deletingVersionsNotification))
             {
                 return;
@@ -993,7 +1009,7 @@ namespace Umbraco.Cms.Core.Services
 
             _mediaRepository.DeleteVersions(id, versionDate);
 
-            scope.Notifications.Publish(new MediaDeletedVersionsNotification(id, evtMsgs, dateToRetain: versionDate).WithStateFrom(deletingVersionsNotification));
+            scope.Notifications.Publish(new MediaDeletedVersionsNotification(key, evtMsgs, dateToRetain: versionDate).WithStateFrom(deletingVersionsNotification));
             Audit(AuditType.Delete, userId, Constants.System.Root, "Delete Media by version date");
         }
 
@@ -1007,12 +1023,20 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="userId">Optional Id of the User deleting versions of a Media object</param>
         public void DeleteVersion(int id, int versionId, bool deletePriorVersions, int userId = Constants.Security.SuperUserId)
         {
+            // TODO (V20): await this once the IMediaService contract goes async.
+            Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForIdAsync(id, UmbracoObjectTypes.Media).GetAwaiter().GetResult();
+            if (keyAttempt.Success is false)
+            {
+                return;
+            }
+
+            Guid key = keyAttempt.Result;
             EventMessages evtMsgs = EventMessagesFactory.Get();
 
             using ICoreScope scope = ScopeProvider.CreateCoreScope();
             scope.WriteLock(Constants.Locks.MediaTree);
 
-            var deletingVersionsNotification = new MediaDeletingVersionsNotification(id, evtMsgs, specificVersion: versionId);
+            var deletingVersionsNotification = new MediaDeletingVersionsNotification(key, evtMsgs, specificVersion: versionId);
             if (scope.Notifications.PublishCancelable(deletingVersionsNotification))
             {
                 scope.Complete();
@@ -1030,7 +1054,7 @@ namespace Umbraco.Cms.Core.Services
 
             _mediaRepository.DeleteVersion(versionId);
 
-            scope.Notifications.Publish(new MediaDeletedVersionsNotification(id, evtMsgs, specificVersion: versionId).WithStateFrom(deletingVersionsNotification));
+            scope.Notifications.Publish(new MediaDeletedVersionsNotification(key, evtMsgs, specificVersion: versionId).WithStateFrom(deletingVersionsNotification));
             Audit(AuditType.Delete, userId, Constants.System.Root, "Delete Media by version");
 
             scope.Complete();
@@ -1201,6 +1225,12 @@ namespace Umbraco.Cms.Core.Services
             // Needed to update the in-memory navigation structure
             var cameFromRecycleBin = media.ParentId == Constants.System.RecycleBinMedia;
             media.ParentId = parentId;
+            media.ParentKey = parentId switch
+            {
+                Constants.System.Root => null,
+                Constants.System.RecycleBinMedia => Constants.System.RecycleBinMediaKey,
+                _ => parent?.Key,
+            };
 
             // get the level delta (old pos to new pos)
             // note that recycle bin (id:-20) level is 0!

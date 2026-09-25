@@ -36,7 +36,7 @@ public partial class UserStartNodeEntitiesServiceTests : UserStartNodeEntitiesSe
                 .WithContentType(contentType)
                 .WithName($"{rootNumber}")
                 .Build();
-            ContentService.Save(root);
+            await ContentService.SaveAsync(root, Constants.Security.SuperUserKey, null, CancellationToken.None);
             ItemsByName[root.Name!] = (root.Id, root.Key);
 
             foreach (var childNumber in Enumerable.Range(1, 10))
@@ -46,7 +46,7 @@ public partial class UserStartNodeEntitiesServiceTests : UserStartNodeEntitiesSe
                     .WithParent(root)
                     .WithName($"{rootNumber}-{childNumber}")
                     .Build();
-                ContentService.Save(child);
+                await ContentService.SaveAsync(child, Constants.Security.SuperUserKey, null, CancellationToken.None);
                 ItemsByName[child.Name!] = (child.Id, child.Key);
 
                 foreach (var grandChildNumber in Enumerable.Range(1, 5))
@@ -56,7 +56,7 @@ public partial class UserStartNodeEntitiesServiceTests : UserStartNodeEntitiesSe
                         .WithParent(child)
                         .WithName($"{rootNumber}-{childNumber}-{grandChildNumber}")
                         .Build();
-                    ContentService.Save(grandchild);
+                    await ContentService.SaveAsync(grandchild, Constants.Security.SuperUserKey, null, CancellationToken.None);
                     ItemsByName[grandchild.Name!] = (grandchild.Id, grandchild.Key);
                 }
             }

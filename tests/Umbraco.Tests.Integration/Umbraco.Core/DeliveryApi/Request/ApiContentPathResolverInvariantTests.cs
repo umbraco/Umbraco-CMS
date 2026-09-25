@@ -48,8 +48,8 @@ public class ApiContentPathResolverInvariantTests : ApiContentPathResolverTestBa
                 .WithContentType(contentType)
                 .WithName($"Root {rootNumber}")
                 .Build();
-            ContentService.Save(root);
-            ContentService.Publish(root, ["*"]);
+            await ContentService.SaveAsync(root, Constants.Security.SuperUserKey, null, CancellationToken.None);
+            await ContentService.PublishAsync(root, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
             _contentByName[root.Name!] = root;
 
             foreach (var childNumber in Enumerable.Range(1, 3))
@@ -59,8 +59,8 @@ public class ApiContentPathResolverInvariantTests : ApiContentPathResolverTestBa
                     .WithParent(root)
                     .WithName($"Child {childNumber}")
                     .Build();
-                ContentService.Save(child);
-                ContentService.Publish(child, ["*"]);
+                await ContentService.SaveAsync(child, Constants.Security.SuperUserKey, null, CancellationToken.None);
+                await ContentService.PublishAsync(child, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
                 _contentByName[$"{root.Name!}/{child.Name!}"] = child;
 
                 foreach (var grandchildNumber in Enumerable.Range(1, 3))
@@ -70,8 +70,8 @@ public class ApiContentPathResolverInvariantTests : ApiContentPathResolverTestBa
                         .WithParent(child)
                         .WithName($"Grandchild {grandchildNumber}")
                         .Build();
-                    ContentService.Save(grandchild);
-                    ContentService.Publish(grandchild, ["*"]);
+                    await ContentService.SaveAsync(grandchild, Constants.Security.SuperUserKey, null, CancellationToken.None);
+                    await ContentService.PublishAsync(grandchild, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
                     _contentByName[$"{root.Name!}/{child.Name!}/{grandchild.Name!}"] = grandchild;
                 }
             }

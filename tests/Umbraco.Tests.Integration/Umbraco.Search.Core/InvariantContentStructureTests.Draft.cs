@@ -1,6 +1,8 @@
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Tests.Integration.Testing.Search;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Core;
@@ -10,7 +12,7 @@ public partial class InvariantContentStructureTests
     [Test]
     public void DraftStructure_YieldsAllDocuments()
     {
-        ContentService.Save([Root(), Child(), Grandchild(), GreatGrandchild()]);
+        ContentService.SaveAsync([Root(), Child(), Grandchild(), GreatGrandchild()], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None).GetAwaiter().GetResult();
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.DraftContent);
         Assert.That(documents, Has.Count.EqualTo(4));
@@ -29,16 +31,16 @@ public partial class InvariantContentStructureTests
     [Test]
     public void DraftStructure_YieldsNoPublishedDocuments()
     {
-        ContentService.Save([Root(), Child(), Grandchild(), GreatGrandchild()]);
+        ContentService.SaveAsync([Root(), Child(), Grandchild(), GreatGrandchild()], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None).GetAwaiter().GetResult();
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.PublishedContent);
         Assert.That(documents, Has.Count.EqualTo(0));
     }
 
     [Test]
-    public void DraftRoot_YieldsOnlyDraftRoot()
+    public async Task DraftRoot_YieldsOnlyDraftRoot()
     {
-        ContentService.Save(Root());
+        await ContentService.SaveAsync(Root(), Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.DraftContent);
         Assert.That(documents, Has.Count.EqualTo(1));
@@ -46,11 +48,11 @@ public partial class InvariantContentStructureTests
     }
 
     [Test]
-    public void DraftStructure_WithGrandchildInRecycleBin_YieldsAllDocuments()
+    public async Task DraftStructure_WithGrandchildInRecycleBin_YieldsAllDocuments()
     {
-        ContentService.Save([Root(), Child(), Grandchild(), GreatGrandchild()]);
+        ContentService.SaveAsync([Root(), Child(), Grandchild(), GreatGrandchild()], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None).GetAwaiter().GetResult();
 
-        OperationResult result = ContentService.MoveToRecycleBin(Grandchild());
+        Attempt<ContentMoveToRecycleBinOperationStatus> result = await ContentService.MoveToRecycleBinAsync(Grandchild(), Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.Multiple(() =>
         {
             Assert.That(result.Success, Is.True);
@@ -73,13 +75,13 @@ public partial class InvariantContentStructureTests
     [Test]
     public void DraftStructure_WithGrandchildDeleted_YieldsNothingBelowChild()
     {
-        ContentService.Save([Root(), Child(), Grandchild(), GreatGrandchild()]);
+        ContentService.SaveAsync([Root(), Child(), Grandchild(), GreatGrandchild()], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None).GetAwaiter().GetResult();
 
-        OperationResult result = ContentService.Delete(Grandchild());
+        Attempt<ContentDeleteOperationStatus> result = ContentService.DeleteAsync(Grandchild(), Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None).GetAwaiter().GetResult();
         Assert.Multiple(() =>
         {
             Assert.That(result.Success, Is.True);
-            Assert.That(ContentService.GetById(GreatGrandchildKey), Is.Null);
+            Assert.That(ContentService.GetByIdAsync(GreatGrandchildKey, CancellationToken.None).GetAwaiter().GetResult(), Is.Null);
         });
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.DraftContent);

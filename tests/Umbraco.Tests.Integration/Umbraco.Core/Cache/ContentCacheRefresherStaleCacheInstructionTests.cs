@@ -55,10 +55,10 @@ internal sealed class ContentCacheRefresherStaleCacheInstructionTests : UmbracoI
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var content = ContentBuilder.CreateSimpleContent(contentType, "Test Content");
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         // Delete the content (simulating what happens before server restart)
-        ContentService.Delete(content);
+        await ContentService.DeleteAsync(content, Constants.Security.SuperUserKey, CancellationToken.None);
 
         return content;
     }

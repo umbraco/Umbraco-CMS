@@ -56,13 +56,13 @@ internal sealed partial class DocumentCacheServiceTests : UmbracoIntegrationTest
     private ILanguageService LanguageService => GetRequiredService<ILanguageService>();
 
     [Test]
-    public void Rebuild_Creates_Invariant_Document_Database_Cache_Records_For_Document_Type()
+    public async Task Rebuild_Creates_Invariant_Document_Database_Cache_Records_For_Document_Type()
     {
         // Arrange - Content is created in base class Setup()
         // The base class creates: Textpage, Subpage, Subpage2, Subpage3 (all using ContentType)
 
         // - publish the root page to ensure we have published and draft content
-        ContentService.Publish(Textpage, ["*"]);
+        await ContentService.PublishAsync(Textpage, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Act - Call Rebuild for the document type
         DocumentCacheService.Rebuild([ContentType.Id]);
@@ -110,13 +110,13 @@ internal sealed partial class DocumentCacheServiceTests : UmbracoIntegrationTest
 
     [Test]
     [ConfigureBuilder(ActionName = nameof(ConfigureMessagePackSerialization))]
-    public void Rebuild_Creates_Invariant_Document_Database_Cache_Records_For_Document_Type_With_Message_Pack_Serialization()
+    public async Task Rebuild_Creates_Invariant_Document_Database_Cache_Records_For_Document_Type_With_Message_Pack_Serialization()
     {
         // Arrange - Content is created in base class Setup()
         // The base class creates: Textpage using ContentType
 
         // - publish the root page
-        ContentService.Publish(Textpage, ["*"]);
+        await ContentService.PublishAsync(Textpage, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Act - Call Rebuild for the document type
         DocumentCacheService.Rebuild([ContentType.Id]);
@@ -188,7 +188,7 @@ internal sealed partial class DocumentCacheServiceTests : UmbracoIntegrationTest
             .Build();
         variantContent.SetValue("pageTitle", "English Title", culture: langEn.IsoCode);
         variantContent.SetValue("pageTitle", "Danish Title", culture: langDa.IsoCode);
-        ContentService.Save(variantContent);
+        await ContentService.SaveAsync(variantContent, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         // Act - Rebuild the cache for the variant document type
         DocumentCacheService.Rebuild([variantContentType.Id]);
@@ -230,7 +230,7 @@ internal sealed partial class DocumentCacheServiceTests : UmbracoIntegrationTest
         => RemoveDatesFromJsonSerialization().Replace(input, @"""dt"":""""");
 
     [Test]
-    public void Rebuild_Replaces_Existing_Document_Database_Cache_Records()
+    public async Task Rebuild_Replaces_Existing_Document_Database_Cache_Records()
     {
         // Arrange - First rebuild to create initial records
         DocumentCacheService.Rebuild([ContentType.Id]);
@@ -250,7 +250,7 @@ internal sealed partial class DocumentCacheServiceTests : UmbracoIntegrationTest
 
         // Modify content
         Textpage.SetValue("title", "Modified Title For Rebuild Test");
-        ContentService.Save(Textpage);
+        await ContentService.SaveAsync(Textpage, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         // Act - Rebuild again
         DocumentCacheService.Rebuild([ContentType.Id]);
@@ -327,7 +327,7 @@ internal sealed partial class DocumentCacheServiceTests : UmbracoIntegrationTest
                 metaDescription = "This is a meta description from the composition.",
             })
             .Build();
-        ContentService.Save(composedContent);
+        await ContentService.SaveAsync(composedContent, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         // Act - Rebuild the cache for the composed content type
         DocumentCacheService.Rebuild([composedContentType.Id]);
@@ -363,7 +363,7 @@ internal sealed partial class DocumentCacheServiceTests : UmbracoIntegrationTest
         // The base class creates: Textpage, Subpage, Subpage2, Subpage3 (all using ContentType)
 
         // - publish the root page to ensure we have published and draft content
-        ContentService.Publish(Textpage, ["*"]);
+        await ContentService.PublishAsync(Textpage, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Act - Full rebuild (the "Rebuild Database Cache" dashboard button path)
         // This calls Rebuild([], [], []) internally — empty arrays meaning "rebuild all"
@@ -453,7 +453,7 @@ internal sealed partial class DocumentCacheServiceTests : UmbracoIntegrationTest
             .Build();
         variantContent.SetValue("pageTitle", "English Title", culture: langEn.IsoCode);
         variantContent.SetValue("pageTitle", "Danish Title", culture: langDa.IsoCode);
-        ContentService.Save(variantContent);
+        await ContentService.SaveAsync(variantContent, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         // Act - Full rebuild (the "Rebuild Database Cache" dashboard button path)
         await DatabaseCacheRebuilder.RebuildAsync(false);
@@ -544,7 +544,7 @@ internal sealed partial class DocumentCacheServiceTests : UmbracoIntegrationTest
                 metaDescription = "This is a meta description from the composition.",
             })
             .Build();
-        ContentService.Save(composedContent);
+        await ContentService.SaveAsync(composedContent, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         // Act - Full rebuild (the "Rebuild Database Cache" dashboard button path)
         await DatabaseCacheRebuilder.RebuildAsync(false);
@@ -574,7 +574,7 @@ internal sealed partial class DocumentCacheServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Rebuild_Does_Not_Create_Untrusted_Foreign_Key_Constraints()
+    public async Task Rebuild_Does_Not_Create_Untrusted_Foreign_Key_Constraints()
     {
         if (BaseTestDatabase.IsSqlServer() is false)
         {
@@ -582,7 +582,7 @@ internal sealed partial class DocumentCacheServiceTests : UmbracoIntegrationTest
         }
 
         // Arrange - publish content so the rebuild inserts both draft and published rows.
-        ContentService.Publish(Textpage, ["*"]);
+        await ContentService.PublishAsync(Textpage, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Act - Rebuild the cache (uses SqlBulkCopy internally).
         DocumentCacheService.Rebuild([ContentType.Id]);

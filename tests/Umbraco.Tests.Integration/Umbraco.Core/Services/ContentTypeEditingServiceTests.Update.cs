@@ -617,7 +617,7 @@ internal sealed partial class ContentTypeEditingServiceTests
             content.Properties[property.Alias]!.SetValue(property.Name);
         }
 
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         if (propertyMoveOperation == PropertyMoveOperation.ToEarlier)
         {
@@ -670,7 +670,7 @@ internal sealed partial class ContentTypeEditingServiceTests
 
             Assert.AreEqual(0, updateAttempt.Result.NoGroupPropertyTypes.Count());
 
-            var updatedContent = ContentService.GetById(content.Id);
+            var updatedContent = ContentService.GetByIdAsync(content.Key, CancellationToken.None).GetAwaiter().GetResult();
             foreach (var property in properties)
             {
                 Assert.AreEqual(property.Name, updatedContent?.Properties[property.Alias]?.GetValue());
@@ -1572,8 +1572,8 @@ internal sealed partial class ContentTypeEditingServiceTests
         createModel.AllowedAsRoot = true;
         var contentType = (await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result!;
 
-        var content = ContentService.Create("Test Content", Constants.System.Root, contentType.Alias);
-        var saveResult = ContentService.Save(content);
+        var content = await ContentService.CreateAsync("Test Content", (Guid?)null, contentType.Alias, Constants.Security.SuperUserKey, CancellationToken.None);
+        var saveResult = await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
         Assert.IsTrue(saveResult.Success);
 
         var updateModel = ContentTypeUpdateModel("Test", "test", isElement: true);
@@ -1591,7 +1591,7 @@ internal sealed partial class ContentTypeEditingServiceTests
         var contentType = (await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result!;
 
         var element = new Element("Test Element", contentType);
-        var saveResult = ElementService.Save(element);
+        var saveResult = await ElementService.SaveAsync(element, Constants.Security.SuperUserKey, null, CancellationToken.None);
         Assert.IsTrue(saveResult.Success);
 
         var updateModel = ContentTypeUpdateModel("Test", "test");

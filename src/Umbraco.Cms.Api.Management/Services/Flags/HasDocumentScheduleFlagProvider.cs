@@ -27,8 +27,8 @@ internal class HasDocumentScheduleFlagProvider : HasScheduleFlagProviderBase
         typeof(TItem) == typeof(DocumentItemResponseModel);
 
     /// <inheritdoc/>
-    protected override IDictionary<Guid, IEnumerable<ContentSchedule>> GetSchedulesByKeys(Guid[] keys)
-        => _contentService.GetContentSchedulesByKeys(keys);
+    protected override Task<IDictionary<Guid, IEnumerable<ContentSchedule>>> GetSchedulesByKeysAsync(Guid[] keys)
+        => _contentService.GetContentSchedulesByKeysAsync(keys, CancellationToken.None);
 
     /// <inheritdoc/>
     protected override void PopulateItemFlags<TItem>(TItem item, ContentSchedule[] releaseSchedules)

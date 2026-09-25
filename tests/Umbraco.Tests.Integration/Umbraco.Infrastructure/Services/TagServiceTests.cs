@@ -59,7 +59,7 @@ internal sealed class TagServiceTests : UmbracoIntegrationTest
     private IContentType _contentType;
 
     [Test]
-    public void TagApiConsistencyTest()
+    public async Task TagApiConsistencyTest()
     {
         IContent content1 = ContentBuilder.CreateSimpleContent(_contentType, "Tagged content 1");
         content1.AssignTags(
@@ -69,25 +69,25 @@ internal sealed class TagServiceTests : UmbracoIntegrationTest
             Serializer,
             "tags",
             new[] { "cow", "pig", "goat" });
-        ContentService.Save(content1);
-        ContentService.Publish(content1, Array.Empty<string>());
+        await ContentService.SaveAsync(content1, Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishAsync(content1, Array.Empty<string>(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         // change
         content1.AssignTags(PropertyEditorCollection, DataTypeService, IdKeyMap, Serializer, "tags", new[] { "elephant" }, true);
         content1.RemoveTags(PropertyEditorCollection, DataTypeService, IdKeyMap, Serializer, "tags", new[] { "cow" });
-        ContentService.Save(content1);
-        ContentService.Publish(content1, Array.Empty<string>());
+        await ContentService.SaveAsync(content1, Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishAsync(content1, Array.Empty<string>(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         // more changes
         content1.AssignTags(PropertyEditorCollection, DataTypeService, IdKeyMap, Serializer, "tags", new[] { "mouse" }, true);
-        ContentService.Save(content1);
-        ContentService.Publish(content1, Array.Empty<string>());
+        await ContentService.SaveAsync(content1, Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishAsync(content1, Array.Empty<string>(), Constants.Security.SuperUserKey, CancellationToken.None);
         content1.RemoveTags(PropertyEditorCollection, DataTypeService, IdKeyMap, Serializer, "tags", new[] { "mouse" });
-        ContentService.Save(content1);
-        ContentService.Publish(content1, Array.Empty<string>());
+        await ContentService.SaveAsync(content1, Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishAsync(content1, Array.Empty<string>(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         // get it back
-        content1 = ContentService.GetById(content1.Id);
+        content1 = await ContentService.GetByIdAsync(content1.Key, CancellationToken.None);
         var tagsValue = content1.GetValue("tags").ToString();
         var tagsValues = JsonSerializer.Deserialize<string[]>(tagsValue);
         Assert.AreEqual(3, tagsValues.Length);
@@ -112,13 +112,13 @@ internal sealed class TagServiceTests : UmbracoIntegrationTest
 
         IElement element1 = new Element("Tagged element 1", elementType);
         element1.AssignTags(PropertyEditorCollection, DataTypeService, IdKeyMap, Serializer, "tags", new[] { "cow", "pig", "goat" });
-        ElementService.Save(element1);
-        ElementService.Publish(element1, Array.Empty<string>());
+        await ElementService.SaveAsync(element1, Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ElementService.PublishAsync(element1, Array.Empty<string>(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         IElement element2 = new Element("Tagged element 2", elementType);
         element2.AssignTags(PropertyEditorCollection, DataTypeService, IdKeyMap, Serializer, "tags", new[] { "pig" });
-        ElementService.Save(element2);
-        ElementService.Publish(element2, Array.Empty<string>());
+        await ElementService.SaveAsync(element2, Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ElementService.PublishAsync(element2, Array.Empty<string>(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         var taggedWithCow = TagService.GetTaggedElementsByTag("cow").ToArray();
         Assert.AreEqual(1, taggedWithCow.Length);
@@ -137,8 +137,8 @@ internal sealed class TagServiceTests : UmbracoIntegrationTest
 
         IElement element1 = new Element("Tagged element 1", elementType);
         element1.AssignTags(PropertyEditorCollection, DataTypeService, IdKeyMap, Serializer, "tags", new[] { "cow", "pig" });
-        ElementService.Save(element1);
-        ElementService.Publish(element1, Array.Empty<string>());
+        await ElementService.SaveAsync(element1, Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ElementService.PublishAsync(element1, Array.Empty<string>(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         var tagged = TagService.GetTaggedElementsByTagGroup("default").ToArray();
         Assert.AreEqual(1, tagged.Length);
@@ -152,18 +152,18 @@ internal sealed class TagServiceTests : UmbracoIntegrationTest
 
         IElement element1 = new Element("Tagged element 1", elementType);
         element1.AssignTags(PropertyEditorCollection, DataTypeService, IdKeyMap, Serializer, "tags", new[] { "cow", "pig", "goat" });
-        ElementService.Save(element1);
-        ElementService.Publish(element1, Array.Empty<string>());
+        await ElementService.SaveAsync(element1, Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ElementService.PublishAsync(element1, Array.Empty<string>(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         IElement element2 = new Element("Tagged element 2", elementType);
         element2.AssignTags(PropertyEditorCollection, DataTypeService, IdKeyMap, Serializer, "tags", new[] { "cow", "pig" });
-        ElementService.Save(element2);
-        ElementService.Publish(element2, Array.Empty<string>());
+        await ElementService.SaveAsync(element2, Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ElementService.PublishAsync(element2, Array.Empty<string>(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         IElement element3 = new Element("Tagged element 3", elementType);
         element3.AssignTags(PropertyEditorCollection, DataTypeService, IdKeyMap, Serializer, "tags", new[] { "cow" });
-        ElementService.Save(element3);
-        ElementService.Publish(element3, Array.Empty<string>());
+        await ElementService.SaveAsync(element3, Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ElementService.PublishAsync(element3, Array.Empty<string>(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         var tags = TagService.GetAllElementTags()
             .OrderByDescending(x => x.NodeCount)
@@ -185,13 +185,13 @@ internal sealed class TagServiceTests : UmbracoIntegrationTest
 
         IContent content = ContentBuilder.CreateSimpleContent(_contentType, "Tagged content");
         content.AssignTags(PropertyEditorCollection, DataTypeService, IdKeyMap, Serializer, "tags", new[] { "shared" });
-        ContentService.Save(content);
-        ContentService.Publish(content, Array.Empty<string>());
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishAsync(content, Array.Empty<string>(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         IElement element = new Element("Tagged element", elementType);
         element.AssignTags(PropertyEditorCollection, DataTypeService, IdKeyMap, Serializer, "tags", new[] { "shared" });
-        ElementService.Save(element);
-        ElementService.Publish(element, Array.Empty<string>());
+        await ElementService.SaveAsync(element, Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ElementService.PublishAsync(element, Array.Empty<string>(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         var taggedContent = TagService.GetTaggedContentByTag("shared").ToArray();
         Assert.AreEqual(1, taggedContent.Length);
@@ -203,7 +203,7 @@ internal sealed class TagServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void TagList_Contains_NodeCount()
+    public async Task TagList_Contains_NodeCount()
     {
         var content1 = ContentBuilder.CreateSimpleContent(_contentType, "Tagged content 1");
         content1.AssignTags(
@@ -213,18 +213,18 @@ internal sealed class TagServiceTests : UmbracoIntegrationTest
             Serializer,
             "tags",
             new[] { "cow", "pig", "goat" });
-        ContentService.Save(content1);
-        ContentService.Publish(content1, Array.Empty<string>());
+        await ContentService.SaveAsync(content1, Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishAsync(content1, Array.Empty<string>(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         var content2 = ContentBuilder.CreateSimpleContent(_contentType, "Tagged content 2");
         content2.AssignTags(PropertyEditorCollection, DataTypeService, IdKeyMap, Serializer, "tags", new[] { "cow", "pig" });
-        ContentService.Save(content2);
-        ContentService.Publish(content2, Array.Empty<string>());
+        await ContentService.SaveAsync(content2, Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishAsync(content2, Array.Empty<string>(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         var content3 = ContentBuilder.CreateSimpleContent(_contentType, "Tagged content 3");
         content3.AssignTags(PropertyEditorCollection, DataTypeService, IdKeyMap, Serializer, "tags", new[] { "cow" });
-        ContentService.Save(content3);
-        ContentService.Publish(content3, Array.Empty<string>());
+        await ContentService.SaveAsync(content3, Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishAsync(content3, Array.Empty<string>(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Act
         var tags = TagService.GetAllContentTags()

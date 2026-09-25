@@ -51,7 +51,7 @@ public class ByKeyDocumentVersionController : DocumentVersionControllerBase
     public async Task<IActionResult> ByKey(CancellationToken cancellationToken, Guid id)
     {
         Attempt<IContent?, ContentVersionOperationStatus> attempt =
-            await _contentVersionService.GetAsync(id);
+            await _contentVersionService.GetAsync(id, cancellationToken);
 
         return attempt.Success
             ? Ok(_umbracoMapper.Map<DocumentVersionResponseModel>(attempt.Result))

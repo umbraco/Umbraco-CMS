@@ -55,12 +55,12 @@ internal sealed class PublicAccessRepository : AsyncEntityRepositoryBase<Guid, P
 
 
     /// <inheritdoc/>
-    protected override async Task<IEnumerable<PublicAccessEntry>?> PerformGetManyAsync(Guid[]? keys) =>
+    protected override async Task<IEnumerable<PublicAccessEntry>?> PerformGetManyAsync(Guid[] keys) =>
         await AmbientScope.ExecuteWithContextAsync(async db =>
         {
             AccessDto[] dtos = await db.Access
                 .Include(x => x.Rules)
-                .Where(x => keys!.Contains(x.Id))
+                .Where(x => keys.Contains(x.Id))
                 .OrderBy(x => x.NodeId)
                 .ToArrayAsync();
 

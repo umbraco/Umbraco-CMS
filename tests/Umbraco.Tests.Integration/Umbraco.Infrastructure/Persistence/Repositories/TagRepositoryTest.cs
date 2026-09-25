@@ -86,7 +86,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
             await ContentTypeRepository.SaveAsync(contentType, CancellationToken.None);
 
             var content = ContentBuilder.CreateSimpleContent(contentType);
-            DocumentRepository.Save(content);
+            await DocumentRepository.SaveAsync(content, CancellationToken.None);
 
             var repository = CreateRepository(provider);
             Tag[] tags = { new Tag { Text = "tag1", Group = "test" }, new Tag { Text = "tag2", Group = "test" } };
@@ -116,7 +116,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
             await ContentTypeRepository.SaveAsync(contentType, CancellationToken.None);
 
             var content = ContentBuilder.CreateSimpleContent(contentType);
-            DocumentRepository.Save(content);
+            await DocumentRepository.SaveAsync(content, CancellationToken.None);
 
             var repository = CreateRepository(provider);
             Tag[] tags = { new Tag { Text = "tag1", Group = "test" }, new Tag { Text = "tag2", Group = "test" } };
@@ -153,7 +153,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
             await ContentTypeRepository.SaveAsync(contentType, CancellationToken.None);
 
             var content = ContentBuilder.CreateSimpleContent(contentType);
-            DocumentRepository.Save(content);
+            await DocumentRepository.SaveAsync(content, CancellationToken.None);
 
             var repository = CreateRepository(provider);
             Tag[] tags = { new Tag { Text = "tag1", Group = "test" }, new Tag { Text = "tag2", Group = "test" } };
@@ -192,7 +192,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
             await ContentTypeRepository.SaveAsync(contentType, CancellationToken.None);
 
             var content = ContentBuilder.CreateSimpleContent(contentType);
-            DocumentRepository.Save(content);
+            await DocumentRepository.SaveAsync(content, CancellationToken.None);
 
             var repository = CreateRepository(provider);
             Tag[] tags = { new Tag { Text = "tag1", Group = "test" }, new Tag { Text = "tag2", Group = "test" } };
@@ -230,7 +230,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
             await ContentTypeRepository.SaveAsync(contentType, CancellationToken.None);
 
             var content = ContentBuilder.CreateSimpleContent(contentType);
-            DocumentRepository.Save(content);
+            await DocumentRepository.SaveAsync(content, CancellationToken.None);
 
             var repository = CreateRepository(provider);
             Tag[] tags = { new Tag { Text = "tag1", Group = "test" }, new Tag { Text = "tag2", Group = "test" } };
@@ -266,7 +266,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
             await ContentTypeRepository.SaveAsync(contentType, CancellationToken.None);
 
             var content = ContentBuilder.CreateSimpleContent(contentType);
-            DocumentRepository.Save(content);
+            await DocumentRepository.SaveAsync(content, CancellationToken.None);
 
             var repository = CreateRepository(provider);
             Tag[] tags =
@@ -309,9 +309,9 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
             await ContentTypeRepository.SaveAsync(contentType, CancellationToken.None);
 
             var content1 = ContentBuilder.CreateSimpleContent(contentType);
-            DocumentRepository.Save(content1);
+            await DocumentRepository.SaveAsync(content1, CancellationToken.None);
             var content2 = ContentBuilder.CreateSimpleContent(contentType);
-            DocumentRepository.Save(content2);
+            await DocumentRepository.SaveAsync(content2, CancellationToken.None);
 
             var repository = CreateRepository(provider);
             Tag[] tags =
@@ -353,9 +353,9 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
             await ContentTypeRepository.SaveAsync(contentType, CancellationToken.None);
 
             var content1 = ContentBuilder.CreateSimpleContent(contentType);
-            DocumentRepository.Save(content1);
+            await DocumentRepository.SaveAsync(content1, CancellationToken.None);
             var content2 = ContentBuilder.CreateSimpleContent(contentType);
-            DocumentRepository.Save(content2);
+            await DocumentRepository.SaveAsync(content2, CancellationToken.None);
 
             var repository = CreateRepository(provider);
             Tag[] tags =
@@ -398,9 +398,9 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
             await ContentTypeRepository.SaveAsync(contentType, CancellationToken.None);
 
             var content1 = ContentBuilder.CreateSimpleContent(contentType);
-            DocumentRepository.Save(content1);
+            await DocumentRepository.SaveAsync(content1, CancellationToken.None);
             var content2 = ContentBuilder.CreateSimpleContent(contentType);
-            DocumentRepository.Save(content2);
+            await DocumentRepository.SaveAsync(content2, CancellationToken.None);
 
             var repository = CreateRepository(provider);
             Tag[] tags =
@@ -435,9 +435,9 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
             await ContentTypeRepository.SaveAsync(contentType, CancellationToken.None);
 
             var content1 = ContentBuilder.CreateSimpleContent(contentType);
-            DocumentRepository.Save(content1);
+            await DocumentRepository.SaveAsync(content1, CancellationToken.None);
             var content2 = ContentBuilder.CreateSimpleContent(contentType);
-            DocumentRepository.Save(content2);
+            await DocumentRepository.SaveAsync(content2, CancellationToken.None);
 
             var repository = CreateRepository(provider);
             Tag[] tags =
@@ -476,9 +476,9 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
             await ContentTypeRepository.SaveAsync(contentType, CancellationToken.None);
 
             var content1 = ContentBuilder.CreateSimpleContent(contentType);
-            DocumentRepository.Save(content1);
+            await DocumentRepository.SaveAsync(content1, CancellationToken.None);
             var content2 = ContentBuilder.CreateSimpleContent(contentType);
-            DocumentRepository.Save(content2);
+            await DocumentRepository.SaveAsync(content2, CancellationToken.None);
 
             var repository = CreateRepository(provider);
             Tag[] tags =
@@ -520,7 +520,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
             await ContentTypeRepository.SaveAsync(contentType, CancellationToken.None);
 
             var content1 = ContentBuilder.CreateSimpleContent(contentType);
-            DocumentRepository.Save(content1);
+            await DocumentRepository.SaveAsync(content1, CancellationToken.None);
 
             var repository = CreateRepository(provider);
             Tag[] tags =
@@ -564,7 +564,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
             await ContentTypeRepository.SaveAsync(contentType, CancellationToken.None);
 
             var content1 = ContentBuilder.CreateSimpleContent(contentType);
-            DocumentRepository.Save(content1);
+            await DocumentRepository.SaveAsync(content1, CancellationToken.None);
 
             var repository = CreateRepository(provider);
             Tag[] tags =
@@ -609,7 +609,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
             await ContentTypeRepository.SaveAsync(contentType, CancellationToken.None);
 
             var content1 = ContentBuilder.CreateSimpleContent(contentType);
-            DocumentRepository.Save(content1);
+            await DocumentRepository.SaveAsync(content1, CancellationToken.None);
 
             var repository = CreateRepository(provider);
             Tag[] tags =
@@ -655,13 +655,13 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
             var content1 = ContentBuilder.CreateSimpleContent(contentType);
             content1.PublishCulture(CultureImpact.Invariant, DateTime.UtcNow, GetRequiredService<PropertyEditorCollection>());
             content1.PublishedState = PublishedState.Publishing;
-            DocumentRepository.Save(content1);
+            await DocumentRepository.SaveAsync(content1, CancellationToken.None);
 
             var content2 = ContentBuilder.CreateSimpleContent(contentType);
             content2.PublishCulture(CultureImpact.Invariant, DateTime.UtcNow, GetRequiredService<PropertyEditorCollection>());
             content2.PublishedState = PublishedState.Publishing;
             content2.Trashed = true;
-            DocumentRepository.Save(content2);
+            await DocumentRepository.SaveAsync(content2, CancellationToken.None);
 
             var mediaType = MediaTypeBuilder.CreateImageMediaType("image2");
             MediaTypeRepository.Save(mediaType);
@@ -739,7 +739,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
             await ContentTypeRepository.SaveAsync(contentType, CancellationToken.None);
 
             var content1 = ContentBuilder.CreateSimpleContent(contentType);
-            DocumentRepository.Save(content1);
+            await DocumentRepository.SaveAsync(content1, CancellationToken.None);
 
             var mediaType = MediaTypeBuilder.CreateImageMediaType("image2");
             MediaTypeRepository.Save(mediaType);
@@ -796,7 +796,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
             await ContentTypeRepository.SaveAsync(contentType, CancellationToken.None);
 
             var content1 = ContentBuilder.CreateSimpleContent(contentType);
-            DocumentRepository.Save(content1);
+            await DocumentRepository.SaveAsync(content1, CancellationToken.None);
 
             var mediaType = MediaTypeBuilder.CreateImageMediaType("image2");
             MediaTypeRepository.Save(mediaType);
@@ -847,7 +847,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
             await ContentTypeRepository.SaveAsync(contentType, CancellationToken.None);
 
             var content1 = ContentBuilder.CreateSimpleContent(contentType);
-            DocumentRepository.Save(content1);
+            await DocumentRepository.SaveAsync(content1, CancellationToken.None);
 
             var repository = CreateRepository(provider);
             Tag[] tags =
@@ -861,7 +861,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
                 tags,
                 false);
 
-            DocumentRepository.Delete(content1);
+            await DocumentRepository.DeleteAsync(content1, CancellationToken.None);
 
             Assert.AreEqual(0, ScopeAccessor.AmbientScope.Database.ExecuteScalar<int>(
                 "SELECT COUNT(*) FROM cmsTagRelationship WHERE nodeId=@nodeId AND propertyTypeId=@propTypeId",
@@ -885,10 +885,10 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
             await ContentTypeRepository.SaveAsync(contentType, CancellationToken.None);
 
             var content1 = ContentBuilder.CreateSimpleContent(contentType);
-            DocumentRepository.Save(content1);
+            await DocumentRepository.SaveAsync(content1, CancellationToken.None);
 
             var content2 = ContentBuilder.CreateSimpleContent(contentType);
-            DocumentRepository.Save(content2);
+            await DocumentRepository.SaveAsync(content2, CancellationToken.None);
 
             var mediaType = MediaTypeBuilder.CreateImageMediaType("image2");
             MediaTypeRepository.Save(mediaType);
@@ -979,10 +979,10 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
             await ContentTypeRepository.SaveAsync(contentType, CancellationToken.None);
 
             var content1 = ContentBuilder.CreateSimpleContent(contentType);
-            DocumentRepository.Save(content1);
+            await DocumentRepository.SaveAsync(content1, CancellationToken.None);
 
             var content2 = ContentBuilder.CreateSimpleContent(contentType);
-            DocumentRepository.Save(content2);
+            await DocumentRepository.SaveAsync(content2, CancellationToken.None);
 
             var mediaType = MediaTypeBuilder.CreateImageMediaType("image2");
             MediaTypeRepository.Save(mediaType);
@@ -1135,8 +1135,8 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
 
         var content1 = ContentBuilder.CreateSimpleContent(contentType);
         var content2 = ContentBuilder.CreateSimpleContent(contentType);
-        DocumentRepository.Save(content1);
-        DocumentRepository.Save(content2);
+        await DocumentRepository.SaveAsync(content1, CancellationToken.None);
+        await DocumentRepository.SaveAsync(content2, CancellationToken.None);
 
         return (contentType, content1, content2);
     }

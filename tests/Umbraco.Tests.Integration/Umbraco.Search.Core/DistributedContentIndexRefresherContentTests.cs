@@ -30,20 +30,20 @@ public class DistributedContentIndexRefresherContentTests : TestBase
     {
         await GetRequiredService<ILanguageService>().CreateAsync(
             new LanguageBuilder().WithCultureInfo("da-DK").Build(),
-            Constants.Security.SuperUserKey);
+            Cms.Core.Constants.Security.SuperUserKey);
 
         IContentType variantContentType = new ContentTypeBuilder()
             .WithAlias("variant")
             .WithContentVariation(ContentVariation.CultureAndSegment)
             .WithAllowAsRoot(true)
             .Build();
-        await ContentTypeService.CreateAsync(variantContentType, Constants.Security.SuperUserKey);
+        await ContentTypeService.CreateAsync(variantContentType, Cms.Core.Constants.Security.SuperUserKey);
 
         IContentType invariantContentType = new ContentTypeBuilder()
             .WithAlias("invariant")
             .WithAllowAsRoot(true)
             .Build();
-        await ContentTypeService.CreateAsync(invariantContentType, Constants.Security.SuperUserKey);
+        await ContentTypeService.CreateAsync(invariantContentType, Cms.Core.Constants.Security.SuperUserKey);
 
         _variantContentKey = Guid.NewGuid();
         IContent variantContent = new ContentBuilder()
@@ -52,8 +52,8 @@ public class DistributedContentIndexRefresherContentTests : TestBase
             .WithCultureName("en-US", "Variant EN")
             .WithCultureName("da-DK", "Variant DA")
             .Build();
-        ContentService.Save(variantContent);
-        ContentService.Publish(variantContent, ["en-US", "da-DK"]);
+        await ContentService.SaveAsync(variantContent, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishAsync(variantContent, ["en-US", "da-DK"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
         _invariantContentKey = Guid.NewGuid();
         IContent invariantContent = new ContentBuilder()
@@ -61,8 +61,8 @@ public class DistributedContentIndexRefresherContentTests : TestBase
             .WithContentType(invariantContentType)
             .WithName("Invariant")
             .Build();
-        ContentService.Save(invariantContent);
-        ContentService.Publish(invariantContent, ["*"]);
+        await ContentService.SaveAsync(invariantContent, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishAsync(invariantContent, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
         IndexerAndSearcher.Reset();
     }
@@ -122,9 +122,9 @@ public class DistributedContentIndexRefresherContentTests : TestBase
     [TestCase(true, false)]
     [TestCase(false, true)]
     [TestCase(true, true)]
-    public void RefreshContent_SinglePublished_SpecificLanguageVariants(bool publishEnglish, bool publishDanish)
+    public async Task RefreshContent_SinglePublished_SpecificLanguageVariants(bool publishEnglish, bool publishDanish)
     {
-        ContentService.Unpublish(VariantContent());
+        await ContentService.UnpublishAsync(VariantContent(), "*", Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
         var culturesToPublish = new List<string>();
         if (publishEnglish)
@@ -135,7 +135,7 @@ public class DistributedContentIndexRefresherContentTests : TestBase
         {
             culturesToPublish.Add("da-DK");
         }
-        ContentService.Publish(VariantContent(), culturesToPublish.ToArray());
+        await ContentService.PublishAsync(VariantContent(), culturesToPublish.ToArray(), Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
         IndexerAndSearcher.Reset();
         Assert.That(IndexerAndSearcher.Dump(IndexAliases.PublishedContent), Is.Empty);
@@ -150,7 +150,7 @@ public class DistributedContentIndexRefresherContentTests : TestBase
         Assert.That(dump[0].Variations.Any(v => v.Culture == "da-DK"), Is.EqualTo(publishDanish));
     }
 
-    private IContent VariantContent() => ContentService.GetById(_variantContentKey) ?? throw new InvalidOperationException("Variant content was not found");
+    private IContent VariantContent() => ContentService.GetByIdAsync(_variantContentKey, CancellationToken.None).GetAwaiter().GetResult() ?? throw new InvalidOperationException("Variant content was not found");
 
-    private IContent InvariantContent() => ContentService.GetById(_invariantContentKey) ?? throw new InvalidOperationException("Invariant content was not found");
+    private IContent InvariantContent() => ContentService.GetByIdAsync(_invariantContentKey, CancellationToken.None).GetAwaiter().GetResult() ?? throw new InvalidOperationException("Invariant content was not found");
 }

@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -77,11 +78,8 @@ internal sealed class ContentEditingService
     protected override string? RelateParentOnDeleteAlias => Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteAlias;
 
     /// <inheritdoc />
-    public override Task<IContent?> GetAsync(Guid key)
-    {
-        IContent? content = ContentService.GetById(key);
-        return Task.FromResult(content);
-    }
+    public override async Task<IContent?> GetAsync(Guid key)
+        => await ContentService.GetByIdAsync(key, CancellationToken.None);
 
     /// <inheritdoc />
     public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateUpdateAsync(
@@ -89,7 +87,7 @@ internal sealed class ContentEditingService
         ValidateContentUpdateModel updateModel,
         Guid userKey)
     {
-        IContent? content = ContentService.GetById(key);
+        IContent? content = await ContentService.GetByIdAsync(key, CancellationToken.None);
         return content is not null
             ? await ValidateCulturesAndPropertiesAsync(
                 updateModel,
@@ -168,7 +166,7 @@ internal sealed class ContentEditingService
 
     private async Task<Attempt<ContentUpdateResult, ContentEditingOperationStatus>> HandleUpdateAsync(Guid key, ContentUpdateModel updateModel, string[]? culturesToPublish, Guid userKey)
     {
-        IContent? content = ContentService.GetById(key);
+        IContent? content = await ContentService.GetByIdAsync(key, CancellationToken.None);
         if (content is null)
         {
             return Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, new ContentUpdateResult());
@@ -281,56 +279,84 @@ internal sealed class ContentEditingService
         => new Content(name, parentId, contentType);
 
     /// <inheritdoc />
-    protected override OperationResult? Move(IContent content, int newParentId, bool includeDescendants, int userId)
-        => ContentService.Move(content, newParentId, includeDescendants, userId);
-
-    /// <inheritdoc />
-    protected override async Task<IContent?> CopyAsync(IContent content, int newParentId, bool relateToOriginal, bool includeDescendants, Guid userKey)
+    protected override async Task<ContentEditingOperationStatus> MoveAsync(IContent content, Guid? parentKey, bool includeDescendants, Guid userKey)
     {
-        var userId = await GetUserIdAsync(userKey);
-        return ContentService.Copy(content, newParentId, relateToOriginal, includeDescendants, userId);
+        Attempt<ContentMoveOperationStatus> result = await ContentService.MoveAsync(content, parentKey, includeDescendants, userKey, CancellationToken.None);
+        return result.Result switch
+        {
+            ContentMoveOperationStatus.Success => ContentEditingOperationStatus.Success,
+            ContentMoveOperationStatus.CancelledByNotification => ContentEditingOperationStatus.CancelledByNotification,
+            ContentMoveOperationStatus.ParentNotFound => ContentEditingOperationStatus.ParentNotFound,
+            ContentMoveOperationStatus.ParentTrashed => ContentEditingOperationStatus.InTrash,
+            _ => ContentEditingOperationStatus.Unknown,
+        };
     }
 
     /// <inheritdoc />
-    protected override OperationResult? MoveToRecycleBin(IContent content, int userId) => ContentService.MoveToRecycleBin(content, userId);
-
-    /// <inheritdoc />
-    protected override OperationResult? Delete(IContent content, int userId) => ContentService.Delete(content, userId);
-
-    /// <inheritdoc />
-    protected override Task<IEnumerable<IContent>> GetPagedChildrenAsync(int parentId, int pageIndex, int pageSize, Ordering? ordering, out long total)
+    protected override async Task<IContent?> CopyAsync(IContent content, Guid? parentKey, bool relateToOriginal, bool includeDescendants, Guid userKey)
     {
-        IEnumerable<IContent> pagedChildren = ContentService.GetPagedChildren(parentId, pageIndex, pageSize, out total, propertyAliases: null, filter: null, ordering: ordering);
-        return Task.FromResult(pagedChildren);
+        Attempt<IContent?, ContentCopyOperationStatus> result = await ContentService.CopyAsync(content, parentKey, relateToOriginal, includeDescendants, userKey, CancellationToken.None);
+        return result.Success ? result.Result : null;
     }
 
     /// <inheritdoc />
-    protected override ContentEditingOperationStatus Sort(IEnumerable<IContent> items, int userId)
+    protected override async Task<OperationResult?> MoveToRecycleBinAsync(IContent content, Guid userKey)
     {
-        OperationResult result = ContentService.Sort(items, userId);
-        return OperationResultToOperationStatus(result);
+        Attempt<ContentMoveToRecycleBinOperationStatus> result = await ContentService.MoveToRecycleBinAsync(content, userKey, CancellationToken.None);
+        return result.Success
+            ? OperationResult.Succeed(new EventMessages())
+            : OperationResult.Cancel(new EventMessages());
     }
 
     /// <inheritdoc />
-    protected override ContentEditingOperationStatus SortChildrenInBulk(int parentId, IReadOnlyList<int> orderedChildIds, int userId)
+    protected override async Task<OperationResult?> DeleteAsync(IContent content, Guid userKey)
     {
-        OperationResult result = ContentService.SortChildren(parentId, orderedChildIds, userId);
-        return OperationResultToOperationStatus(result);
+        Attempt<ContentDeleteOperationStatus> result =
+            await ContentService.DeleteAsync(content, userKey, CancellationToken.None);
+        return result.Success ? OperationResult.Succeed(new EventMessages()) : OperationResult.Cancel(new EventMessages());
+    }
+
+    /// <inheritdoc />
+    protected override Task<PagedModel<IContent>> GetPagedChildrenAsync(Guid? parentKey, int pageIndex, int pageSize, Ordering? ordering)
+        => ContentService.GetChildrenAsync(parentKey, pageIndex * pageSize, pageSize, propertyAliases: null, ordering, CancellationToken.None);
+
+    /// <inheritdoc />
+    protected override async Task<ContentEditingOperationStatus> SortAsync(IReadOnlyList<Guid> orderedKeys, Guid userKey, CancellationToken cancellationToken)
+    {
+        Attempt<ContentSortOperationStatus> result = await ContentService.SortAsync(orderedKeys, userKey, cancellationToken);
+        OperationResult operationResult = result.Result switch
+        {
+            ContentSortOperationStatus.Success => OperationResult.Succeed(new EventMessages()),
+            ContentSortOperationStatus.NoOperation => new OperationResult(OperationResultType.NoOperation, new EventMessages()),
+            _ => OperationResult.Cancel(new EventMessages()),
+        };
+        return OperationResultToOperationStatus(operationResult);
+    }
+
+    /// <inheritdoc />
+    protected override async Task<ContentEditingOperationStatus> SortChildrenInBulkAsync(Guid? parentKey, IReadOnlyList<Guid> orderedChildKeys, Guid userKey)
+    {
+        Attempt<ContentSortChildrenOperationStatus> result = await ContentService.SortChildrenAsync(parentKey, orderedChildKeys, userKey, CancellationToken.None);
+        OperationResult operationResult = result.Result switch
+        {
+            ContentSortChildrenOperationStatus.Success => OperationResult.Succeed(new EventMessages()),
+            ContentSortChildrenOperationStatus.NoOperation => new OperationResult(OperationResultType.NoOperation, new EventMessages()),
+            _ => OperationResult.Cancel(new EventMessages()),
+        };
+        return OperationResultToOperationStatus(operationResult);
     }
 
     private async Task<ContentEditingOperationStatus> Save(IContent content, Guid userKey)
     {
         try
         {
-            var currentUserId = await GetUserIdAsync(userKey);
-            OperationResult saveResult = ContentService.Save(content, currentUserId);
+            Attempt<ContentSaveOperationStatus> saveResult = await ContentService.SaveAsync(content, userKey, null, CancellationToken.None);
             return saveResult.Result switch
             {
-                // these are the only result states currently expected from Save
-                OperationResultType.Success => ContentEditingOperationStatus.Success,
-                OperationResultType.FailedCancelledByEvent => ContentEditingOperationStatus.CancelledByNotification,
-
-                // for any other state we'll return "unknown" so we know that we need to amend this
+                ContentSaveOperationStatus.Success => ContentEditingOperationStatus.Success,
+                ContentSaveOperationStatus.CancelledByNotification => ContentEditingOperationStatus.CancelledByNotification,
+                ContentSaveOperationStatus.InvalidName => ContentEditingOperationStatus.NotAllowed,
+                ContentSaveOperationStatus.InvalidPublishedState => ContentEditingOperationStatus.Unknown,
                 _ => ContentEditingOperationStatus.Unknown,
             };
         }
@@ -345,8 +371,7 @@ internal sealed class ContentEditingService
     {
         try
         {
-            var currentUserId = await GetUserIdAsync(userKey);
-            PublishResult publishResult = ContentService.SaveAndPublish(content, culturesToPublish, userId: currentUserId);
+            PublishResult publishResult = await ContentService.SaveAndPublishAsync(content, culturesToPublish, userKey, CancellationToken.None);
             if (publishResult.Success)
             {
                 return ContentEditingOperationStatus.Success;

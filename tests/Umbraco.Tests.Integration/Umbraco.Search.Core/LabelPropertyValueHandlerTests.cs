@@ -12,7 +12,7 @@ public class LabelPropertyValueHandlerTests : ContentTestBase
     private IContentType _contentType;
 
     [Test]
-    public void AllLabelEditors_CanBeIndexed()
+    public async Task AllLabelEditors_CanBeIndexed()
     {
         Content content = new ContentBuilder()
             .WithContentType(_contentType)
@@ -29,8 +29,8 @@ public class LabelPropertyValueHandlerTests : ContentTestBase
                 })
             .Build();
 
-        ContentService.Save(content);
-        ContentService.Publish(content, ["*"]);
+        await ContentService.SaveAsync(content, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishAsync(content, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.PublishedContent);
         Assert.That(documents, Has.Count.EqualTo(1));
@@ -60,7 +60,7 @@ public class LabelPropertyValueHandlerTests : ContentTestBase
 
     [TestCase(long.MaxValue)]
     [TestCase(long.MinValue)]
-    public void LongValueWithOverflowAsInteger_IsNotIndexed(long value)
+    public async Task LongValueWithOverflowAsInteger_IsNotIndexed(long value)
     {
         Content content = new ContentBuilder()
             .WithContentType(_contentType)
@@ -72,8 +72,8 @@ public class LabelPropertyValueHandlerTests : ContentTestBase
                 })
             .Build();
 
-        ContentService.Save(content);
-        ContentService.Publish(content, ["*"]);
+        await ContentService.SaveAsync(content, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishAsync(content, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.PublishedContent);
         Assert.That(documents, Has.Count.EqualTo(1));
@@ -84,7 +84,7 @@ public class LabelPropertyValueHandlerTests : ContentTestBase
 
     [TestCase(null)]
     [TestCase("")]
-    public void EmptyValues_AreNotIndexed(string? value)
+    public async Task EmptyValues_AreNotIndexed(string? value)
     {
         Content content = new ContentBuilder()
             .WithContentType(_contentType)
@@ -101,8 +101,8 @@ public class LabelPropertyValueHandlerTests : ContentTestBase
                 })
             .Build();
 
-        ContentService.Save(content);
-        ContentService.Publish(content, ["*"]);
+        await ContentService.SaveAsync(content, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishAsync(content, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.PublishedContent);
         Assert.That(documents, Has.Count.EqualTo(1));
@@ -156,7 +156,7 @@ public class LabelPropertyValueHandlerTests : ContentTestBase
             .Done()
             .Build();
 
-        await ContentTypeService.CreateAsync(_contentType, Constants.Security.SuperUserKey);
+        await ContentTypeService.CreateAsync(_contentType, Cms.Core.Constants.Security.SuperUserKey);
 
         IndexerAndSearcher.Reset();
     }

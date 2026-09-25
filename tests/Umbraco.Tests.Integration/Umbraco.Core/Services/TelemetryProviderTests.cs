@@ -83,7 +83,7 @@ internal sealed class TelemetryProviderTests : UmbracoIntegrationTest
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var content = ContentBuilder.CreateBasicContent(contentType);
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         await DomainService.UpdateDomainsAsync(
             content.Key,
@@ -116,12 +116,12 @@ internal sealed class TelemetryProviderTests : UmbracoIntegrationTest
         blueprint.SetValue("keywords", "blueprint 3");
         blueprint.SetValue("description", "blueprint 4");
 
-        ContentService.SaveBlueprint(blueprint, null);
+        await ContentService.SaveBlueprintAsync(blueprint, null, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var fromBlueprint = await ContentBlueprintEditingService.GetScaffoldedAsync(blueprint.Key);
         Assert.IsNotNull(fromBlueprint);
         fromBlueprint.Name = "My test content";
-        ContentService.Save(fromBlueprint);
+        await ContentService.SaveAsync(fromBlueprint, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         IEnumerable<UsageInformation> result = null;
         // Act

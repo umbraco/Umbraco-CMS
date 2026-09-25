@@ -18,6 +18,8 @@ public abstract class ContentBase : TreeEntityBase, IContentBase
 {
     private int _contentTypeId;
     private ContentCultureInfosCollection? _cultureInfos;
+    private bool _hasParentKey;
+    private Guid? _parentKey;
     private IPropertyCollection _properties;
     private int _writerId;
 
@@ -86,6 +88,82 @@ public abstract class ContentBase : TreeEntityBase, IContentBase
     /// </summary>
     [IgnoreDataMember]
     public int VersionId { get; set; }
+
+    /// <inheritdoc cref="IContentBase.ParentKey" />
+    /// <remarks>
+    ///     Once explicitly populated (via the setter, or <see cref="SetParent" />), that value is returned
+    ///     as-is. Until then - e.g. for an entity freshly constructed via the raw <c>parentId</c> constructor,
+    ///     where only an int parent id is known - the root and recycle-bin pseudo-parents are inferred from
+    ///     <see cref="ParentId" /> alone; any other (real) parent's key cannot be known without an external
+    ///     lookup, so this reads as <c>null</c> rather than reach for an ambient service locator to perform one.
+    ///     Callers that must distinguish that from being at the root use <see cref="TryGetParentKey" />.
+    /// </remarks>
+    [DataMember]
+    public Guid? ParentKey
+    {
+        get => TryGetParentKey(out Guid? parentKey) ? parentKey : null;
+
+        set
+        {
+            _parentKey = value;
+            _hasParentKey = true;
+        }
+    }
+
+    /// <inheritdoc />
+    public override int ParentId
+    {
+        get => base.ParentId;
+        set
+        {
+            base.ParentId = value;
+
+            // A direct ParentId assignment only ever carries an int - it cannot be trusted to also be
+            // correct for ParentKey (e.g. after DeepClone, or when a caller doesn't know the new parent's
+            // key), so invalidate rather than risk serving a stale-but-present WRONG key. Callers that
+            // already know the new parent's key must set ParentKey immediately afterward.
+            _hasParentKey = false;
+            _parentKey = null;
+        }
+    }
+
+    /// <inheritdoc />
+    public bool TryGetParentKey(out Guid? parentKey)
+    {
+        if (_hasParentKey)
+        {
+            parentKey = _parentKey;
+            return true;
+        }
+
+        if (ParentId == Constants.System.Root)
+        {
+            parentKey = Constants.System.RootKey;
+            return true;
+        }
+
+        Guid? recycleBinKey = this switch
+        {
+            IContent when ParentId == Constants.System.RecycleBinContent => Constants.System.RecycleBinContentKey,
+            IMedia when ParentId == Constants.System.RecycleBinMedia => Constants.System.RecycleBinMediaKey,
+            IElement when ParentId == Constants.System.RecycleBinElement => Constants.System.RecycleBinElementKey,
+            _ => null,
+        };
+
+        parentKey = recycleBinKey;
+        return recycleBinKey.HasValue;
+    }
+
+    /// <inheritdoc />
+    public override void SetParent(ITreeEntity? parent)
+    {
+        base.SetParent(parent);
+
+        // Eagerly capture the parent's key: Key is always available in memory, even for an unsaved parent
+        // (unlike Id, which ParentId's getter defers resolving until the parent is persisted).
+        _parentKey = parent?.Key;
+        _hasParentKey = true;
+    }
 
     /// <summary>
     ///     Integer Id of the default ContentType

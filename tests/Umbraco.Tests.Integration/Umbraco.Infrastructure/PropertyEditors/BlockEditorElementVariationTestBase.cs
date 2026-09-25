@@ -72,7 +72,7 @@ internal abstract class BlockEditorElementVariationTestBase : UmbracoIntegration
 
     protected void PublishContent(IContent content, string[] culturesToPublish)
     {
-        var publishResult = ContentService.Publish(content, culturesToPublish);
+        var publishResult = ContentService.PublishAsync(content, culturesToPublish, Constants.Security.SuperUserKey, CancellationToken.None).GetAwaiter().GetResult();
         Assert.IsTrue(publishResult.Success);
         DocumentCacheService.RefreshContentAsync(content).GetAwaiter().GetResult();
     }

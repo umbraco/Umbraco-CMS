@@ -34,6 +34,7 @@ public class LoadTestController : Controller
     private static readonly Lock _locko = new();
 
     private static volatile int _containerId = -1;
+    private static Guid _containerKey = Guid.Empty;
 
     private static readonly string _headHtml = @"<html>
 <head>
@@ -187,13 +188,14 @@ public class LoadTestController : Controller
                 return null;
             }
 
-            var container = _contentService.GetPagedOfType(containerType.Id, 0, 100, out _, null).FirstOrDefault();
+            var container = _contentService.GetPagedOfTypeAsync(containerType.Key, 0, 100, ordering: null, CancellationToken.None).GetAwaiter().GetResult().Items.FirstOrDefault();
             if (container == null)
             {
                 return ContentHtml("Panic! Container is missing.");
             }
 
             _containerId = container.Id;
+            _containerKey = container.Key;
             return null;
         }
     }
@@ -244,9 +246,9 @@ public class LoadTestController : Controller
         containerType.SetDefaultTemplate(containerTemplate);
         await _contentTypeService.CreateAsync(containerType, Constants.Security.SuperUserKey);
 
-        var content = _contentService.Create("LoadTestContainer", -1, ContainerAlias);
-        _contentService.Save(content);
-        _contentService.Publish(content, content.AvailableCultures.ToArray());
+        var content = await _contentService.CreateAsync("LoadTestContainer", (Guid?)null, ContainerAlias, Constants.Security.SuperUserKey, CancellationToken.None);
+        await _contentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await _contentService.PublishAsync(content, content.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         return ContentHtml("Installed.");
     }
@@ -308,10 +310,10 @@ public class LoadTestController : Controller
         for (var i = 0; i < n; i++)
         {
             var name = Guid.NewGuid().ToString("N").ToUpper() + "-" + (restart ? "R" : "X") + "-" + o;
-            var content = _contentService.Create(name, _containerId, ContentAlias);
+            var content = await _contentService.CreateAsync(name, _containerKey, ContentAlias, Constants.Security.SuperUserKey, CancellationToken.None);
             content.SetValue("origin", o);
-            _contentService.Save(content);
-            _contentService.Publish(content, content.AvailableCultures.ToArray());
+            await _contentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
+            await _contentService.PublishAsync(content, content.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
         }
 
         if (restart)
@@ -345,7 +347,7 @@ public class LoadTestController : Controller
         }
 
         var contentType = await _contentTypeService.GetAsync(ContentAlias);
-        _contentService.DeleteOfType(contentType.Id);
+        await _contentService.DeleteOfTypeAsync(contentType.Key, Constants.Security.SuperUserKey, CancellationToken.None);
 
         return ContentHtml("Cleared.");
     }

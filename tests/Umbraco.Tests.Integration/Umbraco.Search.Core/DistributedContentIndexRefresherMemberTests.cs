@@ -30,7 +30,7 @@ public class DistributedContentIndexRefresherMemberTests : TestBase
             .WithAlias("invariant")
             .WithAllowAsRoot(true)
             .Build();
-        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
+        await MemberTypeService.CreateAsync(memberType, Cms.Core.Constants.Security.SuperUserKey);
 
         _memberOneKey = Guid.NewGuid();
         IMember memberOne = new MemberBuilder()

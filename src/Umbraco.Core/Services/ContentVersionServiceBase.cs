@@ -23,7 +23,7 @@ internal abstract class ContentVersionServiceBase<TContent>
     private readonly IEventMessagesFactory _eventMessagesFactory;
     private readonly ILanguageRepository _languageRepository;
     private readonly IEntityService _entityService;
-    private readonly IPublishableContentService<TContent> _contentService;
+    private readonly IPublishableContentService<TContent> _asyncContentService;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
     private readonly ILogger<ContentVersionServiceBase<TContent>> _logger;
     private readonly IOptionsMonitor<ContentSettings> _contentSettings;
@@ -40,7 +40,7 @@ internal abstract class ContentVersionServiceBase<TContent>
         IAuditService auditService,
         ILanguageRepository languageRepository,
         IEntityService entityService,
-        IPublishableContentService<TContent> contentService,
+        IPublishableContentService<TContent> asyncContentService,
         IUserIdKeyResolver userIdKeyResolver,
         IOptionsMonitor<ContentSettings> contentSettings)
     {
@@ -52,14 +52,14 @@ internal abstract class ContentVersionServiceBase<TContent>
         _auditService = auditService;
         _languageRepository = languageRepository;
         _entityService = entityService;
-        _contentService = contentService;
+        _asyncContentService = asyncContentService;
         _userIdKeyResolver = userIdKeyResolver;
         _contentSettings = contentSettings;
     }
 
-    protected abstract DeletingVersionsNotification<TContent> DeletingVersionsNotification(int id, EventMessages messages, int specificVersion);
+    protected abstract DeletingVersionsNotification<TContent> DeletingVersionsNotification(Guid key, EventMessages messages, int specificVersion);
 
-    protected abstract DeletedVersionsNotification<TContent> DeletedVersionsNotification(int id, EventMessages messages, int specificVersion);
+    protected abstract DeletedVersionsNotification<TContent> DeletedVersionsNotification(Guid key, EventMessages messages, int specificVersion);
 
     /// <inheritdoc />
     public IReadOnlyCollection<ContentVersionMeta> PerformContentVersionCleanup(DateTime asAtDate) =>
@@ -102,15 +102,15 @@ internal abstract class ContentVersionServiceBase<TContent>
             ContentVersionOperationStatus.Success, new PagedModel<ContentVersionMeta>(total, versions)));
     }
 
-    public Task<Attempt<TContent?, ContentVersionOperationStatus>> GetAsync(Guid versionId)
+    public async Task<Attempt<TContent?, ContentVersionOperationStatus>> GetAsync(Guid versionId, CancellationToken cancellationToken)
     {
-        TContent? version = _contentService.GetVersion(versionId.ToInt());
+        TContent? version = await _asyncContentService.GetVersionAsync(versionId.ToInt(), cancellationToken);
         if (version is null)
         {
-            return Task.FromResult(Attempt<TContent?, ContentVersionOperationStatus>.Fail(ContentVersionOperationStatus.NotFound));
+            return Attempt<TContent?, ContentVersionOperationStatus>.Fail(ContentVersionOperationStatus.NotFound);
         }
 
-        return Task.FromResult(Attempt<TContent?, ContentVersionOperationStatus>.Succeed(ContentVersionOperationStatus.Success, version));
+        return Attempt<TContent?, ContentVersionOperationStatus>.Succeed(ContentVersionOperationStatus.Success, version);
     }
 
     public async Task<Attempt<ContentVersionOperationStatus>> SetPreventCleanupAsync(Guid versionId, bool preventCleanup, Guid userKey)
@@ -134,28 +134,24 @@ internal abstract class ContentVersionServiceBase<TContent>
             return Attempt<ContentVersionOperationStatus>.Fail(ContentVersionOperationStatus.NotFound);
         }
 
-        OperationResult rollBackResult = _contentService.Rollback(
-            version.ContentId,
+        Attempt<Guid> keyAttempt = _entityService.GetKey(version.ContentId, ItemObjectType);
+        if (keyAttempt.Success is false)
+        {
+            return Attempt<ContentVersionOperationStatus>.Fail(ContentVersionOperationStatus.ContentNotFound);
+        }
+
+        Attempt<ContentRollbackOperationStatus> rollBackResult = await _asyncContentService.RollbackAsync(
+            keyAttempt.Result,
             version.VersionId,
             culture ?? "*",
-            await _userIdKeyResolver.GetAsync(userKey));
+            userKey,
+            CancellationToken.None);
 
-        if (rollBackResult.Success)
-        {
-            return Attempt<ContentVersionOperationStatus>.Succeed(ContentVersionOperationStatus.Success);
-        }
-
-        switch (rollBackResult.Result)
-        {
-            case OperationResultType.Failed:
-            case OperationResultType.FailedCannot:
-            case OperationResultType.FailedExceptionThrown:
-            case OperationResultType.NoOperation:
-            default:
-                return Attempt<ContentVersionOperationStatus>.Fail(ContentVersionOperationStatus.RollBackFailed);
-            case OperationResultType.FailedCancelledByEvent:
-                return Attempt<ContentVersionOperationStatus>.Fail(ContentVersionOperationStatus.RollBackCanceled);
-        }
+        return rollBackResult.Success
+            ? Attempt<ContentVersionOperationStatus>.Succeed(ContentVersionOperationStatus.Success)
+            : Attempt<ContentVersionOperationStatus>.Fail(rollBackResult.Result == ContentRollbackOperationStatus.CancelledByNotification
+                ? ContentVersionOperationStatus.RollBackCanceled
+                : ContentVersionOperationStatus.RollBackFailed);
     }
 
     private IEnumerable<ContentVersionMeta> HandleGetPagedContentVersions(
@@ -256,8 +252,17 @@ internal abstract class ContentVersionServiceBase<TContent>
             foreach (ContentVersionMeta version in filteredContentVersions)
             {
                 EventMessages messages = _eventMessagesFactory.Get();
+                Attempt<Guid> keyAttempt = _entityService.GetKey(version.ContentId, ItemObjectType);
+                if (keyAttempt.Success is false)
+                {
+                    _logger.LogWarning(
+                        "Could not resolve a key for content [{ContentId}], skipping cleanup of ContentVersion [{VersionId}]",
+                        version.ContentId,
+                        version.VersionId);
+                    continue;
+                }
 
-                if (scope.Notifications.PublishCancelable(DeletingVersionsNotification(version.ContentId, messages, version.VersionId)))
+                if (scope.Notifications.PublishCancelable(DeletingVersionsNotification(keyAttempt.Result, messages, version.VersionId)))
                 {
                     if (_logger.IsEnabled(LogLevel.Debug))
                     {
@@ -299,8 +304,13 @@ internal abstract class ContentVersionServiceBase<TContent>
                 foreach (ContentVersionMeta version in groupEnumerated)
                 {
                     EventMessages messages = _eventMessagesFactory.Get();
+                    Attempt<Guid> keyAttempt = _entityService.GetKey(version.ContentId, ItemObjectType);
+                    if (keyAttempt.Success is false)
+                    {
+                        continue;
+                    }
 
-                    scope.Notifications.Publish(DeletedVersionsNotification(version.ContentId, messages, version.VersionId));
+                    scope.Notifications.Publish(DeletedVersionsNotification(keyAttempt.Result, messages, version.VersionId));
                 }
 
                 scope.Complete();

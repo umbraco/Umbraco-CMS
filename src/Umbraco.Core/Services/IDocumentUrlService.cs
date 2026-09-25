@@ -22,7 +22,8 @@ public interface IDocumentUrlService
     /// <summary>
     /// Rebuilds all document URLs.
     /// </summary>
-    Task RebuildAllUrlsAsync();
+    /// <param name="cancellationToken">The cancellation token.</param>
+    Task RebuildAllUrlsAsync(CancellationToken cancellationToken);
 
     /// <summary>
     /// Gets a single URL segment from a document key and culture. Preview urls are returned if isDraft is true.

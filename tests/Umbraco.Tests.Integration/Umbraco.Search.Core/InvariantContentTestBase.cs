@@ -29,9 +29,9 @@ public abstract class InvariantContentTestBase : ContentTestBase
             .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.Tags)
             .Done()
             .Build();
-        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+        await ContentTypeService.CreateAsync(contentType, Cms.Core.Constants.Security.SuperUserKey);
         contentType.AllowedContentTypes = [new ContentTypeSort(contentType.Key, 0, contentType.Alias)];
-        await ContentTypeService.UpdateAsync(contentType, Constants.Security.SuperUserKey);
+        await ContentTypeService.UpdateAsync(contentType, Cms.Core.Constants.Security.SuperUserKey);
 
         Content root = new ContentBuilder()
             .WithKey(RootKey)
@@ -45,7 +45,7 @@ public abstract class InvariantContentTestBase : ContentTestBase
                     tags = "[\"tag1\",\"tag2\"]"
                 })
             .Build();
-        ContentService.Save(root);
+        await ContentService.SaveAsync(root, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         Content child = new ContentBuilder()
             .WithKey(ChildKey)
@@ -60,7 +60,7 @@ public abstract class InvariantContentTestBase : ContentTestBase
                     tags = "[\"tag3\",\"tag4\"]"
                 })
             .Build();
-        ContentService.Save(child);
+        await ContentService.SaveAsync(child, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         Content grandchild = new ContentBuilder()
             .WithKey(GrandchildKey)
@@ -75,7 +75,7 @@ public abstract class InvariantContentTestBase : ContentTestBase
                     tags = "[\"tag5\",\"tag6\"]"
                 })
             .Build();
-        ContentService.Save(grandchild);
+        await ContentService.SaveAsync(grandchild, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         Content greatGrandchild = new ContentBuilder()
             .WithKey(GreatGrandchildKey)
@@ -90,7 +90,7 @@ public abstract class InvariantContentTestBase : ContentTestBase
                     tags = "[\"tag7\",\"tag8\"]"
                 })
             .Build();
-        ContentService.Save(greatGrandchild);
+        await ContentService.SaveAsync(greatGrandchild, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         IndexerAndSearcher.Reset();
     }

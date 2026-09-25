@@ -26,10 +26,10 @@ public class BlockListPropertyValueHandlerTests : PropertyValueHandlerTestsBase
     public async Task SetUp()
     {
         await GetRequiredService<ILanguageService>()
-            .CreateAsync(new Language("da-DK", "Danish (Denmark)"), Constants.Security.SuperUserKey);
+            .CreateAsync(new Language("da-DK", "Danish (Denmark)"), Cms.Core.Constants.Security.SuperUserKey);
 
         await GetRequiredService<ILanguageService>()
-            .CreateAsync(new Language("de-DE", "German (Germany)"), Constants.Security.SuperUserKey);
+            .CreateAsync(new Language("de-DE", "German (Germany)"), Cms.Core.Constants.Security.SuperUserKey);
 
         IndexerAndSearcher.Reset();
     }
@@ -159,8 +159,8 @@ public class BlockListPropertyValueHandlerTests : PropertyValueHandlerTestsBase
             .WithName("My Blocks")
             .WithPropertyValues(new { blocks = blocksPropertyValue })
             .Build();
-        ContentService.Save(content);
-        ContentService.Publish(content, ["*"]);
+        await ContentService.SaveAsync(content, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishAsync(content, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
         AssertDocumentFields(IndexAliases.DraftContent);
         AssertDocumentFields(IndexAliases.PublishedContent);
@@ -319,8 +319,8 @@ public class BlockListPropertyValueHandlerTests : PropertyValueHandlerTestsBase
             .WithName("My Blocks")
             .WithPropertyValues(new { rootBlocks = blocksPropertyValue })
             .Build();
-        ContentService.Save(content);
-        ContentService.Publish(content, ["*"]);
+        await ContentService.SaveAsync(content, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishAsync(content, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.PublishedContent);
         Assert.That(documents, Has.Count.EqualTo(1));
@@ -504,8 +504,8 @@ public class BlockListPropertyValueHandlerTests : PropertyValueHandlerTestsBase
             .WithCultureName("da-DK", "My Blocks DA")
             .WithPropertyValues(new { blocks = blocksPropertyValue })
             .Build();
-        ContentService.Save(content);
-        ContentService.Publish(content, ["*"]);
+        await ContentService.SaveAsync(content, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishAsync(content, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
         AssertDocumentFields(
             IndexAliases.DraftContent,
@@ -599,7 +599,7 @@ public class BlockListPropertyValueHandlerTests : PropertyValueHandlerTestsBase
             .WithName("My Blocks")
             .WithPropertyValues(new { blocks = blocksPropertyValue })
             .Build();
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.DraftContent);
         Assert.That(documents, Has.Count.EqualTo(1));
@@ -625,7 +625,7 @@ public class BlockListPropertyValueHandlerTests : PropertyValueHandlerTestsBase
             elementType.PropertyTypes.First(p => p.Alias == "integerValue").Variations = ContentVariation.Culture;
         }
 
-        await ContentTypeService.UpdateAsync(elementType, Constants.Security.SuperUserKey);
+        await ContentTypeService.UpdateAsync(elementType, Cms.Core.Constants.Security.SuperUserKey);
         return elementType;
     }
 
@@ -651,7 +651,7 @@ public class BlockListPropertyValueHandlerTests : PropertyValueHandlerTestsBase
             CreateDate = DateTime.UtcNow
         };
 
-        await GetRequiredService<IDataTypeService>().CreateAsync(blockListDataType, Constants.Security.SuperUserKey);
+        await GetRequiredService<IDataTypeService>().CreateAsync(blockListDataType, Cms.Core.Constants.Security.SuperUserKey);
 
         IContentType contentType = new ContentTypeBuilder()
             .WithAlias("blockEditor")
@@ -668,7 +668,7 @@ public class BlockListPropertyValueHandlerTests : PropertyValueHandlerTestsBase
             contentType.Variations = ContentVariation.Culture;
         }
 
-        await ContentTypeService.UpdateAsync(contentType, Constants.Security.SuperUserKey);
+        await ContentTypeService.UpdateAsync(contentType, Cms.Core.Constants.Security.SuperUserKey);
 
         return (contentType, elementType);
     }
@@ -696,7 +696,7 @@ public class BlockListPropertyValueHandlerTests : PropertyValueHandlerTestsBase
             ParentId = Constants.System.Root,
             CreateDate = DateTime.UtcNow
         };
-        await dataTypeService.CreateAsync(nestedBlockListDataType, Constants.Security.SuperUserKey);
+        await dataTypeService.CreateAsync(nestedBlockListDataType, Cms.Core.Constants.Security.SuperUserKey);
 
         IContentType rootElementType = new ContentTypeBuilder()
             .WithAlias("rootBlockEditor")
@@ -708,7 +708,7 @@ public class BlockListPropertyValueHandlerTests : PropertyValueHandlerTestsBase
             .WithDataTypeId(nestedBlockListDataType.Id)
             .Done()
             .Build();
-        await ContentTypeService.CreateAsync(rootElementType, Constants.Security.SuperUserKey);
+        await ContentTypeService.CreateAsync(rootElementType, Cms.Core.Constants.Security.SuperUserKey);
 
         var rootBlockListDataType = new DataType(PropertyEditorCollection[Constants.PropertyEditors.Aliases.BlockList], ConfigurationEditorJsonSerializer)
         {
@@ -728,7 +728,7 @@ public class BlockListPropertyValueHandlerTests : PropertyValueHandlerTestsBase
             ParentId = Constants.System.Root,
             CreateDate = DateTime.UtcNow
         };
-        await dataTypeService.CreateAsync(rootBlockListDataType, Constants.Security.SuperUserKey);
+        await dataTypeService.CreateAsync(rootBlockListDataType, Cms.Core.Constants.Security.SuperUserKey);
 
         IContentType contentType = new ContentTypeBuilder()
             .WithAlias("blockEditor")
@@ -740,7 +740,7 @@ public class BlockListPropertyValueHandlerTests : PropertyValueHandlerTestsBase
             .WithDataTypeId(rootBlockListDataType.Id)
             .Done()
             .Build();
-        await ContentTypeService.UpdateAsync(contentType, Constants.Security.SuperUserKey);
+        await ContentTypeService.UpdateAsync(contentType, Cms.Core.Constants.Security.SuperUserKey);
 
         return (contentType, rootElementType, nestedElementType);
     }
@@ -758,7 +758,7 @@ public class BlockListPropertyValueHandlerTests : PropertyValueHandlerTestsBase
             .Done()
             .Build();
 
-        await dataTypeService.CreateAsync(markdownDataType, Constants.Security.SuperUserKey);
+        await dataTypeService.CreateAsync(markdownDataType, Cms.Core.Constants.Security.SuperUserKey);
 
         IContentType elementType = new ContentTypeBuilder()
             .WithAlias("blockEditorElement")
@@ -770,7 +770,7 @@ public class BlockListPropertyValueHandlerTests : PropertyValueHandlerTestsBase
             .WithDataTypeId(markdownDataType.Id)
             .Done()
             .Build();
-        await ContentTypeService.CreateAsync(elementType, Constants.Security.SuperUserKey);
+        await ContentTypeService.CreateAsync(elementType, Cms.Core.Constants.Security.SuperUserKey);
 
         var blockListDataType = new DataType(PropertyEditorCollection[Constants.PropertyEditors.Aliases.BlockList], ConfigurationEditorJsonSerializer)
         {
@@ -790,7 +790,7 @@ public class BlockListPropertyValueHandlerTests : PropertyValueHandlerTestsBase
             ParentId = Constants.System.Root,
             CreateDate = DateTime.UtcNow
         };
-        await dataTypeService.CreateAsync(blockListDataType, Constants.Security.SuperUserKey);
+        await dataTypeService.CreateAsync(blockListDataType, Cms.Core.Constants.Security.SuperUserKey);
 
         IContentType contentType = new ContentTypeBuilder()
             .WithAlias("blockEditor")
@@ -801,7 +801,7 @@ public class BlockListPropertyValueHandlerTests : PropertyValueHandlerTestsBase
             .WithDataTypeId(blockListDataType.Id)
             .Done()
             .Build();
-        await ContentTypeService.UpdateAsync(contentType, Constants.Security.SuperUserKey);
+        await ContentTypeService.UpdateAsync(contentType, Cms.Core.Constants.Security.SuperUserKey);
 
         return (contentType, elementType);
     }
@@ -957,14 +957,14 @@ public class BlockListPropertyValueHandlerTests : PropertyValueHandlerTestsBase
             .WithCultureName("de-DE", "My Blocks DE")
             .WithPropertyValues(new { rootBlocks = blocksPropertyValue })
             .Build();
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
         if (publishAllCultures)
         {
-            ContentService.Publish(content, ["en-US", "da-DK", "de-DE"]);
+            await ContentService.PublishAsync(content, ["en-US", "da-DK", "de-DE"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         }
         else
         {
-            ContentService.Publish(content, ["da-DK", "de-DE"]);
+            await ContentService.PublishAsync(content, ["da-DK", "de-DE"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         }
     }
 }

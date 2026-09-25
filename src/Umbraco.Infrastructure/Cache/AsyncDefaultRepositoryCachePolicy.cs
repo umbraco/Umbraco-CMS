@@ -45,7 +45,7 @@ public class AsyncDefaultRepositoryCachePolicy<TEntity, TKey> : AsyncRepositoryC
     /// <summary>
     ///     Gets the cache key prefix for this entity type.
     /// </summary>
-    protected string EntityTypeCacheKey { get; } = RepositoryCacheKeys.GetKey<TEntity>();
+    protected virtual string EntityTypeCacheKey { get; } = RepositoryCacheKeys.GetKey<TEntity>();
 
     /// <inheritdoc />
     public override async Task CreateAsync(TEntity entity, Func<TEntity, Task> persistNew)
@@ -59,7 +59,7 @@ public class AsyncDefaultRepositoryCachePolicy<TEntity, TKey> : AsyncRepositoryC
             // just to be safe, we cannot cache an item without an identity
             if (entity.HasIdentity)
             {
-                Cache.Insert(GetEntityCacheKey(entity.Id), () => entity, TimeSpan.FromMinutes(5), true);
+                Cache.Insert(GetEntityCacheKey(entity), () => entity, TimeSpan.FromMinutes(5), true);
             }
 
             // if there's a GetAllCacheAllowZeroCount cache, ensure it is cleared
@@ -70,7 +70,7 @@ public class AsyncDefaultRepositoryCachePolicy<TEntity, TKey> : AsyncRepositoryC
             // if an exception is thrown we need to remove the entry from cache,
             // this is ONLY a work around because of the way
             // that we cache entities: http://issues.umbraco.org/issue/U4-4259
-            Cache.Clear(GetEntityCacheKey(entity.Id));
+            Cache.Clear(GetEntityCacheKey(entity));
 
             // if there's a GetAllCacheAllowZeroCount cache, ensure it is cleared
             Cache.Clear(EntityTypeCacheKey);
@@ -91,7 +91,7 @@ public class AsyncDefaultRepositoryCachePolicy<TEntity, TKey> : AsyncRepositoryC
             // just to be safe, we cannot cache an item without an identity
             if (entity.HasIdentity)
             {
-                Cache.Insert(GetEntityCacheKey(entity.Id), () => entity, TimeSpan.FromMinutes(5), true);
+                Cache.Insert(GetEntityCacheKey(entity), () => entity, TimeSpan.FromMinutes(5), true);
             }
 
             // if there's a GetAllCacheAllowZeroCount cache, ensure it is cleared
@@ -102,7 +102,7 @@ public class AsyncDefaultRepositoryCachePolicy<TEntity, TKey> : AsyncRepositoryC
             // if an exception is thrown we need to remove the entry from cache,
             // this is ONLY a work around because of the way
             // that we cache entities: http://issues.umbraco.org/issue/U4-4259
-            Cache.Clear(GetEntityCacheKey(entity.Id));
+            Cache.Clear(GetEntityCacheKey(entity));
 
             // if there's a GetAllCacheAllowZeroCount cache, ensure it is cleared
             Cache.Clear(EntityTypeCacheKey);
@@ -127,7 +127,7 @@ public class AsyncDefaultRepositoryCachePolicy<TEntity, TKey> : AsyncRepositoryC
         finally
         {
             // whatever happens, clear the cache
-            var cacheKey = GetEntityCacheKey(entity.Id);
+            var cacheKey = GetEntityCacheKey(entity);
 
             Cache.Clear(cacheKey);
 
@@ -326,6 +326,17 @@ public class AsyncDefaultRepositoryCachePolicy<TEntity, TKey> : AsyncRepositoryC
     protected string GetEntityCacheKey(int id) => EntityTypeCacheKey + id;
 
     /// <summary>
+    ///     Gets the cache key under which an entity is cached.
+    /// </summary>
+    /// <param name="entity">The entity.</param>
+    /// <returns>The cache key.</returns>
+    /// <remarks>
+    ///     Reads are keyed by <typeparamref name="TKey" />, so a policy whose key is not the entity's integer
+    ///     identifier must override this for its writes to land where its reads look.
+    /// </remarks>
+    protected virtual string GetEntityCacheKey(TEntity entity) => GetEntityCacheKey(entity.Id);
+
+    /// <summary>
     ///     Gets the cache key for an entity with the specified key.
     /// </summary>
     /// <param name="key">The key.</param>
@@ -378,7 +389,7 @@ public class AsyncDefaultRepositoryCachePolicy<TEntity, TKey> : AsyncRepositoryC
             foreach (TEntity entity in entities)
             {
                 TEntity capture = entity;
-                Cache.Insert(GetEntityCacheKey(entity.Id), () => capture, TimeSpan.FromMinutes(5), true);
+                Cache.Insert(GetEntityCacheKey(capture), () => capture, TimeSpan.FromMinutes(5), true);
             }
         }
     }

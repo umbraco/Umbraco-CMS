@@ -71,8 +71,8 @@ internal sealed class ScopedNuCacheTests : UmbracoIntegrationTest
 
         using (var scope = ScopeProvider.CreateScope())
         {
-            ContentService.Save(item);
-            ContentService.Publish(item, item.AvailableCultures.ToArray());
+            await ContentService.SaveAsync(item, Constants.Security.SuperUserKey, null, CancellationToken.None);
+            await ContentService.PublishAsync(item, item.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
             scope.Complete();
         }
 
@@ -97,8 +97,8 @@ internal sealed class ScopedNuCacheTests : UmbracoIntegrationTest
         using (var scope = ScopeProvider.CreateScope())
         {
             item.Name = "changed";
-            ContentService.Save(item);
-            ContentService.Publish(item, item.AvailableCultures.ToArray());
+            await ContentService.SaveAsync(item, Constants.Security.SuperUserKey, null, CancellationToken.None);
+            await ContentService.PublishAsync(item, item.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
 
             if (complete)
             {

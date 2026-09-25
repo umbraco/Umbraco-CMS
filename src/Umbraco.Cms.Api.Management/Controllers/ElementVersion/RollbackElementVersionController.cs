@@ -56,7 +56,7 @@ public class RollbackElementVersionController : ElementVersionControllerBase
     [EndpointDescription("Rolls back an element to the version indicated by the provided Id. This will archive the current version of the element and publish the provided one.")]
     public async Task<IActionResult> Rollback(CancellationToken cancellationToken, Guid id, string? culture)
     {
-        Attempt<IElement?, ContentVersionOperationStatus> getContentAttempt = await _elementVersionService.GetAsync(id);
+        Attempt<IElement?, ContentVersionOperationStatus> getContentAttempt = await _elementVersionService.GetAsync(id, cancellationToken);
         if (getContentAttempt.Success is false || getContentAttempt.Result is null)
         {
             return MapFailure(getContentAttempt.Status);

@@ -20,6 +20,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 /// </summary>
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
+#pragma warning disable CS0618 // Type or member is obsolete
 internal sealed class ContentPermissionServiceTests : UmbracoIntegrationTest
 {
     private IContentPermissionService ContentPermissionService => GetRequiredService<IContentPermissionService>();
@@ -43,12 +44,12 @@ internal sealed class ContentPermissionServiceTests : UmbracoIntegrationTest
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var parent = ContentBuilder.CreateSimpleContent(contentType);
-        ContentService.Save(parent);
+        await ContentService.SaveAsync(parent, Constants.Security.SuperUserKey, null, CancellationToken.None);
         var child = ContentBuilder.CreateSimpleContent(contentType, "child", parent.Id);
-        ContentService.Save(child);
+        await ContentService.SaveAsync(child, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
-        ContentService.SetPermission(parent, ActionBrowse.ActionLetter, [userGroup.Id]);
-        ContentService.SetPermission(parent, ActionDelete.ActionLetter, [userGroup.Id]);
+        await ContentService.SetPermissionAsync(parent, ActionBrowse.ActionLetter, [userGroup.Key], CancellationToken.None);
+        await ContentService.SetPermissionAsync(parent, ActionDelete.ActionLetter, [userGroup.Key], CancellationToken.None);
 
         // Act - call both services
         NodePermissions[] viaPermissionService = (await ContentPermissionService.GetPermissionsAsync(user, [child.Key])).ToArray();
@@ -77,14 +78,14 @@ internal sealed class ContentPermissionServiceTests : UmbracoIntegrationTest
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var parent = ContentBuilder.CreateSimpleContent(contentType);
-        ContentService.Save(parent);
+        await ContentService.SaveAsync(parent, Constants.Security.SuperUserKey, null, CancellationToken.None);
         var child = ContentBuilder.CreateSimpleContent(contentType, "child", parent.Id);
-        ContentService.Save(child);
+        await ContentService.SaveAsync(child, Constants.Security.SuperUserKey, null, CancellationToken.None);
         var grandchild = ContentBuilder.CreateSimpleContent(contentType, "grandchild", child.Id);
-        ContentService.Save(grandchild);
+        await ContentService.SaveAsync(grandchild, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
-        ContentService.SetPermission(parent, ActionBrowse.ActionLetter, [userGroup.Id]);
-        ContentService.SetPermission(parent, ActionMove.ActionLetter, [userGroup.Id]);
+        await ContentService.SetPermissionAsync(parent, ActionBrowse.ActionLetter, [userGroup.Key], CancellationToken.None);
+        await ContentService.SetPermissionAsync(parent, ActionMove.ActionLetter, [userGroup.Key], CancellationToken.None);
 
         // Act
         NodePermissions[] viaPermissionService = (await ContentPermissionService.GetPermissionsAsync(user, [grandchild.Key])).ToArray();
@@ -110,15 +111,15 @@ internal sealed class ContentPermissionServiceTests : UmbracoIntegrationTest
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var parent = ContentBuilder.CreateSimpleContent(contentType);
-        ContentService.Save(parent);
+        await ContentService.SaveAsync(parent, Constants.Security.SuperUserKey, null, CancellationToken.None);
         var child = ContentBuilder.CreateSimpleContent(contentType, "child", parent.Id);
-        ContentService.Save(child);
+        await ContentService.SaveAsync(child, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         // Different permissions on parent and child
-        ContentService.SetPermission(parent, ActionBrowse.ActionLetter, [userGroup.Id]);
-        ContentService.SetPermission(parent, ActionDelete.ActionLetter, [userGroup.Id]);
-        ContentService.SetPermission(child, ActionBrowse.ActionLetter, [userGroup.Id]);
-        ContentService.SetPermission(child, ActionMove.ActionLetter, [userGroup.Id]);
+        await ContentService.SetPermissionAsync(parent, ActionBrowse.ActionLetter, [userGroup.Key], CancellationToken.None);
+        await ContentService.SetPermissionAsync(parent, ActionDelete.ActionLetter, [userGroup.Key], CancellationToken.None);
+        await ContentService.SetPermissionAsync(child, ActionBrowse.ActionLetter, [userGroup.Key], CancellationToken.None);
+        await ContentService.SetPermissionAsync(child, ActionMove.ActionLetter, [userGroup.Key], CancellationToken.None);
 
         // Act
         NodePermissions[] viaPermissionService = (await ContentPermissionService.GetPermissionsAsync(user, [child.Key])).ToArray();
@@ -145,16 +146,16 @@ internal sealed class ContentPermissionServiceTests : UmbracoIntegrationTest
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var parent = ContentBuilder.CreateSimpleContent(contentType);
-        ContentService.Save(parent);
+        await ContentService.SaveAsync(parent, Constants.Security.SuperUserKey, null, CancellationToken.None);
         var child = ContentBuilder.CreateSimpleContent(contentType, "child", parent.Id);
-        ContentService.Save(child);
+        await ContentService.SaveAsync(child, Constants.Security.SuperUserKey, null, CancellationToken.None);
         var grandchild = ContentBuilder.CreateSimpleContent(contentType, "grandchild", child.Id);
-        ContentService.Save(grandchild);
+        await ContentService.SaveAsync(grandchild, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
-        ContentService.SetPermission(parent, ActionBrowse.ActionLetter, [userGroup.Id]);
-        ContentService.SetPermission(parent, ActionDelete.ActionLetter, [userGroup.Id]);
-        ContentService.SetPermission(child, ActionBrowse.ActionLetter, [userGroup.Id]);
-        ContentService.SetPermission(child, ActionMove.ActionLetter, [userGroup.Id]);
+        await ContentService.SetPermissionAsync(parent, ActionBrowse.ActionLetter, [userGroup.Key], CancellationToken.None);
+        await ContentService.SetPermissionAsync(parent, ActionDelete.ActionLetter, [userGroup.Key], CancellationToken.None);
+        await ContentService.SetPermissionAsync(child, ActionBrowse.ActionLetter, [userGroup.Key], CancellationToken.None);
+        await ContentService.SetPermissionAsync(child, ActionMove.ActionLetter, [userGroup.Key], CancellationToken.None);
 
         // Act
         NodePermissions[] viaPermissionService = (await ContentPermissionService.GetPermissionsAsync(user, [grandchild.Key])).ToArray();
@@ -187,9 +188,9 @@ internal sealed class ContentPermissionServiceTests : UmbracoIntegrationTest
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var parent = ContentBuilder.CreateSimpleContent(contentType);
-        ContentService.Save(parent);
+        await ContentService.SaveAsync(parent, Constants.Security.SuperUserKey, null, CancellationToken.None);
         var child = ContentBuilder.CreateSimpleContent(contentType, "child", parent.Id);
-        ContentService.Save(child);
+        await ContentService.SaveAsync(child, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         // No explicit permissions set on any node.
 
@@ -219,3 +220,4 @@ internal sealed class ContentPermissionServiceTests : UmbracoIntegrationTest
         return (user, userGroup);
     }
 }
+#pragma warning restore CS0618 // Type or member is obsolete

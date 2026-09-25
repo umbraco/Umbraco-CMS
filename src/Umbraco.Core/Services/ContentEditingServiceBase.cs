@@ -53,6 +53,8 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
     /// <param name="optionsMonitor">The content settings options monitor.</param>
     /// <param name="relationService">The relation service.</param>
     /// <param name="contentTypeFilters">The content type filter collection.</param>
+    /// <param name="languageService">The language service.</param>
+    /// <param name="userService">The user service.</param>
     protected ContentEditingServiceBase(
         TContentService contentService,
         TContentTypeService contentTypeService,
@@ -200,6 +202,12 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         Attempt<ContentValidationResult, ContentEditingOperationStatus> validationResult = await ValidatePropertiesAsync(contentCreationModelBase, contentType);
 
         TContent content = New(string.Empty, parent.ParentId ?? Constants.System.Root, contentType);
+
+        // The new entity's ParentKey field is left unresolved by New() (it only has an int to work with) -
+        // populate it directly from the already-validated Guid the caller supplied, rather than leaving it
+        // to be resolved lazily later.
+        content.ParentKey = contentCreationModelBase.ParentKey;
+
         if (contentCreationModelBase.Key.HasValue)
         {
             content.Key = contentCreationModelBase.Key.Value;

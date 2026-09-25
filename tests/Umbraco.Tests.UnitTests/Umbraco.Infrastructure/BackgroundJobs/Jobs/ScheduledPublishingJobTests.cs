@@ -57,8 +57,8 @@ public class ScheduledPublishingJobTests
     {
         var sut = CreateScheduledPublishing();
         _mockContentService
-            .Setup(x => x.PerformScheduledPublish(It.IsAny<DateTime>()))
-            .Throws<InvalidOperationException>();
+            .Setup(x => x.PerformScheduledPublishAsync(It.IsAny<DateTime>(), It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new InvalidOperationException());
 
         await sut.ExecuteAsync();
 
@@ -137,12 +137,12 @@ public class ScheduledPublishingJobTests
     private void VerifyScheduledPublishingPerformed() => VerifyScheduledPublishingPerformed(Times.Once());
 
     private void VerifyScheduledPublishingPerformed(Times times) =>
-        _mockContentService.Verify(x => x.PerformScheduledPublish(It.IsAny<DateTime>()), times);
+        _mockContentService.Verify(x => x.PerformScheduledPublishAsync(It.IsAny<DateTime>(), It.IsAny<CancellationToken>()), times);
 
     private void VerifyElementScheduledPublishingNotPerformed() => VerifyElementScheduledPublishingPerformed(Times.Never());
 
     private void VerifyElementScheduledPublishingPerformed() => VerifyElementScheduledPublishingPerformed(Times.Once());
 
     private void VerifyElementScheduledPublishingPerformed(Times times) =>
-        _mockElementService.Verify(x => x.PerformScheduledPublish(It.IsAny<DateTime>()), times);
+        _mockElementService.Verify(x => x.PerformScheduledPublishAsync(It.IsAny<DateTime>(), It.IsAny<CancellationToken>()), times);
 }

@@ -367,6 +367,7 @@ public class PackagesRepository : ICreatedPackagesRepository
                 continue;
             }
 
+            // TODO (V20): await this once the IPackagesRepository contract goes async.
             Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForIdAsync(outInt, UmbracoObjectTypes.DataType).GetAwaiter().GetResult();
             if (keyAttempt.Success is false)
             {
@@ -484,9 +485,7 @@ public class PackagesRepository : ICreatedPackagesRepository
 
         root.Add(rootDictionaryItems);
 
-        /// <summary>
-        ///     Appends a dictionary element to the root and tracks it as processed.
-        /// </summary>
+        // Appends a dictionary element to the root and tracks it as processed.
         static void AppendDictionaryElement(
             XElement rootDictionaryItems,
             Dictionary<Guid, (IDictionaryItem dictionaryItem, XElement serializedDictionaryValue)> items,
@@ -682,7 +681,11 @@ public class PackagesRepository : ICreatedPackagesRepository
             if (contentNodeId > 0)
             {
                 // load content from umbraco.
-                IContent? content = _contentService.GetById(contentNodeId);
+                // TODO (V20): await this once the IPackagesRepository contract goes async.
+                Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForIdAsync(contentNodeId, UmbracoObjectTypes.Document).GetAwaiter().GetResult();
+                IContent? content = keyAttempt.Success
+                    ? _contentService.GetByIdAsync(keyAttempt.Result, CancellationToken.None).GetAwaiter().GetResult()
+                    : null;
                 if (content != null)
                 {
                     XElement contentXml = definition.ContentLoadChildNodes

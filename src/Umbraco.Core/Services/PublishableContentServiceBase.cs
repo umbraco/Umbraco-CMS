@@ -26,7 +26,7 @@ namespace Umbraco.Cms.Core.Services;
 ///
 /// The service interfaces do not expose these methods unless they're needed, so they're only visible on the concrete implementations.
 /// </remarks>
-public abstract class PublishableContentServiceBase<TContent> : RepositoryService, IPublishableContentService<TContent>
+public abstract class PublishableContentServiceBase<TContent> : RepositoryService
     where TContent : class, IPublishableContentBase
 {
     private readonly IAuditService _auditService;
@@ -38,6 +38,11 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
     private readonly IUserIdKeyResolver _userIdKeyResolver;
     private readonly PropertyEditorCollection _propertyEditorCollection;
     private readonly IIdKeyMap _idKeyMap;
+
+    /// <summary>
+    ///     Gets the id/key map used to resolve between int ids and Guid keys.
+    /// </summary>
+    protected IIdKeyMap IdKeyMap => _idKeyMap;
 
     protected PublishableContentServiceBase(
         ICoreScopeProvider provider,
@@ -210,7 +215,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
 
     #region Rollback
 
-    /// <inheritdoc/>
+    // Bridges ElementService.RollbackAsync until elements have an async repository.
     public OperationResult Rollback(int id, int versionId, string culture = "*", int userId = Constants.Security.SuperUserId)
     {
         EventMessages evtMsgs = EventMessagesFactory.Get();
@@ -384,16 +389,6 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
     }
 
     /// <inheritdoc />
-    public ContentScheduleCollection GetContentScheduleByContentId(int contentId)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(ReadLockIds);
-            return _contentRepository.GetContentSchedule(contentId);
-        }
-    }
-
-    /// <inheritdoc />
     public ContentScheduleCollection GetContentScheduleByContentId(Guid contentId)
     {
         Attempt<int> idAttempt = _idKeyMap.GetIdForKeyAsync(contentId, ContentObjectType).GetAwaiter().GetResult();
@@ -402,7 +397,13 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
             return new ContentScheduleCollection();
         }
 
-        return GetContentScheduleByContentId(idAttempt.Result);
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        {
+            scope.ReadLock(ReadLockIds);
+            ContentScheduleCollection schedule = _contentRepository.GetContentSchedule(idAttempt.Result);
+            scope.Complete();
+            return schedule;
+        }
     }
 
     /// <inheritdoc />
@@ -443,7 +444,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         return guidKeyedResults;
     }
 
-    /// <inheritdoc />
+    // Bridges ElementService.PersistContentScheduleAsync until elements have an async repository.
     public void PersistContentSchedule(IPublishableContentBase content, ContentScheduleCollection contentSchedule)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
@@ -454,7 +455,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         }
     }
 
-    /// <inheritdoc/>
+    // Bridges ElementService.GetByIdsAsync until elements have an async repository.
     public IEnumerable<TContent> GetByIds(IEnumerable<Guid> ids)
     {
         Guid[] idsA = ids.ToArray();
@@ -547,43 +548,93 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         }
     }
 
-    /// <inheritdoc/>
-    public TContent? GetVersion(int versionId)
+    /// <summary>
+    ///     Gets a single version of a content item.
+    /// </summary>
+    /// <param name="versionId">Id of the version to get.</param>
+    /// <param name="cancellationToken">A cancellation token.</param>
+    /// <returns>The version, or <c>null</c> when it does not exist.</returns>
+    public Task<TContent?> GetVersionAsync(int versionId, CancellationToken cancellationToken)
+        => Task.FromResult(GetVersion(versionId));
+
+    /// <summary>
+    ///     Gets every version of a content item, newest first.
+    /// </summary>
+    /// <param name="contentKey">Key of the content item.</param>
+    /// <param name="cancellationToken">A cancellation token.</param>
+    /// <returns>The versions, or an empty collection when the content item does not exist.</returns>
+    public async Task<IEnumerable<TContent>> GetVersionsAsync(Guid contentKey, CancellationToken cancellationToken)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        Attempt<int> idAttempt = await IdKeyMap.GetIdForKeyAsync(contentKey, ContentObjectType);
+        if (idAttempt.Success is false)
         {
-            scope.ReadLock(ReadLockIds);
-            return _contentRepository.GetVersion(versionId);
+            return Enumerable.Empty<TContent>();
         }
+
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.ReadLock(ReadLockIds);
+        IEnumerable<TContent> result = _contentRepository.GetAllVersions(idAttempt.Result);
+        scope.Complete();
+        return result;
     }
 
-    /// <inheritdoc/>
-    public IEnumerable<TContent> GetVersions(int id)
+    /// <summary>
+    ///     Gets a page of versions of a content item, newest first, without their property data.
+    /// </summary>
+    /// <param name="contentKey">Key of the content item.</param>
+    /// <param name="skip">Number of versions to skip.</param>
+    /// <param name="take">Number of versions to take.</param>
+    /// <param name="cancellationToken">A cancellation token.</param>
+    /// <returns>The versions, or an empty collection when the content item does not exist.</returns>
+    public async Task<IEnumerable<TContent>> GetVersionsSlimAsync(Guid contentKey, int skip, int take, CancellationToken cancellationToken)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        Attempt<int> idAttempt = await IdKeyMap.GetIdForKeyAsync(contentKey, ContentObjectType);
+        if (idAttempt.Success is false)
         {
-            scope.ReadLock(ReadLockIds);
-            return _contentRepository.GetAllVersions(id);
+            return Enumerable.Empty<TContent>();
         }
+
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.ReadLock(ReadLockIds);
+        IEnumerable<TContent> result = _contentRepository.GetAllVersionsSlim(idAttempt.Result, skip, take);
+        scope.Complete();
+        return result;
     }
 
-    /// <inheritdoc/>
-    public IEnumerable<TContent> GetVersionsSlim(int id, int skip, int take)
+    /// <summary>
+    ///     Gets a page of version ids of a content item, newest first.
+    /// </summary>
+    /// <param name="contentKey">Key of the content item.</param>
+    /// <param name="skip">Number of version ids to skip.</param>
+    /// <param name="take">Number of version ids to take.</param>
+    /// <param name="cancellationToken">A cancellation token.</param>
+    /// <returns>The version ids, or an empty collection when the content item does not exist.</returns>
+    public async Task<IEnumerable<int>> GetVersionIdsAsync(Guid contentKey, int skip, int take, CancellationToken cancellationToken)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        Attempt<int> idAttempt = await IdKeyMap.GetIdForKeyAsync(contentKey, ContentObjectType);
+        if (idAttempt.Success is false)
         {
-            scope.ReadLock(ReadLockIds);
-            return _contentRepository.GetAllVersionsSlim(id, skip, take);
+            return Enumerable.Empty<int>();
         }
+
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.ReadLock(ReadLockIds);
+
+        // The underlying NPoco query only supports a maximum row count, not an offset, so over-fetch
+        // and skip in memory - version counts per node are small, this never approaches query-size limits.
+        int maxRows = skip > int.MaxValue - take ? int.MaxValue : skip + take;
+        IEnumerable<int> result = _contentRepository.GetVersionIds(idAttempt.Result, maxRows).Skip(skip);
+        scope.Complete();
+        return result;
     }
 
-    /// <inheritdoc/>
-    public IEnumerable<int> GetVersionIds(int id, int maxRows)
+    private TContent? GetVersion(int versionId)
     {
-        using (ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            return _contentRepository.GetVersionIds(id, maxRows);
-        }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.ReadLock(ReadLockIds);
+        TContent? result = _contentRepository.GetVersion(versionId);
+        scope.Complete();
+        return result;
     }
 
     /// <summary>
@@ -746,11 +797,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         return OperationResult.Succeed(eventMessages);
     }
 
-    /// <inheritdoc />
-    Attempt<OperationResult?> IContentServiceBase<TContent>.Save(IEnumerable<TContent> contents, int userId) =>
-        Attempt.Succeed(Save(contents, userId));
-
-    /// <inheritdoc />
+    // Bridges ElementService.SaveAsync until elements have an async repository.
     public OperationResult Save(IEnumerable<TContent> contents, int userId = Constants.Security.SuperUserId)
     {
         EventMessages eventMessages = EventMessagesFactory.Get();
@@ -796,8 +843,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
             // TODO: See note above about supressing events
             scope.Notifications.Publish(TreeChangeNotification(contentsA, TreeChangeTypes.RefreshNode, eventMessages));
 
-            string contentIds = string.Join(", ", contentsA.Select(x => x.Id));
-            Audit(AuditType.Save, userId, Constants.System.Root, $"Saved multiple content items (#{contentIds.Length})");
+            Audit(AuditType.Save, userId, Constants.System.Root, $"Saved multiple content items (#{contentsA.Length})");
 
             scope.Complete();
         }
@@ -805,7 +851,17 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         return OperationResult.Succeed(eventMessages);
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    ///     Publishes content.
+    /// </summary>
+    /// <remarks>
+    ///     <para>When a culture is being published, it includes all varying values along with all invariant values.</para>
+    ///     <para>Wildcards (*) can be used as culture identifier to publish all cultures.</para>
+    ///     <para>An empty array (or a wildcard) can be passed for culture invariant content.</para>
+    /// </remarks>
+    /// <param name="content">The content to publish.</param>
+    /// <param name="cultures">The cultures to publish.</param>
+    /// <param name="userId">The identifier of the user performing the action.</param>
     public PublishResult Publish(TContent content, string[] cultures, int userId = Constants.Security.SuperUserId)
     {
         if (content == null)
@@ -895,7 +951,24 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         }
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    ///     Saves and publishes content in a single scope.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         For invariant content types, <paramref name="culturesToPublish" /> must be empty; the content is
+    ///         saved and the invariant culture is published.
+    ///     </para>
+    ///     <para>
+    ///         For variant content types, only the cultures listed in <paramref name="culturesToPublish" /> are
+    ///         published. Wildcards (<c>"*"</c>), nulls, whitespace and duplicate entries are not accepted. Passing
+    ///         an empty array saves the content without publishing any culture.
+    ///     </para>
+    /// </remarks>
+    /// <param name="content">The content to publish.</param>
+    /// <param name="culturesToPublish">The cultures to publish, or an empty array for invariant content.</param>
+    /// <param name="userId">The identifier of the user performing the action.</param>
+    /// <returns>The result of the publish operation, or a failure result if saving failed.</returns>
     public PublishResult SaveAndPublish(TContent content, string[] culturesToPublish, int userId = Constants.Security.SuperUserId)
     {
         ArgumentNullException.ThrowIfNull(content);
@@ -1054,7 +1127,23 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         }
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    ///     Unpublishes content.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         By default, unpublishes the content as a whole, but it is possible to specify a culture to be
+    ///         unpublished. Depending on whether that culture is mandatory, and other cultures remain published,
+    ///         the content as a whole may or may not remain published.
+    ///     </para>
+    ///     <para>
+    ///         If the content type is variant, then culture can be either '*' or an actual culture, but neither null nor
+    ///         empty. If the content type is invariant, then culture can be either '*' or null or empty.
+    ///     </para>
+    /// </remarks>
+    /// <param name="content">The content to unpublish.</param>
+    /// <param name="culture">The culture to unpublish, or "*" for all cultures.</param>
+    /// <param name="userId">The identifier of the user performing the action.</param>
     public PublishResult Unpublish(TContent content, string? culture = "*", int userId = Constants.Security.SuperUserId)
     {
         ArgumentNullException.ThrowIfNull(content);
@@ -1146,7 +1235,11 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         }
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    ///     Publishes and unpublishes scheduled content.
+    /// </summary>
+    /// <param name="date">The date to use for determining scheduled actions.</param>
+    /// <returns>The publish results.</returns>
     public IEnumerable<PublishResult> PerformScheduledPublish(DateTime date)
     {
         // TODO: Await this properly when adjusting this service to our new EF Core approach.
@@ -1393,13 +1486,16 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
             raiseSavedNotification: false);
 
     /// <inheritdoc cref="CommitContentChangesInternal(ICoreScope, TContent, EventMessages, IReadOnlyCollection{ILanguage}, IDictionary{string, object}, int, bool, bool)" />
-    /// <param name="raiseSavedNotification">
-    ///     Whether to raise the "saved" notification once the content is persisted. Enabled by the save-and-publish entry
-    ///     points, which combine a save and a publish, so the paired "saved" notification still fires.
-    /// </param>
     /// <remarks>
-    ///     A separate overload rather than an optional parameter on the one above, because adding a parameter to a
-    ///     protected member of a public class is a binary breaking change.
+    ///     <para>
+    ///         <c>raiseSavedNotification</c> raises the "saved" notification once the content is persisted. The
+    ///         save-and-publish entry points enable it, because they combine a save and a publish and the paired
+    ///         "saved" notification still has to fire.
+    ///     </para>
+    ///     <para>
+    ///         A separate overload rather than an optional parameter on the one above, because adding a parameter to a
+    ///         protected member of a public class is a binary breaking change.
+    ///     </para>
     /// </remarks>
     protected PublishResult CommitContentChangesInternal(
         ICoreScope scope,
@@ -1833,6 +1929,14 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
     /// <param name="userId">Optional Id of the User deleting versions of a Content object</param>
     public void DeleteVersions(int id, DateTime versionDate, int userId = Constants.Security.SuperUserId)
     {
+        // TODO (V20): await this once an asynchronous element repository lets this engine go async.
+        Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForIdAsync(id, ContentObjectType).GetAwaiter().GetResult();
+        if (keyAttempt.Success is false)
+        {
+            return;
+        }
+
+        Guid key = keyAttempt.Result;
         EventMessages evtMsgs = EventMessagesFactory.Get();
 
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
@@ -1840,7 +1944,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
             scope.WriteLock(WriteLockIds);
 
             var deletingVersionsNotification =
-                new ContentDeletingVersionsNotification(id, evtMsgs, dateToRetain: versionDate);
+                new ContentDeletingVersionsNotification(key, evtMsgs, dateToRetain: versionDate);
             if (scope.Notifications.PublishCancelable(deletingVersionsNotification))
             {
                 scope.Complete();
@@ -1850,7 +1954,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
             _contentRepository.DeleteVersions(id, versionDate);
 
             scope.Notifications.Publish(
-                new ContentDeletedVersionsNotification(id, evtMsgs, dateToRetain: versionDate).WithStateFrom(
+                new ContentDeletedVersionsNotification(key, evtMsgs, dateToRetain: versionDate).WithStateFrom(
                     deletingVersionsNotification));
             Audit(AuditType.Delete, userId, Constants.System.Root, "Delete (by version date)");
 
@@ -1868,12 +1972,20 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
     /// <param name="userId">Optional Id of the User deleting versions of a Content object</param>
     public void DeleteVersion(int id, int versionId, bool deletePriorVersions, int userId = Constants.Security.SuperUserId)
     {
+        // TODO (V20): await this once an asynchronous element repository lets this engine go async.
+        Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForIdAsync(id, ContentObjectType).GetAwaiter().GetResult();
+        if (keyAttempt.Success is false)
+        {
+            return;
+        }
+
+        Guid key = keyAttempt.Result;
         EventMessages evtMsgs = EventMessagesFactory.Get();
 
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             scope.WriteLock(WriteLockIds);
-            var deletingVersionsNotification = new ContentDeletingVersionsNotification(id, evtMsgs, versionId);
+            var deletingVersionsNotification = new ContentDeletingVersionsNotification(key, evtMsgs, versionId);
             if (scope.Notifications.PublishCancelable(deletingVersionsNotification))
             {
                 scope.Complete();
@@ -1896,7 +2008,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
             }
 
             scope.Notifications.Publish(
-                new ContentDeletedVersionsNotification(id, evtMsgs, versionId).WithStateFrom(
+                new ContentDeletedVersionsNotification(key, evtMsgs, versionId).WithStateFrom(
                     deletingVersionsNotification));
             Audit(AuditType.Delete, userId, Constants.System.Root, "Delete (by version)");
 
@@ -1971,11 +2083,19 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
 
     protected async Task AuditAsync(AuditType type, int userId, int objectId, string? message = null, string? parameters = null)
     {
-        Guid userKey = await _userIdKeyResolver.GetAsync(userId);
+        // A content operation must never fail because its audit metadata could not be attributed - a
+        // user id with no matching key (e.g. unknown/imported content) skips the audit entry rather
+        // than aborting the caller.
+        Attempt<Guid> userKeyAttempt = await _userIdKeyResolver.TryGetAsync(userId);
+        if (userKeyAttempt.Success is false)
+        {
+            Logger.LogWarning("Could not resolve a user key for user id {UserId} - skipping the {AuditType} audit entry for {ObjectId}.", userId, type, objectId);
+            return;
+        }
 
         await _auditService.AddAsync(
             type,
-            userKey,
+            userKeyAttempt.Result,
             objectId,
             ContentObjectType.GetName(),
             message,
@@ -1999,7 +2119,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
     #region Content Types
 
     /// <inheritdoc />
-    public abstract void DeleteOfTypes(IEnumerable<int> contentTypeIds, int userId = Constants.Security.SuperUserId);
+    public abstract OperationResult DeleteOfTypes(IEnumerable<int> contentTypeIds, int userId = Constants.Security.SuperUserId);
 
     private IContentType GetContentType(ICoreScope scope, string contentTypeAlias)
     {

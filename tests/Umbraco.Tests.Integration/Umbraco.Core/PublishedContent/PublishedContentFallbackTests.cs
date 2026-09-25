@@ -157,16 +157,16 @@ public class PublishedContentFallbackTests : UmbracoIntegrationTest
             .WithContentType(contentType)
             .WithName("Parent")
             .Build();
-        ContentService.Save(parent);
-        ContentService.Publish(parent, ["*"]);
+        await ContentService.SaveAsync(parent, Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishAsync(parent, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         var child = new ContentBuilder()
             .WithContentType(contentType)
             .WithParent(parent)
             .WithName("Child")
             .Build();
-        ContentService.Save(child);
-        ContentService.Publish(child, ["*"]);
+        await ContentService.SaveAsync(child, Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishAsync(child, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         var publishedChild = GetPublishedContent(child.Key);
 
@@ -199,8 +199,8 @@ public class PublishedContentFallbackTests : UmbracoIntegrationTest
             .Build();
         content.SetValue("title", invariantTitle);
         content.SetValue("title", segmentedTitle, segment: "s1");
-        ContentService.Save(content);
-        ContentService.Publish(content, ["*"]);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishAsync(content, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         return GetPublishedContent(content.Key);
     }
@@ -230,8 +230,8 @@ public class PublishedContentFallbackTests : UmbracoIntegrationTest
             .Build();
         content.SetValue("title", englishTitle, culture: "en-US");
         content.SetValue("title", danishTitle, culture: "da-DK");
-        ContentService.Save(content);
-        ContentService.Publish(content, ["en-US", "da-DK"]);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishAsync(content, ["en-US", "da-DK"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         return GetPublishedContent(content.Key);
     }

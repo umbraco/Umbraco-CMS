@@ -28,7 +28,7 @@ public partial class ElementServiceTests
         Assert.IsTrue(elementTypeResult.Success, "Failed to create element content type");
 
         var element = ElementBuilder.CreateBasicElement(elementType);
-        ElementService.Save(element);
+        await ElementService.SaveAsync(element, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         var elementScheduleAttempt = await ElementPublishingService.PublishAsync(
             element.Key,
@@ -49,7 +49,7 @@ public partial class ElementServiceTests
         Assert.IsTrue(docTypeResult.Success, "Failed to create document content type");
 
         var document = ContentBuilder.CreateBasicContent(docType);
-        ContentServiceForScheduling.Save(document);
+        await ContentServiceForScheduling.SaveAsync(document, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         var docScheduleAttempt = await ContentPublishingService.PublishAsync(
             document.Key,
@@ -65,12 +65,12 @@ public partial class ElementServiceTests
 
         // Run scheduled publishing for elements - should only process element schedules
         var publishDate = _schedulePublishDate.AddMinutes(1);
-        var elementResults = ElementService.PerformScheduledPublish(publishDate).ToList();
+        var elementResults = (await ElementService.PerformScheduledPublishAsync(publishDate, CancellationToken.None)).ToList();
         Assert.AreEqual(1, elementResults.Count, "Element scheduled publishing should process one element");
         Assert.IsTrue(elementResults[0].Success, $"Element scheduled publish should succeed, got: {elementResults[0].Result}");
 
         // Verify the document schedule is still intact after element scheduled publishing ran
-        var docSchedulesAfterElementPublish = ContentServiceForScheduling.GetContentScheduleByContentId(document.Key);
+        var docSchedulesAfterElementPublish = await ContentServiceForScheduling.GetContentScheduleByContentIdAsync(document.Key, CancellationToken.None);
         Assert.AreEqual(
             1,
             docSchedulesAfterElementPublish.FullSchedule.Count,
@@ -87,7 +87,7 @@ public partial class ElementServiceTests
         Assert.IsTrue(elementTypeResult.Success, "Failed to create element content type");
 
         var element = ElementBuilder.CreateBasicElement(elementType);
-        ElementService.Save(element);
+        await ElementService.SaveAsync(element, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         var publishAttempt = await ElementPublishingService.PublishAsync(
             element.Key,
@@ -114,7 +114,7 @@ public partial class ElementServiceTests
         Assert.IsTrue(docTypeResult.Success, "Failed to create document content type");
 
         var document = ContentBuilder.CreateBasicContent(docType);
-        ContentServiceForScheduling.Save(document);
+        await ContentServiceForScheduling.SaveAsync(document, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         var docPublishAttempt = await ContentPublishingService.PublishAsync(
             document.Key,
@@ -136,12 +136,12 @@ public partial class ElementServiceTests
 
         // Run scheduled publishing for elements - should only process element schedules
         var unpublishDate = _scheduleUnPublishDate.AddMinutes(1);
-        var elementResults = ElementService.PerformScheduledPublish(unpublishDate).ToList();
+        var elementResults = (await ElementService.PerformScheduledPublishAsync(unpublishDate, CancellationToken.None)).ToList();
         Assert.AreEqual(1, elementResults.Count, "Element scheduled unpublishing should process one element");
         Assert.IsTrue(elementResults[0].Success, $"Element scheduled unpublish should succeed, got: {elementResults[0].Result}");
 
         // Verify the document expiration schedule is still intact
-        var docSchedulesAfterElementUnpublish = ContentServiceForScheduling.GetContentScheduleByContentId(document.Key);
+        var docSchedulesAfterElementUnpublish = await ContentServiceForScheduling.GetContentScheduleByContentIdAsync(document.Key, CancellationToken.None);
         Assert.AreEqual(
             1,
             docSchedulesAfterElementUnpublish.FullSchedule.Count,

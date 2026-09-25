@@ -61,7 +61,7 @@ internal sealed partial class MediaEditingServiceTests
     // which falls back to the entity's WriterId when no back-office user can be resolved. Before the
     // fix, MediaService.PerformMoveMediaLocked never updated WriterId on a trash, so the fallback
     // attributed the deletion to the original creator. The fix updates WriterId to the acting user,
-    // mirroring ContentService.PerformMoveContentLocked.
+    // mirroring ContentService.PerformMoveContentLockedAsync.
     [Test]
     public async Task Move_To_Recycle_Bin_Updates_WriterId_To_The_Trashing_User()
     {

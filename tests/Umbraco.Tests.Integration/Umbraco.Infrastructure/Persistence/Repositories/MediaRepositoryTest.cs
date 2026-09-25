@@ -90,6 +90,46 @@ internal sealed class MediaRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
+    public void Get_For_Root_Media_Populates_Null_ParentKey()
+    {
+        var provider = ScopeProvider;
+        using var scope = provider.CreateScope();
+        var repository = CreateRepository(provider, out _);
+
+        IMedia? result = repository.Get(_testFolder.Key);
+
+        Assert.That(result, Is.Not.Null);
+
+        // umbracoNode's own Root row (id -1) carries Constants.System.RootSystemKey, NOT the semantic
+        // "no parent" value ParentKey contracts to - the self-join in GetBaseQuery must not let it leak through.
+        Assert.That(result!.ParentKey, Is.Null);
+    }
+
+    [Test]
+    public void Get_For_Non_Root_Media_Resolves_ParentKey_Without_A_Second_Query()
+    {
+        var provider = ScopeProvider;
+        var scopeAccessor = ScopeAccessor;
+
+        using var scope = provider.CreateScope();
+        var repository = CreateRepository(provider, out _);
+
+        var database = scopeAccessor.AmbientScope.Database;
+
+        // ParentKey is resolved by a self-join in GetBaseQuery (see ContentDto.ParentUniqueId); resolving it
+        // with a follow-up query instead would raise the count asserted below.
+        // Disabling the count resets it to zero, so this pair is how the counter is cleared before the call.
+        database.EnableSqlCount = false;
+        database.EnableSqlCount = true;
+
+        IMedia? result = repository.Get(_testImage.Key);
+
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result!.ParentKey, Is.EqualTo(_testFolder.Key));
+        Assert.That(database.SqlCount, Is.EqualTo(4), "no separate query to resolve ParentKey on top of the usual content/property queries");
+    }
+
+    [Test]
     public void Retrievals_By_Id_And_Key_After_Save_Are_Cached()
     {
         var realCache = new AppCaches(
@@ -205,6 +245,84 @@ internal sealed class MediaRepositoryTest : UmbracoIntegrationTest
 
         repository.Get(media.Id);
         Assert.AreEqual(0, database.SqlCount);
+    }
+
+    /// <summary>
+    ///     A version key identifies one version row for as long as it exists, so saving again must not mint a new
+    ///     one - anything holding a version key would otherwise be pointing at nothing after the next save.
+    /// </summary>
+    [Test]
+    public void Saving_Twice_Keeps_The_Content_Version_Key()
+    {
+        var provider = ScopeProvider;
+        var scopeAccessor = ScopeAccessor;
+
+        using var scope = provider.CreateScope();
+        var repository = CreateRepository(provider, out MediaTypeRepository mediaTypeRepository);
+        var database = scopeAccessor.AmbientScope.Database;
+
+        Media media = CreateMedia(repository, mediaTypeRepository);
+        Guid keyAfterInsert = database.SingleOrDefault<ContentVersionDto>("WHERE id = @0", media.VersionId).Key;
+
+        media.Name = "renamed";
+        repository.Save(media);
+        Guid keyAfterUpdate = database.SingleOrDefault<ContentVersionDto>("WHERE id = @0", media.VersionId).Key;
+
+        scope.Complete();
+
+        Assert.That(keyAfterUpdate, Is.EqualTo(keyAfterInsert));
+    }
+
+    [Test]
+    public void Save_Of_New_Media_Populates_ParentKey_On_The_Cached_Entity()
+    {
+        var realCache = new AppCaches(
+            new ObjectCacheAppCache(),
+            new DictionaryAppCache(),
+            new IsolatedCaches(t => new ObjectCacheAppCache()));
+
+        var provider = ScopeProvider;
+        var scopeAccessor = ScopeAccessor;
+
+        using var scope = provider.CreateScope();
+        var repository = CreateRepository(provider, out var mediaTypeRepository, realCache);
+        var database = scopeAccessor.AmbientScope.Database;
+
+        var mediaType = mediaTypeRepository.Get(1032);
+        var image = MediaBuilder.CreateMediaImage(mediaType, _testFolder.Id);
+        repository.Save(image);
+
+        database.EnableSqlCount = true;
+        IMedia? cached = repository.Get(image.Id);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(database.SqlCount, Is.Zero, "the saved instance is served from the repository cache");
+            Assert.That(image.ParentKey, Is.EqualTo(_testFolder.Key));
+            Assert.That(cached!.ParentKey, Is.EqualTo(_testFolder.Key));
+        });
+    }
+
+    [Test]
+    public void Save_Of_Moved_Media_Populates_ParentKey_For_The_New_Parent()
+    {
+        var provider = ScopeProvider;
+
+        using var scope = provider.CreateScope();
+        var repository = CreateRepository(provider, out var mediaTypeRepository);
+
+        var folderMediaType = mediaTypeRepository.Get(1031);
+        var otherFolder = MediaBuilder.CreateMediaFolder(folderMediaType, -1);
+        repository.Save(otherFolder);
+
+        var mediaType = mediaTypeRepository.Get(1032);
+        var image = MediaBuilder.CreateMediaImage(mediaType, _testFolder.Id);
+        repository.Save(image);
+
+        image.ParentId = otherFolder.Id;
+        repository.Save(image);
+
+        Assert.That(image.ParentKey, Is.EqualTo(otherFolder.Key));
     }
 
     private Media CreateMedia(MediaRepository repository, MediaTypeRepository mediaTypeRepository)

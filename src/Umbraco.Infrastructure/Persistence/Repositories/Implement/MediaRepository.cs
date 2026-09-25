@@ -56,6 +56,7 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
     /// <param name="eventAggregator">Publishes and subscribes to domain events.</param>
     /// <param name="repositoryCacheVersionService">Service for managing cache versioning for repositories.</param>
     /// <param name="cacheSyncService">Service for synchronizing cache across distributed environments.</param>
+    /// <param name="idKeyMap">The ID/key map.</param>
     public MediaRepository(
         IScopeAccessor scopeAccessor,
         AppCaches cache,
@@ -244,6 +245,12 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
 
             Core.Models.Media c = content[i] = ContentBaseFactory.BuildEntity(dto, contentType);
 
+            // Root's node row exists (umbracoNode id -1) but carries RootSystemKey, not the semantic
+            // "no parent" value ParentKey contracts to - see ContentDto.ParentUniqueId's remarks.
+            c.ParentKey = dto.NodeDto.ParentId == Constants.System.Root
+                ? null
+                : dto.ParentUniqueId;
+
             // need properties
             var versionId = dto.ContentVersionDto.Id;
             temps.Add(new TempContent<Core.Models.Media>(dto.NodeId, versionId, 0, contentType, c));
@@ -271,6 +278,12 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
     {
         IMediaType? contentType = _mediaTypeRepository.Get(dto.ContentTypeId);
         Core.Models.Media media = ContentBaseFactory.BuildEntity(dto, contentType);
+
+        // Root's node row exists (umbracoNode id -1) but carries RootSystemKey, not the semantic
+        // "no parent" value ParentKey contracts to - see ContentDto.ParentUniqueId's remarks.
+        media.ParentKey = dto.NodeDto.ParentId == Constants.System.Root
+            ? null
+            : dto.ParentUniqueId;
 
         // get properties - indexed by version id
         var versionId = dto.ContentVersionDto.Id;
@@ -370,7 +383,10 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
 
                     // ContentRepositoryBase expects a variantName field to order by name
                     // for now, just return the plain invariant node name
-                    .AndSelect<NodeDto>(x => Alias(x.Text, "variantName"));
+                    .AndSelect<NodeDto>(x => Alias(x.Text, "variantName"))
+
+                    // self-join, see the "parentNode" LeftJoin below - avoids a second query to resolve ParentKey
+                    .AndSelect<NodeDto>("parentNode", x => Alias(x.UniqueId, "ParentUniqueId"));
                 break;
         }
 
@@ -378,7 +394,12 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
             .From<ContentDto>()
             .InnerJoin<NodeDto>().On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
             .InnerJoin<ContentVersionDto>()
-            .On<ContentDto, ContentVersionDto>(left => left.NodeId, right => right.NodeId);
+            .On<ContentDto, ContentVersionDto>(left => left.NodeId, right => right.NodeId)
+
+            // self-join umbracoNode back onto itself via ParentId, to resolve ParentKey in the same query
+            // instead of a separate follow-up query.
+            .LeftJoin<NodeDto>("parentNode")
+            .On<NodeDto, NodeDto>((left, right) => left.ParentId == right.NodeId, aliasRight: "parentNode");
 
         if (joinMediaVersion)
         {
@@ -552,6 +573,7 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
         entity.Path = nodeDto.Path;
         entity.SortOrder = sortOrder;
         entity.Level = level;
+        entity.ParentKey = ResolveParentKey(entity.ParentId, parent);
 
         // persist the content dto
         ContentDto contentDto = dto.ContentDto;
@@ -562,6 +584,7 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
         // assumes a new version id and version date (modified date) has been set
         ContentVersionDto contentVersionDto = dto.MediaVersionDto.ContentVersionDto;
         contentVersionDto.NodeId = nodeDto.NodeId;
+        contentVersionDto.Key = Guid.NewGuid();
         contentVersionDto.Current = true;
         Database.Insert(contentVersionDto);
         entity.VersionId = contentVersionDto.Id;
@@ -609,6 +632,7 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
                 entity.Path = string.Concat(parent.Path, ",", entity.Id);
                 entity.Level = parent.Level + 1;
                 entity.SortOrder = GetNewChildSortOrder(entity.ParentId, 0);
+                entity.ParentKey = ResolveParentKey(entity.ParentId, parent);
             }
         }
 
@@ -629,7 +653,7 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
             ContentVersionDto contentVersionDto = dto.MediaVersionDto.ContentVersionDto;
             MediaVersionDto mediaVersionDto = dto.MediaVersionDto;
             contentVersionDto.Current = true;
-            Database.Update(contentVersionDto);
+            Database.Update(contentVersionDto, ContentVersionDto.UpdatableColumnNames);
             Database.Update(mediaVersionDto);
 
             // replace the property data

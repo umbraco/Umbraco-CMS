@@ -48,27 +48,22 @@ public class DocumentUrlServiceContentTypeChangedNotificationHandler : IDistribu
 
         foreach (ContentTypeChange<IContentType> change in variationChangedContentTypes)
         {
-            await RebuildUrlCacheForContentTypeAsync(change.Item.Id, cancellationToken);
+            await RebuildUrlCacheForContentTypeAsync(change.Item.Key, cancellationToken);
         }
     }
 
-    private async Task RebuildUrlCacheForContentTypeAsync(int contentTypeId, CancellationToken cancellationToken)
+    private async Task RebuildUrlCacheForContentTypeAsync(Guid contentTypeKey, CancellationToken cancellationToken)
     {
         const int pageSize = 500;
-        long pageIndex = 0;
+        var skip = 0;
         long totalRecords;
 
         do
         {
-            IEnumerable<IContent> contentItems = _contentService.GetPagedOfTypes(
-                [contentTypeId],
-                pageIndex,
-                pageSize,
-                out totalRecords,
-                filter: null,
-                ordering: null);
+            PagedModel<IContent> page = await _contentService.GetPagedOfTypesAsync([contentTypeKey], skip, pageSize, ordering: null, cancellationToken);
+            totalRecords = page.Total;
 
-            foreach (IContent content in contentItems)
+            foreach (IContent content in page.Items)
             {
                 if (cancellationToken.IsCancellationRequested)
                 {
@@ -82,8 +77,8 @@ public class DocumentUrlServiceContentTypeChangedNotificationHandler : IDistribu
                 await _documentUrlAliasService.CreateOrUpdateAliasesAsync(content.Key);
             }
 
-            pageIndex++;
+            skip += pageSize;
         }
-        while (pageIndex * pageSize < totalRecords);
+        while (skip < totalRecords);
     }
 }

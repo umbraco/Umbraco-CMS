@@ -1,4 +1,5 @@
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Search.Core.Models.Searching;
 
@@ -15,11 +16,10 @@ public partial class InvariantContentTreeTests
             await CreateInvariantDocumentTree(true);
         });
 
-        await WaitForIndexing(indexAlias, () =>
+        await WaitForIndexing(indexAlias, async () =>
         {
-            IContent root = ContentService.GetById(RootKey)!;
-            ContentService.MoveToRecycleBin(root);
-            return Task.CompletedTask;
+            IContent root = ContentService.GetByIdAsync(RootKey, CancellationToken.None).GetAwaiter().GetResult()!;
+            await ContentService.MoveToRecycleBinAsync(root, Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         });
 
 
@@ -45,11 +45,10 @@ public partial class InvariantContentTreeTests
             await CreateInvariantDocumentTree(true);
         });
 
-        await WaitForIndexing(indexAlias, () =>
+        await WaitForIndexing(indexAlias, async () =>
         {
-            IContent child = ContentService.GetById(ChildKey)!;
-            ContentService.Unpublish(child);
-            return Task.CompletedTask;
+            IContent child = ContentService.GetByIdAsync(ChildKey, CancellationToken.None).GetAwaiter().GetResult()!;
+            await ContentService.UnpublishAsync(child, "*", Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         });
 
         SearchResult rootResult = await Searcher.SearchAsync(indexAlias, "Root", null, null, null, null, null, null, 0, 100);
@@ -74,11 +73,10 @@ public partial class InvariantContentTreeTests
             await CreateInvariantDocumentTree(true);
         });
 
-        await WaitForIndexing(indexAlias, () =>
+        await WaitForIndexing(indexAlias, async () =>
         {
-            IContent grandchild = ContentService.GetById(GrandchildKey)!;
-            ContentService.Unpublish(grandchild);
-            return Task.CompletedTask;
+            IContent grandchild = ContentService.GetByIdAsync(GrandchildKey, CancellationToken.None).GetAwaiter().GetResult()!;
+            await ContentService.UnpublishAsync(grandchild, "*", Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         });
 
         SearchResult rootResult = await Searcher.SearchAsync(indexAlias, "Root", null, null, null, null, null, null, 0, 100);

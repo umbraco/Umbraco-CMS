@@ -7,16 +7,25 @@ using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.Changes;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
 
+/// <summary>
+///     Manages elements.
+/// </summary>
+/// <remarks>
+///     There is no asynchronous element repository, so the asynchronous contract is satisfied by bridging onto the
+///     synchronous engine inherited from <see cref="PublishableContentServiceBase{TContent}" />.
+/// </remarks>
 public class ElementService : PublishableContentServiceBase<IElement>, IElementService
 {
     private readonly IElementRepository _elementRepository;
     private readonly ILogger<ElementService> _logger;
     private readonly IShortStringHelper _shortStringHelper;
+    private readonly IUserIdKeyResolver _userIdKeyResolver;
 
     public ElementService(
         ICoreScopeProvider provider,
@@ -49,9 +58,115 @@ public class ElementService : PublishableContentServiceBase<IElement>, IElementS
         _elementRepository = elementRepository;
         _shortStringHelper = shortStringHelper;
         _logger = loggerFactory.CreateLogger<ElementService>();
+        _userIdKeyResolver = userIdKeyResolver;
     }
 
     #region Others
+
+    /// <inheritdoc />
+    public Task<IElement?> GetByIdAsync(Guid key, CancellationToken cancellationToken) => Task.FromResult(GetById(key));
+
+    /// <inheritdoc />
+    public Task<IEnumerable<IElement>> GetByIdsAsync(IEnumerable<Guid> ids, CancellationToken cancellationToken) => Task.FromResult(GetByIds(ids));
+
+    /// <inheritdoc />
+    public Task<Attempt<ContentScheduleOperationStatus>> PersistContentScheduleAsync(IPublishableContentBase content, ContentScheduleCollection contentSchedule, CancellationToken cancellationToken)
+    {
+        PersistContentSchedule(content, contentSchedule);
+        return Task.FromResult(Attempt.Succeed(ContentScheduleOperationStatus.Success));
+    }
+
+    /// <inheritdoc />
+    public async Task<PublishResult> PublishAsync(IElement content, string[] cultures, Guid userKey, CancellationToken cancellationToken)
+    {
+        int userId = await _userIdKeyResolver.GetAsync(userKey);
+        return Publish(content, cultures, userId);
+    }
+
+    /// <inheritdoc />
+    public async Task<PublishResult> UnpublishAsync(IElement content, string? culture, Guid userKey, CancellationToken cancellationToken)
+    {
+        int userId = await _userIdKeyResolver.GetAsync(userKey);
+        return Unpublish(content, culture, userId);
+    }
+
+    /// <inheritdoc />
+    public async Task<PublishResult> SaveAndPublishAsync(IElement content, string[] culturesToPublish, Guid userKey, CancellationToken cancellationToken)
+    {
+        int userId = await _userIdKeyResolver.GetAsync(userKey);
+        return SaveAndPublish(content, culturesToPublish, userId);
+    }
+
+    /// <inheritdoc />
+    public Task<IEnumerable<PublishResult>> PerformScheduledPublishAsync(DateTime date, CancellationToken cancellationToken)
+        => Task.FromResult(PerformScheduledPublish(date));
+
+    /// <inheritdoc />
+    public async Task<Attempt<ContentRollbackOperationStatus>> RollbackAsync(Guid key, int versionId, string culture, Guid userKey, CancellationToken cancellationToken)
+    {
+        Attempt<int> idAttempt = await IdKeyMap.GetIdForKeyAsync(key, ContentObjectType);
+        if (idAttempt.Success == false)
+        {
+            return Attempt.Fail(ContentRollbackOperationStatus.ContentNotFound);
+        }
+
+        int userId = await _userIdKeyResolver.GetAsync(userKey);
+        OperationResult result = Rollback(idAttempt.Result, versionId, culture, userId);
+
+        return result.Result switch
+        {
+            OperationResultType.Success => Attempt.Succeed(ContentRollbackOperationStatus.Success),
+            OperationResultType.FailedCancelledByEvent => Attempt.Fail(ContentRollbackOperationStatus.CancelledByNotification),
+            OperationResultType.FailedCannot => Attempt.Fail(ContentRollbackOperationStatus.ContentNotFound),
+            _ => Attempt.Fail(ContentRollbackOperationStatus.SaveFailed),
+        };
+    }
+
+    /// <inheritdoc />
+    public Task<IDictionary<Guid, IEnumerable<ContentSchedule>>> GetContentSchedulesByKeysAsync(Guid[] keys, CancellationToken cancellationToken) =>
+        Task.FromResult(GetContentSchedulesByKeys(keys));
+
+    /// <inheritdoc />
+    public Task<ContentScheduleCollection> GetContentScheduleByContentIdAsync(Guid contentId, CancellationToken cancellationToken) =>
+        Task.FromResult(GetContentScheduleByContentId(contentId));
+
+    /// <inheritdoc />
+    /// <remarks>
+    ///     A synchronous save reports failure only when a notification handler cancels it - its validation
+    ///     failures throw - so every non-success result maps to <see cref="ContentSaveOperationStatus.CancelledByNotification" />.
+    /// </remarks>
+    public async Task<Attempt<ContentSaveOperationStatus>> SaveAsync(IElement content, Guid userKey, ContentScheduleCollection? contentSchedule, CancellationToken cancellationToken)
+    {
+        int userId = await _userIdKeyResolver.GetAsync(userKey);
+        OperationResult result = Save(content, userId, contentSchedule);
+        return result.Success
+            ? Attempt.Succeed(ContentSaveOperationStatus.Success)
+            : Attempt.Fail(ContentSaveOperationStatus.CancelledByNotification);
+    }
+
+    /// <inheritdoc />
+    public async Task<Attempt<ContentDeleteOperationStatus>> DeleteAsync(IElement content, Guid userKey, CancellationToken cancellationToken)
+    {
+        int userId = await _userIdKeyResolver.GetAsync(userKey);
+        OperationResult result = Delete(content, userId);
+        return result.Success
+            ? Attempt.Succeed(ContentDeleteOperationStatus.Success)
+            : Attempt.Fail(ContentDeleteOperationStatus.CancelledByNotification);
+    }
+
+    /// <inheritdoc />
+    /// <remarks>
+    ///     A synchronous save reports failure only when a notification handler cancels it - its validation
+    ///     failures throw - so every non-success result maps to <see cref="ContentSaveOperationStatus.CancelledByNotification" />.
+    /// </remarks>
+    public async Task<Attempt<ContentSaveOperationStatus>> SaveAsync(IEnumerable<IElement> contents, Guid userKey, CancellationToken cancellationToken)
+    {
+        int userId = await _userIdKeyResolver.GetAsync(userKey);
+        OperationResult result = Save(contents, userId);
+        return result.Success
+            ? Attempt.Succeed(ContentSaveOperationStatus.Success)
+            : Attempt.Fail(ContentSaveOperationStatus.CancelledByNotification);
+    }
 
     /// <inheritdoc />
     public override ContentDataIntegrityReport CheckDataIntegrity(ContentDataIntegrityReportOptions options)
@@ -64,12 +179,16 @@ public class ElementService : PublishableContentServiceBase<IElement>, IElementS
                 scope.Notifications.Publish(new ElementTreeChangeNotification(root, TreeChangeTypes.RefreshAll, EventMessagesFactory.Get()));
             });
 
+    /// <inheritdoc />
+    public Task<ContentDataIntegrityReport> CheckDataIntegrityAsync(ContentDataIntegrityReportOptions options, CancellationToken cancellationToken)
+        => Task.FromResult(CheckDataIntegrity(options));
+
     #endregion
 
     #region Content Types
 
     /// <inheritdoc/>
-    public override void DeleteOfTypes(IEnumerable<int> contentTypeIds, int userId = Constants.Security.SuperUserId)
+    public override OperationResult DeleteOfTypes(IEnumerable<int> contentTypeIds, int userId = Constants.Security.SuperUserId)
     {
         var changes = new List<TreeChange<IElement>>();
         var contentTypeIdsA = contentTypeIds.ToArray();
@@ -84,13 +203,13 @@ public class ElementService : PublishableContentServiceBase<IElement>, IElementS
         if (elements.Length is 0)
         {
             scope.Complete();
-            return;
+            return OperationResult.Succeed(eventMessages);
         }
 
         if (scope.Notifications.PublishCancelable(new ElementDeletingNotification(elements, eventMessages)))
         {
             scope.Complete();
-            return;
+            return OperationResult.Cancel(eventMessages);
         }
 
         foreach (IElement element in elements)
@@ -117,6 +236,29 @@ public class ElementService : PublishableContentServiceBase<IElement>, IElementS
         Audit(AuditType.Delete, userId, Constants.System.Root, $"Delete element of type {string.Join(",", contentTypeIdsA)}");
 
         scope.Complete();
+        return OperationResult.Succeed(eventMessages);
+    }
+
+    /// <inheritdoc />
+    public async Task<Attempt<ContentDeleteOfTypesOperationStatus>> DeleteOfTypesAsync(IEnumerable<Guid> contentTypeKeys, Guid userKey, CancellationToken cancellationToken)
+    {
+        var contentTypeIds = new List<int>();
+        foreach (Guid contentTypeKey in contentTypeKeys)
+        {
+            Attempt<int> idAttempt = await IdKeyMap.GetIdForKeyAsync(contentTypeKey, UmbracoObjectTypes.DocumentType);
+            if (idAttempt.Success == false)
+            {
+                return Attempt.Fail(ContentDeleteOfTypesOperationStatus.NotFound);
+            }
+
+            contentTypeIds.Add(idAttempt.Result);
+        }
+
+        int userId = await _userIdKeyResolver.GetAsync(userKey);
+        OperationResult result = DeleteOfTypes(contentTypeIds, userId);
+        return result.Success
+            ? Attempt.Succeed(ContentDeleteOfTypesOperationStatus.Success)
+            : Attempt.Fail(ContentDeleteOfTypesOperationStatus.CancelledByNotification);
     }
 
     #endregion

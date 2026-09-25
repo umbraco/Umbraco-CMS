@@ -1,0 +1,56 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+namespace Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.Configurations;
+
+public class UserGroup2GranularPermissionDtoConfiguration : IEntityTypeConfiguration<UserGroup2GranularPermissionDto>
+{
+    public void Configure(EntityTypeBuilder<UserGroup2GranularPermissionDto> builder)
+    {
+        builder.ToTable(UserGroup2GranularPermissionDto.TableName);
+
+        builder.HasKey(x => x.Id)
+            .HasName("PK_umbracoUserGroup2GranularPermissionDto");
+
+        builder.Property(x => x.Id)
+            .HasColumnName(UserGroup2GranularPermissionDto.PrimaryKeyColumnName)
+            .ValueGeneratedOnAdd();
+
+        builder.Property(x => x.UserGroupKey)
+            .HasColumnName(UserGroup2GranularPermissionDto.UserGroupKeyColumnName)
+            .IsRequired();
+
+        builder.Property(x => x.UniqueId)
+            .HasColumnName(UserGroup2GranularPermissionDto.UniqueIdColumnName);
+
+        builder.Property(x => x.Permission)
+            .HasColumnName(UserGroup2GranularPermissionDto.PermissionColumnName)
+            .IsRequired();
+
+        builder.Property(x => x.Context)
+            .HasColumnName(UserGroup2GranularPermissionDto.ContextColumnName)
+            .IsRequired();
+
+        // FK: uniqueId -> umbracoNode.uniqueId
+        builder.HasOne<NodeDto>()
+            .WithMany()
+            .HasForeignKey(x => x.UniqueId)
+            .HasPrincipalKey(x => x.UniqueId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        // FK: userGroupKey -> umbracoUserGroup.key
+        builder.HasOne<UserGroupDto>()
+            .WithMany()
+            .HasForeignKey(x => x.UserGroupKey)
+            .HasPrincipalKey(x => x.Key)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        // The index names carry the "Dto" suffix the existing schema was created with.
+        // SQL Server included columns are added by SqlServerUserGroup2GranularPermissionDtoModelCustomizer.
+        builder.HasIndex(x => x.UserGroupKey)
+            .HasDatabaseName("IX_umbracoUserGroup2GranularPermissionDto_UserGroupKey_UniqueId");
+
+        builder.HasIndex(x => x.UniqueId)
+            .HasDatabaseName("IX_umbracoUserGroup2GranularPermissionDto_UniqueId");
+    }
+}

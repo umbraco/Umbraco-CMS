@@ -67,13 +67,13 @@ public class ByKeyElementController : ElementControllerBase
             return Forbidden();
         }
 
-        IElement? element = _elementService.GetById(id);
+        IElement? element = await _elementService.GetByIdAsync(id, cancellationToken);
         if (element is null)
         {
             return ContentEditingOperationStatusResult(ContentEditingOperationStatus.NotFound);
         }
 
-        ContentScheduleCollection contentScheduleCollection = _elementService.GetContentScheduleByContentId(id);
+        ContentScheduleCollection contentScheduleCollection = await _elementService.GetContentScheduleByContentIdAsync(id, cancellationToken);
 
         ElementResponseModel model = _elementPresentationFactory.CreateResponseModel(element, contentScheduleCollection);
         return Ok(model);

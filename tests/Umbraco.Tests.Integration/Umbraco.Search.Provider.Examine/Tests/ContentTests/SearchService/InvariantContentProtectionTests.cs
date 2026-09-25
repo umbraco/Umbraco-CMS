@@ -52,7 +52,7 @@ public class InvariantContentProtectionTests : SearcherTestBase
     public async Task CannotGetProtectedContent_Member(bool publish)
     {
         IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
+        await MemberTypeService.CreateAsync(memberType, Cms.Core.Constants.Security.SuperUserKey);
         Member customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
         MemberService.Save(customMember);
 
@@ -93,7 +93,7 @@ public class InvariantContentProtectionTests : SearcherTestBase
         });
 
         IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
+        await MemberTypeService.CreateAsync(memberType, Cms.Core.Constants.Security.SuperUserKey);
 
         Member customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
         MemberService.Save(customMember);
@@ -111,7 +111,7 @@ public class InvariantContentProtectionTests : SearcherTestBase
     public async Task CanGetProtectedContent_Member(bool publish)
     {
         IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
+        await MemberTypeService.CreateAsync(memberType, Cms.Core.Constants.Security.SuperUserKey);
 
         Member customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
         MemberService.Save(customMember);
@@ -157,7 +157,7 @@ public class InvariantContentProtectionTests : SearcherTestBase
 
 
         IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
+        await MemberTypeService.CreateAsync(memberType, Cms.Core.Constants.Security.SuperUserKey);
 
         Member customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
         MemberService.Save(customMember);
@@ -203,7 +203,7 @@ public class InvariantContentProtectionTests : SearcherTestBase
             .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.TextBox)
             .Done()
             .Build();
-        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+        await ContentTypeService.CreateAsync(contentType, Cms.Core.Constants.Security.SuperUserKey);
 
         Content root = new ContentBuilder()
             .WithKey(RootKey)
@@ -213,14 +213,13 @@ public class InvariantContentProtectionTests : SearcherTestBase
                 new { title = "root title", })
             .Build();
 
-        await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, () =>
+        await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, async () =>
         {
-            ContentService.Save(root);
-            ContentService.Publish(root, ["*"]);
-            return Task.CompletedTask;
+            await ContentService.SaveAsync(root, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
+            await ContentService.PublishAsync(root, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         });
 
-        IContent? content = ContentService.GetById(RootKey);
+        IContent? content = ContentService.GetByIdAsync(RootKey, CancellationToken.None).GetAwaiter().GetResult();
         Assert.That(content, Is.Not.Null);
     }
 }

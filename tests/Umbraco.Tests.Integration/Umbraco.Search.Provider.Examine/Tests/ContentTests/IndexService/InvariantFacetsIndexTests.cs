@@ -149,7 +149,7 @@ public class InvariantFacetsIndexTests : IndexTestBase
     {
         await CreateTitleDocType();
 
-        await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, () =>
+        await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, async () =>
         {
             foreach (var stringValue in values)
             {
@@ -163,10 +163,8 @@ public class InvariantFacetsIndexTests : IndexTestBase
                         })
                     .Build();
 
-                SaveAndPublish(document);
+                await SaveAndPublishAsync(document);
             }
-
-            return Task.CompletedTask;
         });
     }
 
@@ -197,7 +195,7 @@ public class InvariantFacetsIndexTests : IndexTestBase
     {
         await CreateDecimalDocType();
 
-        await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, () =>
+        await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, async () =>
         {
             foreach (var doubleValue in values)
             {
@@ -211,10 +209,8 @@ public class InvariantFacetsIndexTests : IndexTestBase
                         })
                     .Build();
 
-                SaveAndPublish(document);
+                await SaveAndPublishAsync(document);
             }
-
-            return Task.CompletedTask;
         });
     }
 
@@ -222,7 +218,7 @@ public class InvariantFacetsIndexTests : IndexTestBase
     {
         await CreateCountDocType();
 
-        await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, () =>
+        await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, async () =>
         {
             foreach (var countValue in values)
             {
@@ -236,10 +232,8 @@ public class InvariantFacetsIndexTests : IndexTestBase
                         })
                     .Build();
 
-                SaveAndPublish(document);
+                await SaveAndPublishAsync(document);
             }
-
-            return Task.CompletedTask;
         });
     }
 }

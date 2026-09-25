@@ -50,15 +50,6 @@ public interface IDomainService : IService
     Task<IEnumerable<IDomain>> GetAssignedDomainsAsync(Guid contentKey, bool includeWildcards);
 
     /// <summary>
-    ///     Gets all assigned domains for a content item by its integer identifier.
-    /// </summary>
-    /// <param name="contentId">The integer identifier of the content item.</param>
-    /// <param name="includeWildcards">Whether to include wildcard domains.</param>
-    /// <returns>A collection of domains assigned to the content item.</returns>
-    [Obsolete("Use the Guid key overload instead. Scheduled for removal when EFCore migration is completed.")]
-    Task<IEnumerable<IDomain>> GetAssignedDomainsAsync(int contentId, bool includeWildcards);
-
-    /// <summary>
     ///     Gets all assigned domains.
     /// </summary>
     /// <param name="includeWildcards">Whether to include wildcard domains.</param>

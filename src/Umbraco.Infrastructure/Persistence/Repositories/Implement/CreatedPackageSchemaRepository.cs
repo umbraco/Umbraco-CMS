@@ -739,7 +739,8 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
             return;
         }
 
-        IContent? content = _contentService.GetById(contentNodeKey);
+        // TODO (V20): await this once the ICreatedPackageSchemaRepository contract goes async.
+        IContent? content = _contentService.GetByIdAsync(contentNodeKey, CancellationToken.None).GetAwaiter().GetResult();
         if (content is null)
         {
             return;
@@ -762,7 +763,8 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
     private void PackageElements(PackageDefinition definition, XContainer root)
     {
         // Each element's container (folder) ancestry is encoded on the serialized element and recreated on import.
-        IEnumerable<IElement> elements = _elementService.GetByIds(definition.Elements);
+        // TODO (V20): await this once the ICreatedPackageSchemaRepository contract goes async.
+        IEnumerable<IElement> elements = _elementService.GetByIdsAsync(definition.Elements, CancellationToken.None).GetAwaiter().GetResult();
 
         var elementsXml = new XElement(
             "Elements",

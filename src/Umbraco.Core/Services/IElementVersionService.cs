@@ -12,7 +12,7 @@ public interface IElementVersionService
 
     ContentVersionMeta? Get(int versionId);
     Task<Attempt<PagedModel<ContentVersionMeta>?, ContentVersionOperationStatus>> GetPagedContentVersionsAsync(Guid contentId, string? culture, int skip, int take);
-    Task<Attempt<IElement?, ContentVersionOperationStatus>> GetAsync(Guid versionId);
+    Task<Attempt<IElement?, ContentVersionOperationStatus>> GetAsync(Guid versionId, CancellationToken cancellationToken);
 
     Task<Attempt<ContentVersionOperationStatus>> SetPreventCleanupAsync(Guid versionId, bool preventCleanup, Guid userKey);
     Task<Attempt<ContentVersionOperationStatus>> RollBackAsync(Guid versionId, string? culture, Guid userKey);

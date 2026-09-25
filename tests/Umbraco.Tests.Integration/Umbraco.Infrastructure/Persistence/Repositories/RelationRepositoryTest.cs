@@ -294,7 +294,7 @@ internal sealed class RelationRepositoryTest : UmbracoIntegrationTest
         for (var i = 0; i < 3; i++)
         {
             var c1 = ContentBuilder.CreateBasicContent(contentType);
-            ContentService.Save(c1);
+            await ContentService.SaveAsync(c1, Constants.Security.SuperUserKey, null, CancellationToken.None);
             createdContent.Add(c1);
         }
 
@@ -303,7 +303,7 @@ internal sealed class RelationRepositoryTest : UmbracoIntegrationTest
         for (var i = 0; i < 3; i++)
         {
             var c1 = ContentBuilder.CreateBasicContent(contentType);
-            ContentService.Save(c1);
+            await ContentService.SaveAsync(c1, Constants.Security.SuperUserKey, null, CancellationToken.None);
             relatedContent.Add(c1);
         }
 
@@ -371,7 +371,7 @@ internal sealed class RelationRepositoryTest : UmbracoIntegrationTest
         for (var i = 0; i < 3; i++)
         {
             var c1 = ContentBuilder.CreateBasicContent(contentType);
-            ContentService.Save(c1);
+            await ContentService.SaveAsync(c1, Constants.Security.SuperUserKey, null, CancellationToken.None);
             copiedContent.Add(c1);
         }
 
@@ -392,7 +392,7 @@ internal sealed class RelationRepositoryTest : UmbracoIntegrationTest
         for (var i = 0; i < 3; i++)
         {
             var c1 = ContentBuilder.CreateBasicContent(contentType);
-            ContentService.Save(c1);
+            await ContentService.SaveAsync(c1, Constants.Security.SuperUserKey, null, CancellationToken.None);
             trashedContent.Add(c1);
         }
 
@@ -495,8 +495,8 @@ internal sealed class RelationRepositoryTest : UmbracoIntegrationTest
         {
             var repository = CreateRepository(out var repositoryType);
 
-            var content = ContentService.GetById(_subpage.Id);
-            ContentService.Delete(content, -1);
+            var content = await ContentService.GetByIdAsync(_subpage.Key, CancellationToken.None);
+            await ContentService.DeleteAsync(content, Constants.Security.SuperUserKey, CancellationToken.None);
 
             // Act
             var shouldntExist = await repository.ExistsAsync(1, CancellationToken.None);
@@ -546,15 +546,15 @@ internal sealed class RelationRepositoryTest : UmbracoIntegrationTest
 
             // Create and Save Content "Homepage" based on "umbTextpage" -> (NodeDto.NodeIdSeed + 1)
             _textpage = ContentBuilder.CreateSimpleContent(_contentType);
-            ContentService.Save(_textpage, -1);
+            await ContentService.SaveAsync(_textpage, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
             // Create and Save Content "Text Page 1" based on "umbTextpage" -> (NodeDto.NodeIdSeed + 2)
             _subpage = ContentBuilder.CreateSimpleContent(_contentType, "Text Page 1", _textpage.Id);
-            ContentService.Save(_subpage, -1);
+            await ContentService.SaveAsync(_subpage, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
             // Create and Save Content "Text Page 1" based on "umbTextpage" -> (NodeDto.NodeIdSeed + 3)
             _subpage2 = ContentBuilder.CreateSimpleContent(_contentType, "Text Page 2", _textpage.Id);
-            ContentService.Save(_subpage2, -1);
+            await ContentService.SaveAsync(_subpage2, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
             _relation = new Relation(_textpage.Id, _subpage.Id, _relateContent) { Comment = string.Empty };
             _relation2 = new Relation(_textpage.Id, _subpage2.Id, _relateContent) { Comment = string.Empty };

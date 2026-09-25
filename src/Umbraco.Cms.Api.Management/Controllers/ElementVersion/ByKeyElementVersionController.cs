@@ -48,7 +48,7 @@ public class ByKeyElementVersionController : ElementVersionControllerBase
     public async Task<IActionResult> ByKey(CancellationToken cancellationToken, Guid id)
     {
         Attempt<IElement?, ContentVersionOperationStatus> attempt =
-            await _elementVersionService.GetAsync(id);
+            await _elementVersionService.GetAsync(id, cancellationToken);
 
         return attempt.Success
             ? Ok(_umbracoMapper.Map<ElementVersionResponseModel>(attempt.Result))

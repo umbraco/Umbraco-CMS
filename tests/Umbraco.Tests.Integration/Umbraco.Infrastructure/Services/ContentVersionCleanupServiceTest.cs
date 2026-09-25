@@ -48,12 +48,12 @@ internal class ContentVersionCleanupServiceTest : UmbracoIntegrationTest
         await ContentTypeService.CreateAsync(contentTypeA, Constants.Security.SuperUserKey);
 
         var content = ContentBuilder.CreateSimpleContent(contentTypeA);
-        ContentService.Save(content);
-        ContentService.Publish(content, []);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishAsync(content, [], Constants.Security.SuperUserKey, CancellationToken.None);
 
         for (var i = 0; i < 10; i++)
         {
-            ContentService.Publish(content, []);
+            await ContentService.PublishAsync(content, [], Constants.Security.SuperUserKey, CancellationToken.None);
         }
 
         var before = GetReport();
@@ -89,12 +89,12 @@ internal class ContentVersionCleanupServiceTest : UmbracoIntegrationTest
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var content = ContentBuilder.CreateSimpleContent(contentType);
-        ContentService.Save(content);
-        ContentService.Publish(content, []);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishAsync(content, [], Constants.Security.SuperUserKey, CancellationToken.None);
 
         for (var i = 0; i < 5; i++)
         {
-            ContentService.Publish(content, []);
+            await ContentService.PublishAsync(content, [], Constants.Security.SuperUserKey, CancellationToken.None);
         }
 
         // Total: 7 versions (1 initial save + 6 publishes). Current draft + current published = 2 active.
@@ -143,13 +143,13 @@ internal class ContentVersionCleanupServiceTest : UmbracoIntegrationTest
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var content = ContentBuilder.CreateSimpleContent(contentType);
-        ContentService.Save(content);
-        ContentService.Publish(content, []);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishAsync(content, [], Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Create 6 more publishes (total 8 versions = 1 save + 7 publishes)
         for (var i = 0; i < 6; i++)
         {
-            ContentService.Publish(content, []);
+            await ContentService.PublishAsync(content, [], Constants.Security.SuperUserKey, CancellationToken.None);
         }
 
         var before = GetReport();
@@ -209,14 +209,14 @@ internal class ContentVersionCleanupServiceTest : UmbracoIntegrationTest
         await ContentTypeService.CreateAsync(contentTypeB, Constants.Security.SuperUserKey);
 
         var contentA = ContentBuilder.CreateSimpleContent(contentTypeA);
-        ContentService.Save(contentA);
-        ContentService.Publish(contentA, []);
-        ContentService.Publish(contentA, []);
+        await ContentService.SaveAsync(contentA, Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishAsync(contentA, [], Constants.Security.SuperUserKey, CancellationToken.None);
+        await ContentService.PublishAsync(contentA, [], Constants.Security.SuperUserKey, CancellationToken.None);
 
         var contentB = ContentBuilder.CreateSimpleContent(contentTypeB);
-        ContentService.Save(contentB);
-        ContentService.Publish(contentB, []);
-        ContentService.Publish(contentB, []);
+        await ContentService.SaveAsync(contentB, Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishAsync(contentB, [], Constants.Security.SuperUserKey, CancellationToken.None);
+        await ContentService.PublishAsync(contentB, [], Constants.Security.SuperUserKey, CancellationToken.None);
 
         var before = GetReport();
         Assert.Greater(before.ContentVersions, 4);
@@ -266,12 +266,12 @@ internal class ContentVersionCleanupServiceTest : UmbracoIntegrationTest
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var content = ContentBuilder.CreateSimpleContent(contentType);
-        ContentService.Save(content);
-        ContentService.Publish(content, []);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishAsync(content, [], Constants.Security.SuperUserKey, CancellationToken.None);
 
         for (var i = 0; i < 5; i++)
         {
-            ContentService.Publish(content, []);
+            await ContentService.PublishAsync(content, [], Constants.Security.SuperUserKey, CancellationToken.None);
         }
 
         // First cleanup run
@@ -314,12 +314,12 @@ internal class ContentVersionCleanupServiceTest : UmbracoIntegrationTest
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var content = ContentBuilder.CreateSimpleContent(contentType);
-        ContentService.Save(content);
-        ContentService.Publish(content, []);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishAsync(content, [], Constants.Security.SuperUserKey, CancellationToken.None);
 
         for (var i = 0; i < 8; i++)
         {
-            ContentService.Publish(content, []);
+            await ContentService.PublishAsync(content, [], Constants.Security.SuperUserKey, CancellationToken.None);
         }
 
         // 10 versions total: 8 historic + current draft + current published.

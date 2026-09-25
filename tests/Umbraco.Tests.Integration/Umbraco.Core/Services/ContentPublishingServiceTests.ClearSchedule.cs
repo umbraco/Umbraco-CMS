@@ -36,8 +36,8 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
 
         Assert.IsTrue(clearScheduleAttempt.Success);
 
-        var schedules = ContentService.GetContentScheduleByContentId(content.Id);
-        content = ContentService.GetById(content.Key);
+        var schedules = await ContentService.GetContentScheduleByContentIdAsync(content.Key, CancellationToken.None);
+        content = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
 
         Assert.Multiple(() =>
         {
@@ -78,8 +78,8 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
 
         Assert.IsTrue(scheduleAttempt.Success);
 
-        var schedules = ContentService.GetContentScheduleByContentId(content.Id);
-        content = ContentService.GetById(content.Key);
+        var schedules = await ContentService.GetContentScheduleByContentIdAsync(content.Key, CancellationToken.None);
+        content = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
 
         Assert.Multiple(() =>
         {
@@ -126,8 +126,8 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
 
         Assert.IsTrue(scheduleAttempt.Success);
 
-        var schedules = ContentService.GetContentScheduleByContentId(content.Id);
-        content = ContentService.GetById(content.Key);
+        var schedules = await ContentService.GetContentScheduleByContentIdAsync(content.Key, CancellationToken.None);
+        content = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
 
         Assert.Multiple(() =>
         {
@@ -181,8 +181,8 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
 
         Assert.IsTrue(scheduleAttempt.Success);
 
-        var schedules = ContentService.GetContentScheduleByContentId(content.Id);
-        content = ContentService.GetById(content.Key);
+        var schedules = await ContentService.GetContentScheduleByContentIdAsync(content.Key, CancellationToken.None);
+        content = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
 
         Assert.Multiple(() =>
         {

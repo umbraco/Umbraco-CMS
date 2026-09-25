@@ -17,7 +17,7 @@ internal abstract class AsyncContentEditingServiceWithSortingBase<TContent, TCon
     : AsyncContentEditingServiceBase<TContent, TContentType, TContentService, TContentTypeService>
     where TContent : class, IContentBase
     where TContentType : class, IContentTypeComposition
-    where TContentService : IContentServiceBase<TContent>
+    where TContentService : IAsyncContentServiceBase<TContent>
     where TContentTypeService : IAsyncContentTypeBaseService<TContentType>
 {
     private readonly ILogger<AsyncContentEditingServiceBase<TContent, TContentType, TContentService, TContentTypeService>> _logger;
@@ -38,6 +38,8 @@ internal abstract class AsyncContentEditingServiceWithSortingBase<TContent, TCon
     /// <param name="optionsMonitor">The content settings options monitor.</param>
     /// <param name="relationService">The relation service.</param>
     /// <param name="contentTypeFilters">The content type filter collection.</param>
+    /// <param name="languageService">The language service.</param>
+    /// <param name="userService">The user service.</param>
     protected AsyncContentEditingServiceWithSortingBase(
         TContentService contentService,
         TContentTypeService contentTypeService,
@@ -75,31 +77,31 @@ internal abstract class AsyncContentEditingServiceWithSortingBase<TContent, TCon
     /// <summary>
     /// Sorts the specified items.
     /// </summary>
-    /// <param name="items">The items to sort.</param>
-    /// <param name="userId">The user performing the sort operation.</param>
+    /// <param name="orderedKeys">The Guid keys of the items to sort, in the desired order.</param>
+    /// <param name="userKey">The Guid key of the user performing the sort operation.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The operation status.</returns>
-    protected abstract ContentEditingOperationStatus Sort(IEnumerable<TContent> items, int userId);
+    protected abstract Task<ContentEditingOperationStatus> SortAsync(IReadOnlyList<Guid> orderedKeys, Guid userKey, CancellationToken cancellationToken);
 
     /// <summary>
     /// Gets the paged children of the specified parent.
     /// </summary>
-    /// <param name="parentId">The parent identifier.</param>
+    /// <param name="parentKey">The Guid key of the parent, or <c>null</c> for the root of the content tree.</param>
     /// <param name="pageIndex">The zero-based page index.</param>
     /// <param name="pageSize">The page size.</param>
     /// <param name="ordering">The ordering to apply, or <c>null</c> to use the default (sort order).</param>
-    /// <param name="total">The total number of children.</param>
     /// <returns>The paged children.</returns>
-    protected abstract Task<IEnumerable<TContent>> GetPagedChildrenAsync(int parentId, int pageIndex, int pageSize, Ordering? ordering, out long total);
+    protected abstract Task<PagedModel<TContent>> GetPagedChildrenAsync(Guid? parentKey, int pageIndex, int pageSize, Ordering? ordering);
 
     /// <summary>
-    /// Persists the supplied (already ordered) child identifiers as the new sort order, without loading
+    /// Persists the supplied (already ordered) child keys as the new sort order, without loading
     /// the children or firing per-item notifications.
     /// </summary>
-    /// <param name="parentId">The parent identifier, or the root identifier for root-level sorting.</param>
-    /// <param name="orderedChildIds">The child identifiers in their desired order.</param>
-    /// <param name="userId">The user performing the operation.</param>
+    /// <param name="parentKey">The Guid key of the parent, or <c>null</c> for root-level sorting.</param>
+    /// <param name="orderedChildKeys">The child keys in their desired order.</param>
+    /// <param name="userKey">The Guid key of the user performing the operation.</param>
     /// <returns>The operation status.</returns>
-    protected abstract ContentEditingOperationStatus SortChildrenInBulk(int parentId, IReadOnlyList<int> orderedChildIds, int userId);
+    protected abstract Task<ContentEditingOperationStatus> SortChildrenInBulkAsync(Guid? parentKey, IReadOnlyList<Guid> orderedChildKeys, Guid userKey);
 
     /// <summary>
     /// Handles the sorting operation asynchronously.
@@ -113,16 +115,12 @@ internal abstract class AsyncContentEditingServiceWithSortingBase<TContent, TCon
         IEnumerable<SortingModel> sortingModels,
         Guid userKey)
     {
-        var contentId = parentKey.HasValue
-            ? ContentService.GetById(parentKey.Value)?.Id
-            : Constants.System.Root;
-
-        if (contentId.HasValue is false)
+        if (parentKey.HasValue && await ContentService.GetByIdAsync(parentKey.Value, CancellationToken.None) is null)
         {
             return ContentEditingOperationStatus.NotFound;
         }
 
-        List<TContent> children = await LoadAllChildrenAsync(contentId.Value, ordering: null);
+        List<TContent> children = await LoadAllChildrenAsync(parentKey, ordering: null);
 
         try
         {
@@ -130,9 +128,7 @@ internal abstract class AsyncContentEditingServiceWithSortingBase<TContent, TCon
                 .SortEntities(children, sortingModels)
                 .ToArray();
 
-            var userId = await GetUserIdAsync(userKey);
-
-            return Sort(sortedChildren, userId);
+            return await SortAsync(sortedChildren.Select(child => child.Key).ToArray(), userKey, CancellationToken.None);
         }
         catch (ArgumentException argumentException)
         {
@@ -157,11 +153,7 @@ internal abstract class AsyncContentEditingServiceWithSortingBase<TContent, TCon
         string? culture,
         Guid userKey)
     {
-        var contentId = parentKey.HasValue
-            ? ContentService.GetById(parentKey.Value)?.Id
-            : Constants.System.Root;
-
-        if (contentId.HasValue is false)
+        if (parentKey.HasValue && await ContentService.GetByIdAsync(parentKey.Value, CancellationToken.None) is null)
         {
             return ContentEditingOperationStatus.NotFound;
         }
@@ -173,46 +165,46 @@ internal abstract class AsyncContentEditingServiceWithSortingBase<TContent, TCon
         {
             // Opt-in path: load the children and persist via the standard sort, firing per-item
             // save/sort notifications (and therefore webhooks), at the cost of loading every child.
-            List<TContent> orderedChildren = await LoadAllChildrenAsync(contentId.Value, ordering);
+            List<TContent> orderedChildren = await LoadAllChildrenAsync(parentKey, ordering);
             if (orderedChildren.Count == 0)
             {
                 return ContentEditingOperationStatus.Success;
             }
 
-            return Sort(orderedChildren, await GetUserIdAsync(userKey));
+            return await SortAsync(orderedChildren.Select(child => child.Key).ToArray(), userKey, CancellationToken.None);
         }
 
         // Default path: persist the resulting order with a single set-based update and a branch cache
         // refresh, without loading every child or firing per-item notifications.
-        List<int> orderedChildIds = await LoadOrderedChildIdsAsync(contentId.Value, ordering);
-        if (orderedChildIds.Count == 0)
+        List<Guid> orderedChildKeys = await LoadOrderedChildKeysAsync(parentKey, ordering);
+        if (orderedChildKeys.Count == 0)
         {
             // Nothing to sort - the order is trivially correct.
             return ContentEditingOperationStatus.Success;
         }
 
-        return SortChildrenInBulk(contentId.Value, orderedChildIds, await GetUserIdAsync(userKey));
+        return await SortChildrenInBulkAsync(parentKey, orderedChildKeys, userKey);
     }
 
-    private Task<List<int>> LoadOrderedChildIdsAsync(int contentId, Ordering ordering)
-        => LoadAllChildrenAsync(contentId, ordering, child => child.Id);
+    private Task<List<Guid>> LoadOrderedChildKeysAsync(Guid? parentKey, Ordering ordering)
+        => LoadAllChildrenAsync(parentKey, ordering, child => child.Key);
 
-    private Task<List<TContent>> LoadAllChildrenAsync(int contentId, Ordering? ordering)
-        => LoadAllChildrenAsync(contentId, ordering, child => child);
+    private Task<List<TContent>> LoadAllChildrenAsync(Guid? parentKey, Ordering? ordering)
+        => LoadAllChildrenAsync(parentKey, ordering, child => child);
 
     // Pages through all children, projecting each page with the selector so callers that only need a
     // lightweight value (e.g. the id) don't retain every loaded child.
-    private async Task<List<TResult>> LoadAllChildrenAsync<TResult>(int contentId, Ordering? ordering, Func<TContent, TResult> selector)
+    private async Task<List<TResult>> LoadAllChildrenAsync<TResult>(Guid? parentKey, Ordering? ordering, Func<TContent, TResult> selector)
     {
         const int pageSize = 500;
         var pageNumber = 0;
-        IEnumerable<TContent> page = await GetPagedChildrenAsync(contentId, pageNumber++, pageSize, ordering, out var total);
-        var results = new List<TResult>((int)total);
-        results.AddRange(page.Select(selector));
-        while (pageNumber * pageSize < total)
+        PagedModel<TContent> page = await GetPagedChildrenAsync(parentKey, pageNumber++, pageSize, ordering);
+        var results = new List<TResult>((int)page.Total);
+        results.AddRange(page.Items.Select(selector));
+        while (pageNumber * pageSize < page.Total)
         {
-            page = await GetPagedChildrenAsync(contentId, pageNumber++, pageSize, ordering, out _);
-            results.AddRange(page.Select(selector));
+            page = await GetPagedChildrenAsync(parentKey, pageNumber++, pageSize, ordering);
+            results.AddRange(page.Items.Select(selector));
         }
 
         return results;

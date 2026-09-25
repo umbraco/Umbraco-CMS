@@ -95,6 +95,25 @@ internal sealed class MemberRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
+    public void GetMember_Populates_Null_ParentKey_For_Root_Parent()
+    {
+        var provider = ScopeProvider;
+        using var scope = provider.CreateScope();
+        var repository = CreateRepository(provider);
+
+        var member = CreateTestMember();
+
+        var result = repository.Get(member.Id);
+
+        Assert.That(result, Is.Not.Null);
+
+        // Members sit directly under Root in practice - umbracoNode's own Root row (id -1) carries
+        // Constants.System.RootSystemKey, NOT the semantic "no parent" value ParentKey contracts to.
+        // The self-join in GetBaseQuery must not let RootSystemKey leak through as ParentKey.
+        Assert.That(result!.ParentKey, Is.Null);
+    }
+
+    [Test]
     public void GetMembers()
     {
         var provider = ScopeProvider;

@@ -52,4 +52,15 @@ public class ContentDto
     [ResultColumn]
     [Reference(ReferenceType.OneToOne, ReferenceMemberName = nameof(ContentVersionDto.NodeId))]
     public ContentVersionDto ContentVersionDto { get; set; } = null!;
+
+    /// <summary>
+    /// Gets or sets the unique identifier of the parent node, populated by an aliased self-join against
+    /// <see cref="Umbraco.Cms.Infrastructure.Persistence.Dtos.NodeDto"/> on <c>ParentId = NodeId</c>. Read-only -
+    /// never written by insert/update. Populated as <c>null</c> when there is no parent row (there normally
+    /// always is one, even for the recycle bin pseudo-parents) - callers must still treat
+    /// <see cref="Umbraco.Cms.Core.Constants.System.Root"/> as a special case: its node row exists but carries
+    /// <see cref="Umbraco.Cms.Core.Constants.System.RootSystemKey"/>, not the semantic "no parent" value.
+    /// </summary>
+    [ResultColumn]
+    public Guid? ParentUniqueId { get; set; }
 }

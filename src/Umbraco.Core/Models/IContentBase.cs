@@ -12,6 +12,49 @@ namespace Umbraco.Cms.Core.Models;
 public interface IContentBase : IUmbracoEntity, IRememberBeingDirty
 {
     /// <summary>
+    ///     Gets or sets the key of the parent entity.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Is <c>null</c> when this entity is at the root (<see cref="ITreeEntity.ParentId" /> equals
+    ///         <see cref="Constants.System.Root" />), matching <see cref="Constants.System.RootKey" />.
+    ///     </para>
+    ///     <para>
+    ///         Is the type-specific recycle bin sentinel key (e.g. <see cref="Constants.System.RecycleBinContentKey" />)
+    ///         when this entity is a direct child of a recycle bin pseudo-node.
+    ///     </para>
+    ///     <para>
+    ///         Is also <c>null</c> when the parent's key is not known - for instance on an entity constructed
+    ///         from a raw parent id alone, where resolving a real parent's key would require a database
+    ///         round-trip. That is indistinguishable here from being at the root; use
+    ///         <see cref="TryGetParentKey" /> to tell the two apart.
+    ///     </para>
+    ///     <para>
+    ///         Implementations populate and maintain this value directly - at repository hydration time, and
+    ///         whenever <see cref="ITreeEntity.ParentId" /> or <see cref="ITreeEntity.SetParent" /> change it -
+    ///         so reading it never requires a database round-trip. The setter exists for repository read paths
+    ///         and write-path orchestration code that has already resolved the correct key (e.g. from a batched
+    ///         query, or from an already-known parent id) but only has a raw <see cref="Guid" /> to work with,
+    ///         not a full parent entity - <see cref="ITreeEntity.SetParent" /> is the right call instead when an
+    ///         actual parent object is in memory.
+    ///     </para>
+    /// </remarks>
+    Guid? ParentKey { get; set; }
+
+    /// <summary>
+    ///     Gets the key of the parent entity, reporting whether it is known.
+    /// </summary>
+    /// <param name="parentKey">
+    ///     When this method returns <c>true</c>, the parent's key - which is <c>null</c> when this entity is at
+    ///     the root. When it returns <c>false</c>, <c>null</c>.
+    /// </param>
+    /// <returns>
+    ///     <c>true</c> when the parent's key is known, either because it has been populated or because it can be
+    ///     inferred from <see cref="ITreeEntity.ParentId" /> alone; otherwise <c>false</c>.
+    /// </returns>
+    bool TryGetParentKey(out Guid? parentKey);
+
+    /// <summary>
     ///     Integer Id of the default ContentType
     /// </summary>
     int ContentTypeId { get; }

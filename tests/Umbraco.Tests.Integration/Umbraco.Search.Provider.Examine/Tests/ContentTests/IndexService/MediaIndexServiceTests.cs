@@ -35,7 +35,7 @@ public class MediaIndexServiceTests : IndexTestBase
             .Done()
             .Done()
             .Build();
-        await GetRequiredService<IMediaTypeService>().CreateAsync(mediaType, Constants.Security.SuperUserKey);
+        await GetRequiredService<IMediaTypeService>().CreateAsync(mediaType, Cms.Core.Constants.Security.SuperUserKey);
 
         await WaitForIndexing(Cms.Core.Constants.IndexAliases.DraftMedia, () =>
         {

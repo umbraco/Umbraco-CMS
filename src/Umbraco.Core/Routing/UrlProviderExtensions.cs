@@ -153,7 +153,7 @@ public static class UrlProviderExtensions
             {
                 // deal with 'could not get the URL'
                 case Constants.Routing.Unroutable:
-                    result.Add(HandleCouldNotGetUrl(content, culture, contentService, textService));
+                    result.Add(await HandleCouldNotGetUrlAsync(content, culture, contentService, textService));
                     break;
 
                 // deal with exceptions
@@ -181,14 +181,14 @@ public static class UrlProviderExtensions
         return result;
     }
 
-    private static UrlInfo HandleCouldNotGetUrl(IContent content, string culture, IContentService contentService, ILocalizedTextService textService)
+    private static async Task<UrlInfo> HandleCouldNotGetUrlAsync(IContent content, string culture, IContentService contentService, ILocalizedTextService textService)
     {
         // document has a published version yet its URL is unrouteable => a parent must be
         // unpublished, walk up the tree until we find it, and report.
         IContent? parent = content;
         do
         {
-            parent = parent.ParentId > 0 ? contentService.GetParent(parent) : null;
+            parent = parent.ParentId > 0 ? await contentService.GetParentAsync(parent, CancellationToken.None) : null;
         }
         while (parent != null && parent.Published &&
                  (!parent.ContentType.VariesByCulture() || parent.IsCulturePublished(culture)));

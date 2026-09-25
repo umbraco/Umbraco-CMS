@@ -34,8 +34,8 @@ public class ApiContentRouteBuilderPublishingTests : ApiContentRouteBuilderTestB
             .WithCultureName("en-US", "Root en-US")
             .WithCultureName("da-DK", "Root da-DK")
             .Build();
-        ContentService.Save(root);
-        ContentService.Publish(root, ["*"]);
+        await ContentService.SaveAsync(root, Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishAsync(root, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         var child = new ContentBuilder()
             .WithContentType(contentType)
@@ -43,8 +43,8 @@ public class ApiContentRouteBuilderPublishingTests : ApiContentRouteBuilderTestB
             .WithCultureName("en-US", "Child en-US")
             .WithCultureName("da-DK", "Child da-DK")
             .Build();
-        ContentService.Save(child);
-        ContentService.Publish(child, ["*"]);
+        await ContentService.SaveAsync(child, Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishAsync(child, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         var grandchild = new ContentBuilder()
             .WithContentType(contentType)
@@ -52,12 +52,12 @@ public class ApiContentRouteBuilderPublishingTests : ApiContentRouteBuilderTestB
             .WithCultureName("en-US", "Grandchild en-US")
             .WithCultureName("da-DK", "Grandchild da-DK")
             .Build();
-        ContentService.Save(grandchild);
-        ContentService.Publish(grandchild, ["*"]);
+        await ContentService.SaveAsync(grandchild, Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishAsync(grandchild, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         if (breakPublishedPath)
         {
-            ContentService.Unpublish(child, "da-DK");
+            await ContentService.UnpublishAsync(child, "da-DK", Constants.Security.SuperUserKey, CancellationToken.None);
         }
 
         SetVariationContext("en-US");
@@ -102,28 +102,28 @@ public class ApiContentRouteBuilderPublishingTests : ApiContentRouteBuilderTestB
             .WithContentType(contentType)
             .WithName("Root")
             .Build();
-        ContentService.Save(root);
-        ContentService.Publish(root, ["*"]);
+        await ContentService.SaveAsync(root, Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishAsync(root, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         var child = new ContentBuilder()
             .WithContentType(contentType)
             .WithParent(root)
             .WithName("Child")
             .Build();
-        ContentService.Save(child);
-        ContentService.Publish(child, ["*"]);
+        await ContentService.SaveAsync(child, Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishAsync(child, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         var grandchild = new ContentBuilder()
             .WithContentType(contentType)
             .WithParent(child)
             .WithName("Grandchild")
             .Build();
-        ContentService.Save(grandchild);
-        ContentService.Publish(grandchild, ["*"]);
+        await ContentService.SaveAsync(grandchild, Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishAsync(grandchild, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         if (breakPublishedPath)
         {
-            ContentService.Unpublish(child);
+            await ContentService.UnpublishAsync(child, "*", Constants.Security.SuperUserKey, CancellationToken.None);
         }
 
         SetVariationContext("en-US");

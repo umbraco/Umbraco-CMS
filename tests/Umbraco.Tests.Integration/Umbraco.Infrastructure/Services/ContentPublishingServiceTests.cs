@@ -62,7 +62,7 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
         content.SetValue("title", string.Empty);
         content.SetValue("bodyText", string.Empty);
         content.SetValue("author", string.Empty);
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         return content;
     }
@@ -153,9 +153,9 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
             .AddNotificationHandler<ContentPublishingNotification, ContentNotificationHandler>()
             .AddNotificationHandler<ContentUnpublishingNotification, ContentNotificationHandler>();
 
-    private void VerifyIsPublished(Guid key) => Assert.IsTrue(ContentService.GetById(key)!.Published);
+    private void VerifyIsPublished(Guid key) => Assert.IsTrue(ContentService.GetByIdAsync(key, CancellationToken.None).GetAwaiter().GetResult()!.Published);
 
-    private void VerifyIsNotPublished(Guid key) => Assert.IsFalse(ContentService.GetById(key)!.Published);
+    private void VerifyIsNotPublished(Guid key) => Assert.IsFalse(ContentService.GetByIdAsync(key, CancellationToken.None).GetAwaiter().GetResult()!.Published);
 
     private ILanguageService LanguageService => GetRequiredService<ILanguageService>();
 
