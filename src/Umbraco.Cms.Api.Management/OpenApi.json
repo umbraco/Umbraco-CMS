@@ -42352,6 +42352,7 @@
           "hasAccessToAllLanguages",
           "fallbackPermissions",
           "permissions",
+          "hasAccessToInvariantForVariant",
           "documentRootAccess",
           "mediaRootAccess",
           "elementRootAccess"
@@ -42396,6 +42397,9 @@
             }
           },
           "hasAccessToAllLanguages": {
+            "type": "boolean"
+          },
+          "hasAccessToInvariantForVariant": {
             "type": "boolean"
           },
           "documentStartNode": {
@@ -42627,6 +42631,7 @@
           "fallbackPermissions",
           "permissions",
           "allowedSections",
+          "hasAccessToInvariantForVariant",
           "isAdmin",
           "email",
           "userName",
@@ -42685,6 +42690,9 @@
             }
           },
           "hasAccessToAllLanguages": {
+            "type": "boolean"
+          },
+          "hasAccessToInvariantForVariant": {
             "type": "boolean"
           },
           "hasAccessToSensitiveData": {
@@ -53277,6 +53285,7 @@
           "hasAccessToAllLanguages",
           "fallbackPermissions",
           "permissions",
+          "hasAccessToInvariantForVariant",
           "documentRootAccess",
           "mediaRootAccess",
           "elementRootAccess"
@@ -53314,6 +53323,9 @@
             }
           },
           "hasAccessToAllLanguages": {
+            "type": "boolean"
+          },
+          "hasAccessToInvariantForVariant": {
             "type": "boolean"
           },
           "documentStartNode": {
@@ -53702,6 +53714,7 @@
           "permissions",
           "isDeletable",
           "aliasCanBeChanged",
+          "hasAccessToInvariantForVariant",
           "documentRootAccess",
           "mediaRootAccess",
           "elementRootAccess"
@@ -53749,6 +53762,9 @@
             }
           },
           "hasAccessToAllLanguages": {
+            "type": "boolean"
+          },
+          "hasAccessToInvariantForVariant": {
             "type": "boolean"
           },
           "documentStartNode": {
