@@ -269,7 +269,7 @@ internal sealed class ContentBlueprintEditingService
     /// Some methods from ContentEditingServiceBase are needed, so we need to inherit from it
     /// but there are others that are not required to be implemented in the case of blueprints.
     /// </remarks>
-    protected override Task<OperationResult?> MoveAsync(IContent content, Guid? parentKey, bool includeDescendants, Guid userKey) => throw new NotImplementedException();
+    protected override Task<ContentEditingOperationStatus> MoveAsync(IContent content, Guid? parentKey, bool includeDescendants, Guid userKey) => throw new NotImplementedException();
 
     /// <summary>
     /// Copies the specified content to a new parent. Not supported for blueprints.
@@ -292,7 +292,7 @@ internal sealed class ContentBlueprintEditingService
     /// Moves the specified content to the recycle bin. Not supported for blueprints.
     /// </summary>
     /// <param name="content">The content to move to recycle bin.</param>
-    /// <param name="userId">The ID of the user performing the operation.</param>
+    /// <param name="userKey">The key of the user performing the operation.</param>
     /// <returns>Not supported for blueprints.</returns>
     /// <exception cref="NotImplementedException">Always thrown as this operation is not supported for blueprints.</exception>
     protected override Task<OperationResult?> MoveToRecycleBinAsync(IContent content, Guid userKey) => throw new NotImplementedException();
@@ -301,7 +301,7 @@ internal sealed class ContentBlueprintEditingService
     /// Deletes the specified content. Not supported for blueprints.
     /// </summary>
     /// <param name="content">The content to delete.</param>
-    /// <param name="userId">The ID of the user performing the operation.</param>
+    /// <param name="userKey">The key of the user performing the operation.</param>
     /// <returns>Not supported for blueprints.</returns>
     /// <exception cref="NotImplementedException">Always thrown as this operation is not supported for blueprints.</exception>
     protected override Task<OperationResult?> DeleteAsync(IContent content, Guid userKey) => throw new NotImplementedException();

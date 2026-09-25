@@ -556,6 +556,10 @@ public interface IContentService : IPublishableContentService<IContent>
     /// <param name="userKey">The Guid key of the user performing the action.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The created and saved document.</returns>
+    /// <exception cref="InvalidOperationException">The document cannot be saved because its name or published state is invalid.</exception>
+    /// <remarks>
+    ///     When a saving notification cancels the save, the document is returned unsaved (without an identity).
+    /// </remarks>
     Task<IContent> CreateAndSaveAsync(string name, Guid? parentKey, string contentTypeAlias, Guid userKey, CancellationToken cancellationToken);
 
     /// <summary>
@@ -567,6 +571,10 @@ public interface IContentService : IPublishableContentService<IContent>
     /// <param name="userKey">The Guid key of the user performing the action.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The created and saved document.</returns>
+    /// <exception cref="InvalidOperationException">The document cannot be saved because its name or published state is invalid.</exception>
+    /// <remarks>
+    ///     When a saving notification cancels the save, the document is returned unsaved (without an identity).
+    /// </remarks>
     Task<IContent> CreateAndSaveAsync(string name, IContent parent, string contentTypeAlias, Guid userKey, CancellationToken cancellationToken);
 
     #endregion

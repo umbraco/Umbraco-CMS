@@ -15,23 +15,15 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Core.Services;
 
 /// <summary>
-/// Base class for publishable content services undergoing incremental conversion to an async, EF Core-backed
-/// repository.
+/// Asynchronous base class for services that manage publishable content through an
+/// <see cref="IAsyncPublishableContentRepository{TContent}"/>.
 /// </summary>
 /// <typeparam name="TContent">The type of content managed by the concrete implementation.</typeparam>
 /// <remarks>
-/// This is a copy of <see cref="PublishableContentServiceBase{TContent}"/>, not a subclass of it — mirroring the
-/// same "AsyncX" scaffolding pattern already used throughout the NPoco-to-EF-Core repository migration (e.g.
-/// <see cref="Umbraco.Cms.Core.Persistence.Repositories.IDocumentRepository"/> alongside <c>IDocumentRepository</c>).
-/// Members are converted to their async, <see cref="IAsyncPublishableContentRepository{TContent}"/>-backed
-/// equivalents one at a time; once a member's sync equivalent has no remaining internal callers, the sync member
-/// is deleted from this class entirely. The end state is a fully async class with none of the original sync
-/// content remaining, at which point it can take over as the shared base (or be inlined) rather than living
-/// alongside <see cref="PublishableContentServiceBase{TContent}"/>.
-///
-/// Only <see cref="ContentService"/> derives from this class today. <see cref="ElementService"/> still derives from
-/// the original <see cref="PublishableContentServiceBase{TContent}"/>, untouched — it will adopt this class (or a
-/// fully-converted successor) once an async element repository exists.
+/// Implements the shared save, publish, unpublish, rollback, schedule and query behaviour of
+/// <see cref="IPublishableContentService{TContent}"/>, leaving the content-type specific parts (object type, lock ids,
+/// notifications) to the derived service. <see cref="ElementService"/> still derives from
+/// <see cref="PublishableContentServiceBase{TContent}"/> until an async element repository exists.
 /// </remarks>
 public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryService, IPublishableContentService<TContent>
     where TContent : class, IPublishableContentBase

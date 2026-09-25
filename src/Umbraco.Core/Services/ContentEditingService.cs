@@ -279,12 +279,17 @@ internal sealed class ContentEditingService
         => new Content(name, parentId, contentType);
 
     /// <inheritdoc />
-    protected override async Task<OperationResult?> MoveAsync(IContent content, Guid? parentKey, bool includeDescendants, Guid userKey)
+    protected override async Task<ContentEditingOperationStatus> MoveAsync(IContent content, Guid? parentKey, bool includeDescendants, Guid userKey)
     {
         Attempt<ContentMoveOperationStatus> result = await ContentService.MoveAsync(content, parentKey, includeDescendants, userKey, CancellationToken.None);
-        return result.Success
-            ? OperationResult.Succeed(new EventMessages())
-            : OperationResult.Cancel(new EventMessages());
+        return result.Result switch
+        {
+            ContentMoveOperationStatus.Success => ContentEditingOperationStatus.Success,
+            ContentMoveOperationStatus.CancelledByNotification => ContentEditingOperationStatus.CancelledByNotification,
+            ContentMoveOperationStatus.ParentNotFound => ContentEditingOperationStatus.ParentNotFound,
+            ContentMoveOperationStatus.ParentTrashed => ContentEditingOperationStatus.InTrash,
+            _ => ContentEditingOperationStatus.Unknown,
+        };
     }
 
     /// <inheritdoc />
@@ -348,11 +353,10 @@ internal sealed class ContentEditingService
             Attempt<ContentSaveOperationStatus> saveResult = await ContentService.SaveAsync(content, userKey, null, CancellationToken.None);
             return saveResult.Result switch
             {
-                // these are the only result states currently expected from SaveAsync
                 ContentSaveOperationStatus.Success => ContentEditingOperationStatus.Success,
                 ContentSaveOperationStatus.CancelledByNotification => ContentEditingOperationStatus.CancelledByNotification,
-
-                // for any other state we'll return "unknown" so we know that we need to amend this
+                ContentSaveOperationStatus.InvalidName => ContentEditingOperationStatus.NotAllowed,
+                ContentSaveOperationStatus.InvalidPublishedState => ContentEditingOperationStatus.Unknown,
                 _ => ContentEditingOperationStatus.Unknown,
             };
         }

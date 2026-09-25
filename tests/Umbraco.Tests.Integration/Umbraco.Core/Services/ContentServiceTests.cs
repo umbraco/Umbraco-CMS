@@ -3835,6 +3835,134 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     }
 
     [Test]
+    public async Task SendToPublicationAsync_SavingNotificationCancelled_ReportsSaveFailed()
+    {
+        ContentNotificationHandler.SavingContent = notification => notification.Cancel = true;
+
+        try
+        {
+            IContent content = (await ContentService.GetByIdAsync(Subpage.Key, CancellationToken.None))!;
+
+            Attempt<ContentSendToPublicationOperationStatus> result = await ContentService.SendToPublicationAsync(
+                content, Constants.Security.SuperUserKey, CancellationToken.None);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.Success, Is.False);
+                Assert.That(result.Result, Is.EqualTo(ContentSendToPublicationOperationStatus.SaveFailed));
+            });
+        }
+        finally
+        {
+            ContentNotificationHandler.SavingContent = null;
+        }
+    }
+
+    [Test]
+    public async Task RollbackAsync_SavingNotificationCancelled_ReportsSaveFailedAndDoesNotRollBack()
+    {
+        // Publishing under an unpublished ancestor fails silently, so the parent is published first and both
+        // results are asserted - otherwise no second version is created and the test would be measuring nothing.
+        IContent parent = (await ContentService.GetByIdAsync(Textpage.Key, CancellationToken.None))!;
+        PublishResult parentPublish = await ContentService.PublishAsync(parent, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
+        Assert.That(parentPublish.Success, Is.True, "guard: the ancestor must be published");
+
+        IContent content = (await ContentService.GetByIdAsync(Subpage.Key, CancellationToken.None))!;
+        PublishResult publish = await ContentService.PublishAsync(content, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
+        Assert.That(publish.Success, Is.True, "guard: the document must be published");
+
+        // A draft save reuses the current version row, so the earlier version only becomes a separate row
+        // once it has been published.
+        content.SetValue("title", "second");
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
+
+        var versionIds = (await ContentService.GetVersionIdsAsync(Subpage.Key, 0, 10, CancellationToken.None)).ToList();
+        Assert.That(versionIds, Has.Count.GreaterThan(1), "guard: rolling back needs an earlier version to roll back to");
+
+        ContentNotificationHandler.SavingContent = notification => notification.Cancel = true;
+
+        try
+        {
+            Attempt<ContentRollbackOperationStatus> result = await ContentService.RollbackAsync(
+                Subpage.Key, versionIds[^1], "*", Constants.Security.SuperUserKey, CancellationToken.None);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.Success, Is.False);
+                Assert.That(result.Result, Is.EqualTo(ContentRollbackOperationStatus.SaveFailed));
+            });
+            IContent reloaded = (await ContentService.GetByIdAsync(Subpage.Key, CancellationToken.None))!;
+            Assert.That(reloaded.GetValue<string>("title"), Is.EqualTo("second"), "a rollback whose save was vetoed must not be persisted");
+        }
+        finally
+        {
+            ContentNotificationHandler.SavingContent = null;
+        }
+    }
+
+    [Test]
+    public async Task MoveAsync_ToUnknownParent_ReportsParentNotFoundAndDoesNotMove()
+    {
+        IContent content = (await ContentService.GetByIdAsync(Subpage.Key, CancellationToken.None))!;
+        var originalParentId = content.ParentId;
+
+        Attempt<ContentMoveOperationStatus> result = await ContentService.MoveAsync(
+            content, Guid.NewGuid(), includeDescendants: false, Constants.Security.SuperUserKey, CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Success, Is.False);
+            Assert.That(result.Result, Is.EqualTo(ContentMoveOperationStatus.ParentNotFound));
+        });
+        IContent reloaded = (await ContentService.GetByIdAsync(Subpage.Key, CancellationToken.None))!;
+        Assert.That(reloaded.ParentId, Is.EqualTo(originalParentId), "a move to an unknown parent must not be persisted");
+    }
+
+    [Test]
+    public async Task MoveAsync_ToTrashedParent_ReportsParentTrashedAndDoesNotMove()
+    {
+        IContent content = (await ContentService.GetByIdAsync(Subpage.Key, CancellationToken.None))!;
+        var originalParentId = content.ParentId;
+
+        Attempt<ContentMoveOperationStatus> result = await ContentService.MoveAsync(
+            content, Trashed.Key, includeDescendants: false, Constants.Security.SuperUserKey, CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Success, Is.False);
+            Assert.That(result.Result, Is.EqualTo(ContentMoveOperationStatus.ParentTrashed));
+        });
+        IContent reloaded = (await ContentService.GetByIdAsync(Subpage.Key, CancellationToken.None))!;
+        Assert.Multiple(() =>
+        {
+            Assert.That(reloaded.ParentId, Is.EqualTo(originalParentId), "a move to a trashed parent must not be persisted");
+            Assert.That(reloaded.Trashed, Is.False);
+        });
+    }
+
+    [Test]
+    public async Task CreateAndSaveAsync_WithParentKey_NameTooLong_ThrowsAndPersistsNothing()
+    {
+        var countBefore = await ContentService.CountAsync(null, CancellationToken.None);
+
+        Assert.ThrowsAsync<InvalidOperationException>(() => ContentService.CreateAndSaveAsync(
+            new string('a', 256), Textpage.Key, "umbTextpage", Constants.Security.SuperUserKey, CancellationToken.None));
+
+        Assert.That(await ContentService.CountAsync(null, CancellationToken.None), Is.EqualTo(countBefore));
+    }
+
+    [Test]
+    public async Task CreateAndSaveAsync_WithParent_NameTooLong_ThrowsAndPersistsNothing()
+    {
+        var countBefore = await ContentService.CountAsync(null, CancellationToken.None);
+
+        Assert.ThrowsAsync<InvalidOperationException>(() => ContentService.CreateAndSaveAsync(
+            new string('a', 256), Textpage, "umbTextpage", Constants.Security.SuperUserKey, CancellationToken.None));
+
+        Assert.That(await ContentService.CountAsync(null, CancellationToken.None), Is.EqualTo(countBefore));
+    }
+
+    [Test]
     public async Task MoveToRecycleBinAsync_MovingNotificationCancelled_ReturnsCancelledStatusAndDoesNotMove()
     {
         ContentNotificationHandler.MovingContentToRecycleBin = notification =>

@@ -100,8 +100,8 @@ internal abstract class AsyncContentEditingServiceBase<TContent, TContentType, T
     /// <param name="parentKey">The new parent key, or null for root.</param>
     /// <param name="includeDescendants">Whether to move the descendants along with the content.</param>
     /// <param name="userKey">The user performing the operation.</param>
-    /// <returns>The operation result.</returns>
-    protected abstract Task<OperationResult?> MoveAsync(TContent content, Guid? parentKey, bool includeDescendants, Guid userKey);
+    /// <returns>The status of the move.</returns>
+    protected abstract Task<ContentEditingOperationStatus> MoveAsync(TContent content, Guid? parentKey, bool includeDescendants, Guid userKey);
 
     /// <summary>
     /// Copies content to a new parent.
@@ -118,7 +118,7 @@ internal abstract class AsyncContentEditingServiceBase<TContent, TContentType, T
     /// Moves content to the recycle bin.
     /// </summary>
     /// <param name="content">The content to move to recycle bin.</param>
-    /// <param name="userId">The user performing the operation.</param>
+    /// <param name="userKey">The user performing the operation.</param>
     /// <returns>The operation result.</returns>
     protected abstract Task<OperationResult?> MoveToRecycleBinAsync(TContent content, Guid userKey);
 
@@ -126,7 +126,7 @@ internal abstract class AsyncContentEditingServiceBase<TContent, TContentType, T
     /// Deletes content.
     /// </summary>
     /// <param name="content">The content to delete.</param>
-    /// <param name="userId">The user performing the operation.</param>
+    /// <param name="userKey">The user performing the operation.</param>
     /// <returns>The operation result.</returns>
     protected abstract Task<OperationResult?> DeleteAsync(TContent content, Guid userKey);
 
@@ -450,11 +450,13 @@ internal abstract class AsyncContentEditingServiceBase<TContent, TContentType, T
             }
         }
 
-        OperationResult? moveResult = await MoveAsync(content, parentKey, includeDescendants, userKey);
+        ContentEditingOperationStatus moveStatus = await MoveAsync(content, parentKey, includeDescendants, userKey);
 
         scope.Complete();
 
-        return OperationResultToAttempt(content, moveResult);
+        return moveStatus == ContentEditingOperationStatus.Success
+            ? Attempt.SucceedWithStatus<TContent?, ContentEditingOperationStatus>(moveStatus, content)
+            : Attempt.FailWithStatus<TContent?, ContentEditingOperationStatus>(moveStatus, content);
     }
 
     /// <summary>
@@ -530,11 +532,11 @@ internal abstract class AsyncContentEditingServiceBase<TContent, TContentType, T
     protected async Task<int> GetUserIdAsync(Guid userKey) => await _userIdKeyResolver.GetAsync(userKey);
 
     /// <summary>
-    /// Gets the user key from the user ID.
+    /// Gets the content type and validates that the variants of the editing model match its variance.
     /// </summary>
-    /// <param name="userId">The user ID.</param>
-    /// <returns>The user key.</returns>
-
+    /// <param name="contentTypeKey">The key of the content type.</param>
+    /// <param name="contentEditingModelBase">The editing model whose variants are validated against the content type.</param>
+    /// <returns>An attempt containing the content type and operation status.</returns>
     protected virtual async Task<Attempt<TContentType?, ContentEditingOperationStatus>> TryGetAndValidateContentTypeAsync(Guid contentTypeKey, ContentEditingModelBase contentEditingModelBase)
     {
         TContentType? contentType = await ContentTypeService.GetAsync(contentTypeKey);

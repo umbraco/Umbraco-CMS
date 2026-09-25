@@ -43,4 +43,17 @@ public partial class ElementServiceTests : UmbracoIntegrationTest
         Assert.That(element.Name, Is.EqualTo("My Element"));
         Assert.That(element.GetValue<string>("title"), Is.EqualTo("The Element Title"));
     }
+
+    [Test]
+    public async Task DeleteOfTypesAsync_WithUnknownElementTypeKey_ReportsNotFound()
+    {
+        Attempt<ContentDeleteOfTypesOperationStatus> result = await ElementService.DeleteOfTypesAsync(
+            [Guid.NewGuid()], Constants.Security.SuperUserKey, CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Success, Is.False);
+            Assert.That(result.Result, Is.EqualTo(ContentDeleteOfTypesOperationStatus.NotFound));
+        });
+    }
 }

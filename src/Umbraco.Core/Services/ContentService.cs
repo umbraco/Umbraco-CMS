@@ -115,9 +115,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
     #region Permissions
 
     /// <inheritdoc />
-#pragma warning disable CS0618 // Type or member is obsolete
     public async Task SetPermissionsAsync(EntityPermissionSet permissionSet, CancellationToken cancellationToken)
-#pragma warning restore CS0618 // Type or member is obsolete
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.WriteLock(Constants.Locks.ContentTree);
@@ -126,9 +124,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
     }
 
     /// <inheritdoc />
-#pragma warning disable CS0618 // Type or member is obsolete
     public async Task SetPermissionAsync(IContent entity, string permission, IEnumerable<Guid> groupKeys, CancellationToken cancellationToken)
-#pragma warning restore CS0618 // Type or member is obsolete
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.WriteLock(Constants.Locks.ContentTree);
@@ -232,7 +228,8 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
             ? new Content(name, parent, contentType, userId)
             : new Content(name, Constants.System.Root, contentType, userId);
 
-        await SaveAsync(content, userKey, null, cancellationToken);
+        Attempt<ContentSaveOperationStatus> saveResult = await SaveAsync(content, userKey, null, cancellationToken);
+        ThrowIfSaveRejected(content, saveResult);
 
         scope.Complete();
 
@@ -256,10 +253,26 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
 
         var content = new Content(name, parent, contentType, userId);
 
-        await SaveAsync(content, userKey, null, cancellationToken);
+        Attempt<ContentSaveOperationStatus> saveResult = await SaveAsync(content, userKey, null, cancellationToken);
+        ThrowIfSaveRejected(content, saveResult);
 
         scope.Complete();
         return content;
+    }
+
+    // Saving rejects an invalid name or published state with a status; creating-and-saving surfaces it as an
+    // exception so the caller is never handed back an item that was silently left unsaved.
+    private static void ThrowIfSaveRejected(IContent content, Attempt<ContentSaveOperationStatus> saveResult)
+    {
+        switch (saveResult.Result)
+        {
+            case ContentSaveOperationStatus.InvalidPublishedState:
+                throw new InvalidOperationException(
+                    $"Cannot save (un)publishing content with name: {content.Name} - and state: {content.PublishedState}.");
+            case ContentSaveOperationStatus.InvalidName:
+                throw new InvalidOperationException(
+                    $"Content with the name {content.Name} cannot be more than 255 characters in length.");
+        }
     }
 
     #endregion
@@ -889,8 +902,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
 
         int parentId = parent?.Id ?? Constants.System.Root;
 
-        // Content.ParentKey can throw for content whose parent key was never populated (e.g. built and
-        // saved without a subsequent reload) - comparing the resolved int id instead is always safe.
+        // A null ParentKey means either "at the root" or "not populated", so the int id is the unambiguous comparison.
         if (content.ParentId == parentId)
         {
             scope.Complete();
@@ -1135,9 +1147,6 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
     {
         EventMessages eventMessages = EventMessagesFactory.Get();
 
-        // keep track of updates (copied item key and parent key) for the in-memory navigation structure
-        var navigationUpdates = new List<Tuple<Guid, Guid?>>();
-
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.WriteLock(Constants.Locks.ContentTree);
 
@@ -1201,9 +1210,6 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
 
         // save and flush because we need the ID for the recursive Copying events
         await _documentRepository.SaveAsync(copy, cancellationToken);
-
-        // store navigation update information for copied item
-        navigationUpdates.Add(Tuple.Create(copy.Key, parentKey.HasValue ? copy.ParentKey : null));
 
         // add permissions
         if (currentPermissions.Count > 0)
@@ -1278,9 +1284,6 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
 
                     // save and flush (see above)
                     await _documentRepository.SaveAsync(descendantCopy, cancellationToken);
-
-                    // store navigation update information for descendants
-                    navigationUpdates.Add(Tuple.Create(descendantCopy.Key, descendantCopy.ParentKey));
 
                     copies.Add(Tuple.Create(descendant, descendantCopy));
                     idmap[descendant.Id] = descendantCopy.Id;

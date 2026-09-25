@@ -556,7 +556,7 @@ internal sealed class ElementEditingService
     }
 
     // NOTE: We have a custom implementation for Move because ContentEditingServiceBase has no concept of Containers.
-    protected override Task<OperationResult?> MoveAsync(IElement element, Guid? parentKey, bool includeDescendants, Guid userKey) => throw new NotImplementedException();
+    protected override Task<ContentEditingOperationStatus> MoveAsync(IElement element, Guid? parentKey, bool includeDescendants, Guid userKey) => throw new NotImplementedException();
 
     private async Task<ContentEditingOperationStatus> SaveAsync(IElement content, Guid userKey)
     {
@@ -565,11 +565,10 @@ internal sealed class ElementEditingService
             Attempt<ContentSaveOperationStatus> saveResult = await ContentService.SaveAsync(content, userKey, null, CancellationToken.None);
             return saveResult.Result switch
             {
-                // these are the only result states currently expected from SaveAsync
                 ContentSaveOperationStatus.Success => ContentEditingOperationStatus.Success,
                 ContentSaveOperationStatus.CancelledByNotification => ContentEditingOperationStatus.CancelledByNotification,
-
-                // for any other state we'll return "unknown" so we know that we need to amend this
+                ContentSaveOperationStatus.InvalidName => ContentEditingOperationStatus.NotAllowed,
+                ContentSaveOperationStatus.InvalidPublishedState => ContentEditingOperationStatus.Unknown,
                 _ => ContentEditingOperationStatus.Unknown
             };
         }

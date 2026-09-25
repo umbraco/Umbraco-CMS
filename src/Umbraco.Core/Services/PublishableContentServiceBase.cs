@@ -215,9 +215,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
 
     #region Rollback
 
-    // No longer an interface member (retired from the synchronous content-service contract in favour of
-    // RollbackAsync) — kept as a plain method because ElementService.RollbackAsync bridges to it
-    // until Element has its own async repository.
+    // Bridges ElementService.RollbackAsync until elements have an async repository.
     public OperationResult Rollback(int id, int versionId, string culture = "*", int userId = Constants.Security.SuperUserId)
     {
         EventMessages evtMsgs = EventMessagesFactory.Get();
@@ -399,10 +397,12 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
             return new ContentScheduleCollection();
         }
 
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             scope.ReadLock(ReadLockIds);
-            return _contentRepository.GetContentSchedule(idAttempt.Result);
+            ContentScheduleCollection schedule = _contentRepository.GetContentSchedule(idAttempt.Result);
+            scope.Complete();
+            return schedule;
         }
     }
 
@@ -444,9 +444,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         return guidKeyedResults;
     }
 
-    // No longer an interface member (retired from the synchronous content-service contract in favour of
-    // PersistContentScheduleAsync) — kept as a plain method because ElementService.PersistContentScheduleAsync
-    // bridges to it until Element has its own async repository.
+    // Bridges ElementService.PersistContentScheduleAsync until elements have an async repository.
     public void PersistContentSchedule(IPublishableContentBase content, ContentScheduleCollection contentSchedule)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
@@ -457,9 +455,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         }
     }
 
-    // No longer an interface member (retired from the synchronous content-service contract in favour of
-    // GetByIdsAsync) — kept as a plain method because ElementService.GetByIdsAsync bridges to it
-    // (Task.FromResult(GetByIds(ids))) until Element has its own async repository.
+    // Bridges ElementService.GetByIdsAsync until elements have an async repository.
     public IEnumerable<TContent> GetByIds(IEnumerable<Guid> ids)
     {
         Guid[] idsA = ids.ToArray();
@@ -801,9 +797,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         return OperationResult.Succeed(eventMessages);
     }
 
-    // No longer an interface member (retired from IAsyncContentServiceBase<TContent> in favour of
-    // SaveAsync) — kept as a plain method because ElementService.SaveAsync bridges to it until Element
-    // has its own async repository.
+    // Bridges ElementService.SaveAsync until elements have an async repository.
     public OperationResult Save(IEnumerable<TContent> contents, int userId = Constants.Security.SuperUserId)
     {
         EventMessages eventMessages = EventMessagesFactory.Get();

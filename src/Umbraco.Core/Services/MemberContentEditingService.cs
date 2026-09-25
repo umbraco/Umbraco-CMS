@@ -119,7 +119,7 @@ internal sealed class MemberContentEditingService
         => throw new NotSupportedException("Member creation is not supported by this service. This should never be called.");
 
     /// <inheritdoc />
-    protected override Task<OperationResult?> MoveAsync(IMember member, Guid? parentKey, bool includeDescendants, Guid userKey)
+    protected override Task<ContentEditingOperationStatus> MoveAsync(IMember member, Guid? parentKey, bool includeDescendants, Guid userKey)
         => throw new InvalidOperationException("Move is not supported for members");
 
     /// <inheritdoc />
