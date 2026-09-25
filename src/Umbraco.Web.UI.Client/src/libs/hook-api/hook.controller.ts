@@ -15,7 +15,7 @@ export class UmbHookController<ValueType, MetaType extends Record<string, unknow
 	}
 
 	async execute(data: ValueType | Promise<ValueType>, meta: MetaType): Promise<ValueType> {
-		const sortedEntries = [...this.#entries].sort((a, b) => a.weight - b.weight);
+		const sortedEntries = [...this.#entries].sort((a, b) => b.weight - a.weight);
 
 		const result = await sortedEntries.reduce(async (prev: ValueType | Promise<ValueType>, entry) => {
 			const prevResolved = await prev;

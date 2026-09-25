@@ -12,17 +12,17 @@ describe('UmbHookController', () => {
 
 	it('returns initial data when no hooks are registered', async () => {
 		const data: TestData = { value: 1 };
-		const result = await hook.execute(data);
+		const result = await hook.execute(data, {});
 		expect(result).to.equal(data);
 	});
 
 	it('single hook transforms data', async () => {
 		hook.add((data) => ({ ...data, value: data.value + 10 }));
-		const result = await hook.execute({ value: 1 });
+		const result = await hook.execute({ value: 1 }, {});
 		expect(result.value).to.equal(11);
 	});
 
-	it('executes hooks in ascending weight order', async () => {
+	it('executes hooks in descending weight order', async () => {
 		const log: Array<number> = [];
 
 		hook.add((data) => {
@@ -40,8 +40,8 @@ describe('UmbHookController', () => {
 			return data;
 		}, 30);
 
-		await hook.execute({ value: 0 });
-		expect(log).to.deep.equal([10, 20, 30]);
+		await hook.execute({ value: 0 }, {});
+		expect(log).to.deep.equal([30, 20, 10]);
 	});
 
 	it('maintains insertion order for same weight', async () => {
@@ -62,7 +62,7 @@ describe('UmbHookController', () => {
 			return data;
 		}, 0);
 
-		await hook.execute({ value: 0 });
+		await hook.execute({ value: 0 }, {});
 		expect(log).to.deep.equal(['first', 'second', 'third']);
 	});
 
@@ -84,8 +84,8 @@ describe('UmbHookController', () => {
 			return data;
 		}, -1);
 
-		await hook.execute({ value: 0 });
-		expect(log).to.deep.equal(['weight-neg1', 'default', 'weight-1']);
+		await hook.execute({ value: 0 }, {});
+		expect(log).to.deep.equal(['weight-1', 'default', 'weight-neg1']);
 	});
 
 	it('awaits async hooks', async () => {
@@ -97,7 +97,7 @@ describe('UmbHookController', () => {
 
 		hook.add((data) => ({ ...data, value: data.value * 2 }));
 
-		const result = await hook.execute({ value: 1 });
+		const result = await hook.execute({ value: 1 }, {});
 		expect(result.value).to.equal(12);
 	});
 
@@ -107,7 +107,7 @@ describe('UmbHookController', () => {
 				data.value = 42;
 				return data;
 			},
-			0,
+			1,
 		);
 
 		hook.add(
@@ -115,10 +115,10 @@ describe('UmbHookController', () => {
 				data.log = [`received:${data.value}`];
 				return data;
 			},
-			1,
+			0,
 		);
 
-		const result = await hook.execute({ value: 0 });
+		const result = await hook.execute({ value: 0 }, {});
 		expect(result.value).to.equal(42);
 		expect(result.log).to.deep.equal(['received:42']);
 	});
@@ -126,7 +126,7 @@ describe('UmbHookController', () => {
 	it('short-circuits when a hook throws', async () => {
 		let thirdCalled = false;
 
-		hook.add((data) => ({ ...data, value: 1 }), 0);
+		hook.add((data) => ({ ...data, value: 1 }), 2);
 
 		hook.add(() => {
 			throw new Error('cancelled');
@@ -135,10 +135,10 @@ describe('UmbHookController', () => {
 		hook.add((data) => {
 			thirdCalled = true;
 			return data;
-		}, 2);
+		}, 0);
 
 		try {
-			await hook.execute({ value: 0 });
+			await hook.execute({ value: 0 }, {});
 			expect.fail('should have thrown');
 		} catch (e) {
 			expect((e as Error).message).to.equal('cancelled');
@@ -150,7 +150,7 @@ describe('UmbHookController', () => {
 	it('short-circuits on async rejection', async () => {
 		let thirdCalled = false;
 
-		hook.add((data) => ({ ...data, value: 1 }), 0);
+		hook.add((data) => ({ ...data, value: 1 }), 2);
 
 		hook.add(async () => {
 			return Promise.reject(new Error('async cancel'));
@@ -159,10 +159,10 @@ describe('UmbHookController', () => {
 		hook.add((data) => {
 			thirdCalled = true;
 			return data;
-		}, 2);
+		}, 0);
 
 		try {
-			await hook.execute({ value: 0 });
+			await hook.execute({ value: 0 }, {});
 			expect.fail('should have thrown');
 		} catch (e) {
 			expect((e as Error).message).to.equal('async cancel');
@@ -180,7 +180,7 @@ describe('UmbHookController', () => {
 
 		hook.remove(addTen);
 
-		const result = await hook.execute({ value: 0 });
+		const result = await hook.execute({ value: 0 }, {});
 		expect(result.value).to.equal(5);
 	});
 
@@ -188,7 +188,7 @@ describe('UmbHookController', () => {
 		hook.add((data) => ({ ...data, value: 999 }));
 		hook.destroy();
 
-		const result = await hook.execute({ value: 1 });
+		const result = await hook.execute({ value: 1 }, {});
 		expect(result.value).to.equal(1);
 	});
 });
