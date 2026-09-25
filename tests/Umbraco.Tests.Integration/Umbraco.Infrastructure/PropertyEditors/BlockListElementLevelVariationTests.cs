@@ -123,12 +123,12 @@ internal sealed partial class BlockListElementLevelVariationTests : BlockEditorE
         };
     }
 
-    private void PublishContent(IContent content, IContentType contentType, string[]? culturesToPublish = null)
+    private void PublishContent(IContent content, IContentType contentType, string[]? culturesToPublish = null, int userId = Constants.Security.SuperUserId)
     {
         culturesToPublish ??= contentType.VariesByCulture()
             ? ["en-US", "da-DK"]
             : ["*"];
-        PublishContent(content, culturesToPublish);
+        PublishContent(content, culturesToPublish, userId);
     }
 
     private async Task<IPublishedContent> CreatePublishedContent(ContentVariation variation, IList<BlockPropertyValue> blockContentValues, IList<BlockPropertyValue> blockSettingsValues)

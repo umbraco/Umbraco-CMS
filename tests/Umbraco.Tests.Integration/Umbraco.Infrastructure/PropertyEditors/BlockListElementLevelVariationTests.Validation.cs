@@ -355,7 +355,6 @@ internal partial class BlockListElementLevelVariationTests
         => await Can_Validate_Missing_Properties_Nested_Blocks_Specific_Culture_Only(true);
 
     [Test]
-    // TODO KJA: Fix this; block editor validation must take into account the current HasAccessToInvariantForVariant state
     public async Task Can_Validate_Missing_Properties_Nested_Blocks_Specific_Culture_Only_Without_AllowEditInvariantFromNonDefault()
         => await Can_Validate_Missing_Properties_Nested_Blocks_Specific_Culture_Only(false);
 
@@ -466,7 +465,8 @@ internal partial class BlockListElementLevelVariationTests
                 ]
             },
             contentType,
-            new[] { "da-DK" });
+            culturesToValidate: ["da-DK"],
+            validateCultureInvariantProperties: expectedInvariantValidationErrors);
 
         var errors = result.ValidationErrors.ToArray();
 

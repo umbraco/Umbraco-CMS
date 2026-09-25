@@ -1754,7 +1754,6 @@ internal partial class BlockListElementLevelVariationTests
     }
 
     [Test]
-    // TODO KJA: Fix this; block editor publishing must take into account the current HasAccessToInvariantForVariant state
     public async Task Cannot_Publish_Invariant_Properties_Without_Default_Culture_Without_AllowEditInvariantFromNonDefault()
     {
         var elementType = await CreateElementType(ContentVariation.Culture);
@@ -1794,7 +1793,9 @@ internal partial class BlockListElementLevelVariationTests
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
         ContentService.Save(content);
 
-        PublishContent(content, contentType, ["da-DK"]);
+        var userId = (await CreateLimitedUser(false)).Id;
+
+        PublishContent(content, contentType, ["da-DK"], userId);
 
         AssertPropertyValues("en-US", 0);
 
