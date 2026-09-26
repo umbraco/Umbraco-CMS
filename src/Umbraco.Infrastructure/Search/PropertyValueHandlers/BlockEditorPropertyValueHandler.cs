@@ -428,7 +428,7 @@ internal abstract class BlockEditorPropertyValueHandler : IPropertyValueHandler
 
             try
             {
-                AmendWithElementIndexValues(element, propertyCultures, segment, published, contentContext, cumulativeIndexValuesByVariation);
+                AmendWithElementIndexValues(element, propertyCultures, culture, segment, published, contentContext, cumulativeIndexValuesByVariation);
             }
             finally
             {
@@ -440,6 +440,7 @@ internal abstract class BlockEditorPropertyValueHandler : IPropertyValueHandler
     private void AmendWithElementIndexValues(
         IElement element,
         string?[] propertyCultures,
+        string? culture,
         string? segment,
         bool published,
         IContentBase contentContext,
@@ -452,8 +453,9 @@ internal abstract class BlockEditorPropertyValueHandler : IPropertyValueHandler
                 foreach (IndexField elementPropertyIndexField in GetElementPropertyIndexFields(elementProperty, propertyCulture, segment, published, contentContext))
                 {
                     // re-home the value under the requested segment - the segment the containing block is actually
-                    // indexed under - exactly as a locally contained block's value is.
-                    (string? Culture, string? Segment) variation = (elementPropertyIndexField.Culture, segment);
+                    // indexed under - and an invariant value under the culture of the containing property when that
+                    // property itself varies, exactly as a locally contained block's value is.
+                    (string? Culture, string? Segment) variation = (elementPropertyIndexField.Culture ?? culture, segment);
                     if (cumulativeIndexValuesByVariation.TryGetValue(variation, out CumulativeIndexValue? elementIndexValue) is false)
                     {
                         elementIndexValue = new CumulativeIndexValue();

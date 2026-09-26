@@ -51,8 +51,8 @@ public class ExternalBlockElementVarianceTests : ContentTestBase
     [Test]
     public async Task Can_Index_Invariant_And_Variant_Block_Content_On_Culture_Variant_Block_List_Property()
     {
-        // a second language, so the invariant content can be shown to be indexed once under the invariant
-        // variation rather than repeated under every culture
+        // a second language, so the invariant content can be shown to be indexed under every culture of the
+        // containing property rather than under a shared invariant variation
         await LanguageService.CreateAsync(
             new LanguageBuilder().WithCultureInfo("da-DK").Build(),
             Constants.Security.SuperUserKey);
@@ -197,28 +197,27 @@ public class ExternalBlockElementVarianceTests : ContentTestBase
 
         TestIndexDocument document = IndexerAndSearcher.Dump(IndexAliases.PublishedContent).Single();
 
-        // invariant content is indexed once, under the invariant variation - not repeated under each culture
-        IndexValue? invariantValue = document.Fields.SingleOrDefault(f => f is { FieldName: "blocks", Culture: null })?.Value;
-        Assert.That(invariantValue, Is.Not.Null, "Invariant blocks/properties should still be indexed even though the containing block-list property varies by culture.");
-        CollectionAssert.AreEquivalent(
-            new[]
-            {
-                "Invariant text in local mixed element", "Invariant text in local invariant element",
-                "Invariant text in external invariant element", "Invariant text in external mixed element",
-            },
-            invariantValue.Texts);
+        // the block-list property varies by culture, so each culture's value owns all of its content - invariant
+        // blocks/properties included - and nothing collapses into a shared invariant variation
+        Assert.That(document.Fields.Any(f => f is { FieldName: "blocks", Culture: null }), Is.False);
 
-        // each culture carries only its own content, local and external alike
+        string[] invariantTexts =
+        [
+            "Invariant text in local mixed element", "Invariant text in local invariant element",
+            "Invariant text in external invariant element", "Invariant text in external mixed element",
+        ];
+
+        // each culture carries only its own variant content, local and external alike
         IndexValue? englishValue = document.Fields.SingleOrDefault(f => f is { FieldName: "blocks", Culture: "en-US" })?.Value;
         Assert.That(englishValue, Is.Not.Null);
         CollectionAssert.AreEquivalent(
-            new[] { "Variant text EN in local mixed element", "Variant text EN in external mixed element" },
+            invariantTexts.Concat(["Variant text EN in local mixed element", "Variant text EN in external mixed element"]),
             englishValue.Texts);
 
         IndexValue? danishValue = document.Fields.SingleOrDefault(f => f is { FieldName: "blocks", Culture: "da-DK" })?.Value;
         Assert.That(danishValue, Is.Not.Null);
         CollectionAssert.AreEquivalent(
-            new[] { "Variant text DA in local mixed element", "Variant text DA in external mixed element" },
+            invariantTexts.Concat(["Variant text DA in local mixed element", "Variant text DA in external mixed element"]),
             danishValue.Texts);
     }
 
