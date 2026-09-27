@@ -74,7 +74,7 @@ internal sealed class ContentTypeIndexingService : IContentTypeIndexingService
         => objectType switch
         {
             UmbracoObjectTypes.Document => await GetDocumentKeysByContentTypesAsync(contentTypeKeys),
-            UmbracoObjectTypes.Media => GetMediaKeysByMediaTypes(contentTypeKeys),
+            UmbracoObjectTypes.Media => await GetMediaKeysByMediaTypesAsync(contentTypeKeys),
             UmbracoObjectTypes.Member => await GetMemberKeysByMemberTypesAsync(contentTypeKeys),
             _ => [],
         };
@@ -111,12 +111,10 @@ internal sealed class ContentTypeIndexingService : IContentTypeIndexingService
         return keys.ToArray();
     }
 
-    private Guid[] GetMediaKeysByMediaTypes(Guid[] mediaTypeKeys)
+    private async Task<Guid[]> GetMediaKeysByMediaTypesAsync(Guid[] mediaTypeKeys)
     {
-        int[] directMediaTypeIds = mediaTypeKeys
-            .Select(key => _mediaTypeService.Get(key))
-            .Where(mt => mt is not null)
-            .Select(mt => mt!.Id)
+        int[] directMediaTypeIds = (await _mediaTypeService.GetManyAsync(mediaTypeKeys))
+            .Select(mt => mt.Id)
             .ToArray();
 
         if (directMediaTypeIds.Length == 0)
@@ -124,7 +122,7 @@ internal sealed class ContentTypeIndexingService : IContentTypeIndexingService
             return [];
         }
 
-        int[] allMediaTypeIds = ExpandWithDependentContentTypes(_mediaTypeService, directMediaTypeIds);
+        int[] allMediaTypeIds = await ExpandWithDependentMediaTypesAsync(directMediaTypeIds);
 
         var keys = new List<Guid>();
         var pageIndex = 0L;
@@ -168,16 +166,15 @@ internal sealed class ContentTypeIndexingService : IContentTypeIndexingService
         return keys.ToArray();
     }
 
-    private static int[] ExpandWithDependentContentTypes<T>(IContentTypeBaseService<T> contentTypeService, int[] contentTypeIds)
-        where T : IContentTypeComposition
-    {
-        T[] allTypes = contentTypeService.GetAll().ToArray();
-        return ExpandWithDependentContentTypes(allTypes, contentTypeIds);
-    }
-
     private async Task<int[]> ExpandWithDependentContentTypesAsync(int[] contentTypeIds)
     {
         IContentType[] allTypes = (await _contentTypeService.GetAllAsync()).ToArray();
+        return ExpandWithDependentContentTypes(allTypes, contentTypeIds);
+    }
+
+    private async Task<int[]> ExpandWithDependentMediaTypesAsync(int[] contentTypeIds)
+    {
+        IMediaType[] allTypes = (await _mediaTypeService.GetAllAsync()).ToArray();
         return ExpandWithDependentContentTypes(allTypes, contentTypeIds);
     }
 

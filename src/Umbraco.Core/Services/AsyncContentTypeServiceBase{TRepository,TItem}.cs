@@ -20,9 +20,7 @@ namespace Umbraco.Cms.Core.Services;
 /// asynchronous <see cref="IAsyncContentTypeRepositoryBase{TItem}" /> contract.
 /// </summary>
 /// <remarks>
-/// This is the async-first counterpart of <see cref="ContentTypeServiceBase{TRepository, TItem}" />. It is used by the
-/// document-type service while its repository runs on EF Core; the media- and member-type services remain on the
-/// synchronous base until their repositories are migrated.
+/// The base class for every content type service (document, media and member types).
 /// </remarks>
 /// <typeparam name="TRepository">The type of the (asynchronous) content type repository.</typeparam>
 /// <typeparam name="TItem">The type of content type.</typeparam>

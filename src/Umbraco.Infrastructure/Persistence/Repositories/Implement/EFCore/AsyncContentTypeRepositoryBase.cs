@@ -42,7 +42,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.EFCore;
 /// </remarks>
 /// <typeparam name="TEntity">The type of content-type composition managed by the repository.</typeparam>
 internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRepositoryBase<Guid, TEntity>,
-    IContentTypeRepositoryBase<TEntity>,
     IAsyncContentTypeRepositoryBase<TEntity>
     where TEntity : class, IContentTypeComposition
 {
@@ -151,8 +150,7 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
         => Task.CompletedTask;
 
     // ----------------------------------------------------------------------------------------------------
-    // Synchronous IContentTypeRepositoryBase contract (consumed by the shared sync content-type service base).
-    // Reads are served from the FullDataSet cache; writes/deletes/queries bridge to the async work.
+    // Reads served from the FullDataSet cache; queries and counts bridge to the async work below.
     // ----------------------------------------------------------------------------------------------------
 
     private IEnumerable<TEntity> GetAllCached()
@@ -169,40 +167,6 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
     /// ambient for subsequent operations.
     /// </summary>
     private void EnsureAmbientScopeOnCallerContext() => _ = AmbientScope;
-
-    /// <inheritdoc />
-    public TEntity? Get(int id)
-        => GetAllCached().FirstOrDefault(x => x.Id == id);
-
-    /// <inheritdoc />
-    public IEnumerable<TEntity> GetMany(params int[]? ids)
-    {
-        IEnumerable<TEntity> all = GetAllCached();
-        return ids is { Length: > 0 } ? all.Where(x => ids.Contains(x.Id)) : all;
-    }
-
-    /// <inheritdoc />
-    public bool Exists(int id) => GetAllCached().Any(x => x.Id == id);
-
-    /// <inheritdoc />
-    public TEntity? Get(Guid id)
-        => GetAllCached().FirstOrDefault(x => x.Key == id);
-
-    /// <remarks>
-    ///     Explicit implementation to disambiguate from the <see cref="int"/>-keyed <see cref="GetMany(int[])"/>.
-    /// </remarks>
-    IEnumerable<TEntity> IReadRepository<Guid, TEntity>.GetMany(params Guid[]? ids)
-    {
-        IEnumerable<TEntity> all = GetAllCached();
-        return ids is { Length: > 0 } ? all.Where(x => ids.Contains(x.Key)) : all;
-    }
-
-    /// <inheritdoc />
-    public bool Exists(Guid id) => GetAllCached().Any(x => x.Key == id);
-
-    /// <inheritdoc />
-    public TEntity? Get(string alias)
-        => GetAllCached().FirstOrDefault(x => x.Alias.InvariantEquals(alias));
 
     /// <inheritdoc cref="IAsyncReadRepository{TKey,TEntity}.GetAsync" />
     public async Task<TEntity?> GetAsync(int id, CancellationToken cancellationToken)
@@ -222,34 +186,6 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
     /// <inheritdoc />
     public async Task<TEntity?> GetAsync(string alias, CancellationToken cancellationToken)
         => (await GetAllAsync(cancellationToken)).FirstOrDefault(x => x.Alias.InvariantEquals(alias));
-
-    /// <inheritdoc />
-    public void Save(TEntity entity)
-    {
-        EnsureAmbientScopeOnCallerContext();
-        SaveAsync(entity, CancellationToken.None).GetAwaiter().GetResult();
-    }
-
-    /// <inheritdoc />
-    public void Delete(TEntity entity)
-    {
-        EnsureAmbientScopeOnCallerContext();
-        DeleteAsync(entity, CancellationToken.None).GetAwaiter().GetResult();
-    }
-
-    /// <inheritdoc />
-    public IEnumerable<TEntity> Get(IQuery<TEntity> query)
-    {
-        EnsureAmbientScopeOnCallerContext();
-        return PerformGetByQueryAsync(query).GetAwaiter().GetResult().WhereNotNull();
-    }
-
-    /// <inheritdoc />
-    public int Count(IQuery<TEntity>? query)
-    {
-        EnsureAmbientScopeOnCallerContext();
-        return PerformCountAsync(query).GetAwaiter().GetResult();
-    }
 
     /// <inheritdoc />
     public async Task<IEnumerable<TEntity>> GetByParentIdAsync(int parentId, CancellationToken cancellationToken)
@@ -308,7 +244,7 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
 #pragma warning restore EF1002
 
         return ids.Count > 0
-            ? GetMany(ids.ToArray()).OrderBy(x => x.Name)
+            ? (await GetManyAsync(ids.ToArray(), CancellationToken.None)).OrderBy(x => x.Name)
             : Enumerable.Empty<TEntity>();
     }
 

@@ -14,7 +14,7 @@ internal sealed class MediaTypeEditingPresentationFactory : ContentTypeEditingPr
     /// <param name="mediaTypeService">The service used to manage media types.</param>
     /// <param name="containerService">The service used to retrieve media type containers (folders).</param>
     public MediaTypeEditingPresentationFactory(IMediaTypeService mediaTypeService, IMediaTypeContainerService containerService)
-        : base(containerService, () => mediaTypeService.GetAll())
+        : base(containerService, () => mediaTypeService.GetAllAsync().GetAwaiter().GetResult())
     {
     }
 

@@ -46,11 +46,11 @@ public class ExportMediaTypeController : MediaTypeControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [EndpointSummary("Exports a media type.")]
     [EndpointDescription("Exports the media type identified by the provided Id to a downloadable format.")]
-    public IActionResult Export(
+    public async Task<IActionResult> Export(
         CancellationToken cancellationToken,
         Guid id)
     {
-        IMediaType? mediaType = _mediaTypeService.Get(id);
+        IMediaType? mediaType = await _mediaTypeService.GetAsync(id);
         if (mediaType is null)
         {
             return OperationStatusResult(ContentTypeOperationStatus.NotFound);

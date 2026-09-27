@@ -67,7 +67,7 @@ public abstract class UmbracoIntegrationTestWithMediaEditing : UmbracoIntegratio
         // Gets all media types
         var folderMediaTypes = await MediaTypeEditingService.GetFolderMediaTypes(0, 10);
         var folderMediaType = folderMediaTypes.Items.FirstOrDefault(x => x.Alias == "Folder");
-        var mediaTypes = MediaTypeService.GetAll();
+        var mediaTypes = await MediaTypeService.GetAllAsync();
         var mediaTypesList = mediaTypes.ToList();
         var imageMediaType = mediaTypesList.FirstOrDefault(x => x.Alias == "Image");
         imageMediaType.PropertyTypes.First().Mandatory = false;

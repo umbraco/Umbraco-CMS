@@ -93,7 +93,7 @@ internal sealed class PublishedContentFactoryTests : UmbracoIntegrationTestWithC
     public async Task ToIPublishedMedia_Returns_PublishedMedia_For_Media_Item()
     {
         // Arrange - Create media type and media item
-        var imageMediaType = MediaTypeService.Get("Image");
+        var imageMediaType = await MediaTypeService.GetAsync("Image");
         Assert.IsNotNull(imageMediaType, "Image media type should exist");
 
         // Make umbracoFile not mandatory for testing

@@ -17,7 +17,7 @@ internal sealed partial class MediaTypeEditingServiceTests
     [Test]
     public async Task Can_Yield_Multiple_Folder_Media_Types()
     {
-        var imageMediaType = MediaTypeService.Get(Constants.Conventions.MediaTypes.Image);
+        var imageMediaType = await MediaTypeService.GetAsync(Constants.Conventions.MediaTypes.Image);
 
         var createModel = MediaTypeCreateModel("Test Media Type", "testMediaType");
         createModel.Description = "This is the Test description";
@@ -47,7 +47,7 @@ internal sealed partial class MediaTypeEditingServiceTests
         // update the system "Folder" media type so it does not pass the conventions for a "folder" media type
         // - remove all allowed child content types
         // - add an "umbracoFile" property
-        var systemFolderMediaType = MediaTypeService.Get(Constants.Conventions.MediaTypes.Folder)!;
+        var systemFolderMediaType = (await MediaTypeService.GetAsync(Constants.Conventions.MediaTypes.Folder))!;
         var updateModel = MediaTypeUpdateModel(Constants.Conventions.MediaTypes.Folder, Constants.Conventions.MediaTypes.Folder);
         updateModel.Properties = new[]
         {

@@ -9,7 +9,7 @@ using Umbraco.Cms.Core.Services.Navigation;
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Services.Navigation;
 
 /// <summary>
-/// Tests for the per-snapshot descendants cache on <see cref="ContentNavigationServiceBase{TContentType, TContentTypeService}"/>.
+/// Tests for the per-snapshot descendants cache on <see cref="AsyncContentNavigationServiceBase{TContentType, TContentTypeService}"/>.
 /// Functional behaviour of the public API (Add, Move, Sort, Remove, etc.) is exhaustively
 /// covered by the integration suite under <c>DocumentNavigationServiceTests</c>; this fixture
 /// focuses on the cache contract introduced by §2.5: cache-hit identity, mutation

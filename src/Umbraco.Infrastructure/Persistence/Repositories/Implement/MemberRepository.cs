@@ -651,7 +651,7 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
             var contentTypeId = dto.ContentDto.ContentTypeId;
             if (contentTypes.TryGetValue(contentTypeId, out IMemberType? contentType) == false)
             {
-                contentTypes[contentTypeId] = contentType = _memberTypeRepository.Get(contentTypeId);
+                contentTypes[contentTypeId] = contentType = _memberTypeRepository.GetAsync(contentTypeId, CancellationToken.None).GetAwaiter().GetResult();
             }
 
             Member c = content[i] = ContentBaseFactory.BuildEntity(dto, contentType);
@@ -681,7 +681,7 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
 
     private IMember MapDtoToContent(MemberDto dto)
     {
-        IMemberType? memberType = _memberTypeRepository.Get(dto.ContentDto.ContentTypeId);
+        IMemberType? memberType = _memberTypeRepository.GetAsync(dto.ContentDto.ContentTypeId, CancellationToken.None).GetAwaiter().GetResult();
         Member member = ContentBaseFactory.BuildEntity(dto, memberType);
 
         // get properties - indexed by version id

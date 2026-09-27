@@ -9,13 +9,8 @@ namespace Umbraco.Cms.Core.Persistence.Repositories;
 /// <summary>
 ///     Represents an asynchronous base repository for content type composition entities.
 /// </summary>
-/// <remarks>
-///     This is the asynchronous counterpart of <see cref="IContentTypeRepositoryBase{TItem}"/>. Both contracts
-///     coexist for now; the synchronous one will be removed once the media- and member-type repositories have been
-///     migrated to EF Core (out of scope for the document-type migration).
-/// </remarks>
 /// <typeparam name="TItem">The type of content type composition.</typeparam>
-// TODO (EFCore): Rename back to IContentTypeRepositoryBase after all ContentType repositories have been migrated
+// TODO (EFCore): Rename to IContentTypeRepositoryBase now that the synchronous contract of that name is gone.
 public interface IAsyncContentTypeRepositoryBase<TItem>
     : IAsyncReadWriteRepository<Guid, TItem>, IAsyncReadRepository<int, TItem>
     where TItem : IContentTypeComposition

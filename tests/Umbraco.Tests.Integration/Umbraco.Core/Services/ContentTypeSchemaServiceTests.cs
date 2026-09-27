@@ -60,7 +60,7 @@ internal sealed class ContentTypeSchemaServiceTests : UmbracoIntegrationTestWith
         var result = ContentTypeSchemaService.GetMediaTypes();
 
         // Assert - count should match the media type service
-        Assert.That(result, Has.Count.EqualTo(MediaTypeService.Count()));
+        Assert.That(result, Has.Count.EqualTo(MediaTypeService.CountAsync().GetAwaiter().GetResult()));
 
         // Built-in Image media type should be present with its properties
         var imageSchema = result.FirstOrDefault(mt => mt.Alias == "Image");

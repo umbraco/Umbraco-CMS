@@ -375,7 +375,7 @@ internal sealed class MediaServiceTests : UmbracoIntegrationTest
     private Tuple<IMedia, IMedia, IMedia, IMedia, IMedia> CreateTrashedTestMedia()
     {
         // Create and Save folder-Media -> 1050
-        var folderMediaType = MediaTypeService.Get(1031);
+        var folderMediaType = MediaTypeService.GetAsync(1031).GetAwaiter().GetResult();
         var folder = MediaBuilder.CreateMediaFolder(folderMediaType, -1);
         MediaService.Save(folder);
 
@@ -384,7 +384,7 @@ internal sealed class MediaServiceTests : UmbracoIntegrationTest
         MediaService.Save(folder2);
 
         // Create and Save image-Media  -> 1052
-        var imageMediaType = MediaTypeService.Get(1032);
+        var imageMediaType = MediaTypeService.GetAsync(1032).GetAwaiter().GetResult();
         var image = MediaBuilder.CreateMediaImage(imageMediaType, 1050);
         MediaService.Save(image);
 
@@ -581,7 +581,7 @@ internal sealed class MediaServiceTests : UmbracoIntegrationTest
     [Test]
     public void SortChildren_Persists_The_Supplied_Order()
     {
-        var folderMediaType = MediaTypeService.Get(Constants.Conventions.MediaTypes.Folder)!;
+        var folderMediaType = MediaTypeService.GetAsync(Constants.Conventions.MediaTypes.Folder).GetAwaiter().GetResult()!;
 
         var root = MediaBuilder.CreateMediaFolder(folderMediaType, Constants.System.Root);
         root.Name = "Root";

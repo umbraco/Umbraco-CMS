@@ -48,7 +48,7 @@ internal sealed class MediaCacheServiceTests : UmbracoIntegrationTestWithContent
     {
         await base.CreateTestDataAsync();
 
-        MediaType = MediaTypeService.Get("image")!;
+        MediaType = (await MediaTypeService.GetAsync("image"))!;
 
         // Create and Save Media "MediaItem" based on "image" media type
         MediaItem = new MediaBuilder()

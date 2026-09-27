@@ -125,7 +125,7 @@ public partial class ContentEditingServiceTests
         Assert.AreEqual(expectedChildKeys, actualChildKeys);
     }
 
-    // Proves the invariant-name fallback documented in ContentEditingServiceWithSortingBase.BuildOrdering():
+    // Proves the invariant-name fallback documented in AsyncContentEditingServiceWithSortingBase.BuildOrdering():
     // for a mix of variant and invariant children, the culture only selects the variant children's name -
     // invariant children always sort by their single node name and ignore the culture entirely.
     [TestCase("en-US", new[] { 0, 2, 1 })] // en names asc: banana(V0), mango(I2), yankee(V1)

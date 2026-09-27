@@ -1319,7 +1319,7 @@ namespace Umbraco.Cms.Core.Services
 
             scope.ReadLock(Constants.Locks.MemberTypes);
 
-            IMemberType? memberType = _memberTypeRepository.Get(memberTypeAlias);
+            IMemberType? memberType = _memberTypeRepository.GetAsync(memberTypeAlias, CancellationToken.None).GetAwaiter().GetResult();
 
             if (memberType == null)
             {

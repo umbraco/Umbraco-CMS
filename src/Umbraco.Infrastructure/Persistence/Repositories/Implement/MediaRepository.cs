@@ -239,7 +239,7 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
             var contentTypeId = dto.ContentTypeId;
             if (contentTypes.TryGetValue(contentTypeId, out IMediaType? contentType) == false)
             {
-                contentTypes[contentTypeId] = contentType = _mediaTypeRepository.Get(contentTypeId);
+                contentTypes[contentTypeId] = contentType = _mediaTypeRepository.GetAsync(contentTypeId, CancellationToken.None).GetAwaiter().GetResult();
             }
 
             Core.Models.Media c = content[i] = ContentBaseFactory.BuildEntity(dto, contentType);
@@ -269,7 +269,7 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
 
     private IMedia MapDtoToContent(ContentDto dto)
     {
-        IMediaType? contentType = _mediaTypeRepository.Get(dto.ContentTypeId);
+        IMediaType? contentType = _mediaTypeRepository.GetAsync(dto.ContentTypeId, CancellationToken.None).GetAwaiter().GetResult();
         Core.Models.Media media = ContentBaseFactory.BuildEntity(dto, contentType);
 
         // get properties - indexed by version id

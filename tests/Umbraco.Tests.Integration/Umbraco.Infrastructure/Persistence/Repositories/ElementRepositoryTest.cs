@@ -459,7 +459,7 @@ public class ElementRepositoryTest : UmbracoIntegrationTest
 
     [Test]
     [LongRunning]
-    public void GetAllElementsManyVersions()
+    public async Task GetAllElementsManyVersions()
     {
         var provider = ScopeProvider;
         IElement[] result;
@@ -468,7 +468,7 @@ public class ElementRepositoryTest : UmbracoIntegrationTest
         {
             var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository, out DataTypeRepository _);
             var elementType = ContentTypeBuilder.CreateSimpleElementType();
-            contentTypeRepository.Save(elementType);
+            await contentTypeRepository.SaveAsync(elementType, CancellationToken.None);
 
             for (var i = 0; i < 4; i++)
             {
@@ -505,15 +505,15 @@ public class ElementRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void GetPagedResultsByQuery_FilterMatchingSome()
+    public async Task GetPagedResultsByQuery_FilterMatchingSome()
     {
         var provider = ScopeProvider;
         using var scope = provider.CreateScope();
         var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository, out DataTypeRepository _);
         var elementType = ContentTypeBuilder.CreateSimpleElementType();
-        contentTypeRepository.Save(elementType);
+        await contentTypeRepository.SaveAsync(elementType, CancellationToken.None);
         var otherElementType = ContentTypeBuilder.CreateSimpleElementType("otherElementType", "Other Element Type");
-        contentTypeRepository.Save(otherElementType);
+        await contentTypeRepository.SaveAsync(otherElementType, CancellationToken.None);
 
         var element1 = ElementBuilder.CreateSimpleElement(elementType, "Element One");
         var element2 = ElementBuilder.CreateSimpleElement(elementType, "Element Two");
@@ -535,15 +535,15 @@ public class ElementRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void GetPagedResultsByQuery_FilterMatchingAll()
+    public async Task GetPagedResultsByQuery_FilterMatchingAll()
     {
         var provider = ScopeProvider;
         using var scope = provider.CreateScope();
         var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository, out DataTypeRepository _);
         var elementType = ContentTypeBuilder.CreateSimpleElementType();
-        contentTypeRepository.Save(elementType);
+        await contentTypeRepository.SaveAsync(elementType, CancellationToken.None);
         var otherElementType = ContentTypeBuilder.CreateSimpleElementType("otherElementType", "Other Element Type");
-        contentTypeRepository.Save(otherElementType);
+        await contentTypeRepository.SaveAsync(otherElementType, CancellationToken.None);
 
         var element1 = ElementBuilder.CreateSimpleElement(elementType, "Element One");
         var element2 = ElementBuilder.CreateSimpleElement(elementType, "Element Two");
@@ -565,13 +565,13 @@ public class ElementRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void GetPagedResultsByQuery_FirstPage()
+    public async Task GetPagedResultsByQuery_FirstPage()
     {
         var provider = ScopeProvider;
         using var scope = provider.CreateScope();
         var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository, out DataTypeRepository _);
         var elementType = ContentTypeBuilder.CreateSimpleElementType();
-        contentTypeRepository.Save(elementType);
+        await contentTypeRepository.SaveAsync(elementType, CancellationToken.None);
 
         var element1 = ElementBuilder.CreateSimpleElement(elementType, "Element One");
         var element2 = ElementBuilder.CreateSimpleElement(elementType, "Element Two");
@@ -590,13 +590,13 @@ public class ElementRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void GetPagedResultsByQuery_SecondPage()
+    public async Task GetPagedResultsByQuery_SecondPage()
     {
         var provider = ScopeProvider;
         using var scope = provider.CreateScope();
         var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository, out DataTypeRepository _);
         var elementType = ContentTypeBuilder.CreateSimpleElementType();
-        contentTypeRepository.Save(elementType);
+        await contentTypeRepository.SaveAsync(elementType, CancellationToken.None);
 
         var element1 = ElementBuilder.CreateSimpleElement(elementType, "Element One");
         var element2 = ElementBuilder.CreateSimpleElement(elementType, "Element Two");
@@ -615,13 +615,13 @@ public class ElementRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void GetPagedResultsByQuery_SinglePage()
+    public async Task GetPagedResultsByQuery_SinglePage()
     {
         var provider = ScopeProvider;
         using var scope = provider.CreateScope();
         var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository, out DataTypeRepository _);
         var elementType = ContentTypeBuilder.CreateSimpleElementType();
-        contentTypeRepository.Save(elementType);
+        await contentTypeRepository.SaveAsync(elementType, CancellationToken.None);
 
         var element1 = ElementBuilder.CreateSimpleElement(elementType, "Element One");
         var element2 = ElementBuilder.CreateSimpleElement(elementType, "Element Two");
@@ -640,15 +640,15 @@ public class ElementRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void GetPagedResultsByQuery_DescendingOrder()
+    public async Task GetPagedResultsByQuery_DescendingOrder()
     {
         var provider = ScopeProvider;
         using var scope = provider.CreateScope();
         var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository, out DataTypeRepository _);
         var elementType = ContentTypeBuilder.CreateSimpleElementType();
-        contentTypeRepository.Save(elementType);
+        await contentTypeRepository.SaveAsync(elementType, CancellationToken.None);
         var otherElementType = ContentTypeBuilder.CreateSimpleElementType("otherElementType", "Other Element Type");
-        contentTypeRepository.Save(otherElementType);
+        await contentTypeRepository.SaveAsync(otherElementType, CancellationToken.None);
 
         var element1 = ElementBuilder.CreateSimpleElement(elementType, "Element A");
         var element2 = ElementBuilder.CreateSimpleElement(elementType, "Element B");
@@ -669,13 +669,13 @@ public class ElementRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void GetAllElementsByIds()
+    public async Task GetAllElementsByIds()
     {
         var provider = ScopeProvider;
         using var scope = provider.CreateScope();
         var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository, out DataTypeRepository _);
         var elementType = ContentTypeBuilder.CreateSimpleElementType();
-        contentTypeRepository.Save(elementType);
+        await contentTypeRepository.SaveAsync(elementType, CancellationToken.None);
 
         var element1 = ElementBuilder.CreateSimpleElement(elementType, "Element One");
         var element2 = ElementBuilder.CreateSimpleElement(elementType, "Element Two");
@@ -695,13 +695,13 @@ public class ElementRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void GetAllElements()
+    public async Task GetAllElements()
     {
         var provider = ScopeProvider;
         using var scope = provider.CreateScope();
         var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository, out DataTypeRepository _);
         var elementType = ContentTypeBuilder.CreateSimpleElementType();
-        contentTypeRepository.Save(elementType);
+        await contentTypeRepository.SaveAsync(elementType, CancellationToken.None);
 
         repository.Save(ElementBuilder.CreateSimpleElement(elementType, "Element One"));
         repository.Save(ElementBuilder.CreateSimpleElement(elementType, "Element Two"));
@@ -720,13 +720,13 @@ public class ElementRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void GetElement()
+    public async Task GetElement()
     {
         var provider = ScopeProvider;
         using var scope = provider.CreateScope();
         var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository, out DataTypeRepository _);
         var elementType = ContentTypeBuilder.CreateSimpleElementType();
-        contentTypeRepository.Save(elementType);
+        await contentTypeRepository.SaveAsync(elementType, CancellationToken.None);
 
         var saved = ElementBuilder.CreateSimpleElement(elementType, "Element One");
         repository.Save(saved);
@@ -748,13 +748,13 @@ public class ElementRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void QueryElement()
+    public async Task QueryElement()
     {
         var provider = ScopeProvider;
         using var scope = provider.CreateScope();
         var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository, out DataTypeRepository _);
         var elementType = ContentTypeBuilder.CreateSimpleElementType();
-        contentTypeRepository.Save(elementType);
+        await contentTypeRepository.SaveAsync(elementType, CancellationToken.None);
 
         var element1 = ElementBuilder.CreateSimpleElement(elementType, "Element One");
         var element2 = ElementBuilder.CreateSimpleElement(elementType, "Element Two");
@@ -768,13 +768,13 @@ public class ElementRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void ExistElement()
+    public async Task ExistElement()
     {
         var provider = ScopeProvider;
         using var scope = provider.CreateScope();
         var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository, out DataTypeRepository _);
         var elementType = ContentTypeBuilder.CreateSimpleElementType();
-        contentTypeRepository.Save(elementType);
+        await contentTypeRepository.SaveAsync(elementType, CancellationToken.None);
 
         var element = ElementBuilder.CreateSimpleElement(elementType);
         repository.Save(element);
@@ -787,15 +787,15 @@ public class ElementRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void CountElement()
+    public async Task CountElement()
     {
         var provider = ScopeProvider;
         using var scope = provider.CreateScope();
         var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository, out DataTypeRepository _);
         var elementType = ContentTypeBuilder.CreateSimpleElementType();
-        contentTypeRepository.Save(elementType);
+        await contentTypeRepository.SaveAsync(elementType, CancellationToken.None);
         var otherElementType = ContentTypeBuilder.CreateSimpleElementType("otherElementType", "Other Element Type");
-        contentTypeRepository.Save(otherElementType);
+        await contentTypeRepository.SaveAsync(otherElementType, CancellationToken.None);
 
         repository.Save(ElementBuilder.CreateSimpleElement(elementType, "Element One"));
         repository.Save(ElementBuilder.CreateSimpleElement(elementType, "Element Two"));
@@ -808,7 +808,7 @@ public class ElementRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void PropertyDataAssignedCorrectly()
+    public async Task PropertyDataAssignedCorrectly()
     {
         var provider = ScopeProvider;
         using var scope = provider.CreateScope();
@@ -816,8 +816,8 @@ public class ElementRepositoryTest : UmbracoIntegrationTest
 
         var emptyContentType = ContentTypeBuilder.CreateBasicElementType();
         var hasPropertiesContentType = ContentTypeBuilder.CreateSimpleElementType("elementTypeWithProps", "Element With Props");
-        contentTypeRepository.Save(emptyContentType);
-        contentTypeRepository.Save(hasPropertiesContentType);
+        await contentTypeRepository.SaveAsync(emptyContentType, CancellationToken.None);
+        await contentTypeRepository.SaveAsync(hasPropertiesContentType, CancellationToken.None);
 
         var element1 = ElementBuilder.CreateSimpleElement(hasPropertiesContentType, "Element One");
         var element2 = ElementBuilder.CreateBasicElement(emptyContentType);
@@ -845,13 +845,13 @@ public class ElementRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void DeleteElement()
+    public async Task DeleteElement()
     {
         var provider = ScopeProvider;
         using var scope = provider.CreateScope();
         var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository, out DataTypeRepository _);
         var elementType = ContentTypeBuilder.CreateSimpleElementType();
-        contentTypeRepository.Save(elementType);
+        await contentTypeRepository.SaveAsync(elementType, CancellationToken.None);
 
         var element = ElementBuilder.CreateSimpleElement(elementType);
         repository.Save(element);
@@ -863,13 +863,13 @@ public class ElementRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void QueryElementByUniqueId()
+    public async Task QueryElementByUniqueId()
     {
         var provider = ScopeProvider;
         using var scope = provider.CreateScope();
         var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository, out DataTypeRepository _);
         var elementType = ContentTypeBuilder.CreateSimpleElementType();
-        contentTypeRepository.Save(elementType);
+        await contentTypeRepository.SaveAsync(elementType, CancellationToken.None);
 
         var element = ElementBuilder.CreateSimpleElement(elementType);
         element.Key = new Guid("A5C3A9D2-6B0E-4F1A-9E7C-3D8B2C1E4F60");
@@ -883,7 +883,7 @@ public class ElementRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void GetPagedResultsByQuery_With_Variant_Names()
+    public async Task GetPagedResultsByQuery_With_Variant_Names()
     {
         var provider = ScopeProvider;
         using var scope = provider.CreateScope();
@@ -897,7 +897,7 @@ public class ElementRepositoryTest : UmbracoIntegrationTest
             propertyType.Variations = ContentVariation.Nothing;
         }
 
-        contentTypeRepository.Save(invariantElementType);
+        await contentTypeRepository.SaveAsync(invariantElementType, CancellationToken.None);
 
         // One variant (by culture) element type, every 2nd property variant by culture, the rest invariant
         var variantElementType = (ContentType)ContentTypeBuilder.CreateSimpleElementType("variantElementType", "Variant Element Type");
@@ -908,7 +908,7 @@ public class ElementRepositoryTest : UmbracoIntegrationTest
             propertyTypes[i].Variations = i % 2 == 0 ? ContentVariation.Culture : ContentVariation.Nothing;
         }
 
-        contentTypeRepository.Save(variantElementType);
+        await contentTypeRepository.SaveAsync(variantElementType, CancellationToken.None);
 
         var elements = new List<IElement>();
         for (var i = 0; i < 10; i++)
@@ -963,7 +963,7 @@ public class ElementRepositoryTest : UmbracoIntegrationTest
     /// the fix is applied.
     /// </remarks>
     [Test]
-    public void GetMany_By_Guid_With_Warm_Cache_Returns_All()
+    public async Task GetMany_By_Guid_With_Warm_Cache_Returns_All()
     {
         var realCache = new AppCaches(
             new ObjectCacheAppCache(),
@@ -976,7 +976,7 @@ public class ElementRepositoryTest : UmbracoIntegrationTest
         var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository, out DataTypeRepository _, realCache);
 
         var elementType = ContentTypeBuilder.CreateSimpleElementType();
-        contentTypeRepository.Save(elementType);
+        await contentTypeRepository.SaveAsync(elementType, CancellationToken.None);
         var element = ElementBuilder.CreateSimpleElement(elementType);
         repository.Save(element);
 
@@ -988,13 +988,13 @@ public class ElementRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void UpdateElement()
+    public async Task UpdateElement()
     {
         var provider = ScopeProvider;
         using var scope = provider.CreateScope();
         var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository, out DataTypeRepository _);
         var elementType = ContentTypeBuilder.CreateSimpleElementType();
-        contentTypeRepository.Save(elementType);
+        await contentTypeRepository.SaveAsync(elementType, CancellationToken.None);
 
         var element = ElementBuilder.CreateSimpleElement(elementType);
         repository.Save(element);
@@ -1020,13 +1020,13 @@ public class ElementRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void ElementIsNotDirtyAfterSave()
+    public async Task ElementIsNotDirtyAfterSave()
     {
         var provider = ScopeProvider;
         using var scope = provider.CreateScope();
         var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository, out DataTypeRepository _);
         var elementType = ContentTypeBuilder.CreateSimpleElementType();
-        contentTypeRepository.Save(elementType);
+        await contentTypeRepository.SaveAsync(elementType, CancellationToken.None);
 
         var element = ElementBuilder.CreateSimpleElement(elementType);
         element.SetValue("title", "Dirty Title");
@@ -1042,13 +1042,13 @@ public class ElementRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void SaveElement()
+    public async Task SaveElement()
     {
         var provider = ScopeProvider;
         using var scope = provider.CreateScope();
         var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository, out DataTypeRepository _);
         var elementType = ContentTypeBuilder.CreateSimpleElementType();
-        contentTypeRepository.Save(elementType);
+        await contentTypeRepository.SaveAsync(elementType, CancellationToken.None);
 
         var element = ElementBuilder.CreateSimpleElement(elementType);
         repository.Save(element);
@@ -1062,13 +1062,13 @@ public class ElementRepositoryTest : UmbracoIntegrationTest
 
     // Covers issue U4-2791 and U4-2607
     [Test]
-    public void SaveElementWithAtSignInName()
+    public async Task SaveElementWithAtSignInName()
     {
         var provider = ScopeProvider;
         using var scope = provider.CreateScope();
         var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository, out DataTypeRepository _);
         var elementType = ContentTypeBuilder.CreateSimpleElementType();
-        contentTypeRepository.Save(elementType);
+        await contentTypeRepository.SaveAsync(elementType, CancellationToken.None);
 
         var element1 = ElementBuilder.CreateSimpleElement(elementType, "test@umbraco.org");
         var element2 = ElementBuilder.CreateSimpleElement(elementType, "@lightgiants");
@@ -1087,13 +1087,13 @@ public class ElementRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void GetPagedResultsByQuery_CustomPropertySort()
+    public async Task GetPagedResultsByQuery_CustomPropertySort()
     {
         var provider = ScopeProvider;
         using var scope = provider.CreateScope();
         var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository, out DataTypeRepository _);
         var elementType = ContentTypeBuilder.CreateSimpleElementType();
-        contentTypeRepository.Save(elementType);
+        await contentTypeRepository.SaveAsync(elementType, CancellationToken.None);
 
         var element1 = ElementBuilder.CreateSimpleElement(elementType, "Element One");
         element1.SetValue("title", "Bravo");

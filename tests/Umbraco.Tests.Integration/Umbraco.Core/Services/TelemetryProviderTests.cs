@@ -157,8 +157,8 @@ internal sealed class TelemetryProviderTests : UmbracoIntegrationTest
     [Test]
     public void MediaTelemetry_Can_Get_Media_In_Folders()
     {
-        var folderType = MediaTypeService.Get(1031);
-        var imageMediaType = MediaTypeService.Get(1032);
+        var folderType = MediaTypeService.GetAsync(1031).GetAwaiter().GetResult();
+        var imageMediaType = MediaTypeService.GetAsync(1032).GetAwaiter().GetResult();
 
         var root = MediaBuilder.CreateMediaFolder(folderType, -1);
         MediaService.Save(root);
@@ -177,7 +177,7 @@ internal sealed class TelemetryProviderTests : UmbracoIntegrationTest
     [Test]
     public void MediaTelemetry_Can_Get_Media_In_Root()
     {
-        var imageMediaType = MediaTypeService.Get(1032);
+        var imageMediaType = MediaTypeService.GetAsync(1032).GetAwaiter().GetResult();
         var createdMediaCount = 10;
         for (var i = 0; i < createdMediaCount; i++)
         {

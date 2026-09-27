@@ -34,7 +34,7 @@ internal sealed class MediaListViewServiceTests : ContentListViewServiceTestsBas
     public async Task Can_Get_List_View_Items_At_Root()
     {
         // Arrange
-        CreateTenMediaItemsFromTwoMediaTypesAtRoot();
+        await CreateTenMediaItemsFromTwoMediaTypesAtRoot();
         var descendants = MediaService.GetPagedDescendants(Constants.System.Root, 0, int.MaxValue, out _);
 
         // Act
@@ -66,7 +66,7 @@ internal sealed class MediaListViewServiceTests : ContentListViewServiceTestsBas
     public async Task Can_Get_Items_With_Default_List_View_Configuration()
     {
         // Arrange
-        CreateTenMediaItemsFromTwoMediaTypesAtRoot();
+        await CreateTenMediaItemsFromTwoMediaTypesAtRoot();
 
         // Act
         var result = await MediaListViewService.GetListViewItemsByKeyAsync(
@@ -130,7 +130,7 @@ internal sealed class MediaListViewServiceTests : ContentListViewServiceTestsBas
     {
         // Arrange
         // Media item that the user doesn't have access to
-        var imageMediaType = MediaTypeService.Get(Constants.Conventions.MediaTypes.Image);
+        var imageMediaType = await MediaTypeService.GetAsync(Constants.Conventions.MediaTypes.Image);
         var image = MediaBuilder.CreateMediaImage(imageMediaType, -1);
         MediaService.Save(image);
 
@@ -201,7 +201,7 @@ internal sealed class MediaListViewServiceTests : ContentListViewServiceTestsBas
 
     private async Task<IMedia> CreateRootMediaWithFiveChildrenAsListViewItems(Guid? listViewDataTypeKey = null)
     {
-        var childImageMediaType = MediaTypeService.Get(Constants.Conventions.MediaTypes.Image);
+        var childImageMediaType = await MediaTypeService.GetAsync(Constants.Conventions.MediaTypes.Image);
         childImageMediaType.PropertyTypes.First(x => x.Alias == "umbracoFile").Mandatory = false;
         await MediaTypeService.CreateAsync(childImageMediaType, Constants.Security.SuperUserKey);
 

@@ -709,7 +709,7 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
                 continue;
             }
 
-            IMediaType? mediaType = _mediaTypeService.Get(mediaTypeKey);
+            IMediaType? mediaType = _mediaTypeService.GetAsync(mediaTypeKey).GetAwaiter().GetResult();
             if (mediaType == null)
             {
                 continue;
@@ -856,7 +856,7 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
     {
         if (mediaType.ParentId > 0)
         {
-            IMediaType? parent = _mediaTypeService.Get(mediaType.ParentId);
+            IMediaType? parent = _mediaTypeService.GetAsync(mediaType.ParentId).GetAwaiter().GetResult();
             if (parent != null)
             {
                 AddMediaType(parent, mediaTypes);

@@ -38,7 +38,7 @@ internal sealed class MediaServiceNotificationWithCacheTests : UmbracoIntegratio
     {
         ContentRepositoryBase.ThrowOnWarning = true;
 
-        _mediaType = MediaTypeService.Get("folder")
+        _mediaType = MediaTypeService.GetAsync("folder").GetAwaiter().GetResult()
                      ?? throw new ApplicationException("Could not find the \"folder\" media type");
     }
 

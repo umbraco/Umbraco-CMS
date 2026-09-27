@@ -45,7 +45,7 @@ public class BatchMediaTypesController : MediaTypeControllerBase
             return Ok(new BatchResponseModel<MediaTypeResponseModel>());
         }
 
-        IEnumerable<IMediaType> mediaTypes = _mediaTypeService.GetMany(requestedIds);
+        IEnumerable<IMediaType> mediaTypes = await _mediaTypeService.GetManyAsync(requestedIds);
 
         List<IMediaType> ordered = OrderByRequestedIds(mediaTypes, requestedIds);
 

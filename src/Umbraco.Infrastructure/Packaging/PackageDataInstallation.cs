@@ -295,7 +295,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                     compiledPackage.Media,
                     importedMediaTypes,
                     userId,
-                    _mediaTypeService,
+                    alias => _mediaTypeService.GetAsync(alias).GetAwaiter().GetResult(),
                     _mediaService);
 
                 // Element types live in the DocumentTypes section, so reuse the already-imported document types.
@@ -332,7 +332,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 docTypeElements.ToList(),
                 true,
                 userId,
-                _mediaTypeService,
+                new MediaTypeImportService(_mediaTypeService),
                 out entityContainersInstalled);
 
         /// <inheritdoc/>
@@ -355,27 +355,6 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         #region Content
 
         /// <summary>
-        /// Imports content base items of a specified type from the provided compiled package content documents.
-        /// </summary>
-        /// <typeparam name="TContentBase">The type of content base item to import, which must implement <see cref="IContentBase"/>.</typeparam>
-        /// <typeparam name="TContentTypeComposition">The type of content type composition, which must implement <see cref="IContentTypeComposition"/>.</typeparam>
-        /// <param name="docs">A collection of <see cref="CompiledPackageContentBase"/> documents to import content from.</param>
-        /// <param name="importedDocumentTypes">A dictionary mapping document type aliases to their imported <typeparamref name="TContentTypeComposition"/> instances.</param>
-        /// <param name="userId">The identifier of the user performing the import operation.</param>
-        /// <param name="typeService">The service used to manage content type compositions.</param>
-        /// <param name="service">The service used to manage content base items.</param>
-        /// <returns>A read-only list containing the imported content base items of type <typeparamref name="TContentBase"/>.</returns>
-        public IReadOnlyList<TContentBase> ImportContentBase<TContentBase, TContentTypeComposition>(
-            IEnumerable<CompiledPackageContentBase> docs,
-            IDictionary<string, TContentTypeComposition> importedDocumentTypes,
-            int userId,
-            IContentTypeBaseService<TContentTypeComposition> typeService,
-            IContentServiceBase<TContentBase> service)
-            where TContentBase : class, IContentBase
-            where TContentTypeComposition : IContentTypeComposition
-            => ImportContentBase(docs, importedDocumentTypes, userId, alias => typeService.Get(alias), service);
-
-        /// <summary>
         /// Imports content base items of a specified type from the provided compiled package content documents using the
         /// (asynchronous) document type service.
         /// </summary>
@@ -391,6 +370,31 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             IDictionary<string, IContentType> importedDocumentTypes,
             int userId,
             IContentTypeService typeService,
+            IContentServiceBase<TContentBase> service)
+            where TContentBase : class, IContentBase
+            => ImportContentBase(
+                docs,
+                importedDocumentTypes,
+                userId,
+                alias => typeService.GetAsync(alias).GetAwaiter().GetResult(),
+                service);
+
+        /// <summary>
+        /// Imports content base items of a specified type from the provided compiled package content documents using the
+        /// (asynchronous) media type service.
+        /// </summary>
+        /// <typeparam name="TContentBase">The type of content base item to import.</typeparam>
+        /// <param name="docs">A collection of <see cref="CompiledPackageContentBase"/> documents to import content from.</param>
+        /// <param name="importedDocumentTypes">A dictionary mapping media type aliases to their imported media types.</param>
+        /// <param name="userId">The identifier of the user performing the import operation.</param>
+        /// <param name="typeService">The media type service.</param>
+        /// <param name="service">The service used to manage content base items.</param>
+        /// <returns>A read-only list containing the imported content base items.</returns>
+        public IReadOnlyList<TContentBase> ImportContentBase<TContentBase>(
+            IEnumerable<CompiledPackageContentBase> docs,
+            IDictionary<string, IMediaType> importedDocumentTypes,
+            int userId,
+            IMediaTypeService typeService,
             IContentServiceBase<TContentBase> service)
             where TContentBase : class, IContentBase
             => ImportContentBase(
@@ -427,17 +431,6 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         /// <param name="userId">Optional Id of the user performing the import</param>
         /// <param name="service">The content service base</param>
         /// <returns>An enumerable list of generated content</returns>
-        public IEnumerable<TContentBase> ImportContentBase<TContentBase, TContentTypeComposition>(
-            IEnumerable<XElement> roots,
-            int parentId,
-            IDictionary<string, TContentTypeComposition> importedDocumentTypes,
-            int userId,
-            IContentTypeBaseService<TContentTypeComposition> typeService,
-            IContentServiceBase<TContentBase> service)
-            where TContentBase : class, IContentBase
-            where TContentTypeComposition : IContentTypeComposition
-            => ImportContentBase(roots, parentId, importedDocumentTypes, userId, alias => typeService.Get(alias), service);
-
         /// <summary>
         /// Imports and saves package xml as <see cref="IContentBase"/> items using the (asynchronous) document type service.
         /// </summary>
@@ -976,10 +969,6 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         /// <param name="userId">Optional id of the User performing the operation. Default is zero (admin).</param>
         /// <param name="service">The content type service.</param>
         /// <returns>An enumerable list of generated ContentTypes</returns>
-        public IReadOnlyList<T> ImportDocumentTypes<T>(IReadOnlyCollection<XElement> unsortedDocumentTypes, bool importStructure, int userId, IContentTypeBaseService<T> service)
-            where T : class, IContentTypeComposition
-            => ImportDocumentTypes(unsortedDocumentTypes, importStructure, userId, new SyncContentTypeImportService<T>(service), out _);
-
         /// <summary>
         /// Imports and saves package xml as <see cref="IContentType"/>
         /// </summary>
@@ -989,15 +978,6 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         /// <param name="service">The content type service</param>
         /// <param name="entityContainersInstalled">Collection of entity containers installed by the package to be populated with those created in installing data types.</param>
         /// <returns>An enumerable list of generated ContentTypes</returns>
-        public IReadOnlyList<T> ImportDocumentTypes<T>(
-            IReadOnlyCollection<XElement> unsortedDocumentTypes,
-            bool importStructure,
-            int userId,
-            IContentTypeBaseService<T> service,
-            out IEnumerable<EntityContainer> entityContainersInstalled)
-            where T : class, IContentTypeComposition
-            => ImportDocumentTypes(unsortedDocumentTypes, importStructure, userId, new SyncContentTypeImportService<T>(service), out entityContainersInstalled);
-
         private IReadOnlyList<T> ImportDocumentTypes<T>(
             IReadOnlyCollection<XElement> unsortedDocumentTypes,
             bool importStructure,
@@ -2478,9 +2458,9 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             }
         }
 
-        // Abstracts the content-type operations the importer needs (alias lookup + create/update), so the shared import
-        // logic can run against the async document-type service and the (still synchronous) media/member type services
-        // alike, without depending on the obsolete IContentTypeBaseService<IContentType> bridge.
+        // Abstracts the content-type operations the importer needs (alias lookup + create/update), so the shared
+        // import logic can run against the document, media and member type services alike. Each service exposes its
+        // own strongly typed contract, so there is no common interface to bind against.
         private interface IContentTypeImportService<T>
             where T : class, IContentTypeComposition
         {
@@ -2489,23 +2469,6 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             Task<Attempt<ContentTypeOperationStatus>> CreateAsync(T item, Guid performingUserKey);
 
             Task<Attempt<ContentTypeOperationStatus>> UpdateAsync(T item, Guid performingUserKey);
-        }
-
-        // Adapter over the synchronous media/member type services.
-        private sealed class SyncContentTypeImportService<T> : IContentTypeImportService<T>
-            where T : class, IContentTypeComposition
-        {
-            private readonly IContentTypeBaseService<T> _inner;
-
-            public SyncContentTypeImportService(IContentTypeBaseService<T> inner) => _inner = inner;
-
-            public T? Get(string alias) => _inner.Get(alias);
-
-            public Task<Attempt<ContentTypeOperationStatus>> CreateAsync(T item, Guid performingUserKey)
-                => _inner.CreateAsync(item, performingUserKey);
-
-            public Task<Attempt<ContentTypeOperationStatus>> UpdateAsync(T item, Guid performingUserKey)
-                => _inner.UpdateAsync(item, performingUserKey);
         }
 
         // Adapter over the asynchronous document-type service.
@@ -2521,6 +2484,22 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 => _inner.CreateAsync(item, performingUserKey);
 
             public Task<Attempt<ContentTypeOperationStatus>> UpdateAsync(IContentType item, Guid performingUserKey)
+                => _inner.UpdateAsync(item, performingUserKey);
+        }
+
+        // Adapter over the asynchronous media-type service.
+        private sealed class MediaTypeImportService : IContentTypeImportService<IMediaType>
+        {
+            private readonly IMediaTypeService _inner;
+
+            public MediaTypeImportService(IMediaTypeService inner) => _inner = inner;
+
+            public IMediaType? Get(string alias) => _inner.GetAsync(alias).GetAwaiter().GetResult();
+
+            public Task<Attempt<ContentTypeOperationStatus>> CreateAsync(IMediaType item, Guid performingUserKey)
+                => _inner.CreateAsync(item, performingUserKey);
+
+            public Task<Attempt<ContentTypeOperationStatus>> UpdateAsync(IMediaType item, Guid performingUserKey)
                 => _inner.UpdateAsync(item, performingUserKey);
         }
 
