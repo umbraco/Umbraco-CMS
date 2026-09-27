@@ -25,7 +25,7 @@ public static class ContentExtensions
     /// <param name="content">The content.</param>
     /// <returns>The published culture codes.</returns>
     public static string?[] PublishedCultures(this IContentBase content)
-        => content is IContent c && c.VariesByCulture()
+        => content is IPublishableContentBase c && c.VariesByCulture()
             ? c.PublishedCultures.ToArray()
             : new string?[] { null };
 
@@ -35,7 +35,7 @@ public static class ContentExtensions
     /// <param name="content">The content.</param>
     /// <returns>The available culture codes.</returns>
     public static string?[] AvailableCultures(this IContentBase content)
-        => content is IContent && content.VariesByCulture()
+        => content is IPublishableContentBase && content.VariesByCulture()
             ? content.AvailableCultures.ToArray()
             : new string?[] { null };
 
@@ -53,7 +53,7 @@ public static class ContentExtensions
     /// <param name="content">The content.</param>
     /// <returns>True if the content's content type varies by culture.</returns>
     public static bool VariesByCulture(this IContentBase content)
-        => content is IContent c && c.ContentType.VariesByCulture();
+        => content is IPublishableContentBase c && c.ContentType.VariesByCulture();
 
     /// <summary>
     /// Gets the Umbraco object type of the content.
@@ -66,6 +66,7 @@ public static class ContentExtensions
             IContent => UmbracoObjectTypes.Document,
             IMedia => UmbracoObjectTypes.Media,
             IMember => UmbracoObjectTypes.Member,
+            IElement => UmbracoObjectTypes.Element,
             _ => throw new ArgumentOutOfRangeException(nameof(content))
         };
 }
