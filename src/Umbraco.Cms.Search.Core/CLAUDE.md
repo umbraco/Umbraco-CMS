@@ -160,6 +160,7 @@ ContentIndexingService (orchestration)
 - `DraftContent` = `"Umb_Content"` - Draft content index
 - `DraftMedia` = `"Umb_Media"` - Media index
 - `DraftMembers` = `"Umb_Members"` - Members index
+- `DraftElements` = `"Umb_Elements"` - Library elements index (draft only; powers backoffice element search). Elements live in element containers, so their ancestor/parent keys resolve as `ElementContainer`, and a `RefreshBranch` element change targets a container key
 
 **System Field Names** (see `Constants.FieldNames`):
 - All system fields are prefixed with `Umb_`
