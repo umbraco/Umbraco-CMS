@@ -3,7 +3,7 @@
 namespace Umbraco.Cms.Core.Search.Indexing;
 
 /// <summary>
-/// Represents a detected change to a content, media or member item that needs to be reflected in a search index.
+/// Represents a detected change to a content, media, member or element item that needs to be reflected in a search index.
 /// </summary>
 public record ContentChange
 {
@@ -44,6 +44,16 @@ public record ContentChange
     /// <returns>The created <see cref="ContentChange"/>.</returns>
     public static ContentChange Member(Guid id, ChangeImpact changeImpact, ContentState contentState)
         => new (id, UmbracoObjectTypes.Member, changeImpact, contentState);
+
+    /// <summary>
+    /// Creates a <see cref="ContentChange"/> for an element.
+    /// </summary>
+    /// <param name="id">The key of the element.</param>
+    /// <param name="changeImpact">The scope of re-indexing required.</param>
+    /// <param name="contentState">The state the change applies to.</param>
+    /// <returns>The created <see cref="ContentChange"/>.</returns>
+    public static ContentChange Element(Guid id, ChangeImpact changeImpact, ContentState contentState)
+        => new (id, UmbracoObjectTypes.Element, changeImpact, contentState);
 
     /// <summary>
     /// Gets the key of the changed item.
