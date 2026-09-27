@@ -15,10 +15,8 @@ using Umbraco.Cms.Tests.Integration.Testing.Search;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Core;
 
-public class ElementTests : ContentBaseTestBase
+public class LibraryElementIndexingTests : ContentBaseTestBase
 {
-    private const string ElementsIndexAlias = global::Umbraco.Cms.Core.Constants.IndexAliases.DraftElements;
-
     private const string ElementsViaDraftContentStrategyIndexAlias = "Test_ElementsViaDraftContentStrategy";
 
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
@@ -26,6 +24,8 @@ public class ElementTests : ContentBaseTestBase
     private IElementEditingService ElementEditingService => GetRequiredService<IElementEditingService>();
 
     private IElementContainerService ElementContainerService => GetRequiredService<IElementContainerService>();
+
+    private IElementPublishingService ElementPublishingService => GetRequiredService<IElementPublishingService>();
 
     private ILanguageService LanguageService => GetRequiredService<ILanguageService>();
 
@@ -45,7 +45,6 @@ public class ElementTests : ContentBaseTestBase
 
         builder.Services.Configure<IndexOptions>(options =>
         {
-            options.RegisterContentIndex<IIndexer, ISearcher, IDraftElementChangeStrategy>(ElementsIndexAlias, UmbracoObjectTypes.Element);
             options.RegisterContentIndex<IIndexer, ISearcher, IDraftContentChangeStrategy>(ElementsViaDraftContentStrategyIndexAlias, UmbracoObjectTypes.Element);
         });
     }
@@ -105,7 +104,7 @@ public class ElementTests : ContentBaseTestBase
 
         Assert.Multiple(() =>
         {
-            Assert.That(IndexerAndSearcher.Dump(ElementsIndexAlias), Has.Count.EqualTo(1));
+            Assert.That(IndexerAndSearcher.Dump(IndexAliases.Elements), Has.Count.EqualTo(1));
             Assert.That(IndexerAndSearcher.Dump(IndexAliases.DraftContent), Is.Empty);
             Assert.That(IndexerAndSearcher.Dump(IndexAliases.PublishedContent), Is.Empty);
             Assert.That(IndexerAndSearcher.Dump(IndexAliases.Media), Is.Empty);
@@ -234,7 +233,7 @@ public class ElementTests : ContentBaseTestBase
         Assert.That(trashResult.Success, Is.True);
 
         IndexerAndSearcher.Reset();
-        DistributedContentIndexRebuilder.Rebuild(ElementsIndexAlias);
+        DistributedContentIndexRebuilder.Rebuild(IndexAliases.Elements);
 
         Assert.That(
             ElementsIndex().Select(document => document.Id),
@@ -296,7 +295,131 @@ public class ElementTests : ContentBaseTestBase
         });
     }
 
-    private IReadOnlyList<TestIndexDocument> ElementsIndex() => IndexerAndSearcher.Dump(ElementsIndexAlias);
+    [Test]
+    public async Task Element_RestoreFromRecycleBin_ReindexesStructure()
+    {
+        IElement element = await CreateElement(ChildContainerKey, "The title");
+        Assert.That((await ElementEditingService.MoveToRecycleBinAsync(element.Key, Constants.Security.SuperUserKey)).Success, Is.True);
+
+        Attempt<ContentEditingOperationStatus> result = await ElementEditingService.RestoreAsync(element.Key, OtherRootContainerKey, Constants.Security.SuperUserKey);
+        Assert.That(result.Success, Is.True);
+
+        VerifyDocumentStructureValues(GetElementDocument(element.Key), element.Key, OtherRootContainerKey, [OtherRootContainerKey, element.Key]);
+    }
+
+    [Test]
+    public async Task Element_Copy_IndexesTheCopy()
+    {
+        IElement element = await CreateElement(ChildContainerKey, "The title");
+
+        Attempt<IElement?, ContentEditingOperationStatus> result = await ElementEditingService.CopyAsync(element.Key, OtherRootContainerKey, Constants.Security.SuperUserKey);
+        Assert.That(result.Success, Is.True);
+        IElement copy = result.Result!;
+
+        Assert.That(ElementsIndex().Select(document => document.Id), Is.EquivalentTo(new[] { element.Key, copy.Key }));
+        VerifyDocumentStructureValues(GetElementDocument(copy.Key), copy.Key, OtherRootContainerKey, [OtherRootContainerKey, copy.Key]);
+        Assert.That(GetTitle(GetElementDocument(copy.Key)), Is.EqualTo("The title"));
+    }
+
+    [Test]
+    public async Task Element_EditedAfterPublish_IndexesLatestDraft()
+    {
+        IElement element = await CreateElement(null, "The published title");
+        Assert.That((await ElementPublishingService.PublishAsync(element.Key, [], Constants.Security.SuperUserKey)).Success, Is.True);
+
+        await UpdateTitle(element, "The draft title");
+
+        Assert.That(GetTitle(GetElementDocument(element.Key)), Is.EqualTo("The draft title"));
+    }
+
+    [Test]
+    public async Task Element_Unpublish_RemainsIndexed()
+    {
+        IElement element = await CreateElement(null, "The title");
+        Assert.That((await ElementPublishingService.PublishAsync(element.Key, [], Constants.Security.SuperUserKey)).Success, Is.True);
+
+        Attempt<ContentPublishingOperationStatus> result = await ElementPublishingService.UnpublishAsync(element.Key, null, Constants.Security.SuperUserKey);
+        Assert.That(result.Success, Is.True);
+
+        Assert.That(GetTitle(GetElementDocument(element.Key)), Is.EqualTo("The title"));
+    }
+
+    [Test]
+    public async Task EmptyRecycleBin_RemovesTrashedElements()
+    {
+        IElement trashedElement = await CreateElement(ChildContainerKey, "Trashed");
+        IElement keptElement = await CreateElement(OtherRootContainerKey, "Kept");
+        Assert.That((await ElementContainerService.MoveToRecycleBinAsync(RootContainerKey, Constants.Security.SuperUserKey)).Success, Is.True);
+
+        Attempt<EntityContainerOperationStatus> result = await ElementContainerService.EmptyRecycleBinAsync(Constants.Security.SuperUserKey);
+        Assert.That(result.Success, Is.True);
+
+        Assert.That(ElementsIndex().Select(document => document.Id), Is.EquivalentTo(new[] { keptElement.Key }));
+        Assert.That(ElementsIndex().Any(document => document.Id == trashedElement.Key), Is.False);
+    }
+
+    [Test]
+    public async Task ContainerDeleteFromRecycleBin_RemovesDescendantElements()
+    {
+        IElement trashedElement = await CreateElement(ChildContainerKey, "Trashed");
+        IElement keptElement = await CreateElement(OtherRootContainerKey, "Kept");
+        Assert.That((await ElementContainerService.MoveToRecycleBinAsync(RootContainerKey, Constants.Security.SuperUserKey)).Success, Is.True);
+
+        Attempt<EntityContainer?, EntityContainerOperationStatus> result = await ElementContainerService.DeleteFromRecycleBinAsync(RootContainerKey, Constants.Security.SuperUserKey);
+        Assert.That(result.Success, Is.True);
+
+        Assert.That(ElementsIndex().Select(document => document.Id), Is.EquivalentTo(new[] { keptElement.Key }));
+        Assert.That(ElementsIndex().Any(document => document.Id == trashedElement.Key), Is.False);
+    }
+
+    [Test]
+    public async Task ContainerRestoreFromRecycleBin_ReindexesDescendantElements()
+    {
+        IElement element = await CreateElement(ChildContainerKey, "The title");
+        Assert.That((await ElementContainerService.MoveToRecycleBinAsync(ChildContainerKey, Constants.Security.SuperUserKey)).Success, Is.True);
+        VerifyDocumentStructureValues(
+            GetElementDocument(element.Key),
+            element.Key,
+            ChildContainerKey,
+            [Constants.System.RecycleBinElementKey, ChildContainerKey, element.Key]);
+
+        Attempt<EntityContainerOperationStatus> result = await ElementContainerService.RestoreAsync(ChildContainerKey, OtherRootContainerKey, Constants.Security.SuperUserKey);
+        Assert.That(result.Success, Is.True);
+
+        VerifyDocumentStructureValues(
+            GetElementDocument(element.Key),
+            element.Key,
+            ChildContainerKey,
+            [OtherRootContainerKey, ChildContainerKey, element.Key]);
+    }
+
+    [Test]
+    public async Task ElementTypeDelete_RemovesElements()
+    {
+        await CreateElement(ChildContainerKey, "The title");
+        IContentType otherElementType = await CreateElementType(ContentVariation.Nothing);
+        IElement otherElement = await CreateElement(null, "Other type", otherElementType);
+
+        ContentTypeOperationStatus result = await ContentTypeService.DeleteAsync(_elementType.Key, Constants.Security.SuperUserKey);
+        Assert.That(result, Is.EqualTo(ContentTypeOperationStatus.Success));
+
+        Assert.That(ElementsIndex().Select(document => document.Id), Is.EquivalentTo(new[] { otherElement.Key }));
+    }
+
+    private async Task UpdateTitle(IElement element, string title)
+    {
+        Attempt<ElementUpdateResult, ContentEditingOperationStatus> result = await ElementEditingService.UpdateAsync(
+            element.Key,
+            new ElementUpdateModel
+            {
+                Variants = [new VariantModel { Name = element.Name! }],
+                Properties = [new PropertyValueModel { Alias = "title", Value = title }],
+            },
+            Constants.Security.SuperUserKey);
+        Assert.That(result.Success, Is.True);
+    }
+
+    private IReadOnlyList<TestIndexDocument> ElementsIndex() => IndexerAndSearcher.Dump(IndexAliases.Elements);
 
     private TestIndexDocument GetElementDocument(Guid key)
     {
@@ -339,12 +462,12 @@ public class ElementTests : ContentBaseTestBase
         return elementType;
     }
 
-    private async Task<IElement> CreateElement(Guid? parentKey, string title)
+    private async Task<IElement> CreateElement(Guid? parentKey, string title, IContentType? elementType = null)
     {
         Attempt<ElementCreateResult, ContentEditingOperationStatus> result = await ElementEditingService.CreateAsync(
             new ElementCreateModel
             {
-                ContentTypeKey = _elementType.Key,
+                ContentTypeKey = (elementType ?? _elementType).Key,
                 ParentKey = parentKey,
                 Variants = [new VariantModel { Name = Guid.NewGuid().ToString("N") }],
                 Properties = [new PropertyValueModel { Alias = "title", Value = title }],
