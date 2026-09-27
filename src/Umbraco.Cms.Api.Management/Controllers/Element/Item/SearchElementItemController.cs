@@ -1,8 +1,10 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.Element.Item;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
@@ -15,9 +17,22 @@ namespace Umbraco.Cms.Api.Management.Controllers.Element.Item;
 [ApiVersion("1.0")]
 public class SearchElementItemController : ElementItemControllerBase
 {
-    private readonly IEntitySearchService _entitySearchService;
-    private readonly IEntityService _entityService;
+    private readonly IIndexedEntitySearchService _indexedEntitySearchService;
     private readonly IElementPresentationFactory _elementPresentationFactory;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SearchElementItemController"/> class, which handles search operations for element items.
+    /// </summary>
+    /// <param name="indexedEntitySearchService">Service used to search the element index.</param>
+    /// <param name="elementPresentationFactory">Factory responsible for creating element presentation models.</param>
+    [ActivatorUtilitiesConstructor]
+    public SearchElementItemController(
+        IIndexedEntitySearchService indexedEntitySearchService,
+        IElementPresentationFactory elementPresentationFactory)
+    {
+        _indexedEntitySearchService = indexedEntitySearchService;
+        _elementPresentationFactory = elementPresentationFactory;
+    }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SearchElementItemController"/> class, which handles search operations for element items.
@@ -25,14 +40,15 @@ public class SearchElementItemController : ElementItemControllerBase
     /// <param name="entitySearchService">Service used to perform entity search operations.</param>
     /// <param name="entityService">Service for retrieving entity data.</param>
     /// <param name="elementPresentationFactory">Factory responsible for creating element presentation models.</param>
+    [Obsolete("Please use the constructor taking an IIndexedEntitySearchService. Scheduled for removal in Umbraco 21.")]
     public SearchElementItemController(
         IEntitySearchService entitySearchService,
         IEntityService entityService,
         IElementPresentationFactory elementPresentationFactory)
+        : this(
+            StaticServiceProvider.Instance.GetRequiredService<IIndexedEntitySearchService>(),
+            elementPresentationFactory)
     {
-        _entitySearchService = entitySearchService;
-        _entityService = entityService;
-        _elementPresentationFactory = elementPresentationFactory;
     }
 
     /// <summary>
@@ -50,20 +66,17 @@ public class SearchElementItemController : ElementItemControllerBase
     [EndpointDescription("Searches element items by the provided query with pagination support.")]
     public async Task<IActionResult> Search(CancellationToken cancellationToken, string query, int skip = 0, int take = 100)
     {
-        PagedModel<IEntitySlim> searchResult = _entitySearchService.Search(UmbracoObjectTypes.Element, query, skip, take);
-        if (searchResult.Items.Any() is false)
-        {
-            return Ok(new PagedModel<ElementItemResponseModel> { Total = searchResult.Total });
-        }
+        PagedModel<IEntitySlim> searchResult = await _indexedEntitySearchService.SearchAsync(
+            UmbracoObjectTypes.Element,
+            query,
+            parentId: null,
+            contentTypeIds: null,
+            trashed: null,
+            skip: skip,
+            take: take);
 
-        Guid[] keys = searchResult.Items.Select(item => item.Key).ToArray();
-        IElementEntitySlim[] elements = _entityService
-            .GetAll(UmbracoObjectTypes.Element, keys)
-            .OfType<IElementEntitySlim>()
-            .ToArray();
-        List<IElementEntitySlim> orderedElements = OrderByRequestedIds(elements, keys);
-
-        ElementItemResponseModel[] items = await Task.WhenAll(orderedElements.Select(_elementPresentationFactory.CreateItemResponseModelAsync));
+        ElementItemResponseModel[] items = await Task.WhenAll(
+            searchResult.Items.OfType<IElementEntitySlim>().Select(_elementPresentationFactory.CreateItemResponseModelAsync));
 
         return Ok(
             new PagedModel<ElementItemResponseModel>

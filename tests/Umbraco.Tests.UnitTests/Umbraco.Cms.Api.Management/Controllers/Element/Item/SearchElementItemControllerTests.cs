@@ -13,50 +13,47 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Management.Controllers.Ele
 [TestFixture]
 public class SearchElementItemControllerTests
 {
-    private Mock<IEntitySearchService> _entitySearchService = null!;
-    private Mock<IEntityService> _entityService = null!;
+    private Mock<IIndexedEntitySearchService> _indexedEntitySearchService = null!;
     private Mock<IElementPresentationFactory> _elementPresentationFactory = null!;
     private SearchElementItemController _controller = null!;
 
     [SetUp]
     public void SetUp()
     {
-        _entitySearchService = new Mock<IEntitySearchService>();
-        _entityService = new Mock<IEntityService>();
+        _indexedEntitySearchService = new Mock<IIndexedEntitySearchService>();
         _elementPresentationFactory = new Mock<IElementPresentationFactory>();
         _controller = new SearchElementItemController(
-            _entitySearchService.Object,
-            _entityService.Object,
+            _indexedEntitySearchService.Object,
             _elementPresentationFactory.Object);
     }
 
     [Test]
-    public async Task Search_Element_Returns_Items_Ordered_By_Search_Result_Order()
+    public async Task Search_Element_Returns_Items_In_Search_Result_Order()
     {
         var keyA = Guid.NewGuid();
         var keyB = Guid.NewGuid();
         var keyC = Guid.NewGuid();
 
-        // Search returns keys in order [A, B, C]
-        _entitySearchService
-            .Setup(x => x.Search(UmbracoObjectTypes.Element, It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>()))
-            .Returns(new PagedModel<IEntitySlim>
-            {
-                Items = [
-                    new EntitySlim { Key = keyA },
-                    new EntitySlim { Key = keyB },
-                    new EntitySlim { Key = keyC },
-                ],
-                Total = 3,
-            });
-
-        // Entity service returns elements in scrambled order [C, A, B]
+        // Deliberately not in key or creation order, so the controller must preserve the search result order
         IElementEntitySlim elementC = Mock.Of<IElementEntitySlim>(x => x.Key == keyC);
         IElementEntitySlim elementA = Mock.Of<IElementEntitySlim>(x => x.Key == keyA);
         IElementEntitySlim elementB = Mock.Of<IElementEntitySlim>(x => x.Key == keyB);
-        _entityService
-            .Setup(x => x.GetAll(UmbracoObjectTypes.Element, It.IsAny<Guid[]>()))
-            .Returns(new IEntitySlim[] { elementC, elementA, elementB });
+        _indexedEntitySearchService
+            .Setup(x => x.SearchAsync(
+                UmbracoObjectTypes.Element,
+                "test",
+                It.IsAny<Guid?>(),
+                It.IsAny<IEnumerable<Guid>?>(),
+                It.IsAny<bool?>(),
+                It.IsAny<string?>(),
+                It.IsAny<int>(),
+                It.IsAny<int>(),
+                It.IsAny<bool>()))
+            .ReturnsAsync(new PagedModel<IEntitySlim>
+            {
+                Items = [elementC, elementA, elementB],
+                Total = 42,
+            });
 
         _elementPresentationFactory
             .Setup(x => x.CreateItemResponseModelAsync(It.IsAny<IElementEntitySlim>()))
@@ -71,9 +68,8 @@ public class SearchElementItemControllerTests
         List<ElementItemResponseModel> items = pagedModel!.Items.ToList();
         Assert.Multiple(() =>
         {
-            Assert.That(items[0].Id, Is.EqualTo(keyA));
-            Assert.That(items[1].Id, Is.EqualTo(keyB));
-            Assert.That(items[2].Id, Is.EqualTo(keyC));
+            Assert.That(pagedModel.Total, Is.EqualTo(42));
+            Assert.That(items.Select(item => item.Id), Is.EqualTo(new[] { keyC, keyA, keyB }));
         });
     }
 }
