@@ -19,6 +19,8 @@ public class ElementTests : ContentBaseTestBase
 {
     private const string ElementsIndexAlias = global::Umbraco.Cms.Core.Constants.IndexAliases.DraftElements;
 
+    private const string ElementsViaDraftContentStrategyIndexAlias = "Test_ElementsViaDraftContentStrategy";
+
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
     private IElementEditingService ElementEditingService => GetRequiredService<IElementEditingService>();
@@ -42,7 +44,10 @@ public class ElementTests : ContentBaseTestBase
         base.CustomTestSetup(builder);
 
         builder.Services.Configure<IndexOptions>(options =>
-            options.RegisterContentIndex<IIndexer, ISearcher, IDraftContentChangeStrategy>(ElementsIndexAlias, UmbracoObjectTypes.Element));
+        {
+            options.RegisterContentIndex<IIndexer, ISearcher, IDraftElementChangeStrategy>(ElementsIndexAlias, UmbracoObjectTypes.Element);
+            options.RegisterContentIndex<IIndexer, ISearcher, IDraftContentChangeStrategy>(ElementsViaDraftContentStrategyIndexAlias, UmbracoObjectTypes.Element);
+        });
     }
 
     [SetUp]
@@ -74,6 +79,23 @@ public class ElementTests : ContentBaseTestBase
 
         TestIndexDocument document = GetElementDocument(element.Key);
         VerifyDocumentStructureValues(document, element.Key, ChildContainerKey, [RootContainerKey, ChildContainerKey, element.Key]);
+    }
+
+    [Test]
+    public async Task Element_IsIndexed_OnlyByTheElementChangeStrategy()
+    {
+        IElement element = await CreateElement(ChildContainerKey, "The title");
+
+        Attempt<EntityContainerOperationStatus> moveResult = await ElementContainerService.MoveAsync(ChildContainerKey, OtherRootContainerKey, Constants.Security.SuperUserKey);
+        Assert.That(moveResult.Success, Is.True);
+
+        DistributedContentIndexRebuilder.Rebuild(ElementsViaDraftContentStrategyIndexAlias);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(ElementsIndex().Select(document => document.Id), Is.EquivalentTo(new[] { element.Key }));
+            Assert.That(IndexerAndSearcher.Dump(ElementsViaDraftContentStrategyIndexAlias), Is.Empty);
+        });
     }
 
     [Test]

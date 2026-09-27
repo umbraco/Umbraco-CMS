@@ -66,9 +66,11 @@ public static class UmbracoBuilderExtensions
 
         builder.Services.AddTransient<PublishedContentChangeStrategy>();
         builder.Services.AddTransient<DraftContentChangeStrategy>();
+        builder.Services.AddTransient<DraftElementChangeStrategy>();
 
         builder.Services.AddTransient<IPublishedContentChangeStrategy, PublishedContentChangeStrategy>();
         builder.Services.AddTransient<IDraftContentChangeStrategy, DraftContentChangeStrategy>();
+        builder.Services.AddTransient<IDraftElementChangeStrategy, DraftElementChangeStrategy>();
 
         builder.Services.AddSingleton<IIndexDocumentRepository, IndexDocumentRepository>();
         builder.Services.AddSingleton<IIndexDocumentService, IndexDocumentService>();

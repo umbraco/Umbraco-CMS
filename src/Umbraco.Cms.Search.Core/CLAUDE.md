@@ -202,7 +202,8 @@ Content changes are tracked via notification handlers that trigger indexing:
 
 - `IContentChangeStrategy` - Base interface for tracking content state changes
 - `IPublishedContentChangeStrategy` - Tracks published content changes (for `Umb_PublishedContent` index)
-- `IDraftContentChangeStrategy` - Tracks draft content changes (for `Umb_Content` index)
+- `IDraftContentChangeStrategy` - Tracks draft content changes (for `Umb_Content`, `Umb_Media` and `Umb_Members` indexes)
+- `IDraftElementChangeStrategy` - Tracks draft library element changes (for `Umb_Elements` index). Kept separate because elements are leaves organised in element containers: a `RefreshWithDescendants` change targets a container key, and descendants/rebuilds are paged via `IEntityService`
 
 Index documents are persisted via `IndexDocumentRepository` using **MessagePack serialization** (with Lz4 compression) for efficient change detection — only actual field changes trigger re-indexing, not every save.
 
