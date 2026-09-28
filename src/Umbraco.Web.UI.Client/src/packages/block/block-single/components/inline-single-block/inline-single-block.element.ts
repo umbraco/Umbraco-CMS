@@ -26,7 +26,6 @@ const apiArgsCreator: UmbApiConstructorArgumentsMethodType<unknown> = (manifest:
 @customElement('umb-inline-single-block')
 export class UmbInlineSingleBlockElement extends UmbLitElement {
 	#blockContext?: typeof UMB_BLOCK_SINGLE_ENTRY_CONTEXT.TYPE;
-	#workspaceContext?: typeof UMB_BLOCK_WORKSPACE_CONTEXT.TYPE;
 	#contentKey?: string;
 
 	@property({ type: String, reflect: false })
@@ -38,11 +37,21 @@ export class UmbInlineSingleBlockElement extends UmbLitElement {
 	@property({ type: Boolean, reflect: true })
 	unpublished?: boolean;
 
+	/**
+	 * Whether the Block is backed by external (library element) content, so the unpublished tooltip
+	 * reflects the library element's own publish state rather than the local expose entry.
+	 */
+	@property({ type: Boolean, attribute: false })
+	isExternalContent?: boolean;
+
 	@property({ attribute: false })
 	content?: UmbBlockDataType;
 
 	@property({ attribute: false })
 	settings?: UmbBlockDataType;
+
+	@state()
+	private _workspaceContext?: typeof UMB_BLOCK_WORKSPACE_CONTEXT.TYPE;
 
 	@state()
 	private _exposed?: boolean;
@@ -79,13 +88,13 @@ export class UmbInlineSingleBlockElement extends UmbLitElement {
 			(permitted, ctrl) => {
 				const context = ctrl.api as typeof UMB_BLOCK_WORKSPACE_CONTEXT.TYPE;
 				if (permitted && context) {
-					this.#workspaceContext = context;
-					this.#workspaceContext.establishLiveSync();
-					this.#workspaceContext.autoReportValidation();
+					this._workspaceContext = context;
+					this._workspaceContext.establishLiveSync();
+					this._workspaceContext.autoReportValidation();
 					this.#load();
 
 					this.observe(
-						this.#workspaceContext.exposed,
+						this._workspaceContext.exposed,
 						(exposed) => {
 							this._exposed = exposed;
 						},
@@ -118,19 +127,19 @@ export class UmbInlineSingleBlockElement extends UmbLitElement {
 						'observeVariant',
 					);
 
-					new UmbExtensionsApiInitializer(this, umbExtensionsRegistry, 'workspaceContext', [this.#workspaceContext]);
+					new UmbExtensionsApiInitializer(this, umbExtensionsRegistry, 'workspaceContext', [this._workspaceContext]);
 				}
 			},
 		);
 	}
 
 	#load() {
-		if (!this.#workspaceContext || !this.#contentKey) return;
-		this.#workspaceContext.load(this.#contentKey);
+		if (!this._workspaceContext || !this.#contentKey) return;
+		this._workspaceContext.load(this.#contentKey);
 	}
 
 	#expose = () => {
-		this.#workspaceContext?.expose();
+		this._workspaceContext?.expose();
 	};
 
 	#onUfmResolved = (event: UmbUfmResolvedEvent) => {
@@ -179,17 +188,25 @@ export class UmbInlineSingleBlockElement extends UmbLitElement {
 					</umb-ufm-render>
 				</div>
 			</span>
-			${when(
-				this.unpublished,
-				() =>
-					html`<uui-tag slot="name" look="secondary" title=${this.localize.term('blockEditor_notExposedDescription')}
-						><umb-localize key="blockEditor_notExposedLabel"></umb-localize
-					></uui-tag>`,
-			)}
+			${when(this.unpublished, () => this.#renderDraftTag())}
+		`;
+	}
+
+	#renderDraftTag() {
+		const titleKey = this.isExternalContent
+			? 'blockEditor_notPublishedLibraryElementDescription'
+			: 'blockEditor_notExposedDescription';
+		return html`
+			<uui-tag slot="name" look="secondary" title=${this.localize.term(titleKey)}>
+				<umb-localize key="blockEditor_notExposedLabel"></umb-localize>
+			</uui-tag>
 		`;
 	}
 
 	#renderInside() {
+		if (!this._workspaceContext) {
+			return html`<umb-view-loader></umb-view-loader>`;
+		}
 		if (this._exposed === false) {
 			return html`<uui-button id="exposeButton" draggable="false" @click=${this.#expose}
 				><uui-icon name="icon-add"></uui-icon>

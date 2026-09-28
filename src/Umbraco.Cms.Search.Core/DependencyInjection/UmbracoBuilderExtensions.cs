@@ -1,12 +1,11 @@
-﻿using Microsoft.AspNetCore.OpenApi;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.OpenApi;
-using Umbraco.Cms.Api.Common.OpenApi;
-using Umbraco.Cms.Api.Management.OpenApi;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DependencyInjection;
-using Umbraco.Cms.Core.ServerEvents;
+using Umbraco.Cms.Core.Search;
+using Umbraco.Cms.Core.Search.Indexing;
+using Umbraco.Cms.Core.Search.Indexing.Collection;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.Search.PropertyValueHandlers;
 using Umbraco.Cms.Search.Core.Cache;
-using Umbraco.Cms.Search.Core.Notifications;
 using Umbraco.Cms.Search.Core.Cache.Content;
 using Umbraco.Cms.Search.Core.Cache.ContentType;
 using Umbraco.Cms.Search.Core.Cache.Index;
@@ -16,11 +15,8 @@ using Umbraco.Cms.Search.Core.Cache.MediaType;
 using Umbraco.Cms.Search.Core.Cache.Member;
 using Umbraco.Cms.Search.Core.Cache.MemberType;
 using Umbraco.Cms.Search.Core.Cache.PublicAccess;
-using Umbraco.Cms.Search.Core.Helpers;
 using Umbraco.Cms.Search.Core.NotificationHandlers;
 using Umbraco.Cms.Search.Core.Persistence;
-using Umbraco.Cms.Search.Core.PropertyValueHandlers;
-using Umbraco.Cms.Search.Core.PropertyValueHandlers.Collection;
 using Umbraco.Cms.Search.Core.Services;
 using Umbraco.Cms.Search.Core.Services.ContentIndexing;
 using Umbraco.Cms.Search.Core.Services.ContentIndexing.Indexers;
@@ -79,6 +75,10 @@ public static class UmbracoBuilderExtensions
         // replace the core IPublishedContentQuery with the search enabled implementation (same scoped lifetime as the core registration)
         builder.Services.AddUnique<Umbraco.Cms.Core.IPublishedContentQuery, SearchEnabledPublishedContentQuery>(ServiceLifetime.Scoped);
 
+        builder.Services.AddUnique<IIndexedEntitySearchService, IndexedEntitySearchService>();
+        builder.Services.AddUnique<IContentSearchService, ContentSearchService>();
+        builder.Services.AddUnique<IMediaSearchService, MediaSearchService>();
+
         // we need these notification handlers explicitly registered for the distributed content index refresher
         builder.Services.AddTransient<DraftContentNotificationHandler>();
         builder.Services.AddTransient<PublishedContentNotificationHandler>();
@@ -96,15 +96,6 @@ public static class UmbracoBuilderExtensions
             .AddNotificationHandler<MediaTypeCacheRefresherNotification, RebuildIndexesNotificationHandler>()
             .AddNotificationHandler<RebuildIndexCacheRefresherNotification, RebuildIndexesNotificationHandler>();
 
-        // Index rebuild server events (for the backoffice UI) require the server event infrastructure, which is
-        // only registered when the Management API is composed - skip them in hosts without a backoffice.
-        if (builder.Services.Any(s => s.ServiceType == typeof(IServerEventRouter)))
-        {
-            builder
-                .AddNotificationAsyncHandler<IndexRebuildStartingNotification, IndexRebuildServerEventNotificationHandler>()
-                .AddNotificationAsyncHandler<IndexRebuildCompletedNotification, IndexRebuildServerEventNotificationHandler>();
-        }
-
         builder
             .AddNotificationHandler<DraftContentCacheRefresherNotification, ContentIndexingNotificationHandler>()
             .AddNotificationHandler<DraftMediaCacheRefresherNotification, ContentIndexingNotificationHandler>()
@@ -118,45 +109,7 @@ public static class UmbracoBuilderExtensions
 
         builder.AddCustomCacheRefresherNotificationHandlers();
 
-        // Add a dedicated OpenAPI document for our own package that can be browsed via the Swagger UI,
-        // along with a generated swagger JSON file used to auto-generate the TypeScript client.
-        builder.AddBackOfficeOpenApiDocument(
-            Constants.Api.Name,
-            document => document
-                .WithTitle("Umbraco Search Management API")
-                .WithBackOfficeAuthentication()
-                .WithJsonOptions(Umbraco.Cms.Core.Constants.JsonOptionsNames.BackOffice)
-                .ConfigureOpenApiOptions(options =>
-                {
-                    options.AddDocumentTransformer((openApiDocument, _, _) =>
-                    {
-                        openApiDocument.Info.Version = "1.0";
-                        return Task.CompletedTask;
-                    });
-
-                    // Emit short operation IDs (the controller action name) so the generated TypeScript
-                    // client has concise method names instead of the verbose path-based defaults.
-                    options.AddOperationTransformer<ActionNameOperationIdTransformer>();
-                }));
-
         return builder;
-    }
-
-    // Sets each operation's ID to the controller action name, matching the operation IDs the generated
-    // TypeScript client was built against.
-    // https://docs.umbraco.com/umbraco-cms/tutorials/creating-a-backoffice-api/umbraco-schema-and-operation-ids#operation-ids
-    private sealed class ActionNameOperationIdTransformer : IOpenApiOperationTransformer
-    {
-        public Task TransformAsync(OpenApiOperation operation, OpenApiOperationTransformerContext context, CancellationToken cancellationToken)
-        {
-            if (context.Description.ActionDescriptor.RouteValues.TryGetValue("action", out var action)
-                && string.IsNullOrWhiteSpace(action) is false)
-            {
-                operation.OperationId = action;
-            }
-
-            return Task.CompletedTask;
-        }
     }
 
     /// <summary>

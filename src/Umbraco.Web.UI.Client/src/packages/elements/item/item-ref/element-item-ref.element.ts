@@ -2,9 +2,9 @@ import { UMB_ELEMENT_ENTITY_TYPE } from '../../entity.js';
 import { UMB_EDIT_ELEMENT_WORKSPACE_PATH_PATTERN } from '../../paths.js';
 import { UmbElementItemDataResolver } from '../data-resolver/element-item-data-resolver.js';
 import type { UmbElementItemModel } from '../types.js';
-import { customElement, html, ifDefined, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, ifDefined, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
+import { umbGenerateWorkspaceLink, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbDeselectedEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import type { UUISelectableEvent } from '@umbraco-cms/backoffice/external/uui';
@@ -76,10 +76,13 @@ export class UmbElementItemRefElement extends UmbLitElement {
 		this.#item.observe(this.#item.isDraft, (isDraft) => (this._isDraft = isDraft ?? false));
 	}
 
-	#getHref() {
+	#getLink() {
 		if (!this._unique) return;
-		const path = UMB_EDIT_ELEMENT_WORKSPACE_PATH_PATTERN.generateLocal({ unique: this._unique });
-		return this._editPath + path;
+		return umbGenerateWorkspaceLink({
+			pattern: UMB_EDIT_ELEMENT_WORKSPACE_PATH_PATTERN,
+			params: { unique: this._unique },
+			routePath: this._editPath,
+		});
 	}
 
 	#onSelected(event: UUISelectableEvent) {
@@ -95,10 +98,13 @@ export class UmbElementItemRefElement extends UmbLitElement {
 	override render() {
 		if (!this.item) return nothing;
 
+		const link = this.#getLink();
+
 		return html`
 			<uui-ref-node
 				name=${this._name}
-				href=${ifDefined(this.#getHref())}
+				href=${ifDefined(link?.href)}
+				target=${ifDefined(link?.target)}
 				?readonly=${this.readonly}
 				?standalone=${this.standalone}
 				?select-only=${this.selectOnly}
@@ -110,6 +116,7 @@ export class UmbElementItemRefElement extends UmbLitElement {
 				<slot name="actions" slot="actions"></slot>
 				${this.#renderIcon()}${this.#renderIsDraft()} ${this.#renderIsTrashed()}
 			</uui-ref-node>
+			<umb-entity-frame><uui-icon name="link"></uui-icon> ${this._name}</umb-entity-frame>
 		`;
 	}
 
@@ -127,6 +134,24 @@ export class UmbElementItemRefElement extends UmbLitElement {
 		if (!this._isDraft) return nothing;
 		return html`<uui-tag size="s" slot="tag" look="secondary" color="default">Draft</uui-tag>`;
 	}
+
+	static override readonly styles = [
+		css`
+			:host {
+				--umb-entity-frame-opacity: 0;
+				--umb-entity-frame-color: var(--umb-color-reference);
+				--umb-entity-frame-contrast-color: var(--umb-color-reference-contrast);
+
+				display: block;
+				position: relative;
+			}
+
+			:host(:hover),
+			:host(:focus-within) {
+				--umb-entity-frame-opacity: 1;
+			}
+		`,
+	];
 }
 
 export { UmbElementItemRefElement as element };

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using System.Globalization;
 using System.Reflection;
 using Examine;
 using Examine.Lucene;
@@ -6,24 +7,24 @@ using Examine.Search;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Exceptions;
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Search.Core.Extensions;
-using Umbraco.Cms.Search.Core.Models.Searching;
-using Umbraco.Cms.Search.Core.Models.Searching.Faceting;
-using Umbraco.Cms.Search.Core.Models.Searching.Filtering;
-using Umbraco.Cms.Search.Core.Models.Searching.Sorting;
+using Umbraco.Cms.Core.Search.Querying;
+using Umbraco.Cms.Core.Search.Querying.Faceting;
+using Umbraco.Cms.Core.Search.Querying.Filtering;
+using Umbraco.Cms.Core.Search.Querying.Sorting;
 using Umbraco.Cms.Search.Provider.Examine.Configuration;
 using Umbraco.Cms.Search.Provider.Examine.Extensions;
 using Umbraco.Cms.Search.Provider.Examine.Helpers;
 using Umbraco.Cms.Search.Provider.Examine.Models.Searching.Filtering;
 using Umbraco.Extensions;
-using FacetResult = Umbraco.Cms.Search.Core.Models.Searching.Faceting.FacetResult;
-using SearchResult = Umbraco.Cms.Search.Core.Models.Searching.SearchResult;
+using FacetResult = Umbraco.Cms.Core.Search.Querying.Faceting.FacetResult;
+using SearchResult = Umbraco.Cms.Core.Search.Querying.SearchResult;
 
 namespace Umbraco.Cms.Search.Provider.Examine.Services;
 
 /// <summary>
-/// Implements <see cref="Umbraco.Cms.Search.Core.Services.ISearcher"/> against Examine/Lucene, translating core
+/// Implements <see cref="Umbraco.Cms.Core.Search.ISearcher"/> against Examine/Lucene, translating core
 /// <see cref="Filter"/>, <see cref="Facet"/>, and <see cref="Sorter"/> types into Examine query operations.
 /// </summary>
 public class Searcher : IExamineSearcher
@@ -131,7 +132,14 @@ public class Searcher : IExamineSearcher
                 //    documents with "whatever" because the wildcard is applied at the end of the query.
                 // to counter for these cases, we split the query into multiple terms and apply wildcard search to each
                 // term with AND grouping.
-                var terms = query.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                // the clauses built below append a wildcard to each term, so a term that already begins with a
+                // wildcard character would yield a leading-wildcard query, which Lucene rejects outright. such a
+                // term carries no text to match on, so drop it rather than fail the whole search.
+                var terms = query
+                    .Split(' ', StringSplitOptions.RemoveEmptyEntries)
+                    .Select(term => term.TrimStart('*', '?'))
+                    .Where(term => term.Length > 0)
+                    .ToArray();
                 foreach (var term in terms)
                 {
                     searchQuery.And().Group(nestedQuery => CreateAggregatedTextQuery(nestedQuery, term, segment));
@@ -601,7 +609,7 @@ public class Searcher : IExamineSearcher
 
                     foreach (IFacetValue decimalExactFacetValue in examineDecimalFacets)
                     {
-                        if (decimal.TryParse(decimalExactFacetValue.Label, out var labelValue) is false)
+                        if (TryParseFacetLabelAsDecimal(decimalExactFacetValue.Label, out var labelValue) is false)
                         {
                             // Cannot convert the label to decimal, skipping.
                             continue;
@@ -662,6 +670,24 @@ public class Searcher : IExamineSearcher
             }
         }
     }
+
+    /// <summary>
+    /// Attempts to parse a facet label as a decimal value, handling both invariant and current culture formats.
+    /// </summary>
+    /// <param name="label">The facet label to parse.</param>
+    /// <param name="value">The parsed decimal value, if successful.</param>
+    /// <returns>True if the label was successfully parsed as a decimal; otherwise, false.</returns>
+    /// <remarks>
+    /// Numeric facet labels are formatted by the search index using the culture of the thread that performed the
+    /// indexing, which is not necessarily the culture of the thread performing the search. The format carries a
+    /// decimal separator but never group separators, which is what makes replacing a comma safe.
+    /// Known gap: when the indexing culture's decimal separator is neither "." nor "," (for example fa-IR) and
+    /// the search culture differs, the label fails to parse and its bucket is omitted from the facet result.
+    /// Whole numbers are unaffected, as are the matched documents themselves.
+    /// </remarks>
+    internal static bool TryParseFacetLabelAsDecimal(string label, out decimal value)
+        => decimal.TryParse(label.Replace(',', '.'), NumberStyles.Float, CultureInfo.InvariantCulture, out value)
+           || decimal.TryParse(label, NumberStyles.Float, CultureInfo.CurrentCulture, out value);
 
     /// <summary>
     /// Override this method to extract custom <see cref="Facet"/> types to <see cref="FacetResult"/> in derived classes.

@@ -24,7 +24,7 @@ import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
-import { UmbReadOnlyVariantGuardManager } from '@umbraco-cms/backoffice/utils';
+import { UmbDeprecation, UmbReadOnlyVariantGuardManager } from '@umbraco-cms/backoffice/utils';
 import {
 	UmbPropertyValuePresetVariantBuilderController,
 	type UmbPropertyTypePresetModel,
@@ -40,6 +40,7 @@ export type UmbBlockDataObjectModel<LayoutEntryType extends UmbBlockLayoutBaseMo
 	content: UmbBlockDataModel;
 	settings?: UmbBlockDataModel;
 };
+
 export abstract class UmbBlockManagerContext<
 	BlockType extends UmbBlockTypeBaseModel = UmbBlockTypeBaseModel,
 	BlockLayoutType extends UmbBlockLayoutBaseModel = UmbBlockLayoutBaseModel,
@@ -84,6 +85,17 @@ export abstract class UmbBlockManagerContext<
 	public readonly contents = this.#contents.asObservable();
 
 	readonly #externalContentValues = new UmbArrayState(<Array<UmbBlockDataModel>>[], (x) => x.key);
+
+	/**
+	 * Combined observable of local block content and resolved external (library element) content.
+	 * Use this alongside `contents` when you also need to react to library elements becoming available.
+	 * The two arrays are concatenated without de-duplication — a key present in both (which should not
+	 * normally happen) appears twice, with the local entry taking precedence in lookups like `getContentOf`.
+	 */
+	public readonly allContents = mergeObservables(
+		[this.#contents.asObservable(), this.#externalContentValues.asObservable()],
+		([local, external]) => [...(local ?? []), ...(external ?? [])],
+	);
 	readonly #externalContentVariants = new UmbArrayState(
 		<
 			Array<{ key: string; variants: Array<{ culture: string | null; segment: string | null; state: string | null }> }>
@@ -843,7 +855,17 @@ export abstract class UmbBlockManagerContext<
 		}
 	}
 
+	/**
+	 * @deprecated Use `removeOneContent` instead. Scheduled for removal in Umbraco 20.
+	 * @param {string} contentKey - The content key of the layout element to delete.
+	 * @internal
+	 */
 	protected removeBlockKey(contentKey: string) {
-		this.#contents.removeOne(contentKey);
+		new UmbDeprecation({
+			deprecated: 'removeBlockKey is deprecated.',
+			removeInVersion: '20.0.0',
+			solution: 'Use removeOneContent instead.',
+		}).warn();
+		this.removeOneContent(contentKey);
 	}
 }

@@ -59,6 +59,7 @@ export default {
 		remove: 'Remove',
 		rename: 'Rename',
 		republish: 'Republish entire site',
+		replace: 'Replace',
 		resendInvite: 'Resend Invitation',
 		restore: 'Restore',
 		rights: 'Permissions',
@@ -226,8 +227,8 @@ export default {
 		sendtopublishvariant: 'Content sent for publishing for languages: %0%',
 		sort: 'Sort child items performed by user',
 		custom: '%0%',
-		contentversionpreventcleanup: 'Clean up disabled for version: %0%',
-		contentversionenablecleanup: 'Clean up enabled for version: %0%',
+		contentversionpreventcleanup: 'Cleanup disabled for version: %0%',
+		contentversionenablecleanup: 'Cleanup enabled for version: %0%',
 		smallAssignDomain: 'Assign Hostname',
 		smallCopy: 'Copy',
 		smallPublish: 'Publish',
@@ -357,6 +358,7 @@ export default {
 		isSensitiveValue:
 			'This value is hidden. If you need access to view this value please contact your website administrator.',
 		isSensitiveValue_short: 'This value is hidden.',
+		isSensitiveValueNotice: 'If you need access to view the hidden values, contact your website administrator.',
 		languagesToPublish: 'What languages would you like to publish?',
 		languagesToSendForApproval: 'What languages would you like to send for approval?',
 		languagesToSchedule: 'What languages would you like to schedule?',
@@ -821,6 +823,8 @@ export default {
 		externalLoginError: 'External login',
 		unauthorized: 'You were not authorized before performing this action',
 		userNotFound: 'The local user was not found in the database',
+		lockedOut: 'The user is locked, and needs to be unlocked before more login attempts can be made',
+		notAllowed: 'The operation is not allowed on the user',
 		externalInfoNotFound: 'The server did not succeed in communicating with the external login provider',
 		externalLoginFailed:
 			'The server failed to authorize you against the external login provider. Please close the window and try again.',
@@ -986,6 +990,7 @@ export default {
 		status: 'Status',
 		submit: 'Submit',
 		success: 'Success',
+		switchView: 'Switch view',
 		type: 'Type',
 		typeName: 'Type Name',
 		typeToSearch: 'Type to search...',
@@ -1571,6 +1576,17 @@ export default {
 			'Drag the different items up or down below to set how they should be arranged. Or click the column headers to sort the entire collection of items',
 		sortPleaseWait: 'Please wait. Items are being sorted, this can take a while.',
 		sortEmptyState: 'This node has no child nodes to sort',
+		sortByFieldHeadline: 'Sort by field',
+		sortByFieldSentence: 'Sort all children by',
+		sortByFieldDirectionLabel: 'Direction',
+		sortByFieldAscending: 'Ascending',
+		sortByFieldDescending: 'Descending',
+		sortByFieldNameOption: 'Name',
+		sortByFieldCreateDateOption: 'Created',
+		sortByFieldUpdateDateOption: 'Last edited',
+		sortIndividuallyHeadline: 'Sort individually',
+		sortByFieldCultureSentence: 'in',
+		sortByFieldCultureLabel: 'Language',
 	},
 	speechBubbles: {
 		validationFailedHeader: 'Validation',
@@ -1965,14 +1981,14 @@ export default {
 		removeChildNodeWarning:
 			'Removing a child node will limit the editors options to create different content types beneath a node.',
 		usingEditor: 'using this editor will get updated with the new settings.',
-		historyCleanupHeading: 'History clean up',
-		historyCleanupDescription: 'Allow overriding the global history clean up settings.',
+		historyCleanupHeading: 'History cleanup',
+		historyCleanupDescription: 'Allow overriding the global history cleanup settings.',
 		historyCleanupKeepAllVersionsNewerThanDays: 'Keep all versions newer than days',
 		historyCleanupKeepLatestVersionPerDayForDays: 'Keep latest version per day for days',
-		historyCleanupPreventCleanup: 'Prevent clean up',
-		historyCleanupEnableCleanup: 'Enable clean up',
+		historyCleanupPreventCleanup: 'Prevent cleanup',
+		historyCleanupEnableCleanup: 'Enable cleanup',
 		historyCleanupGloballyDisabled:
-			'<strong>NOTE!</strong> The clean up of historically content versions are disabled globally. These settings will not take effect before it is enabled.',
+			'<strong>NOTE!</strong> The clean up of historical content versions is disabled globally. These settings will not take effect before it is enabled.',
 		changeDataTypeHelpText:
 			'Changing a data type with stored values is disabled. To allow this you can change the Umbraco:CMS:DataTypes:CanBeChanged setting in appsettings.json.',
 		collection: 'Collection',
@@ -2665,6 +2681,7 @@ export default {
 		labelDescendantsWithReferences: 'Descendants with references',
 		labelDependsOnThis: 'The following items depend on this',
 		labelDependentDescendants: 'The following descending items have dependencies',
+		labelUsedByOtherContent: 'The following items are used by other content',
 		labelMoreReferences: (count: number) => {
 			if (count === 1) return '...and one more item';
 			return `...and ${count} more items`;
@@ -2690,10 +2707,12 @@ export default {
 		searchThisMessageWithGoogle: 'Search this message with Google',
 		searchWithBing: 'Search With Bing',
 		searchThisMessageWithBing: 'Search this message with Bing',
-		searchOurUmbraco: 'Search Our Umbraco',
-		searchThisMessageOnOurUmbracoForumsAndDocs: 'Search this message on Our Umbraco forums and docs',
-		searchOurUmbracoWithGoogle: 'Search Our Umbraco with Google',
-		searchOurUmbracoForumsUsingGoogle: 'Search Our Umbraco forums using Google',
+		searchOurUmbraco: 'Search Umbraco forum',
+		searchThisMessageOnOurUmbracoForumsAndDocs: 'Search this message in the Umbraco forum',
+		searchOurUmbracoWithGoogle: 'Search Umbraco forum with Google',
+		searchOurUmbracoForumsUsingGoogle: 'Search Umbraco forum using Google',
+		searchUmbracoDocs: 'Search Umbraco documentation',
+		searchThisMessageInUmbracoDocs: 'Search this message in the Umbraco documentation',
 		searchUmbracoSource: 'Search Umbraco Source',
 		searchWithinUmbracoSourceCodeOnGithub: 'Search within Umbraco source code on GitHub',
 		searchUmbracoIssues: 'Search Umbraco Issues',
@@ -2745,6 +2764,7 @@ export default {
 		confirmPasteOverwriteMessage: (name: string) =>
 			`The property already contains a value. Paste from the property action will overwrite the current value. Do you want to replace the current value with <strong>${name}</strong>?`,
 		copySuccessHeadline: 'Copied to clipboard',
+		noItemsMessage: 'There are no items in the clipboard.',
 	},
 	propertyActions: {
 		tooltipForPropertyActionsMenu: 'Open Property Actions',
@@ -2960,6 +2980,7 @@ export default {
 		labelInlineMode: 'Display inline with text',
 		notExposedLabel: 'Draft',
 		notExposedDescription: 'This Block is not yet created for this variant',
+		notPublishedLibraryElementDescription: 'The Library Element used by this Block is not published',
 		areaValidationEntriesNotAllowed: '<strong>%0%</strong> is not allowed in this area.',
 		rootValidationEntriesNotAllowed: '<strong>%0%</strong> is not allowed in the root of this property.',
 		unsupportedBlockName: 'Unsupported',
@@ -3149,6 +3170,107 @@ export default {
 		emptyDate: 'Please select a date',
 		emptyTimeZone: 'Please select a time zone',
 		invalidTimeZone: 'The selected time zone is not valid',
+	},
+	searchExamine: {
+	  showFields: 'Show Fields',
+	  invariantCulture: 'Invariant',
+	  headline: 'Search Document Fields',
+	  filterPlaceholder: 'Filter fields by name or value...',
+	  filterLabel: 'Filter fields by name or value',
+	  fieldCount: (count: number) => {
+	    switch (count) {
+	      case 1:
+	        return '1 field';
+	      default:
+	        return `${count} fields`;
+	    }
+	  },
+	  tableColumnName: 'Name',
+	  tableColumnValue: 'Value',
+	  copyValue: 'Copy value',
+	  seeMore: 'See more',
+	  seeLess: 'See less',
+	  noFieldsMatch: 'No fields match your filter.',
+	  noFields: 'This document has no indexed fields.',
+	  loadError: 'Failed to load document fields. Please try again.',
+	  valueIndex: (index: number) => `Value ${index}`,
+	  fieldType: (type: string) => {
+	    switch (type) {
+	      case 'keywords':
+	        return 'Keyword (exact match)';
+	      case 'texts':
+	        return 'Full Text';
+	      case 'textsr1':
+	        return 'Full Text (Boost: High)';
+	      case 'textsr2':
+	        return 'Full Text (Boost: Medium)';
+	      case 'textsr3':
+	        return 'Full Text (Boost: Low)';
+	      case 'integers':
+	        return 'Integer';
+	      case 'decimals':
+	        return 'Decimal';
+	      case 'datetimeoffsets':
+	        return 'Date/Time';
+	      default:
+	        return type;
+	    }
+	  },
+	},
+	searchManagement: {
+		treeHeader: 'Search',
+		tableColumnAlias: 'Alias',
+		tableColumnHealthStatus: 'Health status',
+		tableColumnDocumentCount: 'Document count',
+		healthStatus: (status: string) => status,
+		documentCount: (cnt: number | string) => {
+			switch (cnt) {
+				case 0:
+					return 'Empty';
+				case 1:
+					return '1 document';
+				default:
+					return `${cnt} documents`;
+			}
+		},
+		collectionActionReload: 'Refresh',
+		entityActionRebuildIndex: 'Rebuild',
+		rebuildConfirmHeadline: 'Rebuild index',
+		rebuildConfirmMessage:
+			'<strong>{0}</strong> will be rebuilt from scratch. Searching it may return <i>incomplete results</i> until the rebuild finishes.',
+		rebuildConfirmLabel: 'Rebuild',
+		rebuildStartedMessage: 'Rebuilding {0} in the background.',
+		rebuildCompletedTitle: 'Rebuild completed',
+		rebuildCompletedMessage: '{0} has finished rebuilding.',
+		indexInfo: 'Index information',
+		indexAlias: 'Alias',
+		providerName: 'Provider',
+		searchBox: 'Search',
+		searchPlaceholder: 'Search',
+		searchButton: 'Search',
+		noResults: 'No results',
+		resultsCount: (count: number) => `Found ${count} result${count !== 1 ? 's' : ''}`,
+		tableColumnName: 'Name',
+		tableColumnEntityType: 'Type',
+		statsBoxLabel: 'Statistics',
+		searchBoxLabel: 'Search',
+		// Accessibility labels
+		searching: 'Searching...',
+		searchFailed: 'Search failed',
+		searchComplete: (count: number) => `Search complete. Found ${count} result${count !== 1 ? 's' : ''}`,
+		openEntity: (type: string, id: string) => `Open ${type} with ID ${id}`,
+		searchFormLabel: (indexAlias: string) => `Search ${indexAlias} index`,
+		searchInputLabel: 'Search query',
+		searchInputAriaLabel: (indexAlias: string) => `Enter search query for ${indexAlias} index`,
+		searchButtonAriaLabel: 'Execute search',
+		searchHint: 'Press Enter to search',
+		loading: 'Loading search results',
+		resultsRegion: 'Search results',
+		resultsTable: 'Search results table',
+		paginationLabel: 'Search results pages',
+		cultureSelectLabel: 'Culture',
+		searchDisabled: 'Search unavailable. Index status:',
+		searchError: 'Search failed. Try again.',
 	},
 	uiCulture: {
 		ar: 'العربية',

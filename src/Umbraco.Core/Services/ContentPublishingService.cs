@@ -86,7 +86,7 @@ internal sealed class ContentPublishingService : ContentPublishingServiceBase<IC
             return MapInternalPublishingAttempt(minimalAttempt);
         }
 
-        _logger.LogDebug("Starting long running operation for publishing branch {Key} on background thread.", key);
+        _logger.LogDebug("Starting long running operation for publishing branch {DocumentKey} on background thread.", key);
         Attempt<Guid, LongRunningOperationEnqueueStatus> enqueueAttempt = await _longRunningOperationService.RunAsync(
             PublishBranchOperationType,
             async _ => await PerformPublishBranchAsync(key, cultures, publishBranchFilter, userKey, returnContent: false),

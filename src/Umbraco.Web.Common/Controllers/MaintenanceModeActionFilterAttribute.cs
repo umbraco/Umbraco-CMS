@@ -88,7 +88,7 @@ public sealed class MaintenanceModeActionFilterAttribute : TypeFilterAttribute
 
             context.Result = _runtimeState.Level is RuntimeLevel.Upgrading || inInitializationWindow
                 ? new MaintenanceResult(_globalSettings.CurrentValue.UpgradingViewPath)
-                : new MaintenanceResult();
+                : new MaintenanceResult(_globalSettings.CurrentValue.MaintenanceViewPath);
         }
 
         public void OnActionExecuted(ActionExecutedContext context)

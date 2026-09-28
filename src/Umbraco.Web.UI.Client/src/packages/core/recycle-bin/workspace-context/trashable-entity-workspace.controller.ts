@@ -1,0 +1,152 @@
+import { UmbIsTrashedEntityContext } from '../contexts/is-trashed/is-trashed.entity-context.js';
+import { UmbEntityRestoredFromRecycleBinEvent, UmbEntityTrashedEvent } from '../entity-action/index.js';
+import { UMB_TRASHABLE_ENTITY_WORKSPACE_CONTEXT } from './trashable-entity-workspace.context-token.js';
+import type { UmbTrashableEntityWorkspaceContext } from './types.js';
+import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbVariantGuardRule } from '@umbraco-cms/backoffice/utils';
+
+/**
+ * Adds recycle-bin support (readonly-when-trashed, reload on trash/restore, redirect to parent when the current
+ * user trashes the open entity) to any workspace context satisfying {@link UmbTrashableEntityWorkspaceContext}.
+ * A plain controller, not a context — nothing needs to consume this from elsewhere. Registered directly as the
+ * default `api` of the `Umb.Kind.WorkspaceContext.Trashable` kind — entity types opt in via a `kind: 'trashable'`
+ * manifest instead of subclassing this.
+ * @class UmbTrashableEntityWorkspaceController
+ * @augments {UmbControllerBase}
+ */
+export class UmbTrashableEntityWorkspaceController extends UmbControllerBase {
+	#workspaceContext?: UmbTrashableEntityWorkspaceContext;
+	#actionEventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
+	#isTrashedContext = new UmbIsTrashedEntityContext(this);
+	#navigationParentItemPath?: string;
+
+	constructor(host: UmbControllerHost) {
+		super(host);
+
+		this.consumeContext(UMB_TRASHABLE_ENTITY_WORKSPACE_CONTEXT, (workspaceContext) => {
+			this.#workspaceContext = workspaceContext;
+
+			this.observe(
+				this.#workspaceContext?.isTrashed,
+				(isTrashed) => this.#onTrashStateChange(isTrashed),
+				'umbRecycleBinObserveIsTrashed',
+			);
+
+			this.observe(
+				this.#workspaceContext?.isNew,
+				(isNew) => {
+					if (isNew) {
+						this.#isTrashedContext.setIsTrashed(false);
+					}
+				},
+				'umbRecycleBinObserveIsNew',
+			);
+
+			this.observe(
+				this.#workspaceContext?.navigationParentItemPath,
+				(path) => (this.#navigationParentItemPath = path),
+				'umbRecycleBinObserveNavigationParentItemPath',
+			);
+		});
+
+		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (actionEventContext) => {
+			this.#removeEventListeners();
+			this.#actionEventContext = actionEventContext;
+			this.#addEventListeners();
+		});
+	}
+
+	#addEventListeners() {
+		this.#actionEventContext?.addEventListener(UmbEntityTrashedEvent.TYPE, this.#onTrashed as EventListener);
+		this.#actionEventContext?.addEventListener(
+			UmbEntityRestoredFromRecycleBinEvent.TYPE,
+			this.#onRestored as EventListener,
+		);
+	}
+
+	#removeEventListeners() {
+		this.#actionEventContext?.removeEventListener(UmbEntityTrashedEvent.TYPE, this.#onTrashed as EventListener);
+		this.#actionEventContext?.removeEventListener(
+			UmbEntityRestoredFromRecycleBinEvent.TYPE,
+			this.#onRestored as EventListener,
+		);
+	}
+
+	#isMatchingEvent(event: UmbEntityTrashedEvent | UmbEntityRestoredFromRecycleBinEvent) {
+		return (
+			event.getUnique() === this.#workspaceContext?.getUnique() &&
+			event.getEntityType() === this.#workspaceContext?.getEntityType()
+		);
+	}
+
+	#onRestored = (event: UmbEntityRestoredFromRecycleBinEvent) => {
+		if (!this.#isMatchingEvent(event)) return;
+		this.#workspaceContext?.reload();
+	};
+
+	#onTrashed = (event: UmbEntityTrashedEvent) => {
+		if (!this.#isMatchingEvent(event)) return;
+
+		// Only reload when staying put (a modal), to refresh the visible trashed state — when redirecting away,
+		// the new data isn't needed here.
+		if (event.getUnique() && !this.#workspaceContext?.modalContext) {
+			// The entity is already trashed server-side by this point, so any local edits are moot — reset
+			// the data first so pushState's navigation guard doesn't intercept the redirect with a "discard
+			// changes?" prompt the user never asked for.
+			this.#workspaceContext?.resetData();
+
+			try {
+				this.#redirectToParent();
+			} catch (error) {
+				console.error('Failed to redirect after trashing, reloading in place instead:', error);
+				this.#workspaceContext?.reload();
+			}
+			return;
+		}
+
+		this.#workspaceContext?.reload();
+	};
+
+	#redirectToParent() {
+		const path = this.#navigationParentItemPath;
+		if (!path) throw new Error('Navigation parent item path is not available.');
+
+		// Trashing doesn't delete the entity — it stays reachable, readonly, at its own edit URL. So unlike a
+		// delete or a rename, that URL is still worth keeping in history: pushState rather than replaceState.
+		window.history.pushState(null, '', path);
+	}
+
+	#onTrashStateChange(isTrashed?: boolean) {
+		// TODO v20
+		// `undefined` means "not settled yet" (loading, or data just cleared), not "not trashed". Ideally
+		// that distinction would be forwarded to `#isTrashedContext` and left for consumers (e.g. the
+		// trashed/not-trashed conditions) to ignore as they see fit — but `UmbIsTrashedEntityContext` is
+		// public API typed as `boolean`, and widening it to `boolean | undefined` would be a breaking
+		// change. So keep the last settled value here instead of forwarding an unsettled one.
+		if (isTrashed === undefined) return;
+
+		this.#isTrashedContext.setIsTrashed(isTrashed);
+
+		const guardUnique = `UMB_PREVENT_EDIT_TRASHED_ITEM`;
+
+		if (!isTrashed) {
+			this.#workspaceContext?.readOnlyGuard.removeRule(guardUnique);
+			return;
+		}
+
+		const rule: UmbVariantGuardRule = {
+			unique: guardUnique,
+			permitted: true,
+		};
+
+		// TODO: Change to use property write guard when it supports making the name read-only.
+		this.#workspaceContext?.readOnlyGuard.addRule(rule);
+	}
+
+	public override destroy(): void {
+		this.#removeEventListeners();
+		super.destroy();
+	}
+}

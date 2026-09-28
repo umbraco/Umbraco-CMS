@@ -1,7 +1,8 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Search.Configuration;
+using Umbraco.Cms.Core.Search.Indexing;
 using Umbraco.Cms.Search.Core.Cache.Index;
-using Umbraco.Cms.Search.Core.Configuration;
 
 namespace Umbraco.Cms.Search.Core.Services.ContentIndexing;
 

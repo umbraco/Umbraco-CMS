@@ -553,41 +553,18 @@ public class DocumentUrlServiceTests
     }
 
     /// <summary>
-    /// On a Subscriber the scheduling publisher has already persisted URL segments before publishing the
-    /// cache-refresh instruction, so the subscriber must not re-persist them. Re-writing blows up on
-    /// subscribers configured against a read-only database (issue #22570).
-    /// </summary>
-    [Test]
-    public async Task CreateOrUpdateUrlSegmentsAsync_OnSubscriber_DoesNotCallRepositorySave()
-    {
-        // Arrange
-        var languages = new List<ILanguage> { CreateMockLanguage(1, "en-US") };
-
-        var urlSegmentProvider = CreateFixedSegmentProvider("test-segment");
-        var urlSegmentProviderCollection = new UrlSegmentProviderCollection(() => [urlSegmentProvider]);
-
-        var (service, repositoryMock) = CreateDocumentUrlServiceWithMocks(
-            urlSegmentProviderCollection, languages, ServerRole.Subscriber);
-
-        var contentMock = CreateMockContent(Guid.NewGuid(), variesByCulture: false, isPublished: true);
-
-        // Act
-        await service.CreateOrUpdateUrlSegmentsAsync([contentMock.Object]);
-
-        // Assert
-        repositoryMock.Verify(
-            x => x.Save(It.IsAny<IEnumerable<PublishedDocumentUrlSegment>>()),
-            Times.Never,
-            "Subscribers must not persist URL segments — the publisher already has.");
-    }
-
-    /// <summary>
-    /// Regression guard for the subscriber guard: Single and SchedulingPublisher roles must still persist
-    /// URL segments as they did before the fix.
+    /// CreateOrUpdateUrlSegmentsAsync runs for a change made on this server, after the content write has committed
+    /// on this server's connection, and no other server persists the segments for that change (they only refresh
+    /// their in-memory cache from the instruction). The write must therefore happen whatever the elected server
+    /// role: an instance serving the backoffice can hold the Subscriber role (a second backoffice replica, or the
+    /// surviving instance during a deployment), and skipping there leaves the document unroutable on every server
+    /// after its next restart. Unknown is included because the role is unresolved at boot.
     /// </summary>
     [TestCase(ServerRole.Single)]
     [TestCase(ServerRole.SchedulingPublisher)]
-    public async Task CreateOrUpdateUrlSegmentsAsync_OnSingleOrPublisher_CallsRepositorySave(ServerRole role)
+    [TestCase(ServerRole.Subscriber)]
+    [TestCase(ServerRole.Unknown)]
+    public async Task CreateOrUpdateUrlSegmentsAsync_CallsRepositorySave_ForAnyServerRole(ServerRole role)
     {
         // Arrange
         var languages = new List<ILanguage> { CreateMockLanguage(1, "en-US") };
@@ -607,13 +584,39 @@ public class DocumentUrlServiceTests
         repositoryMock.Verify(
             x => x.Save(It.IsAny<IEnumerable<PublishedDocumentUrlSegment>>()),
             Times.Once,
-            $"The {role} role must continue to persist URL segments.");
+            $"The {role} role must persist URL segments for changes made on this server.");
     }
 
     /// <summary>
-    /// Even though a subscriber skips the database write, the in-memory URL cache must still be refreshed
-    /// so that URL resolution keeps working on the subscriber after the publisher renames a node. This
-    /// guards against over-zealous skipping of the deferred scope-context enlistments.
+    /// The start-up rebuild is a database write that no local content change precedes, so it keeps honouring the
+    /// Subscriber role, which may be configured against a read-only database (issue #22570).
+    /// </summary>
+    [Test]
+    public async Task RebuildAllUrlsAsync_OnSubscriber_DoesNotCallRepositorySave()
+    {
+        // Arrange
+        var languages = new List<ILanguage> { CreateMockLanguage(1, "en-US") };
+
+        var urlSegmentProvider = CreateFixedSegmentProvider("test-segment");
+        var urlSegmentProviderCollection = new UrlSegmentProviderCollection(() => [urlSegmentProvider]);
+
+        var (service, repositoryMock) = CreateDocumentUrlServiceWithMocks(
+            urlSegmentProviderCollection, languages, ServerRole.Subscriber);
+
+        // Act
+        await service.RebuildAllUrlsAsync();
+
+        // Assert
+        repositoryMock.Verify(
+            x => x.Save(It.IsAny<IEnumerable<PublishedDocumentUrlSegment>>()),
+            Times.Never,
+            "Subscribers must not rebuild URL segments — the publisher maintains them.");
+    }
+
+    /// <summary>
+    /// The in-memory URL cache must be refreshed alongside the write, so URL resolution works immediately on the
+    /// server that made the change whatever its role. This guards against over-zealous skipping of the deferred
+    /// scope-context enlistments.
     /// </summary>
     [Test]
     public async Task CreateOrUpdateUrlSegmentsAsync_OnSubscriber_StillPopulatesInMemoryCache()
@@ -632,12 +635,12 @@ public class DocumentUrlServiceTests
         // Act
         await service.CreateOrUpdateUrlSegmentsAsync([contentMock.Object]);
 
-        // Assert — the in-memory lookup resolves even though we never wrote to the database.
+        // Assert — the in-memory lookup resolves without waiting for a cache instruction.
         var resolved = service.GetUrlSegment(documentKey, "en-US", isDraft: false);
         Assert.AreEqual(
             "test-segment",
             resolved,
-            "Subscribers must still update the in-memory URL cache so routing keeps working locally.");
+            "The in-memory URL cache must be updated so routing works locally straight away.");
     }
 
     #endregion

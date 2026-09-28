@@ -170,6 +170,10 @@ export class ScriptApiHelper {
   // Folder
   async getFolder(path: string) {
     const response = await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/script/folder/' + encodeURIComponent(path));
+    if (!response.ok()) {
+      return null;
+    }
+
     return await response.json();
   }
 

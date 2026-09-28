@@ -3,12 +3,10 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.HostedServices;
-using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Search.Core.Configuration;
-using Umbraco.Cms.Search.Core.Models.Configuration;
-using Umbraco.Cms.Search.Core.Models.Indexing;
-using Umbraco.Cms.Search.Core.Notifications;
+using Umbraco.Cms.Core.Notifications;
+using Umbraco.Cms.Core.Search;
+using Umbraco.Cms.Core.Search.Configuration;
+using Umbraco.Cms.Core.Search.Indexing;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Search.Core.Services.ContentIndexing;
@@ -96,10 +94,22 @@ internal sealed class ContentIndexingService : IContentIndexingService
             return;
         }
 
-        if (indexRegistration.SameOriginOnly && origin != _originProvider.GetCurrent())
+        var currentOrigin = _originProvider.GetCurrent();
+        if (indexRegistration.SameOriginOnly && origin != currentOrigin)
         {
+            if (_logger.IsEnabled(LogLevel.Debug))
+            {
+                _logger.LogDebug(
+                    "Skipping rebuild of index {IndexAlias} - it only accepts same-origin rebuilds, and the request originated from {RequestOrigin} rather than {CurrentOrigin}.",
+                    indexRegistration.IndexAlias,
+                    origin,
+                    currentOrigin);
+            }
+
             return;
         }
+
+        _logger.LogInformation("Queued rebuild of index {IndexAlias}", indexRegistration.IndexAlias);
 
         _backgroundTaskQueue.QueueBackgroundWorkItem(async cancellationToken => await RebuildAsync(indexRegistration, cancellationToken));
     }
@@ -111,6 +121,8 @@ internal sealed class ContentIndexingService : IContentIndexingService
         {
             return;
         }
+
+        _logger.LogInformation("Starting rebuild of index {IndexAlias}", indexRegistration.IndexAlias);
 
         await _eventAggregator.PublishAsync(new IndexRebuildStartingNotification(indexRegistration.IndexAlias), cancellationToken);
 

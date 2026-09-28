@@ -72,7 +72,7 @@ public sealed partial class HtmlStringUtilities
             foreach (HtmlNode target in CollectionsMarshal.AsSpan(targets))
             {
                 HtmlNode content = doc.CreateTextNode(target.InnerHtml + " ");
-                target.ParentNode.ReplaceChild(content, target);
+                target.ParentNode!.ReplaceChild(content, target);
             }
         }
         else

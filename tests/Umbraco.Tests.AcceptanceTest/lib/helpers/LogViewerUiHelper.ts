@@ -1,5 +1,6 @@
 import {Page, Locator, expect} from "@playwright/test";
 import {UiBaseLocators} from "./UiBaseLocators";
+import {ConstantHelper} from "./ConstantHelper";
 
 export class LogViewerUiHelper extends UiBaseLocators {
   private readonly searchBtn: Locator;
@@ -66,7 +67,7 @@ export class LogViewerUiHelper extends UiBaseLocators {
     // The force click is necessary.
     await this.click(this.saveSearchHeartIcon, {force: true});
     await this.enterText(this.searchNameTxt, searchName);
-    await this.click(this.saveSearchBtn);
+    await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.logViewerSavedSearch, this.click(this.saveSearchBtn), ConstantHelper.statusCodes.created, ConstantHelper.httpMethods.post);
   }
 
   checkSavedSearch(searchName: string) {
@@ -122,5 +123,9 @@ export class LogViewerUiHelper extends UiBaseLocators {
 
   async waitUntilLoadingSpinnerInvisible() {
     await this.hasCount(this.loadingSpinner, 0);
+  }
+
+  async clickDeleteButtonAndWaitForSavedSearchToBeDeleted() {
+    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.logViewerSavedSearch, this.clickDeleteButton(), ConstantHelper.statusCodes.ok, ConstantHelper.httpMethods.delete);
   }
 }

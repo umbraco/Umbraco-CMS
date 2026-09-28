@@ -8,4 +8,11 @@
     <Right>lib/net10.0/Umbraco.Tests.Integration.dll</Right>
     <IsBaselineSuppression>true</IsBaselineSuppression>
   </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>F:Umbraco.Cms.Tests.Integration.ManagementApi.ManagementApiUserGroupTestBase`1.UserPassword</Target>
+    <Left>lib/net10.0/Umbraco.Tests.Integration.dll</Left>
+    <Right>lib/net10.0/Umbraco.Tests.Integration.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
 </Suppressions>
