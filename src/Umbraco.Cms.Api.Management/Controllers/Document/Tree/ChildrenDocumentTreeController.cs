@@ -21,6 +21,10 @@ namespace Umbraco.Cms.Api.Management.Controllers.Document.Tree;
 [ApiVersion("1.0")]
 public class ChildrenDocumentTreeController : DocumentTreeControllerBase
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ChildrenDocumentTreeController"/> class.
+    /// </summary>
+    /// <param name="entityService">Service for managing and retrieving entities in the system.</param>
     /// <param name="flagProviders">A collection of providers that supply flags for document tree nodes.</param>
     /// <param name="treeFilterService">Service for filtering document tree entities based on user start nodes.</param>
     /// <param name="publicAccessService">Service for handling public access permissions on documents.</param>

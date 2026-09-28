@@ -40,6 +40,7 @@ public class UpdateUserGroupsUserController : UserGroupControllerBase
     /// </summary>
     /// <param name="authorizationService">Service used to authorize user group update operations.</param>
     /// <param name="userGroupService">Service used to manage user group data and operations.</param>
+    /// <param name="backOfficeSecurityAccessor">Accessor for the back office security context of the current user.</param>
     public UpdateUserGroupsUserController(
         IAuthorizationService authorizationService,
         IUserGroupService userGroupService,

@@ -21,6 +21,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.Document.Tree;
 [ApiVersion("1.0")]
 public class RootDocumentTreeController : DocumentTreeControllerBase
 {
+    /// <summary>
     /// Initializes a new instance of the <see cref="RootDocumentTreeController"/> class.
     /// </summary>
     /// <param name="entityService">Service for managing and retrieving entities in the system.</param>
