@@ -1,4 +1,4 @@
-import type { UmbContentDetailModel, UmbElementValueModel } from '../types.js';
+import type { UmbContentDetailModel } from '../types.js';
 import { UmbContentCollectionConfigurationContext, UmbContentCollectionManager } from '../collection/index.js';
 import { UmbContentWorkspaceDataManager } from '../manager/index.js';
 import { UmbMergeContentVariantDataController } from '../controller/merge-content-variant-data.controller.js';
