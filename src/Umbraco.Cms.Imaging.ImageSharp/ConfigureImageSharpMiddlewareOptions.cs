@@ -87,7 +87,7 @@ public sealed class ConfigureImageSharpMiddlewareOptions : IConfigureOptions<Ima
 
         // Bound concurrent decoding from here rather than from the middleware: this runs on a cache
         // miss only, immediately before the decode, so a request the cache can serve never waits.
-        // The middleware owns the slot and gives the place back when the request ends.
+        // The middleware owns the slot; the place is given back below, or when the request ends.
         Func<ImageCommandContext, Configuration, Task<DecoderOptions?>> onBeforeLoadAsync = options.OnBeforeLoadAsync;
         options.OnBeforeLoadAsync = async (context, configuration) =>
         {
@@ -98,6 +98,22 @@ public sealed class ConfigureImageSharpMiddlewareOptions : IConfigureOptions<Ima
             }
 
             return await onBeforeLoadAsync(context, configuration);
+        };
+
+        // The decoded image has been disposed by the time this runs, and the cache write and the
+        // response that follow hold only the encoded result, so the place is given back here rather
+        // than when the request ends. The middleware releases again at the end of the request, which
+        // is a no-op after this, and covers a request that faulted before getting here.
+        Func<ImageProcessingContext, Task> onProcessedAsync = options.OnProcessedAsync;
+        options.OnProcessedAsync = async context =>
+        {
+            await onProcessedAsync(context);
+
+            if (context.Context.Items.TryGetValue(ImageProcessingSlot.HttpContextItemKey, out var value)
+                && value is ImageProcessingSlot slot)
+            {
+                slot.Release();
+            }
         };
 
         // Change Cache-Control header when cache buster value is present

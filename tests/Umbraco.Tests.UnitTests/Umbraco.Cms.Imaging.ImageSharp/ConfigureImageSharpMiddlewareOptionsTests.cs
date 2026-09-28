@@ -72,6 +72,60 @@ public class ConfigureImageSharpMiddlewareOptionsTests
         });
     }
 
+    // The place has to come back as soon as the decoded image is gone, or the cache write and the
+    // response that follow occupy it for nothing.
+    [Test]
+    public async Task Configure_OnProcessedAsync_GivesTheRequestSlotBack()
+    {
+        ImageSharpMiddlewareOptions options = Configure();
+
+        using var semaphore = new SemaphoreSlim(1, 1);
+        var slot = new ImageProcessingSlot(semaphore, TimeSpan.FromSeconds(5));
+        await slot.AcquireAsync(CancellationToken.None);
+
+        await options.OnProcessedAsync(CreateProcessingContext(slot));
+
+        Assert.That(semaphore.CurrentCount, Is.EqualTo(1));
+    }
+
+    [Test]
+    public void Configure_OnProcessedAsync_WhenNoSlotWasPublished_Continues()
+    {
+        ImageSharpMiddlewareOptions options = Configure();
+
+        Assert.DoesNotThrowAsync(() => options.OnProcessedAsync(CreateProcessingContext(slot: null)));
+    }
+
+    // Whatever was configured before must still run, so the throttle does not silently drop another
+    // component's post-processing.
+    [Test]
+    public async Task Configure_OnProcessedAsync_KeepsThePreviouslyConfiguredHook()
+    {
+        var previousHookRan = false;
+        var options = new ImageSharpMiddlewareOptions
+        {
+            OnProcessedAsync = _ =>
+            {
+                previousHookRan = true;
+                return Task.CompletedTask;
+            },
+        };
+
+        Configure(options);
+
+        using var semaphore = new SemaphoreSlim(1, 1);
+        var slot = new ImageProcessingSlot(semaphore, TimeSpan.FromSeconds(5));
+        await slot.AcquireAsync(CancellationToken.None);
+
+        await options.OnProcessedAsync(CreateProcessingContext(slot));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(previousHookRan, Is.True);
+            Assert.That(semaphore.CurrentCount, Is.EqualTo(1));
+        });
+    }
+
     private static ImageSharpMiddlewareOptions Configure()
     {
         var options = new ImageSharpMiddlewareOptions();
@@ -86,6 +140,16 @@ public class ConfigureImageSharpMiddlewareOptionsTests
             .Configure(options);
 
     private static ImageCommandContext CreateContext(ImageProcessingSlot? slot)
+        => new(
+            CreateHttpContext(slot),
+            new CommandCollection(),
+            new CommandParser(Array.Empty<ICommandConverter>()),
+            CultureInfo.InvariantCulture);
+
+    private static ImageProcessingContext CreateProcessingContext(ImageProcessingSlot? slot)
+        => new(CreateHttpContext(slot), Stream.Null, new CommandCollection(), "image/jpeg", "jpg");
+
+    private static HttpContext CreateHttpContext(ImageProcessingSlot? slot)
     {
         var httpContext = new DefaultHttpContext();
         if (slot is not null)
@@ -93,10 +157,6 @@ public class ConfigureImageSharpMiddlewareOptionsTests
             httpContext.Items[ImageProcessingSlot.HttpContextItemKey] = slot;
         }
 
-        return new ImageCommandContext(
-            httpContext,
-            new CommandCollection(),
-            new CommandParser(Array.Empty<ICommandConverter>()),
-            CultureInfo.InvariantCulture);
+        return httpContext;
     }
 }

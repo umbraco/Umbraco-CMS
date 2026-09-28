@@ -236,21 +236,25 @@ The concurrency cap is applied in two stages, and requests over it wait rather t
    decides whether a request *could* decode: it needs a registered processor command and a format
    that resolves to a configured image format, so an unrelated response like
    `/export.csv?format=xlsx` is left alone. For those that qualify it publishes an
-   `ImageProcessingSlot` on `HttpContext.Items` and releases it when the request ends.
+   `ImageProcessingSlot` on `HttpContext.Items` and releases it when the request ends, if nothing
+   else has by then.
 2. `ConfigureImageSharpMiddlewareOptions` wires `OnBeforeLoadAsync`, which ImageSharp invokes on a
    cache **miss** only, after the source is resolved and immediately before the decode. That is
    where the wait happens, so a cache hit never queues behind a decode.
 
-Splitting it this way keeps the wait precise while leaving the release somewhere it is guaranteed to
-run — the hook has no matching "after" callback, and the middleware's `finally` does. The slot is
-held until the request ends rather than freed when processing finishes, because the decoded image
-stays in memory while the result is encoded and cached.
+Splitting it this way keeps the wait precise while leaving a release somewhere it is guaranteed to
+run. The place is normally given back from `OnProcessedAsync`, which ImageSharp invokes once the
+decoded image has been disposed and before the result is written to the cache and sent — so the
+cache write and the response, which hold only the encoded result, do not occupy a place. The
+middleware's `finally` releases again when the request ends, which is a no-op after the first, and
+covers a request that faulted or was turned away before reaching the hook.
 
-**ImageSharp 2.x differs here.** ImageSharp.Web 2.0.2 has no `OnBeforeLoadAsync` (its earliest hook,
-`OnParseCommandsAsync`, runs before the cache check), so `Umbraco.Cms.Imaging.ImageSharp2` waits in
-the middleware for anything its request filter matches — cache hits included. The two copies of
-`ImageProcessingThrottleMiddleware` are therefore *not* interchangeable; the v2 copy is the coarser
-fallback.
+**ImageSharp 2.x differs on the way in, not the way out.** ImageSharp.Web 2.0.2 has no
+`OnBeforeLoadAsync` (its earliest hook, `OnParseCommandsAsync`, runs before the cache check), so
+`Umbraco.Cms.Imaging.ImageSharp2` takes the place in the middleware for anything its request filter
+matches — cache hits included. It does have `OnProcessedAsync`, so the release is the same as above.
+The two copies of `ImageProcessingThrottleMiddleware` are therefore *not* interchangeable; the v2
+copy is the coarser fallback.
 
 ImageSharp's own pool default is an eighth of available memory on a 64-bit process, released only on
 a gen2 collection and then at most 50% per minute, which leaves a container sitting well above its

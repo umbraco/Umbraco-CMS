@@ -27,10 +27,12 @@ namespace Umbraco.Cms.Imaging.ImageSharp;
 /// </para>
 /// <para>
 /// Running ahead of <c>UseImageSharp()</c> means a cache hit cannot be told from a decode, so a
-/// gated request holds its slot for the whole of the downstream pipeline - a cache hit, or a
-/// missing source falling through to the 404 content, included. Narrowing that further needs the
-/// gate inside the imaging middleware, at <c>OnBeforeLoadAsync</c>, which only ImageSharp.Web 3.x
-/// offers - hence the placement here, which both packages share.
+/// gated request takes its place before the downstream pipeline runs - for a cache hit, or a
+/// missing source falling through to the 404 content, as much as for a decode. Narrowing that
+/// needs the gate inside the imaging middleware, at <c>OnBeforeLoadAsync</c>, which only
+/// ImageSharp.Web 3.x offers. The release is the same in both packages: the imaging middleware's
+/// processed hook gives the place back as soon as the decoded image is disposed (see
+/// <see cref="ConfigureImageSharpMiddlewareOptions" />), and the end of the request is the backstop.
 /// </para>
 /// </remarks>
 public sealed class ImageProcessingThrottleMiddleware
@@ -140,21 +142,29 @@ public sealed class ImageProcessingThrottleMiddleware
             return;
         }
 
-        // Waiting without a bound is hanging, not degrading, so demand beyond what the host can
-        // serve is turned away instead of queued indefinitely.
-        if (await _semaphore.WaitAsync(ImageProcessingThrottle.WaitTimeout, context.RequestAborted) is false)
+        var slot = new ImageProcessingSlot(_semaphore, ImageProcessingThrottle.WaitTimeout);
+        try
+        {
+            // Waiting without a bound is hanging, not degrading, so demand beyond what the host can
+            // serve is turned away instead of queued indefinitely.
+            await slot.AcquireAsync(context.RequestAborted);
+        }
+        catch (ImageProcessingUnavailableException)
         {
             ImageProcessingThrottle.Reject(context, _logger);
             return;
         }
 
+        // Published so the imaging middleware can give the place back as soon as the decoded image
+        // is disposed; released again here for a request that never gets that far.
+        context.Items[ImageProcessingSlot.HttpContextItemKey] = slot;
         try
         {
             await InvokeNextAsync(context);
         }
         finally
         {
-            _semaphore.Release();
+            slot.Release();
         }
     }
 

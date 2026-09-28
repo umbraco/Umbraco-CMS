@@ -34,9 +34,10 @@ namespace Umbraco.Cms.Imaging.ImageSharp;
 /// </para>
 /// <para>
 /// Owning the slot here is what makes that safe: the place is given back when the request ends,
-/// whether the decode succeeded, threw, or never happened. It is held until then rather than
-/// released at the end of processing, because the decoded image stays in memory while the result
-/// is encoded and cached, and that is the memory being bounded.
+/// whether the decode succeeded, threw, or never happened. Normally it has already been given
+/// back by then. The imaging middleware's processed hook releases it as soon as the decoded image
+/// is disposed, so the cache write and the response that follow, which hold only the encoded
+/// result, do not occupy a place (see <see cref="ConfigureImageSharpMiddlewareOptions" />).
 /// </para>
 /// </remarks>
 public sealed class ImageProcessingThrottleMiddleware
