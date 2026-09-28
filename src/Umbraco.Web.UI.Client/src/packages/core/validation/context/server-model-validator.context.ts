@@ -18,7 +18,7 @@ import type { UmbApiError } from '@umbraco-cms/backoffice/resources';
  * @param {string} body - the message as returned by the server.
  * @returns {string} the message to present.
  */
-function collapseMissingToEmpty(body: string): string {
+function convertMissingToEmpty(body: string): string {
 	return body === UMB_VALIDATION_MISSING_LOCALIZATION_KEY ? UMB_VALIDATION_EMPTY_LOCALIZATION_KEY : body;
 }
 
@@ -108,7 +108,7 @@ export class UmbServerModelValidatorContext extends UmbContextBase implements Um
 					}
 
 					newBodies.forEach((body: string) =>
-						messages.push({ type: 'server', key: UmbId.new(), path, body: collapseMissingToEmpty(body) }),
+						messages.push({ type: 'server', key: UmbId.new(), path, body: convertMissingToEmpty(body) }),
 					);
 					//this.#context!.messages.addMessages('server', path, errorBody.errors[path]);
 				});
