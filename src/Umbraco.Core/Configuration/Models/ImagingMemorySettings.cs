@@ -22,11 +22,10 @@ namespace Umbraco.Cms.Core.Configuration.Models;
 public class ImagingMemorySettings
 {
     /// <summary>
-    /// Whether image processing memory is managed by default. Off in v17/v18 so a minor upgrade
-    /// cannot change how an existing site allocates image memory; on from v19, where it ships with
-    /// the major.
+    /// Whether image processing memory is managed by default.
     /// </summary>
-    // TODO (V19): Default to true.
+    // TODO (V19): Default to true, and update the remarks on Enabled and the imaging package's
+    // CLAUDE.md to match.
     internal const bool StaticEnabled = false;
 
     /// <summary>
@@ -63,11 +62,10 @@ public class ImagingMemorySettings
     /// Gets or sets a value indicating whether image processing memory is managed.
     /// </summary>
     /// <remarks>
-    /// When enabled, the pool the imaging library retains between requests is capped and the number
-    /// of images decoded at the same time is bounded on hosts where the memory available to the
-    /// process is limited. Left <c>false</c> by default in this version, so the imaging library's own
-    /// memory behaviour is untouched unless a site opts in; set to <c>true</c> to apply the pool cap,
-    /// the concurrency bound and the single-image ceiling.
+    /// When enabled, the pool the imaging library retains between requests is capped, the number of
+    /// images decoded at the same time is bounded and the size of a single decoded image is capped,
+    /// on hosts where the memory available to the process is limited. Defaults to <c>false</c>,
+    /// which leaves the imaging library's own memory behaviour untouched.
     /// </remarks>
     [DefaultValue(StaticEnabled)]
     public bool Enabled { get; set; } = StaticEnabled;
@@ -87,8 +85,10 @@ public class ImagingMemorySettings
     /// Gets or sets the maximum number of images that may be processed at the same time.
     /// </summary>
     /// <remarks>
-    /// Requests beyond this limit wait rather than being rejected. Set to zero to derive a value
-    /// from the available memory and processor count.
+    /// Requests beyond this limit wait for a place. One that does not get a place within the imaging
+    /// package's wait timeout is turned away with a <c>503 Service Unavailable</c> response rather
+    /// than queued indefinitely. Set to zero to derive a value from the available memory and
+    /// processor count.
     /// </remarks>
     [DefaultValue(StaticMaximumConcurrentProcessing)]
     public int MaximumConcurrentProcessing { get; set; } = StaticMaximumConcurrentProcessing;

@@ -68,20 +68,15 @@ Images are processed via URL query parameters handled by ImageSharp.Web middlewa
 
 ### Pipeline Integration
 
-ImageSharp middleware runs **before** static files, with the processing throttle registered ahead of
-it, in `UmbracoBuilderExtensions.cs`:
-```csharp
-options.AddFilter(new UmbracoPipelineFilter(nameof(ImageSharpComposer))
-{
-    PrePipeline = prePipeline =>
-    {
-        prePipeline.UseMiddleware<ImageProcessingThrottleMiddleware>();
-        prePipeline.UseImageSharp();
-    }
-});
-```
+The wiring lives in `UmbracoBuilderExtensions.cs`, in the pre-pipeline of the `ImageSharpComposer`
+pipeline filter, and its order matters:
 
-This ensures query strings are processed before serving static files.
+1. The memory bounds are applied first, while the pipeline is being built, so nothing can decode
+   before they are in force.
+2. `ImageProcessingThrottleMiddleware` is registered ahead of the imaging middleware, because it
+   must own the request before the decode hook fires.
+3. `UseImageSharp()` runs before static files, or the query string is ignored and the source is
+   served as-is.
 
 ### EXIF Orientation Handling
 

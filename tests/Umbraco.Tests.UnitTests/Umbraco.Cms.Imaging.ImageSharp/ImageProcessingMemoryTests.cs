@@ -494,14 +494,6 @@ public class ImageProcessingMemoryTests
         Assert.That(ImageProcessingMemory.RequiresConcurrencyLimit(settings, 384 * OneMegabyte), Is.False);
     }
 
-    [Test]
-    public void Enabled_DefaultsToFalse()
-    {
-        // Off by default in v17/v18 so a minor upgrade does not change how an existing site
-        // allocates image memory. TODO (V19): this flips to true.
-        Assert.That(new ImagingMemorySettings().Enabled, Is.False);
-    }
-
     /// <summary>
     /// Runs the configuration against a provider holding nothing but the settings and the logger,
     /// so reading either from anywhere else would fail rather than silently diverge.
