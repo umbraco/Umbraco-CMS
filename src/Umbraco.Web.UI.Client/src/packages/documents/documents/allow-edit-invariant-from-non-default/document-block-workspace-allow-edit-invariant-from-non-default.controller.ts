@@ -92,7 +92,7 @@ export class UmbDocumentBlockWorkspaceAllowEditInvariantFromNonDefaultController
 
 				// Check if we're viewing a non-default language
 				const currentOption = variantOptions.find((v) => v.culture === managerVariantId.culture);
-				if (!currentOption || currentOption.language.isDefault) return;
+				if (!currentOption || currentOption.language?.isDefault) return;
 
 				// Add rule for invariant datasetVariantId
 				const rule = this._createRule({ datasetVariantId: UmbVariantId.CreateInvariant() });

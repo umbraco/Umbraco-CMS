@@ -57,7 +57,6 @@ export class UmbDocumentWorkspaceContext
 	readonly templateId = this._data.createObservablePartOfCurrent((data) => data?.template?.unique || null);
 
 	#entityContentTypeContext = new UmbEntityContentTypeEntityContext(this);
-	#documentSegmentRepository = new UmbDocumentSegmentRepository(this);
 	#previewController = new UmbPreviewController(this);
 
 	constructor(host: UmbControllerHost) {
@@ -88,7 +87,7 @@ export class UmbDocumentWorkspaceContext
 				}).warn();
 			}
 
-			this._variantOptionsFilter = (variantOption) => {
+			this.variantOptionsManager._internal_setOptionFilter((variantOption) => {
 				const isNotCreatedSegmentVariant = variantOption.segment && !variantOption.variant;
 
 				// Do not allow creating a segment variant
@@ -97,7 +96,7 @@ export class UmbDocumentWorkspaceContext
 				}
 
 				return true;
-			};
+			});
 		});
 
 		this.observe(

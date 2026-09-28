@@ -162,15 +162,12 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 		);
 
 		if (workspaceContext) {
+			const moreThanOneOption = createObservablePart(workspaceContext.variantOptions, (options) => options?.length > 1);
 			this.observe(
-				observeMultiple([
-					workspaceContext.variesByCulture,
-					workspaceContext.variesBySegment,
-					workspaceContext.variantOptions,
-				]),
-				([variesByCulture, variesBySegment, variantOptions]) => {
-					if (variesByCulture === false && variesBySegment === true && variantOptions.length > 1) {
-						this.#expandVariant(UmbVariantId.Create(variantOptions[0]));
+				observeMultiple([workspaceContext.variesByCulture, workspaceContext.variesBySegment, moreThanOneOption]),
+				([variesByCulture, variesBySegment, moreThanOneOption]) => {
+					if (variesByCulture === false && variesBySegment === true && moreThanOneOption) {
+						this.#expandVariant(UmbVariantId.INVARIANT);
 					}
 				},
 				'_observeExpandFirstVariantIfSegmentOnly',

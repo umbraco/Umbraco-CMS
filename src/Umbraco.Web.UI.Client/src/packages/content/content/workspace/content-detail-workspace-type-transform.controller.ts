@@ -161,8 +161,8 @@ export class UmbContentDetailWorkspaceTypeTransformController<
 	}
 
 	#getDefaultLanguage(): string {
-		const languages = this.#workspace.getLanguages();
-		const defaultLanguage = languages.find((lang) => lang.isDefault)?.unique;
+		const languages = this.#workspace.variantOptionsManager.getLanguages();
+		const defaultLanguage = languages?.find((lang) => lang.isDefault)?.unique;
 		if (!defaultLanguage) {
 			throw new Error('Default language not found');
 		}

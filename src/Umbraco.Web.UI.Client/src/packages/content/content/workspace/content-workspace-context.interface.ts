@@ -2,7 +2,7 @@ import type { UmbContentDetailModel } from '../types.js';
 import type { UmbElementPropertyDataOwner } from '../property-dataset-context/index.js';
 import type { UmbContentTypeModel, UmbPropertyStructureWorkspaceContext } from '@umbraco-cms/backoffice/content-type';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
-import type { UmbVariantId, UmbEntityVariantModel } from '@umbraco-cms/backoffice/variant';
+import type { UmbVariantId, UmbEntityVariantModel, UmbEntityVariantOptionModel } from '@umbraco-cms/backoffice/variant';
 import type { UmbRoutableWorkspaceContext, UmbVariantDatasetWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import type { UmbVariantPropertyGuardManager } from '@umbraco-cms/backoffice/property';
 
@@ -10,11 +10,13 @@ export interface UmbContentWorkspaceContext<
 	ContentModel extends UmbContentDetailModel = UmbContentDetailModel,
 	ContentTypeModel extends UmbContentTypeModel = UmbContentTypeModel,
 	VariantModelType extends UmbEntityVariantModel = UmbEntityVariantModel,
+	VariantOptionModelType extends UmbEntityVariantOptionModel<VariantModelType> =
+		UmbEntityVariantOptionModel<VariantModelType>,
 >
 	extends
 		UmbElementPropertyDataOwner<ContentModel, ContentTypeModel>,
 		UmbRoutableWorkspaceContext,
-		UmbVariantDatasetWorkspaceContext<VariantModelType>,
+		UmbVariantDatasetWorkspaceContext<VariantModelType, VariantOptionModelType>,
 		UmbPropertyStructureWorkspaceContext<ContentTypeModel> {
 	readonly IS_CONTENT_WORKSPACE_CONTEXT: true;
 	getData(): ContentModel | undefined;

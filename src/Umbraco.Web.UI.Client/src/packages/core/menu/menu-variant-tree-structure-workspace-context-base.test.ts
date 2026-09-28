@@ -239,7 +239,7 @@ describe('UmbMenuVariantTreeStructureWorkspaceContextBase', () => {
 			return {
 				unique: 'item-unique',
 				entityType: 'test-entity-type',
-				variants: [{ name: 'Item', culture: null, segment: null }],
+				variants: [{ name: 'Item', culture: null }],
 				...overrides,
 			};
 		}
@@ -430,6 +430,8 @@ describe('UmbMenuVariantTreeStructureWorkspaceContextBase (isNew resolves after 
 		await aTimeout(150);
 
 		expect(UmbTestSectionSidebarMenuContext.expandItemsCalls).to.have.lengthOf(1);
-		expect(UmbTestVariantTreeRepository.requestTreeItemAncestorsCalls).to.have.lengthOf(requestCountBeforeIsNewResolves);
+		expect(UmbTestVariantTreeRepository.requestTreeItemAncestorsCalls).to.have.lengthOf(
+			requestCountBeforeIsNewResolves,
+		);
 	});
 });

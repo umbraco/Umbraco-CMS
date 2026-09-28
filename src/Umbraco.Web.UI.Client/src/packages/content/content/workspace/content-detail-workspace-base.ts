@@ -1,4 +1,4 @@
-import type { UmbContentDetailModel } from '../types.js';
+import type { UmbContentDetailModel, UmbEntryValueModel } from '../types.js';
 import { UmbContentCollectionConfigurationContext, UmbContentCollectionManager } from '../collection/index.js';
 import { UmbContentWorkspaceDataManager } from '../manager/index.js';
 import { UmbMergeContentVariantDataController } from '../controller/merge-content-variant-data.controller.js';
@@ -8,12 +8,11 @@ import type { UmbContentValidationRepository } from '../repository/content-valid
 import type { UmbContentCollectionWorkspaceContext } from '../collection/content-collection-workspace-context.interface.js';
 import { UmbEntryDataValueVariantsController } from '../controller/entry-data-value-variants.controller.js';
 import { umbEntryAppendValue } from '../utils/index.js';
-import { UmbContentVariantOptionsManager } from '../manager/content-variant-options-manager.js';
 import type { UmbContentWorkspaceContext } from './content-workspace-context.interface.js';
 import { UmbContentDetailValidationPathTranslator } from './content-detail-validation-path-translator.js';
 import { UmbContentValidationToHintsManager } from './content-validation-to-hints.manager.js';
 import { UmbContentDetailWorkspaceTypeTransformController } from './content-detail-workspace-type-transform.controller.js';
-import { mergeObservables, observeMultiple, UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
+import { mergeObservables, observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UmbContentTypeStructureManager } from '@umbraco-cms/backoffice/content-type';
@@ -23,6 +22,7 @@ import {
 	notifyWorkspaceActionStarting,
 	UmbEntityDetailWorkspaceContextBase,
 	UmbWorkspaceSplitViewManager,
+	UmbWorkspaceVariantOptionsController,
 } from '@umbraco-cms/backoffice/workspace';
 import type {
 	UmbWorkspaceActionExecutionOptions,
@@ -36,7 +36,7 @@ import {
 	UmbRequestReloadStructureForEntityEvent,
 } from '@umbraco-cms/backoffice/entity-action';
 import type { UmbEntityActionEvent } from '@umbraco-cms/backoffice/entity-action';
-import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
+import { UMB_APP_LANGUAGE_CONTEXT, type UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
 import {
 	UmbPropertyValuePresetVariantBuilderController,
 	UmbVariantPropertyGuardManager,
@@ -61,7 +61,6 @@ import type {
 	UmbEntityVariantOptionModel,
 	UmbObjectWithVariantProperties,
 } from '@umbraco-cms/backoffice/variant';
-import type { UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
 import type { UmbPropertyTypePresetModel, UmbPropertyTypePresetModelTypeModel } from '@umbraco-cms/backoffice/property';
 import type { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
@@ -116,13 +115,14 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	VariantModelType extends UmbEntityVariantModel = DetailModelType extends { variants: UmbEntityVariantModel[] }
 		? DetailModelType['variants'][0]
 		: never,
-	VariantOptionModelType extends UmbEntityVariantOptionModel = UmbEntityVariantOptionModel<VariantModelType>,
+	VariantOptionModelType extends UmbEntityVariantOptionModel<VariantModelType> =
+		UmbEntityVariantOptionModel<VariantModelType>,
 	CreateArgsType extends UmbEntityDetailWorkspaceContextCreateArgs<DetailModelType> =
 		UmbEntityDetailWorkspaceContextCreateArgs<DetailModelType>,
 >
 	extends UmbEntityDetailWorkspaceContextBase<DetailModelType, DetailRepositoryType, CreateArgsType>
 	implements
-		UmbContentWorkspaceContext<DetailModelType, ContentTypeDetailModelType, VariantModelType>,
+		UmbContentWorkspaceContext<DetailModelType, ContentTypeDetailModelType, VariantModelType, VariantOptionModelType>,
 		UmbSaveableWorkspaceContext,
 		UmbContentCollectionWorkspaceContext<ContentTypeDetailModelType>
 {
@@ -168,39 +168,32 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 
 	readonly #collectionConfiguration = new UmbContentCollectionConfigurationContext(this);
 
-	/* Variant Options */
-	#languages = new UmbArrayState<UmbLanguageDetailModel>([], (x) => x.unique);
-	/**
-	 * @private
-	 * @description - Should not be used by external code.
-	 * @internal
-	 */
-	public readonly languages = this.#languages.asObservable();
-	getLanguages(): Array<UmbLanguageDetailModel> {
-		return this.#languages.getValue();
-	}
-
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	protected _variantOptionsFilter = (variantOption: VariantOptionModelType) => true;
 
-	public readonly variantOptionsManager = new UmbContentVariantOptionsManager<VariantModelType, VariantOptionModelType>(
-		this,
-		this.varyByCulture,
-		this.varyBySegments,
-		this.variants,
-		this.languages,
-	);
-	public readonly variantOptions = this.variantOptionsManager.variantOptions;
+	public variantOptionsManager: UmbWorkspaceVariantOptionsController<VariantModelType, VariantOptionModelType>;
+	public readonly variantOptions: Observable<Array<VariantOptionModelType>>;
 
-	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-	// @ts-ignore
-	// TODO: fix type error
-	public readonly variantOptions;
+	/**
+	 * @deprecated - Use the languages observable from the variant options manager instead.
+	 * @example
+	 * ```ts
+	 * const languages = contentDetailWorkspace.variantOptionsManager.getLanguages();
+	 * ```
+	 */
+	public getLanguages(): Array<UmbLanguageDetailModel> | undefined {
+		new UmbDeprecation({
+			deprecated: 'Workspace `getLanguages()` is deprecated.',
+			removeInVersion: '21.0.0',
+			solution: 'Use `variantOptionsManager.getLanguages()` instead.',
+		}).warn();
+		return this.variantOptionsManager.getLanguages();
+	}
 
-	async getVariantOptions(): Promise<Array<VariantOptionModelType>> {
+	async getVariantOptions() {
 		return firstValueFrom(this.variantOptions);
 	}
-	async getCultureVariantOptions(): Promise<Array<VariantOptionModelType>> {
+	async getCultureVariantOptions() {
 		return (await firstValueFrom(this.variantOptions)).filter((x) => !x.segment);
 	}
 
@@ -249,6 +242,14 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			x ? x.variesByCulture || x.variesBySegment : undefined,
 		);
 
+		this.variantOptionsManager = new UmbWorkspaceVariantOptionsController<VariantModelType, VariantOptionModelType>(
+			this,
+			this.variesByCulture,
+			this.variesBySegment,
+			this.variants,
+		);
+		this.variantOptions = this.variantOptionsManager.variantOptions;
+
 		this.#collectionConfiguration.setCollectionAlias(args.collectionAlias);
 		this.observe(
 			this.structure.ownerContentTypeObservablePart((x) => x?.collection?.unique),
@@ -271,8 +272,6 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		);
 
 		new UmbContentDetailWorkspaceTypeTransformController(this as any, this._data);
-
-		this.variantOptions = this.variantOptionsManager.variantOptions;
 
 		this.observe(
 			this.variantOptions,
@@ -347,7 +346,11 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		// Languages are requested once per app session by UMB_APP_LANGUAGE_CONTEXT; every workspace observes
 		// that shared state instead of each issuing its own request for the full language collection.
 		this.consumeContext(UMB_APP_LANGUAGE_CONTEXT, (appLanguageContext) => {
-			this.observe(appLanguageContext?.languages, (languages) => this.#languages.setValue(languages ?? []), null);
+			this.observe(
+				appLanguageContext?.languages,
+				(languages) => this.variantOptionsManager.setLanguages(languages ?? []),
+				null,
+			);
 		});
 	}
 

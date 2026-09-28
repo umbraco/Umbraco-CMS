@@ -39,7 +39,6 @@ export interface UmbEntityVariantOptionModel<VariantType extends UmbEntityVarian
 	segmentInfo?: {
 		alias: string;
 		name: string;
-		cultures?: string[] | null;
 	};
 	/**
 	 * The unique identifier is a VariantId string.

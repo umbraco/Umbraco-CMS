@@ -36,7 +36,7 @@ describe('UmbContentDetailWorkspaceContextBase (languages)', () => {
 	it('takes its languages from UMB_APP_LANGUAGE_CONTEXT', async () => {
 		await context.load(INVARIANT_DOCUMENT_ID);
 
-		const languageUniques = context.getLanguages().map((language) => language.unique);
+		const languageUniques = context.variantOptionsManager.getLanguages()?.map((language) => language.unique);
 		expect(languageUniques).to.deep.equal(['en-US', 'da']);
 	});
 
@@ -55,6 +55,6 @@ describe('UmbContentDetailWorkspaceContextBase (languages)', () => {
 		];
 		hostElement.setAppLanguages(updatedLanguages);
 
-		expect(context.getLanguages().map((language) => language.unique)).to.deep.equal(['en-US']);
+		expect(context.variantOptionsManager.getLanguages()?.map((language) => language.unique)).to.deep.equal(['en-US']);
 	});
 });

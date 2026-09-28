@@ -147,11 +147,11 @@ export class UmbContentVariantLanguagePickerElement extends UmbLitElement {
 		renderAdditionalLabel?: (option: UmbEntityVariantOptionModel) => unknown,
 	) {
 		return html` <div class="label" slot="label">
-			<strong> ${option.language.name} </strong>
+			<strong>${option.language?.name}</strong>
 			<div class="label-status">${UmbContentVariantLanguagePickerElement.renderVariantStatus(option)}</div>
 			${renderAdditionalLabel?.(option)}
 			${when(
-				option.language.isMandatory && mustSelect,
+				option.language?.isMandatory && mustSelect,
 				() => html`
 					<div class="label-status">
 						<umb-localize key="languages_mandatoryLanguage">Mandatory language</umb-localize>
