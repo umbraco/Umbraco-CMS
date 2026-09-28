@@ -1,20 +1,33 @@
 import type { UmbEntityReferenceRepository, UmbReferenceItemModel } from '../reference/types.js';
 import type { UmbEntityReferencesConfig } from './types.js';
-import { customElement, css, html, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, css, html, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import type { PropertyValues } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 
 /** @deprecated Scheduled for removal in Umbraco 21. Use `UmbEntityReferencesConfig` instead. [LK] */
 export type UmbConfirmActionModalEntityReferencesConfig = UmbEntityReferencesConfig;
 
+/**
+ * @deprecated Use `umb-entity-references-summary` instead. Scheduled for removal in Umbraco 21. [LK]
+ */
 @customElement('umb-confirm-action-modal-entity-references')
 export class UmbConfirmActionModalEntityReferencesElement extends UmbLitElement {
 	@property({ type: Object, attribute: false })
 	config?: UmbEntityReferencesConfig;
+
+	constructor() {
+		super();
+		new UmbDeprecation({
+			deprecated: 'umb-confirm-action-modal-entity-references',
+			removeInVersion: '21.0.0',
+			solution: 'Use umb-entity-references-summary instead.',
+		}).warn();
+	}
 
 	@state()
 	private _referencedByItems: Array<UmbReferenceItemModel> = [];
@@ -135,27 +148,28 @@ export class UmbConfirmActionModalEntityReferencesElement extends UmbLitElement 
 
 	#renderItems(headline: string, items: Array<UmbReferenceItemModel>, total: number) {
 		if (total === 0) return nothing;
+
 		return html`
-			<h5 class="uui-h5">${this.localize.term(headline)}</h5>
+			<h5 class="uui-h5" id="reference-headline">${this.localize.term(headline)}</h5>
 			<uui-ref-list>
-				${repeat(
-					items,
-					(item) => item.unique,
-					(item) => html`<umb-entity-item-ref .item=${item} readonly></umb-entity-item-ref>`,
+				${items.map(
+					(item) => html`<umb-entity-item-ref .item=${item} ?standalone=${total === 1}></umb-entity-item-ref> `,
 				)}
 			</uui-ref-list>
-			${when(
-				total > this.#limitItems,
-				() => html`<span>${this.localize.term('references_labelMoreReferences', total - this.#limitItems)}</span>`,
-			)}
+			${total > this.#limitItems
+				? html`<span>${this.localize.term('references_labelMoreReferences', total - this.#limitItems)}</span>`
+				: nothing}
 		`;
 	}
 
 	static override styles = [
 		UmbTextStyles,
 		css`
+			#reference-headline {
+				margin-bottom: var(--uui-size-3);
+			}
+
 			uui-ref-list {
-				margin-top: var(--uui-size-3);
 				margin-bottom: var(--uui-size-2);
 			}
 		`,
