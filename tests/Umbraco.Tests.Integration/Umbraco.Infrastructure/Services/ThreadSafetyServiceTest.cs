@@ -1,12 +1,16 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence;
@@ -20,17 +24,11 @@ using IScope = Umbraco.Cms.Infrastructure.Scoping.IScope;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 {
-    // these tests tend to fail from time to time esp. on VSTS
-    //
-    // read
-    // Lock Time-out: https://technet.microsoft.com/en-us/library/ms172402.aspx?f=255&MSPPError=-2147217396
-    //    http://support.x-tensive.com/question/5242/strange-locking-exceptions-with-sqlserverce
-    //    http://debuggingblog.com/wp/2009/05/07/high-cpu-usage-and-windows-forms-application-hang-with-sqlce-database-and-the-sqlcelocktimeoutexception/
-    //
-    // tried to increase it via connection string or via SET LOCK_TIMEOUT
-    // but still, the test fails on VSTS in most cases, so now ignoring it,
-    // as I could not figure out _why_ and it does not look like we are
-    // causing it, getting into __sysObjects locks, no idea why
+    // Every thread's saves queue up on the content tree write lock, so under a slow database the last waiters can
+    // exceed the default five-second lock timeout while nothing is actually wrong. These tests prove the services
+    // survive the contention, not that the queue drains within the default, so the fixture raises the timeout.
+    // The lock mechanism issues SET LOCK_TIMEOUT from that setting on every acquisition, which is why setting it on
+    // the connection here would not stick.
     [TestFixture]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, Logger = UmbracoTestOptions.Logger.Console)]
     internal sealed class ThreadSafetyServiceTest : UmbracoIntegrationTest
@@ -40,6 +38,10 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         private IMediaService MediaService => GetRequiredService<IMediaService>();
 
         private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
+
+        protected override void CustomTestSetup(IUmbracoBuilder builder)
+            => builder.Services.Configure<GlobalSettings>(settings =>
+                settings.DistributedLockingWriteLockDefaultTimeout = TimeSpan.FromSeconds(60));
 
         [SetUp]
         public async Task SetUp()
@@ -53,11 +55,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         {
             using (IScope scope = ScopeProvider.CreateScope())
             {
-                if (ScopeAccessor.AmbientScope.Database.DatabaseType.IsSqlServer())
-                {
-                    ScopeAccessor.AmbientScope.Database.Execute("SET LOCK_TIMEOUT 60000");
-                }
-
                 service.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None).GetAwaiter().GetResult();
                 scope.Complete();
             }
@@ -67,11 +64,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         {
             using (IScope scope = ScopeProvider.CreateScope())
             {
-                if (ScopeAccessor.AmbientScope.Database.DatabaseType.IsSqlServer())
-                {
-                    ScopeAccessor.AmbientScope.Database.Execute("SET LOCK_TIMEOUT 60000");
-                }
-
                 service.Save(media);
                 scope.Complete();
             }
