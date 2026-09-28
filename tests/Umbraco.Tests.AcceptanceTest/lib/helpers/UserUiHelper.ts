@@ -20,6 +20,7 @@ export class UserUiHelper extends UiBaseLocators {
   private readonly chooseUserGroupsBtn: Locator;
   private readonly allowAccessToAllDocumentsToggle: Locator;
   private readonly allowAccessToAllMediaToggle: Locator;
+  private readonly allowAccessToAllDocumentBlueprintsToggle: Locator;
   private readonly mediaInput: Locator;
   private readonly chooseContainerBtn: Locator;
   private readonly disabledTxt: Locator;
@@ -53,6 +54,7 @@ export class UserUiHelper extends UiBaseLocators {
     this.typeBtn = page.locator('uui-button', {hasText: 'Type'});
     this.allowAccessToAllDocumentsToggle = page.locator('umb-property-layout').filter({hasText: 'Allow access to all documents'}).locator('#toggle');
     this.allowAccessToAllMediaToggle = page.locator('umb-property-layout').filter({hasText: 'Allow access to all media'}).locator('#toggle');
+    this.allowAccessToAllDocumentBlueprintsToggle = page.locator('umb-property-layout').filter({hasText: 'Allow access to all document blueprints'}).locator('#toggle');
     this.mediaInput = page.locator('umb-input-media');
     this.chooseContainerBtn = page.locator('#container').getByLabel('Choose');
     this.disabledTxt = page.getByText('Disabled', {exact: true});
@@ -212,6 +214,10 @@ export class UserUiHelper extends UiBaseLocators {
 
   async clickAllowAccessToAllMediaToggle() {
     await this.click(this.allowAccessToAllMediaToggle);
+  }
+
+  async clickAllowAccessToAllDocumentBlueprintsToggle() {
+    await this.click(this.allowAccessToAllDocumentBlueprintsToggle);
   }
 
   async isUserDisabledTextVisible() {
