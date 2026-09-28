@@ -9,6 +9,10 @@ import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 import type { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 
+/**
+ * Which kind of reference `umb-entity-reference-list` lists: the items referencing the entity (`referencedBy`), or
+ * its descendants that are referenced elsewhere (`descendantsWithReferences`).
+ */
 export type UmbEntityReferenceListSource = 'referencedBy' | 'descendantsWithReferences';
 
 /**
@@ -18,6 +22,10 @@ export type UmbEntityReferenceListSource = 'referencedBy' | 'descendantsWithRefe
  */
 @customElement('umb-entity-reference-list')
 export class UmbEntityReferenceListElement extends UmbLitElement {
+	/**
+	 * The unique identifier of the entity to look up references for. Setting it (re)loads the current `source`.
+	 * @param {string | undefined} value - The entity unique.
+	 */
 	@property({ type: String, attribute: false })
 	public set unique(value: string | undefined) {
 		const oldValue = this.#unique;
@@ -26,6 +34,7 @@ export class UmbEntityReferenceListElement extends UmbLitElement {
 		this._currentPage = 1;
 
 		if (!value) {
+			this.#requestToken++;
 			this._items = [];
 			this._total = 0;
 			return;
@@ -38,18 +47,34 @@ export class UmbEntityReferenceListElement extends UmbLitElement {
 	}
 	#unique?: string;
 
+	/**
+	 * Alias of the {@link UmbEntityReferenceRepository} used to look up references.
+	 */
 	@property({ attribute: 'reference-repository-alias' })
 	referenceRepositoryAlias?: string;
 
+	/**
+	 * Alias of the item repository used to resolve the descendant uniques returned by `requestDescendantsWithReferences`
+	 * into presentable items. Only used when `source` is `descendantsWithReferences`.
+	 */
 	@property({ attribute: 'item-repository-alias' })
 	itemRepositoryAlias?: string;
 
+	/**
+	 * Which kind of reference to list: the items referencing the entity, or its descendants that are referenced elsewhere.
+	 */
 	@property()
 	source: UmbEntityReferenceListSource = 'referencedBy';
 
+	/**
+	 * How many items to show per page.
+	 */
 	@property({ type: Number, attribute: 'items-per-page' })
 	itemsPerPage = 10;
 
+	/**
+	 * Whether the listed items are non-interactive (not clickable).
+	 */
 	@property({ type: Boolean, reflect: true })
 	readonly = false;
 
@@ -64,6 +89,7 @@ export class UmbEntityReferenceListElement extends UmbLitElement {
 
 	#referenceRepository?: UmbEntityReferenceRepository;
 	#itemRepository?: UmbItemRepository<any>;
+	#requestToken = 0;
 
 	/**
 	 * The total number of items for the current `source`, once loaded.
@@ -73,22 +99,29 @@ export class UmbEntityReferenceListElement extends UmbLitElement {
 		return this._total;
 	}
 
-	protected override firstUpdated(_changedProperties: PropertyValues): void {
-		super.firstUpdated(_changedProperties);
-		this.#init();
+	protected override updated(changedProperties: PropertyValues): void {
+		super.updated(changedProperties);
+		if (
+			changedProperties.has('referenceRepositoryAlias') ||
+			changedProperties.has('itemRepositoryAlias') ||
+			changedProperties.has('source')
+		) {
+			this.#configureRepositories();
+		}
 	}
 
-	async #init() {
-		if (!this.referenceRepositoryAlias) throw new Error('referenceRepositoryAlias is required');
+	async #configureRepositories() {
+		if (!this.referenceRepositoryAlias) return;
 
 		this.#referenceRepository = await createExtensionApiByAlias<UmbEntityReferenceRepository>(
 			this,
 			this.referenceRepositoryAlias,
 		);
 
-		if (this.source === 'descendantsWithReferences' && this.itemRepositoryAlias) {
-			this.#itemRepository = await createExtensionApiByAlias<UmbItemRepository<any>>(this, this.itemRepositoryAlias);
-		}
+		this.#itemRepository =
+			this.source === 'descendantsWithReferences' && this.itemRepositoryAlias
+				? await createExtensionApiByAlias<UmbItemRepository<any>>(this, this.itemRepositoryAlias)
+				: undefined;
 
 		this.#getReferences();
 	}
@@ -97,32 +130,38 @@ export class UmbEntityReferenceListElement extends UmbLitElement {
 		if (!this.#unique) return;
 		if (!this.#referenceRepository) return;
 
+		const token = ++this.#requestToken;
 		const skip = (this._currentPage - 1) * this.itemsPerPage;
 
 		if (this.source === 'descendantsWithReferences') {
-			await this.#getDescendantsWithReferences(skip);
+			await this.#getDescendantsWithReferences(skip, token);
 		} else {
-			await this.#getReferencedBy(skip);
+			await this.#getReferencedBy(skip, token);
 		}
+
+		// A newer request (e.g. the unique or page changed again) has since started — its result should win, not ours.
+		if (token !== this.#requestToken) return;
 
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
-	async #getReferencedBy(skip: number) {
+	async #getReferencedBy(skip: number, token: number) {
 		if (!this.#referenceRepository || !this.#unique) return;
 
 		const { data } = await this.#referenceRepository.requestReferencedBy(this.#unique, skip, this.itemsPerPage);
 		if (!data) return;
+		if (token !== this.#requestToken) return;
 
 		this._total = data.total;
 		this._items = data.items;
 	}
 
-	async #getDescendantsWithReferences(skip: number) {
+	async #getDescendantsWithReferences(skip: number, token: number) {
 		if (!this.#referenceRepository || !this.#unique) return;
 
 		// If the repository does not have the method, there are no descendants to report.
 		if (!this.#referenceRepository.requestDescendantsWithReferences) {
+			if (token !== this.#requestToken) return;
 			this._total = 0;
 			this._items = [];
 			return;
@@ -134,6 +173,7 @@ export class UmbEntityReferenceListElement extends UmbLitElement {
 			this.itemsPerPage,
 		);
 		if (!data) return;
+		if (token !== this.#requestToken) return;
 
 		this._total = data.total;
 
@@ -144,6 +184,7 @@ export class UmbEntityReferenceListElement extends UmbLitElement {
 
 		const uniques = data.items.map((item) => item.unique).filter(Boolean) as Array<string>;
 		const { data: items } = await this.#itemRepository.requestItems(uniques);
+		if (token !== this.#requestToken) return;
 		this._items = items ?? [];
 	}
 
