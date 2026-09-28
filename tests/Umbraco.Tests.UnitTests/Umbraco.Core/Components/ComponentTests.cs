@@ -70,7 +70,7 @@ public class ComponentTests
             IOHelper,
             Options.Create(globalSettings),
             Mock.Of<IHostingEnvironment>());
-        var coreDebug = new CoreDebugSettings();
+        var coreDebug = new DebugSettings();
         var mediaFileManager = new MediaFileManager(
             Mock.Of<IFileSystem>(),
             Mock.Of<IMediaPathScheme>(),
@@ -85,7 +85,7 @@ public class ComponentTests
             Mock.Of<IDistributedLockingMechanismFactory>(),
             f,
             fs,
-            new TestOptionsMonitor<CoreDebugSettings>(coreDebug),
+            new TestOptionsMonitor<DebugSettings>(coreDebug),
             mediaFileManager,
             loggerFactory,
 

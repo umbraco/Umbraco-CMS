@@ -95,7 +95,7 @@ public class ScopedNotificationPublisherTests
             Mock.Of<IDistributedLockingMechanismFactory>(),
             Mock.Of<IUmbracoDatabaseFactory>(),
             fileSystems,
-            new TestOptionsMonitor<CoreDebugSettings>(new CoreDebugSettings()),
+            new TestOptionsMonitor<DebugSettings>(new DebugSettings()),
             mediaFileManager,
             loggerFactory,
 

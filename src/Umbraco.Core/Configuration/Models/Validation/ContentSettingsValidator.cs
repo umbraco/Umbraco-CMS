@@ -20,15 +20,6 @@ public class ContentSettingsValidator : ConfigurationValidatorBase, IValidateOpt
     /// <summary>
     ///     Initializes a new instance of the <see cref="ContentSettingsValidator" /> class.
     /// </summary>
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
-    public ContentSettingsValidator()
-        : this(StaticServiceProvider.Instance.GetRequiredService<ILogger<ContentSettingsValidator>>())
-    {
-    }
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="ContentSettingsValidator" /> class.
-    /// </summary>
     /// <param name="logger">The logger.</param>
     public ContentSettingsValidator(ILogger<ContentSettingsValidator> logger)
         => _logger = logger;
