@@ -57,14 +57,12 @@ public interface ITagService : IService
     /// <summary>
     ///     Gets all elements tagged with any tag in the specified group.
     /// </summary>
-    // TODO (V19): Remove the default implementation from this interface.
-    IEnumerable<TaggedEntity> GetTaggedElementsByTagGroup(string group, string? culture = null) => [];
+    IEnumerable<TaggedEntity> GetTaggedElementsByTagGroup(string group, string? culture = null);
 
     /// <summary>
     ///     Gets all elements tagged with the specified tag.
     /// </summary>
-    // TODO (V19): Remove the default implementation from this interface.
-    IEnumerable<TaggedEntity> GetTaggedElementsByTag(string tag, string? group = null, string? culture = null) => [];
+    IEnumerable<TaggedEntity> GetTaggedElementsByTag(string tag, string? group = null, string? culture = null);
 
     /// <summary>
     ///     Gets all tags.
@@ -115,8 +113,7 @@ public interface ITagService : IService
     /// <summary>
     ///     Gets all element tags.
     /// </summary>
-    // TODO (V19): Remove the default implementation from this interface.
-    IEnumerable<ITag> GetAllElementTags(string? group = null, string? culture = null) => [];
+    IEnumerable<ITag> GetAllElementTags(string? group = null, string? culture = null);
 
     /// <summary>
     ///     Gets all tags attached to an entity via a property.

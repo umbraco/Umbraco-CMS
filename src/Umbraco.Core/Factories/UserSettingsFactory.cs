@@ -16,41 +16,18 @@ public class UserSettingsFactory : IUserSettingsFactory
 {
     private readonly ILocalizedTextService _localizedTextService;
     private readonly SecuritySettings _securitySettings;
-    
-    // TODO (V19): Remove obsolete constructors and the ActivatorUtilitiesConstructor attribute.
-    // Also update UmbracoBuilder where this service is registered using:
-    //   services.AddTransient<IUserSettingsFactory>(sp => ActivatorUtilities.CreateInstance<UserSettingsFactory>(sp));
-    // We do this to allow the ActivatorUtilitiesConstructor to be used (it's otherwise ignored by AddTransient).
-    // Revert it to:
-    //   services.AddTransient<IUserSettingsFactory, UserSettingsFactory>();    
 
     /// <summary>
     /// Initializes a new instance of the <see cref="UserSettingsFactory"/> class.
     /// </summary>
     /// <param name="securitySettings">The user password configuration settings.</param>
     /// <param name="localizedTextService">The localized text service for retrieving localized descriptions.</param>
-    [ActivatorUtilitiesConstructor]
     public UserSettingsFactory(
         IOptions<SecuritySettings> securitySettings,
         ILocalizedTextService localizedTextService)
     {
         _localizedTextService = localizedTextService;
         _securitySettings = securitySettings.Value;
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="UserSettingsFactory"/> class.
-    /// </summary>
-    /// <param name="securitySettings">The user password configuration settings.</param>
-    /// <param name="localizedTextService">The localized text service for retrieving localized descriptions.</param>
-    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
-    public UserSettingsFactory(
-        IOptions<UserPasswordConfigurationSettings> securitySettings,
-        ILocalizedTextService localizedTextService)
-        : this(
-              StaticServiceProvider.Instance.GetRequiredService<IOptions<SecuritySettings>>(),
-              localizedTextService)
-        {
     }
 
     /// <inheritdoc />

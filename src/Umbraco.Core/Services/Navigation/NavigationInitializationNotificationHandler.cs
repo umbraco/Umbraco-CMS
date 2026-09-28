@@ -41,25 +41,6 @@ public sealed class NavigationInitializationNotificationHandler : INotificationA
     }
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="NavigationInitializationNotificationHandler"/> class.
-    /// </summary>
-    /// <param name="runtimeState">The runtime state service for checking the current runtime level.</param>
-    /// <param name="documentNavigationManagementService">The document navigation management service.</param>
-    /// <param name="mediaNavigationManagementService">The media navigation management service.</param>
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
-    public NavigationInitializationNotificationHandler(
-        IRuntimeState runtimeState,
-        IDocumentNavigationManagementService documentNavigationManagementService,
-        IMediaNavigationManagementService mediaNavigationManagementService)
-        : this(
-            runtimeState,
-            documentNavigationManagementService,
-            mediaNavigationManagementService,
-            StaticServiceProvider.Instance.GetRequiredService<IElementNavigationManagementService>())
-    {
-    }
-
-    /// <summary>
     ///     Handles the <see cref="PostRuntimePremigrationsUpgradeNotification"/> by rebuilding
     ///     the navigation structures for documents and media.
     /// </summary>

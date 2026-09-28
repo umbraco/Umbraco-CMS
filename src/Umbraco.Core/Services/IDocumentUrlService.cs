@@ -74,7 +74,7 @@ public interface IDocumentUrlService
     /// <param name="uri">The uniform resource identifier.</param>
     /// <param name="isDraft">Whether to get the url of the draft or published document.</param>
     /// <returns>The document key, or null if not found.</returns>
-    Guid? GetDocumentKeyByUri(Uri uri, bool isDraft) => throw new NotImplementedException(); // TODO (V19): Remove default implementation.
+    Guid? GetDocumentKeyByUri(Uri uri, bool isDraft);
 
     /// <summary>
     /// Gets a document key by route.
@@ -104,15 +104,11 @@ public interface IDocumentUrlService
     /// Updates the in-memory URL segment cache for a single document without writing to the database.
     /// </summary>
     /// <param name="key">The document key.</param>
-    // TODO (V19): Remove default implementation when external implementations have had time to adopt.
-    Task UpdateUrlSegmentCacheAsync(Guid key)
-        => CreateOrUpdateUrlSegmentsAsync(key);
+    Task UpdateUrlSegmentCacheAsync(Guid key);
 
     /// <summary>
     /// Updates the in-memory URL segment cache for a document and its descendants without writing to the database.
     /// </summary>
     /// <param name="key">The document key.</param>
-    // TODO (V19): Remove default implementation when external implementations have had time to adopt.
-    Task UpdateUrlSegmentCacheWithDescendantsAsync(Guid key)
-        => CreateOrUpdateUrlSegmentsWithDescendantsAsync(key);
+    Task UpdateUrlSegmentCacheWithDescendantsAsync(Guid key);
 }

@@ -25,12 +25,6 @@ public class UmbracoRequestPaths
     private readonly IOptions<UmbracoRequestPathsOptions> _umbracoRequestPathsOptions;
     private readonly IOptions<DeliveryApiSettings> _deliveryApiSettings;
 
-    [Obsolete("Please use the constructor that accepts all arguments. Scheduled for removal in Umbraco 19.")]
-    public UmbracoRequestPaths(IHostingEnvironment hostingEnvironment, IOptions<UmbracoRequestPathsOptions> umbracoRequestPathsOptions)
-        : this(hostingEnvironment, umbracoRequestPathsOptions, StaticServiceProvider.Instance.GetRequiredService<IOptions<DeliveryApiSettings>>())
-    {
-    }
-
     /// <summary>
     /// Initializes a new instance of the <see cref="UmbracoRequestPaths" /> class.
     /// </summary>

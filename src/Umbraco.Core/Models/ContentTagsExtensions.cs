@@ -38,29 +38,6 @@ public static class ContentTagsExtensions
         .AssignTags(propertyEditors, dataTypeService, idKeyMap, serializer, tags, merge, culture);
 
     /// <summary>
-    ///     Assign tags.
-    /// </summary>
-    [Obsolete("Use the overload taking an IIdKeyMap. Scheduled for removal in Umbraco 19.")]
-    public static void AssignTags(
-        this IContentBase content,
-        PropertyEditorCollection propertyEditors,
-        IDataTypeService dataTypeService,
-        IJsonSerializer serializer,
-        string propertyTypeAlias,
-        IEnumerable<string> tags,
-        bool merge = false,
-        string? culture = null) =>
-        content.AssignTags(
-            propertyEditors,
-            dataTypeService,
-            StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>(),
-            serializer,
-            propertyTypeAlias,
-            tags,
-            merge,
-            culture);
-
-    /// <summary>
     ///     Remove tags.
     /// </summary>
     /// <param name="content">The content item.</param>
@@ -82,27 +59,6 @@ public static class ContentTagsExtensions
         string? culture = null) =>
         content.GetTagProperty(propertyTypeAlias)
         .RemoveTags(propertyEditors, dataTypeService, idKeyMap, serializer, tags, culture);
-
-    /// <summary>
-    ///     Remove tags.
-    /// </summary>
-    [Obsolete("Use the overload taking an IIdKeyMap. Scheduled for removal in Umbraco 19.")]
-    public static void RemoveTags(
-        this IContentBase content,
-        PropertyEditorCollection propertyEditors,
-        IDataTypeService dataTypeService,
-        IJsonSerializer serializer,
-        string propertyTypeAlias,
-        IEnumerable<string> tags,
-        string? culture = null) =>
-        content.RemoveTags(
-            propertyEditors,
-            dataTypeService,
-            StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>(),
-            serializer,
-            propertyTypeAlias,
-            tags,
-            culture);
 
     // gets and validates the property
     private static IProperty GetTagProperty(this IContentBase content, string propertyTypeAlias)

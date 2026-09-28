@@ -183,16 +183,7 @@ public class AddUnroutableContentWarningsWhenPublishingNotificationHandlerTests
             umbracoContextAccessor.Object,
             localizedTextService.Object,
             eventMessagesFactory.Object,
-            Options.Create(new ContentSettings { ShowUnroutableContentWarnings = showWarnings }),
-            Mock.Of<IPublishedRouter>(),
-            Mock.Of<ILanguageService>(),
-            Mock.Of<IContentService>(),
-            Mock.Of<IVariationContextAccessor>(),
-            NullLoggerFactory.Instance,
-            new UriUtility(Mock.Of<IHostingEnvironment>()),
-            Mock.Of<IPublishedUrlProvider>(),
-            Mock.Of<IDocumentNavigationQueryService>(),
-            Mock.Of<IPublishedContentStatusFilteringService>());
+            Options.Create(new ContentSettings { ShowUnroutableContentWarnings = showWarnings }));
     }
 
     private void SetupUrls(IContent content, params UrlInfo[] urls)

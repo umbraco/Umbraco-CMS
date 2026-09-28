@@ -50,17 +50,6 @@ namespace Umbraco.Cms.Core.Runtime
         /// </summary>
         /// <param name="logger">The logger instance.</param>
         /// <param name="systemLock">The distributed lock implementation.</param>
-        [Obsolete("Use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
-        public MainDom(ILogger<MainDom> logger, IMainDomLock systemLock)
-            : this(logger, systemLock, StaticServiceProvider.Instance.GetRequiredService<IOptions<GlobalSettings>>())
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="MainDom"/> class.
-        /// </summary>
-        /// <param name="logger">The logger instance.</param>
-        /// <param name="systemLock">The distributed lock implementation.</param>
         /// <param name="globalSettings">The global settings.</param>
         public MainDom(ILogger<MainDom> logger, IMainDomLock systemLock, IOptions<GlobalSettings> globalSettings)
         {

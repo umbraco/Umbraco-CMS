@@ -49,57 +49,6 @@ public class TemplateService : RepositoryService, ITemplateService
     }
 
     /// <inheritdoc />
-    [Obsolete("Use the overload that includes name and alias parameters instead. Scheduled for removal in Umbraco 19.")]
-    public async Task<Attempt<ITemplate, TemplateOperationStatus>> CreateForContentTypeAsync(
-        string contentTypeAlias,
-        string? contentTypeName,
-        Guid userKey)
-    {
-        ITemplate template = new Template(
-            _shortStringHelper,
-            contentTypeName,
-            // NOTE: We are NOT passing in the content type alias here, we want to use it's name since we don't
-            // want to save template file names as camelCase, the Template ctor will clean the alias as
-            // `alias.ToCleanString(CleanStringType.UnderscoreAlias)` which has been the default.
-            // This fixes: http://issues.umbraco.org/issue/U4-7953
-            contentTypeName);
-
-        if (IsValidAlias(template.Alias) == false)
-        {
-            return Attempt.FailWithStatus(TemplateOperationStatus.InvalidAlias, template);
-        }
-
-        EventMessages eventMessages = EventMessagesFactory.Get();
-
-        // check that the template hasn't been created on disk before creating the content type
-        // if it exists, set the new template content to the existing file content
-        var content = GetViewContent(template.Alias);
-        if (content != null)
-        {
-            template.Content = content;
-        }
-
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            var savingEvent = new TemplateSavingNotification(template, eventMessages, true, contentTypeAlias!);
-            if (await scope.Notifications.PublishCancelableAsync(savingEvent))
-            {
-                scope.Complete();
-                return Attempt.FailWithStatus(TemplateOperationStatus.CancelledByNotification, template);
-            }
-
-            _templateRepository.Save(template);
-            scope.Notifications.Publish(
-                new TemplateSavedNotification(template, eventMessages).WithStateFrom(savingEvent));
-
-            await Audit(AuditType.New, userKey, template.Id, UmbracoObjectTypes.Template.GetName());
-            scope.Complete();
-        }
-
-        return Attempt.SucceedWithStatus(TemplateOperationStatus.Success, template);
-    }
-
-    /// <inheritdoc />
     public async Task<Attempt<ITemplate?, TemplateOperationStatus>> CreateForContentTypeAsync(
         string name,
         string alias,

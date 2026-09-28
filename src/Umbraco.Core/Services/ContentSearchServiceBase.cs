@@ -120,7 +120,9 @@ public abstract class ContentSearchServiceBase<TContent> : IndexedSearchServiceB
     public async Task<PagedModel<TContent>> SearchChildrenAsync(
         string? query,
         Guid? parentId,
+        string[]? propertyAliases,
         Ordering? ordering,
+        bool loadTemplates = true,
         int skip = 0,
         int take = 100)
     {

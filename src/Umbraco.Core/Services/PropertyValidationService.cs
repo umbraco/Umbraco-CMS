@@ -57,30 +57,6 @@ public class PropertyValidationService : IPropertyValidationService
         _idKeyMap = idKeyMap;
     }
 
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="PropertyValidationService" /> class.
-    /// </summary>
-    [Obsolete("Use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
-    public PropertyValidationService(
-        PropertyEditorCollection propertyEditors,
-        IDataTypeService dataTypeService,
-        ILocalizedTextService textService,
-        IValueEditorCache valueEditorCache,
-        ICultureDictionary cultureDictionary,
-        ILanguageService languageService,
-        IOptions<ContentSettings> contentSettings)
-        : this(
-            propertyEditors,
-            dataTypeService,
-            textService,
-            valueEditorCache,
-            cultureDictionary,
-            languageService,
-            contentSettings,
-            StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>())
-    {
-    }
-
     /// <inheritdoc />
     public IEnumerable<ValidationResult> ValidatePropertyValue(
         IPropertyType propertyType,

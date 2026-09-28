@@ -46,26 +46,6 @@ public sealed partial class HtmlImageSourceParser
     }
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="HtmlImageSourceParser"/> class.
-    /// </summary>
-    /// <param name="getMediaUrl">A function that retrieves the media URL for a given GUID.</param>
-    [Obsolete("Please use the constructor that accepts IImageUrlTokenGenerator. Scheduled for removal in Umbraco 19.")]
-    public HtmlImageSourceParser(Func<Guid, string> getMediaUrl)
-        : this(getMediaUrl, StaticServiceProvider.Instance.GetRequiredService<IImageUrlTokenGenerator>())
-    {
-    }
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="HtmlImageSourceParser"/> class.
-    /// </summary>
-    /// <param name="publishedUrlProvider">The published URL provider for resolving media URLs.</param>
-    [Obsolete("Please use the constructor that accepts IImageUrlTokenGenerator. Scheduled for removal in Umbraco 19.")]
-    public HtmlImageSourceParser(IPublishedUrlProvider publishedUrlProvider)
-        : this(publishedUrlProvider, StaticServiceProvider.Instance.GetRequiredService<IImageUrlTokenGenerator>())
-    {
-    }
-
-    /// <summary>
     ///     Parses media UDIs out of an HTML string by reading <c>data-udi</c> attributes on
     ///     <c>&lt;a&gt;</c> and <c>&lt;img&gt;</c> tags.
     /// </summary>

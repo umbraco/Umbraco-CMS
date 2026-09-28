@@ -34,22 +34,6 @@ public class MemberPickerValueConverter : PropertyValueConverterBase, IDeliveryA
         _externalMemberService = externalMemberService;
     }
 
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="MemberPickerValueConverter" /> class.
-    /// </summary>
-    /// <param name="memberService">The member service.</param>
-    /// <param name="memberCache">The published member cache.</param>
-    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
-    public MemberPickerValueConverter(
-        IMemberService memberService,
-        IPublishedMemberCache memberCache)
-        : this(
-            memberService,
-            memberCache,
-            StaticServiceProvider.Instance.GetRequiredService<IExternalMemberService>())
-    {
-    }
-
     /// <inheritdoc />
     public override bool IsConverter(IPublishedPropertyType propertyType)
         => propertyType.EditorAlias.InvariantEquals(Constants.PropertyEditors.Aliases.MemberPicker);
