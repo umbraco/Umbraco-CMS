@@ -58,6 +58,7 @@ public interface IUserGroup : IEntity, IRememberBeingDirty
     /// <remarks>
     ///     This is set to return true as default to avoid breaking changes.
     /// </remarks>
+    // TODO (V20): Remove default implementation.
     public bool HasAccessToInvariantForVariant
     {
         get => true;
