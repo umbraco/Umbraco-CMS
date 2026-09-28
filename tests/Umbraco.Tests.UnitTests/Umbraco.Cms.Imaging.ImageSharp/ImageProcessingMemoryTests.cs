@@ -110,20 +110,13 @@ public class ImageProcessingMemoryTests
     }
 
     /// <summary>
-    /// Explicit bounds, but the feature switched off on a host they would have applied to: nothing
-    /// is applied, but the switch is named at Information so an operator can find it.
+    /// The feature switched off on a host the bounds would have engaged on: nothing is applied, but
+    /// the switch is named at Information so an operator can find it.
     /// </summary>
     [Test]
-    public void Configure_WhenDisabledButWouldHaveEngaged_LeavesTheAllocatorAloneAndNamesTheSwitch()
+    public void Configure_WhenDisabledOnAConstrainedHost_LeavesTheAllocatorAloneAndNamesTheSwitch()
     {
-        var settings = new ImagingMemorySettings
-        {
-            Enabled = false,
-            MaximumPoolSizeMegabytes = 128,
-            MaximumDecodedImageMegabytes = 512,
-        };
-
-        LogCapture logs = Configure(settings, ConstrainedMemoryBytes);
+        LogCapture logs = Configure(new ImagingMemorySettings { Enabled = false }, ConstrainedMemoryBytes);
 
         Assert.Multiple(() =>
         {
@@ -132,6 +125,63 @@ public class ImageProcessingMemoryTests
             Assert.That(
                 logs.WithProperty("SettingPath").Properties["SettingPath"],
                 Is.EqualTo($"{Constants.Configuration.ConfigImaging}:Memory:{nameof(ImagingMemorySettings.Enabled)}"));
+
+            // The threshold is named alongside the available memory, so the line explains itself.
+            Assert.That(logs.WithProperty("ThresholdMegabytes").Properties["ThresholdMegabytes"], Is.EqualTo(4096));
+        });
+    }
+
+    /// <summary>
+    /// Explicit bounds, but the feature switched off, on a host with memory to spare: the bounds
+    /// are being discarded by the switch, which is reported whatever the host, and the host's
+    /// memory is not the reason so nothing is said about it.
+    /// </summary>
+    [Test]
+    public void Configure_WhenDisabledWithBoundsConfigured_ReportsThatTheyAreNotApplied()
+    {
+        var settings = new ImagingMemorySettings
+        {
+            Enabled = false,
+            MaximumPoolSizeMegabytes = 128,
+            MaximumDecodedImageMegabytes = 512,
+        };
+
+        LogCapture logs = Configure(settings, AmpleMemoryBytes);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(Configuration.Default.MemoryAllocator, Is.SameAs(_originalAllocator));
+            Assert.That(logs.Levels, Is.EqualTo(new[] { LogLevel.Information }));
+            Assert.That(
+                logs.WithProperty("SettingPath").Properties["SettingPath"],
+                Is.EqualTo($"{Constants.Configuration.ConfigImaging}:Memory:{nameof(ImagingMemorySettings.Enabled)}"));
+            Assert.That(
+                logs.WithProperty("ConfiguredBounds").Properties["ConfiguredBounds"],
+                Is.EqualTo(new[]
+                {
+                    $"{nameof(ImagingMemorySettings.MaximumPoolSizeMegabytes)}=128",
+                    $"{nameof(ImagingMemorySettings.MaximumDecodedImageMegabytes)}=512",
+                }));
+        });
+    }
+
+    /// <summary>
+    /// Both at once: the host is one the bounds would have engaged on, and bounds are configured
+    /// that the switch discards. They are separate facts, so each is reported on its own.
+    /// </summary>
+    [Test]
+    public void Configure_WhenDisabledWithBoundsConfiguredOnAConstrainedHost_ReportsBoth()
+    {
+        var settings = new ImagingMemorySettings { Enabled = false, MaximumConcurrentProcessing = 2 };
+
+        LogCapture logs = Configure(settings, ConstrainedMemoryBytes);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(Configuration.Default.MemoryAllocator, Is.SameAs(_originalAllocator));
+            Assert.That(logs.Levels, Is.EqualTo(new[] { LogLevel.Information, LogLevel.Information }));
+            Assert.That(logs.WithProperty("ThresholdMegabytes").Level, Is.EqualTo(LogLevel.Information));
+            Assert.That(logs.WithProperty("ConfiguredBounds").Level, Is.EqualTo(LogLevel.Information));
         });
     }
 
@@ -191,7 +241,7 @@ public class ImageProcessingMemoryTests
         Assert.Multiple(() =>
         {
             Assert.That(Configuration.Default.MemoryAllocator, Is.SameAs(_originalAllocator));
-            Assert.That(logs.Levels, Is.EqualTo(new[] { LogLevel.Information }));
+            Assert.That(logs.Levels, Is.EqualTo(new[] { LogLevel.Information, LogLevel.Information }));
         });
     }
 
@@ -456,15 +506,15 @@ public class ImageProcessingMemoryTests
     /// Runs the configuration against a provider holding nothing but the settings and the logger,
     /// so reading either from anywhere else would fail rather than silently diverge.
     /// </summary>
-    /// <param name="memory">The imaging memory settings to apply.</param>
+    /// <param name="memorySettings">The imaging memory settings to apply.</param>
     /// <param name="availableMemoryBytes">The memory to report as available to the process.</param>
     /// <returns>What was logged.</returns>
-    private static LogCapture Configure(ImagingMemorySettings memory, long availableMemoryBytes)
+    private static LogCapture Configure(ImagingMemorySettings memorySettings, long availableMemoryBytes)
     {
         var logs = new LogCapture();
         using ServiceProvider services = new ServiceCollection()
             .AddSingleton<ILoggerFactory>(logs)
-            .Configure<ImagingSettings>(x => x.Memory = memory)
+            .Configure<ImagingSettings>(x => x.Memory = memorySettings)
             .BuildServiceProvider();
 
         ImageProcessingMemory.Configure(services, availableMemoryBytes);

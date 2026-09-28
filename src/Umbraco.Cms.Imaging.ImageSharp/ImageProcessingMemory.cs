@@ -107,14 +107,14 @@ internal static class ImageProcessingMemory
     /// </remarks>
     internal static void Configure(IServiceProvider services, long availableMemoryBytes)
     {
-        ImagingMemorySettings memory = services.GetRequiredService<IOptions<ImagingSettings>>().Value.Memory;
+        ImagingMemorySettings memorySettings = services.GetRequiredService<IOptions<ImagingSettings>>().Value.Memory;
         ILogger logger = services.GetRequiredService<ILoggerFactory>().CreateLogger(typeof(ImageProcessingMemory));
 
         var availableMemoryMegabytes = availableMemoryBytes / 1024 / 1024;
 
-        if (memory.Enabled is false)
+        if (memorySettings.Enabled is false)
         {
-            LogDisabled(logger, memory, availableMemoryBytes, availableMemoryMegabytes);
+            LogDisabled(logger, memorySettings, availableMemoryBytes, availableMemoryMegabytes);
             return;
         }
 
@@ -124,14 +124,14 @@ internal static class ImageProcessingMemory
         // the library on a host with room to spare.
         MemoryAllocatorOptions options = default;
 
-        if (RequiresPoolSizeLimit(memory, availableMemoryBytes))
+        if (RequiresPoolSizeLimit(memorySettings, availableMemoryBytes))
         {
-            options.MaximumPoolSizeMegabytes = ResolveMaximumPoolSizeMegabytes(memory, availableMemoryBytes);
+            options.MaximumPoolSizeMegabytes = ResolveMaximumPoolSizeMegabytes(memorySettings, availableMemoryBytes);
         }
 
-        if (RequiresAllocationLimit(memory, availableMemoryBytes))
+        if (RequiresAllocationLimit(memorySettings, availableMemoryBytes))
         {
-            options.AllocationLimitMegabytes = ResolveMaximumDecodedImageMegabytes(memory, availableMemoryBytes);
+            options.AllocationLimitMegabytes = ResolveMaximumDecodedImageMegabytes(memorySettings, availableMemoryBytes);
         }
 
         if (options.MaximumPoolSizeMegabytes.HasValue || options.AllocationLimitMegabytes.HasValue)
@@ -184,32 +184,76 @@ internal static class ImageProcessingMemory
     }
 
     /// <summary>
-    /// Reports that imaging memory management is off, naming the switch on a host the bounds would
-    /// have engaged on so an operator staring at an out-of-memory kill can find it.
+    /// Reports that imaging memory management is off, naming the switch where that matters: on a
+    /// host the bounds would have engaged on, so an operator staring at an out-of-memory kill can
+    /// find it, and where bounds have been configured that the switch is discarding.
     /// </summary>
     /// <param name="logger">The logger.</param>
-    /// <param name="memory">The imaging memory settings.</param>
+    /// <param name="memorySettings">The imaging memory settings.</param>
     /// <param name="availableMemoryBytes">The memory available to the process.</param>
     /// <param name="availableMemoryMegabytes">The memory available to the process, in megabytes.</param>
+    /// <remarks>
+    /// The two are independent facts and are reported separately. Low memory is a property of the
+    /// host, and is only worth mentioning where the host has it. A configured bound that is not
+    /// applied is a contradiction in the configuration, so it is reported whatever the host.
+    /// </remarks>
     private static void LogDisabled(
         ILogger logger,
-        ImagingMemorySettings memory,
+        ImagingMemorySettings memorySettings,
         long availableMemoryBytes,
         long availableMemoryMegabytes)
     {
-        if (WouldApply(memory, availableMemoryBytes))
+        var settingPath = SettingPath(nameof(ImagingMemorySettings.Enabled));
+        var configuredBounds = GetConfiguredBounds(memorySettings);
+
+        if (IsMemoryManaged(availableMemoryBytes))
         {
             logger.LogInformation(
-                "{AvailableMemoryMegabytes} MB available to this process; imaging memory management is disabled, so the imaging library's own memory behaviour stands. Set {SettingPath} to true to bound it.",
+                "Imaging memory management is disabled, so the imaging library's own memory behaviour stands. {AvailableMemoryMegabytes} MB is available to the process, below the {ThresholdMegabytes} MB at which it would bound the memory the library uses. Set {SettingPath} to true to enable it.",
                 availableMemoryMegabytes,
-                $"{Constants.Configuration.ConfigImaging}:Memory:{nameof(ImagingMemorySettings.Enabled)}");
+                MemoryManagementThresholdMegabytes,
+                settingPath);
         }
-        else if (logger.IsEnabled(LogLevel.Debug))
+        else if (configuredBounds.Length == 0 && logger.IsEnabled(LogLevel.Debug))
         {
             logger.LogDebug(
                 "Imaging memory management is disabled; with {AvailableMemoryMegabytes} MB available to the process, no bound would have engaged in any case.",
                 availableMemoryMegabytes);
         }
+
+        if (configuredBounds.Length > 0)
+        {
+            logger.LogInformation(
+                "Imaging memory bounds are configured ({ConfiguredBounds}) but not applied, because {SettingPath} is false. Set it to true to apply them.",
+                configuredBounds,
+                settingPath);
+        }
+    }
+
+    /// <summary>
+    /// Gets the bounds that have been set explicitly, each as its setting name and value.
+    /// </summary>
+    /// <param name="memorySettings">The imaging memory settings.</param>
+    private static string[] GetConfiguredBounds(ImagingMemorySettings memorySettings)
+    {
+        var configured = new List<string>(3);
+
+        if (memorySettings.MaximumPoolSizeMegabytes > 0)
+        {
+            configured.Add($"{nameof(ImagingMemorySettings.MaximumPoolSizeMegabytes)}={memorySettings.MaximumPoolSizeMegabytes}");
+        }
+
+        if (memorySettings.MaximumConcurrentProcessing > 0)
+        {
+            configured.Add($"{nameof(ImagingMemorySettings.MaximumConcurrentProcessing)}={memorySettings.MaximumConcurrentProcessing}");
+        }
+
+        if (memorySettings.MaximumDecodedImageMegabytes > 0)
+        {
+            configured.Add($"{nameof(ImagingMemorySettings.MaximumDecodedImageMegabytes)}={memorySettings.MaximumDecodedImageMegabytes}");
+        }
+
+        return configured.ToArray();
     }
 
     /// <summary>
@@ -231,14 +275,21 @@ internal static class ImageProcessingMemory
         => logger.LogWarning(
             "Could not decode {Path} within the limit set by {SettingPath}. {AllocationDetail} The imaging library attributes the failure to the image's dimensions, but the ceiling is the cause.",
             context.Request.Path.Value,
-            $"{Constants.Configuration.ConfigImaging}:Memory:{nameof(ImagingMemorySettings.MaximumDecodedImageMegabytes)}",
+            SettingPath(nameof(ImagingMemorySettings.MaximumDecodedImageMegabytes)),
             exception.Message);
+
+    /// <summary>
+    /// Gets the configuration path of an imaging memory setting, as an operator would write it.
+    /// </summary>
+    /// <param name="settingName">The name of the setting on <see cref="ImagingMemorySettings" />.</param>
+    private static string SettingPath(string settingName)
+        => $"{Constants.Configuration.ConfigImaging}:Memory:{settingName}";
 
     /// <summary>
     /// Gets a value indicating whether the number of images processed concurrently needs to be
     /// bounded on this host.
     /// </summary>
-    /// <param name="memory">The imaging memory settings.</param>
+    /// <param name="memorySettings">The imaging memory settings.</param>
     /// <param name="availableMemoryBytes">The memory available to the process.</param>
     /// <returns>
     /// <c>true</c> when a limit is configured explicitly, or when the memory available to the
@@ -254,27 +305,27 @@ internal static class ImageProcessingMemory
     /// most needed it (#23556). The resolved value is still clamped to the processor count, so on a
     /// host with cores to spare the bound simply lands there.
     /// </remarks>
-    internal static bool RequiresConcurrencyLimit(ImagingMemorySettings memory, long availableMemoryBytes)
-        => memory.Enabled
-           && (memory.MaximumConcurrentProcessing > 0
+    internal static bool RequiresConcurrencyLimit(ImagingMemorySettings memorySettings, long availableMemoryBytes)
+        => memorySettings.Enabled
+           && (memorySettings.MaximumConcurrentProcessing > 0
                || IsMemoryManaged(availableMemoryBytes));
 
     /// <summary>
     /// Resolves the number of images that may be processed at the same time, deriving a value when
     /// it is not configured.
     /// </summary>
-    /// <param name="memory">The imaging memory settings.</param>
+    /// <param name="memorySettings">The imaging memory settings.</param>
     /// <param name="availableMemoryBytes">The memory available to the process.</param>
     /// <param name="processorCount">The number of processors available to the process.</param>
     /// <returns>The maximum number of images to process concurrently.</returns>
     internal static int ResolveMaximumConcurrentProcessing(
-        ImagingMemorySettings memory,
+        ImagingMemorySettings memorySettings,
         long availableMemoryBytes,
         int processorCount)
     {
-        if (memory.MaximumConcurrentProcessing > 0)
+        if (memorySettings.MaximumConcurrentProcessing > 0)
         {
-            return memory.MaximumConcurrentProcessing;
+            return memorySettings.MaximumConcurrentProcessing;
         }
 
         // Decoding is CPU bound, so more concurrency than processors buys nothing but memory.
@@ -285,7 +336,7 @@ internal static class ImageProcessingMemory
     /// Gets a value indicating whether the pool the imaging library retains between requests needs
     /// to be capped on this host.
     /// </summary>
-    /// <param name="memory">The imaging memory settings.</param>
+    /// <param name="memorySettings">The imaging memory settings.</param>
     /// <param name="availableMemoryBytes">The memory available to the process.</param>
     /// <returns>
     /// <c>true</c> when a size is configured explicitly, or when the memory available to the
@@ -296,23 +347,23 @@ internal static class ImageProcessingMemory
     /// Left alone on a host with memory to spare, so upgrading a site that was never at risk does
     /// not change how the imaging library allocates.
     /// </remarks>
-    internal static bool RequiresPoolSizeLimit(ImagingMemorySettings memory, long availableMemoryBytes)
-        => memory.Enabled
-           && (memory.MaximumPoolSizeMegabytes > 0
+    internal static bool RequiresPoolSizeLimit(ImagingMemorySettings memorySettings, long availableMemoryBytes)
+        => memorySettings.Enabled
+           && (memorySettings.MaximumPoolSizeMegabytes > 0
                || IsMemoryManaged(availableMemoryBytes));
 
     /// <summary>
     /// Resolves the size of the pool the imaging library retains between requests, deriving a value
     /// when it is not configured.
     /// </summary>
-    /// <param name="memory">The imaging memory settings.</param>
+    /// <param name="memorySettings">The imaging memory settings.</param>
     /// <param name="availableMemoryBytes">The memory available to the process.</param>
     /// <returns>The maximum pool size, in megabytes.</returns>
-    internal static int ResolveMaximumPoolSizeMegabytes(ImagingMemorySettings memory, long availableMemoryBytes)
+    internal static int ResolveMaximumPoolSizeMegabytes(ImagingMemorySettings memorySettings, long availableMemoryBytes)
     {
-        if (memory.MaximumPoolSizeMegabytes > 0)
+        if (memorySettings.MaximumPoolSizeMegabytes > 0)
         {
-            return memory.MaximumPoolSizeMegabytes;
+            return memorySettings.MaximumPoolSizeMegabytes;
         }
 
         long derived = availableMemoryBytes / PoolMemoryShareDivisor / OneMegabyte;
@@ -324,7 +375,7 @@ internal static class ImageProcessingMemory
     /// Gets a value indicating whether the size of a single decoded image needs to be capped on
     /// this host.
     /// </summary>
-    /// <param name="memory">The imaging memory settings.</param>
+    /// <param name="memorySettings">The imaging memory settings.</param>
     /// <param name="availableMemoryBytes">The memory available to the process.</param>
     /// <returns>
     /// <c>true</c> when a size is configured explicitly, or when the memory available to the
@@ -336,23 +387,23 @@ internal static class ImageProcessingMemory
     /// Left alone above the same threshold as the pool cap, so one figure governs whether imaging
     /// memory is managed at all.
     /// </remarks>
-    internal static bool RequiresAllocationLimit(ImagingMemorySettings memory, long availableMemoryBytes)
-        => memory.Enabled
-           && (memory.MaximumDecodedImageMegabytes > 0
+    internal static bool RequiresAllocationLimit(ImagingMemorySettings memorySettings, long availableMemoryBytes)
+        => memorySettings.Enabled
+           && (memorySettings.MaximumDecodedImageMegabytes > 0
                || IsMemoryManaged(availableMemoryBytes));
 
     /// <summary>
     /// Resolves the size of the buffers a single image may be decoded into, deriving a value when
     /// it is not configured.
     /// </summary>
-    /// <param name="memory">The imaging memory settings.</param>
+    /// <param name="memorySettings">The imaging memory settings.</param>
     /// <param name="availableMemoryBytes">The memory available to the process.</param>
     /// <returns>The maximum size of a single decoded image, in megabytes.</returns>
-    internal static int ResolveMaximumDecodedImageMegabytes(ImagingMemorySettings memory, long availableMemoryBytes)
+    internal static int ResolveMaximumDecodedImageMegabytes(ImagingMemorySettings memorySettings, long availableMemoryBytes)
     {
-        if (memory.MaximumDecodedImageMegabytes > 0)
+        if (memorySettings.MaximumDecodedImageMegabytes > 0)
         {
-            return memory.MaximumDecodedImageMegabytes;
+            return memorySettings.MaximumDecodedImageMegabytes;
         }
 
         long derived = availableMemoryBytes / DecodedImageMemoryShareDivisor / OneMegabyte;
@@ -371,20 +422,4 @@ internal static class ImageProcessingMemory
     /// <param name="availableMemoryBytes">The memory available to the process.</param>
     private static bool IsMemoryManaged(long availableMemoryBytes)
         => availableMemoryBytes < MemoryManagementThresholdMegabytes * (long)OneMegabyte;
-
-    /// <summary>
-    /// Gets a value indicating whether any imaging memory bound would apply on this host were the
-    /// feature enabled.
-    /// </summary>
-    /// <param name="memory">The imaging memory settings.</param>
-    /// <param name="availableMemoryBytes">The memory available to the process.</param>
-    /// <returns>
-    /// <c>true</c> when the host is one the bounds would engage on, so an operator who has turned
-    /// the feature off on a host it would have protected can be pointed back at the switch.
-    /// </returns>
-    internal static bool WouldApply(ImagingMemorySettings memory, long availableMemoryBytes)
-        => IsMemoryManaged(availableMemoryBytes)
-           || memory.MaximumPoolSizeMegabytes > 0
-           || memory.MaximumConcurrentProcessing > 0
-           || memory.MaximumDecodedImageMegabytes > 0;
 }

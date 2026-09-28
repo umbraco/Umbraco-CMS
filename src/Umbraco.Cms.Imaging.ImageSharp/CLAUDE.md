@@ -208,10 +208,16 @@ unthrottled on expiry instead — concurrent decodes are the thing being bounded
 the OOM under sustained load.
 
 `Enabled: false` is the one-setting escape hatch that restores stock ImageSharp behaviour — and,
-until v19, the default. When it is off on a host a bound *would* have engaged on, `Configure` says so
-once at **Information**, naming the switch (`Umbraco:CMS:Imaging:Memory:Enabled`) — so an operator
-staring at an exit 137 on a memory-limited box is pointed at the setting rather than left to find it.
-On a host no bound would have engaged on, it stays quiet (Debug), so an unaffected site says nothing.
+until v19, the default. `Configure` reports two independent facts about it, each once at startup:
+
+- On a host a bound *would* have engaged on (under the 4 GB threshold), it says so at
+  **Information**, naming the available memory, the threshold and the switch
+  (`Umbraco:CMS:Imaging:Memory:Enabled`) — so an operator staring at an exit 137 on a memory-limited
+  box is pointed at the setting rather than left to find it. On a host with memory to spare it stays
+  quiet (Debug), so an unaffected site says nothing.
+- If any bound has been set explicitly while the switch is off, that is a contradiction in the
+  configuration rather than a property of the host, so it is reported at **Information** whatever
+  the host, naming the settings being discarded.
 
 Each bound reports itself at startup — Information when it engages, naming the resolved value, and
 Debug when it does not, so an unaffected site running at Information says nothing. Those lines are

@@ -97,10 +97,10 @@ public sealed class ImageProcessingThrottleMiddleware
 
         var availableMemoryMegabytes = availableMemoryBytes / 1024 / 1024;
 
-        ImagingMemorySettings memory = imagingSettings.Value.Memory;
-        if (ImageProcessingMemory.RequiresConcurrencyLimit(memory, availableMemoryBytes))
+        ImagingMemorySettings memorySettings = imagingSettings.Value.Memory;
+        if (ImageProcessingMemory.RequiresConcurrencyLimit(memorySettings, availableMemoryBytes))
         {
-            var maximumConcurrentProcessing = ImageProcessingMemory.ResolveMaximumConcurrentProcessing(memory, availableMemoryBytes, processorCount);
+            var maximumConcurrentProcessing = ImageProcessingMemory.ResolveMaximumConcurrentProcessing(memorySettings, availableMemoryBytes, processorCount);
             _semaphore = new SemaphoreSlim(maximumConcurrentProcessing, maximumConcurrentProcessing);
 
             logger.LogInformation(
@@ -108,6 +108,11 @@ public sealed class ImageProcessingThrottleMiddleware
                 maximumConcurrentProcessing,
                 availableMemoryMegabytes,
                 processorCount);
+        }
+        else if (memorySettings.Enabled is false)
+        {
+            // The host's characteristics played no part, so they are not reported as if they had.
+            logger.LogDebug("Left concurrent image processing unbounded, because imaging memory management is disabled.");
         }
         else
         {

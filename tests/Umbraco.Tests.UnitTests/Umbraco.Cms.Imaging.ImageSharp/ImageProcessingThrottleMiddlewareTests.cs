@@ -253,12 +253,12 @@ public class ImageProcessingThrottleMiddlewareTests
 
     private static ImageProcessingThrottleMiddleware Build(
         RequestDelegate next,
-        ImagingMemorySettings memory,
+        ImagingMemorySettings memorySettings,
         long? availableMemoryBytes = null,
         int? processorCount = null,
         ILogger<ImageProcessingThrottleMiddleware>? logger = null)
     {
-        var settings = new ImagingSettings { Memory = memory };
+        var settings = new ImagingSettings { Memory = memorySettings };
 
         var processor = new Mock<IImageWebProcessor>();
         processor.SetupGet(x => x.Commands).Returns(new[] { "width", "height", "format" });
