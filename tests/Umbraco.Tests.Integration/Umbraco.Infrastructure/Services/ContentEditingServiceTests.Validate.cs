@@ -258,6 +258,33 @@ public partial class ContentEditingServiceTests
     }
 
     [Test]
+    public async Task Will_Fail_Invalid_Invariant_Content_Without_Access_To_Invariant_For_Variant()
+    {
+        var content = await CreateInvariantContent();
+
+        IUser editor = await CreateEditorWithoutAccessToInvariantForVariant();
+
+        var validateContentUpdateModel = new ValidateContentUpdateModel
+        {
+            Variants =
+            [
+                new () { Name = "Updated Name" }
+            ],
+            Properties =
+            [
+                new PropertyValueModel { Alias = "title", Value = null },
+                new PropertyValueModel { Alias = "text", Value = "The updated text" }
+            ]
+        };
+
+        Attempt<ContentValidationResult, ContentEditingOperationStatus> result = await ContentEditingService.ValidateUpdateAsync(content.Key, validateContentUpdateModel, editor.Key);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.PropertyValidationError, result.Status);
+        Assert.AreEqual(1, result.Result.ValidationErrors.Count());
+        Assert.AreEqual("#validation_invalidNull", result.Result.ValidationErrors.Single(x => x.Alias == "title").ErrorMessages[0]);
+    }
+
+    [Test]
     public async Task Cannot_Validate_Create_At_Root_When_Not_Allowed_As_Root()
     {
         var createModel = await BuildTextPageRootCreateModel(allowedAsRoot: false);

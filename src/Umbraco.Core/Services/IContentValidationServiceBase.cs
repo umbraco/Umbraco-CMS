@@ -16,7 +16,7 @@ internal interface IContentValidationServiceBase<in TContentType>
     /// <param name="contentEditingModelBase">The content editing model to validate.</param>
     /// <param name="contentType">The content type definition to validate against.</param>
     /// <param name="culturesToValidate">The optional collection of cultures to validate. If <c>null</c>, all cultures are validated.</param>
-    /// <param name="validateCultureInvariantProperties">Whether to include culture invariant properties in the validation.</param>
+    /// <param name="validateCultureInvariantProperties">Whether to include culture invariant properties in the validation of culture variant content. Culture invariant content always has its properties validated.</param>
     /// <returns>A validation result containing any validation errors.</returns>
     Task<ContentValidationResult> ValidatePropertiesAsync(ContentEditingModelBase contentEditingModelBase, TContentType contentType, IEnumerable<string?>? culturesToValidate = null, bool validateCultureInvariantProperties = true);
 
