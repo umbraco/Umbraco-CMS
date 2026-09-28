@@ -1,4 +1,3 @@
-using Microsoft.Extensions.Hosting;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Notifications;
 

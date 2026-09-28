@@ -1,4 +1,3 @@
-using Umbraco.Cms.Api.Management.Extensions;
 using Umbraco.Cms.Api.Management.ViewModels.Member;
 using Umbraco.Cms.Api.Management.ViewModels.Member.Item;
 using Umbraco.Cms.Core.Models;

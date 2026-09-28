@@ -1,5 +1,4 @@
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.Models.PublishedContent;
 
 namespace Umbraco.Extensions;
 

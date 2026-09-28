@@ -1,7 +1,6 @@
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Api.Management.ViewModels.TemporaryFile;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.Media;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 

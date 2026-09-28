@@ -249,4 +249,28 @@ public partial class ContentSearchServiceTests
         PagedModel<IMedia> result = await MediaSearchService.SearchChildrenAsync("triple2child", null, null, null);
         Assert.That(result.Total, Is.EqualTo(0));
     }
+
+    [Test]
+    public async Task Media_LoadsOnlyRequestedPropertiesWithoutQuery()
+    {
+        IMedia root = MediaService.GetRootMedia().First();
+
+        PagedModel<IMedia> allProperties = await MediaSearchService.SearchChildrenAsync(null, root.Key, null, null);
+        PagedModel<IMedia> noProperties = await MediaSearchService.SearchChildrenAsync(null, root.Key, [], null);
+        PagedModel<IMedia> titleOnly = await MediaSearchService.SearchChildrenAsync(null, root.Key, ["title"], null);
+
+        AssertPropertyLoading(allProperties.Items, noProperties.Items, titleOnly.Items);
+    }
+
+    [Test]
+    public async Task Media_LoadsOnlyRequestedPropertiesWithQuery()
+    {
+        IMedia root = MediaService.GetRootMedia().First();
+
+        PagedModel<IMedia> allProperties = await MediaSearchService.SearchChildrenAsync("title", root.Key, null, null);
+        PagedModel<IMedia> noProperties = await MediaSearchService.SearchChildrenAsync("title", root.Key, [], null);
+        PagedModel<IMedia> titleOnly = await MediaSearchService.SearchChildrenAsync("title", root.Key, ["title"], null);
+
+        AssertPropertyLoading(allProperties.Items, noProperties.Items, titleOnly.Items);
+    }
 }

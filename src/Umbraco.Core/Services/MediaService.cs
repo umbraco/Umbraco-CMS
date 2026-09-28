@@ -460,6 +460,32 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <inheritdoc />
+        public IEnumerable<IMedia> GetByIds(IEnumerable<Guid> ids, string[]? propertyAliases)
+        {
+            Guid[] idsA = ids.Distinct().ToArray();
+            if (idsA.Length == 0)
+            {
+                return Enumerable.Empty<IMedia>();
+            }
+
+            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            scope.ReadLock(Constants.Locks.MediaTree);
+
+            var index = new Dictionary<Guid, IMedia>(idsA.Length);
+            foreach (IEnumerable<Guid> group in idsA.InGroupsOf(Constants.Sql.MaxParameterCount))
+            {
+                List<Guid> groupKeys = group.ToList();
+                IQuery<IMedia>? query = Query<IMedia>()?.Where(x => groupKeys.Contains(x.Key));
+                foreach (IMedia item in _mediaRepository.GetPage(query, 0, groupKeys.Count, out _, propertyAliases, null, Ordering.By("sortOrder")))
+                {
+                    index[item.Key] = item;
+                }
+            }
+
+            return idsA.Select(x => index.GetValueOrDefault(x)).WhereNotNull();
+        }
+
+        /// <inheritdoc />
         public IEnumerable<IMedia> GetPagedOfType(int contentTypeId, long pageIndex, int pageSize, out long totalRecords, IQuery<IMedia>? filter = null, Ordering? ordering = null)
         {
             if (pageIndex < 0)
@@ -591,6 +617,10 @@ namespace Umbraco.Cms.Core.Services
 
         /// <inheritdoc />
         public IEnumerable<IMedia> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalChildren, IQuery<IMedia>? filter = null, Ordering? ordering = null)
+            => GetPagedChildren(id, pageIndex, pageSize, out totalChildren, propertyAliases: null, filter, ordering);
+
+        /// <inheritdoc />
+        public IEnumerable<IMedia> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalChildren, string[]? propertyAliases, IQuery<IMedia>? filter, Ordering? ordering)
         {
             if (pageIndex < 0)
             {
@@ -611,7 +641,7 @@ namespace Umbraco.Cms.Core.Services
             scope.ReadLock(Constants.Locks.MediaTree);
 
             IQuery<IMedia>? query = Query<IMedia>()?.Where(x => x.ParentId == id);
-            return _mediaRepository.GetPage(query, pageIndex, pageSize, out totalChildren, propertyAliases: null, filter, ordering);
+            return _mediaRepository.GetPage(query, pageIndex, pageSize, out totalChildren, propertyAliases, filter, ordering);
         }
 
         /// <inheritdoc />

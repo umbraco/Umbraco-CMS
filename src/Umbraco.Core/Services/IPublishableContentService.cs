@@ -13,6 +13,18 @@ public interface IPublishableContentService<TContent> : IContentServiceBase<TCon
     IEnumerable<TContent> GetByIds(IEnumerable<Guid> ids);
 
     /// <summary>
+    ///     Gets content, loading only the requested properties and, optionally, templates.
+    /// </summary>
+    /// <param name="ids">The unique identifiers of the content.</param>
+    /// <param name="propertyAliases">
+    ///     The property aliases to load. If null, all properties are loaded.
+    ///     If empty array, no custom properties are loaded.
+    /// </param>
+    /// <param name="loadTemplates">Whether to load templates. Ignored for content that has no templates.</param>
+    /// <returns>The content, in the order of <paramref name="ids" />.</returns>
+    IEnumerable<TContent> GetByIds(IEnumerable<Guid> ids, string[]? propertyAliases, bool loadTemplates = true);
+
+    /// <summary>
     ///     Saves content.
     /// </summary>
     /// <param name="content">The content to save.</param>

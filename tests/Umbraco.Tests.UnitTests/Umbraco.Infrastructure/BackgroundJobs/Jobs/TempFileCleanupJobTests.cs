@@ -7,7 +7,6 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.IO;
-using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.BackgroundJobs.Jobs

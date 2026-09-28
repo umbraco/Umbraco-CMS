@@ -29,7 +29,7 @@ public interface IDocumentRepository : IPublishableContentRepository<IContent>
     /// </param>
     /// <returns>A collection of documents for the specified page.</returns>
     /// <remarks>Here, <paramref name="filter" /> can be null but <paramref name="ordering" /> cannot.</remarks>
-    IEnumerable<IContent> GetPage(
+    new IEnumerable<IContent> GetPage(
         IQuery<IContent>? query,
         long pageIndex,
         int pageSize,

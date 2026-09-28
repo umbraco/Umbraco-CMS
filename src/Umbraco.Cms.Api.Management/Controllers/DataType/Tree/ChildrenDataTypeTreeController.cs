@@ -4,8 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
-using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Api.Management.Services.Entities;
 using Umbraco.Cms.Api.Management.Services.Flags;
 
 namespace Umbraco.Cms.Api.Management.Controllers.DataType.Tree;

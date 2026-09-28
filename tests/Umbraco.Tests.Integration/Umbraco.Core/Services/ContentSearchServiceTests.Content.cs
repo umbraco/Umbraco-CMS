@@ -249,4 +249,47 @@ public partial class ContentSearchServiceTests
         PagedModel<IContent> result = await ContentSearchService.SearchChildrenAsync("triple2child", null, null, null);
         Assert.That(result.Total, Is.EqualTo(0));
     }
+
+    [Test]
+    public async Task Content_LoadsOnlyRequestedPropertiesWithoutQuery()
+    {
+        IContent root = ContentService.GetRootContent().First();
+
+        PagedModel<IContent> allProperties = await ContentSearchService.SearchChildrenAsync(null, root.Key, null, null);
+        PagedModel<IContent> noProperties = await ContentSearchService.SearchChildrenAsync(null, root.Key, [], null);
+        PagedModel<IContent> titleOnly = await ContentSearchService.SearchChildrenAsync(null, root.Key, ["title"], null);
+
+        AssertPropertyLoading(allProperties.Items, noProperties.Items, titleOnly.Items);
+    }
+
+    [Test]
+    public async Task Content_LoadsOnlyRequestedPropertiesWithQuery()
+    {
+        IContent root = ContentService.GetRootContent().First();
+
+        PagedModel<IContent> allProperties = await ContentSearchService.SearchChildrenAsync("title", root.Key, null, null);
+        PagedModel<IContent> noProperties = await ContentSearchService.SearchChildrenAsync("title", root.Key, [], null);
+        PagedModel<IContent> titleOnly = await ContentSearchService.SearchChildrenAsync("title", root.Key, ["title"], null);
+
+        AssertPropertyLoading(allProperties.Items, noProperties.Items, titleOnly.Items);
+    }
+
+    private static void AssertPropertyLoading(IEnumerable<IContentBase> allProperties, IEnumerable<IContentBase> noProperties, IEnumerable<IContentBase> titleOnly)
+    {
+        IContentBase[] all = allProperties.ToArray();
+        IContentBase[] none = noProperties.ToArray();
+        IContentBase[] title = titleOnly.ToArray();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(all, Is.Not.Empty);
+            Assert.That(all.All(item => item.HasProperty("title")), Is.True, "All properties should load by default");
+
+            Assert.That(none.Select(item => item.Key), Is.EquivalentTo(all.Select(item => item.Key)));
+            Assert.That(none.All(item => item.Properties.Count == 0), Is.True, "An empty alias array should load no properties");
+
+            Assert.That(title.Select(item => item.Key), Is.EquivalentTo(all.Select(item => item.Key)));
+            Assert.That(title.All(item => item.Properties.Count == 1 && item.HasProperty("title")), Is.True, "Only the requested property should load");
+        });
+    }
 }
