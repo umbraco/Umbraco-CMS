@@ -202,7 +202,7 @@ public class AspNetCoreHostingEnvironment : IHostingEnvironment
                 return;
 
             case ApplicationUrlDetection.FirstRequest:
-                TryReplace(currentApplicationUrl, IsUpgrade);
+                TryReplaceApplicationMainUrl(currentApplicationUrl, CanReplaceLockedUrl);
                 break;
 
             case ApplicationUrlDetection.EveryRequest:
@@ -211,7 +211,7 @@ public class AspNetCoreHostingEnvironment : IHostingEnvironment
                     return;
                 }
 
-                if (TryReplace(currentApplicationUrl, static (current, candidate) => IsDowngrade(current, candidate) is false))
+                if (TryReplaceApplicationMainUrl(currentApplicationUrl, IsNoLessUsefulApplicationUrl))
                 {
                     _applicationUrls.TryAdd(currentApplicationUrl);
                 }
@@ -220,10 +220,15 @@ public class AspNetCoreHostingEnvironment : IHostingEnvironment
         }
     }
 
-    private bool TryReplace(Uri candidate, Func<Uri, Uri, bool> shouldReplace)
+    /// <summary>
+    /// Applies <paramref name="candidate" /> as the application main URL when <paramref name="canReplace" />
+    /// accepts it, retrying against the value another request may have applied in the meantime so that a
+    /// replacement is only ever committed against the exact value it was evaluated for.
+    /// </summary>
+    private bool TryReplaceApplicationMainUrl(Uri candidate, Func<Uri, Uri, bool> canReplace)
     {
         Uri? current = _applicationMainUrl;
-        while (current is null || shouldReplace(current, candidate))
+        while (current is null || canReplace(current, candidate))
         {
             Uri? observed = Interlocked.CompareExchange(ref _applicationMainUrl, candidate, current);
             if (ReferenceEquals(observed, current))
@@ -238,34 +243,41 @@ public class AspNetCoreHostingEnvironment : IHostingEnvironment
     }
 
     /// <summary>
-    ///     A locked URL is only replaced by one that is strictly more useful as the public application URL:
-    ///     a non-loopback host replacing a loopback host, or HTTPS replacing HTTP for the same host and path.
+    /// A locked URL is only replaced by a strictly more useful one, and only by a request for the same host
+    /// and path - except when escaping a loopback address, which no visitor can reach in the first place.
     /// </summary>
-    private static bool IsUpgrade(Uri current, Uri candidate)
-    {
-        if (current.IsLoopback != candidate.IsLoopback)
-        {
-            return candidate.IsLoopback is false;
-        }
-
-        return current.Scheme == Uri.UriSchemeHttp
-            && candidate.Scheme == Uri.UriSchemeHttps
-            && Uri.Compare(current, candidate, UriComponents.Host | UriComponents.Path, UriFormat.Unescaped, StringComparison.OrdinalIgnoreCase) == 0;
-    }
+    private static bool CanReplaceLockedUrl(Uri locked, Uri candidate)
+        => IsMoreUsefulApplicationUrl(locked, candidate)
+            && (EscapesLoopback(locked, candidate) || IsSameHostAndPath(locked, candidate));
 
     /// <summary>
-    ///     A URL is never replaced by one that is less useful as the public application URL:
-    ///     a loopback host replacing a non-loopback host, or HTTP replacing HTTPS.
+    /// Any request may replace the URL, including with another host, but never with one that is less useful
+    /// as a public address.
     /// </summary>
-    private static bool IsDowngrade(Uri current, Uri candidate)
-    {
-        if (current.IsLoopback != candidate.IsLoopback)
-        {
-            return candidate.IsLoopback;
-        }
+    private static bool IsNoLessUsefulApplicationUrl(Uri current, Uri candidate)
+        => PublicUrlRank(candidate) >= PublicUrlRank(current);
 
-        return current.Scheme == Uri.UriSchemeHttps && candidate.Scheme == Uri.UriSchemeHttp;
-    }
+    private static bool IsMoreUsefulApplicationUrl(Uri current, Uri candidate)
+        => PublicUrlRank(candidate) > PublicUrlRank(current);
+
+    /// <summary>
+    /// Ranks a URL by how well it serves as the public application URL, from a loopback address that no
+    /// visitor can reach up to a non-loopback HTTPS address. A URL is only ever replaced by one of an equal
+    /// or higher rank.
+    /// </summary>
+    private static int PublicUrlRank(Uri url) => (url.IsLoopback, url.Scheme == Uri.UriSchemeHttps) switch
+    {
+        (true, false) => 0,
+        (true, true) => 1,
+        (false, false) => 2,
+        (false, true) => 3,
+    };
+
+    private static bool EscapesLoopback(Uri current, Uri candidate)
+        => current.IsLoopback && candidate.IsLoopback is false;
+
+    private static bool IsSameHostAndPath(Uri current, Uri candidate)
+        => Uri.Compare(current, candidate, UriComponents.Host | UriComponents.Path, UriFormat.Unescaped, StringComparison.OrdinalIgnoreCase) == 0;
 
     private void SetSiteNameAndDebugMode(HostingSettings hostingSettings)
     {
