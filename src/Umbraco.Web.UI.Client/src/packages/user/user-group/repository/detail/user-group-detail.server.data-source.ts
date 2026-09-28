@@ -42,7 +42,7 @@ export class UmbUserGroupServerDataSource
 			entityType: UMB_USER_GROUP_ENTITY_TYPE,
 			fallbackPermissions: [],
 			hasAccessToAllLanguages: false,
-			hasAccessToInvariantForVariant: true,
+			hasAccessToInvariantForVariant: false,
 			icon: 'icon-users',
 			isDeletable: true,
 			languages: [],

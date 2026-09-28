@@ -27,7 +27,7 @@ export class UmbUserGroupDetailsWorkspaceViewElement extends UmbLitElement imple
 	private _hasAccessToAllLanguages: UmbUserGroupDetailModel['hasAccessToAllLanguages'] = false;
 
 	@state()
-	private _hasAccessToInvariantForVariant: UmbUserGroupDetailModel['hasAccessToInvariantForVariant'] = true;
+	private _hasAccessToInvariantForVariant: UmbUserGroupDetailModel['hasAccessToInvariantForVariant'] = false;
 
 	@state()
 	private _documentStartNode?: UmbUserGroupDetailModel['documentStartNode'];
@@ -70,7 +70,7 @@ export class UmbUserGroupDetailsWorkspaceViewElement extends UmbLitElement imple
 
 		this.observe(
 			this.#workspaceContext?.hasAccessToInvariantForVariant,
-			(value) => (this._hasAccessToInvariantForVariant = value ?? true),
+			(value) => (this._hasAccessToInvariantForVariant = value ?? false),
 			'_observeHasAccessToInvariantForVariant',
 		);
 

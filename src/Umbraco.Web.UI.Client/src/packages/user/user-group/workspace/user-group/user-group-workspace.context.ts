@@ -24,7 +24,7 @@ export class UmbUserGroupWorkspaceContext
 		(data) => data?.hasAccessToAllLanguages || false,
 	);
 	readonly hasAccessToInvariantForVariant = this._data.createObservablePartOfCurrent(
-		(data) => data?.hasAccessToInvariantForVariant ?? true,
+		(data) => data?.hasAccessToInvariantForVariant ?? false,
 	);
 	readonly documentStartNode = this._data.createObservablePartOfCurrent((data) => data?.documentStartNode || null);
 	readonly documentRootAccess = this._data.createObservablePartOfCurrent((data) => data?.documentRootAccess || false);

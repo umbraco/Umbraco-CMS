@@ -117,8 +117,8 @@ public class UserGroupDto
     /// </summary>
     [Column("hasAccessToInvariantForVariant")]
     [NullSetting(NullSetting = NullSettings.NotNull)]
-    [Constraint(Default = "1")]
-    public bool HasAccessToInvariantForVariant { get; set; } = true;
+    [Constraint(Default = "0")]
+    public bool HasAccessToInvariantForVariant { get; set; }
 
     /// <summary>
     /// Gets or sets the ID of the root content node that members of the user group start at in the content tree.

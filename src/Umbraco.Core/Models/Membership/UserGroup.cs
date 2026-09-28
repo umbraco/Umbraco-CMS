@@ -32,7 +32,7 @@ public class UserGroup : EntityBase, IUserGroup, IReadOnlyUserGroup
     private string _name;
     private string? _description;
     private bool _hasAccessToAllLanguages;
-    private bool _hasAccessToInvariantForVariant = true;
+    private bool _hasAccessToInvariantForVariant;
     private ISet<string> _permissions;
     private ISet<IGranularPermission> _granularPermissions;
     private List<string> _sectionCollection;

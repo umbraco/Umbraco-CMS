@@ -80,10 +80,10 @@ public class AddHasAccessToInvariantForVariantToUserGroup : AsyncMigrationBase
         // under the old default-language coupling, plus the built-in admin group (id = 1).
         Database.Execute(
             $@"UPDATE {userGroupTable}
-               SET {columnName} = 0
-               WHERE {hasAccessToAllLanguagesColumn} = 0
-                 AND {idColumn} <> 1
-                 AND {idColumn} NOT IN (
+               SET {columnName} = 1
+               WHERE {hasAccessToAllLanguagesColumn} = 1
+                 OR {idColumn} = 1
+                 OR {idColumn} IN (
                      SELECT l.{userGroupIdColumn}
                      FROM {userGroup2LanguageTable} l
                      INNER JOIN {languageTable} lang ON l.{languageIdColumn} = lang.{idColumn}
