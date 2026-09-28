@@ -27,18 +27,6 @@ public abstract class OpenIdDictApplicationManagerBase
     /// Initializes a new instance of the <see cref="OpenIdDictApplicationManagerBase"/> class.
     /// </summary>
     /// <param name="applicationManager">The OpenIddict application manager.</param>
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
-    protected OpenIdDictApplicationManagerBase(IOpenIddictApplicationManager applicationManager)
-        : this(
-            applicationManager,
-            StaticServiceProvider.Instance.GetRequiredService<ILogger<OpenIdDictApplicationManagerBase>>())
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="OpenIdDictApplicationManagerBase"/> class.
-    /// </summary>
-    /// <param name="applicationManager">The OpenIddict application manager.</param>
     /// <param name="logger">The logger used to report contention while registering an application.</param>
     protected OpenIdDictApplicationManagerBase(
         IOpenIddictApplicationManager applicationManager,

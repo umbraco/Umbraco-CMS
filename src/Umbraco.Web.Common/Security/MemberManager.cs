@@ -56,37 +56,6 @@ public class MemberManager : UmbracoUserManager<MemberIdentityUser, MemberPasswo
         _publishedModelFactory = publishedModelFactory;
     }
 
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
-    public MemberManager(
-        IIpResolver ipResolver,
-        IMemberUserStore store,
-        IOptions<IdentityOptions> optionsAccessor,
-        IPasswordHasher<MemberIdentityUser> passwordHasher,
-        IEnumerable<IUserValidator<MemberIdentityUser>> userValidators,
-        IEnumerable<IPasswordValidator<MemberIdentityUser>> passwordValidators,
-        IdentityErrorDescriber errors,
-        IServiceProvider services,
-        ILogger<UserManager<MemberIdentityUser>> logger,
-        IOptionsSnapshot<MemberPasswordConfigurationSettings> passwordConfiguration,
-        IPublicAccessService publicAccessService,
-        IHttpContextAccessor httpContextAccessor)
-        : this(
-            ipResolver,
-            store,
-            optionsAccessor,
-            passwordHasher,
-            userValidators,
-            passwordValidators,
-            errors,
-            services,
-            logger,
-            passwordConfiguration,
-            publicAccessService,
-            httpContextAccessor,
-            StaticServiceProvider.Instance.GetRequiredService<IPublishedModelFactory>())
-    {
-    }
-
     /// <inheritdoc />
     public virtual async Task<bool> IsMemberAuthorizedAsync(
         IEnumerable<string>? allowTypes = null,

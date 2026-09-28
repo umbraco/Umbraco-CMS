@@ -20,18 +20,6 @@ public class RetrustForeignKeyAndCheckConstraints : AsyncMigrationBase
     /// Initializes a new instance of the <see cref="RetrustForeignKeyAndCheckConstraints"/> class.
     /// </summary>
     /// <param name="context">The migration context.</param>
-    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
-    public RetrustForeignKeyAndCheckConstraints(IMigrationContext context)
-        : this(
-            context,
-            StaticServiceProvider.Instance.GetRequiredService<IUmbracoDatabaseFactory>())
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="RetrustForeignKeyAndCheckConstraints"/> class.
-    /// </summary>
-    /// <param name="context">The migration context.</param>
     /// <param name="databaseFactory">The database factory used to create separate connections for constraint validation.</param>
     public RetrustForeignKeyAndCheckConstraints(IMigrationContext context, IUmbracoDatabaseFactory databaseFactory)
         : base(context) => _databaseFactory = databaseFactory;

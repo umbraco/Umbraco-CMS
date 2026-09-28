@@ -117,12 +117,7 @@ internal sealed class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithC
             new NullLogger<DocumentCacheService>(),
             new ConvertedPublishedContentCacheFactory(null, new NullLogger<ConvertedPublishedContentCacheFactory>()));
 
-        _mockedCache = new DocumentCache(
-            _documentCacheService,
-            GetRequiredService<IPublishedContentTypeCache>(),
-            GetRequiredService<IDocumentNavigationQueryService>(),
-            GetRequiredService<IDocumentUrlService>(),
-            new Lazy<IPublishedUrlProvider>(GetRequiredService<IPublishedUrlProvider>));
+        _mockedCache = new DocumentCache(_documentCacheService);
     }
 
     // We want to be able to alter the settings for the providers AFTER the test has started
@@ -432,12 +427,7 @@ internal sealed class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithC
             new NullLogger<DocumentCacheService>(),
             new ConvertedPublishedContentCacheFactory(null, new NullLogger<ConvertedPublishedContentCacheFactory>()));
 
-        var controlledCache = new DocumentCache(
-            controlledCacheService,
-            GetRequiredService<IPublishedContentTypeCache>(),
-            GetRequiredService<IDocumentNavigationQueryService>(),
-            GetRequiredService<IDocumentUrlService>(),
-            new Lazy<IPublishedUrlProvider>(GetRequiredService<IPublishedUrlProvider>));
+        var controlledCache = new DocumentCache(controlledCacheService);
 
         // Clear any existing cache entry for this key.
         var hybridCache = GetRequiredService<Microsoft.Extensions.Caching.Hybrid.HybridCache>();

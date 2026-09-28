@@ -105,48 +105,6 @@ internal class DocumentRepository : PublishableContentRepositoryBase<IContent, D
         _shortStringHelper = shortStringHelper;
     }
 
-    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
-    public DocumentRepository(
-            IScopeAccessor scopeAccessor,
-            AppCaches appCaches,
-            ILogger<DocumentRepository> logger,
-            ILoggerFactory loggerFactory,
-            IContentTypeRepository contentTypeRepository,
-            ITemplateRepository templateRepository,
-            ITagRepository tagRepository,
-            ILanguageRepository languageRepository,
-            IRelationRepository relationRepository,
-            IRelationTypeRepository relationTypeRepository,
-            PropertyEditorCollection propertyEditors,
-            DataValueReferenceFactoryCollection dataValueReferenceFactories,
-            IDataTypeService dataTypeService,
-            IJsonSerializer serializer,
-            IEventAggregator eventAggregator,
-            IRepositoryCacheVersionService repositoryCacheVersionService,
-            ICacheSyncService cacheSyncService)
-            : this(
-                scopeAccessor,
-                appCaches,
-                logger,
-                loggerFactory,
-                contentTypeRepository,
-                templateRepository,
-                tagRepository,
-                languageRepository,
-                relationRepository,
-                relationTypeRepository,
-                propertyEditors,
-                dataValueReferenceFactories,
-                dataTypeService,
-                StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>(),
-                serializer,
-                eventAggregator,
-                repositoryCacheVersionService,
-                cacheSyncService,
-                StaticServiceProvider.Instance.GetRequiredService<IShortStringHelper>())
-    {
-    }
-
     protected override DocumentRepository This => this;
 
     // note: is ok to 'new' the repo here as it's a sub-repo really

@@ -70,8 +70,6 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddUnique<IStylesheetRepository, StylesheetRepository>();
         builder.Services.AddUnique<IContentTypeCommonRepository, ContentTypeCommonRepository>();
         builder.Services.AddUnique<IKeyValueRepository, KeyValueRepository>();
-        builder.Services.AddUnique<IInstallationRepository, InstallationRepository>();
-        builder.Services.AddUnique<IUpgradeCheckRepository, UpgradeCheckRepository>();
         builder.Services.AddUnique<ILogViewerQueryRepository, LogViewerQueryRepository>();
         builder.Services.AddUnique<INodeCountRepository, NodeCountRepository>();
         builder.Services.AddUnique<IIdKeyMapRepository, IdKeyMapRepository>();

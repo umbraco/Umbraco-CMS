@@ -200,12 +200,7 @@ internal sealed class SyntheticPublishedDocumentTreeFixture
             }
         }
 
-        var documentCache = new DocumentCache(
-            cacheService,
-            contentTypeCache,
-            navigationService,
-            Mock.Of<IDocumentUrlService>(),
-            new Lazy<IPublishedUrlProvider>(() => Mock.Of<IPublishedUrlProvider>()));
+        var documentCache = new DocumentCache(cacheService);
 
         PublishedContentCache = documentCache;
         NavigationQueryService = navigationService;

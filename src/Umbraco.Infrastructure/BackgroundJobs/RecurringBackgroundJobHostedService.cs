@@ -86,26 +86,6 @@ public class RecurringBackgroundJobHostedService<TJob> : RecurringHostedServiceB
         _job.IgnoredDelayChanged += OnIgnoredDelayChanged;
     }
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="RecurringBackgroundJobHostedService{TJob}" /> class, which manages the execution of a recurring background job.
-    /// </summary>
-    /// <param name="runtimeState">Provides information about the current runtime state of the Umbraco application.</param>
-    /// <param name="logger">The logger used to record diagnostic and operational information for this hosted service.</param>
-    /// <param name="mainDom">The main domain instance responsible for coordinating single-instance operations across multiple application domains.</param>
-    /// <param name="serverRoleAccessor">Determines the current server's role in a multi-server environment.</param>
-    /// <param name="eventAggregator">Handles the publishing and subscribing of application events.</param>
-    /// <param name="job">The recurring background job instance to be managed and executed by this service.</param>
-    [Obsolete("Use the constructor accepting IEventMessagesFactory and TimeProvider instead. Scheduled for removal in Umbraco 19.")]
-    public RecurringBackgroundJobHostedService(
-        IRuntimeState runtimeState,
-        ILogger<RecurringBackgroundJobHostedService<TJob>> logger,
-        IMainDom mainDom,
-        IServerRoleAccessor serverRoleAccessor,
-        IEventAggregator eventAggregator,
-        TJob job)
-        : this(runtimeState, logger, mainDom, serverRoleAccessor, eventAggregator, StaticServiceProvider.Instance.GetRequiredService<IEventMessagesFactory>(), job, TimeProvider.System)
-    { }
-
     /// <inheritdoc />
     public override async Task PerformExecuteAsync(CancellationToken stoppingToken)
     {
@@ -149,10 +129,6 @@ public class RecurringBackgroundJobHostedService<TJob> : RecurringHostedServiceB
             await _eventAggregator.PublishAsync(new RecurringBackgroundJobFailedNotification(_job, eventMessages).WithStateFrom(executingNotification), stoppingToken);
         }
     }
-
-    /// <inheritdoc />
-    [Obsolete("Override PerformExecuteAsync(CancellationToken) instead. Scheduled for removal in Umbraco 19.")]
-    public override Task PerformExecuteAsync(object? state) => PerformExecuteAsync(CancellationToken.None);
 
     /// <inheritdoc />
     public override async Task StartAsync(CancellationToken cancellationToken)

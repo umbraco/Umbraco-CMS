@@ -101,40 +101,6 @@ public class UmbracoRouteValueTransformer : DynamicRouteValueTransformer
         _contentRoutingReadiness = contentRoutingReadiness;
     }
 
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="UmbracoRouteValueTransformer" /> class.
-    /// </summary>
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
-    public UmbracoRouteValueTransformer(
-        ILogger<UmbracoRouteValueTransformer> logger,
-        IUmbracoContextAccessor umbracoContextAccessor,
-        IPublishedRouter publishedRouter,
-        IRuntimeState runtime,
-        IUmbracoRouteValuesFactory routeValuesFactory,
-        IRoutableDocumentFilter routableDocumentFilter,
-        IDataProtectionProvider dataProtectionProvider,
-        IControllerActionSearcher controllerActionSearcher,
-        IPublicAccessRequestHandler publicAccessRequestHandler,
-        IUmbracoVirtualPageRoute umbracoVirtualPageRoute,
-        IOptionsMonitor<GlobalSettings> globalSettings,
-        IDocumentUrlService urlService)
-    : this(
-        logger,
-        umbracoContextAccessor,
-        publishedRouter,
-        runtime,
-        routeValuesFactory,
-        routableDocumentFilter,
-        dataProtectionProvider,
-        controllerActionSearcher,
-        publicAccessRequestHandler,
-        umbracoVirtualPageRoute,
-        globalSettings,
-        urlService,
-        StaticServiceProvider.Instance.GetRequiredService<IContentRoutingReadiness>())
-    {
-    }
-
     /// <inheritdoc />
     public override async ValueTask<RouteValueDictionary> TransformAsync(
         HttpContext httpContext, RouteValueDictionary values)

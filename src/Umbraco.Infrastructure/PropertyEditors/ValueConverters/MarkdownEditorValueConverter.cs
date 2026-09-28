@@ -35,20 +35,6 @@ public class MarkdownEditorValueConverter : PropertyValueConverterBase, IDeliver
     }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="MarkdownEditorValueConverter"/> class.
-    /// </summary>
-    /// <param name="localLinkParser">An instance of <see cref="HtmlLocalLinkParser"/> used to parse local links in HTML content.</param>
-    /// <param name="urlParser">An instance of <see cref="HtmlUrlParser"/> used to parse URLs in HTML content.</param>
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
-    public MarkdownEditorValueConverter(HtmlLocalLinkParser localLinkParser, HtmlUrlParser urlParser)
-        : this(
-              localLinkParser,
-              urlParser,
-              StaticServiceProvider.Instance.GetRequiredService<IMarkdownToHtmlConverter>())
-    {
-    }
-
-    /// <summary>
     /// Returns a value indicating whether this converter is applicable to the specified property type.
     /// </summary>
     /// <param name="propertyType">The property type to evaluate.</param>

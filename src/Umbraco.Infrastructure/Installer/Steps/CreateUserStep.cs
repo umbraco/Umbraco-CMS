@@ -39,46 +39,6 @@ public class CreateUserStep : StepBase, IInstallStep
     private readonly ILogger<CreateUserStep> _logger;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="CreateUserStep"/> class, which represents the installer step responsible for creating a user during the installation process.
-    /// </summary>
-    /// <param name="userService">Service for managing users.</param>
-    /// <param name="databaseBuilder">Builds and manages the database schema.</param>
-    /// <param name="httpClientFactory">Factory for creating HTTP client instances.</param>
-    /// <param name="securitySettings">The security settings configuration options.</param>
-    /// <param name="connectionStrings">Monitors the application's connection strings.</param>
-    /// <param name="cookieManager">Manages HTTP cookies.</param>
-    /// <param name="userManager">Manages back office user accounts.</param>
-    /// <param name="dbProviderFactoryCreator">Creates database provider factories.</param>
-    /// <param name="metricsConsentService">Handles user consent for metrics collection.</param>
-    /// <param name="jsonSerializer">Serializes and deserializes JSON data.</param>
-    [Obsolete("Please use the constructor that takes all parameters. Scheduled for removal in Umbraco 19.")]
-    public CreateUserStep(
-        IUserService userService,
-        DatabaseBuilder databaseBuilder,
-        IHttpClientFactory httpClientFactory,
-        IOptions<SecuritySettings> securitySettings,
-        IOptionsMonitor<ConnectionStrings> connectionStrings,
-        ICookieManager cookieManager,
-        IBackOfficeUserManager userManager,
-        IDbProviderFactoryCreator dbProviderFactoryCreator,
-        IMetricsConsentService metricsConsentService,
-        IJsonSerializer jsonSerializer)
-        : this(
-            userService,
-            databaseBuilder,
-            httpClientFactory,
-            securitySettings,
-            connectionStrings,
-            cookieManager,
-            userManager,
-            dbProviderFactoryCreator,
-            metricsConsentService,
-            jsonSerializer,
-            StaticServiceProvider.Instance.GetRequiredService<ILogger<CreateUserStep>>())
-    {
-    }
-
-    /// <summary>
     /// Initializes a new instance of the <see cref="CreateUserStep"/> class, which handles the creation of a user during the installation process.
     /// </summary>
     /// <param name="userService">Service for managing user accounts and operations.</param>

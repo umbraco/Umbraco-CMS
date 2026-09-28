@@ -36,8 +36,6 @@ public abstract class RecurringBackgroundJobBase : IRecurringBackgroundJob, IDis
 
     private TimeSpan _period;
     private TimeSpan _ignoredDelay = DefaultIgnoredDelay;
-    private EventHandler? _periodChanged;
-    private EventHandler? _ignoredDelayChanged;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RecurringBackgroundJobBase" /> class with the specified initial <paramref name="period" />. The initial value is stored directly without raising <see cref="PeriodChanged" />.
@@ -109,42 +107,24 @@ public abstract class RecurringBackgroundJobBase : IRecurringBackgroundJob, IDis
     public virtual ServerRole[] ServerRoles => DefaultServerRoles;
 
     /// <inheritdoc />
-    public virtual event EventHandler PeriodChanged
-    {
-        add { _periodChanged += value; }
-        remove { _periodChanged -= value; }
-    }
+    public virtual event EventHandler? PeriodChanged;
 
     /// <inheritdoc />
-    public virtual event EventHandler IgnoredDelayChanged
-    {
-        add { _ignoredDelayChanged += value; }
-        remove { _ignoredDelayChanged -= value; }
-    }
+    public virtual event EventHandler? IgnoredDelayChanged;
 
     /// <summary>
     /// Raises the <see cref="PeriodChanged" /> event.
     /// </summary>
     /// <param name="e">The <see cref="EventArgs" /> instance containing the event data.</param>
-    /// <remarks>
-    /// Override this when overriding <see cref="PeriodChanged" /> to dispatch through the overridden event's backing delegate.
-    /// </remarks>
     protected virtual void OnPeriodChanged(EventArgs e)
-        => _periodChanged?.Invoke(this, e);
+        => PeriodChanged?.Invoke(this, e);
 
     /// <summary>
     /// Raises the <see cref="IgnoredDelayChanged" /> event.
     /// </summary>
     /// <param name="e">The <see cref="EventArgs" /> instance containing the event data.</param>
-    /// <remarks>
-    /// Override this when overriding <see cref="IgnoredDelayChanged" /> to dispatch through the overridden event's backing delegate.
-    /// </remarks>
     protected virtual void OnIgnoredDelayChanged(EventArgs e)
-        => _ignoredDelayChanged?.Invoke(this, e);
-
-    /// <inheritdoc />
-    [Obsolete("Use RunJobAsync(CancellationToken) instead. Scheduled for removal in Umbraco 19.")]
-    public Task RunJobAsync() => RunJobAsync(CancellationToken.None);
+        => IgnoredDelayChanged?.Invoke(this, e);
 
     /// <inheritdoc />
     public abstract Task RunJobAsync(CancellationToken cancellationToken);
@@ -165,8 +145,8 @@ public abstract class RecurringBackgroundJobBase : IRecurringBackgroundJob, IDis
         if (disposing)
         {
             // Clear the subscriber delegates so the job does not retain references to (or invoke) listeners after disposal.
-            _periodChanged = null;
-            _ignoredDelayChanged = null;
+            PeriodChanged = null;
+            IgnoredDelayChanged = null;
         }
     }
 }

@@ -85,36 +85,6 @@ internal sealed class JsonConfigManipulator : IConfigManipulator
     }
 
     /// <inheritdoc />
-    [Obsolete("This method is no longer used by Umbraco. Scheduled for removal in Umbraco 19.")]
-    public async Task SaveConfigValueAsync(string itemPath, object value)
-    {
-        if (await LoadJsonAsync(preferLast: false) is not (var provider, var node))
-        {
-            _logger.LogWarning("Failed to save configuration key \"{Key}\" in JSON configuration", itemPath);
-            return;
-        }
-
-        JsonNode? propertyNode = node;
-        foreach (var propertyName in itemPath.Split(':'))
-        {
-            propertyNode = FindChildNode(propertyNode, propertyName);
-        }
-
-        if (propertyNode is null)
-        {
-            return;
-        }
-
-        propertyNode.ReplaceWith(value);
-        await WriteJsonAsync(provider, node);
-    }
-
-    /// <inheritdoc />
-    [Obsolete("This method is no longer used by Umbraco. Set the Umbraco:CMS:WebRouting:DisableRedirectUrlTracking configuration key instead. Scheduled for removal in Umbraco 19.")]
-    public Task SaveDisableRedirectUrlTrackingAsync(bool disable)
-        => SetConfigValueAsync(DisableRedirectUrlTrackingPath, disable);
-
-    /// <inheritdoc />
     public Task SetGlobalIdAsync(string id)
         => SetConfigValueAsync(Constants.Configuration.ConfigGlobalId, id);
 

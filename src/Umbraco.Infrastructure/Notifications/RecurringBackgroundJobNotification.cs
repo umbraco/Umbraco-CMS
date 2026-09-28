@@ -7,8 +7,7 @@ namespace Umbraco.Cms.Infrastructure.Notifications
     /// <summary>
     /// Notification that is raised when a recurring background job is triggered or executed.
     /// </summary>
-    // TODO (V19): Mark this class as abstract.
-    public class RecurringBackgroundJobNotification : ObjectNotification<IRecurringBackgroundJob>
+    public abstract class RecurringBackgroundJobNotification : ObjectNotification<IRecurringBackgroundJob>
     {
         /// <summary>
         /// Gets the recurring background job associated with this notification.

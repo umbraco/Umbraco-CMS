@@ -79,11 +79,5 @@ public class RelateOnTrashNotificationHandlerTests
         => new(
             relationService,
             Mock.Of<IEntityService>(),
-            Mock.Of<ILocalizedTextService>(),
-            Mock.Of<IAuditService>(),
-#pragma warning disable CS0618 // Type or member is obsolete
-            Mock.Of<IScopeProvider>(),
-#pragma warning restore CS0618 // Type or member is obsolete
-            Mock.Of<IBackOfficeSecurityAccessor>(),
-            Mock.Of<IUserIdKeyResolver>());
+            Mock.Of<ICoreScopeProvider>());
 }

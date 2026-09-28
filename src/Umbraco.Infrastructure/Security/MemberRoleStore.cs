@@ -39,15 +39,6 @@ public class MemberRoleStore : IQueryableRoleStore<UmbracoIdentityRole>
         _idKeyMap = idKeyMap ?? throw new ArgumentNullException(nameof(idKeyMap));
     }
 
-    [Obsolete("Use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
-    public MemberRoleStore(IMemberGroupService memberGroupService, IdentityErrorDescriber errorDescriber)
-        : this(
-            memberGroupService,
-            errorDescriber,
-            StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>())
-    {
-    }
-
     /// <summary>
     ///     Gets or sets the <see cref="IdentityErrorDescriber" /> for any error that occurred with the current operation.
     /// </summary>

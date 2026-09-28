@@ -23,7 +23,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.BackgroundJobs.Jobs
         public async Task Executes_And_Cleans_Files()
         {
             TempFileCleanupJob sut = CreateTempFileCleanupJob();
-            await sut.RunJobAsync();
+            await sut.RunJobAsync(CancellationToken.None);
             VerifyFilesCleaned();
         }
 

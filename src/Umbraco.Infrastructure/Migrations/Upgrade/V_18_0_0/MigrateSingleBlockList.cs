@@ -63,64 +63,6 @@ public class MigrateSingleBlockList : AsyncMigrationBase
     /// <param name="ioHelper">Helper for IO operations, such as file and path management.</param>
     /// <param name="elementTypeCache">Cache for block editor element types.</param>
     /// <param name="appCaches">Provides access to application-level caches.</param>
-    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
-    public MigrateSingleBlockList(
-        IMigrationContext context,
-        IUmbracoContextFactory umbracoContextFactory,
-        ILanguageService languageService,
-        IContentTypeService contentTypeService,
-        IMediaTypeService mediaTypeService,
-        IMemberTypeService memberTypeService,
-        IDataTypeService dataTypeService,
-        ILogger<MigrateSingleBlockList> logger,
-        ICoreScopeProvider coreScopeProvider,
-        SingleBlockListProcessor singleBlockListProcessor,
-        IJsonSerializer jsonSerializer,
-        SingleBlockListConfigurationCache blockListConfigurationCache,
-        IDataValueEditorFactory dataValueEditorFactory,
-        IIOHelper ioHelper,
-        IBlockEditorElementTypeCache elementTypeCache,
-        AppCaches appCaches)
-        : this(
-            context,
-            umbracoContextFactory,
-            languageService,
-            contentTypeService,
-            mediaTypeService,
-            memberTypeService,
-            dataTypeService,
-            logger,
-            coreScopeProvider,
-            singleBlockListProcessor,
-            jsonSerializer,
-            blockListConfigurationCache,
-            dataValueEditorFactory,
-            ioHelper,
-            elementTypeCache,
-            appCaches,
-            StaticServiceProvider.Instance.GetRequiredService<IDataTypeConfigurationCache>())
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="MigrateSingleBlockList"/> class, responsible for migrating single block list data during the upgrade to version 18.0.0.
-    /// </summary>
-    /// <param name="context">The migration context providing information and services for the migration process.</param>
-    /// <param name="umbracoContextFactory">Factory for creating Umbraco context instances.</param>
-    /// <param name="languageService">Service for managing languages in Umbraco.</param>
-    /// <param name="contentTypeService">Service for managing content types.</param>
-    /// <param name="mediaTypeService">Service for managing media types.</param>
-    /// <param name="memberTypeService">Service for managing member types.</param>
-    /// <param name="dataTypeService">Service for managing data types.</param>
-    /// <param name="logger">The logger used for logging migration operations.</param>
-    /// <param name="coreScopeProvider">Provides scope management for database operations.</param>
-    /// <param name="singleBlockListProcessor">Processor for handling single block list migration logic.</param>
-    /// <param name="jsonSerializer">Serializer for handling JSON data during migration.</param>
-    /// <param name="blockListConfigurationCache">Cache for block list configuration data.</param>
-    /// <param name="dataValueEditorFactory">Factory for creating data value editors.</param>
-    /// <param name="ioHelper">Helper for IO operations, such as file and path management.</param>
-    /// <param name="elementTypeCache">Cache for block editor element types.</param>
-    /// <param name="appCaches">Provides access to application-level caches.</param>
     /// <param name="dataTypeConfigurationCache">Cache for data type configurations.</param>
     public MigrateSingleBlockList(
         IMigrationContext context,

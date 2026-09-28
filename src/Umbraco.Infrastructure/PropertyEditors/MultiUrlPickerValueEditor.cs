@@ -36,43 +36,6 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference, I
     private readonly AppCaches _appCaches;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="MultiUrlPickerValueEditor"/> class with the specified dependencies.
-    /// </summary>
-    /// <param name="logger">The logger used for logging events and errors.</param>
-    /// <param name="localizedTextService">The service for retrieving localized text.</param>
-    /// <param name="shortStringHelper">Helper for handling short string operations.</param>
-    /// <param name="attribute">The data editor attribute that describes the editor.</param>
-    /// <param name="publishedUrlProvider">Provider for published URLs.</param>
-    /// <param name="jsonSerializer">The serializer used for JSON operations.</param>
-    /// <param name="ioHelper">Helper for IO operations.</param>
-    /// <param name="contentService">Service for managing content items.</param>
-    /// <param name="mediaService">Service for managing media items.</param>
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
-    public MultiUrlPickerValueEditor(
-        ILogger<MultiUrlPickerValueEditor> logger,
-        ILocalizedTextService localizedTextService,
-        IShortStringHelper shortStringHelper,
-        DataEditorAttribute attribute,
-        IPublishedUrlProvider publishedUrlProvider,
-        IJsonSerializer jsonSerializer,
-        IIOHelper ioHelper,
-        IContentService contentService,
-        IMediaService mediaService)
-        : this(
-            logger,
-            localizedTextService,
-            shortStringHelper,
-            attribute,
-            publishedUrlProvider,
-            jsonSerializer,
-            ioHelper,
-            contentService,
-            mediaService,
-            StaticServiceProvider.Instance.GetRequiredService<AppCaches>())
-    {
-    }
-
-    /// <summary>
     /// Initializes a new instance of the <see cref="MultiUrlPickerValueEditor"/> class.
     /// </summary>
     /// <param name="logger">The <see cref="ILogger{MultiUrlPickerValueEditor}"/> used for logging.</param>

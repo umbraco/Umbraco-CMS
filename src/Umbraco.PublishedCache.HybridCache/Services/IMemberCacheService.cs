@@ -15,13 +15,4 @@ public interface IMemberCacheService
     /// <returns>The published member, or <c>null</c> if not found.</returns>
     Task<IPublishedMember?> Get(IMember member);
 
-    /// <summary>
-    /// Does nothing. Members are mapped from the member entity when read, rather than served from the
-    /// published cache database table, so there is nothing to rebuild.
-    /// </summary>
-    /// <param name="contentTypeIds">The member type ids. Ignored.</param>
-    [Obsolete("Members are not stored in the published cache database table, so this does nothing. Scheduled for removal in Umbraco 19.")]
-    void Rebuild(IReadOnlyCollection<int> contentTypeIds)
-    {
-    }
 }

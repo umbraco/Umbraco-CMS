@@ -77,21 +77,6 @@ public class BlockListPropertyValueConverter : PropertyValueConverterBase, IDeli
         _elementCacheService = elementCacheService;
     }
 
-    /// <inheritdoc cref="BlockListPropertyValueConverter(IProfilingLogger, BlockEditorConverter, IContentTypeService, IApiElementBuilder, IJsonSerializer, BlockListPropertyValueConstructorCache, IVariationContextAccessor, BlockEditorVarianceHandler, ILanguageService, IPropertyRenderingContextAccessor)"/>
-    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
-    public BlockListPropertyValueConverter(
-        IProfilingLogger proflog,
-        BlockEditorConverter blockConverter,
-        IContentTypeService contentTypeService,
-        IApiElementBuilder apiElementBuilder,
-        IJsonSerializer jsonSerializer,
-        BlockListPropertyValueConstructorCache constructorCache,
-        IVariationContextAccessor variationContextAccessor,
-        BlockEditorVarianceHandler blockEditorVarianceHandler)
-        : this(proflog, blockConverter, contentTypeService, apiElementBuilder, jsonSerializer, constructorCache, variationContextAccessor, blockEditorVarianceHandler, StaticServiceProvider.Instance.GetRequiredService<ILanguageService>(), StaticServiceProvider.Instance.GetRequiredService<IPropertyRenderingContextAccessor>())
-    {
-    }
-
     [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in V20.")]
     public BlockListPropertyValueConverter(
         IProfilingLogger proflog,
