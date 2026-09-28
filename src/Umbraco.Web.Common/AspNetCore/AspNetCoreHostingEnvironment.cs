@@ -243,12 +243,14 @@ public class AspNetCoreHostingEnvironment : IHostingEnvironment
     }
 
     /// <summary>
-    /// A locked URL is only replaced by a strictly more useful one, and only by a request for the same host
-    /// and path - except when escaping a loopback address, which no visitor can reach in the first place.
+    /// A locked URL is only replaced by a strictly more useful one, and only by a request for the same host,
+    /// path and an acceptable port - except when escaping a loopback address, which no visitor can reach in
+    /// the first place.
     /// </summary>
     private static bool CanReplaceLockedUrl(Uri locked, Uri candidate)
         => IsMoreUsefulApplicationUrl(locked, candidate)
-            && (EscapesLoopback(locked, candidate) || IsSameHostAndPath(locked, candidate));
+            && (EscapesLoopback(locked, candidate)
+                || (IsSameHostAndPath(locked, candidate) && IsPortChangeAllowed(locked, candidate)));
 
     /// <summary>
     /// Any request may replace the URL, including with another host, but never with one that is less useful
@@ -278,6 +280,15 @@ public class AspNetCoreHostingEnvironment : IHostingEnvironment
 
     private static bool IsSameHostAndPath(Uri current, Uri candidate)
         => Uri.Compare(current, candidate, UriComponents.Host | UriComponents.Path, UriFormat.Unescaped, StringComparison.OrdinalIgnoreCase) == 0;
+
+    /// <summary>
+    /// A replacement takes its port from the request that triggered it, and that port is not covered by host
+    /// filtering. A URL already reachable on the default port for its scheme may therefore only move to
+    /// another default port, while a deployment bound to a non-standard port stays free to reach its paired
+    /// HTTPS port.
+    /// </summary>
+    private static bool IsPortChangeAllowed(Uri current, Uri candidate)
+        => current.IsDefaultPort is false || candidate.IsDefaultPort;
 
     private void SetSiteNameAndDebugMode(HostingSettings hostingSettings)
     {

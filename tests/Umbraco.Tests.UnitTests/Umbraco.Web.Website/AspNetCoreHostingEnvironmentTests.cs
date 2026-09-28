@@ -165,6 +165,7 @@ public class AspNetCoreHostingEnvironmentTests
 
     [TestCase("http://legit-site.com", "https://legit-site.com")]
     [TestCase("http://legit-site.com:5000", "https://legit-site.com:5001")]
+    [TestCase("http://web:8080", "https://web:8443")]
     [TestCase("http://legit-site.com/site", "https://legit-site.com/site")]
     [TestCase("http://LEGIT-SITE.com", "https://legit-site.com")]
     [TestCase("http://localhost:5000", "https://localhost:5001")]
@@ -191,6 +192,19 @@ public class AspNetCoreHostingEnvironmentTests
         sut.EnsureApplicationMainUrl(new Uri(other));
 
         Assert.AreEqual(locked, sut.ApplicationMainUrl, "The upgrade path must not let a request change the host or path");
+    }
+
+    [TestCase("http://legit-site.com", "https://legit-site.com:8443")]
+    [TestCase("http://legit-site.com/site", "https://legit-site.com:8443/site")]
+    public void EnsureApplicationMainUrl_FirstRequest_HttpsOnNonDefaultPortDoesNotUnlockDefaultPortUrl(string http, string nonDefaultPort)
+    {
+        var sut = CreateWithDefaultConfig(ApplicationUrlDetection.FirstRequest);
+
+        var locked = new Uri(http);
+        sut.EnsureApplicationMainUrl(locked);
+        sut.EnsureApplicationMainUrl(new Uri(nonDefaultPort));
+
+        Assert.AreEqual(locked, sut.ApplicationMainUrl, "A URL already reachable on the default port must not be moved to a port taken from a request host header");
     }
 
     [Test]
