@@ -37,5 +37,4 @@ public sealed class HttpUmbracoFormRouteStringException : Exception
         : base(message, innerException)
     {
     }
-
 }

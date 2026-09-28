@@ -24,6 +24,5 @@ namespace Umbraco.Extensions
         /// <param name="builder">The builder.</param>
         public static FlagProviderCollectionBuilder FlagProviders(this IUmbracoBuilder builder)
             => builder.WithCollectionBuilder<FlagProviderCollectionBuilder>();
-
     }
 }

@@ -13,7 +13,6 @@ public static partial class UmbracoBuilderExtensions
     /// </summary>
     internal static IUmbracoBuilder AddInstaller(this IUmbracoBuilder builder)
     {
-
         // register the installer steps
         builder.Services.AddTransient<PackageMigrationRunner>();
 

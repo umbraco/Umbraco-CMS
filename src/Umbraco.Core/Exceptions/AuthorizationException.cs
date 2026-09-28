@@ -37,5 +37,4 @@ public class AuthorizationException : Exception
         : base(message, innerException)
     {
     }
-
 }

@@ -96,7 +96,7 @@ public class PublicAccessPresentationFactory : IPublicAccessPresentationFactory
             Groups = memberGroups,
             LoginDocument = new ReferenceByIdModel(loginNodeKeyAttempt.Result),
             ErrorDocument = new ReferenceByIdModel(noAccessNodeKeyAttempt.Result),
-            IsProtectedByAncestor = protectedNodeKeyAttempt.Result.Equals(contentKey) is false,
+            IsProtectedByAncestor = protectedNodeKeyAttempt.Result != contentKey,
         };
 
         return Attempt.SucceedWithStatus<PublicAccessResponseModel?, PublicAccessOperationStatus>(PublicAccessOperationStatus.Success, responseModel);

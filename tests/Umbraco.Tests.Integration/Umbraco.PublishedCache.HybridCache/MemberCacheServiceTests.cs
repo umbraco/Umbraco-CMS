@@ -102,7 +102,6 @@ internal sealed class MemberCacheServiceTests : UmbracoIntegrationTestWithConten
         Assert.That(GetCacheRecords(Member.Id), Is.Empty, "Existing member cache entries should be removed");
     }
 
-
     private List<ContentNuDto> GetCacheRecords(int nodeId)
     {
         using var scope = ScopeProvider.CreateScope(autoComplete: true);

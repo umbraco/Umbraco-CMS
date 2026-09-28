@@ -38,5 +38,4 @@ public class PanicException : Exception
         : base(message, innerException)
     {
     }
-
 }

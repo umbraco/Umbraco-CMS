@@ -61,10 +61,4 @@ public class MediaTreeControllerBase : UserStartNodeTreeControllerBase<MediaTree
 
         return responseModel;
     }
-
-    // Only invoked via the CallbackStartNodeTreeFilterService wired up by the obsolete
-    // UserStartNodeTreeControllerBase constructor. The non-obsolete constructor path
-    // routes start node resolution through IMediaStartNodeTreeFilterService and
-    // never calls these overrides; hence the null-forgiving operator on _appCaches.
-
 }

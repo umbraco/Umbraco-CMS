@@ -181,6 +181,7 @@ public interface IContentService : IPublishableContentService<IContent>
     ///     Whether to load templates. Set to false for performance optimization when templates are not needed
     ///     (e.g., collection views). Default is true.
     /// </param>
+    /// <returns>The child documents of the parent.</returns>
     IEnumerable<IContent> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalRecords, string[]? propertyAliases, IQuery<IContent>? filter, Ordering? ordering, bool loadTemplates = true);
 
     /// <summary>

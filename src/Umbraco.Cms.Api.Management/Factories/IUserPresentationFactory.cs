@@ -34,6 +34,8 @@ public interface IUserPresentationFactory
     /// <summary>
     /// Creates an update model for a current user based on the provided request model.
     /// </summary>
+    /// <param name="updateModel">The request model describing the profile changes.</param>
+    /// <returns>The update profile model.</returns>
     Task<UserUpdateProfileModel> CreateUpdateProfileModelAsync(UpdateCurrentUserRequestModel updateModel);
 
     /// <summary>

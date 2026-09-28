@@ -19,5 +19,4 @@ public class DocumentConfigurationResponseModel
     /// Gets or sets a value indicating whether editing the invariant language is allowed from a non-default language.
     /// </summary>
     public required bool AllowEditInvariantFromNonDefault { get; set; }
-
 }

@@ -107,10 +107,10 @@ public abstract class RecurringBackgroundJobBase : IRecurringBackgroundJob, IDis
     public virtual ServerRole[] ServerRoles => DefaultServerRoles;
 
     /// <inheritdoc />
-    public virtual event EventHandler? PeriodChanged;
+    public event EventHandler? PeriodChanged;
 
     /// <inheritdoc />
-    public virtual event EventHandler? IgnoredDelayChanged;
+    public event EventHandler? IgnoredDelayChanged;
 
     /// <summary>
     /// Raises the <see cref="PeriodChanged" /> event.

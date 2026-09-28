@@ -96,5 +96,4 @@ public abstract class UserStartNodeTreeControllerBase<TItem> : EntityTreeControl
 
     private bool ShouldBypassStartNodeFiltering()
         => _treeFilterService.ShouldBypassStartNodeFiltering(_dataTypeKey);
-
 }

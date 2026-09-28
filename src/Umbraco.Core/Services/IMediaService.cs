@@ -141,17 +141,17 @@ public interface IMediaService : IContentServiceBase<IMedia>
     /// <summary>
     ///     Gets a collection of <see cref="IMedia" /> objects by Parent Id, loading only the requested properties.
     /// </summary>
-    /// <param name="id">Id of the Parent to retrieve Children from</param>
-    /// <param name="pageIndex">Page number</param>
-    /// <param name="pageSize">Page size</param>
-    /// <param name="totalRecords">Total records query would return without paging</param>
+    /// <param name="id">Id of the Parent to retrieve Children from.</param>
+    /// <param name="pageIndex">Page number.</param>
+    /// <param name="pageSize">Page size.</param>
+    /// <param name="totalRecords">Total records query would return without paging.</param>
     /// <param name="propertyAliases">
     ///     The property aliases to load. If null, all properties are loaded.
     ///     If empty array, no custom properties are loaded.
     /// </param>
     /// <param name="filter">Query filter.</param>
     /// <param name="ordering">Ordering infos.</param>
-    /// <returns>An Enumerable list of <see cref="IMedia" /> objects</returns>
+    /// <returns>An Enumerable list of <see cref="IMedia" /> objects.</returns>
     IEnumerable<IMedia> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalRecords, string[]? propertyAliases, IQuery<IMedia>? filter, Ordering? ordering);
 
     /// <summary>

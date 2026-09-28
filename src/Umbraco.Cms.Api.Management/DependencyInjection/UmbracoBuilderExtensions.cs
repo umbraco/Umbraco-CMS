@@ -33,7 +33,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddUnique<IConflictingRouteService, ConflictingRouteService>();
         builder.AddUmbracoOpenApi();
 
-        if (services.Any(x => x.ServiceType == typeof(ManagementApiRegistrationMarker)) is false)
+        if (services.All(x => x.ServiceType != typeof(ManagementApiRegistrationMarker)))
         {
             services.AddSingleton<ManagementApiRegistrationMarker>();
             ModelsBuilderBuilderExtensions.AddModelsBuilder(builder)

@@ -167,6 +167,7 @@ public interface IEntityService
     /// </summary>
     /// <param name="objectTypes">The object types of the entities.</param>
     /// <param name="keys">The unique identifiers of the entities.</param>
+    /// <returns>The matching entities.</returns>
     /// <remarks>If <paramref name="keys" /> is empty, returns all entities of the specified types.</remarks>
     IEnumerable<IEntitySlim> GetAll(IEnumerable<UmbracoObjectTypes> objectTypes, params Guid[] keys);
 

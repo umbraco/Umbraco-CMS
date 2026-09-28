@@ -41,5 +41,4 @@ public class IncompleteMigrationExpressionException : Exception
         : base(message, innerException)
     {
     }
-
 }

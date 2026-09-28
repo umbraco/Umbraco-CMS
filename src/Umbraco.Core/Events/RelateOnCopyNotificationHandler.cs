@@ -67,5 +67,4 @@ public class RelateOnCopyNotificationHandler : INotificationAsyncHandler<Content
             UmbracoObjectTypes.Document.GetName() ?? string.Empty,
             $"Copied content with Id: '{notification.Copy.Id}' related to original content with Id: '{notification.Original.Id}'");
     }
-
 }

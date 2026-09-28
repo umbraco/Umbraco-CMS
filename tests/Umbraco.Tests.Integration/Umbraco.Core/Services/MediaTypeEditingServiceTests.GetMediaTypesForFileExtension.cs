@@ -121,5 +121,4 @@ internal sealed partial class MediaTypeEditingServiceTests
             result.Items.Any(r => r.MediaType.Alias == Constants.Conventions.MediaTypes.ArticleAlias && r.IsSpecificMatch),
             $"Article should be a specific match for extension '{fileExtension}'");
     }
-
 }

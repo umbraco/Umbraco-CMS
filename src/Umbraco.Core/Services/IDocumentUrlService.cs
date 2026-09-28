@@ -104,11 +104,13 @@ public interface IDocumentUrlService
     /// Updates the in-memory URL segment cache for a single document without writing to the database.
     /// </summary>
     /// <param name="key">The document key.</param>
+    /// <returns>A task that represents the asynchronous operation.</returns>
     Task UpdateUrlSegmentCacheAsync(Guid key);
 
     /// <summary>
     /// Updates the in-memory URL segment cache for a document and its descendants without writing to the database.
     /// </summary>
     /// <param name="key">The document key.</param>
+    /// <returns>A task that represents the asynchronous operation.</returns>
     Task UpdateUrlSegmentCacheWithDescendantsAsync(Guid key);
 }

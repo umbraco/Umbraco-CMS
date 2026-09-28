@@ -28,5 +28,4 @@ public class ConfigurationException : Exception
         : base(message, innerException)
     {
     }
-
 }

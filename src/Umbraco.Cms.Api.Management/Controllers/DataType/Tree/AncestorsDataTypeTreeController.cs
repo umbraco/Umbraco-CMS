@@ -13,6 +13,14 @@ namespace Umbraco.Cms.Api.Management.Controllers.DataType.Tree;
 [ApiVersion("1.0")]
 public class AncestorsDataTypeTreeController : DataTypeTreeControllerBase
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="AncestorsDataTypeTreeController"/> class.
+    /// </summary>
+    /// <param name="entityService">Service for managing and retrieving entities in the system.</param>
+    /// <param name="flagProviders">A collection of providers that supply flags for tree nodes.</param>
+    /// <param name="entitySearchService">Service for searching entities.</param>
+    /// <param name="idKeyMap">Maps between integer identifiers and keys.</param>
+    /// <param name="dataTypeService">Service for managing data types.</param>
     public AncestorsDataTypeTreeController(IEntityService entityService, FlagProviderCollection flagProviders, IEntitySearchService entitySearchService, IIdKeyMap idKeyMap, IDataTypeService dataTypeService)
     : base(entityService, flagProviders, entitySearchService, idKeyMap, dataTypeService)
     {

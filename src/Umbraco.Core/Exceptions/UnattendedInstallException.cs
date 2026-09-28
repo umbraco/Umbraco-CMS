@@ -35,5 +35,4 @@ public class UnattendedInstallException : Exception
         : base(message, innerException)
     {
     }
-
 }

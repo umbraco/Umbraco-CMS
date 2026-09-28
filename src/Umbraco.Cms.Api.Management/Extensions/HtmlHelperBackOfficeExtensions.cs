@@ -55,5 +55,4 @@ public static class HtmlHelperBackOfficeExtensions
 
         return html.Raw(importmapScript);
     }
-
 }

@@ -45,5 +45,4 @@ public sealed class DocumentCache : IPublishedContentCache
 
     /// <inheritdoc/>
     public IPublishedContent? GetById(Guid contentId) => GetByIdAsync(contentId).GetAwaiter().GetResult();
-
 }

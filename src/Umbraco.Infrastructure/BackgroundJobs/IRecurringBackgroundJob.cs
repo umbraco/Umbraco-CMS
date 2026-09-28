@@ -19,7 +19,7 @@ public interface IRecurringBackgroundJob
     TimeSpan Period { get; }
 
     /// <summary>
-    /// Timespan representing the initial delay after application start-up before the first run of the task occurs.
+    /// Gets the timespan representing the initial delay after application start-up before the first run of the task occurs.
     /// </summary>
     /// <value>
     /// The delay.

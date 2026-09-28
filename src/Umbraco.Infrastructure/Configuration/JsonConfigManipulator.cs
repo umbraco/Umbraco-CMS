@@ -19,7 +19,6 @@ internal sealed class JsonConfigManipulator : IConfigManipulator
     private const string ConnectionStringsObjectName = "ConnectionStrings";
     private const string UmbracoConnectionStringPath = $"{ConnectionStringsObjectName}:{Constants.System.UmbracoConnectionName}";
     private const string UmbracoConnectionStringProviderNamePath = UmbracoConnectionStringPath + ConnectionStrings.ProviderNamePostfix;
-    private const string DisableRedirectUrlTrackingPath = Constants.Configuration.ConfigWebRouting + ":DisableRedirectUrlTracking";
     private const string ImagingHmacSecretKeyPath = Constants.Configuration.ConfigImaging + ":HMACSecretKey";
 
     // Allowlist of filenames created on first write when the source is registered but missing on disk.

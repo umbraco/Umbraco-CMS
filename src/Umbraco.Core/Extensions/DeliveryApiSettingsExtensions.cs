@@ -32,5 +32,4 @@ public static class DeliveryApiSettingsExtensions
         // Otherwise the content type is allowed if it's not in the disallow list.
         return settings.DisallowedContentTypeAliases.InvariantContains(contentTypeAlias) is false;
     }
-
 }

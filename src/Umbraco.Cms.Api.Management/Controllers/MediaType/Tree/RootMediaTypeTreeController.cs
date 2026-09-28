@@ -14,6 +14,14 @@ namespace Umbraco.Cms.Api.Management.Controllers.MediaType.Tree;
 [ApiVersion("1.0")]
 public class RootMediaTypeTreeController : MediaTypeTreeControllerBase
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="RootMediaTypeTreeController"/> class.
+    /// </summary>
+    /// <param name="entityService">Service for managing and retrieving entities in the system.</param>
+    /// <param name="flagProviders">A collection of providers that supply flags for tree nodes.</param>
+    /// <param name="entitySearchService">Service for searching entities.</param>
+    /// <param name="idKeyMap">Maps between integer identifiers and keys.</param>
+    /// <param name="mediaTypeService">Service for managing media types.</param>
     public RootMediaTypeTreeController(IEntityService entityService, FlagProviderCollection flagProviders, IEntitySearchService entitySearchService, IIdKeyMap idKeyMap, IMediaTypeService mediaTypeService)
         : base(entityService, flagProviders, entitySearchService, idKeyMap, mediaTypeService)
     {

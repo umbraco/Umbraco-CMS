@@ -18,8 +18,6 @@ public class PasswordConfigurationPresentationFactory : IPasswordConfigurationPr
     public PasswordConfigurationPresentationFactory(IOptionsSnapshot<SecuritySettings> securitySettings)
         => _securitySettings = securitySettings.Value;
 
-    // This is just here to resolve an ambiguous constructor.
-
     public PasswordConfigurationResponseModel CreatePasswordConfigurationResponseModel() =>
         new()
         {

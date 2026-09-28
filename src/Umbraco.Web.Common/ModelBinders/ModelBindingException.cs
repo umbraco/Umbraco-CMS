@@ -37,5 +37,4 @@ public class ModelBindingException : Exception
         : base(message, innerException)
     {
     }
-
 }

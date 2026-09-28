@@ -14,5 +14,4 @@ public interface IMemberCacheService
     /// <param name="member">The member entity.</param>
     /// <returns>The published member, or <c>null</c> if not found.</returns>
     Task<IPublishedMember?> Get(IMember member);
-
 }

@@ -65,11 +65,13 @@ public interface IDocumentUrlAliasService
     /// Updates the in-memory alias cache for a single document without writing to the database.
     /// </summary>
     /// <param name="documentKey">The document key.</param>
+    /// <returns>A task that represents the asynchronous operation.</returns>
     Task UpdateAliasCacheAsync(Guid documentKey);
 
     /// <summary>
     /// Updates the in-memory alias cache for a document and its descendants without writing to the database.
     /// </summary>
     /// <param name="documentKey">The document key.</param>
+    /// <returns>A task that represents the asynchronous operation.</returns>
     Task UpdateAliasCacheWithDescendantsAsync(Guid documentKey);
 }
