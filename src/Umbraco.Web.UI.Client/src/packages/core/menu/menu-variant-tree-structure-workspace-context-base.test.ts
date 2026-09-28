@@ -1,6 +1,7 @@
 import { UmbMenuVariantTreeStructureWorkspaceContextBase } from './menu-variant-tree-structure-workspace-context-base.js';
 import {
 	UmbTestMenuVariantStructureControllerHostElement,
+	UmbTestSectionContext,
 	UmbTestSectionSidebarMenuContext,
 	UmbTestSubmittableTreeEntityWorkspaceContext,
 	UmbTestVariantTreeRepository,
@@ -8,6 +9,7 @@ import {
 	createTestVariantTreeRepositoryManifest,
 } from './menu-variant-tree-structure-workspace-context.test-utils.js';
 import { UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT } from './section-sidebar-menu/index.js';
+import type { UmbVariantStructureItemModel } from './types.js';
 import { UMB_ANCESTORS_ENTITY_CONTEXT, UMB_PARENT_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
 import { aTimeout, expect } from '@open-wc/testing';
 import { UmbActionEventContext } from '@umbraco-cms/backoffice/action';
@@ -15,7 +17,11 @@ import { UmbContextProviderController } from '@umbraco-cms/backoffice/context-ap
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
-import { UMB_SUBMITTABLE_TREE_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
+import {
+	UMB_SUBMITTABLE_TREE_ENTITY_WORKSPACE_CONTEXT,
+	UMB_WORKSPACE_EDIT_PATH_PATTERN,
+	UMB_WORKSPACE_PATH_PATTERN,
+} from '@umbraco-cms/backoffice/workspace';
 
 const TEST_TREE_REPOSITORY_ALIAS = 'Umb.Test.MenuVariantTreeStructureWorkspaceContextBase.TreeRepository';
 
@@ -54,6 +60,7 @@ describe('UmbMenuVariantTreeStructureWorkspaceContextBase', () => {
 			UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT,
 			new UmbTestSectionSidebarMenuContext(host) as never,
 		);
+		new UmbTestSectionContext(host);
 
 		context = new TestMenuVariantTreeStructureWorkspaceContext(host);
 		context.manifest = {
@@ -129,6 +136,27 @@ describe('UmbMenuVariantTreeStructureWorkspaceContextBase', () => {
 			expect(parentContext?.getParent()).to.equal(undefined);
 			expect(ancestorContext?.getAncestors()).to.deep.equal([]);
 		});
+
+		it('does not expand the outgoing entity when isNew re-settles before `unique` updates to the new entity', async () => {
+			// Give the current entity an ancestor chain ending with itself, matching the real tree repository's shape.
+			UmbTestVariantTreeRepository.ancestors = [
+				createTestVariantAncestorItem({ unique: 'parent-unique', entityType: 'test-entity-type' }),
+				createTestVariantAncestorItem({ unique: 'test-unique', entityType: 'test-entity-type' }),
+			];
+			dispatchReloadStructure();
+			await aTimeout(150);
+
+			UmbTestSectionSidebarMenuContext.reset();
+
+			// Navigate to a sibling entity, replaying the exact `load()` ordering the real workspace context uses:
+			// isNew resets and re-settles to false (with getUnique() transiently undefined) before unique updates.
+			workspaceContext.loadDifferentEntity('other-unique');
+
+			const wasOutgoingEntityExpanded = UmbTestSectionSidebarMenuContext.expandItemsCalls.some((call) =>
+				(call as Array<{ unique: string }>).some((entry) => entry.unique === 'test-unique'),
+			);
+			expect(wasOutgoingEntityExpanded).to.equal(false);
+		});
 	});
 
 	describe('reload on UmbRequestReloadStructureForEntityEvent', () => {
@@ -201,6 +229,65 @@ describe('UmbMenuVariantTreeStructureWorkspaceContextBase', () => {
 	describe('expanding the sidebar menu', () => {
 		it('expands the resolved parent when opening an existing item', async () => {
 			expect(UmbTestSectionSidebarMenuContext.expandItemsCalls).to.have.lengthOf(1);
+		});
+	});
+
+	describe('getItemHref', () => {
+		const TEST_WORKSPACE_ALIAS = 'Umb.Test.MenuVariantTreeStructureWorkspaceContextBase.Workspace';
+
+		function structureItem(overrides: Partial<UmbVariantStructureItemModel>): UmbVariantStructureItemModel {
+			return {
+				unique: 'item-unique',
+				entityType: 'test-entity-type',
+				variants: [{ name: 'Item', culture: null, segment: null }],
+				...overrides,
+			};
+		}
+
+		function registerWorkspaceFor(entityType: string) {
+			umbExtensionsRegistry.register({
+				type: 'workspace',
+				alias: TEST_WORKSPACE_ALIAS,
+				name: 'Test Workspace',
+				meta: { entityType },
+			});
+		}
+
+		afterEach(() => {
+			umbExtensionsRegistry.unregister(TEST_WORKSPACE_ALIAS);
+		});
+
+		it('returns undefined for an item whose entity type has no registered workspace', () => {
+			expect(context.getItemHref(structureItem({}))).to.equal(undefined);
+		});
+
+		it('returns an edit-path link for an item whose entity type has a registered workspace', () => {
+			registerWorkspaceFor('test-entity-type');
+
+			expect(context.getItemHref(structureItem({}))).to.equal(
+				UMB_WORKSPACE_EDIT_PATH_PATTERN.generateAbsolute({
+					sectionName: UmbTestSectionContext.PATHNAME,
+					entityType: 'test-entity-type',
+					unique: 'item-unique',
+				}),
+			);
+		});
+
+		it('returns undefined for a root item (no unique) whose entity type has no registered workspace', () => {
+			expect(context.getItemHref(structureItem({ unique: null, entityType: 'test-root-entity-type' }))).to.equal(
+				undefined,
+			);
+		});
+
+		it('returns a root-path link (no unique segment) for a root item whose entity type has a registered workspace', () => {
+			registerWorkspaceFor('test-root-entity-type');
+
+			expect(context.getItemHref(structureItem({ unique: null, entityType: 'test-root-entity-type' }))).to.equal(
+				UMB_WORKSPACE_PATH_PATTERN.generateAbsolute({
+					sectionName: UmbTestSectionContext.PATHNAME,
+					entityType: 'test-root-entity-type',
+				}),
+			);
 		});
 	});
 

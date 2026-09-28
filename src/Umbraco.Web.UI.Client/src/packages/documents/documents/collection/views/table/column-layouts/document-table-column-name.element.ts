@@ -32,11 +32,24 @@ export class UmbDocumentTableColumnNameElement extends UmbLitElement implements 
 		this.#resolver.observe(this.#resolver.name, (name) => (this._name = name || ''));
 	}
 
+	#onOpenClick(e: Event) {
+		e.stopPropagation();
+		this.value.onOpen?.();
+	}
+
 	override render() {
 		if (!this.value) return nothing;
-		if (!this.value.editPath) return nothing;
 		if (!this._name) return nothing;
-		return html`<uui-button compact href=${this.value.editPath} label=${this._name}></uui-button>`;
+
+		if (this.value.href) {
+			return html`<uui-button compact href=${this.value.href} label=${this._name}></uui-button>`;
+		}
+
+		if (this.value.onOpen) {
+			return html`<uui-button compact label=${this._name} @click=${this.#onOpenClick}>${this._name}</uui-button>`;
+		}
+
+		return html`<span>${this._name}</span>`;
 	}
 
 	static override styles = [
