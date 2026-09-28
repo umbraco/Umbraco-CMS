@@ -580,3 +580,86 @@ test('can enable access to all elements in a user group', async ({umbracoApi, um
   // Assert
   expect(await umbracoApi.userGroup.doesUserGroupContainElementRootAccess(userGroupName)).toBeTruthy();
 });
+
+test('can add a document blueprint folder as a document blueprint start node to a user group', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  await umbracoApi.userGroup.createEmptyUserGroup(userGroupName);
+  const documentBlueprintFolderName = 'TestDocumentBlueprintFolder';
+  await umbracoApi.documentBlueprint.ensureNameNotExists(documentBlueprintFolderName);
+  const documentBlueprintFolderId = await umbracoApi.documentBlueprint.createFolder(documentBlueprintFolderName);
+  await umbracoUi.userGroup.clickUserGroupsButton();
+  await umbracoUi.userGroup.clickUserGroupWithName(userGroupName);
+
+  // Act
+  await umbracoUi.userGroup.clickChooseDocumentBlueprintStartNodeButton();
+  await umbracoUi.userGroup.clickLabelWithName(documentBlueprintFolderName, true, true);
+  await umbracoUi.userGroup.clickChooseContainerButton();
+  await umbracoUi.userGroup.clickSaveButtonAndWaitForUserGroupToBeUpdated();
+
+  // Assert
+  expect(await umbracoApi.userGroup.doesUserGroupContainDocumentBlueprintStartNodeId(userGroupName, documentBlueprintFolderId)).toBeTruthy();
+
+  // Clean
+  await umbracoApi.documentBlueprint.ensureNameNotExists(documentBlueprintFolderName);
+});
+
+test('can add a nested document blueprint folder as a document blueprint start node to a user group', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  await umbracoApi.userGroup.createEmptyUserGroup(userGroupName);
+  const parentFolderName = 'ParentDocumentBlueprintFolder';
+  const childFolderName = 'ChildDocumentBlueprintFolder';
+  await umbracoApi.documentBlueprint.ensureNameNotExists(parentFolderName);
+  const parentFolderId = await umbracoApi.documentBlueprint.createFolder(parentFolderName);
+  const childFolderId = await umbracoApi.documentBlueprint.createFolder(childFolderName, parentFolderId);
+  await umbracoUi.userGroup.clickUserGroupsButton();
+  await umbracoUi.userGroup.clickUserGroupWithName(userGroupName);
+
+  // Act
+  await umbracoUi.userGroup.clickChooseDocumentBlueprintStartNodeButton();
+  await umbracoUi.userGroup.clickCaretButtonForName(parentFolderName);
+  await umbracoUi.userGroup.clickLabelWithName(childFolderName, true, true);
+  await umbracoUi.userGroup.clickChooseContainerButton();
+  await umbracoUi.userGroup.clickSaveButtonAndWaitForUserGroupToBeUpdated();
+
+  // Assert
+  expect(await umbracoApi.userGroup.doesUserGroupContainDocumentBlueprintStartNodeId(userGroupName, childFolderId)).toBeTruthy();
+
+  // Clean
+  await umbracoApi.documentBlueprint.ensureNameNotExists(parentFolderName);
+});
+
+test('can remove a document blueprint start node from a user group', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const documentBlueprintFolderName = 'TestDocumentBlueprintFolder';
+  await umbracoApi.documentBlueprint.ensureNameNotExists(documentBlueprintFolderName);
+  const documentBlueprintFolderId = await umbracoApi.documentBlueprint.createFolder(documentBlueprintFolderName);
+  await umbracoApi.userGroup.createUserGroupWithDocumentBlueprintStartNode(userGroupName, documentBlueprintFolderId);
+  expect(await umbracoApi.userGroup.doesUserGroupContainDocumentBlueprintStartNodeId(userGroupName, documentBlueprintFolderId)).toBeTruthy();
+  await umbracoUi.userGroup.clickUserGroupsButton();
+  await umbracoUi.userGroup.clickUserGroupWithName(userGroupName);
+
+  // Act
+  await umbracoUi.userGroup.clickRemoveButtonForDocumentBlueprintNodeWithName(documentBlueprintFolderName);
+  await umbracoUi.userGroup.clickConfirmRemoveButton();
+  await umbracoUi.userGroup.clickSaveButtonAndWaitForUserGroupToBeUpdated();
+
+  // Assert
+  expect(await umbracoApi.userGroup.doesUserGroupContainDocumentBlueprintStartNodeId(userGroupName, documentBlueprintFolderId)).toBeFalsy();
+
+  // Clean
+  await umbracoApi.documentBlueprint.ensureNameNotExists(documentBlueprintFolderName);
+});
+
+test('can enable access to all document blueprints in a user group', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  await umbracoApi.userGroup.createEmptyUserGroup(userGroupName);
+  await umbracoUi.userGroup.clickUserGroupsButton();
+  await umbracoUi.userGroup.clickUserGroupWithName(userGroupName);
+
+  // Act
+  await umbracoUi.userGroup.clickAllowAccessToAllDocumentBlueprints();
+  await umbracoUi.userGroup.clickSaveButtonAndWaitForUserGroupToBeUpdated();
+
+  // Assert
+  expect(await umbracoApi.userGroup.doesUserGroupContainDocumentBlueprintRootAccess(userGroupName)).toBeTruthy();
+});
