@@ -49,7 +49,7 @@ public class ElementService : PublishableContentServiceBase<IElement>, IElementS
             propertyEditorCollection,
             idKeyMap,
             shortStringHelper,
-            StaticServiceProvider.Instance.GetRequiredService<IServiceProvider>())
+            StaticServiceProvider.Instance.GetRequiredService<Lazy<IUserService>>())
     {
     }
 
@@ -67,7 +67,7 @@ public class ElementService : PublishableContentServiceBase<IElement>, IElementS
         PropertyEditorCollection propertyEditorCollection,
         IIdKeyMap idKeyMap,
         IShortStringHelper shortStringHelper,
-        IServiceProvider serviceProvider)
+        Lazy<IUserService> userService)
         : base(
             provider,
             loggerFactory,
@@ -81,7 +81,7 @@ public class ElementService : PublishableContentServiceBase<IElement>, IElementS
             userIdKeyResolver,
             propertyEditorCollection,
             idKeyMap,
-            serviceProvider)
+            userService)
     {
         _elementRepository = elementRepository;
         _shortStringHelper = shortStringHelper;

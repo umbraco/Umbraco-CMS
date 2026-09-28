@@ -41,7 +41,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
     private readonly IUserIdKeyResolver _userIdKeyResolver;
     private readonly PropertyEditorCollection _propertyEditorCollection;
     private readonly IIdKeyMap _idKeyMap;
-    private readonly IServiceProvider _serviceProvider;
+    private readonly Lazy<IUserService> _userService;
 
     [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 21.")]
     protected PublishableContentServiceBase(
@@ -70,7 +70,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
             userIdKeyResolver,
             propertyEditorCollection,
             idKeyMap,
-            StaticServiceProvider.Instance.GetRequiredService<IServiceProvider>())
+            StaticServiceProvider.Instance.GetRequiredService<Lazy<IUserService>>())
     {
     }
 
@@ -89,7 +89,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
     /// <param name="userIdKeyResolver">The user ID key resolver.</param>
     /// <param name="propertyEditorCollection">The property editor collection.</param>
     /// <param name="idKeyMap">The ID key map.</param>
-    /// <param name="serviceProvider">The service provider for resolving services without causing circular references.</param>
+    /// <param name="userService">The user service, resolved lazily to avoid a circular dependency.</param>
     protected PublishableContentServiceBase(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -103,7 +103,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         IUserIdKeyResolver userIdKeyResolver,
         PropertyEditorCollection propertyEditorCollection,
         IIdKeyMap idKeyMap,
-        IServiceProvider serviceProvider)
+        Lazy<IUserService> userService)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _auditService = auditService;
@@ -115,7 +115,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         _userIdKeyResolver = userIdKeyResolver;
         _propertyEditorCollection = propertyEditorCollection;
         _idKeyMap = idKeyMap;
-        _serviceProvider = serviceProvider;
+        _userService = userService;
     }
 
     protected abstract UmbracoObjectTypes ContentObjectType { get; }
@@ -1995,8 +1995,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
     }
 
     protected IUser GetRequiredUser(int userId)
-        // Directly injecting IUserService causes a circular dependency issue, so we have to resolve it here.
-        => _serviceProvider.GetRequiredService<IUserService>().GetUserById(userId)
+        => _userService.Value.GetUserById(userId)
            ?? throw new ArgumentException("Could not find the supplied user", nameof(userId));
 
     #endregion

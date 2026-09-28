@@ -64,7 +64,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
     /// <param name="idKeyMap">The ID key map.</param>
     /// <param name="optionsMonitor">The content settings options monitor.</param>
     /// <param name="relationService">The relation service.</param>
-    /// <param name="serviceProvider">The service provider for resolving services without causing circular references.</param>
+    /// <param name="userService">The user service, resolved lazily to avoid a circular dependency.</param>
     public ContentService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -83,7 +83,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
         IIdKeyMap idKeyMap,
         IOptionsMonitor<ContentSettings> optionsMonitor,
         IRelationService relationService,
-        IServiceProvider serviceProvider)
+        Lazy<IUserService> userService)
         : base(
             provider,
             loggerFactory,
@@ -97,7 +97,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
             userIdKeyResolver,
             propertyEditorCollection,
             idKeyMap,
-            serviceProvider)
+            userService)
     {
         _documentRepository = documentRepository;
         _entityRepository = entityRepository;
@@ -175,7 +175,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
             idKeyMap,
             optionsMonitor,
             relationService,
-            StaticServiceProvider.Instance.GetRequiredService<IServiceProvider>())
+            StaticServiceProvider.Instance.GetRequiredService<Lazy<IUserService>>())
     {
     }
 
@@ -200,7 +200,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
     /// <param name="idKeyMap">The ID key map.</param>
     /// <param name="optionsMonitor">The content settings options monitor.</param>
     /// <param name="relationService">The relation service.</param>
-    /// <param name="serviceProvider">The service provider for resolving services without causing circular references.</param>
+    /// <param name="userService">The user service, resolved lazily to avoid a circular dependency.</param>
     [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 21.")]
     public ContentService(
         ICoreScopeProvider provider,
@@ -221,7 +221,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
         IIdKeyMap idKeyMap,
         IOptionsMonitor<ContentSettings> optionsMonitor,
         IRelationService relationService,
-        IServiceProvider serviceProvider)
+        Lazy<IUserService> userService)
         : this(
             provider,
             loggerFactory,
@@ -240,7 +240,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
             idKeyMap,
             optionsMonitor,
             relationService,
-            serviceProvider)
+            userService)
     {
     }
 
