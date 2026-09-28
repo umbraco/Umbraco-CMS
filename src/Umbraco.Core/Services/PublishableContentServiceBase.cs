@@ -74,6 +74,22 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
     {
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PublishableContentServiceBase{TContent}"/> class.
+    /// </summary>
+    /// <param name="provider">The core scope provider.</param>
+    /// <param name="loggerFactory">The logger factory.</param>
+    /// <param name="eventMessagesFactory">The event messages factory.</param>
+    /// <param name="auditService">The audit service.</param>
+    /// <param name="contentTypeRepository">The backing content type repository.</param>
+    /// <param name="contentRepository">The backing content repository.</param>
+    /// <param name="languageRepository">The language repository.</param>
+    /// <param name="propertyValidationService">The property validation service.</param>
+    /// <param name="cultureImpactFactory">The culture impact factory.</param>
+    /// <param name="userIdKeyResolver">The user ID key resolver.</param>
+    /// <param name="propertyEditorCollection">The property editor collection.</param>
+    /// <param name="idKeyMap">The ID key map.</param>
+    /// <param name="serviceProvider">The service provider for resolving services without causing circular references.</param>
     protected PublishableContentServiceBase(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -1977,6 +1993,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
     }
 
     protected IUser GetRequiredUser(int userId)
+        // Directly injecting IUserService causes a circular dependency issue, so we have to resolve it here.
         => _serviceProvider.GetRequiredService<IUserService>().GetUserById(userId)
            ?? throw new ArgumentException("Could not find the supplied user", nameof(userId));
 
