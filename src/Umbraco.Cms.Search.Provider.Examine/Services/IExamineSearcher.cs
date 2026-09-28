@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Search.Core.Services;
+﻿using Umbraco.Cms.Core.Search;
 
 namespace Umbraco.Cms.Search.Provider.Examine.Services;
 
