@@ -79,11 +79,6 @@ internal abstract class ContentValidationServiceBase<TContentType>
 
         foreach (IPropertyType propertyType in invariantPropertyTypes)
         {
-            // Don't outright skip the property here even when invariant properties are out of scope for this
-            // validation: a data editor that supports partial property value merging (e.g. block editors with
-            // element level variation) may still hold culture-variant data nested inside an otherwise invariant
-            // property, so it must still be given a chance to validate that. IPropertyValidationService is the
-            // one place that knows whether the editor needs that exception - see ValidateInvariantProperties.
             var validationContext = new PropertyValidationContext
             {
                 Culture = null, Segment = null, CulturesBeingValidated = cultures, SegmentsBeingValidated = segments, ValidateInvariantProperties = validateCultureInvariantProperties
@@ -101,7 +96,11 @@ internal abstract class ContentValidationServiceBase<TContentType>
             {
                 var validationContext = new PropertyValidationContext
                 {
-                    Culture = culture, Segment = null, CulturesBeingValidated = cultures, SegmentsBeingValidated = segments, ValidateInvariantProperties = validateCultureInvariantProperties
+                    Culture = culture,
+                    Segment = null,
+                    CulturesBeingValidated = cultures,
+                    SegmentsBeingValidated = segments,
+                    ValidateInvariantProperties = validateCultureInvariantProperties,
                 };
 
                 PropertyValueModel? propertyValueModel = contentEditingModelBase
@@ -115,11 +114,13 @@ internal abstract class ContentValidationServiceBase<TContentType>
         {
             foreach (var segment in segments)
             {
-                // See the comment above the invariantPropertyTypes loop: don't skip the property outright here,
-                // let IPropertyValidationService decide based on ValidateInvariantProperties.
                 var validationContext = new PropertyValidationContext
                 {
-                    Culture = null, Segment = segment, CulturesBeingValidated = cultures, SegmentsBeingValidated = segments, ValidateInvariantProperties = validateCultureInvariantProperties
+                    Culture = null,
+                    Segment = segment,
+                    CulturesBeingValidated = cultures,
+                    SegmentsBeingValidated = segments,
+                    ValidateInvariantProperties = validateCultureInvariantProperties,
                 };
 
                 PropertyValueModel? propertyValueModel = contentEditingModelBase
