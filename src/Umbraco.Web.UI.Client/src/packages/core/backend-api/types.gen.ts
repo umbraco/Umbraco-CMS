@@ -720,6 +720,7 @@ export type DocumentBlueprintResponseModel = {
 
 export type DocumentBlueprintTreeItemResponseModel = {
     documentType?: null | DocumentTypeReferenceResponseModel;
+    variants: Array<DocumentVariantItemResponseModel>;
     isFolder: boolean;
     noAccess: boolean;
     name: string;

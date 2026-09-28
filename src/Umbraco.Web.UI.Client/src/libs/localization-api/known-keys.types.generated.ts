@@ -1216,6 +1216,7 @@ declare global {
 		general_status: string;
 		general_submit: string;
 		general_success: string;
+		general_switchView: string;
 		general_systemField: string;
 		general_to: string;
 		general_toggleFor: string;
