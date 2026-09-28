@@ -43416,7 +43416,6 @@
         "required": [
           "disableDeleteWhenReferenced",
           "disableUnpublishWhenReferenced",
-          "allowEditInvariantFromNonDefault",
           "allowNonExistingSegmentsCreation"
         ],
         "type": "object",
@@ -43425,9 +43424,6 @@
             "type": "boolean"
           },
           "disableUnpublishWhenReferenced": {
-            "type": "boolean"
-          },
-          "allowEditInvariantFromNonDefault": {
             "type": "boolean"
           },
           "allowNonExistingSegmentsCreation": {
@@ -44673,7 +44669,6 @@
         "required": [
           "disableDeleteWhenReferenced",
           "disableUnpublishWhenReferenced",
-          "allowEditInvariantFromNonDefault",
           "allowNonExistingSegmentsCreation"
         ],
         "type": "object",
@@ -44682,9 +44677,6 @@
             "type": "boolean"
           },
           "disableUnpublishWhenReferenced": {
-            "type": "boolean"
-          },
-          "allowEditInvariantFromNonDefault": {
             "type": "boolean"
           },
           "allowNonExistingSegmentsCreation": {
