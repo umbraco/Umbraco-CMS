@@ -8,12 +8,12 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.OpenApi;
 using Umbraco.Cms.Api.Common.OpenApi;
 using Umbraco.Cms.Api.Management.OpenApi;
-using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Infrastructure.Telemetry.Interfaces;
-using Umbraco.Cms.Search.Core.Notifications;
 using Umbraco.Cms.Search.Provider.Examine.BackgroundJobs;
+using Umbraco.Cms.Search.Provider.Examine.Configuration;
 using Umbraco.Cms.Search.Provider.Examine.Lucene;
 using Umbraco.Cms.Search.Provider.Examine.NotificationHandlers;
 using Umbraco.Cms.Search.Provider.Examine.Services;
@@ -45,9 +45,14 @@ public static class UmbracoBuilderExtensions
 
         builder.Services.AddSingleton<AddExamineSearchProviderMarker>();
 
-        // The settings are registered as options via AddConfiguration(), but the zero-downtime branch below
-        // needs the value synchronously at composition time, so read the section directly.
         IConfigurationSection section = builder.Config.GetSection(Umbraco.Cms.Core.Constants.Configuration.ConfigSearchExamine);
+        builder.Services.AddOptions<ExamineSearchProviderSettings>()
+            .Bind(section)
+            .ValidateDataAnnotations();
+
+        // The settings are registered as options above, but the zero-downtime branch below needs the value
+        // synchronously at composition time, so read the section directly instead of resolving IOptions<T> -
+        // meaning this value cannot be changed later by an IConfigureOptions<ExamineSearchProviderSettings>.
         ExamineSearchProviderSettings settings = section.Get<ExamineSearchProviderSettings>() ?? new ExamineSearchProviderSettings();
 
         if (settings.ZeroDowntimeIndexing)
@@ -109,6 +114,11 @@ public static class UmbracoBuilderExtensions
                     options.AddDocumentTransformer((openApiDocument, _, _) =>
                     {
                         openApiDocument.Info.Version = "1.0";
+
+                        // The document is committed to source control and the TypeScript client is generated
+                        // from it, so it must not carry the host it happened to be fetched from. The
+                        // Management API document clears this for the same reason.
+                        openApiDocument.Servers?.Clear();
                         return Task.CompletedTask;
                     });
 

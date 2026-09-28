@@ -9,6 +9,7 @@ export interface UmbTrashableEntityWorkspaceContext extends UmbEntityWorkspaceCo
 	readonly modalContext?: unknown;
 	readonly isTrashed: Observable<boolean | undefined>;
 	readonly isNew: Observable<boolean | undefined>;
+	readonly navigationParentItemPath: Observable<string | undefined>;
 	reload(): Promise<void>;
 	readonly readOnlyGuard: UmbReadOnlyVariantGuardManager;
 	resetData(): void;

@@ -348,13 +348,16 @@ public partial class ContentEditingServiceTests
         };
     }
 
-    private async Task<IUser> CreateEnglishLanguageOnlyEditor()
+    private async Task<IUser> CreateEnglishLanguageOnlyEditor() => await CreateSingleLanguageEditor("en-US");
+
+    private async Task<IUser> CreateSingleLanguageEditor(string isoCode)
     {
-        var enUSLanguage = await LanguageService.GetAsync("en-US");
+        var language = await LanguageService.GetAsync(isoCode);
+        var alias = isoCode.Replace("-", string.Empty);
         var userGroup = new UserGroupBuilder()
-            .WithName("English Editors")
-            .WithAlias("englishEditors")
-            .WithAllowedLanguages([enUSLanguage.Id])
+            .WithName($"{isoCode} Editors")
+            .WithAlias($"{alias}Editors")
+            .WithAllowedLanguages([language.Id])
             .Build();
 
         var createUserGroupResult = await UserGroupService.CreateAsync(userGroup, Constants.Security.SuperUserKey);
@@ -362,9 +365,9 @@ public partial class ContentEditingServiceTests
 
         var createUserAttempt = await UserService.CreateAsync(Constants.Security.SuperUserKey, new UserCreateModel
         {
-            Email = "english-editor@test.com",
-            Name = "Test English Editor",
-            UserName = "english-editor@test.com",
+            Email = $"{alias}-editor@test.com",
+            Name = $"Test {isoCode} Editor",
+            UserName = $"{alias}-editor@test.com",
             UserGroupKeys = new[] { userGroup.Key }.ToHashSet(),
         });
         Assert.IsTrue(createUserAttempt.Success);

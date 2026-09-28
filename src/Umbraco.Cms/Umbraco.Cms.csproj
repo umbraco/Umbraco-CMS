@@ -8,6 +8,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Umbraco.Cms.Targets\Umbraco.Cms.Targets.csproj" />
     <ProjectReference Include="..\Umbraco.Cms.Imaging.ImageSharp\Umbraco.Cms.Imaging.ImageSharp.csproj" />
+    <ProjectReference Include="..\Umbraco.Cms.Search.Provider.Examine\Umbraco.Cms.Search.Provider.Examine.csproj" />
     <ProjectReference Include="..\Umbraco.Cms.Persistence.Sqlite\Umbraco.Cms.Persistence.Sqlite.csproj" />
     <ProjectReference Include="..\Umbraco.Cms.Persistence.SqlServer\Umbraco.Cms.Persistence.SqlServer.csproj" />
     <ProjectReference Include="..\Umbraco.Cms.Persistence.EFCore.Sqlite\Umbraco.Cms.Persistence.EFCore.Sqlite.csproj" />
