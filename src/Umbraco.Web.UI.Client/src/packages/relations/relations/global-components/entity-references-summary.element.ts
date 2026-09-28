@@ -10,11 +10,11 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { PropertyValues } from '@umbraco-cms/backoffice/external/lit';
 
 /**
- * Publish/unpublish awareness: independent action buttons for the entities referencing the entity in `config`,
- * and for its descendants that are referenced elsewhere, each opening a paged overview of only that kind of
- * reference. Renders nothing when there are no references. Same `config` shape, getters, and `UmbChangeEvent`
- * contract as `umb-confirm-action-modal-entity-references`, so it can be used as a drop-in replacement wherever
- * that component's reference-aware gating (e.g. `disableUnpublishWhenReferenced`) is relied on.
+ * Renders one action button per kind of reference to the entity in `config`: one for the items referencing it,
+ * another for its descendants that are referenced elsewhere. Each button opens a paged overview of only that
+ * kind of reference. Renders nothing when there are no references. Dispatches a `UmbChangeEvent` once both
+ * totals have loaded, and exposes `getTotalReferencedBy()` / `getTotalDescendantsWithReferences()`, so a host
+ * can gate an action on the result — for example, a publish or unpublish confirmation dialog.
  * @element umb-entity-references-summary
  */
 @customElement('umb-entity-references-summary')

@@ -5,6 +5,9 @@ import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-reg
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export interface UmbEntityReferenceCountManagerArgs {
+	/**
+	 * Alias of the reference repository used to look up the count.
+	 */
 	referenceRepositoryAlias: string;
 }
 
