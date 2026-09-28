@@ -209,7 +209,7 @@ internal static class ImageProcessingMemory
         if (IsMemoryManaged(availableMemoryBytes))
         {
             logger.LogInformation(
-                "Imaging memory management is disabled, so the imaging library's own memory behaviour stands. {AvailableMemoryMegabytes} MB is available to the process, below the {ThresholdMegabytes} MB at which it would bound the memory the library uses. Set {SettingPath} to true to enable it.",
+                "Imaging memory management is disabled, so the imaging library's own memory behavior stands. {AvailableMemoryMegabytes} MB is available to the process, below the {ThresholdMegabytes} MB at which it would bound the memory the library uses. Set {SettingPath} to true to enable it.",
                 availableMemoryMegabytes,
                 MemoryManagementThresholdMegabytes,
                 settingPath);

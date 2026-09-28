@@ -65,7 +65,7 @@ public class ImagingMemorySettings
     /// When enabled, the pool the imaging library retains between requests is capped, the number of
     /// images decoded at the same time is bounded and the size of a single decoded image is capped,
     /// on hosts where the memory available to the process is limited. Defaults to <c>false</c>,
-    /// which leaves the imaging library's own memory behaviour untouched.
+    /// which leaves the imaging library's own memory behavior untouched.
     /// </remarks>
     [DefaultValue(StaticEnabled)]
     public bool Enabled { get; set; } = StaticEnabled;
