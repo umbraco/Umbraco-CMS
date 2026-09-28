@@ -68,7 +68,7 @@ public class CurrentUserResponseModel : UserPresentationBase
     /// Aggregated across the user's groups: a single group granting the permission is sufficient.
     /// The permission is not consulted when editing invariant content types.
     /// </remarks>
-    public bool HasAccessToInvariantForVariant { get; init; } = true;
+    public required bool HasAccessToInvariantForVariant { get; init; }
 
     /// <summary>Indicates whether the current user has access to sensitive data.</summary>
     public required bool HasAccessToSensitiveData { get; set; }

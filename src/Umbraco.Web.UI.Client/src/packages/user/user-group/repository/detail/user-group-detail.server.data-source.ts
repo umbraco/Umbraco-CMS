@@ -98,7 +98,7 @@ export class UmbUserGroupServerDataSource
 			entityType: UMB_USER_GROUP_ENTITY_TYPE,
 			fallbackPermissions: data.fallbackPermissions,
 			hasAccessToAllLanguages: data.hasAccessToAllLanguages,
-			hasAccessToInvariantForVariant: data.hasAccessToInvariantForVariant ?? true,
+			hasAccessToInvariantForVariant: data.hasAccessToInvariantForVariant,
 			icon: data.icon || null,
 			isDeletable: data.isDeletable,
 			aliasCanBeChanged: data.aliasCanBeChanged,

@@ -53,7 +53,7 @@ public class UserGroupBase
     /// <remarks>
     /// The permission is not consulted when editing invariant content types — all users with access to the document can edit its properties in that case.
     /// </remarks>
-    public bool HasAccessToInvariantForVariant { get; init; } = true;
+    public required bool HasAccessToInvariantForVariant { get; init; }
 
     /// <summary>
     /// Gets or sets the key of the document that should act as root node for the user group.

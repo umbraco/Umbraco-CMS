@@ -50,6 +50,7 @@ public class CreateUserGroupControllerTests : ManagementApiUserGroupTestBase<Cre
             Description = "Test group description",
             FallbackPermissions = new HashSet<string>(),
             HasAccessToAllLanguages = true,
+            HasAccessToInvariantForVariant = true,
             Languages = [],
             Sections = ["Umb.Section.Content"],
             Permissions = new HashSet<IPermissionPresentationModel> { },
