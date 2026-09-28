@@ -71,6 +71,7 @@ const treeItemMapper = (model: UmbMockMediaModel): MediaTreeItemResponseModel =>
 		isTrashed: model.isTrashed,
 		noAccess: model.noAccess,
 		parent: model.parent,
+		extension: model.extension,
 		variants: model.variants,
 		createDate: model.createDate,
 		flags: model.flags,
@@ -132,6 +133,7 @@ const itemMapper = (model: UmbMockMediaModel): MediaItemResponseModel => {
 		id: model.id,
 		isTrashed: model.isTrashed,
 		parent: model.parent,
+		extension: model.extension,
 		variants: model.variants,
 		flags: model.flags,
 	};
@@ -147,6 +149,7 @@ const collectionMapper = (model: UmbMockMediaModel): MediaCollectionResponseMode
 			icon: model.mediaType.icon,
 		},
 		sortOrder: 0,
+		extension: model.extension,
 		values: model.values,
 		variants: model.variants,
 		flags: model.flags,

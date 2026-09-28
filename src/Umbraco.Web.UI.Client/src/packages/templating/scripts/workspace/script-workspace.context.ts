@@ -1,7 +1,9 @@
 import type { UmbScriptDetailModel } from '../types.js';
-import { UMB_SCRIPT_ENTITY_TYPE } from '../entity.js';
+import { UMB_SCRIPT_ENTITY_TYPE, UMB_SCRIPT_FOLDER_ENTITY_TYPE } from '../entity.js';
 import type { UmbScriptDetailRepository } from '../repository/index.js';
 import { UMB_SCRIPT_DETAIL_REPOSITORY_ALIAS } from '../constants.js';
+import { UMB_EDIT_SCRIPT_WORKSPACE_PATH_PATTERN } from '../paths.js';
+import { UMB_EDIT_SCRIPT_FOLDER_WORKSPACE_PATH_PATTERN } from '../tree/folder/workspace/paths.js';
 import { UMB_SCRIPT_WORKSPACE_ALIAS } from './manifests.js';
 import { UmbScriptWorkspaceEditorElement } from './script-workspace-editor.element.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -13,6 +15,8 @@ import {
 } from '@umbraco-cms/backoffice/workspace';
 import type { IRoutingInfo, PageComponent } from '@umbraco-cms/backoffice/router';
 import { UmbServerFileRenameWorkspaceRedirectController } from '@umbraco-cms/backoffice/server-file-system';
+import { UMB_SETTINGS_SECTION_PATH } from '@umbraco-cms/backoffice/settings';
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 
 export class UmbScriptWorkspaceContext
 	extends UmbEntityNamedDetailWorkspaceContextBase<UmbScriptDetailModel, UmbScriptDetailRepository>
@@ -58,6 +62,14 @@ export class UmbScriptWorkspaceContext
 				},
 			},
 		]);
+	}
+
+	protected override _getNavigationParentItemPath(entity: UmbEntityModel | undefined): string | undefined {
+		if (!entity?.unique) return UMB_SETTINGS_SECTION_PATH;
+		if (entity.entityType === UMB_SCRIPT_FOLDER_ENTITY_TYPE) {
+			return UMB_EDIT_SCRIPT_FOLDER_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: entity.unique });
+		}
+		return UMB_EDIT_SCRIPT_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: entity.unique });
 	}
 
 	/**
