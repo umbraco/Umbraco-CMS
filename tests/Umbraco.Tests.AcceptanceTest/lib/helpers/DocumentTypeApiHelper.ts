@@ -324,6 +324,9 @@ export class DocumentTypeApiHelper {
     return await this.create(documentType);
   }
 
+  /**
+   * Creates a culture-varying document type with a mandatory property split across two tabs.
+   */
   async createDocumentTypeWithMandatoryCultureVaryingPropertyInTwoTabs(documentTypeName: string, dataTypeName: string, dataTypeId: string, tabName: string, secondTabName: string) {
     const crypto = require('crypto');
     const tabId = crypto.randomUUID();

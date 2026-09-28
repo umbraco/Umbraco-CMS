@@ -85,7 +85,6 @@ test('can publish content with RTE Tiptap property editor', async ({umbracoApi, 
 
 test('can not publish a mandatory RTE Tiptap with an empty value', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const inputText = 'Test Tiptap here';
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId, 'Test Group', false, false, true);
   await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
   await umbracoUi.goToBackOffice();

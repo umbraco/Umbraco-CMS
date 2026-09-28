@@ -1038,10 +1038,16 @@ export class ContentUiHelper extends UiBaseLocators {
     await this.enterText(this.numericTxt, number.toString());
   }
 
+  /**
+   * @param isInvalid - Whether the numeric value should currently violate the minimum (default true)
+   */
   async isNumericBelowMinimum(isInvalid: boolean = true) {
     await this.isInputRangeUnderflow(this.numericTxt, isInvalid);
   }
 
+  /**
+   * @param isInvalid - Whether the numeric value should currently violate the maximum (default true)
+   */
   async isNumericAboveMaximum(isInvalid: boolean = true) {
     await this.isInputRangeOverflow(this.numericTxt, isInvalid);
   }
@@ -1051,10 +1057,16 @@ export class ContentUiHelper extends UiBaseLocators {
     await this.enterText(this.decimalTxt, number.toString());
   }
 
+  /**
+   * @param isInvalid - Whether the decimal value should currently violate the minimum (default true)
+   */
   async isDecimalBelowMinimum(isInvalid: boolean = true) {
     await this.isInputRangeUnderflow(this.decimalTxt, isInvalid);
   }
 
+  /**
+   * @param isInvalid - Whether the decimal value should currently violate the maximum (default true)
+   */
   async isDecimalAboveMaximum(isInvalid: boolean = true) {
     await this.isInputRangeOverflow(this.decimalTxt, isInvalid);
   }
