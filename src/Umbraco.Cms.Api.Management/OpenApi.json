@@ -46702,6 +46702,12 @@
           "mediaType": {
             "$ref": "#/components/schemas/MediaTypeCollectionReferenceResponseModel"
           },
+          "extension": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
           "creator": {
             "type": [
               "null",
@@ -46783,6 +46789,12 @@
           },
           "mediaType": {
             "$ref": "#/components/schemas/MediaTypeReferenceResponseModel"
+          },
+          "extension": {
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "variants": {
             "type": "array",
@@ -46900,6 +46912,12 @@
         "properties": {
           "mediaType": {
             "$ref": "#/components/schemas/MediaTypeReferenceResponseModel"
+          },
+          "extension": {
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "variants": {
             "type": "array",

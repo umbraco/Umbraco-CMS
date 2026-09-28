@@ -46,6 +46,7 @@
     emptyManualLinkPicker: 'Please enter an URL or Anchor.',
     needMoreItems: 'This field needs more items',
     emptyDate: 'Please select a date',
+    minimumTwoEntriesRequiresOneMore: 'Minimum 2 entries, requires 1 more.',
   }
 
   public static readonly inputTypes = {
