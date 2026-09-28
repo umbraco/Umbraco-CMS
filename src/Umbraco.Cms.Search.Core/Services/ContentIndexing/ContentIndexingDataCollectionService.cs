@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Search.Indexing;
 
@@ -58,15 +59,22 @@ internal sealed class ContentIndexingDataCollectionService : IContentIndexingDat
             IEnumerable<IndexField> fields = await contentIndexer.GetIndexFieldsAsync(content, cultures, published, cancellationToken);
             foreach (IndexField field in fields)
             {
-                if (fieldsByIdentifier.TryAdd(Identifier(field), field) is false)
+                var identifier = Identifier(field);
+                if (fieldsByIdentifier.TryGetValue(identifier, out IndexField? existingField))
                 {
-                    _logger.LogWarning(
-                        "Duplicate index field with alias {alias} (culture {culture}, segment {segment}) was detected and ignored - caused by indexer {indexer} while indexing content item {contentKey}",
+                    // If multiple content indexers yield the same field, merge the values.
+                    _logger.LogDebug(
+                        "Index field with alias {alias} (culture {culture}, segment {segment}) was contributed by more than one indexer - merging values from {indexer} while indexing content item {contentKey}",
                         field.FieldName,
                         field.Culture ?? "[null]",
                         field.Segment ?? "[null]",
                         contentIndexer.GetType().FullName,
                         content.Key);
+                    fieldsByIdentifier[identifier] = existingField with { Value = existingField.Value.Merge(field.Value) };
+                }
+                else
+                {
+                    fieldsByIdentifier.Add(identifier, field);
                 }
             }
         }
