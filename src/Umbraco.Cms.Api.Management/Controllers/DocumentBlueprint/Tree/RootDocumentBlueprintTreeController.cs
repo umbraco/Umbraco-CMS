@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.Factories;
+using Umbraco.Cms.Api.Management.Services.Entities;
 using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core.Services;
@@ -20,10 +21,12 @@ public class RootDocumentBlueprintTreeController : DocumentBlueprintTreeControll
     /// Initializes a new instance of the <see cref="RootDocumentBlueprintTreeController"/> class.
     /// </summary>
     /// <param name="entityService">Service used for entity operations within the document blueprint tree.</param>
+    /// <param name="entitySearchService">The <see cref="IEntitySearchService"/> used to search entities.</param>
+    /// <param name="idKeyMap">The <see cref="IIdKeyMap"/> used to map between identifiers and keys.</param>
     /// <param name="flagProviders">A collection of providers that supply flags for document blueprints.</param>
     /// <param name="documentPresentationFactory">Factory responsible for creating document presentation models.</param>
-    public RootDocumentBlueprintTreeController(IEntityService entityService, FlagProviderCollection flagProviders, IDocumentPresentationFactory documentPresentationFactory)
-        : base(entityService, flagProviders, documentPresentationFactory)
+    public RootDocumentBlueprintTreeController(IEntityService entityService, FlagProviderCollection flagProviders, IEntitySearchService entitySearchService, IIdKeyMap idKeyMap, IDocumentPresentationFactory documentPresentationFactory)
+        : base(entityService, flagProviders, entitySearchService, idKeyMap, documentPresentationFactory)
     {
     }
 

@@ -98,7 +98,7 @@ internal sealed class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithC
 
         _mockDatabaseCacheRepository.Setup(r => r.DeleteContentItemAsync(It.IsAny<int>()));
 
-        var mockedPublishedStatusService = new Mock<IPublishStatusQueryService>();
+        var mockedPublishedStatusService = new Mock<IDocumentPublishStatusQueryService>();
         mockedPublishedStatusService.Setup(x => x.IsPublishedInAnyCulture(It.IsAny<Guid>())).Returns(true);
         mockedPublishedStatusService.Setup(x => x.HasPublishedAncestorPath(It.IsAny<Guid>())).Returns(true);
 
@@ -122,7 +122,7 @@ internal sealed class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithC
 
     // We want to be able to alter the settings for the providers AFTER the test has started
     // So we'll manually create them with a magic options mock.
-    private IEnumerable<IDocumentSeedKeyProvider> GetSeedProviders(IPublishStatusQueryService publishStatusQueryService)
+    private IEnumerable<IDocumentSeedKeyProvider> GetSeedProviders(IDocumentPublishStatusQueryService publishStatusQueryService)
     {
         _cacheSettings = new CacheSettings
         {
@@ -407,8 +407,8 @@ internal sealed class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithC
         // Arrange - create a new DocumentCacheService with a controllable HasPublishedAncestorPath mock.
         var ancestorCheckReturnsTrue = false;
 
-        var controllableMock = new Mock<IPublishStatusQueryService>();
-        controllableMock.Setup(x => x.IsDocumentPublishedInAnyCulture(It.IsAny<Guid>())).Returns(true);
+        var controllableMock = new Mock<IDocumentPublishStatusQueryService>();
+        controllableMock.Setup(x => x.IsPublishedInAnyCulture(It.IsAny<Guid>())).Returns(true);
         controllableMock.Setup(x => x.HasPublishedAncestorPath(It.IsAny<Guid>()))
             .Returns(() => ancestorCheckReturnsTrue);
 

@@ -12,15 +12,6 @@ public class MemberApplicationManager : OpenIdDictApplicationManagerBase, IMembe
 {
     private readonly IRuntimeState _runtimeState;
 
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
-    public MemberApplicationManager(IOpenIddictApplicationManager applicationManager, IRuntimeState runtimeState)
-        : this(
-            applicationManager,
-            runtimeState,
-            StaticServiceProvider.Instance.GetRequiredService<ILogger<MemberApplicationManager>>())
-    {
-    }
-
     public MemberApplicationManager(
         IOpenIddictApplicationManager applicationManager,
         IRuntimeState runtimeState,

@@ -32,7 +32,6 @@ public class UpdateNotificationsController : DocumentControllerBase
     /// <param name="contentEditingService">Service used for editing content.</param>
     /// <param name="notificationService">Service responsible for handling notifications.</param>
     /// <param name="backOfficeSecurityAccessor">Provides access to back office security features.</param>
-    [ActivatorUtilitiesConstructor]
     public UpdateNotificationsController(IAuthorizationService authorizationService, IContentEditingService contentEditingService, INotificationService notificationService, IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
     {
         _authorizationService = authorizationService;

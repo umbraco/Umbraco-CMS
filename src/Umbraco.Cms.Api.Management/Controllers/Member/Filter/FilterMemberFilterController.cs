@@ -31,14 +31,10 @@ public class FilterMemberFilterController : MemberFilterControllerBase
     /// <summary>
     /// Initializes a new instance of the <see cref="FilterMemberFilterController"/> class.
     /// </summary>
-    /// <param name="memberService">Service used for member management operations (unused, retained for DI compatibility).</param>
     /// <param name="memberPresentationFactory">Factory responsible for creating member presentation models.</param>
     /// <param name="backOfficeSecurityAccessor">Accessor for back office security context.</param>
     /// <param name="memberFilterService">Service for combined member filtering across content and external stores.</param>
-    // TODO (V19): Remove unused parameters which are only here to avoid ambiguous constructor errors.
-    [ActivatorUtilitiesConstructor]
     public FilterMemberFilterController(
-        IMemberService memberService,
         IMemberPresentationFactory memberPresentationFactory,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
         IMemberFilterService memberFilterService)
@@ -46,22 +42,6 @@ public class FilterMemberFilterController : MemberFilterControllerBase
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
         _memberFilterService = memberFilterService;
         _memberPresentationFactory = memberPresentationFactory;
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="FilterMemberFilterController"/> class.
-    /// </summary>
-    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
-    public FilterMemberFilterController(
-        IMemberService memberService,
-        IMemberPresentationFactory memberPresentationFactory,
-        IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
-        : this(
-            memberService,
-            memberPresentationFactory,
-            backOfficeSecurityAccessor,
-            StaticServiceProvider.Instance.GetRequiredService<IMemberFilterService>())
-    {
     }
 
     /// <summary>

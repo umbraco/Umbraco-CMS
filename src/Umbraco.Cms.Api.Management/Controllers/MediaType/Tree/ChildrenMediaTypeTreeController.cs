@@ -2,6 +2,7 @@ using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
+using Umbraco.Cms.Api.Management.Services.Entities;
 using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core.Services;
@@ -19,11 +20,13 @@ public class ChildrenMediaTypeTreeController : MediaTypeTreeControllerBase
     /// Initializes a new instance of the <see cref="ChildrenMediaTypeTreeController"/> class.
     /// </summary>
     /// <param name="entityService">Service used to manage and retrieve entities within the Umbraco CMS.</param>
+    /// <param name="entitySearchService">The <see cref="IEntitySearchService"/> used to search entities.</param>
+    /// <param name="idKeyMap">The <see cref="IIdKeyMap"/> used to map between identifiers and keys.</param>
     /// <param name="flagProviders">A collection of providers that supply flags for entities in the tree.</param>
     /// <param name="mediaTypeService">Service used to manage media types in the Umbraco CMS.</param>
     ///
-    public ChildrenMediaTypeTreeController(IEntityService entityService, FlagProviderCollection flagProviders, IMediaTypeService mediaTypeService)
-        : base(entityService, flagProviders, mediaTypeService)
+    public ChildrenMediaTypeTreeController(IEntityService entityService, FlagProviderCollection flagProviders, IEntitySearchService entitySearchService, IIdKeyMap idKeyMap, IMediaTypeService mediaTypeService)
+        : base(entityService, flagProviders, entitySearchService, idKeyMap, mediaTypeService)
     {
     }
 

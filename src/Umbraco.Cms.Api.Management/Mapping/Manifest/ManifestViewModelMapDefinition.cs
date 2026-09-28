@@ -18,17 +18,7 @@ public class ManifestViewModelMapDefinition : IMapDefinition
     /// <summary>
     /// Initializes a new instance of the <see cref="ManifestViewModelMapDefinition"/> class.
     /// </summary>
-    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
-    public ManifestViewModelMapDefinition()
-        : this(StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<UmbracoPluginSettings>>())
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ManifestViewModelMapDefinition"/> class.
-    /// </summary>
     /// <param name="pluginSettings">The plugin settings, used to read the host cache-buster.</param>
-    [ActivatorUtilitiesConstructor]
     public ManifestViewModelMapDefinition(IOptionsMonitor<UmbracoPluginSettings> pluginSettings)
         => _pluginSettings = pluginSettings;
 

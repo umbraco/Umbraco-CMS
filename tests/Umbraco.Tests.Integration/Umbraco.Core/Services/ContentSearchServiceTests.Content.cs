@@ -12,7 +12,7 @@ public partial class ContentSearchServiceTests
     public async Task Content_CanFindAllRootsWithoutQuery()
     {
         IContent[] contentAtRoot = ContentService.GetRootContent().OrderBy(content => content.SortOrder).ToArray();
-        PagedModel<IContent> result = await ContentSearchService.SearchChildrenAsync(null, null, null);
+        PagedModel<IContent> result = await ContentSearchService.SearchChildrenAsync(null, null, null, null);
 
         Assert.Multiple(() =>
         {
@@ -30,7 +30,7 @@ public partial class ContentSearchServiceTests
     public async Task Content_CanFindAllChildrenWithoutQuery()
     {
         IContent root = ContentService.GetRootContent().Last();
-        PagedModel<IContent> result = await ContentSearchService.SearchChildrenAsync(null, root.Key, null);
+        PagedModel<IContent> result = await ContentSearchService.SearchChildrenAsync(null, root.Key, null, null);
 
         Assert.Multiple(() =>
         {
@@ -45,7 +45,7 @@ public partial class ContentSearchServiceTests
     public async Task Content_CanFindAllRootsByNonDistinctQuery()
     {
         IContent[] contentAtRoot = ContentService.GetRootContent().OrderBy(content => content.SortOrder).ToArray();
-        PagedModel<IContent> result = await ContentSearchService.SearchChildrenAsync("title", null, null);
+        PagedModel<IContent> result = await ContentSearchService.SearchChildrenAsync("title", null, null, null);
 
         Assert.Multiple(() =>
         {
@@ -63,7 +63,7 @@ public partial class ContentSearchServiceTests
     public async Task Content_CanFindAllChildrenByQuery()
     {
         IContent root = ContentService.GetRootContent().Last();
-        PagedModel<IContent> result = await ContentSearchService.SearchChildrenAsync("title", root.Key, null);
+        PagedModel<IContent> result = await ContentSearchService.SearchChildrenAsync("title", root.Key, null, null);
 
         Assert.Multiple(() =>
         {
@@ -77,7 +77,7 @@ public partial class ContentSearchServiceTests
     [Test]
     public async Task Content_CanFindAllRootsByDistinctQuery()
     {
-        PagedModel<IContent> result = await ContentSearchService.SearchChildrenAsync("root", null, null);
+        PagedModel<IContent> result = await ContentSearchService.SearchChildrenAsync("root", null, null, null);
 
         Assert.Multiple(() =>
         {
@@ -92,7 +92,7 @@ public partial class ContentSearchServiceTests
     [Test]
     public async Task Content_CanFindSingleRootByQuery()
     {
-        PagedModel<IContent> result = await ContentSearchService.SearchChildrenAsync("single1root", null, null);
+        PagedModel<IContent> result = await ContentSearchService.SearchChildrenAsync("single1root", null, null, null);
 
         Assert.Multiple(() =>
         {
@@ -105,7 +105,7 @@ public partial class ContentSearchServiceTests
     public async Task Content_CanFindSingleChildByQuery()
     {
         IContent root = ContentService.GetRootContent().Last();
-        PagedModel<IContent> result = await ContentSearchService.SearchChildrenAsync("single3child", root.Key, null);
+        PagedModel<IContent> result = await ContentSearchService.SearchChildrenAsync("single3child", root.Key, null, null);
 
         Assert.Multiple(() =>
         {
@@ -119,7 +119,7 @@ public partial class ContentSearchServiceTests
     public async Task Content_CanFindMultipleChildrenByQuery()
     {
         IContent root = ContentService.GetRootContent().Last();
-        PagedModel<IContent> result = await ContentSearchService.SearchChildrenAsync("triple2child", root.Key, null);
+        PagedModel<IContent> result = await ContentSearchService.SearchChildrenAsync("triple2child", root.Key, null, null);
 
         Assert.Multiple(() =>
         {
@@ -136,7 +136,7 @@ public partial class ContentSearchServiceTests
     public async Task Content_CanFindRootByIdQuery()
     {
         IContent root = ContentService.GetRootContent().First();
-        PagedModel<IContent> result = await ContentSearchService.SearchChildrenAsync(root.Key.AsKeyword(), null, null);
+        PagedModel<IContent> result = await ContentSearchService.SearchChildrenAsync(root.Key.AsKeyword(), null, null, null);
 
         Assert.Multiple(() =>
         {
@@ -149,8 +149,8 @@ public partial class ContentSearchServiceTests
     public async Task Content_CanFindChildByIdQuery()
     {
         IContent root = ContentService.GetRootContent().First();
-        IContent child = ContentService.GetPagedChildren(root.Id, 0, 10, out _).First();
-        PagedModel<IContent> result = await ContentSearchService.SearchChildrenAsync(child.Key.AsKeyword(), root.Key, null);
+        IContent child = ContentService.GetPagedChildren(root.Id, 0, 10, out _, propertyAliases: null, filter: null, ordering: null).First();
+        PagedModel<IContent> result = await ContentSearchService.SearchChildrenAsync(child.Key.AsKeyword(), root.Key, null, null);
 
         Assert.Multiple(() =>
         {
@@ -164,13 +164,13 @@ public partial class ContentSearchServiceTests
     public async Task Content_CanSortAllChildrenByNameWithoutQuery(Direction direction)
     {
         IContent root = ContentService.GetRootContent().Last();
-        IEnumerable<IContent> children = ContentService.GetPagedChildren(root.Id, 0, 10, out _);
+        IEnumerable<IContent> children = ContentService.GetPagedChildren(root.Id, 0, 10, out _, propertyAliases: null, filter: null, ordering: null);
         Guid[] expectedChildrenKeys = (direction is Direction.Ascending
                 ? children.OrderBy(child => child.Name)
                 : children.OrderByDescending(child => child.Name)
             ).Select(child => child.Key).ToArray();
 
-        PagedModel<IContent> result = await ContentSearchService.SearchChildrenAsync(null, root.Key, Ordering.By("name", direction));
+        PagedModel<IContent> result = await ContentSearchService.SearchChildrenAsync(null, root.Key, null, Ordering.By("name", direction));
 
         Assert.Multiple(() =>
         {
@@ -185,13 +185,13 @@ public partial class ContentSearchServiceTests
     public async Task Content_CanSortAllChildrenByUpdateDateWithoutQuery(Direction direction)
     {
         IContent root = ContentService.GetRootContent().Last();
-        IEnumerable<IContent> children = ContentService.GetPagedChildren(root.Id, 0, 10, out _);
+        IEnumerable<IContent> children = ContentService.GetPagedChildren(root.Id, 0, 10, out _, propertyAliases: null, filter: null, ordering: null);
         Guid[] expectedChildrenKeys = (direction is Direction.Ascending
                 ? children.OrderBy(child => child.UpdateDate)
                 : children.OrderByDescending(child => child.UpdateDate)
             ).Select(child => child.Key).ToArray();
 
-        PagedModel<IContent> result = await ContentSearchService.SearchChildrenAsync(null, root.Key, Ordering.By("updateDate", direction));
+        PagedModel<IContent> result = await ContentSearchService.SearchChildrenAsync(null, root.Key, null, Ordering.By("updateDate", direction));
 
         Assert.Multiple(() =>
         {
@@ -212,7 +212,7 @@ public partial class ContentSearchServiceTests
             expectedChildrenOrder = expectedChildrenOrder.Reverse().ToArray();
         }
 
-        PagedModel<IContent> result = await ContentSearchService.SearchChildrenAsync("oddeven1child", root.Key, Ordering.By("name", direction));
+        PagedModel<IContent> result = await ContentSearchService.SearchChildrenAsync("oddeven1child", root.Key, null, Ordering.By("name", direction));
 
         Assert.Multiple(() =>
         {
@@ -233,7 +233,7 @@ public partial class ContentSearchServiceTests
             expectedChildrenOrder = expectedChildrenOrder.Reverse().ToArray();
         }
 
-        PagedModel<IContent> result = await ContentSearchService.SearchChildrenAsync("oddeven0child", root.Key, Ordering.By("updateDate", direction));
+        PagedModel<IContent> result = await ContentSearchService.SearchChildrenAsync("oddeven0child", root.Key, null, Ordering.By("updateDate", direction));
 
         Assert.Multiple(() =>
         {
@@ -246,7 +246,7 @@ public partial class ContentSearchServiceTests
     [Test]
     public async Task Content_CannotFindChildrenWithoutParent()
     {
-        PagedModel<IContent> result = await ContentSearchService.SearchChildrenAsync("triple2child", null, null);
+        PagedModel<IContent> result = await ContentSearchService.SearchChildrenAsync("triple2child", null, null, null);
         Assert.That(result.Total, Is.EqualTo(0));
     }
 }

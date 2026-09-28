@@ -15,35 +15,12 @@ namespace Umbraco.Cms.Api.Management.Controllers.PartialView.Tree;
 [ApiVersion("1.0")]
 public class ChildrenPartialViewTreeController : PartialViewTreeControllerBase
 {
-    // TODO Remove the static service provider, and replace with base when the other constructors are obsoleted.
     /// <summary>
     /// Initializes a new instance of the <see cref="ChildrenPartialViewTreeController"/> class with the specified partial view tree service.
     /// </summary>
     /// <param name="partialViewTreeService">An instance of <see cref="IPartialViewTreeService"/> used to manage partial view trees.</param>
-    [ActivatorUtilitiesConstructor]
     public ChildrenPartialViewTreeController(IPartialViewTreeService partialViewTreeService)
         : base(partialViewTreeService)
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ChildrenPartialViewTreeController"/> class.
-    /// </summary>
-    /// <param name="partialViewTreeService">An instance of <see cref="IPartialViewTreeService"/> used to manage partial view trees.</param>
-    /// <param name="fileSystems">An instance of <see cref="FileSystems"/> providing access to the file system resources.</param>
-    [Obsolete("Please use the constructor taking all parameters. Scheduled to be removed in Umbraco 19.")]
-    public ChildrenPartialViewTreeController(IPartialViewTreeService partialViewTreeService, FileSystems fileSystems)
-        : base(partialViewTreeService, fileSystems)
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ChildrenPartialViewTreeController"/> class.
-    /// </summary>
-    /// <param name="fileSystems">The file systems used by the controller.</param>
-    [Obsolete("Please use the constructor taking all parameters. Scheduled to be removed in Umbraco 19.")]
-    public ChildrenPartialViewTreeController(FileSystems fileSystems)
-        : base(fileSystems)
     {
     }
 

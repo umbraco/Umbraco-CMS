@@ -12,7 +12,7 @@ public partial class ContentSearchServiceTests
     public async Task Media_CanFindAllRootsWithoutQuery()
     {
         IMedia[] mediaAtRoot = MediaService.GetRootMedia().OrderBy(media => media.SortOrder).ToArray();
-        PagedModel<IMedia> result = await MediaSearchService.SearchChildrenAsync(null, null, null);
+        PagedModel<IMedia> result = await MediaSearchService.SearchChildrenAsync(null, null, null, null);
 
         Assert.Multiple(() =>
         {
@@ -30,7 +30,7 @@ public partial class ContentSearchServiceTests
     public async Task Media_CanFindAllChildrenWithoutQuery()
     {
         IMedia root = MediaService.GetRootMedia().Last();
-        PagedModel<IMedia> result = await MediaSearchService.SearchChildrenAsync(null, root.Key, null);
+        PagedModel<IMedia> result = await MediaSearchService.SearchChildrenAsync(null, root.Key, null, null);
 
         Assert.Multiple(() =>
         {
@@ -45,7 +45,7 @@ public partial class ContentSearchServiceTests
     public async Task Media_CanFindAllRootsByNonDistinctQuery()
     {
         IMedia[] mediaAtRoot = MediaService.GetRootMedia().OrderBy(media => media.SortOrder).ToArray();
-        PagedModel<IMedia> result = await MediaSearchService.SearchChildrenAsync("title", null, null);
+        PagedModel<IMedia> result = await MediaSearchService.SearchChildrenAsync("title", null, null, null);
 
         Assert.Multiple(() =>
         {
@@ -63,7 +63,7 @@ public partial class ContentSearchServiceTests
     public async Task Media_CanFindAllChildrenByQuery()
     {
         IMedia root = MediaService.GetRootMedia().Last();
-        PagedModel<IMedia> result = await MediaSearchService.SearchChildrenAsync("title", root.Key, null);
+        PagedModel<IMedia> result = await MediaSearchService.SearchChildrenAsync("title", root.Key, null, null);
 
         Assert.Multiple(() =>
         {
@@ -77,7 +77,7 @@ public partial class ContentSearchServiceTests
     [Test]
     public async Task Media_CanFindAllRootsByDistinctQuery()
     {
-        PagedModel<IMedia> result = await MediaSearchService.SearchChildrenAsync("root", null, null);
+        PagedModel<IMedia> result = await MediaSearchService.SearchChildrenAsync("root", null, null, null);
 
         Assert.Multiple(() =>
         {
@@ -92,7 +92,7 @@ public partial class ContentSearchServiceTests
     [Test]
     public async Task Media_CanFindSingleRootByQuery()
     {
-        PagedModel<IMedia> result = await MediaSearchService.SearchChildrenAsync("single1root", null, null);
+        PagedModel<IMedia> result = await MediaSearchService.SearchChildrenAsync("single1root", null, null, null);
 
         Assert.Multiple(() =>
         {
@@ -105,7 +105,7 @@ public partial class ContentSearchServiceTests
     public async Task Media_CanFindSingleChildByQuery()
     {
         IMedia root = MediaService.GetRootMedia().Last();
-        PagedModel<IMedia> result = await MediaSearchService.SearchChildrenAsync("single3child", root.Key, null);
+        PagedModel<IMedia> result = await MediaSearchService.SearchChildrenAsync("single3child", root.Key, null, null);
 
         Assert.Multiple(() =>
         {
@@ -119,7 +119,7 @@ public partial class ContentSearchServiceTests
     public async Task Media_CanFindMultipleChildrenByQuery()
     {
         IMedia root = MediaService.GetRootMedia().Last();
-        PagedModel<IMedia> result = await MediaSearchService.SearchChildrenAsync("triple2child", root.Key, null);
+        PagedModel<IMedia> result = await MediaSearchService.SearchChildrenAsync("triple2child", root.Key, null, null);
 
         Assert.Multiple(() =>
         {
@@ -136,7 +136,7 @@ public partial class ContentSearchServiceTests
     public async Task Media_CanFindRootByIdQuery()
     {
         IMedia root = MediaService.GetRootMedia().First();
-        PagedModel<IMedia> result = await MediaSearchService.SearchChildrenAsync(root.Key.AsKeyword(), null, null);
+        PagedModel<IMedia> result = await MediaSearchService.SearchChildrenAsync(root.Key.AsKeyword(), null, null, null);
 
         Assert.Multiple(() =>
         {
@@ -150,7 +150,7 @@ public partial class ContentSearchServiceTests
     {
         IMedia root = MediaService.GetRootMedia().First();
         IMedia child = MediaService.GetPagedChildren(root.Id, 0, 10, out _).First();
-        PagedModel<IMedia> result = await MediaSearchService.SearchChildrenAsync(child.Key.AsKeyword(), root.Key, null);
+        PagedModel<IMedia> result = await MediaSearchService.SearchChildrenAsync(child.Key.AsKeyword(), root.Key, null, null);
 
         Assert.Multiple(() =>
         {
@@ -170,7 +170,7 @@ public partial class ContentSearchServiceTests
                 : children.OrderByDescending(child => child.Name)
             ).Select(child => child.Key).ToArray();
 
-        PagedModel<IMedia> result = await MediaSearchService.SearchChildrenAsync(null, root.Key, Ordering.By("name", direction));
+        PagedModel<IMedia> result = await MediaSearchService.SearchChildrenAsync(null, root.Key, null, Ordering.By("name", direction));
 
         Assert.Multiple(() =>
         {
@@ -191,7 +191,7 @@ public partial class ContentSearchServiceTests
                 : children.OrderByDescending(child => child.UpdateDate)
             ).Select(child => child.Key).ToArray();
 
-        PagedModel<IMedia> result = await MediaSearchService.SearchChildrenAsync(null, root.Key, Ordering.By("updateDate", direction));
+        PagedModel<IMedia> result = await MediaSearchService.SearchChildrenAsync(null, root.Key, null, Ordering.By("updateDate", direction));
 
         Assert.Multiple(() =>
         {
@@ -212,7 +212,7 @@ public partial class ContentSearchServiceTests
             expectedChildrenOrder = expectedChildrenOrder.Reverse().ToArray();
         }
 
-        PagedModel<IMedia> result = await MediaSearchService.SearchChildrenAsync("oddeven1child", root.Key, Ordering.By("name", direction));
+        PagedModel<IMedia> result = await MediaSearchService.SearchChildrenAsync("oddeven1child", root.Key, null, Ordering.By("name", direction));
 
         Assert.Multiple(() =>
         {
@@ -233,7 +233,7 @@ public partial class ContentSearchServiceTests
             expectedChildrenOrder = expectedChildrenOrder.Reverse().ToArray();
         }
 
-        PagedModel<IMedia> result = await MediaSearchService.SearchChildrenAsync("oddeven0child", root.Key, Ordering.By("updateDate", direction));
+        PagedModel<IMedia> result = await MediaSearchService.SearchChildrenAsync("oddeven0child", root.Key, null, Ordering.By("updateDate", direction));
 
         Assert.Multiple(() =>
         {
@@ -246,7 +246,7 @@ public partial class ContentSearchServiceTests
     [Test]
     public async Task Media_CannotFindChildrenWithoutParent()
     {
-        PagedModel<IMedia> result = await MediaSearchService.SearchChildrenAsync("triple2child", null, null);
+        PagedModel<IMedia> result = await MediaSearchService.SearchChildrenAsync("triple2child", null, null, null);
         Assert.That(result.Total, Is.EqualTo(0));
     }
 }

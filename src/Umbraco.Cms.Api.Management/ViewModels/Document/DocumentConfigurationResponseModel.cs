@@ -20,9 +20,4 @@ public class DocumentConfigurationResponseModel
     /// </summary>
     public required bool AllowEditInvariantFromNonDefault { get; set; }
 
-    /// <summary>
-    /// Gets or sets a value indicating whether the creation of segments that do not already exist is permitted for this document configuration.
-    /// </summary>
-    [Obsolete("This functionality will be moved to a client-side extension. Scheduled for removal in Umbraco 19.")]
-    public required bool AllowNonExistingSegmentsCreation { get; set; }
 }

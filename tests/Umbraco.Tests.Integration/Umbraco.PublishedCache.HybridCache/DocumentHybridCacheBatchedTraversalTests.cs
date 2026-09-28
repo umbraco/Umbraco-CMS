@@ -134,7 +134,7 @@ internal sealed class DocumentHybridCacheBatchedTraversalTests : UmbracoIntegrat
 
         // Populate the publish-status service the filtering service consults (in the running app the
         // content cache refresher does this on publish; the integration harness doesn't run it).
-        await GetRequiredService<IPublishStatusManagementService>()
+        await GetRequiredService<IDocumentPublishStatusManagementService>()
             .AddOrUpdateStatusWithDescendantsAsync(Textpage.Key, CancellationToken.None);
 
         var cacheService = (DocumentCacheService)DocumentCacheService;

@@ -76,12 +76,7 @@ public class DocumentCacheSyncFastPathTests
     }
 
     private static DocumentCache CreateCache(Mock<IDocumentCacheService> cacheService)
-        => new(
-            cacheService.Object,
-            Mock.Of<IPublishedContentTypeCache>(),
-            Mock.Of<IDocumentNavigationQueryService>(),
-            Mock.Of<IDocumentUrlService>(),
-            new Lazy<IPublishedUrlProvider>(() => Mock.Of<IPublishedUrlProvider>()));
+        => new(cacheService.Object);
 
     // Moq cannot bind directly to ref / out parameters in the lambda overload, so we
     // declare a delegate that matches the TryGetCached signature and pass it explicitly.

@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Api.Management.ViewModels.Security;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -20,22 +20,7 @@ public class PasswordConfigurationPresentationFactory : IPasswordConfigurationPr
     public PasswordConfigurationPresentationFactory(IOptionsSnapshot<SecuritySettings> securitySettings)
         => _securitySettings = securitySettings.Value;
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="PasswordConfigurationPresentationFactory"/> class.
-    /// </summary>
-    /// <param name="userPasswordConfigurationSettings">An <see cref="IOptionsSnapshot{T}"/> containing the current <see cref="UserPasswordConfigurationSettings"/> for user password configuration.</param>
-    [Obsolete("Use the constructor that accepts IOptionsSnapshot<SecuritySettings> instead. Scheduled for removal in Umbraco 19.")]
-    public PasswordConfigurationPresentationFactory(IOptionsSnapshot<UserPasswordConfigurationSettings> userPasswordConfigurationSettings)
-        : this(StaticServiceProvider.Instance.GetRequiredService<IOptionsSnapshot<SecuritySettings>>())
-    {
-    }
-
     // This is just here to resolve an ambiguous constructor.
-    [Obsolete("Use the constructor that accepts IOptionsSnapshot<SecuritySettings> instead. Scheduled for removal in Umbraco 19.")]
-    public PasswordConfigurationPresentationFactory(IOptionsSnapshot<SecuritySettings> securitySettings, IOptionsSnapshot<UserPasswordConfigurationSettings> _)
-        : this(securitySettings)
-    {
-    }
 
     public PasswordConfigurationResponseModel CreatePasswordConfigurationResponseModel() =>
         new()

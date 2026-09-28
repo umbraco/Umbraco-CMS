@@ -46,31 +46,6 @@ public class DataTypePresentationFactory : IDataTypePresentationFactory
         _logger = logger;
     }
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="DataTypePresentationFactory"/> class, which is responsible for creating data type presentation models.
-    /// </summary>
-    /// <param name="dataTypeContainerService">Service used to manage data type containers.</param>
-    /// <param name="propertyEditorCollection">A collection containing all available property editors.</param>
-    /// <param name="dataValueEditorFactory">Factory for creating data value editors.</param>
-    /// <param name="configurationEditorJsonSerializer">Serializer for configuration editor JSON data.</param>
-    /// <param name="timeProvider">Provides the current time for time-dependent operations.</param>
-    [Obsolete("Please use the constructor that takes all parameters. Scheduled for removal in Umbraco 19.")]
-    public DataTypePresentationFactory(
-        IDataTypeContainerService dataTypeContainerService,
-        PropertyEditorCollection propertyEditorCollection,
-        IDataValueEditorFactory dataValueEditorFactory,
-        IConfigurationEditorJsonSerializer configurationEditorJsonSerializer,
-        TimeProvider timeProvider)
-        : this(
-            dataTypeContainerService,
-            propertyEditorCollection,
-            dataValueEditorFactory,
-            configurationEditorJsonSerializer,
-            timeProvider,
-            StaticServiceProvider.Instance.GetRequiredService<ILogger<DataTypePresentationFactory>>())
-    {
-    }
-
     /// <inheritdoc />
     public async Task<Attempt<IDataType, DataTypeOperationStatus>> CreateAsync(CreateDataTypeRequestModel requestModel)
     {

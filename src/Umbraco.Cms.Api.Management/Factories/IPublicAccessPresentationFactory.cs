@@ -23,14 +23,6 @@ public interface IPublicAccessPresentationFactory
     Attempt<PublicAccessResponseModel?, PublicAccessOperationStatus> CreatePublicAccessResponseModel(PublicAccessEntry entry, Guid contentKey);
 
     /// <summary>
-    /// Creates a <see cref="PublicAccessResponseModel"/> from a <see cref="PublicAccessEntry"/>.
-    /// </summary>
-    /// <param name="entry">The public access entry.</param>
-    /// <returns>An <see cref="Attempt{TResult, TStatus}"/> containing the response model or an error status.</returns>
-    [Obsolete("Please use the overload taking all parameters. Scheduled for removal in Umbraco 19.")]
-    Attempt<PublicAccessResponseModel?, PublicAccessOperationStatus> CreatePublicAccessResponseModel(PublicAccessEntry entry);
-
-    /// <summary>
     /// Creates a <see cref="PublicAccessEntrySlim"/> from a <see cref="PublicAccessRequestModel"/>.
     /// </summary>
     /// <param name="requestModel">The public access request model.</param>

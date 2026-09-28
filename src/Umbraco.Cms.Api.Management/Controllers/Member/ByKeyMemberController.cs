@@ -21,40 +21,17 @@ public class ByKeyMemberController : MemberControllerBase
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
     private readonly IMemberPresentationService _memberPresentationService;
 
-    // TODO (V19): Remove the unnecessary parameters provided to the constructor.
-
     /// <summary>
     /// Initializes a new instance of the <see cref="ByKeyMemberController"/> class.
     /// </summary>
-    /// <param name="memberEditingService">Service used to perform editing operations on members.</param>
-    /// <param name="memberPresentationFactory">Factory for creating member presentation models.</param>
     /// <param name="backOfficeSecurityAccessor">Accessor for back office security context.</param>
     /// <param name="memberPresentationService">Service for resolving members across both content and external stores.</param>
-    [ActivatorUtilitiesConstructor]
     public ByKeyMemberController(
-        IMemberEditingService memberEditingService,
-        IMemberPresentationFactory memberPresentationFactory,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
         IMemberPresentationService memberPresentationService)
     {
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
         _memberPresentationService = memberPresentationService;
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ByKeyMemberController"/> class.
-    /// </summary>
-    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
-    public ByKeyMemberController(
-        IMemberEditingService memberEditingService,
-        IMemberPresentationFactory memberPresentationFactory,
-        IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
-        : this(
-            memberEditingService,
-            memberPresentationFactory,
-            backOfficeSecurityAccessor,
-            StaticServiceProvider.Instance.GetRequiredService<IMemberPresentationService>())
-    {
     }
 
     /// <summary>

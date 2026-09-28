@@ -33,7 +33,6 @@ public class CreateTemplateController : TemplateControllerBase
     /// <param name="templateService">An instance of <see cref="ITemplateService"/> used to manage templates.</param>
     /// <param name="backOfficeSecurityAccessor">An instance of <see cref="IBackOfficeSecurityAccessor"/> used to access back office security information.</param>
     /// <param name="runtimeSettings">The runtime configuration settings.</param>
-    [ActivatorUtilitiesConstructor]
     public CreateTemplateController(
         ITemplateService templateService,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
@@ -42,17 +41,6 @@ public class CreateTemplateController : TemplateControllerBase
         _templateService = templateService;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
         _runtimeSettings = runtimeSettings;
-    }
-
-    [Obsolete("Use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
-    public CreateTemplateController(
-        ITemplateService templateService,
-        IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
-        : this(
-            templateService,
-            backOfficeSecurityAccessor,
-            StaticServiceProvider.Instance.GetRequiredService<IOptions<RuntimeSettings>>())
-    {
     }
 
     /// <summary>

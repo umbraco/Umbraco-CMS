@@ -81,11 +81,6 @@ internal sealed class DocumentPresentationFactory
     }
 
     /// <inheritdoc/>
-    [Obsolete("Use CreateItemResponseModelAsync instead. Scheduled for removal in Umbraco 19.")]
-    public DocumentItemResponseModel CreateItemResponseModel(IDocumentEntitySlim entity)
-        => CreateItemResponseModelAsync(entity).GetAwaiter().GetResult();
-
-    /// <inheritdoc/>
     public async Task<DocumentItemResponseModel> CreateItemResponseModelAsync(IDocumentEntitySlim entity)
     {
         Attempt<Guid> parentKeyAttempt = _idKeyMap.GetKeyForId(entity.ParentId, UmbracoObjectTypes.Document);

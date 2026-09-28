@@ -39,26 +39,6 @@ public class DocumentCollectionPresentationFactory : ContentCollectionPresentati
         _documentNavigationQueryService = documentNavigationQueryService;
     }
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="DocumentCollectionPresentationFactory"/> class.
-    /// </summary>
-    /// <param name="mapper">The Umbraco mapper instance used for mapping entities to presentation models.</param>
-    /// <param name="flagProviders">The collection of flag providers used to supply additional document flags.</param>
-    /// <param name="publicAccessService">The service used to manage public access permissions for documents.</param>
-    /// <param name="entityService">The service used to interact with Umbraco entities.</param>
-    /// <param name="userService">The service used to manage user information and permissions.</param>
-    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
-    public DocumentCollectionPresentationFactory(IUmbracoMapper mapper, FlagProviderCollection flagProviders, IPublicAccessService publicAccessService, IEntityService entityService, IUserService userService)
-        : this(
-            mapper,
-            flagProviders,
-            publicAccessService,
-            entityService,
-            userService,
-            StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>())
-    {
-    }
-
     /// <inheritdoc/>
     protected override INavigationQueryService? NavigationQueryService => _documentNavigationQueryService;
 

@@ -38,7 +38,6 @@ public class ConfigurationServerController : ServerControllerBase
     /// <param name="externalLoginProviders">The external login providers for back office.</param>
     /// <param name="hostingEnvironment">The hosting environment.</param>
     /// <param name="signalRSettings">The SignalR settings options.</param>
-    [ActivatorUtilitiesConstructor]
     public ConfigurationServerController(
         IOptions<SecuritySettings> securitySettings,
         IOptions<GlobalSettings> globalSettings,
@@ -51,36 +50,6 @@ public class ConfigurationServerController : ServerControllerBase
         _externalLoginProviders = externalLoginProviders;
         _hostingEnvironment = hostingEnvironment;
         _signalRSettings = signalRSettings.Value;
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Controllers.Server.ConfigurationServerController"/> class.
-    /// </summary>
-    /// <param name="securitySettings">The <see cref="SecuritySettings"/> options.</param>
-    /// <param name="globalSettings">The <see cref="GlobalSettings"/> options.</param>
-    /// <param name="externalLoginProviders">The external login providers used for back office authentication.</param>
-    /// <param name="hostingEnvironment">The hosting environment.</param>
-    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
-    public ConfigurationServerController(IOptions<SecuritySettings> securitySettings, IOptions<GlobalSettings> globalSettings, IBackOfficeExternalLoginProviders externalLoginProviders, IHostingEnvironment hostingEnvironment)
-        : this(
-            securitySettings,
-            globalSettings,
-            externalLoginProviders,
-            hostingEnvironment,
-            StaticServiceProvider.Instance.GetRequiredService<IOptions<SignalRSettings>>())
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Controllers.Server.ConfigurationServerController"/> class.
-    /// </summary>
-    /// <param name="securitySettings">The <see cref="SecuritySettings"/> options.</param>
-    /// <param name="globalSettings">The <see cref="GlobalSettings"/> options.</param>
-    /// <param name="externalLoginProviders">The external login providers used for back office authentication.</param>
-    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
-    public ConfigurationServerController(IOptions<SecuritySettings> securitySettings, IOptions<GlobalSettings> globalSettings, IBackOfficeExternalLoginProviders externalLoginProviders)
-        : this(securitySettings, globalSettings, externalLoginProviders, StaticServiceProvider.Instance.GetRequiredService<IHostingEnvironment>())
-    {
     }
 
     /// <summary>

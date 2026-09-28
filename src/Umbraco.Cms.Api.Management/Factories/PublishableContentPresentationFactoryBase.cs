@@ -47,15 +47,6 @@ internal abstract class PublishableContentPresentationFactoryBase<TEntity, TVari
     protected IUmbracoMapper UmbracoMapper { get; }
 
     /// <summary>
-    /// Creates variant item response models for an entity, including one per culture for culture-varying content.
-    /// </summary>
-    /// <param name="entity">The entity to create variant models for.</param>
-    /// <returns>The variant item response models.</returns>
-    [Obsolete("Use CreateVariantsItemResponseModelsAsync instead. Scheduled for removal in Umbraco 19.")]
-    public IEnumerable<TVariantItemResponseModel> CreateVariantsItemResponseModels(TEntity entity)
-        => CreateVariantsItemResponseModelsAsync(entity).GetAwaiter().GetResult();
-
-    /// <summary>
     /// Asynchronously creates variant item response models for an entity, including one per culture for culture-varying content.
     /// </summary>
     /// <param name="entity">The entity to create variant models for.</param>
@@ -103,16 +94,6 @@ internal abstract class PublishableContentPresentationFactoryBase<TEntity, TVari
         string name,
         PublishableVariantState state,
         string? culture);
-
-    /// <summary>
-    /// Populates flags on a model using all applicable flag providers.
-    /// </summary>
-    /// <typeparam name="TItem">The type of the model supporting flags.</typeparam>
-    /// <param name="model">The model to populate flags on.</param>
-    [Obsolete("Use PopulateFlagsAsync instead. Scheduled for removal in Umbraco 19.")]
-    protected void PopulateFlags<TItem>(TItem model)
-        where TItem : IHasFlags
-        => PopulateFlagsAsync(model).GetAwaiter().GetResult();
 
     /// <summary>
     /// Asynchronously populates flags on a model using all applicable flag providers.

@@ -25,23 +25,6 @@ public class DocumentBlueprintTreeControllerBase : FolderTreeControllerBase<Docu
 {
     private readonly IDocumentPresentationFactory _documentPresentationFactory;
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="DocumentBlueprintTreeControllerBase"/> class, providing required services for managing document blueprint trees.
-    /// </summary>
-    /// <param name="entityService">The service used to interact with entities in the system.</param>
-    /// <param name="flagProviders">A collection of providers that supply flags for entities.</param>
-    /// <param name="documentPresentationFactory">The factory responsible for creating document presentation models.</param>
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
-    public DocumentBlueprintTreeControllerBase(IEntityService entityService, FlagProviderCollection flagProviders, IDocumentPresentationFactory documentPresentationFactory)
-        : this(
-            entityService,
-            flagProviders,
-            StaticServiceProvider.Instance.GetRequiredService<IEntitySearchService>(),
-            StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>(),
-            documentPresentationFactory)
-    {
-    }
-
     public DocumentBlueprintTreeControllerBase(
         IEntityService entityService,
         FlagProviderCollection flagProviders,

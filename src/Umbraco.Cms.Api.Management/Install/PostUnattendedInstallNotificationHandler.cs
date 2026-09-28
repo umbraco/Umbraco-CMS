@@ -31,28 +31,6 @@ public class PostUnattendedInstallNotificationHandler : INotificationAsyncHandle
     /// <param name="userService">The user service.</param>
     /// <param name="serviceScopeFactory">The service scope factory.</param>
     /// <param name="metricsConsentService">The metrics consent service.</param>
-    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
-    public PostUnattendedInstallNotificationHandler(
-        IOptions<UnattendedSettings> unattendedSettings,
-        IUserService userService,
-        IServiceScopeFactory serviceScopeFactory,
-        IMetricsConsentService metricsConsentService)
-        : this(
-            unattendedSettings,
-            userService,
-            serviceScopeFactory,
-            metricsConsentService,
-            StaticServiceProvider.Instance.GetRequiredService<IHmacSecretKeyService>())
-    {
-    }
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="PostUnattendedInstallNotificationHandler" /> class.
-    /// </summary>
-    /// <param name="unattendedSettings">The unattended settings.</param>
-    /// <param name="userService">The user service.</param>
-    /// <param name="serviceScopeFactory">The service scope factory.</param>
-    /// <param name="metricsConsentService">The metrics consent service.</param>
     /// <param name="hmacSecretKeyService">The HMAC secret key service.</param>
     public PostUnattendedInstallNotificationHandler(
         IOptions<UnattendedSettings> unattendedSettings,

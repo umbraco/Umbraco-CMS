@@ -24,26 +24,9 @@ public class DocumentPermissionMapper : IPermissionPresentationMapper, IPermissi
     /// <summary>
     /// Initializes a new instance of the <see cref="DocumentPermissionMapper"/> class.
     /// </summary>
-    /// <param name="entityService">The entity service.</param>
-    /// <param name="userService">The user service.</param>
     /// <param name="contentPermissionService">The content permission service.</param>
-    // TODO (V19): Remove the entityService and userService parameters as they are not used in the current implementation.
-    public DocumentPermissionMapper(
-        Lazy<IEntityService> entityService,
-        Lazy<IUserService> userService,
-        Lazy<IContentPermissionService> contentPermissionService) => _contentPermissionService = contentPermissionService;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="DocumentPermissionMapper"/> class.
-    /// </summary>
-    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
-    public DocumentPermissionMapper(Lazy<IEntityService> entityService, Lazy<IUserService> userService)
-        : this(
-            entityService,
-            userService,
-            new Lazy<IContentPermissionService>(StaticServiceProvider.Instance.GetRequiredService<IContentPermissionService>))
-    {
-    }
+    public DocumentPermissionMapper(Lazy<IContentPermissionService> contentPermissionService)
+        => _contentPermissionService = contentPermissionService;
 
     /// <inheritdoc/>
     public string Context => DocumentGranularPermission.ContextType;

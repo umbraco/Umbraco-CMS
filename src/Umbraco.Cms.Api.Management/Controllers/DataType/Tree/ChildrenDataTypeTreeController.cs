@@ -5,6 +5,7 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Api.Management.Services.Entities;
 using Umbraco.Cms.Api.Management.Services.Flags;
 
 namespace Umbraco.Cms.Api.Management.Controllers.DataType.Tree;
@@ -15,8 +16,8 @@ namespace Umbraco.Cms.Api.Management.Controllers.DataType.Tree;
 [ApiVersion("1.0")]
 public class ChildrenDataTypeTreeController : DataTypeTreeControllerBase
 {
-    public ChildrenDataTypeTreeController(IEntityService entityService, FlagProviderCollection flagProviders, IDataTypeService dataTypeService)
-        : base(entityService, flagProviders, dataTypeService)
+    public ChildrenDataTypeTreeController(IEntityService entityService, FlagProviderCollection flagProviders, IEntitySearchService entitySearchService, IIdKeyMap idKeyMap, IDataTypeService dataTypeService)
+        : base(entityService, flagProviders, entitySearchService, idKeyMap, dataTypeService)
     {
     }
 

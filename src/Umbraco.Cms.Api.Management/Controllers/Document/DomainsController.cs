@@ -30,7 +30,6 @@ public class DomainsController : DocumentControllerBase
     /// </summary>
     /// <param name="domainService">Service used to manage domain-related operations.</param>
     /// <param name="umbracoMapper">The mapper used to map Umbraco objects to API models.</param>
-    [ActivatorUtilitiesConstructor]
     public DomainsController(IAuthorizationService authorizationService, IDomainService domainService, IUmbracoMapper umbracoMapper)
     {
         _authorizationService = authorizationService;

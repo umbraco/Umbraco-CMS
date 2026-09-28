@@ -24,6 +24,24 @@ public interface ITrackedReferencesService
     Task<Attempt<PagedModel<RelationItemModel>, GetReferencesOperationStatus>> GetPagedRelationsForItemAsync(Guid key, UmbracoObjectTypes objectType, long skip, long take, bool filterMustBeIsDependency);
 
     /// <summary>
+    ///     Gets a paged result of items which are in relation with the item identified by <paramref name="key" />,
+    ///     without verifying that an entity exists for the key.
+    /// </summary>
+    /// <param name="key">The identifier of the item to retrieve relations for.</param>
+    /// <param name="skip">The amount of items to skip</param>
+    /// <param name="take">The amount of items to take.</param>
+    /// <param name="filterMustBeIsDependency">
+    ///     A boolean indicating whether to filter only the RelationTypes which are
+    ///     dependencies (isDependency field is set to true).
+    /// </param>
+    /// <returns>A paged result of <see cref="RelationItemModel" /> objects.</returns>
+    /// <remarks>
+    ///     Use this for items that are related by key but are not entities, for example members held in an
+    ///     external store.
+    /// </remarks>
+    Task<PagedModel<RelationItemModel>> GetPagedRelationsForItemAsync(Guid key, long skip, long take, bool filterMustBeIsDependency);
+
+    /// <summary>
     ///     Gets a paged result of items which are in relation with an item in the recycle bin.
     /// </summary>
     /// <param name="objectType">The Umbraco object type that has recycle bin support (currently Document or Media).</param>

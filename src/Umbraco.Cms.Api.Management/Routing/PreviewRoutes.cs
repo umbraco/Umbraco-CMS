@@ -20,18 +20,6 @@ public sealed class PreviewRoutes : SignalRRoutesBase, IAreaRoutes
     /// Initializes a new instance of the <see cref="PreviewRoutes"/> class, configuring preview routing based on the application's runtime state.
     /// </summary>
     /// <param name="runtimeState">An instance representing the current runtime state of the Umbraco application.</param>
-    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
-    public PreviewRoutes(IRuntimeState runtimeState)
-        : this(
-            runtimeState,
-            StaticServiceProvider.Instance.GetRequiredService<IOptions<SignalRSettings>>())
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="PreviewRoutes"/> class, configuring preview routing based on the application's runtime state.
-    /// </summary>
-    /// <param name="runtimeState">An instance representing the current runtime state of the Umbraco application.</param>
     /// <param name="signalRSettings">The SignalR settings options.</param>
     public PreviewRoutes(IRuntimeState runtimeState, IOptions<SignalRSettings> signalRSettings)
         : base(runtimeState, signalRSettings)

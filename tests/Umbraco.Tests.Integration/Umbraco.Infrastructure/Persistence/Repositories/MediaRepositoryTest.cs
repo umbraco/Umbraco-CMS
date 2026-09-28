@@ -79,6 +79,7 @@ internal sealed class MediaRepositoryTest : UmbracoIntegrationTest
             mediaUrlGenerators,
             dataValueReferences,
             DataTypeService,
+            IdKeyMap,
             JsonSerializer,
             Mock.Of<IEventAggregator>(),
             Mock.Of<IRepositoryCacheVersionService>(),

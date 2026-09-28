@@ -20,26 +20,10 @@ public class SettingsInstallController : InstallControllerBase
     private readonly IUmbracoMapper _mapper;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="SettingsInstallController"/> class, responsible for handling installation settings operations in the Umbraco CMS API.
-    /// </summary>
-    /// <param name="installHelper">The <see cref="InstallHelper"/> instance used for installation logic.</param>
-    /// <param name="installSettingsFactory">The <see cref="IInstallSettingsFactory"/> instance used to create installation settings.</param>
-    /// <param name="mapper">The <see cref="IUmbracoMapper"/> instance used for mapping objects.</param>
-    [Obsolete("Please use the constructor without the InstallHelper parameter. Scheduled for removal in Umbraco 19.")]
-    public SettingsInstallController(
-        InstallHelper installHelper,
-        IInstallSettingsFactory installSettingsFactory,
-        IUmbracoMapper mapper)
-        : this(installSettingsFactory, mapper)
-    {
-    }
-
-    /// <summary>
     /// Initializes a new instance of the <see cref="SettingsInstallController"/> class.
     /// </summary>
     /// <param name="installSettingsFactory">An instance of <see cref="IInstallSettingsFactory"/> used to provide install settings.</param>
     /// <param name="mapper">An <see cref="IUmbracoMapper"/> used for object mapping.</param>
-    [ActivatorUtilitiesConstructor]
     public SettingsInstallController(
         IInstallSettingsFactory installSettingsFactory,
         IUmbracoMapper mapper)

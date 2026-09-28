@@ -44,11 +44,18 @@ public class TrackedReferencesService : ITrackedReferencesService
             return Task.FromResult(Attempt.FailWithStatus(GetReferencesOperationStatus.ContentNotFound, new PagedModel<RelationItemModel>()));
         }
 
+        return Task.FromResult(Attempt.SucceedWithStatus(GetReferencesOperationStatus.Success, GetPagedRelationsForItem(key, skip, take, filterMustBeIsDependency)));
+    }
+
+    /// <inheritdoc />
+    public Task<PagedModel<RelationItemModel>> GetPagedRelationsForItemAsync(Guid key, long skip, long take, bool filterMustBeIsDependency)
+        => Task.FromResult(GetPagedRelationsForItem(key, skip, take, filterMustBeIsDependency));
+
+    private PagedModel<RelationItemModel> GetPagedRelationsForItem(Guid key, long skip, long take, bool filterMustBeIsDependency)
+    {
         using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
         IEnumerable<RelationItemModel> items = _trackedReferencesRepository.GetPagedRelationsForItem(key, skip, take, filterMustBeIsDependency, out var totalItems);
-        var pagedModel = new PagedModel<RelationItemModel>(totalItems, items);
-
-        return Task.FromResult(Attempt.SucceedWithStatus(GetReferencesOperationStatus.Success, pagedModel));
+        return new PagedModel<RelationItemModel>(totalItems, items);
     }
 
     /// <inheritdoc />

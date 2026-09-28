@@ -25,17 +25,6 @@ public class DataTypeTreeControllerBase : FolderTreeControllerBase<DataTypeTreeI
 {
     private readonly IDataTypeService _dataTypeService;
 
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
-    public DataTypeTreeControllerBase(IEntityService entityService, FlagProviderCollection flagProviders, IDataTypeService dataTypeService)
-        : this(
-            entityService,
-            flagProviders,
-            StaticServiceProvider.Instance.GetRequiredService<IEntitySearchService>(),
-            StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>(),
-            dataTypeService)
-    {
-    }
-
     public DataTypeTreeControllerBase(
         IEntityService entityService,
         FlagProviderCollection flagProviders,

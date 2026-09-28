@@ -14,37 +14,14 @@ namespace Umbraco.Cms.Api.Management.Controllers.Stylesheet.Tree;
 [ApiVersion("1.0")]
 public class AncestorsStylesheetTreeController : StylesheetTreeControllerBase
 {
-    // TODO Remove the static service provider, and replace with base when the other constructors are obsoleted.
     /// <summary>
     /// Initializes a new instance of the <see cref="AncestorsStylesheetTreeController"/> class.
     /// </summary>
     /// <param name="styleSheetTreeService">
     /// The service used to manage and retrieve stylesheet tree data.
     /// </param>
-    [ActivatorUtilitiesConstructor]
     public AncestorsStylesheetTreeController(IStyleSheetTreeService styleSheetTreeService)
         : base(styleSheetTreeService)
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Controllers.Stylesheet.Tree.AncestorsStylesheetTreeController"/> class.
-    /// </summary>
-    /// <param name="styleSheetTreeService">Service for managing stylesheet tree operations.</param>
-    /// <param name="fileSystems">Provides access to file system abstractions.</param>
-    [Obsolete("Please use the constructor taking all parameters. Scheduled to be removed in Umbraco 19.")]
-    public AncestorsStylesheetTreeController(IStyleSheetTreeService styleSheetTreeService, FileSystems fileSystems)
-        : base(styleSheetTreeService, fileSystems)
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="AncestorsStylesheetTreeController"/> class with the specified file systems.
-    /// </summary>
-    /// <param name="fileSystems">An instance of <see cref="FileSystems"/> to be used by the controller.</param>
-    [Obsolete("Please use the constructor taking all parameters. Scheduled to be removed in Umbraco 19.")]
-    public AncestorsStylesheetTreeController(FileSystems fileSystems)
-        : base(fileSystems)
     {
     }
 

@@ -19,36 +19,12 @@ public class ItemMemberItemController : MemberItemControllerBase
 {
     private readonly IMemberPresentationService _memberPresentationService;
 
-    // TODO (V19): Remove the unnecessary parameters provided to the constructor.
-
     /// <summary>
     /// Initializes a new instance of the <see cref="ItemMemberItemController"/> class.
     /// </summary>
-    /// <param name="entityService">Service used for entity operations and retrieval.</param>
-    /// <param name="memberPresentationFactory">Factory responsible for creating member presentation models.</param>
     /// <param name="memberPresentationService">Service for resolving members across both content and external stores.</param>
-    [ActivatorUtilitiesConstructor]
-    public ItemMemberItemController(
-        IEntityService entityService,
-        IMemberPresentationFactory memberPresentationFactory,
-        IMemberPresentationService memberPresentationService)
-    {
-        _memberPresentationService = memberPresentationService;
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ItemMemberItemController"/> class.
-    /// </summary>
-    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
-    public ItemMemberItemController(
-        IEntityService entityService,
-        IMemberPresentationFactory memberPresentationFactory)
-        : this(
-            entityService,
-            memberPresentationFactory,
-            StaticServiceProvider.Instance.GetRequiredService<IMemberPresentationService>())
-    {
-    }
+    public ItemMemberItemController(IMemberPresentationService memberPresentationService)
+        => _memberPresentationService = memberPresentationService;
 
     [HttpGet]
     [MapToApiVersion("1.0")]

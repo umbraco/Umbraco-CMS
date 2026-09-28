@@ -24,26 +24,11 @@ public class PrivateManifestManifestController : ManifestControllerBase
     private readonly IBackOfficePathGenerator _backOfficePathGenerator;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="PrivateManifestManifestController"/> class.
-    /// </summary>
-    /// <param name="packageManifestService">The service used to manage package manifests.</param>
-    /// <param name="umbracoMapper">The mapper used for mapping Umbraco objects.</param>
-    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
-    public PrivateManifestManifestController(IPackageManifestService packageManifestService, IUmbracoMapper umbracoMapper)
-        : this(
-            packageManifestService,
-            umbracoMapper,
-            StaticServiceProvider.Instance.GetRequiredService<IBackOfficePathGenerator>())
-    {
-    }
-
-    /// <summary>
     /// Initializes a new instance of the <see cref="PrivateManifestManifestController"/> class, which manages private package manifests in the Umbraco back office.
     /// </summary>
     /// <param name="packageManifestService">The service used to manage package manifests.</param>
     /// <param name="umbracoMapper">The mapper used for Umbraco object mapping.</param>
     /// <param name="backOfficePathGenerator">The generator for back office paths.</param>
-    [ActivatorUtilitiesConstructor]
     public PrivateManifestManifestController(
         IPackageManifestService packageManifestService,
         IUmbracoMapper umbracoMapper,

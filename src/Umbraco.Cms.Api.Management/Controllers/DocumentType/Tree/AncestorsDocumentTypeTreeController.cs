@@ -1,6 +1,7 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Api.Management.Services.Entities;
 using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core.Services;
@@ -17,10 +18,12 @@ public class AncestorsDocumentTypeTreeController : DocumentTypeTreeControllerBas
     /// Initializes a new instance of the <see cref="AncestorsDocumentTypeTreeController"/> class, which manages operations related to ancestor document types in the tree structure.
     /// </summary>
     /// <param name="entityService">Service used for entity operations within the Umbraco CMS.</param>
+    /// <param name="entitySearchService">The <see cref="IEntitySearchService"/> used to search entities.</param>
+    /// <param name="idKeyMap">The <see cref="IIdKeyMap"/> used to map between identifiers and keys.</param>
     /// <param name="flagProviders">A collection of flag providers used to determine additional metadata or state for entities.</param>
     /// <param name="contentTypeService">Service used for managing content types in the CMS.</param>
-    public AncestorsDocumentTypeTreeController(IEntityService entityService, FlagProviderCollection flagProviders, IContentTypeService contentTypeService)
-        : base(entityService, flagProviders, contentTypeService)
+    public AncestorsDocumentTypeTreeController(IEntityService entityService, FlagProviderCollection flagProviders, IEntitySearchService entitySearchService, IIdKeyMap idKeyMap, IContentTypeService contentTypeService)
+        : base(entityService, flagProviders, entitySearchService, idKeyMap, contentTypeService)
     {
     }
 

@@ -40,7 +40,6 @@ public class UpdateUserGroupsUserController : UserGroupControllerBase
     /// </summary>
     /// <param name="authorizationService">Service used to authorize user group update operations.</param>
     /// <param name="userGroupService">Service used to manage user group data and operations.</param>
-    [ActivatorUtilitiesConstructor]
     public UpdateUserGroupsUserController(
         IAuthorizationService authorizationService,
         IUserGroupService userGroupService,
@@ -49,15 +48,6 @@ public class UpdateUserGroupsUserController : UserGroupControllerBase
         _authorizationService = authorizationService;
         _userGroupService = userGroupService;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
-    }
-
-    [Obsolete("Please use the constructor accepting all parameters. Scheduled for removal in Umbraco 19.")]
-    public UpdateUserGroupsUserController(IAuthorizationService authorizationService, IUserGroupService userGroupService)
-        : this(
-            authorizationService,
-            userGroupService,
-            StaticServiceProvider.Instance.GetRequiredService<IBackOfficeSecurityAccessor>())
-    {
     }
 
     /// <summary>
