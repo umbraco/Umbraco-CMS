@@ -11,8 +11,7 @@ export const manifest: ManifestPropertyEditorSchema = {
 			properties: [
 				{
 					alias: 'blocks',
-					label: 'Blocks',
-					description: 'Define Blocks based on Element Types.',
+					label: 'Available Blocks',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.BlockGridTypeConfiguration',
 				},
 				{
@@ -22,12 +21,6 @@ export const manifest: ManifestPropertyEditorSchema = {
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.NumberRange',
 					config: [{ alias: 'validationRange', value: { min: 0, max: Infinity } }],
 					weight: 100,
-				},
-			],
-			defaultData: [
-				{
-					alias: 'gridColumns',
-					value: 12,
 				},
 			],
 		},
