@@ -376,11 +376,7 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 	}
 
 	#publishableVariantsFilter = (option: UmbElementVariantOptionModel) => {
-		const variantId = UmbVariantId.Create(option);
-		// If the read only guard is permitted it means the variant is read only
-		const isReadOnly = this.#elementWorkspaceContext!.readOnlyGuard.getIsPermittedForVariant(variantId);
-		// If the variant is read only, we can't publish it
-		return !isReadOnly;
+		return this.#elementWorkspaceContext!.getIsVariantWritable(UmbVariantId.Create(option));
 	};
 
 	async #determineVariantOptions(): Promise<{
@@ -398,10 +394,8 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 		// Selected can contain entries that are not part of the options, therefor filter based on options.
 		selected = selected.filter((x) => options.some((o) => o.unique === x));
 
-		// Filter out read-only variants
-		selected = selected.filter(
-			(x) => this.#elementWorkspaceContext!.readOnlyGuard.getIsPermittedForVariant(new UmbVariantId(x)) === false,
-		);
+		// Filter out variants that cannot be written
+		selected = selected.filter((x) => this.#elementWorkspaceContext!.getIsVariantWritable(new UmbVariantId(x)));
 
 		return {
 			options,

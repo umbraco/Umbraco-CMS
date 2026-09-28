@@ -9,6 +9,7 @@ import type { UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type'
 
 const READ_ONLY_RULE_PREFIX = 'UMB_LANGUAGE_PERMISSION_';
 const PROPERTY_WRITE_RULE_PREFIX = 'UMB_LANGUAGE_PERMISSION_PROPERTY_';
+const VARIANT_WRITE_RULE_PREFIX = 'UMB_LANGUAGE_PERMISSION_VARIANT_';
 
 export class UmbLanguageAccessWorkspaceContext extends UmbContextBase {
 	#workspaceContext?: typeof UMB_CONTENT_WORKSPACE_CONTEXT.TYPE;
@@ -74,6 +75,15 @@ export class UmbLanguageAccessWorkspaceContext extends UmbContextBase {
 		// switching between "has invariant access" and "no invariant access" leaves no orphaned rules
 		this.#clearPreviousRules();
 
+		// Regardless of invariant access, a culture the user has no access to must never be saved or published.
+		const variantWriteRules = datasetVariantIds.map((variantId) => ({
+			unique: VARIANT_WRITE_RULE_PREFIX + variantId.toString(),
+			variantId,
+			permitted: false,
+			message: 'You do not have permission to edit this culture',
+		}));
+		this.#workspaceContext.variantWriteGuard?.addRules(variantWriteRules);
+
 		if (this.#currentUserHasAccessToInvariantForVariant) {
 			// The user is allowed to edit invariant (shared) property data on variant content. Don't
 			// lock the whole dataset read-only — that would cascade down to invariant properties via
@@ -122,6 +132,12 @@ export class UmbLanguageAccessWorkspaceContext extends UmbContextBase {
 			(culture) => this.#contentTypeProperties?.map((prop) => this.#propertyRuleUnique(culture, prop.unique)) ?? [],
 		);
 		this.#workspaceContext?.propertyWriteGuard?.removeRules(propertyIdentifiers);
+
+		const variantWriteIdentifiers =
+			this.#variantOptions?.map(
+				(variant) => VARIANT_WRITE_RULE_PREFIX + new UmbVariantId(variant.culture, variant.segment).toString(),
+			) ?? [];
+		this.#workspaceContext?.variantWriteGuard?.removeRules(variantWriteIdentifiers);
 	}
 
 	#propertyRuleUnique(culture: string | null | undefined, propertyUnique: string) {
