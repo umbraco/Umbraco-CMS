@@ -27,6 +27,9 @@ export class UmbUserGroupDetailsWorkspaceViewElement extends UmbLitElement imple
 	private _hasAccessToAllLanguages: UmbUserGroupDetailModel['hasAccessToAllLanguages'] = false;
 
 	@state()
+	private _hasAccessToInvariantForVariant: UmbUserGroupDetailModel['hasAccessToInvariantForVariant'] = true;
+
+	@state()
 	private _documentStartNode?: UmbUserGroupDetailModel['documentStartNode'];
 
 	@state()
@@ -63,6 +66,12 @@ export class UmbUserGroupDetailsWorkspaceViewElement extends UmbLitElement imple
 			this.#workspaceContext?.hasAccessToAllLanguages,
 			(value) => (this._hasAccessToAllLanguages = value ?? false),
 			'_observeHasAccessToAllLanguages',
+		);
+
+		this.observe(
+			this.#workspaceContext?.hasAccessToInvariantForVariant,
+			(value) => (this._hasAccessToInvariantForVariant = value ?? true),
+			'_observeHasAccessToInvariantForVariant',
 		);
 
 		this.observe(
@@ -114,6 +123,13 @@ export class UmbUserGroupDetailsWorkspaceViewElement extends UmbLitElement imple
 		const target = event.target;
 		// TODO make contexts method
 		this.#workspaceContext?.updateProperty('hasAccessToAllLanguages', target.checked);
+	}
+
+	#onAllowInvariantForVariantChange(event: UUIBooleanInputEvent) {
+		event.stopPropagation();
+		const target = event.target;
+		// TODO make contexts method
+		this.#workspaceContext?.updateProperty('hasAccessToInvariantForVariant', target.checked);
 	}
 
 	#onLanguagePermissionChange(event: UmbChangeEvent) {
@@ -194,8 +210,8 @@ export class UmbUserGroupDetailsWorkspaceViewElement extends UmbLitElement imple
 								@change=${this.#onSectionsChange}></umb-input-section>
 						</umb-property-layout>
 
-						${this.#renderLanguageAccess()} ${this.#renderDocumentAccess()} ${this.#renderMediaAccess()}
-						${this.#renderElementAccess()}
+						${this.#renderLanguageAccess()} ${this.#renderInvariantForVariantAccess()} ${this.#renderDocumentAccess()}
+						${this.#renderMediaAccess()} ${this.#renderElementAccess()}
 					</uui-box>
 
 					${this.#renderPermissionGroups()}
@@ -225,6 +241,21 @@ export class UmbUserGroupDetailsWorkspaceViewElement extends UmbLitElement imple
 								@change=${this.#onLanguagePermissionChange}></umb-input-language>
 						`,
 					)}
+				</div>
+			</umb-property-layout>
+		`;
+	}
+
+	#renderInvariantForVariantAccess() {
+		return html`
+			<umb-property-layout
+				label=${this.localize.term('user_allowAccessToInvariantForVariant')}
+				description=${this.localize.term('user_invariantForVariantHelp')}>
+				<div slot="editor">
+					<uui-toggle
+						label=${this.localize.term('user_allowAccessToInvariantForVariant')}
+						.checked=${this._hasAccessToInvariantForVariant}
+						@change=${this.#onAllowInvariantForVariantChange}></uui-toggle>
 				</div>
 			</umb-property-layout>
 		`;

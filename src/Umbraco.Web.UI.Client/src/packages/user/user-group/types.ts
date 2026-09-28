@@ -11,6 +11,7 @@ export interface UmbUserGroupDetailModel {
 	entityType: UmbUserGroupEntityType;
 	fallbackPermissions: Array<string>;
 	hasAccessToAllLanguages: boolean;
+	hasAccessToInvariantForVariant: boolean;
 	icon: string | null;
 	isDeletable: boolean;
 	languages: Array<string>;

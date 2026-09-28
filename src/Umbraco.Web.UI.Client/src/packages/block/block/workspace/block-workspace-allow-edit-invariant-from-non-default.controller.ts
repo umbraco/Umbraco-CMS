@@ -1,13 +1,15 @@
-import type { UmbDocumentVariantModel } from '../types.js';
-import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../constants.js';
-import { UmbDocumentAllowEditInvariantFromNonDefaultControllerBase } from './document-allow-edit-invariant-from-non-default-controller-base.js';
+import { UMB_BLOCK_MANAGER_CONTEXT } from '../context/block-manager.context-token.js';
+import { UMB_BLOCK_WORKSPACE_CONTEXT } from './block-workspace.context-token.js';
 import type { UmbVariantPropertyGuardManager } from '@umbraco-cms/backoffice/property';
 import { UMB_PROPERTY_CONTEXT_FOR_CULTURE_VARIANT } from '@umbraco-cms/backoffice/property';
-import { UMB_BLOCK_WORKSPACE_CONTEXT, UMB_BLOCK_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/block';
+import {
+	UMB_CONTENT_WORKSPACE_CONTEXT,
+	UmbContentAllowEditInvariantFromNonDefaultControllerBase,
+} from '@umbraco-cms/backoffice/content';
 import { UmbVariantId, type UmbEntityVariantOptionModel } from '@umbraco-cms/backoffice/variant';
 import { observeMultiple, type Observable } from '@umbraco-cms/backoffice/observable-api';
 
-export class UmbDocumentBlockWorkspaceAllowEditInvariantFromNonDefaultController extends UmbDocumentAllowEditInvariantFromNonDefaultControllerBase {
+export class UmbBlockWorkspaceAllowEditInvariantFromNonDefaultController extends UmbContentAllowEditInvariantFromNonDefaultControllerBase {
 	protected async _preventEditInvariantFromNonDefault() {
 		//
 		const varyingProperty = await this.getContext(UMB_PROPERTY_CONTEXT_FOR_CULTURE_VARIANT, {
@@ -18,13 +20,12 @@ export class UmbDocumentBlockWorkspaceAllowEditInvariantFromNonDefaultController
 			return;
 		}
 
-		const documentWorkspaceContext = await this.getContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, {
+		const contentWorkspaceContext = await this.getContext(UMB_CONTENT_WORKSPACE_CONTEXT, {
 			passContextAliasMatches: true,
-		});
+		}).catch(() => undefined);
 
-		if (!documentWorkspaceContext) {
-			throw new Error('Missing Document Workspace Context');
-		}
+		// Blocks are not necessarily hosted by a content workspace, in which case there is no variant content to guard.
+		if (!contentWorkspaceContext) return;
 
 		const blockWorkspace = await this.getContext(UMB_BLOCK_WORKSPACE_CONTEXT);
 		if (!blockWorkspace) {
@@ -36,12 +37,14 @@ export class UmbDocumentBlockWorkspaceAllowEditInvariantFromNonDefaultController
 		// Existing rules for variant blocks (where datasetVariantId matches the viewing language)
 		this._observeAndApplyRule({
 			propertiesObservable: blockWorkspace.content.structure.contentTypeProperties,
-			variantOptionsObservable: documentWorkspaceContext.variantOptions,
+			variantOptionsObservable: contentWorkspaceContext.variantOptions,
+			variesByCultureObservable: contentWorkspaceContext.structure.variesByCulture,
 			propertyWriteGuard: blockWorkspace.content.propertyWriteGuard,
 		});
 		this._observeAndApplyRule({
 			propertiesObservable: blockWorkspace.settings.structure.contentTypeProperties,
-			variantOptionsObservable: documentWorkspaceContext.variantOptions,
+			variantOptionsObservable: contentWorkspaceContext.variantOptions,
+			variesByCultureObservable: contentWorkspaceContext.structure.variesByCulture,
 			propertyWriteGuard: blockWorkspace.settings.propertyWriteGuard,
 		});
 
@@ -60,13 +63,15 @@ export class UmbDocumentBlockWorkspaceAllowEditInvariantFromNonDefaultController
 		this.#applyRuleForInvariantBlocks(
 			blockManager.variantId,
 			blockWorkspace.content.structure.variesByCulture,
-			documentWorkspaceContext.variantOptions,
+			contentWorkspaceContext.structure.variesByCulture,
+			contentWorkspaceContext.variantOptions,
 			blockWorkspace.content.propertyWriteGuard,
 		);
 		this.#applyRuleForInvariantBlocks(
 			blockManager.variantId,
 			blockWorkspace.settings.structure.variesByCulture,
-			documentWorkspaceContext.variantOptions,
+			contentWorkspaceContext.structure.variesByCulture,
+			contentWorkspaceContext.variantOptions,
 			blockWorkspace.settings.propertyWriteGuard,
 		);
 	}
@@ -80,21 +85,23 @@ export class UmbDocumentBlockWorkspaceAllowEditInvariantFromNonDefaultController
 	#applyRuleForInvariantBlocks(
 		managerVariantId: Observable<UmbVariantId | undefined>,
 		variesByCulture: Observable<boolean | undefined>,
-		variantOptions: Observable<UmbEntityVariantOptionModel<UmbDocumentVariantModel>[]>,
+		ownerVariesByCulture: Observable<boolean | undefined>,
+		variantOptions: Observable<Array<UmbEntityVariantOptionModel>>,
 		propertyWriteGuard: UmbVariantPropertyGuardManager,
 	) {
 		this.observe(
-			observeMultiple([managerVariantId, variesByCulture, variantOptions]),
-			([managerVariantId, variesByCulture, variantOptions]) => {
+			observeMultiple([managerVariantId, variesByCulture, ownerVariesByCulture, variantOptions]),
+			([managerVariantId, variesByCulture, ownerVariesByCulture, variantOptions]) => {
 				// Only apply for invariant element types (blocks that don't vary by culture)
 				if (variesByCulture !== false) return;
 				if (!managerVariantId || !variantOptions.length) return;
 
-				// Check if we're viewing a non-default language
-				const currentOption = variantOptions.find((v) => v.culture === managerVariantId.culture);
-				if (!currentOption || currentOption.language.isDefault) return;
+				// If the owning content itself doesn't vary by culture, there is no "non-default language"
+				// to view from - the invariant-for-variant permission is meaningless here and must not restrict it.
+				if (ownerVariesByCulture === false) return;
 
-				// Add rule for invariant datasetVariantId
+				// The user lacks the invariant-for-variant permission, so apply the rule for invariant
+				// blocks regardless of which variant tab is being viewed (default language included).
 				const rule = this._createRule({ datasetVariantId: UmbVariantId.CreateInvariant() });
 				propertyWriteGuard.addRule(rule);
 			},
@@ -102,4 +109,4 @@ export class UmbDocumentBlockWorkspaceAllowEditInvariantFromNonDefaultController
 	}
 }
 
-export { UmbDocumentBlockWorkspaceAllowEditInvariantFromNonDefaultController as api };
+export { UmbBlockWorkspaceAllowEditInvariantFromNonDefaultController as api };

@@ -1,3 +1,4 @@
+export * from './allow-edit-invariant-from-non-default/index.js';
 export * from './audit-log/index.js';
 export * from './collection/index.js';
 export * from './components/index.js';

@@ -63,6 +63,18 @@ export const manifests: Array<UmbExtensionManifest> = [
 		},
 	},
 	{
+		type: 'workspaceContext',
+		alias: 'Umb.WorkspaceContext.Block.AllowEditInvariantFromNonDefault',
+		name: 'Allow Edit Invariant From NonDefault Block Controller',
+		api: () => import('./block-workspace-allow-edit-invariant-from-non-default.controller.js'),
+		conditions: [
+			{
+				alias: UMB_WORKSPACE_CONDITION_ALIAS,
+				match: UMB_BLOCK_WORKSPACE_ALIAS,
+			},
+		],
+	},
+	{
 		type: 'workspaceView',
 		alias: UMB_BLOCK_WORKSPACE_VIEW_CONTENT,
 		name: 'Block Workspace Content View',

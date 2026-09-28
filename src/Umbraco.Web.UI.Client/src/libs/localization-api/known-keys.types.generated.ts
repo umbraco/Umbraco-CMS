@@ -2497,6 +2497,7 @@ declare global {
 		user_allowAccessToAllElements: string;
 		user_allowAccessToAllLanguages: string;
 		user_allowAccessToAllMedia: string;
+		user_allowAccessToInvariantForVariant: string;
 		user_andMore: string;
 		user_assignAccess: string;
 		user_avatarDeleteSuccess: string;
@@ -2537,6 +2538,7 @@ declare global {
 		user_granularRightsDescription: string;
 		user_granularRightsLabel: string;
 		user_groupsHelp: string;
+		user_invariantForVariantHelp: string;
 		user_invite: string;
 		user_inviteAnotherUser: string;
 		user_inviteUser: string;
