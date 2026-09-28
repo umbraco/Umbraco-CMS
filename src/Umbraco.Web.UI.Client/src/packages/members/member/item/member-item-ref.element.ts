@@ -5,9 +5,9 @@ import type { UmbMemberItemModel } from './repository/types.js';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { customElement, html, ifDefined, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { umbGenerateWorkspaceLink, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
+import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS } from '@umbraco-cms/backoffice/section';
-import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
+import { UMB_WORKSPACE_MODAL, umbGenerateWorkspaceLink } from '@umbraco-cms/backoffice/workspace';
 
 @customElement('umb-member-item-ref')
 export class UmbMemberItemRefElement extends UmbLitElement {
