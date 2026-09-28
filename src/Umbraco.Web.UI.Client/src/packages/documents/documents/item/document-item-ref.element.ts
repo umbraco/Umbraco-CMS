@@ -12,9 +12,10 @@ import { UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS } from '@umbraco-cms/backof
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import type { UUISelectableEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbDeselectedEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
+import { UmbEntityItemRefFrameMixin } from '@umbraco-cms/backoffice/entity-item';
 
 @customElement('umb-document-item-ref')
-export class UmbDocumentItemRefElement extends UmbLitElement {
+export class UmbDocumentItemRefElement extends UmbEntityItemRefFrameMixin(UmbLitElement) {
 	#item = new UmbDocumentItemDataResolver<UmbDocumentItemModel>(this);
 
 	@property({ type: Object })
@@ -104,6 +105,10 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 		this.#item.observe(this.#item.isDraft, (isDraft) => (this._isDraft = isDraft ?? false));
 	}
 
+	protected override get isEntityFrameNavigable() {
+		return !this.readonly && this._userHasSectionAccess && !!this._unique;
+	}
+
 	#getLink() {
 		if (!this._unique) return;
 		return umbGenerateWorkspaceLink({
@@ -145,7 +150,7 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 				${this.#renderIcon()}${this.#renderIsDraft()} ${this.#renderIsTrashed()}
 				${this._ancestorPath ? html`<span slot="detail" class="ancestor-path">${this._ancestorPath}</span>` : nothing}
 			</uui-ref-node>
-			<umb-entity-frame><uui-icon name="link"></uui-icon> ${this._name}</umb-entity-frame>
+			${this.renderEntityFrame(this._name)}
 		`;
 	}
 
@@ -164,22 +169,9 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 		return html`<uui-tag size="s" slot="tag" look="secondary" color="default">Draft</uui-tag>`;
 	}
 
-	static override styles = [
+	static override readonly styles = [
+		...super.styles,
 		css`
-			:host {
-				--umb-entity-frame-opacity: 0;
-				--umb-entity-frame-color: var(--umb-color-reference);
-				--umb-entity-frame-contrast-color: var(--umb-color-reference-contrast);
-
-				display: block;
-				position: relative;
-			}
-
-			:host(:hover),
-			:host(:focus-within) {
-				--umb-entity-frame-opacity: 1;
-			}
-
 			.ancestor-path {
 				display: block;
 				overflow: hidden;
