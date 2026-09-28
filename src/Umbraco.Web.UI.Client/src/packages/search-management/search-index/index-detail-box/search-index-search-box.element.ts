@@ -137,19 +137,19 @@ export class UmbSearchIndexSearchBoxElement extends UmbLitElement {
 			});
 
 		this.consumeContext(UMB_SEARCH_WORKSPACE_CONTEXT, (workspaceContext) => {
-			if (!workspaceContext) return;
 			this.#workspaceContext = workspaceContext;
 
 			// Seed culture from URL params or app default (URL takes precedence)
 			const initialCulture = this.#urlCulture ?? this.#defaultAppCulture;
-			if (initialCulture && !workspaceContext.getSelectedCulture()) {
-				workspaceContext.setSelectedCulture(initialCulture);
+			if (initialCulture && !workspaceContext?.getSelectedCulture()) {
+				workspaceContext?.setSelectedCulture(initialCulture);
 			}
 
 			// Trigger search when both alias and culture are ready on the workspace context
 			this.observe(
-				observeMultiple([workspaceContext.name, workspaceContext.selectedCulture]),
-				([alias, culture]) => {
+				workspaceContext ? observeMultiple([workspaceContext.name, workspaceContext.selectedCulture]) : undefined,
+				(values) => {
+					const [alias, culture] = values ?? [];
 					this._indexAlias = alias ?? undefined;
 					this._selectedCulture = culture;
 					if (alias && culture) {
@@ -163,19 +163,17 @@ export class UmbSearchIndexSearchBoxElement extends UmbLitElement {
 		});
 
 		this.consumeContext(UMB_APP_LANGUAGE_CONTEXT, (languageContext) => {
-			if (!languageContext) return;
-
 			this.observe(
-				languageContext.languages,
+				languageContext?.languages,
 				(languages) => {
-					this._languages = languages;
-					this._hasMultipleLanguages = languages.length > 1;
+					this._languages = languages ?? [];
+					this._hasMultipleLanguages = this._languages.length > 1;
 				},
 				'_observeLanguages',
 			);
 
 			this.observe(
-				languageContext.appLanguageCulture,
+				languageContext?.appLanguageCulture,
 				(culture) => {
 					this.#defaultAppCulture = culture;
 					// If workspace context is ready and no culture set yet, apply default
