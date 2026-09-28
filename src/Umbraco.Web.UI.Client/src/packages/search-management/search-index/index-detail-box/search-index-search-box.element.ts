@@ -2,8 +2,9 @@ import { UmbSearchQueryRepository } from '../query/search-query.repository.js';
 import type { UmbSearchRequest, UmbSearchResult, UmbHealthStatusModel } from '../types.js';
 import { UMB_SEARCH_WORKSPACE_CONTEXT } from '../workspace/search-workspace.context-token.js';
 import { UMB_SEARCH_DOCUMENT_ENTITY_TYPE } from '../constants.js';
+import type { ManifestSearchIndexDetailBox } from './types.js';
 
-import { css, customElement, html, nothing, state, when } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing, property, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -19,6 +20,9 @@ const PAGE_SIZE = 10;
 
 @customElement('umb-search-index-search-box')
 export class UmbSearchIndexSearchBoxElement extends UmbLitElement {
+	@property({ type: Object, attribute: false })
+	public manifest?: ManifestSearchIndexDetailBox;
+
 	#workspaceContext?: typeof UMB_SEARCH_WORKSPACE_CONTEXT.TYPE;
 	#queryRepository = new UmbSearchQueryRepository(this);
 	#inputValue = ''; // Non-reactive property for input value
@@ -247,8 +251,11 @@ export class UmbSearchIndexSearchBoxElement extends UmbLitElement {
 	}
 
 	override render() {
+		const headline = this.manifest?.meta?.label
+			? this.localize.string(this.manifest.meta.label)
+			: (this.manifest?.name ?? '');
 		return html`
-			<uui-box headline=${this.localize.term('searchManagement_searchBox')}>
+			<uui-box headline=${headline}>
 				<div
 					class="search-container"
 					role="search"
