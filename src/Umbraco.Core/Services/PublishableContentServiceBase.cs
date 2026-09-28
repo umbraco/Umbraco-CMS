@@ -1337,7 +1337,9 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
 
                         // publish the culture values and validate the property values, if validation fails, log the invalid properties so the develeper has an idea of what has failed
                         IProperty[]? invalidProperties = null;
-                        // TODO KJA: hardcoding allowEditInvariantForVariant as true works for now, but will need replacing with an opt-in for including invariant-for-variant per scheduled culture
+
+                        // NOTE: hardcoding allowEditInvariantForVariant as true works for now, but it will need replacing if we ever introduce
+                        //       "invariance as opt-in" for save/publish/schedule operations.
                         CultureImpact impact = _cultureImpactFactory.ImpactExplicit(culture, includeInvariantForVariant: true);
                         var tryPublish = d.PublishCulture(impact, date, _propertyEditorCollection) &&
                                          _propertyValidationService.Value.IsPropertyDataValid(d, out invalidProperties, impact);
