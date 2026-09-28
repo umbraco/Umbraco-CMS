@@ -373,9 +373,6 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		// Load the content type structure, usually this comes from the data, but in this case we are making the data, and we need this to be able to complete the data. [NL]
 		await this.structure.loadType(contentTypeUnique);
 
-		// Load segments if varying by segment, or reset to empty array:
-		// TODO: HOW?
-
 		const propertyTypes = await this.structure.getContentTypeProperties();
 		const contentTypeVariesByCulture = this.structure.getVariesByCulture();
 		const contentTypeVariesBySegment = this.structure.getVariesBySegment();
@@ -404,6 +401,8 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		);
 
 		const controller = new UmbPropertyValuePresetVariantBuilderController(this);
+
+		// TODO: Let´s make sure we have all the various variant options available at this point... [NL]
 
 		const variantOptions = (await firstValueFrom(this.variantOptions)).map(
 			(o) => new UmbVariantId(o.culture, o.segment),
