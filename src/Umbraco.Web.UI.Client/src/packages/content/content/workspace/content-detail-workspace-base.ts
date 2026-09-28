@@ -7,12 +7,14 @@ import type { UmbContentPropertyDatasetContext } from '../property-dataset-conte
 import type { UmbContentValidationRepository } from '../repository/content-validation-repository.interface.js';
 import type { UmbContentCollectionWorkspaceContext } from '../collection/content-collection-workspace-context.interface.js';
 import { UmbEntryDataValueVariantsController } from '../controller/entry-data-value-variants.controller.js';
+import { umbEntryAppendValue } from '../utils/index.js';
+import { UmbContentVariantOptionsManager } from '../manager/content-variant-options-manager.js';
 import type { UmbContentWorkspaceContext } from './content-workspace-context.interface.js';
 import { UmbContentDetailValidationPathTranslator } from './content-detail-validation-path-translator.js';
 import { UmbContentValidationToHintsManager } from './content-validation-to-hints.manager.js';
 import { UmbContentDetailWorkspaceTypeTransformController } from './content-detail-workspace-type-transform.controller.js';
 import { mergeObservables, observeMultiple, UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
-import { firstValueFrom, map } from '@umbraco-cms/backoffice/external/rxjs';
+import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UmbContentTypeStructureManager } from '@umbraco-cms/backoffice/content-type';
 import { UmbDataTypeItemRepositoryManager } from '@umbraco-cms/backoffice/data-type';
@@ -62,8 +64,6 @@ import type {
 import type { UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
 import type { UmbPropertyTypePresetModel, UmbPropertyTypePresetModelTypeModel } from '@umbraco-cms/backoffice/property';
 import type { UmbModalToken } from '@umbraco-cms/backoffice/modal';
-import type { UmbSegmentModel } from '@umbraco-cms/backoffice/segment';
-import { umbEntryAppendValue } from '../utils/index.js';
 
 export interface UmbContentDetailWorkspaceContextArgs<
 	DetailModelType extends UmbContentDetailModel<VariantModelType>,
@@ -180,7 +180,17 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		return this.#languages.getValue();
 	}
 
-	protected readonly _segments = new UmbArrayState<UmbSegmentModel>([], (x) => x.alias);
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	protected _variantOptionsFilter = (variantOption: VariantOptionModelType) => true;
+
+	public readonly variantOptionsManager = new UmbContentVariantOptionsManager<VariantModelType, VariantOptionModelType>(
+		this,
+		this.varyByCulture,
+		this.varyBySegments,
+		this.variants,
+		this.languages,
+	);
+	public readonly variantOptions = this.variantOptionsManager.variantOptions;
 
 	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 	// @ts-ignore
@@ -193,8 +203,6 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	async getCultureVariantOptions(): Promise<Array<VariantOptionModelType>> {
 		return (await firstValueFrom(this.variantOptions)).filter((x) => !x.segment);
 	}
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	protected _variantOptionsFilter = (variantOption: VariantOptionModelType) => true;
 
 	#variantValidationContexts: Array<UmbValidationController> = [];
 	getVariantValidationContext(variantId: UmbVariantId): UmbValidationController | undefined {
@@ -235,8 +243,8 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		this.#validateOnSubmit = args.skipValidationOnSubmit ? !args.skipValidationOnSubmit : true;
 		this.#ignoreValidationResultOnSubmit = args.ignoreValidationResultOnSubmit ?? false;
 		this.structure = new UmbContentTypeStructureManager<ContentTypeDetailModelType>(this, contentTypeDetailRepository);
-		this.variesByCulture = this.structure.ownerContentTypeObservablePart((x) => x?.variesByCulture);
-		this.variesBySegment = this.structure.ownerContentTypeObservablePart((x) => x?.variesBySegment);
+		this.variesByCulture = this.structure.variesByCulture;
+		this.variesBySegment = this.structure.variesBySegment;
 		this.varies = this.structure.ownerContentTypeObservablePart((x) =>
 			x ? x.variesByCulture || x.variesBySegment : undefined,
 		);
@@ -264,98 +272,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 
 		new UmbContentDetailWorkspaceTypeTransformController(this as any, this._data);
 
-		this.variantOptions = mergeObservables(
-			[this.variesByCulture, this.variesBySegment, this.variants, this.languages, this._segments.asObservable()],
-			([variesByCulture, variesBySegment, variants, languages, segments]) => {
-				if ((variesByCulture || variesBySegment) === undefined) {
-					return [];
-				}
-
-				const varies = variesByCulture || variesBySegment;
-
-				// No variation
-				if (!varies) {
-					return [
-						{
-							variant: variants.find((x) => x.culture === null),
-							language: languages.find((x) => x.isDefault),
-							culture: null,
-							segment: null,
-							unique: new UmbVariantId().toString(),
-						} as VariantOptionModelType,
-					];
-				}
-
-				// Only culture variation
-				if (variesByCulture && !variesBySegment) {
-					return languages.map((language) => {
-						return {
-							variant: variants.find((x) => x.culture === language.unique),
-							language,
-							culture: language.unique,
-							segment: null,
-							unique: new UmbVariantId(language.unique).toString(),
-						} as VariantOptionModelType;
-					});
-				}
-
-				// Only segment variation
-				if (!variesByCulture && variesBySegment) {
-					const invariantCulture = {
-						variant: undefined, // We do not store variant-data for segments. [NL]
-						language: languages.find((x) => x.isDefault),
-						culture: null,
-						segment: null,
-						unique: new UmbVariantId().toString(),
-					} as VariantOptionModelType;
-
-					// Find all segments that are either generic (undefined) or invariant (null)
-					const availableSegments = segments.filter((s) => !s.cultures);
-					const segmentsForInvariantCulture = availableSegments.map((segment) => {
-						return {
-							variant: undefined, // We do not store variant-data for segments. [NL]
-							language: languages.find((x) => x.isDefault),
-							segmentInfo: segment,
-							culture: null,
-							segment: segment.alias,
-							unique: new UmbVariantId(null, segment.alias).toString(),
-						} as VariantOptionModelType;
-					});
-
-					return [invariantCulture, ...segmentsForInvariantCulture] as Array<VariantOptionModelType>;
-				}
-
-				// Culture and segment variation
-				if (variesByCulture && variesBySegment) {
-					return languages.flatMap((language) => {
-						const culture = {
-							variant: variants.find((x) => x.culture === language.unique),
-							language,
-							culture: language.unique,
-							segment: null,
-							unique: new UmbVariantId(language.unique).toString(),
-						} as VariantOptionModelType;
-
-						// Find all segments that are either generic (undefined) or that contains this culture
-						const availableSegments = segments.filter((s) => !s.cultures || s.cultures.includes(language.unique));
-						const segmentsForCulture = availableSegments.map((segment) => {
-							return {
-								variant: undefined, // We do not store variant-data for segments. [NL]
-								language,
-								segmentInfo: segment,
-								culture: language.unique,
-								segment: segment.alias,
-								unique: new UmbVariantId(language.unique, segment.alias).toString(),
-							} as VariantOptionModelType;
-						});
-
-						return [culture, ...segmentsForCulture] as Array<VariantOptionModelType>;
-					});
-				}
-
-				return [] as Array<VariantOptionModelType>;
-			},
-		).pipe(map((options) => options.filter((option) => this._variantOptionsFilter(option))));
+		this.variantOptions = this.variantOptionsManager.variantOptions;
 
 		this.observe(
 			this.variantOptions,
@@ -445,14 +362,6 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		}).warn();
 	}
 
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	protected async _loadSegmentsFor(unique: string): Promise<void> {
-		console.warn(
-			`UmbContentDetailWorkspaceContextBase: Segments are not implemented in the workspace context for "${this.getEntityType()}" types.`,
-		);
-		this._segments.setValue([]);
-	}
-
 	protected override async _processIncomingData(data: DetailModelType): Promise<DetailModelType> {
 		const contentTypeUnique: string | undefined = (data as any)[this.#contentTypePropertyName].unique;
 		if (!contentTypeUnique) {
@@ -462,11 +371,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		await this.structure.loadType(contentTypeUnique);
 
 		// Load segments if varying by segment, or reset to empty array:
-		if (this.#variesBySegment) {
-			await this._loadSegmentsFor(data.unique);
-		} else {
-			this._segments.setValue([]);
-		}
+		// TODO: HOW?
 
 		const propertyTypes = await this.structure.getContentTypeProperties();
 		const contentTypeVariesByCulture = this.structure.getVariesByCulture();
