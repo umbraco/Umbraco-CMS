@@ -1,4 +1,3 @@
-import { UMB_DICTIONARY_OVERVIEW_DASHBOARD_PATH } from '../dashboard/index.js';
 import { html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
@@ -6,7 +5,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 export class UmbDictionaryWorkspaceEditorElement extends UmbLitElement {
 	override render() {
 		return html`
-			<umb-entity-detail-workspace-editor .backPath=${UMB_DICTIONARY_OVERVIEW_DASHBOARD_PATH}>
+			<umb-entity-detail-workspace-editor>
 				<umb-workspace-header-name-editable slot="header"></umb-workspace-header-name-editable>
 			</umb-entity-detail-workspace-editor>
 		`;

@@ -11,6 +11,15 @@ export interface UmbMediaTreeItemModel extends UmbTreeItemModel {
 	entityType: UmbMediaEntityType;
 	noAccess: boolean;
 	isTrashed: boolean;
+	// TODO (V20): make `contentType` required when the deprecated `mediaType` field is removed.
+	contentType?: {
+		unique: string;
+		icon: string;
+		collection: UmbReferenceByUnique | null;
+	};
+	/**
+	 * @deprecated Use `contentType` instead. This field will be removed in v20.
+	 */
 	mediaType: {
 		unique: string;
 		icon: string;
