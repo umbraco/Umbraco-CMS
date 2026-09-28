@@ -154,7 +154,10 @@ test('cannot add number of block element greater than the maximum amount', async
 test('cannot publish content with fewer block elements than the minimum amount', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const minAmount = 1;
-  const customDataTypeId = await umbracoApi.dataType.createBlockListWithABlockAndMinAndMaxAmount(customDataTypeName, elementTypeId, minAmount, 0);
+  // A max of 0 is stored literally rather than meaning unlimited, so {min: 1, max: 0} is unsatisfiable
+  // and no block could ever be added to clear the error.
+  const maxAmount = 10;
+  const customDataTypeId = await umbracoApi.dataType.createBlockListWithABlockAndMinAndMaxAmount(customDataTypeName, elementTypeId, minAmount, maxAmount);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
   await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
   await umbracoUi.goToBackOffice();
@@ -167,6 +170,8 @@ test('cannot publish content with fewer block elements than the minimum amount',
   // Assert
   await umbracoUi.content.isErrorNotificationVisible();
   await umbracoUi.content.doesFormValidationMessageContainText(`Minimum ${minAmount} entries, requires ${minAmount} more.`);
+  const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.variants[0].state).toBe('Draft');
 });
 
 test('can set the label of block element in the content', async ({umbracoApi, umbracoUi}) => {
