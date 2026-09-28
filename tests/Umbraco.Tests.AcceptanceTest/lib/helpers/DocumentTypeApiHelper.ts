@@ -460,6 +460,10 @@ export class DocumentTypeApiHelper {
   }
 
 
+  /**
+   * Creates a culture-variant document type with the given template as its default/allowed template,
+   * optionally allowed as root and/or allowing the given document type as a child node.
+   */
   async createVariantDocumentTypeWithTemplateAndAllowedChildNode(documentTypeName: string, templateId: string, isAllowedAsRoot: boolean = false, allowedChildNodeId?: string) {
     await this.ensureNameNotExists(documentTypeName);
 

@@ -171,11 +171,6 @@ export class DocumentApiHelper {
     return response.status();
   }
 
-  async publishWithCultures(id: string, cultures: string[]) {
-    const publishSchedulesData = {publishSchedules: cultures.map(culture => ({culture}))};
-    return await this.publish(id, publishSchedulesData);
-  }
-
   async unpublish(id: string, cultures: string[] | null = null) {
     if (id == null) {
       return;
@@ -194,6 +189,9 @@ export class DocumentApiHelper {
     return urls[0]?.urlInfos ?? [];
   }
 
+  /**
+   * Returns the document's URL. Throws if the document has no published URL yet.
+   */
   async getDocumentUrl(id: string) {
     const urlInfos = await this.getDocumentUrlInfos(id);
 
@@ -204,6 +202,9 @@ export class DocumentApiHelper {
     return urlInfos[0].url;
   }
 
+  /**
+   * Returns the document's URL for the given culture. Throws if that culture has no published URL yet.
+   */
   async getDocumentUrlByCulture(id: string, culture: string) {
     const urlInfos = await this.getDocumentUrlInfos(id);
     const urlInfo = urlInfos.find(info => info.culture === culture);
