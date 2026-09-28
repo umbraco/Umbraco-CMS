@@ -15,9 +15,9 @@ namespace Umbraco.Cms.Core.Services;
 ///     and managing <see cref="IMedia"/> items through the editing API.
 /// </summary>
 internal sealed class MediaEditingService
-    : ContentEditingServiceWithSortingBase<IMedia, IMediaType, IMediaService, IMediaTypeService>, IMediaEditingService
+    : AsyncContentEditingServiceWithSortingBase<IMedia, IMediaType, IMediaService, IMediaTypeService>, IMediaEditingService
 {
-    private readonly ILogger<ContentEditingServiceBase<IMedia, IMediaType, IMediaService, IMediaTypeService>> _logger;
+    private readonly ILogger<AsyncContentEditingServiceBase<IMedia, IMediaType, IMediaService, IMediaTypeService>> _logger;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="MediaEditingService"/> class.
@@ -39,7 +39,7 @@ internal sealed class MediaEditingService
         IMediaTypeService contentTypeService,
         PropertyEditorCollection propertyEditorCollection,
         IDataTypeService dataTypeService,
-        ILogger<ContentEditingServiceBase<IMedia, IMediaType, IMediaService, IMediaTypeService>> logger,
+        ILogger<AsyncContentEditingServiceBase<IMedia, IMediaType, IMediaService, IMediaTypeService>> logger,
         ICoreScopeProvider scopeProvider,
         IUserIdKeyResolver userIdKeyResolver,
         ITreeEntitySortingService treeEntitySortingService,
@@ -194,40 +194,77 @@ internal sealed class MediaEditingService
         => new Models.Media(name, parentId, mediaType);
 
     /// <inheritdoc />
-    protected override OperationResult? Move(IMedia media, int newParentId, bool includeDescendants, int userId)
-        => ContentService.Move(media, newParentId, includeDescendants, userId).Result;
+    protected override async Task<ContentEditingOperationStatus> MoveAsync(IMedia media, Guid? parentKey, bool includeDescendants, Guid userKey)
+    {
+        var userId = await GetUserIdAsync(userKey);
+        Attempt<OperationResult?> result = ContentService.Move(media, ResolveParentId(parentKey), includeDescendants, userId);
+        return OperationResultToOperationStatus(result.Result);
+    }
 
     /// <inheritdoc />
     /// <exception cref="NotSupportedException">Copy is not supported for media items.</exception>
-    protected override Task<IMedia?> CopyAsync(IMedia media, int newParentId, bool relateToOriginal, bool includeDescendants, Guid userKey)
+    protected override Task<IMedia?> CopyAsync(IMedia media, Guid? parentKey, bool relateToOriginal, bool includeDescendants, Guid userKey)
         => throw new NotSupportedException("Copy is not supported for media");
 
     /// <inheritdoc />
-    protected override OperationResult? MoveToRecycleBin(IMedia media, int userId)
-        => ContentService.MoveToRecycleBin(media, userId).Result;
-
-    /// <inheritdoc />
-    protected override OperationResult? Delete(IMedia media, int userId)
-        => ContentService.Delete(media, userId).Result;
-
-    /// <inheritdoc />
-    protected override IEnumerable<IMedia> GetPagedChildren(int parentId, int pageIndex, int pageSize, Ordering? ordering, out long total)
-        => ContentService.GetPagedChildren(parentId, pageIndex, pageSize, out total, filter: null, ordering: ordering);
-
-    /// <inheritdoc />
-    protected override ContentEditingOperationStatus Sort(IEnumerable<IMedia> items, int userId)
+    protected override async Task<OperationResult?> MoveToRecycleBinAsync(IMedia media, Guid userKey)
     {
-        bool result = ContentService.Sort(items, userId);
-        return result
+        var userId = await GetUserIdAsync(userKey);
+        return ContentService.MoveToRecycleBin(media, userId).Result;
+    }
+
+    /// <inheritdoc />
+    protected override async Task<OperationResult?> DeleteAsync(IMedia media, Guid userKey)
+    {
+        var userId = await GetUserIdAsync(userKey);
+        return ContentService.Delete(media, userId).Result;
+    }
+
+    /// <inheritdoc />
+    protected override Task<PagedModel<IMedia>> GetPagedChildrenAsync(Guid? parentKey, int pageIndex, int pageSize, Ordering? ordering)
+    {
+        IEnumerable<IMedia> pagedChildren = ContentService.GetPagedChildren(ResolveParentId(parentKey), pageIndex, pageSize, out long total, filter: null, ordering: ordering);
+        return Task.FromResult(new PagedModel<IMedia>(total, pagedChildren));
+    }
+
+    /// <inheritdoc />
+    protected override async Task<ContentEditingOperationStatus> SortAsync(IReadOnlyList<Guid> orderedKeys, Guid userKey, CancellationToken cancellationToken)
+    {
+        var userId = await GetUserIdAsync(userKey);
+        Dictionary<Guid, IMedia> itemsByKey = ContentService.GetByIds(orderedKeys).ToDictionary(item => item.Key);
+        IEnumerable<IMedia> orderedItems = orderedKeys.Where(itemsByKey.ContainsKey).Select(key => itemsByKey[key]);
+
+        return ContentService.Sort(orderedItems, userId)
             ? ContentEditingOperationStatus.Success
             : ContentEditingOperationStatus.CancelledByNotification;
     }
 
     /// <inheritdoc />
-    protected override ContentEditingOperationStatus SortChildrenInBulk(int parentId, IReadOnlyList<int> orderedChildIds, int userId)
+    protected override async Task<ContentEditingOperationStatus> SortChildrenInBulkAsync(Guid? parentKey, IReadOnlyList<Guid> orderedChildKeys, Guid userKey)
     {
-        OperationResult result = ContentService.SortChildren(parentId, orderedChildIds, userId);
+        var userId = await GetUserIdAsync(userKey);
+        Dictionary<Guid, int> idsByKey = ContentService.GetByIds(orderedChildKeys).ToDictionary(child => child.Key, child => child.Id);
+        List<int> orderedChildIds = orderedChildKeys.Where(idsByKey.ContainsKey).Select(key => idsByKey[key]).ToList();
+
+        OperationResult result = ContentService.SortChildren(ResolveParentId(parentKey), orderedChildIds, userId);
         return OperationResultToOperationStatus(result);
+    }
+
+    // The media service still identifies parents by id; the recycle bin and the root have fixed ids and every
+    // other parent is looked up by its key.
+    private int ResolveParentId(Guid? parentKey)
+    {
+        if (parentKey is null)
+        {
+            return Constants.System.Root;
+        }
+
+        if (parentKey == Constants.System.RecycleBinMediaKey)
+        {
+            return Constants.System.RecycleBinMedia;
+        }
+
+        return ContentService.GetById(parentKey.Value)?.Id ?? Constants.System.Root;
     }
 
     /// <summary>

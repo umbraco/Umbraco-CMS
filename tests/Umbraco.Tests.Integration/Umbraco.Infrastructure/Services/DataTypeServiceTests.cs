@@ -466,7 +466,7 @@ internal sealed class DataTypeServiceTests : UmbracoIntegrationTest
         documentType = await ContentTypeService.GetAsync(documentType.Id);
         Assert.IsNotNull(documentType.PropertyTypes.SingleOrDefault(pt => pt.PropertyEditorAlias is Constants.PropertyEditors.Aliases.RichText));
 
-        mediaType = MediaTypeService.Get(mediaType.Id);
+        mediaType = await MediaTypeService.GetAsync(mediaType.Id);
         Assert.IsNotNull(mediaType.PropertyTypes.SingleOrDefault(pt => pt.PropertyEditorAlias is Constants.PropertyEditors.Aliases.RichText));
 
         var definition = dataTypeDefinitions.First();

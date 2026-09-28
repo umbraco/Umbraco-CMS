@@ -36,71 +36,6 @@ public interface IPackageDataInstallation
     IReadOnlyList<IMemberType> ImportMemberTypes(IEnumerable<XElement> docTypeElements, int userId) => throw new NotImplementedException();
 
     /// <summary>
-    ///     Imports and saves content base items from a compiled package.
-    /// </summary>
-    /// <typeparam name="TContentBase">The type of content base being imported (e.g., <see cref="IContent"/> or <see cref="IMedia"/>).</typeparam>
-    /// <typeparam name="TContentTypeComposition">The type of content type composition.</typeparam>
-    /// <param name="docs">The compiled package content base items to import.</param>
-    /// <param name="importedDocumentTypes">A dictionary of imported document types keyed by their alias.</param>
-    /// <param name="userId">The id of the user performing the import.</param>
-    /// <param name="typeService">The service for managing content types.</param>
-    /// <param name="service">The service for managing content.</param>
-    /// <returns>A read-only list of imported content base items.</returns>
-    IReadOnlyList<TContentBase> ImportContentBase<TContentBase, TContentTypeComposition>(
-        IEnumerable<CompiledPackageContentBase> docs,
-        IDictionary<string, TContentTypeComposition> importedDocumentTypes,
-        int userId,
-        IContentTypeBaseService<TContentTypeComposition> typeService,
-        IContentServiceBase<TContentBase> service)
-        where TContentBase : class, IContentBase
-        where TContentTypeComposition : IContentTypeComposition;
-
-    /// <summary>
-    ///     Imports and saves content base items from a compiled package, using the async content service of content
-    ///     types that have already been migrated (e.g. documents, elements).
-    /// </summary>
-    /// <typeparam name="TContentBase">The type of content base being imported (e.g., <see cref="IContent"/>).</typeparam>
-    /// <typeparam name="TContentTypeComposition">The type of content type composition.</typeparam>
-    /// <param name="docs">The compiled package content base items to import.</param>
-    /// <param name="importedDocumentTypes">A dictionary of imported document types keyed by their alias.</param>
-    /// <param name="userId">The id of the user performing the import.</param>
-    /// <param name="typeService">The service for managing content types.</param>
-    /// <param name="service">The async service for managing content.</param>
-    /// <returns>A read-only list of imported content base items.</returns>
-    // TODO (V20): remove this overload once media and member types have an async service and the
-    // IContentServiceBase overload can be used again.
-    IReadOnlyList<TContentBase> ImportContentBase<TContentBase, TContentTypeComposition>(
-        IEnumerable<CompiledPackageContentBase> docs,
-        IDictionary<string, TContentTypeComposition> importedDocumentTypes,
-        int userId,
-        IContentTypeBaseService<TContentTypeComposition> typeService,
-        IAsyncContentServiceBase<TContentBase> service)
-        where TContentBase : class, IContentBase
-        where TContentTypeComposition : IContentTypeComposition
-        => throw new NotImplementedException();
-
-    /// <summary>
-    ///     Imports and saves content base items from a compiled package, using the (asynchronous) document type service.
-    /// </summary>
-    /// <typeparam name="TContentBase">The type of content base being imported (e.g., <see cref="IContent"/>).</typeparam>
-    /// <param name="docs">The compiled package content base items to import.</param>
-    /// <param name="importedDocumentTypes">A dictionary of imported document types keyed by their alias.</param>
-    /// <param name="userId">The id of the user performing the import.</param>
-    /// <param name="typeService">The document type service.</param>
-    /// <param name="service">The service for managing content.</param>
-    /// <returns>A read-only list of imported content base items.</returns>
-    // TODO (V20): remove this overload once media and member types have an async service and
-    // IContentTypeBaseService can be used again.
-    IReadOnlyList<TContentBase> ImportContentBase<TContentBase>(
-        IEnumerable<CompiledPackageContentBase> docs,
-        IDictionary<string, IContentType> importedDocumentTypes,
-        int userId,
-        IContentTypeService typeService,
-        IContentServiceBase<TContentBase> service)
-        where TContentBase : class, IContentBase
-        => throw new NotImplementedException();
-
-    /// <summary>
     ///     Imports and saves content base items from a compiled package, using the (asynchronous) document type
     ///     service and the async content service of content types that have already been migrated (e.g. documents,
     ///     elements).
@@ -112,8 +47,6 @@ public interface IPackageDataInstallation
     /// <param name="typeService">The document type service.</param>
     /// <param name="service">The async service for managing content.</param>
     /// <returns>A read-only list of imported content base items.</returns>
-    // TODO (V20): remove this overload once media and member types have an async service and
-    // IContentTypeBaseService can be used again.
     IReadOnlyList<TContentBase> ImportContentBase<TContentBase>(
         IEnumerable<CompiledPackageContentBase> docs,
         IDictionary<string, IContentType> importedDocumentTypes,
@@ -121,6 +54,27 @@ public interface IPackageDataInstallation
         IContentTypeService typeService,
         IAsyncContentServiceBase<TContentBase> service)
         where TContentBase : class, IContentBase
+        => throw new NotImplementedException();
+
+    /// <summary>
+    ///     Imports and saves content base items from a compiled package, using the (asynchronous) media type service.
+    /// </summary>
+    /// <typeparam name="TContentBase">The type of content base being imported (e.g., <see cref="IMedia"/>).</typeparam>
+    /// <param name="docs">The compiled package content base items to import.</param>
+    /// <param name="importedDocumentTypes">A dictionary of imported media types keyed by their alias.</param>
+    /// <param name="userId">The id of the user performing the import.</param>
+    /// <param name="typeService">The media type service.</param>
+    /// <param name="service">The service for managing content.</param>
+    /// <returns>A read-only list of imported content base items.</returns>
+    IReadOnlyList<TContentBase> ImportContentBase<TContentBase>(
+        IEnumerable<CompiledPackageContentBase> docs,
+        IDictionary<string, IMediaType> importedDocumentTypes,
+        int userId,
+        IMediaTypeService typeService,
+        IContentServiceBase<TContentBase> service)
+        where TContentBase : class, IContentBase
+
+        // TODO (V20): fold into the document overload once the media service is async.
         => throw new NotImplementedException();
 
     /// <summary>

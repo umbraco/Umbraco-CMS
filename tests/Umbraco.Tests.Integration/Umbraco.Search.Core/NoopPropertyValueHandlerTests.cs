@@ -194,6 +194,6 @@ public class NoopPropertyValueHandlerTests : ContentTestBase
     private IContentType GetContentType() => ContentTypeService.GetAsync("allEditors").GetAwaiter().GetResult()
                                              ?? throw new InvalidOperationException("Could not find the content type");
 
-    private IMediaType GetMediaType() => GetRequiredService<IMediaTypeService>().Get(Constants.Conventions.MediaTypes.Image)
+    private IMediaType GetMediaType() => GetRequiredService<IMediaTypeService>().GetAsync(Constants.Conventions.MediaTypes.Image).GetAwaiter().GetResult()
                                              ?? throw new InvalidOperationException("Could not find the media type");
 }

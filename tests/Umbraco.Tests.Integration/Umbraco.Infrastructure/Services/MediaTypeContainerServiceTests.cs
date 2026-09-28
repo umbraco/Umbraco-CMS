@@ -190,7 +190,7 @@ internal sealed class MediaTypeContainerServiceTests : UmbracoIntegrationTest
         var currentContainer = await MediaTypeContainerService.GetAsync(container.Key);
         Assert.IsNotNull(currentContainer);
 
-        var currentMediaType = MediaTypeService.Get(mediaType.Key);
+        var currentMediaType = await MediaTypeService.GetAsync(mediaType.Key);
         Assert.IsNotNull(currentMediaType);
     }
 

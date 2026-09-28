@@ -30,7 +30,7 @@ internal sealed class MediaTypeServiceTests : UmbracoIntegrationTest
     {
         // Arrange
         // Act
-        var result = MediaTypeService.Get(Guid.NewGuid());
+        var result = MediaTypeService.GetAsync(Guid.NewGuid()).GetAwaiter().GetResult();
 
         // Assert
         Assert.IsNull(result);
@@ -80,7 +80,7 @@ internal sealed class MediaTypeServiceTests : UmbracoIntegrationTest
         }
 
         // delete the first content type, all other content of different content types should be in the recycle bin
-        MediaTypeService.Delete(contentTypes[0]);
+        await MediaTypeService.DeleteAsync(contentTypes[0], Constants.Security.SuperUserKey);
 
         var found = MediaService.GetByIds(ids);
 
@@ -127,7 +127,7 @@ internal sealed class MediaTypeServiceTests : UmbracoIntegrationTest
 
             foreach (var contentType in contentTypes.Reverse())
             {
-                MediaTypeService.Delete(contentType);
+                await MediaTypeService.DeleteAsync(contentType, Constants.Security.SuperUserKey);
             }
         }
         finally
@@ -200,8 +200,8 @@ internal sealed class MediaTypeServiceTests : UmbracoIntegrationTest
         // Assert
         Assert.That(clone.HasIdentity, Is.True);
 
-        var clonedMediaType = MediaTypeService.Get(clone.Id);
-        var originalMediaType = MediaTypeService.Get(mediaType.Id);
+        var clonedMediaType = await MediaTypeService.GetAsync(clone.Id);
+        var originalMediaType = await MediaTypeService.GetAsync(mediaType.Id);
 
         Assert.That(clonedMediaType.CompositionAliases().Any(x => x.Equals("parent2")), Is.True);
         Assert.That(clonedMediaType.CompositionAliases().Any(x => x.Equals("parent1")), Is.False);
@@ -231,11 +231,11 @@ internal sealed class MediaTypeServiceTests : UmbracoIntegrationTest
     {
         // Arrange
         // Act
-        var mediaType = MediaTypeService.Get(mediaTypeAlias);
+        var mediaType = MediaTypeService.GetAsync(mediaTypeAlias).GetAwaiter().GetResult();
         Assert.IsNotNull(mediaType);
 
         // Assert
-        Assert.Throws<InvalidOperationException>(() => MediaTypeService.Delete(mediaType));
+        Assert.ThrowsAsync<InvalidOperationException>(async () => await MediaTypeService.DeleteAsync(mediaType, Constants.Security.SuperUserKey));
     }
 
     [TestCase(Constants.Conventions.MediaTypes.File)]
@@ -245,7 +245,7 @@ internal sealed class MediaTypeServiceTests : UmbracoIntegrationTest
     {
         // Arrange
         // Act
-        var mediaType = MediaTypeService.Get(mediaTypeAlias);
+        var mediaType = MediaTypeService.GetAsync(mediaTypeAlias).GetAwaiter().GetResult();
         Assert.IsNotNull(mediaType);
 
         // Assert
@@ -258,7 +258,7 @@ internal sealed class MediaTypeServiceTests : UmbracoIntegrationTest
     public async Task Can_Copy_System_Media_Type(string mediaTypeAlias)
     {
         // Arrange
-        var mediaType = MediaTypeService.Get(mediaTypeAlias);
+        var mediaType = await MediaTypeService.GetAsync(mediaTypeAlias);
         Assert.IsNotNull(mediaType);
 
         // Act

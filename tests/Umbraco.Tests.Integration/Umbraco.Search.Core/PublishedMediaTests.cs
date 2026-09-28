@@ -115,7 +115,7 @@ public class PublishedMediaTests : MediaTestBase
         var secondRootFolderKey = Guid.NewGuid();
         Media secondRootFolder = new MediaBuilder()
             .WithKey(secondRootFolderKey)
-            .WithMediaType(MediaTypeService.Get(RootFolder().ContentType.Key)!)
+            .WithMediaType(MediaTypeService.GetAsync(RootFolder().ContentType.Key).GetAwaiter().GetResult()!)
             .WithName("Second Root folder")
             .Build();
         MediaService.Save(secondRootFolder);

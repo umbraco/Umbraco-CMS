@@ -12,6 +12,7 @@ using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.Changes;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Extensions;
 
@@ -109,7 +110,7 @@ namespace Umbraco.Cms.Core.Services
             var mediaTypeId = 0;
             if (string.IsNullOrWhiteSpace(mediaTypeAlias) == false)
             {
-                IMediaType? mediaType = _mediaTypeRepository.Get(mediaTypeAlias);
+                IMediaType? mediaType = _mediaTypeRepository.GetAsync(mediaTypeAlias, CancellationToken.None).GetAwaiter().GetResult();
                 if (mediaType == null)
                 {
                     return 0;
@@ -448,6 +449,13 @@ namespace Umbraco.Cms.Core.Services
             scope.ReadLock(Constants.Locks.MediaTree);
             return _mediaRepository.Get(key);
         }
+
+        /// <inheritdoc />
+        /// <remarks>
+        ///     Media is not yet backed by an asynchronous repository, so this resolves synchronously.
+        /// </remarks>
+        public Task<IMedia?> GetByIdAsync(Guid key, CancellationToken cancellationToken)
+            => Task.FromResult(GetById(key));
 
         /// <summary>
         /// Gets an <see cref="IMedia"/> object by Id
@@ -889,6 +897,22 @@ namespace Umbraco.Cms.Core.Services
             }
 
             return OperationResult.Attempt.Succeed(messages);
+        }
+
+        /// <inheritdoc />
+        /// <remarks>
+        ///     Media is not yet backed by an asynchronous repository, so this resolves synchronously. The
+        ///     synchronous overload reports cancellation through <see cref="OperationResultType.FailedCancelledByEvent" />,
+        ///     which is the only failure it can produce.
+        /// </remarks>
+        public async Task<Attempt<ContentSaveOperationStatus>> SaveAsync(IEnumerable<IMedia> medias, Guid userKey, CancellationToken cancellationToken)
+        {
+            var userId = await _userIdKeyResolver.GetAsync(userKey);
+            Attempt<OperationResult?> result = Save(medias, userId);
+
+            return result.Success
+                ? Attempt.Succeed(ContentSaveOperationStatus.Success)
+                : Attempt.Fail(ContentSaveOperationStatus.CancelledByNotification);
         }
 
         #endregion
@@ -1528,6 +1552,13 @@ namespace Umbraco.Cms.Core.Services
             }
         }
 
+        /// <inheritdoc />
+        /// <remarks>
+        ///     Media is not yet backed by an asynchronous repository, so this resolves synchronously.
+        /// </remarks>
+        public Task<ContentDataIntegrityReport> CheckDataIntegrityAsync(ContentDataIntegrityReportOptions options, CancellationToken cancellationToken)
+            => Task.FromResult(CheckDataIntegrity(options));
+
         #endregion
 
         #region Private Methods
@@ -1732,8 +1763,7 @@ namespace Umbraco.Cms.Core.Services
             using ICoreScope scope = ScopeProvider.CreateCoreScope();
             scope.ReadLock(Constants.Locks.MediaTypes);
 
-            IQuery<IMediaType> query = Query<IMediaType>().Where(x => x.Alias == mediaTypeAlias);
-            IMediaType? mediaType = _mediaTypeRepository.Get(query)?.FirstOrDefault();
+            IMediaType? mediaType = _mediaTypeRepository.GetAsync(mediaTypeAlias, CancellationToken.None).GetAwaiter().GetResult();
 
             if (mediaType == null)
             {

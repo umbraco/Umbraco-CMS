@@ -1845,7 +1845,7 @@ public static class PublishedContentExtensions
     private static Dictionary<string, string> GetAliasesAndNames(IContentTypeService contentTypeService, IMediaTypeService mediaTypeService, IMemberTypeService memberTypeService, string alias)
     {
         IContentTypeBase? type = contentTypeService.GetAsync(alias).GetAwaiter().GetResult()
-                                 ?? mediaTypeService.Get(alias)
+                                 ?? mediaTypeService.GetAsync(alias).GetAwaiter().GetResult()
                                  ?? (IContentTypeBase?)memberTypeService.GetAsync(alias).GetAwaiter().GetResult();
         Dictionary<string, string> fields = GetAliasesAndNames(type);
 

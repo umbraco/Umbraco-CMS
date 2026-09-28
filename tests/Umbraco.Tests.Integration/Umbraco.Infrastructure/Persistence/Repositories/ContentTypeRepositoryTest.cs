@@ -418,7 +418,7 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
 
             IMediaType contentType = MediaTypeBuilder.CreateSimpleMediaType("test", "Test", propertyGroupAlias: "testGroup", propertyGroupName: "testGroup");
             contentType.ParentId = container.Id;
-            MediaTypeRepository.Save(contentType);
+            MediaTypeRepository.SaveAsync(contentType, CancellationToken.None).GetAwaiter().GetResult();
 
             // Act
             MediaTypeContainerRepository.Delete(container);
@@ -426,7 +426,7 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
             var found = MediaTypeContainerRepository.Get(container.Id);
             Assert.IsNull(found);
 
-            contentType = MediaTypeRepository.Get(contentType.Id);
+            contentType = MediaTypeRepository.GetAsync(contentType.Id, CancellationToken.None).GetAwaiter().GetResult();
             Assert.IsNotNull(contentType);
             Assert.AreEqual(-1, contentType.ParentId);
         }

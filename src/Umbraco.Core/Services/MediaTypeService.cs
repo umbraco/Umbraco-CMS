@@ -16,7 +16,7 @@ namespace Umbraco.Cms.Core.Services;
 /// <summary>
 ///     Represents the Media Type Service, which provides operations for managing <see cref="IMediaType"/> entities.
 /// </summary>
-public class MediaTypeService : ContentTypeServiceBase<IMediaTypeRepository, IMediaType>, IMediaTypeService
+public class MediaTypeService : AsyncContentTypeServiceBase<IMediaTypeRepository, IMediaType>, IMediaTypeService
 {
     /// <summary>
     ///     Initializes a new instance of the <see cref="MediaTypeService"/> class.
@@ -160,12 +160,14 @@ public class MediaTypeService : ContentTypeServiceBase<IMediaTypeRepository, IMe
     private IMediaService MediaService { get; }
 
     /// <inheritdoc />
-    protected override void DeleteItemsOfTypes(IEnumerable<int> typeIds)
+    protected override Task DeleteItemsOfTypesAsync(IEnumerable<int> typeIds)
     {
         foreach (var typeId in typeIds)
         {
             MediaService.DeleteMediaOfType(typeId);
         }
+
+        return Task.CompletedTask;
     }
 
     /// <inheritdoc />

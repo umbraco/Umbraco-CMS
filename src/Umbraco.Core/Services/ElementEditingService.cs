@@ -555,7 +555,7 @@ internal sealed class ElementEditingService
         return result.Success ? OperationResult.Succeed(new EventMessages()) : OperationResult.Cancel(new EventMessages());
     }
 
-    // NOTE: We have a custom implementation for Move because ContentEditingServiceBase has no concept of Containers.
+    // NOTE: We have a custom implementation for Move because AsyncContentEditingServiceBase has no concept of Containers.
     protected override Task<ContentEditingOperationStatus> MoveAsync(IElement element, Guid? parentKey, bool includeDescendants, Guid userKey) => throw new NotImplementedException();
 
     private async Task<ContentEditingOperationStatus> SaveAsync(IElement content, Guid userKey)

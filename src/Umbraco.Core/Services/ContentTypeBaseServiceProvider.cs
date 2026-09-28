@@ -57,7 +57,7 @@ public class ContentTypeBaseServiceProvider : IContentTypeBaseServiceProvider
             case IContent _:
                 return _contentTypeService.GetAsync(contentBase.Key).GetAwaiter().GetResult();
             case IMedia _:
-                return _mediaTypeService.Get(contentBase.Key);
+                return _mediaTypeService.GetAsync(contentBase.Key).GetAwaiter().GetResult();
             case IMember _:
                 return _memberTypeService.GetAsync(contentBase.Key).GetAwaiter().GetResult();
             default:

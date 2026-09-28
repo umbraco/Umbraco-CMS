@@ -34,7 +34,7 @@ internal sealed class MemberTypeRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Persist_Member_Type()
+    public async Task Can_Persist_Member_Type()
     {
         var provider = ScopeProvider;
         using (var scope = provider.CreateScope())
@@ -42,9 +42,9 @@ internal sealed class MemberTypeRepositoryTest : UmbracoIntegrationTest
             var repository = CreateRepository(provider);
 
             var memberType = (IMemberType)MemberTypeBuilder.CreateSimpleMemberType();
-            repository.Save(memberType);
+            await repository.SaveAsync(memberType, CancellationToken.None);
 
-            var sut = repository.Get(memberType.Id);
+            var sut = await repository.GetAsync(memberType.Id, CancellationToken.None);
 
             var standardProps = ConventionsHelper.GetStandardPropertyTypeStubs(ShortStringHelper);
 
@@ -63,7 +63,7 @@ internal sealed class MemberTypeRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Persist_Member_Type_Same_Property_Keys()
+    public async Task Can_Persist_Member_Type_Same_Property_Keys()
     {
         var provider = ScopeProvider;
         using (var scope = provider.CreateScope())
@@ -72,13 +72,13 @@ internal sealed class MemberTypeRepositoryTest : UmbracoIntegrationTest
 
             var memberType = (IMemberType)MemberTypeBuilder.CreateSimpleMemberType();
 
-            repository.Save(memberType);
+            await repository.SaveAsync(memberType, CancellationToken.None);
             scope.Complete();
 
             var propertyKeys = memberType.PropertyTypes.Select(x => x.Key).OrderBy(x => x).ToArray();
             var groupKeys = memberType.PropertyGroups.Select(x => x.Key).OrderBy(x => x).ToArray();
 
-            memberType = repository.Get(memberType.Id);
+            memberType = await repository.GetAsync(memberType.Id, CancellationToken.None);
             var propertyKeys2 = memberType.PropertyTypes.Select(x => x.Key).OrderBy(x => x).ToArray();
             var groupKeys2 = memberType.PropertyGroups.Select(x => x.Key).OrderBy(x => x).ToArray();
 
@@ -88,7 +88,7 @@ internal sealed class MemberTypeRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Cannot_Persist_Member_Type_Without_Alias()
+    public async Task Cannot_Persist_Member_Type_Without_Alias()
     {
         var provider = ScopeProvider;
         using (var scope = provider.CreateScope())
@@ -98,12 +98,12 @@ internal sealed class MemberTypeRepositoryTest : UmbracoIntegrationTest
             var memberType = MemberTypeBuilder.CreateSimpleMemberType();
             memberType.Alias = null;
 
-            Assert.Throws<InvalidOperationException>(() => repository.Save(memberType));
+            Assert.ThrowsAsync<InvalidOperationException>(async () => await repository.SaveAsync(memberType, CancellationToken.None));
         }
     }
 
     [Test]
-    public void Can_Get_All_Member_Types()
+    public async Task Can_Get_All_Member_Types()
     {
         var provider = ScopeProvider;
         using (var scope = provider.CreateScope())
@@ -111,14 +111,14 @@ internal sealed class MemberTypeRepositoryTest : UmbracoIntegrationTest
             var repository = CreateRepository(provider);
 
             var memberType1 = MemberTypeBuilder.CreateSimpleMemberType();
-            repository.Save(memberType1);
+            await repository.SaveAsync(memberType1, CancellationToken.None);
 
             var memberType2 = MemberTypeBuilder.CreateSimpleMemberType();
             memberType2.Name = "AnotherType";
             memberType2.Alias = "anotherType";
-            repository.Save(memberType2);
+            await repository.SaveAsync(memberType2, CancellationToken.None);
 
-            var result = repository.GetMany();
+            var result = await repository.GetAllAsync(CancellationToken.None);
 
             // there are 3 because of the Member type created for init data
             Assert.AreEqual(3, result.Count());
@@ -126,7 +126,7 @@ internal sealed class MemberTypeRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Get_All_Member_Types_By_Guid_Ids()
+    public async Task Can_Get_All_Member_Types_By_Guid_Ids()
     {
         var provider = ScopeProvider;
         using (var scope = provider.CreateScope())
@@ -134,14 +134,14 @@ internal sealed class MemberTypeRepositoryTest : UmbracoIntegrationTest
             var repository = CreateRepository(provider);
 
             var memberType1 = MemberTypeBuilder.CreateSimpleMemberType();
-            repository.Save(memberType1);
+            await repository.SaveAsync(memberType1, CancellationToken.None);
 
             var memberType2 = MemberTypeBuilder.CreateSimpleMemberType();
             memberType2.Name = "AnotherType";
             memberType2.Alias = "anotherType";
-            repository.Save(memberType2);
+            await repository.SaveAsync(memberType2, CancellationToken.None);
 
-            var result = ((IReadRepository<Guid, IMemberType>)repository).GetMany(memberType1.Key, memberType2.Key);
+            var result = await repository.GetManyAsync([memberType1.Key, memberType2.Key], CancellationToken.None);
 
             // there are 3 because of the Member type created for init data
             Assert.AreEqual(2, result.Count());
@@ -149,7 +149,7 @@ internal sealed class MemberTypeRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Get_Member_Types_By_Guid_Id()
+    public async Task Can_Get_Member_Types_By_Guid_Id()
     {
         var provider = ScopeProvider;
         using (var scope = provider.CreateScope())
@@ -157,14 +157,14 @@ internal sealed class MemberTypeRepositoryTest : UmbracoIntegrationTest
             var repository = CreateRepository(provider);
 
             var memberType1 = MemberTypeBuilder.CreateSimpleMemberType();
-            repository.Save(memberType1);
+            await repository.SaveAsync(memberType1, CancellationToken.None);
 
             var memberType2 = MemberTypeBuilder.CreateSimpleMemberType();
             memberType2.Name = "AnotherType";
             memberType2.Alias = "anotherType";
-            repository.Save(memberType2);
+            await repository.SaveAsync(memberType2, CancellationToken.None);
 
-            var result = repository.Get(memberType1.Key);
+            var result = await repository.GetAsync(memberType1.Key, CancellationToken.None);
 
             // there are 3 because of the Member type created for init data
             Assert.IsNotNull(result);
@@ -174,7 +174,7 @@ internal sealed class MemberTypeRepositoryTest : UmbracoIntegrationTest
 
     // NOTE: This tests for left join logic (rev 7b14e8eacc65f82d4f184ef46c23340c09569052)
     [Test]
-    public void Can_Get_All_Members_When_No_Properties_Assigned()
+    public async Task Can_Get_All_Members_When_No_Properties_Assigned()
     {
         var provider = ScopeProvider;
         using (var scope = provider.CreateScope())
@@ -183,15 +183,15 @@ internal sealed class MemberTypeRepositoryTest : UmbracoIntegrationTest
 
             var memberType1 = MemberTypeBuilder.CreateSimpleMemberType();
             memberType1.PropertyTypeCollection.Clear();
-            repository.Save(memberType1);
+            await repository.SaveAsync(memberType1, CancellationToken.None);
 
             var memberType2 = MemberTypeBuilder.CreateSimpleMemberType();
             memberType2.PropertyTypeCollection.Clear();
             memberType2.Name = "AnotherType";
             memberType2.Alias = "anotherType";
-            repository.Save(memberType2);
+            await repository.SaveAsync(memberType2, CancellationToken.None);
 
-            var result = repository.GetMany();
+            var result = await repository.GetAllAsync(CancellationToken.None);
 
             // there are 3 because of the Member type created for init data
             Assert.AreEqual(3, result.Count());
@@ -199,7 +199,7 @@ internal sealed class MemberTypeRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Get_Member_Type_By_Id()
+    public async Task Can_Get_Member_Type_By_Id()
     {
         var provider = ScopeProvider;
         using (var scope = provider.CreateScope())
@@ -207,15 +207,15 @@ internal sealed class MemberTypeRepositoryTest : UmbracoIntegrationTest
             var repository = CreateRepository(provider);
 
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-            repository.Save(memberType);
+            await repository.SaveAsync(memberType, CancellationToken.None);
 
-            memberType = repository.Get(memberType.Id);
+            memberType = await repository.GetAsync(memberType.Id, CancellationToken.None);
             Assert.That(memberType, Is.Not.Null);
         }
     }
 
     [Test]
-    public void Can_Get_Member_Type_By_Guid_Id()
+    public async Task Can_Get_Member_Type_By_Guid_Id()
     {
         var provider = ScopeProvider;
         using (var scope = provider.CreateScope())
@@ -223,9 +223,9 @@ internal sealed class MemberTypeRepositoryTest : UmbracoIntegrationTest
             var repository = CreateRepository(provider);
 
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-            repository.Save(memberType);
+            await repository.SaveAsync(memberType, CancellationToken.None);
 
-            memberType = repository.Get(memberType.Key);
+            memberType = await repository.GetAsync(memberType.Key, CancellationToken.None);
             Assert.That(memberType, Is.Not.Null);
         }
     }
@@ -258,7 +258,7 @@ internal sealed class MemberTypeRepositoryTest : UmbracoIntegrationTest
     // This is to show that new properties are created for each member type - there was a bug before
     // that was reusing the same properties with the same Ids between member types
     [Test]
-    public void Built_In_Member_Type_Properties_Are_Not_Reused_For_Different_Member_Types()
+    public async Task Built_In_Member_Type_Properties_Are_Not_Reused_For_Different_Member_Types()
     {
         var provider = ScopeProvider;
         using (var scope = provider.CreateScope())
@@ -267,8 +267,8 @@ internal sealed class MemberTypeRepositoryTest : UmbracoIntegrationTest
 
             IMemberType memberType1 = MemberTypeBuilder.CreateSimpleMemberType();
             IMemberType memberType2 = MemberTypeBuilder.CreateSimpleMemberType("test2");
-            repository.Save(memberType1);
-            repository.Save(memberType2);
+            await repository.SaveAsync(memberType1, CancellationToken.None);
+            await repository.SaveAsync(memberType2, CancellationToken.None);
 
             var m1Ids = memberType1.PropertyTypes.Select(x => x.Id).ToArray();
             var m2Ids = memberType2.PropertyTypes.Select(x => x.Id).ToArray();
@@ -278,7 +278,7 @@ internal sealed class MemberTypeRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Persist_Member_Type_Property_Metadata()
+    public async Task Can_Persist_Member_Type_Property_Metadata()
     {
         var provider = ScopeProvider;
         using (var scope = provider.CreateScope())
@@ -290,10 +290,10 @@ internal sealed class MemberTypeRepositoryTest : UmbracoIntegrationTest
             memberType.SetMemberCanViewProperty("title", false);
             memberType.SetIsSensitiveProperty("title", true);
 
-            repository.Save(memberType);
+            await repository.SaveAsync(memberType, CancellationToken.None);
             scope.Complete();
 
-            var sut = (MemberType)repository.Get(memberType.Id);
+            var sut = (MemberType)await repository.GetAsync(memberType.Id, CancellationToken.None);
 
             Assert.That(sut.MemberCanEditProperty("title"), Is.True);
             Assert.That(sut.MemberCanViewProperty("title"), Is.False);
@@ -302,7 +302,7 @@ internal sealed class MemberTypeRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Delete_MemberType()
+    public async Task Can_Delete_MemberType()
     {
         // Arrange
         var provider = ScopeProvider;
@@ -312,12 +312,12 @@ internal sealed class MemberTypeRepositoryTest : UmbracoIntegrationTest
 
             // Act
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-            repository.Save(memberType);
+            await repository.SaveAsync(memberType, CancellationToken.None);
 
-            var contentType2 = repository.Get(memberType.Id);
-            repository.Delete(contentType2);
+            var contentType2 = await repository.GetAsync(memberType.Id, CancellationToken.None);
+            await repository.DeleteAsync(contentType2, CancellationToken.None);
 
-            var exists = repository.Exists(memberType.Id);
+            var exists = await repository.ExistsAsync(memberType.Id, CancellationToken.None);
 
             // Assert
             Assert.That(exists, Is.False);

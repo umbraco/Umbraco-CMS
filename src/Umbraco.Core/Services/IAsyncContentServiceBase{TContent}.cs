@@ -9,9 +9,8 @@ namespace Umbraco.Cms.Core.Services;
 /// <remarks>
 ///     Provides the typed lookup and batch save every asynchronous content service exposes.
 ///     <see cref="IContentService" /> and <see cref="IElementService" /> back it with asynchronous
-///     implementations; <see cref="IMemberService" /> implements it by delegating to its synchronous members so that
-///     members can share the asynchronous content editing base. Media remains on
-///     <see cref="IContentServiceBase{TItem}" /> alone.
+///     implementations; <see cref="IMemberService" /> and <see cref="IMediaService" /> implement it by delegating to
+///     their synchronous members so that members and media can share the asynchronous content editing base.
 /// </remarks>
 /// <typeparam name="TContent">The type of content item managed by this service.</typeparam>
 public interface IAsyncContentServiceBase<TContent> : IAsyncContentServiceBase

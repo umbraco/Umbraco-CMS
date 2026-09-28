@@ -112,7 +112,7 @@ public class NavigationNodeTests
         Assume.That(initial, Is.EqualTo(new[] { childA, childB, childC }));
 
         // Reverse the sort order via UpdateSortOrder, then invalidate (this mirrors what
-        // ContentNavigationServiceBase.UpdateSortOrder does after mutating a child).
+        // AsyncContentNavigationServiceBase.UpdateSortOrder does after mutating a child).
         structure[childA].UpdateSortOrder(2);
         structure[childB].UpdateSortOrder(1);
         structure[childC].UpdateSortOrder(0);
@@ -130,7 +130,7 @@ public class NavigationNodeTests
         // Documents the contract: NavigationNode.UpdateSortOrder on a child does NOT
         // automatically invalidate the parent's cache (the node has no parent reference).
         // Callers that mutate child SortOrder must call InvalidateOrderedChildren on the parent
-        // — which is what ContentNavigationServiceBase.UpdateSortOrder does.
+        // — which is what AsyncContentNavigationServiceBase.UpdateSortOrder does.
         var structure = new ConcurrentDictionary<Guid, NavigationNode>();
         Guid contentTypeKey = Guid.NewGuid();
         NavigationNode parent = AddNode(structure, contentTypeKey);
@@ -153,7 +153,7 @@ public class NavigationNodeTests
     public void GetOrderedChildren_StaleAfterDirectSortOrderEdit_SelfHealsOnNextAddChild()
     {
         // A third-party caller that mutates SortOrder directly on a NavigationNode (rather than
-        // going through ContentNavigationServiceBase.UpdateSortOrder) leaves the parent's ordered-
+        // going through AsyncContentNavigationServiceBase.UpdateSortOrder) leaves the parent's ordered-
         // children cache stale, but any subsequent structural mutation that flows through
         // AddChild/RemoveChild on that parent will discard the stale array and rebuild against
         // the current SortOrder values.
