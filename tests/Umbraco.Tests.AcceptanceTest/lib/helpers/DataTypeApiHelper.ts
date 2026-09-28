@@ -1300,9 +1300,6 @@ export class DataTypeApiHelper {
     return await this.save(dataType);
   }
 
-  /**
-   * Creates a Decimal data type constrained to the given minimum and maximum value.
-   */
   async createDecimalDataTypeWithMinAndMax(name: string, min: number, max: number) {
     await this.ensureNameNotExists(name);
 
@@ -2029,9 +2026,6 @@ export class DataTypeApiHelper {
     return await this.save(dataType);
   }
 
-  /**
-   * Creates a Numeric data type constrained to the given minimum and maximum value.
-   */
   async createNumericDataTypeWithMinAndMax(name: string, min: number, max: number) {
     await this.ensureNameNotExists(name);
 
