@@ -40,15 +40,16 @@ internal sealed class BlockListPropertyValueCreator : BlockPropertyValueCreatorB
     /// <param name="referenceCacheLevel">The cache level to use for property references during model creation.</param>
     /// <param name="intermediateBlockModelValue">A string containing the serialized intermediate value representing the block list.</param>
     /// <param name="preview">True if the model should be created in preview mode; otherwise, false.</param>
+    /// <param name="owningPropertyCulture">The culture of the stored property value the block value was loaded from, or <c>null</c> when the property does not vary by culture.</param>
     /// <param name="blockConfigurations">An array of <see cref="BlockListConfiguration.BlockConfiguration"/> objects used to configure the blocks.</param>
     /// <returns>A <see cref="BlockListModel"/> instance representing the constructed block list.</returns>
-    public async Task<BlockListModel> CreateBlockModelAsync(IPublishedElement owner, PropertyCacheLevel referenceCacheLevel, string intermediateBlockModelValue, bool preview, BlockListConfiguration.BlockConfiguration[] blockConfigurations)
+    public async Task<BlockListModel> CreateBlockModelAsync(IPublishedElement owner, PropertyCacheLevel referenceCacheLevel, string intermediateBlockModelValue, bool preview, string? owningPropertyCulture, BlockListConfiguration.BlockConfiguration[] blockConfigurations)
     {
         BlockListModel CreateEmptyModel() => BlockListModel.Empty;
 
         BlockListModel CreateModel(IList<BlockListItem> items) => new BlockListModel(items);
 
-        BlockListModel blockModel = await CreateBlockModelAsync(owner, referenceCacheLevel, intermediateBlockModelValue, preview, blockConfigurations, CreateEmptyModel, CreateModel);
+        BlockListModel blockModel = await CreateBlockModelAsync(owner, referenceCacheLevel, intermediateBlockModelValue, preview, owningPropertyCulture, blockConfigurations, CreateEmptyModel, CreateModel);
 
         return blockModel;
     }

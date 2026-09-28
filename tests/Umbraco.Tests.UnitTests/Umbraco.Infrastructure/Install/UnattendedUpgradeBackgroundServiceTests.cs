@@ -14,6 +14,7 @@ using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Install;
+using Umbraco.Cms.Infrastructure.Sync;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Install;
 
@@ -257,6 +258,43 @@ public class UnattendedUpgradeBackgroundServiceTests
         Assert.That(callOrder, Is.EqualTo(new[] { "starting", "ready" }));
     }
 
+    [TestCase(true)]
+    [TestCase(false)]
+    public async Task ExecuteAsync_ElectsServerRoleBeforeStartingNotification(bool isLeader)
+    {
+        // This service publishes UmbracoApplicationStartingNotification directly rather than going through
+        // CoreRuntime.StartAsync (which already returned early once RuntimeLevel.Upgrading was set), so it must
+        // make its own attempt to resolve the server role first - for both the leader and follower path, since
+        // both converge on the same call site after the migration/leadership branch.
+        var runtimeState = CreateMockRuntimeState();
+        var eventAggregator = new Mock<IEventAggregator>();
+        SetupPublishAsync(eventAggregator);
+
+        var callOrder = new List<string>();
+        var serverRoleElector = new Mock<IServerRoleElector>();
+        serverRoleElector
+            .Setup(x => x.TryElectOnceAsync(It.IsAny<CancellationToken>()))
+            .Callback(() => callOrder.Add("elected"))
+            .Returns(Task.CompletedTask);
+
+        eventAggregator
+            .Setup(x => x.PublishAsync(It.IsAny<UmbracoApplicationStartingNotification>(), It.IsAny<CancellationToken>()))
+            .Callback(() => callOrder.Add("starting"))
+            .Returns(Task.CompletedTask);
+
+        var sut = CreateSut(
+            runtimeState.Object,
+            eventAggregator.Object,
+            coordinator: isLeader ? CreateLeaderCoordinator() : CreateFollowerCoordinator(),
+            serverRoleElector: serverRoleElector.Object);
+
+        await sut.StartAsync(CancellationToken.None);
+        await sut.ExecuteTask!;
+
+        serverRoleElector.Verify(x => x.TryElectOnceAsync(It.IsAny<CancellationToken>()), Times.Once);
+        Assert.That(callOrder, Is.EqualTo(new[] { "elected", "starting" }));
+    }
+
     [Test]
     public async Task ExecuteAsync_WhenFollower_MarksContentRoutingReadyAfterStartingNotification()
     {
@@ -319,7 +357,8 @@ public class UnattendedUpgradeBackgroundServiceTests
         IEventAggregator eventAggregator,
         IHostApplicationLifetime? hostApplicationLifetime = null,
         IMigrationCoordinator? coordinator = null,
-        IContentRoutingReadiness? contentRoutingReadiness = null)
+        IContentRoutingReadiness? contentRoutingReadiness = null,
+        IServerRoleElector? serverRoleElector = null)
     {
         var components = new ComponentCollection(
             () => Enumerable.Empty<IAsyncComponent>(),
@@ -336,6 +375,7 @@ public class UnattendedUpgradeBackgroundServiceTests
             hostApplicationLifetime ?? CreateMockLifetime().Object,
             coordinator,
             contentRoutingReadiness ?? Mock.Of<IContentRoutingReadiness>(),
+            serverRoleElector ?? Mock.Of<IServerRoleElector>(),
             NullLogger<UnattendedUpgradeBackgroundService>.Instance);
     }
 

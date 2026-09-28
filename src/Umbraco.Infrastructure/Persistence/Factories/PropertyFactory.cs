@@ -2,6 +2,7 @@ using System.Globalization;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Extensions;
 
@@ -66,6 +67,10 @@ internal static class PropertyFactory
     /// <param name="publishedVersionId"></param>
     /// <param name="properties">The properties to map</param>
     /// <param name="languageRepository"></param>
+    /// <param name="propertyEditors">
+    ///     The collection of registered property editors, used to determine which specific culture(s) an edit
+    ///     applies to when a property is culture-invariant but its data editor carries per-culture nested data.
+    /// </param>
     /// <param name="edited">out parameter indicating that one or more properties have been edited</param>
     /// <param name="editedCultures">
     ///     Out parameter containing a collection of edited cultures when the contentVariation varies by culture.
@@ -78,6 +83,7 @@ internal static class PropertyFactory
         int publishedVersionId,
         IEnumerable<IProperty> properties,
         ILanguageRepository languageRepository,
+        PropertyEditorCollection propertyEditors,
         out bool edited,
         out HashSet<string>? editedCultures)
     {
@@ -153,7 +159,30 @@ internal static class PropertyFactory
                                 defaultCulture = languageRepository.GetDefaultIsoCode();
                             }
 
-                            editedCultures?.Add(defaultCulture);
+                            // the property itself is invariant, but its data editor may carry per-culture
+                            // nested data (e.g. a Block List/Grid property whose element types vary by
+                            // culture) - ask it which specific culture(s) actually changed, instead of
+                            // blindly attributing the edit to the default culture.
+                            string[]? changedCultures = null;
+                            if (propertyEditors.TryGet(property.PropertyType.PropertyEditorAlias, out IDataEditor? dataEditor) &&
+                                dataEditor.CanMergePartialPropertyValues(property.PropertyType))
+                            {
+                                changedCultures = dataEditor
+                                    .GetChangedCulturesForPartialPropertyValues(
+                                        propertyValue?.EditedValue,
+                                        propertyValue?.PublishedValue,
+                                        defaultCulture)
+                                    .ToArray();
+                            }
+
+                            if (changedCultures is { Length: > 0 })
+                            {
+                                editedCultures?.UnionWith(changedCultures);
+                            }
+                            else
+                            {
+                                editedCultures?.Add(defaultCulture);
+                            }
                         }
                     }
                 }

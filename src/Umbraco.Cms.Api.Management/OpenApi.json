@@ -13780,8 +13780,7 @@
             "name": "baseUrl",
             "in": "query",
             "schema": {
-              "type": "string",
-              "default": "https://our.umbraco.com"
+              "type": "string"
             }
           }
         ],
@@ -43421,7 +43420,8 @@
           "hasChildren",
           "id",
           "isFolder",
-          "name"
+          "name",
+          "variants"
         ],
         "type": "object",
         "properties": {
@@ -43463,6 +43463,16 @@
               }
             ],
             "nullable": true
+          },
+          "variants": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DocumentVariantItemResponseModel"
+                }
+              ]
+            }
           }
         },
         "additionalProperties": false
@@ -43472,6 +43482,7 @@
           "ancestors",
           "documentType",
           "flags",
+          "hasChildren",
           "id",
           "isProtected",
           "isTrashed",
@@ -43522,6 +43533,9 @@
           "sortOrder": {
             "type": "integer",
             "format": "int32"
+          },
+          "hasChildren": {
+            "type": "boolean"
           },
           "documentType": {
             "oneOf": [
@@ -46178,6 +46192,7 @@
       "MediaCollectionResponseModel": {
         "required": [
           "flags",
+          "hasChildren",
           "id",
           "mediaType",
           "sortOrder",
@@ -46228,12 +46243,19 @@
             "type": "integer",
             "format": "int32"
           },
+          "hasChildren": {
+            "type": "boolean"
+          },
           "mediaType": {
             "oneOf": [
               {
                 "$ref": "#/components/schemas/MediaTypeCollectionReferenceResponseModel"
               }
             ]
+          },
+          "extension": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -46300,6 +46322,10 @@
                 "$ref": "#/components/schemas/MediaTypeReferenceResponseModel"
               }
             ]
+          },
+          "extension": {
+            "type": "string",
+            "nullable": true
           },
           "variants": {
             "type": "array",
@@ -46510,6 +46536,10 @@
                 "$ref": "#/components/schemas/MediaTypeReferenceResponseModel"
               }
             ]
+          },
+          "extension": {
+            "type": "string",
+            "nullable": true
           },
           "variants": {
             "type": "array",

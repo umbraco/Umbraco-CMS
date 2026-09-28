@@ -6,6 +6,7 @@ export * from './entity-detail/index.js';
 export * from './entity/index.js';
 export * from './info-app/index.js';
 export * from './modals/index.js';
+export * from './namable/index.js';
 export * from './paths.js';
 export * from './submittable/index.js';
 export * from './utils/check-will-navigate-away.function.js';

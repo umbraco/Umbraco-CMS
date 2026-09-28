@@ -76,14 +76,14 @@ public interface IScope : Infrastructure.Scoping.IScope
     /// <summary>
     /// Write-locks some lock objects.
     /// </summary>
-    /// <param name="timeout">The database timeout in milliseconds</param>
+    /// <param name="timeout">The database timeout.</param>
     /// <param name="lockId">The lock object identifier.</param>
     new void WriteLock(TimeSpan timeout, int lockId);
 
     /// <summary>
     /// Read-locks some lock objects.
     /// </summary>
-    /// <param name="timeout">The database timeout in milliseconds</param>
+    /// <param name="timeout">The database timeout.</param>
     /// <param name="lockId">The lock object identifier.</param>
     new void ReadLock(TimeSpan timeout, int lockId);
 

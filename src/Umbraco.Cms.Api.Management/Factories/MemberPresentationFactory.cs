@@ -194,6 +194,7 @@ internal sealed class MemberPresentationFactory : IMemberPresentationFactory
                 Id = item.MemberTypeKey ?? Guid.Empty,
                 Icon = item.MemberTypeIcon ?? string.Empty,
             },
+            Groups = item.Groups,
         };
 
     private MemberItemResponseModel CreateItemResponseModel<T>(T entity)
