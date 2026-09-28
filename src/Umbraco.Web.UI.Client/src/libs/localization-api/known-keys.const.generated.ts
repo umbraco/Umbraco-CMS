@@ -292,6 +292,7 @@ export const KNOWN_LOCALIZATION_KEYS: readonly UmbKnownLocalizationKey[] = [
 	'blockEditor_layoutOptions',
 	'blockEditor_notExposedDescription',
 	'blockEditor_notExposedLabel',
+	'blockEditor_notPublishedLibraryElementDescription',
 	'blockEditor_pickSpecificAllowance',
 	'blockEditor_propertyEditorNotSupported',
 	'blockEditor_rangeAllowed',

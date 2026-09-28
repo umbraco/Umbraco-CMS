@@ -1,10 +1,30 @@
-import { css, customElement, html } from '@umbraco-cms/backoffice/external/lit';
+import { UMB_COLLECTION_CONTEXT } from '../default/collection-default.context-token.js';
+import { css, customElement, html, nothing, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-collection-action-bundle')
 export class UmbCollectionActionBundleElement extends UmbLitElement {
+	@state()
+	private _hideCollectionActions = false;
+
+	constructor() {
+		super();
+
+		/**
+		 * We observe hideCollectionActions until we have conditions on Collection Actions. To avoid Action appearing in modals, later we will make it possible and remove this. [NL]
+		 */
+		this.consumeContext(UMB_COLLECTION_CONTEXT, (context) => {
+			this.observe(
+				context?.hideCollectionActions,
+				(hideCollectionActions) => (this._hideCollectionActions = hideCollectionActions ?? false),
+				'umbCollectionHideCollectionActionsObserver',
+			);
+		});
+	}
+
 	override render() {
-		return html`<umb-extension-with-api-slot type="collectionAction"></umb-extension-with-api-slot>`;
+		if (this._hideCollectionActions) return nothing;
+		return html`<umb-extension-slot type="collectionAction"></umb-extension-slot>`;
 	}
 
 	static override readonly styles = [
