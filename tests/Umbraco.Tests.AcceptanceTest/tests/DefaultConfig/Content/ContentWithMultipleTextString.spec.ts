@@ -30,6 +30,8 @@ test('can not publish a mandatory multiple text string with an empty value', asy
   // Assert
   await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.nullValue);
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
+  const rejectedContentData = await umbracoApi.document.getByName(contentName);
+  expect(rejectedContentData.variants[0].state).toBe('Draft');
   await umbracoUi.content.addMultipleTextStringItem(text);
   await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBeUpdated();
   const contentData = await umbracoApi.document.getByName(contentName);

@@ -79,4 +79,6 @@ test('can not publish a mandatory date time with time zone picker with an empty 
   // Assert
   await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.emptyDate);
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
+  const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.variants[0].state).toBe('Draft');
 });

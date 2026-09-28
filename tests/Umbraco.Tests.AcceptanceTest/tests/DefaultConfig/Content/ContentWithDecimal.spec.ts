@@ -78,6 +78,8 @@ test('can not publish a mandatory decimal with an empty value', async ({umbracoA
   // Assert
   await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.nullValue);
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
+  const rejectedContentData = await umbracoApi.document.getByName(contentName);
+  expect(rejectedContentData.variants[0].state).toBe('Draft');
 
   // The mandatory check only re-runs on the next publish attempt, unlike the range messages above
   await umbracoUi.content.enterDecimal(number);

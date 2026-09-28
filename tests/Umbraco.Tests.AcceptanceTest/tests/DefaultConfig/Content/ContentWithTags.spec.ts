@@ -96,4 +96,6 @@ test('can not publish a mandatory tags with an empty value', async ({umbracoApi,
   await umbracoUi.content.isErrorNotificationVisible();
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
   await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.nullValue);
+  const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.variants[0].state).toBe('Draft');
 });
