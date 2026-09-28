@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
@@ -14,7 +13,6 @@ using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
-using Umbraco.Cms.Tests.Integration.Attributes;
 using Umbraco.Cms.Tests.Integration.Testing;
 using Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping;
 
@@ -44,9 +42,6 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
             options.NuCacheSerializerType = NuCacheSerializerType.JSON;
         });
     }
-
-    public static void ConfigureAllowEditInvariantFromNonDefaultTrue(IUmbracoBuilder builder)
-        => builder.Services.Configure<ContentSettings>(config => config.AllowEditInvariantFromNonDefault = true);
 
     private void AssertJsonStartsWith(int id, string expected)
     {
@@ -1532,7 +1527,6 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
     [TestCase(ContentVariation.Nothing, ContentVariation.CultureAndSegment)]
     [TestCase(ContentVariation.Segment, ContentVariation.Culture)]
     [TestCase(ContentVariation.Segment, ContentVariation.CultureAndSegment)]
-    [ConfigureBuilder(ActionName = nameof(ConfigureAllowEditInvariantFromNonDefaultTrue))]
     public async Task Change_Property_Type_From_Invariant_To_Variant_When_Content_Only_Exists_In_Non_Default_Language_With_AllowEditInvariantFromNonDefault(
         ContentVariation invariant, ContentVariation variant)
     {
@@ -1583,7 +1577,6 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
     [TestCase(ContentVariation.Culture, ContentVariation.Segment)]
     [TestCase(ContentVariation.CultureAndSegment, ContentVariation.Nothing)]
     [TestCase(ContentVariation.CultureAndSegment, ContentVariation.Segment)]
-    [ConfigureBuilder(ActionName = nameof(ConfigureAllowEditInvariantFromNonDefaultTrue))]
     public async Task Change_Property_Type_From_Variant_To_Invariant_When_Content_Only_Exists_In_Non_Default_Language_With_AllowEditInvariantFromNonDefault(
         ContentVariation variant, ContentVariation invariant)
     {
@@ -1631,7 +1624,6 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
     /// This is a regression test for https://github.com/umbraco/Umbraco-CMS/issues/11771
     /// </summary>
     [Test]
-    [ConfigureBuilder(ActionName = nameof(ConfigureAllowEditInvariantFromNonDefaultTrue))]
     public async Task Change_Property_Type_Invariant_To_Variant_And_Back_When_Content_Only_Exists_In_Non_Default_Language_With_AllowEditInvariantFromNonDefault()
     {
         // Arrange - Create languages with English as default and French as non-default
@@ -1682,7 +1674,6 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
     /// This is a regression test for https://github.com/umbraco/Umbraco-CMS/issues/11771
     /// </summary>
     [Test]
-    [ConfigureBuilder(ActionName = nameof(ConfigureAllowEditInvariantFromNonDefaultTrue))]
     public async Task Change_Content_Type_From_Invariant_To_Variant_When_Content_Only_Exists_In_Non_Default_Language_With_AllowEditInvariantFromNonDefault()
     {
         // Arrange - Create languages with English as default and French as non-default
