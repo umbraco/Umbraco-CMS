@@ -322,6 +322,20 @@ export class UserApiHelper {
     return elementStartNodeIdsArray.every(id => elementStartNodeIds.includes(id));
   }
 
+  async doesUserContainDocumentBlueprintStartNodeIds(userName: string, documentBlueprintStartNodeIds: string[]) {
+    const user = await this.getByName(userName);
+    if (!user.documentBlueprintStartNodeIds || user.documentBlueprintStartNodeIds.length === 0) {
+      return false;
+    }
+    const documentBlueprintStartNodeIdsArray = user.documentBlueprintStartNodeIds.map(documentBlueprintStartNode => documentBlueprintStartNode.id);
+    return documentBlueprintStartNodeIdsArray.every(id => documentBlueprintStartNodeIds.includes(id));
+  }
+
+  async doesUserContainDocumentBlueprintRootAccess(userName: string) {
+    const user = await this.getByName(userName);
+    return user.hasDocumentBlueprintRootAccess;
+  }
+
   async setUserPermissionsForElement(userName: string, userEmail: string, userPassword: string, userGroupId: string, elementStartNodeIds: string[] = [], hasElementRootAccess = false, uiCulture: string = 'en-us') {
     let user = await this.getByName(userName);
 
