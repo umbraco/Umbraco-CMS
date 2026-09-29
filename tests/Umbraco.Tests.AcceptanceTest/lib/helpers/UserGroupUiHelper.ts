@@ -291,7 +291,8 @@ export class UserGroupUiHelper extends UiBaseLocators {
   }
 
   async isUserVisibleInUserGroup(userName: string, isVisible = true) {
-    await this.isVisible(this.workspaceUserItemRefs.filter({hasText: userName}), isVisible);
+    // Exact match, not a substring filter, to avoid ambiguity against leftover/residual users.
+    await this.isVisible(this.workspaceUserItemRefs.filter({has: this.page.getByText(userName, {exact: true})}), isVisible);
   }
 
   async getUsersInGroupCount() {
@@ -300,7 +301,7 @@ export class UserGroupUiHelper extends UiBaseLocators {
   }
 
   async clickUserCardWithName(userName: string) {
-    await this.click(this.page.locator('uui-card-user', {hasText: userName}));
+    await this.click(this.page.locator('uui-card-user').filter({has: this.page.getByText(userName, {exact: true})}));
   }
 
   async clickChooseModalButtonAndWaitForGroupUsersUpdate() {

@@ -664,7 +664,7 @@ export class UiBaseLocators extends BasePage {
   }
 
   async isActionsMenuForNameVisible(name: string, isVisible = true) {
-    const menuItem = this.getMenuItemByLabel(name);
+    const menuItem = this.getMenuItemByLabel(name).first();
     await this.click(menuItem);
     await this.isVisible(menuItem.locator("#action-modal").first(), isVisible);
   }
@@ -691,9 +691,11 @@ export class UiBaseLocators extends BasePage {
   async openCaretButtonForName(name: string, isInModal: boolean = false) {
     let menuItem: Locator;
     if (isInModal) {
-      menuItem = this.sidebarModal.locator(`uui-menu-item[label="${name}"]`);
+      menuItem = this.sidebarModal.locator(`uui-menu-item[label="${name}"]`).first();
     } else {
-      menuItem = this.getMenuItemByLabel(name);
+      // .first(): the tree can transiently render the same node twice while an ancestor caret
+      // expansion is still settling, which would otherwise be a strict-mode violation.
+      menuItem = this.getMenuItemByLabel(name).first();
     }
     await this.waitForVisible(menuItem, ConstantHelper.timeout.long);
     const isCaretButtonOpen = await menuItem.getAttribute("show-children");
@@ -715,7 +717,7 @@ export class UiBaseLocators extends BasePage {
 
   async isTreeItemVisible(name: string, isVisible = true) {
     await this.isVisible(
-      this.treeItem.locator('[label="' + name + '"]'),
+      this.treeItem.locator('[label="' + name + '"]').first(),
       isVisible,
     );
   }
@@ -723,9 +725,10 @@ export class UiBaseLocators extends BasePage {
   async doesTreeItemHaveTheCorrectIcon(name: string, icon: string) {
     return await this.isVisible(
       this.treeItem
-        .filter({ hasText: name })
+        .filter({ has: this.page.getByText(name, { exact: true }) })
         .locator("umb-icon")
-        .locator('[name="' + icon + '"]'),
+        .locator('[name="' + icon + '"]')
+        .first(),
     );
   }
 
@@ -1145,7 +1148,7 @@ export class UiBaseLocators extends BasePage {
   // the click keeps working regardless of how the tree item renders its label HTML. Scope defaults to the
   // section sidebar; pass a modal/other root for trees rendered elsewhere (e.g. pickers).
   async clickTreeItemWithName(name: string, scope?: Locator | Page) {
-    await this.click((scope ?? this.sectionSidebar).getByText(name, { exact: true }));
+    await this.click((scope ?? this.sectionSidebar).getByText(name, { exact: true }).first());
   }
 
   async clickButtonWithName(name: string, isExact: boolean = false) {

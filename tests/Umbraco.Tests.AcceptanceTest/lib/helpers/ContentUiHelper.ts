@@ -181,7 +181,6 @@ export class ContentUiHelper extends UiBaseLocators {
   private readonly modalFormValidationMessage: Locator;
   private readonly treePickerSearchTxt: Locator;
   private readonly treePickerSearchTabBtn: Locator;
-  private readonly searchTabInPickerModal: Locator;
   private readonly mediaPickerSearchTxt: Locator;
   private readonly memberPickerSearchTxt: Locator;
   private readonly documentCreateOptionsModal: Locator;
@@ -500,8 +499,10 @@ export class ContentUiHelper extends UiBaseLocators {
     this.cascadingMenuContainer = page.locator('umb-cascading-menu-popover uui-scroll-container');
     this.modalFormValidationMessage = this.sidebarModal.locator('umb-form-validation-message #messages');
     this.treePickerSearchTxt = this.sidebarModal.locator('[data-mark="picker:search-input"] #input');
-    this.treePickerSearchTabBtn = this.page.locator('umb-tree-picker-modal').locator('uui-tab[data-mark="picker:tab:search"]');
-    this.searchTabInPickerModal = this.sidebarModal.locator('[data-mark="picker:tab:search"]');
+    // Scoped to the generic modal-sidebar wrapper, not a specific picker tag, since different entity
+    // pickers (e.g. umb-document-picker-modal) use their own modal element. .last() picks the topmost
+    // if modals are stacked.
+    this.treePickerSearchTabBtn = this.sidebarModal.locator('uui-tab[data-mark="picker:tab:search"]').last();
     this.mediaPickerSearchTxt = this.page.locator('umb-media-picker-modal #search #input');
     this.memberPickerSearchTxt = this.page.locator('umb-member-picker-modal #input');
     // Property Actions
@@ -975,8 +976,16 @@ export class ContentUiHelper extends UiBaseLocators {
   }
 
   async setFocalPoint(widthPercentage: number = 50, heightPercentage: number = 50) {
-    await this.page.waitForTimeout(ConstantHelper.wait.medium);
-    const element = await this.page.locator('#image').boundingBox();
+    const imageLocator = this.page.locator('#image');
+    await expect(imageLocator).toBeVisible();
+    // Wait for the image to finish loading before reading its box: a fixed sleep here can race the
+    // image's real layout size, producing a stale/zero-sized box and wrong drag coordinates.
+    await expect(async () => {
+      const naturalWidth = await imageLocator.evaluate((img: HTMLImageElement) => img.naturalWidth);
+      expect(naturalWidth).toBeGreaterThan(0);
+    }).toPass({timeout: ConstantHelper.timeout.medium});
+
+    const element = await imageLocator.boundingBox();
     if (!element) {
       throw new Error('Element not found');
     }
@@ -2124,7 +2133,6 @@ export class ContentUiHelper extends UiBaseLocators {
   }
 
   async enterSearchKeywordInTreePickerModal(keyword: string) {
-    await this.click(this.searchTabInPickerModal);
     // The search input lives behind the modal's Search tab and is not visible while the Browse tab is active.
     await this.click(this.treePickerSearchTabBtn);
     await this.enterText(this.treePickerSearchTxt, keyword);
