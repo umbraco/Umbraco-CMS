@@ -688,25 +688,27 @@ export class UiBaseLocators extends BasePage {
     await this.click(this.caretBtn);
   }
 
-  async openCaretButtonForName(name: string, isInModal: boolean = false) {
-    let menuItem: Locator;
-    if (isInModal) {
-      menuItem = this.sidebarModal.locator(`uui-menu-item[label="${name}"]`).first();
-    } else {
-      // .first(): the tree can transiently render the same node twice while an ancestor caret
-      // expansion is still settling, which would otherwise be a strict-mode violation.
-      menuItem = this.getMenuItemByLabel(name).first();
-    }
+  async openCaretButtonForName(name: string) {
+    const menuItem = this.getMenuItemByLabel(name).first();
     await this.waitForVisible(menuItem, ConstantHelper.timeout.long);
     // The caret toggles, so acting on a single read can collapse a node that was still expanding.
-    // Click through menuItem (already scoped above), not clickCaretButtonForName - that resolves the
-    // item page-wide, which finds a same-named item's caret behind an open modal instead.
     await expect(async () => {
-      if (await menuItem.getAttribute("show-children") === null) {
-        await this.click(menuItem.locator("#caret-button").first());
-      }
+      await this.clickCaretButtonIfCollapsed(menuItem);
       expect(await menuItem.getAttribute("show-children")).not.toBeNull();
     }).toPass({timeout: ConstantHelper.timeout.medium});
+  }
+
+  // A picker browses into the node rather than expanding it in place, so there is no expanded state to assert.
+  async clickModalCaretButtonForName(name: string) {
+    const menuItem = this.sidebarModal.locator(`uui-menu-item[label="${name}"]`).first();
+    await this.waitForVisible(menuItem, ConstantHelper.timeout.long);
+    await this.clickCaretButtonIfCollapsed(menuItem);
+  }
+
+  private async clickCaretButtonIfCollapsed(menuItem: Locator) {
+    if (await menuItem.getAttribute("show-children") === null) {
+      await this.click(menuItem.locator("#caret-button").first());
+    }
   }
 
   // Tree Methods

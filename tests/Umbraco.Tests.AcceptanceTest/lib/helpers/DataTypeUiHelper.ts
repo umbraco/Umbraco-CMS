@@ -968,7 +968,7 @@ export class DataTypeUiHelper extends UiBaseLocators {
   async chooseBlockThumbnailWithPath(mediaPath: string) {
     const mediaItems = mediaPath.split('/media/')[1].split('/');
     await this.click(this.chooseThumbnailAlias);
-    await this.openCaretButtonForName('wwwroot', true);
+    await this.clickModalCaretButtonForName('wwwroot');
     await this.clickExpandChildItemsForMediaButton();
     for (let i = 0; i < mediaItems.length; i++) {
       if (i === mediaItems.length - 1) {
