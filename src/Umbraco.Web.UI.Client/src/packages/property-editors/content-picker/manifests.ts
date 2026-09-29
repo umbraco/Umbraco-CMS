@@ -11,6 +11,7 @@ const manifest: ManifestPropertyEditorUi = {
 	name: 'Multi Node Tree Picker Property Editor UI',
 	element: () => import('./property-editor-ui-content-picker.element.js'),
 	meta: {
+		supportsVariantChange: true,
 		label: 'Multi Node Tree Picker',
 		icon: 'icon-page-add',
 		group: '#propertyEditorUIGroups_pickers',

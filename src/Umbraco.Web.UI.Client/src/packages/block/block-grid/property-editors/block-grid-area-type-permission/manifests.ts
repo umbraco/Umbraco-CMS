@@ -6,6 +6,7 @@ export const manifest: ManifestPropertyEditorUi = {
 	name: 'Block Grid Area Type Permission Configuration Property Editor UI',
 	element: () => import('./block-grid-area-type-permission.element.js'),
 	meta: {
+		supportsVariantChange: true,
 		label: 'Block Grid Area Type Permissions',
 		icon: 'icon-document',
 		group: '#propertyEditorUIGroups_common',
