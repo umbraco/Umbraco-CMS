@@ -1,6 +1,6 @@
 import type { UmbInputContentElement } from './components/input-content/index.js';
 import type { UmbContentPickerSource, UmbContentPickerSourceType } from './types.js';
-import { UmbDynamicRootResolver } from '@umbraco-cms/backoffice/dynamic-root';
+import { UmbContentDynamicRootResolver } from '@umbraco-cms/backoffice/content';
 import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
@@ -74,7 +74,7 @@ export class UmbPropertyEditorUIContentPickerElement
 	private _interactionMemories: Array<UmbInteractionMemoryModel> = [];
 
 	#dynamicRoot?: UmbContentPickerSource['dynamicRoot'];
-	#dynamicRootResolver = new UmbDynamicRootResolver(this);
+	#dynamicRootResolver = new UmbContentDynamicRootResolver(this);
 
 	#entityTypeDictionary: { [type in UmbContentPickerSourceType]: string } = {
 		content: UMB_DOCUMENT_ENTITY_TYPE,
