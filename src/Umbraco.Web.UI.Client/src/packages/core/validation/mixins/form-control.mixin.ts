@@ -179,8 +179,8 @@ export function UmbFormControlMixin<
 			});
 			this.addEventListener('blur', () => {
 				if (this.pristine) {
-					this.#hadFocus = true;
 					if (this.#valueOnFocus !== this.value) {
+						this.#hadFocus = true;
 						this.checkValidity();
 					}
 				}
