@@ -55,6 +55,7 @@ export class ContentUiHelper extends UiBaseLocators {
   private readonly addMultipleTextStringBtn: Locator;
   private readonly multipleTextStringValueTxt: Locator;
   private readonly sliderInput: Locator;
+  private readonly focalPointImg: Locator;
   private readonly tabItems: Locator;
   private readonly documentWorkspace: Locator;
   private readonly selectAVariantBtn: Locator;
@@ -275,6 +276,8 @@ export class ContentUiHelper extends UiBaseLocators {
       .locator("umb-input-multiple-text-string")
       .getByLabel("Value");
     this.sliderInput = page.locator("umb-property-editor-ui-slider #input");
+    // Scoped: umb-image-cropper and umb-image-cropper-preview also render #image.
+    this.focalPointImg = page.locator("umb-image-cropper-focus-setter #image");
     this.tabItems = page.locator("uui-tab");
     this.documentWorkspace = page.locator("umb-document-workspace-editor");
     this.selectAVariantBtn = page.getByRole("button", {
@@ -976,16 +979,18 @@ export class ContentUiHelper extends UiBaseLocators {
   }
 
   async setFocalPoint(widthPercentage: number = 50, heightPercentage: number = 50) {
-    const imageLocator = this.page.locator('#image');
-    await expect(imageLocator).toBeVisible();
-    // Wait for the image to finish loading before reading its box: a fixed sleep here can race the
-    // image's real layout size, producing a stale/zero-sized box and wrong drag coordinates.
-    await expect(async () => {
-      const naturalWidth = await imageLocator.evaluate((img: HTMLImageElement) => img.naturalWidth);
-      expect(naturalWidth).toBeGreaterThan(0);
-    }).toPass({timeout: ConstantHelper.timeout.medium});
+    await expect(this.focalPointImg).toBeVisible();
+    // The drag uses the rendered box, so wait for layout to settle rather than for the image to load.
+    let previousWidth = -1;
+    await expect.poll(async () => {
+      const box = await this.focalPointImg.boundingBox();
+      const width = box?.width ?? 0;
+      const settled = width > 0 && width === previousWidth;
+      previousWidth = width;
+      return settled;
+    }, {timeout: ConstantHelper.timeout.medium}).toBeTruthy();
 
-    const element = await imageLocator.boundingBox();
+    const element = await this.focalPointImg.boundingBox();
     if (!element) {
       throw new Error('Element not found');
     }
