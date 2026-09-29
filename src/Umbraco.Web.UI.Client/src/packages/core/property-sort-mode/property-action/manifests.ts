@@ -12,6 +12,7 @@ export const UMB_PROPERTY_ACTION_SORT_MODE_KIND_MANIFEST: UmbExtensionManifestKi
 		...UMB_PROPERTY_ACTION_DEFAULT_KIND_MANIFEST.manifest,
 		type: 'propertyAction',
 		kind: 'sortMode',
+		separatorBefore: true,
 		api: UmbPropertySortModePropertyAction,
 		element: UmbPropertySortModePropertyActionElement,
 		meta: {
