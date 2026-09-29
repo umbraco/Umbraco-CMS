@@ -58,7 +58,7 @@ public interface IPublishableContentRepository<TContent> : IContentRepository<in
     /// </summary>
     /// <remarks>
     ///     The content returned from this method may be culture variant, in which case you can use
-    ///     <see cref="Umbraco.Extensions.ContentExtensions.GetStatus(IContent, ContentScheduleCollection, string?)" /> to get the status for a specific culture.
+    ///     <see cref="Umbraco.Extensions.ContentExtensions.GetStatus(IPublishableContentBase, ContentScheduleCollection, string?)" /> to get the status for a specific culture.
     /// </remarks>
     IEnumerable<TContent> GetContentForExpiration(DateTime date);
 
@@ -67,7 +67,7 @@ public interface IPublishableContentRepository<TContent> : IContentRepository<in
     /// </summary>
     /// <remarks>
     ///     The content returned from this method may be culture variant, in which case you can use
-    ///     <see cref="Umbraco.Extensions.ContentExtensions.GetStatus(IContent, ContentScheduleCollection, string?)" /> to get the status for a specific culture.
+    ///     <see cref="Umbraco.Extensions.ContentExtensions.GetStatus(IPublishableContentBase, ContentScheduleCollection, string?)" /> to get the status for a specific culture.
     /// </remarks>
     IEnumerable<TContent> GetContentForRelease(DateTime date);
 

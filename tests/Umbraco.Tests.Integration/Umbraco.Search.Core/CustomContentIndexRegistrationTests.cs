@@ -49,7 +49,7 @@ public class CustomContentIndexRegistrationTests : ContentBaseTestBase
             .Build();
         await GetRequiredService<IContentTypeService>().CreateAsync(contentType, CoreConstants.Security.SuperUserKey);
 
-        ContentService.Save(
+        await ContentService.SaveAsync(
             new ContentBuilder()
                 .WithKey(ContentKey)
                 .WithContentType(contentType)
@@ -59,7 +59,10 @@ public class CustomContentIndexRegistrationTests : ContentBaseTestBase
                     {
                         title = "The content title"
                     })
-                .Build());
+                .Build(),
+            Cms.Core.Constants.Security.SuperUserKey,
+            null,
+            CancellationToken.None);
 
         IMediaType mediaType = new MediaTypeBuilder()
             .WithAlias("theMediaType")
@@ -113,9 +116,9 @@ public class CustomContentIndexRegistrationTests : ContentBaseTestBase
     }
 
     [Test]
-    public void CustomIndexRegistration_CanContainAllTypesOfContent()
+    public async Task CustomIndexRegistration_CanContainAllTypesOfContent()
     {
-        ContentService.Save(Content());
+        await ContentService.SaveAsync(Content(), Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
         MediaService.Save(Media());
         MemberService.Save(Member());
 
@@ -140,7 +143,7 @@ public class CustomContentIndexRegistrationTests : ContentBaseTestBase
         });
     }
 
-    private IContent Content() => ContentService.GetById(ContentKey) ?? throw new InvalidOperationException("Content was not found");
+    private IContent Content() => ContentService.GetByIdAsync(ContentKey, CancellationToken.None).GetAwaiter().GetResult() ?? throw new InvalidOperationException("Content was not found");
 
     private IMedia Media() => MediaService.GetById(MediaKey) ?? throw new InvalidOperationException("Media was not found");
 

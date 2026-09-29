@@ -233,6 +233,20 @@ internal sealed class MediaServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
+    public void Can_Move_Media_Populates_ParentKey()
+    {
+        // Arrange
+        var mediaItems = CreateTrashedTestMedia();
+        var media = MediaService.GetById(mediaItems.Item3.Id);
+
+        // Act
+        MediaService.Move(media, mediaItems.Item2.Id);
+
+        // Assert
+        Assert.That(media.ParentKey, Is.EqualTo(mediaItems.Item2.Key));
+    }
+
+    [Test]
     public void Can_Move_Media_To_RecycleBin()
     {
         // Arrange

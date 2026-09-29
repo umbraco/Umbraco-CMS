@@ -102,8 +102,8 @@ public class VariantFilterTest : SearcherTestBase
             .WithCultureInfo("ja-JP")
             .Build();
 
-        await LanguageService.CreateAsync(langDk, Constants.Security.SuperUserKey);
-        await LanguageService.CreateAsync(langJp, Constants.Security.SuperUserKey);
+        await LanguageService.CreateAsync(langDk, Cms.Core.Constants.Security.SuperUserKey);
+        await LanguageService.CreateAsync(langJp, Cms.Core.Constants.Security.SuperUserKey);
 
         IContentType contentType = new ContentTypeBuilder()
             .WithAlias("variant")
@@ -127,7 +127,7 @@ public class VariantFilterTest : SearcherTestBase
             .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.TextBox)
             .Done()
             .Build();
-        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+        await ContentTypeService.CreateAsync(contentType, Cms.Core.Constants.Security.SuperUserKey);
 
         Content root = new ContentBuilder()
             .WithKey(RootKey)
@@ -149,15 +149,13 @@ public class VariantFilterTest : SearcherTestBase
         root.SetValue("body", "ボディ-segment-1", "ja-JP", "segment-1");
         root.SetValue("body", "ボディ-segment-2", "ja-JP", "segment-2");
 
-        await WaitForIndexing(GetIndexAlias(true), () =>
+        await WaitForIndexing(GetIndexAlias(true), async () =>
         {
-            ContentService.Save(root);
-            ContentService.Publish(root, ["*"]);
-
-            return Task.CompletedTask;
+            await ContentService.SaveAsync(root, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
+            await ContentService.PublishAsync(root, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         });
 
-        IContent? content = ContentService.GetById(RootKey);
+        IContent? content = ContentService.GetByIdAsync(RootKey, CancellationToken.None).GetAwaiter().GetResult();
         Assert.That(content, Is.Not.Null);
     }
 }

@@ -24,10 +24,10 @@ public class ContentIndexingNotificationTests : InvariantContentTestBase
     }
 
     [Test]
-    public void PublishedContent_CanManipulateIndexedFields()
+    public async Task PublishedContent_CanManipulateIndexedFields()
     {
         AddOrUpdateIndexingNotificationHandler.ManipulateFields = true;
-        ContentService.PublishBranch(Root(), PublishBranchFilter.IncludeUnpublished, ["*"]);
+        await ContentService.PublishBranchAsync(Root(), PublishBranchFilter.IncludeUnpublished, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.PublishedContent);
         Assert.That(documents, Has.Count.EqualTo(4));
@@ -50,10 +50,10 @@ public class ContentIndexingNotificationTests : InvariantContentTestBase
     }
 
     [Test]
-    public void PublishedContent_CanCancelIndexingForSpecificDocument()
+    public async Task PublishedContent_CanCancelIndexingForSpecificDocument()
     {
         AddOrUpdateIndexingNotificationHandler.CancelIndexingFor = [ChildKey];
-        ContentService.PublishBranch(Root(), PublishBranchFilter.IncludeUnpublished, ["*"]);
+        await ContentService.PublishBranchAsync(Root(), PublishBranchFilter.IncludeUnpublished, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.PublishedContent);
         Assert.That(documents, Has.Count.EqualTo(3));
@@ -74,10 +74,10 @@ public class ContentIndexingNotificationTests : InvariantContentTestBase
     }
 
     [Test]
-    public void DraftContent_CanManipulateIndexedFields()
+    public async Task DraftContent_CanManipulateIndexedFields()
     {
         AddOrUpdateIndexingNotificationHandler.ManipulateFields = true;
-        ContentService.Save([Root(), Child(), Grandchild(), GreatGrandchild()]);
+        await ContentService.SaveAsync([Root(), Child(), Grandchild(), GreatGrandchild()], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.DraftContent);
         Assert.That(documents, Has.Count.EqualTo(4));
@@ -100,10 +100,10 @@ public class ContentIndexingNotificationTests : InvariantContentTestBase
     }
 
     [Test]
-    public void DraftContent_CanCancelIndexingForSpecificDocument()
+    public async Task DraftContent_CanCancelIndexingForSpecificDocument()
     {
         AddOrUpdateIndexingNotificationHandler.CancelIndexingFor = [ChildKey];
-        ContentService.Save([Root(), Child(), Grandchild(), GreatGrandchild()]);
+        await ContentService.SaveAsync([Root(), Child(), Grandchild(), GreatGrandchild()], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.DraftContent);
         Assert.That(documents, Has.Count.EqualTo(3));

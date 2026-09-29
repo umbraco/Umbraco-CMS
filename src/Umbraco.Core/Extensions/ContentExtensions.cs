@@ -128,30 +128,6 @@ public static class ContentExtensions
         => content.Properties.Where(x => x.PropertyType?.PropertyEditorAlias == editorAlias);
 
     /// <summary>
-    ///     Checks if the IContentBase has children
-    /// </summary>
-    /// <param name="content"></param>
-    /// <param name="services"></param>
-    /// <returns></returns>
-    /// <remarks>
-    ///     This is a bit of a hack because we need to type check!
-    /// </remarks>
-    internal static bool? HasChildren(IContentBase content, ServiceContext services)
-    {
-        if (content is IContent)
-        {
-            return services.ContentService?.HasChildren(content.Id);
-        }
-
-        if (content is IMedia)
-        {
-            return services.MediaService?.HasChildren(content.Id);
-        }
-
-        return false;
-    }
-
-    /// <summary>
     ///     Gets the <see cref="IProfile" /> for the Creator of this content item.
     /// </summary>
     public static IProfile? GetCreatorProfile(this IContentBase content, IUserService userService) =>

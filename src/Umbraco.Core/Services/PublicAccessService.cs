@@ -246,7 +246,7 @@ internal sealed class PublicAccessService : AsyncRepositoryService, IPublicAcces
     /// <inheritdoc />
     public async Task<Attempt<PublicAccessEntry?, PublicAccessOperationStatus>> CreateAsync(PublicAccessEntrySlim entry)
     {
-        Attempt<PublicAccessNodesValidationResult, PublicAccessOperationStatus> validationAttempt = ValidatePublicAccessEntrySlim(entry);
+        Attempt<PublicAccessNodesValidationResult, PublicAccessOperationStatus> validationAttempt = await ValidatePublicAccessEntrySlimAsync(entry);
         if (validationAttempt.Success is false)
         {
             return Attempt.FailWithStatus<PublicAccessEntry?, PublicAccessOperationStatus>(validationAttempt.Status, null);
@@ -296,7 +296,7 @@ internal sealed class PublicAccessService : AsyncRepositoryService, IPublicAcces
     /// </summary>
     /// <param name="entry">The entry to validate.</param>
     /// <returns>An <see cref="Attempt{TResult,TStatus}" /> containing the validation result with resolved nodes.</returns>
-    private Attempt<PublicAccessNodesValidationResult, PublicAccessOperationStatus> ValidatePublicAccessEntrySlim(PublicAccessEntrySlim entry)
+    private async Task<Attempt<PublicAccessNodesValidationResult, PublicAccessOperationStatus>> ValidatePublicAccessEntrySlimAsync(PublicAccessEntrySlim entry)
     {
         var result = new PublicAccessNodesValidationResult();
 
@@ -310,21 +310,21 @@ internal sealed class PublicAccessService : AsyncRepositoryService, IPublicAcces
             return Attempt.FailWithStatus(PublicAccessOperationStatus.AmbiguousRule, result);
         }
 
-        result.ProtectedNode = _contentService.GetById(entry.ContentId);
+        result.ProtectedNode = await _contentService.GetByIdAsync(entry.ContentId, CancellationToken.None);
 
         if (result.ProtectedNode is null)
         {
             return Attempt.FailWithStatus(PublicAccessOperationStatus.ContentNotFound, result);
         }
 
-        result.LoginNode = _contentService.GetById(entry.LoginPageId);
+        result.LoginNode = await _contentService.GetByIdAsync(entry.LoginPageId, CancellationToken.None);
 
         if (result.LoginNode is null)
         {
             return Attempt.FailWithStatus(PublicAccessOperationStatus.LoginNodeNotFound, result);
         }
 
-        result.ErrorNode = _contentService.GetById(entry.ErrorPageId);
+        result.ErrorNode = await _contentService.GetByIdAsync(entry.ErrorPageId, CancellationToken.None);
 
         if (result.ErrorNode is null)
         {
@@ -337,7 +337,7 @@ internal sealed class PublicAccessService : AsyncRepositoryService, IPublicAcces
     /// <inheritdoc />
     public async Task<Attempt<PublicAccessEntry?, PublicAccessOperationStatus>> UpdateAsync(PublicAccessEntrySlim entry)
     {
-        Attempt<PublicAccessNodesValidationResult, PublicAccessOperationStatus> validationAttempt = ValidatePublicAccessEntrySlim(entry);
+        Attempt<PublicAccessNodesValidationResult, PublicAccessOperationStatus> validationAttempt = await ValidatePublicAccessEntrySlimAsync(entry);
 
         if (validationAttempt.Success is false)
         {

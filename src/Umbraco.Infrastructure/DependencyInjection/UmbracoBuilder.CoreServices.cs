@@ -336,16 +336,16 @@ public static partial class UmbracoBuilderExtensions
         // add handlers for sending user notifications (i.e. emails)
         builder.Services.AddSingleton<UserNotificationsHandler.Notifier>();
         builder
-            .AddNotificationHandler<ContentSavedNotification, UserNotificationsHandler>()
-            .AddNotificationHandler<ContentSortedNotification, UserNotificationsHandler>()
-            .AddNotificationHandler<ContentPublishedNotification, UserNotificationsHandler>()
-            .AddNotificationHandler<ContentMovedNotification, UserNotificationsHandler>()
-            .AddNotificationHandler<ContentMovedToRecycleBinNotification, UserNotificationsHandler>()
-            .AddNotificationHandler<ContentCopiedNotification, UserNotificationsHandler>()
-            .AddNotificationHandler<ContentRolledBackNotification, UserNotificationsHandler>()
-            .AddNotificationHandler<ContentUnpublishedNotification, UserNotificationsHandler>()
-            .AddNotificationHandler<AssignedUserGroupPermissionsNotification, UserNotificationsHandler>()
-            .AddNotificationHandler<PublicAccessEntrySavedNotification, UserNotificationsHandler>();
+            .AddNotificationAsyncHandler<ContentSavedNotification, UserNotificationsHandler>()
+            .AddNotificationAsyncHandler<ContentSortedNotification, UserNotificationsHandler>()
+            .AddNotificationAsyncHandler<ContentPublishedNotification, UserNotificationsHandler>()
+            .AddNotificationAsyncHandler<ContentMovedNotification, UserNotificationsHandler>()
+            .AddNotificationAsyncHandler<ContentMovedToRecycleBinNotification, UserNotificationsHandler>()
+            .AddNotificationAsyncHandler<ContentCopiedNotification, UserNotificationsHandler>()
+            .AddNotificationAsyncHandler<ContentRolledBackNotification, UserNotificationsHandler>()
+            .AddNotificationAsyncHandler<ContentUnpublishedNotification, UserNotificationsHandler>()
+            .AddNotificationAsyncHandler<AssignedUserGroupPermissionsNotification, UserNotificationsHandler>()
+            .AddNotificationAsyncHandler<PublicAccessEntrySavedNotification, UserNotificationsHandler>();
 
         // add handlers for building content relations
         builder
@@ -376,9 +376,9 @@ public static partial class UmbracoBuilderExtensions
             .AddNotificationHandler<ContentScaffoldedNotification, RichTextPropertyNotificationHandler>()
             .AddNotificationHandler<ElementSavingNotification, RichTextPropertyNotificationHandler>()
             .AddNotificationHandler<ElementCopyingNotification, RichTextPropertyNotificationHandler>()
-            .AddNotificationHandler<ContentCopiedNotification, FileUploadContentCopiedOrScaffoldedNotificationHandler>()
-            .AddNotificationHandler<ContentScaffoldedNotification, FileUploadContentCopiedOrScaffoldedNotificationHandler>()
-            .AddNotificationHandler<ContentSavedBlueprintNotification, FileUploadContentCopiedOrScaffoldedNotificationHandler>()
+            .AddNotificationAsyncHandler<ContentCopiedNotification, FileUploadContentCopiedOrScaffoldedNotificationHandler>()
+            .AddNotificationAsyncHandler<ContentScaffoldedNotification, FileUploadContentCopiedOrScaffoldedNotificationHandler>()
+            .AddNotificationAsyncHandler<ContentSavedBlueprintNotification, FileUploadContentCopiedOrScaffoldedNotificationHandler>()
             .AddNotificationHandler<ContentDeletedNotification, FileUploadContentDeletedNotificationHandler>()
             .AddNotificationHandler<ContentDeletedBlueprintNotification, FileUploadContentDeletedNotificationHandler>()
             .AddNotificationHandler<MediaDeletedNotification, FileUploadContentDeletedNotificationHandler>()
@@ -387,7 +387,7 @@ public static partial class UmbracoBuilderExtensions
             .AddNotificationHandler<MemberDeletedNotification, FileUploadContentDeletedNotificationHandler>()
             .AddNotificationHandler<MediaSavingNotification, FileUploadMediaSavingNotificationHandler>()
             .AddNotificationHandler<MediaSavingNotification, SvgFileUploadMediaSavingNotificationHandler>()
-            .AddNotificationHandler<ContentCopiedNotification, ImageCropperPropertyEditor>()
+            .AddNotificationAsyncHandler<ContentCopiedNotification, ImageCropperPropertyEditor>()
             .AddNotificationHandler<ContentDeletedNotification, ImageCropperPropertyEditor>()
             .AddNotificationHandler<MediaDeletedNotification, ImageCropperPropertyEditor>()
             .AddNotificationHandler<MediaSavingNotification, ImageCropperPropertyEditor>()

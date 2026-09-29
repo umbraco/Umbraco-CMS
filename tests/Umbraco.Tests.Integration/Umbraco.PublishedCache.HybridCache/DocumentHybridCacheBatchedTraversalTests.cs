@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
@@ -79,13 +80,13 @@ internal sealed class DocumentHybridCacheBatchedTraversalTests : UmbracoIntegrat
         for (var i = 0; i < ExtraChildCount; i++)
         {
             Content child = ContentBuilder.CreateSimpleContent(ContentType, $"Extra Child {i}", Textpage.Id);
-            ContentService.Save(child, -1);
+            await ContentService.SaveAsync(child, Constants.Security.SuperUserKey, null, CancellationToken.None);
         }
 
         for (var i = 0; i < GrandchildCount; i++)
         {
             Content grandchild = ContentBuilder.CreateSimpleContent(ContentType, $"Grandchild {i}", Subpage.Id);
-            ContentService.Save(grandchild, -1);
+            await ContentService.SaveAsync(grandchild, Constants.Security.SuperUserKey, null, CancellationToken.None);
         }
     }
 
@@ -130,7 +131,7 @@ internal sealed class DocumentHybridCacheBatchedTraversalTests : UmbracoIntegrat
     {
         _countingRepository = (CountingDatabaseCacheRepository)GetRequiredService<IDatabaseCacheRepository>();
 
-        ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
+        await ContentService.PublishBranchAsync(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Populate the publish-status service the filtering service consults (in the running app the
         // content cache refresher does this on publish; the integration harness doesn't run it).

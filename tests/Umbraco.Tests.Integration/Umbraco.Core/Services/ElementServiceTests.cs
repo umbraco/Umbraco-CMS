@@ -2,6 +2,7 @@ using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
@@ -30,16 +31,29 @@ public partial class ElementServiceTests : UmbracoIntegrationTest
         element.SetValue("title", "The Element Title");
 
         // Act
-        var result = ElementService.Save(element);
+        var result = await ElementService.SaveAsync(element, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         // Assert
         Assert.That(result.Success, Is.True);
-        Assert.That(result.Result, Is.EqualTo(OperationResultType.Success));
+        Assert.That(result.Result, Is.EqualTo(ContentSaveOperationStatus.Success));
 
-        element = ElementService.GetById(element.Key);
+        element = await ElementService.GetByIdAsync(element.Key, CancellationToken.None);
         Assert.That(element, Is.Not.Null);
         Assert.That(element.HasIdentity, Is.True);
         Assert.That(element.Name, Is.EqualTo("My Element"));
         Assert.That(element.GetValue<string>("title"), Is.EqualTo("The Element Title"));
+    }
+
+    [Test]
+    public async Task DeleteOfTypesAsync_WithUnknownElementTypeKey_ReportsNotFound()
+    {
+        Attempt<ContentDeleteOfTypesOperationStatus> result = await ElementService.DeleteOfTypesAsync(
+            [Guid.NewGuid()], Constants.Security.SuperUserKey, CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Success, Is.False);
+            Assert.That(result.Result, Is.EqualTo(ContentDeleteOfTypesOperationStatus.NotFound));
+        });
     }
 }

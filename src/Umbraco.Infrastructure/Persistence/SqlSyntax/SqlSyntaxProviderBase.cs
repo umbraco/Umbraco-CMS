@@ -406,7 +406,7 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
     /// Retrieves the names of all tables in the current database schema using the specified <paramref name="db"/> instance.
     /// </summary>
     /// <param name="db">The <see cref="IDatabase"/> instance to query for table names.</param>
-    /// <returns>An <see cref="IEnumerable{string}"/> containing the names of tables in the schema.</returns>
+    /// <returns>An <see cref="IEnumerable{T}"/> containing the names of tables in the schema.</returns>
     public virtual IEnumerable<string> GetTablesInSchema(IDatabase db) => new List<string>();
 
     /// <summary>
@@ -671,6 +671,9 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
         string.Join(" ", ClauseOrder
             .Select(action => action(column))
             .Where(clause => string.IsNullOrEmpty(clause) == false));
+
+    /// <inheritdoc />
+    public virtual string FormatAddColumn(ColumnDefinition column) => Format(column);
 
     /// <summary>
     /// Formats a <see cref="ColumnDefinition"/> for a specific table into a SQL string suitable for use in a CREATE or ALTER TABLE statement.
@@ -1057,6 +1060,7 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
     /// Returns the SQL type string representation for a given <see cref="SpecialDbType"/> value.
     /// </summary>
     /// <param name="dbType">The special database type for which to retrieve the SQL type string.</param>
+    /// <param name="customSize">The size to apply to the resulting SQL type.</param>
     /// <returns>The SQL type string corresponding to the specified <paramref name="dbType"/>.</returns>
     public virtual string GetSpecialDbType(SpecialDbType dbType, int customSize) =>
         $"{GetSpecialDbType(dbType)}({customSize})";

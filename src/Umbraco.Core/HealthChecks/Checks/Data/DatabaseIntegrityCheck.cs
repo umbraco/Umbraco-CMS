@@ -36,16 +36,16 @@ public class DatabaseIntegrityCheck : HealthCheck
     }
 
     /// <inheritdoc />
-    public override Task<IEnumerable<HealthCheckStatus>> GetStatusAsync() =>
-        Task.FromResult((IEnumerable<HealthCheckStatus>)new[] { CheckDocuments(false), CheckMedia(false) });
+    public override async Task<IEnumerable<HealthCheckStatus>> GetStatusAsync() =>
+        new[] { await CheckDocumentsAsync(false), CheckMedia(false) };
 
     /// <inheritdoc />
-    public override HealthCheckStatus ExecuteAction(HealthCheckAction action)
+    public override async Task<HealthCheckStatus> ExecuteActionAsync(HealthCheckAction action)
     {
         switch (action.Alias)
         {
             case SFixContentPaths:
-                return CheckDocuments(true);
+                return await CheckDocumentsAsync(true);
             case SSsFixMediaPaths:
                 return CheckMedia(true);
             default:
@@ -96,20 +96,18 @@ public class DatabaseIntegrityCheck : HealthCheck
             SFixMediaPathsTitle,
             Constants.UdiEntityType.Media,
             fix,
-            () => _mediaService.CheckDataIntegrity(new ContentDataIntegrityReportOptions { FixIssues = fix }));
+            _mediaService.CheckDataIntegrity(new ContentDataIntegrityReportOptions { FixIssues = fix }));
 
-    private HealthCheckStatus CheckDocuments(bool fix) =>
+    private async Task<HealthCheckStatus> CheckDocumentsAsync(bool fix) =>
         CheckPaths(
             SFixContentPaths,
             SFixContentPathsTitle,
             Constants.UdiEntityType.Document,
             fix,
-            () => _contentService.CheckDataIntegrity(new ContentDataIntegrityReportOptions { FixIssues = fix }));
+            await _contentService.CheckDataIntegrityAsync(new ContentDataIntegrityReportOptions { FixIssues = fix }, CancellationToken.None));
 
-    private HealthCheckStatus CheckPaths(string actionAlias, string actionName, string entityType, bool detailedReport, Func<ContentDataIntegrityReport> doCheck)
+    private HealthCheckStatus CheckPaths(string actionAlias, string actionName, string entityType, bool detailedReport, ContentDataIntegrityReport report)
     {
-        ContentDataIntegrityReport report = doCheck();
-
         var actions = new List<HealthCheckAction>();
         if (!report.Ok)
         {

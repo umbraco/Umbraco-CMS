@@ -34,7 +34,7 @@ public class MemberIndexServiceTests : IndexTestBase
             .Done()
             .Done()
             .Build();
-        await GetRequiredService<IMemberTypeService>().CreateAsync(memberType, Constants.Security.SuperUserKey);
+        await GetRequiredService<IMemberTypeService>().CreateAsync(memberType, Cms.Core.Constants.Security.SuperUserKey);
 
         await WaitForIndexing(Cms.Core.Constants.IndexAliases.DraftMembers, () =>
         {

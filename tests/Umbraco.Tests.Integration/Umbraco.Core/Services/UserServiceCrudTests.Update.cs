@@ -265,7 +265,7 @@ internal sealed partial class UserServiceCrudTests
         var contentService = GetRequiredService<IContentService>();
         var mediaService = GetRequiredService<IMediaService>();
         var elementContainerService = GetRequiredService<IElementContainerService>();
-        var contentStartNode = contentService.GetRootContent().First();
+        var contentStartNode = (await contentService.GetRootContentAsync(CancellationToken.None)).First();
         var mediaStartNode = mediaService.CreateMediaWithIdentity("test", -1, "Image");
         var elementContainerResult = await elementContainerService.CreateAsync(null, "TestElementFolder", null, Constants.Security.SuperUserKey);
         Assert.IsTrue(elementContainerResult.Success);
@@ -357,7 +357,7 @@ internal sealed partial class UserServiceCrudTests
         var contentService = GetRequiredService<IContentService>();
         var mediaService = GetRequiredService<IMediaService>();
         var elementContainerService = GetRequiredService<IElementContainerService>();
-        var contentStartNode = contentService.GetRootContent().First();
+        var contentStartNode = (await contentService.GetRootContentAsync(CancellationToken.None)).First();
         var mediaStartNode = mediaService.CreateMediaWithIdentity("test", -1, "Image");
 
         var elementContainerResult = await elementContainerService.CreateAsync(null, "TestElementFolder", null, Constants.Security.SuperUserKey);

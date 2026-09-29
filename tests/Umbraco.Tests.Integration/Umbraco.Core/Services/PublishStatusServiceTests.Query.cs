@@ -40,17 +40,17 @@ internal sealed partial class PublishStatusServiceTests
     }
 
     [Test]
-    public void Unpublish_Updates_Document_Path_Published_Status()
+    public async Task Unpublish_Updates_Document_Path_Published_Status()
     {
         var grandchild = ContentBuilder.CreateSimpleContent(ContentType, "Grandchild", Subpage2.Id);
 
         var contentSchedule = ContentScheduleCollection.CreateWithEntry(DateTime.UtcNow.AddMinutes(-5), null);
-        ContentService.Save(grandchild, -1, contentSchedule);
+        await ContentService.SaveAsync(grandchild, Constants.Security.SuperUserKey, contentSchedule, CancellationToken.None);
 
-        var publishResults = ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
+        var publishResults = await ContentService.PublishBranchAsync(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
-        var subPage2FromDB = ContentService.GetById(Subpage2.Key);
-        var publishResult = ContentService.Unpublish(subPage2FromDB);
+        var subPage2FromDB = ContentService.GetByIdAsync(Subpage2.Key, CancellationToken.None).GetAwaiter().GetResult();
+        var publishResult = await ContentService.UnpublishAsync(subPage2FromDB, "*", Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.Multiple(() =>
         {
             Assert.IsTrue(publishResults.All(x => x.Result == PublishResultType.SuccessPublish));
@@ -70,9 +70,9 @@ internal sealed partial class PublishStatusServiceTests
     }
 
     [Test]
-    public void Publish_Branch_Updates_Document_Path_Published_Status()
+    public async Task Publish_Branch_Updates_Document_Path_Published_Status()
     {
-        var publishResults = ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
+        var publishResults = await ContentService.PublishBranchAsync(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.Multiple(() =>
         {
             Assert.IsTrue(publishResults.All(x => x.Result == PublishResultType.SuccessPublish));
@@ -101,7 +101,7 @@ internal sealed partial class PublishStatusServiceTests
     }
 
     [Test]
-    public void Published_Document_With_UnPublished_Parent_Has_Unpublished_Path()
+    public async Task Published_Document_With_UnPublished_Parent_Has_Unpublished_Path()
     {
         Assert.Multiple(() =>
         {
@@ -109,7 +109,7 @@ internal sealed partial class PublishStatusServiceTests
             Assert.IsFalse(PublishStatusQueryService.IsPublished(Subpage.Key, DefaultCulture));
         });
 
-        ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
+        await ContentService.PublishBranchAsync(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         Assert.Multiple(() =>
         {
@@ -117,7 +117,7 @@ internal sealed partial class PublishStatusServiceTests
             Assert.IsTrue(PublishStatusQueryService.IsPublished(Subpage.Key, DefaultCulture));
         });
 
-        ContentService.Unpublish(Textpage);
+        await ContentService.UnpublishAsync(Textpage, "*", Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Unpublish the root item - the sub page will still be published but it won't have a published path.
         Assert.Multiple(() =>
@@ -152,7 +152,7 @@ internal sealed partial class PublishStatusServiceTests
             .WithCultureName("en-US", "Root EN")
             .WithCultureName("da-DK", "Root DA")
             .Build();
-        ContentService.Save(root);
+        await ContentService.SaveAsync(root, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         IContent child = new ContentBuilder()
             .WithContentType(contentType)
@@ -160,7 +160,7 @@ internal sealed partial class PublishStatusServiceTests
             .WithCultureName("da-DK", "Child DA")
             .WithParent(root)
             .Build();
-        ContentService.Save(child);
+        await ContentService.SaveAsync(child, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         IContent grandchild = new ContentBuilder()
             .WithContentType(contentType)
@@ -168,13 +168,13 @@ internal sealed partial class PublishStatusServiceTests
             .WithCultureName("da-DK", "Grandchild DA")
             .WithParent(child)
             .Build();
-        ContentService.Save(grandchild);
+        await ContentService.SaveAsync(grandchild, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
-        ContentService.PublishBranch(root, PublishBranchFilter.IncludeUnpublished, ["en-US", "da-DK"]);
+        await ContentService.PublishBranchAsync(root, PublishBranchFilter.IncludeUnpublished, ["en-US", "da-DK"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         // must refresh the child instance before unpublishing it, to reflect the state changes from the branch publish above
-        child = ContentService.GetById(child.Key)!;
-        ContentService.Unpublish(child, cultureToUnpublish);
+        child = (await ContentService.GetByIdAsync(child.Key, CancellationToken.None))!;
+        await ContentService.UnpublishAsync(child, cultureToUnpublish, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var publishedCulture = cultureToUnpublish is "en-US" ? "da-DK" : "en-US";
         Assert.IsTrue(PublishStatusQueryService.HasPublishedAncestorPath(grandchild.Key, publishedCulture));
@@ -205,7 +205,7 @@ internal sealed partial class PublishStatusServiceTests
             .WithCultureName("en-US", "Root EN")
             .WithCultureName("da-DK", "Root DA")
             .Build();
-        ContentService.Save(root);
+        await ContentService.SaveAsync(root, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         IContent child = new ContentBuilder()
             .WithContentType(contentType)
@@ -213,7 +213,7 @@ internal sealed partial class PublishStatusServiceTests
             .WithCultureName("da-DK", "Child DA")
             .WithParent(root)
             .Build();
-        ContentService.Save(child);
+        await ContentService.SaveAsync(child, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         IContent grandchild = new ContentBuilder()
             .WithContentType(contentType)
@@ -221,28 +221,28 @@ internal sealed partial class PublishStatusServiceTests
             .WithCultureName("da-DK", "Grandchild DA")
             .WithParent(child)
             .Build();
-        ContentService.Save(grandchild);
+        await ContentService.SaveAsync(grandchild, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
-        ContentService.PublishBranch(root, PublishBranchFilter.IncludeUnpublished, ["en-US", "da-DK"]);
+        await ContentService.PublishBranchAsync(root, PublishBranchFilter.IncludeUnpublished, ["en-US", "da-DK"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         // must refresh the child instance before unpublishing it, to reflect the state changes from the branch publish above
-        child = ContentService.GetById(child.Key)!;
+        child = (await ContentService.GetByIdAsync(child.Key, CancellationToken.None))!;
 
         if (unpublishAllCulturesAtOnce)
         {
-            ContentService.Unpublish(child);
+            await ContentService.UnpublishAsync(child, "*", Constants.Security.SuperUserKey, CancellationToken.None);
         }
         else
         {
-            ContentService.Unpublish(child, "en-US");
+            await ContentService.UnpublishAsync(child, "en-US", Constants.Security.SuperUserKey, CancellationToken.None);
 
             // refresh again before unpublishing the last culture
-            child = ContentService.GetById(child.Key)!;
-            ContentService.Unpublish(child, "da-DK");
+            child = (await ContentService.GetByIdAsync(child.Key, CancellationToken.None))!;
+            await ContentService.UnpublishAsync(child, "da-DK", Constants.Security.SuperUserKey, CancellationToken.None);
         }
 
         // refresh to get the latest state
-        child = ContentService.GetById(child.Key)!;
+        child = (await ContentService.GetByIdAsync(child.Key, CancellationToken.None))!;
         Assert.IsFalse(child.Published);
         Assert.IsEmpty(child.PublishedCultures);
         Assert.IsEmpty(child.PublishCultureInfos!);

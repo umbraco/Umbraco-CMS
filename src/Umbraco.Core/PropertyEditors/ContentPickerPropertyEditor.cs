@@ -132,6 +132,7 @@ public class ContentPickerPropertyEditor : DataEditor, IValueSchemaProvider
             if (int.TryParse(stringValue, out var oldInt))
             {
                 // todo: This is a temporary code path that should be removed ASAP
+                // TODO (V20): await this once the IDataValueEditor contract goes async.
                 Attempt<Guid> conversionAttempt = StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>()
                     .GetKeyForIdAsync(oldInt, UmbracoObjectTypes.Document).GetAwaiter().GetResult();
                 return conversionAttempt.Success ? conversionAttempt.Result : null;
@@ -179,7 +180,8 @@ public class ContentPickerPropertyEditor : DataEditor, IValueSchemaProvider
             }
 
             using ICoreScope scope = coreScopeProvider.CreateCoreScope();
-            Guid? key = contentService.GetById(id)?.ContentType?.Key;
+            // TODO (V20): await this once the ITypedValidator contract goes async.
+            Guid? key = contentService.GetByIdAsync(id, CancellationToken.None).GetAwaiter().GetResult()?.ContentType?.Key;
             scope.Complete();
 
             if (key is null)

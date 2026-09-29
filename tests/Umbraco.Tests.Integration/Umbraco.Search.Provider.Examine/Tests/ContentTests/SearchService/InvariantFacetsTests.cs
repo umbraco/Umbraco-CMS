@@ -239,7 +239,7 @@ public class InvariantFacetsTests : SearcherTestBase
             .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.Integer)
             .Done()
             .Build();
-        await ContentTypeService.CreateAsync(ContentType, Constants.Security.SuperUserKey);
+        await ContentTypeService.CreateAsync(ContentType, Cms.Core.Constants.Security.SuperUserKey);
     }
 
     private async Task CreateDatetimeDocType()
@@ -252,14 +252,14 @@ public class InvariantFacetsTests : SearcherTestBase
             .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.DateTime)
             .Done()
             .Build();
-        await ContentTypeService.CreateAsync(ContentType, Constants.Security.SuperUserKey);
+        await ContentTypeService.CreateAsync(ContentType, Cms.Core.Constants.Security.SuperUserKey);
     }
 
     private async Task CreateDatetimeDocuments(DateTimeOffset[] values)
     {
         await CreateDatetimeDocType();
 
-        await WaitForIndexing(GetIndexAlias(true), () =>
+        await WaitForIndexing(GetIndexAlias(true), async () =>
         {
             foreach (DateTimeOffset dateTimeOffset in values)
             {
@@ -270,10 +270,8 @@ public class InvariantFacetsTests : SearcherTestBase
                         new { datetime = dateTimeOffset })
                     .Build();
 
-                SaveAndPublish(document);
+                await SaveAndPublishAsync(document);
             }
-
-            return Task.CompletedTask;
         });
 
 
@@ -290,7 +288,7 @@ public class InvariantFacetsTests : SearcherTestBase
             .Done()
             .Build();
 
-        await DataTypeService.CreateAsync(dataType, Constants.Security.SuperUserKey);
+        await DataTypeService.CreateAsync(dataType, Cms.Core.Constants.Security.SuperUserKey);
         ContentType = new ContentTypeBuilder()
             .WithAlias("invariant")
             .AddPropertyType()
@@ -299,14 +297,14 @@ public class InvariantFacetsTests : SearcherTestBase
             .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.Decimal)
             .Done()
             .Build();
-        await ContentTypeService.CreateAsync(ContentType, Constants.Security.SuperUserKey);
+        await ContentTypeService.CreateAsync(ContentType, Cms.Core.Constants.Security.SuperUserKey);
     }
 
     private async Task CreateDecimalDocuments(double[] values)
     {
         await CreateDecimalDocType();
 
-        await WaitForIndexing(GetIndexAlias(true), () =>
+        await WaitForIndexing(GetIndexAlias(true), async () =>
         {
             foreach (var doubleValue in values)
             {
@@ -320,10 +318,8 @@ public class InvariantFacetsTests : SearcherTestBase
                         })
                     .Build();
 
-                SaveAndPublish(document);
+                await SaveAndPublishAsync(document);
             }
-
-            return Task.CompletedTask;
         });
     }
 
@@ -331,7 +327,7 @@ public class InvariantFacetsTests : SearcherTestBase
     {
         await CreateCountDocType();
 
-        await WaitForIndexing(GetIndexAlias(true), () =>
+        await WaitForIndexing(GetIndexAlias(true), async () =>
         {
             foreach (var countValue in values)
             {
@@ -345,10 +341,8 @@ public class InvariantFacetsTests : SearcherTestBase
                         })
                     .Build();
 
-                SaveAndPublish(document);
+                await SaveAndPublishAsync(document);
             }
-
-            return Task.CompletedTask;
         });
 
     }
@@ -363,14 +357,14 @@ public class InvariantFacetsTests : SearcherTestBase
             .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.DropDownListFlexible)
             .Done()
             .Build();
-        await ContentTypeService.CreateAsync(ContentType, Constants.Security.SuperUserKey);
+        await ContentTypeService.CreateAsync(ContentType, Cms.Core.Constants.Security.SuperUserKey);
     }
 
     private async Task CreateDropDownDocuments(string[] values)
     {
         await CreateDropDownDocType();
 
-        await WaitForIndexing(GetIndexAlias(true), () =>
+        await WaitForIndexing(GetIndexAlias(true), async () =>
         {
             foreach (var stringValue in values)
             {
@@ -381,10 +375,8 @@ public class InvariantFacetsTests : SearcherTestBase
                         new { dropDown = $"[\"{stringValue}\"]" })
                     .Build();
 
-                SaveAndPublish(document);
+                await SaveAndPublishAsync(document);
             }
-
-            return Task.CompletedTask;
         });
 
     }

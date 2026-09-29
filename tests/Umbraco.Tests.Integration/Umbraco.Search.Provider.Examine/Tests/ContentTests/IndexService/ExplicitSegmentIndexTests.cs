@@ -460,21 +460,19 @@ public class ExplicitSegmentIndexTests : IndexTestBase
             docWithSpecialCharacterSegments.SetValue("segmentedProperty", $"ValueFor_{sanitizedSegment}", "da-DK", segment);
         }
 
-        await WaitForIndexing(GetIndexAlias(true), () =>
+        await WaitForIndexing(GetIndexAlias(true), async () =>
         {
-            ContentService.Save(docWithAllSegments);
-            ContentService.Publish(docWithAllSegments, ["*"]);
+            await ContentService.SaveAsync(docWithAllSegments, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
+            await ContentService.PublishAsync(docWithAllSegments, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
-            ContentService.Save(docWithOnlyNullSegment);
-            ContentService.Publish(docWithOnlyNullSegment, ["*"]);
+            await ContentService.SaveAsync(docWithOnlyNullSegment, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
+            await ContentService.PublishAsync(docWithOnlyNullSegment, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
-            ContentService.Save(docWithOnlySegment1);
-            ContentService.Publish(docWithOnlySegment1, ["*"]);
+            await ContentService.SaveAsync(docWithOnlySegment1, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
+            await ContentService.PublishAsync(docWithOnlySegment1, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
-            ContentService.Save(docWithSpecialCharacterSegments);
-            ContentService.Publish(docWithSpecialCharacterSegments, ["*"]);
-
-            return Task.CompletedTask;
+            await ContentService.SaveAsync(docWithSpecialCharacterSegments, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
+            await ContentService.PublishAsync(docWithSpecialCharacterSegments, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         });
     }
 }

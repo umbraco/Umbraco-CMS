@@ -29,7 +29,7 @@ public partial class PublishedContentCacheRefresherTests : TestBase
         => NotificationHandler.Notifications.Clear();
 
     private IContent Get(Guid key)
-        => ContentService.GetById(key) ?? throw new ArgumentException("No content found with that key");
+        => ContentService.GetByIdAsync(key, CancellationToken.None).GetAwaiter().GetResult() ?? throw new ArgumentException("No content found with that key");
 
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 

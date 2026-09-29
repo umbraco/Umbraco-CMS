@@ -1,4 +1,3 @@
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
@@ -24,7 +23,6 @@ internal abstract class ContentPublishingServiceBase<TContent, TContentService>
     private readonly ILanguageService _languageService;
     private ContentSettings _contentSettings;
     private readonly IRelationService _relationService;
-    private readonly ILogger<ContentPublishingServiceBase<TContent, TContentService>> _logger;
 
     protected abstract int WriteLockId { get; }
 
@@ -36,8 +34,7 @@ internal abstract class ContentPublishingServiceBase<TContent, TContentService>
         IContentTypeService contentTypeService,
         ILanguageService languageService,
         IOptionsMonitor<ContentSettings> optionsMonitor,
-        IRelationService relationService,
-        ILogger<ContentPublishingServiceBase<TContent, TContentService>> logger)
+        IRelationService relationService)
     {
         _coreScopeProvider = coreScopeProvider;
         _contentService = contentService;
@@ -46,7 +43,6 @@ internal abstract class ContentPublishingServiceBase<TContent, TContentService>
         _contentTypeService = contentTypeService;
         _languageService = languageService;
         _relationService = relationService;
-        _logger = logger;
         _contentSettings = optionsMonitor.CurrentValue;
         optionsMonitor.OnChange((contentSettings) =>
         {
@@ -63,7 +59,7 @@ internal abstract class ContentPublishingServiceBase<TContent, TContentService>
         var culturesToPublishImmediately =
             culturesToPublishOrSchedule.Where(culture => culture.Schedule is null).Select(c => c.Culture ?? Constants.System.InvariantCulture).ToHashSet();
 
-        ContentScheduleCollection schedules = _contentService.GetContentScheduleByContentId(key);
+        ContentScheduleCollection schedules = await _contentService.GetContentScheduleByContentIdAsync(key, CancellationToken.None);
 
         foreach (CulturePublishScheduleModel cultureToSchedule in culturesToPublishOrSchedule.Where(c => c.Schedule is not null))
         {
@@ -106,7 +102,7 @@ internal abstract class ContentPublishingServiceBase<TContent, TContentService>
     {
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
         scope.WriteLock(WriteLockId);
-        TContent? content = _contentService.GetById(key);
+        TContent? content = await _contentService.GetByIdAsync(key, CancellationToken.None);
         if (content is null)
         {
             scope.Complete();
@@ -117,7 +113,7 @@ internal abstract class ContentPublishingServiceBase<TContent, TContentService>
         if (cultureAndSchedule.CulturesToPublishImmediately.Count == 0 &&
             cultureAndSchedule.Schedules.FullSchedule.Count == 0)
         {
-            _contentService.PersistContentSchedule(content, cultureAndSchedule.Schedules);
+            await _contentService.PersistContentScheduleAsync(content, cultureAndSchedule.Schedules, CancellationToken.None);
             scope.Complete();
             return Attempt.SucceedWithStatus(
                 ContentPublishingOperationStatus.Success,
@@ -194,17 +190,20 @@ internal abstract class ContentPublishingServiceBase<TContent, TContentService>
         }
 
 
-        var userId = await _userIdKeyResolver.GetAsync(userKey);
+        // Validated up front rather than left to PublishAsync below, since that's only reached when
+        // culturesToPublishImmediately is non-empty - a schedule-only request must still reject an
+        // unresolvable user key rather than silently persisting the schedule.
+        _ = await _userIdKeyResolver.GetAsync(userKey);
 
         PublishResult? result = null;
         if (culturesToPublishImmediately.Any())
         {
-            result = _contentService.Publish(content, culturesToPublishImmediately.ToArray(), userId);
+            result = await _contentService.PublishAsync(content, culturesToPublishImmediately.ToArray(), userKey, CancellationToken.None);
         }
 
         if (result?.Success != false && cultureAndSchedule.Schedules.FullSchedule.Any())
         {
-            _contentService.PersistContentSchedule(result?.Content ?? content, cultureAndSchedule.Schedules);
+            await _contentService.PersistContentScheduleAsync(result?.Content ?? content, cultureAndSchedule.Schedules, CancellationToken.None);
             result = new PublishResult(
                 PublishResultType.SuccessPublish,
                 result?.EventMessages ?? new EventMessages(),
@@ -269,7 +268,7 @@ internal abstract class ContentPublishingServiceBase<TContent, TContentService>
     public async Task<Attempt<ContentPublishingOperationStatus>> UnpublishAsync(Guid key, ISet<string>? cultures, Guid userKey)
     {
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
-        TContent? content = _contentService.GetById(key);
+        TContent? content = await _contentService.GetByIdAsync(key, CancellationToken.None);
         if (content is null)
         {
             scope.Complete();
@@ -282,7 +281,9 @@ internal abstract class ContentPublishingServiceBase<TContent, TContentService>
             return Attempt<ContentPublishingOperationStatus>.Fail(ContentPublishingOperationStatus.CannotUnpublishWhenReferenced);
         }
 
-        var userId = await _userIdKeyResolver.GetAsync(userKey);
+        // Validated up front rather than left to the helpers below, since the CultureMissing path
+        // returns without reaching any of them - an unresolvable user key must still be rejected.
+        _ = await _userIdKeyResolver.GetAsync(userKey);
 
         // If cultures are provided for non variant content, and they include the default culture, consider
         // the request as valid for unpublishing the content.
@@ -302,7 +303,7 @@ internal abstract class ContentPublishingServiceBase<TContent, TContentService>
         {
             attempt = await UnpublishInvariantAsync(
                 content,
-                userId);
+                userKey);
 
             scope.Complete();
             return attempt;
@@ -318,38 +319,38 @@ internal abstract class ContentPublishingServiceBase<TContent, TContentService>
         {
             attempt = await UnpublishAllCulturesAsync(
                 content,
-                userId);
+                userKey);
         }
         else
         {
             attempt = await UnpublishMultipleCultures(
                 content,
                 cultures,
-                userId);
+                userKey);
         }
         scope.Complete();
 
         return attempt;
     }
 
-    private Task<Attempt<ContentPublishingOperationStatus>> UnpublishAllCulturesAsync(TContent content, int userId)
+    private async Task<Attempt<ContentPublishingOperationStatus>> UnpublishAllCulturesAsync(TContent content, Guid userKey)
     {
         if (content.ContentType.VariesByCulture() is false)
         {
-            return Task.FromResult(Attempt.Fail(ContentPublishingOperationStatus.CannotPublishVariantWhenNotVariant));
+            return Attempt.Fail(ContentPublishingOperationStatus.CannotPublishVariantWhenNotVariant);
         }
 
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
-        PublishResult result = _contentService.Unpublish(content, "*", userId);
+        PublishResult result = await _contentService.UnpublishAsync(content, "*", userKey, CancellationToken.None);
         scope.Complete();
 
         ContentPublishingOperationStatus contentPublishingOperationStatus = ToContentPublishingOperationStatus(result);
-        return Task.FromResult(contentPublishingOperationStatus is ContentPublishingOperationStatus.Success
+        return contentPublishingOperationStatus is ContentPublishingOperationStatus.Success
             ? Attempt.Succeed(ToContentPublishingOperationStatus(result))
-            : Attempt.Fail(ToContentPublishingOperationStatus(result)));
+            : Attempt.Fail(ToContentPublishingOperationStatus(result));
     }
 
-    private async Task<Attempt<ContentPublishingOperationStatus>> UnpublishMultipleCultures(TContent content, ISet<string> cultures, int userId)
+    private async Task<Attempt<ContentPublishingOperationStatus>> UnpublishMultipleCultures(TContent content, ISet<string> cultures, Guid userKey)
     {
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
 
@@ -369,7 +370,7 @@ internal abstract class ContentPublishingServiceBase<TContent, TContentService>
                 return Attempt.Fail(ContentPublishingOperationStatus.InvalidCulture);
             }
 
-            PublishResult result = _contentService.Unpublish(content, culture, userId);
+            PublishResult result = await _contentService.UnpublishAsync(content, culture, userKey, CancellationToken.None);
 
             ContentPublishingOperationStatus contentPublishingOperationStatus = ToContentPublishingOperationStatus(result);
 
@@ -383,22 +384,22 @@ internal abstract class ContentPublishingServiceBase<TContent, TContentService>
         return Attempt.Succeed(ContentPublishingOperationStatus.Success);
     }
 
-    private Task<Attempt<ContentPublishingOperationStatus>> UnpublishInvariantAsync(TContent content, int userId)
+    private async Task<Attempt<ContentPublishingOperationStatus>> UnpublishInvariantAsync(TContent content, Guid userKey)
     {
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
 
         if (content.ContentType.VariesByCulture())
         {
-            return Task.FromResult(Attempt.Fail(ContentPublishingOperationStatus.CannotPublishInvariantWhenVariant));
+            return Attempt.Fail(ContentPublishingOperationStatus.CannotPublishInvariantWhenVariant);
         }
 
-        PublishResult result = _contentService.Unpublish(content, null, userId);
+        PublishResult result = await _contentService.UnpublishAsync(content, null, userKey, CancellationToken.None);
         scope.Complete();
 
         ContentPublishingOperationStatus contentPublishingOperationStatus = ToContentPublishingOperationStatus(result);
-        return Task.FromResult(contentPublishingOperationStatus is ContentPublishingOperationStatus.Success
+        return contentPublishingOperationStatus is ContentPublishingOperationStatus.Success
             ? Attempt.Succeed(ToContentPublishingOperationStatus(result))
-            : Attempt.Fail(ToContentPublishingOperationStatus(result)));
+            : Attempt.Fail(ToContentPublishingOperationStatus(result));
     }
 
     protected static ContentPublishingOperationStatus ToContentPublishingOperationStatus(PublishResult publishResult)

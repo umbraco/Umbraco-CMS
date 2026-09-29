@@ -55,7 +55,7 @@ public class DocumentUrlController : DocumentControllerBase
     [EndpointDescription("Gets the URLs for the document identified by the provided Id.")]
     public async Task<IActionResult> GetUrls([FromQuery(Name = "id")] HashSet<Guid> ids, [FromQuery] string? culture)
     {
-        IEnumerable<IContent> items = _contentService.GetByIds(ids);
+        IEnumerable<IContent> items = await _contentService.GetByIdsAsync(ids, HttpContext.RequestAborted);
 
         return Ok(await _documentUrlFactory.CreateUrlSetsAsync(items, culture));
     }

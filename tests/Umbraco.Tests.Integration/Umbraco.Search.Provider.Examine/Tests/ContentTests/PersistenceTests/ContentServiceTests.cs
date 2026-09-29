@@ -118,15 +118,13 @@ public class ContentServiceTests : UmbracoIntegrationTest
         // Update the content name
         _rootDocument.Name = "Updated Root Document";
 
-        await WaitForIndexing(indexAlias, () =>
+        await WaitForIndexing(indexAlias, async () =>
         {
-            ContentService.Save(_rootDocument);
+            await ContentService.SaveAsync(_rootDocument, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
             if (publish)
             {
-                ContentService.Publish(_rootDocument, ["*"]);
+                await ContentService.PublishAsync(_rootDocument, ["*"], global::Umbraco.Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
             }
-
-            return Task.CompletedTask;
         });
 
         using (ScopeProvider.CreateScope(autoComplete: true))
@@ -156,7 +154,7 @@ public class ContentServiceTests : UmbracoIntegrationTest
         // Delete the content
         await WaitForIndexing(indexAlias, () =>
         {
-            ContentService.Delete(_rootDocument);
+            ContentService.DeleteAsync(_rootDocument, Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None).GetAwaiter().GetResult();
             return Task.CompletedTask;
         });
 
@@ -191,7 +189,7 @@ public class ContentServiceTests : UmbracoIntegrationTest
 
             if (publish)
             {
-                ContentService.Publish(_rootDocument, ["*"]);
+                await ContentService.PublishAsync(_rootDocument, ["*"], global::Umbraco.Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
             }
         });
     }

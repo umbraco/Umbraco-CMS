@@ -99,12 +99,12 @@ public partial class ContentEditingServiceTests
         Assert.IsTrue(result.Success);
         Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
 
-        VerifyCopy(result.Result);
+        await VerifyCopy(result.Result);
 
         // re-get and re-test
-        VerifyCopy(await ContentEditingService.GetAsync(result.Result!.Key));
+        await VerifyCopy(await ContentEditingService.GetAsync(result.Result!.Key));
 
-        void VerifyCopy(IContent? copiedRoot)
+        async Task VerifyCopy(IContent? copiedRoot)
         {
             Assert.IsNotNull(copiedRoot);
             Assert.AreEqual(root2.Id, copiedRoot.ParentId);
@@ -112,7 +112,9 @@ public partial class ContentEditingServiceTests
             Assert.AreNotEqual(root1.Key, copiedRoot.Key);
             Assert.AreEqual(root1.Name, copiedRoot.Name);
 
-            var copiedChildren = ContentService.GetPagedChildren(copiedRoot.Id, 0, 100, out var total, propertyAliases: null, filter: null, ordering: null).ToArray();
+            PagedModel<IContent> copiedChildrenPage = await ContentService.GetChildrenAsync(copiedRoot.Key, 0, 100, propertyAliases: null, ordering: null, CancellationToken.None);
+            var copiedChildren = copiedChildrenPage.Items.ToArray();
+            var total = copiedChildrenPage.Total;
 
             if (includeDescendants)
             {
@@ -167,19 +169,21 @@ public partial class ContentEditingServiceTests
         Assert.IsTrue(result.Success);
         Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
 
-        VerifyCopy(result.Result);
+        await VerifyCopy(result.Result);
 
         // re-get and re-test
-        VerifyCopy(await ContentEditingService.GetAsync(result.Result!.Key));
+        await VerifyCopy(await ContentEditingService.GetAsync(result.Result!.Key));
 
-        void VerifyCopy(IContent? copiedRoot)
+        async Task VerifyCopy(IContent? copiedRoot)
         {
             Assert.IsNotNull(copiedRoot);
             Assert.AreEqual(child.Id, copiedRoot.ParentId);
             Assert.IsTrue(copiedRoot.HasIdentity);
             Assert.AreNotEqual(root.Key, copiedRoot.Key);
             Assert.AreEqual(root.Name, copiedRoot.Name);
-            var copiedChildren = ContentService.GetPagedChildren(copiedRoot.Id, 0, 100, out var total, propertyAliases: null, filter: null, ordering: null).ToArray();
+            PagedModel<IContent> copiedChildrenPage = await ContentService.GetChildrenAsync(copiedRoot.Key, 0, 100, propertyAliases: null, ordering: null, CancellationToken.None);
+            var copiedChildren = copiedChildrenPage.Items.ToArray();
+            var total = copiedChildrenPage.Total;
 
             if (includeDescendants)
             {
@@ -209,19 +213,21 @@ public partial class ContentEditingServiceTests
         Assert.IsTrue(result.Success);
         Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
 
-        VerifyCopy(result.Result);
+        await VerifyCopy(result.Result);
 
         // re-get and re-test
-        VerifyCopy(await ContentEditingService.GetAsync(result.Result!.Key));
+        await VerifyCopy(await ContentEditingService.GetAsync(result.Result!.Key));
 
-        void VerifyCopy(IContent? copiedRoot)
+        async Task VerifyCopy(IContent? copiedRoot)
         {
             Assert.IsNotNull(copiedRoot);
             Assert.AreEqual(root.Id, copiedRoot.ParentId);
             Assert.IsTrue(copiedRoot.HasIdentity);
             Assert.AreNotEqual(root.Key, copiedRoot.Key);
             Assert.AreEqual(root.Name, copiedRoot.Name);
-            var copiedChildren = ContentService.GetPagedChildren(copiedRoot.Id, 0, 100, out var total, propertyAliases: null, filter: null, ordering: null).ToArray();
+            PagedModel<IContent> copiedChildrenPage = await ContentService.GetChildrenAsync(copiedRoot.Key, 0, 100, propertyAliases: null, ordering: null, CancellationToken.None);
+            var copiedChildren = copiedChildrenPage.Items.ToArray();
+            var total = copiedChildrenPage.Total;
 
             if (includeDescendants)
             {

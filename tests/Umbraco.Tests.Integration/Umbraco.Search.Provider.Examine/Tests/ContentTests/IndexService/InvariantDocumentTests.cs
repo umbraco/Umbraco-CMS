@@ -31,8 +31,8 @@ public class InvariantDocumentTests : IndexTestBase
         var indexAlias = GetIndexAlias(publish);
         await WaitForIndexing(indexAlias, () =>
         {
-            IContent content = ContentService.GetById(RootKey)!;
-            ContentService.Delete(content);
+            IContent content = ContentService.GetByIdAsync(RootKey, CancellationToken.None).GetAwaiter().GetResult()!;
+            ContentService.DeleteAsync(content, Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None).GetAwaiter().GetResult();
             return Task.CompletedTask;
         });
 
@@ -44,11 +44,10 @@ public class InvariantDocumentTests : IndexTestBase
     [Test]
     public async Task CanRemoveUnpublishedDocument()
     {
-        await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, () =>
+        await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, async () =>
         {
-            IContent content = ContentService.GetById(RootKey)!;
-            ContentService.Unpublish(content);
-            return Task.CompletedTask;
+            IContent content = ContentService.GetByIdAsync(RootKey, CancellationToken.None).GetAwaiter().GetResult()!;
+            await ContentService.UnpublishAsync(content, "*", Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         });
 
 
@@ -162,8 +161,8 @@ public class InvariantDocumentTests : IndexTestBase
         var indexAlias = GetIndexAlias(publish);
         await WaitForIndexing(indexAlias, () =>
         {
-            IContent content = ContentService.GetById(RootKey)!;
-            ContentService.Delete(content);
+            IContent content = ContentService.GetByIdAsync(RootKey, CancellationToken.None).GetAwaiter().GetResult()!;
+            ContentService.DeleteAsync(content, Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None).GetAwaiter().GetResult();
             return Task.CompletedTask;
         });
 
@@ -226,31 +225,28 @@ public class InvariantDocumentTests : IndexTestBase
                 })
             .Build();
 
-        await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, () =>
+        await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, async () =>
         {
-            ContentService.Save(root);
-            ContentService.Publish(root, ["*"]);
-            return Task.CompletedTask;
+            await ContentService.SaveAsync(root, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
+            await ContentService.PublishAsync(root, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         });
 
-        IContent? content = ContentService.GetById(RootKey);
+        IContent? content = ContentService.GetByIdAsync(RootKey, CancellationToken.None).GetAwaiter().GetResult();
         Assert.That(content, Is.Not.Null);
     }
 
     private async Task UpdateProperty(string propertyName, object value, bool publish)
     {
-        IContent content = ContentService.GetById(RootKey)!;
+        IContent content = ContentService.GetByIdAsync(RootKey, CancellationToken.None).GetAwaiter().GetResult()!;
         content.SetValue(propertyName, value);
 
-        await WaitForIndexing(GetIndexAlias(publish), () =>
+        await WaitForIndexing(GetIndexAlias(publish), async () =>
         {
-            ContentService.Save(content);
+            await ContentService.SaveAsync(content, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
             if (publish)
             {
-                ContentService.Publish(content, ["*"]);
+                await ContentService.PublishAsync(content, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
             }
-
-            return Task.CompletedTask;
         });
     }
 }

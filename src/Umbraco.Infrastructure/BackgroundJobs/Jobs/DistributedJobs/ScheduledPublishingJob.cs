@@ -64,11 +64,11 @@ internal class ScheduledPublishingJob : IDistributedBackgroundJob
     }
 
     /// <inheritdoc />
-    public Task ExecuteAsync()
+    public async Task ExecuteAsync()
     {
         if (Suspendable.ScheduledPublishing.CanRun == false)
         {
-            return Task.CompletedTask;
+            return;
         }
 
         try
@@ -94,8 +94,8 @@ internal class ScheduledPublishingJob : IDistributedBackgroundJob
             {
                 DateTime date = _timeProvider.GetUtcNow().UtcDateTime;
 
-                PerformScheduledPublish(_contentService, Constants.UdiEntityType.Document, date);
-                PerformScheduledPublish(_elementService, Constants.UdiEntityType.Element, date);
+                await PerformScheduledPublishAsync(_contentService, Constants.UdiEntityType.Document, date);
+                await PerformScheduledPublishAsync(_elementService, Constants.UdiEntityType.Element, date);
 
                 scope.Complete();
             }
@@ -113,14 +113,12 @@ internal class ScheduledPublishingJob : IDistributedBackgroundJob
             // important to catch *everything* to ensure the task repeats
             _logger.LogError(ex, "Failed.");
         }
-
-        return Task.CompletedTask;
     }
 
-    private void PerformScheduledPublish<TContent>(IPublishableContentService<TContent> service, string entityType, DateTime date)
+    private async Task PerformScheduledPublishAsync<TContent>(IPublishableContentService<TContent> service, string entityType, DateTime date)
         where TContent : class, IPublishableContentBase
     {
-        IEnumerable<PublishResult> results = service.PerformScheduledPublish(date);
+        IEnumerable<PublishResult> results = await service.PerformScheduledPublishAsync(date, CancellationToken.None);
         foreach (IGrouping<PublishResultType, PublishResult> grouped in results.GroupBy(x => x.Result))
         {
             _logger.LogInformation(

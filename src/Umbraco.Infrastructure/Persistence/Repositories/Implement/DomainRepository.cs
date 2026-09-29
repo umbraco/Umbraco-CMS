@@ -86,9 +86,9 @@ internal sealed class DomainRepository : AsyncEntityRepositoryBase<Guid, IDomain
         });
 
     /// <inheritdoc/>
-    protected override async Task<IEnumerable<IDomain>?> PerformGetManyAsync(Guid[]? keys)
+    protected override async Task<IEnumerable<IDomain>?> PerformGetManyAsync(Guid[] keys)
     {
-        if (keys is null || keys.Length == 0)
+        if (keys.Length == 0)
         {
             return null;
         }

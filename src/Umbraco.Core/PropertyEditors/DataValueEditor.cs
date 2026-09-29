@@ -431,32 +431,34 @@ public class DataValueEditor : IDataValueEditor
     }
 
     /// <summary>
-    /// Retrieves a <see cref="IContent"/> instance by its unique identifier, using the provided request cache to avoid redundant
-    /// lookups within the same request.
+    /// Gets a content item by key, serving it from the request cache when it is already there.
     /// </summary>
     /// <remarks>
-    /// This method caches content lookups for the duration of the current request to improve performance when the same content
-    /// item may be accessed multiple times. This is particularly useful in scenarios involving multiple languages or blocks.
+    /// Caches the lookup for the duration of the current request, so the same content item accessed
+    /// repeatedly - across languages or blocks - is fetched once.
     /// </remarks>
     /// <param name="key">The unique identifier of the content item to retrieve.</param>
-    /// <param name="requestCache">The request-scoped cache used to store and retrieve content items for the duration of the current request.</param>
-    /// <param name="contentService">The content service used to fetch the content item if it is not found in the cache.</param>
-    /// <returns>The <see cref="IContent"/> instance corresponding to the specified key, or null if no such content item exists.</returns>
-    [Obsolete("This method is available for support of request caching retrieved entities in derived property value editors. " +
-          "The intention is to supersede this with lazy loaded read locks, which will make this unnecessary. " +
-          "Scheduled for removal in Umbraco 19.")]
-    protected static IContent? GetAndCacheContentById(Guid key, IRequestCache requestCache, IContentService contentService)
+    /// <param name="requestCache">The request-scoped cache used to store and retrieve content items.</param>
+    /// <param name="contentService">The content service used to fetch the content item if it is not cached.</param>
+    /// <param name="cancellationToken">A cancellation token.</param>
+    /// <returns>The content item, or <c>null</c> when no such item exists.</returns>
+    protected static async Task<IContent?> GetAndCacheContentByIdAsync(
+        Guid key,
+        IRequestCache requestCache,
+        IContentService contentService,
+        CancellationToken cancellationToken)
     {
         if (requestCache.IsAvailable is false)
         {
-            return contentService.GetById(key);
+            return await contentService.GetByIdAsync(key, cancellationToken);
         }
 
         var cacheKey = string.Format(ContentCacheKeyFormat, key);
         IContent? content = requestCache.GetCacheItem<IContent?>(cacheKey);
+
         if (content is null)
         {
-            content = contentService.GetById(key);
+            content = await contentService.GetByIdAsync(key, cancellationToken);
             if (content is not null)
             {
                 requestCache.Set(cacheKey, content);

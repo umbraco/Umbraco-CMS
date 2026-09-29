@@ -161,15 +161,13 @@ public class RebuildTests : UmbracoIntegrationTest
 
         // Update the content name directly (simulating a change)
         _rootDocument.Name = "Updated Document Name";
-        await WaitForIndexing(indexAlias, () =>
+        await WaitForIndexing(indexAlias, async () =>
         {
-            ContentService.Save(_rootDocument);
+            await ContentService.SaveAsync(_rootDocument, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
             if (publish)
             {
-                ContentService.Publish(_rootDocument, ["*"]);
+                await ContentService.PublishAsync(_rootDocument, ["*"], global::Umbraco.Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
             }
-
-            return Task.CompletedTask;
         });
 
         using (ScopeProvider.CreateScope(autoComplete: true))
@@ -224,7 +222,7 @@ public class RebuildTests : UmbracoIntegrationTest
 
             if (publish)
             {
-                ContentService.Publish(_rootDocument, ["*"]);
+                await ContentService.PublishAsync(_rootDocument, ["*"], global::Umbraco.Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
             }
         });
     }

@@ -203,10 +203,10 @@ internal class HasElementScheduleFlagProviderTests
         await sut.PopulateFlagsAsync(viewModels);
 
         _elementServiceMock.Verify(
-            x => x.GetContentSchedulesByKeys(It.Is<Guid[]>(k => k.Length == 2 && k.Contains(key1) && k.Contains(key2))),
+            x => x.GetContentSchedulesByKeysAsync(It.Is<Guid[]>(k => k.Length == 2 && k.Contains(key1) && k.Contains(key2)), It.IsAny<CancellationToken>()),
             Times.Once);
         _elementServiceMock.Verify(
-            x => x.GetContentScheduleByContentId(It.IsAny<Guid>()),
+            x => x.GetContentScheduleByContentIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()),
             Times.Never);
     }
 
@@ -215,8 +215,8 @@ internal class HasElementScheduleFlagProviderTests
 
     private void SetupBatchScheduleMock(IDictionary<Guid, IEnumerable<ContentSchedule>> schedules) =>
         _elementServiceMock
-            .Setup(x => x.GetContentSchedulesByKeys(It.IsAny<Guid[]>()))
-            .Returns((Guid[] keys) =>
+            .Setup(x => x.GetContentSchedulesByKeysAsync(It.IsAny<Guid[]>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((Guid[] keys, CancellationToken _) =>
             {
                 var result = new Dictionary<Guid, IEnumerable<ContentSchedule>>();
                 foreach (Guid key in keys)
@@ -227,6 +227,6 @@ internal class HasElementScheduleFlagProviderTests
                     }
                 }
 
-                return result;
+                return (IDictionary<Guid, IEnumerable<ContentSchedule>>)result;
             });
 }

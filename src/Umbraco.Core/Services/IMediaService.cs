@@ -6,7 +6,7 @@ namespace Umbraco.Cms.Core.Services;
 /// <summary>
 ///     Defines the Media Service, which is an easy access to operations involving <see cref="IMedia" />
 /// </summary>
-public interface IMediaService : IContentServiceBase<IMedia>
+public interface IMediaService : IContentServiceBase<IMedia>, IAsyncContentServiceBase<IMedia>
 {
     /// <summary>
     ///     Gets the count of media items that are not in the recycle bin.

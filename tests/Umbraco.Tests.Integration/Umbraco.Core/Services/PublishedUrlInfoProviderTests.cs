@@ -32,7 +32,7 @@ internal sealed class PublishedUrlInfoProviderTests : PublishedUrlInfoProviderTe
 
         // The base class creates invariant content (ContentType doesn't vary by culture)
         // Publish the root content
-        ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
+        await ContentService.PublishBranchAsync(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Act: Get all URLs for the invariant content
         var urls = await PublishedUrlInfoProvider.GetAllAsync(Textpage);
@@ -55,7 +55,7 @@ internal sealed class PublishedUrlInfoProviderTests : PublishedUrlInfoProviderTe
         await LanguageService.CreateAsync(danishLanguage, Constants.Security.SuperUserKey);
 
         // The base class creates invariant content
-        ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
+        await ContentService.PublishBranchAsync(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Act: request with and without a culture
         var allUrls = await PublishedUrlInfoProvider.GetAllAsync(Textpage);
@@ -78,7 +78,7 @@ internal sealed class PublishedUrlInfoProviderTests : PublishedUrlInfoProviderTe
         await LanguageService.CreateAsync(danishLanguage, Constants.Security.SuperUserKey);
 
         // Publish the branch (invariant content from base class)
-        ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
+        await ContentService.PublishBranchAsync(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Assign a domain with the non-default culture (da-DK) to the root node
         var updateDomainResult = await DomainService.UpdateDomainsAsync(
@@ -106,16 +106,16 @@ internal sealed class PublishedUrlInfoProviderTests : PublishedUrlInfoProviderTe
         // Create a second root
         var secondRoot = ContentBuilder.CreateSimpleContent(ContentType, "Second Root", null);
         var contentSchedule = ContentScheduleCollection.CreateWithEntry(DateTime.UtcNow.AddMinutes(-5), null);
-        ContentService.Save(secondRoot, -1, contentSchedule);
+        await ContentService.SaveAsync(secondRoot, Constants.Security.SuperUserKey, contentSchedule, CancellationToken.None);
 
         // Create a child of second root
         var childOfSecondRoot = ContentBuilder.CreateSimpleContent(ContentType, Subpage.Name, secondRoot);
         childOfSecondRoot.Key = new Guid("FF6654FB-BC68-4A65-8C6C-135567F50BD6");
-        ContentService.Save(childOfSecondRoot, -1, contentSchedule);
+        await ContentService.SaveAsync(childOfSecondRoot, Constants.Security.SuperUserKey, contentSchedule, CancellationToken.None);
 
         // Publish both the main root and the second root with descendants
-        ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
-        ContentService.PublishBranch(secondRoot, PublishBranchFilter.IncludeUnpublished, ["*"]);
+        await ContentService.PublishBranchAsync(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
+        await ContentService.PublishBranchAsync(secondRoot, PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         var subPageUrls = await PublishedUrlInfoProvider.GetAllAsync(Subpage);
         var childOfSecondRootUrls = await PublishedUrlInfoProvider.GetAllAsync(childOfSecondRoot);
@@ -137,16 +137,16 @@ internal sealed class PublishedUrlInfoProviderTests : PublishedUrlInfoProviderTe
         // Create a second root
         var secondRoot = ContentBuilder.CreateSimpleContent(ContentType, "Second Root", null);
         var contentSchedule = ContentScheduleCollection.CreateWithEntry(DateTime.UtcNow.AddMinutes(-5), null);
-        ContentService.Save(secondRoot, -1, contentSchedule);
+        await ContentService.SaveAsync(secondRoot, Constants.Security.SuperUserKey, contentSchedule, CancellationToken.None);
 
         // Create a child of second root
         var childOfSecondRoot = ContentBuilder.CreateSimpleContent(ContentType, Subpage.Name, secondRoot);
         childOfSecondRoot.Key = new Guid("FF6654FB-BC68-4A65-8C6C-135567F50BD6");
-        ContentService.Save(childOfSecondRoot, -1, contentSchedule);
+        await ContentService.SaveAsync(childOfSecondRoot, Constants.Security.SuperUserKey, contentSchedule, CancellationToken.None);
 
         // Publish both the main root and the second root with descendants
-        ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
-        ContentService.PublishBranch(secondRoot, PublishBranchFilter.IncludeUnpublished, ["*"]);
+        await ContentService.PublishBranchAsync(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
+        await ContentService.PublishBranchAsync(secondRoot, PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         var subPageUrls = await PublishedUrlInfoProvider.GetAllAsync(Subpage);
         var childOfSecondRootUrls = await PublishedUrlInfoProvider.GetAllAsync(childOfSecondRoot);

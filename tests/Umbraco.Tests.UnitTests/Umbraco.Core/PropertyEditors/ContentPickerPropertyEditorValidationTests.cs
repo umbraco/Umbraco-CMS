@@ -63,8 +63,8 @@ public class ContentPickerPropertyEditorValidationTests
         var documentKey = Guid.NewGuid();
 
         _contentServiceMock
-            .Setup(x => x.GetById(It.IsAny<Guid>()))
-            .Returns(CreateContent(documentKey, Guid.NewGuid()));
+            .Setup(x => x.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(CreateContent(documentKey, Guid.NewGuid()));
 
         // AllowedContentTypeIds is null — no restriction
         _valueEditor.ConfigurationObject = new ContentPickerConfiguration { AllowedContentTypeIds = null };
@@ -80,8 +80,8 @@ public class ContentPickerPropertyEditorValidationTests
         var allowedContentTypeKey = Guid.NewGuid();
 
         _contentServiceMock
-            .Setup(x => x.GetById(It.IsAny<Guid>()))
-            .Returns(CreateContent(documentKey, allowedContentTypeKey));
+            .Setup(x => x.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(CreateContent(documentKey, allowedContentTypeKey));
 
         var extraAllowedKey = hasMultipleAllowedTypes ? Guid.NewGuid().ToString() : null;
         _valueEditor.ConfigurationObject = new ContentPickerConfiguration
@@ -102,8 +102,8 @@ public class ContentPickerPropertyEditorValidationTests
         var actualContentTypeKey = Guid.NewGuid(); // different from allowed
 
         _contentServiceMock
-            .Setup(x => x.GetById(It.IsAny<Guid>()))
-            .Returns(CreateContent(documentKey, actualContentTypeKey));
+            .Setup(x => x.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(CreateContent(documentKey, actualContentTypeKey));
 
         _valueEditor.ConfigurationObject = new ContentPickerConfiguration
         {
@@ -119,8 +119,8 @@ public class ContentPickerPropertyEditorValidationTests
         var documentKey = Guid.NewGuid();
 
         _contentServiceMock
-            .Setup(x => x.GetById(It.IsAny<Guid>()))
-            .Returns((IContent?)null);
+            .Setup(x => x.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((IContent?)null);
 
         _valueEditor.ConfigurationObject = new ContentPickerConfiguration
         {

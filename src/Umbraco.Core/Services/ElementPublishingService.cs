@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Scoping;
@@ -16,8 +15,7 @@ internal sealed class ElementPublishingService : ContentPublishingServiceBase<IE
         IContentTypeService contentTypeService,
         ILanguageService languageService,
         IOptionsMonitor<ContentSettings> optionsMonitor,
-        IRelationService relationService,
-        ILogger<ContentPublishingServiceBase<IElement, IElementService>> logger)
+        IRelationService relationService)
         : base(
             coreScopeProvider,
             contentService,
@@ -26,8 +24,7 @@ internal sealed class ElementPublishingService : ContentPublishingServiceBase<IE
             contentTypeService,
             languageService,
             optionsMonitor,
-            relationService,
-            logger)
+            relationService)
     {
     }
 

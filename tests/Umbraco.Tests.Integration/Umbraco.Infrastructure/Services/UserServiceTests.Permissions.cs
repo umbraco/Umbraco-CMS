@@ -9,6 +9,7 @@ using Umbraco.Cms.Tests.Common.Builders;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
+#pragma warning disable CS0618 // Type or member is obsolete
 internal sealed partial class UserServiceTests
 {
     [Test]
@@ -25,13 +26,13 @@ internal sealed partial class UserServiceTests
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var parent = ContentBuilder.CreateSimpleContent(contentType);
-        ContentService.Save(parent);
+        await ContentService.SaveAsync(parent, Constants.Security.SuperUserKey, null, CancellationToken.None);
         var child = ContentBuilder.CreateSimpleContent(contentType, "child", parent.Id);
-        ContentService.Save(child);
+        await ContentService.SaveAsync(child, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         // Set explicit permissions on the parent only
-        ContentService.SetPermission(parent, ActionBrowse.ActionLetter, [userGroup.Id]);
-        ContentService.SetPermission(parent, ActionDelete.ActionLetter, [userGroup.Id]);
+        await ContentService.SetPermissionAsync(parent, ActionBrowse.ActionLetter, [userGroup.Key], CancellationToken.None);
+        await ContentService.SetPermissionAsync(parent, ActionDelete.ActionLetter, [userGroup.Key], CancellationToken.None);
 
         // Act
         var result = await UserService
@@ -62,15 +63,15 @@ internal sealed partial class UserServiceTests
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var parent = ContentBuilder.CreateSimpleContent(contentType);
-        ContentService.Save(parent);
+        await ContentService.SaveAsync(parent, Constants.Security.SuperUserKey, null, CancellationToken.None);
         var child = ContentBuilder.CreateSimpleContent(contentType, "child", parent.Id);
-        ContentService.Save(child);
+        await ContentService.SaveAsync(child, Constants.Security.SuperUserKey, null, CancellationToken.None);
         var grandchild = ContentBuilder.CreateSimpleContent(contentType, "grandchild", child.Id);
-        ContentService.Save(grandchild);
+        await ContentService.SaveAsync(grandchild, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         // Set explicit permissions on the parent only
-        ContentService.SetPermission(parent, ActionBrowse.ActionLetter, [userGroup.Id]);
-        ContentService.SetPermission(parent, ActionMove.ActionLetter, [userGroup.Id]);
+        await ContentService.SetPermissionAsync(parent, ActionBrowse.ActionLetter, [userGroup.Key], CancellationToken.None);
+        await ContentService.SetPermissionAsync(parent, ActionMove.ActionLetter, [userGroup.Key], CancellationToken.None);
 
         // Act
         var result = await UserService
@@ -101,15 +102,15 @@ internal sealed partial class UserServiceTests
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var parent = ContentBuilder.CreateSimpleContent(contentType);
-        ContentService.Save(parent);
+        await ContentService.SaveAsync(parent, Constants.Security.SuperUserKey, null, CancellationToken.None);
         var child = ContentBuilder.CreateSimpleContent(contentType, "child", parent.Id);
-        ContentService.Save(child);
+        await ContentService.SaveAsync(child, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         // Set different explicit permissions on parent and child
-        ContentService.SetPermission(parent, ActionBrowse.ActionLetter, [userGroup.Id]);
-        ContentService.SetPermission(parent, ActionDelete.ActionLetter, [userGroup.Id]);
-        ContentService.SetPermission(child, ActionBrowse.ActionLetter, [userGroup.Id]);
-        ContentService.SetPermission(child, ActionMove.ActionLetter, [userGroup.Id]);
+        await ContentService.SetPermissionAsync(parent, ActionBrowse.ActionLetter, [userGroup.Key], CancellationToken.None);
+        await ContentService.SetPermissionAsync(parent, ActionDelete.ActionLetter, [userGroup.Key], CancellationToken.None);
+        await ContentService.SetPermissionAsync(child, ActionBrowse.ActionLetter, [userGroup.Key], CancellationToken.None);
+        await ContentService.SetPermissionAsync(child, ActionMove.ActionLetter, [userGroup.Key], CancellationToken.None);
 
         // Act
         var result = await UserService
@@ -140,17 +141,17 @@ internal sealed partial class UserServiceTests
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var parent = ContentBuilder.CreateSimpleContent(contentType);
-        ContentService.Save(parent);
+        await ContentService.SaveAsync(parent, Constants.Security.SuperUserKey, null, CancellationToken.None);
         var child = ContentBuilder.CreateSimpleContent(contentType, "child", parent.Id);
-        ContentService.Save(child);
+        await ContentService.SaveAsync(child, Constants.Security.SuperUserKey, null, CancellationToken.None);
         var grandchild = ContentBuilder.CreateSimpleContent(contentType, "grandchild", child.Id);
-        ContentService.Save(grandchild);
+        await ContentService.SaveAsync(grandchild, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         // Set different explicit permissions on parent and child
-        ContentService.SetPermission(parent, ActionBrowse.ActionLetter, [userGroup.Id]);
-        ContentService.SetPermission(parent, ActionDelete.ActionLetter, [userGroup.Id]);
-        ContentService.SetPermission(child, ActionBrowse.ActionLetter, [userGroup.Id]);
-        ContentService.SetPermission(child, ActionMove.ActionLetter, [userGroup.Id]);
+        await ContentService.SetPermissionAsync(parent, ActionBrowse.ActionLetter, [userGroup.Key], CancellationToken.None);
+        await ContentService.SetPermissionAsync(parent, ActionDelete.ActionLetter, [userGroup.Key], CancellationToken.None);
+        await ContentService.SetPermissionAsync(child, ActionBrowse.ActionLetter, [userGroup.Key], CancellationToken.None);
+        await ContentService.SetPermissionAsync(child, ActionMove.ActionLetter, [userGroup.Key], CancellationToken.None);
 
         // Act
         var result = await UserService
@@ -184,9 +185,9 @@ internal sealed partial class UserServiceTests
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var parent = ContentBuilder.CreateSimpleContent(contentType);
-        ContentService.Save(parent);
+        await ContentService.SaveAsync(parent, Constants.Security.SuperUserKey, null, CancellationToken.None);
         var child = ContentBuilder.CreateSimpleContent(contentType, "child", parent.Id);
-        ContentService.Save(child);
+        await ContentService.SaveAsync(child, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         // No explicit permissions set on any node.
 
@@ -221,13 +222,13 @@ internal sealed partial class UserServiceTests
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var parent = ContentBuilder.CreateSimpleContent(contentType);
-        ContentService.Save(parent);
+        await ContentService.SaveAsync(parent, Constants.Security.SuperUserKey, null, CancellationToken.None);
         var child = ContentBuilder.CreateSimpleContent(contentType, "child", parent.Id);
-        ContentService.Save(child);
+        await ContentService.SaveAsync(child, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         // Set explicit permissions on the child only
-        ContentService.SetPermission(child, ActionDelete.ActionLetter, [userGroup.Id]);
-        ContentService.SetPermission(child, ActionMove.ActionLetter, [userGroup.Id]);
+        await ContentService.SetPermissionAsync(child, ActionDelete.ActionLetter, [userGroup.Key], CancellationToken.None);
+        await ContentService.SetPermissionAsync(child, ActionMove.ActionLetter, [userGroup.Key], CancellationToken.None);
 
         // Act - query permissions for both parent and child
         var result = await UserService
@@ -261,7 +262,7 @@ internal sealed partial class UserServiceTests
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var content = ContentBuilder.CreateSimpleContent(contentType);
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         // Act
         var result = await UserService
@@ -286,7 +287,7 @@ internal sealed partial class UserServiceTests
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var content = ContentBuilder.CreateSimpleContent(contentType);
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         // Set initial permissions
         var initialPermissions = new HashSet<string> { ActionBrowse.ActionLetter, ActionDelete.ActionLetter };
@@ -326,9 +327,9 @@ internal sealed partial class UserServiceTests
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var content1 = ContentBuilder.CreateSimpleContent(contentType);
-        ContentService.Save(content1);
+        await ContentService.SaveAsync(content1, Constants.Security.SuperUserKey, null, CancellationToken.None);
         var content2 = ContentBuilder.CreateSimpleContent(contentType, "second");
-        ContentService.Save(content2);
+        await ContentService.SaveAsync(content2, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         var permissions = new HashSet<string> { ActionBrowse.ActionLetter, ActionMove.ActionLetter };
 
@@ -365,9 +366,9 @@ internal sealed partial class UserServiceTests
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var content1 = ContentBuilder.CreateSimpleContent(contentType);
-        ContentService.Save(content1);
+        await ContentService.SaveAsync(content1, Constants.Security.SuperUserKey, null, CancellationToken.None);
         var content2 = ContentBuilder.CreateSimpleContent(contentType, "second");
-        ContentService.Save(content2);
+        await ContentService.SaveAsync(content2, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         // Act
         UserService.AssignUserGroupPermission(userGroup.Id, ActionBrowse.ActionLetter, content1.Id, content2.Id);
@@ -401,7 +402,7 @@ internal sealed partial class UserServiceTests
         contentType.AllowedTemplates = null;
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
         var content = ContentBuilder.CreateSimpleContent(contentType);
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         // Act
         var result = await UserService
@@ -427,7 +428,7 @@ internal sealed partial class UserServiceTests
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var content = ContentBuilder.CreateSimpleContent(contentType);
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         // Set initial permission
         UserService.AssignUserGroupPermission(userGroup.Id, ActionBrowse.ActionLetter, content.Id);
@@ -445,3 +446,4 @@ internal sealed partial class UserServiceTests
         Assert.IsTrue(nodePermissions[0].Permissions.Contains(ActionDelete.ActionLetter));
     }
 }
+#pragma warning restore CS0618 // Type or member is obsolete

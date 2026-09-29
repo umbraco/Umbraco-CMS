@@ -74,12 +74,12 @@ public partial class ContentEditingServiceTests
     [ConfigureBuilder(ActionName = nameof(ConfigureDisableDeleteWhenReferenced))]
     public async Task Cannot_EmptyRecycleBin_When_Content_Is_Related_As_A_Child_And_Configured_To_Disable_When_Related()
     {
-        ContentService.MoveToRecycleBin(Subpage);
+        await ContentService.MoveToRecycleBinAsync(Subpage, Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Setup a relation where the trashed page is related to another page as a child (e.g. the other page has a picker and has selected this page).
         await RelateAsync(Subpage2, Subpage);
 
-        ContentService.EmptyRecycleBin();
+        await ContentService.EmptyRecycleBinAsync(Constants.Security.SuperUserKey, CancellationToken.None);
 
         // re-get and verify not deleted (the relation prevents deletion)
         var subpage = await ContentEditingService.GetAsync(Subpage.Key);
@@ -90,13 +90,13 @@ public partial class ContentEditingServiceTests
     [ConfigureBuilder(ActionName = nameof(ConfigureDisableDeleteWhenReferenced))]
     public async Task Can_EmptyRecycleBin_When_Content_Is_Related_To_Parent_For_Restore_And_Configured_To_Disable_When_Related()
     {
-        ContentService.MoveToRecycleBin(Subpage);
+        await ContentService.MoveToRecycleBinAsync(Subpage, Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Setup a relation where the trashed page is related to its parent (created as the location to restore to).
         // This relation should be excluded from the "disable delete when referenced" check.
         await RelateAsync(Subpage2, Subpage, Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteAlias);
 
-        ContentService.EmptyRecycleBin();
+        await ContentService.EmptyRecycleBinAsync(Constants.Security.SuperUserKey, CancellationToken.None);
 
         // re-get and verify is deleted (the restore relation should not prevent deletion)
         var subpage = await ContentEditingService.GetAsync(Subpage.Key);
@@ -107,13 +107,13 @@ public partial class ContentEditingServiceTests
     [ConfigureBuilder(ActionName = nameof(ConfigureDisableDeleteWhenReferenced))]
     public async Task Can_EmptyRecycleBin_When_Content_Is_Related_As_A_Parent_And_Configured_To_Disable_When_Related()
     {
-        ContentService.MoveToRecycleBin(Subpage);
+        await ContentService.MoveToRecycleBinAsync(Subpage, Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Setup a relation where the trashed page is related to another page as a parent (not a child).
         // Only child relations should prevent deletion.
         await RelateAsync(Subpage, Subpage2);
 
-        ContentService.EmptyRecycleBin();
+        await ContentService.EmptyRecycleBinAsync(Constants.Security.SuperUserKey, CancellationToken.None);
 
         // re-get and verify deleted (parent relations should not prevent deletion)
         var subpage = await ContentEditingService.GetAsync(Subpage.Key);

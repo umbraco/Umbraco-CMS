@@ -76,7 +76,7 @@ internal sealed class ContentPermissionService : IContentPermissionService
     }
 
     /// <inheritdoc/>
-    public Task<ContentAuthorizationStatus> AuthorizeDescendantsAccessAsync(
+    public async Task<ContentAuthorizationStatus> AuthorizeDescendantsAccessAsync(
         IUser user,
         Guid parentKey,
         ISet<string> permissionsToCheck)
@@ -86,11 +86,11 @@ internal sealed class ContentPermissionService : IContentPermissionService
         const int pageSize = 500;
         var total = long.MaxValue;
 
-        IContent? contentItem = _contentService.GetById(parentKey);
+        IContent? contentItem = await _contentService.GetByIdAsync(parentKey, CancellationToken.None);
 
         if (contentItem is null)
         {
-            return Task.FromResult(ContentAuthorizationStatus.NotFound);
+            return ContentAuthorizationStatus.NotFound;
         }
 
         while (page * pageSize < total)
@@ -118,9 +118,9 @@ internal sealed class ContentPermissionService : IContentPermissionService
             }
         }
 
-        return Task.FromResult(denied.Count == 0
+        return denied.Count == 0
             ? ContentAuthorizationStatus.Success
-            : ContentAuthorizationStatus.UnauthorizedMissingDescendantAccess);
+            : ContentAuthorizationStatus.UnauthorizedMissingDescendantAccess;
     }
 
     /// <inheritdoc/>

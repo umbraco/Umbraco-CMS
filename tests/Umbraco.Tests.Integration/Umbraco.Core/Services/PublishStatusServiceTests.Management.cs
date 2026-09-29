@@ -5,6 +5,7 @@ using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Navigation;
+using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
@@ -35,7 +36,7 @@ internal sealed partial class PublishStatusServiceTests
         });
 
         // Act
-        var publishResults = ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
+        var publishResults = await ContentService.PublishBranchAsync(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
         await sut.InitializeAsync(CancellationToken.None);
 
         Assert.Multiple(() =>
@@ -72,7 +73,7 @@ internal sealed partial class PublishStatusServiceTests
         Assert.IsFalse(sut.IsPublished(Textpage.Key, DefaultCulture));
 
         // Act
-        var publishResults = ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
+        var publishResults = await ContentService.PublishBranchAsync(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
         await sut.AddOrUpdateStatusWithDescendantsAsync(Textpage.Key, CancellationToken.None);
 
         Assert.IsTrue(sut.IsPublished(Textpage.Key, DefaultCulture));
@@ -94,7 +95,7 @@ internal sealed partial class PublishStatusServiceTests
         Assert.IsFalse(sut.IsPublished(Textpage.Key, DefaultCulture));
 
         // Act
-        var publishResults = ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
+        var publishResults = await ContentService.PublishBranchAsync(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
         await sut.AddOrUpdateStatusAsync(Textpage.Key, CancellationToken.None);
 
         Assert.IsTrue(sut.IsPublished(Textpage.Key, DefaultCulture));

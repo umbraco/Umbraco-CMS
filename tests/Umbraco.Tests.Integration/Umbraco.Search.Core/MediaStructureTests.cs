@@ -104,7 +104,7 @@ public class MediaStructureTests : MediaTestBase
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.Media);
         Assert.That(documents, Has.Count.EqualTo(5));
 
-        await MediaTypeService.DeleteAsync(RootMedia().ContentType.Key, Constants.Security.SuperUserKey);
+        await MediaTypeService.DeleteAsync(RootMedia().ContentType.Key, Cms.Core.Constants.Security.SuperUserKey);
 
         documents = IndexerAndSearcher.Dump(IndexAliases.Media);
         Assert.That(documents, Has.Count.EqualTo(2));

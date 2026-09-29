@@ -107,13 +107,12 @@ public class InvariantDocumentProtectionIndexTests : IndexTestBase
                 })
             .Build();
 
-        await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, () =>
+        await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, async () =>
         {
-            SaveAndPublish(root);
-            return Task.CompletedTask;
+            await SaveAndPublishAsync(root);
         });
 
-        IContent? content = ContentService.GetById(RootKey);
+        IContent? content = ContentService.GetByIdAsync(RootKey, CancellationToken.None).GetAwaiter().GetResult();
         Assert.That(content, Is.Not.Null);
     }
 }

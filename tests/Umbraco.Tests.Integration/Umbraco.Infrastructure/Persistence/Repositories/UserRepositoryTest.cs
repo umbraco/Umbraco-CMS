@@ -568,7 +568,7 @@ internal sealed class UserRepositoryTest : UmbracoIntegrationTest
             var content = ContentBuilder.CreateBasicContent(ct);
             var media = MediaBuilder.CreateSimpleMedia(mt, "asdf", -1);
 
-            DocumentRepository.Save(content);
+            await DocumentRepository.SaveAsync(content, CancellationToken.None);
             MediaRepository.Save(media);
 
             var user = CreateAndCommitUserWithGroup(userRepository, userGroupRepository);

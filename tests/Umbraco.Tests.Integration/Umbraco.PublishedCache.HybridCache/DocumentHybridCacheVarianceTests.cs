@@ -69,8 +69,8 @@ internal sealed class DocumentHybridCacheVarianceTests : UmbracoIntegrationTest
             .WithName("Variance Render Test")
             .Build();
         content.SetValue("title", "invariant title");
-        ContentService.Save(content);
-        ContentService.Publish(content, ["*"]);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishAsync(content, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Routing sets this before rendering; simulate it so a culture-less read resolves like a real request.
         VariationContextAccessor.VariationContext = new VariationContext(defaultCulture);
@@ -113,8 +113,8 @@ internal sealed class DocumentHybridCacheVarianceTests : UmbracoIntegrationTest
             .WithCultureName(defaultCulture, "Variance Render Test")
             .Build();
         content.SetValue("title", "variant title", defaultCulture);
-        ContentService.Save(content);
-        ContentService.Publish(content, ["*"]);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishAsync(content, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Routing sets this before rendering; simulate it so a culture-less read resolves like a real request.
         VariationContextAccessor.VariationContext = new VariationContext(defaultCulture);
@@ -159,8 +159,8 @@ internal sealed class DocumentHybridCacheVarianceTests : UmbracoIntegrationTest
             .WithCultureName(defaultCulture, "Variance Render Test")
             .Build();
         content.SetValue("title", "invariant title");
-        ContentService.Save(content);
-        ContentService.Publish(content, ["*"]);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishAsync(content, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Routing sets this before rendering; simulate it so a culture-less read resolves like a real request.
         VariationContextAccessor.VariationContext = new VariationContext(defaultCulture);
@@ -202,8 +202,8 @@ internal sealed class DocumentHybridCacheVarianceTests : UmbracoIntegrationTest
             .WithCultureName(defaultCulture, "Variance Render Test")
             .Build();
         content.SetValue("title", "variant title", defaultCulture);
-        ContentService.Save(content);
-        ContentService.Publish(content, ["*"]);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishAsync(content, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Routing sets this before rendering; simulate it so a culture-less read resolves like a real request.
         VariationContextAccessor.VariationContext = new VariationContext(defaultCulture);

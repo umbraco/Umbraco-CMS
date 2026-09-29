@@ -71,7 +71,7 @@ public class PublishedMemberTests : TestBase
             .Done()
             .Done()
             .Build();
-        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
+        await MemberTypeService.CreateAsync(memberType, Cms.Core.Constants.Security.SuperUserKey);
 
         MemberService.Save(
             new MemberBuilder()

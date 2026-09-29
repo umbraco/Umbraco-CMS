@@ -56,10 +56,10 @@ public abstract class TestBase : UmbracoIntegrationTest
     protected IRuntimeState RuntimeState => GetRequiredService<IRuntimeState>();
 
 
-    protected void SaveAndPublish(IContent content)
+    protected async Task SaveAndPublishAsync(IContent content)
     {
-        ContentService.Save(content);
-        ContentService.Publish(content, ["*"]);
+        await ContentService.SaveAsync(content, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishAsync(content, ["*"], global::Umbraco.Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
     }
 
     protected override void CustomTestSetup(IUmbracoBuilder builder)

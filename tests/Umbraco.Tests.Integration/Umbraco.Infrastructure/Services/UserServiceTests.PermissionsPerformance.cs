@@ -12,6 +12,7 @@ using Umbraco.Cms.Tests.Common.Builders;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
+#pragma warning disable CS0618 // Type or member is obsolete
 internal sealed partial class UserServiceTests
 {
     /// <summary>
@@ -43,10 +44,10 @@ internal sealed partial class UserServiceTests
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var root = ContentBuilder.CreateSimpleContent(contentType, "root");
-        ContentService.Save(root);
+        await ContentService.SaveAsync(root, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         var parent = ContentBuilder.CreateSimpleContent(contentType, "parent", root.Id);
-        ContentService.Save(parent);
+        await ContentService.SaveAsync(parent, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         var children = new Content[childCount];
         for (var i = 0; i < childCount; i++)
@@ -54,23 +55,23 @@ internal sealed partial class UserServiceTests
             children[i] = ContentBuilder.CreateSimpleContent(contentType, $"child-{i}", parent.Id);
         }
 
-        ContentService.Save(children);
+        await ContentService.SaveAsync(children, Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Arrange — realistic permission mix:
         //   - root: explicit Browse + Delete (inherited by most nodes)
         //   - parent: explicit Browse + Move (overrides root for its subtree)
         //   - child-0 through child-4: explicit Browse + Publish (overrides parent)
         //   - child-5 through child-49: inherit from parent
-        ContentService.SetPermission(root, ActionBrowse.ActionLetter, new[] { userGroup.Id });
-        ContentService.SetPermission(root, ActionDelete.ActionLetter, new[] { userGroup.Id });
+        await ContentService.SetPermissionAsync(root, ActionBrowse.ActionLetter, new[] { userGroup.Key }, CancellationToken.None);
+        await ContentService.SetPermissionAsync(root, ActionDelete.ActionLetter, new[] { userGroup.Key }, CancellationToken.None);
 
-        ContentService.SetPermission(parent, ActionBrowse.ActionLetter, new[] { userGroup.Id });
-        ContentService.SetPermission(parent, ActionMove.ActionLetter, new[] { userGroup.Id });
+        await ContentService.SetPermissionAsync(parent, ActionBrowse.ActionLetter, new[] { userGroup.Key }, CancellationToken.None);
+        await ContentService.SetPermissionAsync(parent, ActionMove.ActionLetter, new[] { userGroup.Key }, CancellationToken.None);
 
         for (var i = 0; i < 5; i++)
         {
-            ContentService.SetPermission(children[i], ActionBrowse.ActionLetter, new[] { userGroup.Id });
-            ContentService.SetPermission(children[i], ActionPublish.ActionLetter, new[] { userGroup.Id });
+            await ContentService.SetPermissionAsync(children[i], ActionBrowse.ActionLetter, new[] { userGroup.Key }, CancellationToken.None);
+            await ContentService.SetPermissionAsync(children[i], ActionPublish.ActionLetter, new[] { userGroup.Key }, CancellationToken.None);
         }
 
         var childKeys = children.Select(c => c.Key).ToArray();
@@ -139,3 +140,4 @@ internal sealed partial class UserServiceTests
             string.Join(", ", timings.Select(t => $"{t}ms")));
     }
 }
+#pragma warning restore CS0618 // Type or member is obsolete

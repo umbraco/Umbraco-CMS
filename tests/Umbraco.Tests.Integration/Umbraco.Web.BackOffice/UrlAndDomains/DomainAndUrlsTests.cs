@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
@@ -32,7 +33,7 @@ internal sealed class DomainAndUrlsTests : UmbracoIntegrationTest
         InstallationSummary = packagingService.InstallCompiledPackageData(xml);
 
         Root = InstallationSummary.ContentInstalled.First();
-        ContentService.Publish(Root, Root.AvailableCultures.ToArray());
+        ContentService.PublishAsync(Root, Root.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None).GetAwaiter().GetResult();
 
         // Note: this SetUp must remain synchronous. EnsureUmbracoContext() below writes to an AsyncLocal
         // (via HybridUmbracoContextAccessor) and AsyncLocal mutations made inside an awaited Task do not
@@ -421,8 +422,8 @@ internal sealed class DomainAndUrlsTests : UmbracoIntegrationTest
     [Test]
     public async Task Cannot_Assign_Already_Used_Domains()
     {
-        var copy = ContentService.Copy(Root, Root.ParentId, false);
-        ContentService.Publish(copy!, copy!.AvailableCultures.ToArray());
+        var copy = (await ContentService.CopyAsync(Root, Root.ParentKey, false, true, Constants.Security.SuperUserKey, CancellationToken.None)).Result;
+        await ContentService.PublishAsync(copy!, copy!.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         var domainService = GetRequiredService<IDomainService>();
         var updateModel = new DomainsUpdateModel

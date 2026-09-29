@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.DtoCustomization;
 /// </summary>
 public class SqlServerNodeDtoModelCustomizer : IEFCoreModelCustomizer<NodeDto>
 {
-    public string? ProviderName => Constants.ProviderNames.SQLServer;
+    public string? ProviderName => Constants.ProviderNames.EFCore.SQLServer;
 
     public void Customize(EntityTypeBuilder<NodeDto> builder)
     {

@@ -41,7 +41,7 @@ public class DocumentPreviewUrlController : DocumentControllerBase
     [EndpointDescription("Gets the preview URL for the document identified by the provided Id.")]
     public async Task<IActionResult> GetPreviewUrl(Guid id, string providerAlias, string? culture, string? segment)
     {
-        IContent? content = _contentService.GetById(id);
+        IContent? content = await _contentService.GetByIdAsync(id, CancellationToken.None);
         if (content is null)
         {
             return NotFound(new ProblemDetailsBuilder()

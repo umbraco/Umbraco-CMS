@@ -959,7 +959,7 @@ public class ExplicitSegmentSearchTests : SearcherTestBase
         ILanguage langDk = new LanguageBuilder()
             .WithCultureInfo("da-DK")
             .Build();
-        await LanguageService.CreateAsync(langDk, Constants.Security.SuperUserKey);
+        await LanguageService.CreateAsync(langDk, Cms.Core.Constants.Security.SuperUserKey);
 
         DataType decimalDataType = new DataTypeBuilder()
             .WithId(0)
@@ -969,7 +969,7 @@ public class ExplicitSegmentSearchTests : SearcherTestBase
             .WithAlias(Constants.PropertyEditors.Aliases.Decimal)
             .Done()
             .Build();
-        await DataTypeService.CreateAsync(decimalDataType, Constants.Security.SuperUserKey);
+        await DataTypeService.CreateAsync(decimalDataType, Cms.Core.Constants.Security.SuperUserKey);
 
         IContentType contentType = new ContentTypeBuilder()
             .WithAlias("segmentTestType")
@@ -999,7 +999,7 @@ public class ExplicitSegmentSearchTests : SearcherTestBase
             .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.DateTime)
             .Done()
             .Build();
-        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+        await ContentTypeService.CreateAsync(contentType, Cms.Core.Constants.Security.SuperUserKey);
 
         // Document 1: Has distinct values in null-segment, segment-1, and segment-2
         // This allows us to test that searches are isolated to the correct segment
@@ -1087,21 +1087,19 @@ public class ExplicitSegmentSearchTests : SearcherTestBase
         docWithOverlappingValues.SetValue("datetime", new DateTime(2025, 8, 1), "en-US");
         docWithOverlappingValues.SetValue("datetime", new DateTime(2025, 8, 1), "en-US", "segment-1");
 
-        await WaitForIndexing(GetIndexAlias(true), () =>
+        await WaitForIndexing(GetIndexAlias(true), async () =>
         {
-            ContentService.Save(docWithAllSegments);
-            ContentService.Publish(docWithAllSegments, ["*"]);
+            await ContentService.SaveAsync(docWithAllSegments, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
+            await ContentService.PublishAsync(docWithAllSegments, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
-            ContentService.Save(docWithOnlyNullSegment);
-            ContentService.Publish(docWithOnlyNullSegment, ["*"]);
+            await ContentService.SaveAsync(docWithOnlyNullSegment, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
+            await ContentService.PublishAsync(docWithOnlyNullSegment, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
-            ContentService.Save(docWithOnlySegment1);
-            ContentService.Publish(docWithOnlySegment1, ["*"]);
+            await ContentService.SaveAsync(docWithOnlySegment1, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
+            await ContentService.PublishAsync(docWithOnlySegment1, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
-            ContentService.Save(docWithOverlappingValues);
-            ContentService.Publish(docWithOverlappingValues, ["*"]);
-
-            return Task.CompletedTask;
+            await ContentService.SaveAsync(docWithOverlappingValues, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
+            await ContentService.PublishAsync(docWithOverlappingValues, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         });
     }
 }

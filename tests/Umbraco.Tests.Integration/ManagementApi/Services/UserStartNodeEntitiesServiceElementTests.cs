@@ -73,7 +73,7 @@ public partial class UserStartNodeEntitiesServiceElementTests : UserStartNodeEnt
                     {
                         ParentId = childContainer.Id
                     };
-                    var saveElementResult = ElementService.Save([element]);
+                    var saveElementResult = await ElementService.SaveAsync([element], Constants.Security.SuperUserKey, CancellationToken.None);
                     Assert.IsTrue(saveElementResult.Success);
                     ItemsByName[element.Name!] = (element.Id, element.Key);
                 }
@@ -86,7 +86,7 @@ public partial class UserStartNodeEntitiesServiceElementTests : UserStartNodeEnt
                 {
                     ParentId = rootContainer.Id
                 };
-                var saveElementResult = ElementService.Save([element]);
+                var saveElementResult = await ElementService.SaveAsync([element], Constants.Security.SuperUserKey, CancellationToken.None);
                 Assert.IsTrue(saveElementResult.Success);
                 ItemsByName[element.Name!] = (element.Id, element.Key);
             }
@@ -96,7 +96,7 @@ public partial class UserStartNodeEntitiesServiceElementTests : UserStartNodeEnt
         foreach (var elementNumber in Enumerable.Range(1, 3))
         {
             var element = new Core.Models.Element($"E{elementNumber}", contentType);
-            var saveElementResult = ElementService.Save([element]);
+            var saveElementResult = await ElementService.SaveAsync([element], Constants.Security.SuperUserKey, CancellationToken.None);
             Assert.IsTrue(saveElementResult.Success);
             ItemsByName[element.Name!] = (element.Id, element.Key);
         }

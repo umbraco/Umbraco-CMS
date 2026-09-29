@@ -77,7 +77,7 @@ internal sealed class AuditEntryRepository : AsyncEntityRepositoryBase<int, IAud
         });
 
     /// <inheritdoc />
-    protected override async Task<IEnumerable<IAuditEntry>?> PerformGetManyAsync(params int[]? ids)
+    protected override async Task<IEnumerable<IAuditEntry>?> PerformGetManyAsync(params int[] ids)
     {
         var entries = new List<IAuditEntry>();
 

@@ -57,7 +57,7 @@ internal sealed class ContentEditingServiceTests : UmbracoIntegrationTestWithCon
 
         await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
 
-        var content = ContentService.GetById(documentKey)!;
+        var content = (await ContentService.GetByIdAsync(documentKey, CancellationToken.None))!;
 
         var updateModel = new ContentUpdateModel
         {
@@ -73,7 +73,7 @@ internal sealed class ContentEditingServiceTests : UmbracoIntegrationTestWithCon
 
         await ContentEditingService.UpdateAsync(content.Key, updateModel, Constants.Security.SuperUserKey);
 
-        var updatedContent = ContentService.GetById(documentKey)!;
+        var updatedContent = (await ContentService.GetByIdAsync(documentKey, CancellationToken.None))!;
 
         Assert.AreEqual(originalPropertyValue, updatedContent.GetValue(propertyAlias,variantTestData.LangDa.IsoCode));
         Assert.AreEqual(updatedPropertyValue, updatedContent.GetValue(propertyAlias, variantTestData.LangEn.IsoCode));

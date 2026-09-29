@@ -2,6 +2,7 @@ using System.Collections.Concurrent;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
@@ -119,7 +120,7 @@ internal sealed partial class PublishStatusServiceTests
         var sut = CreatePublishedStatusService();
 
         // Publish some content first so InitializeAsync has data to load
-        ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
+        await ContentService.PublishBranchAsync(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         const int numberOfOperations = 100;
         var exceptions = new List<Exception>();
@@ -183,7 +184,7 @@ internal sealed partial class PublishStatusServiceTests
         var sut = CreatePublishedStatusService();
 
         // Publish the Textpage branch so InitializeAsync has data to load.
-        ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
+        await ContentService.PublishBranchAsync(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Initialize once and confirm the baseline.
         await sut.InitializeAsync(CancellationToken.None);

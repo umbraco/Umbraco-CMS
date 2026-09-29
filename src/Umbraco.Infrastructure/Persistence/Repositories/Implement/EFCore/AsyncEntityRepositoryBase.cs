@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Persistence;
@@ -19,7 +20,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.EFCore;
 public abstract class AsyncEntityRepositoryBase<TKey, TEntity> : AsyncRepositoryBase, IAsyncReadWriteRepository<TKey, TEntity>
     where TEntity : class, IEntity
 {
-    private static AsyncRepositoryCachePolicyOptions? _defaultOptions;
+    // Instance-level: the callback closes over AmbientScope, so a shared static would pin whichever repository
+    // instance happened to build it first and hand that instance's scope to every later one.
+    private AsyncRepositoryCachePolicyOptions? _defaultOptions;
 
 
     /// <summary>
@@ -180,13 +183,13 @@ public abstract class AsyncEntityRepositoryBase<TKey, TEntity> : AsyncRepository
 
         // can't query more than 2000 ids at a time... but if someone is really querying 2000+ entities,
         // the additional overhead of fetching them in groups is minimal compared to the lookup time of each group
-        if (keys.Length <= Core.Constants.Sql.MaxParameterCount)
+        if (keys.Length <= Constants.Sql.MaxParameterCount)
         {
             return await CachePolicy.GetManyAsync(keys, PerformGetManyAsync, PerformGetAllAsync);
         }
 
         var entities = new List<TEntity>();
-        foreach (IEnumerable<TKey> group in keys.InGroupsOf(Core.Constants.Sql.MaxParameterCount))
+        foreach (IEnumerable<TKey> group in keys.InGroupsOf(Constants.Sql.MaxParameterCount))
         {
             TEntity[] groups = await CachePolicy.GetManyAsync(group.ToArray(), PerformGetManyAsync, PerformGetAllAsync);
             entities.AddRange(groups);
@@ -248,7 +251,7 @@ public abstract class AsyncEntityRepositoryBase<TKey, TEntity> : AsyncRepository
     /// </summary>
     /// <param name="keys">The keys of the entities to retrieve.</param>
     /// <returns>The matching entities, or <see langword="null"/>.</returns>
-    protected abstract Task<IEnumerable<TEntity>?> PerformGetManyAsync(TKey[]? keys);
+    protected abstract Task<IEnumerable<TEntity>?> PerformGetManyAsync(TKey[] keys);
 
     /// <summary>
     ///     Persists a new entity to the data store.

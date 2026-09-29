@@ -51,8 +51,8 @@ public class ApiContentPathResolverVariantTests : ApiContentPathResolverTestBase
                 .WithCultureName("en-US", $"Root {rootNumber} en-US")
                 .WithCultureName("da-DK", $"Root {rootNumber} da-DK")
                 .Build();
-            ContentService.Save(root);
-            ContentService.Publish(root, ["*"]);
+            await ContentService.SaveAsync(root, Constants.Security.SuperUserKey, null, CancellationToken.None);
+            await ContentService.PublishAsync(root, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
             _contentByName[$"Root {rootNumber}"] = root;
 
             foreach (var childNumber in Enumerable.Range(1, 3))
@@ -63,8 +63,8 @@ public class ApiContentPathResolverVariantTests : ApiContentPathResolverTestBase
                     .WithCultureName("en-US", $"Child {childNumber} en-US")
                     .WithCultureName("da-DK", $"Child {childNumber} da-DK")
                     .Build();
-                ContentService.Save(child);
-                ContentService.Publish(child, ["*"]);
+                await ContentService.SaveAsync(child, Constants.Security.SuperUserKey, null, CancellationToken.None);
+                await ContentService.PublishAsync(child, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
                 _contentByName[$"Root {rootNumber}/Child {childNumber}"] = child;
 
                 foreach (var grandchildNumber in Enumerable.Range(1, 3))
@@ -75,8 +75,8 @@ public class ApiContentPathResolverVariantTests : ApiContentPathResolverTestBase
                         .WithCultureName("en-US", $"Grandchild {grandchildNumber} en-US")
                         .WithCultureName("da-DK", $"Grandchild {grandchildNumber} da-DK")
                         .Build();
-                    ContentService.Save(grandchild);
-                    ContentService.Publish(grandchild, ["*"]);
+                    await ContentService.SaveAsync(grandchild, Constants.Security.SuperUserKey, null, CancellationToken.None);
+                    await ContentService.PublishAsync(grandchild, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
                     _contentByName[$"Root {rootNumber}/Child {childNumber}/Grandchild {grandchildNumber}"] = grandchild;
                 }
             }

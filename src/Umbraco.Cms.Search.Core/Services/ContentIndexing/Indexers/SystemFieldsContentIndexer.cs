@@ -103,6 +103,16 @@ internal sealed class SystemFieldsContentIndexer : ISystemFieldsContentIndexer
             return true;
         }
 
+        // content is normally hydrated via a repository read path, which already populates ParentKey -
+        // fall back to IIdKeyMap only for the rare caller-supplied entity that hasn't gone through one.
+        // ParentId is positive here, so a populated key is necessarily a real one; anything else falls through.
+        if (content.TryGetParentKey(out Guid? parentKey) && parentKey.HasValue)
+        {
+            parentId = parentKey.Value;
+            return true;
+        }
+
+        // TODO (V20): await this once the indexer contract goes async.
         Attempt<Guid> parentKeyAttempt = _idKeyMap.GetKeyForIdAsync(content.ParentId, objectType).GetAwaiter().GetResult();
         if (parentKeyAttempt.Success is false)
         {

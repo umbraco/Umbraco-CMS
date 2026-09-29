@@ -18,9 +18,9 @@ namespace Umbraco.Cms.Infrastructure.PropertyEditors.NotificationHandlers;
 /// sure the new content references a new instance of the file.
 /// </summary>
 internal sealed class FileUploadContentCopiedOrScaffoldedNotificationHandler : FileUploadNotificationHandlerBase,
-    INotificationHandler<ContentCopiedNotification>,
-    INotificationHandler<ContentScaffoldedNotification>,
-    INotificationHandler<ContentSavedBlueprintNotification>
+    INotificationAsyncHandler<ContentCopiedNotification>,
+    INotificationAsyncHandler<ContentScaffoldedNotification>,
+    INotificationAsyncHandler<ContentSavedBlueprintNotification>
 {
     private readonly IContentService _contentService;
     private readonly BlockEditorValues<BlockListValue, BlockListLayoutItem> _blockListEditorValues;
@@ -43,24 +43,31 @@ internal sealed class FileUploadContentCopiedOrScaffoldedNotificationHandler : F
     }
 
     /// <inheritdoc/>
-    public void Handle(ContentCopiedNotification notification) => Handle(notification.Original, notification.Copy, (IContent c) => _contentService.Save(c));
+    public Task HandleAsync(ContentCopiedNotification notification, CancellationToken cancellationToken) => HandleAsync(
+        notification.Original,
+        notification.Copy,
+        (IContent c) => _contentService.SaveAsync(c, Constants.Security.SuperUserKey, null, cancellationToken));
 
     /// <inheritdoc/>
-    public void Handle(ContentScaffoldedNotification notification) => Handle(notification.Original, notification.Scaffold);
+    public Task HandleAsync(ContentScaffoldedNotification notification, CancellationToken cancellationToken)
+        => HandleAsync(notification.Original, notification.Scaffold);
 
     /// <inheritdoc/>
-    public void Handle(ContentSavedBlueprintNotification notification)
+    public Task HandleAsync(ContentSavedBlueprintNotification notification, CancellationToken cancellationToken)
     {
         if (notification.CreatedFromContent is null)
         {
             // If there is no original content, we don't need to copy files.
-            return;
+            return Task.CompletedTask;
         }
 
-        Handle(notification.CreatedFromContent, notification.SavedBlueprint, (IContent c) => _contentService.SaveBlueprint(c, null));
+        return HandleAsync(
+            notification.CreatedFromContent,
+            notification.SavedBlueprint,
+            (IContent c) => _contentService.SaveBlueprintAsync(c, null, Constants.Security.SuperUserKey, cancellationToken));
     }
 
-    private void Handle(IContent source, IContent destination, Action<IContent>? postUpdateAction = null)
+    private async Task HandleAsync(IContent source, IContent destination, Func<IContent, Task>? postUpdateAction = null)
     {
         var isUpdated = false;
 
@@ -98,7 +105,7 @@ internal sealed class FileUploadContentCopiedOrScaffoldedNotificationHandler : F
         // If updated, re-save the destination with the updated value.
         if (isUpdated && postUpdateAction is not null)
         {
-            postUpdateAction(destination);
+            await postUpdateAction(destination);
         }
     }
 

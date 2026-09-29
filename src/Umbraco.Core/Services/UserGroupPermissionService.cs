@@ -15,6 +15,7 @@ internal sealed class UserGroupPermissionService : IUserGroupPermissionService
     private readonly IMediaService _mediaService;
     private readonly IEntityService _entityService;
     private readonly AppCaches _appCaches;
+    private readonly IIdKeyMap _idKeyMap;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="UserGroupPermissionService" /> class.
@@ -23,16 +24,19 @@ internal sealed class UserGroupPermissionService : IUserGroupPermissionService
     /// <param name="mediaService">The media service.</param>
     /// <param name="entityService">The entity service.</param>
     /// <param name="appCaches">The application caches.</param>
+    /// <param name="idKeyMap">The id-key map used to resolve content ids to keys.</param>
     public UserGroupPermissionService(
         IContentService contentService,
         IMediaService mediaService,
         IEntityService entityService,
-        AppCaches appCaches)
+        AppCaches appCaches,
+        IIdKeyMap idKeyMap)
     {
         _contentService = contentService;
         _mediaService = mediaService;
         _entityService = entityService;
         _appCaches = appCaches;
+        _idKeyMap = idKeyMap;
     }
 
     /// <inheritdoc/>
@@ -54,7 +58,7 @@ internal sealed class UserGroupPermissionService : IUserGroupPermissionService
 
     /// <inheritdoc/>
     public Task<UserGroupAuthorizationStatus> AuthorizeCreateAsync(IUser user, IUserGroup userGroup)
-        => Task.FromResult(ValidateAccess(user, userGroup));
+        => ValidateAccessAsync(user, userGroup);
 
 
     /// <inheritdoc/>
@@ -65,7 +69,7 @@ internal sealed class UserGroupPermissionService : IUserGroupPermissionService
 
         return authorizeGroupAccess != UserGroupAuthorizationStatus.Success
             ? authorizeGroupAccess
-            : ValidateAccess(user, userGroup);
+            : await ValidateAccessAsync(user, userGroup);
     }
 
     /// <summary>
@@ -74,7 +78,7 @@ internal sealed class UserGroupPermissionService : IUserGroupPermissionService
     /// <param name="user"><see cref="IUser" /> to validate access.</param>
     /// <param name="userGroup">The user group to be validated.</param>
     /// <returns><see cref="UserGroupAuthorizationStatus"/>.</returns>
-    private UserGroupAuthorizationStatus ValidateAccess(IUser user, IUserGroup userGroup)
+    private async Task<UserGroupAuthorizationStatus> ValidateAccessAsync(IUser user, IUserGroup userGroup)
     {
         var hasAccessToUsersSection = HasAccessToUsersSection(user);
         if (hasAccessToUsersSection is false)
@@ -90,7 +94,7 @@ internal sealed class UserGroupPermissionService : IUserGroupPermissionService
         }
 
         // Check that the user is not setting start nodes that they don't have access to.
-        var hasContentStartNodeAccess = HasAccessToContentStartNode(user, userGroup);
+        var hasContentStartNodeAccess = await HasAccessToContentStartNodeAsync(user, userGroup);
         if (hasContentStartNodeAccess is false)
         {
             return UserGroupAuthorizationStatus.UnauthorizedMissingContentStartNodeAccess;
@@ -136,14 +140,17 @@ internal sealed class UserGroupPermissionService : IUserGroupPermissionService
     /// <param name="user"><see cref="IUser" /> to check for access.</param>
     /// <param name="userGroup">The user group being created or updated.</param>
     /// <returns><c>true</c> if the user has access; otherwise, <c>false</c>.</returns>
-    private bool HasAccessToContentStartNode(IUser user, IUserGroup userGroup)
+    private async Task<bool> HasAccessToContentStartNodeAsync(IUser user, IUserGroup userGroup)
     {
         if (userGroup.StartContentId is null)
         {
             return true;
         }
 
-        IContent? content = _contentService.GetById(userGroup.StartContentId.Value);
+        Attempt<Guid> keyAttempt = await _idKeyMap.GetKeyForIdAsync(userGroup.StartContentId.Value, UmbracoObjectTypes.Document);
+        IContent? content = keyAttempt.Success
+            ? await _contentService.GetByIdAsync(keyAttempt.Result, CancellationToken.None)
+            : null;
 
         if (content is null)
         {

@@ -240,7 +240,7 @@ public class InvariantSortingTests : SearcherTestBase
             .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.Integer)
             .Done()
             .Build();
-        await ContentTypeService.CreateAsync(ContentType, Constants.Security.SuperUserKey);
+        await ContentTypeService.CreateAsync(ContentType, Cms.Core.Constants.Security.SuperUserKey);
     }
 
     private async Task CreateDropDownDocType()
@@ -253,7 +253,7 @@ public class InvariantSortingTests : SearcherTestBase
             .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.DropDownListFlexible)
             .Done()
             .Build();
-        await ContentTypeService.CreateAsync(ContentType, Constants.Security.SuperUserKey);
+        await ContentTypeService.CreateAsync(ContentType, Cms.Core.Constants.Security.SuperUserKey);
     }
 
     private async Task<IEnumerable<KeyValuePair<Guid, string>>> CreateDropDownDocuments(string[] values)
@@ -261,7 +261,7 @@ public class InvariantSortingTests : SearcherTestBase
         var keysAndValues = new List<KeyValuePair<Guid, string>>();
         await CreateDropDownDocType();
 
-        await WaitForIndexing(GetIndexAlias(true), () =>
+        await WaitForIndexing(GetIndexAlias(true), async () =>
         {
             foreach (var stringValue in values)
             {
@@ -272,11 +272,9 @@ public class InvariantSortingTests : SearcherTestBase
                         new { dropDown = $"[\"{stringValue}\"]" })
                     .Build();
 
-                SaveAndPublish(document);
+                await SaveAndPublishAsync(document);
                 keysAndValues.Add(new KeyValuePair<Guid, string>(document.Key, stringValue));
             }
-
-            return Task.CompletedTask;
         });
 
         return keysAndValues;
@@ -292,7 +290,7 @@ public class InvariantSortingTests : SearcherTestBase
             .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.TextBox)
             .Done()
             .Build();
-        await ContentTypeService.CreateAsync(ContentType, Constants.Security.SuperUserKey);
+        await ContentTypeService.CreateAsync(ContentType, Cms.Core.Constants.Security.SuperUserKey);
     }
 
     private async Task<Dictionary<Guid, string>> CreateTitleDocuments(string[] values)
@@ -300,7 +298,7 @@ public class InvariantSortingTests : SearcherTestBase
         var keys = new Dictionary<Guid, string>();
         await CreateTitleDocType();
 
-        await WaitForIndexing(GetIndexAlias(true), () =>
+        await WaitForIndexing(GetIndexAlias(true), async () =>
         {
             foreach (var stringValue in values)
             {
@@ -311,12 +309,10 @@ public class InvariantSortingTests : SearcherTestBase
                         new { title = stringValue })
                     .Build();
 
-                ContentService.Save(document);
-                ContentService.Publish(document, new[] { "*" });
+                await ContentService.SaveAsync(document, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
+                await ContentService.PublishAsync(document, new[] { "*" }, Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
                 keys.Add(document.Key, stringValue);
             }
-
-            return Task.CompletedTask;
         });
 
         return keys;
@@ -332,7 +328,7 @@ public class InvariantSortingTests : SearcherTestBase
             .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.DateTime)
             .Done()
             .Build();
-        await ContentTypeService.CreateAsync(ContentType, Constants.Security.SuperUserKey);
+        await ContentTypeService.CreateAsync(ContentType, Cms.Core.Constants.Security.SuperUserKey);
     }
 
     private async Task<Dictionary<Guid, DateTime>> CreateDatetimeDocuments(DateTime[] values)
@@ -340,7 +336,7 @@ public class InvariantSortingTests : SearcherTestBase
         var keys = new Dictionary<Guid, DateTime>();
         await CreateDatetimeDocType();
 
-        await WaitForIndexing(GetIndexAlias(true), () =>
+        await WaitForIndexing(GetIndexAlias(true), async () =>
         {
             foreach (DateTime dateTimeOffset in values)
             {
@@ -354,12 +350,10 @@ public class InvariantSortingTests : SearcherTestBase
                         })
                     .Build();
 
-                ContentService.Save(document);
-                ContentService.Publish(document, new[] { "*" });
+                await ContentService.SaveAsync(document, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
+                await ContentService.PublishAsync(document, new[] { "*" }, Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
                 keys.Add(document.Key, dateTimeOffset);
             }
-
-            return Task.CompletedTask;
         });
 
         return keys;
@@ -376,7 +370,7 @@ public class InvariantSortingTests : SearcherTestBase
             .Done()
             .Build();
 
-        await DataTypeService.CreateAsync(dataType, Constants.Security.SuperUserKey);
+        await DataTypeService.CreateAsync(dataType, Cms.Core.Constants.Security.SuperUserKey);
         ContentType = new ContentTypeBuilder()
             .WithAlias("invariant")
             .AddPropertyType()
@@ -385,7 +379,7 @@ public class InvariantSortingTests : SearcherTestBase
             .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.Decimal)
             .Done()
             .Build();
-        await ContentTypeService.CreateAsync(ContentType, Constants.Security.SuperUserKey);
+        await ContentTypeService.CreateAsync(ContentType, Cms.Core.Constants.Security.SuperUserKey);
     }
 
     private async Task<Dictionary<Guid, double>> CreateDecimalDocuments(double[] values)
@@ -393,7 +387,7 @@ public class InvariantSortingTests : SearcherTestBase
         var keys = new Dictionary<Guid, double>();
         await CreateDecimalDocType();
 
-        await WaitForIndexing(GetIndexAlias(true), () =>
+        await WaitForIndexing(GetIndexAlias(true), async () =>
         {
             foreach (var doubleValue in values)
             {
@@ -407,12 +401,10 @@ public class InvariantSortingTests : SearcherTestBase
                         })
                     .Build();
 
-                ContentService.Save(document);
-                ContentService.Publish(document, new[] { "*" });
+                await ContentService.SaveAsync(document, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
+                await ContentService.PublishAsync(document, new[] { "*" }, Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
                 keys.Add(document.Key, doubleValue);
             }
-
-            return Task.CompletedTask;
         });
 
         return keys;
@@ -423,7 +415,7 @@ public class InvariantSortingTests : SearcherTestBase
         var keys = new Dictionary<Guid, int>();
         await CreateCountDocType();
 
-        await WaitForIndexing(GetIndexAlias(true), () =>
+        await WaitForIndexing(GetIndexAlias(true), async () =>
         {
             foreach (var countValue in values)
             {
@@ -437,12 +429,10 @@ public class InvariantSortingTests : SearcherTestBase
                         })
                     .Build();
 
-                ContentService.Save(document);
-                ContentService.Publish(document, new[] { "*" });
+                await ContentService.SaveAsync(document, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
+                await ContentService.PublishAsync(document, new[] { "*" }, Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
                 keys.Add(document.Key, countValue);
             }
-
-            return Task.CompletedTask;
         });
 
         return keys;

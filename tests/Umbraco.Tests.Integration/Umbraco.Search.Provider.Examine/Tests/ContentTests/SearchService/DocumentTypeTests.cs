@@ -46,7 +46,7 @@ public class DocumentTypeTests : SearcherTestBase
         Assert.That(results.Total, Is.EqualTo(2));
 
         _childContentType.RemovePropertyType("title");
-        await ContentTypeService.UpdateAsync(_childContentType, Constants.Security.SuperUserKey);
+        await ContentTypeService.UpdateAsync(_childContentType, Cms.Core.Constants.Security.SuperUserKey);
 
         await WaitForIndexesToRebuild();
 
@@ -68,7 +68,7 @@ public class DocumentTypeTests : SearcherTestBase
 
         Assert.That(results.Total, Is.EqualTo(2));
 
-        await ContentTypeService.DeleteAsync(_childContentType.Key, Constants.Security.SuperUserKey);
+        await ContentTypeService.DeleteAsync(_childContentType.Key, Cms.Core.Constants.Security.SuperUserKey);
 
         await WaitForIndexesToRebuild();
 
@@ -94,7 +94,7 @@ public class DocumentTypeTests : SearcherTestBase
             "Parent Type");
         Attempt<IContentType?, ContentTypeOperationStatus> parentContentTypeAttempt = await ContentTypeEditingService.CreateAsync(
             parentContentTypeCreateModel,
-            Constants.Security.SuperUserKey);
+            Cms.Core.Constants.Security.SuperUserKey);
         Assert.That(parentContentTypeAttempt.Success, Is.True);
         _parentContentType = parentContentTypeAttempt.Result!;
 
@@ -104,7 +104,7 @@ public class DocumentTypeTests : SearcherTestBase
             "Child Type");
         Attempt<IContentType?, ContentTypeOperationStatus> childContentTypeAttempt = await ContentTypeEditingService.CreateAsync(
             childContentTypeCreateModel,
-            Constants.Security.SuperUserKey);
+            Cms.Core.Constants.Security.SuperUserKey);
         Assert.That(childContentTypeAttempt.Success, Is.True);
         _childContentType = childContentTypeAttempt.Result!;
 
@@ -117,12 +117,12 @@ public class DocumentTypeTests : SearcherTestBase
         Attempt<IContentType?, ContentTypeOperationStatus> updatedParentResult = await ContentTypeEditingService.UpdateAsync(
             _parentContentType,
             parentContentTypeUpdateModel,
-            Constants.Security.SuperUserKey);
+            Cms.Core.Constants.Security.SuperUserKey);
         Assert.That(updatedParentResult.Success, Is.True);
 
         // Create Root Document (Parent)
         ContentCreateModel rootCreateModel = ContentEditingBuilder.CreateSimpleContent(_parentContentType.Key, "Root Document");
-        Attempt<ContentCreateResult, ContentEditingOperationStatus> createRootResult = await ContentEditingService.CreateAsync(rootCreateModel, Constants.Security.SuperUserKey);
+        Attempt<ContentCreateResult, ContentEditingOperationStatus> createRootResult = await ContentEditingService.CreateAsync(rootCreateModel, Cms.Core.Constants.Security.SuperUserKey);
         Assert.That(createRootResult.Success, Is.True);
         IContent? rootDocument = createRootResult.Result.Content;
 
@@ -131,7 +131,7 @@ public class DocumentTypeTests : SearcherTestBase
             _childContentType.Key,
             "Child Document",
             rootDocument!.Key);
-        Attempt<ContentCreateResult, ContentEditingOperationStatus> createChildResult = await ContentEditingService.CreateAsync(childCreateModel, Constants.Security.SuperUserKey);
+        Attempt<ContentCreateResult, ContentEditingOperationStatus> createChildResult = await ContentEditingService.CreateAsync(childCreateModel, Cms.Core.Constants.Security.SuperUserKey);
         Assert.That(createChildResult.Success, Is.True);
     }
 

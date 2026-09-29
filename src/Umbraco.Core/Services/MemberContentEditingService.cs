@@ -41,6 +41,7 @@ internal sealed class MemberContentEditingService
     /// <param name="optionsMonitor">The options monitor for content settings.</param>
     /// <param name="relationService">The relation service for managing content relations.</param>
     /// <param name="contentTypeFilters">The collection of content type filters.</param>
+    /// <param name="languageService">The language service.</param>
     public MemberContentEditingService(
         IMemberService contentService,
         IMemberTypeService contentTypeService,
@@ -118,20 +119,24 @@ internal sealed class MemberContentEditingService
         => throw new NotSupportedException("Member creation is not supported by this service. This should never be called.");
 
     /// <inheritdoc />
-    protected override OperationResult? Move(IMember member, int newParentId, bool includeDescendants, int userId)
+    protected override Task<ContentEditingOperationStatus> MoveAsync(IMember member, Guid? parentKey, bool includeDescendants, Guid userKey)
         => throw new InvalidOperationException("Move is not supported for members");
 
     /// <inheritdoc />
-    protected override Task<IMember?> CopyAsync(IMember member, int newParentId, bool relateToOriginal, bool includeDescendants, Guid userKey)
+    protected override Task<IMember?> CopyAsync(IMember member, Guid? parentKey, bool relateToOriginal, bool includeDescendants, Guid userKey)
         => throw new NotSupportedException("Copy is not supported for Member");
 
     /// <inheritdoc />
-    protected override OperationResult? MoveToRecycleBin(IMember member, int userId)
+    protected override Task<OperationResult?> MoveToRecycleBinAsync(IMember member, Guid userKey)
         => throw new InvalidOperationException("Recycle bin is not supported for members");
 
     /// <inheritdoc />
-    protected override OperationResult? Delete(IMember member, int userId)
-        => ContentService.Delete(member, userId).Result;
+    protected override async Task<OperationResult?> DeleteAsync(IMember member, Guid userKey)
+    {
+        // The member service is still synchronous and identifies its user by id.
+        var userId = await GetUserIdAsync(userKey);
+        return ContentService.Delete(member, userId).Result;
+    }
 
     /// <summary>
     ///     Saves the specified member with the given user ID.

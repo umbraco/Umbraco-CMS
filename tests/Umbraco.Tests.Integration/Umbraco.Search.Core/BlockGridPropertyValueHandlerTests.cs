@@ -32,10 +32,10 @@ public class BlockGridPropertyValueHandlerTests : PropertyValueHandlerTestsBase
     public async Task SetUp()
     {
         await GetRequiredService<ILanguageService>()
-            .CreateAsync(new Language("da-DK", "Danish (Denmark)"), Constants.Security.SuperUserKey);
+            .CreateAsync(new Language("da-DK", "Danish (Denmark)"), Cms.Core.Constants.Security.SuperUserKey);
 
         await GetRequiredService<ILanguageService>()
-            .CreateAsync(new Language("de-DE", "German (Germany)"), Constants.Security.SuperUserKey);
+            .CreateAsync(new Language("de-DE", "German (Germany)"), Cms.Core.Constants.Security.SuperUserKey);
 
         IndexerAndSearcher.Reset();
     }
@@ -165,8 +165,8 @@ public class BlockGridPropertyValueHandlerTests : PropertyValueHandlerTestsBase
             .WithName("My Blocks")
             .WithPropertyValues(new { blocks = blocksPropertyValue })
             .Build();
-        ContentService.Save(content);
-        ContentService.Publish(content, ["*"]);
+        await ContentService.SaveAsync(content, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishAsync(content, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
         AssertDocumentFields(IndexAliases.DraftContent);
         AssertDocumentFields(IndexAliases.PublishedContent);
@@ -302,8 +302,8 @@ public class BlockGridPropertyValueHandlerTests : PropertyValueHandlerTestsBase
             .WithName("My Blocks")
             .WithPropertyValues(new { rootBlocks = blocksPropertyValue })
             .Build();
-        ContentService.Save(content);
-        ContentService.Publish(content, ["*"]);
+        await ContentService.SaveAsync(content, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishAsync(content, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.PublishedContent);
         Assert.That(documents, Has.Count.EqualTo(1));
@@ -337,7 +337,7 @@ public class BlockGridPropertyValueHandlerTests : PropertyValueHandlerTestsBase
             elementType.PropertyTypes.First(p => p.Alias == "integerValue").Variations = ContentVariation.Culture;
         }
 
-        await ContentTypeService.UpdateAsync(elementType, Constants.Security.SuperUserKey);
+        await ContentTypeService.UpdateAsync(elementType, Cms.Core.Constants.Security.SuperUserKey);
         return elementType;
     }
 
@@ -363,7 +363,7 @@ public class BlockGridPropertyValueHandlerTests : PropertyValueHandlerTestsBase
             CreateDate = DateTime.UtcNow
         };
 
-        await GetRequiredService<IDataTypeService>().CreateAsync(blockGridDataType, Constants.Security.SuperUserKey);
+        await GetRequiredService<IDataTypeService>().CreateAsync(blockGridDataType, Cms.Core.Constants.Security.SuperUserKey);
 
         IContentType contentType = new ContentTypeBuilder()
             .WithAlias("blockEditor")
@@ -380,7 +380,7 @@ public class BlockGridPropertyValueHandlerTests : PropertyValueHandlerTestsBase
             contentType.Variations = ContentVariation.Culture;
         }
 
-        await ContentTypeService.UpdateAsync(contentType, Constants.Security.SuperUserKey);
+        await ContentTypeService.UpdateAsync(contentType, Cms.Core.Constants.Security.SuperUserKey);
 
         return (contentType, elementType);
     }
@@ -408,7 +408,7 @@ public class BlockGridPropertyValueHandlerTests : PropertyValueHandlerTestsBase
             ParentId = Constants.System.Root,
             CreateDate = DateTime.UtcNow
         };
-        await dataTypeService.CreateAsync(nestedBlockGridDataType, Constants.Security.SuperUserKey);
+        await dataTypeService.CreateAsync(nestedBlockGridDataType, Cms.Core.Constants.Security.SuperUserKey);
 
         IContentType rootElementType = new ContentTypeBuilder()
             .WithAlias("rootBlockEditor")
@@ -420,7 +420,7 @@ public class BlockGridPropertyValueHandlerTests : PropertyValueHandlerTestsBase
             .WithDataTypeId(nestedBlockGridDataType.Id)
             .Done()
             .Build();
-        await ContentTypeService.CreateAsync(rootElementType, Constants.Security.SuperUserKey);
+        await ContentTypeService.CreateAsync(rootElementType, Cms.Core.Constants.Security.SuperUserKey);
 
         var rootBlockGridDataType = new DataType(PropertyEditorCollection[Constants.PropertyEditors.Aliases.BlockGrid], ConfigurationEditorJsonSerializer)
         {
@@ -440,7 +440,7 @@ public class BlockGridPropertyValueHandlerTests : PropertyValueHandlerTestsBase
             ParentId = Constants.System.Root,
             CreateDate = DateTime.UtcNow
         };
-        await dataTypeService.CreateAsync(rootBlockGridDataType, Constants.Security.SuperUserKey);
+        await dataTypeService.CreateAsync(rootBlockGridDataType, Cms.Core.Constants.Security.SuperUserKey);
 
         IContentType contentType = new ContentTypeBuilder()
             .WithAlias("blockEditor")
@@ -452,7 +452,7 @@ public class BlockGridPropertyValueHandlerTests : PropertyValueHandlerTestsBase
             .WithDataTypeId(rootBlockGridDataType.Id)
             .Done()
             .Build();
-        await ContentTypeService.UpdateAsync(contentType, Constants.Security.SuperUserKey);
+        await ContentTypeService.UpdateAsync(contentType, Cms.Core.Constants.Security.SuperUserKey);
 
         return (contentType, rootElementType, nestedElementType);
     }

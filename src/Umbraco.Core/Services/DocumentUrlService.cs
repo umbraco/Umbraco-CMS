@@ -215,7 +215,7 @@ public class DocumentUrlService : IDocumentUrlService, IMemoryCacheSizeReporter
         if (SkipDatabaseWrites() is false && await ShouldRebuildUrls())
         {
             _logger.LogInformation("Rebuilding all document URLs.");
-            await RebuildAllUrlsAsync();
+            await RebuildAllUrlsAsync(cancellationToken);
         }
 
         _logger.LogInformation("Caching document URLs.");
@@ -267,7 +267,7 @@ public class DocumentUrlService : IDocumentUrlService, IMemoryCacheSizeReporter
     private string GetCurrentRebuildValue() => string.Join("|", _urlSegmentProviderCollection.Select(x => x.GetType().Name));
 
     /// <inheritdoc/>
-    public async Task RebuildAllUrlsAsync()
+    public async Task RebuildAllUrlsAsync(CancellationToken cancellationToken)
     {
         if (SkipDatabaseWrites())
         {
@@ -278,7 +278,7 @@ public class DocumentUrlService : IDocumentUrlService, IMemoryCacheSizeReporter
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
         scope.ReadLock(Constants.Locks.ContentTree);
 
-        IEnumerable<IContent> documents = _documentRepository.GetMany(Array.Empty<int>());
+        IEnumerable<IContent> documents = await _documentRepository.GetAllAsync(cancellationToken);
 
         await CreateOrUpdateUrlSegmentsAsync(documents);
 
@@ -525,7 +525,7 @@ public class DocumentUrlService : IDocumentUrlService, IMemoryCacheSizeReporter
     /// <inheritdoc/>
     public async Task CreateOrUpdateUrlSegmentsAsync(Guid key)
     {
-        IContent? content = _contentService.GetById(key);
+        IContent? content = await _contentService.GetByIdAsync(key, CancellationToken.None);
 
         if (content is not null)
         {
@@ -536,17 +536,16 @@ public class DocumentUrlService : IDocumentUrlService, IMemoryCacheSizeReporter
     /// <inheritdoc/>
     public async Task CreateOrUpdateUrlSegmentsWithDescendantsAsync(Guid key)
     {
-        var id = (await _idKeyMap.GetIdForKeyAsync(key, UmbracoObjectTypes.Document)).Result;
-        IContent? item = _contentService.GetById(id);
+        IContent? item = await _contentService.GetByIdAsync(key, CancellationToken.None);
         if (item is null)
         {
             _logger.LogDebug("Skipping URL segment rebuild for document with key {DocumentKey} was not found.", key);
             return;
         }
 
-        IEnumerable<IContent> descendants = _contentService.GetPagedDescendants(id, 0, int.MaxValue, out _);
+        PagedModel<IContent> descendantsPage = await _contentService.GetDescendantsAsync(item.Key, 0, int.MaxValue, ordering: null, CancellationToken.None);
 
-        await CreateOrUpdateUrlSegmentsAsync(new List<IContent>(descendants)
+        await CreateOrUpdateUrlSegmentsAsync(new List<IContent>(descendantsPage.Items)
         {
             item,
         });
@@ -559,7 +558,7 @@ public class DocumentUrlService : IDocumentUrlService, IMemoryCacheSizeReporter
     /// <inheritdoc/>
     public async Task UpdateUrlSegmentCacheAsync(Guid key)
     {
-        IContent? content = _contentService.GetById(key);
+        IContent? content = await _contentService.GetByIdAsync(key, CancellationToken.None);
         if (content is not null)
         {
             await CreateOrUpdateUrlSegmentsInternalAsync(content.Yield(), skipDatabaseWrite: true);
@@ -569,18 +568,15 @@ public class DocumentUrlService : IDocumentUrlService, IMemoryCacheSizeReporter
     /// <inheritdoc/>
     public async Task UpdateUrlSegmentCacheWithDescendantsAsync(Guid key)
     {
-        Attempt<int> attempt = await _idKeyMap.GetIdForKeyAsync(key, UmbracoObjectTypes.Document);
-        var id = attempt.Result;
-
-        IContent? item = _contentService.GetById(id);
+        IContent? item = await _contentService.GetByIdAsync(key, CancellationToken.None);
         if (item is null)
         {
             _logger.LogDebug("Skipping URL segment cache update for document with key {DocumentKey} — document not found.", key);
             return;
         }
 
-        IEnumerable<IContent> descendants = _contentService.GetPagedDescendants(id, 0, int.MaxValue, out _);
-        await CreateOrUpdateUrlSegmentsInternalAsync(new List<IContent>(descendants) { item }, skipDatabaseWrite: true);
+        PagedModel<IContent> descendantsPage = await _contentService.GetDescendantsAsync(item.Key, 0, int.MaxValue, ordering: null, CancellationToken.None);
+        await CreateOrUpdateUrlSegmentsInternalAsync(new List<IContent>(descendantsPage.Items) { item }, skipDatabaseWrite: true);
     }
 
     private async Task CreateOrUpdateUrlSegmentsInternalAsync(IEnumerable<IContent> documentsEnumerable, bool skipDatabaseWrite)

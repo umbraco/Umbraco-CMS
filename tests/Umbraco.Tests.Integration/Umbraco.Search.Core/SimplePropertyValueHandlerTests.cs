@@ -1,4 +1,5 @@
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
@@ -14,7 +15,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Core;
 public class SimplePropertyValueHandlerTests : PropertyValueHandlerTestsBase
 {
     [Test]
-    public void AllSupportedEditors_CanBeIndexed()
+    public async Task AllSupportedEditors_CanBeIndexed()
     {
         IJsonSerializer jsonSerializer = GetRequiredService<IJsonSerializer>();
 
@@ -79,8 +80,8 @@ public class SimplePropertyValueHandlerTests : PropertyValueHandlerTestsBase
                 })
             .Build();
 
-        ContentService.Save(content);
-        ContentService.Publish(content, ["*"]);
+        await ContentService.SaveAsync(content, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishAsync(content, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.PublishedContent);
         Assert.That(documents, Has.Count.EqualTo(1));

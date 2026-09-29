@@ -11,13 +11,15 @@ public class PublicAccessChecker : IPublicAccessChecker
 {
     private readonly IContentService _contentService;
     private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly IIdKeyMap _idKeyMap;
     private readonly IPublicAccessService _publicAccessService;
 
-    public PublicAccessChecker(IHttpContextAccessor httpContextAccessor, IPublicAccessService publicAccessService, IContentService contentService)
+    public PublicAccessChecker(IHttpContextAccessor httpContextAccessor, IPublicAccessService publicAccessService, IContentService contentService, IIdKeyMap idKeyMap)
     {
         _httpContextAccessor = httpContextAccessor;
         _publicAccessService = publicAccessService;
         _contentService = contentService;
+        _idKeyMap = idKeyMap;
     }
 
     /// <inheritdoc/>
@@ -57,7 +59,7 @@ public class PublicAccessChecker : IPublicAccessChecker
             return PublicAccessStatus.LockedOut;
         }
 
-        if (await _publicAccessService.HasAccessAsync(publishedContentId, _contentService, username!, userRoles) is false)
+        if (await _publicAccessService.HasAccessAsync(publishedContentId, _contentService, username!, userRoles, _idKeyMap) is false)
         {
             return PublicAccessStatus.AccessDenied;
         }

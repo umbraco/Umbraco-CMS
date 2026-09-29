@@ -1,5 +1,6 @@
 using Examine;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Provider.Examine.Tests.ContentTests.IndexService;
@@ -52,11 +53,10 @@ public partial class InvariantDocumentTreeTests : IndexTestBase
     public async Task PublishedStructure_WithUnpublishedRoot_YieldsNoDocuments()
     {
         await CreateInvariantDocumentTree(true);
-        await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, () =>
+        await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, async () =>
         {
-            IContent root = ContentService.GetById(RootKey)!;
-            ContentService.Unpublish(root);
-            return Task.CompletedTask;
+            IContent root = ContentService.GetByIdAsync(RootKey, CancellationToken.None).GetAwaiter().GetResult()!;
+            await ContentService.UnpublishAsync(root, "*", Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         });
 
         IIndex index = GetIndex(Cms.Core.Constants.IndexAliases.PublishedContent);
@@ -68,11 +68,10 @@ public partial class InvariantDocumentTreeTests : IndexTestBase
     public async Task PublishedStructure_WithUnpublishedChild_YieldsNothingBelowRoot()
     {
         await CreateInvariantDocumentTree(true);
-        await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, () =>
+        await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, async () =>
         {
-            IContent child = ContentService.GetById(ChildKey)!;
-            ContentService.Unpublish(child);
-            return Task.CompletedTask;
+            IContent child = ContentService.GetByIdAsync(ChildKey, CancellationToken.None).GetAwaiter().GetResult()!;
+            await ContentService.UnpublishAsync(child, "*", Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         });
 
         IIndex index = GetIndex(Cms.Core.Constants.IndexAliases.PublishedContent);
@@ -88,11 +87,10 @@ public partial class InvariantDocumentTreeTests : IndexTestBase
     public async Task PublishedStructure_WithUnpublishedGrandchild_YieldsNothingBelowChild()
     {
         await CreateInvariantDocumentTree(true);
-        await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, () =>
+        await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, async () =>
         {
-            IContent grandChild = ContentService.GetById(GrandchildKey)!;
-            ContentService.Unpublish(grandChild);
-            return Task.CompletedTask;
+            IContent grandChild = ContentService.GetByIdAsync(GrandchildKey, CancellationToken.None).GetAwaiter().GetResult()!;
+            await ContentService.UnpublishAsync(grandChild, "*", Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         });
 
         IIndex index = GetIndex(Cms.Core.Constants.IndexAliases.PublishedContent);
@@ -114,11 +112,10 @@ public partial class InvariantDocumentTreeTests : IndexTestBase
     public async Task PublishedStructure_WithRootInRecycleBin_YieldsNoDocuments()
     {
         await CreateInvariantDocumentTree(true);
-        await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, () =>
+        await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, async () =>
         {
-            IContent root = ContentService.GetById(RootKey)!;
-            ContentService.MoveToRecycleBin(root);
-            return Task.CompletedTask;
+            IContent root = ContentService.GetByIdAsync(RootKey, CancellationToken.None).GetAwaiter().GetResult()!;
+            await ContentService.MoveToRecycleBinAsync(root, Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         });
 
         IIndex index = GetIndex(Cms.Core.Constants.IndexAliases.PublishedContent);
@@ -130,11 +127,10 @@ public partial class InvariantDocumentTreeTests : IndexTestBase
     public async Task PublishedStructure_WithChildInRecycleBin_YieldsNothingBelowRoot()
     {
         await CreateInvariantDocumentTree(true);
-        await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, () =>
+        await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, async () =>
         {
-            IContent child = ContentService.GetById(ChildKey)!;
-            ContentService.MoveToRecycleBin(child);
-            return Task.CompletedTask;
+            IContent child = ContentService.GetByIdAsync(ChildKey, CancellationToken.None).GetAwaiter().GetResult()!;
+            await ContentService.MoveToRecycleBinAsync(child, Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         });
 
         IIndex index = GetIndex(Cms.Core.Constants.IndexAliases.PublishedContent);
@@ -150,11 +146,10 @@ public partial class InvariantDocumentTreeTests : IndexTestBase
     public async Task PublishedStructure_WithUGrandchildInRecycleBin_YieldsNothingBelowChild()
     {
         await CreateInvariantDocumentTree(true);
-        await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, () =>
+        await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, async () =>
         {
-            IContent grandChild = ContentService.GetById(GrandchildKey)!;
-            ContentService.MoveToRecycleBin(grandChild);
-            return Task.CompletedTask;
+            IContent grandChild = ContentService.GetByIdAsync(GrandchildKey, CancellationToken.None).GetAwaiter().GetResult()!;
+            await ContentService.MoveToRecycleBinAsync(grandChild, Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         });
 
         IIndex index = GetIndex(Cms.Core.Constants.IndexAliases.PublishedContent);

@@ -240,6 +240,47 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
     }
 
     /// <inheritdoc />
+    /// <remarks>
+    /// SQLite refuses to add a non-nullable column to a table that already holds rows unless the column has a
+    /// constant, non-null default, so neither the system methods other providers default to nor
+    /// <c>CURRENT_TIMESTAMP</c> can be used here. Such a column is given a zero value of its own type, which the
+    /// migration adding it is then free to replace with a real one.
+    /// </remarks>
+    public override string FormatAddColumn(ColumnDefinition column)
+    {
+        var sql = Format(column);
+
+        if (column.IsNullable || sql.Contains("DEFAULT", StringComparison.OrdinalIgnoreCase))
+        {
+            return sql;
+        }
+
+        return $"{sql} DEFAULT {ZeroValueFor(column)}";
+    }
+
+    private static string ZeroValueFor(ColumnDefinition column)
+    {
+        Type type = Nullable.GetUnderlyingType(column.PropertyType) ?? column.PropertyType;
+
+        if (type == typeof(Guid))
+        {
+            return $"'{Guid.Empty}'";
+        }
+
+        if (type == typeof(DateTime) || type == typeof(DateTimeOffset))
+        {
+            return "'0001-01-01 00:00:00'";
+        }
+
+        if (type == typeof(string))
+        {
+            return "''";
+        }
+
+        return "0";
+    }
+
+    /// <inheritdoc />
     protected override string? FormatSystemMethods(SystemMethods systemMethod)
     {
         switch (systemMethod)

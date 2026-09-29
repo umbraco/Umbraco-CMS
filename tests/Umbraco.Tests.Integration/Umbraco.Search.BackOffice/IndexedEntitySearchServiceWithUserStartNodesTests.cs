@@ -47,17 +47,18 @@ public class IndexedEntitySearchServiceWithUserStartNodesTests : BackOfficeTestB
             return;
         }
 
-        IContent[] contentAtRoot = ContentService.GetRootContent().OrderBy(content => content.SortOrder).ToArray();
-        ContentService.MoveToRecycleBin(contentAtRoot.Last());
+        IContent[] contentAtRoot = (await ContentService.GetRootContentAsync(CancellationToken.None)).OrderBy(content => content.SortOrder).ToArray();
+        await ContentService.MoveToRecycleBinAsync(contentAtRoot.Last(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         IMedia[] mediaAtRoot = MediaService.GetRootMedia().OrderBy(media => media.SortOrder).ToArray();
         MediaService.MoveToRecycleBin(mediaAtRoot.Last());
 
+        int rootContentId = (await ContentService.GetRootContentAsync(CancellationToken.None)).First().Id;
         User limitedUser = new UserBuilder()
             .WithKey(LimitedUserKey)
             .WithEmail("limited@local")
             .WithName("Limited User")
-            .WithStartContentId(ContentService.GetRootContent().First().Id)
+            .WithStartContentId(rootContentId)
             .WithStartMediaId(MediaService.GetRootMedia().First().Id)
             .Build();
         GetRequiredService<IUserService>().Save(limitedUser);

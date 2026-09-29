@@ -367,6 +367,17 @@ public interface ISqlSyntaxProvider
     string Format(ColumnDefinition column);
 
     /// <summary>
+    /// Formats a <see cref="ColumnDefinition"/> for an ALTER TABLE ADD statement.
+    /// </summary>
+    /// <param name="column">The column definition to format.</param>
+    /// <returns>A SQL string representing the formatted column definition.</returns>
+    /// <remarks>
+    /// An added column also applies to the rows a table already holds, which can require a definition that
+    /// differs from the one a CREATE TABLE would use.
+    /// </remarks>
+    string FormatAddColumn(ColumnDefinition column);
+
+    /// <summary>
     /// Formats a <see cref="ColumnDefinition"/> into its corresponding SQL statement for the specified table.
     /// </summary>
     /// <param name="column">The <see cref="ColumnDefinition"/> to format.</param>

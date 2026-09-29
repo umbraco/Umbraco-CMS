@@ -26,7 +26,7 @@ internal sealed class ContentServicePerformanceTest : UmbracoIntegrationTest
     [SetUp]
     public async Task SetUpData() => await CreateTestDataAsync();
 
-    private DocumentRepository DocumentRepository => (DocumentRepository)GetRequiredService<IDocumentRepository>();
+    private IDocumentRepository DocumentRepository => GetRequiredService<IDocumentRepository>();
 
     private ITemplateService TemplateService => GetRequiredService<ITemplateService>();
 
@@ -91,14 +91,14 @@ internal sealed class ContentServicePerformanceTest : UmbracoIntegrationTest
         }
 
         var roots = ContentBuilder.CreateTextpageContent(contentType1, -1, 10);
-        ContentService.Save(roots);
+        await ContentService.SaveAsync(roots, Constants.Security.SuperUserKey, CancellationToken.None);
         foreach (var root in roots)
         {
             var item1 = ContentBuilder.CreateTextpageContent(contentType1, root.Id, 10);
             var item2 = ContentBuilder.CreateTextpageContent(contentType2, root.Id, 10);
             var item3 = ContentBuilder.CreateTextpageContent(contentType3, root.Id, 10);
 
-            ContentService.Save(item1.Concat(item2).Concat(item3));
+            await ContentService.SaveAsync(item1.Concat(item2).Concat(item3), Constants.Security.SuperUserKey, CancellationToken.None);
         }
 
         var total = new List<IContent>();
@@ -106,10 +106,10 @@ internal sealed class ContentServicePerformanceTest : UmbracoIntegrationTest
         using (GetTestProfilingLogger().TraceDuration<ContentServicePerformanceTest>("Getting all content in site"))
         {
             TestProfiler.Enable();
-            total.AddRange(ContentService.GetRootContent());
+            total.AddRange(await ContentService.GetRootContentAsync(CancellationToken.None));
             foreach (var content in total.ToArray())
             {
-                total.AddRange(ContentService.GetPagedDescendants(content.Id, 0, int.MaxValue, out var _));
+                total.AddRange((await ContentService.GetDescendantsAsync(content.Key, 0, int.MaxValue, ordering: null, CancellationToken.None)).Items);
             }
 
             TestProfiler.Disable();
@@ -127,7 +127,7 @@ internal sealed class ContentServicePerformanceTest : UmbracoIntegrationTest
 
         // Act
         var watch = Stopwatch.StartNew();
-        ContentService.Save(pages, -1);
+        await ContentService.SaveAsync(pages, Constants.Security.SuperUserKey, CancellationToken.None);
         watch.Stop();
         var elapsed = watch.ElapsedMilliseconds;
 
@@ -147,7 +147,7 @@ internal sealed class ContentServicePerformanceTest : UmbracoIntegrationTest
 
         // Act
         var watch = Stopwatch.StartNew();
-        ContentService.Save(pages, -1);
+        await ContentService.SaveAsync(pages, Constants.Security.SuperUserKey, CancellationToken.None);
         watch.Stop();
         var elapsed = watch.ElapsedMilliseconds;
 
@@ -164,7 +164,7 @@ internal sealed class ContentServicePerformanceTest : UmbracoIntegrationTest
         // Arrange
         var contentType = await ContentTypeService.GetAsync(ContentType.Id);
         var pages = ContentBuilder.CreateTextpageContent(contentType, -1, 100);
-        ContentService.Save(pages, -1);
+        await ContentService.SaveAsync(pages, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var provider = ScopeProvider;
         using (var scope = provider.CreateScope())
@@ -173,7 +173,7 @@ internal sealed class ContentServicePerformanceTest : UmbracoIntegrationTest
 
             // Act
             var watch = Stopwatch.StartNew();
-            var contents = repository.GetMany();
+            var contents = await repository.GetAllAsync(CancellationToken.None);
             watch.Stop();
             var elapsed = watch.ElapsedMilliseconds;
 
@@ -192,7 +192,7 @@ internal sealed class ContentServicePerformanceTest : UmbracoIntegrationTest
         // Arrange
         var contentType = await ContentTypeService.GetAsync(ContentType.Id);
         var pages = ContentBuilder.CreateTextpageContent(contentType, -1, 1000);
-        ContentService.Save(pages, -1);
+        await ContentService.SaveAsync(pages, Constants.Security.SuperUserKey, CancellationToken.None);
 
         using (var scope = ScopeProvider.CreateScope())
         {
@@ -200,7 +200,7 @@ internal sealed class ContentServicePerformanceTest : UmbracoIntegrationTest
 
             // Act
             var watch = Stopwatch.StartNew();
-            var contents = repository.GetMany();
+            var contents = await repository.GetAllAsync(CancellationToken.None);
             watch.Stop();
             var elapsed = watch.ElapsedMilliseconds;
 
@@ -219,17 +219,17 @@ internal sealed class ContentServicePerformanceTest : UmbracoIntegrationTest
         // Arrange
         var contentType = await ContentTypeService.GetAsync(ContentType.Id);
         var pages = ContentBuilder.CreateTextpageContent(contentType, -1, 100);
-        ContentService.Save(pages, -1);
+        await ContentService.SaveAsync(pages, Constants.Security.SuperUserKey, CancellationToken.None);
 
         using (var scope = ScopeProvider.CreateScope())
         {
             var repository = DocumentRepository;
 
             // Act
-            var contents = repository.GetMany();
+            var contents = await repository.GetAllAsync(CancellationToken.None);
 
             var watch = Stopwatch.StartNew();
-            var contentsCached = repository.GetMany();
+            var contentsCached = await repository.GetAllAsync(CancellationToken.None);
             watch.Stop();
             var elapsed = watch.ElapsedMilliseconds;
 
@@ -249,17 +249,17 @@ internal sealed class ContentServicePerformanceTest : UmbracoIntegrationTest
         // Arrange
         var contentType = await ContentTypeService.GetAsync(ContentType.Id);
         var pages = ContentBuilder.CreateTextpageContent(contentType, -1, 1000);
-        ContentService.Save(pages, -1);
+        await ContentService.SaveAsync(pages, Constants.Security.SuperUserKey, CancellationToken.None);
 
         using (var scope = ScopeProvider.CreateScope())
         {
             var repository = DocumentRepository;
 
             // Act
-            var contents = repository.GetMany();
+            var contents = await repository.GetAllAsync(CancellationToken.None);
 
             var watch = Stopwatch.StartNew();
-            var contentsCached = repository.GetMany();
+            var contentsCached = await repository.GetAllAsync(CancellationToken.None);
             watch.Stop();
             var elapsed = watch.ElapsedMilliseconds;
 

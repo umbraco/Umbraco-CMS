@@ -1,98 +1,108 @@
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
-using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Core.Persistence.Repositories;
 
 /// <summary>
-///     Represents a repository for <see cref="IContent" /> document entities.
+///     Defines the async repository contract for <see cref="IContent" /> document entities.
 /// </summary>
-public interface IDocumentRepository : IPublishableContentRepository<IContent>
+public interface IDocumentRepository : IAsyncPublishableContentRepository<IContent>
 {
     /// <summary>
-    ///     Gets paged documents.
+    ///     Gets a paged list of direct children of a document node, without loading template information.
     /// </summary>
-    /// <param name="query">The base query for documents.</param>
-    /// <param name="pageIndex">The page index (zero-based).</param>
-    /// <param name="pageSize">The number of items per page.</param>
-    /// <param name="totalRecords">Output parameter with total record count.</param>
+    /// <remarks>
+    ///     Use this overload when template IDs are not required (e.g. collection/list views) to avoid the
+    ///     template-existence validation round-trip against the template repository.
+    /// </remarks>
+    /// <param name="parentKey">The Guid key of the parent node, or <c>null</c> for the root of the content tree.</param>
+    /// <param name="skip">The number of items to skip.</param>
+    /// <param name="take">The maximum number of items to return.</param>
     /// <param name="propertyAliases">
-    ///     Optional array of property aliases to load. If null, all properties are loaded.
-    ///     If empty array, no custom properties are loaded (only system properties).
+    ///     Optional array of property aliases to load. If <c>null</c>, all properties are loaded.
+    ///     If empty, no custom properties are loaded (only system properties).
     /// </param>
-    /// <param name="filter">Optional filter query.</param>
-    /// <param name="ordering">The ordering specification.</param>
-    /// <param name="loadTemplates">
-    ///     Whether to load templates. Set to false for performance optimization when templates are not needed
-    ///     (e.g., collection views). Default is true.
-    /// </param>
-    /// <returns>A collection of documents for the specified page.</returns>
-    /// <remarks>Here, <paramref name="filter" /> can be null but <paramref name="ordering" /> cannot.</remarks>
-    IEnumerable<IContent> GetPage(
-        IQuery<IContent>? query,
-        long pageIndex,
-        int pageSize,
-        out long totalRecords,
-        string[]? propertyAliases,
-        IQuery<IContent>? filter,
-        Ordering? ordering,
-        bool loadTemplates);
-    /// <summary>
-    ///     Clears the publishing schedule for all entries having a date before (lower than, or equal to) a specified date.
-    /// </summary>
-    /// <param name="date">The cutoff date.</param>
-    /// <summary>
-    ///     Clears the publishing schedule for entries matching the specified action and having a date before the specified date.
-    /// </summary>
-    /// <param name="date">The cutoff date.</param>
-    /// <param name="action">The schedule action to clear.</param>
-    /// <summary>
-    ///     Checks whether there is content scheduled for expiration before the specified date.
-    /// </summary>
-    /// <param name="date">The date to check.</param>
-    /// <returns><c>true</c> if there is content scheduled for expiration; otherwise, <c>false</c>.</returns>
-    /// <summary>
-    ///     Checks whether there is content scheduled for release before the specified date.
-    /// </summary>
-    /// <param name="date">The date to check.</param>
-    /// <returns><c>true</c> if there is content scheduled for release; otherwise, <c>false</c>.</returns>
-    /// <summary>
-    ///     Checks whether the path to a content item is published.
-    /// </summary>
-    /// <param name="content">The content item.</param>
-    /// <returns><c>true</c> if the path is published; otherwise, <c>false</c>.</returns>
+    /// <param name="ordering">The ordering specification. Must not be <c>null</c> — callers that don't have an opinion should use a service-layer facade that applies a default.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A paged result containing the matching children with <c>null</c> template IDs.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="ordering" /> is <c>null</c>.</exception>
+    Task<PagedModel<IContent>> GetChildrenWithoutTemplatesAsync(Guid? parentKey, int skip, int take, string[]? propertyAliases, Ordering? ordering, CancellationToken cancellationToken);
 
     /// <summary>
-    ///     Used to bulk update the permissions set for a content item. This will replace all permissions
-    ///     assigned to an entity with a list of user id &amp; permission pairs.
+    ///     Gets a paged list of all descendants of a document node, without loading template information.
     /// </summary>
-    /// <param name="permissionSet"></param>
-    void ReplaceContentPermissions(EntityPermissionSet permissionSet);
+    /// <remarks>
+    ///     Use this overload when template IDs are not required (e.g. collection/list views) to avoid the
+    ///     template-existence validation round-trip against the template repository.
+    /// </remarks>
+    /// <param name="ancestorKey">The Guid key of the ancestor node.</param>
+    /// <param name="skip">The number of items to skip.</param>
+    /// <param name="take">The maximum number of items to return.</param>
+    /// <param name="ordering">The ordering specification. Must not be <c>null</c> — callers that don't have an opinion should use a service-layer facade that applies a default.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <param name="includeTrashed">Whether to include descendants that are currently in the recycle bin. Default is <c>true</c>.</param>
+    /// <returns>A paged result containing the matching descendants with <c>null</c> template IDs.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="ordering" /> is <c>null</c>.</exception>
+    Task<PagedModel<IContent>> GetDescendantsWithoutTemplatesAsync(Guid ancestorKey, int skip, int take, Ordering? ordering, CancellationToken cancellationToken, bool includeTrashed = true);
 
     /// <summary>
-    ///     Assigns a single permission to the current content item for the specified user group ids
+    ///     Gets a paged list of documents at a given tree level, excluding trashed documents.
     /// </summary>
-    /// <param name="entity"></param>
-    /// <param name="permission"></param>
-    /// <param name="groupIds"></param>
-    void AssignEntityPermission(IContent entity, string permission, IEnumerable<int> groupIds);
+    /// <param name="level">The tree level to filter by.</param>
+    /// <param name="skip">The number of items to skip.</param>
+    /// <param name="take">The maximum number of items to return.</param>
+    /// <param name="ordering">The ordering specification. Must not be <c>null</c> — callers that don't have an opinion should use a service-layer facade that applies a default.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A paged result containing the matching, non-trashed documents.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="ordering" /> is <c>null</c>.</exception>
+    Task<PagedModel<IContent>> GetByLevelAsync(int level, int skip, int take, Ordering? ordering, CancellationToken cancellationToken);
 
     /// <summary>
-    ///     Gets the explicit list of permissions for the content item
+    ///     Gets a paged list of ancestor documents of a document, ordered root-first.
     /// </summary>
-    /// <param name="entityId"></param>
-    /// <returns></returns>
-    EntityPermissionCollection GetPermissionsForEntity(int entityId);
+    /// <param name="key">The Guid key of the document to retrieve ancestors for.</param>
+    /// <param name="skip">The number of items to skip.</param>
+    /// <param name="take">The maximum number of items to return.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A paged result containing the document's ancestors, root-first. Empty if the key does not resolve to a document.</returns>
+    Task<PagedModel<IContent>> GetAncestorsAsync(Guid key, int skip, int take, CancellationToken cancellationToken);
 
     /// <summary>
-    ///     Used to add/update a permission for a content item
+    ///     Bulk-replaces all permissions for a content item with the provided permission set.
     /// </summary>
-    /// <param name="permission"></param>
-    void AddOrUpdatePermissions(ContentPermissionSet permission);
+    /// <param name="permissionSet">The new set of permissions to apply, replacing any existing permissions.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    Task ReplaceContentPermissionsAsync(EntityPermissionSet permissionSet, CancellationToken cancellationToken);
 
     /// <summary>
-    ///     Returns true if there is any content in the recycle bin
+    ///     Assigns a single permission to the specified user groups for the given content item.
     /// </summary>
-    bool RecycleBinSmells();
+    /// <param name="entity">The content item to assign the permission to.</param>
+    /// <param name="permission">The permission string to assign.</param>
+    /// <param name="groupKeys">The Guid keys of the user groups receiving the permission.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    Task AssignEntityPermissionAsync(IContent entity, string permission, IEnumerable<Guid> groupKeys, CancellationToken cancellationToken);
+
+    /// <summary>
+    ///     Gets the explicit list of permissions set on a content item.
+    /// </summary>
+    /// <param name="entityKey">The Guid key of the content item.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>The collection of permissions explicitly assigned to the content item.</returns>
+    Task<EntityPermissionCollection> GetPermissionsForEntityAsync(Guid entityKey, CancellationToken cancellationToken);
+
+    /// <summary>
+    ///     Adds or updates a permission for a content item.
+    /// </summary>
+    /// <param name="permission">The permission to add or update.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    Task AddOrUpdatePermissionsAsync(ContentPermissionSet permission, CancellationToken cancellationToken);
+
+    /// <summary>
+    ///     Returns a value indicating whether the document recycle bin contains any content.
+    /// </summary>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns><c>true</c> if the recycle bin contains at least one document; otherwise, <c>false</c>.</returns>
+    Task<bool> RecycleBinSmellsAsync(CancellationToken cancellationToken);
 }

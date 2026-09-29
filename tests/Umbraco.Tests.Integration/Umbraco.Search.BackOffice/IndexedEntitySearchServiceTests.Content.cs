@@ -50,7 +50,7 @@ public partial class IndexedEntitySearchServiceTests
     [Test]
     public async Task Content_CanFindSpecificRootByQuery()
     {
-        IContent root = ContentService.GetRootContent().OrderBy(content => content.SortOrder).Skip(1).First();
+        IContent root = (await ContentService.GetRootContentAsync(CancellationToken.None)).OrderBy(content => content.SortOrder).Skip(1).First();
         PagedModel<IEntitySlim> result = await IndexedEntitySearchService.SearchAsync(
             UmbracoObjectTypes.Document,
             query: "single1root",
@@ -89,7 +89,7 @@ public partial class IndexedEntitySearchServiceTests
     [Test]
     public async Task Content_CanFindAllChildrenBelowParent()
     {
-        IContent root = ContentService.GetRootContent().Last();
+        IContent root = (await ContentService.GetRootContentAsync(CancellationToken.None)).Last();
         PagedModel<IEntitySlim> result = await IndexedEntitySearchService.SearchAsync(
             UmbracoObjectTypes.Document,
             query: string.Empty,
@@ -110,7 +110,7 @@ public partial class IndexedEntitySearchServiceTests
     [Test]
     public async Task Content_CanFindChildrenBelowParentByQuery()
     {
-        IContent root = ContentService.GetRootContent().Last();
+        IContent root = (await ContentService.GetRootContentAsync(CancellationToken.None)).Last();
         PagedModel<IEntitySlim> result = await IndexedEntitySearchService.SearchAsync(
             UmbracoObjectTypes.Document,
             query: "triple2child",
@@ -159,7 +159,7 @@ public partial class IndexedEntitySearchServiceTests
     [Test]
     public async Task Content_CanCombineParentAndContentTypeFiltering()
     {
-        IContent root = ContentService.GetRootContent().Last();
+        IContent root = (await ContentService.GetRootContentAsync(CancellationToken.None)).Last();
         Guid contentTypeKey = (await ContentTypeService.GetAsync("childContentType"))?.Key
                               ?? throw new InvalidOperationException("Could not find childContentType");
 

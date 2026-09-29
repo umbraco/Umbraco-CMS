@@ -30,7 +30,7 @@ public class DistributedContentIndexRefresherMediaTests : TestBase
             .WithAlias("invariant")
             .WithAllowAsRoot(true)
             .Build();
-        await MediaTypeService.CreateAsync(mediaType, Constants.Security.SuperUserKey);
+        await MediaTypeService.CreateAsync(mediaType, Cms.Core.Constants.Security.SuperUserKey);
 
         _mediaOneKey = Guid.NewGuid();
         IMedia mediaOne = new MediaBuilder()

@@ -342,6 +342,7 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
 
     private void HandleMemoryCache(JsonPayload payload)
     {
+        // TODO (V20): await this once the ICacheRefresher contract goes async.
         Attempt<Guid> attempt = _idKeyMap.GetKeyForIdAsync(payload.Id, UmbracoObjectTypes.Document).GetAwaiter().GetResult();
         Guid key = payload.Key ?? attempt.Result;
 
@@ -404,6 +405,7 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
     {
         if (payload.ChangeTypes.HasType(TreeChangeTypes.Remove))
         {
+            // TODO (V20): await this once the ICacheRefresher contract goes async.
             Attempt<Guid> attempt = _idKeyMap.GetKeyForIdAsync(payload.Id, UmbracoObjectTypes.Document).GetAwaiter().GetResult();
             Guid key = payload.Key ?? attempt.Result;
 
@@ -429,6 +431,7 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
 
         if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshNode))
         {
+            // TODO (V20): await this once the ICacheRefresher contract goes async.
             Attempt<Guid> attempt = _idKeyMap.GetKeyForIdAsync(payload.Id, UmbracoObjectTypes.Document).GetAwaiter().GetResult();
             Guid key = payload.Key ?? attempt.Result;
             _documentUrlService.UpdateUrlSegmentCacheAsync(key).GetAwaiter().GetResult();
@@ -437,6 +440,7 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
 
         if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshBranch))
         {
+            // TODO (V20): await this once the ICacheRefresher contract goes async.
             Attempt<Guid> attempt = _idKeyMap.GetKeyForIdAsync(payload.Id, UmbracoObjectTypes.Document).GetAwaiter().GetResult();
             Guid key = payload.Key ?? attempt.Result;
 
@@ -466,7 +470,8 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
 
         if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshNode))
         {
-            IContent? content = _contentService.GetById(payload.Key.Value);
+            // TODO (V20): await this once the ICacheRefresher contract goes async.
+            IContent? content = _contentService.GetByIdAsync(payload.Key.Value, CancellationToken.None).GetAwaiter().GetResult();
 
             if (content is null)
             {
@@ -478,14 +483,16 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
 
         if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshBranch))
         {
-            IContent? content = _contentService.GetById(payload.Key.Value);
+            // TODO (V20): await this once the ICacheRefresher contract goes async.
+            IContent? content = _contentService.GetByIdAsync(payload.Key.Value, CancellationToken.None).GetAwaiter().GetResult();
 
             if (content is null)
             {
                 return;
             }
 
-            IEnumerable<IContent> descendants = _contentService.GetPagedDescendants(content.Id, 0, int.MaxValue, out _);
+            // TODO (V20): await this once the ICacheRefresher contract goes async.
+            IEnumerable<IContent> descendants = _contentService.GetDescendantsAsync(content.Key, 0, int.MaxValue, ordering: null, CancellationToken.None).GetAwaiter().GetResult().Items;
             foreach (IContent descendant in content.Yield().Concat(descendants))
             {
                 HandleNavigationForSingleContent(descendant);
@@ -498,7 +505,7 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
         // First creation
         if (ExistsInNavigation(content.Key) is false && ExistsInNavigationBin(content.Key) is false)
         {
-            _documentNavigationManagementService.Add(content.Key, content.ContentType.Key, GetParentKey(content), content.SortOrder);
+            _documentNavigationManagementService.Add(content.Key, content.ContentType.Key, content.ParentKey, content.SortOrder);
             if (content.Trashed)
             {
                 // If created as trashed, move to bin
@@ -520,7 +527,7 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
                 }
 
                 // It must have been saved. Check if parent is different
-                Guid? newParentKey = GetParentKey(content);
+                Guid? newParentKey = content.ParentKey;
                 if (oldParentKey != newParentKey)
                 {
                     _documentNavigationManagementService.Move(content.Key, newParentKey);
@@ -536,15 +543,9 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
             if (content.Trashed is false)
             {
                 // It must have been restored
-                _documentNavigationManagementService.RestoreFromBin(content.Key, GetParentKey(content));
+                _documentNavigationManagementService.RestoreFromBin(content.Key, content.ParentKey);
             }
         }
-    }
-
-    private Guid? GetParentKey(IContent content)
-    {
-        Attempt<Guid> attempt = _idKeyMap.GetKeyForIdAsync(content.ParentId, UmbracoObjectTypes.Document).GetAwaiter().GetResult();
-        return content.ParentId == -1 ? null : attempt.Result;
     }
 
     private bool ExistsInNavigation(Guid contentKey) => _documentNavigationQueryService.TryGetParentKey(contentKey, out _);

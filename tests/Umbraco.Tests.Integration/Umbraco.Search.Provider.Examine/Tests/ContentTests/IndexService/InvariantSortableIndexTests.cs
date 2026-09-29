@@ -60,7 +60,7 @@ public class InvariantSortableIndexTests : IndexTestBase
     {
         await CreateTitleDocType();
 
-        await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, () =>
+        await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, async () =>
         {
             foreach (var stringValue in values)
             {
@@ -70,10 +70,8 @@ public class InvariantSortableIndexTests : IndexTestBase
                     .WithPropertyValues(new { sortableTitle = stringValue, title = stringValue })
                     .Build();
 
-                SaveAndPublish(document);
+                await SaveAndPublishAsync(document);
             }
-
-            return Task.CompletedTask;
         });
     }
 }

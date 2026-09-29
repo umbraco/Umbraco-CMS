@@ -22,7 +22,7 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
             Constants.Security.SuperUserKey);
 
         Assert.IsTrue(publishAttempt.Success);
-        content = ContentService.GetById(content.Key);
+        content = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
         Assert.AreEqual(1, content!.PublishedCultures.Count());
     }
 
@@ -41,7 +41,7 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
             Constants.Security.SuperUserKey);
 
         Assert.IsTrue(publishAttempt.Success);
-        content = ContentService.GetById(content.Key);
+        content = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
         Assert.AreEqual(2, content!.PublishedCultures.Count());
     }
 
@@ -61,7 +61,7 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
             Constants.Security.SuperUserKey);
 
         Assert.IsTrue(publishAttempt.Success);
-        content = ContentService.GetById(content.Key);
+        content = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
         Assert.AreEqual(3, content!.PublishedCultures.Count());
     }
 
@@ -83,7 +83,7 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
         Assert.IsFalse(publishAttempt.Success);
         Assert.AreEqual(ContentPublishingOperationStatus.CannotPublishInvariantWhenVariant, publishAttempt.Status);
 
-        content = ContentService.GetById(content.Key);
+        content = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
         Assert.AreEqual(0, content!.PublishedCultures.Count());
     }
 
@@ -100,7 +100,7 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
 
         Assert.IsTrue(publishAttempt.Success);
 
-        content = ContentService.GetById(content.Key);
+        content = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
         Assert.NotNull(content!.PublishDate);
     }
 
@@ -118,7 +118,7 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
         Assert.IsFalse(publishAttempt.Success);
         Assert.AreEqual(ContentPublishingOperationStatus.ContentInvalid, publishAttempt.Status);
 
-        content = ContentService.GetById(content.Key);
+        content = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
         Assert.Null(content!.PublishDate);
     }
 
@@ -145,7 +145,7 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
         Assert.AreEqual(ContentPublishingOperationStatus.ContentInvalid, publishAttempt.Status);
         Assert.AreEqual("title", string.Join(",", publishAttempt.Result.InvalidPropertyAliases));
 
-        content = ContentService.GetById(content.Key);
+        content = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
         Assert.AreEqual(0, content!.PublishedCultures.Count()); // Even though the Danish culture was valid, we still don't publish if if any are invalid.
     }
 
@@ -168,7 +168,7 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
             Constants.Security.SuperUserKey);
 
         Assert.IsTrue(publishAttempt.Success);
-        content = ContentService.GetById(content.Key);
+        content = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
         Assert.AreEqual(1, content!.PublishedCultures.Count());
         Assert.AreEqual(langDa.IsoCode, content!.PublishedCultures.First());
     }
@@ -195,7 +195,7 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
         Assert.IsFalse(publishAttempt.Success);
         Assert.AreEqual(ContentPublishingOperationStatus.InvalidCulture, publishAttempt.Status);
 
-        content = ContentService.GetById(content.Key);
+        content = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
         Assert.AreEqual(0, content!.PublishedCultures.Count());
     }
 
@@ -233,7 +233,7 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
         Assert.IsFalse(publishAttempt.Success);
         Assert.AreEqual(ContentPublishingOperationStatus.CultureAwaitingRelease, publishAttempt.Status);
 
-        content = ContentService.GetById(content.Key);
+        content = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
         Assert.AreEqual(0, content!.PublishedCultures.Count());
     }
 
@@ -365,7 +365,7 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
             Constants.Security.SuperUserKey);
         Assert.IsTrue(publishAttempt.Success);
 
-        var content = ContentService.GetById(setupData.Key)!;
+        var content = (await ContentService.GetByIdAsync(setupData.Key, CancellationToken.None))!;
         var firstPublishDateEn = content.GetPublishDate(langEn.IsoCode)
                                  ?? throw new InvalidOperationException("Expected a publish date for EN");
         var firstPublishDateDa = content.GetPublishDate(langDa.IsoCode)
@@ -381,7 +381,7 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
             Constants.Security.SuperUserKey);
         Assert.IsTrue(publishAttempt.Success);
 
-        content = ContentService.GetById(content.Key)!;
+        content = (await ContentService.GetByIdAsync(content.Key, CancellationToken.None))!;
         Assert.AreEqual(firstPublishDateDa, content.GetPublishDate(langDa.IsoCode));
         Assert.AreEqual(firstPublishDateBe, content.GetPublishDate(langBe.IsoCode));
 

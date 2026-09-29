@@ -28,7 +28,7 @@ internal sealed partial class ContentServiceTests
         Assert.IsTrue(elementTypeResult.Success, "Failed to create element content type");
 
         var element = ElementBuilder.CreateBasicElement(elementType);
-        ElementServiceForScheduling.Save(element);
+        await ElementServiceForScheduling.SaveAsync(element, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         var elementScheduleAttempt = await ElementPublishingService.PublishAsync(
             element.Key,
@@ -49,7 +49,7 @@ internal sealed partial class ContentServiceTests
         Assert.IsTrue(docTypeResult.Success, "Failed to create document content type");
 
         var document = ContentBuilder.CreateBasicContent(docType);
-        ContentService.Save(document);
+        await ContentService.SaveAsync(document, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         var docScheduleAttempt = await ContentPublishingService.PublishAsync(
             document.Key,
@@ -67,11 +67,11 @@ internal sealed partial class ContentServiceTests
         // Note: The base class (UmbracoIntegrationTestWithContent) creates a Subpage with a past
         // release schedule, so more than one result may be returned.
         var publishDate = _schedulePublishDate.AddMinutes(1);
-        var docResults = ContentService.PerformScheduledPublish(publishDate).ToList();
+        var docResults = (await ContentService.PerformScheduledPublishAsync(publishDate, CancellationToken.None)).ToList();
         Assert.IsNotEmpty(docResults, "Document scheduled publishing should process at least one document");
 
         // Verify the element schedule is still intact after document scheduled publishing ran
-        var elementSchedulesAfterDocPublish = ElementServiceForScheduling.GetContentScheduleByContentId(element.Key);
+        var elementSchedulesAfterDocPublish = await ElementServiceForScheduling.GetContentScheduleByContentIdAsync(element.Key, CancellationToken.None);
         Assert.AreEqual(
             1,
             elementSchedulesAfterDocPublish.FullSchedule.Count,
@@ -88,7 +88,7 @@ internal sealed partial class ContentServiceTests
         Assert.IsTrue(elementTypeResult.Success, "Failed to create element content type");
 
         var element = ElementBuilder.CreateBasicElement(elementType);
-        ElementServiceForScheduling.Save(element);
+        await ElementServiceForScheduling.SaveAsync(element, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         var elementPublishAttempt = await ElementPublishingService.PublishAsync(
             element.Key,
@@ -115,7 +115,7 @@ internal sealed partial class ContentServiceTests
         Assert.IsTrue(docTypeResult.Success, "Failed to create document content type");
 
         var document = ContentBuilder.CreateBasicContent(docType);
-        ContentService.Save(document);
+        await ContentService.SaveAsync(document, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         var docPublishAttempt = await ContentPublishingService.PublishAsync(
             document.Key,
@@ -137,11 +137,11 @@ internal sealed partial class ContentServiceTests
 
         // Run scheduled publishing for documents - should only process document schedules
         var unpublishDate = _scheduleUnPublishDate.AddMinutes(1);
-        var docResults = ContentService.PerformScheduledPublish(unpublishDate).ToList();
+        var docResults = (await ContentService.PerformScheduledPublishAsync(unpublishDate, CancellationToken.None)).ToList();
         Assert.IsNotEmpty(docResults, "Document scheduled publishing should process at least one document");
 
         // Verify the element expiration schedule is still intact
-        var elementSchedulesAfterDocUnpublish = ElementServiceForScheduling.GetContentScheduleByContentId(element.Key);
+        var elementSchedulesAfterDocUnpublish = await ElementServiceForScheduling.GetContentScheduleByContentIdAsync(element.Key, CancellationToken.None);
         Assert.AreEqual(
             1,
             elementSchedulesAfterDocUnpublish.FullSchedule.Count,

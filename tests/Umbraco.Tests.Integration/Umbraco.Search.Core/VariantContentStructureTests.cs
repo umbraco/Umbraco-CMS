@@ -9,10 +9,10 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Core;
 public class VariantContentStructureTests : VariantContentTestBase
 {
     [Test]
-    public void PublishedStructureInAllCultures_YieldsAllPublishedDocumentsInAllCultures()
+    public async Task PublishedStructureInAllCultures_YieldsAllPublishedDocumentsInAllCultures()
     {
-        ContentService.Save(Root());
-        ContentService.PublishBranch(Root(), PublishBranchFilter.IncludeUnpublished, ["*"]);
+        await ContentService.SaveAsync(Root(), Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishBranchAsync(Root(), PublishBranchFilter.IncludeUnpublished, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.PublishedContent);
         Assert.That(documents, Has.Count.EqualTo(4));
@@ -38,10 +38,10 @@ public class VariantContentStructureTests : VariantContentTestBase
 
     [TestCase("en-US")]
     [TestCase("da-DK")]
-    public void PublishedStructureSingleCulture_YieldsAllPublishedDocumentsInOneCultures(string culture)
+    public async Task PublishedStructureSingleCulture_YieldsAllPublishedDocumentsInOneCultures(string culture)
     {
-        ContentService.Save(Root());
-        ContentService.PublishBranch(Root(), PublishBranchFilter.IncludeUnpublished, [culture]);
+        await ContentService.SaveAsync(Root(), Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishBranchAsync(Root(), PublishBranchFilter.IncludeUnpublished, [culture], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.PublishedContent);
         Assert.That(documents, Has.Count.EqualTo(4));
@@ -64,10 +64,10 @@ public class VariantContentStructureTests : VariantContentTestBase
     }
 
     [Test]
-    public void PublishedRootInAllCultures_YieldsOnlyRootDocumentInAllCultures()
+    public async Task PublishedRootInAllCultures_YieldsOnlyRootDocumentInAllCultures()
     {
-        ContentService.Save(Root());
-        ContentService.PublishBranch(Root(), PublishBranchFilter.Default, ["*"]);
+        await ContentService.SaveAsync(Root(), Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishBranchAsync(Root(), PublishBranchFilter.Default, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.PublishedContent);
         Assert.That(documents, Has.Count.EqualTo(1));
@@ -76,12 +76,12 @@ public class VariantContentStructureTests : VariantContentTestBase
     }
 
     [Test]
-    public void PublishedStructureInAllCultures_WithUnpublishedRoot_YieldsNoDocuments()
+    public async Task PublishedStructureInAllCultures_WithUnpublishedRoot_YieldsNoDocuments()
     {
-        ContentService.Save(Root());
-        ContentService.PublishBranch(Root(), PublishBranchFilter.IncludeUnpublished, ["*"]);
+        await ContentService.SaveAsync(Root(), Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishBranchAsync(Root(), PublishBranchFilter.IncludeUnpublished, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
-        PublishResult result = ContentService.Unpublish(Root());
+        PublishResult result = await ContentService.UnpublishAsync(Root(), "*", Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.That(result.Success, Is.True);
         Assert.That(Child().Published, Is.True);
 
@@ -91,12 +91,12 @@ public class VariantContentStructureTests : VariantContentTestBase
 
     [TestCase("en-US", "da-DK")]
     [TestCase("da-DK", "en-US")]
-    public void PublishedStructureInAllCultures_WithUnpublishedRootInSingleCulture_YieldsAllDocumentInPublishedRootCulture(string cultureToUnpublish, string expectedCulture)
+    public async Task PublishedStructureInAllCultures_WithUnpublishedRootInSingleCulture_YieldsAllDocumentInPublishedRootCulture(string cultureToUnpublish, string expectedCulture)
     {
-        ContentService.Save(Root());
-        ContentService.PublishBranch(Root(), PublishBranchFilter.IncludeUnpublished, ["*"]);
+        await ContentService.SaveAsync(Root(), Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishBranchAsync(Root(), PublishBranchFilter.IncludeUnpublished, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
-        PublishResult result = ContentService.Unpublish(Root(), cultureToUnpublish);
+        PublishResult result = await ContentService.UnpublishAsync(Root(), cultureToUnpublish, Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.That(result.Success, Is.True);
 
         IContent root = Root();
@@ -129,12 +129,12 @@ public class VariantContentStructureTests : VariantContentTestBase
     }
 
     [Test]
-    public void PublishedStructureInAllCultures_WithUnpublishedGrandchildInAllCultures_YieldsNothingBelowChild()
+    public async Task PublishedStructureInAllCultures_WithUnpublishedGrandchildInAllCultures_YieldsNothingBelowChild()
     {
-        ContentService.Save(Root());
-        ContentService.PublishBranch(Root(), PublishBranchFilter.IncludeUnpublished, ["*"]);
+        await ContentService.SaveAsync(Root(), Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishBranchAsync(Root(), PublishBranchFilter.IncludeUnpublished, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
-        PublishResult result = ContentService.Unpublish(Grandchild());
+        PublishResult result = await ContentService.UnpublishAsync(Grandchild(), "*", Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.That(result.Success, Is.True);
         Assert.That(GreatGrandchild().Published, Is.True);
 
@@ -155,15 +155,15 @@ public class VariantContentStructureTests : VariantContentTestBase
     }
 
     [Test]
-    public void PublishedStructureInAllCultures_UnpublishAllCulturesForGrandchildOneAtATime_YieldsNothingBelowChild()
+    public async Task PublishedStructureInAllCultures_UnpublishAllCulturesForGrandchildOneAtATime_YieldsNothingBelowChild()
     {
-        ContentService.Save(Root());
-        ContentService.PublishBranch(Root(), PublishBranchFilter.IncludeUnpublished, ["*"]);
+        await ContentService.SaveAsync(Root(), Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishBranchAsync(Root(), PublishBranchFilter.IncludeUnpublished, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
-        PublishResult result = ContentService.Unpublish(Grandchild(), "en-US");
+        PublishResult result = await ContentService.UnpublishAsync(Grandchild(), "en-US", Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.That(result.Success, Is.True);
         Assert.That(Grandchild().Published, Is.True);
-        result = ContentService.Unpublish(Grandchild(), "da-DK");
+        result = await ContentService.UnpublishAsync(Grandchild(), "da-DK", Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.That(result.Success, Is.True);
         Assert.That(Grandchild().Published, Is.False);
         Assert.That(GreatGrandchild().Published, Is.True);
@@ -186,12 +186,12 @@ public class VariantContentStructureTests : VariantContentTestBase
 
     [TestCase("en-US", "da-DK")]
     [TestCase("da-DK", "en-US")]
-    public void PublishedStructureInAllCultures_WithUnpublishedGrandchildInSingleCulture_YieldsSingleCultureBelowChild(string cultureToUnpublish, string expectedCulture)
+    public async Task PublishedStructureInAllCultures_WithUnpublishedGrandchildInSingleCulture_YieldsSingleCultureBelowChild(string cultureToUnpublish, string expectedCulture)
     {
-        ContentService.Save(Root());
-        ContentService.PublishBranch(Root(), PublishBranchFilter.IncludeUnpublished, ["*"]);
+        await ContentService.SaveAsync(Root(), Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishBranchAsync(Root(), PublishBranchFilter.IncludeUnpublished, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
-        PublishResult result = ContentService.Unpublish(Grandchild(), cultureToUnpublish);
+        PublishResult result = await ContentService.UnpublishAsync(Grandchild(), cultureToUnpublish, Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.That(result.Success, Is.True);
 
         // grandchild should now be unpublished in a single culture

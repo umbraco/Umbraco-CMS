@@ -48,11 +48,10 @@ public partial class InvariantDocumentTreeTests
     {
         await CreateInvariantDocumentTree(false);
 
-        await WaitForIndexing(Cms.Core.Constants.IndexAliases.DraftContent, () =>
+        await WaitForIndexing(Cms.Core.Constants.IndexAliases.DraftContent, async () =>
         {
-            IContent root = ContentService.GetById(RootKey)!;
-            ContentService.MoveToRecycleBin(root);
-            return Task.CompletedTask;
+            IContent root = ContentService.GetByIdAsync(RootKey, CancellationToken.None).GetAwaiter().GetResult()!;
+            await ContentService.MoveToRecycleBinAsync(root, Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         });
 
         IIndex index = GetIndex(Cms.Core.Constants.IndexAliases.DraftContent);
@@ -78,8 +77,8 @@ public partial class InvariantDocumentTreeTests
         await CreateInvariantDocumentTree(false);
         await WaitForIndexing(Cms.Core.Constants.IndexAliases.DraftContent, () =>
         {
-            IContent child = ContentService.GetById(ChildKey)!;
-            ContentService.Delete(child);
+            IContent child = ContentService.GetByIdAsync(ChildKey, CancellationToken.None).GetAwaiter().GetResult()!;
+            ContentService.DeleteAsync(child, Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None).GetAwaiter().GetResult();
             return Task.CompletedTask;
         });
 
@@ -99,8 +98,8 @@ public partial class InvariantDocumentTreeTests
         await CreateInvariantDocumentTree(false);
         await WaitForIndexing(Cms.Core.Constants.IndexAliases.DraftContent, () =>
         {
-            IContent grandchild = ContentService.GetById(GrandchildKey)!;
-            ContentService.Delete(grandchild);
+            IContent grandchild = ContentService.GetByIdAsync(GrandchildKey, CancellationToken.None).GetAwaiter().GetResult()!;
+            ContentService.DeleteAsync(grandchild, Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None).GetAwaiter().GetResult();
             return Task.CompletedTask;
         });
 
@@ -174,15 +173,15 @@ public partial class InvariantDocumentTreeTests
                 })
             .Build();
 
-        await WaitForIndexing(publish ? Cms.Core.Constants.IndexAliases.PublishedContent : Cms.Core.Constants.IndexAliases.DraftContent, () =>
+        await WaitForIndexing(publish ? Cms.Core.Constants.IndexAliases.PublishedContent : Cms.Core.Constants.IndexAliases.DraftContent, async () =>
         {
             if (publish)
             {
-                SaveAndPublish(root);
+                await SaveAndPublishAsync(root);
             }
             else
             {
-                ContentService.Save(root);
+                await ContentService.SaveAsync(root, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
             }
 
 
@@ -203,11 +202,11 @@ public partial class InvariantDocumentTreeTests
 
             if (publish)
             {
-                SaveAndPublish(child);
+                await SaveAndPublishAsync(child);
             }
             else
             {
-                ContentService.Save(child);
+                await ContentService.SaveAsync(child, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
             }
 
             Content grandchild = new ContentBuilder()
@@ -227,14 +226,12 @@ public partial class InvariantDocumentTreeTests
 
             if (publish)
             {
-                SaveAndPublish(grandchild);
+                await SaveAndPublishAsync(grandchild);
             }
             else
             {
-                ContentService.Save(grandchild);
+                await ContentService.SaveAsync(grandchild, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
             }
-
-            return Task.CompletedTask;
         });
 
 

@@ -70,8 +70,8 @@ internal class TrackedReferencesServiceTests : UmbracoIntegrationTest
             .WithName("Root 1")
             .Build();
 
-        ContentService.Save(Root1);
-        ContentService.Publish(Root1, ["*"]);
+        await ContentService.SaveAsync(Root1, Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishAsync(Root1, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         Child1 = new ContentBuilder()
             .WithContentType(ContentType)
@@ -79,8 +79,8 @@ internal class TrackedReferencesServiceTests : UmbracoIntegrationTest
             .WithParentId(Root1.Id)
             .Build();
 
-        ContentService.Save(Child1);
-        ContentService.Publish(Child1, ["*"]);
+        await ContentService.SaveAsync(Child1, Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishAsync(Child1, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         Root2 = new ContentBuilder()
             .WithContentType(ContentType)
@@ -92,8 +92,8 @@ internal class TrackedReferencesServiceTests : UmbracoIntegrationTest
             })
             .Build();
 
-        ContentService.Save(Root2);
-        ContentService.Publish(Root2, ["*"]);
+        await ContentService.SaveAsync(Root2, Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishAsync(Root2, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
     }
 
     [Test]
@@ -178,7 +178,7 @@ internal class TrackedReferencesServiceTests : UmbracoIntegrationTest
     [Test]
     public async Task Get_Pages_That_Reference_Recycle_Bin_Contents()
     {
-        ContentService.MoveToRecycleBin(Root1);
+        await ContentService.MoveToRecycleBinAsync(Root1, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var sut = GetRequiredService<ITrackedReferencesService>();
 

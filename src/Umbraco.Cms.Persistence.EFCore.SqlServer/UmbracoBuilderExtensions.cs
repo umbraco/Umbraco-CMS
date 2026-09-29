@@ -30,7 +30,15 @@ public static class UmbracoBuilderExtensions
         return builder;
     }
 
-    private static void AddCustomizers(IUmbracoBuilder builder) => builder
-            .AddEFCoreModelCustomizer<SqlServerNodeDtoModelCustomizer>()
-            .AddEFCoreModelCustomizer<SqlServerRedirectUrlDtoModelCustomizer>();
+    private static void AddCustomizers(IUmbracoBuilder builder) =>
+        builder.AddEFCoreModelCustomizer<SqlServerNodeDtoModelCustomizer>()
+            .AddEFCoreModelCustomizer<SqlServerContentVersionDtoModelCustomizer>()
+            .AddEFCoreModelCustomizer<SqlServerContentVersionCultureVariationDtoModelCustomizer>()
+            .AddEFCoreModelCustomizer<SqlServerDocumentVersionDtoModelCustomizer>()
+            .AddEFCoreModelCustomizer<SqlServerDocumentUrlDtoModelCustomizer>()
+            .AddEFCoreModelCustomizer<SqlServerDocumentUrlAliasDtoModelCustomizer>()
+            .AddEFCoreModelCustomizer<SqlServerTagDtoModelCustomizer>()
+            .AddEFCoreModelCustomizer<SqlServerTagRelationshipDtoModelCustomizer>()
+            .AddEFCoreModelCustomizer<SqlServerRedirectUrlDtoModelCustomizer>()
+            .AddEFCoreModelCustomizer<SqlServerUserGroup2GranularPermissionDtoModelCustomizer>();
 }

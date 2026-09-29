@@ -34,8 +34,7 @@ public partial class ContentEditingServiceTests
         var result = await ContentEditingService.SortByFieldAsync(root.Key, field, direction, culture: null, Constants.Security.SuperUserKey);
         Assert.AreEqual(ContentEditingOperationStatus.Success, result);
 
-        var actualChildKeys = ContentService
-            .GetPagedChildren(root.Id, 0, 100, out _, propertyAliases: null, filter: null, ordering: null)
+        var actualChildKeys = (await ContentService.GetChildrenAsync(root.Key, 0, 100, propertyAliases: null, ordering: null, CancellationToken.None)).Items
             .OrderBy(c => c.SortOrder)
             .Select(c => c.Key)
             .ToArray();
@@ -115,8 +114,7 @@ public partial class ContentEditingServiceTests
         var result = await ContentEditingService.SortByFieldAsync(root.Key, ContentSortField.Name, Direction.Ascending, culture, Constants.Security.SuperUserKey);
         Assert.AreEqual(ContentEditingOperationStatus.Success, result);
 
-        var actualChildKeys = ContentService
-            .GetPagedChildren(root.Id, 0, 100, out _, propertyAliases: null, filter: null, ordering: null)
+        var actualChildKeys = (await ContentService.GetChildrenAsync(root.Key, 0, 100, propertyAliases: null, ordering: null, CancellationToken.None)).Items
             .OrderBy(c => c.SortOrder)
             .Select(c => c.Key)
             .ToArray();
@@ -187,8 +185,7 @@ public partial class ContentEditingServiceTests
         var result = await ContentEditingService.SortByFieldAsync(root.Key, ContentSortField.Name, Direction.Ascending, culture, Constants.Security.SuperUserKey);
         Assert.AreEqual(ContentEditingOperationStatus.Success, result);
 
-        var actualChildKeys = ContentService
-            .GetPagedChildren(root.Id, 0, 100, out _, propertyAliases: null, filter: null, ordering: null)
+        var actualChildKeys = (await ContentService.GetChildrenAsync(root.Key, 0, 100, propertyAliases: null, ordering: null, CancellationToken.None)).Items
             .OrderBy(c => c.SortOrder)
             .Select(c => c.Key)
             .ToArray();
@@ -210,8 +207,7 @@ public partial class ContentEditingServiceTests
         var result = await ContentEditingService.SortByFieldAsync(parentKey: null, field, direction, culture: null, Constants.Security.SuperUserKey);
         Assert.AreEqual(ContentEditingOperationStatus.Success, result);
 
-        var actualRootKeys = ContentService
-            .GetPagedChildren(Constants.System.Root, 0, 100, out _, propertyAliases: null, filter: null, ordering: null)
+        var actualRootKeys = (await ContentService.GetChildrenAsync(null, 0, 100, propertyAliases: null, ordering: null, CancellationToken.None)).Items
             .OrderBy(c => c.SortOrder)
             .Select(c => c.Key)
             .ToArray();
@@ -254,7 +250,7 @@ public partial class ContentEditingServiceTests
             // Setting the dates marks them dirty, so they are persisted as-is rather than being stamped with "now".
             child.CreateDate = baseDate.AddDays(createOffset);
             child.UpdateDate = baseDate.AddDays(100 + updateOffset);
-            ContentService.Save(child);
+            await ContentService.SaveAsync(child, Constants.Security.SuperUserKey, null, CancellationToken.None);
         }
 
         return (root, childKeys);
@@ -262,9 +258,9 @@ public partial class ContentEditingServiceTests
 
     private async Task<Guid[]> CreateRootContentForFieldSorting()
     {
-        foreach (var existingRoot in ContentService.GetRootContent())
+        foreach (var existingRoot in await ContentService.GetRootContentAsync(CancellationToken.None))
         {
-            ContentService.Delete(existingRoot);
+            await ContentService.DeleteAsync(existingRoot, Constants.Security.SuperUserKey, CancellationToken.None);
         }
 
         var rootContentType = ContentTypeBuilder.CreateBasicContentType(alias: "rootPage", name: "Root Page");
@@ -288,7 +284,7 @@ public partial class ContentEditingServiceTests
             // Setting the dates marks them dirty, so they are persisted as-is rather than being stamped with "now".
             root.CreateDate = baseDate.AddDays(createOffset);
             root.UpdateDate = baseDate.AddDays(100 + updateOffset);
-            ContentService.Save(root);
+            await ContentService.SaveAsync(root, Constants.Security.SuperUserKey, null, CancellationToken.None);
         }
 
         return rootKeys;

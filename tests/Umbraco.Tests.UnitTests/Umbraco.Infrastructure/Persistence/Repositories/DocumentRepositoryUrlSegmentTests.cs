@@ -5,11 +5,12 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
+using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.EFCore;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Persistence.Repositories;
 
 [TestFixture]
-internal sealed class DocumentRepositoryTests
+internal sealed class DocumentRepositoryUrlSegmentTests
 {
     private IShortStringHelper _shortStringHelper = null!;
 

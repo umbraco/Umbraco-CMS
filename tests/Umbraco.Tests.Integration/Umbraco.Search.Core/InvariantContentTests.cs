@@ -6,17 +6,17 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Core;
 
 public partial class InvariantContentTests : InvariantContentTestBase
 {
-    private void SetupDraftContent()
+    private async Task SetupDraftContent()
     {
         foreach (Guid key in new[] { RootKey, ChildKey, GrandchildKey, GreatGrandchildKey })
         {
-            IContent content = ContentService.GetById(key)
+            IContent content = ContentService.GetByIdAsync(key, CancellationToken.None).GetAwaiter().GetResult()
                                ?? throw new InvalidOperationException($"Could not find content for key: {key}");
             content.Name += " (draft)";
             content.SetValue("title", content.GetValue<string>("title") + " (draft)");
             content.SetValue("count", content.GetValue<int>("count") + 1);
             content.SetValue("tags", content.GetValue<string>("tags")!.TrimEnd("]") + ",\"draft\"]");
-            ContentService.Save(content);
+            await ContentService.SaveAsync(content, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
         }
 
         IndexerAndSearcher.Reset();

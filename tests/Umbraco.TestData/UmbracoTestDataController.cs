@@ -102,7 +102,7 @@ public class UmbracoTestDataController : SurfaceController
             // so that all content is created before we publish the root branch.
             _ = contentIds.ToList();
 
-            Services.ContentService.PublishBranch(root, PublishBranchFilter.IncludeUnpublished, ["*"]);
+            await Services.ContentService.PublishBranchAsync(root, PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
             scope.Complete();
         }
@@ -251,24 +251,26 @@ public class UmbracoTestDataController : SurfaceController
 
         var docType = await GetOrCreateContentTypeAsync();
 
-        var parent = Services.ContentService.Create(company, -1, docType.Alias);
+        var parent = await Services.ContentService.CreateAsync(company, (Guid?)null, docType.Alias, Constants.Security.SuperUserKey, CancellationToken.None);
 
         // give it some reasonable data (100 reviews)
         parent.SetValue("review", string.Join(" ", Enumerable.Range(0, 100).Select(x => faker.Rant.Review())));
         parent.SetValue("desc", company);
         parent.SetValue("media", imageIds[random.Next(0, imageIds.Count - 1)]);
-        Services.ContentService.Save(parent);
+        await Services.ContentService.SaveAsync(parent, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         var udis = CreateHierarchy(parent, count, depth, currParent =>
         {
-            var content = Services.ContentService.Create(faker.Commerce.ProductName(), currParent, docType.Alias);
+            var content = Services.ContentService.CreateAsync(faker.Commerce.ProductName(), currParent, docType.Alias, Constants.Security.SuperUserKey, CancellationToken.None).GetAwaiter().GetResult();
 
             // give it some reasonable data (100 reviews)
             content.SetValue("review", string.Join(" ", Enumerable.Range(0, 100).Select(x => faker.Rant.Review())));
             content.SetValue("desc", string.Join(", ", Enumerable.Range(0, 5).Select(x => faker.Commerce.ProductAdjective())));
             content.SetValue("media", imageIds[random.Next(0, imageIds.Count - 1)]);
 
-            Services.ContentService.Save(content);
+            // CreateHierarchy's delegate is sync (it's a yield-return iterator) - bridging here rather
+            // than restructuring it to accept an async delegate for one sample-data call site.
+            Services.ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None).GetAwaiter().GetResult();
             return (content, () => content);
         });
 

@@ -18,7 +18,7 @@ namespace Umbraco.Cms.Core.Services;
 internal abstract class AsyncContentEditingServiceBase<TContent, TContentType, TContentService, TContentTypeService>
     where TContent : class, IContentBase
     where TContentType : class, IContentTypeComposition
-    where TContentService : IContentServiceBase<TContent>
+    where TContentService : IAsyncContentServiceBase<TContent>
     where TContentTypeService : IAsyncContentTypeBaseService<TContentType>
 {
     private readonly PropertyEditorCollection _propertyEditorCollection;
@@ -97,38 +97,38 @@ internal abstract class AsyncContentEditingServiceBase<TContent, TContentType, T
     /// Moves content to a new parent.
     /// </summary>
     /// <param name="content">The content to move.</param>
-    /// <param name="newParentId">The new parent identifier.</param>
+    /// <param name="parentKey">The new parent key, or null for root.</param>
     /// <param name="includeDescendants">Whether to move the descendants along with the content.</param>
-    /// <param name="userId">The user performing the operation.</param>
-    /// <returns>The operation result.</returns>
-    protected abstract OperationResult? Move(TContent content, int newParentId, bool includeDescendants, int userId);
+    /// <param name="userKey">The user performing the operation.</param>
+    /// <returns>The status of the move.</returns>
+    protected abstract Task<ContentEditingOperationStatus> MoveAsync(TContent content, Guid? parentKey, bool includeDescendants, Guid userKey);
 
     /// <summary>
     /// Copies content to a new parent.
     /// </summary>
     /// <param name="content">The content to copy.</param>
-    /// <param name="newParentId">The new parent identifier.</param>
+    /// <param name="parentKey">The new parent key, or null for root.</param>
     /// <param name="relateToOriginal">Whether to create a relation to the original.</param>
     /// <param name="includeDescendants">Whether to include descendants in the copy.</param>
     /// <param name="userKey">The key of the user performing the operation.</param>
     /// <returns>The copied content, or null if the operation failed.</returns>
-    protected abstract Task<TContent?> CopyAsync(TContent content, int newParentId, bool relateToOriginal, bool includeDescendants, Guid userKey);
+    protected abstract Task<TContent?> CopyAsync(TContent content, Guid? parentKey, bool relateToOriginal, bool includeDescendants, Guid userKey);
 
     /// <summary>
     /// Moves content to the recycle bin.
     /// </summary>
     /// <param name="content">The content to move to recycle bin.</param>
-    /// <param name="userId">The user performing the operation.</param>
+    /// <param name="userKey">The user performing the operation.</param>
     /// <returns>The operation result.</returns>
-    protected abstract OperationResult? MoveToRecycleBin(TContent content, int userId);
+    protected abstract Task<OperationResult?> MoveToRecycleBinAsync(TContent content, Guid userKey);
 
     /// <summary>
     /// Deletes content.
     /// </summary>
     /// <param name="content">The content to delete.</param>
-    /// <param name="userId">The user performing the operation.</param>
+    /// <param name="userKey">The user performing the operation.</param>
     /// <returns>The operation result.</returns>
-    protected abstract OperationResult? Delete(TContent content, int userId);
+    protected abstract Task<OperationResult?> DeleteAsync(TContent content, Guid userKey);
 
     /// <summary>
     /// Gets the current content settings.
@@ -182,6 +182,12 @@ internal abstract class AsyncContentEditingServiceBase<TContent, TContentType, T
         Attempt<ContentValidationResult, ContentEditingOperationStatus> validationResult = await ValidatePropertiesAsync(contentCreationModelBase, contentType);
 
         TContent content = New(string.Empty, parent.ParentId ?? Constants.System.Root, contentType);
+
+        // The new entity's ParentKey field is left unresolved by New() (it only has an int to work with) -
+        // populate it directly from the already-validated Guid the caller supplied, rather than leaving it
+        // to be resolved lazily later.
+        content.ParentKey = contentCreationModelBase.ParentKey;
+
         if (contentCreationModelBase.Key.HasValue)
         {
             content.Key = contentCreationModelBase.Key.Value;
@@ -305,7 +311,7 @@ internal abstract class AsyncContentEditingServiceBase<TContent, TContentType, T
                 key,
                 userKey,
                 ContentTrashStatusRequirement.MustNotBeTrashed,
-                MoveToRecycleBin,
+                MoveToRecycleBinAsync,
                 ContentSettings.DisableDeleteWhenReferenced,
                 ContentEditingOperationStatus.CannotMoveToRecycleBinWhenReferenced);
 
@@ -323,25 +329,25 @@ internal abstract class AsyncContentEditingServiceBase<TContent, TContentType, T
                 mustBeTrashed
                     ? ContentTrashStatusRequirement.MustBeTrashed
                     : ContentTrashStatusRequirement.Irrelevant,
-                Delete,
+                DeleteAsync,
                 ContentSettings.DisableDeleteWhenReferenced,
                 ContentEditingOperationStatus.CannotDeleteWhenReferenced);
 
     // helper method to perform move-to-recycle-bin, delete-from-recycle-bin and delete for content as they are very much handled in the same way
     // IContentEditingService methods hitting this (ContentTrashStatusRequirement, calledFunction):
-    // DeleteAsync (irrelevant, Delete)
-    // MoveToRecycleBinAsync (MustNotBeTrashed, MoveToRecycleBin)
-    // DeleteFromRecycleBinAsync (MustBeTrashed, Delete)
+    // DeleteAsync (irrelevant, DeleteAsync)
+    // MoveToRecycleBinAsync (MustNotBeTrashed, MoveToRecycleBinAsync)
+    // DeleteFromRecycleBinAsync (MustBeTrashed, DeleteAsync)
     private async Task<Attempt<TContent?, ContentEditingOperationStatus>> HandleDeletionAsync(
         Guid key,
         Guid userKey,
         ContentTrashStatusRequirement trashStatusRequirement,
-        Func<TContent, int, OperationResult?> performDelete,
+        Func<TContent, Guid, Task<OperationResult?>> performDelete,
         bool disabledWhenReferenced,
         ContentEditingOperationStatus referenceFailStatus)
     {
         using ICoreScope scope = CoreScopeProvider.CreateCoreScope();
-        TContent? content = ContentService.GetById(key);
+        TContent? content = await ContentService.GetByIdAsync(key, CancellationToken.None);
         if (content == null)
         {
             return Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, content);
@@ -380,8 +386,7 @@ internal abstract class AsyncContentEditingServiceBase<TContent, TContentType, T
             }
         }
 
-        var userId = await GetUserIdAsync(userKey);
-        OperationResult? deleteResult = performDelete(content, userId);
+        OperationResult? deleteResult = await performDelete(content, userKey);
 
         scope.Complete();
 
@@ -403,7 +408,7 @@ internal abstract class AsyncContentEditingServiceBase<TContent, TContentType, T
     protected async Task<Attempt<TContent?, ContentEditingOperationStatus>> HandleMoveAsync(Guid key, Guid? parentKey, Guid userKey, bool mustBeInRecycleBin = false, bool includeDescendants = true)
     {
         using ICoreScope scope = CoreScopeProvider.CreateCoreScope();
-        TContent? content = ContentService.GetById(key);
+        TContent? content = await ContentService.GetByIdAsync(key, CancellationToken.None);
         if (content is null)
         {
             return Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, content);
@@ -438,19 +443,20 @@ internal abstract class AsyncContentEditingServiceBase<TContent, TContentType, T
         {
             // at this point the parent MUST exist - unless someone starts using this move method
             // e.g. for blueprints (which should be handled elsewhere).
-            TContent parentContent = ContentService.GetById(parentKey.Value) ?? throw new InvalidOperationException("The content parent ID was validated, but the parent was not found");
+            TContent parentContent = await ContentService.GetByIdAsync(parentKey.Value, CancellationToken.None) ?? throw new InvalidOperationException("The content parent ID was validated, but the parent was not found");
             if (parentContent.Path.GetIdsFromPath().Contains(content.Id))
             {
                 return Attempt.FailWithStatus<TContent?, ContentEditingOperationStatus>(ContentEditingOperationStatus.ParentInvalid, content);
             }
         }
 
-        var userId = await GetUserIdAsync(userKey);
-        OperationResult? moveResult = Move(content, parent.ParentId ?? Constants.System.Root, includeDescendants, userId);
+        ContentEditingOperationStatus moveStatus = await MoveAsync(content, parentKey, includeDescendants, userKey);
 
         scope.Complete();
 
-        return OperationResultToAttempt(content, moveResult);
+        return moveStatus == ContentEditingOperationStatus.Success
+            ? Attempt.SucceedWithStatus<TContent?, ContentEditingOperationStatus>(moveStatus, content)
+            : Attempt.FailWithStatus<TContent?, ContentEditingOperationStatus>(moveStatus, content);
     }
 
     /// <summary>
@@ -465,7 +471,7 @@ internal abstract class AsyncContentEditingServiceBase<TContent, TContentType, T
     protected async Task<Attempt<TContent?, ContentEditingOperationStatus>> HandleCopyAsync(Guid key, Guid? parentKey, bool relateToOriginal, bool includeDescendants, Guid userKey)
     {
         using ICoreScope scope = CoreScopeProvider.CreateCoreScope();
-        TContent? content = ContentService.GetById(key);
+        TContent? content = await ContentService.GetByIdAsync(key, CancellationToken.None);
         if (content is null)
         {
             return Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, content);
@@ -483,7 +489,7 @@ internal abstract class AsyncContentEditingServiceBase<TContent, TContentType, T
             return Attempt.FailWithStatus<TContent?, ContentEditingOperationStatus>(parent.OperationStatus, content);
         }
 
-        TContent? copy = await CopyAsync(content, parent.ParentId ?? Constants.System.Root, relateToOriginal, includeDescendants, userKey);
+        TContent? copy = await CopyAsync(content, parentKey, relateToOriginal, includeDescendants, userKey);
         scope.Complete();
 
         // we'll assume that we have performed all validations for unsuccessful scenarios above, so a null result here
@@ -525,6 +531,12 @@ internal abstract class AsyncContentEditingServiceBase<TContent, TContentType, T
     /// <returns>The user ID.</returns>
     protected async Task<int> GetUserIdAsync(Guid userKey) => await _userIdKeyResolver.GetAsync(userKey);
 
+    /// <summary>
+    /// Gets the content type and validates that the variants of the editing model match its variance.
+    /// </summary>
+    /// <param name="contentTypeKey">The key of the content type.</param>
+    /// <param name="contentEditingModelBase">The editing model whose variants are validated against the content type.</param>
+    /// <returns>An attempt containing the content type and operation status.</returns>
     protected virtual async Task<Attempt<TContentType?, ContentEditingOperationStatus>> TryGetAndValidateContentTypeAsync(Guid contentTypeKey, ContentEditingModelBase contentEditingModelBase)
     {
         TContentType? contentType = await ContentTypeService.GetAsync(contentTypeKey);
@@ -600,7 +612,7 @@ internal abstract class AsyncContentEditingServiceBase<TContent, TContentType, T
     protected virtual async Task<(int? ParentId, ContentEditingOperationStatus OperationStatus)> TryGetAndValidateParentIdAsync(Guid? parentKey, TContentType contentType)
     {
         TContent? parent = parentKey.HasValue
-            ? ContentService.GetById(parentKey.Value)
+            ? await ContentService.GetByIdAsync(parentKey.Value, CancellationToken.None)
             : null;
 
         if (parentKey.HasValue && parent == null)

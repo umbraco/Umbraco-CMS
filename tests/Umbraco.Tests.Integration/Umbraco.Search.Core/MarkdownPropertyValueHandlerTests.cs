@@ -14,7 +14,7 @@ public class MarkdownPropertyValueHandlerTests : ContentTestBase
     private IContentType _contentType;
 
     [Test]
-    public void MarkdownEditor_CanIndexAllTextRelevanceLevels()
+    public async Task MarkdownEditor_CanIndexAllTextRelevanceLevels()
     {
         Content content = new ContentBuilder()
             .WithContentType(_contentType)
@@ -49,7 +49,7 @@ public class MarkdownPropertyValueHandlerTests : ContentTestBase
                 })
             .Build();
 
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.DraftContent);
         Assert.That(documents, Has.Count.EqualTo(1));
@@ -69,7 +69,7 @@ public class MarkdownPropertyValueHandlerTests : ContentTestBase
     }
 
     [Test]
-    public void MarkdownEditor_IncludesTextFromNestedTags()
+    public async Task MarkdownEditor_IncludesTextFromNestedTags()
     {
         Content content = new ContentBuilder()
             .WithContentType(_contentType)
@@ -86,7 +86,7 @@ public class MarkdownPropertyValueHandlerTests : ContentTestBase
                 })
             .Build();
 
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.DraftContent);
         Assert.That(documents, Has.Count.EqualTo(1));
@@ -99,7 +99,7 @@ public class MarkdownPropertyValueHandlerTests : ContentTestBase
 
     [TestCase(null)]
     [TestCase("")]
-    public void MarkdownEditor_IgnoresEmptyValues(object? value)
+    public async Task MarkdownEditor_IgnoresEmptyValues(object? value)
     {
         Content content = new ContentBuilder()
             .WithContentType(_contentType)
@@ -111,7 +111,7 @@ public class MarkdownPropertyValueHandlerTests : ContentTestBase
                 })
             .Build();
 
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.DraftContent);
         Assert.That(documents, Has.Count.EqualTo(1));
@@ -123,7 +123,7 @@ public class MarkdownPropertyValueHandlerTests : ContentTestBase
     [TestCase(true)]
     [TestCase(123)]
     [TestCase("A text string")]
-    public void MarkdownEditor_IncludesSimpleValues(object value)
+    public async Task MarkdownEditor_IncludesSimpleValues(object value)
     {
         Content content = new ContentBuilder()
             .WithContentType(_contentType)
@@ -135,7 +135,7 @@ public class MarkdownPropertyValueHandlerTests : ContentTestBase
                 })
             .Build();
 
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.DraftContent);
         Assert.That(documents, Has.Count.EqualTo(1));
@@ -158,7 +158,7 @@ public class MarkdownPropertyValueHandlerTests : ContentTestBase
             .WithAlias(Constants.PropertyEditors.Aliases.MarkdownEditor)
             .Done()
             .Build();
-        await GetRequiredService<IDataTypeService>().CreateAsync(markdownDataType, Constants.Security.SuperUserKey);
+        await GetRequiredService<IDataTypeService>().CreateAsync(markdownDataType, Cms.Core.Constants.Security.SuperUserKey);
 
         _contentType = new ContentTypeBuilder()
             .WithAlias("markdownEditor")
@@ -169,7 +169,7 @@ public class MarkdownPropertyValueHandlerTests : ContentTestBase
             .Done()
             .Build();
 
-        await ContentTypeService.CreateAsync(_contentType, Constants.Security.SuperUserKey);
+        await ContentTypeService.CreateAsync(_contentType, Cms.Core.Constants.Security.SuperUserKey);
 
         IndexerAndSearcher.Reset();
     }

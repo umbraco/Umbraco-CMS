@@ -67,7 +67,7 @@ public class ByKeyPublishedElementController : ElementControllerBase
             return Forbidden();
         }
 
-        IElement? element = _elementService.GetById(id);
+        IElement? element = await _elementService.GetByIdAsync(id, cancellationToken);
         if (element is null || element.Published is false)
         {
             return ContentEditingOperationStatusResult(ContentEditingOperationStatus.NotFound);
