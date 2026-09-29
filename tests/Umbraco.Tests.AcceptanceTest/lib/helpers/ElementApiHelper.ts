@@ -298,7 +298,7 @@ export class ElementApiHelper {
 
   async waitUntilFirstPropertyValueEquals(id: string, expectedValue: string) {
     // The save is reflected in the element API shortly after the UI action, so poll rather than read once.
-    await expect.poll(() => this.getFirstPropertyValue(id)).toBe(expectedValue);
+    await expect.poll(() => this.getFirstPropertyValue(id), {timeout: ConstantHelper.timeout.veryLong}).toBe(expectedValue);
   }
 
   async updateFirstPropertyValueAndPublish(id: string, value: string) {

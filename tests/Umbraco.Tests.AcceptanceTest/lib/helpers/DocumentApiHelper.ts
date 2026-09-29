@@ -1184,20 +1184,20 @@ export class DocumentApiHelper {
   }
 
   async createDefaultDocumentWithAnEmptyBlockListEditor(documentName: string, elementTypeId: string, documentTypeName: string, blockListDataTypeName: string) {
-    const blockListDataTypeId = await this.api.dataType.createBlockListDataTypeWithABlock(blockListDataTypeName, elementTypeId) || '';
-    const documentTypeId = await this.api.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, blockListDataTypeName, blockListDataTypeId) || '';
+    const blockListDataTypeId = await this.api.dataType.createBlockListDataTypeWithABlock(blockListDataTypeName, elementTypeId);
+    const documentTypeId = await this.api.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, blockListDataTypeName, blockListDataTypeId);
     return await this.createDefaultDocument(documentName, documentTypeId);
   }
 
   async createDefaultDocumentWithAnEmptyBlockGridEditor(documentName: string, elementTypeId: string, documentTypeName: string, blockGridDataTypeName: string) {
-    const blockGridDataTypeId = await this.api.dataType.createBlockGridWithABlock(blockGridDataTypeName, elementTypeId) || '';
-    const documentTypeId = await this.api.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, blockGridDataTypeName, blockGridDataTypeId) || '';
+    const blockGridDataTypeId = await this.api.dataType.createBlockGridWithABlock(blockGridDataTypeName, elementTypeId);
+    const documentTypeId = await this.api.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, blockGridDataTypeName, blockGridDataTypeId);
     return await this.createDefaultDocument(documentName, documentTypeId);
   }
 
   async createDefaultDocumentWithAnEmptyRichTextEditor(documentName: string, elementTypeId: string, documentTypeName: string, richTextDataTypeName: string) {
-    const richTextDataTypeId = await this.api.dataType.createRichTextEditorWithABlock(richTextDataTypeName, elementTypeId) || '';
-    const documentTypeId = await this.api.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, richTextDataTypeName, richTextDataTypeId) || '';
+    const richTextDataTypeId = await this.api.dataType.createRichTextEditorWithABlock(richTextDataTypeName, elementTypeId);
+    const documentTypeId = await this.api.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, richTextDataTypeName, richTextDataTypeId);
     return await this.createDefaultDocument(documentName, documentTypeId);
   }
 
@@ -1212,8 +1212,8 @@ export class DocumentApiHelper {
   }
 
   async createDefaultDocumentWithAnEmptySingleBlockEditor(documentName: string, elementTypeId: string, documentTypeName: string, singleBlockDataTypeName: string) {
-    const singleBlockDataTypeId = await this.api.dataType.createSingleBlockDataTypeWithABlock(singleBlockDataTypeName, elementTypeId) || '';
-    const documentTypeId = await this.api.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, singleBlockDataTypeName, singleBlockDataTypeId) || '';
+    const singleBlockDataTypeId = await this.api.dataType.createSingleBlockDataTypeWithABlock(singleBlockDataTypeName, elementTypeId);
+    const documentTypeId = await this.api.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, singleBlockDataTypeName, singleBlockDataTypeId);
     return await this.createDefaultDocument(documentName, documentTypeId);
   }
 
