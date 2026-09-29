@@ -3,6 +3,9 @@ import { Link } from '../../externals.js';
 export const UmbLink = Link.extend({
 	name: 'umbLink',
 
+	// Excluded from "Clear formatting" (`unsetAllMarks()`) so links survive it; use `unsetUmbLink()` to remove a link explicitly.
+	clearable: false,
+
 	addAttributes() {
 		return {
 			...this.parent?.(),

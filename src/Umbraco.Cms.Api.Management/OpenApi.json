@@ -16625,8 +16625,7 @@
             "name": "baseUrl",
             "in": "query",
             "schema": {
-              "type": "string",
-              "default": "https://our.umbraco.com"
+              "type": "string"
             }
           }
         ],
@@ -43349,6 +43348,7 @@
       },
       "DocumentBlueprintTreeItemResponseModel": {
         "required": [
+          "variants",
           "isFolder",
           "noAccess",
           "name",
@@ -43367,6 +43367,12 @@
                 "$ref": "#/components/schemas/DocumentTypeReferenceResponseModel"
               }
             ]
+          },
+          "variants": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DocumentVariantItemResponseModel"
+            }
           },
           "isFolder": {
             "type": "boolean"
@@ -43409,6 +43415,7 @@
           "isProtected",
           "ancestors",
           "sortOrder",
+          "hasChildren",
           "id",
           "flags",
           "values",
@@ -43446,6 +43453,9 @@
           "sortOrder": {
             "type": "integer",
             "format": "int32"
+          },
+          "hasChildren": {
+            "type": "boolean"
           },
           "id": {
             "type": "string",
@@ -46688,6 +46698,7 @@
         "required": [
           "mediaType",
           "sortOrder",
+          "hasChildren",
           "id",
           "flags",
           "values",
@@ -46698,6 +46709,12 @@
           "mediaType": {
             "$ref": "#/components/schemas/MediaTypeCollectionReferenceResponseModel"
           },
+          "extension": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
           "creator": {
             "type": [
               "null",
@@ -46707,6 +46724,9 @@
           "sortOrder": {
             "type": "integer",
             "format": "int32"
+          },
+          "hasChildren": {
+            "type": "boolean"
           },
           "id": {
             "type": "string",
@@ -46776,6 +46796,12 @@
           },
           "mediaType": {
             "$ref": "#/components/schemas/MediaTypeReferenceResponseModel"
+          },
+          "extension": {
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "variants": {
             "type": "array",
@@ -46893,6 +46919,12 @@
         "properties": {
           "mediaType": {
             "$ref": "#/components/schemas/MediaTypeReferenceResponseModel"
+          },
+          "extension": {
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "variants": {
             "type": "array",
