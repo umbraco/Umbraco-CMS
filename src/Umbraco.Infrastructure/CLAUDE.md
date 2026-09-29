@@ -11,7 +11,7 @@ Implementation layer for Umbraco CMS, providing concrete implementations of all 
 ## 1. Architecture
 
 ### Target Framework
-- **.NET 10.0** (`net10.0`)
+- **.NET 11.0** (`net11.0`)
 - **C# 12** with nullable reference types enabled
 - **Library** (no executable)
 
@@ -192,7 +192,7 @@ dotnet list src/Umbraco.Infrastructure package --outdated
 ```
 
 ### Environment Setup
-1. **Prerequisites**: .NET 10 SDK, SQL Server or SQLite
+1. **Prerequisites**: .NET 11 SDK, SQL Server or SQLite
 2. **IDE**: Visual Studio 2022, Rider, or VS Code
 3. **Database**: Automatically created on first run (see Install/DatabaseSchemaCreator.cs)
 

@@ -221,6 +221,26 @@ public class ObjectExtensionsTests
     }
 
     [Test]
+    public void ConvertToDecimalFromFloatingPointUsesShortestRepresentation()
+    {
+        var conv = 56.78d.TryConvertTo<decimal>();
+        Assert.IsTrue(conv);
+        Assert.AreEqual(56.78m, conv.Result);
+
+        conv = 12.4552d.TryConvertTo<decimal>();
+        Assert.IsTrue(conv);
+        Assert.AreEqual(12.4552m, conv.Result);
+
+        conv = 1.65f.TryConvertTo<decimal>();
+        Assert.IsTrue(conv);
+        Assert.AreEqual(1.65m, conv.Result);
+
+        var nullableConv = 56.78d.TryConvertTo<decimal?>();
+        Assert.IsTrue(nullableConv);
+        Assert.AreEqual(56.78m, nullableConv.Result);
+    }
+
+    [Test]
     public void ConvertToNullableDecimalTest()
     {
         var conv = "100".TryConvertTo<decimal?>();

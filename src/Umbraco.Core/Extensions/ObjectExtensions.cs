@@ -294,6 +294,19 @@ public static class ObjectExtensions
 
                 // TODO: Do a check for destination type being IEnumerable<T> and source type implementing IEnumerable<T> with
                 // the same 'T', then we'd have to find the extension method for the type AsEnumerable() and execute it.
+                // Floating-point inputs carry human-entered decimals, so convert via their shortest representation
+                // rather than the exact binary expansion a checked conversion produces.
+                if (target == typeof(decimal))
+                {
+                    switch (input)
+                    {
+                        case double doubleInput:
+                            return Attempt<object?>.Succeed(doubleInput.ToShortestDecimal());
+                        case float floatInput:
+                            return Attempt<object?>.Succeed(floatInput.ToShortestDecimal());
+                    }
+                }
+
                 if (GetCachedCanAssign(input, inputType, target))
                 {
                     return Attempt.Succeed(Convert.ChangeType(input, target));

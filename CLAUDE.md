@@ -1,6 +1,6 @@
 # Umbraco CMS - Multi-Project Repository
 
-Enterprise-grade CMS built on .NET 10.0. This repository contains 21 production projects organized in a layered architecture with clear separation of concerns.
+Enterprise-grade CMS built on .NET 11.0. This repository contains 21 production projects organized in a layered architecture with clear separation of concerns.
 
 **Repository**: https://github.com/umbraco/Umbraco-CMS
 **License**: MIT
@@ -42,7 +42,7 @@ Enterprise-grade CMS built on .NET 10.0. This repository contains 21 production 
 
 ### Key Technologies
 
-- **.NET 10.0** - Target framework for all projects
+- **.NET 11.0** - Target framework for all projects
 - **ASP.NET Core** - Web framework
 - **Entity Framework Core** - Modern ORM
 - **OpenIddict** - OAuth 2.0/OpenID Connect authentication

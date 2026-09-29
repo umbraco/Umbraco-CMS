@@ -750,6 +750,9 @@ export type DocumentConfigurationResponseModel = {
     disableDeleteWhenReferenced: boolean;
     disableUnpublishWhenReferenced: boolean;
     allowEditInvariantFromNonDefault: boolean;
+    /**
+     * @deprecated
+     */
     allowNonExistingSegmentsCreation: boolean;
 };
 
@@ -1048,6 +1051,9 @@ export type ElementConfigurationResponseModel = {
     disableDeleteWhenReferenced: boolean;
     disableUnpublishWhenReferenced: boolean;
     allowEditInvariantFromNonDefault: boolean;
+    /**
+     * @deprecated
+     */
     allowNonExistingSegmentsCreation: boolean;
 };
 
@@ -1589,6 +1595,9 @@ export type MediaCollectionResponseModel = {
 
 export type MediaConfigurationResponseModel = {
     disableDeleteWhenReferenced: boolean;
+    /**
+     * @deprecated
+     */
     disableUnpublishWhenReferenced: boolean;
 };
 
@@ -2715,6 +2724,9 @@ export type SecurityConfigurationResponseModel = {
 export type SegmentResponseModel = {
     name: string;
     alias: string;
+    /**
+     * @deprecated
+     */
     cultures?: null | Array<string>;
 };
 
@@ -3360,6 +3372,9 @@ export type UpdateWebhookRequestModel = {
     };
 };
 
+/**
+ * @deprecated
+ */
 export type UpgradeCheckResponseModel = {
     type: string;
     comment: string;
@@ -3371,7 +3386,7 @@ export type UpgradeSettingsResponseModel = {
     newState: string;
     newVersion: string;
     oldVersion: string;
-    reportUrl: null | string;
+    reportUrl: string;
 };
 
 export type UserConfigurationResponseModel = {

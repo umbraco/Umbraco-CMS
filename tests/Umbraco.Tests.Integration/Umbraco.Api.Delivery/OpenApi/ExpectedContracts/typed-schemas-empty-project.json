@@ -1,5 +1,5 @@
 {
-  "openapi": "3.1.1",
+  "openapi": "3.1.2",
   "info": {
     "title": "Umbraco Delivery API",
     "description": "You can find out more about the Umbraco Delivery API in [the documentation](https://docs.umbraco.com/umbraco-cms/reference/content-delivery-api).",
@@ -1279,10 +1279,7 @@
         "type": "object",
         "properties": {
           "contentType": {
-            "type": [
-              "null",
-              "string"
-            ]
+            "type": "string"
           },
           "name": {
             "type": [
@@ -1306,10 +1303,7 @@
             "type": "object",
             "properties": {
               "path": {
-                "type": [
-                  "null",
-                  "string"
-                ]
+                "type": "string"
               },
               "queryString": {
                 "type": [
@@ -1329,10 +1323,7 @@
                     "format": "uuid"
                   },
                   "path": {
-                    "type": [
-                      "null",
-                      "string"
-                    ]
+                    "type": "string"
                   }
                 }
               }
@@ -1343,10 +1334,7 @@
             "format": "uuid"
           },
           "properties": {
-            "type": [
-              "null",
-              "object"
-            ]
+            "type": "object"
           }
         }
       },
@@ -1372,10 +1360,7 @@
         "type": "object",
         "properties": {
           "contentType": {
-            "type": [
-              "null",
-              "string"
-            ]
+            "type": "string"
           },
           "name": {
             "type": [
@@ -1399,10 +1384,7 @@
             "type": "object",
             "properties": {
               "path": {
-                "type": [
-                  "null",
-                  "string"
-                ]
+                "type": "string"
               },
               "queryString": {
                 "type": [
@@ -1422,10 +1404,7 @@
                     "format": "uuid"
                   },
                   "path": {
-                    "type": [
-                      "null",
-                      "string"
-                    ]
+                    "type": "string"
                   }
                 }
               }
@@ -1436,16 +1415,10 @@
             "format": "uuid"
           },
           "properties": {
-            "type": [
-              "null",
-              "object"
-            ]
+            "type": "object"
           },
           "cultures": {
-            "type": [
-              "null",
-              "object"
-            ],
+            "type": "object",
             "additionalProperties": {
               "required": [
                 "path",
@@ -1454,10 +1427,7 @@
               "type": "object",
               "properties": {
                 "path": {
-                  "type": [
-                    "null",
-                    "string"
-                  ]
+                  "type": "string"
                 },
                 "queryString": {
                   "type": [
@@ -1477,10 +1447,7 @@
                       "format": "uuid"
                     },
                     "path": {
-                      "type": [
-                        "null",
-                        "string"
-                      ]
+                      "type": "string"
                     }
                   }
                 }
@@ -1507,10 +1474,7 @@
         "type": "object",
         "properties": {
           "contentType": {
-            "type": [
-              "null",
-              "string"
-            ]
+            "type": "string"
           },
           "id": {
             "type": "string",
@@ -1523,10 +1487,7 @@
             ]
           },
           "properties": {
-            "type": [
-              "null",
-              "object"
-            ]
+            "type": "object"
           }
         }
       },
@@ -1566,22 +1527,13 @@
             "format": "uuid"
           },
           "name": {
-            "type": [
-              "null",
-              "string"
-            ]
+            "type": "string"
           },
           "mediaType": {
-            "type": [
-              "null",
-              "string"
-            ]
+            "type": "string"
           },
           "url": {
-            "type": [
-              "null",
-              "string"
-            ]
+            "type": "string"
           },
           "extension": {
             "type": [
@@ -1611,10 +1563,7 @@
             "format": "int32"
           },
           "properties": {
-            "type": [
-              "null",
-              "object"
-            ]
+            "type": "object"
           }
         }
       },
@@ -1673,10 +1622,7 @@
         "type": "object",
         "properties": {
           "path": {
-            "type": [
-              "null",
-              "string"
-            ]
+            "type": "string"
           },
           "createDate": {
             "type": "string",
@@ -1703,22 +1649,13 @@
             "format": "uuid"
           },
           "name": {
-            "type": [
-              "null",
-              "string"
-            ]
+            "type": "string"
           },
           "mediaType": {
-            "type": [
-              "null",
-              "string"
-            ]
+            "type": "string"
           },
           "url": {
-            "type": [
-              "null",
-              "string"
-            ]
+            "type": "string"
           },
           "extension": {
             "type": [
@@ -1748,10 +1685,7 @@
             "format": "int32"
           },
           "properties": {
-            "type": [
-              "null",
-              "object"
-            ]
+            "type": "object"
           }
         }
       },

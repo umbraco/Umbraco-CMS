@@ -3,7 +3,7 @@
 Entity Framework Core persistence layer for Umbraco CMS. This project provides EF Core integration including scoping, distributed locking, and migration infrastructure.
 
 **Project Type**: Class Library (NuGet package)
-**Target Framework**: net10.0
+**Target Framework**: net11.0
 **Dependencies**: Umbraco.Core, Umbraco.Infrastructure
 
 ---

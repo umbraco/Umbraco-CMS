@@ -55,7 +55,7 @@ public class SliderPropertyValueEditorTests
     [TestCase("0", 0)]
     [TestCase("-1", -1)]
     [TestCase("123456789", 123456789)]
-    [TestCase("123.45", 123.45)]
+    [TestCase("123.45", "123.45")]
     public void Can_Parse_Single_Value_To_Editor(string value, decimal expected)
     {
         var toEditor = ToEditor(value) as SliderPropertyEditor.SliderPropertyValueEditor.SliderRange;
@@ -68,9 +68,9 @@ public class SliderPropertyValueEditorTests
     [TestCase("0,0", 0, 0)]
     [TestCase("-1,-1", -1, -1)]
     [TestCase("10,123456789", 10, 123456789)]
-    [TestCase("1.234,56", 1.234, 56)]
-    [TestCase("4,6.234", 4, 6.234)]
-    [TestCase("10.45,15.3", 10.45, 15.3)]
+    [TestCase("1.234,56", "1.234", 56)]
+    [TestCase("4,6.234", 4, "6.234")]
+    [TestCase("10.45,15.3", "10.45", "15.3")]
     public void Can_Parse_Range_Value_To_Editor(string value, decimal expectedFrom, decimal expectedTo)
     {
         var toEditor = ToEditor(value) as SliderPropertyEditor.SliderPropertyValueEditor.SliderRange;
@@ -84,10 +84,10 @@ public class SliderPropertyValueEditorTests
     [TestCase(0, 0, "0")]
     [TestCase(-10, -10, "-10")]
     [TestCase(10, 123456789, "10,123456789")]
-    [TestCase(1.5, 1.5, "1.5")]
-    [TestCase(0, 0.5, "0,0.5")]
-    [TestCase(5, 5.4, "5,5.4")]
-    [TestCase(0.5, 0.6, "0.5,0.6")]
+    [TestCase("1.5", "1.5", "1.5")]
+    [TestCase(0, "0.5", "0,0.5")]
+    [TestCase(5, "5.4", "5,5.4")]
+    [TestCase("0.5", "0.6", "0.5,0.6")]
     public void Can_Parse_Valid_Value_From_Editor(decimal from, decimal to, string expectedResult)
     {
         var value = JsonNode.Parse($"{{\"from\": {from}, \"to\": {to}}}");
@@ -116,10 +116,10 @@ public class SliderPropertyValueEditorTests
         Assert.IsNull(result);
     }
 
-    [TestCase(true, 1.1, 1.1, true)]
-    [TestCase(true, 1.1, 1.3, true)]
-    [TestCase(false, 1.1, 1.1, true)]
-    [TestCase(false, 1.1, 1.3, false)]
+    [TestCase(true, "1.1", "1.1", true)]
+    [TestCase(true, "1.1", "1.3", true)]
+    [TestCase(false, "1.1", "1.1", true)]
+    [TestCase(false, "1.1", "1.3", false)]
     public void Validates_Contains_Range_Only_When_Enabled(bool enableRange, decimal from, decimal to, bool expectedSuccess)
     {
         var value = new JsonObject
@@ -142,9 +142,9 @@ public class SliderPropertyValueEditorTests
         }
     }
 
-    [TestCase(1.1, 1.1, true)]
-    [TestCase(1.1, 1.3, true)]
-    [TestCase(1.3, 1.1, false)]
+    [TestCase("1.1", "1.1", true)]
+    [TestCase("1.1", "1.3", true)]
+    [TestCase("1.3", "1.1", false)]
     public void Validates_Contains_Valid_Range_Only_When_Enabled(decimal from, decimal to, bool expectedSuccess)
     {
         var value = new JsonObject
@@ -167,9 +167,9 @@ public class SliderPropertyValueEditorTests
         }
     }
 
-    [TestCase(0.9, 1.1, false)]
-    [TestCase(1.1, 1.1, true)]
-    [TestCase(1.3, 1.7, true)]
+    [TestCase("0.9", "1.1", false)]
+    [TestCase("1.1", "1.1", true)]
+    [TestCase("1.3", "1.7", true)]
     public void Validates_Is_Greater_Than_Or_Equal_To_Configured_Min(decimal from, decimal to, bool expectedSuccess)
     {
         var value = new JsonObject
@@ -192,9 +192,9 @@ public class SliderPropertyValueEditorTests
         }
     }
 
-    [TestCase(1.3, 1.7, true)]
-    [TestCase(1.9, 1.9, true)]
-    [TestCase(1.9, 2.1, false)]
+    [TestCase("1.3", "1.7", true)]
+    [TestCase("1.9", "1.9", true)]
+    [TestCase("1.9", "2.1", false)]
     public void Validates_Is_Less_Than_Or_Equal_To_Configured_Max(decimal from, decimal to, bool expectedSuccess)
     {
         var value = new JsonObject
@@ -232,10 +232,10 @@ public class SliderPropertyValueEditorTests
         Assert.IsEmpty(result);
     }
 
-    [TestCase(0.2, 1.3, 1.7, true)]
-    [TestCase(0.2, 1.4, 1.7, false)]
-    [TestCase(0.2, 1.3, 1.6, false)]
-    [TestCase(0.0, 1.4, 1.7, true)] // A step of zero would trigger a divide by zero error in evaluating. So we always pass validation for zero, as effectively any step value is valid.
+    [TestCase("0.2", "1.3", "1.7", true)]
+    [TestCase("0.2", "1.4", "1.7", false)]
+    [TestCase("0.2", "1.3", "1.6", false)]
+    [TestCase("0.0", "1.4", "1.7", true)] // A step of zero would trigger a divide by zero error in evaluating. So we always pass validation for zero, as effectively any step value is valid.
     public void Validates_Matches_Configured_Step(decimal step, decimal from, decimal to, bool expectedSuccess)
     {
         var value = new JsonObject
@@ -271,13 +271,13 @@ public class SliderPropertyValueEditorTests
         return CreateValueEditor().ToEditor(property.Object);
     }
 
-    [TestCase(1.1, 1.1, 0, true)]
-    [TestCase(1.1, 1.1, 0.1, false)]
-    [TestCase(1.1, 1.3, 0.4, false)]
-    [TestCase(1.1, 1.5, 0.4, true)]
-    [TestCase(1.1, 1.9, 0.2, true)]
-    [TestCase(1.1, 1.1, -1, true)] // Negative minimumRange treated as 0
-    [TestCase(1.1, 1.3, -0.5, true)] // Negative minimumRange treated as 0
+    [TestCase("1.1", "1.1", 0, true)]
+    [TestCase("1.1", "1.1", "0.1", false)]
+    [TestCase("1.1", "1.3", "0.4", false)]
+    [TestCase("1.1", "1.5", "0.4", true)]
+    [TestCase("1.1", "1.9", "0.2", true)]
+    [TestCase("1.1", "1.1", -1, true)] // Negative minimumRange treated as 0
+    [TestCase("1.1", "1.3", "-0.5", true)] // Negative minimumRange treated as 0
     public void Validates_Minimum_Range_When_Range_Enabled(decimal from, decimal to, decimal minimumRange, bool expectedSuccess)
     {
         var value = new JsonObject
@@ -300,7 +300,7 @@ public class SliderPropertyValueEditorTests
         }
     }
 
-    [TestCase(1.3, 1.3, 0.2, true)]
+    [TestCase("1.3", "1.3", "0.2", true)]
     public void Minimum_Range_Not_Applied_When_Range_Disabled(decimal from, decimal to, decimal minimumRange, bool expectedSuccess)
     {
         var value = new JsonObject
