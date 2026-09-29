@@ -1,19 +1,15 @@
 import { UmbMediaTypeDetailRepository } from '../../media-types/repository/detail/media-type-detail.repository.js';
 import { UmbMediaPropertyDatasetContext } from '../property-dataset-context/media-property-dataset-context.js';
 import { UMB_MEDIA_ENTITY_TYPE } from '../entity.js';
-import { UMB_MEDIA_DETAIL_REPOSITORY_ALIAS } from '../constants.js';
+import { UMB_MEDIA_DETAIL_REPOSITORY_ALIAS, UMB_MEDIA_RECYCLE_BIN_ROOT_WORKSPACE_PATH } from '../constants.js';
 import type { UmbMediaDetailModel, UmbMediaVariantModel } from '../types.js';
 import { UMB_CREATE_MEDIA_WORKSPACE_PATH_PATTERN, UMB_EDIT_MEDIA_WORKSPACE_PATH_PATTERN } from '../paths.js';
 import { UmbMediaValidationRepository } from '../repository/validation/media-validation.repository.js';
 import { UMB_MEDIA_COLLECTION_ALIAS } from '../collection/constants.js';
 import type { UmbMediaDetailRepository } from '../repository/index.js';
 import { UMB_MEDIA_WORKSPACE_ALIAS, UMB_MEMBER_DETAIL_MODEL_VARIANT_SCAFFOLD } from './constants.js';
+import { UMB_MEDIA_SECTION_PATH } from '../../media-section/paths.js';
 import { UmbContentDetailWorkspaceContextBase, type UmbContentWorkspaceContext } from '@umbraco-cms/backoffice/content';
-import {
-	UmbEntityRestoredFromRecycleBinEvent,
-	UmbEntityTrashedEvent,
-	UmbIsTrashedEntityContext,
-} from '@umbraco-cms/backoffice/recycle-bin';
 import {
 	UmbWorkspaceIsNewRedirectController,
 	UmbWorkspaceIsNewRedirectControllerAlias,
@@ -21,9 +17,8 @@ import {
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UMB_MEDIA_TYPE_ENTITY_TYPE, type UmbMediaTypeDetailModel } from '@umbraco-cms/backoffice/media-type';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
-import type { UmbVariantGuardRule } from '@umbraco-cms/backoffice/utils';
-import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbEntityContentTypeEntityContext } from '@umbraco-cms/backoffice/content-type';
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 
 type ContentModel = UmbMediaDetailModel;
 type ContentTypeModel = UmbMediaTypeDetailModel;
@@ -46,9 +41,7 @@ export class UmbMediaWorkspaceContext
 	readonly contentTypeHasCollection = this._data.createObservablePartOfCurrent((data) => !!data?.mediaType.collection);
 	readonly contentTypeIcon = this._data.createObservablePartOfCurrent((data) => data?.mediaType.icon);
 
-	#isTrashedContext = new UmbIsTrashedEntityContext(this);
 	#entityContentTypeContext = new UmbEntityContentTypeEntityContext(this);
-	#actionEventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
 
 	constructor(host: UmbControllerHost) {
 		super(host, {
@@ -73,14 +66,6 @@ export class UmbMediaWorkspaceContext
 			},
 			null,
 		);
-
-		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (actionEventContext) => {
-			this.#removeEventListeners();
-			this.#actionEventContext = actionEventContext;
-			this.#addEventListeners();
-		});
-
-		this.observe(this.isTrashed, (isTrashed) => this.#onTrashStateChange(isTrashed));
 
 		// TODO: This is done by the content detail base class, so we can remove it from there and only do it here. [NL]
 		this.propertyViewGuard.fallbackToPermitted();
@@ -120,8 +105,14 @@ export class UmbMediaWorkspaceContext
 
 	public override resetState() {
 		super.resetState();
-		this.#isTrashedContext.setIsTrashed(false);
 		this.removeUmbControllerByAlias(UmbWorkspaceIsNewRedirectControllerAlias);
+	}
+
+	protected override _getNavigationParentItemPath(entity: UmbEntityModel | undefined): string | undefined {
+		if (!entity?.unique) {
+			return this._data.getCurrent()?.isTrashed ? UMB_MEDIA_RECYCLE_BIN_ROOT_WORKSPACE_PATH : UMB_MEDIA_SECTION_PATH;
+		}
+		return UMB_EDIT_MEDIA_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: entity.unique });
 	}
 
 	/*
@@ -165,53 +156,6 @@ export class UmbMediaWorkspaceContext
 		variantId: UmbVariantId,
 	): UmbMediaPropertyDatasetContext {
 		return new UmbMediaPropertyDatasetContext(host, this, variantId);
-	}
-
-	#addEventListeners() {
-		this.#actionEventContext?.addEventListener(UmbEntityTrashedEvent.TYPE, this.#onRecycleBinEvent as EventListener);
-		this.#actionEventContext?.addEventListener(
-			UmbEntityRestoredFromRecycleBinEvent.TYPE,
-			this.#onRecycleBinEvent as EventListener,
-		);
-	}
-
-	#removeEventListeners() {
-		this.#actionEventContext?.removeEventListener(UmbEntityTrashedEvent.TYPE, this.#onRecycleBinEvent as EventListener);
-		this.#actionEventContext?.removeEventListener(
-			UmbEntityRestoredFromRecycleBinEvent.TYPE,
-			this.#onRecycleBinEvent as EventListener,
-		);
-	}
-
-	#onRecycleBinEvent = (event: UmbEntityTrashedEvent | UmbEntityRestoredFromRecycleBinEvent) => {
-		const unique = this.getUnique();
-		const entityType = this.getEntityType();
-		if (event.getUnique() !== unique || event.getEntityType() !== entityType) return;
-		this.reload();
-	};
-
-	#onTrashStateChange(isTrashed?: boolean) {
-		this.#isTrashedContext.setIsTrashed(isTrashed ?? false);
-
-		const guardUnique = `UMB_PREVENT_EDIT_TRASHED_ITEM`;
-
-		if (!isTrashed) {
-			this.readOnlyGuard.removeRule(guardUnique);
-			return;
-		}
-
-		const rule: UmbVariantGuardRule = {
-			unique: guardUnique,
-			permitted: true,
-		};
-
-		// TODO: Change to use property write guard when it supports making the name read-only.
-		this.readOnlyGuard.addRule(rule);
-	}
-
-	public override destroy(): void {
-		this.#removeEventListeners();
-		super.destroy();
 	}
 }
 

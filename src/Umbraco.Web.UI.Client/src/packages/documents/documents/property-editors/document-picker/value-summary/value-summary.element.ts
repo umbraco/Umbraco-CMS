@@ -1,7 +1,7 @@
-import { customElement, html, nothing, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbValueSummaryElementBase } from '@umbraco-cms/backoffice/value-summary';
 import { UmbDocumentItemDataResolver } from '../../../item/document-item-data-resolver.js';
 import type { UmbDocumentItemModel } from '../../../item/repository/types.js';
+import { customElement, html, nothing, state } from '@umbraco-cms/backoffice/external/lit';
+import { UmbValueSummaryElementBase } from '@umbraco-cms/backoffice/value-summary';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 
 @customElement('umb-document-picker-property-editor-value-summary')
@@ -15,7 +15,7 @@ export class UmbDocumentPickerPropertyEditorValueSummaryElement extends UmbValue
 
 	constructor() {
 		super();
-		this.observe(this.#resolver.name, (name) => (this._name = name));
+		this.observe(this.#resolver.name, (name) => (this._name = name), null);
 	}
 
 	protected override willUpdate(changedProperties: PropertyValueMap<this>): void {

@@ -55,8 +55,8 @@ export class UmbDefaultCollectionMenuContext extends UmbContextBase {
 
 	/**
 	 * Sets the manifest
-	 * @param {ManifestTree} manifest
-	 * @memberof UmbDefaultTreeContext
+	 * @param {ManifestCollectionMenu} manifest The collection menu manifest.
+	 * @memberof UmbDefaultCollectionMenuContext
 	 */
 	public set manifest(manifest: ManifestCollectionMenu | undefined) {
 		if (this.#manifest === manifest) return;

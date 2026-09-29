@@ -31,21 +31,25 @@ export class UmbTiptapToolbarConfigurationContext extends UmbContextBase {
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_TIPTAP_TOOLBAR_CONFIGURATION_CONTEXT);
 
-		this.observe(umbExtensionsRegistry.byType('tiptapToolbarExtension'), (extensions) => {
-			const _extensions = extensions
-				.sort((a, b) => a.alias.localeCompare(b.alias))
-				.map((ext) => ({
-					kind: (ext.kind as string) ?? 'button',
-					alias: ext.alias,
-					label: ext.meta.label,
-					icon: ext.meta.icon,
-					dependencies: ext.forExtensions,
-				}));
+		this.observe(
+			umbExtensionsRegistry.byType('tiptapToolbarExtension'),
+			(extensions) => {
+				const _extensions = extensions
+					.sort((a, b) => a.alias.localeCompare(b.alias))
+					.map((ext) => ({
+						kind: (ext.kind as string) ?? 'button',
+						alias: ext.alias,
+						label: ext.meta.label,
+						icon: ext.meta.icon,
+						dependencies: ext.forExtensions,
+					}));
 
-			this.#extensions.setValue(_extensions);
+				this.#extensions.setValue(_extensions);
 
-			this.#lookup = new Map(_extensions.map((ext) => [ext.alias, ext]));
-		});
+				this.#lookup = new Map(_extensions.map((ext) => [ext.alias, ext]));
+			},
+			null,
+		);
 
 		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, async (dataset) => {
 			this.observe(
@@ -230,11 +234,19 @@ export class UmbTiptapToolbarConfigurationContext extends UmbContextBase {
 		}
 
 		this.#extensionsInUse.clear();
-		value.forEach((row) => row.forEach((group) => group.forEach((alias) => this.#extensionsInUse.add(alias))));
 
+		// An extension can only be used once, so any repeat occurrence is dropped rather than carried along. (#23524)
 		const toolbar = value.map((row) => ({
 			unique: UmbId.new(),
-			data: row.map((group) => ({ unique: UmbId.new(), data: group })),
+			data: row.map((group) => {
+				const aliases: Array<string> = [];
+				for (const alias of group) {
+					if (this.#extensionsInUse.has(alias)) continue;
+					this.#extensionsInUse.add(alias);
+					aliases.push(alias);
+				}
+				return { unique: UmbId.new(), data: aliases };
+			}),
 		}));
 
 		this.#toolbar.setValue(toolbar);

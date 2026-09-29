@@ -61,15 +61,15 @@ public static class UriUtilityCore
         ReadOnlySpan<char> uriSpan = uri.AsSpan();
         var pos = IndexOfPathEnd(uriSpan);
 
-        var path = (pos > 0 ? uriSpan[..pos] : uriSpan).ToString();
-        path = path.TrimEnd(Constants.CharArrays.ForwardSlash);
+        ReadOnlySpan<char> path = pos > 0 ? uriSpan[..pos] : uriSpan;
+        path = path.TrimEnd('/');
 
         if (pos > 0)
         {
             return string.Concat(path, uriSpan[pos..]);
         }
 
-        return path;
+        return new string(path);
     }
 
     private static int IndexOfPathEnd(ReadOnlySpan<char> uri)

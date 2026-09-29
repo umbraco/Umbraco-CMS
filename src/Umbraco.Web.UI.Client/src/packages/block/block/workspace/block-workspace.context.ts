@@ -1,5 +1,6 @@
 import type { UmbBlockDataModel, UmbBlockDataValueModel, UmbBlockLayoutBaseModel } from '../types.js';
 import { UMB_BLOCK_ENTRIES_CONTEXT, UMB_BLOCK_MANAGER_CONTEXT } from '../context/index.js';
+import { UMB_BLOCK_CONTENT_DATA_PATH_PROPERTY_NAME, UMB_BLOCK_SETTINGS_DATA_PATH_PROPERTY_NAME } from '../constants.js';
 import { UmbBlockWorkspaceEditorElement } from './block-workspace-editor.element.js';
 import { UmbBlockElementManager } from './block-element-manager.js';
 import type { UmbBlockWorkspaceOriginData } from './block-workspace.modal-token.js';
@@ -69,8 +70,16 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	readonly unique = this.#layout.asObservablePart((x) => x?.contentKey);
 	readonly contentKey = this.#layout.asObservablePart((x) => x?.contentKey);
 
-	readonly content = new UmbBlockElementManager(this, 'contentData', UMB_BLOCK_WORKSPACE_VIEW_CONTENT);
-	readonly settings = new UmbBlockElementManager(this, 'settingsData', UMB_BLOCK_WORKSPACE_VIEW_SETTINGS);
+	readonly content = new UmbBlockElementManager(
+		this,
+		UMB_BLOCK_CONTENT_DATA_PATH_PROPERTY_NAME,
+		UMB_BLOCK_WORKSPACE_VIEW_CONTENT,
+	);
+	readonly settings = new UmbBlockElementManager(
+		this,
+		UMB_BLOCK_SETTINGS_DATA_PATH_PROPERTY_NAME,
+		UMB_BLOCK_WORKSPACE_VIEW_SETTINGS,
+	);
 
 	#name = new UmbStringState<string | undefined>(undefined);
 	readonly name = this.#name.asObservable();
@@ -173,7 +182,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 			async ([contentValues, settingsValues]) => {
 				this.#renderLabel(contentValues, settingsValues);
 			},
-			'observeContentForLabelRender',
+			null,
 		);
 
 		this.routes.setRoutes([
@@ -268,6 +277,9 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 						}
 
 						await this.content.structure.whenLoaded();
+						// Have we been destroyed while awaiting the structure? then back out, otherwise reading from
+						// the now-destroyed content type structure or element states throws:
+						if (!this.#blockManager) return;
 						this.#gotLabel(blockType?.label ?? this.content.structure.getOwnerContentTypeName());
 					},
 					'observeBlockType',
@@ -349,7 +361,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	 * @protected
 	 * @param {string | URL} newUrl The new url that the workspace is navigating to.
 	 * @returns {boolean} true if the workspace is navigating away.
-	 * @memberof UmbEntityWorkspaceContextBase
+	 * @memberof UmbBlockWorkspaceContext
 	 */
 	protected _checkWillNavigateAway(newUrl: string | URL): boolean {
 		return umbWorkspaceWillNavigateAway(this.routes, this.getUnique(), newUrl);

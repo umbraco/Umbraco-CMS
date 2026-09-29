@@ -16,7 +16,6 @@ internal static class DocumentUrlAliasServiceExtensions
     public static string NormalizeAlias(this IDocumentUrlAliasService service, string alias) =>
         alias
             .Trim()
-            .TrimStart('/')
-            .TrimEnd('/')
+            .Trim('/')
             .ToLowerInvariant();
 }

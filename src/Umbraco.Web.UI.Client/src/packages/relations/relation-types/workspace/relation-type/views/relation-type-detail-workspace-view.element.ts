@@ -46,8 +46,8 @@ export class UmbRelationTypeDetailWorkspaceViewElement extends UmbLitElement imp
 
 		this.#paginationManager.setPageSize(50);
 
-		this.observe(this.#paginationManager.currentPage, (number) => (this._currentPageNumber = number));
-		this.observe(this.#paginationManager.totalPages, (number) => (this._totalPages = number));
+		this.observe(this.#paginationManager.currentPage, (number) => (this._currentPageNumber = number), null);
+		this.observe(this.#paginationManager.totalPages, (number) => (this._totalPages = number), null);
 
 		this.consumeContext(UMB_RELATION_TYPE_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance;
@@ -229,7 +229,6 @@ export class UmbRelationTypeDetailWorkspaceViewElement extends UmbLitElement imp
 
 			uui-pagination {
 				margin-top: var(--uui-size-layout-1);
-				display: block;
 			}
 		`,
 	];

@@ -103,9 +103,13 @@ export class UmbPropertyEditorUIMediaPickerElement
 			this.observe(context?.variantId, (variantId) => (this._variantId = variantId?.toString() || 'invariant'));
 		});
 
-		this.observe(this.#interactionMemoryManager.memoriesForPropertyEditor, (interactionMemories) => {
-			this._interactionMemories = interactionMemories ?? [];
-		});
+		this.observe(
+			this.#interactionMemoryManager.memoriesForPropertyEditor,
+			(interactionMemories) => {
+				this._interactionMemories = interactionMemories ?? [];
+			},
+			null,
+		);
 	}
 
 	override firstUpdated() {
@@ -161,6 +165,6 @@ export { UmbPropertyEditorUIMediaPickerElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		['umb-property-editor-ui-media-picker']: UmbPropertyEditorUIMediaPickerElement;
+		'umb-property-editor-ui-media-picker': UmbPropertyEditorUIMediaPickerElement;
 	}
 }

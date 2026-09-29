@@ -54,7 +54,7 @@ test('can rename a document type folder', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.documentType.clickRootFolderCaretButton();
   await umbracoUi.documentType.clickActionsMenuForName(oldFolderName);
   await umbracoUi.documentType.clickRenameActionMenuOption();
-  await umbracoUi.documentType.enterFolderName(documentFolderName);
+  await umbracoUi.documentType.enterRenameFolderName(documentFolderName);
   await umbracoUi.documentType.clickConfirmRenameButtonAndWaitForDocumentTypeToBeRenamed();
 
   // Assert
@@ -119,4 +119,24 @@ test('can create a folder in a folder in a folder', {tag: '@smoke'}, async ({umb
   // Clean
   await umbracoApi.documentType.ensureNameNotExists(grandParentFolderName);
   await umbracoApi.documentType.ensureNameNotExists(parentFolderName);
+});
+
+test('can find a document type in a sibling nested folder', async ({umbracoApi}) => {
+  // Arrange
+  const firstChildFolderName = 'AAFirstChildFolder';
+  const nestedFolderName = 'NestedFolder';
+  const secondChildFolderName = 'ZZSecondChildFolder';
+  const targetDocumentTypeName = 'TargetDocumentType';
+  const parentFolderId = await umbracoApi.documentType.createFolder(documentFolderName);
+  const firstChildFolderId = await umbracoApi.documentType.createFolder(firstChildFolderName, parentFolderId);
+  await umbracoApi.documentType.createFolder(nestedFolderName, firstChildFolderId);
+  const secondChildFolderId = await umbracoApi.documentType.createFolder(secondChildFolderName, parentFolderId);
+  const targetDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentTypeInFolder(targetDocumentTypeName, secondChildFolderId);
+
+  // Act
+  const documentTypeData = await umbracoApi.documentType.getByName(targetDocumentTypeName);
+
+  // Assert
+  expect(documentTypeData).toBeTruthy();
+  expect(documentTypeData.id).toBe(targetDocumentTypeId);
 });

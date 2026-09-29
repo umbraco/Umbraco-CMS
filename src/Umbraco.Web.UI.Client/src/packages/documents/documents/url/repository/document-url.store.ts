@@ -5,7 +5,7 @@ import { UmbItemStoreBase } from '@umbraco-cms/backoffice/store';
 
 /**
  * @class UmbDocumentUrlStore
- * @augments {UmbStoreBase}
+ * @augments {UmbItemStoreBase}
  * @description - Data Store for Document URLs
  */
 

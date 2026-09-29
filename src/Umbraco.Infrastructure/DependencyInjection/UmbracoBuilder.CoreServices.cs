@@ -64,6 +64,7 @@ using Umbraco.Cms.Infrastructure.Search;
 using Umbraco.Cms.Infrastructure.Security;
 using Umbraco.Cms.Infrastructure.Serialization;
 using Umbraco.Cms.Infrastructure.Services.Implement;
+using Umbraco.Cms.Infrastructure.Sync;
 using Umbraco.Extensions;
 using IScopeProvider = Umbraco.Cms.Infrastructure.Scoping.IScopeProvider;
 
@@ -89,12 +90,18 @@ public static partial class UmbracoBuilderExtensions
         builder.PackageMigrationPlans().Add(builder.TypeLoader.GetPackageMigrationPlans());
 
         builder.Services.AddSingleton<IRuntimeState, RuntimeState>();
+        builder.Services.AddSingleton<IContentRoutingReadiness, ContentRoutingReadiness>();
         builder.Services.AddSingleton<IRuntime, CoreRuntime>();
         builder.Services.AddSingleton<PendingPackageMigrations>();
         builder.AddNotificationAsyncHandler<RuntimeUnattendedInstallNotification, UnattendedInstaller>();
         builder.AddNotificationAsyncHandler<RuntimeUnattendedUpgradeNotification, UnattendedUpgrader>();
         builder.AddNotificationAsyncHandler<RuntimePremigrationsUpgradeNotification, PremigrationUpgrader>();
         builder.Services.AddSingleton<IMigrationCoordinator, MigrationCoordinator>();
+
+        // Registered here (rather than alongside TouchServerJob in AddBackgroundJobs()) because
+        // UnattendedUpgradeBackgroundService, registered immediately below, needs it and this method runs in
+        // every composition path that also registers that service - AddBackgroundJobs() does not.
+        builder.Services.AddSingleton<IServerRoleElector, ServerRoleElector>();
         builder.Services.AddHostedService<UnattendedUpgradeBackgroundService>();
 
         // Database availability check.

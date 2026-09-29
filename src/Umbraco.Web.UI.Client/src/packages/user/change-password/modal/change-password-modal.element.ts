@@ -80,9 +80,7 @@ export class UmbChangePasswordModalElement extends UmbModalBaseElement<
 		this.#loadPasswordConfiguration();
 	}
 
-	async #loadPasswordConfiguration() {
-		await this.#userConfigRepository.initialized;
-		if (!this.isConnected) return;
+	#loadPasswordConfiguration() {
 		this.observe(this.#userConfigRepository.part('passwordConfiguration'), (passwordConfig) => {
 			this._passwordConfiguration = passwordConfig;
 		});

@@ -41,7 +41,7 @@ export class UmbAuthSessionTimeoutController extends UmbControllerBase {
 					this.#scheduleCheck(expiresAt);
 				}
 			},
-			'_sessionState',
+			null,
 		);
 
 		// When the user times out, clean up
@@ -51,7 +51,7 @@ export class UmbAuthSessionTimeoutController extends UmbControllerBase {
 				this.#clearScheduledCheck();
 				await this.#closeTimeoutModal();
 			},
-			'_timeoutSignal',
+			null,
 		);
 	}
 

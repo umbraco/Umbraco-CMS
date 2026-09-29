@@ -1,5 +1,5 @@
-import { html } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbEntityFrameElement } from './entity-frame.element.js';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 import type { Meta, StoryObj } from '@storybook/web-components-vite';
 
 import './entity-frame.element.js';
