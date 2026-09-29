@@ -1224,7 +1224,9 @@ export class ContentUiHelper extends UiBaseLocators {
 
   async isVariantErrorHintBadgeVisibleForLanguageName(language: string, isVisible: boolean = true) {
     const variantRow = this.variantRow.filter({has: this.page.getByText(language, {exact: true})});
-    await this.isVisible(variantRow.locator('umb-badge'), isVisible);
+    // umb-badge's own host element has a zero-size layout box; the visible badge is its shadow-DOM
+    // uui-badge child, so check that instead of the host (Playwright locators pierce open shadow roots).
+    await this.isVisible(variantRow.locator('uui-badge'), isVisible);
   }
 
   async clickSaveAndCloseButton() {

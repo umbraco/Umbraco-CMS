@@ -103,9 +103,7 @@ test('cannot publish both cultures when danish has empty mandatory field', async
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
 });
 
-// Product gap (https://github.com/umbraco/Umbraco-CMS/pull/23706): the variant selector should hint that
-// an inactive variant has a validation error, but no hint badge appears for danish while viewing english.
-test.skip('shows a hint on the variant selector for a culture with a validation error', async ({umbracoUi}) => {
+test('shows a hint on the variant selector for a culture with a validation error', async ({umbracoUi}) => {
   // Arrange
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
