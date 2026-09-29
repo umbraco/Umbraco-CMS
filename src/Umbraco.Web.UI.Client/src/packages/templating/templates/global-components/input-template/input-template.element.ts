@@ -13,7 +13,9 @@ import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import '../template-card/template-card.element.js';
 
 @customElement('umb-input-template')
-export class UmbInputTemplateElement extends UUIFormControlWithBasicsMixin(UmbLitElement, '') {
+export class UmbInputTemplateElement extends UUIFormControlMixin(UmbLitElement, '') {
+	readonly #templateItemRepository = new UmbTemplateItemRepository(this);
+
 	/**
 	 * This is a minimum amount of selected items in this input.
 	 * @type {number}
@@ -72,8 +74,6 @@ export class UmbInputTemplateElement extends UUIFormControlWithBasicsMixin(UmbLi
 
 	@state()
 	private _pickedTemplates: UmbTemplateItemModel[] = [];
-
-	readonly #templateItemRepository = new UmbTemplateItemRepository(this);
 
 	@state()
 	private _templatePath?: string;
