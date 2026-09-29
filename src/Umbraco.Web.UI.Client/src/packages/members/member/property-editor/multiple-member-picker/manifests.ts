@@ -1,5 +1,4 @@
 import { manifest as schemaManifest } from './Umbraco.MemberPicker.Multiple.js';
-import { manifests as valueSummaryManifests } from './value-summary/manifests.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -29,5 +28,4 @@ export const manifests: Array<UmbExtensionManifest> = [
 		},
 	},
 	schemaManifest,
-	...valueSummaryManifests,
 ];

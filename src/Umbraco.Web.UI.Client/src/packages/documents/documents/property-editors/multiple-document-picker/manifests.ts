@@ -1,5 +1,4 @@
 import { manifest as schemaManifest } from './Umbraco.DocumentPicker.Multiple.js';
-import { manifests as valueSummaryManifests } from './value-summary/manifests.js';
 import { UMB_DYNAMIC_ROOT_PROPERTY_EDITOR_UI_ALIAS } from '@umbraco-cms/backoffice/content';
 
 export const manifests: Array<UmbExtensionManifest> = [
@@ -64,5 +63,4 @@ export const manifests: Array<UmbExtensionManifest> = [
 		},
 	},
 	schemaManifest,
-	...valueSummaryManifests,
 ];
