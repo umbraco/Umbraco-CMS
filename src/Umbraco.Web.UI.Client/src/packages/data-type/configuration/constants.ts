@@ -1,1 +1,1 @@
-export const UMB_DATA_TYPES_CONFIGURATION_REPOSITORY_ALIAS = 'Umb.Repository.DataTypes.Configuration';
+export const UMB_DATA_TYPE_CONFIGURATION_REPOSITORY_ALIAS = 'Umb.Repository.DataType.Configuration';

@@ -1,9 +1,9 @@
 import { useMockHandlers, resetMockHandlers } from '../../../../mocks/index.js';
 import {
-	UmbDataTypesConfigurationRepository,
-	resetUmbDataTypesConfigurationCache,
+	UmbDataTypeConfigurationRepository,
+	resetUmbDataTypeConfigurationCache,
 } from './configuration.repository.js';
-import type { UmbDataTypesConfigurationModel } from './types.js';
+import type { UmbDataTypeConfigurationModel } from './types.js';
 import { expect } from '@open-wc/testing';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
@@ -13,24 +13,24 @@ const { http, HttpResponse } = window.MockServiceWorker;
 
 const UMB_SLUG = '/data-type';
 
-const configuration: UmbDataTypesConfigurationModel = {
+const configuration: UmbDataTypeConfigurationModel = {
 	offerDeprecatedPropertyEditors: true,
 };
 
-@customElement('umb-test-data-types-configuration-repository-host')
-class UmbTestDataTypesConfigurationRepositoryHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
+@customElement('umb-test-data-type-configuration-repository-host')
+class UmbTestDataTypeConfigurationRepositoryHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
 
-describe('UmbDataTypesConfigurationRepository', () => {
-	let host: UmbTestDataTypesConfigurationRepositoryHostElement;
-	let repository: UmbDataTypesConfigurationRepository;
+describe('UmbDataTypeConfigurationRepository', () => {
+	let host: UmbTestDataTypeConfigurationRepositoryHostElement;
+	let repository: UmbDataTypeConfigurationRepository;
 	let requestCount: number;
 
 	beforeEach(() => {
 		requestCount = 0;
-		resetUmbDataTypesConfigurationCache();
-		host = new UmbTestDataTypesConfigurationRepositoryHostElement();
+		resetUmbDataTypeConfigurationCache();
+		host = new UmbTestDataTypeConfigurationRepositoryHostElement();
 		document.body.appendChild(host);
-		repository = new UmbDataTypesConfigurationRepository(host);
+		repository = new UmbDataTypeConfigurationRepository(host);
 	});
 
 	afterEach(() => {

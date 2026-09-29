@@ -1,3 +1,3 @@
-export interface UmbDataTypesConfigurationModel {
+export interface UmbDataTypeConfigurationModel {
 	offerDeprecatedPropertyEditors: boolean;
 }

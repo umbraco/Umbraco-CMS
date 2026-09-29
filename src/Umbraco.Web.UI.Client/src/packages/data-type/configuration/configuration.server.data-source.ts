@@ -1,20 +1,20 @@
-import type { UmbDataTypesConfigurationModel } from './types.js';
+import type { UmbDataTypeConfigurationModel } from './types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { DataTypeService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
-export class UmbDataTypesConfigurationServerDataSource extends UmbControllerBase {
+export class UmbDataTypeConfigurationServerDataSource extends UmbControllerBase {
 	/**
-	 * Gets the configuration of data types from the server.
-	 * @returns {Promise<UmbDataSourceResponse<UmbDataTypesConfigurationModel>>} - The configuration of data types.
-	 * @memberof UmbDataTypesConfigurationServerDataSource
+	 * Gets the Data Type configuration from the server.
+	 * @returns {Promise<UmbDataSourceResponse<UmbDataTypeConfigurationModel>>} - The data type configuration.
+	 * @memberof UmbDataTypeConfigurationServerDataSource
 	 */
-	async getConfiguration(): Promise<UmbDataSourceResponse<UmbDataTypesConfigurationModel>> {
+	async getConfiguration(): Promise<UmbDataSourceResponse<UmbDataTypeConfigurationModel>> {
 		const { data, error } = await tryExecute(this, DataTypeService.getDataTypeConfiguration());
 
 		if (data) {
-			const mappedData: UmbDataTypesConfigurationModel = {
+			const mappedData: UmbDataTypeConfigurationModel = {
 				offerDeprecatedPropertyEditors: data.offerDeprecatedPropertyEditors,
 			};
 

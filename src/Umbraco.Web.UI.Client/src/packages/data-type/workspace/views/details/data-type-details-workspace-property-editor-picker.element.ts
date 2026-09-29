@@ -1,5 +1,5 @@
 import { UMB_DATA_TYPE_WORKSPACE_CONTEXT } from '../../data-type-workspace.context-token.js';
-import { UmbDataTypesConfigurationRepository } from '../../../configuration/index.js';
+import { UmbDataTypeConfigurationRepository } from '../../../configuration/index.js';
 import { css, customElement, html, nothing, property, ref } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIButtonElement } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -34,7 +34,7 @@ export class UmbDataTypeDetailsWorkspacePropertyEditorPickerElement extends UmbF
 
 	#workspaceContext?: typeof UMB_DATA_TYPE_WORKSPACE_CONTEXT.TYPE;
 	#addButton?: UUIButtonElement;
-	#configurationRepository = new UmbDataTypesConfigurationRepository(this);
+	#configurationRepository = new UmbDataTypeConfigurationRepository(this);
 
 	constructor() {
 		super();
