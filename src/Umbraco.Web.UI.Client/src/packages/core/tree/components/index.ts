@@ -1,4 +1,5 @@
 export * from './tree-action-bundle.element.js';
+export * from './tree-item-picker-breadcrumb/index.js';
 export * from './tree-load-more-button.element.js';
 export * from './tree-load-prev-button.element.js';
 export * from './tree-pagination.element.js';

@@ -35,6 +35,7 @@ describe('UmbTrashableEntityWorkspaceController', () => {
 		// each test's assertions only see calls made by that test's own actions.
 		await aTimeout(0);
 		workspaceContext.readOnlyGuardRuleCalls.length = 0;
+		workspaceContext.nameWriteGuardRuleCalls.length = 0;
 	});
 
 	afterEach(() => {
@@ -61,6 +62,8 @@ describe('UmbTrashableEntityWorkspaceController', () => {
 
 			expect(workspaceContext.readOnlyGuardRuleCalls).to.have.lengthOf(1);
 			expect(workspaceContext.readOnlyGuardRuleCalls[0].action).to.equal('add');
+			// `permitted: true` here means "permitted to be read-only" — i.e. locked.
+			expect(workspaceContext.readOnlyGuardRuleCalls[0].permitted).to.be.true;
 		});
 
 		it('removes the readonly rule when the workspace is no longer trashed', async () => {
@@ -95,6 +98,50 @@ describe('UmbTrashableEntityWorkspaceController', () => {
 			workspaceContext.setIsNew(true);
 			await aTimeout(0);
 			expect(isTrashedContext?.getIsTrashed()).to.be.false;
+		});
+	});
+
+	describe('optional guards', () => {
+		it('does not throw when the workspace context does not implement either guard', async () => {
+			const guardlessHost = new UmbTestRecycleBinControllerHostElement();
+			document.body.appendChild(guardlessHost);
+
+			const guardlessWorkspaceContext = new UmbTestTrashableEntityWorkspaceContext(guardlessHost);
+			(guardlessWorkspaceContext as { readOnlyGuard?: unknown }).readOnlyGuard = undefined;
+			(guardlessWorkspaceContext as { nameWriteGuard?: unknown }).nameWriteGuard = undefined;
+			new UmbContextProviderController(guardlessHost, UMB_TRASHABLE_ENTITY_WORKSPACE_CONTEXT, guardlessWorkspaceContext as never);
+			new UmbTrashableEntityWorkspaceController(guardlessHost);
+			await aTimeout(0);
+
+			guardlessWorkspaceContext.setIsTrashed(true);
+			await aTimeout(0);
+			guardlessWorkspaceContext.setIsTrashed(false);
+			await aTimeout(0);
+
+			document.body.removeChild(guardlessHost);
+		});
+	});
+
+	describe('name write guard', () => {
+		it('adds a name write rule when the workspace becomes trashed', async () => {
+			workspaceContext.setIsTrashed(true);
+			await aTimeout(0);
+
+			expect(workspaceContext.nameWriteGuardRuleCalls).to.have.lengthOf(1);
+			expect(workspaceContext.nameWriteGuardRuleCalls[0].action).to.equal('add');
+			// `permitted: false` here means "not permitted to write" — i.e. blocked. The opposite polarity from
+			// readOnlyGuard's rule, since a write guard's `permitted` means "permitted to write", not "read-only".
+			expect(workspaceContext.nameWriteGuardRuleCalls[0].permitted).to.be.false;
+		});
+
+		it('removes the name write rule when the workspace is no longer trashed', async () => {
+			workspaceContext.setIsTrashed(true);
+			await aTimeout(0);
+			workspaceContext.setIsTrashed(false);
+			await aTimeout(0);
+
+			const lastCall = workspaceContext.nameWriteGuardRuleCalls.at(-1);
+			expect(lastCall?.action).to.equal('remove');
 		});
 	});
 
