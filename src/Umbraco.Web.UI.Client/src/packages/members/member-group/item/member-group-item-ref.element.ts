@@ -4,10 +4,10 @@ import { UMB_EDIT_MEMBER_GROUP_WORKSPACE_PATH_PATTERN } from '../paths.js';
 import type { UmbMemberGroupItemModel } from '../repository/item/types.js';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { css, customElement, html, ifDefined, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { umbGenerateWorkspaceLink, UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { umbGenerateWorkspaceLink, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
+import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS } from '@umbraco-cms/backoffice/section';
-import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 
 @customElement('umb-member-group-item-ref')
 export class UmbMemberGroupItemRefElement extends UmbLitElement {
