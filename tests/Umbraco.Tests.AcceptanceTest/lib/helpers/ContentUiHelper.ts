@@ -1802,6 +1802,7 @@ export class ContentUiHelper extends UiBaseLocators {
         .filter({ hasText: "Draft" }),
       isVisible,
     );
+  }
 
   async clickDeleteBlockListBlockButtonAtIndex(index: number) {
     const blockEntry = this.blockListEntry.nth(index);
