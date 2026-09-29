@@ -7,7 +7,7 @@ import type {
 } from '@umbraco-cms/backoffice/property';
 import { UmbVariantId, type UmbVariantDataModel } from '@umbraco-cms/backoffice/variant';
 import { UmbMergeContentVariantDataController } from './merge-content-variant-data.controller.js';
-import type { UmbContentLikeDetailModel, UmbPotentialContentValueModel } from '../types.js';
+import type { UmbContentLikeDetailModel, UmbElementValueModel, UmbPotentialContentValueModel } from '../types.js';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 
@@ -169,6 +169,28 @@ describe('UmbMergeContentVariantDataController', () => {
 			expect(textOf('block-b', 'da'), 'block-b Danish').to.equal('b-da');
 			expect(textOf('block-c', 'da'), 'block-c Danish').to.equal('c-da');
 		});
+
+		it('sorts inner block values by culture, invariant first', async () => {
+			const ctrlHost = new UmbTestControllerHostElement();
+			const ctrl = new UmbMergeContentVariantDataController(ctrlHost);
+
+			const data: UmbContentLikeDetailModel = {
+				values: [
+					blockValue([
+						{
+							key: 'block-a',
+							values: [innerValue('en-us', 'a-en'), innerValue(null, 'a-invariant'), innerValue('da-dk', 'a-da')],
+						},
+					]),
+				],
+			};
+
+			const variants = [new UmbVariantId('en-us'), new UmbVariantId('da-dk')];
+			const result = await ctrl.process(data, data, variants, [...variants, UmbVariantId.CreateInvariant()]);
+
+			const blocks = (result.values[0].value as TestBlockValueType).contentData;
+			expect(blocks[0].values.map((v) => v.culture)).to.deep.equal([null, 'da-dk', 'en-us']);
+		});
 	});
 
 	describe('Simple resolver', () => {
@@ -275,6 +297,82 @@ describe('UmbMergeContentVariantDataController', () => {
 			expect((result.values[0].value as TestPropertyValueNestedType).nestedValue.value).to.be.equal(
 				'saved-nested-value-invariant',
 			);
+		});
+	});
+
+	describe('Value ordering', () => {
+		const value = (alias: string, culture: string | null, segment: string | null = null): UmbElementValueModel => ({
+			editorAlias: 'some-editor',
+			alias,
+			culture,
+			segment,
+			value: `${alias}-${culture}-${segment}`,
+		});
+
+		it('sorts values by culture, invariant first', async () => {
+			const ctrlHost = new UmbTestControllerHostElement();
+			const ctrl = new UmbMergeContentVariantDataController(ctrlHost);
+
+			const data: UmbContentLikeDetailModel = {
+				values: [value('title', 'en-us'), value('title', null), value('title', 'da-dk')],
+			};
+
+			const variants = [new UmbVariantId('en-us'), new UmbVariantId('da-dk')];
+			const result = await ctrl.process(data, data, variants, [...variants, UmbVariantId.CreateInvariant()]);
+
+			expect(result.values.map((v) => v.culture)).to.deep.equal([null, 'da-dk', 'en-us']);
+		});
+
+		it('sorts values sharing a culture by segment, invariant segment first', async () => {
+			const ctrlHost = new UmbTestControllerHostElement();
+			const ctrl = new UmbMergeContentVariantDataController(ctrlHost);
+
+			const data: UmbContentLikeDetailModel = {
+				values: [value('title', 'en-us', 's2'), value('title', 'en-us', null), value('title', 'en-us', 's1')],
+			};
+
+			const variants = [new UmbVariantId('en-us')];
+			const result = await ctrl.process(data, data, variants, [...variants, UmbVariantId.CreateInvariant()]);
+
+			expect(result.values.map((v) => v.segment)).to.deep.equal([null, 's1', 's2']);
+		});
+
+		it('places a draft-only new culture by culture, not at the end', async () => {
+			const ctrlHost = new UmbTestControllerHostElement();
+			const ctrl = new UmbMergeContentVariantDataController(ctrlHost);
+
+			const persistedData: UmbContentLikeDetailModel = {
+				values: [value('title', null), value('title', 'en-us')],
+			};
+			const runtimeData: UmbContentLikeDetailModel = {
+				values: [value('title', null), value('title', 'en-us'), value('title', 'da-dk')],
+			};
+
+			const variants = [new UmbVariantId('en-us'), new UmbVariantId('da-dk')];
+			const result = await ctrl.process(persistedData, runtimeData, variants, [
+				...variants,
+				UmbVariantId.CreateInvariant(),
+			]);
+
+			expect(result.values.map((v) => v.culture)).to.deep.equal([null, 'da-dk', 'en-us']);
+		});
+
+		it('keeps values sharing a culture and segment in their existing relative order', async () => {
+			const ctrlHost = new UmbTestControllerHostElement();
+			const ctrl = new UmbMergeContentVariantDataController(ctrlHost);
+
+			const data: UmbContentLikeDetailModel = {
+				values: [
+					{ ...value('subtitle', 'da-dk'), alias: 'subtitle' },
+					{ ...value('title', 'da-dk'), alias: 'title' },
+					{ ...value('body', 'en-us'), alias: 'body' },
+				],
+			};
+
+			const variants = [new UmbVariantId('da-dk'), new UmbVariantId('en-us')];
+			const result = await ctrl.process(data, data, variants, variants);
+
+			expect(result.values.map((v) => v.alias)).to.deep.equal(['subtitle', 'title', 'body']);
 		});
 	});
 });

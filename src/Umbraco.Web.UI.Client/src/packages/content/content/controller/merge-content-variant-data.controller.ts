@@ -1,4 +1,5 @@
 import type { UmbContentLikeDetailModel, UmbPotentialContentValueModel } from '../types.js';
+import { sortContentValuesByVariant } from '../utils/sort-content-values-by-variant.function.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
@@ -74,7 +75,7 @@ export class UmbMergeContentVariantDataController extends UmbControllerBase {
 		);
 
 		// Map unique values to their respective draft values.
-		return (
+		const values = (
 			await Promise.all(
 				uniqueValues.map((value) => {
 					const persistedValue = persistedValues?.find(
@@ -95,6 +96,8 @@ export class UmbMergeContentVariantDataController extends UmbControllerBase {
 				}),
 			)
 		).filter((x) => x !== undefined) as Array<T>;
+
+		return sortContentValuesByVariant(values);
 	}
 
 	/**
