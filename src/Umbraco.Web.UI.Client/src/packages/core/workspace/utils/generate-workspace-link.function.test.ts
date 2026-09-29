@@ -1,5 +1,5 @@
 import { umbGenerateWorkspaceLink } from './generate-workspace-link.function.js';
-import { UmbPathPattern } from './path-pattern.class.js';
+import { UmbPathPattern } from '@umbraco-cms/backoffice/router';
 import { expect } from '@open-wc/testing';
 
 const PATTERN = new UmbPathPattern<{ unique: string }>('edit/:unique', '/section/workspace/entity');
