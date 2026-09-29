@@ -84,6 +84,44 @@ public class DefaultPropertyValueConverterShadowingTests
 
     [TestCase(true)]
     [TestCase(false)]
+    public void MultipleDocumentPicker_ResolvesMultipleDocumentPickerValueConverterOverJsonValueConverter(bool jsonConverterFirst)
+    {
+        IPropertyValueConverter jsonConverter = new JsonValueConverter(
+            PropertyEditors(Constants.PropertyEditors.Aliases.MultipleDocumentPicker, ValueTypes.Json),
+            Mock.Of<ILogger<JsonValueConverter>>());
+        IPropertyValueConverter pickerConverter = new MultipleDocumentPickerValueConverter(
+            Mock.Of<IJsonSerializer>(),
+            Mock.Of<IPublishedContentCache>(),
+            Mock.Of<IApiContentBuilder>());
+
+        IPublishedPropertyType propertyType = PublishedPropertyType(
+            Constants.PropertyEditors.Aliases.MultipleDocumentPicker,
+            jsonConverterFirst ? [jsonConverter, pickerConverter] : [pickerConverter, jsonConverter]);
+
+        Assert.AreEqual(typeof(IEnumerable<IPublishedContent>), propertyType.ModelClrType);
+    }
+
+    [TestCase(true)]
+    [TestCase(false)]
+    public void MultipleMemberPicker_ResolvesMultipleMemberPickerValueConverterOverJsonValueConverter(bool jsonConverterFirst)
+    {
+        IPropertyValueConverter jsonConverter = new JsonValueConverter(
+            PropertyEditors(Constants.PropertyEditors.Aliases.MultipleMemberPicker, ValueTypes.Json),
+            Mock.Of<ILogger<JsonValueConverter>>());
+        IPropertyValueConverter pickerConverter = new MultipleMemberPickerValueConverter(
+            Mock.Of<IJsonSerializer>(),
+            Mock.Of<IMemberService>(),
+            Mock.Of<IPublishedMemberCache>());
+
+        IPublishedPropertyType propertyType = PublishedPropertyType(
+            Constants.PropertyEditors.Aliases.MultipleMemberPicker,
+            jsonConverterFirst ? [jsonConverter, pickerConverter] : [pickerConverter, jsonConverter]);
+
+        Assert.AreEqual(typeof(IEnumerable<IPublishedContent>), propertyType.ModelClrType);
+    }
+
+    [TestCase(true)]
+    [TestCase(false)]
     public void RichText_ResolvesRteBlockRenderingValueConverterOverSimpleRichTextValueConverter(bool simpleConverterFirst)
     {
         IPropertyValueConverter simpleConverter = new SimpleRichTextValueConverter();
