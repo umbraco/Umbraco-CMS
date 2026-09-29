@@ -195,6 +195,7 @@ export class ContentUiHelper extends UiBaseLocators {
   private readonly hostNameItem: Locator;
   private readonly languageToggle: Locator;
   private readonly contentVariantDropdown: Locator;
+  private readonly contentVariantPopover: Locator;
   private readonly blockProperty: Locator;
   private readonly linkPickerAddBtn: Locator;
   private readonly linkPickerCloseBtn: Locator;
@@ -516,6 +517,7 @@ export class ContentUiHelper extends UiBaseLocators {
     this.entityPickerTree = page.locator('umb-tree[alias="Umb.Tree.EntityDataPicker"]');
     this.languageToggle = page.getByTestId('input:entity-name').locator('#toggle');
     this.contentVariantDropdown = page.locator('umb-document-workspace-split-view-variant-selector uui-popover-container #dropdown');
+    this.contentVariantPopover = page.locator('umb-document-workspace-split-view-variant-selector uui-popover-container#popover');
     this.blockProperty = page.locator('umb-block-workspace-view-edit-property');
     // Multi URL Picker
     this.linkPickerAddBtn = this.linkPickerModal.getByRole('button', {
@@ -2261,12 +2263,20 @@ export class ContentUiHelper extends UiBaseLocators {
     await this.click(notificationOptionLocator);
   }
 
+  // The toggle button opens/closes the popover via the native Popover API. Its own :popover-open state
+  // is a binary flag set the instant the popover opens or closes, unlike isVisible()/toBeHidden() on a
+  // descendant, which can read a stale value mid-layout/animation - checking it makes the retries below
+  // safe to re-click the (non-idempotent) toggle without risking flipping an already-correct state.
+  private async isVariantSelectorPopoverOpen() {
+    return this.contentVariantPopover.evaluate(el => el.matches(':popover-open'));
+  }
+
   async switchLanguage(languageName: string) {
     // The toggle button's first click can be lost if the previous variant-selector popover only just
     // auto-closed (native Popover API state can lag a beat behind), leaving the dropdown unopened.
     const languageOptionLocator = this.contentVariantDropdown.locator('.culture-variant').filter({hasText: languageName});
     await expect(async () => {
-      if (!(await languageOptionLocator.isVisible())) {
+      if (!(await this.isVariantSelectorPopoverOpen())) {
         await this.click(this.languageToggle);
       }
       await expect(languageOptionLocator).toBeVisible({timeout: ConstantHelper.timeout.short});
@@ -2276,7 +2286,7 @@ export class ContentUiHelper extends UiBaseLocators {
     // Selecting an option doesn't reliably auto-close the popover; close it explicitly so a leftover
     // open popover doesn't intercept clicks elsewhere on the page afterward.
     await expect(async () => {
-      if (await this.contentVariantDropdown.isVisible()) {
+      if (await this.isVariantSelectorPopoverOpen()) {
         await this.click(this.languageToggle);
       }
       await expect(this.contentVariantDropdown).toBeHidden({timeout: ConstantHelper.timeout.short});
