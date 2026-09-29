@@ -243,7 +243,8 @@ namespace Umbraco.Cms
                 {
                     using (!_profilingLogger.IsEnabled(Core.Logging.LogLevel.Debug) ? null : _profilingLogger.DebugDuration<CacheInstructionService>("Syncing from database..."))
                     {
-                        _repositoryCacheVersionService.SetCachesSyncedAsync();
+                        // Awaited, so its scope completes before _syncLock is released.
+                        _repositoryCacheVersionService.SetCachesSyncedAsync().GetAwaiter().GetResult();
                         var lastId = _lastSyncedManager.GetLastSyncedExternalAsync().GetAwaiter().GetResult() ?? 0;
                         var previousLastId = lastId;
                         var numberOfInstructionsProcessed = ProcessDatabaseInstructions(cacheRefreshers, cancellationToken, localIdentity, ref lastId);
