@@ -306,6 +306,7 @@
     documentType: '/umbraco/management/api/v1/document-type',
     documentTypeFolder: '/umbraco/management/api/v1/document-type/folder',
     documentBlueprint: '/umbraco/management/api/v1/document-blueprint',
+    documentBlueprintFolder: '/umbraco/management/api/v1/document-blueprint/folder',
     dataType: '/umbraco/management/api/v1/data-type',
     dataTypeFolder: '/umbraco/management/api/v1/data-type/folder',
     dictionary: '/umbraco/management/api/v1/dictionary',
