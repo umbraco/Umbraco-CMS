@@ -1168,6 +1168,7 @@ export const KNOWN_LOCALIZATION_KEYS: readonly UmbKnownLocalizationKey[] = [
 	'general_status',
 	'general_submit',
 	'general_success',
+	'general_switchView',
 	'general_systemField',
 	'general_to',
 	'general_toggleFor',

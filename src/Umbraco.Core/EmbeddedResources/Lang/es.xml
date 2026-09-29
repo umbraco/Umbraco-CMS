@@ -50,7 +50,11 @@
     <key alias="parentNotPublished">Este documento ha sido publicado pero no es visible porque el padre '%0%' no esta publicado</key>
     <key alias="parentNotPublishedAnomaly">Ups: este documento está publicado pero no está en la caché (error interno)</key>
     <key alias="getUrlException">No se pudo obtener la URL</key>
-    <key alias="routeError">Este documento está publicado pero tu URL colisionará con contenido %0%</key>
+    <key alias="routeError">Este documento está publicado pero tu URL colisionará con contenido '%0%'</key>
+    <key alias="unroutableContentWarningHeader">Contenido publicado</key>
+    <key alias="unroutableContentWarning">El documento no tiene URL. Puede encontrar más detalles en "Info".</key>
+    <key alias="unroutableContentWarningWithReason">El documento no tiene URL. %0% Puede encontrar más detalles en "Info".</key>
+    <key alias="routeErrorNoDomainForCulture">Este documento está publicado en '%0%' pero no tiene URL porque no es el idioma predeterminado y no tiene ningún nombre de host asignado</key>
   </area>
   <area alias="member">
   </area>

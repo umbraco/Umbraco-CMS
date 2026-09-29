@@ -69,8 +69,12 @@
     </key>
     <key alias="parentNotPublishedAnomaly">This document is published but is not in the cache</key>
     <key alias="getUrlException">Could not get the URL</key>
-    <key alias="routeError">This document is published but its URL would collide with content %0%</key>
+    <key alias="routeError">This document is published but its URL would collide with content '%0%'</key>
     <key alias="routeErrorCannotRoute">This document is published but its URL cannot be routed</key>
+    <key alias="unroutableContentWarningHeader">Content published</key>
+    <key alias="unroutableContentWarning">The document does not have a URL. More details can be found under "Info".</key>
+    <key alias="unroutableContentWarningWithReason">The document does not have a URL. %0% More details can be found under "Info".</key>
+    <key alias="routeErrorNoDomainForCulture">This document is published in '%0%' but has no URL because it is not the default language and no hostname is assigned for it</key>
   </area>
   <area alias="member">
     <key alias="incorrectPassword">The provided password is incorrect</key>
