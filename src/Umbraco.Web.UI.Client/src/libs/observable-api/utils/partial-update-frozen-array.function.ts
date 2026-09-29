@@ -1,5 +1,6 @@
 /**
  * @function partialUpdateFrozenArray
+ * @template T
  * @param {T} data - Initial data for this Observable.
  * @param {Partial<T>} partialEntry - New data to be added in this Observable.
  * @param {(entry: T) => boolean} findMethod - Method to find the data to be updated.

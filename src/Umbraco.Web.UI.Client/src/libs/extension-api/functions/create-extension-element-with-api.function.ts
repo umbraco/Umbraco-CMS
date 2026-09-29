@@ -8,6 +8,8 @@ import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controlle
 
 /**
  *
+ * @template {UmbControllerHostElement} ElementType
+ * @template {UmbApi} ApiType
  * @param {ManifestElementAndApi<ElementType, ApiType>} manifest The manifest to create the element and api from.
  * @param {unknown[] | UmbApiConstructorArgumentsMethodType<ManifestElementAndApi<ElementType, ApiType>>} [constructorArgs] Additional arguments passed to the api constructor, or a function that returns them.
  * @param {string} [fallbackElement] An element tag name to fall back to if the manifest does not provide one.

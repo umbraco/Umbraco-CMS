@@ -6,12 +6,16 @@ import { StylesheetService } from '@umbraco-cms/backoffice/external/backend-api'
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
+import type {
+	UmbDetailDataSource,
+	UmbDataSourceResponse,
+	UmbDataSourceErrorResponse,
+} from '@umbraco-cms/backoffice/repository';
 
 /**
  * A data source for Stylesheet folders that fetches data from the server
  * @class UmbStylesheetFolderServerDataSource
- * @implements {RepositoryDetailDataSource}
+ * @implements {UmbDetailDataSource<UmbFolderModel>}
  */
 export class UmbStylesheetFolderServerDataSource implements UmbDetailDataSource<UmbFolderModel> {
 	#host: UmbControllerHost;
@@ -43,7 +47,7 @@ export class UmbStylesheetFolderServerDataSource implements UmbDetailDataSource<
 	 * @returns {UmbDataSourceResponse<UmbFolderModel>} The Stylesheet folder
 	 * @memberof UmbStylesheetFolderServerDataSource
 	 */
-	async read(unique: string) {
+	async read(unique: string): Promise<UmbDataSourceResponse<UmbFolderModel>> {
 		if (!unique) throw new Error('Unique is missing');
 
 		const path = this.#serverFilePathUniqueSerializer.toServerPath(unique);
@@ -72,7 +76,7 @@ export class UmbStylesheetFolderServerDataSource implements UmbDetailDataSource<
 
 	/**
 	 * Creates a Stylesheet folder on the server
-	 * @param {UmbCreateFolderModel} model - The Stylesheet folder to create
+	 * @param {UmbFolderModel} model - The Stylesheet folder to create
 	 * @returns {UmbDataSourceResponse<UmbFolderModel>} The created Stylesheet folder
 	 * @memberof UmbStylesheetFolderServerDataSource
 	 */
@@ -108,9 +112,9 @@ export class UmbStylesheetFolderServerDataSource implements UmbDetailDataSource<
 	 * Deletes a Stylesheet folder on the server
 	 * @param {string} unique - The unique identifier of the Stylesheet folder
 	 * @returns {UmbDataSourceErrorResponse} The result of the delete operation
-	 * @memberof UmbStylesheetServerDataSource
+	 * @memberof UmbStylesheetFolderServerDataSource
 	 */
-	async delete(unique: string) {
+	async delete(unique: string): Promise<UmbDataSourceErrorResponse> {
 		if (!unique) throw new Error('Unique is missing');
 
 		const path = this.#serverFilePathUniqueSerializer.toServerPath(unique);

@@ -119,7 +119,7 @@ export class UmbTableSortedEvent extends Event {
  *  @fires {UmbTableSelectedEvent} selected - fires when a row is selected
  *  @fires {UmbTableDeselectedEvent} deselected - fires when a row is deselected
  *  @fires {UmbTableOrderedEvent} sort - fires when a column order is changed
- *  @augments LitElement
+ *  @augments UmbLitElement
  */
 @customElement('umb-table')
 export class UmbTableElement extends UmbLitElement {
@@ -465,7 +465,13 @@ export class UmbTableElement extends UmbLitElement {
 
 		if (indicator.href) {
 			return html`
-				<uui-button compact label=${this.localize.term('general_open')} href=${indicator.href}>${symbol}</uui-button>
+				<uui-button
+					compact
+					label=${this.localize.term('general_open')}
+					href=${indicator.href}
+					data-mark="table-row:open">
+					${symbol}
+				</uui-button>
 			`;
 		}
 
@@ -474,6 +480,7 @@ export class UmbTableElement extends UmbLitElement {
 				<uui-button
 					compact
 					label=${this.localize.term('general_open')}
+					data-mark="table-row:open"
 					@click=${(e: Event) => {
 						e.stopPropagation();
 						indicator.onOpen?.();

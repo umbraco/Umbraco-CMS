@@ -82,7 +82,7 @@ export class UmbClipboardPropertyContext extends UmbContextBase {
 	 * @param {object} args - Arguments for writing a clipboard entry
 	 * @param {string} args.name - The name of the clipboard entry
 	 * @param {string} args.icon - The icon of the clipboard entry
-	 * @param {any} args.propertyValue - The property value to write
+	 * @param {unknown} args.propertyValue - The property value to write
 	 * @param {string} args.propertyEditorUiAlias - The alias of the property editor to match
 	 * @returns { Promise<void> }
 	 */
@@ -133,7 +133,7 @@ export class UmbClipboardPropertyContext extends UmbContextBase {
 	 * @param {boolean} args.multiple - Allow multiple clipboard entries to be picked
 	 * @param {string} args.propertyEditorUiAlias - The alias of the property editor to match
 	 * @param {() => Promise<boolean>} args.filter - A filter function to filter clipboard entries
-	 * @returns { Promise<{ selection: Array<UmbEntityUnique>; propertyValues: Array<any> }> } The selected entries and their translated property values.
+	 * @returns { Promise<{ selection: Array<UmbEntityUnique>; propertyValues: Array<unknown> }> } The selected entries and their translated property values.
 	 */
 	async pick(args: {
 		multiple: boolean;

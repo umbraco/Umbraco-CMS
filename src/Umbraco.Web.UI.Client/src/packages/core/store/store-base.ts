@@ -4,7 +4,7 @@ import { UmbStoreUpdateEvent } from './events/store-update.event.js';
 import { UmbStoreAppendEvent } from './events/store-append.event.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
-import type { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
+import type { Observable, UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
@@ -81,10 +81,10 @@ export class UmbStoreBase<StoreItemType = any> extends UmbContextBase implements
 
 	/**
 	 * Returns an observable of the entire store
-	 * @returns {*} An observable of the entire store
+	 * @returns {Observable<Array<StoreItemType>>} An observable of the entire store
 	 * @memberof UmbStoreBase
 	 */
-	all() {
+	all(): Observable<Array<StoreItemType>> {
 		return this._data.asObservable();
 	}
 }

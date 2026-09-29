@@ -3,6 +3,7 @@ import { umbScopeMapperForJsonPaths } from './scope-mapper-json-paths.function.j
 
 /**
  * Helper method to replace paths index with queries and additionally map the paths.
+ * @template T
  * @param {Array<string>} scopePaths - the JSON paths to map.
  * @param {Array<T>} scopeData - the data corresponding to each entry, used to construct queries.
  * @param {(entry: T) => string} queryConstructor - constructs a JSON-Path query for a given data entry.

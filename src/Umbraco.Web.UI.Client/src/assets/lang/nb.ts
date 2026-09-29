@@ -167,6 +167,7 @@ export default {
 		isPublished: 'Er publisert',
 		isSensitiveValue: 'Denne verdien er skjult. Kontakt administrator for tilgang.',
 		isSensitiveValue_short: 'Denne verdien er skjult.',
+		isSensitiveValueNotice: 'Kontakt administrator for tilgang til de skjulte verdiene.',
 		itemChanged: 'Denne noden er endret siden siste publisering',
 		itemNotPublished: 'Denne noden er enda ikke publisert',
 		languagesToPublish: 'Hvilke språk vil du publisere?',
@@ -264,6 +265,8 @@ export default {
 	},
 	media: {
 		clickToUpload: 'Klikk for å laste opp',
+		browseFilesAction: 'Bla gjennom filer',
+		dropFilesOr: 'Dra og slipp medier her<br />eller',
 	},
 	member: {
 		createNewMember: 'Opprett et nytt medlem',
@@ -534,6 +537,8 @@ export default {
 		no: 'Nei',
 		noItemsInList: 'Ingen elementer er lagt til',
 		nodeName: 'Nodenavn',
+		noResults: 'Ingen resultater',
+		noResultsFor: (query: string) => `Ingen resultater for "${query}".`,
 		of: 'av',
 		off: 'Av',
 		ok: 'OK',
@@ -879,6 +884,17 @@ export default {
 		sortHelp:
 			'Dra elementene opp eller ned for å arrangere dem. Du kan også klikke kolonneoverskriftene for å sortere alt på en gang.',
 		sortPleaseWait: 'Vennligst vent. Elementene blir sortert, dette kan ta litt tid.',
+		sortByFieldHeadline: 'Sorter etter felt',
+		sortByFieldSentence: 'Sorter alle underelementer etter',
+		sortByFieldDirectionLabel: 'Retning',
+		sortByFieldAscending: 'Stigende',
+		sortByFieldDescending: 'Synkende',
+		sortByFieldNameOption: 'Navn',
+		sortByFieldCreateDateOption: 'Opprettet',
+		sortByFieldUpdateDateOption: 'Sist endret',
+		sortIndividuallyHeadline: 'Sorter individuelt',
+		sortByFieldCultureSentence: 'på',
+		sortByFieldCultureLabel: 'Språk',
 	},
 	speechBubbles: {
 		editMultiContentPublishedPartialText: '%0% av %1% dokumenter publisert.',
@@ -1158,10 +1174,6 @@ export default {
 		deselectAllLogLevelFilters: 'Opphev alle',
 	},
 	welcomeDashboard: {
-		ourUmbracoHeadline: 'Our Umbraco - Fellesskap for Umbraco',
-		ourUmbracoDescription:
-			"På 'Our Umbraco', den offisielle fellesskapssiden, finner du all informasjon relatert til Umbraco. Enten du trenger svar på et spørsmål, kule plugins eller en guide til hvordan du gjør noe i Umbraco, er verdens beste og vennligste fellesskap bare et klikk unna.",
-		ourUmbracoButton: 'Besøk Our Umbraco',
 		documentationHeadline: 'Dokumentasjon',
 		documentationDescription: 'Finn svarene på alle dine Umbraco-spørsmål',
 		communityHeadline: 'Fellesskap',
@@ -1296,6 +1308,8 @@ export default {
 		thumbnail: 'Miniatyrbilde',
 	},
 	picker: {
+		browseTab: 'Bla gjennom',
+		searchTab: 'Søk',
 		selectedCount: (count: number) => `${count} ${count === 1 ? 'element' : 'elementer'} valgt`,
 	},
 } as UmbLocalizationDictionary;

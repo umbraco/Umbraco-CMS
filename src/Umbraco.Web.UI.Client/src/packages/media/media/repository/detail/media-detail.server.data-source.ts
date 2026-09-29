@@ -1,7 +1,11 @@
 import type { UmbMediaDetailModel } from '../../types.js';
 import { UMB_MEDIA_ENTITY_TYPE } from '../../entity.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
+import type {
+	UmbDataSourceErrorResponse,
+	UmbDataSourceResponse,
+	UmbDetailDataSource,
+} from '@umbraco-cms/backoffice/repository';
 import type { CreateMediaRequestModel, UpdateMediaRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { MediaService } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
@@ -12,7 +16,7 @@ import { umbDeepMerge, type UmbDeepPartialObject } from '@umbraco-cms/backoffice
 /**
  * A data source for the Media that fetches data from the server
  * @class UmbMediaServerDataSource
- * @implements {RepositoryDetailDataSource}
+ * @implements {UmbDetailDataSource}
  */
 export class UmbMediaServerDataSource extends UmbControllerBase implements UmbDetailDataSource<UmbMediaDetailModel> {
 	/**
@@ -63,10 +67,10 @@ export class UmbMediaServerDataSource extends UmbControllerBase implements UmbDe
 	/**
 	 * Fetches a Media with the given id from the server
 	 * @param {string} unique - The unique ID of the media
-	 * @returns {*} The media
+	 * @returns {Promise<UmbDataSourceResponse<UmbMediaDetailModel>>} The media
 	 * @memberof UmbMediaServerDataSource
 	 */
-	async read(unique: string) {
+	async read(unique: string): Promise<UmbDataSourceResponse<UmbMediaDetailModel>> {
 		if (!unique) throw new Error('Unique is missing');
 
 		const { data, error } = await tryExecute(this, MediaService.getMediaById({ path: { id: unique } }));
@@ -108,10 +112,14 @@ export class UmbMediaServerDataSource extends UmbControllerBase implements UmbDe
 	 * Inserts a new Media on the server
 	 * @param {UmbMediaDetailModel} model - The media to create
 	 * @param {string | null} parentUnique - The unique ID of the parent media
-	 * @returns {*} The created media
+	 * @returns {Promise<UmbDataSourceResponse<UmbMediaDetailModel>>} The created media
 	 * @memberof UmbMediaServerDataSource
 	 */
-	async create(model: UmbMediaDetailModel, parentUnique: string | null = null, disableNotifications = false) {
+	async create(
+		model: UmbMediaDetailModel,
+		parentUnique: string | null = null,
+		disableNotifications = false,
+	): Promise<UmbDataSourceResponse<UmbMediaDetailModel>> {
 		if (!model) throw new Error('Media is missing');
 		if (!model.unique) throw new Error('Media unique is missing');
 
@@ -146,10 +154,10 @@ export class UmbMediaServerDataSource extends UmbControllerBase implements UmbDe
 	/**
 	 * Updates a Media on the server
 	 * @param {UmbMediaDetailModel} model - The media to update
-	 * @returns {*} The updated media
+	 * @returns {Promise<UmbDataSourceResponse<UmbMediaDetailModel>>} The updated media
 	 * @memberof UmbMediaServerDataSource
 	 */
-	async update(model: UmbMediaDetailModel) {
+	async update(model: UmbMediaDetailModel): Promise<UmbDataSourceResponse<UmbMediaDetailModel>> {
 		if (!model.unique) throw new Error('Unique is missing');
 
 		// TODO: make data mapper to prevent errors
@@ -176,10 +184,10 @@ export class UmbMediaServerDataSource extends UmbControllerBase implements UmbDe
 	/**
 	 * Deletes a Media on the server
 	 * @param {string} unique - The unique ID of the media
-	 * @returns {*} A promise that resolves once the media has been deleted
+	 * @returns {Promise<UmbDataSourceErrorResponse>} A promise that resolves once the media has been deleted
 	 * @memberof UmbMediaServerDataSource
 	 */
-	async delete(unique: string) {
+	async delete(unique: string): Promise<UmbDataSourceErrorResponse> {
 		if (!unique) throw new Error('Unique is missing');
 
 		return tryExecute(this, MediaService.deleteMediaById({ path: { id: unique } }));

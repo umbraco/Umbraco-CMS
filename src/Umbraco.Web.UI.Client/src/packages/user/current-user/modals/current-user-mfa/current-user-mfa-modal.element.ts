@@ -9,6 +9,7 @@ import { umbOpenModal, type UmbModalContext } from '@umbraco-cms/backoffice/moda
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { mergeObservables } from '@umbraco-cms/backoffice/observable-api';
+import { of } from '@umbraco-cms/backoffice/external/rxjs';
 
 type UmbMfaLoginProviderOption = UmbCurrentUserMfaProviderModel & {
 	displayName: string;
@@ -48,7 +49,8 @@ export class UmbCurrentUserMfaModalElement extends UmbLitElement {
 				return;
 			}
 
-			const serverLoginProviders$ = serverLoginProvidersResponse.asObservable();
+			// TODO: Fail early? if no asObservable method is available on the server response, we should probably throw an error or handle it differently. [NL]
+			const serverLoginProviders$ = serverLoginProvidersResponse.asObservable?.() ?? of([]);
 			const manifestLoginProviders$ = umbExtensionsRegistry.byType('mfaLoginProvider');
 
 			// Merge the server and manifest providers to get the final list of providers

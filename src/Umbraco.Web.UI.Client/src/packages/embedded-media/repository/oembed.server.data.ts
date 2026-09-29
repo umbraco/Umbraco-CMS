@@ -5,7 +5,6 @@ import { tryExecute } from '@umbraco-cms/backoffice/resources';
 /**
  * A data source for the OEmbed that fetches data from a given URL.
  * @class UmbOEmbedServerDataSource
- * @implements {RepositoryDetailDataSource}
  */
 export class UmbOEmbedServerDataSource {
 	#host: UmbControllerHost;

@@ -14,8 +14,8 @@ export class UmbSectionItemRepository extends UmbRepositoryBase implements UmbIt
 	/**
 	 * Requests the items for the given uniques
 	 * @param {Array<string>} uniques - The unique identifiers of the sections to request
-	 * @returns {*} The requested section items
-	 * @memberof UmbItemRepositoryBase
+	 * @returns {Promise<{data: Array<UmbSectionItemModel>, asObservable: () => Observable<Array<UmbSectionItemModel>>}>} The requested section items
+	 * @memberof UmbSectionItemRepository
 	 */
 	async requestItems(uniques: Array<string>) {
 		if (!uniques) throw new Error('Uniques are missing');
@@ -33,8 +33,8 @@ export class UmbSectionItemRepository extends UmbRepositoryBase implements UmbIt
 	/**
 	 * Returns a promise with an observable of the items for the given uniques
 	 * @param {Array<string>} uniques - The unique identifiers of the sections to observe
-	 * @returns {*} An observable of the section items
-	 * @memberof UmbItemRepositoryBase
+	 * @returns {Promise<Observable<Array<UmbSectionItemModel>>>} An observable of the section items
+	 * @memberof UmbSectionItemRepository
 	 */
 	async items(uniques: Array<string>) {
 		return sectionItemsByUniquesObservable(uniques);

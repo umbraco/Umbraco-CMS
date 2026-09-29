@@ -45,7 +45,7 @@ export function ensureHistoryEvents() {
 /**
  * Attaches a global router event after the native function on the object has been invoked.
  * Stores the original function at the _name.
- * @param {any} obj - The object to patch.
+ * @param {History} obj - The object to patch.
  * @param {string} functionName - The name of the function to patch.
  * @param {GlobalRouterEvent} eventName - The event to dispatch after the function is invoked.
  */
@@ -67,7 +67,7 @@ export function attachCallback(obj: any, functionName: string, eventName: Global
 
 /**
  * Saves the native function on the history object.
- * @param {any} obj - The object to save the native function on.
+ * @param {History} obj - The object to save the native function on.
  * @param {string} name - The name of the function.
  * @param {() => void} func - The native function to save.
  */

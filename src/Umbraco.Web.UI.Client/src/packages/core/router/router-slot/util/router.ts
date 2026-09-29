@@ -29,6 +29,7 @@ export function isPathActive(path: string | PathFragment, fullPath: string = get
 
 /**
  * Matches a route.
+ * @template D
  * @param {IRoute<D>} route - The route to match.
  * @param {string | PathFragment} path - The path to match against.
  * @returns {IRouteMatch<D> | null} The route match, or null if it doesn't match.
@@ -109,6 +110,7 @@ export function matchRoute<D = any>(route: IRoute<D>, path: string | PathFragmen
 
 /**
  * Matches the first route that matches the given path.
+ * @template D
  * @param {IRoute<D>[]} routes - The routes to match against.
  * @param {string | PathFragment} path - The path to match.
  * @returns {IRouteMatch<D> | null} The first matching route, or null if none matches.
@@ -238,6 +240,8 @@ export function getFragments(tree: RouterTree, depth: number): PathFragment[] {
  * - Handles relative paths: "mypath"
  * - Handles absolute paths: "/mypath"
  * - Handles traversing paths: "../../mypath"
+ * @template D
+ * @template P
  * @param {IRouterSlot<D, P>} slot - The router slot to construct the path for.
  * @param {string | PathFragment} [path] - The path to make absolute.
  * @returns {string} The absolute path.
@@ -299,6 +303,7 @@ export function handleRedirect(slot: IRouterSlot, route: IRedirectRoute) {
 
 /**
  * Determines whether the navigation should start based on the current match and the new match.
+ * @template D
  * @param {IRouteMatch<D> | null} currentMatch - The current route match.
  * @param {IRouteMatch<D>} newMatch - The new route match.
  * @returns {boolean} True if the navigation should start.

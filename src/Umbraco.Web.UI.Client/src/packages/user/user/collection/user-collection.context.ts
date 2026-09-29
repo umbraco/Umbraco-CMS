@@ -73,6 +73,21 @@ export class UmbUserCollectionContext extends UmbDefaultCollectionContext<
 
 		this.#orderByOptions.setValue(orderByOptions);
 		this.#activeOrderByOption.setValue(firstOption.unique);
+
+		// The ordering can be set without going through the options, ex. when it is restored from the interaction memory.
+		this.observe(
+			this.filter,
+			(filter) => {
+				const { orderBy, orderDirection } = filter as UmbUserCollectionFilterModel;
+				const option = this.#orderByOptions
+					.getValue()
+					.find((x) => x.config.orderBy === orderBy && x.config.orderDirection === orderDirection);
+				if (option) {
+					this.#activeOrderByOption.setValue(option.unique);
+				}
+			},
+			null,
+		);
 	}
 
 	/**
@@ -88,7 +103,7 @@ export class UmbUserCollectionContext extends UmbDefaultCollectionContext<
 
 	/**
 	 * Sets the state filter for the collection and refreshes the collection.
-	 * @param {Array<UmbUserStateFilterModel>} selection - The selected user states to filter by.
+	 * @param {Array<UmbUserStateFilterType>} selection - The selected user states to filter by.
 	 * @memberof UmbUserCollectionContext
 	 */
 	setStateFilter(selection: Array<UmbUserStateFilterType>) {
@@ -97,7 +112,7 @@ export class UmbUserCollectionContext extends UmbDefaultCollectionContext<
 
 	/**
 	 * Sets the order by filter for the collection and refreshes the collection.
-	 * @param {UmbUserOrderByModel} orderBy - The property to order the collection by.
+	 * @param {UmbUserOrderByType} orderBy - The property to order the collection by.
 	 * @memberof UmbUserCollectionContext
 	 */
 	setOrderByFilter(orderBy: UmbUserOrderByType) {
@@ -115,7 +130,7 @@ export class UmbUserCollectionContext extends UmbDefaultCollectionContext<
 
 	/**
 	 * Sets the order direction filter for the collection and refreshes the collection.
-	 * @param {any} orderDirection - The direction to order the collection by.
+	 * @param {UmbDirectionType} orderDirection - The direction to order the collection by.
 	 * @memberof UmbUserCollectionContext
 	 */
 	setOrderDirectionFilter(orderDirection: UmbDirectionType) {

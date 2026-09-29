@@ -6,6 +6,7 @@ export const manifest: ManifestPropertyEditorUi = {
 	name: 'Entity Data Picker Picker Views Configuration Property Editor UI',
 	element: () => import('./picker-views-configuration.element.js'),
 	meta: {
+		supportsVariantChange: true,
 		label: 'Entity Data Picker Picker Views Configuration',
 		icon: 'icon-grid',
 		group: '#propertyEditorUIGroups_pickers',

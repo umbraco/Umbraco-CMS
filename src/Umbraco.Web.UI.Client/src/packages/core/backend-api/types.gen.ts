@@ -706,6 +706,7 @@ export type DocumentBlueprintTreeItemResponseModel = {
     name: string;
     isFolder: boolean;
     documentType?: DocumentTypeReferenceResponseModel | null;
+    variants: Array<DocumentVariantItemResponseModel>;
 };
 
 export type DocumentCollectionResponseModel = {
@@ -715,6 +716,7 @@ export type DocumentCollectionResponseModel = {
     flags: Array<FlagModel>;
     creator?: string | null;
     sortOrder: number;
+    hasChildren: boolean;
     documentType: DocumentTypeCollectionReferenceResponseModel;
     isTrashed: boolean;
     isProtected: boolean;
@@ -1348,7 +1350,9 @@ export type MediaCollectionResponseModel = {
     flags: Array<FlagModel>;
     creator?: string | null;
     sortOrder: number;
+    hasChildren: boolean;
     mediaType: MediaTypeCollectionReferenceResponseModel;
+    extension?: string | null;
 };
 
 export type MediaConfigurationResponseModel = {
@@ -1366,6 +1370,7 @@ export type MediaItemResponseModel = {
     parent?: ReferenceByIdModel | null;
     hasChildren: boolean;
     mediaType: MediaTypeReferenceResponseModel;
+    extension?: string | null;
     variants: Array<VariantItemResponseModel>;
 };
 
@@ -1403,6 +1408,7 @@ export type MediaTreeItemResponseModel = {
     isTrashed: boolean;
     createDate: string;
     mediaType: MediaTypeReferenceResponseModel;
+    extension?: string | null;
     variants: Array<VariantItemResponseModel>;
 };
 
@@ -3318,6 +3324,17 @@ export type DocumentBlueprintResponseModelWritable = {
     documentType: DocumentTypeReferenceResponseModel;
 };
 
+export type DocumentBlueprintTreeItemResponseModelWritable = {
+    hasChildren: boolean;
+    id: string;
+    parent?: ReferenceByIdModel | null;
+    flags: Array<FlagModel>;
+    name: string;
+    isFolder: boolean;
+    documentType?: DocumentTypeReferenceResponseModel | null;
+    variants: Array<DocumentVariantItemResponseModelWritable>;
+};
+
 export type DocumentCollectionResponseModelWritable = {
     values: Array<DocumentValueResponseModel>;
     variants: Array<DocumentVariantResponseModelWritable>;
@@ -3325,6 +3342,7 @@ export type DocumentCollectionResponseModelWritable = {
     flags: Array<FlagModel>;
     creator?: string | null;
     sortOrder: number;
+    hasChildren: boolean;
     documentType: DocumentTypeCollectionReferenceResponseModel;
     isTrashed: boolean;
     isProtected: boolean;
@@ -3446,6 +3464,11 @@ export type PackageDefinitionResponseModelWritable = {
     id: string;
 };
 
+export type PagedDocumentBlueprintTreeItemResponseModelWritable = {
+    total: number;
+    items: Array<DocumentBlueprintTreeItemResponseModelWritable>;
+};
+
 export type PagedDocumentCollectionResponseModelWritable = {
     total: number;
     items: Array<DocumentCollectionResponseModelWritable>;
@@ -3505,6 +3528,12 @@ export type SearchResultResponseModelWritable = {
     id: string;
     score: number;
     fields: Array<FieldPresentationModel>;
+};
+
+export type SubsetDocumentBlueprintTreeItemResponseModelWritable = {
+    totalBefore: number;
+    totalAfter: number;
+    items: Array<DocumentBlueprintTreeItemResponseModelWritable>;
 };
 
 export type SubsetDocumentRecycleBinItemResponseModelWritable = {
@@ -8648,6 +8677,10 @@ export type GetIndexerErrors = {
      * The resource is protected and requires an authentication token
      */
     401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
 };
 
 export type GetIndexerResponses = {
@@ -8677,6 +8710,10 @@ export type GetIndexerByIndexNameErrors = {
      * The resource is protected and requires an authentication token
      */
     401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
 };
 
 export type GetIndexerByIndexNameError = GetIndexerByIndexNameErrors[keyof GetIndexerByIndexNameErrors];
@@ -8708,6 +8745,10 @@ export type PostIndexerByIndexNameRebuildErrors = {
      * The resource is protected and requires an authentication token
      */
     401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
     /**
      * Not Found
      */
@@ -14113,6 +14154,10 @@ export type PostPublishedCacheRebuildErrors = {
      * The resource is protected and requires an authentication token
      */
     401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
 };
 
 export type PostPublishedCacheRebuildResponses = {
@@ -14134,6 +14179,10 @@ export type GetPublishedCacheRebuildStatusErrors = {
      * The resource is protected and requires an authentication token
      */
     401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
 };
 
 export type GetPublishedCacheRebuildStatusResponses = {
@@ -14157,6 +14206,10 @@ export type PostPublishedCacheReloadErrors = {
      * The resource is protected and requires an authentication token
      */
     401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
 };
 
 export type PostPublishedCacheReloadResponses = {
@@ -14893,6 +14946,10 @@ export type GetSearcherErrors = {
      * The resource is protected and requires an authentication token
      */
     401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
 };
 
 export type GetSearcherResponses = {
@@ -14922,6 +14979,10 @@ export type GetSearcherBySearcherNameQueryErrors = {
      * The resource is protected and requires an authentication token
      */
     401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
     /**
      * Not Found
      */

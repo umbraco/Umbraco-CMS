@@ -222,6 +222,8 @@ export default {
 	},
 	media: {
 		clickToUpload: 'Haz clic para subir archivos',
+		browseFilesAction: 'Explorar archivos',
+		dropFilesOr: 'Arrastra y suelta archivos multimedia aquí<br />o',
 	},
 	member: {
 		createNewMember: 'Crear nuevo miembro',
@@ -527,6 +529,8 @@ export default {
 		new: 'Nuevo',
 		next: 'Próximo',
 		no: 'No',
+		noResults: 'Sin resultados',
+		noResultsFor: (query: string) => `Ningún resultado para "${query}".`,
 		of: 'de',
 		off: 'Desactivado',
 		ok: 'OK',
@@ -932,6 +936,17 @@ export default {
 		sortHelp:
 			'Arrastra las diferentes páginas debajo para colocarlas como deberían estar o haz clic en las cabeceras de las columnas para ordenar todas las páginas',
 		sortPleaseWait: 'Espera por favor, las páginas están siendo ordenadas. El proceso puede durar un poco.',
+		sortByFieldHeadline: 'Ordenar por campo',
+		sortByFieldSentence: 'Ordenar todos los elementos secundarios por',
+		sortByFieldDirectionLabel: 'Dirección',
+		sortByFieldAscending: 'Ascendente',
+		sortByFieldDescending: 'Descendente',
+		sortByFieldNameOption: 'Nombre',
+		sortByFieldCreateDateOption: 'Creado',
+		sortByFieldUpdateDateOption: 'Última edición',
+		sortIndividuallyHeadline: 'Ordenar individualmente',
+		sortByFieldCultureSentence: 'en',
+		sortByFieldCultureLabel: 'Idioma',
 	},
 	speechBubbles: {
 		validationFailedHeader: 'Validación',
@@ -1471,6 +1486,8 @@ export default {
 		deselectAllLogLevelFilters: 'Deseleccionar todo',
 	},
 	picker: {
+		browseTab: 'Explorar',
+		searchTab: 'Buscar',
 		selectedCount: (count: number) => `${count} ${count === 1 ? 'elemento seleccionado' : 'elementos seleccionados'}`,
 	},
 } as UmbLocalizationDictionary;

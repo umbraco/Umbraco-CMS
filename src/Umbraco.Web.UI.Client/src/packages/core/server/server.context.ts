@@ -5,7 +5,7 @@ import type { ServerInformationResponseModel } from '@umbraco-cms/backoffice/ext
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
-import { defer } from '@umbraco-cms/backoffice/external/rxjs';
+import { defer, map } from '@umbraco-cms/backoffice/external/rxjs';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 export class UmbServerContext extends UmbContextBase {
@@ -17,32 +17,29 @@ export class UmbServerContext extends UmbContextBase {
 	#serverInformationFetched = false;
 
 	/**
+	 * Observable that provides the full server information.
+	 * Every subscriber shares one request: the server is asked for its information at most once per
+	 * app session, no matter how many consumers observe this or the derived `isProductionMode` and `isDebugMode`.
+	 */
+	public readonly serverInformation = defer(() => {
+		this.#requestServerInformation();
+		return this.#serverInformation.asObservable();
+	});
+
+	/**
 	 * Observable that emits true when the server is running in Production mode,
 	 * false when not in Production mode, or undefined until server information is loaded.
 	 * UI consumers should treat undefined as restricted (safe default).
-	 * The server information is fetched lazily on first subscription.
 	 */
-	public readonly isProductionMode = defer(() => {
-		this.#ensureServerInformation();
-		return this.#serverInformation.asObservablePart((info) =>
-			info ? info.runtimeMode === RuntimeModeModel.PRODUCTION : undefined,
-		);
-	});
+	public readonly isProductionMode = this.serverInformation.pipe(
+		map((info) => (info ? info.runtimeMode === RuntimeModeModel.PRODUCTION : undefined)),
+	);
 
 	/**
 	 * Observable that emits true when the server is running in debug mode,
 	 * false when not, or undefined until server information is loaded.
-	 * The server information is fetched lazily on first subscription.
 	 */
-	public readonly isDebugMode = defer(() => {
-		this.#ensureServerInformation();
-		return this.#serverInformation.asObservablePart((info) => (info ? info.isDebugMode : undefined));
-	});
-
-	/**
-	 * Observable that provides the full server information.
-	 */
-	public readonly serverInformation = this.#serverInformation.asObservable();
+	public readonly isDebugMode = this.serverInformation.pipe(map((info) => (info ? info.isDebugMode : undefined)));
 
 	constructor(host: UmbControllerHost, config: UmbServerContextConfig) {
 		super(host, UMB_SERVER_CONTEXT);
@@ -51,7 +48,7 @@ export class UmbServerContext extends UmbContextBase {
 		this.#serverConnection = config.serverConnection;
 	}
 
-	#ensureServerInformation() {
+	#requestServerInformation() {
 		if (this.#serverInformationFetched) return;
 		this.#serverInformationFetched = true;
 		this.#fetchServerInformation();
@@ -63,6 +60,9 @@ export class UmbServerContext extends UmbContextBase {
 		});
 		if (data) {
 			this.#serverInformation.setValue(data);
+		} else {
+			this.#serverInformationFetched = false;
+			// Might need a retry mechanism here, but for now we just reset the flag so the next subscriber will trigger a new request. [NL]
 		}
 	}
 

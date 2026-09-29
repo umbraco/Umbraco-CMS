@@ -79,7 +79,7 @@ export class UmbTargetPaginationManager<
 	/**
 	 * Gets the number of items per page
 	 * @returns {number} The number of items per page
-	 * @memberof UmbPaginationManager
+	 * @memberof UmbTargetPaginationManager
 	 */
 	public getTakeSize(): number {
 		return this.#takeSize.getValue();
@@ -88,7 +88,7 @@ export class UmbTargetPaginationManager<
 	/**
 	 * Sets the number of items per page and recalculates the total number of pages
 	 * @param {number} pageSize - The number of items per page
-	 * @memberof UmbPaginationManager
+	 * @memberof UmbTargetPaginationManager
 	 */
 	public setTakeSize(pageSize: number) {
 		this.#takeSize.setValue(pageSize);
@@ -143,7 +143,7 @@ export class UmbTargetPaginationManager<
 	/**
 	 * Gets the total number of items
 	 * @returns {number} The total number of items
-	 * @memberof UmbPaginationManager
+	 * @memberof UmbTargetPaginationManager
 	 */
 	public getTotalItems(): number {
 		return this.#totalItems.getValue();
@@ -152,7 +152,7 @@ export class UmbTargetPaginationManager<
 	/**
 	 * Sets the total number of items and recalculates the total number of pages
 	 * @param {number} totalItems - The total number of items
-	 * @memberof UmbPaginationManager
+	 * @memberof UmbTargetPaginationManager
 	 */
 	public setTotalItems(totalItems: number) {
 		this.#totalItems.setValue(totalItems);
@@ -262,7 +262,7 @@ export class UmbTargetPaginationManager<
 
 	/**
 	 * Clears the pagination manager values and resets them to their default values
-	 * @memberof UmbPaginationManager
+	 * @memberof UmbTargetPaginationManager
 	 */
 	public clear() {
 		this.#totalItems.setValue(0);

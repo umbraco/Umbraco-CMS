@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Net;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 
@@ -17,7 +18,6 @@ namespace Umbraco.Cms.Core.HealthChecks.Checks.Security;
     Group = "Security")]
 public class ExcessiveHeadersCheck : HealthCheck
 {
-    private static HttpClient? httpClient;
     private readonly IHostingEnvironment _hostingEnvironment;
     private readonly ILocalizedTextService _textService;
 
@@ -30,7 +30,7 @@ public class ExcessiveHeadersCheck : HealthCheck
         _hostingEnvironment = hostingEnvironment;
     }
 
-    private static HttpClient HttpClient => httpClient ??= new HttpClient();
+    private static HttpClient HttpClient => SharedHttpClient.Instance;
 
     /// <inheritdoc />
     public override async Task<IEnumerable<HealthCheckStatus>> GetStatusAsync()

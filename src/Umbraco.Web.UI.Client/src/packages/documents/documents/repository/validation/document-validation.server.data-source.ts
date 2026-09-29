@@ -24,7 +24,7 @@ export class UmbDocumentValidationServerDataSource {
 	 * Validate a new Document on the server
 	 * @param {UmbDocumentDetailModel} model - Document Model
 	 * @param {UmbEntityUnique} parentUnique - Parent Unique
-	 * @returns {*} The validation result.
+	 * @returns {Promise<UmbDataSourceResponse<string>>} The validation result.
 	 */
 	async validateCreate(
 		model: UmbDocumentDetailModel,
@@ -66,7 +66,7 @@ export class UmbDocumentValidationServerDataSource {
 	 * Validate a existing Document
 	 * @param {UmbDocumentDetailModel} model - Document Model
 	 * @param {Array<UmbVariantId>} variantIds - Variant Ids
-	 * @returns {*} The validation result.
+	 * @returns {Promise<UmbDataSourceResponse<string>>} The validation result.
 	 */
 	async validateUpdate(
 		model: UmbDocumentDetailModel,
