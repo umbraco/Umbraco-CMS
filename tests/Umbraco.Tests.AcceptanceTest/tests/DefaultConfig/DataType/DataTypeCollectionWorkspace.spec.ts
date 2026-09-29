@@ -3,10 +3,12 @@ import {expect} from "@playwright/test";
 
 const dataTypeName = 'TestDataType';
 const dataTypeFolderName = 'TestDataTypeFolder';
+const childFolderName = 'Test Child Folder';
 
 test.beforeEach(async ({umbracoApi, umbracoUi}) => {
   await umbracoApi.dataType.ensureNameNotExists(dataTypeName);
   await umbracoApi.dataType.ensureNameNotExists(dataTypeFolderName);
+  await umbracoApi.dataType.ensureNameNotExists(childFolderName);
   await umbracoUi.goToBackOffice();
   await umbracoUi.dataType.goToSettingsTreeItem('Data Types');
 });
@@ -14,9 +16,10 @@ test.beforeEach(async ({umbracoApi, umbracoUi}) => {
 test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.dataType.ensureNameNotExists(dataTypeName);
   await umbracoApi.dataType.ensureNameNotExists(dataTypeFolderName);
+  await umbracoApi.dataType.ensureNameNotExists(childFolderName);
 });
 
-test('can create a data type using create options', async ({umbracoApi, umbracoUi}) => {
+test('can create a data type from the tree actions menu', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.dataType.clickActionsMenuAtRoot();
   await umbracoUi.dataType.clickCreateActionMenuOption();
@@ -33,7 +36,7 @@ test('can create a data type using create options', async ({umbracoApi, umbracoU
   await umbracoUi.dataType.doesTreeItemHaveTheCorrectIcon(dataTypeName, 'icon-autofill');
 });
 
-test('can create a data type folder using create options', async ({umbracoApi, umbracoUi}) => {
+test('can create a data type folder from the tree actions menu', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.dataType.clickActionsMenuAtRoot();
   await umbracoUi.dataType.createDataTypeFolderAndWaitForDataTypeToBeCreated(dataTypeFolderName);
@@ -44,7 +47,7 @@ test('can create a data type folder using create options', async ({umbracoApi, u
   await umbracoUi.dataType.doesTreeItemHaveTheCorrectIcon(dataTypeFolderName, 'icon-folder');
 });
 
-test('can create a data type in a folder using create options', async ({umbracoApi, umbracoUi}) => {
+test('can create a data type in a folder from the tree actions menu', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeFolderId = await umbracoApi.dataType.createFolder(dataTypeFolderName);
   await umbracoUi.dataType.reloadDataTypeTree();

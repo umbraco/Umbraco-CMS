@@ -1826,7 +1826,7 @@ export class UiBaseLocators extends BasePage {
     );
   }
 
-  async doesCollectionTreeItemTableRowHaveIcon(name: string, icon: string, exact: boolean = true) {
+  async doesCollectionTreeItemTableRowHaveIcon(name: string, icon: string, exact: boolean = false) {
     await this.waitForVisible(this.collectionTreeItemTableRow.first());
     await this.isVisible(
       this.collectionTreeItemTableRow

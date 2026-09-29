@@ -3,10 +3,12 @@ import {ConstantHelper, test} from '@umbraco/acceptance-test-helpers';
 
 const mediaTypeName = 'TestMediaType';
 const mediaTypeFolderName = 'TestMediaTypeFolder';
+const childFolderName = 'Test Child Folder';
 
 test.beforeEach(async ({umbracoUi, umbracoApi}) => {
   await umbracoApi.mediaType.ensureNameNotExists(mediaTypeName);
   await umbracoApi.mediaType.ensureNameNotExists(mediaTypeFolderName);
+  await umbracoApi.mediaType.ensureNameNotExists(childFolderName);
   await umbracoUi.goToBackOffice();
   await umbracoUi.mediaType.goToSection(ConstantHelper.sections.settings);
 });
@@ -14,9 +16,10 @@ test.beforeEach(async ({umbracoUi, umbracoApi}) => {
 test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.mediaType.ensureNameNotExists(mediaTypeName);
   await umbracoApi.mediaType.ensureNameNotExists(mediaTypeFolderName);
+  await umbracoApi.mediaType.ensureNameNotExists(childFolderName);
 });
 
-test('can create a media type using create options', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+test('can create a media type from the tree actions menu', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.mediaType.clickActionsMenuAtRoot();
   await umbracoUi.mediaType.clickCreateActionMenuOption();
@@ -31,7 +34,7 @@ test('can create a media type using create options', {tag: '@release'}, async ({
   await umbracoUi.mediaType.doesTreeItemHaveTheCorrectIcon(mediaTypeName, 'icon-picture');
 });
 
-test('can create a media type folder using create options', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+test('can create a media type folder from the tree actions menu', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.mediaType.clickActionsMenuAtRoot();
   await umbracoUi.mediaType.clickCreateActionMenuOption();
@@ -45,7 +48,7 @@ test('can create a media type folder using create options', {tag: '@release'}, a
   await umbracoUi.mediaType.doesTreeItemHaveTheCorrectIcon(mediaTypeFolderName, 'icon-folder');
 });
 
-test('can create a media type in a folder using create options', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+test('can create a media type in a folder from the tree actions menu', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const mediaTypeFolderId = await umbracoApi.mediaType.createFolder(mediaTypeFolderName);
   await umbracoUi.mediaType.reloadMediaTypeTree();
