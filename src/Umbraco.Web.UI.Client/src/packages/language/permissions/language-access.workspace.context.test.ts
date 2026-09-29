@@ -195,6 +195,71 @@ describe('UmbLanguageAccessWorkspaceContext', () => {
 		});
 	});
 
+	describe('with invariant-for-variant access and no language access', () => {
+		const enUSSegment = new UmbVariantId('en-US', 'segment');
+		const daDKSegment = new UmbVariantId('da-DK', 'segment');
+
+		beforeEach(() => {
+			host.workspaceContext.setVariants([enUS, enUSSegment, daDK, daDKSegment]);
+			host.workspaceContext.setContentTypeProperties([
+				{ unique: 'culture-property', variesByCulture: true, variesBySegment: false },
+				{ unique: 'culture-and-segment-property', variesByCulture: true, variesBySegment: true },
+				{ unique: 'segment-property', variesByCulture: false, variesBySegment: true },
+				{ unique: 'invariant-property', variesByCulture: false, variesBySegment: false },
+			]);
+			host.currentUserContext.setLanguages([]);
+			host.currentUserContext.setHasAccessToInvariantForVariant(true);
+		});
+
+		it('permits writing properties that do not vary by culture in every culture and segment', async () => {
+			await createContext();
+
+			const propertyWriteGuard = host.workspaceContext.propertyWriteGuard;
+			for (const datasetVariantId of [enUS, enUSSegment, daDK, daDKSegment]) {
+				expect(
+					propertyWriteGuard.getIsPermittedForVariantAndProperty(
+						new UmbVariantId(null, datasetVariantId.segment),
+						{ unique: 'segment-property' },
+						datasetVariantId,
+					),
+					`segment-property in ${datasetVariantId.toString()}`,
+				).to.be.true;
+				expect(
+					propertyWriteGuard.getIsPermittedForVariantAndProperty(
+						UmbVariantId.CreateInvariant(),
+						{ unique: 'invariant-property' },
+						datasetVariantId,
+					),
+					`invariant-property in ${datasetVariantId.toString()}`,
+				).to.be.true;
+			}
+		});
+
+		it('denies writing properties that vary by culture in every culture and segment', async () => {
+			await createContext();
+
+			const propertyWriteGuard = host.workspaceContext.propertyWriteGuard;
+			for (const datasetVariantId of [enUS, enUSSegment, daDK, daDKSegment]) {
+				expect(
+					propertyWriteGuard.getIsPermittedForVariantAndProperty(
+						new UmbVariantId(datasetVariantId.culture),
+						{ unique: 'culture-property' },
+						datasetVariantId,
+					),
+					`culture-property in ${datasetVariantId.toString()}`,
+				).to.be.false;
+				expect(
+					propertyWriteGuard.getIsPermittedForVariantAndProperty(
+						datasetVariantId,
+						{ unique: 'culture-and-segment-property' },
+						datasetVariantId,
+					),
+					`culture-and-segment-property in ${datasetVariantId.toString()}`,
+				).to.be.false;
+			}
+		});
+	});
+
 	it('removes the write restriction when the user gains access to all languages', async () => {
 		host.currentUserContext.setHasAccessToInvariantForVariant(true);
 		await createContext();

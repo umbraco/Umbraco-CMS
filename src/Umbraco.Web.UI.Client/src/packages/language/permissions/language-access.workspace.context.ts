@@ -92,9 +92,9 @@ export class UmbLanguageAccessWorkspaceContext extends UmbContextBase {
 			// The user is allowed to edit invariant (shared) property data on variant content. Don't
 			// lock the whole dataset read-only — that would cascade down to invariant properties via
 			// the dataset → property read-only propagation. Instead install property-level write-deny
-			// rules on culture- or segment-varying properties, leaving invariant properties editable.
-			const variantProperties =
-				this.#contentTypeProperties?.filter((prop) => prop.variesByCulture || prop.variesBySegment) ?? [];
+			// rules on culture-varying properties only. Properties that don't vary by culture (segment
+			// variant ones included) are shared across cultures, so they stay editable.
+			const variantProperties = this.#contentTypeProperties?.filter((prop) => prop.variesByCulture) ?? [];
 
 			const propertyRules = datasetVariantIds.flatMap((datasetVariantId) =>
 				variantProperties.map((prop) => ({
