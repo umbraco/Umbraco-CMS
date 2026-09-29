@@ -17,7 +17,8 @@ public enum ApplicationUrlDetection
     ///     The URL is set from the first HTTP request and then locked against requests for other hosts.
     ///     The locked URL is only replaced when a later request is strictly more useful as a public address:
     ///     a request for a non-loopback host replaces a loopback URL, and an HTTPS request for the same host
-    ///     and path replaces an HTTP URL.
+    ///     and path replaces an HTTP URL. An HTTP URL on the default port is only replaced by an HTTPS URL on
+    ///     the default port.
     /// </summary>
     FirstRequest,
 

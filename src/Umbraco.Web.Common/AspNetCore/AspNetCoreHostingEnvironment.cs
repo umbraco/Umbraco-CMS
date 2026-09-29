@@ -202,7 +202,7 @@ public class AspNetCoreHostingEnvironment : IHostingEnvironment
                 return;
 
             case ApplicationUrlDetection.FirstRequest:
-                TryReplaceApplicationMainUrl(currentApplicationUrl, CanReplaceLockedUrl);
+                TryReplaceApplicationMainUrl(currentApplicationUrl, IsUpgrade);
                 break;
 
             case ApplicationUrlDetection.EveryRequest:
@@ -211,7 +211,7 @@ public class AspNetCoreHostingEnvironment : IHostingEnvironment
                     return;
                 }
 
-                if (TryReplaceApplicationMainUrl(currentApplicationUrl, IsNoLessUsefulApplicationUrl))
+                if (TryReplaceApplicationMainUrl(currentApplicationUrl, static (current, candidate) => IsDowngrade(current, candidate) is false))
                 {
                     _applicationUrls.TryAdd(currentApplicationUrl);
                 }
@@ -221,14 +221,14 @@ public class AspNetCoreHostingEnvironment : IHostingEnvironment
     }
 
     /// <summary>
-    /// Applies <paramref name="candidate" /> as the application main URL when <paramref name="canReplace" />
-    /// accepts it, retrying against the value another request may have applied in the meantime so that a
-    /// replacement is only ever committed against the exact value it was evaluated for.
+    ///     Applies <paramref name="candidate" /> as the application main URL when <paramref name="shouldReplace" />
+    ///     accepts it, retrying against the value another request may have applied in the meantime so that a
+    ///     replacement is only ever committed against the exact value it was evaluated for.
     /// </summary>
-    private bool TryReplaceApplicationMainUrl(Uri candidate, Func<Uri, Uri, bool> canReplace)
+    private bool TryReplaceApplicationMainUrl(Uri candidate, Func<Uri, Uri, bool> shouldReplace)
     {
         Uri? current = _applicationMainUrl;
-        while (current is null || canReplace(current, candidate))
+        while (current is null || shouldReplace(current, candidate))
         {
             Uri? observed = Interlocked.CompareExchange(ref _applicationMainUrl, candidate, current);
             if (ReferenceEquals(observed, current))
@@ -243,52 +243,37 @@ public class AspNetCoreHostingEnvironment : IHostingEnvironment
     }
 
     /// <summary>
-    /// A locked URL is only replaced by a strictly more useful one, and only by a request for the same host,
-    /// path and an acceptable port - except when escaping a loopback address, which no visitor can reach in
-    /// the first place.
+    ///     A locked URL is only replaced by one that is strictly more useful as the public application URL:
+    ///     a non-loopback host replacing a loopback host, or HTTPS replacing HTTP for the same host and path.
+    ///     The port comes from the request's host header, which host filtering does not check, so a URL on a
+    ///     default port only moves to the default HTTPS port.
     /// </summary>
-    private static bool CanReplaceLockedUrl(Uri locked, Uri candidate)
-        => IsMoreUsefulApplicationUrl(locked, candidate)
-            && (EscapesLoopback(locked, candidate)
-                || (IsSameHostAndPath(locked, candidate) && IsPortChangeAllowed(locked, candidate)));
-
-    /// <summary>
-    /// Any request may replace the URL, including with another host, but never with one that is less useful
-    /// as a public address.
-    /// </summary>
-    private static bool IsNoLessUsefulApplicationUrl(Uri current, Uri candidate)
-        => PublicUrlRank(candidate) >= PublicUrlRank(current);
-
-    private static bool IsMoreUsefulApplicationUrl(Uri current, Uri candidate)
-        => PublicUrlRank(candidate) > PublicUrlRank(current);
-
-    /// <summary>
-    /// Ranks a URL by how well it serves as the public application URL, from a loopback address that no
-    /// visitor can reach up to a non-loopback HTTPS address. A URL is only ever replaced by one of an equal
-    /// or higher rank.
-    /// </summary>
-    private static int PublicUrlRank(Uri url) => (url.IsLoopback, url.Scheme == Uri.UriSchemeHttps) switch
+    private static bool IsUpgrade(Uri current, Uri candidate)
     {
-        (true, false) => 0,
-        (true, true) => 1,
-        (false, false) => 2,
-        (false, true) => 3,
-    };
+        if (current.IsLoopback != candidate.IsLoopback)
+        {
+            return candidate.IsLoopback is false;
+        }
 
-    private static bool EscapesLoopback(Uri current, Uri candidate)
-        => current.IsLoopback && candidate.IsLoopback is false;
-
-    private static bool IsSameHostAndPath(Uri current, Uri candidate)
-        => Uri.Compare(current, candidate, UriComponents.Host | UriComponents.Path, UriFormat.Unescaped, StringComparison.OrdinalIgnoreCase) == 0;
+        return current.Scheme == Uri.UriSchemeHttp
+            && candidate.Scheme == Uri.UriSchemeHttps
+            && Uri.Compare(current, candidate, UriComponents.Host | UriComponents.Path, UriFormat.Unescaped, StringComparison.OrdinalIgnoreCase) == 0
+            && (current.IsDefaultPort is false || candidate.IsDefaultPort);
+    }
 
     /// <summary>
-    /// A replacement takes its port from the request that triggered it, and that port is not covered by host
-    /// filtering. A URL already reachable on the default port for its scheme may therefore only move to
-    /// another default port, while a deployment bound to a non-standard port stays free to reach its paired
-    /// HTTPS port.
+    ///     A URL is never replaced by one that is less useful as the public application URL:
+    ///     a loopback host replacing a non-loopback host, or HTTP replacing HTTPS.
     /// </summary>
-    private static bool IsPortChangeAllowed(Uri current, Uri candidate)
-        => current.IsDefaultPort is false || candidate.IsDefaultPort;
+    private static bool IsDowngrade(Uri current, Uri candidate)
+    {
+        if (current.IsLoopback != candidate.IsLoopback)
+        {
+            return candidate.IsLoopback;
+        }
+
+        return current.Scheme == Uri.UriSchemeHttps && candidate.Scheme == Uri.UriSchemeHttp;
+    }
 
     private void SetSiteNameAndDebugMode(HostingSettings hostingSettings)
     {
