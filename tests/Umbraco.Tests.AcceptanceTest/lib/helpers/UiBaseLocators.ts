@@ -2053,16 +2053,15 @@ export class UiBaseLocators extends BasePage {
    */
   async waitForResponseAfterExecutingPromise(
     url: string,
-    promise: Promise<void>,
+    action: Promise<void> | (() => Promise<void>),
     statusCode: number,
     method?: string,
   ) {
-    const [response] = await Promise.all([
-      this.page.waitForResponse(
-        (resp) => resp.url().includes(url) && resp.status() === statusCode && (method === undefined || resp.request().method() === method),
-      ),
-      promise,
-    ]);
+    // Prefer the callback form: an already-started promise can complete before the listener attaches.
+    const responsePromise = this.page.waitForResponse(
+      (resp) => resp.url().includes(url) && resp.status() === statusCode && (method === undefined || resp.request().method() === method),
+    );
+    const [response] = await Promise.all([responsePromise, typeof action === "function" ? action() : action]);
 
     if (statusCode === 201) {
       return response.headers()["location"]?.split("/").pop();
