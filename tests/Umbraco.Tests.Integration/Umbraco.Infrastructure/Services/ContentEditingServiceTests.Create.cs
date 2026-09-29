@@ -621,6 +621,42 @@ public partial class ContentEditingServiceTests
     }
 
     [Test]
+    public async Task Can_Create_Culture_Variant_With_Extraneous_Invariant_Variant()
+    {
+        // the Management API's GET responses include a synthetic (Culture = null, Segment = null) variant
+        // representing invariant properties, distinct from any specific culture. A client that echoes the
+        // full variant list it previously received back into a create/update request must not have that
+        // extraneous entry rejected as a culture variance mismatch.
+        var contentType = await CreateVariantContentType();
+
+        var createModel = new ContentCreateModel
+        {
+            ContentTypeKey = contentType.Key,
+            ParentKey = Constants.System.RootKey,
+            Properties =
+            [
+                new PropertyValueModel { Alias = "invariantTitle", Value = "The Invariant Title" },
+                new PropertyValueModel { Alias = "variantTitle", Value = "The English Title", Culture = "en-US" },
+                new PropertyValueModel { Alias = "variantTitle", Value = "The Danish Title", Culture = "da-DK" }
+            ],
+            Variants =
+            [
+                new VariantModel { Culture = "en-US", Name = "The English Name" },
+                new VariantModel { Culture = "da-DK", Name = "The Danish Name" },
+                new VariantModel { Culture = null, Segment = null, Name = string.Empty }
+            ]
+        };
+
+        var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
+        Assert.IsNotNull(result.Result.Content);
+        Assert.AreEqual("The English Name", result.Result.Content!.GetCultureName("en-US"));
+        Assert.AreEqual("The Danish Name", result.Result.Content.GetCultureName("da-DK"));
+        Assert.AreEqual("The Invariant Title", result.Result.Content.GetValue<string>("invariantTitle"));
+    }
+
+    [Test]
     public async Task Can_Create_Segment_Variant()
     {
         var contentType = await CreateVariantContentType(ContentVariation.Segment);

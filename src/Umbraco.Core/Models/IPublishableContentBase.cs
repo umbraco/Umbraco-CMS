@@ -20,6 +20,15 @@ public interface IPublishableContentBase : IContentBase
     bool Edited { get; set; }
 
     /// <summary>
+    ///     Gets a value indicating whether an invariant property has been edited.
+    /// </summary>
+    /// <remarks>
+    ///     Distinct from <see cref="Edited" />: this reflects only invariant property values, never
+    ///     a specific culture's own values. Set directly by persistence, mirroring <see cref="Edited" />.
+    /// </remarks>
+    bool InvariantEdited { get; set; }
+
+    /// <summary>
     ///     Gets the version identifier for the currently published version of the content.
     /// </summary>
     int PublishedVersionId { get; set; }
@@ -84,7 +93,7 @@ public interface IPublishableContentBase : IContentBase
     DateTime? GetPublishDate(string culture);
 
     /// <summary>
-    ///     Gets a value indicated whether a given culture is edited.
+    ///     Gets a value indicated whether a given culture, or the invariant part of the content, is edited.
     /// </summary>
     /// <remarks>
     ///     <para>
@@ -92,9 +101,13 @@ public interface IPublishableContentBase : IContentBase
     ///         with changes.
     ///     </para>
     ///     <para>A culture can be edited even though the document might now have been saved yet (and can have no identity).</para>
-    ///     <para>Does not support the '*' wildcard (returns false).</para>
+    ///     <para>
+    ///         When <paramref name="culture" /> is <c>null</c> or the invariant culture wildcard ('*'),
+    ///         this asks whether an invariant property is edited instead — see <see cref="InvariantEdited" />. This is
+    ///         distinct from any specific culture's own edited state.
+    ///     </para>
     /// </remarks>
-    bool IsCultureEdited(string culture);
+    bool IsCultureEdited(string? culture);
 
     /// <summary>
     ///     Gets the name of the published version of the content for a given culture.

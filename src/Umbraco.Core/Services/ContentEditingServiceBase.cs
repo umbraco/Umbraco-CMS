@@ -552,9 +552,12 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
             return null;
         }
 
-        if (contentType.VariesByCulture() && contentEditingModelBase.Variants.Any(v => v.Culture is null))
+        if (contentType.VariesByCulture() && contentEditingModelBase.Variants.Any(v => v.Culture is not null) is false)
         {
-            // varies by culture with one or more variants not bound to a culture = invalid
+            // varies by culture with no variant bound to a culture = invalid. A variant not bound to a culture
+            // (Culture is null) is otherwise tolerated and ignored here - e.g. the invariant properties variant
+            // that's always included alongside real culture variants for culture-varying content, which carries
+            // no name of its own and is filtered out by UpdateNames below.
             operationStatus = ContentEditingOperationStatus.ContentTypeCultureVarianceMismatch;
             return null;
         }

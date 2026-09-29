@@ -82,27 +82,40 @@ public abstract class ContentMapDefinition<TContent, TValueViewModel, TVariantVi
     protected IEnumerable<TVariantViewModel> MapVariantViewModels(TContent source, VariantViewModelMapping? additionalVariantMapping = null)
     {
         IPropertyValue[] propertyValues = source.Properties.SelectMany(propertyCollection => propertyCollection.Values).ToArray();
-        var cultures = source.AvailableCultures.DefaultIfEmpty(null).ToArray();
+        var availableCultures = source.AvailableCultures.ToArray();
+        var cultures = availableCultures.DefaultIfEmpty(null).ToArray();
         // the default segment (null) must always be included in the view model - both for variant and invariant documents
         var segments = propertyValues.Select(property => property.Segment).Union([null]).Distinct().ToArray();
 
-        return cultures
-            .SelectMany(culture => segments.Select(segment =>
-            {
-                var variantViewModel = new TVariantViewModel
-                {
-                    Culture = culture,
-                    Segment = segment,
-                    Name = source.GetCultureName(culture) ?? string.Empty,
-                    CreateDate = source.CreateDate, // apparently there is no culture specific creation date
-                    UpdateDate = culture == null
-                        ? source.UpdateDate
-                        : source.GetUpdateDate(culture) ?? source.UpdateDate,
-                };
-                additionalVariantMapping?.Invoke(culture, segment, variantViewModel);
-                return variantViewModel;
-            }))
-            .ToArray();
+        List<TVariantViewModel> variants = cultures
+            .SelectMany(culture => segments.Select(segment => CreateVariantViewModel(source, culture, segment, additionalVariantMapping)))
+            .ToList();
+
+        // for culture-varying publishable content (documents, elements), also include a single invariant
+        // (culture = null, segment = null) entry representing the content's invariant properties, distinct
+        // from any specific culture or segment. Media has no invariant-edited concept, so it's excluded.
+        if (availableCultures.Length > 0 && source is IPublishableContentBase)
+        {
+            variants.Add(CreateVariantViewModel(source, null, null, additionalVariantMapping));
+        }
+
+        return variants;
+    }
+
+    private TVariantViewModel CreateVariantViewModel(TContent source, string? culture, string? segment, VariantViewModelMapping? additionalVariantMapping)
+    {
+        var variantViewModel = new TVariantViewModel
+        {
+            Culture = culture,
+            Segment = segment,
+            Name = source.GetCultureName(culture) ?? string.Empty,
+            CreateDate = source.CreateDate, // apparently there is no culture specific creation date
+            UpdateDate = culture == null
+                ? source.UpdateDate
+                : source.GetUpdateDate(culture) ?? source.UpdateDate,
+        };
+        additionalVariantMapping?.Invoke(culture, segment, variantViewModel);
+        return variantViewModel;
     }
 
     protected void MapContentScheduleCollection<TContentResponseModel, TPublishableVariantResponseModelBase>(ContentScheduleCollection source, TContentResponseModel target, MapperContext context)
