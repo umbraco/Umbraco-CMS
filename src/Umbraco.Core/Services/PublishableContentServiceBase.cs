@@ -1262,7 +1262,17 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
                     }
 
                     _contentRepository.PersistContentSchedule(d, contentSchedule);
-                    PublishResult result = CommitContentChanges(scope, d, evtMsgs, allLangs.Value, savingNotification.State, d.WriterId);
+                    PublishResult result = CommitContentChangesInternal(
+                        scope,
+                        d,
+                        evtMsgs,
+                        allLangs.Value,
+                        savingNotification.State,
+                        d.WriterId,
+                        branchOne: false,
+                        branchRoot: false,
+                        raiseSavedNotification: false,
+                        includeInvariantForVariant: true);
                     if (result.Success == false)
                     {
                         Logger.LogError(null, "Failed to publish content id={ContentId}, key={ContentKey}, reason={Reason}.", d.Id, d.Key, result.Result);
@@ -1340,6 +1350,8 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
 
                         // NOTE: hardcoding allowEditInvariantForVariant as true works for now, but it will need replacing if we ever introduce
                         //       "invariance as opt-in" for save/publish/schedule operations.
+                        //       The writer's permission can't be used instead: the writer is the last user to save the content,
+                        //       not the user who scheduled it.
                         CultureImpact impact = _cultureImpactFactory.ImpactExplicit(culture, includeInvariantForVariant: true);
                         var tryPublish = d.PublishCulture(impact, date, _propertyEditorCollection) &&
                                          _propertyValidationService.Value.IsPropertyDataValid(d, out invalidProperties, impact);
@@ -1372,7 +1384,17 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
                     else
                     {
                         _contentRepository.PersistContentSchedule(d, contentSchedule);
-                        result = CommitContentChanges(scope, d, evtMsgs, allLangs.Value, savingNotification.State, d.WriterId);
+                        result = CommitContentChangesInternal(
+                            scope,
+                            d,
+                            evtMsgs,
+                            allLangs.Value,
+                            savingNotification.State,
+                            d.WriterId,
+                            branchOne: false,
+                            branchRoot: false,
+                            raiseSavedNotification: false,
+                            includeInvariantForVariant: true);
                     }
 
                     if (result.Success == false)
@@ -1473,6 +1495,34 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         bool branchOne,
         bool branchRoot,
         bool raiseSavedNotification)
+        => CommitContentChangesInternal(
+            scope,
+            content,
+            eventMessages,
+            allLangs,
+            notificationState,
+            userId,
+            branchOne,
+            branchRoot,
+            raiseSavedNotification,
+            includeInvariantForVariant: null);
+
+    /// <inheritdoc cref="CommitContentChangesInternal(ICoreScope, TContent, EventMessages, IReadOnlyCollection{ILanguage}, IDictionary{string, object}, int, bool, bool, bool)" />
+    /// <param name="includeInvariantForVariant">
+    ///     Whether publishing includes invariant properties of variant content. When <c>null</c>, it is determined by the
+    ///     invariant-for-variant permission of the user identified by <paramref name="userId"/>.
+    /// </param>
+    private PublishResult CommitContentChangesInternal(
+        ICoreScope scope,
+        TContent content,
+        EventMessages eventMessages,
+        IReadOnlyCollection<ILanguage> allLangs,
+        IDictionary<string, object?>? notificationState,
+        int userId,
+        bool branchOne,
+        bool branchRoot,
+        bool raiseSavedNotification,
+        bool? includeInvariantForVariant)
     {
         if (scope == null)
         {
@@ -1564,7 +1614,8 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
                 eventMessages,
                 allLangs,
                 notificationState,
-                userId);
+                userId,
+                includeInvariantForVariant);
 
             if (publishResult.Success)
             {
@@ -2131,19 +2182,24 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         EventMessages evtMsgs,
         IReadOnlyCollection<ILanguage> allLangs,
         IDictionary<string, object?>? notificationState,
-        int userId)
+        int userId,
+        bool? includeInvariantForVariant)
     {
         var variesByCulture = content.ContentType.VariesByCulture();
-        IUser user = GetRequiredUser(userId);
 
         // If it's null it's invariant
-        CultureImpact[] impactsToPublish = culturesPublishing == null
-                ? new[] { _cultureImpactFactory.ImpactInvariant() }
-            : culturesPublishing.Select(x =>
-                    _cultureImpactFactory.ImpactExplicit(
-                        x,
-                        includeInvariantForVariant: user.HasAccessToInvariantForVariant()))
-                    .ToArray();
+        CultureImpact[] impactsToPublish;
+        if (culturesPublishing == null)
+        {
+            impactsToPublish = [_cultureImpactFactory.ImpactInvariant()];
+        }
+        else
+        {
+            var includeInvariant = includeInvariantForVariant ?? GetRequiredUser(userId).HasAccessToInvariantForVariant();
+            impactsToPublish = culturesPublishing
+                .Select(x => _cultureImpactFactory.ImpactExplicit(x, includeInvariantForVariant: includeInvariant))
+                .ToArray();
+        }
 
         // publish the culture(s)
         var publishTime = DateTime.UtcNow;
