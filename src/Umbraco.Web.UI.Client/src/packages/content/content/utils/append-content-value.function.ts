@@ -5,8 +5,8 @@ import { sortContentValuesByVariant } from './sort-content-values-by-variant.fun
  * Inserts or replaces a content value in a frozen array of content values.
  *
  * A replaced entry keeps the array's existing order — it already has a variant-sorted position from when it
- * was first added. A newly inserted entry is placed by culture and segment, matching the order the backend
- * settles a set of variant values into, so a fresh addition doesn't just land at the end out of order.
+ * was first added. A newly inserted entry is placed by culture, segment, and alias, matching the order the
+ * backend settles a set of variant values into, so a fresh addition doesn't just land at the end out of order.
  * @template T
  * @param {Array<T>} data - An array of content values, which is frozen and should be updated.
  * @param {T} entry - A new or updated content value.

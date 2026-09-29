@@ -357,22 +357,21 @@ describe('UmbMergeContentVariantDataController', () => {
 			expect(result.values.map((v) => v.culture)).to.deep.equal([null, 'da-dk', 'en-us']);
 		});
 
-		it('keeps values sharing a culture and segment in their existing relative order', async () => {
+		it('sorts values sharing a culture and segment by alias, ordinally', async () => {
 			const ctrlHost = new UmbTestControllerHostElement();
 			const ctrl = new UmbMergeContentVariantDataController(ctrlHost);
 
+			// Deliberately out of alias order, mirroring the Management API's
+			// OrderBy(Culture).ThenBy(Segment).ThenBy(Alias) so unchanged values keep the same array
+			// position the backend returns after a save and reload. [NL]
 			const data: UmbContentLikeDetailModel = {
-				values: [
-					{ ...value('subtitle', 'da-dk'), alias: 'subtitle' },
-					{ ...value('title', 'da-dk'), alias: 'title' },
-					{ ...value('body', 'en-us'), alias: 'body' },
-				],
+				values: [value('zzz-alias', 'da-dk'), value('aaa-alias', 'da-dk'), value('title', 'en-us')],
 			};
 
 			const variants = [new UmbVariantId('da-dk'), new UmbVariantId('en-us')];
 			const result = await ctrl.process(data, data, variants, variants);
 
-			expect(result.values.map((v) => v.alias)).to.deep.equal(['subtitle', 'title', 'body']);
+			expect(result.values.map((v) => v.alias)).to.deep.equal(['aaa-alias', 'zzz-alias', 'title']);
 		});
 	});
 });

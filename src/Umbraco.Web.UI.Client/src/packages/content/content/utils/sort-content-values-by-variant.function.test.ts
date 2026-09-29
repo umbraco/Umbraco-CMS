@@ -19,8 +19,10 @@ describe('sortContentValuesByVariant', () => {
 		expect(result).to.deep.equal([null, 'da-dk', 'en-us']);
 	});
 
-	it('compares culture codes case-insensitively', () => {
-		const values = [makeValue('title', 'DA-DK'), makeValue('title', 'en-us')];
+	it('compares culture codes ordinally, case-sensitively, matching the Management API', () => {
+		// StringComparer.Ordinal sorts uppercase before lowercase, so 'DA-DK' sorts before 'en-us'
+		// even though it would sort after under a case-insensitive comparison. [NL]
+		const values = [makeValue('title', 'en-us'), makeValue('title', 'DA-DK')];
 
 		const result = sortContentValuesByVariant(values).map((v) => v.culture);
 
@@ -39,7 +41,15 @@ describe('sortContentValuesByVariant', () => {
 		expect(result).to.deep.equal([null, 's1', 's2']);
 	});
 
-	it('keeps values with the same culture and segment in their original relative order', () => {
+	it('sorts by alias within the same culture and segment, ordinally', () => {
+		const values = [makeValue('zzz-alias', 'en-us', 's1'), makeValue('aaa-alias', 'en-us', 's1')];
+
+		const result = sortContentValuesByVariant(values).map((v) => v.alias);
+
+		expect(result).to.deep.equal(['aaa-alias', 'zzz-alias']);
+	});
+
+	it('groups by culture first, only falling back to alias within the same culture and segment', () => {
 		const values = [makeValue('subtitle', 'da-dk'), makeValue('title', 'da-dk'), makeValue('body', 'en-us')];
 
 		const result = sortContentValuesByVariant(values).map((v) => v.alias);
