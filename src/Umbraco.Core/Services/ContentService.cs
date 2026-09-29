@@ -575,7 +575,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
             cultures = ["*"];
         }
 
-        return cultures.Select(x => x.EnsureCultureCode()!).ToArray();
+        return [.. cultures.Select(x => x.EnsureCultureCode()!)];
     }
 
     private static bool ProvidedCulturesIndicatePublishAll(string[] cultures) => cultures.Length == 0 || (cultures.Length == 1 && cultures[0] == "invariant");
@@ -596,12 +596,12 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
         int userId,
         CancellationToken cancellationToken)
     {
-        if (shouldPublish == null)
+        if (shouldPublish is null)
         {
             throw new ArgumentNullException(nameof(shouldPublish));
         }
 
-        if (publishCultures == null)
+        if (publishCultures is null)
         {
             throw new ArgumentNullException(nameof(publishCultures));
         }
@@ -622,7 +622,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
             }
 
             PublishedState publishedState = document.PublishedState;
-            if (publishedState == PublishedState.Publishing)
+            if (publishedState is PublishedState.Publishing)
             {
                 throw new InvalidOperationException("Cannot mix PublishCulture and SaveAndPublishBranch.");
             }
@@ -648,7 +648,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
             HashSet<string>? culturesToPublish = shouldPublish(document);
             (PublishResult? result, IDictionary<string, object?>? notificationState) =
                 await PublishBranchItemAsync(scope, document, culturesToPublish, publishCultures, true, publishedDocuments, eventMessages, userId, allLangs, cancellationToken);
-            if (result != null)
+            if (result is not null)
             {
                 results.Add(result);
                 if (!result.Success)
@@ -688,7 +688,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
                     // no need to check path here, parent has to be published here
                     culturesToPublish = shouldPublish(d);
                     (result, _) = await PublishBranchItemAsync(scope, d, culturesToPublish, publishCultures, false, publishedDocuments, eventMessages, userId, allLangs, cancellationToken);
-                    if (result != null)
+                    if (result is not null)
                     {
                         results.Add(result);
                         if (result.Success)
@@ -759,7 +759,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
         }
 
         // null = do not include
-        if (culturesToPublish == null)
+        if (culturesToPublish is null)
         {
             return (null, initialNotificationState);
         }
@@ -826,9 +826,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
         scope.Notifications.Publish(
             new ContentTreeChangeNotification(content, TreeChangeTypes.RefreshBranch, eventMessages));
 
-        MoveToRecycleBinEventInfo<IContent>[] moveInfo = moves
-            .Select(x => new MoveToRecycleBinEventInfo<IContent>(x.Item1, x.Item2))
-            .ToArray();
+        MoveToRecycleBinEventInfo<IContent>[] moveInfo = [.. moves.Select(x => new MoveToRecycleBinEventInfo<IContent>(x.Item1, x.Item2))];
 
         scope.Notifications.Publish(
             new ContentMovedToRecycleBinNotification(moveInfo, eventMessages).WithStateFrom(
@@ -926,10 +924,9 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
             // The single RefreshBranch above cannot reconcile the descendants left in the bin (they are no longer
             // descendants of the restored item), so also refresh the re-homed direct children. The navigation
             // reconciler then moves them - and their sub-trees - back under the recycle bin root.
-            IContent[] rehomedChildren = moves
+            IContent[] rehomedChildren = [.. moves
                 .Select(x => x.Item1)
-                .Where(x => x.ParentId == Constants.System.RecycleBinContent)
-                .ToArray();
+                .Where(x => x.ParentId == Constants.System.RecycleBinContent)];
             scope.Notifications.Publish(
                 new ContentTreeChangeNotification(content.Yield().Concat(rehomedChildren), TreeChangeTypes.RefreshBranch, eventMessages));
         }
@@ -940,9 +937,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
         }
 
         // changes
-        MoveEventInfo<IContent>[] moveInfo = moves
-            .Select(x => new MoveEventInfo<IContent>(x.Item1, x.Item2, x.Item1.ParentKey))
-            .ToArray();
+        MoveEventInfo<IContent>[] moveInfo = [.. moves.Select(x => new MoveEventInfo<IContent>(x.Item1, x.Item2, x.Item1.ParentKey))];
 
         scope.Notifications.Publish(
             new ContentMovedNotification(moveInfo, eventMessages).WithStateFrom(movingNotification));
@@ -989,7 +984,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
 
         var paths = new Dictionary<int, string>
         {
-            [content.Id] = (parent == null
+            [content.Id] = (parent is null
                 ? parentId == Constants.System.RecycleBinContent ? "-1,-20" : Constants.System.RootString
                 : parent.Path) + "," + content.Id,
         };
@@ -1072,7 +1067,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
 
         // emptying the recycle bin means deleting whatever is in there - do it properly!
         PagedModel<IContent> contentsPage = await GetChildrenAsync(Constants.System.RecycleBinContentKey, 0, int.MaxValue, propertyAliases: null, ordering: null, cancellationToken);
-        IContent[] contents = contentsPage.Items.ToArray();
+        IContent[] contents = [.. contentsPage.Items];
 
         var emptyingRecycleBinNotification = new ContentEmptyingRecycleBinNotification(contents, eventMessages);
         var deletingContentNotification = new ContentDeletingNotification(contents, eventMessages);
@@ -1226,7 +1221,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
                     }
 
                     // if parent has not been copied, skip, else gets its copy id
-                    if (idmap.TryGetValue(descendant.ParentId, out int descendantParentId) == false)
+                    if (idmap.TryGetValue(descendant.ParentId, out int descendantParentId) is false)
                     {
                         continue;
                     }
@@ -1335,7 +1330,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
         scope.Notifications.Publish(
             new ContentSentToPublishNotification(content, evtMsgs).WithStateFrom(sendingToPublishNotification));
 
-        if (culturesChanging != null)
+        if (culturesChanging is not null)
         {
             await AuditAsync(AuditType.SendToPublishVariant, userId, content.Id, $"Send To Publish for cultures: {culturesChanging}", culturesChanging);
         }
@@ -1364,7 +1359,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
         // partially-loaded content (e.g. loaded with loadTemplates: false or without property data),
         // and saving those directly would wipe the template and property data (#23120).
         // GetByIdsAsync returns items in the requested order, preserving the caller's ordering that drives the sort.
-        IContent[] itemsA = (await GetByIdsAsync(orderedKeys, cancellationToken)).ToArray();
+        IContent[] itemsA = [.. (await GetByIdsAsync(orderedKeys, cancellationToken))];
 
         var sortingNotification = new ContentSortingNotification(itemsA, eventMessages);
         if (await scope.Notifications.PublishCancelableAsync(sortingNotification))
@@ -1515,7 +1510,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
     {
         var changes = new List<TreeChange<IContent>>();
         var moves = new List<(IContent, string)>();
-        Guid[] contentTypeKeysArray = contentTypeKeys.ToArray();
+        Guid[] contentTypeKeysArray = [.. contentTypeKeys];
         EventMessages eventMessages = EventMessagesFactory.Get();
 
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
@@ -1547,7 +1542,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
             // if it's not trashed yet, and published, we should unpublish
             // but... Unpublishing event makes no sense (not going to cancel?) and no need to save
             // just raise the event
-            if (content.Trashed == false && content.Published)
+            if (content is { Trashed: false, Published: true })
             {
                 scope.Notifications.Publish(new ContentUnpublishedNotification(
                     content,
@@ -1570,9 +1565,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
             changes.Add(new TreeChange<IContent>(content, TreeChangeTypes.Remove));
         }
 
-        MoveToRecycleBinEventInfo<IContent>[] moveInfos = moves
-            .Select(x => new MoveToRecycleBinEventInfo<IContent>(x.Item1, x.Item2))
-            .ToArray();
+        MoveToRecycleBinEventInfo<IContent>[] moveInfos = [.. moves.Select(x => new MoveToRecycleBinEventInfo<IContent>(x.Item1, x.Item2))];
         if (moveInfos.Length > 0)
         {
             scope.Notifications.Publish(new ContentMovedToRecycleBinNotification(moveInfos, eventMessages));
@@ -1600,10 +1593,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.ReadLock(Constants.Locks.ContentTree);
         IContent? blueprint = await _documentBlueprintRepository.GetAsync(key, cancellationToken);
-        if (blueprint is not null)
-        {
-            blueprint.Blueprint = true;
-        }
+        blueprint?.Blueprint = true;
 
         scope.Complete();
         return blueprint;
@@ -1621,7 +1611,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
 
         int userId = await _userIdKeyResolver.GetAsync(userKey);
 
-        if (content.HasIdentity == false)
+        if (content.HasIdentity is false)
         {
             content.CreatorId = userId;
         }
@@ -1691,7 +1681,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
         return Attempt.Succeed(ContentBlueprintOperationStatus.Success);
     }
 
-    private static readonly string?[] ArrayOfOneNullString = { null };
+    private static readonly string?[] ArrayOfOneNullString = [null];
 
     /// <summary>
     /// Creates a new <see cref="IContent"/> from a blueprint.
@@ -1790,7 +1780,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.WriteLock(Constants.Locks.ContentTree);
 
-        Guid[] contentTypeKeysArray = contentTypeKeys.ToArray();
+        Guid[] contentTypeKeysArray = [.. contentTypeKeys];
 
         IEnumerable<IContent> blueprints;
         if (contentTypeKeysArray.Length == 0)
@@ -1804,7 +1794,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
             blueprints = paged.Items;
         }
 
-        IContent[] blueprintsArray = blueprints.ToArray();
+        IContent[] blueprintsArray = [.. blueprints];
 
         if (blueprintsArray.Length > 0)
         {
@@ -1830,7 +1820,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
 
     protected override int[] ReadLockIds => WriteLockIds;
 
-    protected override int[] WriteLockIds => new[] { Constants.Locks.ContentTree };
+    protected override int[] WriteLockIds => [Constants.Locks.ContentTree];
 
     protected override bool SupportsBranchPublishing => true;
 

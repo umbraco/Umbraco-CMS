@@ -1,11 +1,11 @@
 using System.Globalization;
-using System.IO;
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Notifications;
@@ -17,9 +17,7 @@ using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore;
 using Umbraco.Cms.Infrastructure.Persistence.EFCore;
 using Umbraco.Cms.Infrastructure.Persistence.EFCore.Scoping;
-using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Infrastructure.Persistence.Factories;
-using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.EFCore;
@@ -135,8 +133,7 @@ internal class DocumentRepository
         await AmbientScope.ExecuteWithContextAsync(async db =>
         {
             item.AddingEntity();
-
-            var publishing = item.PublishedState == PublishedState.Publishing;
+            var publishing = item is { PublishedState: PublishedState.Publishing };
 
             AssignDefaultTemplateIfMissing(item);
 
@@ -208,7 +205,7 @@ internal class DocumentRepository
             var isEntityDirty = item.IsDirty();
             var editedSnapshot = item.Edited;
 
-            if ((item.PublishedState == PublishedState.Published || item.PublishedState == PublishedState.Unpublished)
+            if (item is { PublishedState: PublishedState.Published or PublishedState.Unpublished }
                 && !isEntityDirty && !item.IsAnyUserPropertyDirty())
             {
                 // no change to save, do nothing, don't even update dates
@@ -230,7 +227,7 @@ internal class DocumentRepository
             // we cannot roll a bulk move back anyway.
             var isMoving = item.IsMoving();
 
-            var publishing = item.PublishedState == PublishedState.Publishing;
+            var publishing = item is { PublishedState: PublishedState.Publishing };
 
             if (!isMoving)
             {
@@ -378,11 +375,11 @@ internal class DocumentRepository
                 await db.SaveChangesAsync();
             }
 
-            if (item.PublishedState == PublishedState.Publishing)
+            if (item is { PublishedState: PublishedState.Publishing })
             {
                 dto.Published = true;
             }
-            else if (item.PublishedState == PublishedState.Unpublishing)
+            else if (item is { PublishedState: PublishedState.Unpublishing })
             {
                 dto.Published = false;
             }
@@ -562,17 +559,17 @@ internal class DocumentRepository
 
             if (total == 0)
             {
-                return new PagedModel<IContent> { Total = 0, Items = Enumerable.Empty<IContent>() };
+                return new PagedModel<IContent> { Total = 0, Items = [] };
             }
 
             IQueryable<DocumentJoinRow> baseQuery = BuildBaseQuery(
                 db, db.Nodes.Where(node => node.NodeObjectType == NodeObjectTypeKey && node.ParentId == parentNodeId));
 
-            bool isCustomFieldOrdering = ordering?.IsCustomField == true;
+            bool isCustomFieldOrdering = ordering is { IsCustomField: true };
             bool isCultureNameOrdering =
                 !isCustomFieldOrdering
-                && ordering?.OrderBy?.Equals("name", StringComparison.OrdinalIgnoreCase) == true
-                && ordering?.IsInvariant == false;
+                && ordering?.OrderBy?.Equals("name", StringComparison.OrdinalIgnoreCase) is true
+                && ordering is { IsInvariant: false };
 
             IReadOnlyList<DocumentRow> rows = isCustomFieldOrdering
                 ? await FetchCustomFieldOrdered()
@@ -582,7 +579,7 @@ internal class DocumentRepository
 
             if (rows.Count == 0)
             {
-                return new PagedModel<IContent> { Total = total, Items = Enumerable.Empty<IContent>() };
+                return new PagedModel<IContent> { Total = total, Items = [] };
             }
 
             List<IContent> items = await AssembleEntitiesAsync(rows, db, propertyAliases, loadTemplates);
@@ -654,7 +651,7 @@ internal class DocumentRepository
 
             if (ancestor is null)
             {
-                return new PagedModel<IContent> { Total = 0, Items = Enumerable.Empty<IContent>() };
+                return new PagedModel<IContent> { Total = 0, Items = [] };
             }
 
             var pathMatch = $"{ancestor.Path},";
@@ -667,7 +664,7 @@ internal class DocumentRepository
 
             if (total == 0)
             {
-                return new PagedModel<IContent> { Total = 0, Items = Enumerable.Empty<IContent>() };
+                return new PagedModel<IContent> { Total = 0, Items = [] };
             }
 
             IQueryable<DocumentJoinRow> baseQuery = BuildBaseQuery(
@@ -676,11 +673,11 @@ internal class DocumentRepository
                     && EF.Functions.Like(node.Path, $"{pathMatch}%")
                     && (includeTrashed || node.Trashed == false)));
 
-            bool isCustomFieldOrdering = ordering?.IsCustomField == true;
+            bool isCustomFieldOrdering = ordering is { IsCustomField: true };
             bool isCultureNameOrdering =
                 !isCustomFieldOrdering
-                && ordering?.OrderBy?.Equals("name", StringComparison.OrdinalIgnoreCase) == true
-                && ordering?.IsInvariant == false;
+                && ordering?.OrderBy?.Equals("name", StringComparison.OrdinalIgnoreCase) is true
+                && ordering is { IsInvariant: false };
 
             IReadOnlyList<DocumentRow> rows = isCustomFieldOrdering
                 ? await FetchCustomFieldOrdered()
@@ -690,7 +687,7 @@ internal class DocumentRepository
 
             if (rows.Count == 0)
             {
-                return new PagedModel<IContent> { Total = total, Items = Enumerable.Empty<IContent>() };
+                return new PagedModel<IContent> { Total = total, Items = [] };
             }
 
             List<IContent> items = await AssembleEntitiesAsync(rows, db, loadTemplates: loadTemplates);
@@ -747,7 +744,7 @@ internal class DocumentRepository
 
             if (rows.Count == 0)
             {
-                return Enumerable.Empty<IContent>();
+                return [];
             }
 
             return await AssembleEntitiesAsync(rows, db);
@@ -766,7 +763,7 @@ internal class DocumentRepository
 
             if (rows.Count == 0)
             {
-                return Enumerable.Empty<IContent>();
+                return [];
             }
 
             return await AssembleEntitiesAsync(rows, db);
@@ -785,17 +782,17 @@ internal class DocumentRepository
 
             if (total == 0)
             {
-                return new PagedModel<IContent> { Total = 0, Items = Enumerable.Empty<IContent>() };
+                return new PagedModel<IContent> { Total = 0, Items = [] };
             }
 
             IQueryable<DocumentJoinRow> baseQuery = BuildBaseQuery(
                 db, db.Nodes.Where(node => node.NodeObjectType == NodeObjectTypeKey && node.Trashed));
 
-            bool isCustomFieldOrdering = ordering?.IsCustomField == true;
+            bool isCustomFieldOrdering = ordering is { IsCustomField: true };
             bool isCultureNameOrdering =
                 !isCustomFieldOrdering
-                && ordering?.OrderBy?.Equals("name", StringComparison.OrdinalIgnoreCase) == true
-                && ordering?.IsInvariant == false;
+                && ordering?.OrderBy?.Equals("name", StringComparison.OrdinalIgnoreCase) is true
+                && ordering is { IsInvariant: false };
 
             IReadOnlyList<DocumentRow> rows = isCustomFieldOrdering
                 ? await FetchCustomFieldOrdered()
@@ -805,7 +802,7 @@ internal class DocumentRepository
 
             if (rows.Count == 0)
             {
-                return new PagedModel<IContent> { Total = total, Items = Enumerable.Empty<IContent>() };
+                return new PagedModel<IContent> { Total = total, Items = [] };
             }
 
             List<IContent> items = await AssembleEntitiesAsync(rows, db);
@@ -860,7 +857,7 @@ internal class DocumentRepository
 
             if (total == 0)
             {
-                return new PagedModel<IContent> { Total = 0, Items = Enumerable.Empty<IContent>() };
+                return new PagedModel<IContent> { Total = 0, Items = [] };
             }
 
             // Mirrors GetPagedRecycleBinAsync — only the leading node predicate (Level == level plus the
@@ -869,11 +866,11 @@ internal class DocumentRepository
             IQueryable<DocumentJoinRow> baseQuery = BuildBaseQuery(
                 db, db.Nodes.Where(node => node.NodeObjectType == NodeObjectTypeKey && node.Level == level && !node.Trashed));
 
-            bool isCustomFieldOrdering = ordering?.IsCustomField == true;
+            bool isCustomFieldOrdering = ordering is { IsCustomField: true };
             bool isCultureNameOrdering =
                 !isCustomFieldOrdering
-                && ordering?.OrderBy?.Equals("name", StringComparison.OrdinalIgnoreCase) == true
-                && ordering?.IsInvariant == false;
+                && ordering?.OrderBy?.Equals("name", StringComparison.OrdinalIgnoreCase) is true
+                && ordering is { IsInvariant: false };
 
             IReadOnlyList<DocumentRow> rows = isCustomFieldOrdering
                 ? await FetchCustomFieldOrdered()
@@ -883,7 +880,7 @@ internal class DocumentRepository
 
             if (rows.Count == 0)
             {
-                return new PagedModel<IContent> { Total = total, Items = Enumerable.Empty<IContent>() };
+                return new PagedModel<IContent> { Total = total, Items = [] };
             }
 
             List<IContent> items = await AssembleEntitiesAsync(rows, db);
@@ -936,27 +933,26 @@ internal class DocumentRepository
 
             if (self is null)
             {
-                return new PagedModel<IContent> { Total = 0, Items = Enumerable.Empty<IContent>() };
+                return new PagedModel<IContent> { Total = 0, Items = [] };
             }
 
             // Path is stored root-first (e.g. "-1,1063,1066,1092"), so splitting it already yields the
             // ancestors in root-first order — excluding the root node itself and the node whose ancestors
             // are being requested, mirroring ContentExtensions.GetAncestorIds().
-            List<int> ancestorNodeIds = self.Path.Split(',')
+            List<int> ancestorNodeIds = [.. self.Path.Split(',')
                 .Select(segment => int.Parse(segment, CultureInfo.InvariantCulture))
-                .Where(nodeId => nodeId != Constants.System.Root && nodeId != self.NodeId)
-                .ToList();
+                .Where(nodeId => nodeId != Constants.System.Root && nodeId != self.NodeId)];
 
             int total = ancestorNodeIds.Count;
             if (total == 0)
             {
-                return new PagedModel<IContent> { Total = 0, Items = Enumerable.Empty<IContent>() };
+                return new PagedModel<IContent> { Total = 0, Items = [] };
             }
 
-            List<int> pageNodeIds = ancestorNodeIds.Skip(skip).Take(take).ToList();
+            List<int> pageNodeIds = [.. ancestorNodeIds.Skip(skip).Take(take)];
             if (pageNodeIds.Count == 0)
             {
-                return new PagedModel<IContent> { Total = total, Items = Enumerable.Empty<IContent>() };
+                return new PagedModel<IContent> { Total = total, Items = [] };
             }
 
             List<DocumentRow> rows = await BuildBaseQuery(
@@ -969,7 +965,7 @@ internal class DocumentRepository
             Dictionary<int, int> position = pageNodeIds
                 .Select((nodeId, index) => (nodeId, index))
                 .ToDictionary(x => x.nodeId, x => x.index);
-            List<DocumentRow> orderedRows = rows.OrderBy(row => position[row.Node.NodeId]).ToList();
+            List<DocumentRow> orderedRows = [.. rows.OrderBy(row => position[row.Node.NodeId])];
 
             List<IContent> items = await AssembleEntitiesAsync(orderedRows, db);
             return new PagedModel<IContent> { Total = total, Items = items };
@@ -985,7 +981,7 @@ internal class DocumentRepository
             // Content types are themselves nodes (their own umbracoNode row), so their Guid key lives on
             // NodeDto, not on ContentTypeDto — resolve keys to the underlying node IDs that ContentDto.ContentTypeId
             // actually stores, in one batched query rather than per-key IIdKeyMap round-trips.
-            List<Guid> contentTypeKeysList = contentTypeKeys.ToList();
+            List<Guid> contentTypeKeysList = [.. contentTypeKeys];
             List<int> contentTypeIdsList = await db.Nodes
                 .Where(node => node.NodeObjectType == Constants.ObjectTypes.DocumentType && contentTypeKeysList.Contains(node.UniqueId))
                 .Select(node => node.NodeId)
@@ -1003,7 +999,7 @@ internal class DocumentRepository
 
             if (total == 0)
             {
-                return new PagedModel<IContent> { Total = 0, Items = Enumerable.Empty<IContent>() };
+                return new PagedModel<IContent> { Total = 0, Items = [] };
             }
 
             // The content-type filter is applied as an ordinary Where() on the shared join tail's
@@ -1015,11 +1011,11 @@ internal class DocumentRepository
             IQueryable<DocumentJoinRow> baseQuery = BuildBaseQuery(db, db.Nodes.Where(node => node.NodeObjectType == NodeObjectTypeKey))
                 .Where(joined => contentTypeIdsList.Contains(joined.Content.ContentTypeId));
 
-            bool isCustomFieldOrdering = ordering?.IsCustomField == true;
+            bool isCustomFieldOrdering = ordering is { IsCustomField: true };
             bool isCultureNameOrdering =
                 !isCustomFieldOrdering
-                && ordering?.OrderBy?.Equals("name", StringComparison.OrdinalIgnoreCase) == true
-                && ordering?.IsInvariant == false;
+                && ordering?.OrderBy?.Equals("name", StringComparison.OrdinalIgnoreCase) is true
+                && ordering is { IsInvariant: false };
 
             IReadOnlyList<DocumentRow> rows = isCustomFieldOrdering
                 ? await FetchCustomFieldOrdered()
@@ -1029,7 +1025,7 @@ internal class DocumentRepository
 
             if (rows.Count == 0)
             {
-                return new PagedModel<IContent> { Total = total, Items = Enumerable.Empty<IContent>() };
+                return new PagedModel<IContent> { Total = total, Items = [] };
             }
 
             List<IContent> items = await AssembleEntitiesAsync(rows, db);
@@ -1097,7 +1093,7 @@ internal class DocumentRepository
 
     /// <inheritdoc />
     protected override DocumentDto BuildEntityDto(IContent entity) =>
-        ContentBaseFactory.BuildDocumentDto(entity, NodeObjectTypeKey, entity.PublishedState == PublishedState.Publishing);
+        ContentBaseFactory.BuildDocumentDto(entity, NodeObjectTypeKey, entity is { PublishedState: PublishedState.Publishing });
 
     /// <inheritdoc />
     public Task ReplaceContentPermissionsAsync(EntityPermissionSet permissionSet, CancellationToken cancellationToken) =>
@@ -1128,8 +1124,7 @@ internal class DocumentRepository
             return Task.FromResult(content.Published);
         }
 
-        List<int> ancestorIds = content.Path.Split(',').Skip(1)
-            .Select(s => int.Parse(s, CultureInfo.InvariantCulture)).ToList();
+        List<int> ancestorIds = [.. content.Path.Split(',').Skip(1).Select(s => int.Parse(s, CultureInfo.InvariantCulture))];
 
         return AmbientScope.ExecuteWithContextAsync(async db =>
         {
@@ -1276,7 +1271,7 @@ internal class DocumentRepository
         IQueryable<UserDto> users,
         Ordering? ordering)
     {
-        bool descending = ordering?.Direction == Direction.Descending;
+        bool descending = ordering is { Direction: Direction.Descending };
         // No ordering at all means sort order - the default every caller relies on - which is distinct from
         // asking for a field this repository cannot order by.
         string orderBy = ordering?.OrderBy is { Length: > 0 } field ? field.ToLowerInvariant() : "sortorder";
@@ -1429,10 +1424,9 @@ internal class DocumentRepository
     private static List<DocumentRow> ReorderRowsByNodeIds(List<DocumentRow> rows, List<int> orderedNodeIds)
     {
         Dictionary<int, DocumentRow> rowsByNodeId = rows.ToDictionary(row => row.Node.NodeId);
-        return orderedNodeIds
+        return [.. orderedNodeIds
             .Where(rowsByNodeId.ContainsKey)
-            .Select(nodeId => rowsByNodeId[nodeId])
-            .ToList();
+            .Select(nodeId => rowsByNodeId[nodeId])];
     }
 
     // Shared by every branching method's custom-field ordering path: resolves the full ordered candidate
@@ -1451,7 +1445,7 @@ internal class DocumentRepository
         List<int> orderedNodeIds = await ResolveCustomFieldOrderedNodeIdsAsync(
             db, candidateNodeIds, ordering.OrderBy!, ordering.Culture ?? string.Empty, ordering.Direction, cancellationToken);
 
-        List<int> pageNodeIds = orderedNodeIds.Skip(skip).Take(take).ToList();
+        List<int> pageNodeIds = [.. orderedNodeIds.Skip(skip).Take(take)];
         if (pageNodeIds.Count == 0)
         {
             return [];
@@ -1463,7 +1457,7 @@ internal class DocumentRepository
         var unorderedRows = new List<DocumentRow>();
         foreach (IEnumerable<int> batch in pageNodeIds.InGroupsOf(Constants.Sql.MaxParameterCount))
         {
-            unorderedRows.AddRange(await fetchRowsForPageNodeIds(batch.ToList()));
+            unorderedRows.AddRange(await fetchRowsForPageNodeIds([.. batch]));
         }
 
         return ReorderRowsByNodeIds(unorderedRows, pageNodeIds);
@@ -1504,7 +1498,7 @@ internal class DocumentRepository
                     variantName = ccv != null ? ccv.Name ?? joined.joined.Node.Text : joined.joined.Node.Text,
                 });
 
-        bool descending = ordering.Direction == Direction.Descending;
+        bool descending = ordering is { Direction: Direction.Descending };
 
         var ordered = ApplyVariantNameOrdering(
             withVariantName,
@@ -1539,7 +1533,7 @@ internal class DocumentRepository
         if (!hasLeft || !hasRight)
         {
             int missingFirst = !hasLeft ? -1 : 1;
-            return direction == Direction.Descending ? -missingFirst : missingFirst;
+            return direction is Direction.Descending ? -missingFirst : missingFirst;
         }
 
         int comparison = CompareOrderingValues(left!, right!);
@@ -1548,7 +1542,7 @@ internal class DocumentRepository
             return leftNodeId.CompareTo(rightNodeId);
         }
 
-        return direction == Direction.Descending ? -comparison : comparison;
+        return direction is Direction.Descending ? -comparison : comparison;
     }
 
     // Column priority mirrors NPoco's CASE expression (ContentRepositoryBase.ApplyCustomOrdering):
@@ -1606,12 +1600,11 @@ internal class DocumentRepository
 
     private HashSet<int> ResolveValidTemplateIds(IReadOnlyList<DocumentRow> rows)
     {
-        int[] templateIds = rows
+        int[] templateIds = [.. rows
             .SelectMany(row => new[] { row.DocumentVersion.TemplateId, row.PublishedDocumentVersion?.TemplateId })
             .Where(id => id.HasValue)
             .Select(id => id!.Value)
-            .Distinct()
-            .ToArray();
+            .Distinct()];
 
         return templateIds.Length > 0
             ? [.. _templateRepository.GetMany(templateIds).Select(template => template.Id)]
@@ -1624,7 +1617,7 @@ internal class DocumentRepository
         // null means "skip template assignment entirely".
         HashSet<int>? validTemplateIds = loadTemplates ? ResolveValidTemplateIds(rows) : null;
 
-        int[] nodeIds = rows.Select(row => row.Node.NodeId).ToArray();
+        int[] nodeIds = [.. rows.Select(row => row.Node.NodeId)];
 
         // All relevant version IDs (current + published, deduplicated).
         // Current and published are always different IDs after the first publish.
@@ -1661,10 +1654,7 @@ internal class DocumentRepository
             // Wire nav properties (mirrors what NPoco [Reference] does automatically)
             row.Content.NodeDto = row.Node;
             row.DocumentVersion.ContentVersionDto = row.ContentVersion;
-            if (row.PublishedDocumentVersion is not null)
-            {
-                row.PublishedDocumentVersion.ContentVersionDto = row.PublishedContentVersion!;
-            }
+            row.PublishedDocumentVersion?.ContentVersionDto = row.PublishedContentVersion!;
 
             row.Document.ContentDto = row.Content;
             row.Document.CurrentVersion = row.DocumentVersion;
@@ -1912,7 +1902,7 @@ internal class DocumentRepository
     // PersistNewItemAsync and PersistUpdatedItemAsync.
     private async Task ApplyPostPublishFlagFlipsAsync(IContent item)
     {
-        if (item.PublishedState == PublishedState.Publishing)
+        if (item is { PublishedState: PublishedState.Publishing })
         {
             item.Published = true;
             item.PublishTemplateId = item.TemplateId;
@@ -1922,7 +1912,7 @@ internal class DocumentRepository
 
             await SetEntityTagsAsync(item);
         }
-        else if (item.PublishedState == PublishedState.Unpublishing)
+        else if (item is { PublishedState: PublishedState.Unpublishing })
         {
             item.Published = false;
             item.PublishTemplateId = null;
@@ -1951,7 +1941,7 @@ internal class DocumentRepository
                 // Support for legacy tag editors — everything from here down to the last continue can be
                 // removed when TagsPropertyEditorAttribute is removed.
                 TagConfiguration? tagConfiguration = property.GetTagConfiguration(PropertyEditors, DataTypeService, _idKeyMap);
-                if (tagConfiguration == null)
+                if (tagConfiguration is null)
                 {
                     continue;
                 }
@@ -2170,7 +2160,7 @@ internal class DocumentRepository
         db.DocumentVersions.Add(documentVersionDto);
         await db.SaveChangesAsync();
 
-        if (item.PublishedState == PublishedState.Publishing)
+        if (item is { PublishedState: PublishedState.Publishing })
         {
             // The pair just inserted (Current=false, Published=true) becomes the published version.
             // A second (Current=true, Published=false) pair is inserted for the new draft.
@@ -2350,7 +2340,7 @@ internal class DocumentRepository
         {
             foreach (IEnumerable<int> batch in existingPropertyDataIds.InGroupsOf(Constants.Sql.MaxParameterCount))
             {
-                List<int> batchIds = batch.ToList();
+                List<int> batchIds = [.. batch];
                 await db.PropertyData.Where(propertyData => batchIds.Contains(propertyData.Id)).ExecuteDeleteAsync();
             }
         }

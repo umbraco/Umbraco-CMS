@@ -389,7 +389,7 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
             var entities = new List<TEntity>();
             foreach (IEnumerable<Guid> batch in keys.InGroupsOf(Constants.Sql.MaxParameterCount))
             {
-                IEnumerable<TEntity>? batchEntities = await PerformGetManyAsync(batch.ToArray());
+                IEnumerable<TEntity>? batchEntities = await PerformGetManyAsync([.. batch]);
                 if (batchEntities is not null)
                 {
                     entities.AddRange(batchEntities);
@@ -446,7 +446,7 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
 
             foreach (IEnumerable<Guid> batch in contentKeys.Distinct().InGroupsOf(Constants.Sql.MaxParameterCount))
             {
-                List<Guid> batchKeys = batch.ToList();
+                List<Guid> batchKeys = [.. batch];
 
                 List<(Guid Key, ContentScheduleDto Dto)> rows = await db.ContentSchedules
                     .Join(db.Nodes.Where(node => batchKeys.Contains(node.UniqueId)), contentSchedule => contentSchedule.NodeId, node => node.NodeId, (contentSchedule, node) => new { node.UniqueId, contentSchedule })
@@ -509,7 +509,7 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
             // and then, we need to set the invariant name implicitly,
             // using the default culture if it has a name, otherwise anything we can
             var defaultCulture = await LanguageRepository.GetDefaultIsoCodeAsync();
-            content.Name = defaultCulture != null &&
+            content.Name = defaultCulture is not null &&
                            (content.CultureInfos?.TryGetValue(defaultCulture, out ContentCultureInfos? cultureName) ??
                             false)
                 ? cultureName!.Name
@@ -614,7 +614,7 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
             }
 
             // get a unique name (literal duplicates first, then subclass-specific checks)
-            List<SimilarNodeName> otherNames = cultureNames.Select(cultureName => new SimilarNodeName { Id = cultureName.Id, Name = cultureName.Name }).ToList();
+            List<SimilarNodeName> otherNames = [.. cultureNames.Select(cultureName => new SimilarNodeName { Id = cultureName.Id, Name = cultureName.Name })];
             var uniqueName = SimilarNodeName.GetUniqueName(otherNames, content.Id, cultureInfo.Name);
             uniqueName = await EnsureUniqueVariantNameAsync(uniqueName, content.Id, otherNames, cultureInfo.Culture);
 

@@ -51,7 +51,7 @@ internal static class PropertyFactory
                 }
             }
 
-            var property = Property.CreateWithValues(propertyId, propertyType, values.ToArray());
+            var property = Property.CreateWithValues(propertyId, propertyType, [.. values]);
             properties.Add(property);
         }
 
@@ -99,7 +99,7 @@ internal static class PropertyFactory
                 }
             }
 
-            var property = Property.CreateWithValues(propertyId, propertyType, values.ToArray());
+            var property = Property.CreateWithValues(propertyId, propertyType, [.. values]);
             properties.Add(property);
         }
 
@@ -150,7 +150,7 @@ internal static class PropertyFactory
             if (property.PropertyType.SupportsPublishing)
             {
                 // create the resulting hashset if it's not created and the entity varies by culture
-                if (entityVariesByCulture && editedCultures == null)
+                if (entityVariesByCulture && editedCultures is null)
                 {
                     editedCultures = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
                 }
@@ -158,18 +158,18 @@ internal static class PropertyFactory
                 // publishing = deal with edit and published values
                 foreach (IPropertyValue propertyValue in property.Values)
                 {
-                    var isInvariantValue = propertyValue.Culture == null && propertyValue.Segment == null;
-                    var isCultureValue = propertyValue.Culture != null;
-                    var isSegmentValue = propertyValue.Segment != null;
+                    var isInvariantValue = propertyValue is { Culture: null, Segment: null };
+                    var isCultureValue = propertyValue.Culture is not null;
+                    var isSegmentValue = propertyValue.Segment is not null;
 
                     // deal with published value
-                    if ((propertyValue.PublishedValue != null || isSegmentValue) && publishedVersionId > 0)
+                    if ((propertyValue.PublishedValue is not null || isSegmentValue) && publishedVersionId > 0)
                     {
                         propertyDataDtos.Add(BuildDto(publishedVersionId, property, languageRepository.GetIdByIsoCodeAsync(propertyValue.Culture).GetAwaiter().GetResult(), propertyValue.Segment, propertyValue.PublishedValue));
                     }
 
                     // deal with edit value
-                    if (propertyValue.EditedValue != null || isSegmentValue)
+                    if (propertyValue.EditedValue is not null || isSegmentValue)
                     {
                         propertyDataDtos.Add(BuildDto(currentVersionId, property, languageRepository.GetIdByIsoCodeAsync(propertyValue.Culture).GetAwaiter().GetResult(), propertyValue.Segment, propertyValue.EditedValue));
                     }
@@ -188,8 +188,8 @@ internal static class PropertyFactory
                     }
 
                     // use explicit equals here, else object comparison fails at comparing eg strings
-                    var sameValues = propertyValue?.PublishedValue == null
-                        ? propertyValue?.EditedValue == null
+                    var sameValues = propertyValue?.PublishedValue is null
+                        ? propertyValue?.EditedValue is null
                         : propertyValue.PublishedValue.Equals(propertyValue.EditedValue);
 
                     edited |= !sameValues;
@@ -203,10 +203,7 @@ internal static class PropertyFactory
                         else if (isInvariantValue)
                         {
                             // flag culture as edited if it contains an edited invariant property
-                            if (defaultCulture == null)
-                            {
-                                defaultCulture = languageRepository.GetDefaultIsoCodeAsync().GetAwaiter().GetResult();
-                            }
+                            defaultCulture ??= languageRepository.GetDefaultIsoCodeAsync().GetAwaiter().GetResult();
 
                             // the property itself is invariant, but its data editor may carry per-culture
                             // nested data (e.g. a Block List/Grid property whose element types vary by
@@ -216,12 +213,11 @@ internal static class PropertyFactory
                             if (propertyEditors.TryGet(property.PropertyType.PropertyEditorAlias, out IDataEditor? dataEditor) &&
                                 dataEditor.CanMergePartialPropertyValues(property.PropertyType))
                             {
-                                changedCultures = dataEditor
+                                changedCultures = [.. dataEditor
                                     .GetChangedCulturesForPartialPropertyValues(
                                         propertyValue?.EditedValue,
                                         propertyValue?.PublishedValue,
-                                        defaultCulture)
-                                    .ToArray();
+                                        defaultCulture)];
                             }
 
                             if (changedCultures is { Length: > 0 })
@@ -241,7 +237,7 @@ internal static class PropertyFactory
                 foreach (IPropertyValue propertyValue in property.Values)
                 {
                     // not publishing = only deal with edit values
-                    if (propertyValue.EditedValue != null)
+                    if (propertyValue.EditedValue is not null)
                     {
                         propertyDataDtos.Add(BuildDto(currentVersionId, property, languageRepository.GetIdByIsoCodeAsync(propertyValue.Culture).GetAwaiter().GetResult(), propertyValue.Segment, propertyValue.EditedValue));
                     }
@@ -312,7 +308,7 @@ internal static class PropertyFactory
             if (property.PropertyType.SupportsPublishing)
             {
                 // create the resulting hashset if it's not created and the entity varies by culture
-                if (entityVariesByCulture && editedCultures == null)
+                if (entityVariesByCulture && editedCultures is null)
                 {
                     editedCultures = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
                 }
@@ -320,18 +316,18 @@ internal static class PropertyFactory
                 // publishing = deal with edit and published values
                 foreach (IPropertyValue propertyValue in property.Values)
                 {
-                    var isInvariantValue = propertyValue.Culture == null && propertyValue.Segment == null;
-                    var isCultureValue = propertyValue.Culture != null;
-                    var isSegmentValue = propertyValue.Segment != null;
+                    var isInvariantValue = propertyValue is { Culture: null, Segment: null };
+                    var isCultureValue = propertyValue.Culture is not null;
+                    var isSegmentValue = propertyValue.Segment is not null;
 
                     // deal with published value
-                    if ((propertyValue.PublishedValue != null || isSegmentValue) && publishedVersionId > 0)
+                    if ((propertyValue.PublishedValue is not null || isSegmentValue) && publishedVersionId > 0)
                     {
                         propertyDataDtos.Add(BuildEFCoreDto(publishedVersionId, property, LanguageIdByIsoCode(propertyValue.Culture), propertyValue.Segment, propertyValue.PublishedValue));
                     }
 
                     // deal with edit value
-                    if (propertyValue.EditedValue != null || isSegmentValue)
+                    if (propertyValue.EditedValue is not null || isSegmentValue)
                     {
                         propertyDataDtos.Add(BuildEFCoreDto(currentVersionId, property, LanguageIdByIsoCode(propertyValue.Culture), propertyValue.Segment, propertyValue.EditedValue));
                     }
@@ -350,8 +346,8 @@ internal static class PropertyFactory
                     }
 
                     // use explicit equals here, else object comparison fails at comparing eg strings
-                    var sameValues = propertyValue?.PublishedValue == null
-                        ? propertyValue?.EditedValue == null
+                    var sameValues = propertyValue?.PublishedValue is null
+                        ? propertyValue?.EditedValue is null
                         : propertyValue.PublishedValue.Equals(propertyValue.EditedValue);
 
                     edited |= !sameValues;
@@ -365,10 +361,7 @@ internal static class PropertyFactory
                         else if (isInvariantValue)
                         {
                             // flag culture as edited if it contains an edited invariant property
-                            if (defaultCulture == null)
-                            {
-                                defaultCulture = await languageRepository.GetDefaultIsoCodeAsync();
-                            }
+                            defaultCulture ??= await languageRepository.GetDefaultIsoCodeAsync();
 
                             // the property itself is invariant, but its data editor may carry per-culture
                             // nested data (e.g. a Block List/Grid property whose element types vary by
@@ -378,12 +371,11 @@ internal static class PropertyFactory
                             if (propertyEditors.TryGet(property.PropertyType.PropertyEditorAlias, out IDataEditor? dataEditor) &&
                                 dataEditor.CanMergePartialPropertyValues(property.PropertyType))
                             {
-                                changedCultures = dataEditor
+                                changedCultures = [.. dataEditor
                                     .GetChangedCulturesForPartialPropertyValues(
                                         propertyValue?.EditedValue,
                                         propertyValue?.PublishedValue,
-                                        defaultCulture)
-                                    .ToArray();
+                                        defaultCulture)];
                             }
 
                             if (changedCultures is { Length: > 0 })
@@ -403,7 +395,7 @@ internal static class PropertyFactory
                 foreach (IPropertyValue propertyValue in property.Values)
                 {
                     // not publishing = only deal with edit values
-                    if (propertyValue.EditedValue != null)
+                    if (propertyValue.EditedValue is not null)
                     {
                         propertyDataDtos.Add(BuildEFCoreDto(currentVersionId, property, LanguageIdByIsoCode(propertyValue.Culture), propertyValue.Segment, propertyValue.EditedValue));
                     }
@@ -425,43 +417,43 @@ internal static class PropertyFactory
             dto.LanguageId = languageId;
         }
 
-        if (segment != null)
+        if (segment is not null)
         {
             dto.Segment = segment;
         }
 
-        if (property.ValueStorageType == ValueStorageType.Integer)
+        if (property is { ValueStorageType: ValueStorageType.Integer })
         {
             if (value is bool || property.PropertyType.PropertyEditorAlias == Constants.PropertyEditors.Aliases.Boolean)
             {
-                dto.IntegerValue = value != null && string.IsNullOrEmpty(value.ToString()) ? 0 : Convert.ToInt32(value);
+                dto.IntegerValue = value is not null && string.IsNullOrEmpty(value.ToString()) ? 0 : Convert.ToInt32(value);
             }
-            else if (value != null && string.IsNullOrWhiteSpace(value.ToString()) == false &&
+            else if (value is not null && string.IsNullOrWhiteSpace(value.ToString()) is false &&
                      int.TryParse(value.ToString(), NumberStyles.Integer, CultureInfo.InvariantCulture, out var val))
             {
                 dto.IntegerValue = val;
             }
         }
-        else if (property.ValueStorageType == ValueStorageType.Decimal && value != null)
+        else if (property is { ValueStorageType: ValueStorageType.Decimal } && value is not null)
         {
             if (decimal.TryParse(value.ToString(), out var val))
             {
                 dto.DecimalValue = val; // property value should be normalized already
             }
         }
-        else if (property.ValueStorageType == ValueStorageType.Date && value != null &&
-                 string.IsNullOrWhiteSpace(value.ToString()) == false)
+        else if (property is { ValueStorageType: ValueStorageType.Date } && value is not null &&
+                 string.IsNullOrWhiteSpace(value.ToString()) is false)
         {
             if (DateTime.TryParse(value.ToString(), out DateTime date))
             {
                 dto.DateValue = date;
             }
         }
-        else if (property.ValueStorageType == ValueStorageType.Ntext && value != null)
+        else if (property is { ValueStorageType: ValueStorageType.Ntext } && value is not null)
         {
             dto.TextValue = value.ToString();
         }
-        else if (property.ValueStorageType == ValueStorageType.Nvarchar && value != null)
+        else if (property is { ValueStorageType: ValueStorageType.Nvarchar } && value is not null)
         {
             dto.VarcharValue = value.ToString();
         }
@@ -478,43 +470,43 @@ internal static class PropertyFactory
             dto.LanguageId = languageId;
         }
 
-        if (segment != null)
+        if (segment is not null)
         {
             dto.Segment = segment;
         }
 
-        if (property.ValueStorageType == ValueStorageType.Integer)
+        if (property is { ValueStorageType: ValueStorageType.Integer })
         {
             if (value is bool || property.PropertyType.PropertyEditorAlias == Constants.PropertyEditors.Aliases.Boolean)
             {
-                dto.IntegerValue = value != null && string.IsNullOrEmpty(value.ToString()) ? 0 : Convert.ToInt32(value);
+                dto.IntegerValue = value is not null && string.IsNullOrEmpty(value.ToString()) ? 0 : Convert.ToInt32(value);
             }
-            else if (value != null && string.IsNullOrWhiteSpace(value.ToString()) == false &&
+            else if (value is not null && string.IsNullOrWhiteSpace(value.ToString()) is false &&
                      int.TryParse(value.ToString(), NumberStyles.Integer, CultureInfo.InvariantCulture, out var val))
             {
                 dto.IntegerValue = val;
             }
         }
-        else if (property.ValueStorageType == ValueStorageType.Decimal && value != null)
+        else if (property is { ValueStorageType: ValueStorageType.Decimal } && value is not null)
         {
             if (decimal.TryParse(value.ToString(), out var val))
             {
                 dto.DecimalValue = val; // property value should be normalized already
             }
         }
-        else if (property.ValueStorageType == ValueStorageType.Date && value != null &&
-                 string.IsNullOrWhiteSpace(value.ToString()) == false)
+        else if (property is { ValueStorageType: ValueStorageType.Date } && value is not null &&
+                 string.IsNullOrWhiteSpace(value.ToString()) is false)
         {
             if (DateTime.TryParse(value.ToString(), out DateTime date))
             {
                 dto.DateValue = date;
             }
         }
-        else if (property.ValueStorageType == ValueStorageType.Ntext && value != null)
+        else if (property is { ValueStorageType: ValueStorageType.Ntext } && value is not null)
         {
             dto.TextValue = value.ToString();
         }
-        else if (property.ValueStorageType == ValueStorageType.Nvarchar && value != null)
+        else if (property is { ValueStorageType: ValueStorageType.Nvarchar } && value is not null)
         {
             dto.VarcharValue = value.ToString();
         }

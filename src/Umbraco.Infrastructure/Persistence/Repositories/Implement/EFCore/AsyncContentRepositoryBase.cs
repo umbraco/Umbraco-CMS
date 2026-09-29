@@ -153,7 +153,7 @@ internal abstract class AsyncContentRepositoryBase<TEntity, TRepository>
 
             foreach (IEnumerable<Guid> batch in orderedNodeKeys.Distinct().InGroupsOf(Constants.Sql.MaxParameterCount))
             {
-                List<Guid> batchKeys = batch.ToList();
+                List<Guid> batchKeys = [.. batch];
 
                 List<NodeDto> batchNodes = await db.Nodes
                     .AsTracking()
@@ -390,10 +390,9 @@ internal abstract class AsyncContentRepositoryBase<TEntity, TRepository>
 
                 currentParentIds.Add(node.NodeId);
 
-                string[] pathParts = node.Path
+                string[] pathParts = [.. node.Path
                     .Split(Constants.CharArrays.Comma)
-                    .Where(pathPart => !rootIds.Contains(int.Parse(pathPart, CultureInfo.InvariantCulture)))
-                    .ToArray();
+                    .Where(pathPart => !rootIds.Contains(int.Parse(pathPart, CultureInfo.InvariantCulture)))];
 
                 ContentDataIntegrityReport.IssueType? issue = null;
                 if (!prevParentIds.Contains(node.ParentId))

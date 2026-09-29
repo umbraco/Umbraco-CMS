@@ -58,7 +58,7 @@ internal sealed class AsyncPermissionRepository<TEntity> : AsyncRepositoryBase
                 return new EntityPermissionCollection();
             }
 
-            List<Guid> groupKeys = rows.Select(row => row.UserGroupKey).Distinct().ToList();
+            List<Guid> groupKeys = [.. rows.Select(row => row.UserGroupKey).Distinct()];
             Dictionary<Guid, int> keyToId = await db.UserGroups
                 .Where(userGroup => groupKeys.Contains(userGroup.Key))
                 .ToDictionaryAsync(userGroup => userGroup.Key, userGroup => userGroup.Id, cancellationToken);
@@ -82,7 +82,7 @@ internal sealed class AsyncPermissionRepository<TEntity> : AsyncRepositoryBase
     public Task AssignEntityPermissionAsync(TEntity entity, string permission, IEnumerable<Guid> groupKeys, CancellationToken cancellationToken) =>
         AmbientScope.ExecuteWithContextAsync<object>(async db =>
         {
-            List<Guid> groupKeyList = groupKeys.ToList();
+            List<Guid> groupKeyList = [.. groupKeys];
 
             await db.UserGroup2GranularPermissions
                 .Where(granularPermission => granularPermission.Permission == permission && granularPermission.UniqueId == entity.Key && groupKeyList.Contains(granularPermission.UserGroupKey))
@@ -115,7 +115,7 @@ internal sealed class AsyncPermissionRepository<TEntity> : AsyncRepositoryBase
     {
         // Both the insert and update paths end up here regardless of HasIdentity, because the insert path
         // forwards to this one.
-        if (((IEntity)permission).HasIdentity == false)
+        if (((IEntity)permission).HasIdentity is false)
         {
             throw new InvalidOperationException("Cannot create permissions for an entity without an Id");
         }
@@ -132,7 +132,7 @@ internal sealed class AsyncPermissionRepository<TEntity> : AsyncRepositoryBase
 
         await db.UserGroup2GranularPermissions.Where(granularPermission => granularPermission.UniqueId == entityKey).ExecuteDeleteAsync(cancellationToken);
 
-        List<int> groupIds = permissionSet.PermissionsSet.Select(entityPermission => entityPermission.UserGroupId).Distinct().ToList();
+        List<int> groupIds = [.. permissionSet.PermissionsSet.Select(entityPermission => entityPermission.UserGroupId).Distinct()];
         Dictionary<int, Guid> idToKey = await db.UserGroups
             .Where(userGroup => groupIds.Contains(userGroup.Id))
             .ToDictionaryAsync(userGroup => userGroup.Id, userGroup => userGroup.Key, cancellationToken);
