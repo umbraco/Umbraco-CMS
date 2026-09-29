@@ -675,6 +675,24 @@ export class UserGroupApiHelper {
     return await this.create(userGroup);
   }
 
+  async createUserGroupWithCreateDocumentBlueprintPermissionAndDocumentBlueprintStartNode(name: string, startNodeId: string) {
+    await this.ensureNameNotExists(name);
+
+    const userGroup = new UserGroupBuilder()
+      .withName(name)
+      .addSection(ConstantHelper.sectionAliases.content)
+      .withDocumentRootAccess(true)
+      .withDocumentBlueprintRootAccess(false)
+      .withDocumentBlueprintStartNodeId(startNodeId)
+      .addFallbackPermission()
+        .withCreateDocumentBlueprintPermission(true)
+        .withReadDocumentPermission(true)
+        .done()
+      .build();
+
+    return await this.create(userGroup);
+  }
+
   async createUserGroupWithCreateDocumentBlueprintPermissionForSpecificDocument(name: string, documentId: string, enabled: boolean = true) {
     await this.ensureNameNotExists(name);
 
