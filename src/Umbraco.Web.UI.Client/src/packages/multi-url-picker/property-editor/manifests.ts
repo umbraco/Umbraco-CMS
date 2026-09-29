@@ -30,7 +30,7 @@ export const manifests = [
 		name: 'Multi URL Picker Property Editor UI',
 		element: () => import('./property-editor-ui-multi-url-picker.element.js'),
 		meta: {
-			label: 'Multi URL Picker',
+			label: 'URL Picker',
 			propertyEditorSchemaAlias: 'Umbraco.MultiUrlPicker',
 			icon: 'icon-link',
 			group: '#propertyEditorUIGroups_pickers',

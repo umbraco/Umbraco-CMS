@@ -8,7 +8,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Multiple Document Picker Property Editor UI',
 		element: () => import('./property-editor-ui-multiple-document-picker.element.js'),
 		meta: {
-			label: 'Multiple Document Picker',
+			label: 'Document Picker',
 			propertyEditorSchemaAlias: 'Umbraco.DocumentPicker.Multiple',
 			icon: 'icon-documents',
 			group: '#propertyEditorUIGroups_pickers',
