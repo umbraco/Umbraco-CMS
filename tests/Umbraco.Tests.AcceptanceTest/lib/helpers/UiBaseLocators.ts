@@ -664,9 +664,9 @@ export class UiBaseLocators extends BasePage {
   }
 
   async isActionsMenuForNameVisible(name: string, isVisible = true) {
-    const menuItem = this.getMenuItemByLabel(name).first();
-    await this.click(menuItem);
-    await this.isVisible(menuItem.locator("#action-modal").first(), isVisible);
+    const menuItems = this.getMenuItemByLabel(name);
+    await this.click(menuItems.first());
+    await this.isAnyVisible(menuItems.locator("#action-modal"), isVisible);
   }
 
   // Caret Button Methods
@@ -719,8 +719,8 @@ export class UiBaseLocators extends BasePage {
   }
 
   async isTreeItemVisible(name: string, isVisible = true) {
-    await this.isVisible(
-      this.treeItem.locator('[label="' + name + '"]').first(),
+    await this.isAnyVisible(
+      this.treeItem.locator('[label="' + name + '"]'),
       isVisible,
     );
   }
@@ -1984,7 +1984,7 @@ export class UiBaseLocators extends BasePage {
 
   // Loader Methods
   async waitUntilUiLoaderIsNoLongerVisible() {
-    await this.waitForHidden(this.uiLoader, ConstantHelper.timeout.navigation);
+    await this.isAnyVisible(this.uiLoader, false, ConstantHelper.timeout.navigation);
   }
 
   // Dashboard Methods

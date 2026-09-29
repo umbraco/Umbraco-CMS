@@ -48,8 +48,7 @@ export class DocumentBlueprintUiHelper extends UiBaseLocators{
     if (toReload) {
       await this.reloadDocumentBlueprintsTree();
     }
-    // .first(): the alias-only selector can match more than one co-mounted umb-tree instance.
-    await this.isVisible(this.documentBlueprintTree.getByText(blueprintName, {exact: true}).first(), isVisible);
+    await this.isAnyVisible(this.documentBlueprintTree.getByText(blueprintName, {exact: true}), isVisible);
   }
 
   async clickCreateDocumentBlueprintButton() {
