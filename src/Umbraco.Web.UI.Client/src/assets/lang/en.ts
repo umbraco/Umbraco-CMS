@@ -3250,8 +3250,6 @@ export default {
 		resultsCount: (count: number) => `Found ${count} result${count !== 1 ? 's' : ''}`,
 		tableColumnName: 'Name',
 		tableColumnEntityType: 'Type',
-		statsBoxLabel: 'Statistics',
-		searchBoxLabel: 'Search',
 		// Accessibility labels
 		searching: 'Searching...',
 		searchFailed: 'Search failed',
