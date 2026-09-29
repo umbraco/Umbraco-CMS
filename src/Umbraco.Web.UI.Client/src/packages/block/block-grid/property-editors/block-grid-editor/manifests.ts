@@ -31,8 +31,9 @@ const propertyEditorUi: UmbExtensionManifest = {
 				{
 					alias: 'maxPropertyWidth',
 					label: 'Editor width',
-					description: 'Optional css overwrite. (example: 1200px or 100%)',
+					description: 'Example: `1200px`',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.TextBox',
+					config: [{ alias: 'placeholder', value: '100%' }],
 				},
 				{
 					alias: 'createLabel',

@@ -723,6 +723,7 @@ export type DocumentBlueprintResponseModel = {
 
 export type DocumentBlueprintTreeItemResponseModel = {
     documentType?: null | DocumentTypeReferenceResponseModel;
+    variants: Array<DocumentVariantItemResponseModel>;
     isFolder: boolean;
     noAccess: boolean;
     name: string;
@@ -1576,6 +1577,7 @@ export type ManifestResponseModel = {
 
 export type MediaCollectionResponseModel = {
     mediaType: MediaTypeCollectionReferenceResponseModel;
+    extension?: null | string;
     creator?: null | string;
     sortOrder: number;
     hasChildren: boolean;
@@ -1595,6 +1597,7 @@ export type MediaItemResponseModel = {
     parent?: null | ReferenceByIdModel;
     hasChildren: boolean;
     mediaType: MediaTypeReferenceResponseModel;
+    extension?: null | string;
     variants: Array<VariantItemResponseModel>;
     id: string;
     flags: Array<FlagModel>;
@@ -1620,6 +1623,7 @@ export type MediaResponseModel = {
 
 export type MediaTreeItemResponseModel = {
     mediaType: MediaTypeReferenceResponseModel;
+    extension?: null | string;
     variants: Array<VariantItemResponseModel>;
     noAccess: boolean;
     isTrashed: boolean;
