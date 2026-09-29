@@ -407,8 +407,39 @@ internal abstract class BlockEditorPropertyValueHandler : IPropertyValueHandler
 
         var propertyCultures = GetPropertyCultures(property.PropertyType, culture, published, contentContext);
 
-        HashSet<Guid> ancestryChain = _externalElementAncestryChain.Value ??= [];
+        HashSet<Guid>? existingAncestryChain = _externalElementAncestryChain.Value;
+        var ownsAncestryChain = existingAncestryChain is null;
+        HashSet<Guid> ancestryChain = existingAncestryChain ?? [];
+        if (ownsAncestryChain)
+        {
+            _externalElementAncestryChain.Value = ancestryChain;
+        }
 
+        try
+        {
+            AmendWithExternalElementIndexValues(externalContentKeys, ancestryChain, propertyCultures, culture, segment, published, contentContext, cumulativeIndexValuesByVariation);
+        }
+        finally
+        {
+            if (ownsAncestryChain)
+            {
+                // don't let the chain linger in the caller's execution context, from where it would flow, by reference,
+                // into any concurrent work the caller starts.
+                _externalElementAncestryChain.Value = null;
+            }
+        }
+    }
+
+    private void AmendWithExternalElementIndexValues(
+        Guid[] externalContentKeys,
+        HashSet<Guid> ancestryChain,
+        string?[] propertyCultures,
+        string? culture,
+        string? segment,
+        bool published,
+        IContentBase contentContext,
+        Dictionary<(string? Culture, string? Segment), CumulativeIndexValue> cumulativeIndexValuesByVariation)
+    {
         foreach (IElement element in _elementService.GetByIds(externalContentKeys))
         {
             if (element.Trashed || element.Published is false)

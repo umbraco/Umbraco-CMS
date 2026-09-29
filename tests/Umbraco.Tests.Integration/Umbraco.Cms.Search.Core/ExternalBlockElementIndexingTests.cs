@@ -5,6 +5,8 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Search.Indexing;
+using Umbraco.Cms.Core.Search.Indexing.Collection;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.Common.Builders;
@@ -29,6 +31,12 @@ public class ExternalBlockElementIndexingTests : PropertyValueHandlerTestsBase
     {
         base.ConfigureTestServices(services);
         services.Configure<IndexingSettings>(options => options.IndexExternalBlockElements = true);
+    }
+
+    protected override void CustomTestSetup(IUmbracoBuilder builder)
+    {
+        base.CustomTestSetup(builder);
+        builder.WithCollectionBuilder<PropertyValueHandlerCollectionBuilder>().Add<GatedPropertyValueHandler>();
     }
 
     [Test]
@@ -188,6 +196,64 @@ public class ExternalBlockElementIndexingTests : PropertyValueHandlerTestsBase
         CollectionAssert.Contains(publishedValue.Texts, "Some element text");
     }
 
+    [Test]
+    public async Task Can_Flatten_Same_External_Element_Into_Concurrently_Indexed_Documents()
+    {
+        var (contentType, elementType) = await SetupBlockListWithElementType();
+        IDataType textstringDataType = (await GetRequiredService<IDataTypeService>().GetAsync(Constants.DataTypes.Guids.TextstringGuid))!;
+        elementType.AddPropertyType(new PropertyType(ShortStringHelper, textstringDataType, GatedPropertyValueHandler.PropertyAlias));
+        await ContentTypeService.UpdateAsync(elementType, Constants.Security.SuperUserKey);
+
+        Element element = new ElementBuilder()
+            .WithContentType(elementType)
+            .WithName("Shared element")
+            .Build();
+        element.SetValue("textValue", "The shared element text");
+        element.SetValue(GatedPropertyValueHandler.PropertyAlias, "Gated text");
+        ElementService.Save(element);
+        ElementService.Publish(element, ["*"]);
+
+        Content firstDocument = CreatePageWithExternalBlockReference(contentType, element.Key);
+        ContentService.Save(firstDocument);
+        ContentService.Publish(firstDocument, ["*"]);
+
+        Content secondDocument = CreatePageWithExternalBlockReference(contentType, element.Key);
+        ContentService.Save(secondDocument);
+        ContentService.Publish(secondDocument, ["*"]);
+
+        IProperty firstBlocksProperty = firstDocument.Properties["blocks"]!;
+        IProperty secondBlocksProperty = secondDocument.Properties["blocks"]!;
+        IPropertyValueHandler handler = GetRequiredService<PropertyValueHandlerCollection>().GetPropertyValueHandler(firstBlocksProperty.PropertyType)!;
+
+        // a synchronous caller indexes once before starting concurrent work from the same execution context
+        handler.GetIndexFields(firstBlocksProperty, null, null, true, firstDocument).ToArray();
+
+        GatedPropertyValueHandler gate = GetRequiredService<GatedPropertyValueHandler>();
+        gate.Arm();
+
+        // the first flow holds the shared element in its ancestry chain until the gate opens
+        Task<IndexField[]> firstFlow = Task.Run(() => handler.GetIndexFields(firstBlocksProperty, null, null, true, firstDocument).ToArray());
+        Assert.That(gate.WaitUntilEntered(), Is.True, "The first flow never reached the shared element.");
+
+        IndexField[] secondFlowFields;
+        try
+        {
+            secondFlowFields = await Task.Run(() => handler.GetIndexFields(secondBlocksProperty, null, null, true, secondDocument).ToArray()).ConfigureAwait(false);
+        }
+        finally
+        {
+            gate.Open();
+        }
+
+        IndexField[] firstFlowFields = await firstFlow.ConfigureAwait(false);
+
+        Assert.Multiple(() =>
+        {
+            CollectionAssert.Contains(firstFlowFields.SelectMany(field => field.Value.Texts ?? []), "The shared element text");
+            CollectionAssert.Contains(secondFlowFields.SelectMany(field => field.Value.Texts ?? []), "The shared element text");
+        });
+    }
+
     private Guid CreateAndPublishElement(IContentType elementType, string textValue)
     {
         Element element = new ElementBuilder()
@@ -198,5 +264,37 @@ public class ExternalBlockElementIndexingTests : PropertyValueHandlerTestsBase
         ElementService.Save(element);
         ElementService.Publish(element, ["*"]);
         return element.Key;
+    }
+
+    // once armed, blocks the first caller until opened, so a test can hold an indexing flow at a known point while
+    // another flow runs. Only handles its own dedicated property alias, so it is inert for every other property.
+    public sealed class GatedPropertyValueHandler : IPropertyValueHandler
+    {
+        public const string PropertyAlias = "gatedText";
+
+        private static readonly TimeSpan _timeout = TimeSpan.FromSeconds(30);
+
+        private readonly ManualResetEventSlim _entered = new();
+        private readonly ManualResetEventSlim _opened = new();
+        private int _state;
+
+        public bool CanHandle(IPropertyType propertyType) => propertyType.Alias == PropertyAlias;
+
+        public IEnumerable<IndexField> GetIndexFields(IProperty property, string? culture, string? segment, bool published, IContentBase contentContext)
+        {
+            if (Interlocked.CompareExchange(ref _state, 2, 1) == 1)
+            {
+                _entered.Set();
+                _opened.Wait(_timeout);
+            }
+
+            return [new IndexField(property.Alias, new IndexValue { Texts = ["Gated text"] }, culture, segment)];
+        }
+
+        public void Arm() => Interlocked.Exchange(ref _state, 1);
+
+        public bool WaitUntilEntered() => _entered.Wait(_timeout);
+
+        public void Open() => _opened.Set();
     }
 }
