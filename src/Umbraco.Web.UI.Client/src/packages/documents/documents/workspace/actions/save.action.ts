@@ -62,9 +62,9 @@ export class UmbDocumentSaveWorkspaceAction
 	}
 
 	#checkWritableVariants() {
-		const hasWritableVariant = this.#variants?.some((variant) =>
-			this._workspaceContext!.getIsVariantWritable(UmbVariantId.Create(variant)),
-		);
+		const hasWritableVariant =
+			this.#variants?.some((variant) => this._workspaceContext!.getIsVariantWritable(UmbVariantId.Create(variant))) ||
+			this._workspaceContext!.getIsInvariantDataWritable();
 		if (!hasWritableVariant) {
 			this.disable();
 		} else {

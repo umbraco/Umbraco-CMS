@@ -212,6 +212,29 @@ public class ContentVariantAccessPermissionTests : UmbracoIntegrationTest
     }
 
     [Test]
+    public async Task Can_Edit_Invariant_Property_With_Invariant_Access_But_No_Language_Access()
+    {
+        var contentKey = await SetupBaselineContentAsync();
+        var user = await CreateRestrictedUserAsync(
+            hasAccessToAllLanguages: false,
+            allowedCultures: [],
+            hasAccessToInvariantForVariant: true,
+            suffix: "InvariantOnlyEdit");
+
+        await EditBothCulturesAndInvariantAsync(contentKey, user.Key, "Attempted EN value", "Attempted DA value", "Updated invariant value");
+
+        var draft = ContentService.GetById(contentKey)!;
+        Assert.Multiple(() =>
+        {
+            // the culture edits are silently discarded
+            Assert.AreEqual(InitialValueFor(EnglishCulture), draft.GetValue<string>("variantValue", EnglishCulture));
+            Assert.AreEqual(InitialValueFor(DanishCulture), draft.GetValue<string>("variantValue", DanishCulture));
+
+            Assert.AreEqual("Updated invariant value", draft.GetValue<string>("invariantValue"));
+        });
+    }
+
+    [Test]
     public async Task Cannot_Publish_Pending_Invariant_Change_Without_Invariant_Access()
     {
         var contentKey = await SetupBaselineContentAsync();

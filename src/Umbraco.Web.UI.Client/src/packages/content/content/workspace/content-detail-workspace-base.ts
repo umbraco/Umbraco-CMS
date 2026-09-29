@@ -868,6 +868,14 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		);
 	}
 
+	/**
+	 * Checks if the invariant (shared) data of existing content may be saved on its own, without saving any culture variant.
+	 * @returns {boolean} true if the invariant data may be saved on its own
+	 */
+	public getIsInvariantDataWritable(): boolean {
+		return this.getIsNew() === false && this.getIsVariantWritable(UmbVariantId.CreateInvariant());
+	}
+
 	/* validation */
 
 	/**
@@ -984,6 +992,14 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		// If there is only one variant, we don't need to open the modal.
 		if (options.length === 0) {
 			throw new Error('No variants are available');
+		} else if (
+			this.getVariesByCulture() &&
+			options.some(this._saveableVariantsFilter) === false &&
+			this.getIsInvariantDataWritable()
+		) {
+			// No culture may be saved, but the invariant data may. Saving the invariant variant alone stores the
+			// invariant data and leaves every culture as persisted.
+			variantIds.push(UmbVariantId.CreateInvariant());
 		} else if (options.length === 1) {
 			// If only one option we will skip ahead and save the content with the only variant available:
 			variantIds.push(UmbVariantId.Create(options[0]));
