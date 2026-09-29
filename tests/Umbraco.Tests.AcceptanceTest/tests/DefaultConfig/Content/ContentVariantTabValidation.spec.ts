@@ -19,10 +19,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.language.ensureIsoCodeNotExists('da');
 });
 
-// Product gap (#23706): a client-side mandatory error is lost on re-render after switching tabs and
-// culture, even though the field is genuinely still empty when returning to it. Verified live that the
-// validation message renders correctly before switching, then never reappears after switching back.
-test.skip('client-side mandatory error survives a tab switch and a culture switch', async ({umbracoApi, umbracoUi}) => {
+test('client-side mandatory error survives a tab switch and a culture switch', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithMandatoryCultureVaryingPropertyInTwoTabs(documentTypeName, dataTypeName, dataTypeData.id, firstTabName, secondTabName);
@@ -34,6 +31,7 @@ test.skip('client-side mandatory error survives a tab switch and a culture switc
   // Act
   // Trigger a client-side mandatory error on the first tab by attempting to publish with an empty value.
   await umbracoUi.content.clickSaveAndPublishButton();
+  await umbracoUi.content.clickContainerSaveAndPublishButton();
   await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.nullValue);
   await umbracoUi.content.clickTabWithName(secondTabName);
   await umbracoUi.content.switchLanguage('Danish');
