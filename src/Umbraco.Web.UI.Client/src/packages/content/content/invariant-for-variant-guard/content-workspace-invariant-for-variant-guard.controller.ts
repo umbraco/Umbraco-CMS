@@ -1,12 +1,12 @@
 import { UMB_CONTENT_WORKSPACE_CONTEXT } from '../workspace/content-workspace.context-token.js';
-import { UmbContentAllowEditInvariantFromNonDefaultControllerBase } from './content-allow-edit-invariant-from-non-default-controller-base.js';
+import { UmbContentInvariantForVariantGuardControllerBase } from './content-invariant-for-variant-guard-controller-base.js';
 
 /**
  * Makes invariant (shared) properties of a content workspace read-only when the current user lacks
  * the invariant-for-variant permission.
  */
-export class UmbContentWorkspaceAllowEditInvariantFromNonDefaultController extends UmbContentAllowEditInvariantFromNonDefaultControllerBase {
-	protected async _preventEditInvariantFromNonDefault() {
+export class UmbContentWorkspaceInvariantForVariantGuardController extends UmbContentInvariantForVariantGuardControllerBase {
+	protected async _preventEditInvariantForVariant() {
 		const contentWorkspaceContext = await this.getContext(UMB_CONTENT_WORKSPACE_CONTEXT, {
 			passContextAliasMatches: true,
 		});
@@ -24,4 +24,4 @@ export class UmbContentWorkspaceAllowEditInvariantFromNonDefaultController exten
 	}
 }
 
-export { UmbContentWorkspaceAllowEditInvariantFromNonDefaultController as api };
+export { UmbContentWorkspaceInvariantForVariantGuardController as api };

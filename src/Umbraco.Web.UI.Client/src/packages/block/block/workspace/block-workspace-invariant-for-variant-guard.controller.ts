@@ -4,13 +4,13 @@ import type { UmbVariantPropertyGuardManager } from '@umbraco-cms/backoffice/pro
 import { UMB_PROPERTY_CONTEXT_FOR_CULTURE_VARIANT } from '@umbraco-cms/backoffice/property';
 import {
 	UMB_CONTENT_WORKSPACE_CONTEXT,
-	UmbContentAllowEditInvariantFromNonDefaultControllerBase,
+	UmbContentInvariantForVariantGuardControllerBase,
 } from '@umbraco-cms/backoffice/content';
 import { UmbVariantId, type UmbEntityVariantOptionModel } from '@umbraco-cms/backoffice/variant';
 import { observeMultiple, type Observable } from '@umbraco-cms/backoffice/observable-api';
 
-export class UmbBlockWorkspaceAllowEditInvariantFromNonDefaultController extends UmbContentAllowEditInvariantFromNonDefaultControllerBase {
-	protected async _preventEditInvariantFromNonDefault() {
+export class UmbBlockWorkspaceInvariantForVariantGuardController extends UmbContentInvariantForVariantGuardControllerBase {
+	protected async _preventEditInvariantForVariant() {
 		//
 		const varyingProperty = await this.getContext(UMB_PROPERTY_CONTEXT_FOR_CULTURE_VARIANT, {
 			passContextAliasMatches: true,
@@ -109,4 +109,4 @@ export class UmbBlockWorkspaceAllowEditInvariantFromNonDefaultController extends
 	}
 }
 
-export { UmbBlockWorkspaceAllowEditInvariantFromNonDefaultController as api };
+export { UmbBlockWorkspaceInvariantForVariantGuardController as api };

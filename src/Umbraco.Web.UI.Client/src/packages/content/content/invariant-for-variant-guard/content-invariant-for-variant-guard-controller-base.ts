@@ -10,7 +10,7 @@ import { UmbVariantId, type UmbEntityVariantOptionModel } from '@umbraco-cms/bac
  * Base for controllers that make invariant (shared) properties read-only on variant content
  * when the current user lacks the invariant-for-variant permission.
  */
-export abstract class UmbContentAllowEditInvariantFromNonDefaultControllerBase extends UmbControllerBase {
+export abstract class UmbContentInvariantForVariantGuardControllerBase extends UmbControllerBase {
 	constructor(host: UmbControllerHost) {
 		super(host);
 
@@ -20,12 +20,9 @@ export abstract class UmbContentAllowEditInvariantFromNonDefaultControllerBase e
 			this.observe(
 				context.hasAccessToInvariantForVariant,
 				(hasAccess) => {
-					// When the current user lacks the invariant-for-variant permission, install property write
-					// guards to prevent editing invariant (shared) properties on any variant — including the
-					// default language. The permission replaces the legacy AllowEditInvariantFromNonDefault
-					// tenant-wide config flag and its implicit default-language coupling.
+					// Invariant (shared) properties are guarded on every variant, the default language included.
 					if (hasAccess === false) {
-						this._preventEditInvariantFromNonDefault();
+						this._preventEditInvariantForVariant();
 					}
 				},
 				'_observeHasAccessToInvariantForVariant',
@@ -33,7 +30,10 @@ export abstract class UmbContentAllowEditInvariantFromNonDefaultControllerBase e
 		});
 	}
 
-	protected abstract _preventEditInvariantFromNonDefault(): Promise<void>;
+	/**
+	 * Installs the write guards that make invariant (shared) properties read-only. Called when the current user lacks the invariant-for-variant permission.
+	 */
+	protected abstract _preventEditInvariantForVariant(): Promise<void>;
 
 	protected _observeAndApplyRule(args: {
 		propertiesObservable: Observable<Array<UmbPropertyTypeModel>>;
