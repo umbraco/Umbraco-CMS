@@ -13,7 +13,7 @@ const grandchildDocumentTypeName = 'GrandchildDocumentType';
 // Content
 const rootContentName = 'RootContent';
 const publishedChildName = 'PublishedChild';
-const childToUnpublishName = 'UnpublishedChild';
+const childToUnpublishName = 'ChildToUnpublish';
 const grandchildContentName = 'Grandchild';
 
 // Template
@@ -62,6 +62,7 @@ test('can see a descendant is rendered when its ancestor is published in the req
   await umbracoUi.contentRender.navigateToRenderedContentPage(rootDanishUrl);
 
   // Assert
+  await umbracoUi.contentRender.doesContentRenderValueContainText(publishedChildName);
   await umbracoUi.contentRender.doesContentRenderValueContainText(grandchildContentName);
 });
 
