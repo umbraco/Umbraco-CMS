@@ -53,7 +53,6 @@ export class UmbEntityReferencesModalElement extends UmbModalBaseElement<
 								<umb-localize key="references_labelDependsOnThis">The following items depend on this</umb-localize>
 							</p>
 							<umb-entity-reference-list
-								readonly
 								.unique=${data.unique}
 								.referenceRepositoryAlias=${data.referenceRepositoryAlias}
 								source="referencedBy"
@@ -72,7 +71,6 @@ export class UmbEntityReferencesModalElement extends UmbModalBaseElement<
 								>
 							</p>
 							<umb-entity-reference-list
-								readonly
 								.unique=${data.unique}
 								.referenceRepositoryAlias=${data.referenceRepositoryAlias}
 								.itemRepositoryAlias=${data.itemRepositoryAlias}
@@ -95,10 +93,6 @@ export class UmbEntityReferencesModalElement extends UmbModalBaseElement<
 				display: block;
 				min-width: 460px;
 				max-width: 90vw;
-			}
-
-			h5 {
-				margin-bottom: var(--uui-size-3);
 			}
 		`,
 	];
