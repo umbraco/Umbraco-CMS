@@ -147,6 +147,15 @@ export class UmbUserGroupWorkspaceContext
 	}
 
 	/**
+	 * Sets whether the user group can edit invariant (shared) property data on variant content.
+	 * @param {boolean} value - Whether the user group has invariant-for-variant access.
+	 * @memberof UmbUserGroupWorkspaceContext
+	 */
+	setHasAccessToInvariantForVariant(value: boolean) {
+		this.updateProperty('hasAccessToInvariantForVariant', value);
+	}
+
+	/**
 	 * Sets the user group document access.
 	 * @param {UmbStartNodeAccessValue} value - The document root access and start node.
 	 * @memberof UmbUserGroupWorkspaceContext
