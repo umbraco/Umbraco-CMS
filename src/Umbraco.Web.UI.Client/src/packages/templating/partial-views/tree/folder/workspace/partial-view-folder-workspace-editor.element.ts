@@ -25,6 +25,6 @@ export { UmbPartialViewFolderWorkspaceEditorElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		['umb-partial-view-folder-workspace-editor']: UmbPartialViewFolderWorkspaceEditorElement;
+		'umb-partial-view-folder-workspace-editor': UmbPartialViewFolderWorkspaceEditorElement;
 	}
 }

@@ -1,8 +1,10 @@
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
@@ -10,6 +12,43 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
 internal sealed partial class UserServiceCrudTests
 {
+    private const string CancelledUserEmailDomain = "@saveblocked.com";
+
+    protected override void CustomTestSetup(IUmbracoBuilder builder)
+        => builder.AddNotificationHandler<UserSavingNotification, CancelUserSavingNotificationHandler>();
+
+    [Test]
+    public async Task Cannot_Create_User_When_Cancelled_By_Notification()
+    {
+        var userGroup = await UserGroupService.GetAsync(Constants.Security.AdminGroupAlias);
+        var creationModel = new UserCreateModel
+        {
+            UserName = "cancelled@saveblocked.com",
+            Email = "cancelled@saveblocked.com",
+            Name = "Cancelled Mc. Gee",
+            UserGroupKeys = new HashSet<Guid> { userGroup.Key }
+        };
+
+        var userService = CreateUserService();
+
+        var result = await userService.CreateAsync(Constants.Security.SuperUserKey, creationModel, true);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(UserOperationStatus.CancelledByNotification, result.Status);
+    }
+
+    private sealed class CancelUserSavingNotificationHandler : INotificationHandler<UserSavingNotification>
+    {
+        public void Handle(UserSavingNotification notification)
+        {
+            if (notification.SavedEntities.Any(user =>
+                    user.Email?.EndsWith(CancelledUserEmailDomain, StringComparison.OrdinalIgnoreCase) == true))
+            {
+                notification.Cancel = true;
+            }
+        }
+    }
+
     [Test]
     [TestCase("test@email.com", "test@email.com", true, true)]
     [TestCase("test@email.com", "notTheUserName@email.com", true, false)]

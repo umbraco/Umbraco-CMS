@@ -11,9 +11,12 @@ import type { UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
 @customElement('umb-test-workspace-host')
 class UmbTestWorkspaceHostElement extends UmbControllerHostElementMixin(HTMLElement) {
 	#propertyTypesState = new UmbObjectState<Array<UmbPropertyTypeModel> | undefined>(undefined);
+	#ownerContentTypeState = new UmbObjectState<{ variesByCulture?: boolean } | undefined>(undefined);
 
 	structure = {
 		contentTypeProperties: this.#propertyTypesState.asObservable(),
+		ownerContentTypeObservablePart: <R>(fn: (contentType: { variesByCulture?: boolean } | undefined) => R) =>
+			this.#ownerContentTypeState.asObservablePart(fn),
 	};
 
 	#data: UmbContentDetailModel<UmbEntityVariantModel> | undefined;

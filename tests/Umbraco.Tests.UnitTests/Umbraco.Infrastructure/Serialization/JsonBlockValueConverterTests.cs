@@ -508,4 +508,76 @@ public class JsonBlockValueConverterTests
         Assert.AreEqual("Text", deserialized.ContentData[0].RawPropertyValues["text"]);
         Assert.AreEqual("Values", deserialized.ContentData[0].RawPropertyValues["values"]);
     }
+
+    /// <summary>
+    /// Test case that verifies the fix for https://github.com/umbraco/Umbraco-CMS/issues/23379.
+    /// </summary>
+    [Test]
+    public void Can_Populate_Expose_For_Legacy_Property_Less_Blocks()
+    {
+        // Legacy (pre-variant) block value with a content block that has no property values and no
+        // "expose" property. On upgrade the block must still be exposed to keep its published state.
+        var serialized = @"{
+   ""layout"":{
+      ""Umbraco.RichText"":[
+         {
+            ""contentUdi"":""umb://element/6ad18441631140d48515ea0fc5b00425""
+         }
+      ]
+   },
+   ""contentData"":[
+      {
+         ""contentTypeKey"":""a1d1123c-289b-4a05-b33f-9f06cb723da1"",
+         ""udi"":""umb://element/6ad18441631140d48515ea0fc5b00425""
+      }
+   ],
+   ""settingsData"":[
+   ]
+}";
+
+        var serializer = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
+        var deserialized = serializer.Deserialize<RichTextBlockValue>(serialized);
+
+        Assert.IsNotNull(deserialized);
+        Assert.AreEqual(1, deserialized.ContentData.Count);
+        Assert.IsEmpty(deserialized.ContentData[0].Values);
+
+        Assert.AreEqual(1, deserialized.Expose.Count);
+        Assert.AreEqual(Guid.Parse("6ad18441631140d48515ea0fc5b00425"), deserialized.Expose[0].ContentKey);
+        Assert.IsNull(deserialized.Expose[0].Culture);
+        Assert.IsNull(deserialized.Expose[0].Segment);
+    }
+
+    [Test]
+    public void Does_Not_Populate_Expose_When_Expose_Present()
+    {
+        // Current-format block value that explicitly carries an empty "expose" array alongside content.
+        // This is a healthy (non-legacy) state and must be left untouched.
+        var serialized = @"{
+   ""layout"":{
+      ""Umbraco.RichText"":[
+         {
+            ""contentKey"":""6ad18441-6311-40d4-8515-ea0fc5b00425""
+         }
+      ]
+   },
+   ""contentData"":[
+      {
+         ""contentTypeKey"":""a1d1123c-289b-4a05-b33f-9f06cb723da1"",
+         ""key"":""6ad18441-6311-40d4-8515-ea0fc5b00425""
+      }
+   ],
+   ""settingsData"":[
+   ],
+   ""expose"":[
+   ]
+}";
+
+        var serializer = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
+        var deserialized = serializer.Deserialize<RichTextBlockValue>(serialized);
+
+        Assert.IsNotNull(deserialized);
+        Assert.AreEqual(1, deserialized.ContentData.Count);
+        Assert.IsEmpty(deserialized.Expose);
+    }
 }

@@ -1,5 +1,6 @@
 import { UmbMemberCollectionRepository } from '../../collection/index.js';
-import type { UmbMemberDetailModel } from '../../types.js';
+import { UMB_MEMBER_ENTITY_TYPE } from '../../constants.js';
+import { type UmbMemberDetailModel } from '../../types.js';
 import type { UmbMemberItemModel } from '../../item/types.js';
 import type { UmbMemberPickerModalValue, UmbMemberPickerModalData } from './member-picker-modal.token.js';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
@@ -33,7 +34,7 @@ export class UmbMemberPickerModalElement extends UmbModalBaseElement<
 				this.updateValue({ selection });
 				this.requestUpdate();
 			},
-			'umbSelectionObserver',
+			null,
 		);
 
 		this.observe(
@@ -41,7 +42,7 @@ export class UmbMemberPickerModalElement extends UmbModalBaseElement<
 			(query) => {
 				this._searchQuery = query?.query;
 			},
-			'umbPickerSearchQueryObserver',
+			null,
 		);
 	}
 
@@ -91,7 +92,7 @@ export class UmbMemberPickerModalElement extends UmbModalBaseElement<
 		return html`
 			<umb-body-layout headline=${this.localize.term('defaultdialogs_selectMembers')}>
 				<uui-box>
-					<umb-picker-search-field></umb-picker-search-field>
+					<umb-picker-search-field .alias=${UMB_MEMBER_ENTITY_TYPE}></umb-picker-search-field>
 					<umb-picker-search-result></umb-picker-search-result>
 					${this.#renderItems()}</uui-box
 				>

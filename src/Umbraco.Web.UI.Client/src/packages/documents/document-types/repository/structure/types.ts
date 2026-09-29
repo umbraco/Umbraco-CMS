@@ -8,7 +8,6 @@ export interface UmbAllowedDocumentTypeModel extends UmbEntityModel {
 	icon: string | null;
 }
 
-export interface UmbDocumentTypeStructureDataSource
-	extends UmbContentTypeStructureDataSource<UmbAllowedDocumentTypeModel> {
+export interface UmbDocumentTypeStructureDataSource extends UmbContentTypeStructureDataSource<UmbAllowedDocumentTypeModel> {
 	getAllowedParentsOf(unique: string): Promise<UmbDataSourceResponse<Array<UmbEntityModel>>>;
 }

@@ -89,13 +89,7 @@ public static class HttpContextExtensions
     public static string? GetRequestValue(this HttpContext context, string key)
     {
         HttpRequest request = context.Request;
-        if (!request.HasFormContentType)
-        {
-            return request.Query[key];
-        }
-
-        string? value = request.Form[key];
-        return value ?? request.Query[key];
+        return request.GetFormValueOrNull(key) ?? request.Query[key];
     }
 
     public static void SetPrincipalForRequest(this HttpContext context, ClaimsPrincipal? principal)

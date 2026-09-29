@@ -46,4 +46,35 @@ public class HostingSettingsValidatorTests
         var result = validator.Validate("settings", options);
         Assert.False(result.Succeeded);
     }
+
+    [Test]
+    public void Returns_Success_For_Configuration_With_Short_MachineIdentifier()
+    {
+        var validator = new HostingSettingsValidator();
+        var options = new HostingSettings { MachineIdentifier = "my-stable-instance-id" };
+        var result = validator.Validate("settings", options);
+        Assert.True(result.Succeeded);
+    }
+
+    [Test]
+    public void Returns_Fail_For_Configuration_With_MachineIdentifier_That_Exceeds_Max_Length()
+    {
+        var validator = new HostingSettingsValidator();
+        var options = new HostingSettings { MachineIdentifier = new string('x', MachineInfoFactory.MaxMachineIdentifierLength + 1) };
+        var result = validator.Validate("settings", options);
+        Assert.False(result.Succeeded);
+    }
+
+    [Test]
+    public void Returns_Fail_For_Configuration_With_MachineIdentifier_And_SiteName_That_Exceeds_Max_Length()
+    {
+        var validator = new HostingSettingsValidator();
+        var options = new HostingSettings
+        {
+            MachineIdentifier = "short-id",
+            SiteName = new string('x', MachineInfoFactory.MaxMachineIdentifierLength),
+        };
+        var result = validator.Validate("settings", options);
+        Assert.False(result.Succeeded);
+    }
 }

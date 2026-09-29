@@ -366,7 +366,7 @@ internal sealed partial class DocumentCacheServiceTests : UmbracoIntegrationTest
         ContentService.Publish(Textpage, ["*"]);
 
         // Act - Full rebuild (the "Rebuild Database Cache" dashboard button path)
-        // This calls Rebuild([], [], []) internally — empty arrays meaning "rebuild all"
+        // This calls Rebuild([], []) internally — empty arrays meaning "rebuild all"
         await DatabaseCacheRebuilder.RebuildAsync(false);
 
         // Assert - Verify cmsContentNu table has records for the content items

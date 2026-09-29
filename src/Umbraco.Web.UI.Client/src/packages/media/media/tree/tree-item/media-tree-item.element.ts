@@ -5,19 +5,12 @@ import { UmbTreeItemElementBase } from '@umbraco-cms/backoffice/tree';
 
 @customElement('umb-media-tree-item')
 export class UmbMediaTreeItemElement extends UmbTreeItemElementBase<UmbMediaTreeItemModel, UmbMediaTreeItemContext> {
-	public override set api(value: UmbMediaTreeItemContext | undefined) {
-		// Observe noAccess from context and update base class property (_noAccess).
-		// This enables access restriction behavior (click prevention) and styling from the base class.
-		this.observe(value?.noAccess, (noAccess) => (this._noAccess = noAccess ?? false));
-		super.api = value;
-	}
-
 	override renderIconContainer() {
 		return html`
 			<div id="icon-container" slot="icon">
 				<umb-entity-sign-bundle .entityType=${this._item?.entityType} .entityFlags=${this._flags}>
 					${when(
-						this.item?.mediaType.icon,
+						this.#contentType?.icon,
 						(icon) => html`<umb-icon id="icon" name=${this._getIconToRender(icon)}></umb-icon>`,
 					)}
 				</umb-entity-sign-bundle>
@@ -32,8 +25,14 @@ export class UmbMediaTreeItemElement extends UmbTreeItemElementBase<UmbMediaTree
 		</span> `;
 	}
 
+	// TODO (V20): drop the `mediaType` fallback when the deprecated field is removed.
+	get #contentType() {
+		// eslint-disable-next-line @typescript-eslint/no-deprecated
+		return this.item?.contentType ?? this.item?.mediaType;
+	}
+
 	#renderStateIcon() {
-		if (this.item?.mediaType.collection) {
+		if (this.#contentType?.collection) {
 			return this.#renderIsCollectionIcon();
 		}
 

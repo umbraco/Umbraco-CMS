@@ -42,6 +42,17 @@ public interface IContentEditingService
     Task<Attempt<ContentCreateResult, ContentEditingOperationStatus>> CreateAsync(ContentCreateModel createModel, Guid userKey);
 
     /// <summary>
+    ///     Creates and publishes a new content item.
+    /// </summary>
+    /// <param name="createModel">The model containing the content data.</param>
+    /// <param name="culturesToPublish">The cultures to publish.</param>
+    /// <param name="userKey">The unique identifier of the user performing the action.</param>
+    /// <returns>An attempt containing the creation result or an error status.</returns>
+    // TODO (V19): Remove default implementation.
+    Task<Attempt<ContentCreateResult, ContentEditingOperationStatus>> CreateAndPublishAsync(ContentCreateModel createModel, string[] culturesToPublish, Guid userKey)
+        => throw new NotImplementedException();
+
+    /// <summary>
     ///     Updates an existing content item.
     /// </summary>
     /// <param name="key">The unique identifier of the content item to update.</param>
@@ -49,6 +60,18 @@ public interface IContentEditingService
     /// <param name="userKey">The unique identifier of the user performing the action.</param>
     /// <returns>An attempt containing the update result or an error status.</returns>
     Task<Attempt<ContentUpdateResult, ContentEditingOperationStatus>> UpdateAsync(Guid key, ContentUpdateModel updateModel, Guid userKey);
+
+    /// <summary>
+    ///     Updates and publishes an existing content item.
+    /// </summary>
+    /// <param name="key">The unique identifier of the content item to update.</param>
+    /// <param name="updateModel">The model containing the updated content data.</param>
+    /// <param name="culturesToPublish">The cultures to publish.</param>
+    /// <param name="userKey">The unique identifier of the user performing the action.</param>
+    /// <returns>An attempt containing the update result or an error status.</returns>
+    // TODO (V19): Remove default implementation.
+    Task<Attempt<ContentUpdateResult, ContentEditingOperationStatus>> UpdateAndPublishAsync(Guid key, ContentUpdateModel updateModel, string[] culturesToPublish, Guid userKey)
+        => throw new NotImplementedException();
 
     /// <summary>
     ///     Moves a content item to the recycle bin.
@@ -122,5 +145,34 @@ public interface IContentEditingService
     /// <param name="parentKey">The unique identifier of the parent to restore to, or <c>null</c> for the original location.</param>
     /// <param name="userKey">The unique identifier of the user performing the action.</param>
     /// <returns>An attempt containing the restored content item or an error status.</returns>
+    [Obsolete("Use the overload that takes an includeDescendants parameter instead. Scheduled for removal in Umbraco 19.")]
     Task<Attempt<IContent?, ContentEditingOperationStatus>> RestoreAsync(Guid key, Guid? parentKey, Guid userKey);
+
+    /// <summary>
+    ///     Restores a content item from the recycle bin, optionally leaving its descendants behind.
+    /// </summary>
+    /// <param name="key">The unique identifier of the content item to restore.</param>
+    /// <param name="parentKey">The unique identifier of the parent to restore to, or <c>null</c> for the original location.</param>
+    /// <param name="userKey">The unique identifier of the user performing the action.</param>
+    /// <param name="includeDescendants">
+    ///     Whether to restore the descendants of the content item along with it. When <c>false</c>, only the content
+    ///     item itself is restored and its descendants remain in the recycle bin as top-level bin items, ready to be
+    ///     restored later.
+    /// </param>
+    /// <returns>An attempt containing the restored content item or an error status.</returns>
+    // TODO (V19): Remove the default implementation when the obsolete overload without includeDescendants is removed.
+    Task<Attempt<IContent?, ContentEditingOperationStatus>> RestoreAsync(Guid key, Guid? parentKey, Guid userKey, bool includeDescendants)
+    {
+        // Only the whole-tree restore can be satisfied by delegating to the existing method; there is no way to honour
+        // includeDescendants: false without the concrete implementation, so fail fast rather than silently restore
+        // the descendants after all.
+        if (includeDescendants is false)
+        {
+            throw new NotImplementedException("This IContentEditingService implementation does not support restoring without descendants. Override the RestoreAsync overload that takes an includeDescendants parameter to support it.");
+        }
+
+#pragma warning disable CS0618 // Type or member is obsolete
+        return RestoreAsync(key, parentKey, userKey);
+#pragma warning restore CS0618 // Type or member is obsolete
+    }
 }

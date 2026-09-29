@@ -6,7 +6,7 @@ using Umbraco.Cms.Core.Packaging;
 namespace Umbraco.Cms.Api.Management.Mapping.Package;
 
 /// <summary>
-/// Provides mapping configuration for converting package data to and from the <see cref="PackageViewModel"/>.
+/// Provides mapping configuration for converting package data to and from the package view models.
 /// </summary>
 public class PackageViewModelMapDefinition : IMapDefinition
 {

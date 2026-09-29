@@ -16,6 +16,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Text Box Property Editor UI',
 		element: () => import('./property-editor-ui-text-box.element.js'),
 		meta: {
+			supportsVariantChange: true,
 			label: 'Text Box',
 			propertyEditorSchemaAlias: 'Umbraco.TextBox',
 			icon: 'icon-autofill',
@@ -42,7 +43,29 @@ export const manifests: Array<UmbExtensionManifest> = [
 			],
 			supportsReadOnly: true,
 			settings: {
-				properties: [inputTypeConfig],
+				properties: [
+					inputTypeConfig,
+					{
+						alias: 'autocomplete',
+						label: '#textbox_autocompleteLabel',
+						propertyEditorUiAlias: 'Umb.PropertyEditorUi.Dropdown',
+						config: [
+							{
+								alias: 'items',
+								value: [
+									{ name: 'On', value: 'on' },
+									{ name: 'Off', value: 'off' },
+								],
+							},
+						],
+					},
+					{
+						alias: 'placeholder',
+						label: '#general_placeholder',
+						description: 'Placeholder text shown inside the input when empty',
+						propertyEditorUiAlias: 'Umb.PropertyEditorUi.TextBox',
+					},
+				],
 				defaultData: [
 					{
 						alias: 'inputType',
@@ -58,6 +81,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Email Property Editor UI',
 		element: () => import('./property-editor-ui-text-box.element.js'),
 		meta: {
+			supportsVariantChange: true,
 			label: 'Email',
 			propertyEditorSchemaAlias: 'Umbraco.EmailAddress',
 			icon: 'icon-message',

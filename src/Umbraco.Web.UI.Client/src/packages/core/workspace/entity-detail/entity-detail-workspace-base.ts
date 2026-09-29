@@ -1,12 +1,19 @@
 import { UmbSubmittableWorkspaceContextBase } from '../submittable/index.js';
+import { umbWorkspaceWillNavigateAway } from '../utils/check-will-navigate-away.function.js';
 import { UmbEntityWorkspaceDataManager } from '../entity/entity-workspace-data-manager.js';
 import type { UmbSubmittableTreeEntityWorkspaceContext } from '../contexts/tokens/index.js';
+import { UmbDeleteEntityWorkspaceRedirectController } from '../controllers/delete-entity-workspace-redirect.controller.js';
 import type { UmbEntityDetailWorkspaceContextArgs, UmbEntityDetailWorkspaceContextCreateArgs } from './types.js';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbEntityContext, type UmbEntityModel, type UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
+import {
+	UMB_PARENT_ENTITY_CONTEXT,
+	UmbEntityContext,
+	type UmbEntityModel,
+	type UmbEntityUnique,
+} from '@umbraco-cms/backoffice/entity';
 import { UMB_DISCARD_CHANGES_MODAL, umbOpenModal } from '@umbraco-cms/backoffice/modal';
-import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import {
 	UmbEntityUpdatedEvent,
 	UmbRequestReloadChildrenOfEntityEvent,
@@ -28,11 +35,11 @@ const LOADING_STATE_UNIQUE = 'umbLoadingEntityDetail';
 const FORBIDDEN_STATE_UNIQUE = 'umbForbiddenEntityDetail';
 
 export abstract class UmbEntityDetailWorkspaceContextBase<
-		DetailModelType extends UmbEntityModel = UmbEntityModel,
-		DetailRepositoryType extends UmbDetailRepository<DetailModelType> = UmbDetailRepository<DetailModelType>,
-		CreateArgsType extends
-			UmbEntityDetailWorkspaceContextCreateArgs<DetailModelType> = UmbEntityDetailWorkspaceContextCreateArgs<DetailModelType>,
-	>
+	DetailModelType extends UmbEntityModel = UmbEntityModel,
+	DetailRepositoryType extends UmbDetailRepository<DetailModelType> = UmbDetailRepository<DetailModelType>,
+	CreateArgsType extends UmbEntityDetailWorkspaceContextCreateArgs<DetailModelType> =
+		UmbEntityDetailWorkspaceContextCreateArgs<DetailModelType>,
+>
 	extends UmbSubmittableWorkspaceContextBase<DetailModelType>
 	implements UmbSubmittableTreeEntityWorkspaceContext
 {
@@ -42,7 +49,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	/**
 	 * @description Data manager for the workspace.
 	 * @protected
-	 * @memberof UmbEntityWorkspaceContextBase
+	 * @memberof UmbEntityDetailWorkspaceContextBase
 	 */
 	protected readonly _data = new UmbEntityWorkspaceDataManager<DetailModelType>(this);
 
@@ -106,6 +113,14 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	 */
 	protected validationContext = new UmbValidationContext(this);
 
+	#navigationParentItemPath = new UmbStringState<string | undefined>(undefined);
+	/**
+	 * Where a "back to parent" navigation should go, computed from the entity's current parent (see
+	 * `UMB_PARENT_ENTITY_CONTEXT`). Override `_getNavigationParentItemPath` to provide entity-specific redirect
+	 * logic — the default implementation always resolves to `undefined` (no known target).
+	 */
+	public readonly navigationParentItemPath = this.#navigationParentItemPath.asObservable();
+
 	#initResolver?: () => void;
 	#initialized = false;
 
@@ -122,6 +137,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		this.addValidationContext(this.validationContext);
 		this.#entityContext.setEntityType(args.entityType);
 		window.addEventListener('willchangestate', this.#onWillNavigate);
+		window.addEventListener('beforeunload', this.#onBeforeUnload);
 		this.#observeRepository(args.detailRepositoryAlias);
 
 		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (context) => {
@@ -136,6 +152,32 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 				this.#onEntityUpdatedEvent as unknown as EventListener,
 			);
 		});
+
+		this.consumeContext(UMB_PARENT_ENTITY_CONTEXT, (instance) => {
+			this.observe(
+				instance?.parent,
+				(entity) => this.#navigationParentItemPath.setValue(this._getNavigationParentItemPath(entity)),
+				'umbObserveParentForNavigationPath',
+			);
+		});
+
+		new UmbDeleteEntityWorkspaceRedirectController(this, this);
+	}
+
+	// TODO: Ideally this would be resolved by a more global, outer navigation context instead of by each
+	// workspace individually. Right now, only the workspace itself knows how to match an entity to a path, so
+	// that responsibility sits here. Once there's a way to do that matching more generally, this method could
+	// source the information from that context instead.
+	/**
+	 * Resolves where a "back to parent" navigation should go, given the entity's current parent item (or
+	 * `undefined` when there's no parent or it's not yet known). Override to provide entity-specific redirect
+	 * logic — e.g. a root workspace or section fallback when there's no parent, or branching on the parent's
+	 * entity type (e.g. a folder vs. a regular item). Defaults to `undefined` (no known target).
+	 * @param {UmbEntityModel | undefined} _entity - The current parent entity, or undefined when there is none.
+	 * @returns {string | undefined} An absolute path to navigate to, or undefined if there is none.
+	 */
+	protected _getNavigationParentItemPath(_entity: UmbEntityModel | undefined): string | undefined {
+		return undefined;
 	}
 
 	/**
@@ -268,7 +310,13 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 			this._data.setPersisted(processedData);
 			this._data.setCurrent(processedData);
 
-			this.observe(asObservable?.(), (entity) => this.#onDetailStoreChange(entity), 'umbEntityDetailTypeStoreObserver');
+			this.observe(
+				asObservable?.(),
+				(entity) => {
+					if (!entity) this._data.clear();
+				},
+				'umbEntityDetailTypeStoreObserver',
+			);
 		}
 
 		this.loading.removeState(LOADING_STATE_UNIQUE);
@@ -292,9 +340,22 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	}
 
 	/**
+	 * Requests the latest persisted version of the entity from the server WITHOUT applying it to the
+	 * workspace state, and returns the processed data.
+	 * @returns { Promise<DetailModelType> } The latest persisted data.
+	 */
+	public async loadWithoutPersist(): Promise<DetailModelType> {
+		const unique = this.getUnique();
+		if (!unique) throw new Error('Unique is not set');
+		const { data, error } = await this._detailRepository!.requestByUnique(unique);
+		if (error || !data) throw new Error('Error loading entity', { cause: error });
+		return await this._processIncomingData(data);
+	}
+
+	/**
 	 * Method to check if the workspace data is loaded.
-	 * @returns { Promise<any> | undefined } true if the workspace data is loaded.
-	 * @memberof UmbEntityWorkspaceContextBase
+	 * @returns { Promise<UmbRepositoryResponse<DetailModelType> | UmbRepositoryResponseWithAsObservable<DetailModelType>> | undefined } true if the workspace data is loaded.
+	 * @memberof UmbEntityDetailWorkspaceContextBase
 	 */
 	public isLoaded(): Promise<any> | undefined {
 		return this._getDataPromise;
@@ -307,7 +368,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	 * @param {UmbEntityUnique} args.parent.unique The unique identifier of the parent entity.
 	 * @param {string} args.parent.entityType The entity type of the parent entity.
 	 * @param {Partial<DetailModelType>} args.preset The preset data.
-	 * @returns { Promise<any> | undefined } The data of the scaffold.
+	 * @returns { Promise<DetailModelType | undefined> } The data of the scaffold.
 	 */
 	public async createScaffold(args: CreateArgsType) {
 		this.resetState();
@@ -376,7 +437,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 
 	/**
 	 * Deletes the entity.
-	 * @param unique The unique identifier of the entity to delete.
+	 * @param {string} unique The unique identifier of the entity to delete.
 	 */
 	async delete(unique: string) {
 		await this.#init;
@@ -388,13 +449,10 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	 * @protected
 	 * @param {string | URL} newUrl The new url that the workspace is navigating to.
 	 * @returns {boolean} true if the workspace is navigating away.
-	 * @memberof UmbEntityWorkspaceContextBase
+	 * @memberof UmbEntityDetailWorkspaceContextBase
 	 */
 	protected _checkWillNavigateAway(newUrl: string | URL): boolean {
-		if (newUrl instanceof URL) {
-			newUrl = newUrl.href;
-		}
-		return !newUrl.includes(this.routes.getActiveLocalPath());
+		return umbWorkspaceWillNavigateAway(this.routes, this.getUnique(), newUrl);
 	}
 
 	protected async _create(currentData: DetailModelType, parent: UmbEntityModel) {
@@ -402,7 +460,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 
 		const { error, data } = await this._detailRepository.create(currentData, parent.unique);
 		if (error || !data) {
-			throw error?.message ?? 'Repository did not return data after create.';
+			throw new Error('Repository did not return data after create.', { cause: error });
 		}
 
 		this.#entityContext.setUnique(data.unique);
@@ -431,7 +489,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	protected async _update(currentData: DetailModelType) {
 		const { error, data } = await this._detailRepository!.save(currentData);
 		if (error || !data) {
-			throw error?.message ?? 'Repository did not return data after create.';
+			throw new Error('Entity Detail Repository failed saving', { cause: error });
 		}
 
 		this._data.setPersisted(data);
@@ -485,12 +543,27 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		return true;
 	};
 
+	#onBeforeUnload = (e: BeforeUnloadEvent) => {
+		if (this.getHasUnpersistedChanges()) {
+			e.preventDefault();
+			e.returnValue = '';
+		}
+	};
+
 	/**
 	 * Check if there are unpersisted changes.
 	 * @returns { boolean } true if there are unpersisted changes.
 	 */
 	public getHasUnpersistedChanges(): boolean {
 		return this._data.getHasUnpersistedChanges();
+	}
+
+	/**
+	 * Resets the data back to the last persisted state, discarding any local changes.
+	 * @memberof UmbEntityDetailWorkspaceContextBase
+	 */
+	public resetData(): void {
+		this._data.resetCurrent();
 	}
 
 	override resetState() {
@@ -524,12 +597,6 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		);
 	}
 
-	#onDetailStoreChange(entity: DetailModelType | undefined) {
-		if (!entity) {
-			this._data.clear();
-		}
-	}
-
 	// Discriminator to identify events from this workspace context
 	protected readonly _workspaceEventUnique = UmbId.new();
 
@@ -550,6 +617,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 
 	public override destroy(): void {
 		window.removeEventListener('willchangestate', this.#onWillNavigate);
+		window.removeEventListener('beforeunload', this.#onBeforeUnload);
 		this.#eventContext?.removeEventListener(
 			UmbEntityUpdatedEvent.TYPE,
 			this.#onEntityUpdatedEvent as unknown as EventListener,

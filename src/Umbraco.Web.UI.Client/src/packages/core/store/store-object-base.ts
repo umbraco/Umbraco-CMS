@@ -18,7 +18,7 @@ export class UmbStoreObjectBase<T> extends UmbContextBase implements UmbApi {
 
 	/**
 	 * Updates the store with the given data
-	 * @param data - The (partial) data to update the store with
+	 * @param {Partial<T>} data - The (partial) data to update the store with
 	 * @memberof UmbStoreObjectBase
 	 */
 	update(data: Partial<T>) {
@@ -28,6 +28,7 @@ export class UmbStoreObjectBase<T> extends UmbContextBase implements UmbApi {
 
 	/**
 	 * Returns the current state of the store
+	 * @returns {T | null} The current state of the store
 	 * @memberof UmbStoreObjectBase
 	 */
 	getState() {
@@ -36,6 +37,7 @@ export class UmbStoreObjectBase<T> extends UmbContextBase implements UmbApi {
 
 	/**
 	 * Returns an observable of the store
+	 * @returns {Observable<T | null>} An observable of the store
 	 * @memberof UmbStoreObjectBase
 	 */
 	all() {
@@ -44,7 +46,9 @@ export class UmbStoreObjectBase<T> extends UmbContextBase implements UmbApi {
 
 	/**
 	 * Returns an observable of a part of the store
-	 * @param key - The key of the part to return
+	 * @template {keyof T} Part
+	 * @param {Part} key - The key of the part to return
+	 * @returns {Observable<T[Part]>} An observable of the part of the store
 	 * @memberof UmbStoreObjectBase
 	 */
 	part<Part extends keyof T>(key: Part): Observable<T[Part]> {

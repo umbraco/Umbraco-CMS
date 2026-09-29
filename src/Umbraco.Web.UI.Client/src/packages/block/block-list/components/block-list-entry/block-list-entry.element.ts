@@ -5,6 +5,7 @@ import { css, customElement, html, nothing, property, state, when } from '@umbra
 import { UmbLitElement, umbDestroyOnDisconnect } from '@umbraco-cms/backoffice/lit-element';
 import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
 import { UmbDataPathBlockElementDataQuery } from '@umbraco-cms/backoffice/block';
+import { renderHiddenUfm } from '@umbraco-cms/backoffice/ufm';
 import { UmbObserveValidationStateController } from '@umbraco-cms/backoffice/validation';
 import { UUIBlinkAnimationValue, UUIBlinkKeyframes } from '@umbraco-cms/backoffice/external/uui';
 import type {
@@ -13,6 +14,7 @@ import type {
 } from '@umbraco-cms/backoffice/block-custom-view';
 import type { UmbExtensionElementInitializer } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/property-editor';
+import type { UmbUfmResolvedEvent } from '@umbraco-cms/backoffice/ufm';
 
 import '../ref-list-block/index.js';
 import '../inline-list-block/index.js';
@@ -84,6 +86,9 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 
 	@state()
 	private _isSortMode?: boolean;
+
+	// TODO: consumed by <umb-entity-frame> label, landing in a follow-up PR; add `@state()` when used in render [LK]
+	private _name?: string;
 
 	// 'content-invalid' attribute is used for styling purpose.
 	@property({ type: Boolean, attribute: 'content-invalid', reflect: true })
@@ -173,6 +178,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 		this.observe(this.#context.actionsVisibility, (showActions) => (this._showActions = showActions), null);
 		this.observe(this.#context.inlineEditingMode, (mode) => (this._inlineEditingMode = mode), null);
 		this.observe(this.#context.isSortMode, (isSortMode) => (this._isSortMode = isSortMode), null);
+		this.observe(this.#context.name, (name) => (this._name = name), null);
 
 		// Data props:
 		this.observe(
@@ -279,6 +285,10 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 		this.#context.expose();
 	};
 
+	#onUfmResolved = (event: UmbUfmResolvedEvent) => {
+		this.#context.setName(event.detail.text);
+	};
+
 	#extensionSlotFilterMethod = (manifest: ManifestBlockEditorCustomView) => {
 		if (this._unsupported) {
 			// If the block is unsupported, we should not allow any custom views to render.
@@ -299,23 +309,49 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 
 	#extensionSlotRenderMethod = (ext: UmbExtensionElementInitializer<ManifestBlockEditorCustomView>) => {
 		ext.component?.setAttribute('part', 'component');
-		if (this._exposed || this._isReadOnly) {
-			return ext.component;
-		} else {
-			return html`<div style="min-height: var(--uui-size-16);">
-				${ext.component}
-				<umb-block-overlay-expose-button
-					.contentTypeName=${this._contentTypeName}
-					@click=${this.#expose}></umb-block-overlay-expose-button>
-			</div>`;
-		}
+		return html`${this.#renderHiddenUfm()}
+		${when(
+			this._exposed || this._isReadOnly,
+			() => ext.component,
+			() => html`
+				<div style="min-height: var(--uui-size-16);">
+					${ext.component}
+					<umb-block-overlay-expose-button
+						.contentTypeName=${this._contentTypeName}
+						@click=${this.#expose}></umb-block-overlay-expose-button>
+				</div>
+			`,
+		)}`;
 	};
+
+	get #blockValue() {
+		return {
+			...this._blockViewProps.content,
+			$settings: this._blockViewProps.settings,
+			$index: this.index,
+		};
+	}
+
+	#renderUfm() {
+		return html`
+			<umb-ufm-render
+				slot="name"
+				inline
+				.markdown=${this._label}
+				.value=${this.#blockValue}
+				@umb-ufm-resolved=${this.#onUfmResolved}>
+			</umb-ufm-render>
+		`;
+	}
+
+	#renderHiddenUfm() {
+		return renderHiddenUfm(this._label, this.#blockValue, this.#onUfmResolved);
+	}
 
 	#renderRefBlock() {
 		return html`
 			<umb-ref-list-block
 				class=${this._isSortMode ? 'sortable' : ''}
-				.label=${this._label}
 				.icon=${this._icon}
 				.index=${this._blockViewProps.index}
 				.unpublished=${!this._exposed}
@@ -323,28 +359,35 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 				.content=${this._blockViewProps.content}
 				.settings=${this._blockViewProps.settings}
 				${umbDestroyOnDisconnect()}>
+				${this.#renderUfm()}
 			</umb-ref-list-block>
 		`;
 	}
 
 	#renderInlineBlock() {
-		return html`<umb-inline-list-block
-			.label=${this._label}
-			.icon=${this._icon}
-			.index=${this._blockViewProps.index}
-			.unpublished=${!this._exposed}
-			.config=${this._blockViewProps.config}
-			.content=${this._blockViewProps.content}
-			.settings=${this._blockViewProps.settings}
-			${umbDestroyOnDisconnect()}></umb-inline-list-block>`;
+		return html`
+			<umb-inline-list-block
+				.icon=${this._icon}
+				.index=${this._blockViewProps.index}
+				.unpublished=${!this._exposed}
+				.config=${this._blockViewProps.config}
+				.content=${this._blockViewProps.content}
+				.settings=${this._blockViewProps.settings}
+				${umbDestroyOnDisconnect()}>
+				${this.#renderUfm()}
+			</umb-inline-list-block>
+		`;
 	}
 
 	#renderUnsupportedBlock() {
-		return html`<umb-unsupported-list-block
-			.config=${this._blockViewProps.config}
-			.content=${this._blockViewProps.content}
-			.settings=${this._blockViewProps.settings}
-			${umbDestroyOnDisconnect()}></umb-unsupported-list-block>`;
+		return html`
+			${this.#renderHiddenUfm()}
+			<umb-unsupported-list-block
+				.config=${this._blockViewProps.config}
+				.content=${this._blockViewProps.content}
+				.settings=${this._blockViewProps.settings}
+				${umbDestroyOnDisconnect()}></umb-unsupported-list-block>
+		`;
 	}
 
 	#renderBuiltinBlockView = () => {

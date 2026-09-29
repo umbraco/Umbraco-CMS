@@ -42,6 +42,28 @@ public interface IIdKeyMap
     Attempt<Guid> GetKeyForId(int id, UmbracoObjectTypes umbracoObjectType);
 
     /// <summary>
+    /// Adds known ID/key pairs to the cache, so subsequent lookups do not need to hit the database.
+    /// </summary>
+    /// <param name="pairs">The ID/key pairs to cache. Must be a materialized collection.</param>
+    /// <param name="umbracoObjectType">The type of the Umbraco objects the pairs belong to.</param>
+    /// <remarks>
+    /// Only supply pairs read from persisted entities: the mapping is assumed to be unique and permanent.
+    /// </remarks>
+    // TODO (V19): Remove the default implementation.
+    void PopulateCache(IReadOnlyCollection<(int Id, Guid Key)> pairs, UmbracoObjectTypes umbracoObjectType)
+    {
+    }
+
+    /// <summary>
+    /// Adds a known ID/key pair to the cache, so subsequent lookups do not need to hit the database.
+    /// </summary>
+    /// <param name="id">The integer identifier of the entity.</param>
+    /// <param name="key">The unique GUID key of the entity.</param>
+    /// <param name="umbracoObjectType">The type of the Umbraco object.</param>
+    void PopulateCache(int id, Guid key, UmbracoObjectTypes umbracoObjectType)
+        => PopulateCache([(id, key)], umbracoObjectType);
+
+    /// <summary>
     /// Clears the entire ID/key mapping cache.
     /// </summary>
     void ClearCache();

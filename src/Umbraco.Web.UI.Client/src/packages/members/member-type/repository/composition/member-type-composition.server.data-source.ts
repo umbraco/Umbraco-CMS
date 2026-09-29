@@ -10,19 +10,17 @@ import {
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import type { UmbContentTypeCompositionDataSource } from '@umbraco-cms/backoffice/content-type';
+import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
 
 /**
  * A data source for the Member Type Composition that fetches data from the server
  * @class UmbMemberTypeCompositionServerDataSource
  */
-export class UmbMemberTypeCompositionServerDataSource
-	implements
-		UmbContentTypeCompositionDataSource<
-			UmbMemberTypeCompositionReferenceModel,
-			UmbMemberTypeCompositionCompatibleModel,
-			UmbMemberTypeAvailableCompositionRequestModel
-		>
-{
+export class UmbMemberTypeCompositionServerDataSource implements UmbContentTypeCompositionDataSource<
+	UmbMemberTypeCompositionReferenceModel,
+	UmbMemberTypeCompositionCompatibleModel,
+	UmbMemberTypeAvailableCompositionRequestModel
+> {
 	#host: UmbControllerHost;
 
 	/**
@@ -35,11 +33,11 @@ export class UmbMemberTypeCompositionServerDataSource
 	}
 	/**
 	 * Fetches the compatible compositions for a document type from the server
-	 * @param {string} unique
-	 * @returns {*}
+	 * @param {string} unique - The unique identifier of the Member Type
+	 * @returns {Promise<UmbDataSourceResponse<Array<UmbMemberTypeCompositionReferenceModel>>>} The composition references, or an error
 	 * @memberof UmbMemberTypeCompositionServerDataSource
 	 */
-	async getReferences(unique: string) {
+	async getReferences(unique: string): Promise<UmbDataSourceResponse<Array<UmbMemberTypeCompositionReferenceModel>>> {
 		const response = await tryExecute(
 			this.#host,
 			MemberTypeService.getMemberTypeByIdCompositionReferences({ path: { id: unique } }),
@@ -57,12 +55,13 @@ export class UmbMemberTypeCompositionServerDataSource
 	}
 	/**
 	 * Updates the compositions for a document type on the server
-	 * @param {MemberTypeCompositionRequestModel} body
-	 * @param args
-	 * @returns {*}
+	 * @param {UmbMemberTypeAvailableCompositionRequestModel} args - The arguments for the available compositions request
+	 * @returns {Promise<UmbDataSourceResponse<Array<UmbMemberTypeCompositionCompatibleModel>>>} The compatible compositions, or an error
 	 * @memberof UmbMemberTypeCompositionServerDataSource
 	 */
-	async availableCompositions(args: UmbMemberTypeAvailableCompositionRequestModel) {
+	async availableCompositions(
+		args: UmbMemberTypeAvailableCompositionRequestModel,
+	): Promise<UmbDataSourceResponse<Array<UmbMemberTypeCompositionCompatibleModel>>> {
 		const body: MemberTypeCompositionRequestModel = {
 			id: args.unique,
 			currentCompositeIds: args.currentCompositeUniques,

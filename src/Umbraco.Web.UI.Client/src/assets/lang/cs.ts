@@ -301,6 +301,8 @@ export default {
 		createFromClipboard: 'Paste from clipboard',
 		nodeIsInTrash: 'This item is in the Recycle Bin',
 		saveModalTitle: 'Uložit',
+		saveAndPublishDescendantsModalTitle: 'Uložit a publikovat s potomky',
+		saveAndScheduleModalTitle: 'Uložit a naplánovat publikování',
 	},
 	blueprints: {
 		createBlueprintFrom: 'Vytvořit novou šablonu obsahu z <em>%0%</em>',
@@ -314,6 +316,8 @@ export default {
 	},
 	media: {
 		clickToUpload: 'Klikněte pro nahrání',
+		browseFilesAction: 'Procházet soubory',
+		dropFilesOr: 'Přetáhněte média sem<br />nebo',
 		orClickHereToUpload: 'nebo kliknutím sem vyberte soubory',
 		disallowedFileType: 'Tento soubor nelze nahrát, nemá povolený typ souboru',
 		maxFileSize: 'Maximální velikost souboru je',
@@ -695,6 +699,8 @@ export default {
 		new: 'Nový',
 		next: 'Následující',
 		no: 'Ne',
+		noResults: 'Žádné výsledky',
+		noResultsFor: (query: string) => `Nebyl nalezen žádný výsledek pro "${query}".`,
 		of: 'z',
 		off: 'Vypnuto',
 		ok: 'OK',
@@ -1139,6 +1145,17 @@ export default {
 			'Abyste nastavili, jak mají být položky seřazeny, přetáhněte jednotlivé z nich nahoru či dolů. Anebo klikněte na hlavičku sloupce pro setřídění celé kolekce',
 		sortPleaseWait: ' Čekejte, prosím. Položky jsou tříděny a může to chvíli trvat.',
 		sortEmptyState: 'Tato položka nemá vnořené položky k seřazení',
+		sortByFieldHeadline: 'Seřadit podle pole',
+		sortByFieldSentence: 'Seřadit všechny podřízené položky podle',
+		sortByFieldDirectionLabel: 'Směr',
+		sortByFieldAscending: 'Vzestupně',
+		sortByFieldDescending: 'Sestupně',
+		sortByFieldNameOption: 'Název',
+		sortByFieldCreateDateOption: 'Vytvořeno',
+		sortByFieldUpdateDateOption: 'Naposledy upraveno',
+		sortIndividuallyHeadline: 'Seřadit jednotlivě',
+		sortByFieldCultureSentence: 'v jazyce',
+		sortByFieldCultureLabel: 'Jazyk',
 	},
 	speechBubbles: {
 		validationFailedHeader: 'Validace',
@@ -1381,8 +1398,16 @@ export default {
 		chooseChildNode: 'Vybrat podřízený uzel',
 		compositionsDescription:
 			'Zdědí záložky a vlastnosti z existujícího typu dokumentu. Nové záložky budou přidány do aktuálního typu dokumentu nebo sloučeny, pokud existuje záložka se stejným názvem.',
+		compositionsDescriptionMediaType:
+			'Zdědí záložky a vlastnosti z existujícího typu média. Nové záložky budou přidány do aktuálního typu média nebo sloučeny, pokud existuje záložka se stejným názvem.',
+		compositionsDescriptionMemberType:
+			'Zdědí záložky a vlastnosti z existujícího typu člena. Nové záložky budou přidány do aktuálního typu člena nebo sloučeny, pokud existuje záložka se stejným názvem.',
 		compositionInUse: 'Tento typ obsahu se používá ve složení, a proto jej nelze poskládat.',
+		compositionInUseMediaType: 'Tento typ média se používá ve složení, a proto jej nelze poskládat.',
+		compositionInUseMemberType: 'Tento typ člena se používá ve složení, a proto jej nelze poskládat.',
 		noAvailableCompositions: 'Nejsou k dispozici žádné typy obsahu, které lze použít jako složení.',
+		noAvailableCompositionsMediaType: 'Nejsou k dispozici žádné typy média, které lze použít jako složení.',
+		noAvailableCompositionsMemberType: 'Nejsou k dispozici žádné typy člena, které lze použít jako složení.',
 		compositionRemoveWarning:
 			'Odebráním složení odstraníte všechna související data vlastností. Jakmile uložíte typ dokumentu, již není cesta zpět.',
 		availableEditors: 'Vytvořit nové',
@@ -1415,6 +1440,10 @@ export default {
 		tabHasNoSortOrder: 'záložka nemá žádné řazení',
 		compositionUsageHeading: 'Kde se toto složení používá?',
 		compositionUsageSpecification: 'Toto složení se v současnosti používá ve složení následujících typů obsahu:',
+		compositionUsageSpecificationMediaType:
+			'Toto složení se v současnosti používá ve složení následujících typů média:',
+		compositionUsageSpecificationMemberType:
+			'Toto složení se v současnosti používá ve složení následujících typů člena:',
 		variantsHeading: 'Povolit různé jazyky',
 		variantsDescription: 'Povolit editorům vytvářet obsah tohoto typu v různých jazycích.',
 		allowVaryByCulture: 'Povolit různé jazyky',
@@ -1548,6 +1577,10 @@ export default {
 		thirdPartyGroup: 'Třetí strana',
 		userPermissions: 'Oprávnění uživatele',
 		userTypes: 'Typy uživatelů',
+	},
+	picker: {
+		browseTab: 'Procházet',
+		searchTab: 'Hledat',
 	},
 	update: {
 		updateAvailable: 'Nová aktualizace je připrvena',
@@ -1856,8 +1889,8 @@ export default {
 		searchThisMessageWithBing: 'Vyhledat zprávu na Bing',
 		searchOurUmbraco: 'Prohledat naše Umbraco',
 		searchThisMessageOnOurUmbracoForumsAndDocs: 'Vyhledat tuto zprávu na našich fórech a dokumentech Umbraco',
-		searchOurUmbracoWithGoogle: 'Vyhledat Our Umbraco na Googlu',
-		searchOurUmbracoForumsUsingGoogle: 'Prohledat Our Umbraco fóra pomocí Googlu',
+		searchOurUmbracoWithGoogle: 'Vyhledat Umbraco na Googlu',
+		searchOurUmbracoForumsUsingGoogle: 'Prohledat Umbraco fóra pomocí Googlu',
 		searchUmbracoSource: 'Prohledat Umbraco Source',
 		searchWithinUmbracoSourceCodeOnGithub: 'Vyhledat ve zdrojovém kódu Umbraco na Github',
 		searchUmbracoIssues: 'Prohledat Umbraco Issues',

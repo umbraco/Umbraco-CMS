@@ -199,7 +199,7 @@ namespace Umbraco.Extensions
         /// <param name="sql">The base <see cref="Sql{ISqlContext}"/> instance to which the join will be appended.</param>
         /// <param name="nestedQuery">The nested <see cref="Sql{ISqlContext}"/> subquery to join.</param>
         /// <param name="alias">The alias to assign to the nested subquery in the join clause. The alias will be quoted according to the SQL syntax provider.</param>
-        /// <returns>A <see cref="SqlJoinClause{ISqlContext}"/> representing the INNER JOIN with the nested subquery and alias.</returns>
+        /// <returns>A <see cref="Sql{ISqlContext}.SqlJoinClause{ISqlContext}"/> representing the INNER JOIN with the nested subquery and alias.</returns>
         public static Sql<ISqlContext>.SqlJoinClause<ISqlContext> InnerJoinNested(this Sql<ISqlContext> sql, Sql<ISqlContext> nestedQuery, string alias)
         {
             return new Sql<ISqlContext>.SqlJoinClause<ISqlContext>(sql.Append("INNER JOIN (").Append(nestedQuery)
@@ -1530,7 +1530,7 @@ namespace Umbraco.Extensions
         /// Appends an UPDATE statement to the specified SQL query.
         /// </summary>
         /// <param name="sql">The SQL query to which the UPDATE statement will be appended.</param>
-        /// <returns>The SQL query with the appended UPDATE statement.</returns
+        /// <returns>The SQL query with the appended UPDATE statement.</returns>
         public static Sql<ISqlContext> Update<TDto>(this Sql<ISqlContext> sql, Func<SqlUpd<TDto>, SqlUpd<TDto>> updates)
         {
             Type type = typeof(TDto);
@@ -1641,7 +1641,7 @@ namespace Umbraco.Extensions
             // then GetAliased for "[umbracoNode].[nodeId]" returns "[umbracoNode__nodeId]"
 
             MatchCollection matches = sql.SqlContext.SqlSyntax.AliasRegex.Matches(sql.SQL);
-            Match? match = matches.Cast<Match>().FirstOrDefault(m => m.Groups[1].Value.InvariantEquals(field));
+            Match? match = matches.FirstOrDefault(m => m.Groups[1].ValueSpan.Equals(field, StringComparison.InvariantCultureIgnoreCase));
             return match == null ? field : match.Groups[2].Value;
         }
 

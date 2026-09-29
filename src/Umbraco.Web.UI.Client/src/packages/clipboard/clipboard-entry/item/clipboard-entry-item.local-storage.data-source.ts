@@ -6,7 +6,7 @@ import type { UmbItemDataSource } from '@umbraco-cms/backoffice/repository';
 /**
  * A local storage data source for Clipboard Entry items
  * @class UmbClipboardEntryItemServerDataSource
- * @implements {UmbItemServerDataSourceBase}
+ * @implements {UmbItemDataSource}
  */
 export class UmbClipboardEntryItemLocalStorageDataSource
 	extends UmbControllerBase
@@ -16,7 +16,7 @@ export class UmbClipboardEntryItemLocalStorageDataSource
 
 	/**
 	 * Gets items from local storage
-	 * @param {Array<string>} unique
+	 * @param {Array<string>} unique The unique ids of the clipboard entries to get.
 	 * @memberof UmbClipboardEntryItemLocalStorageDataSource
 	 */
 	async getItems(unique: Array<string>) {

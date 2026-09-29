@@ -7,6 +7,7 @@ import type {
 	HttpResponse as HttpResponseType,
 	delay as delayType,
 	isCommonAssetRequest as isCommonAssetRequestType,
+	HttpHandler,
 } from 'msw';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
@@ -72,6 +73,21 @@ export const startMockServiceWorker = async (config?: UmbMockServiceWorkerOption
 
 // Re-export convenience functions for tests
 export { useMockSet, clearMockData } from './mock-manager.js';
+
+/**
+ * Overrides handlers for the duration of a test. Reset with `resetMockHandlers()`.
+ * @param {...HttpHandler} handlers - The handlers to use in addition to (or in place of) the default ones.
+ */
+export const useMockHandlers = (...handlers: Array<HttpHandler>) => {
+	worker.use(...handlers);
+};
+
+/**
+ * Removes any handlers added via `useMockHandlers()`, restoring the default handlers.
+ */
+export const resetMockHandlers = () => {
+	worker.resetHandlers();
+};
 
 declare global {
 	interface Window {

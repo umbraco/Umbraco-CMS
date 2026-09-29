@@ -63,7 +63,6 @@ export interface UmbFormControlMixinInterface<ValueType> extends HTMLElement {
 	get validationMessage(): string;
 	get validity(): ValidityState;
 	setCustomValidity(error?: string): void;
-	submit(): void;
 	pristine: boolean;
 }
 
@@ -92,7 +91,6 @@ export declare abstract class UmbFormControlMixinElement<ValueType>
 	get validationMessage(): string;
 	get validity(): ValidityState;
 	setCustomValidity(error?: string): void;
-	submit(): void;
 	pristine: boolean;
 }
 
@@ -146,7 +144,14 @@ export function UmbFormControlMixin<
 		public set pristine(value: boolean) {
 			if (this._pristine !== value) {
 				this._pristine = value;
-				this._runValidators();
+				if (value === false) {
+					// Loop over all connected form control elements and set their pristine state to the same value. [NL]
+					this.#formCtrlElements.forEach((el: any) => {
+						if ('pristine' in el && typeof el.pristine === 'boolean' && el.pristine !== value) {
+							el.pristine = value;
+						}
+					});
+				}
 			}
 		}
 		public get pristine(): boolean {
@@ -155,6 +160,10 @@ export function UmbFormControlMixin<
 		private _pristine: boolean = true;
 
 		#value: ValueType | DefaultValueType = defaultValue as unknown as DefaultValueType;
+		#valueOnFocus: ValueType | DefaultValueType | undefined = undefined;
+		// A state to capture late edits to the value after focus has been lost, so we can trigger validation for late value changes. [NL]
+		#hadFocus = false;
+
 		protected _internals: ElementInternals;
 		#form: HTMLFormElement | null = null;
 		#validators: UmbFormControlValidatorConfig[] = [];
@@ -164,11 +173,18 @@ export function UmbFormControlMixin<
 			super(...args);
 			this._internals = this.attachInternals();
 
+			this.addEventListener('focus', () => {
+				this.#valueOnFocus = this.value;
+				this.#hadFocus = false;
+			});
 			this.addEventListener('blur', () => {
-				/*if (e.composedPath().some((x) => x === this)) {
-					return;
-				}*/
-				this.checkValidity();
+				if (this.pristine) {
+					if (this.#valueOnFocus !== this.value) {
+						this.#hadFocus = true;
+						this.checkValidity();
+					}
+				}
+				this.#valueOnFocus = undefined;
 			});
 		}
 
@@ -221,8 +237,8 @@ export function UmbFormControlMixin<
 		 * );
 		 * @function addValidator
 		 * @param {FlagTypes} flagKey the type of validation.
-		 * @param {method} getMessageMethod method to retrieve relevant message. Is executed every time the validator is re-executed.
-		 * @param {method} checkMethod method to determine if this validator should invalidate this form control. Return true if this should prevent submission.
+		 * @param {() => string} getMessageMethod method to retrieve relevant message. Is executed every time the validator is re-executed.
+		 * @param {() => boolean} checkMethod method to determine if this validator should invalidate this form control. Return true if this should prevent submission.
 		 * @returns {UmbFormControlValidatorConfig} - The added validator configuration.
 		 */
 		addValidator(
@@ -254,7 +270,7 @@ export function UmbFormControlMixin<
 			}
 		}
 
-		#runValidatorsCallback = () => this._runValidators;
+		#runValidatorsCallback = () => this._runValidators();
 
 		/**
 		 * @function addFormControlElement
@@ -352,7 +368,6 @@ export function UmbFormControlMixin<
 					for (key in formCtrlEl.validity) {
 						if (key !== 'valid' && formCtrlEl.validity[key]) {
 							this.#validity[key] = true;
-							//messages.add(formCtrlEl.validationMessage);
 							message = formCtrlEl.validationMessage;
 							innerFormControlEl ??= formCtrlEl;
 							return true;
@@ -373,19 +388,35 @@ export function UmbFormControlMixin<
 			this.#dispatchValidationState();
 		}
 
+		#lastEventType: string | undefined = undefined;
+		#lastMessage: string | undefined = undefined;
 		#dispatchValidationState() {
-			// Do not fire validation events unless we are not pristine/'untouched'/not-in-validation-mode. [NL]
-			if (this._pristine === true) return;
 			if (this.#validity.valid) {
+				if (this.#lastEventType === UmbValidationValidEvent.TYPE) return;
+				this.#lastEventType = UmbValidationValidEvent.TYPE;
+				this.#lastMessage = this.validationMessage;
 				this.dispatchEvent(new UmbValidationValidEvent());
-			} else {
+			} else if (this._pristine === false) {
+				if (this.#lastEventType === UmbValidationInvalidEvent.TYPE && this.#lastMessage === this.validationMessage) {
+					return;
+				}
+				// Only fire invalid events when the form control is not pristine, as we do not want to show validation messages for untouched form controls. [NL]
+				// Always fire an Invalid event when the validity is invalid, even if the last event was also Invalid, as the message might have changed. [NL]
+				this.#lastEventType = UmbValidationInvalidEvent.TYPE;
+				this.#lastMessage = this.validationMessage;
 				this.dispatchEvent(new UmbValidationInvalidEvent());
 			}
 		}
 
 		override updated(changedProperties: Map<string | number | symbol, unknown>) {
 			super.updated(changedProperties);
-			this._runValidators();
+			// If still pristine and the input had focus and the value has changed, then we need to check validity, as the value might have been changed after focus was left. [NL]
+			if (this.pristine && this.#hadFocus && changedProperties.has('value')) {
+				// checkValidity will set pristine to false for it self and all connected form controls and then run validators, hence not running _runValidators() below. [NL]
+				this.checkValidity();
+			} else {
+				this._runValidators();
+			}
 		}
 
 		#onFormSubmit = () => {
@@ -405,7 +436,11 @@ export function UmbFormControlMixin<
 		}
 		public formResetCallback() {
 			this.pristine = true;
+			this.#hadFocus = false;
 			this.value = this.getInitialValue() ?? this.getDefaultValue();
+			this.#valueOnFocus = undefined;
+			this.#lastEventType = undefined;
+			this.#lastMessage = undefined;
 		}
 
 		protected getDefaultValue(): DefaultValueType {

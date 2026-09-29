@@ -3,9 +3,14 @@ import { UMB_DOCUMENT_BLUEPRINT_ENTITY_TYPE } from '../entity.js';
 import type { UmbDocumentBlueprintDetailRepository } from '../repository/index.js';
 import { UMB_DOCUMENT_BLUEPRINT_DETAIL_REPOSITORY_ALIAS } from '../constants.js';
 import type { UmbDocumentBlueprintDetailModel, UmbDocumentBlueprintVariantModel } from '../types.js';
-import { UMB_CREATE_DOCUMENT_BLUEPRINT_WORKSPACE_PATH_PATTERN } from '../paths.js';
-import { UMB_DOCUMENT_BLUEPRINT_WORKSPACE_ALIAS } from './constants.js';
 import {
+	UMB_CREATE_DOCUMENT_BLUEPRINT_WORKSPACE_PATH_PATTERN,
+	UMB_DOCUMENT_BLUEPRINT_ROOT_WORKSPACE_PATH,
+} from '../paths.js';
+import { UMB_DOCUMENT_BLUEPRINT_WORKSPACE_ALIAS } from './constants.js';
+import { UMB_SETTINGS_SECTION_PATHNAME } from '@umbraco-cms/backoffice/settings';
+import {
+	UMB_WORKSPACE_EDIT_PATH_PATTERN,
 	UmbWorkspaceIsNewRedirectController,
 	UmbWorkspaceIsNewRedirectControllerAlias,
 } from '@umbraco-cms/backoffice/workspace';
@@ -87,6 +92,18 @@ export class UmbDocumentBlueprintWorkspaceContext
 		]);
 	}
 
+	protected override _getNavigationParentItemPath(entity: UmbEntityModel | undefined): string | undefined {
+		if (!entity?.unique) {
+			return UMB_DOCUMENT_BLUEPRINT_ROOT_WORKSPACE_PATH;
+		}
+
+		return UMB_WORKSPACE_EDIT_PATH_PATTERN.generateAbsolute({
+			sectionName: UMB_SETTINGS_SECTION_PATHNAME,
+			entityType: entity.entityType,
+			unique: entity.unique,
+		});
+	}
+
 	async create(parent: UmbEntityModel, documentTypeUnique: string) {
 		return this.createScaffold({
 			parent,
@@ -107,7 +124,7 @@ export class UmbDocumentBlueprintWorkspaceContext
 	 * Gets the unique identifier of the content type.
 	 * @deprecated Use `getContentTypeUnique` instead.
 	 * @returns { string | undefined} The unique identifier of the content type.
-	 * @memberof UmbDocumentWorkspaceContext
+	 * @memberof UmbDocumentBlueprintWorkspaceContext
 	 */
 	getContentTypeId(): string | undefined {
 		return this.getContentTypeUnique();
@@ -116,7 +133,7 @@ export class UmbDocumentBlueprintWorkspaceContext
 	/**
 	 * Gets the unique identifier of the content type.
 	 * @returns { string | undefined} The unique identifier of the content type.
-	 * @memberof UmbDocumentWorkspaceContext
+	 * @memberof UmbDocumentBlueprintWorkspaceContext
 	 */
 	getContentTypeUnique(): string | undefined {
 		return this.getData()?.documentType.unique;
@@ -125,6 +142,9 @@ export class UmbDocumentBlueprintWorkspaceContext
 	/**
 	 * Override mandatory validation to filter out variants without a name before validating.
 	 * Blueprints allow partial variant data and users may only provide a name for some cultures.
+	 * @param {ContentModel} saveData - The data to validate.
+	 * @param {Array<UmbVariantId>} variantIds - The variant ids to validate.
+	 * @returns {Promise<void>}
 	 */
 	public override async runMandatoryValidationForSaveData(
 		saveData: ContentModel,

@@ -31,7 +31,7 @@ export class UmbDataTypeDetailRepository extends UmbDetailRepositoryBase<
 	/**
 	 * Requests multiple data type details by their unique IDs
 	 * @param {Array<string>} uniques - The unique IDs of the data types to fetch
-	 * @returns {Promise<UmbRepositoryResponseWithAsObservable<Array<UmbDataTypeDetailModel>>>}
+	 * @returns {Promise<UmbRepositoryResponseWithAsObservable<Array<UmbDataTypeDetailModel>>>} - The requested data type details
 	 * @memberof UmbDataTypeDetailRepository
 	 */
 	async requestByUniques(

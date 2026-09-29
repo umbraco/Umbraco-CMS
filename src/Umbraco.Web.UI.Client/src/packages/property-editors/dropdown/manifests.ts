@@ -7,12 +7,22 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Dropdown Property Editor UI',
 		element: () => import('./property-editor-ui-dropdown.element.js'),
 		meta: {
+			supportsVariantChange: true,
 			label: 'Dropdown',
 			propertyEditorSchemaAlias: 'Umbraco.DropDown.Flexible',
 			icon: 'icon-list',
 			group: '#propertyEditorUIGroups_lists',
 			keywords: ['select', 'dropdown', 'choice', 'option', 'list'],
 			supportsReadOnly: true,
+			settings: {
+				properties: [
+					{
+						alias: 'placeholder',
+						label: '#general_placeholder',
+						propertyEditorUiAlias: 'Umb.PropertyEditorUi.TextBox',
+					},
+				],
+			},
 		},
 	},
 	schemaManifest,

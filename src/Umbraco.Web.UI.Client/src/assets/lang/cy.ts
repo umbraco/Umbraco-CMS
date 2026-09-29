@@ -306,6 +306,7 @@ export default {
 		isSensitiveValue:
 			"Mae'r gwerth yma'n gudd. Os ydych chi angen hawl i weld y gwerth yma, cysylltwch â gweinyddwr eich gwefan.",
 		isSensitiveValue_short: "Mae'r gwerth yma'n gudd.",
+		isSensitiveValueNotice: 'Os ydych chi angen hawl i weld y gwerthoedd cudd, cysylltwch â gweinyddwr eich gwefan.',
 		languagesToPublish: 'Pa ieithoedd yr hoffech chi eu cyhoeddi? ',
 		languagesToSendForApproval: 'Pa ieithoedd hoffech chi anfon am gymeradwyaeth?',
 		languagesToSchedule: 'Pa ieithoedd yr hoffech chi eu hamserlennu?',
@@ -345,6 +346,8 @@ export default {
 	},
 	media: {
 		clickToUpload: 'Cliciwch i lanlwytho',
+		browseFilesAction: 'Pori ffeiliau',
+		dropFilesOr: 'Llusgwch a gollwng cyfryngau yma<br />neu',
 		orClickHereToUpload: 'neu cliciwch yma i ddewis ffeiliau',
 		disallowedFileType: "Ni ellir lanlwytho'r ffeil yma, nid yw math y ffeil yn wedi'i gymeradwyo",
 		maxFileSize: 'Maint ffeil uchaf',
@@ -807,6 +810,8 @@ export default {
 		new: 'Newydd',
 		next: 'Nesaf',
 		no: 'Na',
+		noResults: 'Ni ddarganfuwyd unrhyw ganlyniadau',
+		noResultsFor: (query: string) => `Ni ddarganfuwyd unrhyw ganlyniad ar gyfer "${query}".`,
 		of: 'o',
 		off: 'I ffwrdd',
 		ok: 'Iawn',
@@ -1338,6 +1343,17 @@ export default {
 			"Llusgwch yr eitemau gwahanol i fyny neu i lawr isod er mwyn gosod sut dylen nhw gael eu trefnu. Neu cliciwch ar beniadau'r golofnau i drefnu'r holl gasgliad o eitemau",
 		sortPleaseWait: "Arhoswch. Mae'r eitemau yn cael eu trefnu, gall hyn gymryd amser.",
 		sortEmptyState: 'Nid oes gan y nod hwn nodau plentyn i trefnu',
+		sortByFieldHeadline: 'Trefnu yn ôl maes',
+		sortByFieldSentence: 'Trefnu pob eitem plentyn yn ôl',
+		sortByFieldDirectionLabel: 'Cyfeiriad',
+		sortByFieldAscending: 'Esgynnol',
+		sortByFieldDescending: 'Disgynnol',
+		sortByFieldNameOption: 'Enw',
+		sortByFieldCreateDateOption: 'Crëwyd',
+		sortByFieldUpdateDateOption: 'Golygwyd ddiwethaf',
+		sortIndividuallyHeadline: 'Trefnu yn unigol',
+		sortByFieldCultureSentence: 'yn',
+		sortByFieldCultureLabel: 'Iaith',
 	},
 	speechBubbles: {
 		validationFailedHeader: 'Dilysiad',
@@ -1606,9 +1622,19 @@ export default {
 		chooseChildNode: 'Dewis nod blentyn',
 		compositionsDescription:
 			"Etifeddu tabiau a phriodweddau o fath o ddogfen sy'n bodoli eisoes. Bydd tabiau newydd yn cael eu ychwanegu at y fath o ddogfen bresennol neu eu cyfuno os mae tab gyda enw yr union yr un fath yn bodoli eisoes.",
+		compositionsDescriptionMediaType:
+			"Etifeddu tabiau a phriodweddau o fath o gyfrwng sy'n bodoli eisoes. Bydd tabiau newydd yn cael eu ychwanegu at y fath o gyfrwng bresennol neu eu cyfuno os mae tab gyda enw yr union yr un fath yn bodoli eisoes.",
+		compositionsDescriptionMemberType:
+			"Etifeddu tabiau a phriodweddau o fath o aelod sy'n bodoli eisoes. Bydd tabiau newydd yn cael eu ychwanegu at y fath o aelod bresennol neu eu cyfuno os mae tab gyda enw yr union yr un fath yn bodoli eisoes.",
 		compositionInUse:
 			"Mae'r math o gynnwys yma wedi'i ddefnyddio mewn cyfansoddiad, felly ni ellir ei gyfansoddi ei hunan.",
+		compositionInUseMediaType:
+			"Mae'r math o gyfrwng yma wedi'i ddefnyddio mewn cyfansoddiad, felly ni ellir ei gyfansoddi ei hunan.",
+		compositionInUseMemberType:
+			"Mae'r math o aelod yma wedi'i ddefnyddio mewn cyfansoddiad, felly ni ellir ei gyfansoddi ei hunan.",
 		noAvailableCompositions: "Nid oes unrhyw fathau o gynnwys ar gael i'w defnyddio fel cyfansoddiad.",
+		noAvailableCompositionsMediaType: "Nid oes unrhyw fathau o gyfrwng ar gael i'w defnyddio fel cyfansoddiad.",
+		noAvailableCompositionsMemberType: "Nid oes unrhyw fathau o aelod ar gael i'w defnyddio fel cyfansoddiad.",
 		compositionRemoveWarning:
 			"Bydd dileu cyfansoddiad yn dileu'r holl ddata eiddo priodwedd gysylltiedig. Ar ôl i chi arbed y math o ddogfen, bydd ddim ffordd nôl.",
 		availableEditors: 'Golygyddion ar gael',
@@ -1646,6 +1672,10 @@ export default {
 		compositionUsageHeading: "Ble mae'r cyfansoddiad yma'n cael ei ddefnyddio?",
 		compositionUsageSpecification:
 			"Mae'r cyfansoddiad yma yn cael ei ddefnyddio'n bresennol yng nghyfansoddiad o'r mathau o gynnwys ganlynol:",
+		compositionUsageSpecificationMediaType:
+			"Mae'r cyfansoddiad yma yn cael ei ddefnyddio'n bresennol yng nghyfansoddiad o'r mathau o gyfrwng ganlynol:",
+		compositionUsageSpecificationMemberType:
+			"Mae'r cyfansoddiad yma yn cael ei ddefnyddio'n bresennol yng nghyfansoddiad o'r mathau o aelod ganlynol:",
 		variantsHeading: 'Caniatáu amrywiadau',
 		cultureVariantHeading: 'Caniatáu amrywiad  yn ôl ddiwylliant',
 		segmentVariantHeading: 'Caniatáu segmentiad',
@@ -1843,6 +1873,10 @@ export default {
 		templatingGroup: 'Templedi',
 		thirdPartyGroup: 'Trydydd parti',
 		webhooks: 'Bachau gwe',
+	},
+	picker: {
+		browseTab: 'Pori',
+		searchTab: 'Chwilio',
 	},
 	update: {
 		updateAvailable: 'Diweddariad newydd yn barod',
@@ -2249,10 +2283,10 @@ export default {
 		searchThisMessageWithGoogle: 'Chwiliwch y neges hon efo Google',
 		searchWithBing: 'Chwilio efo Bing',
 		searchThisMessageWithBing: 'Chwiliwch y neges hon efo Bing',
-		searchOurUmbraco: 'Chwilio Our Umbraco',
-		searchThisMessageOnOurUmbracoForumsAndDocs: 'Chwiliwch y neges hon arno Our Umbraco fforymau a dogfennau',
-		searchOurUmbracoWithGoogle: 'Chwilio Our Umbraco efo Google',
-		searchOurUmbracoForumsUsingGoogle: 'Chwilio Our Umbraco fforymau efo Google',
+		searchOurUmbraco: 'Chwilio Umbraco',
+		searchThisMessageOnOurUmbracoForumsAndDocs: 'Chwiliwch y neges hon arno Umbraco fforymau a dogfennau',
+		searchOurUmbracoWithGoogle: 'Chwilio Umbraco efo Google',
+		searchOurUmbracoForumsUsingGoogle: 'Chwilio Umbraco fforymau efo Google',
 		searchUmbracoSource: "Chwilio'r cod gwreiddiol Umbraco",
 		searchWithinUmbracoSourceCodeOnGithub: 'Chwilio tu fewn y cod gwreiddiol Umbraco ar Github',
 		searchUmbracoIssues: 'Chwilio Problemau Umbraco',

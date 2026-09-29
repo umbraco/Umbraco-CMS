@@ -192,12 +192,12 @@ export class UmbManagementApiDetailDataRequestManager<
 		if (newIds.length > 0) {
 			try {
 				const getItemsController = new UmbItemDataApiGetRequestController(this, {
-					api: (args) => this.#readMany!(args.uniques),
+					api: async (args) => ({ data: (await this.#readMany!(args.uniques)).data.items }),
 					uniques: newIds,
 				});
 
 				const { data: serverData, error: serverError } = await getItemsController.request();
-				const serverItems = serverData?.items ?? [];
+				const serverItems = serverData ?? [];
 				error = serverError;
 
 				if (this.#isConnectedToServerEvents) {

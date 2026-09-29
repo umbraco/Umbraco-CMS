@@ -20,7 +20,7 @@ public class AncestorsDocumentItemControllerTests : ManagementApiUserGroupTestBa
     private Guid _contentKey;
 
     [SetUp]
-    public async Task Setup()
+    public new async Task Setup()
     {
         var template = TemplateBuilder.CreateTextPageTemplate(Guid.NewGuid().ToString());
         await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);

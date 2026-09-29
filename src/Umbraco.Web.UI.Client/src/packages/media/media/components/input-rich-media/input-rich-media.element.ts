@@ -17,11 +17,8 @@ import { UmbRepositoryItemsManager } from '@umbraco-cms/backoffice/repository';
 import { UMB_MEDIA_TYPE_ENTITY_TYPE } from '@umbraco-cms/backoffice/media-type';
 
 import '@umbraco-cms/backoffice/imaging';
-import {
-	UmbInteractionMemoriesChangeEvent,
-	type UmbInteractionMemoryModel,
-} from '@umbraco-cms/backoffice/interaction-memory';
-import { jsonStringComparison } from '@umbraco-cms/backoffice/observable-api';
+import { UmbEntityInputInteractionMemoryManager } from '@umbraco-cms/backoffice/entity';
+import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
 
 type UmbRichMediaCardModel = {
 	unique: string;
@@ -29,6 +26,7 @@ type UmbRichMediaCardModel = {
 	name: string;
 	src?: string;
 	icon?: string;
+	extension?: string;
 	isTrashed?: boolean;
 	isLoading?: boolean;
 };
@@ -77,12 +75,12 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 
 	/**
 	 * Min validation message.
-	 * @type {boolean}
+	 * @type {string}
 	 * @attr
 	 * @default
 	 */
 	@property({ type: String, attribute: 'min-message' })
-	minMessage = 'This field need more items';
+	minMessage = 'This field needs more items';
 
 	/**
 	 * This is a maximum amount of selected items in this input.
@@ -95,11 +93,11 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 
 	/**
 	 * Max validation message.
-	 * @type {boolean}
+	 * @type {string}
 	 * @attr
 	 * @default
 	 */
-	@property({ type: String, attribute: 'min-message' })
+	@property({ type: String, attribute: 'max-message' })
 	maxMessage = 'This field exceeds the allowed amount of items';
 
 	@property({ type: Array })
@@ -159,14 +157,11 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 
 	@property({ type: Array, attribute: false })
 	public get interactionMemories(): Array<UmbInteractionMemoryModel> | undefined {
-		return this.#pickerInputContext.interactionMemory.getAllMemories();
+		return this.#interactionMemoryManager.getMemories();
 	}
 	public set interactionMemories(value: Array<UmbInteractionMemoryModel> | undefined) {
-		this.#interactionMemories = value;
-		value?.forEach((memory) => this.#pickerInputContext.interactionMemory.setMemory(memory));
+		this.#interactionMemoryManager.setMemories(value);
 	}
-
-	#interactionMemories?: Array<UmbInteractionMemoryModel> = [];
 
 	@state()
 	private _cards: Array<UmbRichMediaCardModel> = [];
@@ -177,13 +172,21 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 	readonly #itemManager = new UmbRepositoryItemsManager<UmbMediaItemModel>(this, UMB_MEDIA_ITEM_REPOSITORY_ALIAS);
 
 	readonly #pickerInputContext = new UmbMediaPickerInputContext(this);
+	readonly #interactionMemoryManager = new UmbEntityInputInteractionMemoryManager(
+		this,
+		this.#pickerInputContext.interactionMemory,
+	);
 
 	constructor() {
 		super();
 
-		this.observe(this.#itemManager.items, () => {
-			this.#populateCards();
-		});
+		this.observe(
+			this.#itemManager.items,
+			() => {
+				this.#populateCards();
+			},
+			null,
+		);
 
 		new UmbModalRouteRegistrationController(this, UMB_IMAGE_CROPPER_EDITOR_MODAL)
 			.addAdditionalPath(':key')
@@ -231,22 +234,12 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 				this._routeBuilder = routeBuilder;
 			});
 
-		this.observe(this.#pickerInputContext.selection, (selection) => {
-			this.#addItems(selection);
-		});
-
 		this.observe(
-			this.#pickerInputContext.interactionMemory.memories,
-			(memories) => {
-				// only dispatch the event if the interaction memories have actually changed
-				const isIdentical = jsonStringComparison(memories, this.#interactionMemories);
-
-				if (!isIdentical) {
-					this.#interactionMemories = memories;
-					this.dispatchEvent(new UmbInteractionMemoriesChangeEvent());
-				}
+			this.#pickerInputContext.selection,
+			(selection) => {
+				this.#addItems(selection);
 			},
-			'_observeMemories',
+			null,
 		);
 
 		this.addValidator(
@@ -291,6 +284,7 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 					media: item.mediaKey,
 					name: media?.name ?? '',
 					icon: media?.mediaType?.icon,
+					extension: media?.extension,
 					isTrashed: media?.isTrashed ?? false,
 					isLoading: !media,
 				};
@@ -413,11 +407,12 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 
 		return html`
 			<uui-card-media id=${item.unique} title=${item.name} name=${item.name} .href=${href} ?readonly=${this.readonly}>
-				<umb-imaging-thumbnail
+				<umb-media-thumbnail
 					.unique=${item.media}
 					.alt=${item.name}
 					.icon=${item.icon ?? 'icon-picture'}
-					.externalLoading=${item.isLoading ?? false}></umb-imaging-thumbnail>
+					.fileExt=${item.extension}
+					.externalLoading=${item.isLoading ?? false}></umb-media-thumbnail>
 
 				${this.#renderIsTrashed(item)} ${this.#renderActions(item)}
 			</uui-card-media>
@@ -457,10 +452,6 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 				gap: var(--uui-size-space-5);
 				grid-template-columns: repeat(auto-fill, minmax(var(--umb-card-medium-min-width), 1fr));
 				grid-auto-rows: var(--umb-card-medium-min-width);
-			}
-
-			#dropzone {
-				margin-bottom: var(--uui-size-space-5);
 			}
 
 			#btn-add {

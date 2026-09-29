@@ -26,11 +26,11 @@ internal sealed class DocumentVersionPresentationFactory : IDocumentVersionPrese
     }
 
     /// <summary>
-    /// Asynchronously creates a <see cref="Umbraco.Cms.Api.Management.Models.DocumentVersionItemResponseModel"/> instance from the specified <see cref="Umbraco.Cms.Core.Models.ContentVersionMeta"/>.
+    /// Asynchronously creates a <see cref="DocumentVersionItemResponseModel"/> instance from the specified <see cref="ContentVersionMeta"/>.
     /// </summary>
     /// <param name="contentVersion">The content version metadata from which to construct the response model.</param>
     /// <returns>
-    /// A task representing the asynchronous operation. The result contains the constructed <see cref="Umbraco.Cms.Api.Management.Models.DocumentVersionItemResponseModel"/> representing the provided content version.
+    /// A task representing the asynchronous operation. The result contains the constructed <see cref="DocumentVersionItemResponseModel"/> representing the provided content version.
     /// </returns>
     public async Task<DocumentVersionItemResponseModel> CreateAsync(ContentVersionMeta contentVersion)
     {

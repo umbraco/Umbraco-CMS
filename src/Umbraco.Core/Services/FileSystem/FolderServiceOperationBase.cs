@@ -173,7 +173,7 @@ internal abstract class FolderServiceOperationBase<TRepository, TFolderModel, TO
     /// </returns>
     private TOperationStatus ValidateCreate(string name, string path, string? parentPath)
     {
-        if (name.ContainsAny(Path.GetInvalidFileNameChars()))
+        if (name.ContainsAny(Constants.CharSearchValues.InvalidFileNameChars))
         {
             return InvalidName;
         }

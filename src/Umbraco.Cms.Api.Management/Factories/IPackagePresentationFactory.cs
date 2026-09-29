@@ -18,9 +18,9 @@ public interface IPackagePresentationFactory
     PackageDefinition CreatePackageDefinition(CreatePackageRequestModel createPackageRequestModel);
 
     /// <summary>
-    /// Creates and returns a new <see cref="Umbraco.Cms.Api.Management.Models.PackageConfigurationResponseModel"/> instance representing the package configuration response.
+    /// Creates and returns a new <see cref="PackageConfigurationResponseModel"/> instance representing the package configuration response.
     /// </summary>
-    /// <returns>The created <see cref="Umbraco.Cms.Api.Management.Models.PackageConfigurationResponseModel"/>.</returns>
+    /// <returns>The created <see cref="PackageConfigurationResponseModel"/>.</returns>
     PackageConfigurationResponseModel CreateConfigurationResponseModel();
 
     /// <summary>

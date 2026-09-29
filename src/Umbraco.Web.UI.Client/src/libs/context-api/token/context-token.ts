@@ -17,17 +17,17 @@ export class UmbContextToken<
 	/**
 	 * Get the type of the token
 	 * @public
-	 * @type      {T}
-	 * @memberOf  UmbContextToken
+	 * @type      {ResultType}
+	 * @memberof UmbContextToken
 	 * @example   `typeof MyToken.TYPE`
 	 * @returns   undefined
 	 */
 	readonly TYPE: ResultType = undefined as never;
 
 	/**
-	 * @param contextAlias   	Unique identifier for the context
-	 * @param apiAlias   			Unique identifier for the api
-	 * @param discriminator   A discriminator that will be used to discriminate the API — testing if the API lives up to a certain requirement. If the API does not meet the requirement then the consumer will not receive this API.
+	 * @param {string} contextAlias   	Unique identifier for the context
+	 * @param {string} apiAlias   			Unique identifier for the api
+	 * @param {UmbContextDiscriminator<BaseType, ResultType>} discriminator   A discriminator that will be used to discriminate the API — testing if the API lives up to a certain requirement. If the API does not meet the requirement then the consumer will not receive this API.
 	 */
 	constructor(
 		public readonly contextAlias: string,
@@ -39,7 +39,7 @@ export class UmbContextToken<
 
 	/**
 	 * Get the discriminator method for the token
-	 * @returns the discriminator method
+	 * @returns {UmbContextDiscriminator<BaseType, ResultType> | undefined} the discriminator method
 	 */
 	getDiscriminator(): UmbContextDiscriminator<BaseType, ResultType> | undefined {
 		return this.#discriminator;
@@ -48,7 +48,7 @@ export class UmbContextToken<
 	/**
 	 * This method must always return the unique alias of the token since that
 	 * will be used to look up the token in the injector.
-	 * @returns the unique alias of the token
+	 * @returns {string} the unique alias of the token
 	 */
 	toString(): string {
 		return this.contextAlias + '#' + this.apiAlias;

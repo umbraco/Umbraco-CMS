@@ -168,11 +168,13 @@ public static class UmbracoBuilderExtensions
         {
         }
 
+        [Obsolete("Use RebuildIndexAsync() instead. Scheduled for removal in Umbraco 19.")]
         public override void RebuildIndex(string indexName, TimeSpan? delay = null, bool useBackgroundThread = true)
         {
             // noop
         }
 
+        [Obsolete("Use RebuildIndexesAsync() instead. Scheduled for removal in Umbraco 19.")]
         public override void RebuildIndexes(bool onlyEmptyIndexes, TimeSpan? delay = null, bool useBackgroundThread = true)
         {
             // noop

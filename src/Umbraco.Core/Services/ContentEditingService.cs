@@ -143,6 +143,13 @@ internal sealed class ContentEditingService
 
     /// <inheritdoc />
     public async Task<Attempt<ContentCreateResult, ContentEditingOperationStatus>> CreateAsync(ContentCreateModel createModel, Guid userKey)
+        => await HandleCreateAsync(createModel, null, userKey);
+
+    /// <inheritdoc />
+    public async Task<Attempt<ContentCreateResult, ContentEditingOperationStatus>> CreateAndPublishAsync(ContentCreateModel createModel, string[] culturesToPublish, Guid userKey)
+        => await HandleCreateAsync(createModel, culturesToPublish, userKey);
+
+    private async Task<Attempt<ContentCreateResult, ContentEditingOperationStatus>> HandleCreateAsync(ContentCreateModel createModel, string[]? culturesToPublish, Guid userKey)
     {
         if (await ValidateCulturesAsync(createModel) is false)
         {
@@ -167,7 +174,9 @@ internal sealed class ContentEditingService
             return Attempt.FailWithStatus(updateTemplateStatus, new ContentCreateResult { Content = content });
         }
 
-        ContentEditingOperationStatus saveStatus = await Save(content, userKey);
+        ContentEditingOperationStatus saveStatus = culturesToPublish is null
+            ? await Save(content, userKey)
+            : await SaveAndPublish(content, culturesToPublish, userKey);
         return saveStatus == ContentEditingOperationStatus.Success
             ? Attempt.SucceedWithStatus(validationStatus, new ContentCreateResult { Content = content, ValidationResult = validationResult })
             : Attempt.FailWithStatus(saveStatus, new ContentCreateResult { Content = content });
@@ -216,14 +225,13 @@ internal sealed class ContentEditingService
             }
         }
 
-        // if the property varies by culture, simply overwrite the edited property value with the current property value for every culture
+        // If the property varies by culture, simply overwrite the edited property value with the current property value
+        // for every culture.
         foreach (IProperty property in variantProperties)
         {
             foreach (var culture in disallowedCultures)
             {
-                    var currentValue = existingContent?.Properties.First(x => x.Alias == property.Alias)
-                        .GetValue(culture, null, false);
-                    property.SetValue(currentValue, culture, null);
+                RestoreExistingPropertyValues(property, existingContent, culture);
             }
         }
 
@@ -232,9 +240,7 @@ internal sealed class ContentEditingService
         {
             foreach (IProperty property in invariantProperties)
             {
-                var currentValue = existingContent?.Properties.First(x => x.Alias == property.Alias)
-                    .GetValue(null, null, false);
-                property.SetValue(currentValue, null, null);
+                RestoreExistingPropertyValues(property, existingContent, null);
             }
         }
 
@@ -242,23 +248,62 @@ internal sealed class ContentEditingService
         // we need perform a merge between the edited property value and the current property value
         foreach ((IProperty Property, IDataEditor DataEditor) propertyWithEditor in invariantWithVariantSupportProperties)
         {
-            var currentValue = existingContent?.Properties.First(x => x.Alias == propertyWithEditor.Property.Alias)
-                .GetValue(null, null, false);
-            var editedValue = contentWithPotentialUnallowedChanges.Properties
-                .First(x => x.Alias == propertyWithEditor.Property.Alias).GetValue(null, null, false);
+            IProperty property = propertyWithEditor.Property;
+            IProperty? existingProperty = existingContent?.Properties.First(x => x.Alias == property.Alias);
 
-            // update the editedValue with a merged value of invariant data and allowed culture data using the currentValue as a fallback.
-            var mergedValue = propertyWithEditor.DataEditor.MergeVariantInvariantPropertyValue(
-                currentValue,
-                editedValue,
-                ContentSettings.AllowEditInvariantFromNonDefault || (defaultLanguage is not null && allowedCultures.Contains(defaultLanguage.IsoCode)),
-                allowedCultures);
+            // The property may vary by segment, in which case each segment holds its own value to merge.
+            foreach (var segment in GetSegmentsToRestore(property, existingProperty, null))
+            {
+                var currentValue = existingProperty?.GetValue(null, segment, false);
+                var editedValue = property.GetValue(null, segment, false);
 
-            propertyWithEditor.Property.SetValue(mergedValue, null, null);
+                // update the editedValue with a merged value of invariant data and allowed culture data using the currentValue as a fallback.
+                var mergedValue = propertyWithEditor.DataEditor.MergeVariantInvariantPropertyValue(
+                    currentValue,
+                    editedValue,
+                    ContentSettings.AllowEditInvariantFromNonDefault || (defaultLanguage is not null && allowedCultures.Contains(defaultLanguage.IsoCode)),
+                    allowedCultures);
+
+                property.SetValue(mergedValue, null, segment);
+            }
         }
 
         return contentWithPotentialUnallowedChanges;
     }
+
+    /// <summary>
+    /// Overwrites the edited values of a property for one culture with the values held by the existing content.
+    /// </summary>
+    /// <remarks>
+    /// The property may vary by segment, so every segment of the culture has to be restored, not only its
+    /// segment-less value - including any segment the edit added, which is restored to no value.
+    /// </remarks>
+    private static void RestoreExistingPropertyValues(IProperty property, IContent? existingContent, string? culture)
+    {
+        IProperty? existingProperty = existingContent?.Properties.First(x => x.Alias == property.Alias);
+
+        foreach (var segment in GetSegmentsToRestore(property, existingProperty, culture))
+        {
+            property.SetValue(existingProperty?.GetValue(culture, segment, false), culture, segment);
+        }
+    }
+
+    /// <summary>
+    /// Gets every segment of a culture held by either the edited or the existing property, along with the
+    /// segment-less value, so all of them can be restored or merged.
+    /// </summary>
+    /// <remarks>
+    /// Materialized because writing to a segment can add a property value, which would otherwise modify the
+    /// collection being enumerated.
+    /// </remarks>
+    private static string?[] GetSegmentsToRestore(IProperty property, IProperty? existingProperty, string? culture)
+        => property.Values
+            .Concat(existingProperty?.Values ?? [])
+            .Where(value => culture.InvariantEquals(value.Culture))
+            .Select(value => value.Segment)
+            .Append(null)
+            .Distinct()
+            .ToArray();
 
     private async Task<HashSet<string>> GetAllowedCulturesForEditingUser(Guid userKey)
     {
@@ -272,6 +317,13 @@ internal sealed class ContentEditingService
 
     /// <inheritdoc />
     public async Task<Attempt<ContentUpdateResult, ContentEditingOperationStatus>> UpdateAsync(Guid key, ContentUpdateModel updateModel, Guid userKey)
+        => await HandleUpdateAsync(key, updateModel, null, userKey);
+
+    /// <inheritdoc />
+    public async Task<Attempt<ContentUpdateResult, ContentEditingOperationStatus>> UpdateAndPublishAsync(Guid key, ContentUpdateModel updateModel, string[] culturesToPublish, Guid userKey)
+        => await HandleUpdateAsync(key, updateModel, culturesToPublish, userKey);
+
+    private async Task<Attempt<ContentUpdateResult, ContentEditingOperationStatus>> HandleUpdateAsync(Guid key, ContentUpdateModel updateModel, string[]? culturesToPublish, Guid userKey)
     {
         IContent? content = ContentService.GetById(key);
         if (content is null)
@@ -303,7 +355,9 @@ internal sealed class ContentEditingService
             return Attempt.FailWithStatus(updateTemplateStatus, new ContentUpdateResult { Content = content });
         }
 
-        ContentEditingOperationStatus saveStatus = await Save(content, userKey);
+        ContentEditingOperationStatus saveStatus = culturesToPublish is null
+            ? await Save(content, userKey)
+            : await SaveAndPublish(content, culturesToPublish, userKey);
         return saveStatus == ContentEditingOperationStatus.Success
             ? Attempt.SucceedWithStatus(validationStatus, new ContentUpdateResult { Content = content, ValidationResult = validationResult })
             : Attempt.FailWithStatus(saveStatus, new ContentUpdateResult { Content = content });
@@ -326,8 +380,13 @@ internal sealed class ContentEditingService
         => await HandleMoveAsync(key, parentKey, userKey);
 
     /// <inheritdoc />
+    [Obsolete("Use the overload that takes an includeDescendants parameter instead. Scheduled for removal in Umbraco 19.")]
     public async Task<Attempt<IContent?, ContentEditingOperationStatus>> RestoreAsync(Guid key, Guid? parentKey, Guid userKey)
-        => await HandleMoveAsync(key, parentKey, userKey, true);
+        => await RestoreAsync(key, parentKey, userKey, true);
+
+    /// <inheritdoc />
+    public async Task<Attempt<IContent?, ContentEditingOperationStatus>> RestoreAsync(Guid key, Guid? parentKey, Guid userKey, bool includeDescendants)
+        => await HandleMoveAsync(key, parentKey, userKey, true, includeDescendants);
 
     /// <inheritdoc />
     public async Task<Attempt<IContent?, ContentEditingOperationStatus>> CopyAsync(Guid key, Guid? parentKey, bool relateToOriginal, bool includeDescendants, Guid userKey)
@@ -387,8 +446,8 @@ internal sealed class ContentEditingService
         => new Content(name, parentId, contentType);
 
     /// <inheritdoc />
-    protected override OperationResult? Move(IContent content, int newParentId, int userId)
-        => ContentService.Move(content, newParentId, userId);
+    protected override OperationResult? Move(IContent content, int newParentId, bool includeDescendants, int userId)
+        => ContentService.Move(content, newParentId, includeDescendants, userId);
 
     /// <inheritdoc />
     protected override IContent? Copy(IContent content, int newParentId, bool relateToOriginal, bool includeDescendants, int userId)
@@ -431,7 +490,31 @@ internal sealed class ContentEditingService
                 OperationResultType.FailedCancelledByEvent => ContentEditingOperationStatus.CancelledByNotification,
 
                 // for any other state we'll return "unknown" so we know that we need to amend this
-                _ => ContentEditingOperationStatus.Unknown
+                _ => ContentEditingOperationStatus.Unknown,
+            };
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Content save operation failed");
+            return ContentEditingOperationStatus.Unknown;
+        }
+    }
+
+    private async Task<ContentEditingOperationStatus> SaveAndPublish(IContent content, string[] culturesToPublish, Guid userKey)
+    {
+        try
+        {
+            var currentUserId = await GetUserIdAsync(userKey);
+            PublishResult publishResult = ContentService.SaveAndPublish(content, culturesToPublish, userId: currentUserId);
+            if (publishResult.Success)
+            {
+                return ContentEditingOperationStatus.Success;
+            }
+
+            return publishResult.Result switch
+            {
+                PublishResultType.FailedPublishCancelledByEvent => ContentEditingOperationStatus.CancelledByNotification,
+                _ => ContentEditingOperationStatus.Unknown,
             };
         }
         catch (Exception ex)

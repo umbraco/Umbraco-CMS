@@ -72,10 +72,11 @@ export class UmbMediaCollectionItemCardElement extends UmbLitElement implements 
 				?disabled=${this.disabled}
 				@selected=${this.#onSelected}
 				@deselected=${this.#onDeselected}>
-				<umb-imaging-thumbnail
+				<umb-media-thumbnail
 					.unique=${this.item.unique}
 					alt=${ifDefined(this.item.name)}
-					icon=${ifDefined(this.item.icon)}></umb-imaging-thumbnail>
+					icon=${ifDefined(this.item.icon)}
+					.fileExt=${this.item.extension}></umb-media-thumbnail>
 				<slot name="actions" slot="actions"></slot>
 			</uui-card-media>
 		`;

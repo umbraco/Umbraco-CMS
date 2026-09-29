@@ -16,7 +16,7 @@ public class UpdateDataTypeFolderControllerTests : ManagementApiUserGroupTestBas
     private Guid _folderKey;
 
     [SetUp]
-    public async Task Setup()
+    public new async Task Setup()
     {
         var response = await DataTypeContainerService.CreateAsync(Guid.NewGuid(), "TestFolder", Constants.System.RootKey, Constants.Security.SuperUserKey);
         _folderKey = response.Result.Key;

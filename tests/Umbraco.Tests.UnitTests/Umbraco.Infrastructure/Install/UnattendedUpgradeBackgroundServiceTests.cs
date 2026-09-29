@@ -11,8 +11,10 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Notifications;
+using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Install;
+using Umbraco.Cms.Infrastructure.Sync;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Install;
 
@@ -184,6 +186,37 @@ public class UnattendedUpgradeBackgroundServiceTests
     }
 
     [Test]
+    public async Task ExecuteAsync_WhenApplicationStartedHandlerThrows_DoesNotSetBootFailed()
+    {
+        // The application has already started by the time the upgrade completes, so registering the callback
+        // invokes it inline. A throwing handler must not be reported as a post-migration initialization failure.
+        using var applicationStarted = new CancellationTokenSource();
+        await applicationStarted.CancelAsync();
+
+        var runtimeState = CreateMockRuntimeState();
+        var eventAggregator = new Mock<IEventAggregator>();
+        SetupPublishAsync(eventAggregator);
+
+        eventAggregator
+            .Setup(x => x.Publish(It.IsAny<UmbracoApplicationStartedNotification>()))
+            .Throws(new BootFailedException("a started handler failed"));
+
+        var sut = CreateSut(
+            runtimeState.Object,
+            eventAggregator.Object,
+            hostApplicationLifetime: CreateMockLifetime(applicationStarted.Token).Object);
+
+        await sut.StartAsync(CancellationToken.None);
+        await sut.ExecuteTask!;
+
+        eventAggregator.Verify(x => x.Publish(It.IsAny<UmbracoApplicationStartedNotification>()), Times.Once);
+
+        runtimeState.Verify(
+            x => x.Configure(RuntimeLevel.BootFailed, It.IsAny<RuntimeLevelReason>(), It.IsAny<Exception?>()),
+            Times.Never);
+    }
+
+    [Test]
     public async Task ExecuteAsync_WhenBootFailedExceptionAlreadySetBeforeDetermineRuntimeLevel_SkipsDetermineRuntimeLevel()
     {
         // The BootFailedException is set before CoreRuntime calls DetermineRuntimeLevel.
@@ -229,11 +262,134 @@ public class UnattendedUpgradeBackgroundServiceTests
             Times.Once);
     }
 
+    [Test]
+    public async Task ExecuteAsync_WhenUpgradeSucceeds_MarksContentRoutingReadyAfterStartingNotification()
+    {
+        // The readiness signal must be set only after UmbracoApplicationStartingNotification has completed
+        // (i.e. the per-server caches are seeded), never before. See #22581.
+        var runtimeState = CreateMockRuntimeState();
+        var eventAggregator = new Mock<IEventAggregator>();
+        SetupPublishAsync(eventAggregator);
+
+        var callOrder = new List<string>();
+        eventAggregator
+            .Setup(x => x.PublishAsync(It.IsAny<UmbracoApplicationStartingNotification>(), It.IsAny<CancellationToken>()))
+            .Callback(() => callOrder.Add("starting"))
+            .Returns(Task.CompletedTask);
+
+        var readiness = new Mock<IContentRoutingReadiness>();
+        readiness.Setup(x => x.MarkReady()).Callback(() => callOrder.Add("ready"));
+
+        var sut = CreateSut(runtimeState.Object, eventAggregator.Object, contentRoutingReadiness: readiness.Object);
+
+        await sut.StartAsync(CancellationToken.None);
+        await sut.ExecuteTask!;
+
+        readiness.Verify(x => x.MarkReady(), Times.Once);
+        Assert.That(callOrder, Is.EqualTo(new[] { "starting", "ready" }));
+    }
+
+    [TestCase(true)]
+    [TestCase(false)]
+    public async Task ExecuteAsync_ElectsServerRoleBeforeStartingNotification(bool isLeader)
+    {
+        // This service publishes UmbracoApplicationStartingNotification directly rather than going through
+        // CoreRuntime.StartAsync (which already returned early once RuntimeLevel.Upgrading was set), so it must
+        // make its own attempt to resolve the server role first - for both the leader and follower path, since
+        // both converge on the same call site after the migration/leadership branch.
+        var runtimeState = CreateMockRuntimeState();
+        var eventAggregator = new Mock<IEventAggregator>();
+        SetupPublishAsync(eventAggregator);
+
+        var callOrder = new List<string>();
+        var serverRoleElector = new Mock<IServerRoleElector>();
+        serverRoleElector
+            .Setup(x => x.TryElectOnceAsync(It.IsAny<CancellationToken>()))
+            .Callback(() => callOrder.Add("elected"))
+            .Returns(Task.CompletedTask);
+
+        eventAggregator
+            .Setup(x => x.PublishAsync(It.IsAny<UmbracoApplicationStartingNotification>(), It.IsAny<CancellationToken>()))
+            .Callback(() => callOrder.Add("starting"))
+            .Returns(Task.CompletedTask);
+
+        var sut = CreateSut(
+            runtimeState.Object,
+            eventAggregator.Object,
+            coordinator: isLeader ? CreateLeaderCoordinator() : CreateFollowerCoordinator(),
+            serverRoleElector: serverRoleElector.Object);
+
+        await sut.StartAsync(CancellationToken.None);
+        await sut.ExecuteTask!;
+
+        serverRoleElector.Verify(x => x.TryElectOnceAsync(It.IsAny<CancellationToken>()), Times.Once);
+        Assert.That(callOrder, Is.EqualTo(new[] { "elected", "starting" }));
+    }
+
+    [Test]
+    public async Task ExecuteAsync_WhenFollower_MarksContentRoutingReadyAfterStartingNotification()
+    {
+        // Follower path (another instance won migration leadership): this instance runs no migrations, but it
+        // still rebuilds its per-server caches via UmbracoApplicationStartingNotification and must converge on
+        // MarkReady() afterwards, exactly like the leader. See #22581.
+        var runtimeState = CreateMockRuntimeState();
+        var eventAggregator = new Mock<IEventAggregator>();
+        SetupPublishAsync(eventAggregator);
+
+        var callOrder = new List<string>();
+        eventAggregator
+            .Setup(x => x.PublishAsync(It.IsAny<UmbracoApplicationStartingNotification>(), It.IsAny<CancellationToken>()))
+            .Callback(() => callOrder.Add("starting"))
+            .Returns(Task.CompletedTask);
+
+        var readiness = new Mock<IContentRoutingReadiness>();
+        readiness.Setup(x => x.MarkReady()).Callback(() => callOrder.Add("ready"));
+
+        var sut = CreateSut(
+            runtimeState.Object,
+            eventAggregator.Object,
+            coordinator: CreateFollowerCoordinator(),
+            contentRoutingReadiness: readiness.Object);
+
+        await sut.StartAsync(CancellationToken.None);
+        await sut.ExecuteTask!;
+
+        // Confirm this really was the follower path: the main migration notification is leader-only.
+        eventAggregator.Verify(x => x.PublishAsync(It.IsAny<RuntimeUnattendedUpgradeNotification>(), It.IsAny<CancellationToken>()), Times.Never);
+
+        readiness.Verify(x => x.MarkReady(), Times.Once);
+        Assert.That(callOrder, Is.EqualTo(new[] { "starting", "ready" }));
+    }
+
+    [Test]
+    public async Task ExecuteAsync_WhenBootFailed_DoesNotMarkContentRoutingReady()
+    {
+        var runtimeState = CreateMockRuntimeState();
+        runtimeState
+            .Setup(x => x.DetermineRuntimeLevel())
+            .Throws(new InvalidOperationException("db gone"));
+
+        var eventAggregator = new Mock<IEventAggregator>();
+        SetupPublishAsync(
+            eventAggregator,
+            premigrationResult: RuntimePremigrationsUpgradeNotification.PremigrationUpgradeResult.CoreUpgradeComplete);
+
+        var readiness = new Mock<IContentRoutingReadiness>();
+        var sut = CreateSut(runtimeState.Object, eventAggregator.Object, contentRoutingReadiness: readiness.Object);
+
+        await sut.StartAsync(CancellationToken.None);
+        await sut.ExecuteTask!;
+
+        readiness.Verify(x => x.MarkReady(), Times.Never);
+    }
+
     private static UnattendedUpgradeBackgroundService CreateSut(
         IRuntimeState runtimeState,
         IEventAggregator eventAggregator,
         IHostApplicationLifetime? hostApplicationLifetime = null,
-        IMigrationCoordinator? coordinator = null)
+        IMigrationCoordinator? coordinator = null,
+        IContentRoutingReadiness? contentRoutingReadiness = null,
+        IServerRoleElector? serverRoleElector = null)
     {
         var components = new ComponentCollection(
             () => Enumerable.Empty<IAsyncComponent>(),
@@ -249,6 +405,8 @@ public class UnattendedUpgradeBackgroundServiceTests
             components,
             hostApplicationLifetime ?? CreateMockLifetime().Object,
             coordinator,
+            contentRoutingReadiness ?? Mock.Of<IContentRoutingReadiness>(),
+            serverRoleElector ?? Mock.Of<IServerRoleElector>(),
             NullLogger<UnattendedUpgradeBackgroundService>.Instance);
     }
 
@@ -257,6 +415,14 @@ public class UnattendedUpgradeBackgroundServiceTests
         var mock = new Mock<IMigrationCoordinator>();
         mock.Setup(x => x.TryBecomeLeaderAsync(It.IsAny<CancellationToken>()))
             .ReturnsAsync(true);
+        return mock.Object;
+    }
+
+    private static IMigrationCoordinator CreateFollowerCoordinator()
+    {
+        var mock = new Mock<IMigrationCoordinator>();
+        mock.Setup(x => x.TryBecomeLeaderAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(false);
         return mock.Object;
     }
 
@@ -286,10 +452,10 @@ public class UnattendedUpgradeBackgroundServiceTests
         return mock;
     }
 
-    private static Mock<IHostApplicationLifetime> CreateMockLifetime()
+    private static Mock<IHostApplicationLifetime> CreateMockLifetime(CancellationToken applicationStarted = default)
     {
         var mock = new Mock<IHostApplicationLifetime>();
-        mock.SetupGet(x => x.ApplicationStarted).Returns(CancellationToken.None);
+        mock.SetupGet(x => x.ApplicationStarted).Returns(applicationStarted);
         mock.SetupGet(x => x.ApplicationStopped).Returns(CancellationToken.None);
         return mock;
     }

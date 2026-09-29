@@ -37,14 +37,49 @@ export default {
 - **Group**: camelCase feature name (e.g., `actions`, `general`, `content`, `media`, `user`)
 - **Term**: camelCase descriptive name (e.g., `assignDomain`, `auditTrail`, `browse`)
 - **Full key** used in code: `group_termName` (underscore separator)
-- Add to an **existing group** when the text belongs to that feature area
-- Create a **new group** only for new feature areas
+
+#### Choosing a group
+
+A group covers a **shared UX area**, not just the one component you're editing. Don't pick a group unilaterally — confirm it with the user:
+
+1. **If you already have a good idea of the scope** (from the surrounding code, the feature being worked on, etc.), propose it: "This looks like it belongs to the `{scope}` scope — should that be the localization group?"
+2. **If you don't**, ask directly: "What is the common group name for this localization?"
+3. **Either way, check for an existing match first.** Search the groups already in `src/assets/lang/en.ts` for one that already covers this UX area, and if you find one, ask whether it should be reused instead of creating a new group: "`{existingGroup}` already covers this — should I use that instead?"
+
+Examples already in this codebase:
+
+- `blockEditor` — Block List, Block Grid, and Block RTE share the same block-configuration UX
+- `contentTypeEditor` — Document Type, Media Type, and Member Type share the same editing UX
+- `codeEditor` — anything embedding the code editor
+
+Only create a new group once the user confirms no existing one fits.
+
+#### Choosing a term
+
+A term names the **situation**, not the wording — two situations with identical English text today should still get separate terms, since the copy can diverge later.
+
+Build it from two parts:
+
+1. **Subject**: `CreateBlock`, `ConfirmDelete`, `AddGroup`.
+2. **Presentation role**: `Title`, `Description`, `Action`, `Label`, `Notice`, `Message`, `ValidationMessage`, `Headline`, etc.
+
+Combined (subject + role suffix): `createAction`, `confirmDeleteTitle`, `addGroupDescription`.
+
+Example — three terms for one dialog in the `blockEditor` group, same subject (`confirmDeleteBlockGroup`) with different roles:
+
+```typescript
+confirmDeleteBlockGroupTitle: 'Delete group?',
+confirmDeleteBlockGroupMessage: 'Are you sure you want to delete group <strong>%0%</strong>?',
+confirmDeleteBlockGroupNotice: 'The content of these Blocks will still be present, editing of this content will no longer be available and will be shown as unsupported content.',
+```
+
+Grouping by subject keeps every piece of the dialog together, even though the wording shares nothing.
 
 ### Value types
 
-| Type | Use when | Example |
-|------|----------|---------|
-| `string` | Static text | `myLabel: 'My Label'` |
+| Type               | Use when                 | Example                                           |
+| ------------------ | ------------------------ | ------------------------------------------------- |
+| `string`           | Static text              | `myLabel: 'My Label'`                             |
 | `(args) => string` | Text with dynamic values | `createFor: (name: string) => \`Create ${name}\`` |
 
 ## Step 2: Use the localized text
@@ -60,9 +95,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 @customElement('umb-my-element')
 export class UmbMyElement extends UmbLitElement {
 	override render() {
-		return html`
-			<uui-button label=${this.localize.term('myFeature_myLabel')}></uui-button>
-		`;
+		return html`<uui-button label=${this.localize.term('myFeature_myLabel')}></uui-button>`;
 	}
 }
 ```

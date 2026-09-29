@@ -14,7 +14,7 @@ public class ByKeyDocumentTypeFolderControllerTests : ManagementApiUserGroupTest
     private Guid _key;
 
     [SetUp]
-    public async Task Setup()
+    public new async Task Setup()
     {
         _key = Guid.NewGuid();
         await ContentTypeContainerService.CreateAsync(_key, "Test", Constants.System.RootKey, Constants.Security.SuperUserKey);

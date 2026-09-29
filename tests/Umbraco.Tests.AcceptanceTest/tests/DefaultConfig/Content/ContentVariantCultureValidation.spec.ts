@@ -59,7 +59,6 @@ test('can publish english variant after visiting danish that has empty mandatory
   await umbracoUi.content.goToContentWithName(contentName);
   // Visit danish and switch back to english
   await umbracoUi.content.switchLanguage('Danish');
-  await umbracoUi.waitForTimeout(ConstantHelper.timeout.short);
   await umbracoUi.content.switchLanguage('English');
   // Publish english
   await umbracoUi.content.clickSaveAndPublishButton();

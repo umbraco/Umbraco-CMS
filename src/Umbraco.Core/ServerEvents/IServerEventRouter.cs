@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models.ServerEvents;
+using Umbraco.Cms.Core.Models.ServerEvents;
 
 namespace Umbraco.Cms.Core.ServerEvents;
 
@@ -13,6 +13,17 @@ public interface IServerEventRouter
     /// <param name="serverEvent">The server event to route.</param>
     /// <returns></returns>
     Task RouteEventAsync(ServerEvent serverEvent);
+
+    /// <summary>
+    /// Route a server event to the users that have permission to see it, using the supplied routing
+    /// context to gate delivery per recipient (e.g. by start-node access for document and media events).
+    /// </summary>
+    /// <param name="serverEvent">The server event to route.</param>
+    /// <param name="context">Server-side routing context. Not sent to clients.</param>
+    /// <returns>A task that represents the asynchronous routing operation.</returns>
+    // TODO (V19): Remove this default implementation.
+    Task RouteEventAsync(ServerEvent serverEvent, ServerEventRoutingContext context)
+        => RouteEventAsync(serverEvent);
 
     /// <summary>
     /// Notify a specific user about a server event.

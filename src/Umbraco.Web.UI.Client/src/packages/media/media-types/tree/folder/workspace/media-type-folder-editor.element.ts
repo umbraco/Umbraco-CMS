@@ -12,6 +12,6 @@ export { UmbMediaTypeFolderWorkspaceEditorElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		['umb-media-type-folder-workspace-editor']: UmbMediaTypeFolderWorkspaceEditorElement;
+		'umb-media-type-folder-workspace-editor': UmbMediaTypeFolderWorkspaceEditorElement;
 	}
 }

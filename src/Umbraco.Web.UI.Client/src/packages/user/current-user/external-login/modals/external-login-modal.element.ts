@@ -1,6 +1,8 @@
 import { UmbCurrentUserRepository } from '../../repository/index.js';
 import type { UmbCurrentUserExternalLoginProviderModel } from '../../types.js';
 import { css, customElement, html, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
+import type { TemplateResult } from '@umbraco-cms/backoffice/external/lit';
+import { escapeHTML } from '@umbraco-cms/backoffice/utils';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { umbConfirmModal, type UmbModalContext } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -9,6 +11,7 @@ import { mergeObservables } from '@umbraco-cms/backoffice/observable-api';
 import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import { UmbApiError } from '@umbraco-cms/backoffice/resources';
+import { of } from '@umbraco-cms/backoffice/external/rxjs';
 
 type UmbExternalLoginProviderOption = UmbCurrentUserExternalLoginProviderModel & {
 	displayName: string;
@@ -37,7 +40,9 @@ export class UmbCurrentUserExternalLoginModalElement extends UmbLitElement {
 	}
 
 	async #loadProviders() {
-		const serverLoginProviders$ = (await this.#currentUserRepository.requestExternalLoginProviders()).asObservable();
+		// TODO: Fail early? if no asObservable method is available on the server response, we should probably throw an error or handle it differently. [NL]
+		const serverLoginProviders$ =
+			(await this.#currentUserRepository.requestExternalLoginProviders()).asObservable?.() ?? of([]);
 		const manifestLoginProviders$ = umbExtensionsRegistry.byTypeAndFilter(
 			'authProvider',
 			(ext) => !!ext.meta?.linking?.allowManualLinking,
@@ -99,9 +104,10 @@ export class UmbCurrentUserExternalLoginModalElement extends UmbLitElement {
 
 	/**
 	 * Render a provider with a toggle to enable/disable it
-	 * @param item
+	 * @param {UmbExternalLoginProviderOption} item The provider to render
+	 * @returns {TemplateResult} The rendered provider
 	 */
-	#renderProvider(item: UmbExternalLoginProviderOption) {
+	#renderProvider(item: UmbExternalLoginProviderOption): TemplateResult {
 		return html`
 			<uui-box>
 				<div class="header" slot="header">
@@ -163,7 +169,7 @@ export class UmbCurrentUserExternalLoginModalElement extends UmbLitElement {
 		try {
 			await umbConfirmModal(this, {
 				headline: this.localize.term('defaultdialogs_linkYour', providerDisplayName),
-				content: this.localize.term('defaultdialogs_linkYourConfirm', providerDisplayName),
+				content: this.localize.term('defaultdialogs_linkYourConfirm', escapeHTML(providerDisplayName)),
 				confirmLabel: '#general_continue',
 				color: 'positive',
 			});
@@ -193,7 +199,7 @@ export class UmbCurrentUserExternalLoginModalElement extends UmbLitElement {
 		try {
 			await umbConfirmModal(this, {
 				headline: this.localize.term('defaultdialogs_unLinkYour', providerDisplayName),
-				content: this.localize.term('defaultdialogs_unLinkYourConfirm', providerDisplayName),
+				content: this.localize.term('defaultdialogs_unLinkYourConfirm', escapeHTML(providerDisplayName)),
 				confirmLabel: '#general_continue',
 				color: 'danger',
 			});

@@ -1,4 +1,4 @@
-import type { UmbMemberCollectionModel } from '../../types.js';
+import type { UmbMemberCollectionFilterModel, UmbMemberCollectionModel } from '../../types.js';
 import { UMB_MEMBER_COLLECTION_CONTEXT } from '../../member-collection.context-token.js';
 import type { UmbMemberCollectionContext } from '../../member-collection.context.js';
 import { UmbMemberKind } from '../../../utils/index.js';
@@ -12,6 +12,7 @@ import type {
 } from '@umbraco-cms/backoffice/components';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UMB_MEMBER_GROUP_UNIQUES_VALUE_TYPE } from '@umbraco-cms/backoffice/member-group';
 import { UmbMemberTypeItemRepository } from '@umbraco-cms/backoffice/member-type';
 import { UmbDirection } from '@umbraco-cms/backoffice/utils';
 
@@ -38,6 +39,10 @@ export class UmbMemberTableCollectionViewElement extends UmbLitElement {
 			name: this.localize.term('general_email'),
 			alias: 'memberEmail',
 			allowSorting: true,
+		},
+		{
+			name: this.localize.term('treeHeaders_memberGroups'),
+			alias: 'memberGroups',
 		},
 		{
 			name: this.localize.term('content_membertype'),
@@ -102,6 +107,18 @@ export class UmbMemberTableCollectionViewElement extends UmbLitElement {
 	#observeCollectionItems() {
 		if (!this.#collectionContext) return;
 		this.observe(this.#collectionContext.items, (items) => this.#createTableItems(items), 'umbCollectionItemsObserver');
+
+		this.observe(
+			this.#collectionContext.filter,
+			(filter) => {
+				const { orderBy, orderDirection } = filter as UmbMemberCollectionFilterModel;
+				const column = Object.entries(this.#columnAliasToOrderBy).find(([, alias]) => alias === orderBy)?.[0];
+				if (!column) return;
+				this._orderingColumn = column;
+				this._orderingDesc = orderDirection === UmbDirection.DESCENDING;
+			},
+			'umbCollectionOrderingObserver',
+		);
 	}
 
 	async #createTableItems(members: Array<UmbMemberCollectionModel>) {
@@ -135,6 +152,12 @@ export class UmbMemberTableCollectionViewElement extends UmbLitElement {
 					{
 						columnAlias: 'memberEmail',
 						value: member.email,
+					},
+					{
+						columnAlias: 'memberGroups',
+						value: html`<umb-value-summary-extension
+							.valueType=${UMB_MEMBER_GROUP_UNIQUES_VALUE_TYPE}
+							.value=${member.groups}></umb-value-summary-extension>`,
 					},
 					{
 						columnAlias: 'memberType',

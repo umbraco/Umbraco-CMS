@@ -18,7 +18,6 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 		{
 			name: this.localize.term('validation_validateNothing'),
 			value: '!NOVALIDATION!',
-			selected: true,
 		},
 		{
 			name: this.localize.term('validation_validateAsEmail'),
@@ -58,7 +57,14 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 
 		this.consumeContext(UMB_PROPERTY_TYPE_WORKSPACE_CONTEXT, (instance) => {
 			this.#context = instance;
-			this.observe(instance?.data, (data) => (this._data = data), 'observeData');
+			this.observe(
+				instance?.data,
+				(data) => {
+					this._data = data;
+					this.#syncCustomValidationSelection(data?.validation?.regEx ?? null);
+				},
+				'observeData',
+			);
 			this.observe(instance?.isNew, (isNew) => (this._isNew = isNew), '_observeIsNew');
 		});
 
@@ -135,6 +141,26 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 		this.updateValue({ isSensitive: e.target.checked });
 	}
 
+	// The <uui-select> binds only via each option's `selected` flag, so this must be
+	// called whenever loaded data changes — otherwise the dropdown shows "No validation"
+	// for any saved regEx until the user manually edits the regex input.
+	#syncCustomValidationSelection(regEx: string | null) {
+		let targetValue: string;
+		if (!regEx) {
+			targetValue = '!NOVALIDATION!';
+		} else {
+			const preset = this._customValidationOptions.find(
+				(option) => option.value !== '!NOVALIDATION!' && option.value !== '.+' && option.value === regEx,
+			);
+			targetValue = preset ? preset.value : '.+';
+		}
+
+		this._customValidationOptions = this._customValidationOptions.map((option) => ({
+			...option,
+			selected: option.value === targetValue,
+		}));
+	}
+
 	#onCustomValidationChange(event: UUISelectEvent) {
 		const value = event.target.value.toString();
 		const regEx = value !== '!NOVALIDATION!' ? value : null;
@@ -188,9 +214,9 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 			<uui-box class="uui-text">
 				<umb-property-layout label=${this.localize.term('general_name')} orientation="vertical" mandatory>
 					<umb-input-with-alias
-						id="name-input"
-						data-mark="input:entity-name"
-						name="name"
+						data-mark="input:propertytype-name"
+						name="propertyTypeName"
+						autocomplete="on"
 						slot="editor"
 						required
 						.value=${this._data?.name ?? ''}
@@ -204,8 +230,7 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 
 				<umb-property-layout label=${this.localize.term('general_description')} orientation="vertical">
 					<uui-textarea
-						id="description-input"
-						data-mark="input:entity-description"
+						data-mark="input:propertytype-description"
 						label="${this.localize.term('general_description')}"
 						slot="editor"
 						name="description"
@@ -217,7 +242,7 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 				<umb-property-layout label=${this.localize.term('general_propertyEditor')} orientation="vertical" mandatory>
 					<umb-data-type-flow-input
 						slot="editor"
-						id="data-type-input"
+						data-mark="input:data-type"
 						label="${this.localize.term('general_propertyEditor')}"
 						.value=${this._data?.dataType?.unique ?? ''}
 						.suggestionQuery=${this._data?.name}

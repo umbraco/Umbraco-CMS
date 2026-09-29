@@ -19,7 +19,7 @@ public interface IDbProviderFactoryCreator
     /// Gets the SQL syntax provider for the specified database provider name.
     /// </summary>
     /// <param name="providerName">The name of the database provider.</param>
-    /// <returns>An instance of <see cref="Umbraco.Cms.Infrastructure.Persistence.ISqlSyntaxProvider"/> corresponding to the provider name.</returns>
+    /// <returns>An instance of <see cref="ISqlSyntaxProvider"/> corresponding to the provider name.</returns>
     ISqlSyntaxProvider GetSqlSyntaxProvider(string providerName);
 
     /// <summary>

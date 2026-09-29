@@ -60,7 +60,7 @@ export const data: Array<UmbMockMediaTypeModel> = [
 			},
 		],
 		compositions: [],
-		isFolder: false,
+		isFolder: true,
 		hasChildren: false,
 		collection: {
 			id: '3a0156c4-3b8c-4803-bdc1-6871faa83fff',

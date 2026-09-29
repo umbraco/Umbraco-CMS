@@ -7,6 +7,11 @@ import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { RedirectManagementService, RedirectStatusModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { RedirectUrlResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type {
+	UmbDataSourceErrorResponse,
+	UmbDataSourceResponse,
+	UmbPagedModel,
+} from '@umbraco-cms/backoffice/repository';
 
 /**
  * A data source for the Document Redirect Management feature that fetches data from the server.
@@ -26,10 +31,10 @@ export class UmbDocumentRedirectManagementServerDataSource {
 
 	/**
 	 * Gets the current redirect URL tracker status.
-	 * @returns {*}
+	 * @returns {Promise<UmbDataSourceResponse<UmbDocumentRedirectStatusModel>>} The current tracker status.
 	 * @memberof UmbDocumentRedirectManagementServerDataSource
 	 */
-	async getStatus() {
+	async getStatus(): Promise<UmbDataSourceResponse<UmbDocumentRedirectStatusModel>> {
 		const { data, error } = await tryExecute(this.#host, RedirectManagementService.getRedirectManagementStatus());
 
 		if (error || !data) {
@@ -46,13 +51,13 @@ export class UmbDocumentRedirectManagementServerDataSource {
 	/**
 	 * Enables or disables the redirect URL tracker.
 	 * @param {boolean} enabled - Whether the tracker should be enabled.
-	 * @returns {*}
+	 * @returns {Promise<UmbDataSourceErrorResponse>} Undefined if the operation succeeded, otherwise an error.
 	 * @memberof UmbDocumentRedirectManagementServerDataSource
 	 * @deprecated Deprecated since v17. The backend endpoint is now a no-op; set the
 	 *   `Umbraco:CMS:WebRouting:DisableRedirectUrlTracking` configuration key instead.
 	 *   Scheduled for removal in Umbraco 19.
 	 */
-	async setStatus(enabled: boolean) {
+	async setStatus(enabled: boolean): Promise<UmbDataSourceErrorResponse> {
 		const status = enabled ? RedirectStatusModel.ENABLED : RedirectStatusModel.DISABLED;
 		const { error } = await tryExecute(
 			this.#host,
@@ -64,10 +69,12 @@ export class UmbDocumentRedirectManagementServerDataSource {
 	/**
 	 * Gets the redirects pointing to a specific document.
 	 * @param {string} unique - The document unique identifier.
-	 * @returns {*}
+	 * @returns {Promise<UmbDataSourceResponse<UmbPagedModel<UmbDocumentRedirectUrlModel>>>} The redirects pointing to the document.
 	 * @memberof UmbDocumentRedirectManagementServerDataSource
 	 */
-	async getByDocumentUnique(unique: string) {
+	async getByDocumentUnique(
+		unique: string,
+	): Promise<UmbDataSourceResponse<UmbPagedModel<UmbDocumentRedirectUrlModel>>> {
 		const { data, error } = await tryExecute(
 			this.#host,
 			RedirectManagementService.getRedirectManagementById({ path: { id: unique } }),
@@ -88,10 +95,12 @@ export class UmbDocumentRedirectManagementServerDataSource {
 	/**
 	 * Gets a paginated, filtered list of redirects.
 	 * @param {UmbDocumentRedirectFilterArgs} args - Filter, skip and take arguments.
-	 * @returns {*}
+	 * @returns {Promise<UmbDataSourceResponse<UmbPagedModel<UmbDocumentRedirectUrlModel>>>} The requested page of redirects.
 	 * @memberof UmbDocumentRedirectManagementServerDataSource
 	 */
-	async filter(args: UmbDocumentRedirectFilterArgs) {
+	async filter(
+		args: UmbDocumentRedirectFilterArgs,
+	): Promise<UmbDataSourceResponse<UmbPagedModel<UmbDocumentRedirectUrlModel>>> {
 		const { data, error } = await tryExecute(
 			this.#host,
 			RedirectManagementService.getRedirectManagement({
@@ -114,10 +123,10 @@ export class UmbDocumentRedirectManagementServerDataSource {
 	/**
 	 * Deletes a redirect by its unique identifier.
 	 * @param {string} unique - The redirect unique identifier.
-	 * @returns {*}
+	 * @returns {Promise<UmbDataSourceErrorResponse>} Undefined if the operation succeeded, otherwise an error.
 	 * @memberof UmbDocumentRedirectManagementServerDataSource
 	 */
-	async delete(unique: string) {
+	async delete(unique: string): Promise<UmbDataSourceErrorResponse> {
 		const { error } = await tryExecute(
 			this.#host,
 			RedirectManagementService.deleteRedirectManagementById({ path: { id: unique } }),

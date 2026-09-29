@@ -52,7 +52,7 @@ export class RelationTypeUiHelper extends UiBaseLocators{
 
   async openRelationTypeByNameAtRoot(relationTypeName: string) {
     await this.clickRootFolderCaretButton();
-    await this.click(this.page.getByLabel(relationTypeName));
+    await this.clickTreeItemWithName(relationTypeName);
   }
 
   async enterRelationTypeName(name: string) {

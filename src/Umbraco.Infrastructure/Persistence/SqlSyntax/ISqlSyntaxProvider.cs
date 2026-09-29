@@ -183,7 +183,7 @@ public interface ISqlSyntaxProvider
     /// </summary>
     /// <param name="current">The current <see cref="DatabaseType"/>.</param>
     /// <param name="connectionString">An optional connection string used to help determine the updated database type.</param>
-    /// <returns>The resolved <see cref="Umbraco.Cms.Infrastructure.Persistence.DatabaseType"/>.</returns>
+    /// <returns>The resolved <see cref="DatabaseType"/>.</returns>
     DatabaseType GetUpdatedDatabaseType(DatabaseType current, string? connectionString) =>
         current; // Default implementation.
 

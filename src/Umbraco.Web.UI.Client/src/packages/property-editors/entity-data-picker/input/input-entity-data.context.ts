@@ -77,6 +77,10 @@ export class UmbEntityDataPickerInputContext extends UmbPickerInputContext<
 	 * @memberof UmbEntityDataPickerInputContext
 	 */
 	setDataSourceApi(api: UmbPickerDataSource | undefined) {
+		// Skip if unchanged: re-setting the same API rebuilds the modal token/route, which would
+		// close and reopen an already-open picker modal on every re-render. [MR]
+		if (api === this.#dataSourceApi) return;
+
 		if (api) {
 			this.#dataSourceApi = api;
 			api.setConfig?.(this.#dataSourceConfig);
@@ -99,7 +103,7 @@ export class UmbEntityDataPickerInputContext extends UmbPickerInputContext<
 
 	/**
 	 * Sets the data source config for the input context.
-	 * @param {(UmbPropertyEditorDataSourceConfigModel | undefined)} config The data source config.
+	 * @param {(UmbConfigCollectionModel | undefined)} config The data source config.
 	 * @memberof UmbEntityDataPickerInputContext
 	 */
 	setDataSourceConfig(config: UmbConfigCollectionModel | undefined) {
@@ -112,7 +116,7 @@ export class UmbEntityDataPickerInputContext extends UmbPickerInputContext<
 
 	/**
 	 * Gets the data source config for the input context.
-	 * @returns {(UmbPropertyEditorDataSourceConfigModel | undefined)} The data source config.
+	 * @returns {(UmbConfigCollectionModel | undefined)} The data source config.
 	 * @memberof UmbEntityDataPickerInputContext
 	 */
 	getDataSourceConfig(): UmbConfigCollectionModel | undefined {

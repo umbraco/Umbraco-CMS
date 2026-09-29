@@ -19,7 +19,7 @@ public abstract class FileSystemTreeServiceBase : IFileSystemTreeService
     /// <param name="path">The file system path for which to retrieve ancestor models.</param>
     /// <param name="includeSelf">If <c>true</c>, includes the model representing the specified path itself as the last element in the result; otherwise, only ancestors are included.</param>
     /// <returns>
-    /// An array of <see cref="Umbraco.Cms.Api.Management.Services.FileSystem.FileSystemTreeItemPresentationModel"/> objects, each representing a directory in the ancestor chain of the specified path, ordered from the root to the specified path (if <paramref name="includeSelf"/> is <c>true</c>).
+    /// An array of <see cref="FileSystemTreeItemPresentationModel"/> objects, each representing a directory in the ancestor chain of the specified path, ordered from the root to the specified path (if <paramref name="includeSelf"/> is <c>true</c>).
     /// </returns>
     public FileSystemTreeItemPresentationModel[] GetAncestorModels(string path, bool includeSelf)
     {

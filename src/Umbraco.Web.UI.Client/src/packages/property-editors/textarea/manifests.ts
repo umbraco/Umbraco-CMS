@@ -7,6 +7,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Text Area Property Editor UI',
 		element: () => import('./property-editor-ui-textarea.element.js'),
 		meta: {
+			supportsVariantChange: true,
 			label: 'Text Area',
 			propertyEditorSchemaAlias: 'Umbraco.TextArea',
 			icon: 'icon-edit',
@@ -36,6 +37,12 @@ export const manifests: Array<UmbExtensionManifest> = [
 						description: 'If empty or zero, the textarea is set to auto-height',
 						propertyEditorUiAlias: 'Umb.PropertyEditorUi.Integer',
 						config: [{ alias: 'min', value: 0 }],
+					},
+					{
+						alias: 'placeholder',
+						label: '#general_placeholder',
+						description: 'Placeholder text shown inside the textarea when empty',
+						propertyEditorUiAlias: 'Umb.PropertyEditorUi.TextBox',
 					},
 				],
 				defaultData: [{ alias: 'rows', value: 10 }],
