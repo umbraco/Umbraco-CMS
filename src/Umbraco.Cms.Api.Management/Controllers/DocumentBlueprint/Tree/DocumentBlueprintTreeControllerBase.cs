@@ -66,19 +66,17 @@ public class DocumentBlueprintTreeControllerBase : FolderTreeControllerBase<Docu
         }
     }
 
-    protected override async Task<DocumentBlueprintTreeItemResponseModel[]> MapTreeItemViewModelsAsync(Guid? parentId, IEntitySlim[] entities)
+    protected override async Task<DocumentBlueprintTreeItemResponseModel> MapTreeItemViewModelAsync(Guid? parentKey, IEntitySlim entity)
     {
-        IEnumerable<Task<DocumentBlueprintTreeItemResponseModel>> tasks = entities.Select(async entity =>
-        {
-            DocumentBlueprintTreeItemResponseModel responseModel = await MapTreeItemViewModelAsync(parentId, entity);
-            if (entity is IDocumentEntitySlim documentEntitySlim)
-            {
-                responseModel.HasChildren = false;
-                responseModel.DocumentType = _documentPresentationFactory.CreateDocumentTypeReferenceResponseModel(documentEntitySlim);
-            }
-            return responseModel;
-        });
+        DocumentBlueprintTreeItemResponseModel responseModel = await base.MapTreeItemViewModelAsync(parentKey, entity);
 
-        return await Task.WhenAll(tasks);
+        if (responseModel.IsFolder is false && entity is IDocumentEntitySlim documentEntitySlim)
+        {
+            responseModel.HasChildren = false;
+            responseModel.DocumentType = _documentPresentationFactory.CreateDocumentTypeReferenceResponseModel(documentEntitySlim);
+            responseModel.Variants = await _documentPresentationFactory.CreateVariantsItemResponseModelsAsync(documentEntitySlim);
+        }
+
+        return responseModel;
     }
 }

@@ -1,6 +1,5 @@
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Search.Core.Models.Persistence;
-using Umbraco.Cms.Search.Core.Persistence;
+using Umbraco.Cms.Core.Search.Indexing;
 
 namespace Umbraco.Cms.Tests.Integration.Testing.Search;
 

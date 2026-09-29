@@ -1,13 +1,10 @@
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models.Membership;
-using Umbraco.Cms.Core.Preview;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Tests.Common.Builders;
@@ -18,7 +15,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Services;
 [TestFixture]
 public class PreviewServiceTests
 {
-    private const string Token = "token";
+    private const string Token = "preview";
 
     [Test]
     public async Task TryEnterPreviewAsync_Sets_Secure_SameSiteNone_Cookie_On_Https_Request()
@@ -72,11 +69,8 @@ public class PreviewServiceTests
     {
         var userKey = Guid.NewGuid();
 
-        var previewTokenGeneratorMock = new Mock<IPreviewTokenGenerator>();
-        previewTokenGeneratorMock
-            .Setup(x => x.GenerateTokenAsync(It.Is<Guid>(y => y == userKey)))
-            .ReturnsAsync(Attempt<string?>.Succeed(Token));
-
+#pragma warning disable CS0618 // Type or member is obsolete - all usage has been removed up in V19
+#pragma warning restore CS0618 // Type or member is obsolete
         var requestAccessorMock = new Mock<IRequestAccessor>();
         requestAccessorMock
             .Setup(x => x.GetRequestUrl())
@@ -88,9 +82,6 @@ public class PreviewServiceTests
 
         return new PreviewService(
             cookieManagerMock.Object,
-            previewTokenGeneratorMock.Object,
-            Mock.Of<IServiceScopeFactory>(),
-            Mock.Of<IRequestCache>(),
             Options.Create(new GlobalSettings { UseHttps = useHttps }),
             requestAccessorMock.Object);
     }

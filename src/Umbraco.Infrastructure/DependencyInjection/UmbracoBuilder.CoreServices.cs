@@ -61,6 +61,7 @@ using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Infrastructure.Security;
 using Umbraco.Cms.Infrastructure.Serialization;
 using Umbraco.Cms.Infrastructure.Services.Implement;
+using Umbraco.Cms.Infrastructure.Sync;
 using Umbraco.Extensions;
 using IScopeProvider = Umbraco.Cms.Infrastructure.Scoping.IScopeProvider;
 
@@ -93,6 +94,11 @@ public static partial class UmbracoBuilderExtensions
         builder.AddNotificationAsyncHandler<RuntimeUnattendedUpgradeNotification, UnattendedUpgrader>();
         builder.AddNotificationAsyncHandler<RuntimePremigrationsUpgradeNotification, PremigrationUpgrader>();
         builder.Services.AddSingleton<IMigrationCoordinator, MigrationCoordinator>();
+
+        // Registered here (rather than alongside TouchServerJob in AddBackgroundJobs()) because
+        // UnattendedUpgradeBackgroundService, registered immediately below, needs it and this method runs in
+        // every composition path that also registers that service - AddBackgroundJobs() does not.
+        builder.Services.AddSingleton<IServerRoleElector, ServerRoleElector>();
         builder.Services.AddHostedService<UnattendedUpgradeBackgroundService>();
 
         // Database availability check.
@@ -170,12 +176,6 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<BlockGridPropertyValueConstructorCache>();
         builder.Services.AddSingleton<RichTextBlockPropertyValueConstructorCache>();
         builder.Services.AddSingleton<BlockEditorVarianceHandler>();
-
-        // both SimpleTinyMceValueConverter (in Core) and RteBlockRenderingValueConverter (in Infrastructure) will be
-        // discovered when CoreBootManager configures the converters. We will remove the basic one defined
-        // in core so that the more enhanced version is active.
-        builder.PropertyValueConverters()
-            .Remove<SimpleRichTextValueConverter>();
 
         // register *all* checks, except those marked [HideFromTypeFinder] of course
         builder.Services.AddSingleton<Core.HealthChecks.NotificationMethods.IMarkdownToHtmlConverter, MarkdownToHtmlConverter>();

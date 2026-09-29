@@ -2,11 +2,10 @@
 using MessagePack.Resolvers;
 using NPoco;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Search.Indexing;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Scoping;
-using Umbraco.Cms.Search.Core.Models.Indexing;
-using Umbraco.Cms.Search.Core.Models.Persistence;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Search.Core.Persistence;

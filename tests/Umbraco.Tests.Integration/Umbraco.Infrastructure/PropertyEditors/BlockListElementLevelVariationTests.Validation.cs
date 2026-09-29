@@ -14,7 +14,7 @@ internal partial class BlockListElementLevelVariationTests
     [Test]
     public async Task Can_Validate_Invalid_Properties()
     {
-        var elementType = await CreateElementTypeWithValidation();
+        var elementType = await CreateElementTypeWithValidationAsync();
         var blockListDataType = await CreateBlockListDataType(elementType);
         var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType);
         var blockListValue = BlockListPropertyValue(
@@ -183,7 +183,7 @@ internal partial class BlockListElementLevelVariationTests
 
     private async Task Can_Validate_Invalid_Properties_Specific_Culture_Only()
     {
-        var elementType = await CreateElementTypeWithValidation();
+        var elementType = await CreateElementTypeWithValidationAsync();
         var blockListDataType = await CreateBlockListDataType(elementType);
         var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType);
         var blockListValue = BlockListPropertyValue(
@@ -238,7 +238,7 @@ internal partial class BlockListElementLevelVariationTests
     [Test]
     public async Task Can_Validate_Invalid_Properties_With_Wildcard_Culture()
     {
-        var elementType = await CreateElementTypeWithValidation();
+        var elementType = await CreateElementTypeWithValidationAsync();
         var blockListDataType = await CreateBlockListDataType(elementType);
         var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType);
         var blockListValue = BlockListPropertyValue(
@@ -292,7 +292,7 @@ internal partial class BlockListElementLevelVariationTests
     [Test]
     public async Task Can_Validate_Missing_Properties()
     {
-        var elementType = await CreateElementTypeWithValidation();
+        var elementType = await CreateElementTypeWithValidationAsync();
         var blockListDataType = await CreateBlockListDataType(elementType);
         var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType);
         var blockListValue = BlockListPropertyValue(
@@ -505,7 +505,7 @@ internal partial class BlockListElementLevelVariationTests
     [Test]
     public async Task Does_Not_Validate_Unexposed_Blocks()
     {
-        var elementType = await CreateElementTypeWithValidation();
+        var elementType = await CreateElementTypeWithValidationAsync();
         var blockListDataType = await CreateBlockListDataType(elementType);
         var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType);
         var blockListValue = BlockListPropertyValue(
@@ -555,7 +555,7 @@ internal partial class BlockListElementLevelVariationTests
     [Test]
     public async Task Can_Validate_Properties_Variant_Blocks()
     {
-        var elementType = await CreateElementTypeWithValidation(ContentVariation.Nothing);
+        var elementType = await CreateElementTypeWithValidationAsync(ContentVariation.Nothing);
         var blockListDataType = await CreateBlockListDataType(elementType);
         var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType, ContentVariation.Culture);
         var blockListValue = BlockListPropertyValue(
@@ -612,7 +612,7 @@ internal partial class BlockListElementLevelVariationTests
     [Test]
     public async Task Can_Validate_Missing_Properties_Variant_Blocks()
     {
-        var elementType = await CreateElementTypeWithValidation(ContentVariation.Nothing);
+        var elementType = await CreateElementTypeWithValidationAsync(ContentVariation.Nothing);
         var blockListDataType = await CreateBlockListDataType(elementType);
         var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType, ContentVariation.Culture);
         var blockListValue = BlockListPropertyValue(

@@ -157,6 +157,10 @@ export class DataTypeApiHelper {
   // FOLDER
   async getFolder(id: string) {
     const response = await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/data-type/folder/' + id);
+    if (!response.ok()) {
+      return null;
+    }
+
     return await response.json();
   }
 
@@ -1485,6 +1489,17 @@ export class DataTypeApiHelper {
     return await this.save(dataType);
   }
 
+  async updateApprovedColorItemLabel(dataTypeName: string, color: string, label: string) {
+    const dataTypeData = await this.getByName(dataTypeName);
+    const itemsValue = dataTypeData.values.find(item => item.alias === 'items');
+    const colorItem = itemsValue?.value?.find(item => item.value === color);
+    if (!colorItem) {
+      throw new Error(`No item with color '${color}' found on data type '${dataTypeName}'.`);
+    }
+    colorItem.label = label;
+    return await this.update(dataTypeData.id, dataTypeData);
+  }
+
   async getTiptapExtensionsCount(tipTapName: string) {
     const tipTapData = await this.getByName(tipTapName);
     const extensionsValue = tipTapData.values.find(value => value.alias === 'extensions');
@@ -2102,6 +2117,17 @@ export class DataTypeApiHelper {
       .addStartNode()
         .withType(startNodeType)
         .done()
+      .build();
+
+    return await this.save(dataType);
+  }
+
+  async createMultiNodeTreePickerDataTypeWithMinNumberOfItems(name: string, minNumber: number) {
+    await this.ensureNameNotExists(name);
+
+    const dataType = new MultiNodeTreePickerDataTypeBuilder()
+      .withName(name)
+      .withMinNumber(minNumber)
       .build();
 
     return await this.save(dataType);

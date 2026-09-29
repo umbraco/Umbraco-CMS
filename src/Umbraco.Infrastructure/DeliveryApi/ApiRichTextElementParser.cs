@@ -122,7 +122,7 @@ internal sealed class ApiRichTextElementParser : ApiRichTextParserBase, IApiRich
             .ToArray();
 
         var tag = TagName(element);
-        var attributes = element.Attributes.ToDictionary(a => a.Name, a => a.Value as object);
+        var attributes = element.Attributes.ToDictionary(a => a.Name, a => (object)(a.Value ?? string.Empty));
 
         ReplaceLocalLinks(contentCache, mediaCache, attributes);
 
@@ -205,7 +205,15 @@ internal sealed class ApiRichTextElementParser : ApiRichTextParserBase, IApiRich
 
     private static void CleanUpBlocks(string tag, Dictionary<string, object> attributes)
     {
-        if (tag.StartsWith("umb-rte-block") is false || attributes.TryGetValue(BlockContentKeyAttribute, out object? blockContentKeyAttribute) is false || blockContentKeyAttribute is not string dataKey)
+        if (tag.StartsWith("umb-rte-block") is false)
+        {
+            return;
+        }
+
+        // The layout key is editor-internal bookkeeping and must not leak into Delivery API output.
+        attributes.Remove(BlockLayoutKeyAttribute);
+
+        if (attributes.TryGetValue(BlockContentKeyAttribute, out object? blockContentKeyAttribute) is false || blockContentKeyAttribute is not string dataKey)
         {
             return;
         }

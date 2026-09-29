@@ -56,6 +56,7 @@ TypeScript/Lit web components library for the Umbraco CMS backoffice. Published 
 | Write or modify tests                                   | [docs/testing.md](./docs/testing.md)                                                                                           |
 | Work with auth or security                              | [docs/security.md](./docs/security.md) + [docs/edge-cases.md](./docs/edge-cases.md)                                            |
 | Scaffold a new package or module                        | [docs/package-development.md](./docs/package-development.md)                                                                   |
+| Change how a package is bundled or chunked              | [docs/package-development.md](./docs/package-development.md#coalescing-a-packages-lazy-modules) — a wrong `eagerModules` list makes boot heavier, and the build still succeeds |
 | Write or change observers / `Umb*State` usage           | [docs/state-system.md](./docs/state-system.md) — states already deduplicate; do not add "is this a re-emit?" guards            |
 | Add, rename, or remove a key in `src/assets/lang/en.ts` | [docs/package-development.md](./docs/package-development.md#type-safe-localization-keys)                                       |
 
@@ -179,7 +180,7 @@ When using `@umbraco-cms/backoffice`:
 
 | File                            | Purpose                                                          |
 | ------------------------------- | ---------------------------------------------------------------- |
-| `package.json`                  | Root package with exports and workspace references               |
+| `package.json`                  | Root package: exports, workspace references, and `@hey-api/openapi-ts` for every workspace that generates a client |
 | `devops/publish/cleanse-pkg.js` | Script that runs during `npm pack` to hoist and convert versions |
 | `src/external/*`                | Dependency wrapper packages                                      |
-| `src/packages/core`             | Contains `@hey-api/openapi-ts` and other utilities               |
+| `src/packages/core`             | Generated backend API client and other utilities                 |

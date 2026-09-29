@@ -12,6 +12,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Single Block Property Editor UI',
 		element: () => import('./property-editor-ui-block-single.element.js'),
 		meta: {
+			supportsVariantChange: true,
 			label: 'Single Block',
 			propertyEditorSchemaAlias: UMB_BLOCK_SINGLE_PROPERTY_EDITOR_SCHEMA_ALIAS,
 			icon: 'icon-shape-square',
@@ -23,14 +24,13 @@ export const manifests: Array<UmbExtensionManifest> = [
 					{
 						alias: 'useLiveEditing',
 						label: 'Live editing mode',
-						description:
-							'Live editing in editor overlays for live updated custom views or labels using custom expression.',
+						description: 'Instant updates',
 						propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
 					},
 					{
 						alias: 'useInlineEditingAsDefault',
 						label: 'Inline editing mode',
-						description: 'Use the inline editor as the default block view.',
+						description: 'Expand to edit',
 						propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
 					},
 					{
@@ -41,9 +41,10 @@ export const manifests: Array<UmbExtensionManifest> = [
 					},
 					{
 						alias: 'maxPropertyWidth',
-						label: 'Property editor width',
-						description: 'Optional CSS override, example: 800px or 100%',
+						label: 'Property Editor width',
+						description: 'Example: `800px`',
 						propertyEditorUiAlias: 'Umb.PropertyEditorUi.TextBox',
+						config: [{ alias: 'placeholder', value: '100%' }],
 					},
 				],
 			},

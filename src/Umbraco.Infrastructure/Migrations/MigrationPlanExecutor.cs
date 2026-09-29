@@ -159,8 +159,21 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
         // If any completed migration requires us to rebuild cache we'll do that.
         if (_rebuildCache)
         {
-            _logger.LogInformation("Starts rebuilding the cache. This can be a long running operation");
-            await RebuildCache();
+            if (result.Successful)
+            {
+                _logger.LogInformation("Starts rebuilding the cache. This can be a long running operation");
+                await RebuildCache();
+            }
+            else
+            {
+                // A rebuild may depend on infrastructure that migrations part way through the plan put in place so
+                // attempting one on a failed plan could also error and mask the migration failure (#23612).
+                // The warning is necessary as even if the problem is fixed and the plan runs successfully to completion
+                // on a second attempt, the step that requested the rebuild may have completed and will not be run again.
+                _logger.LogWarning(
+                    "Skipping the cache rebuild requested by plan {PlanName} as it did not run to completion - the published cache should be rebuilt manually once the upgrade completes",
+                    plan.Name);
+            }
         }
 
         // If any completed migration requires us to sign out the user we'll do that.

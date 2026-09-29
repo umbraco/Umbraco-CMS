@@ -478,7 +478,8 @@ internal sealed partial class ContentTypeEditingServiceTests
             Assert.IsTrue(payload.ChangeTypes.HasTypesAll(ContentTypeChangeTypes.CompositionAdded), "Expected CompositionAdded flag");
             Assert.IsTrue(payload.ChangeTypes.HasType(ContentTypeChangeTypes.RefreshOther), "CompositionAdded should include RefreshOther");
             Assert.IsFalse(payload.ChangeTypes.HasTypesAll(ContentTypeChangeTypes.CompositionRemoved), "Did NOT expect CompositionRemoved flag");
-            Assert.IsFalse(payload.ChangeTypes.HasType(ContentTypeChangeTypes.RefreshMain), "Should NOT include RefreshMain");
+            Assert.IsTrue(payload.ChangeTypes.HasType(ContentTypeChangeTypes.RefreshMain), "CompositionAdded should include RefreshMain");
+            Assert.IsTrue(payload.ChangeTypes.HasType(ContentTypeChangeTypes.RawDataUnaffected), "CompositionAdded should be flagged RawDataUnaffected");
         });
     }
 }

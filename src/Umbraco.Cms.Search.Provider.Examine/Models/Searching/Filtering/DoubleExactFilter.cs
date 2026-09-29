@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Search.Core.Models.Searching.Filtering;
+﻿using Umbraco.Cms.Core.Search.Querying.Filtering;
 
 namespace Umbraco.Cms.Search.Provider.Examine.Models.Searching.Filtering;
 

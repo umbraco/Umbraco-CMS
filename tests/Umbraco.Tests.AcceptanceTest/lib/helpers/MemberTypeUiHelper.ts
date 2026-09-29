@@ -58,7 +58,7 @@ export class MemberTypeUiHelper extends UiBaseLocators {
   }
 
   async clickSaveButtonAndWaitForMemberTypeToBeUpdated() {
-    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.memberType, this.clickSaveButton(), ConstantHelper.statusCodes.ok);
+    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.memberType, this.clickSaveButton(), ConstantHelper.statusCodes.ok, ConstantHelper.httpMethods.put);
   }
 
   async clickConfirmToDeleteButtonAndWaitForMemberTypeToBeDeleted() {

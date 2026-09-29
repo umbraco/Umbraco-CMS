@@ -13,6 +13,9 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Services.PublishStatus;
 [TestFixture]
 public class PublishedContentStatusFilteringServiceTests
 {
+    // Matches IDocumentCacheService.TryGetCached so Moq can bind the out parameter.
+    private delegate bool TryGetCachedCallback(Guid key, bool preview, out IPublishedContent? content);
+
     [Test]
     public void FilterAvailable_Invariant_ForNonPreview_YieldsPublishedItems()
     {
@@ -304,38 +307,58 @@ public class PublishedContentStatusFilteringServiceTests
     }
 
     [Test]
-    public void FilterAvailable_IsLazy_TakeOnlyFetchesRequestedItemsFromCache()
+    public void FilterAvailable_IsLazy_WarmCache_ShortCircuitsWithoutBatching()
     {
-        var (sut, items, cacheMock, _) = SetupCounting(forPreview: true);
-
-        IPublishedContent[] taken = sut.FilterAvailable(items.Keys, null).Take(3).ToArray();
-
-        Assert.AreEqual(3, taken.Length);
-        cacheMock.Verify(c => c.GetById(true, It.IsAny<Guid>()), Times.Exactly(3));
-    }
-
-    [Test]
-    public void FilterAvailable_IsLazy_FirstOrDefaultOnlyFetchesOneItemFromCache()
-    {
-        var (sut, items, cacheMock, _) = SetupCounting(forPreview: true);
+        var (sut, items, _, batchedKeys, serviceMock) = SetupCounting(forPreview: true, warm: true);
 
         IPublishedContent? first = sut.FilterAvailable(items.Keys, null).FirstOrDefault();
 
         Assert.IsNotNull(first);
-        cacheMock.Verify(c => c.GetById(true, It.IsAny<Guid>()), Times.Once);
+
+        // An all-L0-hit chunk must be served synchronously — the batched read is never engaged.
+        Assert.IsEmpty(batchedKeys);
+        serviceMock.Verify(
+            s => s.GetByKeysAsync(It.IsAny<IReadOnlyCollection<Guid>>(), It.IsAny<bool?>()),
+            Times.Never);
+    }
+
+    [Test]
+    public void FilterAvailable_IsLazy_FirstOrDefaultMaterialisesOnlyOneItem()
+    {
+        var (sut, items, _, batchedKeys, _) = SetupCounting(forPreview: true, warm: false);
+
+        IPublishedContent? first = sut.FilterAvailable(items.Keys, null).FirstOrDefault();
+
+        Assert.IsNotNull(first);
+
+        // Slow-start's first chunk is a single key, so exactly one item is materialised.
+        Assert.AreEqual(1, batchedKeys.Count);
+    }
+
+    [Test]
+    public void FilterAvailable_IsLazy_TakeMaterialisesOnlyRequestedItems()
+    {
+        var (sut, items, _, batchedKeys, _) = SetupCounting(forPreview: true, warm: false);
+
+        IPublishedContent[] taken = sut.FilterAvailable(items.Keys, null).Take(3).ToArray();
+
+        Assert.AreEqual(3, taken.Length);
+
+        // Chunks of 1 then 2 cover the three requested items; the remaining seven are never materialised.
+        Assert.AreEqual(3, batchedKeys.Count);
     }
 
     [Test]
     public void FilterAvailable_IsLazy_NonPreviewTakeShortCircuitsPublishStatusQueries()
     {
-        var (sut, items, cacheMock, statusMock) = SetupCounting(forPreview: false);
+        var (sut, items, statusMock, batchedKeys, _) = SetupCounting(forPreview: false, warm: false);
 
         IPublishedContent[] taken = sut.FilterAvailable(items.Keys, null).Take(3).ToArray();
 
         Assert.AreEqual(3, taken.Length);
 
-        // GetById is reached only for keys that pass the publish-status filter, so exactly 3 cache lookups.
-        cacheMock.Verify(c => c.GetById(false, It.IsAny<Guid>()), Times.Exactly(3));
+        // Only the keys passing the publish-status filter are materialised, so exactly three.
+        Assert.AreEqual(3, batchedKeys.Count);
 
         // Publish status must short-circuit before the full candidate set is enumerated.
         statusMock.Verify(
@@ -344,25 +367,36 @@ public class PublishedContentStatusFilteringServiceTests
     }
 
     [Test]
-    public void FilterAvailable_IsLazy_FullEnumerationFetchesAllItemsFromCache()
+    public void FilterAvailable_IsLazy_FullEnumerationMaterialisesAllItemsInFewBatches()
     {
-        var (sut, items, cacheMock, _) = SetupCounting(forPreview: true);
+        var (sut, items, _, batchedKeys, serviceMock) = SetupCounting(forPreview: true, warm: false);
 
         IPublishedContent[] all = sut.FilterAvailable(items.Keys, null).ToArray();
 
         Assert.AreEqual(items.Count, all.Length);
-        cacheMock.Verify(c => c.GetById(true, It.IsAny<Guid>()), Times.Exactly(items.Count));
+
+        // Every item is materialised exactly once...
+        Assert.AreEqual(items.Count, batchedKeys.Count);
+        Assert.AreEqual(items.Count, batchedKeys.Distinct().Count());
+
+        // ...but collapsed into a handful of batched reads rather than one per item.
+        serviceMock.Verify(
+            s => s.GetByKeysAsync(It.IsAny<IReadOnlyCollection<Guid>>(), It.IsAny<bool?>()),
+            Times.AtMost(5));
     }
 
-    // sets up invariant data with mocks exposed so tests can verify per-call counts.
+    // Sets up invariant data with mocks exposed so tests can verify materialisation behaviour.
     // - 10 invariant documents with IDs 0 through 9
     // - even IDs are published, odd are not (relevant only for non-preview)
-    private (
+    // When warm, TryGetCached serves every key from L0; otherwise every key misses L0 and is routed
+    // through the batched GetByKeysAsync, whose requested keys are recorded in the returned list.
+    private static (
         PublishedContentStatusFilteringService Service,
         Dictionary<Guid, IPublishedContent> Items,
-        Mock<IPublishedContentCache> CacheMock,
-        Mock<IDocumentPublishStatusQueryService> StatusMock)
-        SetupCounting(bool forPreview)
+        Mock<IDocumentPublishStatusQueryService> StatusMock,
+        List<Guid> BatchedKeys,
+        Mock<IDocumentCacheService> ServiceMock)
+        SetupCounting(bool forPreview, bool warm)
     {
         var contentType = new Mock<IPublishedContentType>();
         contentType.SetupGet(c => c.Variations).Returns(ContentVariation.Nothing);
@@ -379,10 +413,31 @@ public class PublishedContentStatusFilteringServiceTests
             items[key] = content.Object;
         }
 
-        var cacheMock = new Mock<IPublishedContentCache>();
-        cacheMock
-            .Setup(c => c.GetById(forPreview, It.IsAny<Guid>()))
-            .Returns((bool _, Guid key) => items.TryGetValue(key, out IPublishedContent? item) ? item : null);
+        var batchedKeys = new List<Guid>();
+        var serviceMock = new Mock<IDocumentCacheService>();
+        serviceMock
+            .Setup(s => s.TryGetCached(It.IsAny<Guid>(), It.IsAny<bool>(), out It.Ref<IPublishedContent?>.IsAny))
+            .Returns(new TryGetCachedCallback((Guid key, bool _, out IPublishedContent? content) =>
+            {
+                if (warm && items.TryGetValue(key, out IPublishedContent? item))
+                {
+                    content = item;
+                    return true;
+                }
+
+                content = null;
+                return false;
+            }));
+        serviceMock
+            .Setup(s => s.GetByKeysAsync(It.IsAny<IReadOnlyCollection<Guid>>(), It.IsAny<bool?>()))
+            .ReturnsAsync((IReadOnlyCollection<Guid> keys, bool? _) =>
+            {
+                batchedKeys.AddRange(keys);
+                return (IReadOnlyList<IPublishedContent>)keys
+                    .Select(k => items.TryGetValue(k, out IPublishedContent? item) ? item : null)
+                    .WhereNotNull()
+                    .ToArray();
+            });
 
         var statusMock = new Mock<IDocumentPublishStatusQueryService>();
         statusMock
@@ -392,8 +447,7 @@ public class PublishedContentStatusFilteringServiceTests
             .Setup(s => s.HasPublishedAncestorPath(It.IsAny<Guid>(), It.IsAny<string>()))
             .Returns(true);
 
-        var previewService = new Mock<IPreviewService>();
-        previewService.Setup(p => p.IsInPreview()).Returns(forPreview);
+        var previewSessionService = SetupPreviewService(forPreview);
 
         var variationContextAccessor = new Mock<IVariationContextAccessor>();
         variationContextAccessor.SetupGet(v => v.VariationContext).Returns(new VariationContext(null));
@@ -401,10 +455,11 @@ public class PublishedContentStatusFilteringServiceTests
         var service = new PublishedContentStatusFilteringService(
             variationContextAccessor.Object,
             statusMock.Object,
-            previewService.Object,
-            cacheMock.Object);
+            previewSessionService,
+            Mock.Of<IPublishedContentCache>(),
+            serviceMock.Object);
 
-        return (service, items, cacheMock, statusMock);
+        return (service, items, statusMock, batchedKeys, serviceMock);
     }
 
     // sets up invariant test data:
@@ -429,8 +484,8 @@ public class PublishedContentStatusFilteringServiceTests
             items[key] = content.Object;
         }
 
-        var publishedContentCache = SetupPublishedContentCache(forPreview, items);
-        var previewService = SetupPreviewService(forPreview);
+        var documentCacheService = SetupDocumentCacheService(items);
+        var previewSessionService = SetupPreviewService(forPreview);
         var publishStatusQueryService = SetupPublishStatusQueryService(items);
         var variationContextAccessor = SetupVariantContextAccessor(null);
 
@@ -438,8 +493,9 @@ public class PublishedContentStatusFilteringServiceTests
             new PublishedContentStatusFilteringService(
                 variationContextAccessor,
                 publishStatusQueryService,
-                previewService,
-                publishedContentCache),
+                previewSessionService,
+                Mock.Of<IPublishedContentCache>(),
+                documentCacheService),
             items);
     }
 
@@ -474,8 +530,8 @@ public class PublishedContentStatusFilteringServiceTests
             items[key] = content.Object;
         }
 
-        var publishedContentCache = SetupPublishedContentCache(forPreview, items);
-        var previewService = SetupPreviewService(forPreview);
+        var documentCacheService = SetupDocumentCacheService(items);
+        var previewSessionService = SetupPreviewService(forPreview);
         var publishStatusQueryService = SetupPublishStatusQueryService(items, hasPublishedAncestorPath);
         var variationContextAccessor = SetupVariantContextAccessor(requestCulture);
 
@@ -483,8 +539,9 @@ public class PublishedContentStatusFilteringServiceTests
             new PublishedContentStatusFilteringService(
                 variationContextAccessor,
                 publishStatusQueryService,
-                previewService,
-                publishedContentCache),
+                previewSessionService,
+                Mock.Of<IPublishedContentCache>(),
+                documentCacheService),
             items);
     }
 
@@ -528,8 +585,8 @@ public class PublishedContentStatusFilteringServiceTests
             items[key] = content.Object;
         }
 
-        var publishedContentCache = SetupPublishedContentCache(forPreview, items);
-        var previewService = SetupPreviewService(forPreview);
+        var documentCacheService = SetupDocumentCacheService(items);
+        var previewSessionService = SetupPreviewService(forPreview);
         var publishStatusQueryService = SetupPublishStatusQueryService(items);
         var variationContextAccessor = SetupVariantContextAccessor(requestCulture);
 
@@ -537,8 +594,9 @@ public class PublishedContentStatusFilteringServiceTests
             new PublishedContentStatusFilteringService(
                 variationContextAccessor,
                 publishStatusQueryService,
-                previewService,
-                publishedContentCache),
+                previewSessionService,
+                Mock.Of<IPublishedContentCache>(),
+                documentCacheService),
             items);
     }
 
@@ -560,11 +618,11 @@ public class PublishedContentStatusFilteringServiceTests
         return publishStatusQueryService.Object;
     }
 
-    private IPreviewService SetupPreviewService(bool forPreview)
+    private static IPreviewSessionService SetupPreviewService(bool forPreview)
     {
-        var previewService = new Mock<IPreviewService>();
-        previewService.Setup(p => p.IsInPreview()).Returns(forPreview);
-        return previewService.Object;
+        var previewSessionService = new Mock<IPreviewSessionService>();
+        previewSessionService.Setup(p => p.IsActive()).Returns(forPreview);
+        return previewSessionService.Object;
     }
 
     private IVariationContextAccessor SetupVariantContextAccessor(string? requestCulture)
@@ -574,12 +632,25 @@ public class PublishedContentStatusFilteringServiceTests
         return variationContextAccessor.Object;
     }
 
-    private IPublishedContentCache SetupPublishedContentCache(bool forPreview, Dictionary<Guid, IPublishedContent> items)
+    // Routes every key through the batched GetByKeysAsync (L0 always misses), returning the matching
+    // items in order. This isolates the filtering service from the cache-tier logic under test elsewhere.
+    private static IDocumentCacheService SetupDocumentCacheService(Dictionary<Guid, IPublishedContent> items)
     {
-        var publishedContentCache = new Mock<IPublishedContentCache>();
-        publishedContentCache
-            .Setup(c => c.GetById(forPreview, It.IsAny<Guid>()))
-            .Returns((bool preview, Guid key) => items.TryGetValue(key, out var item) ? item : null);
-        return publishedContentCache.Object;
+        var serviceMock = new Mock<IDocumentCacheService>();
+        serviceMock
+            .Setup(s => s.TryGetCached(It.IsAny<Guid>(), It.IsAny<bool>(), out It.Ref<IPublishedContent?>.IsAny))
+            .Returns(new TryGetCachedCallback((Guid _, bool _, out IPublishedContent? content) =>
+            {
+                content = null;
+                return false;
+            }));
+        serviceMock
+            .Setup(s => s.GetByKeysAsync(It.IsAny<IReadOnlyCollection<Guid>>(), It.IsAny<bool?>()))
+            .ReturnsAsync((IReadOnlyCollection<Guid> keys, bool? _) =>
+                (IReadOnlyList<IPublishedContent>)keys
+                    .Select(k => items.TryGetValue(k, out IPublishedContent? item) ? item : null)
+                    .WhereNotNull()
+                    .ToArray());
+        return serviceMock.Object;
     }
 }

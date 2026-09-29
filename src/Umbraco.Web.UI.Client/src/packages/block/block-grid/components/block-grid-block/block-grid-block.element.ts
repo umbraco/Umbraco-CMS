@@ -37,6 +37,13 @@ export class UmbBlockGridBlockElement extends UmbLitElement {
 	@property({ type: Boolean, reflect: true })
 	unpublished?: boolean;
 
+	/**
+	 * Whether the Block is backed by external (library element) content, so the unpublished tooltip
+	 * reflects the library element's own publish state rather than the local expose entry.
+	 */
+	@property({ type: Boolean, attribute: false })
+	isExternalContent?: boolean;
+
 	@property({ attribute: false })
 	content?: UmbBlockDataType;
 
@@ -58,16 +65,20 @@ export class UmbBlockGridBlockElement extends UmbLitElement {
 					.value=${blockValue}
 					@umb-ufm-resolved=${this.#onUfmResolved}>
 				</umb-ufm-render>
-				${when(
-					this.unpublished,
-					() => html`
-						<uui-tag slot="name" look="secondary" title=${this.localize.term('blockEditor_notExposedDescription')}>
-							<umb-localize key="blockEditor_notExposedLabel"></umb-localize>
-						</uui-tag>
-					`,
-				)}
+				${when(this.unpublished, () => this.#renderDraftTag())}
 				<umb-block-grid-areas-container slot="areas" draggable="false"></umb-block-grid-areas-container>
 			</umb-ref-grid-block>
+		`;
+	}
+
+	#renderDraftTag() {
+		const titleKey = this.isExternalContent
+			? 'blockEditor_notPublishedLibraryElementDescription'
+			: 'blockEditor_notExposedDescription';
+		return html`
+			<uui-tag slot="name" look="secondary" title=${this.localize.term(titleKey)}>
+				<umb-localize key="blockEditor_notExposedLabel"></umb-localize>
+			</uui-tag>
 		`;
 	}
 
