@@ -430,9 +430,10 @@ public partial class ContentEditingServiceTests
         };
     }
 
-    private async Task<IUser> CreateEnglishLanguageOnlyEditor() => await CreateSingleLanguageEditor("en-US");
+    private async Task<IUser> CreateEnglishLanguageOnlyEditor(bool withHasAccessToInvariantForVariant = false)
+        => await CreateSingleLanguageEditor("en-US", withHasAccessToInvariantForVariant);
 
-    private async Task<IUser> CreateSingleLanguageEditor(string isoCode)
+    private async Task<IUser> CreateSingleLanguageEditor(string isoCode, bool withHasAccessToInvariantForVariant = false)
     {
         var language = await LanguageService.GetAsync(isoCode);
         var alias = isoCode.Replace("-", string.Empty);
@@ -441,6 +442,7 @@ public partial class ContentEditingServiceTests
             .WithAlias($"{alias}Editors")
             .WithAllowedLanguages([language.Id])
             .Build();
+        userGroup.HasAccessToInvariantForVariant = withHasAccessToInvariantForVariant;
 
         var createUserGroupResult = await UserGroupService.CreateAsync(userGroup, Constants.Security.SuperUserKey);
         Assert.IsTrue(createUserGroupResult.Success);
