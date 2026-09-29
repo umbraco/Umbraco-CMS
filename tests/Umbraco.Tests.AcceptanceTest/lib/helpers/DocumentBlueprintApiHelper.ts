@@ -150,6 +150,18 @@ export class DocumentBlueprintApiHelper {
     return await this.create(documentBlueprint);
   }
 
+  async createDefaultDocumentBlueprintWithParent(documentBlueprintName: string, documentTypeId: string, parentId: string) {
+    await this.ensureNameNotExists(documentBlueprintName);
+    const documentBlueprint = new DocumentBlueprintsBuilder()
+      .withDocumentTypeId(documentTypeId)
+      .withParentId(parentId)
+      .addVariant()
+        .withName(documentBlueprintName)
+        .done()
+      .build();
+    return await this.create(documentBlueprint);
+  }
+
   async createFromDocument(documentBlueprintName: string, documentId: string, parentId?: string) {
     const documentBlueprintData = {
       "name": documentBlueprintName,
