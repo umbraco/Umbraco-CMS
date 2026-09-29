@@ -8,7 +8,6 @@ using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
-using Umbraco.Cms.Tests.Integration.Attributes;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.PropertyEditors;
 
@@ -1566,13 +1565,12 @@ internal partial class BlockListElementLevelVariationTests
     /// <param name="updateWithLimitedUserAccess">true => danish only which is not the default. false => admin which is all languages</param>
     [TestCase(true)]
     [TestCase(false)]
-    [ConfigureBuilder(ActionName = nameof(ConfigureAllowEditInvariantFromNonDefaultTrue))]
     public async Task Can_Handle_Limited_User_Access_To_Languages_With_Segment_Variant_Elements(bool updateWithLimitedUserAccess)
     {
         // Arrange: prepare an invariant block property whose element type varies by culture AND segment,
         // holding a value per culture and segment, and an editor restricted to Danish.
         var userKey = updateWithLimitedUserAccess
-            ? (await CreateLimitedUser()).Key
+            ? (await CreateLimitedUser(true)).Key
             : Constants.Security.SuperUserKey;
 
         var elementType = await CreateElementType(ContentVariation.CultureAndSegment);
@@ -1658,13 +1656,12 @@ internal partial class BlockListElementLevelVariationTests
     /// <param name="updateWithLimitedUserAccess">true => danish only which is not the default. false => admin which is all languages</param>
     [TestCase(true)]
     [TestCase(false)]
-    [ConfigureBuilder(ActionName = nameof(ConfigureAllowEditInvariantFromNonDefaultTrue))]
     public async Task Can_Handle_Limited_User_Access_To_Languages_With_Segment_Variant_Block_Property(bool updateWithLimitedUserAccess)
     {
         // Arrange: prepare a culture invariant, segment variant block property holding a separate block
         // value per segment, each with a value per culture, and an editor restricted to Danish.
         var userKey = updateWithLimitedUserAccess
-            ? (await CreateLimitedUser()).Key
+            ? (await CreateLimitedUser(true)).Key
             : Constants.Security.SuperUserKey;
 
         var elementType = await CreateElementType(ContentVariation.Culture);
