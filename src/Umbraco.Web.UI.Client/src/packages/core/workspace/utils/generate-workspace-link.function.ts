@@ -1,4 +1,4 @@
-import type { UmbPathPattern, UmbPathPatternParamsType } from './path-pattern.class.js';
+import type { UmbPathPattern, UmbPathPatternParamsType } from '@umbraco-cms/backoffice/router';
 import { ensurePathEndsWithSlash, removeInitialSlashFromPath } from '@umbraco-cms/backoffice/utils';
 
 export interface UmbWorkspaceLink {
