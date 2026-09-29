@@ -1011,7 +1011,6 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
         // assumes a new version id and version date (modified date) has been set
         ContentVersionDto contentVersionDto = memberDto.ContentVersionDto;
         contentVersionDto.NodeId = nodeDto.NodeId;
-        contentVersionDto.Key = Guid.NewGuid();
         contentVersionDto.Current = true;
         Database.Insert(contentVersionDto);
         entity.VersionId = contentVersionDto.Id;
@@ -1076,7 +1075,7 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
         Database.Update(memberDto.ContentDto);
 
         // update the content version dto
-        Database.Update(memberDto.ContentVersionDto, ContentVersionDto.UpdatableColumnNames);
+        Database.Update(memberDto.ContentVersionDto);
 
         // update the member dto
         // but only the changed columns, 'cos we cannot update password if empty

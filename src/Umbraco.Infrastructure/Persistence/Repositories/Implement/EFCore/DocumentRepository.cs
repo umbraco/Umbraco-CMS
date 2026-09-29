@@ -303,15 +303,12 @@ internal class DocumentRepository
             if (publishing)
             {
                 // The row just flipped above (now Current=false, Published=true) becomes the published
-                // version; a new draft pair is inserted to take over as the current version. Built as a
-                // genuinely new DTO instance (not a mutate-and-reinsert of the tracked one) so a fresh Key
-                // can be assigned explicitly — see the equivalent New-path comment in PersistNewVersionsAsync.
+                // version; a new draft pair is inserted to take over as the current version.
                 item.PublishedVersionId = item.VersionId;
 
                 var newContentVersionDto = new ContentVersionDto
                 {
                     NodeId = item.Id,
-                    Key = Guid.NewGuid(),
                     VersionDate = contentVersionDto.VersionDate,
                     UserId = contentVersionDto.UserId,
                     Current = true,
@@ -512,28 +509,6 @@ internal class DocumentRepository
             }
 
             return await AssembleEntitiesAsync(rows, db, propertyAliases: [], loadTemplates: false);
-        });
-
-    /// <inheritdoc />
-    public override Task<IContent?> GetVersionAsync(Guid versionKey, CancellationToken cancellationToken) =>
-        AmbientScope.ExecuteWithContextAsync(async db =>
-        {
-            // Filter by the version GUID key; no Current filter — historical versions are valid targets.
-            // The Nodes join guards against returning versions that belong to a different object type.
-            DocumentRow? row = await BuildBaseQuery(
-                    db,
-                    db.Nodes.Where(node => node.NodeObjectType == NodeObjectTypeKey),
-                    contentVersionFilter: contentVersion => contentVersion.Key == versionKey)
-                .Select(ToDocumentRow)
-                .FirstOrDefaultAsync(cancellationToken);
-
-            if (row is null)
-            {
-                return null;
-            }
-
-            List<IContent> entities = await AssembleEntitiesAsync([row], db);
-            return entities.FirstOrDefault();
         });
 
     /// <inheritdoc />
@@ -2198,17 +2173,13 @@ internal class DocumentRepository
         if (item.PublishedState == PublishedState.Publishing)
         {
             // The pair just inserted (Current=false, Published=true) becomes the published version.
-            // A second (Current=true, Published=false) pair is inserted for the new draft — built as a
-            // genuinely new DTO instance (not a mutate-and-reinsert of the first) so a fresh Key can be
-            // assigned explicitly. Unlike NPoco's ContentVersion table, the EF Core ContentVersionDto.Key
-            // column has no DB-side default, so omitting this would silently duplicate the first row's Key.
+            // A second (Current=true, Published=false) pair is inserted for the new draft.
             item.PublishedVersionId = item.VersionId;
             dto.PublishedVersion = documentVersionDto;
 
             var newContentVersionDto = new ContentVersionDto
             {
                 NodeId = item.Id,
-                Key = Guid.NewGuid(),
                 VersionDate = contentVersionDto.VersionDate,
                 UserId = contentVersionDto.UserId,
                 Current = true,

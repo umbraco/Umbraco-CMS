@@ -928,20 +928,20 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task GetVersionAsync_WithValidVersionKey_ReturnsVersion()
+    public async Task GetVersionAsync_WithValidVersionId_ReturnsVersion()
     {
         var scopeAccessor = GetRequiredService<IEFCoreScopeAccessor<UmbracoDbContext>>();
 
         using var scope = NewScopeProvider.CreateScope();
         var repository = CreateRepository();
 
-        Guid versionKey = await scopeAccessor.AmbientScope!.ExecuteWithContextAsync(db =>
+        var versionId = await scopeAccessor.AmbientScope!.ExecuteWithContextAsync(db =>
             db.ContentVersions
                 .Where(contentVersion => contentVersion.NodeId == _publishedPage.Id && contentVersion.Current)
-                .Select(contentVersion => contentVersion.Key)
+                .Select(contentVersion => contentVersion.Id)
                 .FirstOrDefaultAsync());
 
-        IContent? result = await repository.GetVersionAsync(versionKey, CancellationToken.None);
+        IContent? result = await repository.GetVersionAsync(versionId, CancellationToken.None);
         scope.Complete();
 
         Assert.That(result, Is.Not.Null);
@@ -960,13 +960,13 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
         using var scope = NewScopeProvider.CreateScope();
         var repository = CreateRepository();
 
-        Guid versionKey = await scopeAccessor.AmbientScope!.ExecuteWithContextAsync(db =>
+        var versionId = await scopeAccessor.AmbientScope!.ExecuteWithContextAsync(db =>
             db.ContentVersions
                 .Where(contentVersion => contentVersion.NodeId == _publishedPage.Id && contentVersion.Current)
-                .Select(contentVersion => contentVersion.Key)
+                .Select(contentVersion => contentVersion.Id)
                 .FirstOrDefaultAsync());
 
-        IContent? result = await repository.GetVersionAsync(versionKey, CancellationToken.None);
+        IContent? result = await repository.GetVersionAsync(versionId, CancellationToken.None);
         scope.Complete();
 
         Assert.That(result, Is.Not.Null);
@@ -974,12 +974,12 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task GetVersionAsync_WithNonExistentVersionKey_ReturnsNull()
+    public async Task GetVersionAsync_WithNonExistentVersionId_ReturnsNull()
     {
         using var scope = NewScopeProvider.CreateScope();
         var repository = CreateRepository();
 
-        IContent? result = await repository.GetVersionAsync(Guid.NewGuid(), CancellationToken.None);
+        IContent? result = await repository.GetVersionAsync(int.MaxValue, CancellationToken.None);
         scope.Complete();
 
         Assert.That(result, Is.Null);
@@ -993,13 +993,13 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
         using var scope = NewScopeProvider.CreateScope();
         var repository = CreateRepository();
 
-        Guid versionKey = await scopeAccessor.AmbientScope!.ExecuteWithContextAsync(db =>
+        var versionId = await scopeAccessor.AmbientScope!.ExecuteWithContextAsync(db =>
             db.ContentVersions
                 .Where(contentVersion => contentVersion.NodeId == _publishedPage.Id && contentVersion.Current)
-                .Select(contentVersion => contentVersion.Key)
+                .Select(contentVersion => contentVersion.Id)
                 .FirstOrDefaultAsync());
 
-        IContent? result = await repository.GetVersionAsync(versionKey, CancellationToken.None);
+        IContent? result = await repository.GetVersionAsync(versionId, CancellationToken.None);
         scope.Complete();
 
         Assert.That(result, Is.Not.Null);
@@ -2902,9 +2902,6 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
 
         ContentVersionDto publishedContentVersion = contentVersions.Single(cv => cv.Current == false);
         ContentVersionDto draftContentVersion = contentVersions.Single(cv => cv.Current);
-
-        Assert.That(publishedContentVersion.Key, Is.Not.EqualTo(draftContentVersion.Key),
-            "the two version rows must have distinct Keys, not a duplicated Key from the first row");
 
         DocumentVersionDto publishedDocumentVersion = documentVersions.Single(dv => dv.Id == publishedContentVersion.Id);
         DocumentVersionDto draftDocumentVersion = documentVersions.Single(dv => dv.Id == draftContentVersion.Id);

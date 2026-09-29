@@ -32,16 +32,15 @@ public class SqliteSyntaxProviderTests
     ///     A column added to a table that already holds rows has to give those rows a value, so a non-nullable
     ///     column needs a default even when the type it defaults to has no SQLite equivalent.
     /// </summary>
-    [TestCase(typeof(ContentVersionDto), ContentVersionDto.KeyColumnName)]
-    [TestCase(typeof(DomainDto), DomainDto.KeyColumnName)]
-    public void Add_Column_Gives_A_Non_Nullable_Column_A_Default(Type dtoType, string columnName)
+    [Test]
+    public void Add_Column_Gives_A_Non_Nullable_Column_A_Default()
     {
         var sut = new SqliteSyntaxProvider(
             Options.Create(new GlobalSettings()),
             Mock.Of<ILogger<SqliteSyntaxProvider>>());
 
-        TableDefinition table = DefinitionFactory.GetTableDefinition(dtoType, sut);
-        ColumnDefinition column = table.Columns.First(x => x.Name == columnName);
+        TableDefinition table = DefinitionFactory.GetTableDefinition(typeof(DomainDto), sut);
+        ColumnDefinition column = table.Columns.First(x => x.Name == DomainDto.KeyColumnName);
 
         var sql = sut.FormatAddColumn(column);
 
@@ -63,18 +62,18 @@ public class SqliteSyntaxProviderTests
             Options.Create(new GlobalSettings()),
             Mock.Of<ILogger<SqliteSyntaxProvider>>());
 
-        TableDefinition table = DefinitionFactory.GetTableDefinition(typeof(ContentVersionDto), sut);
-        ColumnDefinition column = table.Columns.First(x => x.Name == ContentVersionDto.KeyColumnName);
+        TableDefinition table = DefinitionFactory.GetTableDefinition(typeof(DomainDto), sut);
+        ColumnDefinition column = table.Columns.First(x => x.Name == DomainDto.KeyColumnName);
 
         using var connection = new SqliteConnection("Data Source=:memory:");
         connection.Open();
 
-        Execute(connection, "CREATE TABLE [umbracoContentVersion] ([id] INTEGER PRIMARY KEY AUTOINCREMENT, [nodeId] INTEGER NOT NULL)");
-        Execute(connection, "INSERT INTO [umbracoContentVersion] ([nodeId]) VALUES (1)");
+        Execute(connection, "CREATE TABLE [umbracoDomain] ([id] INTEGER PRIMARY KEY AUTOINCREMENT, [domainName] TEXT NOT NULL)");
+        Execute(connection, "INSERT INTO [umbracoDomain] ([domainName]) VALUES ('example.com')");
 
         var sql = string.Format(
             sut.AddColumn,
-            sut.GetQuotedTableName(ContentVersionDto.TableName),
+            sut.GetQuotedTableName(DomainDto.TableName),
             sut.FormatAddColumn(column));
 
         Assert.DoesNotThrow(() => Execute(connection, sql), sql);

@@ -411,9 +411,6 @@ internal sealed class ContentBaseFactory
         new()
         {
             Id = entity.VersionId,
-            // EF Core has no DB-side default configured for this column (NPoco's has NEWID()); omitting
-            // this explicit assignment would silently persist Guid.Empty.
-            Key = Guid.NewGuid(),
             NodeId = entity.Id,
             VersionDate = entity.UpdateDate,
             // See the UserId comment in BuildEFCoreNodeDto - EF Core bypasses the 0-to-null coalescing getter.

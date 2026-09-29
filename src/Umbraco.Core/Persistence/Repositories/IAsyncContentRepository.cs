@@ -63,19 +63,11 @@ public interface IAsyncContentRepository<TEntity> : IAsyncReadWriteRepository<Gu
     Task<IEnumerable<int>> GetVersionIdsAsync(Guid nodeKey, int skip, int take, CancellationToken cancellationToken);
 
     /// <summary>
-    ///     Gets a specific version of a content node by its Guid key.
-    /// </summary>
-    /// <param name="versionKey">The Guid key of the version.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>The content entity at the specified version, or <c>null</c> if not found.</returns>
-    Task<TEntity?> GetVersionAsync(Guid versionKey, CancellationToken cancellationToken);
-
-    /// <summary>
     ///     Gets a specific version of a content node by its version id.
     /// </summary>
     /// <remarks>
-    ///     Int-keyed rather than Guid-keyed: unlike content nodes, versions have no Guid key resolvable
-    ///     from a caller-facing identifier today, so this takes the version's raw database id directly.
+    ///     Versions are identified by their database id rather than a Guid key: a version is not an entity in
+    ///     its own right, and the id is the only identifier callers hold for one.
     /// </remarks>
     /// <param name="versionId">The id of the version.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
@@ -83,18 +75,10 @@ public interface IAsyncContentRepository<TEntity> : IAsyncReadWriteRepository<Gu
     Task<TEntity?> GetVersionAsync(int versionId, CancellationToken cancellationToken);
 
     /// <summary>
-    ///     Deletes a specific version by its Guid key.
-    /// </summary>
-    /// <param name="versionKey">The Guid key of the version to delete.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    Task DeleteVersionAsync(Guid versionKey, CancellationToken cancellationToken);
-
-    /// <summary>
     ///     Deletes a specific version by its version id.
     /// </summary>
     /// <remarks>
-    ///     Int-keyed rather than Guid-keyed: mirrors <see cref="GetVersionAsync(int, CancellationToken)" />, since
-    ///     callers of this overload already hold the version's raw database id rather than a Guid key.
+    ///     Identified by database id for the same reason as <see cref="GetVersionAsync(int, CancellationToken)" />.
     /// </remarks>
     /// <param name="versionId">The id of the version to delete.</param>
     /// <param name="cancellationToken">The cancellation token.</param>

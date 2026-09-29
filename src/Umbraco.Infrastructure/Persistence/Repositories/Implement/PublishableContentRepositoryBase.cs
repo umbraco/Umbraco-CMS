@@ -1080,7 +1080,6 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
         // persist the content version dto
         ContentVersionDto contentVersionDto = dto.ContentVersionDto.ContentVersionDto;
         contentVersionDto.NodeId = nodeDto.NodeId;
-        contentVersionDto.Key = Guid.NewGuid();
         contentVersionDto.Current = !publishing;
         Database.Insert(contentVersionDto);
         entity.VersionId = contentVersionDto.Id;
@@ -1100,7 +1099,6 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
         {
             entity.PublishedVersionId = entity.VersionId;
             contentVersionDto.Id = 0;
-            contentVersionDto.Key = Guid.NewGuid(); // reused DTO from the first insert above; needs a fresh key too, not just a fresh id
             contentVersionDto.Current = true;
             contentVersionDto.Text = entity.Name;
             Database.Insert(contentVersionDto);
@@ -1288,7 +1286,7 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
             // Ensure existing version retains current preventCleanup flag (both saving and publishing).
             contentVersionDto.PreventCleanup = version.PreventCleanup;
 
-            Database.Update(contentVersionDto, ContentVersionDto.UpdatableColumnNames);
+            Database.Update(contentVersionDto);
             Database.Update(entityVersionDto);
 
             // and, if publishing, insert new content & entity version dtos
@@ -1297,7 +1295,6 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
                 entity.PublishedVersionId = entity.VersionId;
 
                 contentVersionDto.Id = 0; // want a new id
-                contentVersionDto.Key = Guid.NewGuid(); // each version needs its own unique key
                 contentVersionDto.Current = true; // current version
                 contentVersionDto.Text = entity.Name;
                 contentVersionDto.PreventCleanup = false; // new draft version disregards prevent cleanup flag

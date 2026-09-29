@@ -584,7 +584,6 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
         // assumes a new version id and version date (modified date) has been set
         ContentVersionDto contentVersionDto = dto.MediaVersionDto.ContentVersionDto;
         contentVersionDto.NodeId = nodeDto.NodeId;
-        contentVersionDto.Key = Guid.NewGuid();
         contentVersionDto.Current = true;
         Database.Insert(contentVersionDto);
         entity.VersionId = contentVersionDto.Id;
@@ -653,7 +652,7 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
             ContentVersionDto contentVersionDto = dto.MediaVersionDto.ContentVersionDto;
             MediaVersionDto mediaVersionDto = dto.MediaVersionDto;
             contentVersionDto.Current = true;
-            Database.Update(contentVersionDto, ContentVersionDto.UpdatableColumnNames);
+            Database.Update(contentVersionDto);
             Database.Update(mediaVersionDto);
 
             // replace the property data
