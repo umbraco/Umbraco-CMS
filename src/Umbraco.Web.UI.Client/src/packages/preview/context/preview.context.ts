@@ -106,9 +106,7 @@ export class UmbPreviewContext extends UmbContextBase {
 	async #initHubConnection(serverUrl: string, serverContext?: typeof UMB_SERVER_CONTEXT.TYPE) {
 		const previewHubUrl = `${serverUrl}/umbraco/PreviewHub`;
 
-		// Make sure that no previous connection exists, otherwise an orphaned connection would keep
-		// reconnecting in the background. Clear the reference before stopping so the old connection's
-		// onclose handler sees it is no longer the active one and stays silent.
+		// Clear the reference before stopping so the old connection's onclose handler stays silent.
 		if (this.#connection) {
 			const previousConnection = this.#connection;
 			this.#connection = undefined;
@@ -129,8 +127,6 @@ export class UmbPreviewContext extends UmbContextBase {
 			.withAutomaticReconnect(new UmbSignalRReconnectPolicy())
 			.build();
 
-		// Capture this specific connection so its onclose handler can tell whether it is still the active
-		// one; if it has since been replaced or cleared, the close was deliberate and should stay silent.
 		const connection = this.#connection;
 
 		this.#connection.on('refreshed', (payload) => {
@@ -160,9 +156,7 @@ export class UmbPreviewContext extends UmbContextBase {
 		});
 
 		this.#connection.onclose(() => {
-			// With automatic reconnect, onclose only fires when we stop the connection ourselves (teardown,
-			// exit, or replacing it) or for a close that cannot be recovered. Only warn when this is still
-			// the active connection — i.e. an unexpected drop we did not initiate.
+			// A connection that is no longer the active one was stopped deliberately.
 			if (this.#connection !== connection) {
 				return;
 			}

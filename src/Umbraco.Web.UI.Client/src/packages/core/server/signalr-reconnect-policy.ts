@@ -5,7 +5,7 @@ const MAX_RECONNECT_DELAY_MS = 30000;
 
 /**
  * A SignalR retry policy that reconnects indefinitely with a capped backoff.
- * The default `withAutomaticReconnect()` policy gives up after ~60 seconds, which leaves an idle
+ * The default `withAutomaticReconnect()` policy gives up after ~40 seconds, which leaves an idle
  * backoffice (preview, server events) permanently disconnected.
  */
 export class UmbSignalRReconnectPolicy implements IRetryPolicy {
