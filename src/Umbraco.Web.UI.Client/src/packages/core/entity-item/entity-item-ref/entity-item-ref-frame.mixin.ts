@@ -27,7 +27,7 @@ export declare abstract class UmbEntityItemRefFrameMixinElement extends LitEleme
 
 // Constructor type carries `styles` separately, since ClassConstructor<T> only describes instances, not statics.
 type UmbEntityItemRefFrameMixinConstructor = ClassConstructor<UmbEntityItemRefFrameMixinElement> & {
-	styles: CSSResultGroup[];
+	styles: Array<CSSResultGroup>;
 };
 
 /**
@@ -49,7 +49,8 @@ export const UmbEntityItemRefFrameMixin = <T extends ClassConstructor<LitElement
 			return html`<umb-entity-frame aria-hidden="true"><uui-icon name="link"></uui-icon> ${name}</umb-entity-frame>`;
 		}
 
-		static styles = [
+		static styles: Array<CSSResultGroup> = [
+			(superClass as unknown as typeof LitElement).styles ?? [],
 			css`
 				:host {
 					--umb-entity-frame-opacity: 0;
