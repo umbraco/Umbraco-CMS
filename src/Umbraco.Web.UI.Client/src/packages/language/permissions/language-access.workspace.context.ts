@@ -18,6 +18,9 @@ export class UmbLanguageAccessWorkspaceContext extends UmbContextBase {
 	#currentUserHasAccessToInvariantForVariant?: boolean;
 	#variantOptions?: UmbEntityVariantOptionModel<UmbEntityVariantModel>[];
 	#contentTypeProperties?: Array<UmbPropertyTypeModel>;
+	#readOnlyRuleUniques: Array<string> = [];
+	#propertyWriteRuleUniques: Array<string> = [];
+	#variantWriteRuleUniques: Array<string> = [];
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_LANGUAGE_ACCESS_WORKSPACE_CONTEXT);
@@ -83,6 +86,7 @@ export class UmbLanguageAccessWorkspaceContext extends UmbContextBase {
 			message: 'You do not have permission to edit this culture',
 		}));
 		this.#workspaceContext.variantWriteGuard?.addRules(variantWriteRules);
+		this.#variantWriteRuleUniques = variantWriteRules.map((rule) => rule.unique);
 
 		if (this.#currentUserHasAccessToInvariantForVariant) {
 			// The user is allowed to edit invariant (shared) property data on variant content. Don't
@@ -94,7 +98,7 @@ export class UmbLanguageAccessWorkspaceContext extends UmbContextBase {
 
 			const propertyRules = datasetVariantIds.flatMap((datasetVariantId) =>
 				variantProperties.map((prop) => ({
-					unique: this.#propertyRuleUnique(datasetVariantId.culture, prop.unique),
+					unique: `${PROPERTY_WRITE_RULE_PREFIX}${datasetVariantId.toString()}_${prop.unique}`,
 					variantId: new UmbVariantId(
 						prop.variesByCulture ? datasetVariantId.culture : null,
 						prop.variesBySegment ? datasetVariantId.segment : null,
@@ -107,41 +111,30 @@ export class UmbLanguageAccessWorkspaceContext extends UmbContextBase {
 			);
 
 			this.#workspaceContext.propertyWriteGuard?.addRules(propertyRules);
+			this.#propertyWriteRuleUniques = propertyRules.map((rule) => rule.unique);
 		} else {
 			// The user has no permission to edit invariant-for-variant data, so fall back to locking
 			// the entire disallowed culture dataset read-only (original behavior).
 			const readOnlyRules = datasetVariantIds.map((variantId) => {
 				return {
-					unique: READ_ONLY_RULE_PREFIX + variantId.culture,
+					unique: READ_ONLY_RULE_PREFIX + variantId.toString(),
 					variantId,
 					message: 'You do not have permission to edit to this culture',
 				};
 			});
 
 			this.#workspaceContext.readOnlyGuard?.addRules(readOnlyRules);
+			this.#readOnlyRuleUniques = readOnlyRules.map((rule) => rule.unique);
 		}
 	}
 
 	#clearPreviousRules() {
-		const cultures = this.#variantOptions?.map((variant) => variant.culture) ?? [];
-
-		const readOnlyIdentifiers = cultures.map((culture) => READ_ONLY_RULE_PREFIX + culture);
-		this.#workspaceContext?.readOnlyGuard?.removeRules(readOnlyIdentifiers);
-
-		const propertyIdentifiers = cultures.flatMap(
-			(culture) => this.#contentTypeProperties?.map((prop) => this.#propertyRuleUnique(culture, prop.unique)) ?? [],
-		);
-		this.#workspaceContext?.propertyWriteGuard?.removeRules(propertyIdentifiers);
-
-		const variantWriteIdentifiers =
-			this.#variantOptions?.map(
-				(variant) => VARIANT_WRITE_RULE_PREFIX + new UmbVariantId(variant.culture, variant.segment).toString(),
-			) ?? [];
-		this.#workspaceContext?.variantWriteGuard?.removeRules(variantWriteIdentifiers);
-	}
-
-	#propertyRuleUnique(culture: string | null | undefined, propertyUnique: string) {
-		return `${PROPERTY_WRITE_RULE_PREFIX}${culture}_${propertyUnique}`;
+		this.#workspaceContext?.readOnlyGuard?.removeRules(this.#readOnlyRuleUniques);
+		this.#workspaceContext?.propertyWriteGuard?.removeRules(this.#propertyWriteRuleUniques);
+		this.#workspaceContext?.variantWriteGuard?.removeRules(this.#variantWriteRuleUniques);
+		this.#readOnlyRuleUniques = [];
+		this.#propertyWriteRuleUniques = [];
+		this.#variantWriteRuleUniques = [];
 	}
 }
 

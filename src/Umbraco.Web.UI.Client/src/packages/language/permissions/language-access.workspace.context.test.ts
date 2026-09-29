@@ -29,13 +29,17 @@ class UmbContentWorkspaceContextStub extends UmbContextBase {
 	}
 
 	setCultures(cultures: Array<string>) {
+		this.setVariants(cultures.map((culture) => new UmbVariantId(culture)));
+	}
+
+	setVariants(variantIds: Array<UmbVariantId>) {
 		this.#variantOptions.setValue(
-			cultures.map(
-				(culture) =>
+			variantIds.map(
+				(variantId) =>
 					({
-						culture,
-						segment: null,
-						unique: new UmbVariantId(culture).toString(),
+						culture: variantId.culture,
+						segment: variantId.segment,
+						unique: variantId.toString(),
 					}) as UmbEntityVariantOptionModel,
 			),
 		);
@@ -156,6 +160,38 @@ describe('UmbLanguageAccessWorkspaceContext', () => {
 			await createContext();
 
 			expect(host.workspaceContext.variantWriteGuard.getIsPermittedForVariant(daDK)).to.be.true;
+		});
+	});
+
+	describe('with segment variants of a culture the user has no access to', () => {
+		const enUSSegment = new UmbVariantId('en-US', 'segment');
+
+		beforeEach(() => {
+			host.workspaceContext.setVariants([enUS, enUSSegment, daDK]);
+			host.workspaceContext.setContentTypeProperties([
+				{ unique: 'variant-property', variesByCulture: true, variesBySegment: false },
+				{ unique: 'invariant-property', variesByCulture: false, variesBySegment: false },
+			]);
+		});
+
+		it('denies writing variant properties in every segment of the culture with invariant-for-variant access', async () => {
+			host.currentUserContext.setHasAccessToInvariantForVariant(true);
+			await createContext();
+
+			const propertyWriteGuard = host.workspaceContext.propertyWriteGuard;
+			expect(propertyWriteGuard.getIsPermittedForVariantAndProperty(enUS, { unique: 'variant-property' }, enUS)).to.be
+				.false;
+			expect(
+				propertyWriteGuard.getIsPermittedForVariantAndProperty(enUS, { unique: 'variant-property' }, enUSSegment),
+			).to.be.false;
+		});
+
+		it('makes every segment of the culture read-only without invariant-for-variant access', async () => {
+			host.currentUserContext.setHasAccessToInvariantForVariant(false);
+			await createContext();
+
+			expect(host.workspaceContext.readOnlyGuard.getIsPermittedForVariant(enUS)).to.be.true;
+			expect(host.workspaceContext.readOnlyGuard.getIsPermittedForVariant(enUSSegment)).to.be.true;
 		});
 	});
 
