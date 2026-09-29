@@ -10,8 +10,10 @@ const TEST_REPOSITORY_ALIAS = 'Umb.Test.EntityReferencesSummary.Repository';
 class UmbTestReferenceRepository implements UmbEntityReferenceRepository {
 	static referencedByTotal = 0;
 	static descendantsTotal = 0;
+	static shouldFail = false;
 
 	async requestReferencedBy() {
+		if (UmbTestReferenceRepository.shouldFail) throw new Error('Reference lookup failed');
 		return { data: { items: [], total: UmbTestReferenceRepository.referencedByTotal } };
 	}
 
@@ -46,6 +48,7 @@ describe('UmbEntityReferencesSummaryElement', () => {
 	beforeEach(() => {
 		UmbTestReferenceRepository.referencedByTotal = 0;
 		UmbTestReferenceRepository.descendantsTotal = 0;
+		UmbTestReferenceRepository.shouldFail = false;
 		element = document.createElement('umb-entity-references-summary') as UmbEntityReferencesSummaryElement;
 	});
 
@@ -58,7 +61,7 @@ describe('UmbEntityReferencesSummaryElement', () => {
 		document.body.appendChild(element);
 		await aTimeout(0);
 
-		expect(element.shadowRoot?.querySelector('p'), 'summary line').to.equal(null);
+		expect(element.shadowRoot?.querySelector('p'), 'summary line').to.be.null;
 	});
 
 	it('renders a separate button for each reference kind once references exist', async () => {
@@ -94,5 +97,33 @@ describe('UmbEntityReferencesSummaryElement', () => {
 		await aTimeout(0);
 
 		expect(changeCount).to.equal(1);
+	});
+
+	it('reloads the totals when config changes after the first render', async () => {
+		UmbTestReferenceRepository.referencedByTotal = 1;
+		element.config = { unique: 'elm-1', referenceRepositoryAlias: TEST_REPOSITORY_ALIAS, itemRepositoryAlias: 'n/a' };
+		document.body.appendChild(element);
+		await aTimeout(0);
+		expect(element.getTotalReferencedBy()).to.equal(1);
+
+		UmbTestReferenceRepository.referencedByTotal = 4;
+		element.config = { unique: 'elm-2', referenceRepositoryAlias: TEST_REPOSITORY_ALIAS, itemRepositoryAlias: 'n/a' };
+		await aTimeout(0);
+
+		expect(element.getTotalReferencedBy()).to.equal(4);
+	});
+
+	it('still dispatches a change event, reporting no references, when loading fails', async () => {
+		UmbTestReferenceRepository.shouldFail = true;
+		element.config = { unique: 'elm-1', referenceRepositoryAlias: TEST_REPOSITORY_ALIAS, itemRepositoryAlias: 'n/a' };
+
+		let changeCount = 0;
+		element.addEventListener('change', () => changeCount++);
+
+		document.body.appendChild(element);
+		await aTimeout(0);
+
+		expect(changeCount).to.equal(1);
+		expect(element.getTotalReferencedBy()).to.equal(0);
 	});
 });
