@@ -61,16 +61,13 @@ test('can create a data type in a folder using create options', async ({umbracoA
 
   // Assert
   expect(await umbracoApi.dataType.doesNameExist(dataTypeName)).toBeTruthy();
-  const dataTypeFolderChildren = await umbracoApi.dataType.getChildren(dataTypeFolderId);
-  expect(dataTypeFolderChildren[0].name).toBe(dataTypeName);
+  await expect.poll(async () => (await umbracoApi.dataType.getChildren(dataTypeFolderId))[0]?.name).toBe(dataTypeName);
   await umbracoUi.dataType.goToDataType(dataTypeFolderName);
   await umbracoUi.dataType.doesTreeItemHaveTheCorrectIcon(dataTypeName, 'icon-autofill');
 });
 
-test('can create a data type folder in a folder using create options', async ({umbracoApi, umbracoUi}) => {
+test('can create a data type folder in a folder from the tree actions menu', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const childFolderName = 'Test Child Folder';
-  await umbracoApi.dataType.ensureNameNotExists(childFolderName);
   const dataTypeFolderId = await umbracoApi.dataType.createFolder(dataTypeFolderName);
   await umbracoUi.dataType.reloadDataTypeTree();
 
@@ -81,9 +78,10 @@ test('can create a data type folder in a folder using create options', async ({u
 
   // Assert
   expect(await umbracoApi.dataType.doesNameExist(childFolderName)).toBeTruthy();
-  const dataTypeFolderChildren = await umbracoApi.dataType.getChildren(dataTypeFolderId);
-  expect(dataTypeFolderChildren[0].name).toBe(childFolderName);
-  expect(dataTypeFolderChildren[0].isFolder).toBeTruthy();
+  await expect.poll(async () => {
+    const [child] = await umbracoApi.dataType.getChildren(dataTypeFolderId);
+    return {name: child?.name, isFolder: child?.isFolder};
+  }).toEqual({name: childFolderName, isFolder: true});
   await umbracoUi.dataType.openCaretButtonForName(dataTypeFolderName);
   await umbracoUi.dataType.doesTreeItemHaveTheCorrectIcon(childFolderName, 'icon-folder');
 });

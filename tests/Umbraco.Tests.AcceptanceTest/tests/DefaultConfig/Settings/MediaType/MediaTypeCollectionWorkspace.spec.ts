@@ -60,16 +60,13 @@ test('can create a media type in a folder using create options', {tag: '@release
 
   // Assert
   expect(await umbracoApi.mediaType.doesNameExist(mediaTypeName)).toBeTruthy();
-  const mediaTypeFolderChildren = await umbracoApi.mediaType.getChildren(mediaTypeFolderId);
-  expect(mediaTypeFolderChildren[0].name).toBe(mediaTypeName);
+  await expect.poll(async () => (await umbracoApi.mediaType.getChildren(mediaTypeFolderId))[0]?.name).toBe(mediaTypeName);
   await umbracoUi.mediaType.goToMediaType(mediaTypeFolderName);
   await umbracoUi.mediaType.doesTreeItemHaveTheCorrectIcon(mediaTypeName, 'icon-picture');
 });
 
-test('can create a media type folder in a folder using create options', async ({umbracoApi, umbracoUi}) => {
+test('can create a media type folder in a folder from the tree actions menu', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const childFolderName = 'Test Child Folder';
-  await umbracoApi.mediaType.ensureNameNotExists(childFolderName);
   const mediaTypeFolderId = await umbracoApi.mediaType.createFolder(mediaTypeFolderName);
   await umbracoUi.mediaType.reloadMediaTypeTree();
 
@@ -83,12 +80,10 @@ test('can create a media type folder in a folder using create options', async ({
 
   // Assert
   expect(await umbracoApi.mediaType.doesNameExist(childFolderName)).toBeTruthy();
-  const mediaTypeFolderChildren = await umbracoApi.mediaType.getChildren(mediaTypeFolderId);
-  expect(mediaTypeFolderChildren[0].name).toBe(childFolderName);
-  expect(mediaTypeFolderChildren[0].isFolder).toBeTruthy();
+  await expect.poll(async () => {
+    const [child] = await umbracoApi.mediaType.getChildren(mediaTypeFolderId);
+    return {name: child?.name, isFolder: child?.isFolder};
+  }).toEqual({name: childFolderName, isFolder: true});
   await umbracoUi.mediaType.openCaretButtonForName(mediaTypeFolderName);
   await umbracoUi.mediaType.doesTreeItemHaveTheCorrectIcon(childFolderName, 'icon-folder');
-
-  // Clean
-  await umbracoApi.mediaType.ensureNameNotExists(childFolderName);
 });

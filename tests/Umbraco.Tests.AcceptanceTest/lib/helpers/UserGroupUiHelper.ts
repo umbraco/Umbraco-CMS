@@ -57,9 +57,13 @@ export class UserGroupUiHelper extends UiBaseLocators {
   }
 
   async clickUserGroupsButton() {
-    await this.click(this.userGroupsBtn);
-    // Wait for the list to render (default groups always yield a row) instead of a fixed sleep.
-    await expect(this.firstUserGroupRow).toBeVisible({timeout: ConstantHelper.timeout.long});
+    // The nav click can land before the collection route is ready, leaving the list unrendered.
+    await expect(async () => {
+      if (!(await this.firstUserGroupRow.isVisible())) {
+        await this.click(this.userGroupsBtn);
+      }
+      await expect(this.firstUserGroupRow).toBeVisible({timeout: ConstantHelper.timeout.short});
+    }).toPass({timeout: ConstantHelper.timeout.long});
   }
 
   async enterUserGroupName(name: string) {

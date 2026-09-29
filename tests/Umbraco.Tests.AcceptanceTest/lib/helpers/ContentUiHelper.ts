@@ -2265,6 +2265,8 @@ export class ContentUiHelper extends UiBaseLocators {
 
   async enterBlockPropertyValue(propertyName: string, value: string) {
     const property = this.blockProperty.filter({hasText: propertyName});
+    // The block workspace renders its properties asynchronously once the block type is chosen.
+    await this.waitForVisible(property, ConstantHelper.timeout.long);
     await this.enterText(property.locator('input'), value);
   }
 
