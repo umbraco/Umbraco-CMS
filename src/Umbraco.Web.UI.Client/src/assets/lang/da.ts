@@ -3072,8 +3072,6 @@ export default {
 		resultsCount: (count: number) => `Fandt ${count} resultat${count !== 1 ? 'er' : ''}`,
 		tableColumnName: 'Navn',
 		tableColumnEntityType: 'Type',
-		statsBoxLabel: 'Statistik',
-		searchBoxLabel: 'Søgning',
 		// Accessibility labels
 		searching: 'Søger...',
 		searchFailed: 'Søgning fejlede',
