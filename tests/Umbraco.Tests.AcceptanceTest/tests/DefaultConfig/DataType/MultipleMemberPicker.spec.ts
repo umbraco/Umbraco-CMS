@@ -1,7 +1,7 @@
 import {ConstantHelper, test} from '@umbraco/acceptance-test-helpers';
 import {expect} from "@playwright/test";
 
-const propertyEditorName = 'Multiple Member Picker';
+const propertyEditorName = 'Member Picker';
 const customDataTypeName = 'Custom Multiple Member Picker';
 const editorAlias = 'Umbraco.MemberPicker.Multiple';
 const editorUiAlias = 'Umb.PropertyEditorUi.MemberPicker.Multiple';

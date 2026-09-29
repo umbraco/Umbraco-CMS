@@ -1,7 +1,7 @@
 import {ConstantHelper, test} from '@umbraco/acceptance-test-helpers';
 import {expect} from "@playwright/test";
 
-const propertyEditorName = 'Multiple Document Picker';
+const propertyEditorName = 'Document Picker';
 const customDataTypeName = 'Custom Multiple Document Picker';
 const editorAlias = 'Umbraco.DocumentPicker.Multiple';
 const editorUiAlias = 'Umb.PropertyEditorUi.DocumentPicker.Multiple';
