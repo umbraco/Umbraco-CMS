@@ -31,6 +31,11 @@ public static partial class Constants
                 ///     The localization key for pattern mismatch validation error.
                 /// </summary>
                 public const string PatternMismatch = "#validation_invalidPattern";
+
+                /// <summary>
+                ///     The localization key for a value that could not be interpreted by the property editor.
+                /// </summary>
+                public const string Invalid = "#validation_invalidValue";
             }
         }
     }

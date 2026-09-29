@@ -23,7 +23,7 @@ export const manifest: ManifestPropertyEditorSchema = {
 				{
 					alias: 'validationLimit',
 					label: 'Amount',
-					description: 'Set a required range of medias',
+					description: '#validation_minimumOnlyWhenInUse',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.NumberRange',
 					config: [{ alias: 'validationRange', value: { min: 0, max: Infinity } }],
 				},

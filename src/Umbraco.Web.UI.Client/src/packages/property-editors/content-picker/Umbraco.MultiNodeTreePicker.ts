@@ -11,7 +11,7 @@ export const manifest: ManifestPropertyEditorSchema = {
 				{
 					alias: 'minNumber',
 					label: 'Minimum number of items',
-					description: '',
+					description: '#validation_minimumOnlyWhenInUse',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Integer',
 					config: [{ alias: 'min', value: 0 }],
 				},
