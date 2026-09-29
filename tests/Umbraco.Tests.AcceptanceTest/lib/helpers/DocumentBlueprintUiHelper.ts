@@ -80,4 +80,19 @@ export class DocumentBlueprintUiHelper extends UiBaseLocators{
   async clickConfirmToDeleteButtonAndWaitForDocumentBlueprintToBeDeleted() {
     return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.documentBlueprint, this.clickConfirmToDeleteButton(), ConstantHelper.statusCodes.ok);
   }
+
+  async createDocumentBlueprintFolderAndWaitForFolderToBeCreated(folderName: string) {
+    await this.clickCreateActionMenuOption();
+    await this.clickFolderButton();
+    await this.enterFolderName(folderName);
+    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.documentBlueprintFolder, this.clickConfirmCreateFolderButton(), ConstantHelper.statusCodes.created);
+  }
+
+  async clickConfirmRenameButtonAndWaitForFolderToBeRenamed() {
+    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.documentBlueprintFolder, this.clickConfirmRenameButton(), ConstantHelper.statusCodes.ok);
+  }
+
+  async clickConfirmToDeleteButtonAndWaitForFolderToBeDeleted() {
+    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.documentBlueprintFolder, this.clickConfirmToDeleteButton(), ConstantHelper.statusCodes.ok);
+  }
 }
