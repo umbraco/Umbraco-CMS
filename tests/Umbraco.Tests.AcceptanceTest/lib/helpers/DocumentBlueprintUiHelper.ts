@@ -26,6 +26,14 @@ export class DocumentBlueprintUiHelper extends UiBaseLocators{
     await this.click(this.documentBlueprintSidebarHeader.getByTestId('open-dropdown'), {force: true});
   }
 
+  async isDocumentBlueprintSidebarHeaderVisible(isVisible: boolean = true) {
+    return this.isVisible(this.documentBlueprintSidebarHeader, isVisible);
+  }
+
+  async isChildDocumentBlueprintInTreeVisible(parentName: string, childName: string, isVisible: boolean = true) {
+    await this.isVisible(this.documentBlueprintTree.locator(`[label="${parentName}"]`).locator(`uui-menu-item[label="${childName}"]`), isVisible);
+  }
+
   async chooseDocumentTypeForDocumentBlueprint(documentTypeName: string) {
     await this.click(this.itemPickerModal.locator(`umb-ref-item[name="${documentTypeName}"]`));
   }
