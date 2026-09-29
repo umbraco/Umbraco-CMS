@@ -1,7 +1,7 @@
 import type { UmbPropertyActionArgs } from '../../types.js';
 import type { ManifestPropertyAction, MetaPropertyAction } from '../../property-action.extension.js';
 import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
-import { umbExtensionsRegistry, umbRenderGroupSeparator } from '@umbraco-cms/backoffice/extension-registry';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbExtensionsElementAndApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -58,7 +58,9 @@ export class UmbPropertyActionMenuElement extends UmbLitElement {
 						this._actions,
 						(action) => action.alias,
 						(action, i) =>
-							html`${umbRenderGroupSeparator(this._actions[i - 1]?.manifest, action.manifest!)}${action.component}`,
+							html`${i > 0 && action.manifest?.separatorBefore
+								? html`<umb-separator></umb-separator>`
+								: nothing}${action.component}`,
 					)}
 				</umb-popover-layout>
 			</uui-popover-container>

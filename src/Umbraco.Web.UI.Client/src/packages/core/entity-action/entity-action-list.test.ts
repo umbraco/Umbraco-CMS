@@ -7,7 +7,6 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 import { UmbEntityContext } from '@umbraco-cms/backoffice/entity';
-import '../extension-registry/components/extension-with-api-slot/extension-with-api-slot.element.js';
 
 @customElement('umb-test-entity-action-list-action')
 class UmbTestEntityActionElement extends UmbControllerHostElementMixin(HTMLElement) {}
@@ -32,11 +31,13 @@ class UmbTestEntityActionListHostElement extends UmbLitElement {
 	}
 }
 
+type TestAction = { alias: string; weight: number; separatorBefore?: boolean };
+
 function sleep(timeMs: number) {
 	return new Promise((resolve) => setTimeout(resolve, timeMs));
 }
 
-function registerActions(actions: Array<{ alias: string; weight: number; group?: string }>) {
+function registerActions(actions: Array<TestAction>) {
 	umbExtensionsRegistry.registerMany(
 		actions.map(
 			(action): ManifestEntityAction => ({
@@ -44,7 +45,7 @@ function registerActions(actions: Array<{ alias: string; weight: number; group?:
 				alias: action.alias,
 				name: action.alias,
 				weight: action.weight,
-				group: action.group,
+				separatorBefore: action.separatorBefore,
 				forEntityTypes: [ENTITY_TYPE],
 				elementName: 'umb-test-entity-action-list-action',
 				api: UmbTestEntityActionApi,
@@ -62,14 +63,18 @@ function registerActions(actions: Array<{ alias: string; weight: number; group?:
 function readSequence(element: UmbEntityActionListElement): Array<string> {
 	const slot = element.shadowRoot!.querySelector('umb-extension-with-api-slot')!;
 	return Array.from(slot.shadowRoot!.children).map((child) =>
-		child.getAttribute('role') === 'separator' ? '|' : (child as any).manifest.alias,
+		child.getAttribute('role') === 'separator'
+			? '|'
+			: child instanceof UmbTestEntityActionElement
+				? (child as any).manifest.alias
+				: child.tagName,
 	);
 }
 
 describe('UmbEntityActionListElement', () => {
 	let aliases: Array<string> = [];
 
-	async function renderList(actions: Array<{ alias: string; weight: number; group?: string }>) {
+	async function renderList(actions: Array<TestAction>) {
 		aliases = actions.map((a) => a.alias);
 		registerActions(actions);
 		const host = await fixture<UmbTestEntityActionListHostElement>(
@@ -94,7 +99,7 @@ describe('UmbEntityActionListElement', () => {
 		expect(slot.shadowRoot!.firstElementChild).to.be.instanceOf(UmbTestEntityActionElement);
 	});
 
-	it('renders no separators when no action has a group', async () => {
+	it('renders no separators when no action sets separatorBefore', async () => {
 		const element = await renderList([
 			{ alias: 'a', weight: 3 },
 			{ alias: 'b', weight: 2 },
@@ -103,54 +108,38 @@ describe('UmbEntityActionListElement', () => {
 		expect(readSequence(element)).to.deep.equal(['a', 'b', 'c']);
 	});
 
-	it('renders a separator between adjacent actions of different groups', async () => {
+	it('renders a separator above each action that sets separatorBefore', async () => {
 		const element = await renderList([
-			{ alias: 'a', weight: 4, group: 'create' },
-			{ alias: 'b', weight: 3, group: 'create' },
-			{ alias: 'c', weight: 2, group: 'danger' },
-			{ alias: 'd', weight: 1, group: 'danger' },
+			{ alias: 'a', weight: 4 },
+			{ alias: 'b', weight: 3, separatorBefore: true },
+			{ alias: 'c', weight: 2 },
+			{ alias: 'd', weight: 1, separatorBefore: true },
 		]);
-		expect(readSequence(element)).to.deep.equal(['a', 'b', '|', 'c', 'd']);
+		expect(readSequence(element)).to.deep.equal(['a', '|', 'b', 'c', '|', 'd']);
 	});
 
-	it('treats actions without a group as a group of their own', async () => {
+	it('never renders a separator above the first action', async () => {
 		const element = await renderList([
-			{ alias: 'a', weight: 3, group: 'create' },
-			{ alias: 'b', weight: 2 },
-			{ alias: 'c', weight: 1, group: 'danger' },
+			{ alias: 'a', weight: 2, separatorBefore: true },
+			{ alias: 'b', weight: 1 },
 		]);
-		expect(readSequence(element)).to.deep.equal(['a', '|', 'b', '|', 'c']);
+		expect(readSequence(element)).to.deep.equal(['a', 'b']);
 	});
 
-	it('orders by weight and separates a group again when interleaved by another group', async () => {
+	it('renders a separator only while its action is rendered', async () => {
 		const element = await renderList([
-			{ alias: 'a', weight: 3, group: 'create' },
-			{ alias: 'b', weight: 2, group: 'danger' },
-			{ alias: 'c', weight: 1, group: 'create' },
+			{ alias: 'a', weight: 3 },
+			{ alias: 'c', weight: 1 },
 		]);
-		expect(readSequence(element)).to.deep.equal(['a', '|', 'b', '|', 'c']);
-	});
+		expect(readSequence(element)).to.deep.equal(['a', 'c']);
 
-	it('keeps add-on groups contiguous when their weights are contiguous', async () => {
-		const element = await renderList([
-			{ alias: 'core.create', weight: 1200, group: 'create' },
-			{ alias: 'core.publish', weight: 600, group: 'publishing' },
-			{ alias: 'workflow.request', weight: 590, group: 'workflow' },
-			{ alias: 'workflow.history', weight: 580, group: 'workflow' },
-			{ alias: 'forms.entries', weight: 150, group: 'forms' },
-			{ alias: 'core.delete', weight: 100, group: 'danger' },
-		]);
-		expect(readSequence(element)).to.deep.equal([
-			'core.create',
-			'|',
-			'core.publish',
-			'|',
-			'workflow.request',
-			'workflow.history',
-			'|',
-			'forms.entries',
-			'|',
-			'core.delete',
-		]);
+		aliases.push('b');
+		registerActions([{ alias: 'b', weight: 2, separatorBefore: true }]);
+		await sleep(100);
+		expect(readSequence(element)).to.deep.equal(['a', '|', 'b', 'c']);
+
+		umbExtensionsRegistry.unregister('b');
+		await sleep(100);
+		expect(readSequence(element)).to.deep.equal(['a', 'c']);
 	});
 });
