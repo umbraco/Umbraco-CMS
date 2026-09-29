@@ -57,14 +57,14 @@ public class MultipleTextStringPropertyEditor : DataEditor, IValueSchemaProvider
         // Add min/max items from configuration if available
         if (configuration is MultipleTextStringConfiguration textStringConfig)
         {
-            if (textStringConfig.Min > 0)
+            if (textStringConfig.ValidationLimit.Min is int min && min > 0)
             {
-                schema["minItems"] = textStringConfig.Min;
+                schema["minItems"] = min;
             }
 
-            if (textStringConfig.Max > 0)
+            if (textStringConfig.ValidationLimit.Max is int max && max > 0)
             {
-                schema["maxItems"] = textStringConfig.Max;
+                schema["maxItems"] = max;
             }
         }
 
@@ -238,26 +238,29 @@ public class MultipleTextStringPropertyEditor : DataEditor, IValueSchemaProvider
                     ? strings.Count(s => string.IsNullOrWhiteSpace(s) is false)
                     : 0;
 
-            if (stringCount < multipleTextStringConfiguration.Min)
+            var minCount = multipleTextStringConfiguration.ValidationLimit.Min ?? 0;
+            var maxCount = multipleTextStringConfiguration.ValidationLimit.Max ?? 0;
+
+            if (stringCount < minCount)
             {
                 if (stringCount == 1)
                 {
                     yield return new ValidationResult(
-                        _localizedTextService.Localize("validation", "outOfRangeSingleItemMinimum", [multipleTextStringConfiguration.Min.ToString()]),
+                        _localizedTextService.Localize("validation", "outOfRangeSingleItemMinimum", [minCount.ToString()]),
                         ["value"]);
                 }
                 else
                 {
                     yield return new ValidationResult(
-                        _localizedTextService.Localize("validation", "outOfRangeMultipleItemsMinimum", [stringCount.ToString(), multipleTextStringConfiguration.Min.ToString()]),
+                        _localizedTextService.Localize("validation", "outOfRangeMultipleItemsMinimum", [stringCount.ToString(), minCount.ToString()]),
                         ["value"]);
                 }
             }
 
-            if (multipleTextStringConfiguration.Max > 0 && stringCount > multipleTextStringConfiguration.Max)
+            if (maxCount > 0 && stringCount > maxCount)
             {
                 yield return new ValidationResult(
-                    _localizedTextService.Localize("validation", "outOfRangeMultipleItemsMaximum", [stringCount.ToString(), multipleTextStringConfiguration.Max.ToString()]),
+                    _localizedTextService.Localize("validation", "outOfRangeMultipleItemsMaximum", [stringCount.ToString(), maxCount.ToString()]),
                     ["value"]);
             }
         }

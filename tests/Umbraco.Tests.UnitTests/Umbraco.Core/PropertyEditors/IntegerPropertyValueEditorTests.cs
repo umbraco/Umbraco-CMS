@@ -152,6 +152,23 @@ public class IntegerPropertyValueEditorTests
         }
     }
 
+    [TestCase(17, false)] // With no configured minimum, step validation is anchored at zero, so 17 is not a valid step of 2.
+    [TestCase(18, true)]
+    public void Validates_Step_Anchored_At_Zero_When_Minimum_Unset(object value, bool expectedSuccess)
+    {
+        var editor = CreateValueEditor(step: 2, min: null);
+        var result = editor.Validate(value, false, null, PropertyValidationContext.Empty());
+        if (expectedSuccess)
+        {
+            Assert.IsEmpty(result);
+        }
+        else
+        {
+            Assert.AreEqual(1, result.Count());
+            Assert.AreEqual("validation_invalidStep", result.First().ErrorMessage);
+        }
+    }
+
     private static object? FromEditor(object? value)
         => CreateValueEditor().FromEditor(new ContentPropertyData(value, null), null);
 
@@ -165,7 +182,7 @@ public class IntegerPropertyValueEditorTests
         return CreateValueEditor().ToEditor(property.Object);
     }
 
-    private static IntegerPropertyEditor.IntegerPropertyValueEditor CreateValueEditor(int step = 2)
+    private static IntegerPropertyEditor.IntegerPropertyValueEditor CreateValueEditor(int step = 2, int? min = 10)
     {
         var localizedTextServiceMock = new Mock<ILocalizedTextService>();
         localizedTextServiceMock.Setup(x => x.Localize(
@@ -183,10 +200,25 @@ public class IntegerPropertyValueEditorTests
         {
             ConfigurationObject = new Dictionary<string, object>
             {
-                { "min", 10 },
-                { "max", 20 },
+                { "validationRange", CreateRange(min, 20) },
                 { "step", step }
             }
         };
+    }
+
+    private static Dictionary<string, object> CreateRange(int? min, int? max)
+    {
+        var range = new Dictionary<string, object>();
+        if (min.HasValue)
+        {
+            range["min"] = min.Value;
+        }
+
+        if (max.HasValue)
+        {
+            range["max"] = max.Value;
+        }
+
+        return range;
     }
 }

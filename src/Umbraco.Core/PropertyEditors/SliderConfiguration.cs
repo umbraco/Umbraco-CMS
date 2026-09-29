@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace Umbraco.Cms.Core.PropertyEditors;
 
 /// <summary>
@@ -12,16 +14,32 @@ public class SliderConfiguration
     public bool EnableRange { get; set; }
 
     /// <summary>
+    /// Gets or sets the allowed range (minimum and maximum values) of the slider.
+    /// </summary>
+    [ConfigurationField("validationRange", Type = typeof(RangeConfigurationField))]
+    public DecimalRange ValidationRange { get; set; } = new();
+
+    /// <summary>
     /// Gets or sets the minimum value of the slider.
     /// </summary>
-    [ConfigurationField("minVal")]
-    public decimal MinimumValue { get; set; }
+    [Obsolete("Use ValidationRange instead. Scheduled for removal in Umbraco 21.")]
+    [JsonIgnore]
+    public decimal MinimumValue
+    {
+        get => ValidationRange.Min ?? 0;
+        set => ValidationRange.Min = value;
+    }
 
     /// <summary>
     /// Gets or sets the maximum value of the slider.
     /// </summary>
-    [ConfigurationField("maxVal")]
-    public decimal MaximumValue { get; set; }
+    [Obsolete("Use ValidationRange instead. Scheduled for removal in Umbraco 21.")]
+    [JsonIgnore]
+    public decimal MaximumValue
+    {
+        get => ValidationRange.Max ?? 0;
+        set => ValidationRange.Max = value == 0 ? null : value;
+    }
 
     /// <summary>
     /// Gets or sets the step increment value for the slider.

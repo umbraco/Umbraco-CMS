@@ -270,28 +270,21 @@ public class DecimalPropertyValueEditorTests
         // When configuration is populated from the deserialized JSON, whole number values are deserialized as integers.
         // So we want to replicate that in our tests.
         var configuration = new Dictionary<string, object>();
+
+        var range = new Dictionary<string, object>();
         if (min.HasValue)
         {
-            if (min.Value % 1 == 0)
-            {
-                configuration.Add("min", (int)min.Value);
-            }
-            else
-            {
-                configuration.Add("min", min.Value);
-            }
+            range.Add("min", min.Value % 1 == 0 ? (object)(int)min.Value : min.Value);
         }
 
         if (max.HasValue)
         {
-            if (max.Value % 1 == 0)
-            {
-                configuration.Add("max", (int)max.Value);
-            }
-            else
-            {
-                configuration.Add("max", max.Value);
-            }
+            range.Add("max", max.Value % 1 == 0 ? (object)(int)max.Value : max.Value);
+        }
+
+        if (range.Count > 0)
+        {
+            configuration.Add("validationRange", range);
         }
 
         if (step.HasValue)

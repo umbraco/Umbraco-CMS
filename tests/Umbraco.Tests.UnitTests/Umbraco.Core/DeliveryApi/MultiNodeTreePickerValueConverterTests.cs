@@ -35,7 +35,7 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
     private PublishedDataType MultiNodePickerPublishedDataType(bool multiSelect, string entityType) =>
         new PublishedDataType(123, "test", "test", new Lazy<object>(() => new MultiNodePickerConfiguration
         {
-            MaxNumber = multiSelect ? 10 : 1,
+            ValidationLimit = new NumberRange { Max = multiSelect ? 10 : 1 },
             TreeSource = new MultiNodePickerConfigurationTreeSource
             {
                 ObjectType = entityType

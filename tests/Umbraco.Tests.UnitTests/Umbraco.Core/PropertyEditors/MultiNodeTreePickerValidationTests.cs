@@ -30,7 +30,7 @@ public class MultiNodeTreePickerValidationTests
     public void Validates_Minimum_Entries(int min, bool shouldSucceed, string? value)
     {
         var (valueEditor, _, _, _, _) = CreateValueEditor();
-        valueEditor.ConfigurationObject = new MultiNodePickerConfiguration { MinNumber = min};
+        valueEditor.ConfigurationObject = new MultiNodePickerConfiguration { ValidationLimit = new NumberRange { Min = min } };
 
         var result = valueEditor.Validate(value, false, null, PropertyValidationContext.Empty());
 
@@ -58,7 +58,7 @@ public class MultiNodeTreePickerValidationTests
     public void Validates_Maximum_Entries(int max, bool shouldSucceed, string value)
     {
         var (valueEditor, _, _, _, _) = CreateValueEditor();
-        valueEditor.ConfigurationObject = new MultiNodePickerConfiguration { MaxNumber = max };
+        valueEditor.ConfigurationObject = new MultiNodePickerConfiguration { ValidationLimit = new NumberRange { Max = max } };
 
         var result = valueEditor.Validate(value, false, null, PropertyValidationContext.Empty());
 

@@ -8,17 +8,10 @@ export const manifests: Array<UmbExtensionManifest> = [
 			settings: {
 				properties: [
 					{
-						alias: 'min',
-						label: 'Minimum',
-						description: 'Enter the minimum amount of number to be entered',
-						propertyEditorUiAlias: 'Umb.PropertyEditorUi.Integer',
-					},
-					{
-						alias: 'max',
-						label: 'Maximum',
-						description: 'Enter the maximum amount of number to be entered',
-						propertyEditorUiAlias: 'Umb.PropertyEditorUi.Integer',
-						config: [{ alias: 'placeholder', value: '∞' }],
+						alias: 'validationRange',
+						label: 'Value range',
+						description: 'Set the minimum and maximum value that can be entered',
+						propertyEditorUiAlias: 'Umb.PropertyEditorUi.NumberRange',
 					},
 					{
 						alias: 'step',
