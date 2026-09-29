@@ -166,8 +166,6 @@ test.skip('cannot add number of block element greater than the maximum amount', 
 test('cannot publish content with fewer block elements than the minimum amount', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const minAmount = 1;
-  // A max of 0 is stored literally rather than meaning unlimited, so {min: 1, max: 0} is unsatisfiable
-  // and no block could ever be added to clear the error.
   const maxAmount = 10;
   const customDataTypeId = await umbracoApi.dataType.createBlockGridWithABlockAndMinAndMaxAmount(customDataTypeName, elementTypeId, minAmount, maxAmount);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
