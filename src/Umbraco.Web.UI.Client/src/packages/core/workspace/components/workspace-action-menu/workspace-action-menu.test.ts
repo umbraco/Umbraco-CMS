@@ -3,13 +3,20 @@ import type { ManifestWorkspaceActionMenuItem } from '../../extensions/types.js'
 import { expect, fixture, html } from '@open-wc/testing';
 import type { UmbExtensionElementAndApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 
-function item(alias: string, group?: string) {
+function item(alias: string, separatorBefore?: boolean) {
 	const component = document.createElement('div');
 	component.dataset.alias = alias;
 	return {
 		alias,
 		component,
-		manifest: { type: 'workspaceActionMenuItem', alias, name: alias, group, forWorkspaceActions: [], meta: {} },
+		manifest: {
+			type: 'workspaceActionMenuItem',
+			alias,
+			name: alias,
+			separatorBefore,
+			forWorkspaceActions: [],
+			meta: {},
+		},
 	} as unknown as UmbExtensionElementAndApiInitializer<ManifestWorkspaceActionMenuItem>;
 }
 
@@ -29,13 +36,11 @@ describe('UmbWorkspaceActionMenuElement', () => {
 		expect(element).to.be.instanceOf(UmbWorkspaceActionMenuElement);
 	});
 
-	it('renders no separators when no item has a group', async () => {
+	it('renders no separators when no item sets separatorBefore', async () => {
 		expect(await renderSequence([item('a'), item('b')])).to.deep.equal(['a', 'b']);
 	});
 
-	it('renders a separator between adjacent items of different groups', async () => {
-		expect(
-			await renderSequence([item('a', 'publishing'), item('b', 'publishing'), item('c', 'workflow'), item('d')]),
-		).to.deep.equal(['a', 'b', '|', 'c', '|', 'd']);
+	it('renders a separator above each item that sets separatorBefore, except the first', async () => {
+		expect(await renderSequence([item('a', true), item('b'), item('c', true)])).to.deep.equal(['a', 'b', '|', 'c']);
 	});
 });

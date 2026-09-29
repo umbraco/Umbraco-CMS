@@ -22,7 +22,7 @@ function sleep(timeMs: number) {
 describe('UmbPropertyActionMenuElement', () => {
 	let aliases: Array<string> = [];
 
-	async function renderSequence(actions: Array<{ alias: string; weight: number; group?: string }>) {
+	async function renderSequence(actions: Array<{ alias: string; weight: number; separatorBefore?: boolean }>) {
 		aliases = actions.map((a) => a.alias);
 		umbExtensionsRegistry.registerMany(
 			actions.map(
@@ -31,7 +31,7 @@ describe('UmbPropertyActionMenuElement', () => {
 					alias: action.alias,
 					name: action.alias,
 					weight: action.weight,
-					group: action.group,
+					separatorBefore: action.separatorBefore,
 					forPropertyEditorUis: [PROPERTY_EDITOR_UI_ALIAS],
 					elementName: 'umb-test-property-action-menu-action',
 					api: UmbTestPropertyActionApi,
@@ -57,7 +57,7 @@ describe('UmbPropertyActionMenuElement', () => {
 		umbExtensionsRegistry.unregisterMany(aliases);
 	});
 
-	it('renders no separators when no action has a group', async () => {
+	it('renders no separators when no action sets separatorBefore', async () => {
 		expect(
 			await renderSequence([
 				{ alias: 'a', weight: 2 },
@@ -66,12 +66,12 @@ describe('UmbPropertyActionMenuElement', () => {
 		).to.deep.equal(['a', 'b']);
 	});
 
-	it('renders a separator between adjacent actions of different groups', async () => {
+	it('renders a separator above each action that sets separatorBefore, except the first', async () => {
 		expect(
 			await renderSequence([
-				{ alias: 'a', weight: 3, group: 'clipboard' },
-				{ alias: 'b', weight: 2, group: 'clipboard' },
-				{ alias: 'c', weight: 1 },
+				{ alias: 'a', weight: 3, separatorBefore: true },
+				{ alias: 'b', weight: 2 },
+				{ alias: 'c', weight: 1, separatorBefore: true },
 			]),
 		).to.deep.equal(['a', 'b', '|', 'c']);
 	});

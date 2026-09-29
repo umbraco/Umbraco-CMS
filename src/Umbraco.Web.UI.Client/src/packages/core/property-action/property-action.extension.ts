@@ -9,11 +9,10 @@ export interface ManifestPropertyAction<MetaType extends MetaPropertyAction = Me
 	type: 'propertyAction';
 	forPropertyEditorUis: string[];
 	/**
-	 * The group this action belongs to. Actions are still ordered by `weight`; a separator is rendered
-	 * between two adjacent actions whose groups differ. Actions without a group form a group of their own.
-	 * @example 'clipboard'
+	 * Renders a separator above this action, unless it is the first action in the list.
+	 * The separator belongs to this action, so it is not rendered when the action is not.
 	 */
-	group?: string;
+	separatorBefore?: boolean;
 	meta: MetaType;
 }
 

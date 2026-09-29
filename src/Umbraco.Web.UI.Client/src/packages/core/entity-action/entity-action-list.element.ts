@@ -1,7 +1,7 @@
 import type { UmbEntityActionArgs } from './types.js';
 import type { ManifestEntityAction, MetaEntityAction } from './entity-action.extension.js';
 import { UmbEntityContext, UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
-import { html, customElement, property, state, css } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, state, css, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type {
 	UmbApiConstructorArgumentsMethodType,
@@ -9,7 +9,6 @@ import type {
 } from '@umbraco-cms/backoffice/extension-api';
 import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
-import { umbRenderGroupSeparator } from '@umbraco-cms/backoffice/extension-registry';
 
 const umbEntityActionListDeprecation = new UmbDeprecation({
 	deprecated: 'The `entityType` and `unique` properties on `<umb-entity-action-list>`.',
@@ -105,7 +104,6 @@ export class UmbEntityActionListElement extends UmbLitElement {
 	#firstEntityAction?: HTMLElement;
 
 	#hasRenderedOnce?: boolean;
-	#previousManifest?: ManifestEntityAction;
 
 	#renderEntityAction = (ext: UmbExtensionElementAndApiInitializer<ManifestEntityAction>, i: number) => {
 		if (!this.#hasRenderedOnce && i === 0) {
@@ -114,9 +112,8 @@ export class UmbEntityActionListElement extends UmbLitElement {
 			this.#hasRenderedOnce = true;
 		}
 
-		const previous = i === 0 ? undefined : this.#previousManifest;
-		this.#previousManifest = ext.manifest;
-		return html`${umbRenderGroupSeparator(previous, ext.manifest!)}${ext.component}`;
+		const separator = i > 0 && ext.manifest?.separatorBefore;
+		return html`${separator ? html`<umb-separator></umb-separator>` : nothing}${ext.component}`;
 	};
 
 	override render() {
