@@ -52,6 +52,15 @@ describe('UmbEntityReferencesSummaryElement', () => {
 		element = document.createElement('umb-entity-references-summary') as UmbEntityReferencesSummaryElement;
 	});
 
+	async function connectAndCountChanges() {
+		element.config = { unique: 'elm-1', referenceRepositoryAlias: TEST_REPOSITORY_ALIAS, itemRepositoryAlias: 'n/a' };
+		let changeCount = 0;
+		element.addEventListener('change', () => changeCount++);
+		document.body.appendChild(element);
+		await aTimeout(0);
+		return changeCount;
+	}
+
 	afterEach(() => {
 		element.remove();
 	});
@@ -88,13 +97,8 @@ describe('UmbEntityReferencesSummaryElement', () => {
 
 	it('dispatches a change event once both totals have loaded', async () => {
 		UmbTestReferenceRepository.referencedByTotal = 1;
-		element.config = { unique: 'elm-1', referenceRepositoryAlias: TEST_REPOSITORY_ALIAS, itemRepositoryAlias: 'n/a' };
 
-		let changeCount = 0;
-		element.addEventListener('change', () => changeCount++);
-
-		document.body.appendChild(element);
-		await aTimeout(0);
+		const changeCount = await connectAndCountChanges();
 
 		expect(changeCount).to.equal(1);
 	});
@@ -115,13 +119,8 @@ describe('UmbEntityReferencesSummaryElement', () => {
 
 	it('still dispatches a change event, reporting no references, when loading fails', async () => {
 		UmbTestReferenceRepository.shouldFail = true;
-		element.config = { unique: 'elm-1', referenceRepositoryAlias: TEST_REPOSITORY_ALIAS, itemRepositoryAlias: 'n/a' };
 
-		let changeCount = 0;
-		element.addEventListener('change', () => changeCount++);
-
-		document.body.appendChild(element);
-		await aTimeout(0);
+		const changeCount = await connectAndCountChanges();
 
 		expect(changeCount).to.equal(1);
 		expect(element.getTotalReferencedBy()).to.equal(0);
