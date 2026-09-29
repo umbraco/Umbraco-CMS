@@ -97,8 +97,9 @@ export class UmbPreviewContext extends UmbContextBase {
 
 		// Clean up SignalR connection
 		if (this.#connection) {
-			this.#connection.stop();
+			const connection = this.#connection;
 			this.#connection = undefined;
+			connection.stop();
 		}
 	}
 
@@ -249,8 +250,9 @@ export class UmbPreviewContext extends UmbContextBase {
 
 		// Stop SignalR connection without waiting - window will close anyway
 		if (this.#connection) {
-			this.#connection.stop();
+			const connection = this.#connection;
 			this.#connection = undefined;
+			connection.stop();
 		}
 
 		// Close the preview window
