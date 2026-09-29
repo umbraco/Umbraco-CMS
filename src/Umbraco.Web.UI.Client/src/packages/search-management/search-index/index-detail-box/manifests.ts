@@ -21,7 +21,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		weight: 100,
 		element: () => import('./search-index-stats-box.element.js'),
 		meta: {
-			label: '#searchManagement_statsBoxLabel',
+			label: '#searchManagement_indexInfo',
 			column: 'right',
 		},
 	},
@@ -32,7 +32,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		weight: 100,
 		element: () => import('./search-index-search-box.element.js'),
 		meta: {
-			label: '#searchManagement_searchBoxLabel',
+			label: '#searchManagement_searchBox',
 			column: 'left',
 		},
 	},
