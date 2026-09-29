@@ -11,6 +11,7 @@ import { UMB_ELEMENT_ENTITY_TYPE } from '../../entity.js';
 import { UMB_ELEMENT_WORKSPACE_ALIAS } from '../../workspace/constants.js';
 import { UMB_ELEMENT_PUBLISHING_WORKSPACE_CONTEXT } from './element-publishing.workspace-context.token.js';
 import { UMB_ELEMENT_PUBLISHING_SHORTCUT_UNIQUE } from './constants.js';
+import { umbNeedsPublishConfirmation } from './needs-publish-confirmation.function.js';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
@@ -20,7 +21,6 @@ import {
 	UmbContentUnpublishEntityAction,
 } from '@umbraco-cms/backoffice/content';
 import { UmbEntityReferenceCountManager } from '@umbraco-cms/backoffice/relations';
-import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
@@ -29,7 +29,7 @@ import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import { notifyWorkspaceActionStarting } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
+import type { UmbEntityModel, UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 import type {
 	UmbPublishableWorkspaceContext,
 	UmbWorkspaceActionExecutionOptions,
@@ -304,11 +304,15 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 			throw new Error('No variants are available');
 		}
 
-		// Skip the confirmation dialog only when it would have nothing to say: a single variant to publish and no
-		// items referencing this element. Otherwise open it — the modal itself hides the variant picker when there
-		// is only one option, showing just the reference-awareness section.
+		// Skip the confirmation dialog only when it would have nothing to say: a single variant to publish, no items
+		// referencing this element, and no referenced element left unpublished. Otherwise open it — the modal hides
+		// the variant picker for an invariant element, showing just the reference sections.
 		const entitiesNeedingAttention = await this.#resolveEntitiesNeedingAttention();
-		const needsModal = await this.#needsPublishConfirmationModal(options, entitiesNeedingAttention);
+		const needsModal = await umbNeedsPublishConfirmation(
+			options.length,
+			() => this.#getReferenceCount(),
+			entitiesNeedingAttention.length,
+		);
 
 		if (!needsModal) {
 			variantIds.push(UmbVariantId.Create(options[0]));
@@ -363,28 +367,12 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 	}
 
 	/**
-	 * Whether the publish confirmation modal has anything to say: either there is more than one variant to choose
-	 * between, something references this element, or this element references an entity that needs attention.
-	 * @param {Array<UmbElementVariantOptionModel>} options - The variant options being published.
-	 * @param {Array<UmbEntityModel>} entitiesNeedingAttention - Entities this element references that need attention before publishing.
-	 * @returns {Promise<boolean>} Whether the confirmation modal should be shown.
+	 * The number of items referencing this element. A never-saved element has no server-side references yet.
+	 * @returns {Promise<number>} The reference count.
 	 */
-	async #needsPublishConfirmationModal(
-		options: Array<UmbElementVariantOptionModel>,
-		entitiesNeedingAttention: Array<UmbEntityModel>,
-	): Promise<boolean> {
-		if (options.length > 1) return true;
-		// Resolved from draft values, so it applies to a never-saved element too — unlike referencedBy below.
-		if (entitiesNeedingAttention.length > 0) return true;
-		// An element that has never been saved has no server-side references in either direction yet.
-		if (this.#elementWorkspaceContext?.getIsNew()) return false;
-		try {
-			return (await this.referenceCount.getTotalAsync()) > 0;
-		} catch {
-			// Couldn't determine the reference count — show the modal rather than risk publishing silently past
-			// references we failed to check for.
-			return true;
-		}
+	async #getReferenceCount(): Promise<number> {
+		if (this.#elementWorkspaceContext?.getIsNew()) return 0;
+		return this.referenceCount.getTotalAsync();
 	}
 
 	/**

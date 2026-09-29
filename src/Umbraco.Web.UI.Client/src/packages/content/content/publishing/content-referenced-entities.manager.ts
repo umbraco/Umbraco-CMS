@@ -72,19 +72,27 @@ export class UmbContentReferencedEntitiesManager extends UmbControllerBase {
 		)[0];
 		if (!manifest) return [];
 
-		const api = await createExtensionApi<UmbEntityPublishAwarenessApi>(this, manifest);
-		if (!api) return [];
-
-		const itemRepository = await createExtensionApiByAlias<UmbItemRepository<any>>(
-			this,
-			manifest.meta.itemRepositoryAlias,
-		);
-
 		const uniques = entities.map((x) => x.unique).filter((x): x is string => !!x);
 		if (!uniques.length) return [];
 
-		const { data: items } = await itemRepository.requestItems(uniques);
-		return (items ?? []).filter((item) => api.needsAttention(item));
+		const api = await createExtensionApi<UmbEntityPublishAwarenessApi>(this, manifest);
+		if (!api) return [];
+
+		try {
+			const itemRepository = await createExtensionApiByAlias<UmbItemRepository<any>>(
+				this,
+				manifest.meta.itemRepositoryAlias,
+			);
+
+			try {
+				const { data: items } = await itemRepository.requestItems(uniques);
+				return (items ?? []).filter((item) => api.needsAttention(item));
+			} finally {
+				itemRepository.destroy();
+			}
+		} finally {
+			api.destroy();
+		}
 	}
 
 	readonly #compare = (a: UmbEntityModel, b: UmbEntityModel): number => {

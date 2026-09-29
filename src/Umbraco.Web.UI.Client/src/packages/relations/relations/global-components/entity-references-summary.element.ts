@@ -11,12 +11,13 @@ import type { PropertyValues } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 
 /**
- * Publish/unpublish awareness: independent action buttons for the entities referencing the entity in `config`,
- * for its descendants that are referenced elsewhere, and for any entities it directly references that need
- * attention before publishing — each opening a paged overview of only that kind of reference. Renders nothing
- * when there is nothing to report. Same `config` shape, getters, and `UmbChangeEvent` contract as
- * `umb-confirm-action-modal-entity-references`, so it can be used as a drop-in replacement wherever that
- * component's reference-aware gating (e.g. `disableUnpublishWhenReferenced`) is relied on.
+ * Renders one action button per kind of reference to the entity in `config`: one for the items referencing it,
+ * another for its descendants that are referenced elsewhere, and, when `entitiesNeedingAttention` is set,
+ * a third for the entities it directly references that need attention. Each button opens a paged overview of only
+ * that kind of reference. Renders nothing when there is nothing to report. Dispatches a `UmbChangeEvent` once both
+ * totals have loaded (reporting no references if the lookup fails), reloads when `config` changes, and exposes
+ * `getTotalReferencedBy()` / `getTotalDescendantsWithReferences()`, so a host can gate an action on the result — for
+ * example, a publish or unpublish confirmation dialog.
  * @element umb-entity-references-summary
  */
 @customElement('umb-entity-references-summary')
@@ -39,6 +40,8 @@ export class UmbEntityReferencesSummaryElement extends UmbLitElement {
 	entitiesNeedingAttention?: Array<UmbEntityModel>;
 
 	#referenceRepository?: UmbEntityReferenceRepository;
+	#referenceRepositoryAlias?: string;
+	#loadToken = 0;
 
 	/**
 	 * The number of items referencing the entity in `config`. `0` until the count has loaded.
@@ -66,65 +69,58 @@ export class UmbEntityReferencesSummaryElement extends UmbLitElement {
 		return this.entitiesNeedingAttention?.length ?? 0;
 	}
 
-	protected override firstUpdated(_changedProperties: PropertyValues): void {
-		super.firstUpdated(_changedProperties);
-		this.#initData();
+	protected override updated(changedProperties: PropertyValues): void {
+		super.updated(changedProperties);
+		if (changedProperties.has('config')) {
+			this.#initData();
+		}
 	}
 
 	async #initData() {
-		if (!this.config) {
-			this.#referenceRepository?.destroy();
-			return;
+		const token = ++this.#loadToken;
+		const config = this.config;
+		let totals = { referencedBy: 0, descendants: 0 };
+
+		if (config) {
+			try {
+				totals = await this.#loadTotals(config);
+			} catch (error) {
+				// Fail open: a host gating an action on these totals should proceed, not wait forever for a change event.
+				console.error('Failed to load entity references:', error);
+			}
 		}
 
-		if (!this.config.referenceRepositoryAlias) {
-			throw new Error('Missing referenceRepositoryAlias in config.');
-		}
+		// A newer config has since been set — its result should win, not ours.
+		if (token !== this.#loadToken) return;
 
-		this.#referenceRepository = await createExtensionApiByAlias<UmbEntityReferenceRepository>(
-			this,
-			this.config.referenceRepositoryAlias,
-		);
+		this._totalReferencedByItems = totals.referencedBy;
+		this._totalDescendantsWithReferences = totals.descendants;
 
-		try {
-			await Promise.all([this.#loadReferencedByTotal(), this.#loadDescendantsWithReferencesTotal()]);
-		} catch {
-			// One of the totals failed to load — whichever others succeeded keep their value, and we still
-			// dispatch below regardless. Consumers (e.g. the unpublish modal drives its submit button off
-			// this event) must not be left waiting for a change that would otherwise never come.
-		} finally {
+		if (config) {
 			this.dispatchEvent(new UmbChangeEvent());
 		}
 	}
 
-	async #loadReferencedByTotal() {
-		if (!this.#referenceRepository) {
-			throw new Error('Failed to create reference repository.');
-		}
+	async #loadTotals(config: UmbEntityReferencesConfig) {
+		const repository = await this.#getReferenceRepository(config.referenceRepositoryAlias);
 
-		if (!this.config?.unique) {
-			throw new Error('Missing unique in config.');
-		}
+		// take: 1 — only the totals are needed here, the overview modal fetches the actual items.
+		const [referencedBy, descendants] = await Promise.all([
+			repository.requestReferencedBy(config.unique, 0, 1),
+			// If the repository does not have the method, there are no referenced descendants to load.
+			repository.requestDescendantsWithReferences?.(config.unique, 0, 1),
+		]);
 
-		// take: 1 — only the total is needed here, the overview modal fetches the actual items.
-		const { data } = await this.#referenceRepository.requestReferencedBy(this.config.unique, 0, 1);
-		this._totalReferencedByItems = data?.total ?? 0;
+		return { referencedBy: referencedBy.data?.total ?? 0, descendants: descendants?.data?.total ?? 0 };
 	}
 
-	async #loadDescendantsWithReferencesTotal() {
-		if (!this.#referenceRepository) {
-			throw new Error('Failed to create reference repository.');
-		}
+	async #getReferenceRepository(alias: string): Promise<UmbEntityReferenceRepository> {
+		if (this.#referenceRepository && this.#referenceRepositoryAlias === alias) return this.#referenceRepository;
 
-		// If the repository does not have the method, we don't need to load the referenced descendants.
-		if (!this.#referenceRepository.requestDescendantsWithReferences) return;
-
-		if (!this.config?.unique) {
-			throw new Error('Missing unique in config.');
-		}
-
-		const { data } = await this.#referenceRepository.requestDescendantsWithReferences(this.config.unique, 0, 1);
-		this._totalDescendantsWithReferences = data?.total ?? 0;
+		this.#referenceRepository?.destroy();
+		this.#referenceRepository = await createExtensionApiByAlias<UmbEntityReferenceRepository>(this, alias);
+		this.#referenceRepositoryAlias = alias;
+		return this.#referenceRepository;
 	}
 
 	#onClickView(source: UmbEntityReferenceListSource, event: Event) {

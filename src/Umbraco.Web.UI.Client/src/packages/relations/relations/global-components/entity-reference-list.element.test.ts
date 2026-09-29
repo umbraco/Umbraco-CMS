@@ -23,9 +23,15 @@ function makeItems(count: number): Array<UmbEntityModel> {
 class UmbTestReferenceRepository implements UmbEntityReferenceRepository {
 	static referencedByItems: Array<UmbEntityModel> = [];
 	static descendantItems: Array<UmbEntityModel> = [];
+	// Per-unique overrides, used to tell apart responses for different uniques in the stale-response test below.
+	static itemsByUnique: Record<string, Array<UmbEntityModel>> = {};
+	static delaysMs: Record<string, number> = {};
 
-	async requestReferencedBy(_unique: string, skip = 0, take = 20) {
-		const items = UmbTestReferenceRepository.referencedByItems;
+	async requestReferencedBy(unique: string, skip = 0, take = 20) {
+		const delay = UmbTestReferenceRepository.delaysMs[unique];
+		if (delay) await new Promise((resolve) => setTimeout(resolve, delay));
+
+		const items = UmbTestReferenceRepository.itemsByUnique[unique] ?? UmbTestReferenceRepository.referencedByItems;
 		return { data: { items: items.slice(skip, skip + take), total: items.length } };
 	}
 
@@ -79,6 +85,8 @@ describe('UmbEntityReferenceListElement', () => {
 	beforeEach(() => {
 		UmbTestReferenceRepository.referencedByItems = [];
 		UmbTestReferenceRepository.descendantItems = [];
+		UmbTestReferenceRepository.itemsByUnique = {};
+		UmbTestReferenceRepository.delaysMs = {};
 		element = document.createElement('umb-entity-reference-list') as UmbEntityReferenceListElement;
 	});
 
@@ -179,6 +187,37 @@ describe('UmbEntityReferenceListElement', () => {
 
 			await aTimeout(0);
 			expect(element.getTotal()).to.equal(5);
+		});
+
+		it('ignores a stale response that resolves after a newer request has already started', async () => {
+			element.referenceRepositoryAlias = REFERENCE_REPOSITORY_ALIAS;
+			document.body.appendChild(element);
+			await aTimeout(0);
+
+			UmbTestReferenceRepository.delaysMs = { 'elm-1': 30 };
+			UmbTestReferenceRepository.itemsByUnique = { 'elm-1': makeItems(1), 'elm-2': makeItems(4) };
+
+			// Move on to 'elm-2' before the slow 'elm-1' response has resolved.
+			element.unique = 'elm-1';
+			element.unique = 'elm-2';
+			await aTimeout(50);
+
+			expect(element.getTotal()).to.equal(4);
+			expect(element.shadowRoot?.querySelectorAll('umb-entity-item-ref')).to.have.lengthOf(4);
+		});
+
+		it('loads once the reference repository alias is set after the element has already connected', async () => {
+			UmbTestReferenceRepository.referencedByItems = makeItems(2);
+			element.unique = 'elm-1';
+			document.body.appendChild(element);
+			await aTimeout(0);
+
+			expect(element.getTotal(), 'nothing to load without an alias yet').to.equal(0);
+
+			element.referenceRepositoryAlias = REFERENCE_REPOSITORY_ALIAS;
+			await aTimeout(0);
+
+			expect(element.getTotal()).to.equal(2);
 		});
 	});
 

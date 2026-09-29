@@ -520,7 +520,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 
 		// Skip the confirmation dialog only when it would have nothing to say: a single variant to publish,
 		// nothing referencing this document, and no referenced element left unpublished. Otherwise open it —
-		// the modal hides the variant picker when there is only one option, showing just the reference sections.
+		// the modal hides the variant picker for an invariant document, showing just the reference sections.
 		const entitiesNeedingAttention = await this.#resolveEntitiesNeedingAttention();
 		const needsModal = await this.#needsPublishConfirmationModal(options, entitiesNeedingAttention);
 
@@ -835,7 +835,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 		const publishedData = this.#publishedDocumentData;
 		if (!persistedData || !publishedData) return;
 
-		this.publishedPendingChanges.process({ persistedData, publishedData }).catch(() => undefined);
+		this.publishedPendingChanges.process({ persistedData, publishedData });
 	}
 
 	#clear() {

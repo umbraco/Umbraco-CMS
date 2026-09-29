@@ -9,10 +9,16 @@ import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 import type { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 
-export type UmbEntityReferenceListSource = 'referencedBy' | 'descendantsWithReferences' | 'needingAttention';
+/**
+ * Which kind of reference `umb-entity-reference-list` lists: the items referencing the entity (`referencedBy`), or
+ * its descendants that are referenced elsewhere (`descendantsWithReferences`).
+ */
+export type UmbEntityReferenceListSource = 'referencedBy' | 'descendantsWithReferences';
 
-// Properties that require re-running #init() when they change — see updated() below.
-const REPOSITORY_PROPERTIES = ['referenceRepositoryAlias', 'itemRepositoryAlias', 'source'] as const;
+interface UmbEntityReferenceListPage {
+	total: number;
+	items: Array<UmbReferenceItemModel | UmbEntityModel>;
+}
 
 /**
  * Presentational, paged list of the items referencing (or, in `descendantsWithReferences` mode, the descendants
@@ -21,6 +27,10 @@ const REPOSITORY_PROPERTIES = ['referenceRepositoryAlias', 'itemRepositoryAlias'
  */
 @customElement('umb-entity-reference-list')
 export class UmbEntityReferenceListElement extends UmbLitElement {
+	/**
+	 * The unique identifier of the entity to look up references for. Setting it (re)loads the current `source`.
+	 * @param {string | undefined} value - The entity unique.
+	 */
 	@property({ type: String, attribute: false })
 	public set unique(value: string | undefined) {
 		const oldValue = this.#unique;
@@ -32,7 +42,10 @@ export class UmbEntityReferenceListElement extends UmbLitElement {
 		this._items = [];
 		this._total = 0;
 
-		if (!value) return;
+		if (!value) {
+			this.#requestToken++;
+			return;
+		}
 
 		this.#getReferences();
 	}
@@ -44,10 +57,12 @@ export class UmbEntityReferenceListElement extends UmbLitElement {
 	/**
 	 * A pre-resolved, statically-paged set of items to render — e.g. entities resolved client-side from a
 	 * workspace draft. Setting this switches the element out of `unique`/`source`-driven fetch mode.
+	 * @param {Array<UmbReferenceItemModel | UmbEntityModel> | undefined} value - The items to render.
 	 */
 	@property({ type: Array, attribute: false })
 	public set items(value: Array<UmbReferenceItemModel | UmbEntityModel> | undefined) {
 		this.#staticItems = value;
+		this.#requestToken++;
 		this._currentPage = 1;
 		this._total = value?.length ?? 0;
 		this.#renderStaticItemsPage();
@@ -58,18 +73,34 @@ export class UmbEntityReferenceListElement extends UmbLitElement {
 	}
 	#staticItems?: Array<UmbReferenceItemModel | UmbEntityModel>;
 
+	/**
+	 * Alias of the {@link UmbEntityReferenceRepository} used to look up references.
+	 */
 	@property({ attribute: 'reference-repository-alias' })
 	referenceRepositoryAlias?: string;
 
+	/**
+	 * Alias of the item repository used to resolve the descendant uniques returned by `requestDescendantsWithReferences`
+	 * into presentable items. Only used when `source` is `descendantsWithReferences`.
+	 */
 	@property({ attribute: 'item-repository-alias' })
 	itemRepositoryAlias?: string;
 
+	/**
+	 * Which kind of reference to list: the items referencing the entity, or its descendants that are referenced elsewhere.
+	 */
 	@property()
 	source: UmbEntityReferenceListSource = 'referencedBy';
 
+	/**
+	 * How many items to show per page.
+	 */
 	@property({ type: Number, attribute: 'items-per-page' })
 	itemsPerPage = 10;
 
+	/**
+	 * Whether the listed items are non-interactive (not clickable).
+	 */
 	@property({ type: Boolean, reflect: true })
 	readonly = false;
 
@@ -84,6 +115,7 @@ export class UmbEntityReferenceListElement extends UmbLitElement {
 
 	#referenceRepository?: UmbEntityReferenceRepository;
 	#itemRepository?: UmbItemRepository<any>;
+	#requestToken = 0;
 
 	/**
 	 * The total number of items for the current `source`, once loaded.
@@ -95,19 +127,15 @@ export class UmbEntityReferenceListElement extends UmbLitElement {
 
 	protected override updated(changedProperties: PropertyValues): void {
 		super.updated(changedProperties);
-
-		// Runs on the first update too — every reactive property counts as "changed" then. Re-running #init()
-		// when these change later covers consumers (e.g. the workspace info app) whose extension-provided
-		// referenceRepositoryAlias can arrive or change after this element's first render.
-		if (REPOSITORY_PROPERTIES.some((prop) => changedProperties.has(prop))) {
-			this.#init();
+		const repositoryConfigChanged = ['referenceRepositoryAlias', 'itemRepositoryAlias', 'source'].some((key) =>
+			changedProperties.has(key),
+		);
+		if (repositoryConfigChanged) {
+			this.#configureRepositories();
 		}
 	}
 
-	async #init() {
-		// Not an error: with re-init reacting to property changes (see `updated()`), this runs on the very first
-		// update too, where an extension-provided alias (e.g. from a workspace info app's manifest) may not have
-		// arrived yet. It re-runs once the alias is actually set.
+	async #configureRepositories() {
 		if (!this.referenceRepositoryAlias) return;
 
 		this.#referenceRepository = await createExtensionApiByAlias<UmbEntityReferenceRepository>(
@@ -115,65 +143,67 @@ export class UmbEntityReferenceListElement extends UmbLitElement {
 			this.referenceRepositoryAlias,
 		);
 
-		if (this.source === 'descendantsWithReferences' && this.itemRepositoryAlias) {
-			this.#itemRepository = await createExtensionApiByAlias<UmbItemRepository<any>>(this, this.itemRepositoryAlias);
-		}
+		this.#itemRepository =
+			this.source === 'descendantsWithReferences' && this.itemRepositoryAlias
+				? await createExtensionApiByAlias<UmbItemRepository<any>>(this, this.itemRepositoryAlias)
+				: undefined;
 
 		this.#getReferences();
 	}
 
 	async #getReferences() {
-		if (!this.#unique) return;
-		if (!this.#referenceRepository) return;
+		const unique = this.#unique;
+		const repository = this.#referenceRepository;
+		if (!unique || !repository) return;
 
+		const token = ++this.#requestToken;
 		const skip = (this._currentPage - 1) * this.itemsPerPage;
 
-		if (this.source === 'descendantsWithReferences') {
-			await this.#getDescendantsWithReferences(skip);
-		} else {
-			await this.#getReferencedBy(skip);
+		const page =
+			this.source === 'descendantsWithReferences'
+				? await this.#fetchDescendantsWithReferences(repository, unique, skip)
+				: await this.#fetchReferencedBy(repository, unique, skip);
+
+		// A newer request (e.g. the unique or page changed again) has since started — its result should win, not ours.
+		if (token !== this.#requestToken) return;
+
+		if (page) {
+			this._total = page.total;
+			this._items = page.items;
 		}
 
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
-	async #getReferencedBy(skip: number) {
-		if (!this.#referenceRepository || !this.#unique) return;
-
-		const { data } = await this.#referenceRepository.requestReferencedBy(this.#unique, skip, this.itemsPerPage);
-		if (!data) return;
-
-		this._total = data.total;
-		this._items = data.items;
+	async #fetchReferencedBy(
+		repository: UmbEntityReferenceRepository,
+		unique: string,
+		skip: number,
+	): Promise<UmbEntityReferenceListPage | undefined> {
+		const { data } = await repository.requestReferencedBy(unique, skip, this.itemsPerPage);
+		return data;
 	}
 
-	async #getDescendantsWithReferences(skip: number) {
-		if (!this.#referenceRepository || !this.#unique) return;
-
+	async #fetchDescendantsWithReferences(
+		repository: UmbEntityReferenceRepository,
+		unique: string,
+		skip: number,
+	): Promise<UmbEntityReferenceListPage | undefined> {
 		// If the repository does not have the method, there are no descendants to report.
-		if (!this.#referenceRepository.requestDescendantsWithReferences) {
-			this._total = 0;
-			this._items = [];
-			return;
-		}
+		if (!repository.requestDescendantsWithReferences) return { total: 0, items: [] };
 
-		const { data } = await this.#referenceRepository.requestDescendantsWithReferences(
-			this.#unique,
-			skip,
-			this.itemsPerPage,
-		);
-		if (!data) return;
+		const { data } = await repository.requestDescendantsWithReferences(unique, skip, this.itemsPerPage);
+		if (!data) return undefined;
 
-		this._total = data.total;
+		return { total: data.total, items: await this.#resolveItems(data.items) };
+	}
 
-		if (!this.#itemRepository) {
-			this._items = data.items;
-			return;
-		}
+	async #resolveItems(items: Array<UmbEntityModel>): Promise<Array<UmbEntityModel>> {
+		if (!this.#itemRepository) return items;
 
-		const uniques = data.items.map((item) => item.unique).filter(Boolean) as Array<string>;
-		const { data: items } = await this.#itemRepository.requestItems(uniques);
-		this._items = items ?? [];
+		const uniques = items.map((item) => item.unique).filter(Boolean) as Array<string>;
+		const { data } = await this.#itemRepository.requestItems(uniques);
+		return data ?? [];
 	}
 
 	#renderStaticItemsPage() {

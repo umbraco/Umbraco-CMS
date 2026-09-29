@@ -15,8 +15,10 @@ function makeElements(count: number): Array<UmbEntityModel> {
 class UmbTestReferenceRepository implements UmbEntityReferenceRepository {
 	static referencedByTotal = 0;
 	static descendantsTotal = 0;
+	static shouldFail = false;
 
 	async requestReferencedBy() {
+		if (UmbTestReferenceRepository.shouldFail) throw new Error('Reference lookup failed');
 		return { data: { items: [], total: UmbTestReferenceRepository.referencedByTotal } };
 	}
 
@@ -51,8 +53,18 @@ describe('UmbEntityReferencesSummaryElement', () => {
 	beforeEach(() => {
 		UmbTestReferenceRepository.referencedByTotal = 0;
 		UmbTestReferenceRepository.descendantsTotal = 0;
+		UmbTestReferenceRepository.shouldFail = false;
 		element = document.createElement('umb-entity-references-summary') as UmbEntityReferencesSummaryElement;
 	});
+
+	async function connectAndCountChanges() {
+		element.config = { unique: 'elm-1', referenceRepositoryAlias: TEST_REPOSITORY_ALIAS, itemRepositoryAlias: 'n/a' };
+		let changeCount = 0;
+		element.addEventListener('change', () => changeCount++);
+		document.body.appendChild(element);
+		await aTimeout(0);
+		return changeCount;
+	}
 
 	afterEach(() => {
 		element.remove();
@@ -121,46 +133,32 @@ describe('UmbEntityReferencesSummaryElement', () => {
 
 	it('dispatches a change event once both totals have loaded', async () => {
 		UmbTestReferenceRepository.referencedByTotal = 1;
-		element.config = { unique: 'elm-1', referenceRepositoryAlias: TEST_REPOSITORY_ALIAS, itemRepositoryAlias: 'n/a' };
 
-		let changeCount = 0;
-		element.addEventListener('change', () => changeCount++);
-
-		document.body.appendChild(element);
-		await aTimeout(0);
+		const changeCount = await connectAndCountChanges();
 
 		expect(changeCount).to.equal(1);
 	});
 
-	it('still dispatches a change event when one of the totals fails to load', async () => {
-		UmbTestReferenceRepository.descendantsTotal = 4;
+	it('reloads the totals when config changes after the first render', async () => {
+		UmbTestReferenceRepository.referencedByTotal = 1;
+		element.config = { unique: 'elm-1', referenceRepositoryAlias: TEST_REPOSITORY_ALIAS, itemRepositoryAlias: 'n/a' };
+		document.body.appendChild(element);
+		await aTimeout(0);
+		expect(element.getTotalReferencedBy()).to.equal(1);
 
-		class UmbTestReferenceRepositoryWithFailingReferencedBy extends UmbTestReferenceRepository {
-			override async requestReferencedBy(): Promise<never> {
-				throw new Error('Simulated network error');
-			}
-		}
+		UmbTestReferenceRepository.referencedByTotal = 4;
+		element.config = { unique: 'elm-2', referenceRepositoryAlias: TEST_REPOSITORY_ALIAS, itemRepositoryAlias: 'n/a' };
+		await aTimeout(0);
 
-		const alias = 'Umb.Test.EntityReferencesSummary.Repository.FailingReferencedBy';
-		const manifest: ManifestApi<UmbTestReferenceRepositoryWithFailingReferencedBy> = {
-			type: 'my-test-type',
-			alias,
-			name: 'Test Entity Reference Repository With Failing requestReferencedBy',
-			api: UmbTestReferenceRepositoryWithFailingReferencedBy,
-		};
-		umbExtensionsRegistry.register(manifest);
+		expect(element.getTotalReferencedBy()).to.equal(4);
+	});
 
-		try {
-			let changeCount = 0;
-			element.addEventListener('change', () => changeCount++);
-			element.config = { unique: 'elm-1', referenceRepositoryAlias: alias, itemRepositoryAlias: 'n/a' };
-			document.body.appendChild(element);
-			await aTimeout(0);
+	it('still dispatches a change event, reporting no references, when loading fails', async () => {
+		UmbTestReferenceRepository.shouldFail = true;
 
-			expect(changeCount, 'change event must still fire even though one loader rejected').to.equal(1);
-			expect(element.getTotalDescendantsWithReferences(), 'other loaders must still have completed').to.equal(4);
-		} finally {
-			umbExtensionsRegistry.unregister(alias);
-		}
+		const changeCount = await connectAndCountChanges();
+
+		expect(changeCount).to.equal(1);
+		expect(element.getTotalReferencedBy()).to.equal(0);
 	});
 });

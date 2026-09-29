@@ -6,6 +6,12 @@ import type { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 import '../../global-components/entity-reference-list.element.js';
 
+const HEADLINE_KEYS = {
+	referencedBy: 'references_labelUsedByItems',
+	descendantsWithReferences: 'references_labelDescendantsWithReferences',
+	needingAttention: 'references_labelElementsWithPendingChanges',
+} as const;
+
 @customElement('umb-entity-references-modal')
 export class UmbEntityReferencesModalElement extends UmbModalBaseElement<
 	UmbEntityReferencesModalData,
@@ -38,13 +44,7 @@ export class UmbEntityReferencesModalElement extends UmbModalBaseElement<
 		const showDescendants = !source || source === 'descendantsWithReferences';
 		const showNeedingAttention = !source || source === 'needingAttention';
 
-		const headline =
-			data.headline ??
-			(source === 'descendantsWithReferences'
-				? this.localize.term('references_labelDescendantsWithReferences')
-				: source === 'needingAttention'
-					? this.localize.term('references_labelElementsWithPendingChanges')
-					: this.localize.term('references_labelUsedByItems'));
+		const headline = data.headline ?? this.localize.term(HEADLINE_KEYS[source ?? 'referencedBy']);
 
 		return html`
 			<uui-dialog-layout headline=${headline}>
@@ -56,7 +56,6 @@ export class UmbEntityReferencesModalElement extends UmbModalBaseElement<
 								<umb-localize key="references_labelDependsOnThis">The following items depend on this</umb-localize>
 							</p>
 							<umb-entity-reference-list
-								readonly
 								.unique=${data.unique}
 								.referenceRepositoryAlias=${data.referenceRepositoryAlias}
 								source="referencedBy"
@@ -75,7 +74,6 @@ export class UmbEntityReferencesModalElement extends UmbModalBaseElement<
 								>
 							</p>
 							<umb-entity-reference-list
-								readonly
 								.unique=${data.unique}
 								.referenceRepositoryAlias=${data.referenceRepositoryAlias}
 								.itemRepositoryAlias=${data.itemRepositoryAlias}
@@ -94,7 +92,7 @@ export class UmbEntityReferencesModalElement extends UmbModalBaseElement<
 									>The following referenced elements are not fully published</umb-localize
 								>
 							</p>
-							<umb-entity-reference-list readonly .items=${data.entitiesNeedingAttention}></umb-entity-reference-list>
+							<umb-entity-reference-list .items=${data.entitiesNeedingAttention}></umb-entity-reference-list>
 						</div>
 					`,
 				)}
