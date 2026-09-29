@@ -1,7 +1,9 @@
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Search.Indexing;
+using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Search.Core.Cache.Element;
 
@@ -13,20 +15,26 @@ namespace Umbraco.Cms.Search.Core.Cache.Element;
 internal sealed class PublishedElementNotificationHandler :
     IDistributedCacheNotificationHandler<ElementPublishedNotification>,
     IDistributedCacheNotificationHandler<ElementUnpublishedNotification>,
-    IDistributedCacheNotificationHandler<ElementMovedToRecycleBinNotification>
+    IDistributedCacheNotificationHandler<ElementMovedToRecycleBinNotification>,
+    IDistributedCacheNotificationHandler<EntityContainerMovedToRecycleBinNotification>
 {
+    private const int DescendantsPageSize = 500;
+
     private readonly DistributedCache _distributedCache;
     private readonly IOriginProvider _originProvider;
+    private readonly IEntityService _entityService;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PublishedElementNotificationHandler"/> class.
     /// </summary>
     /// <param name="distributedCache">The distributed cache used to broadcast the paired cache refresher notification.</param>
     /// <param name="originProvider">The provider of the current server origin.</param>
-    public PublishedElementNotificationHandler(DistributedCache distributedCache, IOriginProvider originProvider)
+    /// <param name="entityService">The service used to find the elements below a trashed element container.</param>
+    public PublishedElementNotificationHandler(DistributedCache distributedCache, IOriginProvider originProvider, IEntityService entityService)
     {
         _distributedCache = distributedCache;
         _originProvider = originProvider;
+        _entityService = entityService;
     }
 
     /// <summary>
@@ -55,7 +63,44 @@ internal sealed class PublishedElementNotificationHandler :
     public void Handle(ElementMovedToRecycleBinNotification notification)
         => Broadcast(notification.MoveInfoCollection.Select(info => info.Entity));
 
-    private void Broadcast(IEnumerable<IElement> entities)
+    /// <summary>
+    /// Broadcasts the published elements below the trashed element containers so the documents referencing them can be re-indexed.
+    /// </summary>
+    /// <param name="notification">The notification describing the containers moved to the recycle bin.</param>
+    /// <remarks>
+    /// Moving a container to the recycle bin trashes all of its descendant elements, but raises no
+    /// <see cref="ElementMovedToRecycleBinNotification"/> for them - only this notification for the container itself.
+    /// </remarks>
+    public void Handle(EntityContainerMovedToRecycleBinNotification notification)
+        => Broadcast(notification.MoveInfoCollection
+            .Where(info => info.Entity.ContainedObjectType == Umbraco.Cms.Core.Constants.ObjectTypes.Element)
+            .SelectMany(info => GetPublishedDescendantElements(info.Entity.Key)));
+
+    private IEnumerable<IEntitySlim> GetPublishedDescendantElements(Guid containerKey)
+    {
+        var skip = 0;
+        long total;
+        do
+        {
+            IEntitySlim[] descendants = _entityService.GetPagedDescendants(
+                containerKey,
+                UmbracoObjectTypes.ElementContainer,
+                [UmbracoObjectTypes.Element],
+                skip,
+                DescendantsPageSize,
+                out total).ToArray();
+            skip += DescendantsPageSize;
+
+            // an unpublished element contributes nothing to any published index entry, so there is nothing to refresh
+            foreach (IEntitySlim descendant in descendants.Where(descendant => descendant is IPublishableContentEntitySlim { Published: true }))
+            {
+                yield return descendant;
+            }
+        }
+        while (skip < total);
+    }
+
+    private void Broadcast(IEnumerable<IEntity> entities)
     {
         PublishedElementCacheRefresher.JsonPayload[] payloads = entities
             .Select(entity => new PublishedElementCacheRefresher.JsonPayload(entity.Id, entity.Key))

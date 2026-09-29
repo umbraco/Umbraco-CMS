@@ -92,6 +92,7 @@ public static class UmbracoBuilderExtensions
         builder.AddNotificationHandler<ElementPublishedNotification, PublishedElementNotificationHandler>();
         builder.AddNotificationHandler<ElementUnpublishedNotification, PublishedElementNotificationHandler>();
         builder.AddNotificationHandler<ElementMovedToRecycleBinNotification, PublishedElementNotificationHandler>();
+        builder.AddNotificationHandler<EntityContainerMovedToRecycleBinNotification, PublishedElementNotificationHandler>();
 
         return builder;
     }

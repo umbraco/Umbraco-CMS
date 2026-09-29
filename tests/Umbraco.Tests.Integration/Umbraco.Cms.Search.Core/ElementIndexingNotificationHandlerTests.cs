@@ -42,6 +42,8 @@ public class ElementIndexingNotificationHandlerTests : PropertyValueHandlerTests
 
     private IElementEditingService ElementEditingService => GetRequiredService<IElementEditingService>();
 
+    private IElementContainerService ElementContainerService => GetRequiredService<IElementContainerService>();
+
     [SetUp]
     public void SetUp() => IndexerAndSearcher.Reset();
 
@@ -305,6 +307,22 @@ public class ElementIndexingNotificationHandlerTests : PropertyValueHandlerTests
         var structure = await SetupNestedExternalReferenceStructure();
 
         Assert.That((await ElementEditingService.MoveToRecycleBinAsync(structure.LeafElement.Key, Constants.Security.SuperUserKey)).Success, Is.True);
+
+        AssertPublishedBlocksTexts(absent: [LeafText], present: [IntermediateText]);
+    }
+
+    [Test]
+    public async Task Can_Remove_Transitively_Referenced_Element_Content_From_Referencing_Document_When_Ancestor_Container_Is_Trashed()
+    {
+        var structure = await SetupNestedExternalReferenceStructure();
+
+        // trashing a container raises no per-element trash notification for its descendants, so this nests the
+        // leaf element below a child container to verify all descendants are covered, not just direct children.
+        EntityContainer rootContainer = (await ElementContainerService.CreateAsync(null, "Root folder", null, Constants.Security.SuperUserKey)).Result!;
+        EntityContainer childContainer = (await ElementContainerService.CreateAsync(null, "Child folder", rootContainer.Key, Constants.Security.SuperUserKey)).Result!;
+        Assert.That((await ElementEditingService.MoveAsync(structure.LeafElement.Key, childContainer.Key, Constants.Security.SuperUserKey)).Success, Is.True);
+
+        Assert.That((await ElementContainerService.MoveToRecycleBinAsync(rootContainer.Key, Constants.Security.SuperUserKey)).Success, Is.True);
 
         AssertPublishedBlocksTexts(absent: [LeafText], present: [IntermediateText]);
     }
