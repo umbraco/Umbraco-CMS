@@ -26,11 +26,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
 });
 
-// The four test.fixme cases below are blocked by a product bug: inserting a Library element into the
-// RTE does not add the block to the editor (https://github.com/umbraco/Umbraco-CMS/issues/23381).
-// They depend on a library-inserted external block and will pass once the bug is fixed. RTE Transfer
-// reaches external content a different way and passes.
-test.fixme('can insert a block from the Library', async ({umbracoApi, umbracoUi}) => {
+test('can insert a block from the Library', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const libraryElementId = await umbracoApi.element.createDefaultElement(libraryElementName, elementTypeId);
   await umbracoApi.element.publish(libraryElementId);
@@ -51,7 +47,7 @@ test.fixme('can insert a block from the Library', async ({umbracoApi, umbracoUi}
   expect(layoutItem.contentKey).toBe(libraryElementId);
 });
 
-test.fixme('can transfer a local block to the Library', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+test('can transfer a local block to the Library', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const localBlockText = 'Local rte block content';
   await umbracoApi.document.createDefaultDocumentWithAnEmptyRichTextEditor(contentName, elementTypeId, documentTypeName, customDataTypeName);
@@ -77,7 +73,7 @@ test.fixme('can transfer a local block to the Library', {tag: '@smoke'}, async (
   expect(layoutItem.contentKey).toBe(transferredElement.id);
 });
 
-test.fixme('can disconnect a block from the Library', async ({umbracoApi, umbracoUi}) => {
+test('can disconnect a block from the Library', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const libraryElementId = await umbracoApi.element.createElementWithTextContent(libraryElementName, elementTypeId, 'Shared rte library text', propertyInBlock);
   await umbracoApi.element.publish(libraryElementId);
@@ -101,7 +97,7 @@ test.fixme('can disconnect a block from the Library', async ({umbracoApi, umbrac
   expect(await umbracoApi.element.doesNameExist(libraryElementName)).toBeTruthy();
 });
 
-test.fixme('shows a draft indicator on a block referencing an unpublished Library element', async ({umbracoApi, umbracoUi}) => {
+test('shows a draft indicator on a block referencing an unpublished Library element', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.element.createDefaultElement(libraryElementName, elementTypeId);
   await umbracoApi.document.createDefaultDocumentWithAnEmptyRichTextEditor(contentName, elementTypeId, documentTypeName, customDataTypeName);
