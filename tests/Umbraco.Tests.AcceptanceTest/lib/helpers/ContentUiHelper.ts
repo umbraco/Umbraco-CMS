@@ -2273,6 +2273,14 @@ export class ContentUiHelper extends UiBaseLocators {
     }).toPass({timeout: ConstantHelper.timeout.medium});
     await this.click(languageOptionLocator);
     await expect(languageOptionLocator).toContainClass('selected');
+    // Selecting an option doesn't reliably auto-close the popover; close it explicitly so a leftover
+    // open popover doesn't intercept clicks elsewhere on the page afterward.
+    await expect(async () => {
+      if (await this.contentVariantDropdown.isVisible()) {
+        await this.click(this.languageToggle);
+      }
+      await expect(this.contentVariantDropdown).toBeHidden({timeout: ConstantHelper.timeout.short});
+    }).toPass({timeout: ConstantHelper.timeout.medium});
   }
 
   async clickAddBlockListElementWithName(blockName: string) {
