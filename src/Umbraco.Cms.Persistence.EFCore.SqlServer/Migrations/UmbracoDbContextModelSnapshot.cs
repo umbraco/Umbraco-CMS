@@ -718,10 +718,6 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                         .HasColumnType("bit")
                         .HasColumnName("current");
 
-                    b.Property<Guid>("Key")
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("key");
-
                     b.Property<int>("NodeId")
                         .HasColumnType("int")
                         .HasColumnName("nodeId");
@@ -752,10 +748,6 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                         .HasDatabaseName("IX_umbracoContentVersion_Current");
 
                     SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Current"), new[] { "NodeId" });
-
-                    b.HasIndex("Key")
-                        .IsUnique()
-                        .HasDatabaseName("IX_umbracoContentVersion_key");
 
                     b.HasIndex("UserId");
 

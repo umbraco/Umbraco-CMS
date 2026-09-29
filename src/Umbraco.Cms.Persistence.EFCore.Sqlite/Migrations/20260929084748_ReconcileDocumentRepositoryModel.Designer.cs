@@ -11,7 +11,7 @@ using Umbraco.Cms.Infrastructure.Persistence.EFCore;
 namespace Umbraco.Cms.Persistence.EFCore.Sqlite.Migrations
 {
     [DbContext(typeof(UmbracoDbContext))]
-    [Migration("20260925071347_ReconcileDocumentRepositoryModel")]
+    [Migration("20260929084748_ReconcileDocumentRepositoryModel")]
     partial class ReconcileDocumentRepositoryModel
     {
         /// <inheritdoc />
@@ -760,10 +760,6 @@ namespace Umbraco.Cms.Persistence.EFCore.Sqlite.Migrations
                         .HasColumnType("INTEGER")
                         .HasColumnName("current");
 
-                    b.Property<Guid>("Key")
-                        .HasColumnType("TEXT")
-                        .HasColumnName("key");
-
                     b.Property<int>("NodeId")
                         .HasColumnType("INTEGER")
                         .HasColumnName("nodeId");
@@ -793,10 +789,6 @@ namespace Umbraco.Cms.Persistence.EFCore.Sqlite.Migrations
 
                     b.HasIndex("Current")
                         .HasDatabaseName("IX_umbracoContentVersion_Current");
-
-                    b.HasIndex("Key")
-                        .IsUnique()
-                        .HasDatabaseName("IX_umbracoContentVersion_key");
 
                     b.HasIndex("UserId");
 
