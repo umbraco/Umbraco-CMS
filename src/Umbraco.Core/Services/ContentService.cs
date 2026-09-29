@@ -1,17 +1,11 @@
-using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Notifications;
-using Umbraco.Cms.Core.Persistence;
-using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
@@ -36,7 +30,6 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
     private readonly ICultureImpactFactory _cultureImpactFactory;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
     private readonly PropertyEditorCollection _propertyEditorCollection;
-    private readonly IIdKeyMap _idKeyMap;
     private ContentSettings _contentSettings;
     private readonly IRelationService _relationService;
 
@@ -100,7 +93,6 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
         _cultureImpactFactory = cultureImpactFactory;
         _userIdKeyResolver = userIdKeyResolver;
         _propertyEditorCollection = propertyEditorCollection;
-        _idKeyMap = idKeyMap;
         _contentSettings = optionsMonitor.CurrentValue;
         optionsMonitor.OnChange((contentSettings) =>
         {
@@ -412,16 +404,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
             return false; // trashed content is never publishable
         }
 
-        // not trashed and has a parent: publishable if the parent is path-published
-        if (content.TryGetParentKey(out Guid? parentKey) is false)
-        {
-            Attempt<Guid> parentKeyAttempt = await _idKeyMap.GetKeyForIdAsync(content.ParentId, UmbracoObjectTypes.Document);
-            parentKey = parentKeyAttempt.Success ? parentKeyAttempt.Result : null;
-        }
-
-        IContent? parent = parentKey is null
-            ? null
-            : await GetByIdAsync(parentKey.Value, cancellationToken);
+        IContent? parent = await GetParentAsync(content.Key, cancellationToken);
         return parent is null || await IsPathPublishedAsync(parent, cancellationToken);
     }
 
