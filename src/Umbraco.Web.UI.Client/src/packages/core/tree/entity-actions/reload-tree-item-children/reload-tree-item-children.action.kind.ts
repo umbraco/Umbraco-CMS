@@ -1,7 +1,6 @@
 import { UmbReloadTreeItemChildrenEntityAction } from './reload-tree-item-children.action.js';
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_ENTITY_ACTION_DEFAULT_KIND_MANIFEST } from '@umbraco-cms/backoffice/entity-action';
-import { UMB_ACTION_GROUP_TREE } from '@umbraco-cms/backoffice/action';
 
 export const manifest: UmbExtensionManifestKind = {
 	type: 'kind',
@@ -12,7 +11,7 @@ export const manifest: UmbExtensionManifestKind = {
 		...UMB_ENTITY_ACTION_DEFAULT_KIND_MANIFEST.manifest,
 		type: 'entityAction',
 		kind: 'reloadTreeItemChildren',
-		group: UMB_ACTION_GROUP_TREE,
+		separatorBefore: true,
 		api: UmbReloadTreeItemChildrenEntityAction,
 		weight: 0,
 		forEntityTypes: [],

@@ -9,7 +9,6 @@ import { manifests as createManifests } from './create/manifests.js';
 
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 import type { ManifestEntityAction } from '@umbraco-cms/backoffice/entity-action';
-import { UMB_ACTION_GROUP_USER } from '@umbraco-cms/backoffice/action';
 
 const entityActions: Array<ManifestEntityAction> = [
 	{
@@ -32,7 +31,7 @@ const entityActions: Array<ManifestEntityAction> = [
 		type: 'entityAction',
 		kind: 'default',
 		alias: 'Umb.EntityAction.User.Enable',
-		group: UMB_ACTION_GROUP_USER,
+		separatorBefore: true,
 		name: 'Enable User Entity Action',
 		weight: 800,
 		api: () => import('./enable/enable-user.action.js'),
@@ -51,7 +50,7 @@ const entityActions: Array<ManifestEntityAction> = [
 		type: 'entityAction',
 		kind: 'default',
 		alias: 'Umb.EntityAction.User.Disable',
-		group: UMB_ACTION_GROUP_USER,
+		separatorBefore: true,
 		name: 'Disable User Entity Action',
 		weight: 700,
 		api: () => import('./disable/disable-user.action.js'),
@@ -70,7 +69,6 @@ const entityActions: Array<ManifestEntityAction> = [
 		type: 'entityAction',
 		kind: 'default',
 		alias: 'Umb.EntityAction.User.Unlock',
-		group: UMB_ACTION_GROUP_USER,
 		name: 'Unlock User Entity Action',
 		weight: 600,
 		api: () => import('./unlock/unlock-user.action.js'),
@@ -89,7 +87,6 @@ const entityActions: Array<ManifestEntityAction> = [
 		type: 'entityAction',
 		kind: 'default',
 		alias: 'Umb.EntityAction.User.ConfigureMfa',
-		group: UMB_ACTION_GROUP_USER,
 		name: 'Configure MFA Entity Action',
 		weight: 500,
 		api: () => import('./mfa/mfa-user.action.js'),
