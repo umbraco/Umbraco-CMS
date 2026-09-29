@@ -135,14 +135,15 @@ describe('UmbEntityReferenceListElement', () => {
 		});
 
 		it('ignores a stale response that resolves after a newer request has already started', async () => {
+			element.referenceRepositoryAlias = REFERENCE_REPOSITORY_ALIAS;
+			document.body.appendChild(element);
+			await aTimeout(0);
+
 			UmbTestReferenceRepository.delaysMs = { 'elm-1': 30 };
 			UmbTestReferenceRepository.itemsByUnique = { 'elm-1': makeItems(1), 'elm-2': makeItems(4) };
 
-			element.referenceRepositoryAlias = REFERENCE_REPOSITORY_ALIAS;
-			element.unique = 'elm-1';
-			document.body.appendChild(element);
-
 			// Move on to 'elm-2' before the slow 'elm-1' response has resolved.
+			element.unique = 'elm-1';
 			element.unique = 'elm-2';
 			await aTimeout(50);
 

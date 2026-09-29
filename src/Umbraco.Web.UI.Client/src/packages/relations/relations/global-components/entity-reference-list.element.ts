@@ -15,6 +15,11 @@ import type { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
  */
 export type UmbEntityReferenceListSource = 'referencedBy' | 'descendantsWithReferences';
 
+interface UmbEntityReferenceListPage {
+	total: number;
+	items: Array<UmbReferenceItemModel | UmbEntityModel>;
+}
+
 /**
  * Presentational, paged list of the items referencing (or, in `descendantsWithReferences` mode, the descendants
  * referenced by) a given entity. Used by the entity references workspace info app and the entity references modal.
@@ -101,11 +106,10 @@ export class UmbEntityReferenceListElement extends UmbLitElement {
 
 	protected override updated(changedProperties: PropertyValues): void {
 		super.updated(changedProperties);
-		if (
-			changedProperties.has('referenceRepositoryAlias') ||
-			changedProperties.has('itemRepositoryAlias') ||
-			changedProperties.has('source')
-		) {
+		const repositoryConfigChanged = ['referenceRepositoryAlias', 'itemRepositoryAlias', 'source'].some((key) =>
+			changedProperties.has(key),
+		);
+		if (repositoryConfigChanged) {
 			this.#configureRepositories();
 		}
 	}
@@ -127,65 +131,58 @@ export class UmbEntityReferenceListElement extends UmbLitElement {
 	}
 
 	async #getReferences() {
-		if (!this.#unique) return;
-		if (!this.#referenceRepository) return;
+		const unique = this.#unique;
+		const repository = this.#referenceRepository;
+		if (!unique || !repository) return;
 
 		const token = ++this.#requestToken;
 		const skip = (this._currentPage - 1) * this.itemsPerPage;
 
-		if (this.source === 'descendantsWithReferences') {
-			await this.#getDescendantsWithReferences(skip, token);
-		} else {
-			await this.#getReferencedBy(skip, token);
-		}
+		const page =
+			this.source === 'descendantsWithReferences'
+				? await this.#fetchDescendantsWithReferences(repository, unique, skip)
+				: await this.#fetchReferencedBy(repository, unique, skip);
 
 		// A newer request (e.g. the unique or page changed again) has since started — its result should win, not ours.
 		if (token !== this.#requestToken) return;
 
+		if (page) {
+			this._total = page.total;
+			this._items = page.items;
+		}
+
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
-	async #getReferencedBy(skip: number, token: number) {
-		if (!this.#referenceRepository || !this.#unique) return;
-
-		const { data } = await this.#referenceRepository.requestReferencedBy(this.#unique, skip, this.itemsPerPage);
-		if (!data) return;
-		if (token !== this.#requestToken) return;
-
-		this._total = data.total;
-		this._items = data.items;
+	async #fetchReferencedBy(
+		repository: UmbEntityReferenceRepository,
+		unique: string,
+		skip: number,
+	): Promise<UmbEntityReferenceListPage | undefined> {
+		const { data } = await repository.requestReferencedBy(unique, skip, this.itemsPerPage);
+		return data;
 	}
 
-	async #getDescendantsWithReferences(skip: number, token: number) {
-		if (!this.#referenceRepository || !this.#unique) return;
-
+	async #fetchDescendantsWithReferences(
+		repository: UmbEntityReferenceRepository,
+		unique: string,
+		skip: number,
+	): Promise<UmbEntityReferenceListPage | undefined> {
 		// If the repository does not have the method, there are no descendants to report.
-		if (!this.#referenceRepository.requestDescendantsWithReferences) {
-			if (token !== this.#requestToken) return;
-			this._total = 0;
-			this._items = [];
-			return;
-		}
+		if (!repository.requestDescendantsWithReferences) return { total: 0, items: [] };
 
-		const { data } = await this.#referenceRepository.requestDescendantsWithReferences(
-			this.#unique,
-			skip,
-			this.itemsPerPage,
-		);
-		if (!data) return;
-		if (token !== this.#requestToken) return;
+		const { data } = await repository.requestDescendantsWithReferences(unique, skip, this.itemsPerPage);
+		if (!data) return undefined;
 
-		this._total = data.total;
+		return { total: data.total, items: await this.#resolveItems(data.items) };
+	}
 
-		if (!this.#itemRepository) {
-			this._items = data.items;
-			return;
-		}
+	async #resolveItems(items: Array<UmbEntityModel>): Promise<Array<UmbEntityModel>> {
+		if (!this.#itemRepository) return items;
 
-		const uniques = data.items.map((item) => item.unique).filter(Boolean) as Array<string>;
-		const { data: items } = await this.#itemRepository.requestItems(uniques);
-		if (token !== this.#requestToken) return;
-		this._items = items ?? [];
+		const uniques = items.map((item) => item.unique).filter(Boolean) as Array<string>;
+		const { data } = await this.#itemRepository.requestItems(uniques);
+		return data ?? [];
 	}
 
 	#onPageChange(event: UUIPaginationEvent) {
