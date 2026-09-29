@@ -147,6 +147,34 @@ test('can create a document blueprint from the content menu in a folder', {tag: 
   expect(children[0].name).toBe(documentBlueprintName);
 });
 
+test('can create a document blueprint from the content menu in a nested folder', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const childFolderName = 'ChildBlueprintFolder';
+  const documentTypeId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(documentTypeName);
+  await umbracoApi.document.createDefaultDocument(documentBlueprintName, documentTypeId);
+  const parentFolderId = await umbracoApi.documentBlueprint.createFolder(documentBlueprintFolderName);
+  const childFolderId = await umbracoApi.documentBlueprint.createFolder(childFolderName, parentFolderId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.clickActionsMenuForContent(documentBlueprintName);
+  await umbracoUi.content.clickCreateBlueprintActionMenuOption();
+  // Both the blueprint root and the parent folder render collapsed.
+  await umbracoUi.content.openCaretButtonForName('Document Blueprints');
+  await umbracoUi.content.openCaretButtonForName(documentBlueprintFolderName);
+  await umbracoUi.content.clickModalMenuItemWithName(childFolderName);
+  await umbracoUi.content.clickSaveModalButtonAndWaitForDocumentBlueprintToBeCreated();
+
+  // Assert
+  const children = await umbracoApi.documentBlueprint.getChildren(childFolderId);
+  expect(children.length).toBe(1);
+  expect(children[0].name).toBe(documentBlueprintName);
+
+  // Clean
+  await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
+});
+
 test('cannot save a document blueprint from the content menu without choosing a location', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const documentTypeId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(documentTypeName);
