@@ -2,8 +2,9 @@ import { UmbSearchQueryRepository } from '../query/search-query.repository.js';
 import type { UmbSearchRequest, UmbSearchResult, UmbHealthStatusModel } from '../types.js';
 import { UMB_SEARCH_WORKSPACE_CONTEXT } from '../workspace/search-workspace.context-token.js';
 import { UMB_SEARCH_DOCUMENT_ENTITY_TYPE } from '../constants.js';
+import type { ManifestSearchIndexDetailBox } from './types.js';
 
-import { css, customElement, html, nothing, state, when } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing, property, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -19,6 +20,9 @@ const PAGE_SIZE = 10;
 
 @customElement('umb-search-index-search-box')
 export class UmbSearchIndexSearchBoxElement extends UmbLitElement {
+	@property({ type: Object, attribute: false })
+	public manifest?: ManifestSearchIndexDetailBox;
+
 	#workspaceContext?: typeof UMB_SEARCH_WORKSPACE_CONTEXT.TYPE;
 	#queryRepository = new UmbSearchQueryRepository(this);
 	#inputValue = ''; // Non-reactive property for input value
@@ -133,19 +137,19 @@ export class UmbSearchIndexSearchBoxElement extends UmbLitElement {
 			});
 
 		this.consumeContext(UMB_SEARCH_WORKSPACE_CONTEXT, (workspaceContext) => {
-			if (!workspaceContext) return;
 			this.#workspaceContext = workspaceContext;
 
 			// Seed culture from URL params or app default (URL takes precedence)
 			const initialCulture = this.#urlCulture ?? this.#defaultAppCulture;
-			if (initialCulture && !workspaceContext.getSelectedCulture()) {
-				workspaceContext.setSelectedCulture(initialCulture);
+			if (initialCulture && !workspaceContext?.getSelectedCulture()) {
+				workspaceContext?.setSelectedCulture(initialCulture);
 			}
 
 			// Trigger search when both alias and culture are ready on the workspace context
 			this.observe(
-				observeMultiple([workspaceContext.name, workspaceContext.selectedCulture]),
-				([alias, culture]) => {
+				workspaceContext ? observeMultiple([workspaceContext.name, workspaceContext.selectedCulture]) : undefined,
+				(values) => {
+					const [alias, culture] = values ?? [];
 					this._indexAlias = alias ?? undefined;
 					this._selectedCulture = culture;
 					if (alias && culture) {
@@ -159,19 +163,17 @@ export class UmbSearchIndexSearchBoxElement extends UmbLitElement {
 		});
 
 		this.consumeContext(UMB_APP_LANGUAGE_CONTEXT, (languageContext) => {
-			if (!languageContext) return;
-
 			this.observe(
-				languageContext.languages,
+				languageContext?.languages,
 				(languages) => {
-					this._languages = languages;
-					this._hasMultipleLanguages = languages.length > 1;
+					this._languages = languages ?? [];
+					this._hasMultipleLanguages = this._languages.length > 1;
 				},
 				'_observeLanguages',
 			);
 
 			this.observe(
-				languageContext.appLanguageCulture,
+				languageContext?.appLanguageCulture,
 				(culture) => {
 					this.#defaultAppCulture = culture;
 					// If workspace context is ready and no culture set yet, apply default
@@ -247,8 +249,11 @@ export class UmbSearchIndexSearchBoxElement extends UmbLitElement {
 	}
 
 	override render() {
+		const headline = this.manifest?.meta?.label
+			? this.localize.string(this.manifest.meta.label)
+			: (this.manifest?.name ?? '');
 		return html`
-			<uui-box headline=${this.localize.term('searchManagement_searchBox')}>
+			<uui-box headline=${headline}>
 				<div
 					class="search-container"
 					role="search"

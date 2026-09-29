@@ -9,7 +9,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Webhook Table Collection View',
 		js: () => import('./table/webhook-table-collection-view.element.js'),
 		meta: {
-			label: 'Table',
+			label: '#collection_tableViewLabel',
 			icon: 'icon-table',
 			pathName: 'table',
 		},
