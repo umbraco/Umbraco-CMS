@@ -698,12 +698,15 @@ export class UiBaseLocators extends BasePage {
       menuItem = this.getMenuItemByLabel(name).first();
     }
     await this.waitForVisible(menuItem, ConstantHelper.timeout.long);
-    const isCaretButtonOpen = await menuItem.getAttribute("show-children");
-    if (isCaretButtonOpen === null) {
-      // Click through menuItem (already scoped above), not clickCaretButtonForName - that resolves
-      // the item page-wide, which finds a same-named item's caret behind an open modal instead.
-      await this.click(menuItem.locator("#caret-button").first());
-    }
+    // The caret toggles, so acting on a single read can collapse a node that was still expanding.
+    // Click through menuItem (already scoped above), not clickCaretButtonForName - that resolves the
+    // item page-wide, which finds a same-named item's caret behind an open modal instead.
+    await expect(async () => {
+      if (await menuItem.getAttribute("show-children") === null) {
+        await this.click(menuItem.locator("#caret-button").first());
+      }
+      expect(await menuItem.getAttribute("show-children")).not.toBeNull();
+    }).toPass({timeout: ConstantHelper.timeout.medium});
   }
 
   // Tree Methods
