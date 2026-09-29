@@ -12,8 +12,9 @@ export type CollectionAliasConditionConfig = UmbConditionConfigBase<typeof UMB_C
 };
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface UmbCollectionHasItemsConditionConfig
-	extends UmbConditionConfigBase<typeof UMB_COLLECTION_HAS_ITEMS_CONDITION_ALIAS> {}
+export interface UmbCollectionHasItemsConditionConfig extends UmbConditionConfigBase<
+	typeof UMB_COLLECTION_HAS_ITEMS_CONDITION_ALIAS
+> {}
 
 declare global {
 	interface UmbExtensionConditionConfigMap {

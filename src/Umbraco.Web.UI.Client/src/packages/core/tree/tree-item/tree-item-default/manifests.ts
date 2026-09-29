@@ -1,3 +1,5 @@
+import UmbDefaultTreeItemContext from './tree-item-default.context.js';
+import UmbDefaultTreeItemElement from './tree-item-default.element.js';
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_TREE_ITEM_DEFAULT_KIND_MANIFEST: UmbExtensionManifestKind = {
@@ -7,8 +9,8 @@ export const UMB_TREE_ITEM_DEFAULT_KIND_MANIFEST: UmbExtensionManifestKind = {
 	matchType: 'treeItem',
 	manifest: {
 		type: 'treeItem',
-		api: () => import('./tree-item-default.context.js'),
-		element: () => import('./tree-item-default.element.js'),
+		api: UmbDefaultTreeItemContext,
+		element: UmbDefaultTreeItemElement,
 	},
 };
 

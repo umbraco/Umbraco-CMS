@@ -194,7 +194,7 @@ public static partial class StringExtensions
         for (var i = 0; i < queryStrings.Length; i++)
         {
             queryStrings[i] = queryStrings[i].TrimStart(Constants.CharArrays.QuestionMarkAmpersand)
-                .TrimEnd(Constants.CharArrays.Ampersand);
+                .TrimEnd('&');
         }
 
         var nonEmpty = queryStrings.Where(x => !x.IsNullOrWhiteSpace()).ToArray();
@@ -394,6 +394,23 @@ public static partial class StringExtensions
     /// <summary>
     /// Strips all HTML tags from a string.
     /// </summary>
+    /// <remarks>
+    /// <para>
+    /// This is not a sanitizer and must not be relied on for XSS prevention. Only well-formed tags are
+    /// stripped, so this payload is neutralized:
+    /// <code>&lt;script&gt;alert(1)&lt;/script&gt;</code>
+    /// whereas a tag left unterminated within the value survives:
+    /// <code>&lt;img src=x onerror=alert(1)</code>
+    /// Once that output is concatenated into a page, the surrounding markup supplies the closing
+    /// <c>&gt;</c> and the browser renders the tag.
+    /// </para>
+    /// <para>
+    /// Rely on context-aware output encoding instead (Razor encodes <c>@</c> expressions by default),
+    /// or a dedicated HTML sanitizer where markup has to be preserved. For plain text values,
+    /// <see cref="CleanForXss"/> is an option, though it applies a blunt character filter and is
+    /// destructive to legitimate content.
+    /// </para>
+    /// </remarks>
     /// <param name="text">The text to strip HTML from.</param>
     /// <returns>The string with all HTML tags removed.</returns>
     public static string StripHtml(this string text)
@@ -403,6 +420,10 @@ public static partial class StringExtensions
     /// Strips all HTML tags from a string, replacing them with the specified character and ensuring that
     /// no more than one instance of the replacement string appears in a row.
     /// </summary>
+    /// <remarks>
+    /// This is not a sanitizer and must not be relied on for XSS prevention. See the remarks on
+    /// <see cref="StripHtml(string)"/>.
+    /// </remarks>
     /// <param name="text">The text to strip HTML from.</param>
     /// <param name="replacement">The string to replace the HTML tags with.</param>
     /// <returns>The string with all HTML tags removed.</returns>
@@ -623,22 +644,36 @@ public static partial class StringExtensions
     /// <exception cref="ArgumentNullException">Thrown when text or chars is null.</exception>
     public static string ReplaceMany(this string text, char[] chars, char replacement)
     {
-        if (text == null)
+        ArgumentNullException.ThrowIfNull(text);
+        ArgumentNullException.ThrowIfNull(chars);
+
+        if (chars.Length == 0 || text.Length == 0)
         {
-            throw new ArgumentNullException(nameof(text));
+            return text;
         }
 
-        if (chars == null)
+        // If the text does not contain any of the characters to replace, we can just return the original text.
+        int startingIndex = text.AsSpan().IndexOfAny(chars);
+        if (startingIndex == -1)
         {
-            throw new ArgumentNullException(nameof(chars));
+            return text;
         }
 
-        for (var i = 0; i < chars.Length; i++)
+        return string.Create(text.Length, (text, startingIndex, chars, replacement), static (span, state) =>
         {
-            text = text.Replace(chars[i], replacement);
-        }
+            (string? source, int startingIndex, char[]? set, char replacement) = state;
+            source.AsSpan().CopyTo(span);
 
-        return text;
+            span[startingIndex] = replacement;
+
+            Span<char> remaining = span[(startingIndex + 1)..];
+            int idx;
+            while ((idx = remaining.IndexOfAny(set)) >= 0)
+            {
+                remaining[idx] = replacement;
+                remaining = remaining[(idx + 1)..];
+            }
+        });
     }
 
     /// <summary>
@@ -730,6 +765,10 @@ public static partial class StringExtensions
     /// </summary>
     /// <param name="fileName">The file name to convert.</param>
     /// <returns>A friendly name with the extension stripped, underscores and dashes converted to spaces, and title case applied.</returns>
+    /// <remarks>
+    /// Mirrored client-side in <c>src/Umbraco.Web.UI.Client/src/packages/media/media/utils/to-friendly-name.function.ts</c>;
+    /// keep the two implementations in sync.
+    /// </remarks>
     public static string ToFriendlyName(this string fileName)
     {
         // strip the file extension

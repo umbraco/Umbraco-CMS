@@ -1,5 +1,5 @@
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import { UmbArrayState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import type { IComponentRoute, UmbRoute } from '@umbraco-cms/backoffice/router';
 
 /**
@@ -12,7 +12,8 @@ export class UmbWorkspaceRouteManager extends UmbControllerBase {
 	#routes = new UmbArrayState<UmbRoute>([], (x) => x.path);
 	public readonly routes = this.#routes.asObservable();
 
-	#activeLocalPath = new UmbStringState('');
+	#absolutePath?: string;
+	#localPath?: string;
 
 	/**
 	 * Set the routes for the workspace.
@@ -34,7 +35,10 @@ export class UmbWorkspaceRouteManager extends UmbControllerBase {
 			const oldSetupCallback = route.setup;
 
 			route.setup = (_component: any, info: any) => {
-				this.#activeLocalPath.setValue(info.match.fragments.consumed);
+				// TODO: could this be invalidated by the time it's used? [NL]
+				// That would be a parent router switches path without the view being changed...
+				this.#absolutePath = info.slot?.constructAbsolutePath();
+				this.#localPath = info.match.fragments.consumed;
 
 				if (oldSetupCallback) {
 					oldSetupCallback(_component, info);
@@ -58,10 +62,19 @@ export class UmbWorkspaceRouteManager extends UmbControllerBase {
 
 	/**
 	 * Get the active local path.
-	 * @returns {*}  {string}
+	 * @returns {string} The active local path.
 	 * @memberof UmbWorkspaceRouteManager
 	 */
 	getActiveLocalPath(): string {
-		return this.#activeLocalPath.getValue();
+		return this.#localPath ?? '';
+	}
+
+	/**
+	 * Get the absolute path.
+	 * @returns {string | undefined} The absolute path.
+	 * @memberof UmbWorkspaceRouteManager
+	 */
+	getAbsolutePath(): string | undefined {
+		return this.#absolutePath;
 	}
 }

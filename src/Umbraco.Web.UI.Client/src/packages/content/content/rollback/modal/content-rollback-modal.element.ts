@@ -465,7 +465,7 @@ export class UmbContentRollbackModalElement extends UmbModalBaseElement<
 		return html`
 			<umb-body-layout headline="Rollback">
 				<div id="main">
-					<div id="box-left">
+					<uui-scroll-container id="box-left">
 						${this._availableVariants.length
 							? html`
 									<uui-box id="language-box" headline=${this.localize.term('general_language')}>
@@ -474,7 +474,7 @@ export class UmbContentRollbackModalElement extends UmbModalBaseElement<
 								`
 							: nothing}
 						${this.#renderVersions()}
-					</div>
+					</uui-scroll-container>
 					${this.#renderSelectedVersion()}
 				</div>
 				<umb-footer-layout slot="footer">
@@ -597,7 +597,6 @@ export class UmbContentRollbackModalElement extends UmbModalBaseElement<
 			#box-left {
 				max-width: 500px;
 				flex: 1;
-				overflow: auto;
 				height: 100%;
 			}
 

@@ -36,7 +36,6 @@ test('can add a composition to an element type', {tag: '@smoke'}, async ({umbrac
 
   // Act
   await umbracoUi.documentType.goToDocumentType(elementTypeName);
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.medium);
   await umbracoUi.documentType.clickCompositionsButton();
   await umbracoUi.documentType.clickModalMenuItemWithName(compositionElementTypeName);
   await umbracoUi.documentType.clickSubmitButton();
@@ -56,7 +55,6 @@ test('can remove a composition from an element type', async ({umbracoApi, umbrac
 
   // Act
   await umbracoUi.documentType.goToDocumentType(elementTypeName);
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
   await umbracoUi.documentType.clickCompositionsButton();
   await umbracoUi.documentType.clickModalMenuItemWithName(compositionElementTypeName);
   await umbracoUi.documentType.clickSubmitButton();

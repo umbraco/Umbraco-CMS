@@ -285,7 +285,9 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
                         throw new Exception("bang!");
                     }
 
+#pragma warning disable CS0162 // Unreachable code detected
                     scope.Complete();
+#pragma warning restore CS0162 // Unreachable code detected
                 }
 
                 Assert.Fail("Expected exception.");

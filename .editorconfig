@@ -71,18 +71,6 @@ trim_trailing_whitespace = true
 trim_trailing_whitespace = false
 
 ##########################################
-# File Header (Uncomment to support file headers)
-# https://docs.microsoft.com/visualstudio/ide/reference/add-file-header
-##########################################
-
-# [*.{cs,csx,cake,vb,vbx}]
-file_header_template = Copyright (c) Umbraco.\nSee LICENSE for more details.
-
-# SA1636: File header copyright text should match
-# Justification: .editorconfig supports file headers. If this is changed to a value other than "none", a stylecop.json file will need to added to the project.
-# dotnet_diagnostic.SA1636.severity = none
-
-##########################################
 # .NET Language Conventions
 # https://docs.microsoft.com/visualstudio/ide/editorconfig-language-conventions
 ##########################################
@@ -136,6 +124,10 @@ dotnet_code_quality_unused_parameters = all:warning
 dotnet_style_operator_placement_when_wrapping = end_of_line
 # https://github.com/dotnet/roslyn/pull/40070
 dotnet_style_prefer_simplified_interpolation = true:warning
+# File header preferences
+file_header_template = Copyright (c) Umbraco.\nSee LICENSE for more details.
+dotnet_diagnostic.SA1633.severity = none # Suppressed until we decide to enforce it
+dotnet_diagnostic.SA1636.severity = none # Suppressed since we are using StyleCop
 
 # C# Code Style Settings
 # https://docs.microsoft.com/visualstudio/ide/editorconfig-language-conventions#c-code-style-settings

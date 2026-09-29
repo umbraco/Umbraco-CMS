@@ -1,5 +1,15 @@
 import type { ManifestWorkspaceActionMenuItem } from '../../extensions/types.js';
-import { css, html, customElement, property, state, nothing, repeat } from '@umbraco-cms/backoffice/external/lit';
+import {
+	css,
+	html,
+	customElement,
+	property,
+	state,
+	nothing,
+	repeat,
+	query,
+	eventOptions,
+} from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UUIInterfaceColor, UUIInterfaceLook } from '@umbraco-cms/backoffice/external/uui';
@@ -19,11 +29,24 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 	@state()
 	private _popoverOpen = false;
 
+	@query('#workspace-action-popover')
+	private _popover?: HTMLElement;
+
 	#onPopoverToggle(event: ToggleEvent) {
 		// TODO: This ignorer is just neede for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore
 		this._popoverOpen = event.newState === 'open';
+	}
+
+	// Capture phase so this runs before a menu item's action opens its modal: WebKit otherwise
+	// leaves the popovertarget toggle state "open" after the modal light-dismisses the popover,
+	// and the trigger then stops responding until the page is reloaded (#22777).
+	@eventOptions({ capture: true })
+	private _onPopoverClickCapture() {
+		if (this._popoverOpen) {
+			this._popover?.hidePopover();
+		}
 	}
 
 	override render() {
@@ -43,7 +66,8 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 				id="workspace-action-popover"
 				margin="6"
 				placement="top-end"
-				@toggle=${this.#onPopoverToggle}>
+				@toggle=${this.#onPopoverToggle}
+				@click=${this._onPopoverClickCapture}>
 				<umb-popover-layout id="workspace-action-popover-layout">
 					<uui-scroll-container>
 						${repeat(

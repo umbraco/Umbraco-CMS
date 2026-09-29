@@ -27,6 +27,13 @@ public interface IDocumentUrlAliasRepository
     void DeleteByDocumentKey(IEnumerable<Guid> documentKeys);
 
     /// <summary>
+    /// Deletes every persisted alias, i.e. for a full rebuild that repopulates the table from scratch.
+    /// </summary>
+    // TODO (V19): Remove the default implementation.
+    void DeleteAll()
+        => DeleteByDocumentKey(GetAll().Select(x => x.DocumentKey).Distinct());
+
+    /// <summary>
     /// Gets all document aliases.
     /// </summary>
     /// <returns>Raw alias data from documents with umbracoUrlAlias property.</returns>

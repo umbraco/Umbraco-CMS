@@ -1,3 +1,4 @@
+import { getCharacterCountState, isCharacterLimitExceeded } from '../utils/character-count.js';
 import {
 	css,
 	customElement,
@@ -18,7 +19,6 @@ import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umb
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UUITextareaElement } from '@umbraco-cms/backoffice/external/uui';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-import { getCharacterCountState, isCharacterLimitExceeded } from '../utils/character-count.js';
 
 @customElement('umb-property-editor-ui-textarea')
 export class UmbPropertyEditorUITextareaElement
@@ -57,11 +57,15 @@ export class UmbPropertyEditorUITextareaElement
 	private _rows?: number;
 
 	@state()
+	private _placeholder?: string;
+
+	@state()
 	private _css: StyleInfo = {};
 
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		this._maxChars = Number(config?.getValueByAlias('maxChars')) || undefined;
 		this._rows = Number(config?.getValueByAlias('rows')) || undefined;
+		this._placeholder = this.localize.string(config?.getValueByAlias<string>('placeholder'));
 		// min/max height where for a short period present in the config, but we do not want this complexity of our configuration.
 		// @deprecated remove config option in v.18, leave good default.
 		const _minHeight = Number(config?.getValueByAlias('minHeight')) || undefined;
@@ -119,6 +123,7 @@ export class UmbPropertyEditorUITextareaElement
 				.autoHeight=${this._rows ? false : true}
 				maxlength=${ifDefined(this._maxChars)}
 				rows=${ifDefined(this._rows)}
+				placeholder=${ifDefined(this._placeholder)}
 				.value=${this.value ?? ''}
 				@input=${this.#onInput}
 				?required=${this.mandatory}

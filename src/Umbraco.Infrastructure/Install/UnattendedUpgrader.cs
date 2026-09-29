@@ -11,6 +11,7 @@ using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.Migrations;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade;
 using Umbraco.Cms.Infrastructure.Runtime;
@@ -163,7 +164,23 @@ public class UnattendedUpgrader : INotificationAsyncHandler<RuntimeUnattendedUpg
 
         try
         {
-            await _packageMigrationRunner.RunPackagePlansAsync(pendingMigrations);
+            IEnumerable<ExecutedMigrationPlan> executedPlans =
+                await _packageMigrationRunner.RunPackagePlansAsync(pendingMigrations);
+
+            // Failed plans are reported via the result, not by throwing (the runner deliberately runs all plans to
+            // completion so one package's failure doesn't block another's). Surface them as a boot failure here so the
+            // failure is observable, mirroring the core upgrade path - otherwise the migration stays pending and the
+            // runtime re-derives Upgrading on every boot, leaving the site stuck on the maintenance page.
+            // All failures are reported together.
+            var failedPlans = executedPlans.Where(plan => plan.Successful is false).ToList();
+            if (failedPlans.Count > 0)
+            {
+                SetRuntimeError(CreatePackageMigrationError(failedPlans));
+                notification.UnattendedUpgradeResult =
+                    RuntimeUnattendedUpgradeNotification.UpgradeResult.HasErrors;
+                return;
+            }
+
             notification.UnattendedUpgradeResult = RuntimeUnattendedUpgradeNotification.UpgradeResult.PackageMigrationComplete;
 
             // Migration plans may have changed published content, so refresh the distributed cache to ensure consistency on first request.
@@ -198,6 +215,22 @@ public class UnattendedUpgrader : INotificationAsyncHandler<RuntimeUnattendedUpg
             notification.UnattendedUpgradeResult =
                 RuntimeUnattendedUpgradeNotification.UpgradeResult.CoreUpgradeComplete;
         }
+    }
+
+    private static Exception CreatePackageMigrationError(IReadOnlyList<ExecutedMigrationPlan> failedPlans)
+    {
+        static Exception ToException(ExecutedMigrationPlan plan)
+            => plan.Exception ?? new UnattendedInstallException(
+                $"An error occurred while running the unattended package migration '{plan.Plan.Name}'.");
+
+        if (failedPlans.Count == 1)
+        {
+            return ToException(failedPlans[0]);
+        }
+
+        return new AggregateException(
+            $"{failedPlans.Count} unattended package migrations failed: {string.Join(", ", failedPlans.Select(plan => plan.Plan.Name))}.",
+            failedPlans.Select(ToException));
     }
 
     private void SetRuntimeError(Exception exception)

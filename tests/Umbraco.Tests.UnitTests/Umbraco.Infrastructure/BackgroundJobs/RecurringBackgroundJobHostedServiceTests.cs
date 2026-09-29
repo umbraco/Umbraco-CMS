@@ -237,6 +237,19 @@ public class RecurringBackgroundJobHostedServiceTests
     }
 
     [Test]
+    public async Task Skips_Wait_When_IgnoredDelay_Is_Negative()
+    {
+        var timeProvider = new FakeTimeProvider();
+        var mockJob = new Mock<IRecurringBackgroundJob>();
+        mockJob.Setup(x => x.IgnoredDelay).Returns(TimeSpan.FromSeconds(-5));
+
+        var sut = CreateRecurringBackgroundJobHostedService(mockJob, isMainDom: false, timeProvider: timeProvider);
+
+        // Negative (and not Timeout.InfiniteTimeSpan) is treated like zero — back-off is skipped, no hang or tight loop.
+        await sut.PerformExecuteAsync(CancellationToken.None).WaitAsync(TimeSpan.FromSeconds(5));
+    }
+
+    [Test]
     public async Task Waits_Until_Shutdown_When_IgnoredDelay_Is_Infinite()
     {
         var timeProvider = new FakeTimeProvider();
@@ -254,6 +267,77 @@ public class RecurringBackgroundJobHostedServiceTests
 
         // Only cancellation releases the wait.
         cts.Cancel();
+        await executeTask.WaitAsync(TimeSpan.FromSeconds(5));
+    }
+
+    [Test]
+    public async Task IgnoredDelay_Change_From_Infinite_To_Finite_Resumes_Backoff()
+    {
+        var timeProvider = new FakeTimeProvider();
+        var mockJob = new Mock<IRecurringBackgroundJob>();
+        mockJob.Setup(x => x.IgnoredDelay).Returns(Timeout.InfiniteTimeSpan);
+
+        var sut = CreateRecurringBackgroundJobHostedService(mockJob, isMainDom: false, timeProvider: timeProvider);
+        Task executeTask = sut.PerformExecuteAsync(CancellationToken.None);
+
+        Task completedFirst = await Task.WhenAny(executeTask, Task.Delay(TimeSpan.FromMilliseconds(100)));
+        Assert.AreNotSame(executeTask, completedFirst, "Infinite back-off should be in progress");
+
+        // Switch IgnoredDelay to a finite value and signal the change — the in-progress wait must re-read it.
+        mockJob.Setup(x => x.IgnoredDelay).Returns(TimeSpan.FromMinutes(1));
+        mockJob.Raise(x => x.IgnoredDelayChanged += null, EventArgs.Empty);
+
+        completedFirst = await Task.WhenAny(executeTask, Task.Delay(TimeSpan.FromMilliseconds(100)));
+        Assert.AreNotSame(executeTask, completedFirst, "New finite back-off should be pending");
+
+        timeProvider.Advance(TimeSpan.FromMinutes(1));
+        await executeTask.WaitAsync(TimeSpan.FromSeconds(5));
+    }
+
+    [Test]
+    public async Task IgnoredDelay_Change_To_Zero_Exits_Backoff_Immediately()
+    {
+        var timeProvider = new FakeTimeProvider();
+        var mockJob = new Mock<IRecurringBackgroundJob>();
+        mockJob.Setup(x => x.IgnoredDelay).Returns(TimeSpan.FromHours(1));
+
+        var sut = CreateRecurringBackgroundJobHostedService(mockJob, isMainDom: false, timeProvider: timeProvider);
+        Task executeTask = sut.PerformExecuteAsync(CancellationToken.None);
+
+        Task completedFirst = await Task.WhenAny(executeTask, Task.Delay(TimeSpan.FromMilliseconds(100)));
+        Assert.AreNotSame(executeTask, completedFirst, "Back-off should be in progress");
+
+        mockJob.Setup(x => x.IgnoredDelay).Returns(TimeSpan.Zero);
+        mockJob.Raise(x => x.IgnoredDelayChanged += null, EventArgs.Empty);
+
+        // No time advance required — the loop re-reads zero and exits.
+        await executeTask.WaitAsync(TimeSpan.FromSeconds(5));
+    }
+
+    [Test]
+    public async Task IgnoredDelay_Change_Recomputes_Remaining_From_Elapsed()
+    {
+        var timeProvider = new FakeTimeProvider();
+        var mockJob = new Mock<IRecurringBackgroundJob>();
+        mockJob.Setup(x => x.IgnoredDelay).Returns(TimeSpan.FromMinutes(10));
+
+        var sut = CreateRecurringBackgroundJobHostedService(mockJob, isMainDom: false, timeProvider: timeProvider);
+        Task executeTask = sut.PerformExecuteAsync(CancellationToken.None);
+
+        Task completedFirst = await Task.WhenAny(executeTask, Task.Delay(TimeSpan.FromMilliseconds(100)));
+        Assert.AreNotSame(executeTask, completedFirst, "Back-off should be in progress");
+
+        // 4 of 10 minutes elapsed.
+        timeProvider.Advance(TimeSpan.FromMinutes(4));
+
+        // Shorten IgnoredDelay to 5 minutes — only ~1 minute should remain (5 - 4).
+        mockJob.Setup(x => x.IgnoredDelay).Returns(TimeSpan.FromMinutes(5));
+        mockJob.Raise(x => x.IgnoredDelayChanged += null, EventArgs.Empty);
+
+        completedFirst = await Task.WhenAny(executeTask, Task.Delay(TimeSpan.FromMilliseconds(100)));
+        Assert.AreNotSame(executeTask, completedFirst, "Recomputed remaining should still be pending");
+
+        timeProvider.Advance(TimeSpan.FromMinutes(1));
         await executeTask.WaitAsync(TimeSpan.FromSeconds(5));
     }
 

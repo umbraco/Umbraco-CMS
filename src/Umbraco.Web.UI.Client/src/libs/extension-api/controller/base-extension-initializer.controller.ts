@@ -292,6 +292,14 @@ export abstract class UmbBaseExtensionInitializer<
 					// Since this is a new call, then lets abort the pending call. [NL]
 					this.#abortPendingGoodCall();
 					await this._conditionsAreBad();
+
+					// The manifest can be cleared during the await (e.g. the extension is
+					// unregistered mid-navigation). _conditionsAreGood() asserts a non-null
+					// manifest, so bail out here if it is gone.
+					if (this.#manifest === undefined) {
+						return;
+					}
+
 					const abortController = new AbortController();
 					const promise = this._conditionsAreGood(abortController.signal);
 					entry = { manifest: this.#manifest, promise, abortController };

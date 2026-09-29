@@ -649,5 +649,3 @@ if (state.held?.some((l) => l.name === 'umb:token-refresh')) {
 ```
 
 Note: there is a TOCTOU gap between `query()` and `request()`. If the lock releases between the two calls, `request()` acquires and releases immediately — this is harmless.
-
-

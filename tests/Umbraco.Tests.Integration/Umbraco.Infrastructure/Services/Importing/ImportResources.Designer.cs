@@ -262,6 +262,12 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services.Importin
             }
         }
 
+        internal static string ContentWithNonDefaultTemplate_Package {
+            get {
+                return ResourceManager.GetString("ContentWithNonDefaultTemplate_Package", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;
         ///&lt;umbPackage&gt;

@@ -21,7 +21,7 @@ public class ObjectTypePresentationFactory : IObjectTypePresentationFactory
     }
 
     /// <summary>
-    /// Creates a collection of <see cref="Umbraco.Cms.Api.Management.Models.ObjectTypeResponseModel"/> instances representing the allowed object types retrieved from the relation service.
+    /// Creates a collection of <see cref="ObjectTypeResponseModel"/> instances representing the allowed object types retrieved from the relation service.
     /// </summary>
     /// <returns>
     /// An <see cref="IEnumerable{ObjectTypeResponseModel}"/> containing response models for each allowed object type.

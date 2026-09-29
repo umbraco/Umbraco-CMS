@@ -4,7 +4,11 @@ import type {
 	UmbPickerTreeDataSource,
 } from '@umbraco-cms/backoffice/picker-data-source';
 import type { UmbSearchRequestArgs, UmbSearchResultItemModel } from '@umbraco-cms/backoffice/search';
-import type { UmbTreeChildrenOfRequestArgs, UmbTreeItemModel } from '@umbraco-cms/backoffice/tree';
+import type {
+	UmbTreeAncestorsOfRequestArgs,
+	UmbTreeChildrenOfRequestArgs,
+	UmbTreeItemModel,
+} from '@umbraco-cms/backoffice/tree';
 
 export class ExampleCustomPickerTreePropertyEditorDataSource
 	extends UmbControllerBase
@@ -54,9 +58,19 @@ export class ExampleCustomPickerTreePropertyEditorDataSource
 		return { data };
 	}
 
-	async requestTreeItemAncestors() {
-		// TODO: implement when needed
-		return { data: [] };
+	async requestTreeItemAncestors(args: UmbTreeAncestorsOfRequestArgs) {
+		const ancestors: Array<UmbTreeItemModel> = [];
+
+		let current = customItems.find((item) => item.unique === args.treeItem.unique);
+
+		// Walk up the parent chain, building the list root-first and including the item itself.
+		while (current) {
+			ancestors.unshift(current);
+			const parentUnique = current.parent.unique;
+			current = parentUnique ? customItems.find((item) => item.unique === parentUnique) : undefined;
+		}
+
+		return { data: ancestors };
 	}
 
 	async requestItems(uniques: Array<string>) {

@@ -23,7 +23,7 @@ public class ItemDocumentBlueprintControllerTests : ManagementApiUserGroupTestBa
     private Guid _blueprintKey;
 
     [SetUp]
-    public async Task Setup()
+    public new async Task Setup()
     {
         // Template
         var template = TemplateBuilder.CreateTextPageTemplate(Guid.NewGuid().ToString());

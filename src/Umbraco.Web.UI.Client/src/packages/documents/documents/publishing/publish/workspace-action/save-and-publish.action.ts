@@ -12,6 +12,10 @@ export class UmbDocumentSaveAndPublishWorkspaceAction extends UmbWorkspaceAction
 	constructor(host: UmbControllerHost, args: UmbWorkspaceActionArgs<never>) {
 		super(host, args);
 
+		// Opt in to isExecuting feedback so the workspace-action element waits
+		// for the variant-picker modal (when present) before showing the spinner.
+		this.setExecuting(false);
+
 		/* The action is disabled by default because the onChange callback
 		 will first be triggered when the condition is changed to permitted */
 		this.disable();
@@ -43,11 +47,17 @@ export class UmbDocumentSaveAndPublishWorkspaceAction extends UmbWorkspaceAction
 	}
 
 	override async execute() {
-		const workspaceContext = await this.getContext(UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT);
-		if (!workspaceContext) {
-			throw new Error('The workspace context is missing');
+		try {
+			const workspaceContext = await this.getContext(UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT);
+			if (!workspaceContext) {
+				throw new Error('The workspace context is missing');
+			}
+			await workspaceContext.saveAndPublish({
+				onActionStarting: () => this.setExecuting(true),
+			});
+		} finally {
+			this.setExecuting(false);
 		}
-		return workspaceContext.saveAndPublish();
 	}
 }
 

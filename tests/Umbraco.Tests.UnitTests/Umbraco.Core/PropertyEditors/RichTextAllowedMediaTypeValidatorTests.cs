@@ -1,6 +1,7 @@
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Validation;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -162,7 +163,7 @@ internal class RichTextAllowedMediaTypeValidatorTests
         var mediaTypeServiceMock = new Mock<IMediaTypeService>();
 
         var validator = new RichTextAllowedMediaTypeValidator(
-            new HtmlImageSourceParser(_ => string.Empty),
+            new HtmlImageSourceParser(_ => string.Empty, new NoopImageUrlTokenGenerator()),
             mediaServiceMock.Object,
             Mock.Of<ILocalizedTextService>(),
             new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory()),

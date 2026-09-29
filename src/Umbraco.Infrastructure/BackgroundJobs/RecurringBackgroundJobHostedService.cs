@@ -49,6 +49,7 @@ public class RecurringBackgroundJobHostedService<TJob> : RecurringHostedServiceB
     private readonly IEventMessagesFactory _eventMessagesFactory;
     private readonly IRecurringBackgroundJob _job;
     private readonly TimeProvider _timeProvider;
+    private CancellationTokenSource _ignoredDelayChangeCts = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RecurringBackgroundJobHostedService{TJob}" /> class, which manages the execution of a recurring background job.
@@ -82,6 +83,7 @@ public class RecurringBackgroundJobHostedService<TJob> : RecurringHostedServiceB
         _timeProvider = timeProvider;
 
         _job.PeriodChanged += OnPeriodChanged;
+        _job.IgnoredDelayChanged += OnIgnoredDelayChanged;
     }
 
     /// <summary>
@@ -194,6 +196,9 @@ public class RecurringBackgroundJobHostedService<TJob> : RecurringHostedServiceB
         if (disposing)
         {
             _job.PeriodChanged -= OnPeriodChanged;
+            _job.IgnoredDelayChanged -= OnIgnoredDelayChanged;
+
+            _ignoredDelayChangeCts.Dispose();
         }
 
         base.Dispose(disposing);
@@ -206,6 +211,14 @@ public class RecurringBackgroundJobHostedService<TJob> : RecurringHostedServiceB
     /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
     private void OnPeriodChanged(object? sender, EventArgs e)
         => ChangePeriod(_job.Period);
+
+    /// <summary>
+    /// Handles the <see cref="IRecurringBackgroundJob.IgnoredDelayChanged" /> event by interrupting any in-progress ignored back-off so it re-reads the new <see cref="IRecurringBackgroundJob.IgnoredDelay" /> value.
+    /// </summary>
+    /// <param name="sender">The sender.</param>
+    /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+    private void OnIgnoredDelayChanged(object? sender, EventArgs e)
+        => CancellationTokenSourceRotation.RotateAndCancel(ref _ignoredDelayChangeCts);
 
     /// <summary>
     /// Publishes the ignored notification and waits for <see cref="IRecurringBackgroundJob.IgnoredDelay" /> before allowing the next iteration, preventing tight looping when execution is skipped.
@@ -223,19 +236,43 @@ public class RecurringBackgroundJobHostedService<TJob> : RecurringHostedServiceB
         _logger.LogDebug(message);
         await _eventAggregator.PublishAsync(new RecurringBackgroundJobIgnoredNotification(_job, eventMessages).WithStateFrom(executingNotification), stoppingToken);
 
-        TimeSpan ignoredDelay = _job.IgnoredDelay;
-        if (ignoredDelay == TimeSpan.Zero)
-        {
-            return;
-        }
+        long waitStart = _timeProvider.GetTimestamp();
 
-        try
+        while (true)
         {
-            await Task.Delay(ignoredDelay, _timeProvider, stoppingToken);
-        }
-        catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
-        {
-            // Back-off interrupted by shutdown; the ignored notification has already been published, so do not also publish canceled.
+            TimeSpan ignoredDelay = _job.IgnoredDelay;
+
+            // Skip back-off for zero/negative; Timeout.InfiniteTimeSpan means wait until shutdown or IgnoredDelayChanged.
+            if (ignoredDelay != Timeout.InfiniteTimeSpan && ignoredDelay <= TimeSpan.Zero)
+            {
+                return;
+            }
+
+            TimeSpan remaining = ComputeNextDelay(ignoredDelay, _timeProvider.GetElapsedTime(waitStart));
+            if (remaining == TimeSpan.Zero)
+            {
+                return;
+            }
+
+            CancellationToken ignoredDelayChangeToken = _ignoredDelayChangeCts.Token;
+            using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(stoppingToken, ignoredDelayChangeToken);
+
+            try
+            {
+                await Task.Delay(remaining, _timeProvider, linkedCts.Token);
+
+                // Back-off complete
+                return;
+            }
+            catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
+            {
+                // Back-off interrupted by shutdown; the ignored notification has already been published, so do not also publish canceled
+                return;
+            }
+            catch (OperationCanceledException) when (ignoredDelayChangeToken.IsCancellationRequested)
+            {
+                // IgnoredDelay changed — loop to re-read and recompute the remaining wait
+            }
         }
     }
 }

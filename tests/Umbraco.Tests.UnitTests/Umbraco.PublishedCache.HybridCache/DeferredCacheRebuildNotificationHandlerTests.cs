@@ -1,9 +1,11 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
@@ -119,6 +121,96 @@ public class DeferredCacheRebuildNotificationHandlerTests
         _deferredCacheRebuildService.Verify(
             x => x.QueueContentTypeRebuild(It.IsAny<IReadOnlyCollection<int>>()),
             Times.Never);
+    }
+
+    /// <summary>
+    ///     Verifies that a property-removal (RawDataUnaffected) change does not queue a deferred rebuild — the
+    ///     stored blob stays valid, so only the converted cache is cleared (by the refreshers, not here).
+    /// </summary>
+    [Test]
+    public void RawDataUnaffected_Change_Does_Not_Queue()
+    {
+        // Arrange
+        var handler = CreateHandler(ContentTypeRebuildMode.Deferred);
+        var contentType = CreateContentType(100);
+        var notification = new ContentTypeChangedNotification(
+            new ContentTypeChange<IContentType>(contentType, ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.RawDataUnaffected),
+            new EventMessages());
+
+        // Act
+        handler.Handle(notification);
+
+        // Assert
+        _deferredCacheRebuildService.Verify(
+            x => x.QueueContentTypeRebuild(It.IsAny<IReadOnlyCollection<int>>()),
+            Times.Never);
+    }
+
+    /// <summary>
+    ///     Verifies the handler still queues a rebuild when the notification is dispatched through a
+    ///     distributed-cache-only publisher (e.g. the publisher Umbraco Deploy installs on restore/import
+    ///     scopes). This is the dispatch-filtering path that the direct <see cref="DeferredCacheRebuildNotificationHandler.Handle(ContentTypeChangedNotification)" />
+    ///     tests above cannot exercise, since <see cref="EventAggregator" /> filters handlers by
+    ///     <see cref="IDistributedCacheNotificationHandler" /> before invoking them.
+    /// </summary>
+    [Test]
+    public void Content_Type_Change_Via_Distributed_Cache_Publisher_Queues_Deferred_Rebuild()
+    {
+        // Arrange
+        _deferredCacheRebuildService
+            .Setup(x => x.QueueContentTypeRebuild(It.Is<IReadOnlyCollection<int>>(ids => ids.Count == 1 && ids.Contains(100))));
+
+        IScopedNotificationPublisher publisher = CreateDistributedCacheOnlyPublisher();
+        var notification = new ContentTypeChangedNotification(
+            new ContentTypeChange<IContentType>(CreateContentType(100), ContentTypeChangeTypes.RefreshMain),
+            new EventMessages());
+
+        // Act — publish through the distributed-cache-only publisher, then complete the scope to flush it.
+        publisher.Publish(notification);
+        publisher.ScopeExit(true);
+
+        // Assert
+        _deferredCacheRebuildService.Verify(
+            x => x.QueueContentTypeRebuild(It.Is<IReadOnlyCollection<int>>(ids => ids.Count == 1 && ids.Contains(100))),
+            Times.Once);
+    }
+
+    /// <summary>
+    ///     As <see cref="Content_Type_Change_Via_Distributed_Cache_Publisher_Queues_Deferred_Rebuild" />, but for media type changes.
+    /// </summary>
+    [Test]
+    public void Media_Type_Change_Via_Distributed_Cache_Publisher_Queues_Deferred_Rebuild()
+    {
+        // Arrange
+        _deferredCacheRebuildService
+            .Setup(x => x.QueueMediaTypeRebuild(It.Is<IReadOnlyCollection<int>>(ids => ids.Count == 1 && ids.Contains(200))));
+
+        IScopedNotificationPublisher publisher = CreateDistributedCacheOnlyPublisher();
+        var notification = new MediaTypeChangedNotification(
+            new ContentTypeChange<IMediaType>(CreateMediaType(200), ContentTypeChangeTypes.RefreshMain),
+            new EventMessages());
+
+        // Act
+        publisher.Publish(notification);
+        publisher.ScopeExit(true);
+
+        // Assert
+        _deferredCacheRebuildService.Verify(
+            x => x.QueueMediaTypeRebuild(It.Is<IReadOnlyCollection<int>>(ids => ids.Count == 1 && ids.Contains(200))),
+            Times.Once);
+    }
+
+    private ScopedNotificationPublisher<IDistributedCacheNotificationHandler> CreateDistributedCacheOnlyPublisher()
+    {
+        var services = new ServiceCollection();
+        services.AddSingleton(_deferredCacheRebuildService.Object);
+        services.AddSingleton(Options.Create(new CacheSettings { ContentTypeRebuildMode = ContentTypeRebuildMode.Deferred }));
+        services.AddTransient<INotificationHandler<ContentTypeChangedNotification>, DeferredCacheRebuildNotificationHandler>();
+        services.AddTransient<INotificationHandler<MediaTypeChangedNotification>, DeferredCacheRebuildNotificationHandler>();
+
+        ServiceProvider provider = services.BuildServiceProvider();
+        var eventAggregator = new EventAggregator(type => provider.GetService(type)!);
+        return new ScopedNotificationPublisher<IDistributedCacheNotificationHandler>(eventAggregator);
     }
 
     private static IContentType CreateContentType(int id)

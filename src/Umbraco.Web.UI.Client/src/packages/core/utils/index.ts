@@ -11,6 +11,7 @@ export * from './expansion/index.js';
 export * from './get-guid-from-udi.function.js';
 export * from './get-processed-image-url.function.js';
 export * from './guard-manager/index.js';
+export * from './is-production-build.function.js';
 export * from './is-test-environment.function.js';
 export * from './math/math.js';
 export * from './media/image-size.function.js';

@@ -19,6 +19,10 @@ export interface MetaEntityActionMoveToKind extends MetaEntityActionDefaultKind 
 	treeRepositoryAlias: string;
 	treeAlias: string;
 	foldersOnly?: boolean;
+	/**
+	 * The alias of a search provider used to enable search in the destination picker.
+	 */
+	searchProviderAlias?: string;
 }
 
 declare global {

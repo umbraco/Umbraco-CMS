@@ -24,7 +24,7 @@ import {
  * @slot actions - Slot for actions in the footer
  * @slot default - slot for main content
  * @class UmbBodyLayout
- * @augments {UmbLitElement}
+ * @augments {LitElement}
  */
 @customElement('umb-body-layout')
 export class UmbBodyLayoutElement extends LitElement {
@@ -119,11 +119,10 @@ export class UmbBodyLayoutElement extends LitElement {
 					}}></slot>
 			</div>
 
-			<!-- This div should be changed for the uui-scroll-container when it gets updated -->
-			<div id="main">
+			<uui-scroll-container id="main">
 				${this.loading ? html`<uui-loader-bar></uui-loader-bar>` : nothing}
 				<slot></slot>
-			</div>
+			</uui-scroll-container>
 
 			<slot name="footer"></slot>
 			<umb-footer-layout style="display:${this._footerSlotHasChildren || this._actionsSlotHasChildren ? '' : 'none'}">
@@ -183,6 +182,7 @@ export class UmbBodyLayoutElement extends LitElement {
 			#header-slot {
 				padding: 0 var(--uui-size-layout-1);
 				flex-grow: 1;
+				flex-basis: 0;
 			}
 			:host([header-no-padding]) #header-slot {
 				padding: 0;
@@ -223,7 +223,6 @@ export class UmbBodyLayoutElement extends LitElement {
 				display: block;
 				flex: 1;
 				flex-direction: column;
-				overflow-y: auto;
 				padding: var(--uui-size-layout-1);
 			}
 

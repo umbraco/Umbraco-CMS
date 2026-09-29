@@ -34,8 +34,8 @@ export class UmbPreviewCultureElement extends UmbLitElement {
 	}
 
 	async #loadCultures() {
-		const { data: langauges } = await this.#languageRepository.requestCollection({ skip: 0, take: 100 });
-		this._cultures = langauges?.items ?? [];
+		const { data: languages } = await this.#languageRepository.requestAllItems();
+		this._cultures = languages?.items ?? [];
 
 		const searchParams = new URLSearchParams(window.location.search);
 		const culture = searchParams.get('culture');

@@ -5,6 +5,7 @@ using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Web.Common.Hosting;
+using Umbraco.Cms.Web.Common.Middleware;
 
 namespace Umbraco.Extensions;
 
@@ -68,6 +69,10 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IBackOfficeEnabledMarker, BackOfficeEnabledMarker>();
 
         builder.Services.AddUnique<IBackOfficePathGenerator, UmbracoBackOfficePathGenerator>();
+        // Registered here rather than in AddWebComponents because the middleware depends on
+        // IBackOfficePathGenerator (registered just above). DI scope validation would otherwise
+        // fail in Delivery-only/Website-only bootstraps that never call AddBackOffice().
+        builder.Services.AddSingleton<UmbracoBackOfficeCacheHeadersMiddleware>();
         builder.Services.AddUnique<IPhysicalFileSystem>(factory =>
         {
             var path = "~/";

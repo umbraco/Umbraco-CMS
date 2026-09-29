@@ -61,7 +61,7 @@ public class DbProviderFactoryCreator : IDbProviderFactoryCreator
     /// </summary>
     /// <remarks>gets the sql syntax provider that corresponds, from attribute</remarks>
     /// <param name="providerName">The name of the database provider.</param>
-    /// <returns>An <see cref="Umbraco.Cms.Infrastructure.Persistence.ISqlSyntaxProvider" /> instance for the specified provider.</returns>
+    /// <returns>An <see cref="ISqlSyntaxProvider" /> instance for the specified provider.</returns>
     public ISqlSyntaxProvider GetSqlSyntaxProvider(string providerName)
     {
         if (!_syntaxProviders.TryGetValue(providerName, out ISqlSyntaxProvider? result))

@@ -74,6 +74,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             string[] columns = [
                     sx.ColumnWithAlias("x", "otherId", "nodeId"),
                     sx.ColumnWithAlias("n", "uniqueId", "nodeKey"),
+                    sx.ColumnWithAlias("n", "text", "nodeName"),
                     sx.ColumnWithAlias("n", "nodeObjectType", "nodeObjectType"),
                     sx.ColumnWithAlias("d", "published", "nodePublished"),
                     sx.ColumnWithAlias("ctn", "uniqueId", "contentTypeKey"),

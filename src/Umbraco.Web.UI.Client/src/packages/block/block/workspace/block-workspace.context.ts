@@ -1,16 +1,20 @@
 import type { UmbBlockDataModel, UmbBlockDataValueModel, UmbBlockLayoutBaseModel } from '../types.js';
 import { UMB_BLOCK_ENTRIES_CONTEXT, UMB_BLOCK_MANAGER_CONTEXT } from '../context/index.js';
+import { UMB_BLOCK_CONTENT_DATA_PATH_PROPERTY_NAME, UMB_BLOCK_SETTINGS_DATA_PATH_PROPERTY_NAME } from '../constants.js';
 import { UmbBlockWorkspaceEditorElement } from './block-workspace-editor.element.js';
 import { UmbBlockElementManager } from './block-element-manager.js';
 import type { UmbBlockWorkspaceOriginData } from './block-workspace.modal-token.js';
 import { UMB_BLOCK_WORKSPACE_VIEW_CONTENT, UMB_BLOCK_WORKSPACE_VIEW_SETTINGS } from './constants.js';
 import { UmbBlockLanguageAccessWorkspaceController } from './block-workspace-language-access.controller.js';
+import { resolveBlockWorkspaceLabelIndex } from './block-workspace-label-index.function.js';
+import { buildBlockLabelValueObject } from './block-workspace-label-value.function.js';
 import {
 	UmbSubmittableWorkspaceContextBase,
 	type UmbRoutableWorkspaceContext,
 	UmbWorkspaceIsNewRedirectController,
 	type ManifestWorkspace,
 	UmbWorkspaceIsNewRedirectControllerAlias,
+	umbWorkspaceWillNavigateAway,
 } from '@umbraco-cms/backoffice/workspace';
 import {
 	UmbBooleanState,
@@ -27,6 +31,7 @@ import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 import { UmbUfmVirtualRenderController } from '@umbraco-cms/backoffice/ufm';
 import { UMB_IS_TRASHED_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/recycle-bin';
+import { distinctUntilChanged, map } from '@umbraco-cms/backoffice/external/rxjs';
 
 export type UmbBlockWorkspaceElementManagerNames = 'content' | 'settings';
 
@@ -47,6 +52,8 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	setOriginData(data: UmbBlockWorkspaceOriginData) {
 		this.#originData = data;
 	}
+	// Cached index of this block in its parent layout list, recomputed only when layouts or contentKey change.
+	#index: number | undefined;
 	#modalContext?: typeof UMB_MODAL_CONTEXT.TYPE;
 	#retrieveModalContext;
 
@@ -63,8 +70,16 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	readonly unique = this.#layout.asObservablePart((x) => x?.contentKey);
 	readonly contentKey = this.#layout.asObservablePart((x) => x?.contentKey);
 
-	readonly content = new UmbBlockElementManager(this, 'contentData', UMB_BLOCK_WORKSPACE_VIEW_CONTENT);
-	readonly settings = new UmbBlockElementManager(this, 'settingsData', UMB_BLOCK_WORKSPACE_VIEW_SETTINGS);
+	readonly content = new UmbBlockElementManager(
+		this,
+		UMB_BLOCK_CONTENT_DATA_PATH_PROPERTY_NAME,
+		UMB_BLOCK_WORKSPACE_VIEW_CONTENT,
+	);
+	readonly settings = new UmbBlockElementManager(
+		this,
+		UMB_BLOCK_SETTINGS_DATA_PATH_PROPERTY_NAME,
+		UMB_BLOCK_WORKSPACE_VIEW_SETTINGS,
+	);
 
 	#name = new UmbStringState<string | undefined>(undefined);
 	readonly name = this.#name.asObservable();
@@ -107,6 +122,26 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 
 		this.#retrieveBlockEntries = this.consumeContext(UMB_BLOCK_ENTRIES_CONTEXT, (context) => {
 			this.#blockEntries = context;
+			if (context) {
+				this.observe(
+					// TODO: Turn this into a observablePart that is retrievable from the block entries context, so we do not have to observe multiple values here. [NL]
+					observeMultiple([context.layoutEntries, this.contentKey]).pipe(
+						map(([layouts, contentKey]) => {
+							const found = contentKey ? layouts.findIndex((x) => x.contentKey === contentKey) : -1;
+							return found !== -1 ? found : undefined;
+						}),
+						distinctUntilChanged(),
+					),
+					(index) => {
+						this.#index = index;
+						this.#renderLabel(this.content.getVariantValues(), this.settings.getVariantValues());
+					},
+					'observeLayoutIndex',
+				);
+			} else {
+				this.#index = undefined;
+				this.removeUmbControllerByAlias('observeLayoutIndex');
+			}
 		}).asPromise({ preventTimeout: true });
 
 		this.consumeContext(UMB_IS_TRASHED_ENTITY_CONTEXT, (context) => {
@@ -143,11 +178,11 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 		);
 
 		this.observe(
-			observeMultiple([this.content.values, this.settings.values]),
+			observeMultiple([this.content.variantValues, this.settings.variantValues]),
 			async ([contentValues, settingsValues]) => {
 				this.#renderLabel(contentValues, settingsValues);
 			},
-			'observeContentForLabelRender',
+			null,
 		);
 
 		this.routes.setRoutes([
@@ -242,6 +277,9 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 						}
 
 						await this.content.structure.whenLoaded();
+						// Have we been destroyed while awaiting the structure? then back out, otherwise reading from
+						// the now-destroyed content type structure or element states throws:
+						if (!this.#blockManager) return;
 						this.#gotLabel(blockType?.label ?? this.content.structure.getOwnerContentTypeName());
 					},
 					'observeBlockType',
@@ -254,7 +292,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	#gotLabel(label: string | undefined) {
 		if (label) {
 			this.#labelRender.markdown = label;
-			this.#renderLabel(this.content.getValues(), this.settings.getValues());
+			this.#renderLabel(this.content.getVariantValues(), this.settings.getVariantValues());
 		}
 	}
 
@@ -262,24 +300,18 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 		contentValues: Array<UmbBlockDataValueModel> | undefined,
 		settingsValues: Array<UmbBlockDataValueModel> | undefined,
 	) {
-		const valueObject = {} as Record<string, unknown>;
-		if (contentValues) {
-			for (const property of contentValues) {
-				valueObject[property.alias] = property.value;
-			}
-		}
+		const index = resolveBlockWorkspaceLabelIndex(
+			this.#index,
+			this.#originData,
+			this.#blockEntries?.getLayouts().length,
+		);
 
-		if (settingsValues) {
-			valueObject['$settings'] = settingsValues;
-		}
-
-		// TODO: Look to add support for `$index`, requires wiring up the block-entry with the workspace. [LK]
-		//valueObject['$index'] = 0;
-
-		this.#labelRender.value = valueObject;
+		this.#labelRender.value = buildBlockLabelValueObject(contentValues, settingsValues, index);
 
 		// Await one animation frame:
 		await new Promise((resolve) => requestAnimationFrame(() => resolve(true)));
+		// Check have we been destroyed while waiting for the animation frame? then back out:
+		if (!this.#blockManager) return;
 		const prefix = this.getIsNew() === true ? '#general_add' : '#general_edit';
 		const label = this.#labelRender.toString();
 		const title = `${prefix} ${label}`;
@@ -329,13 +361,10 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	 * @protected
 	 * @param {string | URL} newUrl The new url that the workspace is navigating to.
 	 * @returns {boolean} true if the workspace is navigating away.
-	 * @memberof UmbEntityWorkspaceContextBase
+	 * @memberof UmbBlockWorkspaceContext
 	 */
 	protected _checkWillNavigateAway(newUrl: string | URL): boolean {
-		if (newUrl instanceof URL) {
-			newUrl = newUrl.href;
-		}
-		return !newUrl.includes(this.routes.getActiveLocalPath());
+		return umbWorkspaceWillNavigateAway(this.routes, this.getUnique(), newUrl);
 	}
 
 	setEditorSize(editorSize: UUIModalSidebarSize) {

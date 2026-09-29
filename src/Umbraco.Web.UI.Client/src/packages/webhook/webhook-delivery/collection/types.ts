@@ -1,3 +1,13 @@
+import type { UmbWebhookDeliveryStatusCodeValue } from '../status-code/value-type/constants.js';
+import type { UmbCollectionItemModel } from '@umbraco-cms/backoffice/collection';
+
+export interface UmbWebhookDeliveryCollectionItemModel extends UmbCollectionItemModel {
+	date: string;
+	url: string;
+	retryCount: number;
+	statusCode: UmbWebhookDeliveryStatusCodeValue;
+}
+
 export interface UmbWebhookDeliveryCollectionFilterModel {
 	webhook: { unique: string };
 	skip?: number;

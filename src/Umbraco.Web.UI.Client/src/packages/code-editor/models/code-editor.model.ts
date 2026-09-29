@@ -177,6 +177,11 @@ export interface CodeEditorConstructorOptions {
 	 */
 	lightbulb?: boolean;
 	/**
+	 * Enable auto-height mode where the editor grows to fit content.
+	 * Defaults to false.
+	 */
+	autoHeight?: boolean;
+	/**
 	 * Enable code folding.
 	 * Defaults to true.
 	 */

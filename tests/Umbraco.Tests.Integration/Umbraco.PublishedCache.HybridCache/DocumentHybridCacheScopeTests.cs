@@ -52,7 +52,8 @@ internal sealed class DocumentHybridCacheScopeTests : UmbracoIntegrationTestWith
     {
         using (CoreScopeProvider.CreateCoreScope())
         {
-            await ContentPublishingService.PublishAsync(Textpage.Key.Value,
+            await ContentPublishingService.PublishAsync(
+                Textpage.Key.Value,
                 [new CulturePublishScheduleModel { Culture = "*" }],
                 Constants.Security.SuperUserKey);
         }

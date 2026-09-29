@@ -1,4 +1,5 @@
 import { UMB_BOOLEAN_VALUE_SUMMARY_ALIAS } from './constants.js';
+import { UmbBooleanValueSummaryElement } from './boolean-value-summary.element.js';
 import { UMB_BOOLEAN_VALUE_TYPE } from '@umbraco-cms/backoffice/value-type';
 
 export const manifests: Array<UmbExtensionManifest> = [
@@ -8,6 +9,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 		alias: UMB_BOOLEAN_VALUE_SUMMARY_ALIAS,
 		name: 'Boolean Value Summary',
 		forValueType: UMB_BOOLEAN_VALUE_TYPE,
-		element: () => import('./boolean-value-summary.element.js'),
+		element: UmbBooleanValueSummaryElement,
 	},
 ];

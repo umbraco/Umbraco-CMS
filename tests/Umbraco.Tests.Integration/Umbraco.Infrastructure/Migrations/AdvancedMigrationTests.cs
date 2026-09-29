@@ -32,8 +32,6 @@ internal sealed class AdvancedMigrationTests : UmbracoIntegrationTest
     private IUmbracoVersion UmbracoVersion => GetRequiredService<IUmbracoVersion>();
     private IEventAggregator EventAggregator => GetRequiredService<IEventAggregator>();
     private ICoreScopeProvider CoreScopeProvider => GetRequiredService<ICoreScopeProvider>();
-    private IScopeAccessor ScopeAccessor => GetRequiredService<IScopeAccessor>();
-    private ILoggerFactory LoggerFactory => GetRequiredService<ILoggerFactory>();
     private IMigrationBuilder MigrationBuilder => GetRequiredService<IMigrationBuilder>();
     private IUmbracoDatabaseFactory UmbracoDatabaseFactory => GetRequiredService<IUmbracoDatabaseFactory>();
     private IServiceScopeFactory ServiceScopeFactory => GetRequiredService<IServiceScopeFactory>();

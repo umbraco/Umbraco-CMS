@@ -17,11 +17,6 @@ namespace Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs;
 public class TempFileCleanupJob : RecurringBackgroundJobBase
 {
     /// <summary>
-    /// Gets the time interval between each execution of the temporary file cleanup job.
-    /// </summary>
-    public override TimeSpan Period => TimeSpan.FromMinutes(60);
-
-    /// <summary>
     /// Gets the server roles on which this job runs. This job is configured to run on all server roles.
     /// </summary>
     /// <remarks>Runs on all servers</remarks>
@@ -38,10 +33,10 @@ public class TempFileCleanupJob : RecurringBackgroundJobBase
     /// <param name="ioHelper">Helper service for IO operations.</param>
     /// <param name="logger">The typed logger.</param>
     public TempFileCleanupJob(IIOHelper ioHelper, ILogger<TempFileCleanupJob> logger)
+        : base(TimeSpan.FromMinutes(60))
     {
         _ioHelper = ioHelper;
         _logger = logger;
-
         _tempFolders = _ioHelper.GetTempFolders();
     }
 

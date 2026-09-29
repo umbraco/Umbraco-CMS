@@ -1,4 +1,5 @@
 import { manifests as schemaManifests } from './Umbraco.MultipleTextString.js';
+import { manifests as valueSummaryManifests } from './value-summary/manifests.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -7,6 +8,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Multiple Text String Property Editor UI',
 		element: () => import('./property-editor-ui-multiple-text-string.element.js'),
 		meta: {
+			supportsVariantChange: true,
 			label: 'Multiple Text String',
 			propertyEditorSchemaAlias: 'Umbraco.MultipleTextstring',
 			icon: 'icon-ordered-list',
@@ -16,4 +18,5 @@ export const manifests: Array<UmbExtensionManifest> = [
 		},
 	},
 	...schemaManifests,
+	...valueSummaryManifests,
 ];

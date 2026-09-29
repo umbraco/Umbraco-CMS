@@ -1,8 +1,5 @@
 import type { UmbBlockListValueModel } from '../types.js';
-import {
-	UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS,
-	UMB_BLOCK_LIST_PROPERTY_EDITOR_UI_ALIAS,
-} from '../constants.js';
+import { UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS, UMB_BLOCK_LIST_PROPERTY_EDITOR_UI_ALIAS } from '../constants.js';
 import { UMB_BLOCK_LIST_MANAGER_CONTEXT } from './block-list-manager.context-token.js';
 import { UMB_BLOCK_LIST_ENTRIES_CONTEXT } from './block-list-entries.context-token.js';
 import { UmbBlockEntryContext } from '@umbraco-cms/backoffice/block';
@@ -34,6 +31,12 @@ export class UmbBlockListEntryContext extends UmbBlockEntryContext<
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_BLOCK_LIST_MANAGER_CONTEXT, UMB_BLOCK_LIST_ENTRIES_CONTEXT);
+	}
+
+	protected override _needsLegacyLabelRenderer(): boolean {
+		// Block List entry element owns the canonical `<umb-ufm-render>` and pushes
+		// resolved text via `setName()`. No hidden virtual renderer is needed here.
+		return false;
 	}
 
 	protected override _gotManager() {

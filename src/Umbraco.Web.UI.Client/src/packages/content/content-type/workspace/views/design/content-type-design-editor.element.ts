@@ -153,11 +153,15 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 
 		this.#tabsStructureHelper.setContainerChildType('Tab');
 		this.#tabsStructureHelper.setIsRoot(true);
-		this.observe(this.#tabsStructureHelper.childContainers, (tabs) => {
-			this._tabs = tabs;
-			this.#sorter.setModel(tabs);
-			this.#createRoutes();
-		});
+		this.observe(
+			this.#tabsStructureHelper.childContainers,
+			(tabs) => {
+				this._tabs = tabs;
+				this.#sorter.setModel(tabs);
+				this.#createRoutes();
+			},
+			null,
+		);
 
 		this.observe(
 			this.#tabsStructureHelper.hasProperties,
@@ -165,13 +169,12 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 				this._hasRootProperties = hasRootProperties;
 				this.#createRoutes();
 			},
-			'observeRootProperties',
+			null,
 		);
 
-		this.consumeContext(UMB_CONTENT_TYPE_WORKSPACE_CONTEXT, (workspaceContext) => {
+		this.consumeContext(UMB_CONTENT_TYPE_WORKSPACE_CONTEXT, async (workspaceContext) => {
 			this.#workspaceContext = workspaceContext;
 			this.#tabsStructureHelper.setStructureManager(workspaceContext?.structure);
-
 			this.#observeRootGroups();
 		});
 	}
@@ -194,29 +197,19 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 	}
 
 	#createRoutes() {
-		// TODO: How about storing a set of elements based on tab ids? to prevent re-initializing the element when renaming..[NL]
-		if (!this.#workspaceContext || !this._tabs || this._hasRootGroups === undefined) return;
+		if (
+			!this.#workspaceContext ||
+			this._tabs === undefined ||
+			this._hasRootGroups === undefined ||
+			this._hasRootProperties === undefined
+		) {
+			return;
+		}
+
 		const routes: UmbRoute[] = [];
 
 		// We gather the activeTab name to check for rename, this is a bit hacky way to redirect the user without noticing the url changes to the new name [NL]
 		let activeTabName: string | undefined = undefined;
-
-		if (this._tabs.length > 0) {
-			this._tabs?.forEach((tab) => {
-				const tabName = tab.name && tab.name !== '' ? tab.name : '-';
-				if (tab.ownerId && tab.ownerId === this.#processingTabId) {
-					activeTabName = tabName;
-				}
-				routes.push({
-					path: `tab/${encodeFolderName(tabName)}`,
-					component: () => import('./content-type-design-editor-tab.element.js'),
-					setup: (component) => {
-						this.#currentTabComponent = component as UmbContentTypeDesignEditorTabElement;
-						this.#currentTabComponent.containerId = tab.ownerId ?? tab.ids[0];
-					},
-				});
-			});
-		}
 
 		routes.push({
 			path: 'root',
@@ -227,40 +220,49 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 			},
 		});
 
-		if (this._hasRootGroups || this._hasRootProperties || this._tabs.length === 0) {
-			routes.push({
-				path: '',
-				pathMatch: 'full',
-				redirectTo: 'root',
-				guards: [() => this.#processingTabId === undefined],
-			});
-		} else {
-			routes.push({
-				path: '',
-				pathMatch: 'full',
-				redirectTo: routes[0]?.path,
-				guards: [() => this.#processingTabId === undefined],
+		if (this._tabs.length > 0) {
+			this._tabs?.forEach((tab) => {
+				const tabName = tab.name && tab.name !== '' ? tab.name : '-';
+				const path = `tab/${encodeFolderName(tabName)}`;
+				if (tab.ownerId && tab.ownerId === this.#processingTabId) {
+					activeTabName = tabName;
+				}
+				routes.push({
+					path,
+					component: () => import('./content-type-design-editor-tab.element.js'),
+					setup: (component) => {
+						this.#currentTabComponent = component as UmbContentTypeDesignEditorTabElement;
+						this.#currentTabComponent.containerId = tab.ownerId ?? tab.ids[0];
+					},
+				});
 			});
 		}
 
 		if (routes.length !== 0) {
-			routes.push({
-				path: `**`,
-				component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
-				guards: [() => this.#processingTabId === undefined],
-				setup: () => {
-					this.#currentTabComponent = undefined;
-				},
-			});
-		} else {
-			routes.push({
-				path: `**`,
-				component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
-				setup: () => {
-					this.#currentTabComponent = undefined;
-				},
-			});
+			// If we have a tab, then navigate to it.
+			if (this._tabs.length > 0 && this._hasRootGroups === false && this._hasRootProperties === false) {
+				routes.push({
+					...routes[1],
+					unique: routes[1].path,
+					path: '',
+				});
+			} else {
+				routes.push({
+					...routes[0],
+					unique: routes[0].path,
+					path: '',
+				});
+			}
 		}
+
+		routes.push({
+			path: `**`,
+			component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
+			guards: [() => this.#processingTabId === undefined],
+			setup: () => {
+				this.#currentTabComponent = undefined;
+			},
+		});
 
 		this._routes = routes;
 
@@ -434,6 +436,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 			isElement: ownerContentType.isElement,
 			currentPropertyAliases,
 			isNew: this.#workspaceContext.getIsNew()!,
+			entityType: this.#workspaceContext.getEntityType(),
 		};
 
 		const value = await umbOpenModal(this, UMB_COMPOSITION_PICKER_MODAL, {
@@ -475,8 +478,9 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 						this._routerPath = event.target.absoluteRouterPath;
 					}}
 					@change=${(event: UmbRouterSlotChangeEvent) => {
-						this._activePath = event.target.absoluteActiveViewPath ?? '';
+						this._activePath = event.target.absoluteActiveViewPath;
 					}}>
+					<umb-view-loader></umb-view-loader>
 				</umb-router-slot>
 			</umb-body-layout>
 		`;
@@ -549,8 +553,11 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 
 	renderRootTab() {
 		const path = this._routerPath + '/root';
-		const rootTabActive = path === this._activePath;
-		if (!this._hasRootGroups && !this._hasRootProperties && !this._sortModeActive) {
+		let rootTabActive = path === this._activePath;
+		if (!rootTabActive && (this._hasRootGroups || this._hasRootProperties)) {
+			rootTabActive = this._routerPath + '/' === this._activePath;
+		}
+		if (!rootTabActive && !this._hasRootGroups && !this._hasRootProperties && !this._sortModeActive) {
 			// If we don't have any root groups/properties and we are not in sort mode, then we don't want to render the root tab.
 			return nothing;
 		}
@@ -570,7 +577,10 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 
 	renderTab(tab: UmbPropertyTypeContainerMergedModel) {
 		const path = this._routerPath + '/tab/' + encodeFolderName(tab.name && tab.name !== '' ? tab.name : '-');
-		const tabActive = path === this._activePath;
+		let tabActive = path === this._activePath;
+		if (!tabActive && !this._hasRootGroups && !this._hasRootProperties) {
+			tabActive = this._routerPath + '/' === this._activePath;
+		}
 		const ownedTab = tab.ownerId ? true : false;
 
 		return html`<uui-tab

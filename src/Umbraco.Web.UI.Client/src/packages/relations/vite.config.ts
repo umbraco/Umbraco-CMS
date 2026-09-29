@@ -13,7 +13,6 @@ export default defineConfig({
 		entry: {
 			'relation-types/index': 'relation-types/index.ts',
 			'relations/index': 'relations/index.ts',
-			manifests: 'manifests.ts',
 			'umbraco-package': 'umbraco-package.ts',
 		},
 	}),

@@ -153,15 +153,15 @@ public class ContentValueSetValidator : ValueSetValidator, IContentValueSetValid
     }
 
     /// <summary>
-    /// Validates the specified <see cref="Umbraco.Cms.Core.Models.ValueSet"/> to determine if it meets the requirements for indexing in Examine.
+    /// Validates the specified <see cref="ValueSet"/> to determine if it meets the requirements for indexing in Examine.
     /// <para>
     /// Validation includes checks for published status (including culture variants), the presence and validity of the content path, and whether the content is in the recycle bin or protected.
     /// If the value set fails any of these checks, it is either marked as failed (not indexable) or filtered (excluded from the index), depending on the nature of the issue.
     /// </para>
     /// </summary>
-    /// <param name="valueSet">The <see cref="Umbraco.Cms.Core.Models.ValueSet"/> to validate.</param>
+    /// <param name="valueSet">The <see cref="ValueSet"/> to validate.</param>
     /// <returns>
-    /// A <see cref="Umbraco.Cms.Infrastructure.Examine.ValueSetValidationResult"/> indicating the outcome of the validation:
+    /// A <see cref="ValueSetValidationResult"/> indicating the outcome of the validation:
     /// <list type="bullet">
     ///   <item>
     ///     <description><c>Valid</c>: The value set passed all checks and is suitable for indexing.</description>

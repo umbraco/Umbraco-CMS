@@ -36,7 +36,7 @@ public interface IDeleteBuilder : IFluentBuilder
     /// Specifies the column to be deleted in the current delete expression.
     /// </summary>
     /// <param name="columnName">The name of the column to delete.</param>
-    /// <returns>An <see cref="Umbraco.Cms.Infrastructure.Migrations.Expressions.Delete.IDeleteColumnBuilder" /> to continue building the delete expression.</returns>
+    /// <returns>An <see cref="IDeleteColumnBuilder" /> to continue building the delete expression.</returns>
     IDeleteColumnBuilder Column(string columnName);
 
     /// <summary>
@@ -49,7 +49,7 @@ public interface IDeleteBuilder : IFluentBuilder
     ///     Specifies the foreign key to be deleted in the migration.
     /// </summary>
     /// <param name="foreignKeyName">The name of the foreign key to delete.</param>
-    /// <returns>An <see cref="Umbraco.Cms.Infrastructure.Migrations.Expressions.Delete.IDeleteForeignKeyOnTableBuilder" /> that allows further configuration of the delete operation.</returns>
+    /// <returns>An <see cref="IDeleteForeignKeyOnTableBuilder" /> that allows further configuration of the delete operation.</returns>
     IDeleteForeignKeyOnTableBuilder ForeignKey(string foreignKeyName);
 
     /// <summary>
@@ -69,7 +69,7 @@ public interface IDeleteBuilder : IFluentBuilder
     ///     Specifies the name of the index to delete as part of a migration expression.
     /// </summary>
     /// <param name="indexName">The name of the index to delete.</param>
-    /// <returns>An <see cref="Umbraco.Cms.Infrastructure.Migrations.Expressions.Delete.IDeleteIndexForTableBuilder" /> to continue building the delete expression.</returns>
+    /// <returns>An <see cref="IDeleteIndexForTableBuilder" /> to continue building the delete expression.</returns>
     IDeleteIndexForTableBuilder Index(string indexName);
 
     /// <summary>
@@ -83,14 +83,14 @@ public interface IDeleteBuilder : IFluentBuilder
     /// Specifies which unique constraint should be deleted from the database schema.
     /// </summary>
     /// <param name="constraintName">The name of the unique constraint to delete.</param>
-    /// <returns>An <see cref="Umbraco.Cms.Infrastructure.Migrations.Expressions.Delete.IDeleteConstraintBuilder" /> to continue building the delete expression.</returns>
+    /// <returns>An <see cref="IDeleteConstraintBuilder" /> to continue building the delete expression.</returns>
     IDeleteConstraintBuilder UniqueConstraint(string constraintName);
 
     /// <summary>
     ///     Begins building an expression to delete a default constraint from a table.
     /// </summary>
     /// <returns>
-    /// An <see cref="Umbraco.Cms.Infrastructure.Migrations.Expressions.Delete.IDeleteDefaultConstraintOnTableBuilder" /> to continue building the delete expression.
+    /// An <see cref="IDeleteDefaultConstraintOnTableBuilder" /> to continue building the delete expression.
     /// </returns>
     IDeleteDefaultConstraintOnTableBuilder DefaultConstraint();
 }

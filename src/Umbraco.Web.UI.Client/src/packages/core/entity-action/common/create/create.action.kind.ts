@@ -1,4 +1,5 @@
 import { UMB_ENTITY_ACTION_DEFAULT_KIND_MANIFEST } from '../../default/default.action.kind.js';
+import { UmbCreateEntityAction } from './create.action.js';
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
 export const manifest: UmbExtensionManifestKind = {
@@ -10,7 +11,7 @@ export const manifest: UmbExtensionManifestKind = {
 		...UMB_ENTITY_ACTION_DEFAULT_KIND_MANIFEST.manifest,
 		type: 'entityAction',
 		kind: 'create',
-		api: () => import('./create.action.js'),
+		api: UmbCreateEntityAction,
 		weight: 1200,
 		forEntityTypes: [],
 		meta: {

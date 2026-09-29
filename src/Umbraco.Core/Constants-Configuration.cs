@@ -116,8 +116,17 @@ public static partial class Constants
         public const string ConfigDeliveryApi = ConfigPrefix + "DeliveryApi";
 
         /// <summary>
-        ///     The configuration key for core debug settings.
+        ///     The configuration key for debug settings.
         /// </summary>
+        public const string ConfigDebug = ConfigPrefix + "Debug";
+
+        /// <summary>
+        ///     The legacy configuration key for debug settings.
+        /// </summary>
+        /// <remarks>
+        ///     Retained so existing configuration under this section keeps working; new configuration should
+        ///     use <see cref="ConfigDebug" />. TODO (V19): remove once the legacy binding is dropped.
+        /// </remarks>
         public const string ConfigCoreDebug = ConfigCorePrefix + "Debug";
 
         /// <summary>
@@ -290,6 +299,11 @@ public static partial class Constants
         ///     The configuration key for distributed jobs settings.
         /// </summary>
         public const string ConfigDistributedJobs = ConfigPrefix + "DistributedJobs";
+
+        /// <summary>
+        ///     The configuration key for scheduled publishing settings.
+        /// </summary>
+        public const string ConfigScheduledPublishing = ConfigPrefix + "ScheduledPublishing";
 
         /// <summary>
         ///     The configuration key for backoffice token cookie settings.

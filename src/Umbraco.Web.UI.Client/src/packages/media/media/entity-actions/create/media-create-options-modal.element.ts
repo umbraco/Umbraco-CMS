@@ -7,6 +7,9 @@ import { html, nothing, customElement, state, repeat, css, when } from '@umbraco
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbMediaTypeStructureRepository, type UmbAllowedMediaTypeModel } from '@umbraco-cms/backoffice/media-type';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
+import { UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS } from '@umbraco-cms/backoffice/section';
+import { UMB_SETTINGS_SECTION_ALIAS } from '@umbraco-cms/backoffice/settings';
 
 @customElement('umb-media-create-options-modal')
 export class UmbMediaCreateOptionsModalElement extends UmbModalBaseElement<
@@ -24,6 +27,24 @@ export class UmbMediaCreateOptionsModalElement extends UmbModalBaseElement<
 
 	@state()
 	private _loading = true;
+
+	@state()
+	private _hasSettingsAccess = false;
+
+	constructor() {
+		super();
+
+		createExtensionApiByAlias(this, UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS, [
+			{
+				config: {
+					match: UMB_SETTINGS_SECTION_ALIAS,
+				},
+				onChange: (permitted: boolean) => {
+					this._hasSettingsAccess = permitted;
+				},
+			},
+		]);
+	}
 
 	override async firstUpdated() {
 		const mediaUnique = this.data?.parent.unique;
@@ -89,14 +110,20 @@ export class UmbMediaCreateOptionsModalElement extends UmbModalBaseElement<
 			<umb-localize key="create_noMediaTypes">
 				There are no allowed Media Types available for creating media here. You must enable these in
 				<strong>Media Types</strong> within the <strong>Settings</strong> section, by editing the
-				<strong>Allowed child node types</strong> under <strong>Permissions</strong>. </umb-localize
-			><br />
-			<uui-button
-				id="edit-permissions"
-				look="secondary"
-				@click=${() => this._rejectModal()}
-				href=${`/section/settings/workspace/media-type/edit/${this.data?.mediaType?.unique}/view/structure`}
-				label=${this.localize.term('create_noMediaTypesEditPermissions')}></uui-button>
+				<strong>Allowed child node types</strong> under <strong>Structure</strong>.
+			</umb-localize>
+			${when(
+				this._hasSettingsAccess && this.data?.mediaType?.unique,
+				() => html`
+					<br />
+					<uui-button
+						id="edit-permissions"
+						look="secondary"
+						@click=${() => this._rejectModal()}
+						href=${`/section/settings/workspace/media-type/edit/${this.data?.mediaType?.unique}/view/structure`}
+						label=${this.localize.term('create_noMediaTypesEditPermissions')}></uui-button>
+				`,
+			)}
 		`;
 	}
 

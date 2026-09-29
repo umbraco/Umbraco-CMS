@@ -1,4 +1,5 @@
 import { manifest as schemaManifest } from './Umbraco.DateTimeUnspecified.js';
+import { manifests as valueSummaryManifests } from './value-summary/manifests.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -7,6 +8,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Date Time Picker Property Editor UI',
 		element: () => import('./property-editor-ui-date-time-picker.element.js'),
 		meta: {
+			supportsVariantChange: true,
 			label: 'Date Time (unspecified)',
 			propertyEditorSchemaAlias: 'Umbraco.DateTimeUnspecified',
 			icon: 'icon-calendar-alt',
@@ -53,4 +55,5 @@ export const manifests: Array<UmbExtensionManifest> = [
 		},
 	},
 	schemaManifest,
+	...valueSummaryManifests,
 ];

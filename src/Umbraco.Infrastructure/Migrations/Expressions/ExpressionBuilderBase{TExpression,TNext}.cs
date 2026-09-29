@@ -21,9 +21,9 @@ public abstract class ExpressionBuilderBase<TExpression, TNext> : ExpressionBuil
     private ColumnDefinition? Column => GetColumnForType();
 
     /// <summary>
-    /// Retrieves the <see cref="Umbraco.Cms.Infrastructure.Migrations.Expressions.ColumnDefinition"/> associated with the current expression's type, if one exists.
+    /// Retrieves the <see cref="ColumnDefinition"/> associated with the current expression's type, if one exists.
     /// </summary>
-    /// <returns>The corresponding <see cref="Umbraco.Cms.Infrastructure.Migrations.Expressions.ColumnDefinition"/> if available; otherwise, <c>null</c>.</returns>
+    /// <returns>The corresponding <see cref="ColumnDefinition"/> if available; otherwise, <c>null</c>.</returns>
     public abstract ColumnDefinition? GetColumnForType();
 
     /// <summary>

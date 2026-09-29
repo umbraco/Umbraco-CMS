@@ -9,7 +9,10 @@ console.log('--- Copying assets ---');
 cpSync('./src/assets', `${srcDir}/assets`, { recursive: true });
 console.log('--- Copying assets done ---');
 
-// Copy SRC CSS
+// Copy Umbraco-specific CSS (umb-css.css, etc.) into dist-cms/css/.
+// Note: UUI theme CSS (dark.css, high-contrast.css) is already in dist-cms/css/
+// at this point, copied there by src/external/uui/vite.config.ts during the workspace build.
+// Theme manifests referencing these files live in src/packages/core/themes/manifests.ts.
 console.log('--- Copying src CSS ---');
 cpSync('./src/css', `${srcDir}/css`, { recursive: true });
 console.log('--- Copying src CSS done ---');

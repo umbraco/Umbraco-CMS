@@ -12,8 +12,10 @@ internal sealed class RequestContextOutputExpansionStrategyV2 : ElementOnlyOutpu
     public RequestContextOutputExpansionStrategyV2(
         IHttpContextAccessor httpContextAccessor,
         IApiPropertyRenderer propertyRenderer,
-        ILogger<RequestContextOutputExpansionStrategyV2> logger)
-        : base(propertyRenderer)
+        ILogger<RequestContextOutputExpansionStrategyV2> logger,
+        IApiPublishedContentCache apiPublishedContentCache,
+        IRequestMemberAccessService requestMemberAccessService)
+        : base(propertyRenderer, apiPublishedContentCache, requestMemberAccessService)
     {
         _logger = logger;
 

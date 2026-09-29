@@ -4,7 +4,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		kind: 'actionButton',
 		alias: 'Umb.Tiptap.Toolbar.Undo',
 		name: 'Undo Tiptap Toolbar Extension',
-		api: () => import('./undo.tiptap-toolbar-api.js'),
+		api: () => import('../extension-apis.bundle.js').then((m) => ({ default: m.UmbTiptapToolbarUndoExtensionApi })),
 		meta: {
 			alias: 'undo',
 			icon: 'icon-undo',
@@ -16,7 +16,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		kind: 'actionButton',
 		alias: 'Umb.Tiptap.Toolbar.Redo',
 		name: 'Redo Tiptap Toolbar Extension',
-		api: () => import('./redo.tiptap-toolbar-api.js'),
+		api: () => import('../extension-apis.bundle.js').then((m) => ({ default: m.UmbTiptapToolbarRedoExtensionApi })),
 		meta: {
 			alias: 'redo',
 			icon: 'icon-redo',

@@ -4,7 +4,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		kind: 'button',
 		alias: 'Umb.Tiptap.Superscript',
 		name: 'Superscript Tiptap Extension',
-		api: () => import('./superscript.tiptap-api.js'),
+		api: () => import('../extension-apis.bundle.js').then((m) => ({ default: m.UmbTiptapSuperscriptExtensionApi })),
 		meta: {
 			icon: 'icon-superscript',
 			label: 'Superscript',
@@ -16,7 +16,8 @@ export const manifests: Array<UmbExtensionManifest> = [
 		kind: 'button',
 		alias: 'Umb.Tiptap.Toolbar.Superscript',
 		name: 'Superscript Tiptap Toolbar Extension',
-		api: () => import('./superscript.tiptap-toolbar-api.js'),
+		api: () =>
+			import('../extension-apis.bundle.js').then((m) => ({ default: m.UmbTiptapToolbarSuperscriptExtensionApi })),
 		forExtensions: ['Umb.Tiptap.Superscript'],
 		meta: {
 			alias: 'superscript',

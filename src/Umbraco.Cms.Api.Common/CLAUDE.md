@@ -249,7 +249,11 @@ private string HandleGenerics(string name, Type type)
    builder.Services.AddSingleton<ISchemaIdHandler, MySchemaIdHandler>();
    ```
 
-**Note**: Handlers registered later take precedence in the selector.
+**Note**: The selectors take the **first** registered handler that can handle the input
+(`FirstOrDefault`), and `AddUmbracoApiOpenApiUI()` registers the built-in handlers before any
+consuming API composes. A handler added with `AddSingleton` therefore never wins against a built-in
+one that also matches — insert it ahead of them (`builder.Services.Insert(0, ...)`) if it needs to
+take precedence.
 
 ### Customizing Problem Details
 

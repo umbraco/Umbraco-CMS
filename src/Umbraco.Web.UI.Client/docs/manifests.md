@@ -209,29 +209,37 @@ Three mechanisms exist for registering manifests, appropriate for different scen
 
 ### Package Bundles (Internal Packages)
 
-The standard pattern for packages within the monorepo. A `umbraco-package.ts` exports a bundle manifest that lazy-loads the package's manifests:
+The standard pattern for packages within the monorepo. A `umbraco-package.ts` imports manifests from each sub-feature, assembles them into a static array, and passes that array directly to the bundle extension:
 
 ```typescript
 // umbraco-package.ts
+import { manifests as sectionManifests } from './section/manifests.js';
+import { manifests as dashboardManifests } from './dashboard/manifests.js';
+import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
+
+export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [
+  ...sectionManifests,
+  ...dashboardManifests,
+];
+
+export const name = 'Umbraco.Documents';
 export const extensions = [
   {
     type: 'bundle',
     alias: 'Umb.Bundle.Documents',
     name: 'Documents Bundle',
-    js: () => import('./manifests.js'),
+    js: {
+      manifests,
+    },
   },
 ];
 ```
 
 #### Manifest Bundling
 
-Each sub-feature exports its own `manifests` array. The package-level `manifests.ts` aggregates them:
+Each sub-feature exports its own `manifests` array from its local `manifests.ts`. These are imported and spread directly into the package-level `manifests` array in `umbraco-package.ts` — there is no separate root-level `manifests.ts` aggregator file.
 
-```typescript
-import { manifests as sectionManifests } from './section/manifests.js';
-import { manifests as dashboardManifests } from './dashboard/manifests.js';
-export const manifests = [...sectionManifests, ...dashboardManifests];
-```
+The static `js: { manifests }` reference (instead of a dynamic `js: () => import('./manifests.js')`) allows Vite to bundle the manifest registrations together with the package file, eliminating a network round-trip per bundle at startup.
 
 ### Static Package Manifest (External Packages)
 

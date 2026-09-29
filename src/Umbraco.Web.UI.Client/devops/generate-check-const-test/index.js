@@ -5,7 +5,7 @@ import { createImportMap } from '../importmap/index.js';
 
 const excludeTheseMaps = [
 	'@umbraco-cms/backoffice/models',
-	'@umbraco-cms/backoffice/markdown-editor',
+	'@umbraco-cms/backoffice/markdown-editor', // Excluded because it loads Monaco Editor which fails to load workers in the test environment
 	'@umbraco-cms/backoffice/external/',
 ]
 

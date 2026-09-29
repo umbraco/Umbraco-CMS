@@ -1,4 +1,5 @@
 import { manifest as schemaManifest } from './Umbraco.MarkdownEditor.js';
+import { manifests as valueSummaryManifests } from './value-summary/manifests.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -14,6 +15,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Markdown Editor Property Editor UI',
 		element: () => import('./property-editor-ui-markdown-editor.element.js'),
 		meta: {
+			supportsVariantChange: true,
 			label: 'Markdown Editor',
 			propertyEditorSchemaAlias: 'Umbraco.MarkdownEditor',
 			icon: 'icon-code',
@@ -45,4 +47,5 @@ export const manifests: Array<UmbExtensionManifest> = [
 		},
 	},
 	schemaManifest,
+	...valueSummaryManifests,
 ];

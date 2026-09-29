@@ -8,9 +8,12 @@ export type UrlParametersRecord = UmbUrlParametersRecord;
 const PARAM_IDENTIFIER = /:([^/]+)/g;
 
 /**
- *
- * @param pattern
- * @param params
+ * Resolves the `:parameter` tokens in a URL pattern using the given parameter values.
+ * @param {string} pattern - A URL pattern where parameters are written as `:name` (e.g. `/section/:id/edit`).
+ * @param {UmbUrlParametersRecord | null} params - Key value object, where keys are parameter names and values are the values to replace them with.
+ * @returns {string} The pattern with its parameter tokens replaced.
+ * @example
+ * umbUrlPatternToString('/section/:id/edit', { id: 123 }); // '/section/123/edit'
  */
 export function umbUrlPatternToString(pattern: string, params: UmbUrlParametersRecord | null): string {
 	return params

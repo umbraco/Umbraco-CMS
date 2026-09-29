@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 internal sealed partial class MediaNavigationServiceTests : MediaNavigationServiceTestsBase
 {
     [SetUp]
-    public async Task Setup()
+    public new async Task Setup()
     {
         // Album
         //    - Image 1

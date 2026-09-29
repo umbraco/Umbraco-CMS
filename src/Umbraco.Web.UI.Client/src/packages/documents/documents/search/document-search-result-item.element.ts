@@ -1,4 +1,5 @@
 import type { UmbDocumentItemVariantModel } from '../item/repository/types.js';
+import { UmbDocumentVariantState } from '../variant-state.js';
 import type { UmbDocumentSearchItemModel } from './types.js';
 import {
 	classMap,
@@ -10,7 +11,6 @@ import {
 	state,
 	when,
 } from '@umbraco-cms/backoffice/external/lit';
-import { UmbDocumentVariantState } from '../variant-state.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
 import type { UmbSearchResultItemModel } from '@umbraco-cms/backoffice/search';

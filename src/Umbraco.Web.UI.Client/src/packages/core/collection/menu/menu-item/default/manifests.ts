@@ -1,3 +1,5 @@
+import { UmbDefaultCollectionMenuItemContext } from './default-collection-menu-item.context.js';
+import { UmbDefaultCollectionMenuItemElement } from './default-collection-menu-item.element.js';
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_COLLECTION_MENU_ITEM_DEFAULT_KIND_MANIFEST: UmbExtensionManifestKind = {
@@ -7,8 +9,8 @@ export const UMB_COLLECTION_MENU_ITEM_DEFAULT_KIND_MANIFEST: UmbExtensionManifes
 	matchType: 'collectionMenuItem',
 	manifest: {
 		type: 'collectionMenuItem',
-		api: () => import('./default-collection-menu-item.context.js'),
-		element: () => import('./default-collection-menu-item.element.js'),
+		api: UmbDefaultCollectionMenuItemContext,
+		element: UmbDefaultCollectionMenuItemElement,
 	},
 };
 

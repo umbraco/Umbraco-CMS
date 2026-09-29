@@ -77,6 +77,8 @@ public class UmbracoApplicationBuilder : IUmbracoApplicationBuilder, IUmbracoEnd
         // Only use backoffice rewrites if backoffice is enabled
         if (ApplicationServices.GetService<IBackOfficeEnabledMarker>() is not null)
         {
+            // Must run before the rewriter so the cache-bust hash is still present on the request path.
+            AppBuilder.UseUmbracoBackOfficeCacheHeaders();
             AppBuilder.UseUmbracoBackOfficeRewrites();
         }
 

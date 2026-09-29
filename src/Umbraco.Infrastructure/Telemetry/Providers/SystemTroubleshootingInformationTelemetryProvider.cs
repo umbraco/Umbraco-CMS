@@ -77,7 +77,7 @@ internal sealed class SystemTroubleshootingInformationTelemetryProvider : IDetai
     private string CurrentServerRole => _serverRoleAccessor.CurrentServerRole.ToString();
 
     /// <summary>
-    /// Retrieves a collection of system troubleshooting information, each represented as a <see cref="Umbraco.Cms.Core.Telemetry.UsageInformation"/> instance.
+    /// Retrieves a collection of system troubleshooting information, each represented as a <see cref="UsageInformation"/> instance.
     /// </summary>
     /// <returns>An <see cref="IEnumerable{UsageInformation}"/> containing key-value pairs with details about the server environment, configuration, and runtime state for troubleshooting purposes.</returns>
     public IEnumerable<UsageInformation> GetInformation() =>

@@ -5,7 +5,7 @@ import type { HTMLElementConstructor } from '@umbraco-cms/backoffice/extension-a
 import { type UmbControllerAlias, UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbContextToken, UmbContextCallback, UmbContextMinimal } from '@umbraco-cms/backoffice/context-api';
 import { UmbContextConsumerController, UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
-import type { ObserverCallback } from '@umbraco-cms/backoffice/observable-api';
+import type { ObserverCallback, UmbObserverValueType } from '@umbraco-cms/backoffice/observable-api';
 import { UmbObserverController, simpleHashCode } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbClassGetContextOptions } from '@umbraco-cms/backoffice/class-api';
 
@@ -19,18 +19,13 @@ export const UmbElementMixin = <T extends HTMLElementConstructor>(superClass: T)
 		observe<
 			ObservableType extends Observable<T> | undefined,
 			T,
-			SpecificT = ObservableType extends Observable<infer U>
-				? ObservableType extends undefined
-					? U | undefined
-					: U
-				: undefined,
+			SpecificT = UmbObserverValueType<ObservableType>,
 			SpecificR = ObservableType extends undefined
 				? UmbObserverController<SpecificT> | undefined
 				: UmbObserverController<SpecificT>,
 		>(
-			// This type dance checks if the Observable given could be undefined, if it potentially could be undefined it means that this potentially could return undefined and then call the callback with undefined. [NL]
 			source: ObservableType,
-			callback?: ObserverCallback<SpecificT>,
+			callback?: ObserverCallback<UmbObserverValueType<ObservableType>>,
 			controllerAlias?: UmbControllerAlias | null,
 		): SpecificR {
 			// Fallback to use a hash of the provided method, but only if the alias is undefined and there is a callback.
@@ -49,7 +44,7 @@ export const UmbElementMixin = <T extends HTMLElementConstructor>(superClass: T)
 					controllerAlias,
 				) as unknown as SpecificR;
 			} else {
-				callback?.(undefined as SpecificT);
+				callback?.(undefined as UmbObserverValueType<ObservableType>);
 				this.removeUmbControllerByAlias(controllerAlias);
 				return undefined as SpecificR;
 			}

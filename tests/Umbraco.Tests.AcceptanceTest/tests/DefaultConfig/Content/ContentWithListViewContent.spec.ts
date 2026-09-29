@@ -99,9 +99,9 @@ test('can publish content with a child in the list', async ({umbracoApi, umbraco
   await umbracoUi.content.goToContentWithName(contentName);
 
   // Act
-  // Currently necessary
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
   await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBeUpdated();
+  // A child cannot be published while its parent is unpublished, so wait for the parent to actually be published first.
+  await umbracoApi.document.waitUntilDocumentIsPublished(documentId);
   await umbracoUi.content.goToContentInListViewWithName(childContentName);
   await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBeUpdated();
 
@@ -157,7 +157,7 @@ test('child is removed from list after child content is deleted', async ({umbrac
   await umbracoUi.content.openContentCaretButtonForName(contentName);
   await umbracoUi.content.clickActionsMenuForContent(childContentName);
   await umbracoUi.content.clickTrashActionMenuOption();
-  await umbracoUi.content.clickConfirmTrashButton();
+  await umbracoUi.content.clickConfirmTrashButtonAndWaitForContentToBeTrashed();
 
   // Assert
   await umbracoUi.content.goToContentWithName(contentName);
@@ -394,4 +394,55 @@ test('can change from list view to grid view in list', async ({umbracoApi, umbra
 
   // Assert
   await umbracoUi.content.isDocumentGridViewVisible();
+});
+
+test('can open a child from the grid view', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const childDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentType(childDocumentTypeName);
+  await umbracoApi.dataType.createListViewContentDataTypeWithAllPermissions(dataTypeName);
+  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithAPropertyEditorAndAnAllowedChildNode(documentTypeName, dataTypeName, dataTypeData.id, childDocumentTypeId);
+  const documentId = await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  const childDocumentId = await umbracoApi.document.createDefaultDocumentWithParent(childContentName, childDocumentTypeId, documentId);
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.changeToGridView();
+  await umbracoUi.content.isDocumentGridViewVisible();
+
+  // Act
+  // An early click can be lost while the collection re-renders, leaving the workspace unopened.
+  // Retry until the edit route is actually loaded.
+  await expect(async () => {
+    await umbracoUi.content.clickContentCardWithName(childContentName);
+    await umbracoUi.content.waitForWorkspaceEditRoute('document');
+  }).toPass({timeout: ConstantHelper.timeout.veryLong});
+
+  // Assert
+  // The click must have opened the child's own edit workspace, not just any document route.
+  await expect(umbracoUi.content.page).toHaveURL(new RegExp(childDocumentId));
+});
+
+test('can open a child from the table view', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const childDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentType(childDocumentTypeName);
+  await umbracoApi.dataType.createListViewContentDataTypeWithAllPermissions(dataTypeName);
+  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithAPropertyEditorAndAnAllowedChildNode(documentTypeName, dataTypeName, dataTypeData.id, childDocumentTypeId);
+  const documentId = await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  const childDocumentId = await umbracoApi.document.createDefaultDocumentWithParent(childContentName, childDocumentTypeId, documentId);
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.isDocumentListViewVisible();
+
+  // Act
+  // An early click can be lost while the table re-renders, leaving the workspace unopened.
+  // Retry until the edit route is actually loaded.
+  await expect(async () => {
+    await umbracoUi.content.goToContentInListViewWithName(childContentName);
+    await umbracoUi.content.waitForWorkspaceEditRoute('document');
+  }).toPass({timeout: ConstantHelper.timeout.veryLong});
+
+  // Assert
+  // The click must have opened the child's own edit workspace, not just any document route.
+  await expect(umbracoUi.content.page).toHaveURL(new RegExp(childDocumentId));
 });

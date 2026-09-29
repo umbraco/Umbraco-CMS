@@ -41,11 +41,7 @@ public class MemberIndexPopulator : IndexPopulator<IUmbracoMemberIndex>
         {
             members = _memberService.GetAll(pageIndex, pageSize, out _).ToArray();
 
-            // ReSharper disable once PossibleMultipleEnumeration
-            foreach (IIndex index in indexes)
-            {
-                index.IndexItems(_valueSetBuilder.GetValueSets(members));
-            }
+            ValueSetIndexer.IndexItems(indexes, _valueSetBuilder.GetValueSets(members));
 
             pageIndex++;
         }

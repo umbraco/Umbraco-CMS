@@ -26,7 +26,7 @@ export const getDefaultConfig = (args: UmbViteDefaultConfigArgs): UserConfig => 
 		build: {
 			target: 'es2022',
 			lib: {
-				entry: args.entry || ['index.ts', 'manifests.ts', 'umbraco-package.ts'],
+				entry: args.entry || ['index.ts', 'umbraco-package.ts'],
 				formats: ['es'],
 			},
 			outDir: args.dist,

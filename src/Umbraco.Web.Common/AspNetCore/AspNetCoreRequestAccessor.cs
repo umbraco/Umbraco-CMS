@@ -85,15 +85,7 @@ public class AspNetCoreRequestAccessor : IRequestAccessor, IDisposable
     }
 
     private string? GetFormValue(string name)
-    {
-        HttpRequest? request = _httpContextAccessor.HttpContext?.Request;
-        if (request?.HasFormContentType is not true)
-        {
-            return null;
-        }
-
-        return request.Form[name];
-    }
+        => _httpContextAccessor.HttpContext?.Request.GetFormValueOrNull(name);
 
     public void Dispose() => _onChangeDisposable?.Dispose();
 }

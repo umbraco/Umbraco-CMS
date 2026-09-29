@@ -213,6 +213,8 @@ export default {
 	},
 	media: {
 		clickToUpload: 'Kliknij, aby załadować plik',
+		browseFilesAction: 'Przeglądaj pliki',
+		dropFilesOr: 'Przeciągnij i upuść pliki multimedialne tutaj<br />lub',
 		orClickHereToUpload: 'lub kliknij tutaj, aby wybrać pliki',
 		disallowedFileType: 'Nie można załadować pliku, typ pliku nie jest akceptowany',
 		maxFileSize: 'Maksymalny rozmiar pliku to',
@@ -504,6 +506,8 @@ export default {
 		new: 'Nowy',
 		next: 'Dalej',
 		no: 'Nie',
+		noResults: 'Brak wyników',
+		noResultsFor: (query: string) => `Brak wyników dla "${query}".`,
 		of: 'z',
 		ok: 'OK',
 		open: 'Otwórz',
@@ -891,6 +895,17 @@ export default {
 		sortHelp:
 			'Przesuń poszczególne elementy w górę oraz w dół aż będą w odpowiedniej kolejności lub kliknij na nagłówku kolumny, aby posortować całą kolekcję elementów',
 		sortPleaseWait: 'Proszę czekać. Trwa sortowanie elementów.',
+		sortByFieldHeadline: 'Sortuj według pola',
+		sortByFieldSentence: 'Sortuj wszystkie elementy podrzędne według',
+		sortByFieldDirectionLabel: 'Kierunek',
+		sortByFieldAscending: 'Rosnąco',
+		sortByFieldDescending: 'Malejąco',
+		sortByFieldNameOption: 'Nazwa',
+		sortByFieldCreateDateOption: 'Utworzono',
+		sortByFieldUpdateDateOption: 'Ostatnia edycja',
+		sortIndividuallyHeadline: 'Sortuj pojedynczo',
+		sortByFieldCultureSentence: 'w języku',
+		sortByFieldCultureLabel: 'Język',
 	},
 	speechBubbles: {
 		validationFailedHeader: 'Walidacja',
@@ -1074,8 +1089,16 @@ export default {
 		chooseChildNode: 'Wybierz węzeł dziecka',
 		compositionsDescription:
 			'Odziedzicz zakładki i właściwości z istniejącego typu dokumentu. Nowe zakładki będą dodane do bieżącego typu dokumentu lub złączone jeśli zakładka z identyczną nazwą już istnieje.',
+		compositionsDescriptionMediaType:
+			'Odziedzicz zakładki i właściwości z istniejącego typu mediów. Nowe zakładki będą dodane do bieżącego typu mediów lub złączone jeśli zakładka z identyczną nazwą już istnieje.',
+		compositionsDescriptionMemberType:
+			'Odziedzicz zakładki i właściwości z istniejącego typu członka. Nowe zakładki będą dodane do bieżącego typu członka lub złączone jeśli zakładka z identyczną nazwą już istnieje.',
 		compositionInUse: 'Ten typ zawartości jest używany w kompozycji, przez co sam nie może być złożony.',
+		compositionInUseMediaType: 'Ten typ mediów jest używany w kompozycji, przez co sam nie może być złożony.',
+		compositionInUseMemberType: 'Ten typ członka jest używany w kompozycji, przez co sam nie może być złożony.',
 		noAvailableCompositions: 'Brak możliwych typów zawartości do użycia jako kompozycja.',
+		noAvailableCompositionsMediaType: 'Brak możliwych typów mediów do użycia jako kompozycja.',
+		noAvailableCompositionsMemberType: 'Brak możliwych typów członka do użycia jako kompozycja.',
 		availableEditors: 'Dostępni edytorzy',
 		reuse: 'Użyj ponownie',
 		editorSettings: 'Ustawienia edytora',
@@ -1182,6 +1205,10 @@ export default {
 		templates: 'Szablony',
 		partialViews: 'Częściowe Widoki',
 		partialViewMacros: 'Pliki Makro Częściowych Widoków',
+	},
+	picker: {
+		browseTab: 'Przeglądaj',
+		searchTab: 'Szukaj',
 	},
 	update: {
 		updateAvailable: 'Aktualizacja jest gotowa',

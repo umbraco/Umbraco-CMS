@@ -53,12 +53,12 @@ test('can bulk trash content nodes without a relation in list view', async ({umb
   await umbracoUi.content.clickConfirmTrashButtonAndWaitForContentToBeTrashed();
 
   // // Assert
-  expect(await umbracoApi.document.doesNameExist(firstChildContentName)).toBeFalsy();
-  expect(await umbracoApi.document.doesNameExist(secondChildContentName)).toBeFalsy();
+  await expect.poll(() => umbracoApi.document.doesNameExist(firstChildContentName)).toBeFalsy();
+  await expect.poll(() => umbracoApi.document.doesNameExist(secondChildContentName)).toBeFalsy();
   await umbracoUi.content.isItemVisibleInRecycleBin(firstChildContentName);
   await umbracoUi.content.isItemVisibleInRecycleBin(secondChildContentName);
-  expect(await umbracoApi.document.doesItemExistInRecycleBin(firstChildContentName)).toBeTruthy();
-  expect(await umbracoApi.document.doesItemExistInRecycleBin(secondChildContentName)).toBeTruthy();
+  await expect.poll(() => umbracoApi.document.doesItemExistInRecycleBin(firstChildContentName)).toBeTruthy();
+  await expect.poll(() => umbracoApi.document.doesItemExistInRecycleBin(secondChildContentName)).toBeTruthy();
 });
 
 test('can bulk trash content nodes with a relation in list view', async ({umbracoApi, umbracoUi}) => {
@@ -85,12 +85,12 @@ test('can bulk trash content nodes with a relation in list view', async ({umbrac
   await umbracoUi.content.clickConfirmTrashButtonAndWaitForContentToBeTrashed();
 
   // Assert
-  expect(await umbracoApi.document.doesNameExist(firstChildContentName)).toBeFalsy();
-  expect(await umbracoApi.document.doesNameExist(secondChildContentName)).toBeFalsy();
+  await expect.poll(() => umbracoApi.document.doesNameExist(firstChildContentName)).toBeFalsy();
+  await expect.poll(() => umbracoApi.document.doesNameExist(secondChildContentName)).toBeFalsy();
   await umbracoUi.content.isItemVisibleInRecycleBin(firstChildContentName);
   await umbracoUi.content.isItemVisibleInRecycleBin(secondChildContentName);
-  expect(await umbracoApi.document.doesItemExistInRecycleBin(firstChildContentName)).toBeTruthy();
-  expect(await umbracoApi.document.doesItemExistInRecycleBin(secondChildContentName)).toBeTruthy();
+  await expect.poll(() => umbracoApi.document.doesItemExistInRecycleBin(firstChildContentName)).toBeTruthy();
+  await expect.poll(() => umbracoApi.document.doesItemExistInRecycleBin(secondChildContentName)).toBeTruthy();
 
   // Clean
   await umbracoApi.documentType.ensureNameNotExists(documentPickerName[1]);
@@ -113,12 +113,12 @@ test('can bulk trash content nodes without a relation in grid view', async ({umb
   await umbracoUi.content.clickConfirmTrashButtonAndWaitForContentToBeTrashed();
 
   // // Assert
-  expect(await umbracoApi.document.doesNameExist(firstChildContentName)).toBeFalsy();
-  expect(await umbracoApi.document.doesNameExist(secondChildContentName)).toBeFalsy();
+  await expect.poll(() => umbracoApi.document.doesNameExist(firstChildContentName)).toBeFalsy();
+  await expect.poll(() => umbracoApi.document.doesNameExist(secondChildContentName)).toBeFalsy();
   await umbracoUi.content.isItemVisibleInRecycleBin(firstChildContentName);
   await umbracoUi.content.isItemVisibleInRecycleBin(secondChildContentName);
-  expect(await umbracoApi.document.doesItemExistInRecycleBin(firstChildContentName)).toBeTruthy();
-  expect(await umbracoApi.document.doesItemExistInRecycleBin(secondChildContentName)).toBeTruthy();
+  await expect.poll(() => umbracoApi.document.doesItemExistInRecycleBin(firstChildContentName)).toBeTruthy();
+  await expect.poll(() => umbracoApi.document.doesItemExistInRecycleBin(secondChildContentName)).toBeTruthy();
 });
 
 test('can bulk trash content nodes with a relation in grid view', async ({umbracoApi, umbracoUi}) => {
@@ -144,12 +144,12 @@ test('can bulk trash content nodes with a relation in grid view', async ({umbrac
   await umbracoUi.content.clickConfirmTrashButtonAndWaitForContentToBeTrashed();
 
   // Assert
-  expect(await umbracoApi.document.doesNameExist(firstChildContentName)).toBeFalsy();
-  expect(await umbracoApi.document.doesNameExist(secondChildContentName)).toBeFalsy();
+  await expect.poll(() => umbracoApi.document.doesNameExist(firstChildContentName)).toBeFalsy();
+  await expect.poll(() => umbracoApi.document.doesNameExist(secondChildContentName)).toBeFalsy();
   await umbracoUi.content.isItemVisibleInRecycleBin(firstChildContentName);
   await umbracoUi.content.isItemVisibleInRecycleBin(secondChildContentName);
-  expect(await umbracoApi.document.doesItemExistInRecycleBin(firstChildContentName)).toBeTruthy();
-  expect(await umbracoApi.document.doesItemExistInRecycleBin(secondChildContentName)).toBeTruthy();
+  await expect.poll(() => umbracoApi.document.doesItemExistInRecycleBin(firstChildContentName)).toBeTruthy();
+  await expect.poll(() => umbracoApi.document.doesItemExistInRecycleBin(secondChildContentName)).toBeTruthy();
 
   // Clean
   await umbracoApi.documentType.ensureNameNotExists(documentPickerName[1]);

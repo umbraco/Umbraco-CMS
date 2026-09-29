@@ -3,7 +3,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'tiptapExtension',
 		alias: 'Umb.Tiptap.WordCount',
 		name: 'Word Count Tiptap Extension',
-		api: () => import('./word-count.tiptap-api.js'),
+		api: () => import('../extension-apis.bundle.js').then((m) => ({ default: m.UmbTiptapWordCountExtensionApi })),
 		meta: {
 			icon: 'icon-speed-gauge',
 			label: 'Word Count',
@@ -14,7 +14,8 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'tiptapStatusbarExtension',
 		alias: 'Umb.Tiptap.Statusbar.WordCount',
 		name: 'Word Count Tiptap Statusbar Extension',
-		element: () => import('./word-count.tiptap-statusbar-element.js'),
+		element: () =>
+			import('../extension-apis.bundle.js').then((m) => ({ default: m.UmbTiptapStatusbarWordCountElement })),
 		forExtensions: ['Umb.Tiptap.WordCount'],
 		meta: {
 			alias: 'wordCount',

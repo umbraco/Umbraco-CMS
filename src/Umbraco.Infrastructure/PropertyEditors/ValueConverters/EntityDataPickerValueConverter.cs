@@ -42,7 +42,7 @@ public sealed class EntityDataPickerValueConverter : PropertyValueConverterBase
     /// Gets the cache level for the property, which is always <see cref="PropertyCacheLevel.Element"/> for this value converter.
     /// </summary>
     /// <param name="propertyType">The published property type.</param>
-    /// <returns>The property cache level, always <see cref="PropertyCacheLevel.Element"/>.</returns
+    /// <returns>The property cache level, always <see cref="PropertyCacheLevel.Element"/>.</returns>
     public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
         => PropertyCacheLevel.Element;
 

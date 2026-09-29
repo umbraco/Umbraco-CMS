@@ -184,7 +184,7 @@ internal abstract class FileRepository<TId, TEntity> : IReadRepository<TId, TEnt
 
     /// <summary>
     /// Deletes the specified entity from the repository.
-    /// This virtual method calls <see cref="PersistDeletedItem"/> to perform the deletion.
+    /// This virtual method calls <see cref="PersistDeletedItem(TEntity)"/> to perform the deletion.
     /// </summary>
     /// <param name="entity">The entity to delete.</param>
     public virtual void Delete(TEntity entity) => PersistDeletedItem(entity);

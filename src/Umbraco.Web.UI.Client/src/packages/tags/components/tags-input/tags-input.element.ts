@@ -188,7 +188,45 @@ export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 		}
 	}
 
+	#onPaste(e: ClipboardEvent) {
+		const pastedText = e.clipboardData?.getData('text') ?? '';
+
+		// A typed comma is a literal part of a single tag; only a pasted separator splits into multiple tags.
+		if (!/[,\r\n]/.test(pastedText)) return;
+
+		e.preventDefault();
+
+		const candidates = pastedText
+			.split(/[,\r\n]+/)
+			.map((tag) => tag.trim())
+			.filter((tag) => tag !== '');
+
+		this.#addTags(candidates);
+	}
+
+	#addTags(candidates: string[]) {
+		const existing = new Set(this.items);
+		const newTags: string[] = [];
+		for (const candidate of candidates) {
+			if (existing.has(candidate)) continue;
+			existing.add(candidate);
+			newTags.push(candidate);
+		}
+
+		if (!newTags.length) return;
+
+		this.#inputError(false);
+		this.items = [...this.items, ...newTags];
+		this._tagInput.value = '';
+		this._currentInput = '';
+		this._matches = [];
+		this.dispatchEvent(new UmbChangeEvent());
+	}
+
 	protected override updated(): void {
+		// #main-tag is not rendered in readonly mode, and the queries can resolve to null
+		// during transient re-renders, so guard before touching the elements.
+		if (!this._mainTag || !this._widthTracker) return;
 		this._mainTag.style.width = `${this._widthTracker.offsetWidth - 4}px`;
 	}
 
@@ -375,7 +413,12 @@ export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 	#renderAddButton() {
 		if (this.readonly) return nothing;
 		return html`
-			<uui-tag look="outline" id="main-tag" @click="${this.focus}" @focusout="${this.#onMainTagFocusOut}" slot="trigger">
+			<uui-tag
+				look="outline"
+				id="main-tag"
+				@click="${this.focus}"
+				@focusout="${this.#onMainTagFocusOut}"
+				slot="trigger">
 				<input
 					id="tag-input"
 					aria-label="tag input"
@@ -384,6 +427,7 @@ export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 					.value="${this._currentInput ?? undefined}"
 					@keydown="${this.#onInputKeydown}"
 					@input="${this.#onInput}"
+					@paste="${this.#onPaste}"
 					@blur="${this.#onBlur}" />
 				<uui-icon id="icon-add" name="icon-add"></uui-icon>
 				${this.#renderTagOptions()}

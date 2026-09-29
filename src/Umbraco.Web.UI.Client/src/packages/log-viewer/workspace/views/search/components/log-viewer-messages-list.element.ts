@@ -148,7 +148,6 @@ export class UmbLogViewerMessagesListElement extends UmbLitElement {
 	static override styles = [
 		css`
 			uui-pagination {
-				display: block;
 				margin-bottom: var(--uui-size-layout-1);
 			}
 			uui-box {

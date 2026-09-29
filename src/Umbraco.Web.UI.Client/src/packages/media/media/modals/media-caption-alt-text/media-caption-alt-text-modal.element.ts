@@ -86,43 +86,43 @@ export class UmbMediaCaptionAltTextModalElement extends UmbModalBaseElement<
 		return html`
 			<umb-body-layout .headline=${this.localize.term('defaultdialogs_editSelectedMedia')}>
 				<uui-box>
-				<div id="wrapper">
-					<uui-label for="alt-text">${this.localize.term('content_altTextOptional')}</uui-label>
-					<uui-input
-						id="alt-text"
-						label="alt text"
-						.value=${this.value?.altText ?? ''}
-						@input=${(e: UUIInputEvent) =>
-							(this.value = { ...this.value, altText: e.target.value as string })}></uui-input>
+					<div id="wrapper">
+						<uui-label for="alt-text">${this.localize.term('content_altTextOptional')}</uui-label>
+						<uui-input
+							id="alt-text"
+							label="alt text"
+							.value=${this.value?.altText ?? ''}
+							@input=${(e: UUIInputEvent) =>
+								(this.value = { ...this.value, altText: e.target.value as string })}></uui-input>
 
-					<uui-label for="caption">${this.localize.term('content_captionTextOptional')}</uui-label>
-					<uui-input
-						id="caption"
-						label="caption"
-						.value=${this.value?.caption ?? ''}
-						@input=${(e: UUIInputEvent) =>
-							(this.value = { ...this.value, caption: e.target.value as string })}></uui-input>
+						<uui-label for="caption">${this.localize.term('content_captionTextOptional')}</uui-label>
+						<uui-input
+							id="caption"
+							label="caption"
+							.value=${this.value?.caption ?? ''}
+							@input=${(e: UUIInputEvent) =>
+								(this.value = { ...this.value, caption: e.target.value as string })}></uui-input>
 
-					<umb-input-dimensions
-						.width=${this.value?.width}
-						.height=${this.value?.height}
-						.naturalWidth=${this._naturalWidth}
-						.naturalHeight=${this._naturalHeight}
-						@change=${this.#onDimensionsChange}></umb-input-dimensions>
+						<umb-input-dimensions
+							.width=${this.value?.width}
+							.height=${this.value?.height}
+							.naturalWidth=${this._naturalWidth}
+							.naturalHeight=${this._naturalHeight}
+							@change=${this.#onDimensionsChange}></umb-input-dimensions>
 
-					<figure id="mainobject">
-						${this.value?.url
-							? html`<img
-									src=${this.value.url}
-									alt=${this.value?.altText ?? ''}
-									decoding="async"
-									style=${this.value?.width && this.value?.height
-										? `width: ${this.value.width}px; aspect-ratio: ${this.value.width} / ${this.value.height}`
-										: ''} />`
-							: ''}
-						<figcaption>${this.value?.caption ?? ''}</figcaption>
-					</figure>
-				</div>
+						<figure id="mainobject">
+							${this.value?.url
+								? html`<img
+										src=${this.value.url}
+										alt=${this.value?.altText ?? ''}
+										decoding="async"
+										style=${this.value?.width && this.value?.height
+											? `width: ${this.value.width}px; aspect-ratio: ${this.value.width} / ${this.value.height}`
+											: ''} />`
+								: ''}
+							<figcaption>${this.value?.caption ?? ''}</figcaption>
+						</figure>
+					</div>
 				</uui-box>
 				<div slot="actions">
 					<uui-button label=${this.localize.term('general_close')} @click=${this._rejectModal}></uui-button>

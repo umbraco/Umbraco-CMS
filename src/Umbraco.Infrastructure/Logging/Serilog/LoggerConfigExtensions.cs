@@ -97,9 +97,9 @@ namespace Umbraco.Extensions
         /// It is highly recommended to retain this default configuration when customizing your own logging setup.
         /// </summary>
         /// <param name="logConfig">The <see cref="LoggerConfiguration"/> instance to configure.</param>
-        /// <param name="hostingEnvironment">The Umbraco hosting environment.</param>
+        /// <param name="hostEnvironment">The Umbraco hosting environment.</param>
         /// <param name="loggingConfiguration">The logging configuration settings.</param>
-        /// <param name="configuration">The application configuration.</param>
+        /// <param name="umbracoFileConfiguration">The application configuration.</param>
         /// <returns>The configured <see cref="LoggerConfiguration"/> instance.</returns>
         public static LoggerConfiguration MinimalConfiguration(
             this LoggerConfiguration logConfig,

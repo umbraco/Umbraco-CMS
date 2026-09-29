@@ -1,5 +1,6 @@
 /**
  * Deep freeze an object and all its properties.
+ * @template T
  * @param {T} inObj - The object to deep freeze.
  * @returns {T} - The deep frozen object.
  * @description - Deep freezes an object and all its properties.

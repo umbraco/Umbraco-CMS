@@ -4,7 +4,10 @@ export const manifests: Array<UmbExtensionManifest> = [
 		kind: 'colorPickerButton',
 		alias: 'Umb.Tiptap.Toolbar.TextColorBackground',
 		name: 'Text Color Background Tiptap Toolbar Extension',
-		api: () => import('./text-color-background.tiptap-toolbar-api.js'),
+		api: () =>
+			import('../extension-apis.bundle.js').then((m) => ({
+				default: m.UmbTiptapToolbarTextColorBackgroundExtensionApi,
+			})),
 		forExtensions: ['Umb.Tiptap.HtmlAttributeStyle', 'Umb.Tiptap.HtmlTagSpan'],
 		meta: {
 			alias: 'text-color-background',
@@ -17,7 +20,10 @@ export const manifests: Array<UmbExtensionManifest> = [
 		kind: 'colorPickerButton',
 		alias: 'Umb.Tiptap.Toolbar.TextColorForeground',
 		name: 'Text Color Foreground Tiptap Toolbar Extension',
-		api: () => import('./text-color-foreground.tiptap-toolbar-api.js'),
+		api: () =>
+			import('../extension-apis.bundle.js').then((m) => ({
+				default: m.UmbTiptapToolbarTextColorForegroundExtensionApi,
+			})),
 		forExtensions: ['Umb.Tiptap.HtmlAttributeStyle', 'Umb.Tiptap.HtmlTagSpan'],
 		meta: {
 			alias: 'text-color-foreground',

@@ -50,21 +50,25 @@ export class UmbPropertyEditorUIBlockGridAreaTypePermissionElement
 	constructor() {
 		super();
 
-		this.observe(this.#itemsManager.items, (items) => {
-			this._blockTypesWithElementName = items
-				.map((item) => {
-					const blockType = this._blockTypes?.find((block) => block.contentElementTypeKey === item.unique);
-					if (blockType) {
-						return { type: blockType, name: item.name, icon: item.icon };
-					}
-					return undefined;
-				})
-				.filter((x) => x !== undefined) as Array<{
-				type: UmbBlockTypeWithGroupKey;
-				name: string;
-				icon: string | null | undefined;
-			}>;
-		});
+		this.observe(
+			this.#itemsManager.items,
+			(items) => {
+				this._blockTypesWithElementName = items
+					.map((item) => {
+						const blockType = this._blockTypes?.find((block) => block.contentElementTypeKey === item.unique);
+						if (blockType) {
+							return { type: blockType, name: item.name, icon: item.icon };
+						}
+						return undefined;
+					})
+					.filter((x) => x !== undefined) as Array<{
+					type: UmbBlockTypeWithGroupKey;
+					name: string;
+					icon: string | null | undefined;
+				}>;
+			},
+			null,
+		);
 
 		this.consumeContext(UMB_DATA_TYPE_WORKSPACE_CONTEXT, async (context) => {
 			this.observe(

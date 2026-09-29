@@ -29,13 +29,13 @@ public class UpdateDomainsController : DocumentControllerBase
     private readonly IUmbracoMapper _umbracoMapper;
     private readonly IDomainPresentationFactory _domainPresentationFactory;
 
-    [ActivatorUtilitiesConstructor]
     /// <summary>
     /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Controllers.Document.UpdateDomainsController"/> class.
     /// </summary>
     /// <param name="domainService">Service used to manage domain entities within the Umbraco CMS.</param>
     /// <param name="umbracoMapper">The mapper responsible for converting between Umbraco domain models and API models.</param>
     /// <param name="domainPresentationFactory">Factory for creating presentation models for domains.</param>
+    [ActivatorUtilitiesConstructor]
     public UpdateDomainsController(IAuthorizationService authorizationService, IDomainService domainService, IUmbracoMapper umbracoMapper, IDomainPresentationFactory domainPresentationFactory)
     {
         _authorizationService = authorizationService;

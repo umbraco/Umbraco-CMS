@@ -19,8 +19,7 @@ import type { UmbDocumentItemModel } from '@umbraco-cms/backoffice/document';
 import type { UmbDocumentTypeItemModel } from '@umbraco-cms/backoffice/document-type';
 import type { UmbModalContext } from '@umbraco-cms/backoffice/modal';
 
-const elementName = 'umb-input-content-picker-document-root';
-@customElement(elementName)
+@customElement('umb-input-content-picker-document-root')
 export class UmbInputContentPickerDocumentRootElement extends UmbFormControlMixin<
 	string | undefined,
 	typeof UmbLitElement
@@ -70,6 +69,7 @@ export class UmbInputContentPickerDocumentRootElement extends UmbFormControlMixi
 			(originManifests: Array<ManifestDynamicRootOrigin>) => {
 				this._originManifests = originManifests;
 			},
+			null,
 		);
 
 		this.observe(
@@ -77,28 +77,37 @@ export class UmbInputContentPickerDocumentRootElement extends UmbFormControlMixi
 			(queryStepManifests: Array<ManifestDynamicRootQueryStep>) => {
 				this._queryStepManifests = queryStepManifests;
 			},
+			null,
 		);
 
-		this.observe(this.#documentItemManager.items, (documents) => {
-			if (!documents?.length) return;
+		this.observe(
+			this.#documentItemManager.items,
+			(documents) => {
+				if (!documents?.length) return;
 
-			documents.forEach((document) => {
-				// TODO: [v17] Review usage of `item.variants[0].name` as this needs to be implemented properly! [LK]
-				this.#documentLookup[document.unique] = document.variants[0].name;
-			});
+				documents.forEach((document) => {
+					// TODO: [v17] Review usage of `item.variants[0].name` as this needs to be implemented properly! [LK]
+					this.#documentLookup[document.unique] = document.variants[0].name;
+				});
 
-			this.requestUpdate();
-		});
+				this.requestUpdate();
+			},
+			null,
+		);
 
-		this.observe(this.#documentTypeItemManager.items, (documentTypes) => {
-			if (!documentTypes?.length) return;
+		this.observe(
+			this.#documentTypeItemManager.items,
+			(documentTypes) => {
+				if (!documentTypes?.length) return;
 
-			documentTypes.forEach((documentType) => {
-				this.#documentTypeLookup[documentType.unique] = documentType.name;
-			});
+				documentTypes.forEach((documentType) => {
+					this.#documentTypeLookup[documentType.unique] = documentType.name;
+				});
 
-			this.requestUpdate();
-		});
+				this.requestUpdate();
+			},
+			null,
+		);
 	}
 
 	override connectedCallback() {
@@ -321,6 +330,6 @@ export { UmbInputContentPickerDocumentRootElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbInputContentPickerDocumentRootElement;
+		'umb-input-content-picker-document-root': UmbInputContentPickerDocumentRootElement;
 	}
 }

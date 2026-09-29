@@ -20,7 +20,7 @@ public class NodeCountTelemetryProvider : IDetailedTelemetryProvider
     /// Retrieves telemetry usage information about the number of nodes for various Umbraco object types.
     /// </summary>
     /// <returns>
-    /// An enumerable collection of <see cref="Umbraco.Cms.Infrastructure.Telemetry.UsageInformation"/> instances, each representing the count of a specific node type (such as members, templates, content, and document types) in the system.
+    /// An enumerable collection of <see cref="UsageInformation"/> instances, each representing the count of a specific node type (such as members, templates, content, and document types) in the system.
     /// </returns>
     public IEnumerable<UsageInformation> GetInformation()
     {

@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 public partial class ContentEditingServiceTests : ContentEditingServiceTestsBase
 {
     [SetUp]
-    public void Setup() => ContentRepositoryBase.ThrowOnWarning = true;
+    public new void Setup() => ContentRepositoryBase.ThrowOnWarning = true;
 
     public void Relate(IContent parent, IContent child, string relationTypeAlias = Constants.Conventions.RelationTypes.RelatedDocumentAlias)
     {

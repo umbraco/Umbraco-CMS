@@ -5,7 +5,7 @@ const dataTypeName = 'Member Picker';
 const contentName = 'TestContent';
 const memberName = 'TestMemberForContent';
 const documentTypeName = 'TestDocumentTypeForContent';
-const memberTypeName = 'Test Member Type';
+const memberTypeName = 'Test Member Type Content Picker';
 const memberInfo = ['testmember@acceptance.test', 'testmember', '0123456789'];
 let memberId = '';
 

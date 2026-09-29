@@ -275,4 +275,44 @@ describe('UmbCurrentUserContext', () => {
 			});
 		});
 	});
+
+	describe('invalidate', () => {
+		beforeEach(async () => {
+			// Re-seed the mock data before loading, as earlier tests mutate the user group.
+			await useMockSet('kitchenSink');
+			await hostElement.init();
+		});
+
+		async function removeUsersSectionFromCurrentUserGroup() {
+			const userGroupRepo = new UmbUserGroupDetailRepository(hostElement);
+			const { data: userGroup } = await userGroupRepo.requestByUnique(CURRENT_USER_GROUP_UNIQUE);
+			expect(userGroup).to.exist;
+
+			await userGroupRepo.save({
+				...userGroup!,
+				sections: userGroup!.sections.filter((s) => s !== 'Umb.Section.Users'),
+			});
+		}
+
+		it('load() reuses the previous load and does not re-fetch', async () => {
+			expect(context.getAllowedSection()).to.include('Umb.Section.Users');
+
+			await removeUsersSectionFromCurrentUserGroup();
+
+			await context.load();
+
+			expect(context.getAllowedSection()).to.include('Umb.Section.Users');
+		});
+
+		it('load() re-fetches after invalidate()', async () => {
+			expect(context.getAllowedSection()).to.include('Umb.Section.Users');
+
+			await removeUsersSectionFromCurrentUserGroup();
+
+			context.invalidate();
+			await context.load();
+
+			expect(context.getAllowedSection()).to.not.include('Umb.Section.Users');
+		});
+	});
 });

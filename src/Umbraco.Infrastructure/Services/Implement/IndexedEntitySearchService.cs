@@ -122,11 +122,30 @@ internal sealed class IndexedEntitySearchService : IIndexedEntitySearchService
             .Where(key => key != Guid.Empty)
             .ToArray();
 
+        // EntityService.GetAll returns entities in database (not Lucene score) order, which
+        // would discard the relevance ranking. Re-order to match the search result sequence.
+        IEnumerable<IEntitySlim> orderedItems;
+        if (keys.Length > 0)
+        {
+            var keyOrder = new Dictionary<Guid, int>(keys.Length);
+            for (var i = 0; i < keys.Length; i++)
+            {
+                keyOrder.TryAdd(keys[i], i);
+            }
+
+            orderedItems = _entityService
+                .GetAll(objectType, keys)
+                .OrderBy(entity => keyOrder.TryGetValue(entity.Key, out var index) ? index : int.MaxValue)
+                .ToArray();
+        }
+        else
+        {
+            orderedItems = [];
+        }
+
         return Task.FromResult(new PagedModel<IEntitySlim>
         {
-            Items = keys.Any()
-                ? _entityService.GetAll(objectType, keys)
-                : Enumerable.Empty<IEntitySlim>(),
+            Items = orderedItems,
             Total = totalFound
         });
     }

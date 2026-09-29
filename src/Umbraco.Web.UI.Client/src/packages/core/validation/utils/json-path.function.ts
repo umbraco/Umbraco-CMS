@@ -96,7 +96,7 @@ function _GetNextArrayEntryFromPath(array: Array<any>, path: string): any {
 
 /**
  * @param {string} filter - A JSON Query, limited to filtering features. Do not support other JSON PATH Query features.
- * @returns {Array<(queryFilter: any) => boolean>} - An array of methods that returns true if the given items property value matches the value of the query.
+ * @returns {Array<(item: Record<string, unknown>) => boolean>} - An array of methods that returns true if the given items property value matches the value of the query.
  */
 function JsFilterFromJsonPathFilter(filter: string): Array<(item: any) => boolean> {
 	// strip ?( and ) from the filter

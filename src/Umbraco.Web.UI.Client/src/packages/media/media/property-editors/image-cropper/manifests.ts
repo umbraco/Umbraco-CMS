@@ -1,4 +1,5 @@
 import { manifest as schemaManifest } from './Umbraco.ImageCropper.js';
+import { manifests as valueSummaryManifests } from './value-summary/manifests.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -7,6 +8,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Image Cropper Property Editor UI',
 		element: () => import('./property-editor-ui-image-cropper.element.js'),
 		meta: {
+			supportsVariantChange: true,
 			label: 'Image Cropper',
 			icon: 'icon-crop',
 			group: '#propertyEditorUIGroups_media',
@@ -15,4 +17,5 @@ export const manifests: Array<UmbExtensionManifest> = [
 		},
 	},
 	schemaManifest,
+	...valueSummaryManifests,
 ];

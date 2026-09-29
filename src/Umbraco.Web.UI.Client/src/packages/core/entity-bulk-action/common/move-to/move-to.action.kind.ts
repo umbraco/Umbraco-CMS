@@ -1,4 +1,5 @@
 import { UMB_ENTITY_BULK_ACTION_DEFAULT_KIND_MANIFEST } from '../../default/default.action.kind.js';
+import { UmbMoveToEntityBulkAction } from './move-to.action.js';
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
 export const manifest: UmbExtensionManifestKind = {
@@ -10,7 +11,7 @@ export const manifest: UmbExtensionManifestKind = {
 		...UMB_ENTITY_BULK_ACTION_DEFAULT_KIND_MANIFEST.manifest,
 		type: 'entityBulkAction',
 		kind: 'moveTo',
-		api: () => import('./move-to.action.js'),
+		api: UmbMoveToEntityBulkAction,
 		weight: 700,
 		forEntityTypes: [],
 		meta: {

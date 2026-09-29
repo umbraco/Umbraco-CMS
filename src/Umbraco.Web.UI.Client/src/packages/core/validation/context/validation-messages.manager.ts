@@ -176,7 +176,7 @@ export class UmbValidationMessagesManager {
 	}
 	removeMessagesAndDescendantsByPath(path: string): void {
 		this.initiateChange();
-		this.#messages.filter((x) => MatchPathOrDescendantPath(x.path, path));
+		this.#messages.filter((x) => !MatchPathOrDescendantPath(x.path, path));
 		this.finishChange();
 	}
 	removeMessagesByTypeAndPath(type: UmbValidationMessageType, path: string): void {

@@ -1,5 +1,6 @@
 import type { ManifestBase } from '../types/index.js';
 import { isManifestBaseType } from '../type-guards/index.js';
+import { appendCacheBust } from '../functions/append-cache-bust.function.js';
 import { ManifestService, type ManifestResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -19,7 +20,7 @@ export class UmbServerExtensionRegistrator extends UmbControllerBase {
 	/**
 	 * Registers all extensions from the server.
 	 * This is used to register all extensions that are available to the user (including private extensions).
-	 * @remark Users must have the BACKOFFICE_ACCESS permission to access this method.
+	 * @remarks Users must have the BACKOFFICE_ACCESS permission to access this method.
 	 */
 	public async registerAllExtensions() {
 		const { data: packages } = await tryExecute(this, ManifestService.getManifestManifest());
@@ -31,7 +32,7 @@ export class UmbServerExtensionRegistrator extends UmbControllerBase {
 	/**
 	 * Registers all private extensions from the server.
 	 * This is used to register all private extensions that are available to the user.
-	 * @remark Users must have the BACKOFFICE_ACCESS permission to access this method.
+	 * @remarks Users must have the BACKOFFICE_ACCESS permission to access this method.
 	 */
 	public async registerPrivateExtensions() {
 		const { data: packages } = await tryExecute(this, ManifestService.getManifestManifestPrivate(), {
@@ -45,7 +46,7 @@ export class UmbServerExtensionRegistrator extends UmbControllerBase {
 	/**
 	 * Registers all public extensions from the server.
 	 * This is used to register all extensions that are available to the user (excluding private extensions) such as login extensions.
-	 * @remark Any user can access this method without any permissions.
+	 * @remarks Any user can access this method without any permissions.
 	 */
 	public async registerPublicExtensions() {
 		const { data: packages } = await tryExecute(this, ManifestService.getManifestManifestPublic(), {
@@ -68,6 +69,12 @@ export class UmbServerExtensionRegistrator extends UmbControllerBase {
 		const apiBaseUrl = serverContext?.getServerUrl();
 
 		packages?.forEach((p) => {
+			// Append the server-computed cache-buster on the package's own /App_Plugins path, then prepend the base url.
+			const resolveAssetUrl = (url: string): string => {
+				const busted = appendCacheBust(url, p.cacheBuster);
+				return busted.startsWith('http') ? busted : `${apiBaseUrl}${busted}`;
+			};
+
 			p.extensions?.forEach((e) => {
 				// Crudely validate that the extension at least follows a basic manifest structure
 				// Idea: Use `Zod` to validate the manifest
@@ -78,19 +85,16 @@ export class UmbServerExtensionRegistrator extends UmbControllerBase {
 					 */
 
 					// TODO: add helper to check for relative paths
-					// Add base url if the js path is relative
-					if ('js' in e && typeof e.js === 'string' && !e.js.startsWith('http')) {
-						e.js = `${apiBaseUrl}${e.js}`;
+					if ('js' in e && typeof e.js === 'string') {
+						e.js = resolveAssetUrl(e.js);
 					}
 
-					// Add base url if the element path is relative
-					if ('element' in e && typeof e.element === 'string' && !e.element.startsWith('http')) {
-						e.element = `${apiBaseUrl}${e.element}`;
+					if ('element' in e && typeof e.element === 'string') {
+						e.element = resolveAssetUrl(e.element);
 					}
 
-					// Add base url if the element path api relative
-					if ('api' in e && typeof e.api === 'string' && !e.api.startsWith('http')) {
-						e.api = `${apiBaseUrl}${e.api}`;
+					if ('api' in e && typeof e.api === 'string') {
+						e.api = resolveAssetUrl(e.api);
 					}
 
 					extensions.push(e);

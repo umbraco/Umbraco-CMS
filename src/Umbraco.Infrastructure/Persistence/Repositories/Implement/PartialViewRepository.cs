@@ -124,35 +124,6 @@ internal sealed class PartialViewRepository : FileRepository<string, IPartialVie
     }
 
     /// <summary>
-    /// Returns a stream for reading the content of the file at the specified <paramref name="filepath"/>.
-    /// </summary>
-    /// <param name="filepath">The path of the file to read from the file system.</param>
-    /// <returns>A <see cref="Stream"/> containing the file's content, or <see cref="Stream.Null"/> if the file does not exist or cannot be opened.</returns>
-    public Stream GetFileContentStream(string filepath)
-    {
-        if (FileSystem?.FileExists(filepath) == false)
-        {
-            return Stream.Null;
-        }
-
-        try
-        {
-            return FileSystem?.OpenFile(filepath) ?? Stream.Null;
-        }
-        catch
-        {
-            return Stream.Null; // deal with race conds
-        }
-    }
-
-    /// <summary>
-    /// Sets the content of the specified file by writing the provided stream to the given file path, overwriting any existing content.
-    /// </summary>
-    /// <param name="filepath">The path of the file to which the content will be written.</param>
-    /// <param name="content">A stream containing the content to write to the file.</param>
-    public void SetFileContent(string filepath, Stream content) => FileSystem?.AddFile(filepath, content, true);
-
-    /// <summary>
     ///     Persists a new partial view item, but only when not in production runtime mode.
     /// </summary>
     /// <param name="entity">The partial view entity to persist.</param>

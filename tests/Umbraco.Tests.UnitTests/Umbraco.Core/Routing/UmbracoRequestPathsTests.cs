@@ -14,12 +14,14 @@ public class UmbracoRequestPathsTests
 {
     private IWebHostEnvironment _hostEnvironment;
     private UmbracoRequestPathsOptions _umbracoRequestPathsOptions;
+    private DeliveryApiSettings _deliveryApiSettings;
 
     [OneTimeSetUp]
     public void Setup()
     {
         _hostEnvironment = Mock.Of<IWebHostEnvironment>();
         _umbracoRequestPathsOptions = new UmbracoRequestPathsOptions();
+        _deliveryApiSettings = new DeliveryApiSettings();
     }
 
     private IHostingEnvironment CreateHostingEnvironment(string virtualPath = "")
@@ -43,10 +45,14 @@ public class UmbracoRequestPathsTests
     [TestCase("/home.aspx", true)] // has ext, assume client side
     [TestCase("http://www.domain.com/Umbraco/test/test.aspx", true)] // has ext, assume client side
     [TestCase("http://www.domain.com/umbraco/test/test.js", true)]
+    [TestCase("http://www.domain.com/umbraco/delivery/api/v1.0/my/controller/some.file", true)]
     public void Is_Client_Side_Request(string url, bool assert)
     {
         var hostingEnvironment = CreateHostingEnvironment();
-        var umbracoRequestPaths = new UmbracoRequestPaths(hostingEnvironment, Options.Create(_umbracoRequestPathsOptions));
+        var umbracoRequestPaths = new UmbracoRequestPaths(
+            hostingEnvironment,
+            Options.Create(_umbracoRequestPathsOptions),
+            Options.Create(_deliveryApiSettings));
 
         var uri = new Uri("http://test.com" + url);
         var result = umbracoRequestPaths.IsClientSideRequest(uri.AbsolutePath);
@@ -57,7 +63,10 @@ public class UmbracoRequestPathsTests
     public void Is_Client_Side_Request_InvalidPath_ReturnFalse()
     {
         var hostingEnvironment = CreateHostingEnvironment();
-        var umbracoRequestPaths = new UmbracoRequestPaths(hostingEnvironment, Options.Create(_umbracoRequestPathsOptions));
+        var umbracoRequestPaths = new UmbracoRequestPaths(
+            hostingEnvironment,
+            Options.Create(_umbracoRequestPathsOptions),
+            Options.Create(_deliveryApiSettings));
 
         // This URL is invalid. Default to false when the extension cannot be determined
         var uri = new Uri("http://test.com/installing-modules+foobar+\"yipee\"");
@@ -89,7 +98,10 @@ public class UmbracoRequestPathsTests
     {
         var source = new Uri(input);
         var hostingEnvironment = CreateHostingEnvironment(virtualPath);
-        var umbracoRequestPaths = new UmbracoRequestPaths(hostingEnvironment, Options.Create(_umbracoRequestPathsOptions));
+        var umbracoRequestPaths = new UmbracoRequestPaths(
+            hostingEnvironment,
+            Options.Create(_umbracoRequestPathsOptions),
+            Options.Create(_deliveryApiSettings));
         Assert.AreEqual(expected, umbracoRequestPaths.IsBackOfficeRequest(source.AbsolutePath));
     }
 
@@ -105,7 +117,29 @@ public class UmbracoRequestPathsTests
         {
             IsBackOfficeRequest = _ => true
         };
-        var umbracoRequestPaths = new UmbracoRequestPaths(hostingEnvironment, Options.Create(umbracoRequestPathsOptions));
+        var umbracoRequestPaths = new UmbracoRequestPaths(
+            hostingEnvironment,
+            Options.Create(umbracoRequestPathsOptions),
+            Options.Create(_deliveryApiSettings));
         Assert.AreEqual(expected, umbracoRequestPaths.IsBackOfficeRequest(source.AbsolutePath));
+    }
+
+    [TestCase("/favicon.ico", true)]
+    [TestCase("/umbraco_client/Tree/treeIcons.css", true)]
+    [TestCase("/test/test.aspx", true)]
+    [TestCase("/test/test.js", true)]
+    [TestCase("/umbraco/delivery/api/v1.0/my/controller/some.file", false)]
+    [TestCase("/umbraco/delivery/api/v2/media/item/%2Froot%20folder%2Fchild%20folder%2Funicorn.png%2F", false)]
+    public void Is_Client_Side_Request_Delivery_Api_Enabled(string url, bool assert)
+    {
+        var hostingEnvironment = CreateHostingEnvironment();
+        var umbracoRequestPaths = new UmbracoRequestPaths(
+            hostingEnvironment,
+            Options.Create(_umbracoRequestPathsOptions),
+            Options.Create(new DeliveryApiSettings { Enabled = true }));
+
+        var uri = new Uri("http://test.com" + url);
+        var result = umbracoRequestPaths.IsClientSideRequest(uri.AbsolutePath);
+        Assert.AreEqual(assert, result);
     }
 }
