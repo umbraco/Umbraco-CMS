@@ -151,7 +151,7 @@ export class UmbPropertyEditorUIMultipleDocumentPickerElement
 	}
 }
 
-export default UmbPropertyEditorUIMultipleDocumentPickerElement;
+export { UmbPropertyEditorUIMultipleDocumentPickerElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {

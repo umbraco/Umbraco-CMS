@@ -82,7 +82,7 @@ export class UmbPropertyEditorUIMultipleMemberPickerElement
 	}
 }
 
-export default UmbPropertyEditorUIMultipleMemberPickerElement;
+export { UmbPropertyEditorUIMultipleMemberPickerElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {

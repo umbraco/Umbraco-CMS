@@ -9,7 +9,7 @@ export class UmbPropertyEditorUISingleUrlPickerElement extends UmbUrlPickerPrope
 	protected override readonly multiple = false;
 }
 
-export default UmbPropertyEditorUISingleUrlPickerElement;
+export { UmbPropertyEditorUISingleUrlPickerElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {

@@ -40,7 +40,7 @@ export class UmbPropertyEditorUIMemberTypePickerElement extends UmbLitElement im
 	}
 }
 
-export default UmbPropertyEditorUIMemberTypePickerElement;
+export { UmbPropertyEditorUIMemberTypePickerElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {

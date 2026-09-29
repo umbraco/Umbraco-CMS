@@ -34,7 +34,7 @@ export class UmbPropertyEditorUIDynamicRootElement extends UmbLitElement impleme
 	}
 }
 
-export default UmbPropertyEditorUIDynamicRootElement;
+export { UmbPropertyEditorUIDynamicRootElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {

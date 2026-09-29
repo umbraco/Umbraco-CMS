@@ -9,7 +9,7 @@ export class UmbPropertyEditorUIRangeSliderElement extends UmbSliderPropertyEdit
 	protected override readonly enableRange = true;
 }
 
-export default UmbPropertyEditorUIRangeSliderElement;
+export { UmbPropertyEditorUIRangeSliderElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {

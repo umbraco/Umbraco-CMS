@@ -9,7 +9,7 @@ export class UmbPropertyEditorUISingleDropdownElement extends UmbDropdownPropert
 	protected override readonly multiple = false;
 }
 
-export default UmbPropertyEditorUISingleDropdownElement;
+export { UmbPropertyEditorUISingleDropdownElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
