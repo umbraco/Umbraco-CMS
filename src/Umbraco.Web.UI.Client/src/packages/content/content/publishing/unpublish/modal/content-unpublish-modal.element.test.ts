@@ -1,5 +1,6 @@
 import type { UmbContentUnpublishModalElement } from './content-unpublish-modal.element.js';
 import './content-unpublish-modal.element.js';
+import type { UmbContentUnpublishModalData } from './types.js';
 import type { UmbContentConfigurationModel, UmbContentConfigurationRepository } from '../../../configuration/types.js';
 import type { UmbEntityReferenceRepository } from '@umbraco-cms/backoffice/relations';
 import type { UmbEntityVariantOptionModel } from '@umbraco-cms/backoffice/variant';
@@ -12,6 +13,12 @@ import '@umbraco-cms/backoffice/localization';
 
 const REFERENCE_REPOSITORY_ALIAS = 'Umb.Test.ContentUnpublishModal.ReferenceRepository';
 const CONFIGURATION_REPOSITORY_ALIAS = 'Umb.Test.ContentUnpublishModal.ConfigurationRepository';
+
+const REFERENCES_DATA = {
+	unique: 'elm-1',
+	itemRepositoryAlias: 'n/a',
+	referenceRepositoryAlias: REFERENCE_REPOSITORY_ALIAS,
+};
 
 const INVARIANT_OPTION: UmbEntityVariantOptionModel = {
 	unique: 'invariant',
@@ -104,13 +111,27 @@ describe('UmbContentUnpublishModalElement', () => {
 		return element.shadowRoot?.querySelectorAll('uui-button')[1];
 	}
 
-	it('shows the confirm prompt and an enabled button when there is no references config', async () => {
-		element.data = { options: [INVARIANT_OPTION] };
+	async function open(data: Partial<UmbContentUnpublishModalData> = {}) {
+		element.data = { options: [INVARIANT_OPTION], ...data };
 		document.body.appendChild(element);
 		await aTimeout(0);
+	}
 
-		expect(getPrompt()?.getAttribute('key')).to.equal('prompt_confirmUnpublish');
-		expect(getUnpublishButton()?.hasAttribute('disabled')).to.be.false;
+	async function openReferenced(disableUnpublishWhenReferenced: boolean) {
+		UmbTestReferenceRepository.total = 2;
+		UmbTestConfigurationRepository.configuration = { disableUnpublishWhenReferenced };
+		await open({ ...REFERENCES_DATA, configurationRepositoryAlias: CONFIGURATION_REPOSITORY_ALIAS });
+	}
+
+	function expectPrompt(key: string, disabled: boolean) {
+		expect(getPrompt()?.getAttribute('key')).to.equal(key);
+		expect(getUnpublishButton()?.hasAttribute('disabled')).to.equal(disabled);
+	}
+
+	it('shows the confirm prompt and an enabled button when there is no references config', async () => {
+		await open();
+
+		expectPrompt('prompt_confirmUnpublish', false);
 	});
 
 	it('hides the prompt and disables the button while the reference check is pending', async () => {
@@ -119,56 +140,26 @@ describe('UmbContentUnpublishModalElement', () => {
 			resolveGate = resolve;
 		});
 
-		element.data = {
-			options: [INVARIANT_OPTION],
-			unique: 'elm-1',
-			itemRepositoryAlias: 'n/a',
-			referenceRepositoryAlias: REFERENCE_REPOSITORY_ALIAS,
-		};
-		document.body.appendChild(element);
-		await aTimeout(0);
+		await open(REFERENCES_DATA);
 
-		expect(getPrompt(), 'prompt should not be shown yet').to.equal(null);
+		expect(getPrompt(), 'prompt should not be shown yet').to.be.null;
 		expect(getUnpublishButton()?.hasAttribute('disabled'), 'button should be disabled while loading').to.be.true;
 
 		resolveGate();
 		await aTimeout(0);
 
-		expect(getPrompt()?.getAttribute('key')).to.equal('prompt_confirmUnpublish');
-		expect(getUnpublishButton()?.hasAttribute('disabled')).to.be.false;
+		expectPrompt('prompt_confirmUnpublish', false);
 	});
 
 	it('blocks unpublishing when referenced and disableUnpublishWhenReferenced is set', async () => {
-		UmbTestReferenceRepository.total = 2;
-		UmbTestConfigurationRepository.configuration = { disableUnpublishWhenReferenced: true };
-		element.data = {
-			options: [INVARIANT_OPTION],
-			unique: 'elm-1',
-			itemRepositoryAlias: 'n/a',
-			referenceRepositoryAlias: REFERENCE_REPOSITORY_ALIAS,
-			configurationRepositoryAlias: CONFIGURATION_REPOSITORY_ALIAS,
-		};
-		document.body.appendChild(element);
-		await aTimeout(0);
+		await openReferenced(true);
 
-		expect(getPrompt()?.getAttribute('key')).to.equal('prompt_cannotUnpublishWhenReferenced');
-		expect(getUnpublishButton()?.hasAttribute('disabled')).to.be.true;
+		expectPrompt('prompt_cannotUnpublishWhenReferenced', true);
 	});
 
 	it('allows unpublishing when referenced but disableUnpublishWhenReferenced is not set', async () => {
-		UmbTestReferenceRepository.total = 2;
-		UmbTestConfigurationRepository.configuration = { disableUnpublishWhenReferenced: false };
-		element.data = {
-			options: [INVARIANT_OPTION],
-			unique: 'elm-1',
-			itemRepositoryAlias: 'n/a',
-			referenceRepositoryAlias: REFERENCE_REPOSITORY_ALIAS,
-			configurationRepositoryAlias: CONFIGURATION_REPOSITORY_ALIAS,
-		};
-		document.body.appendChild(element);
-		await aTimeout(0);
+		await openReferenced(false);
 
-		expect(getPrompt()?.getAttribute('key')).to.equal('prompt_confirmUnpublish');
-		expect(getUnpublishButton()?.hasAttribute('disabled')).to.be.false;
+		expectPrompt('prompt_confirmUnpublish', false);
 	});
 });
