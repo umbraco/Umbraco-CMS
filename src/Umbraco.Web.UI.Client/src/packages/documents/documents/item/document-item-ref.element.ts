@@ -16,7 +16,7 @@ import { UmbEntityItemRefFrameMixin } from '@umbraco-cms/backoffice/entity-item'
 
 @customElement('umb-document-item-ref')
 export class UmbDocumentItemRefElement extends UmbEntityItemRefFrameMixin(UmbLitElement) {
-	#item = new UmbDocumentItemDataResolver<UmbDocumentItemModel>(this);
+	readonly #item = new UmbDocumentItemDataResolver<UmbDocumentItemModel>(this);
 
 	@property({ type: Object })
 	public set item(value: UmbDocumentItemModel | undefined) {
@@ -106,7 +106,7 @@ export class UmbDocumentItemRefElement extends UmbEntityItemRefFrameMixin(UmbLit
 	}
 
 	protected override get isEntityFrameNavigable() {
-		return !this.readonly && this._userHasSectionAccess && !!this._unique;
+		return !this.readonly && !this.selectOnly && !this.disabled && this._userHasSectionAccess && !!this._unique;
 	}
 
 	#getLink() {

@@ -22,12 +22,12 @@ describe('UmbLanguageItemRefElement', () => {
 	it('renders no entity frame when readonly', async () => {
 		element.readonly = true;
 		await element.updateComplete;
-		expect(getFrame()).to.equal(null);
+		expect(getFrame()).to.be.null;
 	});
 
 	it('renders no entity frame when the item has no unique', async () => {
 		element.item = { ...item, unique: '' };
 		await element.updateComplete;
-		expect(getFrame()).to.equal(null);
+		expect(getFrame()).to.be.null;
 	});
 });

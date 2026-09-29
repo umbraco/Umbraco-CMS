@@ -56,7 +56,7 @@ describe('UmbEntityItemRefFrameMixin', () => {
 
 	it('renders no entity frame when not navigable', () => {
 		const frame = element.shadowRoot!.querySelector('umb-entity-frame');
-		expect(frame).to.equal(null);
+		expect(frame).to.be.null;
 	});
 
 	it('renders a hidden entity frame with the name when navigable', async () => {
@@ -64,7 +64,7 @@ describe('UmbEntityItemRefFrameMixin', () => {
 		await element.updateComplete;
 
 		const frame = element.shadowRoot!.querySelector('umb-entity-frame');
-		expect(frame).to.not.equal(null);
+		expect(frame).to.not.be.null;
 		expect(frame!.getAttribute('aria-hidden')).to.equal('true');
 		expect(frame!.textContent?.trim()).to.contain('Test name');
 	});

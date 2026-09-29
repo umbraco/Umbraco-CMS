@@ -10,7 +10,8 @@ import type { ClassConstructor } from '@umbraco-cms/backoffice/extension-api';
 export declare abstract class UmbEntityItemRefFrameMixinElement extends LitElement {
 	/**
 	 * Whether this ref links to a workspace and should show the entity frame on hover/focus.
-	 * Refs that never link should leave this at its default.
+	 * Refs that never link, including the default ref used for entity types without a dedicated one, should
+	 * leave this at its default of `false`.
 	 * @protected
 	 * @returns {boolean} Whether the entity frame should be shown.
 	 */
@@ -35,7 +36,7 @@ type UmbEntityItemRefFrameMixinConstructor = ClassConstructor<UmbEntityItemRefFr
  * item ref element.
  * @function UmbEntityItemRefFrameMixin
  * @param {ClassConstructor<LitElement>} superClass - The class to mix the entity frame behaviour into.
- * @returns {ClassConstructor<LitElement>} The mixed-in class.
+ * @returns {UmbEntityItemRefFrameMixinConstructor & T} The mixed-in class.
  * @mixin
  */
 export const UmbEntityItemRefFrameMixin = <T extends ClassConstructor<LitElement>>(superClass: T) => {
@@ -49,7 +50,7 @@ export const UmbEntityItemRefFrameMixin = <T extends ClassConstructor<LitElement
 			return html`<umb-entity-frame aria-hidden="true"><uui-icon name="link"></uui-icon> ${name}</umb-entity-frame>`;
 		}
 
-		static styles: Array<CSSResultGroup> = [
+		static readonly styles: Array<CSSResultGroup> = [
 			(superClass as unknown as typeof LitElement).styles ?? [],
 			css`
 				:host {

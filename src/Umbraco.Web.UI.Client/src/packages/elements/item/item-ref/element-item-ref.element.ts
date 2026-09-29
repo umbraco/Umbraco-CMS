@@ -12,7 +12,7 @@ import { UmbEntityItemRefFrameMixin } from '@umbraco-cms/backoffice/entity-item'
 
 @customElement('umb-element-item-ref')
 export class UmbElementItemRefElement extends UmbEntityItemRefFrameMixin(UmbLitElement) {
-	#item = new UmbElementItemDataResolver<UmbElementItemModel>(this);
+	readonly #item = new UmbElementItemDataResolver<UmbElementItemModel>(this);
 
 	@property({ type: Object })
 	public set item(value: UmbElementItemModel | undefined) {
@@ -78,7 +78,7 @@ export class UmbElementItemRefElement extends UmbEntityItemRefFrameMixin(UmbLitE
 	}
 
 	protected override get isEntityFrameNavigable() {
-		return !this.readonly && !!this._unique;
+		return !this.readonly && !this.selectOnly && !this.disabled && !!this._unique;
 	}
 
 	#getLink() {
