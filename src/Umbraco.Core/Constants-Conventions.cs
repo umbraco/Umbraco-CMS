@@ -169,6 +169,25 @@ public static partial class Constants
             ///     Suffix added to media files when moved to the recycle bin when recycle bin media protection is enabled.
             /// </summary>
             public const string TrashedMediaSuffix = ".deleted";
+
+            /// <summary>
+            ///     Constants for the keys of built-in Umbraco media property types.
+            /// </summary>
+            public static class PropertyTypeKeys
+            {
+                // Must stay in sync between the clean install (DatabaseDataCreator) and the AddDimensionsToSvg
+                // upgrade migration so upgraded and clean-installed sites end up identical.
+
+                /// <summary>
+                ///     Key of the Width property type on the built-in Vector Graphics media type.
+                /// </summary>
+                public const string VectorGraphicsWidth = "5BC7E468-C53E-41A6-A522-2723F3B94514";
+
+                /// <summary>
+                ///     Key of the Height property type on the built-in Vector Graphics media type.
+                /// </summary>
+                public const string VectorGraphicsHeight = "9E4C2B59-6BC6-4648-BB71-B0F45DDBC274";
+            }
         }
 
         /// <summary>

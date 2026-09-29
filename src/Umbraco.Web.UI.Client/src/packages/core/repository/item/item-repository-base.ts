@@ -32,8 +32,8 @@ export class UmbItemRepositoryBase<ItemType extends { unique: string }>
 
 	/**
 	 * Requests the items for the given uniques
-	 * @param {Array<string>} uniques
-	 * @returns {*}
+	 * @param {Array<string>} uniques - The uniques of the items to request
+	 * @returns {Promise<{data?: Array<ItemType>, error?: unknown, asObservable: () => Observable<Array<ItemType>> | undefined}>} The requested data and an observable of the items
 	 * @memberof UmbItemRepositoryBase
 	 */
 	async requestItems(uniques: Array<string>) {
@@ -57,8 +57,8 @@ export class UmbItemRepositoryBase<ItemType extends { unique: string }>
 
 	/**
 	 * Returns a promise with an observable of the items for the given uniques
-	 * @param {Array<string>} uniques
-	 * @returns {*}
+	 * @param {Array<string>} uniques - The uniques of the items to observe
+	 * @returns {Promise<Observable<Array<ItemType>> | undefined>} A promise of an observable of the items
 	 * @memberof UmbItemRepositoryBase
 	 */
 	async items(uniques: Array<string>) {

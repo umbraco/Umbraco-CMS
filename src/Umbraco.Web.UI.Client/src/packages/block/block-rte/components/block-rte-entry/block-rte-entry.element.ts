@@ -1,7 +1,8 @@
-import type { UmbBlockRteLayoutModel } from '../../types.js';
 import { UmbBlockRteEntryContext } from '../../context/block-rte-entry.context.js';
 import { UMB_BLOCK_RTE } from '../../constants.js';
+import type { UmbBlockRteLayoutModel } from '../../types.js';
 import { css, customElement, html, nothing, property, when, state } from '@umbraco-cms/backoffice/external/lit';
+import { renderHiddenUfm } from '@umbraco-cms/backoffice/ufm';
 import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
 import { UmbDataPathBlockElementDataQuery } from '@umbraco-cms/backoffice/block';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -10,8 +11,9 @@ import type {
 	ManifestBlockEditorCustomView,
 	UmbBlockEditorCustomViewProperties,
 } from '@umbraco-cms/backoffice/block-custom-view';
-import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbExtensionElementInitializer } from '@umbraco-cms/backoffice/extension-api';
+import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/property-editor';
+import type { UmbUfmResolvedEvent } from '@umbraco-cms/backoffice/ufm';
 
 import '../ref-rte-block/index.js';
 import '../unsupported-rte-block/index.js';
@@ -73,6 +75,9 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 	@state()
 	private _isReadOnly = false;
 
+	// TODO: consumed by <umb-entity-frame> label, landing in a follow-up PR; add `@state()` when used in render [LK]
+	private _name?: string;
+
 	@state()
 	private _blockViewProps: UmbBlockEditorCustomViewProperties<UmbBlockRteLayoutModel> = {
 		contentKey: undefined!,
@@ -103,6 +108,7 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 		this.#observeBlockViewProps();
 
 		this.observe(this.#context.actionsVisibility, (showActions) => (this._showActions = showActions), null);
+		this.observe(this.#context.name, (name) => (this._name = name), null);
 
 		// Data props:
 		this.observe(
@@ -155,7 +161,7 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 				this._isReadOnly = isReadOnly;
 				this.#updateBlockViewProps({ readonly: isReadOnly });
 			},
-			'umbReadOnlyObserver',
+			null,
 		);
 	}
 
@@ -259,20 +265,34 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 		this.#context.expose();
 	};
 
+	#onUfmResolved = (event: UmbUfmResolvedEvent) => {
+		this.#context.setName(event.detail.text);
+	};
+
+	#renderHiddenUfm() {
+		const blockValue = {
+			...this._blockViewProps.content,
+			$settings: this._blockViewProps.settings,
+			$index: this._blockViewProps.index,
+		};
+		return renderHiddenUfm(this._label, blockValue, this.#onUfmResolved);
+	}
+
 	#extensionSlotRenderMethod = (ext: UmbExtensionElementInitializer<ManifestBlockEditorCustomView>) => {
 		ext.component?.setAttribute('part', 'component');
-		if (this._exposed || this._isReadOnly) {
-			return ext.component;
-		} else {
-			return html`
+		return when(
+			this._exposed || this._isReadOnly,
+			() => html`${this.#renderHiddenUfm()}${ext.component}`,
+			() => html`
+				${this.#renderHiddenUfm()}
 				<div>
 					${ext.component}
 					<umb-block-overlay-expose-button
 						.contentTypeName=${this._contentTypeName}
 						@click=${this.#expose}></umb-block-overlay-expose-button>
 				</div>
-			`;
-		}
+			`,
+		);
 	};
 
 	#renderBlock() {
@@ -343,9 +363,28 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 				--umb-block-entry-actions-opacity: 0;
 			}
 
+			:host([settings-invalid]),
+			:host([content-invalid]),
 			:host(:hover),
 			:host(:focus-within) {
 				--umb-block-entry-actions-opacity: 1;
+			}
+
+			:host::after {
+				content: '';
+				position: absolute;
+				z-index: 1;
+				pointer-events: none;
+				inset: 0;
+				border: 1px solid transparent;
+				border-radius: var(--uui-border-radius);
+
+				transition: border-color 240ms ease-in;
+			}
+
+			:host([settings-invalid])::after,
+			:host([content-invalid])::after {
+				border-color: var(--uui-color-invalid);
 			}
 
 			:host(.ProseMirror-selectednode) {
@@ -365,6 +404,10 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 				opacity: var(--umb-block-entry-actions-opacity, 0);
 				transition: opacity 120ms;
 				z-index: 1;
+			}
+
+			uui-badge {
+				z-index: 2;
 			}
 
 			:host([drag-placeholder]) {

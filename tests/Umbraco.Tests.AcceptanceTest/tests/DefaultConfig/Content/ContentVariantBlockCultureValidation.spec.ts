@@ -100,7 +100,6 @@ test('can publish english after visiting danish that has block validation errors
   await umbracoUi.content.isSuccessNotificationVisible();
   // Switch to danish and back to english
   await umbracoUi.content.switchLanguage('Danish');
-  await umbracoUi.waitForTimeout(ConstantHelper.timeout.short);
   await umbracoUi.content.switchLanguage('English');
   // Publish english again
   await umbracoUi.content.clickSaveAndPublishButton();

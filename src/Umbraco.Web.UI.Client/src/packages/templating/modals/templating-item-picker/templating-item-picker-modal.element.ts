@@ -31,7 +31,7 @@ export class UmbTemplatingItemPickerModalElement extends UmbModalBaseElement<
 	private _close() {
 		this.modalContext?.reject();
 	}
-	
+
 	async #submit() {
 		switch (this._pickedItem) {
 			case CodeSnippetType.pageField:
@@ -98,12 +98,9 @@ export class UmbTemplatingItemPickerModalElement extends UmbModalBaseElement<
 		return html`
 			<umb-body-layout headline=${this.localize.term('template_insert')}>
 				<uui-box> ${this.#renderItems()} </uui-box>
-				
+
 				<div slot="actions">
-					<uui-button
-						@click=${this._close}
-						look="secondary"
-						label=${this.localize.term('general_close')}></uui-button>
+					<uui-button @click=${this._close} look="secondary" label=${this.localize.term('general_close')}></uui-button>
 					<uui-button
 						@click=${this.#submit}
 						look="primary"
@@ -121,8 +118,8 @@ export class UmbTemplatingItemPickerModalElement extends UmbModalBaseElement<
 				selectable
 				selectOnly
 				.selected=${this._pickedItem === CodeSnippetType.pageField}
-				@selected=${() => this._pickedItem = CodeSnippetType.pageField}
-				@deselected=${() => this._pickedItem = undefined}
+				@selected=${() => (this._pickedItem = CodeSnippetType.pageField)}
+				@deselected=${() => (this._pickedItem = undefined)}
 				label=${this.localize.term('template_insert')}>
 				<h3><umb-localize key="template_insertPageField">Value</umb-localize></h3>
 				<p>
@@ -137,8 +134,8 @@ export class UmbTemplatingItemPickerModalElement extends UmbModalBaseElement<
 						selectable
 						selectOnly
 						.selected=${this._pickedItem === CodeSnippetType.partialView}
-						@selected=${() => this._pickedItem = CodeSnippetType.partialView}
-						@deselected=${() => this._pickedItem = undefined}
+						@selected=${() => (this._pickedItem = CodeSnippetType.partialView)}
+						@deselected=${() => (this._pickedItem = undefined)}
 						label=${this.localize.term('template_insert')}>
 						<h3><umb-localize key="template_insertPartialView">Partial view</umb-localize></h3>
 						<p>
@@ -153,8 +150,8 @@ export class UmbTemplatingItemPickerModalElement extends UmbModalBaseElement<
 				selectable
 				selectOnly
 				.selected=${this._pickedItem === CodeSnippetType.dictionaryItem}
-				@selected=${() => this._pickedItem = CodeSnippetType.dictionaryItem}
-				@deselected=${() => this._pickedItem = undefined}
+				@selected=${() => (this._pickedItem = CodeSnippetType.dictionaryItem)}
+				@deselected=${() => (this._pickedItem = undefined)}
 				label=${this.localize.term('template_insertDictionaryItem')}>
 				<h3><umb-localize key="template_insertDictionaryItem">Dictionary Item</umb-localize></h3>
 				<p>

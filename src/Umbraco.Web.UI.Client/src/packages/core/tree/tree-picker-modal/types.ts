@@ -16,6 +16,8 @@ export interface UmbTreePickerModalData<
 	TreeItemType = UmbTreeItemModel,
 	PathPatternParamsType extends UmbPathPatternParamsType = UmbPathPatternParamsType,
 > extends UmbPickerModalData<TreeItemType> {
+	headline?: string;
+	confirmLabel?: string;
 	hideTreeRoot?: boolean;
 	expandTreeRoot?: boolean;
 	treeExpansion?: UmbEntityExpansionModel;

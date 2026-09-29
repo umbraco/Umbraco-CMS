@@ -26,6 +26,7 @@ type UmbRichMediaCardModel = {
 	name: string;
 	src?: string;
 	icon?: string;
+	extension?: string;
 	isTrashed?: boolean;
 	isLoading?: boolean;
 };
@@ -179,9 +180,13 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 	constructor() {
 		super();
 
-		this.observe(this.#itemManager.items, () => {
-			this.#populateCards();
-		});
+		this.observe(
+			this.#itemManager.items,
+			() => {
+				this.#populateCards();
+			},
+			null,
+		);
 
 		new UmbModalRouteRegistrationController(this, UMB_IMAGE_CROPPER_EDITOR_MODAL)
 			.addAdditionalPath(':key')
@@ -229,9 +234,13 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 				this._routeBuilder = routeBuilder;
 			});
 
-		this.observe(this.#pickerInputContext.selection, (selection) => {
-			this.#addItems(selection);
-		});
+		this.observe(
+			this.#pickerInputContext.selection,
+			(selection) => {
+				this.#addItems(selection);
+			},
+			null,
+		);
 
 		this.addValidator(
 			'valueMissing',
@@ -275,6 +284,7 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 					media: item.mediaKey,
 					name: media?.name ?? '',
 					icon: media?.mediaType?.icon,
+					extension: media?.extension,
 					isTrashed: media?.isTrashed ?? false,
 					isLoading: !media,
 				};
@@ -401,6 +411,7 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 					.unique=${item.media}
 					.alt=${item.name}
 					.icon=${item.icon ?? 'icon-picture'}
+					.fileExt=${item.extension}
 					.externalLoading=${item.isLoading ?? false}></umb-media-thumbnail>
 
 				${this.#renderIsTrashed(item)} ${this.#renderActions(item)}

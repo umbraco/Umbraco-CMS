@@ -5,7 +5,7 @@ import type { UmbFolderModel } from '@umbraco-cms/backoffice/tree';
 
 /**
  * @class UmbMediaTypeStore
- * @augments {UmbStoreBase}
+ * @augments {UmbDetailStoreBase}
  * @description - Data Store for Media Types
  */
 export class UmbMediaTypeFolderStore extends UmbDetailStoreBase<UmbFolderModel> {

@@ -169,6 +169,35 @@ public class ContentTypeCacheRefresherTests
     }
 
     [Test]
+    public void RawDataUnaffected_Document_Change_Selectively_Clears_Converted_Cache_Without_Memory_Rebuild()
+    {
+        // Arrange — a property removal is structural but RawDataUnaffected, so on other servers the stored blob
+        // and HybridCache entries stay valid; only the converted cache needs clearing (no memory rebuild/tag eviction).
+        var refresher = CreateRefresher(Mock.Of<IPublishedModelFactory>());
+        var payloads = new[]
+        {
+            new ContentTypeCacheRefresher.JsonPayload(nameof(IContentType), 100, ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.RawDataUnaffected),
+        };
+
+        _documentCacheService
+            .Setup(x => x.ClearConvertedContentCache(It.Is<IReadOnlyCollection<int>>(ids => ids.Count == 1 && ids.Contains(100))));
+
+        // Act
+        refresher.Refresh(payloads);
+
+        // Assert — selective converted-cache clear, no memory rebuild, no full clear.
+        _documentCacheService.Verify(
+            x => x.ClearConvertedContentCache(It.Is<IReadOnlyCollection<int>>(ids => ids.Count == 1 && ids.Contains(100))),
+            Times.Once);
+        _documentCacheService.Verify(
+            x => x.RebuildMemoryCacheByContentTypeAsync(It.IsAny<IEnumerable<int>>()),
+            Times.Never);
+        _documentCacheService.Verify(
+            x => x.ClearConvertedContentCache(),
+            Times.Never);
+    }
+
+    [Test]
     public void Combined_Structural_And_Non_Structural_Change_Uses_Rebuild_Not_Clear()
     {
         // When a payload has both RefreshMain and RefreshOther, it should be treated as structural only.

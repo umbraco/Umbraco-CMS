@@ -4,6 +4,7 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Infrastructure.Persistence.Relations;
 using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
@@ -280,6 +281,51 @@ internal sealed class TrackRelationsTests : UmbracoIntegrationTestWithContent
         Assert.IsTrue(ContentService.Unpublish(draft).Success);
 
         Assert.That(RelationService.GetByParentId(source.Id).Select(x => x.ChildId), Is.EquivalentTo(new[] { targetB.Id }));
+    }
+
+    [Test]
+    [LongRunning]
+    public async Task Can_Delete_Content_Type_Of_Published_Content_With_Relation()
+    {
+        // The relation target uses a different, unrelated content type so that it survives the deletion below -
+        // this is what allows ContentRelationsUpdate to still resolve the (now-deleted) target's node ID when
+        // it re-runs for the source's ContentUnpublishedNotification, and therefore attempt the FK-violating INSERT.
+        var targetType = new ContentTypeBuilder().WithAlias("target").WithName("Target Type").Build();
+        await ContentTypeService.CreateAsync(targetType, Constants.Security.SuperUserKey);
+
+        var sourceType = new ContentTypeBuilder()
+            .WithAlias("source")
+            .WithName("Source Type")
+            .AddPropertyType()
+                .WithAlias("contentPicker")
+                .WithName("Content Picker")
+                .WithDataTypeId(1046)
+                .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.ContentPicker)
+                .Done()
+            .Build();
+        await ContentTypeService.CreateAsync(sourceType, Constants.Security.SuperUserKey);
+
+        var target = new ContentBuilder().WithContentType(targetType).WithName("Target").Build();
+        ContentService.Save(target);
+
+        var source = new ContentBuilder().WithContentType(sourceType).WithName("Source").Build();
+        source.Properties["contentPicker"]!.SetValue(Udi.Create(Constants.UdiEntityType.Document, target.Key).ToString());
+        ContentService.Save(source);
+        PublishResult publishResult = ContentService.Publish(source, ["*"]);
+        Assert.IsTrue(publishResult.Success, publishResult.Result.ToString());
+
+        // The automatic relation exists for the published content before its content type (and the content
+        // itself) is deleted.
+        Assert.That(RelationService.GetByParentId(source.Id).Select(x => x.ChildId), Is.EquivalentTo(new[] { target.Id }));
+
+        // Deleting the content type cascades to permanently deleting the published content within the same scope
+        // that later raises ContentUnpublishedNotification for it. Before the fix, ContentRelationsUpdate would
+        // try to re-persist the relation for the now-deleted node and throw a foreign key violation.
+        ContentTypeOperationStatus status = await ContentTypeService.DeleteAsync(sourceType.Key, Constants.Security.SuperUserKey);
+        Assert.AreEqual(ContentTypeOperationStatus.Success, status);
+
+        Assert.IsNull(ContentService.GetById(source.Id));
+        Assert.IsEmpty(RelationService.GetByChildId(target.Id));
     }
 
     private async Task<(IContent Source, IContent TargetA, IContent TargetB)> CreatePublishedContentPickerScenario()

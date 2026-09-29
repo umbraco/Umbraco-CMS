@@ -8,7 +8,7 @@ import { UmbItemDataApiGetRequestController } from '@umbraco-cms/backoffice/enti
 /**
  * A server data source for Document URLs
  * @class UmbDocumentUrlServerDataSource
- * @implements {DocumentTreeDataSource}
+ * @augments {UmbItemServerDataSourceBase}
  */
 export class UmbDocumentUrlServerDataSource extends UmbItemServerDataSourceBase<
 	DocumentUrlInfoResponseModel,
@@ -23,12 +23,12 @@ export class UmbDocumentUrlServerDataSource extends UmbItemServerDataSourceBase<
 		super(host, { mapper });
 	}
 
-	override async getItems(uniques: Array<string>) {
+	override async getItems(uniques: Array<string>, culture?: string) {
 		if (!uniques) throw new Error('Uniques are missing');
 
 		const itemRequestManager = new UmbItemDataApiGetRequestController(this, {
 			// eslint-disable-next-line local-rules/no-direct-api-import
-			api: (args) => DocumentService.getDocumentUrls({ query: { id: args.uniques } }),
+			api: (args) => DocumentService.getDocumentUrls({ query: { id: args.uniques, culture } }),
 			uniques,
 		});
 

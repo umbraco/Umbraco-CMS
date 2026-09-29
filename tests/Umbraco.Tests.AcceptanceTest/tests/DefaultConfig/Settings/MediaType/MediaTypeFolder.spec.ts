@@ -52,7 +52,7 @@ test('can rename a media type folder', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.mediaType.clickRootFolderCaretButton();
   await umbracoUi.mediaType.clickActionsMenuForName(oldFolderName);
   await umbracoUi.mediaType.clickUpdateActionMenuOption();
-  await umbracoUi.mediaType.enterFolderName(mediaTypeFolderName);
+  await umbracoUi.mediaType.enterRenameFolderName(mediaTypeFolderName);
   await umbracoUi.mediaType.clickConfirmRenameButtonAndWaitForMediaTypeToBeRenamed();
 
   // Assert
@@ -115,4 +115,24 @@ test('can create a media type folder in a folder in a folder', async ({umbracoAp
   // Clean
   await umbracoApi.mediaType.ensureNameNotExists(childFolderName);
   await umbracoApi.mediaType.ensureNameNotExists(grandparentFolderName);
+});
+
+test('can find a media type in a sibling nested folder', async ({umbracoApi}) => {
+  // Arrange
+  const firstChildFolderName = 'AAFirstChildFolder';
+  const nestedFolderName = 'NestedFolder';
+  const secondChildFolderName = 'ZZSecondChildFolder';
+  const targetMediaTypeName = 'TargetMediaType';
+  const parentFolderId = await umbracoApi.mediaType.createFolder(mediaTypeFolderName);
+  const firstChildFolderId = await umbracoApi.mediaType.createFolder(firstChildFolderName, parentFolderId);
+  await umbracoApi.mediaType.createFolder(nestedFolderName, firstChildFolderId);
+  const secondChildFolderId = await umbracoApi.mediaType.createFolder(secondChildFolderName, parentFolderId);
+  const targetMediaTypeId = await umbracoApi.mediaType.createDefaultMediaTypeInFolder(targetMediaTypeName, secondChildFolderId);
+
+  // Act
+  const mediaTypeData = await umbracoApi.mediaType.getByName(targetMediaTypeName);
+
+  // Assert
+  expect(mediaTypeData).toBeTruthy();
+  expect(mediaTypeData.id).toBe(targetMediaTypeId);
 });

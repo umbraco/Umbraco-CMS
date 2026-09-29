@@ -17,6 +17,7 @@ class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLEle
 
 describe('UmbPropertyEditorUiInteractionMemoryManager', () => {
 	let manager: UmbPropertyEditorUiInteractionMemoryManager;
+	let hostElement: UmbTestControllerHostElement;
 	let interactionMemoryContext: UmbInteractionMemoryContext;
 	let childMemories = [
 		{ unique: '1', value: 'Value 1' },
@@ -24,7 +25,7 @@ describe('UmbPropertyEditorUiInteractionMemoryManager', () => {
 	];
 
 	beforeEach(() => {
-		const hostElement = new UmbTestControllerHostElement();
+		hostElement = new UmbTestControllerHostElement();
 		document.body.appendChild(hostElement);
 		interactionMemoryContext = hostElement.interactionMemoryContext;
 

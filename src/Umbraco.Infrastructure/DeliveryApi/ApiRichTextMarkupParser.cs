@@ -126,7 +126,10 @@ internal sealed class ApiRichTextMarkupParser : ApiRichTextParserBase, IApiRichT
 
                 // Re-sign the URL so a rotated HMAC secret key doesn't break previously-authored images.
                 // No-op when HMAC isn't configured.
-                var refreshedSrc = _imageUrlTokenGenerator.RefreshSignature($"{mediaUrl}{currentImageQueryString}");
+                var refreshedSrc = _imageUrlTokenGenerator.RefreshSignature(
+                    currentImageQueryString.IsNullOrWhiteSpace()
+                        ? mediaUrl
+                        : mediaUrl.AppendQueryStringToUrl(currentImageQueryString));
                 image.SetAttributeValue("src", refreshedSrc);
                 image.Attributes.Remove("data-udi");
 

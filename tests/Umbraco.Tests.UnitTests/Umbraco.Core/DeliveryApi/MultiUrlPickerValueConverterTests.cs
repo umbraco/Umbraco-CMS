@@ -313,7 +313,9 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
     {
         // Arrange
         var publishedDataType = new PublishedDataType(
-            123, "test", "test",
+            123,
+            "test",
+            "test",
             new Lazy<object>(() => new MultiUrlPickerConfiguration { MaxNumber = 1 }));
         var publishedPropertyType = new Mock<IPublishedPropertyType>();
         publishedPropertyType.SetupGet(p => p.DataType).Returns(publishedDataType);
@@ -368,7 +370,9 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
     {
         // Arrange
         var publishedDataType = new PublishedDataType(
-            123, "test", "test",
+            123,
+            "test",
+            "test",
             new Lazy<object>(() => new MultiUrlPickerConfiguration { MaxNumber = 1 }));
         var publishedPropertyType = new Mock<IPublishedPropertyType>();
         publishedPropertyType.SetupGet(p => p.DataType).Returns(publishedDataType);

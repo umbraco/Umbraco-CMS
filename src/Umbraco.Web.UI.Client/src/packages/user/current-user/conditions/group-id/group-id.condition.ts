@@ -17,7 +17,7 @@ export class UmbCurrentUserGroupCondition
 		});
 	}
 
-	#observeCurrentUser = async (currentUser: UmbCurrentUserModel) => {
+	#observeCurrentUser = async (currentUser: UmbCurrentUserModel | undefined) => {
 		if (!currentUser) {
 			this.permitted = false;
 			return;

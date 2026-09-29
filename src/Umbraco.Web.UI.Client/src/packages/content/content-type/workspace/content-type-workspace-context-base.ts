@@ -29,9 +29,9 @@ export interface UmbContentTypeWorkspaceContextArgs extends UmbEntityDetailWorks
 const LOADING_STATE_UNIQUE = 'umbLoadingContentTypeDetail';
 
 export abstract class UmbContentTypeWorkspaceContextBase<
-		DetailModelType extends UmbContentTypeDetailModel = UmbContentTypeDetailModel,
-		DetailRepositoryType extends UmbDetailRepository<DetailModelType> = UmbDetailRepository<DetailModelType>,
-	>
+	DetailModelType extends UmbContentTypeDetailModel = UmbContentTypeDetailModel,
+	DetailRepositoryType extends UmbDetailRepository<DetailModelType> = UmbDetailRepository<DetailModelType>,
+>
 	extends UmbEntityDetailWorkspaceContextBase<DetailModelType, DetailRepositoryType>
 	implements UmbContentTypeWorkspaceContext<DetailModelType>, UmbRoutableWorkspaceContext
 {

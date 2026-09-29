@@ -1,8 +1,5 @@
 import { UMB_CREATE_DOCUMENT_BLUEPRINT_WORKSPACE_PATH_PATTERN } from '../../../paths.js';
-import type {
-	UmbDocumentBlueprintFolderEntityType,
-	UmbDocumentBlueprintRootEntityType,
-} from '../../../entity.js';
+import type { UmbDocumentBlueprintFolderEntityType, UmbDocumentBlueprintRootEntityType } from '../../../entity.js';
 import { UmbEntityCreateOptionActionBase } from '@umbraco-cms/backoffice/entity-create-option-action';
 import type { MetaEntityCreateOptionAction } from '@umbraco-cms/backoffice/entity-create-option-action';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';

@@ -23,7 +23,7 @@ export class UmbNotificationHandler {
 
 	/**
 	 * Creates an instance of UmbNotificationHandler.
-	 * @param {UmbNotificationOptions} options
+	 * @param {UmbNotificationOptions} options - The notification options
 	 * @memberof UmbNotificationHandler
 	 */
 	constructor(options: UmbNotificationOptions) {
@@ -53,7 +53,7 @@ export class UmbNotificationHandler {
 	}
 
 	/**
-	 * @param {...any} args
+	 * @param {...unknown} args - Arguments passed to the close resolver
 	 * @memberof UmbNotificationHandler
 	 */
 	public close(...args: any) {
@@ -62,7 +62,7 @@ export class UmbNotificationHandler {
 	}
 
 	/**
-	 * @returns {*}
+	 * @returns {Promise<unknown>} A promise that resolves when the notification is closed
 	 * @memberof UmbNotificationHandler
 	 */
 	public onClose(): Promise<any> {
