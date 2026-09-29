@@ -21,6 +21,8 @@ export abstract class UmbTreeItemElementBase<
 > extends UmbLitElement {
 	@property({ type: Object, attribute: false })
 	set item(newVal: TreeItemModelType) {
+		if (newVal === this._item) return;
+
 		this._item = newVal;
 		this._extractFlags(newVal);
 
@@ -38,7 +40,7 @@ export abstract class UmbTreeItemElementBase<
 	protected _noAccess: boolean = false;
 
 	/**
-	 * @param item - The item from which to extract flags.
+	 * @param {TreeItemModelType | undefined} item - The item from which to extract flags.
 	 * @description This method is called whenever the `item` property is set. It extracts the flags from the item and assigns them to the `_flags` state property.
 	 * This method is in some cases overridden in subclasses to customize how flags are extracted!
 	 */
@@ -185,7 +187,7 @@ export abstract class UmbTreeItemElementBase<
 		this.#api?.deselect();
 	}
 
-	#handleDblClick(event: MouseEvent) {
+	protected _handleDblClick(event: MouseEvent) {
 		if (!this._item?.hasChildren) return;
 		event.stopPropagation();
 		this.#api?.open();
@@ -299,7 +301,7 @@ export abstract class UmbTreeItemElementBase<
 	}
 
 	renderLabel() {
-		return html`<span slot="label" @dblclick=${this.#handleDblClick}>${this._label}<slot name="label"></slot></span>`;
+		return html`<span slot="label" @dblclick=${this._handleDblClick}>${this._label}<slot name="label"></slot></span>`;
 	}
 
 	#renderActions() {
@@ -313,7 +315,7 @@ export abstract class UmbTreeItemElementBase<
 			${this._childItems
 				? repeat(
 						this._childItems,
-						(item, index) => item.name + '___' + index,
+						(item) => `${item.entityType}:${item.unique}`,
 						(item) => html`
 							<umb-tree-item
 								.entityType=${item.entityType}

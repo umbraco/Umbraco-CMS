@@ -28,7 +28,7 @@ export class UmbExtensionApiInitializer<
 	/**
 	 * The api that is created for this extension.
 	 * @readonly
-	 * @type {(class | undefined)}
+	 * @type {ExtensionApiInterface | undefined}
 	 */
 	public get api() {
 		return this.#api;
@@ -36,7 +36,7 @@ export class UmbExtensionApiInitializer<
 
 	/**
 	 * The props that are passed to the class.
-	 * @type {Record<string, any>}
+	 * @type {Record<string, unknown>}
 	 * @memberof UmbExtensionApiController
 	 * @example
 	 * ```ts

@@ -52,7 +52,10 @@ export class UmbBlockGridEntryContext
 		return [x.rowMinSpan ?? 1, x.rowMaxSpan ?? 1];
 	}
 
-	readonly inlineEditingMode = this._blockType.asObservablePart((x) => x?.inlineEditing === true);
+	readonly inlineEditingMode = mergeObservables(
+		[this._blockType.asObservablePart((x) => x?.inlineEditing === true), this.isExternalContent],
+		([inlineEditing, isExternalContent]) => inlineEditing === true && !isExternalContent,
+	);
 
 	#relevantColumnSpanOptions = new UmbArrayState<number>([], (x) => x);
 	readonly relevantColumnSpanOptions = this.#relevantColumnSpanOptions.asObservable();
@@ -113,7 +116,7 @@ export class UmbBlockGridEntryContext
 
 	/**
 	 * Set the column span of this entry.
-	 * @param columnSpan {number} The new column span.
+	 * @param {number} columnSpan The new column span.
 	 */
 	setColumnSpan(columnSpan: number) {
 		if (!this._entries) return;
@@ -139,7 +142,7 @@ export class UmbBlockGridEntryContext
 
 	/**
 	 * Set the row span of this entry.
-	 * @param rowSpan {number} The new row span.
+	 * @param {number} rowSpan The new row span.
 	 */
 	setRowSpan(rowSpan: number) {
 		const minMax = this.getMinMaxRowSpan();

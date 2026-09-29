@@ -25,9 +25,8 @@ public class BlockListPropertyEditor : BlockListPropertyEditorBase
     public BlockListPropertyEditor(
         IDataValueEditorFactory dataValueEditorFactory,
         IIOHelper ioHelper,
-        IBlockListPropertyIndexValueFactory blockValuePropertyIndexValueFactory,
         IJsonSerializer jsonSerializer)
-        : base(dataValueEditorFactory, blockValuePropertyIndexValueFactory, jsonSerializer)
+        : base(dataValueEditorFactory, jsonSerializer)
         => _ioHelper = ioHelper;
 
     /// <inheritdoc/>
@@ -52,6 +51,13 @@ public class BlockListPropertyEditor : BlockListPropertyEditorBase
     {
         var valueEditor = (BlockListEditorPropertyValueEditor)GetValueEditor();
         return valueEditor.MergeVariantInvariantPropertyValue(sourceValue, targetValue, canUpdateInvariantData, allowedCultures);
+    }
+
+    /// <inheritdoc />
+    public override IEnumerable<string> GetChangedCulturesForPartialPropertyValues(object? sourceValue, object? targetValue, string defaultCulture)
+    {
+        var valueEditor = (BlockListEditorPropertyValueEditor)GetValueEditor();
+        return valueEditor.GetChangedCulturesForPartialPropertyValues(sourceValue, targetValue, defaultCulture);
     }
 
     /// <inheritdoc/>

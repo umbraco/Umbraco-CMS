@@ -84,6 +84,9 @@ export class UmbContentDetailWorkspaceTypeTransformController<
 
 	/**
 	 * Moves invariant variant entries to the default language, keeping existing culture entries as-is.
+	 * @param {DetailModelType['variants']} variants - The variants to transform.
+	 * @param {string} defaultLanguage - The default language to assign to invariant entries.
+	 * @returns {DetailModelType['variants']} The transformed variants.
 	 */
 	#transformVariantsToCultureVariant(
 		variants: DetailModelType['variants'],
@@ -105,6 +108,9 @@ export class UmbContentDetailWorkspaceTypeTransformController<
 
 	/**
 	 * Collapses culture variant entries to invariant, preferring the default language and discarding other cultures.
+	 * @param {DetailModelType['variants']} variants - The variants to transform.
+	 * @param {string} defaultLanguage - The default language to prefer when collapsing.
+	 * @returns {DetailModelType['variants']} The transformed variants.
 	 */
 	#transformVariantsToInvariant(
 		variants: DetailModelType['variants'],

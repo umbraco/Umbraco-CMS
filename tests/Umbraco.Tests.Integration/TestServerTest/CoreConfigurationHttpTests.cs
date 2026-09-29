@@ -301,7 +301,7 @@ public class CoreConfigurationHttpTests : UmbracoIntegrationTestBase
     /// Verifies that IUserService read operations work in a delivery-only scenario (no backoffice).
     /// Regression test for https://github.com/umbraco/Umbraco-CMS/issues/22404 where
     /// these methods used service location to resolve IBackOfficeUserStore, which isn't
-    /// registered without AddBackOffice(). This crashed Examine indexing via ContentValueSetBuilder.
+    /// registered without AddBackOffice(). This crashed content indexing.
     /// </summary>
     [Test]
     public async Task CoreWithDeliveryApi_UserServiceReadMethodsDoNotThrow()

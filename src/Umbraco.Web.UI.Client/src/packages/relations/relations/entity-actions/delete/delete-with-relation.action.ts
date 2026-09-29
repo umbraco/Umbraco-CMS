@@ -6,7 +6,7 @@ import { UmbDeleteEntityAction } from '@umbraco-cms/backoffice/entity-action';
 /**
  * Entity action for deleting an item with relations.
  * @class UmbDeleteWithRelationEntityAction
- * @augments {UmbEntityActionBase<MetaEntityActionDeleteWithRelationKind>}
+ * @augments {UmbDeleteEntityAction<MetaEntityActionDeleteWithRelationKind>}
  */
 export class UmbDeleteWithRelationEntityAction extends UmbDeleteEntityAction<MetaEntityActionDeleteWithRelationKind> {
 	protected override async _confirmDelete() {

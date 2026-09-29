@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.Sync;
 using ComponentCollection = Umbraco.Cms.Core.Composing.ComponentCollection;
 
 namespace Umbraco.Cms.Infrastructure.Install;
@@ -27,6 +28,7 @@ internal sealed class UnattendedUpgradeBackgroundService : BackgroundService
     private readonly IHostApplicationLifetime _hostApplicationLifetime;
     private readonly IMigrationCoordinator _coordinator;
     private readonly IContentRoutingReadiness _contentRoutingReadiness;
+    private readonly IServerRoleElector _serverRoleElector;
     private readonly ILogger<UnattendedUpgradeBackgroundService> _logger;
 
     /// <summary>
@@ -38,6 +40,7 @@ internal sealed class UnattendedUpgradeBackgroundService : BackgroundService
     /// <param name="hostApplicationLifetime">The host application lifetime for registering started/stopped callbacks.</param>
     /// <param name="coordinator">Coordinates migration leadership across servers in a load-balanced environment.</param>
     /// <param name="contentRoutingReadiness">Signals when per-server content-routing initialization has completed.</param>
+    /// <param name="serverRoleElector">Makes a one-time attempt to resolve the server role before this service publishes <see cref="UmbracoApplicationStartingNotification"/>.</param>
     /// <param name="logger">The logger.</param>
     public UnattendedUpgradeBackgroundService(
         IRuntimeState runtimeState,
@@ -46,6 +49,7 @@ internal sealed class UnattendedUpgradeBackgroundService : BackgroundService
         IHostApplicationLifetime hostApplicationLifetime,
         IMigrationCoordinator coordinator,
         IContentRoutingReadiness contentRoutingReadiness,
+        IServerRoleElector serverRoleElector,
         ILogger<UnattendedUpgradeBackgroundService> logger)
     {
         _runtimeState = runtimeState;
@@ -54,6 +58,7 @@ internal sealed class UnattendedUpgradeBackgroundService : BackgroundService
         _hostApplicationLifetime = hostApplicationLifetime;
         _coordinator = coordinator;
         _contentRoutingReadiness = contentRoutingReadiness;
+        _serverRoleElector = serverRoleElector;
         _logger = logger;
     }
 
@@ -122,6 +127,13 @@ internal sealed class UnattendedUpgradeBackgroundService : BackgroundService
         try
         {
             await _components.InitializeAsync(false, stoppingToken);
+
+            // Unlike a normal boot, this service publishes UmbracoApplicationStartingNotification itself rather
+            // than going through CoreRuntime.StartAsync (which already returned early once RuntimeLevel.Upgrading
+            // was set) - so it must make its own attempt to resolve the server role first, or any handler reading
+            // IServerRoleAccessor.CurrentServerRole here would be guaranteed to see ServerRole.Unknown.
+            await _serverRoleElector.TryElectOnceAsync(stoppingToken);
+
             await _eventAggregator.PublishAsync(new UmbracoApplicationStartingNotification(_runtimeState.Level, false), stoppingToken);
 
             // Seeding has completed: the front-end may now route content. Until this point the runtime has

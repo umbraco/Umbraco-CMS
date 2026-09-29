@@ -72,9 +72,13 @@ export class UmbPropertyEditorUIDocumentPickerElement
 	constructor() {
 		super();
 
-		this.observe(this.#interactionMemoryManager.memoriesForPropertyEditor, (interactionMemories) => {
-			this._interactionMemories = interactionMemories ?? [];
-		});
+		this.observe(
+			this.#interactionMemoryManager.memoriesForPropertyEditor,
+			(interactionMemories) => {
+				this._interactionMemories = interactionMemories ?? [];
+			},
+			null,
+		);
 	}
 
 	override firstUpdated() {

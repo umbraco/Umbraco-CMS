@@ -45,62 +45,71 @@ export class UmbContentValidationToHintsManager<
 	) {
 		super(host);
 
-		this.observe(structure.contentTypeMergedContainers, (merged) => {
-			this.#containers = merged;
-		});
+		this.observe(
+			structure.contentTypeMergedContainers,
+			(merged) => {
+				this.#containers = merged;
+			},
+			null,
+		);
 
-		this.observe(validation.messages.messagesOfPathAndDescendant('$.values'), (messages) => {
-			messages.forEach((message) => {
-				if (this.#hintedMsgs.has(message.key)) return;
+		this.observe(
+			validation.messages.messagesOfPathAndDescendant('$.values'),
+			(messages) => {
+				messages.forEach((message) => {
+					if (this.#hintedMsgs.has(message.key)) return;
 
-				// Get the value between [ and ] of message.path:
-				const query = getValueBetweenBrackets(message.path);
-				if (!query) return;
-				const queryProps = extractJsonQueryProps(query);
+					// Get the value between [ and ] of message.path:
+					const query = getValueBetweenBrackets(message.path);
+					if (!query) return;
+					const queryProps = extractJsonQueryProps(query);
 
-				const alias = queryProps.alias;
-				const variantId = UmbVariantId.CreateFromPartial(queryProps);
+					const alias = queryProps.alias;
+					const variantId = UmbVariantId.CreateFromPartial(queryProps);
 
-				structure.getPropertyStructureByAlias(alias).then((property) => {
-					if (!property) return;
+					structure.getPropertyStructureByAlias(alias).then((property) => {
+						if (!property) return;
 
-					let path: Array<string> = [];
-					if (property.container) {
-						const container = this.#containers.find((c) => c.ids.includes(property.container!.id));
-						if (container) {
-							path = container.path;
-						} else {
-							throw new Error(
-								`Could not find the declared container of id "${property.container.id}" for property with alias: "${property.alias}"`,
-							);
+						let path: Array<string> = [];
+						if (property.container) {
+							const container = this.#containers.find((c) => c.ids.includes(property.container!.id));
+							if (container) {
+								path = container.path;
+							} else {
+								throw new Error(
+									`Could not find the declared container of id "${property.container.id}" for property with alias: "${property.alias}"`,
+								);
+							}
 						}
-					}
 
-					hints.addOne({
-						unique: message.key,
-						path: [...hintsPathPrefix, ...path],
-						text: '!',
-						/*label: message.body,*/
-						color: 'invalid',
-						weight: 1000,
-						variantId,
+						hints.addOne({
+							unique: message.key,
+							path: [...hintsPathPrefix, ...path],
+							text: '!',
+							/*label: message.body,*/
+							color: 'invalid',
+							weight: 1000,
+							variantId,
+						});
+						this.#hintedMsgs.add(message.key);
 					});
-					this.#hintedMsgs.add(message.key);
 				});
-			});
-			this.#hintedMsgs.forEach((key) => {
-				if (!messages.some((msg) => msg.key === key)) {
-					this.#hintedMsgs.delete(key);
-					hints.removeOne(key);
-				}
-			});
-		});
+				this.#hintedMsgs.forEach((key) => {
+					if (!messages.some((msg) => msg.key === key)) {
+						this.#hintedMsgs.delete(key);
+						hints.removeOne(key);
+					}
+				});
+			},
+			null,
+		);
 	}
 }
 
 /**
- *
- * @param path {string} The path string to extract the value from.
+ * Extracts the value between the first pair of square brackets in a path string.
+ * @param {string} path - The path string to extract the value from.
+ * @returns {string | null} The extracted value, or null if no brackets are found.
  */
 function getValueBetweenBrackets(path: string): string | null {
 	const start = path.indexOf('[');

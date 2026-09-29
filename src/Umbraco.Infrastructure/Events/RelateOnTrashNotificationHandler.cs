@@ -211,10 +211,15 @@ public sealed class RelateOnTrashNotificationHandler :
         IEnumerable<MoveEventInfo<T>> moveInfoCollection,
         string recycleBinPathString,
         string originalParentRelationTypeAlias)
-        where T : IEntity
+        where T : ITreeEntity
 
     {
-        foreach (MoveEventInfo<T> item in moveInfoCollection.Where(x => x.OriginalPath.Contains(recycleBinPathString)))
+        // Only remove the restore relation for items that have actually left the recycle bin. When restoring a single
+        // item without its descendants, those descendants stay trashed (re-homed under the recycle bin root) and must
+        // keep their relation so they can be restored on their own later.
+        foreach (MoveEventInfo<T> item in moveInfoCollection.Where(x =>
+                     x.OriginalPath.Contains(recycleBinPathString)
+                     && x.Entity.Path.Contains(recycleBinPathString) is false))
         {
             IEnumerable<IRelation> relations = _relationService.GetByChildId(item.Entity.Id);
             foreach (IRelation relation in relations.Where(x => x.RelationType.Alias.InvariantEquals(originalParentRelationTypeAlias)))

@@ -37,7 +37,6 @@ let hasWarnedLabelDeprecation = false;
 export class UmbInlineListBlockElement extends UmbLitElement {
 	#manager?: typeof UMB_BLOCK_MANAGER_CONTEXT.TYPE;
 	#blockContext?: typeof UMB_BLOCK_LIST_ENTRY_CONTEXT.TYPE;
-	#workspaceContext?: typeof UMB_BLOCK_WORKSPACE_CONTEXT.TYPE;
 	#contentKey?: string;
 
 	/**
@@ -72,11 +71,21 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 	@property({ type: Boolean, reflect: true })
 	unpublished?: boolean;
 
+	/**
+	 * Whether the Block is backed by external (library element) content, so the unpublished tooltip
+	 * reflects the library element's own publish state rather than the local expose entry.
+	 */
+	@property({ type: Boolean, attribute: false })
+	isExternalContent?: boolean;
+
 	@property({ attribute: false })
 	content?: UmbBlockDataType;
 
 	@property({ attribute: false })
 	settings?: UmbBlockDataType;
+
+	@state()
+	private _workspaceContext?: typeof UMB_BLOCK_WORKSPACE_CONTEXT.TYPE;
 
 	@state()
 	private _exposed?: boolean;
@@ -132,16 +141,16 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 			(permitted, ctrl) => {
 				const context = ctrl.api as typeof UMB_BLOCK_WORKSPACE_CONTEXT.TYPE;
 				if (permitted && context) {
-					this.#workspaceContext = context;
-					this.#workspaceContext.establishLiveSync();
+					this._workspaceContext = context;
+					this._workspaceContext.establishLiveSync();
 					// Avoid view context becoming active: [NL]
 					// in this case its not a routable workspace and we do not want it to become an active view, appending shortcuts or setting browser title. (maybe this code needs to be more explicit. Like a inlineMode()?) [NL]
-					this.#workspaceContext.view.destroy();
-					this.#workspaceContext.autoReportValidation();
+					this._workspaceContext.view.destroy();
+					this._workspaceContext.autoReportValidation();
 					this.#load();
 
 					this.observe(
-						this.#workspaceContext.exposed,
+						this._workspaceContext.exposed,
 						(exposed) => {
 							this._exposed = exposed;
 						},
@@ -174,15 +183,15 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 						'observeVariant',
 					);
 
-					new UmbExtensionsApiInitializer(this, umbExtensionsRegistry, 'workspaceContext', [this.#workspaceContext]);
+					new UmbExtensionsApiInitializer(this, umbExtensionsRegistry, 'workspaceContext', [this._workspaceContext]);
 				}
 			},
 		);
 	}
 
 	#load() {
-		if (!this.#workspaceContext || !this.#contentKey) return;
-		this.#workspaceContext.load(this.#contentKey);
+		if (!this._workspaceContext || !this.#contentKey) return;
+		this._workspaceContext.load(this.#contentKey);
 	}
 
 	#onBlockInserted = (event: Event) => {
@@ -193,7 +202,7 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 	};
 
 	#expose = () => {
-		this.#workspaceContext?.expose();
+		this._workspaceContext?.expose();
 	};
 
 	override render() {
@@ -237,17 +246,25 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 					)}
 				</div>
 			</span>
-			${when(
-				this.unpublished,
-				() =>
-					html`<uui-tag slot="name" look="secondary" title=${this.localize.term('blockEditor_notExposedDescription')}
-						><umb-localize key="blockEditor_notExposedLabel"></umb-localize
-					></uui-tag>`,
-			)}
+			${when(this.unpublished, () => this.#renderDraftTag())}
+		`;
+	}
+
+	#renderDraftTag() {
+		const titleKey = this.isExternalContent
+			? 'blockEditor_notPublishedLibraryElementDescription'
+			: 'blockEditor_notExposedDescription';
+		return html`
+			<uui-tag slot="name" look="secondary" title=${this.localize.term(titleKey)}>
+				<umb-localize key="blockEditor_notExposedLabel"></umb-localize>
+			</uui-tag>
 		`;
 	}
 
 	#renderInside() {
+		if (!this._workspaceContext) {
+			return html`<umb-view-loader></umb-view-loader>`;
+		}
 		if (this._exposed === false) {
 			return html`<uui-button id="exposeButton" draggable="false" @click=${this.#expose}
 				><uui-icon name="icon-add"></uui-icon>

@@ -36,6 +36,7 @@ public class BasicAuthenticationMiddlewareTests
         hostingEnvironmentMock.Setup(x => x.ToAbsolute(It.IsAny<string>())).Returns<string>(path => path.TrimStart('~'));
 
         _signInManagerMock = new Mock<IBackOfficeSignInManager>();
+
         _nextCalled = false;
 
         _middleware = new BasicAuthenticationMiddleware(

@@ -35,7 +35,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Examine.Core" />
     <PackageReference Include="HtmlAgilityPack" />
     <PackageReference Include="MailKit" />
     <PackageReference Include="Markdig" />

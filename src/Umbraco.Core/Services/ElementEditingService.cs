@@ -559,7 +559,7 @@ internal sealed class ElementEditingService
         => ContentService.Delete(element, userId);
 
     // NOTE: We have a custom implementation for Move because ContentEditingServiceBase has no concept of Containers.
-    protected override OperationResult? Move(IElement element, int newParentId, int userId) => throw new NotImplementedException();
+    protected override OperationResult? Move(IElement element, int newParentId, bool includeDescendants, int userId) => throw new NotImplementedException();
 
     private async Task<ContentEditingOperationStatus> SaveAsync(IElement content, Guid userKey)
     {

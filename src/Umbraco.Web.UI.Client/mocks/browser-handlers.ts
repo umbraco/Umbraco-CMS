@@ -7,7 +7,6 @@ import { handlers as documentHandlers } from './msw-handlers/document/index.js';
 import { handlers as documentTypeHandlers } from './msw-handlers/document-type/index.js';
 import { handlers as dynamicRootHandlers } from './msw-handlers/dynamic-root.handlers.js';
 import { handlers as elementHandlers } from './msw-handlers/element/index.js';
-import { handlers as examineManagementHandlers } from './msw-handlers/examine-management.handlers.js';
 import { handlers as healthCheckHandlers } from './msw-handlers/health-check.handlers.js';
 import { handlers as installHandlers } from './msw-handlers/install.handlers.js';
 import { handlers as languageHandlers } from './msw-handlers/language/index.js';
@@ -42,6 +41,7 @@ import * as serverHandlers from './msw-handlers/server.handlers.js';
 import { handlers as documentBlueprintHandlers } from './msw-handlers/document-blueprint/index.js';
 import { handlers as temporaryFileHandlers } from './msw-handlers/temporary-file/index.js';
 import { handlers as segmentHandlers } from './msw-handlers/segment.handlers.js';
+import { handlers as searchHandlers } from './msw-handlers/search.handlers.js';
 import { handlers as webhookHandlers } from './msw-handlers/webhook/index.js';
 
 const handlers = [
@@ -54,7 +54,6 @@ const handlers = [
 	...documentTypeHandlers,
 	...dynamicRootHandlers,
 	...elementHandlers,
-	...examineManagementHandlers,
 	...healthCheckHandlers,
 	...installHandlers,
 	...languageHandlers,
@@ -87,6 +86,7 @@ const handlers = [
 	...documentBlueprintHandlers,
 	...temporaryFileHandlers,
 	...segmentHandlers,
+	...searchHandlers,
 	...webhookHandlers,
 	...serverHandlers.serverInformationHandlers,
 	serverHandlers.serverRunningHandler,

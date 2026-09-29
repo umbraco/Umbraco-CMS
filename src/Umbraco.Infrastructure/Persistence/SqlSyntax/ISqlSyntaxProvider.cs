@@ -483,6 +483,10 @@ public interface ISqlSyntaxProvider
     /// </summary>
     /// <param name="db">The <see cref="IDatabase"/> instance representing the database to inspect.</param>
     /// <returns>An <see cref="IEnumerable{ColumnInfo}"/> containing details for each column in the database schema.</returns>
+    /// <remarks>
+    /// Implementations must return a materialized collection, so that it can be enumerated more than once,
+    /// or only partially, without querying the database again or leaving database resources open.
+    /// </remarks>
     IEnumerable<ColumnInfo> GetColumnsInSchema(IDatabase db);
 
     /// <summary>

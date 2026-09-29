@@ -3,10 +3,8 @@ namespace Umbraco.Cms.Api.Management.ViewModels.Tree;
 /// <summary>
 /// Presentation model for a tree item in the Umbraco CMS Management API.
 /// </summary>
-public class TreeItemPresentationModel
+public class TreeItemPresentationModel : IHasChildren
 {
-    /// <summary>
-    /// Gets or sets a value indicating whether the tree item has child items.
-    /// </summary>
+    /// <inheritdoc />
     public bool HasChildren { get; set; }
 }

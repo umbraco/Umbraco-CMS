@@ -28,9 +28,9 @@ This project packages all static assets required for Umbraco CMS at runtime:
 Umbraco.Cms.StaticAssets/
 ├── umbraco/                                # Razor Views (server-rendered)
 │   ├── UmbracoBackOffice/
-│   │   └── Index.cshtml                    # Backoffice SPA shell (69 lines)
+│   │   └── Index.cshtml                    # Backoffice SPA shell
 │   ├── UmbracoLogin/
-│   │   └── Index.cshtml                    # Login page (99 lines)
+│   │   └── Index.cshtml                    # Login page
 │   └── UmbracoWebsite/
 │       ├── NoNodes.cshtml                  # "No published content" page
 │       ├── NotFound.cshtml                 # 404 error page
@@ -49,7 +49,7 @@ Umbraco.Cms.StaticAssets/
 │       ├── login/                          # Built login SPA (from Umbraco.Web.UI.Login)
 │       └── website/                        # Frontend website assets (fonts, CSS)
 │
-└── Umbraco.Cms.StaticAssets.csproj         # Build configuration (149 lines)
+└── Umbraco.Cms.StaticAssets.csproj         # Build configuration
 ```
 
 ### Project Dependencies
@@ -71,13 +71,13 @@ Umbraco.Cms.StaticAssets/
 
 ### Razor Views
 
-| View                                | Purpose                                                   | Line Count |
-| ----------------------------------- | --------------------------------------------------------- | ---------- |
-| `UmbracoBackOffice/Index.cshtml`    | Backoffice SPA entry point with `<umb-app>` web component | 69         |
-| `UmbracoLogin/Index.cshtml`         | Login page with `<umb-auth>` web component                | 99         |
-| `UmbracoWebsite/NoNodes.cshtml`     | Welcome page when no content published                    | 59         |
-| `UmbracoWebsite/NotFound.cshtml`    | 404 error page (debug info in debug mode)                 | 79         |
-| `UmbracoWebsite/Maintenance.cshtml` | Maintenance mode during upgrades                          | 65         |
+| View | Purpose |
+|------|---------|
+| `UmbracoBackOffice/Index.cshtml` | Backoffice SPA entry point with `<umb-app>` web component |
+| `UmbracoLogin/Index.cshtml` | Login page with `<umb-auth>` web component |
+| `UmbracoWebsite/NoNodes.cshtml` | Welcome page when no content published |
+| `UmbracoWebsite/NotFound.cshtml` | 404 error page (debug info in debug mode) |
+| `UmbracoWebsite/Maintenance.cshtml` | Maintenance mode during upgrades |
 
 ### Backoffice Index View (umbraco/UmbracoBackOffice/Index.cshtml)
 

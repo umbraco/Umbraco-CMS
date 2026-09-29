@@ -105,7 +105,21 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
     /// <param name="newParentId">The new parent identifier.</param>
     /// <param name="userId">The user performing the operation.</param>
     /// <returns>The operation result.</returns>
-    protected abstract OperationResult? Move(TContent content, int newParentId, int userId);
+    protected OperationResult? Move(TContent content, int newParentId, int userId)
+        => Move(content, newParentId, includeDescendants: true, userId);
+
+    /// <summary>
+    /// Moves content to a new parent, optionally leaving its descendants behind.
+    /// </summary>
+    /// <param name="content">The content to move.</param>
+    /// <param name="newParentId">The new parent identifier.</param>
+    /// <param name="includeDescendants">
+    /// Whether to move the descendants along with the content. When restoring content out of the recycle bin this can
+    /// be set to <c>false</c> to restore only the content item itself, leaving its descendants in the recycle bin.
+    /// </param>
+    /// <param name="userId">The user performing the operation.</param>
+    /// <returns>The operation result.</returns>
+    protected abstract OperationResult? Move(TContent content, int newParentId, bool includeDescendants, int userId);
 
     /// <summary>
     /// Copies content to a new parent.
@@ -397,8 +411,12 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
     /// <param name="parentKey">The new parent key, or null for root.</param>
     /// <param name="userKey">The user key performing the operation.</param>
     /// <param name="mustBeInRecycleBin">Whether the content must be in the recycle bin (for restore operations).</param>
+    /// <param name="includeDescendants">
+    /// Whether to move the descendants along with the content. When restoring out of the recycle bin this can be set to
+    /// <c>false</c> to restore only the content item itself, leaving its descendants in the recycle bin.
+    /// </param>
     /// <returns>An attempt containing the content and operation status.</returns>
-    protected async Task<Attempt<TContent?, ContentEditingOperationStatus>> HandleMoveAsync(Guid key, Guid? parentKey, Guid userKey, bool mustBeInRecycleBin = false)
+    protected async Task<Attempt<TContent?, ContentEditingOperationStatus>> HandleMoveAsync(Guid key, Guid? parentKey, Guid userKey, bool mustBeInRecycleBin = false, bool includeDescendants = true)
     {
         using ICoreScope scope = CoreScopeProvider.CreateCoreScope();
         TContent? content = ContentService.GetById(key);
@@ -439,7 +457,7 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         }
 
         var userId = await GetUserIdAsync(userKey);
-        OperationResult? moveResult = Move(content, parent.ParentId ?? Constants.System.Root, userId);
+        OperationResult? moveResult = Move(content, parent.ParentId ?? Constants.System.Root, includeDescendants, userId);
 
         scope.Complete();
 
@@ -849,14 +867,13 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
             }
         }
 
-        // if the property varies by culture, simply overwrite the edited property value with the current property value for every culture
+        // If the property varies by culture, simply overwrite the edited property value with the current property value
+        // for every culture.
         foreach (IProperty property in variantProperties)
         {
             foreach (var culture in disallowedCultures)
             {
-                    var currentValue = existingContent?.Properties.First(x => x.Alias == property.Alias)
-                        .GetValue(culture, null, false);
-                    property.SetValue(currentValue, culture, null);
+                RestoreExistingPropertyValues(property, existingContent, culture);
             }
         }
 
@@ -865,9 +882,7 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         {
             foreach (IProperty property in invariantProperties)
             {
-                var currentValue = existingContent?.Properties.First(x => x.Alias == property.Alias)
-                    .GetValue(null, null, false);
-                property.SetValue(currentValue, null, null);
+                RestoreExistingPropertyValues(property, existingContent, null);
             }
         }
 
@@ -875,23 +890,62 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         // we need perform a merge between the edited property value and the current property value
         foreach ((IProperty Property, IDataEditor DataEditor) propertyWithEditor in invariantWithVariantSupportProperties)
         {
-            var currentValue = existingContent?.Properties.First(x => x.Alias == propertyWithEditor.Property.Alias)
-                .GetValue(null, null, false);
-            var editedValue = contentWithPotentialUnallowedChanges.Properties
-                .First(x => x.Alias == propertyWithEditor.Property.Alias).GetValue(null, null, false);
+            IProperty property = propertyWithEditor.Property;
+            IProperty? existingProperty = existingContent?.Properties.First(x => x.Alias == property.Alias);
 
-            // update the editedValue with a merged value of invariant data and allowed culture data using the currentValue as a fallback.
-            var mergedValue = propertyWithEditor.DataEditor.MergeVariantInvariantPropertyValue(
-                currentValue,
-                editedValue,
-                ContentSettings.AllowEditInvariantFromNonDefault || (defaultLanguage is not null && allowedCultures.Contains(defaultLanguage.IsoCode)),
-                allowedCultures);
+            // The property may vary by segment, in which case each segment holds its own value to merge.
+            foreach (var segment in GetSegmentsToRestore(property, existingProperty, null))
+            {
+                var currentValue = existingProperty?.GetValue(null, segment, false);
+                var editedValue = property.GetValue(null, segment, false);
 
-            propertyWithEditor.Property.SetValue(mergedValue, null, null);
+                // update the editedValue with a merged value of invariant data and allowed culture data using the currentValue as a fallback.
+                var mergedValue = propertyWithEditor.DataEditor.MergeVariantInvariantPropertyValue(
+                    currentValue,
+                    editedValue,
+                    ContentSettings.AllowEditInvariantFromNonDefault || (defaultLanguage is not null && allowedCultures.Contains(defaultLanguage.IsoCode)),
+                    allowedCultures);
+
+                property.SetValue(mergedValue, null, segment);
+            }
         }
 
         return contentWithPotentialUnallowedChanges;
     }
+
+    /// <summary>
+    /// Overwrites the edited values of a property for one culture with the values held by the existing content.
+    /// </summary>
+    /// <remarks>
+    /// The property may vary by segment, so every segment of the culture has to be restored, not only its
+    /// segment-less value - including any segment the edit added, which is restored to no value.
+    /// </remarks>
+    private static void RestoreExistingPropertyValues(IProperty property, TContent? existingContent, string? culture)
+    {
+        IProperty? existingProperty = existingContent?.Properties.First(x => x.Alias == property.Alias);
+
+        foreach (var segment in GetSegmentsToRestore(property, existingProperty, culture))
+        {
+            property.SetValue(existingProperty?.GetValue(culture, segment, false), culture, segment);
+        }
+    }
+
+    /// <summary>
+    /// Gets every segment of a culture held by either the edited or the existing property, along with the
+    /// segment-less value, so all of them can be restored or merged.
+    /// </summary>
+    /// <remarks>
+    /// Materialized because writing to a segment can add a property value, which would otherwise modify the
+    /// collection being enumerated.
+    /// </remarks>
+    private static string?[] GetSegmentsToRestore(IProperty property, IProperty? existingProperty, string? culture)
+        => property.Values
+            .Concat(existingProperty?.Values ?? [])
+            .Where(value => culture.InvariantEquals(value.Culture))
+            .Select(value => value.Segment)
+            .Append(null)
+            .Distinct()
+            .ToArray();
 
     /// <summary>
     /// Should never be made public, serves the purpose of a nullable bool but more readable.

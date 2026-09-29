@@ -5,10 +5,7 @@ import type { UmbPagedModel } from '../types.js';
  * A function that returns a single page of an offset-paginated collection.
  * @template T - The type of items in the page.
  */
-export type UmbOffsetPageFetcher<T> = (
-	skip: number,
-	take: number,
-) => Promise<UmbDataSourceResponse<UmbPagedModel<T>>>;
+export type UmbOffsetPageFetcher<T> = (skip: number, take: number) => Promise<UmbDataSourceResponse<UmbPagedModel<T>>>;
 
 /**
  * Pages through an offset-paginated data source, accumulating every item until `total` has been reached.

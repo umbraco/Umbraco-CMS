@@ -17,13 +17,22 @@ import {
 	mergeObservables,
 	observeMultiple,
 } from '@umbraco-cms/backoffice/observable-api';
-import { encodeFilePath, UmbDeprecation, UmbReadOnlyVariantGuardManager } from '@umbraco-cms/backoffice/utils';
+import {
+	encodeFilePath,
+	escapeHTML,
+	UmbDeprecation,
+	UmbReadOnlyVariantGuardManager,
+} from '@umbraco-cms/backoffice/utils';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import { UmbModalRouteRegistrationController, UmbRoutePathAddendumContext } from '@umbraco-cms/backoffice/router';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbUfmVirtualRenderController } from '@umbraco-cms/backoffice/ufm';
-import { UMB_EDIT_ELEMENT_WORKSPACE_PATH_PATTERN, UMB_ELEMENT_ENTITY_TYPE } from '@umbraco-cms/backoffice/element';
+import {
+	UMB_EDIT_ELEMENT_WORKSPACE_PATH_PATTERN,
+	UMB_ELEMENT_ENTITY_TYPE,
+	UmbElementVariantState,
+} from '@umbraco-cms/backoffice/element';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
@@ -78,7 +87,24 @@ export abstract class UmbBlockEntryContext<
 	protected readonly _variantId = this.#variantId.asObservable();
 
 	#hasExpose = new UmbBooleanState(undefined);
+	/**
+	 * Whether the local expose entry exists. Prefer {@link isExposed} to determine rendered publish state.
+	 */
 	readonly hasExpose = this.#hasExpose.asObservable();
+
+	/**
+	 * Whether the block is currently published/exposed. For a block backed by external (library element)
+	 * content, this reflects that content's own variant state rather than the local expose entry.
+	 */
+	readonly isExposed = mergeObservables(
+		[this.hasExpose, this.isExternalContent, this.externalContentVariantState],
+		([hasExpose, isExternalContent, variantState]) =>
+			// External content blocks use the element's variant state; local blocks use the expose entry
+			isExternalContent
+				? variantState === UmbElementVariantState.PUBLISHED ||
+					variantState === UmbElementVariantState.PUBLISHED_PENDING_CHANGES
+				: hasExpose,
+	);
 
 	#actionsVisibility = new UmbBooleanState(true);
 	readonly actionsVisibility = this.#actionsVisibility.asObservable();
@@ -331,7 +357,7 @@ export abstract class UmbBlockEntryContext<
 		x ? (x.contentTypeKey ?? undefined) : null,
 	);
 	/**
-	 * @deprecated Use {@link _settingsDataContentTypeKey} instead. This will be removed in Umbraco 18.
+	 * @deprecated Use {@link UmbBlockEntryContext#_settingsDataContentTypeKey} instead. This will be removed in Umbraco 18.
 	 */
 	// eslint-disable-next-line
 	private readonly settingsDataContentTypeKey = this._settingsDataContentTypeKey;
@@ -393,11 +419,15 @@ export abstract class UmbBlockEntryContext<
 				}).warn();
 			}
 			this.#labelRender = new UmbUfmVirtualRenderController(this);
-			this.observe(this.label, (label) => {
-				if (this.#labelRender) {
-					this.#labelRender.markdown = label;
-				}
-			});
+			this.observe(
+				this.label,
+				(label) => {
+					if (this.#labelRender) {
+						this.#labelRender.markdown = label;
+					}
+				},
+				null,
+			);
 			this.#watchContentForLabelRender();
 		}
 
@@ -891,7 +921,7 @@ export abstract class UmbBlockEntryContext<
 		const blockName = this.getName();
 		await umbConfirmModal(this, {
 			headline: this.localize.term('blockEditor_confirmDeleteBlockTitle', blockName),
-			content: this.localize.term('blockEditor_confirmDeleteBlockMessage', blockName),
+			content: this.localize.term('blockEditor_confirmDeleteBlockMessage', escapeHTML(blockName)),
 			confirmLabel: '#general_delete',
 			color: 'danger',
 		});

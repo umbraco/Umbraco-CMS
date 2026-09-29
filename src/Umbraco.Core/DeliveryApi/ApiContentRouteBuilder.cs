@@ -138,7 +138,7 @@ public sealed class ApiContentRouteBuilder : IApiContentRouteBuilder
             return null;
         }
 
-        contentPath = contentPath.EnsureStartsWith("/");
+        contentPath = contentPath.EnsureStartsWith('/');
 
         IPublishedContent? root = GetRoot(content, isPreview);
         if (root is null)
@@ -151,7 +151,7 @@ public sealed class ApiContentRouteBuilder : IApiContentRouteBuilder
 
         if (_globalSettings.HideTopLevelNodeFromPath == false)
         {
-            contentPath = contentPath.TrimStart(rootPath.EnsureStartsWith("/")).EnsureStartsWith("/");
+            contentPath = contentPath.TrimStart(rootPath.EnsureStartsWith('/')).EnsureStartsWith('/');
         }
 
         return new ApiContentRoute(contentPath, new ApiContentStartItem(root.Key, rootPath));

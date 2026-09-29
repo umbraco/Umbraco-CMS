@@ -24,9 +24,13 @@ export class UmbElementTreeItemContext extends UmbDefaultTreeItemContext<
 	constructor(host: UmbControllerHost) {
 		super(host);
 
-		this.observe(this.isTrashed, (isTrashed) => {
-			this.#isTrashedContext.setIsTrashed(isTrashed);
-		});
+		this.observe(
+			this.isTrashed,
+			(isTrashed) => {
+				this.#isTrashedContext.setIsTrashed(isTrashed);
+			},
+			null,
+		);
 	}
 
 	public override setTreeItem(treeItem: UmbElementTreeItemModel | undefined) {

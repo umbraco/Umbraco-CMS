@@ -244,10 +244,14 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 					.catch(() => {});
 			}
 		});
-		this.observe(this.#propertyStructureHelper.propertyStructure, (propertyStructure) => {
-			this._properties = propertyStructure;
-			this.#sorter.setModel(this._properties);
-		});
+		this.observe(
+			this.#propertyStructureHelper.propertyStructure,
+			(propertyStructure) => {
+				this._properties = propertyStructure;
+				this.#sorter.setModel(this._properties);
+			},
+			null,
+		);
 	}
 
 	override disconnectedCallback(): void {

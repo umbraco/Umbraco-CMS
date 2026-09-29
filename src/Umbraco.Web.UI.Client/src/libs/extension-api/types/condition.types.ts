@@ -17,8 +17,9 @@ export type SpecificConditionTypeOrUmbConditionConfigBase<
 	T extends keyof ConditionTypeMap<ConditionConfigs> | string,
 > = T extends keyof ConditionTypeMap<ConditionConfigs> ? ConditionTypeMap<ConditionConfigs>[T] : UmbConditionConfigBase;
 
-export interface ManifestWithDynamicConditions<ConditionConfigs extends UmbConditionConfigBase = UmbConditionConfigBase>
-	extends ManifestBase {
+export interface ManifestWithDynamicConditions<
+	ConditionConfigs extends UmbConditionConfigBase = UmbConditionConfigBase,
+> extends ManifestBase {
 	/**
 	 * Set the conditions for when the extension should be loaded
 	 */

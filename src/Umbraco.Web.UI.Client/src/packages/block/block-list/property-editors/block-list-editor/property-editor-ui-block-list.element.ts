@@ -273,7 +273,7 @@ export class UmbPropertyEditorUIBlockListElement
 			);
 		});
 
-		this.observe(this.#managerContext.isSortMode, (isSortMode) => (this._isSortMode = isSortMode ?? false));
+		this.observe(this.#managerContext.isSortMode, (isSortMode) => (this._isSortMode = isSortMode ?? false), null);
 
 		this.addValidator(
 			'rangeUnderflow',

@@ -17,11 +17,14 @@ export class UmbElementFolderTreeItemContext extends UmbDefaultTreeItemContext<
 	constructor(host: UmbControllerHost) {
 		super(host);
 
-		this.observe(this.isTrashed, (isTrashed) => {
-			this.#isTrashedContext.setIsTrashed(isTrashed);
-		});
+		this.observe(
+			this.isTrashed,
+			(isTrashed) => {
+				this.#isTrashedContext.setIsTrashed(isTrashed);
+			},
+			null,
+		);
 	}
-
 }
 
 export { UmbElementFolderTreeItemContext as api };

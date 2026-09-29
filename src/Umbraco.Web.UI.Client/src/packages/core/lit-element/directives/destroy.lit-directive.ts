@@ -41,7 +41,7 @@ class UmbDestroyDirective extends AsyncDirective {
 /**
  * @description
  * A Lit directive, which destroys the element once its disconnected from the DOM.
- * @example:
+ * @example
  * ```js
  * html`<input ${umbDestroyOnDisconnect()}>`;
  * ```

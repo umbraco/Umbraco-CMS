@@ -14,7 +14,7 @@ import { DictionaryService } from '@umbraco-cms/backoffice/external/backend-api'
 /**
  * A data source for the Dictionary tree that fetches data from the server
  * @class UmbDictionaryTreeServerDataSource
- * @implements {UmbTreeDataSource}
+ * @augments {UmbTreeServerDataSourceBase}
  */
 export class UmbDictionaryTreeServerDataSource extends UmbTreeServerDataSourceBase<
 	NamedEntityTreeItemResponseModel,
@@ -41,7 +41,10 @@ const getRootItems = async (args: UmbTreeRootItemsRequestArgs) => {
 	const { data, ...rest } = await DictionaryService.getTreeDictionaryRoot({
 		query: { skip, take },
 	});
-	return { data: { ...data, totalBefore: skip, totalAfter: Math.max(data.total - skip - data.items.length, 0) }, ...rest };
+	return {
+		data: { ...data, totalBefore: skip, totalAfter: Math.max(data.total - skip - data.items.length, 0) },
+		...rest,
+	};
 };
 
 const getChildrenOf = async (args: UmbTreeChildrenOfRequestArgs) => {
@@ -53,7 +56,10 @@ const getChildrenOf = async (args: UmbTreeChildrenOfRequestArgs) => {
 		const { data, ...rest } = await DictionaryService.getTreeDictionaryChildren({
 			query: { parentId: args.parent.unique, skip, take },
 		});
-		return { data: { ...data, totalBefore: skip, totalAfter: Math.max(data.total - skip - data.items.length, 0) }, ...rest };
+		return {
+			data: { ...data, totalBefore: skip, totalAfter: Math.max(data.total - skip - data.items.length, 0) },
+			...rest,
+		};
 	}
 };
 

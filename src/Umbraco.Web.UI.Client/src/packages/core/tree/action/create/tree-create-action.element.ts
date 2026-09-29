@@ -1,7 +1,7 @@
-import { customElement, html, ifDefined, nothing, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbTreeCreateActionApi } from './tree-create-action.api.js';
 import type { UmbTreeCreateOption } from './types.js';
+import { customElement, html, ifDefined, nothing, state } from '@umbraco-cms/backoffice/external/lit';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-tree-create-action-button')
 export class UmbTreeCreateActionButtonElement extends UmbLitElement {
@@ -89,9 +89,7 @@ export class UmbTreeCreateActionButtonElement extends UmbLitElement {
 				placement="bottom-start"
 				@toggle=${this.#onPopoverToggle}>
 				<umb-popover-layout>
-					<uui-scroll-container>
-						${this._options.map((option) => this.#renderMenuItem(option))}
-					</uui-scroll-container>
+					<uui-scroll-container> ${this._options.map((option) => this.#renderMenuItem(option))} </uui-scroll-container>
 				</umb-popover-layout>
 			</uui-popover-container>
 		`;

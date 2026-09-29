@@ -1,7 +1,6 @@
 import type { ManifestPropertyContext, MetaPropertyContext } from '@umbraco-cms/backoffice/property';
 
-export interface ManifestPropertyContextClipboardKind
-	extends ManifestPropertyContext<MetaPropertyContextClipboardKind> {
+export interface ManifestPropertyContextClipboardKind extends ManifestPropertyContext<MetaPropertyContextClipboardKind> {
 	type: 'propertyContext';
 	kind: 'clipboard';
 }

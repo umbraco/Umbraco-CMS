@@ -116,8 +116,17 @@ public static partial class Constants
         public const string ConfigDeliveryApi = ConfigPrefix + "DeliveryApi";
 
         /// <summary>
-        ///     The configuration key for core debug settings.
+        ///     The configuration key for debug settings.
         /// </summary>
+        public const string ConfigDebug = ConfigPrefix + "Debug";
+
+        /// <summary>
+        ///     The legacy configuration key for debug settings.
+        /// </summary>
+        /// <remarks>
+        ///     Retained so existing configuration under this section keeps working; new configuration should
+        ///     use <see cref="ConfigDebug" />. TODO (V19): remove once the legacy binding is dropped.
+        /// </remarks>
         public const string ConfigCoreDebug = ConfigCorePrefix + "Debug";
 
         /// <summary>
@@ -151,14 +160,14 @@ public static partial class Constants
         public const string ConfigImaging = ConfigPrefix + "Imaging";
 
         /// <summary>
-        ///     The configuration key for Examine search settings.
-        /// </summary>
-        public const string ConfigExamine = ConfigPrefix + "Examine";
-
-        /// <summary>
         ///     The configuration key for indexing settings.
         /// </summary>
         public const string ConfigIndexing = ConfigPrefix + "Indexing";
+
+        /// <summary>
+        ///     The configuration key for the Examine provider for Umbraco Search.
+        /// </summary>
+        public const string ConfigSearchExamine = ConfigPrefix + "Search:Examine";
 
         /// <summary>
         ///     The configuration key for logging settings.
@@ -296,10 +305,6 @@ public static partial class Constants
         /// </summary>
         public const string ConfigScheduledPublishing = ConfigPrefix + "ScheduledPublishing";
 
-        /// <summary>
-        ///     The configuration key for backoffice token cookie settings.
-        /// </summary>
-        public const string ConfigBackOfficeTokenCookie = ConfigSecurity + ":BackOfficeTokenCookie";
         public const string ConfigDictionary = ConfigPrefix + "Dictionary";
 
         /// <summary>

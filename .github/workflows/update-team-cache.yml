@@ -1,0 +1,67 @@
+name: Update Team Members Cache
+
+on:
+  schedule:
+    - cron: "0 2 * * *" # daily at 02:00 UTC
+  workflow_dispatch: # allow manual runs
+
+jobs:
+  cache-teams:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+    steps:
+      - name: Fetch org teams and save to JSON
+        uses: actions/github-script@v9
+        with:
+          # PAT or GitHub App token with org:read:org (Members/Teams: Read).
+          # A default GITHUB_TOKEN cannot read organization team membership.
+          github-token: ${{ secrets.ORG_READ_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const org = 'umbraco';
+
+            // "hq-only-teams" is the parent team; GitHub's list-team-members API
+            // includes members of its child teams, so this one slug covers all of them.
+            const excludedTeams = [
+              'hq-only-teams',
+            ];
+
+            const excludedUsers = new Set();
+            let hadError = false;
+
+            for (const team_slug of excludedTeams) {
+              try {
+                const members = await github.paginate(github.rest.teams.listMembersInOrg, {
+                  org,
+                  team_slug,
+                  per_page: 100
+                });
+                members.forEach(m => excludedUsers.add(m.login.toLowerCase()));
+                core.info(`Fetched ${members.length} members from team: ${team_slug}`);
+              } catch (err) {
+                core.error(`Failed to fetch team ${team_slug}: ${err.message}`);
+                hadError = true;
+              }
+            }
+
+            if (hadError) {
+              // Don't cache a partial/incomplete exclusion list — that risks
+              // an HQ author getting an automated response until the next
+              // successful sync.
+              core.setFailed('Failed to fetch one or more teams; not caching a possibly-incomplete exclusion list.');
+              return;
+            }
+
+            const uniqueList = Array.from(excludedUsers);
+            core.info(`Total unique excluded users across all teams: ${uniqueList.length}`);
+
+            fs.writeFileSync('team-members.json', JSON.stringify(uniqueList));
+
+      - name: Push JSON to GitHub Actions Cache
+        uses: actions/cache/save@v6
+        with:
+          path: team-members.json
+          # Unique key per run; the notifier workflow restores via restore-keys
+          # prefix match, which resolves to the most recently created cache.
+          key: team-members-cache-${{ github.run_id }}

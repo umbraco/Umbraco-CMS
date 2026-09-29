@@ -24,7 +24,7 @@ export class UmbMediaValidationServerDataSource {
 	 * Validate a new Media on the server
 	 * @param {UmbMediaDetailModel} model - Media Model
 	 * @param {UmbEntityUnique} parentUnique - Parent Unique
-	 * @returns {*}
+	 * @returns {Promise<UmbDataSourceResponse<string>>} The response from the server
 	 */
 	async validateCreate(
 		model: UmbMediaDetailModel,
@@ -65,7 +65,7 @@ export class UmbMediaValidationServerDataSource {
 	 * Validate a existing Media
 	 * @param {UmbMediaDetailModel} model - Media Model
 	 * @param {Array<UmbVariantId>} variantIds - Variant Ids
-	 * @returns {Promise<*>} - The response from the server
+	 * @returns {Promise<UmbDataSourceResponse<string>>} - The response from the server
 	 */
 	async validateUpdate(
 		model: UmbMediaDetailModel,

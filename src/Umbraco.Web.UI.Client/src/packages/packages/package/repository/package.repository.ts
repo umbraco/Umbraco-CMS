@@ -1,4 +1,4 @@
-import type { UmbCreatedPackageDefinition, UmbCreatedPackages } from '../../types.js';
+import type { UmbCreatedPackageDefinition, UmbCreatedPackages, UmbPackage } from '../../types.js';
 import { UMB_PACKAGE_STORE_TOKEN } from './package.store.context-token.js';
 import { UmbPackageServerDataSource } from './sources/package.server.data.js';
 import type { UmbPackageStore } from './package.store.js';
@@ -7,10 +7,12 @@ import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbApi, ManifestBase } from '@umbraco-cms/backoffice/extension-api';
 import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
+import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
+import type { PackageMigrationStatusResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 /**
  * A repository for Packages which mimics a tree store.
-
+ 
  */
 export class UmbPackageRepository extends UmbControllerBase implements UmbApi {
 	#init!: Promise<void>;
@@ -98,8 +100,8 @@ export class UmbPackageRepository extends UmbControllerBase implements UmbApi {
 
 	/**
 	 * Request the root items from the Data Source
-	 * @param store
-	 * @memberOf UmbPackageRepository
+	 * @param {UmbPackageStore} store - The store to append the root items to
+	 * @memberof UmbPackageRepository
 	 */
 	async requestRootItems(store: UmbPackageStore) {
 		if (store.isPackagesLoaded) {
@@ -156,8 +158,8 @@ export class UmbPackageRepository extends UmbControllerBase implements UmbApi {
 
 	/**
 	 * Request the package migrations from the Data Source
-	 * @param store
-	 * @memberOf UmbPackageRepository
+	 * @param {UmbPackageStore} store - The store to append the migrations to
+	 * @memberof UmbPackageRepository
 	 */
 	async requestPackageMigrations(store: UmbPackageStore) {
 		const { data: migrations } = await this.#packageSource.getPackageMigrations();
@@ -187,27 +189,30 @@ export class UmbPackageRepository extends UmbControllerBase implements UmbApi {
 
 	/**
 	 * Observable of root items
-	 * @memberOf UmbPackageRepository
+	 * @returns {Promise<Observable<Array<UmbPackage>>>} The root items observable.
+	 * @memberof UmbPackageRepository
 	 */
-	async rootItems() {
+	async rootItems(): Promise<Observable<Array<UmbPackage>>> {
 		await this.#init;
 		return this.#packageStore!.rootItems;
 	}
 
 	/**
 	 * Observable of extensions
-	 * @memberOf UmbPackageRepository
+	 * @returns {Promise<Observable<Array<ManifestBase>>>} The extensions observable.
+	 * @memberof UmbPackageRepository
 	 */
-	async extensions() {
+	async extensions(): Promise<Observable<Array<ManifestBase>>> {
 		await this.#init;
 		return this.#packageStore!.extensions;
 	}
 
 	/**
 	 * Observable of migrations
-	 * @memberOf UmbPackageRepository
+	 * @returns {Promise<Observable<Array<PackageMigrationStatusResponseModel>>>} The migrations observable.
+	 * @memberof UmbPackageRepository
 	 */
-	async migrations() {
+	async migrations(): Promise<Observable<Array<PackageMigrationStatusResponseModel>>> {
 		await this.#init;
 		return this.#packageStore!.migrations;
 	}

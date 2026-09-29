@@ -1,4 +1,4 @@
-﻿export {DataTypeBuilder} from './dataTypeBuilder';
+export {DataTypeBuilder} from './dataTypeBuilder';
 export {SliderDataTypeBuilder} from './sliderDataTypeBuilder';
 export {TextAreaDataTypeBuilder} from './textAreaDataTypeBuilder';
 export {NumericDataTypeBuilder} from './numericDataTypeBuilder';
@@ -34,3 +34,5 @@ export {TimeOnlyPickerDataTypeBuilder} from './timeOnlyPickerDataTypeBuilder';
 export {DateTimePickerDataTypeBuilder} from './dateTimePickerDataTypeBuilder';
 export {EntityDataPickerDataTypeBuilder} from './entityDataPickerDataTypeBuilder';
 export {ElementPickerDataTypeBuilder} from './elementPickerDataTypeBuilder';
+export {UserPickerDataTypeBuilder} from './userPickerDataTypeBuilder';
+export {MemberGroupPickerDataTypeBuilder} from './memberGroupPickerDataTypeBuilder';
