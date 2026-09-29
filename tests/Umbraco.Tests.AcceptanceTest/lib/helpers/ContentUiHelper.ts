@@ -2262,8 +2262,15 @@ export class ContentUiHelper extends UiBaseLocators {
   }
 
   async switchLanguage(languageName: string) {
-    await this.click(this.languageToggle);
+    // The toggle button's first click can be lost if the previous variant-selector popover only just
+    // auto-closed (native Popover API state can lag a beat behind), leaving the dropdown unopened.
     const languageOptionLocator = this.contentVariantDropdown.locator('.culture-variant').filter({hasText: languageName});
+    await expect(async () => {
+      if (!(await languageOptionLocator.isVisible())) {
+        await this.click(this.languageToggle);
+      }
+      await expect(languageOptionLocator).toBeVisible({timeout: ConstantHelper.timeout.short});
+    }).toPass({timeout: ConstantHelper.timeout.medium});
     await this.click(languageOptionLocator);
     await expect(languageOptionLocator).toContainClass('selected');
   }
