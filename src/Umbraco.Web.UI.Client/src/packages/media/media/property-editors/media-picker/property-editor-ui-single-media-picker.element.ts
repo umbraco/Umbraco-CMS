@@ -1,11 +1,11 @@
-import { UmbPropertyEditorUIMediaPickerElementBase } from './property-editor-ui-media-picker-base.element.js';
+import { UmbMediaPickerPropertyEditorUIElementBase } from './property-editor-ui-media-picker-base.element.js';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 
 /**
  * @element umb-property-editor-ui-single-media-picker
  */
 @customElement('umb-property-editor-ui-single-media-picker')
-export class UmbPropertyEditorUISingleMediaPickerElement extends UmbPropertyEditorUIMediaPickerElementBase {
+export class UmbPropertyEditorUISingleMediaPickerElement extends UmbMediaPickerPropertyEditorUIElementBase {
 	protected override readonly multiple = false;
 }
 

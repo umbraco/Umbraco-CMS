@@ -1,4 +1,4 @@
-import type { UmbPropertyEditorUIDropdownElementBase } from './property-editor-ui-dropdown-base.element.js';
+import type { UmbDropdownPropertyEditorUIElementBase } from './property-editor-ui-dropdown-base.element.js';
 import { UmbPropertyEditorUIDropdownElement } from './property-editor-ui-dropdown.element.js';
 import { UmbPropertyEditorUISingleDropdownElement } from './property-editor-ui-single-dropdown.element.js';
 import { expect, fixture, html } from '@open-wc/testing';
@@ -6,7 +6,7 @@ import { type UmbTestRunnerWindow, defaultA11yConfig } from '@umbraco-cms/intern
 import { MULTI_SELECT_TEST_DATA } from '../utils/property-editor-test-utils.js';
 
 describe('UmbPropertyEditorUIDropdownElement', () => {
-	let element: UmbPropertyEditorUIDropdownElementBase;
+	let element: UmbDropdownPropertyEditorUIElementBase;
 
 	beforeEach(async () => {
 		element = await fixture(html` <umb-property-editor-ui-dropdown></umb-property-editor-ui-dropdown> `);

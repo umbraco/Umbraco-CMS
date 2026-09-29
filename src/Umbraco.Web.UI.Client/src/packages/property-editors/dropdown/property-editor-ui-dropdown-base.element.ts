@@ -15,7 +15,7 @@ import type { UmbInputDropdownListElement } from '@umbraco-cms/backoffice/compon
  * yields follows from the editor rather than from the configuration of the data type it is used through. Both are
  * edited the same way, which is what this base holds.
  */
-export abstract class UmbPropertyEditorUIDropdownElementBase
+export abstract class UmbDropdownPropertyEditorUIElementBase
 	extends UmbFormControlMixin<Array<string> | string | undefined, typeof UmbLitElement, undefined>(UmbLitElement)
 	implements UmbPropertyEditorUiElement
 {

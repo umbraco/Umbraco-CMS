@@ -52,7 +52,7 @@ function undefinedFallback(value: number | undefined, fallback: number) {
  * There is one slider editor per shape of value a slider holds, so the mode is fixed by the element rather than read
  * from configuration.
  */
-export abstract class UmbPropertyEditorUISliderElementBase
+export abstract class UmbSliderPropertyEditorUIElementBase
 	extends UmbFormControlMixin<UmbSliderPropertyEditorUiValue, typeof UmbLitElement>(UmbLitElement)
 	implements UmbPropertyEditorUiElement
 {

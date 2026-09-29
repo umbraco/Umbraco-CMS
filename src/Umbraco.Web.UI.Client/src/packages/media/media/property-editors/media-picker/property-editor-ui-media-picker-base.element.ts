@@ -22,7 +22,7 @@ import '../../components/input-rich-media/input-rich-media.element.js';
  * property yields follows from the editor rather than from the configuration of the data type it is used through.
  * Both are edited the same way, which is what this base holds.
  */
-export abstract class UmbPropertyEditorUIMediaPickerElementBase
+export abstract class UmbMediaPickerPropertyEditorUIElementBase
 	extends UmbFormControlMixin<UmbMediaPickerValueModel | undefined, typeof UmbLitElement, undefined>(UmbLitElement)
 	implements UmbPropertyEditorUiElement
 {

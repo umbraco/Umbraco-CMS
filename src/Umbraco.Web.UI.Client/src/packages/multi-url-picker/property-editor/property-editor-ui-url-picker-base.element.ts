@@ -21,7 +21,7 @@ import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umb
  * property yields follows from the editor rather than from the configuration of the data type it is used through.
  * Both are edited the same way, which is what this base holds.
  */
-export abstract class UmbPropertyEditorUIMultiUrlPickerElementBase
+export abstract class UmbUrlPickerPropertyEditorUIElementBase
 	extends UmbFormControlMixin<Array<UmbLinkPickerLink>, typeof UmbLitElement, undefined>(UmbLitElement)
 	implements UmbPropertyEditorUiElement
 {

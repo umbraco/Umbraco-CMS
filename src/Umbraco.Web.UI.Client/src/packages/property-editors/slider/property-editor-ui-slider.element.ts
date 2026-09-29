@@ -1,11 +1,11 @@
-import { UmbPropertyEditorUISliderElementBase } from './property-editor-ui-slider-base.element.js';
+import { UmbSliderPropertyEditorUIElementBase } from './property-editor-ui-slider-base.element.js';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 
 /**
  * @element umb-property-editor-ui-slider
  */
 @customElement('umb-property-editor-ui-slider')
-export class UmbPropertyEditorUISliderElement extends UmbPropertyEditorUISliderElementBase {
+export class UmbPropertyEditorUISliderElement extends UmbSliderPropertyEditorUIElementBase {
 	protected override readonly enableRange = false;
 }
 
