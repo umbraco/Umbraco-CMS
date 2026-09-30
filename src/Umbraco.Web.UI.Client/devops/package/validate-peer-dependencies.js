@@ -1,5 +1,5 @@
 /* eslint-disable local-rules/enforce-umbraco-external-imports */
-import { readFileSync } from 'fs';
+import { existsSync, readFileSync, writeFileSync } from 'fs';
 import { relative, resolve } from 'path';
 import { listPeerDependencies, toPeerDependencies } from './peer-dependencies.js';
 import semver from 'semver';
@@ -8,6 +8,8 @@ const clientProjectRoot = resolve(import.meta.dirname, '../../');
 const repositoryRoot = resolve(clientProjectRoot, '../../');
 const templateFolder = resolve(repositoryRoot, 'templates/UmbracoExtension/Client');
 const templateFolderName = relative(repositoryRoot, templateFolder);
+const baselineFile = resolve(import.meta.dirname, 'peer-dependencies.baseline.json');
+const baselineFileName = relative(clientProjectRoot, baselineFile);
 
 const readJson = (file) => JSON.parse(readFileSync(file, 'utf8'));
 
@@ -51,6 +53,59 @@ const templatePackageJson = readJson(resolve(templateFolder, 'package.json'));
 		}
 	});
 });
+
+// An extension that depends on the previous floor with a caret range must still satisfy the published peer dependencies
+if (process.argv.includes('--update-baseline')) {
+	const sortedNames = Object.keys(peerDependencies).sort();
+	const snapshot = Object.fromEntries(sortedNames.map((name) => [name, peerDependencies[name]]));
+	writeFileSync(baselineFile, `${JSON.stringify(snapshot, null, '\t')}\n`, 'utf8');
+	console.log(`Updated ${baselineFileName}`);
+}
+
+const baseline = existsSync(baselineFile) ? readJson(baselineFile) : {};
+const breakingChanges = [];
+const otherChanges = [];
+[...new Set([...Object.keys(baseline), ...Object.keys(peerDependencies)])].sort().forEach((name) => {
+	const before = baseline[name];
+	const after = peerDependencies[name];
+	if (before === after) return;
+
+	if (!before) {
+		breakingChanges.push(`    added:   ${name} ${after}`);
+	} else if (!after) {
+		otherChanges.push(`    removed: ${name} ${before}`);
+	} else if (!semver.intersects(`^${semver.minVersion(before).version}`, after)) {
+		breakingChanges.push(`    changed: ${name} ${before} -> ${after}`);
+	} else {
+		otherChanges.push(`    changed: ${name} ${before} -> ${after}`);
+	}
+});
+
+if (breakingChanges.length > 0) {
+	errors.push(
+		[
+			`Breaking changes to the published peer dependencies, compared with ${baselineFileName}:`,
+			...breakingChanges,
+			`  A changed range no longer accepts what a caret range on the previous floor allows, so an extension that depends`,
+			`  on that floor fails "npm install" with ERESOLVE. An added peer dependency is a new requirement on every extension.`,
+			`  Either is a breaking change in a patch or minor release. If the change is intended, run`,
+			`  "npm run package:update-peer-baseline" and commit the updated baseline.`,
+		].join('\n'),
+	);
+}
+
+if (otherChanges.length > 0) {
+	console.log(
+		[
+			'--- Peer dependency notice (not a failure) ---',
+			'',
+			`The published peer dependencies changed without breaking extensions, compared with ${baselineFileName}:`,
+			...otherChanges,
+			`  Run "npm run package:update-peer-baseline" to refresh the baseline.`,
+			'',
+		].join('\n'),
+	);
+}
 
 if (errors.length > 0) {
 	console.error(`--- Peer dependency validation failed ---\n\n${errors.join('\n\n')}\n`);

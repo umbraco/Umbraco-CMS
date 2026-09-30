@@ -170,6 +170,9 @@ npm run storybook:preview
 # Validate package exports and peer dependencies
 npm run package:validate
 
+# Refresh the snapshot of the published peer dependencies (after an intended change)
+npm run package:update-peer-baseline
+
 # Prepare for npm publish
 npm run prepack
 ```
