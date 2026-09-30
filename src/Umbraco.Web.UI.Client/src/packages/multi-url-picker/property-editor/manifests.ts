@@ -35,7 +35,7 @@ export const manifests = [
 			propertyEditorSchemaAlias: 'Umbraco.MultiUrlPicker',
 			icon: 'icon-link',
 			group: '#propertyEditorUIGroups_pickers',
-			keywords: ['url', 'link', 'cta', 'links', 'multiple', 'several'],
+			keywords: ['url', 'link', 'cta', 'links', 'multiple', 'several', 'multi url picker'],
 			supportsReadOnly: true,
 			settings: {
 				properties: settingsProperties,
