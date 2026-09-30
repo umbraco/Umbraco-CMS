@@ -13,7 +13,7 @@ import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import '../template-card/template-card.element.js';
 
 @customElement('umb-input-template')
-export class UmbInputTemplateElement extends UUIFormControlMixin(UmbLitElement, '') {
+export class UmbInputTemplateElement extends UUIFormControlWithBasicsMixin(UmbLitElement, '') {
 	readonly #templateItemRepository = new UmbTemplateItemRepository(this);
 
 	/**

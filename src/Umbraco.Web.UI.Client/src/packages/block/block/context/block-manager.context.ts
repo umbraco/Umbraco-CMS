@@ -384,7 +384,7 @@ export abstract class UmbBlockManagerContext<
 	contentOf(key: string) {
 		return mergeObservables(
 			[
-				this.#contents.asObservablePart((source) => source.find((x) => x.key === key)),
+				this.#contents.asObservablePart((source) => source?.find((x) => x.key === key)),
 				this.#externalContentValues.asObservablePart((source) => source.find((x) => x.key === key)),
 			],
 			([localContent, externalContent]) => localContent ?? externalContent ?? undefined,
@@ -518,7 +518,7 @@ export abstract class UmbBlockManagerContext<
 	}
 	getContentOf(contentKey: string) {
 		return (
-			this.#contents.value.find((x) => x.key === contentKey) ??
+			this.#contents.value?.find((x) => x.key === contentKey) ??
 			this.#externalContentValues.value.find((x) => x.key === contentKey)
 		);
 	}
