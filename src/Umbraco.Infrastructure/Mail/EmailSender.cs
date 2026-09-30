@@ -194,6 +194,7 @@ public class EmailSender : IEmailSender
         return isAvailable;
     }
 
+    // Mirrors SendAsyncInternal: a pickup directory is only used when a From address is set, otherwise sending falls back to SMTP.
     private bool UsesSmtpTransport()
         => _globalSettings.IsSmtpServerConfigured
            && (_globalSettings.IsPickupDirectoryLocationConfigured is false || string.IsNullOrWhiteSpace(_globalSettings.Smtp?.From));

@@ -39,7 +39,7 @@ public abstract class SecurityControllerBase : ManagementApiControllerBase
                 .Build()),
             UserOperationStatus.PasswordResetUnavailable => BadRequest(problemDetailsBuilder
                 .WithTitle("Password reset unavailable")
-                .WithDetail("Password reset is not currently available because the email could not be sent.")
+                .WithDetail("Password reset is not currently available because email cannot currently be sent.")
                 .Build()),
             _ => StatusCode(StatusCodes.Status500InternalServerError, problemDetailsBuilder
                 .WithTitle("Unknown user operation status.")
