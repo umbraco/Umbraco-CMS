@@ -666,6 +666,12 @@ const variantLibraryStatesDocument: UmbMockDocumentModel = {
 							isExternalContent: true,
 						},
 						{
+							key: 'variant-library-states-not-created-da',
+							contentKey: 'library-variant-element-id',
+							settingsKey: null,
+							isExternalContent: true,
+						},
+						{
 							key: 'variant-library-states-empty-variants',
 							contentKey: 'library-variant-element-empty-variants-id',
 							settingsKey: null,
