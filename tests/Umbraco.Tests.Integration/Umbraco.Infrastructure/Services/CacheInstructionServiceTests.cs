@@ -340,7 +340,6 @@ internal sealed class CacheInstructionServiceTests : UmbracoIntegrationTest
         // A payload instruction: only Refresh raises the notification, RefreshInternal does not.
         var payload = GetRequiredService<UserCacheRefresher>().Serialize(new UserCacheRefresher.JsonPayload
         {
-            Id = Constants.Security.SuperUserId,
             Key = Constants.Security.SuperUserKey,
         });
         sut.DeliverInstructions(

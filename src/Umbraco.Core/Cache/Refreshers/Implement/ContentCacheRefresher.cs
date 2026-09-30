@@ -465,12 +465,12 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
         }
 
         // The parent was created on another server and its instruction has not been processed here yet.
-        foreach (IContent ancestor in _contentService.GetAncestors(content).OrderBy(x => x.Level))
+        IEnumerable<IContent> missingAncestors = _contentService.GetAncestors(content)
+            .Where(x => ExistsInNavigation(x.Key) is false)
+            .OrderBy(x => x.Level);
+        foreach (IContent ancestor in missingAncestors)
         {
-            if (ExistsInNavigation(ancestor.Key) is false)
-            {
-                _documentNavigationManagementService.Add(ancestor.Key, ancestor.ContentType.Key, GetParentKey(ancestor), ancestor.SortOrder);
-            }
+            _documentNavigationManagementService.Add(ancestor.Key, ancestor.ContentType.Key, GetParentKey(ancestor), ancestor.SortOrder);
         }
 
         _documentNavigationManagementService.Add(content.Key, content.ContentType.Key, parentKey, content.SortOrder);

@@ -85,23 +85,6 @@ internal sealed class LastSyncedManager : ILastSyncedManager
         scope.Complete();
     }
 
-    // The internal id is saved by the periodic sync and by inline syncs on request threads, which can process the same
-    // instructions concurrently or in a different order. Only ever moving it forward keeps the checkpoint consistent
-    // and lets one writer stand in for the others.
-    private bool TryRaiseInternalId(int id)
-    {
-        lock (_internalIdLock)
-        {
-            if (_lastSyncedInternalId >= id)
-            {
-                return false;
-            }
-
-            _lastSyncedInternalId = id;
-            return true;
-        }
-    }
-
     /// <inheritdoc/>
     public async Task SaveLastSyncedExternalAsync(int id)
     {
@@ -133,7 +116,28 @@ internal sealed class LastSyncedManager : ILastSyncedManager
     [EditorBrowsable(EditorBrowsableState.Never)]
     internal void ClearLocalCache()
     {
-        _lastSyncedInternalId = null;
+        lock (_internalIdLock)
+        {
+            _lastSyncedInternalId = null;
+        }
+
         _lastSyncedExternalId = null;
+    }
+
+    // The internal id is saved by the periodic sync and by inline syncs on request threads, which can process the same
+    // instructions concurrently or in a different order. Only ever moving it forward keeps the checkpoint consistent
+    // and lets one writer stand in for the others.
+    private bool TryRaiseInternalId(int id)
+    {
+        lock (_internalIdLock)
+        {
+            if (_lastSyncedInternalId >= id)
+            {
+                return false;
+            }
+
+            _lastSyncedInternalId = id;
+            return true;
+        }
     }
 }

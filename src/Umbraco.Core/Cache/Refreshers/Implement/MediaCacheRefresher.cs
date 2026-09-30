@@ -342,12 +342,12 @@ public sealed class MediaCacheRefresher : PayloadCacheRefresherBase<MediaCacheRe
         }
 
         // The parent was created on another server and its instruction has not been processed here yet.
-        foreach (IMedia ancestor in _mediaService.GetAncestors(media).OrderBy(x => x.Level))
+        IEnumerable<IMedia> missingAncestors = _mediaService.GetAncestors(media)
+            .Where(x => ExistsInNavigation(x.Key) is false)
+            .OrderBy(x => x.Level);
+        foreach (IMedia ancestor in missingAncestors)
         {
-            if (ExistsInNavigation(ancestor.Key) is false)
-            {
-                _mediaNavigationManagementService.Add(ancestor.Key, ancestor.ContentType.Key, GetParentKey(ancestor), ancestor.SortOrder);
-            }
+            _mediaNavigationManagementService.Add(ancestor.Key, ancestor.ContentType.Key, GetParentKey(ancestor), ancestor.SortOrder);
         }
 
         _mediaNavigationManagementService.Add(media.Key, media.ContentType.Key, parentKey, media.SortOrder);

@@ -56,8 +56,6 @@ internal sealed class CacheSyncServiceLockOrderingTests : UmbracoIntegrationTest
 
     private ILastSyncedManager LastSyncedManager => GetRequiredService<ILastSyncedManager>();
 
-    private IIdKeyMap IdKeyMap => GetRequiredService<IIdKeyMap>();
-
     private LockRecorder Recorder => GetRequiredService<LockRecorder>();
 
     private RefreshRecorder Refreshes => GetRequiredService<RefreshRecorder>();

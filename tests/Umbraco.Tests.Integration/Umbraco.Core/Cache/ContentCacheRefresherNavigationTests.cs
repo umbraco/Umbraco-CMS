@@ -80,6 +80,6 @@ internal sealed class ContentCacheRefresherNavigationTests : UmbracoIntegrationT
         });
     }
 
-    private static ContentCacheRefresher.JsonPayload RefreshNode(IContent content)
+    private static ContentCacheRefresher.JsonPayload RefreshNode(Content content)
         => new() { Id = content.Id, Key = content.Key, ChangeTypes = TreeChangeTypes.RefreshNode };
 }

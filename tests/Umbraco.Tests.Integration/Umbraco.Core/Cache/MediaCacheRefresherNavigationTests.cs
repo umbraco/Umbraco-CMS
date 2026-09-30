@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
@@ -29,10 +30,10 @@ internal sealed class MediaCacheRefresherNavigationTests : UmbracoIntegrationTes
     private IMediaTypeService MediaTypeService => GetRequiredService<IMediaTypeService>();
 
     [Test]
-    public void Refresh_Adds_The_Missing_Parent_Before_The_Node()
+    public async Task Refresh_Adds_The_Missing_Parent_Before_The_Node()
     {
         MediaType mediaType = MediaTypeBuilder.CreateSimpleMediaType("navigationTestFolder", "Navigation test folder");
-        MediaTypeService.Save(mediaType);
+        await MediaTypeService.CreateAsync(mediaType, Constants.Security.SuperUserKey);
         Media folder = MediaBuilder.CreateMediaFolder(mediaType, -1);
         MediaService.Save(folder);
         Media child = MediaBuilder.CreateMediaFolder(mediaType, folder.Id);

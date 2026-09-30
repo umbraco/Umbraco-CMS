@@ -33,12 +33,6 @@ namespace Umbraco.Cms
             private readonly IProfilingLogger _profilingLogger;
             private readonly Lock _syncLock = new();
 
-            private enum RefreshTarget
-            {
-                AllCaches,
-                IsolatedCachesOnly,
-            }
-
             /// <summary>
             /// Initializes a new instance of the <see cref="CacheInstructionService"/> class.
             /// </summary>
@@ -101,6 +95,12 @@ namespace Umbraco.Cms
                 _lastSyncedManager = lastSyncedManager;
                 _repositoryCacheVersionService = repositoryCacheVersionService;
                 _globalSettings = globalSettings.Value;
+            }
+
+            private enum RefreshTarget
+            {
+                AllCaches,
+                IsolatedCachesOnly,
             }
 
             /// <inheritdoc />
