@@ -32,7 +32,6 @@ namespace Umbraco.Cms
             private readonly IRepositoryCacheVersionService _repositoryCacheVersionService;
             private readonly IProfilingLogger _profilingLogger;
             private readonly Lock _syncLock = new();
-            private int _isolatedCachesLastProcessedId;
 
             private enum RefreshTarget
             {
@@ -230,8 +229,9 @@ namespace Umbraco.Cms
             ///     <see cref="ProcessAllInstructions" /> holds <c>_syncLock</c> and takes those same locks. So this must never
             ///     wait for <c>_syncLock</c> or take distributed locks: only the in-memory
             ///     <see cref="IJsonCacheRefresher.RefreshInternal(string)" /> runs. The internal last-synced id is saved inside
-            ///     the caller's transaction, which holds the umbracoLastSynced row until the caller commits, so overlapping calls
-            ///     that processed the same instructions leave the write to a single one of them.
+            ///     the caller's transaction, which holds the umbracoLastSynced row until the caller commits;
+            ///     <see cref="ILastSyncedManager" /> only moves that id forward, so overlapping calls that processed the same
+            ///     instructions write it once.
             /// </remarks>
             public ProcessInstructionsResult ProcessInternalInstructions(
                 CacheRefresherCollection cacheRefreshers,
@@ -245,30 +245,13 @@ namespace Umbraco.Cms
                     var previousLastId = lastId;
                     var numberOfInstructionsProcessed = ProcessDatabaseInstructions(cacheRefreshers, cancellationToken, localIdentity, RefreshTarget.IsolatedCachesOnly, ref lastId);
 
-                    if (lastId > 0 && lastId != previousLastId && TryRaiseIsolatedCachesLastProcessedId(lastId))
+                    if (lastId > 0 && lastId != previousLastId)
                     {
                         _lastSyncedManager.SaveLastSyncedInternalAsync(lastId).GetAwaiter().GetResult();
                     }
 
                     return ProcessInstructionsResult.AsCompleted(numberOfInstructionsProcessed, lastId);
                 }
-            }
-
-            private bool TryRaiseIsolatedCachesLastProcessedId(int lastId)
-            {
-                var current = Volatile.Read(ref _isolatedCachesLastProcessedId);
-                while (current < lastId)
-                {
-                    var previous = Interlocked.CompareExchange(ref _isolatedCachesLastProcessedId, lastId, current);
-                    if (previous == current)
-                    {
-                        return true;
-                    }
-
-                    current = previous;
-                }
-
-                return false;
             }
 
             private CacheInstruction CreateCacheInstruction(IEnumerable<RefreshInstruction> instructions, string localIdentity)

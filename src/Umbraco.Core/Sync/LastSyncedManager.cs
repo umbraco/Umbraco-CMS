@@ -11,6 +11,7 @@ internal sealed class LastSyncedManager : ILastSyncedManager
 {
     private readonly ILastSyncedRepository _lastSyncedRepository;
     private readonly ICoreScopeProvider _coreScopeProvider;
+    private readonly Lock _internalIdLock = new();
     private int? _lastSyncedInternalId;
     private int? _lastSyncedExternalId;
 
@@ -28,16 +29,26 @@ internal sealed class LastSyncedManager : ILastSyncedManager
     /// <inheritdoc/>
     public async Task<int?> GetLastSyncedInternalAsync()
     {
-        if (_lastSyncedInternalId is not null)
+        lock (_internalIdLock)
         {
-            return _lastSyncedInternalId;
+            if (_lastSyncedInternalId is not null)
+            {
+                return _lastSyncedInternalId;
+            }
         }
 
-        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
-        _lastSyncedInternalId = await _lastSyncedRepository.GetInternalIdAsync();
-        scope.Complete();
+        int? persistedId;
+        using (ICoreScope scope = _coreScopeProvider.CreateCoreScope())
+        {
+            persistedId = await _lastSyncedRepository.GetInternalIdAsync();
+            scope.Complete();
+        }
 
-        return _lastSyncedInternalId;
+        lock (_internalIdLock)
+        {
+            _lastSyncedInternalId ??= persistedId;
+            return _lastSyncedInternalId;
+        }
     }
 
     /// <inheritdoc/>
@@ -63,10 +74,32 @@ internal sealed class LastSyncedManager : ILastSyncedManager
             throw new ArgumentException("Invalid last synced id. Must be non-negative.");
         }
 
+        await GetLastSyncedInternalAsync();
+        if (TryRaiseInternalId(id) is false)
+        {
+            return;
+        }
+
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
         await _lastSyncedRepository.SaveInternalIdAsync(id);
-        _lastSyncedInternalId = id;
         scope.Complete();
+    }
+
+    // The internal id is saved by the periodic sync and by inline syncs on request threads, which can process the same
+    // instructions concurrently or in a different order. Only ever moving it forward keeps the checkpoint consistent
+    // and lets one writer stand in for the others.
+    private bool TryRaiseInternalId(int id)
+    {
+        lock (_internalIdLock)
+        {
+            if (_lastSyncedInternalId >= id)
+            {
+                return false;
+            }
+
+            _lastSyncedInternalId = id;
+            return true;
+        }
     }
 
     /// <inheritdoc/>

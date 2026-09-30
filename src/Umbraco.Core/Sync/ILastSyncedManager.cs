@@ -21,6 +21,9 @@ public interface ILastSyncedManager
     /// Saves the last synced Internal ID to the Database.
     /// </summary>
     /// <param name="id">The last synced internal ID.</param>
+    /// <remarks>
+    /// The internal ID only moves forward: an ID that is not higher than the one already recorded is ignored.
+    /// </remarks>
     Task SaveLastSyncedInternalAsync(int id);
 
     /// <summary>

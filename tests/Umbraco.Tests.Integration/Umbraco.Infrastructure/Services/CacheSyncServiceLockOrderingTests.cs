@@ -54,6 +54,8 @@ internal sealed class CacheSyncServiceLockOrderingTests : UmbracoIntegrationTest
 
     private ILastSyncedRepository LastSyncedRepository => GetRequiredService<ILastSyncedRepository>();
 
+    private ILastSyncedManager LastSyncedManager => GetRequiredService<ILastSyncedManager>();
+
     private IIdKeyMap IdKeyMap => GetRequiredService<IIdKeyMap>();
 
     private LockRecorder Recorder => GetRequiredService<LockRecorder>();
@@ -283,6 +285,29 @@ internal sealed class CacheSyncServiceLockOrderingTests : UmbracoIntegrationTest
     }
 
     [Test]
+    public void SyncInternal_Continues_From_Its_Own_Checkpoint_When_A_Lower_One_Is_Saved()
+    {
+        DeliverRemoteInstructions(RecordingInstruction(1));
+        DeliverRemoteInstructions(RecordingInstruction(2));
+        DeliverRemoteInstructions(RecordingInstruction(3));
+        CacheSyncService.SyncInternal(CancellationToken.None);
+        Assume.That(Refreshes.RefreshInternalCount, Is.EqualTo(3));
+        var checkpoint = CacheInstructionService.GetMaxInstructionId();
+
+        // A full sync that started from an older external id saves the lower id it reached.
+        LastSyncedManager.SaveLastSyncedInternalAsync(1).GetAwaiter().GetResult();
+        DeliverRemoteInstructions(RecordingInstruction(4));
+
+        CacheSyncService.SyncInternal(CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(LastSyncedInternalIdInDatabase(), Is.EqualTo(checkpoint + 1), "The internal last-synced id did not move forward.");
+            Assert.That(Refreshes.RefreshInternalCount, Is.EqualTo(4), "Already processed instructions were processed again.");
+        });
+    }
+
+    [Test]
     public void SyncInternal_Runs_Safely_Alongside_SyncAll()
     {
         InitialiseLocalContentCacheVersion();
@@ -398,8 +423,9 @@ internal sealed class CacheSyncServiceLockOrderingTests : UmbracoIntegrationTest
             null!,
             GetRequiredService<DomainCacheRefresher>().Serialize(new DomainCacheRefresher.JsonPayload(0, DomainChangeTypes.RefreshAll)));
 
-    private static RefreshInstruction RecordingInstruction()
-        => new(RecordingCacheRefresher.UniqueId, RefreshMethodType.RefreshByJson, Guid.Empty, 0, null!, "[]");
+    // Identical instructions are processed once per run, so give each one a distinct payload where several are needed.
+    private static RefreshInstruction RecordingInstruction(int marker = 0)
+        => new(RecordingCacheRefresher.UniqueId, RefreshMethodType.RefreshByJson, Guid.Empty, 0, null!, $"[{marker}]");
 
     /// <summary>
     ///     Saves as another server would: the write bypasses this server's isolated cache, then the remote server's new

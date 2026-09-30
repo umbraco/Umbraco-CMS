@@ -53,6 +53,18 @@ public class LastSyncedManagerTest : UmbracoIntegrationTest
     }
 
     [Test]
+    public async Task Save_Last_Synced_Internal_Id_Ignores_Ids_That_Do_Not_Move_Forward()
+    {
+        await manager.SaveLastSyncedInternalAsync(5);
+
+        await manager.SaveLastSyncedInternalAsync(3);
+
+        Assert.AreEqual(5, await manager.GetLastSyncedInternalAsync());
+        manager.ClearLocalCache();
+        Assert.AreEqual(5, await manager.GetLastSyncedInternalAsync(), "The lower id was persisted.");
+    }
+
+    [Test]
     public async Task Save_Last_Synced_External_Id()
     {
         Random random = new Random();
