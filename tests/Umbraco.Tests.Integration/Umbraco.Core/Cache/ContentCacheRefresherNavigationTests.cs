@@ -4,11 +4,13 @@
 using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.Changes;
 using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
+using IScope = Umbraco.Cms.Infrastructure.Scoping.IScope;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Cache;
 
@@ -78,6 +80,74 @@ internal sealed class ContentCacheRefresherNavigationTests : UmbracoIntegrationT
             Assert.That(NavigationQueryService.TryGetChildrenKeys(Textpage.Key, out IEnumerable<Guid> children), Is.True);
             Assert.That(children.Count(x => x == Subpage.Key), Is.EqualTo(1));
         });
+    }
+
+    [Test]
+    public void Refresh_Moves_Node_To_A_Parent_Unknown_Locally()
+    {
+        ContentCacheRefresher.Refresh([RefreshNode(Textpage), RefreshNode(Subpage)]);
+
+        Content newParent = ContentBuilder.CreateSimpleContent(ContentType, "New parent");
+        SaveAsAnotherServer(newParent);
+        MoveAsAnotherServer(Subpage, newParent.Id);
+        Assume.That(NavigationQueryService.TryGetParentKey(newParent.Key, out _), Is.False, "The new parent is already in navigation, so this test proves nothing.");
+        Assume.That(NavigationQueryService.TryGetParentKey(Subpage.Key, out Guid? parentBefore) && parentBefore == Textpage.Key, "Subpage is not under Textpage, so this test proves nothing.");
+
+        ContentCacheRefresher.Refresh([RefreshNode(Subpage)]);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(NavigationQueryService.TryGetParentKey(Subpage.Key, out Guid? parentKey), Is.True);
+            Assert.That(parentKey, Is.EqualTo(newParent.Key), "The node was not moved under the parent that was unknown locally.");
+            Assert.That(NavigationQueryService.TryGetParentKey(newParent.Key, out Guid? newParentParent), Is.True, "The missing parent was not added to navigation.");
+            Assert.That(newParentParent, Is.Null);
+            Assert.That(NavigationQueryService.TryGetChildrenKeys(Textpage.Key, out IEnumerable<Guid> oldSiblings), Is.True);
+            Assert.That(oldSiblings, Does.Not.Contain(Subpage.Key));
+        });
+    }
+
+    [Test]
+    public void Refresh_Restores_Node_To_A_Parent_Unknown_Locally()
+    {
+        ContentCacheRefresher.Refresh([RefreshNode(Textpage), RefreshNode(Subpage)]);
+        using (IScope scope = ScopeProvider.CreateScope(repositoryCacheMode: RepositoryCacheMode.None))
+        {
+            ContentService.MoveToRecycleBin(ContentService.GetById(Subpage.Key)!);
+            scope.Complete();
+        }
+
+        ContentCacheRefresher.Refresh([RefreshNode(Subpage)]);
+        Assume.That(NavigationQueryService.TryGetParentKeyInBin(Subpage.Key, out _), Is.True, "Subpage is not in the bin, so this test proves nothing.");
+
+        Content newParent = ContentBuilder.CreateSimpleContent(ContentType, "New parent");
+        SaveAsAnotherServer(newParent);
+        MoveAsAnotherServer(Subpage, newParent.Id);
+        Assume.That(NavigationQueryService.TryGetParentKey(newParent.Key, out _), Is.False, "The new parent is already in navigation, so this test proves nothing.");
+
+        ContentCacheRefresher.Refresh([RefreshNode(Subpage)]);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(NavigationQueryService.TryGetParentKey(Subpage.Key, out Guid? parentKey), Is.True, "The node was not restored.");
+            Assert.That(parentKey, Is.EqualTo(newParent.Key));
+            Assert.That(NavigationQueryService.TryGetParentKeyInBin(Subpage.Key, out _), Is.False);
+            Assert.That(NavigationQueryService.TryGetParentKey(newParent.Key, out _), Is.True, "The missing parent was not added to navigation.");
+        });
+    }
+
+    /// <summary>Writes as another server would: nothing runs against this server's in-memory structures.</summary>
+    private void SaveAsAnotherServer(Content content)
+    {
+        using IScope scope = ScopeProvider.CreateScope(repositoryCacheMode: RepositoryCacheMode.None);
+        ContentService.Save(content);
+        scope.Complete();
+    }
+
+    private void MoveAsAnotherServer(Content content, int parentId)
+    {
+        using IScope scope = ScopeProvider.CreateScope(repositoryCacheMode: RepositoryCacheMode.None);
+        ContentService.Move(ContentService.GetById(content.Key)!, parentId);
+        scope.Complete();
     }
 
     private static ContentCacheRefresher.JsonPayload RefreshNode(Content content)

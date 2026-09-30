@@ -37,10 +37,16 @@ internal sealed class MediaNavigationService : ContentNavigationServiceBase<IMed
     }
 
     /// <inheritdoc />
+    protected override int TreeLockId => Constants.Locks.MediaTree;
+
+    /// <inheritdoc />
+    protected override Guid ObjectTypeKey => Constants.ObjectTypes.Media;
+
+    /// <inheritdoc />
     public override async Task RebuildAsync()
-        => await HandleRebuildAsync(Constants.Locks.MediaTree, Constants.ObjectTypes.Media, false);
+        => await HandleRebuildAsync(TreeLockId, ObjectTypeKey, false);
 
     /// <inheritdoc />
     public override async Task RebuildBinAsync()
-        => await HandleRebuildAsync(Constants.Locks.MediaTree, Constants.ObjectTypes.Media, true);
+        => await HandleRebuildAsync(TreeLockId, ObjectTypeKey, true);
 }

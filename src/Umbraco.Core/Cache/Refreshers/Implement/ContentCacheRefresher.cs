@@ -410,7 +410,7 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
         // First creation
         if (ExistsInNavigation(content.Key) is false && ExistsInNavigationBin(content.Key) is false)
         {
-            AddToNavigation(content);
+            _documentNavigationManagementService.Add(content.Key, content.ContentType.Key, GetParentKey(content), content.SortOrder);
             if (content.Trashed)
             {
                 // If created as trashed, move to bin
@@ -451,30 +451,6 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
                 _documentNavigationManagementService.RestoreFromBin(content.Key, GetParentKey(content));
             }
         }
-    }
-
-    private void AddToNavigation(IContent content)
-    {
-        Guid? parentKey = GetParentKey(content);
-        if (_documentNavigationManagementService.Add(content.Key, content.ContentType.Key, parentKey, content.SortOrder)
-            || parentKey is null
-            || content.Trashed
-            || ExistsInNavigation(parentKey.Value)
-            || ExistsInNavigationBin(parentKey.Value))
-        {
-            return;
-        }
-
-        // The parent was created on another server and its instruction has not been processed here yet.
-        IEnumerable<IContent> missingAncestors = _contentService.GetAncestors(content)
-            .Where(x => ExistsInNavigation(x.Key) is false)
-            .OrderBy(x => x.Level);
-        foreach (IContent ancestor in missingAncestors)
-        {
-            _documentNavigationManagementService.Add(ancestor.Key, ancestor.ContentType.Key, GetParentKey(ancestor), ancestor.SortOrder);
-        }
-
-        _documentNavigationManagementService.Add(content.Key, content.ContentType.Key, parentKey, content.SortOrder);
     }
 
     private Guid? GetParentKey(IContent content) => (content.ParentId == -1) ? null : _idKeyMap.GetKeyForId(content.ParentId, UmbracoObjectTypes.Document).Result;
