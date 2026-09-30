@@ -134,8 +134,9 @@ public class EmailSender : IEmailSender
 
     /// <inheritdoc/>
     /// <remarks>
-    ///     Only the SMTP transport is probed. A registered notification handler cannot be probed, and a pickup directory
-    ///     only requires a local file write, so both are assumed to be available.
+    ///     Only the SMTP transport is probed. A pickup directory only requires a local file write, so it is assumed to be
+    ///     available. A registered notification handler cannot be probed, and may handle only some email types, so SMTP is
+    ///     still probed when it is configured as the fallback; a handler alone is assumed to be available.
     ///     Concurrent callers share a single probe, and its result is cached briefly, so the SMTP server is contacted at
     ///     most once per cache period regardless of how often this is called. The cancellation token only stops the
     ///     caller waiting; it does not cancel the shared probe.
@@ -195,7 +196,6 @@ public class EmailSender : IEmailSender
 
     private bool UsesSmtpTransport()
         => _globalSettings.IsSmtpServerConfigured
-           && _notificationHandlerRegistered is false
            && (_globalSettings.IsPickupDirectoryLocationConfigured is false || string.IsNullOrWhiteSpace(_globalSettings.Smtp?.From));
 
     private async Task SendAsyncInternal(EmailMessage message, string emailType, bool enableNotification, TimeSpan? expires)
