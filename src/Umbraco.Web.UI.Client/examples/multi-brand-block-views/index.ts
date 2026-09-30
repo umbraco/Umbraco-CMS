@@ -1,4 +1,5 @@
 const forBlockEditor = 'block-grid';
+const forBlockEditorWithRte = ['block-grid', 'block-rte'];
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -39,7 +40,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Example Product Teaser Block View',
 		element: () => import('./product-teaser-block-view.element.js'),
 		forContentTypeAlias: 'productTeaserBlock',
-		forBlockEditor,
+		forBlockEditor: forBlockEditorWithRte,
 	},
 	{
 		type: 'blockEditorCustomView',
@@ -47,6 +48,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Example Article Teaser Block View',
 		element: () => import('./article-teaser-block-view.element.js'),
 		forContentTypeAlias: 'articleTeaserBlock',
-		forBlockEditor,
+		forBlockEditor: forBlockEditorWithRte,
 	},
 ];

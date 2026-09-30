@@ -10,6 +10,16 @@ export const exampleBlockViewStyles = css`
 		color: var(--uui-color-text);
 		font-family: 'Helvetica Neue', Helvetica, Arial, system-ui, sans-serif;
 		-webkit-font-smoothing: antialiased;
+		-webkit-user-select: none;
+		user-select: none;
+	}
+
+	:host([inline]) {
+		display: inline-block;
+		width: 100%;
+		max-width: 420px;
+		height: auto;
+		vertical-align: top;
 	}
 
 	h2,
@@ -23,6 +33,7 @@ export const exampleBlockViewStyles = css`
 		display: block;
 		width: 100%;
 		object-fit: cover;
+		pointer-events: none;
 		transition: transform 0.6s cubic-bezier(0.2, 0.7, 0.2, 1);
 	}
 

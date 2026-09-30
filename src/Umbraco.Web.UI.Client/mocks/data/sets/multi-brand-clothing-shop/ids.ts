@@ -50,6 +50,7 @@ export const DATA_TYPE_IDS = {
 	storesCollection: mbcsId('dataType', 22),
 	pageContentBlockGrid: mbcsId('dataType', 20),
 	imageCropper: mbcsId('dataType', 21),
+	articleRichTextEditor: mbcsId('dataType', 23),
 } as const;
 
 export const DOCUMENT_TYPE_IDS = {

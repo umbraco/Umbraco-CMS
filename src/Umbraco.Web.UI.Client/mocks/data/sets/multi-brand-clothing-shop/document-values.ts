@@ -17,11 +17,40 @@ export const textValue = (alias: string, value: string) => varying('Umbraco.Text
 
 export const textareaValue = (alias: string, value: string) => varying('Umbraco.TextArea', alias, value);
 
-export const richTextValue = (alias: string, markup: string) =>
-	varying('Umbraco.RichText', alias, {
-		markup,
-		blocks: { contentData: [], settingsData: [], expose: [], layout: {} },
+export const rteInlineBlockTag = (key: string) =>
+	`<umb-rte-block-inline data-content-key="${key}"></umb-rte-block-inline>`;
+
+/**
+ * @param alias The property alias.
+ * @param markup The markup, or a function that receives the keys of the given blocks so it can place them.
+ * @param blocks Blocks to embed in the rich text.
+ */
+export const richTextValue = (
+	alias: string,
+	markup: string | ((blockKeys: Array<string>) => string),
+	blocks: Array<UmbMbcsBlock> = [],
+) => {
+	const instances = blocks.map(withKeys);
+
+	return varying('Umbraco.RichText', alias, {
+		markup: typeof markup === 'function' ? markup(instances.map((block) => block.key)) : markup,
+		blocks: {
+			contentData: instances.map(toContentData),
+			settingsData: [],
+			expose: instances.flatMap(toExposeEntries),
+			layout: instances.length
+				? {
+						'Umbraco.RichText': instances.map((block) => ({
+							contentUdi: mbcsElementUdi(block.key),
+							settingsUdi: null,
+							contentKey: block.key,
+							settingsKey: null,
+						})),
+					}
+				: {},
+		},
 	});
+};
 
 export const invariantTextValue = (alias: string, value: string) => invariant('Umbraco.TextBox', alias, value);
 
@@ -103,37 +132,42 @@ const flatten = (block: UmbMbcsBlockInstance): Array<UmbMbcsBlockInstance> => [
  * The Block Grid itself is invariant; text inside the blocks varies through the element types (block-level variation),
  * so every block is exposed in each culture.
  */
+const toContentData = (block: UmbMbcsBlockInstance) => ({
+	contentTypeKey: block.elementTypeId,
+	key: block.key,
+	values: (block.values ?? []).flatMap(
+		(property): Array<UmbMbcsValue> =>
+			property.varies
+				? CULTURES.map((culture) => ({
+						editorAlias: property.editorAlias,
+						alias: property.alias,
+						culture,
+						segment: null,
+						value: property.value,
+					}))
+				: [
+						{
+							editorAlias: property.editorAlias,
+							alias: property.alias,
+							culture: null,
+							segment: null,
+							value: property.value,
+						},
+					],
+	),
+});
+
+const toExposeEntries = (block: UmbMbcsBlockInstance) =>
+	CULTURES.map((culture) => ({ contentKey: block.key, culture, segment: null }));
+
 export const blockGridValue = (alias: string, blocks: Array<UmbMbcsBlock>): Array<UmbMbcsValue> => {
 	const instances = blocks.map(withKeys);
 	const all = instances.flatMap(flatten);
 
 	return invariant('Umbraco.BlockGrid', alias, {
-		contentData: all.map((block) => ({
-			contentTypeKey: block.elementTypeId,
-			key: block.key,
-			values: (block.values ?? []).flatMap(
-				(property): Array<UmbMbcsValue> =>
-					property.varies
-						? CULTURES.map((culture) => ({
-								editorAlias: property.editorAlias,
-								alias: property.alias,
-								culture,
-								segment: null,
-								value: property.value,
-							}))
-						: [
-								{
-									editorAlias: property.editorAlias,
-									alias: property.alias,
-									culture: null,
-									segment: null,
-									value: property.value,
-								},
-							],
-			),
-		})),
+		contentData: all.map(toContentData),
 		settingsData: [],
-		expose: all.flatMap((block) => CULTURES.map((culture) => ({ contentKey: block.key, culture, segment: null }))),
+		expose: all.flatMap(toExposeEntries),
 		layout: { 'Umbraco.BlockGrid': instances.map(toLayoutItem) },
 	});
 };

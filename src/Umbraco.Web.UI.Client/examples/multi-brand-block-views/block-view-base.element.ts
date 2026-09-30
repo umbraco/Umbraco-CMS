@@ -5,6 +5,7 @@ import { UmbDocumentDetailRepository } from '@umbraco-cms/backoffice/document';
 import { UmbMediaUrlRepository } from '@umbraco-cms/backoffice/media';
 import { UMB_VARIANT_CONTEXT } from '@umbraco-cms/backoffice/variant';
 import type { UmbBlockDataType } from '@umbraco-cms/backoffice/block';
+import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
 import type { UmbBlockEditorCustomViewElement } from '@umbraco-cms/backoffice/block-custom-view';
 import type { UmbDocumentDetailModel } from '@umbraco-cms/backoffice/document';
 
@@ -17,6 +18,9 @@ export abstract class ExampleBlockViewBase
 
 	@property({ attribute: false })
 	settings?: UmbBlockDataType;
+
+	@property({ attribute: false })
+	blockType?: UmbBlockTypeBaseModel & { displayInline?: boolean };
 
 	@state()
 	protected _culture?: string;
@@ -39,6 +43,10 @@ export abstract class ExampleBlockViewBase
 	}
 
 	protected override updated(changedProperties: PropertyValues) {
+		if (changedProperties.has('blockType')) {
+			this.toggleAttribute('inline', !!this.blockType?.displayInline);
+		}
+
 		if (changedProperties.has('content') || changedProperties.has('_culture')) {
 			this._load();
 		}

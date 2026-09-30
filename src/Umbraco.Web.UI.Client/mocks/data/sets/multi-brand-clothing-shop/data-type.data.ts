@@ -102,6 +102,60 @@ const block = (options: UmbMbcsBlockOptions) => ({
 	forceHideContentEditorInOverlay: false,
 });
 
+const richTextEditor = (id: string, name: string, blockElementTypeIds: Array<string> = []) =>
+	dataType(id, name, 'Umbraco.RichText', 'Umb.PropertyEditorUi.Tiptap', [
+		{
+			alias: 'toolbar',
+			value: [
+				[
+					[
+						'Umb.Tiptap.Toolbar.StyleSelect',
+						'Umb.Tiptap.Toolbar.Bold',
+						'Umb.Tiptap.Toolbar.Italic',
+						'Umb.Tiptap.Toolbar.BulletList',
+						'Umb.Tiptap.Toolbar.OrderedList',
+						'Umb.Tiptap.Toolbar.Link',
+						'Umb.Tiptap.Toolbar.MediaPicker',
+						...(blockElementTypeIds.length ? ['Umb.Tiptap.Toolbar.BlockPicker'] : []),
+					],
+				],
+			],
+		},
+		{
+			alias: 'extensions',
+			value: [
+				'Umb.Tiptap.RichTextEssentials',
+				'Umb.Tiptap.Figure',
+				'Umb.Tiptap.Image',
+				'Umb.Tiptap.Link',
+				'Umb.Tiptap.MediaUpload',
+				'Umb.Tiptap.Blockquote',
+				'Umb.Tiptap.Bold',
+				'Umb.Tiptap.BulletList',
+				'Umb.Tiptap.Heading',
+				'Umb.Tiptap.Italic',
+				'Umb.Tiptap.OrderedList',
+				'Umb.Tiptap.TrailingNode',
+				...(blockElementTypeIds.length ? ['Umb.Tiptap.Block'] : []),
+			],
+		},
+		{ alias: 'maxImageSize', value: 500 },
+		...(blockElementTypeIds.length
+			? [
+					{
+						alias: 'blocks',
+						value: blockElementTypeIds.map((contentElementTypeKey) => ({
+							contentElementTypeKey,
+							displayInline: true,
+							label: '',
+							editorSize: 'medium',
+							forceHideContentEditorInOverlay: false,
+						})),
+					},
+				]
+			: []),
+	]);
+
 const SIZES = [
 	'50',
 	'56',
@@ -146,41 +200,10 @@ export const data: Array<UmbMockDataTypeModel> = [
 		'Umb.PropertyEditorUi.TextArea',
 		[{ alias: 'maxChars', value: 160 }],
 	),
-	dataType(DATA_TYPE_IDS.richTextEditor, 'Richtext editor', 'Umbraco.RichText', 'Umb.PropertyEditorUi.Tiptap', [
-		{
-			alias: 'toolbar',
-			value: [
-				[
-					[
-						'Umb.Tiptap.Toolbar.StyleSelect',
-						'Umb.Tiptap.Toolbar.Bold',
-						'Umb.Tiptap.Toolbar.Italic',
-						'Umb.Tiptap.Toolbar.BulletList',
-						'Umb.Tiptap.Toolbar.OrderedList',
-						'Umb.Tiptap.Toolbar.Link',
-						'Umb.Tiptap.Toolbar.MediaPicker',
-					],
-				],
-			],
-		},
-		{
-			alias: 'extensions',
-			value: [
-				'Umb.Tiptap.RichTextEssentials',
-				'Umb.Tiptap.Figure',
-				'Umb.Tiptap.Image',
-				'Umb.Tiptap.Link',
-				'Umb.Tiptap.MediaUpload',
-				'Umb.Tiptap.Blockquote',
-				'Umb.Tiptap.Bold',
-				'Umb.Tiptap.BulletList',
-				'Umb.Tiptap.Heading',
-				'Umb.Tiptap.Italic',
-				'Umb.Tiptap.OrderedList',
-				'Umb.Tiptap.TrailingNode',
-			],
-		},
-		{ alias: 'maxImageSize', value: 500 },
+	richTextEditor(DATA_TYPE_IDS.richTextEditor, 'Richtext editor'),
+	richTextEditor(DATA_TYPE_IDS.articleRichTextEditor, 'Richtext editor (Article)', [
+		DOCUMENT_TYPE_IDS.productTeaserBlock,
+		DOCUMENT_TYPE_IDS.articleTeaserBlock,
 	]),
 	dataType(
 		DATA_TYPE_IDS.mediaPicker,

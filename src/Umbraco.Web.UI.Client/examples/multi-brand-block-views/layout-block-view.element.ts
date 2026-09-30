@@ -13,11 +13,8 @@ export class ExampleLayoutBlockView
 	layout?: UmbBlockGridLayoutModel;
 
 	override render() {
-		const columns = this.layout?.areas?.length ?? 1;
-
 		return html`
 			<div class="layout">
-				<span class="eyebrow">${columns === 1 ? 'One column' : `${columns} columns`}</span>
 				<umb-block-grid-areas-container draggable="false"></umb-block-grid-areas-container>
 			</div>
 		`;

@@ -26,6 +26,7 @@ import {
 	invariantTextValue,
 	mediaPickerValue,
 	richTextValue,
+	rteInlineBlockTag,
 	tagsValue,
 	textValue,
 	textareaValue,
@@ -253,7 +254,7 @@ const AUTHORS: Record<UmbMbcsSiteCode, Array<string>> = {
 	GU: ['Anders Vinther', 'Camilla Dahl', 'Mikkel Skov', 'Freja Winther', 'Jesper Toft'],
 };
 
-const relatedProductIds = (
+const relatedProductNumbers = (
 	site: UmbMbcsSiteCode,
 	productRows: Array<UmbMbcsProductRow>,
 	articleTags: Array<string>,
@@ -271,7 +272,7 @@ const relatedProductIds = (
 				((a.number + articleNumber) % productRows.length) - ((b.number + articleNumber) % productRows.length),
 		)
 		.slice(0, 3)
-		.map((candidate) => productId(site, candidate.number));
+		.map((candidate) => candidate.number);
 };
 
 const buildArticles = (
@@ -287,12 +288,15 @@ const buildArticles = (
 		const siteName = SITES[site].name;
 		const publishDate = new Date(Date.UTC(2026, 8, 1) - number * 3 * DAY_IN_MS);
 		const teaser = `${title}: practical advice from the team at ${siteName} on ${tags.slice(0, 2).join(' and ').toLowerCase()}.`;
-		const markup = [
-			`<h2>${title}</h2>`,
-			`<p>${teaser}</p>`,
-			`<p>This guide covers ${tags.join(', ').toLowerCase()}, with tips you can put to use straight away.</p>`,
-			'<ul><li>Start with what you already own</li><li>Choose quality over quantity</li><li>Look after your clothes so they last</li></ul>',
-		].join('');
+		const relatedNumbers = relatedProductNumbers(site, productRows, tags, number);
+		const markup = ([teaserKey]: Array<string>) =>
+			[
+				`<h2>${title}</h2>`,
+				`<p>${teaser}</p>`,
+				`<p>${rteInlineBlockTag(teaserKey)}</p>`,
+				`<p>This guide covers ${tags.join(', ').toLowerCase()}, with tips you can put to use straight away.</p>`,
+				'<ul><li>Start with what you already own</li><li>Choose quality over quantity</li><li>Look after your clothes so they last</li></ul>',
+			].join('');
 		const heroImageId = articleImageId(site, articleCategoryIndex(number));
 
 		return createDocument({
@@ -307,11 +311,14 @@ const buildArticles = (
 			values: [
 				...textareaValue('teaser', teaser),
 				...mediaPickerValue('heroImage', heroImageId),
-				...richTextValue('text', markup),
+				...richTextValue('text', markup, [productTeaser(site, relatedNumbers[0], 'Related product')]),
 				...textValue('author', AUTHORS[site][number % AUTHORS[site].length]),
 				...dateValue('publishDate', isoDate(publishDate).slice(0, 10)),
 				...tagsValue('tags', tags),
-				...documentPickerValue('relatedProducts', relatedProductIds(site, productRows, tags, number)),
+				...documentPickerValue(
+					'relatedProducts',
+					relatedNumbers.map((relatedNumber) => productId(site, relatedNumber)),
+				),
 				...seoValues(siteName, title, teaser, { ogImageId: heroImageId }),
 			],
 		});
@@ -593,9 +600,6 @@ const buildPages = (
 				hasChildren: (entry.children?.length ?? 0) > 0,
 				updateDate: '2026-09-01T10:00:00.000Z',
 				values: [
-					...textValue('herotitle', entry.name),
-					...textareaValue('heroDescription', `Everything you need to know about ${entry.name.toLowerCase()}.`),
-					...mediaPickerValue('heroImage', heroMediaId(site)),
 					...(isFirstLevel ? blockGridValue('content', landingBlocks(site, entry.name, index, hidden)) : []),
 					...seoValues(siteName, entry.name, `Everything you need to know about ${entry.name.toLowerCase()}.`, {
 						excludeFromSitemap: hidden,

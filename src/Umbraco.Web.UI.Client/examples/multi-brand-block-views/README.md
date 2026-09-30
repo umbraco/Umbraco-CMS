@@ -10,6 +10,8 @@ Each view renders its block as it would look on the site, instead of the default
 - **Product Teaser** - the picked product's picture, name, price and stock status, plus the block's label.
 - **Article Teaser** - the picked article's hero image, title and teaser.
 
+The two teaser views also apply when the teasers are inserted into a Rich Text Editor, as in the article text.
+
 - **One / Two Column Layout** - a dashed frame with a label, and extra spacing around the areas.
 
 ## How it works

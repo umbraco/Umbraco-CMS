@@ -97,7 +97,6 @@ const documentType = (options: UmbMbcsDocumentTypeOptions): UmbMockDocumentTypeM
 const seoTab = tab('SEO', 10);
 const pageContentTab = tab('Content');
 const siteTab = tab('Site', 1);
-const contentPageTab = tab('Content');
 const productsTab = tab('Content');
 const articlesTab = tab('Content');
 const storesTab = tab('Content');
@@ -196,18 +195,6 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		alias: 'contentPage',
 		name: 'Content Page',
 		icon: 'icon-document',
-		containers: [contentPageTab],
-		properties: [
-			{ alias: 'herotitle', name: 'Title', dataTypeId: textstring, container: contentPageTab.id, varies: true },
-			{
-				alias: 'heroDescription',
-				name: 'Description',
-				dataTypeId: textarea,
-				container: contentPageTab.id,
-				varies: true,
-			},
-			{ alias: 'heroImage', name: 'Image', dataTypeId: mediaPicker, container: contentPageTab.id },
-		],
 		allowedChildren: [DOCUMENT_TYPE_IDS.contentPage],
 		compositions: [DOCUMENT_TYPE_IDS.seoComposition, DOCUMENT_TYPE_IDS.pageContentComposition],
 	}),
@@ -290,7 +277,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			{
 				alias: 'text',
 				name: 'Text',
-				dataTypeId: DATA_TYPE_IDS.richTextEditor,
+				dataTypeId: DATA_TYPE_IDS.articleRichTextEditor,
 				container: articleTab.id,
 				varies: true,
 				mandatory: true,
