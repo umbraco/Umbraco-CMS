@@ -2263,25 +2263,23 @@ export class ContentUiHelper extends UiBaseLocators {
     await this.click(notificationOptionLocator);
   }
 
-  async switchLanguage(languageName: string) {
-    // :popover-open avoids a stale isVisible() read flipping the non-idempotent toggle the wrong way.
-    const isPopoverOpen = () => this.contentVariantPopover.evaluate(el => el.matches(':popover-open'));
-    const languageOptionLocator = this.contentVariantDropdown.locator('.culture-variant').filter({hasText: languageName});
+  // :popover-open avoids a stale isVisible() read flipping the non-idempotent toggle the wrong way.
+  private async setVariantSelectorPopoverOpen(open: boolean) {
     await expect(async () => {
-      if (!(await isPopoverOpen())) {
+      const isOpen = await this.contentVariantPopover.evaluate(el => el.matches(':popover-open'));
+      if (isOpen !== open) {
         await this.click(this.languageToggle);
       }
-      await expect(languageOptionLocator).toBeVisible({timeout: ConstantHelper.timeout.short});
+      expect(await this.contentVariantPopover.evaluate(el => el.matches(':popover-open'))).toBe(open);
     }).toPass({timeout: ConstantHelper.timeout.medium});
+  }
+
+  async switchLanguage(languageName: string) {
+    const languageOptionLocator = this.contentVariantDropdown.locator('.culture-variant').filter({hasText: languageName});
+    await this.setVariantSelectorPopoverOpen(true);
     await this.click(languageOptionLocator);
     await expect(languageOptionLocator).toContainClass('selected');
-    // Selecting an option doesn't reliably auto-close the popover; close it explicitly.
-    await expect(async () => {
-      if (await isPopoverOpen()) {
-        await this.click(this.languageToggle);
-      }
-      await expect(this.contentVariantDropdown).toBeHidden({timeout: ConstantHelper.timeout.short});
-    }).toPass({timeout: ConstantHelper.timeout.medium});
+    await this.setVariantSelectorPopoverOpen(false); // selecting an option doesn't reliably auto-close it
   }
 
   async clickAddBlockListElementWithName(blockName: string) {
