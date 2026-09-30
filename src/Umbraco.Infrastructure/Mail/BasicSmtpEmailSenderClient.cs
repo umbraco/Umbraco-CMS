@@ -29,16 +29,7 @@ namespace Umbraco.Cms.Infrastructure.Mail
         {
             using var client = new SmtpClient();
 
-            await client.ConnectAsync(
-                _globalSettings.Smtp!.Host!,
-                _globalSettings.Smtp.Port,
-                (SecureSocketOptions)(int)_globalSettings.Smtp.SecureSocketOptions);
-
-            if (!string.IsNullOrWhiteSpace(_globalSettings.Smtp.Username) &&
-                !string.IsNullOrWhiteSpace(_globalSettings.Smtp.Password))
-            {
-                await client.AuthenticateAsync(_globalSettings.Smtp.Username, _globalSettings.Smtp.Password);
-            }
+            await ConnectAndAuthenticateAsync(client, CancellationToken.None);
 
             var mimeMessage = message.ToMimeMessage(_globalSettings.Smtp!.From);
 
@@ -60,6 +51,30 @@ namespace Umbraco.Cms.Infrastructure.Mail
             else
             {
                 client.Send(mimeMessage);
+            }
+        }
+
+        /// <inheritdoc />
+        public async Task VerifyConnectionAsync(CancellationToken cancellationToken = default)
+        {
+            using var client = new SmtpClient();
+
+            await ConnectAndAuthenticateAsync(client, cancellationToken);
+            await client.DisconnectAsync(true, cancellationToken);
+        }
+
+        private async Task ConnectAndAuthenticateAsync(SmtpClient client, CancellationToken cancellationToken)
+        {
+            await client.ConnectAsync(
+                _globalSettings.Smtp!.Host!,
+                _globalSettings.Smtp.Port,
+                (SecureSocketOptions)(int)_globalSettings.Smtp.SecureSocketOptions,
+                cancellationToken);
+
+            if (!string.IsNullOrWhiteSpace(_globalSettings.Smtp.Username) &&
+                !string.IsNullOrWhiteSpace(_globalSettings.Smtp.Password))
+            {
+                await client.AuthenticateAsync(_globalSettings.Smtp.Username, _globalSettings.Smtp.Password, cancellationToken);
             }
         }
     }

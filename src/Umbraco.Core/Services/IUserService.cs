@@ -449,6 +449,11 @@ public interface IUserService : IMembershipUserService
     /// </summary>
     /// <param name="userEmail">The email address of the user.</param>
     /// <returns>An attempt indicating if the operation was successful as well as a more detailed <see cref="UserOperationStatus"/>.</returns>
+    /// <remarks>
+    ///     <see cref="UserOperationStatus.PasswordResetUnavailable"/> is determined before the user is looked up, so it does not
+    ///     reveal whether the email belongs to a user. A failure to send the message is logged and returned as
+    ///     <see cref="UserOperationStatus.UnknownFailure"/> rather than thrown.
+    /// </remarks>
     Task<Attempt<UserOperationStatus>> SendResetPasswordEmailAsync(string userEmail);
 
     /// <summary>

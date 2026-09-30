@@ -37,6 +37,10 @@ public abstract class SecurityControllerBase : ManagementApiControllerBase
                 .WithTitle("Application URL not configured")
                 .WithDetail("The application URL is not configured. Set Umbraco:CMS:WebRouting:UmbracoApplicationUrl in configuration, or change Umbraco:CMS:WebRouting:ApplicationUrlDetection to 'FirstRequest' or 'EveryRequest'.")
                 .Build()),
+            UserOperationStatus.PasswordResetUnavailable => BadRequest(problemDetailsBuilder
+                .WithTitle("Password reset unavailable")
+                .WithDetail("Password reset is not currently available because the email could not be sent.")
+                .Build()),
             _ => StatusCode(StatusCodes.Status500InternalServerError, problemDetailsBuilder
                 .WithTitle("Unknown user operation status.")
                 .Build()),

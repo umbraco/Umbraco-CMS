@@ -60,13 +60,50 @@ public class EmailSender : IEmailSender
         await SendAsyncInternal(message, emailType, enableNotification, expires);
 
     /// <inheritdoc/>
+    [Obsolete("Please use IsEmailConfigured to check configuration only, or IsEmailAvailableAsync to also check that the transport can currently be reached. Scheduled for removal in Umbraco 19.")]
+    public bool CanSendRequiredEmail() => IsEmailConfigured();
+
+    /// <inheritdoc/>
     /// <remarks>
     ///     We assume this is possible if either an event handler is registered or an smtp server is configured
     ///     or a pickup directory location is configured.
     /// </remarks>
-    public bool CanSendRequiredEmail() => _globalSettings.IsSmtpServerConfigured
-                                          || _globalSettings.IsPickupDirectoryLocationConfigured
-                                          || _notificationHandlerRegistered;
+    public bool IsEmailConfigured() => _globalSettings.IsSmtpServerConfigured
+                                       || _globalSettings.IsPickupDirectoryLocationConfigured
+                                       || _notificationHandlerRegistered;
+
+    /// <inheritdoc/>
+    /// <remarks>
+    ///     Only the SMTP transport is probed. A registered notification handler cannot be probed, and a pickup directory
+    ///     only requires a local file write, so both are assumed to be available.
+    /// </remarks>
+    public async Task<bool> IsEmailAvailableAsync(CancellationToken cancellationToken = default)
+    {
+        if (UsesSmtpTransport() is false)
+        {
+            return IsEmailConfigured();
+        }
+
+        try
+        {
+            await _emailSenderClient.VerifyConnectionAsync(cancellationToken);
+            return true;
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException || cancellationToken.IsCancellationRequested is false)
+        {
+            _logger.LogWarning(
+                ex,
+                "Could not connect to the SMTP server at {SmtpHost}:{SmtpPort}.",
+                _globalSettings.Smtp?.Host,
+                _globalSettings.Smtp?.Port);
+            return false;
+        }
+    }
+
+    private bool UsesSmtpTransport()
+        => _globalSettings.IsSmtpServerConfigured
+           && _notificationHandlerRegistered is false
+           && (_globalSettings.IsPickupDirectoryLocationConfigured is false || string.IsNullOrWhiteSpace(_globalSettings.Smtp?.From));
 
     private async Task SendAsyncInternal(EmailMessage message, string emailType, bool enableNotification, TimeSpan? expires)
     {

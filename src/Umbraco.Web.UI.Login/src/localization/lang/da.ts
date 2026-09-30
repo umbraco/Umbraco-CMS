@@ -27,6 +27,7 @@ export default {
 		userFailedLogin: 'Ups! Vi kunne ikke logge dig ind. Tjek at dit brugernavn og adgangskode er korrekt og prøv igen.',
 		userLockedOut: 'Din konto er blevet låst. Prøv igen senere.',
 		receivedErrorFromServer: 'Der skete en fejl på serveren',
+		passwordResetUnavailable: 'Beklager, nulstilling af adgangskode er ikke tilgængelig i øjeblikket. Prøv igen senere, eller kontakt din administrator.',
 		resetCodeExpired: 'Det link, du har klikket på, er ugyldigt eller udløbet',
 		userInviteWelcomeMessage:
 			'Hej og velkommen til Umbraco! På bare 1 minut vil du være klar til at komme i gang, vi skal bare have dig til at oprette en adgangskode.',
