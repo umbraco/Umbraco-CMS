@@ -1,6 +1,12 @@
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
-export type UmbPropertyEditorUIPickerModalData = object;
+export type UmbPropertyEditorUIPickerModalData = {
+	/**
+	 * Whether to offer the Property Editor UIs that are deprecated.
+	 * @default false
+	 */
+	offerDeprecated?: boolean;
+};
 
 export type UmbPropertyEditorUIPickerModalValue = {
 	selection: Array<string>;

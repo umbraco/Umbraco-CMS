@@ -1,4 +1,4 @@
-import {test} from '@umbraco/acceptance-test-helpers';
+import {ConstantHelper, test} from '@umbraco/acceptance-test-helpers';
 import {expect} from "@playwright/test";
 
 const propertyEditorName = 'Slider';
@@ -74,4 +74,19 @@ test('can update step size value', async ({umbracoApi, umbracoUi}) => {
 
   // Assert
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'step', stepSizeValue)).toBeTruthy();
+});
+
+test('the settings of a slider are correct', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  await umbracoApi.dataType.createSliderDataType(customDataTypeName);
+
+  // Act
+  await umbracoUi.dataType.goToDataType(customDataTypeName);
+
+  // Assert
+  // The range values moved to the range slider, so a slider no longer offers them.
+  await umbracoUi.dataType.doesSettingHaveValue(ConstantHelper.sliderSettings);
+  await umbracoUi.dataType.doesSettingItemsHaveCount(ConstantHelper.sliderSettings);
+  await umbracoUi.dataType.doesPropertyEditorHaveAlias(editorAlias);
+  await umbracoUi.dataType.doesPropertyEditorHaveUiAlias(editorUiAlias);
 });

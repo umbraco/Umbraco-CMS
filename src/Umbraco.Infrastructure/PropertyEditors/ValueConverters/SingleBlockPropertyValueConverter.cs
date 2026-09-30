@@ -1,4 +1,4 @@
-// Copyright (c) Umbraco.
+﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using Microsoft.Extensions.DependencyInjection;
@@ -110,7 +110,11 @@ public class SingleBlockPropertyValueConverter : PropertyValueConverterBase, IDe
         => propertyType.EditorAlias.InvariantEquals(Constants.PropertyEditors.Aliases.SingleBlock);
 
     /// <inheritdoc />
-    public override Type GetPropertyValueType(IPublishedPropertyType propertyType) => typeof( BlockListItem);
+    /// <remarks>
+    /// The model is untyped because the editor holds one block chosen from all the element types its data type
+    /// allows, so which element type a property holds is not known from its configuration.
+    /// </remarks>
+    public override Type GetPropertyValueType(IPublishedPropertyType propertyType) => typeof(BlockListItem);
 
     /// <inheritdoc />
     public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
