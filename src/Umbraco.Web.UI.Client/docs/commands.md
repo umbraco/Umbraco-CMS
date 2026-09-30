@@ -167,11 +167,8 @@ npm run storybook:preview
 ### Package Management
 
 ```bash
-# Validate package exports and peer dependencies
+# Validate package exports and the extension template's @hey-api/openapi-ts version
 npm run package:validate
-
-# Refresh the snapshot of the published peer dependencies (after an intended change)
-npm run package:update-peer-baseline
 
 # Prepare for npm publish
 npm run prepack
