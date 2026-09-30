@@ -12,6 +12,8 @@ const baselineFile = resolve(import.meta.dirname, 'peer-dependencies.baseline.js
 const baselineFileName = relative(clientProjectRoot, baselineFile);
 
 const readJson = (file) => JSON.parse(readFileSync(file, 'utf8'));
+// A fixed locale keeps the baseline's order the same on every machine
+const byName = (a, b) => a.localeCompare(b, 'en');
 
 const packageJson = readJson(resolve(clientProjectRoot, 'package.json'));
 const dependencies = await listPeerDependencies(packageJson, { cwd: clientProjectRoot });
@@ -56,7 +58,7 @@ const templatePackageJson = readJson(resolve(templateFolder, 'package.json'));
 
 // An extension that depends on the previous floor with a caret range must still satisfy the published peer dependencies
 if (process.argv.includes('--update-baseline')) {
-	const sortedNames = Object.keys(peerDependencies).sort();
+	const sortedNames = Object.keys(peerDependencies).sort(byName);
 	const snapshot = Object.fromEntries(sortedNames.map((name) => [name, peerDependencies[name]]));
 	writeFileSync(baselineFile, `${JSON.stringify(snapshot, null, '\t')}\n`, 'utf8');
 	console.log(`Updated ${baselineFileName}`);
@@ -65,7 +67,7 @@ if (process.argv.includes('--update-baseline')) {
 const baseline = existsSync(baselineFile) ? readJson(baselineFile) : {};
 const breakingChanges = [];
 const otherChanges = [];
-[...new Set([...Object.keys(baseline), ...Object.keys(peerDependencies)])].sort().forEach((name) => {
+[...new Set([...Object.keys(baseline), ...Object.keys(peerDependencies)])].sort(byName).forEach((name) => {
 	const before = baseline[name];
 	const after = peerDependencies[name];
 	if (before === after) return;
