@@ -29,6 +29,7 @@ const secondTextName = 'SecondText';
 
 test.beforeEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
+  await umbracoApi.language.ensureIsoCodeNotExists(secondCulture);
   await umbracoApi.language.createDanishLanguage();
   textStringDataType = await umbracoApi.dataType.getByName(textStringDataTypeName);
 });

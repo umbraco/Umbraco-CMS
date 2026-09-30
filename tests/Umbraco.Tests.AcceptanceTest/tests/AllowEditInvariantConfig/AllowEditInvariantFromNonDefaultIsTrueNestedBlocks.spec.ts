@@ -62,6 +62,7 @@ const formatCombo = (tc: typeof matrixCases[number]): string =>
   `, text=${tc.text ? 'Varies by culture' : 'Shared'}`;
 
 test.beforeEach(async ({umbracoApi, umbracoUi}) => {
+  await umbracoApi.language.ensureIsoCodeNotExists(secondCulture);
   await umbracoApi.language.createDanishLanguage();
   const textStringDataType = await umbracoApi.dataType.getByName(textStringDataTypeName);
   textStringDataTypeId = textStringDataType.id;

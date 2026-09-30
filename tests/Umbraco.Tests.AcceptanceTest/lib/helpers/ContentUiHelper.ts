@@ -55,6 +55,7 @@ export class ContentUiHelper extends UiBaseLocators {
   private readonly addMultipleTextStringBtn: Locator;
   private readonly multipleTextStringValueTxt: Locator;
   private readonly sliderInput: Locator;
+  private readonly focalPointImg: Locator;
   private readonly tabItems: Locator;
   private readonly documentWorkspace: Locator;
   private readonly selectAVariantBtn: Locator;
@@ -181,7 +182,6 @@ export class ContentUiHelper extends UiBaseLocators {
   private readonly modalFormValidationMessage: Locator;
   private readonly treePickerSearchTxt: Locator;
   private readonly treePickerSearchTabBtn: Locator;
-  private readonly searchTabInPickerModal: Locator;
   private readonly mediaPickerSearchTxt: Locator;
   private readonly memberPickerSearchTxt: Locator;
   private readonly documentCreateOptionsModal: Locator;
@@ -276,6 +276,8 @@ export class ContentUiHelper extends UiBaseLocators {
       .locator("umb-input-multiple-text-string")
       .getByLabel("Value");
     this.sliderInput = page.locator("umb-property-editor-ui-slider #input");
+    // Scoped: umb-image-cropper and umb-image-cropper-preview also render #image.
+    this.focalPointImg = page.locator("umb-image-cropper-focus-setter #image");
     this.tabItems = page.locator("uui-tab");
     this.documentWorkspace = page.locator("umb-document-workspace-editor");
     this.selectAVariantBtn = page.getByRole("button", {
@@ -346,8 +348,9 @@ export class ContentUiHelper extends UiBaseLocators {
     this.sortChildrenBtn = page.getByRole('button', {name: 'Sort children'});
     this.rollbackBtn = this.documentWorkspace.locator('[data-mark="audit-log-action:Umb.AuditLogAction.Document.Rollback"]');
     this.sortByFieldTab = page.getByTestId('sort-children-of-modal:tab-by-field');
-    this.sortByFieldSelect = page.locator('umb-sort-children-of-document-modal [label="Sort by field"] select');
-    this.sortByFieldDirectionSelect = page.locator('umb-sort-children-of-document-modal [label="Direction"] select');
+    // Each tree registers its own subclassed modal tag, which does not answer to its parent's.
+    this.sortByFieldSelect = page.locator('#sort-by-field [label="Sort by field"] select');
+    this.sortByFieldDirectionSelect = page.locator('#sort-by-field [label="Direction"] select');
     this.publishModalBtn = this.backofficeModalContainer.getByLabel('Publish', {exact: true});
     this.unpublishModalBtn = this.backofficeModalContainer.getByLabel('Unpublish', {exact: true});
     this.rollbackContainerBtn = this.container.getByLabel("Rollback");
@@ -499,8 +502,10 @@ export class ContentUiHelper extends UiBaseLocators {
     this.cascadingMenuContainer = page.locator('umb-cascading-menu-popover uui-scroll-container');
     this.modalFormValidationMessage = this.sidebarModal.locator('umb-form-validation-message #messages');
     this.treePickerSearchTxt = this.sidebarModal.locator('[data-mark="picker:search-input"] #input');
-    this.treePickerSearchTabBtn = this.page.locator('umb-tree-picker-modal').locator('uui-tab[data-mark="picker:tab:search"]');
-    this.searchTabInPickerModal = this.sidebarModal.locator('[data-mark="picker:tab:search"]');
+    // Scoped to the generic modal-sidebar wrapper, not a specific picker tag, since different entity
+    // pickers (e.g. umb-document-picker-modal) use their own modal element. .last() picks the topmost
+    // if modals are stacked.
+    this.treePickerSearchTabBtn = this.sidebarModal.locator('uui-tab[data-mark="picker:tab:search"]').last();
     this.mediaPickerSearchTxt = this.page.locator('umb-media-picker-modal #search #input');
     this.memberPickerSearchTxt = this.page.locator('umb-member-picker-modal #input');
     // Property Actions
@@ -974,8 +979,18 @@ export class ContentUiHelper extends UiBaseLocators {
   }
 
   async setFocalPoint(widthPercentage: number = 50, heightPercentage: number = 50) {
-    await this.page.waitForTimeout(ConstantHelper.wait.medium);
-    const element = await this.page.locator('#image').boundingBox();
+    await expect(this.focalPointImg).toBeVisible();
+    // The drag uses the rendered box, so wait for layout to settle rather than for the image to load.
+    let previousWidth = -1;
+    await expect.poll(async () => {
+      const box = await this.focalPointImg.boundingBox();
+      const width = box?.width ?? 0;
+      const settled = width > 0 && width === previousWidth;
+      previousWidth = width;
+      return settled;
+    }, {timeout: ConstantHelper.timeout.medium}).toBeTruthy();
+
+    const element = await this.focalPointImg.boundingBox();
     if (!element) {
       throw new Error('Element not found');
     }
@@ -2123,7 +2138,6 @@ export class ContentUiHelper extends UiBaseLocators {
   }
 
   async enterSearchKeywordInTreePickerModal(keyword: string) {
-    await this.click(this.searchTabInPickerModal);
     // The search input lives behind the modal's Search tab and is not visible while the Browse tab is active.
     await this.click(this.treePickerSearchTabBtn);
     await this.enterText(this.treePickerSearchTxt, keyword);
@@ -2251,6 +2265,8 @@ export class ContentUiHelper extends UiBaseLocators {
 
   async enterBlockPropertyValue(propertyName: string, value: string) {
     const property = this.blockProperty.filter({hasText: propertyName});
+    // The block workspace renders its properties asynchronously once the block type is chosen.
+    await this.waitForVisible(property, ConstantHelper.timeout.long);
     await this.enterText(property.locator('input'), value);
   }
 
@@ -2321,7 +2337,7 @@ export class ContentUiHelper extends UiBaseLocators {
   }
 
   async clickSaveModalButtonAndWaitForDocumentBlueprintToBeCreated() {
-    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.documentBlueprint, this.click(this.documentBlueprintSaveBtn), ConstantHelper.statusCodes.created);
+    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.documentBlueprint, () => this.click(this.documentBlueprintSaveBtn), ConstantHelper.statusCodes.created);
   }
 
   async clickSaveModalButtonAndWaitForNotificationToBeCreated() {
