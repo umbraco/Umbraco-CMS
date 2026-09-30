@@ -23,6 +23,13 @@ if (!backofficeRange || !templateRange) {
 	process.exit(1);
 }
 
+if (!semver.validRange(templateRange) || !semver.validRange(backofficeRange)) {
+	console.error(
+		`--- ${packageName} must use a semver range in both places (template: ${templateRange}, backoffice: ${backofficeRange}) ---`,
+	);
+	process.exit(1);
+}
+
 if (!semver.subset(templateRange, backofficeRange)) {
 	console.error(`--- ${packageName} in the Umbraco Extension template is outside the backoffice's range ---
 
