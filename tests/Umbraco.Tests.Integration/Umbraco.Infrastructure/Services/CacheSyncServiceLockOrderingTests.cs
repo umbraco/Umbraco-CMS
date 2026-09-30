@@ -351,6 +351,14 @@ internal sealed class CacheSyncServiceLockOrderingTests : UmbracoIntegrationTest
     [Test]
     public void SyncInternal_Runs_Safely_Alongside_SyncAll()
     {
+        if (BaseTestDatabase.IsSqlite())
+        {
+            // SQLite allows a single writer: a scope that started reading and then persists the checkpoint cannot
+            // become a writer once another writer has committed, so the concurrent callers here stall on the busy
+            // timeout instead of contending on a row. Load balancing, and with it the inline sync, is not a SQLite scenario.
+            Assert.Ignore("Concurrent checkpoint writers stall on SQLite's single-writer model; this scenario is verified on SQL Server.");
+        }
+
         InitialiseLocalContentCacheVersion();
         DeliverRemoteInstructions(ContentRefreshNodeInstruction(Textpage), RecordingInstruction());
 
