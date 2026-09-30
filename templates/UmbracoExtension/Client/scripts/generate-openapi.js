@@ -35,15 +35,15 @@ fetch(swaggerUrl).then(async (response) => {
     input: swaggerUrl,
     output: 'src/api',
     plugins: [
-      // Spread defaults so future @hey-api/openapi-ts additions come along automatically,
-      // but filter out @hey-api/sdk because we override its options below.
-      ...defaultPlugins.filter((plugin) => (typeof plugin === 'string' ? plugin : plugin.name) !== '@hey-api/sdk'),
+      ...defaultPlugins,
+      {
+        name: '@hey-api/client-fetch',
+        runtimeConfigPath: '../hey-api',
+      },
       {
         name: '@hey-api/sdk',
-        operations: {
-          strategy: 'byTags',
-          containerName: '{{name}}Service',
-        },
+        asClass: true,
+        classNameBuilder: '{{name}}Service',
       }
     ],
   });

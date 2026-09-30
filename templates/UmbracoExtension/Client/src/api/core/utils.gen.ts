@@ -13,9 +13,9 @@ export interface PathSerializer {
   url: string;
 }
 
-export const PATH_PARAM_RE: RegExp = /\{[^{}]+\}/g;
+export const PATH_PARAM_RE = /\{[^{}]+\}/g;
 
-export const defaultPathSerializer = ({ path, url: _url }: PathSerializer): string => {
+export const defaultPathSerializer = ({ path, url: _url }: PathSerializer) => {
   let url = _url;
   const matches = _url.match(PATH_PARAM_RE);
   if (matches) {
@@ -44,7 +44,10 @@ export const defaultPathSerializer = ({ path, url: _url }: PathSerializer): stri
       }
 
       if (Array.isArray(value)) {
-        url = url.replace(match, serializeArrayParam({ explode, name, style, value }));
+        url = url.replace(
+          match,
+          serializeArrayParam({ explode, name, style, value }),
+        );
         continue;
       }
 
@@ -94,7 +97,7 @@ export const getUrl = ({
   query?: Record<string, unknown>;
   querySerializer: QuerySerializer;
   url: string;
-}): string => {
+}) => {
   const pathUrl = _url.startsWith('/') ? _url : `/${_url}`;
   let url = (baseUrl ?? '') + pathUrl;
   if (path) {
@@ -114,7 +117,7 @@ export function getValidRequestBody(options: {
   body?: unknown;
   bodySerializer?: BodySerializer | null;
   serializedBody?: unknown;
-}): unknown {
+}) {
   const hasBody = options.body !== undefined;
   const isSerializedBody = hasBody && options.bodySerializer;
 
@@ -126,7 +129,7 @@ export function getValidRequestBody(options: {
       return hasSerializedBody ? options.serializedBody : null;
     }
 
-    // not all clients implement a serializedBody property (i.e., client-axios)
+    // not all clients implement a serializedBody property (i.e. client-axios)
     return options.body !== '' ? options.body : null;
   }
 
