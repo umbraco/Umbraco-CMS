@@ -1,7 +1,11 @@
 import { UMB_DOCUMENT_BLUEPRINT_TREE_ALIAS } from '../tree/constants.js';
 import { UMB_DOCUMENT_BLUEPRINT_ROOT_ENTITY_TYPE } from '../entity.js';
 import { UMB_DOCUMENT_BLUEPRINT_WORKSPACE_ALIAS } from '../workspace/constants.js';
-import { UMB_DOCUMENT_BLUEPRINT_MENU_ALIAS, UMB_DOCUMENT_BLUEPRINT_MENU_ITEM_ALIAS } from './constants.js';
+import {
+	UMB_DOCUMENT_BLUEPRINT_MENU_ALIAS,
+	UMB_DOCUMENT_BLUEPRINT_MENU_ITEM_ALIAS,
+	UMB_DOCUMENT_BLUEPRINT_SIDEBAR_APP_ALIAS,
+} from './constants.js';
 import { UMB_LIBRARY_SECTION_ALIAS } from '@umbraco-cms/backoffice/library';
 import { UMB_SECTION_ALIAS_CONDITION_ALIAS } from '@umbraco-cms/backoffice/section';
 import { UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
@@ -31,7 +35,7 @@ const menuItem: ManifestMenuItemTreeKind = {
 const sectionSidebarApp: ManifestSectionSidebarAppMenuWithEntityActionsKind = {
 	type: 'sectionSidebarApp',
 	kind: 'menuWithEntityActions',
-	alias: 'Umb.SidebarMenu.DocumentBlueprint',
+	alias: UMB_DOCUMENT_BLUEPRINT_SIDEBAR_APP_ALIAS,
 	name: 'Document Blueprint Sidebar Menu',
 	weight: 90,
 	meta: {
