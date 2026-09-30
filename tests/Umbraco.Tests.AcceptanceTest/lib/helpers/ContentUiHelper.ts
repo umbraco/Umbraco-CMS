@@ -195,7 +195,6 @@ export class ContentUiHelper extends UiBaseLocators {
   private readonly hostNameItem: Locator;
   private readonly languageToggle: Locator;
   private readonly contentVariantDropdown: Locator;
-  private readonly contentVariantPopover: Locator;
   private readonly blockProperty: Locator;
   private readonly linkPickerAddBtn: Locator;
   private readonly linkPickerCloseBtn: Locator;
@@ -517,7 +516,6 @@ export class ContentUiHelper extends UiBaseLocators {
     this.entityPickerTree = page.locator('umb-tree[alias="Umb.Tree.EntityDataPicker"]');
     this.languageToggle = page.getByTestId('input:entity-name').locator('#toggle');
     this.contentVariantDropdown = page.locator('umb-document-workspace-split-view-variant-selector uui-popover-container #dropdown');
-    this.contentVariantPopover = page.locator('umb-document-workspace-split-view-variant-selector uui-popover-container#popover');
     this.blockProperty = page.locator('umb-block-workspace-view-edit-property');
     // Multi URL Picker
     this.linkPickerAddBtn = this.linkPickerModal.getByRole('button', {
@@ -2263,24 +2261,11 @@ export class ContentUiHelper extends UiBaseLocators {
     await this.click(notificationOptionLocator);
   }
 
-  // Toggles the variant-selector popover to the given open/closed state, retrying via :popover-open
-  // (not isVisible(), which can read stale mid-animation and flip the non-idempotent toggle the wrong way).
-  private async setVariantSelectorPopoverOpen(open: boolean) {
-    const isPopoverOpen = () => this.contentVariantPopover.evaluate(el => el.matches(':popover-open'));
-    await expect(async () => {
-      if ((await isPopoverOpen()) !== open) {
-        await this.click(this.languageToggle);
-      }
-      expect(await isPopoverOpen()).toBe(open);
-    }).toPass({timeout: ConstantHelper.timeout.medium});
-  }
-
   async switchLanguage(languageName: string) {
+    await this.click(this.languageToggle);
     const languageOptionLocator = this.contentVariantDropdown.locator('.culture-variant').filter({hasText: languageName});
-    await this.setVariantSelectorPopoverOpen(true);
     await this.click(languageOptionLocator);
     await expect(languageOptionLocator).toContainClass('selected');
-    await this.setVariantSelectorPopoverOpen(false); // selecting an option doesn't reliably auto-close it
   }
 
   async clickAddBlockListElementWithName(blockName: string) {
