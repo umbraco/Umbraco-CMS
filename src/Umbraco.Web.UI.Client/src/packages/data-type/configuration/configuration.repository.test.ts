@@ -1,8 +1,6 @@
 import { useMockHandlers, resetMockHandlers } from '../../../../mocks/index.js';
-import {
-	UmbDataTypeConfigurationRepository,
-	resetUmbDataTypeConfigurationCache,
-} from './configuration.repository.js';
+import { _resetDataTypeConfigurationCacheForTesting } from './configuration.cache.js';
+import { UmbDataTypeConfigurationRepository } from './configuration.repository.js';
 import type { UmbDataTypeConfigurationModel } from './types.js';
 import { expect } from '@open-wc/testing';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
@@ -27,7 +25,7 @@ describe('UmbDataTypeConfigurationRepository', () => {
 
 	beforeEach(() => {
 		requestCount = 0;
-		resetUmbDataTypeConfigurationCache();
+		_resetDataTypeConfigurationCacheForTesting();
 		host = new UmbTestDataTypeConfigurationRepositoryHostElement();
 		document.body.appendChild(host);
 		repository = new UmbDataTypeConfigurationRepository(host);

@@ -1,11 +1,7 @@
+import { _getCachedDataTypeConfiguration } from './configuration.cache.js';
 import { UmbDataTypeConfigurationServerDataSource } from './configuration.server.data-source.js';
 import type { UmbDataTypeConfigurationModel } from './types.js';
 import { UmbRepositoryBase, type UmbRepositoryResponse } from '@umbraco-cms/backoffice/repository';
-
-/**
- * The cached data type configuration, shared across all repository instances.
- */
-let configurationPromise: Promise<UmbRepositoryResponse<UmbDataTypeConfigurationModel>> | undefined;
 
 /**
  * @description - Repository for Data Type configuration.
@@ -21,22 +17,9 @@ export class UmbDataTypeConfigurationRepository extends UmbRepositoryBase {
 	 * @returns {Promise<UmbRepositoryResponse<UmbDataTypeConfigurationModel>>} - The data type configuration.
 	 * @memberof UmbDataTypeConfigurationRepository
 	 */
-	async requestConfiguration(): Promise<UmbRepositoryResponse<UmbDataTypeConfigurationModel>> {
-		configurationPromise ??= this.#serverDataSource.getConfiguration();
-		const response = await configurationPromise;
-		if (response.error) {
-			configurationPromise = undefined;
-		}
-		return response;
+	requestConfiguration(): Promise<UmbRepositoryResponse<UmbDataTypeConfigurationModel>> {
+		return _getCachedDataTypeConfiguration(() => this.#serverDataSource.getConfiguration());
 	}
 }
 
 export { UmbDataTypeConfigurationRepository as api };
-
-/**
- * Test-only.
- * @internal
- */
-export function resetUmbDataTypeConfigurationCache(): void {
-	configurationPromise = undefined;
-}
