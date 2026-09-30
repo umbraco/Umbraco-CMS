@@ -2263,7 +2263,8 @@ export class ContentUiHelper extends UiBaseLocators {
     await this.click(notificationOptionLocator);
   }
 
-  // :popover-open avoids a stale isVisible() read flipping the non-idempotent toggle the wrong way.
+  // Toggles the variant-selector popover to the given open/closed state, retrying via :popover-open
+  // (not isVisible(), which can read stale mid-animation and flip the non-idempotent toggle the wrong way).
   private async setVariantSelectorPopoverOpen(open: boolean) {
     await expect(async () => {
       const isOpen = await this.contentVariantPopover.evaluate(el => el.matches(':popover-open'));
