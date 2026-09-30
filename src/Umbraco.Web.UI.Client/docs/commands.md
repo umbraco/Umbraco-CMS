@@ -167,7 +167,7 @@ npm run storybook:preview
 ### Package Management
 
 ```bash
-# Validate package exports
+# Validate package exports and peer dependencies
 npm run package:validate
 
 # Prepare for npm publish

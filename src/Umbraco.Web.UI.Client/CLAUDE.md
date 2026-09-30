@@ -174,11 +174,17 @@ When using `@umbraco-cms/backoffice`:
 - **Runtime comes from importmap**: The actual code at runtime is managed by the backoffice (importmap)
 - **Future compatibility**: When `@hey-api` hits `1.0.0`, the published range will automatically become `^1.0.0`
 
+### Validation
+
+`npm run package:validate` (part of `build:for:npm` and `build:for:cms`) computes the published peerDependencies from `src`, the same way `cleanse-pkg.js` does, and fails when the Umbraco Extension template (`templates/UmbracoExtension/Client/package.json`) pins one of them outside its published range. A new extension would otherwise fail `npm install` with ERESOLVE, so raise the template's range together with the backoffice's (and regenerate its committed API client if the generator's output changed).
+
 ### Key Files
 
-| File                            | Purpose                                                          |
-| ------------------------------- | ---------------------------------------------------------------- |
-| `package.json`                  | Root package with exports and workspace references               |
-| `devops/publish/cleanse-pkg.js` | Script that runs during `npm pack` to hoist and convert versions |
-| `src/external/*`                | Dependency wrapper packages                                      |
-| `src/packages/core`             | Contains `@hey-api/openapi-ts` and other utilities               |
+| File                                           | Purpose                                                                    |
+| ---------------------------------------------- | -------------------------------------------------------------------------- |
+| `package.json`                                 | Root package with exports and workspace references                         |
+| `devops/publish/cleanse-pkg.js`                | Script that runs during `npm pack` to hoist and convert versions           |
+| `devops/package/peer-dependencies.js`          | Computes the published peerDependencies (shared by cleanse and validation) |
+| `devops/package/validate-peer-dependencies.js` | Validates the published peerDependencies (part of `package:validate`)      |
+| `src/external/*`                               | Dependency wrapper packages                                                |
+| `src/packages/core`                            | Contains `@hey-api/openapi-ts` and other utilities                         |
