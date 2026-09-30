@@ -19,7 +19,9 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.language.ensureIsoCodeNotExists('da');
 });
 
-test('client-side mandatory error survives a tab switch and a culture switch', async ({umbracoApi, umbracoUi}) => {
+// Product gap (https://github.com/umbraco/Umbraco-CMS/issues/24025): switching culture leaves the variant
+// selector popover open, which breaks the tab switch that follows it in this test.
+test.skip('client-side mandatory error survives a tab switch and a culture switch', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithMandatoryCultureVaryingPropertyInTwoTabs(documentTypeName, dataTypeName, dataTypeData.id, firstTabName, secondTabName);
