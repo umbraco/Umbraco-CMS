@@ -297,10 +297,11 @@ namespace Umbraco.Cms
                 var processed = new HashSet<RefreshInstruction>();
                 var numberOfInstructionsProcessed = 0;
 
-                // The read gets a scope of its own, so that its transaction is committed before the cache refreshers
-                // run. Refreshing the caches for a large batch can take minutes, and holding a read transaction open
-                // on umbracoCacheInstruction for that long blocks writing new instructions - which is what every
-                // content or schema change on this server has to do.
+                // Outside an ambient scope (the periodic sync) the read gets a transaction of its own, so it is committed
+                // before the cache refreshers run. Refreshing the caches for a large batch can take minutes, and holding
+                // a read transaction open on umbracoCacheInstruction for that long blocks writing new instructions -
+                // which is what every content or schema change on this server has to do. Inside an ambient scope the
+                // read joins the caller's transaction.
                 List<CacheInstruction> pendingInstructions;
                 using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
                 {

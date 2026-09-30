@@ -336,7 +336,8 @@ public sealed class MediaCacheRefresher : PayloadCacheRefresherBase<MediaCacheRe
         if (_mediaNavigationManagementService.Add(media.Key, media.ContentType.Key, parentKey, media.SortOrder)
             || parentKey is null
             || media.Trashed
-            || ExistsInNavigation(parentKey.Value))
+            || ExistsInNavigation(parentKey.Value)
+            || ExistsInNavigationBin(parentKey.Value))
         {
             return;
         }

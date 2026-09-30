@@ -361,11 +361,12 @@ internal sealed class CacheSyncServiceLockOrderingTests : UmbracoIntegrationTest
 
     private SyncLockHolder HoldSyncLockOnAnotherThread() => new(GetSyncLock());
 
+    // Dedicated threads: the callers block on synchronous waits, which starves the pool when many fixtures run together.
     private static Task RunDetached(Action action)
     {
         using (ExecutionContext.SuppressFlow())
         {
-            return Task.Run(action);
+            return Task.Factory.StartNew(action, CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Default);
         }
     }
 

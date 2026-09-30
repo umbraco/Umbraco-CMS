@@ -459,7 +459,8 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
         if (_documentNavigationManagementService.Add(content.Key, content.ContentType.Key, parentKey, content.SortOrder)
             || parentKey is null
             || content.Trashed
-            || ExistsInNavigation(parentKey.Value))
+            || ExistsInNavigation(parentKey.Value)
+            || ExistsInNavigationBin(parentKey.Value))
         {
             return;
         }
