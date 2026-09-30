@@ -3,9 +3,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.ContentEditing;
-using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.PropertyEditors;
-using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 
@@ -24,7 +22,7 @@ internal partial class BlockListElementLevelVariationTests
         await LanguageService.CreateAsync(
             new Language("de-DE", "German"), Constants.Security.SuperUserKey);
         var userKey = updateWithLimitedUserAccess
-            ? (await CreateLimitedUser(true)).Key
+            ? (await CreateLimitedUser(hasAccessToInvariantForVariant: true)).Key
             : Constants.Security.SuperUserKey;
 
         var elementType = await CreateElementType(ContentVariation.Culture);
@@ -181,7 +179,7 @@ internal partial class BlockListElementLevelVariationTests
         await LanguageService.CreateAsync(
             new Language("de-DE", "German"), Constants.Security.SuperUserKey);
         var userKey = updateWithLimitedUserAccess
-            ? (await CreateLimitedUser(true)).Key
+            ? (await CreateLimitedUser(hasAccessToInvariantForVariant: true)).Key
             : Constants.Security.SuperUserKey;
 
         var elementType = await CreateElementType(ContentVariation.Culture);
@@ -313,7 +311,7 @@ internal partial class BlockListElementLevelVariationTests
         await LanguageService.CreateAsync(
             new Language("de-DE", "German"), Constants.Security.SuperUserKey);
         var userKey = updateWithLimitedUserAccess
-            ? (await CreateLimitedUser(false)).Key
+            ? (await CreateLimitedUser(hasAccessToInvariantForVariant: false)).Key
             : Constants.Security.SuperUserKey;
 
         var elementType = await CreateElementType(ContentVariation.Culture);
@@ -474,7 +472,7 @@ internal partial class BlockListElementLevelVariationTests
         await LanguageService.CreateAsync(
             new Language("de-DE", "German"), Constants.Security.SuperUserKey);
         var userKey = updateWithLimitedUserAccess
-            ? (await CreateLimitedUser(false)).Key
+            ? (await CreateLimitedUser(hasAccessToInvariantForVariant: false)).Key
             : Constants.Security.SuperUserKey;
 
         var elementType = await CreateElementType(ContentVariation.Culture);
@@ -597,7 +595,7 @@ internal partial class BlockListElementLevelVariationTests
         await LanguageService.CreateAsync(
             new Language("de-DE", "German"), Constants.Security.SuperUserKey);
         var userKey = updateWithLimitedUserAccess
-            ? (await CreateLimitedUser(false)).Key
+            ? (await CreateLimitedUser(hasAccessToInvariantForVariant: false)).Key
             : Constants.Security.SuperUserKey;
 
         var elementType = await CreateElementType(ContentVariation.Culture);
@@ -761,7 +759,7 @@ internal partial class BlockListElementLevelVariationTests
         await LanguageService.CreateAsync(
             new Language("de-DE", "German"), Constants.Security.SuperUserKey);
         var userKey = updateWithLimitedUserAccess
-            ? (await CreateLimitedUser(true)).Key
+            ? (await CreateLimitedUser(hasAccessToInvariantForVariant: true)).Key
             : Constants.Security.SuperUserKey;
 
         var elementType = await CreateElementType(ContentVariation.Culture);
@@ -886,7 +884,7 @@ internal partial class BlockListElementLevelVariationTests
         await LanguageService.CreateAsync(
             new Language("de-DE", "German"), Constants.Security.SuperUserKey);
         var userKey = updateWithLimitedUserAccess
-            ? (await CreateLimitedUser(false)).Key
+            ? (await CreateLimitedUser(hasAccessToInvariantForVariant: false)).Key
             : Constants.Security.SuperUserKey;
 
         var elementType = await CreateElementType(ContentVariation.Culture);
@@ -989,7 +987,7 @@ internal partial class BlockListElementLevelVariationTests
         await LanguageService.CreateAsync(
             new Language("de-DE", "German"), Constants.Security.SuperUserKey);
         var userKey = updateWithLimitedUserAccess
-            ? (await CreateLimitedUser(false)).Key
+            ? (await CreateLimitedUser(hasAccessToInvariantForVariant: false)).Key
             : Constants.Security.SuperUserKey;
 
         var elementType = await CreateElementType(ContentVariation.Culture);
@@ -1134,7 +1132,7 @@ internal partial class BlockListElementLevelVariationTests
         await LanguageService.CreateAsync(
             new Language("de-DE", "German"), Constants.Security.SuperUserKey);
         var userKey = updateWithLimitedUserAccess
-            ? (await CreateLimitedUser(true)).Key
+            ? (await CreateLimitedUser(hasAccessToInvariantForVariant: true)).Key
             : Constants.Security.SuperUserKey;
         var nestedElementType = await CreateElementType(ContentVariation.Culture);
         var nestedBlockListDataType = await CreateBlockListDataType(nestedElementType);
@@ -1570,7 +1568,7 @@ internal partial class BlockListElementLevelVariationTests
         // Arrange: prepare an invariant block property whose element type varies by culture AND segment,
         // holding a value per culture and segment, and an editor restricted to Danish.
         var userKey = updateWithLimitedUserAccess
-            ? (await CreateLimitedUser(true)).Key
+            ? (await CreateLimitedUser(hasAccessToInvariantForVariant: true)).Key
             : Constants.Security.SuperUserKey;
 
         var elementType = await CreateElementType(ContentVariation.CultureAndSegment);
@@ -1661,7 +1659,7 @@ internal partial class BlockListElementLevelVariationTests
         // Arrange: prepare a culture invariant, segment variant block property holding a separate block
         // value per segment, each with a value per culture, and an editor restricted to Danish.
         var userKey = updateWithLimitedUserAccess
-            ? (await CreateLimitedUser(true)).Key
+            ? (await CreateLimitedUser(hasAccessToInvariantForVariant: true)).Key
             : Constants.Security.SuperUserKey;
 
         var elementType = await CreateElementType(ContentVariation.Culture);
@@ -1748,28 +1746,6 @@ internal partial class BlockListElementLevelVariationTests
             return JsonSerializer.Deserialize<BlockListValue>(savedBlocksValue)!.ContentData[0].Values
                 .Single(value => value.Alias == "variantText" && value.Culture == culture).Value as string;
         }
-    }
-
-    private async Task<IUser> CreateLimitedUser(bool hasAccessToInvariantForVariant)
-    {
-        var userGroupService = GetRequiredService<IUserGroupService>();
-        var userService = GetRequiredService<IUserService>();
-
-        var danish = await LanguageService.GetAsync("da-DK");
-        Assert.IsNotNull(danish);
-
-        var user = UserBuilder.CreateUser();
-        userService.Save(user);
-
-        var group = UserGroupBuilder.CreateUserGroup();
-        group.ClearAllowedLanguages();
-        group.AddAllowedLanguage(danish.Id);
-        group.HasAccessToInvariantForVariant = hasAccessToInvariantForVariant;
-
-        var userGroupResult = await userGroupService.CreateAsync(group, Constants.Security.SuperUserKey, [user.Key]);
-        Assert.IsTrue(userGroupResult.Success);
-
-        return user;
     }
 
     private void AddBlock(BlockListValue listValue, BlockItemData contentData, BlockItemData? settingsData, IContentType elementType)

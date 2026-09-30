@@ -1,11 +1,14 @@
 using Microsoft.Extensions.DependencyInjection;
+using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 
@@ -196,6 +199,28 @@ internal sealed partial class BlockListElementLevelVariationTests : BlockEditorE
         await ContentTypeService.CreateAsync(rootElementType, Constants.Security.SuperUserKey);
 
         return (rootElementType, nestedElementType);
+    }
+
+    private async Task<IUser> CreateLimitedUser(bool hasAccessToInvariantForVariant)
+    {
+        var userGroupService = GetRequiredService<IUserGroupService>();
+        var userService = GetRequiredService<IUserService>();
+
+        var danish = await LanguageService.GetAsync("da-DK");
+        Assert.IsNotNull(danish);
+
+        var user = UserBuilder.CreateUser();
+        userService.Save(user);
+
+        var group = UserGroupBuilder.CreateUserGroup();
+        group.ClearAllowedLanguages();
+        group.AddAllowedLanguage(danish.Id);
+        group.HasAccessToInvariantForVariant = hasAccessToInvariantForVariant;
+
+        var userGroupResult = await userGroupService.CreateAsync(group, Constants.Security.SuperUserKey, [user.Key]);
+        Assert.IsTrue(userGroupResult.Success);
+
+        return user;
     }
 
     private class BlockProperty

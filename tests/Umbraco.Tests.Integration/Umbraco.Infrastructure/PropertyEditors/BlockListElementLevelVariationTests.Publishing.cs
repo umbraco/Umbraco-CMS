@@ -1905,7 +1905,7 @@ internal partial class BlockListElementLevelVariationTests
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
         ContentService.Save(content);
 
-        var userId = (await CreateLimitedUser(false)).Id;
+        var userId = (await CreateLimitedUser(hasAccessToInvariantForVariant: false)).Id;
 
         PublishContent(content, contentType, ["da-DK"], userId);
 
