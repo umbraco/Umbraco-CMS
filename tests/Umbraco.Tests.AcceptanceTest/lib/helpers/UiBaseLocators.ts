@@ -688,7 +688,12 @@ export class UiBaseLocators extends BasePage {
     await this.click(this.caretBtn);
   }
 
-  async openCaretButtonForName(name: string) {
+  /** @param isInModal - @deprecated use {@link clickModalCaretButtonForName} instead; kept for backwards compatibility. */
+  async openCaretButtonForName(name: string, isInModal: boolean = false) {
+    if (isInModal) {
+      await this.clickModalCaretButtonForName(name);
+      return;
+    }
     const menuItem = this.getMenuItemByLabel(name).first();
     await this.waitForVisible(menuItem, ConstantHelper.timeout.long);
     // The caret toggles, so acting on a single read can collapse a node that was still expanding.
@@ -728,9 +733,9 @@ export class UiBaseLocators extends BasePage {
   }
 
   async doesTreeItemHaveTheCorrectIcon(name: string, icon: string) {
+    // Exact-label match, unlike a text-content filter which would also match ancestors.
     return await this.isVisible(
-      this.treeItem
-        .filter({ has: this.page.getByText(name, { exact: true }) })
+      this.getMenuItemByLabel(name)
         .locator("umb-icon")
         .locator('[name="' + icon + '"]')
         .first(),
