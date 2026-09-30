@@ -5,14 +5,14 @@ import { customElement } from '@umbraco-cms/backoffice/external/lit';
  * @element umb-property-editor-ui-single-url-picker
  */
 @customElement('umb-property-editor-ui-single-url-picker')
-export class UmbPropertyEditorUISingleUrlPickerElement extends UmbUrlPickerPropertyEditorUIElementBase {
+export class UmbSingleUrlPickerPropertyEditorUIElement extends UmbUrlPickerPropertyEditorUIElementBase {
 	protected override readonly multiple = false;
 }
 
-export { UmbPropertyEditorUISingleUrlPickerElement as element };
+export { UmbSingleUrlPickerPropertyEditorUIElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-property-editor-ui-single-url-picker': UmbPropertyEditorUISingleUrlPickerElement;
+		'umb-property-editor-ui-single-url-picker': UmbSingleUrlPickerPropertyEditorUIElement;
 	}
 }

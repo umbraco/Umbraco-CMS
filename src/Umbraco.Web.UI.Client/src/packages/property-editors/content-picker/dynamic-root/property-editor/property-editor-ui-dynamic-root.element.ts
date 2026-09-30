@@ -15,7 +15,7 @@ import '../components/index.js';
  * @element umb-property-editor-ui-dynamic-root
  */
 @customElement('umb-property-editor-ui-dynamic-root')
-export class UmbPropertyEditorUIDynamicRootElement extends UmbLitElement implements UmbPropertyEditorUiElement {
+export class UmbDynamicRootPropertyEditorUIElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	@property({ type: Object })
 	value?: UmbContentPickerDynamicRoot;
 
@@ -34,10 +34,10 @@ export class UmbPropertyEditorUIDynamicRootElement extends UmbLitElement impleme
 	}
 }
 
-export { UmbPropertyEditorUIDynamicRootElement as element };
+export { UmbDynamicRootPropertyEditorUIElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-property-editor-ui-dynamic-root': UmbPropertyEditorUIDynamicRootElement;
+		'umb-property-editor-ui-dynamic-root': UmbDynamicRootPropertyEditorUIElement;
 	}
 }

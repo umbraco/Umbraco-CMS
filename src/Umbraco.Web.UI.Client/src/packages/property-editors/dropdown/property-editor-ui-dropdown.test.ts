@@ -1,6 +1,6 @@
 import type { UmbDropdownPropertyEditorUIElementBase } from './property-editor-ui-dropdown-base.element.js';
 import { UmbPropertyEditorUIDropdownElement } from './property-editor-ui-dropdown.element.js';
-import { UmbPropertyEditorUISingleDropdownElement } from './property-editor-ui-single-dropdown.element.js';
+import { UmbSingleDropdownPropertyEditorUIElement } from './property-editor-ui-single-dropdown.element.js';
 import { expect, fixture, html } from '@open-wc/testing';
 import { type UmbTestRunnerWindow, defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
 import { MULTI_SELECT_TEST_DATA } from '../utils/property-editor-test-utils.js';
@@ -79,7 +79,7 @@ describe('UmbPropertyEditorUIDropdownElement', () => {
 		});
 
 		it('is defined with its own instance', () => {
-			expect(element).to.be.instanceOf(UmbPropertyEditorUISingleDropdownElement);
+			expect(element).to.be.instanceOf(UmbSingleDropdownPropertyEditorUIElement);
 		});
 
 		it('should update UI immediately when value is set programmatically with array', async () => {

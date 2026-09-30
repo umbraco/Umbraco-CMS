@@ -13,7 +13,7 @@ import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umb
  * @element umb-property-editor-ui-multiple-member-picker
  */
 @customElement('umb-property-editor-ui-multiple-member-picker')
-export class UmbPropertyEditorUIMultipleMemberPickerElement
+export class UmbMultipleMemberPickerPropertyEditorUIElement
 	extends UmbFormControlMixin<Array<string> | undefined, typeof UmbLitElement, undefined>(UmbLitElement)
 	implements UmbPropertyEditorUiElement
 {
@@ -82,10 +82,10 @@ export class UmbPropertyEditorUIMultipleMemberPickerElement
 	}
 }
 
-export { UmbPropertyEditorUIMultipleMemberPickerElement as element };
+export { UmbMultipleMemberPickerPropertyEditorUIElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-property-editor-ui-multiple-member-picker': UmbPropertyEditorUIMultipleMemberPickerElement;
+		'umb-property-editor-ui-multiple-member-picker': UmbMultipleMemberPickerPropertyEditorUIElement;
 	}
 }

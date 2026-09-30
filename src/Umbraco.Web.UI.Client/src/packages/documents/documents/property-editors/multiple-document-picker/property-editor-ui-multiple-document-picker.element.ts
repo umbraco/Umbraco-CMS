@@ -21,7 +21,7 @@ import '../../components/input-document/input-document.element.js';
  * @element umb-property-editor-ui-multiple-document-picker
  */
 @customElement('umb-property-editor-ui-multiple-document-picker')
-export class UmbPropertyEditorUIMultipleDocumentPickerElement
+export class UmbMultipleDocumentPickerPropertyEditorUIElement
 	extends UmbFormControlMixin<Array<string> | undefined, typeof UmbLitElement, undefined>(UmbLitElement)
 	implements UmbPropertyEditorUiElement
 {
@@ -151,10 +151,10 @@ export class UmbPropertyEditorUIMultipleDocumentPickerElement
 	}
 }
 
-export { UmbPropertyEditorUIMultipleDocumentPickerElement as element };
+export { UmbMultipleDocumentPickerPropertyEditorUIElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-property-editor-ui-multiple-document-picker': UmbPropertyEditorUIMultipleDocumentPickerElement;
+		'umb-property-editor-ui-multiple-document-picker': UmbMultipleDocumentPickerPropertyEditorUIElement;
 	}
 }

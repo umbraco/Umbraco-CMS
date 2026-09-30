@@ -9,7 +9,7 @@ import type {
 } from '@umbraco-cms/backoffice/property-editor';
 
 @customElement('umb-property-editor-ui-member-type-picker')
-export class UmbPropertyEditorUIMemberTypePickerElement extends UmbLitElement implements UmbPropertyEditorUiElement {
+export class UmbMemberTypePickerPropertyEditorUIElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	@property()
 	public value?: string;
 
@@ -40,10 +40,10 @@ export class UmbPropertyEditorUIMemberTypePickerElement extends UmbLitElement im
 	}
 }
 
-export { UmbPropertyEditorUIMemberTypePickerElement as element };
+export { UmbMemberTypePickerPropertyEditorUIElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-property-editor-ui-member-type-picker': UmbPropertyEditorUIMemberTypePickerElement;
+		'umb-property-editor-ui-member-type-picker': UmbMemberTypePickerPropertyEditorUIElement;
 	}
 }
