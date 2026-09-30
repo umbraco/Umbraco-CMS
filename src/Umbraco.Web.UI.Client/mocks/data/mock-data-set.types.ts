@@ -7,6 +7,7 @@ import type {
 	DictionaryItemItemResponseModel,
 	DictionaryItemResponseModel,
 	DictionaryOverviewResponseModel,
+	DomainsResponseModel,
 	NamedEntityTreeItemResponseModel,
 	// Document
 	DocumentItemResponseModel,
@@ -116,6 +117,8 @@ export type UmbMockDocumentModel = DocumentResponseModel &
 	DocumentItemResponseModel & {
 		/** Mock-only: the parent before trashing, used to restore it. Not a real response field. */
 		originalParent?: { id: string } | null;
+		/** Mock-only: the culture and hostnames of the document. Not a real response field. */
+		domains?: DomainsResponseModel;
 	};
 
 export type UmbMockDocumentBlueprintModel = DocumentBlueprintResponseModel &
