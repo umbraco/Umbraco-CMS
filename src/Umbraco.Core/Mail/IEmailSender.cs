@@ -54,7 +54,7 @@ public interface IEmailSender
     /// <returns><c>true</c> if emails can currently be sent; otherwise, <c>false</c>.</returns>
     /// <remarks>
     /// Implementations may perform network I/O, such as connecting to a mail server, so prefer
-    /// <see cref="IsEmailConfigured"/> unless an email is about to be sent.
+    /// <see cref="IsEmailConfigured"/> unless an email is about to be sent. Implementations may cache the result briefly.
     /// </remarks>
     // TODO (V19): Remove the default implementation.
     Task<bool> IsEmailAvailableAsync(CancellationToken cancellationToken = default)

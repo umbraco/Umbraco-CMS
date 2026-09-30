@@ -27,10 +27,35 @@ public class EmailSender : IEmailSender
     private readonly bool _notificationHandlerRegistered;
     private GlobalSettings _globalSettings;
     private readonly IEmailSenderClient _emailSenderClient;
+    private readonly TimeProvider _timeProvider;
+    private readonly Lock _smtpProbeLock = new();
+    private Task<bool>? _smtpProbe;
+    private DateTimeOffset _smtpProbeExpiry;
+
+    /// <summary>
+    /// The maximum time the SMTP probe may take before the server is treated as unavailable.
+    /// </summary>
+    internal static readonly TimeSpan SmtpProbeTimeout = TimeSpan.FromSeconds(10);
+
+    /// <summary>
+    /// How long a successful SMTP probe result is reused before the server is probed again.
+    /// </summary>
+    internal static readonly TimeSpan SmtpProbeAvailableCacheDuration = TimeSpan.FromSeconds(60);
+
+    /// <summary>
+    /// How long a failed SMTP probe result is reused before the server is probed again, kept short so recovery is noticed quickly.
+    /// </summary>
+    internal static readonly TimeSpan SmtpProbeUnavailableCacheDuration = TimeSpan.FromSeconds(15);
 
     /// <summary>
     /// Initializes a new instance of the <see cref="EmailSender"/> class.
     /// </summary>
+    /// <param name="logger">The logger.</param>
+    /// <param name="globalSettings">The global settings, including the SMTP configuration.</param>
+    /// <param name="eventAggregator">The event aggregator used to publish <see cref="SendEmailNotification"/>.</param>
+    /// <param name="emailSenderClient">The client used to send emails and verify the SMTP connection.</param>
+    /// <param name="handler1">An optional synchronous handler for <see cref="SendEmailNotification"/>.</param>
+    /// <param name="handler2">An optional asynchronous handler for <see cref="SendEmailNotification"/>.</param>
     public EmailSender(
         ILogger<EmailSender> logger,
         IOptionsMonitor<GlobalSettings> globalSettings,
@@ -38,13 +63,48 @@ public class EmailSender : IEmailSender
         IEmailSenderClient emailSenderClient,
         INotificationHandler<SendEmailNotification>? handler1,
         INotificationAsyncHandler<SendEmailNotification>? handler2)
+        : this(logger, globalSettings, eventAggregator, emailSenderClient, handler1, handler2, TimeProvider.System)
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="EmailSender"/> class using the specified time provider.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    /// <param name="globalSettings">The global settings, including the SMTP configuration.</param>
+    /// <param name="eventAggregator">The event aggregator used to publish <see cref="SendEmailNotification"/>.</param>
+    /// <param name="emailSenderClient">The client used to send emails and verify the SMTP connection.</param>
+    /// <param name="handler1">An optional synchronous handler for <see cref="SendEmailNotification"/>.</param>
+    /// <param name="handler2">An optional asynchronous handler for <see cref="SendEmailNotification"/>.</param>
+    /// <param name="timeProvider">The time provider used for the SMTP probe cache expiry and timeout.</param>
+    /// <remarks>
+    /// This constructor is internal because the time provider only exists so tests can control the SMTP probe cache
+    /// expiry and timeout. Production code uses <see cref="TimeProvider.System"/> via the public constructor, so exposing
+    /// this would add public API surface without a use case.
+    /// </remarks>
+    internal EmailSender(
+        ILogger<EmailSender> logger,
+        IOptionsMonitor<GlobalSettings> globalSettings,
+        IEventAggregator eventAggregator,
+        IEmailSenderClient emailSenderClient,
+        INotificationHandler<SendEmailNotification>? handler1,
+        INotificationAsyncHandler<SendEmailNotification>? handler2,
+        TimeProvider timeProvider)
     {
         _logger = logger;
         _eventAggregator = eventAggregator;
         _globalSettings = globalSettings.CurrentValue;
         _notificationHandlerRegistered = handler1 is not null || handler2 is not null;
         _emailSenderClient = emailSenderClient;
-        globalSettings.OnChange(x => _globalSettings = x);
+        _timeProvider = timeProvider;
+        globalSettings.OnChange(x =>
+        {
+            lock (_smtpProbeLock)
+            {
+                _globalSettings = x;
+                _smtpProbe = null;
+            }
+        });
     }
 
     /// <inheritdoc/>
@@ -76,6 +136,9 @@ public class EmailSender : IEmailSender
     /// <remarks>
     ///     Only the SMTP transport is probed. A registered notification handler cannot be probed, and a pickup directory
     ///     only requires a local file write, so both are assumed to be available.
+    ///     Concurrent callers share a single probe, and its result is cached briefly, so the SMTP server is contacted at
+    ///     most once per cache period regardless of how often this is called. The cancellation token only stops the
+    ///     caller waiting; it does not cancel the shared probe.
     /// </remarks>
     public async Task<bool> IsEmailAvailableAsync(CancellationToken cancellationToken = default)
     {
@@ -84,20 +147,50 @@ public class EmailSender : IEmailSender
             return IsEmailConfigured();
         }
 
-        try
+        return await GetOrStartSmtpProbe().WaitAsync(cancellationToken);
+    }
+
+    private Task<bool> GetOrStartSmtpProbe()
+    {
+        lock (_smtpProbeLock)
         {
-            await _emailSenderClient.VerifyConnectionAsync(cancellationToken);
-            return true;
+            if (_smtpProbe is null || (_smtpProbe.IsCompleted && _timeProvider.GetUtcNow() >= _smtpProbeExpiry))
+            {
+                _smtpProbe = ProbeSmtpAsync();
+            }
+
+            return _smtpProbe;
         }
-        catch (Exception ex) when (ex is not OperationCanceledException || cancellationToken.IsCancellationRequested is false)
+    }
+
+    private async Task<bool> ProbeSmtpAsync()
+    {
+        bool isAvailable;
+        using (var timeout = new CancellationTokenSource(SmtpProbeTimeout, _timeProvider))
         {
-            _logger.LogWarning(
-                ex,
-                "Could not connect to the SMTP server at {SmtpHost}:{SmtpPort}.",
-                _globalSettings.Smtp?.Host,
-                _globalSettings.Smtp?.Port);
-            return false;
+            try
+            {
+                await _emailSenderClient.VerifyConnectionAsync(timeout.Token);
+                isAvailable = true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(
+                    ex,
+                    "Could not connect to the SMTP server at {SmtpHost}:{SmtpPort}.",
+                    _globalSettings.Smtp?.Host,
+                    _globalSettings.Smtp?.Port);
+                isAvailable = false;
+            }
         }
+
+        lock (_smtpProbeLock)
+        {
+            _smtpProbeExpiry = _timeProvider.GetUtcNow()
+                               + (isAvailable ? SmtpProbeAvailableCacheDuration : SmtpProbeUnavailableCacheDuration);
+        }
+
+        return isAvailable;
     }
 
     private bool UsesSmtpTransport()

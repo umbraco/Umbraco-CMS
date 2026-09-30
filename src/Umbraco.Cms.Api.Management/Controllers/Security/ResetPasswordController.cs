@@ -45,7 +45,7 @@ public class ResetPasswordController : SecurityControllerBase
     [UserPasswordEnsureMinimumResponseTime]
     public async Task<IActionResult> RequestPasswordReset(CancellationToken cancellationToken, ResetPasswordRequestModel model)
     {
-        Attempt<UserOperationStatus> result = await _userService.SendResetPasswordEmailAsync(model.Email);
+        Attempt<UserOperationStatus> result = await _userService.SendResetPasswordEmailAsync(model.Email, cancellationToken);
 
         // If this feature is switched off in configuration, the UI will be amended to not make the request to reset password available.
         // So this is just a server-side secondary check.

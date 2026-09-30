@@ -22,7 +22,7 @@ internal sealed partial class UserServiceCrudTests
         var userService = CreateUserService(forgotPasswordSender: senderMock.Object);
         await CreateResetPasswordUser(userService);
 
-        var result = await userService.SendResetPasswordEmailAsync(email);
+        var result = await userService.SendResetPasswordEmailAsync(email, CancellationToken.None);
 
         Assert.IsFalse(result.Success);
         Assert.AreEqual(UserOperationStatus.PasswordResetUnavailable, result.Result);
@@ -39,7 +39,7 @@ internal sealed partial class UserServiceCrudTests
         var userService = CreateUserService(forgotPasswordSender: senderMock.Object);
         await CreateResetPasswordUser(userService);
 
-        var result = await userService.SendResetPasswordEmailAsync(ResetPasswordUserEmail);
+        var result = await userService.SendResetPasswordEmailAsync(ResetPasswordUserEmail, CancellationToken.None);
 
         Assert.IsFalse(result.Success);
         Assert.AreEqual(UserOperationStatus.UnknownFailure, result.Result);
