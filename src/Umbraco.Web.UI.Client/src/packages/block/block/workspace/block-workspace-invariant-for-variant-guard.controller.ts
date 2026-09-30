@@ -89,7 +89,7 @@ export class UmbBlockWorkspaceInvariantForVariantGuardController extends UmbCont
 		variantOptions: Observable<Array<UmbEntityVariantOptionModel>>,
 		propertyWriteGuard: UmbVariantPropertyGuardManager,
 	) {
-		this.observe(
+		this._observeWhileRestricted(
 			observeMultiple([managerVariantId, variesByCulture, ownerVariesByCulture, variantOptions]),
 			([managerVariantId, variesByCulture, ownerVariesByCulture, variantOptions]) => {
 				// Only apply for invariant element types (blocks that don't vary by culture)
@@ -102,8 +102,10 @@ export class UmbBlockWorkspaceInvariantForVariantGuardController extends UmbCont
 
 				// The user lacks the invariant-for-variant permission, so apply the rule for invariant
 				// blocks regardless of which variant tab is being viewed (default language included).
-				const rule = this._createRule({ datasetVariantId: UmbVariantId.CreateInvariant() });
-				propertyWriteGuard.addRule(rule);
+				this._addRestrictionRule(
+					propertyWriteGuard,
+					this._createRule({ datasetVariantId: UmbVariantId.CreateInvariant() }),
+				);
 			},
 		);
 	}

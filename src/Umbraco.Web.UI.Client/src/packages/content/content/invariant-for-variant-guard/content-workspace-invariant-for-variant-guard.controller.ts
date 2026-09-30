@@ -25,22 +25,18 @@ export class UmbContentWorkspaceInvariantForVariantGuardController extends UmbCo
 			propertyWriteGuard: contentWorkspaceContext.propertyWriteGuard,
 		});
 
-		this.observe(
-			contentWorkspaceContext.structure.variesByCulture,
-			(variesByCulture) => {
-				if (variesByCulture) {
-					contentWorkspaceContext.variantWriteGuard.addRule({
-						unique: PREVENT_WRITE_INVARIANT_RULE_UNIQUE,
-						variantId: UmbVariantId.CreateInvariant(),
-						permitted: false,
-						message: 'You do not have permission to edit shared (invariant) properties on this content.',
-					});
-				} else {
-					contentWorkspaceContext.variantWriteGuard.removeRule(PREVENT_WRITE_INVARIANT_RULE_UNIQUE);
-				}
-			},
-			'_observeVariesByCultureForInvariantVariantWrite',
-		);
+		this._observeWhileRestricted(contentWorkspaceContext.structure.variesByCulture, (variesByCulture) => {
+			if (variesByCulture) {
+				this._addRestrictionRule(contentWorkspaceContext.variantWriteGuard, {
+					unique: PREVENT_WRITE_INVARIANT_RULE_UNIQUE,
+					variantId: UmbVariantId.CreateInvariant(),
+					permitted: false,
+					message: 'You do not have permission to edit shared (invariant) properties on this content.',
+				});
+			} else {
+				contentWorkspaceContext.variantWriteGuard.removeRule(PREVENT_WRITE_INVARIANT_RULE_UNIQUE);
+			}
+		});
 	}
 }
 

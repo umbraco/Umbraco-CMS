@@ -29,12 +29,19 @@ class UmbContentWorkspaceContextStub extends UmbContextBase {
 		super(host, UMB_CONTENT_WORKSPACE_CONTEXT.toString());
 		this.propertyWriteGuard.fallbackToPermitted();
 		this.variantWriteGuard.fallbackToPermitted();
-		this.#variantOptions.setValue([
-			{ culture: 'en-US', segment: null, unique: new UmbVariantId('en-US').toString() } as UmbEntityVariantOptionModel,
-		]);
+		this.setCultures(['en-US']);
 		this.#contentTypeProperties.setValue([
 			{ unique: 'invariant-property', variesByCulture: false, variesBySegment: false } as UmbPropertyTypeModel,
 		]);
+	}
+
+	setCultures(cultures: Array<string>) {
+		this.#variantOptions.setValue(
+			cultures.map(
+				(culture) =>
+					({ culture, segment: null, unique: new UmbVariantId(culture).toString() }) as UmbEntityVariantOptionModel,
+			),
+		);
 	}
 
 	setVariesByCulture(value: boolean) {
@@ -76,6 +83,16 @@ async function flushMicrotasks() {
 describe('UmbContentWorkspaceInvariantForVariantGuardController', () => {
 	let host: UmbTestInvariantForVariantGuardHostElement;
 	const invariant = UmbVariantId.CreateInvariant();
+	const enUS = new UmbVariantId('en-US');
+	const daDK = new UmbVariantId('da-DK');
+
+	function isInvariantPropertyWritable(datasetVariantId: UmbVariantId) {
+		return host.workspaceContext.propertyWriteGuard.getIsPermittedForVariantAndProperty(
+			invariant,
+			{ unique: 'invariant-property' },
+			datasetVariantId,
+		);
+	}
 
 	beforeEach(async () => {
 		host = await fixture(
@@ -114,5 +131,46 @@ describe('UmbContentWorkspaceInvariantForVariantGuardController', () => {
 		await createController();
 
 		expect(host.workspaceContext.variantWriteGuard.getIsPermittedForVariant(invariant)).to.be.true;
+	});
+
+	it('removes the restriction when the user gains invariant-for-variant access', async () => {
+		host.workspaceContext.setVariesByCulture(true);
+		host.currentUserContext.setHasAccessToInvariantForVariant(false);
+		await createController();
+		expect(isInvariantPropertyWritable(enUS)).to.be.false;
+		expect(host.workspaceContext.variantWriteGuard.getIsPermittedForVariant(invariant)).to.be.false;
+
+		host.currentUserContext.setHasAccessToInvariantForVariant(true);
+		await flushMicrotasks();
+
+		expect(isInvariantPropertyWritable(enUS)).to.be.true;
+		expect(host.workspaceContext.variantWriteGuard.getIsPermittedForVariant(invariant)).to.be.true;
+	});
+
+	it('does not restrict variants added after the user gains invariant-for-variant access', async () => {
+		host.workspaceContext.setVariesByCulture(true);
+		host.currentUserContext.setHasAccessToInvariantForVariant(false);
+		await createController();
+
+		host.currentUserContext.setHasAccessToInvariantForVariant(true);
+		await flushMicrotasks();
+		host.workspaceContext.setCultures(['en-US', 'da-DK']);
+		await flushMicrotasks();
+
+		expect(isInvariantPropertyWritable(daDK)).to.be.true;
+	});
+
+	it('restricts again when the user loses invariant-for-variant access', async () => {
+		host.workspaceContext.setVariesByCulture(true);
+		host.currentUserContext.setHasAccessToInvariantForVariant(false);
+		await createController();
+		host.currentUserContext.setHasAccessToInvariantForVariant(true);
+		await flushMicrotasks();
+
+		host.currentUserContext.setHasAccessToInvariantForVariant(false);
+		await flushMicrotasks();
+
+		expect(isInvariantPropertyWritable(enUS)).to.be.false;
+		expect(host.workspaceContext.variantWriteGuard.getIsPermittedForVariant(invariant)).to.be.false;
 	});
 });
