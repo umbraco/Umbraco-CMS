@@ -1,16 +1,16 @@
 ﻿using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_19_0_0;
 
 /// <summary>
-///     Adds the <c>hasAccessToInvariantForVariant</c> column to the <c>umbracoUserGroup</c> table
-///     and backfills it based on the previous <see cref="ContentSettings.AllowEditInvariantFromNonDefault"/>
-///     configuration value.
+///     Grants the invariant-for-variant permission to the existing user groups, based on the previous
+///     <see cref="ContentSettings.AllowEditInvariantFromNonDefault"/> configuration value.
 /// </summary>
 /// <remarks>
+///     The <c>hasAccessToInvariantForVariant</c> column is added by the <see cref="AddHasAccessToInvariantForVariantColumnToUserGroup"/>
+///     pre-migration.
 ///     This is the last consumer of <see cref="ContentSettings.AllowEditInvariantFromNonDefault"/>.
 ///     Do not remove the setting until Umbraco 21 per the obsoletion schedule.
 /// </remarks>
@@ -40,13 +40,6 @@ public class AddHasAccessToInvariantForVariantToUserGroup : AsyncMigrationBase
         {
             return Task.CompletedTask;
         }
-
-        if (ColumnExists(Constants.DatabaseSchema.Tables.UserGroup, ColumnName))
-        {
-            return Task.CompletedTask;
-        }
-
-        AddColumn<UserGroupDto>(Constants.DatabaseSchema.Tables.UserGroup, ColumnName);
 
         BackfillFromLegacySetting();
 

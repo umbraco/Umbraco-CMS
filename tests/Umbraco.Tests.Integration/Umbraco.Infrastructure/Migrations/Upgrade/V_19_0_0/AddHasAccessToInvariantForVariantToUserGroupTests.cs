@@ -15,6 +15,7 @@ using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Migrations;
+using Umbraco.Cms.Infrastructure.Migrations.Upgrade;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_19_0_0;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Scoping;
@@ -31,6 +32,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Migrations.Upgrad
 internal sealed class AddHasAccessToInvariantForVariantToUserGroupTests : UmbracoIntegrationTest
 {
     private const string ColumnName = "hasAccessToInvariantForVariant";
+
+    private const string PremigrationStateBeforeColumn = "{31C0D92A-49DD-47EC-B2A7-932A58FF224E}";
 
     private IUserGroupService UserGroupService => GetRequiredService<IUserGroupService>();
 
@@ -70,6 +73,22 @@ internal sealed class AddHasAccessToInvariantForVariantToUserGroupTests : Umbrac
         });
     }
 
+    [Test]
+    public async Task Earlier_User_Group_Migrations_Can_Run_When_Upgrading_From_Before_The_Column_Existed()
+    {
+        DropColumn();
+
+        await ExecutePlanAsync(new UmbracoPremigrationPlan(), PremigrationStateBeforeColumn);
+        await ExecutePlanAsync(
+            new MigrationPlan(nameof(AddHasAccessToInvariantForVariantToUserGroupTests))
+                .From(string.Empty)
+                .To<global::Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_18_0_0.AddElementSectionForAdmins>("elements")
+                .To<AddHasAccessToInvariantForVariantToUserGroup>("done"),
+            string.Empty);
+
+        Assert.IsTrue(GetColumnValue(Constants.Security.AdminGroupKey), "admin group");
+    }
+
     private async Task<(Guid AllLanguages, Guid DefaultLanguage, Guid NonDefaultLanguage, Guid NoLanguages)> CreateUserGroupsAsync()
     {
         ILanguage defaultLanguage = (await LanguageService.GetDefaultLanguageAsync())!;
@@ -102,10 +121,16 @@ internal sealed class AddHasAccessToInvariantForVariantToUserGroupTests : Umbrac
         GetRequiredService<IOptions<ContentSettings>>().Value.AllowEditInvariantFromNonDefault = allowEditInvariantFromNonDefault;
 #pragma warning restore CS0618 // Type or member is obsolete
 
-        MigrationPlan plan = new MigrationPlan(nameof(AddHasAccessToInvariantForVariantToUserGroupTests))
-            .From(string.Empty)
-            .To<AddHasAccessToInvariantForVariantToUserGroup>("done");
+        await ExecutePlanAsync(new UmbracoPremigrationPlan(), PremigrationStateBeforeColumn);
+        await ExecutePlanAsync(
+            new MigrationPlan(nameof(AddHasAccessToInvariantForVariantToUserGroupTests))
+                .From(string.Empty)
+                .To<AddHasAccessToInvariantForVariantToUserGroup>("done"),
+            string.Empty);
+    }
 
+    private async Task ExecutePlanAsync(MigrationPlan plan, string fromState)
+    {
         var executor = new MigrationPlanExecutor(
             GetRequiredService<ICoreScopeProvider>(),
             ScopeAccessor,
@@ -119,7 +144,7 @@ internal sealed class AddHasAccessToInvariantForVariantToUserGroupTests : Umbrac
             GetRequiredService<AppCaches>(),
             GetRequiredService<IPublishedContentTypeFactory>());
 
-        ExecutedMigrationPlan result = await executor.ExecutePlanAsync(plan, string.Empty);
+        ExecutedMigrationPlan result = await executor.ExecutePlanAsync(plan, fromState);
 
         Assert.That(result.Successful, Is.True, result.Exception?.ToString());
     }
