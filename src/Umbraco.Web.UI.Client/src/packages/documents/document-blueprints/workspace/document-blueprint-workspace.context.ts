@@ -8,7 +8,7 @@ import {
 	UMB_DOCUMENT_BLUEPRINT_ROOT_WORKSPACE_PATH,
 } from '../paths.js';
 import { UMB_DOCUMENT_BLUEPRINT_WORKSPACE_ALIAS } from './constants.js';
-import { UMB_SETTINGS_SECTION_PATHNAME } from '@umbraco-cms/backoffice/settings';
+import { UMB_LIBRARY_SECTION_PATHNAME } from '@umbraco-cms/backoffice/library';
 import {
 	UMB_WORKSPACE_EDIT_PATH_PATTERN,
 	UmbWorkspaceIsNewRedirectController,
@@ -97,7 +97,7 @@ export class UmbDocumentBlueprintWorkspaceContext
 		}
 
 		return UMB_WORKSPACE_EDIT_PATH_PATTERN.generateAbsolute({
-			sectionName: UMB_SETTINGS_SECTION_PATHNAME,
+			sectionName: UMB_LIBRARY_SECTION_PATHNAME,
 			entityType: entity.entityType,
 			unique: entity.unique,
 		});
