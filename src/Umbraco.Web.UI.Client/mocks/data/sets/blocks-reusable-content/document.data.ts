@@ -319,4 +319,213 @@ export const data: Array<UmbMockDocumentModel> = [
 		],
 		flags: [],
 	},
+	{
+		ancestors: [],
+		template: null,
+		id: '8b5e2d7a-4c19-4a3f-9e6b-1d0f7a2c8e53',
+		createDate: '2026-04-16 13:00:00.000000',
+		parent: null,
+		documentType: {
+			id: 'c7d3e1a4-2b58-4f69-9a0e-6d1f8b3c5e72',
+			icon: 'icon-bulleted-list color-green',
+		},
+		hasChildren: false,
+		noAccess: false,
+		isProtected: false,
+		isTrashed: false,
+		variants: [
+			{
+				state: 'Published' as UmbDocumentVariantState,
+				publishDate: '2026-04-16 13:05:00.000000',
+				culture: 'en-US',
+				segment: null,
+				name: 'Variant Block List',
+				createDate: '2026-04-16 13:00:00.000000',
+				updateDate: '2026-04-16 13:05:00.000000',
+				id: 'variant-block-list-en-us',
+				flags: [],
+			},
+			{
+				state: 'Draft' as UmbDocumentVariantState,
+				publishDate: null,
+				culture: 'da',
+				segment: null,
+				name: 'Variant Bloklist',
+				createDate: '2026-04-16 13:00:00.000000',
+				updateDate: '2026-04-16 13:00:00.000000',
+				id: 'variant-block-list-da',
+				flags: [],
+			},
+		],
+		values: [
+			{
+				editorAlias: 'Umbraco.BlockList',
+				alias: 'blockListVariant',
+				culture: 'en-US',
+				segment: null,
+				value: {
+					contentData: [
+						{
+							contentTypeKey: 'b818bb55-31e1-4537-9c42-17471a176089',
+							key: '2f6c9a1e-7b4d-4e38-a5c2-9d1e3b7f4a60',
+							values: [
+								{
+									editorAlias: 'Umbraco.TextBox',
+									culture: null,
+									segment: null,
+									alias: 'title',
+									value: 'This is Element One (English)',
+								},
+							],
+						},
+					],
+					settingsData: [],
+					expose: [
+						{
+							contentKey: '2f6c9a1e-7b4d-4e38-a5c2-9d1e3b7f4a60',
+							culture: null,
+							segment: null,
+						},
+					],
+					layout: {
+						'Umbraco.BlockList': [
+							{
+								key: '2f6c9a1e-7b4d-4e38-a5c2-9d1e3b7f4a60',
+								contentKey: '2f6c9a1e-7b4d-4e38-a5c2-9d1e3b7f4a60',
+								settingsKey: null,
+							},
+							{
+								key: 'variant-block-list-en-library-element-two',
+								contentKey: 'library-element-two-id',
+								settingsKey: null,
+								isExternalContent: true,
+							},
+						],
+					},
+				},
+			},
+			{
+				editorAlias: 'Umbraco.BlockList',
+				alias: 'blockListVariant',
+				culture: 'da',
+				segment: null,
+				value: {
+					contentData: [
+						{
+							contentTypeKey: 'b818bb55-31e1-4537-9c42-17471a176089',
+							key: '5a8d3c7f-1e92-4b06-8f4a-6c2b9e0d7a31',
+							values: [
+								{
+									editorAlias: 'Umbraco.TextBox',
+									culture: null,
+									segment: null,
+									alias: 'title',
+									value: 'Dette er Element Et (dansk)',
+								},
+							],
+						},
+					],
+					settingsData: [],
+					expose: [
+						{
+							contentKey: '5a8d3c7f-1e92-4b06-8f4a-6c2b9e0d7a31',
+							culture: null,
+							segment: null,
+						},
+					],
+					layout: {
+						'Umbraco.BlockList': [
+							{
+								key: '5a8d3c7f-1e92-4b06-8f4a-6c2b9e0d7a31',
+								contentKey: '5a8d3c7f-1e92-4b06-8f4a-6c2b9e0d7a31',
+								settingsKey: null,
+							},
+							{
+								key: 'variant-block-list-da-library-element-one',
+								contentKey: 'library-element-one-id',
+								settingsKey: null,
+								isExternalContent: true,
+							},
+						],
+					},
+				},
+			},
+			{
+				editorAlias: 'Umbraco.BlockList',
+				alias: 'blockListShared',
+				culture: null,
+				segment: null,
+				value: {
+					contentData: [
+						{
+							contentTypeKey: 'b818bb55-31e1-4537-9c42-17471a176089',
+							key: 'b3e7a5c9-8d21-4f64-a0b8-7e5c1d9f2a46',
+							values: [
+								{
+									editorAlias: 'Umbraco.TextBox',
+									culture: null,
+									segment: null,
+									alias: 'title',
+									value: 'This is a shared Element One',
+								},
+							],
+						},
+						{
+							contentTypeKey: 'a9c5e3f7-6b12-4d84-9e0f-2b7a4d1c8e65',
+							key: 'c8f1d6a3-5e72-4b09-9d4a-1a7b3e5c8f20',
+							values: [
+								{
+									editorAlias: 'Umbraco.TextBox',
+									culture: 'en-US',
+									segment: null,
+									alias: 'title',
+									value: 'Only exposed in English',
+								},
+							],
+						},
+					],
+					settingsData: [],
+					expose: [
+						{
+							contentKey: 'b3e7a5c9-8d21-4f64-a0b8-7e5c1d9f2a46',
+							culture: null,
+							segment: null,
+						},
+						{
+							contentKey: 'c8f1d6a3-5e72-4b09-9d4a-1a7b3e5c8f20',
+							culture: 'en-US',
+							segment: null,
+						},
+					],
+					layout: {
+						'Umbraco.BlockList': [
+							{
+								key: 'b3e7a5c9-8d21-4f64-a0b8-7e5c1d9f2a46',
+								contentKey: 'b3e7a5c9-8d21-4f64-a0b8-7e5c1d9f2a46',
+								settingsKey: null,
+							},
+							{
+								key: 'variant-block-list-shared-library-element-two',
+								contentKey: 'library-element-two-id',
+								settingsKey: null,
+								isExternalContent: true,
+							},
+							{
+								key: 'c8f1d6a3-5e72-4b09-9d4a-1a7b3e5c8f20',
+								contentKey: 'c8f1d6a3-5e72-4b09-9d4a-1a7b3e5c8f20',
+								settingsKey: null,
+							},
+							{
+								key: 'variant-block-list-shared-library-variant-element',
+								contentKey: 'library-variant-element-id',
+								settingsKey: null,
+								isExternalContent: true,
+							},
+						],
+					},
+				},
+			},
+		],
+		flags: [],
+	},
 ];

@@ -119,7 +119,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 				value: [
 					{
 						contentElementTypeKey: 'b818bb55-31e1-4537-9c42-17471a176089',
-						label: '{=title}',
+						label: '',
 						displayInline: false,
 						editorSize: 'medium',
 						forceHideContentEditorInOverlay: false,
@@ -152,7 +152,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 				value: [
 					{
 						contentElementTypeKey: 'b818bb55-31e1-4537-9c42-17471a176089',
-						label: '{=title}',
+						label: '',
 						editorSize: 'medium',
 						forceHideContentEditorInOverlay: false,
 					},
@@ -212,7 +212,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 						allowInAreas: true,
 						areas: [],
 						contentElementTypeKey: 'b818bb55-31e1-4537-9c42-17471a176089',
-						label: '{=title}',
+						label: '',
 						editorSize: 'medium',
 						inlineEditing: false,
 						forceHideContentEditorInOverlay: false,
@@ -267,9 +267,62 @@ export const data: Array<UmbMockDataTypeModel> = [
 				value: [
 					{
 						contentElementTypeKey: 'b818bb55-31e1-4537-9c42-17471a176089',
-						label: '{=title}',
+						label: '',
 					},
 				],
+			},
+		],
+	},
+	{
+		name: 'Block List - Variant Element',
+		id: 'd4b8f2a6-3e17-4c95-b0a1-8f6e2c7d9b35',
+		parent: null,
+		editorAlias: 'Umbraco.BlockList',
+		editorUiAlias: 'Umb.PropertyEditorUi.BlockList',
+		hasChildren: false,
+		noAccess: false,
+		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
+		flags: [],
+		values: [
+			{
+				alias: 'blocks',
+				value: [
+					{
+						contentElementTypeKey: 'b818bb55-31e1-4537-9c42-17471a176089',
+						label: '',
+						editorSize: 'medium',
+						forceHideContentEditorInOverlay: false,
+					},
+					{
+						contentElementTypeKey: 'f7f156a0-a3f3-42ec-8b9c-e788157bd84e',
+						editorSize: 'medium',
+						forceHideContentEditorInOverlay: false,
+					},
+					{
+						contentElementTypeKey: 'a9c5e3f7-6b12-4d84-9e0f-2b7a4d1c8e65',
+						label: '',
+						editorSize: 'medium',
+						forceHideContentEditorInOverlay: false,
+					},
+				],
+			},
+			{
+				alias: 'validationLimit',
+				value: {},
+			},
+			{
+				alias: 'useSingleBlockMode',
+				value: false,
+			},
+			{
+				alias: 'useLiveEditing',
+				value: false,
+			},
+			{
+				alias: 'useInlineEditingAsDefault',
+				value: false,
 			},
 		],
 	},
