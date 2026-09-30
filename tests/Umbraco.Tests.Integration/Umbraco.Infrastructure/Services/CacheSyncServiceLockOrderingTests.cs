@@ -13,9 +13,11 @@ using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Cms.Core.Factories;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Changes;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Infrastructure.DistributedLocking;
 using Umbraco.Cms.Infrastructure.Scoping;
@@ -280,6 +282,47 @@ internal sealed class CacheSyncServiceLockOrderingTests : UmbracoIntegrationTest
             Assert.That(LastSyncedInternalIdInDatabase(), Is.EqualTo(maxInstructionId), "The internal last-synced id was not persisted.");
             Assert.That(afterConvergence.NumberOfInstructionsProcessed, Is.EqualTo(0), "Already processed instructions were processed again.");
         });
+    }
+
+    [Test]
+    public void SyncInternal_Clears_Data_Type_Configuration_Changed_On_Another_Server()
+    {
+        const int newMaxChars = 123;
+        Guid dataTypeKey = Constants.DataTypes.Guids.TextstringGuid;
+        var dataTypeCacheKey = typeof(IDataType).FullName!;
+        IDataTypeConfigurationCache configurationCache = GetRequiredService<IDataTypeConfigurationCache>();
+        IDataTypeService dataTypeService = GetRequiredService<IDataTypeService>();
+
+        // This server has seen the current IDataType cache version and holds the configuration in its cache.
+        WriteRemoteCacheVersion(dataTypeCacheKey);
+        TextboxConfiguration? before = configurationCache.GetConfigurationAs<TextboxConfiguration>(dataTypeKey);
+        Assume.That(before, Is.Not.Null);
+        Assume.That(before!.MaxChars, Is.Not.EqualTo(newMaxChars));
+
+        // Another server changes the configuration: the write bypasses this server's caches, then its version and instruction arrive.
+        IDataType dataType;
+        using (IScope scope = ScopeProvider.CreateScope(repositoryCacheMode: RepositoryCacheMode.None))
+        {
+            dataType = dataTypeService.GetAsync(dataTypeKey).GetAwaiter().GetResult()!;
+            dataType.ConfigurationData["maxChars"] = newMaxChars;
+            Attempt<IDataType, DataTypeOperationStatus> updated = dataTypeService.UpdateAsync(dataType, Constants.Security.SuperUserKey).GetAwaiter().GetResult();
+            Assume.That(updated.Success, Is.True, $"The remote change could not be made: {updated.Status}.");
+            scope.Complete();
+        }
+
+        WriteRemoteCacheVersion(dataTypeCacheKey);
+        DeliverRemoteInstructions(new RefreshInstruction(
+            DataTypeCacheRefresher.UniqueId,
+            RefreshMethodType.RefreshByJson,
+            Guid.Empty,
+            0,
+            null!,
+            GetRequiredService<DataTypeCacheRefresher>().Serialize(new DataTypeCacheRefresher.JsonPayload(dataType.Id, dataTypeKey, false))));
+        Assume.That(configurationCache.GetConfigurationAs<TextboxConfiguration>(dataTypeKey)!.MaxChars, Is.Not.EqualTo(newMaxChars), "The remote change touched this server's configuration cache, so this test proves nothing.");
+
+        CacheSyncService.SyncInternal(CancellationToken.None);
+
+        Assert.That(configurationCache.GetConfigurationAs<TextboxConfiguration>(dataTypeKey)!.MaxChars, Is.EqualTo(newMaxChars), "The data type configuration cache still holds the configuration from before the remote change.");
     }
 
     [Test]
