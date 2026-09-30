@@ -466,7 +466,7 @@ public interface IUserService : IMembershipUserService
     // TODO (V19): Remove the default implementation when the obsolete overload is removed.
     Task<Attempt<UserOperationStatus>> SendResetPasswordEmailAsync(string userEmail, CancellationToken cancellationToken)
 #pragma warning disable CS0618 // Type or member is obsolete
-        => SendResetPasswordEmailAsync(userEmail);
+        => SendResetPasswordEmailAsync(userEmail).WaitAsync(cancellationToken);
 #pragma warning restore CS0618 // Type or member is obsolete
 
     /// <summary>

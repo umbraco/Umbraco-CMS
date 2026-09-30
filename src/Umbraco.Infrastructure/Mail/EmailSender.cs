@@ -31,6 +31,7 @@ public class EmailSender : IEmailSender
     private readonly Lock _smtpProbeLock = new();
     private Task<bool>? _smtpProbe;
     private DateTimeOffset _smtpProbeExpiry;
+    private int _smtpProbeGeneration;
 
     /// <summary>
     /// The maximum time the SMTP probe may take before the server is treated as unavailable.
@@ -103,6 +104,7 @@ public class EmailSender : IEmailSender
             {
                 _globalSettings = x;
                 _smtpProbe = null;
+                _smtpProbeGeneration++;
             }
         });
     }
@@ -157,14 +159,14 @@ public class EmailSender : IEmailSender
         {
             if (_smtpProbe is null || (_smtpProbe.IsCompleted && _timeProvider.GetUtcNow() >= _smtpProbeExpiry))
             {
-                _smtpProbe = ProbeSmtpAsync();
+                _smtpProbe = ProbeSmtpAsync(_smtpProbeGeneration, _globalSettings.Smtp);
             }
 
             return _smtpProbe;
         }
     }
 
-    private async Task<bool> ProbeSmtpAsync()
+    private async Task<bool> ProbeSmtpAsync(int generation, SmtpSettings? smtpSettings)
     {
         bool isAvailable;
         using (var timeout = new CancellationTokenSource(SmtpProbeTimeout, _timeProvider))
@@ -179,16 +181,20 @@ public class EmailSender : IEmailSender
                 _logger.LogWarning(
                     ex,
                     "Could not connect to the SMTP server at {SmtpHost}:{SmtpPort}.",
-                    _globalSettings.Smtp?.Host,
-                    _globalSettings.Smtp?.Port);
+                    smtpSettings?.Host,
+                    smtpSettings?.Port);
                 isAvailable = false;
             }
         }
 
         lock (_smtpProbeLock)
         {
-            _smtpProbeExpiry = _timeProvider.GetUtcNow()
-                               + (isAvailable ? SmtpProbeAvailableCacheDuration : SmtpProbeUnavailableCacheDuration);
+            // A settings change while this probe was running replaces it, so its result must not set the replacement's expiry.
+            if (generation == _smtpProbeGeneration)
+            {
+                _smtpProbeExpiry = _timeProvider.GetUtcNow()
+                                   + (isAvailable ? SmtpProbeAvailableCacheDuration : SmtpProbeUnavailableCacheDuration);
+            }
         }
 
         return isAvailable;

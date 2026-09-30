@@ -14,11 +14,11 @@ namespace Umbraco.Cms.Infrastructure.Mail
     /// </summary>
     public class BasicSmtpEmailSenderClient : IEmailSenderClient
     {
-        private readonly GlobalSettings _globalSettings;
+        private readonly IOptionsMonitor<GlobalSettings> _globalSettings;
 
         /// <inheritdoc />
         public BasicSmtpEmailSenderClient(IOptionsMonitor<GlobalSettings> globalSettings)
-            => _globalSettings = globalSettings.CurrentValue;
+            => _globalSettings = globalSettings;
 
         /// <inheritdoc />
         public async Task SendAsync(EmailMessage message)
@@ -27,15 +27,16 @@ namespace Umbraco.Cms.Infrastructure.Mail
         /// <inheritdoc />
         public async Task SendAsync(EmailMessage message, TimeSpan? expires)
         {
+            GlobalSettings globalSettings = _globalSettings.CurrentValue;
             using var client = new SmtpClient();
 
-            await ConnectAndAuthenticateAsync(client, CancellationToken.None);
+            await ConnectAndAuthenticateAsync(client, globalSettings, CancellationToken.None);
 
-            var mimeMessage = message.ToMimeMessage(_globalSettings.Smtp!.From);
+            var mimeMessage = message.ToMimeMessage(globalSettings.Smtp!.From);
 
-            if (_globalSettings.IsSmtpExpiryConfigured)
+            if (globalSettings.IsSmtpExpiryConfigured)
             {
-                expires ??= _globalSettings.Smtp.EmailExpiration;
+                expires ??= globalSettings.Smtp.EmailExpiration;
             }
 
             if (expires.HasValue)
@@ -44,7 +45,7 @@ namespace Umbraco.Cms.Infrastructure.Mail
                 mimeMessage.Headers.Add("Expires", DateTimeOffset.UtcNow.Add(expires.GetValueOrDefault()).ToString("R"));
             }
 
-            if (_globalSettings.Smtp.DeliveryMethod == SmtpDeliveryMethod.Network)
+            if (globalSettings.Smtp.DeliveryMethod == SmtpDeliveryMethod.Network)
             {
                 await client.SendAsync(mimeMessage);
             }
@@ -59,22 +60,22 @@ namespace Umbraco.Cms.Infrastructure.Mail
         {
             using var client = new SmtpClient();
 
-            await ConnectAndAuthenticateAsync(client, cancellationToken);
+            await ConnectAndAuthenticateAsync(client, _globalSettings.CurrentValue, cancellationToken);
             await client.DisconnectAsync(true, cancellationToken);
         }
 
-        private async Task ConnectAndAuthenticateAsync(SmtpClient client, CancellationToken cancellationToken)
+        private static async Task ConnectAndAuthenticateAsync(SmtpClient client, GlobalSettings globalSettings, CancellationToken cancellationToken)
         {
             await client.ConnectAsync(
-                _globalSettings.Smtp!.Host!,
-                _globalSettings.Smtp.Port,
-                (SecureSocketOptions)(int)_globalSettings.Smtp.SecureSocketOptions,
+                globalSettings.Smtp!.Host!,
+                globalSettings.Smtp.Port,
+                (SecureSocketOptions)(int)globalSettings.Smtp.SecureSocketOptions,
                 cancellationToken);
 
-            if (!string.IsNullOrWhiteSpace(_globalSettings.Smtp.Username) &&
-                !string.IsNullOrWhiteSpace(_globalSettings.Smtp.Password))
+            if (!string.IsNullOrWhiteSpace(globalSettings.Smtp.Username) &&
+                !string.IsNullOrWhiteSpace(globalSettings.Smtp.Password))
             {
-                await client.AuthenticateAsync(_globalSettings.Smtp.Username, _globalSettings.Smtp.Password, cancellationToken);
+                await client.AuthenticateAsync(globalSettings.Smtp.Username, globalSettings.Smtp.Password, cancellationToken);
             }
         }
     }

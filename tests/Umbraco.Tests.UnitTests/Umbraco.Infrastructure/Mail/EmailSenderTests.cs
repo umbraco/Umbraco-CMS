@@ -170,6 +170,36 @@ public class EmailSenderTests
     }
 
     [Test]
+    public async Task IsEmailAvailableAsync_Probe_Superseded_By_Settings_Change_Does_Not_Set_Cache_Expiry()
+    {
+        Action<GlobalSettings, string?>? onChange = null;
+        var optionsMonitorMock = new Mock<IOptionsMonitor<GlobalSettings>>();
+        optionsMonitorMock.SetupGet(x => x.CurrentValue).Returns(new GlobalSettings { Smtp = _smtpServerSettings });
+        optionsMonitorMock
+            .Setup(x => x.OnChange(It.IsAny<Action<GlobalSettings, string?>>()))
+            .Callback<Action<GlobalSettings, string?>>(listener => onChange = listener);
+        var supersededProbe = new TaskCompletionSource();
+        var clientMock = new Mock<IEmailSenderClient>();
+        clientMock
+            .SetupSequence(x => x.VerifyConnectionAsync(It.IsAny<CancellationToken>()))
+            .Returns(supersededProbe.Task)
+            .ThrowsAsync(new SocketException())
+            .Returns(Task.CompletedTask);
+        var timeProvider = new FakeTimeProvider();
+        var sender = CreateSender(optionsMonitorMock.Object, clientMock.Object, timeProvider: timeProvider);
+
+        Task<bool> supersededResult = sender.IsEmailAvailableAsync();
+        onChange!(new GlobalSettings { Smtp = new SmtpSettings { From = "from@test.com", Host = "other.test.com" } }, null);
+        Assert.IsFalse(await sender.IsEmailAvailableAsync());
+        supersededProbe.SetResult();
+        Assert.IsTrue(await supersededResult);
+
+        timeProvider.Advance(EmailSender.SmtpProbeUnavailableCacheDuration);
+        Assert.IsTrue(await sender.IsEmailAvailableAsync());
+        clientMock.Verify(x => x.VerifyConnectionAsync(It.IsAny<CancellationToken>()), Times.Exactly(3));
+    }
+
+    [Test]
     public async Task IsEmailAvailableAsync_Returns_False_When_Probe_Times_Out()
     {
         var timeProvider = new FakeTimeProvider();
