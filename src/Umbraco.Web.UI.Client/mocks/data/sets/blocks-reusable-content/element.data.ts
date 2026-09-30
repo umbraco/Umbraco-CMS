@@ -1,5 +1,5 @@
-import { UmbElementVariantState } from '@umbraco-cms/backoffice/element';
 import type { UmbMockElementModel } from '../../mock-data-set.types.js';
+import { UmbElementVariantState } from '@umbraco-cms/backoffice/element';
 
 const elementOneLibraryElement: UmbMockElementModel = {
 	ancestors: [],
@@ -129,8 +129,243 @@ const variantLibraryElement: UmbMockElementModel = {
 	noAccess: false,
 };
 
+const draftLibraryElement: UmbMockElementModel = {
+	ancestors: [],
+	id: 'library-variant-element-draft-id',
+	createDate: '2024-01-15T10:00:00.000Z',
+	parent: null,
+	documentType: {
+		id: 'a9c5e3f7-6b12-4d84-9e0f-2b7a4d1c8e65',
+		icon: 'icon-science color-deep-purple',
+	},
+	hasChildren: false,
+	isTrashed: false,
+	isFolder: false,
+	name: 'Draft Variant Element (Library)',
+	variants: [
+		{
+			state: UmbElementVariantState.DRAFT,
+			culture: 'en-US',
+			segment: null,
+			name: 'Draft Variant Element (Library)',
+			createDate: '2024-01-15T10:00:00.000Z',
+			updateDate: '2024-01-15T10:00:00.000Z',
+			publishDate: null,
+			id: 'library-variant-element-draft-en-us',
+			flags: [],
+		},
+		{
+			state: UmbElementVariantState.DRAFT,
+			culture: 'da',
+			segment: null,
+			name: 'Draft Variant Element (Library)',
+			createDate: '2024-01-15T10:00:00.000Z',
+			updateDate: '2024-01-15T10:00:00.000Z',
+			publishDate: null,
+			id: 'library-variant-element-draft-da',
+			flags: [],
+		},
+	],
+	values: [
+		{
+			editorAlias: 'Umbraco.TextBox',
+			alias: 'title',
+			culture: 'en-US',
+			segment: null,
+			value: 'Draft in both cultures',
+		},
+	],
+	flags: [],
+	noAccess: false,
+};
+
+const pendingChangesLibraryElement: UmbMockElementModel = {
+	ancestors: [],
+	id: 'library-variant-element-pending-changes-id',
+	createDate: '2024-01-15T10:00:00.000Z',
+	parent: null,
+	documentType: {
+		id: 'a9c5e3f7-6b12-4d84-9e0f-2b7a4d1c8e65',
+		icon: 'icon-science color-deep-purple',
+	},
+	hasChildren: false,
+	isTrashed: false,
+	isFolder: false,
+	name: 'Pending Changes Variant Element (Library)',
+	variants: [
+		{
+			state: UmbElementVariantState.PUBLISHED_PENDING_CHANGES,
+			culture: 'en-US',
+			segment: null,
+			name: 'Pending Changes Variant Element (Library)',
+			createDate: '2024-01-15T10:00:00.000Z',
+			updateDate: '2024-01-15T10:00:00.000Z',
+			publishDate: '2024-01-15T10:00:00.000Z',
+			id: 'library-variant-element-pending-changes-en-us',
+			flags: [],
+		},
+		{
+			state: UmbElementVariantState.PUBLISHED_PENDING_CHANGES,
+			culture: 'da',
+			segment: null,
+			name: 'Pending Changes Variant Element (Library)',
+			createDate: '2024-01-15T10:00:00.000Z',
+			updateDate: '2024-01-15T10:00:00.000Z',
+			publishDate: '2024-01-15T10:00:00.000Z',
+			id: 'library-variant-element-pending-changes-da',
+			flags: [],
+		},
+	],
+	values: [
+		{
+			editorAlias: 'Umbraco.TextBox',
+			alias: 'title',
+			culture: 'en-US',
+			segment: null,
+			value: 'Published with pending changes (English)',
+		},
+		{
+			editorAlias: 'Umbraco.TextBox',
+			alias: 'title',
+			culture: 'da',
+			segment: null,
+			value: 'Udgivet med afventende ændringer (dansk)',
+		},
+	],
+	flags: [],
+	noAccess: false,
+};
+
+const publishedBothLibraryElement: UmbMockElementModel = {
+	ancestors: [],
+	id: 'library-variant-element-published-both-id',
+	createDate: '2024-01-15T10:00:00.000Z',
+	parent: null,
+	documentType: {
+		id: 'a9c5e3f7-6b12-4d84-9e0f-2b7a4d1c8e65',
+		icon: 'icon-science color-deep-purple',
+	},
+	hasChildren: false,
+	isTrashed: false,
+	isFolder: false,
+	name: 'Published Variant Element (Library)',
+	variants: [
+		{
+			state: UmbElementVariantState.PUBLISHED,
+			culture: 'en-US',
+			segment: null,
+			name: 'Published Variant Element (Library)',
+			createDate: '2024-01-15T10:00:00.000Z',
+			updateDate: '2024-01-15T10:00:00.000Z',
+			publishDate: '2024-01-15T10:00:00.000Z',
+			id: 'library-variant-element-published-both-en-us',
+			flags: [],
+		},
+		{
+			state: UmbElementVariantState.PUBLISHED,
+			culture: 'da',
+			segment: null,
+			name: 'Published Variant Element (Library)',
+			createDate: '2024-01-15T10:00:00.000Z',
+			updateDate: '2024-01-15T10:00:00.000Z',
+			publishDate: '2024-01-15T10:00:00.000Z',
+			id: 'library-variant-element-published-both-da',
+			flags: [],
+		},
+	],
+	values: [
+		{
+			editorAlias: 'Umbraco.TextBox',
+			alias: 'title',
+			culture: 'en-US',
+			segment: null,
+			value: 'Published in both cultures (English)',
+		},
+		{
+			editorAlias: 'Umbraco.TextBox',
+			alias: 'title',
+			culture: 'da',
+			segment: null,
+			value: 'Udgivet på begge sprog (dansk)',
+		},
+	],
+	flags: [],
+	noAccess: false,
+};
+
+const missingDaLibraryElement: UmbMockElementModel = {
+	ancestors: [],
+	id: 'library-variant-element-missing-da-id',
+	createDate: '2024-01-15T10:00:00.000Z',
+	parent: null,
+	documentType: {
+		id: 'a9c5e3f7-6b12-4d84-9e0f-2b7a4d1c8e65',
+		icon: 'icon-science color-deep-purple',
+	},
+	hasChildren: false,
+	isTrashed: false,
+	isFolder: false,
+	name: 'Missing Danish Variant Element (Library)',
+	variants: [
+		{
+			state: UmbElementVariantState.PUBLISHED,
+			culture: 'en-US',
+			segment: null,
+			name: 'Missing Danish Variant Element (Library)',
+			createDate: '2024-01-15T10:00:00.000Z',
+			updateDate: '2024-01-15T10:00:00.000Z',
+			publishDate: '2024-01-15T10:00:00.000Z',
+			id: 'library-variant-element-missing-da-en-us',
+			flags: [],
+		},
+	],
+	values: [
+		{
+			editorAlias: 'Umbraco.TextBox',
+			alias: 'title',
+			culture: 'en-US',
+			segment: null,
+			value: 'No Danish variant exists',
+		},
+	],
+	flags: [],
+	noAccess: false,
+};
+
+const emptyVariantsLibraryElement: UmbMockElementModel = {
+	ancestors: [],
+	id: 'library-variant-element-empty-variants-id',
+	createDate: '2024-01-15T10:00:00.000Z',
+	parent: null,
+	documentType: {
+		id: 'a9c5e3f7-6b12-4d84-9e0f-2b7a4d1c8e65',
+		icon: 'icon-science color-deep-purple',
+	},
+	hasChildren: false,
+	isTrashed: false,
+	isFolder: false,
+	name: 'No Variants Element (Library)',
+	variants: [],
+	values: [
+		{
+			editorAlias: 'Umbraco.TextBox',
+			alias: 'title',
+			culture: 'en-US',
+			segment: null,
+			value: 'Element with an empty variants array',
+		},
+	],
+	flags: [],
+	noAccess: false,
+};
+
 export const data: Array<UmbMockElementModel> = [
 	elementOneLibraryElement,
 	elementTwoLibraryElement,
 	variantLibraryElement,
+	draftLibraryElement,
+	pendingChangesLibraryElement,
+	publishedBothLibraryElement,
+	missingDaLibraryElement,
+	emptyVariantsLibraryElement,
 ];

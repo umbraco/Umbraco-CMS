@@ -3,6 +3,9 @@ import type { UmbMockUserGroupModel } from '../../mock-data-set.types.js';
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export const ADMIN_USER_GROUP_ID = 'blocks-reusable-content-user-group-administrators-id';
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
+export const DANISH_EDITOR_USER_GROUP_ID = 'blocks-reusable-content-user-group-danish-editors-id';
+
 const adminUserGroup: UmbMockUserGroupModel = {
 	id: ADMIN_USER_GROUP_ID,
 	name: 'Administrators',
@@ -63,4 +66,64 @@ const adminUserGroup: UmbMockUserGroupModel = {
 	flags: [],
 };
 
-export const data: Array<UmbMockUserGroupModel> = [adminUserGroup];
+const danishEditorsUserGroup: UmbMockUserGroupModel = {
+	id: DANISH_EDITOR_USER_GROUP_ID,
+	name: 'Danish Editors',
+	alias: 'danishEditors',
+	description: 'Danish editors can edit content in Danish only; other languages are read-only.',
+	icon: 'icon-globe',
+	fallbackPermissions: [
+		'Umb.Document.Read',
+		'Umb.Document.Create',
+		'Umb.Document.Update',
+		'Umb.Document.Delete',
+		'Umb.Document.CreateBlueprint',
+		'Umb.Document.Notifications',
+		'Umb.Document.Publish',
+		'Umb.Document.Permissions',
+		'Umb.Document.Unpublish',
+		'Umb.Document.Duplicate',
+		'Umb.Document.Move',
+		'Umb.Document.Sort',
+		'Umb.Document.CultureAndHostnames',
+		'Umb.Document.PublicAccess',
+		'Umb.Document.Rollback',
+		'Umb.Document.PropertyValue.Read',
+		'Umb.Document.PropertyValue.Write',
+		'Umb.Element.Read',
+		'Umb.Element.Create',
+		'Umb.Element.Update',
+		'Umb.Element.Delete',
+		'Umb.Element.Publish',
+		'Umb.Element.Unpublish',
+		'Umb.Element.Duplicate',
+		'Umb.Element.Move',
+		'Umb.Element.Rollback',
+		'Umb.ElementContainer.Create',
+		'Umb.ElementContainer.Read',
+		'Umb.ElementContainer.Update',
+		'Umb.ElementContainer.Delete',
+		'Umb.ElementContainer.Move',
+	],
+	permissions: [],
+	sections: [
+		'Umb.Section.Content',
+		'Umb.Section.Media',
+		'Umb.Section.Library',
+		'Umb.Section.Settings',
+		'Umb.Section.Members',
+		'Umb.Section.Packages',
+		'Umb.Section.Translation',
+		'Umb.Section.Users',
+	],
+	languages: ['da'],
+	hasAccessToAllLanguages: false,
+	documentRootAccess: true,
+	elementRootAccess: true,
+	mediaRootAccess: true,
+	aliasCanBeChanged: true,
+	isDeletable: true,
+	flags: [],
+};
+
+export const data: Array<UmbMockUserGroupModel> = [adminUserGroup, danishEditorsUserGroup];

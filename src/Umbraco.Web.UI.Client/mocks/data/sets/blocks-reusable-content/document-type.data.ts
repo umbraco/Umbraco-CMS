@@ -520,6 +520,68 @@ const variantElementElementType: UmbMockDocumentTypeModel = {
 	flags: [],
 };
 
+const variantLibraryStatesDocumentType: UmbMockDocumentTypeModel = {
+	allowedTemplates: [],
+	defaultTemplate: null,
+	id: 'e5a2c8f1-7d43-4b96-a1e0-9c3f6b2d8a74',
+	alias: 'variantLibraryStatesDocType',
+	name: 'Variant Library States',
+	description: null,
+	icon: 'icon-bulleted-list color-green',
+	allowedAsRoot: true,
+	allowedInLibrary: false,
+	variesByCulture: true,
+	variesBySegment: false,
+	isElement: false,
+	hasChildren: false,
+	noAccess: false,
+	parent: null,
+	isFolder: false,
+	properties: [
+		{
+			id: 'pt-158',
+			container: {
+				id: 'f1b7d3a9-2c58-4e06-b9a4-6d0e8c5a3f17',
+			},
+			alias: 'blockListStates',
+			name: 'Block List - States',
+			description: null,
+			dataType: {
+				id: 'd4b8f2a6-3e17-4c95-b0a1-8f6e2c7d9b35',
+			},
+			variesByCulture: false,
+			variesBySegment: false,
+			sortOrder: 0,
+			validation: {
+				mandatory: false,
+				mandatoryMessage: null,
+				regEx: null,
+				regExMessage: null,
+			},
+			appearance: {
+				labelOnTop: false,
+			},
+		},
+	],
+	containers: [
+		{
+			id: 'f1b7d3a9-2c58-4e06-b9a4-6d0e8c5a3f17',
+			parent: null,
+			name: 'Content',
+			type: 'Group',
+			sortOrder: 0,
+		},
+	],
+	allowedDocumentTypes: [],
+	compositions: [],
+	cleanup: {
+		preventCleanup: false,
+		keepAllVersionsNewerThanDays: null,
+		keepLatestVersionPerDayForDays: null,
+	},
+	flags: [],
+};
+
 export const data: Array<UmbMockDocumentTypeModel> = [
 	elementOneElementType,
 	elementTwoElementType,
@@ -529,4 +591,5 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 	blockSingleDocumentType,
 	variantBlockListDocumentType,
 	variantElementElementType,
+	variantLibraryStatesDocumentType,
 ];

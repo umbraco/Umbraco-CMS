@@ -541,10 +541,149 @@ const variantBlockListDocument: UmbMockDocumentModel = {
 	flags: [],
 };
 
+const variantLibraryStatesDocument: UmbMockDocumentModel = {
+	ancestors: [],
+	template: null,
+	id: '3d7a1f5c-8e29-4b64-a0c3-5f9e2b8d4a17',
+	createDate: '2026-04-16 14:00:00.000000',
+	parent: null,
+	documentType: {
+		id: 'e5a2c8f1-7d43-4b96-a1e0-9c3f6b2d8a74',
+		icon: 'icon-bulleted-list color-green',
+	},
+	hasChildren: false,
+	noAccess: false,
+	isProtected: false,
+	isTrashed: false,
+	variants: [
+		{
+			state: 'Published' as UmbDocumentVariantState,
+			publishDate: '2026-04-16 14:05:00.000000',
+			culture: 'en-US',
+			segment: null,
+			name: 'Variant Library States',
+			createDate: '2026-04-16 14:00:00.000000',
+			updateDate: '2026-04-16 14:05:00.000000',
+			id: 'variant-library-states-en-us',
+			flags: [],
+		},
+		{
+			state: 'Draft' as UmbDocumentVariantState,
+			publishDate: null,
+			culture: 'da',
+			segment: null,
+			name: 'Variant Biblioteksstatus',
+			createDate: '2026-04-16 14:00:00.000000',
+			updateDate: '2026-04-16 14:00:00.000000',
+			id: 'variant-library-states-da',
+			flags: [],
+		},
+	],
+	values: [
+		{
+			editorAlias: 'Umbraco.BlockList',
+			alias: 'blockListStates',
+			culture: null,
+			segment: null,
+			value: {
+				contentData: [
+					{
+						contentTypeKey: 'a9c5e3f7-6b12-4d84-9e0f-2b7a4d1c8e65',
+						key: '7c3e9a15-4b82-4d60-8f1a-2e6b0d9c5a43',
+						values: [
+							{
+								editorAlias: 'Umbraco.TextBox',
+								culture: 'en-US',
+								segment: null,
+								alias: 'title',
+								value: 'Local block, not exposed in English',
+							},
+							{
+								editorAlias: 'Umbraco.TextBox',
+								culture: 'da',
+								segment: null,
+								alias: 'title',
+								value: 'Lokal blok, kun eksponeret på dansk',
+							},
+						],
+					},
+					{
+						contentTypeKey: 'b818bb55-31e1-4537-9c42-17471a176089',
+						key: '9e5b1d37-6a04-4c28-b7f3-4d8a2c0e6b19',
+						values: [
+							{
+								editorAlias: 'Umbraco.TextBox',
+								culture: null,
+								segment: null,
+								alias: 'title',
+								value: 'Invariant local block, never exposed',
+							},
+						],
+					},
+				],
+				settingsData: [],
+				expose: [
+					{
+						contentKey: '7c3e9a15-4b82-4d60-8f1a-2e6b0d9c5a43',
+						culture: 'da',
+						segment: null,
+					},
+				],
+				layout: {
+					'Umbraco.BlockList': [
+						{
+							key: '7c3e9a15-4b82-4d60-8f1a-2e6b0d9c5a43',
+							contentKey: '7c3e9a15-4b82-4d60-8f1a-2e6b0d9c5a43',
+							settingsKey: null,
+						},
+						{
+							key: '9e5b1d37-6a04-4c28-b7f3-4d8a2c0e6b19',
+							contentKey: '9e5b1d37-6a04-4c28-b7f3-4d8a2c0e6b19',
+							settingsKey: null,
+						},
+						{
+							key: 'variant-library-states-draft',
+							contentKey: 'library-variant-element-draft-id',
+							settingsKey: null,
+							isExternalContent: true,
+						},
+						{
+							key: 'variant-library-states-pending-changes',
+							contentKey: 'library-variant-element-pending-changes-id',
+							settingsKey: null,
+							isExternalContent: true,
+						},
+						{
+							key: 'variant-library-states-published-both',
+							contentKey: 'library-variant-element-published-both-id',
+							settingsKey: null,
+							isExternalContent: true,
+						},
+						{
+							key: 'variant-library-states-missing-da',
+							contentKey: 'library-variant-element-missing-da-id',
+							settingsKey: null,
+							isExternalContent: true,
+						},
+						{
+							key: 'variant-library-states-empty-variants',
+							contentKey: 'library-variant-element-empty-variants-id',
+							settingsKey: null,
+							isExternalContent: true,
+						},
+					],
+				},
+			},
+		},
+	],
+	flags: [],
+};
+
 export const data: Array<UmbMockDocumentModel> = [
 	blockGridDocument,
 	blockListDocument,
 	blockSingleDocument,
 	richTextEditorDocument,
 	variantBlockListDocument,
+	variantLibraryStatesDocument,
 ];
