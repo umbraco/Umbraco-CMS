@@ -2264,9 +2264,7 @@ export class ContentUiHelper extends UiBaseLocators {
   }
 
   async switchLanguage(languageName: string) {
-    // :popover-open is a binary flag the native Popover API sets the instant it opens/closes, unlike
-    // isVisible()/toBeHidden() on a descendant, which can read a stale value mid-animation - checking it
-    // makes it safe to re-click the (non-idempotent) toggle below without risking flipping a correct state.
+    // :popover-open avoids a stale isVisible() read flipping the non-idempotent toggle the wrong way.
     const isPopoverOpen = () => this.contentVariantPopover.evaluate(el => el.matches(':popover-open'));
     const languageOptionLocator = this.contentVariantDropdown.locator('.culture-variant').filter({hasText: languageName});
     await expect(async () => {
@@ -2277,8 +2275,7 @@ export class ContentUiHelper extends UiBaseLocators {
     }).toPass({timeout: ConstantHelper.timeout.medium});
     await this.click(languageOptionLocator);
     await expect(languageOptionLocator).toContainClass('selected');
-    // Selecting an option doesn't reliably auto-close the popover; close it explicitly so a leftover
-    // open popover doesn't intercept clicks elsewhere on the page afterward.
+    // Selecting an option doesn't reliably auto-close the popover; close it explicitly.
     await expect(async () => {
       if (await isPopoverOpen()) {
         await this.click(this.languageToggle);
