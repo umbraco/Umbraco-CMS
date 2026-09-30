@@ -128,14 +128,39 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
 
     protected abstract ILogger<PublishableContentServiceBase<TContent>> Logger { get; }
 
+    /// <summary>
+    ///     Persists the pending changes of a content item, publishing or unpublishing it as its published state dictates.
+    /// </summary>
+    /// <param name="scope">The scope to persist within.</param>
+    /// <param name="content">The content item to persist.</param>
+    /// <param name="eventMessages">The event messages to report to.</param>
+    /// <param name="allLangs">All languages.</param>
+    /// <param name="notificationState">The notification state to pass on to notifications.</param>
+    /// <param name="userId">The identifier of the user performing the operation.</param>
+    /// <param name="includeInvariantForVariant">
+    ///     Whether publishing includes invariant properties of variant content. When <c>null</c>, it is determined by the
+    ///     invariant-for-variant permission of the user identified by <paramref name="userId"/>.
+    /// </param>
+    /// <returns>The result of the operation.</returns>
     protected virtual PublishResult CommitContentChanges(
         ICoreScope scope,
         TContent content,
         EventMessages eventMessages,
         IReadOnlyCollection<ILanguage> allLangs,
         IDictionary<string, object?>? notificationState,
-        int userId)
-        => CommitContentChangesInternal(scope, content, eventMessages, allLangs, notificationState, userId);
+        int userId,
+        bool? includeInvariantForVariant)
+        => CommitContentChangesInternal(
+            scope,
+            content,
+            eventMessages,
+            allLangs,
+            notificationState,
+            userId,
+            branchOne: false,
+            branchRoot: false,
+            raiseSavedNotification: false,
+            includeInvariantForVariant);
 
     protected abstract void DeleteLocked(ICoreScope scope, TContent content, EventMessages evtMsgs);
 
@@ -943,7 +968,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
             // Change state to publishing
             content.PublishedState = PublishedState.Publishing;
 
-            PublishResult result = CommitContentChanges(scope, content, evtMsgs, allLangs, new Dictionary<string, object?>(), userId);
+            PublishResult result = CommitContentChanges(scope, content, evtMsgs, allLangs, new Dictionary<string, object?>(), userId, includeInvariantForVariant: null);
             scope.Complete();
             return result;
         }
@@ -1175,7 +1200,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
                 // We are however unpublishing all cultures, so we will set this to unpublishing.
                 content.UnpublishCulture(culture);
                 content.PublishedState = PublishedState.Unpublishing;
-                PublishResult result = CommitContentChanges(scope, content, evtMsgs, allLangs, savingNotification.State, userId);
+                PublishResult result = CommitContentChanges(scope, content, evtMsgs, allLangs, savingNotification.State, userId, includeInvariantForVariant: null);
                 scope.Complete();
                 return result;
             }
@@ -1189,7 +1214,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
                 var removed = content.UnpublishCulture(culture);
 
                 // Save and publish any changes
-                PublishResult result = CommitContentChanges(scope, content, evtMsgs, allLangs, savingNotification.State, userId);
+                PublishResult result = CommitContentChanges(scope, content, evtMsgs, allLangs, savingNotification.State, userId, includeInvariantForVariant: null);
 
                 scope.Complete();
 
@@ -1262,17 +1287,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
                     }
 
                     _contentRepository.PersistContentSchedule(d, contentSchedule);
-                    PublishResult result = CommitContentChangesInternal(
-                        scope,
-                        d,
-                        evtMsgs,
-                        allLangs.Value,
-                        savingNotification.State,
-                        d.WriterId,
-                        branchOne: false,
-                        branchRoot: false,
-                        raiseSavedNotification: false,
-                        includeInvariantForVariant: true);
+                    PublishResult result = CommitContentChanges(scope, d, evtMsgs, allLangs.Value, savingNotification.State, d.WriterId, includeInvariantForVariant: true);
                     if (result.Success == false)
                     {
                         Logger.LogError(null, "Failed to publish content id={ContentId}, key={ContentKey}, reason={Reason}.", d.Id, d.Key, result.Result);
@@ -1384,17 +1399,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
                     else
                     {
                         _contentRepository.PersistContentSchedule(d, contentSchedule);
-                        result = CommitContentChangesInternal(
-                            scope,
-                            d,
-                            evtMsgs,
-                            allLangs.Value,
-                            savingNotification.State,
-                            d.WriterId,
-                            branchOne: false,
-                            branchRoot: false,
-                            raiseSavedNotification: false,
-                            includeInvariantForVariant: true);
+                        result = CommitContentChanges(scope, d, evtMsgs, allLangs.Value, savingNotification.State, d.WriterId, includeInvariantForVariant: true);
                     }
 
                     if (result.Success == false)
