@@ -9,6 +9,25 @@ import {
 } from './catalog.js';
 import { MEDIA_TYPE_IDS } from './ids.js';
 
+const PHOTO_FILE_NAMES = new Set([
+	'hero-little-ones',
+	'lo-article-1',
+	'lo-article-3',
+	'lo-article-4',
+	'lo-product-8',
+	'lo-product-1',
+	'lo-product-2',
+	'lo-product-3',
+	'lo-product-5',
+	'lo-product-10',
+	'lo-article-2',
+	'gu-product-2',
+	'gu-product-7',
+	'gu-article-1',
+	'gu-article-3',
+	'hero-outdoor-shop',
+]);
+
 const CREATE_DATE = '2026-01-15 10:00:00';
 
 const folder = (id: string, name: string, hasChildren = true): UmbMockMediaModel => ({
@@ -48,7 +67,7 @@ const image = (id: string, parentId: string, name: string, fileName: string): Um
 			value: {
 				focalPoint: { left: 0.5, top: 0.5 },
 				crops: [],
-				src: `/umbraco/backoffice/assets/mbcs-${fileName}.svg`,
+				src: `/umbraco/backoffice/assets/mbcs-${fileName}.${PHOTO_FILE_NAMES.has(fileName) ? 'jpg' : 'svg'}`,
 			},
 		},
 	],

@@ -94,12 +94,14 @@ const documentType = (options: UmbMbcsDocumentTypeOptions): UmbMockDocumentTypeM
 	flags: [],
 });
 
-const seoTab = tab('SEO');
+const seoTab = tab('SEO', 10);
 const pageContentTab = tab('Content');
-const siteTab = tab('Site');
+const siteTab = tab('Site', 1);
 const contentPageTab = tab('Content');
 const productsTab = tab('Content');
 const articlesTab = tab('Content');
+const storesTab = tab('Content');
+const storeTab = tab('Store');
 const productTab = tab('Product');
 const articleTab = tab('Article');
 const heroBlockTab = tab('Content');
@@ -181,7 +183,12 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			{ alias: 'siteName', name: 'Site name', dataTypeId: textstring, container: siteTab.id, varies: true },
 			{ alias: 'logo', name: 'Logo', dataTypeId: mediaPicker, container: siteTab.id },
 		],
-		allowedChildren: [DOCUMENT_TYPE_IDS.contentPage, DOCUMENT_TYPE_IDS.products, DOCUMENT_TYPE_IDS.articles],
+		allowedChildren: [
+			DOCUMENT_TYPE_IDS.contentPage,
+			DOCUMENT_TYPE_IDS.products,
+			DOCUMENT_TYPE_IDS.articles,
+			DOCUMENT_TYPE_IDS.stores,
+		],
 		compositions: [DOCUMENT_TYPE_IDS.seoComposition, DOCUMENT_TYPE_IDS.pageContentComposition],
 	}),
 	documentType({
@@ -200,12 +207,6 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				varies: true,
 			},
 			{ alias: 'heroImage', name: 'Image', dataTypeId: mediaPicker, container: contentPageTab.id },
-			{
-				alias: 'umbracoNaviHide',
-				name: 'Hide from navigation',
-				dataTypeId: toggle,
-				container: contentPageTab.id,
-			},
 		],
 		allowedChildren: [DOCUMENT_TYPE_IDS.contentPage],
 		compositions: [DOCUMENT_TYPE_IDS.seoComposition, DOCUMENT_TYPE_IDS.pageContentComposition],
@@ -307,6 +308,40 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				name: 'Related products',
 				dataTypeId: DATA_TYPE_IDS.productPicker,
 				container: articleTab.id,
+			},
+		],
+		compositions: [DOCUMENT_TYPE_IDS.seoComposition],
+	}),
+	documentType({
+		id: DOCUMENT_TYPE_IDS.stores,
+		alias: 'stores',
+		name: 'Stores',
+		icon: 'icon-store',
+		containers: [storesTab],
+		properties: [
+			{ alias: 'title', name: 'Title', dataTypeId: textstring, container: storesTab.id, varies: true },
+			{ alias: 'intro', name: 'Intro', dataTypeId: textarea, container: storesTab.id, varies: true },
+			{ alias: 'heroImage', name: 'Hero image', dataTypeId: mediaPicker, container: storesTab.id },
+		],
+		allowedChildren: [DOCUMENT_TYPE_IDS.store],
+		compositions: [DOCUMENT_TYPE_IDS.seoComposition, DOCUMENT_TYPE_IDS.pageContentComposition],
+		collection: DATA_TYPE_IDS.storesCollection,
+	}),
+	documentType({
+		id: DOCUMENT_TYPE_IDS.store,
+		alias: 'store',
+		name: 'Store',
+		icon: 'icon-pin-location',
+		containers: [storeTab],
+		properties: [
+			{ alias: 'address', name: 'Address', dataTypeId: textarea, container: storeTab.id, varies: true },
+			{ alias: 'phone', name: 'Phone', dataTypeId: textstring, container: storeTab.id },
+			{
+				alias: 'openingHours',
+				name: 'Opening hours',
+				dataTypeId: textarea,
+				container: storeTab.id,
+				varies: true,
 			},
 		],
 		compositions: [DOCUMENT_TYPE_IDS.seoComposition],

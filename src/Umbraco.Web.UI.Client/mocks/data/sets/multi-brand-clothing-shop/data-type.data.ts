@@ -249,6 +249,18 @@ export const data: Array<UmbMockDataTypeModel> = [
 		layouts: ['table'],
 		tabName: 'Articles',
 	}),
+	collection(DATA_TYPE_IDS.storesCollection, 'Stores Collection', {
+		pageSize: 10,
+		orderBy: 'name',
+		orderDirection: 'asc',
+		columns: [
+			{ alias: 'address', header: 'Address', isSystem: false },
+			{ alias: 'phone', header: 'Phone', isSystem: false },
+			{ alias: 'updateDate', header: 'Last edited', isSystem: true },
+		],
+		layouts: ['table', 'grid'],
+		tabName: 'Stores',
+	}),
 	dataType(
 		DATA_TYPE_IDS.pageContentBlockGrid,
 		'Page Content – Block Grid',

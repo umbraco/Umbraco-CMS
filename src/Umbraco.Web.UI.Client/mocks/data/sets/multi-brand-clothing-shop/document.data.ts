@@ -35,6 +35,7 @@ import {
 } from './document-values.js';
 import { AREA_KEYS, CULTURES, CULTURE_DA, CULTURE_EN, DATA_TYPE_IDS, DOCUMENT_TYPE_IDS, mbcsId } from './ids.js';
 import { littleOnesProducts, outdoorShopProducts, type UmbMbcsProductRow } from './products.data.js';
+import { littleOnesStores, outdoorShopStores, type UmbMbcsStoreRow } from './stores.data.js';
 
 const CREATE_DATE = '2026-01-15T10:00:00.000Z';
 const DAY_IN_MS = 24 * 60 * 60 * 1000;
@@ -43,6 +44,8 @@ const DOCUMENT_TYPE_ICONS = {
 	siteRoot: 'icon-home',
 	contentPage: 'icon-document',
 	products: 'icon-shopping-basket-alt-2',
+	stores: 'icon-store',
+	store: 'icon-pin-location',
 	product: 'icon-tag',
 	articles: 'icon-newspaper-alt',
 	article: 'icon-article',
@@ -54,6 +57,7 @@ let pageCounter = 0;
 const rootId = (site: UmbMbcsSiteCode) => mbcsId('document', site === 'LO' ? 1 : 2);
 const productsNodeId = (site: UmbMbcsSiteCode) => mbcsId('document', site === 'LO' ? 3 : 4);
 const articlesNodeId = (site: UmbMbcsSiteCode) => mbcsId('document', site === 'LO' ? 5 : 6);
+const storesNodeId = (site: UmbMbcsSiteCode) => mbcsId('document', site === 'LO' ? 7 : 8);
 const productId = (site: UmbMbcsSiteCode, number: number) =>
 	mbcsId('document', (site === 'LO' ? 10000 : 20000) + number);
 const articleId = (site: UmbMbcsSiteCode, number: number) =>
@@ -313,13 +317,41 @@ const buildArticles = (
 		});
 	});
 
+const buildStores = (
+	site: UmbMbcsSiteCode,
+	rows: Array<UmbMbcsStoreRow>,
+	parentId: string,
+	ancestorIds: Array<string>,
+): Array<UmbMockDocumentModel> =>
+	rows.map(([name, address, phone], index) => {
+		const siteName = SITES[site].name;
+		const description = `Visit ${siteName} in ${name}.`;
+
+		return createDocument({
+			id: mbcsId('document', (site === 'LO' ? 50000 : 60000) + index + 1),
+			parentId,
+			ancestorIds,
+			documentTypeId: DOCUMENT_TYPE_IDS.store,
+			icon: DOCUMENT_TYPE_ICONS.store,
+			name,
+			hasChildren: false,
+			updateDate: '2026-09-01T10:00:00.000Z',
+			values: [
+				...textareaValue('address', address),
+				...invariantTextValue('phone', phone),
+				...textareaValue('openingHours', 'Mon–Fri 10:00–18:00, Sat 10:00–16:00, Sun closed'),
+				...seoValues(siteName, `${siteName} ${name}`, description),
+			],
+		});
+	});
+
 // ---------------------------------------------------------------------------------------------------------------------
 // Pages
 // ---------------------------------------------------------------------------------------------------------------------
 
 interface UmbMbcsPage {
 	name: string;
-	kind?: 'products' | 'articles';
+	kind?: 'products' | 'articles' | 'stores';
 	hidden?: boolean;
 	children?: Array<UmbMbcsPage>;
 }
@@ -327,15 +359,23 @@ interface UmbMbcsPage {
 const page = (name: string, children?: Array<UmbMbcsPage>, hidden = false): UmbMbcsPage => ({ name, children, hidden });
 const products = (): UmbMbcsPage => ({ name: 'Products', kind: 'products' });
 const articles = (): UmbMbcsPage => ({ name: 'Articles', kind: 'articles' });
+const stores = (): UmbMbcsPage => ({ name: 'Stores', kind: 'stores' });
 
 const LITTLE_ONES_PAGES: Array<UmbMbcsPage> = [
 	products(),
 	articles(),
+	stores(),
 	page('New Customer', [page('Baby (0–2 years)'), page('Toddler (2–6 years)'), page('Big Kids (6–12 years)')]),
 	page('Sale', [page('Up to 50% Off'), page('Last Sizes')]),
-	page('Gift Guide', [page('Baby Shower Gifts'), page('Birthday Gifts'), page('Christmas Gifts'), page('Gift Cards')]),
-	page('Size Guide', [page('Baby Sizes (50–92 cm)'), page('Kids Sizes (98–152 cm)'), page('Shoe Sizes (EU 18–38)')]),
-	page('Pre-loved', [page('How Take-Back Works'), page('Shop Pre-loved')]),
+	page('Guides', [
+		page('Gift Guide', [
+			page('Baby Shower Gifts'),
+			page('Birthday Gifts'),
+			page('Christmas Gifts'),
+			page('Gift Cards'),
+		]),
+		page('Size Guide', [page('Baby Sizes (50–92 cm)'), page('Kids Sizes (98–152 cm)'), page('Shoe Sizes (EU 18–38)')]),
+	]),
 	page('Customer Service', [
 		page('Shipping & Delivery'),
 		page('Returns & Exchanges'),
@@ -343,7 +383,6 @@ const LITTLE_ONES_PAGES: Array<UmbMbcsPage> = [
 		page('FAQ'),
 		page('Contact Us'),
 	]),
-	page('Stores', [page('Copenhagen'), page('Aarhus'), page('Odense')]),
 	page('About Us', [page('Our Story'), page('Sustainability'), page('Careers')]),
 	page('My Account', [page('Order History'), page('Wishlist'), page('Addresses')], true),
 	page('Basket', [page('Checkout', [page('Order Confirmation')])], true),
@@ -353,10 +392,17 @@ const LITTLE_ONES_PAGES: Array<UmbMbcsPage> = [
 const OUTDOOR_SHOP_PAGES: Array<UmbMbcsPage> = [
 	products(),
 	articles(),
+	stores(),
 	page('New Customer', [page('Women'), page('Men'), page('Unisex')]),
 	page('Sale', [page('Up to 50% Off'), page('Outlet')]),
 	page('Lookbook', [page('Autumn/Winter 2026'), page('Workwear Edit'), page('Weekend Outdoors')]),
-	page('Size Guide', [page("Women's Sizes (EU 32–48)"), page("Men's Sizes (EU 44–58)"), page('Shoe Sizes (EU 36–47)')]),
+	page('Guides', [
+		page('Size Guide', [
+			page("Women's Sizes (EU 32–48)"),
+			page("Men's Sizes (EU 44–58)"),
+			page('Shoe Sizes (EU 36–47)'),
+		]),
+	]),
 	page('Repair Service', [page('Book a Repair'), page('Care Instructions'), page('Lifetime Guarantee')]),
 	page('Customer Service', [
 		page('Shipping & Delivery'),
@@ -366,7 +412,6 @@ const OUTDOOR_SHOP_PAGES: Array<UmbMbcsPage> = [
 		page('FAQ'),
 		page('Contact Us'),
 	]),
-	page('Stores', [page('Copenhagen'), page('Aarhus'), page('Aalborg')]),
 	page('About Us', [page('Our Story'), page('Sustainability'), page('Careers'), page('Press')]),
 	page(
 		'My Account',
@@ -473,6 +518,7 @@ const buildPages = (
 	const siteName = SITES[site].name;
 	const productRows = site === 'LO' ? littleOnesProducts : outdoorShopProducts;
 	const articleRows = site === 'LO' ? littleOnesArticles : outdoorShopArticles;
+	const storeRows = site === 'LO' ? littleOnesStores : outdoorShopStores;
 	const isFirstLevel = ancestorIds.length === 0;
 
 	pages.forEach((entry, index) => {
@@ -482,19 +528,37 @@ const buildPages = (
 				? productsNodeId(site)
 				: entry.kind === 'articles'
 					? articlesNodeId(site)
-					: mbcsId('document', (site === 'LO' ? 100 : 500) + ++pageCounter);
+					: entry.kind === 'stores'
+						? storesNodeId(site)
+						: mbcsId('document', (site === 'LO' ? 100 : 500) + ++pageCounter);
 		const intro = `Everything from ${siteName}, in one place.`;
 
 		if (entry.kind) {
 			const isProducts = entry.kind === 'products';
+			const isStores = entry.kind === 'stores';
+			const listing = isProducts
+				? {
+						documentTypeId: DOCUMENT_TYPE_IDS.products,
+						icon: DOCUMENT_TYPE_ICONS.products,
+						collectionDataTypeId: DATA_TYPE_IDS.productsCollection,
+					}
+				: isStores
+					? {
+							documentTypeId: DOCUMENT_TYPE_IDS.stores,
+							icon: DOCUMENT_TYPE_ICONS.stores,
+							collectionDataTypeId: DATA_TYPE_IDS.storesCollection,
+						}
+					: {
+							documentTypeId: DOCUMENT_TYPE_IDS.articles,
+							icon: DOCUMENT_TYPE_ICONS.articles,
+							collectionDataTypeId: DATA_TYPE_IDS.articlesCollection,
+						};
 			output.push(
 				createDocument({
 					id,
 					parentId,
 					ancestorIds: ancestors,
-					documentTypeId: isProducts ? DOCUMENT_TYPE_IDS.products : DOCUMENT_TYPE_IDS.articles,
-					icon: isProducts ? DOCUMENT_TYPE_ICONS.products : DOCUMENT_TYPE_ICONS.articles,
-					collectionDataTypeId: isProducts ? DATA_TYPE_IDS.productsCollection : DATA_TYPE_IDS.articlesCollection,
+					...listing,
 					name: entry.name,
 					hasChildren: true,
 					updateDate: '2026-09-01T10:00:00.000Z',
@@ -510,7 +574,9 @@ const buildPages = (
 			output.push(
 				...(isProducts
 					? buildProducts(site, productRows, id, [...ancestors, id])
-					: buildArticles(site, articleRows, productRows, id, [...ancestors, id])),
+					: isStores
+						? buildStores(site, storeRows, id, [...ancestors, id])
+						: buildArticles(site, articleRows, productRows, id, [...ancestors, id])),
 			);
 			return;
 		}
@@ -530,7 +596,6 @@ const buildPages = (
 					...textValue('herotitle', entry.name),
 					...textareaValue('heroDescription', `Everything you need to know about ${entry.name.toLowerCase()}.`),
 					...mediaPickerValue('heroImage', heroMediaId(site)),
-					...toggleValue('umbracoNaviHide', hidden),
 					...(isFirstLevel ? blockGridValue('content', landingBlocks(site, entry.name, index, hidden)) : []),
 					...seoValues(siteName, entry.name, `Everything you need to know about ${entry.name.toLowerCase()}.`, {
 						excludeFromSitemap: hidden,
