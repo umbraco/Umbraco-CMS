@@ -734,11 +734,13 @@ export class UiBaseLocators extends BasePage {
 
   async doesTreeItemHaveTheCorrectIcon(name: string, icon: string) {
     // Exact-label match, unlike a text-content filter which would also match ancestors.
+    // Scoped to #icon-container so the item's own icon is checked, not one rendered by its children.
     return await this.isVisible(
       this.getMenuItemByLabel(name)
-        .locator("umb-icon")
-        .locator('[name="' + icon + '"]')
-        .first(),
+        .first()
+        .locator("#icon-container umb-icon")
+        .first()
+        .and(this.page.locator(`[name="${icon}"]`)),
     );
   }
 
